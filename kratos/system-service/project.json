@@ -1,0 +1,85 @@
+{
+  "name": "system-service",
+  "root": "kratos/system-service",
+  "targets": {
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "go generate ./...",
+          "go mod tidy"
+        ],
+        "parallel": false
+      }
+    },
+
+    "dep": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "buf dep update"
+        ],
+        "parallel": false
+      }
+    },
+
+    "ent": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "go run -mod=mod entgo.io/ent/cmd/ent new --target=internal/data/ent/schema {args.Entity}"
+        ],
+        "parallel": false
+      }
+    },
+
+    "config": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "buf generate --template buf.gen.conf.yaml"
+        ],
+        "parallel": false
+      }
+    },
+
+    "api": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "buf format -w",
+          "buf generate --template buf.gen.api.yaml"
+        ],
+        "parallel": false
+      }
+    },
+
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "DEPLOY_ENV=dev kratos run"
+        ],
+        "parallel": false
+      }
+    },
+
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "mkdir -p bin/",
+          "export VERSION=$(git describe --tags --always) && go build -ldflags \"-X main.Version=$VERSION\" -o ./bin/ ./..."
+        ],
+        "parallel": false
+      }
+    }
+  }
+}

@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="764cc3a6-150a-4d48-9f12-48c452eecb82" name="Changes" comment="init" />
+    <list default="true" id="764cc3a6-150a-4d48-9f12-48c452eecb82" name="Changes" comment="chore: base">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,7 +19,7 @@
     </option>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="1" />
+    <option name="cachedIndexableFilesCount" value="89" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="GOROOT" url="file://$USER_HOME$/go/app" />
@@ -30,6 +32,16 @@
     &quot;assignee&quot;: &quot;DrReMain&quot;
   }
 }</component>
+  <component name="GitRewordedCommitMessages">
+    <option name="commitMessagesMapping">
+      <RewordedCommitMessageMapping>
+        <option name="originalMessage" value="chore: kratos base" />
+        <option name="rewordedMessage" value="chore: kratos base" />
+      </RewordedCommitMessageMapping>
+    </option>
+    <option name="currentCommit" value="1" />
+    <option name="onto" value="430b1aac8e48e34b2ec0f610af5e6a90c55dc4f9" />
+  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/DrReMain/cyber-ecosystem.git&quot;,
@@ -38,6 +50,10 @@
 }</component>
   <component name="HttpClientOnboardingState">{
   &quot;isOnboardingCommentShown&quot;: true
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
 }</component>
   <component name="McpProjectServerCommands">
     <commands />
@@ -55,7 +71,21 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Go Build.cyber-ecosystem.executor&quot;: &quot;Run&quot;,
+    &quot;Go Build.go build github.com/DrReMain/cyber-ecosystem/kratos/system-service/cmd/app.executor&quot;: &quot;Debug&quot;,
+    &quot;Go Build.system-service.executor&quot;: &quot;Debug&quot;,
+    &quot;HTTP Request.generated-requests | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #2.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #3.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #4.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #5.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.generated-requests | #6.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Nx.go-shared:tidy.executor&quot;: &quot;Run&quot;,
+    &quot;Nx.system-service:api.executor&quot;: &quot;Run&quot;,
+    &quot;Nx.system-service:config.executor&quot;: &quot;Run&quot;,
+    &quot;Nx.system-service:dep.executor&quot;: &quot;Run&quot;,
+    &quot;Nx.system-service:generate.executor&quot;: &quot;Run&quot;,
+    &quot;Nx.tools:init.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
@@ -64,22 +94,124 @@
     &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Shell Script.system-service api.executor&quot;: &quot;Run&quot;,
+    &quot;Shell Script.system-service generate.executor&quot;: &quot;Run&quot;,
+    &quot;dev.nx.console.last_ai_configure_notification_timestamp&quot;: &quot;1773395591925&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
     &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/shijiao&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;22.12.0&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;22.12.0&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/shijiao/Desktop/workspace/cyber-ecosystem/kratos/system-service/api/v1&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;,
+      &quot;mysql&quot;
+    ],
+    &quot;dev.nx.console.project_details_files&quot;: [
+      &quot;/Users/shijiao/Desktop/workspace/cyber-ecosystem/clients/admin/project.json&quot;,
+      &quot;/Users/shijiao/Desktop/workspace/cyber-ecosystem/clients/admin/package.json&quot;,
+      &quot;/Users/shijiao/Desktop/workspace/cyber-ecosystem/servers/system-service/project.json&quot;,
+      &quot;/Users/shijiao/Desktop/workspace/cyber-ecosystem/servers/system-service/package.json&quot;,
+      &quot;/Users/shijiao/Desktop/workspace/cyber-ecosystem/tools/project.json&quot;,
+      &quot;/Users/shijiao/Desktop/workspace/cyber-ecosystem/tools/package.json&quot;
+    ]
   }
 }</component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1774512019327" />
-    <option name="spentUsd" value="0.109291896" />
+    <option name="spentUsd" value="0.47514394" />
   </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="0" />
+    <option name="suspendCountdown" value="8" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/kratos/system-service/api/v1" />
+      <recent name="$PROJECT_DIR$/kratos/system-service/api/common" />
+      <recent name="$PROJECT_DIR$/kratos/system-service/internal/biz" />
+      <recent name="$PROJECT_DIR$/packages/go-shared/pkg/encoder" />
+      <recent name="$PROJECT_DIR$/servers/system-service/cmd/server" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs" />
+      <recent name="$PROJECT_DIR$/go-shared/kratos" />
+      <recent name="$PROJECT_DIR$/go-shared" />
+      <recent name="$PROJECT_DIR$/go-shared/infra" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationStatuses">
+      <map>
+        <entry key="HttpClient.HttpRequestRunConfigurationType">
+          <value>
+            <map>
+              <entry key="generated-requests | #1" value="STOPPED" />
+              <entry key="generated-requests | #3" value="STOPPED" />
+              <entry key="generated-requests | #4" value="STOPPED" />
+              <entry key="generated-requests | #5" value="STOPPED" />
+              <entry key="generated-requests | #6" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="Go Build.system-service">
+    <configuration name="system-service" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="cyber-ecosystem" />
+      <working_directory value="$PROJECT_DIR$/kratos/system-service" />
+      <parameters value="-conf ./configs" />
+      <envs>
+        <env name="DEPLOY_ENV" value="dev" />
+      </envs>
+      <kind value="PACKAGE" />
+      <package value="github.com/DrReMain/cyber-ecosystem/kratos/system-service/cmd/app" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="system-service api" type="ShConfigurationType">
+      <option name="SCRIPT_TEXT" value="./nx run system-service:api" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/zsh" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="false" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="system-service generate" type="ShConfigurationType">
+      <option name="SCRIPT_TEXT" value="./nx run system-service:generate" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/zsh" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="false" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Go Build.system-service" />
+      <item itemvalue="Shell Script.system-service api" />
+      <item itemvalue="Shell Script.system-service generate" />
+    </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -102,6 +234,11 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="dependencySupport" implementationName="javascript:npm:nx" />
+    <option featureType="dependencySupport" implementationName="executable:kubectl" />
+  </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
@@ -115,6 +252,28 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init" />
-    <option name="LAST_COMMIT_MESSAGE" value="init" />
+    <MESSAGE value="chore: nx init" />
+    <MESSAGE value="refactor: init" />
+    <MESSAGE value="refactor: kratos base" />
+    <MESSAGE value="chore: finish proto" />
+    <MESSAGE value="chore: gowork migrate to single" />
+    <MESSAGE value="chore: kratos base" />
+    <MESSAGE value="chore: proto design" />
+    <MESSAGE value="chore: base" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: base" />
+  </component>
+  <component name="VgoModernizerVersionTracker">
+    <upgrades>
+      <map>
+        <entry key="$PROJECT_DIR$/go-shared/infra/orm/ent/go.mod">
+          <value>
+            <VersionUpgradeInfo>
+              <version>1.26</version>
+              <timestamp>1773476750275</timestamp>
+            </VersionUpgradeInfo>
+          </value>
+        </entry>
+      </map>
+    </upgrades>
   </component>
 </project>
