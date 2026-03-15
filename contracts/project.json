@@ -1,0 +1,18 @@
+{
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "contracts",
+  "root": "contracts",
+  "projectType": "library",
+  "targets": {
+    "proto": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}/proto",
+        "commands": [
+          "buf generate --template buf.gen.yaml --path common"
+        ],
+        "parallel": true
+      }
+    }
+  }
+}

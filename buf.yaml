@@ -1,0 +1,20 @@
+version: v2
+modules:
+  - path: contracts/proto
+    name: buf.build/DrReMain/proto
+
+  - path: examples/template1/api
+    name: buf.build/DrReMain/template1-api
+  - path: examples/template2/api
+    name: buf.build/DrReMain/template2-api
+
+deps:
+  - buf.build/googleapis/googleapis
+  - buf.build/bufbuild/protovalidate
+  - buf.build/gnostic/gnostic
+lint:
+  use:
+    - STANDARD
+breaking:
+  use:
+    - FILE

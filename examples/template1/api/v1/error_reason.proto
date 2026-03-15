@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package api.template1.v1;
+
+import "errors/errors.proto";
+
+option go_package = "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1;template1V1";
+
+enum ErrorReason {
+  option (errors.default_code) = 500;
+
+  DATA_CONFLICT = 0 [(errors.code) = 409];
+}

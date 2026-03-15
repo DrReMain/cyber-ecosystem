@@ -1,0 +1,20 @@
+:root {
+  --background: 0 0% 100%;
+  --background-deep: 216 20.11% 95.4%;
+  --foreground: 210 6% 21%;
+  --border: 0 0% 94%;
+}
+
+.dark {
+  --background: 222.32 10.43% 12.27%;
+  --background-deep: 220 13.06% 9%;
+  --foreground: 0 0% 95%;
+  --border: 220 5% 23%;
+}
+
+html,
+body {
+  background-color: hsl(var(--background-deep));
+  color: hsl(var(--foreground));
+  overscroll-behavior: none;
+}

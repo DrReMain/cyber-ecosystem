@@ -1,0 +1,7 @@
+- error message
+    - panic (recovery.Recovery()) (nil:UNKNOWN - unknown request error)
+    - marshal (proto: CODEC - body unmarshal proto .....)
+    - validate (validate.ProtoValidate(validate.UseProtoMessage))
+    - ent (EntErrorHandler)
+    - biz errors
+    - grpc connect (last connection error: connection error: desc = \"transport: Error while dialing: dial tcp 127.0.0.1:9001: connect: connection refused\")

@@ -1,0 +1,137 @@
+services:
+  # ==================== PostgreSQL ====================
+  postgres:
+    image: postgres:18.3-trixie
+    container_name: cyber-ecosystem-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cyber-ecosystem-network
+
+  # ==================== Redis ====================
+  redis:
+    image: redis:7-alpine
+    container_name: cyber-ecosystem-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cyber-ecosystem-network
+
+  # ==================== Jaeger ====================
+  jaeger:
+    image: jaegertracing/all-in-one:1.76.0
+    container_name: cyber-ecosystem-jaeger
+    restart: unless-stopped
+    environment:
+      # Collector
+      COLLECTOR_ZIPKIN_HOST_PORT: :9411
+      COLLECTOR_OTLP_ENABLED: "true"
+      # prod -> Elasticsearch or Cassandra
+      SPAN_STORAGE_TYPE: memory
+      LOG_LEVEL: info
+    ports:
+      # UI
+      - "16686:16686"
+      # Collector - HTTP
+      - "14268:14268"
+      # Collector - gRPC
+      - "14250:14250"
+      # OTLP gRPC
+      - "4317:4317"
+      # OTLP HTTP
+      - "4318:4318"
+      # Zipkin compatibility port
+      - "9411:9411"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:16686/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cyber-ecosystem-network
+
+  # ==================== Prometheus ====================
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    container_name: cyber-ecosystem-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cyber-ecosystem-network
+
+  # ==================== Grafana ====================
+  grafana:
+    image: grafana/grafana:11.5.2
+    container_name: cyber-ecosystem-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_ROOT_URL: "http://localhost:3000"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - prometheus
+    networks:
+      - cyber-ecosystem-network
+
+networks:
+  cyber-ecosystem-network:
+    driver: bridge
+    name: cyber-ecosystem-network
+
+volumes:
+  postgres_data:
+    name: cyber-ecosystem-postgres-data
+  redis_data:
+    name: cyber-ecosystem-redis-data
+  prometheus_data:
+    name: cyber-ecosystem-prometheus-data
+  grafana_data:
+    name: cyber-ecosystem-grafana-data

@@ -1,0 +1,265 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: BlogService API
+    version: 0.0.1
+paths:
+    /api/v1/blog:
+        get:
+            tags:
+                - BlogService
+            operationId: BlogService_QueryBlog
+            parameters:
+                - name: page.page_no
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.page_size
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.created_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.created_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+                - name: title
+                  in: query
+                  schema:
+                    type: string
+                - name: published_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: published_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: order_by
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.template1.v1.QueryBlogResponse'
+        post:
+            tags:
+                - BlogService
+            operationId: BlogService_CreateBlog
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.template1.v1.CreateBlogRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.template1.v1.CreateBlogResponse'
+    /api/v1/blog/delete-batch:
+        post:
+            tags:
+                - BlogService
+            operationId: BlogService_DeleteBatchBlog
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.template1.v1.DeleteBatchBlogRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.template1.v1.DeleteBatchBlogResponse'
+    /api/v1/blog/{id}:
+        get:
+            tags:
+                - BlogService
+            operationId: BlogService_GetBlog
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.template1.v1.GetBlogResponse'
+        put:
+            tags:
+                - BlogService
+            operationId: BlogService_UpdateBlog
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.template1.v1.UpdateBlogRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.template1.v1.UpdateBlogResponse'
+        delete:
+            tags:
+                - BlogService
+            operationId: BlogService_DeleteBlog
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.template1.v1.DeleteBlogResponse'
+components:
+    schemas:
+        api.template1.v1.CreateBlogRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+                content:
+                    type: string
+                published_at:
+                    type: string
+                    format: date-time
+        api.template1.v1.CreateBlogResponse:
+            type: object
+            properties: {}
+        api.template1.v1.DeleteBatchBlogRequest:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: string
+        api.template1.v1.DeleteBatchBlogResponse:
+            type: object
+            properties:
+                count:
+                    type: integer
+                    format: int32
+        api.template1.v1.DeleteBlogResponse:
+            type: object
+            properties: {}
+        api.template1.v1.GetBlogResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                title:
+                    type: string
+                content:
+                    type: string
+                published_at:
+                    type: string
+                    format: date-time
+        api.template1.v1.QueryBlogResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.template1.v1.GetBlogResponse'
+        api.template1.v1.UpdateBlogRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                published_at:
+                    type: string
+                    format: date-time
+                fields_mask:
+                    type: array
+                    items:
+                        type: string
+        api.template1.v1.UpdateBlogResponse:
+            type: object
+            properties: {}
+        common.PageResponse:
+            type: object
+            properties:
+                page_no:
+                    type: integer
+                    format: int32
+                page_size:
+                    type: integer
+                    format: int32
+                total:
+                    type: integer
+                    format: int32
+                more:
+                    type: boolean
+tags:
+    - name: BlogService

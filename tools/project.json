@@ -1,13 +1,13 @@
 {
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
   "name": "tools",
   "root": "tools",
   "targets": {
-    "init": {
+    "go:init": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          ": 初始化Golang相关命令行工具和插件",
           "go install github.com/bufbuild/buf/cmd/buf@latest",
           "go install github.com/go-kratos/kratos/cmd/kratos/v2@latest",
           "go install google.golang.org/protobuf/cmd/protoc-gen-go@latest",
@@ -19,26 +19,116 @@
         "parallel": false
       }
     },
-
-    "tidy": {
+    "go:tidy": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "commands": [
-          "go mod tidy"
-        ],
-        "parallel": false
+        "command": "go mod tidy"
       }
     },
-
-    "kratos_new": {
+    "buf:dep": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "commands": [
-          "cd kratos && kratos new {args.name} -r https://github.com/go-kratos/kratos-layout.git"
-        ],
-        "parallel": false
+        "command": "buf dep update"
+      }
+    },
+    "buf:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf format -w"
+      }
+    },
+    "buf:lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf lint"
+      }
+    },
+    "docker:up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose up -d"
+      }
+    },
+    "docker:down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose down"
+      }
+    },
+    "docker:logs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose logs -f"
+      }
+    },
+    "docker:ps": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose ps"
+      }
+    },
+    "docker:restart": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose restart"
+      }
+    },
+    "docker:clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose down -v --remove-orphans"
+      }
+    },
+    "docker:postgres": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose up -d postgres"
+      }
+    },
+    "docker:redis": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose up -d redis"
+      }
+    },
+    "docker:jaeger": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose up -d jaeger"
+      }
+    },
+    "docker:prometheus": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose up -d prometheus"
+      }
+    },
+    "docker:grafana": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose up -d grafana"
+      }
+    },
+    "docker:monitoring": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/tools/docker",
+        "command": "docker compose up -d prometheus grafana"
       }
     }
   }

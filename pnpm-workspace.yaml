@@ -1,2 +1,8 @@
 packages:
   - clients/admin
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+
+autoInstallPeers: true

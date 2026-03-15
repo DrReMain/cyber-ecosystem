@@ -1,0 +1,198 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ReadingService API
+    version: 0.0.1
+paths:
+    /api/v1/reading/blog:
+        get:
+            tags:
+                - ReadingService
+            operationId: ReadingService_QueryBlog
+            parameters:
+                - name: page.page_no
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.page_size
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.created_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.created_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+                - name: title
+                  in: query
+                  schema:
+                    type: string
+                - name: published_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: published_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: order_by
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.template2.v1.QueryBlogResponse'
+    /api/v1/reading/blog/{id}:
+        get:
+            tags:
+                - ReadingService
+            operationId: ReadingService_GetBlog
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.template2.v1.GetBlogResponse'
+    /api/v1/reading/blog/{id}/read:
+        post:
+            tags:
+                - ReadingService
+            operationId: ReadingService_RecordReading
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.template2.v1.RecordReadingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.template2.v1.RecordReadingResponse'
+components:
+    schemas:
+        api.template2.v1.BlogWithReading:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                title:
+                    type: string
+                content:
+                    type: string
+                published_at:
+                    type: string
+                    format: date-time
+                reading_count:
+                    type: string
+        api.template2.v1.GetBlogResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                title:
+                    type: string
+                content:
+                    type: string
+                published_at:
+                    type: string
+                    format: date-time
+                reading_count:
+                    type: string
+        api.template2.v1.QueryBlogResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.template2.v1.BlogWithReading'
+        api.template2.v1.RecordReadingRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+        api.template2.v1.RecordReadingResponse:
+            type: object
+            properties:
+                reading_count:
+                    type: string
+        common.PageResponse:
+            type: object
+            properties:
+                page_no:
+                    type: integer
+                    format: int32
+                page_size:
+                    type: integer
+                    format: int32
+                total:
+                    type: integer
+                    format: int32
+                more:
+                    type: boolean
+tags:
+    - name: ReadingService
