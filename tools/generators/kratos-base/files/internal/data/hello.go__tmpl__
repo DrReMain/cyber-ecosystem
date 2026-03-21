@@ -1,0 +1,41 @@
+package data
+
+import (
+	"context"
+
+	"github.com/DrReMain/cyber-ecosystem/<%= projectRoot %>/internal/biz"
+	"github.com/DrReMain/cyber-ecosystem/<%= projectRoot %>/internal/data/ent/user"
+)
+
+type HelloRepo struct {
+	data *Data
+}
+
+func NewHelloRP(data *Data) biz.HelloRP {
+	return &HelloRepo{
+		data: data,
+	}
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+func (rp *HelloRepo) SayHello(ctx context.Context, entity *biz.HelloEntity) (*biz.HelloEntity, error) {
+	var result *biz.HelloEntity
+	err := rp.data.InTx(ctx, func(ctx context.Context) error {
+		client := rp.data.getClient(ctx)
+		if en, err := client.User.Query().
+			Where(user.NameEQ(*entity.Name)).
+			Only(ctx); err != nil {
+			return HandleError(err)
+		} else {
+			result = &biz.HelloEntity{
+				Name: &en.Name,
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

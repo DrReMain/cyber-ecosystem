@@ -16,11 +16,13 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/metrics"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
 	"github.com/google/wire"
+	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -67,15 +69,25 @@ func NewData(
 	}, func() { db.Close() }, nil
 }
 
-func NewTemplate1BlogService(c *conf.Data, logger log.Logger, tp *tracesdk.TracerProvider) template1V1.BlogServiceClient {
+func NewTemplate1BlogService(
+	c *conf.Data,
+	logger log.Logger,
+	tp *tracesdk.TracerProvider,
+	_metricRequests metric.Int64Counter,
+	_metricSeconds metric.Float64Histogram,
+) template1V1.BlogServiceClient {
 	conn, err := grpc.DialInsecure(
 		context.Background(),
 		grpc.WithEndpoint(c.ServiceTemplate1.Addr),
 		grpc.WithTimeout(c.ServiceTemplate1.Timeout.AsDuration()),
 		grpc.WithHealthCheck(true),
 		grpc.WithMiddleware(
-			tracing.Client(tracing.WithTracerProvider(tp)),
 			recovery.Recovery(),
+			metrics.Client(
+				metrics.WithSeconds(_metricSeconds),
+				metrics.WithRequests(_metricRequests),
+			),
+			tracing.Client(tracing.WithTracerProvider(tp)),
 			logging.Client(logger),
 		),
 	)

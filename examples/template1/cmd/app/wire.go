@@ -16,10 +16,19 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 
 	"github.com/google/wire"
+	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 )
 
-func wireApp(*conf.Server, *conf.Data, log.Logger, *tracesdk.TracerProvider) (*kratos.App, func(), error) {
+func wireApp(
+	*conf.Server,
+	*conf.Data,
+	log.Logger,
+	*tracesdk.TracerProvider,
+	*conf.Metrics,
+	metric.Int64Counter,
+	metric.Float64Histogram,
+) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		server.ProviderSet,
 		service.ProviderSet,

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
@@ -11,12 +12,17 @@ import (
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/encoding/json"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/metrics"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/exporters/jaeger"
-	"go.opentelemetry.io/otel/sdk/resource"
+	otelprometheus "go.opentelemetry.io/otel/exporters/prometheus"
+	"go.opentelemetry.io/otel/metric"
+	metricsdk "go.opentelemetry.io/otel/sdk/metric"
+	sourcesdk "go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -27,6 +33,9 @@ var (
 	Version  string
 	flagConf string
 	id, _    = os.Hostname()
+
+	_metricRequests metric.Int64Counter
+	_metricSeconds  metric.Float64Histogram
 )
 
 func init() {
@@ -34,6 +43,23 @@ func init() {
 	json.MarshalOptions = protojson.MarshalOptions{
 		EmitUnpopulated: true,
 		UseProtoNames:   true,
+	}
+
+	{
+		exporter, err := otelprometheus.New(otelprometheus.WithRegisterer(prometheus.DefaultRegisterer))
+		if err != nil {
+			panic(err)
+		}
+		provider := metricsdk.NewMeterProvider(metricsdk.WithReader(exporter))
+		meter := provider.Meter(Name)
+		_metricRequests, err = metrics.DefaultRequestsCounter(meter, metrics.DefaultServerRequestsCounterName)
+		if err != nil {
+			panic(err)
+		}
+		_metricSeconds, err = metrics.DefaultSecondsHistogram(meter, metrics.DefaultServerSecondsHistogramName)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -84,16 +110,31 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		tp = tracesdk.NewTracerProvider(tracesdk.WithBatcher(exp), tracesdk.WithResource(resource.NewSchemaless(
+		tp = tracesdk.NewTracerProvider(tracesdk.WithBatcher(exp), tracesdk.WithResource(sourcesdk.NewSchemaless(
 			semconv.ServiceNameKey.String(Name),
 		)))
 	}
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, logger, tp)
+	app, cleanup, err := wireApp(
+		bc.Server,
+		bc.Data,
+		logger,
+		tp,
+		bc.Metrics,
+		_metricRequests,
+		_metricSeconds,
+	)
 	if err != nil {
 		panic(err)
 	}
-	defer cleanup()
+	defer func() {
+		cleanup()
+		if tp != nil {
+			if err := tp.Shutdown(context.Background()); err != nil {
+				log.Errorf("failed to shutdown tracer provider: %v", err)
+			}
+		}
+	}()
 
 	// start and wait for stop signal
 	if err := app.Run(); err != nil {

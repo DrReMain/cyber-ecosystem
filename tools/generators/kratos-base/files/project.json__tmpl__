@@ -1,0 +1,66 @@
+{
+  "$schema": "<%= relativePath %>/.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "<%= projectName %>",
+  "root": "<%= projectRoot %>",
+  "projectType": "application",
+  "implicitDependencies": ["gen", "shared-go"],
+  "targets": {
+    "proto:conf": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "buf generate --template buf.gen.conf.yaml"
+      }
+    },
+    "proto:api": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "buf generate --template buf.gen.api.yaml"
+      }
+    },
+    "proto": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["proto:api", "proto:conf"],
+      "options": {
+        "command": "echo 'proto generation completed'"
+      }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["proto"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "go generate ./...",
+          "go mod tidy"
+        ],
+        "parallel": false
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "DEPLOY_ENV=dev kratos run"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{projectRoot}/bin"
+      ],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go build -ldflags \"-X main.Version=$(git describe --tags --always)\" -o ./bin/ ./..."
+      }
+    },
+    "ent:new": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go run -mod=mod entgo.io/ent/cmd/ent new --target=internal/data/ent/schema {args.Entity}"
+      }
+    }
+  }
+}

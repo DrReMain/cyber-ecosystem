@@ -9,6 +9,7 @@ message Bootstrap {
   Server server = 1;
   Data data = 2;
   Trace trace = 3;
+  Metrics metrics = 4;
 }
 
 message Server {
@@ -55,4 +56,8 @@ message Data {
 
 message Trace {
   string endpoint = 1;
+}
+
+message Metrics {
+  string path = 1;
 }

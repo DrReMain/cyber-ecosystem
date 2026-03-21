@@ -1,6 +1,7 @@
 package server
 
 import (
+	"strings"
 	"time"
 
 	"github.com/DrReMain/cyber-ecosystem/examples/template1/internal/conf"
@@ -13,19 +14,34 @@ import (
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/metrics"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-func NewHTTPServer(c *conf.Server, logger log.Logger, services []service.Registrar, tp *tracesdk.TracerProvider) *http.Server {
+func NewHTTPServer(
+	c *conf.Server,
+	logger log.Logger,
+	services []service.Registrar,
+	tp *tracesdk.TracerProvider,
+	cMetrics *conf.Metrics,
+	_metricRequests metric.Int64Counter,
+	_metricSeconds metric.Float64Histogram,
+) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
+			metrics.Server(
+				metrics.WithSeconds(_metricSeconds),
+				metrics.WithRequests(_metricRequests),
+			),
 			tracing.Server(tracing.WithTracerProvider(tp)),
 			logging.Server(logger),
 			validate.ProtoValidate(validate.UseProtoMessage),
@@ -43,6 +59,9 @@ func NewHTTPServer(c *conf.Server, logger log.Logger, services []service.Registr
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
+	if len(cMetrics.Path) > 1 && strings.HasPrefix(cMetrics.Path, "/") {
+		srv.Handle(cMetrics.Path, promhttp.Handler())
+	}
 	for _, svc := range services {
 		svc.RegisterHTTP(srv)
 	}

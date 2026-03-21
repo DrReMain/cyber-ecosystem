@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "generators": {
+    "kratos-base": {
+      "factory": "./kratos-base/generator",
+      "schema": "./kratos-base/schema.json",
+      "description": "Generate a Kratos base layout"
+    }
+  }
+}

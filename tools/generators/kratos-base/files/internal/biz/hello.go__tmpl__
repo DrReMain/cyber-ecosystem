@@ -1,0 +1,42 @@
+package biz
+
+import (
+	"context"
+)
+
+type HelloEntity struct {
+	Name *string
+}
+
+type HelloRP interface {
+	SayHello(ctx context.Context, entity *HelloEntity) (*HelloEntity, error)
+}
+
+type HelloUC struct {
+	tm Transaction
+
+	helloRP HelloRP
+}
+
+func NewHelloUC(tm Transaction, helloRP HelloRP) *HelloUC {
+	return &HelloUC{
+		tm:      tm,
+		helloRP: helloRP,
+	}
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+func (uc *HelloUC) SayHello(ctx context.Context, entity *HelloEntity) (*HelloEntity, error) {
+	var result *HelloEntity
+	err := uc.tm.InTx(ctx, func(ctx context.Context) error {
+		if en, err := uc.helloRP.SayHello(ctx, entity); err != nil {
+			return err
+		} else {
+			result = en
+		}
+		return nil
+	})
+
+	return result, err
+}

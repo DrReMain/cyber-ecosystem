@@ -1,9 +1,9 @@
 server:
   http:
-    addr: 0.0.0.0:8001
+    addr: 0.0.0.0:11000
     timeout: 1s
   grpc:
-    addr: 0.0.0.0:9001
+    addr: 0.0.0.0:12000
     timeout: 1s
 data:
   database:
@@ -22,3 +22,5 @@ data:
     write_timeout: 0.2s
 trace:
   endpoint: "http://127.0.0.1:14268/api/traces"
+metrics:
+  path: "/metrics"
