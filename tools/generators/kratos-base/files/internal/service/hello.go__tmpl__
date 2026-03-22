@@ -7,6 +7,7 @@ import (
 
 	<%= goPackage %>V1 "github.com/DrReMain/cyber-ecosystem/gen/go/<%= name %>/v1"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 )
@@ -14,11 +15,13 @@ import (
 type HelloService struct {
 	<%= goPackage %>V1.UnimplementedHelloServiceServer
 
+	log    *log.Helper
 	helloUC *biz.HelloUC
 }
 
-func NewHelloService(helloUC *biz.HelloUC) *HelloService {
+func NewHelloService(logger log.Logger, helloUC *biz.HelloUC) *HelloService {
 	return &HelloService{
+		log:     log.NewHelper(log.With(logger, "module", "service/hello")),
 		helloUC: helloUC,
 	}
 }

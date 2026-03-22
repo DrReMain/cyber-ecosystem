@@ -5,21 +5,25 @@ import (
 
 	"github.com/DrReMain/cyber-ecosystem/<%= projectRoot %>/internal/biz"
 	"github.com/DrReMain/cyber-ecosystem/<%= projectRoot %>/internal/data/ent/user"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
-type HelloRepo struct {
+type helloRP struct {
+	log  *log.Helper
 	data *Data
 }
 
-func NewHelloRP(data *Data) biz.HelloRP {
-	return &HelloRepo{
+func NewHelloRP(logger log.Logger, data *Data) biz.HelloRP {
+	return &helloRP{
+		log:  log.NewHelper(log.With(logger, "module", "data/hello")),
 		data: data,
 	}
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-func (rp *HelloRepo) SayHello(ctx context.Context, entity *biz.HelloEntity) (*biz.HelloEntity, error) {
+func (rp *helloRP) SayHello(ctx context.Context, entity *biz.HelloEntity) (*biz.HelloEntity, error) {
 	var result *biz.HelloEntity
 	err := rp.data.InTx(ctx, func(ctx context.Context) error {
 		client := rp.data.getClient(ctx)

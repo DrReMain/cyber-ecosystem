@@ -2,6 +2,8 @@ package biz
 
 import (
 	"context"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 type HelloEntity struct {
@@ -13,13 +15,15 @@ type HelloRP interface {
 }
 
 type HelloUC struct {
-	tm Transaction
+	log *log.Helper
+	tm  Transaction
 
 	helloRP HelloRP
 }
 
-func NewHelloUC(tm Transaction, helloRP HelloRP) *HelloUC {
+func NewHelloUC(logger log.Logger, tm Transaction, helloRP HelloRP) *HelloUC {
 	return &HelloUC{
+		log:     log.NewHelper(log.With(logger, "module", "biz/hello")),
 		tm:      tm,
 		helloRP: helloRP,
 	}
