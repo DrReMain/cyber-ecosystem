@@ -17,7 +17,7 @@ log:
     color: true
     format: console
   file:
-    enabled: true
+    enabled: false
     path: "../../logs/examples-template1/app.log"
     max_size: 100
     max_backups: 10
@@ -40,7 +40,7 @@ data:
     password: postgres
     db_name: cyber_ecosystem_template1
     max_open_conns: 100
-    max_idle_conns: 10
+    max_idle_conns: 100
     conn_max_lifetime: 3600s
     migrate: false
   redis:

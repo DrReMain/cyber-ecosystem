@@ -42,7 +42,7 @@ data:
     max_open_conns: 100
     max_idle_conns: 10
     conn_max_lifetime: 3600s
-    migrate: false
+    migrate: true
   redis:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s

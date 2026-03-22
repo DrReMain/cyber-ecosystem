@@ -25,6 +25,7 @@ import (
 	"entgo.io/ent/dialect"
 	"github.com/google/wire"
 	"go.opentelemetry.io/otel/metric"
+	metricsdk "go.opentelemetry.io/otel/sdk/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -36,11 +37,35 @@ type Data struct {
 
 func NewData(
 	c *conf.Data,
-	cLog *conf.Log,
 	logger log.Logger,
+	db *ent.Client,
 	template1BlogService template1V1.BlogServiceClient,
 ) (*Data, func(), error) {
-	drv, err := client.NewEntClient(client.DBConfig{
+	return &Data{
+		db:                   db,
+		template1BlogService: template1BlogService,
+	}, func() { db.Close() }, nil
+}
+
+func (d *Data) getClient(ctx context.Context) *ent.Client {
+	return entutil.GetClientFromTx(ctx,
+		ent.TxFromContext,
+		func(tx *ent.Tx) *ent.Client { return tx.Client() },
+		d.db,
+	)
+}
+
+func (d *Data) InTx(ctx context.Context, fn func(context.Context) error) error {
+	return entutil.InTx(ctx,
+		ent.TxFromContext,
+		ent.NewTxContext,
+		d.db.Tx,
+		fn,
+	)
+}
+
+func NewEntClient(c *conf.Data, cLog *conf.Log, logger log.Logger, meterProvider *metricsdk.MeterProvider) (*ent.Client, error) {
+	entClient, err := client.NewEntClient(client.DBConfig{
 		Driver:          c.Database.Driver,
 		Host:            c.Database.Host,
 		Port:            int(c.Database.Port),
@@ -50,18 +75,19 @@ func NewData(
 		MaxOpenConns:    int(c.Database.MaxOpenConns),
 		MaxIdleConns:    int(c.Database.MaxIdleConns),
 		ConnMaxLifetime: c.Database.ConnMaxLifetime.AsDuration(),
+		MeterProvider:   meterProvider,
 	})
 	if err != nil {
 		log.Fatalf("failed opening connection to database: %v", err)
 	}
 
-	var finalDrv dialect.Driver = drv
+	var finalDrv dialect.Driver = entClient.Driver
 	if cLog != nil && cLog.Ent != nil && cLog.Ent.Enabled {
 		slowQueryThreshold := 200 * time.Millisecond
 		if cLog.Ent.SlowQueryThreshold != nil {
 			slowQueryThreshold = cLog.Ent.SlowQueryThreshold.AsDuration()
 		}
-		finalDrv = entlog.NewDriverWrapper(drv, logger, cLog.Ent.Level, cLog.Ent.SlowQuery, slowQueryThreshold)
+		finalDrv = entlog.NewDriverWrapper(entClient.Driver, logger, cLog.Ent.Level, cLog.Ent.SlowQuery, slowQueryThreshold)
 	}
 	db := ent.NewClient(ent.Driver(finalDrv))
 
@@ -70,14 +96,10 @@ func NewData(
 			context.Background(),
 			migrate.WithDropIndex(true),
 		); err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 	}
-
-	return &Data{
-		db:                   db,
-		template1BlogService: template1BlogService,
-	}, func() { db.Close() }, nil
+	return db, nil
 }
 
 func NewTemplate1BlogService(
@@ -108,26 +130,10 @@ func NewTemplate1BlogService(
 	return template1V1.NewBlogServiceClient(conn)
 }
 
-func (d *Data) getClient(ctx context.Context) *ent.Client {
-	return entutil.GetClientFromTx(ctx,
-		ent.TxFromContext,
-		func(tx *ent.Tx) *ent.Client { return tx.Client() },
-		d.db,
-	)
-}
-
-func (d *Data) InTx(ctx context.Context, fn func(context.Context) error) error {
-	return entutil.InTx(ctx,
-		ent.TxFromContext,
-		ent.NewTxContext,
-		d.db.Tx,
-		fn,
-	)
-}
-
 var ProviderSet = wire.NewSet(
 	NewData,
+	NewEntClient,
 	wire.Bind(new(biz.Transaction), new(*Data)),
-	NewReadingRP,
 	NewTemplate1BlogService,
+	NewReadingRP,
 )

@@ -15,13 +15,18 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"go.opentelemetry.io/otel/metric"
+	metric2 "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 // Injectors from wire.go:
 
-func wireApp(confServer *conf.Server, confLog *conf.Log, confData *conf.Data, metrics *conf.Metrics, logger log.Logger, tracerProvider *trace.TracerProvider, int64Counter metric.Int64Counter, float64Histogram metric.Float64Histogram) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, confLog, logger)
+func wireApp(confServer *conf.Server, confLog *conf.Log, confData *conf.Data, metrics *conf.Metrics, logger log.Logger, tracerProvider *trace.TracerProvider, int64Counter metric.Int64Counter, float64Histogram metric.Float64Histogram, meterProvider *metric2.MeterProvider) (*kratos.App, func(), error) {
+	client, err := data.NewEntClient(confData, confLog, logger, meterProvider)
+	if err != nil {
+		return nil, nil, err
+	}
+	dataData, cleanup, err := data.NewData(confData, logger, client)
 	if err != nil {
 		return nil, nil, err
 	}

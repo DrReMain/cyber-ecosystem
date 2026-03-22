@@ -39,6 +39,7 @@ var (
 
 	_metricRequests metric.Int64Counter
 	_metricSeconds  metric.Float64Histogram
+	_meterProvider  *metricsdk.MeterProvider
 )
 
 func init() {
@@ -53,8 +54,8 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		provider := metricsdk.NewMeterProvider(metricsdk.WithReader(exporter))
-		meter := provider.Meter(Name)
+		_meterProvider = metricsdk.NewMeterProvider(metricsdk.WithReader(exporter))
+		meter := _meterProvider.Meter(Name)
 		_metricRequests, err = metrics.DefaultRequestsCounter(meter, metrics.DefaultServerRequestsCounterName)
 		if err != nil {
 			panic(err)
@@ -132,6 +133,7 @@ func main() {
 		tp,
 		_metricRequests,
 		_metricSeconds,
+		_meterProvider,
 	)
 	if err != nil {
 		panic(err)

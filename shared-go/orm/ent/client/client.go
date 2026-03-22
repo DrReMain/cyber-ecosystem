@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
 )
 
@@ -25,9 +27,16 @@ type DBConfig struct {
 	MaxOpenConns    int
 	MaxIdleConns    int
 	ConnMaxLifetime time.Duration
+	MeterProvider   metric.MeterProvider
 }
 
-func NewEntClient(cfg DBConfig) (*entsql.Driver, error) {
+// EntClient wraps entsql.Driver and sql.DB for metrics registration
+type EntClient struct {
+	Driver *entsql.Driver
+	DB     *sql.DB
+}
+
+func NewEntClient(cfg DBConfig) (*EntClient, error) {
 	var (
 		drvName string
 		dsn     string
@@ -45,15 +54,22 @@ func NewEntClient(cfg DBConfig) (*entsql.Driver, error) {
 		return nil, fmt.Errorf("unsupported database driver %s", cfg.Driver)
 	}
 
-	// Use otelsql to wrap the database driver for OpenTelemetry tracing
-	// This automatically creates spans for each SQL operation
-	db, err := otelsql.Open(drvName, dsn,
+	opts := []otelsql.Option{
 		otelsql.WithAttributes(
 			semconv.DBSystemKey.String(cfg.Driver),
 			attribute.String("db.name", cfg.DBName),
 		),
 		otelsql.WithSQLCommenter(true),
-	)
+	}
+
+	// Enable metrics if MeterProvider is provided
+	if cfg.MeterProvider != nil {
+		opts = append(opts, otelsql.WithMeterProvider(cfg.MeterProvider))
+	}
+
+	// Use otelsql to wrap the database driver for OpenTelemetry tracing
+	// This automatically creates spans for each SQL operation
+	db, err := otelsql.Open(drvName, dsn, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed opening connection: %w", err)
 	}
@@ -67,5 +83,16 @@ func NewEntClient(cfg DBConfig) (*entsql.Driver, error) {
 	if err := db.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("failed pinging database: %w", err)
 	}
-	return entsql.OpenDB(cfg.Driver, db), nil
+
+	// Register DB stats metrics for connection pool monitoring
+	if cfg.MeterProvider != nil {
+		if _, err := otelsql.RegisterDBStatsMetrics(db, otelsql.WithMeterProvider(cfg.MeterProvider)); err != nil {
+			return nil, fmt.Errorf("failed registering db stats metrics: %w", err)
+		}
+	}
+
+	return &EntClient{
+		Driver: entsql.OpenDB(cfg.Driver, db),
+		DB:     db,
+	}, nil
 }

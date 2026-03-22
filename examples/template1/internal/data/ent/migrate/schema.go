@@ -36,9 +36,12 @@ var (
 				Columns: []*schema.Column{BlogColumns[2]},
 			},
 			{
-				Name:    "blog_deleted_at",
+				Name:    "blog_id",
 				Unique:  false,
-				Columns: []*schema.Column{BlogColumns[3]},
+				Columns: []*schema.Column{BlogColumns[0]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
 			},
 			{
 				Name:    "blog_title",

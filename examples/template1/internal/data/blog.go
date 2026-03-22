@@ -14,8 +14,7 @@ import (
 	"github.com/DrReMain/cyber-ecosystem/shared-go/orm/ent/entutil"
 
 	"github.com/go-kratos/kratos/v2/log"
-
-	"entgo.io/ent/dialect/sql"
+	//"entgo.io/ent/dialect/sql"
 )
 
 type blogRP struct {
@@ -124,9 +123,9 @@ func (rp *blogRP) Query(ctx context.Context, bo *biz.BlogQueryIn) (*biz.BlogQuer
 	entutil.WherePtr(query, bo.Title, blog.TitleContainsFold)
 	entutil.WherePtr(query, bo.PublishedAtA, blog.PublishedAtGTE)
 	entutil.WherePtr(query, bo.PublishedAtZ, blog.PublishedAtLTE)
-	query.Order(func(selector *sql.Selector) {
-		selector.OrderExpr(sql.IsNull(selector.C(blog.FieldPublishedAt)))
-	})
+	//query.Order(func(selector *sql.Selector) {
+	//	selector.OrderExpr(sql.IsNull(selector.C(blog.FieldPublishedAt)))
+	//})
 	entutil.ApplyOrderBy(bo.OrderBy, ent.Asc, ent.Desc, entutil.FOMapping{
 		"created_at": func(sel entutil.SQLSelector) { query.Order(sel(blog.FieldCreatedAt)) },
 		"updated_at": func(sel entutil.SQLSelector) { query.Order(sel(blog.FieldUpdatedAt)) },

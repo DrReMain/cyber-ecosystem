@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -28,7 +29,9 @@ func (SoftDeleteMixin) Fields() []ent.Field {
 
 func (SoftDeleteMixin) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("deleted_at"),
+		index.Fields("id").
+			Annotations(entsql.IndexWhere("deleted_at IS NULL")),
+		//index.Fields("deleted_at"),
 	}
 }
 
