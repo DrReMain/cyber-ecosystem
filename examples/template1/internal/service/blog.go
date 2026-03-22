@@ -8,6 +8,8 @@ import (
 
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/order_by"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/util"
+
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
@@ -17,11 +19,13 @@ import (
 type BlogService struct {
 	template1V1.UnimplementedBlogServiceServer
 
+	log    *log.Helper
 	blogUC *biz.BlogUC
 }
 
-func NewBlogService(blogUC *biz.BlogUC) *BlogService {
+func NewBlogService(logger log.Logger, blogUC *biz.BlogUC) *BlogService {
 	return &BlogService{
+		log:    log.NewHelper(log.With(logger, "module", "service/blog")),
 		blogUC: blogUC,
 	}
 }

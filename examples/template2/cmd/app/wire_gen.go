@@ -20,15 +20,15 @@ import (
 
 // Injectors from wire.go:
 
-func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger, tracerProvider *trace.TracerProvider, metrics *conf.Metrics, int64Counter metric.Int64Counter, float64Histogram metric.Float64Histogram) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, confLog *conf.Log, confData *conf.Data, metrics *conf.Metrics, logger log.Logger, tracerProvider *trace.TracerProvider, int64Counter metric.Int64Counter, float64Histogram metric.Float64Histogram) (*kratos.App, func(), error) {
 	blogServiceClient := data.NewTemplate1BlogService(confData, logger, tracerProvider, int64Counter, float64Histogram)
-	dataData, cleanup, err := data.NewData(confData, blogServiceClient)
+	dataData, cleanup, err := data.NewData(confData, confLog, logger, blogServiceClient)
 	if err != nil {
 		return nil, nil, err
 	}
-	readingRP := data.NewReadingRP(dataData)
-	readingUC := biz.NewReadingUC(dataData, readingRP)
-	readingService := service.NewReadingService(readingUC)
+	readingRP := data.NewReadingRP(logger, dataData)
+	readingUC := biz.NewReadingUC(logger, dataData, readingRP)
+	readingService := service.NewReadingService(logger, readingUC)
 	v := service.NewRegistrarList(readingService)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, tracerProvider, int64Counter, float64Histogram)
 	httpServer := server.NewHTTPServer(confServer, logger, v, tracerProvider, metrics, int64Counter, float64Histogram)

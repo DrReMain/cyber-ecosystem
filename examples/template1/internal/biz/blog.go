@@ -6,6 +6,8 @@ import (
 
 	"github.com/DrReMain/cyber-ecosystem/gen/go/common"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/order_by"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 type BlogEntity struct {
@@ -41,13 +43,15 @@ type BlogRP interface {
 }
 
 type BlogUC struct {
-	tm Transaction
+	log *log.Helper
+	tm  Transaction
 
 	blogRP BlogRP
 }
 
-func NewBlogUC(tm Transaction, blogRP BlogRP) *BlogUC {
+func NewBlogUC(logger log.Logger, tm Transaction, blogRP BlogRP) *BlogUC {
 	return &BlogUC{
+		log:    log.NewHelper(log.With(logger, "module", "biz/blog")),
 		tm:     tm,
 		blogRP: blogRP,
 	}

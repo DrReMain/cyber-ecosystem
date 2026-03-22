@@ -2,15 +2,17 @@ package client
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
 
+	"github.com/XSAM/otelsql"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"go.opentelemetry.io/otel/attribute"
+	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
 )
 
 type DBConfig struct {
@@ -43,16 +45,15 @@ func NewEntClient(cfg DBConfig) (*entsql.Driver, error) {
 		return nil, fmt.Errorf("unsupported database driver %s", cfg.Driver)
 	}
 
-	//"github.com/XSAM/otelsql"
-	//"go.opentelemetry.io/otel/semconv/v1.27.0"
-	//db, err := otelsql.Open(drvName, dsn,
-	//	otelsql.WithAttributes(
-	//		semconv.DBSystemKey.String(cfg.Driver),
-	//		semconv.DBNamespaceKey.String(cfg.DBName),
-	//	),
-	//	otelsql.WithSQLCommenter(true),
-	//)
-	db, err := sql.Open(drvName, dsn)
+	// Use otelsql to wrap the database driver for OpenTelemetry tracing
+	// This automatically creates spans for each SQL operation
+	db, err := otelsql.Open(drvName, dsn,
+		otelsql.WithAttributes(
+			semconv.DBSystemKey.String(cfg.Driver),
+			attribute.String("db.name", cfg.DBName),
+		),
+		otelsql.WithSQLCommenter(true),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed opening connection: %w", err)
 	}

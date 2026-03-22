@@ -22,10 +22,11 @@ import (
 
 func wireApp(
 	*conf.Server,
+	*conf.Log,
 	*conf.Data,
+	*conf.Metrics,
 	log.Logger,
 	*tracesdk.TracerProvider,
-	*conf.Metrics,
 	metric.Int64Counter,
 	metric.Float64Histogram,
 ) (*kratos.App, func(), error) {

@@ -8,6 +8,8 @@ import (
 	templateV1 "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/order_by"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/util"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 type BlogWithReadingEntity struct {
@@ -44,13 +46,18 @@ type ReadingRP interface {
 }
 
 type ReadingUC struct {
-	tm Transaction
+	log *log.Helper
+	tm  Transaction
 
 	readingRP ReadingRP
 }
 
-func NewReadingUC(tm Transaction, readingRP ReadingRP) *ReadingUC {
-	return &ReadingUC{tm: tm, readingRP: readingRP}
+func NewReadingUC(logger log.Logger, tm Transaction, readingRP ReadingRP) *ReadingUC {
+	return &ReadingUC{
+		log:       log.NewHelper(log.With(logger, "module", "biz/reading")),
+		tm:        tm,
+		readingRP: readingRP,
+	}
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -5,6 +5,32 @@ server:
   grpc:
     addr: 0.0.0.0:12000
     timeout: 1s
+log:
+  level: debug
+  ent:
+    enabled: true
+    level: debug
+    slow_query: true
+    slow_query_threshold: 0.2s
+  console:
+    enabled: true
+    color: true
+    format: console
+  file:
+    enabled: true
+    path: "../../logs/examples-template1/app.log"
+    max_size: 100
+    max_backups: 10
+    max_age: 30
+    compress: true
+  loki:
+    enabled: true
+    url: "http://localhost:3100/loki/api/v1/push"
+    labels:
+      app: "examples-template1"
+      env: "development"
+    batch_wait: 1s
+    batch_size: 1048576 #1MB
 data:
   database:
     driver: postgres
@@ -16,6 +42,7 @@ data:
     max_open_conns: 100
     max_idle_conns: 10
     conn_max_lifetime: 3600s
+    migrate: false
   redis:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s

@@ -9,6 +9,7 @@ import (
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/order_by"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/util"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
@@ -18,11 +19,13 @@ import (
 type ReadingService struct {
 	template2V1.UnimplementedReadingServiceServer
 
+	log       *log.Helper
 	readingUC *biz.ReadingUC
 }
 
-func NewReadingService(readingUC *biz.ReadingUC) *ReadingService {
+func NewReadingService(logger log.Logger, readingUC *biz.ReadingUC) *ReadingService {
 	return &ReadingService{
+		log:       log.NewHelper(log.With(logger, "module", "service/reading")),
 		readingUC: readingUC,
 	}
 }

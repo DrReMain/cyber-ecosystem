@@ -8,14 +8,21 @@ import (
 	"github.com/DrReMain/cyber-ecosystem/examples/template2/internal/data/ent/reading"
 
 	template1V1 "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 type readingRP struct {
+	log *log.Helper
+
 	data *Data
 }
 
-func NewReadingRP(data *Data) biz.ReadingRP {
-	return &readingRP{data: data}
+func NewReadingRP(logger log.Logger, data *Data) biz.ReadingRP {
+	return &readingRP{
+		log:  log.NewHelper(log.With(logger, "module", "data/reading")),
+		data: data,
+	}
 }
 
 func (rp *readingRP) GetReadingCount(ctx context.Context, blogID string) (int64, error) {

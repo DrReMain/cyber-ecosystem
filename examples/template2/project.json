@@ -42,7 +42,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "DEPLOY_ENV=dev kratos run"
+        "command": "kratos run"
       }
     },
     "build": {

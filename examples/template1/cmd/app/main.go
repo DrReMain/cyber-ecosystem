@@ -7,6 +7,8 @@ import (
 
 	"github.com/DrReMain/cyber-ecosystem/examples/template1/internal/conf"
 
+	zaplog "github.com/DrReMain/cyber-ecosystem/shared-go/kratos/logging/zap"
+
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
@@ -18,6 +20,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	otelprometheus "go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric"
@@ -79,15 +82,6 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 
 func main() {
 	flag.Parse()
-	logger := log.With(log.NewStdLogger(os.Stdout),
-		"ts", log.DefaultTimestamp,
-		"caller", log.DefaultCaller,
-		"service.id", id,
-		"service.name", Name,
-		"service.version", Version,
-		"trace.id", tracing.TraceID(),
-		"span.id", tracing.SpanID(),
-	)
 	c := config.New(
 		config.WithSource(
 			file.NewSource(flagConf),
@@ -104,6 +98,19 @@ func main() {
 		panic(err)
 	}
 
+	logger, loggerCleanup, err := zaplog.NewLoggerFromConfig(convertLogConfig(bc.Log))
+	if err != nil {
+		panic(err)
+	}
+	log.SetLogger(logger)
+	logger = log.With(logger,
+		"service.id", id,
+		"service.name", Name,
+		"service.version", Version,
+		"trace.id", tracing.TraceID(),
+		"span.id", tracing.SpanID(),
+	)
+
 	var tp *tracesdk.TracerProvider
 	if bc.Trace.Endpoint != "" {
 		exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(bc.Trace.Endpoint)))
@@ -113,14 +120,16 @@ func main() {
 		tp = tracesdk.NewTracerProvider(tracesdk.WithBatcher(exp), tracesdk.WithResource(sourcesdk.NewSchemaless(
 			semconv.ServiceNameKey.String(Name),
 		)))
+		otel.SetTracerProvider(tp)
 	}
 
 	app, cleanup, err := wireApp(
 		bc.Server,
+		bc.Log,
 		bc.Data,
+		bc.Metrics,
 		logger,
 		tp,
-		bc.Metrics,
 		_metricRequests,
 		_metricSeconds,
 	)
@@ -129,6 +138,7 @@ func main() {
 	}
 	defer func() {
 		cleanup()
+		loggerCleanup()
 		if tp != nil {
 			if err := tp.Shutdown(context.Background()); err != nil {
 				log.Errorf("failed to shutdown tracer provider: %v", err)
@@ -140,4 +150,49 @@ func main() {
 	if err := app.Run(); err != nil {
 		panic(err)
 	}
+}
+
+func convertLogConfig(c *conf.Log) *zaplog.Config {
+	if c == nil {
+		return nil
+	}
+
+	cfg := &zaplog.Config{
+		Level: c.Level,
+	}
+
+	if c.Console != nil {
+		cfg.Console = &zaplog.ConsoleConfig{
+			Enabled: c.Console.Enabled,
+			Color:   c.Console.Color,
+			Format:  c.Console.Format,
+		}
+	}
+
+	if c.File != nil {
+		cfg.File = &zaplog.FileConfig{
+			Enabled:    c.File.Enabled,
+			Path:       c.File.Path,
+			MaxSize:    int(c.File.MaxSize),
+			MaxBackups: int(c.File.MaxBackups),
+			MaxAge:     int(c.File.MaxAge),
+			Compress:   c.File.Compress,
+		}
+	}
+
+	if c.Loki != nil {
+		batchWait := int64(1000) // default 1s in milliseconds
+		if c.Loki.BatchWait != nil {
+			batchWait = c.Loki.BatchWait.AsDuration().Milliseconds()
+		}
+		cfg.Loki = &zaplog.LokiConfig{
+			Enabled:   c.Loki.Enabled,
+			URL:       c.Loki.Url,
+			Labels:    c.Loki.Labels,
+			BatchWait: batchWait,
+			BatchSize: int(c.Loki.BatchSize),
+		}
+	}
+
+	return cfg
 }

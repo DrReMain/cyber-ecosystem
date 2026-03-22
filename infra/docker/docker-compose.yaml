@@ -96,6 +96,24 @@ services:
     networks:
       - cyber-ecosystem-network
 
+  # ==================== Loki ====================
+  loki:
+    image: grafana/loki:3.4.3
+    container_name: cyber-ecosystem-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cyber-ecosystem-network
+
   # ==================== Grafana ====================
   grafana:
     image: grafana/grafana:11.5.2
@@ -118,6 +136,7 @@ services:
       retries: 5
     depends_on:
       - prometheus
+      - loki
     networks:
       - cyber-ecosystem-network
 
@@ -207,5 +226,7 @@ volumes:
     name: cyber-ecosystem-prometheus-data
   grafana_data:
     name: cyber-ecosystem-grafana-data
+  loki_data:
+    name: cyber-ecosystem-loki-data
   minio_data:
     name: cyber-ecosystem-minio-data

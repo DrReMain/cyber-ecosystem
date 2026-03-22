@@ -2,7 +2,7 @@ package data
 
 import (
 	"context"
-	"os"
+	"time"
 
 	"github.com/DrReMain/cyber-ecosystem/examples/template2/internal/biz"
 	"github.com/DrReMain/cyber-ecosystem/examples/template2/internal/conf"
@@ -11,6 +11,7 @@ import (
 	_ "github.com/DrReMain/cyber-ecosystem/examples/template2/internal/data/ent/runtime"
 
 	template1V1 "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1"
+	entlog "github.com/DrReMain/cyber-ecosystem/shared-go/kratos/logging/ent"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/orm/ent/client"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/orm/ent/entutil"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
+	"entgo.io/ent/dialect"
 	"github.com/google/wire"
 	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
@@ -34,6 +36,8 @@ type Data struct {
 
 func NewData(
 	c *conf.Data,
+	cLog *conf.Log,
+	logger log.Logger,
 	template1BlogService template1V1.BlogServiceClient,
 ) (*Data, func(), error) {
 	drv, err := client.NewEntClient(client.DBConfig{
@@ -51,14 +55,21 @@ func NewData(
 		log.Fatalf("failed opening connection to database: %v", err)
 	}
 
-	db := ent.NewClient(ent.Driver(drv))
-	if os.Getenv("DEPLOY_ENV") == "dev" {
-		db = db.Debug()
-		err := db.Schema.Create(
+	var finalDrv dialect.Driver = drv
+	if cLog != nil && cLog.Ent != nil && cLog.Ent.Enabled {
+		slowQueryThreshold := 200 * time.Millisecond
+		if cLog.Ent.SlowQueryThreshold != nil {
+			slowQueryThreshold = cLog.Ent.SlowQueryThreshold.AsDuration()
+		}
+		finalDrv = entlog.NewDriverWrapper(drv, logger, cLog.Ent.Level, cLog.Ent.SlowQuery, slowQueryThreshold)
+	}
+	db := ent.NewClient(ent.Driver(finalDrv))
+
+	if c.Database.Migrate {
+		if err := db.Schema.Create(
 			context.Background(),
 			migrate.WithDropIndex(true),
-		)
-		if err != nil {
+		); err != nil {
 			return nil, nil, err
 		}
 	}

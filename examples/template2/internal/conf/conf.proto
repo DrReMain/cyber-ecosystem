@@ -7,9 +7,10 @@ option go_package = "github.com/DrReMain/cyber-ecosystem/examples/template2/inte
 
 message Bootstrap {
   Server server = 1;
-  Data data = 2;
-  Trace trace = 3;
-  Metrics metrics = 4;
+  Log log = 2;
+  Data data = 3;
+  Trace trace = 4;
+  Metrics metrics = 5;
 }
 
 message Server {
@@ -27,6 +28,45 @@ message Server {
   GRPC grpc = 2;
 }
 
+message Log {
+  string level = 1;
+
+  message Console {
+    bool enabled = 1;
+    bool color = 2;
+    string format = 3;  // "console" or "json", default "console"
+  }
+
+  message File {
+    bool enabled = 1;
+    string path = 2;
+    int32 max_size = 3;        // MB
+    int32 max_backups = 4;
+    int32 max_age = 5;         // days
+    bool compress = 6;
+  }
+
+  message Loki {
+    bool enabled = 1;
+    string url = 2;
+    map<string, string> labels = 3;
+    google.protobuf.Duration batch_wait = 4;
+    int32 batch_size = 5;      // bytes
+  }
+
+  message Ent {
+    bool enabled = 1;
+    string level = 2;
+    bool slow_query = 3;
+    google.protobuf.Duration slow_query_threshold = 4;
+  }
+
+  Console console = 2;
+  File file = 3;
+  Loki loki = 4;
+  Ent ent = 5;
+}
+
 message Data {
   message Database {
     string driver = 1;
@@ -38,6 +78,7 @@ message Data {
     int32 max_open_conns = 7;
     int32 max_idle_conns = 8;
     google.protobuf.Duration conn_max_lifetime = 9;
+    bool migrate = 10;
   }
   message Redis {
     string network = 1;

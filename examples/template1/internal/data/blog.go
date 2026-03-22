@@ -13,15 +13,20 @@ import (
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/util"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/orm/ent/entutil"
 
+	"github.com/go-kratos/kratos/v2/log"
+
 	"entgo.io/ent/dialect/sql"
 )
 
 type blogRP struct {
+	log *log.Helper
+
 	data *Data
 }
 
-func NewBlogRP(data *Data) biz.BlogRP {
+func NewBlogRP(logger log.Logger, data *Data) biz.BlogRP {
 	return &blogRP{
+		log:  log.NewHelper(log.With(logger, "module", "data/blog")),
 		data: data,
 	}
 }
