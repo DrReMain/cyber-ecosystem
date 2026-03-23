@@ -7,24 +7,28 @@ managed:
     - file_option: go_package
       module: buf.build/bufbuild/protovalidate
 plugins:
-  - local: protoc-gen-go
+  - local: [ go, tool, protoc-gen-go ]
     out: ../../gen/go/template2
     opt: paths=source_relative
-  - local: protoc-gen-go-grpc
+  - local: [ go, tool, protoc-gen-go-grpc ]
     out: ../../gen/go/template2
     opt: paths=source_relative
-  - local: protoc-gen-go-http
+  - local: [ go, tool, protoc-gen-go-http ]
     out: ../../gen/go/template2
     opt: paths=source_relative
-  - local: protoc-gen-go-errors
+  - local: [ go, tool, protoc-gen-connect-go ]
+    out: ../../gen/go/template2
+    opt:
+      - paths=source_relative
+      - simple
+  - local: [ go, tool, protoc-gen-go-errors ]
     out: ../../gen/go/template2
     opt: paths=source_relative
-  - local: protoc-gen-openapi
+  - local: [ go, tool, protoc-gen-openapi ]
     strategy: all
     out: ../../gen/oas/template2
     opt:
       - paths=source_relative
-      - naming=proto
       - enum_type=string
       - fq_schema_naming=true
       - default_response=false

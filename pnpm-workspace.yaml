@@ -1,6 +1,6 @@
 packages:
   - generators/*
-  - clients/admin
+  - clients/*
 
 ignoredBuiltDependencies:
   - sharp

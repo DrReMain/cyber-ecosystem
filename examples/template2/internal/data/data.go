@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/DrReMain/cyber-ecosystem/examples/template2/internal/biz"
@@ -11,7 +12,9 @@ import (
 	_ "github.com/DrReMain/cyber-ecosystem/examples/template2/internal/data/ent/runtime"
 
 	template1V1 "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1"
+	template1V1connect "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1/template1V1connect"
 	entlog "github.com/DrReMain/cyber-ecosystem/shared-go/kratos/logging/ent"
+	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/transport/connect"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/orm/ent/client"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/orm/ent/entutil"
 
@@ -33,7 +36,8 @@ import (
 type Data struct {
 	db *ent.Client
 
-	template1BlogService template1V1.BlogServiceClient
+	template1BlogService        template1V1.BlogServiceClient
+	template1ConnectBlogService template1V1connect.BlogServiceClient
 }
 
 func NewData(
@@ -41,10 +45,12 @@ func NewData(
 	logger log.Logger,
 	db *ent.Client,
 	template1BlogService template1V1.BlogServiceClient,
+	template1ConnectBlogService template1V1connect.BlogServiceClient,
 ) (*Data, func(), error) {
 	return &Data{
-		db:                   db,
-		template1BlogService: template1BlogService,
+		db:                          db,
+		template1BlogService:        template1BlogService,
+		template1ConnectBlogService: template1ConnectBlogService,
 	}, func() { db.Close() }, nil
 }
 
@@ -79,7 +85,7 @@ func NewEntClient(c *conf.Data, cLog *conf.Log, logger log.Logger, meterProvider
 		MeterProvider:   meterProvider,
 	})
 	if err != nil {
-		log.Fatalf("failed opening connection to database: %v", err)
+		return nil, fmt.Errorf("failed opening connection to database: %w", err)
 	}
 
 	var finalDrv dialect.Driver = entClient.Driver
@@ -109,7 +115,7 @@ func NewTemplate1BlogService(
 	tp *tracesdk.TracerProvider,
 	_metricRequests metric.Int64Counter,
 	_metricSeconds metric.Float64Histogram,
-) template1V1.BlogServiceClient {
+) (template1V1.BlogServiceClient, error) {
 	var middlewares = []middleware.Middleware{recovery.Recovery()}
 	middlewares = append(middlewares, metrics.Client(metrics.WithSeconds(_metricSeconds), metrics.WithRequests(_metricRequests)))
 	if tp != nil {
@@ -120,13 +126,37 @@ func NewTemplate1BlogService(
 		context.Background(),
 		grpc.WithEndpoint(c.ServiceTemplate1.Addr),
 		grpc.WithTimeout(c.ServiceTemplate1.Timeout.AsDuration()),
-		grpc.WithHealthCheck(true),
 		grpc.WithMiddleware(middlewares...),
 	)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to dial template1 gRPC service: %w", err)
 	}
-	return template1V1.NewBlogServiceClient(conn)
+	return template1V1.NewBlogServiceClient(conn), nil
+}
+
+func NewTemplate1ConnectBlogService(
+	c *conf.Data,
+	logger log.Logger,
+	tp *tracesdk.TracerProvider,
+	_metricRequests metric.Int64Counter,
+	_metricSeconds metric.Float64Histogram,
+) (template1V1connect.BlogServiceClient, error) {
+	var middlewares = []middleware.Middleware{recovery.Recovery()}
+	middlewares = append(middlewares, metrics.Client(metrics.WithSeconds(_metricSeconds), metrics.WithRequests(_metricRequests)))
+	if tp != nil {
+		middlewares = append(middlewares, tracing.Client(tracing.WithTracerProvider(tp)))
+	}
+	middlewares = append(middlewares, logging.Client(logger))
+	conn, err := connect.DialInsecure(
+		context.Background(),
+		connect.WithEndpoint(c.ServiceTemplate1Connect.Addr),
+		connect.WithTimeout(c.ServiceTemplate1Connect.Timeout.AsDuration()),
+		connect.WithMiddleware(middlewares...),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to dial template1 Connect service: %w", err)
+	}
+	return template1V1connect.NewBlogServiceClient(conn.HTTPClient(), conn.Endpoint(), conn.ClientOptions()...), nil
 }
 
 var ProviderSet = wire.NewSet(
@@ -134,5 +164,6 @@ var ProviderSet = wire.NewSet(
 	NewEntClient,
 	wire.Bind(new(biz.Transaction), new(*Data)),
 	NewTemplate1BlogService,
+	NewTemplate1ConnectBlogService,
 	NewReadingRP,
 )

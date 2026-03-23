@@ -26,8 +26,15 @@ func wireApp(confServer *conf.Server, confLog *conf.Log, confData *conf.Data, me
 	if err != nil {
 		return nil, nil, err
 	}
-	blogServiceClient := data.NewTemplate1BlogService(confData, logger, tracerProvider, int64Counter, float64Histogram)
-	dataData, cleanup, err := data.NewData(confData, logger, client, blogServiceClient)
+	blogServiceClient, err := data.NewTemplate1BlogService(confData, logger, tracerProvider, int64Counter, float64Histogram)
+	if err != nil {
+		return nil, nil, err
+	}
+	template1V1connectBlogServiceClient, err := data.NewTemplate1ConnectBlogService(confData, logger, tracerProvider, int64Counter, float64Histogram)
+	if err != nil {
+		return nil, nil, err
+	}
+	dataData, cleanup, err := data.NewData(confData, logger, client, blogServiceClient, template1V1connectBlogServiceClient)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -37,7 +44,8 @@ func wireApp(confServer *conf.Server, confLog *conf.Log, confData *conf.Data, me
 	v := service.NewRegistrarList(readingService)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, tracerProvider, int64Counter, float64Histogram)
 	httpServer := server.NewHTTPServer(confServer, logger, v, tracerProvider, metrics, int64Counter, float64Histogram)
-	app := newApp(logger, grpcServer, httpServer)
+	connectServer := server.NewConnectServer(confServer, logger, v, tracerProvider, int64Counter, float64Histogram)
+	app := newApp(logger, grpcServer, httpServer, connectServer)
 	return app, func() {
 		cleanup()
 	}, nil

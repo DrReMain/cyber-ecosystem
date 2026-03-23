@@ -5,8 +5,10 @@ import (
 
 	"github.com/DrReMain/cyber-ecosystem/examples/template1/internal/biz"
 	template1V1 "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1"
+	template1V1connect "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1/template1V1connect"
 
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/order_by"
+	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/transport/connect"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/util"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -34,6 +36,9 @@ func (s *BlogService) RegisterGRPC(srv *grpc.Server) {
 }
 func (s *BlogService) RegisterHTTP(srv *http.Server) {
 	template1V1.RegisterBlogServiceHTTPServer(srv, s)
+}
+func (s *BlogService) RegisterConnect(srv *connect.Server) {
+	srv.Register(template1V1connect.NewBlogServiceHandler(s, srv.HandlerOptions()...))
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

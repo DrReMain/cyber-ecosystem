@@ -102,6 +102,7 @@ type Server struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Http          *Server_HTTP           `protobuf:"bytes,1,opt,name=http,proto3" json:"http,omitempty"`
 	Grpc          *Server_GRPC           `protobuf:"bytes,2,opt,name=grpc,proto3" json:"grpc,omitempty"`
+	Connect       *Server_Connect        `protobuf:"bytes,3,opt,name=connect,proto3" json:"connect,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -146,6 +147,13 @@ func (x *Server) GetHttp() *Server_HTTP {
 func (x *Server) GetGrpc() *Server_GRPC {
 	if x != nil {
 		return x.Grpc
+	}
+	return nil
+}
+
+func (x *Server) GetConnect() *Server_Connect {
+	if x != nil {
+		return x.Connect
 	}
 	return nil
 }
@@ -486,6 +494,66 @@ func (x *Server_GRPC) GetTimeout() *durationpb.Duration {
 	return nil
 }
 
+type Server_Connect struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Network       string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Addr          string                 `protobuf:"bytes,2,opt,name=addr,proto3" json:"addr,omitempty"`
+	Timeout       *durationpb.Duration   `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Server_Connect) Reset() {
+	*x = Server_Connect{}
+	mi := &file_conf_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Server_Connect) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Server_Connect) ProtoMessage() {}
+
+func (x *Server_Connect) ProtoReflect() protoreflect.Message {
+	mi := &file_conf_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Server_Connect.ProtoReflect.Descriptor instead.
+func (*Server_Connect) Descriptor() ([]byte, []int) {
+	return file_conf_proto_rawDescGZIP(), []int{1, 2}
+}
+
+func (x *Server_Connect) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
+func (x *Server_Connect) GetAddr() string {
+	if x != nil {
+		return x.Addr
+	}
+	return ""
+}
+
+func (x *Server_Connect) GetTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.Timeout
+	}
+	return nil
+}
+
 type Log_Console struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -497,7 +565,7 @@ type Log_Console struct {
 
 func (x *Log_Console) Reset() {
 	*x = Log_Console{}
-	mi := &file_conf_proto_msgTypes[8]
+	mi := &file_conf_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -509,7 +577,7 @@ func (x *Log_Console) String() string {
 func (*Log_Console) ProtoMessage() {}
 
 func (x *Log_Console) ProtoReflect() protoreflect.Message {
-	mi := &file_conf_proto_msgTypes[8]
+	mi := &file_conf_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -560,7 +628,7 @@ type Log_File struct {
 
 func (x *Log_File) Reset() {
 	*x = Log_File{}
-	mi := &file_conf_proto_msgTypes[9]
+	mi := &file_conf_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -572,7 +640,7 @@ func (x *Log_File) String() string {
 func (*Log_File) ProtoMessage() {}
 
 func (x *Log_File) ProtoReflect() protoreflect.Message {
-	mi := &file_conf_proto_msgTypes[9]
+	mi := &file_conf_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -643,7 +711,7 @@ type Log_Loki struct {
 
 func (x *Log_Loki) Reset() {
 	*x = Log_Loki{}
-	mi := &file_conf_proto_msgTypes[10]
+	mi := &file_conf_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -655,7 +723,7 @@ func (x *Log_Loki) String() string {
 func (*Log_Loki) ProtoMessage() {}
 
 func (x *Log_Loki) ProtoReflect() protoreflect.Message {
-	mi := &file_conf_proto_msgTypes[10]
+	mi := &file_conf_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -718,7 +786,7 @@ type Log_Ent struct {
 
 func (x *Log_Ent) Reset() {
 	*x = Log_Ent{}
-	mi := &file_conf_proto_msgTypes[11]
+	mi := &file_conf_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -730,7 +798,7 @@ func (x *Log_Ent) String() string {
 func (*Log_Ent) ProtoMessage() {}
 
 func (x *Log_Ent) ProtoReflect() protoreflect.Message {
-	mi := &file_conf_proto_msgTypes[11]
+	mi := &file_conf_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -792,7 +860,7 @@ type Data_Database struct {
 
 func (x *Data_Database) Reset() {
 	*x = Data_Database{}
-	mi := &file_conf_proto_msgTypes[13]
+	mi := &file_conf_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -804,7 +872,7 @@ func (x *Data_Database) String() string {
 func (*Data_Database) ProtoMessage() {}
 
 func (x *Data_Database) ProtoReflect() protoreflect.Message {
-	mi := &file_conf_proto_msgTypes[13]
+	mi := &file_conf_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -902,7 +970,7 @@ type Data_Redis struct {
 
 func (x *Data_Redis) Reset() {
 	*x = Data_Redis{}
-	mi := &file_conf_proto_msgTypes[14]
+	mi := &file_conf_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -914,7 +982,7 @@ func (x *Data_Redis) String() string {
 func (*Data_Redis) ProtoMessage() {}
 
 func (x *Data_Redis) ProtoReflect() protoreflect.Message {
-	mi := &file_conf_proto_msgTypes[14]
+	mi := &file_conf_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -970,15 +1038,20 @@ const file_conf_proto_rawDesc = "" +
 	"\x03log\x18\x02 \x01(\v2\x0f.kratos.api.LogR\x03log\x12$\n" +
 	"\x04data\x18\x03 \x01(\v2\x10.kratos.api.DataR\x04data\x12'\n" +
 	"\x05trace\x18\x04 \x01(\v2\x11.kratos.api.TraceR\x05trace\x12-\n" +
-	"\ametrics\x18\x05 \x01(\v2\x13.kratos.api.MetricsR\ametrics\"\xb8\x02\n" +
+	"\ametrics\x18\x05 \x01(\v2\x13.kratos.api.MetricsR\ametrics\"\xdc\x03\n" +
 	"\x06Server\x12+\n" +
 	"\x04http\x18\x01 \x01(\v2\x17.kratos.api.Server.HTTPR\x04http\x12+\n" +
-	"\x04grpc\x18\x02 \x01(\v2\x17.kratos.api.Server.GRPCR\x04grpc\x1ai\n" +
+	"\x04grpc\x18\x02 \x01(\v2\x17.kratos.api.Server.GRPCR\x04grpc\x124\n" +
+	"\aconnect\x18\x03 \x01(\v2\x1a.kratos.api.Server.ConnectR\aconnect\x1ai\n" +
 	"\x04HTTP\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
 	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x1ai\n" +
 	"\x04GRPC\x12\x18\n" +
+	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
+	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x1al\n" +
+	"\aConnect\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
 	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xeb\x06\n" +
@@ -1054,7 +1127,7 @@ func file_conf_proto_rawDescGZIP() []byte {
 	return file_conf_proto_rawDescData
 }
 
-var file_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),           // 0: kratos.api.Bootstrap
 	(*Server)(nil),              // 1: kratos.api.Server
@@ -1064,14 +1137,15 @@ var file_conf_proto_goTypes = []any{
 	(*Metrics)(nil),             // 5: kratos.api.Metrics
 	(*Server_HTTP)(nil),         // 6: kratos.api.Server.HTTP
 	(*Server_GRPC)(nil),         // 7: kratos.api.Server.GRPC
-	(*Log_Console)(nil),         // 8: kratos.api.Log.Console
-	(*Log_File)(nil),            // 9: kratos.api.Log.File
-	(*Log_Loki)(nil),            // 10: kratos.api.Log.Loki
-	(*Log_Ent)(nil),             // 11: kratos.api.Log.Ent
-	nil,                         // 12: kratos.api.Log.Loki.LabelsEntry
-	(*Data_Database)(nil),       // 13: kratos.api.Data.Database
-	(*Data_Redis)(nil),          // 14: kratos.api.Data.Redis
-	(*durationpb.Duration)(nil), // 15: google.protobuf.Duration
+	(*Server_Connect)(nil),      // 8: kratos.api.Server.Connect
+	(*Log_Console)(nil),         // 9: kratos.api.Log.Console
+	(*Log_File)(nil),            // 10: kratos.api.Log.File
+	(*Log_Loki)(nil),            // 11: kratos.api.Log.Loki
+	(*Log_Ent)(nil),             // 12: kratos.api.Log.Ent
+	nil,                         // 13: kratos.api.Log.Loki.LabelsEntry
+	(*Data_Database)(nil),       // 14: kratos.api.Data.Database
+	(*Data_Redis)(nil),          // 15: kratos.api.Data.Redis
+	(*durationpb.Duration)(nil), // 16: google.protobuf.Duration
 }
 var file_conf_proto_depIdxs = []int32{
 	1,  // 0: kratos.api.Bootstrap.server:type_name -> kratos.api.Server
@@ -1081,25 +1155,27 @@ var file_conf_proto_depIdxs = []int32{
 	5,  // 4: kratos.api.Bootstrap.metrics:type_name -> kratos.api.Metrics
 	6,  // 5: kratos.api.Server.http:type_name -> kratos.api.Server.HTTP
 	7,  // 6: kratos.api.Server.grpc:type_name -> kratos.api.Server.GRPC
-	8,  // 7: kratos.api.Log.console:type_name -> kratos.api.Log.Console
-	9,  // 8: kratos.api.Log.file:type_name -> kratos.api.Log.File
-	10, // 9: kratos.api.Log.loki:type_name -> kratos.api.Log.Loki
-	11, // 10: kratos.api.Log.ent:type_name -> kratos.api.Log.Ent
-	13, // 11: kratos.api.Data.database:type_name -> kratos.api.Data.Database
-	14, // 12: kratos.api.Data.redis:type_name -> kratos.api.Data.Redis
-	15, // 13: kratos.api.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	15, // 14: kratos.api.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	12, // 15: kratos.api.Log.Loki.labels:type_name -> kratos.api.Log.Loki.LabelsEntry
-	15, // 16: kratos.api.Log.Loki.batch_wait:type_name -> google.protobuf.Duration
-	15, // 17: kratos.api.Log.Ent.slow_query_threshold:type_name -> google.protobuf.Duration
-	15, // 18: kratos.api.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	15, // 19: kratos.api.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	15, // 20: kratos.api.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	8,  // 7: kratos.api.Server.connect:type_name -> kratos.api.Server.Connect
+	9,  // 8: kratos.api.Log.console:type_name -> kratos.api.Log.Console
+	10, // 9: kratos.api.Log.file:type_name -> kratos.api.Log.File
+	11, // 10: kratos.api.Log.loki:type_name -> kratos.api.Log.Loki
+	12, // 11: kratos.api.Log.ent:type_name -> kratos.api.Log.Ent
+	14, // 12: kratos.api.Data.database:type_name -> kratos.api.Data.Database
+	15, // 13: kratos.api.Data.redis:type_name -> kratos.api.Data.Redis
+	16, // 14: kratos.api.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	16, // 15: kratos.api.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	16, // 16: kratos.api.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	13, // 17: kratos.api.Log.Loki.labels:type_name -> kratos.api.Log.Loki.LabelsEntry
+	16, // 18: kratos.api.Log.Loki.batch_wait:type_name -> google.protobuf.Duration
+	16, // 19: kratos.api.Log.Ent.slow_query_threshold:type_name -> google.protobuf.Duration
+	16, // 20: kratos.api.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	16, // 21: kratos.api.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	16, // 22: kratos.api.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	23, // [23:23] is the sub-list for method output_type
+	23, // [23:23] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_conf_proto_init() }
@@ -1113,7 +1189,7 @@ func file_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_conf_proto_rawDesc), len(file_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

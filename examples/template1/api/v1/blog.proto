@@ -34,6 +34,7 @@ service BlogService {
   }
   rpc GetBlog(GetBlogRequest) returns (GetBlogResponse) {
     option (google.api.http) = {get: "/api/v1/blog/{id}"};
+    option idempotency_level = NO_SIDE_EFFECTS;
   }
   rpc QueryBlog(QueryBlogRequest) returns (QueryBlogResponse) {
     option (google.api.http) = {get: "/api/v1/blog"};
@@ -105,7 +106,7 @@ message QueryBlogRequest {
   repeated string order_by = 100 [(buf.validate.field).cel = {
     id: "QueryBlogRequest.order_by"
     message: "排序格式错误"
-    expression: "this.all(item, size(item) == 0 || item.matches('^(created_at|updated_at):(asc|desc)$'))"
+    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt):(asc|desc)$'))"
   }];
 }
 message QueryBlogResponse {

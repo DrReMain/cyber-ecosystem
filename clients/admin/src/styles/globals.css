@@ -1,7 +1,0 @@
-@layer theme, base, antd, components, utilities;
-
-@import "tailwindcss/theme" layer(theme);
-@import "tailwindcss/preflight" layer(base);
-@import "tailwindcss/utilities" layer(utilities);
-
-@import "./app.css" layer(base);

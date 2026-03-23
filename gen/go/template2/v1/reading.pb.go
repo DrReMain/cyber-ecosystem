@@ -482,15 +482,15 @@ var File_v1_reading_proto protoreflect.FileDescriptor
 
 const file_v1_reading_proto_rawDesc = "" +
 	"\n" +
-	"\x10v1/reading.proto\x12\x10api.template2.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13common/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xc7\x03\n" +
+	"\x10v1/reading.proto\x12\x10api.template2.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13common/common.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xb7\x03\n" +
 	"\x10QueryBlogRequest\x12'\n" +
 	"\x04page\x18\x01 \x01(\v2\x13.common.PageRequestR\x04page\x12\x1d\n" +
 	"\x02id\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01\x12\x19\n" +
 	"\x05title\x18\x03 \x01(\tH\x01R\x05title\x88\x01\x01\x12@\n" +
 	"\x0epublished_at_a\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\fpublishedAtA\x12@\n" +
-	"\x0epublished_at_z\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\fpublishedAtZ\x12\xba\x01\n" +
-	"\border_by\x18d \x03(\tB\x9e\x01\xbaH\x9a\x01\xba\x01\x96\x01\n" +
-	"\x19QueryBlogRequest.order_by\x12\x12排序格式错误\x1aethis.all(item, size(item) == 0 || item.matches('^(created_at|updated_at|reading_count):(asc|desc)$'))R\aorderByB\x05\n" +
+	"\x0epublished_at_z\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\fpublishedAtZ\x12\xaa\x01\n" +
+	"\border_by\x18d \x03(\tB\x8e\x01\xbaH\x8a\x01\xba\x01\x86\x01\n" +
+	"\x19QueryBlogRequest.order_by\x12\x12排序格式错误\x1aUthis.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt):(asc|desc)$'))R\aorderByB\x05\n" +
 	"\x03_idB\b\n" +
 	"\x06_title\"t\n" +
 	"\x11QueryBlogResponse\x12(\n" +
@@ -521,10 +521,10 @@ const file_v1_reading_proto_rawDesc = "" +
 	"\x14RecordReadingRequest\x12\x18\n" +
 	"\x02id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14R\x02id\"<\n" +
 	"\x15RecordReadingResponse\x12#\n" +
-	"\rreading_count\x18\x01 \x01(\x03R\freadingCount2\x85\x03\n" +
+	"\rreading_count\x18\x01 \x01(\x03R\freadingCount2\x88\x03\n" +
 	"\x0eReadingService\x12r\n" +
-	"\tQueryBlog\x12\".api.template2.v1.QueryBlogRequest\x1a#.api.template2.v1.QueryBlogResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/reading/blog\x12q\n" +
-	"\aGetBlog\x12 .api.template2.v1.GetBlogRequest\x1a!.api.template2.v1.GetBlogResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/reading/blog/{id}\x12\x8b\x01\n" +
+	"\tQueryBlog\x12\".api.template2.v1.QueryBlogRequest\x1a#.api.template2.v1.QueryBlogResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/reading/blog\x12t\n" +
+	"\aGetBlog\x12 .api.template2.v1.GetBlogRequest\x1a!.api.template2.v1.GetBlogResponse\"$\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/reading/blog/{id}\x90\x02\x01\x12\x8b\x01\n" +
 	"\rRecordReading\x12&.api.template2.v1.RecordReadingRequest\x1a'.api.template2.v1.RecordReadingResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/reading/blog/{id}/readB\xcb\x01\n" +
 	"\x14com.api.template2.v1B\fReadingProtoP\x01ZCgithub.com/DrReMain/cyber-ecosystem/gen/go/template2/v1;template2V1\xa2\x02\x03ATX\xaa\x02\x10Api.Template2.V1\xca\x02\x10Api\\Template2\\V1\xe2\x02\x1cApi\\Template2\\V1\\GPBMetadata\xea\x02\x12Api::Template2::V1b\x06proto3"
 

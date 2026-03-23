@@ -3,12 +3,13 @@ package zap
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/go-kratos/kratos/v2/encoding"
 )
 
 type LokiWriter struct {
@@ -140,7 +141,8 @@ func (w *LokiWriter) flush() error {
 		},
 	}
 
-	body, err := json.Marshal(req)
+	codec := encoding.GetCodec("json")
+	body, err := codec.Marshal(req)
 	if err != nil {
 		return fmt.Errorf("failed to marshal loki request: %w", err)
 	}

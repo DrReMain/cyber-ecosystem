@@ -87,7 +87,7 @@ func (rp *readingRP) IncrementReading(ctx context.Context, blogID string) error 
 // ---------------------------------------------------------------------------------------------------------------------
 
 func (rp *readingRP) QueryBlog(ctx context.Context, in *template1V1.QueryBlogRequest) (*template1V1.QueryBlogResponse, error) {
-	return rp.data.template1BlogService.QueryBlog(ctx, in)
+	return rp.data.template1ConnectBlogService.QueryBlog(ctx, in)
 }
 
 func (rp *readingRP) GetBlog(ctx context.Context, in *template1V1.GetBlogRequest) (*template1V1.GetBlogResponse, error) {

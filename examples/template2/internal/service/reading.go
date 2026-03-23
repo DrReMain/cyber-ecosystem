@@ -5,8 +5,10 @@ import (
 
 	"github.com/DrReMain/cyber-ecosystem/examples/template2/internal/biz"
 	template2V1 "github.com/DrReMain/cyber-ecosystem/gen/go/template2/v1"
+	template2V1connect "github.com/DrReMain/cyber-ecosystem/gen/go/template2/v1/template2V1connect"
 
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/order_by"
+	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/transport/connect"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/util"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -34,6 +36,9 @@ func (s *ReadingService) RegisterGRPC(srv *grpc.Server) {
 }
 func (s *ReadingService) RegisterHTTP(srv *http.Server) {
 	template2V1.RegisterReadingServiceHTTPServer(srv, s)
+}
+func (s *ReadingService) RegisterConnect(srv *connect.Server) {
+	srv.Register(template2V1connect.NewReadingServiceHandler(s, srv.HandlerOptions()...))
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

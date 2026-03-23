@@ -8,6 +8,7 @@ import (
 	"github.com/DrReMain/cyber-ecosystem/examples/template1/internal/conf"
 
 	zaplog "github.com/DrReMain/cyber-ecosystem/shared-go/kratos/logging/zap"
+	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/transport/connect"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -44,9 +45,13 @@ var (
 
 func init() {
 	flag.StringVar(&flagConf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+
 	json.MarshalOptions = protojson.MarshalOptions{
-		EmitUnpopulated: true,
-		UseProtoNames:   true,
+		EmitUnpopulated: true,  // Zero values are emitted
+		UseProtoNames:   false, // camelCase output (createdAt, not created_at)
+	}
+	json.UnmarshalOptions = protojson.UnmarshalOptions{
+		DiscardUnknown: true, // Ignore unknown fields
 	}
 
 	{
@@ -67,7 +72,7 @@ func init() {
 	}
 }
 
-func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server, cs *connect.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
@@ -77,6 +82,7 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 		kratos.Server(
 			gs,
 			hs,
+			cs,
 		),
 	)
 }

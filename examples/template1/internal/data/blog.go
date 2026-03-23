@@ -66,7 +66,7 @@ func (rp *blogRP) Update(ctx context.Context, fieldsMask []string, entity *biz.B
 				func() { builder.SetContent(schema.BlogDefaultContent()) },
 				func() { builder.SetContent(*entity.Content) },
 			},
-			"published_at": {
+			"publishedAt": {
 				entity.PublishedAt == nil,
 				func() { builder.ClearPublishedAt() },
 				func() { builder.SetPublishedAt(*entity.PublishedAt) },
@@ -127,8 +127,8 @@ func (rp *blogRP) Query(ctx context.Context, bo *biz.BlogQueryIn) (*biz.BlogQuer
 	//	selector.OrderExpr(sql.IsNull(selector.C(blog.FieldPublishedAt)))
 	//})
 	entutil.ApplyOrderBy(bo.OrderBy, ent.Asc, ent.Desc, entutil.FOMapping{
-		"created_at": func(sel entutil.SQLSelector) { query.Order(sel(blog.FieldCreatedAt)) },
-		"updated_at": func(sel entutil.SQLSelector) { query.Order(sel(blog.FieldUpdatedAt)) },
+		"createdAt": func(sel entutil.SQLSelector) { query.Order(sel(blog.FieldCreatedAt)) },
+		"updatedAt": func(sel entutil.SQLSelector) { query.Order(sel(blog.FieldUpdatedAt)) },
 	})
 
 	total, offset, limit, err := entutil.ApplyPagination(ctx, query, bo.PageRequest,

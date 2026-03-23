@@ -12,12 +12,12 @@ paths:
                 - ReadingService
             operationId: ReadingService_QueryBlog
             parameters:
-                - name: page.page_no
+                - name: page.pageNo
                   in: query
                   schema:
                     type: integer
                     format: int32
-                - name: page.page_size
+                - name: page.pageSize
                   in: query
                   schema:
                     type: integer
@@ -26,22 +26,22 @@ paths:
                   in: query
                   schema:
                     type: boolean
-                - name: page.created_at_a
+                - name: page.createdAtA
                   in: query
                   schema:
                     type: string
                     format: date-time
-                - name: page.created_at_z
+                - name: page.createdAtZ
                   in: query
                   schema:
                     type: string
                     format: date-time
-                - name: page.updated_at_a
+                - name: page.updatedAtA
                   in: query
                   schema:
                     type: string
                     format: date-time
-                - name: page.updated_at_z
+                - name: page.updatedAtZ
                   in: query
                   schema:
                     type: string
@@ -54,17 +54,17 @@ paths:
                   in: query
                   schema:
                     type: string
-                - name: published_at_a
+                - name: publishedAtA
                   in: query
                   schema:
                     type: string
                     format: date-time
-                - name: published_at_z
+                - name: publishedAtZ
                   in: query
                   schema:
                     type: string
                     format: date-time
-                - name: order_by
+                - name: orderBy
                   in: query
                   schema:
                     type: array
@@ -126,40 +126,40 @@ components:
             properties:
                 id:
                     type: string
-                created_at:
+                createdAt:
                     type: string
                     format: date-time
-                updated_at:
+                updatedAt:
                     type: string
                     format: date-time
                 title:
                     type: string
                 content:
                     type: string
-                published_at:
+                publishedAt:
                     type: string
                     format: date-time
-                reading_count:
+                readingCount:
                     type: string
         api.template2.v1.GetBlogResponse:
             type: object
             properties:
                 id:
                     type: string
-                created_at:
+                createdAt:
                     type: string
                     format: date-time
-                updated_at:
+                updatedAt:
                     type: string
                     format: date-time
                 title:
                     type: string
                 content:
                     type: string
-                published_at:
+                publishedAt:
                     type: string
                     format: date-time
-                reading_count:
+                readingCount:
                     type: string
         api.template2.v1.QueryBlogResponse:
             type: object
@@ -178,15 +178,15 @@ components:
         api.template2.v1.RecordReadingResponse:
             type: object
             properties:
-                reading_count:
+                readingCount:
                     type: string
         common.PageResponse:
             type: object
             properties:
-                page_no:
+                pageNo:
                     type: integer
                     format: int32
-                page_size:
+                pageSize:
                     type: integer
                     format: int32
                 total:

@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/DrReMain/cyber-ecosystem/examples/template1/internal/biz"
@@ -64,7 +65,7 @@ func NewEntClient(c *conf.Data, cLog *conf.Log, logger log.Logger, meterProvider
 		MeterProvider:   meterProvider,
 	})
 	if err != nil {
-		log.Fatalf("failed opening connection to database: %v", err)
+		return nil, fmt.Errorf("failed opening connection to database: %w", err)
 	}
 
 	var finalDrv dialect.Driver = entClient.Driver

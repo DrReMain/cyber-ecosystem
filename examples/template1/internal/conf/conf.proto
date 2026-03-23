@@ -24,8 +24,14 @@ message Server {
     string addr = 2;
     google.protobuf.Duration timeout = 3;
   }
+  message Connect {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
   HTTP http = 1;
   GRPC grpc = 2;
+  Connect connect = 3;
 }
 
 message Log {
@@ -34,15 +40,15 @@ message Log {
   message Console {
     bool enabled = 1;
     bool color = 2;
-    string format = 3;  // "console" or "json", default "console"
+    string format = 3; // "console" or "json", default "console"
   }
 
   message File {
     bool enabled = 1;
     string path = 2;
-    int32 max_size = 3;        // MB
+    int32 max_size = 3; // MB
     int32 max_backups = 4;
-    int32 max_age = 5;         // days
+    int32 max_age = 5; // days
     bool compress = 6;
   }
 
@@ -51,7 +57,7 @@ message Log {
     string url = 2;
     map<string, string> labels = 3;
     google.protobuf.Duration batch_wait = 4;
-    int32 batch_size = 5;      // bytes
+    int32 batch_size = 5; // bytes
   }
 
   message Ent {

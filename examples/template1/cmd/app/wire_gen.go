@@ -36,7 +36,8 @@ func wireApp(confServer *conf.Server, confLog *conf.Log, confData *conf.Data, me
 	v := service.NewRegistrarList(blogService)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, tracerProvider, int64Counter, float64Histogram)
 	httpServer := server.NewHTTPServer(confServer, logger, v, tracerProvider, metrics, int64Counter, float64Histogram)
-	app := newApp(logger, grpcServer, httpServer)
+	connectServer := server.NewConnectServer(confServer, logger, v, tracerProvider, int64Counter, float64Histogram)
+	app := newApp(logger, grpcServer, httpServer, connectServer)
 	return app, func() {
 		cleanup()
 	}, nil
