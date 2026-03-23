@@ -9,7 +9,7 @@ option go_package = "github.com/DrReMain/cyber-ecosystem/gen/go/<%= name %>/v1;<
 
 service HelloService {
   rpc SayHello(SayHelloRequest) returns (SayHelloResponse) {
-    option (google.api.http) = {get: "/api/v1/hello"};
+    option (google.api.http) = {get: "/api/v1/hello/{name}"};
   }
 }
 

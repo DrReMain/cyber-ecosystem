@@ -113,7 +113,7 @@ func main() {
 	)
 
 	var tp *tracesdk.TracerProvider
-	if bc.Trace.Endpoint != "" {
+	if bc.Trace != nil && bc.Trace.Endpoint != "" {
 		exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(bc.Trace.Endpoint)))
 		if err != nil {
 			panic(err)

@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/metrics"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
@@ -35,17 +36,15 @@ func NewHTTPServer(
 	_metricRequests metric.Int64Counter,
 	_metricSeconds metric.Float64Histogram,
 ) *http.Server {
+	var middlewares = []middleware.Middleware{recovery.Recovery()}
+	middlewares = append(middlewares, metrics.Server(metrics.WithSeconds(_metricSeconds), metrics.WithRequests(_metricRequests)))
+	if tp != nil {
+		middlewares = append(middlewares, tracing.Server(tracing.WithTracerProvider(tp)))
+	}
+	middlewares = append(middlewares, logging.Server(logger))
+	middlewares = append(middlewares, validate.ProtoValidate(validate.UseProtoMessage))
 	var opts = []http.ServerOption{
-		http.Middleware(
-			recovery.Recovery(),
-			metrics.Server(
-				metrics.WithSeconds(_metricSeconds),
-				metrics.WithRequests(_metricRequests),
-			),
-			tracing.Server(tracing.WithTracerProvider(tp)),
-			logging.Server(logger),
-			validate.ProtoValidate(validate.UseProtoMessage),
-		),
+		http.Middleware(middlewares...),
 		http.ResponseEncoder(encoder.NewResponseEncoder(ResponseBuildBody)),
 		http.ErrorEncoder(encoder.NewErrorEncoder(ErrorBuildBody)),
 	}
@@ -59,7 +58,7 @@ func NewHTTPServer(
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
-	if len(cMetrics.Path) > 1 && strings.HasPrefix(cMetrics.Path, "/") {
+	if cMetrics != nil && len(cMetrics.Path) > 1 && strings.HasPrefix(cMetrics.Path, "/") {
 		srv.Handle(cMetrics.Path, promhttp.Handler())
 	}
 	for _, svc := range services {

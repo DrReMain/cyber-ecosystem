@@ -265,6 +265,19 @@ export default async function kratosBaseGenerator(
     }
 
     // Run generate
+    logger.info(`\n🔄 Running [generate:ent] for project "${projectName}"...`);
+    try {
+      execSync(`"${nxPath}" run ${projectName}:generate:ent`, {
+        cwd: workspaceRoot,
+        stdio: 'inherit',
+      });
+      logger.info(`\n✅ Successfully ran [generate:ent] for project "${projectName}"`);
+    } catch (error) {
+      logger.error(`\n❌ Failed to run [generate:ent] for project "${projectName}"`);
+      throw error;
+    }
+
+    // Run generate
     logger.info(`\n🔄 Running [generate] for project "${projectName}"...`);
     try {
       execSync(`"${nxPath}" run ${projectName}:generate`, {

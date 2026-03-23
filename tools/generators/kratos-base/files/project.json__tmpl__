@@ -26,6 +26,18 @@
         "command": "echo 'proto generation completed'"
       }
     },
+    "generate:ent": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["proto"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "go generate ./internal/data/ent",
+          "go mod tidy"
+        ],
+        "parallel": false
+      }
+    },
     "generate": {
       "executor": "nx:run-commands",
       "dependsOn": ["proto"],

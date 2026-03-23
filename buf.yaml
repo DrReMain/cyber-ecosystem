@@ -4,6 +4,7 @@ modules:
 
   - path: examples/template1/api
   - path: examples/template2/api
+  - path: examples/template3/api
 
 deps:
   - buf.build/googleapis/googleapis

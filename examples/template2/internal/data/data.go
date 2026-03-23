@@ -16,6 +16,7 @@ import (
 	"github.com/DrReMain/cyber-ecosystem/shared-go/orm/ent/entutil"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/metrics"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
@@ -109,20 +110,18 @@ func NewTemplate1BlogService(
 	_metricRequests metric.Int64Counter,
 	_metricSeconds metric.Float64Histogram,
 ) template1V1.BlogServiceClient {
+	var middlewares = []middleware.Middleware{recovery.Recovery()}
+	middlewares = append(middlewares, metrics.Client(metrics.WithSeconds(_metricSeconds), metrics.WithRequests(_metricRequests)))
+	if tp != nil {
+		middlewares = append(middlewares, tracing.Client(tracing.WithTracerProvider(tp)))
+	}
+	middlewares = append(middlewares, logging.Client(logger))
 	conn, err := grpc.DialInsecure(
 		context.Background(),
 		grpc.WithEndpoint(c.ServiceTemplate1.Addr),
 		grpc.WithTimeout(c.ServiceTemplate1.Timeout.AsDuration()),
 		grpc.WithHealthCheck(true),
-		grpc.WithMiddleware(
-			recovery.Recovery(),
-			metrics.Client(
-				metrics.WithSeconds(_metricSeconds),
-				metrics.WithRequests(_metricRequests),
-			),
-			tracing.Client(tracing.WithTracerProvider(tp)),
-			logging.Client(logger),
-		),
+		grpc.WithMiddleware(middlewares...),
 	)
 	if err != nil {
 		panic(err)

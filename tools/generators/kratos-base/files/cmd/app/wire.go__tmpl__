@@ -17,6 +17,7 @@ import (
 
 	"github.com/google/wire"
 	"go.opentelemetry.io/otel/metric"
+    metricsdk "go.opentelemetry.io/otel/sdk/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -29,6 +30,7 @@ func wireApp(
 	*tracesdk.TracerProvider,
 	metric.Int64Counter,
 	metric.Float64Histogram,
+    *metricsdk.MeterProvider,
 ) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		server.ProviderSet,

@@ -24,3 +24,10 @@ scrape_configs:
         labels:
           service: 'examples-template2'
     metrics_path: /metrics
+
+  - job_name: 'examples-template3'
+    static_configs:
+      - targets: [ 'host.docker.internal:11002' ]
+        labels:
+          service: 'examples-template3'
+    metrics_path: /metrics
