@@ -1,11 +1,17 @@
 package server
 
 import (
+	"context"
+
 	"github.com/DrReMain/cyber-ecosystem/examples/template2/internal/conf"
 	"github.com/DrReMain/cyber-ecosystem/examples/template2/internal/service"
 
+	template2V1 "github.com/DrReMain/cyber-ecosystem/gen/go/template2/v1"
+	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/middleware/responsemeta"
+	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/middleware/traceheader"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/middleware/validate"
 
+	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
@@ -26,13 +32,18 @@ func NewGRPCServer(
 	_metricRequests metric.Int64Counter,
 	_metricSeconds metric.Float64Histogram,
 ) *grpc.Server {
-	var middlewares = []middleware.Middleware{recovery.Recovery()}
+	var middlewares = []middleware.Middleware{recovery.Recovery(recovery.WithHandler(func(context.Context, any, any) error {
+		return errors.InternalServer(template2V1.ErrorReason_ERROR_REASON_UNSPECIFIED.String(), "")
+	}))}
 	middlewares = append(middlewares, metrics.Server(metrics.WithSeconds(_metricSeconds), metrics.WithRequests(_metricRequests)))
 	if tp != nil {
 		middlewares = append(middlewares, tracing.Server(tracing.WithTracerProvider(tp)))
 	}
+	middlewares = append(middlewares, traceheader.Server())
+	middlewares = append(middlewares, responsemeta.Server())
 	middlewares = append(middlewares, logging.Server(logger))
-	middlewares = append(middlewares, validate.ProtoValidate(validate.UseProtoMessage))
+	middlewares = append(middlewares, localizeErrorMiddleware(template2V1.ErrorReason_ERROR_REASON_UNSPECIFIED.String()))
+	middlewares = append(middlewares, validate.ProtoValidate(template2V1.ErrorReason_ERROR_REASON_VALIDATOR.String(), validate.UseDefaultError))
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(middlewares...),
 	}

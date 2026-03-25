@@ -1,14 +1,18 @@
 package server
 
 import (
+	"context"
 	"strings"
-	"time"
 
 	"github.com/DrReMain/cyber-ecosystem/examples/template1/internal/conf"
 	"github.com/DrReMain/cyber-ecosystem/examples/template1/internal/service"
 
 	"github.com/DrReMain/cyber-ecosystem/gen/go/common"
+	template1V1 "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/encoder"
+	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/i18n"
+	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/middleware/responsemeta"
+	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/middleware/traceheader"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/middleware/validate"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -23,9 +27,19 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
+
+var i18nTranslator i18n.Translator = newDefaultI18nTranslator()
+
+func SetI18nTranslator(translator i18n.Translator) {
+	if translator == nil {
+		return
+	}
+	i18nTranslator = translator
+}
 
 func NewHTTPServer(
 	c *conf.Server,
@@ -36,13 +50,18 @@ func NewHTTPServer(
 	_metricRequests metric.Int64Counter,
 	_metricSeconds metric.Float64Histogram,
 ) *http.Server {
-	var middlewares = []middleware.Middleware{recovery.Recovery()}
+	var middlewares = []middleware.Middleware{recovery.Recovery(recovery.WithHandler(func(context.Context, any, any) error {
+		return errors.InternalServer(template1V1.ErrorReason_ERROR_REASON_UNSPECIFIED.String(), "")
+	}))}
 	middlewares = append(middlewares, metrics.Server(metrics.WithSeconds(_metricSeconds), metrics.WithRequests(_metricRequests)))
 	if tp != nil {
 		middlewares = append(middlewares, tracing.Server(tracing.WithTracerProvider(tp)))
 	}
+	middlewares = append(middlewares, traceheader.Server())
+	middlewares = append(middlewares, responsemeta.Server())
 	middlewares = append(middlewares, logging.Server(logger))
-	middlewares = append(middlewares, validate.ProtoValidate(validate.UseProtoMessage))
+	middlewares = append(middlewares, localizeErrorMiddleware(template1V1.ErrorReason_ERROR_REASON_UNSPECIFIED.String()))
+	middlewares = append(middlewares, validate.ProtoValidate(template1V1.ErrorReason_ERROR_REASON_VALIDATOR.String(), validate.UseDefaultError))
 	var opts = []http.ServerOption{
 		http.Middleware(middlewares...),
 		http.ResponseEncoder(encoder.NewResponseEncoder(ResponseBuildBody)),
@@ -68,27 +87,37 @@ func NewHTTPServer(
 }
 
 func ResponseBuildBody(v any) (any, error) {
-	reply := &common.Reply{
-		T:       time.Now().UnixMilli(),
-		Success: true,
-		Msg:     "OK",
-		Result:  nil,
+	msg, ok := v.(proto.Message)
+	if !ok {
+		return nil, errors.InternalServer(template1V1.ErrorReason_ERROR_REASON_UNSPECIFIED.String(), "")
 	}
-	if m, ok := v.(proto.Message); ok {
-		if anyVal, err := anypb.New(m); err != nil {
-			return nil, err
-		} else {
-			reply.Result = anyVal
-		}
-	}
-	return reply, nil
+	return msg, nil
 }
 
-func ErrorBuildBody(err *errors.Error) any {
-	return &common.Reply{
-		T:       time.Now().UnixMilli(),
-		Success: false,
-		Msg:     err.Message,
-		Result:  nil,
+func ErrorBuildBody(ctx context.Context, sourceErr error, err *errors.Error) any {
+	return &common.ErrorBody{
+		Reason:  err.Reason,
+		Message: resolveErrorMessage(ctx, err),
+		Details: extractErrorDetails(sourceErr),
 	}
+}
+
+func extractErrorDetails(sourceErr error) []*anypb.Any {
+	s := status.Convert(sourceErr)
+	if s == nil {
+		return nil
+	}
+	details := make([]*anypb.Any, 0, len(s.Details()))
+	for _, detail := range s.Details() {
+		message, ok := detail.(proto.Message)
+		if !ok {
+			continue
+		}
+		anyVal, err := anypb.New(message)
+		if err != nil {
+			continue
+		}
+		details = append(details, anyVal)
+	}
+	return details
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/DrReMain/cyber-ecosystem/examples/template1/internal/data/ent/predicate"
 	"github.com/DrReMain/cyber-ecosystem/examples/template1/internal/data/ent/schema"
 
+	template1V1 "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/masks"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/util"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/orm/ent/entutil"
@@ -132,7 +133,9 @@ func (rp *blogRP) Query(ctx context.Context, bo *biz.BlogQueryIn) (*biz.BlogQuer
 	})
 
 	total, offset, limit, err := entutil.ApplyPagination(ctx, query, bo.PageRequest,
-		entutil.NewPageConfig(entutil.DefaultPageSize, entutil.DefaultPageSizeUnlimit))
+		entutil.NewPageConfig(entutil.DefaultPageSize, entutil.DefaultPageSizeMax),
+		template1V1.ErrorReason_ERROR_REASON_PAGINATION_INVALID_ARGUMENT.String(),
+	)
 	if err != nil {
 		return nil, HandleError(err)
 	}

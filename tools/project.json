@@ -9,6 +9,13 @@
         "cwd": "{workspaceRoot}",
         "command": "./nx g ./tools/generators/generators.json:kratos-base"
       }
+    },
+    "i18n:kratos-sync": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "go run ./tools/i18n/kratos-sync --service={args.service}"
+      }
     }
   }
 }

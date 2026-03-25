@@ -1,0 +1,7 @@
+package locales
+
+import "embed"
+
+//go:embed active.*.json
+var FS embed.FS
+

@@ -1,28 +1,25 @@
 # 文档索引
 
-`docs/` 分为四类内容：当前有效规范、技术决策记录、现状评审、未来路线图。
+本文档说明 `docs/` 的用途与阅读顺序。  
+更新时间：2026-03-26。
 
-## 当前有效
+## 1. 当前有效规范（先读）
 
-- [AGENTS.md](./AGENTS.md): 面向 AI Agent 的仓库工作约束
-- [DEVELOPMENT.md](./DEVELOPMENT.md): 面向开发者的日常开发指南
-- [ARCHITECTURE_BLUEPRINT.md](./ARCHITECTURE_BLUEPRINT.md): 当前仓库架构蓝图与边界
+- [DEVELOPMENT.md](./DEVELOPMENT.md)：开发者日常开发与实现约束
+- [AGENTS.md](./AGENTS.md)：AI Agent 执行约束
+- [ARCHITECTURE_BLUEPRINT.md](./ARCHITECTURE_BLUEPRINT.md)：当前架构边界与演进原则
 
-## 技术决策记录
+## 2. 决策与评审（辅助）
 
-- [API_CONTRACT_DECISIONS.md](./API_CONTRACT_DECISIONS.md): API 契约技术选型决策，涵盖 tRPC、oRPC、ts-rest、Kubb、Connect-RPC 的对比分析与架构设计
+- [API_CONTRACT_DECISIONS.md](./API_CONTRACT_DECISIONS.md)：契约技术选型与协议分层决策
+- [PROJECT_REVIEW.md](./PROJECT_REVIEW.md)：阶段性审视与问题清单
 
-## 现状评审
+## 3. 路线图（非现状承诺）
 
-- [PROJECT_REVIEW.md](./PROJECT_REVIEW.md): 对结构、扩展性、稳定性、文档一致性的审视
+- [ROADMAP.md](./ROADMAP.md)：未来主题与推进方向
 
-## 未来路线
+## 4. 使用建议
 
-- [ROADMAP.md](./ROADMAP.md): 尚未落地但值得继续推进的主题，包括错误治理、i18n、限流熔断、分布式事务、链路上下文增强、契约架构升级
-
-## 使用建议
-
-- 要开始编码：先读 `DEVELOPMENT.md`
+- 要开始改代码：先读 `DEVELOPMENT.md`
 - 要让 Agent 接手：先读 `AGENTS.md`
-- 要理解仓库边界：读 `ARCHITECTURE_BLUEPRINT.md`
-- 要决定下一步补什么：读 `PROJECT_REVIEW.md` 和 `ROADMAP.md`
+- 要判断“是否已实现”：优先看代码和 `project.json`，再参考文档

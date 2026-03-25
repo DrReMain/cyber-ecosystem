@@ -27,30 +27,30 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Reply struct {
+type ErrorBody struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	T             int64                  `protobuf:"varint,1,opt,name=t,proto3" json:"t,omitempty"`
-	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
-	Msg           string                 `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`
-	Result        *anypb.Any             `protobuf:"bytes,4,opt,name=result,proto3" json:"result,omitempty"`
+	Reason        string                 `protobuf:"bytes,1,opt,name=reason,proto3" json:"reason,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Details       []*anypb.Any           `protobuf:"bytes,3,rep,name=details,proto3" json:"details,omitempty"`
+	Errors        []*ErrorBody           `protobuf:"bytes,4,rep,name=errors,proto3" json:"errors,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Reply) Reset() {
-	*x = Reply{}
+func (x *ErrorBody) Reset() {
+	*x = ErrorBody{}
 	mi := &file_common_common_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Reply) String() string {
+func (x *ErrorBody) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Reply) ProtoMessage() {}
+func (*ErrorBody) ProtoMessage() {}
 
-func (x *Reply) ProtoReflect() protoreflect.Message {
+func (x *ErrorBody) ProtoReflect() protoreflect.Message {
 	mi := &file_common_common_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -62,35 +62,95 @@ func (x *Reply) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Reply.ProtoReflect.Descriptor instead.
-func (*Reply) Descriptor() ([]byte, []int) {
+// Deprecated: Use ErrorBody.ProtoReflect.Descriptor instead.
+func (*ErrorBody) Descriptor() ([]byte, []int) {
 	return file_common_common_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Reply) GetT() int64 {
+func (x *ErrorBody) GetReason() string {
 	if x != nil {
-		return x.T
+		return x.Reason
 	}
-	return 0
+	return ""
 }
 
-func (x *Reply) GetSuccess() bool {
+func (x *ErrorBody) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ErrorBody) GetDetails() []*anypb.Any {
+	if x != nil {
+		return x.Details
+	}
+	return nil
+}
+
+func (x *ErrorBody) GetErrors() []*ErrorBody {
+	if x != nil {
+		return x.Errors
+	}
+	return nil
+}
+
+type ResponseBody struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Result        *anypb.Any             `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
+	Err           *ErrorBody             `protobuf:"bytes,3,opt,name=err,proto3" json:"err,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResponseBody) Reset() {
+	*x = ResponseBody{}
+	mi := &file_common_common_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResponseBody) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResponseBody) ProtoMessage() {}
+
+func (x *ResponseBody) ProtoReflect() protoreflect.Message {
+	mi := &file_common_common_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResponseBody.ProtoReflect.Descriptor instead.
+func (*ResponseBody) Descriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ResponseBody) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
 	return false
 }
 
-func (x *Reply) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
-func (x *Reply) GetResult() *anypb.Any {
+func (x *ResponseBody) GetResult() *anypb.Any {
 	if x != nil {
 		return x.Result
+	}
+	return nil
+}
+
+func (x *ResponseBody) GetErr() *ErrorBody {
+	if x != nil {
+		return x.Err
 	}
 	return nil
 }
@@ -110,7 +170,7 @@ type PageRequest struct {
 
 func (x *PageRequest) Reset() {
 	*x = PageRequest{}
-	mi := &file_common_common_proto_msgTypes[1]
+	mi := &file_common_common_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -122,7 +182,7 @@ func (x *PageRequest) String() string {
 func (*PageRequest) ProtoMessage() {}
 
 func (x *PageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[1]
+	mi := &file_common_common_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -135,7 +195,7 @@ func (x *PageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PageRequest.ProtoReflect.Descriptor instead.
 func (*PageRequest) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{1}
+	return file_common_common_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *PageRequest) GetPageNo() int32 {
@@ -199,7 +259,7 @@ type PageResponse struct {
 
 func (x *PageResponse) Reset() {
 	*x = PageResponse{}
-	mi := &file_common_common_proto_msgTypes[2]
+	mi := &file_common_common_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -211,7 +271,7 @@ func (x *PageResponse) String() string {
 func (*PageResponse) ProtoMessage() {}
 
 func (x *PageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[2]
+	mi := &file_common_common_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -224,7 +284,7 @@ func (x *PageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PageResponse.ProtoReflect.Descriptor instead.
 func (*PageResponse) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{2}
+	return file_common_common_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *PageResponse) GetPageNo() int32 {
@@ -259,12 +319,16 @@ var File_common_common_proto protoreflect.FileDescriptor
 
 const file_common_common_proto_rawDesc = "" +
 	"\n" +
-	"\x13common/common.proto\x12\x06common\x1a\x1bbuf/validate/validate.proto\x1a\x19google/protobuf/any.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"o\n" +
-	"\x05Reply\x12\f\n" +
-	"\x01t\x18\x01 \x01(\x03R\x01t\x12\x18\n" +
-	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x10\n" +
-	"\x03msg\x18\x03 \x01(\tR\x03msg\x12,\n" +
-	"\x06result\x18\x04 \x01(\v2\x14.google.protobuf.AnyR\x06result\"\x92\x03\n" +
+	"\x13common/common.proto\x12\x06common\x1a\x1bbuf/validate/validate.proto\x1a\x19google/protobuf/any.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x98\x01\n" +
+	"\tErrorBody\x12\x16\n" +
+	"\x06reason\x18\x01 \x01(\tR\x06reason\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12.\n" +
+	"\adetails\x18\x03 \x03(\v2\x14.google.protobuf.AnyR\adetails\x12)\n" +
+	"\x06errors\x18\x04 \x03(\v2\x11.common.ErrorBodyR\x06errors\"{\n" +
+	"\fResponseBody\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12,\n" +
+	"\x06result\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x06result\x12#\n" +
+	"\x03err\x18\x03 \x01(\v2\x11.common.ErrorBodyR\x03err\"\x92\x03\n" +
 	"\vPageRequest\x12%\n" +
 	"\apage_no\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02 \x00H\x00R\x06pageNo\x88\x01\x01\x12+\n" +
 	"\tpage_size\x18\x02 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d \x00H\x01R\bpageSize\x88\x01\x01\x12\x15\n" +
@@ -302,25 +366,29 @@ func file_common_common_proto_rawDescGZIP() []byte {
 	return file_common_common_proto_rawDescData
 }
 
-var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_common_common_proto_goTypes = []any{
-	(*Reply)(nil),                 // 0: common.Reply
-	(*PageRequest)(nil),           // 1: common.PageRequest
-	(*PageResponse)(nil),          // 2: common.PageResponse
-	(*anypb.Any)(nil),             // 3: google.protobuf.Any
-	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
+	(*ErrorBody)(nil),             // 0: common.ErrorBody
+	(*ResponseBody)(nil),          // 1: common.ResponseBody
+	(*PageRequest)(nil),           // 2: common.PageRequest
+	(*PageResponse)(nil),          // 3: common.PageResponse
+	(*anypb.Any)(nil),             // 4: google.protobuf.Any
+	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
 }
 var file_common_common_proto_depIdxs = []int32{
-	3, // 0: common.Reply.result:type_name -> google.protobuf.Any
-	4, // 1: common.PageRequest.created_at_a:type_name -> google.protobuf.Timestamp
-	4, // 2: common.PageRequest.created_at_z:type_name -> google.protobuf.Timestamp
-	4, // 3: common.PageRequest.updated_at_a:type_name -> google.protobuf.Timestamp
-	4, // 4: common.PageRequest.updated_at_z:type_name -> google.protobuf.Timestamp
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	4, // 0: common.ErrorBody.details:type_name -> google.protobuf.Any
+	0, // 1: common.ErrorBody.errors:type_name -> common.ErrorBody
+	4, // 2: common.ResponseBody.result:type_name -> google.protobuf.Any
+	0, // 3: common.ResponseBody.err:type_name -> common.ErrorBody
+	5, // 4: common.PageRequest.created_at_a:type_name -> google.protobuf.Timestamp
+	5, // 5: common.PageRequest.created_at_z:type_name -> google.protobuf.Timestamp
+	5, // 6: common.PageRequest.updated_at_a:type_name -> google.protobuf.Timestamp
+	5, // 7: common.PageRequest.updated_at_z:type_name -> google.protobuf.Timestamp
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_common_common_proto_init() }
@@ -328,14 +396,14 @@ func file_common_common_proto_init() {
 	if File_common_common_proto != nil {
 		return
 	}
-	file_common_common_proto_msgTypes[1].OneofWrappers = []any{}
+	file_common_common_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_common_proto_rawDesc), len(file_common_common_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

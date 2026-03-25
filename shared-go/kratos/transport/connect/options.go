@@ -1,6 +1,7 @@
 package connect
 
 import (
+	"context"
 	"crypto/tls"
 	"net"
 	"net/url"
@@ -116,5 +117,15 @@ func DisableH2C() ServerOption {
 func Filter(filters ...FilterFunc) ServerOption {
 	return func(s *Server) {
 		s.filters = append(s.filters, filters...)
+	}
+}
+
+// ErrorEncoder customizes connect error encoding.
+func ErrorEncoder(encoder func(context.Context, error) error) ServerOption {
+	return func(s *Server) {
+		if encoder == nil {
+			return
+		}
+		s.errorEncoder = encoder
 	}
 }

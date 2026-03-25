@@ -58,6 +58,7 @@ type Server struct {
 	reflectionServices   map[string]struct{}
 	reflectionRegistered bool
 	enableH2C            bool
+	errorEncoder         func(context.Context, error) error
 }
 
 type handlerEntry struct {
@@ -78,6 +79,9 @@ func NewServer(opts ...ServerOption) *Server {
 		health:             newHealthServer(),
 		reflectionServices: make(map[string]struct{}),
 		enableH2C:          true,
+		errorEncoder: func(_ context.Context, err error) error {
+			return ErrorToConnect(err)
+		},
 	}
 	srv.connectOpts = append(srv.connectOpts, connect.WithCodec(JSONCodec()))
 
@@ -320,7 +324,9 @@ func (i *kratosInterceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc 
 		// Execute
 		resp, err := h(ctx, req.Any())
 		if err != nil {
-			return nil, ErrorToConnect(err)
+			encodedErr := i.server.errorEncoder(ctx, err)
+			attachReplyHeadersToConnectError(tr, encodedErr)
+			return nil, encodedErr
 		}
 
 		// Handle response headers
@@ -378,9 +384,30 @@ func (i *kratosInterceptor) WrapStreamingHandler(next connect.StreamingHandlerFu
 
 		if m := i.server.streamMiddleware.Match(tr.Operation()); len(m) > 0 {
 			_, err := middleware.Chain(m...)(h)(ctx, conn)
-			return err
+			if err != nil {
+				encodedErr := i.server.errorEncoder(ctx, err)
+				attachReplyHeadersToConnectError(tr, encodedErr)
+				return encodedErr
+			}
+			return nil
 		}
+		if err := next(ctx, conn); err != nil {
+			encodedErr := i.server.errorEncoder(ctx, err)
+			attachReplyHeadersToConnectError(tr, encodedErr)
+			return encodedErr
+		}
+		return nil
+	}
+}
 
-		return next(ctx, conn)
+func attachReplyHeadersToConnectError(tr *Transport, err error) {
+	ce, ok := err.(*connect.Error)
+	if !ok || tr == nil {
+		return
+	}
+	for _, key := range tr.replyHeader.Keys() {
+		for _, value := range tr.replyHeader.Values(key) {
+			ce.Meta().Add(key, value)
+		}
 	}
 }

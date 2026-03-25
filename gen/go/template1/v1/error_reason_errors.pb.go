@@ -11,14 +11,98 @@ import (
 // is compatible with the kratos package it is being compiled against.
 const _ = errors.SupportPackageIsVersion1
 
-func IsDataConflict(err error) bool {
+func IsErrorReasonUnspecified(err error) bool {
 	if err == nil {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == ErrorReason_DATA_CONFLICT.String() && e.Code == 409
+	return e.Reason == ErrorReason_ERROR_REASON_UNSPECIFIED.String() && e.Code == 500
 }
 
-func ErrorDataConflict(format string, args ...interface{}) *errors.Error {
-	return errors.New(409, ErrorReason_DATA_CONFLICT.String(), fmt.Sprintf(format, args...))
+func ErrorErrorReasonUnspecified(format string, args ...interface{}) *errors.Error {
+	return errors.New(500, ErrorReason_ERROR_REASON_UNSPECIFIED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsErrorReasonEntNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_ENT_NOT_FOUND.String() && e.Code == 404
+}
+
+func ErrorErrorReasonEntNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, ErrorReason_ERROR_REASON_ENT_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsErrorReasonEntValidation(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_ENT_VALIDATION.String() && e.Code == 400
+}
+
+func ErrorErrorReasonEntValidation(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_ERROR_REASON_ENT_VALIDATION.String(), fmt.Sprintf(format, args...))
+}
+
+func IsErrorReasonEntNotSingular(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_ENT_NOT_SINGULAR.String() && e.Code == 400
+}
+
+func ErrorErrorReasonEntNotSingular(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_ERROR_REASON_ENT_NOT_SINGULAR.String(), fmt.Sprintf(format, args...))
+}
+
+func IsErrorReasonEntNotLoaded(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_ENT_NOT_LOADED.String() && e.Code == 500
+}
+
+func ErrorErrorReasonEntNotLoaded(format string, args ...interface{}) *errors.Error {
+	return errors.New(500, ErrorReason_ERROR_REASON_ENT_NOT_LOADED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsErrorReasonEntConstraint(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_ENT_CONSTRAINT.String() && e.Code == 409
+}
+
+func ErrorErrorReasonEntConstraint(format string, args ...interface{}) *errors.Error {
+	return errors.New(409, ErrorReason_ERROR_REASON_ENT_CONSTRAINT.String(), fmt.Sprintf(format, args...))
+}
+
+func IsErrorReasonValidator(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_VALIDATOR.String() && e.Code == 400
+}
+
+func ErrorErrorReasonValidator(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_ERROR_REASON_VALIDATOR.String(), fmt.Sprintf(format, args...))
+}
+
+func IsErrorReasonPaginationInvalidArgument(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_PAGINATION_INVALID_ARGUMENT.String() && e.Code == 400
+}
+
+func ErrorErrorReasonPaginationInvalidArgument(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, ErrorReason_ERROR_REASON_PAGINATION_INVALID_ARGUMENT.String(), fmt.Sprintf(format, args...))
 }

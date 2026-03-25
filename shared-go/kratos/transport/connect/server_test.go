@@ -102,7 +102,18 @@ func TestServerUnaryMiddlewareAndHeaders(t *testing.T) {
 }
 
 func TestServerErrorMapping(t *testing.T) {
-	srv := NewServer(Address("127.0.0.1:0"))
+	srv := NewServer(
+		Address("127.0.0.1:0"),
+		Middleware(func(next middleware.Handler) middleware.Handler {
+			return func(ctx context.Context, req any) (any, error) {
+				info, ok := transport.FromServerContext(ctx)
+				if ok {
+					info.ReplyHeader().Set("x-mw", "err")
+				}
+				return next(ctx, req)
+			}
+		}),
+	)
 	srv.Register(
 		testProcedure,
 		connectrpc.NewUnaryHandlerSimple(
@@ -137,6 +148,9 @@ func TestServerErrorMapping(t *testing.T) {
 	}
 	if ce.Code() != connectrpc.CodeInvalidArgument {
 		t.Fatalf("code = %v, want %v", ce.Code(), connectrpc.CodeInvalidArgument)
+	}
+	if ce.Meta().Get("x-mw") != "err" {
+		t.Fatalf("x-mw = %q", ce.Meta().Get("x-mw"))
 	}
 
 	stopCtx, stopCancel := context.WithTimeout(context.Background(), 3*time.Second)

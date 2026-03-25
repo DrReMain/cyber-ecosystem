@@ -10,11 +10,17 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/DrReMain/cyber-ecosystem/gen/go/common;common";
 
-message Reply {
-  int64 t = 1;
-  bool success = 2;
-  string msg = 3;
-  google.protobuf.Any result = 4;
+message ErrorBody {
+  string reason = 1;
+  string message = 2;
+  repeated google.protobuf.Any details = 3;
+  repeated ErrorBody errors = 4;
+}
+
+message ResponseBody {
+  bool success = 1;
+  google.protobuf.Any result = 2;
+  ErrorBody err = 3;
 }
 
 message PageRequest {

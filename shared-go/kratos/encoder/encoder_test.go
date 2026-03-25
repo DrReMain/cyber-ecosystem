@@ -1,6 +1,8 @@
 package encoder
 
 import (
+	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,7 +12,7 @@ import (
 
 func TestNewErrorEncoder(t *testing.T) {
 	// Create a simple buildBody function
-	buildBody := func(err *errors.Error) any {
+	buildBody := func(_ context.Context, _ error, err *errors.Error) any {
 		return map[string]any{
 			"code":    err.Code,
 			"message": err.Message,
@@ -24,7 +26,7 @@ func TestNewErrorEncoder(t *testing.T) {
 }
 
 func TestNewErrorEncoder_EncodesError(t *testing.T) {
-	buildBody := func(err *errors.Error) any {
+	buildBody := func(_ context.Context, _ error, err *errors.Error) any {
 		return map[string]any{
 			"code":    err.Code,
 			"message": err.Message,
@@ -56,13 +58,9 @@ func TestNewErrorEncoder_EncodesError(t *testing.T) {
 }
 
 func TestNewResponseEncoder(t *testing.T) {
-	// Create a simple buildBody function
 	buildBody := func(v any) (any, error) {
-		return map[string]any{
-			"data": v,
-		}, nil
+		return map[string]any{"result": v}, nil
 	}
-
 	encoder := NewResponseEncoder(buildBody)
 	if encoder == nil {
 		t.Error("NewResponseEncoder should return a non-nil function")
@@ -72,11 +70,10 @@ func TestNewResponseEncoder(t *testing.T) {
 func TestNewResponseEncoder_EncodesResponse(t *testing.T) {
 	buildBody := func(v any) (any, error) {
 		return map[string]any{
-			"data":    v,
 			"success": true,
+			"result":  v,
 		}, nil
 	}
-
 	encoder := NewResponseEncoder(buildBody)
 
 	// Create test request and response
@@ -97,13 +94,26 @@ func TestNewResponseEncoder_EncodesResponse(t *testing.T) {
 	if w.Header().Get("Content-Type") == "" {
 		t.Error("Content-Type header should be set")
 	}
+
+	// Verify body is the wrapped response body
+	var got map[string]any
+	if err := json.Unmarshal(w.Body.Bytes(), &got); err != nil {
+		t.Fatalf("response body should be valid json: %v", err)
+	}
+	if got["success"] != true {
+		t.Fatalf("expected success=true, got: %#v", got)
+	}
+	result, ok := got["result"].(map[string]any)
+	if !ok {
+		t.Fatalf("expected object result field, got: %#v", got["result"])
+	}
+	if result["name"] != "test" {
+		t.Fatalf("expected result.name=test, got: %#v", result)
+	}
 }
 
 func TestNewResponseEncoder_NilValue(t *testing.T) {
-	buildBody := func(v any) (any, error) {
-		return v, nil
-	}
-
+	buildBody := func(v any) (any, error) { return v, nil }
 	encoder := NewResponseEncoder(buildBody)
 
 	// Create test request and response

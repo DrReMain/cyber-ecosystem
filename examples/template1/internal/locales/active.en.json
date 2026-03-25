@@ -1,0 +1,34 @@
+[
+  {
+    "id": "ERROR_REASON_UNSPECIFIED",
+    "translation": "Internal server error."
+  },
+  {
+    "id": "ERROR_REASON_ENT_NOT_FOUND",
+    "translation": "Resource not found."
+  },
+  {
+    "id": "ERROR_REASON_ENT_VALIDATION",
+    "translation": "Data validation failed."
+  },
+  {
+    "id": "ERROR_REASON_ENT_NOT_SINGULAR",
+    "translation": "Expected exactly one record."
+  },
+  {
+    "id": "ERROR_REASON_ENT_NOT_LOADED",
+    "translation": "Related data was not loaded."
+  },
+  {
+    "id": "ERROR_REASON_ENT_CONSTRAINT",
+    "translation": "Resource conflict."
+  },
+  {
+    "id": "ERROR_REASON_VALIDATOR",
+    "translation": "Request validation failed."
+  },
+  {
+    "id": "ERROR_REASON_PAGINATION_INVALID_ARGUMENT",
+    "translation": "Invalid pagination arguments."
+  }
+]

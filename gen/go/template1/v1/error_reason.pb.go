@@ -25,16 +25,37 @@ const (
 type ErrorReason int32
 
 const (
-	ErrorReason_DATA_CONFLICT ErrorReason = 0
+	ErrorReason_ERROR_REASON_UNSPECIFIED                 ErrorReason = 0
+	ErrorReason_ERROR_REASON_ENT_NOT_FOUND               ErrorReason = 1
+	ErrorReason_ERROR_REASON_ENT_VALIDATION              ErrorReason = 2
+	ErrorReason_ERROR_REASON_ENT_NOT_SINGULAR            ErrorReason = 3
+	ErrorReason_ERROR_REASON_ENT_NOT_LOADED              ErrorReason = 4
+	ErrorReason_ERROR_REASON_ENT_CONSTRAINT              ErrorReason = 5
+	ErrorReason_ERROR_REASON_VALIDATOR                   ErrorReason = 6
+	ErrorReason_ERROR_REASON_PAGINATION_INVALID_ARGUMENT ErrorReason = 7
 )
 
 // Enum value maps for ErrorReason.
 var (
 	ErrorReason_name = map[int32]string{
-		0: "DATA_CONFLICT",
+		0: "ERROR_REASON_UNSPECIFIED",
+		1: "ERROR_REASON_ENT_NOT_FOUND",
+		2: "ERROR_REASON_ENT_VALIDATION",
+		3: "ERROR_REASON_ENT_NOT_SINGULAR",
+		4: "ERROR_REASON_ENT_NOT_LOADED",
+		5: "ERROR_REASON_ENT_CONSTRAINT",
+		6: "ERROR_REASON_VALIDATOR",
+		7: "ERROR_REASON_PAGINATION_INVALID_ARGUMENT",
 	}
 	ErrorReason_value = map[string]int32{
-		"DATA_CONFLICT": 0,
+		"ERROR_REASON_UNSPECIFIED":                 0,
+		"ERROR_REASON_ENT_NOT_FOUND":               1,
+		"ERROR_REASON_ENT_VALIDATION":              2,
+		"ERROR_REASON_ENT_NOT_SINGULAR":            3,
+		"ERROR_REASON_ENT_NOT_LOADED":              4,
+		"ERROR_REASON_ENT_CONSTRAINT":              5,
+		"ERROR_REASON_VALIDATOR":                   6,
+		"ERROR_REASON_PAGINATION_INVALID_ARGUMENT": 7,
 	}
 )
 
@@ -69,9 +90,16 @@ var File_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\x15v1/error_reason.proto\x12\x10api.template1.v1\x1a\x13errors/errors.proto*,\n" +
-	"\vErrorReason\x12\x17\n" +
-	"\rDATA_CONFLICT\x10\x00\x1a\x04\xa8E\x99\x03\x1a\x04\xa0E\xf4\x03B\xcf\x01\n" +
+	"\x15v1/error_reason.proto\x12\x10api.template1.v1\x1a\x13errors/errors.proto*\xd1\x02\n" +
+	"\vErrorReason\x12\"\n" +
+	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12$\n" +
+	"\x1aERROR_REASON_ENT_NOT_FOUND\x10\x01\x1a\x04\xa8E\x94\x03\x12%\n" +
+	"\x1bERROR_REASON_ENT_VALIDATION\x10\x02\x1a\x04\xa8E\x90\x03\x12'\n" +
+	"\x1dERROR_REASON_ENT_NOT_SINGULAR\x10\x03\x1a\x04\xa8E\x90\x03\x12%\n" +
+	"\x1bERROR_REASON_ENT_NOT_LOADED\x10\x04\x1a\x04\xa8E\xf4\x03\x12%\n" +
+	"\x1bERROR_REASON_ENT_CONSTRAINT\x10\x05\x1a\x04\xa8E\x99\x03\x12 \n" +
+	"\x16ERROR_REASON_VALIDATOR\x10\x06\x1a\x04\xa8E\x90\x03\x122\n" +
+	"(ERROR_REASON_PAGINATION_INVALID_ARGUMENT\x10\a\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\xf4\x03B\xcf\x01\n" +
 	"\x14com.api.template1.v1B\x10ErrorReasonProtoP\x01ZCgithub.com/DrReMain/cyber-ecosystem/gen/go/template1/v1;template1V1\xa2\x02\x03ATX\xaa\x02\x10Api.Template1.V1\xca\x02\x10Api\\Template1\\V1\xe2\x02\x1cApi\\Template1\\V1\\GPBMetadata\xea\x02\x12Api::Template1::V1b\x06proto3"
 
 var (

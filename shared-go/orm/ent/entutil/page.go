@@ -2,16 +2,13 @@ package entutil
 
 import (
 	"context"
+	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/DrReMain/cyber-ecosystem/gen/go/common"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/order_by"
 
 	"github.com/go-kratos/kratos/v2/errors"
-)
-
-const (
-	reason = "PAGINATION_INVALID_ARGUMENT"
 )
 
 var (
@@ -36,9 +33,12 @@ type QueryPaginator[Q any] interface {
 	Count(context.Context) (int, error)
 }
 
-func ApplyPagination[Q QueryPaginator[Q]](ctx context.Context, query Q, req *common.PageRequest, config PageConfig) (total, offset, limit int, err error) {
+func ApplyPagination[Q QueryPaginator[Q]](ctx context.Context, query Q, req *common.PageRequest, config PageConfig, badRequestReason string) (total, offset, limit int, err error) {
+	if badRequestReason == "" {
+		return 0, 0, 0, fmt.Errorf("badRequestReason is required")
+	}
 	if req == nil {
-		return 0, 0, 0, errors.BadRequest(reason, "page request is nil")
+		return 0, 0, 0, errors.BadRequest(badRequestReason, "")
 	}
 	reqPageNo := req.GetPageNo()
 	reqPageSize := req.GetPageSize()
@@ -54,7 +54,7 @@ func ApplyPagination[Q QueryPaginator[Q]](ctx context.Context, query Q, req *com
 
 	if req.GetAll() {
 		if config.MaxSize > 0 {
-			return 0, 0, 0, errors.BadRequest(reason, "cannot get all when limit is set")
+			return 0, 0, 0, errors.BadRequest(badRequestReason, "")
 		}
 		// Count may trigger query interceptors that append predicates in-place.
 		// Use a clone so the original query builder can still be reused safely.

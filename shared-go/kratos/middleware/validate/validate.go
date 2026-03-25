@@ -10,12 +10,12 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func ProtoValidate(formatError func(error) string) middleware.Middleware {
+func ProtoValidate(reason string, formatError func(error) string) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (reply any, err error) {
 			if msg, ok := req.(proto.Message); ok {
 				if err := protovalidate.Validate(msg); err != nil {
-					return nil, errors.BadRequest("VALIDATOR", formatError(err)).WithCause(err)
+					return nil, errors.BadRequest(reason, formatError(err)).WithCause(err)
 				}
 			}
 			return handler(ctx, req)
