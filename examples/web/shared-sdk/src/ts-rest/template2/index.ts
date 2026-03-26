@@ -1,0 +1,1 @@
+export { readingContract } from './contract';

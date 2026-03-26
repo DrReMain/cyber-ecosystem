@@ -10,7 +10,6 @@ import (
 	"github.com/DrReMain/cyber-ecosystem/gen/go/common"
 	template1V1 "github.com/DrReMain/cyber-ecosystem/gen/go/template1/v1"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/encoder"
-	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/i18n"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/middleware/responsemeta"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/middleware/traceheader"
 	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/middleware/validate"
@@ -24,6 +23,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
+	"github.com/gorilla/handlers"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
@@ -31,15 +31,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
-
-var i18nTranslator i18n.Translator = newDefaultI18nTranslator()
-
-func SetI18nTranslator(translator i18n.Translator) {
-	if translator == nil {
-		return
-	}
-	i18nTranslator = translator
-}
 
 func NewHTTPServer(
 	c *conf.Server,
@@ -64,6 +55,12 @@ func NewHTTPServer(
 	middlewares = append(middlewares, validate.ProtoValidate(template1V1.ErrorReason_ERROR_REASON_VALIDATOR.String(), validate.UseDefaultError))
 	var opts = []http.ServerOption{
 		http.Middleware(middlewares...),
+		http.Filter(handlers.CORS(
+			handlers.AllowedOrigins([]string{"*"}),
+			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+			handlers.AllowedHeaders([]string{"Content-Type", "Accept", "Accept-Language", "Authorization", "X-Trace-Id", "X-Request-Id"}),
+			handlers.ExposedHeaders([]string{"X-Trace-Id", "X-Response-Success", "X-Error-Reason"}),
+		)),
 		http.ResponseEncoder(encoder.NewResponseEncoder(ResponseBuildBody)),
 		http.ErrorEncoder(encoder.NewErrorEncoder(ErrorBuildBody)),
 	}

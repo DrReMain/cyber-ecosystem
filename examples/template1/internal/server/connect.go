@@ -21,6 +21,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 
+	"github.com/gorilla/handlers"
 	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	"google.golang.org/protobuf/proto"
@@ -48,6 +49,12 @@ func NewConnectServer(
 	middlewares = append(middlewares, validate.ProtoValidate(template1V1.ErrorReason_ERROR_REASON_VALIDATOR.String(), validate.UseDefaultError))
 	var opts = []connect.ServerOption{
 		connect.Middleware(middlewares...),
+		connect.Filter(handlers.CORS(
+			handlers.AllowedOrigins([]string{"*"}),
+			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+			handlers.AllowedHeaders([]string{"Content-Type", "Accept", "Accept-Language", "Authorization", "X-Trace-Id", "X-Request-Id"}),
+			handlers.ExposedHeaders([]string{"X-Trace-Id", "X-Response-Success", "X-Error-Reason"}),
+		)),
 		connect.ErrorEncoder(func(ctx context.Context, err error) error {
 			return connect.NewErrorEncoder(resolveErrorMessage, func(_ context.Context, sourceErr error, se *errors.Error, message string) proto.Message {
 				return &common.ErrorBody{

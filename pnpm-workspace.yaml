@@ -1,6 +1,7 @@
 packages:
   - generators/*
   - clients/*
+  - examples/web/*
 
 ignoredBuiltDependencies:
   - sharp

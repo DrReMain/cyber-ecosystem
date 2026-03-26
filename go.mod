@@ -13,6 +13,7 @@ require (
 	github.com/go-kratos/kratos/v2 v2.9.2
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/google/wire v0.7.0
+	github.com/gorilla/handlers v1.5.2
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/matoous/go-nanoid/v2 v2.1.0
 	github.com/nicksnyder/go-i18n/v2 v2.6.1
@@ -45,6 +46,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-kratos/kratos/cmd/protoc-gen-go-errors/v2 v2.0.0-20260323060105-a0f54b772a1e // indirect
 	github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2 v2.0.0-20260323060105-a0f54b772a1e // indirect

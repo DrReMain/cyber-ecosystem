@@ -19,6 +19,15 @@ import (
 
 var languages = []string{"zh-Hans", "en"}
 
+var i18nTranslator i18n.Translator = newDefaultI18nTranslator()
+
+func SetI18nTranslator(translator i18n.Translator) {
+	if translator == nil {
+		return
+	}
+	i18nTranslator = translator
+}
+
 func newDefaultI18nTranslator() i18n.Translator {
 	provider := goi18n.NewProvider(goi18n.NewBundle(language.English))
 	for _, lang := range languages {
