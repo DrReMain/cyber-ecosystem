@@ -14,14 +14,6 @@ type EntErrorChecker interface {
 	IsConstraintError(err error) bool
 }
 
-type DefaultErrorMessages struct {
-	NotFound    string
-	Validation  string
-	NotSingular string
-	NotLoaded   string
-	Constraint  string
-}
-
 type DefaultErrorReasons struct {
 	NotFound    string
 	Validation  string
@@ -30,19 +22,15 @@ type DefaultErrorReasons struct {
 	Constraint  string
 }
 
-var defaultMessages = DefaultErrorMessages{
-	NotFound:    "",
-	Validation:  "",
-	NotSingular: "",
-	NotLoaded:   "",
-	Constraint:  "",
+type DefaultErrorMessages struct {
+	NotFound    string
+	Validation  string
+	NotSingular string
+	NotLoaded   string
+	Constraint  string
 }
 
-func GetDefaultMessages() DefaultErrorMessages {
-	return defaultMessages
-}
-
-func HandleEntError(err error, checker EntErrorChecker, reasons DefaultErrorReasons, messages DefaultErrorMessages) error {
+func HandleEntError(err error, checker EntErrorChecker, reasons *DefaultErrorReasons, messages *DefaultErrorMessages) error {
 	if err := validateReasons(reasons); err != nil {
 		return fmt.Errorf("ent error reason mapping invalid: %w", err)
 	}
@@ -62,7 +50,7 @@ func HandleEntError(err error, checker EntErrorChecker, reasons DefaultErrorReas
 	}
 }
 
-func validateReasons(reasons DefaultErrorReasons) error {
+func validateReasons(reasons *DefaultErrorReasons) error {
 	if reasons.NotFound == "" {
 		return fmt.Errorf("NotFound reason is empty")
 	}

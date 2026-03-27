@@ -1,7 +1,8 @@
 {
   "installation": {
-    "version": "22.5.4"
+    "version": "22.6.2"
   },
+  "analytics": false,
   "targetDefaults": {
     "dev": {
       "cache": false

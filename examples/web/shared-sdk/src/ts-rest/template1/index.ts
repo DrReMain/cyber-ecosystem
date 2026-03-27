@@ -1,1 +1,0 @@
-export { blogContract } from './contract';

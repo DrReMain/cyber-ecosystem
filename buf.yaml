@@ -1,9 +1,7 @@
 version: v2
 modules:
-  - path: contracts/proto
-
-  - path: examples/template1/api
-  - path: examples/template2/api
+  - path: contracts
+  - path: apps
 deps:
   - buf.build/googleapis/googleapis
   - buf.build/bufbuild/protovalidate

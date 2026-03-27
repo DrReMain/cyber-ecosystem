@@ -3,13 +3,13 @@
   "private": true,
   "packageManager": "pnpm@10.30.3",
   "engines": {
-    "node": ">=24.14.0"
+    "node": ">=24"
   },
   "devDependencies": {
-    "@nx/devkit": "22.5.4",
-    "@swc-node/register": "^1.11.1",
-    "@swc/core": "^1.15.18",
-    "@types/node": "^24.0.0",
-    "typescript": "^5.9.3"
+    "@nx/devkit": "22.6.2",
+    "@swc-node/register": "^1",
+    "@swc/core": "^1",
+    "@types/node": "^24",
+    "typescript": "^6"
   }
 }

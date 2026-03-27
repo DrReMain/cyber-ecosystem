@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/go-kratos/kratos/v2/transport"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/go-kratos/kratos/v2/transport"
 )
 
 type mockHeader map[string][]string

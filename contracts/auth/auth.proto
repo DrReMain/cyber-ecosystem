@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package auth;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "cyber-ecosystem/contracts/go/auth;auth";
+
+extend google.protobuf.MethodOptions {
+  bool public_access = 10001;
+}

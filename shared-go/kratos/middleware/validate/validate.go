@@ -23,12 +23,14 @@ func ProtoValidate(reason string, formatError func(error) string) middleware.Mid
 	}
 }
 
-// UseDefaultError eg: validate.ProtoValidate(validate.UseDefaultError)
 func UseDefaultError(err error) string {
 	return err.Error()
 }
 
-// UseProtoMessage eg: validate.ProtoValidate(validate.UseProtoMessage)
+func UseEmptyError(_ error) string {
+	return ""
+}
+
 func UseProtoMessage(err error) string {
 	if valErr, ok := err.(*protovalidate.ValidationError); ok {
 		for _, v := range valErr.Violations {

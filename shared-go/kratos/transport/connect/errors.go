@@ -1,28 +1,32 @@
 package connect
 
 import (
+	stderrors "errors"
+
 	"connectrpc.com/connect"
-	"github.com/go-kratos/kratos/v2/errors"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
+
+	"github.com/go-kratos/kratos/v2/errors"
 )
 
-// ErrorToConnect converts Kratos/gRPC error to Connect error.
+// ErrorToConnect converts a Kratos error to a Connect error.
+// The error reason and metadata are carried in a google.rpc.ErrorInfo detail,
+// which is consistent with how native gRPC encodes them in grpc-status-details-bin.
 func ErrorToConnect(err error) error {
 	if err == nil {
 		return nil
 	}
 
-	// If already a connect.Error, return as is
 	var ce *connect.Error
 	if errors.As(err, &ce) {
 		return ce
 	}
 
-	// Convert Kratos error
 	ke := errors.FromError(err)
 
-	// Get gRPC code from Kratos error via GRPCStatus
 	var grpcCode codes.Code
 	if gs := ke.GRPCStatus(); gs != nil {
 		grpcCode = gs.Code()
@@ -30,40 +34,80 @@ func ErrorToConnect(err error) error {
 		grpcCode = codes.Unknown
 	}
 
-	// Map gRPC code to Connect code
-	code := mapGRPCCodeToConnect(grpcCode)
+	connectErr := connect.NewError(mapGRPCCodeToConnect(grpcCode), stderrors.New(ke.Message))
 
-	// Create Connect error with the message
-	return connect.NewError(code, errors.New(int(ke.Code), ke.Reason, ke.Message))
+	if ke.Reason != "" || len(ke.Metadata) > 0 {
+		info := &errdetails.ErrorInfo{
+			Reason:   ke.Reason,
+			Metadata: ke.Metadata,
+		}
+		if detail, detailErr := connect.NewErrorDetail(info); detailErr == nil {
+			connectErr.AddDetail(detail)
+		}
+	}
+
+	return connectErr
 }
 
-// ConnectToError converts Connect error to Kratos error.
+// ConnectToError converts a Connect error to a Kratos error.
+// It extracts reason and metadata from google.rpc.ErrorInfo detail if present.
 func ConnectToError(err error) *errors.Error {
 	if err == nil {
 		return nil
 	}
 
-	// If already a Kratos error, return as is
 	var ke *errors.Error
 	if errors.As(err, &ke) {
 		return ke
 	}
 
-	// If Connect error, convert
 	var ce *connect.Error
-	if errors.As(err, &ce) {
-		grpcCode := mapConnectCodeToGRPC(ce.Code())
-		// Map gRPC code to HTTP code for Kratos error
-		httpCode := mapGRPCCodeToHTTP(grpcCode)
-		return errors.New(httpCode, "CONNECT_ERROR", ce.Message())
+	if !errors.As(err, &ce) {
+		return errors.FromError(err)
 	}
 
-	// Unknown error
-	return errors.FromError(err)
+	grpcCode := mapConnectCodeToGRPC(ce.Code())
+	httpCode := mapGRPCCodeToHTTP(grpcCode)
+
+	reason := ""
+	var metadata map[string]string
+	for _, detail := range ce.Details() {
+		msg, err := detail.Value()
+		if err != nil {
+			continue
+		}
+		if info, ok := msg.(*errdetails.ErrorInfo); ok {
+			reason = info.Reason
+			metadata = info.Metadata
+			break
+		}
+	}
+
+	ke = errors.New(httpCode, reason, ce.Message())
+	if len(metadata) > 0 {
+		ke.Metadata = metadata
+	}
+	return ke
 }
 
-// mapGRPCCodeToHTTP maps gRPC codes to HTTP status codes.
-// This matches Kratos behavior.
+func StatusToConnect(s *status.Status) error {
+	if s == nil || s.Code() == codes.OK {
+		return nil
+	}
+
+	connectErr := connect.NewError(mapGRPCCodeToConnect(s.Code()), stderrors.New(s.Message()))
+
+	for _, detail := range s.Details() {
+		if msg, ok := detail.(proto.Message); ok {
+			if d, err := connect.NewErrorDetail(msg); err == nil {
+				connectErr.AddDetail(d)
+			}
+		}
+	}
+
+	return connectErr
+}
+
 func mapGRPCCodeToHTTP(code codes.Code) int {
 	switch code {
 	case codes.OK:
@@ -175,12 +219,4 @@ func mapConnectCodeToGRPC(code connect.Code) codes.Code {
 	default:
 		return codes.Unknown
 	}
-}
-
-// StatusToConnect converts a gRPC status to Connect error.
-func StatusToConnect(s *status.Status) error {
-	if s == nil || s.Code() == codes.OK {
-		return nil
-	}
-	return connect.NewError(mapGRPCCodeToConnect(s.Code()), errors.New(500, s.Code().String(), s.Message()))
 }

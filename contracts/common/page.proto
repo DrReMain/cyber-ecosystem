@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package common;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "cyber-ecosystem/contracts/go/common;common";
+
+message PageRequest {
+  optional int32 page_no = 1 [(buf.validate.field).int32 = {gt: 0}];
+  optional int32 page_size = 2 [(buf.validate.field).int32 = {
+    gt: 0
+    lte: 100
+  }];
+  optional bool all = 3;
+  google.protobuf.Timestamp created_at_a = 4;
+  google.protobuf.Timestamp created_at_z = 5;
+  google.protobuf.Timestamp updated_at_a = 6;
+  google.protobuf.Timestamp updated_at_z = 7;
+}
+
+message PageResponse {
+  int32 page_no = 1;
+  int32 page_size = 2;
+  int32 total = 3;
+  bool more = 4;
+}

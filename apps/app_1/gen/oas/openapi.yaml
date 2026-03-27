@@ -1,0 +1,510 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /api/v1/author:
+        post:
+            tags:
+                - AuthorService
+            description: CreateAuthor
+            operationId: AuthorService_CreateAuthor
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.app_1.v1.CreateAuthorRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.CreateAuthorResponse'
+    /api/v1/author/{id}:
+        get:
+            tags:
+                - AuthorService
+            description: GetAuthor
+            operationId: AuthorService_GetAuthor
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.GetAuthorResponse'
+    /api/v1/blog:
+        get:
+            tags:
+                - BlogService
+            description: QueryBlog
+            operationId: BlogService_QueryBlog
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+                - name: title
+                  in: query
+                  schema:
+                    type: string
+                - name: publishedAtA
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: publishedAtZ
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.QueryBlogResponse'
+        post:
+            tags:
+                - BlogService
+            description: CreateBlog
+            operationId: BlogService_CreateBlog
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.app_1.v1.CreateBlogRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.CreateBlogResponse'
+    /api/v1/blog/delete-batch:
+        post:
+            tags:
+                - BlogService
+            description: DeleteBatchBlog
+            operationId: BlogService_DeleteBatchBlog
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.app_1.v1.DeleteBatchBlogRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.DeleteBatchBlogResponse'
+    /api/v1/blog/{id}:
+        get:
+            tags:
+                - BlogService
+            description: GetBlog
+            operationId: BlogService_GetBlog
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.GetBlogResponse'
+        put:
+            tags:
+                - BlogService
+            description: UpdateBlog
+            operationId: BlogService_UpdateBlog
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.app_1.v1.UpdateBlogRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.UpdateBlogResponse'
+        delete:
+            tags:
+                - BlogService
+            description: DeleteBlog
+            operationId: BlogService_DeleteBlog
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.DeleteBlogResponse'
+    /api/v1/reading/blog:
+        get:
+            tags:
+                - ReadingService
+            description: QueryBlogReading
+            operationId: ReadingService_QueryBlogReading
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+                - name: title
+                  in: query
+                  schema:
+                    type: string
+                - name: publishedAtA
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: publishedAtZ
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.QueryBlogReadingResponse'
+    /api/v1/reading/blog/{id}:
+        get:
+            tags:
+                - ReadingService
+            description: GetBlogReading
+            operationId: ReadingService_GetBlogReading
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.GetBlogReadingResponse'
+    /api/v1/reading/blog/{id}/read:
+        post:
+            tags:
+                - ReadingService
+            description: RecordReading
+            operationId: ReadingService_RecordReading
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.app_1.v1.RecordReadingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.app_1.v1.RecordReadingResponse'
+components:
+    schemas:
+        api.app_1.v1.BlogWithReading:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                title:
+                    type: string
+                content:
+                    type: string
+                publishedAt:
+                    type: string
+                    format: date-time
+                readingCount:
+                    type: string
+        api.app_1.v1.CreateAuthorRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+        api.app_1.v1.CreateAuthorResponse:
+            type: object
+            properties: {}
+        api.app_1.v1.CreateBlogRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+                content:
+                    type: string
+                publishedAt:
+                    type: string
+                    format: date-time
+        api.app_1.v1.CreateBlogResponse:
+            type: object
+            properties: {}
+        api.app_1.v1.DeleteBatchBlogRequest:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: string
+        api.app_1.v1.DeleteBatchBlogResponse:
+            type: object
+            properties:
+                count:
+                    type: integer
+                    format: int32
+        api.app_1.v1.DeleteBlogResponse:
+            type: object
+            properties: {}
+        api.app_1.v1.GetAuthorResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                name:
+                    type: string
+        api.app_1.v1.GetBlogReadingResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                title:
+                    type: string
+                content:
+                    type: string
+                publishedAt:
+                    type: string
+                    format: date-time
+                readingCount:
+                    type: string
+        api.app_1.v1.GetBlogResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                title:
+                    type: string
+                content:
+                    type: string
+                publishedAt:
+                    type: string
+                    format: date-time
+        api.app_1.v1.QueryBlogReadingResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.app_1.v1.BlogWithReading'
+        api.app_1.v1.QueryBlogResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.app_1.v1.GetBlogResponse'
+        api.app_1.v1.RecordReadingRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+        api.app_1.v1.RecordReadingResponse:
+            type: object
+            properties:
+                readingCount:
+                    type: string
+        api.app_1.v1.UpdateBlogRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                publishedAt:
+                    type: string
+                    format: date-time
+                fieldsMask:
+                    type: array
+                    items:
+                        type: string
+        api.app_1.v1.UpdateBlogResponse:
+            type: object
+            properties: {}
+        common.PageResponse:
+            type: object
+            properties:
+                pageNo:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+                total:
+                    type: integer
+                    format: int32
+                more:
+                    type: boolean
+tags:
+    - name: AuthorService
+      description: AuthorService
+    - name: BlogService
+      description: BlogService
+    - name: ReadingService
+      description: ReadingService

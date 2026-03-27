@@ -1,58 +1,71 @@
 package connect
 
 import (
+	"context"
+	"fmt"
 	"net/http"
-	"sync"
 	"sync/atomic"
+
+	connectrpc "connectrpc.com/connect"
+	"connectrpc.com/grpchealth"
 
 	"github.com/go-kratos/kratos/v2/encoding"
 )
 
-// healthServer implements a simple health check server.
-type healthServer struct {
-	mu      sync.Mutex
-	serving atomic.Bool
+// healthChecker implements grpchealth.Checker and drives both the standard
+// grpc.health.v1.Health protocol and the simple /healthz REST endpoint.
+type healthChecker struct {
+	serving  atomic.Bool
+	services map[string]struct{}
 }
 
-// newHealthServer creates a new health server.
-func newHealthServer() *healthServer {
-	h := &healthServer{}
-	h.serving.Store(false)
-	return h
+func newHealthChecker() *healthChecker {
+	return &healthChecker{
+		services: make(map[string]struct{}),
+	}
 }
 
-// Resume marks the server as serving.
-func (h *healthServer) Resume() {
+func (h *healthChecker) setServices(services map[string]struct{}) {
+	h.services = services
+}
+
+func (h *healthChecker) resume() {
 	h.serving.Store(true)
 }
 
-// Shutdown marks the server as not serving.
-func (h *healthServer) Shutdown() {
+func (h *healthChecker) shutdown() {
 	h.serving.Store(false)
 }
 
-// HealthResponse is the response for health check.
-type HealthResponse struct {
-	Status string `json:"status"`
+// Check implements grpchealth.Checker.
+// An empty service name checks the overall server health.
+func (h *healthChecker) Check(_ context.Context, req *grpchealth.CheckRequest) (*grpchealth.CheckResponse, error) {
+	if req.Service != "" {
+		if _, ok := h.services[req.Service]; !ok {
+			return nil, connectrpc.NewError(connectrpc.CodeNotFound,
+				fmt.Errorf("unknown service: %s", req.Service))
+		}
+	}
+	if h.serving.Load() {
+		return &grpchealth.CheckResponse{Status: grpchealth.StatusServing}, nil
+	}
+	return &grpchealth.CheckResponse{Status: grpchealth.StatusNotServing}, nil
 }
 
-// HandlerFunc returns a handler function for health check endpoint.
-// It uses the globally registered JSON codec for consistent serialization.
-func (h *healthServer) HandlerFunc() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+// healthzHandlerFunc returns a simple REST handler for load balancers and probes.
+func (h *healthChecker) healthzHandlerFunc() http.HandlerFunc {
+	type response struct {
+		Status string `json:"status"`
+	}
+	return func(w http.ResponseWriter, _ *http.Request) {
 		status := "SERVING"
 		if !h.serving.Load() {
 			status = "NOT_SERVING"
 			w.WriteHeader(http.StatusServiceUnavailable)
 		}
-
-		resp := HealthResponse{Status: status}
-
-		// Use the globally registered JSON codec
 		codec := encoding.GetCodec("json")
-		data, _ := codec.Marshal(resp)
-
+		data, _ := codec.Marshal(response{Status: status})
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(data)
+		w.Write(data) //nolint:errcheck
 	}
 }

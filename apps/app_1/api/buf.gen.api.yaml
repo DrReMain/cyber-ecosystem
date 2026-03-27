@@ -1,0 +1,37 @@
+version: v2
+
+plugins:
+  - local: [go, tool, protoc-gen-go]
+    out: .
+    opt:
+      - module=cyber-ecosystem
+
+  - local: [go, tool, protoc-gen-go-grpc]
+    out: .
+    opt:
+      - module=cyber-ecosystem
+
+  - local: [go, tool, protoc-gen-go-http]
+    out: .
+    opt:
+      - module=cyber-ecosystem
+
+  - local: [go, tool, protoc-gen-connect-go]
+    out: .
+    opt:
+      - module=cyber-ecosystem
+      - simple
+
+  - local: [go, tool, protoc-gen-go-errors]
+    out: .
+    opt:
+      - module=cyber-ecosystem
+
+  - local: [go, tool, protoc-gen-openapi]
+    strategy: all
+    out: ./apps/app_1/gen/oas
+    opt:
+      - paths=source_relative
+      - enum_type=string
+      - fq_schema_naming=true
+      - default_response=false

@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"time"
 
-	"entgo.io/ent/dialect"
-	entsql "entgo.io/ent/dialect/sql"
-
 	"github.com/XSAM/otelsql"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
+
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
 )
 
 type DBConfig struct {
@@ -30,7 +30,6 @@ type DBConfig struct {
 	MeterProvider   metric.MeterProvider
 }
 
-// EntClient wraps entsql.Driver and sql.DB for metrics registration
 type EntClient struct {
 	Driver *entsql.Driver
 	DB     *sql.DB
@@ -44,8 +43,8 @@ func NewEntClient(cfg DBConfig) (*EntClient, error) {
 	switch cfg.Driver {
 	case dialect.MySQL:
 		drvName = "mysql"
-		// interpolateParams=true 提升批量插入性能
-		// parseTime=true 处理 time.Time 转换
+		// interpolateParams=true improves batch insertion performance
+		// parseTime=true handles time.Time conversion
 		dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=True&loc=Local&interpolateParams=true", cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
 	case dialect.Postgres:
 		drvName = "pgx"

@@ -2,12 +2,22 @@ package zap
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
+
+var whitespaceRegex = regexp.MustCompile(`\s+`)
+
+func compact(query string) string {
+	result := strings.TrimSpace(whitespaceRegex.ReplaceAllString(query, " "))
+	result = strings.ReplaceAll(result, "\"", "'")
+	return strings.TrimSpace(result)
+}
 
 type Logger struct {
 	log     *zap.Logger
@@ -52,7 +62,12 @@ func (l *Logger) Log(level log.Level, keyvals ...any) error {
 			msg, _ = keyvals[i+1].(string)
 			continue
 		}
-		fields = append(fields, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
+		if v, ok := keyvals[i+1].(string); ok {
+			fields = append(fields, zap.Any(fmt.Sprint(keyvals[i]), compact(v)))
+		} else {
+			fields = append(fields, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
+		}
+
 	}
 
 	switch level {

@@ -3,12 +3,12 @@ package mixins
 import (
 	"time"
 
+	"github.com/rs/xid"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
-
-	"github.com/rs/xid"
 )
 
 type IDStringMixin struct {

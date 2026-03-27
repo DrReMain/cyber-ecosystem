@@ -13,9 +13,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 // TestLogger_Log tests the Log method with various log levels

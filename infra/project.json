@@ -3,46 +3,6 @@
   "name": "infra",
   "root": "infra",
   "targets": {
-    "go:init": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "commands": [
-          "go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest",
-          "go install github.com/bufbuild/buf/cmd/buf@latest",
-          "go install github.com/go-kratos/kratos/cmd/kratos/v2@latest"
-        ],
-        "parallel": false
-      }
-    },
-    "go:tidy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "go mod tidy"
-      }
-    },
-    "buf:dep": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "buf dep update"
-      }
-    },
-    "buf:format": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "buf format -w"
-      }
-    },
-    "buf:lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "buf lint"
-      }
-    },
     "docker:up": {
       "executor": "nx:run-commands",
       "options": {

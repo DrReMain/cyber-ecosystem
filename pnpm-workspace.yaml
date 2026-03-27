@@ -1,10 +1,4 @@
 packages:
-  - generators/*
-  - clients/*
-  - examples/web/*
-
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+  - apps/**/*
 
 autoInstallPeers: true

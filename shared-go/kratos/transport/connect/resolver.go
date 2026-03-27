@@ -12,10 +12,9 @@ import (
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/selector"
 
-	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/transport/connect/internal/endpoint"
+	"cyber-ecosystem/shared-go/kratos/transport/connect/internal/endpoint"
 )
 
-// Target is resolver target.
 type Target struct {
 	Scheme    string
 	Authority string

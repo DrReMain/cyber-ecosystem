@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/DrReMain/cyber-ecosystem/gen/go/common"
-	"github.com/DrReMain/cyber-ecosystem/shared-go/kratos/order_by"
 
 	"github.com/go-kratos/kratos/v2/errors"
+
+	"cyber-ecosystem/contracts/go/common"
 )
 
 var (
@@ -100,16 +100,21 @@ type SQLSelector func(string) func(*sql.Selector)
 
 type FOMapping map[string]func(SQLSelector)
 
-func ApplyOrderBy(ob []*order_by.OrderBy, ascFunc, descFunc func(...string) func(*sql.Selector), mapping FOMapping) {
+func ApplyOrderBy[O interface {
+	FieldString() string
+	OrderString() string
+	ASC() string
+	DESC() string
+}](ob []O, ascFunc, descFunc func(...string) func(*sql.Selector), mapping FOMapping) {
 	if len(ob) > 0 {
 		for _, rule := range ob {
-			if action, ok := mapping[rule.Field]; ok {
-				if rule.Order == order_by.ASC {
+			if action, ok := mapping[rule.FieldString()]; ok {
+				if rule.OrderString() == rule.ASC() {
 					action(func(s string) func(*sql.Selector) {
 						return ascFunc(s)
 					})
 				}
-				if rule.Order == order_by.DESC {
+				if rule.OrderString() == rule.DESC() {
 					action(func(s string) func(*sql.Selector) {
 						return descFunc(s)
 					})

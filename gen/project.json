@@ -1,7 +1,0 @@
-{
-  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
-  "name": "gen",
-  "root": "gen",
-  "projectType": "library",
-  "targets": {}
-}

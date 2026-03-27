@@ -1,33 +1,19 @@
 global:
-  scrape_interval: 15s     # 默认抓取间隔
-  evaluation_interval: 15s # 规则评估间隔
+  scrape_interval: 15s
+  evaluation_interval: 15s
   external_labels:
-    monitor: 'cyber-ecosystem'
+    monitor: "cyber-ecosystem"
 
 scrape_configs:
-  - job_name: 'prometheus'
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
         labels:
-          instance: 'prometheus'
+          instance: "prometheus"
 
-  - job_name: 'examples-template1'
+  - job_name: "app_1_service_1"
     static_configs:
-      - targets: ['host.docker.internal:11000']
+      - targets: ["host.docker.internal:14000"]
         labels:
-          service: 'examples-template1'
-    metrics_path: /metrics
-
-  - job_name: 'examples-template2'
-    static_configs:
-      - targets: ['host.docker.internal:11001']
-        labels:
-          service: 'examples-template2'
-    metrics_path: /metrics
-
-  - job_name: 'examples-template3'
-    static_configs:
-      - targets: [ 'host.docker.internal:11002' ]
-        labels:
-          service: 'examples-template3'
+          service: 'app_1_service_1'
     metrics_path: /metrics

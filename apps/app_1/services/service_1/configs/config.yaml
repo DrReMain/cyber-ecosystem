@@ -1,0 +1,68 @@
+server:
+  http:
+    addr: 0.0.0.0:11000
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:12000
+    timeout: 1s
+  connect:
+    addr: 0.0.0.0:13000
+    timeout: 1s
+auth:
+  secret: secret
+log:
+  level: debug
+  ent:
+    enabled: false
+    level: debug
+    slow_query: true
+    slow_query_threshold: 0.2s
+  console:
+    enabled: true
+    color: true
+    format: console
+  file:
+    enabled: false
+    path: "../../../../logs/app_1/service_1.log"
+    max_size: 100
+    max_backups: 10
+    max_age: 30
+    compress: true
+  loki:
+    enabled: true
+    url: "http://localhost:3100/loki/api/v1/push"
+    labels:
+      app: "app_1_service_1"
+      env: "development"
+    batch_wait: 1s
+    batch_size: 1048576 #1MB
+data:
+  database:
+    driver: postgres
+    host: localhost
+    port: 5432
+    user: postgres
+    password: postgres
+    db_name: cyber_ecosystem_app_1_service_1
+    max_open_conns: 100
+    max_idle_conns: 100
+    conn_max_lifetime: 3600s
+    migrate: true
+  redis:
+    addr: localhost:6379
+    read_timeout: 0.2s
+    write_timeout: 0.2s
+trace:
+  endpoint: "localhost:4318"
+ops:
+  enabled: true
+  addr: "0.0.0.0:14000"
+  metrics: "/metrics"
+  pprof:
+    enabled: true
+    cpu_enabled: true
+    heap_enabled: true
+    goroutine_enabled: true
+    mutex_enabled: true
+    thread_enabled: true
+    trace_enabled: true

@@ -2,16 +2,32 @@
   "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
   "name": "contracts",
   "root": "contracts",
-  "projectType": "library",
   "targets": {
-    "proto": {
+    "proto:common": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "{projectRoot}/proto",
+        "cwd": "{projectRoot}",
         "commands": [
           "buf generate --template buf.gen.yaml --path common"
         ],
         "parallel": true
+      }
+    },
+    "proto:auth": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "buf generate --template buf.gen.yaml --path auth"
+        ],
+        "parallel": true
+      }
+    },
+    "proto": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["proto:common", "proto:auth"],
+      "options": {
+        "command": "echo 'proto generation completed'"
       }
     }
   }

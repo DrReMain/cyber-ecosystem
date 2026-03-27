@@ -2,14 +2,5 @@
   "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
   "name": "shared-go",
   "root": "shared-go",
-  "projectType": "library",
-  "targets": {
-    "test": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "command": "go test -v ./..."
-      }
-    }
-  }
+  "targets": {}
 }

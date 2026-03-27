@@ -13,6 +13,22 @@ type OrderBy struct {
 	Order string
 }
 
+func (ob *OrderBy) FieldString() string {
+	return ob.Field
+}
+
+func (ob *OrderBy) OrderString() string {
+	return ob.Order
+}
+
+func (ob *OrderBy) ASC() string {
+	return ASC
+}
+
+func (ob *OrderBy) DESC() string {
+	return DESC
+}
+
 func ParseOrderBy(orderBy []string) []*OrderBy {
 	if len(orderBy) == 0 {
 		return nil

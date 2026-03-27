@@ -24,17 +24,13 @@ Desktop.ini
 # JetBrains IDEs
 .idea/
 
-# VS Code
-.vscode/
+# VSCode
+.vscode/launch.json
 
 # Vim
 *.swp
 *.swo
 *~
-
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
 
 # ==================== Go ====================
 # Binaries for programs and plugins
@@ -53,10 +49,6 @@ coverage.html
 
 # Dependency directories
 vendor/
-
-# Go workspace file
-go.work
-go.work.sum
 
 # Compiled Object files, Static and Dynamic libs
 *.o

@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "nrwl.angular-console",
+        "redhat.vscode-yaml",
+        "bufbuild.buf",
+        "pbkit.vscode-overview",
+        "golang.go"
+    ]
+}
