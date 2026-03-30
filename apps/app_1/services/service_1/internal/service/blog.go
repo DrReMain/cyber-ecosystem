@@ -9,9 +9,8 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
-	"cyber-ecosystem/shared-go/kratos/order_by"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
-	"cyber-ecosystem/shared-go/kratos/utils"
+	"cyber-ecosystem/shared-go/utils"
 
 	app1V1 "cyber-ecosystem/apps/app_1/gen/go/v1"
 	app1ConnectV1 "cyber-ecosystem/apps/app_1/gen/go/v1/app1V1connect"
@@ -101,7 +100,7 @@ func (s *BlogService) GetBlog(ctx context.Context, in *app1V1.GetBlogRequest) (*
 func (s *BlogService) QueryBlog(ctx context.Context, in *app1V1.QueryBlogRequest) (*app1V1.QueryBlogResponse, error) {
 	out, err := s.blogUC.QueryBlog(ctx, &biz.BlogQueryIn{
 		PageRequest:  utils.GetOrBuildPage(in.Page),
-		OrderBy:      order_by.ParseOrderBy(in.OrderBy),
+		OrderBy:      utils.ParseOrderBy(in.OrderBy),
 		ID:           in.Id,
 		Title:        in.Title,
 		PublishedAtA: utils.GetPTimeFromPPbTime(in.PublishedAtA),

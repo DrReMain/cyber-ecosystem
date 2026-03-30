@@ -216,10 +216,11 @@ func (x *Auth) GetSecret() string {
 type Log struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Level         string                 `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty"`
-	Console       *Log_Console           `protobuf:"bytes,2,opt,name=console,proto3" json:"console,omitempty"`
-	File          *Log_File              `protobuf:"bytes,3,opt,name=file,proto3" json:"file,omitempty"`
-	Loki          *Log_Loki              `protobuf:"bytes,4,opt,name=loki,proto3" json:"loki,omitempty"`
-	Ent           *Log_Ent               `protobuf:"bytes,5,opt,name=ent,proto3" json:"ent,omitempty"`
+	Cache         *Log_Cache             `protobuf:"bytes,2,opt,name=cache,proto3" json:"cache,omitempty"`
+	Ent           *Log_Ent               `protobuf:"bytes,3,opt,name=ent,proto3" json:"ent,omitempty"`
+	Console       *Log_Console           `protobuf:"bytes,4,opt,name=console,proto3" json:"console,omitempty"`
+	File          *Log_File              `protobuf:"bytes,5,opt,name=file,proto3" json:"file,omitempty"`
+	Loki          *Log_Loki              `protobuf:"bytes,6,opt,name=loki,proto3" json:"loki,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -261,6 +262,20 @@ func (x *Log) GetLevel() string {
 	return ""
 }
 
+func (x *Log) GetCache() *Log_Cache {
+	if x != nil {
+		return x.Cache
+	}
+	return nil
+}
+
+func (x *Log) GetEnt() *Log_Ent {
+	if x != nil {
+		return x.Ent
+	}
+	return nil
+}
+
 func (x *Log) GetConsole() *Log_Console {
 	if x != nil {
 		return x.Console
@@ -282,17 +297,10 @@ func (x *Log) GetLoki() *Log_Loki {
 	return nil
 }
 
-func (x *Log) GetEnt() *Log_Ent {
-	if x != nil {
-		return x.Ent
-	}
-	return nil
-}
-
 type Data struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Database      *Data_Database         `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
-	Redis         *Data_Redis            `protobuf:"bytes,2,opt,name=redis,proto3" json:"redis,omitempty"`
+	Cache         *Data_Cache            `protobuf:"bytes,2,opt,name=cache,proto3" json:"cache,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -334,9 +342,9 @@ func (x *Data) GetDatabase() *Data_Database {
 	return nil
 }
 
-func (x *Data) GetRedis() *Data_Redis {
+func (x *Data) GetCache() *Data_Cache {
 	if x != nil {
-		return x.Redis
+		return x.Cache
 	}
 	return nil
 }
@@ -344,6 +352,7 @@ func (x *Data) GetRedis() *Data_Redis {
 type Trace struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Endpoint      string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Insecure      bool                   `protobuf:"varint,2,opt,name=insecure,proto3" json:"insecure,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -383,6 +392,13 @@ func (x *Trace) GetEndpoint() string {
 		return x.Endpoint
 	}
 	return ""
+}
+
+func (x *Trace) GetInsecure() bool {
+	if x != nil {
+		return x.Insecure
+	}
+	return false
 }
 
 type Ops struct {
@@ -641,6 +657,142 @@ func (x *Server_Connect) GetTimeout() *durationpb.Duration {
 	return nil
 }
 
+type Log_Cache struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Enabled            bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Level              string                 `protobuf:"bytes,2,opt,name=level,proto3" json:"level,omitempty"`
+	SlowQuery          bool                   `protobuf:"varint,3,opt,name=slow_query,json=slowQuery,proto3" json:"slow_query,omitempty"`
+	SlowQueryThreshold *durationpb.Duration   `protobuf:"bytes,4,opt,name=slow_query_threshold,json=slowQueryThreshold,proto3" json:"slow_query_threshold,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *Log_Cache) Reset() {
+	*x = Log_Cache{}
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Log_Cache) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Log_Cache) ProtoMessage() {}
+
+func (x *Log_Cache) ProtoReflect() protoreflect.Message {
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Log_Cache.ProtoReflect.Descriptor instead.
+func (*Log_Cache) Descriptor() ([]byte, []int) {
+	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{3, 0}
+}
+
+func (x *Log_Cache) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *Log_Cache) GetLevel() string {
+	if x != nil {
+		return x.Level
+	}
+	return ""
+}
+
+func (x *Log_Cache) GetSlowQuery() bool {
+	if x != nil {
+		return x.SlowQuery
+	}
+	return false
+}
+
+func (x *Log_Cache) GetSlowQueryThreshold() *durationpb.Duration {
+	if x != nil {
+		return x.SlowQueryThreshold
+	}
+	return nil
+}
+
+type Log_Ent struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Enabled            bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Level              string                 `protobuf:"bytes,2,opt,name=level,proto3" json:"level,omitempty"`
+	SlowQuery          bool                   `protobuf:"varint,3,opt,name=slow_query,json=slowQuery,proto3" json:"slow_query,omitempty"`
+	SlowQueryThreshold *durationpb.Duration   `protobuf:"bytes,4,opt,name=slow_query_threshold,json=slowQueryThreshold,proto3" json:"slow_query_threshold,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *Log_Ent) Reset() {
+	*x = Log_Ent{}
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Log_Ent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Log_Ent) ProtoMessage() {}
+
+func (x *Log_Ent) ProtoReflect() protoreflect.Message {
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Log_Ent.ProtoReflect.Descriptor instead.
+func (*Log_Ent) Descriptor() ([]byte, []int) {
+	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{3, 1}
+}
+
+func (x *Log_Ent) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *Log_Ent) GetLevel() string {
+	if x != nil {
+		return x.Level
+	}
+	return ""
+}
+
+func (x *Log_Ent) GetSlowQuery() bool {
+	if x != nil {
+		return x.SlowQuery
+	}
+	return false
+}
+
+func (x *Log_Ent) GetSlowQueryThreshold() *durationpb.Duration {
+	if x != nil {
+		return x.SlowQueryThreshold
+	}
+	return nil
+}
+
 type Log_Console struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -652,7 +804,7 @@ type Log_Console struct {
 
 func (x *Log_Console) Reset() {
 	*x = Log_Console{}
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -664,7 +816,7 @@ func (x *Log_Console) String() string {
 func (*Log_Console) ProtoMessage() {}
 
 func (x *Log_Console) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -677,7 +829,7 @@ func (x *Log_Console) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Log_Console.ProtoReflect.Descriptor instead.
 func (*Log_Console) Descriptor() ([]byte, []int) {
-	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{3, 0}
+	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{3, 2}
 }
 
 func (x *Log_Console) GetEnabled() bool {
@@ -715,7 +867,7 @@ type Log_File struct {
 
 func (x *Log_File) Reset() {
 	*x = Log_File{}
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -727,7 +879,7 @@ func (x *Log_File) String() string {
 func (*Log_File) ProtoMessage() {}
 
 func (x *Log_File) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -740,7 +892,7 @@ func (x *Log_File) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Log_File.ProtoReflect.Descriptor instead.
 func (*Log_File) Descriptor() ([]byte, []int) {
-	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{3, 1}
+	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{3, 3}
 }
 
 func (x *Log_File) GetEnabled() bool {
@@ -798,7 +950,7 @@ type Log_Loki struct {
 
 func (x *Log_Loki) Reset() {
 	*x = Log_Loki{}
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -810,7 +962,7 @@ func (x *Log_Loki) String() string {
 func (*Log_Loki) ProtoMessage() {}
 
 func (x *Log_Loki) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -823,7 +975,7 @@ func (x *Log_Loki) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Log_Loki.ProtoReflect.Descriptor instead.
 func (*Log_Loki) Descriptor() ([]byte, []int) {
-	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{3, 2}
+	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{3, 4}
 }
 
 func (x *Log_Loki) GetEnabled() bool {
@@ -861,74 +1013,6 @@ func (x *Log_Loki) GetBatchSize() int32 {
 	return 0
 }
 
-type Log_Ent struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	Enabled            bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Level              string                 `protobuf:"bytes,2,opt,name=level,proto3" json:"level,omitempty"`
-	SlowQuery          bool                   `protobuf:"varint,3,opt,name=slow_query,json=slowQuery,proto3" json:"slow_query,omitempty"`
-	SlowQueryThreshold *durationpb.Duration   `protobuf:"bytes,4,opt,name=slow_query_threshold,json=slowQueryThreshold,proto3" json:"slow_query_threshold,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
-}
-
-func (x *Log_Ent) Reset() {
-	*x = Log_Ent{}
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Log_Ent) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Log_Ent) ProtoMessage() {}
-
-func (x *Log_Ent) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Log_Ent.ProtoReflect.Descriptor instead.
-func (*Log_Ent) Descriptor() ([]byte, []int) {
-	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{3, 3}
-}
-
-func (x *Log_Ent) GetEnabled() bool {
-	if x != nil {
-		return x.Enabled
-	}
-	return false
-}
-
-func (x *Log_Ent) GetLevel() string {
-	if x != nil {
-		return x.Level
-	}
-	return ""
-}
-
-func (x *Log_Ent) GetSlowQuery() bool {
-	if x != nil {
-		return x.SlowQuery
-	}
-	return false
-}
-
-func (x *Log_Ent) GetSlowQueryThreshold() *durationpb.Duration {
-	if x != nil {
-		return x.SlowQueryThreshold
-	}
-	return nil
-}
-
 type Data_Database struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Driver          string                 `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"`
@@ -947,7 +1031,7 @@ type Data_Database struct {
 
 func (x *Data_Database) Reset() {
 	*x = Data_Database{}
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[15]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -959,7 +1043,7 @@ func (x *Data_Database) String() string {
 func (*Data_Database) ProtoMessage() {}
 
 func (x *Data_Database) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[15]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1045,31 +1129,30 @@ func (x *Data_Database) GetMigrate() bool {
 	return false
 }
 
-type Data_Redis struct {
+type Data_Cache struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Network       string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
-	Addr          string                 `protobuf:"bytes,2,opt,name=addr,proto3" json:"addr,omitempty"`
-	ReadTimeout   *durationpb.Duration   `protobuf:"bytes,3,opt,name=read_timeout,json=readTimeout,proto3" json:"read_timeout,omitempty"`
-	WriteTimeout  *durationpb.Duration   `protobuf:"bytes,4,opt,name=write_timeout,json=writeTimeout,proto3" json:"write_timeout,omitempty"`
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // memory / redis
+	Memory        *Data_Cache_Memory     `protobuf:"bytes,2,opt,name=memory,proto3" json:"memory,omitempty"`
+	Redis         *Data_Cache_Redis      `protobuf:"bytes,3,opt,name=redis,proto3" json:"redis,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Data_Redis) Reset() {
-	*x = Data_Redis{}
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[16]
+func (x *Data_Cache) Reset() {
+	*x = Data_Cache{}
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Data_Redis) String() string {
+func (x *Data_Cache) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Data_Redis) ProtoMessage() {}
+func (*Data_Cache) ProtoMessage() {}
 
-func (x *Data_Redis) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[16]
+func (x *Data_Cache) ProtoReflect() protoreflect.Message {
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1080,37 +1163,190 @@ func (x *Data_Redis) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Data_Redis.ProtoReflect.Descriptor instead.
-func (*Data_Redis) Descriptor() ([]byte, []int) {
+// Deprecated: Use Data_Cache.ProtoReflect.Descriptor instead.
+func (*Data_Cache) Descriptor() ([]byte, []int) {
 	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{4, 1}
 }
 
-func (x *Data_Redis) GetNetwork() string {
+func (x *Data_Cache) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Data_Cache) GetMemory() *Data_Cache_Memory {
+	if x != nil {
+		return x.Memory
+	}
+	return nil
+}
+
+func (x *Data_Cache) GetRedis() *Data_Cache_Redis {
+	if x != nil {
+		return x.Redis
+	}
+	return nil
+}
+
+type Data_Cache_Memory struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OtelEnabled   bool                   `protobuf:"varint,1,opt,name=otel_enabled,json=otelEnabled,proto3" json:"otel_enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Data_Cache_Memory) Reset() {
+	*x = Data_Cache_Memory{}
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Data_Cache_Memory) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Data_Cache_Memory) ProtoMessage() {}
+
+func (x *Data_Cache_Memory) ProtoReflect() protoreflect.Message {
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Data_Cache_Memory.ProtoReflect.Descriptor instead.
+func (*Data_Cache_Memory) Descriptor() ([]byte, []int) {
+	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{4, 1, 0}
+}
+
+func (x *Data_Cache_Memory) GetOtelEnabled() bool {
+	if x != nil {
+		return x.OtelEnabled
+	}
+	return false
+}
+
+type Data_Cache_Redis struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Network         string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Addr            string                 `protobuf:"bytes,2,opt,name=addr,proto3" json:"addr,omitempty"`
+	ReadTimeout     *durationpb.Duration   `protobuf:"bytes,3,opt,name=read_timeout,json=readTimeout,proto3" json:"read_timeout,omitempty"`
+	WriteTimeout    *durationpb.Duration   `protobuf:"bytes,4,opt,name=write_timeout,json=writeTimeout,proto3" json:"write_timeout,omitempty"`
+	PoolSize        int32                  `protobuf:"varint,5,opt,name=pool_size,json=poolSize,proto3" json:"pool_size,omitempty"`
+	MinIdleConns    int32                  `protobuf:"varint,6,opt,name=min_idle_conns,json=minIdleConns,proto3" json:"min_idle_conns,omitempty"`
+	ConnMaxLifetime *durationpb.Duration   `protobuf:"bytes,7,opt,name=conn_max_lifetime,json=connMaxLifetime,proto3" json:"conn_max_lifetime,omitempty"`
+	Password        string                 `protobuf:"bytes,8,opt,name=password,proto3" json:"password,omitempty"`
+	Db              int32                  `protobuf:"varint,9,opt,name=db,proto3" json:"db,omitempty"`
+	OtelEnabled     bool                   `protobuf:"varint,10,opt,name=otel_enabled,json=otelEnabled,proto3" json:"otel_enabled,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *Data_Cache_Redis) Reset() {
+	*x = Data_Cache_Redis{}
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Data_Cache_Redis) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Data_Cache_Redis) ProtoMessage() {}
+
+func (x *Data_Cache_Redis) ProtoReflect() protoreflect.Message {
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Data_Cache_Redis.ProtoReflect.Descriptor instead.
+func (*Data_Cache_Redis) Descriptor() ([]byte, []int) {
+	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP(), []int{4, 1, 1}
+}
+
+func (x *Data_Cache_Redis) GetNetwork() string {
 	if x != nil {
 		return x.Network
 	}
 	return ""
 }
 
-func (x *Data_Redis) GetAddr() string {
+func (x *Data_Cache_Redis) GetAddr() string {
 	if x != nil {
 		return x.Addr
 	}
 	return ""
 }
 
-func (x *Data_Redis) GetReadTimeout() *durationpb.Duration {
+func (x *Data_Cache_Redis) GetReadTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.ReadTimeout
 	}
 	return nil
 }
 
-func (x *Data_Redis) GetWriteTimeout() *durationpb.Duration {
+func (x *Data_Cache_Redis) GetWriteTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.WriteTimeout
 	}
 	return nil
+}
+
+func (x *Data_Cache_Redis) GetPoolSize() int32 {
+	if x != nil {
+		return x.PoolSize
+	}
+	return 0
+}
+
+func (x *Data_Cache_Redis) GetMinIdleConns() int32 {
+	if x != nil {
+		return x.MinIdleConns
+	}
+	return 0
+}
+
+func (x *Data_Cache_Redis) GetConnMaxLifetime() *durationpb.Duration {
+	if x != nil {
+		return x.ConnMaxLifetime
+	}
+	return nil
+}
+
+func (x *Data_Cache_Redis) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *Data_Cache_Redis) GetDb() int32 {
+	if x != nil {
+		return x.Db
+	}
+	return 0
+}
+
+func (x *Data_Cache_Redis) GetOtelEnabled() bool {
+	if x != nil {
+		return x.OtelEnabled
+	}
+	return false
 }
 
 type Ops_Pprof struct {
@@ -1128,7 +1364,7 @@ type Ops_Pprof struct {
 
 func (x *Ops_Pprof) Reset() {
 	*x = Ops_Pprof{}
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[17]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1140,7 +1376,7 @@ func (x *Ops_Pprof) String() string {
 func (*Ops_Pprof) ProtoMessage() {}
 
 func (x *Ops_Pprof) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[17]
+	mi := &file_app_1_services_service_1_internal_conf_conf_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1234,13 +1470,26 @@ const file_app_1_services_service_1_internal_conf_conf_proto_rawDesc = "" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
 	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\x1e\n" +
 	"\x04Auth\x12\x16\n" +
-	"\x06secret\x18\x01 \x01(\tR\x06secret\"\x9d\a\n" +
+	"\x06secret\x18\x01 \x01(\tR\x06secret\"\xfa\b\n" +
 	"\x03Log\x12\x14\n" +
-	"\x05level\x18\x01 \x01(\tR\x05level\x12;\n" +
-	"\aconsole\x18\x02 \x01(\v2!.cyber_ecosystem.conf.Log.ConsoleR\aconsole\x122\n" +
-	"\x04file\x18\x03 \x01(\v2\x1e.cyber_ecosystem.conf.Log.FileR\x04file\x122\n" +
-	"\x04loki\x18\x04 \x01(\v2\x1e.cyber_ecosystem.conf.Log.LokiR\x04loki\x12/\n" +
-	"\x03ent\x18\x05 \x01(\v2\x1d.cyber_ecosystem.conf.Log.EntR\x03ent\x1aQ\n" +
+	"\x05level\x18\x01 \x01(\tR\x05level\x125\n" +
+	"\x05cache\x18\x02 \x01(\v2\x1f.cyber_ecosystem.conf.Log.CacheR\x05cache\x12/\n" +
+	"\x03ent\x18\x03 \x01(\v2\x1d.cyber_ecosystem.conf.Log.EntR\x03ent\x12;\n" +
+	"\aconsole\x18\x04 \x01(\v2!.cyber_ecosystem.conf.Log.ConsoleR\aconsole\x122\n" +
+	"\x04file\x18\x05 \x01(\v2\x1e.cyber_ecosystem.conf.Log.FileR\x04file\x122\n" +
+	"\x04loki\x18\x06 \x01(\v2\x1e.cyber_ecosystem.conf.Log.LokiR\x04loki\x1a\xa3\x01\n" +
+	"\x05Cache\x12\x18\n" +
+	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\tR\x05level\x12\x1d\n" +
+	"\n" +
+	"slow_query\x18\x03 \x01(\bR\tslowQuery\x12K\n" +
+	"\x14slow_query_threshold\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\x12slowQueryThreshold\x1a\xa1\x01\n" +
+	"\x03Ent\x12\x18\n" +
+	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\tR\x05level\x12\x1d\n" +
+	"\n" +
+	"slow_query\x18\x03 \x01(\bR\tslowQuery\x12K\n" +
+	"\x14slow_query_threshold\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\x12slowQueryThreshold\x1aQ\n" +
 	"\aConsole\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14\n" +
 	"\x05color\x18\x02 \x01(\bR\x05color\x12\x16\n" +
@@ -1263,16 +1512,10 @@ const file_app_1_services_service_1_internal_conf_conf_proto_rawDesc = "" +
 	"batch_size\x18\x05 \x01(\x05R\tbatchSize\x1a9\n" +
 	"\vLabelsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a\xa1\x01\n" +
-	"\x03Ent\x12\x18\n" +
-	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14\n" +
-	"\x05level\x18\x02 \x01(\tR\x05level\x12\x1d\n" +
-	"\n" +
-	"slow_query\x18\x03 \x01(\bR\tslowQuery\x12K\n" +
-	"\x14slow_query_threshold\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\x12slowQueryThreshold\"\xf8\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x9b\b\n" +
 	"\x04Data\x12?\n" +
 	"\bdatabase\x18\x01 \x01(\v2#.cyber_ecosystem.conf.Data.DatabaseR\bdatabase\x126\n" +
-	"\x05redis\x18\x02 \x01(\v2 .cyber_ecosystem.conf.Data.RedisR\x05redis\x1a\xc0\x02\n" +
+	"\x05cache\x18\x02 \x01(\v2 .cyber_ecosystem.conf.Data.CacheR\x05cache\x1a\xc0\x02\n" +
 	"\bDatabase\x12\x16\n" +
 	"\x06driver\x18\x01 \x01(\tR\x06driver\x12\x12\n" +
 	"\x04host\x18\x02 \x01(\tR\x04host\x12\x12\n" +
@@ -1284,14 +1527,28 @@ const file_app_1_services_service_1_internal_conf_conf_proto_rawDesc = "" +
 	"\x0emax_idle_conns\x18\b \x01(\x05R\fmaxIdleConns\x12E\n" +
 	"\x11conn_max_lifetime\x18\t \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\x12\x18\n" +
 	"\amigrate\x18\n" +
-	" \x01(\bR\amigrate\x1a\xb3\x01\n" +
+	" \x01(\bR\amigrate\x1a\xd6\x04\n" +
+	"\x05Cache\x12\x12\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12?\n" +
+	"\x06memory\x18\x02 \x01(\v2'.cyber_ecosystem.conf.Data.Cache.MemoryR\x06memory\x12<\n" +
+	"\x05redis\x18\x03 \x01(\v2&.cyber_ecosystem.conf.Data.Cache.RedisR\x05redis\x1a+\n" +
+	"\x06Memory\x12!\n" +
+	"\fotel_enabled\x18\x01 \x01(\bR\votelEnabled\x1a\x8c\x03\n" +
 	"\x05Redis\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x12<\n" +
 	"\fread_timeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\vreadTimeout\x12>\n" +
-	"\rwrite_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\fwriteTimeout\"#\n" +
+	"\rwrite_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\fwriteTimeout\x12\x1b\n" +
+	"\tpool_size\x18\x05 \x01(\x05R\bpoolSize\x12$\n" +
+	"\x0emin_idle_conns\x18\x06 \x01(\x05R\fminIdleConns\x12E\n" +
+	"\x11conn_max_lifetime\x18\a \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\x12\x1a\n" +
+	"\bpassword\x18\b \x01(\tR\bpassword\x12\x0e\n" +
+	"\x02db\x18\t \x01(\x05R\x02db\x12!\n" +
+	"\fotel_enabled\x18\n" +
+	" \x01(\bR\votelEnabled\"?\n" +
 	"\x05Trace\x12\x1a\n" +
-	"\bendpoint\x18\x01 \x01(\tR\bendpoint\"\xa4\x03\n" +
+	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x1a\n" +
+	"\binsecure\x18\x02 \x01(\bR\binsecure\"\xa4\x03\n" +
 	"\x03Ops\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x18\n" +
 	"\anetwork\x18\x02 \x01(\tR\anetwork\x12\x12\n" +
@@ -1320,7 +1577,7 @@ func file_app_1_services_service_1_internal_conf_conf_proto_rawDescGZIP() []byte
 	return file_app_1_services_service_1_internal_conf_conf_proto_rawDescData
 }
 
-var file_app_1_services_service_1_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_app_1_services_service_1_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_app_1_services_service_1_internal_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),           // 0: cyber_ecosystem.conf.Bootstrap
 	(*Server)(nil),              // 1: cyber_ecosystem.conf.Server
@@ -1332,15 +1589,18 @@ var file_app_1_services_service_1_internal_conf_conf_proto_goTypes = []any{
 	(*Server_HTTP)(nil),         // 7: cyber_ecosystem.conf.Server.HTTP
 	(*Server_GRPC)(nil),         // 8: cyber_ecosystem.conf.Server.GRPC
 	(*Server_Connect)(nil),      // 9: cyber_ecosystem.conf.Server.Connect
-	(*Log_Console)(nil),         // 10: cyber_ecosystem.conf.Log.Console
-	(*Log_File)(nil),            // 11: cyber_ecosystem.conf.Log.File
-	(*Log_Loki)(nil),            // 12: cyber_ecosystem.conf.Log.Loki
-	(*Log_Ent)(nil),             // 13: cyber_ecosystem.conf.Log.Ent
-	nil,                         // 14: cyber_ecosystem.conf.Log.Loki.LabelsEntry
-	(*Data_Database)(nil),       // 15: cyber_ecosystem.conf.Data.Database
-	(*Data_Redis)(nil),          // 16: cyber_ecosystem.conf.Data.Redis
-	(*Ops_Pprof)(nil),           // 17: cyber_ecosystem.conf.Ops.Pprof
-	(*durationpb.Duration)(nil), // 18: google.protobuf.Duration
+	(*Log_Cache)(nil),           // 10: cyber_ecosystem.conf.Log.Cache
+	(*Log_Ent)(nil),             // 11: cyber_ecosystem.conf.Log.Ent
+	(*Log_Console)(nil),         // 12: cyber_ecosystem.conf.Log.Console
+	(*Log_File)(nil),            // 13: cyber_ecosystem.conf.Log.File
+	(*Log_Loki)(nil),            // 14: cyber_ecosystem.conf.Log.Loki
+	nil,                         // 15: cyber_ecosystem.conf.Log.Loki.LabelsEntry
+	(*Data_Database)(nil),       // 16: cyber_ecosystem.conf.Data.Database
+	(*Data_Cache)(nil),          // 17: cyber_ecosystem.conf.Data.Cache
+	(*Data_Cache_Memory)(nil),   // 18: cyber_ecosystem.conf.Data.Cache.Memory
+	(*Data_Cache_Redis)(nil),    // 19: cyber_ecosystem.conf.Data.Cache.Redis
+	(*Ops_Pprof)(nil),           // 20: cyber_ecosystem.conf.Ops.Pprof
+	(*durationpb.Duration)(nil), // 21: google.protobuf.Duration
 }
 var file_app_1_services_service_1_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber_ecosystem.conf.Bootstrap.server:type_name -> cyber_ecosystem.conf.Server
@@ -1352,27 +1612,32 @@ var file_app_1_services_service_1_internal_conf_conf_proto_depIdxs = []int32{
 	7,  // 6: cyber_ecosystem.conf.Server.http:type_name -> cyber_ecosystem.conf.Server.HTTP
 	8,  // 7: cyber_ecosystem.conf.Server.grpc:type_name -> cyber_ecosystem.conf.Server.GRPC
 	9,  // 8: cyber_ecosystem.conf.Server.connect:type_name -> cyber_ecosystem.conf.Server.Connect
-	10, // 9: cyber_ecosystem.conf.Log.console:type_name -> cyber_ecosystem.conf.Log.Console
-	11, // 10: cyber_ecosystem.conf.Log.file:type_name -> cyber_ecosystem.conf.Log.File
-	12, // 11: cyber_ecosystem.conf.Log.loki:type_name -> cyber_ecosystem.conf.Log.Loki
-	13, // 12: cyber_ecosystem.conf.Log.ent:type_name -> cyber_ecosystem.conf.Log.Ent
-	15, // 13: cyber_ecosystem.conf.Data.database:type_name -> cyber_ecosystem.conf.Data.Database
-	16, // 14: cyber_ecosystem.conf.Data.redis:type_name -> cyber_ecosystem.conf.Data.Redis
-	17, // 15: cyber_ecosystem.conf.Ops.pprof:type_name -> cyber_ecosystem.conf.Ops.Pprof
-	18, // 16: cyber_ecosystem.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	18, // 17: cyber_ecosystem.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	18, // 18: cyber_ecosystem.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	14, // 19: cyber_ecosystem.conf.Log.Loki.labels:type_name -> cyber_ecosystem.conf.Log.Loki.LabelsEntry
-	18, // 20: cyber_ecosystem.conf.Log.Loki.batch_wait:type_name -> google.protobuf.Duration
-	18, // 21: cyber_ecosystem.conf.Log.Ent.slow_query_threshold:type_name -> google.protobuf.Duration
-	18, // 22: cyber_ecosystem.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	18, // 23: cyber_ecosystem.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	18, // 24: cyber_ecosystem.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	10, // 9: cyber_ecosystem.conf.Log.cache:type_name -> cyber_ecosystem.conf.Log.Cache
+	11, // 10: cyber_ecosystem.conf.Log.ent:type_name -> cyber_ecosystem.conf.Log.Ent
+	12, // 11: cyber_ecosystem.conf.Log.console:type_name -> cyber_ecosystem.conf.Log.Console
+	13, // 12: cyber_ecosystem.conf.Log.file:type_name -> cyber_ecosystem.conf.Log.File
+	14, // 13: cyber_ecosystem.conf.Log.loki:type_name -> cyber_ecosystem.conf.Log.Loki
+	16, // 14: cyber_ecosystem.conf.Data.database:type_name -> cyber_ecosystem.conf.Data.Database
+	17, // 15: cyber_ecosystem.conf.Data.cache:type_name -> cyber_ecosystem.conf.Data.Cache
+	20, // 16: cyber_ecosystem.conf.Ops.pprof:type_name -> cyber_ecosystem.conf.Ops.Pprof
+	21, // 17: cyber_ecosystem.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	21, // 18: cyber_ecosystem.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	21, // 19: cyber_ecosystem.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	21, // 20: cyber_ecosystem.conf.Log.Cache.slow_query_threshold:type_name -> google.protobuf.Duration
+	21, // 21: cyber_ecosystem.conf.Log.Ent.slow_query_threshold:type_name -> google.protobuf.Duration
+	15, // 22: cyber_ecosystem.conf.Log.Loki.labels:type_name -> cyber_ecosystem.conf.Log.Loki.LabelsEntry
+	21, // 23: cyber_ecosystem.conf.Log.Loki.batch_wait:type_name -> google.protobuf.Duration
+	21, // 24: cyber_ecosystem.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	18, // 25: cyber_ecosystem.conf.Data.Cache.memory:type_name -> cyber_ecosystem.conf.Data.Cache.Memory
+	19, // 26: cyber_ecosystem.conf.Data.Cache.redis:type_name -> cyber_ecosystem.conf.Data.Cache.Redis
+	21, // 27: cyber_ecosystem.conf.Data.Cache.Redis.read_timeout:type_name -> google.protobuf.Duration
+	21, // 28: cyber_ecosystem.conf.Data.Cache.Redis.write_timeout:type_name -> google.protobuf.Duration
+	21, // 29: cyber_ecosystem.conf.Data.Cache.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
+	30, // [30:30] is the sub-list for method output_type
+	30, // [30:30] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_app_1_services_service_1_internal_conf_conf_proto_init() }
@@ -1386,7 +1651,7 @@ func file_app_1_services_service_1_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_app_1_services_service_1_internal_conf_conf_proto_rawDesc), len(file_app_1_services_service_1_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

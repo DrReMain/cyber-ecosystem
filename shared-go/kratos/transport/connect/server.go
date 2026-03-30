@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"connectrpc.com/connect"
@@ -37,6 +38,7 @@ type FilterFunc func(http.Handler) http.Handler
 type Server struct {
 	*http.Server
 
+	mu                   sync.RWMutex
 	baseCtx              context.Context
 	tlsConf              *tls.Config
 	lis                  net.Listener
@@ -132,6 +134,8 @@ func (s *Server) Endpoint() (*url.URL, error) {
 	if err := s.listenAndEndpoint(); err != nil {
 		return nil, s.err
 	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	return s.endpoint, nil
 }
 
@@ -180,6 +184,9 @@ func (s *Server) Stop(ctx context.Context) error {
 }
 
 func (s *Server) listenAndEndpoint() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	if s.lis == nil {
 		lis, err := net.Listen(s.network, s.address)
 		if err != nil {
@@ -197,6 +204,15 @@ func (s *Server) listenAndEndpoint() error {
 		s.endpoint = endpoint.NewEndpoint(endpoint.Scheme("connect", s.tlsConf != nil), addr)
 	}
 	return s.err
+}
+
+func (s *Server) listenerAddr() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if s.lis == nil {
+		return ""
+	}
+	return s.lis.Addr().String()
 }
 
 func filterChain(filters ...FilterFunc) FilterFunc {

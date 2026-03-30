@@ -2,22 +2,12 @@ package zap
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
-
-var whitespaceRegex = regexp.MustCompile(`\s+`)
-
-func compact(query string) string {
-	result := strings.TrimSpace(whitespaceRegex.ReplaceAllString(query, " "))
-	result = strings.ReplaceAll(result, "\"", "'")
-	return strings.TrimSpace(result)
-}
 
 type Logger struct {
 	log     *zap.Logger
@@ -58,16 +48,15 @@ func (l *Logger) Log(level log.Level, keyvals ...any) error {
 
 	fields := make([]zap.Field, 0, (keylen/2)+1)
 	for i := 0; i < keylen; i += 2 {
-		if keyvals[i].(string) == l.msgKey {
+		key, ok := keyvals[i].(string)
+		if !ok {
+			key = fmt.Sprint(keyvals[i])
+		}
+		if key == l.msgKey {
 			msg, _ = keyvals[i+1].(string)
 			continue
 		}
-		if v, ok := keyvals[i+1].(string); ok {
-			fields = append(fields, zap.Any(fmt.Sprint(keyvals[i]), compact(v)))
-		} else {
-			fields = append(fields, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
-		}
-
+		fields = append(fields, zap.Any(key, keyvals[i+1]))
 	}
 
 	switch level {
@@ -104,6 +93,7 @@ func (l *Logger) Close() error {
 func (l *Logger) With(fields ...zap.Field) *Logger {
 	return &Logger{
 		log:     l.log.With(fields...),
+		msgKey:  l.msgKey,
 		closers: l.closers,
 	}
 }

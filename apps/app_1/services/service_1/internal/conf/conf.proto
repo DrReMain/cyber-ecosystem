@@ -42,14 +42,23 @@ message Auth {
 }
 
 message Log {
-  string level = 1;
-
+  message Cache {
+    bool enabled = 1;
+    string level = 2;
+    bool slow_query = 3;
+    google.protobuf.Duration slow_query_threshold = 4;
+  }
+  message Ent {
+    bool enabled = 1;
+    string level = 2;
+    bool slow_query = 3;
+    google.protobuf.Duration slow_query_threshold = 4;
+  }
   message Console {
     bool enabled = 1;
     bool color = 2;
     string format = 3; // "console" or "json", default "console"
   }
-
   message File {
     bool enabled = 1;
     string path = 2;
@@ -58,7 +67,6 @@ message Log {
     int32 max_age = 5; // days
     bool compress = 6;
   }
-
   message Loki {
     bool enabled = 1;
     string url = 2;
@@ -67,17 +75,12 @@ message Log {
     int32 batch_size = 5; // bytes
   }
 
-  message Ent {
-    bool enabled = 1;
-    string level = 2;
-    bool slow_query = 3;
-    google.protobuf.Duration slow_query_threshold = 4;
-  }
-
-  Console console = 2;
-  File file = 3;
-  Loki loki = 4;
-  Ent ent = 5;
+  string level = 1;
+  Cache cache = 2;
+  Ent ent = 3;
+  Console console = 4;
+  File file = 5;
+  Loki loki = 6;
 }
 
 message Data {
@@ -93,18 +96,33 @@ message Data {
     google.protobuf.Duration conn_max_lifetime = 9;
     bool migrate = 10;
   }
-  message Redis {
-    string network = 1;
-    string addr = 2;
-    google.protobuf.Duration read_timeout = 3;
-    google.protobuf.Duration write_timeout = 4;
+  message Cache {
+    message Memory {
+      bool otel_enabled = 1;
+    }
+    message Redis {
+      string network = 1;
+      string addr = 2;
+      google.protobuf.Duration read_timeout = 3;
+      google.protobuf.Duration write_timeout = 4;
+      int32 pool_size = 5;
+      int32 min_idle_conns = 6;
+      google.protobuf.Duration conn_max_lifetime = 7;
+      string password = 8;
+      int32 db = 9;
+      bool otel_enabled = 10;
+    }
+    string type = 1; // memory / redis
+    Memory memory = 2;
+    Redis redis = 3;
   }
   Database database = 1;
-  Redis redis = 2;
+  Cache cache = 2;
 }
 
 message Trace {
   string endpoint = 1;
+  bool insecure = 2;
 }
 
 message Ops {

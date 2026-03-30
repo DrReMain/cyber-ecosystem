@@ -24,9 +24,6 @@ Desktop.ini
 # JetBrains IDEs
 .idea/
 
-# VSCode
-.vscode/launch.json
-
 # Vim
 *.swp
 *.swo

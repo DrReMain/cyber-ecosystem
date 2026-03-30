@@ -58,14 +58,25 @@ func (h *healthChecker) healthzHandlerFunc() http.HandlerFunc {
 		Status string `json:"status"`
 	}
 	return func(w http.ResponseWriter, _ *http.Request) {
+		serving := h.serving.Load()
 		status := "SERVING"
-		if !h.serving.Load() {
+		if !serving {
 			status = "NOT_SERVING"
-			w.WriteHeader(http.StatusServiceUnavailable)
 		}
 		codec := encoding.GetCodec("json")
-		data, _ := codec.Marshal(response{Status: status})
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(data) //nolint:errcheck
+		if !serving {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+		if codec == nil {
+			http.Error(w, `{"status":"UNKNOWN"}`, http.StatusInternalServerError)
+			return
+		}
+		data, err := codec.Marshal(response{Status: status})
+		if err != nil {
+			http.Error(w, `{"status":"UNKNOWN"}`, http.StatusInternalServerError)
+			return
+		}
+		_, _ = w.Write(data)
 	}
 }

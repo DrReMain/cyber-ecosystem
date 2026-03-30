@@ -7,7 +7,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 
 	"cyber-ecosystem/contracts/go/common"
-	"cyber-ecosystem/shared-go/kratos/order_by"
+	"cyber-ecosystem/shared-go/utils"
 )
 
 type BlogEntity struct {
@@ -21,7 +21,7 @@ type BlogEntity struct {
 
 type BlogQueryIn struct {
 	*common.PageRequest
-	OrderBy      []*order_by.OrderBy
+	OrderBy      []*utils.OrderBy
 	ID           *string
 	Title        *string
 	PublishedAtA *time.Time

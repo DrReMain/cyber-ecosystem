@@ -307,10 +307,14 @@ func (rt *clientRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 	}
 	resp, err := rt.next.RoundTrip(r)
 	if done != nil {
+		bytesReceived := false
+		if resp != nil && resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusMultipleChoices {
+			bytesReceived = true
+		}
 		done(ctx, selector.DoneInfo{
 			Err:           err,
 			BytesSent:     true,
-			BytesReceived: resp != nil,
+			BytesReceived: bytesReceived,
 		})
 	}
 	if err != nil {

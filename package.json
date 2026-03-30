@@ -10,6 +10,6 @@
     "@swc-node/register": "^1",
     "@swc/core": "^1",
     "@types/node": "^24",
-    "typescript": "^6"
+    "typescript": "^5"
   }
 }

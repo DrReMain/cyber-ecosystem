@@ -24,6 +24,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/metrics"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
+	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
@@ -54,18 +55,26 @@ func init() {
 }
 
 func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server, cs *connect.Server, os *server.OpsServer) *kratos.App {
+	var srv []transport.Server
+	if gs != nil {
+		srv = append(srv, gs)
+	}
+	if hs != nil {
+		srv = append(srv, hs)
+	}
+	if cs != nil {
+		srv = append(srv, cs)
+	}
+	if os != nil {
+		srv = append(srv, os)
+	}
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
 		kratos.Version(Version),
 		kratos.Metadata(map[string]string{}),
 		kratos.Logger(logger),
-		kratos.Server(
-			gs,
-			hs,
-			cs,
-			os,
-		),
+		kratos.Server(srv...),
 	)
 }
 
@@ -104,10 +113,13 @@ func main() {
 
 	var tp *tracesdk.TracerProvider
 	if bc.Trace != nil && bc.Trace.Endpoint != "" {
-		exp, err := otlptracehttp.New(context.Background(),
+		traceOpts := []otlptracehttp.Option{
 			otlptracehttp.WithEndpoint(bc.Trace.Endpoint),
-			otlptracehttp.WithInsecure(), // Use WithInsecure for non-TLS endpoints like Jaeger 4318
-		)
+		}
+		if bc.Trace.Insecure {
+			traceOpts = append(traceOpts, otlptracehttp.WithInsecure())
+		}
+		exp, err := otlptracehttp.New(context.Background(), traceOpts...)
 		if err != nil {
 			panic(err)
 		}

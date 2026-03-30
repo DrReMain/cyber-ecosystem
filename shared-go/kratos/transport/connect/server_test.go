@@ -429,8 +429,7 @@ func waitUntilServing(t *testing.T, srv *Server) {
 	client := &http.Client{Timeout: 200 * time.Millisecond}
 	deadline := time.Now().Add(3 * time.Second)
 	for time.Now().Before(deadline) {
-		if srv.lis != nil {
-			host := srv.lis.Addr().String()
+		if host := srv.listenerAddr(); host != "" {
 			resp, reqErr := client.Get("http://" + host + "/healthz")
 			if reqErr == nil {
 				_ = resp.Body.Close()

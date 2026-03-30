@@ -10,7 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
-	"cyber-ecosystem/shared-go/kratos/utils"
+	"cyber-ecosystem/shared-go/utils"
 
 	app1V1 "cyber-ecosystem/apps/app_1/gen/go/v1"
 	app1ConnectV1 "cyber-ecosystem/apps/app_1/gen/go/v1/app1V1connect"

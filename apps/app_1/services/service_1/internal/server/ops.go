@@ -18,6 +18,9 @@ type OpsServer struct {
 }
 
 func NewOpsServer(c *conf.Ops, logger log.Logger) *OpsServer {
+	if !c.Enabled {
+		return nil
+	}
 	mux := http.NewServeMux()
 
 	if c.Metrics != "" && len(c.Metrics) > 1 {

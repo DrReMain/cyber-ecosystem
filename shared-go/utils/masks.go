@@ -1,4 +1,4 @@
-package masks
+package utils
 
 type MaskAction struct {
 	Condition bool
@@ -8,7 +8,6 @@ type MaskAction struct {
 
 type Handler map[string]MaskAction
 
-// Emit executes the mask actions for the given fields
 func (mh Handler) Emit(fieldsMask []string) {
 	for _, v := range fieldsMask {
 		if action, ok := mh[v]; ok {

@@ -26,7 +26,11 @@ func wireApp(confServer *conf.Server, auth *conf.Auth, confLog *conf.Log, confDa
 	if err != nil {
 		return nil, nil, err
 	}
-	dataData, cleanup, err := data.NewData(confData, client)
+	cache, err := data.NewCache(confData, confLog, logger)
+	if err != nil {
+		return nil, nil, err
+	}
+	dataData, cleanup, err := data.NewData(client, cache)
 	if err != nil {
 		return nil, nil, err
 	}

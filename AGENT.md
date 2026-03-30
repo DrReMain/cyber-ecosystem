@@ -2,7 +2,17 @@
 
 ## Project Overview
 
-Cyber Ecosystem is a microservice architecture project built with **Go** and **Kratos** framework, using **Monorepo** management pattern and **Nx** as the build tool.
+Cyber Ecosystem is a **general-purpose development platform** built with **Go** and **Kratos** framework, using **Monorepo** management pattern and **Nx** as the build tool. It is not a specific business project, but rather a foundation for rapidly building and deploying microservices.
+
+### Architecture Concepts
+
+- **`apps/`** - Contains individual projects that are completely independent of each other. Each project represents a separate domain or service ecosystem.
+- **Project Structure** - Each project under `apps/` follows a consistent structure:
+  - `api/` - Shared API definitions (protobuf) used by multiple services and clients within the project
+  - `services/` - One or more microservices implementing the business logic
+  - `clients/` - Optional client libraries for consuming the project's APIs
+- **`shared-*`** - Shared packages that provide common functionality across the monorepo (e.g., `shared-go`, `shared-ts`)
+- **`infra/`** - Development environment infrastructure configurations (e.g., Docker, Prometheus, Grafana)
 
 ---
 
@@ -40,12 +50,11 @@ cyber-ecosystem/
 │   └── kratos/               # Kratos framework extensions
 │       ├── logging/          # Logging components
 │       ├── middleware/        # Middleware
-│       ├── order_by/          # Sorting support
+│       ├── orderby/          # Sorting support
 │       ├── orm/              # ORM extensions
 │       ├── transport/         # Transport extensions
 │       └── utils/             # Utilities
 ├── tools/                    # Tool definitions
-├── plans/                    # Design documents
 ├── nx                        # Nx executable
 ├── nx.json                  # Nx configuration
 ├── buf.lock / buf.yaml      # Buf (Protobuf) configuration
@@ -59,7 +68,7 @@ cyber-ecosystem/
 
 | Area | Technology |
 |------|------------|
-| **Language** | Go 1.21+ |
+| **Language** | Go 1.25+ |
 | **Framework** | Kratos v2 |
 | **Communication** | gRPC, HTTP, ConnectRPC |
 | **Database** | PostgreSQL + Ent ORM |
@@ -183,6 +192,12 @@ ops:
   metrics: "/metrics"
   pprof:
     enabled: true
+    cpu_enabled: true
+    heap_enabled: true
+    goroutine_enabled: true
+    mutex_enabled: true
+    thread_enabled: true
+    trace_enabled: true
 ```
 
 ---

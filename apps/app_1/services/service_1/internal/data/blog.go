@@ -6,9 +6,8 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	//"entgo.io/ent/dialect/sql"
 
-	"cyber-ecosystem/shared-go/kratos/masks"
-	"cyber-ecosystem/shared-go/kratos/utils"
 	"cyber-ecosystem/shared-go/orm/ent/entutil"
+	"cyber-ecosystem/shared-go/utils"
 
 	app1V1 "cyber-ecosystem/apps/app_1/gen/go/v1"
 	"cyber-ecosystem/apps/app_1/services/service_1/internal/biz"
@@ -53,7 +52,7 @@ func (rp *blogRP) Create(ctx context.Context, entity *biz.BlogEntity) error {
 func (rp *blogRP) Update(ctx context.Context, fieldsMask []string, entity *biz.BlogEntity) error {
 	if err := rp.data.InTx(ctx, func(ctx context.Context) error {
 		builder := rp.data.getClient(ctx).Blog.UpdateOneID(entity.ID)
-		masks.Handler{
+		utils.Handler{
 			"title": {
 				entity.Title == nil,
 				func() { builder.SetTitle(schema.BlogDefaultTitle()) },
@@ -141,6 +140,7 @@ func (rp *blogRP) Query(ctx context.Context, bo *biz.BlogQueryIn) (*biz.BlogQuer
 	if err != nil {
 		return nil, HandleError(err)
 	}
+
 	return &biz.BlogQueryOut{
 		PageResponse: entutil.BuildPageResponse(total, offset, limit),
 		List: func() []*biz.BlogEntity {

@@ -61,7 +61,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -118,12 +118,12 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\"}[$__rate_interval]))",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\"}[1m]))",
           "legendFormat": "总 QPS",
           "refId": "A"
         },
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\"}[$__rate_interval])) by (kind)",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\"}[1m])) by (kind)",
           "legendFormat": "{{kind}}",
           "refId": "B"
         }
@@ -159,7 +159,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -216,7 +216,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\", operation=~\".*(Create|Update|Delete).*\"}[$__rate_interval])) by (operation)",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\", operation=~\".*(Create|Update|Delete).*\"}[1m])) by (operation)",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }
@@ -252,7 +252,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -317,7 +317,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\", code=~\"5..\"}[$__rate_interval])) by (operation) / sum(rate(server_requests_code_total{job=\"app_1_service_1\"}[$__rate_interval])) by (operation)",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\", code=~\"5..\"}[1m])) by (operation) / sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\"}[1m])) by (operation)",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }
@@ -377,7 +377,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "count(up{job=\"app_1_service_1\"})",
+          "expr": "count(up{app=\"app_1\", service=\"service_1\"})",
           "refId": "A"
         }
       ],
@@ -440,7 +440,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "count(up{job=\"app_1_service_1\"} == 1)",
+          "expr": "count(up{app=\"app_1\", service=\"service_1\"} == 1)",
           "refId": "A"
         }
       ],
@@ -509,7 +509,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\", code=~\"5..\"}[$__rate_interval])) / sum(rate(server_requests_code_total{job=\"app_1_service_1\"}[$__rate_interval]))",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\", code=~\"5..\"}[1m])) / sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\"}[1m]))",
           "refId": "A"
         }
       ],
@@ -557,7 +557,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -614,7 +614,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\", kind=\"http\"}[$__rate_interval])) by (operation)",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\", kind=\"http\"}[1m])) by (operation)",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }
@@ -650,7 +650,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -707,7 +707,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\", kind=\"http\", operation=~\".*(Create|Update|Delete).*\"}[$__rate_interval])) by (operation)",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\", kind=\"http\", operation=~\".*(Create|Update|Delete).*\"}[1m])) by (operation)",
           "legendFormat": "TPS - {{operation}}",
           "refId": "A"
         }
@@ -742,7 +742,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -860,7 +860,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(increase(server_requests_code_total{job=\"app_1_service_1\", kind=\"http\"}[$__rate_interval])) by (code)",
+          "expr": "sum(increase(server_requests_code_total{app=\"app_1\", service=\"service_1\", kind=\"http\"}[$__rate_interval])) by (code)",
           "legendFormat": "{{code}}",
           "refId": "A"
         }
@@ -895,7 +895,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -952,17 +952,17 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(server_requests_seconds_bucket_bucket{job=\"app_1_service_1\", kind=\"http\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(server_requests_seconds_bucket_bucket{app=\"app_1\", service=\"service_1\", kind=\"http\"}[1m])) by (le))",
           "legendFormat": "P99",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.95, sum(rate(server_requests_seconds_bucket_bucket{job=\"app_1_service_1\", kind=\"http\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(server_requests_seconds_bucket_bucket{app=\"app_1\", service=\"service_1\", kind=\"http\"}[1m])) by (le))",
           "legendFormat": "P95",
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.50, sum(rate(server_requests_seconds_bucket_bucket{job=\"app_1_service_1\", kind=\"http\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(server_requests_seconds_bucket_bucket{app=\"app_1\", service=\"service_1\", kind=\"http\"}[1m])) by (le))",
           "legendFormat": "P50",
           "refId": "C"
         }
@@ -1011,7 +1011,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1068,7 +1068,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\", kind=\"grpc\"}[$__rate_interval])) by (operation)",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\", kind=\"grpc\"}[1m])) by (operation)",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }
@@ -1104,7 +1104,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1161,7 +1161,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\", kind=\"grpc\", operation=~\".*(Create|Update|Delete).*\"}[$__rate_interval])) by (operation)",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\", kind=\"grpc\", operation=~\".*(Create|Update|Delete).*\"}[1m])) by (operation)",
           "legendFormat": "TPS - {{operation}}",
           "refId": "A"
         }
@@ -1196,7 +1196,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1257,7 +1257,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(increase(server_requests_code_total{job=\"app_1_service_1\", kind=\"grpc\"}[$__rate_interval])) by (code)",
+          "expr": "sum(increase(server_requests_code_total{app=\"app_1\", service=\"service_1\", kind=\"grpc\"}[$__rate_interval])) by (code)",
           "legendFormat": "{{code}}",
           "refId": "A"
         }
@@ -1292,7 +1292,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1349,17 +1349,17 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(server_requests_seconds_bucket_bucket{job=\"app_1_service_1\", kind=\"grpc\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(server_requests_seconds_bucket_bucket{app=\"app_1\", service=\"service_1\", kind=\"grpc\"}[1m])) by (le))",
           "legendFormat": "P99",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.95, sum(rate(server_requests_seconds_bucket_bucket{job=\"app_1_service_1\", kind=\"grpc\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(server_requests_seconds_bucket_bucket{app=\"app_1\", service=\"service_1\", kind=\"grpc\"}[1m])) by (le))",
           "legendFormat": "P95",
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.50, sum(rate(server_requests_seconds_bucket_bucket{job=\"app_1_service_1\", kind=\"grpc\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(server_requests_seconds_bucket_bucket{app=\"app_1\", service=\"service_1\", kind=\"grpc\"}[1m])) by (le))",
           "legendFormat": "P50",
           "refId": "C"
         }
@@ -1408,7 +1408,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1465,7 +1465,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\", kind=\"connect\"}[$__rate_interval])) by (operation)",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\", kind=\"connect\"}[1m])) by (operation)",
           "legendFormat": "{{operation}}",
           "refId": "A"
         }
@@ -1501,7 +1501,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1558,7 +1558,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(rate(server_requests_code_total{job=\"app_1_service_1\", kind=\"connect\", operation=~\".*(Create|Update|Delete).*\"}[$__rate_interval])) by (operation)",
+          "expr": "sum(irate(server_requests_code_total{app=\"app_1\", service=\"service_1\", kind=\"connect\", operation=~\".*(Create|Update|Delete).*\"}[1m])) by (operation)",
           "legendFormat": "TPS - {{operation}}",
           "refId": "A"
         }
@@ -1593,7 +1593,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1681,7 +1681,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "sum(increase(server_requests_code_total{job=\"app_1_service_1\", kind=\"connect\"}[$__rate_interval])) by (code)",
+          "expr": "sum(increase(server_requests_code_total{app=\"app_1\", service=\"service_1\", kind=\"connect\"}[$__rate_interval])) by (code)",
           "legendFormat": "{{code}}",
           "refId": "A"
         }
@@ -1716,7 +1716,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1773,17 +1773,17 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(server_requests_seconds_bucket_bucket{job=\"app_1_service_1\", kind=\"connect\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(server_requests_seconds_bucket_bucket{app=\"app_1\", service=\"service_1\", kind=\"connect\"}[1m])) by (le))",
           "legendFormat": "P99",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.95, sum(rate(server_requests_seconds_bucket_bucket{job=\"app_1_service_1\", kind=\"connect\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(server_requests_seconds_bucket_bucket{app=\"app_1\", service=\"service_1\", kind=\"connect\"}[1m])) by (le))",
           "legendFormat": "P95",
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.50, sum(rate(server_requests_seconds_bucket_bucket{job=\"app_1_service_1\", kind=\"connect\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(server_requests_seconds_bucket_bucket{app=\"app_1\", service=\"service_1\", kind=\"connect\"}[1m])) by (le))",
           "legendFormat": "P50",
           "refId": "C"
         }
@@ -1831,7 +1831,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1885,7 +1885,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "go_goroutines{job=\"app_1_service_1\"}",
+          "expr": "go_goroutines{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
@@ -1921,7 +1921,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1978,17 +1978,17 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "go_memstats_heap_alloc_bytes{job=\"app_1_service_1\"}",
+          "expr": "go_memstats_heap_alloc_bytes{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "Heap Alloc",
           "refId": "A"
         },
         {
-          "expr": "go_memstats_heap_inuse_bytes{job=\"app_1_service_1\"}",
+          "expr": "go_memstats_heap_inuse_bytes{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "Heap Inuse",
           "refId": "B"
         },
         {
-          "expr": "go_memstats_heap_sys_bytes{job=\"app_1_service_1\"}",
+          "expr": "go_memstats_heap_sys_bytes{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "Heap Sys",
           "refId": "C"
         }
@@ -2024,7 +2024,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2098,12 +2098,12 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "go_gc_duration_seconds{job=\"app_1_service_1\",quantile=\"1.0\"}",
+          "expr": "go_gc_duration_seconds{app=\"app_1\", service=\"service_1\",quantile=\"1.0\"}",
           "legendFormat": "GC Max 停顿",
           "refId": "A"
         },
         {
-          "expr": "rate(go_gc_duration_seconds_count{job=\"app_1_service_1\"}[$__rate_interval]) * 60",
+          "expr": "rate(go_gc_duration_seconds_count{app=\"app_1\", service=\"service_1\"}[$__rate_interval]) * 60",
           "legendFormat": "GC 频率 (次/min)",
           "refId": "B"
         }
@@ -2138,7 +2138,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2195,7 +2195,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "go_threads{job=\"app_1_service_1\"}",
+          "expr": "go_threads{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "Go 线程数",
           "refId": "A"
         }
@@ -2230,7 +2230,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2287,7 +2287,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "go_sched_gomaxprocs_threads{job=\"app_1_service_1\"}",
+          "expr": "go_sched_gomaxprocs_threads{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "调度线程数",
           "refId": "A"
         }
@@ -2335,7 +2335,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2389,7 +2389,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "db_sql_connection_open{job=\"app_1_service_1\"}",
+          "expr": "db_sql_connection_open{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "{{status}}",
           "refId": "A"
         }
@@ -2425,7 +2425,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2492,7 +2492,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "db_sql_connection_open{job=\"app_1_service_1\",status=\"inuse\"} / ignoring(status) group_left(db_name) db_sql_connection_max_open{job=\"app_1_service_1\"}",
+          "expr": "db_sql_connection_open{app=\"app_1\", service=\"service_1\",status=\"inuse\"} / ignoring(status) group_left(db_name) db_sql_connection_max_open{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "连接池使用率",
           "refId": "A"
         }
@@ -2527,7 +2527,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2584,7 +2584,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "rate(db_sql_connection_wait_total{job=\"app_1_service_1\",otel_scope_name=\"github.com/XSAM/otelsql\"}[$__rate_interval])",
+          "expr": "rate(db_sql_connection_wait_total{app=\"app_1\", service=\"service_1\",otel_scope_name=\"github.com/XSAM/otelsql\"}[$__rate_interval])",
           "legendFormat": "连接等待次数",
           "refId": "A"
         }
@@ -2620,7 +2620,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2677,17 +2677,17 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(db_sql_latency_milliseconds_bucket{job=\"app_1_service_1\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(db_sql_latency_milliseconds_bucket{app=\"app_1\", service=\"service_1\"}[$__rate_interval])) by (le))",
           "legendFormat": "P99 Latency",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.95, sum(rate(db_sql_latency_milliseconds_bucket{job=\"app_1_service_1\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(db_sql_latency_milliseconds_bucket{app=\"app_1\", service=\"service_1\"}[$__rate_interval])) by (le))",
           "legendFormat": "P95 Latency",
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.50, sum(rate(db_sql_latency_milliseconds_bucket{job=\"app_1_service_1\"}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(db_sql_latency_milliseconds_bucket{app=\"app_1\", service=\"service_1\"}[$__rate_interval])) by (le))",
           "legendFormat": "P50 Latency",
           "refId": "C"
         }
@@ -2735,7 +2735,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2789,7 +2789,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "time() - process_start_time_seconds{job=\"app_1_service_1\"}",
+          "expr": "time() - process_start_time_seconds{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
@@ -2825,7 +2825,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2882,12 +2882,12 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "process_resident_memory_bytes{job=\"app_1_service_1\"}",
+          "expr": "process_resident_memory_bytes{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "RSS ({{instance}})",
           "refId": "A"
         },
         {
-          "expr": "process_virtual_memory_bytes{job=\"app_1_service_1\"}",
+          "expr": "process_virtual_memory_bytes{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "VSZ ({{instance}})",
           "refId": "B"
         }
@@ -2923,7 +2923,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -2980,12 +2980,12 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "process_open_fds{job=\"app_1_service_1\"}",
+          "expr": "process_open_fds{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "Open FDs",
           "refId": "A"
         },
         {
-          "expr": "process_max_fds{job=\"app_1_service_1\"}",
+          "expr": "process_max_fds{app=\"app_1\", service=\"service_1\"}",
           "legendFormat": "Max FDs",
           "refId": "B"
         }
@@ -3020,7 +3020,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -3087,7 +3087,7 @@
       "pluginVersion": "12.4.2",
       "targets": [
         {
-          "expr": "rate(process_cpu_seconds_total{job=\"app_1_service_1\"}[$__rate_interval])",
+          "expr": "rate(process_cpu_seconds_total{app=\"app_1\", service=\"service_1\"}[$__rate_interval])",
           "legendFormat": "CPU 使用率 ({{instance}})",
           "refId": "A"
         }
@@ -3116,14 +3116,14 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(up{job=\"app_1_service_1\"}, instance)",
+        "definition": "label_values(up{app=\"app_1\", service=\"service_1\"}, instance)",
         "includeAll": true,
         "label": "实例",
         "multi": true,
         "name": "instance",
         "options": [],
         "query": {
-          "query": "label_values(up{job=\"app_1_service_1\"}, instance)",
+          "query": "label_values(up{app=\"app_1\", service=\"service_1\"}, instance)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,

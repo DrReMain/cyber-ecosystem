@@ -11,9 +11,9 @@ scrape_configs:
         labels:
           instance: "prometheus"
 
-  - job_name: "app_1_service_1"
-    static_configs:
-      - targets: ["host.docker.internal:14000"]
-        labels:
-          service: 'app_1_service_1'
+  - job_name: "services"
     metrics_path: /metrics
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/apps/*.yaml
+        refresh_interval: 30s

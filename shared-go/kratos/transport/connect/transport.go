@@ -30,10 +30,16 @@ func (tr *Transport) Operation() string {
 }
 
 func (tr *Transport) RequestHeader() transport.Header {
+	if tr.reqHeader == nil {
+		tr.reqHeader = NewHeader(http.Header{})
+	}
 	return tr.reqHeader
 }
 
 func (tr *Transport) ReplyHeader() transport.Header {
+	if tr.replyHeader == nil {
+		tr.replyHeader = NewHeader(http.Header{})
+	}
 	return tr.replyHeader
 }
 

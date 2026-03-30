@@ -15,18 +15,22 @@ type Registrar interface {
 	RegisterConnect(*connect.Server)
 }
 
+// ProviderSet aggregates all service providers.
+// When adding a new service: add its constructor here AND add it to NewRegistrarList.
 var ProviderSet = wire.NewSet(
 	NewRegistrarList,
 	NewBlogService,
 	NewAuthorService,
 )
 
+// NewRegistrarList collects all services that need to register with transport servers.
+// Add new services as parameters here and append them to the returned slice.
 func NewRegistrarList(
-	s1 *BlogService,
-	s2 *AuthorService,
+	blog *BlogService,
+	author *AuthorService,
 ) []Registrar {
 	return []Registrar{
-		s1,
-		s2,
+		blog,
+		author,
 	}
 }

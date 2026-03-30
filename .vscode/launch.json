@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "app_1_service_1",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/apps/app_1/services/service_1/cmd/app",
+      "cwd": "${workspaceFolder}/apps/app_1",
+      "args": [
+        "-conf",
+        "${workspaceFolder}/apps/app_1/services/service_1/configs"
+      ]
+    }
+  ]
+}

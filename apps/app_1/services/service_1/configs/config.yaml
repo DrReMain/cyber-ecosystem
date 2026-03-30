@@ -13,7 +13,12 @@ auth:
 log:
   level: debug
   ent:
-    enabled: false
+    enabled: true
+    level: debug
+    slow_query: true
+    slow_query_threshold: 0.2s
+  cache:
+    enabled: true
     level: debug
     slow_query: true
     slow_query_threshold: 0.2s
@@ -22,8 +27,8 @@ log:
     color: true
     format: console
   file:
-    enabled: false
-    path: "../../../../logs/app_1/service_1.log"
+    enabled: true
+    path: "./logs/service_1.log"
     max_size: 100
     max_backups: 10
     max_age: 30
@@ -45,15 +50,26 @@ data:
     password: postgres
     db_name: cyber_ecosystem_app_1_service_1
     max_open_conns: 100
-    max_idle_conns: 100
+    max_idle_conns: 50
     conn_max_lifetime: 3600s
     migrate: true
-  redis:
-    addr: localhost:6379
-    read_timeout: 0.2s
-    write_timeout: 0.2s
+  cache:
+    type: redis
+    memory:
+      otel_enabled: true
+    redis:
+      addr: localhost:6379
+      read_timeout: 0.2s
+      write_timeout: 0.2s
+      pool_size: 100
+      min_idle_conns: 10
+      conn_max_lifetime: 3600s
+      password: ""
+      db: 0
+      otel_enabled: true
 trace:
   endpoint: "localhost:4318"
+  insecure: true
 ops:
   enabled: true
   addr: "0.0.0.0:14000"

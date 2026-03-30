@@ -28,6 +28,12 @@ datasources:
           url: "$${__value.raw}"
           datasourceUid: "jaeger"
           urlDisplayLabel: "View Trace"
+        - name: Component
+          matcherRegex: '"component":"([^"]+)"'
+          url: ""
+        - name: ServiceID
+          matcherRegex: '"service\.id":"([^"]+)"'
+          url: ""
 
   - name: Jaeger
     type: jaeger
