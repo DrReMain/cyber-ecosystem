@@ -83,6 +83,18 @@ func ErrorErrorReasonEntConstraint(format string, args ...interface{}) *errors.E
 	return errors.New(409, ErrorReason_ERROR_REASON_ENT_CONSTRAINT.String(), fmt.Sprintf(format, args...))
 }
 
+func IsErrorReasonUnauthorized(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_UNAUTHORIZED.String() && e.Code == 401
+}
+
+func ErrorErrorReasonUnauthorized(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, ErrorReason_ERROR_REASON_UNAUTHORIZED.String(), fmt.Sprintf(format, args...))
+}
+
 func IsErrorReasonValidator(err error) bool {
 	if err == nil {
 		return false

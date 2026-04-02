@@ -20,6 +20,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 
 	"cyber-ecosystem/shared-go/kratos/middleware/auth"
+	"cyber-ecosystem/shared-go/kratos/middleware/i18n"
 	"cyber-ecosystem/shared-go/kratos/middleware/traceheader"
 	"cyber-ecosystem/shared-go/kratos/middleware/validate"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
@@ -37,8 +38,11 @@ func NewConnectServer(
 	tp *tracesdk.TracerProvider,
 	_metricRequests metric.Int64Counter,
 	_metricSeconds metric.Float64Histogram,
+	i18nBundle *i18n.Bundle,
 ) *connect.Server {
-	var middlewares = []middleware.Middleware{recovery.Recovery(recovery.WithHandler(func(context.Context, any, any) error { return app1V1.ErrorErrorReasonUnspecified("") }))}
+	var middlewares = []middleware.Middleware{}
+	middlewares = append(middlewares, i18n.Server(i18nBundle))
+	middlewares = append(middlewares, recovery.Recovery(recovery.WithHandler(func(context.Context, any, any) error { return app1V1.ErrorErrorReasonUnspecified("") })))
 	middlewares = append(middlewares, ratelimit.Server())
 	middlewares = append(middlewares, metrics.Server(metrics.WithSeconds(_metricSeconds), metrics.WithRequests(_metricRequests)))
 	if tp != nil {
@@ -52,7 +56,7 @@ func NewConnectServer(
 		jwt.WithSigningMethod(jwt2.SigningMethodHS256),
 		jwt.WithClaims(func() jwt2.Claims { return &jwt2.MapClaims{} })),
 	).Match(auth.NewWhiteListByPublicAccessInProtoMatcher()).Build())
-	middlewares = append(middlewares, validate.ProtoValidate(app1V1.ErrorReason_ERROR_REASON_VALIDATOR.String(), validate.UseEmptyError))
+	middlewares = append(middlewares, validate.ProtoValidate(app1V1.ErrorErrorReasonValidator("")))
 
 	var opts = []connect.ServerOption{
 		connect.Middleware(middlewares...),

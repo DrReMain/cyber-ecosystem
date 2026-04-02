@@ -10,6 +10,7 @@ import (
 	"cyber-ecosystem/apps/app_1/services/service_1/internal/biz"
 	"cyber-ecosystem/apps/app_1/services/service_1/internal/conf"
 	"cyber-ecosystem/apps/app_1/services/service_1/internal/data"
+	"cyber-ecosystem/apps/app_1/services/service_1/internal/i18n"
 	"cyber-ecosystem/apps/app_1/services/service_1/internal/server"
 	"cyber-ecosystem/apps/app_1/services/service_1/internal/service"
 	"github.com/go-kratos/kratos/v2"
@@ -41,9 +42,14 @@ func wireApp(confServer *conf.Server, auth *conf.Auth, confLog *conf.Log, confDa
 	authorUC := biz.NewAuthorUC(logger, dataData, authorRP)
 	authorService := service.NewAuthorService(logger, authorUC)
 	v := service.NewRegistrarList(blogService, authorService)
-	grpcServer := server.NewGRPCServer(confServer, auth, logger, v, tracerProvider, int64Counter, float64Histogram)
-	httpServer := server.NewHTTPServer(confServer, auth, logger, v, tracerProvider, int64Counter, float64Histogram)
-	connectServer := server.NewConnectServer(confServer, auth, logger, v, tracerProvider, int64Counter, float64Histogram)
+	bundle, err := i18n.NewBundle()
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	grpcServer := server.NewGRPCServer(confServer, auth, logger, v, tracerProvider, int64Counter, float64Histogram, bundle)
+	httpServer := server.NewHTTPServer(confServer, auth, logger, v, tracerProvider, int64Counter, float64Histogram, bundle)
+	connectServer := server.NewConnectServer(confServer, auth, logger, v, tracerProvider, int64Counter, float64Histogram, bundle)
 	opsServer := server.NewOpsServer(ops, logger)
 	app := newApp(logger, grpcServer, httpServer, connectServer, opsServer)
 	return app, func() {

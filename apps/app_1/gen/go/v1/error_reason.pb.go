@@ -33,8 +33,9 @@ const (
 	ErrorReason_ERROR_REASON_ENT_NOT_SINGULAR            ErrorReason = 3
 	ErrorReason_ERROR_REASON_ENT_NOT_LOADED              ErrorReason = 4
 	ErrorReason_ERROR_REASON_ENT_CONSTRAINT              ErrorReason = 5
-	ErrorReason_ERROR_REASON_VALIDATOR                   ErrorReason = 6
-	ErrorReason_ERROR_REASON_PAGINATION_INVALID_ARGUMENT ErrorReason = 7
+	ErrorReason_ERROR_REASON_UNAUTHORIZED                ErrorReason = 6
+	ErrorReason_ERROR_REASON_VALIDATOR                   ErrorReason = 7
+	ErrorReason_ERROR_REASON_PAGINATION_INVALID_ARGUMENT ErrorReason = 8
 )
 
 // Enum value maps for ErrorReason.
@@ -46,8 +47,9 @@ var (
 		3: "ERROR_REASON_ENT_NOT_SINGULAR",
 		4: "ERROR_REASON_ENT_NOT_LOADED",
 		5: "ERROR_REASON_ENT_CONSTRAINT",
-		6: "ERROR_REASON_VALIDATOR",
-		7: "ERROR_REASON_PAGINATION_INVALID_ARGUMENT",
+		6: "ERROR_REASON_UNAUTHORIZED",
+		7: "ERROR_REASON_VALIDATOR",
+		8: "ERROR_REASON_PAGINATION_INVALID_ARGUMENT",
 	}
 	ErrorReason_value = map[string]int32{
 		"ERROR_REASON_UNSPECIFIED":                 0,
@@ -56,8 +58,9 @@ var (
 		"ERROR_REASON_ENT_NOT_SINGULAR":            3,
 		"ERROR_REASON_ENT_NOT_LOADED":              4,
 		"ERROR_REASON_ENT_CONSTRAINT":              5,
-		"ERROR_REASON_VALIDATOR":                   6,
-		"ERROR_REASON_PAGINATION_INVALID_ARGUMENT": 7,
+		"ERROR_REASON_UNAUTHORIZED":                6,
+		"ERROR_REASON_VALIDATOR":                   7,
+		"ERROR_REASON_PAGINATION_INVALID_ARGUMENT": 8,
 	}
 )
 
@@ -92,16 +95,17 @@ var File_app_1_api_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_app_1_api_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\x1fapp_1/api/v1/error_reason.proto\x12\fapi.app_1.v1\x1a\x13errors/errors.proto*\xd1\x02\n" +
+	"\x1fapp_1/api/v1/error_reason.proto\x12\fapi.app_1.v1\x1a\x13errors/errors.proto*\xf6\x02\n" +
 	"\vErrorReason\x12\"\n" +
 	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12$\n" +
 	"\x1aERROR_REASON_ENT_NOT_FOUND\x10\x01\x1a\x04\xa8E\x94\x03\x12%\n" +
 	"\x1bERROR_REASON_ENT_VALIDATION\x10\x02\x1a\x04\xa8E\x90\x03\x12'\n" +
 	"\x1dERROR_REASON_ENT_NOT_SINGULAR\x10\x03\x1a\x04\xa8E\x90\x03\x12%\n" +
 	"\x1bERROR_REASON_ENT_NOT_LOADED\x10\x04\x1a\x04\xa8E\xf4\x03\x12%\n" +
-	"\x1bERROR_REASON_ENT_CONSTRAINT\x10\x05\x1a\x04\xa8E\x99\x03\x12 \n" +
-	"\x16ERROR_REASON_VALIDATOR\x10\x06\x1a\x04\xa8E\x90\x03\x122\n" +
-	"(ERROR_REASON_PAGINATION_INVALID_ARGUMENT\x10\a\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\xf4\x03B-Z+cyber-ecosystem/apps/app_1/gen/go/v1;app1V1b\x06proto3"
+	"\x1bERROR_REASON_ENT_CONSTRAINT\x10\x05\x1a\x04\xa8E\x99\x03\x12#\n" +
+	"\x19ERROR_REASON_UNAUTHORIZED\x10\x06\x1a\x04\xa8E\x91\x03\x12 \n" +
+	"\x16ERROR_REASON_VALIDATOR\x10\a\x1a\x04\xa8E\x90\x03\x122\n" +
+	"(ERROR_REASON_PAGINATION_INVALID_ARGUMENT\x10\b\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\xf4\x03B-Z+cyber-ecosystem/apps/app_1/gen/go/v1;app1V1b\x06proto3"
 
 var (
 	file_app_1_api_v1_error_reason_proto_rawDescOnce sync.Once

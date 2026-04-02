@@ -1,15 +1,17 @@
 {
   "name": "cyber-ecosystem",
   "private": true,
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "bun@1.3.0",
   "engines": {
-    "node": ">=24"
+    "bun": ">=1.3.0"
   },
+  "workspaces": [
+    "apps/**"
+  ],
   "devDependencies": {
-    "@nx/devkit": "22.6.2",
+    "@nx/devkit": "22.6.4",
     "@swc-node/register": "^1",
     "@swc/core": "^1",
-    "@types/node": "^24",
-    "typescript": "^5"
+    "typescript": "^6"
   }
 }

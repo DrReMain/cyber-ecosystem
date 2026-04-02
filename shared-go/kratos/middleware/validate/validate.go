@@ -10,32 +10,20 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func ProtoValidate(reason string, formatError func(error) string) middleware.Middleware {
+func ProtoValidate(ce *errors.Error) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (reply any, err error) {
 			if msg, ok := req.(proto.Message); ok {
 				if err := protovalidate.Validate(msg); err != nil {
-					return nil, errors.BadRequest(reason, formatError(err)).WithCause(err)
+					// if valErr, ok := err.(*protovalidate.ValidationError); ok {
+					// 	for _, v := range valErr.Violations {
+					// 		*v.Proto.Message
+					// 	}
+					// }
+					return nil, ce.WithCause(err)
 				}
 			}
 			return handler(ctx, req)
 		}
 	}
-}
-
-func UseDefaultError(err error) string {
-	return err.Error()
-}
-
-func UseEmptyError(_ error) string {
-	return ""
-}
-
-func UseProtoMessage(err error) string {
-	if valErr, ok := err.(*protovalidate.ValidationError); ok {
-		for _, v := range valErr.Violations {
-			return *v.Proto.Message
-		}
-	}
-	return ""
 }

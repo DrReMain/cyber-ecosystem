@@ -27,7 +27,7 @@ log:
     color: true
     format: console
   file:
-    enabled: true
+    enabled: false
     path: "./logs/service_1.log"
     max_size: 100
     max_backups: 10

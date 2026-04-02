@@ -130,7 +130,7 @@ func (rp *blogRP) Query(ctx context.Context, bo *biz.BlogQueryIn) (*biz.BlogQuer
 
 	total, offset, limit, err := entutil.ApplyPagination(ctx, query, bo.PageRequest,
 		entutil.NewPageConfig(entutil.DefaultPageSize, entutil.DefaultPageSizeMax),
-		app1V1.ErrorReason_ERROR_REASON_PAGINATION_INVALID_ARGUMENT.String(),
+		app1V1.ErrorErrorReasonPaginationInvalidArgument(""),
 	)
 	if err != nil {
 		return nil, HandleError(err)

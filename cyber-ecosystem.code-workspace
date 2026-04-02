@@ -1,0 +1,24 @@
+{
+    "folders": [
+        {"path": "."},
+        {"path": "apps/app_1/api"},
+        {"path": "apps/app_1/services/service_1"}
+    ],
+    "settings": {
+        "files.exclude": {
+            "**/.git": true,
+            "**/.idea": true,
+            "**/.buf-deps": true,
+            "**/.nx": true,
+            "**/vendor": true,
+            "**/node_modules": true,
+            "nx": true,
+            "nx.bat": true,
+            "buf.lock": true,
+            "go.sum": true,
+        },
+        "protobuf.externalLinter.enabled": true,
+        "protobuf.externalLinter.linter": "buf",
+        "protobuf.externalLinter.bufPath": "buf"
+    }
+}
