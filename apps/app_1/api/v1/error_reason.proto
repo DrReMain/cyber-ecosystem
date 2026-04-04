@@ -49,7 +49,9 @@ enum ErrorReason {
   ERROR_REASON_ENT_CONSTRAINT = 5 [(errors.code) = 409];
 
   ERROR_REASON_UNAUTHORIZED = 6 [(errors.code) = 401];
+  ERROR_REASON_RATELIMIT = 7 [(errors.code) = 429];
+  ERROR_REASON_CIRCUITBREAKER = 8 [(errors.code) = 503];
 
-  ERROR_REASON_VALIDATOR = 7 [(errors.code) = 400];
-  ERROR_REASON_PAGINATION_INVALID_ARGUMENT = 8 [(errors.code) = 400];
+  ERROR_REASON_VALIDATOR = 10 [(errors.code) = 400];
+  ERROR_REASON_PAGINATION_INVALID_ARGUMENT = 11 [(errors.code) = 400];
 }

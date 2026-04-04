@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        (unknown)
-// source: app_1/api/v1/auth.proto
+// source: app_1/api/v1/author.proto
 
 // buf:lint:ignore PACKAGE_DIRECTORY_MATCH
 
@@ -36,7 +36,7 @@ type CreateAuthorRequest struct {
 
 func (x *CreateAuthorRequest) Reset() {
 	*x = CreateAuthorRequest{}
-	mi := &file_app_1_api_v1_auth_proto_msgTypes[0]
+	mi := &file_app_1_api_v1_author_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +48,7 @@ func (x *CreateAuthorRequest) String() string {
 func (*CreateAuthorRequest) ProtoMessage() {}
 
 func (x *CreateAuthorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_api_v1_auth_proto_msgTypes[0]
+	mi := &file_app_1_api_v1_author_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +61,7 @@ func (x *CreateAuthorRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAuthorRequest.ProtoReflect.Descriptor instead.
 func (*CreateAuthorRequest) Descriptor() ([]byte, []int) {
-	return file_app_1_api_v1_auth_proto_rawDescGZIP(), []int{0}
+	return file_app_1_api_v1_author_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *CreateAuthorRequest) GetName() string {
@@ -79,7 +79,7 @@ type CreateAuthorResponse struct {
 
 func (x *CreateAuthorResponse) Reset() {
 	*x = CreateAuthorResponse{}
-	mi := &file_app_1_api_v1_auth_proto_msgTypes[1]
+	mi := &file_app_1_api_v1_author_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -91,7 +91,7 @@ func (x *CreateAuthorResponse) String() string {
 func (*CreateAuthorResponse) ProtoMessage() {}
 
 func (x *CreateAuthorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_api_v1_auth_proto_msgTypes[1]
+	mi := &file_app_1_api_v1_author_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -104,7 +104,7 @@ func (x *CreateAuthorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAuthorResponse.ProtoReflect.Descriptor instead.
 func (*CreateAuthorResponse) Descriptor() ([]byte, []int) {
-	return file_app_1_api_v1_auth_proto_rawDescGZIP(), []int{1}
+	return file_app_1_api_v1_author_proto_rawDescGZIP(), []int{1}
 }
 
 type GetAuthorRequest struct {
@@ -116,7 +116,7 @@ type GetAuthorRequest struct {
 
 func (x *GetAuthorRequest) Reset() {
 	*x = GetAuthorRequest{}
-	mi := &file_app_1_api_v1_auth_proto_msgTypes[2]
+	mi := &file_app_1_api_v1_author_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -128,7 +128,7 @@ func (x *GetAuthorRequest) String() string {
 func (*GetAuthorRequest) ProtoMessage() {}
 
 func (x *GetAuthorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_api_v1_auth_proto_msgTypes[2]
+	mi := &file_app_1_api_v1_author_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -141,7 +141,7 @@ func (x *GetAuthorRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAuthorRequest.ProtoReflect.Descriptor instead.
 func (*GetAuthorRequest) Descriptor() ([]byte, []int) {
-	return file_app_1_api_v1_auth_proto_rawDescGZIP(), []int{2}
+	return file_app_1_api_v1_author_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetAuthorRequest) GetId() string {
@@ -163,7 +163,7 @@ type GetAuthorResponse struct {
 
 func (x *GetAuthorResponse) Reset() {
 	*x = GetAuthorResponse{}
-	mi := &file_app_1_api_v1_auth_proto_msgTypes[3]
+	mi := &file_app_1_api_v1_author_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -175,7 +175,7 @@ func (x *GetAuthorResponse) String() string {
 func (*GetAuthorResponse) ProtoMessage() {}
 
 func (x *GetAuthorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_app_1_api_v1_auth_proto_msgTypes[3]
+	mi := &file_app_1_api_v1_author_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -188,7 +188,7 @@ func (x *GetAuthorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAuthorResponse.ProtoReflect.Descriptor instead.
 func (*GetAuthorResponse) Descriptor() ([]byte, []int) {
-	return file_app_1_api_v1_auth_proto_rawDescGZIP(), []int{3}
+	return file_app_1_api_v1_author_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetAuthorResponse) GetId() string {
@@ -219,11 +219,11 @@ func (x *GetAuthorResponse) GetName() *wrapperspb.StringValue {
 	return nil
 }
 
-var File_app_1_api_v1_auth_proto protoreflect.FileDescriptor
+var File_app_1_api_v1_author_proto protoreflect.FileDescriptor
 
-const file_app_1_api_v1_auth_proto_rawDesc = "" +
+const file_app_1_api_v1_author_proto_rawDesc = "" +
 	"\n" +
-	"\x17app_1/api/v1/auth.proto\x12\fapi.app_1.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"B\n" +
+	"\x19app_1/api/v1/author.proto\x12\fapi.app_1.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"B\n" +
 	"\x13CreateAuthorRequest\x12\"\n" +
 	"\x04name\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x02\x182H\x00R\x04name\x88\x01\x01B\a\n" +
 	"\x05_name\"\x16\n" +
@@ -242,19 +242,19 @@ const file_app_1_api_v1_auth_proto_rawDesc = "" +
 	"\tGetAuthor\x12\x1e.api.app_1.v1.GetAuthorRequest\x1a\x1f.api.app_1.v1.GetAuthorResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/author/{id}B-Z+cyber-ecosystem/apps/app_1/gen/go/v1;app1V1b\x06proto3"
 
 var (
-	file_app_1_api_v1_auth_proto_rawDescOnce sync.Once
-	file_app_1_api_v1_auth_proto_rawDescData []byte
+	file_app_1_api_v1_author_proto_rawDescOnce sync.Once
+	file_app_1_api_v1_author_proto_rawDescData []byte
 )
 
-func file_app_1_api_v1_auth_proto_rawDescGZIP() []byte {
-	file_app_1_api_v1_auth_proto_rawDescOnce.Do(func() {
-		file_app_1_api_v1_auth_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_app_1_api_v1_auth_proto_rawDesc), len(file_app_1_api_v1_auth_proto_rawDesc)))
+func file_app_1_api_v1_author_proto_rawDescGZIP() []byte {
+	file_app_1_api_v1_author_proto_rawDescOnce.Do(func() {
+		file_app_1_api_v1_author_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_app_1_api_v1_author_proto_rawDesc), len(file_app_1_api_v1_author_proto_rawDesc)))
 	})
-	return file_app_1_api_v1_auth_proto_rawDescData
+	return file_app_1_api_v1_author_proto_rawDescData
 }
 
-var file_app_1_api_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_app_1_api_v1_auth_proto_goTypes = []any{
+var file_app_1_api_v1_author_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_app_1_api_v1_author_proto_goTypes = []any{
 	(*CreateAuthorRequest)(nil),    // 0: api.app_1.v1.CreateAuthorRequest
 	(*CreateAuthorResponse)(nil),   // 1: api.app_1.v1.CreateAuthorResponse
 	(*GetAuthorRequest)(nil),       // 2: api.app_1.v1.GetAuthorRequest
@@ -262,7 +262,7 @@ var file_app_1_api_v1_auth_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil),  // 4: google.protobuf.Timestamp
 	(*wrapperspb.StringValue)(nil), // 5: google.protobuf.StringValue
 }
-var file_app_1_api_v1_auth_proto_depIdxs = []int32{
+var file_app_1_api_v1_author_proto_depIdxs = []int32{
 	4, // 0: api.app_1.v1.GetAuthorResponse.created_at:type_name -> google.protobuf.Timestamp
 	4, // 1: api.app_1.v1.GetAuthorResponse.updated_at:type_name -> google.protobuf.Timestamp
 	5, // 2: api.app_1.v1.GetAuthorResponse.name:type_name -> google.protobuf.StringValue
@@ -277,27 +277,27 @@ var file_app_1_api_v1_auth_proto_depIdxs = []int32{
 	0, // [0:3] is the sub-list for field type_name
 }
 
-func init() { file_app_1_api_v1_auth_proto_init() }
-func file_app_1_api_v1_auth_proto_init() {
-	if File_app_1_api_v1_auth_proto != nil {
+func init() { file_app_1_api_v1_author_proto_init() }
+func file_app_1_api_v1_author_proto_init() {
+	if File_app_1_api_v1_author_proto != nil {
 		return
 	}
-	file_app_1_api_v1_auth_proto_msgTypes[0].OneofWrappers = []any{}
+	file_app_1_api_v1_author_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_app_1_api_v1_auth_proto_rawDesc), len(file_app_1_api_v1_auth_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_app_1_api_v1_author_proto_rawDesc), len(file_app_1_api_v1_author_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_app_1_api_v1_auth_proto_goTypes,
-		DependencyIndexes: file_app_1_api_v1_auth_proto_depIdxs,
-		MessageInfos:      file_app_1_api_v1_auth_proto_msgTypes,
+		GoTypes:           file_app_1_api_v1_author_proto_goTypes,
+		DependencyIndexes: file_app_1_api_v1_author_proto_depIdxs,
+		MessageInfos:      file_app_1_api_v1_author_proto_msgTypes,
 	}.Build()
-	File_app_1_api_v1_auth_proto = out.File
-	file_app_1_api_v1_auth_proto_goTypes = nil
-	file_app_1_api_v1_auth_proto_depIdxs = nil
+	File_app_1_api_v1_author_proto = out.File
+	file_app_1_api_v1_author_proto_goTypes = nil
+	file_app_1_api_v1_author_proto_depIdxs = nil
 }

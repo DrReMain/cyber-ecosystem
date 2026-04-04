@@ -35,16 +35,19 @@ Optional toolchain bootstrap:
 4. Generate service config proto:
 ```bash
 ./nx run app_1_service_1:proto:conf
+./nx run app_1_service_2:proto:conf
 ```
 
-5. Run service generation chain (Wire + Ent + i18n + tidy):
+5. Run service generation chains (Wire + Ent + i18n + tidy):
 ```bash
 ./nx run app_1_service_1:generate
+./nx run app_1_service_2:generate
 ```
 
-6. Launch service in development:
+6. Launch services in development (separate terminals):
 ```bash
 ./nx run app_1_service_1:dev
+./nx run app_1_service_2:dev
 ```
 
 ---
@@ -53,16 +56,16 @@ Optional toolchain bootstrap:
 
 ### Quick profile (API-only or docs-only changes)
 1. Run only required generation target(s).
-2. Run `./nx run app_1_service_1:build` if service code is touched.
+2. Run affected service build target(s) if service code is touched.
 
 ### Standard profile (default)
 1. Run full generation path for affected modules.
-2. Run `./nx run app_1_service_1:build`.
+2. Run affected service build target(s).
 3. Run focused tests on touched packages.
 
 ### Full profile (release-sensitive or cross-cutting changes)
-1. Run `contracts -> app_1_api -> service_1` generation chain.
-2. Run `./nx run app_1_service_1:build`.
+1. Run `contracts -> app_1_api -> service_1 + service_2` generation chain.
+2. Run both service builds.
 3. Run `go test ./...` and document known failures.
 
 ---
@@ -79,11 +82,19 @@ Optional toolchain bootstrap:
 ### Build
 ```bash
 ./nx run app_1_service_1:build
+./nx run app_1_service_2:build
+```
+
+### Dev run
+```bash
+./nx run app_1_service_1:dev
+./nx run app_1_service_2:dev
 ```
 
 ### Generate new Ent entity schema scaffold
 ```bash
 ./nx run app_1_service_1:ent:new --args="Entity=<EntityName>"
+./nx run app_1_service_2:ent:new --args="Entity=<EntityName>"
 ```
 
 ### Common infra controls
@@ -116,8 +127,8 @@ Audit status on 2026-04-04:
   - `tools/go-jwt/main.go:162:4: fmt.Println arg list ends with redundant newline`
 
 Recommended minimum validation for feature changes:
-1. `./nx run app_1_service_1:generate` (if source definitions changed)
-2. `./nx run app_1_service_1:build`
+1. Run affected generate target(s) (service_1 and/or service_2) if source definitions changed.
+2. Run affected build target(s).
 3. Focused `go test` on touched packages
 
 ---
@@ -133,8 +144,10 @@ Recommended minimum validation for feature changes:
 ## 5) Logs and Observability
 
 ### Service logs
-- Dev logs are streamed in the terminal from `./nx run app_1_service_1:dev`.
-- File logging path (when enabled): `apps/app_1/services/service_1/logs/service_1.log`.
+- Dev logs are streamed in terminals from `./nx run app_1_service_1:dev` and `./nx run app_1_service_2:dev`.
+- File logging paths (when enabled):
+  - `apps/app_1/services/service_1/logs/service_1.log`
+  - `apps/app_1/services/service_2/logs/service_2.log`
 
 ### Infra logs
 ```bash
@@ -142,12 +155,18 @@ Recommended minimum validation for feature changes:
 ```
 
 ### Default endpoints (from current `configs/config.yaml`)
-- HTTP API: `http://localhost:11000`
-- gRPC: `localhost:12000`
-- Connect API: `http://localhost:13000`
-- Ops server: `http://localhost:14000`
+- service_1 HTTP API: `http://localhost:11000`
+- service_1 gRPC: `localhost:12000`
+- service_1 Connect API: `http://localhost:13000`
+- service_1 Ops server: `http://localhost:14000`
+- service_2 HTTP API: `http://localhost:11001`
+- service_2 gRPC: `localhost:12001`
+- service_2 Connect API: `http://localhost:13001`
+- service_2 Ops server: `http://localhost:14001`
 - Metrics: `http://localhost:14000/metrics`
+- Metrics (service_2): `http://localhost:14001/metrics`
 - pprof index: `http://localhost:14000/debug/pprof/`
+- pprof index (service_2): `http://localhost:14001/debug/pprof/`
 - Jaeger UI: `http://localhost:16686`
 - Prometheus: `http://localhost:9090`
 - Grafana: `http://localhost:3000` (`admin/admin`)

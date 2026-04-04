@@ -3,6 +3,7 @@ syntax = "proto3";
 // buf:lint:ignore PACKAGE_DIRECTORY_MATCH
 package api.app_1.v1;
 
+import "auth/auth.proto";
 import "buf/validate/validate.proto";
 import "common/page.proto";
 import "google/api/annotations.proto";
@@ -15,6 +16,7 @@ option go_package = "cyber-ecosystem/apps/app_1/gen/go/v1;app1V1";
 service ReadingService {
   // QueryBlogReading
   rpc QueryBlogReading(QueryBlogReadingRequest) returns (QueryBlogReadingResponse) {
+    option (auth.public_access) = true;
     option (google.api.http) = {get: "/api/v1/reading/blog"};
   }
   // GetBlogReading

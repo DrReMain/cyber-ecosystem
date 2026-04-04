@@ -39,7 +39,7 @@ func NewGRPCServer(
 	_metricSeconds metric.Float64Histogram,
 	i18nBundle *i18n.Bundle,
 ) *grpc.Server {
-	var middlewares = []middleware.Middleware{}
+	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, i18n.Server(i18nBundle))
 	middlewares = append(middlewares, recovery.Recovery(recovery.WithHandler(func(context.Context, any, any) error { return app1V1.ErrorErrorReasonUnspecified("") })))
 	middlewares = append(middlewares, ratelimit.Server())

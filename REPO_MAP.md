@@ -7,7 +7,8 @@ apps/
   app_1/
     api/                         # App-level proto API definitions
     gen/                         # Generated Go stubs and OpenAPI
-    services/service_1/          # Kratos service implementation
+    services/service_1/          # Kratos service: blog + author
+    services/service_2/          # Kratos service: reading
 contracts/                       # Shared proto contracts across apps
 shared-go/                       # Shared Go platform libraries
 infra/docker/                    # Local infra and observability stack
@@ -21,13 +22,13 @@ tools/                           # Dev/debug utility commands
 ### API (Protocol Definitions)
 
 App API files:
-- `apps/app_1/api/v1/auth.proto`
+- `apps/app_1/api/v1/author.proto`
 - `apps/app_1/api/v1/blog.proto`
 - `apps/app_1/api/v1/reading.proto`
 - `apps/app_1/api/v1/error_reason.proto`
 
 Shared contract files:
-- `contracts/auth/auth.proto`
+- `contracts/auth/author.proto`
 - `contracts/common/page.proto`
 - `contracts/errors/errors.proto`
 
@@ -38,9 +39,14 @@ Generated API code:
 
 ### Biz (Business Core)
 
+service_1:
 - `apps/app_1/services/service_1/internal/biz/biz.go`
 - `apps/app_1/services/service_1/internal/biz/blog.go`
 - `apps/app_1/services/service_1/internal/biz/author.go`
+
+service_2:
+- `apps/app_1/services/service_2/internal/biz/biz.go`
+- `apps/app_1/services/service_2/internal/biz/reading.go`
 
 Biz owns:
 - domain entities
@@ -50,18 +56,29 @@ Biz owns:
 
 ### Data (Persistence + Integration)
 
+service_1:
 - `apps/app_1/services/service_1/internal/data/data.go`
 - `apps/app_1/services/service_1/internal/data/ent.go`
 - `apps/app_1/services/service_1/internal/data/cache.go`
 - `apps/app_1/services/service_1/internal/data/blog.go`
 - `apps/app_1/services/service_1/internal/data/author.go`
 
+service_2:
+- `apps/app_1/services/service_2/internal/data/data.go`
+- `apps/app_1/services/service_2/internal/data/ent.go`
+- `apps/app_1/services/service_2/internal/data/cache.go`
+- `apps/app_1/services/service_2/internal/data/reading.go`
+- `apps/app_1/services/service_2/internal/data/grpc_service_1.go`
+- `apps/app_1/services/service_2/internal/data/connect_service_1.go`
+
 Ent schema source:
 - `apps/app_1/services/service_1/internal/data/ent/schema/blog.go`
 - `apps/app_1/services/service_1/internal/data/ent/schema/author.go`
+- `apps/app_1/services/service_2/internal/data/ent/schema/reading.go`
 
 Generated Ent code:
 - `apps/app_1/services/service_1/internal/data/ent/**`
+- `apps/app_1/services/service_2/internal/data/ent/**`
 
 ---
 
@@ -75,6 +92,13 @@ cmd/app/main.go
         -> use cases (internal/biz)
           -> repositories (internal/data)
             -> Ent client / cache adapters
+```
+
+Cross-service call path (reading flow):
+```text
+service_2 ReadingRP
+  -> gRPC client to service_1 BlogService.GetBlog
+  -> Connect client to service_1 BlogService.QueryBlog
 ```
 
 Transport constructors:
@@ -119,8 +143,7 @@ Key reusable modules:
 - Fully implemented service chains:
   - `BlogService`: API -> service -> biz -> data complete
   - `AuthorService`: API -> service -> biz -> data complete
-- Partially implemented:
-  - `ReadingService` proto exists, but no matching service/biz/data implementation yet.
+  - `ReadingService`: API -> service -> biz -> data complete (implemented in `service_2`)
 
 Generated artifacts to expect during normal workflow:
 - `contracts/go/**`
@@ -129,6 +152,10 @@ Generated artifacts to expect during normal workflow:
 - `apps/app_1/services/service_1/cmd/app/wire_gen.go`
 - `apps/app_1/services/service_1/internal/data/ent/**`
 - `apps/app_1/services/service_1/internal/i18n/translations/v1.*.yaml`
+- `apps/app_1/services/service_2/internal/conf/conf.pb.go`
+- `apps/app_1/services/service_2/cmd/app/wire_gen.go`
+- `apps/app_1/services/service_2/internal/data/ent/**`
+- `apps/app_1/services/service_2/internal/i18n/translations/v1.*.yaml`
 
 ---
 
@@ -143,8 +170,9 @@ Use this quick map to choose regeneration/build scope:
   - Rebuild service consumers
 - Change in `internal/conf/conf.proto`:
   - Run `./nx run app_1_service_1:proto:conf`
-  - Then `./nx run app_1_service_1:generate` if DI/types are impacted
+  - And/or `./nx run app_1_service_2:proto:conf` based on touched service
+  - Then run affected generate target(s) if DI/types are impacted
 - Change in `internal/data/ent/schema/**`:
-  - Run `./nx run app_1_service_1:generate`
+  - Run affected generate target (`app_1_service_1:generate` and/or `app_1_service_2:generate`)
 - Change in `cmd/app/wire.go` or provider sets:
-  - Run `./nx run app_1_service_1:generate`
+  - Run affected generate target (`app_1_service_1:generate` and/or `app_1_service_2:generate`)

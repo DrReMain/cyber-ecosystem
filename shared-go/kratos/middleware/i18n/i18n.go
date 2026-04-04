@@ -10,11 +10,14 @@ import (
 	"github.com/go-kratos/kratos/v2/transport"
 )
 
-const (
-	defaultHeaderLang   = "Accept-Language"
-	kratosUnauthorized  = "UNAUTHORIZED"
-	defaultUnauthorized = "ERROR_REASON_UNAUTHORIZED"
-)
+const defaultHeaderLang = "Accept-Language"
+
+var internalKeyMap = map[string]string{
+	"UNKNOWN":        "ERROR_REASON_UNSPECIFIED",
+	"UNAUTHORIZED":   "ERROR_REASON_UNAUTHORIZED",
+	"RATELIMIT":      "ERROR_REASON_RATELIMIT",
+	"CIRCUITBREAKER": "ERROR_REASON_CIRCUITBREAKER",
+}
 
 type contextKey struct{}
 
@@ -65,19 +68,23 @@ func Server(bundle *Bundle, opts ...Option) middleware.Middleware {
 					return reply, err
 				}
 
-				if ke.Reason == kratosUnauthorized {
-					ke = errors.Clone(ke)
-					ke.Reason = defaultUnauthorized
-				}
-
 				tr, ok := transport.FromServerContext(ctx)
 				if !ok {
 					return reply, err
 				}
 
 				lang := resolveLang(tr, o.headerLang)
-				if lang == "" || ke.Reason == "" {
+				if lang == "" {
 					return reply, err
+				}
+
+				if ke.Reason == "" {
+					ke = errors.New(500, internalKeyMap["UNKNOWN"], "").WithCause(ke.Unwrap())
+				}
+
+				if transKey, ok := internalKeyMap[ke.Reason]; ok {
+					ke = errors.Clone(ke)
+					ke.Reason = transKey
 				}
 
 				if ke.Metadata == nil {

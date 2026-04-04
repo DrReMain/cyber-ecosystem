@@ -33,6 +33,8 @@ type BlogQueryOut struct {
 	List []*BlogEntity
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 type BlogRP interface {
 	Create(context.Context, *BlogEntity) error
 	Update(context.Context, []string, *BlogEntity) error

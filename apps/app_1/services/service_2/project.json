@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "app_1_service_2",
+  "root": "apps/app_1/services/service_2",
+  "projectType": "application",
+  "implicitDependencies": ["app_1_api", "shared-go"],
+  "targets": {
+    "proto:conf": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/apps",
+        "command": "buf generate --template app_1/services/service_2/buf.gen.conf.yaml --path app_1/services/service_2/internal/conf"
+      }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["proto"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "go generate ./...",
+          "go mod tidy"
+        ],
+        "parallel": false
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "kratos run"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{projectRoot}/bin"
+      ],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go build -ldflags \"-X main.Version=$(git describe --tags --always)\" -o ./bin/ ./..."
+      }
+    },
+    "ent:new": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go run -mod=mod entgo.io/ent/cmd/ent new --target=internal/data/ent/schema {args.Entity}"
+      }
+    }
+  }
+}

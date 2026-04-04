@@ -10,6 +10,7 @@ package app1V1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "cyber-ecosystem/contracts/go/auth"
 	common "cyber-ecosystem/contracts/go/common"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -484,7 +485,7 @@ var File_app_1_api_v1_reading_proto protoreflect.FileDescriptor
 
 const file_app_1_api_v1_reading_proto_rawDesc = "" +
 	"\n" +
-	"\x1aapp_1/api/v1/reading.proto\x12\fapi.app_1.v1\x1a\x1bbuf/validate/validate.proto\x1a\x11common/page.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xc0\x03\n" +
+	"\x1aapp_1/api/v1/reading.proto\x12\fapi.app_1.v1\x1a\x0fauth/auth.proto\x1a\x1bbuf/validate/validate.proto\x1a\x11common/page.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xc0\x03\n" +
 	"\x17QueryBlogReadingRequest\x12'\n" +
 	"\x04page\x18\x01 \x01(\v2\x13.common.PageRequestR\x04page\x12\x1d\n" +
 	"\x02id\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01\x12\x19\n" +
@@ -523,9 +524,9 @@ const file_app_1_api_v1_reading_proto_rawDesc = "" +
 	"\x14RecordReadingRequest\x12\x18\n" +
 	"\x02id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14R\x02id\"<\n" +
 	"\x15RecordReadingResponse\x12#\n" +
-	"\rreading_count\x18\x01 \x01(\x03R\freadingCount2\x97\x03\n" +
-	"\x0eReadingService\x12\x7f\n" +
-	"\x10QueryBlogReading\x12%.api.app_1.v1.QueryBlogReadingRequest\x1a&.api.app_1.v1.QueryBlogReadingResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/reading/blog\x12~\n" +
+	"\rreading_count\x18\x01 \x01(\x03R\freadingCount2\x9c\x03\n" +
+	"\x0eReadingService\x12\x83\x01\n" +
+	"\x10QueryBlogReading\x12%.api.app_1.v1.QueryBlogReadingRequest\x1a&.api.app_1.v1.QueryBlogReadingResponse\" \x88\xf1\x04\x01\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/reading/blog\x12~\n" +
 	"\x0eGetBlogReading\x12#.api.app_1.v1.GetBlogReadingRequest\x1a$.api.app_1.v1.GetBlogReadingResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/reading/blog/{id}\x12\x83\x01\n" +
 	"\rRecordReading\x12\".api.app_1.v1.RecordReadingRequest\x1a#.api.app_1.v1.RecordReadingResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/reading/blog/{id}/readB-Z+cyber-ecosystem/apps/app_1/gen/go/v1;app1V1b\x06proto3"
 

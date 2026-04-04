@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             (unknown)
-// source: app_1/api/v1/auth.proto
+// source: app_1/api/v1/author.proto
 
 // buf:lint:ignore PACKAGE_DIRECTORY_MATCH
 
@@ -165,5 +165,5 @@ var AuthorService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "app_1/api/v1/auth.proto",
+	Metadata: "app_1/api/v1/author.proto",
 }

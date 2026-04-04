@@ -29,6 +29,7 @@ The keywords `MUST`, `MUST NOT`, `SHOULD`, and `MAY` are normative.
 - `apps/`: independent application domains (currently `app_1`).
 - `apps/<app>/api`: API proto definitions shared by services and clients.
 - `apps/<app>/services/<service>`: service implementation (Kratos).
+- Current app services: `service_1` (blog/author) and `service_2` (reading).
 - `contracts/`: shared cross-app contracts.
 - `shared-go/`: shared middleware, transport, cache, ORM utilities.
 - `infra/`: local infrastructure and observability stack.
@@ -61,6 +62,12 @@ Key targets currently available:
 - `./nx run app_1_service_1:generate`
 - `./nx run app_1_service_1:dev`
 - `./nx run app_1_service_1:build`
+- `./nx run app_1_service_1:ent:new --args="Entity=<EntityName>"`
+- `./nx run app_1_service_2:proto:conf`
+- `./nx run app_1_service_2:generate`
+- `./nx run app_1_service_2:dev`
+- `./nx run app_1_service_2:build`
+- `./nx run app_1_service_2:ent:new --args="Entity=<EntityName>"`
 - `./nx run infra:docker:*`
 
 You `MUST NOT` replace core Nx workflow with ad-hoc local commands as the standard path.
@@ -97,7 +104,7 @@ All three steps are `MUST`.
 
 ### 5.1 Main generation flow
 
-`./nx run app_1_service_1:generate` executes:
+`./nx run app_1_service_1:generate` and `./nx run app_1_service_2:generate` execute:
 - `go generate ./...` (Wire + Ent + i18n generators)
 - `go mod tidy`
 
@@ -105,7 +112,8 @@ All three steps are `MUST`.
 
 - `./nx run contracts:proto` -> `contracts/go/**`
 - `./nx run app_1_api:proto:api` -> `apps/app_1/gen/go/**` and `apps/app_1/gen/oas/openapi.yaml`
-- `./nx run app_1_service_1:proto:conf` -> `internal/conf/conf.pb.go`
+- `./nx run app_1_service_1:proto:conf` -> `apps/app_1/services/service_1/internal/conf/conf.pb.go`
+- `./nx run app_1_service_2:proto:conf` -> `apps/app_1/services/service_2/internal/conf/conf.pb.go`
 
 ### 5.3 Source-of-truth policy
 
@@ -120,7 +128,7 @@ Generated artifacts must be command-generated, not manually edited for business 
 
 ## 6) Naming and Style Preferences
 
-- Directory naming follows underscore style for apps/services (`app_1`, `service_1`).
+- Directory naming follows underscore style for apps/services (`app_1`, `service_1`, `service_2`).
 - UseCase naming: `*UC`.
 - Repository interface/implementation naming: `*RP`.
 - Proto nullable fields: prefer `optional`; Go mapping should preserve nullability semantics.
@@ -138,9 +146,13 @@ Generated artifacts must be command-generated, not manually edited for business 
   - `apps/app_1/gen/**`
   - `contracts/go/**`
   - `apps/app_1/services/service_1/internal/data/ent/**` (except schema source files)
+  - `apps/app_1/services/service_2/internal/data/ent/**` (except schema source files)
   - `apps/app_1/services/service_1/cmd/app/wire_gen.go`
+  - `apps/app_1/services/service_2/cmd/app/wire_gen.go`
   - `apps/app_1/services/service_1/internal/conf/conf.pb.go`
+  - `apps/app_1/services/service_2/internal/conf/conf.pb.go`
   - `apps/app_1/services/service_1/internal/i18n/translations/v1.*.yaml`
+  - `apps/app_1/services/service_2/internal/i18n/translations/v1.*.yaml`
 - Do not break package / `go_package` / enum naming contracts in proto files.
 - Do not hardcode secrets in code; use config injection.
 
@@ -153,7 +165,9 @@ Generated artifacts must be command-generated, not manually edited for business 
 - `apps/app_1/api/**/*.proto`
 - `contracts/**/*.proto`
 - `apps/app_1/services/service_1/internal/**` (non-generated source)
+- `apps/app_1/services/service_2/internal/**` (non-generated source)
 - `apps/app_1/services/service_1/configs/config.yaml`
+- `apps/app_1/services/service_2/configs/config.yaml`
 - `shared-go/**` (when change is platform-level and backward compatible)
 
 ### 8.2 Generated or semi-generated files
@@ -165,6 +179,10 @@ Files below `MUST` be modified only through generators unless task explicitly as
 - `apps/app_1/services/service_1/internal/data/ent/**` (except `schema/**` source)
 - `apps/app_1/services/service_1/cmd/app/wire_gen.go`
 - `apps/app_1/services/service_1/internal/i18n/translations/v1.*.yaml`
+- `apps/app_1/services/service_2/internal/conf/conf.pb.go`
+- `apps/app_1/services/service_2/internal/data/ent/**` (except `schema/**` source)
+- `apps/app_1/services/service_2/cmd/app/wire_gen.go`
+- `apps/app_1/services/service_2/internal/i18n/translations/v1.*.yaml`
 
 ### 8.3 Cross-layer edits
 
@@ -176,9 +194,9 @@ If one task touches `service`, `biz`, and `data` together, you `SHOULD` keep int
 
 1. Identify the owning Nx project and target set.
 2. Update source definitions (proto/schema/wire/provider).
-3. Regenerate (`contracts` -> `app_1_api` -> `service_1` when relevant).
+3. Regenerate (`contracts` -> `app_1_api` -> affected service(s), for example `service_1` / `service_2`).
 4. Implement business code in the correct layer.
-5. Run `./nx run app_1_service_1:build` and relevant tests.
+5. Run affected builds (`app_1_service_1` and/or `app_1_service_2`) and relevant tests.
 6. Commit only task-relevant source + generated files.
 
 ---
@@ -187,7 +205,7 @@ If one task touches `service`, `biz`, and `data` together, you `SHOULD` keep int
 
 A change is considered done only if all relevant checks pass:
 1. Correct Nx generation targets were run for changed source-of-truth files.
-2. `./nx run app_1_service_1:build` passes.
+2. Affected service build targets pass (`app_1_service_1` and/or `app_1_service_2`).
 3. Tests were run at least on touched packages (or full `go test ./...` when feasible).
 4. No unintended modifications in generated files.
 5. Layering rules remain intact.

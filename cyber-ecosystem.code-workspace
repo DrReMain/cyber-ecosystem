@@ -2,7 +2,8 @@
     "folders": [
         {"path": "."},
         {"path": "apps/app_1/api"},
-        {"path": "apps/app_1/services/service_1"}
+        {"path": "apps/app_1/services/service_1"},
+        {"path": "apps/app_1/services/service_2"}
     ],
     "settings": {
         "files.exclude": {

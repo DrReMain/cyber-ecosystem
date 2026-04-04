@@ -95,6 +95,30 @@ func ErrorErrorReasonUnauthorized(format string, args ...interface{}) *errors.Er
 	return errors.New(401, ErrorReason_ERROR_REASON_UNAUTHORIZED.String(), fmt.Sprintf(format, args...))
 }
 
+func IsErrorReasonRatelimit(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_RATELIMIT.String() && e.Code == 429
+}
+
+func ErrorErrorReasonRatelimit(format string, args ...interface{}) *errors.Error {
+	return errors.New(429, ErrorReason_ERROR_REASON_RATELIMIT.String(), fmt.Sprintf(format, args...))
+}
+
+func IsErrorReasonCircuitbreaker(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_CIRCUITBREAKER.String() && e.Code == 503
+}
+
+func ErrorErrorReasonCircuitbreaker(format string, args ...interface{}) *errors.Error {
+	return errors.New(503, ErrorReason_ERROR_REASON_CIRCUITBREAKER.String(), fmt.Sprintf(format, args...))
+}
+
 func IsErrorReasonValidator(err error) bool {
 	if err == nil {
 		return false
