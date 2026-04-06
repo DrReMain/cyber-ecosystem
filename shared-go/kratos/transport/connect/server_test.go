@@ -12,12 +12,13 @@ import (
 
 	connectrpc "connectrpc.com/connect"
 	"connectrpc.com/grpcreflect"
-	kerrors "github.com/go-kratos/kratos/v2/errors"
-	"github.com/go-kratos/kratos/v2/middleware"
-	"github.com/go-kratos/kratos/v2/transport"
 	"golang.org/x/net/http2"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	kerrors "github.com/go-kratos/kratos/v2/errors"
+	"github.com/go-kratos/kratos/v2/middleware"
+	"github.com/go-kratos/kratos/v2/transport"
 )
 
 const testProcedure = "/acme.echo.v1.EchoService/Ping"

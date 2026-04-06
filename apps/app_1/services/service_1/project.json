@@ -12,9 +12,17 @@
         "command": "buf generate --template app_1/services/service_1/buf.gen.conf.yaml --path app_1/services/service_1/internal/conf"
       }
     },
+    "generate:i18n": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["app_1_api:proto:api"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go generate ./internal/server/..."
+      }
+    },
     "generate": {
       "executor": "nx:run-commands",
-      "dependsOn": ["proto"],
+      "dependsOn": ["app_1_api:proto:api", "proto:conf"],
       "options": {
         "cwd": "{projectRoot}",
         "commands": [

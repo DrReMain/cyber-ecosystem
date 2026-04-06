@@ -17,7 +17,6 @@ import (
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/biz"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/conf"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/data"
-	"cyber-ecosystem/apps/app_1/services/service_2/internal/i18n"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/server"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/service"
 )
@@ -39,7 +38,6 @@ func wireApp(
 		service.ProviderSet,
 		biz.ProviderSet,
 		data.ProviderSet,
-		i18n.ProviderSet,
 		newApp,
 	))
 }

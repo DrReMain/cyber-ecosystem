@@ -2,6 +2,7 @@ package connect
 
 import (
 	connectrpc "connectrpc.com/connect"
+
 	"github.com/go-kratos/kratos/v2/encoding"
 )
 

@@ -1,25 +1,48 @@
 {
-    "folders": [
-        {"path": "."},
-        {"path": "apps/app_1/api"},
-        {"path": "apps/app_1/services/service_1"},
-        {"path": "apps/app_1/services/service_2"}
-    ],
-    "settings": {
-        "files.exclude": {
-            "**/.git": true,
-            "**/.idea": true,
-            "**/.buf-deps": true,
-            "**/.nx": true,
-            "**/vendor": true,
-            "**/node_modules": true,
-            "nx": true,
-            "nx.bat": true,
-            "buf.lock": true,
-            "go.sum": true,
-        },
-        "protobuf.externalLinter.enabled": true,
-        "protobuf.externalLinter.linter": "buf",
-        "protobuf.externalLinter.bufPath": "buf"
-    }
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "apps/app_1/api",
+			"name": "app_1_api"
+		},
+		{
+			"path": "apps/app_1/services/service_1",
+			"name": "app_1_service_1"
+		},
+		{
+			"path": "apps/app_1/services/service_2",
+			"name": "app_1_service_2"
+		},
+		{
+			"path": "apps/singleton/api",
+			"name": "singleton_api"
+		},
+		{
+			"path": "apps/singleton/services/backend",
+			"name": "singleton_backend"
+		},
+        {
+            "path": "apps/singleton/clients/admin",
+            "name": "singleton_admin"
+        }
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.idea": true,
+			"**/.buf-deps": true,
+			"**/.nx": true,
+			"**/vendor": true,
+			"**/node_modules": true,
+			"nx": true,
+			"nx.bat": true,
+			"buf.lock": true,
+			"go.sum": true
+		},
+		"protobuf.externalLinter.enabled": true,
+		"protobuf.externalLinter.linter": "buf",
+		"protobuf.externalLinter.bufPath": "buf"
+	}
 }

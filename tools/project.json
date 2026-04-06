@@ -16,7 +16,8 @@
           "go get -tool github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest",
           "go get -tool github.com/google/gnostic/cmd/protoc-gen-openapi@latest",
           "go get -tool google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest",
-          "go get -tool google.golang.org/protobuf/cmd/protoc-gen-go@latest"
+          "go get -tool google.golang.org/protobuf/cmd/protoc-gen-go@latest",
+          "go get -tool github.com/daixiang0/gci@latest"
         ],
         "parallel": false
       }
@@ -35,18 +36,25 @@
         "command": "buf format -w"
       }
     },
-    "buf:lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "buf lint"
-      }
-    },
     "debug:jwt": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
         "command": "go run go-jwt/main.go"
+      }
+    },
+    "gci:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "go tool gci list --skip-generated --custom-order -s standard -s default -s 'Prefix(github.com/go-kratos/kratos)' -s 'Prefix(cyber-ecosystem/shared-go,cyber-ecosystem/contracts)' -s 'Prefix(cyber-ecosystem/apps)' ."
+      }
+    },
+    "gci:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "go tool gci write --skip-generated --custom-order -s standard -s default -s 'Prefix(github.com/go-kratos/kratos)' -s 'Prefix(cyber-ecosystem/shared-go,cyber-ecosystem/contracts)' -s 'Prefix(cyber-ecosystem/apps)' ."
       }
     }
   }

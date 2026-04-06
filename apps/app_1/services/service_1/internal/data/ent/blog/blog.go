@@ -35,7 +35,7 @@ const (
 	AuthorsTable = "blog_author"
 	// AuthorsInverseTable is the table name for the Author entity.
 	// It exists in this package in order to avoid circular dependency with the "author" package.
-	AuthorsInverseTable = "auther"
+	AuthorsInverseTable = "author"
 )
 
 // Columns holds all SQL columns for blog fields.

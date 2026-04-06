@@ -1,12 +1,12 @@
 package service
 
 import (
-	"cyber-ecosystem/shared-go/kratos/transport/connect"
+	"github.com/google/wire"
 
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
-	"github.com/google/wire"
+	"cyber-ecosystem/shared-go/kratos/transport/connect"
 )
 
 type Registrar interface {

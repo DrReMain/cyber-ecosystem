@@ -3,8 +3,6 @@ package service
 import (
 	"context"
 
-	"google.golang.org/protobuf/types/known/wrapperspb"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
@@ -13,7 +11,7 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	app1V1 "cyber-ecosystem/apps/app_1/gen/go/v1"
-	"cyber-ecosystem/apps/app_1/gen/go/v1/app1V1connect"
+	app1V1connect "cyber-ecosystem/apps/app_1/gen/go/v1/app1V1connect"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/biz"
 )
 
@@ -40,37 +38,23 @@ func (s *ReadingService) RegisterConnect(srv *connect.Server) {
 	srv.Register(app1V1connect.NewReadingServiceHandler(s, srv.HandlerOptions()...))
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *ReadingService) QueryBlogReading(ctx context.Context, in *app1V1.QueryBlogReadingRequest) (*app1V1.QueryBlogReadingResponse, error) {
 	out, err := s.readingUC.QueryBlog(ctx, &biz.ReadingQueryIn{
-		PageRequest:  utils.GetOrBuildPage(in.Page),
+		PageRequest:  utils.EnsurePageRequest(in.Page),
 		OrderBy:      utils.ParseOrderBy(in.OrderBy),
 		ID:           in.Id,
 		Title:        in.Title,
-		PublishedAtA: utils.GetPTimeFromPPbTime(in.PublishedAtA),
-		PublishedAtZ: utils.GetPTimeFromPPbTime(in.PublishedAtZ),
+		PublishedAtA: utils.FromTimestamp(in.PublishedAtA),
+		PublishedAtZ: utils.FromTimestamp(in.PublishedAtZ),
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &app1V1.QueryBlogReadingResponse{
 		Page: out.PageResponse,
-		List: func() []*app1V1.BlogWithReading {
-			result := make([]*app1V1.BlogWithReading, len(out.List))
-			for i, entity := range out.List {
-				result[i] = &app1V1.BlogWithReading{
-					Id:           entity.ID,
-					CreatedAt:    utils.GetPPbTimeFromPTime(entity.CreatedAt),
-					UpdatedAt:    utils.GetPPbTimeFromPTime(entity.UpdatedAt),
-					Title:        utils.ToPtrWrapper(entity.Title, wrapperspb.String),
-					Content:      utils.ToPtrWrapper(entity.Content, wrapperspb.String),
-					PublishedAt:  utils.GetPPbTimeFromPTime(entity.PublishedAt),
-					ReadingCount: entity.ReadingCount,
-				}
-			}
-			return result
-		}(),
+		List: utils.SliceMap(out.List, s.blogToProto),
 	}, nil
 }
 
@@ -81,11 +65,11 @@ func (s *ReadingService) GetBlogReading(ctx context.Context, in *app1V1.GetBlogR
 	}
 	return &app1V1.GetBlogReadingResponse{
 		Id:           entity.ID,
-		CreatedAt:    utils.GetPPbTimeFromPTime(entity.CreatedAt),
-		UpdatedAt:    utils.GetPPbTimeFromPTime(entity.UpdatedAt),
-		Title:        utils.ToPtrWrapper(entity.Title, wrapperspb.String),
-		Content:      utils.ToPtrWrapper(entity.Content, wrapperspb.String),
-		PublishedAt:  utils.GetPPbTimeFromPTime(entity.PublishedAt),
+		CreatedAt:    utils.ToTimestamp(entity.CreatedAt),
+		UpdatedAt:    utils.ToTimestamp(entity.UpdatedAt),
+		Title:        utils.Wrap(entity.Title, utils.StringW),
+		Content:      utils.Wrap(entity.Content, utils.StringW),
+		PublishedAt:  utils.ToTimestamp(entity.PublishedAt),
 		ReadingCount: entity.ReadingCount,
 	}, nil
 }
@@ -98,4 +82,16 @@ func (s *ReadingService) RecordReading(ctx context.Context, in *app1V1.RecordRea
 	return &app1V1.RecordReadingResponse{
 		ReadingCount: readingCount,
 	}, nil
+}
+
+func (s *ReadingService) blogToProto(e *biz.BlogWithReadingEntity) *app1V1.BlogWithReading {
+	return &app1V1.BlogWithReading{
+		Id:           e.ID,
+		CreatedAt:    utils.ToTimestamp(e.CreatedAt),
+		UpdatedAt:    utils.ToTimestamp(e.UpdatedAt),
+		Title:        utils.Wrap(e.Title, utils.StringW),
+		Content:      utils.Wrap(e.Content, utils.StringW),
+		PublishedAt:  utils.ToTimestamp(e.PublishedAt),
+		ReadingCount: e.ReadingCount,
+	}
 }

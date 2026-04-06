@@ -147,7 +147,7 @@ func generateTranslationFile(outputPath string, values []string, locale string) 
 #   - Many:  CLDR plural form "many" (e.g., 11-99 in Polish)
 #   - Description: Context for translators
 #
-# Note: Not all languages support all plural forms. 
+# Note: Not all languages support all plural forms.
 # Refer to CLDR rules for specific language requirements.
 # =================================================================
 #

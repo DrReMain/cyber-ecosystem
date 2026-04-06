@@ -14,57 +14,49 @@ type EntErrorChecker interface {
 	IsConstraintError(err error) bool
 }
 
-type DefaultErrorReasons struct {
-	NotFound    string
-	Validation  string
-	NotSingular string
-	NotLoaded   string
-	Constraint  string
+type DefaultError struct {
+	NotFound    *errors.Error
+	Validation  *errors.Error
+	NotSingular *errors.Error
+	NotLoaded   *errors.Error
+	Constraint  *errors.Error
 }
 
-type DefaultErrorMessages struct {
-	NotFound    string
-	Validation  string
-	NotSingular string
-	NotLoaded   string
-	Constraint  string
-}
-
-func HandleEntError(err error, checker EntErrorChecker, reasons *DefaultErrorReasons, messages *DefaultErrorMessages) error {
-	if err := validateReasons(reasons); err != nil {
+func HandleEntError(err error, checker EntErrorChecker, errs *DefaultError) error {
+	if err := validateReasons(errs); err != nil {
 		return fmt.Errorf("ent error reason mapping invalid: %w", err)
 	}
 	switch {
 	case checker.IsNotFound(err):
-		return errors.NotFound(reasons.NotFound, messages.NotFound).WithCause(err)
+		return errs.NotFound.WithCause(err)
 	case checker.IsValidationError(err):
-		return errors.BadRequest(reasons.Validation, messages.Validation).WithCause(err)
+		return errs.Validation.WithCause(err)
 	case checker.IsNotSingular(err):
-		return errors.BadRequest(reasons.NotSingular, messages.NotSingular).WithCause(err)
+		return errs.NotSingular.WithCause(err)
 	case checker.IsNotLoaded(err):
-		return errors.InternalServer(reasons.NotLoaded, messages.NotLoaded).WithCause(err)
+		return errs.NotLoaded.WithCause(err)
 	case checker.IsConstraintError(err):
-		return errors.Conflict(reasons.Constraint, messages.Constraint).WithCause(err)
+		return errs.Constraint.WithCause(err)
 	default:
 		return err
 	}
 }
 
-func validateReasons(reasons *DefaultErrorReasons) error {
-	if reasons.NotFound == "" {
-		return fmt.Errorf("NotFound reason is empty")
+func validateReasons(errs *DefaultError) error {
+	if errs.NotFound == nil {
+		return fmt.Errorf("NotFound is nil")
 	}
-	if reasons.Validation == "" {
-		return fmt.Errorf("Validation reason is empty")
+	if errs.Validation == nil {
+		return fmt.Errorf("validation is nil")
 	}
-	if reasons.NotSingular == "" {
-		return fmt.Errorf("NotSingular reason is empty")
+	if errs.NotSingular == nil {
+		return fmt.Errorf("NotSingular is nil")
 	}
-	if reasons.NotLoaded == "" {
-		return fmt.Errorf("NotLoaded reason is empty")
+	if errs.NotLoaded == nil {
+		return fmt.Errorf("NotLoaded is nil")
 	}
-	if reasons.Constraint == "" {
-		return fmt.Errorf("Constraint reason is empty")
+	if errs.Constraint == nil {
+		return fmt.Errorf("constraint is nil")
 	}
 	return nil
 }

@@ -23,7 +23,7 @@ const (
 	// EdgeBlogs holds the string denoting the blogs edge name in mutations.
 	EdgeBlogs = "blogs"
 	// Table holds the table name of the author in the database.
-	Table = "auther"
+	Table = "author"
 	// BlogsTable is the table that holds the blogs relation/edge. The primary key declared below.
 	BlogsTable = "blog_author"
 	// BlogsInverseTable is the table name for the Blog entity.

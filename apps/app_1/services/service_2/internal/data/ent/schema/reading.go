@@ -31,6 +31,7 @@ func (Reading) Edges() []ent.Edge {
 func (Reading) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
+		mixins.CreatedUpdatedMixin{},
 	}
 }
 

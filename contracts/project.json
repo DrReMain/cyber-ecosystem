@@ -23,9 +23,19 @@
         "parallel": true
       }
     },
+    "proto:desc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "buf generate --template buf.gen.yaml --path desc"
+        ],
+        "parallel": true
+      }
+    },
     "proto": {
       "executor": "nx:run-commands",
-      "dependsOn": ["proto:common", "proto:auth"],
+      "dependsOn": ["proto:common", "proto:auth", "proto:desc"],
       "options": {
         "command": "echo 'proto generation completed'"
       }

@@ -3,8 +3,6 @@ package service
 import (
 	"context"
 
-	"google.golang.org/protobuf/types/known/wrapperspb"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
@@ -13,13 +11,12 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	app1V1 "cyber-ecosystem/apps/app_1/gen/go/v1"
-	app1ConnectV1 "cyber-ecosystem/apps/app_1/gen/go/v1/app1V1connect"
+	app1V1connect "cyber-ecosystem/apps/app_1/gen/go/v1/app1V1connect"
 	"cyber-ecosystem/apps/app_1/services/service_1/internal/biz"
 )
 
 type AuthorService struct {
 	app1V1.UnimplementedAuthorServiceServer
-
 	log      *log.Helper
 	authorUC *biz.AuthorUC
 }
@@ -37,10 +34,10 @@ func (s *AuthorService) RegisterHTTP(srv *http.Server) {
 	app1V1.RegisterAuthorServiceHTTPServer(srv, s)
 }
 func (s *AuthorService) RegisterConnect(srv *connect.Server) {
-	srv.Register(app1ConnectV1.NewAuthorServiceHandler(s, srv.HandlerOptions()...))
+	srv.Register(app1V1connect.NewAuthorServiceHandler(s, srv.HandlerOptions()...))
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *AuthorService) CreateAuthor(ctx context.Context, in *app1V1.CreateAuthorRequest) (*app1V1.CreateAuthorResponse, error) {
 	entity := &biz.AuthorEntity{
@@ -59,8 +56,8 @@ func (s *AuthorService) GetAuthor(ctx context.Context, in *app1V1.GetAuthorReque
 	}
 	return &app1V1.GetAuthorResponse{
 		Id:        entity.ID,
-		CreatedAt: utils.GetPPbTimeFromPTime(entity.CreatedAt),
-		UpdatedAt: utils.GetPPbTimeFromPTime(entity.UpdatedAt),
-		Name:      utils.ToPtrWrapper(entity.Name, wrapperspb.String),
+		CreatedAt: utils.ToTimestamp(entity.CreatedAt),
+		UpdatedAt: utils.ToTimestamp(entity.UpdatedAt),
+		Name:      utils.Wrap(entity.Name, utils.StringW),
 	}, nil
 }

@@ -1,0 +1,123 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.singleton.v1;
+
+import "buf/validate/validate.proto";
+import "common/page.proto";
+import "desc/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/apps/singleton/gen/go/v1;singletonV1";
+
+// ConditionService
+service ConditionService {
+  option (desc.service_comment) = "条件管理服务";
+
+  // CreateCondition
+  rpc CreateCondition(CreateConditionRequest) returns (CreateConditionResponse) {
+    option (desc.method_comment) = "创建访问条件";
+    option (google.api.http) = {
+      post: "/api/v1/condition"
+      body: "*"
+    };
+  }
+  // UpdateCondition
+  rpc UpdateCondition(UpdateConditionRequest) returns (UpdateConditionResponse) {
+    option (desc.method_comment) = "修改访问条件";
+    option (google.api.http) = {
+      put: "/api/v1/condition/{id}"
+      body: "*"
+    };
+  }
+  // DeleteCondition
+  rpc DeleteCondition(DeleteConditionRequest) returns (DeleteConditionResponse) {
+    option (desc.method_comment) = "删除访问条件";
+    option (google.api.http) = {delete: "/api/v1/condition/{id}"};
+  }
+  // GetCondition
+  rpc GetCondition(GetConditionRequest) returns (GetConditionResponse) {
+    option (desc.method_comment) = "查询访问条件详情";
+    option (google.api.http) = {get: "/api/v1/condition/{id}"};
+  }
+  // QueryConditions
+  rpc QueryConditions(QueryConditionsRequest) returns (QueryConditionsResponse) {
+    option (desc.method_comment) = "查询访问条件列表";
+    option (google.api.http) = {get: "/api/v1/condition"};
+  }
+}
+
+message CreateConditionRequest {
+  optional string role_code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string operation = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string condition_type = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string config = 4;
+  optional string group_id = 5 [(buf.validate.field).string.max_len = 50];
+}
+
+message CreateConditionResponse {}
+
+message UpdateConditionRequest {
+  string id = 1 [(buf.validate.field).string.len = 20];
+  optional string operation = 2;
+  optional string condition_type = 3;
+  optional string config = 4;
+  optional string group_id = 5;
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+  }];
+}
+
+message UpdateConditionResponse {}
+
+message DeleteConditionRequest {
+  string id = 1 [(buf.validate.field).string.len = 20];
+}
+
+message DeleteConditionResponse {}
+
+message GetConditionRequest {
+  string id = 1 [(buf.validate.field).string.len = 20];
+}
+
+message GetConditionResponse {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue role_code = 4;
+  google.protobuf.StringValue operation = 5;
+  google.protobuf.StringValue condition_type = 6;
+  google.protobuf.StringValue config = 7;
+  google.protobuf.StringValue group_id = 8;
+}
+
+message QueryConditionsRequest {
+  common.PageRequest page = 1;
+  optional string role_code = 2;
+  optional string operation = 3;
+  optional string condition_type = 4;
+  optional string group_id = 5;
+
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "QueryConditionsRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(created_at|updated_at):(asc|desc)$'))"
+  }];
+}
+
+message QueryConditionsResponse {
+  common.PageResponse page = 1;
+  repeated GetConditionResponse list = 2;
+}

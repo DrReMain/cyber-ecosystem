@@ -33,6 +33,7 @@ func (Author) Edges() []ent.Edge {
 func (Author) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
+		mixins.CreatedUpdatedMixin{},
 	}
 }
 
@@ -45,6 +46,6 @@ func (Author) Indexes() []ent.Index {
 func (Author) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.WithComments(true),
-		entsql.Annotation{Table: "auther"},
+		entsql.Annotation{Table: "author"},
 	}
 }

@@ -1,0 +1,1896 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /api/v1/account/auth/login_password:
+        post:
+            tags:
+                - AccountAuthService
+            description: LoginPassword
+            operationId: AccountAuthService_LoginPassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.LoginPasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.LoginPasswordResponse'
+    /api/v1/account/auth/logout:
+        post:
+            tags:
+                - AccountAuthService
+            description: Logout
+            operationId: AccountAuthService_Logout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.LogoutRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.LogoutResponse'
+    /api/v1/account/auth/refresh:
+        post:
+            tags:
+                - AccountAuthService
+            description: RefreshToken
+            operationId: AccountAuthService_RefreshToken
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.RefreshTokenRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.RefreshTokenResponse'
+    /api/v1/account/profile:
+        get:
+            tags:
+                - AccountDetailService
+            description: GetProfile
+            operationId: AccountDetailService_GetProfile
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.GetProfileResponse'
+    /api/v1/condition:
+        get:
+            tags:
+                - ConditionService
+            description: QueryConditions
+            operationId: ConditionService_QueryConditions
+            parameters:
+                - name: page.page_no
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.page_size
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.created_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.created_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: role_code
+                  in: query
+                  schema:
+                    type: string
+                - name: operation
+                  in: query
+                  schema:
+                    type: string
+                - name: condition_type
+                  in: query
+                  schema:
+                    type: string
+                - name: group_id
+                  in: query
+                  schema:
+                    type: string
+                - name: order_by
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.QueryConditionsResponse'
+        post:
+            tags:
+                - ConditionService
+            description: CreateCondition
+            operationId: ConditionService_CreateCondition
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.CreateConditionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.CreateConditionResponse'
+    /api/v1/condition/{id}:
+        get:
+            tags:
+                - ConditionService
+            description: GetCondition
+            operationId: ConditionService_GetCondition
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.GetConditionResponse'
+        put:
+            tags:
+                - ConditionService
+            description: UpdateCondition
+            operationId: ConditionService_UpdateCondition
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.UpdateConditionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.UpdateConditionResponse'
+        delete:
+            tags:
+                - ConditionService
+            description: DeleteCondition
+            operationId: ConditionService_DeleteCondition
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.DeleteConditionResponse'
+    /api/v1/data-scope:
+        get:
+            tags:
+                - DataScopeService
+            description: QueryDataScopes
+            operationId: DataScopeService_QueryDataScopes
+            parameters:
+                - name: page.page_no
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.page_size
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.created_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.created_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: role_code
+                  in: query
+                  schema:
+                    type: string
+                - name: scope_type
+                  in: query
+                  schema:
+                    type: string
+                - name: target_resource
+                  in: query
+                  schema:
+                    type: string
+                - name: order_by
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.QueryDataScopesResponse'
+        post:
+            tags:
+                - DataScopeService
+            description: CreateDataScope
+            operationId: DataScopeService_CreateDataScope
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.CreateDataScopeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.CreateDataScopeResponse'
+    /api/v1/data-scope/{id}:
+        get:
+            tags:
+                - DataScopeService
+            description: GetDataScope
+            operationId: DataScopeService_GetDataScope
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.GetDataScopeResponse'
+        put:
+            tags:
+                - DataScopeService
+            description: UpdateDataScope
+            operationId: DataScopeService_UpdateDataScope
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.UpdateDataScopeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.UpdateDataScopeResponse'
+        delete:
+            tags:
+                - DataScopeService
+            description: DeleteDataScope
+            operationId: DataScopeService_DeleteDataScope
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.DeleteDataScopeResponse'
+    /api/v1/department:
+        get:
+            tags:
+                - DepartmentService
+            description: QueryDepartment
+            operationId: DepartmentService_QueryDepartment
+            parameters:
+                - name: page.page_no
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.page_size
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.created_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.created_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: code
+                  in: query
+                  schema:
+                    type: string
+                - name: parent_id
+                  in: query
+                  schema:
+                    type: string
+                - name: order_by
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.QueryDepartmentResponse'
+        post:
+            tags:
+                - DepartmentService
+            description: CreateDepartment
+            operationId: DepartmentService_CreateDepartment
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.CreateDepartmentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.CreateDepartmentResponse'
+    /api/v1/department-binding/department/{department_id}:
+        get:
+            tags:
+                - DepartmentBindingService
+            description: ListDepartmentUsers
+            operationId: DepartmentBindingService_ListDepartmentUsers
+            parameters:
+                - name: department_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.ListDepartmentUsersResponse'
+    /api/v1/department-binding/{user_id}:
+        get:
+            tags:
+                - DepartmentBindingService
+            description: ListUserDepartments
+            operationId: DepartmentBindingService_ListUserDepartments
+            parameters:
+                - name: user_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.ListUserDepartmentsResponse'
+        put:
+            tags:
+                - DepartmentBindingService
+            description: SetUserDepartments
+            operationId: DepartmentBindingService_SetUserDepartments
+            parameters:
+                - name: user_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.SetUserDepartmentsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.SetUserDepartmentsResponse'
+    /api/v1/department/{id}:
+        get:
+            tags:
+                - DepartmentService
+            description: GetDepartment
+            operationId: DepartmentService_GetDepartment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.GetDepartmentResponse'
+        put:
+            tags:
+                - DepartmentService
+            description: UpdateDepartment
+            operationId: DepartmentService_UpdateDepartment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.UpdateDepartmentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.UpdateDepartmentResponse'
+        delete:
+            tags:
+                - DepartmentService
+            description: DeleteDepartment
+            operationId: DepartmentService_DeleteDepartment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.DeleteDepartmentResponse'
+    /api/v1/department/{id}/move:
+        put:
+            tags:
+                - DepartmentService
+            description: MoveDepartment
+            operationId: DepartmentService_MoveDepartment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.MoveDepartmentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.MoveDepartmentResponse'
+    /api/v1/permission-binding:
+        get:
+            tags:
+                - PermissionBindingService
+            description: ListPermissionBindings
+            operationId: PermissionBindingService_ListPermissionBindings
+            parameters:
+                - name: role_code
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.ListPermissionBindingsResponse'
+        post:
+            tags:
+                - PermissionBindingService
+            description: CreatePermissionBinding
+            operationId: PermissionBindingService_CreatePermissionBinding
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.CreatePermissionBindingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.CreatePermissionBindingResponse'
+    /api/v1/permission-binding:delete:
+        post:
+            tags:
+                - PermissionBindingService
+            description: DeletePermissionBinding
+            operationId: PermissionBindingService_DeletePermissionBinding
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.DeletePermissionBindingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.DeletePermissionBindingResponse'
+    /api/v1/resource:
+        get:
+            tags:
+                - ResourceService
+            description: ListResource
+            operationId: ResourceService_ListResource
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.ListResourceResponse'
+    /api/v1/role:
+        get:
+            tags:
+                - RoleService
+            description: QueryRole
+            operationId: RoleService_QueryRole
+            parameters:
+                - name: page.page_no
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.page_size
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.created_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.created_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: code
+                  in: query
+                  schema:
+                    type: string
+                - name: order_by
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.QueryRoleResponse'
+        post:
+            tags:
+                - RoleService
+            description: CreateRole
+            operationId: RoleService_CreateRole
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.CreateRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.CreateRoleResponse'
+    /api/v1/role-binding:
+        get:
+            tags:
+                - RoleBindingService
+            description: ListRoleBindings
+            operationId: RoleBindingService_ListRoleBindings
+            parameters:
+                - name: user_id
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.ListRoleBindingsResponse'
+        post:
+            tags:
+                - RoleBindingService
+            description: CreateRoleBinding
+            operationId: RoleBindingService_CreateRoleBinding
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.CreateRoleBindingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.CreateRoleBindingResponse'
+    /api/v1/role-binding/{user_id}/{role_code}:
+        delete:
+            tags:
+                - RoleBindingService
+            description: DeleteRoleBinding
+            operationId: RoleBindingService_DeleteRoleBinding
+            parameters:
+                - name: user_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: role_code
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.DeleteRoleBindingResponse'
+    /api/v1/role/{id}:
+        get:
+            tags:
+                - RoleService
+            description: GetRole
+            operationId: RoleService_GetRole
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.GetRoleResponse'
+        put:
+            tags:
+                - RoleService
+            description: UpdateRole
+            operationId: RoleService_UpdateRole
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.UpdateRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.UpdateRoleResponse'
+        delete:
+            tags:
+                - RoleService
+            description: DeleteRole
+            operationId: RoleService_DeleteRole
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.DeleteRoleResponse'
+    /api/v1/user:
+        get:
+            tags:
+                - UserService
+            description: QueryUser
+            operationId: UserService_QueryUser
+            parameters:
+                - name: page.page_no
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.page_size
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.created_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.created_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: id
+                  in: query
+                  schema:
+                    type: string
+                - name: email
+                  in: query
+                  schema:
+                    type: string
+                - name: order_by
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.QueryUserResponse'
+        post:
+            tags:
+                - UserService
+            description: CreateUser
+            operationId: UserService_CreateUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.CreateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.CreateUserResponse'
+    /api/v1/user-attribute:
+        put:
+            tags:
+                - UserAttributeService
+            description: SetUserAttribute
+            operationId: UserAttributeService_SetUserAttribute
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.SetUserAttributeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.SetUserAttributeResponse'
+    /api/v1/user-attribute/{user_id}:
+        get:
+            tags:
+                - UserAttributeService
+            description: QueryUserAttributes
+            operationId: UserAttributeService_QueryUserAttributes
+            parameters:
+                - name: user_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.QueryUserAttributesResponse'
+    /api/v1/user-attribute/{user_id}/{key}:
+        delete:
+            tags:
+                - UserAttributeService
+            description: RemoveUserAttribute
+            operationId: UserAttributeService_RemoveUserAttribute
+            parameters:
+                - name: user_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: key
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.RemoveUserAttributeResponse'
+    /api/v1/user/{id}:
+        get:
+            tags:
+                - UserService
+            description: GetUser
+            operationId: UserService_GetUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.GetUserResponse'
+        put:
+            tags:
+                - UserService
+            description: UpdateUser
+            operationId: UserService_UpdateUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.UpdateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.UpdateUserResponse'
+        delete:
+            tags:
+                - UserService
+            description: DeleteUser
+            operationId: UserService_DeleteUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.DeleteUserResponse'
+    /api/v1/work/report:
+        get:
+            tags:
+                - WorkReportService
+            description: QueryWorkReport
+            operationId: WorkReportService_QueryWorkReport
+            parameters:
+                - name: page.page_no
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.page_size
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.created_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.created_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_a
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updated_at_z
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: type
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+                - name: order_by
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.QueryWorkReportResponse'
+        post:
+            tags:
+                - WorkReportService
+            description: CreateWorkReport
+            operationId: WorkReportService_CreateWorkReport
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.CreateWorkReportRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.CreateWorkReportResponse'
+    /api/v1/work/report/{id}:
+        get:
+            tags:
+                - WorkReportService
+            description: GetWorkReport
+            operationId: WorkReportService_GetWorkReport
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.GetWorkReportResponse'
+        put:
+            tags:
+                - WorkReportService
+            description: UpdateWorkReport
+            operationId: WorkReportService_UpdateWorkReport
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.singleton.v1.UpdateWorkReportRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.UpdateWorkReportResponse'
+        delete:
+            tags:
+                - WorkReportService
+            description: DeleteWorkReport
+            operationId: WorkReportService_DeleteWorkReport
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.singleton.v1.DeleteWorkReportResponse'
+components:
+    schemas:
+        api.singleton.v1.AccessToken:
+            type: object
+            properties:
+                token:
+                    type: string
+                expire:
+                    type: string
+                    format: date-time
+        api.singleton.v1.CreateConditionRequest:
+            type: object
+            properties:
+                role_code:
+                    type: string
+                operation:
+                    type: string
+                condition_type:
+                    type: string
+                config:
+                    type: string
+                group_id:
+                    type: string
+        api.singleton.v1.CreateConditionResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.CreateDataScopeRequest:
+            type: object
+            properties:
+                role_code:
+                    type: string
+                scope_type:
+                    type: string
+                scope_config:
+                    type: string
+                target_resource:
+                    type: string
+        api.singleton.v1.CreateDataScopeResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.CreateDepartmentRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                code:
+                    type: string
+                parent_id:
+                    type: string
+        api.singleton.v1.CreateDepartmentResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.CreatePermissionBindingRequest:
+            type: object
+            properties:
+                role_code:
+                    type: string
+                object:
+                    type: string
+                effect:
+                    type: string
+        api.singleton.v1.CreatePermissionBindingResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.CreateRoleBindingRequest:
+            type: object
+            properties:
+                user_id:
+                    type: string
+                role_code:
+                    type: string
+        api.singleton.v1.CreateRoleBindingResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.CreateRoleRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                code:
+                    type: string
+                description:
+                    type: string
+        api.singleton.v1.CreateRoleResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.CreateUserRequest:
+            type: object
+            properties:
+                password:
+                    type: string
+                confirm:
+                    type: string
+                email:
+                    type: string
+        api.singleton.v1.CreateUserResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.CreateWorkReportRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+                content:
+                    type: string
+                type:
+                    type: string
+                department_id:
+                    type: string
+                access_level:
+                    type: integer
+                    format: int32
+                region:
+                    type: string
+        api.singleton.v1.CreateWorkReportResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+        api.singleton.v1.DeleteConditionResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.DeleteDataScopeResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.DeleteDepartmentResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.DeletePermissionBindingRequest:
+            type: object
+            properties:
+                role_code:
+                    type: string
+                object:
+                    type: string
+                effect:
+                    type: string
+        api.singleton.v1.DeletePermissionBindingResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.DeleteRoleBindingResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.DeleteRoleResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.DeleteUserResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.DeleteWorkReportResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.GetConditionResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                role_code:
+                    type: string
+                operation:
+                    type: string
+                condition_type:
+                    type: string
+                config:
+                    type: string
+                group_id:
+                    type: string
+        api.singleton.v1.GetDataScopeResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                role_code:
+                    type: string
+                scope_type:
+                    type: string
+                scope_config:
+                    type: string
+                target_resource:
+                    type: string
+        api.singleton.v1.GetDepartmentResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                name:
+                    type: string
+                code:
+                    type: string
+                parent_id:
+                    type: string
+                path:
+                    type: string
+                status:
+                    type: integer
+                    format: uint32
+                sort:
+                    type: string
+        api.singleton.v1.GetProfileResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                email:
+                    type: string
+        api.singleton.v1.GetRoleResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                name:
+                    type: string
+                code:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: integer
+                    format: uint32
+                sort:
+                    type: string
+        api.singleton.v1.GetUserAttributeResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                user_id:
+                    type: string
+                key:
+                    type: string
+                value:
+                    type: string
+        api.singleton.v1.GetUserResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                email:
+                    type: string
+        api.singleton.v1.GetWorkReportResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                title:
+                    type: string
+                content:
+                    type: string
+                type:
+                    type: string
+                department_id:
+                    type: string
+                access_level:
+                    type: integer
+                    format: int32
+                region:
+                    type: string
+                created_by:
+                    type: string
+                status:
+                    type: string
+        api.singleton.v1.ListDepartmentUsersResponse:
+            type: object
+            properties:
+                user_ids:
+                    type: array
+                    items:
+                        type: string
+        api.singleton.v1.ListPermissionBindingsResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.PermissionBinding'
+        api.singleton.v1.ListResourceResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.Service'
+        api.singleton.v1.ListRoleBindingsResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.GetRoleResponse'
+        api.singleton.v1.ListUserDepartmentsResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.GetDepartmentResponse'
+        api.singleton.v1.LoginPasswordRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                password:
+                    type: string
+        api.singleton.v1.LoginPasswordResponse:
+            type: object
+            properties:
+                access_token:
+                    $ref: '#/components/schemas/api.singleton.v1.AccessToken'
+                refresh_token:
+                    $ref: '#/components/schemas/api.singleton.v1.RefreshToken'
+        api.singleton.v1.LogoutRequest:
+            type: object
+            properties: {}
+        api.singleton.v1.LogoutResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.Method:
+            type: object
+            properties:
+                name:
+                    type: string
+                full_name:
+                    type: string
+                request_name:
+                    type: string
+                request_full_name:
+                    type: string
+                response_name:
+                    type: string
+                response_full_name:
+                    type: string
+                http_method:
+                    type: string
+                http_path:
+                    type: string
+                comment:
+                    type: string
+        api.singleton.v1.MoveDepartmentRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                parent_id:
+                    type: string
+        api.singleton.v1.MoveDepartmentResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.PermissionBinding:
+            type: object
+            properties:
+                object:
+                    type: string
+                effect:
+                    type: string
+        api.singleton.v1.QueryConditionsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.GetConditionResponse'
+        api.singleton.v1.QueryDataScopesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.GetDataScopeResponse'
+        api.singleton.v1.QueryDepartmentResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.GetDepartmentResponse'
+        api.singleton.v1.QueryRoleResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.GetRoleResponse'
+        api.singleton.v1.QueryUserAttributesResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.GetUserAttributeResponse'
+        api.singleton.v1.QueryUserResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.GetUserResponse'
+        api.singleton.v1.QueryWorkReportResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/common.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.GetWorkReportResponse'
+        api.singleton.v1.RefreshToken:
+            type: object
+            properties:
+                token:
+                    type: string
+                expire:
+                    type: string
+                    format: date-time
+        api.singleton.v1.RefreshTokenRequest:
+            type: object
+            properties:
+                refresh_token:
+                    type: string
+        api.singleton.v1.RefreshTokenResponse:
+            type: object
+            properties:
+                access_token:
+                    $ref: '#/components/schemas/api.singleton.v1.AccessToken'
+                refresh_token:
+                    $ref: '#/components/schemas/api.singleton.v1.RefreshToken'
+        api.singleton.v1.RemoveUserAttributeResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.Service:
+            type: object
+            properties:
+                name:
+                    type: string
+                full_name:
+                    type: string
+                package:
+                    type: string
+                source_file:
+                    type: string
+                comment:
+                    type: string
+                methods:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.singleton.v1.Method'
+        api.singleton.v1.SetUserAttributeRequest:
+            type: object
+            properties:
+                user_id:
+                    type: string
+                key:
+                    type: string
+                value:
+                    type: string
+        api.singleton.v1.SetUserAttributeResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.SetUserDepartmentsRequest:
+            type: object
+            properties:
+                user_id:
+                    type: string
+                department_ids:
+                    type: array
+                    items:
+                        type: string
+        api.singleton.v1.SetUserDepartmentsResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.UpdateConditionRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                operation:
+                    type: string
+                condition_type:
+                    type: string
+                config:
+                    type: string
+                group_id:
+                    type: string
+                fields_mask:
+                    type: array
+                    items:
+                        type: string
+        api.singleton.v1.UpdateConditionResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.UpdateDataScopeRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                scope_type:
+                    type: string
+                scope_config:
+                    type: string
+                target_resource:
+                    type: string
+                fields_mask:
+                    type: array
+                    items:
+                        type: string
+        api.singleton.v1.UpdateDataScopeResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.UpdateDepartmentRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                code:
+                    type: string
+                status:
+                    type: integer
+                    format: uint32
+                fields_mask:
+                    type: array
+                    items:
+                        type: string
+        api.singleton.v1.UpdateDepartmentResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.UpdateRoleRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: integer
+                    format: uint32
+                fields_mask:
+                    type: array
+                    items:
+                        type: string
+        api.singleton.v1.UpdateRoleResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.UpdateUserRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                password:
+                    type: string
+                confirm:
+                    type: string
+                fields_mask:
+                    type: array
+                    items:
+                        type: string
+        api.singleton.v1.UpdateUserResponse:
+            type: object
+            properties: {}
+        api.singleton.v1.UpdateWorkReportRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+                type:
+                    type: string
+                access_level:
+                    type: integer
+                    format: int32
+                region:
+                    type: string
+                status:
+                    type: string
+                fields_mask:
+                    type: array
+                    items:
+                        type: string
+        api.singleton.v1.UpdateWorkReportResponse:
+            type: object
+            properties: {}
+        common.PageResponse:
+            type: object
+            properties:
+                page_no:
+                    type: integer
+                    format: int32
+                page_size:
+                    type: integer
+                    format: int32
+                total:
+                    type: integer
+                    format: int32
+                more:
+                    type: boolean
+tags:
+    - name: AccountAuthService
+      description: AccountAuthService
+    - name: AccountDetailService
+      description: AccountDetailService
+    - name: ConditionService
+      description: ConditionService
+    - name: DataScopeService
+      description: DataScopeService
+    - name: DepartmentBindingService
+      description: DepartmentBindingService
+    - name: DepartmentService
+      description: DepartmentService
+    - name: PermissionBindingService
+      description: PermissionBindingService
+    - name: ResourceService
+      description: ResourceService
+    - name: RoleBindingService
+      description: RoleBindingService
+    - name: RoleService
+      description: RoleService
+    - name: UserAttributeService
+      description: UserAttributeService
+    - name: UserService
+      description: UserService
+    - name: WorkReportService
+      description: WorkReportService

@@ -4,7 +4,6 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
-
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -15,18 +14,21 @@ import (
 )
 
 const (
-	MetadataI18nPrefix     = "x-md-global-i18n"
-	MetadataI18nTranslated = "x-md-global-i18n-translated"
-	MetadataI18nLocale     = "x-md-global-i18n-locale"
-	MetadataI18nMessage    = "x-md-global-i18n-message"
+	MetadataI18nPrefix  = "x-md-global-i18n"
+	MetadataI18nMessage = "x-md-global-i18n-message"
 )
 
 type Bundle struct {
-	bundle *i18n.Bundle
+	bundle      *i18n.Bundle
+	defaultLang language.Tag
 }
 
-func NewBundleFS(fsys embed.FS, translationsDir, serviceName string) (*Bundle, error) {
-	b := i18n.NewBundle(language.AmericanEnglish)
+func (b *Bundle) DefaultLang() string {
+	return b.defaultLang.String()
+}
+
+func NewBundleFS(fsys embed.FS, translationsDir, serviceName string, defaultLang language.Tag) (*Bundle, error) {
+	b := i18n.NewBundle(defaultLang)
 	b.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
 	pattern := filepath.Join(translationsDir, serviceName+".*.yaml")
@@ -58,11 +60,11 @@ func NewBundleFS(fsys embed.FS, translationsDir, serviceName string) (*Bundle, e
 		return nil, err
 	}
 
-	return &Bundle{bundle: b}, nil
+	return &Bundle{bundle: b, defaultLang: defaultLang}, nil
 }
 
-func NewBundleFromDir(translationsDir, serviceName string) (*Bundle, error) {
-	b := i18n.NewBundle(language.AmericanEnglish)
+func NewBundleFromDir(translationsDir, serviceName string, defaultLang language.Tag) (*Bundle, error) {
+	b := i18n.NewBundle(defaultLang)
 	b.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
 	pattern := filepath.Join(translationsDir, serviceName+".*.yaml")
@@ -77,11 +79,11 @@ func NewBundleFromDir(translationsDir, serviceName string) (*Bundle, error) {
 		}
 	}
 
-	return &Bundle{bundle: b}, nil
+	return &Bundle{bundle: b, defaultLang: defaultLang}, nil
 }
 
-func NewBundleFromFiles(files map[string][]byte) (*Bundle, error) {
-	b := i18n.NewBundle(language.AmericanEnglish)
+func NewBundleFromFiles(files map[string][]byte, defaultLang language.Tag) (*Bundle, error) {
+	b := i18n.NewBundle(defaultLang)
 	b.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
 	for name, data := range files {
@@ -90,7 +92,7 @@ func NewBundleFromFiles(files map[string][]byte) (*Bundle, error) {
 		}
 	}
 
-	return &Bundle{bundle: b}, nil
+	return &Bundle{bundle: b, defaultLang: defaultLang}, nil
 }
 
 func (b *Bundle) Localize(key, fallback string, data map[string]string, lang string) string {

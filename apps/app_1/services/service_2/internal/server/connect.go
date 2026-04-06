@@ -1,9 +1,7 @@
 package server
 
 import (
-	"context"
-
-	jwt2 "github.com/golang-jwt/jwt/v5"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/handlers"
 	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
@@ -19,13 +17,11 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/selector"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 
-	"cyber-ecosystem/shared-go/kratos/middleware/auth"
+	authmw "cyber-ecosystem/shared-go/kratos/middleware/auth"
 	"cyber-ecosystem/shared-go/kratos/middleware/i18n"
-	"cyber-ecosystem/shared-go/kratos/middleware/traceheader"
 	"cyber-ecosystem/shared-go/kratos/middleware/validate"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	app1V1 "cyber-ecosystem/apps/app_1/gen/go/v1"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/conf"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/service"
 )
@@ -42,21 +38,22 @@ func NewConnectServer(
 ) *connect.Server {
 	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, i18n.Server(i18nBundle))
-	middlewares = append(middlewares, recovery.Recovery(recovery.WithHandler(func(context.Context, any, any) error { return app1V1.ErrorErrorReasonUnspecified("") })))
+	middlewares = append(middlewares, recovery.Recovery())
 	middlewares = append(middlewares, ratelimit.Server())
 	middlewares = append(middlewares, metrics.Server(metrics.WithSeconds(_metricSeconds), metrics.WithRequests(_metricRequests)))
 	if tp != nil {
 		middlewares = append(middlewares, tracing.Server(tracing.WithTracerProvider(tp)))
 	}
 	middlewares = append(middlewares, metadata.Server())
-	middlewares = append(middlewares, traceheader.Server())
 	middlewares = append(middlewares, logging.Server(logger))
-	middlewares = append(middlewares, selector.Server(jwt.Server(
-		func(token *jwt2.Token) (any, error) { return []byte(ca.Secret), nil },
-		jwt.WithSigningMethod(jwt2.SigningMethodHS256),
-		jwt.WithClaims(func() jwt2.Claims { return &jwt2.MapClaims{} })),
-	).Match(auth.NewWhiteListByPublicAccessInProtoMatcher()).Build())
-	middlewares = append(middlewares, validate.ProtoValidate(app1V1.ErrorErrorReasonValidator("")))
+	middlewares = append(middlewares, selector.Server(
+		jwt.Server(
+			func(token *jwtv5.Token) (any, error) { return []byte(ca.Secret), nil },
+			jwt.WithSigningMethod(jwtv5.SigningMethodHS256),
+			jwt.WithClaims(func() jwtv5.Claims { return &jwtv5.MapClaims{} }),
+		),
+	).Match(authmw.NewWhiteListByPublicAccessInProtoMatcher()).Build())
+	middlewares = append(middlewares, validate.ProtoValidate())
 
 	var opts = []connect.ServerOption{
 		connect.Middleware(middlewares...),
@@ -64,7 +61,6 @@ func NewConnectServer(
 			handlers.AllowedOrigins([]string{"*"}),
 			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}),
 			handlers.AllowedHeaders([]string{"Content-Type", "Accept-Language", "Authorization"}),
-			handlers.ExposedHeaders([]string{traceheader.HeaderTraceID}),
 			// handlers.AllowCredentials(),
 			handlers.MaxAge(86400), // 24 * 60 * 60
 		)),

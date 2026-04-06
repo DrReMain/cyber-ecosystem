@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package desc;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "cyber-ecosystem/contracts/go/desc;desc";
+
+extend google.protobuf.ServiceOptions {
+  string service_comment = 20001;
+}
+
+extend google.protobuf.MethodOptions {
+  string method_comment = 30001;
+}

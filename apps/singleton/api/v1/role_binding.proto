@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.singleton.v1;
+
+import "buf/validate/validate.proto";
+import "desc/desc.proto";
+import "google/api/annotations.proto";
+import "singleton/api/v1/role.proto";
+
+option go_package = "cyber-ecosystem/apps/singleton/gen/go/v1;singletonV1";
+
+// RoleBindingService
+service RoleBindingService {
+  option (desc.service_comment) = "用户角色绑定服务";
+
+  // CreateRoleBinding
+  rpc CreateRoleBinding(CreateRoleBindingRequest) returns (CreateRoleBindingResponse) {
+    option (desc.method_comment) = "为用户分配角色";
+    option (google.api.http) = {
+      post: "/api/v1/role-binding"
+      body: "*"
+    };
+  }
+  // DeleteRoleBinding
+  rpc DeleteRoleBinding(DeleteRoleBindingRequest) returns (DeleteRoleBindingResponse) {
+    option (desc.method_comment) = "移除用户角色";
+    option (google.api.http) = {delete: "/api/v1/role-binding/{user_id}/{role_code}"};
+  }
+  // ListRoleBindings
+  rpc ListRoleBindings(ListRoleBindingsRequest) returns (ListRoleBindingsResponse) {
+    option (desc.method_comment) = "查询用户角色列表";
+    option (google.api.http) = {get: "/api/v1/role-binding"};
+  }
+}
+
+message CreateRoleBindingRequest {
+  string user_id = 1 [(buf.validate.field).string.len = 20];
+  string role_code = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message CreateRoleBindingResponse {}
+
+message DeleteRoleBindingRequest {
+  string user_id = 1 [(buf.validate.field).string.len = 20];
+  string role_code = 2 [(buf.validate.field).string.min_len = 1];
+}
+
+message DeleteRoleBindingResponse {}
+
+message ListRoleBindingsRequest {
+  string user_id = 1 [(buf.validate.field).string.len = 20];
+}
+
+message ListRoleBindingsResponse {
+  repeated GetRoleResponse list = 1;
+}

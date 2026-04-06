@@ -7,11 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-
-	"github.com/redis/go-redis/v9"
 
 	"cyber-ecosystem/shared-go/cache"
 )

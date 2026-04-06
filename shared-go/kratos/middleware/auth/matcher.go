@@ -14,10 +14,10 @@ import (
 	"cyber-ecosystem/contracts/go/auth"
 )
 
-// NewWhiteListMatcher creates a selector.MatchFunc that determines whether
-// a given operation requires authentication based on the proto-defined
-// (auth.public_access) option. Operations marked with public_access=true
-// will skip authentication (MatchFunc returns false).
+// NewWhiteListByPublicAccessInProtoMatcher creates a selector.MatchFunc
+// that determines whether a given operation requires authentication
+// based on the proto-defined (auth.public_access) option.
+// Operations marked with public_access=true will skip authentication (MatchFunc returns false).
 func NewWhiteListByPublicAccessInProtoMatcher() selector.MatchFunc {
 	cache := sync.Map{}
 

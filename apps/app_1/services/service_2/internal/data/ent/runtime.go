@@ -15,14 +15,16 @@ func init() {
 	readingMixin := schema.Reading{}.Mixin()
 	readingMixinFields0 := readingMixin[0].Fields()
 	_ = readingMixinFields0
+	readingMixinFields1 := readingMixin[1].Fields()
+	_ = readingMixinFields1
 	readingFields := schema.Reading{}.Fields()
 	_ = readingFields
 	// readingDescCreatedAt is the schema descriptor for created_at field.
-	readingDescCreatedAt := readingMixinFields0[1].Descriptor()
+	readingDescCreatedAt := readingMixinFields1[0].Descriptor()
 	// reading.DefaultCreatedAt holds the default value on creation for the created_at field.
 	reading.DefaultCreatedAt = readingDescCreatedAt.Default.(func() time.Time)
 	// readingDescUpdatedAt is the schema descriptor for updated_at field.
-	readingDescUpdatedAt := readingMixinFields0[2].Descriptor()
+	readingDescUpdatedAt := readingMixinFields1[1].Descriptor()
 	// reading.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	reading.DefaultUpdatedAt = readingDescUpdatedAt.Default.(func() time.Time)
 	// reading.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

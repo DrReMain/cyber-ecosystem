@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"github.com/matoous/go-nanoid/v2"
-
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/entsql"
@@ -10,6 +8,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/matoous/go-nanoid/v2"
 
 	"cyber-ecosystem/shared-go/orm/ent/mixins"
 
@@ -45,13 +44,15 @@ func (Blog) Edges() []ent.Edge {
 func (Blog) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
+		mixins.CreatedUpdatedMixin{},
 		local_mixins.SoftDeleteMixin{},
 	}
 }
 
 func (Blog) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("title").Unique(),
+		index.Fields("title").
+			Annotations(entsql.IndexWhere("deleted_at IS NULL")),
 		index.Fields("id").
 			StorageKey("blog_id_published_null").
 			Annotations(entsql.IndexWhere("published_at IS NULL")),

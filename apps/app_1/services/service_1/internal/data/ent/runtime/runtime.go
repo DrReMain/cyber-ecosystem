@@ -16,14 +16,16 @@ func init() {
 	authorMixin := schema.Author{}.Mixin()
 	authorMixinFields0 := authorMixin[0].Fields()
 	_ = authorMixinFields0
+	authorMixinFields1 := authorMixin[1].Fields()
+	_ = authorMixinFields1
 	authorFields := schema.Author{}.Fields()
 	_ = authorFields
 	// authorDescCreatedAt is the schema descriptor for created_at field.
-	authorDescCreatedAt := authorMixinFields0[1].Descriptor()
+	authorDescCreatedAt := authorMixinFields1[0].Descriptor()
 	// author.DefaultCreatedAt holds the default value on creation for the created_at field.
 	author.DefaultCreatedAt = authorDescCreatedAt.Default.(func() time.Time)
 	// authorDescUpdatedAt is the schema descriptor for updated_at field.
-	authorDescUpdatedAt := authorMixinFields0[2].Descriptor()
+	authorDescUpdatedAt := authorMixinFields1[1].Descriptor()
 	// author.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	author.DefaultUpdatedAt = authorDescUpdatedAt.Default.(func() time.Time)
 	// author.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -39,20 +41,22 @@ func init() {
 	// author.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	author.IDValidator = authorDescID.Validators[0].(func(string) error)
 	blogMixin := schema.Blog{}.Mixin()
-	blogMixinHooks1 := blogMixin[1].Hooks()
-	blog.Hooks[0] = blogMixinHooks1[0]
-	blogMixinInters1 := blogMixin[1].Interceptors()
-	blog.Interceptors[0] = blogMixinInters1[0]
+	blogMixinHooks2 := blogMixin[2].Hooks()
+	blog.Hooks[0] = blogMixinHooks2[0]
+	blogMixinInters2 := blogMixin[2].Interceptors()
+	blog.Interceptors[0] = blogMixinInters2[0]
 	blogMixinFields0 := blogMixin[0].Fields()
 	_ = blogMixinFields0
+	blogMixinFields1 := blogMixin[1].Fields()
+	_ = blogMixinFields1
 	blogFields := schema.Blog{}.Fields()
 	_ = blogFields
 	// blogDescCreatedAt is the schema descriptor for created_at field.
-	blogDescCreatedAt := blogMixinFields0[1].Descriptor()
+	blogDescCreatedAt := blogMixinFields1[0].Descriptor()
 	// blog.DefaultCreatedAt holds the default value on creation for the created_at field.
 	blog.DefaultCreatedAt = blogDescCreatedAt.Default.(func() time.Time)
 	// blogDescUpdatedAt is the schema descriptor for updated_at field.
-	blogDescUpdatedAt := blogMixinFields0[2].Descriptor()
+	blogDescUpdatedAt := blogMixinFields1[1].Descriptor()
 	// blog.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	blog.DefaultUpdatedAt = blogDescUpdatedAt.Default.(func() time.Time)
 	// blog.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

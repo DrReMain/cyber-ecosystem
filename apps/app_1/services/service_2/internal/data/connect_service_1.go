@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	jwt2 "github.com/golang-jwt/jwt/v5"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 
@@ -18,10 +18,11 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 
+	"cyber-ecosystem/shared-go/kratos/transport/connect"
+
 	app1V1 "cyber-ecosystem/apps/app_1/gen/go/v1"
 	"cyber-ecosystem/apps/app_1/gen/go/v1/app1V1connect"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/conf"
-	"cyber-ecosystem/shared-go/kratos/transport/connect"
 )
 
 func NewConnectClientService1(
@@ -41,9 +42,9 @@ func NewConnectClientService1(
 	}
 	middlewares = append(middlewares, metadata.Client())
 	middlewares = append(middlewares, jwt.Client(
-		func(token *jwt2.Token) (any, error) { return []byte(ca.Secret), nil },
-		jwt.WithSigningMethod(jwt2.SigningMethodHS256),
-		jwt.WithClaims(func() jwt2.Claims { return &jwt2.MapClaims{} }),
+		func(token *jwtv5.Token) (any, error) { return []byte(ca.Secret), nil },
+		jwt.WithSigningMethod(jwtv5.SigningMethodHS256),
+		jwt.WithClaims(func() jwtv5.Claims { return &jwtv5.MapClaims{} }),
 	))
 	middlewares = append(middlewares, logging.Client(logger))
 	conn, err := connect.DialInsecure(

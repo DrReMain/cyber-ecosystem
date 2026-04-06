@@ -385,6 +385,7 @@ func (i *kratosInterceptor) WrapStreamingHandler(next connect.StreamingHandlerFu
 				attachReplyHeadersToConnectError(tr, encodedErr)
 				return encodedErr
 			}
+			attachReplyHeadersToConn(tr, conn)
 			return nil
 		}
 		if err := next(ctx, conn); err != nil {
@@ -392,7 +393,16 @@ func (i *kratosInterceptor) WrapStreamingHandler(next connect.StreamingHandlerFu
 			attachReplyHeadersToConnectError(tr, encodedErr)
 			return encodedErr
 		}
+		attachReplyHeadersToConn(tr, conn)
 		return nil
+	}
+}
+
+func attachReplyHeadersToConn(tr *Transport, conn connect.StreamingHandlerConn) {
+	for _, key := range tr.replyHeader.Keys() {
+		for _, value := range tr.replyHeader.Values(key) {
+			conn.ResponseHeader().Add(key, value)
+		}
 	}
 }
 

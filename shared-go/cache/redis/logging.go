@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 // ClientWrapper wraps a redis client to add logging support.

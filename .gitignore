@@ -29,6 +29,14 @@ Desktop.ini
 *.swo
 *~
 
+# =================== Rust ===================
+# Build artifacts
+target/
+
+# Lock files (binary projects; library projects should commit these)
+Cargo.lock
+.cargo-lock
+
 # ==================== Go ====================
 # Binaries for programs and plugins
 *.exe

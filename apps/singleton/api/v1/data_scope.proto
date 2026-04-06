@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.singleton.v1;
+
+import "buf/validate/validate.proto";
+import "common/page.proto";
+import "desc/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/apps/singleton/gen/go/v1;singletonV1";
+
+// DataScopeService
+service DataScopeService {
+  option (desc.service_comment) = "数据范围管理服务";
+
+  // CreateDataScope
+  rpc CreateDataScope(CreateDataScopeRequest) returns (CreateDataScopeResponse) {
+    option (desc.method_comment) = "创建数据范围";
+    option (google.api.http) = {
+      post: "/api/v1/data-scope"
+      body: "*"
+    };
+  }
+  // UpdateDataScope
+  rpc UpdateDataScope(UpdateDataScopeRequest) returns (UpdateDataScopeResponse) {
+    option (desc.method_comment) = "修改数据范围";
+    option (google.api.http) = {
+      put: "/api/v1/data-scope/{id}"
+      body: "*"
+    };
+  }
+  // DeleteDataScope
+  rpc DeleteDataScope(DeleteDataScopeRequest) returns (DeleteDataScopeResponse) {
+    option (desc.method_comment) = "删除数据范围";
+    option (google.api.http) = {delete: "/api/v1/data-scope/{id}"};
+  }
+  // GetDataScope
+  rpc GetDataScope(GetDataScopeRequest) returns (GetDataScopeResponse) {
+    option (desc.method_comment) = "查询数据范围详情";
+    option (google.api.http) = {get: "/api/v1/data-scope/{id}"};
+  }
+  // QueryDataScopes
+  rpc QueryDataScopes(QueryDataScopesRequest) returns (QueryDataScopesResponse) {
+    option (desc.method_comment) = "查询数据范围列表";
+    option (google.api.http) = {get: "/api/v1/data-scope"};
+  }
+}
+
+message CreateDataScopeRequest {
+  optional string role_code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string scope_type = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string scope_config = 3;
+  optional string target_resource = 4;
+}
+
+message CreateDataScopeResponse {}
+
+message UpdateDataScopeRequest {
+  string id = 1 [(buf.validate.field).string.len = 20];
+  optional string scope_type = 2;
+  optional string scope_config = 3;
+  optional string target_resource = 4;
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+  }];
+}
+
+message UpdateDataScopeResponse {}
+
+message DeleteDataScopeRequest {
+  string id = 1 [(buf.validate.field).string.len = 20];
+}
+
+message DeleteDataScopeResponse {}
+
+message GetDataScopeRequest {
+  string id = 1 [(buf.validate.field).string.len = 20];
+}
+
+message GetDataScopeResponse {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue role_code = 4;
+  google.protobuf.StringValue scope_type = 5;
+  google.protobuf.StringValue scope_config = 6;
+  google.protobuf.StringValue target_resource = 7;
+}
+
+message QueryDataScopesRequest {
+  common.PageRequest page = 1;
+  optional string role_code = 2;
+  optional string scope_type = 3;
+  optional string target_resource = 4;
+
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "QueryDataScopesRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(created_at|updated_at):(asc|desc)$'))"
+  }];
+}
+
+message QueryDataScopesResponse {
+  common.PageResponse page = 1;
+  repeated GetDataScopeResponse list = 2;
+}

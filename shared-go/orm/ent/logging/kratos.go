@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
+
 	"github.com/go-kratos/kratos/v2/log"
 )
 

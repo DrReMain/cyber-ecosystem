@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.singleton.v1;
+
+import "auth/auth.proto";
+import "buf/validate/validate.proto";
+import "common/page.proto";
+import "desc/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/apps/singleton/gen/go/v1;singletonV1";
+
+// AccountAuthService
+service AccountAuthService {
+  option (desc.service_comment) = "账号认证服务";
+
+  // LoginPassword
+  rpc LoginPassword(LoginPasswordRequest) returns (LoginPasswordResponse) {
+    option (desc.method_comment) = "密码登录";
+    option (auth.public_access) = true;
+    option (google.api.http) = {
+      post: "/api/v1/account/auth/login_password"
+      body: "*"
+    };
+  }
+
+  // RefreshToken
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {
+    option (desc.method_comment) = "刷新令牌";
+    option (auth.public_access) = true;
+    option (google.api.http) = {
+      post: "/api/v1/account/auth/refresh"
+      body: "*"
+    };
+  }
+
+  // Logout
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (desc.method_comment) = "退出登录";
+    option (google.api.http) = {
+      post: "/api/v1/account/auth/logout"
+      body: "*"
+    };
+  }
+}
+
+message AccessToken {
+  string token = 1;
+  google.protobuf.Timestamp expire = 2;
+}
+
+message RefreshToken {
+  string token = 1;
+  google.protobuf.Timestamp expire = 2;
+}
+
+message LoginPasswordRequest {
+  optional string email = 1 [(buf.validate.field).required = true];
+  optional string password = 2 [(buf.validate.field).required = true];
+}
+
+message LoginPasswordResponse {
+  AccessToken access_token = 1;
+  RefreshToken refresh_token = 2;
+}
+
+message RefreshTokenRequest {
+  optional string refresh_token = 1 [(buf.validate.field).required = true];
+}
+
+message RefreshTokenResponse {
+  AccessToken access_token = 1;
+  RefreshToken refresh_token = 2;
+}
+
+message LogoutRequest {}
+
+message LogoutResponse {}

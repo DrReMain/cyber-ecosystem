@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	jwt2 "github.com/golang-jwt/jwt/v5"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 )
 
 const (
@@ -159,7 +159,7 @@ func runInteractive() {
 			fmt.Println("Goodbye!")
 			return
 		default:
-			fmt.Println("\nInvalid choice. Please try again.\n")
+			fmt.Println("\nInvalid choice. Please try again.")
 		}
 		fmt.Println()
 	}
@@ -234,7 +234,7 @@ func generateTokenInteractive(reader *bufio.Reader) {
 
 	// Build claims
 	now := time.Now()
-	claims := jwt2.MapClaims{
+	claims := jwtv5.MapClaims{
 		"sub": subject,
 		"iat": now.Unix(),
 		"exp": now.Add(expDuration).Unix(),
@@ -246,14 +246,14 @@ func generateTokenInteractive(reader *bufio.Reader) {
 	}
 
 	// Create token
-	var token *jwt2.Token
+	var token *jwtv5.Token
 	switch signingMethod {
 	case "HS256":
-		token = jwt2.NewWithClaims(jwt2.SigningMethodHS256, claims)
+		token = jwtv5.NewWithClaims(jwtv5.SigningMethodHS256, claims)
 	case "HS384":
-		token = jwt2.NewWithClaims(jwt2.SigningMethodHS384, claims)
+		token = jwtv5.NewWithClaims(jwtv5.SigningMethodHS384, claims)
 	case "HS512":
-		token = jwt2.NewWithClaims(jwt2.SigningMethodHS512, claims)
+		token = jwtv5.NewWithClaims(jwtv5.SigningMethodHS512, claims)
 	}
 
 	tokenString, err := token.SignedString([]byte(secret))
@@ -293,8 +293,8 @@ func verifyTokenInteractive(reader *bufio.Reader) {
 	}
 
 	// Parse and validate token
-	token, err := jwt2.Parse(tokenString, func(token *jwt2.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt2.SigningMethodHMAC); !ok {
+	token, err := jwtv5.Parse(tokenString, func(token *jwtv5.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwtv5.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(secret), nil
@@ -311,7 +311,7 @@ func verifyTokenInteractive(reader *bufio.Reader) {
 	}
 
 	// Extract claims
-	claims, ok := token.Claims.(jwt2.MapClaims)
+	claims, ok := token.Claims.(jwtv5.MapClaims)
 	if !ok {
 		fmt.Println("\n❌ Failed to extract claims")
 		return
@@ -392,7 +392,7 @@ func generateToken() {
 
 	// Build claims
 	now := time.Now()
-	claims := jwt2.MapClaims{
+	claims := jwtv5.MapClaims{
 		"sub": *subject,
 		"iat": now.Unix(),
 		"exp": now.Add(expDurationParsed).Unix(),
@@ -404,14 +404,14 @@ func generateToken() {
 	}
 
 	// Create token based on method
-	var token *jwt2.Token
+	var token *jwtv5.Token
 	switch method {
 	case "HS256":
-		token = jwt2.NewWithClaims(jwt2.SigningMethodHS256, claims)
+		token = jwtv5.NewWithClaims(jwtv5.SigningMethodHS256, claims)
 	case "HS384":
-		token = jwt2.NewWithClaims(jwt2.SigningMethodHS384, claims)
+		token = jwtv5.NewWithClaims(jwtv5.SigningMethodHS384, claims)
 	case "HS512":
-		token = jwt2.NewWithClaims(jwt2.SigningMethodHS512, claims)
+		token = jwtv5.NewWithClaims(jwtv5.SigningMethodHS512, claims)
 	}
 
 	tokenString, err := token.SignedString([]byte(*secret))
@@ -444,8 +444,8 @@ func verifyToken() {
 	}
 
 	// Parse and validate token (accept any HMAC method)
-	token, err := jwt2.Parse(*tokenString, func(token *jwt2.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt2.SigningMethodHMAC); !ok {
+	token, err := jwtv5.Parse(*tokenString, func(token *jwtv5.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwtv5.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(*secret), nil
@@ -462,7 +462,7 @@ func verifyToken() {
 	}
 
 	// Extract claims
-	claims, ok := token.Claims.(jwt2.MapClaims)
+	claims, ok := token.Claims.(jwtv5.MapClaims)
 	if !ok {
 		fmt.Println("Error: Failed to extract claims")
 		os.Exit(1)

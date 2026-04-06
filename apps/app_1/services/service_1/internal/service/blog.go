@@ -3,8 +3,6 @@ package service
 import (
 	"context"
 
-	"google.golang.org/protobuf/types/known/wrapperspb"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
@@ -13,13 +11,12 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	app1V1 "cyber-ecosystem/apps/app_1/gen/go/v1"
-	app1ConnectV1 "cyber-ecosystem/apps/app_1/gen/go/v1/app1V1connect"
+	app1V1connect "cyber-ecosystem/apps/app_1/gen/go/v1/app1V1connect"
 	"cyber-ecosystem/apps/app_1/services/service_1/internal/biz"
 )
 
 type BlogService struct {
 	app1V1.UnimplementedBlogServiceServer
-
 	log    *log.Helper
 	blogUC *biz.BlogUC
 }
@@ -37,16 +34,16 @@ func (s *BlogService) RegisterHTTP(srv *http.Server) {
 	app1V1.RegisterBlogServiceHTTPServer(srv, s)
 }
 func (s *BlogService) RegisterConnect(srv *connect.Server) {
-	srv.Register(app1ConnectV1.NewBlogServiceHandler(s, srv.HandlerOptions()...))
+	srv.Register(app1V1connect.NewBlogServiceHandler(s, srv.HandlerOptions()...))
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+// Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *BlogService) CreateBlog(ctx context.Context, in *app1V1.CreateBlogRequest) (*app1V1.CreateBlogResponse, error) {
 	entity := &biz.BlogEntity{
 		Title:       in.Title,
 		Content:     in.Content,
-		PublishedAt: utils.GetPTimeFromPPbTime(in.PublishedAt),
+		PublishedAt: utils.FromTimestamp(in.PublishedAt),
 	}
 	if err := s.blogUC.CreateBlog(ctx, entity); err != nil {
 		return nil, err
@@ -59,7 +56,7 @@ func (s *BlogService) UpdateBlog(ctx context.Context, in *app1V1.UpdateBlogReque
 		ID:          in.Id,
 		Title:       in.Title,
 		Content:     in.Content,
-		PublishedAt: utils.GetPTimeFromPPbTime(in.PublishedAt),
+		PublishedAt: utils.FromTimestamp(in.PublishedAt),
 	}
 	if err := s.blogUC.UpdateBlog(ctx, in.FieldsMask, entity); err != nil {
 		return nil, err
@@ -87,43 +84,34 @@ func (s *BlogService) GetBlog(ctx context.Context, in *app1V1.GetBlogRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	return &app1V1.GetBlogResponse{
-		Id:          entity.ID,
-		CreatedAt:   utils.GetPPbTimeFromPTime(entity.CreatedAt),
-		UpdatedAt:   utils.GetPPbTimeFromPTime(entity.UpdatedAt),
-		Title:       utils.ToPtrWrapper(entity.Title, wrapperspb.String),
-		Content:     utils.ToPtrWrapper(entity.Content, wrapperspb.String),
-		PublishedAt: utils.GetPPbTimeFromPTime(entity.PublishedAt),
-	}, nil
+	return s.blogToProto(entity), nil
 }
 
 func (s *BlogService) QueryBlog(ctx context.Context, in *app1V1.QueryBlogRequest) (*app1V1.QueryBlogResponse, error) {
 	out, err := s.blogUC.QueryBlog(ctx, &biz.BlogQueryIn{
-		PageRequest:  utils.GetOrBuildPage(in.Page),
+		PageRequest:  utils.EnsurePageRequest(in.Page),
 		OrderBy:      utils.ParseOrderBy(in.OrderBy),
 		ID:           in.Id,
 		Title:        in.Title,
-		PublishedAtA: utils.GetPTimeFromPPbTime(in.PublishedAtA),
-		PublishedAtZ: utils.GetPTimeFromPPbTime(in.PublishedAtZ),
+		PublishedAtA: utils.FromTimestamp(in.PublishedAtA),
+		PublishedAtZ: utils.FromTimestamp(in.PublishedAtZ),
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &app1V1.QueryBlogResponse{
 		Page: out.PageResponse,
-		List: func() []*app1V1.GetBlogResponse {
-			result := make([]*app1V1.GetBlogResponse, len(out.List))
-			for i, entity := range out.List {
-				result[i] = &app1V1.GetBlogResponse{
-					Id:          entity.ID,
-					CreatedAt:   utils.GetPPbTimeFromPTime(entity.CreatedAt),
-					UpdatedAt:   utils.GetPPbTimeFromPTime(entity.UpdatedAt),
-					Title:       utils.ToPtrWrapper(entity.Title, wrapperspb.String),
-					Content:     utils.ToPtrWrapper(entity.Content, wrapperspb.String),
-					PublishedAt: utils.GetPPbTimeFromPTime(entity.PublishedAt),
-				}
-			}
-			return result
-		}(),
+		List: utils.SliceMap(out.List, s.blogToProto),
 	}, nil
+}
+
+func (s *BlogService) blogToProto(e *biz.BlogEntity) *app1V1.GetBlogResponse {
+	return &app1V1.GetBlogResponse{
+		Id:          e.ID,
+		CreatedAt:   utils.ToTimestamp(e.CreatedAt),
+		UpdatedAt:   utils.ToTimestamp(e.UpdatedAt),
+		Title:       utils.Wrap(e.Title, utils.StringW),
+		Content:     utils.Wrap(e.Content, utils.StringW),
+		PublishedAt: utils.ToTimestamp(e.PublishedAt),
+	}
 }

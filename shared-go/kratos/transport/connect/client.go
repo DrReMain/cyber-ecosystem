@@ -10,13 +10,14 @@ import (
 	"time"
 
 	connectrpc "connectrpc.com/connect"
+	"golang.org/x/net/http2"
+
 	kerrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/selector"
 	"github.com/go-kratos/kratos/v2/selector/wrr"
 	"github.com/go-kratos/kratos/v2/transport"
-	"golang.org/x/net/http2"
 )
 
 func init() {

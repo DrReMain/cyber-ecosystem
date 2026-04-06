@@ -9,33 +9,33 @@ import (
 )
 
 var (
-	// AutherColumns holds the columns for the "auther" table.
-	AutherColumns = []*schema.Column{
+	// AuthorColumns holds the columns for the "author" table.
+	AuthorColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Comment: "Name", Default: ""},
 	}
-	// AutherTable holds the schema information for the "auther" table.
-	AutherTable = &schema.Table{
-		Name:       "auther",
-		Columns:    AutherColumns,
-		PrimaryKey: []*schema.Column{AutherColumns[0]},
+	// AuthorTable holds the schema information for the "author" table.
+	AuthorTable = &schema.Table{
+		Name:       "author",
+		Columns:    AuthorColumns,
+		PrimaryKey: []*schema.Column{AuthorColumns[0]},
 		Indexes: []*schema.Index{
 			{
 				Name:    "author_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{AutherColumns[1]},
+				Columns: []*schema.Column{AuthorColumns[1]},
 			},
 			{
 				Name:    "author_updated_at",
 				Unique:  false,
-				Columns: []*schema.Column{AutherColumns[2]},
+				Columns: []*schema.Column{AuthorColumns[2]},
 			},
 			{
 				Name:    "author_name",
 				Unique:  false,
-				Columns: []*schema.Column{AutherColumns[3]},
+				Columns: []*schema.Column{AuthorColumns[3]},
 			},
 		},
 	}
@@ -75,8 +75,11 @@ var (
 			},
 			{
 				Name:    "blog_title",
-				Unique:  true,
+				Unique:  false,
 				Columns: []*schema.Column{BlogColumns[4]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
 			},
 			{
 				Name:    "blog_id_published_null",
@@ -108,26 +111,26 @@ var (
 			{
 				Symbol:     "blog_author_author_id",
 				Columns:    []*schema.Column{BlogAuthorColumns[1]},
-				RefColumns: []*schema.Column{AutherColumns[0]},
+				RefColumns: []*schema.Column{AuthorColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		AutherTable,
+		AuthorTable,
 		BlogTable,
 		BlogAuthorTable,
 	}
 )
 
 func init() {
-	AutherTable.Annotation = &entsql.Annotation{
-		Table: "auther",
+	AuthorTable.Annotation = &entsql.Annotation{
+		Table: "author",
 	}
 	BlogTable.Annotation = &entsql.Annotation{
 		Table: "blog",
 	}
 	BlogAuthorTable.ForeignKeys[0].RefTable = BlogTable
-	BlogAuthorTable.ForeignKeys[1].RefTable = AutherTable
+	BlogAuthorTable.ForeignKeys[1].RefTable = AuthorTable
 }

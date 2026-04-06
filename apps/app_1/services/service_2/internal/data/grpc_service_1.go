@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	jwt2 "github.com/golang-jwt/jwt/v5"
+	jwtv5 "github.com/golang-jwt/jwt/v5"
 	"go.opentelemetry.io/otel/metric"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 
@@ -40,9 +40,9 @@ func NewGRPCClientService1(
 	}
 	middlewares = append(middlewares, metadata.Client())
 	middlewares = append(middlewares, jwt.Client(
-		func(token *jwt2.Token) (any, error) { return []byte(ca.Secret), nil },
-		jwt.WithSigningMethod(jwt2.SigningMethodHS256),
-		jwt.WithClaims(func() jwt2.Claims { return &jwt2.MapClaims{} }),
+		func(token *jwtv5.Token) (any, error) { return []byte(ca.Secret), nil },
+		jwt.WithSigningMethod(jwtv5.SigningMethodHS256),
+		jwt.WithClaims(func() jwtv5.Claims { return &jwtv5.MapClaims{} }),
 	))
 	middlewares = append(middlewares, logging.Client(logger))
 

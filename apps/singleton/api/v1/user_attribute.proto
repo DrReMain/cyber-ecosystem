@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.singleton.v1;
+
+import "buf/validate/validate.proto";
+import "desc/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/apps/singleton/gen/go/v1;singletonV1";
+
+// UserAttributeService
+service UserAttributeService {
+  option (desc.service_comment) = "用户属性服务";
+
+  // SetUserAttribute
+  rpc SetUserAttribute(SetUserAttributeRequest) returns (SetUserAttributeResponse) {
+    option (desc.method_comment) = "设置用户属性（upsert）";
+    option (google.api.http) = {
+      put: "/api/v1/user-attribute"
+      body: "*"
+    };
+  }
+  // RemoveUserAttribute
+  rpc RemoveUserAttribute(RemoveUserAttributeRequest) returns (RemoveUserAttributeResponse) {
+    option (desc.method_comment) = "删除用户属性";
+    option (google.api.http) = {delete: "/api/v1/user-attribute/{user_id}/{key}"};
+  }
+  // QueryUserAttributes
+  rpc QueryUserAttributes(QueryUserAttributesRequest) returns (QueryUserAttributesResponse) {
+    option (desc.method_comment) = "查询用户所有属性";
+    option (google.api.http) = {get: "/api/v1/user-attribute/{user_id}"};
+  }
+}
+
+message SetUserAttributeRequest {
+  string user_id = 1 [(buf.validate.field).string.len = 20];
+  string key = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  string value = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message SetUserAttributeResponse {}
+
+message RemoveUserAttributeRequest {
+  string user_id = 1 [(buf.validate.field).string.len = 20];
+  string key = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message RemoveUserAttributeResponse {}
+
+message QueryUserAttributesRequest {
+  string user_id = 1 [(buf.validate.field).string.len = 20];
+}
+
+message QueryUserAttributesResponse {
+  repeated GetUserAttributeResponse list = 1;
+}
+
+message GetUserAttributeResponse {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  string user_id = 4;
+  string key = 5;
+  string value = 6;
+}

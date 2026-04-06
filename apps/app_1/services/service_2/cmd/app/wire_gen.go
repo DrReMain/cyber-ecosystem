@@ -10,7 +10,6 @@ import (
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/biz"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/conf"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/data"
-	"cyber-ecosystem/apps/app_1/services/service_2/internal/i18n"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/server"
 	"cyber-ecosystem/apps/app_1/services/service_2/internal/service"
 	"github.com/go-kratos/kratos/v2"
@@ -23,11 +22,11 @@ import (
 // Injectors from wire.go:
 
 func wireApp(confServer *conf.Server, auth *conf.Auth, confLog *conf.Log, confData *conf.Data, ops *conf.Ops, logger log.Logger, tracerProvider *trace.TracerProvider, meterProvider *metric.MeterProvider, int64Counter metric2.Int64Counter, float64Histogram metric2.Float64Histogram) (*kratos.App, func(), error) {
-	client, err := data.NewEntClient(confData, confLog, logger, meterProvider)
+	cache, err := data.NewCache(confData, confLog, logger)
 	if err != nil {
 		return nil, nil, err
 	}
-	cache, err := data.NewCache(confData, confLog, logger)
+	client, err := data.NewEntClient(confData, confLog, logger, meterProvider)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -39,15 +38,15 @@ func wireApp(confServer *conf.Server, auth *conf.Auth, confLog *conf.Log, confDa
 	if err != nil {
 		return nil, nil, err
 	}
-	dataData, cleanup, err := data.NewData(client, cache, blogServiceClient, app1V1connectBlogServiceClient)
+	store, cleanup, err := data.NewStore(cache, client, blogServiceClient, app1V1connectBlogServiceClient)
 	if err != nil {
 		return nil, nil, err
 	}
-	readingRP := data.NewReadingRP(logger, dataData)
-	readingUC := biz.NewReadingUC(logger, dataData, readingRP)
+	readingRP := data.NewReadingRP(logger, store)
+	readingUC := biz.NewReadingUC(logger, store, readingRP)
 	readingService := service.NewReadingService(logger, readingUC)
 	v := service.NewRegistrarList(readingService)
-	bundle, err := i18n.NewBundle()
+	bundle, err := server.NewI18nBundle()
 	if err != nil {
 		cleanup()
 		return nil, nil, err

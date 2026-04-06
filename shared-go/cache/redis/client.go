@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/go-kratos/kratos/v2/log"
 
 	"cyber-ecosystem/shared-go/cache/redis/otel"
 )

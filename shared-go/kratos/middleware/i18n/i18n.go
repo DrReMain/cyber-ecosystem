@@ -10,14 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport"
 )
 
-const defaultHeaderLang = "Accept-Language"
-
-var internalKeyMap = map[string]string{
-	"UNKNOWN":        "ERROR_REASON_UNSPECIFIED",
-	"UNAUTHORIZED":   "ERROR_REASON_UNAUTHORIZED",
-	"RATELIMIT":      "ERROR_REASON_RATELIMIT",
-	"CIRCUITBREAKER": "ERROR_REASON_CIRCUITBREAKER",
-}
+const DefaultHeaderLang = "Accept-Language"
 
 type contextKey struct{}
 
@@ -53,10 +46,12 @@ func LangFromContext(ctx context.Context) string {
 }
 
 func Server(bundle *Bundle, opts ...Option) middleware.Middleware {
-	o := &options{headerLang: defaultHeaderLang}
+	o := &options{headerLang: DefaultHeaderLang}
 	for _, opt := range opts {
 		opt(o)
 	}
+
+	defaultLang := bundle.DefaultLang()
 
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
@@ -64,7 +59,8 @@ func Server(bundle *Bundle, opts ...Option) middleware.Middleware {
 			if err != nil {
 				ke := errors.FromError(err)
 
-				if ke.Metadata != nil && ke.Metadata[MetadataI18nTranslated] == "true" {
+				// Business code provided a custom message, skip translation.
+				if ke.Metadata != nil && ke.Metadata[MetadataI18nMessage] != "" {
 					return reply, err
 				}
 
@@ -75,31 +71,27 @@ func Server(bundle *Bundle, opts ...Option) middleware.Middleware {
 
 				lang := resolveLang(tr, o.headerLang)
 				if lang == "" {
-					return reply, err
+					if defaultLang != "" {
+						lang = defaultLang
+					} else {
+						return reply, err
+					}
 				}
 
-				if ke.Reason == "" {
-					ke = errors.New(500, internalKeyMap["UNKNOWN"], "").WithCause(ke.Unwrap())
-				}
+				translated := bundle.Localize(ke.Reason, ke.Message, ke.Metadata, lang)
 
-				if transKey, ok := internalKeyMap[ke.Reason]; ok {
-					ke = errors.Clone(ke)
-					ke.Reason = transKey
+				// Create a new error to avoid mutating shared/package-level error objects.
+				// Metadata map is shared (not written), so no map copy needed.
+				newErr := errors.New(int(ke.Code), ke.Reason, translated)
+				if ke.Metadata != nil {
+					newErr.Metadata = ke.Metadata
 				}
-
-				if ke.Metadata == nil {
-					ke.Metadata = make(map[string]string)
+				if cause := ke.Unwrap(); cause != nil {
+					_ = newErr.WithCause(cause)
 				}
-
-				if msg := ke.Metadata[MetadataI18nMessage]; msg == "" {
-					ke.Message = bundle.Localize(ke.Reason, ke.Message, ke.Metadata, lang)
-				}
-
-				ke.Metadata[MetadataI18nTranslated] = "true"
-				ke.Metadata[MetadataI18nLocale] = lang
 
 				ctx = context.WithValue(ctx, contextKey{}, lang)
-				return reply, ke
+				return reply, newErr
 			}
 			return reply, err
 		}
