@@ -2,39 +2,15 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "app_1_service_1",
+			"name": "template_base",
 			"type": "go",
 			"request": "launch",
 			"mode": "debug",
-			"program": "${workspaceFolder}/apps/app_1/services/service_1/cmd/app",
-			"cwd": "${workspaceFolder}/apps/app_1",
+			"program": "${workspaceFolder}/apps/template/services/base/cmd/app",
+			"cwd": "${workspaceFolder}/apps/template",
 			"args": [
 				"-conf",
-				"${workspaceFolder}/apps/app_1/services/service_1/configs"
-			]
-		},
-		{
-			"name": "app_1_service_2",
-			"type": "go",
-			"request": "launch",
-			"mode": "debug",
-			"program": "${workspaceFolder}/apps/app_1/services/service_2/cmd/app",
-			"cwd": "${workspaceFolder}/apps/app_1",
-			"args": [
-				"-conf",
-				"${workspaceFolder}/apps/app_1/services/service_2/configs"
-			]
-		},
-		{
-			"name": "singleton_backend",
-			"type": "go",
-			"request": "launch",
-			"mode": "debug",
-			"program": "${workspaceFolder}/apps/singleton/services/backend/cmd/app",
-			"cwd": "${workspaceFolder}/apps/singleton",
-			"args": [
-				"-conf",
-				"${workspaceFolder}/apps/singleton/services/backend/configs"
+				"${workspaceFolder}/apps/template/services/base/configs"
 			]
 		}
 	]

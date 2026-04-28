@@ -4,29 +4,13 @@
 			"path": "."
 		},
 		{
-			"path": "apps/app_1/api",
-			"name": "app_1_api"
+			"path": "apps/template/api",
+			"name": "template_api"
 		},
 		{
-			"path": "apps/app_1/services/service_1",
-			"name": "app_1_service_1"
-		},
-		{
-			"path": "apps/app_1/services/service_2",
-			"name": "app_1_service_2"
-		},
-		{
-			"path": "apps/singleton/api",
-			"name": "singleton_api"
-		},
-		{
-			"path": "apps/singleton/services/backend",
-			"name": "singleton_backend"
-		},
-        {
-            "path": "apps/singleton/clients/admin",
-            "name": "singleton_admin"
-        }
+			"path": "apps/template/services/base",
+			"name": "template_base"
+		}
 	],
 	"settings": {
 		"files.exclude": {
