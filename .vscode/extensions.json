@@ -1,9 +1,11 @@
 {
-    "recommendations": [
-        "nrwl.angular-console",
-        "redhat.vscode-yaml",
-        "bufbuild.buf",
-        "pbkit.vscode-overview",
-        "golang.go"
-    ]
+  "recommendations": [
+    "mihelcic.colored-regions",
+    "nrwl.angular-console",
+    "redhat.vscode-yaml",
+    "bufbuild.buf",
+    "pbkit.vscode-overview",
+    "golang.go",
+    "biomejs.biome"
+  ]
 }

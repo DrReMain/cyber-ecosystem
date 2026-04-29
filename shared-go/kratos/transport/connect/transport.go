@@ -15,6 +15,8 @@ type Transport struct {
 	operation   string
 	reqHeader   transport.Header
 	replyHeader transport.Header
+	httpMethod  string
+	remoteAddr  string
 }
 
 func (tr *Transport) Kind() transport.Kind {
@@ -41,6 +43,14 @@ func (tr *Transport) ReplyHeader() transport.Header {
 		tr.replyHeader = NewHeader(http.Header{})
 	}
 	return tr.replyHeader
+}
+
+func (tr *Transport) HTTPMethod() string {
+	return tr.httpMethod
+}
+
+func (tr *Transport) RemoteAddr() string {
+	return tr.remoteAddr
 }
 
 type Header struct {

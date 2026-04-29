@@ -56,6 +56,20 @@
         "cwd": "{workspaceRoot}",
         "command": "go tool gci write --skip-generated --custom-order -s standard -s default -s 'Prefix(github.com/go-kratos/kratos)' -s 'Prefix(cyber-ecosystem/shared-go,cyber-ecosystem/contracts)' -s 'Prefix(cyber-ecosystem/apps)' ."
       }
+    },
+    "biome:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "biome check ."
+      }
+    },
+    "biome:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "biome check . --write"
+      }
     }
   }
 }

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.template.v1;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/apps/template/gen/go/v1;templateV1";
+
+enum ErrorReason {
+  option (errors.default_code) = 500;
+
+  ERROR_REASON_UNSPECIFIED = 0 [(errors.code) = 500];
+
+  // --- 6xxx: Business Errors ---
+  ERROR_REASON_MESSAGE_INVALID_STATUS_TRANSITION = 6000 [(errors.code) = 400];
+}

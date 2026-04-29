@@ -1,0 +1,29 @@
+{
+  "$schema": "../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "shared_antd",
+  "root": "shared-ts/antd",
+  "projectType": "library",
+  "targets": {
+    "biome:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "bun --bun run lint"
+      }
+    },
+    "biome:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "bun --bun run lint:fix"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "bun --bun run typecheck"
+      }
+    }
+  }
+}

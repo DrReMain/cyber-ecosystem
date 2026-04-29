@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package errors;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/contracts/go/errors;errors";
+
+// Infrastructure errors: database (30xx), cache (31xx), storage (32xx), network (33xx).
+enum InfraError {
+  option (errors.default_code) = 500;
+
+  INFRA_ERROR_UNSPECIFIED = 0 [(errors.code) = 500];
+
+  // --- Database ---
+  INFRA_ERROR_DB_NOT_FOUND    = 3000 [(errors.code) = 404]; // Database record not found
+  INFRA_ERROR_DB_VALIDATION   = 3001 [(errors.code) = 400]; // Database validation error
+  INFRA_ERROR_DB_CONSTRAINT   = 3002 [(errors.code) = 409]; // Database constraint violation
+  INFRA_ERROR_DB_NOT_SINGULAR = 3003 [(errors.code) = 400]; // Expected single record, got multiple or none
+  INFRA_ERROR_DB_NOT_LOADED   = 3004 [(errors.code) = 500]; // Required relation not loaded
+  INFRA_ERROR_DB_INTERNAL     = 3005 [(errors.code) = 500]; // Internal database error
+  INFRA_ERROR_DB_DEADLOCK     = 3006 [(errors.code) = 409]; // Database deadlock detected
+  INFRA_ERROR_DB_CONNECTION   = 3007 [(errors.code) = 503]; // Database connection failed
+
+  // --- Cache ---
+  INFRA_ERROR_CACHE_MISS             = 3100 [(errors.code) = 404]; // Cache key miss
+  INFRA_ERROR_CACHE_KEY_NOT_FOUND    = 3101 [(errors.code) = 404]; // Cache key does not exist
+  INFRA_ERROR_CACHE_SESSION_NOT_FOUND = 3102 [(errors.code) = 404]; // Cache session not found
+  INFRA_ERROR_CACHE_QUOTA_EXCEEDED   = 3103 [(errors.code) = 429]; // Cache quota exceeded
+  INFRA_ERROR_CACHE_INVALID_ARGUMENT = 3104 [(errors.code) = 400]; // Invalid cache argument
+  INFRA_ERROR_CACHE_UNAVAILABLE      = 3105 [(errors.code) = 503]; // Cache service unavailable
+
+  // --- Storage ---
+  INFRA_ERROR_STORAGE_NOT_FOUND   = 3200 [(errors.code) = 404]; // Storage object not found
+  INFRA_ERROR_STORAGE_FORBIDDEN   = 3201 [(errors.code) = 403]; // Storage access denied
+  INFRA_ERROR_STORAGE_SIZE_EXCEED = 3202 [(errors.code) = 413]; // Storage size limit exceeded
+  INFRA_ERROR_STORAGE_UNAVAILABLE = 3203 [(errors.code) = 503]; // Storage service unavailable
+
+  // --- Network (outgoing) ---
+  INFRA_ERROR_NETWORK_TIMEOUT    = 3300 [(errors.code) = 504]; // Outgoing request timed out
+  INFRA_ERROR_NETWORK_CONNECTION = 3301 [(errors.code) = 503]; // Outgoing connection failed
+  INFRA_ERROR_NETWORK_DNS        = 3302 [(errors.code) = 503]; // DNS resolution failed
+  INFRA_ERROR_NETWORK_TLS        = 3303 [(errors.code) = 503]; // TLS handshake failed
+}

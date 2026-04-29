@@ -1,0 +1,7 @@
+# Proto files for i18n key generation.
+# Order determines key order in output: contracts (general) first, app (business) last.
+../../../../../../contracts/errors/codes_general.proto
+../../../../../../contracts/errors/codes_infra.proto
+../../../../../../contracts/errors/codes_flow.proto
+../../../../../../contracts/errors/codes_auth.proto
+../../../../api/v1/error_reason.proto

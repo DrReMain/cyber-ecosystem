@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package errors;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/contracts/go/errors;errors";
+
+// General errors: client errors (1xxx) and server errors (2xxx).
+enum GeneralError {
+  option (errors.default_code) = 500;
+
+  GENERAL_ERROR_UNSPECIFIED = 0 [(errors.code) = 500];
+
+  // --- 1xxx: Client Errors ---
+  GENERAL_ERROR_INVALID_ARGUMENT    = 1000 [(errors.code) = 400]; // Invalid or malformed request argument
+  GENERAL_ERROR_VALIDATION_FAILED   = 1001 [(errors.code) = 400]; // Request validation failed
+  GENERAL_ERROR_NOT_FOUND           = 1002 [(errors.code) = 404]; // Requested resource not found
+  GENERAL_ERROR_ALREADY_EXISTS      = 1003 [(errors.code) = 409]; // Resource already exists
+  GENERAL_ERROR_PERMISSION_DENIED   = 1004 [(errors.code) = 403]; // Insufficient permissions
+  GENERAL_ERROR_UNAUTHENTICATED     = 1005 [(errors.code) = 401]; // Authentication required
+  GENERAL_ERROR_PRECONDITION_FAILED = 1006 [(errors.code) = 412]; // Precondition check failed
+  GENERAL_ERROR_PAYLOAD_TOO_LARGE   = 1007 [(errors.code) = 413]; // Request payload exceeds size limit
+  GENERAL_ERROR_METHOD_NOT_ALLOWED          = 1008 [(errors.code) = 405]; // HTTP method not allowed
+  GENERAL_ERROR_PAGINATION_INVALID_ARGUMENT  = 1009 [(errors.code) = 400]; // Invalid pagination parameters
+
+  // --- 2xxx: Server Errors ---
+  GENERAL_ERROR_INTERNAL            = 2000 [(errors.code) = 500]; // Internal server error
+  GENERAL_ERROR_NOT_IMPLEMENTED     = 2001 [(errors.code) = 501]; // Feature not implemented
+  GENERAL_ERROR_UNAVAILABLE         = 2002 [(errors.code) = 503]; // Service temporarily unavailable
+  GENERAL_ERROR_TIMEOUT             = 2003 [(errors.code) = 504]; // Request timed out
+  GENERAL_ERROR_RESOURCE_EXHAUSTED  = 2004 [(errors.code) = 429]; // Resource quota exhausted
+}

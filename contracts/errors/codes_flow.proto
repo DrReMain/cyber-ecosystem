@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package errors;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/contracts/go/errors;errors";
+
+// Flow control errors: rate limiting, circuit breaker, quotas (4xxx).
+enum FlowError {
+  option (errors.default_code) = 429;
+
+  FLOW_ERROR_UNSPECIFIED = 0 [(errors.code) = 500];
+
+  FLOW_ERROR_RATE_LIMITED     = 4000 [(errors.code) = 429]; // Request rate limited
+  FLOW_ERROR_CIRCUIT_BREAKER  = 4001 [(errors.code) = 503]; // Circuit breaker open
+  FLOW_ERROR_QUOTA_EXCEEDED   = 4002 [(errors.code) = 429]; // Resource quota exceeded
+  FLOW_ERROR_CONCURRENT_LIMIT = 4003 [(errors.code) = 429]; // Concurrent request limit reached
+}

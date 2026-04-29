@@ -1,0 +1,41 @@
+{
+  "name": "@shared/antd",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./skins": "./src/skins/index.ts",
+    "./skins/ssr": "./src/skins/ssr.ts",
+    "./filter": "./src/filter/index.ts",
+    "./table": "./src/table/index.ts",
+    "./use-search": "./src/use-search/index.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "lint:fix": "biome check . --write",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "antd": "^6",
+    "antd-style": "^4",
+    "dayjs": "^1",
+    "lucide-react": "^1",
+    "react": "^19",
+    "react-dom": "^19",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "antd": "^6",
+    "antd-style": "^4",
+    "dayjs": "^1",
+    "lucide-react": "^1",
+    "react": "^19",
+    "react-dom": "^19",
+    "zod": "^4",
+    "typescript": "^6"
+  }
+}

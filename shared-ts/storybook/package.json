@@ -1,0 +1,33 @@
+{
+  "name": "@shared/storybook",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --write",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@shared/antd": "workspace:*"
+  },
+  "devDependencies": {
+    "@ant-design/cssinjs": "^2",
+    "@ant-design/icons": "^6",
+    "@storybook/addon-a11y": "^10",
+    "@storybook/react": "^10",
+    "@storybook/react-vite": "^10",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dayjs": "^1",
+    "storybook": "^10",
+    "antd": "^6",
+    "antd-style": "^4",
+    "react": "^19",
+    "react-dom": "^19",
+    "typescript": "^6",
+    "@storybook/addon-docs": "^10"
+  }
+}

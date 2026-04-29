@@ -18,7 +18,7 @@ func newRateLimiter(m *Memory) *rateLimiter {
 func (r *rateLimiter) Allow(ctx context.Context, key string, quota int64, window time.Duration) (bool, error) {
 	opStart := time.Now()
 	if err := cache.ValidateRateLimit(key, quota, window); err != nil {
-		r.m.logOperation(ctx, "allow", "key", key, "quota", quota, "window", window, "duration", time.Since(opStart), "error", err)
+		r.m.logOperation(ctx, "allow", "key", key, "quota", quota, "window", window, "latency", time.Since(opStart), "error", err)
 		return false, err
 	}
 
@@ -66,7 +66,7 @@ func (r *rateLimiter) Allow(ctx context.Context, key string, quota int64, window
 		return nil
 	})
 
-	r.m.logOperation(ctx, "allow", "key", key, "quota", quota, "window", window, "allowed", allowed, "duration", time.Since(opStart), "error", err)
+	r.m.logOperation(ctx, "allow", "key", key, "quota", quota, "window", window, "allowed", allowed, "latency", time.Since(opStart), "error", err)
 	return allowed, err
 }
 

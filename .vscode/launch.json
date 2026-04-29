@@ -1,17 +1,27 @@
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "template_base",
-			"type": "go",
-			"request": "launch",
-			"mode": "debug",
-			"program": "${workspaceFolder}/apps/template/services/base/cmd/app",
-			"cwd": "${workspaceFolder}/apps/template",
-			"args": [
-				"-conf",
-				"${workspaceFolder}/apps/template/services/base/configs"
-			]
-		}
-	]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "template_base",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/apps/template/services/base/cmd/app",
+      "cwd": "${workspaceFolder}/apps/template",
+      "args": [
+        "-conf",
+        "${workspaceFolder}/apps/template/services/base/configs"
+      ]
+    },
+    {
+      "name": "template_client_admin",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:10000",
+      "webRoot": "${workspaceFolder}/apps/template/clients/admin",
+      "sourceMaps": true,
+      "preLaunchTask": "template_client_admin:dev",
+      "runtimeArgs": ["--auto-open-devtools-for-tabs"]
+    }
+  ]
 }

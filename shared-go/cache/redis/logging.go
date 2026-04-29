@@ -10,6 +10,8 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/go-kratos/kratos/v2/log"
+
+	"cyber-ecosystem/shared-go/cache"
 )
 
 // ClientWrapper wraps a redis client to add logging support.
@@ -26,7 +28,7 @@ func NewKratosClientWrapper(client *redis.Client, logger log.Logger, level strin
 	return &ClientWrapper{
 		client:        client,
 		logger:        logger,
-		level:         parseLogLevel(level),
+		level:         cache.ParseLogLevel(level),
 		slowQuery:     slowQuery,
 		slowThreshold: slowThreshold,
 	}
@@ -60,6 +62,11 @@ func (h *ClientWrapper) ProcessPipelineHook(next redis.ProcessPipelineHook) redi
 }
 
 func (h *ClientWrapper) logCommand(ctx context.Context, cmd redis.Cmder, duration time.Duration, err error) {
+	// Suppress go-redis client capability probes — not business operations
+	if isExpectedRedisClientError(err) {
+		return
+	}
+
 	logger := log.WithContext(ctx, h.logger)
 
 	fields := []any{
@@ -74,17 +81,14 @@ func (h *ClientWrapper) logCommand(ctx context.Context, cmd redis.Cmder, duratio
 		if errors.Is(err, redis.Nil) {
 			fields = append(fields, "expected_error", true)
 		}
-		if isExpectedRedisClientError(err) {
-			fields = append(fields, "expected_error", true)
-		}
 	} else if h.slowQuery && duration > h.slowThreshold {
 		fields = append(fields, "slow_query", true, "threshold", h.slowThreshold.String())
 	}
 
-	fields = append(fields, "duration", duration.String())
+	fields = append(fields, "latency", duration.Seconds())
 
 	if err != nil {
-		if errors.Is(err, redis.Nil) || isExpectedRedisClientError(err) {
+		if errors.Is(err, redis.Nil) {
 			_ = logger.Log(h.level, fields...)
 			return
 		}
@@ -102,19 +106,4 @@ func isExpectedRedisClientError(err error) bool {
 	}
 	// go-redis may probe client capabilities with optional subcommands.
 	return strings.Contains(err.Error(), "unknown subcommand 'maint_notifications'")
-}
-
-func parseLogLevel(s string) log.Level {
-	switch s {
-	case "debug":
-		return log.LevelDebug
-	case "info":
-		return log.LevelInfo
-	case "warn":
-		return log.LevelWarn
-	case "error":
-		return log.LevelError
-	default:
-		return log.LevelInfo
-	}
 }

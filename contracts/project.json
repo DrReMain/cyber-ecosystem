@@ -7,9 +7,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "commands": [
-          "buf generate --template buf.gen.yaml --path common"
-        ],
+        "commands": ["buf generate --template buf.gen.yaml --path common"],
         "parallel": true
       }
     },
@@ -17,9 +15,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "commands": [
-          "buf generate --template buf.gen.yaml --path auth"
-        ],
+        "commands": ["buf generate --template buf.gen.yaml --path auth"],
         "parallel": true
       }
     },
@@ -27,15 +23,21 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "commands": [
-          "buf generate --template buf.gen.yaml --path desc"
-        ],
+        "commands": ["buf generate --template buf.gen.yaml --path desc"],
+        "parallel": true
+      }
+    },
+    "proto:errors": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": ["buf generate --template buf.gen.yaml --path errors --exclude-path errors/errors.proto"],
         "parallel": true
       }
     },
     "proto": {
       "executor": "nx:run-commands",
-      "dependsOn": ["proto:common", "proto:auth", "proto:desc"],
+      "dependsOn": ["proto:common", "proto:auth", "proto:desc", "proto:errors"],
       "options": {
         "command": "echo 'proto generation completed'"
       }

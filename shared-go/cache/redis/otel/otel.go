@@ -100,21 +100,6 @@ func (h *TracingHook) ProcessPipelineHook(next redis.ProcessPipelineHook) redis.
 	}
 }
 
-// TraceOperation implements cache.Tracer (no-op for redis hook pattern)
-func (h *TracingHook) TraceOperation(ctx context.Context, operation string, fn func(context.Context) error) error {
-	return fn(ctx)
-}
-
-// TraceOperationWithArgs implements cache.Tracer (no-op for redis hook pattern)
-func (h *TracingHook) TraceOperationWithArgs(ctx context.Context, operation string, args *cache.OperationArgs, fn func(context.Context) error) error {
-	return fn(ctx)
-}
-
-// TracePipeline implements cache.Tracer (no-op for redis hook pattern)
-func (h *TracingHook) TracePipeline(ctx context.Context, operations []string, fn func(context.Context) error) error {
-	return fn(ctx)
-}
-
 func estimateRedisKeyCount(op string, args []interface{}) int {
 	argc := len(args)
 	if argc <= 1 {

@@ -1,6 +1,7 @@
 package zap
 
 import (
+	"fmt"
 	"os"
 
 	"go.uber.org/zap"
@@ -14,7 +15,7 @@ type Config struct {
 	Level   string
 	Console *ConsoleConfig
 	File    *FileConfig
-	Loki    *LokiConfig
+	OtlpLog *OtlpLogConfig
 }
 
 type ConsoleConfig struct {
@@ -30,14 +31,6 @@ type FileConfig struct {
 	MaxBackups int
 	MaxAge     int // days
 	Compress   bool
-}
-
-type LokiConfig struct {
-	Enabled   bool
-	URL       string
-	Labels    map[string]string
-	BatchWait int64 // milliseconds
-	BatchSize int   // bytes
 }
 
 func NewLoggerFromConfig(cfg *Config) (log.Logger, func(), error) {
@@ -63,8 +56,11 @@ func NewLoggerFromConfig(cfg *Config) (log.Logger, func(), error) {
 		}
 	}
 
-	if cfg.Loki != nil && cfg.Loki.Enabled {
-		core, closer := buildLokiCore(cfg.Loki, level)
+	if cfg.OtlpLog != nil && cfg.OtlpLog.Enabled {
+		core, closer, err := buildOtlpLogCore(cfg.OtlpLog, level)
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to create OTLP log core: %w", err)
+		}
 		cores = append(cores, core)
 		if closer != nil {
 			closers = append(closers, closer)
@@ -127,10 +123,13 @@ func buildFileCore(cfg *FileConfig, level zapcore.Level) (zapcore.Core, func()) 
 	return zapcore.NewCore(encoder, zapcore.AddSync(writer), level), func() { writer.Close() }
 }
 
-func buildLokiCore(cfg *LokiConfig, level zapcore.Level) (zapcore.Core, func()) {
-	writer := NewLokiWriter(cfg)
+func buildOtlpLogCore(cfg *OtlpLogConfig, level zapcore.Level) (zapcore.Core, func(), error) {
+	writer, err := NewOtlpLogWriter(cfg)
+	if err != nil {
+		return nil, nil, fmt.Errorf("create OTLP log writer: %w", err)
+	}
 	encoder := buildJSONEncoder()
-	return zapcore.NewCore(encoder, zapcore.AddSync(writer), level), func() { writer.Close() }
+	return zapcore.NewCore(encoder, zapcore.AddSync(writer), level), func() { writer.Close() }, nil
 }
 
 func buildConsoleEncoder(color bool) zapcore.Encoder {

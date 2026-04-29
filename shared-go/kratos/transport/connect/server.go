@@ -316,6 +316,8 @@ func (i *kratosInterceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc 
 			operation:   req.Spec().Procedure,
 			reqHeader:   NewHeader(req.Header()),
 			replyHeader: NewHeader(http.Header{}),
+			httpMethod:  "POST",
+			remoteAddr:  req.Peer().Addr,
 		}
 		ctx = transport.NewServerContext(ctx, tr)
 
@@ -372,6 +374,8 @@ func (i *kratosInterceptor) WrapStreamingHandler(next connect.StreamingHandlerFu
 			operation:   conn.Spec().Procedure,
 			reqHeader:   NewHeader(conn.RequestHeader()),
 			replyHeader: NewHeader(http.Header{}),
+			httpMethod:  "POST",
+			remoteAddr:  conn.Peer().Addr,
 		}
 		ctx = transport.NewServerContext(ctx, tr)
 

@@ -1,0 +1,75 @@
+{
+  "$schema": "../../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "template_base",
+  "root": "apps/template/services/base",
+  "projectType": "application",
+  "implicitDependencies": ["template_api", "shared-go"],
+  "targets": {
+    "proto:conf": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/apps",
+        "command": "buf generate --template template/services/base/buf.gen.conf.yaml --path template/services/base/internal/conf"
+      }
+    },
+    "generate:i18n": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["template_api:proto:api"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go generate ./internal/i18n/..."
+      }
+    },
+    "generate:ent": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go generate ./internal/ent/..."
+      }
+    },
+    "generate:wire": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go run -mod=mod github.com/google/wire/cmd/wire ./cmd/app"
+      }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "template_api:proto:api",
+        "proto:conf",
+        "generate:i18n",
+        "generate:ent",
+        "generate:wire"
+      ],
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": ["go mod tidy"],
+        "parallel": false
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "kratos run"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/bin"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go build -ldflags \"-X main.Version=$(git describe --tags --always)\" -o ./bin/ ./..."
+      }
+    },
+    "ent:new": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go run -mod=mod entgo.io/ent/cmd/ent new --target=internal/ent/schema {args.Entity}"
+      }
+    }
+  }
+}

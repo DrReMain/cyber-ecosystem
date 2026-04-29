@@ -1,6 +1,0 @@
-- targets: ["host.docker.internal:14000"]
-  labels:
-    app: "app_1"
-    service: "service_1"
-    env: "development"
-    component: "ops"

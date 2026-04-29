@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package errors;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/contracts/go/errors;errors";
+
+// Authentication & authorization errors: token, session, MFA, account status (5xxx).
+enum AuthError {
+  option (errors.default_code) = 401;
+
+  AUTH_ERROR_UNSPECIFIED = 0 [(errors.code) = 500];
+
+  AUTH_ERROR_TOKEN_EXPIRED     = 5000 [(errors.code) = 401]; // Token has expired
+  AUTH_ERROR_TOKEN_INVALID     = 5001 [(errors.code) = 401]; // Token is invalid
+  AUTH_ERROR_TOKEN_MISSING     = 5002 [(errors.code) = 401]; // Token not provided
+  AUTH_ERROR_TOKEN_REVOKED     = 5003 [(errors.code) = 401]; // Token has been revoked
+  AUTH_ERROR_PERMISSION_DENIED = 5004 [(errors.code) = 403]; // Insufficient permissions
+  AUTH_ERROR_ACCOUNT_DISABLED  = 5005 [(errors.code) = 403]; // Account is disabled
+  AUTH_ERROR_ACCOUNT_LOCKED    = 5006 [(errors.code) = 403]; // Account is locked
+  AUTH_ERROR_MFA_REQUIRED      = 5007 [(errors.code) = 403]; // Multi-factor authentication required
+  AUTH_ERROR_SESSION_EXPIRED   = 5008 [(errors.code) = 401]; // Session has expired
+}

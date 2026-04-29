@@ -38,7 +38,7 @@ services:
 
   # ==================== Redis ====================
   redis:
-    image: redis:8
+    image: redis:8.6-alpine
     container_name: cyber-ecosystem-redis
     restart: unless-stopped
     command: >
@@ -64,124 +64,340 @@ services:
     networks:
       - cyber-ecosystem-network
 
-  # ==================== Jaeger ====================
-  jaeger:
-    image: jaegertracing/all-in-one:1.76.0
-    container_name: cyber-ecosystem-jaeger
-    restart: unless-stopped
+  # ==================== SigNoz ====================
+  # --- Zookeeper ---
+  signoz-zookeeper:
+    image: signoz/zookeeper:3.7.1
+    container_name: signoz-zookeeper-1
+    hostname: zookeeper-1
+    user: root
+    restart: on-failure
+    volumes:
+      - signoz_zookeeper_data:/bitnami/zookeeper
     environment:
-      # Collector
-      COLLECTOR_ZIPKIN_HOST_PORT: :9411
-      COLLECTOR_OTLP_ENABLED: "true"
-      COLLECTOR_OTLP_HTTP_PROTOBUF_ENABLED: "true"
-      # prod -> Elasticsearch or Cassandra
-      SPAN_STORAGE_TYPE: memory
-      LOG_LEVEL: info
-    ports:
-      # UI
-      - "16686:16686"
-      # Collector - HTTP
-      - "14268:14268"
-      # Collector - gRPC
-      - "14250:14250"
-      # OTLP gRPC
-      - "4317:4317"
-      # OTLP HTTP
-      - "4318:4318"
-      # Zipkin compatibility port
-      - "9411:9411"
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:16686/"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - cyber-ecosystem-network
-
-  # ==================== Prometheus ====================
-  prometheus:
-    image: prom/prometheus:v3.10.0
-    container_name: cyber-ecosystem-prometheus
-    restart: unless-stopped
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=15d"
-      - "--web.enable-lifecycle"
-      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
-      - "--web.console.templates=/usr/share/prometheus/consoles"
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./prometheus/apps:/etc/prometheus/apps:ro
-      - prometheus_data:/prometheus
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - cyber-ecosystem-network
-
-  # ==================== Loki ====================
-  loki:
-    image: grafana/loki:3.7
-    container_name: cyber-ecosystem-loki
-    restart: unless-stopped
-    command: -config.file=/etc/loki/local-config.yaml
-    ports:
-      - "3100:3100"
-    volumes:
-      - loki_data:/loki
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3100/ready || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - cyber-ecosystem-network
-
-  # ==================== Grafana ====================
-  grafana:
-    image: grafana/grafana:12.4.2
-    container_name: cyber-ecosystem-grafana
-    restart: unless-stopped
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
-      GF_USERS_ALLOW_SIGN_UP: "false"
-      GF_SERVER_ROOT_URL: "http://localhost:3000"
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ZOO_SERVER_ID=1
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_AUTOPURGE_INTERVAL=1
+      - ZOO_ENABLE_PROMETHEUS_METRICS=yes
+      - ZOO_PROMETHEUS_METRICS_PORT_NUMBER=9141
     healthcheck:
       test:
-        ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
-      interval: 10s
+        - CMD-SHELL
+        - curl -s -m 2 http://localhost:8080/commands/ruok | grep error | grep null
+      interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 3
+    networks:
+      - cyber-ecosystem-network
+
+  # --- Init ClickHouse (downloads histogramQuantile) ---
+  signoz-init-clickhouse:
+    image: clickhouse/clickhouse-server:25.5.6
+    container_name: signoz-init-clickhouse
+    command:
+      - bash
+      - -c
+      - |
+        version="v0.0.1"
+        node_os=$$(uname -s | tr '[:upper:]' '[:lower:]')
+        node_arch=$$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/)
+        echo "Fetching histogram-binary for $${node_os}/$${node_arch}"
+        cd /tmp
+        wget -O histogram-quantile.tar.gz "https://github.com/SigNoz/signoz/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
+        tar -xvzf histogram-quantile.tar.gz
+        mv histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile
+    volumes:
+      - ./signoz/user_scripts:/var/lib/clickhouse/user_scripts/
+    networks:
+      - cyber-ecosystem-network
+
+  # --- ClickHouse ---
+  signoz-clickhouse:
+    image: clickhouse/clickhouse-server:25.5.6
+    container_name: signoz-clickhouse
+    hostname: clickhouse
+    restart: on-failure
     depends_on:
-      - prometheus
-      - loki
+      signoz-init-clickhouse:
+        condition: service_completed_successfully
+      signoz-zookeeper:
+        condition: service_healthy
+    logging:
+      options:
+        max-size: 50m
+        max-file: "3"
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+      - "9181:9181"
+    volumes:
+      - ./signoz/clickhouse-config.xml:/etc/clickhouse-server/config.xml
+      - ./signoz/clickhouse-users.xml:/etc/clickhouse-server/users.xml
+      - ./signoz/custom-function.xml:/etc/clickhouse-server/custom-function.xml
+      - ./signoz/clickhouse-cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
+      - signoz_clickhouse_data:/var/lib/clickhouse/
+      - ./signoz/user_scripts:/var/lib/clickhouse/user_scripts/
+    environment:
+      - CLICKHOUSE_SKIP_USER_SETUP=1
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "0.0.0.0:8123/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - cyber-ecosystem-network
+
+  # --- TelemetryStore Migrator (one-shot) ---
+  signoz-telemetrystore-migrator:
+    image: signoz/signoz-otel-collector:v0.144.4
+    container_name: signoz-telemetrystore-migrator
+    depends_on:
+      signoz-clickhouse:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+    command:
+      - -c
+      - |
+        /signoz-otel-collector migrate bootstrap &&
+        /signoz-otel-collector migrate sync up &&
+        /signoz-otel-collector migrate async up
+    restart: on-failure
+    environment:
+      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
+      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - SIGNOZ_OTEL_COLLECTOR_TIMEOUT=10m
+    networks:
+      - cyber-ecosystem-network
+
+  # --- SigNoz (unified: query-service + frontend + alertmanager) ---
+  signoz:
+    image: signoz/signoz:v0.123.0
+    container_name: signoz
+    restart: on-failure
+    depends_on:
+      signoz-clickhouse:
+        condition: service_healthy
+      signoz-telemetrystore-migrator:
+        condition: service_completed_successfully
+    ports:
+      - "8080:8080"
+    volumes:
+      - signoz_data:/var/lib/signoz/
+    environment:
+      - SIGNOZ_ALERTMANAGER_PROVIDER=signoz
+      - SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - SIGNOZ_SQLSTORE_SQLITE_PATH=/var/lib/signoz/signoz.db
+      - SIGNOZ_TOKENIZER_JWT_SECRET=secret
+      - SIGNOZ_USER_ROOT_ENABLED=true
+      - SIGNOZ_USER_ROOT_EMAIL=admin@cyber-ecosystem.com
+      - SIGNOZ_USER_ROOT_PASSWORD=Cyber-Ecosystem123
+      - SIGNOZ_USER_ROOT_ORG_NAME=default
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --spider
+        - -q
+        - localhost:8080/api/v1/health
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - cyber-ecosystem-network
+
+  # --- OTel Collector ---
+  signoz-otel-collector:
+    image: signoz/signoz-otel-collector:v0.144.4
+    container_name: signoz-otel-collector
+    entrypoint:
+      - /bin/sh
+    command:
+      - -c
+      - |
+        /signoz-otel-collector migrate sync check &&
+        /signoz-otel-collector --config=/etc/otel-collector-config.yaml --copy-path=/var/tmp/collector-config.yaml
+    user: root
+    volumes:
+      - ./signoz/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /:/hostfs:ro
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=host.name=signoz-host,os.type=linux
+      - LOW_CARDINAL_EXCEPTION_GROUPING=false
+      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
+      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - SIGNOZ_OTEL_COLLECTOR_TIMEOUT=10m
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    restart: on-failure
+    depends_on:
+      signoz-clickhouse:
+        condition: service_healthy
+      signoz-telemetrystore-migrator:
+        condition: service_completed_successfully
+    networks:
+      - cyber-ecosystem-network
+
+  # ==================== GlitchTip ====================
+  # --- Init: create database if not exists ---
+  glitchtip-init:
+    image: postgres:18.3-trixie
+    container_name: glitchtip-init
+    restart: "no"
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "Waiting for postgres..."
+        until pg_isready -h postgres -U postgres; do sleep 1; done
+        echo "Checking if glitchtip database exists..."
+        if ! psql -h postgres -U postgres -lqt | cut -d \| -f 1 | grep -qw glitchtip; then
+          echo "Creating glitchtip database..."
+          psql -h postgres -U postgres -c "CREATE DATABASE glitchtip;"
+          echo "Database created."
+        else
+          echo "Database glitchtip already exists."
+        fi
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cyber-ecosystem-network
+
+  # --- Migrate: run Django migrations ---
+  glitchtip-migrate:
+    image: glitchtip/glitchtip:v6.0.3
+    container_name: glitchtip-migrate
+    restart: "no"
+    command: ./bin/run-migrate.sh
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/glitchtip
+      - REDIS_URL=redis://redis:6379/15
+      - SECRET_KEY=glitchtip-dev-secret-key-change-in-production
+      - GLITCHTIP_DOMAIN=http://localhost:8000
+    depends_on:
+      glitchtip-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - glitchtip_uploads:/code/uploads
+    networks:
+      - cyber-ecosystem-network
+
+  # --- Create superuser ---
+  glitchtip-createsuperuser:
+    image: glitchtip/glitchtip:v6.0.3
+    container_name: glitchtip-createsuperuser
+    restart: "no"
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        python manage.py createsuperuser --noinput || echo "Superuser already exists, skipping."
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/glitchtip
+      - REDIS_URL=redis://redis:6379/15
+      - SECRET_KEY=glitchtip-dev-secret-key-change-in-production
+      - GLITCHTIP_DOMAIN=http://localhost:8000
+      - DJANGO_SUPERUSER_EMAIL=admin@cyber-ecosystem.com
+      - DJANGO_SUPERUSER_PASSWORD=Cyber-Ecosystem123
+    depends_on:
+      glitchtip-migrate:
+        condition: service_completed_successfully
+    networks:
+      - cyber-ecosystem-network
+
+  # --- GlitchTip Web ---
+  glitchtip:
+    image: glitchtip/glitchtip:v6.0.3
+    container_name: glitchtip
+    restart: unless-stopped
+    depends_on:
+      glitchtip-init:
+        condition: service_completed_successfully
+      glitchtip-migrate:
+        condition: service_completed_successfully
+      glitchtip-createsuperuser:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/glitchtip
+      - REDIS_URL=redis://redis:6379/15
+      - SECRET_KEY=glitchtip-dev-secret-key-change-in-production
+      - GLITCHTIP_DOMAIN=http://localhost:8000
+      - PORT=8000
+      - TRUSTED_PROXIES=*
+    volumes:
+      - glitchtip_uploads:/code/uploads
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - cyber-ecosystem-network
+
+  # --- GlitchTip Worker ---
+  glitchtip-worker:
+    image: glitchtip/glitchtip:v6.0.3
+    container_name: glitchtip-worker
+    restart: unless-stopped
+    command: ./bin/run-worker.sh
+    depends_on:
+      glitchtip-init:
+        condition: service_completed_successfully
+      glitchtip-migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/glitchtip
+      - REDIS_URL=redis://redis:6379/15
+      - SECRET_KEY=glitchtip-dev-secret-key-change-in-production
+      - GLITCHTIP_DOMAIN=http://localhost:8000
+      - TRUSTED_PROXIES=*
+    volumes:
+      - glitchtip_uploads:/code/uploads
     networks:
       - cyber-ecosystem-network
 
   # ==================== MinIO ====================
   minio:
-    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
     container_name: cyber-ecosystem-minio
     restart: unless-stopped
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin123
+      MINIO_ROOT_USER: admin@cyber-ecosystem.com
+      MINIO_ROOT_PASSWORD: Cyber-Ecosystem123
     ports:
-      # API port
-      - "9000:9000"
-      # Console port
-      - "9001:9001"
+      - "19000:9000"
+      - "19001:9001"
     volumes:
       - minio_data:/data
       - ./minio-entrypoint.sh:/minio-entrypoint.sh:ro
@@ -204,11 +420,13 @@ volumes:
     name: cyber-ecosystem-postgres-data
   redis_data:
     name: cyber-ecosystem-redis-data
-  prometheus_data:
-    name: cyber-ecosystem-prometheus-data
-  grafana_data:
-    name: cyber-ecosystem-grafana-data
-  loki_data:
-    name: cyber-ecosystem-loki-data
   minio_data:
     name: cyber-ecosystem-minio-data
+  signoz_zookeeper_data:
+    name: cyber-ecosystem-signoz-zookeeper-data
+  signoz_clickhouse_data:
+    name: cyber-ecosystem-signoz-clickhouse-data
+  signoz_data:
+    name: cyber-ecosystem-signoz-data
+  glitchtip_uploads:
+    name: cyber-ecosystem-glitchtip-uploads

@@ -28,11 +28,11 @@ func (s *session) sessionKey(sessionID, key string) string {
 func (s *session) Get(ctx context.Context, sessionID, key string) ([]byte, error) {
 	opStart := time.Now()
 	if err := cache.ValidateSessionID(sessionID); err != nil {
-		s.m.logOperation(ctx, "get", "sessionID", sessionID, "key", key, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "get", "sessionID", sessionID, "key", key, "latency", time.Since(opStart), "error", err)
 		return nil, err
 	}
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "get", "sessionID", sessionID, "key", key, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "get", "sessionID", sessionID, "key", key, "latency", time.Since(opStart), "error", err)
 		return nil, err
 	}
 
@@ -54,18 +54,18 @@ func (s *session) Get(ctx context.Context, sessionID, key string) ([]byte, error
 		return nil
 	})
 
-	s.m.logOperation(ctx, "get", "sessionID", sessionID, "key", key, "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "get", "sessionID", sessionID, "key", key, "latency", time.Since(opStart), "error", err)
 	return result, err
 }
 
 func (s *session) Set(ctx context.Context, sessionID, key string, val []byte, ttl time.Duration) error {
 	opStart := time.Now()
 	if err := cache.ValidateSessionID(sessionID); err != nil {
-		s.m.logOperation(ctx, "set", "sessionID", sessionID, "key", key, "ttl", ttl, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "set", "sessionID", sessionID, "key", key, "ttl", ttl, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "set", "sessionID", sessionID, "key", key, "ttl", ttl, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "set", "sessionID", sessionID, "key", key, "ttl", ttl, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -86,18 +86,18 @@ func (s *session) Set(ctx context.Context, sessionID, key string, val []byte, tt
 		return nil
 	})
 
-	s.m.logOperation(ctx, "set", "sessionID", sessionID, "key", key, "ttl", ttl, "duration", time.Since(opStart))
+	s.m.logOperation(ctx, "set", "sessionID", sessionID, "key", key, "ttl", ttl, "latency", time.Since(opStart))
 	return err
 }
 
 func (s *session) Delete(ctx context.Context, sessionID, key string) error {
 	opStart := time.Now()
 	if err := cache.ValidateSessionID(sessionID); err != nil {
-		s.m.logOperation(ctx, "del", "sessionID", sessionID, "key", key, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "del", "sessionID", sessionID, "key", key, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "del", "sessionID", sessionID, "key", key, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "del", "sessionID", sessionID, "key", key, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -111,14 +111,14 @@ func (s *session) Delete(ctx context.Context, sessionID, key string) error {
 		return nil
 	})
 
-	s.m.logOperation(ctx, "del", "sessionID", sessionID, "key", key, "duration", time.Since(opStart))
+	s.m.logOperation(ctx, "del", "sessionID", sessionID, "key", key, "latency", time.Since(opStart))
 	return err
 }
 
 func (s *session) Exists(ctx context.Context, sessionID string) (bool, error) {
 	opStart := time.Now()
 	if err := cache.ValidateSessionID(sessionID); err != nil {
-		s.m.logOperation(ctx, "exists", "sessionID", sessionID, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "exists", "sessionID", sessionID, "latency", time.Since(opStart), "error", err)
 		return false, err
 	}
 
@@ -142,14 +142,14 @@ func (s *session) Exists(ctx context.Context, sessionID string) (bool, error) {
 		return nil
 	})
 
-	s.m.logOperation(ctx, "exists", "sessionID", sessionID, "exist", exist, "duration", time.Since(opStart))
+	s.m.logOperation(ctx, "exists", "sessionID", sessionID, "exist", exist, "latency", time.Since(opStart))
 	return exist, nil
 }
 
 func (s *session) Refresh(ctx context.Context, sessionID string, ttl time.Duration) error {
 	opStart := time.Now()
 	if err := cache.ValidateSessionID(sessionID); err != nil {
-		s.m.logOperation(ctx, "refresh", "sessionID", sessionID, "ttl", ttl, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "refresh", "sessionID", sessionID, "ttl", ttl, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -179,14 +179,14 @@ func (s *session) Refresh(ctx context.Context, sessionID string, ttl time.Durati
 		return nil
 	})
 
-	s.m.logOperation(ctx, "refresh", "sessionID", sessionID, "ttl", ttl, "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "refresh", "sessionID", sessionID, "ttl", ttl, "latency", time.Since(opStart), "error", err)
 	return err
 }
 
 func (s *session) Destroy(ctx context.Context, sessionID string) error {
 	opStart := time.Now()
 	if err := cache.ValidateSessionID(sessionID); err != nil {
-		s.m.logOperation(ctx, "destroy", "sessionID", sessionID, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "destroy", "sessionID", sessionID, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -205,14 +205,14 @@ func (s *session) Destroy(ctx context.Context, sessionID string) error {
 		return nil
 	})
 
-	s.m.logOperation(ctx, "destroy", "sessionID", sessionID, "duration", time.Since(opStart))
+	s.m.logOperation(ctx, "destroy", "sessionID", sessionID, "latency", time.Since(opStart))
 	return err
 }
 
 func (s *session) Keys(ctx context.Context, sessionID string) ([]string, error) {
 	opStart := time.Now()
 	if err := cache.ValidateSessionID(sessionID); err != nil {
-		s.m.logOperation(ctx, "keys", "sessionID", sessionID, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "keys", "sessionID", sessionID, "latency", time.Since(opStart), "error", err)
 		return nil, err
 	}
 
@@ -236,6 +236,6 @@ func (s *session) Keys(ctx context.Context, sessionID string) ([]string, error) 
 		return nil
 	})
 
-	s.m.logOperation(ctx, "keys", "sessionID", sessionID, "count", len(keys), "duration", time.Since(opStart))
+	s.m.logOperation(ctx, "keys", "sessionID", sessionID, "count", len(keys), "latency", time.Since(opStart))
 	return keys, nil
 }

@@ -1,0 +1,192 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.template.v1;
+
+import "buf/validate/validate.proto";
+import "common/page.proto";
+import "desc/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/apps/template/gen/go/v1;templateV1";
+
+// region[rgba(52,152,219,0.2)] 🔵 Service -----------------------------------------------------------------------------
+
+// MessageService
+service MessageService {
+  option (desc.service_comment) = "消息服务";
+
+  // CreateMessage
+  rpc CreateMessage(CreateMessageRequest) returns (CreateMessageResponse) {
+    option (desc.method_comment) = "创建消息";
+    option (google.api.http) = {
+      post: "/api/v1/message"
+      body: "*"
+    };
+  }
+  // UpdateMessage
+  rpc UpdateMessage(UpdateMessageRequest) returns (UpdateMessageResponse) {
+    option (desc.method_comment) = "修改消息";
+    option (google.api.http) = {
+      put: "/api/v1/message/{id}"
+      body: "*"
+    };
+  }
+  // DeleteMessage
+  rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse) {
+    option (desc.method_comment) = "删除消息";
+    option (google.api.http) = {delete: "/api/v1/message/{id}"};
+  }
+  // GetMessage
+  rpc GetMessage(GetMessageRequest) returns (GetMessageResponse) {
+    option (desc.method_comment) = "查询消息详情";
+    option (google.api.http) = {get: "/api/v1/message/{id}"};
+  }
+  // QueryMessage
+  rpc QueryMessage(QueryMessageRequest) returns (QueryMessageResponse) {
+    option (desc.method_comment) = "查询消息列表";
+    option (google.api.http) = {get: "/api/v1/message"};
+  }
+  // UpdateMessageStatus
+  rpc UpdateMessageStatus(UpdateMessageStatusRequest) returns (UpdateMessageStatusResponse) {
+    option (desc.method_comment) = "更新消息状态";
+    option (google.api.http) = {
+      put: "/api/v1/message/{id}/status"
+      body: "*"
+    };
+  }
+  // SortMessage
+  rpc SortMessage(SortMessageRequest) returns (SortMessageResponse) {
+    option (desc.method_comment) = "排序消息";
+    option (google.api.http) = {
+      post: "/api/v1/message/{id}/sort"
+      body: "*"
+    };
+  }
+}
+
+// region[rgba(155,89,182,0.2)] 🟣 Messages ----------------------------------------------------------------------------
+
+message CreateMessageRequest {
+  optional string title = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string content = 2;
+}
+
+message CreateMessageResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+message UpdateMessageRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string title = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string content = 3;
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+  }];
+}
+
+message UpdateMessageResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+message DeleteMessageRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message DeleteMessageResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+message GetMessageRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetMessageResponse {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue title = 4;
+  google.protobuf.StringValue content = 5;
+  google.protobuf.StringValue status = 6;
+}
+
+message QueryMessageRequest {
+  common.PageRequest page = 1;
+  optional string title = 2;
+  optional string status = 3 [(buf.validate.field).string = {
+    in: [
+      "draft",
+      "published",
+      "archived"
+    ]
+  }];
+
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "QueryMessageRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt|sort):(asc|desc)$'))"
+  }];
+}
+
+message QueryMessageResponse {
+  common.PageResponse page = 1;
+  repeated GetMessageResponse list = 2;
+}
+
+message UpdateMessageStatusRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string status = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      in: [
+        "draft",
+        "published",
+        "archived"
+      ]
+    }
+  ];
+}
+
+message UpdateMessageStatusResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+message SortMessageRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string prev_id = 2;
+  optional string next_id = 3;
+
+  option (buf.validate.message).cel = {
+    id: "SortMessageRequest.prev_id-next_id"
+    message: "at least one of prev_id or next_id is required"
+    expression: "has(this.prev_id) || has(this.next_id)"
+  };
+}
+
+message SortMessageResponse {
+  google.protobuf.StringValue id = 1;
+}

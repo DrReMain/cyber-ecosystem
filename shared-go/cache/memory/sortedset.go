@@ -117,11 +117,11 @@ func (s *sortedSet) Add(ctx context.Context, key string, members ...cache.Member
 		return nil
 	}
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "zadd", "key", key, "members", len(members), "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zadd", "key", key, "members", len(members), "latency", time.Since(opStart), "error", err)
 		return err
 	}
 	if err := cache.ValidateMembers(members); err != nil {
-		s.m.logOperation(ctx, "zadd", "key", key, "members", len(members), "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zadd", "key", key, "members", len(members), "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -149,18 +149,18 @@ func (s *sortedSet) Add(ctx context.Context, key string, members ...cache.Member
 		return nil
 	})
 
-	s.m.logOperation(ctx, "zadd", "key", key, "members", len(members), "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "zadd", "key", key, "members", len(members), "latency", time.Since(opStart), "error", err)
 	return err
 }
 
 func (s *sortedSet) Incr(ctx context.Context, key string, member string, delta float64) (float64, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "zincrby", "key", key, "member", member, "delta", delta, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zincrby", "key", key, "member", member, "delta", delta, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 	if err := cache.ValidateMember(member); err != nil {
-		s.m.logOperation(ctx, "zincrby", "key", key, "member", member, "delta", delta, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zincrby", "key", key, "member", member, "delta", delta, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 
@@ -186,18 +186,18 @@ func (s *sortedSet) Incr(ctx context.Context, key string, member string, delta f
 		return nil
 	})
 
-	s.m.logOperation(ctx, "zincrby", "key", key, "member", member, "delta", delta, "newScore", newScore, "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "zincrby", "key", key, "member", member, "delta", delta, "newScore", newScore, "latency", time.Since(opStart), "error", err)
 	return newScore, err
 }
 
 func (s *sortedSet) Rank(ctx context.Context, key string, member string) (int64, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "zrank", "key", key, "member", member, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zrank", "key", key, "member", member, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 	if err := cache.ValidateMember(member); err != nil {
-		s.m.logOperation(ctx, "zrank", "key", key, "member", member, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zrank", "key", key, "member", member, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 
@@ -224,18 +224,18 @@ func (s *sortedSet) Rank(ctx context.Context, key string, member string) (int64,
 		return nil
 	})
 
-	s.m.logOperation(ctx, "zrank", "key", key, "member", member, "rank", rank, "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "zrank", "key", key, "member", member, "rank", rank, "latency", time.Since(opStart), "error", err)
 	return rank, err
 }
 
 func (s *sortedSet) RevRank(ctx context.Context, key string, member string) (int64, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "zrevrank", "key", key, "member", member, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zrevrank", "key", key, "member", member, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 	if err := cache.ValidateMember(member); err != nil {
-		s.m.logOperation(ctx, "zrevrank", "key", key, "member", member, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zrevrank", "key", key, "member", member, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 
@@ -262,18 +262,18 @@ func (s *sortedSet) RevRank(ctx context.Context, key string, member string) (int
 		return nil
 	})
 
-	s.m.logOperation(ctx, "zrevrank", "key", key, "member", member, "rank", rank, "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "zrevrank", "key", key, "member", member, "rank", rank, "latency", time.Since(opStart), "error", err)
 	return rank, err
 }
 
 func (s *sortedSet) Score(ctx context.Context, key string, member string) (float64, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "zscore", "key", key, "member", member, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zscore", "key", key, "member", member, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 	if err := cache.ValidateMember(member); err != nil {
-		s.m.logOperation(ctx, "zscore", "key", key, "member", member, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zscore", "key", key, "member", member, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 
@@ -300,14 +300,14 @@ func (s *sortedSet) Score(ctx context.Context, key string, member string) (float
 		return nil
 	})
 
-	s.m.logOperation(ctx, "zscore", "key", key, "member", member, "score", score, "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "zscore", "key", key, "member", member, "score", score, "latency", time.Since(opStart), "error", err)
 	return score, err
 }
 
 func (s *sortedSet) Range(ctx context.Context, key string, start, stop int64) ([]cache.Member, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "zrange", "key", key, "start", start, "stop", stop, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zrange", "key", key, "start", start, "stop", stop, "latency", time.Since(opStart), "error", err)
 		return nil, err
 	}
 
@@ -329,14 +329,14 @@ func (s *sortedSet) Range(ctx context.Context, key string, start, stop int64) ([
 		return nil
 	})
 
-	s.m.logOperation(ctx, "zrange", "key", key, "start", start, "stop", stop, "count", len(result), "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "zrange", "key", key, "start", start, "stop", stop, "count", len(result), "latency", time.Since(opStart), "error", err)
 	return result, err
 }
 
 func (s *sortedSet) RevRange(ctx context.Context, key string, start, stop int64) ([]cache.Member, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "zrevrange", "key", key, "start", start, "stop", stop, "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zrevrange", "key", key, "start", start, "stop", stop, "latency", time.Since(opStart), "error", err)
 		return nil, err
 	}
 
@@ -358,7 +358,7 @@ func (s *sortedSet) RevRange(ctx context.Context, key string, start, stop int64)
 		return nil
 	})
 
-	s.m.logOperation(ctx, "zrevrange", "key", key, "start", start, "stop", stop, "count", len(result), "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "zrevrange", "key", key, "start", start, "stop", stop, "count", len(result), "latency", time.Since(opStart), "error", err)
 	return result, err
 }
 
@@ -368,11 +368,11 @@ func (s *sortedSet) Remove(ctx context.Context, key string, members ...string) e
 		return nil
 	}
 	if err := cache.ValidateKey(key); err != nil {
-		s.m.logOperation(ctx, "zrem", "key", key, "members", len(members), "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zrem", "key", key, "members", len(members), "latency", time.Since(opStart), "error", err)
 		return err
 	}
 	if err := cache.ValidateMemberStrings(members...); err != nil {
-		s.m.logOperation(ctx, "zrem", "key", key, "members", len(members), "duration", time.Since(opStart), "error", err)
+		s.m.logOperation(ctx, "zrem", "key", key, "members", len(members), "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -395,7 +395,7 @@ func (s *sortedSet) Remove(ctx context.Context, key string, members ...string) e
 		return nil
 	})
 
-	s.m.logOperation(ctx, "zrem", "key", key, "members", len(members), "duration", time.Since(opStart), "error", err)
+	s.m.logOperation(ctx, "zrem", "key", key, "members", len(members), "latency", time.Since(opStart), "error", err)
 	return err
 }
 

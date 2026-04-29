@@ -143,3 +143,14 @@ If a failure is clearly pre-existing and out of scope → record it explicitly.
 - Local files may be stricter than this root file but must not conflict with it.
 - Until local files exist, keep this root file minimal rather than embedding
   deep stack-specific instructions here.
+
+---
+
+## 10) Tech Stack Guides
+
+When working on a specific stack, read the corresponding guide first:
+
+| Stack | Guide | Applies to |
+|-------|-------|------------|
+| Kratos + Go | `docs/stacks/kratos-go.md` | Go microservices using Kratos framework |
+| TanStack + React | `docs/stacks/tanstack-react.md` | React clients using TanStack Start, Router, and Query |

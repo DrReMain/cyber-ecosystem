@@ -20,6 +20,7 @@ type DefaultError struct {
 	NotSingular *errors.Error
 	NotLoaded   *errors.Error
 	Constraint  *errors.Error
+	Internal    *errors.Error
 }
 
 func HandleEntError(err error, checker EntErrorChecker, errs *DefaultError) error {
@@ -38,6 +39,9 @@ func HandleEntError(err error, checker EntErrorChecker, errs *DefaultError) erro
 	case checker.IsConstraintError(err):
 		return errs.Constraint.WithCause(err)
 	default:
+		if errs.Internal != nil {
+			return errs.Internal.WithCause(err)
+		}
 		return err
 	}
 }

@@ -1,32 +1,30 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "apps/template/api",
-			"name": "template_api"
-		},
-		{
-			"path": "apps/template/services/base",
-			"name": "template_base"
-		}
-	],
-	"settings": {
-		"files.exclude": {
-			"**/.git": true,
-			"**/.idea": true,
-			"**/.buf-deps": true,
-			"**/.nx": true,
-			"**/vendor": true,
-			"**/node_modules": true,
-			"nx": true,
-			"nx.bat": true,
-			"buf.lock": true,
-			"go.sum": true
-		},
-		"protobuf.externalLinter.enabled": true,
-		"protobuf.externalLinter.linter": "buf",
-		"protobuf.externalLinter.bufPath": "buf"
-	}
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "apps/template/api",
+      "name": "template_api"
+    },
+    {
+      "path": "apps/template/services/base",
+      "name": "template_base"
+    },
+    {
+      "path": "apps/template/clients/admin",
+      "name": "template_client_admin"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": true,
+      "**/.idea": true,
+      "nx": true,
+      "nx.bat": true
+    },
+    "protobuf.externalLinter.enabled": true,
+    "protobuf.externalLinter.linter": "buf",
+    "protobuf.externalLinter.bufPath": "buf"
+  }
 }

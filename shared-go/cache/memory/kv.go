@@ -14,7 +14,7 @@ type kv struct {
 func (k *kv) Get(ctx context.Context, key string) ([]byte, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		k.m.logOperation(ctx, "get", "key", key, "duration", time.Since(opStart), "error", err)
+		k.m.logOperation(ctx, "get", "key", key, "latency", time.Since(opStart), "error", err)
 		return nil, err
 	}
 
@@ -35,14 +35,14 @@ func (k *kv) Get(ctx context.Context, key string) ([]byte, error) {
 		return nil
 	})
 
-	k.m.logOperation(ctx, "get", "key", key, "duration", time.Since(opStart), "error", err)
+	k.m.logOperation(ctx, "get", "key", key, "latency", time.Since(opStart), "error", err)
 	return result, err
 }
 
 func (k *kv) Set(ctx context.Context, key string, val []byte, ttl time.Duration) error {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		k.m.logOperation(ctx, "set", "key", key, "ttl", ttl, "duration", time.Since(opStart), "error", err)
+		k.m.logOperation(ctx, "set", "key", key, "ttl", ttl, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -63,14 +63,14 @@ func (k *kv) Set(ctx context.Context, key string, val []byte, ttl time.Duration)
 		return nil
 	})
 
-	k.m.logOperation(ctx, "set", "key", key, "ttl", ttl, "duration", time.Since(opStart), "error", err)
+	k.m.logOperation(ctx, "set", "key", key, "ttl", ttl, "latency", time.Since(opStart), "error", err)
 	return err
 }
 
 func (k *kv) Delete(ctx context.Context, key string) error {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		k.m.logOperation(ctx, "del", "key", key, "duration", time.Since(opStart), "error", err)
+		k.m.logOperation(ctx, "del", "key", key, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -84,14 +84,14 @@ func (k *kv) Delete(ctx context.Context, key string) error {
 		return nil
 	})
 
-	k.m.logOperation(ctx, "del", "key", key, "duration", time.Since(opStart), "error", err)
+	k.m.logOperation(ctx, "del", "key", key, "latency", time.Since(opStart), "error", err)
 	return err
 }
 
 func (k *kv) Exist(ctx context.Context, key string) (bool, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		k.m.logOperation(ctx, "exists", "key", key, "duration", time.Since(opStart), "error", err)
+		k.m.logOperation(ctx, "exists", "key", key, "latency", time.Since(opStart), "error", err)
 		return false, err
 	}
 
@@ -111,14 +111,14 @@ func (k *kv) Exist(ctx context.Context, key string) (bool, error) {
 		return nil
 	})
 
-	k.m.logOperation(ctx, "exists", "key", key, "exist", exist, "duration", time.Since(opStart), "error", err)
+	k.m.logOperation(ctx, "exists", "key", key, "exist", exist, "latency", time.Since(opStart), "error", err)
 	return exist, err
 }
 
 func (k *kv) GetTTL(ctx context.Context, key string) (time.Duration, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		k.m.logOperation(ctx, "ttl", "key", key, "duration", time.Since(opStart), "error", err)
+		k.m.logOperation(ctx, "ttl", "key", key, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 
@@ -142,7 +142,7 @@ func (k *kv) GetTTL(ctx context.Context, key string) (time.Duration, error) {
 		return nil
 	})
 
-	k.m.logOperation(ctx, "ttl", "key", key, "ttl", ttl, "duration", time.Since(opStart), "error", err)
+	k.m.logOperation(ctx, "ttl", "key", key, "ttl", ttl, "latency", time.Since(opStart), "error", err)
 	return ttl, err
 }
 
@@ -152,7 +152,7 @@ func (k *kv) MGet(ctx context.Context, keys ...string) ([][]byte, error) {
 		return nil, nil
 	}
 	if err := cache.ValidateKeys(keys...); err != nil {
-		k.m.logOperation(ctx, "mget", "keys", keys, "duration", time.Since(opStart), "error", err)
+		k.m.logOperation(ctx, "mget", "keys", keys, "latency", time.Since(opStart), "error", err)
 		return nil, err
 	}
 
@@ -174,7 +174,7 @@ func (k *kv) MGet(ctx context.Context, keys ...string) ([][]byte, error) {
 		return nil
 	})
 
-	k.m.logOperation(ctx, "mget", "keys", keys, "duration", time.Since(opStart))
+	k.m.logOperation(ctx, "mget", "keys", keys, "latency", time.Since(opStart))
 	return result, nil
 }
 
@@ -184,7 +184,7 @@ func (k *kv) MSet(ctx context.Context, pairs map[string][]byte, ttl time.Duratio
 		return nil
 	}
 	if err := cache.ValidatePairs(pairs); err != nil {
-		k.m.logOperation(ctx, "mset", "count", len(pairs), "ttl", ttl, "duration", time.Since(opStart), "error", err)
+		k.m.logOperation(ctx, "mset", "count", len(pairs), "ttl", ttl, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -205,6 +205,6 @@ func (k *kv) MSet(ctx context.Context, pairs map[string][]byte, ttl time.Duratio
 		return nil
 	})
 
-	k.m.logOperation(ctx, "mset", "count", len(pairs), "ttl", ttl, "duration", time.Since(opStart))
+	k.m.logOperation(ctx, "mset", "count", len(pairs), "ttl", ttl, "latency", time.Since(opStart))
 	return nil
 }

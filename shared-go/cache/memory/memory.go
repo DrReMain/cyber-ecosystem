@@ -59,7 +59,7 @@ func NewMemoryClient(cfg *Config) *cache.Cache {
 	m := &Memory{
 		data:          make(map[string]*entry),
 		logger:        logger,
-		logLevel:      parseLogLevel(cfg.LogLevel),
+		logLevel:      cache.ParseLogLevel(cfg.LogLevel),
 		slowQuery:     cfg.SlowQuery,
 		slowThreshold: cfg.SlowQueryThreshold,
 	}
@@ -104,7 +104,7 @@ func (m *Memory) logOperation(ctx context.Context, op string, args ...any) {
 				if e, ok := args[i+1].(error); ok && e != nil {
 					opErr = e
 				}
-			} else if key == "duration" {
+			} else if key == "latency" {
 				if d, ok := args[i+1].(time.Duration); ok {
 					opDuration = d
 				}
@@ -117,7 +117,7 @@ func (m *Memory) logOperation(ctx context.Context, op string, args ...any) {
 	if opDuration <= 0 {
 		opDuration = 1 * time.Nanosecond
 	}
-	fields = append(fields, "duration", opDuration.String())
+	fields = append(fields, "latency", opDuration.Seconds())
 
 	if opErr != nil {
 		fields = append(fields, "error", opErr.Error())
@@ -147,10 +147,4 @@ func (m *Memory) traceOperationWithArgs(ctx context.Context, op string, args *ca
 		return m.otel.TraceOperationWithArgs(ctx, op, args, fn)
 	}
 	return fn(ctx)
-}
-
-type CloserFunc func() error
-
-func (f CloserFunc) Close() error {
-	return f()
 }

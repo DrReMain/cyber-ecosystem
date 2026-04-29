@@ -9,6 +9,8 @@ import (
 	entsql "entgo.io/ent/dialect/sql"
 
 	"github.com/go-kratos/kratos/v2/log"
+
+	"cyber-ecosystem/shared-go/cache"
 )
 
 // DriverWrapper wraps an ent dialect.Driver to add logging support.
@@ -26,7 +28,7 @@ func NewKratosDriverWrapper(drv *entsql.Driver, logger log.Logger, level string,
 	return &DriverWrapper{
 		drv:                drv,
 		logger:             logger,
-		level:              parseLogLevel(level),
+		level:              cache.ParseLogLevel(level),
 		slowQuery:          slowQuery,
 		slowQueryThreshold: slowQueryThreshold,
 	}
@@ -80,7 +82,7 @@ func (d *DriverWrapper) logQuery(ctx context.Context, query string, args any, du
 		"component", "ent",
 		"query", query,
 		"args", fmt.Sprintf("%v", args),
-		"duration", duration.String(),
+		"latency", duration.Seconds(),
 	}
 
 	if err != nil {
@@ -91,20 +93,5 @@ func (d *DriverWrapper) logQuery(ctx context.Context, query string, args any, du
 		_ = logger.Log(log.LevelWarn, fields...)
 	} else {
 		_ = logger.Log(d.level, fields...)
-	}
-}
-
-func parseLogLevel(s string) log.Level {
-	switch s {
-	case "debug":
-		return log.LevelDebug
-	case "info":
-		return log.LevelInfo
-	case "warn":
-		return log.LevelWarn
-	case "error":
-		return log.LevelError
-	default:
-		return log.LevelInfo
 	}
 }

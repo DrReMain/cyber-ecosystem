@@ -15,7 +15,7 @@ type counter struct {
 func (c *counter) Incr(ctx context.Context, key string, delta int64) (int64, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		c.m.logOperation(ctx, "incrby", "key", key, "delta", delta, "duration", time.Since(opStart), "error", err)
+		c.m.logOperation(ctx, "incrby", "key", key, "delta", delta, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 
@@ -47,14 +47,14 @@ func (c *counter) Incr(ctx context.Context, key string, delta int64) (int64, err
 		return nil
 	})
 
-	c.m.logOperation(ctx, "incrby", "key", key, "delta", delta, "newVal", newVal, "duration", time.Since(opStart), "error", err)
+	c.m.logOperation(ctx, "incrby", "key", key, "delta", delta, "newVal", newVal, "latency", time.Since(opStart), "error", err)
 	return newVal, err
 }
 
 func (c *counter) Decr(ctx context.Context, key string, delta int64) (int64, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		c.m.logOperation(ctx, "decrby", "key", key, "delta", delta, "duration", time.Since(opStart), "error", err)
+		c.m.logOperation(ctx, "decrby", "key", key, "delta", delta, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 
@@ -86,14 +86,14 @@ func (c *counter) Decr(ctx context.Context, key string, delta int64) (int64, err
 		return nil
 	})
 
-	c.m.logOperation(ctx, "decrby", "key", key, "delta", delta, "newVal", newVal, "duration", time.Since(opStart), "error", err)
+	c.m.logOperation(ctx, "decrby", "key", key, "delta", delta, "newVal", newVal, "latency", time.Since(opStart), "error", err)
 	return newVal, err
 }
 
 func (c *counter) Get(ctx context.Context, key string) (int64, error) {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		c.m.logOperation(ctx, "get", "key", key, "duration", time.Since(opStart), "error", err)
+		c.m.logOperation(ctx, "get", "key", key, "latency", time.Since(opStart), "error", err)
 		return 0, err
 	}
 
@@ -113,14 +113,14 @@ func (c *counter) Get(ctx context.Context, key string) (int64, error) {
 		return nil
 	})
 
-	c.m.logOperation(ctx, "get", "key", key, "val", val, "duration", time.Since(opStart), "error", err)
+	c.m.logOperation(ctx, "get", "key", key, "val", val, "latency", time.Since(opStart), "error", err)
 	return val, err
 }
 
 func (c *counter) Set(ctx context.Context, key string, value int64) error {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		c.m.logOperation(ctx, "set", "key", key, "value", value, "duration", time.Since(opStart), "error", err)
+		c.m.logOperation(ctx, "set", "key", key, "value", value, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -137,14 +137,14 @@ func (c *counter) Set(ctx context.Context, key string, value int64) error {
 		return nil
 	})
 
-	c.m.logOperation(ctx, "set", "key", key, "value", value, "duration", time.Since(opStart), "error", err)
+	c.m.logOperation(ctx, "set", "key", key, "value", value, "latency", time.Since(opStart), "error", err)
 	return err
 }
 
 func (c *counter) Expire(ctx context.Context, key string, ttl time.Duration) error {
 	opStart := time.Now()
 	if err := cache.ValidateKey(key); err != nil {
-		c.m.logOperation(ctx, "expire", "key", key, "ttl", ttl, "duration", time.Since(opStart), "error", err)
+		c.m.logOperation(ctx, "expire", "key", key, "ttl", ttl, "latency", time.Since(opStart), "error", err)
 		return err
 	}
 
@@ -168,6 +168,6 @@ func (c *counter) Expire(ctx context.Context, key string, ttl time.Duration) err
 		return nil
 	})
 
-	c.m.logOperation(ctx, "expire", "key", key, "ttl", ttl, "duration", time.Since(opStart), "error", err)
+	c.m.logOperation(ctx, "expire", "key", key, "ttl", ttl, "latency", time.Since(opStart), "error", err)
 	return err
 }

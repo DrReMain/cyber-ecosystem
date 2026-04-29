@@ -3,6 +3,9 @@
     "version": "22.6.2"
   },
   "analytics": false,
+  "cli": {
+    "packageManager": "bun"
+  },
   "targetDefaults": {
     "dev": {
       "cache": false

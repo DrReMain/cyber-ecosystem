@@ -44,69 +44,6 @@
         "cwd": "{workspaceRoot}/infra/docker",
         "command": "docker compose down -v --remove-orphans"
       }
-    },
-    "docker:postgres": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose up -d postgres"
-      }
-    },
-    "docker:redis": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose up -d redis"
-      }
-    },
-    "docker:jaeger": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose up -d jaeger"
-      }
-    },
-    "docker:prometheus": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose up -d prometheus"
-      }
-    },
-    "docker:grafana": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose up -d grafana"
-      }
-    },
-    "docker:monitoring": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose up -d prometheus grafana jaeger"
-      }
-    },
-    "docker:minio": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose up -d minio"
-      }
-    },
-    "docker:tusd": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose up -d tusd"
-      }
-    },
-    "docker:oss": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose up -d minio tusd"
-      }
     }
   }
 }

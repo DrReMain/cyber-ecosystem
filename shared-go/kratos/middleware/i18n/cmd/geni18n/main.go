@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,33 +10,56 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <proto_file> <output_dir> [-locale=en-US,zh-CN]\n", os.Args[0])
-		os.Exit(1)
-	}
-
-	protoPath := ""
+	var protoPaths []string
 	outputDir := ""
 	var locales string
+	var protosFile string
+	var nameOverride string
 
 	for i := 1; i < len(os.Args); i++ {
 		arg := os.Args[i]
 		if strings.HasPrefix(arg, "-locale=") {
 			locales = strings.TrimPrefix(arg, "-locale=")
-		} else if protoPath == "" {
-			protoPath = arg
-		} else if outputDir == "" {
-			outputDir = arg
+		} else if strings.HasPrefix(arg, "-protos=") {
+			protosFile = strings.TrimPrefix(arg, "-protos=")
+		} else if strings.HasPrefix(arg, "-name=") {
+			nameOverride = strings.TrimPrefix(arg, "-name=")
 		}
+	}
+
+	// Collect positional args (non-flag)
+	var nonFlagArgs []string
+	for i := 1; i < len(os.Args); i++ {
+		arg := os.Args[i]
+		if !strings.HasPrefix(arg, "-") {
+			nonFlagArgs = append(nonFlagArgs, arg)
+		}
+	}
+
+	// Proto files from -protos file or positional args
+	if protosFile != "" {
+		paths, err := readProtoList(protosFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to read proto list: %v\n", err)
+			os.Exit(1)
+		}
+		protoPaths = paths
+		if len(nonFlagArgs) < 1 {
+			fmt.Fprintf(os.Stderr, "Usage: %s -protos=<file> <output_dir> [-locale=en-US,zh-CN]\n", os.Args[0])
+			os.Exit(1)
+		}
+		outputDir = nonFlagArgs[0]
+	} else {
+		if len(nonFlagArgs) < 2 {
+			fmt.Fprintf(os.Stderr, "Usage: %s <proto_file>... <output_dir> [-locale=en-US,zh-CN]\n       %s -protos=<file> <output_dir> [-locale=en-US,zh-CN]\n", os.Args[0], os.Args[0])
+			os.Exit(1)
+		}
+		protoPaths = nonFlagArgs[:len(nonFlagArgs)-1]
+		outputDir = nonFlagArgs[len(nonFlagArgs)-1]
 	}
 
 	if locales == "" {
 		fmt.Fprintf(os.Stderr, "Error: -locale flag is required\n")
-		os.Exit(1)
-	}
-
-	if protoPath == "" || outputDir == "" {
-		fmt.Fprintf(os.Stderr, "Usage: %s <proto_file> <output_dir> [-locale=en-US,zh-CN]\n", os.Args[0])
 		os.Exit(1)
 	}
 
@@ -45,15 +69,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	data, err := os.ReadFile(protoPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to read proto file: %v\n", err)
-		os.Exit(1)
+	var allValues []string
+	for _, protoPath := range protoPaths {
+		data, err := os.ReadFile(protoPath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to read proto file %s: %v\n", protoPath, err)
+			os.Exit(1)
+		}
+
+		values := parseAllEnums(string(data))
+		if len(values) == 0 {
+			fmt.Printf("No enum values found in %s, skipping\n", protoPath)
+			continue
+		}
+		allValues = append(allValues, values...)
 	}
 
-	enumValues := parseErrorReasonEnum(string(data))
-	if len(enumValues) == 0 {
-		fmt.Fprintf(os.Stderr, "No enum values found in %s\n", protoPath)
+	if len(allValues) == 0 {
+		fmt.Fprintf(os.Stderr, "No enum values found in any proto file\n")
 		os.Exit(1)
 	}
 
@@ -62,36 +95,63 @@ func main() {
 		os.Exit(1)
 	}
 
-	serviceName := guessServiceName(protoPath)
+	serviceName := nameOverride
+	if serviceName == "" {
+		serviceName = guessServiceName(protoPaths[0])
+	}
 
 	for _, locale := range localeList {
 		locale = strings.TrimSpace(locale)
 		langPath := filepath.Join(outputDir, serviceName+"."+locale+".yaml")
-		generateTranslationFile(langPath, enumValues, locale)
+		generateTranslationFile(langPath, allValues, locale)
 	}
 
-	fmt.Printf("Generated translation files in %s: %v\n", outputDir, localeList)
+	fmt.Printf("Generated translation files in %s: %v (%d keys)\n", outputDir, localeList, len(allValues))
 }
 
-func parseErrorReasonEnum(content string) []string {
+// readProtoList reads a text file with one proto path per line.
+// Empty lines and lines starting with # are skipped.
+func readProtoList(path string) ([]string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	var paths []string
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		paths = append(paths, line)
+	}
+	return paths, scanner.Err()
+}
+
+// parseAllEnums extracts all enum value names from all enums in a proto file.
+func parseAllEnums(content string) []string {
 	var values []string
 
-	enumRegex := regexp.MustCompile(`enum\s+ErrorReason\s*\{([^}]+)\}`)
-	matches := enumRegex.FindStringSubmatch(content)
-	if len(matches) < 2 {
-		return values
-	}
+	enumRegex := regexp.MustCompile(`(?s)enum\s+\w+\s*\{(.*?)\}`)
+	enumMatches := enumRegex.FindAllStringSubmatch(content, -1)
 
-	enumBody := matches[1]
+	valueRegex := regexp.MustCompile(`([A-Z][A-Z0-9_]*)\s*=\s*\d+`)
 
-	valueRegex := regexp.MustCompile(`ERROR_REASON_\w+\s*=\s*\d+`)
-	valueMatches := valueRegex.FindAllString(enumBody, -1)
+	for _, match := range enumMatches {
+		if len(match) < 2 {
+			continue
+		}
+		enumBody := match[1]
 
-	for _, v := range valueMatches {
-		nameRegex := regexp.MustCompile(`(ERROR_REASON_\w+)`)
-		nameMatch := nameRegex.FindStringSubmatch(v)
-		if len(nameMatch) > 1 {
-			values = append(values, nameMatch[1])
+		valueMatches := valueRegex.FindAllStringSubmatch(enumBody, -1)
+		for _, vm := range valueMatches {
+			name := vm[1]
+			if strings.HasPrefix(name, "OPTION") {
+				continue
+			}
+			values = append(values, name)
 		}
 	}
 

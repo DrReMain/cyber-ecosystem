@@ -1,0 +1,36 @@
+{
+  "$schema": "../../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "template_client_admin",
+  "root": "apps/template/clients/admin",
+  "projectType": "application",
+  "targets": {
+    "biome:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "bun --bun run lint"
+      }
+    },
+    "biome:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "bun --bun run lint:fix"
+      }
+    },
+    "messages:gen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "bun --bun run messages:gen"
+      }
+    },
+    "messages:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "bun --bun run messages:check"
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_title": "Cyber Ecosystem",
+  "column_action": "Action",
+  "column_created_at": "Created At",
+  "column_updated_at": "Updated At",
+  "error_back_home": "Back Home",
+  "error_error_subtitle": "Something went wrong, please try again later",
+  "error_not_found_subtitle": "Sorry, the page you visited does not exist",
+  "error_retry": "Retry",
+  "filter_expand": "Expand",
+  "filter_fold": "Fold",
+  "filter_reset": "Reset",
+  "filter_search": "Search",
+  "locale_name": [
+    {
+      "declarations": ["input locale"],
+      "selectors": ["locale"],
+      "match": {
+        "locale=zh-CN": "简体中文",
+        "locale=en-US": "English",
+        "locale=ar-SA": "العربية",
+        "locale=ja-JP": "日本語",
+        "locale=ko-KR": "한국어",
+        "locale=*": "{locale}"
+      }
+    }
+  ],
+  "pending_subtitle": "Page is loading, please wait",
+  "toolbar_density": "Density",
+  "toolbar_density_large": "Large",
+  "toolbar_density_middle": "Default",
+  "toolbar_density_small": "Compact",
+  "toolbar_refresh": "Refresh"
+}

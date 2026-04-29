@@ -106,6 +106,15 @@ out/
 # TanStack
 .tanstack/
 
+# Paraglide (generated)
+**/src/paraglide/
+
+# ==================== AI Tools ====================
+.playwright-mcp/
+.superpowers/
+.memsearch/
+.codegraph
+
 # ==================== Misc ====================
 # Temporary files
 tmp/
