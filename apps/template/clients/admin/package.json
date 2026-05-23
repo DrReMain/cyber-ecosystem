@@ -14,8 +14,8 @@
     "lint:fix": "biome check . --write",
     "generate:connect": "buf generate --template ./buf.gen.client.yaml --include-imports",
     "generate:openapi": "openapi-ts -f hey-api.config.ts",
-    "messages:gen": "bun run scripts/gen-messages.ts",
-    "messages:check": "bun run scripts/check-messages.ts"
+    "messages:gen": "npx tsx scripts/gen-messages.ts",
+    "messages:check": "npx tsx scripts/check-messages.ts"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^2",
@@ -62,12 +62,13 @@
     "@rolldown/plugin-babel": "^0.2",
     "@tailwindcss/vite": "^4",
     "@tanstack/devtools-vite": "^0.7",
-    "@types/bun": "^1.3",
+    "@types/node": "25.9.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/devtools": "^0.2",
     "@vitejs/plugin-react": "^6",
     "babel-plugin-react-compiler": "^1",
+    "glob": "13.0.6",
     "tailwindcss": "^4",
     "typescript": "^6",
     "vite": "^8",

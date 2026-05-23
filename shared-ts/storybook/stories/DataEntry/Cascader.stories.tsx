@@ -184,7 +184,7 @@ export const StaticOpen: Story = {
             showSearch={false}
             placeholder="Static open cascader"
             style={{ width: W.cascader }}
-            getPopupContainer={() => containerRef.current!}
+            getPopupContainer={() => containerRef.current ?? document.body}
           />
         </div>
       </div>

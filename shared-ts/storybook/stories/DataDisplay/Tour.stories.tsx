@@ -318,7 +318,9 @@ export const Interactive: Story = {
           open={open}
           onClose={() => {
             setOpen(false)
-            args.onClose?.({} as any)
+            args.onClose?.(
+              {} as Parameters<NonNullable<typeof args.onClose>>[0],
+            )
           }}
           steps={[
             {

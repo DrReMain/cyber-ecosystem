@@ -129,13 +129,13 @@ export const StaticOpen: Story = {
             <div style={{ marginBottom: 320 }}>
               <DatePicker
                 open
-                getPopupContainer={() => containerRef.current!}
+                getPopupContainer={() => containerRef.current ?? document.body}
                 placeholder="DatePicker open"
               />
             </div>
             <DatePicker.RangePicker
               open
-              getPopupContainer={() => containerRef.current!}
+              getPopupContainer={() => containerRef.current ?? document.body}
             />
           </Flex>
         </div>

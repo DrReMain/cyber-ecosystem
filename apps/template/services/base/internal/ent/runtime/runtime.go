@@ -3,7 +3,6 @@
 package runtime
 
 import (
-	"cyber-ecosystem/apps/template/services/base/internal/ent/file"
 	"cyber-ecosystem/apps/template/services/base/internal/ent/message"
 	"cyber-ecosystem/apps/template/services/base/internal/ent/schema"
 	"time"
@@ -13,47 +12,6 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	fileMixin := schema.File{}.Mixin()
-	fileMixinFields0 := fileMixin[0].Fields()
-	_ = fileMixinFields0
-	fileMixinFields1 := fileMixin[1].Fields()
-	_ = fileMixinFields1
-	fileFields := schema.File{}.Fields()
-	_ = fileFields
-	// fileDescCreatedAt is the schema descriptor for created_at field.
-	fileDescCreatedAt := fileMixinFields1[0].Descriptor()
-	// file.DefaultCreatedAt holds the default value on creation for the created_at field.
-	file.DefaultCreatedAt = fileDescCreatedAt.Default.(func() time.Time)
-	// fileDescUpdatedAt is the schema descriptor for updated_at field.
-	fileDescUpdatedAt := fileMixinFields1[1].Descriptor()
-	// file.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	file.DefaultUpdatedAt = fileDescUpdatedAt.Default.(func() time.Time)
-	// file.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	file.UpdateDefaultUpdatedAt = fileDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// fileDescName is the schema descriptor for name field.
-	fileDescName := fileFields[0].Descriptor()
-	// file.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	file.NameValidator = fileDescName.Validators[0].(func(string) error)
-	// fileDescContentType is the schema descriptor for content_type field.
-	fileDescContentType := fileFields[1].Descriptor()
-	// file.ContentTypeValidator is a validator for the "content_type" field. It is called by the builders before save.
-	file.ContentTypeValidator = fileDescContentType.Validators[0].(func(string) error)
-	// fileDescSize is the schema descriptor for size field.
-	fileDescSize := fileFields[2].Descriptor()
-	// file.SizeValidator is a validator for the "size" field. It is called by the builders before save.
-	file.SizeValidator = fileDescSize.Validators[0].(func(int64) error)
-	// fileDescStatus is the schema descriptor for status field.
-	fileDescStatus := fileFields[3].Descriptor()
-	// file.DefaultStatus holds the default value on creation for the status field.
-	file.DefaultStatus = fileDescStatus.Default.(string)
-	// file.StatusValidator is a validator for the "status" field. It is called by the builders before save.
-	file.StatusValidator = fileDescStatus.Validators[0].(func(string) error)
-	// fileDescID is the schema descriptor for id field.
-	fileDescID := fileMixinFields0[0].Descriptor()
-	// file.DefaultID holds the default value on creation for the id field.
-	file.DefaultID = fileDescID.Default.(func() string)
-	// file.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	file.IDValidator = fileDescID.Validators[0].(func(string) error)
 	messageMixin := schema.Message{}.Mixin()
 	messageMixinHooks2 := messageMixin[2].Hooks()
 	messageMixinHooks3 := messageMixin[3].Hooks()

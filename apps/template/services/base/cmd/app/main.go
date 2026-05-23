@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	Name     string = "template_base"
+	Name     string = "template_service_base"
 	Version  string
 	flagConf string
 	id, _    = os.Hostname()

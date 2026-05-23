@@ -34,25 +34,17 @@ func wireApp(confServer *conf.Server, confLog *conf.Log, confData *conf.Data, op
 		return nil, nil, err
 	}
 	entErrorHandler := platform.NewEntErrorHandler()
-	storage, err := platform.NewStorage(confData, logger)
+	platformPlatform, cleanup, err := platform.NewPlatform(logger, cache, cacheErrorHandler, client, entErrorHandler)
 	if err != nil {
 		return nil, nil, err
 	}
-	storageErrorHandler := platform.NewStorageErrorHandler()
-	platformPlatform, cleanup, err := platform.NewPlatform(logger, cache, cacheErrorHandler, client, entErrorHandler, storage, storageErrorHandler)
-	if err != nil {
-		return nil, nil, err
-	}
-	fileRP := data.NewFileRP(logger, platformPlatform)
-	fileUC := biz.NewFileUC(logger, platformPlatform, fileRP)
-	fileService := service.NewFileService(logger, confData, fileUC)
 	resourceRP := data.NewResourceRP(logger, platformPlatform)
 	resourceUC := biz.NewResourceUC(logger, platformPlatform, resourceRP)
 	resourceService := service.NewResourceService(logger, resourceUC)
 	messageRP := data.NewMessageRP(logger, platformPlatform)
 	messageUC := biz.NewMessageUC(logger, platformPlatform, messageRP)
 	messageService := service.NewMessageService(logger, messageUC)
-	v := service.NewRegistrarList(fileService, resourceService, messageService)
+	v := service.NewRegistrarList(resourceService, messageService)
 	bundle, err := i18n.NewI18nBundle()
 	if err != nil {
 		cleanup()

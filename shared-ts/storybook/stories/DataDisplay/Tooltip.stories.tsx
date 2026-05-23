@@ -127,7 +127,7 @@ export const StaticOpen: Story = {
                 title={`Static ${placement} tooltip`}
                 placement={placement}
                 open
-                getPopupContainer={() => containerRef.current!}
+                getPopupContainer={() => containerRef.current ?? document.body}
               >
                 <Button>{placement}</Button>
               </Tooltip>

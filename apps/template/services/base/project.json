@@ -1,6 +1,6 @@
 {
   "$schema": "../../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
-  "name": "template_base",
+  "name": "template_service_base",
   "root": "apps/template/services/base",
   "projectType": "application",
   "implicitDependencies": ["template_api", "shared-go"],

@@ -150,7 +150,7 @@ export const StaticOpen: Story = {
             value="burn"
             placeholder="Static open dropdown"
             style={{ width: W.cascader }}
-            getPopupContainer={() => containerRef.current!}
+            getPopupContainer={() => containerRef.current ?? document.body}
           />
         </div>
       </div>

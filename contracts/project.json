@@ -31,7 +31,9 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "commands": ["buf generate --template buf.gen.yaml --path errors --exclude-path errors/errors.proto"],
+        "commands": [
+          "buf generate --template buf.gen.yaml --path errors --exclude-path errors/errors.proto"
+        ],
         "parallel": true
       }
     },

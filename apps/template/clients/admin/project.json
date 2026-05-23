@@ -8,28 +8,28 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "bun --bun run lint"
+        "command": "pnpm run lint"
       }
     },
     "biome:format": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "bun --bun run lint:fix"
+        "command": "pnpm run lint:fix"
       }
     },
     "messages:gen": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "bun --bun run messages:gen"
+        "command": "pnpm run messages:gen"
       }
     },
     "messages:check": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "bun --bun run messages:check"
+        "command": "pnpm run messages:check"
       }
     }
   }

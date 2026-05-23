@@ -18,7 +18,6 @@ type UC struct {
 }
 
 var ProviderSet = wire.NewSet(
-	NewFileUC,
 	NewResourceUC,
 	NewMessageUC,
 )

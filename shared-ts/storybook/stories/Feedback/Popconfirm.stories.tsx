@@ -115,7 +115,7 @@ export const StaticOpen: Story = {
             open
             onConfirm={() => {}}
             onCancel={() => {}}
-            getPopupContainer={() => containerRef.current!}
+            getPopupContainer={() => containerRef.current ?? document.body}
           >
             <Button danger>Delete</Button>
           </Popconfirm>

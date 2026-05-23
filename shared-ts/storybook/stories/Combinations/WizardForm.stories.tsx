@@ -159,6 +159,7 @@ export const Interactive: Story = {
   args: {
     onFinish: fn(),
   },
+  // biome-ignore lint/suspicious/noExplicitAny: Storybook story args need any
   render: (args: any) => (
     <Card style={{ maxWidth: 700 }}>
       <Steps
@@ -178,6 +179,7 @@ export const Interactive: Story = {
       </Flex>
     </Card>
   ),
+  // biome-ignore lint/suspicious/noExplicitAny: Storybook story args need any
   play: async ({ canvasElement, args }: any) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText("Enter username")

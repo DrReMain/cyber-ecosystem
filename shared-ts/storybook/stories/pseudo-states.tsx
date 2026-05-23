@@ -26,6 +26,7 @@ function extractPseudoRules(rules: CSSRuleList, layer?: string): string {
 
       PSEUDO_REGEX.lastIndex = 0
       let m: RegExpExecArray | null
+      // biome-ignore lint/suspicious/noAssignInExpressions: idiomatic regex exec loop
       while ((m = PSEUDO_REGEX.exec(sel))) {
         const pseudo = m[1] as keyof typeof PSEUDO_MAP
         const cls = PSEUDO_MAP[pseudo]

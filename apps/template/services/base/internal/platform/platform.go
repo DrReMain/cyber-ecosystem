@@ -9,22 +9,18 @@ import (
 
 	"cyber-ecosystem/shared-go/cache"
 	"cyber-ecosystem/shared-go/orm/ent/entutil"
-	"cyber-ecosystem/shared-go/storage"
 
 	"cyber-ecosystem/apps/template/services/base/internal/ent"
 )
 
 type CacheErrorHandler func(error) error
 type EntErrorHandler func(error) error
-type StorageErrorHandler func(error) error
 
 type Platform struct {
 	cache            *cache.Cache
 	handleCacheError CacheErrorHandler
 	db               *ent.Client
 	handleEntError   EntErrorHandler
-	storage          storage.Storage
-	handleStorageErr StorageErrorHandler
 }
 
 func NewPlatform(
@@ -33,8 +29,6 @@ func NewPlatform(
 	handleCacheError CacheErrorHandler,
 	db *ent.Client,
 	handleEntError EntErrorHandler,
-	storage storage.Storage,
-	handleStorageErr StorageErrorHandler,
 ) (*Platform, func(), error) {
 	helper := log.NewHelper(log.With(logger, "module", "platform/platform"))
 	p := &Platform{
@@ -42,8 +36,6 @@ func NewPlatform(
 		handleCacheError: handleCacheError,
 		db:               db,
 		handleEntError:   handleEntError,
-		storage:          storage,
-		handleStorageErr: handleStorageErr,
 	}
 	return p,
 		func() {
@@ -77,20 +69,10 @@ func (p *Platform) HandleCacheError(err error) error {
 	return p.handleCacheError(err)
 }
 
-func (p *Platform) GetStorage() storage.Storage {
-	return p.storage
-}
-
-func (p *Platform) HandleStorageError(err error) error {
-	return p.handleStorageErr(err)
-}
-
 var ProviderSet = wire.NewSet(
 	NewPlatform,
 	NewCache,
 	NewCacheErrorHandler,
 	NewEntClient,
 	NewEntErrorHandler,
-	NewStorage,
-	NewStorageErrorHandler,
 )

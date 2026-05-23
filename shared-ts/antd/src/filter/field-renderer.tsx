@@ -52,7 +52,6 @@ export function FieldRenderer({
           {...control}
         />
       )
-    case "input":
     default:
       return <Input allowClear placeholder={option.placeholder} {...control} />
   }

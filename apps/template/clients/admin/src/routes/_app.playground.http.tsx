@@ -120,7 +120,6 @@ function HttpPlayground() {
     <Flex className="p-4" flex={1} gap={16} vertical>
       <Card>
         <Filter
-          columns={4}
           initialValues={values}
           labels={{
             search: m.filter_search(),

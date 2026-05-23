@@ -9,39 +9,6 @@ import (
 )
 
 var (
-	// FileColumns holds the columns for the "file" table.
-	FileColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Size: 20},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "name", Type: field.TypeString, Size: 255},
-		{Name: "content_type", Type: field.TypeString, Size: 128},
-		{Name: "size", Type: field.TypeInt64},
-		{Name: "status", Type: field.TypeString, Size: 20, Comment: "pending / attached", Default: "pending"},
-	}
-	// FileTable holds the schema information for the "file" table.
-	FileTable = &schema.Table{
-		Name:       "file",
-		Columns:    FileColumns,
-		PrimaryKey: []*schema.Column{FileColumns[0]},
-		Indexes: []*schema.Index{
-			{
-				Name:    "file_created_at",
-				Unique:  false,
-				Columns: []*schema.Column{FileColumns[1]},
-			},
-			{
-				Name:    "file_updated_at",
-				Unique:  false,
-				Columns: []*schema.Column{FileColumns[2]},
-			},
-			{
-				Name:    "file_status",
-				Unique:  false,
-				Columns: []*schema.Column{FileColumns[6]},
-			},
-		},
-	}
 	// MessageColumns holds the columns for the "message" table.
 	MessageColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -89,15 +56,11 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		FileTable,
 		MessageTable,
 	}
 )
 
 func init() {
-	FileTable.Annotation = &entsql.Annotation{
-		Table: "file",
-	}
 	MessageTable.Annotation = &entsql.Annotation{
 		Table: "message",
 	}

@@ -229,7 +229,7 @@ export const StaticOpen: Story = {
             treeDefaultExpandAll
             placeholder="Static open tree select"
             style={w}
-            getPopupContainer={() => containerRef.current!}
+            getPopupContainer={() => containerRef.current ?? document.body}
           />
         </div>
       </div>

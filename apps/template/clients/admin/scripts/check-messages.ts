@@ -1,3 +1,6 @@
+import { readFile, writeFile } from "node:fs/promises"
+import * as readline from "node:readline"
+import { glob } from "glob"
 import { parse as parseYaml, stringify } from "yaml"
 import {
   compileParaglide,
@@ -40,11 +43,11 @@ function warnEmpty(locale: string, messages: Record<string, unknown>): void {
 }
 
 async function findUsedKeys(): Promise<Set<string>> {
-  const glob = new Bun.Glob("**/*.{ts,tsx}")
+  const files = await glob("**/*.{ts,tsx}", { cwd: SRC_DIR })
   const used = new Set<string>()
-  for await (const file of glob.scan({ cwd: SRC_DIR })) {
+  for (const file of files) {
     if (file.startsWith("paraglide/")) continue
-    const content = await Bun.file(`${SRC_DIR}/${file}`).text()
+    const content = await readFile(`${SRC_DIR}/${file}`, "utf-8")
     for (const line of content.split("\n")) {
       const m = line.match(M_KEY_RE)
       if (m) used.add(m[1])
@@ -55,7 +58,7 @@ async function findUsedKeys(): Promise<Set<string>> {
 
 async function removeUnusedKeys(keys: string[]): Promise<void> {
   const schemaPath = `${I18N_DIR}/schema.yaml`
-  const schemaRaw = await Bun.file(schemaPath).text()
+  const schemaRaw = await readFile(schemaPath, "utf-8")
   const headerMatch = schemaRaw.match(
     /^([\s\S]*?# ==================== 应用全局)/,
   )
@@ -67,7 +70,7 @@ async function removeUnusedKeys(keys: string[]): Promise<void> {
   for (const key of keys) {
     deleteFromSchemaNode(schemaTree, flatKeyToPath(key))
   }
-  await Bun.write(schemaPath, `${header}\n${stringify(schemaTree)}\n`)
+  await writeFile(schemaPath, `${header}\n${stringify(schemaTree)}\n`)
 
   const { locales } = await readSettings()
   for (const locale of locales) {
@@ -84,12 +87,16 @@ async function removeUnusedKeys(keys: string[]): Promise<void> {
 }
 
 async function ask(question: string): Promise<string> {
-  process.stdout.write(question)
-  const rl = Bun.stdin.stream()
-  const reader = rl.getReader()
-  const { value } = await reader.read()
-  reader.releaseLock()
-  return new TextDecoder().decode(value).trim()
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close()
+      resolve(answer.trim())
+    })
+  })
 }
 
 async function handleUnusedKeys(unusedKeys: string[]): Promise<void> {

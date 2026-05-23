@@ -17,19 +17,16 @@ type Registrar interface {
 
 var ProviderSet = wire.NewSet(
 	NewRegistrarList,
-	NewFileService,
 	NewResourceService,
 	NewMessageService,
 )
 
 func NewRegistrarList(
-	s1 *FileService,
-	s2 *ResourceService,
-	s3 *MessageService,
+	s1 *ResourceService,
+	s2 *MessageService,
 ) []Registrar {
 	return []Registrar{
 		s1,
 		s2,
-		s3,
 	}
 }

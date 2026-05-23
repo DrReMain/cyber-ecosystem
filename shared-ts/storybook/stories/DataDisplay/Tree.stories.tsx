@@ -76,7 +76,12 @@ const disabledData = [
     children: [
       { title: "Disabled Node", key: "0-0-0", value: "0-0-0", disabled: true },
       { title: "Normal Node", key: "0-0-1", value: "0-0-1" },
-      { title: "Disable Checkbox", key: "0-0-2", value: "0-0-2", disableCheckbox: true },
+      {
+        title: "Disable Checkbox",
+        key: "0-0-2",
+        value: "0-0-2",
+        disableCheckbox: true,
+      },
     ],
   },
 ]
@@ -98,7 +103,12 @@ const directoryData = [
             value: "src/components/Button.tsx",
             isLeaf: true,
           },
-          { title: "Input.tsx", key: "src/components/Input.tsx", value: "src/components/Input.tsx", isLeaf: true },
+          {
+            title: "Input.tsx",
+            key: "src/components/Input.tsx",
+            value: "src/components/Input.tsx",
+            isLeaf: true,
+          },
         ],
       },
       {
@@ -106,18 +116,40 @@ const directoryData = [
         key: "src/pages",
         value: "src/pages",
         children: [
-          { title: "index.tsx", key: "src/pages/index.tsx", value: "src/pages/index.tsx", isLeaf: true },
-          { title: "about.tsx", key: "src/pages/about.tsx", value: "src/pages/about.tsx", isLeaf: true },
+          {
+            title: "index.tsx",
+            key: "src/pages/index.tsx",
+            value: "src/pages/index.tsx",
+            isLeaf: true,
+          },
+          {
+            title: "about.tsx",
+            key: "src/pages/about.tsx",
+            value: "src/pages/about.tsx",
+            isLeaf: true,
+          },
         ],
       },
-      { title: "App.tsx", key: "src/App.tsx", value: "src/App.tsx", isLeaf: true },
+      {
+        title: "App.tsx",
+        key: "src/App.tsx",
+        value: "src/App.tsx",
+        isLeaf: true,
+      },
     ],
   },
   {
     title: "public",
     key: "public",
     value: "public",
-    children: [{ title: "index.html", key: "public/index.html", value: "public/index.html", isLeaf: true }],
+    children: [
+      {
+        title: "index.html",
+        key: "public/index.html",
+        value: "public/index.html",
+        isLeaf: true,
+      },
+    ],
   },
 ]
 

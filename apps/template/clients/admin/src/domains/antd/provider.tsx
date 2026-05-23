@@ -20,26 +20,25 @@ export function AntdProvider({ children }: Readonly<PropsWithChildren>) {
         locale={locale}
         theme={{
           token: {
-            // Compatible with Tailwind: sm=640 md=768 lg=1024 xl=1280 2xl=1536
-            // antd has 7 tiers (xs..xxxl), Tailwind has 5 (sm..2xl)
-            // Mapping: xs=sm, sm=md, md=lg, lg=xl, xl=2xl, xxl/xxxl=antd defaults
-            screenXS: 640,
-            screenXSMin: 640,
-            screenXSMax: 767,
-            screenSM: 768,
-            screenSMMin: 768,
-            screenSMMax: 1023,
-            screenMD: 1024,
-            screenMDMin: 1024,
-            screenMDMax: 1279,
-            screenLG: 1280,
-            screenLGMin: 1280,
-            screenLGMax: 1535,
-            screenXL: 1536,
-            screenXLMin: 1536,
-            screenXLMax: 1599,
-            screenXXL: 1600,
-            screenXXLMin: 1600,
+            // Align antd breakpoints with Tailwind by name and value
+            // xs=0 (base/mobile) sm=640 md=768 lg=1024 xl=1280 xxl=1536
+            screenXS: 0,
+            screenXSMin: 0,
+            screenXSMax: 639,
+            screenSM: 640,
+            screenSMMin: 640,
+            screenSMMax: 767,
+            screenMD: 768,
+            screenMDMin: 768,
+            screenMDMax: 1023,
+            screenLG: 1024,
+            screenLGMin: 1024,
+            screenLGMax: 1279,
+            screenXL: 1280,
+            screenXLMin: 1280,
+            screenXLMax: 1535,
+            screenXXL: 1536,
+            screenXXLMin: 1536,
             screenXXLMax: 1919,
           },
         }}

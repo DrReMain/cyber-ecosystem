@@ -1,6 +1,14 @@
+import { execFileSync } from "node:child_process"
+import { existsSync } from "node:fs"
+import { readFile, writeFile } from "node:fs/promises"
+import { dirname } from "node:path"
+import { fileURLToPath } from "node:url"
 import { parse as parseYaml } from "yaml"
 
-export const ROOT = import.meta.dir.replace(/\/scripts(\/lib)?$/, "")
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+export const ROOT = __dirname.replace(/\/scripts(\/lib)?$/, "")
 export const SRC_DIR = `${ROOT}/src`
 export const I18N_DIR = `${ROOT}/i18n`
 export const INLANG_DIR = `${ROOT}/project.inlang`
@@ -39,9 +47,9 @@ export function flattenSchema(
 }
 
 export async function readJson<T>(path: string): Promise<T> {
-  const file = Bun.file(path)
-  if (!(await file.exists())) return {} as T
-  return await file.json()
+  if (!existsSync(path)) return {} as T
+  const content = await readFile(path, "utf-8")
+  return JSON.parse(content) as T
 }
 
 export async function readSettings(): Promise<Settings> {
@@ -55,12 +63,11 @@ export async function readSettings(): Promise<Settings> {
 
 export async function readSchema(): Promise<Map<string, string>> {
   const schemaPath = `${I18N_DIR}/schema.yaml`
-  const schemaFile = Bun.file(schemaPath)
-  if (!(await schemaFile.exists())) {
+  if (!existsSync(schemaPath)) {
     console.error(`Schema not found: ${schemaPath}`)
     process.exit(1)
   }
-  const schema = parseYaml(await schemaFile.text()) as SchemaNode
+  const schema = parseYaml(await readFile(schemaPath, "utf-8")) as SchemaNode
   if (typeof schema !== "object" || schema === null) {
     console.error("Schema is not a valid YAML object")
     process.exit(1)
@@ -105,13 +112,13 @@ export async function writeSortedJson(
   const sorted = Object.fromEntries(
     Object.entries(data).sort(([a], [b]) => a.localeCompare(b)),
   )
-  await Bun.write(path, `${JSON.stringify(sorted, null, 2)}\n`)
+  await writeFile(path, `${JSON.stringify(sorted, null, 2)}\n`)
 }
 
 export async function compileParaglide(): Promise<void> {
-  const proc = Bun.spawn(
+  execFileSync(
+    "npx",
     [
-      "npx",
       "@inlang/paraglide-js",
       "compile",
       "--project",
@@ -119,7 +126,6 @@ export async function compileParaglide(): Promise<void> {
       "--outdir",
       "./src/paraglide",
     ],
-    { cwd: ROOT, stdout: "pipe", stderr: "pipe" },
+    { cwd: ROOT, stdio: "pipe" },
   )
-  await proc.exited
 }

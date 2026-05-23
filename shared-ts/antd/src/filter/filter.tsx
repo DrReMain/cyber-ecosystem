@@ -1,6 +1,5 @@
 import { Button, Col, Form, Grid, Row, Space } from "antd"
 import { ChevronDown, ChevronUp, Search, Undo2 } from "lucide-react"
-import type { ReactNode } from "react"
 import { useEffect, useMemo, useState } from "react"
 import { OptionCol } from "./option-col"
 import type { FilterProps } from "./types"
@@ -8,9 +7,16 @@ import type { FilterProps } from "./types"
 const Item = Form.Item
 const useBreakpoint = Grid.useBreakpoint
 
-const DEFAULT_COL_SPAN = { xs: 24, sm: 12, md: 8, lg: 6, xl: 4, xxl: 4 }
-const HIDDEN_SPAN = { xs: 0, sm: 0, md: 0, lg: 0, xl: 0, xxl: 0 }
-const REQUIRED_MARK = (label: ReactNode) => label
+const DEFAULT_COL_SPAN = {
+  xs: 24,
+  sm: 12,
+  md: 12,
+  lg: 8,
+  xl: 6,
+  xxl: 6,
+  xxxl: 4,
+}
+const HIDDEN_SPAN = { xs: 0, sm: 0, md: 0, lg: 0, xl: 0, xxl: 0, xxxl: 0 }
 
 function isRangeOption(opt: {
   name: string | [string, string]
@@ -55,7 +61,7 @@ export function Filter<
   const colSpan = useMemo(() => {
     if (!columns) return DEFAULT_COL_SPAN
     const span = 24 / columns
-    return { ...DEFAULT_COL_SPAN, lg: span, xl: span, xxl: span }
+    return { ...DEFAULT_COL_SPAN, lg: span, xl: span, xxl: span, xxxl: span }
   }, [columns])
 
   const visibleOptions = useMemo(
@@ -64,6 +70,7 @@ export function Filter<
   )
 
   const colsPerRow = useMemo(() => {
+    if (screens.xxxl) return 24 / colSpan.xxxl
     if (screens.xxl) return 24 / colSpan.xxl
     if (screens.xl) return 24 / colSpan.xl
     if (screens.lg) return 24 / colSpan.lg
@@ -116,46 +123,19 @@ export function Filter<
       disabled={disabled}
       onFinish={handleFinish}
       onReset={handleReset}
-      requiredMark={REQUIRED_MARK}
+      requiredMark={(label) => label}
     >
       {!mounted && (
         <>
-          <style>{`@keyframes fsp{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
-          <Row gutter={[8, 8]}>
-            {visibleOptions
-              .slice(0, Math.floor(24 / colSpan.lg) - 1)
-              .map((opt) => (
-                <Col
-                  key={
-                    isRangeOption(opt)
-                      ? `${opt.name[0]}-${opt.name[1]}`
-                      : opt.name
-                  }
-                  {...colSpan}
-                >
-                  <div
-                    style={{
-                      height: 32,
-                      borderRadius: 6,
-                      background:
-                        "var(--ant-color-fill-secondary, rgba(0,0,0,.06))",
-                      animation: "fsp 1.5s ease-in-out infinite",
-                    }}
-                  />
-                </Col>
-              ))}
-            <Col key="__skeleton_actions" {...colSpan}>
-              <div
-                style={{
-                  height: 32,
-                  borderRadius: 6,
-                  background:
-                    "var(--ant-color-fill-secondary, rgba(0,0,0,.06))",
-                  animation: "fsp 1.5s ease-in-out infinite",
-                }}
-              />
-            </Col>
-          </Row>
+          <style>{`@keyframes filter-pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
+          <div
+            style={{
+              height: 60,
+              borderRadius: 6,
+              background: "var(--ant-color-fill-secondary, rgba(0,0,0,.06))",
+              animation: "filter-pulse 1.5s ease-in-out infinite",
+            }}
+          />
         </>
       )}
       {mounted && (

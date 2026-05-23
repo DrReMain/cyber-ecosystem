@@ -9,7 +9,7 @@
     },
     {
       "path": "apps/template/services/base",
-      "name": "template_base"
+      "name": "template_service_base"
     },
     {
       "path": "apps/template/clients/admin",

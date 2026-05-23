@@ -157,9 +157,7 @@ export const Gallery: Story = {
                     }
                     title={
                       <Flex align="center" gap={8}>
-                        <Text strong={item.read ? false : true}>
-                          {item.title}
-                        </Text>
+                        <Text strong={!item.read}>{item.title}</Text>
                         <Tag color={config.tag} style={{ fontSize: 10 }}>
                           {item.type}
                         </Tag>

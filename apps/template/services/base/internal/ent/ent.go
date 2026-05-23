@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"cyber-ecosystem/apps/template/services/base/internal/ent/file"
 	"cyber-ecosystem/apps/template/services/base/internal/ent/message"
 	"errors"
 	"fmt"
@@ -74,7 +73,6 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			file.Table:    file.ValidColumn,
 			message.Table: message.ValidColumn,
 		})
 	})

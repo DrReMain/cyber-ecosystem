@@ -14,7 +14,6 @@ type RP struct {
 }
 
 var ProviderSet = wire.NewSet(
-	NewFileRP,
 	NewResourceRP,
 	NewMessageRP,
 )

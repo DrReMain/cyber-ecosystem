@@ -94,7 +94,7 @@ export const StaticOpen: Story = {
           <ColorPicker
             open
             defaultValue="#1677ff"
-            getPopupContainer={() => containerRef.current!}
+            getPopupContainer={() => containerRef.current ?? document.body}
           />
         </div>
       </div>

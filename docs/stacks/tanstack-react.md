@@ -1,7 +1,7 @@
 # TanStack + React Stack Guide
 
 Guide for React applications built with TanStack Start, TanStack Router,
-TanStack Query, Ant Design, Paraglide, Vite, Bun, and Nx in this monorepo.
+TanStack Query, Ant Design, Paraglide, Vite, pnpm, and Nx in this monorepo.
 
 ---
 
@@ -19,7 +19,7 @@ Applies to React clients that use:
 - Ant Design
 - Paraglide i18n
 - Vite
-- Bun
+- pnpm
 - Nx
 
 ---
@@ -31,7 +31,7 @@ The toolchain has clear ownership boundaries:
 | Tool | Responsibility |
 |------|----------------|
 | Nx | Monorepo orchestration and declared project workflows |
-| Bun | JavaScript runtime and package-script execution |
+| pnpm | Package manager and script runner |
 | Vite | Dev server, bundling, and plugin pipeline |
 | TanStack Start | React application runtime and SSR entry |
 | TanStack Router | Type-safe routing, route loading, and URL state |
@@ -49,7 +49,7 @@ targets:
 ./nx run <project>:messages:check
 ```
 
-Do not bypass Nx with direct Bun or Vite commands when a target exists. If a
+Do not bypass Nx with direct pnpm or Vite commands when a target exists. If a
 workflow is repeated, expose it as an Nx target.
 
 ---

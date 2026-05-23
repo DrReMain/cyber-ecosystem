@@ -57,9 +57,9 @@ export const Gallery: Story = {
               "https://picsum.photos/seed/antd4/200/150",
               "https://picsum.photos/seed/antd5/200/150",
               "https://picsum.photos/seed/antd6/200/150",
-            ].map((src, i) => (
+            ].map((src) => (
               <Image
-                key={i}
+                key={src}
                 width={120}
                 height={90}
                 src={src}
@@ -87,9 +87,9 @@ export const Gallery: Story = {
             "https://picsum.photos/seed/grid6/300/200",
             "https://picsum.photos/seed/grid7/300/200",
             "https://picsum.photos/seed/grid8/300/200",
-          ].map((src, i) => (
+          ].map((src) => (
             <Image
-              key={i}
+              key={src}
               src={src}
               style={{ borderRadius: 4, objectFit: "cover", width: "100%" }}
             />

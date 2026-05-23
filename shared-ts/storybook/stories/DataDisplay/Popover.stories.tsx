@@ -192,7 +192,7 @@ export const StaticOpen: Story = {
                 content={textContent}
                 placement={placement}
                 open
-                getPopupContainer={() => containerRef.current!}
+                getPopupContainer={() => containerRef.current ?? document.body}
               >
                 <Button>{placement}</Button>
               </Popover>

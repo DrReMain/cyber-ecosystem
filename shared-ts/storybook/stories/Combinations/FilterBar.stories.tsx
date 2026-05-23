@@ -219,6 +219,7 @@ export const Interactive: Story = {
   args: {
     onSearch: fn(),
   },
+  // biome-ignore lint/suspicious/noExplicitAny: Storybook story args need any
   render: (args: any) => (
     <Card>
       <Flex vertical gap={16}>
@@ -253,6 +254,7 @@ export const Interactive: Story = {
       </Flex>
     </Card>
   ),
+  // biome-ignore lint/suspicious/noExplicitAny: Storybook story args need any
   play: async ({ canvasElement, args }: any) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText("Search projects...")

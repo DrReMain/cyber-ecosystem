@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "template_base",
+      "name": "template_service_base",
       "type": "go",
       "request": "launch",
       "mode": "debug",

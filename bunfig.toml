@@ -1,4 +1,0 @@
-[install]
-exact = true
-frozenLockfile = true
-registry = "https://registry.npmmirror.com"

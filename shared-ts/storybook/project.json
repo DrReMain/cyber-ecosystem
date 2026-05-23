@@ -8,21 +8,21 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "bun --bun run lint"
+        "command": "pnpm run lint"
       }
     },
     "biome:format": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "bun --bun run lint:fix"
+        "command": "pnpm run lint:fix"
       }
     },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "bun --bun run typecheck"
+        "command": "pnpm run typecheck"
       }
     }
   }

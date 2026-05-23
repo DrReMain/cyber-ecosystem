@@ -50,13 +50,6 @@ function AppLayout() {
             >
               HTTP
             </Link>
-            <Link
-              activeProps={{ className: "font-semibold" }}
-              className="rounded px-2 py-1 text-sm transition-colors hover:bg-antd-fill"
-              to="/playground/file"
-            >
-              File
-            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-2">

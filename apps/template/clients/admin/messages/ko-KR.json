@@ -14,8 +14,12 @@
   "filter_search": "검색",
   "locale_name": [
     {
-      "declarations": ["input locale"],
-      "selectors": ["locale"],
+      "declarations": [
+        "input locale"
+      ],
+      "selectors": [
+        "locale"
+      ],
       "match": {
         "locale=zh-CN": "简体中文",
         "locale=en-US": "English",

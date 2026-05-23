@@ -188,7 +188,7 @@ export const StaticOpen: Story = {
                 options={basicOptions}
                 defaultValue="apple"
                 style={{ width: W.select }}
-                getPopupContainer={() => containerRef.current!}
+                getPopupContainer={() => containerRef.current ?? document.body}
               />
             </div>
             <Label>With grouped options</Label>
@@ -197,7 +197,7 @@ export const StaticOpen: Story = {
               options={groupedOptions}
               defaultValue="lucy"
               style={{ width: W.select }}
-              getPopupContainer={() => containerRef.current!}
+              getPopupContainer={() => containerRef.current ?? document.body}
             />
           </Flex>
         </div>

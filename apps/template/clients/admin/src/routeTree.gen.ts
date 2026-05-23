@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppPlaygroundHttpRouteImport } from './routes/_app.playground.http'
-import { Route as AppPlaygroundFileRouteImport } from './routes/_app.playground.file'
 import { Route as AppPlaygroundConnectRouteImport } from './routes/_app.playground.connect'
 
 const AppRoute = AppRouteImport.update({
@@ -29,11 +28,6 @@ const AppPlaygroundHttpRoute = AppPlaygroundHttpRouteImport.update({
   path: '/playground/http',
   getParentRoute: () => AppRoute,
 } as any)
-const AppPlaygroundFileRoute = AppPlaygroundFileRouteImport.update({
-  id: '/playground/file',
-  path: '/playground/file',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppPlaygroundConnectRoute = AppPlaygroundConnectRouteImport.update({
   id: '/playground/connect',
   path: '/playground/connect',
@@ -43,13 +37,11 @@ const AppPlaygroundConnectRoute = AppPlaygroundConnectRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/playground/connect': typeof AppPlaygroundConnectRoute
-  '/playground/file': typeof AppPlaygroundFileRoute
   '/playground/http': typeof AppPlaygroundHttpRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/playground/connect': typeof AppPlaygroundConnectRoute
-  '/playground/file': typeof AppPlaygroundFileRoute
   '/playground/http': typeof AppPlaygroundHttpRoute
 }
 export interface FileRoutesById {
@@ -57,24 +49,18 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/': typeof AppIndexRoute
   '/_app/playground/connect': typeof AppPlaygroundConnectRoute
-  '/_app/playground/file': typeof AppPlaygroundFileRoute
   '/_app/playground/http': typeof AppPlaygroundHttpRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/playground/connect'
-    | '/playground/file'
-    | '/playground/http'
+  fullPaths: '/' | '/playground/connect' | '/playground/http'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/playground/connect' | '/playground/file' | '/playground/http'
+  to: '/' | '/playground/connect' | '/playground/http'
   id:
     | '__root__'
     | '/_app'
     | '/_app/'
     | '/_app/playground/connect'
-    | '/_app/playground/file'
     | '/_app/playground/http'
   fileRoutesById: FileRoutesById
 }
@@ -105,13 +91,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPlaygroundHttpRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/playground/file': {
-      id: '/_app/playground/file'
-      path: '/playground/file'
-      fullPath: '/playground/file'
-      preLoaderRoute: typeof AppPlaygroundFileRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/playground/connect': {
       id: '/_app/playground/connect'
       path: '/playground/connect'
@@ -125,14 +104,12 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppPlaygroundConnectRoute: typeof AppPlaygroundConnectRoute
-  AppPlaygroundFileRoute: typeof AppPlaygroundFileRoute
   AppPlaygroundHttpRoute: typeof AppPlaygroundHttpRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppPlaygroundConnectRoute: AppPlaygroundConnectRoute,
-  AppPlaygroundFileRoute: AppPlaygroundFileRoute,
   AppPlaygroundHttpRoute: AppPlaygroundHttpRoute,
 }
 

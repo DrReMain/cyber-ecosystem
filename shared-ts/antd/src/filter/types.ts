@@ -52,9 +52,7 @@ export type RangeDateFilterOption = BaseOption & {
   placeholder?: [string, string]
 }
 
-export type RangeFilterOption =
-  | RangeNumberFilterOption
-  | RangeDateFilterOption
+export type RangeFilterOption = RangeNumberFilterOption | RangeDateFilterOption
 
 export type BuiltinFilterOption =
   | InputFilterOption

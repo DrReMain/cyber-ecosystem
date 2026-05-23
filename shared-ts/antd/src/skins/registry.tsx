@@ -1,14 +1,21 @@
 import type { ReactNode } from "react"
-import type { SkinPlugin } from "./types"
 import defaultSkin from "../skin-presets/default"
 import doodleSkin from "../skin-presets/doodle"
 import heroSkin from "../skin-presets/hero"
 import illustrationSkin from "../skin-presets/illustration"
 import lumaSkin from "../skin-presets/luma"
 import lyraSkin from "../skin-presets/lyra"
+import type { SkinPlugin } from "./types"
 
 const SKINS: Record<string, SkinPlugin> = {}
-for (const skin of [defaultSkin, doodleSkin, heroSkin, illustrationSkin, lumaSkin, lyraSkin]) {
+for (const skin of [
+  defaultSkin,
+  doodleSkin,
+  heroSkin,
+  illustrationSkin,
+  lumaSkin,
+  lyraSkin,
+]) {
   SKINS[skin.id] = skin
 }
 

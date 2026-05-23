@@ -429,6 +429,7 @@ export const Interactive: Story = {
   args: {
     onFinish: fn(),
   },
+  // biome-ignore lint/suspicious/noExplicitAny: Storybook story args need any
   render: (args: any) => (
     <Form
       name="interactive"
@@ -446,6 +447,7 @@ export const Interactive: Story = {
       </Form.Item>
     </Form>
   ),
+  // biome-ignore lint/suspicious/noExplicitAny: Storybook story args need any
   play: async ({ canvasElement, args }: any) => {
     const canvas = within(canvasElement)
     const input = canvas.getByRole("textbox")

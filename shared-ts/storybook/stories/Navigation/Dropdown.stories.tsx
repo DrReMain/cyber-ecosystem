@@ -135,7 +135,7 @@ export const StaticOpen: Story = {
                 { key: "5", label: "Last Item" },
               ],
             }}
-            getPopupContainer={() => containerRef.current!}
+            getPopupContainer={() => containerRef.current ?? document.body}
           >
             <Button>
               Static Open <DownOutlined />
