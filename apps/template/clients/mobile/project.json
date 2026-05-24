@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "template_client_mobile",
+  "root": "apps/template/clients/mobile",
+  "projectType": "application",
+  "targets": {
+    "biome:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm run lint"
+      }
+    },
+    "biome:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm run lint:fix"
+      }
+    }
+  }
+}

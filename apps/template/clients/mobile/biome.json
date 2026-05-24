@@ -1,0 +1,56 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
+  "extends": "//",
+  "files": {
+    "includes": [
+      "**",
+      "!**/services/connect",
+      "!ios",
+      "!android",
+      "!.expo"
+    ]
+  },
+  "linter": {
+    "rules": {
+      "correctness": {
+        "noNestedComponentDefinitions": "error"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "error",
+        "noExcessiveLinesPerFunction": {
+          "level": "error",
+          "options": { "maxLines": 200, "skipBlankLines": true }
+        }
+      },
+      "style": {
+        "useConsistentTypeDefinitions": "error",
+        "noParameterAssign": "error",
+        "useExportType": "error",
+        "useImportType": "error"
+      },
+      "nursery": {
+        "useSortedClasses": "error",
+        "noFloatingPromises": "error",
+        "noLeakedRender": "error",
+        "noShadow": "error",
+        "noComponentHookFactories": "error",
+        "noMisusedPromises": "error",
+        "useExhaustiveSwitchCases": "error",
+        "noUnnecessaryConditions": "error",
+        "noUnnecessaryTemplateExpression": "error"
+      }
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "useSortedAttributes": "on"
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
+}

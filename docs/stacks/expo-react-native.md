@@ -13,7 +13,7 @@ This guide covers the mobile client stack for the cyber-ecosystem monorepo, used
 | Framework | Expo SDK | 53+ |
 | Runtime | React Native | (managed by Expo) |
 | Language | TypeScript | strict mode |
-| Package Manager | pnpm | (monorepo-wide) |
+| Package Manager | Bun | (monorepo-wide) |
 
 ---
 

@@ -6,6 +6,7 @@
     "bufbuild.buf",
     "pbkit.vscode-overview",
     "golang.go",
-    "biomejs.biome"
+    "biomejs.biome",
+    "expo.vscode-expo-tools"
   ]
 }
