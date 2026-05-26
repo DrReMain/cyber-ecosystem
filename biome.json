@@ -58,5 +58,19 @@
     "formatter": {
       "trailingCommas": "none"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/components/ui/**"],
+      "linter": {
+        "enabled": false
+      }
+    },
+    {
+      "includes": ["**/*.css"],
+      "linter": {
+        "enabled": false
+      }
+    }
+  ]
 }

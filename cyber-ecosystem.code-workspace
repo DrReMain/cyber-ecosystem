@@ -4,20 +4,28 @@
       "path": "."
     },
     {
-      "path": "apps/template/api",
-      "name": "template_api"
+      "path": "apps/genesis/api",
+      "name": "genesis_api"
     },
     {
-      "path": "apps/template/services/base",
-      "name": "template_service_base"
+      "path": "apps/genesis/services/base",
+      "name": "genesis_service_base"
     },
     {
-      "path": "apps/template/clients/admin",
-      "name": "template_client_admin"
+      "path": "apps/genesis/services/admin-bff",
+      "name": "genesis_bff_admin"
     },
     {
-      "path": "apps/template/clients/mobile",
-      "name": "template_client_mobile"
+      "path": "apps/genesis/services/mobile-bff",
+      "name": "genesis_bff_mobile"
+    },
+    {
+      "path": "apps/genesis/clients/admin",
+      "name": "genesis_client_admin"
+    },
+    {
+      "path": "apps/genesis/clients/mobile",
+      "name": "genesis_client_mobile"
     }
   ],
   "settings": {

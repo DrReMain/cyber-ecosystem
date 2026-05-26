@@ -17,6 +17,34 @@
         "cwd": "{projectRoot}",
         "command": "pnpm run lint:fix"
       }
+    },
+    "i18n:extract": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "lingui extract --clean"
+      }
+    },
+    "i18n:compile": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "lingui compile"
+      }
+    },
+    "proto:connect": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf generate --template apps/template/clients/mobile/buf.gen.client.yaml --path apps/template/api --include-imports"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "tsc --noEmit"
+      }
     }
   }
 }

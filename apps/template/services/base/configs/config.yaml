@@ -32,7 +32,7 @@ log:
     max_age: 30
     compress: true
   otlp_log:
-    enabled: true
+    enabled: false
     endpoint: "localhost:4318"
     insecure: true
 data:
@@ -69,9 +69,9 @@ data:
       secret_key: "Cyber-Ecosystem123"
       bucket: "uploads"
       region: "us-east-1"
-trace:
-  endpoint: "localhost:4318"
-  insecure: true
+# trace:
+# endpoint: "localhost:4318"
+# insecure: true
 ops:
   enabled: false
   addr: "0.0.0.0:14000"

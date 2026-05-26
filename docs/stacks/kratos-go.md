@@ -481,7 +481,7 @@ func (m *Message) TransitionTo(ctx context.Context, target string) error {
     m.Status = utils.Ptr(utils.Deref(m.Status, "draft"))
     f := newMessageFSM(*m.Status, m)
     if err := f.Event(ctx, target); err != nil {
-        return templateV1.ErrorErrorReasonXxx("").WithCause(err)
+        return appV1.ErrorErrorReasonXxx("").WithCause(err)
     }
     return nil
 }

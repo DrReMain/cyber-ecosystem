@@ -8,12 +8,10 @@
   "scripts": {
     "dev": "vite dev --host",
     "build": "vite build",
-    "build:analyze": "VITE_DEVTOOLS=true node node_modules/.bin/vite build",
+    "build:analyze": "VITE_DEVTOOLS=true vite build",
     "preview": "vite preview",
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
-    "generate:connect": "buf generate --template ./buf.gen.client.yaml --include-imports",
-    "generate:openapi": "openapi-ts -f hey-api.config.ts",
     "messages:gen": "npx tsx scripts/gen-messages.ts",
     "messages:check": "npx tsx scripts/check-messages.ts"
   },
@@ -62,7 +60,7 @@
     "@rolldown/plugin-babel": "^0.2",
     "@tailwindcss/vite": "^4",
     "@tanstack/devtools-vite": "^0.7",
-    "@types/node": "25.9.1",
+    "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/devtools": "^0.2",

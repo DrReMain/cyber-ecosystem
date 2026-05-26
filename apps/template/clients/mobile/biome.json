@@ -5,9 +5,11 @@
     "includes": [
       "**",
       "!**/services/connect",
+      "!locale/**/*.js",
       "!ios",
       "!android",
-      "!.expo"
+      "!.expo",
+      "!./src/global.css"
     ]
   },
   "linter": {

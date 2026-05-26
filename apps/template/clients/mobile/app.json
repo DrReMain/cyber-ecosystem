@@ -1,5 +1,6 @@
 {
   "expo": {
+    "platforms": ["ios", "android"],
     "name": "mobile",
     "slug": "mobile",
     "version": "1.0.0",
@@ -22,10 +23,6 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.cyberecosystem.template.mobile"
     },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
     "plugins": [
       "expo-router",
       [
@@ -37,7 +34,8 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

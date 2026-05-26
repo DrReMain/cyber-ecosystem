@@ -3,46 +3,116 @@
   "name": "infra",
   "root": "infra",
   "targets": {
-    "docker:up": {
+    "core:up": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}/infra/docker",
         "command": "docker compose up -d"
       }
     },
-    "docker:down": {
+    "core:down": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}/infra/docker",
         "command": "docker compose down"
       }
     },
-    "docker:logs": {
+    "core:logs": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose logs -f"
+        "command": "docker compose logs -f postgres redis"
       }
     },
-    "docker:ps": {
+    "core:ps": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}/infra/docker",
         "command": "docker compose ps"
       }
     },
-    "docker:restart": {
+    "core:restart": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose restart"
+        "command": "docker compose restart postgres redis"
       }
     },
-    "docker:clean": {
+    "observability:up": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}/infra/docker",
-        "command": "docker compose down -v --remove-orphans"
+        "command": "docker compose --profile observability up -d"
+      }
+    },
+    "observability:down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose rm -f -s signoz-zookeeper signoz-init-clickhouse signoz-clickhouse signoz-telemetrystore-migrator signoz signoz-otel-collector glitchtip-init glitchtip-migrate glitchtip-createsuperuser glitchtip glitchtip-worker"
+      }
+    },
+    "observability:logs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose --profile observability logs -f"
+      }
+    },
+    "storage:up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose --profile storage up -d"
+      }
+    },
+    "storage:down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose rm -f -s minio"
+      }
+    },
+    "storage:logs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose --profile storage logs -f"
+      }
+    },
+    "all:up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose --profile observability --profile storage up -d"
+      }
+    },
+    "all:down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose --profile observability --profile storage down"
+      }
+    },
+    "all:logs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose --profile observability --profile storage logs -f"
+      }
+    },
+    "all:ps": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose --profile observability --profile storage ps"
+      }
+    },
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}/infra/docker",
+        "command": "docker compose --profile observability --profile storage down -v --remove-orphans"
       }
     }
   }

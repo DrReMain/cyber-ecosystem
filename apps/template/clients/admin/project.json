@@ -31,6 +31,20 @@
         "cwd": "{projectRoot}",
         "command": "pnpm run messages:check"
       }
+    },
+    "proto:openapi": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "openapi-ts -f hey-api.config.ts"
+      }
+    },
+    "proto:connect": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf generate --template apps/template/clients/admin/buf.gen.client.yaml --path apps/template/api --include-imports"
+      }
     }
   }
 }
