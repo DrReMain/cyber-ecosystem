@@ -1,0 +1,16 @@
+{
+  "$schema": "../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "genesis_api",
+  "root": "apps/genesis/api",
+  "projectType": "application",
+  "implicitDependencies": ["contracts"],
+  "targets": {
+    "proto:api": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf generate --template apps/genesis/api/buf.gen.api.yaml --path apps/genesis/api"
+      }
+    }
+  }
+}

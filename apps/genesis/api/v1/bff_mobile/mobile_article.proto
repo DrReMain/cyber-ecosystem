@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.genesis.v1;
+
+import "genesis/api/v1/messages/article.proto";
+import "desc/desc.proto";
+import "google/api/annotations.proto";
+
+option go_package = "cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1";
+
+// region[rgba(52,152,219,0.2)] 🔵 Service
+
+// MobileArticleService — create + query for mobile client
+service MobileArticleService {
+  option (desc.service_comment) = "移动端文章服务";
+
+  rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse) {
+    option (desc.method_comment) = "创建文章";
+    option (google.api.http) = {
+      post: "/api/v1/article"
+      body: "*"
+    };
+  }
+  rpc QueryArticle(QueryArticleRequest) returns (QueryArticleResponse) {
+    option (desc.method_comment) = "查询文章列表";
+    option (google.api.http) = {get: "/api/v1/article"};
+  }
+}

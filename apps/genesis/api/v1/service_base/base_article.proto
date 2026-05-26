@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.genesis.v1;
+
+import "genesis/api/v1/messages/article.proto";
+import "desc/desc.proto";
+
+option go_package = "cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1";
+
+// region[rgba(52,152,219,0.2)] 🔵 Service
+
+// ArticleService — core CRUD, gRPC only
+service ArticleService {
+  option (desc.service_comment) = "文章服务";
+
+  rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse) {
+    option (desc.method_comment) = "创建文章";
+  }
+  rpc UpdateArticle(UpdateArticleRequest) returns (UpdateArticleResponse) {
+    option (desc.method_comment) = "修改文章";
+  }
+  rpc DeleteArticle(DeleteArticleRequest) returns (DeleteArticleResponse) {
+    option (desc.method_comment) = "删除文章";
+  }
+  rpc GetArticle(GetArticleRequest) returns (GetArticleResponse) {
+    option (desc.method_comment) = "查询文章详情";
+  }
+  rpc QueryArticle(QueryArticleRequest) returns (QueryArticleResponse) {
+    option (desc.method_comment) = "查询文章列表";
+  }
+  rpc SortArticle(SortArticleRequest) returns (SortArticleResponse) {
+    option (desc.method_comment) = "排序文章";
+  }
+  rpc UpdateArticleStatus(UpdateArticleStatusRequest) returns (UpdateArticleStatusResponse) {
+    option (desc.method_comment) = "修改文章状态";
+  }
+}

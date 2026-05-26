@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.genesis.v1;
+
+import "buf/validate/validate.proto";
+import "common/page.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1";
+
+// region[rgba(239,83,80,0.15)] 🔴 Model
+
+message Article {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue title = 4;
+  google.protobuf.StringValue content = 5;
+  google.protobuf.StringValue status = 6;
+}
+
+// region[rgba(186,104,200,0.15)] 🟣 Messages
+
+message CreateArticleRequest {
+  optional string title = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string content = 2;
+}
+
+message CreateArticleResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+message UpdateArticleRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string title = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string content = 3;
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+  }];
+}
+
+message UpdateArticleResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+message DeleteArticleRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message DeleteArticleResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+message GetArticleRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetArticleResponse {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue title = 4;
+  google.protobuf.StringValue content = 5;
+  google.protobuf.StringValue status = 6;
+}
+
+message QueryArticleRequest {
+  common.PageRequest page = 1;
+  optional string title = 2;
+  optional string status = 3 [(buf.validate.field).string = {
+    in: [
+      "draft",
+      "published",
+      "archived"
+    ]
+  }];
+
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "QueryArticleRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt):(asc|desc)$'))"
+  }];
+}
+
+message QueryArticleResponse {
+  common.PageResponse page = 1;
+  repeated GetArticleResponse list = 2;
+}
+
+message UpdateArticleStatusRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string status = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      in: [
+        "draft",
+        "published",
+        "archived"
+      ]
+    }
+  ];
+}
+
+message UpdateArticleStatusResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+message SortArticleRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string prev_id = 2;
+  optional string next_id = 3;
+
+  option (buf.validate.message).cel = {
+    id: "SortArticleRequest.prev_id-next_id"
+    message: "at least one of prev_id or next_id is required"
+    expression: "has(this.prev_id) || has(this.next_id)"
+  };
+}
+
+message SortArticleResponse {
+  google.protobuf.StringValue id = 1;
+}

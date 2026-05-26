@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+package api.genesis.v1;
+
+import "genesis/api/v1/messages/resource.proto";
+import "desc/desc.proto";
+
+option go_package = "cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1";
+
+// region[rgba(52,152,219,0.2)] 🔵 Service
+
+// ResourceService — proto introspection, gRPC only
+service ResourceService {
+  option (desc.service_comment) = "系统资源服务";
+
+  rpc ListResource(ListResourceRequest) returns (ListResourceResponse) {
+    option (desc.method_comment) = "获取所有rpc信息";
+  }
+}

@@ -1,0 +1,157 @@
+syntax = "proto3";
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package cyber_ecosystem.conf;
+
+import "google/protobuf/duration.proto";
+
+option go_package = "genesis/services/base/internal/conf;conf";
+
+message Bootstrap {
+  Server server = 1;
+  Log log = 2;
+  Data data = 3;
+  Trace trace = 4;
+  Ops ops = 5;
+  ErrorReport error_report = 6;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message Connect {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+  Connect connect = 3;
+}
+
+message Log {
+  message Cache {
+    bool enabled = 1;
+    string level = 2;
+    bool slow_query = 3;
+    google.protobuf.Duration slow_query_threshold = 4;
+  }
+  message Ent {
+    bool enabled = 1;
+    string level = 2;
+    bool slow_query = 3;
+    google.protobuf.Duration slow_query_threshold = 4;
+  }
+  message Console {
+    bool enabled = 1;
+    bool color = 2;
+    string format = 3;
+  }
+  message File {
+    bool enabled = 1;
+    string path = 2;
+    int32 max_size = 3;
+    int32 max_backups = 4;
+    int32 max_age = 5;
+    bool compress = 6;
+  }
+  message OtlpLog {
+    bool enabled = 1;
+    string endpoint = 2;
+    bool insecure = 3;
+  }
+
+  string level = 1;
+  Cache cache = 2;
+  Ent ent = 3;
+  Console console = 4;
+  File file = 5;
+  OtlpLog otlp_log = 6;
+}
+
+message Data {
+  message Cache {
+    message Memory {
+      bool otel_enabled = 1;
+    }
+    message Redis {
+      string network = 1;
+      string addr = 2;
+      google.protobuf.Duration read_timeout = 3;
+      google.protobuf.Duration write_timeout = 4;
+      int32 pool_size = 5;
+      int32 min_idle_conns = 6;
+      google.protobuf.Duration conn_max_lifetime = 7;
+      string password = 8;
+      int32 db = 9;
+      bool otel_enabled = 10;
+    }
+    string type = 1;
+    Memory memory = 2;
+    Redis redis = 3;
+  }
+  message Database {
+    string driver = 1;
+    string host = 2;
+    int32 port = 3;
+    string user = 4;
+    string password = 5;
+    string db_name = 6;
+    int32 max_open_conns = 7;
+    int32 max_idle_conns = 8;
+    google.protobuf.Duration conn_max_lifetime = 9;
+    bool migrate = 10;
+  }
+  message Storage {
+    message S3 {
+      string endpoint = 1;
+      string access_key = 2;
+      string secret_key = 3;
+      string bucket = 4;
+      string region = 5;
+      bool use_ssl = 6;
+    }
+    int64 max_file_size = 1;
+    S3 s3 = 2;
+  }
+  Cache cache = 1;
+  Database database = 2;
+  Storage storage = 3;
+}
+
+message Trace {
+  string endpoint = 1;
+  bool insecure = 2;
+}
+
+message ErrorReport {
+  bool enabled = 1;
+  string dsn = 2;
+  string environment = 3;
+  double sample_rate = 4;
+}
+
+message Ops {
+  message Pprof {
+    bool enabled = 1;
+    bool cpu_enabled = 2;
+    bool heap_enabled = 3;
+    bool goroutine_enabled = 4;
+    bool mutex_enabled = 5;
+    bool thread_enabled = 6;
+    bool trace_enabled = 7;
+  }
+  bool enabled = 1;
+  string network = 2;
+  string addr = 3;
+  string metrics = 4;
+  Pprof pprof = 5;
+}
