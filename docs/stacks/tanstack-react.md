@@ -5,6 +5,57 @@ TanStack Query, Ant Design, Paraglide, Vite, pnpm, and Nx in this monorepo.
 
 ---
 
+## Quick Reference
+
+### Pagination Builders (`lib/builder.ts`)
+
+```ts
+import { buildConnectPage, buildHTTPPage, buildOrderBy } from "@/lib/builder"
+
+// Both take a pagination/search input: { pageNo?, pageSize?, createdAtA?, ... }
+const page = buildConnectPage(search)   // → Connect RPC page message
+const params = buildHTTPPage(search)    // → flat `page.*` query params
+
+// Sort: comma-separated "field:asc" string → string[]
+const orderBy = buildOrderBy(sort)
+```
+
+### Connect RPC Query (generated hooks)
+
+```ts
+import { useQuery } from "@connectrpc/connect-query"
+import { listArticles } from "#/services/connect/<app>V1-<service>Service-Connect"
+const { data } = useQuery(listArticles, { pageSize: 10 })
+```
+
+### HTTP REST Query (OpenAPI generated)
+
+```ts
+import { adminArticleServiceListArticle } from "#/services/openapi/CustomClient"
+const { data } = await adminArticleServiceListArticle({ queries: { "page.size": 10 } })
+```
+
+### Environment Variables
+
+```ts
+// Server + Client (shared)
+CONNECT_API_URL  // Connect RPC base URL (server-side full URL, client-side proxied)
+HTTP_API_URL     // HTTP REST base URL
+
+// Client only (VITE_ prefix)
+VITE_SITE_URL
+VITE_GLITCHTIP_DSN
+VITE_OTEL_URL
+```
+
+### Error Suppression
+
+```ts
+useQuery(listArticles, { pageSize: 10 }, { meta: { silent: true } })
+```
+
+---
+
 ## 1. Scope
 
 This guide is stack-level only. Product, client, page, and domain conventions
@@ -562,3 +613,59 @@ src/
     use-utils.tsx                     # Table column builders, time formatting
   components/                         # Shared UI components
 ```
+
+---
+
+## 20. Testing
+
+### Conventions
+
+- Co-located test files: `{file}.test.tsx` or `{file}.spec.tsx`
+- Recommended setup (configure per client — there is no global `test` target yet): `vitest` runner, `@testing-library/react` for components, `msw` for API mocking
+
+### Running Tests
+
+```bash
+./nx run <project>:test              # Run all tests
+./nx run <project>:test -- --watch   # Watch mode
+./nx run <project>:test -- --coverage # With coverage
+```
+
+> If `test` target is not declared, add it to `project.json` or run `pnpm vitest` directly and note the gap.
+
+### What to Test
+
+| Layer | What to Test | Tool |
+|-------|-------------|------|
+| Components | Rendering, user interactions | vitest + testing-library |
+| Hooks (queries) | Data loading, caching, error handling | vitest + msw |
+| Stores (Jotai) | State transitions, persistence | vitest |
+| Services | Transport config, interceptors | vitest |
+
+---
+
+## 21. Generation Troubleshooting
+
+### Connect code generation fails
+
+**Fix**: `proto:connect` runs from `{workspaceRoot}` because `protoc-gen-*` binaries are root devDependencies. Verify the `--template` and `--path` flags in `project.json`.
+
+### OpenAPI client names unexpected
+
+**Cause**: BFF path prefixes affect OpenAPI operation IDs.
+
+**Fix**: When BFFs use `/api/v1/admin/`, functions are prefixed: `adminArticleServiceCreateArticle`.
+
+### Paraglide messages out of sync
+
+**Fix**: Edit `i18n/messages/` source files → `./nx run <project>:messages:gen` → never edit `src/paraglide/` directly.
+
+### Vite plugin order issues
+
+**Fix**: Plugin order must be: devtools → paraglide → tailwind → start → react → babel. Changing this order breaks SSR or HMR.
+
+### pnpm "cannot find module"
+
+**Cause**: pnpm isolated mode — each package only sees its declared dependencies.
+
+**Fix**: Add the missing dependency to the package's `package.json`, then `pnpm install`.

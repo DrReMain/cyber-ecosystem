@@ -4,6 +4,62 @@ Guide for coding agents working on Go microservices built with the Kratos framew
 
 ---
 
+## Quick Reference
+
+### shared-go/utils — Pointer & Wrapper
+
+```go
+utils.Ptr(val)                    // T → *T
+utils.Deref(ptr, default)         // *T → T (with default)
+utils.PtrApply(ptr, fn)           // apply fn if ptr non-nil → *R
+utils.ConvNum[R](src)             // numeric type conversion
+
+utils.Wrap(ptr, utils.StringW)    // *string → *wrapperspb.StringValue
+utils.Unwrap[string](wrapper)     // *wrapperspb.StringValue → *string
+utils.StringW                     // string → *StringValue constructor
+utils.ToTimestamp(timePtr)        // *time.Time → *timestamppb.Timestamp
+utils.FromTimestamp(ts)           // *timestamppb.Timestamp → *time.Time
+```
+
+### shared-go/utils — Slice & Sort
+
+```go
+utils.SliceMap(slice, fn)         // []T → []R
+utils.SliceMapErr(slice, fn)      // []T → ([]R, error)
+utils.ParseOrderBy([]string)      // ["field:asc"] → []*OrderBy
+utils.StringifyOrderBy([]*OrderBy)// reverse
+```
+
+### shared-go/orm/ent/entutil — Pagination
+
+```go
+config := entutil.NewPageConfig(defaultSize, maxSize) // maxSize=0 means unlimited
+total, offset, limit, err := entutil.ApplyPagination(ctx, query, pageReq, config, ce)
+page := entutil.BuildPageResponse(total, offset, limit) // → *common.PageResponse
+
+entutil.WherePtr(query, filter.Title, func(v string) predicate.Xxx { ... })
+utils.EnsurePageRequest(req) // nil-safe
+```
+
+### shared-go/utils/masks — Field Mask Update
+
+```go
+utils.Handler{
+    "title":   {Condition: m.Title != nil, OnTrue: func() { updater.SetTitle(*m.Title) }, OnFalse: func() {}},
+}.Emit(fieldsMask)
+```
+
+### File Naming Cheat Sheet
+
+| Layer | Pattern | Example |
+|-------|---------|---------|
+| biz | `{aggregate}.go` (model), `{aggregate}_uc.go` (port+UC), `{aggregate}_fsm.go` (FSM) | `article.go`, `article_uc.go` |
+| data | `{aggregate}_rp.go` | `article_rp.go` |
+| service | `{aggregate}.go` | `article.go` |
+| platform | `platform_{type}.go` + `platform_{type}_handler.go` | `platform_cache.go` |
+
+---
+
 ## 1. Architecture
 
 ### Layered Structure
@@ -717,3 +773,111 @@ apps/<app>/
 ```
 
 `[DB]`, `[gRPC Client]`, `[Storage]` markers indicate capability-specific files — include only the files needed for the service's capabilities.
+
+---
+
+## 15. Testing
+
+### Conventions
+
+- Tests co-located with source: `{file}_test.go` in the same package
+- Table-driven tests for repository and UC layer
+- Assertions via the standard `testing` package; `testify` is optional (add to `go.mod` if adopted — the example below uses it)
+- Mock interfaces at the RP port boundary for UC tests
+
+### Running Tests
+
+```bash
+# Single service
+cd apps/<app>/services/<service> && go test ./...
+
+# With verbose output
+go test -v ./internal/biz/...
+
+# Run a specific test
+go test -run TestCommentUC_Create ./internal/biz/...
+```
+
+### Test Patterns
+
+```go
+// UC test — mock the RP port
+type mockCommentRP struct {
+    biz.CommentRP
+    getFn func(ctx context.Context, id string) (*biz.Comment, error)
+}
+
+func (m *mockCommentRP) Get(ctx context.Context, id string) (*biz.Comment, error) {
+    return m.getFn(ctx, id)
+}
+
+func TestCommentUC_Get(t *testing.T) {
+    rp := &mockCommentRP{
+        getFn: func(_ context.Context, id string) (*biz.Comment, error) {
+            return &biz.Comment{ID: utils.Ptr(id)}, nil
+        },
+    }
+    uc := biz.NewCommentUC(log.DefaultLogger, &noopTx{}, rp)
+    got, err := uc.Get(context.Background(), "test123")
+    require.NoError(t, err)
+    assert.Equal(t, "test123", *got.ID)
+}
+```
+
+### What to Test
+
+| Layer | What to Test | Mock Boundary |
+|-------|-------------|---------------|
+| biz (UC) | Business logic, state transitions, validations | RP port interface |
+| data (RP) | Query construction, mapping, error handling | Ent client (integration) |
+| service | Proto-to-biz mapping, response construction | UC layer |
+| platform | Error mapping correctness | Infrastructure (integration) |
+
+---
+
+## 16. Generation Troubleshooting
+
+### Wire fails with "no provider found"
+
+**Cause**: Missing constructor in a `ProviderSet`.
+
+**Fix**: Check that ALL constructors Wire needs are listed in the corresponding `ProviderSet`:
+- `data/data.go` — includes `NewXxxRP` for each repository
+- `biz/biz.go` — includes `NewXxxUC` for each use case
+- `service/service.go` — includes `NewXxxService` for each service
+- `platform/` — includes `NewGRPCXxxClient` for each remote service
+
+Then: `./nx run <project>:generate:wire`
+
+### Ent fails with "undefined" errors for local_mixins
+
+**Cause**: Local mixins import generated Ent packages that don't exist yet (chicken-and-egg).
+
+**Fix**: Three-stage bootstrap (see `/kratos-scaffold` skill for details):
+1. Comment out local_mixins from schema + `intercept` feature → `generate:ent`
+2. Uncomment `intercept` feature → `generate:ent`
+3. Uncomment local_mixins → `generate:ent`
+
+### buf generate fails with import errors
+
+**Cause**: Import paths don't resolve correctly from the buf module root.
+
+**Fix**:
+1. Verify import paths resolve relative to `contracts/` or `apps/` (defined in root `buf.yaml`)
+2. The `genesis/` prefix maps to `apps/genesis/`
+3. Run: `./nx run <app>_api:proto:api`
+
+### i18n generate produces empty or wrong stubs
+
+**Cause**: `i18n.protos` file has incorrect relative paths.
+
+**Fix**: Paths are relative from `internal/i18n/` to the proto file:
+- To contracts: `../../../../../../contracts/errors/codes_general.proto`
+- To app errors: `../../../../api/v1/error/error_reason.proto`
+- Run: `./nx run <project>:generate:i18n`
+
+### go mod tidy removes needed dependencies
+
+**Cause**: Imports look unused before generation completes.
+
+**Fix**: Always run generation BEFORE `go mod tidy`. The `generate` target handles this automatically by running `go mod tidy` as the last step.

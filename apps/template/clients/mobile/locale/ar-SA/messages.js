@@ -1,1 +1,0 @@
-/*eslint-disable*/module.exports={messages:JSON.parse("{\"mY42CM\":[\"مرحبا بالعالم\"]}")};

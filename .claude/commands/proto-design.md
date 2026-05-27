@@ -1,104 +1,99 @@
+---
+name: proto-design
+description: Use when creating or modifying proto files, setting up buf generation, designing gRPC service definitions, or debugging proto/generation issues
+---
+
 # Proto Design & Generation
 
-Guide for designing, organizing, and generating Protobuf/gRPC definitions in this monorepo. Use this when creating or modifying proto files, setting up generation for a new app, or debugging buf/generation issues.
+Guide for designing, organizing, and generating Protobuf/gRPC definitions in this monorepo.
 
 ---
 
-## 1. Directory Structure
+## When to Use
 
-Proto files live under `apps/<app>/api/v1/` with this layout:
+- Creating new proto files (messages, services, errors)
+- Setting up buf generation for a new app or service
+- Designing BFF HTTP annotations
+- Debugging generation failures or import issues
+
+## Key Rules
+
+- File name prefix required in service directories to avoid Go generation collisions
+- `messages/` = pure data, no service blocks, no HTTP annotations
+- `service_base/` = gRPC-only, NO HTTP annotations
+- `bff_*/` = client-facing, WITH `google.api.http` annotations
+- Use `StringValue` (not `optional string`) in response/model messages
+- Use `optional string` in request messages with `(buf.validate.field)` constraints
+- BFF HTTP paths must include BFF prefix (`/api/v1/admin/`, `/api/v1/mobile/`)
+- All files in an app share one `package` and one `go_package`
+- `PACKAGE_DIRECTORY_MATCH` lint ignore required due to subdirectory layout
+
+---
+
+## Directory Structure
 
 ```
 apps/<app>/api/v1/
   messages/            # Shared messages (request/response pairs, models)
     article.proto
-    resource.proto
   service_base/        # Core gRPC services (NO HTTP annotations)
     base_article.proto
-    base_resource.proto
   bff_admin/           # Admin BFF services (WITH HTTP annotations)
     admin_article.proto
-    admin_resource.proto
   bff_mobile/          # Mobile BFF services (WITH HTTP annotations)
     mobile_article.proto
   error/               # App-specific error enums
     error_reason.proto
 ```
 
-Why this split:
-- **messages/** — pure data definitions shared by all services. No `service` blocks, no HTTP annotations.
-- **service_base/** — core domain service, gRPC-only. No HTTP annotations because the base service only exposes gRPC. Other services (BFFs) call it internally.
-- **bff_admin/ and bff_mobile/** — BFF services that face external clients. Include `google.api.http` annotations. Each BFF selects the subset of methods it needs.
-- **error/** — error enums specific to this app. General/infra errors live in `contracts/errors/`.
+- **messages/** — pure data shared by all services. No `service` blocks.
+- **service_base/** — core domain, gRPC-only. BFFs call it internally.
+- **bff_*/** — external-facing. Include `google.api.http` annotations. Each BFF selects the methods it needs.
+- **error/** — app-specific errors. General/infra errors live in `contracts/errors/`.
 
 ---
 
-## 2. File Naming — Prefix Required
+## File Naming
 
-All proto files in service directories MUST use a unique prefix to avoid Go generation collisions:
+All proto files in service directories MUST use a unique prefix:
 
 ```
 service_base/base_article.proto    → prefix: "base_"
 bff_admin/admin_article.proto      → prefix: "admin_"
 bff_mobile/mobile_article.proto    → prefix: "mobile_"
-messages/article.proto             → no prefix (shared messages)
-error/error_reason.proto           → no prefix (error enums)
+messages/article.proto             → no prefix (shared)
+error/error_reason.proto           → no prefix (errors)
 ```
 
-Why: buf generates Go into a single `gen/go/v1/` directory. If two files define `ArticleService`, the generated `article_service_grpc.pb.go` overwrites the other. The prefix makes each service name unique in the generated output.
-
-The prefix applies to the **file name**, not the service name in proto. Service names can still be clean (e.g., `ArticleService` in `base_article.proto`, `AdminArticleService` in `admin_article.proto`).
+The prefix applies to the file name, not the proto service name. This prevents Go generation collisions since buf generates into a single `gen/go/v1/` directory.
 
 ---
 
-## 3. Package & Import Conventions
-
-### Package name
-
-All proto files in an app share the same package:
+## Package & Import Conventions
 
 ```protobuf
 // buf:lint:ignore PACKAGE_DIRECTORY_MATCH
 package api.<app>.v1;
-```
 
-The `PACKAGE_DIRECTORY_MATCH` ignore is required because files are in subdirectories (`messages/`, `service_base/`, etc.) but share one package.
-
-### Go package
-
-```protobuf
 option go_package = "cyber-ecosystem/apps/<app>/gen/go/v1;<app>V1";
 ```
 
-All files in the same app use the same `go_package` — they generate into the same Go package.
-
-### Imports
-
-Import paths are relative to the buf module root. The `buf.yaml` defines two module roots: `contracts/` and `apps/`. So:
+Imports resolve relative to `contracts/` or `apps/` (defined in root `buf.yaml`):
 
 ```protobuf
-// Import from the same app
-import "genesis/api/v1/messages/article.proto";
-
-// Import shared contracts
-import "common/page.proto";
-import "errors/errors.proto";
+import "genesis/api/v1/messages/article.proto";  // apps/ → genesis/api/v1/...
+import "common/page.proto";                       // contracts/common/page.proto
+import "errors/errors.proto";                     // contracts/errors/errors.proto
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "desc/desc.proto";
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/wrappers.proto";
 ```
-
-The `genesis/` prefix comes from the `apps/` module root — buf resolves `genesis/api/v1/...` as `apps/genesis/api/v1/...`.
 
 ---
 
-## 4. Message Design Patterns
+## Message Design Patterns
 
 ### Model message (in messages/)
-
-Represents the domain entity for read responses:
 
 ```protobuf
 message Article {
@@ -111,9 +106,9 @@ message Article {
 }
 ```
 
-Use `StringValue` (not `optional string`) for nullable fields in model/response messages — this makes nil-vs-empty unambiguous.
+Use `StringValue` for nullable fields in models — makes nil-vs-empty unambiguous.
 
-### Request messages
+### Request message
 
 ```protobuf
 message CreateArticleRequest {
@@ -125,11 +120,9 @@ message CreateArticleRequest {
 }
 ```
 
-Use `optional string` in requests — the validation middleware checks constraints. Required fields get `(buf.validate.field).required = true`.
+Use `optional string` in requests. Required fields get `(buf.validate.field).required = true`.
 
-### ID validation pattern
-
-IDs use xid (20-char string):
+### ID validation (xid 20-char)
 
 ```protobuf
 optional string id = 1 [
@@ -145,7 +138,6 @@ import "common/page.proto";
 
 message QueryArticleRequest {
   common.PageRequest page = 1;
-  // ... filters
   repeated string order_by = 100 [(buf.validate.field).cel = {
     id: "QueryArticleRequest.order_by"
     message: ""
@@ -159,9 +151,7 @@ message QueryArticleResponse {
 }
 ```
 
-- `order_by` uses field number 100 (high number to avoid conflicts when adding new fields).
-- The CEL expression validates format: `fieldName:asc` or `fieldName:desc`.
-- Include `sort` in the regex when the entity uses `SortMixin`. Common sortable fields: `createdAt`, `updatedAt`, `sort`.
+`order_by` uses field number 100 (high to avoid conflicts). CEL validates `fieldName:asc` or `fieldName:desc` format.
 
 ### Field mask (partial update)
 
@@ -205,15 +195,11 @@ message SortArticleRequest {
 }
 ```
 
-Cross-field validation uses message-level CEL.
-
 ---
 
-## 5. Service Definitions
+## Service Definitions
 
 ### Core service (service_base/) — gRPC only
-
-No HTTP annotations. Methods have `desc.method_comment` for documentation:
 
 ```protobuf
 service ArticleService {
@@ -222,13 +208,13 @@ service ArticleService {
   rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse) {
     option (desc.method_comment) = "创建文章";
   }
-  // ... more methods
+  rpc GetArticle(GetArticleRequest) returns (GetArticleResponse) {
+    option (desc.method_comment) = "查询文章详情";
+  }
 }
 ```
 
-### BFF service (bff_admin/, bff_mobile/) — with HTTP
-
-Each method gets `google.api.http` annotations:
+### BFF service (bff_*/) — with HTTP
 
 ```protobuf
 service AdminArticleService {
@@ -236,41 +222,26 @@ service AdminArticleService {
 
   rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse) {
     option (desc.method_comment) = "创建文章";
-    option (google.api.http) = {
-      post: "/api/v1/admin/article"
-      body: "*"
-    };
+    option (google.api.http) = { post: "/api/v1/admin/article", body: "*" };
   }
   rpc GetArticle(GetArticleRequest) returns (GetArticleResponse) {
-    option (desc.method_comment) = "查询文章详情";
-    option (google.api.http) = {get: "/api/v1/admin/article/{id}"};
+    option (google.api.http) = { get: "/api/v1/admin/article/{id}" };
   }
-  // ...
 }
 ```
 
-**BFF HTTP path prefix convention:** Each BFF uses a path prefix to avoid OpenAPI collisions when multiple BFFs expose the same entity:
+**BFF path prefix convention:**
 
 | BFF | Prefix | Example |
 |-----|--------|---------|
 | Admin | `/api/v1/admin/` | `/api/v1/admin/article` |
 | Mobile | `/api/v1/mobile/` | `/api/v1/mobile/article` |
 
-Without the prefix, two BFFs sharing `GET /api/v1/article` would cause the OpenAPI generator to produce only one set of client functions.
-
-HTTP path conventions (with BFF prefix):
-- POST for create: `post: "/api/v1/<bff>/<entity>"` with `body: "*"`
-- PUT for update: `put: "/api/v1/<bff>/<entity>/{id}"` with `body: "*"`
-- DELETE: `delete: "/api/v1/<bff>/<entity>/{id}"`
-- GET single: `get: "/api/v1/<bff>/<entity>/{id}"`
-- GET list: `get: "/api/v1/<bff>/<entity>"`
-- POST for special actions: `post: "/api/v1/<bff>/<entity>/{id}/sort"` or `post: "/api/v1/<bff>/<entity>/{id}/status"`
+HTTP path conventions: POST create, PUT update, DELETE delete, GET single, GET list, POST for special actions (sort, status).
 
 ---
 
-## 6. Error Enums
-
-App-specific errors in `error/error_reason.proto`:
+## Error Enums
 
 ```protobuf
 syntax = "proto3";
@@ -288,19 +259,15 @@ enum ErrorReason {
 }
 ```
 
-- First value must be `_UNSPECIFIED = 0`.
-- Use app-specific codes starting from 6000 to avoid collision with shared error codes.
-- The `(errors.code)` option sets the HTTP status code returned to clients.
-
-General/infra errors are in `contracts/errors/` — do NOT duplicate them here.
+- First value must be `_UNSPECIFIED = 0`
+- Use codes starting from 6000 to avoid collision with shared error codes
+- General/infra errors are in `contracts/errors/` — do NOT duplicate
 
 ---
 
-## 7. buf Toolchain
+## buf Toolchain
 
-### Module configuration
-
-Root `buf.yaml` defines two module roots:
+### Module configuration (root `buf.yaml`)
 
 ```yaml
 version: v2
@@ -313,13 +280,9 @@ deps:
   - buf.build/gnostic/gnostic
 ```
 
-This means all import paths resolve relative to `contracts/` or `apps/`.
-
 ### Generation configs
 
-Two generation configs per app:
-
-**`apps/<app>/api/buf.gen.api.yaml`** — generates app-level proto stubs (message types + error enums):
+**App-level** (`apps/<app>/api/buf.gen.api.yaml`) — message types + error enums:
 
 ```yaml
 version: v2
@@ -332,9 +295,7 @@ plugins:
     opt: paths=source_relative
 ```
 
-Run via: `./nx run <app>_api:proto:api`
-
-**`apps/<app>/services/<service>/buf.gen.conf.yaml`** — generates service-level code (gRPC, HTTP, Connect, OpenAPI):
+**Service-level** (`apps/<app>/services/<service>/buf.gen.conf.yaml`) — gRPC, HTTP, Connect, OpenAPI:
 
 ```yaml
 version: v2
@@ -360,23 +321,9 @@ plugins:
     opt: [paths=source_relative, enum_type=string, fq_schema_naming=true, default_response=false, naming=json]
 ```
 
-Run via: `./nx run <project>:proto:conf`
-
-The `module=cyber-ecosystem` prefix rewrites import paths from `apps/<app>/gen/go/v1/` to `cyber-ecosystem/apps/<app>/gen/go/v1/` in generated code.
-
-### Config proto
-
-Each service has `internal/conf/conf.proto` for config generation:
-
-```bash
-./nx run <project>:proto:conf
-```
-
-This generates `conf.pb.go` from the config proto definition.
-
 ---
 
-## 8. i18n Integration
+## i18n Integration
 
 The `i18n.protos` file in `internal/i18n/` lists proto files for error key generation:
 
@@ -388,85 +335,31 @@ The `i18n.protos` file in `internal/i18n/` lists proto files for error key gener
 ../../../../api/v1/error/error_reason.proto
 ```
 
-The path is relative from `internal/i18n/` to the proto file. Order matters: general contracts first, app-specific last.
+Paths are relative from `internal/i18n/` to the proto file. Order: shared contracts first, app-specific last.
 
-After adding new error enum values:
-1. Run `./nx run <project>:generate:i18n` to regenerate YAML stubs
-2. Fill in translations in `locales/v1.zh-CN.yaml` and `locales/v1.en-US.yaml`
+After adding new error enum values: `./nx run <project>:generate:i18n` → fill translations in `locales/v1.zh-CN.yaml`.
 
 ---
 
-## 9. Generation Order
-
-Run targets in this order (the `generate` target handles this automatically):
+## Generation Order
 
 ```
-1. genesis_api:proto:api     → Generate app-level proto stubs (messages + errors)
-2. <project>:proto:conf      → Generate config proto (conf.pb.go)
-3. <project>:generate:i18n   → Generate i18n stubs from error enums
-4. <project>:generate:ent    → Generate Ent ORM code
-5. <project>:generate:wire   → Generate Wire DI
-6. <project>:proto:connect   → Generate Connect clients (for BFF services with HTTP annotations)
-7. <project>:proto:openapi   → Generate OpenAPI spec (for web clients)
+1. genesis_api:proto:api     → App-level proto stubs (messages + errors)
+2. <project>:proto:conf      → Config proto (conf.pb.go)
+3. <project>:generate:i18n   → i18n stubs from error enums
+4. <project>:generate:ent    → Ent ORM code
+5. <project>:generate:wire   → Wire DI
+6. <project>:proto:connect   → Connect clients (BFF services with HTTP annotations)
+7. <project>:proto:openapi   → OpenAPI spec (web clients)
 ```
 
 Or run all at once: `./nx run <project>:generate`
 
-**Important:** proto changes MUST be generated before i18n, ent, or wire — other layers depend on generated proto types.
+Proto changes MUST be generated before i18n, ent, or wire — other layers depend on generated proto types.
 
 ---
 
-## 10. Common Pitfalls
-
-### File name collision
-
-Two service files with the same base name will collide in generated output:
-- `service_base/article.proto` + `bff_admin/article.proto` → both generate into the same Go files
-- Fix: use prefixes (`base_article.proto`, `admin_article.proto`)
-
-### Missing HTTP registration
-
-If a proto service has NO `google.api.http` annotations, the generated code will NOT include `RegisterXxxHTTPServer`. The service's `RegisterHTTP` method must be a no-op:
-
-```go
-func (s *ArticleService) RegisterHTTP(_ *http.Server) {}
-```
-
-### Wrong import path in i18n.protos
-
-The path is relative from `internal/i18n/` to the proto file, not from the project root. Check the actual directory depth:
-- From `services/base/internal/i18n/` to `api/v1/error/` = `../../../../api/v1/error/error_reason.proto`
-- From `services/base/internal/i18n/` to `contracts/errors/` = `../../../../../../contracts/errors/codes_general.proto`
-
-### buf generate path
-
-Always run buf generate from the workspace root with `--path` to scope generation:
-
-```bash
-buf generate --template apps/<app>/api/buf.gen.api.yaml --path apps/<app>/api
-```
-
-Never cd into a subdirectory to run buf.
-
-### Ent schema depends on generated code
-
-Local mixins (`local_mixins/soft_delete.go`, `local_mixins/sort.go`) import generated Ent packages that don't exist on first generation. Use the three-stage bootstrap:
-
-1. Generate without local_mixins and without intercept feature
-2. Generate with intercept feature (adds interceptor support)
-3. Add local_mixins back and generate again
-
-### OpenAPI path collision across BFFs
-
-When two BFF services (admin, mobile) define the same HTTP path (e.g., `GET /api/v1/article`), the OpenAPI generator produces only one set of client functions — the second service silently overwrites the first. The generated client will only have functions named after one BFF.
-
-Fix: use BFF-specific path prefixes (`/api/v1/admin/`, `/api/v1/mobile/`). This gives each path a unique OpenAPI operation ID.
-
----
-
-## 11. Region Annotations in Proto
-
-Proto files use the same region annotation pattern as Go:
+## Region Annotations in Proto
 
 ```protobuf
 // region[rgba(239,83,80,0.15)] 🔴 Model
@@ -489,3 +382,49 @@ service ArticleService { ... }
 ```
 
 Section order: Model → Messages → Service.
+
+---
+
+## Common Pitfalls
+
+### File name collision
+
+Two service files with the same base name collide in generated output. Fix: use prefixes (`base_article.proto`, `admin_article.proto`).
+
+### Missing HTTP registration
+
+If a proto service has NO `google.api.http` annotations, generated code will NOT include `RegisterXxxHTTPServer`. `RegisterHTTP` and `RegisterConnect` must be no-ops.
+
+### Wrong import path in i18n.protos
+
+Path is relative from `internal/i18n/` to the proto file, not from the project root.
+
+### buf generate path
+
+Always run from workspace root with `--path` to scope: `buf generate --template apps/<app>/api/buf.gen.api.yaml --path apps/<app>/api`. Never cd into a subdirectory.
+
+### Ent schema depends on generated code
+
+Local mixins import generated packages that don't exist on first generation. Use the three-stage bootstrap (see `/kratos-scaffold`).
+
+### OpenAPI path collision across BFFs
+
+Two BFFs sharing `GET /api/v1/article` causes the OpenAPI generator to overwrite. Fix: use BFF-specific path prefixes.
+
+### StringValue vs optional string confusion
+
+Use `StringValue` in response/model messages (nil-safe). Use `optional string` in request messages (for validation constraints). Never mix the two in the same message type.
+
+---
+
+## Nx Targets
+
+```bash
+./nx run <app>_api:proto:api     # App-level proto stubs
+./nx run <project>:proto:conf    # Config proto (conf.pb.go)
+./nx run <project>:generate      # All generation targets
+```
+
+---
+
+For deep architecture details, see `docs/stacks/kratos-go.md`.

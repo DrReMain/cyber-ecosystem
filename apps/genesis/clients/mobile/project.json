@@ -1,0 +1,50 @@
+{
+  "$schema": "../../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "genesis_client_mobile",
+  "root": "apps/genesis/clients/mobile",
+  "projectType": "application",
+  "targets": {
+    "biome:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm run lint"
+      }
+    },
+    "biome:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm run lint:fix"
+      }
+    },
+    "i18n:extract": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "lingui extract --clean"
+      }
+    },
+    "i18n:compile": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "lingui compile"
+      }
+    },
+    "proto:connect": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf generate --template apps/genesis/clients/mobile/buf.gen.client.yaml --path apps/genesis/api --include-imports"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "tsc --noEmit"
+      }
+    }
+  }
+}

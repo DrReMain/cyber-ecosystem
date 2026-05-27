@@ -1,0 +1,107 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-05-28 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: ja\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. js-lingui-explicit-id
+#: src/app/article/create.tsx
+msgid "article.cancel"
+msgstr "キャンセル"
+
+#. js-lingui-explicit-id
+#: src/app/article/create.tsx
+msgid "article.contentPlaceholder"
+msgstr "内容を入力..."
+
+#. js-lingui-explicit-id
+#: src/app/article/create.tsx
+msgid "article.create"
+msgstr "記事を作成"
+
+#. js-lingui-explicit-id
+#: src/app/article/[id].tsx
+msgid "article.createdAt"
+msgstr "作成：{date}"
+
+#. js-lingui-explicit-id
+#: src/app/article/[id].tsx
+msgid "article.detail"
+msgstr "記事詳細"
+
+#. js-lingui-explicit-id
+#: src/components/EmptyState.tsx
+msgid "article.empty"
+msgstr "記事がありません"
+
+#. js-lingui-explicit-id
+#: src/components/ArticleList.tsx
+msgid "article.error.load"
+msgstr "読み込み失敗"
+
+#. js-lingui-explicit-id
+#: src/components/ArticleList.tsx
+msgid "article.error.retry"
+msgstr "再試行"
+
+#. js-lingui-explicit-id
+#: src/app/article/create.tsx
+msgid "article.error.title"
+msgstr "作成失敗"
+
+#. js-lingui-explicit-id
+#: src/components/LoadingFooter.tsx
+msgid "article.loading"
+msgstr "読み込み中..."
+
+#. js-lingui-explicit-id
+#: src/app/article/create.tsx
+msgid "article.publish"
+msgstr "公開"
+
+#. js-lingui-explicit-id
+msgid "article.status.draft"
+msgstr "下書き"
+
+#. js-lingui-explicit-id
+msgid "article.status.published"
+msgstr "公開済み"
+
+#. js-lingui-explicit-id
+msgid "article.status.archived"
+msgstr "アーカイブ"
+
+#. js-lingui-explicit-id
+#: src/app/index.tsx
+msgid "article.title"
+msgstr "記事"
+
+#. js-lingui-explicit-id
+msgid "article.time.daysAgo"
+msgstr "{n}日前"
+
+#. js-lingui-explicit-id
+msgid "article.time.hoursAgo"
+msgstr "{n}時間前"
+
+#. js-lingui-explicit-id
+msgid "article.time.justNow"
+msgstr "たった今"
+
+#. js-lingui-explicit-id
+msgid "article.time.minutesAgo"
+msgstr "{n}分前"
+
+#. js-lingui-explicit-id
+#: src/app/article/create.tsx
+msgid "article.titlePlaceholder"
+msgstr "タイトルを入力"

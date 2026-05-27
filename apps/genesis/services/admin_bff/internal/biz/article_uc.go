@@ -11,6 +11,7 @@ import (
 type ArticleRP interface {
 	Create(ctx context.Context, a *Article) (*Article, error)
 	Update(ctx context.Context, fieldsMask []string, a *Article) (*Article, error)
+	UpdateStatus(ctx context.Context, id string, status string) (*Article, error)
 	Delete(ctx context.Context, id string) (string, error)
 	Get(ctx context.Context, id string) (*Article, error)
 	Query(ctx context.Context, in *ArticleQueryIn) (*ArticleQueryOut, error)
@@ -70,14 +71,7 @@ func (uc *ArticleUC) Query(ctx context.Context, in *ArticleQueryIn) (*ArticleQue
 
 func (uc *ArticleUC) UpdateStatus(ctx context.Context, id string, target string) (out *Article, err error) {
 	err = uc.tm.InTx(ctx, func(ctx context.Context) (e error) {
-		a, e := uc.articleRP.Get(ctx, id)
-		if e != nil {
-			return e
-		}
-		if e = a.TransitionTo(ctx, target); e != nil {
-			return e
-		}
-		out, e = uc.articleRP.Update(ctx, []string{"status"}, a)
+		out, e = uc.articleRP.UpdateStatus(ctx, id, target)
 		return
 	})
 	return

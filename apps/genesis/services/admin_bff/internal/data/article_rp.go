@@ -51,6 +51,17 @@ func (rp *articleRP) Update(ctx context.Context, fieldsMask []string, a *biz.Art
 	return &biz.Article{ID: utils.Unwrap(resp.Id)}, nil
 }
 
+func (rp *articleRP) UpdateStatus(ctx context.Context, id string, status string) (*biz.Article, error) {
+	resp, err := rp.platform.GetArticleClient().UpdateArticleStatus(ctx, &genesisV1.UpdateArticleStatusRequest{
+		Id:     utils.Ptr(id),
+		Status: utils.Ptr(status),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &biz.Article{ID: utils.Unwrap(resp.Id)}, nil
+}
+
 func (rp *articleRP) Delete(ctx context.Context, id string) (string, error) {
 	resp, err := rp.platform.GetArticleClient().DeleteArticle(ctx, &genesisV1.DeleteArticleRequest{
 		Id: utils.Ptr(id),

@@ -154,3 +154,75 @@ When working on a specific stack, read the corresponding guide first:
 |-------|-------|------------|
 | Kratos + Go | `docs/stacks/kratos-go.md` | Go microservices using Kratos framework |
 | TanStack + React | `docs/stacks/tanstack-react.md` | React clients using TanStack Start, Router, and Query |
+| Expo + React Native | `docs/stacks/expo-react-native.md` | Mobile clients using Expo SDK and expo-router |
+| Observability | `docs/stacks/observability.md` | Local dev observability (SigNoz, GlitchTip, OTel) |
+
+---
+
+## 11) Skills Index
+
+Skills live in `.claude/commands/` and provide step-by-step guidance for common workflows. Invoke them with `/skill-name`.
+
+| Skill | File | When to Use |
+|-------|------|-------------|
+| `/proto-design` | `.claude/commands/proto-design.md` | Creating or modifying proto files, setting up buf generation |
+| `/kratos-scaffold` | `.claude/commands/kratos-scaffold.md` | Scaffolding Go microservices, adding aggregates, implementing business logic |
+| `/tanstack-client` | `.claude/commands/tanstack-client.md` | Creating React web clients, adding pages, connecting to BFF APIs |
+| `/expo-react-native` | `.claude/commands/expo-react-native.md` | Creating mobile clients, adding screens, Connect RPC, i18n, navigation |
+| `/observability` | `.claude/commands/observability.md` | Setting up error reporting, metrics scraping, traces for new services |
+
+Each skill is self-contained with inline code examples. For deep architecture details,
+see the corresponding stack guide in `docs/stacks/`.
+
+---
+
+## 12) Commit & Branch Conventions
+
+### Commit Messages
+
+```
+type(scope): description
+```
+
+| Field | Values |
+|-------|--------|
+| type | `feat`, `fix`, `refactor`, `docs`, `chore`, `test` |
+| scope | App or component name (e.g., `genesis`, `contracts`, `shared-go`) |
+| description | Concise summary in English, lowercase, no period |
+
+### Branch Naming
+
+Use descriptive kebab-case: `feat/genesis-comment-aggregate`, `fix/base-ent-migration`.
+
+### Pull Requests
+
+Squash merge to `main`. PR title follows the commit format.
+
+---
+
+## 13) Testing Strategy
+
+- **Go services**: `go test` (standard library `testing`; `testify` optional). Tests co-located as `{file}_test.go`.
+  Run per-service: `cd apps/<app>/services/<service> && go test ./...`
+- **React clients**: recommended `vitest` + `@testing-library`, tests co-located as `{file}.test.tsx` (set up per client; no global `test` target yet).
+  Run via: `./nx run <project>:test` (if declared) or `pnpm vitest`.
+- **Shared libraries**: Co-located test files. `shared-go/` uses standard `go test`.
+- New code SHOULD include tests for business logic (UC layer) and critical mappings (service layer).
+
+Stack-specific testing patterns: see `docs/stacks/<stack>.md` Testing section.
+
+---
+
+## 14) Generation Recovery
+
+When code generation fails, follow these recovery steps:
+
+| Failure | Cause | Recovery |
+|---------|-------|----------|
+| Wire "no provider found" | Missing constructor in ProviderSet | Add to the appropriate `ProviderSet`, then `./nx run <project>:generate:wire` |
+| Ent "undefined" for local_mixins | Chicken-and-egg: mixins need generated code | Three-stage bootstrap (see `/kratos-scaffold`) |
+| buf import not found | Import path doesn't resolve from module root | Check path resolves relative to `contracts/` or `apps/`, then `./nx run <app>_api:proto:api` |
+| i18n empty stubs | Wrong relative path in `i18n.protos` | Fix path from `internal/i18n/` to proto file, then `./nx run <project>:generate:i18n` |
+| `go mod tidy` removes deps | Imports look unused before generation | Run generation first; `generate` target runs `go mod tidy` as last step |
+
+Always run generation BEFORE `go mod tidy`. The `generate` target handles ordering automatically.

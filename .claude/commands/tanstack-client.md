@@ -1,67 +1,40 @@
+---
+name: tanstack-client
+description: Use when creating a new React web client, adding pages or routes, connecting to BFF APIs via Connect RPC or OpenAPI, or configuring i18n/theme/error handling in TanStack Start
+---
+
 # TanStack Start React Web Client
 
-Guide for scaffolding and implementing React web clients using TanStack Start in this monorepo. Use this when creating a new web client, adding pages, connecting to backend APIs, or configuring i18n/theme/error handling.
-
-For architecture reference, utility libraries, and project structure, see `docs/stacks/tanstack-react.md`.
+Guide for scaffolding and implementing React web clients using TanStack Start in this monorepo.
 
 ---
 
-## 1. Client Directory Structure
+## When to Use
 
-```
-apps/<app>/clients/<client>/
-  src/
-    routes/                   # TanStack Router file-based routes
-      __root.tsx              # Document shell, providers, root loader
-      _app.tsx                # Layout route (nav, sidebar)
-      _app.index.tsx          # Home page
-      _app.<feature>.*.tsx    # Feature pages
-    router.tsx                # Router setup, QueryClient config
-    server.ts                 # TanStack Start server entry
-    env.ts                    # Typed env (t3-env)
-    domains/                  # Cross-cutting domain modules
-      antd/                   # Ant Design provider stack
-      errors/                 # Error handling system
-      i18n/                   # i18n UI helpers
-      router-progress/        # Route transition progress bar
-      seo/                    # SEO utilities
-      theme/                  # Theme state management
-    services/                 # API client layer
-      connect-transport.tsx   # Connect RPC transport
-      http-config.ts          # OpenAPI client configuration
-      http-client.ts          # OpenAPI HTTP client
-      connect/                # Generated Connect code
-      openapi/                # Generated OpenAPI code
-    stores/                   # Jotai state management
-    lib/                      # Shared utilities
-    components/               # Shared UI components
-    styles/                   # Global CSS
-  i18n/
-    messages/                 # Paraglide message source files
-  project.inlang/            # Paraglide project config
-  public/                    # Static assets
-  vite.config.ts
-  hey-api.config.ts          # OpenAPI code generation config
-  buf.gen.client.yaml        # Connect code generation config
-  project.json               # Nx targets
-  package.json
-  tsconfig.json
-  biome.json
-```
+- Creating a new web client (admin, portal, etc.)
+- Adding pages, routes, or navigation
+- Connecting to BFF services (Connect RPC or HTTP REST)
+- Configuring i18n (Paraglide), theme, or error handling
+
+## Key Rules
+
+- Dual transport: Connect RPC (primary) + HTTP REST via OpenAPI (secondary)
+- Use `buildConnectPage` / `buildHTTPPage` from `lib/builder.ts` for pagination — never construct manually
+- Paraglide messages are generated — never edit `src/paraglide/`, edit `i18n/messages/` source files
+- `proto:connect` runs from `{workspaceRoot}` because buf generators are root devDependencies
+- BFF path prefixes (`/api/v1/admin/`, `/api/v1/mobile/`) produce prefixed OpenAPI function names
+- Vite plugin order matters: devtools → paraglide → tailwind → start → react → babel
+- pnpm isolated mode: packages only see declared dependencies
 
 ---
 
-## 2. Adding a New Web Client
-
-When adding a new web client (e.g., "admin", "portal") to an app:
+## Adding a New Web Client — Step by Step
 
 ### Step 1: Create Directory Structure
 
-Create `apps/<app>/clients/<client>/` with the directory layout above. Copy an existing client as a starting point if one exists in the same app.
+Create `apps/<app>/clients/<client>/` with the layout from `docs/stacks/tanstack-react.md` Section 19. Copy an existing client as a starting point.
 
 ### Step 2: Configure package.json
-
-Key dependencies:
 
 ```json
 {
@@ -117,27 +90,18 @@ import { defineConfig } from "@hey-api/openapi-ts"
 export default defineConfig({
   input: "../../../<app>/gen/oas/openapi.yaml",
   output: "src/services/openapi",
-  plugins: [
-    {
-      name: "@hey-api/client-ky",
-      runtimeConfigPath: "./src/services/http-config",
-    },
-  ],
+  plugins: [{ name: "@hey-api/client-ky", runtimeConfigPath: "./src/services/http-config" }],
 })
 ```
 
 ### Step 4: Configure Vite
 
-`vite.config.ts` must include the plugin chain in this order:
+Plugin chain order matters:
 
 ```ts
 plugins: [
   TanstackDevtools(),
-  paraglideVitePlugin({
-    project: "./project.inlang",
-    outdir: "./src/paraglide",
-    strategy: ["custom-smart-preferred", "url", "baseLocale"],
-  }),
+  paraglideVitePlugin({ project: "./project.inlang", outdir: "./src/paraglide", strategy: ["custom-smart-preferred", "url", "baseLocale"] }),
   tailwindcss(),
   tanstackStart(),
   viteReact(),
@@ -145,121 +109,94 @@ plugins: [
 ]
 ```
 
-Configure dev proxy for backend services:
+Dev proxy for backend:
 
 ```ts
 server: {
   proxy: {
-    "/connect": {
-      target: env.CONNECT_API_URL || "http://localhost:<connect-port>",
-      changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/connect/, ""),
-    },
-    "/http": {
-      target: env.HTTP_API_URL || "http://localhost:<http-port>",
-      changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/http/, ""),
-    },
+    "/connect": { target: env.CONNECT_API_URL || "http://localhost:<connect-port>", changeOrigin: true, rewrite: (path) => path.replace(/^\/connect/, "") },
+    "/http": { target: env.HTTP_API_URL || "http://localhost:<http-port>", changeOrigin: true, rewrite: (path) => path.replace(/^\/http/, "") },
   },
 }
 ```
 
 ### Step 5: Configure Nx Targets
 
-In `project.json`, declare standard targets:
-
 ```json
 {
   "targets": {
     "proto:connect": {
       "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "buf generate --template apps/<app>/clients/<client>/buf.gen.client.yaml --path apps/<app>/api --include-imports"
-      }
+      "options": { "cwd": "{workspaceRoot}", "command": "buf generate --template apps/<app>/clients/<client>/buf.gen.client.yaml --path apps/<app>/api --include-imports" }
     },
     "proto:openapi": {
       "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "command": "openapi-ts -f hey-api.config.ts"
-      }
+      "options": { "cwd": "{projectRoot}", "command": "openapi-ts -f hey-api.config.ts" }
     },
-    "dev": { "executor": "nx:run-commands", "options": { "cwd": "{projectRoot}", "command": "vite dev --host" } },
-    "build": { "executor": "nx:run-commands", "options": { "cwd": "{projectRoot}", "command": "vite build" } }
+    "messages:gen": {
+      "executor": "nx:run-commands",
+      "options": { "cwd": "{projectRoot}", "command": "pnpm paraglide compile" }
+    },
+    "messages:check": {
+      "executor": "nx:run-commands",
+      "options": { "cwd": "{projectRoot}", "command": "pnpm paraglide compile --dry-run" }
+    },
+    "biome:check": {
+      "executor": "nx:run-commands",
+      "options": { "cwd": "{projectRoot}", "command": "biome check src/" }
+    },
+    "biome:format": {
+      "executor": "nx:run-commands",
+      "options": { "cwd": "{projectRoot}", "command": "biome check --unsafe --write src/" }
+    }
   }
 }
 ```
 
-Note: `proto:connect` runs from `{workspaceRoot}` because buf generators are installed as root devDependencies.
-
 ### Step 6: Wire Into the Workspace
 
-1. `pnpm install` — pnpm workspace auto-discovers the new package via `apps/**` glob
+1. `pnpm install` — pnpm workspace auto-discovers via `apps/**` glob
 2. Generate Connect clients: `./nx run <project>:proto:connect`
 3. Generate OpenAPI clients: `./nx run <project>:proto:openapi`
-4. Run dev: `./nx run <project>:dev`
+4. Generate messages: `./nx run <project>:messages:gen`
 
 ---
 
-## 3. Dual API Backend Pattern
+## Dual API Backend
 
-Web clients connect to BFF services through two independent transport layers. Both layers must be configured for a fully functional client.
+Web clients connect to BFF services through two independent transport layers.
 
-### Connect RPC (Primary)
-
-Transport setup in `src/services/connect-transport.tsx`:
-- Creates `ConnectTransport` with `@connectrpc/connect-web`
-- Base URL: full URL on server, `/connect` on client (proxied by Vite dev server)
-- Interceptors: locale injection, error handling
-
-Generated query hooks via `@connectrpc/protoc-gen-connect-query`. Usage:
+### Connect RPC (primary)
 
 ```ts
 import { useQuery } from "@connectrpc/connect-query"
 import { listArticles } from "#/services/connect/<app>V1-<service>Service-Connect"
-
 const { data } = useQuery(listArticles, { pageSize: 10 })
 ```
 
-### HTTP REST (Secondary)
-
-Generated client via `@hey-api/openapi-ts` with `ky` runtime. Config in `http-config.ts`:
-- Base URL: full URL on server, `/http` on client (proxied by Vite dev server)
-
-Usage:
+### HTTP REST (secondary)
 
 ```ts
 import { adminArticleServiceListArticle } from "#/services/openapi/CustomClient"
-
 const { data } = await adminArticleServiceListArticle({ queries: { "page.size": 10 } })
 ```
 
-### Pagination Builders
-
-`lib/builder.ts` provides `buildConnectPage` and `buildHTTPPage` to transform pagination parameters for each transport, plus `buildOrderBy` for sort parameters.
+Use `buildConnectPage` / `buildHTTPPage` from `lib/builder.ts` for pagination — never construct manually.
 
 ---
 
-## 4. i18n Workflow (Paraglide)
+## i18n Workflow
 
-Message definitions in `i18n/messages/` are the source of truth. The `project.inlang/` directory configures the Paraglide project.
-
-Workflow:
 1. Add/edit messages in `i18n/messages/` source files
-2. Run `./nx run <project>:messages:gen` to generate Paraglide code
+2. `./nx run <project>:messages:gen` — generate Paraglide code
 3. Use generated functions from `#/paraglide/messages`
-4. Run `./nx run <project>:messages:check` to validate
+4. `./nx run <project>:messages:check` — validate
 
-Generated files under `src/paraglide/` are derived output — never edit them directly.
+Generated files under `src/paraglide/` are derived output — never edit directly.
 
 ---
 
-## 5. Adding a New Page
-
-### Route File Convention
-
-TanStack Router uses file-based routing. Files under `src/routes/`:
+## Adding a New Page
 
 | File | Purpose |
 |------|---------|
@@ -267,11 +204,6 @@ TanStack Router uses file-based routing. Files under `src/routes/`:
 | `_app.tsx` | Layout route (navigation, sidebar) |
 | `_app.index.tsx` | Home page (matches `/`) |
 | `_app.<feature>.tsx` | Feature page (matches `/<feature>`) |
-| `_app.<feature>.<sub>.tsx` | Sub-feature page (matches `/<feature>/<sub>`) |
-
-The `_app` prefix creates a pathless layout group — all `_app.*` routes share the `_app.tsx` layout.
-
-### Typical Page Structure
 
 ```tsx
 import { createFileRoute } from "@tanstack/react-router"
@@ -285,40 +217,59 @@ function FeaturePage() {
 }
 ```
 
-For data-fetching pages, use route loaders or TanStack Query hooks.
+---
+
+## Error Handling
+
+Three-layer pipeline: normalize → display → report.
+
+- `toApiError()` normalizes Connect, HTTP, and unknown errors into a unified `ApiError`
+- `AntdErrorFeedbackAdapter`: mutation errors → `message.error()` (toast), query errors → `notification.error()`
+- Domain handlers register by reason code: `registerErrorHandler("CODE", handler)`
+- Suppress per-query: `meta: { silent: true }`
+- `reportError()` sends to Sentry (lazy-initialized from `VITE_GLITCHTIP_DSN`)
 
 ---
 
-## 6. Error Handling
-
-The error pipeline is: normalize → display → report. See `docs/stacks/tanstack-react.md` Section 8 for the full pipeline.
-
-Key points:
-- `toApiError()` normalizes Connect, HTTP, and unknown errors
-- `AntdErrorFeedbackAdapter` shows mutation errors as toasts, query errors as notifications
-- Domain-specific handlers register by error reason code
-- Queries that should suppress feedback: `meta: { silent: true }`
-
----
-
-## 7. Common Pitfalls
+## Common Pitfalls
 
 ### Connect code generation runs from workspace root
 
-The `proto:connect` target uses `cwd: "{workspaceRoot}"` because `protoc-gen-*` binaries are root devDependencies. The buf config path is relative to the workspace root, but `./node_modules/.bin/` in the config also resolves from the workspace root.
+The `proto:connect` target uses `cwd: "{workspaceRoot}"` because `protoc-gen-*` binaries are root devDependencies.
 
 ### OpenAPI client naming follows BFF path prefixes
 
-When BFFs use path prefixes (`/api/v1/admin/`, `/api/v1/mobile/`), the OpenAPI generator produces function names prefixed by the BFF name (e.g., `adminArticleServiceCreateArticle`). The client code must import from the correct generated module.
+BFF prefixes produce prefixed function names: `adminArticleServiceCreateArticle`.
 
 ### Dual transport requires dual pagination
 
-Connect and HTTP backends have different pagination shapes. Use `buildConnectPage` / `buildHTTPPage` from `lib/builder.ts` — do not construct pagination parameters manually.
+Use `buildConnectPage` / `buildHTTPPage` from `lib/builder.ts` — do not construct pagination manually.
 
 ### Paraglide messages are generated
 
-Never edit files under `src/paraglide/`. Edit `i18n/messages/` source files and regenerate. Run `messages:check` before committing to catch stale generated output.
+Never edit `src/paraglide/`. Edit `i18n/messages/` and regenerate. Run `messages:check` before committing.
 
 ### pnpm isolated mode
 
-The monorepo uses pnpm's default isolated mode. Each package only sees its declared dependencies. If a package needs a tool (e.g., buf generators), it must either declare it as a dependency or rely on the root package's devDependencies with workspace-root-relative execution.
+Each package only sees its declared dependencies. Missing module → add to `package.json` → `pnpm install`.
+
+### Vite plugin order
+
+Must be: devtools → paraglide → tailwind → start → react → babel. Changing order breaks SSR or HMR.
+
+---
+
+## Nx Targets
+
+```bash
+./nx run <project>:proto:connect    # Generate Connect clients
+./nx run <project>:proto:openapi    # Generate OpenAPI clients
+./nx run <project>:messages:gen     # Generate Paraglide messages
+./nx run <project>:messages:check   # Validate Paraglide (dry-run)
+./nx run <project>:biome:check      # Lint check
+./nx run <project>:biome:format     # Lint fix
+```
+
+---
+
+For deep architecture details, see `docs/stacks/tanstack-react.md`.
