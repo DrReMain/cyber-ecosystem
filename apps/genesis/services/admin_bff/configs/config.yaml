@@ -27,7 +27,7 @@ log:
     max_age: 30
     compress: true
   otlp_log:
-    enabled: false
+    enabled: true
     endpoint: "localhost:4318"
     insecure: true
 data:
@@ -38,11 +38,11 @@ data:
   base_service:
     addr: "0.0.0.0:12000"
     timeout: 1s
-# trace:
-#   endpoint: "localhost:4318"
-#   insecure: true
+trace:
+  endpoint: "localhost:4318"
+  insecure: true
 ops:
-  enabled: false
+  enabled: true
   addr: "0.0.0.0:14001"
   metrics: "/metrics"
   pprof:
@@ -54,7 +54,7 @@ ops:
     thread_enabled: true
     trace_enabled: true
 error_report:
-  enabled: false
-  dsn: ""
+  enabled: true
+  dsn: "http://f8992a6045b64fb9a1a8bbf4c0ed6d6d@localhost:8000/3"
   environment: "development"
   sample_rate: 1.0

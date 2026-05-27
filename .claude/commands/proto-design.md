@@ -149,7 +149,7 @@ message QueryArticleRequest {
   repeated string order_by = 100 [(buf.validate.field).cel = {
     id: "QueryArticleRequest.order_by"
     message: ""
-    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt):(asc|desc)$'))"
+    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt|sort):(asc|desc)$'))"
   }];
 }
 
@@ -161,6 +161,7 @@ message QueryArticleResponse {
 
 - `order_by` uses field number 100 (high number to avoid conflicts when adding new fields).
 - The CEL expression validates format: `fieldName:asc` or `fieldName:desc`.
+- Include `sort` in the regex when the entity uses `SortMixin`. Common sortable fields: `createdAt`, `updatedAt`, `sort`.
 
 ### Field mask (partial update)
 
@@ -236,25 +237,34 @@ service AdminArticleService {
   rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse) {
     option (desc.method_comment) = "创建文章";
     option (google.api.http) = {
-      post: "/api/v1/article"
+      post: "/api/v1/admin/article"
       body: "*"
     };
   }
   rpc GetArticle(GetArticleRequest) returns (GetArticleResponse) {
     option (desc.method_comment) = "查询文章详情";
-    option (google.api.http) = {get: "/api/v1/article/{id}"};
+    option (google.api.http) = {get: "/api/v1/admin/article/{id}"};
   }
   // ...
 }
 ```
 
-HTTP path conventions:
-- POST for create: `post: "/api/v1/<entity>"` with `body: "*"`
-- PUT for update: `put: "/api/v1/<entity>/{id}"` with `body: "*"`
-- DELETE: `delete: "/api/v1/<entity>/{id}"`
-- GET single: `get: "/api/v1/<entity>/{id}"`
-- GET list: `get: "/api/v1/<entity>"`
-- POST for special actions: `post: "/api/v1/<entity>/{id}/sort"` or `post: "/api/v1/<entity>/{id}/status"`
+**BFF HTTP path prefix convention:** Each BFF uses a path prefix to avoid OpenAPI collisions when multiple BFFs expose the same entity:
+
+| BFF | Prefix | Example |
+|-----|--------|---------|
+| Admin | `/api/v1/admin/` | `/api/v1/admin/article` |
+| Mobile | `/api/v1/mobile/` | `/api/v1/mobile/article` |
+
+Without the prefix, two BFFs sharing `GET /api/v1/article` would cause the OpenAPI generator to produce only one set of client functions.
+
+HTTP path conventions (with BFF prefix):
+- POST for create: `post: "/api/v1/<bff>/<entity>"` with `body: "*"`
+- PUT for update: `put: "/api/v1/<bff>/<entity>/{id}"` with `body: "*"`
+- DELETE: `delete: "/api/v1/<bff>/<entity>/{id}"`
+- GET single: `get: "/api/v1/<bff>/<entity>/{id}"`
+- GET list: `get: "/api/v1/<bff>/<entity>"`
+- POST for special actions: `post: "/api/v1/<bff>/<entity>/{id}/sort"` or `post: "/api/v1/<bff>/<entity>/{id}/status"`
 
 ---
 
@@ -396,6 +406,8 @@ Run targets in this order (the `generate` target handles this automatically):
 3. <project>:generate:i18n   → Generate i18n stubs from error enums
 4. <project>:generate:ent    → Generate Ent ORM code
 5. <project>:generate:wire   → Generate Wire DI
+6. <project>:proto:connect   → Generate Connect clients (for BFF services with HTTP annotations)
+7. <project>:proto:openapi   → Generate OpenAPI spec (for web clients)
 ```
 
 Or run all at once: `./nx run <project>:generate`
@@ -443,6 +455,12 @@ Local mixins (`local_mixins/soft_delete.go`, `local_mixins/sort.go`) import gene
 1. Generate without local_mixins and without intercept feature
 2. Generate with intercept feature (adds interceptor support)
 3. Add local_mixins back and generate again
+
+### OpenAPI path collision across BFFs
+
+When two BFF services (admin, mobile) define the same HTTP path (e.g., `GET /api/v1/article`), the OpenAPI generator produces only one set of client functions — the second service silently overwrites the first. The generated client will only have functions named after one BFF.
+
+Fix: use BFF-specific path prefixes (`/api/v1/admin/`, `/api/v1/mobile/`). This gives each path a unique OpenAPI operation ID.
 
 ---
 

@@ -18,6 +18,8 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 
+	"cyber-ecosystem/shared-go/kratos/middleware/grpc_status"
+
 	genesisV1 "cyber-ecosystem/apps/genesis/gen/go/v1"
 	"cyber-ecosystem/apps/genesis/services/admin_bff/internal/conf"
 )
@@ -38,6 +40,7 @@ func dialGRPC(
 	}
 	middlewares = append(middlewares, metadata.Client())
 	middlewares = append(middlewares, logging.Client(logger))
+	middlewares = append(middlewares, grpc_status.Client())
 
 	conn, err := kgrpc.DialInsecure(
 		context.Background(),

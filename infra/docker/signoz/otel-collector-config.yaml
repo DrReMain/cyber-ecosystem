@@ -23,17 +23,28 @@ receivers:
             labels:
               job_name: otel-collector
         # Go services metrics via host.docker.internal
-        # Add per-service scrape targets as services are deployed
-        # - job_name: go-services
-        #   metrics_path: /metrics
-        #   static_configs:
-        #   - targets:
-        #       - host.docker.internal:14000
-        #     labels:
-        #       app: <app>
-        #       service: <service>
-        #       env: development
-        #       component: ops
+        - job_name: genesis-service-base
+          metrics_path: /metrics
+          scrape_interval: 15s
+          static_configs:
+          - targets:
+              - host.docker.internal:14000
+            labels:
+              app: genesis
+              service: base
+              env: development
+              component: ops
+        - job_name: genesis-service-admin-bff
+          metrics_path: /metrics
+          scrape_interval: 15s
+          static_configs:
+          - targets:
+              - host.docker.internal:14001
+            labels:
+              app: genesis
+              service: admin_bff
+              env: development
+              component: ops
 
 processors:
   batch:

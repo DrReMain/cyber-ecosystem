@@ -29,8 +29,8 @@ type MobileArticleServiceHTTPServer interface {
 
 func RegisterMobileArticleServiceHTTPServer(s *http.Server, srv MobileArticleServiceHTTPServer) {
 	r := s.Route("/")
-	r.POST("/api/v1/article", _MobileArticleService_CreateArticle0_HTTP_Handler(srv))
-	r.GET("/api/v1/article", _MobileArticleService_QueryArticle0_HTTP_Handler(srv))
+	r.POST("/api/v1/mobile/article", _MobileArticleService_CreateArticle0_HTTP_Handler(srv))
+	r.GET("/api/v1/mobile/article", _MobileArticleService_QueryArticle0_HTTP_Handler(srv))
 }
 
 func _MobileArticleService_CreateArticle0_HTTP_Handler(srv MobileArticleServiceHTTPServer) func(ctx http.Context) error {
@@ -89,7 +89,7 @@ func NewMobileArticleServiceHTTPClient(client *http.Client) MobileArticleService
 
 func (c *MobileArticleServiceHTTPClientImpl) CreateArticle(ctx context.Context, in *CreateArticleRequest, opts ...http.CallOption) (*CreateArticleResponse, error) {
 	var out CreateArticleResponse
-	pattern := "/api/v1/article"
+	pattern := "/api/v1/mobile/article"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationMobileArticleServiceCreateArticle))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -102,7 +102,7 @@ func (c *MobileArticleServiceHTTPClientImpl) CreateArticle(ctx context.Context, 
 
 func (c *MobileArticleServiceHTTPClientImpl) QueryArticle(ctx context.Context, in *QueryArticleRequest, opts ...http.CallOption) (*QueryArticleResponse, error) {
 	var out QueryArticleResponse
-	pattern := "/api/v1/article"
+	pattern := "/api/v1/mobile/article"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationMobileArticleServiceQueryArticle))
 	opts = append(opts, http.PathTemplate(pattern))

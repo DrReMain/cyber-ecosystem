@@ -28,10 +28,10 @@ var File_genesis_api_v1_bff_mobile_mobile_article_proto protoreflect.FileDescrip
 
 const file_genesis_api_v1_bff_mobile_mobile_article_proto_rawDesc = "" +
 	"\n" +
-	".genesis/api/v1/bff_mobile/mobile_article.proto\x12\x0eapi.genesis.v1\x1a%genesis/api/v1/messages/article.proto\x1a\x0fdesc/desc.proto\x1a\x1cgoogle/api/annotations.proto2\xc7\x02\n" +
-	"\x14MobileArticleService\x12\x88\x01\n" +
-	"\rCreateArticle\x12$.api.genesis.v1.CreateArticleRequest\x1a%.api.genesis.v1.CreateArticleResponse\"*\x8a\xd3\x0e\f创建文章\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/article\x12\x88\x01\n" +
-	"\fQueryArticle\x12#.api.genesis.v1.QueryArticleRequest\x1a$.api.genesis.v1.QueryArticleResponse\"-\x8a\xd3\x0e\x12查询文章列表\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/article\x1a\x19\x8a\xe2\t\x15移动端文章服务B2Z0cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1b\x06proto3"
+	".genesis/api/v1/bff_mobile/mobile_article.proto\x12\x0eapi.genesis.v1\x1a%genesis/api/v1/messages/article.proto\x1a\x0fdesc/desc.proto\x1a\x1cgoogle/api/annotations.proto2\xd5\x02\n" +
+	"\x14MobileArticleService\x12\x8f\x01\n" +
+	"\rCreateArticle\x12$.api.genesis.v1.CreateArticleRequest\x1a%.api.genesis.v1.CreateArticleResponse\"1\x8a\xd3\x0e\f创建文章\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/mobile/article\x12\x8f\x01\n" +
+	"\fQueryArticle\x12#.api.genesis.v1.QueryArticleRequest\x1a$.api.genesis.v1.QueryArticleResponse\"4\x8a\xd3\x0e\x12查询文章列表\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/mobile/article\x1a\x19\x8a\xe2\t\x15移动端文章服务B2Z0cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1b\x06proto3"
 
 var file_genesis_api_v1_bff_mobile_mobile_article_proto_goTypes = []any{
 	(*CreateArticleRequest)(nil),  // 0: api.genesis.v1.CreateArticleRequest

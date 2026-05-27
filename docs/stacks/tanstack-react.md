@@ -40,6 +40,14 @@ The toolchain has clear ownership boundaries:
 | Paraglide | Type-safe messages, locale runtime, and localized URLs |
 | Biome | Formatting and static checks |
 
+### pnpm Isolated Mode
+
+The monorepo uses pnpm's default isolated mode (`node-linker=isolated`). Each workspace package has its own `node_modules/` with only its declared dependencies. This eliminates the phantom dependency and React version collision problems that occur with hoisted mode in React Native + React web monorepos.
+
+Expo SDK 54+ officially supports pnpm isolated mode.
+
+`pnpm.overrides` in the root `package.json` is reserved for transitive dependency conflicts that cannot be resolved at the package level (e.g., `lightningcss` version pinning for Tailwind/Vite compatibility). Overrides are root-only — sub-projects cannot define them.
+
 Use Nx for recurring workflows. Read the owning `project.json` and run declared
 targets:
 

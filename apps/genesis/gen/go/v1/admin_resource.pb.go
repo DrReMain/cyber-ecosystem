@@ -28,9 +28,9 @@ var File_genesis_api_v1_bff_admin_admin_resource_proto protoreflect.FileDescript
 
 const file_genesis_api_v1_bff_admin_admin_resource_proto_rawDesc = "" +
 	"\n" +
-	"-genesis/api/v1/bff_admin/admin_resource.proto\x12\x0eapi.genesis.v1\x1a&genesis/api/v1/messages/resource.proto\x1a\x0fdesc/desc.proto\x1a\x1cgoogle/api/annotations.proto2\xc6\x01\n" +
-	"\x14AdminResourceService\x12\x8c\x01\n" +
-	"\fListResource\x12#.api.genesis.v1.ListResourceRequest\x1a$.api.genesis.v1.ListResourceResponse\"1\x8a\xd3\x0e\x15获取所有rpc信息\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/resource\x1a\x1f\x8a\xe2\t\x1b管理端系统资源服务B2Z0cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1b\x06proto3"
+	"-genesis/api/v1/bff_admin/admin_resource.proto\x12\x0eapi.genesis.v1\x1a&genesis/api/v1/messages/resource.proto\x1a\x0fdesc/desc.proto\x1a\x1cgoogle/api/annotations.proto2\xcc\x01\n" +
+	"\x14AdminResourceService\x12\x92\x01\n" +
+	"\fListResource\x12#.api.genesis.v1.ListResourceRequest\x1a$.api.genesis.v1.ListResourceResponse\"7\x8a\xd3\x0e\x15获取所有rpc信息\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/admin/resource\x1a\x1f\x8a\xe2\t\x1b管理端系统资源服务B2Z0cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1b\x06proto3"
 
 var file_genesis_api_v1_bff_admin_admin_resource_proto_goTypes = []any{
 	(*ListResourceRequest)(nil),  // 0: api.genesis.v1.ListResourceRequest

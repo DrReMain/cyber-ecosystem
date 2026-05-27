@@ -18,12 +18,12 @@ service MobileArticleService {
   rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse) {
     option (desc.method_comment) = "创建文章";
     option (google.api.http) = {
-      post: "/api/v1/article"
+      post: "/api/v1/mobile/article"
       body: "*"
     };
   }
   rpc QueryArticle(QueryArticleRequest) returns (QueryArticleResponse) {
     option (desc.method_comment) = "查询文章列表";
-    option (google.api.http) = {get: "/api/v1/article"};
+    option (google.api.http) = {get: "/api/v1/mobile/article"};
   }
 }

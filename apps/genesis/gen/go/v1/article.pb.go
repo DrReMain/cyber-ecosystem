@@ -908,13 +908,13 @@ const file_genesis_api_v1_messages_article_proto_rawDesc = "" +
 	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x122\n" +
 	"\x05title\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x05title\x126\n" +
 	"\acontent\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\acontent\x124\n" +
-	"\x06status\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\x06status\"\xc9\x02\n" +
+	"\x06status\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\x06status\"\xcf\x02\n" +
 	"\x13QueryArticleRequest\x12'\n" +
 	"\x04page\x18\x01 \x01(\v2\x13.common.PageRequestR\x04page\x12\x19\n" +
 	"\x05title\x18\x02 \x01(\tH\x00R\x05title\x88\x01\x01\x12>\n" +
-	"\x06status\x18\x03 \x01(\tB!\xbaH\x1er\x1cR\x05draftR\tpublishedR\barchivedH\x01R\x06status\x88\x01\x01\x12\x98\x01\n" +
-	"\border_by\x18d \x03(\tB}\xbaHz\xba\x01w\n" +
-	"\x1cQueryArticleRequest.order_by\x12\x00\x1aUthis.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt):(asc|desc)$'))R\aorderByB\b\n" +
+	"\x06status\x18\x03 \x01(\tB!\xbaH\x1er\x1cR\x05draftR\tpublishedR\barchivedH\x01R\x06status\x88\x01\x01\x12\x9e\x01\n" +
+	"\border_by\x18d \x03(\tB\x82\x01\xbaH\x7f\xba\x01|\n" +
+	"\x1cQueryArticleRequest.order_by\x12\x00\x1aZthis.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt|sort):(asc|desc)$'))R\aorderByB\b\n" +
 	"\x06_titleB\t\n" +
 	"\a_status\"x\n" +
 	"\x14QueryArticleResponse\x12(\n" +

@@ -6,7 +6,203 @@ info:
     title: ""
     version: 0.0.1
 paths:
-    /api/v1/article:
+    /api/v1/admin/article:
+        get:
+            tags:
+                - AdminArticleService
+            operationId: AdminArticleService_QueryArticle
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  schema:
+                    type: string
+                    format: date-time
+                - name: title
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.genesis.v1.QueryArticleResponse'
+        post:
+            tags:
+                - AdminArticleService
+            operationId: AdminArticleService_CreateArticle
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.genesis.v1.CreateArticleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.genesis.v1.CreateArticleResponse'
+    /api/v1/admin/article/{id}:
+        get:
+            tags:
+                - AdminArticleService
+            operationId: AdminArticleService_GetArticle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.genesis.v1.GetArticleResponse'
+        put:
+            tags:
+                - AdminArticleService
+            operationId: AdminArticleService_UpdateArticle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.genesis.v1.UpdateArticleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.genesis.v1.UpdateArticleResponse'
+        delete:
+            tags:
+                - AdminArticleService
+            operationId: AdminArticleService_DeleteArticle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.genesis.v1.DeleteArticleResponse'
+    /api/v1/admin/article/{id}/sort:
+        post:
+            tags:
+                - AdminArticleService
+            operationId: AdminArticleService_SortArticle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.genesis.v1.SortArticleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.genesis.v1.SortArticleResponse'
+    /api/v1/admin/article/{id}/status:
+        put:
+            tags:
+                - AdminArticleService
+            operationId: AdminArticleService_UpdateArticleStatus
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.genesis.v1.UpdateArticleStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.genesis.v1.UpdateArticleStatusResponse'
+    /api/v1/admin/resource:
+        get:
+            tags:
+                - AdminResourceService
+            operationId: AdminResourceService_ListResource
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.genesis.v1.ListResourceResponse'
+    /api/v1/mobile/article:
         get:
             tags:
                 - MobileArticleService
@@ -84,124 +280,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.genesis.v1.CreateArticleResponse'
-    /api/v1/article/{id}:
-        get:
-            tags:
-                - AdminArticleService
-            operationId: AdminArticleService_GetArticle
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/api.genesis.v1.GetArticleResponse'
-        put:
-            tags:
-                - AdminArticleService
-            operationId: AdminArticleService_UpdateArticle
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/api.genesis.v1.UpdateArticleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/api.genesis.v1.UpdateArticleResponse'
-        delete:
-            tags:
-                - AdminArticleService
-            operationId: AdminArticleService_DeleteArticle
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/api.genesis.v1.DeleteArticleResponse'
-    /api/v1/article/{id}/sort:
-        post:
-            tags:
-                - AdminArticleService
-            operationId: AdminArticleService_SortArticle
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/api.genesis.v1.SortArticleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/api.genesis.v1.SortArticleResponse'
-    /api/v1/article/{id}/status:
-        put:
-            tags:
-                - AdminArticleService
-            operationId: AdminArticleService_UpdateArticleStatus
-            parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/api.genesis.v1.UpdateArticleStatusRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/api.genesis.v1.UpdateArticleStatusResponse'
-    /api/v1/resource:
-        get:
-            tags:
-                - AdminResourceService
-            operationId: AdminResourceService_ListResource
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/api.genesis.v1.ListResourceResponse'
 components:
     schemas:
         api.genesis.v1.CreateArticleRequest:

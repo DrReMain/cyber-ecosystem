@@ -96,7 +96,7 @@ message QueryArticleRequest {
   repeated string order_by = 100 [(buf.validate.field).cel = {
     id: "QueryArticleRequest.order_by"
     message: ""
-    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt):(asc|desc)$'))"
+    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt|sort):(asc|desc)$'))"
   }];
 }
 

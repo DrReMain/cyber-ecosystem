@@ -17,6 +17,6 @@ service AdminResourceService {
 
   rpc ListResource(ListResourceRequest) returns (ListResourceResponse) {
     option (desc.method_comment) = "获取所有rpc信息";
-    option (google.api.http) = {get: "/api/v1/resource"};
+    option (google.api.http) = {get: "/api/v1/admin/resource"};
   }
 }

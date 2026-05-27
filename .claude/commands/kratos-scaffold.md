@@ -101,28 +101,29 @@ Create `internal/biz/comment.go`:
 package biz
 
 import (
-    "cyber-ecosystem/shared-go/orm/ent/entutil"
+    "time"
+
+    "cyber-ecosystem/contracts/go/common"
     "cyber-ecosystem/shared-go/utils"
-    common "cyber-ecosystem/contracts/go/common"
 )
 
 type Comment struct {
     ID        *string
-    CreatedAt *utils.TimeString
-    UpdatedAt *utils.TimeString
+    CreatedAt *time.Time
+    UpdatedAt *time.Time
     Content   *string
     Status    *string
 }
 
 type CommentQueryIn struct {
-    entutil.PageRequest
-    entutil.OrderBy
+    *common.PageRequest
+    OrderBy []*utils.OrderBy
     Content *string
     Status  *string
 }
 
 type CommentQueryOut struct {
-    *entutil.PageResponse
+    *common.PageResponse
     List []*Comment
 }
 ```
@@ -324,8 +325,7 @@ func (s *CommentService) RegisterHTTP(srv *http.Server) {
     <app>V1.RegisterCommentServiceHTTPServer(srv, s)
 }
 func (s *CommentService) RegisterConnect(srv *connect.Server) {
-    path, handler := <app>V1connect.NewCommentServiceHandler(s, srv.HandlerOptions()...)
-    srv.Register(path, handler)
+    srv.Register(<app>V1connect.NewCommentServiceHandler(s, srv.HandlerOptions()...))
 }
 ```
 
@@ -344,6 +344,16 @@ Then regenerate: `./nx run <project>:generate:wire`
 ---
 
 ## 3. Key Patterns
+
+### BFF UC Layer Mirrors Base Patterns
+
+BFF services that call a base service via gRPC should still follow the same UC layer patterns as the base service:
+
+- Wrap all write operations (Create, Update, Delete, Sort, UpdateStatus) in `uc.tm.InTx()`. Even though BFF's `InTx()` is a no-op passthrough (no database), keeping the pattern consistent means the UC layer looks identical across base and BFF services.
+- Include FSM for status transitions (`TransitionTo` method). The BFF's `UpdateStatus` should do Get → TransitionTo → Update, same as the base service.
+- The `UpdateStatus` method should NOT be in the RP port interface — it's composed from Get + TransitionTo + Update at the UC level.
+
+**No distributed transaction concern:** When BFFs are stateless proxies (no own database) calling a single base service, the transaction boundary is always within the base service. BFF's `InTx()` is a passthrough — there's no cross-service consistency issue. This only changes if future services each have their own database and an operation must update data across them.
 
 ### Transaction Management
 
@@ -507,7 +517,7 @@ var ProviderSet = wire.NewSet(
 )
 ```
 
-See `docs/stacks/kratos-go.md` Section 9 (gRPC Client) for the `platform_grpc.go` middleware setup.
+See `docs/stacks/kratos-go.md` Section 9 (gRPC Client) for the `platform_grpc.go` middleware setup. The client middleware chain MUST end with `grpc_status.Client()` as the innermost middleware — it maps gRPC transport errors to Kratos errors with reason codes so that i18n, logging, and error reporting all work correctly. Import: `"cyber-ecosystem/shared-go/kratos/middleware/grpc_status"`.
 
 ### With Both Database and gRPC Client (monolith)
 
@@ -528,6 +538,25 @@ After the first successful generation, subsequent runs work normally without sta
 ---
 
 ## 6. Common Pitfalls
+
+### Single Go Module (No go mod init)
+
+This monorepo uses a single Go module at the repository root. Do NOT run `go mod init` in any service subdirectory. New services are just packages under the existing module — no separate go.mod needed.
+
+### Platform ProviderSet Must Include gRPC Client Constructors
+
+The platform layer's `ProviderSet` must list ALL constructors that Wire needs to resolve, including `NewGRPCXxxClient` functions. Omitting them causes "no provider found" errors:
+
+```go
+var ProviderSet = wire.NewSet(
+    NewPlatform,
+    NewGRPCArticleClient,  // MUST include — Wire needs this to resolve XxxServiceClient
+)
+```
+
+### OpsServer Must Be a Concrete Struct (Not Type Alias)
+
+Do NOT use `type OpsServer = ops.Server` — Wire cannot resolve type aliases. Define a concrete struct with `Start(ctx) error` and `Stop(ctx) error` methods. See `admin_bff/internal/server/ops.go` for the full implementation.
 
 ### GCI Import Formatting
 

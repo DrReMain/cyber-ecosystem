@@ -15,7 +15,6 @@ type ArticleRP interface {
 	Get(ctx context.Context, id string) (*Article, error)
 	Query(ctx context.Context, in *ArticleQueryIn) (*ArticleQueryOut, error)
 	Sort(ctx context.Context, id string, prevID, nextID *string) (*Article, error)
-	UpdateStatus(ctx context.Context, id string, target string) (*Article, error)
 }
 
 // region[rgba(102,187,106,0.15)] 🟢 UC ----------------------------------------------------------------------------------
@@ -37,16 +36,28 @@ func NewArticleUC(logger log.Logger, tm Transaction, articleRP ArticleRP) *Artic
 
 // region[rgba(186,104,200,0.15)] 🟣 Method ------------------------------------------------------------------------------
 
-func (uc *ArticleUC) Create(ctx context.Context, a *Article) (*Article, error) {
-	return uc.articleRP.Create(ctx, a)
+func (uc *ArticleUC) Create(ctx context.Context, a *Article) (out *Article, err error) {
+	err = uc.tm.InTx(ctx, func(ctx context.Context) (e error) {
+		out, e = uc.articleRP.Create(ctx, a)
+		return
+	})
+	return
 }
 
-func (uc *ArticleUC) Update(ctx context.Context, fieldsMask []string, a *Article) (*Article, error) {
-	return uc.articleRP.Update(ctx, fieldsMask, a)
+func (uc *ArticleUC) Update(ctx context.Context, fieldsMask []string, a *Article) (out *Article, err error) {
+	err = uc.tm.InTx(ctx, func(ctx context.Context) (e error) {
+		out, e = uc.articleRP.Update(ctx, fieldsMask, a)
+		return
+	})
+	return
 }
 
-func (uc *ArticleUC) Delete(ctx context.Context, id string) (string, error) {
-	return uc.articleRP.Delete(ctx, id)
+func (uc *ArticleUC) Delete(ctx context.Context, id string) (out string, err error) {
+	err = uc.tm.InTx(ctx, func(ctx context.Context) (e error) {
+		out, e = uc.articleRP.Delete(ctx, id)
+		return
+	})
+	return
 }
 
 func (uc *ArticleUC) Get(ctx context.Context, id string) (*Article, error) {
@@ -57,10 +68,25 @@ func (uc *ArticleUC) Query(ctx context.Context, in *ArticleQueryIn) (*ArticleQue
 	return uc.articleRP.Query(ctx, in)
 }
 
-func (uc *ArticleUC) Sort(ctx context.Context, id string, prevID, nextID *string) (*Article, error) {
-	return uc.articleRP.Sort(ctx, id, prevID, nextID)
+func (uc *ArticleUC) UpdateStatus(ctx context.Context, id string, target string) (out *Article, err error) {
+	err = uc.tm.InTx(ctx, func(ctx context.Context) (e error) {
+		a, e := uc.articleRP.Get(ctx, id)
+		if e != nil {
+			return e
+		}
+		if e = a.TransitionTo(ctx, target); e != nil {
+			return e
+		}
+		out, e = uc.articleRP.Update(ctx, []string{"status"}, a)
+		return
+	})
+	return
 }
 
-func (uc *ArticleUC) UpdateStatus(ctx context.Context, id string, target string) (*Article, error) {
-	return uc.articleRP.UpdateStatus(ctx, id, target)
+func (uc *ArticleUC) Sort(ctx context.Context, id string, prevID, nextID *string) (out *Article, err error) {
+	err = uc.tm.InTx(ctx, func(ctx context.Context) (e error) {
+		out, e = uc.articleRP.Sort(ctx, id, prevID, nextID)
+		return
+	})
+	return
 }

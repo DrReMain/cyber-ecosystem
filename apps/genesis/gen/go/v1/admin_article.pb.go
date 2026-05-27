@@ -28,16 +28,16 @@ var File_genesis_api_v1_bff_admin_admin_article_proto protoreflect.FileDescripto
 
 const file_genesis_api_v1_bff_admin_admin_article_proto_rawDesc = "" +
 	"\n" +
-	",genesis/api/v1/bff_admin/admin_article.proto\x12\x0eapi.genesis.v1\x1a%genesis/api/v1/messages/article.proto\x1a\x0fdesc/desc.proto\x1a\x1cgoogle/api/annotations.proto2\xab\b\n" +
-	"\x13AdminArticleService\x12\x88\x01\n" +
-	"\rCreateArticle\x12$.api.genesis.v1.CreateArticleRequest\x1a%.api.genesis.v1.CreateArticleResponse\"*\x8a\xd3\x0e\f创建文章\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/article\x12\x8d\x01\n" +
-	"\rUpdateArticle\x12$.api.genesis.v1.UpdateArticleRequest\x1a%.api.genesis.v1.UpdateArticleResponse\"/\x8a\xd3\x0e\f修改文章\x82\xd3\xe4\x93\x02\x19:\x01*\x1a\x14/api/v1/article/{id}\x12\x8a\x01\n" +
-	"\rDeleteArticle\x12$.api.genesis.v1.DeleteArticleRequest\x1a%.api.genesis.v1.DeleteArticleResponse\",\x8a\xd3\x0e\f删除文章\x82\xd3\xe4\x93\x02\x16*\x14/api/v1/article/{id}\x12\x87\x01\n" +
+	",genesis/api/v1/bff_admin/admin_article.proto\x12\x0eapi.genesis.v1\x1a%genesis/api/v1/messages/article.proto\x1a\x0fdesc/desc.proto\x1a\x1cgoogle/api/annotations.proto2\xd5\b\n" +
+	"\x13AdminArticleService\x12\x8e\x01\n" +
+	"\rCreateArticle\x12$.api.genesis.v1.CreateArticleRequest\x1a%.api.genesis.v1.CreateArticleResponse\"0\x8a\xd3\x0e\f创建文章\x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/admin/article\x12\x93\x01\n" +
+	"\rUpdateArticle\x12$.api.genesis.v1.UpdateArticleRequest\x1a%.api.genesis.v1.UpdateArticleResponse\"5\x8a\xd3\x0e\f修改文章\x82\xd3\xe4\x93\x02\x1f:\x01*\x1a\x1a/api/v1/admin/article/{id}\x12\x90\x01\n" +
+	"\rDeleteArticle\x12$.api.genesis.v1.DeleteArticleRequest\x1a%.api.genesis.v1.DeleteArticleResponse\"2\x8a\xd3\x0e\f删除文章\x82\xd3\xe4\x93\x02\x1c*\x1a/api/v1/admin/article/{id}\x12\x8d\x01\n" +
 	"\n" +
-	"GetArticle\x12!.api.genesis.v1.GetArticleRequest\x1a\".api.genesis.v1.GetArticleResponse\"2\x8a\xd3\x0e\x12查询文章详情\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/article/{id}\x12\x88\x01\n" +
-	"\fQueryArticle\x12#.api.genesis.v1.QueryArticleRequest\x1a$.api.genesis.v1.QueryArticleResponse\"-\x8a\xd3\x0e\x12查询文章列表\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/article\x12\x8c\x01\n" +
-	"\vSortArticle\x12\".api.genesis.v1.SortArticleRequest\x1a#.api.genesis.v1.SortArticleResponse\"4\x8a\xd3\x0e\f排序文章\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/article/{id}/sort\x12\xac\x01\n" +
-	"\x13UpdateArticleStatus\x12*.api.genesis.v1.UpdateArticleStatusRequest\x1a+.api.genesis.v1.UpdateArticleStatusResponse\"<\x8a\xd3\x0e\x12修改文章状态\x82\xd3\xe4\x93\x02 :\x01*\x1a\x1b/api/v1/article/{id}/status\x1a\x19\x8a\xe2\t\x15管理端文章服务B2Z0cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1b\x06proto3"
+	"GetArticle\x12!.api.genesis.v1.GetArticleRequest\x1a\".api.genesis.v1.GetArticleResponse\"8\x8a\xd3\x0e\x12查询文章详情\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/admin/article/{id}\x12\x8e\x01\n" +
+	"\fQueryArticle\x12#.api.genesis.v1.QueryArticleRequest\x1a$.api.genesis.v1.QueryArticleResponse\"3\x8a\xd3\x0e\x12查询文章列表\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/admin/article\x12\x92\x01\n" +
+	"\vSortArticle\x12\".api.genesis.v1.SortArticleRequest\x1a#.api.genesis.v1.SortArticleResponse\":\x8a\xd3\x0e\f排序文章\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/api/v1/admin/article/{id}/sort\x12\xb2\x01\n" +
+	"\x13UpdateArticleStatus\x12*.api.genesis.v1.UpdateArticleStatusRequest\x1a+.api.genesis.v1.UpdateArticleStatusResponse\"B\x8a\xd3\x0e\x12修改文章状态\x82\xd3\xe4\x93\x02&:\x01*\x1a!/api/v1/admin/article/{id}/status\x1a\x19\x8a\xe2\t\x15管理端文章服务B2Z0cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1b\x06proto3"
 
 var file_genesis_api_v1_bff_admin_admin_article_proto_goTypes = []any{
 	(*CreateArticleRequest)(nil),        // 0: api.genesis.v1.CreateArticleRequest

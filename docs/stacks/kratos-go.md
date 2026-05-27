@@ -221,7 +221,7 @@ type MessageRP interface {
 1. Edit `.proto` files in `api/v1/`
 2. Run `./nx run <project>:generate` (or individual targets)
 3. Generated Go code lands in `gen/go/v1/`
-4. Generated TypeScript clients land in `clients/admin/src/services/connect/` (Connect) and `clients/admin/src/services/openapi/` (OpenAPI)
+4. Generated TypeScript clients land in `clients/<client>/src/services/connect/` (Connect) and `clients/<client>/src/services/openapi/` (OpenAPI)
 
 ### Error Handling Chain
 
@@ -495,14 +495,24 @@ import (
 )
 
 func (s *ArticleService) RegisterConnect(srv *connect.Server) {
-    path, handler := appV1connect.NewArticleServiceHandler(s, srv.HandlerOptions()...)
-    srv.Register(path, handler)
+    srv.Register(appV1connect.NewArticleServiceHandler(s, srv.HandlerOptions()...))
 }
 ```
 
 Connect supports three wire formats simultaneously: Connect, gRPC, and gRPC-Web. Clients can use `grpcurl` (gRPC), `curl` with JSON (HTTP), or Connect-native clients.
 
 If a proto service has NO `google.api.http` annotations, the generated code will NOT include `RegisterXxxHTTPServer` or Connect handler. `RegisterHTTP` and `RegisterConnect` must be no-ops.
+
+### BFF HTTP Path Prefix Convention
+
+When an app has multiple BFF services (admin, mobile), each BFF must use a distinct HTTP path prefix to avoid OpenAPI generation collisions:
+
+| BFF | Path Prefix |
+|-----|-------------|
+| Admin BFF | `/api/v1/admin/` |
+| Mobile BFF | `/api/v1/mobile/` |
+
+Without the prefix, two BFFs sharing `GET /api/v1/article` would cause the OpenAPI generator to produce only one set of client functions (the second overwrites the first). The prefix is set in the proto `google.api.http` annotations.
 
 ### gRPC Client (Calling Other Services)
 
@@ -518,6 +528,7 @@ func dialGRPC(c *conf.Data, logger, tp, _metricRequests, _metricSeconds) (*grpc.
     if tp != nil { middlewares = append(middlewares, tracing.Client(...)) }
     middlewares = append(middlewares, metadata.Client())
     middlewares = append(middlewares, logging.Client(logger))
+    middlewares = append(middlewares, grpc_status.Client()) // innermost — maps gRPC status to Kratos errors
 
     conn, err := kgrpc.DialInsecure(context.Background(),
         kgrpc.WithEndpoint(c.BaseService.Addr),
@@ -530,6 +541,7 @@ func dialGRPC(c *conf.Data, logger, tp, _metricRequests, _metricSeconds) (*grpc.
 
 Key points:
 - Use `metrics.Client()`, `tracing.Client()`, `logging.Client()` — client-side variants, not `Server()`
+- `grpc_status.Client()` MUST be the innermost middleware (last appended). It maps gRPC transport errors (`Unavailable`, `DeadlineExceeded`) to Kratos errors with proper reason codes, so all outer middlewares (logging, tracing, metrics, circuit breaker) see structured errors with reasons. Without it, gRPC transport failures return empty reason and raw message, breaking i18n translation and error reporting.
 - Each remote service gets its own `NewGRPCXxxClient` constructor, all sharing `dialGRPC`
 - Remote service config lives in `conf.Data`, named per service (e.g., `Data.BaseService`)
 - `kgrpc.DialInsecure` returns `*grpc.ClientConn` (standard gRPC), not a Kratos type

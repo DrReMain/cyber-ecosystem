@@ -32,7 +32,7 @@ log:
     max_age: 30
     compress: true
   otlp_log:
-    enabled: false
+    enabled: true
     endpoint: "localhost:4318"
     insecure: true
 data:
@@ -69,11 +69,11 @@ data:
       secret_key: "Cyber-Ecosystem123"
       bucket: "uploads"
       region: "us-east-1"
-# trace:
-#   endpoint: "localhost:4318"
-#   insecure: true
+trace:
+  endpoint: "localhost:4318"
+  insecure: true
 ops:
-  enabled: false
+  enabled: true
   addr: "0.0.0.0:14000"
   metrics: "/metrics"
   pprof:
@@ -85,7 +85,7 @@ ops:
     thread_enabled: true
     trace_enabled: true
 error_report:
-  enabled: false
-  dsn: ""
+  enabled: true
+  dsn: "http://ce217894c77a4ee1babbb76e4e584bf0@localhost:8000/2"
   environment: "development"
   sample_rate: 1.0

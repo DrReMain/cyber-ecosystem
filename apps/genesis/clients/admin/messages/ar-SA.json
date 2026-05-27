@@ -1,0 +1,35 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_title": "Cyber Ecosystem",
+  "column_action": "إجراء",
+  "column_created_at": "تاريخ الإنشاء",
+  "column_updated_at": "تاريخ التعديل",
+  "error_back_home": "العودة إلى الرئيسية",
+  "error_error_subtitle": "حدث خطأ ما، يرجى المحاولة لاحقاً",
+  "error_not_found_subtitle": "عذراً، الصفحة التي زرتها غير موجودة",
+  "error_retry": "إعادة المحاولة",
+  "filter_expand": "توسيع",
+  "filter_fold": "طي",
+  "filter_reset": "إعادة تعيين",
+  "filter_search": "بحث",
+  "locale_name": [
+    {
+      "declarations": ["input locale"],
+      "selectors": ["locale"],
+      "match": {
+        "locale=zh-CN": "简体中文",
+        "locale=en-US": "English",
+        "locale=ar-SA": "العربية",
+        "locale=ja-JP": "日本語",
+        "locale=ko-KR": "한국어",
+        "locale=*": "{locale}"
+      }
+    }
+  ],
+  "pending_subtitle": "جاري تحميل الصفحة، يرجى الانتظار",
+  "toolbar_density": "الكثافة",
+  "toolbar_density_large": "واسع",
+  "toolbar_density_middle": "افتراضي",
+  "toolbar_density_small": "مضغوط",
+  "toolbar_refresh": "تحديث"
+}

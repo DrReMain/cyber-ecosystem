@@ -18,40 +18,40 @@ service AdminArticleService {
   rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse) {
     option (desc.method_comment) = "创建文章";
     option (google.api.http) = {
-      post: "/api/v1/article"
+      post: "/api/v1/admin/article"
       body: "*"
     };
   }
   rpc UpdateArticle(UpdateArticleRequest) returns (UpdateArticleResponse) {
     option (desc.method_comment) = "修改文章";
     option (google.api.http) = {
-      put: "/api/v1/article/{id}"
+      put: "/api/v1/admin/article/{id}"
       body: "*"
     };
   }
   rpc DeleteArticle(DeleteArticleRequest) returns (DeleteArticleResponse) {
     option (desc.method_comment) = "删除文章";
-    option (google.api.http) = {delete: "/api/v1/article/{id}"};
+    option (google.api.http) = {delete: "/api/v1/admin/article/{id}"};
   }
   rpc GetArticle(GetArticleRequest) returns (GetArticleResponse) {
     option (desc.method_comment) = "查询文章详情";
-    option (google.api.http) = {get: "/api/v1/article/{id}"};
+    option (google.api.http) = {get: "/api/v1/admin/article/{id}"};
   }
   rpc QueryArticle(QueryArticleRequest) returns (QueryArticleResponse) {
     option (desc.method_comment) = "查询文章列表";
-    option (google.api.http) = {get: "/api/v1/article"};
+    option (google.api.http) = {get: "/api/v1/admin/article"};
   }
   rpc SortArticle(SortArticleRequest) returns (SortArticleResponse) {
     option (desc.method_comment) = "排序文章";
     option (google.api.http) = {
-      post: "/api/v1/article/{id}/sort"
+      post: "/api/v1/admin/article/{id}/sort"
       body: "*"
     };
   }
   rpc UpdateArticleStatus(UpdateArticleStatusRequest) returns (UpdateArticleStatusResponse) {
     option (desc.method_comment) = "修改文章状态";
     option (google.api.http) = {
-      put: "/api/v1/article/{id}/status"
+      put: "/api/v1/admin/article/{id}/status"
       body: "*"
     };
   }

@@ -39,13 +39,13 @@ type AdminArticleServiceHTTPServer interface {
 
 func RegisterAdminArticleServiceHTTPServer(s *http.Server, srv AdminArticleServiceHTTPServer) {
 	r := s.Route("/")
-	r.POST("/api/v1/article", _AdminArticleService_CreateArticle0_HTTP_Handler(srv))
-	r.PUT("/api/v1/article/{id}", _AdminArticleService_UpdateArticle0_HTTP_Handler(srv))
-	r.DELETE("/api/v1/article/{id}", _AdminArticleService_DeleteArticle0_HTTP_Handler(srv))
-	r.GET("/api/v1/article/{id}", _AdminArticleService_GetArticle0_HTTP_Handler(srv))
-	r.GET("/api/v1/article", _AdminArticleService_QueryArticle0_HTTP_Handler(srv))
-	r.POST("/api/v1/article/{id}/sort", _AdminArticleService_SortArticle0_HTTP_Handler(srv))
-	r.PUT("/api/v1/article/{id}/status", _AdminArticleService_UpdateArticleStatus0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/article", _AdminArticleService_CreateArticle0_HTTP_Handler(srv))
+	r.PUT("/api/v1/admin/article/{id}", _AdminArticleService_UpdateArticle0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/admin/article/{id}", _AdminArticleService_DeleteArticle0_HTTP_Handler(srv))
+	r.GET("/api/v1/admin/article/{id}", _AdminArticleService_GetArticle0_HTTP_Handler(srv))
+	r.GET("/api/v1/admin/article", _AdminArticleService_QueryArticle0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/article/{id}/sort", _AdminArticleService_SortArticle0_HTTP_Handler(srv))
+	r.PUT("/api/v1/admin/article/{id}/status", _AdminArticleService_UpdateArticleStatus0_HTTP_Handler(srv))
 }
 
 func _AdminArticleService_CreateArticle0_HTTP_Handler(srv AdminArticleServiceHTTPServer) func(ctx http.Context) error {
@@ -228,7 +228,7 @@ func NewAdminArticleServiceHTTPClient(client *http.Client) AdminArticleServiceHT
 
 func (c *AdminArticleServiceHTTPClientImpl) CreateArticle(ctx context.Context, in *CreateArticleRequest, opts ...http.CallOption) (*CreateArticleResponse, error) {
 	var out CreateArticleResponse
-	pattern := "/api/v1/article"
+	pattern := "/api/v1/admin/article"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAdminArticleServiceCreateArticle))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -241,7 +241,7 @@ func (c *AdminArticleServiceHTTPClientImpl) CreateArticle(ctx context.Context, i
 
 func (c *AdminArticleServiceHTTPClientImpl) DeleteArticle(ctx context.Context, in *DeleteArticleRequest, opts ...http.CallOption) (*DeleteArticleResponse, error) {
 	var out DeleteArticleResponse
-	pattern := "/api/v1/article/{id}"
+	pattern := "/api/v1/admin/article/{id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationAdminArticleServiceDeleteArticle))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -254,7 +254,7 @@ func (c *AdminArticleServiceHTTPClientImpl) DeleteArticle(ctx context.Context, i
 
 func (c *AdminArticleServiceHTTPClientImpl) GetArticle(ctx context.Context, in *GetArticleRequest, opts ...http.CallOption) (*GetArticleResponse, error) {
 	var out GetArticleResponse
-	pattern := "/api/v1/article/{id}"
+	pattern := "/api/v1/admin/article/{id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationAdminArticleServiceGetArticle))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -267,7 +267,7 @@ func (c *AdminArticleServiceHTTPClientImpl) GetArticle(ctx context.Context, in *
 
 func (c *AdminArticleServiceHTTPClientImpl) QueryArticle(ctx context.Context, in *QueryArticleRequest, opts ...http.CallOption) (*QueryArticleResponse, error) {
 	var out QueryArticleResponse
-	pattern := "/api/v1/article"
+	pattern := "/api/v1/admin/article"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationAdminArticleServiceQueryArticle))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -280,7 +280,7 @@ func (c *AdminArticleServiceHTTPClientImpl) QueryArticle(ctx context.Context, in
 
 func (c *AdminArticleServiceHTTPClientImpl) SortArticle(ctx context.Context, in *SortArticleRequest, opts ...http.CallOption) (*SortArticleResponse, error) {
 	var out SortArticleResponse
-	pattern := "/api/v1/article/{id}/sort"
+	pattern := "/api/v1/admin/article/{id}/sort"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAdminArticleServiceSortArticle))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -293,7 +293,7 @@ func (c *AdminArticleServiceHTTPClientImpl) SortArticle(ctx context.Context, in 
 
 func (c *AdminArticleServiceHTTPClientImpl) UpdateArticle(ctx context.Context, in *UpdateArticleRequest, opts ...http.CallOption) (*UpdateArticleResponse, error) {
 	var out UpdateArticleResponse
-	pattern := "/api/v1/article/{id}"
+	pattern := "/api/v1/admin/article/{id}"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAdminArticleServiceUpdateArticle))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -306,7 +306,7 @@ func (c *AdminArticleServiceHTTPClientImpl) UpdateArticle(ctx context.Context, i
 
 func (c *AdminArticleServiceHTTPClientImpl) UpdateArticleStatus(ctx context.Context, in *UpdateArticleStatusRequest, opts ...http.CallOption) (*UpdateArticleStatusResponse, error) {
 	var out UpdateArticleStatusResponse
-	pattern := "/api/v1/article/{id}/status"
+	pattern := "/api/v1/admin/article/{id}/status"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAdminArticleServiceUpdateArticleStatus))
 	opts = append(opts, http.PathTemplate(pattern))

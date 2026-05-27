@@ -27,7 +27,7 @@ type AdminResourceServiceHTTPServer interface {
 
 func RegisterAdminResourceServiceHTTPServer(s *http.Server, srv AdminResourceServiceHTTPServer) {
 	r := s.Route("/")
-	r.GET("/api/v1/resource", _AdminResourceService_ListResource0_HTTP_Handler(srv))
+	r.GET("/api/v1/admin/resource", _AdminResourceService_ListResource0_HTTP_Handler(srv))
 }
 
 func _AdminResourceService_ListResource0_HTTP_Handler(srv AdminResourceServiceHTTPServer) func(ctx http.Context) error {
@@ -63,7 +63,7 @@ func NewAdminResourceServiceHTTPClient(client *http.Client) AdminResourceService
 
 func (c *AdminResourceServiceHTTPClientImpl) ListResource(ctx context.Context, in *ListResourceRequest, opts ...http.CallOption) (*ListResourceResponse, error) {
 	var out ListResourceResponse
-	pattern := "/api/v1/resource"
+	pattern := "/api/v1/admin/resource"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationAdminResourceServiceListResource))
 	opts = append(opts, http.PathTemplate(pattern))

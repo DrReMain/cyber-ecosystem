@@ -37,8 +37,7 @@ func (s *ArticleService) RegisterHTTP(srv *http.Server) {
 	genesisV1.RegisterAdminArticleServiceHTTPServer(srv, s)
 }
 func (s *ArticleService) RegisterConnect(srv *connect.Server) {
-	path, handler := genesisV1connect.NewAdminArticleServiceHandler(s, srv.HandlerOptions()...)
-	srv.Register(path, handler)
+	srv.Register(genesisV1connect.NewAdminArticleServiceHandler(s, srv.HandlerOptions()...))
 }
 
 // region[rgba(255,167,38,0.15)] 🟠 Handler -----------------------------------------------------------------------------

@@ -9,9 +9,6 @@
 package genesisV1
 
 import (
-	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
-	_ "cyber-ecosystem/contracts/go/desc"
-	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -302,7 +299,7 @@ var File_genesis_api_v1_messages_resource_proto protoreflect.FileDescriptor
 
 const file_genesis_api_v1_messages_resource_proto_rawDesc = "" +
 	"\n" +
-	"&genesis/api/v1/messages/resource.proto\x12\x0eapi.genesis.v1\x1a\x1bbuf/validate/validate.proto\x1a\x0fdesc/desc.proto\x1a\x1cgoogle/api/annotations.proto\"\xb3\x02\n" +
+	"&genesis/api/v1/messages/resource.proto\x12\x0eapi.genesis.v1\"\xb3\x02\n" +
 	"\x06Method\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
 	"\tfull_name\x18\x02 \x01(\tR\bfullName\x12!\n" +

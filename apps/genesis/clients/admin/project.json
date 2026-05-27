@@ -1,0 +1,50 @@
+{
+  "$schema": "../../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "genesis_client_admin",
+  "root": "apps/genesis/clients/admin",
+  "projectType": "application",
+  "targets": {
+    "biome:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm run lint"
+      }
+    },
+    "biome:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm run lint:fix"
+      }
+    },
+    "messages:gen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm run messages:gen"
+      }
+    },
+    "messages:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm run messages:check"
+      }
+    },
+    "proto:openapi": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "openapi-ts -f hey-api.config.ts"
+      }
+    },
+    "proto:connect": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf generate --template apps/genesis/clients/admin/buf.gen.client.yaml --path apps/genesis/api --include-imports"
+      }
+    }
+  }
+}

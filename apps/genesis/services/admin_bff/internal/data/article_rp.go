@@ -99,17 +99,6 @@ func (rp *articleRP) Sort(ctx context.Context, id string, prevID, nextID *string
 	return &biz.Article{ID: utils.Unwrap(resp.Id)}, nil
 }
 
-func (rp *articleRP) UpdateStatus(ctx context.Context, id string, target string) (*biz.Article, error) {
-	resp, err := rp.platform.GetArticleClient().UpdateArticleStatus(ctx, &genesisV1.UpdateArticleStatusRequest{
-		Id:     utils.Ptr(id),
-		Status: utils.Ptr(target),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &biz.Article{ID: utils.Unwrap(resp.Id)}, nil
-}
-
 // region[rgba(144,164,174,0.10)] ⚪ Private ---------------------------------------------------------------------------
 
 func protoToArticle(resp *genesisV1.GetArticleResponse) *biz.Article {

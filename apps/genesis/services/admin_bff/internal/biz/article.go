@@ -21,6 +21,7 @@ type Article struct {
 type ArticleQueryIn struct {
 	*common.PageRequest
 	OrderBy []*utils.OrderBy
+	ID      *string
 	Title   *string
 	Status  *string
 }

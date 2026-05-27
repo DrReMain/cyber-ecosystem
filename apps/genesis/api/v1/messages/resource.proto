@@ -3,10 +3,6 @@ syntax = "proto3";
 // buf:lint:ignore PACKAGE_DIRECTORY_MATCH
 package api.genesis.v1;
 
-import "buf/validate/validate.proto";
-import "desc/desc.proto";
-import "google/api/annotations.proto";
-
 option go_package = "cyber-ecosystem/apps/genesis/gen/go/v1;genesisV1";
 
 // region[rgba(239,83,80,0.15)] 🔴 Model

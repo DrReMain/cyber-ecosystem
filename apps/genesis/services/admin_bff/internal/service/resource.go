@@ -36,13 +36,12 @@ func (s *ResourceService) RegisterHTTP(srv *http.Server) {
 	genesisV1.RegisterAdminResourceServiceHTTPServer(srv, s)
 }
 func (s *ResourceService) RegisterConnect(srv *connect.Server) {
-	path, handler := genesisV1connect.NewAdminResourceServiceHandler(s, srv.HandlerOptions()...)
-	srv.Register(path, handler)
+	srv.Register(genesisV1connect.NewAdminResourceServiceHandler(s, srv.HandlerOptions()...))
 }
 
 // region[rgba(255,167,38,0.15)] 🟠 Handler -----------------------------------------------------------------------------
 
-func (s *ResourceService) ListResource(ctx context.Context, _ *genesisV1.ListResourceRequest) (*genesisV1.ListResourceResponse, error) {
+func (s *ResourceService) ListResource(ctx context.Context, in *genesisV1.ListResourceRequest) (*genesisV1.ListResourceResponse, error) {
 	services, err := s.resourceUC.ListResource(ctx)
 	if err != nil {
 		return nil, err
