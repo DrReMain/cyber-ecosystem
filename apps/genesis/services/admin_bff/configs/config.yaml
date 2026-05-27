@@ -1,0 +1,60 @@
+server:
+  http:
+    addr: 0.0.0.0:11001
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:12001
+    timeout: 1s
+  connect:
+    addr: 0.0.0.0:13001
+    timeout: 1s
+log:
+  level: debug
+  cache:
+    enabled: true
+    level: debug
+    slow_query: true
+    slow_query_threshold: 0.2s
+  console:
+    enabled: true
+    color: true
+    format: console
+  file:
+    enabled: false
+    path: "./logs/admin_bff.log"
+    max_size: 100
+    max_backups: 10
+    max_age: 30
+    compress: true
+  otlp_log:
+    enabled: false
+    endpoint: "localhost:4318"
+    insecure: true
+data:
+  cache:
+    type: memory
+    memory:
+      otel_enabled: true
+  base_service:
+    addr: "0.0.0.0:12000"
+    timeout: 1s
+# trace:
+#   endpoint: "localhost:4318"
+#   insecure: true
+ops:
+  enabled: false
+  addr: "0.0.0.0:14001"
+  metrics: "/metrics"
+  pprof:
+    enabled: true
+    cpu_enabled: true
+    heap_enabled: true
+    goroutine_enabled: true
+    mutex_enabled: true
+    thread_enabled: true
+    trace_enabled: true
+error_report:
+  enabled: false
+  dsn: ""
+  environment: "development"
+  sample_rate: 1.0

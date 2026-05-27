@@ -1,99 +1,57 @@
 # Kratos Service Scaffold
 
-Guide for scaffolding and implementing Go microservices using the Kratos framework in this monorepo. Use this when creating a new service, adding a new aggregate/entity, or implementing business logic following the established patterns.
+Step-by-step guide for scaffolding and implementing Go microservices using the Kratos framework in this monorepo. Use this when creating a new service, adding a new aggregate/entity, or implementing business logic.
 
-This skill assumes proto files and generation are already set up (see `/proto-design`). Focus here is on the Go service implementation.
+This skill assumes proto files and generation are already set up (see `/proto-design`). For architecture reference, middleware chains, utils, and project structure, see `docs/stacks/kratos-go.md`.
 
 ---
 
 ## 1. Service Directory Structure
 
 ```
-apps/<app>/services/<service>/
+apps/<app>/services/<service>/    # use underscores (admin_bff, not admin-bff)
   cmd/app/
-    main.go              # Bootstrap: config → logger → metrics → tracing → sentry → wire
-    wire.go              # Wire injection (build tag: wireinject)
-    wire_gen.go          # Wire generated (DO NOT EDIT)
-    logger.go            # Zap logger setup
-    metrics.go           # OTel MeterProvider
-    tracing.go           # OTel TracerProvider
-    sentry.go            # Sentry init
-    resource.go          # OTel resource with service metadata
+    main.go, wire.go, wire_gen.go
+    logger.go, metrics.go, tracing.go, sentry.go, resource.go
   internal/
     conf/
-      conf.proto         # Config proto definition
-      conf.pb.go         # Generated config types
-    ent/
-      schema/            # Ent entity schemas
-        article.go
-        local_mixins/    # Service-specific mixins
-          soft_delete.go
-          sort.go
-    platform/            # Infrastructure container
-      interface.go
-      platform.go
-      platform_ent.go
-      platform_ent_handler.go
-      platform_cache.go
-      platform_cache_handler.go
-    data/                # Repository implementations
+      conf.proto, conf.pb.go
+    ent/schema/                  # [DB capability]
+      {aggregate}.go
+      local_mixins/
+        soft_delete.go, sort.go
+    platform/
+      interface.go, platform.go
+      platform_ent.go            # [DB] Ent client
+      platform_ent_handler.go    # [DB] Ent error mapping
+      platform_grpc.go           # [gRPC Client] Remote service clients
+      platform_cache.go, platform_cache_handler.go
+    data/
       data.go
-      article_rp.go
-    biz/                 # Domain layer
+      {aggregate}_rp.go
+    biz/
       biz.go
-      article.go
-      article_uc.go
-      article_fsm.go     # If entity has state machine
-    service/             # Proto handler layer
+      {aggregate}.go
+      {aggregate}_uc.go
+      {aggregate}_fsm.go
+    service/
       service.go
-      article.go
-    server/              # Transport setup
-      server.go
-      grpc.go
-      http.go
-      connect.go
-      ops.go
+      {aggregate}.go
+    server/
+      server.go, grpc.go, http.go, connect.go, ops.go
     i18n/
-      generate.go
-      i18n.go
-      i18n.protos
-      locales/
-        v1.zh-CN.yaml
-        v1.en-US.yaml
-  configs/
-    config.yaml
-  project.json           # Nx targets
-  buf.gen.conf.yaml      # Proto generation config
+      generate.go, i18n.go, i18n.protos
+      locales/v1.zh-CN.yaml, v1.en-US.yaml
+  configs/config.yaml
+  project.json
+  buf.gen.conf.yaml
 ```
+
+For the full project structure with annotations, see `docs/stacks/kratos-go.md` Section 14.
 
 ---
 
-## 2. Layer Architecture
-
-Strict layered structure with unidirectional dependencies:
-
-```
-server → service → biz ← data → platform
-                      ↑         ↑
-                   proto      ent
-```
-
-**Dependency rule:** arrows point inward. Inner layers MUST NOT import outer layers.
-
-**Exception:** biz layer MAY import proto (generated error codes) for `ErrorErrorReasonXxx("")` calls. This is the only allowed biz → outer dependency.
-
-| Layer | Package | Responsibility |
-|-------|---------|----------------|
-| server | `internal/server/` | Transport setup, middleware chain |
-| service | `internal/service/` | Proto request/response mapping |
-| biz | `internal/biz/` | Domain models, use cases, RP port interfaces |
-| data | `internal/data/` | Repository implementations (RP) |
-| platform | `internal/platform/` | DB, cache, error handling |
-| ent | `internal/ent/` | Ent ORM schemas + generated code |
-
----
-
-## 3. Adding a New Aggregate
+## 2. Adding a New Aggregate
 
 When adding a new entity (e.g., "Comment"), follow this order:
 
@@ -254,6 +212,8 @@ func (c *Comment) TransitionTo(ctx context.Context, target string) error {
 
 ### Step 5: Data Layer — Repository
 
+#### With Database (Ent)
+
 Create `internal/data/comment_rp.go`:
 
 ```go
@@ -300,6 +260,39 @@ func (rp *commentRP) Update(ctx context.Context, fieldsMask []string, c *biz.Com
 }
 ```
 
+#### With gRPC Client (calling another service)
+
+The data layer calls remote service clients and maps between proto types and biz models:
+
+```go
+func (rp *commentRP) Get(ctx context.Context, id string) (*biz.Comment, error) {
+    resp, err := rp.platform.GetCommentClient().GetComment(ctx,
+        &appV1.GetCommentRequest{Id: utils.Ptr(id)},
+    )
+    if err != nil {
+        return nil, err
+    }
+    return protoToComment(resp), nil
+}
+
+// Proto-to-biz mapping:
+func protoToComment(resp *appV1.GetCommentResponse) *biz.Comment {
+    return &biz.Comment{
+        ID:        utils.Unwrap(resp.Id),
+        CreatedAt: utils.FromTimestamp(resp.CreatedAt),
+        UpdatedAt: utils.FromTimestamp(resp.UpdatedAt),
+        Content:   utils.Unwrap(resp.Content),
+        Status:    utils.Unwrap(resp.Status),
+    }
+}
+```
+
+**Type conversion rule of thumb:**
+- `utils.Ptr(val)` — `string` → `*string` (for request fields: `optional string` in proto)
+- `utils.Unwrap(wrapper)` — `*wrapperspb.StringValue` → `*string` (for response fields)
+- `utils.Wrap(ptr, utils.StringW)` — `*string` → `*wrapperspb.StringValue` (for building proto responses in service layer)
+- `utils.FromTimestamp(ts)` — `*timestamppb.Timestamp` → `*time.Time`
+
 ### Step 6: Service Layer
 
 Create `internal/service/comment.go`:
@@ -321,8 +314,19 @@ func NewCommentService(logger log.Logger, commentUC *biz.CommentUC) *CommentServ
 func (s *CommentService) RegisterGRPC(srv *grpc.Server) {
     <app>V1.RegisterCommentServiceServer(srv, s)
 }
+
+// For services without HTTP annotations — no-ops:
 func (s *CommentService) RegisterHTTP(_ *http.Server)       {}
 func (s *CommentService) RegisterConnect(_ *connect.Server) {}
+
+// For services WITH HTTP annotations — register handlers:
+func (s *CommentService) RegisterHTTP(srv *http.Server) {
+    <app>V1.RegisterCommentServiceHTTPServer(srv, s)
+}
+func (s *CommentService) RegisterConnect(srv *connect.Server) {
+    path, handler := <app>V1connect.NewCommentServiceHandler(s, srv.HandlerOptions()...)
+    srv.Register(path, handler)
+}
 ```
 
 ### Step 7: Wire Everything
@@ -333,11 +337,13 @@ Update each layer's ProviderSet:
 - `biz/biz.go`: add `NewCommentUC` to ProviderSet
 - `service/service.go`: add `NewCommentService` to ProviderSet and registrar list
 
+For services with gRPC client capability, also add `NewGRPCXxxClient` to `platform/` ProviderSet.
+
 Then regenerate: `./nx run <project>:generate:wire`
 
 ---
 
-## 4. Key Patterns
+## 3. Key Patterns
 
 ### Transaction Management
 
@@ -459,107 +465,57 @@ func (s *ArticleService) articleToProto(a *biz.Article) *genesisV1.GetArticleRes
 }
 ```
 
-Key utils:
-- `utils.Wrap(ptr, utils.StringW)` — `*string` → `*wrapperspb.StringValue`
-- `utils.StringW(value)` — `string` → `*wrapperspb.StringValue`
-- `utils.ToTimestamp(timePtr)` — `*time.Time` → `*timestamppb.Timestamp`
-- `utils.SliceMap(slice, fn)` — `[]T` → `[]R`
-- `utils.EnsurePageRequest(req)` — nil-safe page request
-- `utils.ParseOrderBy([]string)` — `["field:asc"]` → `[]*OrderBy`
-
 ---
 
-## 5. Server Setup
+## 4. Platform Variants by Capability
 
-### Middleware Chain
+The Platform struct and ProviderSet change based on which capabilities are enabled.
 
-All transport servers share the same middleware in this order:
-
-```
-i18n → recovery → ratelimit → metrics → tracing → connect_span* → metadata → logging → validate → error_report
-```
-
-`connect_span` only appears on the Connect server.
-
-### Registrar Pattern
-
-Services register themselves to transports via the `Registrar` interface:
+### With Database (Ent)
 
 ```go
-type Registrar interface {
-    RegisterGRPC(*grpc.Server)
-    RegisterHTTP(*http.Server)
-    RegisterConnect(*connect.Server)
-}
-```
-
-For gRPC-only services (base service), `RegisterHTTP` and `RegisterConnect` are no-ops.
-
-### Error Override in server.go
-
-```go
-func init() {
-    recovery.ErrUnknownRequest = errorspb.ErrorGeneralErrorUnspecified("").WithCause(recovery.ErrUnknownRequest)
-    ratelimit.ErrLimitExceed = errorspb.ErrorFlowErrorRateLimited("").WithCause(ratelimit.ErrLimitExceed)
-    validate.ErrVALIDATOR = errorspb.ErrorGeneralErrorValidationFailed("").WithCause(validate.ErrVALIDATOR)
-}
-```
-
----
-
-## 6. Platform Layer
-
-The Platform struct is the infrastructure container. It holds cache and DB clients and provides error handlers.
-
-```go
+// platform.go
 type Platform struct {
     cache            *cache.Cache
-    client           *ent.Client
-    HandleEntError   func(error) error
-    HandleCacheError func(error) error
+    handleCacheError CacheErrorHandler
+    db               *ent.Client
+    handleEntError   EntErrorHandler
 }
 
-func (p *Platform) InTx(ctx context.Context, fn func(context.Context) error) error { ... }
-func (p *Platform) GetClient(ctx context.Context) *ent.Client { ... }
-func (p *Platform) GetCache() *cache.Cache { ... }
+var ProviderSet = wire.NewSet(
+    NewPlatform,
+    NewCache, NewCacheErrorHandler,
+    NewEntClient, NewEntErrorHandler,
+)
 ```
 
-Error handlers map infrastructure errors to standardized `errorspb` errors. The data layer calls them via `rp.platform.HandleEntError(err)` and `rp.platform.HandleCacheError(err)`.
-
----
-
-## 7. Wire DI
-
-### Composition Root (`cmd/app/wire.go`)
+### With gRPC Client (no database)
 
 ```go
-func wireApp(...) (*kratos.App, func(), error) {
-    panic(wire.Build(
-        server.ProviderSet,
-        service.ProviderSet,
-        biz.ProviderSet,
-        data.ProviderSet,
-        i18n.ProviderSet,
-        platform.ProviderSet,
-        wire.Bind(new(biz.Transaction), new(*platform.Platform)),
-        newApp,
-    ))
+// platform.go
+type Platform struct {
+    cache            *cache.Cache
+    handleCacheError CacheErrorHandler
+    articleClient    appV1.ArticleServiceClient
+    resourceClient   appV1.ResourceServiceClient
 }
+
+var ProviderSet = wire.NewSet(
+    NewPlatform,
+    NewCache, NewCacheErrorHandler,
+    NewGRPCArticleClient, NewGRPCResourceClient,
+)
 ```
 
-Each package's `ProviderSet` registers its constructors. Interface bindings (`wire.Bind`) live exclusively in `wire.go`.
+See `docs/stacks/kratos-go.md` Section 9 (gRPC Client) for the `platform_grpc.go` middleware setup.
 
-### main.go Bootstrap Order
+### With Both Database and gRPC Client (monolith)
 
-```
-config → logger → metrics → tracing → sentry → wireApp() → app.Run()
-```
-
-`newApp` accepts all server instances but may not start all of them. For base (gRPC-only) services, only gRPC and Ops servers are started.
+Combine both sets of fields and constructors.
 
 ---
 
-## 8. Ent Three-Stage Bootstrap
+## 5. Ent Three-Stage Bootstrap
 
 Local mixins (`soft_delete.go`, `sort.go`) import generated Ent packages that don't exist on first generation. Work around this chicken-and-egg problem:
 
@@ -571,30 +527,7 @@ After the first successful generation, subsequent runs work normally without sta
 
 ---
 
-## 9. Nx Targets
-
-Standard targets in `project.json`:
-
-```json
-{
-  "targets": {
-    "proto:conf":       "Generate config proto",
-    "generate:i18n":    "Generate i18n stubs",
-    "generate:ent":     "Generate Ent ORM",
-    "generate:wire":    "Generate Wire DI",
-    "generate":         "Full chain: proto + i18n + ent + wire + go mod tidy",
-    "dev":              "Run with kratos",
-    "build":            "Build binary with version",
-    "ent:new":          "Create new Ent schema"
-  }
-}
-```
-
-Always use `./nx run <project>:<target>` from workspace root. Never cd into subdirectories or run Go tools directly.
-
----
-
-## 10. Common Pitfalls
+## 6. Common Pitfalls
 
 ### GCI Import Formatting
 
@@ -610,7 +543,7 @@ If a proto service has NO `google.api.http` annotations, the generated code will
 
 ### newApp Server Selection
 
-For gRPC-only services, `newApp` only appends gRPC and Ops servers to `kratos.Server()`. HTTP and Connect server instances exist (for Wire compatibility) but are not started.
+All services create gRPC, HTTP, Connect, and Ops servers (for structural consistency). `newApp` accepts all four but selectively starts them — see `docs/stacks/kratos-go.md` Section 9 (`newApp` Server Selection).
 
 ### Database Name Convention
 
@@ -621,3 +554,42 @@ Database names follow the pattern: `cyber_ecosystem_<app>_service_<service>`. Th
 Paths in `i18n.protos` are relative from `internal/i18n/` to the proto file. Count directory levels carefully:
 - To contracts: `../../../../../../contracts/errors/codes_general.proto`
 - To app errors: `../../../../api/v1/error/error_reason.proto`
+
+### Services Without Database
+
+Services without Ent skip the `generate:ent` target and have no `ent/` directory. Their `project.json` omits `generate:ent` and `ent:new` targets. The `Data` config section only has `Cache` and remote service addresses — no `Database` or `Storage`.
+
+### CORS Configuration
+
+HTTP and Connect servers MUST include CORS filter (using `github.com/gorilla/handlers`):
+
+```go
+krahttp.Filter(handlers.CORS(
+    handlers.AllowedOrigins([]string{"*"}),
+    handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"}),
+    handlers.AllowedHeaders([]string{"Content-Type", i18n.DefaultHeaderLang, "Authorization"}),
+    handlers.MaxAge(86400),
+)),
+```
+
+### i18n Bundle
+
+All services use the same minimal `NewI18nBundle()` — no logger parameter:
+
+```go
+func NewI18nBundle() (*i18n.Bundle, error) {
+    return i18n.NewBundleFS(locales, "locales", "v1", language.Make("zh-CN"))
+}
+```
+
+### wireApp Signature
+
+`wireApp` has the same parameters regardless of capabilities — `*conf.Client` is NOT needed because remote service config is inside `*conf.Data`:
+
+```go
+func wireApp(
+    *conf.Server, *conf.Log, *conf.Data, *conf.Ops,
+    log.Logger, *tracesdk.TracerProvider, *metricsdk.MeterProvider,
+    metric.Int64Counter, metric.Float64Histogram,
+) (*kratos.App, func(), error)
+```

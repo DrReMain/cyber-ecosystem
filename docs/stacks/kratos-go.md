@@ -75,6 +75,44 @@ Use cases that modify data wrap their logic in `uc.tm.InTx(ctx, func(ctx) error 
 
 Each telemetry component returns a cleanup function. `main()` defers all cleanups in reverse order.
 
+### Service Capabilities
+
+Every Kratos service shares the same layered architecture. Capabilities are enabled by including or omitting specific files in the Platform layer:
+
+| Capability | Platform files | Config key |
+|------------|---------------|------------|
+| Database (Ent) | `platform_ent.go`, `platform_ent_handler.go` | `Data.database` |
+| gRPC Client (remote calls) | `platform_grpc.go` | `Data.<service_name>` |
+| Cache | `platform_cache.go`, `platform_cache_handler.go` | `Data.cache` |
+| Storage (S3) | `platform_storage.go`, `platform_storage_handler.go` | `Data.storage` |
+
+Common configurations in this repo:
+- **Base service** (owns domain logic, DB access): DB + Cache + gRPC server + Ops
+- **BFF service** (calls other services, exposes HTTP/Connect): gRPC client + Cache + HTTP + Connect + Ops
+- **Monolith**: all capabilities enabled
+
+The `Platform` struct adapts to the enabled capabilities:
+
+```go
+// With database:
+type Platform struct {
+    cache            *cache.Cache
+    handleCacheError CacheErrorHandler
+    db               *ent.Client
+    handleEntError   EntErrorHandler
+}
+
+// With gRPC client (no database):
+type Platform struct {
+    cache            *cache.Cache
+    handleCacheError CacheErrorHandler
+    articleClient    appV1.ArticleServiceClient
+    resourceClient   appV1.ResourceServiceClient
+}
+```
+
+`InTx` also adapts: with DB it opens a transaction; without DB it calls `fn(ctx)` directly.
+
 ---
 
 ## 2. File Naming Convention
@@ -366,8 +404,11 @@ utils.ConvNum[R](intPtr)      // numeric pointer type conversion
 
 ```go
 utils.Wrap(ptr, utils.StringW)    // *string → *wrapperspb.StringValue
+utils.Unwrap(wrapper)             // *wrapperspb.StringValue → *string
 utils.StringW(value)              // string → *wrapperspb.StringValue
+utils.Ptr(value)                  // T → *T (e.g., string → *string for request fields)
 utils.ToTimestamp(timePtr)        // *time.Time → *timestamppb.Timestamp
+utils.FromTimestamp(ts)           // *timestamppb.Timestamp → *time.Time
 utils.EnsurePageRequest(req)      // nil-safe page request
 ```
 
@@ -443,6 +484,86 @@ type Registrar interface {
 ```
 
 `NewRegistrarList` collects all `Registrar` implementations into a `[]Registrar` slice that feeds the server constructors. Each service aggregate implements `Registrar`.
+
+### Connect Registration
+
+Services with HTTP annotations use generated Connect handlers:
+
+```go
+import (
+    appV1connect "cyber-ecosystem/apps/<app>/gen/go/v1/<app>V1connect"
+)
+
+func (s *ArticleService) RegisterConnect(srv *connect.Server) {
+    path, handler := appV1connect.NewArticleServiceHandler(s, srv.HandlerOptions()...)
+    srv.Register(path, handler)
+}
+```
+
+Connect supports three wire formats simultaneously: Connect, gRPC, and gRPC-Web. Clients can use `grpcurl` (gRPC), `curl` with JSON (HTTP), or Connect-native clients.
+
+If a proto service has NO `google.api.http` annotations, the generated code will NOT include `RegisterXxxHTTPServer` or Connect handler. `RegisterHTTP` and `RegisterConnect` must be no-ops.
+
+### gRPC Client (Calling Other Services)
+
+Services that call other services use client-side middleware. Create `platform_grpc.go`:
+
+```go
+func dialGRPC(c *conf.Data, logger, tp, _metricRequests, _metricSeconds) (*grpc.ClientConn, func(), error) {
+    // Client middleware — use Client() variants, not Server()
+    var middlewares []middleware.Middleware
+    middlewares = append(middlewares, recovery.Recovery())
+    middlewares = append(middlewares, circuitbreaker.Client())
+    middlewares = append(middlewares, metrics.Client(...))
+    if tp != nil { middlewares = append(middlewares, tracing.Client(...)) }
+    middlewares = append(middlewares, metadata.Client())
+    middlewares = append(middlewares, logging.Client(logger))
+
+    conn, err := kgrpc.DialInsecure(context.Background(),
+        kgrpc.WithEndpoint(c.BaseService.Addr),
+        kgrpc.WithTimeout(c.BaseService.Timeout.AsDuration()),
+        kgrpc.WithMiddleware(middlewares...),
+    )
+    // ...
+}
+```
+
+Key points:
+- Use `metrics.Client()`, `tracing.Client()`, `logging.Client()` — client-side variants, not `Server()`
+- Each remote service gets its own `NewGRPCXxxClient` constructor, all sharing `dialGRPC`
+- Remote service config lives in `conf.Data`, named per service (e.g., `Data.BaseService`)
+- `kgrpc.DialInsecure` returns `*grpc.ClientConn` (standard gRPC), not a Kratos type
+
+Remote service config in `conf.proto`:
+
+```protobuf
+message Data {
+  message BaseService {
+    string addr = 1;
+    google.protobuf.Duration timeout = 2;
+  }
+  Cache cache = 1;
+  BaseService base_service = 2;  // named per remote service
+}
+```
+
+### `newApp` Server Selection
+
+All services create gRPC, HTTP, Connect, and Ops servers for structural consistency. `newApp` selectively starts them — the signature is identical across all services, only the `srv = append(...)` lines differ:
+
+```go
+func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server, cs *connect.Server, os *server.OpsServer) *kratos.App {
+    var srv []transport.Server
+    // Uncomment the servers this service exposes:
+    // srv = append(srv, gs)  // gRPC (for services with DB)
+    if hs != nil { srv = append(srv, hs) }
+    if cs != nil { srv = append(srv, cs) }
+    if os != nil { srv = append(srv, os) }
+    return kratos.New(kratos.Server(srv...), ...)
+}
+```
+
+This allows quick migration: toggle which servers are started by commenting/uncommenting `srv = append(srv, gs)`.
 
 ---
 
@@ -537,7 +658,7 @@ apps/<app>/
   gen/go/v1/                         # Generated proto code (app-level)
   services/<service>/
     internal/
-      ent/schema/                    # Ent schema definitions
+      ent/schema/                    # [DB] Ent schema definitions
         local_mixins/                # Service-specific mixins
       biz/                           # Domain layer
         biz.go                       # UC, Transaction base types
@@ -559,12 +680,13 @@ apps/<app>/
       platform/                      # Infrastructure container
         platform.go                  # Platform struct, InTx, ProviderSet
         interface.go                 # Handler type definitions
-        platform_ent.go              # Ent client init (slow query logging)
-        platform_ent_handler.go      # Ent error mapping config
+        platform_ent.go              # [DB] Ent client init (slow query logging)
+        platform_ent_handler.go      # [DB] Ent error mapping config
+        platform_grpc.go             # [gRPC Client] Remote service client creation with middleware
         platform_cache.go            # Cache init (Redis or in-memory)
         platform_cache_handler.go    # Cache error mapping
-        platform_storage.go          # S3 storage init
-        platform_storage_handler.go  # Storage error mapping
+        platform_storage.go          # [Storage] S3 storage init
+        platform_storage_handler.go  # [Storage] Storage error mapping
       i18n/                          # i18n bundle
         generate.go                  # go:generate directive
         i18n.go                      # Bundle init with embed
@@ -581,3 +703,5 @@ apps/<app>/
       wire_gen.go                    # Wire generated (DO NOT EDIT)
     configs/config.yaml              # Service configuration
 ```
+
+`[DB]`, `[gRPC Client]`, `[Storage]` markers indicate capability-specific files — include only the files needed for the service's capabilities.
