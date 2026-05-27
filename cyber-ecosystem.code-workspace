@@ -16,6 +16,10 @@
       "name": "genesis_service_admin_bff"
     },
     {
+      "path": "apps/genesis/services/mobile_bff",
+      "name": "genesis_service_mobile_bff"
+    },
+    {
       "path": "apps/genesis/clients/admin",
       "name": "genesis_client_admin"
     },

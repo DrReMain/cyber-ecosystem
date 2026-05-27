@@ -32,14 +32,14 @@ log:
     max_age: 30
     compress: true
   otlp_log:
-    enabled: true
+    enabled: false
     endpoint: "localhost:4318"
     insecure: true
 data:
   cache:
     type: redis
     memory:
-      otel_enabled: true
+      otel_enabled: false
     redis:
       addr: localhost:6379
       read_timeout: 0.2s
@@ -49,7 +49,7 @@ data:
       conn_max_lifetime: 3600s
       password: ""
       db: 0
-      otel_enabled: true
+      otel_enabled: false
   database:
     driver: postgres
     host: localhost
@@ -69,11 +69,11 @@ data:
       secret_key: "Cyber-Ecosystem123"
       bucket: "uploads"
       region: "us-east-1"
-trace:
-  endpoint: "localhost:4318"
-  insecure: true
+# trace:
+  # endpoint: "localhost:4318"
+  # insecure: true
 ops:
-  enabled: true
+  enabled: false
   addr: "0.0.0.0:14000"
   metrics: "/metrics"
   pprof:
@@ -85,7 +85,7 @@ ops:
     thread_enabled: true
     trace_enabled: true
 error_report:
-  enabled: true
-  dsn: "http://ce217894c77a4ee1babbb76e4e584bf0@localhost:8000/2"
+  enabled: false
+  dsn: "http://7b87a97ea8c4487ca367fca4ae9d7e34@localhost:8000/1"
   environment: "development"
   sample_rate: 1.0

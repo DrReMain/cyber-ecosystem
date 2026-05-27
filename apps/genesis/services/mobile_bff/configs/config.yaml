@@ -1,12 +1,12 @@
 server:
   http:
-    addr: 0.0.0.0:11001
+    addr: 0.0.0.0:11002
     timeout: 1s
   grpc:
-    addr: 0.0.0.0:12001
+    addr: 0.0.0.0:12002
     timeout: 1s
   connect:
-    addr: 0.0.0.0:13001
+    addr: 0.0.0.0:13002
     timeout: 1s
 log:
   level: debug
@@ -21,7 +21,7 @@ log:
     format: console
   file:
     enabled: false
-    path: "./logs/admin_bff.log"
+    path: "./logs/mobile_bff.log"
     max_size: 100
     max_backups: 10
     max_age: 30
@@ -43,7 +43,7 @@ data:
   # insecure: true
 ops:
   enabled: false
-  addr: "0.0.0.0:14001"
+  addr: "0.0.0.0:14002"
   metrics: "/metrics"
   pprof:
     enabled: true
@@ -55,6 +55,6 @@ ops:
     trace_enabled: true
 error_report:
   enabled: false
-  dsn: "http://e177b5961e9745a48bef2ab2125cd829@localhost:8000/2"
+  dsn: "http://116d5313df8149b491b89e1c90b75a74@localhost:8000/3"
   environment: "development"
   sample_rate: 1.0

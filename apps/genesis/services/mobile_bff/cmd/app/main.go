@@ -17,12 +17,12 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	"cyber-ecosystem/apps/genesis/services/admin_bff/internal/conf"
-	"cyber-ecosystem/apps/genesis/services/admin_bff/internal/server"
+	"cyber-ecosystem/apps/genesis/services/mobile_bff/internal/conf"
+	"cyber-ecosystem/apps/genesis/services/mobile_bff/internal/server"
 )
 
 var (
-	Name     string = "genesis_service_admin_bff"
+	Name     string = "genesis_service_mobile_bff"
 	Version  string
 	flagConf string
 	id, _    = os.Hostname()

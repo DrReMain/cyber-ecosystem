@@ -341,6 +341,13 @@ For services with gRPC client capability, also add `NewGRPCXxxClient` to `platfo
 
 Then regenerate: `./nx run <project>:generate:wire`
 
+### Step 8: Observability Setup
+
+After scaffolding and before first run, complete the observability configuration following `docs/ops/observability.md`:
+
+1. Create a GlitchTip project and configure the DSN in `config.yaml`
+2. Add the service's ops server port as a Prometheus scrape target in `infra/docker/signoz/otel-collector-config.yaml`
+
 ---
 
 ## 3. Key Patterns

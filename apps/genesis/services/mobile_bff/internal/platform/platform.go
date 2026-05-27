@@ -18,7 +18,6 @@ type Platform struct {
 	cache            *cache.Cache
 	handleCacheError CacheErrorHandler
 	articleClient    genesisV1.ArticleServiceClient
-	resourceClient   genesisV1.ResourceServiceClient
 }
 
 func NewPlatform(
@@ -26,13 +25,11 @@ func NewPlatform(
 	cache *cache.Cache,
 	handleCacheError CacheErrorHandler,
 	articleClient genesisV1.ArticleServiceClient,
-	resourceClient genesisV1.ResourceServiceClient,
 ) (*Platform, func(), error) {
 	p := &Platform{
 		cache:            cache,
 		handleCacheError: handleCacheError,
 		articleClient:    articleClient,
-		resourceClient:   resourceClient,
 	}
 	return p,
 		func() {
@@ -59,14 +56,9 @@ func (p *Platform) GetArticleClient() genesisV1.ArticleServiceClient {
 	return p.articleClient
 }
 
-func (p *Platform) GetResourceClient() genesisV1.ResourceServiceClient {
-	return p.resourceClient
-}
-
 var ProviderSet = wire.NewSet(
 	NewPlatform,
 	NewCache,
 	NewCacheErrorHandler,
-	NewGRPCResourceClient,
 	NewGRPCArticleClient,
 )

@@ -45,6 +45,17 @@ receivers:
               service: admin_bff
               env: development
               component: ops
+        - job_name: genesis-service-mobile-bff
+          metrics_path: /metrics
+          scrape_interval: 15s
+          static_configs:
+          - targets:
+              - host.docker.internal:14002
+            labels:
+              app: genesis
+              service: mobile_bff
+              env: development
+              component: ops
 
 processors:
   batch:
