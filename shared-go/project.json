@@ -1,6 +1,0 @@
-{
-  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
-  "name": "shared-go",
-  "root": "shared-go",
-  "targets": {}
-}
