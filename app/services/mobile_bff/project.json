@@ -1,0 +1,46 @@
+{
+  "$schema": "../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "mobile_bff",
+  "root": "app/services/mobile_bff",
+  "projectType": "application",
+  "targets": {
+    "proto:conf": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "buf generate --template internal/conf/buf.gen.conf.yaml --path internal/conf"
+      }
+    },
+    "generate:wire": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go generate ./cmd/app/..."
+      }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["proto:generate", "proto:conf", "generate:wire"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": ["go mod tidy"],
+        "parallel": false
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go tool kratos run"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/bin"],
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go build -ldflags \"-X main.Version=$(git describe --tags --always)\" -o ./bin/ ./..."
+      }
+    }
+  }
+}

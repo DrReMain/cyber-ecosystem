@@ -1,0 +1,316 @@
+# SignOz credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: signoz-credentials
+  namespace: observability
+type: Opaque
+stringData:
+  SIGNOZ_TOKENIZER_JWT_SECRET: "secret"
+  SIGNOZ_USER_ROOT_EMAIL: "admin@cyber-ecosystem.com"
+  SIGNOZ_USER_ROOT_PASSWORD: "Cyber-Ecosystem123"
+---
+# OTel Collector ConfigMap (aligned with original otel-collector-config.yaml)
+# DSN uses clickhouse service name (cross-namespace not needed, same namespace)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: signoz-otel-collector-config
+  namespace: observability
+data:
+  otel-collector-config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+            cors:
+              allowed_origins:
+                - "http://localhost:*"
+                - "https://cyber-ecosystem.com"
+              allowed_headers: ["*"]
+
+    processors:
+      batch:
+        send_batch_size: 10000
+        send_batch_max_size: 11000
+        timeout: 10s
+      resourcedetection:
+        detectors: [env, system]
+        timeout: 2s
+      signozspanmetrics/delta:
+        metrics_exporter: signozclickhousemetrics
+        metrics_flush_interval: 60s
+        latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 50ms, 100ms, 250ms, 500ms, 1000ms, 1400ms, 2000ms, 5s, 10s, 20s, 40s, 60s]
+        dimensions_cache_size: 100000
+        aggregation_temporality: AGGREGATION_TEMPORALITY_DELTA
+        enable_exp_histogram: true
+        dimensions:
+          - name: service.namespace
+            default: default
+          - name: deployment.environment
+            default: default
+          - name: signoz.collector.id
+          - name: service.version
+          - name: browser.platform
+          - name: browser.mobile
+          - name: k8s.cluster.name
+          - name: k8s.node.name
+          - name: k8s.namespace.name
+          - name: host.name
+          - name: host.type
+          - name: container.name
+
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133
+      pprof:
+        endpoint: 0.0.0.0:1777
+
+    exporters:
+      clickhousetraces:
+        datasource: tcp://clickhouse:9000/signoz_traces
+        low_cardinal_exception_grouping: false
+        use_new_schema: true
+      signozclickhousemetrics:
+        dsn: tcp://clickhouse:9000/signoz_metrics
+      clickhouselogsexporter:
+        dsn: tcp://clickhouse:9000/signoz_logs
+        timeout: 10s
+        use_new_schema: true
+      signozclickhousemeter:
+        dsn: tcp://clickhouse:9000/signoz_meter
+        timeout: 45s
+        sending_queue:
+          enabled: false
+
+    connectors:
+      signozmeter:
+        metrics_flush_interval: 1h
+        dimensions:
+          - name: service.name
+          - name: deployment.environment
+          - name: host.name
+
+    service:
+      telemetry:
+        logs:
+          encoding: json
+      extensions:
+        - health_check
+        - pprof
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [signozspanmetrics/delta, batch]
+          exporters: [clickhousetraces, signozmeter]
+        metrics:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [signozclickhousemetrics, signozmeter]
+        logs:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [clickhouselogsexporter, signozmeter]
+        metrics/meter:
+          receivers: [signozmeter]
+          processors: [batch]
+          exporters: [signozclickhousemeter]
+---
+# OTel Collector Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signoz-otel-collector
+  namespace: observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: signoz-otel-collector
+  template:
+    metadata:
+      labels:
+        app: signoz-otel-collector
+    spec:
+      containers:
+        - name: otel-collector
+          image: signoz/signoz-otel-collector:v0.144.4
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until /signoz-otel-collector migrate sync check; do
+                echo "Waiting for SignOz schema migration..."
+                sleep 5
+              done
+              /signoz-otel-collector --config=/etc/otel-collector-config.yaml --copy-path=/var/tmp/collector-config.yaml
+          ports:
+            - containerPort: 4317
+            - containerPort: 4318
+          env:
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "host.name=signoz-host,os.type=linux"
+            - name: LOW_CARDINAL_EXCEPTION_GROUPING
+              value: "false"
+            - name: SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN
+              value: "tcp://clickhouse:9000"
+            - name: SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER
+              value: "cluster"
+            - name: SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION
+              value: "false"
+            - name: SIGNOZ_OTEL_COLLECTOR_TIMEOUT
+              value: "10m"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otel-collector-config.yaml
+              subPath: otel-collector-config.yaml
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+            initialDelaySeconds: 30
+            periodSeconds: 15
+      volumes:
+        - name: config
+          configMap:
+            name: signoz-otel-collector-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: signoz-otel-collector
+  namespace: observability
+spec:
+  type: NodePort
+  selector:
+    app: signoz-otel-collector
+  ports:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      nodePort: 30317
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      nodePort: 30318
+---
+# SignOz Query Service + Frontend (unified image)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signoz
+  namespace: observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: signoz
+  template:
+    metadata:
+      labels:
+        app: signoz
+    spec:
+      containers:
+        - name: signoz
+          image: signoz/signoz:v0.123.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SIGNOZ_ALERTMANAGER_PROVIDER
+              value: "signoz"
+            - name: SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN
+              value: "tcp://clickhouse:9000"
+            - name: SIGNOZ_SQLSTORE_SQLITE_PATH
+              value: "/var/lib/signoz/signoz.db"
+            - name: SIGNOZ_TOKENIZER_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: signoz-credentials
+                  key: SIGNOZ_TOKENIZER_JWT_SECRET
+            - name: SIGNOZ_USER_ROOT_ENABLED
+              value: "true"
+            - name: SIGNOZ_USER_ROOT_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: signoz-credentials
+                  key: SIGNOZ_USER_ROOT_EMAIL
+            - name: SIGNOZ_USER_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: signoz-credentials
+                  key: SIGNOZ_USER_ROOT_PASSWORD
+            - name: SIGNOZ_USER_ROOT_ORG_NAME
+              value: "default"
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/signoz
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 3
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: signoz-data
+---
+# SignOz data PVC (SQLite)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: signoz-data
+  namespace: observability
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: signoz
+  namespace: observability
+spec:
+  type: NodePort
+  selector:
+    app: signoz
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 30301

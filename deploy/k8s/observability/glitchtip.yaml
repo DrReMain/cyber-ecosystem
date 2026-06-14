@@ -1,0 +1,234 @@
+# GlitchTip credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: glitchtip-credentials
+  namespace: observability
+type: Opaque
+stringData:
+  DATABASE_URL: "postgres://postgres:postgres@postgresql.db.svc.cluster.local:5432/glitchtip"
+  REDIS_URL: "redis://redis.db.svc.cluster.local:6379/15"
+  SECRET_KEY: "glitchtip-dev-secret-key-change-in-production"
+  DJANGO_SUPERUSER_EMAIL: "admin@cyber-ecosystem.com"
+  DJANGO_SUPERUSER_PASSWORD: "Cyber-Ecosystem123"
+---
+# GlitchTip uploads PVC.
+# This deployment intentionally treats GlitchTip as a single-node service:
+# web and worker run in one Pod and share this RWO local-path volume.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: glitchtip-uploads
+  namespace: observability
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+# GlitchTip setup: create database, run migrations, then create superuser
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: glitchtip-setup
+  namespace: observability
+  labels:
+    app: glitchtip-setup
+spec:
+  backoffLimit: 5
+  template:
+    metadata:
+      labels:
+        app: glitchtip-setup
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+        - name: init-db
+          image: postgres:18.3-trixie
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for postgres..."
+              until pg_isready -h postgresql.db.svc.cluster.local -U postgres; do sleep 1; done
+              echo "Checking if glitchtip database exists..."
+              if ! psql -h postgresql.db.svc.cluster.local -U postgres -lqt | cut -d \| -f 1 | grep -qw glitchtip; then
+                echo "Creating glitchtip database..."
+                psql -h postgresql.db.svc.cluster.local -U postgres -c "CREATE DATABASE glitchtip;"
+                echo "Database created."
+              else
+                echo "Database glitchtip already exists."
+              fi
+          env:
+            - name: PGHOST
+              value: "postgresql.db.svc.cluster.local"
+            - name: PGUSER
+              value: "postgres"
+            - name: PGPASSWORD
+              value: "postgres"
+      containers:
+        - name: setup
+          image: glitchtip/glitchtip:v6.0.3
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              ./bin/run-migrate.sh
+              python manage.py createsuperuser --noinput || echo "Superuser already exists, skipping."
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: REDIS_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: SECRET_KEY
+            - name: GLITCHTIP_DOMAIN
+              value: "http://localhost:8000"
+            - name: DJANGO_SUPERUSER_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: DJANGO_SUPERUSER_EMAIL
+            - name: DJANGO_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: DJANGO_SUPERUSER_PASSWORD
+---
+# GlitchTip Web + Worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glitchtip
+  namespace: observability
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: glitchtip
+  template:
+    metadata:
+      labels:
+        app: glitchtip
+    spec:
+      containers:
+        - name: web
+          image: glitchtip/glitchtip:v6.0.3
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: REDIS_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: SECRET_KEY
+            - name: GLITCHTIP_DOMAIN
+              value: "http://localhost:8000"
+            - name: PORT
+              value: "8000"
+            - name: TRUSTED_PROXIES
+              value: "*"
+          volumeMounts:
+            - name: uploads
+              mountPath: /code/uploads
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          readinessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+        - name: worker
+          image: glitchtip/glitchtip:v6.0.3
+          command: ["./bin/run-worker.sh"]
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: REDIS_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: glitchtip-credentials
+                  key: SECRET_KEY
+            - name: GLITCHTIP_DOMAIN
+              value: "http://localhost:8000"
+            - name: TRUSTED_PROXIES
+              value: "*"
+          volumeMounts:
+            - name: uploads
+              mountPath: /code/uploads
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: glitchtip-uploads
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: glitchtip
+  namespace: observability
+spec:
+  type: NodePort
+  selector:
+    app: glitchtip
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      nodePort: 30080

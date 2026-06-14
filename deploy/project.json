@@ -1,0 +1,99 @@
+{
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "deploy",
+  "root": "deploy",
+  "targets": {
+    "db:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "kubectl apply -f deploy/k8s/db/namespace.yaml",
+          "kubectl apply -f deploy/k8s/db/postgresql.yaml -f deploy/k8s/db/redis.yaml",
+          "kubectl wait pod -n db --for=condition=ready --all --timeout=120s"
+        ],
+        "parallel": false
+      }
+    },
+    "db:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "kubectl delete namespace db --ignore-not-found"
+      }
+    },
+    "storage:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "kubectl apply -f deploy/k8s/storage/namespace.yaml",
+          "kubectl apply -f deploy/k8s/storage/minio.yaml",
+          "kubectl wait pod -n storage --for=condition=ready --all --timeout=120s"
+        ],
+        "parallel": false
+      }
+    },
+    "storage:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "kubectl delete namespace storage --ignore-not-found"
+      }
+    },
+    "observability:start": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["db:start"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "kubectl apply -f deploy/k8s/observability/namespace.yaml",
+          "kubectl apply -f deploy/k8s/observability/clickhouse.yaml",
+          "kubectl wait pod -n observability -l app=clickhouse --for=condition=ready --timeout=120s",
+          "kubectl apply -f deploy/k8s/observability/signoz-migrator.yaml",
+          "kubectl wait job -n observability signoz-schema-migrator --for=condition=complete --timeout=300s",
+          "kubectl apply -f deploy/k8s/observability/signoz.yaml",
+          "kubectl wait deployment -n observability signoz-otel-collector signoz --for=condition=available --timeout=120s",
+          "kubectl apply -f deploy/k8s/observability/glitchtip.yaml",
+          "kubectl wait job -n observability glitchtip-setup --for=condition=complete --timeout=300s",
+          "kubectl wait deployment -n observability glitchtip --for=condition=available --timeout=120s"
+        ],
+        "parallel": false
+      }
+    },
+    "observability:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "kubectl delete namespace observability --ignore-not-found"
+      }
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["db:start", "storage:start", "observability:start"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "echo '=== All services started ===' && kubectl get pods -A -o wide | grep -v kube-system"
+      }
+    },
+    "stop": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["observability:stop", "storage:stop", "db:stop"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "echo '=== All services stopped ==='"
+      }
+    },
+    "status": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "kubectl get pods -A -o wide | grep -v kube-system",
+          "kubectl get svc -A -o wide | grep -v kube-system"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+# SignOz schema migrator - one-shot Job
+# Aligned with original: bootstrap → sync up → async up
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: signoz-schema-migrator
+  namespace: observability
+  labels:
+    app: signoz-migrator
+spec:
+  backoffLimit: 5
+  template:
+    metadata:
+      labels:
+        app: signoz-migrator
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrator
+          image: signoz/signoz-otel-collector:v0.144.4
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until /signoz-otel-collector migrate bootstrap; do
+                echo "Waiting for ClickHouse before SignOz schema migration..."
+                sleep 5
+              done
+              /signoz-otel-collector migrate sync up &&
+              /signoz-otel-collector migrate async up
+          env:
+            - name: SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN
+              value: "tcp://clickhouse:9000"
+            - name: SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER
+              value: "cluster"
+            - name: SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION
+              value: "false"
+            - name: SIGNOZ_OTEL_COLLECTOR_TIMEOUT
+              value: "10m"

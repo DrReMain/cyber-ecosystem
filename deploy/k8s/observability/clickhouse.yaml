@@ -1,0 +1,420 @@
+# Zookeeper - ClickHouse cluster replication dependency
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: observability
+spec:
+  serviceName: zookeeper-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: signoz/zookeeper:3.7.1
+          ports:
+            - containerPort: 2181
+          env:
+            - name: ZOO_SERVER_ID
+              value: "1"
+            - name: ALLOW_ANONYMOUS_LOGIN
+              value: "yes"
+            - name: ZOO_AUTOPURGE_INTERVAL
+              value: "1"
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/zookeeper
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /commands/ruok
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /commands/ruok
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 15
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-headless
+  namespace: observability
+spec:
+  clusterIP: None
+  selector:
+    app: zookeeper
+  ports:
+    - port: 2181
+      targetPort: 2181
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  namespace: observability
+spec:
+  type: ClusterIP
+  selector:
+    app: zookeeper
+  ports:
+    - port: 2181
+      targetPort: 2181
+---
+# ClickHouse config.xml (replaces default, aligned with original repo)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-server-config
+  namespace: observability
+data:
+  config.xml: |
+    <?xml version="1.0"?>
+    <clickhouse>
+        <logger>
+            <level>warning</level>
+            <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+            <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+            <size>1000M</size>
+            <count>10</count>
+        </logger>
+
+        <http_port>8123</http_port>
+        <tcp_port>9000</tcp_port>
+
+        <listen_host>0.0.0.0</listen_host>
+        <max_connections>4096</max_connections>
+        <keep_alive_timeout>3</keep_alive_timeout>
+
+        <max_concurrent_queries>100</max_concurrent_queries>
+        <max_server_memory_usage>0</max_server_memory_usage>
+        <max_server_memory_usage_to_ram_ratio>0.9</max_server_memory_usage_to_ram_ratio>
+
+        <uncompressed_cache_size>0</uncompressed_cache_size>
+        <mark_cache_size>536870912</mark_cache_size>
+
+        <path>/var/lib/clickhouse/</path>
+        <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
+        <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
+
+        <user_directories>
+            <users_xml>
+                <path>users.xml</path>
+            </users_xml>
+            <local_directory>
+                <path>/var/lib/clickhouse/access/</path>
+            </local_directory>
+        </user_directories>
+
+        <default_profile>default</default_profile>
+        <default_database>default</default_database>
+
+        <macros>
+            <shard>01</shard>
+            <replica>replica-1</replica>
+        </macros>
+
+        <distributed_ddl>
+            <path>/clickhouse/task_queue/ddl</path>
+        </distributed_ddl>
+
+        <query_log>
+            <database>system</database>
+            <table>query_log</table>
+            <partition_by>toYYYYMM(event_date)</partition_by>
+            <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        </query_log>
+
+        <trace_log>
+            <database>system</database>
+            <table>trace_log</table>
+            <partition_by>toYYYYMM(event_date)</partition_by>
+            <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        </trace_log>
+
+        <metric_log>
+            <database>system</database>
+            <table>metric_log</table>
+            <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            <collect_interval_milliseconds>1000</collect_interval_milliseconds>
+        </metric_log>
+
+        <send_crash_reports>
+            <enabled>false</enabled>
+        </send_crash_reports>
+    </clickhouse>
+---
+# ClickHouse users.xml (replaces default)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-server-users
+  namespace: observability
+data:
+  users.xml: |
+    <?xml version="1.0"?>
+    <clickhouse>
+        <profiles>
+            <default>
+                <max_memory_usage>2147483648</max_memory_usage>
+                <load_balancing>random</load_balancing>
+            </default>
+            <readonly>
+                <readonly>1</readonly>
+            </readonly>
+        </profiles>
+
+        <users>
+            <default>
+                <password></password>
+                <networks>
+                    <ip>::/0</ip>
+                </networks>
+                <profile>default</profile>
+                <quota>default</quota>
+            </default>
+        </users>
+
+        <quotas>
+            <default>
+                <interval>
+                    <duration>3600</duration>
+                    <queries>0</queries>
+                    <errors>0</errors>
+                    <result_rows>0</result_rows>
+                    <read_rows>0</read_rows>
+                    <execution_time>0</execution_time>
+                </interval>
+            </default>
+        </quotas>
+    </clickhouse>
+---
+# ClickHouse cluster.xml (Zookeeper + remote_servers)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-cluster-config
+  namespace: observability
+data:
+  cluster.xml: |
+    <?xml version="1.0"?>
+    <clickhouse>
+        <zookeeper>
+            <node index="1">
+                <host>zookeeper</host>
+                <port>2181</port>
+            </node>
+        </zookeeper>
+
+        <remote_servers>
+            <cluster>
+                <shard>
+                    <replica>
+                        <host>localhost</host>
+                        <port>9000</port>
+                    </replica>
+                </shard>
+            </cluster>
+        </remote_servers>
+    </clickhouse>
+---
+# ClickHouse custom function (histogramQuantile)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-custom-function
+  namespace: observability
+data:
+  custom-function.xml: |
+    <functions>
+        <function>
+            <type>executable</type>
+            <name>histogramQuantile</name>
+            <return_type>Float64</return_type>
+            <argument>
+                <type>Array(Float64)</type>
+                <name>buckets</name>
+            </argument>
+            <argument>
+                <type>Array(Float64)</type>
+                <name>counts</name>
+            </argument>
+            <argument>
+                <type>Float64</type>
+                <name>quantile</name>
+            </argument>
+            <format>CSV</format>
+            <command>./histogramQuantile</command>
+        </function>
+    </functions>
+---
+# ClickHouse StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: clickhouse
+  namespace: observability
+spec:
+  serviceName: clickhouse-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      initContainers:
+        - name: init-scripts
+          image: clickhouse/clickhouse-server:25.5
+          command:
+            - bash
+            - -c
+            - |
+              version="v0.0.1"
+              node_os=$(uname -s | tr '[:upper:]' '[:lower:]')
+              node_arch=$(uname -m | sed 's/aarch64/arm64/' | sed 's/x86_64/amd64/')
+              echo "Fetching histogram-binary for ${node_os}/${node_arch}"
+              cd /tmp
+              wget -q -O histogram-quantile.tar.gz "https://github.com/SigNoz/signoz/releases/download/histogram-quantile%2F${version}/histogram-quantile_${node_os}_${node_arch}.tar.gz"
+              tar -xzf histogram-quantile.tar.gz
+              mkdir -p /user_scripts
+              mv histogram-quantile /user_scripts/histogramQuantile
+              chmod +x /user_scripts/histogramQuantile
+              echo "histogramQuantile installed"
+          volumeMounts:
+            - name: user-scripts
+              mountPath: /user_scripts
+      containers:
+        - name: clickhouse
+          image: clickhouse/clickhouse-server:25.5
+          ports:
+            - containerPort: 9000
+            - containerPort: 8123
+          env:
+            - name: CLICKHOUSE_SKIP_USER_SETUP
+              value: "1"
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/clickhouse
+            - name: config
+              mountPath: /etc/clickhouse-server/config.xml
+              subPath: config.xml
+            - name: users
+              mountPath: /etc/clickhouse-server/users.xml
+              subPath: users.xml
+            - name: cluster-config
+              mountPath: /etc/clickhouse-server/config.d/cluster.xml
+              subPath: cluster.xml
+            - name: custom-function
+              mountPath: /etc/clickhouse-server/custom-function.xml
+              subPath: custom-function.xml
+            - name: user-scripts
+              mountPath: /var/lib/clickhouse/user_scripts
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 3
+      volumes:
+        - name: config
+          configMap:
+            name: clickhouse-server-config
+        - name: users
+          configMap:
+            name: clickhouse-server-users
+        - name: cluster-config
+          configMap:
+            name: clickhouse-cluster-config
+        - name: custom-function
+          configMap:
+            name: clickhouse-custom-function
+        - name: user-scripts
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 20Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickhouse-headless
+  namespace: observability
+spec:
+  clusterIP: None
+  selector:
+    app: clickhouse
+  ports:
+    - name: tcp
+      port: 9000
+      targetPort: 9000
+    - name: http
+      port: 8123
+      targetPort: 8123
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickhouse
+  namespace: observability
+spec:
+  type: ClusterIP
+  selector:
+    app: clickhouse
+  ports:
+    - name: tcp
+      port: 9000
+      targetPort: 9000
+    - name: http
+      port: 8123
+      targetPort: 8123
