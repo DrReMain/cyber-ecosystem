@@ -1,0 +1,9 @@
+{
+  "name": "@cyber-ecosystem/gen-ts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@bufbuild/protobuf": "2.12.0"
+  }
+}

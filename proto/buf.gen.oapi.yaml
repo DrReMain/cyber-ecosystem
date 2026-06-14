@@ -1,0 +1,11 @@
+version: v2
+plugins:
+  - local: [go, tool, protoc-gen-openapi]
+    strategy: all
+    out: gen/openapi
+    opt:
+      - paths=source_relative
+      - fq_schema_naming=true
+      - enum_type=string
+      - naming=json
+      - default_response=false

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package cyber.shared.errors.v1;
+
+import "cyber/shared/errors/v1/errors.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/shared/errors/v1";
+
+enum FlowError {
+  option (cyber.shared.errors.v1.default_code) = 429;
+
+  FLOW_ERROR_UNSPECIFIED = 0 [(cyber.shared.errors.v1.code) = 500];
+
+  FLOW_ERROR_RATE_LIMITED = 4000 [(cyber.shared.errors.v1.code) = 429];
+  FLOW_ERROR_CIRCUIT_BREAKER = 4001 [(cyber.shared.errors.v1.code) = 503];
+  FLOW_ERROR_QUOTA_EXCEEDED = 4002 [(cyber.shared.errors.v1.code) = 429];
+  FLOW_ERROR_CONCURRENT_LIMIT = 4003 [(cyber.shared.errors.v1.code) = 429];
+}

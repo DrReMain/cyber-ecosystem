@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package cyber.shared.errors.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/shared/errors/v1";
+
+extend google.protobuf.EnumOptions {
+  int32 default_code = 1108;
+}
+
+extend google.protobuf.EnumValueOptions {
+  int32 code = 1109;
+}

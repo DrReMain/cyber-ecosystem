@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package cyber.mobile.v1;
+
+import "cyber/shared/ext/v1/desc.proto";
+import "cyber/user/v1/user.proto";
+import "google/api/annotations.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/mobile/v1";
+
+// Mobile user service. Client-facing surface for user CRUD over Connect/HTTP.
+service MobileUserService {
+  // Create a user.
+  rpc CreateUser(cyber.user.v1.CreateUserRequest) returns (cyber.user.v1.CreateUserResponse) {
+    option (cyber.shared.ext.v1.method_comment) = "创建用户";
+    option (google.api.http) = {
+      post: "/api/v1/mobile/user"
+      body: "*"
+    };
+  }
+  // Update a user.
+  rpc UpdateUser(cyber.user.v1.UpdateUserRequest) returns (cyber.user.v1.UpdateUserResponse) {
+    option (cyber.shared.ext.v1.method_comment) = "修改用户";
+    option (google.api.http) = {
+      put: "/api/v1/mobile/user/{id}"
+      body: "*"
+    };
+  }
+  // Delete a user.
+  rpc DeleteUser(cyber.user.v1.DeleteUserRequest) returns (cyber.user.v1.DeleteUserResponse) {
+    option (cyber.shared.ext.v1.method_comment) = "删除用户";
+    option (google.api.http) = {delete: "/api/v1/mobile/user/{id}"};
+  }
+  // Get a user by ID.
+  rpc GetUser(cyber.user.v1.GetUserRequest) returns (cyber.user.v1.GetUserResponse) {
+    option (cyber.shared.ext.v1.method_comment) = "查询用户详情";
+    option (google.api.http) = {get: "/api/v1/mobile/user/{id}"};
+  }
+  // List users with pagination and filters.
+  rpc ListUsers(cyber.user.v1.ListUsersRequest) returns (cyber.user.v1.ListUsersResponse) {
+    option (cyber.shared.ext.v1.method_comment) = "查询用户列表";
+    option (google.api.http) = {get: "/api/v1/mobile/user"};
+  }
+  // Update user status.
+  rpc UpdateUserStatus(cyber.user.v1.UpdateUserStatusRequest) returns (cyber.user.v1.UpdateUserStatusResponse) {
+    option (cyber.shared.ext.v1.method_comment) = "修改用户状态";
+    option (google.api.http) = {
+      put: "/api/v1/mobile/user/{id}/status"
+      body: "*"
+    };
+  }
+  // Sort user position.
+  rpc SortUser(cyber.user.v1.SortUserRequest) returns (cyber.user.v1.SortUserResponse) {
+    option (cyber.shared.ext.v1.method_comment) = "排序用户";
+    option (google.api.http) = {
+      put: "/api/v1/mobile/user/{id}/sort"
+      body: "*"
+    };
+  }
+}

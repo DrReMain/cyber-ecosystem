@@ -1,0 +1,605 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /api/v1/mobile/resource:
+        get:
+            tags:
+                - MobileResourceService
+            description: List all RPC service and method info.
+            operationId: MobileResourceService_ListResource
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.resource.v1.ListResourceResponse'
+    /api/v1/mobile/transfer/echo:
+        get:
+            tags:
+                - MobileTransferService
+            description: Echo back a summary of received messages.
+            operationId: MobileTransferService_Echo
+            parameters:
+                - name: data
+                  in: query
+                  description: Message payload.
+                  schema:
+                    type: string
+                    format: bytes
+                - name: sequence
+                  in: query
+                  description: Sequence number.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.transfer.v1.EchoResponse'
+    /api/v1/mobile/transfer/pipe:
+        get:
+            tags:
+                - MobileTransferService
+            description: Bidirectional data pipe via WebSocket.
+            operationId: MobileTransferService_Pipe
+            parameters:
+                - name: data
+                  in: query
+                  description: Message payload.
+                  schema:
+                    type: string
+                    format: bytes
+                - name: type
+                  in: query
+                  description: Message type.
+                  schema:
+                    type: string
+                - name: sequence
+                  in: query
+                  description: Sequence number.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.transfer.v1.PipeResponse'
+    /api/v1/mobile/transfer/raw:
+        post:
+            tags:
+                - MobileTransferService
+            description: |-
+                Return raw bytes via HttpBody.
+                 buf:lint:ignore RPC_RESPONSE_STANDARD_NAME -- HttpBody is intentional: raw binary response, not a conventional *Response message.
+            operationId: MobileTransferService_Raw
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.transfer.v1.RawRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
+    /api/v1/mobile/transfer/subscribe:
+        get:
+            tags:
+                - MobileTransferService
+            description: Subscribe to events via SSE.
+            operationId: MobileTransferService_Subscribe
+            parameters:
+                - name: topic
+                  in: query
+                  description: Topic to subscribe.
+                  schema:
+                    type: string
+                - name: lastEventId
+                  in: query
+                  description: Last event ID for reconnection.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.transfer.v1.SubscribeResponse'
+    /api/v1/mobile/user:
+        get:
+            tags:
+                - MobileUserService
+            description: List users with pagination and filters.
+            operationId: MobileUserService_ListUsers
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: phone
+                  in: query
+                  description: Filter by phone (exact).
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  description: Filter by status.
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  description: Sort fields, e.g. "createdAt:asc".
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.user.v1.ListUsersResponse'
+        post:
+            tags:
+                - MobileUserService
+            description: Create a user.
+            operationId: MobileUserService_CreateUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.user.v1.CreateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.user.v1.CreateUserResponse'
+    /api/v1/mobile/user/{id}:
+        get:
+            tags:
+                - MobileUserService
+            description: Get a user by ID.
+            operationId: MobileUserService_GetUser
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.user.v1.GetUserResponse'
+        put:
+            tags:
+                - MobileUserService
+            description: Update a user.
+            operationId: MobileUserService_UpdateUser
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.user.v1.UpdateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.user.v1.UpdateUserResponse'
+        delete:
+            tags:
+                - MobileUserService
+            description: Delete a user.
+            operationId: MobileUserService_DeleteUser
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.user.v1.DeleteUserResponse'
+    /api/v1/mobile/user/{id}/sort:
+        put:
+            tags:
+                - MobileUserService
+            description: Sort user position.
+            operationId: MobileUserService_SortUser
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.user.v1.SortUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.user.v1.SortUserResponse'
+    /api/v1/mobile/user/{id}/status:
+        put:
+            tags:
+                - MobileUserService
+            description: Update user status.
+            operationId: MobileUserService_UpdateUserStatus
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.user.v1.UpdateUserStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.user.v1.UpdateUserStatusResponse'
+components:
+    schemas:
+        cyber.resource.v1.ListResourceResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.resource.v1.Service'
+                    description: Service list.
+            description: ListResource response.
+        cyber.resource.v1.Method:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Method short name.
+                fullName:
+                    type: string
+                    description: Method fully qualified name.
+                requestName:
+                    type: string
+                    description: Request message short name.
+                requestFullName:
+                    type: string
+                    description: Request message fully qualified name.
+                responseName:
+                    type: string
+                    description: Response message short name.
+                responseFullName:
+                    type: string
+                    description: Response message fully qualified name.
+                httpMethod:
+                    type: string
+                    description: HTTP method (GET, POST, PUT, DELETE).
+                httpPath:
+                    type: string
+                    description: HTTP path pattern.
+                comment:
+                    type: string
+                    description: Method description.
+            description: RPC method descriptor.
+        cyber.resource.v1.Service:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Service short name.
+                fullName:
+                    type: string
+                    description: Service fully qualified name.
+                package:
+                    type: string
+                    description: Proto package name.
+                sourceFile:
+                    type: string
+                    description: Source proto file path.
+                comment:
+                    type: string
+                    description: Service description.
+                methods:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.resource.v1.Method'
+                    description: Service methods.
+            description: RPC service descriptor.
+        cyber.shared.common.v1.PageResponse:
+            type: object
+            properties:
+                pageNo:
+                    type: integer
+                    description: Current page number.
+                    format: int32
+                pageSize:
+                    type: integer
+                    description: Page size.
+                    format: int32
+                total:
+                    type: integer
+                    description: Total count.
+                    format: int32
+                more:
+                    type: boolean
+                    description: Whether more results exist.
+            description: Pagination response.
+        cyber.transfer.v1.EchoResponse:
+            type: object
+            properties:
+                totalMessages:
+                    type: integer
+                    description: Total messages received.
+                    format: int32
+                totalBytes:
+                    type: string
+                    description: Total bytes received.
+                lastSequence:
+                    type: string
+                    description: Last sequence number.
+                durationNs:
+                    type: string
+                    description: Round-trip duration in nanoseconds.
+            description: Echo response summary.
+        cyber.transfer.v1.PipeResponse:
+            type: object
+            properties:
+                data:
+                    type: string
+                    description: Message payload.
+                    format: bytes
+                type:
+                    type: string
+                    description: Message type.
+                sequence:
+                    type: string
+                    description: Sequence number.
+            description: Bidirectional pipe response.
+        cyber.transfer.v1.RawRequest:
+            type: object
+            properties:
+                contentType:
+                    type: string
+                    description: Desired content type for the response.
+                data:
+                    type: string
+                    description: Request body.
+                    format: bytes
+            description: Raw bytes request.
+        cyber.transfer.v1.SubscribeResponse:
+            type: object
+            properties:
+                eventId:
+                    type: string
+                    description: Event ID for SSE reconnection.
+                eventType:
+                    type: string
+                    description: Event type for SSE client-side filtering.
+                data:
+                    type: string
+                    description: Event payload.
+                    format: bytes
+                timestamp:
+                    type: string
+                    description: Event timestamp.
+                    format: date-time
+            description: Subscribe event response.
+        cyber.user.v1.CreateUserRequest:
+            type: object
+            properties:
+                nickname:
+                    type: string
+                    description: Nickname.
+                phone:
+                    type: string
+                    description: Phone number, used as the login account. Unique.
+                password:
+                    type: string
+                    description: Login password (plaintext over the wire; hashed server-side before storage).
+            description: CreateUser request.
+        cyber.user.v1.CreateUserResponse:
+            type: object
+            properties: {}
+            description: CreateUser response.
+        cyber.user.v1.DeleteUserResponse:
+            type: object
+            properties: {}
+            description: DeleteUser response.
+        cyber.user.v1.GetUserResponse:
+            type: object
+            properties:
+                user:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.user.v1.User'
+                    description: User detail.
+            description: GetUser response.
+        cyber.user.v1.ListUsersResponse:
+            type: object
+            properties:
+                page:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                    description: Pagination info.
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.user.v1.GetUserResponse'
+                    description: User list.
+            description: ListUsers response.
+        cyber.user.v1.SortUserRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: User ID.
+                prevId:
+                    type: string
+                    description: Move after this user.
+                nextId:
+                    type: string
+                    description: Move before this user.
+            description: |-
+                SortUser request. Reorder a user's position relative to its neighbors.
+                 At least one of prev_id or next_id must be set. The service updates the
+                 affected users' positions atomically (a multi-row transaction).
+        cyber.user.v1.SortUserResponse:
+            type: object
+            properties: {}
+            description: SortUser response.
+        cyber.user.v1.UpdateUserRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: User ID.
+                nickname:
+                    type: string
+                    description: Nickname.
+                phone:
+                    type: string
+                    description: Phone number.
+                password:
+                    type: string
+                    description: Password (set to change credentials).
+                fieldsMask:
+                    type: array
+                    items:
+                        type: string
+                    description: Fields to update.
+            description: UpdateUser request.
+        cyber.user.v1.UpdateUserResponse:
+            type: object
+            properties: {}
+            description: UpdateUser response.
+        cyber.user.v1.UpdateUserStatusRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: User ID.
+                status:
+                    type: string
+                    description: Target status.
+            description: UpdateUserStatus request.
+        cyber.user.v1.UpdateUserStatusResponse:
+            type: object
+            properties: {}
+            description: UpdateUserStatus response.
+        cyber.user.v1.User:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                nickname:
+                    type: string
+                avatar:
+                    type: string
+                phone:
+                    type: string
+                status:
+                    type: string
+                    description: |-
+                        Account status: enabled | disabled | restricted. Valid transitions are
+                         enforced as a finite state machine in the biz layer.
+            description: User resource model. Represents a user account.
+tags:
+    - name: MobileResourceService
+      description: |-
+        Mobile resource introspection service. Lists all RPC service/method info by
+         reflecting on the registered proto descriptors.
+    - name: MobileTransferService
+      description: |-
+        Mobile transfer service. Exposes the streaming transport primitives
+         (SSE / client-stream / bidi / HttpBody) to mobile clients.
+    - name: MobileUserService
+      description: Mobile user service. Client-facing surface for user CRUD over Connect/HTTP.

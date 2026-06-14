@@ -1,0 +1,77 @@
+{
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "proto",
+  "root": "proto",
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf lint"
+      }
+    },
+    "breaking": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf breaking --against .git#branch=main"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf format -w"
+      }
+    },
+    "format:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf format -d --exit-code"
+      }
+    },
+    "generate:go": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "node proto/scripts/clean-gen.cjs gen/go",
+          "buf generate --template proto/buf.gen.go.yaml",
+          "go mod tidy"
+        ],
+        "parallel": false
+      }
+    },
+    "generate:ts": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "node proto/scripts/clean-gen.cjs gen/ts",
+          "buf generate --template proto/buf.gen.ts.yaml --include-imports",
+          "pnpm install"
+        ],
+        "parallel": false
+      }
+    },
+    "generate:oapi": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "node proto/scripts/clean-gen.cjs gen/openapi",
+          "buf generate --template proto/buf.gen.oapi.yaml"
+        ],
+        "parallel": false
+      }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["generate:go", "generate:ts", "generate:oapi"],
+      "options": {
+        "command": "echo 'proto generation completed'"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package cyber.shared.ext.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/shared/ext/v1";
+
+extend google.protobuf.MethodOptions {
+  bool public_access = 10001;
+}

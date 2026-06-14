@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package cyber.shared.errors.v1;
+
+import "cyber/shared/errors/v1/errors.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/shared/errors/v1";
+
+enum InfraError {
+  option (cyber.shared.errors.v1.default_code) = 500;
+
+  INFRA_ERROR_UNSPECIFIED = 0 [(cyber.shared.errors.v1.code) = 500];
+
+  // 30xx: Database
+  INFRA_ERROR_DB_NOT_FOUND = 3000 [(cyber.shared.errors.v1.code) = 404];
+  INFRA_ERROR_DB_VALIDATION = 3001 [(cyber.shared.errors.v1.code) = 400];
+  INFRA_ERROR_DB_CONSTRAINT = 3002 [(cyber.shared.errors.v1.code) = 409];
+  INFRA_ERROR_DB_NOT_SINGULAR = 3003 [(cyber.shared.errors.v1.code) = 400];
+  INFRA_ERROR_DB_NOT_LOADED = 3004 [(cyber.shared.errors.v1.code) = 500];
+  INFRA_ERROR_DB_INTERNAL = 3005 [(cyber.shared.errors.v1.code) = 500];
+  INFRA_ERROR_DB_DEADLOCK = 3006 [(cyber.shared.errors.v1.code) = 409];
+  INFRA_ERROR_DB_CONNECTION = 3007 [(cyber.shared.errors.v1.code) = 503];
+
+  // 31xx: Cache
+  INFRA_ERROR_CACHE_MISS = 3100 [(cyber.shared.errors.v1.code) = 404];
+  INFRA_ERROR_CACHE_KEY_NOT_FOUND = 3101 [(cyber.shared.errors.v1.code) = 404];
+  INFRA_ERROR_CACHE_SESSION_NOT_FOUND = 3102 [(cyber.shared.errors.v1.code) = 404];
+  INFRA_ERROR_CACHE_QUOTA_EXCEEDED = 3103 [(cyber.shared.errors.v1.code) = 429];
+  INFRA_ERROR_CACHE_INVALID_ARGUMENT = 3104 [(cyber.shared.errors.v1.code) = 400];
+  INFRA_ERROR_CACHE_UNAVAILABLE = 3105 [(cyber.shared.errors.v1.code) = 503];
+
+  // 32xx: Storage
+  INFRA_ERROR_STORAGE_NOT_FOUND = 3200 [(cyber.shared.errors.v1.code) = 404];
+  INFRA_ERROR_STORAGE_FORBIDDEN = 3201 [(cyber.shared.errors.v1.code) = 403];
+  INFRA_ERROR_STORAGE_SIZE_EXCEED = 3202 [(cyber.shared.errors.v1.code) = 413];
+  INFRA_ERROR_STORAGE_UNAVAILABLE = 3203 [(cyber.shared.errors.v1.code) = 503];
+
+  // 33xx: Network
+  INFRA_ERROR_NETWORK_TIMEOUT = 3300 [(cyber.shared.errors.v1.code) = 504];
+  INFRA_ERROR_NETWORK_CONNECTION = 3301 [(cyber.shared.errors.v1.code) = 503];
+  INFRA_ERROR_NETWORK_DNS = 3302 [(cyber.shared.errors.v1.code) = 503];
+  INFRA_ERROR_NETWORK_TLS = 3303 [(cyber.shared.errors.v1.code) = 503];
+}
