@@ -1,6 +1,5 @@
 {
   "recommendations": [
-    "mihelcic.colored-regions",
     "nrwl.angular-console",
     "redhat.vscode-yaml",
     "bufbuild.buf",
