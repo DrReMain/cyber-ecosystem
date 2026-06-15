@@ -4,7 +4,7 @@ package cyber.conf;
 
 import "google/protobuf/duration.proto";
 
-option go_package = "cyber-ecosystem/app/services/mobile_bff/internal/conf;conf";
+option go_package = "cyber-ecosystem/app/services/edge_mobile/internal/conf;conf";
 
 message Bootstrap {
   Server server = 1;
@@ -35,7 +35,15 @@ message Server {
 message Data {
   message Database {
     string driver = 1;
-    string source = 2;
+    string host = 2;
+    int32 port = 3;
+    string user = 4;
+    string password = 5;
+    string db_name = 6;
+    int32 max_open_conns = 7;
+    int32 max_idle_conns = 8;
+    google.protobuf.Duration conn_max_lifetime = 9;
+    bool migrate = 10;
   }
   message Redis {
     string network = 1;

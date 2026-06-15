@@ -6,10 +6,10 @@ import "errors/errors.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/mobile/v1";
 
-// Mobile_bff business errors (service-level): domain-specific failures the
+// business errors (service-level): domain-specific failures the
 // service layer returns actively, distinct from the generic codes in
 // cyber/shared/errors (General/Auth/Flow/Infra). The 6xxx range is reserved for
-// mobile_bff business errors.
+// edge_mobile business errors.
 enum ErrorReason {
   option (.errors.default_code) = 400;
 

@@ -11,8 +11,8 @@ import (
 
 	"cyber-ecosystem/shared-go/helper"
 
-	"cyber-ecosystem/app/services/mobile_bff/internal/biz"
-	"cyber-ecosystem/app/services/mobile_bff/internal/platform"
+	"cyber-ecosystem/app/services/edge_mobile/internal/biz"
+	"cyber-ecosystem/app/services/edge_mobile/internal/platform"
 )
 
 // Struct ----------------------------------------------------------------------------------------------------------------

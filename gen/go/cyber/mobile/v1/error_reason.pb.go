@@ -22,6 +22,10 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// business errors (service-level): domain-specific failures the
+// service layer returns actively, distinct from the generic codes in
+// cyber/shared/errors (General/Auth/Flow/Infra). The 6xxx range is reserved for
+// edge_mobile business errors.
 type ErrorReason int32
 
 const (

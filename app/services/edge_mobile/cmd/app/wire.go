@@ -11,12 +11,12 @@ import (
 	"github.com/go-kratos/kratos/v3"
 	"github.com/google/wire"
 
-	"cyber-ecosystem/app/services/mobile_bff/internal/biz"
-	"cyber-ecosystem/app/services/mobile_bff/internal/conf"
-	"cyber-ecosystem/app/services/mobile_bff/internal/data"
-	"cyber-ecosystem/app/services/mobile_bff/internal/platform"
-	"cyber-ecosystem/app/services/mobile_bff/internal/server"
-	"cyber-ecosystem/app/services/mobile_bff/internal/service"
+	"cyber-ecosystem/app/services/edge_mobile/internal/biz"
+	"cyber-ecosystem/app/services/edge_mobile/internal/conf"
+	"cyber-ecosystem/app/services/edge_mobile/internal/data"
+	"cyber-ecosystem/app/services/edge_mobile/internal/platform"
+	"cyber-ecosystem/app/services/edge_mobile/internal/server"
+	"cyber-ecosystem/app/services/edge_mobile/internal/service"
 )
 
 // wireApp init kratos application.

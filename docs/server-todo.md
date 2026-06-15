@@ -1,4 +1,4 @@
-# mobile_bff server 层后续工作（TODO）
+# edge_mobile server 层后续工作（TODO）
 
 记录已设计 / 分析但尚未实施的 server 层工作，作为排期 backlog。
 
@@ -30,7 +30,7 @@
 
 #### a. 错误内容三协议一致 ✓
 
-mobile_bff 实测（invalid = 校验错误 / valid = 业务错误）：
+edge_mobile 实测（invalid = 校验错误 / valid = 业务错误）：
 
 | 客户端 → 服务器 | invalid | valid |
 |---|---|---|

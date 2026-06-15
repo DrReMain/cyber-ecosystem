@@ -14,12 +14,12 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	"cyber-ecosystem/app/services/mobile_bff/internal/conf"
+	"cyber-ecosystem/app/services/edge_mobile/internal/conf"
 )
 
 var (
-	Name     string = "mobile_bff"
-	Version  string
+	Name     string = "edge_mobile"
+	Version  string = "dev"
 	flagconf string
 	id, _    = os.Hostname()
 )

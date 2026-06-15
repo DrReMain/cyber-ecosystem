@@ -14,8 +14,8 @@ import (
 	"cyber-ecosystem/shared-go/kratos/transport/connect/health"
 	"cyber-ecosystem/shared-go/kratos/transport/connect/reflection"
 
-	"cyber-ecosystem/app/services/mobile_bff/internal/conf"
-	"cyber-ecosystem/app/services/mobile_bff/internal/service"
+	"cyber-ecosystem/app/services/edge_mobile/internal/conf"
+	"cyber-ecosystem/app/services/edge_mobile/internal/service"
 )
 
 func NewConnectServer(

@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/wire"
 
-	"cyber-ecosystem/app/services/mobile_bff/internal/platform"
+	"cyber-ecosystem/app/services/edge_mobile/internal/platform"
 )
 
 type RP struct {

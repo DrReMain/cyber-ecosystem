@@ -11,7 +11,15 @@ server:
 data:
   database:
     driver: postgres
-    source: "host=localhost port=5432 user=postgres password=postgres dbname=mobile_bff sslmode=disable"
+    host: localhost
+    port: 5432
+    user: postgres
+    password: postgres
+    db_name: edge_mobile
+    max_open_conns: 100
+    max_idle_conns: 50
+    conn_max_lifetime: 3600s
+    migrate: true
   redis:
     addr: localhost:6379
     read_timeout: 0.2s

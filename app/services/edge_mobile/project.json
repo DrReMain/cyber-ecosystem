@@ -1,7 +1,7 @@
 {
   "$schema": "../../../.nx/installation/node_modules/nx/schemas/project-schema.json",
-  "name": "mobile_bff",
-  "root": "app/services/mobile_bff",
+  "name": "edge_mobile",
+  "root": "app/services/edge_mobile",
   "projectType": "application",
   "targets": {
     "proto:conf": {

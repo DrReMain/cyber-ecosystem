@@ -13,6 +13,11 @@ export const file_cyber_mobile_v1_error_reason: GenFile = /*@__PURE__*/
   fileDesc("CiJjeWJlci9tb2JpbGUvdjEvZXJyb3JfcmVhc29uLnByb3RvEg9jeWJlci5tb2JpbGUudjEqagoLRXJyb3JSZWFzb24SIgoYRVJST1JfUkVBU09OX1VOU1BFQ0lGSUVEEAAaBKhF9AMSMQomRVJST1JfUkVBU09OX1NUQVRVU19JTlZBTElEX1RSQU5TSVRJT04Q8C4aBKhFkAMaBKBFkANCKFomY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9tb2JpbGUvdjFiBnByb3RvMw", [file_errors_errors]);
 
 /**
+ * business errors (service-level): domain-specific failures the
+ * service layer returns actively, distinct from the generic codes in
+ * cyber/shared/errors (General/Auth/Flow/Infra). The 6xxx range is reserved for
+ * edge_mobile business errors.
+ *
  * @generated from enum cyber.mobile.v1.ErrorReason
  */
 export enum ErrorReason {

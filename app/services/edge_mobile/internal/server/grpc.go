@@ -8,19 +8,19 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware/metadata"
 	"github.com/go-kratos/kratos/v3/middleware/ratelimit"
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
-	"github.com/go-kratos/kratos/v3/transport/http"
+	"github.com/go-kratos/kratos/v3/transport/grpc"
 
 	"cyber-ecosystem/shared-go/kratos/middleware/validator"
 
-	"cyber-ecosystem/app/services/mobile_bff/internal/conf"
-	"cyber-ecosystem/app/services/mobile_bff/internal/service"
+	"cyber-ecosystem/app/services/edge_mobile/internal/conf"
+	"cyber-ecosystem/app/services/edge_mobile/internal/service"
 )
 
-func NewHTTPServer(
+func NewGRPCServer(
 	c *conf.Server,
 	logger *slog.Logger,
 	registrar []service.Registrar,
-) *http.Server {
+) *grpc.Server {
 	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, recovery.Recovery())
 	middlewares = append(middlewares, ratelimit.Server())
@@ -28,21 +28,21 @@ func NewHTTPServer(
 	middlewares = append(middlewares, logging.Server(logger))
 	middlewares = append(middlewares, validator.Server())
 
-	var opts = []http.ServerOption{
-		http.Middleware(middlewares...),
+	var opts = []grpc.ServerOption{
+		grpc.Middleware(middlewares...),
 	}
-	if c.Http.Network != "" {
-		opts = append(opts, http.Network(c.Http.Network))
+	if c.Grpc.Network != "" {
+		opts = append(opts, grpc.Network(c.Grpc.Network))
 	}
-	if c.Http.Addr != "" {
-		opts = append(opts, http.Address(c.Http.Addr))
+	if c.Grpc.Addr != "" {
+		opts = append(opts, grpc.Address(c.Grpc.Addr))
 	}
-	if c.Http.Timeout != nil {
-		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
+	if c.Grpc.Timeout != nil {
+		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
-	srv := http.NewServer(opts...)
+	srv := grpc.NewServer(opts...)
 	for _, r := range registrar {
-		r.RegisterHTTP(srv)
+		r.RegisterGRPC(srv)
 	}
 	return srv
 }

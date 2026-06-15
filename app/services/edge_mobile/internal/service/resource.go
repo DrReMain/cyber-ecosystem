@@ -11,7 +11,7 @@ import (
 
 	pb "cyber-ecosystem/gen/go/cyber/mobile/v1"
 
-	"cyber-ecosystem/app/services/mobile_bff/internal/biz"
+	"cyber-ecosystem/app/services/edge_mobile/internal/biz"
 )
 
 // Struct ----------------------------------------------------------------------------------------------------------------
