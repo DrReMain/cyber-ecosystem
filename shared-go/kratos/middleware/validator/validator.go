@@ -17,7 +17,6 @@ var ErrValidator = errors.BadRequest("VALIDATOR", "verification failed")
 
 // Server returns a middleware that validates each unary request against its
 // buf.validate rules. i18n integration (violation extraction, direct-expose)
-// is planned — see docs/design/i18n-error.md.
 func Server() middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (reply any, err error) {
