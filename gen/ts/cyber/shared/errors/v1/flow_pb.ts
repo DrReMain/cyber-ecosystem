@@ -4,13 +4,13 @@
 
 import type { GenEnum, GenFile } from "@bufbuild/protobuf/codegenv2";
 import { enumDesc, fileDesc } from "@bufbuild/protobuf/codegenv2";
-import { file_cyber_shared_errors_v1_errors } from "./errors_pb";
+import { file_errors_errors } from "../../../../errors/errors_pb";
 
 /**
  * Describes the file cyber/shared/errors/v1/flow.proto.
  */
 export const file_cyber_shared_errors_v1_flow: GenFile = /*@__PURE__*/
-  fileDesc("CiFjeWJlci9zaGFyZWQvZXJyb3JzL3YxL2Zsb3cucHJvdG8SFmN5YmVyLnNoYXJlZC5lcnJvcnMudjEqzAEKCUZsb3dFcnJvchIgChZGTE9XX0VSUk9SX1VOU1BFQ0lGSUVEEAAaBKhF9AMSIgoXRkxPV19FUlJPUl9SQVRFX0xJTUlURUQQoB8aBKhFrQMSJQoaRkxPV19FUlJPUl9DSVJDVUlUX0JSRUFLRVIQoR8aBKhF9wMSJAoZRkxPV19FUlJPUl9RVU9UQV9FWENFRURFRBCiHxoEqEWtAxImChtGTE9XX0VSUk9SX0NPTkNVUlJFTlRfTElNSVQQox8aBKhFrQMaBKBFrQNCL1otY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9zaGFyZWQvZXJyb3JzL3YxYgZwcm90bzM", [file_cyber_shared_errors_v1_errors]);
+  fileDesc("CiFjeWJlci9zaGFyZWQvZXJyb3JzL3YxL2Zsb3cucHJvdG8SFmN5YmVyLnNoYXJlZC5lcnJvcnMudjEqzAEKCUZsb3dFcnJvchIgChZGTE9XX0VSUk9SX1VOU1BFQ0lGSUVEEAAaBKhF9AMSIgoXRkxPV19FUlJPUl9SQVRFX0xJTUlURUQQoB8aBKhFrQMSJQoaRkxPV19FUlJPUl9DSVJDVUlUX0JSRUFLRVIQoR8aBKhF9wMSJAoZRkxPV19FUlJPUl9RVU9UQV9FWENFRURFRBCiHxoEqEWtAxImChtGTE9XX0VSUk9SX0NPTkNVUlJFTlRfTElNSVQQox8aBKhFrQMaBKBFrQNCL1otY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9zaGFyZWQvZXJyb3JzL3YxYgZwcm90bzM", [file_errors_errors]);
 
 /**
  * @generated from enum cyber.shared.errors.v1.FlowError

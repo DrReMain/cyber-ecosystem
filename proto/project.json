@@ -37,7 +37,7 @@
         "cwd": "{workspaceRoot}",
         "commands": [
           "node proto/scripts/clean-gen.cjs gen/go",
-          "buf generate --template proto/buf.gen.go.yaml",
+          "buf generate --template proto/buf.gen.go.yaml --exclude-path proto/errors/errors.proto",
           "go mod tidy"
         ],
         "parallel": false

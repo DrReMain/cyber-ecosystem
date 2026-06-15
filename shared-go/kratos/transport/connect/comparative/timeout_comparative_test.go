@@ -37,7 +37,6 @@ import (
 
 	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
 	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
-	v1 "cyber-ecosystem/gen/go/cyber/transfer/v1"
 )
 
 // bareCtxErrService is a TransferService whose unary Raw blocks until the
@@ -48,7 +47,7 @@ type bareCtxErrService struct {
 	mobilepb.UnimplementedMobileTransferServiceServer
 }
 
-func (bareCtxErrService) Raw(ctx context.Context, _ *v1.RawRequest) (*httpbody.HttpBody, error) {
+func (bareCtxErrService) Raw(ctx context.Context, _ *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
 	<-ctx.Done() // block until the server unary timeout fires
 	return nil, ctx.Err()
 }
@@ -145,7 +144,7 @@ func TestTimeoutMappingGRPCvsConnect(t *testing.T) {
 	grpcCli, connCli, stop := startTimeoutPair(t, serverTimeout)
 	defer stop()
 
-	req := &v1.RawRequest{Data: []byte("x")}
+	req := &mobilepb.RawRequest{Data: []byte("x")}
 
 	// --- gRPC leg ---
 	grpcStart := time.Now()

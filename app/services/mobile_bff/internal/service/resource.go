@@ -10,7 +10,6 @@ import (
 	connecttransport "cyber-ecosystem/shared-go/kratos/transport/connect"
 
 	pb "cyber-ecosystem/gen/go/cyber/mobile/v1"
-	resourcev1 "cyber-ecosystem/gen/go/cyber/resource/v1"
 
 	"cyber-ecosystem/app/services/mobile_bff/internal/biz"
 )
@@ -45,22 +44,22 @@ func (s *ResourceService) RegisterConnect(srv *connecttransport.Server) {
 
 // Handler ---------------------------------------------------------------------------------------------------------------
 
-func (s *ResourceService) ListResource(ctx context.Context, _ *resourcev1.ListResourceRequest) (*resourcev1.ListResourceResponse, error) {
+func (s *ResourceService) ListResource(ctx context.Context, _ *pb.ListResourceRequest) (*pb.ListResourceResponse, error) {
 	services, err := s.resourceUC.ListResource(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &resourcev1.ListResourceResponse{
+	return &pb.ListResourceResponse{
 		List: toProtoServices(services),
 	}, nil
 }
 
 // Private ---------------------------------------------------------------------------------------------------------------
 
-func toProtoServices(services []*biz.ResourceService) []*resourcev1.Service {
-	out := make([]*resourcev1.Service, len(services))
+func toProtoServices(services []*biz.ResourceService) []*pb.Service {
+	out := make([]*pb.Service, len(services))
 	for i, svc := range services {
-		out[i] = &resourcev1.Service{
+		out[i] = &pb.Service{
 			Name:       svc.Name,
 			FullName:   svc.FullName,
 			Package:    svc.Package,
@@ -72,10 +71,10 @@ func toProtoServices(services []*biz.ResourceService) []*resourcev1.Service {
 	return out
 }
 
-func toProtoMethods(methods []*biz.ResourceMethod) []*resourcev1.Method {
-	out := make([]*resourcev1.Method, len(methods))
+func toProtoMethods(methods []*biz.ResourceMethod) []*pb.Method {
+	out := make([]*pb.Method, len(methods))
 	for i, m := range methods {
-		out[i] = &resourcev1.Method{
+		out[i] = &pb.Method{
 			Name:             m.Name,
 			FullName:         m.FullName,
 			RequestName:      m.RequestName,

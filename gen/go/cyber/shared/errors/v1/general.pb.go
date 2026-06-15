@@ -7,6 +7,7 @@
 package v1
 
 import (
+	_ "github.com/go-kratos/kratos/v3/errors"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -115,7 +116,7 @@ var File_cyber_shared_errors_v1_general_proto protoreflect.FileDescriptor
 
 const file_cyber_shared_errors_v1_general_proto_rawDesc = "" +
 	"\n" +
-	"$cyber/shared/errors/v1/general.proto\x12\x16cyber.shared.errors.v1\x1a#cyber/shared/errors/v1/errors.proto*\xb2\x05\n" +
+	"$cyber/shared/errors/v1/general.proto\x12\x16cyber.shared.errors.v1\x1a\x13errors/errors.proto*\xb2\x05\n" +
 	"\fGeneralError\x12#\n" +
 	"\x19GENERAL_ERROR_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12)\n" +
 	"\x1eGENERAL_ERROR_INVALID_ARGUMENT\x10\xe8\a\x1a\x04\xa8E\x90\x03\x12*\n" +
@@ -163,7 +164,6 @@ func file_cyber_shared_errors_v1_general_proto_init() {
 	if File_cyber_shared_errors_v1_general_proto != nil {
 		return
 	}
-	file_cyber_shared_errors_v1_errors_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -8,6 +8,8 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 
+	"cyber-ecosystem/shared-go/kratos/middleware/validator"
+
 	"cyber-ecosystem/app/services/mobile_bff/internal/conf"
 	"cyber-ecosystem/app/services/mobile_bff/internal/service"
 )
@@ -20,6 +22,7 @@ func NewGRPCServer(
 	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, recovery.Recovery())
 	middlewares = append(middlewares, logging.Server(logger))
+	middlewares = append(middlewares, validator.Server())
 
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(middlewares...),

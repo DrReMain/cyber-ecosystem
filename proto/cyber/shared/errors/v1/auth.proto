@@ -2,22 +2,22 @@ syntax = "proto3";
 
 package cyber.shared.errors.v1;
 
-import "cyber/shared/errors/v1/errors.proto";
+import "errors/errors.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/shared/errors/v1";
 
 enum AuthError {
-  option (cyber.shared.errors.v1.default_code) = 401;
+  option (.errors.default_code) = 401;
 
-  AUTH_ERROR_UNSPECIFIED = 0 [(cyber.shared.errors.v1.code) = 500];
+  AUTH_ERROR_UNSPECIFIED = 0 [(.errors.code) = 500];
 
-  AUTH_ERROR_TOKEN_EXPIRED = 5000 [(cyber.shared.errors.v1.code) = 401];
-  AUTH_ERROR_TOKEN_INVALID = 5001 [(cyber.shared.errors.v1.code) = 401];
-  AUTH_ERROR_TOKEN_MISSING = 5002 [(cyber.shared.errors.v1.code) = 401];
-  AUTH_ERROR_TOKEN_REVOKED = 5003 [(cyber.shared.errors.v1.code) = 401];
-  AUTH_ERROR_PERMISSION_DENIED = 5004 [(cyber.shared.errors.v1.code) = 403];
-  AUTH_ERROR_ACCOUNT_DISABLED = 5005 [(cyber.shared.errors.v1.code) = 403];
-  AUTH_ERROR_ACCOUNT_LOCKED = 5006 [(cyber.shared.errors.v1.code) = 403];
-  AUTH_ERROR_MFA_REQUIRED = 5007 [(cyber.shared.errors.v1.code) = 403];
-  AUTH_ERROR_SESSION_EXPIRED = 5008 [(cyber.shared.errors.v1.code) = 401];
+  AUTH_ERROR_TOKEN_EXPIRED = 5000 [(.errors.code) = 401];
+  AUTH_ERROR_TOKEN_INVALID = 5001 [(.errors.code) = 401];
+  AUTH_ERROR_TOKEN_MISSING = 5002 [(.errors.code) = 401];
+  AUTH_ERROR_TOKEN_REVOKED = 5003 [(.errors.code) = 401];
+  AUTH_ERROR_PERMISSION_DENIED = 5004 [(.errors.code) = 403];
+  AUTH_ERROR_ACCOUNT_DISABLED = 5005 [(.errors.code) = 403];
+  AUTH_ERROR_ACCOUNT_LOCKED = 5006 [(.errors.code) = 403];
+  AUTH_ERROR_MFA_REQUIRED = 5007 [(.errors.code) = 403];
+  AUTH_ERROR_SESSION_EXPIRED = 5008 [(.errors.code) = 401];
 }

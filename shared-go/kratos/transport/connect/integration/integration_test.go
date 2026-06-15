@@ -32,7 +32,6 @@ import (
 
 	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
 	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
-	v1 "cyber-ecosystem/gen/go/cyber/transfer/v1"
 )
 
 // testService implements mobilepb.MobileTransferServiceServer (the gRPC-style interface)
@@ -43,9 +42,9 @@ type testService struct {
 }
 
 // Subscribe emits 5 events derived from the requested topic.
-func (testService) Subscribe(req *v1.SubscribeRequest, stream grpc.ServerStreamingServer[v1.SubscribeResponse]) error {
+func (testService) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerStreamingServer[mobilepb.SubscribeResponse]) error {
 	for i := 0; i < 5; i++ {
-		if err := stream.Send(&v1.SubscribeResponse{
+		if err := stream.Send(&mobilepb.SubscribeResponse{
 			EventId: fmt.Sprintf("%s-%d", req.GetTopic(), i+1),
 		}); err != nil {
 			return err
@@ -60,7 +59,7 @@ func (testService) Subscribe(req *v1.SubscribeRequest, stream grpc.ServerStreami
 // misbehave — it returns nil WITHOUT calling SendAndClose, exercising the
 // transport's CodeInternal error path (see adapter.HandleClientStream). Used by
 // TestClientStreamMissingSendAndClose.
-func (testService) Echo(stream grpc.ClientStreamingServer[v1.EchoRequest, v1.EchoResponse]) error {
+func (testService) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoRequest, mobilepb.EchoResponse]) error {
 	var n int32
 	var totalBytes int64
 	skipClose := false
@@ -79,17 +78,17 @@ func (testService) Echo(stream grpc.ClientStreamingServer[v1.EchoRequest, v1.Ech
 	if skipClose {
 		return nil // misbehave: return without SendAndClose
 	}
-	return stream.SendAndClose(&v1.EchoResponse{TotalMessages: n, TotalBytes: totalBytes})
+	return stream.SendAndClose(&mobilepb.EchoResponse{TotalMessages: n, TotalBytes: totalBytes})
 }
 
 // Pipe echoes each incoming message back to the client until the stream closes.
-func (testService) Pipe(stream grpc.BidiStreamingServer[v1.PipeRequest, v1.PipeResponse]) error {
+func (testService) Pipe(stream grpc.BidiStreamingServer[mobilepb.PipeRequest, mobilepb.PipeResponse]) error {
 	for {
 		req, err := stream.Recv()
 		if err != nil {
 			return nil // EOF / client closed send side
 		}
-		if err := stream.Send(&v1.PipeResponse{Data: req.GetData()}); err != nil {
+		if err := stream.Send(&mobilepb.PipeResponse{Data: req.GetData()}); err != nil {
 			return err
 		}
 	}
@@ -104,7 +103,7 @@ func (testService) Pipe(stream grpc.BidiStreamingServer[v1.PipeRequest, v1.PipeR
 //   - Data == "SLOW" sleeps 1s before responding — used by TestClientTimeout
 //     to trigger a client-side deadline. Guarded by the sentinel so other
 //     tests are unaffected.
-func (testService) Raw(ctx context.Context, req *v1.RawRequest) (*httpbody.HttpBody, error) {
+func (testService) Raw(ctx context.Context, req *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
 	if string(req.GetData()) == "ERR" {
 		return nil, kerrors.NotFound("NOT_FOUND", "raw error sentinel")
 	}
@@ -201,7 +200,7 @@ func TestUnaryRaw(t *testing.T) {
 	cli, stop := startServer(t)
 	defer stop()
 
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte("hello"),
 	}))
@@ -220,7 +219,7 @@ func TestServerStreamSubscribe(t *testing.T) {
 	cli, stop := startServer(t)
 	defer stop()
 
-	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&v1.SubscribeRequest{Topic: "t"}))
+	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "t"}))
 	if err != nil {
 		t.Fatalf("Subscribe: %v", err)
 	}
@@ -252,7 +251,7 @@ func TestClientStreamEcho(t *testing.T) {
 
 	stream := cli.Echo(context.Background())
 	for i := 0; i < 3; i++ {
-		if err := stream.Send(&v1.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := stream.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("Send[%d]: %v", i, err)
 		}
 	}
@@ -278,7 +277,7 @@ func TestClientStreamMissingSendAndClose(t *testing.T) {
 	defer stop()
 
 	stream := cli.Echo(context.Background())
-	if err := stream.Send(&v1.EchoRequest{Data: []byte("NO_CLOSE")}); err != nil {
+	if err := stream.Send(&mobilepb.EchoRequest{Data: []byte("NO_CLOSE")}); err != nil {
 		t.Fatal(err)
 	}
 	_, err := stream.CloseAndReceive() // connect-go v1.20 client method name (T10a)
@@ -301,7 +300,7 @@ func TestBidiPipe(t *testing.T) {
 	stream := cli.Pipe(context.Background())
 	for i := 0; i < 3; i++ {
 		payload := fmt.Sprintf("m%d", i)
-		if err := stream.Send(&v1.PipeRequest{Data: []byte(payload)}); err != nil {
+		if err := stream.Send(&mobilepb.PipeRequest{Data: []byte(payload)}); err != nil {
 			t.Fatalf("Send[%d]: %v", i, err)
 		}
 		resp, err := stream.Receive()
@@ -342,7 +341,7 @@ func TestUnaryJSONAndProto(t *testing.T) {
 	// startServer's client already speaks application/proto.
 	protoCli, protoStop := startServer(t)
 	defer protoStop()
-	resp, err := protoCli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	resp, err := protoCli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		ContentType: "application/octet-stream",
 		Data:        []byte(want),
 	}))
@@ -357,7 +356,7 @@ func TestUnaryJSONAndProto(t *testing.T) {
 	// via WithProtoJSON, injected through WithClientOptions on our dial.
 	jsonCli, jsonStop := startClientWithCodec(t, connectrpc.WithProtoJSON())
 	defer jsonStop()
-	jresp, err := jsonCli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	jresp, err := jsonCli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		ContentType: "application/octet-stream",
 		Data:        []byte(want),
 	}))
@@ -409,7 +408,7 @@ func TestServerStreamCancel(t *testing.T) {
 	defer stop()
 
 	ctx, cancel := context.WithCancel(context.Background())
-	stream, err := cli.Subscribe(ctx, connectrpc.NewRequest(&v1.SubscribeRequest{Topic: "cancel"}))
+	stream, err := cli.Subscribe(ctx, connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "cancel"}))
 	if err != nil {
 		t.Fatalf("Subscribe: %v", err)
 	}
@@ -447,7 +446,7 @@ func TestErrorMapping(t *testing.T) {
 	cli, stop := startServer(t)
 	defer stop()
 
-	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		Data: []byte("ERR"),
 	}))
 	if err == nil {
@@ -501,7 +500,7 @@ func TestPerMessageStreamMiddleware(t *testing.T) {
 
 	client := mobilev1connect.NewMobileTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
 
-	stream, err := client.Subscribe(ctx, connectrpc.NewRequest(&v1.SubscribeRequest{Topic: "mw"}))
+	stream, err := client.Subscribe(ctx, connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "mw"}))
 	if err != nil {
 		t.Fatalf("Subscribe: %v", err)
 	}

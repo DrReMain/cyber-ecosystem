@@ -15,7 +15,6 @@ import (
 	connecttransport "cyber-ecosystem/shared-go/kratos/transport/connect"
 
 	pb "cyber-ecosystem/gen/go/cyber/mobile/v1"
-	v1 "cyber-ecosystem/gen/go/cyber/transfer/v1"
 )
 
 // Struct ----------------------------------------------------------------------------------------------------------------
@@ -46,11 +45,11 @@ func (s *TransferService) RegisterConnect(srv *connecttransport.Server) {
 
 // Handler ---------------------------------------------------------------------------------------------------------------
 
-func (s *TransferService) Subscribe(req *v1.SubscribeRequest, stream grpc.ServerStreamingServer[v1.SubscribeResponse]) error {
+func (s *TransferService) Subscribe(req *pb.SubscribeRequest, stream grpc.ServerStreamingServer[pb.SubscribeResponse]) error {
 	s.log.Info("Subscribe", "topic", req.GetTopic(), "last_event_id", req.GetLastEventId())
 
 	for i := 0; i < 5; i++ {
-		msg := &v1.SubscribeResponse{
+		msg := &pb.SubscribeResponse{
 			EventId:   fmt.Sprintf("%s-%d", req.GetTopic(), i+1),
 			EventType: "message",
 			Data:      []byte(fmt.Sprintf("event %d on topic %q", i+1, req.GetTopic())),
@@ -69,7 +68,7 @@ func (s *TransferService) Subscribe(req *v1.SubscribeRequest, stream grpc.Server
 	return nil
 }
 
-func (s *TransferService) Echo(stream grpc.ClientStreamingServer[v1.EchoRequest, v1.EchoResponse]) error {
+func (s *TransferService) Echo(stream grpc.ClientStreamingServer[pb.EchoRequest, pb.EchoResponse]) error {
 	var (
 		totalMessages int32
 		totalBytes    int64
@@ -87,7 +86,7 @@ func (s *TransferService) Echo(stream grpc.ClientStreamingServer[v1.EchoRequest,
 		lastSeq = req.GetSequence()
 	}
 
-	return stream.SendAndClose(&v1.EchoResponse{
+	return stream.SendAndClose(&pb.EchoResponse{
 		TotalMessages: totalMessages,
 		TotalBytes:    totalBytes,
 		LastSequence:  lastSeq,
@@ -95,13 +94,13 @@ func (s *TransferService) Echo(stream grpc.ClientStreamingServer[v1.EchoRequest,
 	})
 }
 
-func (s *TransferService) Pipe(stream grpc.BidiStreamingServer[v1.PipeRequest, v1.PipeResponse]) error {
+func (s *TransferService) Pipe(stream grpc.BidiStreamingServer[pb.PipeRequest, pb.PipeResponse]) error {
 	for {
 		req, err := stream.Recv()
 		if err != nil {
 			return nil // EOF or client closed
 		}
-		if err := stream.Send(&v1.PipeResponse{
+		if err := stream.Send(&pb.PipeResponse{
 			Data:     req.GetData(),
 			Type:     req.GetType(),
 			Sequence: req.GetSequence(),
@@ -111,7 +110,7 @@ func (s *TransferService) Pipe(stream grpc.BidiStreamingServer[v1.PipeRequest, v
 	}
 }
 
-func (s *TransferService) Raw(ctx context.Context, req *v1.RawRequest) (*httpbody.HttpBody, error) {
+func (s *TransferService) Raw(ctx context.Context, req *pb.RawRequest) (*httpbody.HttpBody, error) {
 	s.log.Info("Raw", "content_type", req.GetContentType(), "data_len", len(req.GetData()))
 
 	ct := req.GetContentType()

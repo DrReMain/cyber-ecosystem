@@ -7,6 +7,7 @@
 package v1
 
 import (
+	_ "github.com/go-kratos/kratos/v3/errors"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -80,7 +81,7 @@ var File_cyber_shared_errors_v1_flow_proto protoreflect.FileDescriptor
 
 const file_cyber_shared_errors_v1_flow_proto_rawDesc = "" +
 	"\n" +
-	"!cyber/shared/errors/v1/flow.proto\x12\x16cyber.shared.errors.v1\x1a#cyber/shared/errors/v1/errors.proto*\xcc\x01\n" +
+	"!cyber/shared/errors/v1/flow.proto\x12\x16cyber.shared.errors.v1\x1a\x13errors/errors.proto*\xcc\x01\n" +
 	"\tFlowError\x12 \n" +
 	"\x16FLOW_ERROR_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12\"\n" +
 	"\x17FLOW_ERROR_RATE_LIMITED\x10\xa0\x1f\x1a\x04\xa8E\xad\x03\x12%\n" +
@@ -117,7 +118,6 @@ func file_cyber_shared_errors_v1_flow_proto_init() {
 	if File_cyber_shared_errors_v1_flow_proto != nil {
 		return
 	}
-	file_cyber_shared_errors_v1_errors_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

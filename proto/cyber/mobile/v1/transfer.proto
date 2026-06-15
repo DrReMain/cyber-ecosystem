@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package cyber.mobile.v1;
+
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/mobile/v1";
+
+// Mobile streaming transport messages (Subscribe / Echo / Pipe / Raw) and the
+// MobileTransferService that exposes the streaming primitives
+// (SSE / client-stream / bidi / HttpBody) to mobile clients.
+
+// Subscribe request.
+message SubscribeRequest {
+  // Topic to subscribe.
+  string topic = 1;
+  // Last event ID for reconnection.
+  string last_event_id = 2;
+}
+
+// Subscribe event response.
+message SubscribeResponse {
+  // Event ID for SSE reconnection.
+  string event_id = 1;
+  // Event type for SSE client-side filtering.
+  string event_type = 2;
+  // Event payload.
+  bytes data = 3;
+  // Event timestamp.
+  google.protobuf.Timestamp timestamp = 4;
+}
+
+// Echo request message.
+message EchoRequest {
+  // Message payload.
+  bytes data = 1;
+  // Sequence number.
+  int64 sequence = 2;
+}
+
+// Echo response summary.
+message EchoResponse {
+  // Total messages received.
+  int32 total_messages = 1;
+  // Total bytes received.
+  int64 total_bytes = 2;
+  // Last sequence number.
+  int64 last_sequence = 3;
+  // Round-trip duration in nanoseconds.
+  int64 duration_ns = 4;
+}
+
+// Bidirectional pipe request.
+message PipeRequest {
+  // Message payload.
+  bytes data = 1;
+  // Message type.
+  string type = 2;
+  // Sequence number.
+  int64 sequence = 3;
+}
+
+// Bidirectional pipe response.
+message PipeResponse {
+  // Message payload.
+  bytes data = 1;
+  // Message type.
+  string type = 2;
+  // Sequence number.
+  int64 sequence = 3;
+}
+
+// Raw bytes request.
+message RawRequest {
+  // Desired content type for the response.
+  string content_type = 1;
+  // Request body.
+  bytes data = 2;
+}
+
+// Mobile transfer service. Exposes the streaming transport primitives
+// (SSE / client-stream / bidi / HttpBody) to mobile clients.
+service MobileTransferService {
+  // Subscribe to events via SSE.
+  rpc Subscribe(SubscribeRequest) returns (stream SubscribeResponse) {
+    option (cyber.ext.v1.method_comment) = "订阅事件流";
+    option (google.api.http) = {get: "/api/v1/mobile/transfer/subscribe"};
+  }
+  // Echo back a summary of received messages.
+  rpc Echo(stream EchoRequest) returns (EchoResponse) {
+    option (cyber.ext.v1.method_comment) = "流式回显";
+    option (google.api.http) = {get: "/api/v1/mobile/transfer/echo"};
+  }
+  // Bidirectional data pipe via WebSocket.
+  rpc Pipe(stream PipeRequest) returns (stream PipeResponse) {
+    option (cyber.ext.v1.method_comment) = "双向数据管道";
+    option (google.api.http) = {get: "/api/v1/mobile/transfer/pipe"};
+  }
+  // Return raw bytes via HttpBody.
+  // buf:lint:ignore RPC_RESPONSE_STANDARD_NAME -- HttpBody is intentional: raw binary response, not a conventional *Response message.
+  rpc Raw(RawRequest) returns (google.api.HttpBody) {
+    option (cyber.ext.v1.method_comment) = "原始字节响应";
+    option (google.api.http) = {
+      post: "/api/v1/mobile/transfer/raw"
+      body: "*"
+    };
+  }
+}

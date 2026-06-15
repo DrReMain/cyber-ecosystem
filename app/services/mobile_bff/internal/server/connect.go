@@ -7,6 +7,7 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware/logging"
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
 
+	"cyber-ecosystem/shared-go/kratos/middleware/validator"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 	"cyber-ecosystem/shared-go/kratos/transport/connect/health"
 	"cyber-ecosystem/shared-go/kratos/transport/connect/reflection"
@@ -23,6 +24,7 @@ func NewConnectServer(
 	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, recovery.Recovery())
 	middlewares = append(middlewares, logging.Server(logger))
+	middlewares = append(middlewares, validator.Server())
 
 	var opts = []connect.ServerOption{
 		connect.Middleware(middlewares...),

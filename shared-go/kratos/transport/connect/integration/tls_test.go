@@ -33,7 +33,6 @@ import (
 
 	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
 	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
-	v1 "cyber-ecosystem/gen/go/cyber/transfer/v1"
 )
 
 // tlsSelfSigned generates a self-signed certificate valid for 127.0.0.1 and
@@ -147,7 +146,7 @@ func TestTLSUnary(t *testing.T) {
 	cli, stop := startTLSServer(t)
 	defer stop()
 
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte("hello-tls"),
 	}))
@@ -170,7 +169,7 @@ func TestTLSServerStream(t *testing.T) {
 	cli, stop := startTLSServer(t)
 	defer stop()
 
-	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&v1.SubscribeRequest{Topic: "tls"}))
+	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "tls"}))
 	if err != nil {
 		t.Fatalf("Subscribe over TLS: %v", err)
 	}

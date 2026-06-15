@@ -32,7 +32,6 @@ import (
 
 	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
 	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
-	v1 "cyber-ecosystem/gen/go/cyber/transfer/v1"
 )
 
 // headerService is a testService variant whose server-stream Subscribe sets a
@@ -46,14 +45,14 @@ type headerService struct {
 // Subscribe sets x-custom-header before sending any event and x-custom-trailer
 // before returning, exercising serverStream.SetHeader/SetTrailer -> Connect
 // ResponseHeader/ResponseTrailer propagation (the F10 gap).
-func (headerService) Subscribe(req *v1.SubscribeRequest, stream grpc.ServerStreamingServer[v1.SubscribeResponse]) error {
+func (headerService) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerStreamingServer[mobilepb.SubscribeResponse]) error {
 	// Buffer a header; it is flushed on the first Send (see serverStream.SendMsg
 	// -> flushHeader).
 	if err := stream.SetHeader(metadata.Pairs("x-custom-header", "hv")); err != nil {
 		return err
 	}
 	for i := 0; i < 5; i++ {
-		if err := stream.Send(&v1.SubscribeResponse{
+		if err := stream.Send(&mobilepb.SubscribeResponse{
 			EventId: bytesHeaderEventID(req.GetTopic(), i),
 		}); err != nil {
 			return err
@@ -141,7 +140,7 @@ func TestHeaderTrailerPropagation(t *testing.T) {
 	cli, stop := startServerWithService(t, headerService{})
 	defer stop()
 
-	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&v1.SubscribeRequest{Topic: "hdr"}))
+	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "hdr"}))
 	if err != nil {
 		t.Fatalf("Subscribe: %v", err)
 	}
@@ -185,7 +184,7 @@ type slowService struct {
 
 // Raw sleeps 1 second (longer than the 500ms server timeout) so the
 // server-side context deadline fires before the handler returns.
-func (slowService) Raw(ctx context.Context, _ *v1.RawRequest) (*httpbody.HttpBody, error) {
+func (slowService) Raw(ctx context.Context, _ *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
 	// Wait until the server's unary timeout (set below to 500ms) cancels ctx.
 	select {
 	case <-time.After(1 * time.Second):
@@ -220,7 +219,7 @@ func TestUnaryTimeout(t *testing.T) {
 	defer stop()
 
 	start := time.Now()
-	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		Data: []byte("slow"),
 	}))
 	elapsed := time.Since(start)
@@ -258,7 +257,7 @@ func TestLargeMessageRoundTrip(t *testing.T) {
 
 	want := bytes.Repeat([]byte("a"), 1<<20) // 1 MiB
 
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		ContentType: "application/octet-stream",
 		Data:        want,
 	}))
@@ -299,7 +298,7 @@ func TestConcurrentStreams(t *testing.T) {
 		go func(id int) {
 			defer wg.Done()
 			topic := itoa(id)
-			stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&v1.SubscribeRequest{Topic: topic}))
+			stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: topic}))
 			if err != nil {
 				errCh <- err
 				return
@@ -345,7 +344,7 @@ type errReasonService struct {
 
 // Raw returns kerrors.NotFound("BIG", ...) for the "ERR" sentinel so the
 // Reason survives the kratos->connect->kratos round trip.
-func (errReasonService) Raw(_ context.Context, req *v1.RawRequest) (*httpbody.HttpBody, error) {
+func (errReasonService) Raw(_ context.Context, req *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
 	if string(req.GetData()) == "ERR" {
 		return nil, kerrors.NotFound("BIG", "nope")
 	}
@@ -364,7 +363,7 @@ func TestConnectToErrorE2E(t *testing.T) {
 	cli, stop := startServerWithService(t, errReasonService{})
 	defer stop()
 
-	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		Data: []byte("ERR"),
 	}))
 	if err == nil {

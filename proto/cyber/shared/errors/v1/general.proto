@@ -2,31 +2,31 @@ syntax = "proto3";
 
 package cyber.shared.errors.v1;
 
-import "cyber/shared/errors/v1/errors.proto";
+import "errors/errors.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/shared/errors/v1";
 
 enum GeneralError {
-  option (cyber.shared.errors.v1.default_code) = 500;
+  option (.errors.default_code) = 500;
 
-  GENERAL_ERROR_UNSPECIFIED = 0 [(cyber.shared.errors.v1.code) = 500];
+  GENERAL_ERROR_UNSPECIFIED = 0 [(.errors.code) = 500];
 
   // 1xxx: Client Errors
-  GENERAL_ERROR_INVALID_ARGUMENT = 1000 [(cyber.shared.errors.v1.code) = 400];
-  GENERAL_ERROR_VALIDATION_FAILED = 1001 [(cyber.shared.errors.v1.code) = 400];
-  GENERAL_ERROR_NOT_FOUND = 1002 [(cyber.shared.errors.v1.code) = 404];
-  GENERAL_ERROR_ALREADY_EXISTS = 1003 [(cyber.shared.errors.v1.code) = 409];
-  GENERAL_ERROR_PERMISSION_DENIED = 1004 [(cyber.shared.errors.v1.code) = 403];
-  GENERAL_ERROR_UNAUTHENTICATED = 1005 [(cyber.shared.errors.v1.code) = 401];
-  GENERAL_ERROR_PRECONDITION_FAILED = 1006 [(cyber.shared.errors.v1.code) = 412];
-  GENERAL_ERROR_PAYLOAD_TOO_LARGE = 1007 [(cyber.shared.errors.v1.code) = 413];
-  GENERAL_ERROR_METHOD_NOT_ALLOWED = 1008 [(cyber.shared.errors.v1.code) = 405];
-  GENERAL_ERROR_PAGINATION_INVALID_ARGUMENT = 1009 [(cyber.shared.errors.v1.code) = 400];
+  GENERAL_ERROR_INVALID_ARGUMENT = 1000 [(.errors.code) = 400];
+  GENERAL_ERROR_VALIDATION_FAILED = 1001 [(.errors.code) = 400];
+  GENERAL_ERROR_NOT_FOUND = 1002 [(.errors.code) = 404];
+  GENERAL_ERROR_ALREADY_EXISTS = 1003 [(.errors.code) = 409];
+  GENERAL_ERROR_PERMISSION_DENIED = 1004 [(.errors.code) = 403];
+  GENERAL_ERROR_UNAUTHENTICATED = 1005 [(.errors.code) = 401];
+  GENERAL_ERROR_PRECONDITION_FAILED = 1006 [(.errors.code) = 412];
+  GENERAL_ERROR_PAYLOAD_TOO_LARGE = 1007 [(.errors.code) = 413];
+  GENERAL_ERROR_METHOD_NOT_ALLOWED = 1008 [(.errors.code) = 405];
+  GENERAL_ERROR_PAGINATION_INVALID_ARGUMENT = 1009 [(.errors.code) = 400];
 
   // 2xxx: Server Errors
-  GENERAL_ERROR_INTERNAL = 2000 [(cyber.shared.errors.v1.code) = 500];
-  GENERAL_ERROR_NOT_IMPLEMENTED = 2001 [(cyber.shared.errors.v1.code) = 501];
-  GENERAL_ERROR_UNAVAILABLE = 2002 [(cyber.shared.errors.v1.code) = 503];
-  GENERAL_ERROR_TIMEOUT = 2003 [(cyber.shared.errors.v1.code) = 504];
-  GENERAL_ERROR_RESOURCE_EXHAUSTED = 2004 [(cyber.shared.errors.v1.code) = 429];
+  GENERAL_ERROR_INTERNAL = 2000 [(.errors.code) = 500];
+  GENERAL_ERROR_NOT_IMPLEMENTED = 2001 [(.errors.code) = 501];
+  GENERAL_ERROR_UNAVAILABLE = 2002 [(.errors.code) = 503];
+  GENERAL_ERROR_TIMEOUT = 2003 [(.errors.code) = 504];
+  GENERAL_ERROR_RESOURCE_EXHAUSTED = 2004 [(.errors.code) = 429];
 }

@@ -29,7 +29,7 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	v1 "cyber-ecosystem/gen/go/cyber/transfer/v1"
+	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
 )
 
 const rawProcedure = "/cyber.mobile.v1.MobileTransferService/Raw"
@@ -63,7 +63,7 @@ func TestClientMiddlewareRunsUnary(t *testing.T) {
 	cli, stop := startServerWithClient(t, connect.WithMiddleware(countingMW))
 	defer stop()
 
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte("hello"),
 	}))
@@ -108,7 +108,7 @@ func TestClientMiddlewareRunsStream(t *testing.T) {
 	cli, stop := startServerWithClient(t, connect.WithStreamMiddleware(countingStreamMW))
 	defer stop()
 
-	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&v1.SubscribeRequest{Topic: "mw"}))
+	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "mw"}))
 	if err != nil {
 		t.Fatalf("Subscribe: %v", err)
 	}
@@ -145,7 +145,7 @@ func TestClientTimeout(t *testing.T) {
 	defer stop()
 
 	start := time.Now()
-	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		Data: []byte("SLOW"),
 	}))
 	elapsed := time.Since(start)
@@ -207,7 +207,7 @@ func TestClientCustomTransport(t *testing.T) {
 	cli, stop := startServerWithClient(t, connect.WithTransport(counter))
 	defer stop()
 
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte("via-custom-rt"),
 	}))

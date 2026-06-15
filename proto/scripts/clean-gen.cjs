@@ -28,6 +28,11 @@ if (!dir) {
 }
 
 function clean(target, isRoot) {
+  // No-op when the target doesn't exist yet (fresh checkout with no gen/, or a
+  // manually wiped tree). buf generate (re)creates the tree from scratch.
+  if (!fs.existsSync(target)) {
+    return
+  }
   for (const entry of fs.readdirSync(target, { withFileTypes: true })) {
     if (isRoot && entry.isFile() && PRESERVE.has(entry.name)) {
       continue

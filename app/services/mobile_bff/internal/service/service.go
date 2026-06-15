@@ -18,14 +18,17 @@ var ProviderSet = wire.NewSet(
 	NewRegistrarList,
 	NewResourceService,
 	NewTransferService,
+	NewUserService,
 )
 
 func NewRegistrarList(
 	s1 *ResourceService,
 	s2 *TransferService,
+	s3 *UserService,
 ) []Registrar {
 	return []Registrar{
 		s1,
 		s2,
+		s3,
 	}
 }

@@ -32,7 +32,6 @@ import (
 
 	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
 	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
-	v1 "cyber-ecosystem/gen/go/cyber/transfer/v1"
 )
 
 // taggedService implements TransferServiceServer and stamps every Raw response
@@ -44,7 +43,7 @@ type taggedService struct {
 	tag string
 }
 
-func (s taggedService) Raw(_ context.Context, req *v1.RawRequest) (*httpbody.HttpBody, error) {
+func (s taggedService) Raw(_ context.Context, req *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
 	ct := req.GetContentType()
 	if ct == "" {
 		ct = "application/octet-stream"
@@ -58,13 +57,13 @@ func (s taggedService) Raw(_ context.Context, req *v1.RawRequest) (*httpbody.Htt
 // Subscribe / Echo / Pipe are not used by the discovery tests but must be
 // implemented to satisfy the server registration (the generated handler binds
 // the whole service). They delegate to the base testService behavior.
-func (s taggedService) Subscribe(req *v1.SubscribeRequest, stream grpc.ServerStreamingServer[v1.SubscribeResponse]) error {
+func (s taggedService) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerStreamingServer[mobilepb.SubscribeResponse]) error {
 	return (testService{}).Subscribe(req, stream)
 }
-func (s taggedService) Echo(stream grpc.ClientStreamingServer[v1.EchoRequest, v1.EchoResponse]) error {
+func (s taggedService) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoRequest, mobilepb.EchoResponse]) error {
 	return (testService{}).Echo(stream)
 }
-func (s taggedService) Pipe(stream grpc.BidiStreamingServer[v1.PipeRequest, v1.PipeResponse]) error {
+func (s taggedService) Pipe(stream grpc.BidiStreamingServer[mobilepb.PipeRequest, mobilepb.PipeResponse]) error {
 	return (testService{}).Pipe(stream)
 }
 
@@ -260,7 +259,7 @@ func dialDiscovery(t *testing.T, reg *mockRegistry, extra ...connect.ClientOptio
 // the serving node stamped into the response ("<tag>:<payload>").
 func rawNodeTag(t *testing.T, cli mobilev1connect.MobileTransferServiceClient, payload string) string {
 	t.Helper()
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&v1.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte(payload),
 	}))

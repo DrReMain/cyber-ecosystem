@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package cyber.mobile.v1;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/mobile/v1";
+
+// Mobile_bff business errors (service-level): domain-specific failures the
+// service layer returns actively, distinct from the generic codes in
+// cyber/shared/errors (General/Auth/Flow/Infra). The 6xxx range is reserved for
+// mobile_bff business errors.
+enum ErrorReason {
+  option (.errors.default_code) = 400;
+
+  ERROR_REASON_UNSPECIFIED = 0 [(.errors.code) = 500];
+
+  // A status change the current status does not allow (FSM transition violation).
+  ERROR_REASON_STATUS_INVALID_TRANSITION = 6000 [(.errors.code) = 400];
+}

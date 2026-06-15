@@ -5,7 +5,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	extv1 "cyber-ecosystem/gen/go/cyber/shared/ext/v1"
+	extv1 "cyber-ecosystem/gen/go/cyber/ext/v1"
 )
 
 // ExtractHTTP returns the HTTP method and path from an HttpRule.

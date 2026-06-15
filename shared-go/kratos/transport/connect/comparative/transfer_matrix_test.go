@@ -32,7 +32,6 @@ import (
 
 	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
 	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
-	v1 "cyber-ecosystem/gen/go/cyber/transfer/v1"
 )
 
 // ---------------------------------------------------------------------------
@@ -48,9 +47,9 @@ type matrixTransferSvc struct {
 }
 
 // Subscribe (server-stream): emit 5 events named "<topic>-<i>".
-func (matrixTransferSvc) Subscribe(req *v1.SubscribeRequest, stream grpc.ServerStreamingServer[v1.SubscribeResponse]) error {
+func (matrixTransferSvc) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerStreamingServer[mobilepb.SubscribeResponse]) error {
 	for i := 0; i < 5; i++ {
-		if err := stream.Send(&v1.SubscribeResponse{
+		if err := stream.Send(&mobilepb.SubscribeResponse{
 			EventId: fmt.Sprintf("%s-%d", req.GetTopic(), i+1),
 		}); err != nil {
 			return err
@@ -60,7 +59,7 @@ func (matrixTransferSvc) Subscribe(req *v1.SubscribeRequest, stream grpc.ServerS
 }
 
 // Echo (client-stream): count received messages, return the total.
-func (matrixTransferSvc) Echo(stream grpc.ClientStreamingServer[v1.EchoRequest, v1.EchoResponse]) error {
+func (matrixTransferSvc) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoRequest, mobilepb.EchoResponse]) error {
 	var n int32
 	for {
 		_, err := stream.Recv()
@@ -69,24 +68,24 @@ func (matrixTransferSvc) Echo(stream grpc.ClientStreamingServer[v1.EchoRequest, 
 		}
 		n++
 	}
-	return stream.SendAndClose(&v1.EchoResponse{TotalMessages: n})
+	return stream.SendAndClose(&mobilepb.EchoResponse{TotalMessages: n})
 }
 
 // Pipe (bidi): echo each received message's Data back to the client.
-func (matrixTransferSvc) Pipe(stream grpc.BidiStreamingServer[v1.PipeRequest, v1.PipeResponse]) error {
+func (matrixTransferSvc) Pipe(stream grpc.BidiStreamingServer[mobilepb.PipeRequest, mobilepb.PipeResponse]) error {
 	for {
 		req, err := stream.Recv()
 		if err != nil {
 			return nil // EOF / client closed
 		}
-		if err := stream.Send(&v1.PipeResponse{Data: req.GetData()}); err != nil {
+		if err := stream.Send(&mobilepb.PipeResponse{Data: req.GetData()}); err != nil {
 			return err
 		}
 	}
 }
 
 // Raw (unary): echo the request Data back inside an HttpBody.
-func (matrixTransferSvc) Raw(_ context.Context, req *v1.RawRequest) (*httpbody.HttpBody, error) {
+func (matrixTransferSvc) Raw(_ context.Context, req *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
 	return &httpbody.HttpBody{ContentType: "text/plain", Data: req.GetData()}, nil
 }
 
@@ -217,15 +216,15 @@ func TestMatrixRawUnary(t *testing.T) {
 	ctx := context.Background()
 	const wantData = "hello-raw"
 
-	grpcResp, err := cl.grpc.Raw(ctx, &v1.RawRequest{Data: []byte(wantData)})
+	grpcResp, err := cl.grpc.Raw(ctx, &mobilepb.RawRequest{Data: []byte(wantData)})
 	if err != nil {
 		t.Fatalf("grpc Raw: %v", err)
 	}
-	httpResp, err := cl.http.Raw(ctx, &v1.RawRequest{Data: []byte(wantData)})
+	httpResp, err := cl.http.Raw(ctx, &mobilepb.RawRequest{Data: []byte(wantData)})
 	if err != nil {
 		t.Fatalf("http Raw: %v", err)
 	}
-	connResp, err := cl.connect.Raw(ctx, connectrpc.NewRequest(&v1.RawRequest{Data: []byte(wantData)}))
+	connResp, err := cl.connect.Raw(ctx, connectrpc.NewRequest(&mobilepb.RawRequest{Data: []byte(wantData)}))
 	if err != nil {
 		t.Fatalf("connect Raw: %v", err)
 	}
@@ -259,7 +258,7 @@ func TestMatrixSubscribeServerStream(t *testing.T) {
 	ctx := context.Background()
 
 	// --- grpc ---
-	grpcStream, err := cl.grpc.Subscribe(ctx, &v1.SubscribeRequest{Topic: "t"})
+	grpcStream, err := cl.grpc.Subscribe(ctx, &mobilepb.SubscribeRequest{Topic: "t"})
 	if err != nil {
 		t.Fatalf("grpc Subscribe open: %v", err)
 	}
@@ -280,7 +279,7 @@ func TestMatrixSubscribeServerStream(t *testing.T) {
 	}
 
 	// --- http (SSE) ---
-	httpStream, err := cl.http.Subscribe(ctx, &v1.SubscribeRequest{Topic: "t"})
+	httpStream, err := cl.http.Subscribe(ctx, &mobilepb.SubscribeRequest{Topic: "t"})
 	if err != nil {
 		t.Fatalf("http Subscribe open: %v", err)
 	}
@@ -301,7 +300,7 @@ func TestMatrixSubscribeServerStream(t *testing.T) {
 	}
 
 	// --- connect ---
-	connStream, err := cl.connect.Subscribe(ctx, connectrpc.NewRequest(&v1.SubscribeRequest{Topic: "t"}))
+	connStream, err := cl.connect.Subscribe(ctx, connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "t"}))
 	if err != nil {
 		t.Fatalf("connect Subscribe open: %v", err)
 	}
@@ -350,7 +349,7 @@ func TestMatrixPipeBidi(t *testing.T) {
 	grpcCount := 0
 	for i := 0; i < 3; i++ {
 		payload := fmt.Sprintf("g%d", i)
-		if err := grpcPipe.Send(&v1.PipeRequest{Data: []byte(payload)}); err != nil {
+		if err := grpcPipe.Send(&mobilepb.PipeRequest{Data: []byte(payload)}); err != nil {
 			t.Fatalf("grpc Pipe Send[%d]: %v", i, err)
 		}
 		resp, rerr := grpcPipe.Recv()
@@ -376,7 +375,7 @@ func TestMatrixPipeBidi(t *testing.T) {
 	connCount := 0
 	for i := 0; i < 3; i++ {
 		payload := fmt.Sprintf("c%d", i)
-		if err := connPipe.Send(&v1.PipeRequest{Data: []byte(payload)}); err != nil {
+		if err := connPipe.Send(&mobilepb.PipeRequest{Data: []byte(payload)}); err != nil {
 			t.Fatalf("connect Pipe Send[%d]: %v", i, err)
 		}
 		resp, rerr := connPipe.Receive()
@@ -430,7 +429,7 @@ func TestMatrixPipeBidi(t *testing.T) {
 		t.Fatalf("http Pipe open: %v", err)
 	}
 	const httpPayload = "h-single"
-	if err := httpPipe.Send(&v1.PipeRequest{Data: []byte(httpPayload)}); err != nil {
+	if err := httpPipe.Send(&mobilepb.PipeRequest{Data: []byte(httpPayload)}); err != nil {
 		t.Fatalf("http Pipe Send: %v", err)
 	}
 	resp, rerr := httpPipe.Recv()
@@ -468,7 +467,7 @@ func TestMatrixEchoClientStream(t *testing.T) {
 		t.Fatalf("grpc Echo open: %v", err)
 	}
 	for i := 0; i < 3; i++ {
-		if err := grpcEcho.Send(&v1.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := grpcEcho.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("grpc Echo Send[%d]: %v", i, err)
 		}
 	}
@@ -483,7 +482,7 @@ func TestMatrixEchoClientStream(t *testing.T) {
 		t.Fatalf("http Echo open: %v", err)
 	}
 	for i := 0; i < 3; i++ {
-		if err := httpEcho.Send(&v1.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := httpEcho.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("http Echo Send[%d]: %v", i, err)
 		}
 	}
@@ -495,7 +494,7 @@ func TestMatrixEchoClientStream(t *testing.T) {
 	// --- connect ---
 	connEcho := cl.connect.Echo(ctx)
 	for i := 0; i < 3; i++ {
-		if err := connEcho.Send(&v1.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := connEcho.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("connect Echo Send[%d]: %v", i, err)
 		}
 	}
@@ -534,13 +533,13 @@ func TestMatrixMiddlewareParityTransfer(t *testing.T) {
 
 	ctx := context.Background()
 
-	if _, err := cl.grpc.Raw(ctx, &v1.RawRequest{Data: []byte("a")}); err != nil {
+	if _, err := cl.grpc.Raw(ctx, &mobilepb.RawRequest{Data: []byte("a")}); err != nil {
 		t.Fatalf("grpc Raw: %v", err)
 	}
-	if _, err := cl.http.Raw(ctx, &v1.RawRequest{Data: []byte("a")}); err != nil {
+	if _, err := cl.http.Raw(ctx, &mobilepb.RawRequest{Data: []byte("a")}); err != nil {
 		t.Fatalf("http Raw: %v", err)
 	}
-	if _, err := cl.connect.Raw(ctx, connectrpc.NewRequest(&v1.RawRequest{Data: []byte("a")})); err != nil {
+	if _, err := cl.connect.Raw(ctx, connectrpc.NewRequest(&mobilepb.RawRequest{Data: []byte("a")})); err != nil {
 		t.Fatalf("connect Raw: %v", err)
 	}
 
