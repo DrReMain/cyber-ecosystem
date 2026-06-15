@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-kratos/kratos/v3/middleware"
 	"github.com/go-kratos/kratos/v3/middleware/logging"
+	"github.com/go-kratos/kratos/v3/middleware/metadata"
+	"github.com/go-kratos/kratos/v3/middleware/ratelimit"
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
 	"github.com/go-kratos/kratos/v3/transport/http"
 
@@ -21,6 +23,8 @@ func NewHTTPServer(
 ) *http.Server {
 	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, recovery.Recovery())
+	middlewares = append(middlewares, ratelimit.Server())
+	middlewares = append(middlewares, metadata.Server())
 	middlewares = append(middlewares, logging.Server(logger))
 	middlewares = append(middlewares, validator.Server())
 
