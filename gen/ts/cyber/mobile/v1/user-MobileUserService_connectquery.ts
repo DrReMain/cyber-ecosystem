@@ -12,20 +12,6 @@ import { MobileUserService } from "./user_pb";
 export const createUser = MobileUserService.method.createUser;
 
 /**
- * Update a user.
- *
- * @generated from rpc cyber.mobile.v1.MobileUserService.UpdateUser
- */
-export const updateUser = MobileUserService.method.updateUser;
-
-/**
- * Delete a user.
- *
- * @generated from rpc cyber.mobile.v1.MobileUserService.DeleteUser
- */
-export const deleteUser = MobileUserService.method.deleteUser;
-
-/**
  * Get a user by ID.
  *
  * @generated from rpc cyber.mobile.v1.MobileUserService.GetUser
@@ -40,11 +26,25 @@ export const getUser = MobileUserService.method.getUser;
 export const listUsers = MobileUserService.method.listUsers;
 
 /**
+ * Update a user.
+ *
+ * @generated from rpc cyber.mobile.v1.MobileUserService.UpdateUser
+ */
+export const updateUser = MobileUserService.method.updateUser;
+
+/**
  * Update user status.
  *
  * @generated from rpc cyber.mobile.v1.MobileUserService.UpdateUserStatus
  */
 export const updateUserStatus = MobileUserService.method.updateUserStatus;
+
+/**
+ * Delete a user.
+ *
+ * @generated from rpc cyber.mobile.v1.MobileUserService.DeleteUser
+ */
+export const deleteUser = MobileUserService.method.deleteUser;
 
 /**
  * Sort user position.

@@ -3,8 +3,6 @@ package biz
 import (
 	"context"
 	"log/slog"
-
-	"cyber-ecosystem/app/services/edge_mobile/internal/platform"
 )
 
 // Port ------------------------------------------------------------------------------------------------------------------
@@ -20,7 +18,7 @@ type ResourceUC struct {
 	resourceRP ResourceRP
 }
 
-func NewResourceUC(logger *slog.Logger, tm platform.Transaction, resourceRP ResourceRP) *ResourceUC {
+func NewResourceUC(logger *slog.Logger, tm Transaction, resourceRP ResourceRP) *ResourceUC {
 	return &ResourceUC{
 		UC: UC{
 			log: logger.With("module", "biz/resource_uc"),

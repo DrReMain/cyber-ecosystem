@@ -17,7 +17,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/mobile/v1/user.proto.
  */
 export const file_cyber_mobile_v1_user: GenFile = /*@__PURE__*/
-  fileDesc("ChpjeWJlci9tb2JpbGUvdjEvdXNlci5wcm90bxIPY3liZXIubW9iaWxlLnYxIskCCgRVc2VyEigKAmlkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCmNyZWF0ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCG5pY2tuYW1lGAQgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEiwKBmF2YXRhchgFIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIrCgVwaG9uZRgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIsCgZzdGF0dXMYByABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUikQEKEUNyZWF0ZVVzZXJSZXF1ZXN0EhUKCG5pY2tuYW1lGAEgASgJSACIAQESHgoFcGhvbmUYAiABKAlCCrpIB8gBAXICEAFIAYgBARIhCghwYXNzd29yZBgDIAEoCUIKukgHyAEBcgIQCEgCiAEBQgsKCV9uaWNrbmFtZUIICgZfcGhvbmVCCwoJX3Bhc3N3b3JkIhQKEkNyZWF0ZVVzZXJSZXNwb25zZSK/AQoRVXBkYXRlVXNlclJlcXVlc3QSHAoCaWQYASABKAlCC7pICMgBAXIDmAEUSACIAQESFQoIbmlja25hbWUYAiABKAlIAYgBARISCgVwaG9uZRgDIAEoCUgCiAEBEhUKCHBhc3N3b3JkGAQgASgJSAOIAQESHwoLZmllbGRzX21hc2sYZCADKAlCCrpIB5IBBAgBGAFCBQoDX2lkQgsKCV9uaWNrbmFtZUIICgZfcGhvbmVCCwoJX3Bhc3N3b3JkIhQKElVwZGF0ZVVzZXJSZXNwb25zZSI4ChFEZWxldGVVc2VyUmVxdWVzdBIcCgJpZBgBIAEoCUILukgIyAEBcgOYARRIAIgBAUIFCgNfaWQiFAoSRGVsZXRlVXNlclJlc3BvbnNlIjUKDkdldFVzZXJSZXF1ZXN0EhwKAmlkGAEgASgJQgu6SAjIAQFyA5gBFEgAiAEBQgUKA19pZCI2Cg9HZXRVc2VyUmVzcG9uc2USIwoEdXNlchgBIAEoCzIVLmN5YmVyLm1vYmlsZS52MS5Vc2VyIr0CChBMaXN0VXNlcnNSZXF1ZXN0EjEKBHBhZ2UYASABKAsyIy5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXF1ZXN0EhIKBXBob25lGAIgASgJSACIAQESOQoGc3RhdHVzGAMgASgJQiS6SCFyH1IHZW5hYmxlZFIIZGlzYWJsZWRSCnJlc3RyaWN0ZWRIAYgBARKRAQoIb3JkZXJfYnkYZCADKAlCf7pIfLoBeQoZTGlzdFVzZXJzUmVxdWVzdC5vcmRlcl9ieRIAGlp0aGlzLmFsbChpdGVtLCBzaXplKGl0ZW0pID09IDAgfHwgaXRlbS5tYXRjaGVzKCdeKGNyZWF0ZWRBdHx1cGRhdGVkQXR8c29ydCk6KGFzY3xkZXNjKSQnKSlCCAoGX3Bob25lQgkKB19zdGF0dXMidwoRTGlzdFVzZXJzUmVzcG9uc2USMgoEcGFnZRgBIAEoCzIkLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlc3BvbnNlEi4KBGxpc3QYAiADKAsyIC5jeWJlci5tb2JpbGUudjEuR2V0VXNlclJlc3BvbnNlIocBChdVcGRhdGVVc2VyU3RhdHVzUmVxdWVzdBIcCgJpZBgBIAEoCUILukgIyAEBcgOYARRIAIgBARI8CgZzdGF0dXMYAiABKAlCJ7pIJMgBAXIfUgdlbmFibGVkUghkaXNhYmxlZFIKcmVzdHJpY3RlZEgBiAEBQgUKA19pZEIJCgdfc3RhdHVzIhoKGFVwZGF0ZVVzZXJTdGF0dXNSZXNwb25zZSL6AQoPU29ydFVzZXJSZXF1ZXN0EhwKAmlkGAEgASgJQgu6SAjIAQFyA5gBFEgAiAEBEhQKB3ByZXZfaWQYAiABKAlIAYgBARIUCgduZXh0X2lkGAMgASgJSAKIAQE6frpIexp5Ch9Tb3J0VXNlclJlcXVlc3QucHJldl9pZC1uZXh0X2lkEi5hdCBsZWFzdCBvbmUgb2YgcHJldl9pZCBvciBuZXh0X2lkIGlzIHJlcXVpcmVkGiZoYXModGhpcy5wcmV2X2lkKSB8fCBoYXModGhpcy5uZXh0X2lkKUIFCgNfaWRCCgoIX3ByZXZfaWRCCgoIX25leHRfaWQiEgoQU29ydFVzZXJSZXNwb25zZTL5BwoRTW9iaWxlVXNlclNlcnZpY2UShQEKCkNyZWF0ZVVzZXISIi5jeWJlci5tb2JpbGUudjEuQ3JlYXRlVXNlclJlcXVlc3QaIy5jeWJlci5tb2JpbGUudjEuQ3JlYXRlVXNlclJlc3BvbnNlIi6K0w4M5Yib5bu655So5oi3gtPkkwIYOgEqIhMvYXBpL3YxL21vYmlsZS91c2VyEooBCgpVcGRhdGVVc2VyEiIuY3liZXIubW9iaWxlLnYxLlVwZGF0ZVVzZXJSZXF1ZXN0GiMuY3liZXIubW9iaWxlLnYxLlVwZGF0ZVVzZXJSZXNwb25zZSIzitMODOS/ruaUueeUqOaIt4LT5JMCHToBKhoYL2FwaS92MS9tb2JpbGUvdXNlci97aWR9EocBCgpEZWxldGVVc2VyEiIuY3liZXIubW9iaWxlLnYxLkRlbGV0ZVVzZXJSZXF1ZXN0GiMuY3liZXIubW9iaWxlLnYxLkRlbGV0ZVVzZXJSZXNwb25zZSIwitMODOWIoOmZpOeUqOaIt4LT5JMCGioYL2FwaS92MS9tb2JpbGUvdXNlci97aWR9EoQBCgdHZXRVc2VyEh8uY3liZXIubW9iaWxlLnYxLkdldFVzZXJSZXF1ZXN0GiAuY3liZXIubW9iaWxlLnYxLkdldFVzZXJSZXNwb25zZSI2itMOEuafpeivoueUqOaIt+ivpuaDhYLT5JMCGhIYL2FwaS92MS9tb2JpbGUvdXNlci97aWR9EoUBCglMaXN0VXNlcnMSIS5jeWJlci5tb2JpbGUudjEuTGlzdFVzZXJzUmVxdWVzdBoiLmN5YmVyLm1vYmlsZS52MS5MaXN0VXNlcnNSZXNwb25zZSIxitMOEuafpeivoueUqOaIt+WIl+ihqILT5JMCFRITL2FwaS92MS9tb2JpbGUvdXNlchKpAQoQVXBkYXRlVXNlclN0YXR1cxIoLmN5YmVyLm1vYmlsZS52MS5VcGRhdGVVc2VyU3RhdHVzUmVxdWVzdBopLmN5YmVyLm1vYmlsZS52MS5VcGRhdGVVc2VyU3RhdHVzUmVzcG9uc2UiQIrTDhLkv67mlLnnlKjmiLfnirbmgIGC0+STAiQ6ASoaHy9hcGkvdjEvbW9iaWxlL3VzZXIve2lkfS9zdGF0dXMSiQEKCFNvcnRVc2VyEiAuY3liZXIubW9iaWxlLnYxLlNvcnRVc2VyUmVxdWVzdBohLmN5YmVyLm1vYmlsZS52MS5Tb3J0VXNlclJlc3BvbnNlIjiK0w4M5o6S5bqP55So5oi3gtPkkwIiOgEqGh0vYXBpL3YxL21vYmlsZS91c2VyL3tpZH0vc29ydEIoWiZjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL21vYmlsZS92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_shared_common_v1_pagination, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("ChpjeWJlci9tb2JpbGUvdjEvdXNlci5wcm90bxIPY3liZXIubW9iaWxlLnYxIskCCgRVc2VyEigKAmlkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCmNyZWF0ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCG5pY2tuYW1lGAQgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEiwKBmF2YXRhchgFIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIrCgVwaG9uZRgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIsCgZzdGF0dXMYByABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUizAEKEUNyZWF0ZVVzZXJSZXF1ZXN0Eh4KCG5pY2tuYW1lGAEgASgJQge6SARyAhhASACIAQESIAoFcGhvbmUYAiABKAlCDLpICcgBAXIEEAEYFEgBiAEBEiQKCHBhc3N3b3JkGAMgASgJQg26SArIAQFyBRAIGIABSAKIAQESIAoGYXZhdGFyGAQgASgJQgu6SAhyBhiABIgBAUgDiAEBQgsKCV9uaWNrbmFtZUIICgZfcGhvbmVCCwoJX3Bhc3N3b3JkQgkKB19hdmF0YXIiPgoSQ3JlYXRlVXNlclJlc3BvbnNlEigKAmlkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlIjUKDkdldFVzZXJSZXF1ZXN0EhwKAmlkGAEgASgJQgu6SAjIAQFyA5gBFEgAiAEBQgUKA19pZCI2Cg9HZXRVc2VyUmVzcG9uc2USIwoEdXNlchgBIAEoCzIVLmN5YmVyLm1vYmlsZS52MS5Vc2VyIr0CChBMaXN0VXNlcnNSZXF1ZXN0EjEKBHBhZ2UYASABKAsyIy5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXF1ZXN0EhIKBXBob25lGAIgASgJSACIAQESOQoGc3RhdHVzGAMgASgJQiS6SCFyH1IHZW5hYmxlZFIIZGlzYWJsZWRSCnJlc3RyaWN0ZWRIAYgBARKRAQoIb3JkZXJfYnkYZCADKAlCf7pIfLoBeQoZTGlzdFVzZXJzUmVxdWVzdC5vcmRlcl9ieRIAGlp0aGlzLmFsbChpdGVtLCBzaXplKGl0ZW0pID09IDAgfHwgaXRlbS5tYXRjaGVzKCdeKGNyZWF0ZWRBdHx1cGRhdGVkQXR8c29ydCk6KGFzY3xkZXNjKSQnKSlCCAoGX3Bob25lQgkKB19zdGF0dXMidwoRTGlzdFVzZXJzUmVzcG9uc2USMgoEcGFnZRgBIAEoCzIkLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlc3BvbnNlEi4KBGxpc3QYAiADKAsyIC5jeWJlci5tb2JpbGUudjEuR2V0VXNlclJlc3BvbnNlIogCChFVcGRhdGVVc2VyUmVxdWVzdBIcCgJpZBgBIAEoCUILukgIyAEBcgOYARRIAIgBARIeCghuaWNrbmFtZRgCIAEoCUIHukgEcgIYQEgBiAEBEhsKBXBob25lGAMgASgJQge6SARyAhgUSAKIAQESHwoIcGFzc3dvcmQYBCABKAlCCLpIBXIDGIABSAOIAQESIAoGYXZhdGFyGAUgASgJQgu6SAhyBhiABIgBAUgEiAEBEh8KC2ZpZWxkc19tYXNrGGQgAygJQgq6SAeSAQQIARgBQgUKA19pZEILCglfbmlja25hbWVCCAoGX3Bob25lQgsKCV9wYXNzd29yZEIJCgdfYXZhdGFyIhQKElVwZGF0ZVVzZXJSZXNwb25zZSKHAQoXVXBkYXRlVXNlclN0YXR1c1JlcXVlc3QSHAoCaWQYASABKAlCC7pICMgBAXIDmAEUSACIAQESPAoGc3RhdHVzGAIgASgJQie6SCTIAQFyH1IHZW5hYmxlZFIIZGlzYWJsZWRSCnJlc3RyaWN0ZWRIAYgBAUIFCgNfaWRCCQoHX3N0YXR1cyIaChhVcGRhdGVVc2VyU3RhdHVzUmVzcG9uc2UiOAoRRGVsZXRlVXNlclJlcXVlc3QSHAoCaWQYASABKAlCC7pICMgBAXIDmAEUSACIAQFCBQoDX2lkIhQKEkRlbGV0ZVVzZXJSZXNwb25zZSL6AQoPU29ydFVzZXJSZXF1ZXN0EhwKAmlkGAEgASgJQgu6SAjIAQFyA5gBFEgAiAEBEhQKB3ByZXZfaWQYAiABKAlIAYgBARIUCgduZXh0X2lkGAMgASgJSAKIAQE6frpIexp5Ch9Tb3J0VXNlclJlcXVlc3QucHJldl9pZC1uZXh0X2lkEi5hdCBsZWFzdCBvbmUgb2YgcHJldl9pZCBvciBuZXh0X2lkIGlzIHJlcXVpcmVkGiZoYXModGhpcy5wcmV2X2lkKSB8fCBoYXModGhpcy5uZXh0X2lkKUIFCgNfaWRCCgoIX3ByZXZfaWRCCgoIX25leHRfaWQiEgoQU29ydFVzZXJSZXNwb25zZTL5BwoRTW9iaWxlVXNlclNlcnZpY2UShQEKCkNyZWF0ZVVzZXISIi5jeWJlci5tb2JpbGUudjEuQ3JlYXRlVXNlclJlcXVlc3QaIy5jeWJlci5tb2JpbGUudjEuQ3JlYXRlVXNlclJlc3BvbnNlIi6K0w4M5Yib5bu655So5oi3gtPkkwIYOgEqIhMvYXBpL3YxL21vYmlsZS91c2VyEoQBCgdHZXRVc2VyEh8uY3liZXIubW9iaWxlLnYxLkdldFVzZXJSZXF1ZXN0GiAuY3liZXIubW9iaWxlLnYxLkdldFVzZXJSZXNwb25zZSI2itMOEuafpeivoueUqOaIt+ivpuaDhYLT5JMCGhIYL2FwaS92MS9tb2JpbGUvdXNlci97aWR9EoUBCglMaXN0VXNlcnMSIS5jeWJlci5tb2JpbGUudjEuTGlzdFVzZXJzUmVxdWVzdBoiLmN5YmVyLm1vYmlsZS52MS5MaXN0VXNlcnNSZXNwb25zZSIxitMOEuafpeivoueUqOaIt+WIl+ihqILT5JMCFRITL2FwaS92MS9tb2JpbGUvdXNlchKKAQoKVXBkYXRlVXNlchIiLmN5YmVyLm1vYmlsZS52MS5VcGRhdGVVc2VyUmVxdWVzdBojLmN5YmVyLm1vYmlsZS52MS5VcGRhdGVVc2VyUmVzcG9uc2UiM4rTDgzkv67mlLnnlKjmiLeC0+STAh06ASoaGC9hcGkvdjEvbW9iaWxlL3VzZXIve2lkfRKpAQoQVXBkYXRlVXNlclN0YXR1cxIoLmN5YmVyLm1vYmlsZS52MS5VcGRhdGVVc2VyU3RhdHVzUmVxdWVzdBopLmN5YmVyLm1vYmlsZS52MS5VcGRhdGVVc2VyU3RhdHVzUmVzcG9uc2UiQIrTDhLkv67mlLnnlKjmiLfnirbmgIGC0+STAiQ6ASoaHy9hcGkvdjEvbW9iaWxlL3VzZXIve2lkfS9zdGF0dXMShwEKCkRlbGV0ZVVzZXISIi5jeWJlci5tb2JpbGUudjEuRGVsZXRlVXNlclJlcXVlc3QaIy5jeWJlci5tb2JpbGUudjEuRGVsZXRlVXNlclJlc3BvbnNlIjCK0w4M5Yig6Zmk55So5oi3gtPkkwIaKhgvYXBpL3YxL21vYmlsZS91c2VyL3tpZH0SiQEKCFNvcnRVc2VyEiAuY3liZXIubW9iaWxlLnYxLlNvcnRVc2VyUmVxdWVzdBohLmN5YmVyLm1vYmlsZS52MS5Tb3J0VXNlclJlc3BvbnNlIjiK0w4M5o6S5bqP55So5oi3gtPkkwIiOgEqGh0vYXBpL3YxL21vYmlsZS91c2VyL3tpZH0vc29ydEIoWiZjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL21vYmlsZS92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_shared_common_v1_pagination, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * User resource model. Represents a user account.
@@ -56,9 +56,6 @@ export type User = Message<"cyber.mobile.v1.User"> & {
   phone?: string | undefined;
 
   /**
-   * Account status: enabled | disabled | restricted. Valid transitions are
-   * enforced as a finite state machine in the biz layer.
-   *
    * @generated from field: google.protobuf.StringValue status = 7;
    */
   status?: string | undefined;
@@ -97,6 +94,13 @@ export type CreateUserRequest = Message<"cyber.mobile.v1.CreateUserRequest"> & {
    * @generated from field: optional string password = 3;
    */
   password?: string | undefined;
+
+  /**
+   * Avatar URL (optional; later backed by the storage/upload flow).
+   *
+   * @generated from field: optional string avatar = 4;
+   */
+  avatar?: string | undefined;
 };
 
 /**
@@ -112,6 +116,12 @@ export const CreateUserRequestSchema: GenMessage<CreateUserRequest> = /*@__PURE_
  * @generated from message cyber.mobile.v1.CreateUserResponse
  */
 export type CreateUserResponse = Message<"cyber.mobile.v1.CreateUserResponse"> & {
+  /**
+   * The created user ID.
+   *
+   * @generated from field: google.protobuf.StringValue id = 1;
+   */
+  id?: string | undefined;
 };
 
 /**
@@ -120,106 +130,6 @@ export type CreateUserResponse = Message<"cyber.mobile.v1.CreateUserResponse"> &
  */
 export const CreateUserResponseSchema: GenMessage<CreateUserResponse> = /*@__PURE__*/
   messageDesc(file_cyber_mobile_v1_user, 2);
-
-/**
- * UpdateUser request.
- *
- * @generated from message cyber.mobile.v1.UpdateUserRequest
- */
-export type UpdateUserRequest = Message<"cyber.mobile.v1.UpdateUserRequest"> & {
-  /**
-   * User ID.
-   *
-   * @generated from field: optional string id = 1;
-   */
-  id?: string | undefined;
-
-  /**
-   * Nickname.
-   *
-   * @generated from field: optional string nickname = 2;
-   */
-  nickname?: string | undefined;
-
-  /**
-   * Phone number.
-   *
-   * @generated from field: optional string phone = 3;
-   */
-  phone?: string | undefined;
-
-  /**
-   * Password (set to change credentials).
-   *
-   * @generated from field: optional string password = 4;
-   */
-  password?: string | undefined;
-
-  /**
-   * Fields to update.
-   *
-   * @generated from field: repeated string fields_mask = 100;
-   */
-  fieldsMask: string[];
-};
-
-/**
- * Describes the message cyber.mobile.v1.UpdateUserRequest.
- * Use `create(UpdateUserRequestSchema)` to create a new message.
- */
-export const UpdateUserRequestSchema: GenMessage<UpdateUserRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_mobile_v1_user, 3);
-
-/**
- * UpdateUser response.
- *
- * @generated from message cyber.mobile.v1.UpdateUserResponse
- */
-export type UpdateUserResponse = Message<"cyber.mobile.v1.UpdateUserResponse"> & {
-};
-
-/**
- * Describes the message cyber.mobile.v1.UpdateUserResponse.
- * Use `create(UpdateUserResponseSchema)` to create a new message.
- */
-export const UpdateUserResponseSchema: GenMessage<UpdateUserResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_mobile_v1_user, 4);
-
-/**
- * DeleteUser request.
- *
- * @generated from message cyber.mobile.v1.DeleteUserRequest
- */
-export type DeleteUserRequest = Message<"cyber.mobile.v1.DeleteUserRequest"> & {
-  /**
-   * User ID.
-   *
-   * @generated from field: optional string id = 1;
-   */
-  id?: string | undefined;
-};
-
-/**
- * Describes the message cyber.mobile.v1.DeleteUserRequest.
- * Use `create(DeleteUserRequestSchema)` to create a new message.
- */
-export const DeleteUserRequestSchema: GenMessage<DeleteUserRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_mobile_v1_user, 5);
-
-/**
- * DeleteUser response.
- *
- * @generated from message cyber.mobile.v1.DeleteUserResponse
- */
-export type DeleteUserResponse = Message<"cyber.mobile.v1.DeleteUserResponse"> & {
-};
-
-/**
- * Describes the message cyber.mobile.v1.DeleteUserResponse.
- * Use `create(DeleteUserResponseSchema)` to create a new message.
- */
-export const DeleteUserResponseSchema: GenMessage<DeleteUserResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_mobile_v1_user, 6);
 
 /**
  * GetUser request.
@@ -240,7 +150,7 @@ export type GetUserRequest = Message<"cyber.mobile.v1.GetUserRequest"> & {
  * Use `create(GetUserRequestSchema)` to create a new message.
  */
 export const GetUserRequestSchema: GenMessage<GetUserRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_mobile_v1_user, 7);
+  messageDesc(file_cyber_mobile_v1_user, 3);
 
 /**
  * GetUser response.
@@ -261,7 +171,7 @@ export type GetUserResponse = Message<"cyber.mobile.v1.GetUserResponse"> & {
  * Use `create(GetUserResponseSchema)` to create a new message.
  */
 export const GetUserResponseSchema: GenMessage<GetUserResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_mobile_v1_user, 8);
+  messageDesc(file_cyber_mobile_v1_user, 4);
 
 /**
  * ListUsers request.
@@ -303,7 +213,7 @@ export type ListUsersRequest = Message<"cyber.mobile.v1.ListUsersRequest"> & {
  * Use `create(ListUsersRequestSchema)` to create a new message.
  */
 export const ListUsersRequestSchema: GenMessage<ListUsersRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_mobile_v1_user, 9);
+  messageDesc(file_cyber_mobile_v1_user, 5);
 
 /**
  * ListUsers response.
@@ -331,7 +241,78 @@ export type ListUsersResponse = Message<"cyber.mobile.v1.ListUsersResponse"> & {
  * Use `create(ListUsersResponseSchema)` to create a new message.
  */
 export const ListUsersResponseSchema: GenMessage<ListUsersResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_mobile_v1_user, 10);
+  messageDesc(file_cyber_mobile_v1_user, 6);
+
+/**
+ * UpdateUser request.
+ *
+ * @generated from message cyber.mobile.v1.UpdateUserRequest
+ */
+export type UpdateUserRequest = Message<"cyber.mobile.v1.UpdateUserRequest"> & {
+  /**
+   * User ID.
+   *
+   * @generated from field: optional string id = 1;
+   */
+  id?: string | undefined;
+
+  /**
+   * Nickname.
+   *
+   * @generated from field: optional string nickname = 2;
+   */
+  nickname?: string | undefined;
+
+  /**
+   * Phone number.
+   *
+   * @generated from field: optional string phone = 3;
+   */
+  phone?: string | undefined;
+
+  /**
+   * Password (set to change credentials).
+   *
+   * @generated from field: optional string password = 4;
+   */
+  password?: string | undefined;
+
+  /**
+   * Avatar URL.
+   *
+   * @generated from field: optional string avatar = 5;
+   */
+  avatar?: string | undefined;
+
+  /**
+   * Fields to update.
+   *
+   * @generated from field: repeated string fields_mask = 100;
+   */
+  fieldsMask: string[];
+};
+
+/**
+ * Describes the message cyber.mobile.v1.UpdateUserRequest.
+ * Use `create(UpdateUserRequestSchema)` to create a new message.
+ */
+export const UpdateUserRequestSchema: GenMessage<UpdateUserRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_mobile_v1_user, 7);
+
+/**
+ * UpdateUser response.
+ *
+ * @generated from message cyber.mobile.v1.UpdateUserResponse
+ */
+export type UpdateUserResponse = Message<"cyber.mobile.v1.UpdateUserResponse"> & {
+};
+
+/**
+ * Describes the message cyber.mobile.v1.UpdateUserResponse.
+ * Use `create(UpdateUserResponseSchema)` to create a new message.
+ */
+export const UpdateUserResponseSchema: GenMessage<UpdateUserResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_mobile_v1_user, 8);
 
 /**
  * UpdateUserStatus request.
@@ -359,7 +340,7 @@ export type UpdateUserStatusRequest = Message<"cyber.mobile.v1.UpdateUserStatusR
  * Use `create(UpdateUserStatusRequestSchema)` to create a new message.
  */
 export const UpdateUserStatusRequestSchema: GenMessage<UpdateUserStatusRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_mobile_v1_user, 11);
+  messageDesc(file_cyber_mobile_v1_user, 9);
 
 /**
  * UpdateUserStatus response.
@@ -374,6 +355,42 @@ export type UpdateUserStatusResponse = Message<"cyber.mobile.v1.UpdateUserStatus
  * Use `create(UpdateUserStatusResponseSchema)` to create a new message.
  */
 export const UpdateUserStatusResponseSchema: GenMessage<UpdateUserStatusResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_mobile_v1_user, 10);
+
+/**
+ * DeleteUser request.
+ *
+ * @generated from message cyber.mobile.v1.DeleteUserRequest
+ */
+export type DeleteUserRequest = Message<"cyber.mobile.v1.DeleteUserRequest"> & {
+  /**
+   * User ID.
+   *
+   * @generated from field: optional string id = 1;
+   */
+  id?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.mobile.v1.DeleteUserRequest.
+ * Use `create(DeleteUserRequestSchema)` to create a new message.
+ */
+export const DeleteUserRequestSchema: GenMessage<DeleteUserRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_mobile_v1_user, 11);
+
+/**
+ * DeleteUser response.
+ *
+ * @generated from message cyber.mobile.v1.DeleteUserResponse
+ */
+export type DeleteUserResponse = Message<"cyber.mobile.v1.DeleteUserResponse"> & {
+};
+
+/**
+ * Describes the message cyber.mobile.v1.DeleteUserResponse.
+ * Use `create(DeleteUserResponseSchema)` to create a new message.
+ */
+export const DeleteUserResponseSchema: GenMessage<DeleteUserResponse> = /*@__PURE__*/
   messageDesc(file_cyber_mobile_v1_user, 12);
 
 /**
@@ -445,26 +462,6 @@ export const MobileUserService: GenService<{
     output: typeof CreateUserResponseSchema;
   },
   /**
-   * Update a user.
-   *
-   * @generated from rpc cyber.mobile.v1.MobileUserService.UpdateUser
-   */
-  updateUser: {
-    methodKind: "unary";
-    input: typeof UpdateUserRequestSchema;
-    output: typeof UpdateUserResponseSchema;
-  },
-  /**
-   * Delete a user.
-   *
-   * @generated from rpc cyber.mobile.v1.MobileUserService.DeleteUser
-   */
-  deleteUser: {
-    methodKind: "unary";
-    input: typeof DeleteUserRequestSchema;
-    output: typeof DeleteUserResponseSchema;
-  },
-  /**
    * Get a user by ID.
    *
    * @generated from rpc cyber.mobile.v1.MobileUserService.GetUser
@@ -485,6 +482,16 @@ export const MobileUserService: GenService<{
     output: typeof ListUsersResponseSchema;
   },
   /**
+   * Update a user.
+   *
+   * @generated from rpc cyber.mobile.v1.MobileUserService.UpdateUser
+   */
+  updateUser: {
+    methodKind: "unary";
+    input: typeof UpdateUserRequestSchema;
+    output: typeof UpdateUserResponseSchema;
+  },
+  /**
    * Update user status.
    *
    * @generated from rpc cyber.mobile.v1.MobileUserService.UpdateUserStatus
@@ -493,6 +500,16 @@ export const MobileUserService: GenService<{
     methodKind: "unary";
     input: typeof UpdateUserStatusRequestSchema;
     output: typeof UpdateUserStatusResponseSchema;
+  },
+  /**
+   * Delete a user.
+   *
+   * @generated from rpc cyber.mobile.v1.MobileUserService.DeleteUser
+   */
+  deleteUser: {
+    methodKind: "unary";
+    input: typeof DeleteUserRequestSchema;
+    output: typeof DeleteUserResponseSchema;
   },
   /**
    * Sort user position.

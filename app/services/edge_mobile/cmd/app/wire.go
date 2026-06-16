@@ -27,7 +27,7 @@ func wireApp(*conf.Server, *conf.Data, *slog.Logger) (*kratos.App, func(), error
 		biz.ProviderSet,
 		service.ProviderSet,
 		platform.ProviderSet,
-		wire.Bind(new(platform.Transaction), new(*platform.Platform)),
+		wire.Bind(new(biz.Transaction), new(*platform.Platform)),
 		newApp,
 	))
 }

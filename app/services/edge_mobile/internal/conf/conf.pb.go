@@ -377,7 +377,6 @@ type Data_Database struct {
 	MaxOpenConns    int32                  `protobuf:"varint,7,opt,name=max_open_conns,json=maxOpenConns,proto3" json:"max_open_conns,omitempty"`
 	MaxIdleConns    int32                  `protobuf:"varint,8,opt,name=max_idle_conns,json=maxIdleConns,proto3" json:"max_idle_conns,omitempty"`
 	ConnMaxLifetime *durationpb.Duration   `protobuf:"bytes,9,opt,name=conn_max_lifetime,json=connMaxLifetime,proto3" json:"conn_max_lifetime,omitempty"`
-	Migrate         bool                   `protobuf:"varint,10,opt,name=migrate,proto3" json:"migrate,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -475,13 +474,6 @@ func (x *Data_Database) GetConnMaxLifetime() *durationpb.Duration {
 	return nil
 }
 
-func (x *Data_Database) GetMigrate() bool {
-	if x != nil {
-		return x.Migrate
-	}
-	return false
-}
-
 type Data_Redis struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Network       string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
@@ -574,10 +566,10 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\aConnect\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
-	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xe4\x04\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xca\x04\n" +
 	"\x04Data\x125\n" +
 	"\bdatabase\x18\x01 \x01(\v2\x19.cyber.conf.Data.DatabaseR\bdatabase\x12,\n" +
-	"\x05redis\x18\x02 \x01(\v2\x16.cyber.conf.Data.RedisR\x05redis\x1a\xc0\x02\n" +
+	"\x05redis\x18\x02 \x01(\v2\x16.cyber.conf.Data.RedisR\x05redis\x1a\xa6\x02\n" +
 	"\bDatabase\x12\x16\n" +
 	"\x06driver\x18\x01 \x01(\tR\x06driver\x12\x12\n" +
 	"\x04host\x18\x02 \x01(\tR\x04host\x12\x12\n" +
@@ -587,9 +579,7 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\adb_name\x18\x06 \x01(\tR\x06dbName\x12$\n" +
 	"\x0emax_open_conns\x18\a \x01(\x05R\fmaxOpenConns\x12$\n" +
 	"\x0emax_idle_conns\x18\b \x01(\x05R\fmaxIdleConns\x12E\n" +
-	"\x11conn_max_lifetime\x18\t \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\x12\x18\n" +
-	"\amigrate\x18\n" +
-	" \x01(\bR\amigrate\x1a\xb3\x01\n" +
+	"\x11conn_max_lifetime\x18\t \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\x1a\xb3\x01\n" +
 	"\x05Redis\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x12<\n" +

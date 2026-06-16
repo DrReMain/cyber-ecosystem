@@ -32,6 +32,8 @@ const (
 	ErrorReason_ERROR_REASON_UNSPECIFIED ErrorReason = 0
 	// A status change the current status does not allow (FSM transition violation).
 	ErrorReason_ERROR_REASON_STATUS_INVALID_TRANSITION ErrorReason = 6000
+	// The phone (login account) is already registered.
+	ErrorReason_ERROR_REASON_MOBILE_USER_ALREADY_EXISTS ErrorReason = 6001
 )
 
 // Enum value maps for ErrorReason.
@@ -39,10 +41,12 @@ var (
 	ErrorReason_name = map[int32]string{
 		0:    "ERROR_REASON_UNSPECIFIED",
 		6000: "ERROR_REASON_STATUS_INVALID_TRANSITION",
+		6001: "ERROR_REASON_MOBILE_USER_ALREADY_EXISTS",
 	}
 	ErrorReason_value = map[string]int32{
-		"ERROR_REASON_UNSPECIFIED":               0,
-		"ERROR_REASON_STATUS_INVALID_TRANSITION": 6000,
+		"ERROR_REASON_UNSPECIFIED":                0,
+		"ERROR_REASON_STATUS_INVALID_TRANSITION":  6000,
+		"ERROR_REASON_MOBILE_USER_ALREADY_EXISTS": 6001,
 	}
 )
 
@@ -77,10 +81,11 @@ var File_cyber_mobile_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_mobile_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/mobile/v1/error_reason.proto\x12\x0fcyber.mobile.v1\x1a\x13errors/errors.proto*j\n" +
+	"\"cyber/mobile/v1/error_reason.proto\x12\x0fcyber.mobile.v1\x1a\x13errors/errors.proto*\x9e\x01\n" +
 	"\vErrorReason\x12\"\n" +
 	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x121\n" +
-	"&ERROR_REASON_STATUS_INVALID_TRANSITION\x10\xf0.\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03B(Z&cyber-ecosystem/gen/go/cyber/mobile/v1b\x06proto3"
+	"&ERROR_REASON_STATUS_INVALID_TRANSITION\x10\xf0.\x1a\x04\xa8E\x90\x03\x122\n" +
+	"'ERROR_REASON_MOBILE_USER_ALREADY_EXISTS\x10\xf1.\x1a\x04\xa8E\x99\x03\x1a\x04\xa0E\x90\x03B(Z&cyber-ecosystem/gen/go/cyber/mobile/v1b\x06proto3"
 
 var (
 	file_cyber_mobile_v1_error_reason_proto_rawDescOnce sync.Once

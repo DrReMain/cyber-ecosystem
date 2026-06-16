@@ -21,7 +21,12 @@ import (
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, logger *slog.Logger) (*kratos.App, func(), error) {
-	platformPlatform, cleanup, err := platform.NewPlatform(logger)
+	client, err := platform.NewEntClient(confData)
+	if err != nil {
+		return nil, nil, err
+	}
+	entErrorHandler := platform.NewEntErrorHandler()
+	platformPlatform, cleanup, err := platform.NewPlatform(logger, client, entErrorHandler)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -29,7 +34,9 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger *slog.Logger) 
 	resourceUC := biz.NewResourceUC(logger, platformPlatform, resourceRP)
 	resourceService := service.NewResourceService(logger, resourceUC)
 	transferService := service.NewTransferService(logger)
-	userService := service.NewUserService(logger)
+	mobileUserRP := data.NewMobileUserRP(logger, platformPlatform)
+	mobileUserUC := biz.NewMobileUserUC(logger, platformPlatform, mobileUserRP)
+	userService := service.NewUserService(logger, mobileUserUC)
 	v := service.NewRegistrarList(resourceService, transferService, userService)
 	grpcServer := server.NewGRPCServer(confServer, logger, v)
 	httpServer := server.NewHTTPServer(confServer, logger, v)

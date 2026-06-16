@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"log/slog"
+	"strings"
 
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
@@ -14,8 +15,6 @@ import (
 	"cyber-ecosystem/app/services/edge_mobile/internal/biz"
 	"cyber-ecosystem/app/services/edge_mobile/internal/platform"
 )
-
-// Struct ----------------------------------------------------------------------------------------------------------------
 
 type resourceRP struct {
 	RP
@@ -30,15 +29,18 @@ func NewResourceRP(logger *slog.Logger, p *platform.Platform) biz.ResourceRP {
 	}
 }
 
-// Repo ------------------------------------------------------------------------------------------------------------------
+// Repo --------------------------------------------------------------------------------------------------------
 
-func (rp *resourceRP) ListResource(_ context.Context) ([]*biz.ResourceService, error) {
+func (rp *resourceRP) ListResource(ctx context.Context) ([]*biz.ResourceService, error) {
+	const protoPrefix = "cyber/mobile/v1/"
 	var services []*biz.ResourceService
 
 	protoregistry.GlobalFiles.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
+		if !strings.HasPrefix(fd.Path(), protoPrefix) {
+			return true
+		}
 		for i := 0; i < fd.Services().Len(); i++ {
-			sd := fd.Services().Get(i)
-			services = append(services, buildResourceService(sd, fd))
+			services = append(services, buildResourceService(fd.Services().Get(i), fd))
 		}
 		return true
 	})
@@ -46,7 +48,7 @@ func (rp *resourceRP) ListResource(_ context.Context) ([]*biz.ResourceService, e
 	return services, nil
 }
 
-// Private ---------------------------------------------------------------------------------------------------------------
+// Private --------------------------------------------------------------------------------------------------------
 
 func buildResourceService(sd protoreflect.ServiceDescriptor, fd protoreflect.FileDescriptor) *biz.ResourceService {
 	svc := &biz.ResourceService{

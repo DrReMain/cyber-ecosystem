@@ -20,11 +20,11 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	MobileUserService_CreateUser_FullMethodName       = "/cyber.mobile.v1.MobileUserService/CreateUser"
-	MobileUserService_UpdateUser_FullMethodName       = "/cyber.mobile.v1.MobileUserService/UpdateUser"
-	MobileUserService_DeleteUser_FullMethodName       = "/cyber.mobile.v1.MobileUserService/DeleteUser"
 	MobileUserService_GetUser_FullMethodName          = "/cyber.mobile.v1.MobileUserService/GetUser"
 	MobileUserService_ListUsers_FullMethodName        = "/cyber.mobile.v1.MobileUserService/ListUsers"
+	MobileUserService_UpdateUser_FullMethodName       = "/cyber.mobile.v1.MobileUserService/UpdateUser"
 	MobileUserService_UpdateUserStatus_FullMethodName = "/cyber.mobile.v1.MobileUserService/UpdateUserStatus"
+	MobileUserService_DeleteUser_FullMethodName       = "/cyber.mobile.v1.MobileUserService/DeleteUser"
 	MobileUserService_SortUser_FullMethodName         = "/cyber.mobile.v1.MobileUserService/SortUser"
 )
 
@@ -36,16 +36,16 @@ const (
 type MobileUserServiceClient interface {
 	// Create a user.
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
-	// Update a user.
-	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
-	// Delete a user.
-	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error)
 	// Get a user by ID.
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	// List users with pagination and filters.
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
+	// Update a user.
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	// Update user status.
 	UpdateUserStatus(ctx context.Context, in *UpdateUserStatusRequest, opts ...grpc.CallOption) (*UpdateUserStatusResponse, error)
+	// Delete a user.
+	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error)
 	// Sort user position.
 	SortUser(ctx context.Context, in *SortUserRequest, opts ...grpc.CallOption) (*SortUserResponse, error)
 }
@@ -62,26 +62,6 @@ func (c *mobileUserServiceClient) CreateUser(ctx context.Context, in *CreateUser
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateUserResponse)
 	err := c.cc.Invoke(ctx, MobileUserService_CreateUser_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mobileUserServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateUserResponse)
-	err := c.cc.Invoke(ctx, MobileUserService_UpdateUser_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mobileUserServiceClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteUserResponse)
-	err := c.cc.Invoke(ctx, MobileUserService_DeleteUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,10 +88,30 @@ func (c *mobileUserServiceClient) ListUsers(ctx context.Context, in *ListUsersRe
 	return out, nil
 }
 
+func (c *mobileUserServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateUserResponse)
+	err := c.cc.Invoke(ctx, MobileUserService_UpdateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *mobileUserServiceClient) UpdateUserStatus(ctx context.Context, in *UpdateUserStatusRequest, opts ...grpc.CallOption) (*UpdateUserStatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UpdateUserStatusResponse)
 	err := c.cc.Invoke(ctx, MobileUserService_UpdateUserStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mobileUserServiceClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteUserResponse)
+	err := c.cc.Invoke(ctx, MobileUserService_DeleteUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,16 +136,16 @@ func (c *mobileUserServiceClient) SortUser(ctx context.Context, in *SortUserRequ
 type MobileUserServiceServer interface {
 	// Create a user.
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
-	// Update a user.
-	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
-	// Delete a user.
-	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
 	// Get a user by ID.
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	// List users with pagination and filters.
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
+	// Update a user.
+	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	// Update user status.
 	UpdateUserStatus(context.Context, *UpdateUserStatusRequest) (*UpdateUserStatusResponse, error)
+	// Delete a user.
+	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
 	// Sort user position.
 	SortUser(context.Context, *SortUserRequest) (*SortUserResponse, error)
 	mustEmbedUnimplementedMobileUserServiceServer()
@@ -161,20 +161,20 @@ type UnimplementedMobileUserServiceServer struct{}
 func (UnimplementedMobileUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedMobileUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateUser not implemented")
-}
-func (UnimplementedMobileUserServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteUser not implemented")
-}
 func (UnimplementedMobileUserServiceServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedMobileUserServiceServer) ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListUsers not implemented")
 }
+func (UnimplementedMobileUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateUser not implemented")
+}
 func (UnimplementedMobileUserServiceServer) UpdateUserStatus(context.Context, *UpdateUserStatusRequest) (*UpdateUserStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUserStatus not implemented")
+}
+func (UnimplementedMobileUserServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteUser not implemented")
 }
 func (UnimplementedMobileUserServiceServer) SortUser(context.Context, *SortUserRequest) (*SortUserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SortUser not implemented")
@@ -218,42 +218,6 @@ func _MobileUserService_CreateUser_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MobileUserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MobileUserServiceServer).UpdateUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MobileUserService_UpdateUser_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MobileUserServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MobileUserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteUserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MobileUserServiceServer).DeleteUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MobileUserService_DeleteUser_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MobileUserServiceServer).DeleteUser(ctx, req.(*DeleteUserRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _MobileUserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserRequest)
 	if err := dec(in); err != nil {
@@ -290,6 +254,24 @@ func _MobileUserService_ListUsers_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MobileUserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MobileUserServiceServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MobileUserService_UpdateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MobileUserServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MobileUserService_UpdateUserStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserStatusRequest)
 	if err := dec(in); err != nil {
@@ -304,6 +286,24 @@ func _MobileUserService_UpdateUserStatus_Handler(srv interface{}, ctx context.Co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MobileUserServiceServer).UpdateUserStatus(ctx, req.(*UpdateUserStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MobileUserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MobileUserServiceServer).DeleteUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MobileUserService_DeleteUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MobileUserServiceServer).DeleteUser(ctx, req.(*DeleteUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -338,14 +338,6 @@ var MobileUserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MobileUserService_CreateUser_Handler,
 		},
 		{
-			MethodName: "UpdateUser",
-			Handler:    _MobileUserService_UpdateUser_Handler,
-		},
-		{
-			MethodName: "DeleteUser",
-			Handler:    _MobileUserService_DeleteUser_Handler,
-		},
-		{
 			MethodName: "GetUser",
 			Handler:    _MobileUserService_GetUser_Handler,
 		},
@@ -354,8 +346,16 @@ var MobileUserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MobileUserService_ListUsers_Handler,
 		},
 		{
+			MethodName: "UpdateUser",
+			Handler:    _MobileUserService_UpdateUser_Handler,
+		},
+		{
 			MethodName: "UpdateUserStatus",
 			Handler:    _MobileUserService_UpdateUserStatus_Handler,
+		},
+		{
+			MethodName: "DeleteUser",
+			Handler:    _MobileUserService_DeleteUser_Handler,
 		},
 		{
 			MethodName: "SortUser",

@@ -29,15 +29,13 @@ const (
 
 // User resource model. Represents a user account.
 type User struct {
-	state     protoimpl.MessageState  `protogen:"open.v1"`
-	Id        *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	CreatedAt *timestamppb.Timestamp  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt *timestamppb.Timestamp  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Nickname  *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=nickname,proto3" json:"nickname,omitempty"`
-	Avatar    *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=avatar,proto3" json:"avatar,omitempty"`
-	Phone     *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=phone,proto3" json:"phone,omitempty"`
-	// Account status: enabled | disabled | restricted. Valid transitions are
-	// enforced as a finite state machine in the biz layer.
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Id            *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CreatedAt     *timestamppb.Timestamp  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Nickname      *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Avatar        *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	Phone         *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=phone,proto3" json:"phone,omitempty"`
 	Status        *wrapperspb.StringValue `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -130,7 +128,9 @@ type CreateUserRequest struct {
 	// Phone number, used as the login account. Unique.
 	Phone *string `protobuf:"bytes,2,opt,name=phone,proto3,oneof" json:"phone,omitempty"`
 	// Login password (plaintext over the wire; hashed server-side before storage).
-	Password      *string `protobuf:"bytes,3,opt,name=password,proto3,oneof" json:"password,omitempty"`
+	Password *string `protobuf:"bytes,3,opt,name=password,proto3,oneof" json:"password,omitempty"`
+	// Avatar URL (optional; later backed by the storage/upload flow).
+	Avatar        *string `protobuf:"bytes,4,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -186,9 +186,18 @@ func (x *CreateUserRequest) GetPassword() string {
 	return ""
 }
 
+func (x *CreateUserRequest) GetAvatar() string {
+	if x != nil && x.Avatar != nil {
+		return *x.Avatar
+	}
+	return ""
+}
+
 // CreateUser response.
 type CreateUserResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The created user ID.
+	Id            *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -223,206 +232,11 @@ func (*CreateUserResponse) Descriptor() ([]byte, []int) {
 	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{2}
 }
 
-// UpdateUser request.
-type UpdateUserRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// User ID.
-	Id *string `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
-	// Nickname.
-	Nickname *string `protobuf:"bytes,2,opt,name=nickname,proto3,oneof" json:"nickname,omitempty"`
-	// Phone number.
-	Phone *string `protobuf:"bytes,3,opt,name=phone,proto3,oneof" json:"phone,omitempty"`
-	// Password (set to change credentials).
-	Password *string `protobuf:"bytes,4,opt,name=password,proto3,oneof" json:"password,omitempty"`
-	// Fields to update.
-	FieldsMask    []string `protobuf:"bytes,100,rep,name=fields_mask,json=fieldsMask,proto3" json:"fields_mask,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateUserRequest) Reset() {
-	*x = UpdateUserRequest{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateUserRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateUserRequest) ProtoMessage() {}
-
-func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[3]
+func (x *CreateUserResponse) GetId() *wrapperspb.StringValue {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
-func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *UpdateUserRequest) GetId() string {
-	if x != nil && x.Id != nil {
-		return *x.Id
-	}
-	return ""
-}
-
-func (x *UpdateUserRequest) GetNickname() string {
-	if x != nil && x.Nickname != nil {
-		return *x.Nickname
-	}
-	return ""
-}
-
-func (x *UpdateUserRequest) GetPhone() string {
-	if x != nil && x.Phone != nil {
-		return *x.Phone
-	}
-	return ""
-}
-
-func (x *UpdateUserRequest) GetPassword() string {
-	if x != nil && x.Password != nil {
-		return *x.Password
-	}
-	return ""
-}
-
-func (x *UpdateUserRequest) GetFieldsMask() []string {
-	if x != nil {
-		return x.FieldsMask
+		return x.Id
 	}
 	return nil
-}
-
-// UpdateUser response.
-type UpdateUserResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateUserResponse) Reset() {
-	*x = UpdateUserResponse{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateUserResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateUserResponse) ProtoMessage() {}
-
-func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateUserResponse.ProtoReflect.Descriptor instead.
-func (*UpdateUserResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{4}
-}
-
-// DeleteUser request.
-type DeleteUserRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// User ID.
-	Id            *string `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteUserRequest) Reset() {
-	*x = DeleteUserRequest{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteUserRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteUserRequest) ProtoMessage() {}
-
-func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
-func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *DeleteUserRequest) GetId() string {
-	if x != nil && x.Id != nil {
-		return *x.Id
-	}
-	return ""
-}
-
-// DeleteUser response.
-type DeleteUserResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteUserResponse) Reset() {
-	*x = DeleteUserResponse{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteUserResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteUserResponse) ProtoMessage() {}
-
-func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteUserResponse.ProtoReflect.Descriptor instead.
-func (*DeleteUserResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{6}
 }
 
 // GetUser request.
@@ -436,7 +250,7 @@ type GetUserRequest struct {
 
 func (x *GetUserRequest) Reset() {
 	*x = GetUserRequest{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[7]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -448,7 +262,7 @@ func (x *GetUserRequest) String() string {
 func (*GetUserRequest) ProtoMessage() {}
 
 func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[7]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -461,7 +275,7 @@ func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
 func (*GetUserRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{7}
+	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetUserRequest) GetId() string {
@@ -482,7 +296,7 @@ type GetUserResponse struct {
 
 func (x *GetUserResponse) Reset() {
 	*x = GetUserResponse{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[8]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -494,7 +308,7 @@ func (x *GetUserResponse) String() string {
 func (*GetUserResponse) ProtoMessage() {}
 
 func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[8]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -507,7 +321,7 @@ func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserResponse.ProtoReflect.Descriptor instead.
 func (*GetUserResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{8}
+	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetUserResponse) GetUser() *User {
@@ -534,7 +348,7 @@ type ListUsersRequest struct {
 
 func (x *ListUsersRequest) Reset() {
 	*x = ListUsersRequest{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[9]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -546,7 +360,7 @@ func (x *ListUsersRequest) String() string {
 func (*ListUsersRequest) ProtoMessage() {}
 
 func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[9]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -559,7 +373,7 @@ func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
 func (*ListUsersRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{9}
+	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListUsersRequest) GetPage() *v1.PageRequest {
@@ -603,7 +417,7 @@ type ListUsersResponse struct {
 
 func (x *ListUsersResponse) Reset() {
 	*x = ListUsersResponse{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[10]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -615,7 +429,7 @@ func (x *ListUsersResponse) String() string {
 func (*ListUsersResponse) ProtoMessage() {}
 
 func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[10]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -628,7 +442,7 @@ func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
 func (*ListUsersResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{10}
+	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListUsersResponse) GetPage() *v1.PageResponse {
@@ -645,6 +459,134 @@ func (x *ListUsersResponse) GetList() []*GetUserResponse {
 	return nil
 }
 
+// UpdateUser request.
+type UpdateUserRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// User ID.
+	Id *string `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	// Nickname.
+	Nickname *string `protobuf:"bytes,2,opt,name=nickname,proto3,oneof" json:"nickname,omitempty"`
+	// Phone number.
+	Phone *string `protobuf:"bytes,3,opt,name=phone,proto3,oneof" json:"phone,omitempty"`
+	// Password (set to change credentials).
+	Password *string `protobuf:"bytes,4,opt,name=password,proto3,oneof" json:"password,omitempty"`
+	// Avatar URL.
+	Avatar *string `protobuf:"bytes,5,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
+	// Fields to update.
+	FieldsMask    []string `protobuf:"bytes,100,rep,name=fields_mask,json=fieldsMask,proto3" json:"fields_mask,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserRequest) Reset() {
+	*x = UpdateUserRequest{}
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserRequest) ProtoMessage() {}
+
+func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdateUserRequest) GetId() string {
+	if x != nil && x.Id != nil {
+		return *x.Id
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetNickname() string {
+	if x != nil && x.Nickname != nil {
+		return *x.Nickname
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetPhone() string {
+	if x != nil && x.Phone != nil {
+		return *x.Phone
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetPassword() string {
+	if x != nil && x.Password != nil {
+		return *x.Password
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetAvatar() string {
+	if x != nil && x.Avatar != nil {
+		return *x.Avatar
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetFieldsMask() []string {
+	if x != nil {
+		return x.FieldsMask
+	}
+	return nil
+}
+
+// UpdateUser response.
+type UpdateUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserResponse) Reset() {
+	*x = UpdateUserResponse{}
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserResponse) ProtoMessage() {}
+
+func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserResponse.ProtoReflect.Descriptor instead.
+func (*UpdateUserResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{8}
+}
+
 // UpdateUserStatus request.
 type UpdateUserStatusRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -658,7 +600,7 @@ type UpdateUserStatusRequest struct {
 
 func (x *UpdateUserStatusRequest) Reset() {
 	*x = UpdateUserStatusRequest{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[11]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -670,7 +612,7 @@ func (x *UpdateUserStatusRequest) String() string {
 func (*UpdateUserStatusRequest) ProtoMessage() {}
 
 func (x *UpdateUserStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[11]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -683,7 +625,7 @@ func (x *UpdateUserStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserStatusRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserStatusRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{11}
+	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UpdateUserStatusRequest) GetId() string {
@@ -709,7 +651,7 @@ type UpdateUserStatusResponse struct {
 
 func (x *UpdateUserStatusResponse) Reset() {
 	*x = UpdateUserStatusResponse{}
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[12]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -721,7 +663,7 @@ func (x *UpdateUserStatusResponse) String() string {
 func (*UpdateUserStatusResponse) ProtoMessage() {}
 
 func (x *UpdateUserStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_mobile_v1_user_proto_msgTypes[12]
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -734,6 +676,89 @@ func (x *UpdateUserStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserStatusResponse.ProtoReflect.Descriptor instead.
 func (*UpdateUserStatusResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{10}
+}
+
+// DeleteUser request.
+type DeleteUserRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// User ID.
+	Id            *string `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserRequest) Reset() {
+	*x = DeleteUserRequest{}
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserRequest) ProtoMessage() {}
+
+func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
+func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeleteUserRequest) GetId() string {
+	if x != nil && x.Id != nil {
+		return *x.Id
+	}
+	return ""
+}
+
+// DeleteUser response.
+type DeleteUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserResponse) Reset() {
+	*x = DeleteUserResponse{}
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserResponse) ProtoMessage() {}
+
+func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_mobile_v1_user_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserResponse.ProtoReflect.Descriptor instead.
+func (*DeleteUserResponse) Descriptor() ([]byte, []int) {
 	return file_cyber_mobile_v1_user_proto_rawDescGZIP(), []int{12}
 }
 
@@ -854,34 +879,19 @@ const file_cyber_mobile_v1_user_proto_rawDesc = "" +
 	"\bnickname\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\bnickname\x124\n" +
 	"\x06avatar\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar\x122\n" +
 	"\x05phone\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\x05phone\x124\n" +
-	"\x06status\x18\a \x01(\v2\x1c.google.protobuf.StringValueR\x06status\"\xac\x01\n" +
-	"\x11CreateUserRequest\x12\x1f\n" +
-	"\bnickname\x18\x01 \x01(\tH\x00R\bnickname\x88\x01\x01\x12%\n" +
-	"\x05phone\x18\x02 \x01(\tB\n" +
-	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x01R\x05phone\x88\x01\x01\x12+\n" +
-	"\bpassword\x18\x03 \x01(\tB\n" +
-	"\xbaH\a\xc8\x01\x01r\x02\x10\bH\x02R\bpassword\x88\x01\x01B\v\n" +
+	"\x06status\x18\a \x01(\v2\x1c.google.protobuf.StringValueR\x06status\"\xef\x01\n" +
+	"\x11CreateUserRequest\x12(\n" +
+	"\bnickname\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x18@H\x00R\bnickname\x88\x01\x01\x12'\n" +
+	"\x05phone\x18\x02 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18\x14H\x01R\x05phone\x88\x01\x01\x12.\n" +
+	"\bpassword\x18\x03 \x01(\tB\r\xbaH\n" +
+	"\xc8\x01\x01r\x05\x10\b\x18\x80\x01H\x02R\bpassword\x88\x01\x01\x12(\n" +
+	"\x06avatar\x18\x04 \x01(\tB\v\xbaH\br\x06\x18\x80\x04\x88\x01\x01H\x03R\x06avatar\x88\x01\x01B\v\n" +
 	"\t_nicknameB\b\n" +
 	"\x06_phoneB\v\n" +
-	"\t_password\"\x14\n" +
-	"\x12CreateUserResponse\"\xea\x01\n" +
-	"\x11UpdateUserRequest\x12 \n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01\x12\x1f\n" +
-	"\bnickname\x18\x02 \x01(\tH\x01R\bnickname\x88\x01\x01\x12\x19\n" +
-	"\x05phone\x18\x03 \x01(\tH\x02R\x05phone\x88\x01\x01\x12\x1f\n" +
-	"\bpassword\x18\x04 \x01(\tH\x03R\bpassword\x88\x01\x01\x12+\n" +
-	"\vfields_mask\x18d \x03(\tB\n" +
-	"\xbaH\a\x92\x01\x04\b\x01\x18\x01R\n" +
-	"fieldsMaskB\x05\n" +
-	"\x03_idB\v\n" +
-	"\t_nicknameB\b\n" +
-	"\x06_phoneB\v\n" +
-	"\t_password\"\x14\n" +
-	"\x12UpdateUserResponse\"<\n" +
-	"\x11DeleteUserRequest\x12 \n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01B\x05\n" +
-	"\x03_id\"\x14\n" +
-	"\x12DeleteUserResponse\"9\n" +
+	"\t_passwordB\t\n" +
+	"\a_avatar\"B\n" +
+	"\x12CreateUserResponse\x12,\n" +
+	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"9\n" +
 	"\x0eGetUserRequest\x12 \n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01B\x05\n" +
 	"\x03_id\"<\n" +
@@ -898,14 +908,33 @@ const file_cyber_mobile_v1_user_proto_rawDesc = "" +
 	"\a_status\"\x83\x01\n" +
 	"\x11ListUsersResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x124\n" +
-	"\x04list\x18\x02 \x03(\v2 .cyber.mobile.v1.GetUserResponseR\x04list\"\x93\x01\n" +
+	"\x04list\x18\x02 \x03(\v2 .cyber.mobile.v1.GetUserResponseR\x04list\"\xbb\x02\n" +
+	"\x11UpdateUserRequest\x12 \n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01\x12(\n" +
+	"\bnickname\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x18@H\x01R\bnickname\x88\x01\x01\x12\"\n" +
+	"\x05phone\x18\x03 \x01(\tB\a\xbaH\x04r\x02\x18\x14H\x02R\x05phone\x88\x01\x01\x12)\n" +
+	"\bpassword\x18\x04 \x01(\tB\b\xbaH\x05r\x03\x18\x80\x01H\x03R\bpassword\x88\x01\x01\x12(\n" +
+	"\x06avatar\x18\x05 \x01(\tB\v\xbaH\br\x06\x18\x80\x04\x88\x01\x01H\x04R\x06avatar\x88\x01\x01\x12+\n" +
+	"\vfields_mask\x18d \x03(\tB\n" +
+	"\xbaH\a\x92\x01\x04\b\x01\x18\x01R\n" +
+	"fieldsMaskB\x05\n" +
+	"\x03_idB\v\n" +
+	"\t_nicknameB\b\n" +
+	"\x06_phoneB\v\n" +
+	"\t_passwordB\t\n" +
+	"\a_avatar\"\x14\n" +
+	"\x12UpdateUserResponse\"\x93\x01\n" +
 	"\x17UpdateUserStatusRequest\x12 \n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01\x12D\n" +
 	"\x06status\x18\x02 \x01(\tB'\xbaH$\xc8\x01\x01r\x1fR\aenabledR\bdisabledR\n" +
 	"restrictedH\x01R\x06status\x88\x01\x01B\x05\n" +
 	"\x03_idB\t\n" +
 	"\a_status\"\x1a\n" +
-	"\x18UpdateUserStatusResponse\"\x8e\x02\n" +
+	"\x18UpdateUserStatusResponse\"<\n" +
+	"\x11DeleteUserRequest\x12 \n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01B\x05\n" +
+	"\x03_id\"\x14\n" +
+	"\x12DeleteUserResponse\"\x8e\x02\n" +
 	"\x0fSortUserRequest\x12 \n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01\x12\x1c\n" +
 	"\aprev_id\x18\x02 \x01(\tH\x01R\x06prevId\x88\x01\x01\x12\x1c\n" +
@@ -919,14 +948,14 @@ const file_cyber_mobile_v1_user_proto_rawDesc = "" +
 	"\x10SortUserResponse2\xf9\a\n" +
 	"\x11MobileUserService\x12\x85\x01\n" +
 	"\n" +
-	"CreateUser\x12\".cyber.mobile.v1.CreateUserRequest\x1a#.cyber.mobile.v1.CreateUserResponse\".\x8a\xd3\x0e\f创建用户\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/mobile/user\x12\x8a\x01\n" +
-	"\n" +
-	"UpdateUser\x12\".cyber.mobile.v1.UpdateUserRequest\x1a#.cyber.mobile.v1.UpdateUserResponse\"3\x8a\xd3\x0e\f修改用户\x82\xd3\xe4\x93\x02\x1d:\x01*\x1a\x18/api/v1/mobile/user/{id}\x12\x87\x01\n" +
-	"\n" +
-	"DeleteUser\x12\".cyber.mobile.v1.DeleteUserRequest\x1a#.cyber.mobile.v1.DeleteUserResponse\"0\x8a\xd3\x0e\f删除用户\x82\xd3\xe4\x93\x02\x1a*\x18/api/v1/mobile/user/{id}\x12\x84\x01\n" +
+	"CreateUser\x12\".cyber.mobile.v1.CreateUserRequest\x1a#.cyber.mobile.v1.CreateUserResponse\".\x8a\xd3\x0e\f创建用户\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/mobile/user\x12\x84\x01\n" +
 	"\aGetUser\x12\x1f.cyber.mobile.v1.GetUserRequest\x1a .cyber.mobile.v1.GetUserResponse\"6\x8a\xd3\x0e\x12查询用户详情\x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/mobile/user/{id}\x12\x85\x01\n" +
-	"\tListUsers\x12!.cyber.mobile.v1.ListUsersRequest\x1a\".cyber.mobile.v1.ListUsersResponse\"1\x8a\xd3\x0e\x12查询用户列表\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/mobile/user\x12\xa9\x01\n" +
-	"\x10UpdateUserStatus\x12(.cyber.mobile.v1.UpdateUserStatusRequest\x1a).cyber.mobile.v1.UpdateUserStatusResponse\"@\x8a\xd3\x0e\x12修改用户状态\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/api/v1/mobile/user/{id}/status\x12\x89\x01\n" +
+	"\tListUsers\x12!.cyber.mobile.v1.ListUsersRequest\x1a\".cyber.mobile.v1.ListUsersResponse\"1\x8a\xd3\x0e\x12查询用户列表\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/mobile/user\x12\x8a\x01\n" +
+	"\n" +
+	"UpdateUser\x12\".cyber.mobile.v1.UpdateUserRequest\x1a#.cyber.mobile.v1.UpdateUserResponse\"3\x8a\xd3\x0e\f修改用户\x82\xd3\xe4\x93\x02\x1d:\x01*\x1a\x18/api/v1/mobile/user/{id}\x12\xa9\x01\n" +
+	"\x10UpdateUserStatus\x12(.cyber.mobile.v1.UpdateUserStatusRequest\x1a).cyber.mobile.v1.UpdateUserStatusResponse\"@\x8a\xd3\x0e\x12修改用户状态\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/api/v1/mobile/user/{id}/status\x12\x87\x01\n" +
+	"\n" +
+	"DeleteUser\x12\".cyber.mobile.v1.DeleteUserRequest\x1a#.cyber.mobile.v1.DeleteUserResponse\"0\x8a\xd3\x0e\f删除用户\x82\xd3\xe4\x93\x02\x1a*\x18/api/v1/mobile/user/{id}\x12\x89\x01\n" +
 	"\bSortUser\x12 .cyber.mobile.v1.SortUserRequest\x1a!.cyber.mobile.v1.SortUserResponse\"8\x8a\xd3\x0e\f排序用户\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/api/v1/mobile/user/{id}/sortB(Z&cyber-ecosystem/gen/go/cyber/mobile/v1b\x06proto3"
 
 var (
@@ -946,16 +975,16 @@ var file_cyber_mobile_v1_user_proto_goTypes = []any{
 	(*User)(nil),                     // 0: cyber.mobile.v1.User
 	(*CreateUserRequest)(nil),        // 1: cyber.mobile.v1.CreateUserRequest
 	(*CreateUserResponse)(nil),       // 2: cyber.mobile.v1.CreateUserResponse
-	(*UpdateUserRequest)(nil),        // 3: cyber.mobile.v1.UpdateUserRequest
-	(*UpdateUserResponse)(nil),       // 4: cyber.mobile.v1.UpdateUserResponse
-	(*DeleteUserRequest)(nil),        // 5: cyber.mobile.v1.DeleteUserRequest
-	(*DeleteUserResponse)(nil),       // 6: cyber.mobile.v1.DeleteUserResponse
-	(*GetUserRequest)(nil),           // 7: cyber.mobile.v1.GetUserRequest
-	(*GetUserResponse)(nil),          // 8: cyber.mobile.v1.GetUserResponse
-	(*ListUsersRequest)(nil),         // 9: cyber.mobile.v1.ListUsersRequest
-	(*ListUsersResponse)(nil),        // 10: cyber.mobile.v1.ListUsersResponse
-	(*UpdateUserStatusRequest)(nil),  // 11: cyber.mobile.v1.UpdateUserStatusRequest
-	(*UpdateUserStatusResponse)(nil), // 12: cyber.mobile.v1.UpdateUserStatusResponse
+	(*GetUserRequest)(nil),           // 3: cyber.mobile.v1.GetUserRequest
+	(*GetUserResponse)(nil),          // 4: cyber.mobile.v1.GetUserResponse
+	(*ListUsersRequest)(nil),         // 5: cyber.mobile.v1.ListUsersRequest
+	(*ListUsersResponse)(nil),        // 6: cyber.mobile.v1.ListUsersResponse
+	(*UpdateUserRequest)(nil),        // 7: cyber.mobile.v1.UpdateUserRequest
+	(*UpdateUserResponse)(nil),       // 8: cyber.mobile.v1.UpdateUserResponse
+	(*UpdateUserStatusRequest)(nil),  // 9: cyber.mobile.v1.UpdateUserStatusRequest
+	(*UpdateUserStatusResponse)(nil), // 10: cyber.mobile.v1.UpdateUserStatusResponse
+	(*DeleteUserRequest)(nil),        // 11: cyber.mobile.v1.DeleteUserRequest
+	(*DeleteUserResponse)(nil),       // 12: cyber.mobile.v1.DeleteUserResponse
 	(*SortUserRequest)(nil),          // 13: cyber.mobile.v1.SortUserRequest
 	(*SortUserResponse)(nil),         // 14: cyber.mobile.v1.SortUserResponse
 	(*wrapperspb.StringValue)(nil),   // 15: google.protobuf.StringValue
@@ -971,29 +1000,30 @@ var file_cyber_mobile_v1_user_proto_depIdxs = []int32{
 	15, // 4: cyber.mobile.v1.User.avatar:type_name -> google.protobuf.StringValue
 	15, // 5: cyber.mobile.v1.User.phone:type_name -> google.protobuf.StringValue
 	15, // 6: cyber.mobile.v1.User.status:type_name -> google.protobuf.StringValue
-	0,  // 7: cyber.mobile.v1.GetUserResponse.user:type_name -> cyber.mobile.v1.User
-	17, // 8: cyber.mobile.v1.ListUsersRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	18, // 9: cyber.mobile.v1.ListUsersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	8,  // 10: cyber.mobile.v1.ListUsersResponse.list:type_name -> cyber.mobile.v1.GetUserResponse
-	1,  // 11: cyber.mobile.v1.MobileUserService.CreateUser:input_type -> cyber.mobile.v1.CreateUserRequest
-	3,  // 12: cyber.mobile.v1.MobileUserService.UpdateUser:input_type -> cyber.mobile.v1.UpdateUserRequest
-	5,  // 13: cyber.mobile.v1.MobileUserService.DeleteUser:input_type -> cyber.mobile.v1.DeleteUserRequest
-	7,  // 14: cyber.mobile.v1.MobileUserService.GetUser:input_type -> cyber.mobile.v1.GetUserRequest
-	9,  // 15: cyber.mobile.v1.MobileUserService.ListUsers:input_type -> cyber.mobile.v1.ListUsersRequest
-	11, // 16: cyber.mobile.v1.MobileUserService.UpdateUserStatus:input_type -> cyber.mobile.v1.UpdateUserStatusRequest
-	13, // 17: cyber.mobile.v1.MobileUserService.SortUser:input_type -> cyber.mobile.v1.SortUserRequest
-	2,  // 18: cyber.mobile.v1.MobileUserService.CreateUser:output_type -> cyber.mobile.v1.CreateUserResponse
-	4,  // 19: cyber.mobile.v1.MobileUserService.UpdateUser:output_type -> cyber.mobile.v1.UpdateUserResponse
-	6,  // 20: cyber.mobile.v1.MobileUserService.DeleteUser:output_type -> cyber.mobile.v1.DeleteUserResponse
-	8,  // 21: cyber.mobile.v1.MobileUserService.GetUser:output_type -> cyber.mobile.v1.GetUserResponse
-	10, // 22: cyber.mobile.v1.MobileUserService.ListUsers:output_type -> cyber.mobile.v1.ListUsersResponse
-	12, // 23: cyber.mobile.v1.MobileUserService.UpdateUserStatus:output_type -> cyber.mobile.v1.UpdateUserStatusResponse
-	14, // 24: cyber.mobile.v1.MobileUserService.SortUser:output_type -> cyber.mobile.v1.SortUserResponse
-	18, // [18:25] is the sub-list for method output_type
-	11, // [11:18] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	15, // 7: cyber.mobile.v1.CreateUserResponse.id:type_name -> google.protobuf.StringValue
+	0,  // 8: cyber.mobile.v1.GetUserResponse.user:type_name -> cyber.mobile.v1.User
+	17, // 9: cyber.mobile.v1.ListUsersRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	18, // 10: cyber.mobile.v1.ListUsersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	4,  // 11: cyber.mobile.v1.ListUsersResponse.list:type_name -> cyber.mobile.v1.GetUserResponse
+	1,  // 12: cyber.mobile.v1.MobileUserService.CreateUser:input_type -> cyber.mobile.v1.CreateUserRequest
+	3,  // 13: cyber.mobile.v1.MobileUserService.GetUser:input_type -> cyber.mobile.v1.GetUserRequest
+	5,  // 14: cyber.mobile.v1.MobileUserService.ListUsers:input_type -> cyber.mobile.v1.ListUsersRequest
+	7,  // 15: cyber.mobile.v1.MobileUserService.UpdateUser:input_type -> cyber.mobile.v1.UpdateUserRequest
+	9,  // 16: cyber.mobile.v1.MobileUserService.UpdateUserStatus:input_type -> cyber.mobile.v1.UpdateUserStatusRequest
+	11, // 17: cyber.mobile.v1.MobileUserService.DeleteUser:input_type -> cyber.mobile.v1.DeleteUserRequest
+	13, // 18: cyber.mobile.v1.MobileUserService.SortUser:input_type -> cyber.mobile.v1.SortUserRequest
+	2,  // 19: cyber.mobile.v1.MobileUserService.CreateUser:output_type -> cyber.mobile.v1.CreateUserResponse
+	4,  // 20: cyber.mobile.v1.MobileUserService.GetUser:output_type -> cyber.mobile.v1.GetUserResponse
+	6,  // 21: cyber.mobile.v1.MobileUserService.ListUsers:output_type -> cyber.mobile.v1.ListUsersResponse
+	8,  // 22: cyber.mobile.v1.MobileUserService.UpdateUser:output_type -> cyber.mobile.v1.UpdateUserResponse
+	10, // 23: cyber.mobile.v1.MobileUserService.UpdateUserStatus:output_type -> cyber.mobile.v1.UpdateUserStatusResponse
+	12, // 24: cyber.mobile.v1.MobileUserService.DeleteUser:output_type -> cyber.mobile.v1.DeleteUserResponse
+	14, // 25: cyber.mobile.v1.MobileUserService.SortUser:output_type -> cyber.mobile.v1.SortUserResponse
+	19, // [19:26] is the sub-list for method output_type
+	12, // [12:19] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_cyber_mobile_v1_user_proto_init() }

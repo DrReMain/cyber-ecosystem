@@ -1,16 +1,22 @@
 package biz
 
 import (
+	"context"
 	"log/slog"
 
 	"github.com/google/wire"
-
-	"cyber-ecosystem/app/services/edge_mobile/internal/platform"
 )
+
+type Transaction interface {
+	InTx(ctx context.Context, fn func(context.Context) error) error
+}
 
 type UC struct {
 	log *slog.Logger
-	tm  platform.Transaction
+	tm  Transaction
 }
 
-var ProviderSet = wire.NewSet(NewResourceUC)
+var ProviderSet = wire.NewSet(
+	NewResourceUC,
+	NewMobileUserUC,
+)

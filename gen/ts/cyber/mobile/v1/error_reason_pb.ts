@@ -10,7 +10,7 @@ import { file_errors_errors } from "../../../errors/errors_pb";
  * Describes the file cyber/mobile/v1/error_reason.proto.
  */
 export const file_cyber_mobile_v1_error_reason: GenFile = /*@__PURE__*/
-  fileDesc("CiJjeWJlci9tb2JpbGUvdjEvZXJyb3JfcmVhc29uLnByb3RvEg9jeWJlci5tb2JpbGUudjEqagoLRXJyb3JSZWFzb24SIgoYRVJST1JfUkVBU09OX1VOU1BFQ0lGSUVEEAAaBKhF9AMSMQomRVJST1JfUkVBU09OX1NUQVRVU19JTlZBTElEX1RSQU5TSVRJT04Q8C4aBKhFkAMaBKBFkANCKFomY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9tb2JpbGUvdjFiBnByb3RvMw", [file_errors_errors]);
+  fileDesc("CiJjeWJlci9tb2JpbGUvdjEvZXJyb3JfcmVhc29uLnByb3RvEg9jeWJlci5tb2JpbGUudjEqngEKC0Vycm9yUmVhc29uEiIKGEVSUk9SX1JFQVNPTl9VTlNQRUNJRklFRBAAGgSoRfQDEjEKJkVSUk9SX1JFQVNPTl9TVEFUVVNfSU5WQUxJRF9UUkFOU0lUSU9OEPAuGgSoRZADEjIKJ0VSUk9SX1JFQVNPTl9NT0JJTEVfVVNFUl9BTFJFQURZX0VYSVNUUxDxLhoEqEWZAxoEoEWQA0IoWiZjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL21vYmlsZS92MWIGcHJvdG8z", [file_errors_errors]);
 
 /**
  * business errors (service-level): domain-specific failures the
@@ -32,6 +32,13 @@ export enum ErrorReason {
    * @generated from enum value: ERROR_REASON_STATUS_INVALID_TRANSITION = 6000;
    */
   STATUS_INVALID_TRANSITION = 6000,
+
+  /**
+   * The phone (login account) is already registered.
+   *
+   * @generated from enum value: ERROR_REASON_MOBILE_USER_ALREADY_EXISTS = 6001;
+   */
+  MOBILE_USER_ALREADY_EXISTS = 6001,
 }
 
 /**

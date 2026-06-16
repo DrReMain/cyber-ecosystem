@@ -43,7 +43,6 @@ message Data {
     int32 max_open_conns = 7;
     int32 max_idle_conns = 8;
     google.protobuf.Duration conn_max_lifetime = 9;
-    bool migrate = 10;
   }
   message Redis {
     string network = 1;

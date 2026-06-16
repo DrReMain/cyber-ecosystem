@@ -88,6 +88,8 @@ build/
 logs/
 *.log
 *.sql
+# ent/atlas versioned migrations are source — must be tracked, not ignored
+!**/ent/migrate/migrations/*.sql
 *.sqlite
 *.db
 

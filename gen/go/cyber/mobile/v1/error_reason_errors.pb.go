@@ -36,3 +36,17 @@ func IsErrorReasonStatusInvalidTransition(err error) bool {
 func ErrorErrorReasonStatusInvalidTransition(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, ErrorReason_ERROR_REASON_STATUS_INVALID_TRANSITION.String(), fmt.Sprintf(format, args...))
 }
+
+// The phone (login account) is already registered.
+func IsErrorReasonMobileUserAlreadyExists(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ERROR_REASON_MOBILE_USER_ALREADY_EXISTS.String() && e.Code == 409
+}
+
+// The phone (login account) is already registered.
+func ErrorErrorReasonMobileUserAlreadyExists(format string, args ...interface{}) *errors.Error {
+	return errors.New(409, ErrorReason_ERROR_REASON_MOBILE_USER_ALREADY_EXISTS.String(), fmt.Sprintf(format, args...))
+}

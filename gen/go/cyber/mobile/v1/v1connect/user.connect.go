@@ -36,21 +36,21 @@ const (
 	// MobileUserServiceCreateUserProcedure is the fully-qualified name of the MobileUserService's
 	// CreateUser RPC.
 	MobileUserServiceCreateUserProcedure = "/cyber.mobile.v1.MobileUserService/CreateUser"
-	// MobileUserServiceUpdateUserProcedure is the fully-qualified name of the MobileUserService's
-	// UpdateUser RPC.
-	MobileUserServiceUpdateUserProcedure = "/cyber.mobile.v1.MobileUserService/UpdateUser"
-	// MobileUserServiceDeleteUserProcedure is the fully-qualified name of the MobileUserService's
-	// DeleteUser RPC.
-	MobileUserServiceDeleteUserProcedure = "/cyber.mobile.v1.MobileUserService/DeleteUser"
 	// MobileUserServiceGetUserProcedure is the fully-qualified name of the MobileUserService's GetUser
 	// RPC.
 	MobileUserServiceGetUserProcedure = "/cyber.mobile.v1.MobileUserService/GetUser"
 	// MobileUserServiceListUsersProcedure is the fully-qualified name of the MobileUserService's
 	// ListUsers RPC.
 	MobileUserServiceListUsersProcedure = "/cyber.mobile.v1.MobileUserService/ListUsers"
+	// MobileUserServiceUpdateUserProcedure is the fully-qualified name of the MobileUserService's
+	// UpdateUser RPC.
+	MobileUserServiceUpdateUserProcedure = "/cyber.mobile.v1.MobileUserService/UpdateUser"
 	// MobileUserServiceUpdateUserStatusProcedure is the fully-qualified name of the MobileUserService's
 	// UpdateUserStatus RPC.
 	MobileUserServiceUpdateUserStatusProcedure = "/cyber.mobile.v1.MobileUserService/UpdateUserStatus"
+	// MobileUserServiceDeleteUserProcedure is the fully-qualified name of the MobileUserService's
+	// DeleteUser RPC.
+	MobileUserServiceDeleteUserProcedure = "/cyber.mobile.v1.MobileUserService/DeleteUser"
 	// MobileUserServiceSortUserProcedure is the fully-qualified name of the MobileUserService's
 	// SortUser RPC.
 	MobileUserServiceSortUserProcedure = "/cyber.mobile.v1.MobileUserService/SortUser"
@@ -60,16 +60,16 @@ const (
 type MobileUserServiceClient interface {
 	// Create a user.
 	CreateUser(context.Context, *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error)
-	// Update a user.
-	UpdateUser(context.Context, *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error)
-	// Delete a user.
-	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
 	// Get a user by ID.
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
 	// List users with pagination and filters.
 	ListUsers(context.Context, *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error)
+	// Update a user.
+	UpdateUser(context.Context, *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error)
 	// Update user status.
 	UpdateUserStatus(context.Context, *connect.Request[v1.UpdateUserStatusRequest]) (*connect.Response[v1.UpdateUserStatusResponse], error)
+	// Delete a user.
+	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
 	// Sort user position.
 	SortUser(context.Context, *connect.Request[v1.SortUserRequest]) (*connect.Response[v1.SortUserResponse], error)
 }
@@ -91,18 +91,6 @@ func NewMobileUserServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(mobileUserServiceMethods.ByName("CreateUser")),
 			connect.WithClientOptions(opts...),
 		),
-		updateUser: connect.NewClient[v1.UpdateUserRequest, v1.UpdateUserResponse](
-			httpClient,
-			baseURL+MobileUserServiceUpdateUserProcedure,
-			connect.WithSchema(mobileUserServiceMethods.ByName("UpdateUser")),
-			connect.WithClientOptions(opts...),
-		),
-		deleteUser: connect.NewClient[v1.DeleteUserRequest, v1.DeleteUserResponse](
-			httpClient,
-			baseURL+MobileUserServiceDeleteUserProcedure,
-			connect.WithSchema(mobileUserServiceMethods.ByName("DeleteUser")),
-			connect.WithClientOptions(opts...),
-		),
 		getUser: connect.NewClient[v1.GetUserRequest, v1.GetUserResponse](
 			httpClient,
 			baseURL+MobileUserServiceGetUserProcedure,
@@ -115,10 +103,22 @@ func NewMobileUserServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(mobileUserServiceMethods.ByName("ListUsers")),
 			connect.WithClientOptions(opts...),
 		),
+		updateUser: connect.NewClient[v1.UpdateUserRequest, v1.UpdateUserResponse](
+			httpClient,
+			baseURL+MobileUserServiceUpdateUserProcedure,
+			connect.WithSchema(mobileUserServiceMethods.ByName("UpdateUser")),
+			connect.WithClientOptions(opts...),
+		),
 		updateUserStatus: connect.NewClient[v1.UpdateUserStatusRequest, v1.UpdateUserStatusResponse](
 			httpClient,
 			baseURL+MobileUserServiceUpdateUserStatusProcedure,
 			connect.WithSchema(mobileUserServiceMethods.ByName("UpdateUserStatus")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteUser: connect.NewClient[v1.DeleteUserRequest, v1.DeleteUserResponse](
+			httpClient,
+			baseURL+MobileUserServiceDeleteUserProcedure,
+			connect.WithSchema(mobileUserServiceMethods.ByName("DeleteUser")),
 			connect.WithClientOptions(opts...),
 		),
 		sortUser: connect.NewClient[v1.SortUserRequest, v1.SortUserResponse](
@@ -133,27 +133,17 @@ func NewMobileUserServiceClient(httpClient connect.HTTPClient, baseURL string, o
 // mobileUserServiceClient implements MobileUserServiceClient.
 type mobileUserServiceClient struct {
 	createUser       *connect.Client[v1.CreateUserRequest, v1.CreateUserResponse]
-	updateUser       *connect.Client[v1.UpdateUserRequest, v1.UpdateUserResponse]
-	deleteUser       *connect.Client[v1.DeleteUserRequest, v1.DeleteUserResponse]
 	getUser          *connect.Client[v1.GetUserRequest, v1.GetUserResponse]
 	listUsers        *connect.Client[v1.ListUsersRequest, v1.ListUsersResponse]
+	updateUser       *connect.Client[v1.UpdateUserRequest, v1.UpdateUserResponse]
 	updateUserStatus *connect.Client[v1.UpdateUserStatusRequest, v1.UpdateUserStatusResponse]
+	deleteUser       *connect.Client[v1.DeleteUserRequest, v1.DeleteUserResponse]
 	sortUser         *connect.Client[v1.SortUserRequest, v1.SortUserResponse]
 }
 
 // CreateUser calls cyber.mobile.v1.MobileUserService.CreateUser.
 func (c *mobileUserServiceClient) CreateUser(ctx context.Context, req *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error) {
 	return c.createUser.CallUnary(ctx, req)
-}
-
-// UpdateUser calls cyber.mobile.v1.MobileUserService.UpdateUser.
-func (c *mobileUserServiceClient) UpdateUser(ctx context.Context, req *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error) {
-	return c.updateUser.CallUnary(ctx, req)
-}
-
-// DeleteUser calls cyber.mobile.v1.MobileUserService.DeleteUser.
-func (c *mobileUserServiceClient) DeleteUser(ctx context.Context, req *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error) {
-	return c.deleteUser.CallUnary(ctx, req)
 }
 
 // GetUser calls cyber.mobile.v1.MobileUserService.GetUser.
@@ -166,9 +156,19 @@ func (c *mobileUserServiceClient) ListUsers(ctx context.Context, req *connect.Re
 	return c.listUsers.CallUnary(ctx, req)
 }
 
+// UpdateUser calls cyber.mobile.v1.MobileUserService.UpdateUser.
+func (c *mobileUserServiceClient) UpdateUser(ctx context.Context, req *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error) {
+	return c.updateUser.CallUnary(ctx, req)
+}
+
 // UpdateUserStatus calls cyber.mobile.v1.MobileUserService.UpdateUserStatus.
 func (c *mobileUserServiceClient) UpdateUserStatus(ctx context.Context, req *connect.Request[v1.UpdateUserStatusRequest]) (*connect.Response[v1.UpdateUserStatusResponse], error) {
 	return c.updateUserStatus.CallUnary(ctx, req)
+}
+
+// DeleteUser calls cyber.mobile.v1.MobileUserService.DeleteUser.
+func (c *mobileUserServiceClient) DeleteUser(ctx context.Context, req *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error) {
+	return c.deleteUser.CallUnary(ctx, req)
 }
 
 // SortUser calls cyber.mobile.v1.MobileUserService.SortUser.
@@ -180,16 +180,16 @@ func (c *mobileUserServiceClient) SortUser(ctx context.Context, req *connect.Req
 type MobileUserServiceHandler interface {
 	// Create a user.
 	CreateUser(context.Context, *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error)
-	// Update a user.
-	UpdateUser(context.Context, *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error)
-	// Delete a user.
-	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
 	// Get a user by ID.
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
 	// List users with pagination and filters.
 	ListUsers(context.Context, *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error)
+	// Update a user.
+	UpdateUser(context.Context, *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error)
 	// Update user status.
 	UpdateUserStatus(context.Context, *connect.Request[v1.UpdateUserStatusRequest]) (*connect.Response[v1.UpdateUserStatusResponse], error)
+	// Delete a user.
+	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
 	// Sort user position.
 	SortUser(context.Context, *connect.Request[v1.SortUserRequest]) (*connect.Response[v1.SortUserResponse], error)
 }
@@ -207,18 +207,6 @@ func NewMobileUserServiceHandler(svc MobileUserServiceHandler, opts ...connect.H
 		connect.WithSchema(mobileUserServiceMethods.ByName("CreateUser")),
 		connect.WithHandlerOptions(opts...),
 	)
-	mobileUserServiceUpdateUserHandler := connect.NewUnaryHandler(
-		MobileUserServiceUpdateUserProcedure,
-		svc.UpdateUser,
-		connect.WithSchema(mobileUserServiceMethods.ByName("UpdateUser")),
-		connect.WithHandlerOptions(opts...),
-	)
-	mobileUserServiceDeleteUserHandler := connect.NewUnaryHandler(
-		MobileUserServiceDeleteUserProcedure,
-		svc.DeleteUser,
-		connect.WithSchema(mobileUserServiceMethods.ByName("DeleteUser")),
-		connect.WithHandlerOptions(opts...),
-	)
 	mobileUserServiceGetUserHandler := connect.NewUnaryHandler(
 		MobileUserServiceGetUserProcedure,
 		svc.GetUser,
@@ -231,10 +219,22 @@ func NewMobileUserServiceHandler(svc MobileUserServiceHandler, opts ...connect.H
 		connect.WithSchema(mobileUserServiceMethods.ByName("ListUsers")),
 		connect.WithHandlerOptions(opts...),
 	)
+	mobileUserServiceUpdateUserHandler := connect.NewUnaryHandler(
+		MobileUserServiceUpdateUserProcedure,
+		svc.UpdateUser,
+		connect.WithSchema(mobileUserServiceMethods.ByName("UpdateUser")),
+		connect.WithHandlerOptions(opts...),
+	)
 	mobileUserServiceUpdateUserStatusHandler := connect.NewUnaryHandler(
 		MobileUserServiceUpdateUserStatusProcedure,
 		svc.UpdateUserStatus,
 		connect.WithSchema(mobileUserServiceMethods.ByName("UpdateUserStatus")),
+		connect.WithHandlerOptions(opts...),
+	)
+	mobileUserServiceDeleteUserHandler := connect.NewUnaryHandler(
+		MobileUserServiceDeleteUserProcedure,
+		svc.DeleteUser,
+		connect.WithSchema(mobileUserServiceMethods.ByName("DeleteUser")),
 		connect.WithHandlerOptions(opts...),
 	)
 	mobileUserServiceSortUserHandler := connect.NewUnaryHandler(
@@ -247,16 +247,16 @@ func NewMobileUserServiceHandler(svc MobileUserServiceHandler, opts ...connect.H
 		switch r.URL.Path {
 		case MobileUserServiceCreateUserProcedure:
 			mobileUserServiceCreateUserHandler.ServeHTTP(w, r)
-		case MobileUserServiceUpdateUserProcedure:
-			mobileUserServiceUpdateUserHandler.ServeHTTP(w, r)
-		case MobileUserServiceDeleteUserProcedure:
-			mobileUserServiceDeleteUserHandler.ServeHTTP(w, r)
 		case MobileUserServiceGetUserProcedure:
 			mobileUserServiceGetUserHandler.ServeHTTP(w, r)
 		case MobileUserServiceListUsersProcedure:
 			mobileUserServiceListUsersHandler.ServeHTTP(w, r)
+		case MobileUserServiceUpdateUserProcedure:
+			mobileUserServiceUpdateUserHandler.ServeHTTP(w, r)
 		case MobileUserServiceUpdateUserStatusProcedure:
 			mobileUserServiceUpdateUserStatusHandler.ServeHTTP(w, r)
+		case MobileUserServiceDeleteUserProcedure:
+			mobileUserServiceDeleteUserHandler.ServeHTTP(w, r)
 		case MobileUserServiceSortUserProcedure:
 			mobileUserServiceSortUserHandler.ServeHTTP(w, r)
 		default:
@@ -272,14 +272,6 @@ func (UnimplementedMobileUserServiceHandler) CreateUser(context.Context, *connec
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.mobile.v1.MobileUserService.CreateUser is not implemented"))
 }
 
-func (UnimplementedMobileUserServiceHandler) UpdateUser(context.Context, *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.mobile.v1.MobileUserService.UpdateUser is not implemented"))
-}
-
-func (UnimplementedMobileUserServiceHandler) DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.mobile.v1.MobileUserService.DeleteUser is not implemented"))
-}
-
 func (UnimplementedMobileUserServiceHandler) GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.mobile.v1.MobileUserService.GetUser is not implemented"))
 }
@@ -288,8 +280,16 @@ func (UnimplementedMobileUserServiceHandler) ListUsers(context.Context, *connect
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.mobile.v1.MobileUserService.ListUsers is not implemented"))
 }
 
+func (UnimplementedMobileUserServiceHandler) UpdateUser(context.Context, *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.mobile.v1.MobileUserService.UpdateUser is not implemented"))
+}
+
 func (UnimplementedMobileUserServiceHandler) UpdateUserStatus(context.Context, *connect.Request[v1.UpdateUserStatusRequest]) (*connect.Response[v1.UpdateUserStatusResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.mobile.v1.MobileUserService.UpdateUserStatus is not implemented"))
+}
+
+func (UnimplementedMobileUserServiceHandler) DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.mobile.v1.MobileUserService.DeleteUser is not implemented"))
 }
 
 func (UnimplementedMobileUserServiceHandler) SortUser(context.Context, *connect.Request[v1.SortUserRequest]) (*connect.Response[v1.SortUserResponse], error) {

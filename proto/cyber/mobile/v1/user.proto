@@ -11,15 +11,6 @@ import "google/protobuf/wrappers.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/mobile/v1";
 
-// Mobile user entity, user-domain request/response messages, and the
-// MobileUserService that exposes user CRUD over Connect/HTTP.
-//
-// The mobile edge owns its user table; a separate admin edge will define its
-// own admin-user types rather than reuse these.
-//
-// password is intentionally not part of User: it only appears in
-// CreateUserRequest/UpdateUserRequest and is never serialized in responses.
-
 // User resource model. Represents a user account.
 message User {
   google.protobuf.StringValue id = 1;
@@ -28,64 +19,37 @@ message User {
   google.protobuf.StringValue nickname = 4;
   google.protobuf.StringValue avatar = 5;
   google.protobuf.StringValue phone = 6;
-  // Account status: enabled | disabled | restricted. Valid transitions are
-  // enforced as a finite state machine in the biz layer.
   google.protobuf.StringValue status = 7;
 }
 
 // CreateUser request.
 message CreateUserRequest {
   // Nickname.
-  optional string nickname = 1;
+  optional string nickname = 1 [(buf.validate.field).string.max_len = 64];
   // Phone number, used as the login account. Unique.
   optional string phone = 2 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.min_len = 1
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 20
   ];
   // Login password (plaintext over the wire; hashed server-side before storage).
   optional string password = 3 [
     (buf.validate.field).required = true,
-    (buf.validate.field).string.min_len = 8
+    (buf.validate.field).string.min_len = 8,
+    (buf.validate.field).string.max_len = 128
+  ];
+  // Avatar URL (optional; later backed by the storage/upload flow).
+  optional string avatar = 4 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 512
   ];
 }
 
 // CreateUser response.
-message CreateUserResponse {}
-
-// UpdateUser request.
-message UpdateUserRequest {
-  // User ID.
-  optional string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.len = 20
-  ];
-  // Nickname.
-  optional string nickname = 2;
-  // Phone number.
-  optional string phone = 3;
-  // Password (set to change credentials).
-  optional string password = 4;
-  // Fields to update.
-  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
-    min_items: 1
-    unique: true
-  }];
+message CreateUserResponse {
+  // The created user ID.
+  google.protobuf.StringValue id = 1;
 }
-
-// UpdateUser response.
-message UpdateUserResponse {}
-
-// DeleteUser request.
-message DeleteUserRequest {
-  // User ID.
-  optional string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.len = 20
-  ];
-}
-
-// DeleteUser response.
-message DeleteUserResponse {}
 
 // GetUser request.
 message GetUserRequest {
@@ -132,6 +96,34 @@ message ListUsersResponse {
   repeated GetUserResponse list = 2;
 }
 
+// UpdateUser request.
+message UpdateUserRequest {
+  // User ID.
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  // Nickname.
+  optional string nickname = 2 [(buf.validate.field).string.max_len = 64];
+  // Phone number.
+  optional string phone = 3 [(buf.validate.field).string.max_len = 20];
+  // Password (set to change credentials).
+  optional string password = 4 [(buf.validate.field).string.max_len = 128];
+  // Avatar URL.
+  optional string avatar = 5 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 512
+  ];
+  // Fields to update.
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+  }];
+}
+
+// UpdateUser response.
+message UpdateUserResponse {}
+
 // UpdateUserStatus request.
 message UpdateUserStatusRequest {
   // User ID.
@@ -154,6 +146,18 @@ message UpdateUserStatusRequest {
 
 // UpdateUserStatus response.
 message UpdateUserStatusResponse {}
+
+// DeleteUser request.
+message DeleteUserRequest {
+  // User ID.
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+// DeleteUser response.
+message DeleteUserResponse {}
 
 // SortUser request. Reorder a user's position relative to its neighbors.
 // At least one of prev_id or next_id must be set. The service updates the
@@ -189,19 +193,6 @@ service MobileUserService {
       body: "*"
     };
   }
-  // Update a user.
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
-    option (cyber.ext.v1.method_comment) = "修改用户";
-    option (google.api.http) = {
-      put: "/api/v1/mobile/user/{id}"
-      body: "*"
-    };
-  }
-  // Delete a user.
-  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
-    option (cyber.ext.v1.method_comment) = "删除用户";
-    option (google.api.http) = {delete: "/api/v1/mobile/user/{id}"};
-  }
   // Get a user by ID.
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {
     option (cyber.ext.v1.method_comment) = "查询用户详情";
@@ -212,6 +203,14 @@ service MobileUserService {
     option (cyber.ext.v1.method_comment) = "查询用户列表";
     option (google.api.http) = {get: "/api/v1/mobile/user"};
   }
+  // Update a user.
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (cyber.ext.v1.method_comment) = "修改用户";
+    option (google.api.http) = {
+      put: "/api/v1/mobile/user/{id}"
+      body: "*"
+    };
+  }
   // Update user status.
   rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse) {
     option (cyber.ext.v1.method_comment) = "修改用户状态";
@@ -219,6 +218,11 @@ service MobileUserService {
       put: "/api/v1/mobile/user/{id}/status"
       body: "*"
     };
+  }
+  // Delete a user.
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    option (cyber.ext.v1.method_comment) = "删除用户";
+    option (google.api.http) = {delete: "/api/v1/mobile/user/{id}"};
   }
   // Sort user position.
   rpc SortUser(SortUserRequest) returns (SortUserResponse) {

@@ -17,4 +17,7 @@ enum ErrorReason {
 
   // A status change the current status does not allow (FSM transition violation).
   ERROR_REASON_STATUS_INVALID_TRANSITION = 6000 [(.errors.code) = 400];
+
+  // The phone (login account) is already registered.
+  ERROR_REASON_MOBILE_USER_ALREADY_EXISTS = 6001 [(.errors.code) = 409];
 }

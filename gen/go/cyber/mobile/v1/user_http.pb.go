@@ -45,11 +45,11 @@ type MobileUserServiceHTTPServer interface {
 func RegisterMobileUserServiceHTTPServer(s *http.Server, srv MobileUserServiceHTTPServer) {
 	r := s.Route("/")
 	r.Handle("POST", "/api/v1/mobile/user", _MobileUserService_CreateUser0_HTTP_Handler(srv))
-	r.Handle("PUT", "/api/v1/mobile/user/{id}", _MobileUserService_UpdateUser0_HTTP_Handler(srv))
-	r.Handle("DELETE", "/api/v1/mobile/user/{id}", _MobileUserService_DeleteUser0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/mobile/user/{id}", _MobileUserService_GetUser0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/mobile/user", _MobileUserService_ListUsers0_HTTP_Handler(srv))
+	r.Handle("PUT", "/api/v1/mobile/user/{id}", _MobileUserService_UpdateUser0_HTTP_Handler(srv))
 	r.Handle("PUT", "/api/v1/mobile/user/{id}/status", _MobileUserService_UpdateUserStatus0_HTTP_Handler(srv))
+	r.Handle("DELETE", "/api/v1/mobile/user/{id}", _MobileUserService_DeleteUser0_HTTP_Handler(srv))
 	r.Handle("PUT", "/api/v1/mobile/user/{id}/sort", _MobileUserService_SortUser0_HTTP_Handler(srv))
 }
 
@@ -68,50 +68,6 @@ func _MobileUserService_CreateUser0_HTTP_Handler(srv MobileUserServiceHTTPServer
 			return err
 		}
 		reply := out.(*CreateUserResponse)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _MobileUserService_UpdateUser0_HTTP_Handler(srv MobileUserServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in UpdateUserRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationMobileUserServiceUpdateUser)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.UpdateUser(ctx, req.(*UpdateUserRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*UpdateUserResponse)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _MobileUserService_DeleteUser0_HTTP_Handler(srv MobileUserServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in DeleteUserRequest
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationMobileUserServiceDeleteUser)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.DeleteUser(ctx, req.(*DeleteUserRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*DeleteUserResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -157,6 +113,28 @@ func _MobileUserService_ListUsers0_HTTP_Handler(srv MobileUserServiceHTTPServer)
 	}
 }
 
+func _MobileUserService_UpdateUser0_HTTP_Handler(srv MobileUserServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateUserRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationMobileUserServiceUpdateUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateUser(ctx, req.(*UpdateUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateUserResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _MobileUserService_UpdateUserStatus0_HTTP_Handler(srv MobileUserServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UpdateUserStatusRequest
@@ -175,6 +153,28 @@ func _MobileUserService_UpdateUserStatus0_HTTP_Handler(srv MobileUserServiceHTTP
 			return err
 		}
 		reply := out.(*UpdateUserStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _MobileUserService_DeleteUser0_HTTP_Handler(srv MobileUserServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteUserRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationMobileUserServiceDeleteUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteUser(ctx, req.(*DeleteUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteUserResponse)
 		return ctx.Result(200, reply)
 	}
 }

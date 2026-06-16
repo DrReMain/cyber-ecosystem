@@ -337,10 +337,16 @@ components:
                 password:
                     type: string
                     description: Login password (plaintext over the wire; hashed server-side before storage).
+                avatar:
+                    type: string
+                    description: Avatar URL (optional; later backed by the storage/upload flow).
             description: CreateUser request.
         cyber.mobile.v1.CreateUserResponse:
             type: object
-            properties: {}
+            properties:
+                id:
+                    type: string
+                    description: The created user ID.
             description: CreateUser response.
         cyber.mobile.v1.DeleteUserResponse:
             type: object
@@ -526,6 +532,9 @@ components:
                 password:
                     type: string
                     description: Password (set to change credentials).
+                avatar:
+                    type: string
+                    description: Avatar URL.
                 fieldsMask:
                     type: array
                     items:
@@ -569,9 +578,6 @@ components:
                     type: string
                 status:
                     type: string
-                    description: |-
-                        Account status: enabled | disabled | restricted. Valid transitions are
-                         enforced as a finite state machine in the biz layer.
             description: User resource model. Represents a user account.
         cyber.shared.common.v1.PageResponse:
             type: object
