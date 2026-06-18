@@ -1,109 +1,139 @@
-# edge_mobile 后续工作（TODO）
+# 后端平台后续工作（TODO）
 
-记录已设计 / 部分实施但尚未完成的工作，作为排期 backlog。新仓库从零重构，平台能力参考旧仓库 `/Users/shijiao/Desktop/lab/cyber-ecosystem` 的封装方式（逐部分对照）。
+排期 backlog。新仓库从零重构，平台能力参考旧仓库 `/Users/shijiao/Desktop/lab/cyber-ecosystem` 对照。本文记录后续路线 —— 含 **mobile 业务丰富**、**平台能力补齐**（storage / 可观测收尾 / 异常上报）、以及**第二个服务 edge_admin** 的搭建（解锁多服务能力）。
 
-**已接入**：db（ent + postgres + Atlas 版本迁移）、三 transport server（http :11002 / grpc :12002 / connect :13002）、中间件链（recovery→tracing→metrics→logging→ratelimit→metadata→validator）、**可观测性（trace/metrics/log OTLP→SigNoz，抽到 `shared-go/kratos/observability`，多 sink 日志含 file 轮转）**。
+**已接入**：db（ent + postgres + Atlas 版本迁移）、三 transport server（http :11002 / grpc :12002 / connect :13002）、中间件链（recovery→tracing→metrics→logging→ratelimit→metadata→validator）、**可观测性**（trace/metrics/log OTLP→SigNoz，抽到 `shared-go/kratos/observability`，多 sink 日志含 file 轮转）、**cache**（`shared-go/cache`：10 接口 KV/Hash/List/Set/SortedSet/Counter/Lock/RateLimiter/Pub/Sub/Session + redis 实现，接 edge_mobile Platform；bsm/redislock + redis_rate；已过两轮专家复审）。
 
-## 全貌
+---
 
-分三层、八个部分。横切关注点（可观测性）已打底完成，接下来平台能力，最后生产运维：
+## 架构与边界（两服务）
 
-| 部分 | 事项 | 状态 |
+> 平台演进为两个服务：**edge_mobile（边缘/消费面）+ edge_admin（管理面）**。**主权数据**：各管自己的 DB，无跨库直读。
+
+- **edge_mobile**：终端用户系统。owns `mobile_user`（用户账号）+ 消费侧业务。**必须能独立运行**（每次请求鉴权，不依赖 admin）—— 它是稳定内核。
+- **edge_admin**：内部管理系统。owns `admin_user`（员工账号）+ RBAC/ABAC/datascope。通过 **RPC 管理 mobile 的 `mobile_user`**（不直接读 mobile 的库）。`mobile_user` ≠ `admin_user`（两类人、两个库，零重叠）。
+- **依赖方向**：**admin → mobile（单向，不环）**。被调方（mobile 的管理 API）必须先存在，所以顺序天然 mobile 先行。
+
+**mobile 设计时带上 admin 意识（便宜两层）**：
+1. **数据模型**：设计 mobile 实体（mobile_user 等）时，带上 admin 管理明确需要的字段（status/软删、scope 维度、审计字段）—— 加字段现在便宜，迁移贵。datascope 模型未定就先留 hook。
+2. **管理 RPC 契约**：mobile 成型时把 admin 要调的内部管理 RPC 挂 proto —— 只实现现在用得到的，不投机建整套 admin API。
+
+**分布式相关设计原则**：
+- **分布式事务 —— 设计上回避**：admin 调 mobile 改用户 = mobile 库内原子写 + admin 另记审计（最终一致）。真要跨库原子（少）才上 saga/outbox；平台准备该能力，但别滥用（分布式 tx 是最贵的东西）。
+- **服务发现 —— k3s DNS 即发现**：`<svc>.<ns>.svc.cluster.local`，不自建 discovery/etcd（除非脱离 k8s 部署）。
+- **一致性姿态**：跨服务审计/日志走最终一致。
+
+---
+
+## 路线图（按阶段）
+
+| 阶段 | 事项 | 状态 |
 |---|---|---|
-| **B** | 日志体系（trace_id 关联 + 多 sink fanout logger） | ✅ 完成 |
-| **C** | 可观测性（trace/metrics/log OTLP→SigNoz） | ✅ 完成；⏳ db-span 待做 |
-| **D** | [cache](#d-cache)（redis 抽象层 + otel hook） | 主线 |
-| **E** | [storage](#e-storage)（S3/MinIO + 预签名） | 主线 |
-| **F** | [远程服务客户端](#f-远程服务客户端)（connect/grpc client + 客户端中间件链） | 主线 |
-| **H** | [生产运维](#h-健康检查--安全关机--pprof)（健康检查 + 安全关机 + pprof） | 主线 |
-| **A** | [错误出口守卫](#a-错误出口守卫)（出口 sanitize，防内部信息泄漏） | 延后（安全兜底） |
-| **G** | [mq](#g-mq可选--延后)（从零选型） | 延后（待业务） |
+| ~~B/C/D~~ | 日志 / 可观测 / cache | ✅ 已完成 |
+| **一** | [cache 集成探针：验集成（解耦业务）](#阶段一cache-集成探针验集成解耦业务) | **主线（下一步）** |
+| **二** | [storage：mobile 接入 + 验平台能力（文件逻辑延后）](#阶段二storage平台能力文件逻辑延后) | 主线 |
+| **三** | [可观测收尾 + 异常上报](#阶段三可观测收尾--异常上报) | 主线 |
+| **四** | [edge_admin 搭建 + 多服务能力（F）](#阶段四edge_admin--多服务能力) | 骨架成型后 |
+| **五** | [生产运维（H）+ 错误守卫（A）](#阶段五生产运维h--错误守卫a) | 主线 / 延后 |
+| | [mobile auth / 会话子系统（业务，后续独立设计）](#mobile-业务-backlogauth--会话子系统后续独立设计) | 后续 |
+| | mq（G，可选） | 延后（待业务） |
 
-> 推荐顺序：~~B → C~~（✅ 已完成）→ **D / E /（F）→ 可观测收尾（db-span + 后端 span + 慢查询）→ H**。A、G 延后。
-
----
-
-## 第一层：横切关注点（已完成）
-
-**B 日志体系 + C 可观测性（trace/metrics/log）已落地**，抽到 `shared-go/kratos/observability` 包：
-
-- `Init` 统一建 trace/metrics/log provider（otlphttp exporter、共享 resource 带 host+env、可选采样、聚合 shutdown）+ 多 sink fanout logger（console / otlp / file+lumberjack 轮转）。
-- `MetricsServer` 中间件（contrib `metrics.Server` + 默认仪表）。
-- 三协议中间件链 `tracing→metrics→logging→recovery→ratelimit→metadata→validator`（三个记录型在 recovery 外，panic/429 不丢信息）。
-- 生产硬化：resource `host.name`+`deployment.environment`、采样可配（默认不采）、错误记 Error（链顺序）、log 默认 info。
-- conf 嵌套 `Observability{Trace{enabled,sampling_ratio}, Metrics{enabled}, Log{level,console,otlp,file{...}}}`。
+> 推荐顺序：**一（cache 探针）→ 二 → 三 → 四 → 五**。三排在 cache+storage 之后，让三个后端 span 一起接（避免半截 trace）。**mobile auth/会话**是独立业务特性，按业务节奏排，不绑平台阶段顺序。
 
 ---
 
-## 第二层：平台能力
+## 阶段一：cache 集成探针（验集成，解耦业务）
 
-> `conf.Data` 现只有 `Database` + `Redis`（Redis 段已定义但无代码）。新增能力都要扩 `conf.Data` 或新增 `conf.Cache` / `conf.Storage` 等。
+cache 层内正确性已由 `shared-go/cache` 集成测试覆盖；缺的是**穿过服务栈的集成没被验过**：conf → wire → `Platform.GetCache` → UC 用 cache → `HandleCacheError` → 三协议渲染。用一个专门的**探针 RPC** 把这条链跑通 —— 不必为验 cache 去设计真实业务流（真实业务的 cache 用法见 [mobile auth 等](#mobile-业务-backlogauth--会话子系统后续独立设计)，按业务自身节奏做）。
 
-### D. cache
+- 一个 `Debug.CacheProbe` RPC（或类似）：固定序列跑各接口典型操作（KV Set/Get/Del、Session Set/Get/Destroy、RateLimiter Allow→deny、Counter、Lock、SortedSet…），走真实 Platform 栈，返回每接口 pass/fail（错误经 `HandleCacheError` 映射）。
+- **隔离 key**（`debug:probe:*` 前缀，不碰真实业务 key）+ **配置门控**（`debug.cache_probe_enabled`，默认关）—— 本质是 dev/ops 工具（兼作 cache 健康探针），非对外业务接口。
+- **验**：集成 plumbing（conf/wire/Platform/UC/HandleCacheError/三协议渲染）。
+- **不验**：真实业务下的 key 设计 / TTL 调优 / 失效策略 / 热点访问 pattern —— 那些只有真实业务流量才能暴露，等 mobile auth 等业务真用 cache 时自然出现。
 
-**现状**：`conf.Data.Redis` 已定义，无任何缓存代码。
+---
 
-**做什么**：`shared-go/cache` 抽象层 + redis 实现。
+## mobile 业务 backlog：auth / 会话子系统（后续，独立设计）
 
-- **接口拆分**（借鉴旧仓库，按需取用）：`KV`（Get/Set/Del/Exist/MGet/MSet）、`Counter`、`SortedSet`、`RateLimiter`；聚合成一个 `Cache` struct + `io.Closer`。
-- **后端**：**只做 redis**（go-redis/v9），**砍 memory 后端**（旧仓库有，生产不用、工作量大；留接口位，单测用 fake）。
-- **otel hook**：`redis.AddHook` 挂 tracing（每命令一个 span，带 operation/key_count/duration）。
-- **补分布式锁**（旧仓库无）：SETNX 或 redlock 封装。
-- 激活已定义的 `conf.Data.Redis`；key 前缀由调用方管（抽象层不绑）。
+mobile 目前只有 mobile_user CRUD（无登录）。后续做真实 auth，**核心是双 token（OAuth2 风格）**。能力清单（做时分步，独立 brainstorm/spec，不被"验 cache"绑架）：
 
-> **借鉴**：5 接口拆分 + 聚合 struct + otel hook + 慢查询日志。**舍弃**：memory 后端。
+- **双 token**：access（短 TTL **JWT**，无状态本地验签，不可吊销但短 TTL 封顶）+ refresh（长效，**服务端 DB 记录**、可吊销）。这是 Google / Auth0 / Okta / Cognito 的范式，也是"管理端能查看/管理签发凭证"的基础。
+- **密码 login** → 签 access + refresh。
+- **refresh 端点**：凭 refresh 换新 access，**轮换**（签新 refresh、吊销旧）+ **复用检测**（被吊销的旧 refresh 再被用 → 视为被盗，吊销整条链；Auth0/Okta 做法）。
+- **auth 中间件**：验 access（JWT 本地验签）放行受保护 RPC。
+- **logout / 吊销**：吊销 refresh（DB）+ access 进黑名单（redis，TTL = access 剩余有效期）。
+- **refresh-token 实体**（mobile ent + Atlas，**存哈希不存原文**，跟 password_hash 同理）：id / user_id / token_hash / device·client / ip / issued·last_used·expires / revoked / replaced_by（轮换链）。
+- **多端登录策略**（可配）：同一账号**允许多客户端并发**（每端独立 refresh）vs **单点登录**（新登录踢掉旧端）—— 策略可选。
+- **第三方登录**（OAuth：Google / Apple / 微信）—— 可插拔 auth method，签同样的 access+refresh（加法，不重构）。
+- **admin 管理凭证**：列表 / 吊销单个 / 吊销全部（"在所有设备登出"）—— admin 经 RPC 调 mobile 操作 refresh-token 表（主权数据，admin→mobile）。
 
-### E. storage
+**关键设计点（做时定）**：
+- **access 签名密钥**：HMAC（对称，简单）vs RSA/Ed25519（非对称，其他服务只验不签，多服务场景更合适）。
+- **refresh 轮换 + 复用检测**：双 token 的核心安全特性，建议核心就含。
+- **refresh 存哈希**：DB 泄露 ≠ token 可用。
+- **多端策略实现**：per-user session 集合 / token family / 单点登录踢人机制。
+
+**cache 在 auth 里的角色**：login 暴力限频（RateLimiter）、access 黑名单（KV/Set，logout）、refresh 热查缓存（KV）—— cache 在 auth 里被真实用上，key/TTL/失效 pattern 在此暴露。注：refresh 是 DB 实体，access 是 JWT 本地验，**双 token 下 Session 接口不被用**（Session 只由 cache 集成探针 / 其他场景验）。
+
+**排序（分步）**：① login 核心（access+refresh+中间件+吊销）→ ② refresh-token 管理 RPC（列表/吊销，给 admin + 自查"我在哪登录"）→ ③ 第三方登录 → ④ admin 管理凭证 UI/RPC。
+
+---
+
+## 阶段二：storage（平台能力，文件逻辑延后）
 
 **现状**：无。k3s 已部署 MinIO。
 
-**做什么**：`shared-go/storage` 接口 + S3 实现（aws-sdk-go-v2，`UsePathStyle` 指向 MinIO）。
+**做什么**：`shared-go/storage` 接口 + S3/MinIO 实现（aws-sdk-go-v2，`UsePathStyle` 指向 MinIO）；接入 mobile Platform；**集成测试级验证**（upload/download/presign 对 MinIO 通）。
 
-- **接口**（借鉴旧仓库并补全）：`Upload / Download / Delete` + **补 `Presign`（上传/下载预签名，前端直传必需）+ `Stat` + `Copy`**。
-- 错误映射：smithy `APIError` → 应用错误。otel span（每操作一个 span，带 bucket/key/size）。
+- **接口**（借鉴旧仓库 + 补全）：`Upload / Download / Delete` + 补 `Presign`（上传/下载预签名，前端直传必需）+ `Stat` + `Copy`。
+- 错误映射：smithy `APIError` → 应用错误。
 - 扩 `conf.Data.Storage`（endpoint/access_key/secret_key/bucket/region/max_file_size）。
 
-> **借鉴**：接口骨架 + smithy 错误映射 + otel span。**补**：Presign/Stat/Copy。
+**关键：文件逻辑延后**。文件上传下载不只是 storage —— 还要**文件元数据表**，而**文件表归 admin**（admin 管理文件）。所以：
+- 本阶段只验 storage **平台能力**（对 MinIO 接入 + 接口），**不建文件表、不做真实文件业务**。
+- 真实文件逻辑（文件表 + 上传下载业务）等 admin 落地后在 admin 侧重构。
+- 故 storage 是"平台/接入验证"，非"业务验证"（其业务消费方在 admin）。storage 是 shared-go 跨服务复用基建，admin 也会用，先建+冒烟不算白建。
 
-### F. 远程服务客户端
-
-**现状**：新仓库已有自研 connect **server**（transport/connect + health + reflection）。缺 **client** 端（BFF 调下游服务）。
-
-**做什么**：connect/grpc client + 客户端中间件链。
-
-- **客户端中间件链**（借鉴旧仓库，教科书级）：`recovery → circuitbreaker → metrics → tracing → metadata → logging → status 转换`。
-- **传输**：和下游服务协议对齐，**二选一，别像旧仓库 server=connect / client=grpc 两套并存**。
-- **服务发现**：**先不做**。k3s 里下游用 Service name 直连（`<svc>.<ns>.svc.cluster.local`）；旧仓库自研 discovery 但 BFF 实际也直连。discovery/etcd 延后。
-- 扩 `conf.Data.BaseService`（addr/timeout）。
-
-> **借鉴**：客户端中间件链顺序。**舍弃**：自研 discovery（k3s 直连）、grpc/connect 并存的半迁移态。
-
-### G. mq（可选 / 延后）
-
-**现状**：旧仓库也没有 MQ，当前无业务驱动。
-
-**做什么（待业务出现再选型）**：套 cache 的抽象模式。
-
-- `mq.Publisher` / `mq.Consumer` 接口；后端按场景选 **redis-stream（轻，复用已有 redis）** 或 **kafka（重，segmentio/kafka-go）**。
-- 重试 / 死信在抽象层或装饰器；otel hook（每消息一个 span）。
+> 借鉴旧仓库：接口骨架 + smithy 错误映射 + otel span。补：Presign/Stat/Copy。
 
 ---
 
-## 可观测性收尾：db-span + 后端 span + 慢查询（排在平台能力之后）
+## 阶段三：可观测收尾 + 异常上报
 
-trace 目前只有 RPC span，**无后端子 span**（DB/cache/storage 调用都不可见）。等 D/E 落地后统一接，构成完整后端追踪：
+三个后端（cache / storage / db）都到位后，统一接后端 span（避免半截 trace）：
 
-- **db-span**：`github.com/XSAM/otelsql` wrap SQL 驱动 → 每个查询一个 span。
-- **cache-span**：随 D（redis `AddHook`，已在 D 的设计里）。
-- **storage-span**：随 E（每操作一个 span，已在 E 的设计里）。
-- **慢查询日志**：补 B 的慢查询缺口（duration + slow 标记 + 阈值，db/cache/storage 各接）。
-- **client tracing**：`tracing.Client()` 进 F 的客户端中间件链。
+- **db-span**：`github.com/XSAM/otelsql` wrap SQL 驱动 → 每查询一个 span。
+- **cache-span**：redisotel `AddHook`（cache 已落地、未接观测，这里补）。
+- **storage-span**：每操作一个 span（带 bucket/key/size，随阶段二设计）。
+- **慢查询日志**：duration + slow 标记 + 阈值，db/cache/storage 各接。
+- **异常上报**：panic/错误经 recovery 中间件 → OTel log → SigNoz（**不引 sentry**，统一走 OTel log→SigNoz；让错误在 SigNoz 可查/可告警）。
+- **client tracing**：随阶段四的 F 客户端中间件（`tracing.Client()`）。
 
-复用 shared-go observability 已设的全局 tracer。**为什么排在 D/E 之后**：避免半截 trace（只显示 DB 不显示 cache）误导；后端 span 是一组内聚工作，一起做更干净。
+复用 shared-go observability 已设的全局 tracer。**排在 cache+storage 之后**：三后端 span 一起接更干净，避免半截 trace（只显示 DB 不显示 cache/storage）误导。
 
 ---
 
-## 第三层：生产运维
+## 阶段四：edge_admin + 多服务能力（F）
+
+后端骨架成型后（mobile 业务+能力齐、可观测收尾完），起 edge_admin。**复用 shared-go**（cache/observability/transport/错误模型/ent 工具），净新增：
+
+- **admin 本体**：kratos 服务骨架 + `admin_user` 员工账号体系 + **RBAC/ABAC/datascope**。
+- **F 远程服务客户端**：admin→mobile 客户端 + 客户端中间件链（`recovery → circuitbreaker → metrics → tracing → metadata → logging → status 转换`）。传输协议**二选一**（别像旧仓库 server=connect / client=grpc 两套并存）。
+- **mobile 侧**：暴露**面向 admin 的内部管理 RPC**（管 mobile_user），与给 App 的公开 API 分开，走内部鉴权（mTLS / internal token），**不挂在公开面**。
+- **解锁验证**：多服务链路追踪、熔断、（分布式事务按需）。
+
+**datascope 跨边界（设计点）**：策略在 admin（哪个员工能看哪些用户）、数据在 mobile —— 两条路：
+- **push**：admin 把 scope 下推给 mobile 查询 RPC（如"只返 dept=X 的用户"）—— 不拉冗余，但 mobile 要懂一部分 admin scope 模型。
+- **pull**：mobile 全量返、admin 端过滤 —— 简单无耦合，但过度拉数据、分页难。
+
+按 scope 复杂度选（结构化维度 push、轻量 pull）。无银弹，做到那里再定。
+
+> 服务发现：k3s Service DNS 直连，不自建 discovery。扩 `conf.Data.BaseService`（addr/timeout）。
+> 借鉴旧仓库：客户端中间件链顺序。舍弃：自研 discovery（k3s 直连）、grpc/connect 并存的半迁移态。
+
+---
+
+## 阶段五：生产运维（H）+ 错误守卫（A）
 
 ### H. 健康检查 + 安全关机 + pprof
 
@@ -123,11 +153,7 @@ trace 目前只有 RPC span，**无后端子 span**（DB/cache/storage 调用都
 
 > **设计依据（已核对源码）**：kratos App 默认 `stopTimeout=0`（`app.go:106`）；`App.Stop()` 先 beforeStop 再 cancel；各 server `Stop()` 并发执行，不能靠注册顺序。
 
----
-
-## 延后 / 可选
-
-### A. 错误出口守卫
+### A. 错误出口守卫（延后，安全兜底）
 
 **设计原则**：透传给客户端的永远是**受控的模糊信息**（reason 级）；精确内容走 cause → 日志排查。校验类字段提示是客户端职责——客户端用 buf.validate 生成器守第一道，自带友好精准提示；透到后端才报错的，后端只给模糊信息，细节进日志。
 
@@ -143,16 +169,28 @@ trace 目前只有 RPC span，**无后端子 span**（DB/cache/storage 调用都
 
 ---
 
+## mq（G，可选 / 延后）
+
+**现状**：旧仓库也没有 MQ，当前无业务驱动。
+
+**做什么（待业务出现再选型）**：套 cache 的抽象模式。
+
+- `mq.Publisher` / `mq.Consumer` 接口；后端按场景选 **redis-stream（轻，复用已有 redis）** 或 **kafka（重，segmentio/kafka-go）**。
+- 重试 / 死信在抽象层或装饰器；otel hook（每消息一个 span）。
+
+---
+
 ## 总览：旧仓库对照
 
 | 能力 | 旧仓库技术栈 | 借鉴 | 舍弃 / 改进 |
 |---|---|---|---|
-| cache | go-redis/v9 + memory，5 接口 + otel hook | 接口拆分、otel hook、慢查询日志 | 砍 memory 后端；补分布式锁 |
+| cache | go-redis/v9 + memory，5 接口 + otel hook | 接口拆分、otel hook、慢查询日志 | 砍 memory 后端；补分布式锁（bsm/redislock）；限流 redis_rate |
 | mq | 无 | cache 的抽象模式 | — |
-| storage | aws-sdk-go-v2/s3（MinIO） | 接口骨架、smithy 错误映射、otel span | 补 Presign/Stat/Copy |
+| storage | aws-sdk-go-v2/s3（MinIO） | 接口骨架、smithy 错误映射、otel span | 补 Presign/Stat/Copy；文件表归 admin |
 | 远程调用 | 自研 connect transport + kgrpc client | 客户端中间件链 | discovery（k3s 直连）；grpc/connect 二选一 |
 | logging | zap + lumberjack + otel log | 多输出、慢查询、字段约定 | 切 slog；v3 `log` facade + `contrib/otel/log`（内置 trace 关联） |
-| 可观测 | otel trace/metric/log + otelsql + sentry | 三 provider、newResource、W3C propagator | 官方 `contrib/otel/{tracing,metrics,log}` middleware（三协议统一）；metric 统一 OTLP；弃 sentry |
+| 可观测 | otel trace/metric/log + otelsql + sentry | 三 provider、newResource、W3C propagator | 官方 `contrib/otel/{tracing,metrics,log}` middleware（三协议统一）；metric 统一 OTLP；**弃 sentry，异常上报走 OTel log→SigNoz** |
+| 架构 | 单服务 genesis | — | 两服务（mobile/admin）主权数据；admin→mobile 单向依赖 |
 
 ---
 
@@ -161,3 +199,4 @@ trace 目前只有 RPC span，**无后端子 span**（DB/cache/storage 调用都
 - 共享能力进 `shared-go/`，服务特有进 `internal/`；不引入跨服务依赖。
 - conf 改动走 proto 源 → Nx `proto:conf` 重生成。
 - 每个部分做完：`go build ./...` 过 + 相关 Nx target 跑过 + 按关注点单独提交。
+- mobile 实体设计带上 admin 意识（status/软删、scope 维度、审计字段）；管理 RPC 契约挂 proto 但 admin 本体后建。

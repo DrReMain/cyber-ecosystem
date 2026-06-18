@@ -23,7 +23,57 @@ func ErrorInfraErrorUnspecified(format string, args ...interface{}) *errors.Erro
 	return errors.New(500, InfraError_INFRA_ERROR_UNSPECIFIED.String(), fmt.Sprintf(format, args...))
 }
 
-// 30xx: Database
+// 30xx: Network
+func IsInfraErrorNetworkTimeout(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_NETWORK_TIMEOUT.String() && e.Code == 504
+}
+
+// 30xx: Network
+func ErrorInfraErrorNetworkTimeout(format string, args ...interface{}) *errors.Error {
+	return errors.New(504, InfraError_INFRA_ERROR_NETWORK_TIMEOUT.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorNetworkConnection(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_NETWORK_CONNECTION.String() && e.Code == 503
+}
+
+func ErrorInfraErrorNetworkConnection(format string, args ...interface{}) *errors.Error {
+	return errors.New(503, InfraError_INFRA_ERROR_NETWORK_CONNECTION.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorNetworkDns(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_NETWORK_DNS.String() && e.Code == 503
+}
+
+func ErrorInfraErrorNetworkDns(format string, args ...interface{}) *errors.Error {
+	return errors.New(503, InfraError_INFRA_ERROR_NETWORK_DNS.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorNetworkTls(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_NETWORK_TLS.String() && e.Code == 503
+}
+
+func ErrorInfraErrorNetworkTls(format string, args ...interface{}) *errors.Error {
+	return errors.New(503, InfraError_INFRA_ERROR_NETWORK_TLS.String(), fmt.Sprintf(format, args...))
+}
+
+// 31xx: Database
 func IsInfraErrorDbNotFound(err error) bool {
 	if err == nil {
 		return false
@@ -32,7 +82,7 @@ func IsInfraErrorDbNotFound(err error) bool {
 	return e.Reason == InfraError_INFRA_ERROR_DB_NOT_FOUND.String() && e.Code == 404
 }
 
-// 30xx: Database
+// 31xx: Database
 func ErrorInfraErrorDbNotFound(format string, args ...interface{}) *errors.Error {
 	return errors.New(404, InfraError_INFRA_ERROR_DB_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
@@ -121,7 +171,7 @@ func ErrorInfraErrorDbConnection(format string, args ...interface{}) *errors.Err
 	return errors.New(503, InfraError_INFRA_ERROR_DB_CONNECTION.String(), fmt.Sprintf(format, args...))
 }
 
-// 31xx: Cache
+// 32xx: Cache
 func IsInfraErrorCacheMiss(err error) bool {
 	if err == nil {
 		return false
@@ -130,7 +180,7 @@ func IsInfraErrorCacheMiss(err error) bool {
 	return e.Reason == InfraError_INFRA_ERROR_CACHE_MISS.String() && e.Code == 404
 }
 
-// 31xx: Cache
+// 32xx: Cache
 func ErrorInfraErrorCacheMiss(format string, args ...interface{}) *errors.Error {
 	return errors.New(404, InfraError_INFRA_ERROR_CACHE_MISS.String(), fmt.Sprintf(format, args...))
 }
@@ -195,7 +245,19 @@ func ErrorInfraErrorCacheUnavailable(format string, args ...interface{}) *errors
 	return errors.New(503, InfraError_INFRA_ERROR_CACHE_UNAVAILABLE.String(), fmt.Sprintf(format, args...))
 }
 
-// 32xx: Storage
+func IsInfraErrorCacheLockNotAcquired(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_CACHE_LOCK_NOT_ACQUIRED.String() && e.Code == 423
+}
+
+func ErrorInfraErrorCacheLockNotAcquired(format string, args ...interface{}) *errors.Error {
+	return errors.New(423, InfraError_INFRA_ERROR_CACHE_LOCK_NOT_ACQUIRED.String(), fmt.Sprintf(format, args...))
+}
+
+// 33xx: Storage
 func IsInfraErrorStorageNotFound(err error) bool {
 	if err == nil {
 		return false
@@ -204,7 +266,7 @@ func IsInfraErrorStorageNotFound(err error) bool {
 	return e.Reason == InfraError_INFRA_ERROR_STORAGE_NOT_FOUND.String() && e.Code == 404
 }
 
-// 32xx: Storage
+// 33xx: Storage
 func ErrorInfraErrorStorageNotFound(format string, args ...interface{}) *errors.Error {
 	return errors.New(404, InfraError_INFRA_ERROR_STORAGE_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
@@ -245,52 +307,14 @@ func ErrorInfraErrorStorageUnavailable(format string, args ...interface{}) *erro
 	return errors.New(503, InfraError_INFRA_ERROR_STORAGE_UNAVAILABLE.String(), fmt.Sprintf(format, args...))
 }
 
-// 33xx: Network
-func IsInfraErrorNetworkTimeout(err error) bool {
+func IsInfraErrorStorageInvalidArgument(err error) bool {
 	if err == nil {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == InfraError_INFRA_ERROR_NETWORK_TIMEOUT.String() && e.Code == 504
+	return e.Reason == InfraError_INFRA_ERROR_STORAGE_INVALID_ARGUMENT.String() && e.Code == 400
 }
 
-// 33xx: Network
-func ErrorInfraErrorNetworkTimeout(format string, args ...interface{}) *errors.Error {
-	return errors.New(504, InfraError_INFRA_ERROR_NETWORK_TIMEOUT.String(), fmt.Sprintf(format, args...))
-}
-
-func IsInfraErrorNetworkConnection(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == InfraError_INFRA_ERROR_NETWORK_CONNECTION.String() && e.Code == 503
-}
-
-func ErrorInfraErrorNetworkConnection(format string, args ...interface{}) *errors.Error {
-	return errors.New(503, InfraError_INFRA_ERROR_NETWORK_CONNECTION.String(), fmt.Sprintf(format, args...))
-}
-
-func IsInfraErrorNetworkDns(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == InfraError_INFRA_ERROR_NETWORK_DNS.String() && e.Code == 503
-}
-
-func ErrorInfraErrorNetworkDns(format string, args ...interface{}) *errors.Error {
-	return errors.New(503, InfraError_INFRA_ERROR_NETWORK_DNS.String(), fmt.Sprintf(format, args...))
-}
-
-func IsInfraErrorNetworkTls(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == InfraError_INFRA_ERROR_NETWORK_TLS.String() && e.Code == 503
-}
-
-func ErrorInfraErrorNetworkTls(format string, args ...interface{}) *errors.Error {
-	return errors.New(503, InfraError_INFRA_ERROR_NETWORK_TLS.String(), fmt.Sprintf(format, args...))
+func ErrorInfraErrorStorageInvalidArgument(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, InfraError_INFRA_ERROR_STORAGE_INVALID_ARGUMENT.String(), fmt.Sprintf(format, args...))
 }

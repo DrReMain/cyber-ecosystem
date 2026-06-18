@@ -27,12 +27,15 @@ require (
 	connectrpc.com/grpchealth v1.4.0
 	connectrpc.com/grpcreflect v1.3.0
 	entgo.io/ent v0.14.6
+	github.com/bsm/redislock v0.10.0
 	github.com/go-kratos/aegis v0.2.0
 	github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0
 	github.com/go-kratos/kratos/v3 v3.0.0
+	github.com/go-redis/redis_rate/v10 v10.0.1
 	github.com/google/wire v0.7.0
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/looplab/fsm v1.0.3
+	github.com/redis/go-redis/v9 v9.20.1
 	github.com/rs/xid v1.6.0
 	go.opentelemetry.io/contrib/bridges/otelslog v0.18.0
 	go.opentelemetry.io/otel v1.44.0
@@ -302,6 +305,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.44.0 // indirect
 	go.opentelemetry.io/otel/metric v1.44.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.10.0 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect

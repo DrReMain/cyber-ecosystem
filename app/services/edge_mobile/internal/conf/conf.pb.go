@@ -559,13 +559,20 @@ func (x *Data_Database) GetConnMaxLifetime() *durationpb.Duration {
 }
 
 type Data_Redis struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Network       string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
-	Addr          string                 `protobuf:"bytes,2,opt,name=addr,proto3" json:"addr,omitempty"`
-	ReadTimeout   *durationpb.Duration   `protobuf:"bytes,3,opt,name=read_timeout,json=readTimeout,proto3" json:"read_timeout,omitempty"`
-	WriteTimeout  *durationpb.Duration   `protobuf:"bytes,4,opt,name=write_timeout,json=writeTimeout,proto3" json:"write_timeout,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Network         string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Addr            string                 `protobuf:"bytes,2,opt,name=addr,proto3" json:"addr,omitempty"`
+	Password        string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	Db              int32                  `protobuf:"varint,4,opt,name=db,proto3" json:"db,omitempty"`
+	PoolSize        int32                  `protobuf:"varint,5,opt,name=pool_size,json=poolSize,proto3" json:"pool_size,omitempty"`
+	MinIdleConns    int32                  `protobuf:"varint,6,opt,name=min_idle_conns,json=minIdleConns,proto3" json:"min_idle_conns,omitempty"`
+	ConnMaxLifetime *durationpb.Duration   `protobuf:"bytes,7,opt,name=conn_max_lifetime,json=connMaxLifetime,proto3" json:"conn_max_lifetime,omitempty"`
+	ReadTimeout     *durationpb.Duration   `protobuf:"bytes,8,opt,name=read_timeout,json=readTimeout,proto3" json:"read_timeout,omitempty"`
+	WriteTimeout    *durationpb.Duration   `protobuf:"bytes,9,opt,name=write_timeout,json=writeTimeout,proto3" json:"write_timeout,omitempty"`
+	DialTimeout     *durationpb.Duration   `protobuf:"bytes,10,opt,name=dial_timeout,json=dialTimeout,proto3" json:"dial_timeout,omitempty"`
+	PoolTimeout     *durationpb.Duration   `protobuf:"bytes,11,opt,name=pool_timeout,json=poolTimeout,proto3" json:"pool_timeout,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Data_Redis) Reset() {
@@ -612,6 +619,41 @@ func (x *Data_Redis) GetAddr() string {
 	return ""
 }
 
+func (x *Data_Redis) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *Data_Redis) GetDb() int32 {
+	if x != nil {
+		return x.Db
+	}
+	return 0
+}
+
+func (x *Data_Redis) GetPoolSize() int32 {
+	if x != nil {
+		return x.PoolSize
+	}
+	return 0
+}
+
+func (x *Data_Redis) GetMinIdleConns() int32 {
+	if x != nil {
+		return x.MinIdleConns
+	}
+	return 0
+}
+
+func (x *Data_Redis) GetConnMaxLifetime() *durationpb.Duration {
+	if x != nil {
+		return x.ConnMaxLifetime
+	}
+	return nil
+}
+
 func (x *Data_Redis) GetReadTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.ReadTimeout
@@ -622,6 +664,20 @@ func (x *Data_Redis) GetReadTimeout() *durationpb.Duration {
 func (x *Data_Redis) GetWriteTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.WriteTimeout
+	}
+	return nil
+}
+
+func (x *Data_Redis) GetDialTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.DialTimeout
+	}
+	return nil
+}
+
+func (x *Data_Redis) GetPoolTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.PoolTimeout
 	}
 	return nil
 }
@@ -891,7 +947,7 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\aConnect\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
-	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xca\x04\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xfc\x06\n" +
 	"\x04Data\x125\n" +
 	"\bdatabase\x18\x01 \x01(\v2\x19.cyber.conf.Data.DatabaseR\bdatabase\x12,\n" +
 	"\x05redis\x18\x02 \x01(\v2\x16.cyber.conf.Data.RedisR\x05redis\x1a\xa6\x02\n" +
@@ -904,12 +960,20 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\adb_name\x18\x06 \x01(\tR\x06dbName\x12$\n" +
 	"\x0emax_open_conns\x18\a \x01(\x05R\fmaxOpenConns\x12$\n" +
 	"\x0emax_idle_conns\x18\b \x01(\x05R\fmaxIdleConns\x12E\n" +
-	"\x11conn_max_lifetime\x18\t \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\x1a\xb3\x01\n" +
+	"\x11conn_max_lifetime\x18\t \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\x1a\xe5\x03\n" +
 	"\x05Redis\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
-	"\x04addr\x18\x02 \x01(\tR\x04addr\x12<\n" +
-	"\fread_timeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\vreadTimeout\x12>\n" +
-	"\rwrite_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\fwriteTimeout\"\x87\x05\n" +
+	"\x04addr\x18\x02 \x01(\tR\x04addr\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x0e\n" +
+	"\x02db\x18\x04 \x01(\x05R\x02db\x12\x1b\n" +
+	"\tpool_size\x18\x05 \x01(\x05R\bpoolSize\x12$\n" +
+	"\x0emin_idle_conns\x18\x06 \x01(\x05R\fminIdleConns\x12E\n" +
+	"\x11conn_max_lifetime\x18\a \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\x12<\n" +
+	"\fread_timeout\x18\b \x01(\v2\x19.google.protobuf.DurationR\vreadTimeout\x12>\n" +
+	"\rwrite_timeout\x18\t \x01(\v2\x19.google.protobuf.DurationR\fwriteTimeout\x12<\n" +
+	"\fdial_timeout\x18\n" +
+	" \x01(\v2\x19.google.protobuf.DurationR\vdialTimeout\x12<\n" +
+	"\fpool_timeout\x18\v \x01(\v2\x19.google.protobuf.DurationR\vpoolTimeout\"\x87\x05\n" +
 	"\rObservability\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x1a\n" +
 	"\binsecure\x18\x02 \x01(\bR\binsecure\x125\n" +
@@ -981,14 +1045,17 @@ var file_internal_conf_conf_proto_depIdxs = []int32{
 	13, // 12: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
 	13, // 13: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
 	13, // 14: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	13, // 15: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	13, // 16: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	12, // 17: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	13, // 15: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
+	13, // 16: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	13, // 17: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	13, // 18: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
+	13, // 19: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
+	12, // 20: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
+	21, // [21:21] is the sub-list for method output_type
+	21, // [21:21] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }

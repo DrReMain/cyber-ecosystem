@@ -11,33 +11,35 @@ enum InfraError {
 
   INFRA_ERROR_UNSPECIFIED = 0 [(.errors.code) = 500];
 
-  // 30xx: Database
-  INFRA_ERROR_DB_NOT_FOUND = 3000 [(.errors.code) = 404];
-  INFRA_ERROR_DB_VALIDATION = 3001 [(.errors.code) = 400];
-  INFRA_ERROR_DB_CONSTRAINT = 3002 [(.errors.code) = 409];
-  INFRA_ERROR_DB_NOT_SINGULAR = 3003 [(.errors.code) = 400];
-  INFRA_ERROR_DB_NOT_LOADED = 3004 [(.errors.code) = 500];
-  INFRA_ERROR_DB_INTERNAL = 3005 [(.errors.code) = 500];
-  INFRA_ERROR_DB_DEADLOCK = 3006 [(.errors.code) = 409];
-  INFRA_ERROR_DB_CONNECTION = 3007 [(.errors.code) = 503];
+  // 30xx: Network
+  INFRA_ERROR_NETWORK_TIMEOUT = 3000 [(.errors.code) = 504];
+  INFRA_ERROR_NETWORK_CONNECTION = 3001 [(.errors.code) = 503];
+  INFRA_ERROR_NETWORK_DNS = 3002 [(.errors.code) = 503];
+  INFRA_ERROR_NETWORK_TLS = 3003 [(.errors.code) = 503];
 
-  // 31xx: Cache
-  INFRA_ERROR_CACHE_MISS = 3100 [(.errors.code) = 404];
-  INFRA_ERROR_CACHE_KEY_NOT_FOUND = 3101 [(.errors.code) = 404];
-  INFRA_ERROR_CACHE_SESSION_NOT_FOUND = 3102 [(.errors.code) = 404];
-  INFRA_ERROR_CACHE_QUOTA_EXCEEDED = 3103 [(.errors.code) = 429];
-  INFRA_ERROR_CACHE_INVALID_ARGUMENT = 3104 [(.errors.code) = 400];
-  INFRA_ERROR_CACHE_UNAVAILABLE = 3105 [(.errors.code) = 503];
+  // 31xx: Database
+  INFRA_ERROR_DB_NOT_FOUND = 3100 [(.errors.code) = 404];
+  INFRA_ERROR_DB_VALIDATION = 3101 [(.errors.code) = 400];
+  INFRA_ERROR_DB_CONSTRAINT = 3102 [(.errors.code) = 409];
+  INFRA_ERROR_DB_NOT_SINGULAR = 3103 [(.errors.code) = 400];
+  INFRA_ERROR_DB_NOT_LOADED = 3104 [(.errors.code) = 500];
+  INFRA_ERROR_DB_INTERNAL = 3105 [(.errors.code) = 500];
+  INFRA_ERROR_DB_DEADLOCK = 3106 [(.errors.code) = 409];
+  INFRA_ERROR_DB_CONNECTION = 3107 [(.errors.code) = 503];
 
-  // 32xx: Storage
-  INFRA_ERROR_STORAGE_NOT_FOUND = 3200 [(.errors.code) = 404];
-  INFRA_ERROR_STORAGE_FORBIDDEN = 3201 [(.errors.code) = 403];
-  INFRA_ERROR_STORAGE_SIZE_EXCEED = 3202 [(.errors.code) = 413];
-  INFRA_ERROR_STORAGE_UNAVAILABLE = 3203 [(.errors.code) = 503];
+  // 32xx: Cache
+  INFRA_ERROR_CACHE_MISS = 3200 [(.errors.code) = 404];
+  INFRA_ERROR_CACHE_KEY_NOT_FOUND = 3201 [(.errors.code) = 404];
+  INFRA_ERROR_CACHE_SESSION_NOT_FOUND = 3202 [(.errors.code) = 404];
+  INFRA_ERROR_CACHE_QUOTA_EXCEEDED = 3203 [(.errors.code) = 429];
+  INFRA_ERROR_CACHE_INVALID_ARGUMENT = 3204 [(.errors.code) = 400];
+  INFRA_ERROR_CACHE_UNAVAILABLE = 3205 [(.errors.code) = 503];
+  INFRA_ERROR_CACHE_LOCK_NOT_ACQUIRED = 3206 [(.errors.code) = 423];
 
-  // 33xx: Network
-  INFRA_ERROR_NETWORK_TIMEOUT = 3300 [(.errors.code) = 504];
-  INFRA_ERROR_NETWORK_CONNECTION = 3301 [(.errors.code) = 503];
-  INFRA_ERROR_NETWORK_DNS = 3302 [(.errors.code) = 503];
-  INFRA_ERROR_NETWORK_TLS = 3303 [(.errors.code) = 503];
+  // 33xx: Storage
+  INFRA_ERROR_STORAGE_NOT_FOUND = 3300 [(.errors.code) = 404];
+  INFRA_ERROR_STORAGE_FORBIDDEN = 3301 [(.errors.code) = 403];
+  INFRA_ERROR_STORAGE_SIZE_EXCEED = 3302 [(.errors.code) = 413];
+  INFRA_ERROR_STORAGE_UNAVAILABLE = 3303 [(.errors.code) = 503];
+  INFRA_ERROR_STORAGE_INVALID_ARGUMENT = 3304 [(.errors.code) = 400];
 }

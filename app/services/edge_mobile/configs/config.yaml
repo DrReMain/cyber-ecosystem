@@ -14,9 +14,17 @@ data:
     max_idle_conns: 50
     conn_max_lifetime: 3600s
   redis:
+    network: tcp
     addr: localhost:6379
+    password: ""
+    db: 0
+    pool_size: 50
+    min_idle_conns: 5
+    conn_max_lifetime: 1800s
     read_timeout: 0.2s
     write_timeout: 0.2s
+    # dial_timeout: 5s # omit → go-redis default (5s)
+    # pool_timeout: 4s # omit → go-redis default (ReadTimeout+1s ≈ 1.2s here)
 observability:
   endpoint: localhost:4318
   insecure: true

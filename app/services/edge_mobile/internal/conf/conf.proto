@@ -48,8 +48,15 @@ message Data {
   message Redis {
     string network = 1;
     string addr = 2;
-    google.protobuf.Duration read_timeout = 3;
-    google.protobuf.Duration write_timeout = 4;
+    string password = 3;
+    int32 db = 4;
+    int32 pool_size = 5;
+    int32 min_idle_conns = 6;
+    google.protobuf.Duration conn_max_lifetime = 7;
+    google.protobuf.Duration read_timeout = 8;
+    google.protobuf.Duration write_timeout = 9;
+    google.protobuf.Duration dial_timeout = 10;
+    google.protobuf.Duration pool_timeout = 11;
   }
   Database database = 1;
   Redis redis = 2;
