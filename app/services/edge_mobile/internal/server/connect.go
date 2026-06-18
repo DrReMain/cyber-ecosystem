@@ -3,6 +3,7 @@ package server
 import (
 	"log/slog"
 
+	"github.com/go-kratos/kratos/contrib/otel/v3/tracing"
 	"github.com/go-kratos/kratos/v3/middleware"
 	"github.com/go-kratos/kratos/v3/middleware/logging"
 	"github.com/go-kratos/kratos/v3/middleware/metadata"
@@ -10,6 +11,7 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
 
 	"cyber-ecosystem/shared-go/kratos/middleware/validator"
+	"cyber-ecosystem/shared-go/kratos/observability"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 	"cyber-ecosystem/shared-go/kratos/transport/connect/health"
 	"cyber-ecosystem/shared-go/kratos/transport/connect/reflection"
@@ -24,10 +26,12 @@ func NewConnectServer(
 	registrar []service.Registrar,
 ) *connect.Server {
 	var middlewares []middleware.Middleware
+	middlewares = append(middlewares, tracing.Server())
+	middlewares = append(middlewares, observability.MetricsServer())
+	middlewares = append(middlewares, logging.Server(logger))
 	middlewares = append(middlewares, recovery.Recovery())
 	middlewares = append(middlewares, ratelimit.Server())
 	middlewares = append(middlewares, metadata.Server())
-	middlewares = append(middlewares, logging.Server(logger))
 	middlewares = append(middlewares, validator.Server())
 
 	var opts = []connect.ServerOption{

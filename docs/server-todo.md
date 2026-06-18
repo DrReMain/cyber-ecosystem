@@ -2,71 +2,36 @@
 
 记录已设计 / 部分实施但尚未完成的工作，作为排期 backlog。新仓库从零重构，平台能力参考旧仓库 `/Users/shijiao/Desktop/lab/cyber-ecosystem` 的封装方式（逐部分对照）。
 
-**已接入**：db（ent + postgres + Atlas 版本迁移）、三 transport server（http :11002 / grpc :12002 / connect :13002）、基础中间件链（recovery/ratelimit/metadata/logging/validator）、基础 slog 日志。
+**已接入**：db（ent + postgres + Atlas 版本迁移）、三 transport server（http :11002 / grpc :12002 / connect :13002）、中间件链（recovery→tracing→metrics→logging→ratelimit→metadata→validator）、**可观测性（trace/metrics/log OTLP→SigNoz，抽到 `shared-go/kratos/observability`，多 sink 日志含 file 轮转）**。
 
 ## 全貌
 
-分三层、八个部分。按层往上做——横切关注点先打底，平台能力再接，最后生产运维：
+分三层、八个部分。横切关注点（可观测性）已打底完成，接下来平台能力，最后生产运维：
 
-| 部分 | 事项 | 大小 | 依赖前置 | 状态 |
-|---|---|---|---|---|
-| **B** | [日志体系](#b-日志体系)（v3 slog facade + contrib/otel/log + trace 关联） | 中 | 无 | 主线 |
-| **C** | [可观测性](#c-可观测性)（contrib/otel tracing/metrics + db-span → SigNoz） | 大 | B | 主线 |
-| **D** | [cache](#d-cache)（redis 抽象层 + otel hook） | 中 | B、C | 主线 |
-| **E** | [storage](#e-storage)（S3/MinIO + 预签名） | 中 | C | 主线 |
-| **F** | [远程服务客户端](#f-远程服务客户端)（connect/grpc client + 客户端中间件链） | 中 | C | 主线 |
-| **H** | [生产运维](#h-健康检查--安全关机--pprof)（健康检查 + 安全关机 + pprof） | 中 | 无 | 主线 |
-| **A** | [错误出口守卫](#a-错误出口守卫)（出口 sanitize，防内部信息泄漏） | 小 | 无 | 延后（安全兜底） |
-| **G** | [mq](#g-mq可选--延后)（从零选型） | 大 | C | 延后（待业务） |
+| 部分 | 事项 | 状态 |
+|---|---|---|
+| **B** | 日志体系（trace_id 关联 + 多 sink fanout logger） | ✅ 完成 |
+| **C** | 可观测性（trace/metrics/log OTLP→SigNoz） | ✅ 完成；⏳ db-span 待做 |
+| **D** | [cache](#d-cache)（redis 抽象层 + otel hook） | 主线 |
+| **E** | [storage](#e-storage)（S3/MinIO + 预签名） | 主线 |
+| **F** | [远程服务客户端](#f-远程服务客户端)（connect/grpc client + 客户端中间件链） | 主线 |
+| **H** | [生产运维](#h-健康检查--安全关机--pprof)（健康检查 + 安全关机 + pprof） | 主线 |
+| **A** | [错误出口守卫](#a-错误出口守卫)（出口 sanitize，防内部信息泄漏） | 延后（安全兜底） |
+| **G** | [mq](#g-mq可选--延后)（从零选型） | 延后（待业务） |
 
-> 推荐顺序：**B → C → D/E/F → H**。A（错误出口守卫，安全兜底）、G（mq，无业务驱动）延后。
+> 推荐顺序：~~B → C~~（✅ 已完成）→ **D / E /（F）→ 可观测收尾（db-span + 后端 span + 慢查询）→ H**。A、G 延后。
 
 ---
 
-## 第一层：横切关注点（打地基）
+## 第一层：横切关注点（已完成）
 
-### B. 日志体系
+**B 日志体系 + C 可观测性（trace/metrics/log）已落地**，抽到 `shared-go/kratos/observability` 包：
 
-**现状**：`main.go` 用基础 `slog`（text handler + 固定 service.id/name/version）。无 trace 关联、无慢查询日志、无 OTLP 上报。
-
-> **源码事实（Kratos v3）**：v3 的 `log` 包是纯 slog facade——核心 `*slog.Logger`，`log.NewLogger(handler, opts...)` 把任意 `slog.Handler` 包上 Kratos 装饰器，关键是 **`log.WithExtractor(func(ctx) []slog.Attr)`**（contextHandler 从 ctx 提取属性注入每条 record）。logging middleware 全程 `*slog.Logger` 并透传 ctx。→ trace 注入走官方 Extractor，不自己造 handler。
-
-**做什么**：把 slog 增强成生产可用。
-
-- **trace_id 关联**：`log.WithExtractor(tracing.TraceAttrs)`——`contrib/otel/tracing.TraceAttrs(ctx)` 签名正好是 `func(ctx) []slog.Attr`，一行让所有日志带 `trace_id/span_id`。依赖 C 先把 span 注入 ctx（见「trace 最小闭环」）。
-- **多输出**：console（`log.NewHandler(WithFormat(JSON))` → stdout）+ OTLP（`contrib/otel/log.NewHandler`：内部经 otelslog → otel log SDK，且 `traceHandler` 自动关联 trace）。两者用 fanout slog.Handler 组合（slog 无内置 multi，约 15 行自写）。容器 stdout，**不要 file 轮转**。
-- **慢查询日志**：建慢查询 helper（duration + slow 标记 + 阈值）；接入随各能力（db 用 `otelsql` wrap、cache 用 redis `AddHook`）。
-- **结构化字段约定**：`component`、`backend`、`operation`、`latency`、`module`。依赖注入贯穿各层，`log.SetDefault` 只兜底。
-- 扩 `conf.Log`：level / console（format）/ otlp（endpoint）/ 各组件慢查询阈值。
-
-> **借鉴旧仓库**：多输出、慢查询日志、结构化字段约定。**舍弃**：zap（v3 已定 slog）、`zap→JSON→OTLP` round-trip、file 轮转（容器 stdout）。
-
-### C. 可观测性
-
-**现状**：无。SigNoz 已部署在 k3s（OTLP collector :4318），新仓库未接。
-
-> **源码事实（Kratos v3，已用 fork 复核）**：v3 的 otel 在**官方 `contrib/otel/v3`**（独立 module，需 `go get`）——`tracing`/`metrics`/`log` 三子包齐全，都是 **kratos middleware / slog.Handler** 形态，三协议统一。**不碰三个 transport 的 otel instrumentation**，一条 middleware 链搞定。（早前据第三方结构索引误判「contrib/otel 未发布」已纠正：它在主仓 `contrib/otel/` 下，只是独立 module、不在主仓 module cache 里。）
-
-**做什么**：trace + metrics + db-span 三路，**统一 OTLP/HTTP push → SigNoz**。
-
-> 比喻：给每个请求贴「全程追踪条码」（trace）、装「客流仪表盘」（metrics）、把数据库操作也纳入追踪（db-span）——汇总到一个看板（SigNoz）。
-
-- **trace**：`contrib/otel/tracing.Server()` middleware（从 transport header Extract traceparent，默认 `Metadata+Baggage+TraceContext`，起 span 注入 ctx）+ tracer provider（`otlptracehttp` → `:4318` + `newResource`）。
-- **metrics**：`contrib/otel/metrics.Server()` middleware（Kratos requests counter + seconds histogram）+ meter provider（`otlpmetrichttp` push，**不用 prometheus pull**）。
-- **log（OTLP）**：`contrib/otel/log.NewHandler`（见 B）+ logger provider（`otlploghttp`）。
-- **db span**：`github.com/XSAM/otelsql` wrap SQL 驱动（顺带慢查询）。
-- **client 端**：`tracing.Client()` + `metrics.Client()` 进 F 的客户端中间件链。
-- 扩 `conf.Trace`（endpoint/insecure）、`conf.Ops`（metrics 开关）。
-
-> **借鉴旧仓库**：三 provider 构造 + `newResource` + W3C propagator。**舍弃**：prometheus pull（统一 OTLP）、sentry（与 otel 重叠）。
-
-### B+C 交集：trace 最小闭环（建议优先，待确认）
-
-trace 注入是 B、C 的核心交集：B 的日志 trace 关联要 C 先把 span 注入 ctx 才有数据。严格 B→C 会留「空管道」。建议先做一个最小闭环：
-
-**tracer provider（otlp）+ middleware 链加 `tracing.Server()`（C）+ logger 接 `log.NewHandler` / `TraceAttrs` extractor，console 日志带 trace_id（B）**——小而完整的交付，日志立刻能看到 trace_id。之后 B 补（慢查询 / fanout / DI）、C 补（metrics / db-span / pprof）。
-
-> 待确认：先做这个最小闭环，还是严格 B→C（B 先空管道）？
+- `Init` 统一建 trace/metrics/log provider（otlphttp exporter、共享 resource 带 host+env、可选采样、聚合 shutdown）+ 多 sink fanout logger（console / otlp / file+lumberjack 轮转）。
+- `MetricsServer` 中间件（contrib `metrics.Server` + 默认仪表）。
+- 三协议中间件链 `tracing→metrics→logging→recovery→ratelimit→metadata→validator`（三个记录型在 recovery 外，panic/429 不丢信息）。
+- 生产硬化：resource `host.name`+`deployment.environment`、采样可配（默认不采）、错误记 Error（链顺序）、log 默认 info。
+- conf 嵌套 `Observability{Trace{enabled,sampling_ratio}, Metrics{enabled}, Log{level,console,otlp,file{...}}}`。
 
 ---
 
@@ -121,6 +86,20 @@ trace 注入是 B、C 的核心交集：B 的日志 trace 关联要 C 先把 spa
 
 - `mq.Publisher` / `mq.Consumer` 接口；后端按场景选 **redis-stream（轻，复用已有 redis）** 或 **kafka（重，segmentio/kafka-go）**。
 - 重试 / 死信在抽象层或装饰器；otel hook（每消息一个 span）。
+
+---
+
+## 可观测性收尾：db-span + 后端 span + 慢查询（排在平台能力之后）
+
+trace 目前只有 RPC span，**无后端子 span**（DB/cache/storage 调用都不可见）。等 D/E 落地后统一接，构成完整后端追踪：
+
+- **db-span**：`github.com/XSAM/otelsql` wrap SQL 驱动 → 每个查询一个 span。
+- **cache-span**：随 D（redis `AddHook`，已在 D 的设计里）。
+- **storage-span**：随 E（每操作一个 span，已在 E 的设计里）。
+- **慢查询日志**：补 B 的慢查询缺口（duration + slow 标记 + 阈值，db/cache/storage 各接）。
+- **client tracing**：`tracing.Client()` 进 F 的客户端中间件链。
+
+复用 shared-go observability 已设的全局 tracer。**为什么排在 D/E 之后**：避免半截 trace（只显示 DB 不显示 cache）误导；后端 span 是一组内聚工作，一起做更干净。
 
 ---
 

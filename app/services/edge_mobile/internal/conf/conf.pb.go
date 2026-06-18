@@ -26,6 +26,7 @@ type Bootstrap struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Server        *Server                `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty"`
 	Data          *Data                  `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	Observability *Observability         `protobuf:"bytes,3,opt,name=observability,proto3" json:"observability,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -70,6 +71,13 @@ func (x *Bootstrap) GetServer() *Server {
 func (x *Bootstrap) GetData() *Data {
 	if x != nil {
 		return x.Data
+	}
+	return nil
+}
+
+func (x *Bootstrap) GetObservability() *Observability {
+	if x != nil {
+		return x.Observability
 	}
 	return nil
 }
@@ -186,6 +194,82 @@ func (x *Data) GetRedis() *Data_Redis {
 	return nil
 }
 
+type Observability struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Endpoint      string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Insecure      bool                   `protobuf:"varint,2,opt,name=insecure,proto3" json:"insecure,omitempty"`
+	Trace         *Observability_Trace   `protobuf:"bytes,3,opt,name=trace,proto3" json:"trace,omitempty"`
+	Metrics       *Observability_Metrics `protobuf:"bytes,4,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	Log           *Observability_Log     `protobuf:"bytes,5,opt,name=log,proto3" json:"log,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Observability) Reset() {
+	*x = Observability{}
+	mi := &file_internal_conf_conf_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Observability) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Observability) ProtoMessage() {}
+
+func (x *Observability) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Observability.ProtoReflect.Descriptor instead.
+func (*Observability) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Observability) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *Observability) GetInsecure() bool {
+	if x != nil {
+		return x.Insecure
+	}
+	return false
+}
+
+func (x *Observability) GetTrace() *Observability_Trace {
+	if x != nil {
+		return x.Trace
+	}
+	return nil
+}
+
+func (x *Observability) GetMetrics() *Observability_Metrics {
+	if x != nil {
+		return x.Metrics
+	}
+	return nil
+}
+
+func (x *Observability) GetLog() *Observability_Log {
+	if x != nil {
+		return x.Log
+	}
+	return nil
+}
+
 type Server_HTTP struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Network       string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
@@ -197,7 +281,7 @@ type Server_HTTP struct {
 
 func (x *Server_HTTP) Reset() {
 	*x = Server_HTTP{}
-	mi := &file_internal_conf_conf_proto_msgTypes[3]
+	mi := &file_internal_conf_conf_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -209,7 +293,7 @@ func (x *Server_HTTP) String() string {
 func (*Server_HTTP) ProtoMessage() {}
 
 func (x *Server_HTTP) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[3]
+	mi := &file_internal_conf_conf_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -257,7 +341,7 @@ type Server_GRPC struct {
 
 func (x *Server_GRPC) Reset() {
 	*x = Server_GRPC{}
-	mi := &file_internal_conf_conf_proto_msgTypes[4]
+	mi := &file_internal_conf_conf_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -269,7 +353,7 @@ func (x *Server_GRPC) String() string {
 func (*Server_GRPC) ProtoMessage() {}
 
 func (x *Server_GRPC) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[4]
+	mi := &file_internal_conf_conf_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -317,7 +401,7 @@ type Server_Connect struct {
 
 func (x *Server_Connect) Reset() {
 	*x = Server_Connect{}
-	mi := &file_internal_conf_conf_proto_msgTypes[5]
+	mi := &file_internal_conf_conf_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -329,7 +413,7 @@ func (x *Server_Connect) String() string {
 func (*Server_Connect) ProtoMessage() {}
 
 func (x *Server_Connect) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[5]
+	mi := &file_internal_conf_conf_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -383,7 +467,7 @@ type Data_Database struct {
 
 func (x *Data_Database) Reset() {
 	*x = Data_Database{}
-	mi := &file_internal_conf_conf_proto_msgTypes[6]
+	mi := &file_internal_conf_conf_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -395,7 +479,7 @@ func (x *Data_Database) String() string {
 func (*Data_Database) ProtoMessage() {}
 
 func (x *Data_Database) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[6]
+	mi := &file_internal_conf_conf_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -486,7 +570,7 @@ type Data_Redis struct {
 
 func (x *Data_Redis) Reset() {
 	*x = Data_Redis{}
-	mi := &file_internal_conf_conf_proto_msgTypes[7]
+	mi := &file_internal_conf_conf_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -498,7 +582,7 @@ func (x *Data_Redis) String() string {
 func (*Data_Redis) ProtoMessage() {}
 
 func (x *Data_Redis) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[7]
+	mi := &file_internal_conf_conf_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -542,15 +626,256 @@ func (x *Data_Redis) GetWriteTimeout() *durationpb.Duration {
 	return nil
 }
 
+type Observability_Trace struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	SamplingRatio float64                `protobuf:"fixed64,2,opt,name=sampling_ratio,json=samplingRatio,proto3" json:"sampling_ratio,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Observability_Trace) Reset() {
+	*x = Observability_Trace{}
+	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Observability_Trace) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Observability_Trace) ProtoMessage() {}
+
+func (x *Observability_Trace) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Observability_Trace.ProtoReflect.Descriptor instead.
+func (*Observability_Trace) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{3, 0}
+}
+
+func (x *Observability_Trace) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *Observability_Trace) GetSamplingRatio() float64 {
+	if x != nil {
+		return x.SamplingRatio
+	}
+	return 0
+}
+
+type Observability_Metrics struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Observability_Metrics) Reset() {
+	*x = Observability_Metrics{}
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Observability_Metrics) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Observability_Metrics) ProtoMessage() {}
+
+func (x *Observability_Metrics) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Observability_Metrics.ProtoReflect.Descriptor instead.
+func (*Observability_Metrics) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{3, 1}
+}
+
+func (x *Observability_Metrics) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+type Observability_Log struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Level         string                        `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty"`
+	Console       bool                          `protobuf:"varint,2,opt,name=console,proto3" json:"console,omitempty"`
+	Otlp          bool                          `protobuf:"varint,3,opt,name=otlp,proto3" json:"otlp,omitempty"`
+	File          *Observability_Log_FileOutput `protobuf:"bytes,4,opt,name=file,proto3" json:"file,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Observability_Log) Reset() {
+	*x = Observability_Log{}
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Observability_Log) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Observability_Log) ProtoMessage() {}
+
+func (x *Observability_Log) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Observability_Log.ProtoReflect.Descriptor instead.
+func (*Observability_Log) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{3, 2}
+}
+
+func (x *Observability_Log) GetLevel() string {
+	if x != nil {
+		return x.Level
+	}
+	return ""
+}
+
+func (x *Observability_Log) GetConsole() bool {
+	if x != nil {
+		return x.Console
+	}
+	return false
+}
+
+func (x *Observability_Log) GetOtlp() bool {
+	if x != nil {
+		return x.Otlp
+	}
+	return false
+}
+
+func (x *Observability_Log) GetFile() *Observability_Log_FileOutput {
+	if x != nil {
+		return x.File
+	}
+	return nil
+}
+
+type Observability_Log_FileOutput struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	MaxSizeMb     int32                  `protobuf:"varint,2,opt,name=max_size_mb,json=maxSizeMb,proto3" json:"max_size_mb,omitempty"`
+	MaxBackups    int32                  `protobuf:"varint,3,opt,name=max_backups,json=maxBackups,proto3" json:"max_backups,omitempty"`
+	MaxAgeDays    int32                  `protobuf:"varint,4,opt,name=max_age_days,json=maxAgeDays,proto3" json:"max_age_days,omitempty"`
+	Compress      bool                   `protobuf:"varint,5,opt,name=compress,proto3" json:"compress,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Observability_Log_FileOutput) Reset() {
+	*x = Observability_Log_FileOutput{}
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Observability_Log_FileOutput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Observability_Log_FileOutput) ProtoMessage() {}
+
+func (x *Observability_Log_FileOutput) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Observability_Log_FileOutput.ProtoReflect.Descriptor instead.
+func (*Observability_Log_FileOutput) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{3, 2, 0}
+}
+
+func (x *Observability_Log_FileOutput) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *Observability_Log_FileOutput) GetMaxSizeMb() int32 {
+	if x != nil {
+		return x.MaxSizeMb
+	}
+	return 0
+}
+
+func (x *Observability_Log_FileOutput) GetMaxBackups() int32 {
+	if x != nil {
+		return x.MaxBackups
+	}
+	return 0
+}
+
+func (x *Observability_Log_FileOutput) GetMaxAgeDays() int32 {
+	if x != nil {
+		return x.MaxAgeDays
+	}
+	return 0
+}
+
+func (x *Observability_Log_FileOutput) GetCompress() bool {
+	if x != nil {
+		return x.Compress
+	}
+	return false
+}
+
 var File_internal_conf_conf_proto protoreflect.FileDescriptor
 
 const file_internal_conf_conf_proto_rawDesc = "" +
 	"\n" +
 	"\x18internal/conf/conf.proto\x12\n" +
-	"cyber.conf\x1a\x1egoogle/protobuf/duration.proto\"]\n" +
+	"cyber.conf\x1a\x1egoogle/protobuf/duration.proto\"\x9e\x01\n" +
 	"\tBootstrap\x12*\n" +
 	"\x06server\x18\x01 \x01(\v2\x12.cyber.conf.ServerR\x06server\x12$\n" +
-	"\x04data\x18\x02 \x01(\v2\x10.cyber.conf.DataR\x04data\"\xdc\x03\n" +
+	"\x04data\x18\x02 \x01(\v2\x10.cyber.conf.DataR\x04data\x12?\n" +
+	"\robservability\x18\x03 \x01(\v2\x19.cyber.conf.ObservabilityR\robservability\"\xdc\x03\n" +
 	"\x06Server\x12+\n" +
 	"\x04http\x18\x01 \x01(\v2\x17.cyber.conf.Server.HTTPR\x04http\x12+\n" +
 	"\x04grpc\x18\x02 \x01(\v2\x17.cyber.conf.Server.GRPCR\x04grpc\x124\n" +
@@ -584,7 +909,32 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x12<\n" +
 	"\fread_timeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\vreadTimeout\x12>\n" +
-	"\rwrite_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\fwriteTimeoutB=Z;cyber-ecosystem/app/services/edge_mobile/internal/conf;confb\x06proto3"
+	"\rwrite_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\fwriteTimeout\"\x87\x05\n" +
+	"\rObservability\x12\x1a\n" +
+	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x1a\n" +
+	"\binsecure\x18\x02 \x01(\bR\binsecure\x125\n" +
+	"\x05trace\x18\x03 \x01(\v2\x1f.cyber.conf.Observability.TraceR\x05trace\x12;\n" +
+	"\ametrics\x18\x04 \x01(\v2!.cyber.conf.Observability.MetricsR\ametrics\x12/\n" +
+	"\x03log\x18\x05 \x01(\v2\x1d.cyber.conf.Observability.LogR\x03log\x1aH\n" +
+	"\x05Trace\x12\x18\n" +
+	"\aenabled\x18\x01 \x01(\bR\aenabled\x12%\n" +
+	"\x0esampling_ratio\x18\x02 \x01(\x01R\rsamplingRatio\x1a#\n" +
+	"\aMetrics\x12\x18\n" +
+	"\aenabled\x18\x01 \x01(\bR\aenabled\x1a\xa9\x02\n" +
+	"\x03Log\x12\x14\n" +
+	"\x05level\x18\x01 \x01(\tR\x05level\x12\x18\n" +
+	"\aconsole\x18\x02 \x01(\bR\aconsole\x12\x12\n" +
+	"\x04otlp\x18\x03 \x01(\bR\x04otlp\x12<\n" +
+	"\x04file\x18\x04 \x01(\v2(.cyber.conf.Observability.Log.FileOutputR\x04file\x1a\x9f\x01\n" +
+	"\n" +
+	"FileOutput\x12\x12\n" +
+	"\x04path\x18\x01 \x01(\tR\x04path\x12\x1e\n" +
+	"\vmax_size_mb\x18\x02 \x01(\x05R\tmaxSizeMb\x12\x1f\n" +
+	"\vmax_backups\x18\x03 \x01(\x05R\n" +
+	"maxBackups\x12 \n" +
+	"\fmax_age_days\x18\x04 \x01(\x05R\n" +
+	"maxAgeDays\x12\x1a\n" +
+	"\bcompress\x18\x05 \x01(\bR\bcompressB=Z;cyber-ecosystem/app/services/edge_mobile/internal/conf;confb\x06proto3"
 
 var (
 	file_internal_conf_conf_proto_rawDescOnce sync.Once
@@ -598,37 +948,47 @@ func file_internal_conf_conf_proto_rawDescGZIP() []byte {
 	return file_internal_conf_conf_proto_rawDescData
 }
 
-var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_internal_conf_conf_proto_goTypes = []any{
-	(*Bootstrap)(nil),           // 0: cyber.conf.Bootstrap
-	(*Server)(nil),              // 1: cyber.conf.Server
-	(*Data)(nil),                // 2: cyber.conf.Data
-	(*Server_HTTP)(nil),         // 3: cyber.conf.Server.HTTP
-	(*Server_GRPC)(nil),         // 4: cyber.conf.Server.GRPC
-	(*Server_Connect)(nil),      // 5: cyber.conf.Server.Connect
-	(*Data_Database)(nil),       // 6: cyber.conf.Data.Database
-	(*Data_Redis)(nil),          // 7: cyber.conf.Data.Redis
-	(*durationpb.Duration)(nil), // 8: google.protobuf.Duration
+	(*Bootstrap)(nil),                    // 0: cyber.conf.Bootstrap
+	(*Server)(nil),                       // 1: cyber.conf.Server
+	(*Data)(nil),                         // 2: cyber.conf.Data
+	(*Observability)(nil),                // 3: cyber.conf.Observability
+	(*Server_HTTP)(nil),                  // 4: cyber.conf.Server.HTTP
+	(*Server_GRPC)(nil),                  // 5: cyber.conf.Server.GRPC
+	(*Server_Connect)(nil),               // 6: cyber.conf.Server.Connect
+	(*Data_Database)(nil),                // 7: cyber.conf.Data.Database
+	(*Data_Redis)(nil),                   // 8: cyber.conf.Data.Redis
+	(*Observability_Trace)(nil),          // 9: cyber.conf.Observability.Trace
+	(*Observability_Metrics)(nil),        // 10: cyber.conf.Observability.Metrics
+	(*Observability_Log)(nil),            // 11: cyber.conf.Observability.Log
+	(*Observability_Log_FileOutput)(nil), // 12: cyber.conf.Observability.Log.FileOutput
+	(*durationpb.Duration)(nil),          // 13: google.protobuf.Duration
 }
 var file_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber.conf.Bootstrap.server:type_name -> cyber.conf.Server
 	2,  // 1: cyber.conf.Bootstrap.data:type_name -> cyber.conf.Data
-	3,  // 2: cyber.conf.Server.http:type_name -> cyber.conf.Server.HTTP
-	4,  // 3: cyber.conf.Server.grpc:type_name -> cyber.conf.Server.GRPC
-	5,  // 4: cyber.conf.Server.connect:type_name -> cyber.conf.Server.Connect
-	6,  // 5: cyber.conf.Data.database:type_name -> cyber.conf.Data.Database
-	7,  // 6: cyber.conf.Data.redis:type_name -> cyber.conf.Data.Redis
-	8,  // 7: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	8,  // 8: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	8,  // 9: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	8,  // 10: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	8,  // 11: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	8,  // 12: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	3,  // 2: cyber.conf.Bootstrap.observability:type_name -> cyber.conf.Observability
+	4,  // 3: cyber.conf.Server.http:type_name -> cyber.conf.Server.HTTP
+	5,  // 4: cyber.conf.Server.grpc:type_name -> cyber.conf.Server.GRPC
+	6,  // 5: cyber.conf.Server.connect:type_name -> cyber.conf.Server.Connect
+	7,  // 6: cyber.conf.Data.database:type_name -> cyber.conf.Data.Database
+	8,  // 7: cyber.conf.Data.redis:type_name -> cyber.conf.Data.Redis
+	9,  // 8: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
+	10, // 9: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
+	11, // 10: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
+	13, // 11: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	13, // 12: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	13, // 13: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	13, // 14: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	13, // 15: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	13, // 16: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	12, // 17: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }
@@ -642,7 +1002,7 @@ func file_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_conf_conf_proto_rawDesc), len(file_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

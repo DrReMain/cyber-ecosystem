@@ -1,13 +1,7 @@
 server:
-  http:
-    addr: 0.0.0.0:11002
-    timeout: 1s
-  grpc:
-    addr: 0.0.0.0:12002
-    timeout: 1s
-  connect:
-    addr: 0.0.0.0:13002
-    timeout: 1s
+  http: {addr: 0.0.0.0:11002, timeout: 1s}
+  grpc: {addr: 0.0.0.0:12002, timeout: 1s}
+  connect: {addr: 0.0.0.0:13002, timeout: 1s}
 data:
   database:
     driver: postgres
@@ -23,3 +17,21 @@ data:
     addr: localhost:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
+observability:
+  endpoint: localhost:4318
+  insecure: true
+  trace:
+    enabled: true
+#    sampling_ratio: 0.1
+  metrics:
+    enabled: true
+  log:
+    level: debug
+    console: true
+    otlp: true
+#    file:
+#      path: edge_mobile.log
+#      max_size_mb: 100
+#      max_backups: 10
+#      max_age_days: 30
+#      compress: true

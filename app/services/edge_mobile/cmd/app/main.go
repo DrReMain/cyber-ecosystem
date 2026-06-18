@@ -12,6 +12,7 @@ import (
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 	"github.com/go-kratos/kratos/v3/transport/http"
 
+	"cyber-ecosystem/shared-go/kratos/observability"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
 	"cyber-ecosystem/app/services/edge_mobile/internal/conf"
@@ -35,25 +36,45 @@ func newApp(logger *slog.Logger, gs *grpc.Server, hs *http.Server, cs *connect.S
 		kratos.Version(Version),
 		kratos.Metadata(map[string]string{}),
 		kratos.Logger(logger),
-		kratos.Server(
-			gs,
-			hs,
-			cs,
-		),
+		kratos.Server(gs, hs, cs),
 	)
+}
+
+func initObservability(o *conf.Observability) (func(), *slog.Logger, error) {
+	if o == nil {
+		return func() {}, slog.New(slog.NewTextHandler(
+			os.Stdout,
+			&slog.HandlerOptions{Level: slog.LevelInfo}),
+		), nil
+	}
+
+	// Each nested message is nil in proto3 if its sub-block is omitted from
+	// config — guard each so a partial observability block doesn't panic.
+	cfg := observability.Config{Endpoint: o.Endpoint, Insecure: o.Insecure}
+	if o.Trace != nil {
+		cfg.Trace = observability.TraceConfig{Enabled: o.Trace.Enabled, SamplingRatio: o.Trace.SamplingRatio}
+	}
+	if o.Metrics != nil {
+		cfg.Metrics = observability.MetricsConfig{Enabled: o.Metrics.Enabled}
+	}
+	if o.Log != nil {
+		logCfg := observability.LogConfig{Level: o.Log.Level, Console: o.Log.Console, OTLP: o.Log.Otlp}
+		if o.Log.File != nil {
+			logCfg.File = &observability.FileOutputConfig{
+				Path:       o.Log.File.Path,
+				MaxSizeMB:  int(o.Log.File.MaxSizeMb),
+				MaxBackups: int(o.Log.File.MaxBackups),
+				MaxAgeDays: int(o.Log.File.MaxAgeDays),
+				Compress:   o.Log.File.Compress,
+			}
+		}
+		cfg.Log = logCfg
+	}
+	return observability.Init(cfg, Name, Version, id)
 }
 
 func main() {
 	flag.Parse()
-
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		AddSource: true,
-		Level:     slog.LevelDebug,
-	})).With(
-		"service.id", id,
-		"service.name", Name,
-		"service.version", Version,
-	)
 
 	c := config.New(
 		config.WithSource(
@@ -71,6 +92,12 @@ func main() {
 	if err := c.Scan(&bc); err != nil {
 		panic(err)
 	}
+
+	shutdownObs, logger, err := initObservability(bc.Observability)
+	if err != nil {
+		panic(err)
+	}
+	defer shutdownObs()
 
 	app, cleanup, err := wireApp(bc.Server, bc.Data, logger)
 	if err != nil {
