@@ -82,7 +82,7 @@ func main() {
 			env.NewSource("APP_"),
 		),
 	)
-	defer c.Close()
+	defer func() { _ = c.Close() }()
 
 	if err := c.Load(); err != nil {
 		panic(err)

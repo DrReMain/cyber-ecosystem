@@ -26,7 +26,7 @@ func TestHealthzNotServingThenServing(t *testing.T) {
 			t.Fatal(err)
 		}
 		_, _ = io.Copy(io.Discard, resp.Body)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return resp.StatusCode
 	}
 

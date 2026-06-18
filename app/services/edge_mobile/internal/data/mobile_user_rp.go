@@ -68,10 +68,10 @@ func (rp *mobileUserRP) Get(ctx context.Context, id string) (*biz.MobileUser, er
 
 func (rp *mobileUserRP) List(ctx context.Context, in *biz.MobileUserListIn) (*biz.MobileUserListOut, error) {
 	query := rp.platform.GetClient(ctx).MobileUser.Query()
-	helper.WherePtr(query, utils.FromTimestamp(in.PageRequest.CreatedAtA), mobileuser.CreatedAtGTE)
-	helper.WherePtr(query, utils.FromTimestamp(in.PageRequest.CreatedAtZ), mobileuser.CreatedAtLTE)
-	helper.WherePtr(query, utils.FromTimestamp(in.PageRequest.UpdatedAtA), mobileuser.UpdatedAtGTE)
-	helper.WherePtr(query, utils.FromTimestamp(in.PageRequest.UpdatedAtZ), mobileuser.UpdatedAtLTE)
+	helper.WherePtr(query, utils.FromTimestamp(in.CreatedAtA), mobileuser.CreatedAtGTE)
+	helper.WherePtr(query, utils.FromTimestamp(in.CreatedAtZ), mobileuser.CreatedAtLTE)
+	helper.WherePtr(query, utils.FromTimestamp(in.UpdatedAtA), mobileuser.UpdatedAtGTE)
+	helper.WherePtr(query, utils.FromTimestamp(in.UpdatedAtZ), mobileuser.UpdatedAtLTE)
 	helper.Where(query, in.Phone != nil, func() predicate.MobileUser { return mobileuser.PhoneEQ(*in.Phone) })
 	helper.Where(query, in.Status != nil, func() predicate.MobileUser { return mobileuser.StatusEQ(*in.Status) })
 	helper.ApplyOrderBy(in.OrderBy, ent.Asc, ent.Desc, helper.FOMapping{

@@ -15,8 +15,6 @@ import (
 	"github.com/go-kratos/kratos/v3/log"
 	"github.com/go-kratos/kratos/v3/middleware"
 	"github.com/go-kratos/kratos/v3/transport"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect/internal/endpoint"
 	"cyber-ecosystem/shared-go/kratos/transport/connect/internal/host"
@@ -88,13 +86,20 @@ func NewServer(opts ...ServerOption) *Server {
 	if len(srv.filters) > 0 {
 		handler = filterChain(srv.filters...)(handler)
 	}
-	if srv.tlsConf == nil && srv.enableH2C {
-		handler = h2c.NewHandler(handler, &http2.Server{})
+	// HTTP/2: ALPN HTTP/2 under TLS; unencrypted HTTP/2 (h2c) over cleartext
+	// when enableH2C, via net/http's native Protocols field.
+	protos := &http.Protocols{}
+	protos.SetHTTP1(true)
+	if srv.tlsConf != nil {
+		protos.SetHTTP2(true)
+	} else if srv.enableH2C {
+		protos.SetUnencryptedHTTP2(true)
 	}
 
 	srv.Server = &http.Server{
 		Handler:   handler,
 		TLSConfig: srv.tlsConf,
+		Protocols: protos,
 	}
 
 	return srv
@@ -189,7 +194,7 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 
 	s.baseCtx = ctx
-	s.Server.BaseContext = func(net.Listener) context.Context {
+	s.BaseContext = func(net.Listener) context.Context {
 		return ctx
 	}
 
@@ -204,9 +209,9 @@ func (s *Server) Start(ctx context.Context) error {
 
 	var err error
 	if s.tlsConf != nil {
-		err = s.Server.ServeTLS(s.lis, "", "")
+		err = s.ServeTLS(s.lis, "", "")
 	} else {
-		err = s.Server.Serve(s.lis)
+		err = s.Serve(s.lis)
 	}
 
 	if !errors.Is(err, http.ErrServerClosed) {
@@ -226,11 +231,11 @@ func (s *Server) Stop(ctx context.Context) error {
 		fn()
 	}
 
-	err := s.Server.Shutdown(ctx)
+	err := s.Shutdown(ctx)
 	if err != nil {
 		if ctx.Err() != nil {
 			log.Warn("[Connect] server couldn't stop gracefully in time, doing force stop")
-			err = s.Server.Close()
+			err = s.Close()
 		}
 	}
 	return err

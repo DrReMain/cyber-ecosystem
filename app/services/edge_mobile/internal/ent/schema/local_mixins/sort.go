@@ -100,7 +100,7 @@ func queryMaxSort(ctx context.Context, client *gen.Client, table string, softDel
 	if err != nil {
 		return "", fmt.Errorf("sort mixin: query max sort: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	if rows.Next() {
 		var maxSort string

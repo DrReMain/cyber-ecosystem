@@ -10,7 +10,7 @@ func TestClientBaseURL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Close()
+	defer func() { _ = c.Close() }()
 	if c.BaseURL() == "" {
 		t.Fatal("BaseURL() is empty")
 	}
@@ -24,7 +24,7 @@ func TestClientOptionsNonNil(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Close()
+	defer func() { _ = c.Close() }()
 	if opts := c.ClientOptions(); len(opts) == 0 {
 		t.Fatal("ClientOptions() empty; client interceptors (Transport injection + middleware) must be wired")
 	}

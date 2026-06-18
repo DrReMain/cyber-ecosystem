@@ -41,7 +41,7 @@ func ErrorToConnect(err error) error {
 	// gRPC-go (status.FromError resolves grpcstatus before FromContextError).
 	// Only a context error WITHOUT its own status falls into the shortcut.
 	if _, ok := asGRPCStatus(err); !ok {
-		if ctxErr, code := contextErrorCode(err); code != connectrpc.CodeUnknown {
+		if code, ctxErr := contextErrorCode(err); code != connectrpc.CodeUnknown {
 			return connectrpc.NewError(code, stderrors.New(ctxErr.Error()))
 		}
 	}
@@ -81,14 +81,15 @@ func asGRPCStatus(err error) (*status.Status, bool) {
 // falls through to the kratos FromError path. errors.Is is used so WRAPPED
 // context errors (e.g. fmt.Errorf("...: %w", context.DeadlineExceeded)) map
 // the same way, mirroring gRPC-go's status.FromContextError behavior.
-func contextErrorCode(err error) (contextError error, code connectrpc.Code) {
-	if stderrors.Is(err, context.DeadlineExceeded) {
-		return context.DeadlineExceeded, connectrpc.CodeDeadlineExceeded
+func contextErrorCode(err error) (code connectrpc.Code, contextError error) {
+	switch {
+	case stderrors.Is(err, context.DeadlineExceeded):
+		return connectrpc.CodeDeadlineExceeded, context.DeadlineExceeded
+	case stderrors.Is(err, context.Canceled):
+		return connectrpc.CodeCanceled, context.Canceled
+	default:
+		return connectrpc.CodeUnknown, err
 	}
-	if stderrors.Is(err, context.Canceled) {
-		return context.Canceled, connectrpc.CodeCanceled
-	}
-	return err, connectrpc.CodeUnknown
 }
 
 // ConnectToError converts a Connect error into a Kratos error.
