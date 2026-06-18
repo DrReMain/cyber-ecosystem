@@ -58,8 +58,24 @@ message Data {
     google.protobuf.Duration dial_timeout = 10;
     google.protobuf.Duration pool_timeout = 11;
   }
+  message Storage {
+    message S3 {
+      string endpoint = 1;
+      string access_key = 2;
+      string secret_key = 3;
+      string bucket = 4;
+      string region = 5;
+      bool use_path_style = 6;
+      int64 multipart_threshold = 7;
+      int64 part_size = 8;
+      google.protobuf.Duration presign_ttl = 9;
+    }
+    int64 max_file_size = 1;
+    S3 s3 = 2;
+  }
   Database database = 1;
   Redis redis = 2;
+  Storage storage = 3;
 }
 
 message Observability {

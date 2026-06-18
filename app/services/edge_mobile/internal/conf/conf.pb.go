@@ -146,6 +146,7 @@ type Data struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Database      *Data_Database         `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
 	Redis         *Data_Redis            `protobuf:"bytes,2,opt,name=redis,proto3" json:"redis,omitempty"`
+	Storage       *Data_Storage          `protobuf:"bytes,3,opt,name=storage,proto3" json:"storage,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -190,6 +191,13 @@ func (x *Data) GetDatabase() *Data_Database {
 func (x *Data) GetRedis() *Data_Redis {
 	if x != nil {
 		return x.Redis
+	}
+	return nil
+}
+
+func (x *Data) GetStorage() *Data_Storage {
+	if x != nil {
+		return x.Storage
 	}
 	return nil
 }
@@ -682,6 +690,166 @@ func (x *Data_Redis) GetPoolTimeout() *durationpb.Duration {
 	return nil
 }
 
+type Data_Storage struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MaxFileSize   int64                  `protobuf:"varint,1,opt,name=max_file_size,json=maxFileSize,proto3" json:"max_file_size,omitempty"`
+	S3            *Data_Storage_S3       `protobuf:"bytes,2,opt,name=s3,proto3" json:"s3,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Data_Storage) Reset() {
+	*x = Data_Storage{}
+	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Data_Storage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Data_Storage) ProtoMessage() {}
+
+func (x *Data_Storage) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Data_Storage.ProtoReflect.Descriptor instead.
+func (*Data_Storage) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{2, 2}
+}
+
+func (x *Data_Storage) GetMaxFileSize() int64 {
+	if x != nil {
+		return x.MaxFileSize
+	}
+	return 0
+}
+
+func (x *Data_Storage) GetS3() *Data_Storage_S3 {
+	if x != nil {
+		return x.S3
+	}
+	return nil
+}
+
+type Data_Storage_S3 struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Endpoint           string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	AccessKey          string                 `protobuf:"bytes,2,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
+	SecretKey          string                 `protobuf:"bytes,3,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"`
+	Bucket             string                 `protobuf:"bytes,4,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	Region             string                 `protobuf:"bytes,5,opt,name=region,proto3" json:"region,omitempty"`
+	UsePathStyle       bool                   `protobuf:"varint,6,opt,name=use_path_style,json=usePathStyle,proto3" json:"use_path_style,omitempty"`
+	MultipartThreshold int64                  `protobuf:"varint,7,opt,name=multipart_threshold,json=multipartThreshold,proto3" json:"multipart_threshold,omitempty"`
+	PartSize           int64                  `protobuf:"varint,8,opt,name=part_size,json=partSize,proto3" json:"part_size,omitempty"`
+	PresignTtl         *durationpb.Duration   `protobuf:"bytes,9,opt,name=presign_ttl,json=presignTtl,proto3" json:"presign_ttl,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *Data_Storage_S3) Reset() {
+	*x = Data_Storage_S3{}
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Data_Storage_S3) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Data_Storage_S3) ProtoMessage() {}
+
+func (x *Data_Storage_S3) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Data_Storage_S3.ProtoReflect.Descriptor instead.
+func (*Data_Storage_S3) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{2, 2, 0}
+}
+
+func (x *Data_Storage_S3) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *Data_Storage_S3) GetAccessKey() string {
+	if x != nil {
+		return x.AccessKey
+	}
+	return ""
+}
+
+func (x *Data_Storage_S3) GetSecretKey() string {
+	if x != nil {
+		return x.SecretKey
+	}
+	return ""
+}
+
+func (x *Data_Storage_S3) GetBucket() string {
+	if x != nil {
+		return x.Bucket
+	}
+	return ""
+}
+
+func (x *Data_Storage_S3) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *Data_Storage_S3) GetUsePathStyle() bool {
+	if x != nil {
+		return x.UsePathStyle
+	}
+	return false
+}
+
+func (x *Data_Storage_S3) GetMultipartThreshold() int64 {
+	if x != nil {
+		return x.MultipartThreshold
+	}
+	return 0
+}
+
+func (x *Data_Storage_S3) GetPartSize() int64 {
+	if x != nil {
+		return x.PartSize
+	}
+	return 0
+}
+
+func (x *Data_Storage_S3) GetPresignTtl() *durationpb.Duration {
+	if x != nil {
+		return x.PresignTtl
+	}
+	return nil
+}
+
 type Observability_Trace struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -692,7 +860,7 @@ type Observability_Trace struct {
 
 func (x *Observability_Trace) Reset() {
 	*x = Observability_Trace{}
-	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -704,7 +872,7 @@ func (x *Observability_Trace) String() string {
 func (*Observability_Trace) ProtoMessage() {}
 
 func (x *Observability_Trace) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -743,7 +911,7 @@ type Observability_Metrics struct {
 
 func (x *Observability_Metrics) Reset() {
 	*x = Observability_Metrics{}
-	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -755,7 +923,7 @@ func (x *Observability_Metrics) String() string {
 func (*Observability_Metrics) ProtoMessage() {}
 
 func (x *Observability_Metrics) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -790,7 +958,7 @@ type Observability_Log struct {
 
 func (x *Observability_Log) Reset() {
 	*x = Observability_Log{}
-	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -802,7 +970,7 @@ func (x *Observability_Log) String() string {
 func (*Observability_Log) ProtoMessage() {}
 
 func (x *Observability_Log) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -859,7 +1027,7 @@ type Observability_Log_FileOutput struct {
 
 func (x *Observability_Log_FileOutput) Reset() {
 	*x = Observability_Log_FileOutput{}
-	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -871,7 +1039,7 @@ func (x *Observability_Log_FileOutput) String() string {
 func (*Observability_Log_FileOutput) ProtoMessage() {}
 
 func (x *Observability_Log_FileOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -947,10 +1115,12 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\aConnect\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
-	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xfc\x06\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xce\n" +
+	"\n" +
 	"\x04Data\x125\n" +
 	"\bdatabase\x18\x01 \x01(\v2\x19.cyber.conf.Data.DatabaseR\bdatabase\x12,\n" +
-	"\x05redis\x18\x02 \x01(\v2\x16.cyber.conf.Data.RedisR\x05redis\x1a\xa6\x02\n" +
+	"\x05redis\x18\x02 \x01(\v2\x16.cyber.conf.Data.RedisR\x05redis\x122\n" +
+	"\astorage\x18\x03 \x01(\v2\x18.cyber.conf.Data.StorageR\astorage\x1a\xa6\x02\n" +
 	"\bDatabase\x12\x16\n" +
 	"\x06driver\x18\x01 \x01(\tR\x06driver\x12\x12\n" +
 	"\x04host\x18\x02 \x01(\tR\x04host\x12\x12\n" +
@@ -973,7 +1143,23 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\rwrite_timeout\x18\t \x01(\v2\x19.google.protobuf.DurationR\fwriteTimeout\x12<\n" +
 	"\fdial_timeout\x18\n" +
 	" \x01(\v2\x19.google.protobuf.DurationR\vdialTimeout\x12<\n" +
-	"\fpool_timeout\x18\v \x01(\v2\x19.google.protobuf.DurationR\vpoolTimeout\"\x87\x05\n" +
+	"\fpool_timeout\x18\v \x01(\v2\x19.google.protobuf.DurationR\vpoolTimeout\x1a\x9b\x03\n" +
+	"\aStorage\x12\"\n" +
+	"\rmax_file_size\x18\x01 \x01(\x03R\vmaxFileSize\x12+\n" +
+	"\x02s3\x18\x02 \x01(\v2\x1b.cyber.conf.Data.Storage.S3R\x02s3\x1a\xbe\x02\n" +
+	"\x02S3\x12\x1a\n" +
+	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x1d\n" +
+	"\n" +
+	"access_key\x18\x02 \x01(\tR\taccessKey\x12\x1d\n" +
+	"\n" +
+	"secret_key\x18\x03 \x01(\tR\tsecretKey\x12\x16\n" +
+	"\x06bucket\x18\x04 \x01(\tR\x06bucket\x12\x16\n" +
+	"\x06region\x18\x05 \x01(\tR\x06region\x12$\n" +
+	"\x0euse_path_style\x18\x06 \x01(\bR\fusePathStyle\x12/\n" +
+	"\x13multipart_threshold\x18\a \x01(\x03R\x12multipartThreshold\x12\x1b\n" +
+	"\tpart_size\x18\b \x01(\x03R\bpartSize\x12:\n" +
+	"\vpresign_ttl\x18\t \x01(\v2\x19.google.protobuf.DurationR\n" +
+	"presignTtl\"\x87\x05\n" +
 	"\rObservability\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x1a\n" +
 	"\binsecure\x18\x02 \x01(\bR\binsecure\x125\n" +
@@ -1012,7 +1198,7 @@ func file_internal_conf_conf_proto_rawDescGZIP() []byte {
 	return file_internal_conf_conf_proto_rawDescData
 }
 
-var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_internal_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),                    // 0: cyber.conf.Bootstrap
 	(*Server)(nil),                       // 1: cyber.conf.Server
@@ -1023,11 +1209,13 @@ var file_internal_conf_conf_proto_goTypes = []any{
 	(*Server_Connect)(nil),               // 6: cyber.conf.Server.Connect
 	(*Data_Database)(nil),                // 7: cyber.conf.Data.Database
 	(*Data_Redis)(nil),                   // 8: cyber.conf.Data.Redis
-	(*Observability_Trace)(nil),          // 9: cyber.conf.Observability.Trace
-	(*Observability_Metrics)(nil),        // 10: cyber.conf.Observability.Metrics
-	(*Observability_Log)(nil),            // 11: cyber.conf.Observability.Log
-	(*Observability_Log_FileOutput)(nil), // 12: cyber.conf.Observability.Log.FileOutput
-	(*durationpb.Duration)(nil),          // 13: google.protobuf.Duration
+	(*Data_Storage)(nil),                 // 9: cyber.conf.Data.Storage
+	(*Data_Storage_S3)(nil),              // 10: cyber.conf.Data.Storage.S3
+	(*Observability_Trace)(nil),          // 11: cyber.conf.Observability.Trace
+	(*Observability_Metrics)(nil),        // 12: cyber.conf.Observability.Metrics
+	(*Observability_Log)(nil),            // 13: cyber.conf.Observability.Log
+	(*Observability_Log_FileOutput)(nil), // 14: cyber.conf.Observability.Log.FileOutput
+	(*durationpb.Duration)(nil),          // 15: google.protobuf.Duration
 }
 var file_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber.conf.Bootstrap.server:type_name -> cyber.conf.Server
@@ -1038,24 +1226,27 @@ var file_internal_conf_conf_proto_depIdxs = []int32{
 	6,  // 5: cyber.conf.Server.connect:type_name -> cyber.conf.Server.Connect
 	7,  // 6: cyber.conf.Data.database:type_name -> cyber.conf.Data.Database
 	8,  // 7: cyber.conf.Data.redis:type_name -> cyber.conf.Data.Redis
-	9,  // 8: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
-	10, // 9: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
-	11, // 10: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
-	13, // 11: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	13, // 12: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	13, // 13: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	13, // 14: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	13, // 15: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
-	13, // 16: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	13, // 17: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	13, // 18: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
-	13, // 19: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
-	12, // 20: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	9,  // 8: cyber.conf.Data.storage:type_name -> cyber.conf.Data.Storage
+	11, // 9: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
+	12, // 10: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
+	13, // 11: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
+	15, // 12: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	15, // 13: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	15, // 14: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	15, // 15: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	15, // 16: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
+	15, // 17: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	15, // 18: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	15, // 19: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
+	15, // 20: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
+	10, // 21: cyber.conf.Data.Storage.s3:type_name -> cyber.conf.Data.Storage.S3
+	15, // 22: cyber.conf.Data.Storage.S3.presign_ttl:type_name -> google.protobuf.Duration
+	14, // 23: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
+	24, // [24:24] is the sub-list for method output_type
+	24, // [24:24] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }
@@ -1069,7 +1260,7 @@ func file_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_conf_conf_proto_rawDesc), len(file_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

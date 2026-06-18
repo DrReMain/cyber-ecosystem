@@ -10,27 +10,39 @@ data:
     user: postgres
     password: postgres
     db_name: edge_mobile
-    max_open_conns: 100
-    max_idle_conns: 50
-    conn_max_lifetime: 3600s
+    max_open_conns: 100        # 个 (最大连接数)
+    max_idle_conns: 50         # 个 (最大空闲连接数)
+    conn_max_lifetime: 3600s   # 时长 (连接最大存活)
   redis:
     network: tcp
     addr: localhost:6379
     password: ""
-    db: 0
-    pool_size: 50
-    min_idle_conns: 5
-    conn_max_lifetime: 1800s
-    read_timeout: 0.2s
-    write_timeout: 0.2s
-    # dial_timeout: 5s # omit → go-redis default (5s)
-    # pool_timeout: 4s # omit → go-redis default (ReadTimeout+1s ≈ 1.2s here)
+    db: 0                      # 序号 (Redis 数据库 0–15)
+    pool_size: 50              # 个 (连接池大小)
+    min_idle_conns: 5          # 个 (最小空闲连接数)
+    conn_max_lifetime: 1800s   # 时长 (连接最大存活)
+    read_timeout: 0.2s         # 时长 (读超时)
+    write_timeout: 0.2s        # 时长 (写超时)
+    # dial_timeout: 5s         # 时长 (拨号超时) — omit → go-redis default (5s)
+    # pool_timeout: 4s         # 时长 (池等待超时) — omit → go-redis default (ReadTimeout+1s ≈ 1.2s here)
+  storage:
+    max_file_size: 52428800    # 字节 bytes (50 MiB)
+    s3:
+      endpoint: http://localhost:9000 # k3d LB host:9000 → MinIO NodePort 30090
+      access_key: admin@cyber-ecosystem.com
+      secret_key: Cyber-Ecosystem123
+      bucket: mobile
+      region: us-east-1
+      use_path_style: true
+      multipart_threshold: 8388608 # 字节 bytes (8 MiB)
+      part_size: 5242880           # 字节 bytes (5 MiB)
+      presign_ttl: 900s            # 时长 (预签名有效期)
 observability:
   endpoint: localhost:4318
   insecure: true
   trace:
     enabled: true
-#    sampling_ratio: 0.1
+#    sampling_ratio: 0.1      # 比率 (0.0–1.0)
   metrics:
     enabled: true
   log:
@@ -39,7 +51,7 @@ observability:
     otlp: true
 #    file:
 #      path: edge_mobile.log
-#      max_size_mb: 100
-#      max_backups: 10
-#      max_age_days: 30
+#      max_size_mb: 100   # MiB (单文件最大)
+#      max_backups: 10    # 个 (保留备份数)
+#      max_age_days: 30   # 天 (最大保留天数)
 #      compress: true
