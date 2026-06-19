@@ -9,11 +9,6 @@ import (
 	"cyber-ecosystem/app/services/edge_mobile/internal/conf"
 )
 
-// NewCache builds the redis-backed cache container for edge_mobile and returns
-// it with a cleanup that closes the redis client. The cleanup is part of the
-// provider signature so google/wire registers it: wire invokes it on graceful
-// shutdown AND automatically if a later provider fails during injection (e.g. DB
-// unreachable at boot), so the redis connection pool is never orphaned.
 func NewCache(c *conf.Data) (*cache.Cache, func(), error) {
 	rc := c.GetRedis()
 	if rc == nil {

@@ -10,11 +10,6 @@ import (
 	_ "cyber-ecosystem/app/services/edge_mobile/internal/ent/runtime"
 )
 
-// NewEntClient opens the ent client and returns it with a cleanup that closes
-// the underlying database pool. Wire registers the cleanup so the pool is
-// closed on shutdown and on any later provider failure during injection. Schema
-// management is external (Atlas versioned migrations via the migrate:diff /
-// migrate:apply Nx targets); the app performs no DDL on startup.
 func NewEntClient(c *conf.Data) (*ent.Client, func(), error) {
 	ec, err := client.NewEntClient(client.DBConfig{
 		Driver:          c.Database.Driver,

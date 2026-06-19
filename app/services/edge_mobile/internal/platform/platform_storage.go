@@ -9,10 +9,6 @@ import (
 	"cyber-ecosystem/app/services/edge_mobile/internal/conf"
 )
 
-// NewStorage builds the S3-backed storage container for edge_mobile. Returning
-// the cleanup from the provider lets wire chain it for graceful shutdown and
-// partial-injection rollback; the S3 client owns no closeable resource, so the
-// cleanup is a no-op.
 func NewStorage(c *conf.Data) (*storage.Storage, func(), error) {
 	sc := c.GetStorage()
 	if sc == nil {

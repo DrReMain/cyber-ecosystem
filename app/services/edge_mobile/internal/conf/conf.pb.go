@@ -753,6 +753,7 @@ func (x *Data_Storage) GetS3() *Data_Storage_S3 {
 type Data_MQ struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Nats          *Data_MQ_NATS          `protobuf:"bytes,1,opt,name=nats,proto3" json:"nats,omitempty"`
+	Pg            *Data_MQ_PG            `protobuf:"bytes,2,opt,name=pg,proto3" json:"pg,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -790,6 +791,13 @@ func (*Data_MQ) Descriptor() ([]byte, []int) {
 func (x *Data_MQ) GetNats() *Data_MQ_NATS {
 	if x != nil {
 		return x.Nats
+	}
+	return nil
+}
+
+func (x *Data_MQ) GetPg() *Data_MQ_PG {
+	if x != nil {
+		return x.Pg
 	}
 	return nil
 }
@@ -1018,6 +1026,90 @@ func (x *Data_MQ_NATS) GetNakBackoffStep() *durationpb.Duration {
 	return nil
 }
 
+type Data_MQ_PG struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Dsn               string                 `protobuf:"bytes,1,opt,name=dsn,proto3" json:"dsn,omitempty"`                                                      // postgres://... to the standalone `mq` database
+	PollInterval      *durationpb.Duration   `protobuf:"bytes,2,opt,name=poll_interval,json=pollInterval,proto3" json:"poll_interval,omitempty"`                // consumer poll interval (0 → backend default)
+	VisibilityTimeout *durationpb.Duration   `protobuf:"bytes,3,opt,name=visibility_timeout,json=visibilityTimeout,proto3" json:"visibility_timeout,omitempty"` // = NATS ack_wait (0 → backend default)
+	MaxRetries        int32                  `protobuf:"varint,4,opt,name=max_retries,json=maxRetries,proto3" json:"max_retries,omitempty"`                     // delivery attempts before DLQ (0 → backend default)
+	Retention         *durationpb.Duration   `protobuf:"bytes,5,opt,name=retention,proto3" json:"retention,omitempty"`                                          // message retention, age-based eviction (0 → backend default)
+	BatchSize         int32                  `protobuf:"varint,6,opt,name=batch_size,json=batchSize,proto3" json:"batch_size,omitempty"`                        // max messages per poll batch (0 → backend default)
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *Data_MQ_PG) Reset() {
+	*x = Data_MQ_PG{}
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Data_MQ_PG) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Data_MQ_PG) ProtoMessage() {}
+
+func (x *Data_MQ_PG) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Data_MQ_PG.ProtoReflect.Descriptor instead.
+func (*Data_MQ_PG) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{2, 3, 1}
+}
+
+func (x *Data_MQ_PG) GetDsn() string {
+	if x != nil {
+		return x.Dsn
+	}
+	return ""
+}
+
+func (x *Data_MQ_PG) GetPollInterval() *durationpb.Duration {
+	if x != nil {
+		return x.PollInterval
+	}
+	return nil
+}
+
+func (x *Data_MQ_PG) GetVisibilityTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.VisibilityTimeout
+	}
+	return nil
+}
+
+func (x *Data_MQ_PG) GetMaxRetries() int32 {
+	if x != nil {
+		return x.MaxRetries
+	}
+	return 0
+}
+
+func (x *Data_MQ_PG) GetRetention() *durationpb.Duration {
+	if x != nil {
+		return x.Retention
+	}
+	return nil
+}
+
+func (x *Data_MQ_PG) GetBatchSize() int32 {
+	if x != nil {
+		return x.BatchSize
+	}
+	return 0
+}
+
 type Observability_Trace struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -1028,7 +1120,7 @@ type Observability_Trace struct {
 
 func (x *Observability_Trace) Reset() {
 	*x = Observability_Trace{}
-	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1040,7 +1132,7 @@ func (x *Observability_Trace) String() string {
 func (*Observability_Trace) ProtoMessage() {}
 
 func (x *Observability_Trace) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1079,7 +1171,7 @@ type Observability_Metrics struct {
 
 func (x *Observability_Metrics) Reset() {
 	*x = Observability_Metrics{}
-	mi := &file_internal_conf_conf_proto_msgTypes[14]
+	mi := &file_internal_conf_conf_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1091,7 +1183,7 @@ func (x *Observability_Metrics) String() string {
 func (*Observability_Metrics) ProtoMessage() {}
 
 func (x *Observability_Metrics) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[14]
+	mi := &file_internal_conf_conf_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1126,7 +1218,7 @@ type Observability_Log struct {
 
 func (x *Observability_Log) Reset() {
 	*x = Observability_Log{}
-	mi := &file_internal_conf_conf_proto_msgTypes[15]
+	mi := &file_internal_conf_conf_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1138,7 +1230,7 @@ func (x *Observability_Log) String() string {
 func (*Observability_Log) ProtoMessage() {}
 
 func (x *Observability_Log) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[15]
+	mi := &file_internal_conf_conf_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1195,7 +1287,7 @@ type Observability_Log_FileOutput struct {
 
 func (x *Observability_Log_FileOutput) Reset() {
 	*x = Observability_Log_FileOutput{}
-	mi := &file_internal_conf_conf_proto_msgTypes[16]
+	mi := &file_internal_conf_conf_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1207,7 +1299,7 @@ func (x *Observability_Log_FileOutput) String() string {
 func (*Observability_Log_FileOutput) ProtoMessage() {}
 
 func (x *Observability_Log_FileOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[16]
+	mi := &file_internal_conf_conf_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1283,7 +1375,7 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\aConnect\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
-	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xd7\x0e\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\x9b\x11\n" +
 	"\x04Data\x125\n" +
 	"\bdatabase\x18\x01 \x01(\v2\x19.cyber.conf.Data.DatabaseR\bdatabase\x12,\n" +
 	"\x05redis\x18\x02 \x01(\v2\x16.cyber.conf.Data.RedisR\x05redis\x122\n" +
@@ -1327,9 +1419,10 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\x13multipart_threshold\x18\a \x01(\x03R\x12multipartThreshold\x12\x1b\n" +
 	"\tpart_size\x18\b \x01(\x03R\bpartSize\x12:\n" +
 	"\vpresign_ttl\x18\t \x01(\v2\x19.google.protobuf.DurationR\n" +
-	"presignTtl\x1a\xe1\x03\n" +
+	"presignTtl\x1a\xa5\x06\n" +
 	"\x02MQ\x12,\n" +
-	"\x04nats\x18\x01 \x01(\v2\x18.cyber.conf.Data.MQ.NATSR\x04nats\x1a\xac\x03\n" +
+	"\x04nats\x18\x01 \x01(\v2\x18.cyber.conf.Data.MQ.NATSR\x04nats\x12&\n" +
+	"\x02pg\x18\x02 \x01(\v2\x16.cyber.conf.Data.MQ.PGR\x02pg\x1a\xac\x03\n" +
 	"\x04NATS\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x14\n" +
 	"\x05creds\x18\x02 \x01(\tR\x05creds\x122\n" +
@@ -1342,7 +1435,16 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\vdlq_max_age\x18\b \x01(\v2\x19.google.protobuf.DurationR\tdlqMaxAge\x12\"\n" +
 	"\rdlq_max_bytes\x18\t \x01(\x03R\vdlqMaxBytes\x12C\n" +
 	"\x10nak_backoff_step\x18\n" +
-	" \x01(\v2\x19.google.protobuf.DurationR\x0enakBackoffStep\"\x87\x05\n" +
+	" \x01(\v2\x19.google.protobuf.DurationR\x0enakBackoffStep\x1a\x99\x02\n" +
+	"\x02PG\x12\x10\n" +
+	"\x03dsn\x18\x01 \x01(\tR\x03dsn\x12>\n" +
+	"\rpoll_interval\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\fpollInterval\x12H\n" +
+	"\x12visibility_timeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\x11visibilityTimeout\x12\x1f\n" +
+	"\vmax_retries\x18\x04 \x01(\x05R\n" +
+	"maxRetries\x127\n" +
+	"\tretention\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\tretention\x12\x1d\n" +
+	"\n" +
+	"batch_size\x18\x06 \x01(\x05R\tbatchSize\"\x87\x05\n" +
 	"\rObservability\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x1a\n" +
 	"\binsecure\x18\x02 \x01(\bR\binsecure\x125\n" +
@@ -1381,7 +1483,7 @@ func file_internal_conf_conf_proto_rawDescGZIP() []byte {
 	return file_internal_conf_conf_proto_rawDescData
 }
 
-var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_internal_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),                    // 0: cyber.conf.Bootstrap
 	(*Server)(nil),                       // 1: cyber.conf.Server
@@ -1396,11 +1498,12 @@ var file_internal_conf_conf_proto_goTypes = []any{
 	(*Data_MQ)(nil),                      // 10: cyber.conf.Data.MQ
 	(*Data_Storage_S3)(nil),              // 11: cyber.conf.Data.Storage.S3
 	(*Data_MQ_NATS)(nil),                 // 12: cyber.conf.Data.MQ.NATS
-	(*Observability_Trace)(nil),          // 13: cyber.conf.Observability.Trace
-	(*Observability_Metrics)(nil),        // 14: cyber.conf.Observability.Metrics
-	(*Observability_Log)(nil),            // 15: cyber.conf.Observability.Log
-	(*Observability_Log_FileOutput)(nil), // 16: cyber.conf.Observability.Log.FileOutput
-	(*durationpb.Duration)(nil),          // 17: google.protobuf.Duration
+	(*Data_MQ_PG)(nil),                   // 13: cyber.conf.Data.MQ.PG
+	(*Observability_Trace)(nil),          // 14: cyber.conf.Observability.Trace
+	(*Observability_Metrics)(nil),        // 15: cyber.conf.Observability.Metrics
+	(*Observability_Log)(nil),            // 16: cyber.conf.Observability.Log
+	(*Observability_Log_FileOutput)(nil), // 17: cyber.conf.Observability.Log.FileOutput
+	(*durationpb.Duration)(nil),          // 18: google.protobuf.Duration
 }
 var file_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber.conf.Bootstrap.server:type_name -> cyber.conf.Server
@@ -1413,31 +1516,35 @@ var file_internal_conf_conf_proto_depIdxs = []int32{
 	8,  // 7: cyber.conf.Data.redis:type_name -> cyber.conf.Data.Redis
 	9,  // 8: cyber.conf.Data.storage:type_name -> cyber.conf.Data.Storage
 	10, // 9: cyber.conf.Data.mq:type_name -> cyber.conf.Data.MQ
-	13, // 10: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
-	14, // 11: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
-	15, // 12: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
-	17, // 13: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	17, // 14: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	17, // 15: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	17, // 16: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	17, // 17: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
-	17, // 18: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	17, // 19: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	17, // 20: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
-	17, // 21: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
+	14, // 10: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
+	15, // 11: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
+	16, // 12: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
+	18, // 13: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	18, // 14: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	18, // 15: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	18, // 16: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	18, // 17: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
+	18, // 18: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	18, // 19: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	18, // 20: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
+	18, // 21: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
 	11, // 22: cyber.conf.Data.Storage.s3:type_name -> cyber.conf.Data.Storage.S3
 	12, // 23: cyber.conf.Data.MQ.nats:type_name -> cyber.conf.Data.MQ.NATS
-	17, // 24: cyber.conf.Data.Storage.S3.presign_ttl:type_name -> google.protobuf.Duration
-	17, // 25: cyber.conf.Data.MQ.NATS.max_age:type_name -> google.protobuf.Duration
-	17, // 26: cyber.conf.Data.MQ.NATS.ack_wait:type_name -> google.protobuf.Duration
-	17, // 27: cyber.conf.Data.MQ.NATS.dlq_max_age:type_name -> google.protobuf.Duration
-	17, // 28: cyber.conf.Data.MQ.NATS.nak_backoff_step:type_name -> google.protobuf.Duration
-	16, // 29: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
-	30, // [30:30] is the sub-list for method output_type
-	30, // [30:30] is the sub-list for method input_type
-	30, // [30:30] is the sub-list for extension type_name
-	30, // [30:30] is the sub-list for extension extendee
-	0,  // [0:30] is the sub-list for field type_name
+	13, // 24: cyber.conf.Data.MQ.pg:type_name -> cyber.conf.Data.MQ.PG
+	18, // 25: cyber.conf.Data.Storage.S3.presign_ttl:type_name -> google.protobuf.Duration
+	18, // 26: cyber.conf.Data.MQ.NATS.max_age:type_name -> google.protobuf.Duration
+	18, // 27: cyber.conf.Data.MQ.NATS.ack_wait:type_name -> google.protobuf.Duration
+	18, // 28: cyber.conf.Data.MQ.NATS.dlq_max_age:type_name -> google.protobuf.Duration
+	18, // 29: cyber.conf.Data.MQ.NATS.nak_backoff_step:type_name -> google.protobuf.Duration
+	18, // 30: cyber.conf.Data.MQ.PG.poll_interval:type_name -> google.protobuf.Duration
+	18, // 31: cyber.conf.Data.MQ.PG.visibility_timeout:type_name -> google.protobuf.Duration
+	18, // 32: cyber.conf.Data.MQ.PG.retention:type_name -> google.protobuf.Duration
+	17, // 33: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
+	34, // [34:34] is the sub-list for method output_type
+	34, // [34:34] is the sub-list for method input_type
+	34, // [34:34] is the sub-list for extension type_name
+	34, // [34:34] is the sub-list for extension extendee
+	0,  // [0:34] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }
@@ -1451,7 +1558,7 @@ func file_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_conf_conf_proto_rawDesc), len(file_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

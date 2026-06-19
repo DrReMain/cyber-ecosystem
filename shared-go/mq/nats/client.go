@@ -43,12 +43,15 @@ func NewClient(cfg *Config) (*handle, func(), error) {
 		return nil, nil, fmt.Errorf("%w: jetstream init: %w", mq.ErrUnavailable, err)
 	}
 	h := &handle{nc: nc, js: js, cfg: *cfg}
+	h.ctx, h.cancel = context.WithCancel(context.Background())
 	return h, func() {
-		// Stop consumers first (process in-flight, then close), bounded; only then
-		// drain the connection. nc.Drain itself is non-blocking (server-side flush),
-		// but ordering it after the subscriptions are closed avoids ack/dlq calls
-		// racing a closing connection.
+		// Cancel the lifetime ctx first so every consume callback (derived from it,
+		// not from any caller ctx) stops, then drain the subscriptions, then the
+		// connection. nc.Drain itself is non-blocking (server-side flush), but
+		// ordering it after the subscriptions are closed avoids ack/dlq calls racing
+		// a closing connection.
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		h.cancel()
 		h.drainSubs(ctx)
 		cancel()
 		_ = nc.Drain()
@@ -61,6 +64,12 @@ type handle struct {
 	nc  *natsclient.Conn
 	js  jetstream.JetStream
 	cfg Config
+
+	// ctx is the handle lifetime context. Consume callbacks derive from it (not from
+	// any Subscribe caller ctx) so long-lived subscriptions outlive the originating
+	// request; cancelled by the returned cleanup.
+	ctx    context.Context
+	cancel context.CancelFunc
 
 	mu   sync.Mutex
 	subs map[*subscription]struct{}

@@ -5,24 +5,31 @@ import (
 
 	"cyber-ecosystem/shared-go/mq"
 	mqnats "cyber-ecosystem/shared-go/mq/nats"
+	mqpg "cyber-ecosystem/shared-go/mq/pg"
 
 	"cyber-ecosystem/app/services/edge_mobile/internal/conf"
 )
 
-// NewMQ builds the NATS-backed MQ container for edge_mobile. The (T, func(), error)
-// shape lets wire chain the cleanup (NATS conn drain) for graceful shutdown and
-// partial-injection rollback.
 func NewMQ(c *conf.Data) (*mq.MQ, func(), error) {
 	mc := c.GetMq()
 	if mc == nil {
 		return nil, nil, fmt.Errorf("mq config is required")
 	}
-	cfg := toMQConfig(mc.GetNats())
-	h, closeFn, err := mqnats.NewClient(cfg)
-	if err != nil {
-		return nil, nil, err
+	if n := mc.GetNats(); n != nil && n.GetEndpoint() != "" {
+		h, closeFn, err := mqnats.NewClient(toMQConfig(n))
+		if err != nil {
+			return nil, nil, err
+		}
+		return mqnats.New(h), closeFn, nil
 	}
-	return mqnats.New(h), closeFn, nil
+	if p := mc.GetPg(); p != nil && p.GetDsn() != "" {
+		h, closeFn, err := mqpg.NewClient(toPGConfig(p))
+		if err != nil {
+			return nil, nil, err
+		}
+		return mqpg.New(h), closeFn, nil
+	}
+	return nil, nil, fmt.Errorf("mq: configure either nats or pg")
 }
 
 func toMQConfig(n *conf.Data_MQ_NATS) *mqnats.Config {
@@ -48,6 +55,24 @@ func toMQConfig(n *conf.Data_MQ_NATS) *mqnats.Config {
 	}
 	if n.NakBackoffStep != nil {
 		cfg.NakBackoffStep = n.GetNakBackoffStep().AsDuration()
+	}
+	return cfg
+}
+
+func toPGConfig(p *conf.Data_MQ_PG) *mqpg.Config {
+	cfg := &mqpg.Config{
+		DSN:        p.GetDsn(),
+		MaxRetries: int(p.GetMaxRetries()),
+		BatchSize:  int(p.GetBatchSize()),
+	}
+	if p.PollInterval != nil {
+		cfg.PollInterval = p.GetPollInterval().AsDuration()
+	}
+	if p.VisibilityTimeout != nil {
+		cfg.VisibilityTimeout = p.GetVisibilityTimeout().AsDuration()
+	}
+	if p.Retention != nil {
+		cfg.Retention = p.GetRetention().AsDuration()
 	}
 	return cfg
 }

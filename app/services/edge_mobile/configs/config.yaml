@@ -49,6 +49,13 @@ data:
       dlq_max_age: 2592000s       # 30 天 (DLQ 流保留，长于业务流)
       dlq_max_bytes: 1073741824   # 1 GiB (DLQ 流容量)
       nak_backoff_step: 0.5s      # 线性退避步长 (Nak 重投延迟)
+    # pg:                          # 备选后端（与 nats 二选一；无 NATS 部署用；需预先 CREATE DATABASE mq）
+    #   dsn: postgres://postgres:postgres@localhost:5432/mq?sslmode=disable
+    #   poll_interval: 0.5s
+    #   visibility_timeout: 30s
+    #   max_retries: 5
+    #   retention: 604800s         # 7 天 (protobuf Duration: 秒)
+    #   batch_size: 16
 observability:
   endpoint: localhost:4318
   insecure: true

@@ -104,7 +104,10 @@ func (c *consumer) Subscribe(ctx context.Context, topic, group string, handler f
 		return nil, mapError(err, "create consumer")
 	}
 
-	cctx, cancel := context.WithCancel(ctx)
+	// The consume callback runs under the handle's lifetime ctx, NOT the caller's
+	// ctx, so a long-lived subscription survives the originating request/RPC ending.
+	// The caller ctx only gates the synchronous setup above.
+	cctx, cancel := context.WithCancel(c.h.ctx)
 	cc, err := cons.Consume(func(msg jetstream.Msg) {
 		meta, merr := msg.Metadata()
 		m := mq.Message{Topic: topic, Payload: msg.Data(), Headers: headerToMap(msg.Headers())}

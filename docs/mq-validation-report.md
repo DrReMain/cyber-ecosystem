@@ -4,6 +4,15 @@ Full test coverage for the MQ capability (`shared-go/mq` + NATS JetStream +
 `edge_mobile` Platform wiring). All tests run against a **real NATS JetStream**
 instance (k3d, `localhost:4222`) — no mocks.
 
+> **PG backend added** (`shared-go/mq/pg`, 2026-06-19): a second backend
+> implementing the same contract on PostgreSQL (per `docs/pg-mq-design.md`).
+> 10 tests (schema/fault/publish/retry→DLQ/round-trip/competing/broadcast/
+> durable-resume) against a real PG `mq` database, green incl. `-count=5 -race`;
+> the PG-backed service boots and serves on all 3 transports. Same observable
+> contract as NATS (visibility_timeout=AckWait, deliveries=NumDelivered, DLQ at
+> cap); one advantage — DLQ+remove is a single PG transaction (atomic, no
+> dup-DLQ window).
+
 - **Capability commits:** `c26caba5` (impl) · `dbd6c4ff` (hardening + this report).
 - **Test totals:** 17 automated tests — 3 pure-logic (`shared-go/mq`) + 14
   NATS-backed (`shared-go/mq/nats`) — plus a temporary 3-transport stack probe
