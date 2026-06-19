@@ -41,6 +41,25 @@
         "command": "kubectl delete namespace storage --ignore-not-found"
       }
     },
+    "mq:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "kubectl apply -f deploy/k8s/mq/namespace.yaml",
+          "kubectl apply -f deploy/k8s/mq/nats.yaml",
+          "kubectl wait pod -n mq --for=condition=ready --all --timeout=120s"
+        ],
+        "parallel": false
+      }
+    },
+    "mq:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "kubectl delete namespace mq --ignore-not-found"
+      }
+    },
     "observability:start": {
       "executor": "nx:run-commands",
       "dependsOn": ["db:start"],
@@ -70,7 +89,7 @@
     },
     "start": {
       "executor": "nx:run-commands",
-      "dependsOn": ["db:start", "storage:start", "observability:start"],
+      "dependsOn": ["db:start", "storage:start", "mq:start", "observability:start"],
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "echo '=== All services started ===' && kubectl get pods -A -o wide | grep -v kube-system"
@@ -78,7 +97,7 @@
     },
     "stop": {
       "executor": "nx:run-commands",
-      "dependsOn": ["observability:stop", "storage:stop", "db:stop"],
+      "dependsOn": ["observability:stop", "mq:stop", "storage:stop", "db:stop"],
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "echo '=== All services stopped ==='"

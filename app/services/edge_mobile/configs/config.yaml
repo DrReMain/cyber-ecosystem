@@ -41,14 +41,14 @@ observability:
   endpoint: localhost:4318
   insecure: true
   trace:
-    enabled: true
+    enabled: false
 #    sampling_ratio: 0.1      # 比率 (0.0–1.0)
   metrics:
-    enabled: true
+    enabled: false
   log:
     level: debug
     console: true
-    otlp: true
+    otlp: false
 #    file:
 #      path: edge_mobile.log
 #      max_size_mb: 100   # MiB (单文件最大)
