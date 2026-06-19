@@ -49,8 +49,24 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger *slog.Logger) 
 		cleanup()
 		return nil, nil, err
 	}
-	platformPlatform, err := platform.NewPlatform(cache, cacheErrorHandler, client, entErrorHandler, storage, storageErrorHandler)
+	mq, cleanup4, err := platform.NewMQ(confData)
 	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	mqErrorHandler, err := platform.NewMQErrorHandler()
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	platformPlatform, err := platform.NewPlatform(cache, cacheErrorHandler, client, entErrorHandler, storage, storageErrorHandler, mq, mqErrorHandler)
+	if err != nil {
+		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()
@@ -69,6 +85,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger *slog.Logger) 
 	connectServer := server.NewConnectServer(confServer, logger, v)
 	app := newApp(logger, grpcServer, httpServer, connectServer)
 	return app, func() {
+		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()

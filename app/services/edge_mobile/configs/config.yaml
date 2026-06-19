@@ -37,6 +37,18 @@ data:
       multipart_threshold: 8388608 # 字节 bytes (8 MiB)
       part_size: 5242880           # 字节 bytes (5 MiB)
       presign_ttl: 900s            # 时长 (预签名有效期)
+  mq:
+    nats:
+      endpoint: nats://localhost:4222
+      # creds: "" # dev 无鉴权
+      max_age: 604800s            # 7 天 (protobuf Duration: 秒)
+      max_bytes: 1073741824       # 1 GiB
+      max_retries: 5              # 次 (投递上限，超过则 DLQ)
+      ack_wait: 30s               # 时长 (重投等待，须大于 handler p99)
+      max_ack_pending: 256        # 个 (每消费者在途未 ack 上限，限内存+重投)
+      dlq_max_age: 2592000s       # 30 天 (DLQ 流保留，长于业务流)
+      dlq_max_bytes: 1073741824   # 1 GiB (DLQ 流容量)
+      nak_backoff_step: 0.5s      # 线性退避步长 (Nak 重投延迟)
 observability:
   endpoint: localhost:4318
   insecure: true

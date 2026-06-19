@@ -6,6 +6,7 @@ import (
 	"github.com/google/wire"
 
 	"cyber-ecosystem/shared-go/cache"
+	"cyber-ecosystem/shared-go/mq"
 	"cyber-ecosystem/shared-go/orm/ent/entutil"
 	"cyber-ecosystem/shared-go/storage"
 
@@ -15,6 +16,7 @@ import (
 type EntErrorHandler func(error) error
 type CacheErrorHandler func(error) error
 type StorageErrorHandler func(error) error
+type MQErrorHandler func(error) error
 
 type Platform struct {
 	cache              *cache.Cache
@@ -23,6 +25,8 @@ type Platform struct {
 	handleEntError     EntErrorHandler
 	storage            *storage.Storage
 	handleStorageError StorageErrorHandler
+	mq                 *mq.MQ
+	handleMQError      MQErrorHandler
 }
 
 // NewPlatform assembles the platform resources behind a single facade. It does
@@ -36,6 +40,8 @@ func NewPlatform(
 	handleEntError EntErrorHandler,
 	storage *storage.Storage,
 	handleStorageError StorageErrorHandler,
+	mq *mq.MQ,
+	handleMQError MQErrorHandler,
 ) (*Platform, error) {
 	return &Platform{
 		cache:              cache,
@@ -44,6 +50,8 @@ func NewPlatform(
 		handleEntError:     handleEntError,
 		storage:            storage,
 		handleStorageError: handleStorageError,
+		mq:                 mq,
+		handleMQError:      handleMQError,
 	}, nil
 }
 
@@ -62,6 +70,9 @@ func (p *Platform) HandleCacheError(err error) error { return p.handleCacheError
 func (p *Platform) GetStorage() *storage.Storage       { return p.storage }
 func (p *Platform) HandleStorageError(err error) error { return p.handleStorageError(err) }
 
+func (p *Platform) GetMQ() *mq.MQ                 { return p.mq }
+func (p *Platform) HandleMQError(err error) error { return p.handleMQError(err) }
+
 var ProviderSet = wire.NewSet(
 	NewPlatform,
 	NewCache,
@@ -70,4 +81,6 @@ var ProviderSet = wire.NewSet(
 	NewEntErrorHandler,
 	NewStorage,
 	NewStorageErrorHandler,
+	NewMQ,
+	NewMQErrorHandler,
 )

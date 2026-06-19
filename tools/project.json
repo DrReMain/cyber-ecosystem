@@ -24,6 +24,13 @@
         "commands": ["go tool golangci-lint run ./..."]
       }
     },
+    "go:test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": ["go test ./..."]
+      }
+    },
     "go:check": {
       "executor": "nx:run-commands",
       "options": {

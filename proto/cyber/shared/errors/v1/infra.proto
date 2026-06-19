@@ -42,4 +42,9 @@ enum InfraError {
   INFRA_ERROR_STORAGE_SIZE_EXCEED = 3302 [(.errors.code) = 413];
   INFRA_ERROR_STORAGE_UNAVAILABLE = 3303 [(.errors.code) = 503];
   INFRA_ERROR_STORAGE_INVALID_ARGUMENT = 3304 [(.errors.code) = 400];
+
+  // 34xx: MQ
+  INFRA_ERROR_MQ_INVALID_ARGUMENT = 3400 [(.errors.code) = 400];
+  INFRA_ERROR_MQ_UNAVAILABLE = 3401 [(.errors.code) = 503];
+  INFRA_ERROR_MQ_TIMEOUT = 3402 [(.errors.code) = 504];
 }

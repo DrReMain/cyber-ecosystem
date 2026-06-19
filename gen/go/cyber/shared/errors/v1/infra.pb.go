@@ -54,6 +54,10 @@ const (
 	InfraError_INFRA_ERROR_STORAGE_SIZE_EXCEED      InfraError = 3302
 	InfraError_INFRA_ERROR_STORAGE_UNAVAILABLE      InfraError = 3303
 	InfraError_INFRA_ERROR_STORAGE_INVALID_ARGUMENT InfraError = 3304
+	// 34xx: MQ
+	InfraError_INFRA_ERROR_MQ_INVALID_ARGUMENT InfraError = 3400
+	InfraError_INFRA_ERROR_MQ_UNAVAILABLE      InfraError = 3401
+	InfraError_INFRA_ERROR_MQ_TIMEOUT          InfraError = 3402
 )
 
 // Enum value maps for InfraError.
@@ -84,6 +88,9 @@ var (
 		3302: "INFRA_ERROR_STORAGE_SIZE_EXCEED",
 		3303: "INFRA_ERROR_STORAGE_UNAVAILABLE",
 		3304: "INFRA_ERROR_STORAGE_INVALID_ARGUMENT",
+		3400: "INFRA_ERROR_MQ_INVALID_ARGUMENT",
+		3401: "INFRA_ERROR_MQ_UNAVAILABLE",
+		3402: "INFRA_ERROR_MQ_TIMEOUT",
 	}
 	InfraError_value = map[string]int32{
 		"INFRA_ERROR_UNSPECIFIED":              0,
@@ -111,6 +118,9 @@ var (
 		"INFRA_ERROR_STORAGE_SIZE_EXCEED":      3302,
 		"INFRA_ERROR_STORAGE_UNAVAILABLE":      3303,
 		"INFRA_ERROR_STORAGE_INVALID_ARGUMENT": 3304,
+		"INFRA_ERROR_MQ_INVALID_ARGUMENT":      3400,
+		"INFRA_ERROR_MQ_UNAVAILABLE":           3401,
+		"INFRA_ERROR_MQ_TIMEOUT":               3402,
 	}
 )
 
@@ -145,7 +155,7 @@ var File_cyber_shared_errors_v1_infra_proto protoreflect.FileDescriptor
 
 const file_cyber_shared_errors_v1_infra_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/shared/errors/v1/infra.proto\x12\x16cyber.shared.errors.v1\x1a\x13errors/errors.proto*\x8f\b\n" +
+	"\"cyber/shared/errors/v1/infra.proto\x12\x16cyber.shared.errors.v1\x1a\x13errors/errors.proto*\x85\t\n" +
 	"\n" +
 	"InfraError\x12!\n" +
 	"\x17INFRA_ERROR_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12&\n" +
@@ -172,7 +182,10 @@ const file_cyber_shared_errors_v1_infra_proto_rawDesc = "" +
 	"\x1dINFRA_ERROR_STORAGE_FORBIDDEN\x10\xe5\x19\x1a\x04\xa8E\x93\x03\x12*\n" +
 	"\x1fINFRA_ERROR_STORAGE_SIZE_EXCEED\x10\xe6\x19\x1a\x04\xa8E\x9d\x03\x12*\n" +
 	"\x1fINFRA_ERROR_STORAGE_UNAVAILABLE\x10\xe7\x19\x1a\x04\xa8E\xf7\x03\x12/\n" +
-	"$INFRA_ERROR_STORAGE_INVALID_ARGUMENT\x10\xe8\x19\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\xf4\x03B/Z-cyber-ecosystem/gen/go/cyber/shared/errors/v1b\x06proto3"
+	"$INFRA_ERROR_STORAGE_INVALID_ARGUMENT\x10\xe8\x19\x1a\x04\xa8E\x90\x03\x12*\n" +
+	"\x1fINFRA_ERROR_MQ_INVALID_ARGUMENT\x10\xc8\x1a\x1a\x04\xa8E\x90\x03\x12%\n" +
+	"\x1aINFRA_ERROR_MQ_UNAVAILABLE\x10\xc9\x1a\x1a\x04\xa8E\xf7\x03\x12!\n" +
+	"\x16INFRA_ERROR_MQ_TIMEOUT\x10\xca\x1a\x1a\x04\xa8E\xf8\x03\x1a\x04\xa0E\xf4\x03B/Z-cyber-ecosystem/gen/go/cyber/shared/errors/v1b\x06proto3"
 
 var (
 	file_cyber_shared_errors_v1_infra_proto_rawDescOnce sync.Once

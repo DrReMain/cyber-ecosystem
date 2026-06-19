@@ -73,9 +73,25 @@ message Data {
     int64 max_file_size = 1;
     S3 s3 = 2;
   }
+  message MQ {
+    message NATS {
+      string endpoint = 1;
+      string creds = 2;
+      google.protobuf.Duration max_age = 3;
+      int64 max_bytes = 4;
+      int32 max_retries = 5;
+      google.protobuf.Duration ack_wait = 6;
+      int32 max_ack_pending = 7;          // in-flight unacked cap per consumer (0 → backend default)
+      google.protobuf.Duration dlq_max_age = 8;  // DLQ stream TTL (0 → backend default)
+      int64 dlq_max_bytes = 9;            // DLQ stream size cap (0 → backend default)
+      google.protobuf.Duration nak_backoff_step = 10; // linear Nak redelivery delay step (0 → backend default)
+    }
+    NATS nats = 1;
+  }
   Database database = 1;
   Redis redis = 2;
   Storage storage = 3;
+  MQ mq = 4;
 }
 
 message Observability {
