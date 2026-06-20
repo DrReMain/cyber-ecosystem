@@ -1,8 +1,9 @@
 package pg
 
-// schemaStmts 幂等建表语句（逐条 Exec；pgx 扩展协议不支持单次多语句）。在独立的 `mq` 库
-// 执行，不走 atlas。messages/deliveries/subscribers/dlq 四张表 + 索引。设计见
-// docs/pg-mq-design.md §4。
+// schemaStmts are the idempotent DDL statements (executed one-by-one; the pgx extended
+// protocol does not support multiple statements in one call). They run against the
+// standalone `mq` database, not via atlas. Four tables — messages/deliveries/
+// subscribers/dlq — plus indexes.
 var schemaStmts = []string{
 	`CREATE TABLE IF NOT EXISTS messages (
   id         BIGSERIAL PRIMARY KEY,

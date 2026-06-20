@@ -1,5 +1,5 @@
 // Package comparative is the headline validation of the "three protocols treated
-// equally" (一视同仁) thesis.
+// equally" thesis.
 //
 // It brings up kratos gRPC + kratos HTTP + our Connect servers simultaneously,
 // all sharing ONE middleware closure and ONE service implementation, then drives

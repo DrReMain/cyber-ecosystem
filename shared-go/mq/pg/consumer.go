@@ -200,9 +200,9 @@ func (c *consumer) pollLoop(ctx context.Context, topic, group string, handler fu
 }
 
 // fetchBatch locks a batch of due deliveries (FOR UPDATE SKIP LOCKED), counts this
-// delivery (deliveries+1 — visibility-timeout redelivery now counts toward
-// maxRetries, matching NATS NumDelivered), and renews visibility so other consumers
-// in the same group don't grab them while the handler runs.
+// delivery (deliveries+1 — a visibility-timeout redelivery counts toward maxRetries,
+// matching NATS NumDelivered), and renews visibility so other consumers in the same
+// group don't grab them while the handler runs.
 func (c *consumer) fetchBatch(ctx context.Context, group, topic string, batch int, vis time.Duration) ([]delivery, error) {
 	tx, err := c.h.pool.Begin(ctx)
 	if err != nil {

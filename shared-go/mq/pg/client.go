@@ -20,8 +20,10 @@ type stopper interface {
 	stop(ctx context.Context)
 }
 
-// NewClient 连独立 `mq` 库的 pgx 池，幂等建表，启动保留期 reaper，返回 handle + cleanup。
-// cleanup：先 drain 所有订阅（停轮询），关 reaper，再关池。
+// NewClient connects a pgx pool to the standalone `mq` database, idempotently creates
+// the schema, starts the retention reaper, and returns the handle + cleanup.
+// cleanup: drain all subscriptions (stop pollers) first, then stop the reaper, then
+// close the pool.
 func NewClient(cfg *Config) (*handle, func(), error) {
 	if cfg == nil || cfg.DSN == "" {
 		return nil, nil, fmt.Errorf("%w: dsn is required", mq.ErrInvalidArgument)

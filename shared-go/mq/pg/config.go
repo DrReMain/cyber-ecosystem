@@ -2,13 +2,14 @@ package pg
 
 import "time"
 
-// Config 映射 conf.Data.MQ.PG 到 pgx 客户端。零值字段在 NewClient 内回退到默认。
+// Config maps conf.Data.MQ.PG to the pgx client. Zero fields fall back to defaults
+// inside NewClient.
 type Config struct {
 	DSN               string        // postgres://user:pass@host:5432/mq?sslmode=disable
-	PollInterval      time.Duration // 消费轮询间隔；0 → 500ms
-	VisibilityTimeout time.Duration // 取出后不可见时长（=NATS AckWait）；0 → 30s，须大于 handler p99
-	MaxRetries        int           // 投递上限，超过进 DLQ；0 → 5
-	Retention         time.Duration // messages 保留时长（=NATS MaxAge），到期清理；0 → 7d
+	PollInterval      time.Duration // consume poll interval; 0 → 500ms
+	VisibilityTimeout time.Duration // invisible-after-fetch duration (= NATS AckWait); 0 → 30s, must exceed handler p99
+	MaxRetries        int           // delivery cap, exceeded → DLQ; 0 → 5
+	Retention         time.Duration // messages retention (= NATS MaxAge), age-evicted on expiry; 0 → 7d
 	// BatchSize bounds how many deliveries one poll iteration locks+processes. Since
 	// the poll loop is a single goroutine that processes a batch serially before
 	// fetching the next, this is also the per-subscription in-flight cap — the PG

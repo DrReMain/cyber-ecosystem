@@ -10,7 +10,8 @@ import (
 	"cyber-ecosystem/shared-go/mq"
 )
 
-// mapError 把 pgx/PG 错误翻成 mq sentinel。consumer handler 业务错误不进这里。
+// mapError translates a pgx/PG error into an mq sentinel. Consumer handler business
+// errors do not go through here.
 func mapError(err error, op string) error {
 	if err == nil {
 		return nil
