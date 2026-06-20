@@ -87,6 +87,11 @@ func Init(cfg Config, name, version, instanceID string) (func(), *slog.Logger, e
 		}
 	}
 
+	// Slow-op thresholds, read by WrapSlowQueryDriver / AttachSlowRedisHook.
+	// Zero disables (the helpers no-op).
+	slowDB = cfg.SlowQuery.DB
+	slowCache = cfg.SlowQuery.Cache
+
 	logger := buildLogger(cfg, name, version, instanceID, res, &shutdowns)
 
 	// Each provider gets its own fresh timeout so one slow flush can't starve

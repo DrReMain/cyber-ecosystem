@@ -211,12 +211,13 @@ func (x *Data) GetMq() *Data_MQ {
 }
 
 type Observability struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Endpoint      string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	Insecure      bool                   `protobuf:"varint,2,opt,name=insecure,proto3" json:"insecure,omitempty"`
-	Trace         *Observability_Trace   `protobuf:"bytes,3,opt,name=trace,proto3" json:"trace,omitempty"`
-	Metrics       *Observability_Metrics `protobuf:"bytes,4,opt,name=metrics,proto3" json:"metrics,omitempty"`
-	Log           *Observability_Log     `protobuf:"bytes,5,opt,name=log,proto3" json:"log,omitempty"`
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Endpoint      string                   `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Insecure      bool                     `protobuf:"varint,2,opt,name=insecure,proto3" json:"insecure,omitempty"`
+	Trace         *Observability_Trace     `protobuf:"bytes,3,opt,name=trace,proto3" json:"trace,omitempty"`
+	Metrics       *Observability_Metrics   `protobuf:"bytes,4,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	Log           *Observability_Log       `protobuf:"bytes,5,opt,name=log,proto3" json:"log,omitempty"`
+	SlowQuery     *Observability_SlowQuery `protobuf:"bytes,6,opt,name=slow_query,json=slowQuery,proto3" json:"slow_query,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -282,6 +283,13 @@ func (x *Observability) GetMetrics() *Observability_Metrics {
 func (x *Observability) GetLog() *Observability_Log {
 	if x != nil {
 		return x.Log
+	}
+	return nil
+}
+
+func (x *Observability) GetSlowQuery() *Observability_SlowQuery {
+	if x != nil {
+		return x.SlowQuery
 	}
 	return nil
 }
@@ -1274,6 +1282,58 @@ func (x *Observability_Log) GetFile() *Observability_Log_FileOutput {
 	return nil
 }
 
+type Observability_SlowQuery struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Db            *durationpb.Duration   `protobuf:"bytes,1,opt,name=db,proto3" json:"db,omitempty"`       // slow SQL threshold; 0/omit = disabled
+	Cache         *durationpb.Duration   `protobuf:"bytes,2,opt,name=cache,proto3" json:"cache,omitempty"` // slow redis op threshold; 0/omit = disabled
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Observability_SlowQuery) Reset() {
+	*x = Observability_SlowQuery{}
+	mi := &file_internal_conf_conf_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Observability_SlowQuery) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Observability_SlowQuery) ProtoMessage() {}
+
+func (x *Observability_SlowQuery) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Observability_SlowQuery.ProtoReflect.Descriptor instead.
+func (*Observability_SlowQuery) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{3, 3}
+}
+
+func (x *Observability_SlowQuery) GetDb() *durationpb.Duration {
+	if x != nil {
+		return x.Db
+	}
+	return nil
+}
+
+func (x *Observability_SlowQuery) GetCache() *durationpb.Duration {
+	if x != nil {
+		return x.Cache
+	}
+	return nil
+}
+
 type Observability_Log_FileOutput struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
@@ -1287,7 +1347,7 @@ type Observability_Log_FileOutput struct {
 
 func (x *Observability_Log_FileOutput) Reset() {
 	*x = Observability_Log_FileOutput{}
-	mi := &file_internal_conf_conf_proto_msgTypes[17]
+	mi := &file_internal_conf_conf_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1299,7 +1359,7 @@ func (x *Observability_Log_FileOutput) String() string {
 func (*Observability_Log_FileOutput) ProtoMessage() {}
 
 func (x *Observability_Log_FileOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[17]
+	mi := &file_internal_conf_conf_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1444,13 +1504,15 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"maxRetries\x127\n" +
 	"\tretention\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\tretention\x12\x1d\n" +
 	"\n" +
-	"batch_size\x18\x06 \x01(\x05R\tbatchSize\"\x87\x05\n" +
+	"batch_size\x18\x06 \x01(\x05R\tbatchSize\"\xb4\x06\n" +
 	"\rObservability\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x1a\n" +
 	"\binsecure\x18\x02 \x01(\bR\binsecure\x125\n" +
 	"\x05trace\x18\x03 \x01(\v2\x1f.cyber.conf.Observability.TraceR\x05trace\x12;\n" +
 	"\ametrics\x18\x04 \x01(\v2!.cyber.conf.Observability.MetricsR\ametrics\x12/\n" +
-	"\x03log\x18\x05 \x01(\v2\x1d.cyber.conf.Observability.LogR\x03log\x1aH\n" +
+	"\x03log\x18\x05 \x01(\v2\x1d.cyber.conf.Observability.LogR\x03log\x12B\n" +
+	"\n" +
+	"slow_query\x18\x06 \x01(\v2#.cyber.conf.Observability.SlowQueryR\tslowQuery\x1aH\n" +
 	"\x05Trace\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12%\n" +
 	"\x0esampling_ratio\x18\x02 \x01(\x01R\rsamplingRatio\x1a#\n" +
@@ -1469,7 +1531,10 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"maxBackups\x12 \n" +
 	"\fmax_age_days\x18\x04 \x01(\x05R\n" +
 	"maxAgeDays\x12\x1a\n" +
-	"\bcompress\x18\x05 \x01(\bR\bcompressB=Z;cyber-ecosystem/app/services/edge_mobile/internal/conf;confb\x06proto3"
+	"\bcompress\x18\x05 \x01(\bR\bcompress\x1ag\n" +
+	"\tSlowQuery\x12)\n" +
+	"\x02db\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x02db\x12/\n" +
+	"\x05cache\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x05cacheB=Z;cyber-ecosystem/app/services/edge_mobile/internal/conf;confb\x06proto3"
 
 var (
 	file_internal_conf_conf_proto_rawDescOnce sync.Once
@@ -1483,7 +1548,7 @@ func file_internal_conf_conf_proto_rawDescGZIP() []byte {
 	return file_internal_conf_conf_proto_rawDescData
 }
 
-var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_internal_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),                    // 0: cyber.conf.Bootstrap
 	(*Server)(nil),                       // 1: cyber.conf.Server
@@ -1502,8 +1567,9 @@ var file_internal_conf_conf_proto_goTypes = []any{
 	(*Observability_Trace)(nil),          // 14: cyber.conf.Observability.Trace
 	(*Observability_Metrics)(nil),        // 15: cyber.conf.Observability.Metrics
 	(*Observability_Log)(nil),            // 16: cyber.conf.Observability.Log
-	(*Observability_Log_FileOutput)(nil), // 17: cyber.conf.Observability.Log.FileOutput
-	(*durationpb.Duration)(nil),          // 18: google.protobuf.Duration
+	(*Observability_SlowQuery)(nil),      // 17: cyber.conf.Observability.SlowQuery
+	(*Observability_Log_FileOutput)(nil), // 18: cyber.conf.Observability.Log.FileOutput
+	(*durationpb.Duration)(nil),          // 19: google.protobuf.Duration
 }
 var file_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber.conf.Bootstrap.server:type_name -> cyber.conf.Server
@@ -1519,32 +1585,35 @@ var file_internal_conf_conf_proto_depIdxs = []int32{
 	14, // 10: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
 	15, // 11: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
 	16, // 12: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
-	18, // 13: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	18, // 14: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	18, // 15: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	18, // 16: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	18, // 17: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
-	18, // 18: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	18, // 19: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	18, // 20: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
-	18, // 21: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
-	11, // 22: cyber.conf.Data.Storage.s3:type_name -> cyber.conf.Data.Storage.S3
-	12, // 23: cyber.conf.Data.MQ.nats:type_name -> cyber.conf.Data.MQ.NATS
-	13, // 24: cyber.conf.Data.MQ.pg:type_name -> cyber.conf.Data.MQ.PG
-	18, // 25: cyber.conf.Data.Storage.S3.presign_ttl:type_name -> google.protobuf.Duration
-	18, // 26: cyber.conf.Data.MQ.NATS.max_age:type_name -> google.protobuf.Duration
-	18, // 27: cyber.conf.Data.MQ.NATS.ack_wait:type_name -> google.protobuf.Duration
-	18, // 28: cyber.conf.Data.MQ.NATS.dlq_max_age:type_name -> google.protobuf.Duration
-	18, // 29: cyber.conf.Data.MQ.NATS.nak_backoff_step:type_name -> google.protobuf.Duration
-	18, // 30: cyber.conf.Data.MQ.PG.poll_interval:type_name -> google.protobuf.Duration
-	18, // 31: cyber.conf.Data.MQ.PG.visibility_timeout:type_name -> google.protobuf.Duration
-	18, // 32: cyber.conf.Data.MQ.PG.retention:type_name -> google.protobuf.Duration
-	17, // 33: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
-	34, // [34:34] is the sub-list for method output_type
-	34, // [34:34] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	17, // 13: cyber.conf.Observability.slow_query:type_name -> cyber.conf.Observability.SlowQuery
+	19, // 14: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	19, // 15: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	19, // 16: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	19, // 17: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	19, // 18: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
+	19, // 19: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	19, // 20: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	19, // 21: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
+	19, // 22: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
+	11, // 23: cyber.conf.Data.Storage.s3:type_name -> cyber.conf.Data.Storage.S3
+	12, // 24: cyber.conf.Data.MQ.nats:type_name -> cyber.conf.Data.MQ.NATS
+	13, // 25: cyber.conf.Data.MQ.pg:type_name -> cyber.conf.Data.MQ.PG
+	19, // 26: cyber.conf.Data.Storage.S3.presign_ttl:type_name -> google.protobuf.Duration
+	19, // 27: cyber.conf.Data.MQ.NATS.max_age:type_name -> google.protobuf.Duration
+	19, // 28: cyber.conf.Data.MQ.NATS.ack_wait:type_name -> google.protobuf.Duration
+	19, // 29: cyber.conf.Data.MQ.NATS.dlq_max_age:type_name -> google.protobuf.Duration
+	19, // 30: cyber.conf.Data.MQ.NATS.nak_backoff_step:type_name -> google.protobuf.Duration
+	19, // 31: cyber.conf.Data.MQ.PG.poll_interval:type_name -> google.protobuf.Duration
+	19, // 32: cyber.conf.Data.MQ.PG.visibility_timeout:type_name -> google.protobuf.Duration
+	19, // 33: cyber.conf.Data.MQ.PG.retention:type_name -> google.protobuf.Duration
+	18, // 34: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
+	19, // 35: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
+	19, // 36: cyber.conf.Observability.SlowQuery.cache:type_name -> google.protobuf.Duration
+	37, // [37:37] is the sub-list for method output_type
+	37, // [37:37] is the sub-list for method input_type
+	37, // [37:37] is the sub-list for extension type_name
+	37, // [37:37] is the sub-list for extension extendee
+	0,  // [0:37] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }
@@ -1558,7 +1627,7 @@ func file_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_conf_conf_proto_rawDesc), len(file_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

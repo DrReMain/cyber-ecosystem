@@ -76,6 +76,14 @@ func initObservability(o *conf.Observability) (func(), *slog.Logger, error) {
 		}
 		cfg.Log = logCfg
 	}
+	if o.SlowQuery != nil {
+		if d := o.SlowQuery.GetDb(); d != nil {
+			cfg.SlowQuery.DB = d.AsDuration()
+		}
+		if d := o.SlowQuery.GetCache(); d != nil {
+			cfg.SlowQuery.Cache = d.AsDuration()
+		}
+	}
 	return observability.Init(cfg, Name, Version, id)
 }
 

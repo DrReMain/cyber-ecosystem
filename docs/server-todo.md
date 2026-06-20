@@ -1,6 +1,6 @@
 # 后端平台后续工作（TODO）
 
-后续路线：mobile 业务、可观测收尾、edge_admin（多服务）。平台基础已就绪（db + 三 transport + 中间件链 + cache/storage/mq + 可观测全链路 → SigNoz，均接入验证），本文只列**未完成**项。
+后续路线：mobile 业务、edge_admin（多服务）。平台基础已就绪（db + 三 transport + 中间件链 + cache/storage/mq + 可观测全链路 trace/metric/log/error/slow → SigNoz，均接入验证），本文只列**未完成**项。
 
 ---
 
@@ -26,7 +26,7 @@
 
 | 阶段 | 事项 | 状态 |
 |---|---|---|
-| **三** | [可观测收尾：慢查询 log + 后端异常上报](#阶段三可观测收尾--异常上报) | **下一步** |
+| **三** | [客户端异常上报（GlitchTip + 客户端 OTel，属客户端项目）](#阶段三客户端异常上报) | 后端完成 / 客户端待办 |
 | **四** | [edge_admin + 多服务能力（F）](#阶段四edge_admin--多服务能力f) | 骨架成型后 |
 | **五** | [生产运维（H）+ 错误守卫（A）](#阶段五生产运维h--错误守卫a) | 主线 / 延后 |
 | | [mobile auth / 会话子系统](#mobile-业务-backlogauth--会话子系统后续独立设计) | 后续 |
@@ -35,18 +35,12 @@
 
 ---
 
-## 阶段三：可观测收尾 + 异常上报
+## 阶段三：客户端异常上报
 
-trace/metric/log 全链路 + db/cache/storage/mq 四后端 span 已完成（SigNoz 验证）。剩余两件小事 + 异常上报分流架构：
+> 后端可观测已全链路接入 SigNoz（trace/metric/log/error/slow，均验证）——后端部分完成。剩余客户端侧，属各客户端项目投入，非本仓库后端事：
 
-**异常上报架构（后端 vs 客户端）**：
-- **后端异常 → SigNoz**（OTel log：panic/未受控错误 → 结构化 error log，带 trace_id 关联；recovery 中间件落地）。后端异常天然跟 trace 相关，留 SigNoz 保持统一（trace/metric/log/error 一处）。权衡：错误 dedup/grouping 不如 Sentry 级，早期够用。
 - **客户端异常 → GlitchTip**（自建 Sentry 协议，sentry-go SDK；crash 报告主场）。
-- **客户端全链路 OTel**：各客户端引入 OTel SDK，链路从客户端起。**后端已就绪**（kratos tracing 中间件 W3C Extract，客户端带 traceparent 即续链，后端零改动）。属各客户端项目投入，非本仓库事。
-
-**待办（后端残余）**：
-- **慢查询 log**：db/cache/storage/mq 操作超阈值 → slog warn → OTLP log → SigNoz。阈值进 conf。
-- **后端异常上报 → SigNoz**：recovery 中间件把 panic/未受控错误发结构化 error log（OTel log sink 已在）。
+- **客户端全链路 OTel**：各客户端引入 OTel SDK，链路从客户端起；后端已就绪（kratos tracing W3C Extract，客户端带 traceparent 即续链，后端零改动）。
 
 ---
 
@@ -96,6 +90,22 @@ trace/metric/log 全链路 + db/cache/storage/mq 四后端 span 已完成（SigN
 - **构造纪律**：`Message` 默认空（模糊）；非空 = 故意直出。防开发随手把内部细节塞进 `Message`。手段：lint / 显式 `ErrorXxxDirect` 工厂。
 - **出口兜底**：错误透传前（中间件层），非受控 `*Error` → 转通用安全文案，原文进 cause 日志。
 - （低优先）三协议 ReplyHeader 错误路径位置对齐（connect unary 在 `*connect.Error.Meta()`）。
+
+---
+
+## 后续集成：asynq / livekit / centrifugo
+
+按业务节奏引入的三个外部组件，各自定位与现有能力的边界（避免与已建能力重叠）：
+
+| 组件 | 类型 | 定位 | 与现有能力的边界 | 触发点 |
+|---|---|---|---|---|
+| **asynq** | 异步任务队列（Redis） | 后台/定时/重试任务（发邮件、转码、延迟、清理） | 封装为**独立 tq 抽象**（`shared-go/tq`），与 mq 并存——不并入 mq（理由见下） | 出现后台/定时任务需求 |
+| **livekit** | WebRTC SFU（Go） | 实时音视频**媒体面** | connect 只做信令/控制面；媒体帧走 livekit（UDP/SFU/转码/simulcast）。kratos 签 token，客户端直连 livekit | 视频/直播/会议业务 |
+| **centrifugo** | 实时消息推送（WS/SSE） | 服务→客户端**实时推送** | 不同于 connect SSE（RPC 风格、单服务）：centrifugo 专门推送服务器（scale/channel/presence/历史）；也不同于 mq（mq=服务间） | 大规模实时推送/在线状态/聊天动态 |
+
+**asynq → 独立 tq 抽象（`shared-go/tq`），不并入 mq**。双理由：① **结构**——mq 在 platform 是单后端实例化（config 二选一 nats/pg），asynq 并入会三选一互斥，独立才能同时用 mq + tq；② **语义**——mq = 消息（pub/sub/delivery），tq = 任务（retry/delay/scheduled/cron + Mux 多句柄），接口正交。tq 接口轮廓：`Enqueuer` / `Mux` / `Server` / `Scheduler`，asynq 作后端，复用 Redis + 可观测性装饰器。
+
+> 共性：都是按需引入的领域专用能力。**livekit / centrifugo 是独立部署的服务**，**tq(asynq)是 Redis 任务库**（复用现有 Redis）。接入时各自走 `shared-go/` 能力包封装 + 业务按需组合，不投机提前建。
 
 ---
 

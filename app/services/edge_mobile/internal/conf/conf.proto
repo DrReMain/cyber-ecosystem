@@ -124,10 +124,15 @@ message Observability {
     bool otlp = 3;
     FileOutput file = 4;
   }
+  message SlowQuery {
+    google.protobuf.Duration db = 1;     // slow SQL threshold; 0/omit = disabled
+    google.protobuf.Duration cache = 2;  // slow redis op threshold; 0/omit = disabled
+  }
   string endpoint = 1;
   bool insecure = 2;
   Trace trace = 3;
   Metrics metrics = 4;
   Log log = 5;
+  SlowQuery slow_query = 6;
 }
 

@@ -2,6 +2,7 @@ package platform
 
 import (
 	"fmt"
+	"log/slog"
 
 	"cyber-ecosystem/shared-go/kratos/observability"
 	"cyber-ecosystem/shared-go/orm/ent/client"
@@ -11,7 +12,7 @@ import (
 	_ "cyber-ecosystem/app/services/edge_mobile/internal/ent/runtime"
 )
 
-func NewEntClient(c *conf.Data) (*ent.Client, func(), error) {
+func NewEntClient(c *conf.Data, logger *slog.Logger) (*ent.Client, func(), error) {
 	ec, err := client.NewEntClient(client.DBConfig{
 		Driver:          c.Database.Driver,
 		Host:            c.Database.Host,
@@ -28,6 +29,6 @@ func NewEntClient(c *conf.Data) (*ent.Client, func(), error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed opening connection to database: %w", err)
 	}
-	cl := ent.NewClient(ent.Driver(ec.Driver))
+	cl := ent.NewClient(ent.Driver(observability.WrapSlowQueryDriver(ec.Driver, logger)))
 	return cl, func() { _ = cl.Close() }, nil
 }

@@ -1,5 +1,7 @@
 package observability
 
+import "time"
+
 // Config is the service-agnostic observability configuration. A service maps
 // its own generated conf onto this struct before calling Init.
 type Config struct {
@@ -8,6 +10,7 @@ type Config struct {
 	Trace    TraceConfig
 	Metrics  MetricsConfig
 	Log      LogConfig
+	SlowQuery SlowQueryConfig
 }
 
 type TraceConfig struct {
@@ -32,4 +35,12 @@ type FileOutputConfig struct {
 	MaxBackups int // rotated files to retain
 	MaxAgeDays int // days to retain
 	Compress   bool
+}
+
+// SlowQueryConfig holds per-backend thresholds: an operation taking longer than
+// the threshold emits a WARN log (→ OTLP → SigNoz). A zero duration disables
+// that backend's slow-op logging.
+type SlowQueryConfig struct {
+	DB    time.Duration // ent SQL query threshold
+	Cache time.Duration // redis op threshold
 }
