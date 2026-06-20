@@ -20,7 +20,8 @@ func (s *set) SAdd(ctx context.Context, key string, members ...string) (int64, e
 	if len(members) == 0 {
 		return 0, nil
 	}
-	return s.client.SAdd(ctx, key, toAny(members)...).Result()
+	n, err := s.client.SAdd(ctx, key, toAny(members)...).Result()
+	return n, mapErr(err)
 }
 
 func (s *set) SRem(ctx context.Context, key string, members ...string) (int64, error) {
@@ -30,28 +31,32 @@ func (s *set) SRem(ctx context.Context, key string, members ...string) (int64, e
 	if len(members) == 0 {
 		return 0, nil
 	}
-	return s.client.SRem(ctx, key, toAny(members)...).Result()
+	n, err := s.client.SRem(ctx, key, toAny(members)...).Result()
+	return n, mapErr(err)
 }
 
 func (s *set) SMembers(ctx context.Context, key string) ([]string, error) {
 	if err := cache.ValidateKey(key); err != nil {
 		return nil, err
 	}
-	return s.client.SMembers(ctx, key).Result()
+	m, err := s.client.SMembers(ctx, key).Result()
+	return m, mapErr(err)
 }
 
 func (s *set) SIsMember(ctx context.Context, key, member string) (bool, error) {
 	if err := cache.ValidateKey(key); err != nil {
 		return false, err
 	}
-	return s.client.SIsMember(ctx, key, member).Result()
+	ok, err := s.client.SIsMember(ctx, key, member).Result()
+	return ok, mapErr(err)
 }
 
 func (s *set) SCard(ctx context.Context, key string) (int64, error) {
 	if err := cache.ValidateKey(key); err != nil {
 		return 0, err
 	}
-	return s.client.SCard(ctx, key).Result()
+	n, err := s.client.SCard(ctx, key).Result()
+	return n, mapErr(err)
 }
 
 func (s *set) SInter(ctx context.Context, keys ...string) ([]string, error) {
@@ -61,7 +66,8 @@ func (s *set) SInter(ctx context.Context, keys ...string) ([]string, error) {
 	if len(keys) == 0 {
 		return nil, nil
 	}
-	return s.client.SInter(ctx, keys...).Result()
+	m, err := s.client.SInter(ctx, keys...).Result()
+	return m, mapErr(err)
 }
 
 func (s *set) SUnion(ctx context.Context, keys ...string) ([]string, error) {
@@ -71,5 +77,6 @@ func (s *set) SUnion(ctx context.Context, keys ...string) ([]string, error) {
 	if len(keys) == 0 {
 		return nil, nil
 	}
-	return s.client.SUnion(ctx, keys...).Result()
+	m, err := s.client.SUnion(ctx, keys...).Result()
+	return m, mapErr(err)
 }

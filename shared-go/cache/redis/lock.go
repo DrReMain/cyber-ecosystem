@@ -49,7 +49,7 @@ func (l *lock) acquire(ctx context.Context, key string, ttl time.Duration, opt *
 			}
 			return nil, cache.ErrLockNotAcquired
 		}
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return &release{lk: lk}, nil
 }
@@ -61,7 +61,7 @@ func (r *release) Unlock(ctx context.Context) error {
 		if errors.Is(err, redislock.ErrLockNotHeld) {
 			return cache.ErrLockNotAcquired
 		}
-		return err
+		return mapErr(err)
 	}
 	return nil
 }
@@ -76,7 +76,7 @@ func (r *release) Extend(ctx context.Context, ttl time.Duration) error {
 		if errors.Is(err, redislock.ErrLockNotHeld) || errors.Is(err, redislock.ErrNotObtained) {
 			return cache.ErrLockNotAcquired
 		}
-		return err
+		return mapErr(err)
 	}
 	return nil
 }

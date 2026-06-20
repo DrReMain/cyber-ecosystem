@@ -37,7 +37,7 @@ func (r *rateLimiter) Allow(ctx context.Context, key string, limit int64, window
 		Period: window,
 	})
 	if err != nil {
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return &cache.RateResult{
 		Allowed:    res.Allowed > 0,

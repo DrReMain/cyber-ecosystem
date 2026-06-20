@@ -24,7 +24,7 @@ func (p *pubsub) Publish(ctx context.Context, channel string, payload []byte) er
 	if err := cache.ValidateKey(channel); err != nil {
 		return err
 	}
-	return p.client.Publish(ctx, channel, payload).Err()
+	return mapErr(p.client.Publish(ctx, channel, payload).Err())
 }
 
 // Subscribe args are LITERAL channel names; PSubscribe args are glob PATTERNS.

@@ -24,7 +24,7 @@ func (k *kv) Get(ctx context.Context, key string) ([]byte, error) {
 		if errors.Is(err, redis.Nil) {
 			return nil, cache.ErrCacheMiss
 		}
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return val, nil
 }
@@ -33,14 +33,14 @@ func (k *kv) Set(ctx context.Context, key string, val []byte, ttl time.Duration)
 	if err := cache.ValidateKey(key); err != nil {
 		return err
 	}
-	return k.client.Set(ctx, key, val, ttl).Err()
+	return mapErr(k.client.Set(ctx, key, val, ttl).Err())
 }
 
 func (k *kv) Del(ctx context.Context, key string) error {
 	if err := cache.ValidateKey(key); err != nil {
 		return err
 	}
-	return k.client.Del(ctx, key).Err()
+	return mapErr(k.client.Del(ctx, key).Err())
 }
 
 func (k *kv) Exist(ctx context.Context, key string) (bool, error) {
@@ -49,7 +49,7 @@ func (k *kv) Exist(ctx context.Context, key string) (bool, error) {
 	}
 	n, err := k.client.Exists(ctx, key).Result()
 	if err != nil {
-		return false, err
+		return false, mapErr(err)
 	}
 	return n > 0, nil
 }
@@ -62,7 +62,7 @@ func (k *kv) GetTTL(ctx context.Context, key string) (time.Duration, error) {
 	// absent, -1ns => no expiry; real TTLs are scaled by time.Second.
 	ttl, err := k.client.TTL(ctx, key).Result()
 	if err != nil {
-		return 0, err
+		return 0, mapErr(err)
 	}
 	switch ttl {
 	case -2 * time.Nanosecond:
@@ -83,7 +83,7 @@ func (k *kv) MGet(ctx context.Context, keys ...string) ([][]byte, error) {
 	}
 	vals, err := k.client.MGet(ctx, keys...).Result()
 	if err != nil {
-		return nil, err
+		return nil, mapErr(err)
 	}
 	out := make([][]byte, len(vals))
 	for i, v := range vals {
@@ -106,5 +106,5 @@ func (k *kv) MSet(ctx context.Context, pairs map[string][]byte, ttl time.Duratio
 		pipe.Set(ctx, key, val, ttl)
 	}
 	_, err := pipe.Exec(ctx)
-	return err
+	return mapErr(err)
 }

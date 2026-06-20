@@ -18,7 +18,7 @@ func (h *hash) HSet(ctx context.Context, key, field string, val []byte) error {
 	if err := cache.ValidateKey(key); err != nil {
 		return err
 	}
-	return h.client.HSet(ctx, key, field, val).Err()
+	return mapErr(h.client.HSet(ctx, key, field, val).Err())
 }
 
 func (h *hash) HMSet(ctx context.Context, key string, fields map[string][]byte) error {
@@ -32,7 +32,7 @@ func (h *hash) HMSet(ctx context.Context, key string, fields map[string][]byte) 
 	for f, v := range fields {
 		args = append(args, f, v)
 	}
-	return h.client.HSet(ctx, key, args...).Err()
+	return mapErr(h.client.HSet(ctx, key, args...).Err())
 }
 
 func (h *hash) HGet(ctx context.Context, key, field string) ([]byte, error) {
@@ -44,7 +44,7 @@ func (h *hash) HGet(ctx context.Context, key, field string) ([]byte, error) {
 		if errors.Is(err, redis.Nil) {
 			return nil, cache.ErrCacheMiss
 		}
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return val, nil
 }
@@ -55,7 +55,7 @@ func (h *hash) HGetAll(ctx context.Context, key string) (map[string][]byte, erro
 	}
 	m, err := h.client.HGetAll(ctx, key).Result()
 	if err != nil {
-		return nil, err
+		return nil, mapErr(err)
 	}
 	out := make(map[string][]byte, len(m))
 	for k, v := range m {
@@ -71,26 +71,29 @@ func (h *hash) HDel(ctx context.Context, key string, fields ...string) error {
 	if len(fields) == 0 {
 		return nil
 	}
-	return h.client.HDel(ctx, key, fields...).Err()
+	return mapErr(h.client.HDel(ctx, key, fields...).Err())
 }
 
 func (h *hash) HExists(ctx context.Context, key, field string) (bool, error) {
 	if err := cache.ValidateKey(key); err != nil {
 		return false, err
 	}
-	return h.client.HExists(ctx, key, field).Result()
+	ok, err := h.client.HExists(ctx, key, field).Result()
+	return ok, mapErr(err)
 }
 
 func (h *hash) HIncrBy(ctx context.Context, key, field string, delta int64) (int64, error) {
 	if err := cache.ValidateKey(key); err != nil {
 		return 0, err
 	}
-	return h.client.HIncrBy(ctx, key, field, delta).Result()
+	v, err := h.client.HIncrBy(ctx, key, field, delta).Result()
+	return v, mapErr(err)
 }
 
 func (h *hash) HLen(ctx context.Context, key string) (int64, error) {
 	if err := cache.ValidateKey(key); err != nil {
 		return 0, err
 	}
-	return h.client.HLen(ctx, key).Result()
+	v, err := h.client.HLen(ctx, key).Result()
+	return v, mapErr(err)
 }

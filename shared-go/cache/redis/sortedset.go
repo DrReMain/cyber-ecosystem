@@ -23,14 +23,15 @@ func (z *sortedSet) Add(ctx context.Context, key string, members ...cache.Member
 	if len(members) == 0 {
 		return nil
 	}
-	return z.client.ZAdd(ctx, key, toZ(members)...).Err()
+	return mapErr(z.client.ZAdd(ctx, key, toZ(members)...).Err())
 }
 
 func (z *sortedSet) IncrBy(ctx context.Context, key, member string, delta float64) (float64, error) {
 	if err := cache.ValidateKey(key); err != nil {
 		return 0, err
 	}
-	return z.client.ZIncrBy(ctx, key, delta, member).Result()
+	v, err := z.client.ZIncrBy(ctx, key, delta, member).Result()
+	return v, mapErr(err)
 }
 
 func (z *sortedSet) Score(ctx context.Context, key, member string) (float64, error) {
@@ -42,7 +43,7 @@ func (z *sortedSet) Score(ctx context.Context, key, member string) (float64, err
 		if errors.Is(err, redis.Nil) {
 			return 0, cache.ErrKeyNotFound
 		}
-		return 0, err
+		return 0, mapErr(err)
 	}
 	return v, nil
 }
@@ -56,7 +57,7 @@ func (z *sortedSet) Rank(ctx context.Context, key, member string) (int64, error)
 		if errors.Is(err, redis.Nil) {
 			return 0, cache.ErrKeyNotFound
 		}
-		return 0, err
+		return 0, mapErr(err)
 	}
 	return v, nil
 }
@@ -70,7 +71,7 @@ func (z *sortedSet) RevRank(ctx context.Context, key, member string) (int64, err
 		if errors.Is(err, redis.Nil) {
 			return 0, cache.ErrKeyNotFound
 		}
-		return 0, err
+		return 0, mapErr(err)
 	}
 	return v, nil
 }
@@ -81,7 +82,7 @@ func (z *sortedSet) Range(ctx context.Context, key string, start, stop int64) ([
 	}
 	vals, err := z.client.ZRangeWithScores(ctx, key, start, stop).Result()
 	if err != nil {
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return fromZ(vals), nil
 }
@@ -92,7 +93,7 @@ func (z *sortedSet) RevRange(ctx context.Context, key string, start, stop int64)
 	}
 	vals, err := z.client.ZRevRangeWithScores(ctx, key, start, stop).Result()
 	if err != nil {
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return fromZ(vals), nil
 }
@@ -112,7 +113,7 @@ func (z *sortedSet) RangeByScore(ctx context.Context, key string, min, max float
 		Count:  count,
 	}).Result()
 	if err != nil {
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return fromZ(vals), nil
 }
@@ -124,14 +125,15 @@ func (z *sortedSet) Remove(ctx context.Context, key string, members ...string) e
 	if len(members) == 0 {
 		return nil
 	}
-	return z.client.ZRem(ctx, key, toAny(members)...).Err()
+	return mapErr(z.client.ZRem(ctx, key, toAny(members)...).Err())
 }
 
 func (z *sortedSet) Card(ctx context.Context, key string) (int64, error) {
 	if err := cache.ValidateKey(key); err != nil {
 		return 0, err
 	}
-	return z.client.ZCard(ctx, key).Result()
+	n, err := z.client.ZCard(ctx, key).Result()
+	return n, mapErr(err)
 }
 
 func toZ(members []cache.Member) []redis.Z {

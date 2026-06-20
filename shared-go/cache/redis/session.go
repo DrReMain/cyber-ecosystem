@@ -34,7 +34,7 @@ func (s *session) Get(ctx context.Context, id, key string) ([]byte, error) {
 		if errors.Is(err, redis.Nil) {
 			return nil, cache.ErrCacheMiss
 		}
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return val, nil
 }
@@ -46,7 +46,7 @@ func (s *session) Set(ctx context.Context, id, key string, val []byte, ttl time.
 	if err := cache.ValidateSessionKey(key); err != nil {
 		return err
 	}
-	return s.client.Set(ctx, sessionKey(id, key), val, ttl).Err()
+	return mapErr(s.client.Set(ctx, sessionKey(id, key), val, ttl).Err())
 }
 
 func (s *session) Del(ctx context.Context, id, key string) error {
@@ -56,7 +56,7 @@ func (s *session) Del(ctx context.Context, id, key string) error {
 	if err := cache.ValidateSessionKey(key); err != nil {
 		return err
 	}
-	return s.client.Del(ctx, sessionKey(id, key)).Err()
+	return mapErr(s.client.Del(ctx, sessionKey(id, key)).Err())
 }
 
 func (s *session) Exists(ctx context.Context, id string) (bool, error) {
@@ -64,7 +64,8 @@ func (s *session) Exists(ctx context.Context, id string) (bool, error) {
 		return false, err
 	}
 	iter := s.client.Scan(ctx, 0, sessionMatch(id), 100).Iterator()
-	return iter.Next(ctx), iter.Err()
+	ok := iter.Next(ctx)
+	return ok, mapErr(iter.Err())
 }
 
 func (s *session) Refresh(ctx context.Context, id string, ttl time.Duration) error {
@@ -73,7 +74,7 @@ func (s *session) Refresh(ctx context.Context, id string, ttl time.Duration) err
 	}
 	keys, err := scanKeys(ctx, s.client, sessionMatch(id))
 	if err != nil {
-		return err
+		return mapErr(err)
 	}
 	if len(keys) == 0 {
 		return cache.ErrSessionNotFound
@@ -83,7 +84,7 @@ func (s *session) Refresh(ctx context.Context, id string, ttl time.Duration) err
 		pipe.Expire(ctx, k, ttl)
 	}
 	_, err = pipe.Exec(ctx)
-	return err
+	return mapErr(err)
 }
 
 func (s *session) Destroy(ctx context.Context, id string) error {
@@ -92,12 +93,12 @@ func (s *session) Destroy(ctx context.Context, id string) error {
 	}
 	keys, err := scanKeys(ctx, s.client, sessionMatch(id))
 	if err != nil {
-		return err
+		return mapErr(err)
 	}
 	if len(keys) == 0 {
 		return nil
 	}
-	return s.client.Del(ctx, keys...).Err()
+	return mapErr(s.client.Del(ctx, keys...).Err())
 }
 
 func (s *session) Keys(ctx context.Context, id string) ([]string, error) {
@@ -106,7 +107,7 @@ func (s *session) Keys(ctx context.Context, id string) ([]string, error) {
 	}
 	keys, err := scanKeys(ctx, s.client, sessionMatch(id))
 	if err != nil {
-		return nil, err
+		return nil, mapErr(err)
 	}
 	out := make([]string, len(keys))
 	for i, k := range keys {

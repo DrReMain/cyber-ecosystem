@@ -21,7 +21,8 @@ func (l *list) LPush(ctx context.Context, key string, vals ...[]byte) (int64, er
 	if len(vals) == 0 {
 		return 0, nil
 	}
-	return l.client.LPush(ctx, key, toAny(vals)...).Result()
+	n, err := l.client.LPush(ctx, key, toAny(vals)...).Result()
+	return n, mapErr(err)
 }
 
 func (l *list) RPush(ctx context.Context, key string, vals ...[]byte) (int64, error) {
@@ -31,7 +32,8 @@ func (l *list) RPush(ctx context.Context, key string, vals ...[]byte) (int64, er
 	if len(vals) == 0 {
 		return 0, nil
 	}
-	return l.client.RPush(ctx, key, toAny(vals)...).Result()
+	n, err := l.client.RPush(ctx, key, toAny(vals)...).Result()
+	return n, mapErr(err)
 }
 
 func (l *list) LPop(ctx context.Context, key string) ([]byte, error) {
@@ -43,7 +45,7 @@ func (l *list) LPop(ctx context.Context, key string) ([]byte, error) {
 		if errors.Is(err, redis.Nil) {
 			return nil, cache.ErrCacheMiss
 		}
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return val, nil
 }
@@ -57,7 +59,7 @@ func (l *list) RPop(ctx context.Context, key string) ([]byte, error) {
 		if errors.Is(err, redis.Nil) {
 			return nil, cache.ErrCacheMiss
 		}
-		return nil, err
+		return nil, mapErr(err)
 	}
 	return val, nil
 }
@@ -68,7 +70,7 @@ func (l *list) LRange(ctx context.Context, key string, start, stop int64) ([][]b
 	}
 	vals, err := l.client.LRange(ctx, key, start, stop).Result()
 	if err != nil {
-		return nil, err
+		return nil, mapErr(err)
 	}
 	out := make([][]byte, len(vals))
 	for i, v := range vals {
@@ -81,14 +83,15 @@ func (l *list) LLen(ctx context.Context, key string) (int64, error) {
 	if err := cache.ValidateKey(key); err != nil {
 		return 0, err
 	}
-	return l.client.LLen(ctx, key).Result()
+	n, err := l.client.LLen(ctx, key).Result()
+	return n, mapErr(err)
 }
 
 func (l *list) LTrim(ctx context.Context, key string, start, stop int64) error {
 	if err := cache.ValidateKey(key); err != nil {
 		return err
 	}
-	return l.client.LTrim(ctx, key, start, stop).Err()
+	return mapErr(l.client.LTrim(ctx, key, start, stop).Err())
 }
 
 // toAny converts a slice into []any for variadic go-redis commands.

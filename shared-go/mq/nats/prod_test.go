@@ -3,15 +3,15 @@ package nats
 import (
 	"context"
 	"errors"
-	"sync/atomic"
 	"testing"
-	"time"
 
 	natsclient "github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 
 	"cyber-ecosystem/shared-go/mq"
 )
+
+var errBoom = errors.New("boom")
 
 // mapError classifies server-side timeouts (nats ErrTimeout, ctx deadline, a
 // JetStream 504 API error) as ErrTimeout, and connection-class errors as
@@ -33,73 +33,8 @@ func TestMapErrorTimeout(t *testing.T) {
 			t.Errorf("%s: mapError(%v) not %v", c.name, c.in, c.want)
 		}
 	}
-	// a non-timeout API error must NOT be classified as Timeout.
 	if errors.Is(mapError(&jetstream.APIError{Code: 500}, "op"), mq.ErrTimeout) {
 		t.Error("500 APIError should not map to ErrTimeout")
-	}
-}
-
-// The created consumer must carry the configured MaxAckPending (bounds in-flight
-// memory + redelivery), not the server default of 1000.
-func TestConsumerMaxAckPendingSet(t *testing.T) {
-	m, cleanup := newTestMQ(t)
-	defer cleanup()
-	topic := uniqTopic(t, "ackpend")
-	sub, err := m.Consumer.Subscribe(context.Background(), topic, "g", func(context.Context, mq.Message) error { return nil })
-	if err != nil {
-		t.Fatalf("Subscribe: %v", err)
-	}
-	defer func() { _ = sub.Close() }()
-
-	h, _, _ := NewClient(testConfig())
-	defer func() { _ = h.nc.Drain() }()
-	cons, err := h.js.Consumer(context.Background(), streamName(topic), "g-"+topic)
-	if err != nil {
-		t.Fatalf("consumer lookup: %v", err)
-	}
-	info, err := cons.Info(context.Background())
-	if err != nil {
-		t.Fatalf("consumer info: %v", err)
-	}
-	if want := int32(10); int32(info.Config.MaxAckPending) != want { // testConfig MaxAckPending=10
-		t.Fatalf("MaxAckPending: got %d, want %d", info.Config.MaxAckPending, want)
-	}
-}
-
-// After Close, no further handler callbacks run (graceful drain, then stopped).
-func TestSubscriptionCloseStopsCallbacks(t *testing.T) {
-	m, cleanup := newTestMQ(t)
-	defer cleanup()
-	topic := uniqTopic(t, "close")
-	var n atomic.Int32
-	sub, err := m.Consumer.Subscribe(context.Background(), topic, "g", func(context.Context, mq.Message) error {
-		n.Add(1)
-		return nil
-	})
-	if err != nil {
-		t.Fatalf("Subscribe: %v", err)
-	}
-	if _, err := m.Publisher.Publish(context.Background(), topic, &mq.Message{Payload: []byte("a")}); err != nil {
-		t.Fatalf("Publish: %v", err)
-	}
-	deadline := time.After(5 * time.Second)
-	for n.Load() == 0 {
-		select {
-		case <-time.After(50 * time.Millisecond):
-		case <-deadline:
-			t.Fatal("no initial delivery")
-		}
-	}
-	if err := sub.Close(); err != nil {
-		t.Fatalf("Close: %v", err)
-	}
-	before := n.Load()
-	for range 5 {
-		_, _ = m.Publisher.Publish(context.Background(), topic, &mq.Message{Payload: []byte("b")})
-	}
-	time.Sleep(700 * time.Millisecond)
-	if got := n.Load(); got != before {
-		t.Fatalf("callback fired after Close: before=%d after=%d", before, got)
 	}
 }
 

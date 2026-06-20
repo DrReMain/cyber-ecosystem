@@ -2,6 +2,7 @@ package mq
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	kratoserrors "github.com/go-kratos/kratos/v3/errors"
@@ -43,31 +44,79 @@ func TestValidateMQDefaultError(t *testing.T) {
 	}
 }
 
-func TestValidateTopicGroup(t *testing.T) {
-	// rejected: empty, over-long, or any byte unsafe as a NATS subject literal or
-	// stream/consumer-name fragment (the stream name is "mq-"+topic and the
-	// durable name is group+"-"+topic, so '.', '>', '*', '/', whitespace and
-	// control chars are illegal).
-	for _, bad := range []string{
-		"", "orders.events", "a b", "a.>", "a*", "a/b", "中文", "x\ty", "tab\t",
-	} {
-		if err := ValidateTopic(bad); err != ErrInvalidArgument {
-			t.Errorf("ValidateTopic(%q): want ErrInvalidArgument, got %v", bad, err)
-		}
+// TestValidateTopicGroupCharset is an exhaustive charset check for ValidateTopic
+// and ValidateGroup. Both share the isSubjectToken rule (a token safe as BOTH a
+// NATS subject literal and a stream/consumer-name fragment: the stream name is
+// "mq-"+topic and the durable name is group+"-"+topic, so '.', '>', '*', '/',
+// whitespace, control chars and any non-ASCII rune are illegal). The table is
+// run against both functions; each function only differs in its own length cap.
+func TestValidateTopicGroupCharset(t *testing.T) {
+	// Build over-length inputs at exactly one past each cap.
+	tooLongTopic := strings.Repeat("a", maxTopicLen+1)
+	tooLongGroup := strings.Repeat("a", maxGroupLen+1)
+
+	cases := []struct {
+		name  string
+		input string
+		want  error // nil == accept; ErrInvalidArgument == reject
+	}{
+		// --- REJECT: empty / over-long ---
+		{name: "empty", input: "", want: ErrInvalidArgument},
+		{name: "overlong_topic", input: tooLongTopic, want: ErrInvalidArgument},
+		{name: "overlong_group", input: tooLongGroup, want: ErrInvalidArgument},
+
+		// --- REJECT: NATS wildcard / separator chars ---
+		{name: "dot", input: "a.b", want: ErrInvalidArgument},
+		{name: "gt_wildcard", input: "a>b", want: ErrInvalidArgument},
+		{name: "star_wildcard", input: "a*b", want: ErrInvalidArgument},
+		{name: "slash", input: "a/b", want: ErrInvalidArgument},
+
+		// --- REJECT: whitespace ---
+		{name: "space", input: "a b", want: ErrInvalidArgument},
+		{name: "tab", input: "a\tb", want: ErrInvalidArgument},
+		{name: "newline", input: "a\nb", want: ErrInvalidArgument},
+
+		// --- REJECT: non-ASCII (CJK, emoji) and control chars ---
+		{name: "cjk", input: "a.中", want: ErrInvalidArgument},
+		{name: "emoji", input: "a🎉b", want: ErrInvalidArgument},
+		{name: "nul_control", input: "a\x00b", want: ErrInvalidArgument},
+
+		// --- ACCEPT: plain ASCII tokens ---
+		{name: "single", input: "a", want: nil},
+		{name: "dash", input: "a-b", want: nil},
+		{name: "underscore", input: "a_b", want: nil},
+		{name: "alphanumeric_mixed", input: "A1", want: nil},
+		{name: "mixed_token", input: "grp_1-topicA", want: nil},
 	}
-	// valid tokens
-	for _, ok := range []string{"orders_events", "orders-events", "topic123", "ABC"} {
-		if err := ValidateTopic(ok); err != nil {
-			t.Errorf("ValidateTopic(%q): want nil, got %v", ok, err)
-		}
+
+	for _, c := range cases {
+		// At-cap is still ACCEPT (boundary): confirm the cap itself passes for the
+		// at-max form of an otherwise-valid token, then the over-cap form rejects.
+		t.Run("topic/"+c.name, func(t *testing.T) {
+			if c.name == "overlong_group" {
+				return // overlong_group is a group-only fixture here
+			}
+			if got := ValidateTopic(c.input); !errors.Is(got, c.want) {
+				t.Errorf("ValidateTopic(%q): want %v, got %v", c.input, c.want, got)
+			}
+		})
+		t.Run("group/"+c.name, func(t *testing.T) {
+			if c.name == "overlong_topic" {
+				return // overlong_topic is a topic-only fixture here
+			}
+			if got := ValidateGroup(c.input); !errors.Is(got, c.want) {
+				t.Errorf("ValidateGroup(%q): want %v, got %v", c.input, c.want, got)
+			}
+		})
 	}
-	if err := ValidateGroup(""); err != ErrInvalidArgument {
-		t.Errorf("empty group: %v", err)
+
+	// Boundary: a token exactly at the length cap is accepted (one byte over rejects).
+	atMaxTopic := strings.Repeat("a", maxTopicLen)
+	atMaxGroup := strings.Repeat("a", maxGroupLen)
+	if err := ValidateTopic(atMaxTopic); err != nil {
+		t.Errorf("ValidateTopic at maxTopicLen: want nil, got %v", err)
 	}
-	if err := ValidateGroup("notify-svc"); err != nil {
-		t.Errorf("valid group: %v", err)
-	}
-	if err := ValidateGroup("notify.svc"); err != ErrInvalidArgument {
-		t.Errorf("group with '.' should be rejected: %v", err)
+	if err := ValidateGroup(atMaxGroup); err != nil {
+		t.Errorf("ValidateGroup at maxGroupLen: want nil, got %v", err)
 	}
 }

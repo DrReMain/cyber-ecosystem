@@ -1,8 +1,10 @@
 # 后端平台后续工作（TODO）
 
-排期 backlog。新仓库从零重构，平台能力参考旧仓库 `/Users/shijiao/Desktop/lab/cyber-ecosystem` 对照。本文记录后续路线 —— 含 **mobile 业务丰富**、**平台能力补齐**（storage / 可观测收尾 / 异常上报）、以及**第二个服务 edge_admin** 的搭建（解锁多服务能力）。
+排期 backlog。新仓库从零重构，平台能力参考旧仓库 `/Users/shijiao/Desktop/lab/cyber-ecosystem` 对照。本文记录后续路线 —— 含 **mobile 业务丰富**、**可观测收尾 / 异常上报**、**第二个服务 edge_admin** 的搭建（解锁多服务能力）。
 
-**已接入**：db（ent + postgres + Atlas 版本迁移）、三 transport server（http :11002 / grpc :12002 / connect :13002）、中间件链（recovery→tracing→metrics→logging→ratelimit→metadata→validator）、**可观测性**（trace/metrics/log OTLP→SigNoz，抽到 `shared-go/kratos/observability`，多 sink 日志含 file 轮转）、**cache**（`shared-go/cache`：10 接口 KV/Hash/List/Set/SortedSet/Counter/Lock/RateLimiter/Pub/Sub/Session + redis 实现，接 edge_mobile Platform；bsm/redislock + redis_rate；已过两轮专家复审）。
+**已接入**：db（ent + postgres + Atlas 版本化迁移）、三 transport server（http :11002 / grpc :12002 / connect :13002）、中间件链（recovery→tracing→metrics→logging→ratelimit→metadata→validator）、**可观测性底座**（trace/metrics/log OTLP→SigNoz，抽到 `shared-go/kratos/observability`，多 sink 日志含 file 轮转）、**cache**（`shared-go/cache`：10 接口 KV/Hash/List/Set/SortedSet/Counter/Lock/RateLimiter/Pub/Sub/Session + redis 实现）、**storage**（`shared-go/storage`：S3/MinIO 实现 + Presign/Stat/Copy）、**mq**（`shared-go/mq`：NATS JetStream + PostgreSQL 双后端）。三能力均接入 edge_mobile Platform。
+
+> **三能力已通过对抗式真实后端集成验证（无 P0/P1；cache 修复 1 个错误映射 P0）**，证据见 `docs/integration-test-report.md`。验证用临时探针/测试，按"仅留纯逻辑单测"原则已清理（仓库 cache/storage/mq 仅余纯逻辑单测）。
 
 ---
 
@@ -29,33 +31,24 @@
 
 | 阶段 | 事项 | 状态 |
 |---|---|---|
-| ~~B/C/D~~ | 日志 / 可观测 / cache | ✅ 已完成 |
-| **一** | [cache 集成探针：验集成（解耦业务）](#阶段一cache-集成探针验集成解耦业务) | **主线（下一步）** |
-| **二** | [storage：mobile 接入 + 验平台能力（文件逻辑延后）](#阶段二storage平台能力文件逻辑延后) | 主线 |
-| **三** | [可观测收尾 + 异常上报](#阶段三可观测收尾--异常上报) | 主线 |
-| **四** | [edge_admin 搭建 + 多服务能力（F）](#阶段四edge_admin--多服务能力) | 骨架成型后 |
+| ~~B/C/D~~ | 日志 / 可观测底座 / cache | ✅ 已完成 |
+| ~~一~~ | cache 服务栈集成验证 | ✅ 已完成（一次性 campaign 探针，见报告）|
+| ~~二~~ | storage 平台能力（S3/MinIO + Presign/Stat/Copy）| ✅ 已完成 |
+| | ~~mq（G，可选）~~ | ✅ 已完成（已建 NATS+PG 双后端，非"待业务"）|
+| **三** | [可观测收尾 + 异常上报](#阶段三可观测收尾--异常上报) | **主线（下一步）** |
+| **四** | [edge_admin 搭建 + 多服务能力（F）](#阶段四edge_admin--多服务能力f) | 骨架成型后 |
 | **五** | [生产运维（H）+ 错误守卫（A）](#阶段五生产运维h--错误守卫a) | 主线 / 延后 |
 | | [mobile auth / 会话子系统（业务，后续独立设计）](#mobile-业务-backlogauth--会话子系统后续独立设计) | 后续 |
-| | mq（G，可选） | 延后（待业务） |
 
-> 推荐顺序：**一（cache 探针）→ 二 → 三 → 四 → 五**。三排在 cache+storage 之后，让三个后端 span 一起接（避免半截 trace）。**mobile auth/会话**是独立业务特性，按业务节奏排，不绑平台阶段顺序。
-
----
-
-## 阶段一：cache 集成探针（验集成，解耦业务）
-
-cache 层内正确性已由 `shared-go/cache` 集成测试覆盖；缺的是**穿过服务栈的集成没被验过**：conf → wire → `Platform.GetCache` → UC 用 cache → `HandleCacheError` → 三协议渲染。用一个专门的**探针 RPC** 把这条链跑通 —— 不必为验 cache 去设计真实业务流（真实业务的 cache 用法见 [mobile auth 等](#mobile-业务-backlogauth--会话子系统后续独立设计)，按业务自身节奏做）。
-
-- 一个 `Debug.CacheProbe` RPC（或类似）：固定序列跑各接口典型操作（KV Set/Get/Del、Session Set/Get/Destroy、RateLimiter Allow→deny、Counter、Lock、SortedSet…），走真实 Platform 栈，返回每接口 pass/fail（错误经 `HandleCacheError` 映射）。
-- **隔离 key**（`debug:probe:*` 前缀，不碰真实业务 key）+ **配置门控**（`debug.cache_probe_enabled`，默认关）—— 本质是 dev/ops 工具（兼作 cache 健康探针），非对外业务接口。
-- **验**：集成 plumbing（conf/wire/Platform/UC/HandleCacheError/三协议渲染）。
-- **不验**：真实业务下的 key 设计 / TTL 调优 / 失效策略 / 热点访问 pattern —— 那些只有真实业务流量才能暴露，等 mobile auth 等业务真用 cache 时自然出现。
+> 推荐顺序：**三（可观测收尾）→ 四 → 五**。三现在排第一：cache/storage/db 三后端都到位，统一接后端 span（避免半截 trace）。**mobile auth/会话**是独立业务特性，按业务节奏排，不绑平台阶段顺序。
+>
+> 注：cache/storage/mq 的"做什么"细节已随实现落地而归档（接口/实现/错误映射/部署均已完成），不再在本文展开。
 
 ---
 
 ## mobile 业务 backlog：auth / 会话子系统（后续，独立设计）
 
-mobile 目前只有 mobile_user CRUD（无登录）。后续做真实 auth，**核心是双 token（OAuth2 风格）**。能力清单（做时分步，独立 brainstorm/spec，不被"验 cache"绑架）：
+mobile 目前只有 mobile_user CRUD（无登录）。后续做真实 auth，**核心是双 token（OAuth2 风格）**。能力清单（做时分步，独立 brainstorm/spec）：
 
 - **双 token**：access（短 TTL **JWT**，无状态本地验签，不可吊销但短 TTL 封顶）+ refresh（长效，**服务端 DB 记录**、可吊销）。这是 Google / Auth0 / Okta / Cognito 的范式，也是"管理端能查看/管理签发凭证"的基础。
 - **密码 login** → 签 access + refresh。
@@ -73,43 +66,24 @@ mobile 目前只有 mobile_user CRUD（无登录）。后续做真实 auth，**�
 - **refresh 存哈希**：DB 泄露 ≠ token 可用。
 - **多端策略实现**：per-user session 集合 / token family / 单点登录踢人机制。
 
-**cache 在 auth 里的角色**：login 暴力限频（RateLimiter）、access 黑名单（KV/Set，logout）、refresh 热查缓存（KV）—— cache 在 auth 里被真实用上，key/TTL/失效 pattern 在此暴露。注：refresh 是 DB 实体，access 是 JWT 本地验，**双 token 下 Session 接口不被用**（Session 只由 cache 集成探针 / 其他场景验）。
+**cache 在 auth 里的角色**：login 暴力限频（RateLimiter）、access 黑名单（KV/Set，logout）、refresh 热查缓存（KV）—— cache 在 auth 里被真实用上，key/TTL/失效 pattern 在此暴露。注：refresh 是 DB 实体，access 是 JWT 本地验，**双 token 下 Session 接口不被用**。
 
 **排序（分步）**：① login 核心（access+refresh+中间件+吊销）→ ② refresh-token 管理 RPC（列表/吊销，给 admin + 自查"我在哪登录"）→ ③ 第三方登录 → ④ admin 管理凭证 UI/RPC。
 
 ---
 
-## 阶段二：storage（平台能力，文件逻辑延后）
-
-**现状**：无。k3s 已部署 MinIO。
-
-**做什么**：`shared-go/storage` 接口 + S3/MinIO 实现（aws-sdk-go-v2，`UsePathStyle` 指向 MinIO）；接入 mobile Platform；**集成测试级验证**（upload/download/presign 对 MinIO 通）。
-
-- **接口**（借鉴旧仓库 + 补全）：`Upload / Download / Delete` + 补 `Presign`（上传/下载预签名，前端直传必需）+ `Stat` + `Copy`。
-- 错误映射：smithy `APIError` → 应用错误。
-- 扩 `conf.Data.Storage`（endpoint/access_key/secret_key/bucket/region/max_file_size）。
-
-**关键：文件逻辑延后**。文件上传下载不只是 storage —— 还要**文件元数据表**，而**文件表归 admin**（admin 管理文件）。所以：
-- 本阶段只验 storage **平台能力**（对 MinIO 接入 + 接口），**不建文件表、不做真实文件业务**。
-- 真实文件逻辑（文件表 + 上传下载业务）等 admin 落地后在 admin 侧重构。
-- 故 storage 是"平台/接入验证"，非"业务验证"（其业务消费方在 admin）。storage 是 shared-go 跨服务复用基建，admin 也会用，先建+冒烟不算白建。
-
-> 借鉴旧仓库：接口骨架 + smithy 错误映射 + otel span。补：Presign/Stat/Copy。
-
----
-
 ## 阶段三：可观测收尾 + 异常上报
 
-三个后端（cache / storage / db）都到位后，统一接后端 span（避免半截 trace）：
+cache/storage/db 三后端都到位后，统一接后端 span（避免半截 trace）。现状：可观测**底座**（trace/metrics/log provider + 中间件）已接，缺**后端 span + 慢查询 + 异常上报**：
 
 - **db-span**：`github.com/XSAM/otelsql` wrap SQL 驱动 → 每查询一个 span。
-- **cache-span**：redisotel `AddHook`（cache 已落地、未接观测，这里补）。
-- **storage-span**：每操作一个 span（带 bucket/key/size，随阶段二设计）。
+- **cache-span**：redisotel `AddHook`（cache client 已预留 hook 注入点 `shared-go/cache/redis/client.go`，这里补上）。
+- **storage-span**：每操作一个 span（带 bucket/key/size）。
 - **慢查询日志**：duration + slow 标记 + 阈值，db/cache/storage 各接。
 - **异常上报**：panic/错误经 recovery 中间件 → OTel log → SigNoz（**不引 sentry**，统一走 OTel log→SigNoz；让错误在 SigNoz 可查/可告警）。
 - **client tracing**：随阶段四的 F 客户端中间件（`tracing.Client()`）。
 
-复用 shared-go observability 已设的全局 tracer。**排在 cache+storage 之后**：三后端 span 一起接更干净，避免半截 trace（只显示 DB 不显示 cache/storage）误导。
+复用 shared-go observability 已设的全局 tracer。**现在三后端齐了，正适合一起接**，避免半截 trace（只显示 DB 不显示 cache/storage）误导。
 
 ---
 
@@ -169,23 +143,12 @@ mobile 目前只有 mobile_user CRUD（无登录）。后续做真实 auth，**�
 
 ---
 
-## mq（G，可选 / 延后）
-
-**现状**：旧仓库也没有 MQ，当前无业务驱动。
-
-**做什么（待业务出现再选型）**：套 cache 的抽象模式。
-
-- `mq.Publisher` / `mq.Consumer` 接口；后端按场景选 **redis-stream（轻，复用已有 redis）** 或 **kafka（重，segmentio/kafka-go）**。
-- 重试 / 死信在抽象层或装饰器；otel hook（每消息一个 span）。
-
----
-
 ## 总览：旧仓库对照
 
 | 能力 | 旧仓库技术栈 | 借鉴 | 舍弃 / 改进 |
 |---|---|---|---|
 | cache | go-redis/v9 + memory，5 接口 + otel hook | 接口拆分、otel hook、慢查询日志 | 砍 memory 后端；补分布式锁（bsm/redislock）；限流 redis_rate |
-| mq | 无 | cache 的抽象模式 | — |
+| mq | 无 | cache 的抽象模式 | 实落 NATS JetStream + PG 双后端（旧仓库无）|
 | storage | aws-sdk-go-v2/s3（MinIO） | 接口骨架、smithy 错误映射、otel span | 补 Presign/Stat/Copy；文件表归 admin |
 | 远程调用 | 自研 connect transport + kgrpc client | 客户端中间件链 | discovery（k3s 直连）；grpc/connect 二选一 |
 | logging | zap + lumberjack + otel log | 多输出、慢查询、字段约定 | 切 slog；v3 `log` facade + `contrib/otel/log`（内置 trace 关联） |
