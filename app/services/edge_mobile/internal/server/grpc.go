@@ -27,7 +27,7 @@ func NewGRPCServer(
 	middlewares = append(middlewares, tracing.Server())
 	middlewares = append(middlewares, observability.MetricsServer())
 	middlewares = append(middlewares, logging.Server(logger))
-	middlewares = append(middlewares, recovery.Recovery())
+	middlewares = append(middlewares, recovery.Recovery(recovery.WithLogger(observability.PrettyProto(logger))))
 	middlewares = append(middlewares, ratelimit.Server())
 	middlewares = append(middlewares, metadata.Server())
 	middlewares = append(middlewares, validator.Server())
