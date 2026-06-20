@@ -16,6 +16,7 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware"
 	"github.com/go-kratos/kratos/v3/transport"
 
+	"cyber-ecosystem/shared-go/kratos/jsoncodec"
 	"cyber-ecosystem/shared-go/kratos/transport/connect/internal/endpoint"
 	"cyber-ecosystem/shared-go/kratos/transport/connect/internal/host"
 	"cyber-ecosystem/shared-go/kratos/transport/connect/internal/matcher"
@@ -128,6 +129,15 @@ func (s *Server) Register(path string, handler http.Handler) {
 func (s *Server) HandlerOptions() []connect.HandlerOption {
 	opts := []connect.HandlerOption{
 		connect.WithInterceptors(newKratosInterceptor(s)), // outermost: injects Transport first
+		// Replace connect-go's default json codecs (protojson
+		// EmitUnpopulated=false) with one that emits unpopulated fields, so
+		// zero-value scalars reach the client. Both "json" and
+		// "json; charset=utf-8" are registered — connect-go treats them as
+		// separate codec names, so overriding only "json" would let the charset
+		// variant (curl/many SDKs default to it) silently fall back to the
+		// default codec and omit empty fields. The proto codec is untouched.
+		connect.WithCodec(jsoncodec.Codec{}),
+		connect.WithCodec(jsoncodec.NewCodec("json; charset=utf-8")),
 	}
 	opts = append(opts, s.connectOpts...)
 	if len(s.interceptors) > 0 {

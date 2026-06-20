@@ -12,6 +12,7 @@ import (
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 	"github.com/go-kratos/kratos/v3/transport/http"
 
+	"cyber-ecosystem/shared-go/kratos/jsoncodec"
 	"cyber-ecosystem/shared-go/kratos/observability"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
@@ -27,6 +28,11 @@ var (
 
 func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+
+	// Override kratos's default "json" codec (Go std json, which omits proto
+	// zero-value fields via struct tags) so HTTP JSON responses include zero
+	// values (count=0, status=0, ...). Connect uses connect.WithCodec separately.
+	jsoncodec.Register()
 }
 
 func newApp(logger *slog.Logger, gs *grpc.Server, hs *http.Server, cs *connect.Server) *kratos.App {
