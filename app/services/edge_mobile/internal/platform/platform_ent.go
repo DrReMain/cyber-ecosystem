@@ -3,6 +3,7 @@ package platform
 import (
 	"fmt"
 
+	"cyber-ecosystem/shared-go/kratos/observability"
 	"cyber-ecosystem/shared-go/orm/ent/client"
 
 	"cyber-ecosystem/app/services/edge_mobile/internal/conf"
@@ -21,6 +22,8 @@ func NewEntClient(c *conf.Data) (*ent.Client, func(), error) {
 		MaxOpenConns:    int(c.Database.MaxOpenConns),
 		MaxIdleConns:    int(c.Database.MaxIdleConns),
 		ConnMaxLifetime: c.Database.ConnMaxLifetime.AsDuration(),
+		// Wrap the SQL driver with otelsql (tracing + pool metrics; global providers).
+		SQLOpener: observability.OpenSQL,
 	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed opening connection to database: %w", err)

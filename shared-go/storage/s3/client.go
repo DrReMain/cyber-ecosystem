@@ -20,7 +20,12 @@ import (
 // AccessKey and SecretKey are set (then static creds override — dev/MinIO). It
 // validates config, ensures the default bucket exists, and returns a no-op
 // cleanup (the S3 client owns no closeable resource).
-func NewClient(cfg *Config) (*s3.Client, func(), error) {
+//
+// opts are applied to the s3.Options AFTER the config-driven options; the
+// platform layer passes observability.S3Options() here to attach OTel
+// middlewares. This package must NOT import the observability package — the
+// dependency is one-way (platform → storage).
+func NewClient(cfg *Config, opts ...func(*s3.Options)) (*s3.Client, func(), error) {
 	if cfg == nil {
 		return nil, nil, fmt.Errorf("%w: nil config", storage.ErrInvalidArgument)
 	}
@@ -48,6 +53,9 @@ func NewClient(cfg *Config) (*s3.Client, func(), error) {
 			o.BaseEndpoint = aws.String(cfg.Endpoint)
 		}
 		o.UsePathStyle = cfg.UsePathStyle
+		for _, opt := range opts {
+			opt(o)
+		}
 	})
 
 	bucketCtx, bucketCancel := context.WithTimeout(context.Background(), 5*time.Second)

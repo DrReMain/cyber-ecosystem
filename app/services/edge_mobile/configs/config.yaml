@@ -54,23 +54,23 @@ data:
     #   poll_interval: 0.5s
     #   visibility_timeout: 30s
     #   max_retries: 5
-    #   retention: 604800s         # 7 天 (protobuf Duration: 秒)
+    #   retention: 604800s         # 7 天
     #   batch_size: 16
 observability:
-  endpoint: localhost:4318
+  endpoint: localhost:4318    # SigNoz OTLP HTTP
   insecure: true
   trace:
-    enabled: false
-#    sampling_ratio: 0.1      # 比率 (0.0–1.0)
+    enabled: true
+    sampling_ratio: 1         # 比率 (0.0–1.0)
   metrics:
-    enabled: false
+    enabled: true
   log:
     level: debug
     console: true
-    otlp: false
+    otlp: true
 #    file:
 #      path: edge_mobile.log
-#      max_size_mb: 100   # MiB (单文件最大)
-#      max_backups: 10    # 个 (保留备份数)
-#      max_age_days: 30   # 天 (最大保留天数)
+#      max_size_mb: 100 # MiB (单文件最大)
+#      max_backups: 10 # 个 (保留备份数)
+#      max_age_days: 30 # 天 (最大保留天数)
 #      compress: true

@@ -21,6 +21,11 @@ type DBConfig struct {
 	MaxOpenConns    int
 	MaxIdleConns    int
 	ConnMaxLifetime time.Duration
+	// SQLOpener opens the *sql.DB for (driverName, dsn). Defaults to sql.Open.
+	// The platform layer sets this to observability.OpenSQL to wrap the driver
+	// with OTel tracing + pool metrics. This package must NOT import the
+	// observability package — the dependency is one-way (platform → orm).
+	SQLOpener func(driverName, dsn string) (*sql.DB, error)
 }
 
 type EntClient struct {
@@ -39,7 +44,11 @@ func NewEntClient(cfg DBConfig) (*EntClient, error) {
 		return nil, fmt.Errorf("unsupported database driver %s", cfg.Driver)
 	}
 
-	db, err := sql.Open(drvName, dsn)
+	opener := cfg.SQLOpener
+	if opener == nil {
+		opener = sql.Open
+	}
+	db, err := opener(drvName, dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed opening connection: %w", err)
 	}

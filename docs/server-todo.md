@@ -1,10 +1,8 @@
 # 后端平台后续工作（TODO）
 
-排期 backlog。新仓库从零重构，平台能力参考旧仓库 `/Users/shijiao/Desktop/lab/cyber-ecosystem` 对照。本文记录后续路线 —— 含 **mobile 业务丰富**、**可观测收尾 / 异常上报**、**第二个服务 edge_admin** 的搭建（解锁多服务能力）。
+排期 backlog。新仓库从零重构，平台能力参考旧仓库 `/Users/shijiao/Desktop/lab/cyber-ecosystem` 对照。本文记录后续路线 —— 含 **mobile 业务丰富**、**可观测收尾**、**第二个服务 edge_admin** 的搭建（解锁多服务能力）。
 
-**已接入**：db（ent + postgres + Atlas 版本化迁移）、三 transport server（http :11002 / grpc :12002 / connect :13002）、中间件链（recovery→tracing→metrics→logging→ratelimit→metadata→validator）、**可观测性底座**（trace/metrics/log OTLP→SigNoz，抽到 `shared-go/kratos/observability`，多 sink 日志含 file 轮转）、**cache**（`shared-go/cache`：10 接口 KV/Hash/List/Set/SortedSet/Counter/Lock/RateLimiter/Pub/Sub/Session + redis 实现）、**storage**（`shared-go/storage`：S3/MinIO 实现 + Presign/Stat/Copy）、**mq**（`shared-go/mq`：NATS JetStream + PostgreSQL 双后端）。三能力均接入 edge_mobile Platform。
-
-> **三能力已通过对抗式真实后端集成验证（无 P0/P1；cache 修复 1 个错误映射 P0）**，证据见 `docs/integration-test-report.md`。验证用临时探针/测试，按"仅留纯逻辑单测"原则已清理（仓库 cache/storage/mq 仅余纯逻辑单测）。
+**已接入**：db（ent + postgres + Atlas 版本化迁移）、三 transport server（http :11002 / grpc :12002 / connect :13002）、中间件链（recovery→tracing→metrics→logging→ratelimit→metadata→validator）、**可观测性全链路**（trace/metric/log OTLP→SigNoz；db/cache/storage/mq 四后端的 span+metric 全接入并经 SigNoz 控制面验证；`shared-go/kratos/observability` 提供仪表化 helper、后端包不耦合；多 sink 日志含 file 轮转）、**cache**（`shared-go/cache`，redis，10 接口）、**storage**（`shared-go/storage`，S3/MinIO + Presign/Stat/Copy）、**mq**（`shared-go/mq`，NATS JetStream + PostgreSQL 双后端）。三能力均接入 edge_mobile Platform 并经对抗式真实后端验证（无 P0/P1，证据见 `docs/integration-test-report.md`）。
 
 ---
 
@@ -35,12 +33,12 @@
 | ~~一~~ | cache 服务栈集成验证 | ✅ 已完成（一次性 campaign 探针，见报告）|
 | ~~二~~ | storage 平台能力（S3/MinIO + Presign/Stat/Copy）| ✅ 已完成 |
 | | ~~mq（G，可选）~~ | ✅ 已完成（已建 NATS+PG 双后端，非"待业务"）|
-| **三** | [可观测收尾 + 异常上报](#阶段三可观测收尾--异常上报) | **主线（下一步）** |
+| **三** | [可观测收尾 + 异常上报](#阶段三可观测收尾--异常上报) | **进行中（主体完成）**：trace/metric/log + 四后端 span ✅（SigNoz 验证）；残余：慢查询 log + 后端异常上报（→SigNoz）|
 | **四** | [edge_admin 搭建 + 多服务能力（F）](#阶段四edge_admin--多服务能力f) | 骨架成型后 |
 | **五** | [生产运维（H）+ 错误守卫（A）](#阶段五生产运维h--错误守卫a) | 主线 / 延后 |
 | | [mobile auth / 会话子系统（业务，后续独立设计）](#mobile-业务-backlogauth--会话子系统后续独立设计) | 后续 |
 
-> 推荐顺序：**三（可观测收尾）→ 四 → 五**。三现在排第一：cache/storage/db 三后端都到位，统一接后端 span（避免半截 trace）。**mobile auth/会话**是独立业务特性，按业务节奏排，不绑平台阶段顺序。
+> 推荐顺序：**三残余（慢查询 log + 后端异常上报）→ 四 → 五**。三的主体（trace/metric/log 全链路 + 四后端 span）已完成并经 SigNoz 验证。**mobile auth/会话**是独立业务特性，按业务节奏排，不绑平台阶段顺序。
 >
 > 注：cache/storage/mq 的"做什么"细节已随实现落地而归档（接口/实现/错误映射/部署均已完成），不再在本文展开。
 
@@ -74,16 +72,18 @@ mobile 目前只有 mobile_user CRUD（无登录）。后续做真实 auth，**�
 
 ## 阶段三：可观测收尾 + 异常上报
 
-cache/storage/db 三后端都到位后，统一接后端 span（避免半截 trace）。现状：可观测**底座**（trace/metrics/log provider + 中间件）已接，缺**后端 span + 慢查询 + 异常上报**：
+**已完成（✅ SigNoz 验证）**：trace/metric/log 全链路 + db/cache/storage/mq 四后端的 span+metric 全接入（`shared-go/kratos/observability/instrument.go` 仪表化 helper + platform 接线；后端包不耦合 observability 库）。三信号 OTLP→SigNoz，控制面 `/services` 出现 `edge_mobile`（spanmetric 派生 P99/错误率）+ ingestion active。
 
-- **db-span**：`github.com/XSAM/otelsql` wrap SQL 驱动 → 每查询一个 span。
-- **cache-span**：redisotel `AddHook`（cache client 已预留 hook 注入点 `shared-go/cache/redis/client.go`，这里补上）。
-- **storage-span**：每操作一个 span（带 bucket/key/size）。
-- **慢查询日志**：duration + slow 标记 + 阈值，db/cache/storage 各接。
-- **异常上报**：panic/错误经 recovery 中间件 → OTel log → SigNoz（**不引 sentry**，统一走 OTel log→SigNoz；让错误在 SigNoz 可查/可告警）。
-- **client tracing**：随阶段四的 F 客户端中间件（`tracing.Client()`）。
+**异常上报架构（后端 vs 客户端分流）**：
+- **后端异常 → SigNoz**（经 OTel log：panic/未受控错误 → 结构化 error log，带 trace_id 关联；recovery 中间件落地）。后端异常天然跟 trace 强相关，留在 SigNoz 保持后端可观测统一（trace/metric/log/error 一处、全关联）。权衡：错误 dedup/grouping/版本回归不如 Sentry 级，早期够用，真要重 error workflow 再补。
+- **客户端异常 → GlitchTip**（自建 Sentry 协议，sentry-go SDK；breadcrumbs / 崩溃 grouping / release）—— 移动/Web crash 报告是它的主场，SigNoz 不做。
+- **客户端全链路 OTel**：各客户端（iOS/Android/Web）引入 OTel SDK，链路从客户端起。**后端已就绪**（kratos tracing 中间件对进来的请求做 W3C tracecontext `Extract`，客户端带 `traceparent` 即续链，后端零改动）。属各**客户端项目**的投入（OTel SDK + on-device 采样 + 客户端可达的 OTLP 接收网关），非本后端仓库事。
 
-复用 shared-go observability 已设的全局 tracer。**现在三后端齐了，正适合一起接**，避免半截 trace（只显示 DB 不显示 cache/storage）误导。
+**待办（后端残余，小）**：
+- **慢查询 log**：db/cache/storage/mq 操作超阈值 → slog warn → OTLP log → SigNoz。阈值进 conf。
+- **后端异常上报 → SigNoz**：recovery 中间件把 panic/未受控错误发结构化 error log（OTel log sink 已在）。
+
+client tracing 随阶段四 F 客户端中间件；客户端全链路 OTel 是各客户端项目事项。
 
 ---
 
@@ -152,7 +152,7 @@ cache/storage/db 三后端都到位后，统一接后端 span（避免半截 tra
 | storage | aws-sdk-go-v2/s3（MinIO） | 接口骨架、smithy 错误映射、otel span | 补 Presign/Stat/Copy；文件表归 admin |
 | 远程调用 | 自研 connect transport + kgrpc client | 客户端中间件链 | discovery（k3s 直连）；grpc/connect 二选一 |
 | logging | zap + lumberjack + otel log | 多输出、慢查询、字段约定 | 切 slog；v3 `log` facade + `contrib/otel/log`（内置 trace 关联） |
-| 可观测 | otel trace/metric/log + otelsql + sentry | 三 provider、newResource、W3C propagator | 官方 `contrib/otel/{tracing,metrics,log}` middleware（三协议统一）；metric 统一 OTLP；**弃 sentry，异常上报走 OTel log→SigNoz** |
+| 可观测 | otel trace/metric/log + otelsql + sentry | 三 provider、newResource、W3C propagator | 官方 `contrib/otel/{tracing,metrics,log}` middleware（三协议统一）；metric 统一 OTLP；**后端 trace/metric/log + 异常 → SigNoz；客户端 crash + 全链路 OTel → GlitchTip（自建 Sentry 协议）；不引商业 Sentry SaaS** |
 | 架构 | 单服务 genesis | — | 两服务（mobile/admin）主权数据；admin→mobile 单向依赖 |
 
 ---

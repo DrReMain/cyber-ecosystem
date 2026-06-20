@@ -3,6 +3,7 @@ package platform
 import (
 	"fmt"
 
+	"cyber-ecosystem/shared-go/kratos/observability"
 	"cyber-ecosystem/shared-go/storage"
 	storageS3 "cyber-ecosystem/shared-go/storage/s3"
 
@@ -15,7 +16,9 @@ func NewStorage(c *conf.Data) (*storage.Storage, func(), error) {
 		return nil, nil, fmt.Errorf("storage config is required")
 	}
 	cfg := toStorageConfig(sc)
-	client, closeFn, err := storageS3.NewClient(&cfg)
+	// S3Options() appends the aws-sdk-v2 OTel middlewares (trace + metrics) to
+	// the client; storage/s3 stays free of the observability import.
+	client, closeFn, err := storageS3.NewClient(&cfg, observability.S3Options())
 	if err != nil {
 		return nil, nil, err
 	}

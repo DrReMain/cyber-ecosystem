@@ -3,6 +3,7 @@ package platform
 import (
 	"fmt"
 
+	"cyber-ecosystem/shared-go/kratos/observability"
 	"cyber-ecosystem/shared-go/mq"
 	mqnats "cyber-ecosystem/shared-go/mq/nats"
 	mqpg "cyber-ecosystem/shared-go/mq/pg"
@@ -20,14 +21,14 @@ func NewMQ(c *conf.Data) (*mq.MQ, func(), error) {
 		if err != nil {
 			return nil, nil, err
 		}
-		return mqnats.New(h), closeFn, nil
+		return observability.InstrumentMQ(mqnats.New(h)), closeFn, nil
 	}
 	if p := mc.GetPg(); p != nil && p.GetDsn() != "" {
 		h, closeFn, err := mqpg.NewClient(toPGConfig(p))
 		if err != nil {
 			return nil, nil, err
 		}
-		return mqpg.New(h), closeFn, nil
+		return observability.InstrumentMQ(mqpg.New(h)), closeFn, nil
 	}
 	return nil, nil, fmt.Errorf("mq: configure either nats or pg")
 }
