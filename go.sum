@@ -340,10 +340,10 @@ github.com/go-kratos/kratos/cmd/protoc-gen-go-errors/v3 v3.0.0-20260611174812-9f
 github.com/go-kratos/kratos/cmd/protoc-gen-go-errors/v3 v3.0.0-20260611174812-9f39b510d6bb/go.mod h1:vY7c3BMKGQWq1U3HSJVZJkrZr5R2nl2DlDJyIJ4RWYw=
 github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v3 v3.0.0-20260617100506-4e232a3eff59 h1:bEAFQu23dlvIJtdBuuM3s55QPADfoFqXixS6SRVtow8=
 github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v3 v3.0.0-20260617100506-4e232a3eff59/go.mod h1:RGZtB27P0RHKnUjghZEjoZM3HqN1lzNWT7FEXoXVTp8=
-github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0-20260617100506-4e232a3eff59 h1:FeDujUZF6a2pPS0RWGI52IXWPqVcGW1QP5vHDlAqLE8=
-github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0-20260617100506-4e232a3eff59/go.mod h1:hT2QNZ/0DPOvRqVqxoBBL/aMCOHhbbWh92mF87DBiCU=
-github.com/go-kratos/kratos/v3 v3.0.0-20260617100506-4e232a3eff59 h1:32laNndL0GsYLuGwWquB6if8yrBQWEzXlkkXImcfeKA=
-github.com/go-kratos/kratos/v3 v3.0.0-20260617100506-4e232a3eff59/go.mod h1:8l+0M5UPlm/5hWLvS+wzxHRVRv6sHMG6Lgb4+rw1KIs=
+github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0-20260621094049-2726761cdd77 h1:NiOiS3X74uuS/HJ3o0G8XOohFVQj2MZnTCzx2Bw31hk=
+github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0-20260621094049-2726761cdd77/go.mod h1:hT2QNZ/0DPOvRqVqxoBBL/aMCOHhbbWh92mF87DBiCU=
+github.com/go-kratos/kratos/v3 v3.0.0-20260621094049-2726761cdd77 h1:LEUBqzmd6eYLivPO2GOFsahx7bbUGfL4QYKHEOYBnBI=
+github.com/go-kratos/kratos/v3 v3.0.0-20260621094049-2726761cdd77/go.mod h1:8l+0M5UPlm/5hWLvS+wzxHRVRv6sHMG6Lgb4+rw1KIs=
 github.com/go-logfmt/logfmt v0.3.0/go.mod h1:Qt1PoO58o5twSAckw1HlFXLmHsOX5/0LbT9GBnD5lWE=
 github.com/go-logfmt/logfmt v0.4.0/go.mod h1:3RMwSq7FuexP4Kalkev3ejPJsZTpXXBr9+V4qmtdjCk=
 github.com/go-logfmt/logfmt v0.5.0/go.mod h1:wCYkCAKZfumFQihp8CzCvQ3paCTfi41vtzG1KdI/P7A=

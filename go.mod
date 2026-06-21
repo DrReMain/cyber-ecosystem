@@ -16,8 +16,8 @@ tool (
 )
 
 replace (
-	github.com/go-kratos/kratos/contrib/otel/v3 => github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0-20260617100506-4e232a3eff59
-	github.com/go-kratos/kratos/v3 => github.com/go-kratos/kratos/v3 v3.0.0-20260617100506-4e232a3eff59
+	github.com/go-kratos/kratos/contrib/otel/v3 => github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0-20260621094049-2726761cdd77
+	github.com/go-kratos/kratos/v3 => github.com/go-kratos/kratos/v3 v3.0.0-20260621094049-2726761cdd77
 )
 
 require (

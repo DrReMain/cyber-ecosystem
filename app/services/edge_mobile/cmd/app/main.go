@@ -12,6 +12,7 @@ import (
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 	"github.com/go-kratos/kratos/v3/transport/http"
 
+	"cyber-ecosystem/shared-go/kratos/health"
 	"cyber-ecosystem/shared-go/kratos/jsoncodec"
 	"cyber-ecosystem/shared-go/kratos/observability"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
@@ -36,14 +37,14 @@ func init() {
 }
 
 func newApp(logger *slog.Logger, gs *grpc.Server, hs *http.Server, cs *connect.Server) *kratos.App {
-	return kratos.New(
+	return kratos.New(append([]kratos.Option{
 		kratos.ID(id),
 		kratos.Name(Name),
 		kratos.Version(Version),
 		kratos.Metadata(map[string]string{}),
 		kratos.Logger(logger),
 		kratos.Server(gs, hs, cs),
-	)
+	}, health.Mount(hs)...)...)
 }
 
 func initObservability(o *conf.Observability) (func(), *slog.Logger, error) {

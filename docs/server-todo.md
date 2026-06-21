@@ -65,14 +65,12 @@
 
 ### H. 健康检查 + 安全关机 + pprof
 
-**现状**：connect 有 `/healthz`（仅 liveness 恒 200）；http 无探针；`StopTimeout` 默认 0（无 drain）；无 pprof。k8s Deployment 清单未写。
-
-**① 健康检查 + ② 安全关机**（一起做，共用「准备好了 / 要收摊了」开关）：
-- http `/healthz`（liveness 恒 200）+ `/readyz`（`ready` 标志驱动 200/503）；`AfterStart`→MarkReady、`BeforeStop`→MarkNotReady。
-- 停机时 **liveness 保持 200**（防 SIGKILL 打断 drain）、**readiness 翻 503**（摘流量）。
-- `kratos.StopTimeout(drain 窗口)` 默认 15s；扩 `conf.Server.graceful_stop_timeout`；`newApp` 加 `*conf.Server` 参数。
-- 时序：SIGTERM → BeforeStop（ready=false）→ cancel → 并发 drain → cleanup。
-- k8s 探针指 `:11002`；`terminationGracePeriodSeconds` > `graceful_stop_timeout`。
+**① 健康检查 + ② 安全关机：✅ 完成**（`shared-go/kratos/health` 包 + `health.Mount(hs)` 一键，commit 2c3e4744）。落地决策（简化后与初稿有别）：
+- **readiness 由 app 生命周期驱动**（AfterStart→ready、BeforeStop→摘流），**不 ping 依赖** —— 依赖可达靠 k8s 管理，app 不自证连接（避免 Wire bundle / 平台运维字段那套复杂度，代码回归干净）。
+- **liveness 恒 200**（不查依赖/ready；停机保持 200 防 kill）。
+- 探针挂 **HTTP**（`/healthz`/`/readyz`），三协议都起；`checker` 收拢 `newApp`（不入 wire），`Mount` 封装端点 + 钩子。
+- **固定 drain 15s**（`WithGracefulStopTimeout` option 可覆盖；不做 conf 配置 — YAGNI）。
+- k8s 探针配置 + Deployment 清单 → 归「部署与镜像策略」节。
 
 **③ pprof** —— `/debug/pprof`，配置/env 门控默认关，port-forward 抓取；注意 prod 暴露风险。
 
@@ -90,6 +88,32 @@
 - **构造纪律**：`Message` 默认空（模糊）；非空 = 故意直出。防开发随手把内部细节塞进 `Message`。手段：lint / 显式 `ErrorXxxDirect` 工厂。
 - **出口兜底**：错误透传前（中间件层），非受控 `*Error` → 转通用安全文案，原文进 cause 日志。
 - （低优先）三协议 ReplyHeader 错误路径位置对齐（connect unary 在 `*connect.Error.Meta()`）。
+
+---
+
+## 部署与镜像策略（服务 + 客户端统一，最后处理）
+
+> 演示部署涉及客户端（部署），统一考虑，**放最后**。当前优先 mobile 业务 / edge_admin。
+
+**环境形态**：
+- **开发（当前，保留）**：edge_mobile 在 Mac `go run`，基础设施用 NodePort + k3d 映射宿主机 → `localhost:NodePort` 直连 k3s 里 pg/redis。调试用。
+- **演示（目标，拟真生产）**：edge_mobile 进 k3s（Deployment），**集群内 Service DNS** 访问同一套基础设施，**Ingress 对外**。刻意拟真（Service DNS + Ingress + 标准 k8s），迁生产只换镜像（amd64）+ registry，架构不动。
+- **生产（缓）**：Linux 裸 k3s。
+
+**镜像策略（无 CI/CD）**：
+- dev/演示（Mac k3d，arm64）：`docker build` + `k3d image import` + `imagePullPolicy: Never`。
+- prod（Linux amd64）：`buildx --platform linux/amd64` + `docker save` tar + scp + `k3s ctr images import`（或集群内 `registry:2` push/pull）。**别用 `Always` pull**（无公网 registry 会失败）。
+- tag：git sha（可追溯）+ semver（release）。
+- 构建：Dockerfile（多阶段）+ Nx target（`docker:build`）。
+
+**生产就绪拆分**（A 完成；B–E 待，统一处理）：
+- ✅ **A** 健康探针 + 优雅停机（上）。
+- ⏸ **B** Dockerfile（容器化）。
+- ⏸ **C** config localhost → Service DNS 适配（演示用；开发 localhost 保留）。
+- ⏸ **D** 部署清单（Deployment/Service/ConfigMap/Secret/探针配置/migrate）。
+- ⏸ **E** Ingress（确认/启用 k3s Traefik + 路由 connect/http，演示对外）。
+
+**演示拟真要点**（易迁生产）：Service DNS 而非 localhost、Ingress 而非 NodePort、标准 Deployment/Service/ConfigMap/Secret。
 
 ---
 
