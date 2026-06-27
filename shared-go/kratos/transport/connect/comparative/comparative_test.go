@@ -42,8 +42,8 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
-	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
+	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
+	testpbconnect "cyber-ecosystem/shared-go/kratos/transport/connect/testpb/testpbconnect"
 )
 
 // ---------------------------------------------------------------------------
@@ -95,22 +95,22 @@ func makeMW(r *recorder) kratosmiddleware.Middleware {
 // Shared services
 // ---------------------------------------------------------------------------
 
-// resourceSvc implements the MobileResourceService unary RPC for ALL 3 transports.
-// mobilepb.MobileResourceServiceServer (grpc-style) is the canonical interface;
+// resourceSvc implements the ResourceService unary RPC for ALL 3 transports.
+// testpb.ResourceServiceServer (grpc-style) is the canonical interface;
 // both the HTTP and Connect generators dispatch to the same ListResource method.
 // errOn flips the implementation to return a kratos NotFound for the error
 // parity test.
 type resourceSvc struct {
-	mobilepb.UnimplementedMobileResourceServiceServer
+	testpb.UnimplementedResourceServiceServer
 	errOn bool
 }
 
-func (s *resourceSvc) ListResource(_ context.Context, _ *mobilepb.ListResourceRequest) (*mobilepb.ListResourceResponse, error) {
+func (s *resourceSvc) ListResource(_ context.Context, _ *testpb.ListResourceRequest) (*testpb.ListResourceResponse, error) {
 	if s.errOn {
 		return nil, kerrors.NotFound("RES_NOT_FOUND", "nope")
 	}
-	return &mobilepb.ListResourceResponse{
-		List: []*mobilepb.Service{{Name: "demo"}},
+	return &testpb.ListResourceResponse{
+		List: []*testpb.Service{{Name: "demo"}},
 	}, nil
 }
 
@@ -118,12 +118,12 @@ func (s *resourceSvc) ListResource(_ context.Context, _ *mobilepb.ListResourceRe
 // Echo→counts, Pipe→echo. Used for the grpc-vs-connect streaming parity test.
 // (Transfer has no HTTP binding, so there is no http leg.)
 type transferSvc struct {
-	mobilepb.UnimplementedMobileTransferServiceServer
+	testpb.UnimplementedTransferServiceServer
 }
 
-func (transferSvc) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerStreamingServer[mobilepb.SubscribeResponse]) error {
+func (transferSvc) Subscribe(req *testpb.SubscribeRequest, stream grpc.ServerStreamingServer[testpb.SubscribeResponse]) error {
 	for i := 0; i < 5; i++ {
-		if err := stream.Send(&mobilepb.SubscribeResponse{
+		if err := stream.Send(&testpb.SubscribeResponse{
 			EventId: fmt.Sprintf("%s-%d", req.GetTopic(), i+1),
 		}); err != nil {
 			return err
@@ -132,7 +132,7 @@ func (transferSvc) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerS
 	return nil
 }
 
-func (transferSvc) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoRequest, mobilepb.EchoResponse]) error {
+func (transferSvc) Echo(stream grpc.ClientStreamingServer[testpb.EchoRequest, testpb.EchoResponse]) error {
 	var n int32
 	for {
 		_, err := stream.Recv()
@@ -141,23 +141,23 @@ func (transferSvc) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoRequest, 
 		}
 		n++
 	}
-	return stream.SendAndClose(&mobilepb.EchoResponse{TotalMessages: n})
+	return stream.SendAndClose(&testpb.EchoResponse{TotalMessages: n})
 }
 
-func (transferSvc) Pipe(stream grpc.BidiStreamingServer[mobilepb.PipeRequest, mobilepb.PipeResponse]) error {
+func (transferSvc) Pipe(stream grpc.BidiStreamingServer[testpb.PipeRequest, testpb.PipeResponse]) error {
 	for {
 		req, err := stream.Recv()
 		if err != nil {
 			return nil // EOF / client closed
 		}
-		if err := stream.Send(&mobilepb.PipeResponse{Data: req.GetData()}); err != nil {
+		if err := stream.Send(&testpb.PipeResponse{Data: req.GetData()}); err != nil {
 			return err
 		}
 	}
 }
 
 // Raw is required by the interface but unused by the streaming parity test.
-func (transferSvc) Raw(_ context.Context, req *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
+func (transferSvc) Raw(_ context.Context, req *testpb.RawRequest) (*httpbody.HttpBody, error) {
 	ct := req.GetContentType()
 	if ct == "" {
 		ct = "application/octet-stream"
@@ -171,13 +171,13 @@ func (transferSvc) Raw(_ context.Context, req *mobilepb.RawRequest) (*httpbody.H
 
 // clients holds the three typed clients built against the three servers.
 type clients struct {
-	grpcClient    mobilepb.MobileResourceServiceClient
-	httpClient    mobilepb.MobileResourceServiceHTTPClient
-	connectClient mobilev1connect.MobileResourceServiceClient
+	grpcClient    testpb.ResourceServiceClient
+	httpClient    testpb.ResourceServiceHTTPClient
+	connectClient testpbconnect.ResourceServiceClient
 
 	// streaming clients (grpc + connect only)
-	grpcStreamClient    mobilepb.MobileTransferServiceClient
-	connectStreamClient mobilev1connect.MobileTransferServiceClient
+	grpcStreamClient    testpb.TransferServiceClient
+	connectStreamClient testpbconnect.TransferServiceClient
 }
 
 // startAll spins up grpc, http, and connect servers on 127.0.0.1:0, each with
@@ -212,8 +212,8 @@ func startAll(t *testing.T, res *resourceSvc) (*clients, *recorder, func()) {
 		kratosgrpc.Timeout(0),
 		kratosgrpc.Middleware(mw),
 	)
-	mobilepb.RegisterMobileResourceServiceServer(grpcSrv, res)
-	mobilepb.RegisterMobileTransferServiceServer(grpcSrv, transferSvc{})
+	testpb.RegisterResourceServiceServer(grpcSrv, res)
+	testpb.RegisterTransferServiceServer(grpcSrv, transferSvc{})
 	// NOTE: kratos grpc.NewServer auto-registers grpc.health.v1.Health by
 	// default (it creates its own grpchealth.Server), so the kratos grpc
 	// client's health-aware path has a target without us re-registering.
@@ -236,8 +236,8 @@ func startAll(t *testing.T, res *resourceSvc) (*clients, *recorder, func()) {
 	if err != nil {
 		fail("grpc client: %v", err)
 	}
-	cl.grpcClient = mobilepb.NewMobileResourceServiceClient(grpcConn)
-	cl.grpcStreamClient = mobilepb.NewMobileTransferServiceClient(grpcConn)
+	cl.grpcClient = testpb.NewResourceServiceClient(grpcConn)
+	cl.grpcStreamClient = testpb.NewTransferServiceClient(grpcConn)
 	stops = append(stops, func() { _ = grpcConn.Close() })
 	stops = append(stops, func() { _ = grpcSrv.Stop(ctx) })
 
@@ -247,7 +247,7 @@ func startAll(t *testing.T, res *resourceSvc) (*clients, *recorder, func()) {
 		kratoshttp.Timeout(0),
 		kratoshttp.Middleware(mw),
 	)
-	mobilepb.RegisterMobileResourceServiceHTTPServer(httpSrv, res)
+	testpb.RegisterResourceServiceHTTPServer(httpSrv, res)
 	httpEP, err := httpSrv.Endpoint()
 	if err != nil {
 		fail("http endpoint: %v", err)
@@ -262,7 +262,7 @@ func startAll(t *testing.T, res *resourceSvc) (*clients, *recorder, func()) {
 	if err != nil {
 		fail("http client: %v", err)
 	}
-	cl.httpClient = mobilepb.NewMobileResourceServiceHTTPClient(httpClient)
+	cl.httpClient = testpb.NewResourceServiceHTTPClient(httpClient)
 	stops = append(stops, func() { _ = httpClient.Close() })
 	stops = append(stops, func() { _ = httpSrv.Stop(ctx) })
 
@@ -272,8 +272,8 @@ func startAll(t *testing.T, res *resourceSvc) (*clients, *recorder, func()) {
 		connect.Timeout(0),
 		connect.Middleware(mw),
 	)
-	mobilepb.RegisterMobileResourceServiceConnectServer(connSrv, res)
-	mobilepb.RegisterMobileTransferServiceConnectServer(connSrv, transferSvc{})
+	testpb.RegisterResourceServiceConnectServer(connSrv, res)
+	testpb.RegisterTransferServiceConnectServer(connSrv, transferSvc{})
 	connEP, err := connSrv.Endpoint()
 	if err != nil {
 		fail("connect endpoint: %v", err)
@@ -289,10 +289,10 @@ func startAll(t *testing.T, res *resourceSvc) (*clients, *recorder, func()) {
 	if err != nil {
 		fail("connect dial: %v", err)
 	}
-	cl.connectClient = mobilev1connect.NewMobileResourceServiceClient(
+	cl.connectClient = testpbconnect.NewResourceServiceClient(
 		connClient.HTTPClient(), connClient.BaseURL(), connClient.ClientOptions()...,
 	)
-	cl.connectStreamClient = mobilev1connect.NewMobileTransferServiceClient(
+	cl.connectStreamClient = testpbconnect.NewTransferServiceClient(
 		connClient.HTTPClient(), connClient.BaseURL(), connClient.ClientOptions()...,
 	)
 	stops = append(stops, func() { _ = connClient.Close() })
@@ -327,13 +327,13 @@ func TestMiddlewareParityAllThree(t *testing.T) {
 	defer stop()
 
 	ctx := context.Background()
-	if _, err := cl.grpcClient.ListResource(ctx, &mobilepb.ListResourceRequest{}); err != nil {
+	if _, err := cl.grpcClient.ListResource(ctx, &testpb.ListResourceRequest{}); err != nil {
 		t.Fatalf("grpc ListResource: %v", err)
 	}
-	if _, err := cl.httpClient.ListResource(ctx, &mobilepb.ListResourceRequest{}); err != nil {
+	if _, err := cl.httpClient.ListResource(ctx, &testpb.ListResourceRequest{}); err != nil {
 		t.Fatalf("http ListResource: %v", err)
 	}
-	if _, err := cl.connectClient.ListResource(ctx, connectrpc.NewRequest(&mobilepb.ListResourceRequest{})); err != nil {
+	if _, err := cl.connectClient.ListResource(ctx, connectrpc.NewRequest(&testpb.ListResourceRequest{})); err != nil {
 		t.Fatalf("connect ListResource: %v", err)
 	}
 
@@ -363,15 +363,15 @@ func TestUnaryResponseParity(t *testing.T) {
 	ctx := context.Background()
 	const want = "demo"
 
-	grpcResp, err := cl.grpcClient.ListResource(ctx, &mobilepb.ListResourceRequest{})
+	grpcResp, err := cl.grpcClient.ListResource(ctx, &testpb.ListResourceRequest{})
 	if err != nil {
 		t.Fatalf("grpc: %v", err)
 	}
-	httpResp, err := cl.httpClient.ListResource(ctx, &mobilepb.ListResourceRequest{})
+	httpResp, err := cl.httpClient.ListResource(ctx, &testpb.ListResourceRequest{})
 	if err != nil {
 		t.Fatalf("http: %v", err)
 	}
-	connResp, err := cl.connectClient.ListResource(ctx, connectrpc.NewRequest(&mobilepb.ListResourceRequest{}))
+	connResp, err := cl.connectClient.ListResource(ctx, connectrpc.NewRequest(&testpb.ListResourceRequest{}))
 	if err != nil {
 		t.Fatalf("connect: %v", err)
 	}
@@ -399,13 +399,13 @@ func TestTransportKindAndOperation(t *testing.T) {
 
 	ctx := context.Background()
 	// one call per protocol so the recorder captures exactly one op per kind.
-	if _, err := cl.grpcClient.ListResource(ctx, &mobilepb.ListResourceRequest{}); err != nil {
+	if _, err := cl.grpcClient.ListResource(ctx, &testpb.ListResourceRequest{}); err != nil {
 		t.Fatalf("grpc: %v", err)
 	}
-	if _, err := cl.httpClient.ListResource(ctx, &mobilepb.ListResourceRequest{}); err != nil {
+	if _, err := cl.httpClient.ListResource(ctx, &testpb.ListResourceRequest{}); err != nil {
 		t.Fatalf("http: %v", err)
 	}
-	if _, err := cl.connectClient.ListResource(ctx, connectrpc.NewRequest(&mobilepb.ListResourceRequest{})); err != nil {
+	if _, err := cl.connectClient.ListResource(ctx, connectrpc.NewRequest(&testpb.ListResourceRequest{})); err != nil {
 		t.Fatalf("connect: %v", err)
 	}
 
@@ -435,7 +435,7 @@ func TestTransportKindAndOperation(t *testing.T) {
 	// path-template form ("/api/v1/admin/resource") while grpc/connect kept the
 	// gRPC FullMethod form. In practice ALL THREE report the identical gRPC
 	// FullMethod — because protoc-gen-go-http emits an explicit
-	// http.SetOperation(ctx, OperationMobileResourceServiceListResource) whose
+	// http.SetOperation(ctx, OperationResourceServiceListResource) whose
 	// constant is the FullMethod, overriding the mux path template the kratos
 	// http filter would otherwise set. This is a STRONGER parity result than
 	// expected: one middleware selector string ("…/ListResource") matches all 3.
@@ -444,7 +444,7 @@ func TestTransportKindAndOperation(t *testing.T) {
 	// hand-written handler), the http Operation() WOULD fall back to the path
 	// template — a genuine transport-level difference to be aware of for
 	// non-generated handlers. For generated services, parity holds exactly.
-	const fullMethod = "/cyber.mobile.v1.MobileResourceService/ListResource"
+	const fullMethod = "/connecttest.v1.ResourceService/ListResource"
 
 	for _, kind := range []string{"grpc", "http", "connect"} {
 		if op := kind2op[kind]; op != fullMethod {
@@ -466,7 +466,7 @@ func TestErrorParity(t *testing.T) {
 	const wantReason = "RES_NOT_FOUND"
 
 	// --- grpc ---
-	_, grpcErr := cl.grpcClient.ListResource(ctx, &mobilepb.ListResourceRequest{})
+	_, grpcErr := cl.grpcClient.ListResource(ctx, &testpb.ListResourceRequest{})
 	if grpcErr == nil {
 		t.Fatal("grpc: expected error, got nil")
 	}
@@ -481,7 +481,7 @@ func TestErrorParity(t *testing.T) {
 	}
 
 	// --- http ---
-	_, httpErr := cl.httpClient.ListResource(ctx, &mobilepb.ListResourceRequest{})
+	_, httpErr := cl.httpClient.ListResource(ctx, &testpb.ListResourceRequest{})
 	if httpErr == nil {
 		t.Fatal("http: expected error, got nil")
 	}
@@ -499,7 +499,7 @@ func TestErrorParity(t *testing.T) {
 	}
 
 	// --- connect ---
-	_, connErr := cl.connectClient.ListResource(ctx, connectrpc.NewRequest(&mobilepb.ListResourceRequest{}))
+	_, connErr := cl.connectClient.ListResource(ctx, connectrpc.NewRequest(&testpb.ListResourceRequest{}))
 	if connErr == nil {
 		t.Fatal("connect: expected error, got nil")
 	}
@@ -538,7 +538,7 @@ func TestStreamingParityGRPCvsConnect(t *testing.T) {
 	ctx := context.Background()
 
 	// --- Subscribe (server-stream): expect 5 events on both ---
-	grpcStream, err := cl.grpcStreamClient.Subscribe(ctx, &mobilepb.SubscribeRequest{Topic: "t"})
+	grpcStream, err := cl.grpcStreamClient.Subscribe(ctx, &testpb.SubscribeRequest{Topic: "t"})
 	if err != nil {
 		t.Fatalf("grpc Subscribe open: %v", err)
 	}
@@ -554,7 +554,7 @@ func TestStreamingParityGRPCvsConnect(t *testing.T) {
 		grpcSubCount++
 	}
 
-	connStream, err := cl.connectStreamClient.Subscribe(ctx, connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "t"}))
+	connStream, err := cl.connectStreamClient.Subscribe(ctx, connectrpc.NewRequest(&testpb.SubscribeRequest{Topic: "t"}))
 	if err != nil {
 		t.Fatalf("connect Subscribe open: %v", err)
 	}
@@ -579,7 +579,7 @@ func TestStreamingParityGRPCvsConnect(t *testing.T) {
 		t.Fatalf("grpc Echo open: %v", eerr)
 	}
 	for i := 0; i < 3; i++ {
-		if err := grpcEcho.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := grpcEcho.Send(&testpb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("grpc Echo Send[%d]: %v", i, err)
 		}
 	}
@@ -590,7 +590,7 @@ func TestStreamingParityGRPCvsConnect(t *testing.T) {
 
 	connEcho := cl.connectStreamClient.Echo(ctx)
 	for i := 0; i < 3; i++ {
-		if err := connEcho.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := connEcho.Send(&testpb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("connect Echo Send[%d]: %v", i, err)
 		}
 	}
@@ -616,7 +616,7 @@ func TestStreamingParityGRPCvsConnect(t *testing.T) {
 	grpcPipeCount := 0
 	for i := 0; i < 3; i++ {
 		payload := fmt.Sprintf("m%d", i)
-		if err := grpcPipe.Send(&mobilepb.PipeRequest{Data: []byte(payload)}); err != nil {
+		if err := grpcPipe.Send(&testpb.PipeRequest{Data: []byte(payload)}); err != nil {
 			t.Fatalf("grpc Pipe Send[%d]: %v", i, err)
 		}
 		resp, rerr := grpcPipe.Recv()
@@ -641,7 +641,7 @@ func TestStreamingParityGRPCvsConnect(t *testing.T) {
 	connPipeCount := 0
 	for i := 0; i < 3; i++ {
 		payload := fmt.Sprintf("m%d", i)
-		if err := connPipe.Send(&mobilepb.PipeRequest{Data: []byte(payload)}); err != nil {
+		if err := connPipe.Send(&testpb.PipeRequest{Data: []byte(payload)}); err != nil {
 			t.Fatalf("connect Pipe Send[%d]: %v", i, err)
 		}
 		resp, rerr := connPipe.Receive()

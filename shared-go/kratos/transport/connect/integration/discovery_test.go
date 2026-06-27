@@ -30,8 +30,8 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
-	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
+	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
+	testpbconnect "cyber-ecosystem/shared-go/kratos/transport/connect/testpb/testpbconnect"
 )
 
 // taggedService implements TransferServiceServer and stamps every Raw response
@@ -39,11 +39,11 @@ import (
 // This lets a discovery test assert WHICH registered node served a given call:
 // the response Data is "<tag>:<echo of request data>".
 type taggedService struct {
-	mobilepb.UnimplementedMobileTransferServiceServer
+	testpb.UnimplementedTransferServiceServer
 	tag string
 }
 
-func (s taggedService) Raw(_ context.Context, req *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
+func (s taggedService) Raw(_ context.Context, req *testpb.RawRequest) (*httpbody.HttpBody, error) {
 	ct := req.GetContentType()
 	if ct == "" {
 		ct = "application/octet-stream"
@@ -57,13 +57,13 @@ func (s taggedService) Raw(_ context.Context, req *mobilepb.RawRequest) (*httpbo
 // Subscribe / Echo / Pipe are not used by the discovery tests but must be
 // implemented to satisfy the server registration (the generated handler binds
 // the whole service). They delegate to the base testService behavior.
-func (s taggedService) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerStreamingServer[mobilepb.SubscribeResponse]) error {
+func (s taggedService) Subscribe(req *testpb.SubscribeRequest, stream grpc.ServerStreamingServer[testpb.SubscribeResponse]) error {
 	return (testService{}).Subscribe(req, stream)
 }
-func (s taggedService) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoRequest, mobilepb.EchoResponse]) error {
+func (s taggedService) Echo(stream grpc.ClientStreamingServer[testpb.EchoRequest, testpb.EchoResponse]) error {
 	return (testService{}).Echo(stream)
 }
-func (s taggedService) Pipe(stream grpc.BidiStreamingServer[mobilepb.PipeRequest, mobilepb.PipeResponse]) error {
+func (s taggedService) Pipe(stream grpc.BidiStreamingServer[testpb.PipeRequest, testpb.PipeResponse]) error {
 	return (testService{}).Pipe(stream)
 }
 
@@ -73,7 +73,7 @@ func (s taggedService) Pipe(stream grpc.BidiStreamingServer[mobilepb.PipeRequest
 func startTaggedServer(t *testing.T, tag string) (endpointURL string, stop func()) {
 	t.Helper()
 	srv := connect.NewServer(connect.Address("127.0.0.1:0"), connect.Timeout(0))
-	mobilepb.RegisterMobileTransferServiceConnectServer(srv, taggedService{tag: tag})
+	testpb.RegisterTransferServiceConnectServer(srv, taggedService{tag: tag})
 
 	ep, err := srv.Endpoint()
 	if err != nil {
@@ -237,7 +237,7 @@ func (w *mockWatcher) Stop() error {
 // initial instance set, so the client is ready to call immediately on return.
 // The mock registry MUST already hold at least one "svc" instance before Dial
 // (WithBlock would otherwise hang until the registry pushes one).
-func dialDiscovery(t *testing.T, reg *mockRegistry, extra ...connect.ClientOption) (mobilev1connect.MobileTransferServiceClient, func()) {
+func dialDiscovery(t *testing.T, reg *mockRegistry, extra ...connect.ClientOption) (testpbconnect.TransferServiceClient, func()) {
 	t.Helper()
 	ctx := context.Background()
 	opts := []connect.ClientOption{
@@ -251,15 +251,15 @@ func dialDiscovery(t *testing.T, reg *mockRegistry, extra ...connect.ClientOptio
 	if err != nil {
 		t.Fatalf("dial discovery: %v", err)
 	}
-	client := mobilev1connect.NewMobileTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
+	client := testpbconnect.NewTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
 	return client, func() { _ = cli.Close() }
 }
 
 // rawNodeTag issues a Raw call with the given payload and extracts the node tag
 // the serving node stamped into the response ("<tag>:<payload>").
-func rawNodeTag(t *testing.T, cli mobilev1connect.MobileTransferServiceClient, payload string) string {
+func rawNodeTag(t *testing.T, cli testpbconnect.TransferServiceClient, payload string) string {
 	t.Helper()
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte(payload),
 	}))
@@ -412,4 +412,4 @@ func TestDiscoveryNodeFilter(t *testing.T) {
 // binds the full TransferServiceServer). The Unimplemented embed covers the
 // rest; we only override Raw (+ delegate the stream methods), so this catches a
 // future interface drift.
-var _ mobilepb.MobileTransferServiceServer = taggedService{}
+var _ testpb.TransferServiceServer = taggedService{}

@@ -6,25 +6,25 @@ info:
     title: ""
     version: 0.0.1
 paths:
-    /api/v1/mobile/resource:
+    /api/v1/core/resource:
         get:
             tags:
-                - MobileResourceService
+                - ResourceService
             description: List all RPC service and method info.
-            operationId: MobileResourceService_ListResource
+            operationId: ResourceService_ListResource
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.ListResourceResponse'
-    /api/v1/mobile/transfer/echo:
+                                $ref: '#/components/schemas/cyber.core.v1.ListResourceResponse'
+    /api/v1/core/transfer/echo:
         get:
             tags:
-                - MobileTransferService
+                - TransferService
             description: Echo back a summary of received messages.
-            operationId: MobileTransferService_Echo
+            operationId: TransferService_Echo
             parameters:
                 - name: data
                   in: query
@@ -43,13 +43,13 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.EchoResponse'
-    /api/v1/mobile/transfer/pipe:
+                                $ref: '#/components/schemas/cyber.core.v1.EchoResponse'
+    /api/v1/core/transfer/pipe:
         get:
             tags:
-                - MobileTransferService
+                - TransferService
             description: Bidirectional data pipe via WebSocket.
-            operationId: MobileTransferService_Pipe
+            operationId: TransferService_Pipe
             parameters:
                 - name: data
                   in: query
@@ -73,32 +73,32 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.PipeResponse'
-    /api/v1/mobile/transfer/raw:
+                                $ref: '#/components/schemas/cyber.core.v1.PipeResponse'
+    /api/v1/core/transfer/raw:
         post:
             tags:
-                - MobileTransferService
+                - TransferService
             description: |-
                 Return raw bytes via HttpBody.
                  buf:lint:ignore RPC_RESPONSE_STANDARD_NAME -- HttpBody is intentional: raw binary response, not a conventional *Response message.
-            operationId: MobileTransferService_Raw
+            operationId: TransferService_Raw
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/cyber.mobile.v1.RawRequest'
+                            $ref: '#/components/schemas/cyber.core.v1.RawRequest'
                 required: true
             responses:
                 "200":
                     description: OK
                     content:
                         '*/*': {}
-    /api/v1/mobile/transfer/subscribe:
+    /api/v1/core/transfer/subscribe:
         get:
             tags:
-                - MobileTransferService
+                - TransferService
             description: Subscribe to events via SSE.
-            operationId: MobileTransferService_Subscribe
+            operationId: TransferService_Subscribe
             parameters:
                 - name: topic
                   in: query
@@ -116,13 +116,13 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.SubscribeResponse'
-    /api/v1/mobile/user:
+                                $ref: '#/components/schemas/cyber.core.v1.SubscribeResponse'
+    /api/v1/core/user:
         get:
             tags:
-                - MobileUserService
+                - UserService
             description: List users with pagination and filters.
-            operationId: MobileUserService_ListUsers
+            operationId: UserService_ListUsers
             parameters:
                 - name: page.pageNo
                   in: query
@@ -188,17 +188,17 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.ListUsersResponse'
+                                $ref: '#/components/schemas/cyber.core.v1.ListUsersResponse'
         post:
             tags:
-                - MobileUserService
+                - UserService
             description: Create a user.
-            operationId: MobileUserService_CreateUser
+            operationId: UserService_CreateUser
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/cyber.mobile.v1.CreateUserRequest'
+                            $ref: '#/components/schemas/cyber.core.v1.CreateUserRequest'
                 required: true
             responses:
                 "200":
@@ -206,13 +206,13 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.CreateUserResponse'
-    /api/v1/mobile/user/{id}:
+                                $ref: '#/components/schemas/cyber.core.v1.CreateUserResponse'
+    /api/v1/core/user/{id}:
         get:
             tags:
-                - MobileUserService
+                - UserService
             description: Get a user by ID.
-            operationId: MobileUserService_GetUser
+            operationId: UserService_GetUser
             parameters:
                 - name: id
                   in: path
@@ -226,12 +226,12 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.GetUserResponse'
+                                $ref: '#/components/schemas/cyber.core.v1.GetUserResponse'
         put:
             tags:
-                - MobileUserService
+                - UserService
             description: Update a user.
-            operationId: MobileUserService_UpdateUser
+            operationId: UserService_UpdateUser
             parameters:
                 - name: id
                   in: path
@@ -243,7 +243,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/cyber.mobile.v1.UpdateUserRequest'
+                            $ref: '#/components/schemas/cyber.core.v1.UpdateUserRequest'
                 required: true
             responses:
                 "200":
@@ -251,12 +251,12 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.UpdateUserResponse'
+                                $ref: '#/components/schemas/cyber.core.v1.UpdateUserResponse'
         delete:
             tags:
-                - MobileUserService
+                - UserService
             description: Delete a user.
-            operationId: MobileUserService_DeleteUser
+            operationId: UserService_DeleteUser
             parameters:
                 - name: id
                   in: path
@@ -270,13 +270,13 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.DeleteUserResponse'
-    /api/v1/mobile/user/{id}/sort:
+                                $ref: '#/components/schemas/cyber.core.v1.DeleteUserResponse'
+    /api/v1/core/user/{id}/sort:
         put:
             tags:
-                - MobileUserService
+                - UserService
             description: Sort user position.
-            operationId: MobileUserService_SortUser
+            operationId: UserService_SortUser
             parameters:
                 - name: id
                   in: path
@@ -288,7 +288,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/cyber.mobile.v1.SortUserRequest'
+                            $ref: '#/components/schemas/cyber.core.v1.SortUserRequest'
                 required: true
             responses:
                 "200":
@@ -296,13 +296,13 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.SortUserResponse'
-    /api/v1/mobile/user/{id}/status:
+                                $ref: '#/components/schemas/cyber.core.v1.SortUserResponse'
+    /api/v1/core/user/{id}/status:
         put:
             tags:
-                - MobileUserService
+                - UserService
             description: Update user status.
-            operationId: MobileUserService_UpdateUserStatus
+            operationId: UserService_UpdateUserStatus
             parameters:
                 - name: id
                   in: path
@@ -314,7 +314,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/cyber.mobile.v1.UpdateUserStatusRequest'
+                            $ref: '#/components/schemas/cyber.core.v1.UpdateUserStatusRequest'
                 required: true
             responses:
                 "200":
@@ -322,10 +322,10 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.mobile.v1.UpdateUserStatusResponse'
+                                $ref: '#/components/schemas/cyber.core.v1.UpdateUserStatusResponse'
 components:
     schemas:
-        cyber.mobile.v1.CreateUserRequest:
+        cyber.core.v1.CreateUserRequest:
             type: object
             properties:
                 nickname:
@@ -341,18 +341,18 @@ components:
                     type: string
                     description: Avatar URL (optional; later backed by the storage/upload flow).
             description: CreateUser request.
-        cyber.mobile.v1.CreateUserResponse:
+        cyber.core.v1.CreateUserResponse:
             type: object
             properties:
                 id:
                     type: string
                     description: The created user ID.
             description: CreateUser response.
-        cyber.mobile.v1.DeleteUserResponse:
+        cyber.core.v1.DeleteUserResponse:
             type: object
             properties: {}
             description: DeleteUser response.
-        cyber.mobile.v1.EchoResponse:
+        cyber.core.v1.EchoResponse:
             type: object
             properties:
                 totalMessages:
@@ -369,24 +369,24 @@ components:
                     type: string
                     description: Round-trip duration in nanoseconds.
             description: Echo response summary.
-        cyber.mobile.v1.GetUserResponse:
+        cyber.core.v1.GetUserResponse:
             type: object
             properties:
                 user:
                     allOf:
-                        - $ref: '#/components/schemas/cyber.mobile.v1.User'
+                        - $ref: '#/components/schemas/cyber.core.v1.User'
                     description: User detail.
             description: GetUser response.
-        cyber.mobile.v1.ListResourceResponse:
+        cyber.core.v1.ListResourceResponse:
             type: object
             properties:
                 list:
                     type: array
                     items:
-                        $ref: '#/components/schemas/cyber.mobile.v1.Service'
+                        $ref: '#/components/schemas/cyber.core.v1.Service'
                     description: Service list.
             description: ListResource response.
-        cyber.mobile.v1.ListUsersResponse:
+        cyber.core.v1.ListUsersResponse:
             type: object
             properties:
                 page:
@@ -396,10 +396,10 @@ components:
                 list:
                     type: array
                     items:
-                        $ref: '#/components/schemas/cyber.mobile.v1.GetUserResponse'
+                        $ref: '#/components/schemas/cyber.core.v1.GetUserResponse'
                     description: User list.
             description: ListUsers response.
-        cyber.mobile.v1.Method:
+        cyber.core.v1.Method:
             type: object
             properties:
                 name:
@@ -430,7 +430,7 @@ components:
                     type: string
                     description: Method description.
             description: RPC method descriptor.
-        cyber.mobile.v1.PipeResponse:
+        cyber.core.v1.PipeResponse:
             type: object
             properties:
                 data:
@@ -444,7 +444,7 @@ components:
                     type: string
                     description: Sequence number.
             description: Bidirectional pipe response.
-        cyber.mobile.v1.RawRequest:
+        cyber.core.v1.RawRequest:
             type: object
             properties:
                 contentType:
@@ -455,7 +455,7 @@ components:
                     description: Request body.
                     format: bytes
             description: Raw bytes request.
-        cyber.mobile.v1.Service:
+        cyber.core.v1.Service:
             type: object
             properties:
                 name:
@@ -476,10 +476,10 @@ components:
                 methods:
                     type: array
                     items:
-                        $ref: '#/components/schemas/cyber.mobile.v1.Method'
+                        $ref: '#/components/schemas/cyber.core.v1.Method'
                     description: Service methods.
             description: RPC service descriptor.
-        cyber.mobile.v1.SortUserRequest:
+        cyber.core.v1.SortUserRequest:
             type: object
             properties:
                 id:
@@ -495,11 +495,11 @@ components:
                 SortUser request. Reorder a user's position relative to its neighbors.
                  At least one of prev_id or next_id must be set. The service updates the
                  affected users' positions atomically (a multi-row transaction).
-        cyber.mobile.v1.SortUserResponse:
+        cyber.core.v1.SortUserResponse:
             type: object
             properties: {}
             description: SortUser response.
-        cyber.mobile.v1.SubscribeResponse:
+        cyber.core.v1.SubscribeResponse:
             type: object
             properties:
                 eventId:
@@ -517,7 +517,7 @@ components:
                     description: Event timestamp.
                     format: date-time
             description: Subscribe event response.
-        cyber.mobile.v1.UpdateUserRequest:
+        cyber.core.v1.UpdateUserRequest:
             type: object
             properties:
                 id:
@@ -541,11 +541,11 @@ components:
                         type: string
                     description: Fields to update.
             description: UpdateUser request.
-        cyber.mobile.v1.UpdateUserResponse:
+        cyber.core.v1.UpdateUserResponse:
             type: object
             properties: {}
             description: UpdateUser response.
-        cyber.mobile.v1.UpdateUserStatusRequest:
+        cyber.core.v1.UpdateUserStatusRequest:
             type: object
             properties:
                 id:
@@ -555,11 +555,11 @@ components:
                     type: string
                     description: Target status.
             description: UpdateUserStatus request.
-        cyber.mobile.v1.UpdateUserStatusResponse:
+        cyber.core.v1.UpdateUserStatusResponse:
             type: object
             properties: {}
             description: UpdateUserStatus response.
-        cyber.mobile.v1.User:
+        cyber.core.v1.User:
             type: object
             properties:
                 id:
@@ -599,13 +599,13 @@ components:
                     description: Whether more results exist.
             description: Pagination response.
 tags:
-    - name: MobileResourceService
+    - name: ResourceService
       description: |-
-        Mobile resource introspection service. Lists all RPC service/method info by
+        Resource introspection service. Lists all RPC service/method info by
          reflecting on the registered proto descriptors.
-    - name: MobileTransferService
+    - name: TransferService
       description: |-
-        Mobile transfer service. Exposes the streaming transport primitives
-         (SSE / client-stream / bidi / HttpBody) to mobile clients.
-    - name: MobileUserService
-      description: Mobile user service. Client-facing surface for user CRUD over Connect/HTTP.
+        Transfer service. Exposes the streaming transport primitives
+         (SSE / client-stream / bidi / HttpBody) to clients.
+    - name: UserService
+      description: User service. Client-facing surface for user CRUD over Connect/HTTP.

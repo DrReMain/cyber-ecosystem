@@ -2,6 +2,8 @@ package observability
 
 import (
 	"context"
+	stdsql "database/sql"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -85,6 +87,44 @@ func (d *slowDriver) Query(ctx context.Context, query string, args, v any) error
 	return err
 }
 
+func (d *slowDriver) ExecContext(ctx context.Context, query string, args ...any) (stdsql.Result, error) {
+	ex, ok := d.Driver.(interface {
+		ExecContext(context.Context, string, ...any) (stdsql.Result, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Driver.ExecContext is not supported")
+	}
+	start := time.Now()
+	res, err := ex.ExecContext(ctx, query, args...)
+	if dur := time.Since(start); dur >= d.threshold {
+		d.logger.WarnContext(ctx, "slow db query",
+			slog.String("query", trunc(query, slowLogQueryLimit)),
+			slog.Duration("duration", dur),
+			slog.Any("err", err),
+		)
+	}
+	return res, err
+}
+
+func (d *slowDriver) QueryContext(ctx context.Context, query string, args ...any) (*stdsql.Rows, error) {
+	q, ok := d.Driver.(interface {
+		QueryContext(context.Context, string, ...any) (*stdsql.Rows, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Driver.QueryContext is not supported")
+	}
+	start := time.Now()
+	rows, err := q.QueryContext(ctx, query, args...)
+	if dur := time.Since(start); dur >= d.threshold {
+		d.logger.WarnContext(ctx, "slow db query",
+			slog.String("query", trunc(query, slowLogQueryLimit)),
+			slog.Duration("duration", dur),
+			slog.Any("err", err),
+		)
+	}
+	return rows, err
+}
+
 func (d *slowDriver) Tx(ctx context.Context) (dialect.Tx, error) {
 	tx, err := d.Driver.Tx(ctx)
 	if err != nil {
@@ -127,6 +167,46 @@ func (t *slowTx) Query(ctx context.Context, query string, args, v any) error {
 		)
 	}
 	return err
+}
+
+func (t *slowTx) ExecContext(ctx context.Context, query string, args ...any) (stdsql.Result, error) {
+	ex, ok := t.Tx.(interface {
+		ExecContext(context.Context, string, ...any) (stdsql.Result, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Tx.ExecContext is not supported")
+	}
+	start := time.Now()
+	res, err := ex.ExecContext(ctx, query, args...)
+	if dur := time.Since(start); dur >= t.threshold {
+		t.logger.WarnContext(ctx, "slow db query",
+			slog.String("query", trunc(query, slowLogQueryLimit)),
+			slog.Duration("duration", dur),
+			slog.Bool("tx", true),
+			slog.Any("err", err),
+		)
+	}
+	return res, err
+}
+
+func (t *slowTx) QueryContext(ctx context.Context, query string, args ...any) (*stdsql.Rows, error) {
+	q, ok := t.Tx.(interface {
+		QueryContext(context.Context, string, ...any) (*stdsql.Rows, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Tx.QueryContext is not supported")
+	}
+	start := time.Now()
+	rows, err := q.QueryContext(ctx, query, args...)
+	if dur := time.Since(start); dur >= t.threshold {
+		t.logger.WarnContext(ctx, "slow db query",
+			slog.String("query", trunc(query, slowLogQueryLimit)),
+			slog.Duration("duration", dur),
+			slog.Bool("tx", true),
+			slog.Any("err", err),
+		)
+	}
+	return rows, err
 }
 
 // slowHook is a redis.Hook timing each command against the cache threshold.

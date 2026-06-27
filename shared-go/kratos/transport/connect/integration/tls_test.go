@@ -31,8 +31,8 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
-	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
+	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
+	testpbconnect "cyber-ecosystem/shared-go/kratos/transport/connect/testpb/testpbconnect"
 )
 
 // tlsSelfSigned generates a self-signed certificate valid for 127.0.0.1 and
@@ -99,7 +99,7 @@ func tlsSelfSigned(t *testing.T) (serverConf, clientConf *tls.Config) {
 // with the test service registered, and returns a typed v1connect client built
 // from connect.Dial WITH WithTLSConfig and WITHOUT WithH2C. The stop func tears
 // everything down.
-func startTLSServer(t *testing.T) (mobilev1connect.MobileTransferServiceClient, func()) {
+func startTLSServer(t *testing.T) (testpbconnect.TransferServiceClient, func()) {
 	t.Helper()
 
 	serverConf, clientConf := tlsSelfSigned(t)
@@ -109,7 +109,7 @@ func startTLSServer(t *testing.T) (mobilev1connect.MobileTransferServiceClient, 
 		connect.TLSConfig(serverConf),
 		connect.Timeout(0),
 	)
-	mobilepb.RegisterMobileTransferServiceConnectServer(srv, testService{})
+	testpb.RegisterTransferServiceConnectServer(srv, testService{})
 
 	ep, err := srv.Endpoint()
 	if err != nil {
@@ -131,7 +131,7 @@ func startTLSServer(t *testing.T) (mobilev1connect.MobileTransferServiceClient, 
 		_ = srv.Stop(ctx)
 		t.Fatalf("dial: %v", err)
 	}
-	client := mobilev1connect.NewMobileTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
+	client := testpbconnect.NewTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
 
 	stop := func() {
 		_ = cli.Close()
@@ -146,7 +146,7 @@ func TestTLSUnary(t *testing.T) {
 	cli, stop := startTLSServer(t)
 	defer stop()
 
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte("hello-tls"),
 	}))
@@ -169,7 +169,7 @@ func TestTLSServerStream(t *testing.T) {
 	cli, stop := startTLSServer(t)
 	defer stop()
 
-	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "tls"}))
+	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&testpb.SubscribeRequest{Topic: "tls"}))
 	if err != nil {
 		t.Fatalf("Subscribe over TLS: %v", err)
 	}

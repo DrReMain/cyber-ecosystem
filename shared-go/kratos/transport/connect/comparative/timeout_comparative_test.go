@@ -35,8 +35,8 @@ import (
 
 	connect "cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
-	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
+	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
+	testpbconnect "cyber-ecosystem/shared-go/kratos/transport/connect/testpb/testpbconnect"
 )
 
 // bareCtxErrService is a TransferService whose unary Raw blocks until the
@@ -44,10 +44,10 @@ import (
 // (context.DeadlineExceeded) — exactly the "handler didn't catch the timeout"
 // scenario under test.
 type bareCtxErrService struct {
-	mobilepb.UnimplementedMobileTransferServiceServer
+	testpb.UnimplementedTransferServiceServer
 }
 
-func (bareCtxErrService) Raw(ctx context.Context, _ *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
+func (bareCtxErrService) Raw(ctx context.Context, _ *testpb.RawRequest) (*httpbody.HttpBody, error) {
 	<-ctx.Done() // block until the server unary timeout fires
 	return nil, ctx.Err()
 }
@@ -57,7 +57,7 @@ func (bareCtxErrService) Raw(ctx context.Context, _ *mobilepb.RawRequest) (*http
 // returns native clients for both. The server timeout (not a client timeout)
 // is what fires — so the codes we observe reflect each transport's server-side
 // error mapping of a bare ctx.Err().
-func startTimeoutPair(t *testing.T, serverTimeout time.Duration) (grpcRaw mobilepb.MobileTransferServiceClient, connRaw mobilev1connect.MobileTransferServiceClient, stop func()) {
+func startTimeoutPair(t *testing.T, serverTimeout time.Duration) (grpcRaw testpb.TransferServiceClient, connRaw testpbconnect.TransferServiceClient, stop func()) {
 	t.Helper()
 	ctx := context.Background()
 	svc := bareCtxErrService{}
@@ -77,7 +77,7 @@ func startTimeoutPair(t *testing.T, serverTimeout time.Duration) (grpcRaw mobile
 		kratosgrpc.Address("127.0.0.1:0"),
 		kratosgrpc.Timeout(serverTimeout),
 	)
-	mobilepb.RegisterMobileTransferServiceServer(grpcSrv, svc)
+	testpb.RegisterTransferServiceServer(grpcSrv, svc)
 	grpcEP, err := grpcSrv.Endpoint()
 	if err != nil {
 		fail("grpc endpoint: %v", err)
@@ -92,7 +92,7 @@ func startTimeoutPair(t *testing.T, serverTimeout time.Duration) (grpcRaw mobile
 	if err != nil {
 		fail("grpc client: %v", err)
 	}
-	grpcRaw = mobilepb.NewMobileTransferServiceClient(grpcConn)
+	grpcRaw = testpb.NewTransferServiceClient(grpcConn)
 	stops = append(stops, func() { _ = grpcConn.Close() })
 	stops = append(stops, func() { _ = grpcSrv.Stop(ctx) })
 
@@ -101,7 +101,7 @@ func startTimeoutPair(t *testing.T, serverTimeout time.Duration) (grpcRaw mobile
 		connect.Address("127.0.0.1:0"),
 		connect.Timeout(serverTimeout),
 	)
-	mobilepb.RegisterMobileTransferServiceConnectServer(connSrv, svc)
+	testpb.RegisterTransferServiceConnectServer(connSrv, svc)
 	connEP, err := connSrv.Endpoint()
 	if err != nil {
 		fail("connect endpoint: %v", err)
@@ -117,7 +117,7 @@ func startTimeoutPair(t *testing.T, serverTimeout time.Duration) (grpcRaw mobile
 	if err != nil {
 		fail("connect dial: %v", err)
 	}
-	connRaw = mobilev1connect.NewMobileTransferServiceClient(connClient.HTTPClient(), connClient.BaseURL(), connClient.ClientOptions()...)
+	connRaw = testpbconnect.NewTransferServiceClient(connClient.HTTPClient(), connClient.BaseURL(), connClient.ClientOptions()...)
 	stops = append(stops, func() { _ = connClient.Close() })
 	stops = append(stops, func() { _ = connSrv.Stop(ctx) })
 
@@ -144,7 +144,7 @@ func TestTimeoutMappingGRPCvsConnect(t *testing.T) {
 	grpcCli, connCli, stop := startTimeoutPair(t, serverTimeout)
 	defer stop()
 
-	req := &mobilepb.RawRequest{Data: []byte("x")}
+	req := &testpb.RawRequest{Data: []byte("x")}
 
 	// --- gRPC leg ---
 	grpcStart := time.Now()

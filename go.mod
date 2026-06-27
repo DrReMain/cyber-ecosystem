@@ -15,11 +15,6 @@ tool (
 	google.golang.org/protobuf/cmd/protoc-gen-go
 )
 
-replace (
-	github.com/go-kratos/kratos/contrib/otel/v3 => github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0-20260621094049-2726761cdd77
-	github.com/go-kratos/kratos/v3 => github.com/go-kratos/kratos/v3 v3.0.0-20260621094049-2726761cdd77
-)
-
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260415201107-50325440f8f2.1
 	buf.build/go/protovalidate v1.2.0
@@ -36,7 +31,7 @@ require (
 	github.com/aws/smithy-go v1.27.2
 	github.com/bsm/redislock v0.10.0
 	github.com/go-kratos/aegis v0.2.0
-	github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0
+	github.com/go-kratos/kratos/contrib/otel/v3 v3.0.0-20260626125723-668db92c2c00
 	github.com/go-kratos/kratos/v3 v3.0.0
 	github.com/go-redis/redis_rate/v10 v10.0.1
 	github.com/google/wire v0.7.0

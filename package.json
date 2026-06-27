@@ -1,19 +1,14 @@
 {
   "name": "cyber-ecosystem",
   "private": true,
-  "packageManager": "pnpm@10.12.1",
+  "packageManager": "pnpm@11.9.0",
   "engines": {
     "node": ">=24.15.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.16",
-    "@bufbuild/protoc-gen-es": "2.12.0",
+    "@biomejs/biome": "2.5.3",
+    "@bufbuild/protoc-gen-es": "2.12.1",
     "@connectrpc/protoc-gen-connect-query": "2.2.0",
-    "typescript": "6.0.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "lightningcss": "1.30.1"
-    }
+    "typescript": "7.0.2"
   }
 }

@@ -1,0 +1,235 @@
+syntax = "proto3";
+
+package cyber.core.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/core/v1";
+
+// User resource model. Represents a user account.
+message User {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue nickname = 4;
+  google.protobuf.StringValue avatar = 5;
+  google.protobuf.StringValue phone = 6;
+  google.protobuf.StringValue status = 7;
+}
+
+// CreateUser request.
+message CreateUserRequest {
+  // Nickname.
+  optional string nickname = 1 [(buf.validate.field).string.max_len = 64];
+  // Phone number, used as the login account. Unique.
+  optional string phone = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 20
+  ];
+  // Login password (plaintext over the wire; hashed server-side before storage).
+  optional string password = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 8,
+    (buf.validate.field).string.max_len = 128
+  ];
+  // Avatar URL (optional; later backed by the storage/upload flow).
+  optional string avatar = 4 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+// CreateUser response.
+message CreateUserResponse {
+  // The created user ID.
+  google.protobuf.StringValue id = 1;
+}
+
+// GetUser request.
+message GetUserRequest {
+  // User ID.
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+// GetUser response.
+message GetUserResponse {
+  // User detail.
+  User user = 1;
+}
+
+// ListUsers request.
+message ListUsersRequest {
+  // Pagination.
+  cyber.shared.common.v1.PageRequest page = 1;
+  // Filter by phone (exact).
+  optional string phone = 2;
+  // Filter by status.
+  optional string status = 3 [(buf.validate.field).string = {
+    in: [
+      "enabled",
+      "disabled",
+      "restricted"
+    ]
+  }];
+  // Sort fields, e.g. "createdAt:asc".
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListUsersRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt|updatedAt|sort):(asc|desc)$'))"
+  }];
+}
+
+// ListUsers response.
+message ListUsersResponse {
+  // Pagination info.
+  cyber.shared.common.v1.PageResponse page = 1;
+  // User list.
+  repeated GetUserResponse list = 2;
+}
+
+// UpdateUser request.
+message UpdateUserRequest {
+  // User ID.
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  // Nickname.
+  optional string nickname = 2 [(buf.validate.field).string.max_len = 64];
+  // Phone number.
+  optional string phone = 3 [(buf.validate.field).string.max_len = 20];
+  // Password (set to change credentials).
+  optional string password = 4 [(buf.validate.field).string.max_len = 128];
+  // Avatar URL.
+  optional string avatar = 5 [
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.max_len = 512
+  ];
+  // Fields to update.
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+  }];
+}
+
+// UpdateUser response.
+message UpdateUserResponse {}
+
+// UpdateUserStatus request.
+message UpdateUserStatusRequest {
+  // User ID.
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  // Target status.
+  optional string status = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      in: [
+        "enabled",
+        "disabled",
+        "restricted"
+      ]
+    }
+  ];
+}
+
+// UpdateUserStatus response.
+message UpdateUserStatusResponse {}
+
+// DeleteUser request.
+message DeleteUserRequest {
+  // User ID.
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+// DeleteUser response.
+message DeleteUserResponse {}
+
+// SortUser request. Reorder a user's position relative to its neighbors.
+// At least one of prev_id or next_id must be set. The service updates the
+// affected users' positions atomically (a multi-row transaction).
+message SortUserRequest {
+  // User ID.
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  // Move after this user.
+  optional string prev_id = 2;
+  // Move before this user.
+  optional string next_id = 3;
+
+  option (buf.validate.message).cel = {
+    id: "SortUserRequest.prev_id-next_id"
+    message: "at least one of prev_id or next_id is required"
+    expression: "has(this.prev_id) || has(this.next_id)"
+  };
+}
+
+// SortUser response.
+message SortUserResponse {}
+
+// User service. Client-facing surface for user CRUD over Connect/HTTP.
+service UserService {
+  // Create a user.
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (cyber.ext.v1.method_comment) = "创建用户";
+    option (google.api.http) = {
+      post: "/api/v1/core/user"
+      body: "*"
+    };
+  }
+  // Update a user.
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (cyber.ext.v1.method_comment) = "修改用户";
+    option (google.api.http) = {
+      put: "/api/v1/core/user/{id}"
+      body: "*"
+    };
+  }
+  // Update user status.
+  rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse) {
+    option (cyber.ext.v1.method_comment) = "修改用户状态";
+    option (google.api.http) = {
+      put: "/api/v1/core/user/{id}/status"
+      body: "*"
+    };
+  }
+  // Delete a user.
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    option (cyber.ext.v1.method_comment) = "删除用户";
+    option (google.api.http) = {delete: "/api/v1/core/user/{id}"};
+  }
+  // List users with pagination and filters.
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (cyber.ext.v1.method_comment) = "查询用户列表";
+    option (google.api.http) = {get: "/api/v1/core/user"};
+  }
+  // Get a user by ID.
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (cyber.ext.v1.method_comment) = "查询用户详情";
+    option (google.api.http) = {get: "/api/v1/core/user/{id}"};
+  }
+  // Sort user position.
+  rpc SortUser(SortUserRequest) returns (SortUserResponse) {
+    option (cyber.ext.v1.method_comment) = "排序用户";
+    option (google.api.http) = {
+      put: "/api/v1/core/user/{id}/sort"
+      body: "*"
+    };
+  }
+}

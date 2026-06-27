@@ -24,13 +24,13 @@ import (
 	"github.com/go-kratos/kratos/v3/transport"
 	"google.golang.org/genproto/googleapis/api/httpbody"
 
-	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
+	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
 )
 
 // replyHeaderErrSvc sets a reply header then returns an error.
 type replyHeaderErrSvc struct{ testService }
 
-func (replyHeaderErrSvc) Raw(ctx context.Context, _ *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
+func (replyHeaderErrSvc) Raw(ctx context.Context, _ *testpb.RawRequest) (*httpbody.HttpBody, error) {
 	if tr, ok := transport.FromServerContext(ctx); ok {
 		tr.ReplyHeader().Add("x-custom-reply", "rv")
 	}
@@ -45,7 +45,7 @@ func TestReplyHeaderOnErrorConnectUnary(t *testing.T) {
 	cli, stop := startServerWithService(t, replyHeaderErrSvc{})
 	defer stop()
 
-	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{Data: []byte("x")}))
+	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{Data: []byte("x")}))
 	if err == nil {
 		t.Fatal("expected an error from Raw")
 	}

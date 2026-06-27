@@ -2,6 +2,7 @@
 .nx/installation
 .nx/cache
 .nx/workspace-data
+.nx/migrate-runs
 
 # ==================== Operating System ====================
 # macOS

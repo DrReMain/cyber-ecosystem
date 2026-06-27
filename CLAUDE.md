@@ -65,3 +65,14 @@ Before closing any change:
 4. Generated outputs were reviewed; unrelated churn was excluded.
 5. Any skipped step or pre-existing failure is called out.
 
+---
+
+## 7) Conventions & Stack Docs
+
+Conventions live under `docs/<area>/` — one subdir per tech stack or bounded domain. Read the relevant `CONVENTIONS.md` BEFORE writing code in that area and follow it exactly (structure, naming, ordering, comments, dependency rules).
+
+- **kratos (Go services)** — `docs/kratos/CONVENTIONS.md`
+- **proto (contracts)** — `docs/proto/CONVENTIONS.md` (when present)
+
+Adding a new tech stack or bounded domain: create `docs/<area>/CONVENTIONS.md` (prescriptive rules) plus supporting guides, and add an entry to this list.
+

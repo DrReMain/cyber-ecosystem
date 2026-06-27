@@ -7,7 +7,7 @@
 // (gRPC-style impl -> Connect handler), the codec, and the client transport
 // (including its h2c round tripper).
 //
-// All four method kinds are exercised against the cyber.mobile.v1.MobileTransferService:
+// All four method kinds are exercised against the connecttest.v1.TransferService:
 //   - Raw         (unary,           returns google.api.HttpBody)
 //   - Subscribe   (server-stream,   5 events)
 //   - Echo        (client-stream,   counts 3 messages)
@@ -30,21 +30,21 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
-	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
+	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
+	testpbconnect "cyber-ecosystem/shared-go/kratos/transport/connect/testpb/testpbconnect"
 )
 
-// testService implements mobilepb.MobileTransferServiceServer (the gRPC-style interface)
+// testService implements testpb.TransferServiceServer (the gRPC-style interface)
 // for the integration tests. RegisterTransferServiceConnectServer bridges it
 // onto a Connect server.
 type testService struct {
-	mobilepb.UnimplementedMobileTransferServiceServer
+	testpb.UnimplementedTransferServiceServer
 }
 
 // Subscribe emits 5 events derived from the requested topic.
-func (testService) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerStreamingServer[mobilepb.SubscribeResponse]) error {
+func (testService) Subscribe(req *testpb.SubscribeRequest, stream grpc.ServerStreamingServer[testpb.SubscribeResponse]) error {
 	for i := 0; i < 5; i++ {
-		if err := stream.Send(&mobilepb.SubscribeResponse{
+		if err := stream.Send(&testpb.SubscribeResponse{
 			EventId: fmt.Sprintf("%s-%d", req.GetTopic(), i+1),
 		}); err != nil {
 			return err
@@ -59,7 +59,7 @@ func (testService) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerS
 // misbehave — it returns nil WITHOUT calling SendAndClose, exercising the
 // transport's CodeInternal error path (see adapter.HandleClientStream). Used by
 // TestClientStreamMissingSendAndClose.
-func (testService) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoRequest, mobilepb.EchoResponse]) error {
+func (testService) Echo(stream grpc.ClientStreamingServer[testpb.EchoRequest, testpb.EchoResponse]) error {
 	var n int32
 	var totalBytes int64
 	skipClose := false
@@ -78,17 +78,17 @@ func (testService) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoRequest, 
 	if skipClose {
 		return nil // misbehave: return without SendAndClose
 	}
-	return stream.SendAndClose(&mobilepb.EchoResponse{TotalMessages: n, TotalBytes: totalBytes})
+	return stream.SendAndClose(&testpb.EchoResponse{TotalMessages: n, TotalBytes: totalBytes})
 }
 
 // Pipe echoes each incoming message back to the client until the stream closes.
-func (testService) Pipe(stream grpc.BidiStreamingServer[mobilepb.PipeRequest, mobilepb.PipeResponse]) error {
+func (testService) Pipe(stream grpc.BidiStreamingServer[testpb.PipeRequest, testpb.PipeResponse]) error {
 	for {
 		req, err := stream.Recv()
 		if err != nil {
 			return nil // EOF / client closed send side
 		}
-		if err := stream.Send(&mobilepb.PipeResponse{Data: req.GetData()}); err != nil {
+		if err := stream.Send(&testpb.PipeResponse{Data: req.GetData()}); err != nil {
 			return err
 		}
 	}
@@ -103,7 +103,7 @@ func (testService) Pipe(stream grpc.BidiStreamingServer[mobilepb.PipeRequest, mo
 //   - Data == "SLOW" sleeps 1s before responding — used by TestClientTimeout
 //     to trigger a client-side deadline. Guarded by the sentinel so other
 //     tests are unaffected.
-func (testService) Raw(ctx context.Context, req *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
+func (testService) Raw(ctx context.Context, req *testpb.RawRequest) (*httpbody.HttpBody, error) {
 	if string(req.GetData()) == "ERR" {
 		return nil, kerrors.NotFound("NOT_FOUND", "raw error sentinel")
 	}
@@ -129,7 +129,7 @@ func (testService) Raw(ctx context.Context, req *mobilepb.RawRequest) (*httpbody
 // The server wraps its mux with h2c.NewHandler when tlsConf==nil (see
 // NewServer), and the client uses an http2.Transport with AllowHTTP:true when
 // insecure && WithH2C (see defaultRoundTripper).
-func startServer(t *testing.T) (mobilev1connect.MobileTransferServiceClient, func()) {
+func startServer(t *testing.T) (testpbconnect.TransferServiceClient, func()) {
 	t.Helper()
 	return startServerWithClient(t)
 }
@@ -139,13 +139,13 @@ func startServer(t *testing.T) (mobilev1connect.MobileTransferServiceClient, fun
 // connect.Dial with the given extra dial options (applied on top of the
 // mandatory WithEndpoint + WithH2C). It lets client-behavior tests dial with
 // specific With* options (WithMiddleware, WithTimeout, WithTransport, ...).
-func startServerWithClient(t *testing.T, dialOpts ...connect.ClientOption) (mobilev1connect.MobileTransferServiceClient, func()) {
+func startServerWithClient(t *testing.T, dialOpts ...connect.ClientOption) (testpbconnect.TransferServiceClient, func()) {
 	t.Helper()
 
 	// Timeout(0) disables the unary/overall deadline so long-lived streams
 	// aren't killed by the server's default 1s timeout.
 	srv := connect.NewServer(connect.Address("127.0.0.1:0"), connect.Timeout(0))
-	mobilepb.RegisterMobileTransferServiceConnectServer(srv, testService{})
+	testpb.RegisterTransferServiceConnectServer(srv, testService{})
 
 	// Endpoint() creates the listener up front, so its Host is the real
 	// address the client must dial.
@@ -171,7 +171,7 @@ func startServerWithClient(t *testing.T, dialOpts ...connect.ClientOption) (mobi
 		_ = srv.Stop(ctx)
 		t.Fatalf("dial: %v", err)
 	}
-	client := mobilev1connect.NewMobileTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
+	client := testpbconnect.NewTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
 
 	stop := func() {
 		_ = cli.Close()
@@ -200,7 +200,7 @@ func TestUnaryRaw(t *testing.T) {
 	cli, stop := startServer(t)
 	defer stop()
 
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte("hello"),
 	}))
@@ -219,7 +219,7 @@ func TestServerStreamSubscribe(t *testing.T) {
 	cli, stop := startServer(t)
 	defer stop()
 
-	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "t"}))
+	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&testpb.SubscribeRequest{Topic: "t"}))
 	if err != nil {
 		t.Fatalf("Subscribe: %v", err)
 	}
@@ -251,7 +251,7 @@ func TestClientStreamEcho(t *testing.T) {
 
 	stream := cli.Echo(context.Background())
 	for i := 0; i < 3; i++ {
-		if err := stream.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := stream.Send(&testpb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("Send[%d]: %v", i, err)
 		}
 	}
@@ -277,7 +277,7 @@ func TestClientStreamMissingSendAndClose(t *testing.T) {
 	defer stop()
 
 	stream := cli.Echo(context.Background())
-	if err := stream.Send(&mobilepb.EchoRequest{Data: []byte("NO_CLOSE")}); err != nil {
+	if err := stream.Send(&testpb.EchoRequest{Data: []byte("NO_CLOSE")}); err != nil {
 		t.Fatal(err)
 	}
 	_, err := stream.CloseAndReceive() // connect-go v1.20 client method name (T10a)
@@ -300,7 +300,7 @@ func TestBidiPipe(t *testing.T) {
 	stream := cli.Pipe(context.Background())
 	for i := 0; i < 3; i++ {
 		payload := fmt.Sprintf("m%d", i)
-		if err := stream.Send(&mobilepb.PipeRequest{Data: []byte(payload)}); err != nil {
+		if err := stream.Send(&testpb.PipeRequest{Data: []byte(payload)}); err != nil {
 			t.Fatalf("Send[%d]: %v", i, err)
 		}
 		resp, err := stream.Receive()
@@ -341,7 +341,7 @@ func TestUnaryJSONAndProto(t *testing.T) {
 	// startServer's client already speaks application/proto.
 	protoCli, protoStop := startServer(t)
 	defer protoStop()
-	resp, err := protoCli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
+	resp, err := protoCli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{
 		ContentType: "application/octet-stream",
 		Data:        []byte(want),
 	}))
@@ -356,7 +356,7 @@ func TestUnaryJSONAndProto(t *testing.T) {
 	// via WithProtoJSON, injected through WithClientOptions on our dial.
 	jsonCli, jsonStop := startClientWithCodec(t, connectrpc.WithProtoJSON())
 	defer jsonStop()
-	jresp, err := jsonCli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
+	jresp, err := jsonCli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{
 		ContentType: "application/octet-stream",
 		Data:        []byte(want),
 	}))
@@ -371,10 +371,10 @@ func TestUnaryJSONAndProto(t *testing.T) {
 // startClientWithCodec brings up a loopback Connect server (h2c) with the test
 // service and a client whose connect client options include the given
 // connect-go ClientOptions (e.g. WithProtoJSON to force application/json).
-func startClientWithCodec(t *testing.T, extraClientOpts ...connectrpc.ClientOption) (mobilev1connect.MobileTransferServiceClient, func()) {
+func startClientWithCodec(t *testing.T, extraClientOpts ...connectrpc.ClientOption) (testpbconnect.TransferServiceClient, func()) {
 	t.Helper()
 	srv := connect.NewServer(connect.Address("127.0.0.1:0"), connect.Timeout(0))
-	mobilepb.RegisterMobileTransferServiceConnectServer(srv, testService{})
+	testpb.RegisterTransferServiceConnectServer(srv, testService{})
 	ep, err := srv.Endpoint()
 	if err != nil {
 		t.Fatalf("endpoint: %v", err)
@@ -392,7 +392,7 @@ func startClientWithCodec(t *testing.T, extraClientOpts ...connectrpc.ClientOpti
 		_ = srv.Stop(ctx)
 		t.Fatalf("dial: %v", err)
 	}
-	client := mobilev1connect.NewMobileTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
+	client := testpbconnect.NewTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
 	return client, func() {
 		_ = cli.Close()
 		_ = srv.Stop(ctx)
@@ -408,7 +408,7 @@ func TestServerStreamCancel(t *testing.T) {
 	defer stop()
 
 	ctx, cancel := context.WithCancel(context.Background())
-	stream, err := cli.Subscribe(ctx, connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "cancel"}))
+	stream, err := cli.Subscribe(ctx, connectrpc.NewRequest(&testpb.SubscribeRequest{Topic: "cancel"}))
 	if err != nil {
 		t.Fatalf("Subscribe: %v", err)
 	}
@@ -446,7 +446,7 @@ func TestErrorMapping(t *testing.T) {
 	cli, stop := startServer(t)
 	defer stop()
 
-	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
+	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{
 		Data: []byte("ERR"),
 	}))
 	if err == nil {
@@ -477,8 +477,8 @@ func TestPerMessageStreamMiddleware(t *testing.T) {
 	}
 
 	srv := connect.NewServer(connect.Address("127.0.0.1:0"), connect.Timeout(0))
-	srv.UseStream("/cyber.mobile.v1.MobileTransferService/Subscribe", mw)
-	mobilepb.RegisterMobileTransferServiceConnectServer(srv, testService{})
+	srv.UseStream("/connecttest.v1.TransferService/Subscribe", mw)
+	testpb.RegisterTransferServiceConnectServer(srv, testService{})
 
 	ep, err := srv.Endpoint()
 	if err != nil {
@@ -498,9 +498,9 @@ func TestPerMessageStreamMiddleware(t *testing.T) {
 		_ = srv.Stop(ctx)
 	}()
 
-	client := mobilev1connect.NewMobileTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
+	client := testpbconnect.NewTransferServiceClient(cli.HTTPClient(), cli.BaseURL(), cli.ClientOptions()...)
 
-	stream, err := client.Subscribe(ctx, connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "mw"}))
+	stream, err := client.Subscribe(ctx, connectrpc.NewRequest(&testpb.SubscribeRequest{Topic: "mw"}))
 	if err != nil {
 		t.Fatalf("Subscribe: %v", err)
 	}

@@ -35,14 +35,18 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "commands": ["go tool gci diff --skip-generated --custom-order -s standard -s default -s 'Prefix(cyber-ecosystem/shared-go)' -s 'Prefix(cyber-ecosystem/gen/go)' -s 'Prefix(cyber-ecosystem/app)' ."]
+        "commands": [
+          "go tool gci diff --skip-generated --custom-order -s standard -s default -s 'Prefix(cyber-ecosystem/shared-go)' -s 'Prefix(cyber-ecosystem/gen/go)' -s 'Prefix(cyber-ecosystem/app)' ."
+        ]
       }
     },
     "go:format": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "commands": ["go tool gci write --skip-generated --custom-order -s standard -s default -s 'Prefix(cyber-ecosystem/shared-go)' -s 'Prefix(cyber-ecosystem/gen/go)' -s 'Prefix(cyber-ecosystem/app)' ."]
+        "commands": [
+          "go tool gci write --skip-generated --custom-order -s standard -s default -s 'Prefix(cyber-ecosystem/shared-go)' -s 'Prefix(cyber-ecosystem/gen/go)' -s 'Prefix(cyber-ecosystem/app)' ."
+        ]
       }
     }
   }

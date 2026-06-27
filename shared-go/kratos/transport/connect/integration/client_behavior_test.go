@@ -29,11 +29,11 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
+	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
 )
 
-const rawProcedure = "/cyber.mobile.v1.MobileTransferService/Raw"
-const subscribeProcedure = "/cyber.mobile.v1.MobileTransferService/Subscribe"
+const rawProcedure = "/connecttest.v1.TransferService/Raw"
+const subscribeProcedure = "/connecttest.v1.TransferService/Subscribe"
 
 // TestClientMiddlewareRunsUnary verifies that client-side middleware registered
 // via connect.WithMiddleware runs for a unary RPC, and that the middleware can
@@ -63,7 +63,7 @@ func TestClientMiddlewareRunsUnary(t *testing.T) {
 	cli, stop := startServerWithClient(t, connect.WithMiddleware(countingMW))
 	defer stop()
 
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte("hello"),
 	}))
@@ -108,7 +108,7 @@ func TestClientMiddlewareRunsStream(t *testing.T) {
 	cli, stop := startServerWithClient(t, connect.WithStreamMiddleware(countingStreamMW))
 	defer stop()
 
-	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "mw"}))
+	stream, err := cli.Subscribe(context.Background(), connectrpc.NewRequest(&testpb.SubscribeRequest{Topic: "mw"}))
 	if err != nil {
 		t.Fatalf("Subscribe: %v", err)
 	}
@@ -145,7 +145,7 @@ func TestClientTimeout(t *testing.T) {
 	defer stop()
 
 	start := time.Now()
-	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
+	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{
 		Data: []byte("SLOW"),
 	}))
 	elapsed := time.Since(start)
@@ -207,7 +207,7 @@ func TestClientCustomTransport(t *testing.T) {
 	cli, stop := startServerWithClient(t, connect.WithTransport(counter))
 	defer stop()
 
-	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&mobilepb.RawRequest{
+	resp, err := cli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{
 		ContentType: "text/plain",
 		Data:        []byte("via-custom-rt"),
 	}))

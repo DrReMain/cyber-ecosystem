@@ -1,13 +1,12 @@
-// This file extends the comparative harness to MobileTransferService
-// (cyber/mobile/v1) — the one service in the codebase that binds ALL THREE
-// transports including HTTP streaming: Subscribe over SSE, Echo/Pipe over
-// WebSocket, Raw as a plain HttpBody unary. comparative_test.go covered the
-// BASE transfer package over grpc+connect only (it has no HTTP binding) and
-// explicitly skipped HTTP streaming. This file closes that gap by driving the
-// full admin_bff service × protocol matrix.
+// This file extends the comparative harness to the connecttest TransferService
+// fixture — a self-contained service that binds ALL THREE transports including
+// HTTP streaming: Subscribe over SSE, Echo/Pipe over WebSocket, Raw as a plain
+// HttpBody unary. comparative_test.go covered the BASE transfer package over
+// grpc+connect only (no HTTP binding) and explicitly skipped HTTP streaming.
+// This file closes that gap by driving the full service × protocol matrix.
 //
 // The single matrixTransferSvc satisfies all three generated server interfaces
-// (grpc-style MobileTransferServiceServer, which the HTTP and Connect generators
+// (grpc-style TransferServiceServer, which the HTTP and Connect generators
 // also dispatch to), so one implementation is exercised across grpc, http, and
 // connect simultaneously. Every test asserts behavioral PARITY across the three
 // protocols — including the HTTP SSE and WebSocket legs, which validate that the
@@ -30,26 +29,26 @@ import (
 
 	connect "cyber-ecosystem/shared-go/kratos/transport/connect"
 
-	mobilepb "cyber-ecosystem/gen/go/cyber/mobile/v1"
-	mobilev1connect "cyber-ecosystem/gen/go/cyber/mobile/v1/v1connect"
+	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
+	testpbconnect "cyber-ecosystem/shared-go/kratos/transport/connect/testpb/testpbconnect"
 )
 
 // ---------------------------------------------------------------------------
 // Shared service implementation (satisfies all 3 generated server interfaces)
 // ---------------------------------------------------------------------------
 
-// matrixTransferSvc implements the four MobileTransferService methods gRPC-style.
+// matrixTransferSvc implements the four TransferService methods gRPC-style.
 // Because protoc-gen-go-http and protoc-gen-go-connect both dispatch to the
 // gRPC-style signatures, this one struct is registered on the grpc, http, AND
 // connect servers, so the same code path runs under all three protocols.
 type matrixTransferSvc struct {
-	mobilepb.UnimplementedMobileTransferServiceServer
+	testpb.UnimplementedTransferServiceServer
 }
 
 // Subscribe (server-stream): emit 5 events named "<topic>-<i>".
-func (matrixTransferSvc) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.ServerStreamingServer[mobilepb.SubscribeResponse]) error {
+func (matrixTransferSvc) Subscribe(req *testpb.SubscribeRequest, stream grpc.ServerStreamingServer[testpb.SubscribeResponse]) error {
 	for i := 0; i < 5; i++ {
-		if err := stream.Send(&mobilepb.SubscribeResponse{
+		if err := stream.Send(&testpb.SubscribeResponse{
 			EventId: fmt.Sprintf("%s-%d", req.GetTopic(), i+1),
 		}); err != nil {
 			return err
@@ -59,7 +58,7 @@ func (matrixTransferSvc) Subscribe(req *mobilepb.SubscribeRequest, stream grpc.S
 }
 
 // Echo (client-stream): count received messages, return the total.
-func (matrixTransferSvc) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoRequest, mobilepb.EchoResponse]) error {
+func (matrixTransferSvc) Echo(stream grpc.ClientStreamingServer[testpb.EchoRequest, testpb.EchoResponse]) error {
 	var n int32
 	for {
 		_, err := stream.Recv()
@@ -68,24 +67,24 @@ func (matrixTransferSvc) Echo(stream grpc.ClientStreamingServer[mobilepb.EchoReq
 		}
 		n++
 	}
-	return stream.SendAndClose(&mobilepb.EchoResponse{TotalMessages: n})
+	return stream.SendAndClose(&testpb.EchoResponse{TotalMessages: n})
 }
 
 // Pipe (bidi): echo each received message's Data back to the client.
-func (matrixTransferSvc) Pipe(stream grpc.BidiStreamingServer[mobilepb.PipeRequest, mobilepb.PipeResponse]) error {
+func (matrixTransferSvc) Pipe(stream grpc.BidiStreamingServer[testpb.PipeRequest, testpb.PipeResponse]) error {
 	for {
 		req, err := stream.Recv()
 		if err != nil {
 			return nil // EOF / client closed
 		}
-		if err := stream.Send(&mobilepb.PipeResponse{Data: req.GetData()}); err != nil {
+		if err := stream.Send(&testpb.PipeResponse{Data: req.GetData()}); err != nil {
 			return err
 		}
 	}
 }
 
 // Raw (unary): echo the request Data back inside an HttpBody.
-func (matrixTransferSvc) Raw(_ context.Context, req *mobilepb.RawRequest) (*httpbody.HttpBody, error) {
+func (matrixTransferSvc) Raw(_ context.Context, req *testpb.RawRequest) (*httpbody.HttpBody, error) {
 	return &httpbody.HttpBody{ContentType: "text/plain", Data: req.GetData()}, nil
 }
 
@@ -93,12 +92,12 @@ func (matrixTransferSvc) Raw(_ context.Context, req *mobilepb.RawRequest) (*http
 // Harness: bring up grpc + http + connect servers, one shared svc, 3 clients
 // ---------------------------------------------------------------------------
 
-// matrixClients holds the three MobileTransferService clients built against the
+// matrixClients holds the three TransferService clients built against the
 // three servers.
 type matrixClients struct {
-	grpc    mobilepb.MobileTransferServiceClient
-	http    mobilepb.MobileTransferServiceHTTPClient
-	connect mobilev1connect.MobileTransferServiceClient
+	grpc    testpb.TransferServiceClient
+	http    testpb.TransferServiceHTTPClient
+	connect testpbconnect.TransferServiceClient
 }
 
 // startTransferMatrix spins up grpc, http, and connect servers on 127.0.0.1:0,
@@ -129,7 +128,7 @@ func startTransferMatrix(t *testing.T) (*matrixClients, *recorder, func()) {
 		kratosgrpc.Timeout(0),
 		kratosgrpc.Middleware(mw),
 	)
-	mobilepb.RegisterMobileTransferServiceServer(grpcSrv, matrixTransferSvc{})
+	testpb.RegisterTransferServiceServer(grpcSrv, matrixTransferSvc{})
 
 	grpcEP, err := grpcSrv.Endpoint()
 	if err != nil {
@@ -145,7 +144,7 @@ func startTransferMatrix(t *testing.T) (*matrixClients, *recorder, func()) {
 	if err != nil {
 		fail("grpc client: %v", err)
 	}
-	cl.grpc = mobilepb.NewMobileTransferServiceClient(grpcConn)
+	cl.grpc = testpb.NewTransferServiceClient(grpcConn)
 	stops = append(stops, func() { _ = grpcConn.Close() })
 	stops = append(stops, func() { _ = grpcSrv.Stop(ctx) })
 
@@ -155,7 +154,7 @@ func startTransferMatrix(t *testing.T) (*matrixClients, *recorder, func()) {
 		kratoshttp.Timeout(0),
 		kratoshttp.Middleware(mw),
 	)
-	mobilepb.RegisterMobileTransferServiceHTTPServer(httpSrv, matrixTransferSvc{})
+	testpb.RegisterTransferServiceHTTPServer(httpSrv, matrixTransferSvc{})
 	httpEP, err := httpSrv.Endpoint()
 	if err != nil {
 		fail("http endpoint: %v", err)
@@ -170,7 +169,7 @@ func startTransferMatrix(t *testing.T) (*matrixClients, *recorder, func()) {
 	if err != nil {
 		fail("http client: %v", err)
 	}
-	cl.http = mobilepb.NewMobileTransferServiceHTTPClient(httpClient)
+	cl.http = testpb.NewTransferServiceHTTPClient(httpClient)
 	stops = append(stops, func() { _ = httpClient.Close() })
 	stops = append(stops, func() { _ = httpSrv.Stop(ctx) })
 
@@ -180,7 +179,7 @@ func startTransferMatrix(t *testing.T) (*matrixClients, *recorder, func()) {
 		connect.Timeout(0),
 		connect.Middleware(mw),
 	)
-	mobilepb.RegisterMobileTransferServiceConnectServer(connSrv, matrixTransferSvc{})
+	testpb.RegisterTransferServiceConnectServer(connSrv, matrixTransferSvc{})
 	connEP, err := connSrv.Endpoint()
 	if err != nil {
 		fail("connect endpoint: %v", err)
@@ -196,7 +195,7 @@ func startTransferMatrix(t *testing.T) (*matrixClients, *recorder, func()) {
 	if err != nil {
 		fail("connect dial: %v", err)
 	}
-	cl.connect = mobilev1connect.NewMobileTransferServiceClient(
+	cl.connect = testpbconnect.NewTransferServiceClient(
 		connClient.HTTPClient(), connClient.BaseURL(), connClient.ClientOptions()...,
 	)
 	stops = append(stops, func() { _ = connClient.Close() })
@@ -216,15 +215,15 @@ func TestMatrixRawUnary(t *testing.T) {
 	ctx := context.Background()
 	const wantData = "hello-raw"
 
-	grpcResp, err := cl.grpc.Raw(ctx, &mobilepb.RawRequest{Data: []byte(wantData)})
+	grpcResp, err := cl.grpc.Raw(ctx, &testpb.RawRequest{Data: []byte(wantData)})
 	if err != nil {
 		t.Fatalf("grpc Raw: %v", err)
 	}
-	httpResp, err := cl.http.Raw(ctx, &mobilepb.RawRequest{Data: []byte(wantData)})
+	httpResp, err := cl.http.Raw(ctx, &testpb.RawRequest{Data: []byte(wantData)})
 	if err != nil {
 		t.Fatalf("http Raw: %v", err)
 	}
-	connResp, err := cl.connect.Raw(ctx, connectrpc.NewRequest(&mobilepb.RawRequest{Data: []byte(wantData)}))
+	connResp, err := cl.connect.Raw(ctx, connectrpc.NewRequest(&testpb.RawRequest{Data: []byte(wantData)}))
 	if err != nil {
 		t.Fatalf("connect Raw: %v", err)
 	}
@@ -258,7 +257,7 @@ func TestMatrixSubscribeServerStream(t *testing.T) {
 	ctx := context.Background()
 
 	// --- grpc ---
-	grpcStream, err := cl.grpc.Subscribe(ctx, &mobilepb.SubscribeRequest{Topic: "t"})
+	grpcStream, err := cl.grpc.Subscribe(ctx, &testpb.SubscribeRequest{Topic: "t"})
 	if err != nil {
 		t.Fatalf("grpc Subscribe open: %v", err)
 	}
@@ -279,7 +278,7 @@ func TestMatrixSubscribeServerStream(t *testing.T) {
 	}
 
 	// --- http (SSE) ---
-	httpStream, err := cl.http.Subscribe(ctx, &mobilepb.SubscribeRequest{Topic: "t"})
+	httpStream, err := cl.http.Subscribe(ctx, &testpb.SubscribeRequest{Topic: "t"})
 	if err != nil {
 		t.Fatalf("http Subscribe open: %v", err)
 	}
@@ -300,7 +299,7 @@ func TestMatrixSubscribeServerStream(t *testing.T) {
 	}
 
 	// --- connect ---
-	connStream, err := cl.connect.Subscribe(ctx, connectrpc.NewRequest(&mobilepb.SubscribeRequest{Topic: "t"}))
+	connStream, err := cl.connect.Subscribe(ctx, connectrpc.NewRequest(&testpb.SubscribeRequest{Topic: "t"}))
 	if err != nil {
 		t.Fatalf("connect Subscribe open: %v", err)
 	}
@@ -349,7 +348,7 @@ func TestMatrixPipeBidi(t *testing.T) {
 	grpcCount := 0
 	for i := 0; i < 3; i++ {
 		payload := fmt.Sprintf("g%d", i)
-		if err := grpcPipe.Send(&mobilepb.PipeRequest{Data: []byte(payload)}); err != nil {
+		if err := grpcPipe.Send(&testpb.PipeRequest{Data: []byte(payload)}); err != nil {
 			t.Fatalf("grpc Pipe Send[%d]: %v", i, err)
 		}
 		resp, rerr := grpcPipe.Recv()
@@ -375,7 +374,7 @@ func TestMatrixPipeBidi(t *testing.T) {
 	connCount := 0
 	for i := 0; i < 3; i++ {
 		payload := fmt.Sprintf("c%d", i)
-		if err := connPipe.Send(&mobilepb.PipeRequest{Data: []byte(payload)}); err != nil {
+		if err := connPipe.Send(&testpb.PipeRequest{Data: []byte(payload)}); err != nil {
 			t.Fatalf("connect Pipe Send[%d]: %v", i, err)
 		}
 		resp, rerr := connPipe.Receive()
@@ -429,7 +428,7 @@ func TestMatrixPipeBidi(t *testing.T) {
 		t.Fatalf("http Pipe open: %v", err)
 	}
 	const httpPayload = "h-single"
-	if err := httpPipe.Send(&mobilepb.PipeRequest{Data: []byte(httpPayload)}); err != nil {
+	if err := httpPipe.Send(&testpb.PipeRequest{Data: []byte(httpPayload)}); err != nil {
 		t.Fatalf("http Pipe Send: %v", err)
 	}
 	resp, rerr := httpPipe.Recv()
@@ -467,7 +466,7 @@ func TestMatrixEchoClientStream(t *testing.T) {
 		t.Fatalf("grpc Echo open: %v", err)
 	}
 	for i := 0; i < 3; i++ {
-		if err := grpcEcho.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := grpcEcho.Send(&testpb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("grpc Echo Send[%d]: %v", i, err)
 		}
 	}
@@ -482,7 +481,7 @@ func TestMatrixEchoClientStream(t *testing.T) {
 		t.Fatalf("http Echo open: %v", err)
 	}
 	for i := 0; i < 3; i++ {
-		if err := httpEcho.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := httpEcho.Send(&testpb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("http Echo Send[%d]: %v", i, err)
 		}
 	}
@@ -494,7 +493,7 @@ func TestMatrixEchoClientStream(t *testing.T) {
 	// --- connect ---
 	connEcho := cl.connect.Echo(ctx)
 	for i := 0; i < 3; i++ {
-		if err := connEcho.Send(&mobilepb.EchoRequest{Data: []byte("x")}); err != nil {
+		if err := connEcho.Send(&testpb.EchoRequest{Data: []byte("x")}); err != nil {
 			t.Fatalf("connect Echo Send[%d]: %v", i, err)
 		}
 	}
@@ -533,13 +532,13 @@ func TestMatrixMiddlewareParityTransfer(t *testing.T) {
 
 	ctx := context.Background()
 
-	if _, err := cl.grpc.Raw(ctx, &mobilepb.RawRequest{Data: []byte("a")}); err != nil {
+	if _, err := cl.grpc.Raw(ctx, &testpb.RawRequest{Data: []byte("a")}); err != nil {
 		t.Fatalf("grpc Raw: %v", err)
 	}
-	if _, err := cl.http.Raw(ctx, &mobilepb.RawRequest{Data: []byte("a")}); err != nil {
+	if _, err := cl.http.Raw(ctx, &testpb.RawRequest{Data: []byte("a")}); err != nil {
 		t.Fatalf("http Raw: %v", err)
 	}
-	if _, err := cl.connect.Raw(ctx, connectrpc.NewRequest(&mobilepb.RawRequest{Data: []byte("a")})); err != nil {
+	if _, err := cl.connect.Raw(ctx, connectrpc.NewRequest(&testpb.RawRequest{Data: []byte("a")})); err != nil {
 		t.Fatalf("connect Raw: %v", err)
 	}
 
@@ -560,7 +559,7 @@ func TestMatrixMiddlewareParityTransfer(t *testing.T) {
 	// Operation() parity for the Raw unary method: all three report the gRPC
 	// FullMethod (the generated http handler calls http.SetOperation with the
 	// FullMethod constant), so a single selector matches all three.
-	const fullMethod = "/cyber.mobile.v1.MobileTransferService/Raw"
+	const fullMethod = "/connecttest.v1.TransferService/Raw"
 	for i, k := range kinds {
 		if ops[i] != fullMethod {
 			t.Errorf("%s Raw Operation() = %q, want %q", k, ops[i], fullMethod)
@@ -572,4 +571,4 @@ func TestMatrixMiddlewareParityTransfer(t *testing.T) {
 // interface — guarantees the one-impl-for-three-protocols claim at build time.
 // The HTTP and Connect generators dispatch to the same gRPC-style signatures,
 // so satisfying this interface is sufficient for all three registrations.
-var _ mobilepb.MobileTransferServiceServer = matrixTransferSvc{}
+var _ testpb.TransferServiceServer = matrixTransferSvc{}
