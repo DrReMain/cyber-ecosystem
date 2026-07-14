@@ -1,4 +1,3 @@
-# Zookeeper - ClickHouse cluster replication dependency
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -87,7 +86,6 @@ spec:
     - port: 2181
       targetPort: 2181
 ---
-# ClickHouse config.xml (replaces default, aligned with original repo)
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -170,7 +168,6 @@ data:
         </send_crash_reports>
     </clickhouse>
 ---
-# ClickHouse users.xml (replaces default)
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -215,7 +212,6 @@ data:
         </quotas>
     </clickhouse>
 ---
-# ClickHouse cluster.xml (Zookeeper + remote_servers)
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -244,7 +240,6 @@ data:
         </remote_servers>
     </clickhouse>
 ---
-# ClickHouse custom function (histogramQuantile)
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -274,7 +269,6 @@ data:
         </function>
     </functions>
 ---
-# ClickHouse StatefulSet
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -344,7 +338,7 @@ spec:
               memory: 256Mi
             limits:
               cpu: "2"
-              memory: 4Gi
+              memory: 2Gi
           readinessProbe:
             httpGet:
               path: /ping

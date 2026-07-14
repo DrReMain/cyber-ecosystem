@@ -1,5 +1,3 @@
-# SignOz schema migrator - one-shot Job
-# Aligned with original: bootstrap → sync up → async up
 apiVersion: batch/v1
 kind: Job
 metadata:

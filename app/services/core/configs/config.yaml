@@ -1,7 +1,7 @@
 server:
-  http: {addr: 0.0.0.0:11002, timeout: 1s}
-  grpc: {addr: 0.0.0.0:12002, timeout: 1s}
-  connect: {addr: 0.0.0.0:13002, timeout: 1s}
+  http: {addr: 0.0.0.0:11001, timeout: 1s}
+  grpc: {addr: 0.0.0.0:12001, timeout: 1s}
+  connect: {addr: 0.0.0.0:13001, timeout: 1s}
 data:
   database:
     driver: postgres
@@ -28,7 +28,7 @@ data:
   storage:
     max_file_size: 52428800    # 字节 bytes (50 MiB)
     s3:
-      endpoint: http://localhost:9000
+      endpoint: http://s3.cyber.test
       access_key: admin@cyber-ecosystem.com
       secret_key: Cyber-Ecosystem123
       bucket: core
@@ -57,7 +57,7 @@ data:
       retention: 604800s         # 7 天
       batch_size: 16
 observability:
-  endpoint: localhost:4318    # SigNoz OTLP HTTP
+  endpoint: otlp.cyber.test:80    # SigNoz OTLP HTTP (via otlp Ingress)
   insecure: true
   trace:
     enabled: false

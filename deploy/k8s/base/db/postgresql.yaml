@@ -8,6 +8,16 @@ stringData:
   POSTGRES_USER: "postgres"
   POSTGRES_PASSWORD: "postgres"
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-extensions
+  namespace: db
+data:
+  01-extensions.sql: |
+    DO $$ BEGIN EXECUTE 'CREATE EXTENSION IF NOT EXISTS vector'; EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'vector not installed, skipping'; END $$;
+    DO $$ BEGIN EXECUTE 'CREATE EXTENSION IF NOT EXISTS postgis'; EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'postgis not installed, skipping'; END $$;
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -26,7 +36,8 @@ spec:
     spec:
       containers:
         - name: postgresql
-          image: postgres:18.3-trixie
+          # image: postgres:18.3-trixie
+          image: pg-extended:18.3
           ports:
             - containerPort: 5432
           env:
@@ -60,6 +71,9 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/lib/postgresql
+            - name: extensions
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
           resources:
             requests:
               cpu: 100m
@@ -79,6 +93,10 @@ spec:
               command: ["pg_isready", "-U", "postgres"]
             initialDelaySeconds: 30
             periodSeconds: 10
+      volumes:
+        - name: extensions
+          configMap:
+            name: postgresql-extensions
   volumeClaimTemplates:
     - metadata:
         name: data

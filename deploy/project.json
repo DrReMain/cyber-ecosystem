@@ -8,9 +8,10 @@
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          "kubectl apply -f deploy/k8s/db/namespace.yaml",
-          "kubectl apply -f deploy/k8s/db/postgresql.yaml -f deploy/k8s/db/redis.yaml",
-          "kubectl wait pod -n db --for=condition=ready --all --timeout=120s"
+          "kubectl apply -f deploy/k8s/base/db/namespace.yaml",
+          "kubectl apply -f deploy/k8s/base/db/postgresql.yaml -f deploy/k8s/base/db/redis.yaml",
+          "kubectl rollout status statefulset/postgresql -n db --timeout=300s",
+          "kubectl rollout status statefulset/redis -n db --timeout=300s"
         ],
         "parallel": false
       }
@@ -27,9 +28,9 @@
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          "kubectl apply -f deploy/k8s/storage/namespace.yaml",
-          "kubectl apply -f deploy/k8s/storage/minio.yaml",
-          "kubectl wait pod -n storage --for=condition=ready --all --timeout=120s"
+          "kubectl apply -f deploy/k8s/base/storage/namespace.yaml",
+          "kubectl apply -f deploy/k8s/base/storage/seaweedfs.yaml",
+          "kubectl rollout status statefulset/seaweedfs -n storage --timeout=300s"
         ],
         "parallel": false
       }
@@ -46,9 +47,9 @@
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          "kubectl apply -f deploy/k8s/mq/namespace.yaml",
-          "kubectl apply -f deploy/k8s/mq/nats.yaml",
-          "kubectl wait pod -n mq --for=condition=ready --all --timeout=120s"
+          "kubectl apply -f deploy/k8s/base/mq/namespace.yaml",
+          "kubectl apply -f deploy/k8s/base/mq/nats.yaml",
+          "kubectl rollout status statefulset/nats -n mq --timeout=300s"
         ],
         "parallel": false
       }
@@ -60,22 +61,61 @@
         "command": "kubectl delete namespace mq --ignore-not-found"
       }
     },
+    "realtime:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "kubectl apply -f deploy/k8s/base/realtime/namespace.yaml",
+          "kubectl apply -f deploy/k8s/base/realtime/centrifugo.yaml",
+          "kubectl rollout status deployment/centrifugo -n realtime --timeout=300s"
+        ],
+        "parallel": false
+      }
+    },
+    "realtime:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "kubectl delete namespace realtime --ignore-not-found"
+      }
+    },
+    "media:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "kubectl apply -f deploy/k8s/base/media/namespace.yaml",
+          "kubectl apply -f deploy/k8s/base/media/livekit.yaml",
+          "kubectl rollout status deployment/livekit -n media --timeout=300s"
+        ],
+        "parallel": false
+      }
+    },
+    "media:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "kubectl delete namespace media --ignore-not-found"
+      }
+    },
     "observability:start": {
       "executor": "nx:run-commands",
       "dependsOn": ["db:start"],
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          "kubectl apply -f deploy/k8s/observability/namespace.yaml",
-          "kubectl apply -f deploy/k8s/observability/clickhouse.yaml",
-          "kubectl wait pod -n observability -l app=clickhouse --for=condition=ready --timeout=120s",
-          "kubectl apply -f deploy/k8s/observability/signoz-migrator.yaml",
-          "kubectl wait job -n observability signoz-schema-migrator --for=condition=complete --timeout=300s",
-          "kubectl apply -f deploy/k8s/observability/signoz.yaml",
-          "kubectl wait deployment -n observability signoz-otel-collector signoz --for=condition=available --timeout=120s",
-          "kubectl apply -f deploy/k8s/observability/glitchtip.yaml",
-          "kubectl wait job -n observability glitchtip-setup --for=condition=complete --timeout=300s",
-          "kubectl wait deployment -n observability glitchtip --for=condition=available --timeout=120s"
+          "kubectl apply -f deploy/k8s/base/observability/namespace.yaml",
+          "kubectl apply -f deploy/k8s/base/observability/clickhouse.yaml",
+          "kubectl wait pod -n observability -l app=clickhouse --for=condition=ready --timeout=600s",
+          "kubectl wait pod -n observability -l app=zookeeper --for=condition=ready --timeout=600s",
+          "kubectl apply -f deploy/k8s/base/observability/signoz-migrator.yaml",
+          "kubectl wait job -n observability signoz-schema-migrator --for=condition=complete --timeout=600s",
+          "kubectl apply -f deploy/k8s/base/observability/signoz.yaml",
+          "kubectl wait deployment -n observability signoz-otel-collector signoz --for=condition=available --timeout=600s",
+          "kubectl apply -f deploy/k8s/base/observability/glitchtip.yaml",
+          "kubectl wait job -n observability glitchtip-setup --for=condition=complete --timeout=600s",
+          "kubectl wait deployment -n observability glitchtip --for=condition=available --timeout=600s"
         ],
         "parallel": false
       }
@@ -89,15 +129,15 @@
     },
     "start": {
       "executor": "nx:run-commands",
-      "dependsOn": ["db:start", "storage:start", "mq:start", "observability:start"],
+      "dependsOn": ["db:start", "storage:start", "mq:start"],
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "echo '=== All services started ===' && kubectl get pods -A -o wide | grep -v kube-system"
+        "command": "echo '=== Core services started (observability/realtime/media are opt-in) ===' && kubectl get pods -A -o wide | grep -v kube-system"
       }
     },
     "stop": {
       "executor": "nx:run-commands",
-      "dependsOn": ["observability:stop", "mq:stop", "storage:stop", "db:stop"],
+      "dependsOn": ["observability:stop", "media:stop", "realtime:stop", "mq:stop", "storage:stop", "db:stop"],
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "echo '=== All services stopped ==='"

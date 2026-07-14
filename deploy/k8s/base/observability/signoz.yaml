@@ -1,4 +1,3 @@
-# SignOz credentials
 apiVersion: v1
 kind: Secret
 metadata:
@@ -10,8 +9,6 @@ stringData:
   SIGNOZ_USER_ROOT_EMAIL: "admin@cyber-ecosystem.com"
   SIGNOZ_USER_ROOT_PASSWORD: "Cyber-Ecosystem123"
 ---
-# OTel Collector ConfigMap (aligned with original otel-collector-config.yaml)
-# DSN uses clickhouse service name (cross-namespace not needed, same namespace)
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -119,7 +116,6 @@ data:
           processors: [batch]
           exporters: [signozclickhousemeter]
 ---
-# OTel Collector Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -197,20 +193,17 @@ metadata:
   name: signoz-otel-collector
   namespace: observability
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: signoz-otel-collector
   ports:
     - name: otlp-grpc
       port: 4317
       targetPort: 4317
-      nodePort: 30317
     - name: otlp-http
       port: 4318
       targetPort: 4318
-      nodePort: 30318
 ---
-# SignOz Query Service + Frontend (unified image)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -287,7 +280,6 @@ spec:
           persistentVolumeClaim:
             claimName: signoz-data
 ---
-# SignOz data PVC (SQLite)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -306,11 +298,48 @@ metadata:
   name: signoz
   namespace: observability
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: signoz
   ports:
     - name: http
       port: 8080
       targetPort: 8080
-      nodePort: 30301
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: signoz
+  namespace: observability
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: observe.cyber.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: signoz
+                port:
+                  number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: signoz-otel-collector
+  namespace: observability
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: otlp.cyber.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: signoz-otel-collector
+                port:
+                  number: 4318

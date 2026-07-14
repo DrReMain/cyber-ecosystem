@@ -1,0 +1,116 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: livekit-config
+  namespace: media
+type: Opaque
+stringData:
+  config.yaml: |
+    port: 7880
+    rtc:
+      tcp_port: 7881
+      port_range_start: 50000
+      port_range_end: 50060
+      use_external_ip: true
+    keys:
+      cyber-ecosystem: "Cyber-Ecosystem-livekit-secret"
+    room:
+      auto_create: true
+    logging:
+      level: info
+    turn:
+      enabled: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livekit
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: livekit
+  template:
+    metadata:
+      labels:
+        app: livekit
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: livekit
+          image: livekit/livekit-server:v1.13.0
+          ports:
+            - name: signal
+              containerPort: 7880
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          args:
+            - --config=/config.yaml
+            - --bind=0.0.0.0
+            - --node-ip=$(POD_IP)
+          volumeMounts:
+            - name: config
+              mountPath: /config.yaml
+              subPath: config.yaml
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          readinessProbe:
+            tcpSocket:
+              port: 7880
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 7880
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+      volumes:
+        - name: config
+          secret:
+            secretName: livekit-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: livekit-server
+  namespace: media
+spec:
+  selector:
+    app: livekit
+  ports:
+    - name: signal
+      port: 7880
+      targetPort: 7880
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: livekit
+  namespace: media
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: rtc.cyber.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: livekit-server
+                port:
+                  number: 7880

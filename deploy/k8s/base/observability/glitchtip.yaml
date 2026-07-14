@@ -1,4 +1,3 @@
-# GlitchTip credentials
 apiVersion: v1
 kind: Secret
 metadata:
@@ -12,9 +11,6 @@ stringData:
   DJANGO_SUPERUSER_EMAIL: "admin@cyber-ecosystem.com"
   DJANGO_SUPERUSER_PASSWORD: "Cyber-Ecosystem123"
 ---
-# GlitchTip uploads PVC.
-# This deployment intentionally treats GlitchTip as a single-node service:
-# web and worker run in one Pod and share this RWO local-path volume.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -27,7 +23,6 @@ spec:
     requests:
       storage: 1Gi
 ---
-# GlitchTip setup: create database, run migrations, then create superuser
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -94,7 +89,7 @@ spec:
                   name: glitchtip-credentials
                   key: SECRET_KEY
             - name: GLITCHTIP_DOMAIN
-              value: "http://localhost:8000"
+              value: "http://errors.cyber.test"
             - name: DJANGO_SUPERUSER_EMAIL
               valueFrom:
                 secretKeyRef:
@@ -106,7 +101,6 @@ spec:
                   name: glitchtip-credentials
                   key: DJANGO_SUPERUSER_PASSWORD
 ---
-# GlitchTip Web + Worker
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -146,7 +140,7 @@ spec:
                   name: glitchtip-credentials
                   key: SECRET_KEY
             - name: GLITCHTIP_DOMAIN
-              value: "http://localhost:8000"
+              value: "http://errors.cyber.test"
             - name: PORT
               value: "8000"
             - name: TRUSTED_PROXIES
@@ -200,7 +194,7 @@ spec:
                   name: glitchtip-credentials
                   key: SECRET_KEY
             - name: GLITCHTIP_DOMAIN
-              value: "http://localhost:8000"
+              value: "http://errors.cyber.test"
             - name: TRUSTED_PROXIES
               value: "*"
           volumeMounts:
@@ -224,11 +218,29 @@ metadata:
   name: glitchtip
   namespace: observability
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: glitchtip
   ports:
     - name: http
       port: 8000
       targetPort: 8000
-      nodePort: 30080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: glitchtip
+  namespace: observability
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: errors.cyber.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: glitchtip
+                port:
+                  number: 8000

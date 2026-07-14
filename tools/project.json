@@ -9,7 +9,7 @@
         "cwd": "{workspaceRoot}",
         "commands": [
           "go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest",
-          "go install github.com/bufbuild/buf/cmd/buf@v1.70.0",
+          "go install github.com/bufbuild/buf/cmd/buf@v1.71.0",
           "go mod download",
           "buf dep update",
           "pnpm install"

@@ -35,9 +35,9 @@ spec:
             - --appendfsync
             - everysec
             - --maxmemory
-            - 256mb
+            - 512mb
             - --maxmemory-policy
-            - allkeys-lru
+            - volatile-lru
             - --tcp-keepalive
             - "300"
             - --timeout
@@ -54,10 +54,10 @@ spec:
           resources:
             requests:
               cpu: 50m
-              memory: 64Mi
+              memory: 128Mi
             limits:
               cpu: "1"
-              memory: 512Mi
+              memory: 1Gi
           readinessProbe:
             exec:
               command: ["redis-cli", "ping"]
