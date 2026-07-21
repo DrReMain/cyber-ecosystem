@@ -1,0 +1,15 @@
+{
+  "welcome": "مرحبًا، {name}!",
+  "locale_name": [
+    {
+      "declarations": ["input locale"],
+      "selectors": ["locale"],
+      "match": {
+        "locale=en-US": "English",
+        "locale=zh-CN": "简体中文",
+        "locale=ar-SA": "العربية",
+        "locale=*": "{locale}"
+      }
+    }
+  ]
+}

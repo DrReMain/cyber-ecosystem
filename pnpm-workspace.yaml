@@ -2,3 +2,9 @@ packages:
   - "shared-ts/*"
   - "gen/ts"
   - "app/clients/*"
+
+minimumReleaseAge: 0
+
+onlyBuiltDependencies:
+  - esbuild
+  - lightningcss

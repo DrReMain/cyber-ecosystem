@@ -1,0 +1,68 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.3/schema.json",
+  "extends": ["../../../biome.json"],
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "!**/*.gen.ts",
+      "!**/*.gen.tsx",
+      "!**/*.gen.d.ts",
+      "!**/dist",
+      "!**/.output",
+      "!**/coverage",
+      "!**/src/paraglide"
+    ]
+  },
+  "linter": {
+    "rules": {
+      "correctness": {
+        "noNestedComponentDefinitions": "error"
+      },
+      "suspicious": {
+        "noLeakedRender": "error",
+        "noShadow": "error",
+        "noUnnecessaryConditions": "error"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "error",
+        "noExcessiveLinesPerFunction": {
+          "level": "error",
+          "options": { "maxLines": 200, "skipBlankLines": true }
+        },
+        "useArrowFunction": "error",
+        "useSimplifiedLogicExpression": "error"
+      },
+      "style": {
+        "useConsistentTypeDefinitions": "error",
+        "noParameterAssign": "error",
+        "useExportType": "error",
+        "useImportType": "error"
+      },
+      "nursery": {
+        "useSortedClasses": "error",
+        "noFloatingPromises": "error",
+        "noComponentHookFactories": "error",
+        "noMisusedPromises": "error",
+        "useExhaustiveSwitchCases": "error",
+        "noUnnecessaryTemplateExpression": "error"
+      }
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "useSortedAttributes": "on"
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
+}
