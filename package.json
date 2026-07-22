@@ -1,5 +1,6 @@
 {
   "name": "cyber-ecosystem",
+  "license": "MIT",
   "private": true,
   "packageManager": "pnpm@11.9.0",
   "engines": {
