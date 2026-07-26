@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+// business errors (service-level): domain-specific failures the
+// service layer returns actively, distinct from the generic codes in
+// cyber/shared/errors (General/Flow/Infra). The 6xxx range is reserved for
+enum ErrorReason {
+  option (.errors.default_code) = 400;
+
+  ERROR_REASON_UNSPECIFIED = 0 [(.errors.code) = 500];
+
+  // Status transition rejected by the aggregate's FSM.
+  ERROR_REASON_INVALID_STATUS_TRANSITION = 6000 [(.errors.code) = 400];
+}

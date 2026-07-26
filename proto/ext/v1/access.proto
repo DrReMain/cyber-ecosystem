@@ -6,6 +6,17 @@ import "google/protobuf/descriptor.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/ext/v1";
 
+// Method access policy: who may call an RPC, and which middleware auth path
+// enforces it. Drives the auth selector. Unset (ACCESS_UNSPECIFIED) defaults to
+// ACCESS_ADMIN — deny-by-default; only public endpoints opt out with
+// ACCESS_PUBLIC. Future audiences (app/h5) add values here plus a matching
+// selector branch, no rework to existing methods.
+enum Access {
+  ACCESS_UNSPECIFIED = 0;
+  ACCESS_PUBLIC = 1;
+  ACCESS_ADMIN = 2;
+}
+
 extend google.protobuf.MethodOptions {
-  bool public_access = 10001;
+  Access access = 10001;
 }

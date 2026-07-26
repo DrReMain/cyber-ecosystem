@@ -6,123 +6,11 @@ info:
     title: ""
     version: 0.0.1
 paths:
-    /api/v1/core/resource:
+    /api/v1/system/items:
         get:
             tags:
-                - ResourceService
-            description: List all RPC service and method info.
-            operationId: ResourceService_ListResource
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/cyber.core.v1.ListResourceResponse'
-    /api/v1/core/transfer/echo:
-        get:
-            tags:
-                - TransferService
-            description: Echo back a summary of received messages.
-            operationId: TransferService_Echo
-            parameters:
-                - name: data
-                  in: query
-                  description: Message payload.
-                  schema:
-                    type: string
-                    format: bytes
-                - name: sequence
-                  in: query
-                  description: Sequence number.
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/cyber.core.v1.EchoResponse'
-    /api/v1/core/transfer/pipe:
-        get:
-            tags:
-                - TransferService
-            description: Bidirectional data pipe via WebSocket.
-            operationId: TransferService_Pipe
-            parameters:
-                - name: data
-                  in: query
-                  description: Message payload.
-                  schema:
-                    type: string
-                    format: bytes
-                - name: type
-                  in: query
-                  description: Message type.
-                  schema:
-                    type: string
-                - name: sequence
-                  in: query
-                  description: Sequence number.
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/cyber.core.v1.PipeResponse'
-    /api/v1/core/transfer/raw:
-        post:
-            tags:
-                - TransferService
-            description: |-
-                Return raw bytes via HttpBody.
-                 buf:lint:ignore RPC_RESPONSE_STANDARD_NAME -- HttpBody is intentional: raw binary response, not a conventional *Response message.
-            operationId: TransferService_Raw
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/cyber.core.v1.RawRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        '*/*': {}
-    /api/v1/core/transfer/subscribe:
-        get:
-            tags:
-                - TransferService
-            description: Subscribe to events via SSE.
-            operationId: TransferService_Subscribe
-            parameters:
-                - name: topic
-                  in: query
-                  description: Topic to subscribe.
-                  schema:
-                    type: string
-                - name: lastEventId
-                  in: query
-                  description: Last event ID for reconnection.
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/cyber.core.v1.SubscribeResponse'
-    /api/v1/core/user:
-        get:
-            tags:
-                - UserService
-            description: List users with pagination and filters.
-            operationId: UserService_ListUsers
+                - ItemService
+            operationId: ItemService_ListItems
             parameters:
                 - name: page.pageNo
                   in: query
@@ -165,19 +53,16 @@ paths:
                   schema:
                     type: string
                     format: date-time
-                - name: phone
+                - name: name
                   in: query
-                  description: Filter by phone (exact).
                   schema:
                     type: string
                 - name: status
                   in: query
-                  description: Filter by status.
                   schema:
                     type: string
                 - name: orderBy
                   in: query
-                  description: Sort fields, e.g. "createdAt:asc".
                   schema:
                     type: array
                     items:
@@ -188,17 +73,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.core.v1.ListUsersResponse'
+                                $ref: '#/components/schemas/cyber.system.v1.ListItemsResponse'
         post:
             tags:
-                - UserService
-            description: Create a user.
-            operationId: UserService_CreateUser
+                - ItemService
+            operationId: ItemService_CreateItem
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/cyber.core.v1.CreateUserRequest'
+                            $ref: '#/components/schemas/cyber.system.v1.CreateItemRequest'
                 required: true
             responses:
                 "200":
@@ -206,17 +90,15 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.core.v1.CreateUserResponse'
-    /api/v1/core/user/{id}:
+                                $ref: '#/components/schemas/cyber.system.v1.CreateItemResponse'
+    /api/v1/system/items/{id}:
         get:
             tags:
-                - UserService
-            description: Get a user by ID.
-            operationId: UserService_GetUser
+                - ItemService
+            operationId: ItemService_GetItem
             parameters:
                 - name: id
                   in: path
-                  description: User ID.
                   required: true
                   schema:
                     type: string
@@ -226,16 +108,14 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.core.v1.GetUserResponse'
+                                $ref: '#/components/schemas/cyber.system.v1.GetItemResponse'
         put:
             tags:
-                - UserService
-            description: Update a user.
-            operationId: UserService_UpdateUser
+                - ItemService
+            operationId: ItemService_UpdateItem
             parameters:
                 - name: id
                   in: path
-                  description: User ID.
                   required: true
                   schema:
                     type: string
@@ -243,7 +123,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/cyber.core.v1.UpdateUserRequest'
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateItemRequest'
                 required: true
             responses:
                 "200":
@@ -251,16 +131,14 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.core.v1.UpdateUserResponse'
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateItemResponse'
         delete:
             tags:
-                - UserService
-            description: Delete a user.
-            operationId: UserService_DeleteUser
+                - ItemService
+            operationId: ItemService_DeleteItem
             parameters:
                 - name: id
                   in: path
-                  description: User ID.
                   required: true
                   schema:
                     type: string
@@ -270,17 +148,15 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.core.v1.DeleteUserResponse'
-    /api/v1/core/user/{id}/sort:
-        put:
+                                $ref: '#/components/schemas/cyber.system.v1.DeleteItemResponse'
+    /api/v1/system/items/{id}/sort:
+        patch:
             tags:
-                - UserService
-            description: Sort user position.
-            operationId: UserService_SortUser
+                - ItemService
+            operationId: ItemService_SortItem
             parameters:
                 - name: id
                   in: path
-                  description: User ID.
                   required: true
                   schema:
                     type: string
@@ -288,7 +164,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/cyber.core.v1.SortUserRequest'
+                            $ref: '#/components/schemas/cyber.system.v1.SortItemRequest'
                 required: true
             responses:
                 "200":
@@ -296,17 +172,15 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.core.v1.SortUserResponse'
-    /api/v1/core/user/{id}/status:
-        put:
+                                $ref: '#/components/schemas/cyber.system.v1.SortItemResponse'
+    /api/v1/system/items/{id}/status:
+        patch:
             tags:
-                - UserService
-            description: Update user status.
-            operationId: UserService_UpdateUserStatus
+                - ItemService
+            operationId: ItemService_UpdateItemStatus
             parameters:
                 - name: id
                   in: path
-                  description: User ID.
                   required: true
                   schema:
                     type: string
@@ -314,7 +188,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/cyber.core.v1.UpdateUserStatusRequest'
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateItemStatusRequest'
                 required: true
             responses:
                 "200":
@@ -322,84 +196,98 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/cyber.core.v1.UpdateUserStatusResponse'
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateItemStatusResponse'
+    /api/v1/system/resource:
+        get:
+            tags:
+                - ResourceService
+            description: List all RPC service and method info.
+            operationId: ResourceService_ListResource
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListResourceResponse'
 components:
     schemas:
-        cyber.core.v1.CreateUserRequest:
+        cyber.shared.common.v1.PageResponse:
             type: object
             properties:
-                nickname:
+                pageNo:
+                    type: integer
+                    description: Current page number.
+                    format: int32
+                pageSize:
+                    type: integer
+                    description: Page size.
+                    format: int32
+                total:
+                    type: integer
+                    description: Total count.
+                    format: int32
+                more:
+                    type: boolean
+                    description: Whether more results exist.
+            description: Pagination response.
+        cyber.system.v1.CreateItemRequest:
+            type: object
+            properties:
+                name:
                     type: string
-                    description: Nickname.
-                phone:
+                description:
                     type: string
-                    description: Phone number, used as the login account. Unique.
-                password:
-                    type: string
-                    description: Login password (plaintext over the wire; hashed server-side before storage).
-                avatar:
-                    type: string
-                    description: Avatar URL (optional; later backed by the storage/upload flow).
-            description: CreateUser request.
-        cyber.core.v1.CreateUserResponse:
+            description: create
+        cyber.system.v1.CreateItemResponse:
             type: object
             properties:
                 id:
                     type: string
-                    description: The created user ID.
-            description: CreateUser response.
-        cyber.core.v1.DeleteUserResponse:
+        cyber.system.v1.DeleteItemResponse:
             type: object
             properties: {}
-            description: DeleteUser response.
-        cyber.core.v1.EchoResponse:
+        cyber.system.v1.GetItemResponse:
             type: object
             properties:
-                totalMessages:
-                    type: integer
-                    description: Total messages received.
-                    format: int32
-                totalBytes:
-                    type: string
-                    description: Total bytes received.
-                lastSequence:
-                    type: string
-                    description: Last sequence number.
-                durationNs:
-                    type: string
-                    description: Round-trip duration in nanoseconds.
-            description: Echo response summary.
-        cyber.core.v1.GetUserResponse:
+                item:
+                    $ref: '#/components/schemas/cyber.system.v1.Item'
+        cyber.system.v1.Item:
             type: object
             properties:
-                user:
-                    allOf:
-                        - $ref: '#/components/schemas/cyber.core.v1.User'
-                    description: User detail.
-            description: GetUser response.
-        cyber.core.v1.ListResourceResponse:
-            type: object
-            properties:
-                list:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/cyber.core.v1.Service'
-                    description: Service list.
-            description: ListResource response.
-        cyber.core.v1.ListUsersResponse:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                name:
+                    type: string
+                description:
+                    type: string
+                status:
+                    type: string
+        cyber.system.v1.ListItemsResponse:
             type: object
             properties:
                 page:
-                    allOf:
-                        - $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
-                    description: Pagination info.
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
                 list:
                     type: array
                     items:
-                        $ref: '#/components/schemas/cyber.core.v1.GetUserResponse'
-                    description: User list.
-            description: ListUsers response.
-        cyber.core.v1.Method:
+                        $ref: '#/components/schemas/cyber.system.v1.Item'
+        cyber.system.v1.ListResourceResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Service'
+                    description: Service list.
+            description: ListResource response.
+        cyber.system.v1.Method:
             type: object
             properties:
                 name:
@@ -430,32 +318,7 @@ components:
                     type: string
                     description: Method description.
             description: RPC method descriptor.
-        cyber.core.v1.PipeResponse:
-            type: object
-            properties:
-                data:
-                    type: string
-                    description: Message payload.
-                    format: bytes
-                type:
-                    type: string
-                    description: Message type.
-                sequence:
-                    type: string
-                    description: Sequence number.
-            description: Bidirectional pipe response.
-        cyber.core.v1.RawRequest:
-            type: object
-            properties:
-                contentType:
-                    type: string
-                    description: Desired content type for the response.
-                data:
-                    type: string
-                    description: Request body.
-                    format: bytes
-            description: Raw bytes request.
-        cyber.core.v1.Service:
+        cyber.system.v1.Service:
             type: object
             properties:
                 name:
@@ -476,136 +339,52 @@ components:
                 methods:
                     type: array
                     items:
-                        $ref: '#/components/schemas/cyber.core.v1.Method'
+                        $ref: '#/components/schemas/cyber.system.v1.Method'
                     description: Service methods.
             description: RPC service descriptor.
-        cyber.core.v1.SortUserRequest:
+        cyber.system.v1.SortItemRequest:
             type: object
             properties:
                 id:
                     type: string
-                    description: User ID.
                 prevId:
                     type: string
-                    description: Move after this user.
                 nextId:
                     type: string
-                    description: Move before this user.
-            description: |-
-                SortUser request. Reorder a user's position relative to its neighbors.
-                 At least one of prev_id or next_id must be set. The service updates the
-                 affected users' positions atomically (a multi-row transaction).
-        cyber.core.v1.SortUserResponse:
+        cyber.system.v1.SortItemResponse:
             type: object
             properties: {}
-            description: SortUser response.
-        cyber.core.v1.SubscribeResponse:
-            type: object
-            properties:
-                eventId:
-                    type: string
-                    description: Event ID for SSE reconnection.
-                eventType:
-                    type: string
-                    description: Event type for SSE client-side filtering.
-                data:
-                    type: string
-                    description: Event payload.
-                    format: bytes
-                timestamp:
-                    type: string
-                    description: Event timestamp.
-                    format: date-time
-            description: Subscribe event response.
-        cyber.core.v1.UpdateUserRequest:
+        cyber.system.v1.UpdateItemRequest:
             type: object
             properties:
                 id:
                     type: string
-                    description: User ID.
-                nickname:
+                name:
                     type: string
-                    description: Nickname.
-                phone:
+                description:
                     type: string
-                    description: Phone number.
-                password:
-                    type: string
-                    description: Password (set to change credentials).
-                avatar:
-                    type: string
-                    description: Avatar URL.
                 fieldsMask:
                     type: array
                     items:
                         type: string
-                    description: Fields to update.
-            description: UpdateUser request.
-        cyber.core.v1.UpdateUserResponse:
+            description: update
+        cyber.system.v1.UpdateItemResponse:
             type: object
             properties: {}
-            description: UpdateUser response.
-        cyber.core.v1.UpdateUserStatusRequest:
+        cyber.system.v1.UpdateItemStatusRequest:
             type: object
             properties:
                 id:
                     type: string
-                    description: User ID.
                 status:
                     type: string
-                    description: Target status.
-            description: UpdateUserStatus request.
-        cyber.core.v1.UpdateUserStatusResponse:
+            description: other
+        cyber.system.v1.UpdateItemStatusResponse:
             type: object
             properties: {}
-            description: UpdateUserStatus response.
-        cyber.core.v1.User:
-            type: object
-            properties:
-                id:
-                    type: string
-                createdAt:
-                    type: string
-                    format: date-time
-                updatedAt:
-                    type: string
-                    format: date-time
-                nickname:
-                    type: string
-                avatar:
-                    type: string
-                phone:
-                    type: string
-                status:
-                    type: string
-            description: User resource model. Represents a user account.
-        cyber.shared.common.v1.PageResponse:
-            type: object
-            properties:
-                pageNo:
-                    type: integer
-                    description: Current page number.
-                    format: int32
-                pageSize:
-                    type: integer
-                    description: Page size.
-                    format: int32
-                total:
-                    type: integer
-                    description: Total count.
-                    format: int32
-                more:
-                    type: boolean
-                    description: Whether more results exist.
-            description: Pagination response.
 tags:
+    - name: ItemService
     - name: ResourceService
       description: |-
         Resource introspection service. Lists all RPC service/method info by
          reflecting on the registered proto descriptors.
-    - name: TransferService
-      description: |-
-        Transfer service. Exposes the streaming transport primitives
-         (SSE / client-stream / bidi / HttpBody) to clients.
-    - name: UserService
-      description: User service. Client-facing surface for user CRUD over Connect/HTTP.

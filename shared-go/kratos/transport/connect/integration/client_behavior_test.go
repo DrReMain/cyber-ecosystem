@@ -28,7 +28,6 @@ import (
 	"golang.org/x/net/http2"
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
-
 	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
 )
 

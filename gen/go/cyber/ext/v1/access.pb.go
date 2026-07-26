@@ -11,6 +11,7 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	descriptorpb "google.golang.org/protobuf/types/descriptorpb"
 	reflect "reflect"
+	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -21,38 +22,111 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Method access policy: who may call an RPC, and which middleware auth path
+// enforces it. Drives the auth selector. Unset (ACCESS_UNSPECIFIED) defaults to
+// ACCESS_ADMIN — deny-by-default; only public endpoints opt out with
+// ACCESS_PUBLIC. Future audiences (app/h5) add values here plus a matching
+// selector branch, no rework to existing methods.
+type Access int32
+
+const (
+	Access_ACCESS_UNSPECIFIED Access = 0
+	Access_ACCESS_PUBLIC      Access = 1
+	Access_ACCESS_ADMIN       Access = 2
+)
+
+// Enum value maps for Access.
+var (
+	Access_name = map[int32]string{
+		0: "ACCESS_UNSPECIFIED",
+		1: "ACCESS_PUBLIC",
+		2: "ACCESS_ADMIN",
+	}
+	Access_value = map[string]int32{
+		"ACCESS_UNSPECIFIED": 0,
+		"ACCESS_PUBLIC":      1,
+		"ACCESS_ADMIN":       2,
+	}
+)
+
+func (x Access) Enum() *Access {
+	p := new(Access)
+	*p = x
+	return p
+}
+
+func (x Access) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Access) Descriptor() protoreflect.EnumDescriptor {
+	return file_ext_v1_access_proto_enumTypes[0].Descriptor()
+}
+
+func (Access) Type() protoreflect.EnumType {
+	return &file_ext_v1_access_proto_enumTypes[0]
+}
+
+func (x Access) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Access.Descriptor instead.
+func (Access) EnumDescriptor() ([]byte, []int) {
+	return file_ext_v1_access_proto_rawDescGZIP(), []int{0}
+}
+
 var file_ext_v1_access_proto_extTypes = []protoimpl.ExtensionInfo{
 	{
 		ExtendedType:  (*descriptorpb.MethodOptions)(nil),
-		ExtensionType: (*bool)(nil),
+		ExtensionType: (*Access)(nil),
 		Field:         10001,
-		Name:          "cyber.ext.v1.public_access",
-		Tag:           "varint,10001,opt,name=public_access",
+		Name:          "cyber.ext.v1.access",
+		Tag:           "varint,10001,opt,name=access,enum=cyber.ext.v1.Access",
 		Filename:      "ext/v1/access.proto",
 	},
 }
 
 // Extension fields to descriptorpb.MethodOptions.
 var (
-	// optional bool public_access = 10001;
-	E_PublicAccess = &file_ext_v1_access_proto_extTypes[0]
+	// optional cyber.ext.v1.Access access = 10001;
+	E_Access = &file_ext_v1_access_proto_extTypes[0]
 )
 
 var File_ext_v1_access_proto protoreflect.FileDescriptor
 
 const file_ext_v1_access_proto_rawDesc = "" +
 	"\n" +
-	"\x13ext/v1/access.proto\x12\fcyber.ext.v1\x1a google/protobuf/descriptor.proto:D\n" +
-	"\rpublic_access\x12\x1e.google.protobuf.MethodOptions\x18\x91N \x01(\bR\fpublicAccessB%Z#cyber-ecosystem/gen/go/cyber/ext/v1b\x06proto3"
+	"\x13ext/v1/access.proto\x12\fcyber.ext.v1\x1a google/protobuf/descriptor.proto*E\n" +
+	"\x06Access\x12\x16\n" +
+	"\x12ACCESS_UNSPECIFIED\x10\x00\x12\x11\n" +
+	"\rACCESS_PUBLIC\x10\x01\x12\x10\n" +
+	"\fACCESS_ADMIN\x10\x02:M\n" +
+	"\x06access\x12\x1e.google.protobuf.MethodOptions\x18\x91N \x01(\x0e2\x14.cyber.ext.v1.AccessR\x06accessB%Z#cyber-ecosystem/gen/go/cyber/ext/v1b\x06proto3"
 
+var (
+	file_ext_v1_access_proto_rawDescOnce sync.Once
+	file_ext_v1_access_proto_rawDescData []byte
+)
+
+func file_ext_v1_access_proto_rawDescGZIP() []byte {
+	file_ext_v1_access_proto_rawDescOnce.Do(func() {
+		file_ext_v1_access_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ext_v1_access_proto_rawDesc), len(file_ext_v1_access_proto_rawDesc)))
+	})
+	return file_ext_v1_access_proto_rawDescData
+}
+
+var file_ext_v1_access_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_ext_v1_access_proto_goTypes = []any{
-	(*descriptorpb.MethodOptions)(nil), // 0: google.protobuf.MethodOptions
+	(Access)(0),                        // 0: cyber.ext.v1.Access
+	(*descriptorpb.MethodOptions)(nil), // 1: google.protobuf.MethodOptions
 }
 var file_ext_v1_access_proto_depIdxs = []int32{
-	0, // 0: cyber.ext.v1.public_access:extendee -> google.protobuf.MethodOptions
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
+	1, // 0: cyber.ext.v1.access:extendee -> google.protobuf.MethodOptions
+	0, // 1: cyber.ext.v1.access:type_name -> cyber.ext.v1.Access
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	1, // [1:2] is the sub-list for extension type_name
 	0, // [0:1] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
@@ -67,13 +141,14 @@ func file_ext_v1_access_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ext_v1_access_proto_rawDesc), len(file_ext_v1_access_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   0,
 			NumExtensions: 1,
 			NumServices:   0,
 		},
 		GoTypes:           file_ext_v1_access_proto_goTypes,
 		DependencyIndexes: file_ext_v1_access_proto_depIdxs,
+		EnumInfos:         file_ext_v1_access_proto_enumTypes,
 		ExtensionInfos:    file_ext_v1_access_proto_extTypes,
 	}.Build()
 	File_ext_v1_access_proto = out.File

@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service ItemService {
+  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {
+    option (cyber.ext.v1.method_comment) = "创建 Item";
+    option (google.api.http) = {
+      post: "/api/v1/system/items"
+      body: "*"
+    };
+  }
+  rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse) {
+    option (cyber.ext.v1.method_comment) = "修改 Item";
+    option (google.api.http) = {
+      put: "/api/v1/system/items/{id}"
+      body: "*"
+    };
+  }
+  rpc UpdateItemStatus(UpdateItemStatusRequest) returns (UpdateItemStatusResponse) {
+    option (cyber.ext.v1.method_comment) = "修改 Item 状态";
+    option (google.api.http) = {
+      patch: "/api/v1/system/items/{id}/status"
+      body: "*"
+    };
+  }
+  rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse) {
+    option (cyber.ext.v1.method_comment) = "删除 Item";
+    option (google.api.http) = {delete: "/api/v1/system/items/{id}"};
+  }
+  rpc ListItems(ListItemsRequest) returns (ListItemsResponse) {
+    option (cyber.ext.v1.method_comment) = "查询 Item 列表";
+    option (google.api.http) = {get: "/api/v1/system/items"};
+  }
+  rpc GetItem(GetItemRequest) returns (GetItemResponse) {
+    option (cyber.ext.v1.method_comment) = "查询 Item 详情";
+    option (google.api.http) = {get: "/api/v1/system/items/{id}"};
+  }
+  rpc SortItem(SortItemRequest) returns (SortItemResponse) {
+    option (cyber.ext.v1.method_comment) = "排序 Item";
+    option (google.api.http) = {
+      patch: "/api/v1/system/items/{id}/sort"
+      body: "*"
+    };
+  }
+}
+
+message Item {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue name = 4;
+  google.protobuf.StringValue description = 5;
+  google.protobuf.StringValue status = 6;
+}
+
+// create
+message CreateItemRequest {
+  optional string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string description = 2;
+}
+
+message CreateItemResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+// update
+message UpdateItemRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string name = 2;
+  optional string description = 3;
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+  }];
+}
+
+message UpdateItemResponse {}
+
+// delete
+message DeleteItemRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message DeleteItemResponse {}
+
+// get
+message GetItemRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetItemResponse {
+  Item item = 1;
+}
+
+// list
+message ListItemsRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional string name = 2;
+  optional string status = 3 [(buf.validate.field).string = {
+    in: [
+      "active",
+      "inactive"
+    ]
+  }];
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListItemsRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(name|createdAt|updatedAt|sort):(asc|desc)$'))"
+  }];
+}
+
+message ListItemsResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated Item list = 2;
+}
+
+// other
+message UpdateItemStatusRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string status = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      in: [
+        "active",
+        "inactive"
+      ]
+    }
+  ];
+}
+
+message UpdateItemStatusResponse {}
+
+message SortItemRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string prev_id = 2;
+  optional string next_id = 3;
+
+  option (buf.validate.message).cel = {
+    id: "SortItemRequest.prev_id-next_id"
+    message: "at least one of prev_id or next_id is required"
+    expression: "has(this.prev_id) || has(this.next_id)"
+  };
+}
+
+message SortItemResponse {}

@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package cyber.conf;
+
+import "google/protobuf/duration.proto";
+
+option go_package = "cyber-ecosystem/app/services/system/internal/conf;conf";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+  Observability observability = 3;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message Connect {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+  Connect connect = 3;
+}
+
+message Data {
+  message Database {
+    string driver = 1;
+    string host = 2;
+    int32 port = 3;
+    string user = 4;
+    string password = 5;
+    string db_name = 6;
+    int32 max_open_conns = 7;
+    int32 max_idle_conns = 8;
+    google.protobuf.Duration conn_max_lifetime = 9;
+  }
+  message Redis {
+    string network = 1;
+    string addr = 2;
+    string password = 3;
+    int32 db = 4;
+    int32 pool_size = 5;
+    int32 min_idle_conns = 6;
+    google.protobuf.Duration conn_max_lifetime = 7;
+    google.protobuf.Duration read_timeout = 8;
+    google.protobuf.Duration write_timeout = 9;
+    google.protobuf.Duration dial_timeout = 10;
+    google.protobuf.Duration pool_timeout = 11;
+  }
+  message Storage {
+    message S3 {
+      string endpoint = 1;
+      string access_key = 2;
+      string secret_key = 3;
+      string bucket = 4;
+      string region = 5;
+      bool use_path_style = 6;
+      int64 multipart_threshold = 7;
+      int64 part_size = 8;
+      google.protobuf.Duration presign_ttl = 9;
+    }
+    int64 max_file_size = 1;
+    S3 s3 = 2;
+  }
+  message MQ {
+    message NATS {
+      string endpoint = 1;
+      string creds = 2;
+      google.protobuf.Duration max_age = 3;
+      int64 max_bytes = 4;
+      int32 max_retries = 5;
+      google.protobuf.Duration ack_wait = 6;
+      int32 max_ack_pending = 7;          // in-flight unacked cap per consumer (0 → backend default)
+      google.protobuf.Duration dlq_max_age = 8;  // DLQ stream TTL (0 → backend default)
+      int64 dlq_max_bytes = 9;            // DLQ stream size cap (0 → backend default)
+      google.protobuf.Duration nak_backoff_step = 10; // linear Nak redelivery delay step (0 → backend default)
+    }
+    message PG {
+      string dsn = 1;                          // postgres://... to the standalone `mq` database
+      google.protobuf.Duration poll_interval = 2;      // consumer poll interval (0 → backend default)
+      google.protobuf.Duration visibility_timeout = 3; // = NATS ack_wait (0 → backend default)
+      int32 max_retries = 4;                   // delivery attempts before DLQ (0 → backend default)
+      google.protobuf.Duration retention = 5;         // message retention, age-based eviction (0 → backend default)
+      int32 batch_size = 6;                    // max messages per poll batch (0 → backend default)
+    }
+    NATS nats = 1;
+    PG pg = 2;
+  }
+  Database database = 1;
+  Redis redis = 2;
+  Storage storage = 3;
+  MQ mq = 4;
+}
+
+message Observability {
+  message Trace {
+    bool enabled = 1;
+    double sampling_ratio = 2;
+  }
+  message Metrics {
+    bool enabled = 1;
+  }
+  message Log {
+    message FileOutput {
+      string path = 1;
+      int32 max_size_mb = 2;
+      int32 max_backups = 3;
+      int32 max_age_days = 4;
+      bool compress = 5;
+    }
+    string level = 1;
+    bool console = 2;
+    bool otlp = 3;
+    FileOutput file = 4;
+  }
+  message SlowQuery {
+    google.protobuf.Duration db = 1;     // slow SQL threshold; 0/omit = disabled
+    google.protobuf.Duration cache = 2;  // slow redis op threshold; 0/omit = disabled
+  }
+  string endpoint = 1;
+  bool insecure = 2;
+  Trace trace = 3;
+  Metrics metrics = 4;
+  Log log = 5;
+  SlowQuery slow_query = 6;
+}

@@ -2,8 +2,8 @@
 // @generated from file ext/v1/access.proto (package cyber.ext.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenExtension, GenFile } from "@bufbuild/protobuf/codegenv2";
-import { extDesc, fileDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenExtension, GenFile } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, extDesc, fileDesc } from "@bufbuild/protobuf/codegenv2";
 import type { MethodOptions } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_descriptor } from "@bufbuild/protobuf/wkt";
 
@@ -11,11 +11,43 @@ import { file_google_protobuf_descriptor } from "@bufbuild/protobuf/wkt";
  * Describes the file ext/v1/access.proto.
  */
 export const file_ext_v1_access: GenFile = /*@__PURE__*/
-  fileDesc("ChNleHQvdjEvYWNjZXNzLnByb3RvEgxjeWJlci5leHQudjE6RAoNcHVibGljX2FjY2VzcxIeLmdvb2dsZS5wcm90b2J1Zi5NZXRob2RPcHRpb25zGJFOIAEoCFIMcHVibGljQWNjZXNzQiVaI2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXh0L3YxYgZwcm90bzM", [file_google_protobuf_descriptor]);
+  fileDesc("ChNleHQvdjEvYWNjZXNzLnByb3RvEgxjeWJlci5leHQudjEqRQoGQWNjZXNzEhYKEkFDQ0VTU19VTlNQRUNJRklFRBAAEhEKDUFDQ0VTU19QVUJMSUMQARIQCgxBQ0NFU1NfQURNSU4QAjpNCgZhY2Nlc3MSHi5nb29nbGUucHJvdG9idWYuTWV0aG9kT3B0aW9ucxiRTiABKA4yFC5jeWJlci5leHQudjEuQWNjZXNzUgZhY2Nlc3NCJVojY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9leHQvdjFiBnByb3RvMw", [file_google_protobuf_descriptor]);
 
 /**
- * @generated from extension: bool public_access = 10001;
+ * Method access policy: who may call an RPC, and which middleware auth path
+ * enforces it. Drives the auth selector. Unset (ACCESS_UNSPECIFIED) defaults to
+ * ACCESS_ADMIN — deny-by-default; only public endpoints opt out with
+ * ACCESS_PUBLIC. Future audiences (app/h5) add values here plus a matching
+ * selector branch, no rework to existing methods.
+ *
+ * @generated from enum cyber.ext.v1.Access
  */
-export const public_access: GenExtension<MethodOptions, boolean> = /*@__PURE__*/
+export enum Access {
+  /**
+   * @generated from enum value: ACCESS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: ACCESS_PUBLIC = 1;
+   */
+  PUBLIC = 1,
+
+  /**
+   * @generated from enum value: ACCESS_ADMIN = 2;
+   */
+  ADMIN = 2,
+}
+
+/**
+ * Describes the enum cyber.ext.v1.Access.
+ */
+export const AccessSchema: GenEnum<Access> = /*@__PURE__*/
+  enumDesc(file_ext_v1_access, 0);
+
+/**
+ * @generated from extension: cyber.ext.v1.Access access = 10001;
+ */
+export const access: GenExtension<MethodOptions, Access> = /*@__PURE__*/
   extDesc(file_ext_v1_access, 0);
 

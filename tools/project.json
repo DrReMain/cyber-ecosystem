@@ -17,6 +17,13 @@
         "parallel": false
       }
     },
+    "buf:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf format -w"
+      }
+    },
     "go:lint": {
       "executor": "nx:run-commands",
       "options": {

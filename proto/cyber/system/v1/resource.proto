@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+// Resource introspection service. Lists all RPC service/method info by
+// reflecting on the registered proto descriptors.
+service ResourceService {
+  // List all RPC service and method info.
+  rpc ListResource(ListResourceRequest) returns (ListResourceResponse) {
+    option (cyber.ext.v1.method_comment) = "获取所有rpc信息";
+    option (google.api.http) = {get: "/api/v1/system/resource"};
+  }
+}
+
+// RPC method descriptor.
+message Method {
+  // Method short name.
+  string name = 1;
+  // Method fully qualified name.
+  string full_name = 2;
+  // Request message short name.
+  string request_name = 3;
+  // Request message fully qualified name.
+  string request_full_name = 4;
+  // Response message short name.
+  string response_name = 5;
+  // Response message fully qualified name.
+  string response_full_name = 6;
+  // HTTP method (GET, POST, PUT, DELETE).
+  string http_method = 7;
+  // HTTP path pattern.
+  string http_path = 8;
+  // Method description.
+  string comment = 9;
+}
+
+// RPC service descriptor.
+message Service {
+  // Service short name.
+  string name = 1;
+  // Service fully qualified name.
+  string full_name = 2;
+  // Proto package name.
+  string package = 3;
+  // Source proto file path.
+  string source_file = 4;
+  // Service description.
+  string comment = 5;
+  // Service methods.
+  repeated Method methods = 6;
+}
+
+// ListResource request.
+message ListResourceRequest {}
+
+// ListResource response.
+message ListResourceResponse {
+  // Service list.
+  repeated Service list = 1;
+}
