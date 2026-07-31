@@ -384,7 +384,7 @@ func (i *unaryClientInterceptor) WrapUnary(next connectrpc.UnaryFunc) connectrpc
 		}
 		respAny, err := h(ctx, req.Any())
 		if err != nil {
-			return nil, ErrorToConnect(err)
+			return nil, ConnectToError(err)
 		}
 		resp, ok := respAny.(connectrpc.AnyResponse)
 		if !ok {

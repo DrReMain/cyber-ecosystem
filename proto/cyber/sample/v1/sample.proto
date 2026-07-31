@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package cyber.sample.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/sample/v1";
+
+service SampleService {
+  rpc CreateSample(CreateSampleRequest) returns (CreateSampleResponse) {
+    option (cyber.ext.v1.method_comment) = "创建 Sample";
+    option (google.api.http) = {
+      post: "/api/v1/sample/samples"
+      body: "*"
+    };
+  }
+  rpc ListSamples(ListSamplesRequest) returns (ListSamplesResponse) {
+    option (cyber.ext.v1.method_comment) = "查询 Sample 列表";
+    option (google.api.http) = {get: "/api/v1/sample/samples"};
+  }
+}
+
+message Sample {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.StringValue name = 3;
+}
+
+// create
+message CreateSampleRequest {
+  optional string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message CreateSampleResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+// list
+message ListSamplesRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+}
+
+message ListSamplesResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated Sample list = 2;
+}

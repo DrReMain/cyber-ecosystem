@@ -6,6 +6,77 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/v1/sample/samples:
+        get:
+            tags:
+                - SampleService
+            operationId: SampleService_ListSamples
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.sample.v1.ListSamplesResponse'
+        post:
+            tags:
+                - SampleService
+            operationId: SampleService_CreateSample
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.sample.v1.CreateSampleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.sample.v1.CreateSampleResponse'
     /api/v1/system/items:
         get:
             tags:
@@ -212,6 +283,36 @@ paths:
                                 $ref: '#/components/schemas/cyber.system.v1.ListResourceResponse'
 components:
     schemas:
+        cyber.sample.v1.CreateSampleRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+            description: create
+        cyber.sample.v1.CreateSampleResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+        cyber.sample.v1.ListSamplesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.sample.v1.Sample'
+        cyber.sample.v1.Sample:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                name:
+                    type: string
         cyber.shared.common.v1.PageResponse:
             type: object
             properties:
@@ -388,3 +489,4 @@ tags:
       description: |-
         Resource introspection service. Lists all RPC service/method info by
          reflecting on the registered proto descriptors.
+    - name: SampleService

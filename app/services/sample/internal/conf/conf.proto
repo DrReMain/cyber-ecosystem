@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package cyber.conf;
+
+import "google/protobuf/duration.proto";
+
+option go_package = "cyber-ecosystem/app/services/sample/internal/conf;conf";
+
+message Bootstrap {
+  Server server = 1;
+  Observability observability = 2;
+  Remote remote = 3;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message Connect {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+  Connect connect = 3;
+}
+
+message Observability {
+  message Trace {
+    bool enabled = 1;
+    double sampling_ratio = 2;
+  }
+  message Metrics {
+    bool enabled = 1;
+  }
+  message Log {
+    message FileOutput {
+      string path = 1;
+      int32 max_size_mb = 2;
+      int32 max_backups = 3;
+      int32 max_age_days = 4;
+      bool compress = 5;
+    }
+    string level = 1;
+    bool console = 2;
+    bool otlp = 3;
+    FileOutput file = 4;
+  }
+  string endpoint = 1;
+  bool insecure = 2;
+  Trace trace = 3;
+  Metrics metrics = 4;
+  Log log = 5;
+}
+
+// Remote holds endpoints of other services this service calls (ACL targets).
+message Remote {
+  string system = 1;          // system service over gRPC (read path)
+  string system_connect = 2;  // system service over connect (write path)
+}
