@@ -56,35 +56,36 @@ func Client() middleware.Middleware {
 }
 
 // MapUpstreamErr maps an upstream error to a GeneralError by HTTP code,
-// preserving the code's semantics (NotFound→NotFound, Unavailable→…) while
-// regenerating a clean reason and message, so neither the provider's reason
-// nor transport detail leaks.
+// preserving the code's semantics (NotFound→NotFound, Unavailable→…). The
+// mapped error carries only the reason (empty message) — the upstream error is
+// attached as the cause so logs keep the detail while neither the provider's
+// reason nor transport detail leaks to the caller.
 func MapUpstreamErr(err error) error {
 	switch extractHTTPCode(err) {
 	case 400:
-		return errorspb.ErrorGeneralErrorInvalidArgument("upstream rejected argument")
+		return errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(err)
 	case 401:
-		return errorspb.ErrorGeneralErrorUnauthenticated("upstream unauthenticated")
+		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(err)
 	case 403:
-		return errorspb.ErrorGeneralErrorPermissionDenied("upstream forbidden")
+		return errorspb.ErrorGeneralErrorPermissionDenied("").WithCause(err)
 	case 404:
-		return errorspb.ErrorGeneralErrorNotFound("upstream not found")
+		return errorspb.ErrorGeneralErrorNotFound("").WithCause(err)
 	case 409:
-		return errorspb.ErrorGeneralErrorAlreadyExists("upstream conflict")
+		return errorspb.ErrorGeneralErrorAlreadyExists("").WithCause(err)
 	case 412:
-		return errorspb.ErrorGeneralErrorPreconditionFailed("upstream precondition failed")
+		return errorspb.ErrorGeneralErrorPreconditionFailed("").WithCause(err)
 	case 413:
-		return errorspb.ErrorGeneralErrorPayloadTooLarge("upstream payload too large")
+		return errorspb.ErrorGeneralErrorPayloadTooLarge("").WithCause(err)
 	case 429:
-		return errorspb.ErrorGeneralErrorResourceExhausted("upstream rate limited")
+		return errorspb.ErrorGeneralErrorResourceExhausted("").WithCause(err)
 	case 501:
-		return errorspb.ErrorGeneralErrorNotImplemented("upstream not implemented")
+		return errorspb.ErrorGeneralErrorNotImplemented("").WithCause(err)
 	case 503:
-		return errorspb.ErrorGeneralErrorUnavailable("upstream unavailable")
+		return errorspb.ErrorGeneralErrorUnavailable("").WithCause(err)
 	case 504:
-		return errorspb.ErrorGeneralErrorTimeout("upstream timeout")
+		return errorspb.ErrorGeneralErrorTimeout("").WithCause(err)
 	default:
-		return errorspb.ErrorGeneralErrorInternal("upstream error")
+		return errorspb.ErrorGeneralErrorInternal("").WithCause(err)
 	}
 }
 

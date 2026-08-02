@@ -11,6 +11,8 @@ import (
 	"github.com/go-kratos/kratos/v3"
 	"github.com/google/wire"
 
+	krauth "cyber-ecosystem/shared-go/kratos/security/auth"
+
 	"cyber-ecosystem/app/services/system/internal/biz"
 	"cyber-ecosystem/app/services/system/internal/conf"
 	"cyber-ecosystem/app/services/system/internal/data"
@@ -28,6 +30,7 @@ func wireApp(*conf.Server, *conf.Data, *slog.Logger) (*kratos.App, func(), error
 		service.ProviderSet,
 		platform.ProviderSet,
 		wire.Bind(new(biz.Transaction), new(*platform.Platform)),
+		wire.Bind(new(krauth.Authenticator), new(*biz.AuthUC)),
 		newApp,
 	))
 }

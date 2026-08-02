@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (cyber.ext.v1.method_comment) = "登录";
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/login"
+      body: "*"
+    };
+  }
+}
+
+// login
+message LoginRequest {
+  optional string email = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string password = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message LoginResponse {
+  string token = 1;
+}

@@ -11,14 +11,19 @@ import { file_google_protobuf_descriptor } from "@bufbuild/protobuf/wkt";
  * Describes the file ext/v1/access.proto.
  */
 export const file_ext_v1_access: GenFile = /*@__PURE__*/
-  fileDesc("ChNleHQvdjEvYWNjZXNzLnByb3RvEgxjeWJlci5leHQudjEqRQoGQWNjZXNzEhYKEkFDQ0VTU19VTlNQRUNJRklFRBAAEhEKDUFDQ0VTU19QVUJMSUMQARIQCgxBQ0NFU1NfQURNSU4QAjpNCgZhY2Nlc3MSHi5nb29nbGUucHJvdG9idWYuTWV0aG9kT3B0aW9ucxiRTiABKA4yFC5jeWJlci5leHQudjEuQWNjZXNzUgZhY2Nlc3NCJVojY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9leHQvdjFiBnByb3RvMw", [file_google_protobuf_descriptor]);
+  fileDesc("ChNleHQvdjEvYWNjZXNzLnByb3RvEgxjeWJlci5leHQudjEqVQoGQWNjZXNzEhYKEkFDQ0VTU19VTlNQRUNJRklFRBAAEhEKDUFDQ0VTU19QVUJMSUMQARIQCgxBQ0NFU1NfQURNSU4QAhIOCgpBQ0NFU1NfQVBQEAM6TQoGYWNjZXNzEh4uZ29vZ2xlLnByb3RvYnVmLk1ldGhvZE9wdGlvbnMYkU4gASgOMhQuY3liZXIuZXh0LnYxLkFjY2Vzc1IGYWNjZXNzQiVaI2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXh0L3YxYgZwcm90bzM", [file_google_protobuf_descriptor]);
 
 /**
- * Method access policy: who may call an RPC, and which middleware auth path
- * enforces it. Drives the auth selector. Unset (ACCESS_UNSPECIFIED) defaults to
- * ACCESS_ADMIN — deny-by-default; only public endpoints opt out with
- * ACCESS_PUBLIC. Future audiences (app/h5) add values here plus a matching
- * selector branch, no rework to existing methods.
+ * Method access policy: which audience may call an RPC. Each value is a label
+ * the auth selector matches (auth.MatchAccess) to pick a middleware chain. The
+ * enum is standalone — adding a value only enables a selector branch; it
+ * enforces nothing on its own. Wiring (which chain each audience gets, and what
+ * that chain does) lives in each service's server setup.
+ *   PUBLIC — opt out of auth (login, public endpoints)
+ *   ADMIN  — admin audience
+ *   APP    — app / end-user audience
+ * ACCESS_UNSPECIFIED is the zero value (no annotation set); how it is handled
+ * is the caller's decision, not the enum's.
  *
  * @generated from enum cyber.ext.v1.Access
  */
@@ -37,6 +42,11 @@ export enum Access {
    * @generated from enum value: ACCESS_ADMIN = 2;
    */
   ADMIN = 2,
+
+  /**
+   * @generated from enum value: ACCESS_APP = 3;
+   */
+  APP = 3,
 }
 
 /**

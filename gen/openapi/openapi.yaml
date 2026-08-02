@@ -77,6 +77,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.sample.v1.CreateSampleResponse'
+    /api/v1/system/auth/login:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.LoginResponse'
     /api/v1/system/items:
         get:
             tags:
@@ -281,6 +299,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ListResourceResponse'
+    /api/v1/system/users:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_CreateUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreateUserResponse'
+    /api/v1/system/users/{id}:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_GetUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetUserResponse'
 components:
     schemas:
         cyber.sample.v1.CreateSampleRequest:
@@ -345,6 +399,19 @@ components:
             properties:
                 id:
                     type: string
+        cyber.system.v1.CreateUserRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                password:
+                    type: string
+            description: create
+        cyber.system.v1.CreateUserResponse:
+            type: object
+            properties:
+                id:
+                    type: string
         cyber.system.v1.DeleteItemResponse:
             type: object
             properties: {}
@@ -353,6 +420,11 @@ components:
             properties:
                 item:
                     $ref: '#/components/schemas/cyber.system.v1.Item'
+        cyber.system.v1.GetUserResponse:
+            type: object
+            properties:
+                user:
+                    $ref: '#/components/schemas/cyber.system.v1.User'
         cyber.system.v1.Item:
             type: object
             properties:
@@ -388,6 +460,19 @@ components:
                         $ref: '#/components/schemas/cyber.system.v1.Service'
                     description: Service list.
             description: ListResource response.
+        cyber.system.v1.LoginRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                password:
+                    type: string
+            description: login
+        cyber.system.v1.LoginResponse:
+            type: object
+            properties:
+                token:
+                    type: string
         cyber.system.v1.Method:
             type: object
             properties:
@@ -483,10 +568,25 @@ components:
         cyber.system.v1.UpdateItemStatusResponse:
             type: object
             properties: {}
+        cyber.system.v1.User:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                email:
+                    type: string
 tags:
+    - name: AuthService
     - name: ItemService
     - name: ResourceService
       description: |-
         Resource introspection service. Lists all RPC service/method info by
          reflecting on the registered proto descriptors.
     - name: SampleService
+    - name: UserService

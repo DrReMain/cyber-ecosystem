@@ -69,6 +69,13 @@
         "cwd": "{projectRoot}",
         "command": "atlas migrate validate --dir \"file://internal/ent/migrate/migrations\""
       }
+    },
+    "migrate:hash": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "atlas migrate hash --dir \"file://internal/ent/migrate/migrations\""
+      }
     }
   }
 }

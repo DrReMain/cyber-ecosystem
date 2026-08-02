@@ -4,6 +4,7 @@ package cyber.system.v1;
 
 import "buf/validate/validate.proto";
 import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -14,6 +15,7 @@ option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 service ItemService {
   rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {
     option (cyber.ext.v1.method_comment) = "创建 Item";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {
       post: "/api/v1/system/items"
       body: "*"
@@ -21,6 +23,7 @@ service ItemService {
   }
   rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse) {
     option (cyber.ext.v1.method_comment) = "修改 Item";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {
       put: "/api/v1/system/items/{id}"
       body: "*"
@@ -28,6 +31,7 @@ service ItemService {
   }
   rpc UpdateItemStatus(UpdateItemStatusRequest) returns (UpdateItemStatusResponse) {
     option (cyber.ext.v1.method_comment) = "修改 Item 状态";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {
       patch: "/api/v1/system/items/{id}/status"
       body: "*"
@@ -35,18 +39,22 @@ service ItemService {
   }
   rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse) {
     option (cyber.ext.v1.method_comment) = "删除 Item";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {delete: "/api/v1/system/items/{id}"};
   }
   rpc ListItems(ListItemsRequest) returns (ListItemsResponse) {
     option (cyber.ext.v1.method_comment) = "查询 Item 列表";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {get: "/api/v1/system/items"};
   }
   rpc GetItem(GetItemRequest) returns (GetItemResponse) {
     option (cyber.ext.v1.method_comment) = "查询 Item 详情";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {get: "/api/v1/system/items/{id}"};
   }
   rpc SortItem(SortItemRequest) returns (SortItemResponse) {
     option (cyber.ext.v1.method_comment) = "排序 Item";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {
       patch: "/api/v1/system/items/{id}/sort"
       body: "*"

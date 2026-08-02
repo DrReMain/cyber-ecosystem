@@ -48,12 +48,6 @@ func (_c *ItemCreate) SetNillableUpdatedAt(v *time.Time) *ItemCreate {
 	return _c
 }
 
-// SetSort sets the "sort" field.
-func (_c *ItemCreate) SetSort(v string) *ItemCreate {
-	_c.mutation.SetSort(v)
-	return _c
-}
-
 // SetDeletedAt sets the "deleted_at" field.
 func (_c *ItemCreate) SetDeletedAt(v time.Time) *ItemCreate {
 	_c.mutation.SetDeletedAt(v)
@@ -65,6 +59,12 @@ func (_c *ItemCreate) SetNillableDeletedAt(v *time.Time) *ItemCreate {
 	if v != nil {
 		_c.SetDeletedAt(*v)
 	}
+	return _c
+}
+
+// SetSort sets the "sort" field.
+func (_c *ItemCreate) SetSort(v string) *ItemCreate {
+	_c.mutation.SetSort(v)
 	return _c
 }
 
@@ -268,13 +268,13 @@ func (_c *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_spec.SetField(item.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := _c.mutation.Sort(); ok {
-		_spec.SetField(item.FieldSort, field.TypeString, value)
-		_node.Sort = value
-	}
 	if value, ok := _c.mutation.DeletedAt(); ok {
 		_spec.SetField(item.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
+	}
+	if value, ok := _c.mutation.Sort(); ok {
+		_spec.SetField(item.FieldSort, field.TypeString, value)
+		_node.Sort = value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(item.FieldName, field.TypeString, value)

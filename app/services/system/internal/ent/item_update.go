@@ -35,20 +35,6 @@ func (_u *ItemUpdate) SetUpdatedAt(v time.Time) *ItemUpdate {
 	return _u
 }
 
-// SetSort sets the "sort" field.
-func (_u *ItemUpdate) SetSort(v string) *ItemUpdate {
-	_u.mutation.SetSort(v)
-	return _u
-}
-
-// SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *ItemUpdate) SetNillableSort(v *string) *ItemUpdate {
-	if v != nil {
-		_u.SetSort(*v)
-	}
-	return _u
-}
-
 // SetDeletedAt sets the "deleted_at" field.
 func (_u *ItemUpdate) SetDeletedAt(v time.Time) *ItemUpdate {
 	_u.mutation.SetDeletedAt(v)
@@ -66,6 +52,20 @@ func (_u *ItemUpdate) SetNillableDeletedAt(v *time.Time) *ItemUpdate {
 // ClearDeletedAt clears the value of the "deleted_at" field.
 func (_u *ItemUpdate) ClearDeletedAt() *ItemUpdate {
 	_u.mutation.ClearDeletedAt()
+	return _u
+}
+
+// SetSort sets the "sort" field.
+func (_u *ItemUpdate) SetSort(v string) *ItemUpdate {
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *ItemUpdate) SetNillableSort(v *string) *ItemUpdate {
+	if v != nil {
+		_u.SetSort(*v)
+	}
 	return _u
 }
 
@@ -199,14 +199,14 @@ func (_u *ItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(item.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(item.FieldSort, field.TypeString, value)
-	}
 	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(item.FieldDeletedAt, field.TypeTime, value)
 	}
 	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(item.FieldDeletedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(item.FieldSort, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(item.FieldName, field.TypeString, value)
@@ -245,20 +245,6 @@ func (_u *ItemUpdateOne) SetUpdatedAt(v time.Time) *ItemUpdateOne {
 	return _u
 }
 
-// SetSort sets the "sort" field.
-func (_u *ItemUpdateOne) SetSort(v string) *ItemUpdateOne {
-	_u.mutation.SetSort(v)
-	return _u
-}
-
-// SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *ItemUpdateOne) SetNillableSort(v *string) *ItemUpdateOne {
-	if v != nil {
-		_u.SetSort(*v)
-	}
-	return _u
-}
-
 // SetDeletedAt sets the "deleted_at" field.
 func (_u *ItemUpdateOne) SetDeletedAt(v time.Time) *ItemUpdateOne {
 	_u.mutation.SetDeletedAt(v)
@@ -276,6 +262,20 @@ func (_u *ItemUpdateOne) SetNillableDeletedAt(v *time.Time) *ItemUpdateOne {
 // ClearDeletedAt clears the value of the "deleted_at" field.
 func (_u *ItemUpdateOne) ClearDeletedAt() *ItemUpdateOne {
 	_u.mutation.ClearDeletedAt()
+	return _u
+}
+
+// SetSort sets the "sort" field.
+func (_u *ItemUpdateOne) SetSort(v string) *ItemUpdateOne {
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *ItemUpdateOne) SetNillableSort(v *string) *ItemUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
+	}
 	return _u
 }
 
@@ -439,14 +439,14 @@ func (_u *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) {
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(item.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(item.FieldSort, field.TypeString, value)
-	}
 	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(item.FieldDeletedAt, field.TypeTime, value)
 	}
 	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(item.FieldDeletedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(item.FieldSort, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(item.FieldName, field.TypeString, value)

@@ -793,7 +793,7 @@ var File_cyber_system_v1_item_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_item_proto_rawDesc = "" +
 	"\n" +
-	"\x1acyber/system/v1/item.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xd2\x02\n" +
+	"\x1acyber/system/v1/item.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xd2\x02\n" +
 	"\x04Item\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
 	"\n" +
@@ -858,18 +858,18 @@ const file_cyber_system_v1_item_proto_rawDesc = "" +
 	"\b_prev_idB\n" +
 	"\n" +
 	"\b_next_id\"\x12\n" +
-	"\x10SortItemResponse2\xf6\a\n" +
-	"\vItemService\x12\x85\x01\n" +
+	"\x10SortItemResponse2\x92\b\n" +
+	"\vItemService\x12\x89\x01\n" +
 	"\n" +
-	"CreateItem\x12\".cyber.system.v1.CreateItemRequest\x1a#.cyber.system.v1.CreateItemResponse\".\x8a\xd3\x0e\v创建 Item\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/system/items\x12\x8a\x01\n" +
+	"CreateItem\x12\".cyber.system.v1.CreateItemRequest\x1a#.cyber.system.v1.CreateItemResponse\"2\x88\xf1\x04\x02\x8a\xd3\x0e\v创建 Item\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/system/items\x12\x8e\x01\n" +
 	"\n" +
-	"UpdateItem\x12\".cyber.system.v1.UpdateItemRequest\x1a#.cyber.system.v1.UpdateItemResponse\"3\x8a\xd3\x0e\v修改 Item\x82\xd3\xe4\x93\x02\x1e:\x01*\x1a\x19/api/v1/system/items/{id}\x12\xaa\x01\n" +
-	"\x10UpdateItemStatus\x12(.cyber.system.v1.UpdateItemStatusRequest\x1a).cyber.system.v1.UpdateItemStatusResponse\"A\x8a\xd3\x0e\x12修改 Item 状态\x82\xd3\xe4\x93\x02%:\x01*2 /api/v1/system/items/{id}/status\x12\x87\x01\n" +
+	"UpdateItem\x12\".cyber.system.v1.UpdateItemRequest\x1a#.cyber.system.v1.UpdateItemResponse\"7\x88\xf1\x04\x02\x8a\xd3\x0e\v修改 Item\x82\xd3\xe4\x93\x02\x1e:\x01*\x1a\x19/api/v1/system/items/{id}\x12\xae\x01\n" +
+	"\x10UpdateItemStatus\x12(.cyber.system.v1.UpdateItemStatusRequest\x1a).cyber.system.v1.UpdateItemStatusResponse\"E\x88\xf1\x04\x02\x8a\xd3\x0e\x12修改 Item 状态\x82\xd3\xe4\x93\x02%:\x01*2 /api/v1/system/items/{id}/status\x12\x8b\x01\n" +
 	"\n" +
-	"DeleteItem\x12\".cyber.system.v1.DeleteItemRequest\x1a#.cyber.system.v1.DeleteItemResponse\"0\x8a\xd3\x0e\v删除 Item\x82\xd3\xe4\x93\x02\x1b*\x19/api/v1/system/items/{id}\x12\x86\x01\n" +
-	"\tListItems\x12!.cyber.system.v1.ListItemsRequest\x1a\".cyber.system.v1.ListItemsResponse\"2\x8a\xd3\x0e\x12查询 Item 列表\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/system/items\x12\x85\x01\n" +
-	"\aGetItem\x12\x1f.cyber.system.v1.GetItemRequest\x1a .cyber.system.v1.GetItemResponse\"7\x8a\xd3\x0e\x12查询 Item 详情\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/items/{id}\x12\x89\x01\n" +
-	"\bSortItem\x12 .cyber.system.v1.SortItemRequest\x1a!.cyber.system.v1.SortItemResponse\"8\x8a\xd3\x0e\v排序 Item\x82\xd3\xe4\x93\x02#:\x01*2\x1e/api/v1/system/items/{id}/sortB(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"DeleteItem\x12\".cyber.system.v1.DeleteItemRequest\x1a#.cyber.system.v1.DeleteItemResponse\"4\x88\xf1\x04\x02\x8a\xd3\x0e\v删除 Item\x82\xd3\xe4\x93\x02\x1b*\x19/api/v1/system/items/{id}\x12\x8a\x01\n" +
+	"\tListItems\x12!.cyber.system.v1.ListItemsRequest\x1a\".cyber.system.v1.ListItemsResponse\"6\x88\xf1\x04\x02\x8a\xd3\x0e\x12查询 Item 列表\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/system/items\x12\x89\x01\n" +
+	"\aGetItem\x12\x1f.cyber.system.v1.GetItemRequest\x1a .cyber.system.v1.GetItemResponse\";\x88\xf1\x04\x02\x8a\xd3\x0e\x12查询 Item 详情\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/items/{id}\x12\x8d\x01\n" +
+	"\bSortItem\x12 .cyber.system.v1.SortItemRequest\x1a!.cyber.system.v1.SortItemResponse\"<\x88\xf1\x04\x02\x8a\xd3\x0e\v排序 Item\x82\xd3\xe4\x93\x02#:\x01*2\x1e/api/v1/system/items/{id}/sortB(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_item_proto_rawDescOnce sync.Once

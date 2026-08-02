@@ -1,2 +1,4 @@
-h1:XgkGh2BuhkdtPBq4++cVnqqlGJtix8Ax5TyFZ/+p1oQ=
+h1:KmTgutqh66oTJbua7tpBHBTxJJUtjEXQAdC2wGXI0mo=
 20260731121904_init.sql h1:VUtNr6afz1BlEWwDTJdwDNK9m+XRCjA8Fmqxdn5Fmuk=
+20260802120544_create_user.sql h1:rKTSxngaKTZKXuT7Pa6kiQ/bJb1fwII+KdVtk4xwZgs=
+20260804153945_add_tenant_id.sql h1:opMqOkecVz7Bua0Wmc5qbfaDfEUlQCg/Yj9sadwjdbo=

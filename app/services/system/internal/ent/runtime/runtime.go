@@ -5,6 +5,7 @@ package runtime
 import (
 	"cyber-ecosystem/app/services/system/internal/ent/item"
 	"cyber-ecosystem/app/services/system/internal/ent/schema"
+	"cyber-ecosystem/app/services/system/internal/ent/user"
 	"time"
 )
 
@@ -17,8 +18,8 @@ func init() {
 	itemMixinHooks3 := itemMixin[3].Hooks()
 	item.Hooks[0] = itemMixinHooks2[0]
 	item.Hooks[1] = itemMixinHooks3[0]
-	itemMixinInters3 := itemMixin[3].Interceptors()
-	item.Interceptors[0] = itemMixinInters3[0]
+	itemMixinInters2 := itemMixin[2].Interceptors()
+	item.Interceptors[0] = itemMixinInters2[0]
 	itemMixinFields0 := itemMixin[0].Fields()
 	_ = itemMixinFields0
 	itemMixinFields1 := itemMixin[1].Fields()
@@ -71,6 +72,63 @@ func init() {
 	item.DefaultID = itemDescID.Default.(func() string)
 	// item.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	item.IDValidator = itemDescID.Validators[0].(func(string) error)
+	userMixin := schema.User{}.Mixin()
+	userMixinHooks2 := userMixin[2].Hooks()
+	user.Hooks[0] = userMixinHooks2[0]
+	userMixinInters2 := userMixin[2].Interceptors()
+	userMixinInters3 := userMixin[3].Interceptors()
+	user.Interceptors[0] = userMixinInters2[0]
+	user.Interceptors[1] = userMixinInters3[0]
+	userMixinFields0 := userMixin[0].Fields()
+	_ = userMixinFields0
+	userMixinFields1 := userMixin[1].Fields()
+	_ = userMixinFields1
+	userMixinFields3 := userMixin[3].Fields()
+	_ = userMixinFields3
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userMixinFields1[0].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUpdatedAt is the schema descriptor for updated_at field.
+	userDescUpdatedAt := userMixinFields1[1].Descriptor()
+	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// userDescTenantID is the schema descriptor for tenant_id field.
+	userDescTenantID := userMixinFields3[0].Descriptor()
+	// user.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	user.TenantIDValidator = userDescTenantID.Validators[0].(func(string) error)
+	// userDescEmail is the schema descriptor for email field.
+	userDescEmail := userFields[0].Descriptor()
+	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	user.EmailValidator = func() func(string) error {
+		validators := userDescEmail.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(email string) error {
+			for _, fn := range fns {
+				if err := fn(email); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// userDescPasswordHash is the schema descriptor for password_hash field.
+	userDescPasswordHash := userFields[1].Descriptor()
+	// user.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
+	user.PasswordHashValidator = userDescPasswordHash.Validators[0].(func(string) error)
+	// userDescID is the schema descriptor for id field.
+	userDescID := userMixinFields0[0].Descriptor()
+	// user.DefaultID holds the default value on creation for the id field.
+	user.DefaultID = userDescID.Default.(func() string)
+	// user.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	user.IDValidator = userDescID.Validators[0].(func(string) error)
 }
 
 const (

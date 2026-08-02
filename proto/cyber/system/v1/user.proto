@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (cyber.ext.v1.method_comment) = "创建用户";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/users"
+      body: "*"
+    };
+  }
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (cyber.ext.v1.method_comment) = "查询用户详情";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/users/{id}"};
+  }
+}
+
+message User {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue email = 4;
+}
+
+// create
+message CreateUserRequest {
+  optional string email = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string password = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message CreateUserResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+// get
+message GetUserRequest {
+  optional string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetUserResponse {
+  User user = 1;
+}

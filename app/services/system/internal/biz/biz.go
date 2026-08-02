@@ -17,6 +17,8 @@ type UC struct {
 }
 
 var ProviderSet = wire.NewSet(
+	NewAuthUC,
 	NewItemUC,
 	NewResourceUC,
+	NewUserUC,
 )

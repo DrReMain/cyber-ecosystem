@@ -32,10 +32,10 @@ func (Item) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
 		mixins.CreatedUpdatedMixin{},
+		local_mixins.SoftDeleteMixin{},
 		// Table must match the entsql table annotation below; SortMixin queries
 		// max(sort) by table name to auto-assign a key on create.
 		local_mixins.SortMixin{SoftDelete: true, Table: "item"},
-		local_mixins.SoftDeleteMixin{},
 	}
 }
 

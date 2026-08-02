@@ -9,11 +9,16 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware/metadata"
 	"github.com/go-kratos/kratos/v3/middleware/ratelimit"
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
+	"github.com/go-kratos/kratos/v3/middleware/selector"
 	"github.com/go-kratos/kratos/v3/transport/http"
 
 	"cyber-ecosystem/shared-go/kratos/middleware/sanitize"
 	"cyber-ecosystem/shared-go/kratos/middleware/validator"
 	"cyber-ecosystem/shared-go/kratos/observability"
+	"cyber-ecosystem/shared-go/kratos/security"
+	krauth "cyber-ecosystem/shared-go/kratos/security/auth"
+
+	extv1 "cyber-ecosystem/gen/go/cyber/ext/v1"
 
 	"cyber-ecosystem/app/services/system/internal/conf"
 	"cyber-ecosystem/app/services/system/internal/service"
@@ -23,6 +28,7 @@ func NewHTTPServer(
 	c *conf.Server,
 	logger *slog.Logger,
 	registrar []service.Registrar,
+	authn krauth.Authenticator,
 ) *http.Server {
 	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, sanitize.Server())
@@ -32,6 +38,10 @@ func NewHTTPServer(
 	middlewares = append(middlewares, recovery.Recovery(recovery.WithLogger(observability.PrettyProto(logger))))
 	middlewares = append(middlewares, ratelimit.Server())
 	middlewares = append(middlewares, metadata.Server())
+	middlewares = append(middlewares, selector.Server(
+		krauth.BearerAuth(authn),
+	).Match(security.MatchAccess(extv1.Access_ACCESS_ADMIN)).Build())
+	middlewares = append(middlewares, selector.Server(security.DefaultGuard()).Match(security.MatchAccess(extv1.Access_ACCESS_UNSPECIFIED)).Build())
 	middlewares = append(middlewares, validator.Server())
 
 	var opts = []http.ServerOption{

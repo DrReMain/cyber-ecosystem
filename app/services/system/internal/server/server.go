@@ -7,6 +7,8 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/middleware/sanitize"
 	"cyber-ecosystem/shared-go/kratos/middleware/validator"
+	"cyber-ecosystem/shared-go/kratos/security"
+	krauth "cyber-ecosystem/shared-go/kratos/security/auth"
 
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 )
@@ -18,6 +20,10 @@ func init() {
 	recovery.ErrUnknownRequest = errorspb.ErrorGeneralErrorUnspecified("").WithCause(recovery.ErrUnknownRequest)
 	ratelimit.ErrLimitExceed = errorspb.ErrorFlowErrorRateLimited("").WithCause(ratelimit.ErrLimitExceed)
 	validator.ErrValidator = errorspb.ErrorGeneralErrorValidationFailed("").WithCause(validator.ErrValidator)
+
+	security.ErrMissingANNOTATION = errorspb.ErrorGeneralErrorUnavailable("").WithCause(security.ErrMissingANNOTATION)
+	krauth.ErrMissingToken = errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(krauth.ErrMissingToken)
+	krauth.ErrInvalidToken = errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(krauth.ErrInvalidToken)
 }
 
 var ProviderSet = wire.NewSet(NewGRPCServer, NewHTTPServer, NewConnectServer)

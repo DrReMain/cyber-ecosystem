@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"cyber-ecosystem/app/services/system/internal/ent/item"
+	"cyber-ecosystem/app/services/system/internal/ent/user"
 	"errors"
 	"fmt"
 	"reflect"
@@ -74,6 +75,7 @@ func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			item.Table: item.ValidColumn,
+			user.Table: user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

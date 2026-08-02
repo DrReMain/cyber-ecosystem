@@ -14,8 +14,8 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "sort", Type: field.TypeString, Comment: "fractional index for ordering", Collation: "C"},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "sort", Type: field.TypeString, Comment: "fractional index for ordering", Collation: "C"},
 		{Name: "name", Type: field.TypeString, Size: 64},
 		{Name: "description", Type: field.TypeString, Size: 1024, Default: ""},
 		{Name: "status", Type: field.TypeString, Size: 10, Comment: "active/inactive", Default: "active"},
@@ -39,7 +39,7 @@ var (
 			{
 				Name:    "item_sort",
 				Unique:  true,
-				Columns: []*schema.Column{ItemColumns[3]},
+				Columns: []*schema.Column{ItemColumns[4]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "deleted_at IS NULL",
 				},
@@ -54,14 +54,54 @@ var (
 			},
 		},
 	}
+	// UserColumns holds the columns for the "user" table.
+	UserColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20},
+		{Name: "email", Type: field.TypeString, Size: 128},
+		{Name: "password_hash", Type: field.TypeString, Size: 128},
+	}
+	// UserTable holds the schema information for the "user" table.
+	UserTable = &schema.Table{
+		Name:       "user",
+		Columns:    UserColumns,
+		PrimaryKey: []*schema.Column{UserColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "user_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{UserColumns[1]},
+			},
+			{
+				Name:    "user_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{UserColumns[2]},
+			},
+			{
+				Name:    "user_tenant_id_email",
+				Unique:  true,
+				Columns: []*schema.Column{UserColumns[4], UserColumns[5]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ItemTable,
+		UserTable,
 	}
 )
 
 func init() {
 	ItemTable.Annotation = &entsql.Annotation{
 		Table: "item",
+	}
+	UserTable.Annotation = &entsql.Annotation{
+		Table: "user",
 	}
 }
