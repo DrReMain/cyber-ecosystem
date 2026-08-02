@@ -4,7 +4,7 @@ go 1.25.0
 
 tool (
 	connectrpc.com/connect/cmd/protoc-gen-connect-go
-	cyber-ecosystem/shared-go/kratos/cmd/protoc-gen-go-connect
+	cyber-ecosystem/shared-go/codegen/cmd/protoc-gen-go-connect
 	github.com/daixiang0/gci
 	github.com/go-kratos/kratos/cmd/kratos/v3
 	github.com/go-kratos/kratos/cmd/protoc-gen-go-errors/v3

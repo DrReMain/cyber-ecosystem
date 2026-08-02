@@ -1,7 +1,7 @@
 package platform
 
 import (
-	"cyber-ecosystem/shared-go/mq"
+	"cyber-ecosystem/shared-go/capability/mq"
 
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 )

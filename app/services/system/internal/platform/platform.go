@@ -5,10 +5,10 @@ import (
 
 	"github.com/google/wire"
 
-	"cyber-ecosystem/shared-go/cache"
-	"cyber-ecosystem/shared-go/mq"
+	"cyber-ecosystem/shared-go/capability/cache"
+	"cyber-ecosystem/shared-go/capability/mq"
+	"cyber-ecosystem/shared-go/capability/storage"
 	"cyber-ecosystem/shared-go/orm/ent/entutil"
-	"cyber-ecosystem/shared-go/storage"
 
 	"cyber-ecosystem/app/services/system/internal/ent"
 )

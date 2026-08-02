@@ -28,7 +28,7 @@ import (
 	"go.opentelemetry.io/otel/semconv/v1.27.0"
 	"go.opentelemetry.io/otel/trace"
 
-	"cyber-ecosystem/shared-go/mq"
+	"cyber-ecosystem/shared-go/capability/mq"
 )
 
 // dbAttr is the static db.system attribute reused across SQL helpers. Pinned to

@@ -3,9 +3,9 @@ package platform
 import (
 	"fmt"
 
+	"cyber-ecosystem/shared-go/capability/storage"
+	storageS3 "cyber-ecosystem/shared-go/capability/storage/s3"
 	"cyber-ecosystem/shared-go/kratos/observability"
-	"cyber-ecosystem/shared-go/storage"
-	storageS3 "cyber-ecosystem/shared-go/storage/s3"
 
 	"cyber-ecosystem/app/services/system/internal/conf"
 )

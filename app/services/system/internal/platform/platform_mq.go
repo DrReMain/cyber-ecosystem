@@ -3,10 +3,10 @@ package platform
 import (
 	"fmt"
 
+	"cyber-ecosystem/shared-go/capability/mq"
+	mqnats "cyber-ecosystem/shared-go/capability/mq/nats"
+	mqpg "cyber-ecosystem/shared-go/capability/mq/pg"
 	"cyber-ecosystem/shared-go/kratos/observability"
-	"cyber-ecosystem/shared-go/mq"
-	mqnats "cyber-ecosystem/shared-go/mq/nats"
-	mqpg "cyber-ecosystem/shared-go/mq/pg"
 
 	"cyber-ecosystem/app/services/system/internal/conf"
 )

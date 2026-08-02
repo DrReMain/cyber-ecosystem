@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log/slog"
 
-	"cyber-ecosystem/shared-go/cache"
-	cacheredis "cyber-ecosystem/shared-go/cache/redis"
+	"cyber-ecosystem/shared-go/capability/cache"
+	cacheredis "cyber-ecosystem/shared-go/capability/cache/redis"
 	"cyber-ecosystem/shared-go/kratos/observability"
 
 	"cyber-ecosystem/app/services/system/internal/conf"

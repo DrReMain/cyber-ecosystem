@@ -1,7 +1,7 @@
 package platform
 
 import (
-	"cyber-ecosystem/shared-go/storage"
+	"cyber-ecosystem/shared-go/capability/storage"
 
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 )
