@@ -3,6 +3,7 @@
 package runtime
 
 import (
+	"cyber-ecosystem/app/services/system/internal/ent/dept"
 	"cyber-ecosystem/app/services/system/internal/ent/item"
 	"cyber-ecosystem/app/services/system/internal/ent/schema"
 	"cyber-ecosystem/app/services/system/internal/ent/user"
@@ -13,6 +14,59 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	deptMixin := schema.Dept{}.Mixin()
+	deptMixinHooks2 := deptMixin[2].Hooks()
+	dept.Hooks[0] = deptMixinHooks2[0]
+	deptMixinInters2 := deptMixin[2].Interceptors()
+	deptMixinInters3 := deptMixin[3].Interceptors()
+	dept.Interceptors[0] = deptMixinInters2[0]
+	dept.Interceptors[1] = deptMixinInters3[0]
+	deptMixinFields0 := deptMixin[0].Fields()
+	_ = deptMixinFields0
+	deptMixinFields1 := deptMixin[1].Fields()
+	_ = deptMixinFields1
+	deptMixinFields3 := deptMixin[3].Fields()
+	_ = deptMixinFields3
+	deptFields := schema.Dept{}.Fields()
+	_ = deptFields
+	// deptDescCreatedAt is the schema descriptor for created_at field.
+	deptDescCreatedAt := deptMixinFields1[0].Descriptor()
+	// dept.DefaultCreatedAt holds the default value on creation for the created_at field.
+	dept.DefaultCreatedAt = deptDescCreatedAt.Default.(func() time.Time)
+	// deptDescUpdatedAt is the schema descriptor for updated_at field.
+	deptDescUpdatedAt := deptMixinFields1[1].Descriptor()
+	// dept.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	dept.DefaultUpdatedAt = deptDescUpdatedAt.Default.(func() time.Time)
+	// dept.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	dept.UpdateDefaultUpdatedAt = deptDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// deptDescTenantID is the schema descriptor for tenant_id field.
+	deptDescTenantID := deptMixinFields3[0].Descriptor()
+	// dept.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	dept.TenantIDValidator = deptDescTenantID.Validators[0].(func(string) error)
+	// deptDescName is the schema descriptor for name field.
+	deptDescName := deptFields[0].Descriptor()
+	// dept.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	dept.NameValidator = func() func(string) error {
+		validators := deptDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// deptDescID is the schema descriptor for id field.
+	deptDescID := deptMixinFields0[0].Descriptor()
+	// dept.DefaultID holds the default value on creation for the id field.
+	dept.DefaultID = deptDescID.Default.(func() string)
+	// dept.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	dept.IDValidator = deptDescID.Validators[0].(func(string) error)
 	itemMixin := schema.Item{}.Mixin()
 	itemMixinHooks2 := itemMixin[2].Hooks()
 	itemMixinHooks3 := itemMixin[3].Hooks()
@@ -123,6 +177,10 @@ func init() {
 	userDescPasswordHash := userFields[1].Descriptor()
 	// user.PasswordHashValidator is a validator for the "password_hash" field. It is called by the builders before save.
 	user.PasswordHashValidator = userDescPasswordHash.Validators[0].(func(string) error)
+	// userDescDeptID is the schema descriptor for dept_id field.
+	userDescDeptID := userFields[2].Descriptor()
+	// user.DeptIDValidator is a validator for the "dept_id" field. It is called by the builders before save.
+	user.DeptIDValidator = userDescDeptID.Validators[0].(func(string) error)
 	// userDescID is the schema descriptor for id field.
 	userDescID := userMixinFields0[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.

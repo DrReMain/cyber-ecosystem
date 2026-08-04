@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service DeptService {
+  rpc CreateDept(CreateDeptRequest) returns (CreateDeptResponse) {
+    option (cyber.ext.v1.method_comment) = "创建部门";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/depts"
+      body: "*"
+    };
+  }
+  rpc UpdateDept(UpdateDeptRequest) returns (UpdateDeptResponse) {
+    option (cyber.ext.v1.method_comment) = "修改部门";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/system/depts/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteDept(DeleteDeptRequest) returns (DeleteDeptResponse) {
+    option (cyber.ext.v1.method_comment) = "删除部门";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {delete: "/api/v1/system/depts/{id}"};
+  }
+  rpc ListDepts(ListDeptsRequest) returns (ListDeptsResponse) {
+    option (cyber.ext.v1.method_comment) = "查询部门列表";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/depts"};
+  }
+  rpc GetDept(GetDeptRequest) returns (GetDeptResponse) {
+    option (cyber.ext.v1.method_comment) = "查询部门详情";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/depts/{id}"};
+  }
+}
+
+message Dept {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue name = 4;
+}
+
+// create
+message CreateDeptRequest {
+  optional string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message CreateDeptResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+// update
+message UpdateDeptRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string name = 2;
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+  }];
+}
+
+message UpdateDeptResponse {}
+
+// delete
+message DeleteDeptRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message DeleteDeptResponse {}
+
+// list
+message ListDeptsRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional string name = 2;
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListDeptsRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(name|createdAt|updatedAt):(asc|desc)$'))"
+  }];
+}
+
+message ListDeptsResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated Dept list = 2;
+}
+
+// get
+message GetDeptRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetDeptResponse {
+  Dept dept = 1;
+}

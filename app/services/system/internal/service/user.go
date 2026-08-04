@@ -46,7 +46,7 @@ func (s *UserService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *UserService) CreateUser(ctx context.Context, in *systempb.CreateUserRequest) (*systempb.CreateUserResponse, error) {
-	created, err := s.userUC.Create(ctx, *in.Email, *in.Password)
+	created, err := s.userUC.Create(ctx, *in.Email, *in.Password, in.DeptId)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (s *UserService) CreateUser(ctx context.Context, in *systempb.CreateUserReq
 }
 
 func (s *UserService) GetUser(ctx context.Context, in *systempb.GetUserRequest) (*systempb.GetUserResponse, error) {
-	a, err := s.userUC.Get(ctx, *in.Id)
+	a, err := s.userUC.Get(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -73,5 +73,6 @@ func (s *UserService) userToProto(a *biz.User) *systempb.User {
 		CreatedAt: utils.ToTimestamp(&a.CreatedAt),
 		UpdatedAt: utils.ToTimestamp(&a.UpdatedAt),
 		Email:     utils.StringW(a.Email),
+		DeptId:    utils.Wrap(a.DeptID, utils.StringW),
 	}
 }

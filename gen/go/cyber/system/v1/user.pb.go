@@ -32,6 +32,7 @@ type User struct {
 	CreatedAt     *timestamppb.Timestamp  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Email         *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	DeptId        *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=dept_id,json=deptId,proto3" json:"dept_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -94,11 +95,19 @@ func (x *User) GetEmail() *wrapperspb.StringValue {
 	return nil
 }
 
+func (x *User) GetDeptId() *wrapperspb.StringValue {
+	if x != nil {
+		return x.DeptId
+	}
+	return nil
+}
+
 // create
 type CreateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         *string                `protobuf:"bytes,1,opt,name=email,proto3,oneof" json:"email,omitempty"`
 	Password      *string                `protobuf:"bytes,2,opt,name=password,proto3,oneof" json:"password,omitempty"`
+	DeptId        *string                `protobuf:"bytes,3,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -143,6 +152,13 @@ func (x *CreateUserRequest) GetEmail() string {
 func (x *CreateUserRequest) GetPassword() string {
 	if x != nil && x.Password != nil {
 		return *x.Password
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetDeptId() string {
+	if x != nil && x.DeptId != nil {
+		return *x.DeptId
 	}
 	return ""
 }
@@ -194,7 +210,7 @@ func (x *CreateUserResponse) GetId() *wrapperspb.StringValue {
 // get
 type GetUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -230,8 +246,8 @@ func (*GetUserRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *GetUserRequest) GetId() string {
-	if x != nil && x.Id != nil {
-		return *x.Id
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
@@ -284,26 +300,29 @@ var File_cyber_system_v1_user_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x1acyber/system/v1/user.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xde\x01\n" +
+	"\x1acyber/system/v1/user.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x95\x02\n" +
 	"\x04User\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
 	"\n" +
 	"created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x122\n" +
-	"\x05email\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\"~\n" +
+	"\x05email\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\x125\n" +
+	"\adept_id\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\x06deptId\"\xa8\x01\n" +
 	"\x11CreateUserRequest\x12%\n" +
 	"\x05email\x18\x01 \x01(\tB\n" +
 	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\x05email\x88\x01\x01\x12+\n" +
 	"\bpassword\x18\x02 \x01(\tB\n" +
-	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x01R\bpassword\x88\x01\x01B\b\n" +
+	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x01R\bpassword\x88\x01\x01\x12\x1c\n" +
+	"\adept_id\x18\x03 \x01(\tH\x02R\x06deptId\x88\x01\x01B\b\n" +
 	"\x06_emailB\v\n" +
-	"\t_password\"B\n" +
+	"\t_passwordB\n" +
+	"\n" +
+	"\b_dept_id\"B\n" +
 	"\x12CreateUserResponse\x12,\n" +
-	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"9\n" +
-	"\x0eGetUserRequest\x12 \n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01B\x05\n" +
-	"\x03_id\"<\n" +
+	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"-\n" +
+	"\x0eGetUserRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"<\n" +
 	"\x0fGetUserResponse\x12)\n" +
 	"\x04user\x18\x01 \x01(\v2\x15.cyber.system.v1.UserR\x04user2\xa6\x02\n" +
 	"\vUserService\x12\x8a\x01\n" +
@@ -338,17 +357,18 @@ var file_cyber_system_v1_user_proto_depIdxs = []int32{
 	6, // 1: cyber.system.v1.User.created_at:type_name -> google.protobuf.Timestamp
 	6, // 2: cyber.system.v1.User.updated_at:type_name -> google.protobuf.Timestamp
 	5, // 3: cyber.system.v1.User.email:type_name -> google.protobuf.StringValue
-	5, // 4: cyber.system.v1.CreateUserResponse.id:type_name -> google.protobuf.StringValue
-	0, // 5: cyber.system.v1.GetUserResponse.user:type_name -> cyber.system.v1.User
-	1, // 6: cyber.system.v1.UserService.CreateUser:input_type -> cyber.system.v1.CreateUserRequest
-	3, // 7: cyber.system.v1.UserService.GetUser:input_type -> cyber.system.v1.GetUserRequest
-	2, // 8: cyber.system.v1.UserService.CreateUser:output_type -> cyber.system.v1.CreateUserResponse
-	4, // 9: cyber.system.v1.UserService.GetUser:output_type -> cyber.system.v1.GetUserResponse
-	8, // [8:10] is the sub-list for method output_type
-	6, // [6:8] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	5, // 4: cyber.system.v1.User.dept_id:type_name -> google.protobuf.StringValue
+	5, // 5: cyber.system.v1.CreateUserResponse.id:type_name -> google.protobuf.StringValue
+	0, // 6: cyber.system.v1.GetUserResponse.user:type_name -> cyber.system.v1.User
+	1, // 7: cyber.system.v1.UserService.CreateUser:input_type -> cyber.system.v1.CreateUserRequest
+	3, // 8: cyber.system.v1.UserService.GetUser:input_type -> cyber.system.v1.GetUserRequest
+	2, // 9: cyber.system.v1.UserService.CreateUser:output_type -> cyber.system.v1.CreateUserResponse
+	4, // 10: cyber.system.v1.UserService.GetUser:output_type -> cyber.system.v1.GetUserResponse
+	9, // [9:11] is the sub-list for method output_type
+	7, // [7:9] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_user_proto_init() }
@@ -357,7 +377,6 @@ func file_cyber_system_v1_user_proto_init() {
 		return
 	}
 	file_cyber_system_v1_user_proto_msgTypes[1].OneofWrappers = []any{}
-	file_cyber_system_v1_user_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

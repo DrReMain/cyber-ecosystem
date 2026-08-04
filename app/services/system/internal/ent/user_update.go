@@ -83,6 +83,26 @@ func (_u *UserUpdate) SetNillablePasswordHash(v *string) *UserUpdate {
 	return _u
 }
 
+// SetDeptID sets the "dept_id" field.
+func (_u *UserUpdate) SetDeptID(v string) *UserUpdate {
+	_u.mutation.SetDeptID(v)
+	return _u
+}
+
+// SetNillableDeptID sets the "dept_id" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableDeptID(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetDeptID(*v)
+	}
+	return _u
+}
+
+// ClearDeptID clears the value of the "dept_id" field.
+func (_u *UserUpdate) ClearDeptID() *UserUpdate {
+	_u.mutation.ClearDeptID()
+	return _u
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdate) Mutation() *UserMutation {
 	return _u.mutation
@@ -142,6 +162,11 @@ func (_u *UserUpdate) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.DeptID(); ok {
+		if err := user.DeptIDValidator(v); err != nil {
+			return &ValidationError{Name: "dept_id", err: fmt.Errorf(`ent: validator failed for field "User.dept_id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -177,6 +202,12 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.PasswordHash(); ok {
 		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.DeptID(); ok {
+		_spec.SetField(user.FieldDeptID, field.TypeString, value)
+	}
+	if _u.mutation.DeptIDCleared() {
+		_spec.ClearField(user.FieldDeptID, field.TypeString)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -254,6 +285,26 @@ func (_u *UserUpdateOne) SetNillablePasswordHash(v *string) *UserUpdateOne {
 	return _u
 }
 
+// SetDeptID sets the "dept_id" field.
+func (_u *UserUpdateOne) SetDeptID(v string) *UserUpdateOne {
+	_u.mutation.SetDeptID(v)
+	return _u
+}
+
+// SetNillableDeptID sets the "dept_id" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableDeptID(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetDeptID(*v)
+	}
+	return _u
+}
+
+// ClearDeptID clears the value of the "dept_id" field.
+func (_u *UserUpdateOne) ClearDeptID() *UserUpdateOne {
+	_u.mutation.ClearDeptID()
+	return _u
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdateOne) Mutation() *UserMutation {
 	return _u.mutation
@@ -326,6 +377,11 @@ func (_u *UserUpdateOne) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.DeptID(); ok {
+		if err := user.DeptIDValidator(v); err != nil {
+			return &ValidationError{Name: "dept_id", err: fmt.Errorf(`ent: validator failed for field "User.dept_id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -378,6 +434,12 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	}
 	if value, ok := _u.mutation.PasswordHash(); ok {
 		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.DeptID(); ok {
+		_spec.SetField(user.FieldDeptID, field.TypeString, value)
+	}
+	if _u.mutation.DeptIDCleared() {
+		_spec.ClearField(user.FieldDeptID, field.TypeString)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &User{config: _u.config}

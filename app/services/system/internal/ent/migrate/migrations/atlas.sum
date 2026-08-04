@@ -1,4 +1,6 @@
-h1:KmTgutqh66oTJbua7tpBHBTxJJUtjEXQAdC2wGXI0mo=
+h1:FZmdW3KAEI2d5TQvqywbGWs224bpbmZzP5gC9AW100M=
 20260731121904_init.sql h1:VUtNr6afz1BlEWwDTJdwDNK9m+XRCjA8Fmqxdn5Fmuk=
 20260802120544_create_user.sql h1:rKTSxngaKTZKXuT7Pa6kiQ/bJb1fwII+KdVtk4xwZgs=
 20260804153945_add_tenant_id.sql h1:opMqOkecVz7Bua0Wmc5qbfaDfEUlQCg/Yj9sadwjdbo=
+20260805142206_changes.sql h1:+Xwd9lo2Za5tECmGaW/lfBkG2k58adLCxlt2EFuouPI=
+20260805163111_changes.sql h1:pXWrU0H6wQAnEOjAELRiDhusrDwTmugDouWZBVZAjC0=

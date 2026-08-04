@@ -211,7 +211,7 @@ func (x *CreateItemResponse) GetId() *wrapperspb.StringValue {
 // update
 type UpdateItemRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          *string                `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	Description   *string                `protobuf:"bytes,3,opt,name=description,proto3,oneof" json:"description,omitempty"`
 	FieldsMask    []string               `protobuf:"bytes,100,rep,name=fields_mask,json=fieldsMask,proto3" json:"fields_mask,omitempty"`
@@ -250,8 +250,8 @@ func (*UpdateItemRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *UpdateItemRequest) GetId() string {
-	if x != nil && x.Id != nil {
-		return *x.Id
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
@@ -316,7 +316,7 @@ func (*UpdateItemResponse) Descriptor() ([]byte, []int) {
 // delete
 type DeleteItemRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -352,8 +352,8 @@ func (*DeleteItemRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *DeleteItemRequest) GetId() string {
-	if x != nil && x.Id != nil {
-		return *x.Id
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
@@ -394,95 +394,6 @@ func (*DeleteItemResponse) Descriptor() ([]byte, []int) {
 	return file_cyber_system_v1_item_proto_rawDescGZIP(), []int{6}
 }
 
-// get
-type GetItemRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetItemRequest) Reset() {
-	*x = GetItemRequest{}
-	mi := &file_cyber_system_v1_item_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetItemRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetItemRequest) ProtoMessage() {}
-
-func (x *GetItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_item_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetItemRequest.ProtoReflect.Descriptor instead.
-func (*GetItemRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_item_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *GetItemRequest) GetId() string {
-	if x != nil && x.Id != nil {
-		return *x.Id
-	}
-	return ""
-}
-
-type GetItemResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Item          *Item                  `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetItemResponse) Reset() {
-	*x = GetItemResponse{}
-	mi := &file_cyber_system_v1_item_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetItemResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetItemResponse) ProtoMessage() {}
-
-func (x *GetItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_item_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetItemResponse.ProtoReflect.Descriptor instead.
-func (*GetItemResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_item_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *GetItemResponse) GetItem() *Item {
-	if x != nil {
-		return x.Item
-	}
-	return nil
-}
-
 // list
 type ListItemsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -496,7 +407,7 @@ type ListItemsRequest struct {
 
 func (x *ListItemsRequest) Reset() {
 	*x = ListItemsRequest{}
-	mi := &file_cyber_system_v1_item_proto_msgTypes[9]
+	mi := &file_cyber_system_v1_item_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -508,7 +419,7 @@ func (x *ListItemsRequest) String() string {
 func (*ListItemsRequest) ProtoMessage() {}
 
 func (x *ListItemsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_item_proto_msgTypes[9]
+	mi := &file_cyber_system_v1_item_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -521,7 +432,7 @@ func (x *ListItemsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListItemsRequest.ProtoReflect.Descriptor instead.
 func (*ListItemsRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_item_proto_rawDescGZIP(), []int{9}
+	return file_cyber_system_v1_item_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListItemsRequest) GetPage() *v1.PageRequest {
@@ -562,7 +473,7 @@ type ListItemsResponse struct {
 
 func (x *ListItemsResponse) Reset() {
 	*x = ListItemsResponse{}
-	mi := &file_cyber_system_v1_item_proto_msgTypes[10]
+	mi := &file_cyber_system_v1_item_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -574,7 +485,7 @@ func (x *ListItemsResponse) String() string {
 func (*ListItemsResponse) ProtoMessage() {}
 
 func (x *ListItemsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_item_proto_msgTypes[10]
+	mi := &file_cyber_system_v1_item_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -587,7 +498,7 @@ func (x *ListItemsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListItemsResponse.ProtoReflect.Descriptor instead.
 func (*ListItemsResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_item_proto_rawDescGZIP(), []int{10}
+	return file_cyber_system_v1_item_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListItemsResponse) GetPage() *v1.PageResponse {
@@ -604,10 +515,99 @@ func (x *ListItemsResponse) GetList() []*Item {
 	return nil
 }
 
+// get
+type GetItemRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetItemRequest) Reset() {
+	*x = GetItemRequest{}
+	mi := &file_cyber_system_v1_item_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetItemRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetItemRequest) ProtoMessage() {}
+
+func (x *GetItemRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_item_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetItemRequest.ProtoReflect.Descriptor instead.
+func (*GetItemRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_item_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetItemRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetItemResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Item          *Item                  `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetItemResponse) Reset() {
+	*x = GetItemResponse{}
+	mi := &file_cyber_system_v1_item_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetItemResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetItemResponse) ProtoMessage() {}
+
+func (x *GetItemResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_item_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetItemResponse.ProtoReflect.Descriptor instead.
+func (*GetItemResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_item_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetItemResponse) GetItem() *Item {
+	if x != nil {
+		return x.Item
+	}
+	return nil
+}
+
 // other
 type UpdateItemStatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Status        *string                `protobuf:"bytes,2,opt,name=status,proto3,oneof" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -644,8 +644,8 @@ func (*UpdateItemStatusRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *UpdateItemStatusRequest) GetId() string {
-	if x != nil && x.Id != nil {
-		return *x.Id
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
@@ -695,7 +695,7 @@ func (*UpdateItemStatusResponse) Descriptor() ([]byte, []int) {
 
 type SortItemRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	PrevId        *string                `protobuf:"bytes,2,opt,name=prev_id,json=prevId,proto3,oneof" json:"prev_id,omitempty"`
 	NextId        *string                `protobuf:"bytes,3,opt,name=next_id,json=nextId,proto3,oneof" json:"next_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -733,8 +733,8 @@ func (*SortItemRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *SortItemRequest) GetId() string {
-	if x != nil && x.Id != nil {
-		return *x.Id
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
@@ -810,27 +810,20 @@ const file_cyber_system_v1_item_proto_rawDesc = "" +
 	"\x05_nameB\x0e\n" +
 	"\f_description\"B\n" +
 	"\x12CreateItemResponse\x12,\n" +
-	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"\xc2\x01\n" +
-	"\x11UpdateItemRequest\x12 \n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01\x12\x17\n" +
-	"\x04name\x18\x02 \x01(\tH\x01R\x04name\x88\x01\x01\x12%\n" +
-	"\vdescription\x18\x03 \x01(\tH\x02R\vdescription\x88\x01\x01\x12+\n" +
+	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"\xb6\x01\n" +
+	"\x11UpdateItemRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\x12\x17\n" +
+	"\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x12%\n" +
+	"\vdescription\x18\x03 \x01(\tH\x01R\vdescription\x88\x01\x01\x12+\n" +
 	"\vfields_mask\x18d \x03(\tB\n" +
 	"\xbaH\a\x92\x01\x04\b\x01\x18\x01R\n" +
-	"fieldsMaskB\x05\n" +
-	"\x03_idB\a\n" +
+	"fieldsMaskB\a\n" +
 	"\x05_nameB\x0e\n" +
 	"\f_description\"\x14\n" +
-	"\x12UpdateItemResponse\"<\n" +
-	"\x11DeleteItemRequest\x12 \n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01B\x05\n" +
-	"\x03_id\"\x14\n" +
-	"\x12DeleteItemResponse\"9\n" +
-	"\x0eGetItemRequest\x12 \n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01B\x05\n" +
-	"\x03_id\"<\n" +
-	"\x0fGetItemResponse\x12)\n" +
-	"\x04item\x18\x01 \x01(\v2\x15.cyber.system.v1.ItemR\x04item\"\xd2\x02\n" +
+	"\x12UpdateItemResponse\"0\n" +
+	"\x11DeleteItemRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"\x14\n" +
+	"\x12DeleteItemResponse\"\xd2\x02\n" +
 	"\x10ListItemsRequest\x127\n" +
 	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12\x17\n" +
 	"\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x124\n" +
@@ -841,19 +834,21 @@ const file_cyber_system_v1_item_proto_rawDesc = "" +
 	"\a_status\"x\n" +
 	"\x11ListItemsResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x12)\n" +
-	"\x04list\x18\x02 \x03(\v2\x15.cyber.system.v1.ItemR\x04list\"\x86\x01\n" +
-	"\x17UpdateItemStatusRequest\x12 \n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01\x127\n" +
-	"\x06status\x18\x02 \x01(\tB\x1a\xbaH\x17\xc8\x01\x01r\x12R\x06activeR\binactiveH\x01R\x06status\x88\x01\x01B\x05\n" +
-	"\x03_idB\t\n" +
+	"\x04list\x18\x02 \x03(\v2\x15.cyber.system.v1.ItemR\x04list\"-\n" +
+	"\x0eGetItemRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"<\n" +
+	"\x0fGetItemResponse\x12)\n" +
+	"\x04item\x18\x01 \x01(\v2\x15.cyber.system.v1.ItemR\x04item\"z\n" +
+	"\x17UpdateItemStatusRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\x127\n" +
+	"\x06status\x18\x02 \x01(\tB\x1a\xbaH\x17\xc8\x01\x01r\x12R\x06activeR\binactiveH\x00R\x06status\x88\x01\x01B\t\n" +
 	"\a_status\"\x1a\n" +
-	"\x18UpdateItemStatusResponse\"\x8e\x02\n" +
-	"\x0fSortItemRequest\x12 \n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14H\x00R\x02id\x88\x01\x01\x12\x1c\n" +
-	"\aprev_id\x18\x02 \x01(\tH\x01R\x06prevId\x88\x01\x01\x12\x1c\n" +
-	"\anext_id\x18\x03 \x01(\tH\x02R\x06nextId\x88\x01\x01:~\xbaH{\x1ay\n" +
-	"\x1fSortItemRequest.prev_id-next_id\x12.at least one of prev_id or next_id is required\x1a&has(this.prev_id) || has(this.next_id)B\x05\n" +
-	"\x03_idB\n" +
+	"\x18UpdateItemStatusResponse\"\x82\x02\n" +
+	"\x0fSortItemRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\x12\x1c\n" +
+	"\aprev_id\x18\x02 \x01(\tH\x00R\x06prevId\x88\x01\x01\x12\x1c\n" +
+	"\anext_id\x18\x03 \x01(\tH\x01R\x06nextId\x88\x01\x01:~\xbaH{\x1ay\n" +
+	"\x1fSortItemRequest.prev_id-next_id\x12.at least one of prev_id or next_id is required\x1a&has(this.prev_id) || has(this.next_id)B\n" +
 	"\n" +
 	"\b_prev_idB\n" +
 	"\n" +
@@ -892,10 +887,10 @@ var file_cyber_system_v1_item_proto_goTypes = []any{
 	(*UpdateItemResponse)(nil),       // 4: cyber.system.v1.UpdateItemResponse
 	(*DeleteItemRequest)(nil),        // 5: cyber.system.v1.DeleteItemRequest
 	(*DeleteItemResponse)(nil),       // 6: cyber.system.v1.DeleteItemResponse
-	(*GetItemRequest)(nil),           // 7: cyber.system.v1.GetItemRequest
-	(*GetItemResponse)(nil),          // 8: cyber.system.v1.GetItemResponse
-	(*ListItemsRequest)(nil),         // 9: cyber.system.v1.ListItemsRequest
-	(*ListItemsResponse)(nil),        // 10: cyber.system.v1.ListItemsResponse
+	(*ListItemsRequest)(nil),         // 7: cyber.system.v1.ListItemsRequest
+	(*ListItemsResponse)(nil),        // 8: cyber.system.v1.ListItemsResponse
+	(*GetItemRequest)(nil),           // 9: cyber.system.v1.GetItemRequest
+	(*GetItemResponse)(nil),          // 10: cyber.system.v1.GetItemResponse
 	(*UpdateItemStatusRequest)(nil),  // 11: cyber.system.v1.UpdateItemStatusRequest
 	(*UpdateItemStatusResponse)(nil), // 12: cyber.system.v1.UpdateItemStatusResponse
 	(*SortItemRequest)(nil),          // 13: cyber.system.v1.SortItemRequest
@@ -913,23 +908,23 @@ var file_cyber_system_v1_item_proto_depIdxs = []int32{
 	15, // 4: cyber.system.v1.Item.description:type_name -> google.protobuf.StringValue
 	15, // 5: cyber.system.v1.Item.status:type_name -> google.protobuf.StringValue
 	15, // 6: cyber.system.v1.CreateItemResponse.id:type_name -> google.protobuf.StringValue
-	0,  // 7: cyber.system.v1.GetItemResponse.item:type_name -> cyber.system.v1.Item
-	17, // 8: cyber.system.v1.ListItemsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	18, // 9: cyber.system.v1.ListItemsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	0,  // 10: cyber.system.v1.ListItemsResponse.list:type_name -> cyber.system.v1.Item
+	17, // 7: cyber.system.v1.ListItemsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	18, // 8: cyber.system.v1.ListItemsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	0,  // 9: cyber.system.v1.ListItemsResponse.list:type_name -> cyber.system.v1.Item
+	0,  // 10: cyber.system.v1.GetItemResponse.item:type_name -> cyber.system.v1.Item
 	1,  // 11: cyber.system.v1.ItemService.CreateItem:input_type -> cyber.system.v1.CreateItemRequest
 	3,  // 12: cyber.system.v1.ItemService.UpdateItem:input_type -> cyber.system.v1.UpdateItemRequest
 	11, // 13: cyber.system.v1.ItemService.UpdateItemStatus:input_type -> cyber.system.v1.UpdateItemStatusRequest
 	5,  // 14: cyber.system.v1.ItemService.DeleteItem:input_type -> cyber.system.v1.DeleteItemRequest
-	9,  // 15: cyber.system.v1.ItemService.ListItems:input_type -> cyber.system.v1.ListItemsRequest
-	7,  // 16: cyber.system.v1.ItemService.GetItem:input_type -> cyber.system.v1.GetItemRequest
+	7,  // 15: cyber.system.v1.ItemService.ListItems:input_type -> cyber.system.v1.ListItemsRequest
+	9,  // 16: cyber.system.v1.ItemService.GetItem:input_type -> cyber.system.v1.GetItemRequest
 	13, // 17: cyber.system.v1.ItemService.SortItem:input_type -> cyber.system.v1.SortItemRequest
 	2,  // 18: cyber.system.v1.ItemService.CreateItem:output_type -> cyber.system.v1.CreateItemResponse
 	4,  // 19: cyber.system.v1.ItemService.UpdateItem:output_type -> cyber.system.v1.UpdateItemResponse
 	12, // 20: cyber.system.v1.ItemService.UpdateItemStatus:output_type -> cyber.system.v1.UpdateItemStatusResponse
 	6,  // 21: cyber.system.v1.ItemService.DeleteItem:output_type -> cyber.system.v1.DeleteItemResponse
-	10, // 22: cyber.system.v1.ItemService.ListItems:output_type -> cyber.system.v1.ListItemsResponse
-	8,  // 23: cyber.system.v1.ItemService.GetItem:output_type -> cyber.system.v1.GetItemResponse
+	8,  // 22: cyber.system.v1.ItemService.ListItems:output_type -> cyber.system.v1.ListItemsResponse
+	10, // 23: cyber.system.v1.ItemService.GetItem:output_type -> cyber.system.v1.GetItemResponse
 	14, // 24: cyber.system.v1.ItemService.SortItem:output_type -> cyber.system.v1.SortItemResponse
 	18, // [18:25] is the sub-list for method output_type
 	11, // [11:18] is the sub-list for method input_type
@@ -945,9 +940,7 @@ func file_cyber_system_v1_item_proto_init() {
 	}
 	file_cyber_system_v1_item_proto_msgTypes[1].OneofWrappers = []any{}
 	file_cyber_system_v1_item_proto_msgTypes[3].OneofWrappers = []any{}
-	file_cyber_system_v1_item_proto_msgTypes[5].OneofWrappers = []any{}
 	file_cyber_system_v1_item_proto_msgTypes[7].OneofWrappers = []any{}
-	file_cyber_system_v1_item_proto_msgTypes[9].OneofWrappers = []any{}
 	file_cyber_system_v1_item_proto_msgTypes[11].OneofWrappers = []any{}
 	file_cyber_system_v1_item_proto_msgTypes[13].OneofWrappers = []any{}
 	type x struct{}

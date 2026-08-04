@@ -16,6 +16,7 @@ type Registrar interface {
 
 var ProviderSet = wire.NewSet(
 	NewAuthService,
+	NewDeptService,
 	NewItemService,
 	NewRegistrarList,
 	NewResourceService,
@@ -27,6 +28,7 @@ func NewRegistrarList(
 	s2 *ResourceService,
 	s3 *UserService,
 	s4 *AuthService,
+	s5 *DeptService,
 ) []Registrar {
-	return []Registrar{s1, s2, s3, s4}
+	return []Registrar{s1, s2, s3, s4, s5}
 }

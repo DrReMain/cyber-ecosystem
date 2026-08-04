@@ -8,6 +8,18 @@ import (
 	"fmt"
 )
 
+// The DeptFunc type is an adapter to allow the use of ordinary
+// function as Dept mutator.
+type DeptFunc func(context.Context, *ent.DeptMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DeptFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DeptMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DeptMutation", m)
+}
+
 // The ItemFunc type is an adapter to allow the use of ordinary
 // function as Item mutator.
 type ItemFunc func(context.Context, *ent.ItemMutation) (ent.Value, error)

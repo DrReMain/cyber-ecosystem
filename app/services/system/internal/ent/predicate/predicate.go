@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Dept is the predicate function for dept builders.
+type Dept func(*sql.Selector)
+
 // Item is the predicate function for item builders.
 type Item func(*sql.Selector)
 

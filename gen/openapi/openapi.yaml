@@ -131,6 +131,145 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.RefreshResponse'
+    /api/v1/system/depts:
+        get:
+            tags:
+                - DeptService
+            operationId: DeptService_ListDepts
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListDeptsResponse'
+        post:
+            tags:
+                - DeptService
+            operationId: DeptService_CreateDept
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreateDeptRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreateDeptResponse'
+    /api/v1/system/depts/{id}:
+        get:
+            tags:
+                - DeptService
+            operationId: DeptService_GetDept
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetDeptResponse'
+        put:
+            tags:
+                - DeptService
+            operationId: DeptService_UpdateDept
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateDeptRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateDeptResponse'
+        delete:
+            tags:
+                - DeptService
+            operationId: DeptService_DeleteDept
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.DeleteDeptResponse'
     /api/v1/system/items:
         get:
             tags:
@@ -422,6 +561,17 @@ components:
                     type: boolean
                     description: Whether more results exist.
             description: Pagination response.
+        cyber.system.v1.CreateDeptRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+            description: create
+        cyber.system.v1.CreateDeptResponse:
+            type: object
+            properties:
+                id:
+                    type: string
         cyber.system.v1.CreateItemRequest:
             type: object
             properties:
@@ -442,15 +592,38 @@ components:
                     type: string
                 password:
                     type: string
+                deptId:
+                    type: string
             description: create
         cyber.system.v1.CreateUserResponse:
             type: object
             properties:
                 id:
                     type: string
+        cyber.system.v1.DeleteDeptResponse:
+            type: object
+            properties: {}
         cyber.system.v1.DeleteItemResponse:
             type: object
             properties: {}
+        cyber.system.v1.Dept:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                name:
+                    type: string
+        cyber.system.v1.GetDeptResponse:
+            type: object
+            properties:
+                dept:
+                    $ref: '#/components/schemas/cyber.system.v1.Dept'
         cyber.system.v1.GetItemResponse:
             type: object
             properties:
@@ -478,6 +651,15 @@ components:
                     type: string
                 status:
                     type: string
+        cyber.system.v1.ListDeptsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Dept'
         cyber.system.v1.ListItemsResponse:
             type: object
             properties:
@@ -596,6 +778,21 @@ components:
         cyber.system.v1.SortItemResponse:
             type: object
             properties: {}
+        cyber.system.v1.UpdateDeptRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                fieldsMask:
+                    type: array
+                    items:
+                        type: string
+            description: update
+        cyber.system.v1.UpdateDeptResponse:
+            type: object
+            properties: {}
         cyber.system.v1.UpdateItemRequest:
             type: object
             properties:
@@ -637,8 +834,11 @@ components:
                     format: date-time
                 email:
                     type: string
+                deptId:
+                    type: string
 tags:
     - name: AuthService
+    - name: DeptService
     - name: ItemService
     - name: ResourceService
       description: |-

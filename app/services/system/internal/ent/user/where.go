@@ -94,6 +94,11 @@ func PasswordHash(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPasswordHash, v))
 }
 
+// DeptID applies equality check predicate on the "dept_id" field. It's identical to DeptIDEQ.
+func DeptID(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldDeptID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldCreatedAt, v))
@@ -417,6 +422,81 @@ func PasswordHashEqualFold(v string) predicate.User {
 // PasswordHashContainsFold applies the ContainsFold predicate on the "password_hash" field.
 func PasswordHashContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldPasswordHash, v))
+}
+
+// DeptIDEQ applies the EQ predicate on the "dept_id" field.
+func DeptIDEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldDeptID, v))
+}
+
+// DeptIDNEQ applies the NEQ predicate on the "dept_id" field.
+func DeptIDNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldDeptID, v))
+}
+
+// DeptIDIn applies the In predicate on the "dept_id" field.
+func DeptIDIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldDeptID, vs...))
+}
+
+// DeptIDNotIn applies the NotIn predicate on the "dept_id" field.
+func DeptIDNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldDeptID, vs...))
+}
+
+// DeptIDGT applies the GT predicate on the "dept_id" field.
+func DeptIDGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldDeptID, v))
+}
+
+// DeptIDGTE applies the GTE predicate on the "dept_id" field.
+func DeptIDGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldDeptID, v))
+}
+
+// DeptIDLT applies the LT predicate on the "dept_id" field.
+func DeptIDLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldDeptID, v))
+}
+
+// DeptIDLTE applies the LTE predicate on the "dept_id" field.
+func DeptIDLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldDeptID, v))
+}
+
+// DeptIDContains applies the Contains predicate on the "dept_id" field.
+func DeptIDContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldDeptID, v))
+}
+
+// DeptIDHasPrefix applies the HasPrefix predicate on the "dept_id" field.
+func DeptIDHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldDeptID, v))
+}
+
+// DeptIDHasSuffix applies the HasSuffix predicate on the "dept_id" field.
+func DeptIDHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldDeptID, v))
+}
+
+// DeptIDIsNil applies the IsNil predicate on the "dept_id" field.
+func DeptIDIsNil() predicate.User {
+	return predicate.User(sql.FieldIsNull(FieldDeptID))
+}
+
+// DeptIDNotNil applies the NotNil predicate on the "dept_id" field.
+func DeptIDNotNil() predicate.User {
+	return predicate.User(sql.FieldNotNull(FieldDeptID))
+}
+
+// DeptIDEqualFold applies the EqualFold predicate on the "dept_id" field.
+func DeptIDEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldDeptID, v))
+}
+
+// DeptIDContainsFold applies the ContainsFold predicate on the "dept_id" field.
+func DeptIDContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldDeptID, v))
 }
 
 // And groups predicates with the AND operator between them.

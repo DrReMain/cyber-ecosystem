@@ -18,7 +18,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/system/v1/item.proto.
  */
 export const file_cyber_system_v1_item: GenFile = /*@__PURE__*/
-  fileDesc("ChpjeWJlci9zeXN0ZW0vdjEvaXRlbS5wcm90bxIPY3liZXIuc3lzdGVtLnYxIp0CCgRJdGVtEigKAmlkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCmNyZWF0ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEioKBG5hbWUYBCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLZGVzY3JpcHRpb24YBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLAoGc3RhdHVzGAYgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlImUKEUNyZWF0ZUl0ZW1SZXF1ZXN0Eh0KBG5hbWUYASABKAlCCrpIB8gBAXICEAFIAIgBARIYCgtkZXNjcmlwdGlvbhgCIAEoCUgBiAEBQgcKBV9uYW1lQg4KDF9kZXNjcmlwdGlvbiI+ChJDcmVhdGVJdGVtUmVzcG9uc2USKAoCaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUinwEKEVVwZGF0ZUl0ZW1SZXF1ZXN0EhwKAmlkGAEgASgJQgu6SAjIAQFyA5gBFEgAiAEBEhEKBG5hbWUYAiABKAlIAYgBARIYCgtkZXNjcmlwdGlvbhgDIAEoCUgCiAEBEh8KC2ZpZWxkc19tYXNrGGQgAygJQgq6SAeSAQQIARgBQgUKA19pZEIHCgVfbmFtZUIOCgxfZGVzY3JpcHRpb24iFAoSVXBkYXRlSXRlbVJlc3BvbnNlIjgKEURlbGV0ZUl0ZW1SZXF1ZXN0EhwKAmlkGAEgASgJQgu6SAjIAQFyA5gBFEgAiAEBQgUKA19pZCIUChJEZWxldGVJdGVtUmVzcG9uc2UiNQoOR2V0SXRlbVJlcXVlc3QSHAoCaWQYASABKAlCC7pICMgBAXIDmAEUSACIAQFCBQoDX2lkIjYKD0dldEl0ZW1SZXNwb25zZRIjCgRpdGVtGAEgASgLMhUuY3liZXIuc3lzdGVtLnYxLkl0ZW0itQIKEExpc3RJdGVtc1JlcXVlc3QSMQoEcGFnZRgBIAEoCzIjLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlcXVlc3QSEQoEbmFtZRgCIAEoCUgAiAEBEiwKBnN0YXR1cxgDIAEoCUIXukgUchJSBmFjdGl2ZVIIaW5hY3RpdmVIAYgBARKYAQoIb3JkZXJfYnkYZCADKAlChQG6SIEBugF+ChlMaXN0SXRlbXNSZXF1ZXN0Lm9yZGVyX2J5EgAaX3RoaXMuYWxsKGl0ZW0sIHNpemUoaXRlbSkgPT0gMCB8fCBpdGVtLm1hdGNoZXMoJ14obmFtZXxjcmVhdGVkQXR8dXBkYXRlZEF0fHNvcnQpOihhc2N8ZGVzYykkJykpQgcKBV9uYW1lQgkKB19zdGF0dXMibAoRTGlzdEl0ZW1zUmVzcG9uc2USMgoEcGFnZRgBIAEoCzIkLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlc3BvbnNlEiMKBGxpc3QYAiADKAsyFS5jeWJlci5zeXN0ZW0udjEuSXRlbSJ6ChdVcGRhdGVJdGVtU3RhdHVzUmVxdWVzdBIcCgJpZBgBIAEoCUILukgIyAEBcgOYARRIAIgBARIvCgZzdGF0dXMYAiABKAlCGrpIF8gBAXISUgZhY3RpdmVSCGluYWN0aXZlSAGIAQFCBQoDX2lkQgkKB19zdGF0dXMiGgoYVXBkYXRlSXRlbVN0YXR1c1Jlc3BvbnNlIvoBCg9Tb3J0SXRlbVJlcXVlc3QSHAoCaWQYASABKAlCC7pICMgBAXIDmAEUSACIAQESFAoHcHJldl9pZBgCIAEoCUgBiAEBEhQKB25leHRfaWQYAyABKAlIAogBATp+ukh7GnkKH1NvcnRJdGVtUmVxdWVzdC5wcmV2X2lkLW5leHRfaWQSLmF0IGxlYXN0IG9uZSBvZiBwcmV2X2lkIG9yIG5leHRfaWQgaXMgcmVxdWlyZWQaJmhhcyh0aGlzLnByZXZfaWQpIHx8IGhhcyh0aGlzLm5leHRfaWQpQgUKA19pZEIKCghfcHJldl9pZEIKCghfbmV4dF9pZCISChBTb3J0SXRlbVJlc3BvbnNlMpIICgtJdGVtU2VydmljZRKJAQoKQ3JlYXRlSXRlbRIiLmN5YmVyLnN5c3RlbS52MS5DcmVhdGVJdGVtUmVxdWVzdBojLmN5YmVyLnN5c3RlbS52MS5DcmVhdGVJdGVtUmVzcG9uc2UiMojxBAKK0w4L5Yib5bu6IEl0ZW2C0+STAhk6ASoiFC9hcGkvdjEvc3lzdGVtL2l0ZW1zEo4BCgpVcGRhdGVJdGVtEiIuY3liZXIuc3lzdGVtLnYxLlVwZGF0ZUl0ZW1SZXF1ZXN0GiMuY3liZXIuc3lzdGVtLnYxLlVwZGF0ZUl0ZW1SZXNwb25zZSI3iPEEAorTDgvkv67mlLkgSXRlbYLT5JMCHjoBKhoZL2FwaS92MS9zeXN0ZW0vaXRlbXMve2lkfRKuAQoQVXBkYXRlSXRlbVN0YXR1cxIoLmN5YmVyLnN5c3RlbS52MS5VcGRhdGVJdGVtU3RhdHVzUmVxdWVzdBopLmN5YmVyLnN5c3RlbS52MS5VcGRhdGVJdGVtU3RhdHVzUmVzcG9uc2UiRYjxBAKK0w4S5L+u5pS5IEl0ZW0g54q25oCBgtPkkwIlOgEqMiAvYXBpL3YxL3N5c3RlbS9pdGVtcy97aWR9L3N0YXR1cxKLAQoKRGVsZXRlSXRlbRIiLmN5YmVyLnN5c3RlbS52MS5EZWxldGVJdGVtUmVxdWVzdBojLmN5YmVyLnN5c3RlbS52MS5EZWxldGVJdGVtUmVzcG9uc2UiNIjxBAKK0w4L5Yig6ZmkIEl0ZW2C0+STAhsqGS9hcGkvdjEvc3lzdGVtL2l0ZW1zL3tpZH0SigEKCUxpc3RJdGVtcxIhLmN5YmVyLnN5c3RlbS52MS5MaXN0SXRlbXNSZXF1ZXN0GiIuY3liZXIuc3lzdGVtLnYxLkxpc3RJdGVtc1Jlc3BvbnNlIjaI8QQCitMOEuafpeivoiBJdGVtIOWIl+ihqILT5JMCFhIUL2FwaS92MS9zeXN0ZW0vaXRlbXMSiQEKB0dldEl0ZW0SHy5jeWJlci5zeXN0ZW0udjEuR2V0SXRlbVJlcXVlc3QaIC5jeWJlci5zeXN0ZW0udjEuR2V0SXRlbVJlc3BvbnNlIjuI8QQCitMOEuafpeivoiBJdGVtIOivpuaDhYLT5JMCGxIZL2FwaS92MS9zeXN0ZW0vaXRlbXMve2lkfRKNAQoIU29ydEl0ZW0SIC5jeWJlci5zeXN0ZW0udjEuU29ydEl0ZW1SZXF1ZXN0GiEuY3liZXIuc3lzdGVtLnYxLlNvcnRJdGVtUmVzcG9uc2UiPIjxBAKK0w4L5o6S5bqPIEl0ZW2C0+STAiM6ASoyHi9hcGkvdjEvc3lzdGVtL2l0ZW1zL3tpZH0vc29ydEIoWiZjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL3N5c3RlbS92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_shared_common_v1_pagination, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("ChpjeWJlci9zeXN0ZW0vdjEvaXRlbS5wcm90bxIPY3liZXIuc3lzdGVtLnYxIp0CCgRJdGVtEigKAmlkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCmNyZWF0ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEioKBG5hbWUYBCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLZGVzY3JpcHRpb24YBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLAoGc3RhdHVzGAYgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlImUKEUNyZWF0ZUl0ZW1SZXF1ZXN0Eh0KBG5hbWUYASABKAlCCrpIB8gBAXICEAFIAIgBARIYCgtkZXNjcmlwdGlvbhgCIAEoCUgBiAEBQgcKBV9uYW1lQg4KDF9kZXNjcmlwdGlvbiI+ChJDcmVhdGVJdGVtUmVzcG9uc2USKAoCaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUikwEKEVVwZGF0ZUl0ZW1SZXF1ZXN0EhcKAmlkGAEgASgJQgu6SAjIAQFyA5gBFBIRCgRuYW1lGAIgASgJSACIAQESGAoLZGVzY3JpcHRpb24YAyABKAlIAYgBARIfCgtmaWVsZHNfbWFzaxhkIAMoCUIKukgHkgEECAEYAUIHCgVfbmFtZUIOCgxfZGVzY3JpcHRpb24iFAoSVXBkYXRlSXRlbVJlc3BvbnNlIiwKEURlbGV0ZUl0ZW1SZXF1ZXN0EhcKAmlkGAEgASgJQgu6SAjIAQFyA5gBFCIUChJEZWxldGVJdGVtUmVzcG9uc2UitQIKEExpc3RJdGVtc1JlcXVlc3QSMQoEcGFnZRgBIAEoCzIjLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlcXVlc3QSEQoEbmFtZRgCIAEoCUgAiAEBEiwKBnN0YXR1cxgDIAEoCUIXukgUchJSBmFjdGl2ZVIIaW5hY3RpdmVIAYgBARKYAQoIb3JkZXJfYnkYZCADKAlChQG6SIEBugF+ChlMaXN0SXRlbXNSZXF1ZXN0Lm9yZGVyX2J5EgAaX3RoaXMuYWxsKGl0ZW0sIHNpemUoaXRlbSkgPT0gMCB8fCBpdGVtLm1hdGNoZXMoJ14obmFtZXxjcmVhdGVkQXR8dXBkYXRlZEF0fHNvcnQpOihhc2N8ZGVzYykkJykpQgcKBV9uYW1lQgkKB19zdGF0dXMibAoRTGlzdEl0ZW1zUmVzcG9uc2USMgoEcGFnZRgBIAEoCzIkLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlc3BvbnNlEiMKBGxpc3QYAiADKAsyFS5jeWJlci5zeXN0ZW0udjEuSXRlbSIpCg5HZXRJdGVtUmVxdWVzdBIXCgJpZBgBIAEoCUILukgIyAEBcgOYARQiNgoPR2V0SXRlbVJlc3BvbnNlEiMKBGl0ZW0YASABKAsyFS5jeWJlci5zeXN0ZW0udjEuSXRlbSJuChdVcGRhdGVJdGVtU3RhdHVzUmVxdWVzdBIXCgJpZBgBIAEoCUILukgIyAEBcgOYARQSLwoGc3RhdHVzGAIgASgJQhq6SBfIAQFyElIGYWN0aXZlUghpbmFjdGl2ZUgAiAEBQgkKB19zdGF0dXMiGgoYVXBkYXRlSXRlbVN0YXR1c1Jlc3BvbnNlIu4BCg9Tb3J0SXRlbVJlcXVlc3QSFwoCaWQYASABKAlCC7pICMgBAXIDmAEUEhQKB3ByZXZfaWQYAiABKAlIAIgBARIUCgduZXh0X2lkGAMgASgJSAGIAQE6frpIexp5Ch9Tb3J0SXRlbVJlcXVlc3QucHJldl9pZC1uZXh0X2lkEi5hdCBsZWFzdCBvbmUgb2YgcHJldl9pZCBvciBuZXh0X2lkIGlzIHJlcXVpcmVkGiZoYXModGhpcy5wcmV2X2lkKSB8fCBoYXModGhpcy5uZXh0X2lkKUIKCghfcHJldl9pZEIKCghfbmV4dF9pZCISChBTb3J0SXRlbVJlc3BvbnNlMpIICgtJdGVtU2VydmljZRKJAQoKQ3JlYXRlSXRlbRIiLmN5YmVyLnN5c3RlbS52MS5DcmVhdGVJdGVtUmVxdWVzdBojLmN5YmVyLnN5c3RlbS52MS5DcmVhdGVJdGVtUmVzcG9uc2UiMojxBAKK0w4L5Yib5bu6IEl0ZW2C0+STAhk6ASoiFC9hcGkvdjEvc3lzdGVtL2l0ZW1zEo4BCgpVcGRhdGVJdGVtEiIuY3liZXIuc3lzdGVtLnYxLlVwZGF0ZUl0ZW1SZXF1ZXN0GiMuY3liZXIuc3lzdGVtLnYxLlVwZGF0ZUl0ZW1SZXNwb25zZSI3iPEEAorTDgvkv67mlLkgSXRlbYLT5JMCHjoBKhoZL2FwaS92MS9zeXN0ZW0vaXRlbXMve2lkfRKuAQoQVXBkYXRlSXRlbVN0YXR1cxIoLmN5YmVyLnN5c3RlbS52MS5VcGRhdGVJdGVtU3RhdHVzUmVxdWVzdBopLmN5YmVyLnN5c3RlbS52MS5VcGRhdGVJdGVtU3RhdHVzUmVzcG9uc2UiRYjxBAKK0w4S5L+u5pS5IEl0ZW0g54q25oCBgtPkkwIlOgEqMiAvYXBpL3YxL3N5c3RlbS9pdGVtcy97aWR9L3N0YXR1cxKLAQoKRGVsZXRlSXRlbRIiLmN5YmVyLnN5c3RlbS52MS5EZWxldGVJdGVtUmVxdWVzdBojLmN5YmVyLnN5c3RlbS52MS5EZWxldGVJdGVtUmVzcG9uc2UiNIjxBAKK0w4L5Yig6ZmkIEl0ZW2C0+STAhsqGS9hcGkvdjEvc3lzdGVtL2l0ZW1zL3tpZH0SigEKCUxpc3RJdGVtcxIhLmN5YmVyLnN5c3RlbS52MS5MaXN0SXRlbXNSZXF1ZXN0GiIuY3liZXIuc3lzdGVtLnYxLkxpc3RJdGVtc1Jlc3BvbnNlIjaI8QQCitMOEuafpeivoiBJdGVtIOWIl+ihqILT5JMCFhIUL2FwaS92MS9zeXN0ZW0vaXRlbXMSiQEKB0dldEl0ZW0SHy5jeWJlci5zeXN0ZW0udjEuR2V0SXRlbVJlcXVlc3QaIC5jeWJlci5zeXN0ZW0udjEuR2V0SXRlbVJlc3BvbnNlIjuI8QQCitMOEuafpeivoiBJdGVtIOivpuaDhYLT5JMCGxIZL2FwaS92MS9zeXN0ZW0vaXRlbXMve2lkfRKNAQoIU29ydEl0ZW0SIC5jeWJlci5zeXN0ZW0udjEuU29ydEl0ZW1SZXF1ZXN0GiEuY3liZXIuc3lzdGVtLnYxLlNvcnRJdGVtUmVzcG9uc2UiPIjxBAKK0w4L5o6S5bqPIEl0ZW2C0+STAiM6ASoyHi9hcGkvdjEvc3lzdGVtL2l0ZW1zL3tpZH0vc29ydEIoWiZjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL3N5c3RlbS92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_shared_common_v1_pagination, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * @generated from message cyber.system.v1.Item
@@ -110,9 +110,9 @@ export const CreateItemResponseSchema: GenMessage<CreateItemResponse> = /*@__PUR
  */
 export type UpdateItemRequest = Message<"cyber.system.v1.UpdateItemRequest"> & {
   /**
-   * @generated from field: optional string id = 1;
+   * @generated from field: string id = 1;
    */
-  id?: string | undefined;
+  id: string;
 
   /**
    * @generated from field: optional string name = 2;
@@ -157,9 +157,9 @@ export const UpdateItemResponseSchema: GenMessage<UpdateItemResponse> = /*@__PUR
  */
 export type DeleteItemRequest = Message<"cyber.system.v1.DeleteItemRequest"> & {
   /**
-   * @generated from field: optional string id = 1;
+   * @generated from field: string id = 1;
    */
-  id?: string | undefined;
+  id: string;
 };
 
 /**
@@ -181,42 +181,6 @@ export type DeleteItemResponse = Message<"cyber.system.v1.DeleteItemResponse"> &
  */
 export const DeleteItemResponseSchema: GenMessage<DeleteItemResponse> = /*@__PURE__*/
   messageDesc(file_cyber_system_v1_item, 6);
-
-/**
- * get
- *
- * @generated from message cyber.system.v1.GetItemRequest
- */
-export type GetItemRequest = Message<"cyber.system.v1.GetItemRequest"> & {
-  /**
-   * @generated from field: optional string id = 1;
-   */
-  id?: string | undefined;
-};
-
-/**
- * Describes the message cyber.system.v1.GetItemRequest.
- * Use `create(GetItemRequestSchema)` to create a new message.
- */
-export const GetItemRequestSchema: GenMessage<GetItemRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_item, 7);
-
-/**
- * @generated from message cyber.system.v1.GetItemResponse
- */
-export type GetItemResponse = Message<"cyber.system.v1.GetItemResponse"> & {
-  /**
-   * @generated from field: cyber.system.v1.Item item = 1;
-   */
-  item?: Item | undefined;
-};
-
-/**
- * Describes the message cyber.system.v1.GetItemResponse.
- * Use `create(GetItemResponseSchema)` to create a new message.
- */
-export const GetItemResponseSchema: GenMessage<GetItemResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_item, 8);
 
 /**
  * list
@@ -250,7 +214,7 @@ export type ListItemsRequest = Message<"cyber.system.v1.ListItemsRequest"> & {
  * Use `create(ListItemsRequestSchema)` to create a new message.
  */
 export const ListItemsRequestSchema: GenMessage<ListItemsRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_item, 9);
+  messageDesc(file_cyber_system_v1_item, 7);
 
 /**
  * @generated from message cyber.system.v1.ListItemsResponse
@@ -272,6 +236,42 @@ export type ListItemsResponse = Message<"cyber.system.v1.ListItemsResponse"> & {
  * Use `create(ListItemsResponseSchema)` to create a new message.
  */
 export const ListItemsResponseSchema: GenMessage<ListItemsResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_item, 8);
+
+/**
+ * get
+ *
+ * @generated from message cyber.system.v1.GetItemRequest
+ */
+export type GetItemRequest = Message<"cyber.system.v1.GetItemRequest"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+};
+
+/**
+ * Describes the message cyber.system.v1.GetItemRequest.
+ * Use `create(GetItemRequestSchema)` to create a new message.
+ */
+export const GetItemRequestSchema: GenMessage<GetItemRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_item, 9);
+
+/**
+ * @generated from message cyber.system.v1.GetItemResponse
+ */
+export type GetItemResponse = Message<"cyber.system.v1.GetItemResponse"> & {
+  /**
+   * @generated from field: cyber.system.v1.Item item = 1;
+   */
+  item?: Item | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.GetItemResponse.
+ * Use `create(GetItemResponseSchema)` to create a new message.
+ */
+export const GetItemResponseSchema: GenMessage<GetItemResponse> = /*@__PURE__*/
   messageDesc(file_cyber_system_v1_item, 10);
 
 /**
@@ -281,9 +281,9 @@ export const ListItemsResponseSchema: GenMessage<ListItemsResponse> = /*@__PURE_
  */
 export type UpdateItemStatusRequest = Message<"cyber.system.v1.UpdateItemStatusRequest"> & {
   /**
-   * @generated from field: optional string id = 1;
+   * @generated from field: string id = 1;
    */
-  id?: string | undefined;
+  id: string;
 
   /**
    * @generated from field: optional string status = 2;
@@ -316,9 +316,9 @@ export const UpdateItemStatusResponseSchema: GenMessage<UpdateItemStatusResponse
  */
 export type SortItemRequest = Message<"cyber.system.v1.SortItemRequest"> & {
   /**
-   * @generated from field: optional string id = 1;
+   * @generated from field: string id = 1;
    */
-  id?: string | undefined;
+  id: string;
 
   /**
    * @generated from field: optional string prev_id = 2;

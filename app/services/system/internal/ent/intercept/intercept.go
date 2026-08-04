@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"cyber-ecosystem/app/services/system/internal/ent"
+	"cyber-ecosystem/app/services/system/internal/ent/dept"
 	"cyber-ecosystem/app/services/system/internal/ent/item"
 	"cyber-ecosystem/app/services/system/internal/ent/predicate"
 	"cyber-ecosystem/app/services/system/internal/ent/user"
@@ -70,6 +71,33 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 	return f(ctx, query)
 }
 
+// The DeptFunc type is an adapter to allow the use of ordinary function as a Querier.
+type DeptFunc func(context.Context, *ent.DeptQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f DeptFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.DeptQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.DeptQuery", q)
+}
+
+// The TraverseDept type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseDept func(context.Context, *ent.DeptQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseDept) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseDept) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.DeptQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.DeptQuery", q)
+}
+
 // The ItemFunc type is an adapter to allow the use of ordinary function as a Querier.
 type ItemFunc func(context.Context, *ent.ItemQuery) (ent.Value, error)
 
@@ -127,6 +155,8 @@ func (f TraverseUser) Traverse(ctx context.Context, q ent.Query) error {
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
+	case *ent.DeptQuery:
+		return &query[*ent.DeptQuery, predicate.Dept, dept.OrderOption]{typ: ent.TypeDept, tq: q}, nil
 	case *ent.ItemQuery:
 		return &query[*ent.ItemQuery, predicate.Item, item.OrderOption]{typ: ent.TypeItem, tq: q}, nil
 	case *ent.UserQuery:

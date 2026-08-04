@@ -86,7 +86,7 @@ message CreateItemResponse {
 
 // update
 message UpdateItemRequest {
-  optional string id = 1 [
+  string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.len = 20
   ];
@@ -102,25 +102,13 @@ message UpdateItemResponse {}
 
 // delete
 message DeleteItemRequest {
-  optional string id = 1 [
+  string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.len = 20
   ];
 }
 
 message DeleteItemResponse {}
-
-// get
-message GetItemRequest {
-  optional string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.len = 20
-  ];
-}
-
-message GetItemResponse {
-  Item item = 1;
-}
 
 // list
 message ListItemsRequest {
@@ -144,9 +132,21 @@ message ListItemsResponse {
   repeated Item list = 2;
 }
 
+// get
+message GetItemRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetItemResponse {
+  Item item = 1;
+}
+
 // other
 message UpdateItemStatusRequest {
-  optional string id = 1 [
+  string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.len = 20
   ];
@@ -164,7 +164,7 @@ message UpdateItemStatusRequest {
 message UpdateItemStatusResponse {}
 
 message SortItemRequest {
-  optional string id = 1 [
+  string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.len = 20
   ];

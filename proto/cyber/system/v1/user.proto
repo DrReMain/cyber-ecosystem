@@ -32,6 +32,7 @@ message User {
   google.protobuf.Timestamp created_at = 2;
   google.protobuf.Timestamp updated_at = 3;
   google.protobuf.StringValue email = 4;
+  google.protobuf.StringValue dept_id = 5;
 }
 
 // create
@@ -44,6 +45,7 @@ message CreateUserRequest {
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 1
   ];
+  optional string dept_id = 3;
 }
 
 message CreateUserResponse {
@@ -52,7 +54,7 @@ message CreateUserResponse {
 
 // get
 message GetUserRequest {
-  optional string id = 1 [
+  string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.len = 20
   ];

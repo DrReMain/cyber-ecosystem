@@ -80,6 +80,20 @@ func (_c *UserCreate) SetPasswordHash(v string) *UserCreate {
 	return _c
 }
 
+// SetDeptID sets the "dept_id" field.
+func (_c *UserCreate) SetDeptID(v string) *UserCreate {
+	_c.mutation.SetDeptID(v)
+	return _c
+}
+
+// SetNillableDeptID sets the "dept_id" field if the given value is not nil.
+func (_c *UserCreate) SetNillableDeptID(v *string) *UserCreate {
+	if v != nil {
+		_c.SetDeptID(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *UserCreate) SetID(v string) *UserCreate {
 	_c.mutation.SetID(v)
@@ -187,6 +201,11 @@ func (_c *UserCreate) check() error {
 			return &ValidationError{Name: "password_hash", err: fmt.Errorf(`ent: validator failed for field "User.password_hash": %w`, err)}
 		}
 	}
+	if v, ok := _c.mutation.DeptID(); ok {
+		if err := user.DeptIDValidator(v); err != nil {
+			return &ValidationError{Name: "dept_id", err: fmt.Errorf(`ent: validator failed for field "User.dept_id": %w`, err)}
+		}
+	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := user.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "User.id": %w`, err)}
@@ -250,6 +269,10 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.PasswordHash(); ok {
 		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
 		_node.PasswordHash = value
+	}
+	if value, ok := _c.mutation.DeptID(); ok {
+		_spec.SetField(user.FieldDeptID, field.TypeString, value)
+		_node.DeptID = &value
 	}
 	return _node, _spec
 }

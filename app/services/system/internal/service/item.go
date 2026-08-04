@@ -61,7 +61,7 @@ func (s *ItemService) CreateItem(ctx context.Context, in *systempb.CreateItemReq
 
 func (s *ItemService) UpdateItem(ctx context.Context, in *systempb.UpdateItemRequest) (*systempb.UpdateItemResponse, error) {
 	if _, err := s.itemUC.Update(ctx, in.FieldsMask, &biz.Item{
-		ID:          *in.Id,
+		ID:          in.Id,
 		Name:        in.Name,
 		Description: in.Description,
 	}); err != nil {
@@ -71,14 +71,14 @@ func (s *ItemService) UpdateItem(ctx context.Context, in *systempb.UpdateItemReq
 }
 
 func (s *ItemService) UpdateItemStatus(ctx context.Context, in *systempb.UpdateItemStatusRequest) (*systempb.UpdateItemStatusResponse, error) {
-	if _, err := s.itemUC.UpdateStatus(ctx, *in.Id, *in.Status); err != nil {
+	if _, err := s.itemUC.UpdateStatus(ctx, in.Id, *in.Status); err != nil {
 		return nil, err
 	}
 	return &systempb.UpdateItemStatusResponse{}, nil
 }
 
 func (s *ItemService) DeleteItem(ctx context.Context, in *systempb.DeleteItemRequest) (*systempb.DeleteItemResponse, error) {
-	if _, err := s.itemUC.Delete(ctx, *in.Id); err != nil {
+	if _, err := s.itemUC.Delete(ctx, in.Id); err != nil {
 		return nil, err
 	}
 	return &systempb.DeleteItemResponse{}, nil
@@ -101,7 +101,7 @@ func (s *ItemService) ListItems(ctx context.Context, in *systempb.ListItemsReque
 }
 
 func (s *ItemService) GetItem(ctx context.Context, in *systempb.GetItemRequest) (*systempb.GetItemResponse, error) {
-	a, err := s.itemUC.Get(ctx, *in.Id)
+	a, err := s.itemUC.Get(ctx, in.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *ItemService) GetItem(ctx context.Context, in *systempb.GetItemRequest) 
 }
 
 func (s *ItemService) SortItem(ctx context.Context, in *systempb.SortItemRequest) (*systempb.SortItemResponse, error) {
-	if _, err := s.itemUC.Sort(ctx, *in.Id, in.PrevId, in.NextId); err != nil {
+	if _, err := s.itemUC.Sort(ctx, in.Id, in.PrevId, in.NextId); err != nil {
 		return nil, err
 	}
 	return &systempb.SortItemResponse{}, nil

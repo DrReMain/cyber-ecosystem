@@ -12,23 +12,21 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
 )
 
-type User struct {
+type Dept struct {
 	ent.Schema
 }
 
-func (User) Fields() []ent.Field {
+func (Dept) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("email").NotEmpty().MaxLen(128),
-		field.String("password_hash").Sensitive().MaxLen(128),
-		field.String("dept_id").Optional().Nillable().MaxLen(20),
+		field.String("name").NotEmpty().MaxLen(64),
 	}
 }
 
-func (User) Edges() []ent.Edge {
+func (Dept) Edges() []ent.Edge {
 	return nil
 }
 
-func (User) Mixin() []ent.Mixin {
+func (Dept) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
 		mixins.CreatedUpdatedMixin{},
@@ -37,16 +35,16 @@ func (User) Mixin() []ent.Mixin {
 	}
 }
 
-func (User) Indexes() []ent.Index {
+func (Dept) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("tenant_id", "email").Unique().
+		index.Fields("tenant_id", "name").Unique().
 			Annotations(entsql.IndexWhere("deleted_at IS NULL")),
 	}
 }
 
-func (User) Annotations() []schema.Annotation {
+func (Dept) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.WithComments(true),
-		entsql.Annotation{Table: "user"},
+		entsql.Annotation{Table: "dept"},
 	}
 }

@@ -23,7 +23,7 @@ A service MUST own its proto under `cyber/<service>/v1/`; shared types go under 
 |---|---|---|
 | package | `cyber.<scope>.v1` | `cyber.<service>.v1`, `cyber.shared.common.v1` |
 | service | `<Entity>Service` | `<Entity>Service` |
-| rpc | `<Verb><Entity>`; verb order Create/Update/Delete/Read/Other | `Create<Entity>`, `List<Entities>`, `Get<Entity>` |
+| rpc | `<Verb><Entity>`; verb order Create/Update/Delete/List → Get → GetByXxx/Other | `Create<Entity>`, `List<Entities>`, `Get<Entity>` |
 | message | `<Entity>`, `<Verb><Entity>Request`/`<Verb><Entity>Response` | `<Entity>`, `Create<Entity>Request` |
 | field | snake_case | `created_at`, `page_size` |
 | enum | `UPPER_SNAKE`; first value `<ENUM>_UNSPECIFIED = 0` | `<ENUM>_UNSPECIFIED` |
@@ -36,6 +36,7 @@ A service MUST own its proto under `cyber/<service>/v1/`; shared types go under 
 - **Nullable scalar/string:** `optional <type>` (proto3 optional) for value semantics, or a **WKT wrapper** (`google.protobuf.StringValue` / `BoolValue` / `Int32Value` …) when the field must round-trip as a nullable pointer across JSON/codegen. Pick one per field and stay consistent.
 - **Time:** `google.protobuf.Timestamp`.
 - **Non-null scalar:** plain `string` / `int32` / …
+- **Path-bound fields** (bound from `{xxx}` in `google.api.http`): MUST be plain (non-`optional`, non-wrapper). They are always present from the URL; `optional`/wrapper generates a proto oneof that conflicts with `body:"*"` decode ("field already set for oneof").
 - **Validation:** `buf.validate.field` rules inline (`required`, `string.min_len`, `int32.gt`/`lte`, …). Validate at the boundary (server inbound); do not re-validate in biz.
 
 ---

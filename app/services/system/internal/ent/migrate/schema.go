@@ -9,6 +9,41 @@ import (
 )
 
 var (
+	// DeptColumns holds the columns for the "dept" table.
+	DeptColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20},
+		{Name: "name", Type: field.TypeString, Size: 64},
+	}
+	// DeptTable holds the schema information for the "dept" table.
+	DeptTable = &schema.Table{
+		Name:       "dept",
+		Columns:    DeptColumns,
+		PrimaryKey: []*schema.Column{DeptColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "dept_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{DeptColumns[1]},
+			},
+			{
+				Name:    "dept_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{DeptColumns[2]},
+			},
+			{
+				Name:    "dept_tenant_id_name",
+				Unique:  true,
+				Columns: []*schema.Column{DeptColumns[4], DeptColumns[5]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+		},
+	}
 	// ItemColumns holds the columns for the "item" table.
 	ItemColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -63,6 +98,7 @@ var (
 		{Name: "tenant_id", Type: field.TypeString, Size: 20},
 		{Name: "email", Type: field.TypeString, Size: 128},
 		{Name: "password_hash", Type: field.TypeString, Size: 128},
+		{Name: "dept_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// UserTable holds the schema information for the "user" table.
 	UserTable = &schema.Table{
@@ -92,12 +128,16 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		DeptTable,
 		ItemTable,
 		UserTable,
 	}
 )
 
 func init() {
+	DeptTable.Annotation = &entsql.Annotation{
+		Table: "dept",
+	}
 	ItemTable.Annotation = &entsql.Annotation{
 		Table: "item",
 	}

@@ -28,6 +28,7 @@ func NewUserRP(logger *slog.Logger, p *platform.Platform) biz.UserRP {
 func (rp *userRP) Create(ctx context.Context, u *biz.User) (*biz.User, error) {
 	created, err := rp.platform.GetClient(ctx).User.Create().
 		SetTenantID(u.TenantID).
+		SetNillableDeptID(u.DeptID).
 		SetEmail(u.Email).
 		SetPasswordHash(u.PasswordHash).
 		Save(ctx)
@@ -63,6 +64,7 @@ func mapUser(d *ent.User) *biz.User {
 		CreatedAt:    d.CreatedAt,
 		UpdatedAt:    d.UpdatedAt,
 		TenantID:     d.TenantID,
+		DeptID:       d.DeptID,
 		Email:        d.Email,
 		PasswordHash: d.PasswordHash,
 	}

@@ -15,6 +15,7 @@ type User struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	TenantID     string
+	DeptID       *string
 	Email        string
 	PasswordHash string // stays in biz — never reaches proto, so login verifies without leaking it
 }
@@ -43,13 +44,13 @@ func NewUserUC(logger *slog.Logger, tm Transaction, userRP UserRP) *UserUC {
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *UserUC) Create(ctx context.Context, email, password string) (out *User, err error) {
+func (uc *UserUC) Create(ctx context.Context, email, password string, deptID *string) (out *User, err error) {
 	hash, err := utils.Hash(password)
 	if err != nil {
 		return
 	}
 	err = uc.tm.InTx(ctx, func(ctx context.Context) error {
-		out, err = uc.userRP.Create(ctx, &User{TenantID: defaultTenant, Email: email, PasswordHash: hash})
+		out, err = uc.userRP.Create(ctx, &User{TenantID: defaultTenant, DeptID: deptID, Email: email, PasswordHash: hash})
 		return err
 	})
 	return
