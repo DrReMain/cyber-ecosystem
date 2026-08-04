@@ -23,7 +23,7 @@ func ErrorGeneralErrorUnspecified(format string, args ...interface{}) *errors.Er
 	return errors.New(500, GeneralError_GENERAL_ERROR_UNSPECIFIED.String(), fmt.Sprintf(format, args...))
 }
 
-// 1xxx: Client Errors
+// 400 Bad Request
 func IsGeneralErrorInvalidArgument(err error) bool {
 	if err == nil {
 		return false
@@ -32,7 +32,7 @@ func IsGeneralErrorInvalidArgument(err error) bool {
 	return e.Reason == GeneralError_GENERAL_ERROR_INVALID_ARGUMENT.String() && e.Code == 400
 }
 
-// 1xxx: Client Errors
+// 400 Bad Request
 func ErrorGeneralErrorInvalidArgument(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, GeneralError_GENERAL_ERROR_INVALID_ARGUMENT.String(), fmt.Sprintf(format, args...))
 }
@@ -49,28 +49,42 @@ func ErrorGeneralErrorValidationFailed(format string, args ...interface{}) *erro
 	return errors.New(400, GeneralError_GENERAL_ERROR_VALIDATION_FAILED.String(), fmt.Sprintf(format, args...))
 }
 
-func IsGeneralErrorNotFound(err error) bool {
+func IsGeneralErrorPaginationInvalidArgument(err error) bool {
 	if err == nil {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == GeneralError_GENERAL_ERROR_NOT_FOUND.String() && e.Code == 404
+	return e.Reason == GeneralError_GENERAL_ERROR_PAGINATION_INVALID_ARGUMENT.String() && e.Code == 400
 }
 
-func ErrorGeneralErrorNotFound(format string, args ...interface{}) *errors.Error {
-	return errors.New(404, GeneralError_GENERAL_ERROR_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+func ErrorGeneralErrorPaginationInvalidArgument(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, GeneralError_GENERAL_ERROR_PAGINATION_INVALID_ARGUMENT.String(), fmt.Sprintf(format, args...))
 }
 
-func IsGeneralErrorAlreadyExists(err error) bool {
+// 401 Unauthorized / 403 Forbidden
+func IsGeneralErrorUnauthenticated(err error) bool {
 	if err == nil {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == GeneralError_GENERAL_ERROR_ALREADY_EXISTS.String() && e.Code == 409
+	return e.Reason == GeneralError_GENERAL_ERROR_UNAUTHENTICATED.String() && e.Code == 401
 }
 
-func ErrorGeneralErrorAlreadyExists(format string, args ...interface{}) *errors.Error {
-	return errors.New(409, GeneralError_GENERAL_ERROR_ALREADY_EXISTS.String(), fmt.Sprintf(format, args...))
+// 401 Unauthorized / 403 Forbidden
+func ErrorGeneralErrorUnauthenticated(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, GeneralError_GENERAL_ERROR_UNAUTHENTICATED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsGeneralErrorTokenExpired(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == GeneralError_GENERAL_ERROR_TOKEN_EXPIRED.String() && e.Code == 401
+}
+
+func ErrorGeneralErrorTokenExpired(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, GeneralError_GENERAL_ERROR_TOKEN_EXPIRED.String(), fmt.Sprintf(format, args...))
 }
 
 func IsGeneralErrorPermissionDenied(err error) bool {
@@ -85,16 +99,42 @@ func ErrorGeneralErrorPermissionDenied(format string, args ...interface{}) *erro
 	return errors.New(403, GeneralError_GENERAL_ERROR_PERMISSION_DENIED.String(), fmt.Sprintf(format, args...))
 }
 
-func IsGeneralErrorUnauthenticated(err error) bool {
+// 404 / 405 / 409 / 412 / 413
+func IsGeneralErrorNotFound(err error) bool {
 	if err == nil {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == GeneralError_GENERAL_ERROR_UNAUTHENTICATED.String() && e.Code == 401
+	return e.Reason == GeneralError_GENERAL_ERROR_NOT_FOUND.String() && e.Code == 404
 }
 
-func ErrorGeneralErrorUnauthenticated(format string, args ...interface{}) *errors.Error {
-	return errors.New(401, GeneralError_GENERAL_ERROR_UNAUTHENTICATED.String(), fmt.Sprintf(format, args...))
+// 404 / 405 / 409 / 412 / 413
+func ErrorGeneralErrorNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, GeneralError_GENERAL_ERROR_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsGeneralErrorMethodNotAllowed(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == GeneralError_GENERAL_ERROR_METHOD_NOT_ALLOWED.String() && e.Code == 405
+}
+
+func ErrorGeneralErrorMethodNotAllowed(format string, args ...interface{}) *errors.Error {
+	return errors.New(405, GeneralError_GENERAL_ERROR_METHOD_NOT_ALLOWED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsGeneralErrorAlreadyExists(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == GeneralError_GENERAL_ERROR_ALREADY_EXISTS.String() && e.Code == 409
+}
+
+func ErrorGeneralErrorAlreadyExists(format string, args ...interface{}) *errors.Error {
+	return errors.New(409, GeneralError_GENERAL_ERROR_ALREADY_EXISTS.String(), fmt.Sprintf(format, args...))
 }
 
 func IsGeneralErrorPreconditionFailed(err error) bool {
@@ -121,31 +161,21 @@ func ErrorGeneralErrorPayloadTooLarge(format string, args ...interface{}) *error
 	return errors.New(413, GeneralError_GENERAL_ERROR_PAYLOAD_TOO_LARGE.String(), fmt.Sprintf(format, args...))
 }
 
-func IsGeneralErrorMethodNotAllowed(err error) bool {
+// 429 Too Many Requests
+func IsGeneralErrorResourceExhausted(err error) bool {
 	if err == nil {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == GeneralError_GENERAL_ERROR_METHOD_NOT_ALLOWED.String() && e.Code == 405
+	return e.Reason == GeneralError_GENERAL_ERROR_RESOURCE_EXHAUSTED.String() && e.Code == 429
 }
 
-func ErrorGeneralErrorMethodNotAllowed(format string, args ...interface{}) *errors.Error {
-	return errors.New(405, GeneralError_GENERAL_ERROR_METHOD_NOT_ALLOWED.String(), fmt.Sprintf(format, args...))
+// 429 Too Many Requests
+func ErrorGeneralErrorResourceExhausted(format string, args ...interface{}) *errors.Error {
+	return errors.New(429, GeneralError_GENERAL_ERROR_RESOURCE_EXHAUSTED.String(), fmt.Sprintf(format, args...))
 }
 
-func IsGeneralErrorPaginationInvalidArgument(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == GeneralError_GENERAL_ERROR_PAGINATION_INVALID_ARGUMENT.String() && e.Code == 400
-}
-
-func ErrorGeneralErrorPaginationInvalidArgument(format string, args ...interface{}) *errors.Error {
-	return errors.New(400, GeneralError_GENERAL_ERROR_PAGINATION_INVALID_ARGUMENT.String(), fmt.Sprintf(format, args...))
-}
-
-// 2xxx: Server Errors
+// 5xx Server Errors
 func IsGeneralErrorInternal(err error) bool {
 	if err == nil {
 		return false
@@ -154,7 +184,7 @@ func IsGeneralErrorInternal(err error) bool {
 	return e.Reason == GeneralError_GENERAL_ERROR_INTERNAL.String() && e.Code == 500
 }
 
-// 2xxx: Server Errors
+// 5xx Server Errors
 func ErrorGeneralErrorInternal(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, GeneralError_GENERAL_ERROR_INTERNAL.String(), fmt.Sprintf(format, args...))
 }
@@ -193,16 +223,4 @@ func IsGeneralErrorTimeout(err error) bool {
 
 func ErrorGeneralErrorTimeout(format string, args ...interface{}) *errors.Error {
 	return errors.New(504, GeneralError_GENERAL_ERROR_TIMEOUT.String(), fmt.Sprintf(format, args...))
-}
-
-func IsGeneralErrorResourceExhausted(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == GeneralError_GENERAL_ERROR_RESOURCE_EXHAUSTED.String() && e.Code == 429
-}
-
-func ErrorGeneralErrorResourceExhausted(format string, args ...interface{}) *errors.Error {
-	return errors.New(429, GeneralError_GENERAL_ERROR_RESOURCE_EXHAUSTED.String(), fmt.Sprintf(format, args...))
 }

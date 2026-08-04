@@ -11,22 +11,29 @@ enum GeneralError {
 
   GENERAL_ERROR_UNSPECIFIED = 0 [(.errors.code) = 500];
 
-  // 1xxx: Client Errors
-  GENERAL_ERROR_INVALID_ARGUMENT = 1000 [(.errors.code) = 400];
-  GENERAL_ERROR_VALIDATION_FAILED = 1001 [(.errors.code) = 400];
-  GENERAL_ERROR_NOT_FOUND = 1002 [(.errors.code) = 404];
-  GENERAL_ERROR_ALREADY_EXISTS = 1003 [(.errors.code) = 409];
-  GENERAL_ERROR_PERMISSION_DENIED = 1004 [(.errors.code) = 403];
-  GENERAL_ERROR_UNAUTHENTICATED = 1005 [(.errors.code) = 401];
-  GENERAL_ERROR_PRECONDITION_FAILED = 1006 [(.errors.code) = 412];
-  GENERAL_ERROR_PAYLOAD_TOO_LARGE = 1007 [(.errors.code) = 413];
-  GENERAL_ERROR_METHOD_NOT_ALLOWED = 1008 [(.errors.code) = 405];
-  GENERAL_ERROR_PAGINATION_INVALID_ARGUMENT = 1009 [(.errors.code) = 400];
+  // 400 Bad Request
+  GENERAL_ERROR_INVALID_ARGUMENT = 100 [(.errors.code) = 400];
+  GENERAL_ERROR_VALIDATION_FAILED = 101 [(.errors.code) = 400];
+  GENERAL_ERROR_PAGINATION_INVALID_ARGUMENT = 102 [(.errors.code) = 400];
 
-  // 2xxx: Server Errors
-  GENERAL_ERROR_INTERNAL = 2000 [(.errors.code) = 500];
-  GENERAL_ERROR_NOT_IMPLEMENTED = 2001 [(.errors.code) = 501];
-  GENERAL_ERROR_UNAVAILABLE = 2002 [(.errors.code) = 503];
-  GENERAL_ERROR_TIMEOUT = 2003 [(.errors.code) = 504];
-  GENERAL_ERROR_RESOURCE_EXHAUSTED = 2004 [(.errors.code) = 429];
+  // 401 Unauthorized / 403 Forbidden
+  GENERAL_ERROR_UNAUTHENTICATED = 200 [(.errors.code) = 401];
+  GENERAL_ERROR_TOKEN_EXPIRED = 201 [(.errors.code) = 401];
+  GENERAL_ERROR_PERMISSION_DENIED = 202 [(.errors.code) = 403];
+
+  // 404 / 405 / 409 / 412 / 413
+  GENERAL_ERROR_NOT_FOUND = 300 [(.errors.code) = 404];
+  GENERAL_ERROR_METHOD_NOT_ALLOWED = 301 [(.errors.code) = 405];
+  GENERAL_ERROR_ALREADY_EXISTS = 302 [(.errors.code) = 409];
+  GENERAL_ERROR_PRECONDITION_FAILED = 303 [(.errors.code) = 412];
+  GENERAL_ERROR_PAYLOAD_TOO_LARGE = 304 [(.errors.code) = 413];
+
+  // 429 Too Many Requests
+  GENERAL_ERROR_RESOURCE_EXHAUSTED = 400 [(.errors.code) = 429];
+
+  // 5xx Server Errors
+  GENERAL_ERROR_INTERNAL = 500 [(.errors.code) = 500];
+  GENERAL_ERROR_NOT_IMPLEMENTED = 501 [(.errors.code) = 501];
+  GENERAL_ERROR_UNAVAILABLE = 502 [(.errors.code) = 503];
+  GENERAL_ERROR_TIMEOUT = 503 [(.errors.code) = 504];
 }

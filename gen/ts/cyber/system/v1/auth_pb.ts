@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/system/v1/auth.proto.
  */
 export const file_cyber_system_v1_auth: GenFile = /*@__PURE__*/
-  fileDesc("ChpjeWJlci9zeXN0ZW0vdjEvYXV0aC5wcm90bxIPY3liZXIuc3lzdGVtLnYxImgKDExvZ2luUmVxdWVzdBIeCgVlbWFpbBgBIAEoCUIKukgHyAEBcgIQAUgAiAEBEiEKCHBhc3N3b3JkGAIgASgJQgq6SAfIAQFyAhABSAGIAQFCCAoGX2VtYWlsQgsKCV9wYXNzd29yZCIeCg1Mb2dpblJlc3BvbnNlEg0KBXRva2VuGAEgASgJMokBCgtBdXRoU2VydmljZRJ6CgVMb2dpbhIdLmN5YmVyLnN5c3RlbS52MS5Mb2dpblJlcXVlc3QaHi5jeWJlci5zeXN0ZW0udjEuTG9naW5SZXNwb25zZSIyiPEEAYrTDgbnmbvlvZWC0+STAh46ASoiGS9hcGkvdjEvc3lzdGVtL2F1dGgvbG9naW5CKFomY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9zeXN0ZW0vdjFiBnByb3RvMw", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations]);
+  fileDesc("ChpjeWJlci9zeXN0ZW0vdjEvYXV0aC5wcm90bxIPY3liZXIuc3lzdGVtLnYxImgKDExvZ2luUmVxdWVzdBIeCgVlbWFpbBgBIAEoCUIKukgHyAEBcgIQAUgAiAEBEiEKCHBhc3N3b3JkGAIgASgJQgq6SAfIAQFyAhABSAGIAQFCCAoGX2VtYWlsQgsKCV9wYXNzd29yZCI1Cg1Mb2dpblJlc3BvbnNlEg0KBXRva2VuGAEgASgJEhUKDXJlZnJlc2hfdG9rZW4YAiABKAkiDwoNTG9nb3V0UmVxdWVzdCIQCg5Mb2dvdXRSZXNwb25zZSJKCg5SZWZyZXNoUmVxdWVzdBImCg1yZWZyZXNoX3Rva2VuGAEgASgJQgq6SAfIAQFyAhABSACIAQFCEAoOX3JlZnJlc2hfdG9rZW4iNwoPUmVmcmVzaFJlc3BvbnNlEg0KBXRva2VuGAEgASgJEhUKDXJlZnJlc2hfdG9rZW4YAiABKAkylAMKC0F1dGhTZXJ2aWNlEnoKBUxvZ2luEh0uY3liZXIuc3lzdGVtLnYxLkxvZ2luUmVxdWVzdBoeLmN5YmVyLnN5c3RlbS52MS5Mb2dpblJlc3BvbnNlIjKI8QQBitMOBueZu+W9lYLT5JMCHjoBKiIZL2FwaS92MS9zeXN0ZW0vYXV0aC9sb2dpbhJ+CgZMb2dvdXQSHi5jeWJlci5zeXN0ZW0udjEuTG9nb3V0UmVxdWVzdBofLmN5YmVyLnN5c3RlbS52MS5Mb2dvdXRSZXNwb25zZSIziPEEAorTDgbnmbvlh7qC0+STAh86ASoiGi9hcGkvdjEvc3lzdGVtL2F1dGgvbG9nb3V0EogBCgdSZWZyZXNoEh8uY3liZXIuc3lzdGVtLnYxLlJlZnJlc2hSZXF1ZXN0GiAuY3liZXIuc3lzdGVtLnYxLlJlZnJlc2hSZXNwb25zZSI6iPEEAYrTDgzliLfmlrDku6TniYyC0+STAiA6ASoiGy9hcGkvdjEvc3lzdGVtL2F1dGgvcmVmcmVzaEIoWiZjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL3N5c3RlbS92MWIGcHJvdG8z", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations]);
 
 /**
  * login
@@ -48,6 +48,11 @@ export type LoginResponse = Message<"cyber.system.v1.LoginResponse"> & {
    * @generated from field: string token = 1;
    */
   token: string;
+
+  /**
+   * @generated from field: string refresh_token = 2;
+   */
+  refreshToken: string;
 };
 
 /**
@@ -56,6 +61,71 @@ export type LoginResponse = Message<"cyber.system.v1.LoginResponse"> & {
  */
 export const LoginResponseSchema: GenMessage<LoginResponse> = /*@__PURE__*/
   messageDesc(file_cyber_system_v1_auth, 1);
+
+/**
+ * @generated from message cyber.system.v1.LogoutRequest
+ */
+export type LogoutRequest = Message<"cyber.system.v1.LogoutRequest"> & {
+};
+
+/**
+ * Describes the message cyber.system.v1.LogoutRequest.
+ * Use `create(LogoutRequestSchema)` to create a new message.
+ */
+export const LogoutRequestSchema: GenMessage<LogoutRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 2);
+
+/**
+ * @generated from message cyber.system.v1.LogoutResponse
+ */
+export type LogoutResponse = Message<"cyber.system.v1.LogoutResponse"> & {
+};
+
+/**
+ * Describes the message cyber.system.v1.LogoutResponse.
+ * Use `create(LogoutResponseSchema)` to create a new message.
+ */
+export const LogoutResponseSchema: GenMessage<LogoutResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 3);
+
+/**
+ * @generated from message cyber.system.v1.RefreshRequest
+ */
+export type RefreshRequest = Message<"cyber.system.v1.RefreshRequest"> & {
+  /**
+   * @generated from field: optional string refresh_token = 1;
+   */
+  refreshToken?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.RefreshRequest.
+ * Use `create(RefreshRequestSchema)` to create a new message.
+ */
+export const RefreshRequestSchema: GenMessage<RefreshRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 4);
+
+/**
+ * @generated from message cyber.system.v1.RefreshResponse
+ */
+export type RefreshResponse = Message<"cyber.system.v1.RefreshResponse"> & {
+  /**
+   * @generated from field: string token = 1;
+   */
+  token: string;
+
+  /**
+   * @generated from field: string refresh_token = 2;
+   */
+  refreshToken: string;
+};
+
+/**
+ * Describes the message cyber.system.v1.RefreshResponse.
+ * Use `create(RefreshResponseSchema)` to create a new message.
+ */
+export const RefreshResponseSchema: GenMessage<RefreshResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 5);
 
 /**
  * @generated from service cyber.system.v1.AuthService
@@ -68,6 +138,22 @@ export const AuthService: GenService<{
     methodKind: "unary";
     input: typeof LoginRequestSchema;
     output: typeof LoginResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.Logout
+   */
+  logout: {
+    methodKind: "unary";
+    input: typeof LogoutRequestSchema;
+    output: typeof LogoutResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.Refresh
+   */
+  refresh: {
+    methodKind: "unary";
+    input: typeof RefreshRequestSchema;
+    output: typeof RefreshResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_cyber_system_v1_auth, 0);

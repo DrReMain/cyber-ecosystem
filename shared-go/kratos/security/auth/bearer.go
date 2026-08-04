@@ -16,12 +16,12 @@ const (
 	header = "Authorization"
 )
 
-// ErrMissingToken is returned when the request carries no bearer token.
-// Override it in the server's init() to map it onto the app's error enum.
-var ErrMissingToken = errors.Unauthorized("MISSING_TOKEN", "")
+var (
+	ErrMissingToken = errors.Unauthorized("MISSING_TOKEN", "") // no Authorization header
+	ErrTokenExpired = errors.Unauthorized("TOKEN_EXPIRED", "") // phase-1: access token missing/expired (client may refresh)
+	ErrInvalidToken = errors.Unauthorized("INVALID_TOKEN", "") // phase-2: session gone (client must re-login)
+)
 
-// BearerAuth verifies the opaque bearer token carried in the Authorization
-// header and injects the authenticated Subject into the request context.
 func BearerAuth(auth Authenticator) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
@@ -31,11 +31,9 @@ func BearerAuth(auth Authenticator) middleware.Middleware {
 			}
 			subject, err := auth.Authenticate(ctx, tok)
 			if err != nil {
-				e := errors.FromError(ErrInvalidToken.Unwrap())
-				if e != nil {
-					e.Message = err.Error()
-					return nil, ErrInvalidToken.WithCause(e)
-				}
+				return nil, ErrTokenExpired.WithCause(err)
+			}
+			if err := auth.CheckSession(ctx, subject.SessionID); err != nil {
 				return nil, ErrInvalidToken.WithCause(err)
 			}
 			return handler(security.WithSubject(ctx, subject), req)

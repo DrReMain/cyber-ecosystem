@@ -95,6 +95,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.LoginResponse'
+    /api/v1/system/auth/logout:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_Logout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.LogoutRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.LogoutResponse'
+    /api/v1/system/auth/refresh:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_Refresh
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.RefreshRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.RefreshResponse'
     /api/v1/system/items:
         get:
             tags:
@@ -473,6 +509,14 @@ components:
             properties:
                 token:
                     type: string
+                refreshToken:
+                    type: string
+        cyber.system.v1.LogoutRequest:
+            type: object
+            properties: {}
+        cyber.system.v1.LogoutResponse:
+            type: object
+            properties: {}
         cyber.system.v1.Method:
             type: object
             properties:
@@ -504,6 +548,18 @@ components:
                     type: string
                     description: Method description.
             description: RPC method descriptor.
+        cyber.system.v1.RefreshRequest:
+            type: object
+            properties:
+                refreshToken:
+                    type: string
+        cyber.system.v1.RefreshResponse:
+            type: object
+            properties:
+                token:
+                    type: string
+                refreshToken:
+                    type: string
         cyber.system.v1.Service:
             type: object
             properties:

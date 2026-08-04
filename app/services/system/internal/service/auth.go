@@ -45,9 +45,24 @@ func (s *AuthService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *AuthService) Login(ctx context.Context, in *systempb.LoginRequest) (*systempb.LoginResponse, error) {
-	token, err := s.authUC.Login(ctx, *in.Email, *in.Password)
+	pair, err := s.authUC.Login(ctx, *in.Email, *in.Password)
 	if err != nil {
 		return nil, err
 	}
-	return &systempb.LoginResponse{Token: token}, nil
+	return &systempb.LoginResponse{Token: pair.Access, RefreshToken: pair.Refresh}, nil
+}
+
+func (s *AuthService) Logout(ctx context.Context, in *systempb.LogoutRequest) (*systempb.LogoutResponse, error) {
+	if err := s.authUC.Logout(ctx); err != nil {
+		return nil, err
+	}
+	return &systempb.LogoutResponse{}, nil
+}
+
+func (s *AuthService) Refresh(ctx context.Context, in *systempb.RefreshRequest) (*systempb.RefreshResponse, error) {
+	pair, err := s.authUC.Refresh(ctx, *in.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.RefreshResponse{Token: pair.Access, RefreshToken: pair.Refresh}, nil
 }

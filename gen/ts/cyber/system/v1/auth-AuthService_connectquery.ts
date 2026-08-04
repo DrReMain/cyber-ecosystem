@@ -8,3 +8,13 @@ import { AuthService } from "./auth_pb";
  * @generated from rpc cyber.system.v1.AuthService.Login
  */
 export const login = AuthService.method.login;
+
+/**
+ * @generated from rpc cyber.system.v1.AuthService.Logout
+ */
+export const logout = AuthService.method.logout;
+
+/**
+ * @generated from rpc cyber.system.v1.AuthService.Refresh
+ */
+export const refresh = AuthService.method.refresh;

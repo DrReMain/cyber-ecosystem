@@ -38,3 +38,10 @@ func (r *tokenRP) Get(ctx context.Context, key string) ([]byte, error) {
 	}
 	return val, nil
 }
+
+func (r *tokenRP) Del(ctx context.Context, key string) error {
+	if err := r.platform.GetCache().KV.Del(ctx, key); err != nil {
+		return r.platform.HandleCacheError(err)
+	}
+	return nil
+}

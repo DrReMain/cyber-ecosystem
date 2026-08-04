@@ -18,6 +18,24 @@ service AuthService {
       body: "*"
     };
   }
+
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (cyber.ext.v1.method_comment) = "登出";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/logout"
+      body: "*"
+    };
+  }
+
+  rpc Refresh(RefreshRequest) returns (RefreshResponse) {
+    option (cyber.ext.v1.method_comment) = "刷新令牌";
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/refresh"
+      body: "*"
+    };
+  }
 }
 
 // login
@@ -34,4 +52,21 @@ message LoginRequest {
 
 message LoginResponse {
   string token = 1;
+  string refresh_token = 2;
+}
+
+message LogoutRequest {}
+
+message LogoutResponse {}
+
+message RefreshRequest {
+  optional string refresh_token = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message RefreshResponse {
+  string token = 1;
+  string refresh_token = 2;
 }

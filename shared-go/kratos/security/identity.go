@@ -3,8 +3,9 @@ package security
 import "context"
 
 type Subject struct {
-	UserID   string
-	TenantID string
+	UserID    string
+	TenantID  string
+	SessionID string
 }
 
 type subjectKey struct{}

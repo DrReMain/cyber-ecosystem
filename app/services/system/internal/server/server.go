@@ -23,6 +23,7 @@ func init() {
 
 	security.ErrMissingANNOTATION = errorspb.ErrorGeneralErrorUnavailable("").WithCause(security.ErrMissingANNOTATION)
 	krauth.ErrMissingToken = errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(krauth.ErrMissingToken)
+	krauth.ErrTokenExpired = errorspb.ErrorGeneralErrorTokenExpired("").WithCause(krauth.ErrTokenExpired)
 	krauth.ErrInvalidToken = errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(krauth.ErrInvalidToken)
 }
 

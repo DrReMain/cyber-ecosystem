@@ -1,7 +1,7 @@
 # ADR-0001: Auth, RBAC, ABAC, Datascope & Multi-tenancy
 
-- **Status:** Proposed — root decisions locked; implementation details TBD (see *Open questions*).
-- **Date:** 2026-08-01
+- **Status:** Proposed — root decisions locked. **M1 (identity) + M2 (tenant) + M3 (selector) + M4 (token full loop) landed and e2e-verified; M5–M8 deferred pending business/service/multi-instance thickness.** Implementation details still evolving (see *Open questions*).
+- **Date:** 2026-08-01 (last revised 2026-08-05)
 
 ## Context
 
@@ -122,11 +122,12 @@ RPC → [selector: access annotation picks chain]
 - **+** Instant revocation (opaque token).
 - **−** Tenant cognitive tax on every developer (mitigated by injection transparency).
 - **−** Recommended: enable ent `privacy` feature (+ regenerate); MVP can defer and ship on pure intercept.
-- **Risk** Middlewares must actually be wired — smart-park's core failure was defining middlewares but never registering them. Needs an integration check that endpoints are really protected.
+- **Risk** Middlewares must actually be wired — smart-park's core failure was defining middlewares but never registering them. Needs an integration check that endpoints are really protected. **Mitigated in M1**: e2e verified login → token → protected RPC (200) and 401 without token, across connect/grpc/http.
 
 ## Open questions (to decide next)
 
 1. **Device identity extension (IoT)** — device registry, certs, online state (separate ADR when IoT lands).
+2. **Token at-rest hardening (deferred to real-business phase)** — opaque tokens currently key redis by plaintext (`auth:token:<token>`); a redis dump/RDB leak exposes usable tokens. Plan: store SHA-256 of the token and key redis by the hash (token is 256-bit high-entropy → fast SHA-256 suffices; no bcrypt/salt needed, unlike low-entropy passwords). Deferred deliberately — not a skeleton-phase concern; recorded so M4–M8 implementers know the gap.
 
 **Resolved in this revision:** service-to-service identity (D10), datascope tiers (D11), casbin storage & sync (D12), token & refresh lifecycle (D13).
 
@@ -136,88 +137,67 @@ RPC → [selector: access annotation picks chain]
 
 ### Execution discipline — paradigm rules
 
-Verified against the ad73adb layered paradigm; every step MUST keep:
+Verified against the ad73adb layered paradigm; evolved through M1 landing (see *Implementation paradigm*). Every step MUST keep:
 
-1. **biz is the dependency center, defining all ports** (`UserRP` / `TokenService` / `Authorizer` …); data implements them; **biz depends on no shared business interface**.
-2. **middleware belongs to the service** (`internal/server/middleware/`), consuming biz ports / security interfaces; `shared-go` provides only matchers / helpers — never a concrete service's middleware.
-3. **`capability/auth` holds only multi-service pure primitives** (ctx plumbing: `Subject` / `WithTenant`); token / RBAC / datascope ports belong to **each service's biz** (they depend on that service's domain types).
+1. **biz is the dependency center for domain ports** (`UserRP` / `TokenRP` / …); data implements them; **biz depends on no shared business interface**. Cross-cutting contracts consumed by shared middleware (`Authenticator`, future `Authorizer`) are defined in the shared middleware package and implemented by biz via `wire.Bind` — DIP, detailed below.
+2. **Service-specific middleware belongs to the service** (`internal/server/middleware/`); **cross-cutting, reuse-intended middleware** (BearerAuth / RBAC / datascope) lives in the shared layer (`shared-go/kratos/security/`) via dependency inversion — it imports its own package's contract, never biz. `shared-go` ships matchers / guards / cross-cutting middleware, never a concrete service's business middleware.
+3. **`shared-go/kratos/security/` holds only multi-service pure primitives + cross-cutting contracts** (ctx plumbing `Subject` / `WithSubject`; matchers; guards; `Authenticator`); token *storage* / RBAC / datascope *domain* ports belong to **each service's biz** (they depend on that service's domain types).
 4. **Minimum closed loop**: each sub-task compiles / is verifiable, no dead code, no dangling deps; transitional code must be replaced by a later M and marked.
 
 ### Paradigm open points (discuss before coding that M)
 
-- **M3** — casbin enforcer lifecycle ownership: biz adapter vs platform handle.
-- **M5** — datascope scope source: baked into token payload vs queried from role live.
-- **M6** — service-identity middleware ownership: shared reuse vs each service internal.
+- **M5 (RBAC)** — casbin enforcer lifecycle ownership: biz adapter vs platform handle.
+- **M6 (datascope)** — datascope scope source: baked into token payload vs queried from role live.
+- **M7 (service identity)** — service-identity middleware ownership: shared reuse vs each service internal.
 
 ### Milestones
 
-| M | ADR | Trunk / thickening | Goal | Minimum closed loop |
+> **Roadmap re-sequenced (2026-08-05).** The auth **trunk closes first** (identity → tenant → selector → token full loop): these need no business thickness and are curl-verifiable. **RBAC / datascope are deferred** — they need real role/permission scenarios and data distributions to validate, which only land with actual business logic (same YAGNI as multi-tenant deepening). Service identity needs a 2nd service; cross-instance broadcast needs multi-instance deploy. The old linear M1–M7 was renumbered so **milestone order = execution order**.
+
+| M | Phase | ADR | Goal | Minimum closed loop |
 |---|---|---|---|---|
-| **M1** identity trunk (single-tenant) | D5+D8+D13p | **trunk** | user entity CRUD + login + opaque-token verify middleware; identity (Subject) into ctx | (①) create→get user; (②) login → token → protected RPC → Subject in ctx |
-| **M2** tenant thickening | D2+D8 | thickening | user gains `tenant_id`; login carries tenant; identity carries tenant; ent transparent filter | multi-tenant data isolation (lands D2 end-state: tenant always present) |
-| **M3** RBAC (casbin) | D6 | thickening | role/permission schema + casbin + interface-authz middleware | unauthorized role rejected |
-| **M4** selector chain | D9 | thickening | access annotation + selector; public/admin walk different chains | public RPC needs no token, admin requires token |
-| **M5** datascope | D11 | thickening | DataScopeMixin intercept (mine/dept/all) | different-scope users see different rows |
-| **M6** service identity | D10 | thickening | internal token (caller+for) outbound + downstream verify | sample→system carries internal token, downstream verifies |
-| **M7** revocation broadcast | D13 | thickening | cache PubSub revocation / policy-reload | permission change/revocation effective across instances immediately |
+| **M1** ✅ identity (single-tenant) | done | D5+D8+D13p | user entity CRUD + login + opaque-token verify; identity (Subject) into ctx | create→get user; login → token → protected RPC → Subject in ctx — **landed** |
+| **M2** ✅ tenant | done | D2+D8 | user gains `tenant_id`; login carries tenant; ent transparent filter | tenant always present, transparent — **landed** |
+| **M3** ✅ selector | done | D9 | access annotation + selector; public/admin/unspecified walk different chains | public RPC token-free, admin requires token, unspecified denied — **landed with M1** |
+| **M4** ✅ token full loop | done | D13 | refresh token + rotation + single-instance revoke (reuse detection deferred) | login → refresh → new pair; old refresh 401; logout → access 401 — **landed** |
+| **M5** RBAC (casbin) | deferred — needs business thickness | D6 | role/permission schema + casbin + interface-authz middleware | unauthorized role rejected |
+| **M6** datascope | deferred — needs business thickness + RBAC | D11 | DataScopeMixin intercept (mine/dept/all) | different-scope users see different rows |
+| **M7** service identity | deferred — needs 2nd service | D10 | internal token (caller+for) outbound + downstream verify | sample→system carries internal token, downstream verifies |
+| **M8** cross-instance broadcast | deferred — needs multi-instance | D13 | cache PubSub revocation broadcast / policy-reload | revocation effective across instances immediately |
 
 **Relation to D2:** M1 single-tenant is the *development-time* evolutionary start (no `tenant_id` on the table); `tenant_id` + transparent injection land only in M2 — at which point D2's "tenant always present, transparent" becomes the end-state. D2's "zero-schema-migration" promise targets **production-time CRM→SaaS evolution** (tenant already present), not development-time M1→M2.
 
-> The selector's PUBLIC tier ships with M1's Login (Login must be token-free); M4 extends admin / multi-audience tiers. Token revocation (`KV.Del`) is nearly free under M2's opaque token; M7 adds cross-instance broadcast.
+> The selector's PUBLIC tier shipped with M1's Login (Login must be token-free); M3 (selector) is fully landed. **M4 (token full loop) closes the auth trunk**: refresh + rotation + single-instance revoke (`KV.Del` is nearly free under the opaque token). M8 adds cross-instance broadcast (cache PubSub) — only when multi-instance deploy lands.
 
-### M1 small steps (single-tenant; vertical slices, stop-and-confirm each)
+### M1 small steps — landed
 
-M1 ships as **vertical slices**, not horizontal layers — each slice is a complete capability with its own e2e loop. Principle: split by entity/capability (full stack), not by layer; the depended-on capability goes first (user → login → verify). Subject (identity-in-ctx) is needed only by verify, so it lands in ②b, not with login.
+M1 shipped as **vertical slices** (split by entity/capability full-stack, not by layer; depended-on capability first: user → login → verify). **Done and e2e-verified.** The original step grid planned `TokenService{Issue,Verify}` / `Session` / `capability/auth` paths, which drifted on landing — the authoritative shape lives in *Implementation paradigm (landed)* below. Notable deltas vs the plan:
 
-**① user entity trunk** ✅ done
+- domain token port is `TokenRP{Set,Get}` (biz defines, data implements), not a `TokenService{Issue,Verify}`.
+- identity aggregate is `security.Subject` (root `identity.go`), not a per-auth `Session`.
+- verify runs in the shared `security/auth.BearerAuth` + DIP `Authenticator` (`wire.Bind` → `*biz.AuthUC`), not a service-internal middleware file.
 
-| Step | What | Loop | Files | Paradigm |
-|---|---|---|---|---|
-| **M1.1** ✅ | user schema (`email`+`password_hash` + IDString/CreatedUpdated/SoftDelete, `email` unique; **no tenant_id**) + clean migrate (reset) | generate + migrate + build ✅ | ent/schema/user.go + migration | ent |
-| **M1.2** ✅ | biz: `User` DO + `UserRP` (`Create` + `FindByEmail` + `FindByID`) + `UserUC` (`Create` hashes password, `Get`) | build ✅ | biz/user.go | rule ① port in biz |
-| **M1.3** ✅ | data: `userRP` (implements `UserRP`) | build ✅ | data/user_rp.go | rule ① data implements biz port |
-| **M1.4** ✅ | proto: `UserService` (`Create` + `Get`, ACCESS_ADMIN explicit) | generate + build ✅ | proto/user.proto | proto |
-| **M1.5** ✅ | service: `UserService` handler + Registrar + wire | generate:wire + build ✅ | service/user.go | service |
-| **M1.6** ✅ | e2e: curl create user → get user; DB bcrypt verified | curl ✅ | — | — |
+Closed loop: create→get user; login → opaque token → BearerAuth → `Subject` in ctx; 401 without token. M2 layered `tenant_id` + transparent filtering on top.
 
-**②a auth — login (issue token)**
+### M2–M8 small steps (refined on arrival, same method)
 
-| Step | What | Loop | Files | Paradigm |
-|---|---|---|---|---|
-| **M1.7** | biz: `Session{UserID}` + `TokenService` port{`Issue`} + `AuthUC.Login` (FindByEmail → utils.Verify → Issue; NotFound/bad-pw → UNAUTHENTICATED anti-enumeration) | build | biz/auth.go | rule ① port in biz |
-| **M1.8** | data: `tokenRP` implements `Issue` (random token + Session JSON → cache.KV.Set, TTL) | build | data/token_rp.go | rule ① data implements biz port |
-| **M1.9** | proto: `AuthService.Login` (email/password → token, ACCESS_PUBLIC) | generate + build | proto/auth.proto | proto |
-| **M1.10** | service: `AuthService` handler + Registrar | build | service/auth.go | service |
-| **M1.11** | wire + e2e: login(email/password) → token | generate:wire + curl | wire | DI |
-
-**②b auth — verify (inject Subject)**
-
-| Step | What | Loop | Files | Paradigm |
-|---|---|---|---|---|
-| **M1.12** | `capability/auth/subject.go`: `Subject{UserID}` + WithSubject/SubjectFromCtx + unit test | unit test + build | capability/auth/subject.go | rule ③ pure primitive |
-| **M1.13** | biz: `TokenService` += `Verify` + ErrInvalidToken; data: `tokenRP` += Verify (cache.KV.Get); `internal/server/middleware/auth.go` (verify→WithSubject) + selector allows Login (public) | build | biz/auth.go, data/token_rp.go, server/middleware/auth.go (new), server/connect.go | rule ①② |
-| **M1.14** | e2e: token request protected RPC → Subject in ctx | curl | — | — |
-
-Note: `TokenService` port splits — ②a defines only `Issue` (login needs no Verify); `Verify` lands in ②b when the middleware consumes the token. No dead code in ②a.
-
-M1 done = user entity CRUD-able + auth login + verify end-to-end (single-tenant); M2 layers `tenant_id` + transparent filtering on top of both.
-
-### M2–M7 small steps (refined on arrival, same method)
-
-- **M2 tenant thickening** — WithTenant primitive → TenantMixin → user gains `tenant_id` + composite unique → login carries tenant → Session/middleware inject tenant → item wired → multi-tenant isolation loop.
-- **M3 RBAC** — decide enforcer ownership (open point) → role/permission schema → casbin → Authorizer interface → middleware.
-- **M4 selector** — extend admin / multi-audience tiers.
-- **M5 datascope** — decide scope source (open point) → DataScopeMixin.
-- **M6 service identity** — decide middleware ownership (open point) → internal token.
-- **M7 revocation** — token revoke (`KV.Del`, can ride M2) + policy-reload (PubSub).
+- **M2 tenant** ✅ landed — `Subject.TenantID` (no separate `WithTenant`; Subject carries all identity fields) → `TenantMixin` (local, intercept-based transparent `WHERE tenant_id`) → user gains `tenant_id` + composite unique `(tenant_id, email)` → login carries tenant → `issueToken` marshals TenantID → interceptor reads `SubjectFromCtx().TenantID`. Single-tenant via `defaultTenant`. **Multi-tenant deepening (Login tenant field + `FindByEmail(tenant,email)` + cross-tenant e2e) deferred** — no real 2nd tenant to validate against; M2's hooks make it a pure additive change later.
+- **M3 selector** ✅ landed with M1 — `security.MatchAccess` + `DefaultGuard`, deny-by-default, PUBLIC/ADMIN/UNSPECIFIED three chains (connect/grpc/http).
+- **M4 token full loop** ✅ landed — M4.1 session 引擎(`TokenRP{Set,Get,Del}` + `auth:access/refresh/session:` prefix 规约) → M4.2 login 双 token(access+refresh) + `Authenticate` session 存活校验(D1 即时吊销) → M4.3 `Refresh` rotation → M4.4 `Logout`(Del session)。e2e 全通过:login→refresh→新对、旧 refresh 401、logout→access 401。
+  - **复用检测 deferred(策略 A)**: rotation 删旧 refresh 已让旧 token 无法再 refresh(核心达成);复用检测(`CurrentRefresh` 指针比对)额外价值仅"泄漏可见 + 竞争防护",代价是误报(网络重试→合法用户旧 refresh 被用→误吊销)——管理后台非必需。需高安全时再加(指针比对 + 不删旧 refresh)。
+  - **M4.5 session policy(deferred,零重写)**: `SINGLE_GLOBAL`(单会话)/`SINGLE_PER_CLIENT`(单客户端)并发登录控制。机制:`auth:user:<uid>(:<client>)`→sid 索引 + login 读索引踢旧 + 写新索引;策略由 config 选预定义枚举;`client_type` 加 `LoginRequest`。`Session` struct 不改,Login 线性结构使踢旧/写索引插首尾即可。
+- **M5 RBAC** *(deferred — needs business thickness)* — decide enforcer ownership (open point) → role/permission schema → casbin → Authorizer interface → middleware.
+- **M6 datascope** *(deferred — needs business thickness + RBAC)* — decide scope source (open point) → DataScopeMixin.
+- **M7 service identity** *(deferred — needs 2nd service)* — decide middleware ownership (open point) → internal token (caller+for).
+- **M8 cross-instance broadcast** *(deferred — needs multi-instance)* — cache PubSub revocation broadcast + policy-reload.
 
 ## Implementation paradigm (landed in M1)
 
 M1 落地后确立/调整的实现范式(对上方 paradigm rules 的细化与演进):
 
 ### 包结构 — security 顶层分层
-- `shared-go/kratos/security/`(根):access 选链基建 —— `matcher.go`(`MatchAccess`/`AccessOf` 读 proto 注解)、`default_guard.go`(`DefaultGuard`,UNSPECIFIED 业务 RPC 兜底拒)。
-- `shared-go/kratos/security/auth/`:认证 —— `subject.go`(`Subject`/`WithSubject`/`SubjectFromCtx`)、`authenticator.go`(`Authenticator` 契约 / `ErrInvalidToken`)、`bearer.go`(`BearerAuth`/`ErrMissingToken`)、`token.go`(`GenerateToken`)。
+- `shared-go/kratos/security/`(根):身份聚合 + access 选链基建 —— `identity.go`(`Subject`/`WithSubject`/`SubjectFromCtx`,跨 auth/authz/datascope 共用,故置于根而非 auth 子包)、`matcher.go`(`MatchAccess`/`AccessOf` 读 proto 注解)、`default_guard.go`(`DefaultGuard`,UNSPECIFIED 业务 RPC 兜底拒)。
+- `shared-go/kratos/security/auth/`:认证 —— `authenticator.go`(`Authenticator` 契约 / `ErrInvalidToken`)、`bearer.go`(`BearerAuth`/`ErrMissingToken`)、`token.go`(`GenerateToken`)。
 - 后续 `security/authz/`(RBAC/ABAC)、`security/datascope/` 平级子包,各 import `security`(选链)+ `security/auth`(身份)。
 - 横切 middleware 放共享层(不塞服务 internal),命名按职责、不带 MW 前缀(子包已表达)。
 

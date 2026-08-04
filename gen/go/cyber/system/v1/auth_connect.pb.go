@@ -10,4 +10,6 @@ import (
 // Kratos Connect transport server, bridging a gRPC-style implementation.
 func RegisterAuthServiceConnectServer(srv *connect.Server, svc AuthServiceServer) {
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/Login", svc.Login)
+	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/Logout", svc.Logout)
+	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/Refresh", svc.Refresh)
 }
