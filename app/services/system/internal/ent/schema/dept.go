@@ -19,6 +19,7 @@ type Dept struct {
 func (Dept) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").NotEmpty().MaxLen(64),
+		field.String("parent_id").Optional().Nillable().MaxLen(20),
 	}
 }
 
@@ -37,7 +38,7 @@ func (Dept) Mixin() []ent.Mixin {
 
 func (Dept) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("tenant_id", "name").Unique().
+		index.Fields("tenant_id", "parent_id", "name").Unique().
 			Annotations(entsql.IndexWhere("deleted_at IS NULL")),
 	}
 }

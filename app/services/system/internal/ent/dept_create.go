@@ -74,6 +74,20 @@ func (_c *DeptCreate) SetName(v string) *DeptCreate {
 	return _c
 }
 
+// SetParentID sets the "parent_id" field.
+func (_c *DeptCreate) SetParentID(v string) *DeptCreate {
+	_c.mutation.SetParentID(v)
+	return _c
+}
+
+// SetNillableParentID sets the "parent_id" field if the given value is not nil.
+func (_c *DeptCreate) SetNillableParentID(v *string) *DeptCreate {
+	if v != nil {
+		_c.SetParentID(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *DeptCreate) SetID(v string) *DeptCreate {
 	_c.mutation.SetID(v)
@@ -173,6 +187,11 @@ func (_c *DeptCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Dept.name": %w`, err)}
 		}
 	}
+	if v, ok := _c.mutation.ParentID(); ok {
+		if err := dept.ParentIDValidator(v); err != nil {
+			return &ValidationError{Name: "parent_id", err: fmt.Errorf(`ent: validator failed for field "Dept.parent_id": %w`, err)}
+		}
+	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := dept.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Dept.id": %w`, err)}
@@ -232,6 +251,10 @@ func (_c *DeptCreate) createSpec() (*Dept, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(dept.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := _c.mutation.ParentID(); ok {
+		_spec.SetField(dept.FieldParentID, field.TypeString, value)
+		_node.ParentID = &value
 	}
 	return _node, _spec
 }

@@ -61,6 +61,10 @@ func init() {
 			return nil
 		}
 	}()
+	// deptDescParentID is the schema descriptor for parent_id field.
+	deptDescParentID := deptFields[1].Descriptor()
+	// dept.ParentIDValidator is a validator for the "parent_id" field. It is called by the builders before save.
+	dept.ParentIDValidator = deptDescParentID.Validators[0].(func(string) error)
 	// deptDescID is the schema descriptor for id field.
 	deptDescID := deptMixinFields0[0].Descriptor()
 	// dept.DefaultID holds the default value on creation for the id field.

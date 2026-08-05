@@ -69,6 +69,26 @@ func (_u *DeptUpdate) SetNillableName(v *string) *DeptUpdate {
 	return _u
 }
 
+// SetParentID sets the "parent_id" field.
+func (_u *DeptUpdate) SetParentID(v string) *DeptUpdate {
+	_u.mutation.SetParentID(v)
+	return _u
+}
+
+// SetNillableParentID sets the "parent_id" field if the given value is not nil.
+func (_u *DeptUpdate) SetNillableParentID(v *string) *DeptUpdate {
+	if v != nil {
+		_u.SetParentID(*v)
+	}
+	return _u
+}
+
+// ClearParentID clears the value of the "parent_id" field.
+func (_u *DeptUpdate) ClearParentID() *DeptUpdate {
+	_u.mutation.ClearParentID()
+	return _u
+}
+
 // Mutation returns the DeptMutation object of the builder.
 func (_u *DeptUpdate) Mutation() *DeptMutation {
 	return _u.mutation
@@ -123,6 +143,11 @@ func (_u *DeptUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Dept.name": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.ParentID(); ok {
+		if err := dept.ParentIDValidator(v); err != nil {
+			return &ValidationError{Name: "parent_id", err: fmt.Errorf(`ent: validator failed for field "Dept.parent_id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -155,6 +180,12 @@ func (_u *DeptUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(dept.FieldName, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.ParentID(); ok {
+		_spec.SetField(dept.FieldParentID, field.TypeString, value)
+	}
+	if _u.mutation.ParentIDCleared() {
+		_spec.ClearField(dept.FieldParentID, field.TypeString)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -215,6 +246,26 @@ func (_u *DeptUpdateOne) SetNillableName(v *string) *DeptUpdateOne {
 	if v != nil {
 		_u.SetName(*v)
 	}
+	return _u
+}
+
+// SetParentID sets the "parent_id" field.
+func (_u *DeptUpdateOne) SetParentID(v string) *DeptUpdateOne {
+	_u.mutation.SetParentID(v)
+	return _u
+}
+
+// SetNillableParentID sets the "parent_id" field if the given value is not nil.
+func (_u *DeptUpdateOne) SetNillableParentID(v *string) *DeptUpdateOne {
+	if v != nil {
+		_u.SetParentID(*v)
+	}
+	return _u
+}
+
+// ClearParentID clears the value of the "parent_id" field.
+func (_u *DeptUpdateOne) ClearParentID() *DeptUpdateOne {
+	_u.mutation.ClearParentID()
 	return _u
 }
 
@@ -285,6 +336,11 @@ func (_u *DeptUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Dept.name": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.ParentID(); ok {
+		if err := dept.ParentIDValidator(v); err != nil {
+			return &ValidationError{Name: "parent_id", err: fmt.Errorf(`ent: validator failed for field "Dept.parent_id": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -334,6 +390,12 @@ func (_u *DeptUpdateOne) sqlSave(ctx context.Context) (_node *Dept, err error) {
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(dept.FieldName, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.ParentID(); ok {
+		_spec.SetField(dept.FieldParentID, field.TypeString, value)
+	}
+	if _u.mutation.ParentIDCleared() {
+		_spec.ClearField(dept.FieldParentID, field.TypeString)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &Dept{config: _u.config}

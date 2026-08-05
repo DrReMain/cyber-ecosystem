@@ -16,9 +16,9 @@ observability:
     level: debug
     console: true
     otlp: false
-    file:
-      path: app.log
-      max_size_mb: 100 # MiB (单文件最大)
-      max_backups: 10 # 个 (保留备份数)
-      max_age_days: 30 # 天 (最大保留天数)
-      compress: true
+#    file:
+#      path: app.log
+#      max_size_mb: 100 # MiB (单文件最大)
+#      max_backups: 10 # 个 (保留备份数)
+#      max_age_days: 30 # 天 (最大保留天数)
+#      compress: true

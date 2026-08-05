@@ -34,6 +34,7 @@ func NewDeptRP(logger *slog.Logger, p *platform.Platform) biz.DeptRP {
 func (rp *deptRP) Create(ctx context.Context, d *biz.Dept) (*biz.Dept, error) {
 	created, err := rp.platform.GetClient(ctx).Dept.Create().
 		SetTenantID(d.TenantID).
+		SetNillableParentID(d.ParentID).
 		SetName(*d.Name).
 		Save(ctx)
 	if err != nil {
@@ -49,6 +50,11 @@ func (rp *deptRP) Update(ctx context.Context, fieldsMask []string, d *biz.Dept) 
 			Condition: d.Name != nil,
 			OnTrue:    func() { updater.SetName(*d.Name) },
 			OnFalse:   func() {},
+		},
+		"parent_id": {
+			Condition: d.ParentID != nil,
+			OnTrue:    func() { updater.SetNillableParentID(d.ParentID) },
+			OnFalse:   func() { updater.ClearParentID() },
 		},
 	}.Emit(fieldsMask)
 	updated, err := updater.Save(ctx)
@@ -103,6 +109,39 @@ func (rp *deptRP) Get(ctx context.Context, id string) (*biz.Dept, error) {
 	return mapDept(d), nil
 }
 
+func (rp *deptRP) HasChildren(ctx context.Context, id string) (bool, error) {
+	count, err := rp.platform.GetClient(ctx).Dept.Query().
+		Where(dept.ParentIDEQ(id)).
+		Count(ctx)
+	if err != nil {
+		return false, rp.platform.HandleEntError(err)
+	}
+	return count > 0, nil
+}
+
+func (rp *deptRP) IsAncestor(ctx context.Context, ancestorID, descendantID string) (bool, error) {
+	client := rp.platform.GetClient(ctx)
+	cur := descendantID
+	visited := map[string]struct{}{cur: {}}
+	for {
+		d, err := client.Dept.Get(ctx, cur)
+		if err != nil {
+			return false, rp.platform.HandleEntError(err)
+		}
+		if d.ParentID == nil {
+			return false, nil // reached root without a match
+		}
+		if *d.ParentID == ancestorID {
+			return true, nil
+		}
+		if _, seen := visited[*d.ParentID]; seen {
+			return false, nil // cycle guard — data should never form a ring
+		}
+		visited[*d.ParentID] = struct{}{}
+		cur = *d.ParentID
+	}
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func mapDept(d *ent.Dept) *biz.Dept {
@@ -112,5 +151,6 @@ func mapDept(d *ent.Dept) *biz.Dept {
 		UpdatedAt: d.UpdatedAt,
 		TenantID:  d.TenantID,
 		Name:      &d.Name,
+		ParentID:  d.ParentID,
 	}
 }

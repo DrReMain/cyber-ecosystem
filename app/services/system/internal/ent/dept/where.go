@@ -89,6 +89,11 @@ func Name(v string) predicate.Dept {
 	return predicate.Dept(sql.FieldEQ(FieldName, v))
 }
 
+// ParentID applies equality check predicate on the "parent_id" field. It's identical to ParentIDEQ.
+func ParentID(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldEQ(FieldParentID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Dept {
 	return predicate.Dept(sql.FieldEQ(FieldCreatedAt, v))
@@ -347,6 +352,81 @@ func NameEqualFold(v string) predicate.Dept {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Dept {
 	return predicate.Dept(sql.FieldContainsFold(FieldName, v))
+}
+
+// ParentIDEQ applies the EQ predicate on the "parent_id" field.
+func ParentIDEQ(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldEQ(FieldParentID, v))
+}
+
+// ParentIDNEQ applies the NEQ predicate on the "parent_id" field.
+func ParentIDNEQ(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldNEQ(FieldParentID, v))
+}
+
+// ParentIDIn applies the In predicate on the "parent_id" field.
+func ParentIDIn(vs ...string) predicate.Dept {
+	return predicate.Dept(sql.FieldIn(FieldParentID, vs...))
+}
+
+// ParentIDNotIn applies the NotIn predicate on the "parent_id" field.
+func ParentIDNotIn(vs ...string) predicate.Dept {
+	return predicate.Dept(sql.FieldNotIn(FieldParentID, vs...))
+}
+
+// ParentIDGT applies the GT predicate on the "parent_id" field.
+func ParentIDGT(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldGT(FieldParentID, v))
+}
+
+// ParentIDGTE applies the GTE predicate on the "parent_id" field.
+func ParentIDGTE(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldGTE(FieldParentID, v))
+}
+
+// ParentIDLT applies the LT predicate on the "parent_id" field.
+func ParentIDLT(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldLT(FieldParentID, v))
+}
+
+// ParentIDLTE applies the LTE predicate on the "parent_id" field.
+func ParentIDLTE(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldLTE(FieldParentID, v))
+}
+
+// ParentIDContains applies the Contains predicate on the "parent_id" field.
+func ParentIDContains(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldContains(FieldParentID, v))
+}
+
+// ParentIDHasPrefix applies the HasPrefix predicate on the "parent_id" field.
+func ParentIDHasPrefix(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldHasPrefix(FieldParentID, v))
+}
+
+// ParentIDHasSuffix applies the HasSuffix predicate on the "parent_id" field.
+func ParentIDHasSuffix(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldHasSuffix(FieldParentID, v))
+}
+
+// ParentIDIsNil applies the IsNil predicate on the "parent_id" field.
+func ParentIDIsNil() predicate.Dept {
+	return predicate.Dept(sql.FieldIsNull(FieldParentID))
+}
+
+// ParentIDNotNil applies the NotNil predicate on the "parent_id" field.
+func ParentIDNotNil() predicate.Dept {
+	return predicate.Dept(sql.FieldNotNull(FieldParentID))
+}
+
+// ParentIDEqualFold applies the EqualFold predicate on the "parent_id" field.
+func ParentIDEqualFold(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldEqualFold(FieldParentID, v))
+}
+
+// ParentIDContainsFold applies the ContainsFold predicate on the "parent_id" field.
+func ParentIDContainsFold(v string) predicate.Dept {
+	return predicate.Dept(sql.FieldContainsFold(FieldParentID, v))
 }
 
 // And groups predicates with the AND operator between them.

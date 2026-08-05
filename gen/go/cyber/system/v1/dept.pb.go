@@ -33,6 +33,7 @@ type Dept struct {
 	CreatedAt     *timestamppb.Timestamp  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Name          *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	ParentId      *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -95,10 +96,18 @@ func (x *Dept) GetName() *wrapperspb.StringValue {
 	return nil
 }
 
+func (x *Dept) GetParentId() *wrapperspb.StringValue {
+	if x != nil {
+		return x.ParentId
+	}
+	return nil
+}
+
 // create
 type CreateDeptRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          *string                `protobuf:"bytes,1,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	ParentId      *string                `protobuf:"bytes,2,opt,name=parent_id,json=parentId,proto3,oneof" json:"parent_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -136,6 +145,13 @@ func (*CreateDeptRequest) Descriptor() ([]byte, []int) {
 func (x *CreateDeptRequest) GetName() string {
 	if x != nil && x.Name != nil {
 		return *x.Name
+	}
+	return ""
+}
+
+func (x *CreateDeptRequest) GetParentId() string {
+	if x != nil && x.ParentId != nil {
+		return *x.ParentId
 	}
 	return ""
 }
@@ -189,6 +205,7 @@ type UpdateDeptRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          *string                `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	ParentId      *string                `protobuf:"bytes,3,opt,name=parent_id,json=parentId,proto3,oneof" json:"parent_id,omitempty"`
 	FieldsMask    []string               `protobuf:"bytes,100,rep,name=fields_mask,json=fieldsMask,proto3" json:"fields_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -234,6 +251,13 @@ func (x *UpdateDeptRequest) GetId() string {
 func (x *UpdateDeptRequest) GetName() string {
 	if x != nil && x.Name != nil {
 		return *x.Name
+	}
+	return ""
+}
+
+func (x *UpdateDeptRequest) GetParentId() string {
+	if x != nil && x.ParentId != nil {
+		return *x.ParentId
 	}
 	return ""
 }
@@ -568,27 +592,34 @@ var File_cyber_system_v1_dept_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_dept_proto_rawDesc = "" +
 	"\n" +
-	"\x1acyber/system/v1/dept.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xdc\x01\n" +
+	"\x1acyber/system/v1/dept.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x97\x02\n" +
 	"\x04Dept\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
 	"\n" +
 	"created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x120\n" +
-	"\x04name\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x04name\"A\n" +
+	"\x04name\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x04name\x129\n" +
+	"\tparent_id\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\bparentId\"q\n" +
 	"\x11CreateDeptRequest\x12#\n" +
 	"\x04name\x18\x01 \x01(\tB\n" +
-	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\x04name\x88\x01\x01B\a\n" +
-	"\x05_name\"B\n" +
+	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\x04name\x88\x01\x01\x12 \n" +
+	"\tparent_id\x18\x02 \x01(\tH\x01R\bparentId\x88\x01\x01B\a\n" +
+	"\x05_nameB\f\n" +
+	"\n" +
+	"_parent_id\"B\n" +
 	"\x12CreateDeptResponse\x12,\n" +
-	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"\x7f\n" +
+	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"\xaf\x01\n" +
 	"\x11UpdateDeptRequest\x12\x1b\n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\x12\x17\n" +
-	"\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x12+\n" +
+	"\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x12 \n" +
+	"\tparent_id\x18\x03 \x01(\tH\x01R\bparentId\x88\x01\x01\x12+\n" +
 	"\vfields_mask\x18d \x03(\tB\n" +
 	"\xbaH\a\x92\x01\x04\b\x01\x18\x01R\n" +
 	"fieldsMaskB\a\n" +
-	"\x05_name\"\x14\n" +
+	"\x05_nameB\f\n" +
+	"\n" +
+	"_parent_id\"\x14\n" +
 	"\x12UpdateDeptResponse\"0\n" +
 	"\x11DeleteDeptRequest\x12\x1b\n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"\x14\n" +
@@ -651,26 +682,27 @@ var file_cyber_system_v1_dept_proto_depIdxs = []int32{
 	12, // 1: cyber.system.v1.Dept.created_at:type_name -> google.protobuf.Timestamp
 	12, // 2: cyber.system.v1.Dept.updated_at:type_name -> google.protobuf.Timestamp
 	11, // 3: cyber.system.v1.Dept.name:type_name -> google.protobuf.StringValue
-	11, // 4: cyber.system.v1.CreateDeptResponse.id:type_name -> google.protobuf.StringValue
-	13, // 5: cyber.system.v1.ListDeptsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	14, // 6: cyber.system.v1.ListDeptsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	0,  // 7: cyber.system.v1.ListDeptsResponse.list:type_name -> cyber.system.v1.Dept
-	0,  // 8: cyber.system.v1.GetDeptResponse.dept:type_name -> cyber.system.v1.Dept
-	1,  // 9: cyber.system.v1.DeptService.CreateDept:input_type -> cyber.system.v1.CreateDeptRequest
-	3,  // 10: cyber.system.v1.DeptService.UpdateDept:input_type -> cyber.system.v1.UpdateDeptRequest
-	5,  // 11: cyber.system.v1.DeptService.DeleteDept:input_type -> cyber.system.v1.DeleteDeptRequest
-	7,  // 12: cyber.system.v1.DeptService.ListDepts:input_type -> cyber.system.v1.ListDeptsRequest
-	9,  // 13: cyber.system.v1.DeptService.GetDept:input_type -> cyber.system.v1.GetDeptRequest
-	2,  // 14: cyber.system.v1.DeptService.CreateDept:output_type -> cyber.system.v1.CreateDeptResponse
-	4,  // 15: cyber.system.v1.DeptService.UpdateDept:output_type -> cyber.system.v1.UpdateDeptResponse
-	6,  // 16: cyber.system.v1.DeptService.DeleteDept:output_type -> cyber.system.v1.DeleteDeptResponse
-	8,  // 17: cyber.system.v1.DeptService.ListDepts:output_type -> cyber.system.v1.ListDeptsResponse
-	10, // 18: cyber.system.v1.DeptService.GetDept:output_type -> cyber.system.v1.GetDeptResponse
-	14, // [14:19] is the sub-list for method output_type
-	9,  // [9:14] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	11, // 4: cyber.system.v1.Dept.parent_id:type_name -> google.protobuf.StringValue
+	11, // 5: cyber.system.v1.CreateDeptResponse.id:type_name -> google.protobuf.StringValue
+	13, // 6: cyber.system.v1.ListDeptsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	14, // 7: cyber.system.v1.ListDeptsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	0,  // 8: cyber.system.v1.ListDeptsResponse.list:type_name -> cyber.system.v1.Dept
+	0,  // 9: cyber.system.v1.GetDeptResponse.dept:type_name -> cyber.system.v1.Dept
+	1,  // 10: cyber.system.v1.DeptService.CreateDept:input_type -> cyber.system.v1.CreateDeptRequest
+	3,  // 11: cyber.system.v1.DeptService.UpdateDept:input_type -> cyber.system.v1.UpdateDeptRequest
+	5,  // 12: cyber.system.v1.DeptService.DeleteDept:input_type -> cyber.system.v1.DeleteDeptRequest
+	7,  // 13: cyber.system.v1.DeptService.ListDepts:input_type -> cyber.system.v1.ListDeptsRequest
+	9,  // 14: cyber.system.v1.DeptService.GetDept:input_type -> cyber.system.v1.GetDeptRequest
+	2,  // 15: cyber.system.v1.DeptService.CreateDept:output_type -> cyber.system.v1.CreateDeptResponse
+	4,  // 16: cyber.system.v1.DeptService.UpdateDept:output_type -> cyber.system.v1.UpdateDeptResponse
+	6,  // 17: cyber.system.v1.DeptService.DeleteDept:output_type -> cyber.system.v1.DeleteDeptResponse
+	8,  // 18: cyber.system.v1.DeptService.ListDepts:output_type -> cyber.system.v1.ListDeptsResponse
+	10, // 19: cyber.system.v1.DeptService.GetDept:output_type -> cyber.system.v1.GetDeptResponse
+	15, // [15:20] is the sub-list for method output_type
+	10, // [10:15] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_dept_proto_init() }

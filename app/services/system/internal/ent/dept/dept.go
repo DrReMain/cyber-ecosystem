@@ -24,6 +24,8 @@ const (
 	FieldTenantID = "tenant_id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldParentID holds the string denoting the parent_id field in the database.
+	FieldParentID = "parent_id"
 	// Table holds the table name of the dept in the database.
 	Table = "dept"
 )
@@ -36,6 +38,7 @@ var Columns = []string{
 	FieldDeletedAt,
 	FieldTenantID,
 	FieldName,
+	FieldParentID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -66,6 +69,8 @@ var (
 	TenantIDValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// ParentIDValidator is a validator for the "parent_id" field. It is called by the builders before save.
+	ParentIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -103,4 +108,9 @@ func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByParentID orders the results by the parent_id field.
+func ByParentID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParentID, opts...).ToFunc()
 }

@@ -17,6 +17,7 @@ var (
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeString, Size: 20},
 		{Name: "name", Type: field.TypeString, Size: 64},
+		{Name: "parent_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// DeptTable holds the schema information for the "dept" table.
 	DeptTable = &schema.Table{
@@ -35,9 +36,9 @@ var (
 				Columns: []*schema.Column{DeptColumns[2]},
 			},
 			{
-				Name:    "dept_tenant_id_name",
+				Name:    "dept_tenant_id_parent_id_name",
 				Unique:  true,
-				Columns: []*schema.Column{DeptColumns[4], DeptColumns[5]},
+				Columns: []*schema.Column{DeptColumns[4], DeptColumns[6], DeptColumns[5]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "deleted_at IS NULL",
 				},

@@ -26,7 +26,9 @@ type Dept struct {
 	// TenantID holds the value of the "tenant_id" field.
 	TenantID string `json:"tenant_id,omitempty"`
 	// Name holds the value of the "name" field.
-	Name         string `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
+	// ParentID holds the value of the "parent_id" field.
+	ParentID     *string `json:"parent_id,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -35,7 +37,7 @@ func (*Dept) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case dept.FieldID, dept.FieldTenantID, dept.FieldName:
+		case dept.FieldID, dept.FieldTenantID, dept.FieldName, dept.FieldParentID:
 			values[i] = new(sql.NullString)
 		case dept.FieldCreatedAt, dept.FieldUpdatedAt, dept.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -91,6 +93,13 @@ func (_m *Dept) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Name = value.String
 			}
+		case dept.FieldParentID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
+			} else if value.Valid {
+				_m.ParentID = new(string)
+				*_m.ParentID = value.String
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -143,6 +152,11 @@ func (_m *Dept) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
+	builder.WriteString(", ")
+	if v := _m.ParentID; v != nil {
+		builder.WriteString("parent_id=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

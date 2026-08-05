@@ -42,6 +42,7 @@ type DeptMutation struct {
 	deleted_at    *time.Time
 	tenant_id     *string
 	name          *string
+	parent_id     *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Dept, error)
@@ -345,6 +346,55 @@ func (m *DeptMutation) ResetName() {
 	m.name = nil
 }
 
+// SetParentID sets the "parent_id" field.
+func (m *DeptMutation) SetParentID(s string) {
+	m.parent_id = &s
+}
+
+// ParentID returns the value of the "parent_id" field in the mutation.
+func (m *DeptMutation) ParentID() (r string, exists bool) {
+	v := m.parent_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParentID returns the old "parent_id" field's value of the Dept entity.
+// If the Dept object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeptMutation) OldParentID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParentID: %w", err)
+	}
+	return oldValue.ParentID, nil
+}
+
+// ClearParentID clears the value of the "parent_id" field.
+func (m *DeptMutation) ClearParentID() {
+	m.parent_id = nil
+	m.clearedFields[dept.FieldParentID] = struct{}{}
+}
+
+// ParentIDCleared returns if the "parent_id" field was cleared in this mutation.
+func (m *DeptMutation) ParentIDCleared() bool {
+	_, ok := m.clearedFields[dept.FieldParentID]
+	return ok
+}
+
+// ResetParentID resets all changes to the "parent_id" field.
+func (m *DeptMutation) ResetParentID() {
+	m.parent_id = nil
+	delete(m.clearedFields, dept.FieldParentID)
+}
+
 // Where appends a list predicates to the DeptMutation builder.
 func (m *DeptMutation) Where(ps ...predicate.Dept) {
 	m.predicates = append(m.predicates, ps...)
@@ -379,7 +429,7 @@ func (m *DeptMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DeptMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, dept.FieldCreatedAt)
 	}
@@ -394,6 +444,9 @@ func (m *DeptMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, dept.FieldName)
+	}
+	if m.parent_id != nil {
+		fields = append(fields, dept.FieldParentID)
 	}
 	return fields
 }
@@ -413,6 +466,8 @@ func (m *DeptMutation) Field(name string) (ent.Value, bool) {
 		return m.TenantID()
 	case dept.FieldName:
 		return m.Name()
+	case dept.FieldParentID:
+		return m.ParentID()
 	}
 	return nil, false
 }
@@ -432,6 +487,8 @@ func (m *DeptMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldTenantID(ctx)
 	case dept.FieldName:
 		return m.OldName(ctx)
+	case dept.FieldParentID:
+		return m.OldParentID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Dept field %s", name)
 }
@@ -476,6 +533,13 @@ func (m *DeptMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
+	case dept.FieldParentID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParentID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Dept field %s", name)
 }
@@ -509,6 +573,9 @@ func (m *DeptMutation) ClearedFields() []string {
 	if m.FieldCleared(dept.FieldDeletedAt) {
 		fields = append(fields, dept.FieldDeletedAt)
 	}
+	if m.FieldCleared(dept.FieldParentID) {
+		fields = append(fields, dept.FieldParentID)
+	}
 	return fields
 }
 
@@ -525,6 +592,9 @@ func (m *DeptMutation) ClearField(name string) error {
 	switch name {
 	case dept.FieldDeletedAt:
 		m.ClearDeletedAt()
+		return nil
+	case dept.FieldParentID:
+		m.ClearParentID()
 		return nil
 	}
 	return fmt.Errorf("unknown Dept nullable field %s", name)
@@ -548,6 +618,9 @@ func (m *DeptMutation) ResetField(name string) error {
 		return nil
 	case dept.FieldName:
 		m.ResetName()
+		return nil
+	case dept.FieldParentID:
+		m.ResetParentID()
 		return nil
 	}
 	return fmt.Errorf("unknown Dept field %s", name)

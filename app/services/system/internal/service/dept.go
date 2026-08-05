@@ -48,7 +48,8 @@ func (s *DeptService) RegisterConnect(srv *connecttransport.Server) {
 
 func (s *DeptService) CreateDept(ctx context.Context, in *systempb.CreateDeptRequest) (*systempb.CreateDeptResponse, error) {
 	created, err := s.deptUC.Create(ctx, &biz.Dept{
-		Name: in.Name,
+		Name:     in.Name,
+		ParentID: in.ParentId,
 	})
 	if err != nil {
 		return nil, err
@@ -60,8 +61,9 @@ func (s *DeptService) CreateDept(ctx context.Context, in *systempb.CreateDeptReq
 
 func (s *DeptService) UpdateDept(ctx context.Context, in *systempb.UpdateDeptRequest) (*systempb.UpdateDeptResponse, error) {
 	if _, err := s.deptUC.Update(ctx, in.FieldsMask, &biz.Dept{
-		ID:   in.Id,
-		Name: in.Name,
+		ID:       in.Id,
+		Name:     in.Name,
+		ParentID: in.ParentId,
 	}); err != nil {
 		return nil, err
 	}
@@ -108,5 +110,6 @@ func (s *DeptService) deptToProto(d *biz.Dept) *systempb.Dept {
 		CreatedAt: utils.ToTimestamp(&d.CreatedAt),
 		UpdatedAt: utils.ToTimestamp(&d.UpdatedAt),
 		Name:      utils.Wrap(d.Name, utils.StringW),
+		ParentId:  utils.Wrap(d.ParentID, utils.StringW),
 	}
 }

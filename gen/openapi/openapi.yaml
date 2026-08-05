@@ -566,6 +566,8 @@ components:
             properties:
                 name:
                     type: string
+                parentId:
+                    type: string
             description: create
         cyber.system.v1.CreateDeptResponse:
             type: object
@@ -618,6 +620,8 @@ components:
                     type: string
                     format: date-time
                 name:
+                    type: string
+                parentId:
                     type: string
         cyber.system.v1.GetDeptResponse:
             type: object
@@ -784,6 +788,8 @@ components:
                 id:
                     type: string
                 name:
+                    type: string
+                parentId:
                     type: string
                 fieldsMask:
                     type: array

@@ -98,7 +98,7 @@ conf      config (proto-defined, generated)
 
 ## 5. Layer specifics
 
-**biz** — domain errors via `errorspb.ErrorXxx("")` (generated from proto error enums); infra errors come from `data`/`client` already mapped (see §6). Multi-op atomicity via `uc.tm.InTx`. An aggregate FSM lives in `Private` (`looplab/fsm`; `TransitionTo(ctx, target)` returns a domain error on illegal transition).
+**biz** — domain errors via `errorspb.ErrorXxx("").WithCause(errors.New(<reason>))` (generated from proto error enums); **the message MUST stay empty (`""`) — it is serialized back to the client, so the real reason goes in `WithCause` (server-log only, stripped by outbound sanitize). Never write `ErrorXxx("some text")` — that leaks internals.** Infra errors come from `data`/`client` already mapped (see §6). Multi-op atomicity via `uc.tm.InTx`. An aggregate FSM lives in `Private` (`looplab/fsm`; `TransitionTo(ctx, target)` returns a domain error on illegal transition).
 
 **data** — repo `<do>RP` embeds `RP{log, platform}`; on ent error `return ..., rp.platform.HandleEntError(err)` (maps to `InfraError`). **No business rules.**
 
