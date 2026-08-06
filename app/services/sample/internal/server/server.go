@@ -20,4 +20,4 @@ func init() {
 	validator.ErrValidator = errorspb.ErrorGeneralErrorValidationFailed("").WithCause(validator.ErrValidator)
 }
 
-var ProviderSet = wire.NewSet(NewGRPCServer, NewHTTPServer, NewConnectServer)
+var ProviderSet = wire.NewSet(NewGRPCServer, NewHTTPServer, NewConnectServer, NewRegistrarList)

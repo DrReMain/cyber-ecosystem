@@ -33,11 +33,11 @@ A service MUST own its proto under `cyber/<service>/v1/`; shared types go under 
 
 ## 3. Field types
 
-- **Nullable scalar/string:** `optional <type>` (proto3 optional) for value semantics, or a **WKT wrapper** (`google.protobuf.StringValue` / `BoolValue` / `Int32Value` …) when the field must round-trip as a nullable pointer across JSON/codegen. Pick one per field and stay consistent.
+- **Body fields default to `optional`** (`optional <type>` → Go `*T`): prefer the pointer form so proto ↔ DO types align and the service passes pointers through with no nil-checks. Express "required" via `buf.validate.field.required` (a validation rule), **not** via a plain non-optional type. Add `string.min_len`/`max_len`/`pattern` and `cel` (cross-field) as needed.
+- **WKT wrappers** (`google.protobuf.StringValue` / `BoolValue` / `Int32Value` …): use when a response/entity field must round-trip as a nullable pointer across JSON/codegen; otherwise prefer proto3 `optional`.
 - **Time:** `google.protobuf.Timestamp`.
-- **Non-null scalar:** plain `string` / `int32` / …
 - **Path-bound fields** (bound from `{xxx}` in `google.api.http`): MUST be plain (non-`optional`, non-wrapper). They are always present from the URL; `optional`/wrapper generates a proto oneof that conflicts with `body:"*"` decode ("field already set for oneof").
-- **Validation:** `buf.validate.field` rules inline (`required`, `string.min_len`, `int32.gt`/`lte`, …). Validate at the boundary (server inbound); do not re-validate in biz.
+- **Validation:** `buf.validate.field` rules inline, **correct and reasonable** — `required` for mandatory, `string.min_len`/`max_len`/`pattern` for format, `cel` for cross-field (e.g. password==confirm). Validate at the boundary (server inbound); do not re-validate in biz.
 
 ---
 

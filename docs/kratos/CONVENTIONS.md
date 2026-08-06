@@ -8,17 +8,21 @@ This document states **constraints, rationale, and anti-patterns** — the thing
 
 ## 1. Layering & dependencies
 
-Dependencies point **inward** (outer → inner, never reverse):
+Each service is a **modular monolith**: one self-contained module per aggregate root under `module/`, shared infra at the top. Dependencies point **inward** (outer → inner, never reverse), and **across modules only via port read / domain event** (see §1b).
 
 ```
-cmd/app   wire DI assembly
-server    transports (HTTP / gRPC / Connect) + middleware chain
-service   RPC handlers — thin
-biz       use cases (UC) + entities + repo PORTS (local <DO>RP + remote <Remote>RP)
-data      adapter: local repo ports (ent-backed persistence)
-client    adapter: remote repo ports (ACL to other services)
-platform  capability facade (cache / db / storage / mq)
-conf      config (proto-defined, generated)
+cmd/app          wire DI assembly (wireApp + newApp + ...; //go:generate wire)
+server           transports (HTTP/gRPC/Connect) + middleware chain + Registrar port
+module/<d>/      one domain module per aggregate root, self-contained:
+                   biz.go     UC + DO + repo PORT (<DO>RP / <Remote>RP)
+                   data.go    local repo adapter (ent-backed); omit if a pure ACL facade
+                   service.go RPC handlers (thin); implements server.Registrar
+                   module.go  wire ProviderSet for this module
+shared/kernel.go cross-module kernel: UC base, RP base, Transaction, DefaultTenant
+client           outbound adapter: remote repo ports (ACL) — present only if the service calls out
+platform         capability facade (cache / db / storage / mq)
+ent              generated persistence (shared by all modules in the service)
+conf             config (proto-defined, generated)
 ```
 
 - `MUST` keep business logic in `biz`; `service` is thin; `data`/`client` are adapters only.
@@ -26,8 +30,19 @@ conf      config (proto-defined, generated)
 - **A UC depends on repo ports, never on another UC.** Cross-aggregate *read* → the other aggregate's port; cross-aggregate *side-effect* → a **domain event**, not a direct UC call.
 - Two aggregates constantly reaching into each other are probably **one** aggregate — merge or redraw the boundary.
 - **Entity relations follow aggregate boundaries.** *Intra-aggregate* composition (same root, same lifecycle, never a separate service — e.g. Order→OrderLine) uses an **ent edge**; *inter-aggregate* references (independent aggregates, any cross-service possibility — e.g. User→Dept) use a **plain `<x>_id` field** resolved via a repo port (local or `<Remote>RP`). Rationale: edges lock a relation to one DB and can't span services / DTM-Temporal sagas; plain IDs migrate to a remote RP with zero refactor. Edges also clash with soft-delete cascade and add nothing over the intercept-based (tenant/datascope) column filtering already in use. Default to plain FK unless the relation is definitively intra-aggregate-and-intra-service-forever.
-- **biz-domain dependency graph MUST be acyclic (DAG).** biz is one package, so Go won't catch same-package import cycles; keep域间依赖 a DAG (consumer → provider via repo port). Detailed convention + arch test: TODO.
+- **Module dependency graph MUST be acyclic (DAG).** Each module is its own package, so Go catches cross-module import cycles at compile time; keep inter-module dependencies a DAG (consumer → provider via repo port).
 - Events + outbox are `MAY` until a real cross-aggregate side-effect appears. Do not scaffold speculatively; `shared-go/mq` is there when needed.
+
+---
+
+## 1b. Module-to-module dependency paradigm
+
+Modules are aggregate-root boundaries. Cross-module access is constrained so the graph stays a sparse DAG, never a mesh:
+
+- **Read (query)** — a module MAY import another module's repo port for a read (e.g. `auth` uses `user.UserRP.FindByEmail`). Read-only, no side-effect.
+- **Write (side-effect)** — cross-module writes are **forbidden** as direct calls; use a **domain event** (the other module subscribes). Events + outbox are `MAY` until a real cross-aggregate write exists.
+- **Keep the graph sparse** — every cross-module import is a review point. Go only blocks cycles, not meshes, so default to no cross-module dependency and add one only for a real read need.
+- **Kernel is per-service** — `shared/kernel.go` (UC/RP base) lives in each service's `internal/shared`, because `RP` embeds the service-specific `*platform.Platform`. It is NOT in `shared-go`.
 
 ---
 
@@ -35,8 +50,8 @@ conf      config (proto-defined, generated)
 
 | Concept | Rule | Example |
 |---|---|---|
-| Package | one per layer, flat | `biz`, `data`, `service` |
-| biz file | one per aggregate: `<domain>.go` | `user.go` |
+| Package | one per **domain module** (`module/<d>/` is package `<d>`, holding biz+data+service+module.go); `shared`/`server`/`client`/`platform`/`conf` are top-level | `module/user` |
+| biz file | one per module: `module/<d>/biz.go` | `module/user/biz.go` |
 | DO (aggregate root) | `<Domain>`, singular, no redundant prefix | `User` |
 | Repo port — local (interface, in biz) | `<DO>RP` | `UserRP` |
 | Repo port — remote service (interface, in biz, ACL) | `<Remote>RP` | `<Remote>RP` |
@@ -59,7 +74,7 @@ conf      config (proto-defined, generated)
 
 ## 3. File structure & ordering
 
-**One file per aggregate — never split by concern.** `<domain>.go` bundles the aggregate's DO + port + UC + auxiliary code. `MUST NOT` split across `<domain>_uc.go` / `_fsm.go` / `_repo.go`. If it becomes unwieldy, the **aggregate boundary** is wrong — split into two aggregates, don't fragment one. `biz.go` holds only cross-aggregate infra (`Transaction`, `UC` base, `ProviderSet`).
+**One module per domain (aggregate root): `module/<d>/{biz,data,service,module}.go`.** Each file is one concern within the module: `biz.go` = DO + port + UC + aux (FSM, entity behavior); `data.go` = local repo; `service.go` = handlers; `module.go` = ProviderSet. `MUST NOT` split a concern across extra files (`<d>_uc.go` etc.). If `biz.go` becomes unwieldy, the **aggregate boundary** is wrong — split into two modules, don't fragment one. Cross-module infra (`UC`/`RP` base, `Transaction`, `DefaultTenant`) lives in `shared/kernel.go`, not in any module.
 
 **Section order** (each preceded by a divider, §4; omit empty):
 
@@ -71,7 +86,7 @@ conf      config (proto-defined, generated)
 | client | `Adapter` → `Private` |
 
 - biz `DO` = data shape only. `Private` = trailing catch-all (FSM, entity-behavior, helpers). Always last.
-- client: `Adapter` = `<remote>Client` + `New<Remote>Client` + port-method impls; `Private` = `map<ProviderDO>`. `client.go` is the layer's infra file (shared `standardMiddleware` + `ProviderSet`), like `biz.go` — no dividers.
+- client: `Adapter` = `<remote>Client` + `New<Remote>Client` + port-method impls; `Private` = `map<ProviderDO>`. `client.go` is the layer's infra file (shared `standardMiddleware` + `ProviderSet`) — no dividers.
 
 **Client files** — `client.go` (shared `standardMiddleware` + `ProviderSet`) plus `<remote>.go` per remote. One remote = one repo port = one adapter = one file. Adding an RPC adds a method, **never a new file**; only a new remote opens one.
 
@@ -84,7 +99,20 @@ conf      config (proto-defined, generated)
 
 **Proto import alias** — MUST be `<scope>pb`, never bare `pb`, so multiple proto imports never collide: `commonpb` (`cyber.shared.common.v1`), `errorspb` (`cyber.shared.errors.v1`), `extpb` (`cyber.ext.v1`), and per-service `<service>pb` (e.g. a `foo` service → `foopb`).
 
-**Struct fields** — embedded base first, then `log`, then dependencies.
+**Struct fields** — embedded base first, then `log`, then dependencies. Base `shared.UC`/`shared.RP` use **exported** fields (`Log`/`Tm`/`Platform`) so they stay visible across packages when embedded; service structs keep the conventional unexported `log`.
+
+---
+
+## 3a. proto ↔ DO pointer paradigm
+
+Align proto optional fields, DO fields, and the service/data mapping around pointers so the layers stay free of nil-check boilerplate:
+
+- **proto** body fields `optional` (`*T`) + `buf.validate` controls required/format (see proto CONVENTIONS §3); **path-bound `{id}` plain `string`**.
+- **DO**: optional / proto-bound fields are `*T` (align with proto); mandatory system fields (`ID`, `CreatedAt`, `UpdatedAt`, `TenantID`) stay non-pointer.
+- **service**: proto `*T` → DO `*T` **passed straight through — no deref, no nil-check**.
+- **data**: optional fields `SetNillableX(*T)` / `ClearX`; mandatory NOT-NULL fields `SetX(*p)` (validate guarantees `*p` non-nil).
+- **ent schema**: constraints by need — mandatory `.NotEmpty()` (NOT NULL), optional `.Optional().Nillable()`. Do **not** force everything Nillable: DB integrity (NOT NULL on mandatory fields) outweighs saving one deref.
+- **biz**: nil-semantics (e.g. update-leave-unchanged) live in the UC.
 
 ---
 
@@ -98,9 +126,9 @@ conf      config (proto-defined, generated)
 
 ## 5. Layer specifics
 
-**biz** — domain errors via `errorspb.ErrorXxx("").WithCause(errors.New(<reason>))` (generated from proto error enums); **the message MUST stay empty (`""`) — it is serialized back to the client, so the real reason goes in `WithCause` (server-log only, stripped by outbound sanitize). Never write `ErrorXxx("some text")` — that leaks internals.** Infra errors come from `data`/`client` already mapped (see §6). Multi-op atomicity via `uc.tm.InTx`. An aggregate FSM lives in `Private` (`looplab/fsm`; `TransitionTo(ctx, target)` returns a domain error on illegal transition).
+**biz** — domain errors via `errorspb.ErrorXxx("").WithCause(errors.New(<reason>))` (generated from proto error enums); **the message MUST stay empty (`""`) — it is serialized back to the client, so the real reason goes in `WithCause` (server-log only, stripped by outbound sanitize). Never write `ErrorXxx("some text")` — that leaks internals.** Infra errors come from `data`/`client` already mapped (see §6). Multi-op atomicity via `uc.Tm.InTx`. An aggregate FSM lives in `Private` (`looplab/fsm`; `TransitionTo(ctx, target)` returns a domain error on illegal transition).
 
-**data** — repo `<do>RP` embeds `RP{log, platform}`; on ent error `return ..., rp.platform.HandleEntError(err)` (maps to `InfraError`). **No business rules.**
+**data** — repo `<do>RP` embeds `shared.RP{Log, Platform}`; on ent error `return ..., rp.Platform.HandleEntError(err)` (maps to `InfraError`). **No business rules.**
 
 **service** — `<Name>Service` embeds the proto `Unimplemented<X>Server`, implements `Registrar` (`RegisterGRPC/HTTP/Connect`). Thin: `in.GetXxx()` → UC → map to proto. No direct repo access.
 
@@ -126,12 +154,13 @@ So a UC never returns a raw upstream error — the client middleware both logs t
 
 ## 7. Checklist
 
-**Adding a new aggregate / UC:**
-1. biz `<domain>.go`: `DO` → `Port` → `UC` → `Method` (→ `Private`). Register `New<Name>UC` in `biz.ProviderSet`.
+**Adding a new domain module (aggregate root):**
+1. `module/<d>/biz.go`: `DO` → `Port` → `UC` → `Method` (→ `Private`); UC embeds `shared.UC` (`uc.Tm` / `uc.Log`).
 2. ent `schema/<do>.go`: fields + mixins; `./nx run <service>:generate:ent`, `:migrate:diff`, `:migrate:apply` (persisted only).
-3. data `<do>_rp.go`: `<do>RP` + `New<DO>RP` + `map<DO>`. Register in `data.ProviderSet`.
-4. service `<name>.go`: `<Name>Service` + handlers + Registrar. Register in `service.ProviderSet` + `NewRegistrarList`.
-5. `./nx run <service>:generate:wire` then `:build`. Verify dependency direction (UC→port, no UC→UC).
+3. `module/<d>/data.go`: `<do>RP` + `New<DO>RP` + `map<DO>` (embed `shared.RP`, use `rp.Platform`). **Omit** this file for a pure ACL facade (no persistence).
+4. `module/<d>/service.go`: `<Name>Service` + handlers + Registrar. `module/<d>/module.go`: `ProviderSet{New<Name>UC, New<DO>RP, New<Name>Service}`.
+5. Wire it in: add the module's `ProviderSet` to `wireApp`; add its `*<Name>Service` param to `server.NewRegistrarList`.
+6. `./nx run <service>:generate:wire` then `:build`. If it imports another module, keep it a **read** (port query) — cross-module writes go via domain event. Verify dependency direction (UC→port, no UC→UC).
 
 **Adding a remote-service dependency (treat as a repo):**
 1. biz: declare `<Remote>RP` with neutral ACL payloads; inject into the UC like any repo.
@@ -139,4 +168,4 @@ So a UC never returns a raw upstream error — the client middleware both logs t
 3. conf `conf.proto` `Remote`: add endpoint field; `configs/config.yaml`: set it. `./nx run <service>:proto:conf`.
 4. `./nx run <service>:generate:wire` then `:build`. Verify biz never imports the provider's proto.
 
-**Pure ACL facade** (no own persistence): keep `data/` as just the `RP` base, no `ProviderSet` (wire rejects an empty set); omit `data.ProviderSet` from `wireApp`.
+**Pure ACL facade** (no own persistence): the module has **no `data.go`**; its UC depends on a `<Remote>RP` satisfied by the `client` layer. Its `module.go` `ProviderSet` lists only `New<Name>UC` + `New<Name>Service`.

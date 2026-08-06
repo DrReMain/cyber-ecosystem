@@ -1,7 +1,7 @@
 # ADR-0001: Auth, RBAC, ABAC, Datascope & Multi-tenancy
 
-- **Status:** M1–M4 (identity / tenant / selector / token full loop) **landed and e2e-verified — code is the source of truth; this ADR no longer tracks their implementation.** Remaining work is re-sequenced in *Remaining work*. Root design decisions (D1–D13) are stable.
-- **Date:** 2026-08-01 (last revised 2026-08-05)
+- **Status:** M1–M4 (identity / tenant / selector / token full loop) + dept (flat + tree) **landed and e2e-verified — code is the source of truth; this ADR no longer tracks their implementation.** Remaining work is re-sequenced in *Remaining work*. Root design decisions (D1–D13) are stable. **Current focus (2026-08-07): pivoted to completing auth entities (user full CRUD) + admin web UI before resuming backend authorization — see *Remaining work › Current focus*.**
+- **Date:** 2026-08-01 (last revised 2026-08-07)
 
 ## Context
 
@@ -40,7 +40,7 @@ Every core table carries `tenant_id`; single-tenant deploy = one default tenant;
 **Convention:** every unique index MUST be composite with `tenant_id` (e.g. `(tenant_id, username)`), so multi-tenant promotion never rewrites indexes.
 
 ### D3 — Org unit (flat `dept`) is Core; tree hierarchy is Extension
-Datascope needs an anchor (which unit a user belongs to), so a flat `dept` is Core. Tree hierarchy (`parent_id` + materialized path) is an opt-in mixin that unlocks the "my-dept and subordinates" datascope tier.
+Datascope needs an anchor (which unit a user belongs to), so a flat `dept` is Core. Tree hierarchy is an opt-in mixin that unlocks the "my-dept and subordinates" datascope tier. **Landed as adjacency list** (`parent_id` + recursive `IsAncestor` traversal + cycle/delete guards), not materialized path — simpler to maintain, sufficient for shallow org trees. Whether a `path` column / closure table is needed for the my-dept-and-sub *query* is an open implementation point at M6 (see D11).
 
 ### D4 — Datascope concept is Core; tier implementation is layered
 Core datascope = flat three tiers **mine / my-dept / all**. "My-dept **and subordinates**" requires the org-tree extension.
@@ -76,7 +76,7 @@ A role carries a `data_scope` enum (`mine` / `my-dept` / `all`; `my-dept-and-sub
 - `mine` → `WHERE created_by = current_user`
 - `my-dept` → `WHERE org_id = current_user.org_id`
 - `all` → no filter (still tenant-filtered)
-- `my-dept-and-sub` (ext) → `WHERE org_path LIKE current_user.org_path || '%'`
+- `my-dept-and-sub` (ext) → subtree membership of the user's dept (adjacency-list traversal today; a `path`/closure-table optimization is an open point at M6)
 
 The rule ANDs with the tenant rule. Scope is global (one user, one scope). "mine" defaults to `created_by`, field name configurable per table.
 
@@ -148,11 +148,27 @@ proto `cyber.ext.v1.access` 注解 + `security.MatchAccess` 驱动 selector 多�
 
 > M1–M4 landed — code is the source of truth. Below is only what's **not yet built**, regrouped by what unblocks it.
 
+### Current focus (2026-08-07)
+
+Backend authorization (M5 RBAC / M6 datascope / M7 service identity / M8 broadcast) is **paused**. Pivoting to: **complete auth entities (user full CRUD) + admin web UI first, then resume RBAC.**
+
+Rationale — RBAC depends on what isn't built yet:
+- `UserRole` (assign roles to users) needs a **complete user entity** — currently only `create/get`, no `list`.
+- RBAC admin UI (role/permission pages) needs the **admin web framework**.
+
+Building these first lands RBAC on a real base rather than abstract scaffolding. Product-driven (usable admin console early) over engine-driven (authz engine + curl only).
+
+Sequence:
+1. ✅ casbin groundwork deferred (no-dependency foundation; role/permission schema re-added when M5 resumes).
+2. **user full CRUD** (backend: list/update/delete) — dept already complete.
+3. **admin web UI framework** (login + layout + user/dept management pages).
+4. resume **M5 RBAC** (+ role/permission UI + permission control) → security closure.
+5. M6 datascope / ABAC after.
+
 ### Milestones (pending)
 
 | M | Unblocks / depends | ADR | Scope |
 |---|---|---|---|
-| **dept** | M6 的 my-dept 锚点(D3 Core,前置) | D3 | flat `dept` 实体 + mixin |
 | **M4.5** session policy | —(零重写) | D13 | `SINGLE_GLOBAL`/`SINGLE_PER_CLIENT` 并发登录;`auth:user:<uid>(:<client>)` 索引 + login 踢旧;config 选策略枚举 |
 | **M5** RBAC | 业务厚度 | D6+D12 | casbin + `Authorizer` + **ent adapter**;access token 补 roles/scope |
 | **M6** datascope | dept + M5 | D11 | DataScopeMixin(mine/dept/all);intercept(或 privacy) |
@@ -161,7 +177,7 @@ proto `cyber.ext.v1.access` 注解 + `security.MatchAccess` 驱动 selector 多�
 
 ### Extensions (deferred, business-driven — no milestone)
 - **ABAC** dynamic context (time/location/device) — D6 Ext
-- **Org tree** (`parent_id` + path, unlocks my-dept-and-sub) — D3 Ext
+- **Org tree** (adjacency-list structure **landed**; the my-dept-and-sub datascope tier still pending M6) — D3 Ext
 - **UI permission** granularity (menu/button)
 - **Multi-tenant management plane** (Login tenant field + tenant CRUD + cross-tenant e2e)
 - **Device identity / registry** (IoT) — separate ADR when IoT lands

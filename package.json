@@ -7,8 +7,8 @@
     "node": ">=24.15.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.3",
-    "@bufbuild/protoc-gen-es": "2.12.1",
+    "@biomejs/biome": "2.5.7",
+    "@bufbuild/protoc-gen-es": "2.13.0",
     "@connectrpc/protoc-gen-connect-query": "2.2.0",
     "typescript": "7.0.2"
   }

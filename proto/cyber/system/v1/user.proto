@@ -3,6 +3,7 @@ syntax = "proto3";
 package cyber.system.v1;
 
 import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
 import "ext/v1/access.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
@@ -20,10 +21,33 @@ service UserService {
       body: "*"
     };
   }
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (cyber.ext.v1.method_comment) = "修改用户";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/system/users/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    option (cyber.ext.v1.method_comment) = "删除用户";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {delete: "/api/v1/system/users/{id}"};
+  }
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (cyber.ext.v1.method_comment) = "查询用户列表";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/users"};
+  }
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {
     option (cyber.ext.v1.method_comment) = "查询用户详情";
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {get: "/api/v1/system/users/{id}"};
+  }
+  rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse) {
+    option (cyber.ext.v1.method_comment) = "获取当前登录用户";
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/me"};
   }
 }
 
@@ -52,6 +76,49 @@ message CreateUserResponse {
   google.protobuf.StringValue id = 1;
 }
 
+// update
+message UpdateUserRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string email = 2;
+  optional string password = 3;
+  optional string dept_id = 4;
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+  }];
+}
+
+message UpdateUserResponse {}
+
+// delete
+message DeleteUserRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message DeleteUserResponse {}
+
+// list
+message ListUsersRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional string email = 2;
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListUsersRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(email|createdAt|updatedAt):(asc|desc)$'))"
+  }];
+}
+
+message ListUsersResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated User list = 2;
+}
+
 // get
 message GetUserRequest {
   string id = 1 [
@@ -61,5 +128,12 @@ message GetUserRequest {
 }
 
 message GetUserResponse {
+  User user = 1;
+}
+
+// getCurrentUser
+message GetCurrentUserRequest {}
+
+message GetCurrentUserResponse {
   User user = 1;
 }

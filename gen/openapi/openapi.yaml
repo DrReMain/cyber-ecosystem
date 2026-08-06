@@ -461,6 +461,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.UpdateItemStatusResponse'
+    /api/v1/system/me:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_GetCurrentUser
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetCurrentUserResponse'
     /api/v1/system/resource:
         get:
             tags:
@@ -475,6 +487,69 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ListResourceResponse'
     /api/v1/system/users:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_ListUsers
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: email
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListUsersResponse'
         post:
             tags:
                 - UserService
@@ -510,6 +585,46 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.GetUserResponse'
+        put:
+            tags:
+                - UserService
+            operationId: UserService_UpdateUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateUserResponse'
+        delete:
+            tags:
+                - UserService
+            operationId: UserService_DeleteUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.DeleteUserResponse'
 components:
     schemas:
         cyber.sample.v1.CreateSampleRequest:
@@ -608,6 +723,9 @@ components:
         cyber.system.v1.DeleteItemResponse:
             type: object
             properties: {}
+        cyber.system.v1.DeleteUserResponse:
+            type: object
+            properties: {}
         cyber.system.v1.Dept:
             type: object
             properties:
@@ -623,6 +741,11 @@ components:
                     type: string
                 parentId:
                     type: string
+        cyber.system.v1.GetCurrentUserResponse:
+            type: object
+            properties:
+                user:
+                    $ref: '#/components/schemas/cyber.system.v1.User'
         cyber.system.v1.GetDeptResponse:
             type: object
             properties:
@@ -682,6 +805,15 @@ components:
                         $ref: '#/components/schemas/cyber.system.v1.Service'
                     description: Service list.
             description: ListResource response.
+        cyber.system.v1.ListUsersResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.User'
         cyber.system.v1.LoginRequest:
             type: object
             properties:
@@ -825,6 +957,25 @@ components:
                     type: string
             description: other
         cyber.system.v1.UpdateItemStatusResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.UpdateUserRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+                deptId:
+                    type: string
+                fieldsMask:
+                    type: array
+                    items:
+                        type: string
+            description: update
+        cyber.system.v1.UpdateUserResponse:
             type: object
             properties: {}
         cyber.system.v1.User:

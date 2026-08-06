@@ -18,13 +18,12 @@ import (
 	"cyber-ecosystem/shared-go/kratos/transport/connect/reflection"
 
 	"cyber-ecosystem/app/services/sample/internal/conf"
-	"cyber-ecosystem/app/services/sample/internal/service"
 )
 
 func NewConnectServer(
 	c *conf.Server,
 	logger *slog.Logger,
-	registrar []service.Registrar,
+	registrar []Registrar,
 ) *connect.Server {
 	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, sanitize.Server())

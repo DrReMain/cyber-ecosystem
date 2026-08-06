@@ -1,5 +1,5 @@
 import { useQuery } from "@connectrpc/connect-query";
-import { listResource } from "@cyber-ecosystem/gen-ts/cyber/core/v1/resource-ResourceService_connectquery";
+import { listResource } from "@cyber-ecosystem/gen-ts/cyber/system/v1/resource-ResourceService_connectquery";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/playground-connect")({

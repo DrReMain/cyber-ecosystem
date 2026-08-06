@@ -10,6 +10,26 @@ import { UserService } from "./user_pb";
 export const createUser = UserService.method.createUser;
 
 /**
+ * @generated from rpc cyber.system.v1.UserService.UpdateUser
+ */
+export const updateUser = UserService.method.updateUser;
+
+/**
+ * @generated from rpc cyber.system.v1.UserService.DeleteUser
+ */
+export const deleteUser = UserService.method.deleteUser;
+
+/**
+ * @generated from rpc cyber.system.v1.UserService.ListUsers
+ */
+export const listUsers = UserService.method.listUsers;
+
+/**
  * @generated from rpc cyber.system.v1.UserService.GetUser
  */
 export const getUser = UserService.method.getUser;
+
+/**
+ * @generated from rpc cyber.system.v1.UserService.GetCurrentUser
+ */
+export const getCurrentUser = UserService.method.getCurrentUser;

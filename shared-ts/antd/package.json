@@ -16,6 +16,8 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "antd": "^6",
     "antd-style": "^4",
     "dayjs": "^1",
@@ -23,13 +25,6 @@
     "react-dom": "^19"
   },
   "devDependencies": {
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "antd": "^6",
-    "antd-style": "^4",
-    "dayjs": "^1",
-    "react": "^19",
-    "react-dom": "^19",
     "typescript": "7.0.2"
   }
 }

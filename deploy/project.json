@@ -137,7 +137,14 @@
     },
     "stop": {
       "executor": "nx:run-commands",
-      "dependsOn": ["observability:stop", "media:stop", "realtime:stop", "mq:stop", "storage:stop", "db:stop"],
+      "dependsOn": [
+        "observability:stop",
+        "media:stop",
+        "realtime:stop",
+        "mq:stop",
+        "storage:stop",
+        "db:stop"
+      ],
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "echo '=== All services stopped ==='"

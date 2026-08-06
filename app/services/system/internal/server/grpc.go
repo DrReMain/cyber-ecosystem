@@ -21,13 +21,12 @@ import (
 	extv1 "cyber-ecosystem/gen/go/cyber/ext/v1"
 
 	"cyber-ecosystem/app/services/system/internal/conf"
-	"cyber-ecosystem/app/services/system/internal/service"
 )
 
 func NewGRPCServer(
 	c *conf.Server,
 	logger *slog.Logger,
-	registrar []service.Registrar,
+	registrar []Registrar,
 	authn krauth.Authenticator,
 ) *grpc.Server {
 	var middlewares []middleware.Middleware

@@ -27,4 +27,4 @@ func init() {
 	krauth.ErrInvalidToken = errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(krauth.ErrInvalidToken)
 }
 
-var ProviderSet = wire.NewSet(NewGRPCServer, NewHTTPServer, NewConnectServer)
+var ProviderSet = wire.NewSet(NewGRPCServer, NewHTTPServer, NewConnectServer, NewRegistrarList)

@@ -11,19 +11,17 @@ import (
 	"github.com/go-kratos/kratos/v3"
 	"github.com/google/wire"
 
-	"cyber-ecosystem/app/services/sample/internal/biz"
 	"cyber-ecosystem/app/services/sample/internal/client"
 	"cyber-ecosystem/app/services/sample/internal/conf"
+	"cyber-ecosystem/app/services/sample/internal/module/sample"
 	"cyber-ecosystem/app/services/sample/internal/server"
-	"cyber-ecosystem/app/services/sample/internal/service"
 )
 
 // wireApp init kratos application.
 func wireApp(*conf.Server, *conf.Remote, *slog.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		server.ProviderSet,
-		biz.ProviderSet,
-		service.ProviderSet,
+		sample.ProviderSet,
 		client.ProviderSet,
 		newApp,
 	))

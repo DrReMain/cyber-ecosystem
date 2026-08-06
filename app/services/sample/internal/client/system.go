@@ -10,8 +10,8 @@ import (
 
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
 
-	"cyber-ecosystem/app/services/sample/internal/biz"
 	"cyber-ecosystem/app/services/sample/internal/conf"
+	"cyber-ecosystem/app/services/sample/internal/module/sample"
 )
 
 // Adapter -------------------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ type systemClient struct {
 	items systempb.ItemServiceClient
 }
 
-func NewSystemClient(c *conf.Remote, logger *slog.Logger) (biz.SystemRP, func(), error) {
+func NewSystemClient(c *conf.Remote, logger *slog.Logger) (sample.SystemRP, func(), error) {
 	conn, err := grpc.NewClient(context.Background(),
 		grpc.WithEndpoint(c.GetSystem()),
 		grpc.WithMiddleware(standardMiddleware(logger)...),
@@ -38,12 +38,12 @@ func NewSystemClient(c *conf.Remote, logger *slog.Logger) (biz.SystemRP, func(),
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (c *systemClient) ListItems(ctx context.Context, in *biz.ItemListIn) (*biz.ItemListOut, error) {
+func (c *systemClient) ListItems(ctx context.Context, in *sample.ItemListIn) (*sample.ItemListOut, error) {
 	resp, err := c.items.ListItems(ctx, &systempb.ListItemsRequest{Page: in.PageRequest})
 	if err != nil {
 		return nil, err
 	}
-	return &biz.ItemListOut{
+	return &sample.ItemListOut{
 		PageResponse: resp.GetPage(),
 		List:         utils.SliceMap(resp.GetList(), mapItem),
 	}, nil
@@ -51,9 +51,9 @@ func (c *systemClient) ListItems(ctx context.Context, in *biz.ItemListIn) (*biz.
 
 // Private -------------------------------------------------------------------------------------------------------------
 
-func mapItem(it *systempb.Item) *biz.Item {
+func mapItem(it *systempb.Item) *sample.Item {
 	id := utils.Unwrap[string](it.GetId())
-	return &biz.Item{
+	return &sample.Item{
 		ID:        utils.Deref(id, ""),
 		CreatedAt: utils.ToTime(it.GetCreatedAt()),
 		Name:      utils.Unwrap[string](it.GetName()),

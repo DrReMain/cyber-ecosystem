@@ -7,12 +7,14 @@
 package main
 
 import (
-	"cyber-ecosystem/app/services/system/internal/biz"
 	"cyber-ecosystem/app/services/system/internal/conf"
-	"cyber-ecosystem/app/services/system/internal/data"
+	"cyber-ecosystem/app/services/system/internal/module/auth"
+	"cyber-ecosystem/app/services/system/internal/module/dept"
+	"cyber-ecosystem/app/services/system/internal/module/item"
+	"cyber-ecosystem/app/services/system/internal/module/resource"
+	"cyber-ecosystem/app/services/system/internal/module/user"
 	"cyber-ecosystem/app/services/system/internal/platform"
 	"cyber-ecosystem/app/services/system/internal/server"
-	"cyber-ecosystem/app/services/system/internal/service"
 	"github.com/go-kratos/kratos/v3"
 	"log/slog"
 )
@@ -20,8 +22,8 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, logger *slog.Logger) (*kratos.App, func(), error) {
-	cache, cleanup, err := platform.NewCache(confData, logger)
+func wireApp(confServer *conf.Server, data *conf.Data, logger *slog.Logger) (*kratos.App, func(), error) {
+	cache, cleanup, err := platform.NewCache(data, logger)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -30,13 +32,13 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger *slog.Logger) 
 		cleanup()
 		return nil, nil, err
 	}
-	client, cleanup2, err := platform.NewEntClient(confData, logger)
+	client, cleanup2, err := platform.NewEntClient(data, logger)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
 	entErrorHandler := platform.NewEntErrorHandler()
-	storage, cleanup3, err := platform.NewStorage(confData)
+	storage, cleanup3, err := platform.NewStorage(data)
 	if err != nil {
 		cleanup2()
 		cleanup()
@@ -49,7 +51,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger *slog.Logger) 
 		cleanup()
 		return nil, nil, err
 	}
-	mq, cleanup4, err := platform.NewMQ(confData)
+	mq, cleanup4, err := platform.NewMQ(data)
 	if err != nil {
 		cleanup3()
 		cleanup2()
@@ -72,22 +74,22 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger *slog.Logger) 
 		cleanup()
 		return nil, nil, err
 	}
-	itemRP := data.NewItemRP(logger, platformPlatform)
-	itemUC := biz.NewItemUC(logger, platformPlatform, itemRP)
-	itemService := service.NewItemService(logger, itemUC)
-	resourceRP := data.NewResourceRP(logger, platformPlatform)
-	resourceUC := biz.NewResourceUC(logger, platformPlatform, resourceRP)
-	resourceService := service.NewResourceService(logger, resourceUC)
-	userRP := data.NewUserRP(logger, platformPlatform)
-	userUC := biz.NewUserUC(logger, platformPlatform, userRP)
-	userService := service.NewUserService(logger, userUC)
-	tokenRP := data.NewTokenRP(logger, platformPlatform)
-	authUC := biz.NewAuthUC(logger, platformPlatform, userRP, tokenRP)
-	authService := service.NewAuthService(logger, authUC)
-	deptRP := data.NewDeptRP(logger, platformPlatform)
-	deptUC := biz.NewDeptUC(logger, platformPlatform, deptRP)
-	deptService := service.NewDeptService(logger, deptUC)
-	v := service.NewRegistrarList(itemService, resourceService, userService, authService, deptService)
+	userRP := user.NewUserRP(logger, platformPlatform)
+	tokenRP := auth.NewTokenRP(logger, platformPlatform)
+	authUC := auth.NewAuthUC(logger, platformPlatform, userRP, tokenRP)
+	authService := auth.NewAuthService(logger, authUC)
+	deptRP := dept.NewDeptRP(logger, platformPlatform)
+	deptUC := dept.NewDeptUC(logger, platformPlatform, deptRP)
+	deptService := dept.NewDeptService(logger, deptUC)
+	itemRP := item.NewItemRP(logger, platformPlatform)
+	itemUC := item.NewItemUC(logger, platformPlatform, itemRP)
+	itemService := item.NewItemService(logger, itemUC)
+	resourceRP := resource.NewResourceRP(logger, platformPlatform)
+	resourceUC := resource.NewResourceUC(logger, platformPlatform, resourceRP)
+	resourceService := resource.NewResourceService(logger, resourceUC)
+	userUC := user.NewUserUC(logger, platformPlatform, userRP)
+	userService := user.NewUserService(logger, userUC)
+	v := server.NewRegistrarList(authService, deptService, itemService, resourceService, userService)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, authUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, authUC)
 	connectServer := server.NewConnectServer(confServer, logger, v, authUC)

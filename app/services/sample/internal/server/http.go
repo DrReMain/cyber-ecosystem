@@ -16,13 +16,12 @@ import (
 	"cyber-ecosystem/shared-go/kratos/observability"
 
 	"cyber-ecosystem/app/services/sample/internal/conf"
-	"cyber-ecosystem/app/services/sample/internal/service"
 )
 
 func NewHTTPServer(
 	c *conf.Server,
 	logger *slog.Logger,
-	registrar []service.Registrar,
+	registrar []Registrar,
 ) *http.Server {
 	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, sanitize.Server())

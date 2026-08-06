@@ -9,6 +9,7 @@ package v1
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "cyber-ecosystem/gen/go/cyber/ext/v1"
+	v1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -207,6 +208,313 @@ func (x *CreateUserResponse) GetId() *wrapperspb.StringValue {
 	return nil
 }
 
+// update
+type UpdateUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Email         *string                `protobuf:"bytes,2,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	Password      *string                `protobuf:"bytes,3,opt,name=password,proto3,oneof" json:"password,omitempty"`
+	DeptId        *string                `protobuf:"bytes,4,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
+	FieldsMask    []string               `protobuf:"bytes,100,rep,name=fields_mask,json=fieldsMask,proto3" json:"fields_mask,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserRequest) Reset() {
+	*x = UpdateUserRequest{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserRequest) ProtoMessage() {}
+
+func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *UpdateUserRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetEmail() string {
+	if x != nil && x.Email != nil {
+		return *x.Email
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetPassword() string {
+	if x != nil && x.Password != nil {
+		return *x.Password
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetDeptId() string {
+	if x != nil && x.DeptId != nil {
+		return *x.DeptId
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetFieldsMask() []string {
+	if x != nil {
+		return x.FieldsMask
+	}
+	return nil
+}
+
+type UpdateUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserResponse) Reset() {
+	*x = UpdateUserResponse{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserResponse) ProtoMessage() {}
+
+func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserResponse.ProtoReflect.Descriptor instead.
+func (*UpdateUserResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{4}
+}
+
+// delete
+type DeleteUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserRequest) Reset() {
+	*x = DeleteUserRequest{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserRequest) ProtoMessage() {}
+
+func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
+func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *DeleteUserRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserResponse) Reset() {
+	*x = DeleteUserResponse{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserResponse) ProtoMessage() {}
+
+func (x *DeleteUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserResponse.ProtoReflect.Descriptor instead.
+func (*DeleteUserResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{6}
+}
+
+// list
+type ListUsersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *v1.PageRequest        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	Email         *string                `protobuf:"bytes,2,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	OrderBy       []string               `protobuf:"bytes,100,rep,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersRequest) Reset() {
+	*x = ListUsersRequest{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersRequest) ProtoMessage() {}
+
+func (x *ListUsersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersRequest.ProtoReflect.Descriptor instead.
+func (*ListUsersRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ListUsersRequest) GetPage() *v1.PageRequest {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *ListUsersRequest) GetEmail() string {
+	if x != nil && x.Email != nil {
+		return *x.Email
+	}
+	return ""
+}
+
+func (x *ListUsersRequest) GetOrderBy() []string {
+	if x != nil {
+		return x.OrderBy
+	}
+	return nil
+}
+
+type ListUsersResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *v1.PageResponse       `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	List          []*User                `protobuf:"bytes,2,rep,name=list,proto3" json:"list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUsersResponse) Reset() {
+	*x = ListUsersResponse{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUsersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUsersResponse) ProtoMessage() {}
+
+func (x *ListUsersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUsersResponse.ProtoReflect.Descriptor instead.
+func (*ListUsersResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ListUsersResponse) GetPage() *v1.PageResponse {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *ListUsersResponse) GetList() []*User {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
 // get
 type GetUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -217,7 +525,7 @@ type GetUserRequest struct {
 
 func (x *GetUserRequest) Reset() {
 	*x = GetUserRequest{}
-	mi := &file_cyber_system_v1_user_proto_msgTypes[3]
+	mi := &file_cyber_system_v1_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -229,7 +537,7 @@ func (x *GetUserRequest) String() string {
 func (*GetUserRequest) ProtoMessage() {}
 
 func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_user_proto_msgTypes[3]
+	mi := &file_cyber_system_v1_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -242,7 +550,7 @@ func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
 func (*GetUserRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{3}
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetUserRequest) GetId() string {
@@ -261,7 +569,7 @@ type GetUserResponse struct {
 
 func (x *GetUserResponse) Reset() {
 	*x = GetUserResponse{}
-	mi := &file_cyber_system_v1_user_proto_msgTypes[4]
+	mi := &file_cyber_system_v1_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -273,7 +581,7 @@ func (x *GetUserResponse) String() string {
 func (*GetUserResponse) ProtoMessage() {}
 
 func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_user_proto_msgTypes[4]
+	mi := &file_cyber_system_v1_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -286,10 +594,91 @@ func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserResponse.ProtoReflect.Descriptor instead.
 func (*GetUserResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{4}
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetUserResponse) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
+// getCurrentUser
+type GetCurrentUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCurrentUserRequest) Reset() {
+	*x = GetCurrentUserRequest{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCurrentUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCurrentUserRequest) ProtoMessage() {}
+
+func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCurrentUserRequest.ProtoReflect.Descriptor instead.
+func (*GetCurrentUserRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{11}
+}
+
+type GetCurrentUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCurrentUserResponse) Reset() {
+	*x = GetCurrentUserResponse{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCurrentUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCurrentUserResponse) ProtoMessage() {}
+
+func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCurrentUserResponse.ProtoReflect.Descriptor instead.
+func (*GetCurrentUserResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetCurrentUserResponse) GetUser() *User {
 	if x != nil {
 		return x.User
 	}
@@ -300,7 +689,7 @@ var File_cyber_system_v1_user_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x1acyber/system/v1/user.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x95\x02\n" +
+	"\x1acyber/system/v1/user.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x95\x02\n" +
 	"\x04User\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
 	"\n" +
@@ -320,15 +709,49 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\n" +
 	"\b_dept_id\"B\n" +
 	"\x12CreateUserResponse\x12,\n" +
-	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"-\n" +
+	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"\xda\x01\n" +
+	"\x11UpdateUserRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\x12\x19\n" +
+	"\x05email\x18\x02 \x01(\tH\x00R\x05email\x88\x01\x01\x12\x1f\n" +
+	"\bpassword\x18\x03 \x01(\tH\x01R\bpassword\x88\x01\x01\x12\x1c\n" +
+	"\adept_id\x18\x04 \x01(\tH\x02R\x06deptId\x88\x01\x01\x12+\n" +
+	"\vfields_mask\x18d \x03(\tB\n" +
+	"\xbaH\a\x92\x01\x04\b\x01\x18\x01R\n" +
+	"fieldsMaskB\b\n" +
+	"\x06_emailB\v\n" +
+	"\t_passwordB\n" +
+	"\n" +
+	"\b_dept_id\"\x14\n" +
+	"\x12UpdateUserResponse\"0\n" +
+	"\x11DeleteUserRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"\x14\n" +
+	"\x12DeleteUserResponse\"\x8f\x02\n" +
+	"\x10ListUsersRequest\x127\n" +
+	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12\x19\n" +
+	"\x05email\x18\x02 \x01(\tH\x00R\x05email\x88\x01\x01\x12\x9c\x01\n" +
+	"\border_by\x18d \x03(\tB\x80\x01\xbaH}\xba\x01z\n" +
+	"\x19ListUsersRequest.order_by\x12\x00\x1a[this.all(item, size(item) == 0 || item.matches('^(email|createdAt|updatedAt):(asc|desc)$'))R\aorderByB\b\n" +
+	"\x06_email\"x\n" +
+	"\x11ListUsersResponse\x128\n" +
+	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x12)\n" +
+	"\x04list\x18\x02 \x03(\v2\x15.cyber.system.v1.UserR\x04list\"-\n" +
 	"\x0eGetUserRequest\x12\x1b\n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"<\n" +
 	"\x0fGetUserResponse\x12)\n" +
-	"\x04user\x18\x01 \x01(\v2\x15.cyber.system.v1.UserR\x04user2\xa6\x02\n" +
+	"\x04user\x18\x01 \x01(\v2\x15.cyber.system.v1.UserR\x04user\"\x17\n" +
+	"\x15GetCurrentUserRequest\"C\n" +
+	"\x16GetCurrentUserResponse\x12)\n" +
+	"\x04user\x18\x01 \x01(\v2\x15.cyber.system.v1.UserR\x04user2\xf3\x06\n" +
 	"\vUserService\x12\x8a\x01\n" +
 	"\n" +
-	"CreateUser\x12\".cyber.system.v1.CreateUserRequest\x1a#.cyber.system.v1.CreateUserResponse\"3\x88\xf1\x04\x02\x8a\xd3\x0e\f创建用户\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/system/users\x12\x89\x01\n" +
-	"\aGetUser\x12\x1f.cyber.system.v1.GetUserRequest\x1a .cyber.system.v1.GetUserResponse\";\x88\xf1\x04\x02\x8a\xd3\x0e\x12查询用户详情\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/users/{id}B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"CreateUser\x12\".cyber.system.v1.CreateUserRequest\x1a#.cyber.system.v1.CreateUserResponse\"3\x88\xf1\x04\x02\x8a\xd3\x0e\f创建用户\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/system/users\x12\x8f\x01\n" +
+	"\n" +
+	"UpdateUser\x12\".cyber.system.v1.UpdateUserRequest\x1a#.cyber.system.v1.UpdateUserResponse\"8\x88\xf1\x04\x02\x8a\xd3\x0e\f修改用户\x82\xd3\xe4\x93\x02\x1e:\x01*\x1a\x19/api/v1/system/users/{id}\x12\x8c\x01\n" +
+	"\n" +
+	"DeleteUser\x12\".cyber.system.v1.DeleteUserRequest\x1a#.cyber.system.v1.DeleteUserResponse\"5\x88\xf1\x04\x02\x8a\xd3\x0e\f删除用户\x82\xd3\xe4\x93\x02\x1b*\x19/api/v1/system/users/{id}\x12\x8a\x01\n" +
+	"\tListUsers\x12!.cyber.system.v1.ListUsersRequest\x1a\".cyber.system.v1.ListUsersResponse\"6\x88\xf1\x04\x02\x8a\xd3\x0e\x12查询用户列表\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/system/users\x12\x89\x01\n" +
+	"\aGetUser\x12\x1f.cyber.system.v1.GetUserRequest\x1a .cyber.system.v1.GetUserResponse\";\x88\xf1\x04\x02\x8a\xd3\x0e\x12查询用户详情\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/users/{id}\x12\x9c\x01\n" +
+	"\x0eGetCurrentUser\x12&.cyber.system.v1.GetCurrentUserRequest\x1a'.cyber.system.v1.GetCurrentUserResponse\"9\x88\xf1\x04\x02\x8a\xd3\x0e\x18获取当前登录用户\x82\xd3\xe4\x93\x02\x13\x12\x11/api/v1/system/meB(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_user_proto_rawDescOnce sync.Once
@@ -342,33 +765,55 @@ func file_cyber_system_v1_user_proto_rawDescGZIP() []byte {
 	return file_cyber_system_v1_user_proto_rawDescData
 }
 
-var file_cyber_system_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_cyber_system_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_cyber_system_v1_user_proto_goTypes = []any{
 	(*User)(nil),                   // 0: cyber.system.v1.User
 	(*CreateUserRequest)(nil),      // 1: cyber.system.v1.CreateUserRequest
 	(*CreateUserResponse)(nil),     // 2: cyber.system.v1.CreateUserResponse
-	(*GetUserRequest)(nil),         // 3: cyber.system.v1.GetUserRequest
-	(*GetUserResponse)(nil),        // 4: cyber.system.v1.GetUserResponse
-	(*wrapperspb.StringValue)(nil), // 5: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),  // 6: google.protobuf.Timestamp
+	(*UpdateUserRequest)(nil),      // 3: cyber.system.v1.UpdateUserRequest
+	(*UpdateUserResponse)(nil),     // 4: cyber.system.v1.UpdateUserResponse
+	(*DeleteUserRequest)(nil),      // 5: cyber.system.v1.DeleteUserRequest
+	(*DeleteUserResponse)(nil),     // 6: cyber.system.v1.DeleteUserResponse
+	(*ListUsersRequest)(nil),       // 7: cyber.system.v1.ListUsersRequest
+	(*ListUsersResponse)(nil),      // 8: cyber.system.v1.ListUsersResponse
+	(*GetUserRequest)(nil),         // 9: cyber.system.v1.GetUserRequest
+	(*GetUserResponse)(nil),        // 10: cyber.system.v1.GetUserResponse
+	(*GetCurrentUserRequest)(nil),  // 11: cyber.system.v1.GetCurrentUserRequest
+	(*GetCurrentUserResponse)(nil), // 12: cyber.system.v1.GetCurrentUserResponse
+	(*wrapperspb.StringValue)(nil), // 13: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),  // 14: google.protobuf.Timestamp
+	(*v1.PageRequest)(nil),         // 15: cyber.shared.common.v1.PageRequest
+	(*v1.PageResponse)(nil),        // 16: cyber.shared.common.v1.PageResponse
 }
 var file_cyber_system_v1_user_proto_depIdxs = []int32{
-	5, // 0: cyber.system.v1.User.id:type_name -> google.protobuf.StringValue
-	6, // 1: cyber.system.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	6, // 2: cyber.system.v1.User.updated_at:type_name -> google.protobuf.Timestamp
-	5, // 3: cyber.system.v1.User.email:type_name -> google.protobuf.StringValue
-	5, // 4: cyber.system.v1.User.dept_id:type_name -> google.protobuf.StringValue
-	5, // 5: cyber.system.v1.CreateUserResponse.id:type_name -> google.protobuf.StringValue
-	0, // 6: cyber.system.v1.GetUserResponse.user:type_name -> cyber.system.v1.User
-	1, // 7: cyber.system.v1.UserService.CreateUser:input_type -> cyber.system.v1.CreateUserRequest
-	3, // 8: cyber.system.v1.UserService.GetUser:input_type -> cyber.system.v1.GetUserRequest
-	2, // 9: cyber.system.v1.UserService.CreateUser:output_type -> cyber.system.v1.CreateUserResponse
-	4, // 10: cyber.system.v1.UserService.GetUser:output_type -> cyber.system.v1.GetUserResponse
-	9, // [9:11] is the sub-list for method output_type
-	7, // [7:9] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	13, // 0: cyber.system.v1.User.id:type_name -> google.protobuf.StringValue
+	14, // 1: cyber.system.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	14, // 2: cyber.system.v1.User.updated_at:type_name -> google.protobuf.Timestamp
+	13, // 3: cyber.system.v1.User.email:type_name -> google.protobuf.StringValue
+	13, // 4: cyber.system.v1.User.dept_id:type_name -> google.protobuf.StringValue
+	13, // 5: cyber.system.v1.CreateUserResponse.id:type_name -> google.protobuf.StringValue
+	15, // 6: cyber.system.v1.ListUsersRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	16, // 7: cyber.system.v1.ListUsersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	0,  // 8: cyber.system.v1.ListUsersResponse.list:type_name -> cyber.system.v1.User
+	0,  // 9: cyber.system.v1.GetUserResponse.user:type_name -> cyber.system.v1.User
+	0,  // 10: cyber.system.v1.GetCurrentUserResponse.user:type_name -> cyber.system.v1.User
+	1,  // 11: cyber.system.v1.UserService.CreateUser:input_type -> cyber.system.v1.CreateUserRequest
+	3,  // 12: cyber.system.v1.UserService.UpdateUser:input_type -> cyber.system.v1.UpdateUserRequest
+	5,  // 13: cyber.system.v1.UserService.DeleteUser:input_type -> cyber.system.v1.DeleteUserRequest
+	7,  // 14: cyber.system.v1.UserService.ListUsers:input_type -> cyber.system.v1.ListUsersRequest
+	9,  // 15: cyber.system.v1.UserService.GetUser:input_type -> cyber.system.v1.GetUserRequest
+	11, // 16: cyber.system.v1.UserService.GetCurrentUser:input_type -> cyber.system.v1.GetCurrentUserRequest
+	2,  // 17: cyber.system.v1.UserService.CreateUser:output_type -> cyber.system.v1.CreateUserResponse
+	4,  // 18: cyber.system.v1.UserService.UpdateUser:output_type -> cyber.system.v1.UpdateUserResponse
+	6,  // 19: cyber.system.v1.UserService.DeleteUser:output_type -> cyber.system.v1.DeleteUserResponse
+	8,  // 20: cyber.system.v1.UserService.ListUsers:output_type -> cyber.system.v1.ListUsersResponse
+	10, // 21: cyber.system.v1.UserService.GetUser:output_type -> cyber.system.v1.GetUserResponse
+	12, // 22: cyber.system.v1.UserService.GetCurrentUser:output_type -> cyber.system.v1.GetCurrentUserResponse
+	17, // [17:23] is the sub-list for method output_type
+	11, // [11:17] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_user_proto_init() }
@@ -377,13 +822,15 @@ func file_cyber_system_v1_user_proto_init() {
 		return
 	}
 	file_cyber_system_v1_user_proto_msgTypes[1].OneofWrappers = []any{}
+	file_cyber_system_v1_user_proto_msgTypes[3].OneofWrappers = []any{}
+	file_cyber_system_v1_user_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_system_v1_user_proto_rawDesc), len(file_cyber_system_v1_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

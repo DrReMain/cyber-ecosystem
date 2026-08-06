@@ -7,11 +7,10 @@
 package main
 
 import (
-	"cyber-ecosystem/app/services/sample/internal/biz"
 	"cyber-ecosystem/app/services/sample/internal/client"
 	"cyber-ecosystem/app/services/sample/internal/conf"
+	"cyber-ecosystem/app/services/sample/internal/module/sample"
 	"cyber-ecosystem/app/services/sample/internal/server"
-	"cyber-ecosystem/app/services/sample/internal/service"
 	"github.com/go-kratos/kratos/v3"
 	"log/slog"
 )
@@ -29,9 +28,9 @@ func wireApp(confServer *conf.Server, remote *conf.Remote, logger *slog.Logger) 
 		cleanup()
 		return nil, nil, err
 	}
-	sampleUC := biz.NewSampleUC(logger, systemRP, systemConnectRP)
-	sampleService := service.NewSampleService(logger, sampleUC)
-	v := service.NewRegistrarList(sampleService)
+	sampleUC := sample.NewSampleUC(logger, systemRP, systemConnectRP)
+	sampleService := sample.NewSampleService(logger, sampleUC)
+	v := server.NewRegistrarList(sampleService)
 	grpcServer := server.NewGRPCServer(confServer, logger, v)
 	httpServer := server.NewHTTPServer(confServer, logger, v)
 	connectServer := server.NewConnectServer(confServer, logger, v)
