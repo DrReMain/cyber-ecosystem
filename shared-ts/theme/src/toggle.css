@@ -1,0 +1,67 @@
+/* Theme toggle button — plain CSS so the package never requires the consumer
+   to have a utility framework. State classes drive the visuals:
+   .theme-dark → dark palette (mirrors ThemeProvider's preference)
+   .icon-dark  → sun shown / moon hidden */
+
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  color: #4b5563;
+  transition:
+    color 300ms,
+    border-color 300ms;
+}
+
+.theme-toggle:hover {
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+.theme-toggle.theme-dark {
+  border-color: rgb(255 255 255 / 0.15);
+  color: rgb(255 255 255 / 0.7);
+}
+
+.theme-toggle.theme-dark:hover {
+  border-color: rgb(255 255 255 / 0.3);
+  color: #fff;
+}
+
+.theme-toggle-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1rem;
+  height: 1rem;
+  translate: -50% -50%;
+  transition:
+    rotate 300ms,
+    scale 300ms;
+}
+
+.theme-toggle-icon.sun {
+  rotate: -90deg;
+  scale: 0;
+}
+
+.theme-toggle-icon.moon {
+  rotate: 0deg;
+  scale: 1;
+}
+
+.theme-toggle.icon-dark .theme-toggle-icon.sun {
+  rotate: 0deg;
+  scale: 1;
+}
+
+.theme-toggle.icon-dark .theme-toggle-icon.moon {
+  rotate: 90deg;
+  scale: 0;
+}

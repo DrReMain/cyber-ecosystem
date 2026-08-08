@@ -19,7 +19,10 @@ const path = require("node:path");
 // Files at the gen package root that are hand-maintained (not buf output) and
 // must survive a regen. Matched only at the target root, never inside generated
 // sub-packages.
-const PRESERVE = new Set(["package.json", "tsconfig.json"]);
+// Hand-maintained files at the gen package root that buf/hey-api do NOT produce
+// and must survive a regen. hey-api.config.ts is the OpenAPI-TS generator config
+// co-located in gen/openapi-ts (it must live in that package for module resolution).
+const PRESERVE = new Set(["package.json", "tsconfig.json", "hey-api.config.ts"]);
 
 const dir = process.argv[2];
 if (!dir) {

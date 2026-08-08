@@ -37,7 +37,7 @@
         "cwd": "{workspaceRoot}",
         "commands": [
           "node proto/scripts/clean-gen.cjs gen/go",
-          "buf generate --template proto/buf.gen.go.yaml --exclude-path proto/errors/errors.proto",
+          "buf generate --template proto/buf.gen.go.yaml --exclude-path proto/errors/errors.proto --exclude-path proto/cyber/shared/errors/v1/error_detail.proto",
           "go mod tidy"
         ],
         "parallel": false
@@ -66,9 +66,21 @@
         "parallel": false
       }
     },
+    "generate:oapi-ts": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["generate:oapi"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "node proto/scripts/clean-gen.cjs gen/openapi-ts",
+          "pnpm --filter @cyber-ecosystem/gen-openapi-ts exec openapi-ts -f hey-api.config.ts"
+        ],
+        "parallel": false
+      }
+    },
     "generate": {
       "executor": "nx:run-commands",
-      "dependsOn": ["generate:go", "generate:ts", "generate:oapi"],
+      "dependsOn": ["generate:go", "generate:ts", "generate:oapi", "generate:oapi-ts"],
       "options": {
         "command": "echo 'proto generation completed'"
       }

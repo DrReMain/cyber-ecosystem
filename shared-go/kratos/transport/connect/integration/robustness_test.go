@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"net/http"
 	"sync"
 	"testing"
 	"time"
@@ -210,8 +211,9 @@ func (slowService) Raw(ctx context.Context, _ *testpb.RawRequest) (*httpbody.Htt
 // comparative.TestTimeoutMappingGRPCvsConnect.
 //
 // What this test proves: (1) the timeout fires (elapsed << the handler's 1s
-// sleep), (2) the failure reaches the client as a *connect.Error, and (3) the
-// surfaced code is DeadlineExceeded (parity with gRPC).
+// sleep), (2) the failure reaches the client as a kratos error (the client
+// unary interceptor normalizes via ConnectToError), and (3) the surfaced code
+// is DeadlineExceeded's HTTP face — 504 (parity with gRPC).
 func TestUnaryTimeout(t *testing.T) {
 	// 500ms server timeout; handler sleeps 1s.
 	cli, stop := startServerWithService(t, slowService{}, connect.Timeout(500*time.Millisecond))
@@ -227,17 +229,18 @@ func TestUnaryTimeout(t *testing.T) {
 		t.Fatal("expected an error from Raw when the server unary timeout fires, got nil")
 	}
 
-	var ce *connectrpc.Error
-	if !errors.As(err, &ce) {
-		t.Fatalf("expected *connect.Error, got %T: %v", err, err)
+	// The surfaced code is DeadlineExceeded's HTTP face: the server's bare
+	// ctx.Err() maps to CodeDeadlineExceeded (ErrorToConnect's context branch),
+	// and the client normalizes back to a kratos error with grpcToHTTP's 504 —
+	// the same code the kratos gRPC server surfaces for this scenario
+	// (codes.DeadlineExceeded). 500 means the context-error branch regressed
+	// and Connect diverged from gRPC.
+	var ke *kerrors.Error
+	if !errors.As(err, &ke) {
+		t.Fatalf("expected *kerrors.Error (normalized at the client boundary), got %T: %v", err, err)
 	}
-
-	// The surfaced code MUST be DeadlineExceeded — matching the kratos gRPC
-	// server, which surfaces codes.DeadlineExceeded for the same bare-ctx.Err()
-	// scenario. A regression to CodeInternal would mean ErrorToConnect's
-	// context-error branch regressed and Connect would diverge from gRPC again.
-	if ce.Code() != connectrpc.CodeDeadlineExceeded {
-		t.Fatalf("connect code = %v, want CodeDeadlineExceeded (parity with gRPC-go's status.FromContextError)", ce.Code())
+	if ke.Code != http.StatusGatewayTimeout {
+		t.Fatalf("kratos Code = %d, want 504 (DeadlineExceeded, parity with gRPC-go's status.FromContextError)", ke.Code)
 	}
 
 	// The client must observe the failure well before the 1s handler would have

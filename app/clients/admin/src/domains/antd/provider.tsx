@@ -1,6 +1,6 @@
+import { useTheme } from "@cyber-ecosystem/shared-theme";
 import { App, ConfigProvider } from "antd";
 import type { PropsWithChildren } from "react";
-import { useTheme } from "#/domains/theme";
 import { useAntdLocale } from "./locale";
 import { AntdRegistry } from "./registry";
 import { SkinSwitcher } from "./skins";

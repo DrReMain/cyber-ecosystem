@@ -1,0 +1,31 @@
+{
+  "name": "@cyber-ecosystem/shared-theme",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./route-transition": "./src/route-transition/index.ts"
+  },
+  "scripts": {
+    "check": "biome check",
+    "format": "biome format",
+    "lint": "biome lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cyber-ecosystem/shared-cookie": "workspace:*"
+  },
+  "peerDependencies": {
+    "@types/react": "^19",
+    "lucide-react": "^1",
+    "react": "^19",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

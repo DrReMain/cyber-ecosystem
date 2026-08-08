@@ -1,6 +1,6 @@
+import { defineStore } from "@cyber-ecosystem/shared-store";
 import { atom } from "jotai";
 import { z } from "zod";
-import { defineStore } from "#/stores/_core/define-store";
 
 export interface TodoItem {
   id: number;

@@ -2,7 +2,7 @@
 
 **Scope:** Rules for kratos-based Go services in this repo (`app/services/*`). Prescriptive — `MUST` / `SHOULD` / `MAY`.
 
-This document states **constraints, rationale, and anti-patterns** — the things code alone can't enforce or explain. It deliberately does not restate what the code already shows; look at any service under `app/services/*` for the shape. For design rationale see `ARCHITECTURE.md` (TODO); for proto contracts see `docs/proto/CONVENTIONS.md`.
+This document states **constraints, rationale, and anti-patterns** — the things code alone can't enforce or explain. It deliberately does not restate what the code already shows; look at any service under `app/services/*` for the shape. For proto contracts see `docs/proto/CONVENTIONS.md`.
 
 ---
 
@@ -142,7 +142,7 @@ Align proto optional fields, DO fields, and the service/data mapping around poin
 
 **Two-layer error model** (the security boundary):
 - **To the outside (downstream client):** only predefined error enums (`errorspb`) — never leak internals. Outbound errors from a remote provider are remapped into this service's own error space: `shared-go/kratos/middleware/sanitize` `Client()` collapses any provider error (transport failure or provider business error) by HTTP code to a clean `GeneralError`/`InfraError`, regenerating reason/message — no upstream reason or connection detail crosses back. `Server()` masks any non-kratos inbound error the same way.
-- **To the inside (own logs):** the **original**, detailed error — the logging middleware records it with `trace_id`. The报error service's own log holds the detail; `trace_id` chains per-service logs across the call chain.
+- **To the inside (own logs):** the **original**, detailed error — the logging middleware records it with `trace_id`. The erroring service's own log holds the detail; `trace_id` chains per-service logs across the call chain.
 
 So a UC never returns a raw upstream error — the client middleware both logs the detail and returns a sanitized enum.
 

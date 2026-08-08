@@ -1,17 +1,22 @@
+import { RouterProgress } from "@cyber-ecosystem/shared-router-progress";
+import { collectPersistedStores, JotaiProvider } from "@cyber-ecosystem/shared-store";
+import { resolveThemeData, THEME_COOKIE_KEY, ThemeProvider } from "@cyber-ecosystem/shared-theme";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { createServerFn } from "@tanstack/react-start";
+import { getCookie, getRequestHeader } from "@tanstack/react-start/server";
 import type { PropsWithChildren } from "react";
 import { AntdProvider } from "#/domains/antd";
-import { ErrorPage, NotFound } from "#/domains/errors";
-import { RouterProgress } from "#/domains/router-progress";
-import { getThemeFromServer, ThemeProvider } from "#/domains/theme";
+import { ErrorFallback } from "#/domains/errors/ErrorFallback";
+import { errorHandler } from "#/domains/errors/error-handler";
+import { ErrorListeners } from "#/domains/errors/listen";
+import { NotFoundFallback } from "#/domains/errors/NotFoundFallback";
 import { getLocale, getTextDirection } from "#/paraglide/runtime";
-import { TransportProvider } from "#/services/connect-transport";
-import { JotaiProvider } from "#/stores/_core/provider";
-import { getStoreCookies } from "#/stores/_core/server";
+import { TransportProvider } from "#/services/connect";
+import { FeedbackToaster } from "../components/feedback-toaster";
 import { TailwindIndicator } from "../components/tailwind-indicator";
 import style from "../styles/styles.css?url";
 import "#/stores";
@@ -19,6 +24,14 @@ import "#/stores";
 interface MyRouterContext {
   queryClient: QueryClient;
 }
+
+const getThemeFromServer = createServerFn({ method: "GET" }).handler(async () =>
+  resolveThemeData(getCookie(THEME_COOKIE_KEY), getRequestHeader("sec-ch-prefers-color-scheme")),
+);
+
+const getStoreCookies = createServerFn({ method: "GET" }).handler(async () =>
+  collectPersistedStores((key) => getCookie(key)),
+);
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -29,10 +42,18 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
     links: [{ rel: "stylesheet", href: style }],
   }),
-  notFoundComponent: NotFound,
-  errorComponent: ({ error }: { error: Error }) => (
-    <ErrorPage error={error} showDetails={!!import.meta.env.DEV} />
-  ),
+  notFoundComponent: NotFoundFallback,
+  errorComponent: ({ error, reset }) => {
+    errorHandler.handle(error, "render", { feedback: false });
+    return (
+      <ErrorFallback
+        error={error}
+        fullScreen
+        resetErrorBoundary={reset}
+        showDetails={!!import.meta.env.DEV}
+      />
+    );
+  },
   shellComponent: RootDocument,
   beforeLoad: () => {
     if (typeof document !== "undefined") {
@@ -58,9 +79,11 @@ function RootDocument({ children }: Readonly<PropsWithChildren>) {
         <HeadContent />
       </head>
       <body>
+        <ErrorListeners />
         <JotaiProvider initialData={storeData}>
           <ThemeProvider initialTheme={themeData}>
             <RouterProgress />
+            <FeedbackToaster />
             <TransportProvider>
               <AntdProvider>{children}</AntdProvider>
             </TransportProvider>
@@ -70,7 +93,7 @@ function RootDocument({ children }: Readonly<PropsWithChildren>) {
           config={{ position: "bottom-left", panelLocation: "bottom" }}
           plugins={[
             { name: "Tanstack Router", render: <TanStackRouterDevtoolsPanel /> },
-            { name: "Tanstack Query", render: <ReactQueryDevtoolsPanel /> },
+            { name: "TanStack Query", render: <ReactQueryDevtoolsPanel /> },
           ]}
         />
         <Scripts />

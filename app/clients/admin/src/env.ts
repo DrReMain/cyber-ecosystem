@@ -7,18 +7,15 @@ export const env = createEnv({
   server: {
     HTTP_API_URL: z.string().default("http://localhost:11001"),
     CONNECT_API_URL: z.string().default("http://localhost:13001"),
+    SESSION_SECRET: z.string().min(32).default("11223344556677889900aabbccddeeff"),
   },
   clientPrefix: "VITE_",
   client: {
-    VITE_SITE_URL: z.url().default("http://localhost:3000"),
-    VITE_HTTP_API_URL: z.string().default("http://localhost:3000/http"),
-    VITE_CONNECT_API_URL: z.string().default("http://localhost:3000/connect"),
+    VITE_HTTP_API_URL: z.string().default("http://localhost:5173/http"),
+    VITE_CONNECT_API_URL: z.string().default("http://localhost:5173/connect"),
+    VITE_SITE_URL: z.url().default("http://localhost:5173"),
   },
 });
-
-export function getSiteUrl(): string {
-  return env.VITE_SITE_URL.replace(/\/+$/, "");
-}
 
 function isServer(): boolean {
   return typeof window === "undefined";
@@ -30,4 +27,8 @@ export function resolveCONNECTBaseUrl(): string {
 
 export function resolveHTTPBaseUrl(): string {
   return isServer() ? env.HTTP_API_URL : env.VITE_HTTP_API_URL;
+}
+
+export function getSiteUrl(): string {
+  return env.VITE_SITE_URL.replace(/\/+$/, "");
 }

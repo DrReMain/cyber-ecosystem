@@ -498,20 +498,22 @@ func TestErrorParity(t *testing.T) {
 	}
 
 	// --- connect ---
+	// The connect client's unary interceptor normalizes errors at its boundary
+	// (ConnectToError in client.go): the caller sees a *kerrors.Error with the
+	// HTTP status as Code and the reason recovered from the ErrorInfo detail
+	// attached server-side by ErrorToConnect — the same shape as the http leg.
 	_, connErr := cl.connectClient.ListResource(ctx, connectrpc.NewRequest(&testpb.ListResourceRequest{}))
 	if connErr == nil {
 		t.Fatal("connect: expected error, got nil")
 	}
-	var ce *connectrpc.Error
-	if !errors.As(connErr, &ce) {
-		t.Fatalf("connect: expected *connect.Error, got %T: %v", connErr, connErr)
+	var connKE *kerrors.Error
+	if !errors.As(connErr, &connKE) {
+		t.Fatalf("connect: expected *kerrors.Error, got %T: %v", connErr, connErr)
 	}
-	if ce.Code() != connectrpc.CodeNotFound {
-		t.Errorf("connect code = %v, want CodeNotFound", ce.Code())
+	if connKE.Code != http.StatusNotFound {
+		t.Errorf("connect Code = %d, want 404", connKE.Code)
 	}
-	// ConnectToError recovers the reason from the ErrorInfo detail we attached
-	// in ErrorToConnect.
-	connReason := connect.ConnectToError(connErr).Reason
+	connReason := connKE.Reason
 	if connReason != wantReason {
 		t.Errorf("connect reason = %q, want %q", connReason, wantReason)
 	}

@@ -1,5 +1,5 @@
+import { ThemeToggle, useTheme } from "@cyber-ecosystem/shared-theme";
 import { createFileRoute } from "@tanstack/react-router";
-import { ThemeToggle, useTheme } from "#/domains/theme";
 
 export const Route = createFileRoute("/_app/theme")({ component: ThemeDemo });
 

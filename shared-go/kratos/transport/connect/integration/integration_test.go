@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"testing"
 	"time"
 
@@ -439,8 +440,10 @@ func TestServerStreamCancel(t *testing.T) {
 }
 
 // TestErrorMapping (errors) verifies that a kratos error returned from the
-// service is mapped to a *connect.Error with the matching Connect code. We
-// trigger a kerrors.NotFound via the "ERR" sentinel in Raw.
+// service reaches the caller as a kratos error again: the server maps it onto
+// the wire via ErrorToConnect, the client unary interceptor normalizes back
+// via ConnectToError — Code = HTTP status, reason recovered from the
+// ErrorInfo detail. We trigger kerrors.NotFound via the "ERR" sentinel in Raw.
 func TestErrorMapping(t *testing.T) {
 	cli, stop := startServer(t)
 	defer stop()
@@ -452,12 +455,15 @@ func TestErrorMapping(t *testing.T) {
 		t.Fatalf("expected error from Raw(ERR), got nil")
 	}
 
-	var ce *connectrpc.Error
-	if !errors.As(err, &ce) {
-		t.Fatalf("expected *connect.Error, got %T: %v", err, err)
+	var ke *kerrors.Error
+	if !errors.As(err, &ke) {
+		t.Fatalf("expected *kerrors.Error (normalized at the client boundary), got %T: %v", err, err)
 	}
-	if got := ce.Code(); got != connectrpc.CodeNotFound {
-		t.Fatalf("connect code = %v, want %v", got, connectrpc.CodeNotFound)
+	if ke.Code != http.StatusNotFound {
+		t.Fatalf("kratos Code = %d, want 404", ke.Code)
+	}
+	if ke.Reason != "NOT_FOUND" {
+		t.Fatalf("reason = %q, want NOT_FOUND (round-tripped via the ErrorInfo detail)", ke.Reason)
 	}
 }
 

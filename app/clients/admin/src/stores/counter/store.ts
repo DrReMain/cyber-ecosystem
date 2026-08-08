@@ -1,4 +1,4 @@
-import { defineStore } from "#/stores/_core/define-store";
+import { defineStore } from "@cyber-ecosystem/shared-store";
 
 export const counterStore = defineStore("store_counter", 0, {
   debugLabel: "Counter",

@@ -1,5 +1,5 @@
+import { RouteTransition } from "@cyber-ecosystem/shared-theme/route-transition";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { RouteTransition } from "#/domains/route-transition";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -11,12 +11,13 @@ const NAV_ITEMS = [
   { to: "/stores", label: "Stores", exact: false },
   { to: "/antd", label: "AntD", exact: false },
   { to: "/playground-connect", label: "Connect", exact: false },
+  { to: "/playground-http", label: "HTTP", exact: false },
 ] as const;
 
 function AppLayout() {
   return (
     <div className="flex min-h-screen">
-      <aside className="w-48 shrink-0 border-black/10 border-r p-4 dark:border-white/10">
+      <aside className="flex w-48 shrink-0 flex-col border-r p-4">
         <nav className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <Link

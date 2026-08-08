@@ -25,6 +25,9 @@ import (
 	"google.golang.org/genproto/googleapis/api/httpbody"
 
 	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
+	testpbconnect "cyber-ecosystem/shared-go/kratos/transport/connect/testpb/testpbconnect"
+
+	"cyber-ecosystem/shared-go/kratos/transport/connect"
 )
 
 // replyHeaderErrSvc sets a reply header then returns an error.
@@ -41,11 +44,35 @@ func (replyHeaderErrSvc) Raw(ctx context.Context, _ *testpb.RawRequest) (*httpbo
 // transport attaches the ReplyHeader to the returned *connect.Error's Meta()
 // (a unary error has no response header). This diverges from grpc/http, which
 // send ReplyHeader as a response header even on error.
+//
+// The ReplyHeader lands on the *connect.Error's Meta() at the WIRE level. The
+// kratos unary interceptor that normalizes errors to *kerrors.Error drops
+// Meta() by design, so this contract is visible only to raw connect clients —
+// built without cli.ClientOptions() — and to non-kratos connect peers.
 func TestReplyHeaderOnErrorConnectUnary(t *testing.T) {
-	cli, stop := startServerWithService(t, replyHeaderErrSvc{})
-	defer stop()
+	srv := connect.NewServer(connect.Address("127.0.0.1:0"), connect.Timeout(0))
+	testpb.RegisterTransferServiceConnectServer(srv, replyHeaderErrSvc{})
 
-	_, err := cli.Raw(context.Background(), connectrpc.NewRequest(&testpb.RawRequest{Data: []byte("x")}))
+	ep, err := srv.Endpoint()
+	if err != nil {
+		t.Fatalf("endpoint: %v", err)
+	}
+	ctx := context.Background()
+	go func() { _ = srv.Start(ctx) }()
+	waitReady(t, ep.Host)
+
+	cli, err := connect.Dial(ctx, connect.WithEndpoint(ep.Host), connect.WithH2C(true))
+	if err != nil {
+		_ = srv.Stop(ctx)
+		t.Fatalf("dial: %v", err)
+	}
+	defer func() {
+		_ = cli.Close()
+		_ = srv.Stop(ctx)
+	}()
+
+	raw := testpbconnect.NewTransferServiceClient(cli.HTTPClient(), cli.BaseURL())
+	_, err = raw.Raw(ctx, connectrpc.NewRequest(&testpb.RawRequest{Data: []byte("x")}))
 	if err == nil {
 		t.Fatal("expected an error from Raw")
 	}

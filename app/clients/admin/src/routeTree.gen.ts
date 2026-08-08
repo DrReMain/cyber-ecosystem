@@ -10,14 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppAntdRouteImport } from './routes/_app.antd'
 import { Route as AppPlaygroundConnectRouteImport } from './routes/_app.playground-connect'
+import { Route as AppPlaygroundHttpRouteImport } from './routes/_app.playground-http'
 import { Route as AppStoresRouteImport } from './routes/_app.stores'
 import { Route as AppThemeRouteImport } from './routes/_app.theme'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -35,6 +42,11 @@ const AppPlaygroundConnectRoute = AppPlaygroundConnectRouteImport.update({
   path: '/playground-connect',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPlaygroundHttpRoute = AppPlaygroundHttpRouteImport.update({
+  id: '/playground-http',
+  path: '/playground-http',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppStoresRoute = AppStoresRouteImport.update({
   id: '/stores',
   path: '/stores',
@@ -48,14 +60,18 @@ const AppThemeRoute = AppThemeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/login': typeof LoginRoute
   '/antd': typeof AppAntdRoute
   '/playground-connect': typeof AppPlaygroundConnectRoute
+  '/playground-http': typeof AppPlaygroundHttpRoute
   '/stores': typeof AppStoresRoute
   '/theme': typeof AppThemeRoute
 }
 export interface FileRoutesByTo {
+  '/login': typeof LoginRoute
   '/antd': typeof AppAntdRoute
   '/playground-connect': typeof AppPlaygroundConnectRoute
+  '/playground-http': typeof AppPlaygroundHttpRoute
   '/stores': typeof AppStoresRoute
   '/theme': typeof AppThemeRoute
   '/': typeof AppIndexRoute
@@ -63,22 +79,40 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
   '/_app/antd': typeof AppAntdRoute
   '/_app/playground-connect': typeof AppPlaygroundConnectRoute
+  '/_app/playground-http': typeof AppPlaygroundHttpRoute
   '/_app/stores': typeof AppStoresRoute
   '/_app/theme': typeof AppThemeRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/antd' | '/playground-connect' | '/stores' | '/theme'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/antd'
+    | '/playground-connect'
+    | '/playground-http'
+    | '/stores'
+    | '/theme'
   fileRoutesByTo: FileRoutesByTo
-  to: '/antd' | '/playground-connect' | '/stores' | '/theme' | '/'
+  to:
+    | '/login'
+    | '/antd'
+    | '/playground-connect'
+    | '/playground-http'
+    | '/stores'
+    | '/theme'
+    | '/'
   id:
     | '__root__'
     | '/_app'
+    | '/login'
     | '/_app/antd'
     | '/_app/playground-connect'
+    | '/_app/playground-http'
     | '/_app/stores'
     | '/_app/theme'
     | '/_app/'
@@ -86,6 +120,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -95,6 +130,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -118,6 +160,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPlaygroundConnectRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/playground-http': {
+      id: '/_app/playground-http'
+      path: '/playground-http'
+      fullPath: '/playground-http'
+      preLoaderRoute: typeof AppPlaygroundHttpRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/stores': {
       id: '/_app/stores'
       path: '/stores'
@@ -138,6 +187,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAntdRoute: typeof AppAntdRoute
   AppPlaygroundConnectRoute: typeof AppPlaygroundConnectRoute
+  AppPlaygroundHttpRoute: typeof AppPlaygroundHttpRoute
   AppStoresRoute: typeof AppStoresRoute
   AppThemeRoute: typeof AppThemeRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -146,6 +196,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAntdRoute: AppAntdRoute,
   AppPlaygroundConnectRoute: AppPlaygroundConnectRoute,
+  AppPlaygroundHttpRoute: AppPlaygroundHttpRoute,
   AppStoresRoute: AppStoresRoute,
   AppThemeRoute: AppThemeRoute,
   AppIndexRoute: AppIndexRoute,
@@ -155,6 +206,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

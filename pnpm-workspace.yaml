@@ -1,6 +1,7 @@
 packages:
   - "shared-ts/*"
   - "gen/ts"
+  - "gen/openapi-ts"
   - "app/clients/*"
 
 minimumReleaseAge: 0

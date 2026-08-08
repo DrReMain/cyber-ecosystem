@@ -84,11 +84,11 @@ func (uc *AuthUC) Login(ctx context.Context, email, password string) (*TokenPair
 	if err != nil {
 		return nil, err
 	}
-	if err := uc.tokenRP.Set(ctx, sessionPrefix+sid, utils.MustMarshal(&Session{UserID: u.ID, TenantID: u.TenantID}), sessionTTL); err != nil {
-		return nil, err
-	}
 	access, err := authtoken.GenerateToken()
 	if err != nil {
+		return nil, err
+	}
+	if err := uc.tokenRP.Set(ctx, sessionPrefix+sid, utils.MustMarshal(&Session{UserID: u.ID, TenantID: u.TenantID}), sessionTTL); err != nil {
 		return nil, err
 	}
 	if err := uc.tokenRP.Set(ctx, accessPrefix+access, utils.MustMarshal(&security.Subject{UserID: u.ID, TenantID: u.TenantID, SessionID: sid}), accessTTL); err != nil {
@@ -137,20 +137,23 @@ func (uc *AuthUC) Refresh(ctx context.Context, refreshToken string) (*TokenPair,
 	if err != nil {
 		return nil, err
 	}
-	newRefresh, err := authtoken.GenerateToken()
+	refresh, err := authtoken.GenerateToken()
 	if err != nil {
 		return nil, err
 	}
 	if err := uc.tokenRP.Set(ctx, accessPrefix+access, utils.MustMarshal(&security.Subject{UserID: sess.UserID, TenantID: sess.TenantID, SessionID: sid}), accessTTL); err != nil {
 		return nil, err
 	}
-	if err := uc.tokenRP.Set(ctx, refreshPrefix+newRefresh, []byte(sid), refreshTTL); err != nil {
+	if err := uc.tokenRP.Set(ctx, refreshPrefix+refresh, []byte(sid), refreshTTL); err != nil {
+		return nil, err
+	}
+	if err := uc.tokenRP.Set(ctx, sessionPrefix+sid, sessBytes, sessionTTL); err != nil {
 		return nil, err
 	}
 	if err := uc.tokenRP.Del(ctx, refreshPrefix+refreshToken); err != nil {
 		return nil, err
 	}
-	return &TokenPair{Access: access, Refresh: newRefresh}, nil
+	return &TokenPair{Access: access, Refresh: refresh}, nil
 }
 
 func (uc *AuthUC) Logout(ctx context.Context) error {

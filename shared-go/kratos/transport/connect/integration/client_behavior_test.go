@@ -23,6 +23,7 @@ import (
 	"time"
 
 	connectrpc "connectrpc.com/connect"
+	kerrors "github.com/go-kratos/kratos/v3/errors"
 	"github.com/go-kratos/kratos/v3/middleware"
 	"github.com/go-kratos/kratos/v3/transport"
 	"golang.org/x/net/http2"
@@ -136,9 +137,10 @@ func TestClientMiddlewareRunsStream(t *testing.T) {
 // TestClientTimeout verifies that connect.WithTimeout surfaces a client-side
 // deadline. We dial with a 200ms timeout and call the "SLOW" Raw variant whose
 // server handler sleeps 1s. The client must error out (it must NOT wait the
-// full second). We assert honestly on whatever connect surfaces: a
-// *connect.Error with CodeDeadlineExceeded, or a context deadline / url error
-// wrapping one — any of these proves the timeout fired client-side.
+// full second). Errors surface as *kerrors.Error Code 504: the client unary
+// interceptor normalizes via ConnectToError, and grpcToHTTP maps
+// DeadlineExceeded to 504. A raw *connect.Error(CodeDeadlineExceeded) or a
+// bare context deadline also proves the timeout fired client-side.
 func TestClientTimeout(t *testing.T) {
 	cli, stop := startServerWithClient(t, connect.WithTimeout(200*time.Millisecond))
 	defer stop()
@@ -159,10 +161,17 @@ func TestClientTimeout(t *testing.T) {
 		t.Fatalf("client waited %v for SLOW call, expected to time out well under 1s", elapsed)
 	}
 
-	// connect-go surfaces client timeouts as *connect.Error(CodeDeadlineExceeded)
-	// (the client interceptor's context.WithTimeout trips and the unary func
-	// returns a deadline error that connect wraps). Accept that, or a raw
-	// context.DeadlineExceeded / net deadline error as an honest fallback.
+	// The client unary interceptor normalizes to *kerrors.Error (ConnectToError);
+	// grpcToHTTP maps DeadlineExceeded to 504. The fallbacks cover errors that
+	// escape before normalization: a raw *connect.Error(CodeDeadlineExceeded)
+	// or a bare context.DeadlineExceeded.
+	var ke *kerrors.Error
+	if errors.As(err, &ke) {
+		if ke.Code != http.StatusGatewayTimeout {
+			t.Fatalf("kratos Code = %d, want 504 (DeadlineExceeded)", ke.Code)
+		}
+		return
+	}
 	var ce *connectrpc.Error
 	if errors.As(err, &ce) {
 		if ce.Code() != connectrpc.CodeDeadlineExceeded {
@@ -171,7 +180,7 @@ func TestClientTimeout(t *testing.T) {
 		return
 	}
 	if !errors.Is(err, context.DeadlineExceeded) {
-		t.Fatalf("client timeout did not surface as connect CodeDeadlineExceeded or context.DeadlineExceeded: %T: %v", err, err)
+		t.Fatalf("client timeout did not surface as kratos 504, connect CodeDeadlineExceeded, or context.DeadlineExceeded: %T: %v", err, err)
 	}
 }
 

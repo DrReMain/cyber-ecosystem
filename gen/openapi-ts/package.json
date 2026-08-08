@@ -1,0 +1,11 @@
+{
+  "name": "@cyber-ecosystem/gen-openapi-ts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.99.0",
+    "typescript": "6.0.3"
+  }
+}
+
