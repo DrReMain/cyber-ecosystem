@@ -1,0 +1,177 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service FileService {
+  option (cyber.ext.v1.service_comment) = "文件管理";
+
+  rpc RenameFile(RenameFileRequest) returns (RenameFileResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "重命名文件"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {
+      put: "/api/v1/system/files/{id}/name"
+      body: "*"
+    };
+  }
+
+  // Soft delete: the row enters the recycle state, the stored object is retained.
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "删除文件"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {delete: "/api/v1/system/files/{id}"};
+  }
+
+  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询文件列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {get: "/api/v1/system/files"};
+  }
+
+  rpc GetFile(GetFileRequest) returns (GetFileResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询文件详情"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {get: "/api/v1/system/files/{id}"};
+  }
+
+  rpc GetFileUrls(GetFileUrlsRequest) returns (GetFileUrlsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "铸造文件下载地址（批量）"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/files/urls"
+      body: "*"
+    };
+  }
+}
+
+enum FileStatus {
+  FILE_STATUS_UNSPECIFIED = 0;
+  FILE_STATUS_UPLOADING = 1;
+  FILE_STATUS_CONFIRMED = 2;
+}
+
+enum FileSource {
+  FILE_SOURCE_UNSPECIFIED = 0;
+  FILE_SOURCE_CLIENT_UPLOAD = 1;
+  FILE_SOURCE_SERVER_GENERATED = 2;
+}
+
+message File {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue name = 4;
+  // Actually stored Content-Type (backfilled from HEAD at confirm; may differ
+  // from the declaration — storage wins).
+  google.protobuf.StringValue content_type = 5;
+  google.protobuf.Int64Value size = 6;
+  FileSource source = 7;
+  FileStatus status = 8;
+  google.protobuf.StringValue owner_id = 9;
+}
+
+// renameFile
+message RenameFileRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string name = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 255
+    }
+  ];
+}
+
+message RenameFileResponse {}
+
+// deleteFile
+message DeleteFileRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message DeleteFileResponse {}
+
+// listFiles
+message ListFilesRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional string name = 2;
+  optional string content_type = 3;
+  optional FileStatus status = 4;
+  optional FileSource source = 5;
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListFilesRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(name|size|createdAt|updatedAt):(asc|desc)$'))"
+  }];
+}
+
+message ListFilesResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated File list = 2;
+}
+
+// getFile
+message GetFileRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetFileResponse {
+  File file = 1;
+}
+
+// getFileUrls
+message GetFileUrlsRequest {
+  repeated string ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 128
+    unique: true
+    items: {string: {len: 20}}
+  }];
+}
+
+message FileUrl {
+  string url = 1;
+  google.protobuf.Timestamp expires_at = 2;
+}
+
+message GetFileUrlsResponse {
+  map<string, FileUrl> urls = 1;
+}

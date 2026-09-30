@@ -1,0 +1,52 @@
+/*
+ * Tailwind ↔ antd token bridge. antd is the source of truth (ConfigProvider
+ * injects its variables on a provider-wrapper class), and this file is the
+ * only place that knows antd exists - swapping the token source only touches
+ * the right-hand column, business code stays unaware.
+ */
+
+/*
+ * `inline` bakes the right-hand expression into each utility at its usage
+ * point (text-primary → var(--ant-color-primary) directly). Utilities then
+ * resolve wherever antd's variables actually live: they are class-scoped to
+ * the provider wrapper rather than on :root, so utilities depending on
+ * :root-level variables (plain @theme) would resolve empty in this app.
+ */
+@theme inline {
+  --color-primary: var(--ant-color-primary, #2563eb);
+  --color-success: var(--ant-color-success);
+  --color-warning: var(--ant-color-warning);
+  --color-error: var(--ant-color-error);
+  --color-primary-bright: color-mix(in srgb, var(--ant-color-primary, #2563eb) 85%, white);
+  /* Surfaces */
+  --color-canvas: var(--ant-color-bg-base);
+  --color-container: var(--ant-color-bg-container);
+  --color-elevated: var(--ant-color-bg-elevated);
+  --color-layout: var(--ant-color-bg-layout);
+  /* Ink scale */
+  --color-ink: var(--ant-color-text);
+  --color-ink-secondary: var(--ant-color-text-secondary);
+  --color-ink-tertiary: var(--ant-color-text-tertiary);
+  --color-ink-quaternary: var(--ant-color-text-quaternary);
+  --color-ink-heading: var(--ant-color-text-heading);
+  --color-ink-label: var(--ant-color-text-label);
+  --color-ink-description: var(--ant-color-text-description);
+  --color-ink-disabled: var(--ant-color-text-disabled);
+  --color-ink-placeholder: var(--ant-color-text-placeholder);
+  --color-ink-inverse: var(--ant-color-text-light-solid);
+  /* Hairlines */
+  --color-line: var(--ant-color-border);
+  --color-line-soft: var(--ant-color-border-secondary);
+  /* Fills */
+  --color-fill: var(--ant-color-fill);
+  --color-fill-secondary: var(--ant-color-fill-secondary);
+  --color-fill-tertiary: var(--ant-color-fill-tertiary);
+  /* Control radii (namespaced so Tailwind's default rounded-* stays intact) */
+  --radius-control-sm: var(--ant-border-radius-sm);
+  --radius-control: var(--ant-border-radius);
+  --radius-control-lg: var(--ant-border-radius-lg);
+  /* Shadow layers */
+  --shadow-layer-sm: var(--ant-box-shadow);
+  --shadow-layer-md: var(--ant-box-shadow-secondary);
+  --shadow-layer-lg: var(--ant-box-shadow-tertiary);
+}

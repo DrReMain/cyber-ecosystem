@@ -1,0 +1,15 @@
+{
+  "name": "cyber-ecosystem",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "devDependencies": {
+    "@ariga/atlas": "1.3.2",
+    "@biomejs/biome": "2.5.12",
+    "@bufbuild/protoc-gen-es": "2.14.1",
+    "@connectrpc/protoc-gen-connect-query": "2.3.1",
+    "typescript": "7.0.2"
+  }
+}

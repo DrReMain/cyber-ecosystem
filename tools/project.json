@@ -1,0 +1,49 @@
+{
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "tools",
+  "root": "tools",
+  "targets": {
+    "init": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest",
+          "go install github.com/bufbuild/buf/cmd/buf@v1.71.0",
+          "go mod download",
+          "buf dep update",
+          "pnpm install"
+        ],
+        "parallel": false
+      }
+    },
+    "buf:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf format -w"
+      }
+    },
+    "go:lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": ["go tool golangci-lint run ./..."]
+      }
+    },
+    "go:format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": ["go tool golangci-lint run --fix ./..."]
+      }
+    },
+    "go:test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": ["go test ./..."]
+      }
+    }
+  }
+}

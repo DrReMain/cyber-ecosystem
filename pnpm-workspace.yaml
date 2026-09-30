@@ -1,0 +1,15 @@
+packages:
+  - "shared-ts/*"
+  - "gen/connect-ts"
+  - "gen/openapi-ts"
+  - "app/clients/*"
+
+allowBuilds:
+  esbuild: true
+  '@ariga/atlas': true
+
+minimumReleaseAge: 0
+
+onlyBuiltDependencies:
+  - esbuild
+  - lightningcss

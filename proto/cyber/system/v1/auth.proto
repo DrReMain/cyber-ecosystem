@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/system/v1/user.proto";
+import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service AuthService {
+  option (cyber.ext.v1.service_comment) = "认证与会话";
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "登录"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/login"
+      body: "*"
+    };
+  }
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "登出"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/logout"
+      body: "*"
+    };
+  }
+  rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "获取当前登录用户"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {get: "/api/v1/system/me"};
+  }
+}
+
+message LoginRequest {
+  optional string email = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string password = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message LoginResponse {
+  string session_token = 1;
+  google.protobuf.Timestamp issued_at = 2;
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+message LogoutRequest {}
+
+message LogoutResponse {}
+
+// getCurrentUser
+message GetCurrentUserRequest {}
+
+message GetCurrentUserResponse {
+  cyber.system.v1.User user = 1;
+  repeated string permissions = 2;
+}

@@ -1,0 +1,32 @@
+{
+  "common_locale_name": [
+    {
+      "declarations": ["input locale"],
+      "selectors": ["locale"],
+      "match": {
+        "locale=en-US": "English",
+        "locale=zh-CN": "简体中文",
+        "locale=ar-SA": "العربية",
+        "locale=ja-JP": "日本語",
+        "locale=ko-KR": "한국어",
+        "locale=*": "{locale}"
+      }
+    }
+  ],
+  "common_loading": "로딩 중",
+  "common_retry": "다시 시도",
+  "common_toolbar_refresh": "새로 고침",
+  "common_toolbar_density": "행 높이",
+  "common_toolbar_density_large": "넓게",
+  "common_toolbar_density_middle": "기본",
+  "common_toolbar_density_small": "좁게",
+  "common_filter_search": "검색",
+  "common_filter_reset": "초기화",
+  "common_filter_fold": "접기",
+  "common_filter_expand": "펼치기",
+  "common_column_settings": "열 설정",
+  "common_column_settings_reset": "초기화",
+  "common_save": "저장",
+  "common_cancel": "취소",
+  "common_user_deleted": "삭제됨"
+}

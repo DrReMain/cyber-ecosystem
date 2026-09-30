@@ -1,0 +1,16 @@
+{
+  "login_default_title": "ログイン",
+  "login_default_description": "",
+  "login_default_hero_title_a": "スマート",
+  "login_default_hero_title_b": "マネジメントコンソール",
+  "login_default_hero_sub": "AI駆動の汎用管理基盤。統一された入り口から、すべてのサブシステムとインテリジェントツールへ。",
+  "login_default_form_title": "ログイン",
+  "login_default_form_sub": "会社のメールアドレスで続行",
+  "login_default_label_email": "メールアドレス",
+  "login_default_label_password": "パスワード",
+  "login_default_forgot": "パスワードをお忘れですか？",
+  "login_default_submit": "コンソールへ進む",
+  "login_default_divider_or": "または",
+  "login_default_sso": "SSOでログイン",
+  "login_default_session_expired": "セッションの有効期限が切れました。再度ログインしてください"
+}

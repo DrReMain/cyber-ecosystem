@@ -1,0 +1,99 @@
+# Application layer: the system service, the admin client, and the one-shot
+# atlas migration job. Layered over compose.dev.yaml so apps share the
+# middleware network, volumes, and compose project with dev:
+#
+#   docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml \
+#     --profile db --profile storage --profile mq --profile app up -d --build --wait
+#
+# App containers publish NO host ports — the edge (compose.edge.yaml) is the
+# only way in, mirroring the prod access shape. Use the deploy Nx targets
+# (deploy:app:start, deploy:pre:start) instead of raw compose.
+
+services:
+  system-migrate: # applies atlas versioned migrations, then exits
+    profiles: ["app"]
+    image: arigaio/atlas:1.3.2 # version-aligned with the local @ariga/atlas CLI
+    command:
+      - migrate
+      - apply
+      - --dir
+      - file:///migrations
+      - --url
+      - postgres://postgres:postgres@postgresql.db:5432/system?sslmode=disable
+    volumes:
+      # bound from the repo checkout; an offline install bundle ships the
+      # migrations directory alongside the compose files
+      - ../../app/services/system/internal/ent/migrate/migrations:/migrations:ro
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: "no"
+
+  system:
+    profiles: ["app"]
+    build:
+      context: ../..
+      dockerfile: app/services/system/Dockerfile
+      args:
+        # stamped by the deploy targets from git describe; bare `--build`
+        # without it would silently regress the version to the ARG default
+        VERSION: "${VERSION:-dev}"
+    image: cyber-ecosystem/system:local
+    networks:
+      default:
+        aliases: ["system.api"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:11001/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+    depends_on:
+      system-migrate:
+        condition: service_completed_successfully
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      seaweedfs:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+    restart: unless-stopped
+
+  admin:
+    profiles: ["app"]
+    build:
+      context: ../..
+      dockerfile: app/clients/admin/Dockerfile
+    image: cyber-ecosystem/admin:local
+    environment:
+      PORT: "3000"
+      CONNECT_API_URL: http://system.api:13001 # SSR server → system, in-network
+    networks:
+      default:
+        aliases: ["admin.web"]
+    healthcheck: # static asset probe — no SSR render cost
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/favicon.ico"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+    depends_on:
+      system:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+    restart: unless-stopped

@@ -1,0 +1,32 @@
+{
+  "common_locale_name": [
+    {
+      "declarations": ["input locale"],
+      "selectors": ["locale"],
+      "match": {
+        "locale=en-US": "English",
+        "locale=zh-CN": "简体中文",
+        "locale=ar-SA": "العربية",
+        "locale=ja-JP": "日本語",
+        "locale=ko-KR": "한국어",
+        "locale=*": "{locale}"
+      }
+    }
+  ],
+  "common_loading": "加载中",
+  "common_retry": "重试",
+  "common_toolbar_refresh": "刷新",
+  "common_toolbar_density": "密度",
+  "common_toolbar_density_large": "宽松",
+  "common_toolbar_density_middle": "默认",
+  "common_toolbar_density_small": "紧凑",
+  "common_filter_search": "查询",
+  "common_filter_reset": "重置",
+  "common_filter_fold": "收起",
+  "common_filter_expand": "展开",
+  "common_column_settings": "列设置",
+  "common_column_settings_reset": "恢复",
+  "common_save": "保存",
+  "common_cancel": "取消",
+  "common_user_deleted": "已删除"
+}

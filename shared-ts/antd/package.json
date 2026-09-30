@@ -1,0 +1,52 @@
+{
+  "name": "@cyber-ecosystem/shared-antd",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./filter": "./src/filter/index.ts",
+    "./skins": "./src/skins/index.ts",
+    "./ssr": "./src/ssr.ts",
+    "./table": "./src/table/index.ts",
+    "./use-search": "./src/use-search/index.ts"
+  },
+  "scripts": {
+    "check": "biome check",
+    "format": "biome format",
+    "lint": "biome lint",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@bufbuild/protobuf": "^2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "antd": "^6",
+    "antd-style": "^4",
+    "dayjs": "^1",
+    "lucide-react": "^1",
+    "react": "^19",
+    "react-dom": "^19",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "@bufbuild/protobuf": "2.14.1",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "antd": "6.6.3",
+    "antd-style": "4.1.0",
+    "dayjs": "1.11.23",
+    "jsdom": "30.0.1",
+    "lucide-react": "1.44.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.0",
+    "zod": "4.6.1"
+  }
+}

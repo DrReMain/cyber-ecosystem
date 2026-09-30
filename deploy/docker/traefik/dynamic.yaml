@@ -1,0 +1,85 @@
+# Host routes for the HTTP/WS edge (traefik :80).
+# The edge is the prod routing shape; in dev it coexists with direct
+# port access and exists to keep these routes verified.
+http:
+  routers:
+    seaweedfs-s3:
+      rule: "Host(`s3.cyber.test`)"
+      entryPoints: ["web"]
+      service: seaweedfs-s3
+    centrifugo:
+      rule: "Host(`realtime.cyber.test`)"
+      entryPoints: ["web"]
+      service: centrifugo
+    signoz:
+      rule: "Host(`observe.cyber.test`)"
+      entryPoints: ["web"]
+      service: signoz
+    signoz-otlp:
+      rule: "Host(`otlp.cyber.test`)"
+      entryPoints: ["web"]
+      service: signoz-otlp
+    glitchtip:
+      rule: "Host(`errors.cyber.test`)"
+      entryPoints: ["web"]
+      service: glitchtip
+    livekit-signal:
+      rule: "Host(`rtc.cyber.test`)"
+      entryPoints: ["web"]
+      service: livekit-signal
+    admin-connect:
+      # The browser bundle calls same-origin /connect; dev's vite proxy does
+      # exactly this strip+forward to the connect port (WS included).
+      # Traefik's length-based priority ranks this above the plain admin Host
+      # rule below, so no explicit priorities are needed.
+      rule: "Host(`admin.cyber.test`) && PathPrefix(`/connect`)"
+      entryPoints: ["web"]
+      service: system-connect
+      middlewares: [strip-connect]
+    admin:
+      rule: "Host(`admin.cyber.test`)"
+      entryPoints: ["web"]
+      service: admin
+    api:
+      rule: "Host(`api.cyber.test`)"
+      entryPoints: ["web"]
+      service: system-connect
+
+  middlewares:
+    strip-connect:
+      stripPrefix:
+        prefixes: ["/connect"]
+
+  services:
+    seaweedfs-s3:
+      loadBalancer:
+        servers:
+          - url: "http://seaweedfs:80"
+    centrifugo:
+      loadBalancer:
+        servers:
+          - url: "http://centrifugo:8000"
+    signoz:
+      loadBalancer:
+        servers:
+          - url: "http://signoz:8080"
+    signoz-otlp:
+      loadBalancer:
+        servers:
+          - url: "http://signoz-otel-collector:4318"
+    glitchtip:
+      loadBalancer:
+        servers:
+          - url: "http://glitchtip:8000"
+    livekit-signal:
+      loadBalancer:
+        servers:
+          - url: "http://livekit:7880"
+    system-connect:
+      loadBalancer:
+        servers:
+          - url: "http://system:13001"
+    admin:
+      loadBalancer:
+        servers:
+          - url: "http://admin:3000"

@@ -1,0 +1,15 @@
+{
+  "name": "@cyber-ecosystem/gen-connect-ts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@bufbuild/protobuf": "2.14.1"
+  },
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

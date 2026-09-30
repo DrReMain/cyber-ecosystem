@@ -1,0 +1,34 @@
+{
+  "$schema": "https://inlang.com/schema/project-settings",
+  "baseLocale": "en-US",
+  "locales": [
+    "en-US",
+    "zh-CN",
+    "ar-SA",
+    "ja-JP",
+    "ko-KR"
+  ],
+  "modules": [
+    "https://cdn.jsdelivr.net/npm/@inlang/plugin-message-format@4/dist/index.js",
+    "https://cdn.jsdelivr.net/npm/@inlang/plugin-m-function-matcher@2/dist/index.js"
+  ],
+  "plugin.inlang.messageFormat": {
+    "pathPattern": [
+      "./messages/common/{locale}.json",
+      "./messages/home/{locale}.json",
+      "./messages/not-found/{locale}.json",
+      "./messages/error/{locale}.json",
+      "./messages/layout-dashboard/{locale}.json",
+      "./messages/login-default/{locale}.json",
+      "./messages/system/{locale}.json",
+      "./messages/system-depts/{locale}.json",
+      "./messages/system-roles/{locale}.json",
+      "./messages/system-users/{locale}.json",
+      "./messages/system-policies/{locale}.json",
+      "./messages/system-diag/{locale}.json",
+      "./messages/system-audit/{locale}.json",
+      "./messages/files/{locale}.json",
+      "./messages/files-list/{locale}.json"
+    ]
+  }
+}

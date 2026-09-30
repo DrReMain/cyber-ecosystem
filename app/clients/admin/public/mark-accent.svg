@@ -1,0 +1,11 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" ><title>cyber mark</title>
+  <!-- cyber mark · img 用固定色版：白括号 + 青→紫渐变星（currentColor 版见 docs/brand） -->
+  <defs>
+    <linearGradient id="cyber-star" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#67E8F9"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+  <path d="M 18 36 L 18 18 L 36 18 M 64 18 L 82 18 L 82 36 M 82 64 L 82 82 L 64 82 M 36 82 L 18 82 L 18 64" fill="none" stroke="#e8ecf4" stroke-linecap="square" stroke-linejoin="miter" stroke-width="5" />
+  <path d="M 59.2 40.8 Q 52.2 50 59.2 59.2 Q 50 52.2 40.8 59.2 Q 47.8 50 40.8 40.8 Q 50 47.8 59.2 40.8 Z" fill="url(#cyber-star)"/>
+</svg>

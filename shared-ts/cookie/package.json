@@ -1,0 +1,23 @@
+{
+  "name": "@cyber-ecosystem/shared-cookie",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "biome check",
+    "format": "biome format",
+    "lint": "biome lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "superjson": "^2",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

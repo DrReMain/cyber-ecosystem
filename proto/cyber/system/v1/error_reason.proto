@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+// business errors (service-level): domain-specific failures the
+// service layer returns actively, distinct from the generic codes in
+// cyber/shared/errors (General/Flow/Infra). The 6xxx range is reserved for service-level business reasons.
+enum System {
+  option (.errors.default_code) = 400;
+
+  SYSTEM_UNSPECIFIED = 0 [(.errors.code) = 500];
+
+  // 600x: auth
+  SYSTEM_LOGIN_FAILED = 6000 [(.errors.code) = 400];
+
+  // 601x: dept
+  SYSTEM_DEPT_SELF_PARENT = 6010 [(.errors.code) = 400];
+  SYSTEM_DEPT_CYCLE = 6011 [(.errors.code) = 400];
+  SYSTEM_DEPT_HAS_CHILDREN = 6012 [(.errors.code) = 400];
+  SYSTEM_DEPT_NOT_FOUND = 6013 [(.errors.code) = 404];
+  SYSTEM_DEPT_HAS_USERS = 6014 [(.errors.code) = 400];
+  SYSTEM_DEPT_MEMBER_NOT_FOUND = 6015 [(.errors.code) = 404];
+
+  // 602x: role
+  SYSTEM_ROLE_NOT_FOUND = 6020 [(.errors.code) = 404];
+  SYSTEM_ROLE_HAS_BINDINGS = 6021 [(.errors.code) = 400];
+  // 603x: permission
+  SYSTEM_PERMISSION_INVALID_OPERATION = 6030 [(.errors.code) = 400];
+  reserved 6031;
+  // 604x: policy
+  SYSTEM_POLICY_UNKNOWN_KIND = 6040 [(.errors.code) = 400];
+  SYSTEM_POLICY_INVALID_PARAMS = 6041 [(.errors.code) = 400];
+  SYSTEM_POLICY_NOT_FOUND = 6042 [(.errors.code) = 404];
+  // 605x: apikey (provision cleared 2026-09-29; number stays reserved)
+  reserved 6050;
+  // 606x: authz runtime
+  SYSTEM_AUTHZ_POLICY_DENIED = 6060 [(.errors.code) = 403];
+  // 607x: user
+  SYSTEM_USER_SELF_DELETE = 6070 [(.errors.code) = 400];
+  SYSTEM_USER_SELF_DISABLE = 6071 [(.errors.code) = 400];
+  SYSTEM_USER_DISABLED = 6072 [(.errors.code) = 403];
+  // 608x: file
+  SYSTEM_FILE_NOT_FOUND = 6080 [(.errors.code) = 404];
+  SYSTEM_FILE_TOO_LARGE = 6081 [(.errors.code) = 400];
+  SYSTEM_FILE_INVALID_STATE = 6083 [(.errors.code) = 400];
+}

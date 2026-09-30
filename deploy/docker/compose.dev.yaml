@@ -1,0 +1,541 @@
+name: cyber-ecosystem
+
+volumes:
+  db-data-postgresql: {}
+  db-data-redis: {}
+  storage-data-seaweedfs: {}
+  mq-data-nats: {}
+  observability-data-zookeeper: {}
+  observability-data-clickhouse: {}
+  observability-user-scripts: {}
+  observability-data-signoz: {}
+  observability-data-glitchtip-uploads: {}
+
+services:
+  postgresql:
+    profiles: ["db"]
+    build:
+      context: ../images/pg-extended
+    image: pg-extended:18.3
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    command:
+      - -c
+      - max_connections=200
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - effective_cache_size=512MB
+      - -c
+      - work_mem=16MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - log_min_duration_statement=1000
+    volumes:
+      - db-data-postgresql:/var/lib/postgresql
+      - ./postgres:/docker-entrypoint-initdb.d:ro
+    networks:
+      default:
+        aliases: ["postgresql.db"]
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 256M
+    restart: unless-stopped
+
+  redis:
+    profiles: ["db"]
+    image: redis:8.6-alpine
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --appendfsync
+      - everysec
+      - --maxmemory
+      - 512mb
+      - --maxmemory-policy
+      - volatile-lru
+      - --tcp-keepalive
+      - "300"
+      - --timeout
+      - "0"
+      - --save
+      - "900 1"
+      - --save
+      - "300 10"
+      - --save
+      - "60 10000"
+    volumes:
+      - db-data-redis:/data
+    networks:
+      default:
+        aliases: ["redis.db"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.05"
+          memory: 128M
+    restart: unless-stopped
+
+  seaweedfs:
+    profiles: ["storage"]
+    image: chrislusf/seaweedfs:4.39
+    command:
+      - server
+      - -dir=/data
+      - -s3
+      - -s3.config=/etc/seaweedfs/s3.json
+      - -s3.port=80
+      - -master.volumeSizeLimitMB=1024
+    volumes:
+      - storage-data-seaweedfs:/data
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    networks:
+      default:
+        # s3.cyber.test: the public edge name doubles as an in-network alias so
+        # presigned URLs (signed against the external name) work from inside
+        # the network too — see docs/deploy/CONVENTIONS.md §6.
+        aliases: ["seaweedfs.storage", "s3.cyber.test"]
+    ports:
+      - "8333:80" # S3 API (container listens on 80; host port unchanged for dev)
+      - "8888:8888" # filer UI
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "80"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.1"
+          memory: 256M
+    restart: unless-stopped
+
+  nats:
+    profiles: ["mq"]
+    image: nats:2.14.2
+    # scratch-based image: no shell or probing tools, so no container healthcheck
+    command:
+      - -js
+      - --store_dir
+      - /data
+      - -m
+      - "8222"
+    volumes:
+      - mq-data-nats:/data
+    networks:
+      default:
+        aliases: ["nats.mq"]
+    ports:
+      - "4222:4222"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.025"
+          memory: 64M
+    restart: unless-stopped
+
+  centrifugo:
+    profiles: ["realtime"]
+    image: centrifugo/centrifugo:v6.9.1
+    environment:
+      CENTRIFUGO_HTTP_API_KEY: cyber-ecosystem-api-key
+      CENTRIFUGO_CLIENT_TOKEN_HMAC_SECRET_KEY: Cyber-Ecosystem-centrifugo-hmac
+      CENTRIFUGO_ADMIN_PASSWORD: Cyber-Ecosystem123
+      CENTRIFUGO_ADMIN_SECRET: Cyber-Ecosystem-admin-secret
+      CENTRIFUGO_ADMIN_ENABLED: "true"
+      CENTRIFUGO_HEALTH_ENABLED: "true"
+      CENTRIFUGO_USAGE_STATS_DISABLED: "true"
+    networks:
+      default:
+        aliases: ["centrifugo.realtime"]
+    ports:
+      - "8000:8000" # HTTP API + websocket
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.05"
+          memory: 64M
+    restart: unless-stopped
+
+  livekit:
+    profiles: ["media"]
+    image: livekit/livekit-server:v1.13.0
+    command:
+      - --config=/config.yaml
+      - --bind=0.0.0.0
+    volumes:
+      - ./livekit/config.yaml:/config.yaml:ro
+    networks:
+      default:
+        aliases: ["livekit-server.media"]
+    ports:
+      - "7880:7880" # signaling
+      - "50000-50060:50000-50060/udp" # WebRTC ICE/UDP media range
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "7880"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.1"
+          memory: 256M
+    restart: unless-stopped
+
+  zookeeper:
+    profiles: ["observability"]
+    image: signoz/zookeeper:3.7.1
+    environment:
+      ZOO_SERVER_ID: "1"
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOO_AUTOPURGE_INTERVAL: "1"
+    volumes:
+      - observability-data-zookeeper:/bitnami/zookeeper
+    networks:
+      default:
+        aliases: ["zookeeper.observability"]
+    healthcheck: # bash /dev/tcp probe (minideb has no wget/curl)
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/127.0.0.1/2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.05"
+          memory: 128M
+    restart: unless-stopped
+
+  clickhouse-init: # fetches the histogramQuantile UDF binary used by SigNoz dashboards
+    profiles: ["observability"]
+    image: clickhouse/clickhouse-server:25.5.6
+    command:
+      - bash
+      - -c
+      - |
+        version="v0.0.1"
+        node_os=$$(uname -s | tr '[:upper:]' '[:lower:]')
+        node_arch=$$(uname -m | sed 's/aarch64/arm64/' | sed 's/x86_64/amd64/')
+        echo "Fetching histogram-binary for $${node_os}/$${node_arch}"
+        cd /tmp
+        wget -q -O histogram-quantile.tar.gz "https://github.com/SigNoz/signoz/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
+        tar -xzf histogram-quantile.tar.gz
+        mkdir -p /user_scripts
+        mv histogram-quantile /user_scripts/histogramQuantile
+        chmod +x /user_scripts/histogramQuantile
+    volumes:
+      - observability-user-scripts:/user_scripts
+    restart: "no"
+
+  clickhouse:
+    profiles: ["observability"]
+    image: clickhouse/clickhouse-server:25.5.6
+    environment:
+      CLICKHOUSE_SKIP_USER_SETUP: "1"
+    volumes:
+      - observability-data-clickhouse:/var/lib/clickhouse
+      - ./observability/clickhouse/config.xml:/etc/clickhouse-server/config.xml:ro
+      - ./observability/clickhouse/users.xml:/etc/clickhouse-server/users.xml:ro
+      - ./observability/clickhouse/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
+      - ./observability/clickhouse/custom-function.xml:/etc/clickhouse-server/custom-function.xml:ro
+      - observability-user-scripts:/var/lib/clickhouse/user_scripts
+    networks:
+      default:
+        aliases: ["clickhouse.observability"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      clickhouse-init:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "0.1"
+          memory: 256M
+    restart: unless-stopped
+
+  signoz-schema-migrator: # creates/updates SigNoz schemas in ClickHouse, then exits
+    profiles: ["observability"]
+    image: signoz/signoz-otel-collector:v0.144.5
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until /signoz-otel-collector migrate bootstrap; do
+          echo "Waiting for ClickHouse before SignOz schema migration..."
+          sleep 5
+        done
+        /signoz-otel-collector migrate sync up &&
+        /signoz-otel-collector migrate async up
+    environment:
+      SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN: tcp://clickhouse:9000
+      SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER: cluster
+      SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION: "false"
+      SIGNOZ_OTEL_COLLECTOR_TIMEOUT: 10m
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    restart: "no"
+
+  signoz-otel-collector:
+    profiles: ["observability"]
+    image: signoz/signoz-otel-collector:v0.144.5
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until /signoz-otel-collector migrate sync check; do
+          echo "Waiting for SignOz schema migration..."
+          sleep 5
+        done
+        /signoz-otel-collector --config=/etc/otel-collector-config.yaml --copy-path=/var/tmp/collector-config.yaml
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: "host.name=signoz-host,os.type=linux"
+      LOW_CARDINAL_EXCEPTION_GROUPING: "false"
+      SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN: tcp://clickhouse:9000
+      SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER: cluster
+      SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION: "false"
+      SIGNOZ_OTEL_COLLECTOR_TIMEOUT: 10m
+    volumes:
+      - ./observability/signoz/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    networks:
+      default:
+        aliases: ["signoz-otel-collector.observability"]
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    healthcheck: # bash /dev/tcp probe (no wget/curl in image)
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/127.0.0.1/13133"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      signoz-schema-migrator:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.1"
+          memory: 200M
+    restart: unless-stopped
+
+  signoz:
+    profiles: ["observability"]
+    image: signoz/signoz:v0.129.0
+    environment:
+      SIGNOZ_ALERTMANAGER_PROVIDER: signoz
+      SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN: tcp://clickhouse:9000
+      SIGNOZ_SQLSTORE_SQLITE_PATH: /var/lib/signoz/signoz.db
+      SIGNOZ_TOKENIZER_JWT_SECRET: secret
+      SIGNOZ_USER_ROOT_ENABLED: "true"
+      SIGNOZ_USER_ROOT_EMAIL: admin@cyber-ecosystem.com
+      SIGNOZ_USER_ROOT_PASSWORD: Cyber-Ecosystem123
+      SIGNOZ_USER_ROOT_ORG_NAME: default
+    volumes:
+      - observability-data-signoz:/var/lib/signoz
+    networks:
+      default:
+        aliases: ["signoz.observability"]
+    ports:
+      - "8080:8080" # web UI
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      signoz-schema-migrator:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+    restart: unless-stopped
+
+  glitchtip-db-init: # waits for postgres, creates the glitchtip database
+    profiles: ["observability"]
+    image: postgres:18.3-trixie
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "Waiting for postgres..."
+        until pg_isready -h postgresql.db -U postgres; do sleep 1; done
+        echo "Checking if glitchtip database exists..."
+        if ! psql -h postgresql.db -U postgres -lqt | cut -d \| -f 1 | grep -qw glitchtip; then
+          echo "Creating glitchtip database..."
+          psql -h postgresql.db -U postgres -c "CREATE DATABASE glitchtip;"
+          echo "Database created."
+        else
+          echo "Database glitchtip already exists."
+        fi
+    environment:
+      PGHOST: postgresql.db
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: "no"
+
+  glitchtip-setup: # django migrate + superuser bootstrap, then exits
+    profiles: ["observability"]
+    image: glitchtip/glitchtip:v6.0.3
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        ./bin/run-migrate.sh
+        python manage.py createsuperuser --noinput || echo "Superuser already exists, skipping."
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgresql.db:5432/glitchtip
+      REDIS_URL: redis://redis.db:6379/15
+      SECRET_KEY: glitchtip-dev-secret-key-change-in-production
+      GLITCHTIP_DOMAIN: http://localhost:8100
+      DJANGO_SUPERUSER_EMAIL: admin@cyber-ecosystem.com
+      DJANGO_SUPERUSER_PASSWORD: Cyber-Ecosystem123
+    depends_on:
+      glitchtip-db-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    restart: "no"
+
+  glitchtip:
+    profiles: ["observability"]
+    image: glitchtip/glitchtip:v6.0.3
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgresql.db:5432/glitchtip
+      REDIS_URL: redis://redis.db:6379/15
+      SECRET_KEY: glitchtip-dev-secret-key-change-in-production
+      GLITCHTIP_DOMAIN: http://localhost:8100
+      PORT: "8000"
+      TRUSTED_PROXIES: "*"
+    volumes:
+      - observability-data-glitchtip-uploads:/code/uploads
+    networks:
+      default:
+        aliases: ["glitchtip.observability"]
+    ports:
+      - "8100:8000" # web UI (host 8100: centrifugo owns 8000)
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/')",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      glitchtip-setup:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 256M
+    restart: unless-stopped
+
+  glitchtip-worker:
+    profiles: ["observability"]
+    image: glitchtip/glitchtip:v6.0.3
+    command: ["./bin/run-worker.sh"]
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgresql.db:5432/glitchtip
+      REDIS_URL: redis://redis.db:6379/15
+      SECRET_KEY: glitchtip-dev-secret-key-change-in-production
+      GLITCHTIP_DOMAIN: http://localhost:8100
+      TRUSTED_PROXIES: "*"
+    volumes:
+      - observability-data-glitchtip-uploads:/code/uploads
+    depends_on:
+      glitchtip-setup:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 256M
+    restart: unless-stopped

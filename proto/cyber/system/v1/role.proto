@@ -1,0 +1,383 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service RoleService {
+  option (cyber.ext.v1.service_comment) = "角色与授权管理";
+  rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "创建角色"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/roles"
+      body: "*"
+    };
+  }
+  rpc UpdateRole(UpdateRoleRequest) returns (UpdateRoleResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "修改角色"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/system/roles/{id}"
+      body: "*"
+    };
+  }
+  rpc UpdateRoleStatus(UpdateRoleStatusRequest) returns (UpdateRoleStatusResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "启停角色"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/system/roles/{id}/status"
+      body: "*"
+    };
+  }
+  rpc DeleteRole(DeleteRoleRequest) returns (DeleteRoleResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "删除角色"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {delete: "/api/v1/system/roles/{id}"};
+  }
+  rpc ListRoles(ListRolesRequest) returns (ListRolesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询角色列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/roles"};
+  }
+  rpc GetRole(GetRoleRequest) returns (GetRoleResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询角色详情"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/roles/{id}"};
+  }
+  rpc RemoveRoleMember(RemoveRoleMemberRequest) returns (RemoveRoleMemberResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "解绑角色成员"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {delete: "/api/v1/system/roles/{role_id}/members/{principal_type}/{principal_id}"};
+  }
+  rpc ListRoleMembers(ListRoleMembersRequest) returns (ListRoleMembersResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询角色成员列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/roles/{role_id}/members"};
+  }
+  rpc ListRolesByPrincipal(ListRolesByPrincipalRequest) returns (ListRolesByPrincipalResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "按主体查询角色"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/principals/{principal_type}/{principal_id}/roles"};
+  }
+  rpc ExplainOperation(ExplainOperationRequest) returns (ExplainOperationResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "诊断解释"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/authz/explain"};
+  }
+  rpc PreviewGrants(PreviewGrantsRequest) returns (PreviewGrantsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "权限预览"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/authz/preview"
+      body: "*"
+    };
+  }
+}
+
+message Role {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue code = 4;
+  google.protobuf.StringValue name = 5;
+  google.protobuf.BoolValue enabled = 6;
+  google.protobuf.StringValue remark = 7;
+  google.protobuf.Int64Value grant_count = 8;
+  google.protobuf.Int64Value bound_count = 9;
+  google.protobuf.BoolValue global_grant = 10;
+  google.protobuf.Int64Value wildcard_count = 11;
+  google.protobuf.Int64Value narrowed_count = 12; // grants narrowing row scope (self/dept_tree)
+  google.protobuf.Int64Value policy_count = 13; // grants with attached constraint policies
+}
+
+enum ScopeKind {
+  SCOPE_KIND_UNSPECIFIED = 0;
+  SCOPE_KIND_ALL = 1;
+  SCOPE_KIND_SELF = 2;
+  SCOPE_KIND_DEPT_TREE = 3;
+}
+
+message RoleGrant {
+  string operation = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 255
+      pattern: "^/\\S+$"
+    }
+  ];
+  ScopeKind scope_kind = 2;
+  // Constraint policies attached to this grant (AND semantics). Resolved and
+  // tenant-checked on save; evaluation fail-closes if a linked policy is
+  // later removed (the join row goes with the policy).
+  repeated string policy_ids = 3 [(buf.validate.field).repeated = {
+    max_items: 16
+    unique: true
+    items: {string: {len: 20}}
+  }];
+}
+
+message RoleMember {
+  google.protobuf.StringValue principal_type = 1;
+  google.protobuf.StringValue principal_id = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+// create
+message CreateRoleRequest {
+  optional string code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 64
+    }
+  ];
+  optional string name = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 128
+    }
+  ];
+  optional string remark = 3 [(buf.validate.field).string.max_len = 255];
+  repeated RoleGrant grants = 4;
+}
+
+message CreateRoleResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+// update
+message UpdateRoleRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 128
+  }];
+  reserved 3; // was `enabled`; the toggle lives on UpdateRoleStatus now
+  optional string remark = 4 [(buf.validate.field).string.max_len = 255];
+  repeated RoleGrant grants = 5;
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+    items: {string: {pattern: "^(name|remark|grants)$"}}
+  }];
+}
+
+message UpdateRoleResponse {}
+
+// updateRoleStatus
+message UpdateRoleStatusRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional bool enabled = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateRoleStatusResponse {}
+
+// delete
+message DeleteRoleRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message DeleteRoleResponse {}
+
+// list
+message ListRolesRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional string code = 2;
+  optional string name = 3;
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListRolesRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(code|name|createdAt|updatedAt):(asc|desc)$'))"
+  }];
+}
+
+message ListRolesResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated Role list = 2;
+}
+
+// get
+message GetRoleRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetRoleResponse {
+  Role role = 1;
+  repeated RoleGrant grants = 2;
+}
+
+// removeRoleMember
+message RemoveRoleMemberRequest {
+  string role_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  string principal_type = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 16
+    }
+  ];
+  string principal_id = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message RemoveRoleMemberResponse {}
+
+// listRoleMembers
+message ListRoleMembersRequest {
+  string role_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  cyber.shared.common.v1.PageRequest page = 2;
+  optional string principal_type = 3;
+}
+
+message ListRoleMembersResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated RoleMember list = 2;
+}
+
+// listRolesByPrincipal
+message ListRolesByPrincipalRequest {
+  string principal_type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 16
+    }
+  ];
+  string principal_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message ListRolesByPrincipalResponse {
+  repeated Role list = 1;
+}
+
+// explainOperation — verdict plus reasoning material against the live
+// snapshot (same engine as enforcement).
+message ExplainOperationRequest {
+  string principal_type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 16
+    }
+  ];
+  string principal_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  // Full operation name, e.g. "/cyber.system.v1.UserService/ListUsers".
+  string operation = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 255
+      pattern: "^/\\S+$"
+    }
+  ];
+}
+
+message ExplainOperationResponse {
+  // "ALLOW" | "DENY".
+  string verdict = 1;
+  // Covered by the session-contract baseline rather than any grant.
+  bool builtin = 2;
+  // Role bindings held (disabled roles included — they bind but contribute
+  // no grants).
+  repeated string role_codes = 3;
+  // Matched grant patterns with role attribution and per-policy verdicts.
+  repeated ExplainHit hits = 4;
+}
+
+message ExplainHit {
+  string pattern = 1;
+  string role_code = 2;
+  ScopeKind scope_kind = 3;
+  // Per-policy verdicts for this grant at explain time (empty = unconstrained
+  // grant; disabled policies are compiled out and do not appear).
+  repeated ExplainPolicy policies = 4;
+}
+
+// One linked policy's evaluation at explain time. A failed policy eliminates
+// the hit's grant; the verdict survives only on hits with no failed policy.
+message ExplainPolicy {
+  string kind = 1;
+  string name = 2;
+  // passed | failed | indeterminate. indeterminate is reserved for
+  // source-type attributes the subject cannot know (future ip/geo plugins);
+  // v1 plugins always resolve.
+  string state = 3;
+}
+
+message PreviewGrantsRequest {
+  repeated string role_codes = 1;
+}
+
+message PreviewGrantsResponse {
+  repeated string operations = 1;
+}

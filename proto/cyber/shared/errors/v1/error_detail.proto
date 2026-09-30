@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package cyber.shared.errors.v1;
+
+// Anchor file: no messages on purpose. Its google/rpc import is what makes
+// `proto:generate:ts` (--include-imports) emit error_details_pb into gen/ts.
+// Excluded from Go generation via --exclude-path in proto/project.json;
+// go_package below exists only to satisfy the package-wide buf lint rule.
+import "google/rpc/error_details.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/shared/errors/v1";

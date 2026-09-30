@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_VERSION_SUFFIX
+package errors;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/go-kratos/kratos/v3/errors;errors";
+
+// kratos error-code extensions: a local copy of kratos's canonical errors.proto
+// (package "errors", fields 1108/1109). It defines the `(errors.code)` /
+// `(errors.default_code)` options that the repo's error enums use (under
+// cyber/shared/errors and each edge's error_reason.proto).
+//
+// go_package points at kratos's own errors package and proto:generate excludes
+// this file from Go codegen (--exclude-path, see proto/project.json): it exists
+// for buf to resolve the options, while kratos's bundled errors.pb.go provides
+// them at runtime.
+extend google.protobuf.EnumOptions {
+  int32 default_code = 1108;
+}
+
+extend google.protobuf.EnumValueOptions {
+  int32 code = 1109;
+}

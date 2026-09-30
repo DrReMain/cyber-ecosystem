@@ -1,0 +1,75 @@
+# Container-mode bootstrap config (baked by the Dockerfile; configs/ holds
+# only the bare-metal dev config). Endpoints are network discovery aliases
+# (<service>.<domain> — the same names k8s Service DNS resolves), so one file
+# serves every container shape. Deployment-sensitive values are
+# ${VAR:default} placeholders overridden by APP_-prefixed env vars (e.g.
+# APP_DB_HOST=prod-db reconfigures without a rebuild); booleans included —
+# main.go wires WithResolveActualTypes for the string→bool conversion. Keep
+# placeholders opt-in (only keys a deployment actually flips). When a key
+# changes in configs/config.yaml, mirror it here.
+server:
+  http: {addr: 0.0.0.0:11001, timeout: 1s}
+  grpc: {addr: 0.0.0.0:12001, timeout: 1s}
+  connect: {addr: 0.0.0.0:13001, timeout: 1s}
+data:
+  database:
+    driver: postgres
+    host: ${DB_HOST:postgresql.db}
+    port: ${DB_PORT:5432}
+    user: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+    db_name: ${DB_NAME:system}
+    max_open_conns: 100        # connections (max)
+    max_idle_conns: 50         # connections (max idle)
+    conn_max_lifetime: 3600s   # duration (max connection lifetime)
+  redis:
+    network: tcp
+    addr: ${REDIS_ADDR:redis.db:6379}
+    password: ${REDIS_PASS:}
+    db: 0                      # index (Redis database 0–15)
+    pool_size: 50              # connections (pool size)
+    min_idle_conns: 5          # connections (min idle)
+    conn_max_lifetime: 1800s   # duration (max connection lifetime)
+    read_timeout: 0.2s         # duration (read timeout)
+    write_timeout: 0.2s        # duration (write timeout)
+    dial_timeout: 5s           # duration (dial timeout)
+    pool_timeout: 1.2s         # duration (pool wait timeout)
+  storage:
+    s3:
+      # Browser-facing presigned URLs are signed against this endpoint, so it
+      # must be the EXTERNAL name (edge host route). In-network callers reach
+      # the same name directly via the s3.cyber.test network alias on the
+      # seaweedfs container (see deploy/docker/compose.dev.yaml).
+      endpoint: ${S3_ENDPOINT:http://s3.cyber.test}
+      access_key: ${S3_ACCESS_KEY:admin@cyber-ecosystem.com}
+      secret_key: ${S3_SECRET_KEY:Cyber-Ecosystem123}
+      bucket: ${S3_BUCKET:core}
+      region: ${S3_REGION:us-east-1}
+      use_path_style: true
+      multipart_threshold: 8388608 # bytes (8 MiB)
+      part_size: 5242880           # bytes (5 MiB)
+      presign_ttl: 900s            # duration (presign validity)
+      max_file_size: 52428800      # bytes (50 MiB)
+  mq:
+    pg: # pg mode like the dev config; needs the mq database (created by the
+        # postgres bootstrap SQL) — schemas are created on first connect
+      dsn: ${MQ_DSN:postgres://postgres:postgres@postgresql.db:5432/mq?sslmode=disable}
+      poll_interval: 0.5s
+      visibility_timeout: 30s
+      max_retries: 5              # attempts (delivery ceiling)
+      retention: 604800s          # duration (7 days)
+      batch_size: 16
+observability:
+  endpoint: ${OTLP_ENDPOINT:signoz-otel-collector.observability:4318} # SigNoz OTLP HTTP
+  insecure: true
+  trace:
+    enabled: ${TRACE_ENABLED:false}
+  metrics:
+    enabled: ${METRICS_ENABLED:false}
+  slow_query:
+    db: 0.2s
+    cache: 0.05s
+  log:
+    level: info
+    console: true
+    otlp: false

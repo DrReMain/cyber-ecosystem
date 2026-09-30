@@ -1,0 +1,32 @@
+{
+  "common_locale_name": [
+    {
+      "declarations": ["input locale"],
+      "selectors": ["locale"],
+      "match": {
+        "locale=en-US": "English",
+        "locale=zh-CN": "简体中文",
+        "locale=ar-SA": "العربية",
+        "locale=ja-JP": "日本語",
+        "locale=ko-KR": "한국어",
+        "locale=*": "{locale}"
+      }
+    }
+  ],
+  "common_loading": "Loading",
+  "common_retry": "Retry",
+  "common_toolbar_refresh": "Refresh",
+  "common_toolbar_density": "Density",
+  "common_toolbar_density_large": "Large",
+  "common_toolbar_density_middle": "Default",
+  "common_toolbar_density_small": "Compact",
+  "common_filter_search": "Search",
+  "common_filter_reset": "Reset",
+  "common_filter_fold": "Fold",
+  "common_filter_expand": "Expand",
+  "common_column_settings": "Columns",
+  "common_column_settings_reset": "Reset",
+  "common_save": "Save",
+  "common_cancel": "Cancel",
+  "common_user_deleted": "Deleted"
+}

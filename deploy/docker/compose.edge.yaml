@@ -1,0 +1,26 @@
+name: cyber-ecosystem-edge
+
+networks:
+  default:
+    name: cyber-ecosystem_default
+    external: true
+
+services:
+  traefik:
+    image: traefik:v3.5
+    command:
+      - --entryPoints.web.address=:80
+      - --providers.file.directory=/etc/traefik/dynamic
+      - --providers.file.watch=true
+      - --ping=true
+    volumes:
+      - ./traefik:/etc/traefik/dynamic:ro
+    ports:
+      - "80:80"
+    healthcheck: # ping lives on the internal traefik entrypoint (:8080), not web
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped

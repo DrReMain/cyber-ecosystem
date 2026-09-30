@@ -1,0 +1,32 @@
+{
+  "common_locale_name": [
+    {
+      "declarations": ["input locale"],
+      "selectors": ["locale"],
+      "match": {
+        "locale=en-US": "English",
+        "locale=zh-CN": "简体中文",
+        "locale=ar-SA": "العربية",
+        "locale=ja-JP": "日本語",
+        "locale=ko-KR": "한국어",
+        "locale=*": "{locale}"
+      }
+    }
+  ],
+  "common_loading": "جارٍ التحميل",
+  "common_retry": "إعادة المحاولة",
+  "common_toolbar_refresh": "تحديث",
+  "common_toolbar_density": "الكثافة",
+  "common_toolbar_density_large": "واسع",
+  "common_toolbar_density_middle": "افتراضي",
+  "common_toolbar_density_small": "مضغوط",
+  "common_filter_search": "بحث",
+  "common_filter_reset": "إعادة تعيين",
+  "common_filter_fold": "طي",
+  "common_filter_expand": "توسيع",
+  "common_column_settings": "الأعمدة",
+  "common_column_settings_reset": "استعادة",
+  "common_save": "حفظ",
+  "common_cancel": "إلغاء",
+  "common_user_deleted": "محذوف"
+}

@@ -1,0 +1,16 @@
+{
+  "login_default_title": "登录",
+  "login_default_description": "",
+  "login_default_hero_title_a": "智能",
+  "login_default_hero_title_b": "管理控制台",
+  "login_default_hero_sub": "AI 驱动的通用管理底座：统一入口，连接所有子系统与智能工具。",
+  "login_default_form_title": "登录",
+  "login_default_form_sub": "使用工作邮箱继续",
+  "login_default_label_email": "邮箱",
+  "login_default_label_password": "密码",
+  "login_default_forgot": "忘记密码？",
+  "login_default_submit": "进入控制台",
+  "login_default_divider_or": "或",
+  "login_default_sso": "企业统一认证登录",
+  "login_default_session_expired": "登录已过期，请重新登录"
+}

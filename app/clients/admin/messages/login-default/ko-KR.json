@@ -1,0 +1,16 @@
+{
+  "login_default_title": "로그인",
+  "login_default_description": "",
+  "login_default_hero_title_a": "스마트 ",
+  "login_default_hero_title_b": "관리 콘솔",
+  "login_default_hero_sub": "AI 기반의 범용 관리 플랫폼. 하나의 계정으로 모든 하위 시스템과 지능형 도구를 연결합니다.",
+  "login_default_form_title": "로그인",
+  "login_default_form_sub": "회사 이메일로 계속",
+  "login_default_label_email": "이메일",
+  "login_default_label_password": "비밀번호",
+  "login_default_forgot": "비밀번호를 잊으셨나요?",
+  "login_default_submit": "콘솔 진입",
+  "login_default_divider_or": "또는",
+  "login_default_sso": "SSO로 로그인",
+  "login_default_session_expired": "로그인이 만료되었습니다. 다시 로그인해 주세요"
+}

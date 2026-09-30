@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service AuditService {
+  option (cyber.ext.v1.service_comment) = "审计日志";
+  rpc ListAuditLogs(ListAuditLogsRequest) returns (ListAuditLogsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询审计日志"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/system/audit-logs"};
+  }
+}
+
+message AuditLog {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.StringValue tenant = 3;
+  google.protobuf.StringValue actor = 4;
+  google.protobuf.StringValue principal_type = 5;
+  google.protobuf.StringValue operation = 6;
+  google.protobuf.StringValue http_method = 7;
+  google.protobuf.StringValue http_path = 8;
+  google.protobuf.Int32Value status = 9;
+  google.protobuf.Int32Value latency_ms = 10;
+  google.protobuf.StringValue ip = 11;
+  google.protobuf.StringValue user_agent = 12;
+  google.protobuf.StringValue deny_reason = 13;
+}
+
+// list; created_at range filters come from the shared PageRequest.
+message ListAuditLogsRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional string actor = 2;
+  optional string operation = 3;
+  optional int32 status = 4;
+  optional string deny_reason = 5;
+  optional bool denied = 6;
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListAuditLogsRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt):(asc|desc)$'))"
+  }];
+}
+
+message ListAuditLogsResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated AuditLog list = 2;
+}

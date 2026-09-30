@@ -1,0 +1,42 @@
+# The docker build context for app images is the workspace root (single Go
+# module + pnpm workspace); this file is the single trim surface for it.
+# Keep in sync with docs/deploy/CONVENTIONS.md.
+
+# VCS / tooling state
+.git
+.nx
+.codegraph
+.memsearch
+.claude
+.idea
+.vscode
+
+# Dependencies and build outputs (recreated inside the image)
+**/node_modules
+**/dist
+**/bin
+**/coverage
+
+# Generated sources not consumed by image builds
+# (gen/go and gen/connect-ts ARE consumed — Go build + admin client build;
+#  gen/openapi-ts only needs its manifest for pnpm workspace completeness)
+gen/openapi
+gen/openapi-ts
+!gen/openapi-ts/package.json
+**/src/paraglide
+
+# Source areas no image build needs
+proto
+docs
+tools
+deploy
+demos
+
+# Environment / secrets — never bake into a context
+.env
+.env.*
+
+# Tests never run inside images
+**/*.test.ts
+**/*.test.tsx
+**/*.test.js

@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/system/v1/file.proto";
+import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+// File proxy channel: the app-generic small-file upload path (D14 path 1).
+// Bytes ride the unary RPC body through the service to object storage — no
+// presigning, no CORS, no client-side S3 surface. The payload cap is a
+// contract constant, not a tunable. This lives in its own proto because its
+// audience is the opposite of FileService's: a builtin capability every
+// authenticated principal holds — an operator must not be able to lock a
+// user out of their own file space — while FileService stays the admin
+// management plane.
+// The response carries the File entity, never a URL: callers persist the
+// file id, access URLs are minted at render time (D15), and storage
+// backends can migrate without touching stored references.
+service FileProxyService {
+  option (cyber.ext.v1.service_comment) = "文件代理上传";
+
+  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "代理上传小文件"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {
+      post: "/api/v1/system/files/upload"
+      body: "*"
+    };
+  }
+}
+
+// uploadFile
+message UploadFileRequest {
+  optional string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 255
+    }
+  ];
+  optional string content_type = 2 [(buf.validate.field).string.max_len = 128];
+  // The 4 MiB cap is a contract constant, deliberately matched to the
+  // native gRPC default receive cap so the gRPC leg needs no
+  // MaxRecvMsgSize override. A file near the cap can still overflow the
+  // framed message by its field overhead — the connect/HTTP path (the
+  // primary consumer) has no such limit; gRPC callers keep headroom.
+  optional bytes data = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).bytes = {
+      min_len: 1
+      max_len: 4194304
+    }
+  ];
+}
+
+message UploadFileResponse {
+  File file = 1;
+}

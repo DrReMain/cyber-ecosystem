@@ -1,0 +1,16 @@
+{
+  "login_default_title": "تسجيل الدخول",
+  "login_default_description": "",
+  "login_default_hero_title_a": "وحدة تحكم ",
+  "login_default_hero_title_b": "إدارية ذكية",
+  "login_default_hero_sub": "قاعدة إدارة عامة مدعومة بالذكاء الاصطناعي - مدخل موحّد يربط كل الأنظمة الفرعية والأدوات الذكية.",
+  "login_default_form_title": "تسجيل الدخول",
+  "login_default_form_sub": "تابع باستخدام بريدك الإلكتروني للعمل",
+  "login_default_label_email": "البريد الإلكتروني",
+  "login_default_label_password": "كلمة المرور",
+  "login_default_forgot": "نسيت كلمة المرور؟",
+  "login_default_submit": "الدخول إلى وحدة التحكم",
+  "login_default_divider_or": "أو",
+  "login_default_sso": "تسجيل الدخول عبر SSO",
+  "login_default_session_expired": "انتهت صلاحية تسجيل الدخول، يرجى تسجيل الدخول مرة أخرى"
+}

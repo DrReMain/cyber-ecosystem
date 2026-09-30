@@ -1,0 +1,104 @@
+{
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "proto",
+  "root": "proto",
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf lint"
+      }
+    },
+    "breaking": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf breaking --against .git#branch=origin/main"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf format -w"
+      }
+    },
+    "format:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "buf format -d --exit-code"
+      }
+    },
+    "generate:go": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "node proto/scripts/clean-gen.cjs gen/go",
+          "buf generate --template proto/buf.gen.go.yaml --exclude-path proto/errors/errors.proto --exclude-path proto/cyber/shared/errors/v1/error_detail.proto",
+          "go mod tidy"
+        ],
+        "parallel": false
+      }
+    },
+    "generate:connect-ts": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "node proto/scripts/clean-gen.cjs gen/connect-ts",
+          "buf generate --template proto/buf.gen.connect-ts.yaml --include-imports",
+          "pnpm install"
+        ],
+        "parallel": false
+      }
+    },
+    "generate:oapi": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "node proto/scripts/clean-gen.cjs gen/openapi",
+          "buf generate --template proto/buf.gen.oapi.yaml"
+        ],
+        "parallel": false
+      }
+    },
+    "generate:oapi-ts": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["generate:oapi"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "node proto/scripts/clean-gen.cjs gen/openapi-ts",
+          "pnpm --filter @cyber-ecosystem/gen-openapi-ts exec openapi-ts -f hey-api.config.ts"
+        ],
+        "parallel": false
+      }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "lint",
+        "format:check",
+        "generate:go",
+        "generate:connect-ts",
+        "generate:oapi",
+        "generate:oapi-ts"
+      ],
+      "options": {
+        "command": "echo 'proto generation completed'"
+      }
+    },
+    "check-drift": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["generate"],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "git add -A -N gen/ && git diff --exit-code --stat gen/ && echo 'gen/ is in sync with proto/'"
+      }
+    }
+  }
+}

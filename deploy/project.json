@@ -1,0 +1,224 @@
+{
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "deploy",
+  "root": "deploy",
+  "targets": {
+    "edge:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.edge.yaml up -d --wait"
+      }
+    },
+    "edge:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.edge.yaml down"
+      }
+    },
+    "db:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile db up -d --wait"
+      }
+    },
+    "db:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile db down"
+      }
+    },
+    "storage:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile storage up -d --wait"
+      }
+    },
+    "storage:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile storage down"
+      }
+    },
+    "mq:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile mq up -d --wait"
+      }
+    },
+    "mq:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile mq down"
+      }
+    },
+    "realtime:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile realtime up -d --wait"
+      }
+    },
+    "realtime:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile realtime down"
+      }
+    },
+    "media:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile media up -d --wait"
+      }
+    },
+    "media:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile media down"
+      }
+    },
+    "observability:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile db --profile observability up -d --wait"
+      }
+    },
+    "observability:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile db --profile observability down"
+      }
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml --profile db --profile storage --profile mq up -d --wait"
+      }
+    },
+    "stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "docker compose -f deploy/docker/compose.dev.yaml --profile db --profile storage --profile mq --profile realtime --profile media --profile observability down"
+        ],
+        "parallel": false
+      }
+    },
+    "status": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "docker compose -f deploy/docker/compose.dev.yaml --profile db --profile storage --profile mq --profile realtime --profile media --profile observability ps -a"
+        ],
+        "parallel": false
+      }
+    },
+    "app:start": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": [
+            "system",
+            "@cyber-ecosystem/admin"
+          ],
+          "target": "image"
+        }
+      ],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "VERSION=$(git describe --tags --always) docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait"
+      }
+    },
+    "app:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app rm -sf system admin system-migrate"
+      }
+    },
+    "app:status": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app ps -a system admin system-migrate"
+      }
+    },
+    "pre:start": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": [
+            "system",
+            "@cyber-ecosystem/admin"
+          ],
+          "target": "image"
+        }
+      ],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "VERSION=$(git describe --tags --always) docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait",
+          "docker compose -f deploy/docker/compose.edge.yaml up -d --wait"
+        ],
+        "parallel": false
+      }
+    },
+    "pre:full:start": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": [
+            "system",
+            "@cyber-ecosystem/admin"
+          ],
+          "target": "image"
+        }
+      ],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "VERSION=$(git describe --tags --always) docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile mq --profile realtime --profile media --profile observability --profile app up -d --wait",
+          "docker compose -f deploy/docker/compose.edge.yaml up -d --wait"
+        ],
+        "parallel": false
+      }
+    },
+    "pre:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "docker compose -f deploy/docker/compose.edge.yaml down",
+          "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app rm -sf system admin system-migrate"
+        ],
+        "parallel": false
+      }
+    },
+    "reset": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "docker compose -f deploy/docker/compose.edge.yaml down",
+          "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile mq --profile realtime --profile media --profile observability --profile app down -v --remove-orphans"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}
