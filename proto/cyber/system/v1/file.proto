@@ -66,6 +66,7 @@ service FileService {
       action: ACTION_READ
     };
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
     option (google.api.http) = {
       post: "/api/v1/system/files/urls"
       body: "*"
@@ -77,6 +78,8 @@ enum FileStatus {
   FILE_STATUS_UNSPECIFIED = 0;
   FILE_STATUS_UPLOADING = 1;
   FILE_STATUS_CONFIRMED = 2;
+  FILE_STATUS_PROCESSING = 3;
+  FILE_STATUS_FAILED = 4;
 }
 
 enum FileSource {

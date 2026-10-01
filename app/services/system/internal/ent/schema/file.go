@@ -29,7 +29,7 @@ func (File) Fields() []ent.Field {
 		field.String("source").Default("client_upload").MaxRuneLen(32).
 			Comment("client_upload | server_generated"),
 		field.String("status").Default("uploading").MaxRuneLen(16).
-			Comment("uploading | confirmed; aborted uploads hard-delete the row"),
+			Comment("uploading | processing | confirmed | failed; aborted uploads hard-delete the row"),
 		field.String("upload_id").Default("").MaxRuneLen(128).
 			Comment("S3 multipart session id; empty on the single-PUT path"),
 		field.String("etag").Default("").MaxRuneLen(64).

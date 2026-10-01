@@ -1,14 +1,22 @@
 import { timestampFromMs } from "@bufbuild/protobuf/wkt";
-import { useQuery } from "@connectrpc/connect-query";
+import { useMutation, useQuery } from "@connectrpc/connect-query";
 import type { AuditLog } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/audit_pb";
-import { listAuditLogs } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/audit-AuditService_connectquery";
+import {
+  exportAuditLogs,
+  listAuditLogs,
+} from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/audit-AuditService_connectquery";
 import { UserService } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/user_pb";
 import { Filter } from "@cyber-ecosystem/shared-antd/filter";
+import type { DataTableProps } from "@cyber-ecosystem/shared-antd/table";
 import { useFilter, useServerPagination } from "@cyber-ecosystem/shared-antd/use-search";
 import { useRouteContext, useSearch } from "@tanstack/react-router";
-import { Card, Input, Select } from "antd";
+import type { TableProps } from "antd";
+import { Button, Card, Input, Select } from "antd";
+import { Download, FileDown } from "lucide-react";
+import type { Key } from "react";
 import { useMemo, useState } from "react";
-import { useUserDirectory } from "#/features/app/use-user-directory";
+import { toast } from "sonner";
+import { useUserDirectory } from "#/features/app/user/use-user-directory";
 import { isOperationAllowed, op } from "#/features/layout-dashboard/auth/permissions";
 import { useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
@@ -16,6 +24,7 @@ import { auditSearchSchema, parseAuditSearch } from "./search";
 import { AuditDrawer } from "./ui/audit-drawer";
 import { AuditTable } from "./ui/audit-table";
 import { denyLabel } from "./ui/event-tags";
+import { ExportDrawer } from "./ui/export-drawer";
 
 const denyOptions = () => [
   { label: denyLabel("NO_GRANT"), value: "NO_GRANT" },
@@ -33,6 +42,15 @@ export function AuditPage() {
   const store = useAreaSearchStore(AREA, search, parseAuditSearch);
   const { values, onFilter, onReset } = useFilter(store, auditSearchSchema);
   const [detail, setDetail] = useState<{ event: AuditLog; open: boolean } | null>(null);
+  const [selected, setSelected] = useState<Key[]>([]);
+  const [exportsOpen, setExportsOpen] = useState(false);
+
+  const exportMutation = useMutation(exportAuditLogs, {
+    onSuccess: () => {
+      toast.success(m.system_audit_export_started());
+      setSelected([]);
+    },
+  });
 
   const canListUsers = isOperationAllowed(permissions, op(UserService, "listUsers"));
   const { byId: usersById, byEmail, known: actorKnown } = useUserDirectory(canListUsers);
@@ -72,6 +90,51 @@ export function AuditPage() {
     values.createdAtA !== undefined ||
     values.createdAtZ !== undefined ||
     values.lens === "denied";
+
+  const exportEntry = (
+    <div className="flex items-center gap-2">
+      <Button
+        color="default"
+        icon={<FileDown size={14} />}
+        onClick={() => setExportsOpen(true)}
+        variant="filled"
+      >
+        {m.system_audit_act_export_records()}
+      </Button>
+      <Button
+        color="primary"
+        icon={<Download size={14} />}
+        loading={exportMutation.isPending}
+        onClick={() => exportMutation.mutate({ ids: [] })}
+        variant="filled"
+      >
+        {m.system_audit_act_export_all()}
+      </Button>
+    </div>
+  );
+  const rowSelection: TableProps<AuditLog>["rowSelection"] = {
+    onChange: (keys) => setSelected(keys),
+    preserveSelectedRowKeys: true,
+    selectedRowKeys: selected,
+  };
+  const selection: DataTableProps<AuditLog>["selection"] = {
+    actions: (
+      <Button
+        color="primary"
+        loading={exportMutation.isPending}
+        onClick={() => exportMutation.mutate({ ids: selected.map(String) })}
+        size="small"
+        variant="filled"
+      >
+        {m.system_audit_act_export_selected()}
+      </Button>
+    ),
+    labels: {
+      clear: m.system_audit_export_clear(),
+      mode: m.system_audit_selection_mode(),
+      selected: (n: number) => m.system_audit_selected_n({ n }),
+    },
+  };
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -150,6 +213,9 @@ export function AuditPage() {
         onDetail={(event) => setDetail({ event, open: true })}
         onRefresh={() => auditQuery.refetch()}
         pagination={pagination}
+        rowSelection={rowSelection}
+        selection={selection}
+        toolbarExtra={exportEntry}
       />
       <AuditDrawer
         actorKnown={actorKnown}
@@ -160,6 +226,12 @@ export function AuditPage() {
         event={detail?.event ?? null}
         onClose={() => setDetail((prev) => (prev ? { ...prev, open: false } : prev))}
         open={detail?.open ?? false}
+      />
+      <ExportDrawer
+        onClose={() => setExportsOpen(false)}
+        open={exportsOpen}
+        ownerKnown={actorKnown}
+        ownerName={actorName}
       />
     </div>
   );

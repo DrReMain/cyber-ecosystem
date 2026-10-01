@@ -13,7 +13,6 @@ interface ErrorPageProps {
   extraBtn?: ReactNode;
 }
 
-// The full-page brand face - the root errorComponent's dedicated screen.
 export function ErrorPage({
   appName,
   homePath,
@@ -40,7 +39,7 @@ export function ErrorPage({
           className="absolute inset-0 bg-linear-to-t from-[#05070d]/85 via-[#05070d]/20 to-transparent"
         />
 
-        <header className="relative z-10 flex items-center justify-between px-[clamp(20px,5vw,64px)] py-4.5 font-mono text-[10px] text-white/35 tracking-[0.22em]">
+        <header className="relative z-20 flex items-center justify-between px-[clamp(20px,5vw,64px)] py-4.5 font-mono text-[10px] text-white/35 tracking-[0.22em]">
           <span className="inline-flex items-center gap-2.5 font-semibold text-[#e8ecf4]">
             <Image
               alt=""

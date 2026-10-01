@@ -1,35 +1,53 @@
 import type { File as FileView } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TablePaginationConfig, TableProps } from "antd";
-import { Button, Popconfirm, Tag } from "antd";
-import { Pencil, Trash2 } from "lucide-react";
+import { Button, Popconfirm, Progress, Tag, Tooltip } from "antd";
+import { RotateCw, X } from "lucide-react";
 import type { ReactNode } from "react";
-import { UserDeletedTag, userRefView } from "#/features/app/user-ref";
+import { isPreviewable } from "#/features/app/file/is-previewable";
+import { useFileUrls } from "#/features/app/file/use-file-url";
+import type { UploadProgress } from "#/features/app/file/use-upload";
+import { UserDeletedTag } from "#/features/app/user/user-deleted-tag";
+import { userRefView } from "#/features/app/user/user-ref";
+import { formatSize } from "#/libs";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
-
-const STATUS_CONFIRMED = "FILE_STATUS_CONFIRMED";
+import { UploadProbe } from "./upload-probe";
 
 const enumName = (v: unknown): string => (v == null ? "" : String(v));
+
+type FileStatusView = "uploading" | "confirmed" | "processing" | "failed";
+
+function fileStatus(file: FileView): FileStatusView {
+  switch (enumName(file.status)) {
+    case "FILE_STATUS_CONFIRMED":
+      return "confirmed";
+    case "FILE_STATUS_PROCESSING":
+      return "processing";
+    case "FILE_STATUS_FAILED":
+      return "failed";
+    default:
+      return "uploading";
+  }
+}
+
+function statusTag(status: FileStatusView) {
+  switch (status) {
+    case "confirmed":
+      return <Tag color="success">{m.files_status_confirmed()}</Tag>;
+    case "processing":
+      return <Tag color="processing">{m.files_status_processing()}</Tag>;
+    case "failed":
+      return <Tag color="error">{m.files_status_failed()}</Tag>;
+    default:
+      return <Tag>{m.files_status_uploading()}</Tag>;
+  }
+}
 
 const SOURCE_COLORS: Record<string, string> = {
   FILE_SOURCE_CLIENT_UPLOAD: "blue",
   FILE_SOURCE_SERVER_GENERATED: "purple",
 };
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-  const units = ["KB", "MB", "GB", "TB"];
-  let value = bytes;
-  let unit = -1;
-  do {
-    value /= 1024;
-    unit += 1;
-  } while (value >= 1024 && unit < units.length - 1);
-  return `${value < 10 ? value.toFixed(1) : Math.round(value)} ${units[unit]}`;
-}
 
 function sourceLabel(source: string): string {
   if (source === "FILE_SOURCE_SERVER_GENERATED") {
@@ -46,9 +64,13 @@ interface FilesTableProps {
   ownerName: (id: string) => string | undefined;
   ownerKnown: boolean;
   pendingDeleteId: string | null;
+  pendingAbortId: string | null;
+  progressById: Record<string, UploadProgress>;
   toolbarExtra: ReactNode;
   onRename: (file: FileView) => void;
   onDelete: (file: FileView) => void;
+  onResume: (file: FileView) => void;
+  onAbort: (file: FileView) => void;
   onRefresh: () => void;
 }
 
@@ -60,12 +82,44 @@ export function FilesTable({
   ownerName,
   ownerKnown,
   pendingDeleteId,
+  pendingAbortId,
+  progressById,
   toolbarExtra,
   onRename,
   onDelete,
+  onResume,
+  onAbort,
   onRefresh,
 }: Readonly<FilesTableProps>) {
   const { fieldTimestamp, fieldAction } = useColumns();
+  const urls = useFileUrls(
+    files
+      .filter((f) => fileStatus(f) === "confirmed")
+      .map((f) => f.id ?? "")
+      .filter(Boolean),
+  );
+
+  const renderCancel = (file: FileView) => (
+    <Popconfirm
+      cancelButtonProps={{ variant: "filled", color: "default" }}
+      okButtonProps={{ variant: "filled", color: "danger" }}
+      onConfirm={() => onAbort(file)}
+      title={m.files_abort_confirm()}
+    >
+      <Tooltip title={m.common_cancel()}>
+        <span className="inline-flex">
+          <Button
+            aria-label={m.common_cancel()}
+            color="danger"
+            disabled={pendingAbortId === (file.id ?? "")}
+            icon={<X size={14} />}
+            size="small"
+            variant="text"
+          />
+        </span>
+      </Tooltip>
+    </Popconfirm>
+  );
 
   const columns: TableProps<FileView>["columns"] = [
     {
@@ -100,12 +154,45 @@ export function FilesTable({
       title: () => m.files_col_status(),
       dataIndex: "status",
       width: 110,
-      render: (_, file) =>
-        enumName(file.status) === STATUS_CONFIRMED ? (
-          <Tag color="success">{m.files_status_confirmed()}</Tag>
-        ) : (
-          <Tag>{m.files_status_uploading()}</Tag>
-        ),
+      render: (_, file) => statusTag(fileStatus(file)),
+    },
+    {
+      key: "progress",
+      title: () => m.files_col_progress(),
+      width: 220,
+      render: (_, file) => {
+        const status = fileStatus(file);
+        if (status === "confirmed") {
+          return <Progress percent={100} size="small" status="success" />;
+        }
+        if (status === "processing") {
+          return <Progress percent={100} showInfo={false} size="small" status="active" />;
+        }
+        if (status === "failed") {
+          return <Progress percent={100} showInfo={false} size="small" status="exception" />;
+        }
+        const p = progressById[file.id ?? ""];
+        const pct = p && p.total > 0 ? Math.min(100, Math.floor((p.loaded / p.total) * 100)) : 0;
+        return (
+          <div className="flex items-center gap-2">
+            {p ? <Progress percent={pct} size="small" /> : <UploadProbe file={file} />}
+            <Tooltip title={m.files_act_resume()}>
+              <span className="inline-flex">
+                <Button
+                  aria-label={m.files_act_resume()}
+                  color="primary"
+                  disabled={Boolean(p)}
+                  icon={<RotateCw size={14} />}
+                  onClick={() => onResume(file)}
+                  size="small"
+                  variant="text"
+                />
+              </span>
+            </Tooltip>
+            {renderCancel(file)}
+          </div>
+        );
+      },
     },
     {
       title: () => m.files_col_owner(),
@@ -144,25 +231,28 @@ export function FilesTable({
     },
     fieldAction<FileView>(
       (_, file) => {
-        const renameBtn = (
-          <Button
-            color="primary"
-            icon={<Pencil size={14} />}
-            onClick={() => onRename(file)}
-            size="small"
-            variant="text"
-          >
-            {m.files_act_rename()}
-          </Button>
-        );
-        // An uploading row is the upload channel's in-flight state — delete
-        // refuses it server-side, so only rename is offered here.
-        if (enumName(file.status) !== STATUS_CONFIRMED) {
-          return renameBtn;
-        }
+        const status = fileStatus(file);
+        const confirmed = status === "confirmed";
+        const deletable = confirmed || status === "failed";
+        const url = confirmed ? urls.get(file.id ?? "") : undefined;
         return (
           <div className="flex items-center gap-1">
-            {renameBtn}
+            <Button
+              color="primary"
+              disabled={!url}
+              href={url}
+              rel="noreferrer"
+              size="small"
+              target="_blank"
+              variant="text"
+            >
+              {isPreviewable(file.contentType ?? "")
+                ? m.files_act_preview()
+                : m.files_act_preview()}
+            </Button>
+            <Button color="primary" onClick={() => onRename(file)} size="small" variant="text">
+              {m.files_act_rename()}
+            </Button>
             <Popconfirm
               cancelButtonProps={{ variant: "filled", color: "default" }}
               okButtonProps={{ variant: "filled", color: "danger" }}
@@ -172,8 +262,7 @@ export function FilesTable({
             >
               <Button
                 color="danger"
-                disabled={pendingDeleteId === (file.id ?? "")}
-                icon={<Trash2 size={14} />}
+                disabled={!deletable || pendingDeleteId === (file.id ?? "")}
                 size="small"
                 variant="text"
               >

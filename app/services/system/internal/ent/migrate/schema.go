@@ -9,6 +9,43 @@ import (
 )
 
 var (
+	// AuditExportColumns holds the columns for the "audit_export" table.
+	AuditExportColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "file_id", Type: field.TypeString, Size: 20, Comment: "logical reference to the file row; status/size live there"},
+		{Name: "owner_id", Type: field.TypeString, Size: 20, Comment: "initiating user snapshot; datascope self dimension"},
+	}
+	// AuditExportTable holds the schema information for the "audit_export" table.
+	AuditExportTable = &schema.Table{
+		Name:       "audit_export",
+		Columns:    AuditExportColumns,
+		PrimaryKey: []*schema.Column{AuditExportColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "auditexport_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AuditExportColumns[1]},
+			},
+			{
+				Name:    "auditexport_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{AuditExportColumns[2]},
+			},
+			{
+				Name:    "auditexport_tenant_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AuditExportColumns[3], AuditExportColumns[1]},
+			},
+			{
+				Name:    "auditexport_file_id",
+				Unique:  true,
+				Columns: []*schema.Column{AuditExportColumns[4]},
+			},
+		},
+	}
 	// AuditLogColumns holds the columns for the "audit_log" table.
 	AuditLogColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -138,7 +175,7 @@ var (
 		{Name: "content_type", Type: field.TypeString, Size: 128, Comment: "declared at upload, backfilled from HEAD at confirm; storage wins", Default: ""},
 		{Name: "size", Type: field.TypeInt64, Comment: "declared at create, replaced by the measured size at confirm", Default: 0},
 		{Name: "source", Type: field.TypeString, Size: 32, Comment: "client_upload | server_generated", Default: "client_upload"},
-		{Name: "status", Type: field.TypeString, Size: 16, Comment: "uploading | confirmed; aborted uploads hard-delete the row", Default: "uploading"},
+		{Name: "status", Type: field.TypeString, Size: 16, Comment: "uploading | processing | confirmed | failed; aborted uploads hard-delete the row", Default: "uploading"},
 		{Name: "upload_id", Type: field.TypeString, Size: 128, Comment: "S3 multipart session id; empty on the single-PUT path", Default: ""},
 		{Name: "etag", Type: field.TypeString, Size: 64, Comment: "object ETag captured at confirm; integrity/dedup seam", Default: ""},
 		{Name: "owner_id", Type: field.TypeString, Size: 20, Comment: "creating user; datascope self dimension", Default: ""},
@@ -349,6 +386,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AuditExportTable,
 		AuditLogTable,
 		PolicyTable,
 		DeptTable,
@@ -362,6 +400,9 @@ var (
 )
 
 func init() {
+	AuditExportTable.Annotation = &entsql.Annotation{
+		Table: "audit_export",
+	}
 	AuditLogTable.Annotation = &entsql.Annotation{
 		Table: "audit_log",
 	}

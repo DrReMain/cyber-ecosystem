@@ -7,7 +7,10 @@ import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
 import type { PageRequest, PageResponse } from "../../shared/common/v1/pagination_pb";
 import { file_cyber_shared_common_v1_pagination } from "../../shared/common/v1/pagination_pb";
+import type { File } from "./file_pb";
+import { file_cyber_system_v1_file } from "./file_pb";
 import { file_ext_v1_access } from "../../../ext/v1/access_pb";
+import { file_ext_v1_authz } from "../../../ext/v1/authz_pb";
 import { file_ext_v1_desc } from "../../../ext/v1/desc_pb";
 import { file_google_api_annotations } from "../../../google/api/annotations_pb";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
@@ -18,7 +21,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/system/v1/audit.proto.
  */
 export const file_cyber_system_v1_audit: GenFile = /*@__PURE__*/
-  fileDesc("ChtjeWJlci9zeXN0ZW0vdjEvYXVkaXQucHJvdG8SD2N5YmVyLnN5c3RlbS52MSL3BAoIQXVkaXRMb2cSKAoCaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoKY3JlYXRlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoGdGVuYW50GAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEisKBWFjdG9yGAQgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjQKDnByaW5jaXBhbF90eXBlGAUgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi8KCW9wZXJhdGlvbhgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIxCgtodHRwX21ldGhvZBgHIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIvCglodHRwX3BhdGgYCCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSKwoGc3RhdHVzGAkgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSLwoKbGF0ZW5jeV9tcxgKIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlEigKAmlwGAsgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjAKCnVzZXJfYWdlbnQYDCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLZGVueV9yZWFzb24YDSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUigAMKFExpc3RBdWRpdExvZ3NSZXF1ZXN0EjEKBHBhZ2UYASABKAsyIy5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXF1ZXN0EhIKBWFjdG9yGAIgASgJSACIAQESFgoJb3BlcmF0aW9uGAMgASgJSAGIAQESEwoGc3RhdHVzGAQgASgFSAKIAQESGAoLZGVueV9yZWFzb24YBSABKAlIA4gBARITCgZkZW5pZWQYBiABKAhIBIgBARKGAQoIb3JkZXJfYnkYZCADKAlCdLpIcboBbgodTGlzdEF1ZGl0TG9nc1JlcXVlc3Qub3JkZXJfYnkSABpLdGhpcy5hbGwoaXRlbSwgc2l6ZShpdGVtKSA9PSAwIHx8IGl0ZW0ubWF0Y2hlcygnXihjcmVhdGVkQXQpOihhc2N8ZGVzYykkJykpQggKBl9hY3RvckIMCgpfb3BlcmF0aW9uQgkKB19zdGF0dXNCDgoMX2RlbnlfcmVhc29uQgkKB19kZW5pZWQidAoVTGlzdEF1ZGl0TG9nc1Jlc3BvbnNlEjIKBHBhZ2UYASABKAsyJC5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXNwb25zZRInCgRsaXN0GAIgAygLMhkuY3liZXIuc3lzdGVtLnYxLkF1ZGl0TG9nMsIBCgxBdWRpdFNlcnZpY2USnwEKDUxpc3RBdWRpdExvZ3MSJS5jeWJlci5zeXN0ZW0udjEuTGlzdEF1ZGl0TG9nc1JlcXVlc3QaJi5jeWJlci5zeXN0ZW0udjEuTGlzdEF1ZGl0TG9nc1Jlc3BvbnNlIj+I8QQCitMOFgoS5p+l6K+i5a6h6K6h5pel5b+XEAGC0+STAhsSGS9hcGkvdjEvc3lzdGVtL2F1ZGl0LWxvZ3MaEIriCQzlrqHorqHml6Xlv5dCKFomY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9zeXN0ZW0vdjFiBnByb3RvMw", [file_buf_validate_validate, file_cyber_shared_common_v1_pagination, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("ChtjeWJlci9zeXN0ZW0vdjEvYXVkaXQucHJvdG8SD2N5YmVyLnN5c3RlbS52MSL3BAoIQXVkaXRMb2cSKAoCaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoKY3JlYXRlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoGdGVuYW50GAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEisKBWFjdG9yGAQgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjQKDnByaW5jaXBhbF90eXBlGAUgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi8KCW9wZXJhdGlvbhgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIxCgtodHRwX21ldGhvZBgHIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIvCglodHRwX3BhdGgYCCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSKwoGc3RhdHVzGAkgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSLwoKbGF0ZW5jeV9tcxgKIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlEigKAmlwGAsgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjAKCnVzZXJfYWdlbnQYDCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLZGVueV9yZWFzb24YDSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUigAMKFExpc3RBdWRpdExvZ3NSZXF1ZXN0EjEKBHBhZ2UYASABKAsyIy5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXF1ZXN0EhIKBWFjdG9yGAIgASgJSACIAQESFgoJb3BlcmF0aW9uGAMgASgJSAGIAQESEwoGc3RhdHVzGAQgASgFSAKIAQESGAoLZGVueV9yZWFzb24YBSABKAlIA4gBARITCgZkZW5pZWQYBiABKAhIBIgBARKGAQoIb3JkZXJfYnkYZCADKAlCdLpIcboBbgodTGlzdEF1ZGl0TG9nc1JlcXVlc3Qub3JkZXJfYnkSABpLdGhpcy5hbGwoaXRlbSwgc2l6ZShpdGVtKSA9PSAwIHx8IGl0ZW0ubWF0Y2hlcygnXihjcmVhdGVkQXQpOihhc2N8ZGVzYykkJykpQggKBl9hY3RvckIMCgpfb3BlcmF0aW9uQgkKB19zdGF0dXNCDgoMX2RlbnlfcmVhc29uQgkKB19kZW5pZWQidAoVTGlzdEF1ZGl0TG9nc1Jlc3BvbnNlEjIKBHBhZ2UYASABKAsyJC5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXNwb25zZRInCgRsaXN0GAIgAygLMhkuY3liZXIuc3lzdGVtLnYxLkF1ZGl0TG9nIjYKFkV4cG9ydEF1ZGl0TG9nc1JlcXVlc3QSHAoDaWRzGAEgAygJQg+6SAySAQkYASIFcgOYARQiPgoXRXhwb3J0QXVkaXRMb2dzUmVzcG9uc2USIwoEZmlsZRgBIAEoCzIVLmN5YmVyLnN5c3RlbS52MS5GaWxlIoUBCgtBdWRpdEV4cG9ydBIPCgdmaWxlX2lkGAEgASgJEi4KCmNyZWF0ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhAKCG93bmVyX2lkGAMgASgJEiMKBGZpbGUYBCABKAsyFS5jeWJlci5zeXN0ZW0udjEuRmlsZSLYAQoXTGlzdEF1ZGl0RXhwb3J0c1JlcXVlc3QSMQoEcGFnZRgBIAEoCzIjLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlcXVlc3QSiQEKCG9yZGVyX2J5GGQgAygJQne6SHS6AXEKIExpc3RBdWRpdEV4cG9ydHNSZXF1ZXN0Lm9yZGVyX2J5EgAaS3RoaXMuYWxsKGl0ZW0sIHNpemUoaXRlbSkgPT0gMCB8fCBpdGVtLm1hdGNoZXMoJ14oY3JlYXRlZEF0KTooYXNjfGRlc2MpJCcpKSJ6ChhMaXN0QXVkaXRFeHBvcnRzUmVzcG9uc2USMgoEcGFnZRgBIAEoCzIkLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlc3BvbnNlEioKBGxpc3QYAiADKAsyHC5jeWJlci5zeXN0ZW0udjEuQXVkaXRFeHBvcnQysQQKDEF1ZGl0U2VydmljZRKfAQoNTGlzdEF1ZGl0TG9ncxIlLmN5YmVyLnN5c3RlbS52MS5MaXN0QXVkaXRMb2dzUmVxdWVzdBomLmN5YmVyLnN5c3RlbS52MS5MaXN0QXVkaXRMb2dzUmVzcG9uc2UiP4jxBAKK0w4WChLmn6Xor6LlrqHorqHml6Xlv5cQAYLT5JMCGxIZL2FwaS92MS9zeXN0ZW0vYXVkaXQtbG9ncxKvAQoPRXhwb3J0QXVkaXRMb2dzEicuY3liZXIuc3lzdGVtLnYxLkV4cG9ydEF1ZGl0TG9nc1JlcXVlc3QaKC5jeWJlci5zeXN0ZW0udjEuRXhwb3J0QXVkaXRMb2dzUmVzcG9uc2UiSYjxBAKK0w4WChLlr7zlh7rlrqHorqHml6Xlv5cQAoLT5JMCJToBKiIgL2FwaS92MS9zeXN0ZW0vYXVkaXQtbG9ncy9leHBvcnQSugEKEExpc3RBdWRpdEV4cG9ydHMSKC5jeWJlci5zeXN0ZW0udjEuTGlzdEF1ZGl0RXhwb3J0c1JlcXVlc3QaKS5jeWJlci5zeXN0ZW0udjEuTGlzdEF1ZGl0RXhwb3J0c1Jlc3BvbnNlIlGI8QQCoPEEAYrTDhwKGOafpeivouWuoeiuoeWvvOWHuuiusOW9lRABgtPkkwIjEiEvYXBpL3YxL3N5c3RlbS9hdWRpdC1sb2dzL2V4cG9ydHMaEIriCQzlrqHorqHml6Xlv5dCKFomY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9zeXN0ZW0vdjFiBnByb3RvMw", [file_buf_validate_validate, file_cyber_shared_common_v1_pagination, file_cyber_system_v1_file, file_ext_v1_access, file_ext_v1_authz, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * @generated from message cyber.system.v1.AuditLog
@@ -169,6 +172,130 @@ export const ListAuditLogsResponseSchema: GenMessage<ListAuditLogsResponse> = /*
   messageDesc(file_cyber_system_v1_audit, 2);
 
 /**
+ * exportAuditLogs
+ * Empty ids = full export; non-empty = the selected rows only. No cap; cost
+ * is O(result set). Authorization is the operation itself — the caller's
+ * datascope does not narrow it.
+ *
+ * @generated from message cyber.system.v1.ExportAuditLogsRequest
+ */
+export type ExportAuditLogsRequest = Message<"cyber.system.v1.ExportAuditLogsRequest"> & {
+  /**
+   * @generated from field: repeated string ids = 1;
+   */
+  ids: string[];
+};
+
+/**
+ * Describes the message cyber.system.v1.ExportAuditLogsRequest.
+ * Use `create(ExportAuditLogsRequestSchema)` to create a new message.
+ */
+export const ExportAuditLogsRequestSchema: GenMessage<ExportAuditLogsRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_audit, 3);
+
+/**
+ * @generated from message cyber.system.v1.ExportAuditLogsResponse
+ */
+export type ExportAuditLogsResponse = Message<"cyber.system.v1.ExportAuditLogsResponse"> & {
+  /**
+   * PROCESSING at return; the file row lands CONFIRMED or FAILED when the
+   * background generation ends.
+   *
+   * @generated from field: cyber.system.v1.File file = 1;
+   */
+  file?: File | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.ExportAuditLogsResponse.
+ * Use `create(ExportAuditLogsResponseSchema)` to create a new message.
+ */
+export const ExportAuditLogsResponseSchema: GenMessage<ExportAuditLogsResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_audit, 4);
+
+/**
+ * @generated from message cyber.system.v1.AuditExport
+ */
+export type AuditExport = Message<"cyber.system.v1.AuditExport"> & {
+  /**
+   * Both ids are always present on the row.
+   *
+   * @generated from field: string file_id = 1;
+   */
+  fileId: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 2;
+   */
+  createdAt?: Timestamp | undefined;
+
+  /**
+   * @generated from field: string owner_id = 3;
+   */
+  ownerId: string;
+
+  /**
+   * Absent when the file row was deleted.
+   *
+   * @generated from field: cyber.system.v1.File file = 4;
+   */
+  file?: File | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.AuditExport.
+ * Use `create(AuditExportSchema)` to create a new message.
+ */
+export const AuditExportSchema: GenMessage<AuditExport> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_audit, 5);
+
+/**
+ * listAuditExports; records are scope-narrowed by their owner.
+ *
+ * @generated from message cyber.system.v1.ListAuditExportsRequest
+ */
+export type ListAuditExportsRequest = Message<"cyber.system.v1.ListAuditExportsRequest"> & {
+  /**
+   * @generated from field: cyber.shared.common.v1.PageRequest page = 1;
+   */
+  page?: PageRequest | undefined;
+
+  /**
+   * @generated from field: repeated string order_by = 100;
+   */
+  orderBy: string[];
+};
+
+/**
+ * Describes the message cyber.system.v1.ListAuditExportsRequest.
+ * Use `create(ListAuditExportsRequestSchema)` to create a new message.
+ */
+export const ListAuditExportsRequestSchema: GenMessage<ListAuditExportsRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_audit, 6);
+
+/**
+ * @generated from message cyber.system.v1.ListAuditExportsResponse
+ */
+export type ListAuditExportsResponse = Message<"cyber.system.v1.ListAuditExportsResponse"> & {
+  /**
+   * @generated from field: cyber.shared.common.v1.PageResponse page = 1;
+   */
+  page?: PageResponse | undefined;
+
+  /**
+   * @generated from field: repeated cyber.system.v1.AuditExport list = 2;
+   */
+  list: AuditExport[];
+};
+
+/**
+ * Describes the message cyber.system.v1.ListAuditExportsResponse.
+ * Use `create(ListAuditExportsResponseSchema)` to create a new message.
+ */
+export const ListAuditExportsResponseSchema: GenMessage<ListAuditExportsResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_audit, 7);
+
+/**
  * @generated from service cyber.system.v1.AuditService
  */
 export const AuditService: GenService<{
@@ -179,6 +306,25 @@ export const AuditService: GenService<{
     methodKind: "unary";
     input: typeof ListAuditLogsRequestSchema;
     output: typeof ListAuditLogsResponseSchema;
+  },
+  /**
+   * Export is asynchronous: registers a generation job and returns
+   * immediately.
+   *
+   * @generated from rpc cyber.system.v1.AuditService.ExportAuditLogs
+   */
+  exportAuditLogs: {
+    methodKind: "unary";
+    input: typeof ExportAuditLogsRequestSchema;
+    output: typeof ExportAuditLogsResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuditService.ListAuditExports
+   */
+  listAuditExports: {
+    methodKind: "unary";
+    input: typeof ListAuditExportsRequestSchema;
+    output: typeof ListAuditExportsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_cyber_system_v1_audit, 0);

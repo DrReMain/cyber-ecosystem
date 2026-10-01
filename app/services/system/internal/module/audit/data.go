@@ -13,8 +13,11 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	"cyber-ecosystem/app/services/system/internal/ent"
+	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
+	entfile "cyber-ecosystem/app/services/system/internal/ent/file"
 	"cyber-ecosystem/app/services/system/internal/ent/predicate"
+	"cyber-ecosystem/app/services/system/internal/module/file"
 	"cyber-ecosystem/app/services/system/internal/platform"
 	"cyber-ecosystem/app/services/system/internal/shared"
 )
@@ -84,6 +87,90 @@ func (rp *auditRP) ListAuditLogs(ctx context.Context, in *AuditListIn) (*AuditLi
 
 func (rp *auditRP) Publish(ctx context.Context, ev *kaudit.Event) {
 	rp.emitter.Emit(ctx, ev)
+}
+
+func (rp *auditRP) CreateExport(ctx context.Context, fileID, ownerID string) error {
+	if err := rp.Platform.GetClient(ctx).AuditExport.Create().
+		SetFileID(fileID).
+		SetOwnerID(ownerID).
+		Exec(ctx); err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
+}
+
+func (rp *auditRP) ListExports(ctx context.Context, in *ExportListIn) (*ExportListOut, error) {
+	query := rp.Platform.GetClient(ctx).AuditExport.Query()
+	helper.ApplyOrderBy(helper.ParseOrderBy(in.OrderBy), ent.Asc, ent.Desc, helper.FOMapping{
+		"createdAt": func(sel helper.SQLSelector) { query.Order(sel(auditexport.FieldCreatedAt)) },
+	})
+	total, offset, limit, err := shared.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	rows, err := query.All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	// Hydration is a plain management-plane read: a retired file renders as
+	// absent. Datascope on both tables is owner-aligned by construction —
+	// the export row's owner is the file's owner.
+	ids := make([]string, 0, len(rows))
+	for _, r := range rows {
+		ids = append(ids, r.FileID)
+	}
+	files, err := rp.Platform.GetClient(ctx).File.Query().Where(entfile.IDIn(ids...)).All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	byID := make(map[string]*file.File, len(files))
+	for _, d := range files {
+		byID[d.ID] = file.MapFile(d)
+	}
+	list := make([]*AuditExport, 0, len(rows))
+	for _, r := range rows {
+		list = append(list, &AuditExport{
+			ID:        r.ID,
+			CreatedAt: r.CreatedAt,
+			FileID:    r.FileID,
+			OwnerID:   r.OwnerID,
+			File:      byID[r.FileID],
+		})
+	}
+	return &ExportListOut{
+		PageResponse: helper.BuildPageResponse(total, offset, limit),
+		List:         list,
+	}, nil
+}
+
+func (rp *auditRP) ListLogsAfter(ctx context.Context, tenant, after string, limit int) ([]*AuditLog, error) {
+	// Keyset iteration: id order is total and stable, so cursor resumption
+	// never skips or repeats a row.
+	query := rp.Platform.GetClient(ctx).AuditLog.Query().
+		Where(auditlog.TenantIn(tenant, "")).
+		Order(ent.Asc(auditlog.FieldID)).
+		Limit(limit)
+	if after != "" {
+		query.Where(auditlog.IDGT(after))
+	}
+	logs, err := query.All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return utils.SliceMap(logs, mapAuditLog), nil
+}
+
+func (rp *auditRP) FindLogsByIDs(ctx context.Context, tenant string, ids []string) ([]*AuditLog, error) {
+	// Unknown ids simply export fewer rows, mirroring the skip semantics
+	// of a missing-key map read.
+	logs, err := rp.Platform.GetClient(ctx).AuditLog.Query().
+		Where(auditlog.TenantIn(tenant, ""), auditlog.IDIn(ids...)).
+		Order(ent.Asc(auditlog.FieldID)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return utils.SliceMap(logs, mapAuditLog), nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

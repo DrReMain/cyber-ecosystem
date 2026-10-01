@@ -11,6 +11,7 @@ import (
 
 	"cyber-ecosystem/app/services/system/internal/ent/migrate"
 
+	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
 	"cyber-ecosystem/app/services/system/internal/ent/dept"
@@ -33,6 +34,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AuditExport is the client for interacting with the AuditExport builders.
+	AuditExport *AuditExportClient
 	// AuditLog is the client for interacting with the AuditLog builders.
 	AuditLog *AuditLogClient
 	// AuthzPolicy is the client for interacting with the AuthzPolicy builders.
@@ -62,6 +65,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AuditExport = NewAuditExportClient(c.config)
 	c.AuditLog = NewAuditLogClient(c.config)
 	c.AuthzPolicy = NewAuthzPolicyClient(c.config)
 	c.Dept = NewDeptClient(c.config)
@@ -163,6 +167,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:              ctx,
 		config:           cfg,
+		AuditExport:      NewAuditExportClient(cfg),
 		AuditLog:         NewAuditLogClient(cfg),
 		AuthzPolicy:      NewAuthzPolicyClient(cfg),
 		Dept:             NewDeptClient(cfg),
@@ -191,6 +196,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:              ctx,
 		config:           cfg,
+		AuditExport:      NewAuditExportClient(cfg),
 		AuditLog:         NewAuditLogClient(cfg),
 		AuthzPolicy:      NewAuthzPolicyClient(cfg),
 		Dept:             NewDeptClient(cfg),
@@ -206,7 +212,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		AuditLog.
+//		AuditExport.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -229,8 +235,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AuditLog, c.AuthzPolicy, c.Dept, c.File, c.Permission, c.PermissionPolicy,
-		c.PrincipalRole, c.Role, c.User,
+		c.AuditExport, c.AuditLog, c.AuthzPolicy, c.Dept, c.File, c.Permission,
+		c.PermissionPolicy, c.PrincipalRole, c.Role, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -240,8 +246,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AuditLog, c.AuthzPolicy, c.Dept, c.File, c.Permission, c.PermissionPolicy,
-		c.PrincipalRole, c.Role, c.User,
+		c.AuditExport, c.AuditLog, c.AuthzPolicy, c.Dept, c.File, c.Permission,
+		c.PermissionPolicy, c.PrincipalRole, c.Role, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -250,6 +256,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *AuditExportMutation:
+		return c.AuditExport.mutate(ctx, m)
 	case *AuditLogMutation:
 		return c.AuditLog.mutate(ctx, m)
 	case *AuthzPolicyMutation:
@@ -270,6 +278,141 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// AuditExportClient is a client for the AuditExport schema.
+type AuditExportClient struct {
+	config
+}
+
+// NewAuditExportClient returns a client for the AuditExport from the given config.
+func NewAuditExportClient(c config) *AuditExportClient {
+	return &AuditExportClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `auditexport.Hooks(f(g(h())))`.
+func (c *AuditExportClient) Use(hooks ...Hook) {
+	c.hooks.AuditExport = append(c.hooks.AuditExport, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `auditexport.Intercept(f(g(h())))`.
+func (c *AuditExportClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AuditExport = append(c.inters.AuditExport, interceptors...)
+}
+
+// Create returns a builder for creating a AuditExport entity.
+func (c *AuditExportClient) Create() *AuditExportCreate {
+	mutation := newAuditExportMutation(c.config, OpCreate)
+	return &AuditExportCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AuditExport entities.
+func (c *AuditExportClient) CreateBulk(builders ...*AuditExportCreate) *AuditExportCreateBulk {
+	return &AuditExportCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AuditExportClient) MapCreateBulk(slice any, setFunc func(*AuditExportCreate, int)) *AuditExportCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AuditExportCreateBulk{err: fmt.Errorf("calling to AuditExportClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AuditExportCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AuditExportCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AuditExport.
+func (c *AuditExportClient) Update() *AuditExportUpdate {
+	mutation := newAuditExportMutation(c.config, OpUpdate)
+	return &AuditExportUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AuditExportClient) UpdateOne(_m *AuditExport) *AuditExportUpdateOne {
+	mutation := newAuditExportMutation(c.config, OpUpdateOne, withAuditExport(_m))
+	return &AuditExportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AuditExportClient) UpdateOneID(id string) *AuditExportUpdateOne {
+	mutation := newAuditExportMutation(c.config, OpUpdateOne, withAuditExportID(id))
+	return &AuditExportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AuditExport.
+func (c *AuditExportClient) Delete() *AuditExportDelete {
+	mutation := newAuditExportMutation(c.config, OpDelete)
+	return &AuditExportDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AuditExportClient) DeleteOne(_m *AuditExport) *AuditExportDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AuditExportClient) DeleteOneID(id string) *AuditExportDeleteOne {
+	builder := c.Delete().Where(auditexport.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AuditExportDeleteOne{builder}
+}
+
+// Query returns a query builder for AuditExport.
+func (c *AuditExportClient) Query() *AuditExportQuery {
+	return &AuditExportQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAuditExport},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AuditExport entity by its id.
+func (c *AuditExportClient) Get(ctx context.Context, id string) (*AuditExport, error) {
+	return c.Query().Where(auditexport.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AuditExportClient) GetX(ctx context.Context, id string) *AuditExport {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AuditExportClient) Hooks() []Hook {
+	hooks := c.hooks.AuditExport
+	return append(hooks[:len(hooks):len(hooks)], auditexport.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *AuditExportClient) Interceptors() []Interceptor {
+	inters := c.inters.AuditExport
+	return append(inters[:len(inters):len(inters)], auditexport.Interceptors[:]...)
+}
+
+func (c *AuditExportClient) mutate(ctx context.Context, m *AuditExportMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AuditExportCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AuditExportUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AuditExportUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AuditExportDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AuditExport mutation op: %q", m.Op())
 	}
 }
 
@@ -1489,12 +1632,12 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AuditLog, AuthzPolicy, Dept, File, Permission, PermissionPolicy, PrincipalRole,
-		Role, User []ent.Hook
+		AuditExport, AuditLog, AuthzPolicy, Dept, File, Permission, PermissionPolicy,
+		PrincipalRole, Role, User []ent.Hook
 	}
 	inters struct {
-		AuditLog, AuthzPolicy, Dept, File, Permission, PermissionPolicy, PrincipalRole,
-		Role, User []ent.Interceptor
+		AuditExport, AuditLog, AuthzPolicy, Dept, File, Permission, PermissionPolicy,
+		PrincipalRole, Role, User []ent.Interceptor
 	}
 )
 

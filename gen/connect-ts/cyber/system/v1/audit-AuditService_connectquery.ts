@@ -8,3 +8,16 @@ import { AuditService } from "./audit_pb";
  * @generated from rpc cyber.system.v1.AuditService.ListAuditLogs
  */
 export const listAuditLogs = AuditService.method.listAuditLogs;
+
+/**
+ * Export is asynchronous: registers a generation job and returns
+ * immediately.
+ *
+ * @generated from rpc cyber.system.v1.AuditService.ExportAuditLogs
+ */
+export const exportAuditLogs = AuditService.method.exportAuditLogs;
+
+/**
+ * @generated from rpc cyber.system.v1.AuditService.ListAuditExports
+ */
+export const listAuditExports = AuditService.method.listAuditExports;

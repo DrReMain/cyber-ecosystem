@@ -267,6 +267,18 @@ func ErrorSystemFileTooLarge(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, System_SYSTEM_FILE_TOO_LARGE.String(), fmt.Sprintf(format, args...))
 }
 
+func IsSystemFileSizeMismatch(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_FILE_SIZE_MISMATCH.String() && e.Code == 400
+}
+
+func ErrorSystemFileSizeMismatch(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_FILE_SIZE_MISMATCH.String(), fmt.Sprintf(format, args...))
+}
+
 func IsSystemFileInvalidState(err error) bool {
 	if err == nil {
 		return false

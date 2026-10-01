@@ -77,5 +77,6 @@
   "error_SYSTEM_USER_DISABLED": "账号已停用，请联系管理员",
   "error_SYSTEM_FILE_NOT_FOUND": "文件不存在",
   "error_SYSTEM_FILE_TOO_LARGE": "文件超出大小限制",
+  "error_SYSTEM_FILE_SIZE_MISMATCH": "上传大小与声明不符",
   "error_SYSTEM_FILE_INVALID_STATE": "当前文件状态不支持该操作"
 }

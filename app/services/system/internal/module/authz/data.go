@@ -25,18 +25,22 @@ const reconcileEvery = 5 * time.Minute
 
 type authzRP struct {
 	shared.RP
-	snap atomic.Pointer[snapshot]
+	snap      atomic.Pointer[snapshot]
+	watchDone chan struct{}
+	watchSub  cache.Subscription
 }
 
-func NewAuthzRP(logger *slog.Logger, p *platform.Platform) (AuthzRP, func(), error) {
+func NewAuthzRP(logger *slog.Logger, p *platform.Platform) (AuthzRP, error) {
 	r := &authzRP{RP: shared.NewRP(logger.With("module", "module/authz"), p)}
+	// Every request reads the snapshot, so compile failure must fail
+	// construction.
 	ctx := context.Background()
 	snap, err := r.compileFromDB(ctx, r.remoteVersionSafe(ctx))
 	if err != nil {
-		return nil, nil, fmt.Errorf("authz rp: initial compile: %w", err)
+		return nil, fmt.Errorf("authz rp: initial compile: %w", err)
 	}
 	r.snap.Store(snap)
-	return r, r.watch(), nil
+	return r, nil
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -173,6 +177,47 @@ func (r *authzRP) PreviewGrants(ctx context.Context, tenant string, roleCodes []
 	return ops, nil
 }
 
+func (r *authzRP) StartWatch(context.Context) error {
+	if s, err := r.Platform.GetCache().PubSub.Subscribe(context.Background(), shared.PolicyChangedChannel); err != nil {
+		r.Log.Warn("authz: pubsub subscribe failed; periodic reconcile only", "error", err)
+	} else {
+		r.watchSub = s
+	}
+	r.watchDone = make(chan struct{})
+	go func() {
+		if r.watchSub == nil {
+			return
+		}
+		for range r.watchSub.Channel() {
+			r.reconcile()
+		}
+	}()
+	go func() {
+		ticker := time.NewTicker(reconcileEvery)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-r.watchDone:
+				return
+			case <-ticker.C:
+				r.reconcile()
+			}
+		}
+	}()
+	return nil
+}
+
+func (r *authzRP) StopWatch(context.Context) error {
+	if r.watchDone == nil {
+		return nil
+	}
+	close(r.watchDone)
+	if r.watchSub != nil {
+		_ = r.watchSub.Close()
+	}
+	return nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func (r *authzRP) reconcile() {
@@ -225,42 +270,6 @@ func (r *authzRP) rebuild(ctx context.Context, version int64) error {
 	r.snap.Store(snap)
 	r.Log.Info("authz: snapshot rebuilt", "version", version)
 	return nil
-}
-
-func (r *authzRP) watch() func() {
-	var sub cache.Subscription
-	if s, err := r.Platform.GetCache().PubSub.Subscribe(context.Background(), shared.PolicyChangedChannel); err != nil {
-		r.Log.Warn("authz: pubsub subscribe failed; periodic reconcile only", "error", err)
-	} else {
-		sub = s
-	}
-	done := make(chan struct{})
-	go func() {
-		if sub == nil {
-			return
-		}
-		for range sub.Channel() {
-			r.reconcile()
-		}
-	}()
-	go func() {
-		ticker := time.NewTicker(reconcileEvery)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-done:
-				return
-			case <-ticker.C:
-				r.reconcile()
-			}
-		}
-	}()
-	return func() {
-		close(done)
-		if sub != nil {
-			_ = sub.Close()
-		}
-	}
 }
 
 func (r *authzRP) compileFromDB(ctx context.Context, version int64) (*snapshot, error) {

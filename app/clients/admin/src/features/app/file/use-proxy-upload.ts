@@ -10,7 +10,9 @@ export function useProxyUpload() {
   const mutation = useMutation(uploadFile);
   const upload = async (file: File): Promise<FileView | undefined> => {
     if (file.size > MAX_PROXY_UPLOAD_BYTES) {
-      toast.error(m.files_upload_too_large({ max: "4 MB" }));
+      toast.error(
+        m.common_upload_too_large({ max: `${MAX_PROXY_UPLOAD_BYTES / (1024 * 1024)} MB` }),
+      );
       return undefined;
     }
     try {

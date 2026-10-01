@@ -12,6 +12,8 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
+
+	"cyber-ecosystem/app/services/system/internal/module/file"
 )
 
 // Struct --------------------------------------------------------------------------------------------------------------
@@ -63,7 +65,41 @@ func (s *AuditService) ListAuditLogs(ctx context.Context, in *systempb.ListAudit
 	}, nil
 }
 
+func (s *AuditService) ExportAuditLogs(ctx context.Context, in *systempb.ExportAuditLogsRequest) (*systempb.ExportAuditLogsResponse, error) {
+	f, err := s.auditUC.Export(ctx, &ExportIn{IDs: in.Ids})
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.ExportAuditLogsResponse{File: file.ToProtoFile(f)}, nil
+}
+
+func (s *AuditService) ListAuditExports(ctx context.Context, in *systempb.ListAuditExportsRequest) (*systempb.ListAuditExportsResponse, error) {
+	out, err := s.auditUC.ListExports(ctx, &ExportListIn{
+		PageRequest: helper.EnsurePageRequest(in.Page),
+		OrderBy:     in.OrderBy,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.ListAuditExportsResponse{
+		Page: out.PageResponse,
+		List: utils.SliceMap(out.List, toProtoAuditExport),
+	}, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
+
+func toProtoAuditExport(e *AuditExport) *systempb.AuditExport {
+	p := &systempb.AuditExport{
+		FileId:    e.FileID,
+		CreatedAt: utils.ToTimestamp(&e.CreatedAt),
+		OwnerId:   e.OwnerID,
+	}
+	if e.File != nil {
+		p.File = file.ToProtoFile(e.File)
+	}
+	return p
+}
 
 func toProtoAuditLog(l *AuditLog) *systempb.AuditLog {
 	return &systempb.AuditLog{

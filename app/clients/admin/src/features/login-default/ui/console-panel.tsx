@@ -28,7 +28,7 @@ export function ConsolePanel({ children }: { children?: ReactNode }) {
         className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,252,0.98))] max-[899px]:block max-[899px]:dark:hidden"
       />
 
-      <header className="relative z-10 flex items-center justify-end gap-2 px-[clamp(24px,3.5vw,44px)] pt-5.5 font-mono text-[10px] text-black/35 tracking-[0.22em] dark:text-white/35">
+      <header className="relative z-20 flex items-center justify-end gap-2 px-[clamp(24px,3.5vw,44px)] pt-5.5 font-mono text-[10px] text-black/35 tracking-[0.22em] dark:text-white/35">
         <ThemeToggle>
           {({ isDark, toggle }) => (
             <button

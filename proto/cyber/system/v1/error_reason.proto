@@ -46,5 +46,6 @@ enum System {
   // 608x: file
   SYSTEM_FILE_NOT_FOUND = 6080 [(.errors.code) = 404];
   SYSTEM_FILE_TOO_LARGE = 6081 [(.errors.code) = 400];
+  SYSTEM_FILE_SIZE_MISMATCH = 6082 [(.errors.code) = 400];
   SYSTEM_FILE_INVALID_STATE = 6083 [(.errors.code) = 400];
 }

@@ -2,11 +2,17 @@ package file
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log/slog"
+	"sync"
 	"time"
 
+	"github.com/rs/xid"
+
 	"cyber-ecosystem/shared-go/capability/storage"
+	"cyber-ecosystem/shared-go/kratos/security"
 
 	commonpb "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
@@ -16,12 +22,31 @@ import (
 )
 
 const (
-	StatusUploading = "uploading"
-	StatusConfirmed = "confirmed"
+	StatusUploading  = "uploading"
+	StatusConfirmed  = "confirmed"
+	StatusProcessing = "processing"
+	StatusFailed     = "failed"
 
 	SourceClientUpload    = "client_upload"
 	SourceServerGenerated = "server_generated"
 )
+
+const (
+	generationTimeout   = 30 * time.Minute
+	generationDrainWait = 10 * time.Second
+	cleanupTimeout      = 30 * time.Second
+
+	sweepInterval   = 7 * 24 * time.Hour
+	sweepBatch      = 100
+	sweepTTLFactor  = 4
+	sweepKeyPrefix  = "f/"
+	retentionPeriod = 7 * 24 * time.Hour
+)
+
+type countingReader struct {
+	r io.Reader
+	n int64
+}
 
 // DO ------------------------------------------------------------------------------------------------------------------
 
@@ -61,6 +86,12 @@ type UrlMint struct {
 	ExpiresAt time.Time
 }
 
+type GenerationSpec struct {
+	Name        string
+	ContentType string
+	Produce     func(ctx context.Context, w io.Writer) error
+}
+
 // Port ----------------------------------------------------------------------------------------------------------------
 
 type FileRP interface {
@@ -71,6 +102,21 @@ type FileRP interface {
 	FindRef(ctx context.Context, id string) (*File, error)
 	Limits() storage.Limits
 	PresignDownload(ctx context.Context, key string, ttl time.Duration, opts storage.DownloadOptions) (string, error)
+	CreateGeneration(ctx context.Context, f *File) (*File, error)
+	UploadObject(ctx context.Context, key, contentType string, r io.Reader) (*storage.ObjectInfo, error)
+	DeleteObject(ctx context.Context, key string) error
+	MarkGenerated(ctx context.Context, id string, size int64, etag string) error
+	MarkFailed(ctx context.Context, id string) error
+	FailProcessing(ctx context.Context) (int, error)
+	ListStaleUploading(ctx context.Context, createdBefore time.Time, afterID string, limit int) ([]*File, error)
+	ClaimUploading(ctx context.Context, id string, createdBefore time.Time) (bool, error)
+	FindByKey(ctx context.Context, key string) (*File, error)
+	ListMultipartUploads(ctx context.Context, prefix string, visit func(storage.PendingUpload) error) error
+	AbortSession(ctx context.Context, key, uploadID string) error
+	ListObjects(ctx context.Context, prefix, cursor string, maxKeys int32) (*storage.ListResult, error)
+	FindRefByKey(ctx context.Context, key string) (*File, error)
+	ListSoftDeleted(ctx context.Context, deletedBefore time.Time, afterID string, limit int) ([]*File, error)
+	ReclaimDeleted(ctx context.Context, id string, deletedBefore time.Time) (bool, error)
 }
 
 // UC ------------------------------------------------------------------------------------------------------------------
@@ -78,13 +124,32 @@ type FileRP interface {
 type FileUC struct {
 	shared.UC
 	fileRP FileRP
+
+	genCtx    context.Context
+	genCancel context.CancelFunc
+	genWG     sync.WaitGroup
+
+	sweepCtx    context.Context
+	sweepCancel context.CancelFunc
+	sweepWG     sync.WaitGroup
 }
 
-func NewFileUC(logger *slog.Logger, tm shared.Transaction, fileRP FileRP) *FileUC {
-	return &FileUC{
-		UC:     shared.NewUC(logger.With("module", "module/file"), tm),
-		fileRP: fileRP,
+func NewFileUC(logger *slog.Logger, tm shared.Transaction, fileRP FileRP, lc shared.HookRegistry) *FileUC {
+	genCtx, genCancel := context.WithCancel(context.Background())
+	sweepCtx, sweepCancel := context.WithCancel(context.Background())
+	uc := &FileUC{
+		UC:          shared.NewUC(logger.With("module", "module/file"), tm),
+		fileRP:      fileRP,
+		genCtx:      genCtx,
+		genCancel:   genCancel,
+		sweepCtx:    sweepCtx,
+		sweepCancel: sweepCancel,
 	}
+	lc.OnStart(uc.RecoverGenerations)
+	lc.OnStart(uc.StartSweep)
+	lc.OnStop(uc.ShutdownGenerations)
+	lc.OnStop(uc.StopSweep)
+	return uc
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -101,9 +166,10 @@ func (uc *FileUC) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	// An UPLOADING row belongs to the upload channel's lifecycle (its exit is
-	// abort); the metadata plane only retires confirmed files.
-	if f.Status != StatusConfirmed {
+	// Only terminal rows retire here. UPLOADING's exit is abort (upload
+	// channel lifecycle), PROCESSING's is the generation task itself; a FAILED
+	// row is deletable as a record whose session leak the sweeper owns.
+	if f.Status != StatusConfirmed && f.Status != StatusFailed {
 		return systempb.ErrorSystemFileInvalidState("")
 	}
 	return uc.fileRP.Delete(ctx, id)
@@ -148,4 +214,332 @@ func (uc *FileUC) MintUrls(ctx context.Context, ids []string) ([]*UrlMint, error
 		mints = append(mints, &UrlMint{ID: id, URL: url, ExpiresAt: time.Now().Add(ttl)})
 	}
 	return mints, nil
+}
+
+func (uc *FileUC) Generate(ctx context.Context, spec *GenerationSpec, record func(context.Context, *File) error) (*File, error) {
+	ownerID, err := subjectUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var f *File
+	if err := uc.Tm.InTx(ctx, func(tctx context.Context) error {
+		created, err := uc.fileRP.CreateGeneration(tctx, &File{
+			Key:         newKey(),
+			Name:        spec.Name,
+			ContentType: spec.ContentType,
+			Source:      SourceServerGenerated,
+			Status:      StatusProcessing,
+			OwnerID:     ownerID,
+		})
+		if err != nil {
+			return err
+		}
+		if record != nil {
+			if err := record(tctx, created); err != nil {
+				return err
+			}
+		}
+		f = created
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+	// Post-commit launch: the task must not write against a rolled-back row.
+	// InTx joins an ambient transaction, so Generate assumes it is the
+	// top-level entry — a caller-side tx would launch before its own commit.
+	uc.runGeneration(f, spec)
+	return f, nil
+}
+
+func (uc *FileUC) RecoverGenerations(ctx context.Context) error {
+	// The only writer of PROCESSING died with the previous process;
+	// re-requesting a generation is cheap, so boot fails them outright.
+	n, err := uc.fileRP.FailProcessing(ctx)
+	if err != nil {
+		return err
+	}
+	if n > 0 {
+		uc.Log.Info("recovered stale generations", "count", n)
+	}
+	return nil
+}
+
+func (uc *FileUC) ShutdownGenerations(context.Context) error {
+	// Cancel first so in-flight uploads abort cleanly instead of leaking
+	// half objects, then wait a bounded time for the drain.
+	uc.genCancel()
+	done := make(chan struct{})
+	go func() {
+		uc.genWG.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(generationDrainWait):
+		uc.Log.Warn("generation tasks did not drain in time")
+	}
+	return nil
+}
+
+func (uc *FileUC) StartSweep(ctx context.Context) error {
+	uc.sweepWG.Add(1)
+	go uc.sweepLoop()
+	return nil
+}
+
+func (uc *FileUC) StopSweep(context.Context) error {
+	// Bounded by each item's ctx check; an abort is idempotent, so losing a
+	// partially finished pass to shutdown costs one item at most.
+	uc.sweepCancel()
+	uc.sweepWG.Wait()
+	return nil
+}
+
+// Private -------------------------------------------------------------------------------------------------------------
+
+func (uc *FileUC) runGeneration(f *File, spec *GenerationSpec) {
+	uc.genWG.Add(1)
+	go func() {
+		defer uc.genWG.Done()
+		// genCtx is cancelled at shutdown; the timeout caps a runaway job.
+		ctx, cancel := context.WithTimeout(uc.genCtx, generationTimeout)
+		defer cancel()
+		if err := uc.generate(ctx, f, spec); err != nil {
+			uc.Log.Warn("file generation failed", "id", f.ID, "key", f.Key, "error", err)
+		}
+	}()
+}
+
+func (uc *FileUC) generate(ctx context.Context, f *File, spec *GenerationSpec) error {
+	pr, pw := io.Pipe()
+	go func() {
+		// nil → EOF for the reader; an error propagates through Upload.
+		pw.CloseWithError(spec.Produce(ctx, pw))
+	}()
+	// Count bytes here: Upload backfills Size only when the backend enforces
+	// MaxFileSize; row truth must not depend on conf.
+	body := &countingReader{r: pr}
+	info, err := uc.fileRP.UploadObject(ctx, f.Key, spec.ContentType, body)
+	if err == nil {
+		err = uc.fileRP.MarkGenerated(ctx, f.ID, body.n, info.ETag)
+	}
+	if err == nil {
+		return nil
+	}
+	// Cleanup outlives the failure cause — a dead ctx must not block it.
+	cctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), cleanupTimeout)
+	defer cancel()
+	if dErr := uc.fileRP.DeleteObject(cctx, f.Key); dErr != nil {
+		uc.Log.Warn("generation cleanup failed", "id", f.ID, "key", f.Key, "error", dErr)
+	}
+	if mErr := uc.fileRP.MarkFailed(cctx, f.ID); mErr != nil {
+		return errors.Join(mErr, err)
+	}
+	return err
+}
+
+func newKey() string {
+	return "f/" + xid.New().String()
+}
+
+func (uc *FileUC) sweepLoop() {
+	defer uc.sweepWG.Done()
+	// First pass runs immediately: interval semantics catch up after downtime,
+	// unlike a fixed clock time that would silently miss its window.
+	uc.runSweep(uc.sweepCtx)
+	t := time.NewTicker(sweepInterval)
+	defer t.Stop()
+	for {
+		select {
+		case <-uc.sweepCtx.Done():
+			return
+		case <-t.C:
+			uc.runSweep(uc.sweepCtx)
+		}
+	}
+}
+
+func (uc *FileUC) runSweep(ctx context.Context) {
+	cut := time.Now().Add(-time.Duration(sweepTTLFactor) * uc.fileRP.Limits().PresignTTL)
+	rows := uc.sweepStaleRows(ctx, cut)
+	sessions := uc.sweepOrphanSessions(ctx)
+	objects := uc.sweepOrphanObjects(ctx, cut)
+	reclaimed := uc.sweepExpiredDeleted(ctx, time.Now().Add(-retentionPeriod))
+	if rows+sessions+objects+reclaimed > 0 {
+		uc.Log.Info("file sweep", "rows", rows, "sessions", sessions, "objects", objects, "reclaimed", reclaimed)
+	}
+}
+
+func (uc *FileUC) sweepStaleRows(ctx context.Context, cut time.Time) int {
+	claimed := 0
+	afterID := ""
+	for {
+		if ctx.Err() != nil {
+			return claimed
+		}
+		rows, err := uc.fileRP.ListStaleUploading(ctx, cut, afterID, sweepBatch)
+		if err != nil {
+			uc.Log.Warn("file sweep: list stale rows", "error", err)
+			return claimed
+		}
+		for _, f := range rows {
+			if ctx.Err() != nil {
+				return claimed
+			}
+			// Claim-first: the conditional hard delete is the fence. Losing it
+			// means confirm/abort just won the row, and the S3 side must not be
+			// touched — a confirmed object would otherwise be destroyed.
+			ok, err := uc.fileRP.ClaimUploading(ctx, f.ID, cut)
+			if err != nil {
+				uc.Log.Warn("file sweep: claim", "id", f.ID, "error", err)
+				continue
+			}
+			if !ok {
+				continue
+			}
+			claimed++
+			if f.UploadID != "" {
+				if err := uc.fileRP.AbortSession(ctx, f.Key, f.UploadID); err != nil {
+					uc.Log.Warn("file sweep: abort session", "key", f.Key, "error", err)
+				}
+			} else if err := uc.fileRP.DeleteObject(ctx, f.Key); err != nil {
+				uc.Log.Warn("file sweep: delete object", "key", f.Key, "error", err)
+			}
+		}
+		if len(rows) < sweepBatch {
+			return claimed
+		}
+		afterID = rows[len(rows)-1].ID
+	}
+}
+
+func (uc *FileUC) sweepOrphanSessions(ctx context.Context) int {
+	aborted := 0
+	err := uc.fileRP.ListMultipartUploads(ctx, sweepKeyPrefix, func(u storage.PendingUpload) error {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		f, err := uc.fileRP.FindByKey(ctx, u.Key)
+		if err != nil {
+			return err
+		}
+		// Row-join, not age: this backend omits Initiated. A live row owns the
+		// session (pass 1 for uploading, its owner for processing/confirmed);
+		// no row — or a terminal failed row — means leaked.
+		if f != nil && (f.Status == StatusUploading || f.Status == StatusProcessing || f.Status == StatusConfirmed) {
+			return nil
+		}
+		if err := uc.fileRP.AbortSession(ctx, u.Key, u.UploadID); err != nil {
+			uc.Log.Warn("file sweep: abort orphan session", "key", u.Key, "error", err)
+			return nil
+		}
+		aborted++
+		return nil
+	})
+	if err != nil && !errors.Is(err, context.Canceled) {
+		uc.Log.Warn("file sweep: list sessions", "error", err)
+	}
+	return aborted
+}
+
+func (uc *FileUC) sweepOrphanObjects(ctx context.Context, cut time.Time) int {
+	deleted := 0
+	cursor := ""
+	for {
+		if ctx.Err() != nil {
+			return deleted
+		}
+		res, err := uc.fileRP.ListObjects(ctx, sweepKeyPrefix, cursor, sweepBatch)
+		if err != nil {
+			uc.Log.Warn("file sweep: list objects", "error", err)
+			return deleted
+		}
+		for _, obj := range res.Objects {
+			if ctx.Err() != nil {
+				return deleted
+			}
+			// Unlike sessions, objects carry a real timestamp. The grace
+			// window only needs to cover the proxy path where the object
+			// lands before its row exists; direct uploads mint the row first.
+			if !obj.LastModified.Before(cut) {
+				continue
+			}
+			// Unscoped lookup: a soft-deleted row still owns its object until
+			// the retention pass reclaims it — rowless-object deletion must
+			// not bypass the retention window.
+			f, err := uc.fileRP.FindRefByKey(ctx, obj.Key)
+			if err != nil {
+				uc.Log.Warn("file sweep: find by key", "key", obj.Key, "error", err)
+				return deleted
+			}
+			if f != nil {
+				continue
+			}
+			if err := uc.fileRP.DeleteObject(ctx, obj.Key); err != nil {
+				uc.Log.Warn("file sweep: delete orphan object", "key", obj.Key, "error", err)
+				continue
+			}
+			deleted++
+		}
+		// Key-ordered cursor: deleting already-paged keys never shifts the
+		// remaining sequence.
+		if res.NextCursor == "" {
+			return deleted
+		}
+		cursor = res.NextCursor
+	}
+}
+
+func (uc *FileUC) sweepExpiredDeleted(ctx context.Context, cut time.Time) int {
+	reclaimed := 0
+	afterID := ""
+	for {
+		if ctx.Err() != nil {
+			return reclaimed
+		}
+		rows, err := uc.fileRP.ListSoftDeleted(ctx, cut, afterID, sweepBatch)
+		if err != nil {
+			uc.Log.Warn("file sweep: list deleted rows", "error", err)
+			return reclaimed
+		}
+		for _, f := range rows {
+			if ctx.Err() != nil {
+				return reclaimed
+			}
+			// Claim-first again: the conditional hard delete owns the row
+			// first, so a failed object delete afterwards only leaves a
+			// rowless object — exactly what the orphan-object pass reclaims
+			// next round.
+			ok, err := uc.fileRP.ReclaimDeleted(ctx, f.ID, cut)
+			if err != nil {
+				uc.Log.Warn("file sweep: reclaim", "id", f.ID, "error", err)
+				continue
+			}
+			if !ok {
+				continue
+			}
+			reclaimed++
+			if err := uc.fileRP.DeleteObject(ctx, f.Key); err != nil {
+				uc.Log.Warn("file sweep: delete reclaimed object", "key", f.Key, "error", err)
+			}
+		}
+		if len(rows) < sweepBatch {
+			return reclaimed
+		}
+		afterID = rows[len(rows)-1].ID
+	}
+}
+
+func subjectUserID(ctx context.Context) (string, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return "", errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("no subject in context"))
+	}
+	return subject.UserID, nil
+}
+
+func (c *countingReader) Read(p []byte) (int, error) {
+	n, err := c.r.Read(p)
+	c.n += int64(n)
+	return n, err
 }

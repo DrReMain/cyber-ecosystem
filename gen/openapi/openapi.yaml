@@ -87,6 +87,87 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ListAuditLogsResponse'
+    /api/v1/system/audit-logs/export:
+        post:
+            tags:
+                - AuditService
+            description: |-
+                Export is asynchronous: registers a generation job and returns
+                 immediately.
+            operationId: AuditService_ExportAuditLogs
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ExportAuditLogsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ExportAuditLogsResponse'
+    /api/v1/system/audit-logs/exports:
+        get:
+            tags:
+                - AuditService
+            operationId: AuditService_ListAuditExports
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListAuditExportsResponse'
     /api/v1/system/auth/login:
         post:
             tags:
@@ -450,6 +531,8 @@ paths:
                         - FILE_STATUS_UNSPECIFIED
                         - FILE_STATUS_UPLOADING
                         - FILE_STATUS_CONFIRMED
+                        - FILE_STATUS_PROCESSING
+                        - FILE_STATUS_FAILED
                     type: string
                     format: enum
                 - name: source
@@ -1121,6 +1204,84 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.SubscribeResponse'
+    /api/v1/system/uploads:
+        post:
+            tags:
+                - FilePresignService
+            operationId: FilePresignService_CreateUpload
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreateUploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreateUploadResponse'
+    /api/v1/system/uploads/{id}:
+        delete:
+            tags:
+                - FilePresignService
+            operationId: FilePresignService_AbortUpload
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.AbortUploadResponse'
+    /api/v1/system/uploads/{id}/confirm:
+        post:
+            tags:
+                - FilePresignService
+            operationId: FilePresignService_ConfirmUpload
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ConfirmUploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ConfirmUploadResponse'
+    /api/v1/system/uploads/{id}/parts:
+        get:
+            tags:
+                - FilePresignService
+            operationId: FilePresignService_ListUploadedParts
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListUploadedPartsResponse'
     /api/v1/system/users:
         get:
             tags:
@@ -1313,6 +1474,24 @@ components:
                     type: boolean
                     description: Whether more results exist.
             description: Pagination response.
+        cyber.system.v1.AbortUploadResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.AuditExport:
+            type: object
+            properties:
+                fileId:
+                    type: string
+                    description: Both ids are always present on the row.
+                createdAt:
+                    type: string
+                    format: date-time
+                ownerId:
+                    type: string
+                file:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.system.v1.File'
+                    description: Absent when the file row was deleted.
         cyber.system.v1.AuditLog:
             type: object
             properties:
@@ -1370,6 +1549,35 @@ components:
                  it. Three forms: WEEKDAYS + deny overrides = workday calendar (holidays);
                  NONE + allow overrides = on-call/inspection calendar; ALL + deny
                  overrides = lockdown calendar.
+        cyber.system.v1.ConfirmUploadPart:
+            type: object
+            properties:
+                partNumber:
+                    type: integer
+                    format: int32
+                etag:
+                    type: string
+            description: confirmUpload
+        cyber.system.v1.ConfirmUploadRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                parts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.ConfirmUploadPart'
+                    description: |-
+                        Collected from part PUT response headers; empty on the single-PUT path.
+                         Claims are validated against backend part truth before completion;
+                         integrity beyond the size check is a future contract extension — a
+                         resumed upload of a same-size, different-content file would otherwise
+                         assemble and confirm spliced content undetectably.
+        cyber.system.v1.ConfirmUploadResponse:
+            type: object
+            properties:
+                file:
+                    $ref: '#/components/schemas/cyber.system.v1.File'
         cyber.system.v1.CreateDeptRequest:
             type: object
             properties:
@@ -1417,6 +1625,29 @@ components:
             properties:
                 id:
                     type: string
+        cyber.system.v1.CreateUploadRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                contentType:
+                    type: string
+                size:
+                    type: string
+                    description: |-
+                        Declared size routes the channel (single PUT below the multipart
+                         threshold, session at/above) and anchors the confirm-time size check —
+                         the minted URLs enforce no Content-Length themselves.
+            description: createUpload
+        cyber.system.v1.CreateUploadResponse:
+            type: object
+            properties:
+                file:
+                    $ref: '#/components/schemas/cyber.system.v1.File'
+                single:
+                    $ref: '#/components/schemas/cyber.system.v1.PresignedPut'
+                multipart:
+                    $ref: '#/components/schemas/cyber.system.v1.UploadSession'
         cyber.system.v1.CreateUserRequest:
             type: object
             properties:
@@ -1560,6 +1791,27 @@ components:
             description: |-
                 One linked policy's evaluation at explain time. A failed policy eliminates
                  the hit's grant; the verdict survives only on hits with no failed policy.
+        cyber.system.v1.ExportAuditLogsRequest:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: string
+            description: |-
+                exportAuditLogs
+                 Empty ids = full export; non-empty = the selected rows only. No cap; cost
+                 is O(result set). Authorization is the operation itself — the caller's
+                 datascope does not narrow it.
+        cyber.system.v1.ExportAuditLogsResponse:
+            type: object
+            properties:
+                file:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.system.v1.File'
+                    description: |-
+                        PROCESSING at return; the file row lands CONFIRMED or FAILED when the
+                         background generation ends.
         cyber.system.v1.File:
             type: object
             properties:
@@ -1592,6 +1844,8 @@ components:
                         - FILE_STATUS_UNSPECIFIED
                         - FILE_STATUS_UPLOADING
                         - FILE_STATUS_CONFIRMED
+                        - FILE_STATUS_PROCESSING
+                        - FILE_STATUS_FAILED
                     type: string
                     format: enum
                 ownerId:
@@ -1657,6 +1911,15 @@ components:
             properties:
                 user:
                     $ref: '#/components/schemas/cyber.system.v1.User'
+        cyber.system.v1.ListAuditExportsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.AuditExport'
         cyber.system.v1.ListAuditLogsResponse:
             type: object
             properties:
@@ -1736,6 +1999,25 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.system.v1.Role'
+        cyber.system.v1.ListUploadedPartsResponse:
+            type: object
+            properties:
+                file:
+                    $ref: '#/components/schemas/cyber.system.v1.File'
+                partSize:
+                    type: string
+                    description: 'Re-slice basis for the resuming client (plain: success implies present).'
+                uploaded:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.UploadedPart'
+                missing:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.UploadPartUrl'
+                expiresAt:
+                    type: string
+                    format: date-time
         cyber.system.v1.ListUsersResponse:
             type: object
             properties:
@@ -1855,6 +2137,15 @@ components:
                 Typed constraint params: the oneof case doubles as the policy kind, so an
                  unregistered kind cannot even be expressed. New kinds = new oneof members
                  (a proto addition, non-breaking).
+        cyber.system.v1.PresignedPut:
+            type: object
+            properties:
+                url:
+                    type: string
+                    description: 'Present whenever creation succeeds (carve-out: success implies present).'
+                expiresAt:
+                    type: string
+                    format: date-time
         cyber.system.v1.PreviewGrantsRequest:
             type: object
             properties:
@@ -2159,6 +2450,45 @@ components:
             properties:
                 file:
                     $ref: '#/components/schemas/cyber.system.v1.File'
+        cyber.system.v1.UploadPartUrl:
+            type: object
+            properties:
+                partNumber:
+                    type: integer
+                    description: Same carve-out as PresignedPut.url.
+                    format: int32
+                url:
+                    type: string
+        cyber.system.v1.UploadSession:
+            type: object
+            properties:
+                uploadId:
+                    type: string
+                    description: Same carve-out family; opaque backend session id.
+                partSize:
+                    type: string
+                partCount:
+                    type: integer
+                    format: int32
+                partUrls:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.UploadPartUrl'
+                    description: |-
+                        All part URLs minted upfront (signing is local and cheap); expiry
+                         mid-flight is recovered via ListUploadedParts re-minting.
+                expiresAt:
+                    type: string
+                    format: date-time
+        cyber.system.v1.UploadedPart:
+            type: object
+            properties:
+                partNumber:
+                    type: integer
+                    description: Same carve-out as PresignedPut.url.
+                    format: int32
+                etag:
+                    type: string
         cyber.system.v1.User:
             type: object
             properties:
@@ -2186,9 +2516,23 @@ tags:
     - name: AuditService
     - name: AuthService
     - name: DeptService
+    - name: FilePresignService
+      description: |-
+        File presign channel: the client-direct upload path. The
+         service registers metadata and mints time-limited presigned URLs; bytes
+         travel client → object storage without crossing this stack. Addressing is
+         compiled into every minted URL (minted against the storage backend's
+         advertised public endpoint), so the client holds no storage configuration
+         of its own — CreateUpload's response shape IS the routing decision.
+         Same audience as the proxy channel: a builtin capability every
+         authenticated principal holds, while FileService stays the admin
+         management plane.
+         Resume needs no client-side persistence: multipart sessions live in the
+         file row + the backend's part set, and ListUploadedParts replays both
+         (uploaded parts with ETags, fresh URLs for the missing ones).
     - name: FileProxyService
       description: |-
-        File proxy channel: the app-generic small-file upload path (D14 path 1).
+        File proxy channel: the app-generic small-file upload path.
          Bytes ride the unary RPC body through the service to object storage — no
          presigning, no CORS, no client-side S3 surface. The payload cap is a
          contract constant, not a tunable. This lives in its own proto because its
@@ -2197,7 +2541,7 @@ tags:
          user out of their own file space — while FileService stays the admin
          management plane.
          The response carries the File entity, never a URL: callers persist the
-         file id, access URLs are minted at render time (D15), and storage
+         file id, access URLs are minted at render time, and storage
          backends can migrate without touching stored references.
     - name: FileService
     - name: PolicyService

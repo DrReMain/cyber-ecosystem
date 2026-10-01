@@ -1,4 +1,4 @@
-package seed
+package bootstrap
 
 import (
 	"context"

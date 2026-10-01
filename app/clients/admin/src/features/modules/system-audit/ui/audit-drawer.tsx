@@ -2,7 +2,8 @@ import type { AuditLog } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/a
 import { dateLikeMs, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import { Button, Descriptions, Drawer, Skeleton, Typography } from "antd";
 import { toast } from "sonner";
-import { UserDeletedTag, userRefView } from "#/features/app/user-ref";
+import { UserDeletedTag } from "#/features/app/user/user-deleted-tag";
+import { userRefView } from "#/features/app/user/user-ref";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import { denyHint, denyLabel, StatusTag } from "./event-tags";

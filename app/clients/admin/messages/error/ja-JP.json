@@ -77,5 +77,6 @@
   "error_SYSTEM_USER_DISABLED": "このアカウントは無効化されています。管理者に連絡してください。",
   "error_SYSTEM_FILE_NOT_FOUND": "ファイルが見つかりません。",
   "error_SYSTEM_FILE_TOO_LARGE": "ファイルがサイズ上限を超えています。",
+  "error_SYSTEM_FILE_SIZE_MISMATCH": "アップロードされたサイズが宣言と一致しません。",
   "error_SYSTEM_FILE_INVALID_STATE": "現在のファイル状態ではこの操作を実行できません。"
 }

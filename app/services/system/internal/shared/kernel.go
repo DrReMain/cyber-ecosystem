@@ -14,6 +14,11 @@ type Transaction interface {
 	InTx(ctx context.Context, fn func(context.Context) error) error
 }
 
+type HookRegistry interface {
+	OnStart(fn func(context.Context) error)
+	OnStop(fn func(context.Context) error)
+}
+
 // Base ----------------------------------------------------------------------------------------------------------------
 
 type UC struct {

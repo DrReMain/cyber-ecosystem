@@ -77,5 +77,6 @@
   "error_SYSTEM_USER_DISABLED": "This account is disabled - contact an administrator.",
   "error_SYSTEM_FILE_NOT_FOUND": "File not found.",
   "error_SYSTEM_FILE_TOO_LARGE": "File exceeds the size limit.",
+  "error_SYSTEM_FILE_SIZE_MISMATCH": "Uploaded size does not match the declaration.",
   "error_SYSTEM_FILE_INVALID_STATE": "Invalid file state for this operation."
 }

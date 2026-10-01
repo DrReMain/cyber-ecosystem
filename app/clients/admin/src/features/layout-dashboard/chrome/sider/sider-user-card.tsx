@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Avatar, Tooltip } from "antd";
 import clsx from "clsx";
-import { useFileUrl } from "#/features/app/use-file-url";
+import { useFileUrl } from "#/features/app/file/use-file-url";
 import { getTextDirection } from "#/paraglide/runtime";
 import { sessionQuery } from "../../auth/session.fn";
 

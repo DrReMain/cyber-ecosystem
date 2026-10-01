@@ -72,7 +72,7 @@ export const UploadFileResponseSchema: GenMessage<UploadFileResponse> = /*@__PUR
   messageDesc(file_cyber_system_v1_file_proxy, 1);
 
 /**
- * File proxy channel: the app-generic small-file upload path (D14 path 1).
+ * File proxy channel: the app-generic small-file upload path.
  * Bytes ride the unary RPC body through the service to object storage — no
  * presigning, no CORS, no client-side S3 surface. The payload cap is a
  * contract constant, not a tunable. This lives in its own proto because its
@@ -81,7 +81,7 @@ export const UploadFileResponseSchema: GenMessage<UploadFileResponse> = /*@__PUR
  * user out of their own file space — while FileService stays the admin
  * management plane.
  * The response carries the File entity, never a URL: callers persist the
- * file id, access URLs are minted at render time (D15), and storage
+ * file id, access URLs are minted at render time, and storage
  * backends can migrate without touching stored references.
  *
  * @generated from service cyber.system.v1.FileProxyService

@@ -1,8 +1,11 @@
 import type { AuditLog } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/audit_pb";
+import type { DataTableProps } from "@cyber-ecosystem/shared-antd/table";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TablePaginationConfig, TableProps } from "antd";
 import { Button, Tag } from "antd";
-import { UserDeletedTag, userRefView } from "#/features/app/user-ref";
+import type { ReactNode } from "react";
+import { UserDeletedTag } from "#/features/app/user/user-deleted-tag";
+import { userRefView } from "#/features/app/user/user-ref";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import { DenyTag, StatusTag } from "./event-tags";
@@ -15,6 +18,9 @@ interface AuditTableProps {
   emptyDescription: string;
   actorName: (id: string) => string | undefined;
   actorKnown: boolean;
+  rowSelection?: DataTableProps<AuditLog>["rowSelection"];
+  selection?: DataTableProps<AuditLog>["selection"];
+  toolbarExtra?: ReactNode;
   onRefresh: () => void;
   onDetail: (event: AuditLog) => void;
 }
@@ -26,6 +32,9 @@ export function AuditTable({
   emptyDescription,
   actorName,
   actorKnown,
+  rowSelection,
+  selection,
+  toolbarExtra,
   onRefresh,
   onDetail,
 }: Readonly<AuditTableProps>) {
@@ -151,7 +160,10 @@ export function AuditTable({
         (event.denyReason ?? "") !== "" ? "bg-red-500/5 dark:bg-red-400/10" : ""
       }
       rowKey="id"
+      rowSelection={rowSelection}
+      selection={selection}
       toolbar={{
+        extra: toolbarExtra,
         labels: {
           density: m.common_toolbar_density(),
           densityLarge: m.common_toolbar_density_large(),

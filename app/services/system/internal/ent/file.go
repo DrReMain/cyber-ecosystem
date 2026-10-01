@@ -35,7 +35,7 @@ type File struct {
 	Size int64 `json:"size,omitempty"`
 	// client_upload | server_generated
 	Source string `json:"source,omitempty"`
-	// uploading | confirmed; aborted uploads hard-delete the row
+	// uploading | processing | confirmed | failed; aborted uploads hard-delete the row
 	Status string `json:"status,omitempty"`
 	// S3 multipart session id; empty on the single-PUT path
 	UploadID string `json:"upload_id,omitempty"`

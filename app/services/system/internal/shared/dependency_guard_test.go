@@ -12,11 +12,13 @@ import (
 	"testing"
 )
 
-// Static guards for the dependency rules iam.md §4.3 spells out as prose:
-// the module DAG, and the shared-contract seams that must hold until the
-// multi-service split (§4.4). Seam 2 (compile() stays a pure function) is a
-// review-enforced property a file walk cannot see; seams 1 and 3 are checked
-// here, plus single-sourcing of the ABAC vocabulary.
+// Static guards for the dependency rules kratos CONVENTIONS §2/§3 spell out
+// as prose: the module DAG, the shared-contract seams that must hold until
+// the multi-service split, and the composition layering (cmd/app wires
+// through bootstrap; shared stays a contracts-only kernel; injected app
+// contracts land in module biz constructors). A pure-function property like
+// compile() is review-enforced — a file walk cannot see it; the rest is
+// checked here, plus single-sourcing of the ABAC vocabulary.
 
 // bannedImports maps a package directory (relative to internal/, prefix
 // match) to import markers it must not contain. Direct imports only: a
@@ -38,6 +40,10 @@ var bannedImports = map[string][]string{
 	"module/auth": {"internal/ent"},
 	// CONVENTIONS §3: shared → platform → ent closes a cycle.
 	"ent/schema": {"internal/shared"},
+	// Bootstrap sits below business modules.
+	"bootstrap": {"module/"},
+	// The kernel stays ent-free (Paginate is generic by design).
+	"shared": {"internal/ent"},
 }
 
 // literalOwners pins contract strings to the single file allowed to declare
@@ -54,7 +60,7 @@ var (
 
 func TestModuleDependencyDAG(t *testing.T) {
 	for dir, bans := range bannedImports {
-		files := goFiles(t, dir, true)
+		files := goFiles(t, "..", dir, true)
 		if len(files) == 0 {
 			if _, statErr := os.Stat(filepath.Join("..", dir)); statErr == nil {
 				// The directory exists but matched nothing: renamed files or
@@ -67,7 +73,7 @@ func TestModuleDependencyDAG(t *testing.T) {
 			for _, imp := range f.imports {
 				for _, ban := range bans {
 					if strings.Contains(imp, "/"+ban) {
-						t.Errorf("%s imports %q — %s must not depend on %s (iam.md DAG)",
+						t.Errorf("%s imports %q — %s must not depend on %s (CONVENTIONS §3 DAG)",
 							f.rel, imp, dir, ban)
 					}
 				}
@@ -76,8 +82,34 @@ func TestModuleDependencyDAG(t *testing.T) {
 	}
 }
 
+// TestCompositionBoundaries pins the composition layering: hand-written
+// cmd/app assembly reaches business modules only through wire provider
+// sets, and injected app contracts (HookRegistry) land in module biz
+// constructors — a repo's phase machinery is exposed as port methods and
+// registered by its UC; data/client adapters never receive the registry.
+func TestCompositionBoundaries(t *testing.T) {
+	for _, f := range goFiles(t, filepath.Clean("../../cmd/app"), "", true) {
+		if f.rel == "wire.go" || f.rel == "wire_gen.go" {
+			continue
+		}
+		for _, imp := range f.imports {
+			if strings.Contains(imp, "/internal/module/") {
+				t.Errorf("%s imports %q — cmd/app hand-written assembly wires via bootstrap/server only; modules enter through wire provider sets", f.rel, imp)
+			}
+		}
+	}
+	for _, f := range goFiles(t, "..", "module", false) {
+		if f.hookRefs == 0 {
+			continue
+		}
+		if !strings.HasSuffix(f.rel, "/biz.go") {
+			t.Errorf("%s references HookRegistry — injected app contracts land in biz constructors only", f.rel)
+		}
+	}
+}
+
 func TestSharedContractSingleSource(t *testing.T) {
-	files := goFiles(t, "", false)
+	files := goFiles(t, "..", "", false)
 	if len(files) == 0 {
 		t.Fatal("walk matched no files — guard root is broken")
 	}
@@ -104,22 +136,23 @@ type goFile struct {
 	rel      string
 	imports  []string
 	literals []string
+	hookRefs int
 }
 
-// goFiles walks internal/ collecting parsed files. When ruleDir is non-empty
+// goFiles walks root collecting parsed files. When ruleDir is non-empty
 // only that directory subtree is parsed, imports-only (the DAG check);
 // otherwise every handwritten file (ent generated code excluded, ent/schema
-// included) is fully parsed to surface string literals.
-func goFiles(t *testing.T, ruleDir string, importsOnly bool) []goFile {
+// included) is fully parsed to surface string literals and contract refs.
+func goFiles(t *testing.T, root, ruleDir string, importsOnly bool) []goFile {
 	t.Helper()
-	root := filepath.Clean("..") // the shared package sits directly under internal/
+	root = filepath.Clean(root)
 	var out []goFile
 	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 		if path == root {
-			return nil // the root's own entry ("..") is not a hidden dir to skip
+			return nil // the root's own entry is not a hidden dir to skip
 		}
 		rel := filepath.ToSlash(strings.TrimPrefix(filepath.ToSlash(path), filepath.ToSlash(root)+"/"))
 		if d.IsDir() {
@@ -156,9 +189,16 @@ func goFiles(t *testing.T, ruleDir string, importsOnly bool) []goFile {
 		}
 		if !importsOnly {
 			ast.Inspect(f, func(n ast.Node) bool {
-				if lit, ok := n.(*ast.BasicLit); ok && lit.Kind == token.STRING {
-					if v, err := strconv.Unquote(lit.Value); err == nil {
-						gf.literals = append(gf.literals, v)
+				switch n := n.(type) {
+				case *ast.BasicLit:
+					if n.Kind == token.STRING {
+						if v, err := strconv.Unquote(n.Value); err == nil {
+							gf.literals = append(gf.literals, v)
+						}
+					}
+				case *ast.Ident:
+					if n.Name == "HookRegistry" {
+						gf.hookRefs++
 					}
 				}
 				return true

@@ -312,11 +312,280 @@ func (x *ListAuditLogsResponse) GetList() []*AuditLog {
 	return nil
 }
 
+// exportAuditLogs
+// Empty ids = full export; non-empty = the selected rows only. No cap; cost
+// is O(result set). Authorization is the operation itself — the caller's
+// datascope does not narrow it.
+type ExportAuditLogsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ids           []string               `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExportAuditLogsRequest) Reset() {
+	*x = ExportAuditLogsRequest{}
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExportAuditLogsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExportAuditLogsRequest) ProtoMessage() {}
+
+func (x *ExportAuditLogsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExportAuditLogsRequest.ProtoReflect.Descriptor instead.
+func (*ExportAuditLogsRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_audit_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ExportAuditLogsRequest) GetIds() []string {
+	if x != nil {
+		return x.Ids
+	}
+	return nil
+}
+
+type ExportAuditLogsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// PROCESSING at return; the file row lands CONFIRMED or FAILED when the
+	// background generation ends.
+	File          *File `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExportAuditLogsResponse) Reset() {
+	*x = ExportAuditLogsResponse{}
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExportAuditLogsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExportAuditLogsResponse) ProtoMessage() {}
+
+func (x *ExportAuditLogsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExportAuditLogsResponse.ProtoReflect.Descriptor instead.
+func (*ExportAuditLogsResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_audit_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ExportAuditLogsResponse) GetFile() *File {
+	if x != nil {
+		return x.File
+	}
+	return nil
+}
+
+type AuditExport struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Both ids are always present on the row.
+	FileId    string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	OwnerId   string                 `protobuf:"bytes,3,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	// Absent when the file row was deleted.
+	File          *File `protobuf:"bytes,4,opt,name=file,proto3" json:"file,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AuditExport) Reset() {
+	*x = AuditExport{}
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuditExport) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuditExport) ProtoMessage() {}
+
+func (x *AuditExport) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuditExport.ProtoReflect.Descriptor instead.
+func (*AuditExport) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_audit_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *AuditExport) GetFileId() string {
+	if x != nil {
+		return x.FileId
+	}
+	return ""
+}
+
+func (x *AuditExport) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *AuditExport) GetOwnerId() string {
+	if x != nil {
+		return x.OwnerId
+	}
+	return ""
+}
+
+func (x *AuditExport) GetFile() *File {
+	if x != nil {
+		return x.File
+	}
+	return nil
+}
+
+// listAuditExports; records are scope-narrowed by their owner.
+type ListAuditExportsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *v1.PageRequest        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	OrderBy       []string               `protobuf:"bytes,100,rep,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAuditExportsRequest) Reset() {
+	*x = ListAuditExportsRequest{}
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAuditExportsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAuditExportsRequest) ProtoMessage() {}
+
+func (x *ListAuditExportsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAuditExportsRequest.ProtoReflect.Descriptor instead.
+func (*ListAuditExportsRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_audit_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ListAuditExportsRequest) GetPage() *v1.PageRequest {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *ListAuditExportsRequest) GetOrderBy() []string {
+	if x != nil {
+		return x.OrderBy
+	}
+	return nil
+}
+
+type ListAuditExportsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *v1.PageResponse       `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	List          []*AuditExport         `protobuf:"bytes,2,rep,name=list,proto3" json:"list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAuditExportsResponse) Reset() {
+	*x = ListAuditExportsResponse{}
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAuditExportsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAuditExportsResponse) ProtoMessage() {}
+
+func (x *ListAuditExportsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_audit_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAuditExportsResponse.ProtoReflect.Descriptor instead.
+func (*ListAuditExportsResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_audit_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ListAuditExportsResponse) GetPage() *v1.PageResponse {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *ListAuditExportsResponse) GetList() []*AuditExport {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
 var File_cyber_system_v1_audit_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_audit_proto_rawDesc = "" +
 	"\n" +
-	"\x1bcyber/system/v1/audit.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xf3\x05\n" +
+	"\x1bcyber/system/v1/audit.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x1acyber/system/v1/file.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xf3\x05\n" +
 	"\bAuditLog\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
 	"\n" +
@@ -355,10 +624,31 @@ const file_cyber_system_v1_audit_proto_rawDesc = "" +
 	"\a_denied\"\x80\x01\n" +
 	"\x15ListAuditLogsResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x12-\n" +
-	"\x04list\x18\x02 \x03(\v2\x19.cyber.system.v1.AuditLogR\x04list2\xc2\x01\n" +
+	"\x04list\x18\x02 \x03(\v2\x19.cyber.system.v1.AuditLogR\x04list\";\n" +
+	"\x16ExportAuditLogsRequest\x12!\n" +
+	"\x03ids\x18\x01 \x03(\tB\x0f\xbaH\f\x92\x01\t\x18\x01\"\x05r\x03\x98\x01\x14R\x03ids\"D\n" +
+	"\x17ExportAuditLogsResponse\x12)\n" +
+	"\x04file\x18\x01 \x01(\v2\x15.cyber.system.v1.FileR\x04file\"\xa7\x01\n" +
+	"\vAuditExport\x12\x17\n" +
+	"\afile_id\x18\x01 \x01(\tR\x06fileId\x129\n" +
+	"\n" +
+	"created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x19\n" +
+	"\bowner_id\x18\x03 \x01(\tR\aownerId\x12)\n" +
+	"\x04file\x18\x04 \x01(\v2\x15.cyber.system.v1.FileR\x04file\"\xe7\x01\n" +
+	"\x17ListAuditExportsRequest\x127\n" +
+	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12\x92\x01\n" +
+	"\border_by\x18d \x03(\tBw\xbaHt\xba\x01q\n" +
+	" ListAuditExportsRequest.order_by\x12\x00\x1aKthis.all(item, size(item) == 0 || item.matches('^(createdAt):(asc|desc)$'))R\aorderBy\"\x86\x01\n" +
+	"\x18ListAuditExportsResponse\x128\n" +
+	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x120\n" +
+	"\x04list\x18\x02 \x03(\v2\x1c.cyber.system.v1.AuditExportR\x04list2\xb1\x04\n" +
 	"\fAuditService\x12\x9f\x01\n" +
 	"\rListAuditLogs\x12%.cyber.system.v1.ListAuditLogsRequest\x1a&.cyber.system.v1.ListAuditLogsResponse\"?\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
-	"\x12查询审计日志\x10\x01\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/audit-logs\x1a\x10\x8a\xe2\t\f审计日志B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"\x12查询审计日志\x10\x01\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/audit-logs\x12\xaf\x01\n" +
+	"\x0fExportAuditLogs\x12'.cyber.system.v1.ExportAuditLogsRequest\x1a(.cyber.system.v1.ExportAuditLogsResponse\"I\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
+	"\x12导出审计日志\x10\x02\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/system/audit-logs/export\x12\xba\x01\n" +
+	"\x10ListAuditExports\x12(.cyber.system.v1.ListAuditExportsRequest\x1a).cyber.system.v1.ListAuditExportsResponse\"Q\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x1c\n" +
+	"\x18查询审计导出记录\x10\x01\x82\xd3\xe4\x93\x02#\x12!/api/v1/system/audit-logs/exports\x1a\x10\x8a\xe2\t\f审计日志B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_audit_proto_rawDescOnce sync.Once
@@ -372,41 +662,57 @@ func file_cyber_system_v1_audit_proto_rawDescGZIP() []byte {
 	return file_cyber_system_v1_audit_proto_rawDescData
 }
 
-var file_cyber_system_v1_audit_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_cyber_system_v1_audit_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_cyber_system_v1_audit_proto_goTypes = []any{
-	(*AuditLog)(nil),               // 0: cyber.system.v1.AuditLog
-	(*ListAuditLogsRequest)(nil),   // 1: cyber.system.v1.ListAuditLogsRequest
-	(*ListAuditLogsResponse)(nil),  // 2: cyber.system.v1.ListAuditLogsResponse
-	(*wrapperspb.StringValue)(nil), // 3: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),  // 4: google.protobuf.Timestamp
-	(*wrapperspb.Int32Value)(nil),  // 5: google.protobuf.Int32Value
-	(*v1.PageRequest)(nil),         // 6: cyber.shared.common.v1.PageRequest
-	(*v1.PageResponse)(nil),        // 7: cyber.shared.common.v1.PageResponse
+	(*AuditLog)(nil),                 // 0: cyber.system.v1.AuditLog
+	(*ListAuditLogsRequest)(nil),     // 1: cyber.system.v1.ListAuditLogsRequest
+	(*ListAuditLogsResponse)(nil),    // 2: cyber.system.v1.ListAuditLogsResponse
+	(*ExportAuditLogsRequest)(nil),   // 3: cyber.system.v1.ExportAuditLogsRequest
+	(*ExportAuditLogsResponse)(nil),  // 4: cyber.system.v1.ExportAuditLogsResponse
+	(*AuditExport)(nil),              // 5: cyber.system.v1.AuditExport
+	(*ListAuditExportsRequest)(nil),  // 6: cyber.system.v1.ListAuditExportsRequest
+	(*ListAuditExportsResponse)(nil), // 7: cyber.system.v1.ListAuditExportsResponse
+	(*wrapperspb.StringValue)(nil),   // 8: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),    // 9: google.protobuf.Timestamp
+	(*wrapperspb.Int32Value)(nil),    // 10: google.protobuf.Int32Value
+	(*v1.PageRequest)(nil),           // 11: cyber.shared.common.v1.PageRequest
+	(*v1.PageResponse)(nil),          // 12: cyber.shared.common.v1.PageResponse
+	(*File)(nil),                     // 13: cyber.system.v1.File
 }
 var file_cyber_system_v1_audit_proto_depIdxs = []int32{
-	3,  // 0: cyber.system.v1.AuditLog.id:type_name -> google.protobuf.StringValue
-	4,  // 1: cyber.system.v1.AuditLog.created_at:type_name -> google.protobuf.Timestamp
-	3,  // 2: cyber.system.v1.AuditLog.tenant:type_name -> google.protobuf.StringValue
-	3,  // 3: cyber.system.v1.AuditLog.actor:type_name -> google.protobuf.StringValue
-	3,  // 4: cyber.system.v1.AuditLog.principal_type:type_name -> google.protobuf.StringValue
-	3,  // 5: cyber.system.v1.AuditLog.operation:type_name -> google.protobuf.StringValue
-	3,  // 6: cyber.system.v1.AuditLog.http_method:type_name -> google.protobuf.StringValue
-	3,  // 7: cyber.system.v1.AuditLog.http_path:type_name -> google.protobuf.StringValue
-	5,  // 8: cyber.system.v1.AuditLog.status:type_name -> google.protobuf.Int32Value
-	5,  // 9: cyber.system.v1.AuditLog.latency_ms:type_name -> google.protobuf.Int32Value
-	3,  // 10: cyber.system.v1.AuditLog.ip:type_name -> google.protobuf.StringValue
-	3,  // 11: cyber.system.v1.AuditLog.user_agent:type_name -> google.protobuf.StringValue
-	3,  // 12: cyber.system.v1.AuditLog.deny_reason:type_name -> google.protobuf.StringValue
-	6,  // 13: cyber.system.v1.ListAuditLogsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	7,  // 14: cyber.system.v1.ListAuditLogsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	8,  // 0: cyber.system.v1.AuditLog.id:type_name -> google.protobuf.StringValue
+	9,  // 1: cyber.system.v1.AuditLog.created_at:type_name -> google.protobuf.Timestamp
+	8,  // 2: cyber.system.v1.AuditLog.tenant:type_name -> google.protobuf.StringValue
+	8,  // 3: cyber.system.v1.AuditLog.actor:type_name -> google.protobuf.StringValue
+	8,  // 4: cyber.system.v1.AuditLog.principal_type:type_name -> google.protobuf.StringValue
+	8,  // 5: cyber.system.v1.AuditLog.operation:type_name -> google.protobuf.StringValue
+	8,  // 6: cyber.system.v1.AuditLog.http_method:type_name -> google.protobuf.StringValue
+	8,  // 7: cyber.system.v1.AuditLog.http_path:type_name -> google.protobuf.StringValue
+	10, // 8: cyber.system.v1.AuditLog.status:type_name -> google.protobuf.Int32Value
+	10, // 9: cyber.system.v1.AuditLog.latency_ms:type_name -> google.protobuf.Int32Value
+	8,  // 10: cyber.system.v1.AuditLog.ip:type_name -> google.protobuf.StringValue
+	8,  // 11: cyber.system.v1.AuditLog.user_agent:type_name -> google.protobuf.StringValue
+	8,  // 12: cyber.system.v1.AuditLog.deny_reason:type_name -> google.protobuf.StringValue
+	11, // 13: cyber.system.v1.ListAuditLogsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	12, // 14: cyber.system.v1.ListAuditLogsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
 	0,  // 15: cyber.system.v1.ListAuditLogsResponse.list:type_name -> cyber.system.v1.AuditLog
-	1,  // 16: cyber.system.v1.AuditService.ListAuditLogs:input_type -> cyber.system.v1.ListAuditLogsRequest
-	2,  // 17: cyber.system.v1.AuditService.ListAuditLogs:output_type -> cyber.system.v1.ListAuditLogsResponse
-	17, // [17:18] is the sub-list for method output_type
-	16, // [16:17] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	13, // 16: cyber.system.v1.ExportAuditLogsResponse.file:type_name -> cyber.system.v1.File
+	9,  // 17: cyber.system.v1.AuditExport.created_at:type_name -> google.protobuf.Timestamp
+	13, // 18: cyber.system.v1.AuditExport.file:type_name -> cyber.system.v1.File
+	11, // 19: cyber.system.v1.ListAuditExportsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	12, // 20: cyber.system.v1.ListAuditExportsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	5,  // 21: cyber.system.v1.ListAuditExportsResponse.list:type_name -> cyber.system.v1.AuditExport
+	1,  // 22: cyber.system.v1.AuditService.ListAuditLogs:input_type -> cyber.system.v1.ListAuditLogsRequest
+	3,  // 23: cyber.system.v1.AuditService.ExportAuditLogs:input_type -> cyber.system.v1.ExportAuditLogsRequest
+	6,  // 24: cyber.system.v1.AuditService.ListAuditExports:input_type -> cyber.system.v1.ListAuditExportsRequest
+	2,  // 25: cyber.system.v1.AuditService.ListAuditLogs:output_type -> cyber.system.v1.ListAuditLogsResponse
+	4,  // 26: cyber.system.v1.AuditService.ExportAuditLogs:output_type -> cyber.system.v1.ExportAuditLogsResponse
+	7,  // 27: cyber.system.v1.AuditService.ListAuditExports:output_type -> cyber.system.v1.ListAuditExportsResponse
+	25, // [25:28] is the sub-list for method output_type
+	22, // [22:25] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_audit_proto_init() }
@@ -414,6 +720,7 @@ func file_cyber_system_v1_audit_proto_init() {
 	if File_cyber_system_v1_audit_proto != nil {
 		return
 	}
+	file_cyber_system_v1_file_proto_init()
 	file_cyber_system_v1_audit_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -421,7 +728,7 @@ func file_cyber_system_v1_audit_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_system_v1_audit_proto_rawDesc), len(file_cyber_system_v1_audit_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

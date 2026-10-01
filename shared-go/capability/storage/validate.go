@@ -14,3 +14,13 @@ func ValidateKey(key string) error {
 	}
 	return nil
 }
+
+// ValidatePrefix rejects over-long listing prefixes. Empty is valid — it means
+// "every key" — because listing surfaces are sweep/audit shaped, not
+// object-address shaped.
+func ValidatePrefix(prefix string) error {
+	if len(prefix) > maxKeyLen {
+		return ErrInvalidArgument
+	}
+	return nil
+}

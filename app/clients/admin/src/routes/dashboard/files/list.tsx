@@ -1,4 +1,5 @@
 import { FileService } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file_pb";
+import { FilePresignService } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file_presign_pb";
 import { createFileRoute } from "@tanstack/react-router";
 import { List } from "lucide-react";
 import { pageTitle } from "#/config";
@@ -6,7 +7,7 @@ import { op, requireOperations } from "#/features/layout-dashboard/auth/permissi
 import { FilesPage, parseFilesSearch } from "#/features/modules/files";
 import { m } from "#/paraglide/messages";
 
-const operations = [op(FileService, "listFiles")];
+const operations = [op(FileService, "listFiles"), op(FilePresignService, "listUploadedParts")];
 
 export const Route = createFileRoute("/dashboard/files/list")({
   staticData: {

@@ -28,5 +28,6 @@
   "common_column_settings_reset": "استعادة",
   "common_save": "حفظ",
   "common_cancel": "إلغاء",
-  "common_user_deleted": "محذوف"
+  "common_user_deleted": "محذوف",
+  "common_upload_too_large": "الملف يتجاوز حد الرفع {max}"
 }

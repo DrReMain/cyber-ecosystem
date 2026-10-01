@@ -121,17 +121,27 @@ func ToProtoFile(f *File) *systempb.File {
 }
 
 func toProtoStatus(s string) systempb.FileStatus {
-	if s == StatusConfirmed {
+	switch s {
+	case StatusConfirmed:
 		return systempb.FileStatus_FILE_STATUS_CONFIRMED
+	case StatusProcessing:
+		return systempb.FileStatus_FILE_STATUS_PROCESSING
+	case StatusFailed:
+		return systempb.FileStatus_FILE_STATUS_FAILED
 	}
-	return systempb.FileStatus_FILE_STATUS_UPLOADING
+	return systempb.FileStatus_FILE_STATUS_UNSPECIFIED
 }
 
 func statusToString(s systempb.FileStatus) string {
-	if s == systempb.FileStatus_FILE_STATUS_CONFIRMED {
+	switch s {
+	case systempb.FileStatus_FILE_STATUS_CONFIRMED:
 		return StatusConfirmed
+	case systempb.FileStatus_FILE_STATUS_PROCESSING:
+		return StatusProcessing
+	case systempb.FileStatus_FILE_STATUS_FAILED:
+		return StatusFailed
 	}
-	return StatusUploading
+	return ""
 }
 
 func toProtoSource(s string) systempb.FileSource {

@@ -10,4 +10,6 @@ import (
 // Kratos Connect transport server, bridging a gRPC-style implementation.
 func RegisterAuditServiceConnectServer(srv *connect.Server, svc AuditServiceServer) {
 	connect.HandleUnary(srv, "/cyber.system.v1.AuditService/ListAuditLogs", svc.ListAuditLogs)
+	connect.HandleUnary(srv, "/cyber.system.v1.AuditService/ExportAuditLogs", svc.ExportAuditLogs)
+	connect.HandleUnary(srv, "/cyber.system.v1.AuditService/ListAuditExports", svc.ListAuditExports)
 }

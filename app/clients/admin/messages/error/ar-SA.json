@@ -77,5 +77,6 @@
   "error_SYSTEM_USER_DISABLED": "هذا الحساب موقوف - تواصل مع المسؤول.",
   "error_SYSTEM_FILE_NOT_FOUND": "الملف غير موجود.",
   "error_SYSTEM_FILE_TOO_LARGE": "الملف يتجاوز حد الحجم.",
+  "error_SYSTEM_FILE_SIZE_MISMATCH": "حجم الملف المرفوع لا يطابق الحجم المصرّح به.",
   "error_SYSTEM_FILE_INVALID_STATE": "حالة الملف لا تسمح بهذه العملية."
 }

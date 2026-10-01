@@ -15,7 +15,7 @@ import {
 } from "antd";
 import { FileUp, KeyRound, RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { useFileUrl } from "#/features/app/use-file-url";
+import { useFileUrl } from "#/features/app/file/use-file-url";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import type { DeptNode, OperationCatalog, UserDraft } from "../types";

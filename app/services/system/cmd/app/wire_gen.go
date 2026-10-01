@@ -7,12 +7,14 @@
 package main
 
 import (
+	"cyber-ecosystem/app/services/system/internal/bootstrap"
 	"cyber-ecosystem/app/services/system/internal/conf"
 	"cyber-ecosystem/app/services/system/internal/module/audit"
 	"cyber-ecosystem/app/services/system/internal/module/auth"
 	"cyber-ecosystem/app/services/system/internal/module/authz"
 	"cyber-ecosystem/app/services/system/internal/module/dept"
 	"cyber-ecosystem/app/services/system/internal/module/file"
+	"cyber-ecosystem/app/services/system/internal/module/filepresign"
 	"cyber-ecosystem/app/services/system/internal/module/fileproxy"
 	"cyber-ecosystem/app/services/system/internal/module/policy"
 	"cyber-ecosystem/app/services/system/internal/module/resource"
@@ -20,7 +22,6 @@ import (
 	"cyber-ecosystem/app/services/system/internal/module/transfer"
 	"cyber-ecosystem/app/services/system/internal/module/user"
 	"cyber-ecosystem/app/services/system/internal/platform"
-	"cyber-ecosystem/app/services/system/internal/seed"
 	"cyber-ecosystem/app/services/system/internal/server"
 	"github.com/go-kratos/kratos/v3"
 	"log/slog"
@@ -92,7 +93,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, lo
 	userUC := user.NewUserUC(logger, platformPlatform, userRP, deptRP, fileRP)
 	userService := user.NewUserService(logger, userUC)
 	transferService := transfer.NewTransferService(logger)
-	authzRP, cleanup5, err := authz.NewAuthzRP(logger, platformPlatform)
+	authzRP, err := authz.NewAuthzRP(logger, platformPlatform)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -109,22 +110,25 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, lo
 	roleService := role.NewRoleService(logger, roleUC)
 	policyUC := policy.NewPolicyUC(logger, platformPlatform, policyRP)
 	policyService := policy.NewPolicyService(logger, policyUC)
-	auditRP, cleanup6 := audit.NewAuditRP(logger, platformPlatform)
-	auditUC := audit.NewAuditUC(logger, platformPlatform, auditRP)
+	auditRP, cleanup5 := audit.NewAuditRP(logger, platformPlatform)
+	lifecycle := bootstrap.NewLifecycle()
+	fileUC := file.NewFileUC(logger, platformPlatform, fileRP, lifecycle)
+	auditUC := audit.NewAuditUC(logger, platformPlatform, auditRP, fileUC)
 	auditService := audit.NewAuditService(logger, auditUC)
-	fileUC := file.NewFileUC(logger, platformPlatform, fileRP)
 	fileService := file.NewFileService(logger, fileUC)
 	fileProxyRP := fileproxy.NewFileProxyRP(logger, platformPlatform)
 	fileProxyUC := fileproxy.NewFileProxyUC(logger, platformPlatform, fileProxyRP)
 	fileProxyService := fileproxy.NewFileProxyService(logger, fileProxyUC)
-	v := server.NewRegistrarList(deptService, resourceService, userService, transferService, authService, roleService, policyService, auditService, fileService, fileProxyService)
-	authzUC := authz.NewAuthzUC(logger, platformPlatform, authzRP)
+	filePresignRP := filepresign.NewFilePresignRP(logger, platformPlatform)
+	filePresignUC := filepresign.NewFilePresignUC(logger, platformPlatform, filePresignRP)
+	filePresignService := filepresign.NewFilePresignService(logger, filePresignUC)
+	v := server.NewRegistrarList(deptService, resourceService, userService, transferService, authService, roleService, policyService, auditService, fileService, fileProxyService, filePresignService)
+	authzUC := authz.NewAuthzUC(logger, platformPlatform, authzRP, lifecycle)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, authUC, authzUC, auditUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, authUC, authzUC, auditUC)
 	connectServer := server.NewConnectServer(confServer, logger, v, authUC, authzUC, auditUC)
-	seedSeed, err := seed.NewSeed(confAuthz, platformPlatform, logger)
+	seed, err := bootstrap.NewSeed(confAuthz, platformPlatform, logger)
 	if err != nil {
-		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -132,9 +136,8 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, lo
 		cleanup()
 		return nil, nil, err
 	}
-	app := newApp(logger, grpcServer, httpServer, connectServer, seedSeed)
+	app := newApp(logger, grpcServer, httpServer, connectServer, seed, lifecycle)
 	return app, func() {
-		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()

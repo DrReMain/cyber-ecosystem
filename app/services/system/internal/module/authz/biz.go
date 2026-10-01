@@ -56,6 +56,8 @@ type AuthzRP interface {
 	EffectiveGrants(ctx context.Context, subject *security.Subject) ([]GrantView, error)
 	ExplainGrants(ctx context.Context, principalType, principalID, tenant, operation string) (*ExplainResult, error)
 	PreviewGrants(ctx context.Context, tenant string, roleCodes []string) ([]string, error)
+	StartWatch(ctx context.Context) error
+	StopWatch(ctx context.Context) error
 }
 
 // UC ------------------------------------------------------------------------------------------------------------------
@@ -65,7 +67,9 @@ type AuthzUC struct {
 	authzRP AuthzRP
 }
 
-func NewAuthzUC(logger *slog.Logger, tm shared.Transaction, authzRP AuthzRP) *AuthzUC {
+func NewAuthzUC(logger *slog.Logger, tm shared.Transaction, authzRP AuthzRP, lc shared.HookRegistry) *AuthzUC {
+	lc.OnStart(authzRP.StartWatch)
+	lc.OnStop(authzRP.StopWatch)
 	return &AuthzUC{UC: shared.NewUC(logger.With("module", "module/authz"), tm), authzRP: authzRP}
 }
 

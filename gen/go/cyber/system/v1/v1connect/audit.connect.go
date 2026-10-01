@@ -36,11 +36,21 @@ const (
 	// AuditServiceListAuditLogsProcedure is the fully-qualified name of the AuditService's
 	// ListAuditLogs RPC.
 	AuditServiceListAuditLogsProcedure = "/cyber.system.v1.AuditService/ListAuditLogs"
+	// AuditServiceExportAuditLogsProcedure is the fully-qualified name of the AuditService's
+	// ExportAuditLogs RPC.
+	AuditServiceExportAuditLogsProcedure = "/cyber.system.v1.AuditService/ExportAuditLogs"
+	// AuditServiceListAuditExportsProcedure is the fully-qualified name of the AuditService's
+	// ListAuditExports RPC.
+	AuditServiceListAuditExportsProcedure = "/cyber.system.v1.AuditService/ListAuditExports"
 )
 
 // AuditServiceClient is a client for the cyber.system.v1.AuditService service.
 type AuditServiceClient interface {
 	ListAuditLogs(context.Context, *connect.Request[v1.ListAuditLogsRequest]) (*connect.Response[v1.ListAuditLogsResponse], error)
+	// Export is asynchronous: registers a generation job and returns
+	// immediately.
+	ExportAuditLogs(context.Context, *connect.Request[v1.ExportAuditLogsRequest]) (*connect.Response[v1.ExportAuditLogsResponse], error)
+	ListAuditExports(context.Context, *connect.Request[v1.ListAuditExportsRequest]) (*connect.Response[v1.ListAuditExportsResponse], error)
 }
 
 // NewAuditServiceClient constructs a client for the cyber.system.v1.AuditService service. By
@@ -60,12 +70,26 @@ func NewAuditServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(auditServiceMethods.ByName("ListAuditLogs")),
 			connect.WithClientOptions(opts...),
 		),
+		exportAuditLogs: connect.NewClient[v1.ExportAuditLogsRequest, v1.ExportAuditLogsResponse](
+			httpClient,
+			baseURL+AuditServiceExportAuditLogsProcedure,
+			connect.WithSchema(auditServiceMethods.ByName("ExportAuditLogs")),
+			connect.WithClientOptions(opts...),
+		),
+		listAuditExports: connect.NewClient[v1.ListAuditExportsRequest, v1.ListAuditExportsResponse](
+			httpClient,
+			baseURL+AuditServiceListAuditExportsProcedure,
+			connect.WithSchema(auditServiceMethods.ByName("ListAuditExports")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // auditServiceClient implements AuditServiceClient.
 type auditServiceClient struct {
-	listAuditLogs *connect.Client[v1.ListAuditLogsRequest, v1.ListAuditLogsResponse]
+	listAuditLogs    *connect.Client[v1.ListAuditLogsRequest, v1.ListAuditLogsResponse]
+	exportAuditLogs  *connect.Client[v1.ExportAuditLogsRequest, v1.ExportAuditLogsResponse]
+	listAuditExports *connect.Client[v1.ListAuditExportsRequest, v1.ListAuditExportsResponse]
 }
 
 // ListAuditLogs calls cyber.system.v1.AuditService.ListAuditLogs.
@@ -73,9 +97,23 @@ func (c *auditServiceClient) ListAuditLogs(ctx context.Context, req *connect.Req
 	return c.listAuditLogs.CallUnary(ctx, req)
 }
 
+// ExportAuditLogs calls cyber.system.v1.AuditService.ExportAuditLogs.
+func (c *auditServiceClient) ExportAuditLogs(ctx context.Context, req *connect.Request[v1.ExportAuditLogsRequest]) (*connect.Response[v1.ExportAuditLogsResponse], error) {
+	return c.exportAuditLogs.CallUnary(ctx, req)
+}
+
+// ListAuditExports calls cyber.system.v1.AuditService.ListAuditExports.
+func (c *auditServiceClient) ListAuditExports(ctx context.Context, req *connect.Request[v1.ListAuditExportsRequest]) (*connect.Response[v1.ListAuditExportsResponse], error) {
+	return c.listAuditExports.CallUnary(ctx, req)
+}
+
 // AuditServiceHandler is an implementation of the cyber.system.v1.AuditService service.
 type AuditServiceHandler interface {
 	ListAuditLogs(context.Context, *connect.Request[v1.ListAuditLogsRequest]) (*connect.Response[v1.ListAuditLogsResponse], error)
+	// Export is asynchronous: registers a generation job and returns
+	// immediately.
+	ExportAuditLogs(context.Context, *connect.Request[v1.ExportAuditLogsRequest]) (*connect.Response[v1.ExportAuditLogsResponse], error)
+	ListAuditExports(context.Context, *connect.Request[v1.ListAuditExportsRequest]) (*connect.Response[v1.ListAuditExportsResponse], error)
 }
 
 // NewAuditServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -91,10 +129,26 @@ func NewAuditServiceHandler(svc AuditServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(auditServiceMethods.ByName("ListAuditLogs")),
 		connect.WithHandlerOptions(opts...),
 	)
+	auditServiceExportAuditLogsHandler := connect.NewUnaryHandler(
+		AuditServiceExportAuditLogsProcedure,
+		svc.ExportAuditLogs,
+		connect.WithSchema(auditServiceMethods.ByName("ExportAuditLogs")),
+		connect.WithHandlerOptions(opts...),
+	)
+	auditServiceListAuditExportsHandler := connect.NewUnaryHandler(
+		AuditServiceListAuditExportsProcedure,
+		svc.ListAuditExports,
+		connect.WithSchema(auditServiceMethods.ByName("ListAuditExports")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.system.v1.AuditService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuditServiceListAuditLogsProcedure:
 			auditServiceListAuditLogsHandler.ServeHTTP(w, r)
+		case AuditServiceExportAuditLogsProcedure:
+			auditServiceExportAuditLogsHandler.ServeHTTP(w, r)
+		case AuditServiceListAuditExportsProcedure:
+			auditServiceListAuditExportsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -106,4 +160,12 @@ type UnimplementedAuditServiceHandler struct{}
 
 func (UnimplementedAuditServiceHandler) ListAuditLogs(context.Context, *connect.Request[v1.ListAuditLogsRequest]) (*connect.Response[v1.ListAuditLogsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuditService.ListAuditLogs is not implemented"))
+}
+
+func (UnimplementedAuditServiceHandler) ExportAuditLogs(context.Context, *connect.Request[v1.ExportAuditLogsRequest]) (*connect.Response[v1.ExportAuditLogsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuditService.ExportAuditLogs is not implemented"))
+}
+
+func (UnimplementedAuditServiceHandler) ListAuditExports(context.Context, *connect.Request[v1.ListAuditExportsRequest]) (*connect.Response[v1.ListAuditExportsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuditService.ListAuditExports is not implemented"))
 }

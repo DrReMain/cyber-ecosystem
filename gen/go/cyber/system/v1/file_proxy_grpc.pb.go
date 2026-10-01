@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// File proxy channel: the app-generic small-file upload path (D14 path 1).
+// File proxy channel: the app-generic small-file upload path.
 // Bytes ride the unary RPC body through the service to object storage — no
 // presigning, no CORS, no client-side S3 surface. The payload cap is a
 // contract constant, not a tunable. This lives in its own proto because its
@@ -35,7 +35,7 @@ const (
 // user out of their own file space — while FileService stays the admin
 // management plane.
 // The response carries the File entity, never a URL: callers persist the
-// file id, access URLs are minted at render time (D15), and storage
+// file id, access URLs are minted at render time, and storage
 // backends can migrate without touching stored references.
 type FileProxyServiceClient interface {
 	UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileResponse, error)
@@ -63,7 +63,7 @@ func (c *fileProxyServiceClient) UploadFile(ctx context.Context, in *UploadFileR
 // All implementations must embed UnimplementedFileProxyServiceServer
 // for forward compatibility.
 //
-// File proxy channel: the app-generic small-file upload path (D14 path 1).
+// File proxy channel: the app-generic small-file upload path.
 // Bytes ride the unary RPC body through the service to object storage — no
 // presigning, no CORS, no client-side S3 surface. The payload cap is a
 // contract constant, not a tunable. This lives in its own proto because its
@@ -72,7 +72,7 @@ func (c *fileProxyServiceClient) UploadFile(ctx context.Context, in *UploadFileR
 // user out of their own file space — while FileService stays the admin
 // management plane.
 // The response carries the File entity, never a URL: callers persist the
-// file id, access URLs are minted at render time (D15), and storage
+// file id, access URLs are minted at render time, and storage
 // backends can migrate without touching stored references.
 type FileProxyServiceServer interface {
 	UploadFile(context.Context, *UploadFileRequest) (*UploadFileResponse, error)

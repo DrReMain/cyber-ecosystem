@@ -40,6 +40,7 @@ http:
       rule: "Host(`admin.cyber.test`)"
       entryPoints: ["web"]
       service: admin
+      middlewares: [compress]
     api:
       rule: "Host(`api.cyber.test`)"
       entryPoints: ["web"]
@@ -49,6 +50,8 @@ http:
     strip-connect:
       stripPrefix:
         prefixes: ["/connect"]
+    compress:
+      compress: {}
 
   services:
     seaweedfs-s3:

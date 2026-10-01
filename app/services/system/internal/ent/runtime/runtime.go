@@ -3,6 +3,7 @@
 package runtime
 
 import (
+	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
 	"cyber-ecosystem/app/services/system/internal/ent/dept"
@@ -20,6 +21,79 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	auditexportMixin := schema.AuditExport{}.Mixin()
+	auditexportMixinHooks2 := auditexportMixin[2].Hooks()
+	auditexportMixinHooks3 := auditexportMixin[3].Hooks()
+	auditexport.Hooks[0] = auditexportMixinHooks2[0]
+	auditexport.Hooks[1] = auditexportMixinHooks3[0]
+	auditexportMixinInters2 := auditexportMixin[2].Interceptors()
+	auditexportMixinInters3 := auditexportMixin[3].Interceptors()
+	auditexport.Interceptors[0] = auditexportMixinInters2[0]
+	auditexport.Interceptors[1] = auditexportMixinInters3[0]
+	auditexportMixinFields0 := auditexportMixin[0].Fields()
+	_ = auditexportMixinFields0
+	auditexportMixinFields1 := auditexportMixin[1].Fields()
+	_ = auditexportMixinFields1
+	auditexportMixinFields2 := auditexportMixin[2].Fields()
+	_ = auditexportMixinFields2
+	auditexportFields := schema.AuditExport{}.Fields()
+	_ = auditexportFields
+	// auditexportDescCreatedAt is the schema descriptor for created_at field.
+	auditexportDescCreatedAt := auditexportMixinFields1[0].Descriptor()
+	// auditexport.DefaultCreatedAt holds the default value on creation for the created_at field.
+	auditexport.DefaultCreatedAt = auditexportDescCreatedAt.Default.(func() time.Time)
+	// auditexportDescUpdatedAt is the schema descriptor for updated_at field.
+	auditexportDescUpdatedAt := auditexportMixinFields1[1].Descriptor()
+	// auditexport.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	auditexport.DefaultUpdatedAt = auditexportDescUpdatedAt.Default.(func() time.Time)
+	// auditexport.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	auditexport.UpdateDefaultUpdatedAt = auditexportDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// auditexportDescTenantID is the schema descriptor for tenant_id field.
+	auditexportDescTenantID := auditexportMixinFields2[0].Descriptor()
+	// auditexport.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	auditexport.TenantIDValidator = auditexportDescTenantID.Validators[0].(func(string) error)
+	// auditexportDescFileID is the schema descriptor for file_id field.
+	auditexportDescFileID := auditexportFields[0].Descriptor()
+	// auditexport.FileIDValidator is a validator for the "file_id" field. It is called by the builders before save.
+	auditexport.FileIDValidator = func() func(string) error {
+		validators := auditexportDescFileID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(file_id string) error {
+			for _, fn := range fns {
+				if err := fn(file_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// auditexportDescOwnerID is the schema descriptor for owner_id field.
+	auditexportDescOwnerID := auditexportFields[1].Descriptor()
+	// auditexport.OwnerIDValidator is a validator for the "owner_id" field. It is called by the builders before save.
+	auditexport.OwnerIDValidator = func() func(string) error {
+		validators := auditexportDescOwnerID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(owner_id string) error {
+			for _, fn := range fns {
+				if err := fn(owner_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// auditexportDescID is the schema descriptor for id field.
+	auditexportDescID := auditexportMixinFields0[0].Descriptor()
+	// auditexport.DefaultID holds the default value on creation for the id field.
+	auditexport.DefaultID = auditexportDescID.Default.(func() string)
+	// auditexport.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	auditexport.IDValidator = auditexportDescID.Validators[0].(func(string) error)
 	auditlogMixin := schema.AuditLog{}.Mixin()
 	auditlogMixinFields0 := auditlogMixin[0].Fields()
 	_ = auditlogMixinFields0

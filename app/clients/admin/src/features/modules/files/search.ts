@@ -9,7 +9,7 @@ import { z } from "zod";
 export const filesSearchSchema = z.looseObject({
   name: z.string().optional(),
   contentType: z.string().optional(),
-  status: z.enum(["UPLOADING", "CONFIRMED"]).optional(),
+  status: z.enum(["UPLOADING", "CONFIRMED", "PROCESSING", "FAILED"]).optional(),
   source: z.enum(["CLIENT_UPLOAD", "SERVER_GENERATED"]).optional(),
   pageNo: pageNoField(),
   pageSize: pageSizeField(20),

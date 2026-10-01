@@ -1,0 +1,193 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/system/v1/file.proto";
+import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+// File presign channel: the client-direct upload path. The
+// service registers metadata and mints time-limited presigned URLs; bytes
+// travel client → object storage without crossing this stack. Addressing is
+// compiled into every minted URL (minted against the storage backend's
+// advertised public endpoint), so the client holds no storage configuration
+// of its own — CreateUpload's response shape IS the routing decision.
+// Same audience as the proxy channel: a builtin capability every
+// authenticated principal holds, while FileService stays the admin
+// management plane.
+// Resume needs no client-side persistence: multipart sessions live in the
+// file row + the backend's part set, and ListUploadedParts replays both
+// (uploaded parts with ETags, fresh URLs for the missing ones).
+service FilePresignService {
+  option (cyber.ext.v1.service_comment) = "文件直传上传";
+
+  rpc CreateUpload(CreateUploadRequest) returns (CreateUploadResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "创建直传会话（登记元数据并铸造上传地址）"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {
+      post: "/api/v1/system/uploads"
+      body: "*"
+    };
+  }
+
+  rpc ConfirmUpload(ConfirmUploadRequest) returns (ConfirmUploadResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "确认直传（校验对象与大小，回填元数据）"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {
+      post: "/api/v1/system/uploads/{id}/confirm"
+      body: "*"
+    };
+  }
+
+  rpc AbortUpload(AbortUploadRequest) returns (AbortUploadResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "放弃直传会话（终止分片会话并删除记录）"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {delete: "/api/v1/system/uploads/{id}"};
+  }
+
+  rpc ListUploadedParts(ListUploadedPartsRequest) returns (ListUploadedPartsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询已传分片（断点续传恢复，补铸缺失分片地址）"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {get: "/api/v1/system/uploads/{id}/parts"};
+  }
+}
+
+// createUpload
+message CreateUploadRequest {
+  optional string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 255
+    }
+  ];
+  optional string content_type = 2 [(buf.validate.field).string.max_len = 128];
+  // Declared size routes the channel (single PUT below the multipart
+  // threshold, session at/above) and anchors the confirm-time size check —
+  // the minted URLs enforce no Content-Length themselves.
+  optional int64 size = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64.gt = 0
+  ];
+}
+
+message PresignedPut {
+  // Present whenever creation succeeds (carve-out: success implies present).
+  string url = 1;
+  google.protobuf.Timestamp expires_at = 2;
+}
+
+message UploadPartUrl {
+  // Same carve-out as PresignedPut.url.
+  int32 part_number = 1;
+  string url = 2;
+}
+
+message UploadSession {
+  // Same carve-out family; opaque backend session id.
+  string upload_id = 1;
+  int64 part_size = 2;
+  int32 part_count = 3;
+  // All part URLs minted upfront (signing is local and cheap); expiry
+  // mid-flight is recovered via ListUploadedParts re-minting.
+  repeated UploadPartUrl part_urls = 4;
+  google.protobuf.Timestamp expires_at = 5;
+}
+
+message CreateUploadResponse {
+  File file = 1;
+  oneof channel {
+    PresignedPut single = 2;
+    UploadSession multipart = 3;
+  }
+}
+
+// confirmUpload
+message ConfirmUploadPart {
+  int32 part_number = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32 = {
+      gte: 1
+      lte: 10000
+    }
+  ];
+  string etag = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 128
+    }
+  ];
+}
+
+message ConfirmUploadRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  // Collected from part PUT response headers; empty on the single-PUT path.
+  // Claims are validated against backend part truth before completion;
+  // integrity beyond the size check is a future contract extension — a
+  // resumed upload of a same-size, different-content file would otherwise
+  // assemble and confirm spliced content undetectably.
+  repeated ConfirmUploadPart parts = 2 [(buf.validate.field).repeated.max_items = 10000];
+}
+
+message ConfirmUploadResponse {
+  File file = 1;
+}
+
+// listUploadedParts
+message ListUploadedPartsRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message UploadedPart {
+  // Same carve-out as PresignedPut.url.
+  int32 part_number = 1;
+  string etag = 2;
+}
+
+message ListUploadedPartsResponse {
+  File file = 1;
+  // Re-slice basis for the resuming client (plain: success implies present).
+  int64 part_size = 2;
+  repeated UploadedPart uploaded = 3;
+  repeated UploadPartUrl missing = 4;
+  google.protobuf.Timestamp expires_at = 5;
+}
+
+// abortUpload
+message AbortUploadRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message AbortUploadResponse {}

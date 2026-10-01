@@ -3,7 +3,7 @@
 # the repo root:  docker build -f app/services/system/Dockerfile .
 # The Nx target `system:image` wraps this and stamps the version.
 
-FROM golang:1.25-alpine AS build
+FROM golang:1.26-alpine AS build
 ARG GOPROXY=https://proxy.golang.org,direct
 ARG VERSION=dev
 ENV CGO_ENABLED=0

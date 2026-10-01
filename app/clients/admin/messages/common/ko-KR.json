@@ -28,5 +28,6 @@
   "common_column_settings_reset": "초기화",
   "common_save": "저장",
   "common_cancel": "취소",
-  "common_user_deleted": "삭제됨"
+  "common_user_deleted": "삭제됨",
+  "common_upload_too_large": "파일이 업로드 한도 {max}를 초과했습니다"
 }

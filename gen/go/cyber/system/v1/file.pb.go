@@ -33,6 +33,8 @@ const (
 	FileStatus_FILE_STATUS_UNSPECIFIED FileStatus = 0
 	FileStatus_FILE_STATUS_UPLOADING   FileStatus = 1
 	FileStatus_FILE_STATUS_CONFIRMED   FileStatus = 2
+	FileStatus_FILE_STATUS_PROCESSING  FileStatus = 3
+	FileStatus_FILE_STATUS_FAILED      FileStatus = 4
 )
 
 // Enum value maps for FileStatus.
@@ -41,11 +43,15 @@ var (
 		0: "FILE_STATUS_UNSPECIFIED",
 		1: "FILE_STATUS_UPLOADING",
 		2: "FILE_STATUS_CONFIRMED",
+		3: "FILE_STATUS_PROCESSING",
+		4: "FILE_STATUS_FAILED",
 	}
 	FileStatus_value = map[string]int32{
 		"FILE_STATUS_UNSPECIFIED": 0,
 		"FILE_STATUS_UPLOADING":   1,
 		"FILE_STATUS_CONFIRMED":   2,
+		"FILE_STATUS_PROCESSING":  3,
+		"FILE_STATUS_FAILED":      4,
 	}
 )
 
@@ -827,17 +833,19 @@ const file_cyber_system_v1_file_proto_rawDesc = "" +
 	"\x04urls\x18\x01 \x03(\v2..cyber.system.v1.GetFileUrlsResponse.UrlsEntryR\x04urls\x1aQ\n" +
 	"\tUrlsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12.\n" +
-	"\x05value\x18\x02 \x01(\v2\x18.cyber.system.v1.FileUrlR\x05value:\x028\x01*_\n" +
+	"\x05value\x18\x02 \x01(\v2\x18.cyber.system.v1.FileUrlR\x05value:\x028\x01*\x93\x01\n" +
 	"\n" +
 	"FileStatus\x12\x1b\n" +
 	"\x17FILE_STATUS_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15FILE_STATUS_UPLOADING\x10\x01\x12\x19\n" +
-	"\x15FILE_STATUS_CONFIRMED\x10\x02*j\n" +
+	"\x15FILE_STATUS_CONFIRMED\x10\x02\x12\x1a\n" +
+	"\x16FILE_STATUS_PROCESSING\x10\x03\x12\x16\n" +
+	"\x12FILE_STATUS_FAILED\x10\x04*j\n" +
 	"\n" +
 	"FileSource\x12\x1b\n" +
 	"\x17FILE_SOURCE_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19FILE_SOURCE_CLIENT_UPLOAD\x10\x01\x12 \n" +
-	"\x1cFILE_SOURCE_SERVER_GENERATED\x10\x022\xb2\x06\n" +
+	"\x1cFILE_SOURCE_SERVER_GENERATED\x10\x022\xb6\x06\n" +
 	"\vFileService\x12\x9f\x01\n" +
 	"\n" +
 	"RenameFile\x12\".cyber.system.v1.RenameFileRequest\x1a#.cyber.system.v1.RenameFileResponse\"H\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x13\n" +
@@ -848,8 +856,8 @@ const file_cyber_system_v1_file_proto_rawDesc = "" +
 	"\tListFiles\x12!.cyber.system.v1.ListFilesRequest\x1a\".cyber.system.v1.ListFilesResponse\">\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
 	"\x12查询文件列表\x10\x01\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/system/files\x12\x91\x01\n" +
 	"\aGetFile\x12\x1f.cyber.system.v1.GetFileRequest\x1a .cyber.system.v1.GetFileResponse\"C\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
-	"\x12查询文件详情\x10\x01\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/files/{id}\x12\xae\x01\n" +
-	"\vGetFileUrls\x12#.cyber.system.v1.GetFileUrlsRequest\x1a$.cyber.system.v1.GetFileUrlsResponse\"T\x88\xf1\x04\x02\x8a\xd3\x0e(\n" +
+	"\x12查询文件详情\x10\x01\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/files/{id}\x12\xb2\x01\n" +
+	"\vGetFileUrls\x12#.cyber.system.v1.GetFileUrlsRequest\x1a$.cyber.system.v1.GetFileUrlsResponse\"X\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e(\n" +
 	"$铸造文件下载地址（批量）\x10\x01\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/system/files/urls\x1a\x10\x8a\xe2\t\f文件管理B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (

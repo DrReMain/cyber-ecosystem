@@ -1,3 +1,27 @@
+-- Create "audit_export" table
+CREATE TABLE "public"."audit_export" (
+  "id" character varying NOT NULL,
+  "created_at" timestamptz NOT NULL,
+  "updated_at" timestamptz NOT NULL,
+  "tenant_id" character varying NOT NULL,
+  "file_id" character varying NOT NULL,
+  "owner_id" character varying NOT NULL,
+  PRIMARY KEY ("id")
+);
+-- Create index "auditexport_created_at" to table: "audit_export"
+CREATE INDEX "auditexport_created_at" ON "public"."audit_export" ("created_at");
+-- Create index "auditexport_file_id" to table: "audit_export"
+CREATE UNIQUE INDEX "auditexport_file_id" ON "public"."audit_export" ("file_id");
+-- Create index "auditexport_tenant_id_created_at" to table: "audit_export"
+CREATE INDEX "auditexport_tenant_id_created_at" ON "public"."audit_export" ("tenant_id", "created_at");
+-- Create index "auditexport_updated_at" to table: "audit_export"
+CREATE INDEX "auditexport_updated_at" ON "public"."audit_export" ("updated_at");
+-- Set comment to column: "tenant_id" on table: "audit_export"
+COMMENT ON COLUMN "public"."audit_export"."tenant_id" IS 'tenant scope; back-filled on insert and filtered from the request subject';
+-- Set comment to column: "file_id" on table: "audit_export"
+COMMENT ON COLUMN "public"."audit_export"."file_id" IS 'logical reference to the file row; status/size live there';
+-- Set comment to column: "owner_id" on table: "audit_export"
+COMMENT ON COLUMN "public"."audit_export"."owner_id" IS 'initiating user snapshot; datascope self dimension';
 -- Create "audit_log" table
 CREATE TABLE "public"."audit_log" (
   "id" character varying NOT NULL,
@@ -104,7 +128,7 @@ COMMENT ON COLUMN "public"."file"."size" IS 'declared at create, replaced by the
 -- Set comment to column: "source" on table: "file"
 COMMENT ON COLUMN "public"."file"."source" IS 'client_upload | server_generated';
 -- Set comment to column: "status" on table: "file"
-COMMENT ON COLUMN "public"."file"."status" IS 'uploading | confirmed; aborted uploads hard-delete the row';
+COMMENT ON COLUMN "public"."file"."status" IS 'uploading | processing | confirmed | failed; aborted uploads hard-delete the row';
 -- Set comment to column: "upload_id" on table: "file"
 COMMENT ON COLUMN "public"."file"."upload_id" IS 'S3 multipart session id; empty on the single-PUT path';
 -- Set comment to column: "etag" on table: "file"

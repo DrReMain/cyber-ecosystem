@@ -26,6 +26,23 @@ export type CyberSharedCommonV1PageResponse = {
     more?: boolean;
 };
 
+export type CyberSystemV1AbortUploadResponse = {
+    [key: string]: unknown;
+};
+
+export type CyberSystemV1AuditExport = {
+    /**
+     * Both ids are always present on the row.
+     */
+    fileId?: string;
+    createdAt?: string;
+    ownerId?: string;
+    /**
+     * Absent when the file row was deleted.
+     */
+    file?: CyberSystemV1File;
+};
+
 export type CyberSystemV1AuditLog = {
     id?: string;
     createdAt?: string;
@@ -71,6 +88,30 @@ export type CyberSystemV1CalendarParams = {
 };
 
 /**
+ * confirmUpload
+ */
+export type CyberSystemV1ConfirmUploadPart = {
+    partNumber?: number;
+    etag?: string;
+};
+
+export type CyberSystemV1ConfirmUploadRequest = {
+    id?: string;
+    /**
+     * Collected from part PUT response headers; empty on the single-PUT path.
+     * Claims are validated against backend part truth before completion;
+     * integrity beyond the size check is a future contract extension — a
+     * resumed upload of a same-size, different-content file would otherwise
+     * assemble and confirm spliced content undetectably.
+     */
+    parts?: Array<CyberSystemV1ConfirmUploadPart>;
+};
+
+export type CyberSystemV1ConfirmUploadResponse = {
+    file?: CyberSystemV1File;
+};
+
+/**
  * create
  */
 export type CyberSystemV1CreateDeptRequest = {
@@ -107,6 +148,26 @@ export type CyberSystemV1CreateRoleRequest = {
 
 export type CyberSystemV1CreateRoleResponse = {
     id?: string;
+};
+
+/**
+ * createUpload
+ */
+export type CyberSystemV1CreateUploadRequest = {
+    name?: string;
+    contentType?: string;
+    /**
+     * Declared size routes the channel (single PUT below the multipart
+     * threshold, session at/above) and anchors the confirm-time size check —
+     * the minted URLs enforce no Content-Length themselves.
+     */
+    size?: string;
+};
+
+export type CyberSystemV1CreateUploadResponse = {
+    file?: CyberSystemV1File;
+    single?: CyberSystemV1PresignedPut;
+    multipart?: CyberSystemV1UploadSession;
 };
 
 /**
@@ -232,6 +293,24 @@ export type CyberSystemV1ExplainPolicy = {
     state?: string;
 };
 
+/**
+ * exportAuditLogs
+ * Empty ids = full export; non-empty = the selected rows only. No cap; cost
+ * is O(result set). Authorization is the operation itself — the caller's
+ * datascope does not narrow it.
+ */
+export type CyberSystemV1ExportAuditLogsRequest = {
+    ids?: Array<string>;
+};
+
+export type CyberSystemV1ExportAuditLogsResponse = {
+    /**
+     * PROCESSING at return; the file row lands CONFIRMED or FAILED when the
+     * background generation ends.
+     */
+    file?: CyberSystemV1File;
+};
+
 export type CyberSystemV1File = {
     id?: string;
     createdAt?: string;
@@ -244,7 +323,7 @@ export type CyberSystemV1File = {
     contentType?: string;
     size?: string;
     source?: 'FILE_SOURCE_UNSPECIFIED' | 'FILE_SOURCE_CLIENT_UPLOAD' | 'FILE_SOURCE_SERVER_GENERATED';
-    status?: 'FILE_STATUS_UNSPECIFIED' | 'FILE_STATUS_UPLOADING' | 'FILE_STATUS_CONFIRMED';
+    status?: 'FILE_STATUS_UNSPECIFIED' | 'FILE_STATUS_UPLOADING' | 'FILE_STATUS_CONFIRMED' | 'FILE_STATUS_PROCESSING' | 'FILE_STATUS_FAILED';
     ownerId?: string;
 };
 
@@ -290,6 +369,11 @@ export type CyberSystemV1GetRoleResponse = {
 
 export type CyberSystemV1GetUserResponse = {
     user?: CyberSystemV1User;
+};
+
+export type CyberSystemV1ListAuditExportsResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    list?: Array<CyberSystemV1AuditExport>;
 };
 
 export type CyberSystemV1ListAuditLogsResponse = {
@@ -339,6 +423,17 @@ export type CyberSystemV1ListRolesByPrincipalResponse = {
 export type CyberSystemV1ListRolesResponse = {
     page?: CyberSharedCommonV1PageResponse;
     list?: Array<CyberSystemV1Role>;
+};
+
+export type CyberSystemV1ListUploadedPartsResponse = {
+    file?: CyberSystemV1File;
+    /**
+     * Re-slice basis for the resuming client (plain: success implies present).
+     */
+    partSize?: string;
+    uploaded?: Array<CyberSystemV1UploadedPart>;
+    missing?: Array<CyberSystemV1UploadPartUrl>;
+    expiresAt?: string;
 };
 
 export type CyberSystemV1ListUsersResponse = {
@@ -456,6 +551,14 @@ export type CyberSystemV1Policy = {
 export type CyberSystemV1PolicyParams = {
     timeWindow?: CyberSystemV1TimeWindowParams;
     calendar?: CyberSystemV1CalendarParams;
+};
+
+export type CyberSystemV1PresignedPut = {
+    /**
+     * Present whenever creation succeeds (carve-out: success implies present).
+     */
+    url?: string;
+    expiresAt?: string;
 };
 
 export type CyberSystemV1PreviewGrantsRequest = {
@@ -716,6 +819,37 @@ export type CyberSystemV1UploadFileResponse = {
     file?: CyberSystemV1File;
 };
 
+export type CyberSystemV1UploadPartUrl = {
+    /**
+     * Same carve-out as PresignedPut.url.
+     */
+    partNumber?: number;
+    url?: string;
+};
+
+export type CyberSystemV1UploadSession = {
+    /**
+     * Same carve-out family; opaque backend session id.
+     */
+    uploadId?: string;
+    partSize?: string;
+    partCount?: number;
+    /**
+     * All part URLs minted upfront (signing is local and cheap); expiry
+     * mid-flight is recovered via ListUploadedParts re-minting.
+     */
+    partUrls?: Array<CyberSystemV1UploadPartUrl>;
+    expiresAt?: string;
+};
+
+export type CyberSystemV1UploadedPart = {
+    /**
+     * Same carve-out as PresignedPut.url.
+     */
+    partNumber?: number;
+    etag?: string;
+};
+
 export type CyberSystemV1User = {
     id?: string;
     createdAt?: string;
@@ -777,6 +911,68 @@ export type AuditServiceListAuditLogsResponses = {
 };
 
 export type AuditServiceListAuditLogsResponse = AuditServiceListAuditLogsResponses[keyof AuditServiceListAuditLogsResponses];
+
+export type AuditServiceExportAuditLogsData = {
+    body: CyberSystemV1ExportAuditLogsRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/audit-logs/export';
+};
+
+export type AuditServiceExportAuditLogsResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ExportAuditLogsResponse;
+};
+
+export type AuditServiceExportAuditLogsResponse = AuditServiceExportAuditLogsResponses[keyof AuditServiceExportAuditLogsResponses];
+
+export type AuditServiceListAuditExportsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        orderBy?: Array<string>;
+    };
+    url: '/api/v1/system/audit-logs/exports';
+};
+
+export type AuditServiceListAuditExportsResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ListAuditExportsResponse;
+};
+
+export type AuditServiceListAuditExportsResponse = AuditServiceListAuditExportsResponses[keyof AuditServiceListAuditExportsResponses];
 
 export type AuthServiceLoginData = {
     body: CyberSystemV1LoginRequest;
@@ -1066,7 +1262,7 @@ export type FileServiceListFilesData = {
         'page.updatedAtZ'?: string;
         name?: string;
         contentType?: string;
-        status?: 'FILE_STATUS_UNSPECIFIED' | 'FILE_STATUS_UPLOADING' | 'FILE_STATUS_CONFIRMED';
+        status?: 'FILE_STATUS_UNSPECIFIED' | 'FILE_STATUS_UPLOADING' | 'FILE_STATUS_CONFIRMED' | 'FILE_STATUS_PROCESSING' | 'FILE_STATUS_FAILED';
         source?: 'FILE_SOURCE_UNSPECIFIED' | 'FILE_SOURCE_CLIENT_UPLOAD' | 'FILE_SOURCE_SERVER_GENERATED';
         orderBy?: Array<string>;
     };
@@ -1634,6 +1830,76 @@ export type TransferServiceSubscribeResponses = {
 };
 
 export type TransferServiceSubscribeResponse = TransferServiceSubscribeResponses[keyof TransferServiceSubscribeResponses];
+
+export type FilePresignServiceCreateUploadData = {
+    body: CyberSystemV1CreateUploadRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/uploads';
+};
+
+export type FilePresignServiceCreateUploadResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1CreateUploadResponse;
+};
+
+export type FilePresignServiceCreateUploadResponse = FilePresignServiceCreateUploadResponses[keyof FilePresignServiceCreateUploadResponses];
+
+export type FilePresignServiceAbortUploadData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/system/uploads/{id}';
+};
+
+export type FilePresignServiceAbortUploadResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1AbortUploadResponse;
+};
+
+export type FilePresignServiceAbortUploadResponse = FilePresignServiceAbortUploadResponses[keyof FilePresignServiceAbortUploadResponses];
+
+export type FilePresignServiceConfirmUploadData = {
+    body: CyberSystemV1ConfirmUploadRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/system/uploads/{id}/confirm';
+};
+
+export type FilePresignServiceConfirmUploadResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ConfirmUploadResponse;
+};
+
+export type FilePresignServiceConfirmUploadResponse = FilePresignServiceConfirmUploadResponses[keyof FilePresignServiceConfirmUploadResponses];
+
+export type FilePresignServiceListUploadedPartsData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/system/uploads/{id}/parts';
+};
+
+export type FilePresignServiceListUploadedPartsResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ListUploadedPartsResponse;
+};
+
+export type FilePresignServiceListUploadedPartsResponse = FilePresignServiceListUploadedPartsResponses[keyof FilePresignServiceListUploadedPartsResponses];
 
 export type UserServiceListUsersData = {
     body?: never;

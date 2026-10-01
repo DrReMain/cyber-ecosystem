@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from "@connectrpc/connect-query";
+import type { File as FileView } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file_pb";
 import { FileSource, FileStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file_pb";
+import { abortUpload } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file_presign-FilePresignService_connectquery";
 import {
   deleteFile,
   listFiles,
@@ -10,11 +12,13 @@ import { Filter } from "@cyber-ecosystem/shared-antd/filter";
 import { useFilter, useServerPagination } from "@cyber-ecosystem/shared-antd/use-search";
 import { useRouteContext, useSearch } from "@tanstack/react-router";
 import { Button, Card, Input, Modal, Upload } from "antd";
-import { FileUp } from "lucide-react";
-import { useMemo, useState } from "react";
+import { CloudUpload, FileUp } from "lucide-react";
+import type { ChangeEvent } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useProxyUpload } from "#/features/app/use-proxy-upload";
-import { useUserDirectory } from "#/features/app/use-user-directory";
+import { useProxyUpload } from "#/features/app/file/use-proxy-upload";
+import { useUpload } from "#/features/app/file/use-upload";
+import { useUserDirectory } from "#/features/app/user/use-user-directory";
 import { isOperationAllowed, op } from "#/features/layout-dashboard/auth/permissions";
 import { useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
@@ -65,27 +69,69 @@ export function FilesPage() {
       refetch();
     },
   });
-  const { upload: proxyUpload, isPending: uploadPending } = useProxyUpload();
-  const onUploadFile = (file: File) => {
-    void proxyUpload(file).then((f) => {
-      if (!f) return;
-      refetch();
-      toast.success(m.files_upload_done({ name: f.name ?? "" }));
-    });
+  const { upload: proxyUpload, isPending: proxyPending } = useProxyUpload();
+  const { uploadDirect, resume, cancelUpload, progressById, uploading } = useUpload({
+    onCreated: refetch,
+  });
+  const abortMutation = useMutation(abortUpload, { onSuccess: refetch });
+  const onUploaded = (f: FileView | undefined) => {
+    if (!f) return;
+    refetch();
+    toast.success(m.files_upload_done({ name: f.name ?? "" }));
+  };
+  const onAbortFile = (file: FileView) => {
+    cancelUpload(file.id ?? "");
+    abortMutation.mutate({ id: file.id ?? "" });
   };
   const uploadEntry = (
-    <Upload
-      beforeUpload={(file) => {
-        onUploadFile(file);
-        return false;
-      }}
-      showUploadList={false}
-    >
-      <Button color="primary" icon={<FileUp size={14} />} loading={uploadPending} variant="filled">
-        {m.files_upload()}
-      </Button>
-    </Upload>
+    <div className="flex items-center gap-2">
+      <Upload
+        beforeUpload={(file) => {
+          void proxyUpload(file).then(onUploaded);
+          return false;
+        }}
+        showUploadList={false}
+      >
+        <Button color="primary" icon={<FileUp size={14} />} loading={proxyPending} variant="filled">
+          {m.files_upload()}
+        </Button>
+      </Upload>
+      <Upload
+        beforeUpload={(file) => {
+          void uploadDirect(file).then(onUploaded);
+          return false;
+        }}
+        showUploadList={false}
+      >
+        <Button
+          color="primary"
+          icon={<CloudUpload size={14} />}
+          loading={uploading}
+          variant="filled"
+        >
+          {m.files_upload_direct()}
+        </Button>
+      </Upload>
+    </div>
   );
+
+  const [resumeTarget, setResumeTarget] = useState<FileView | null>(null);
+  const resumeInputRef = useRef<HTMLInputElement>(null);
+  const onResumeFile = (file: FileView) => {
+    setResumeTarget(file);
+    resumeInputRef.current?.click();
+  };
+  const onResumePicked = (e: ChangeEvent<HTMLInputElement>) => {
+    const picked = e.target.files?.[0];
+    e.target.value = "";
+    if (!(picked && resumeTarget)) return;
+    if (picked.name !== resumeTarget.name || picked.size !== Number(resumeTarget.size ?? 0)) {
+      toast.error(m.files_resume_mismatch());
+      return;
+    }
+    const target = resumeTarget;
+    void resume(picked, target.id ?? "").then(onUploaded);
+  };
 
   const filtersActive =
     clean(values.name) !== undefined ||
@@ -126,6 +172,8 @@ export function FilesPage() {
               options: [
                 { label: m.files_status_confirmed(), value: "CONFIRMED" },
                 { label: m.files_status_uploading(), value: "UPLOADING" },
+                { label: m.files_status_processing(), value: "PROCESSING" },
+                { label: m.files_status_failed(), value: "FAILED" },
               ],
             },
             {
@@ -145,15 +193,20 @@ export function FilesPage() {
         emptyDescription={filtersActive ? m.files_empty_filtered() : m.files_empty()}
         files={filesQuery.data?.list ?? []}
         loading={filesQuery.isFetching}
+        onAbort={onAbortFile}
         onDelete={(file) => deleteMutation.mutate({ id: file.id ?? "" })}
         onRefresh={refetch}
         onRename={(file) => setRenaming({ id: file.id ?? "", name: file.name ?? "" })}
+        onResume={onResumeFile}
         ownerKnown={ownerKnown}
         ownerName={(id) => usersById.get(id)}
         pagination={pagination}
+        pendingAbortId={abortMutation.isPending ? (abortMutation.variables?.id ?? null) : null}
         pendingDeleteId={deleteMutation.isPending ? (deleteMutation.variables?.id ?? null) : null}
+        progressById={progressById}
         toolbarExtra={uploadEntry}
       />
+      <input className="hidden" onChange={onResumePicked} ref={resumeInputRef} type="file" />
       <Modal
         cancelButtonProps={{ variant: "filled", color: "default" }}
         cancelText={m.common_cancel()}

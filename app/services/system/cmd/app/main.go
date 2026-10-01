@@ -17,8 +17,8 @@ import (
 	"cyber-ecosystem/shared-go/kratos/observability"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
+	"cyber-ecosystem/app/services/system/internal/bootstrap"
 	"cyber-ecosystem/app/services/system/internal/conf"
-	"cyber-ecosystem/app/services/system/internal/seed"
 )
 
 var (
@@ -37,7 +37,7 @@ func init() {
 	jsoncodec.Register()
 }
 
-func newApp(logger *slog.Logger, gs *grpc.Server, hs *http.Server, cs *connect.Server, seeder *seed.Seed) *kratos.App {
+func newApp(logger *slog.Logger, gs *grpc.Server, hs *http.Server, cs *connect.Server, seeder *bootstrap.Seed, lc *bootstrap.Lifecycle) *kratos.App {
 	return kratos.New(append([]kratos.Option{
 		kratos.ID(id),
 		kratos.Name(Name),
@@ -46,6 +46,8 @@ func newApp(logger *slog.Logger, gs *grpc.Server, hs *http.Server, cs *connect.S
 		kratos.Logger(logger),
 		kratos.Server(gs, hs, cs),
 		kratos.BeforeStart(seeder.Run),
+		kratos.BeforeStart(lc.Start),
+		kratos.AfterStop(lc.Stop),
 	}, health.Mount(hs)...)...)
 }
 

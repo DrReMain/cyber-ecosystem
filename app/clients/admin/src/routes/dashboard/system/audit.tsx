@@ -6,7 +6,7 @@ import { op, requireOperations } from "#/features/layout-dashboard/auth/permissi
 import { AuditPage, parseAuditSearch } from "#/features/modules/system-audit";
 import { m } from "#/paraglide/messages";
 
-const operations = [op(AuditService, "listAuditLogs")];
+const operations = [op(AuditService, "listAuditLogs"), op(AuditService, "listAuditExports")];
 
 export const Route = createFileRoute("/dashboard/system/audit")({
   staticData: {

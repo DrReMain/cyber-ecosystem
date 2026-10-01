@@ -3,6 +3,7 @@ package s3
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -35,6 +36,13 @@ func TestMultipartArgumentGuards(t *testing.T) {
 	}
 	if err := m.Abort(ctx, "k", ""); !errors.Is(err, storage.ErrInvalidArgument) {
 		t.Errorf("Abort(empty uploadID): %v", err)
+	}
+	longPrefix := strings.Repeat("p", 1025)
+	if err := m.ListMultipartUploads(ctx, longPrefix, nil); !errors.Is(err, storage.ErrInvalidArgument) {
+		t.Errorf("ListMultipartUploads(over-long prefix): %v", err)
+	}
+	if err := m.ListMultipartUploads(ctx, "conformance/", nil); !errors.Is(err, storage.ErrInvalidArgument) {
+		t.Errorf("ListMultipartUploads(nil visit): %v", err)
 	}
 }
 

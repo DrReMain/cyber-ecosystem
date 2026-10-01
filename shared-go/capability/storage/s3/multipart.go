@@ -2,6 +2,7 @@ package s3
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -133,4 +134,48 @@ func (m *multipartSvc) Abort(ctx context.Context, key, uploadID string) error {
 		return mapError(err, "multipart abort")
 	}
 	return nil
+}
+
+func (m *multipartSvc) ListMultipartUploads(ctx context.Context, prefix string, visit func(storage.PendingUpload) error) error {
+	if err := storage.ValidatePrefix(prefix); err != nil {
+		return err
+	}
+	if visit == nil {
+		return storage.ErrInvalidArgument
+	}
+	var keyMarker, uploadMarker string
+	for {
+		in := &s3.ListMultipartUploadsInput{
+			Bucket:     aws.String(m.bucket),
+			Prefix:     aws.String(prefix),
+			MaxUploads: aws.Int32(1000),
+		}
+		if keyMarker != "" {
+			in.KeyMarker = aws.String(keyMarker)
+			if uploadMarker != "" {
+				in.UploadIdMarker = aws.String(uploadMarker)
+			}
+		}
+		out, err := m.b.client.ListMultipartUploads(ctx, in)
+		if err != nil {
+			return mapError(err, "multipart list uploads")
+		}
+		for _, u := range out.Uploads {
+			if err := visit(storage.PendingUpload{
+				Key:       aws.ToString(u.Key),
+				UploadID:  aws.ToString(u.UploadId),
+				Initiated: aws.ToTime(u.Initiated),
+			}); err != nil {
+				return fmt.Errorf("multipart list uploads: visit %q: %w", aws.ToString(u.Key), err)
+			}
+		}
+		if !aws.ToBool(out.IsTruncated) {
+			return nil
+		}
+		next := aws.ToString(out.NextKeyMarker)
+		if next == "" || next == keyMarker {
+			return fmt.Errorf("multipart list uploads: truncated page without marker progress — backend pagination drift")
+		}
+		keyMarker, uploadMarker = next, aws.ToString(out.NextUploadIdMarker)
+	}
 }

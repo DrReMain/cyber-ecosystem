@@ -4,7 +4,9 @@ package cyber.system.v1;
 
 import "buf/validate/validate.proto";
 import "cyber/shared/common/v1/pagination.proto";
+import "cyber/system/v1/file.proto";
 import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -21,6 +23,28 @@ service AuditService {
     };
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {get: "/api/v1/system/audit-logs"};
+  }
+  // Export is asynchronous: registers a generation job and returns
+  // immediately.
+  rpc ExportAuditLogs(ExportAuditLogsRequest) returns (ExportAuditLogsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "导出审计日志"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/audit-logs/export"
+      body: "*"
+    };
+  }
+  rpc ListAuditExports(ListAuditExportsRequest) returns (ListAuditExportsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询审计导出记录"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {get: "/api/v1/system/audit-logs/exports"};
   }
 }
 
@@ -58,4 +82,45 @@ message ListAuditLogsRequest {
 message ListAuditLogsResponse {
   cyber.shared.common.v1.PageResponse page = 1;
   repeated AuditLog list = 2;
+}
+
+// exportAuditLogs
+// Empty ids = full export; non-empty = the selected rows only. No cap; cost
+// is O(result set). Authorization is the operation itself — the caller's
+// datascope does not narrow it.
+message ExportAuditLogsRequest {
+  repeated string ids = 1 [(buf.validate.field).repeated = {
+    unique: true
+    items: {string: {len: 20}}
+  }];
+}
+
+message ExportAuditLogsResponse {
+  // PROCESSING at return; the file row lands CONFIRMED or FAILED when the
+  // background generation ends.
+  File file = 1;
+}
+
+message AuditExport {
+  // Both ids are always present on the row.
+  string file_id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string owner_id = 3;
+  // Absent when the file row was deleted.
+  File file = 4;
+}
+
+// listAuditExports; records are scope-narrowed by their owner.
+message ListAuditExportsRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListAuditExportsRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(createdAt):(asc|desc)$'))"
+  }];
+}
+
+message ListAuditExportsResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated AuditExport list = 2;
 }

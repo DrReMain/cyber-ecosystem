@@ -2,7 +2,7 @@ import { useQuery } from "@connectrpc/connect-query";
 import { getFileUrls } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file-FileService_connectquery";
 import { useMemo } from "react";
 
-const STALE_MS = 10 * 60 * 1000;
+const STALE_MS = 10 * 60 * 1000; // must stay under the s3 presign TTL (15m default)
 
 const EMPTY: readonly string[] = [];
 

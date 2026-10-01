@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuditServiceListAuditLogsData, AuditServiceListAuditLogsResponses, AuthServiceGetCurrentUserData, AuthServiceGetCurrentUserResponses, AuthServiceLoginData, AuthServiceLoginResponses, AuthServiceLogoutData, AuthServiceLogoutResponses, DeptServiceCreateDeptData, DeptServiceCreateDeptResponses, DeptServiceDeleteDeptData, DeptServiceDeleteDeptResponses, DeptServiceGetDeptData, DeptServiceGetDeptResponses, DeptServiceListDeptMembersData, DeptServiceListDeptMembersResponses, DeptServiceListDeptsData, DeptServiceListDeptsResponses, DeptServiceRemoveDeptMemberData, DeptServiceRemoveDeptMemberResponses, DeptServiceUpdateDeptData, DeptServiceUpdateDeptResponses, FileProxyServiceUploadFileData, FileProxyServiceUploadFileResponses, FileServiceDeleteFileData, FileServiceDeleteFileResponses, FileServiceGetFileData, FileServiceGetFileResponses, FileServiceGetFileUrlsData, FileServiceGetFileUrlsResponses, FileServiceListFilesData, FileServiceListFilesResponses, FileServiceRenameFileData, FileServiceRenameFileResponses, PolicyServiceCreatePolicyData, PolicyServiceCreatePolicyResponses, PolicyServiceDeletePolicyData, PolicyServiceDeletePolicyResponses, PolicyServiceGetPolicyData, PolicyServiceGetPolicyResponses, PolicyServiceListPoliciesData, PolicyServiceListPoliciesResponses, PolicyServiceUpdatePolicyData, PolicyServiceUpdatePolicyResponses, ResourceServiceListResourceData, ResourceServiceListResourceResponses, RoleServiceCreateRoleData, RoleServiceCreateRoleResponses, RoleServiceDeleteRoleData, RoleServiceDeleteRoleResponses, RoleServiceExplainOperationData, RoleServiceExplainOperationResponses, RoleServiceGetRoleData, RoleServiceGetRoleResponses, RoleServiceListRoleMembersData, RoleServiceListRoleMembersResponses, RoleServiceListRolesByPrincipalData, RoleServiceListRolesByPrincipalResponses, RoleServiceListRolesData, RoleServiceListRolesResponses, RoleServicePreviewGrantsData, RoleServicePreviewGrantsResponses, RoleServiceRemoveRoleMemberData, RoleServiceRemoveRoleMemberResponses, RoleServiceUpdateRoleData, RoleServiceUpdateRoleResponses, RoleServiceUpdateRoleStatusData, RoleServiceUpdateRoleStatusResponses, TransferServiceEchoData, TransferServiceEchoResponses, TransferServicePipeData, TransferServicePipeResponses, TransferServiceRawData, TransferServiceRawResponses, TransferServiceSubscribeData, TransferServiceSubscribeResponses, UserServiceCreateUserData, UserServiceCreateUserResponses, UserServiceDeleteUserData, UserServiceDeleteUserResponses, UserServiceGetUserData, UserServiceGetUserResponses, UserServiceListUsersData, UserServiceListUsersResponses, UserServiceUpdateUserData, UserServiceUpdateUserResponses, UserServiceUpdateUserStatusData, UserServiceUpdateUserStatusResponses } from './types.gen';
+import type { AuditServiceExportAuditLogsData, AuditServiceExportAuditLogsResponses, AuditServiceListAuditExportsData, AuditServiceListAuditExportsResponses, AuditServiceListAuditLogsData, AuditServiceListAuditLogsResponses, AuthServiceGetCurrentUserData, AuthServiceGetCurrentUserResponses, AuthServiceLoginData, AuthServiceLoginResponses, AuthServiceLogoutData, AuthServiceLogoutResponses, DeptServiceCreateDeptData, DeptServiceCreateDeptResponses, DeptServiceDeleteDeptData, DeptServiceDeleteDeptResponses, DeptServiceGetDeptData, DeptServiceGetDeptResponses, DeptServiceListDeptMembersData, DeptServiceListDeptMembersResponses, DeptServiceListDeptsData, DeptServiceListDeptsResponses, DeptServiceRemoveDeptMemberData, DeptServiceRemoveDeptMemberResponses, DeptServiceUpdateDeptData, DeptServiceUpdateDeptResponses, FilePresignServiceAbortUploadData, FilePresignServiceAbortUploadResponses, FilePresignServiceConfirmUploadData, FilePresignServiceConfirmUploadResponses, FilePresignServiceCreateUploadData, FilePresignServiceCreateUploadResponses, FilePresignServiceListUploadedPartsData, FilePresignServiceListUploadedPartsResponses, FileProxyServiceUploadFileData, FileProxyServiceUploadFileResponses, FileServiceDeleteFileData, FileServiceDeleteFileResponses, FileServiceGetFileData, FileServiceGetFileResponses, FileServiceGetFileUrlsData, FileServiceGetFileUrlsResponses, FileServiceListFilesData, FileServiceListFilesResponses, FileServiceRenameFileData, FileServiceRenameFileResponses, PolicyServiceCreatePolicyData, PolicyServiceCreatePolicyResponses, PolicyServiceDeletePolicyData, PolicyServiceDeletePolicyResponses, PolicyServiceGetPolicyData, PolicyServiceGetPolicyResponses, PolicyServiceListPoliciesData, PolicyServiceListPoliciesResponses, PolicyServiceUpdatePolicyData, PolicyServiceUpdatePolicyResponses, ResourceServiceListResourceData, ResourceServiceListResourceResponses, RoleServiceCreateRoleData, RoleServiceCreateRoleResponses, RoleServiceDeleteRoleData, RoleServiceDeleteRoleResponses, RoleServiceExplainOperationData, RoleServiceExplainOperationResponses, RoleServiceGetRoleData, RoleServiceGetRoleResponses, RoleServiceListRoleMembersData, RoleServiceListRoleMembersResponses, RoleServiceListRolesByPrincipalData, RoleServiceListRolesByPrincipalResponses, RoleServiceListRolesData, RoleServiceListRolesResponses, RoleServicePreviewGrantsData, RoleServicePreviewGrantsResponses, RoleServiceRemoveRoleMemberData, RoleServiceRemoveRoleMemberResponses, RoleServiceUpdateRoleData, RoleServiceUpdateRoleResponses, RoleServiceUpdateRoleStatusData, RoleServiceUpdateRoleStatusResponses, TransferServiceEchoData, TransferServiceEchoResponses, TransferServicePipeData, TransferServicePipeResponses, TransferServiceRawData, TransferServiceRawResponses, TransferServiceSubscribeData, TransferServiceSubscribeResponses, UserServiceCreateUserData, UserServiceCreateUserResponses, UserServiceDeleteUserData, UserServiceDeleteUserResponses, UserServiceGetUserData, UserServiceGetUserResponses, UserServiceListUsersData, UserServiceListUsersResponses, UserServiceUpdateUserData, UserServiceUpdateUserResponses, UserServiceUpdateUserStatusData, UserServiceUpdateUserStatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -19,6 +19,21 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 export const auditServiceListAuditLogs = <ThrowOnError extends boolean = false>(options?: Options<AuditServiceListAuditLogsData, ThrowOnError>): RequestResult<AuditServiceListAuditLogsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<AuditServiceListAuditLogsResponses, unknown, ThrowOnError>({ url: '/api/v1/system/audit-logs', ...options });
+
+/**
+ * Export is asynchronous: registers a generation job and returns
+ * immediately.
+ */
+export const auditServiceExportAuditLogs = <ThrowOnError extends boolean = false>(options: Options<AuditServiceExportAuditLogsData, ThrowOnError>): RequestResult<AuditServiceExportAuditLogsResponses, unknown, ThrowOnError> => (options.client ?? client).post<AuditServiceExportAuditLogsResponses, unknown, ThrowOnError>({
+    url: '/api/v1/system/audit-logs/export',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const auditServiceListAuditExports = <ThrowOnError extends boolean = false>(options?: Options<AuditServiceListAuditExportsData, ThrowOnError>): RequestResult<AuditServiceListAuditExportsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<AuditServiceListAuditExportsResponses, unknown, ThrowOnError>({ url: '/api/v1/system/audit-logs/exports', ...options });
 
 export const authServiceLogin = <ThrowOnError extends boolean = false>(options: Options<AuthServiceLoginData, ThrowOnError>): RequestResult<AuthServiceLoginResponses, unknown, ThrowOnError> => (options.client ?? client).post<AuthServiceLoginResponses, unknown, ThrowOnError>({
     url: '/api/v1/system/auth/login',
@@ -210,6 +225,28 @@ export const transferServiceRaw = <ThrowOnError extends boolean = false>(options
  * Subscribe to events via SSE.
  */
 export const transferServiceSubscribe = <ThrowOnError extends boolean = false>(options?: Options<TransferServiceSubscribeData, ThrowOnError>): RequestResult<TransferServiceSubscribeResponses, unknown, ThrowOnError> => (options?.client ?? client).get<TransferServiceSubscribeResponses, unknown, ThrowOnError>({ url: '/api/v1/system/transfer/subscribe', ...options });
+
+export const filePresignServiceCreateUpload = <ThrowOnError extends boolean = false>(options: Options<FilePresignServiceCreateUploadData, ThrowOnError>): RequestResult<FilePresignServiceCreateUploadResponses, unknown, ThrowOnError> => (options.client ?? client).post<FilePresignServiceCreateUploadResponses, unknown, ThrowOnError>({
+    url: '/api/v1/system/uploads',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const filePresignServiceAbortUpload = <ThrowOnError extends boolean = false>(options: Options<FilePresignServiceAbortUploadData, ThrowOnError>): RequestResult<FilePresignServiceAbortUploadResponses, unknown, ThrowOnError> => (options.client ?? client).delete<FilePresignServiceAbortUploadResponses, unknown, ThrowOnError>({ url: '/api/v1/system/uploads/{id}', ...options });
+
+export const filePresignServiceConfirmUpload = <ThrowOnError extends boolean = false>(options: Options<FilePresignServiceConfirmUploadData, ThrowOnError>): RequestResult<FilePresignServiceConfirmUploadResponses, unknown, ThrowOnError> => (options.client ?? client).post<FilePresignServiceConfirmUploadResponses, unknown, ThrowOnError>({
+    url: '/api/v1/system/uploads/{id}/confirm',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const filePresignServiceListUploadedParts = <ThrowOnError extends boolean = false>(options: Options<FilePresignServiceListUploadedPartsData, ThrowOnError>): RequestResult<FilePresignServiceListUploadedPartsResponses, unknown, ThrowOnError> => (options.client ?? client).get<FilePresignServiceListUploadedPartsResponses, unknown, ThrowOnError>({ url: '/api/v1/system/uploads/{id}/parts', ...options });
 
 export const userServiceListUsers = <ThrowOnError extends boolean = false>(options?: Options<UserServiceListUsersData, ThrowOnError>): RequestResult<UserServiceListUsersResponses, unknown, ThrowOnError> => (options?.client ?? client).get<UserServiceListUsersResponses, unknown, ThrowOnError>({ url: '/api/v1/system/users', ...options });
 

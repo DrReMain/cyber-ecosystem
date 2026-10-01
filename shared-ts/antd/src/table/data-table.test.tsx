@@ -68,30 +68,56 @@ describe("DataTable", () => {
     expect(screen.getByRole("button", { name: "新建" })).toBeTruthy();
   });
 
-  it("shows the selection bar while rows are selected and clears through onChange", () => {
+  it("hides the checkbox column until select mode is toggled on", () => {
+    const { container } = render(
+      <DataTable<Row>
+        columns={baseColumns}
+        dataSource={rows}
+        rowKey="id"
+        rowSelection={{ selectedRowKeys: [], onChange: vi.fn() }}
+        selection={{ labels: { selected: (n) => `已选择 ${n} 项`, clear: "清空", mode: "选择" } }}
+      />,
+    );
+    expect(container.querySelectorAll(".ant-table-selection-column").length).toBe(0);
+    fireEvent.click(screen.getByRole("button", { name: "选择" }));
+    expect(container.querySelectorAll(".ant-table-selection-column").length).toBeGreaterThan(0);
+    expect(screen.getByText("已选择 0 项")).toBeTruthy();
+  });
+
+  it("shows the alert bar in select mode and clears through onChange", () => {
     const onChange = vi.fn();
-    const { rerender } = render(
+    render(
       <DataTable<Row>
         columns={baseColumns}
         dataSource={rows}
         rowKey="id"
         rowSelection={{ selectedRowKeys: ["1"], onChange }}
-        selection={{ labels: { selected: (n) => `已选择 ${n} 项`, clear: "清空" } }}
+        selection={{ labels: { selected: (n) => `已选择 ${n} 项`, clear: "清空", mode: "选择" } }}
       />,
     );
+    fireEvent.click(screen.getByRole("button", { name: "选择" }));
     expect(screen.getByText("已选择 1 项")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "清空" }));
     expect(onChange).toHaveBeenCalledWith([], [], { type: "none" });
+  });
 
-    rerender(
+  it("exits select mode through the alert close and resets keys", () => {
+    const onChange = vi.fn();
+    const { container } = render(
       <DataTable<Row>
         columns={baseColumns}
         dataSource={rows}
         rowKey="id"
-        rowSelection={{ selectedRowKeys: [], onChange }}
-        selection={{ labels: { selected: (n) => `已选择 ${n} 项`, clear: "清空" } }}
+        rowSelection={{ selectedRowKeys: ["1"], onChange }}
+        selection={{ labels: { selected: (n) => `已选择 ${n} 项`, clear: "清空", mode: "选择" } }}
       />,
     );
+    fireEvent.click(screen.getByRole("button", { name: "选择" }));
+    const closeBtn = container.querySelector("button.ant-alert-close-icon");
+    expect(closeBtn).toBeTruthy();
+    fireEvent.click(closeBtn as HTMLButtonElement);
+    expect(onChange).toHaveBeenCalledWith([], [], { type: "none" });
+    expect(container.querySelectorAll(".ant-table-selection-column").length).toBe(0);
     expect(screen.queryByText(/已选择/)).toBeNull();
   });
 });

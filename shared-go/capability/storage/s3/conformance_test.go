@@ -38,9 +38,9 @@ func TestLiveConformance(t *testing.T) {
 		Bucket:             os.Getenv("S3_CONFORMANCE_BUCKET"),
 		Region:             "us-east-1",
 		UsePathStyle:       true,
-		MaxFileSize:        52428800, // 50 MiB
-		MultipartThreshold: 8388608,  // 8 MiB
-		PartSize:           5242880,  // 5 MiB
+		MaxFileSize:        2147483648, // 2 GiB
+		MultipartThreshold: 8388608,    // 8 MiB
+		PartSize:           5242880,    // 5 MiB
 		PresignTTL:         15 * time.Minute,
 	}
 	if cfg.Bucket == "" {
@@ -86,7 +86,7 @@ func TestLiveConformance(t *testing.T) {
 
 	t.Run("content-type-passthrough", func(t *testing.T) {
 		// Unsigned Content-Type must still be stored; failure = Confirm-time
-		// metadata backfill breaks (G4 closure).
+		// metadata backfill breaks.
 		obj, err := s.Object.Stat(ctx, key)
 		if err != nil {
 			t.Fatalf("Stat: %v", err)
@@ -111,7 +111,7 @@ func TestLiveConformance(t *testing.T) {
 
 	t.Run("get-response-overrides", func(t *testing.T) {
 		// response-* overrides signed into a presigned GET; failure = download
-		// filename/inline control breaks (G3).
+		// filename/inline control breaks.
 		disposition := `attachment; filename="probe.txt"`
 		url, err := s.Presign.PresignDownload(ctx, key, time.Minute, storage.DownloadOptions{
 			ContentType:        "text/plain; charset=utf-8",
@@ -260,6 +260,58 @@ func TestLiveConformance(t *testing.T) {
 			t.Errorf("assembled size = %d, want %d — part data lost", st.Size, len(part1)+len(part2))
 		}
 		defer func() { _ = s.Object.Delete(ctx, mKey) }()
+	})
+
+	t.Run("multipart-session-sweep", func(t *testing.T) {
+		// Bucket-level enumeration of in-progress sessions — the orphan-sweep
+		// primitive. Drift here means crashed-upload sessions leak forever with
+		// no metadata row to find them by.
+		sPrefix := fmt.Sprintf("conformance/sweep-%d-", suffix)
+		id1, err := s.Multipart.Create(ctx, sPrefix+"a.bin", "application/octet-stream")
+		if err != nil {
+			t.Fatalf("Create(a): %v", err)
+		}
+		id2, err := s.Multipart.Create(ctx, sPrefix+"b.bin", "application/octet-stream")
+		if err != nil {
+			t.Fatalf("Create(b): %v", err)
+		}
+		defer func() {
+			_ = s.Multipart.Abort(ctx, sPrefix+"a.bin", id1)
+			_ = s.Multipart.Abort(ctx, sPrefix+"b.bin", id2)
+		}()
+		seen := map[string]string{}
+		if err := s.Multipart.ListMultipartUploads(ctx, sPrefix, func(u storage.PendingUpload) error {
+			seen[u.Key] = u.UploadID
+			if u.Initiated.IsZero() {
+				// Documented drift: SeaweedFS omits Initiated. Listing stays a
+				// hard pass; age-based decisions must use a row-join instead.
+				t.Logf("drift: session %q has no Initiated timestamp — age-based sweep clocks cannot depend on it", u.Key)
+			} else if time.Since(u.Initiated) > 5*time.Minute {
+				t.Errorf("session %q Initiated %v is stale for a fresh session", u.Key, u.Initiated)
+			}
+			return nil
+		}); err != nil {
+			t.Fatalf("ListMultipartUploads: %v", err)
+		}
+		if seen[sPrefix+"a.bin"] != id1 || seen[sPrefix+"b.bin"] != id2 {
+			t.Errorf("prefix listing = %v, want both fresh sessions (a=%q b=%q) — prefix filter or listing drift", seen, id1, id2)
+		}
+		if err := s.Multipart.Abort(ctx, sPrefix+"a.bin", id1); err != nil {
+			t.Fatalf("Abort(a): %v", err)
+		}
+		after := map[string]bool{}
+		if err := s.Multipart.ListMultipartUploads(ctx, sPrefix, func(u storage.PendingUpload) error {
+			after[u.Key] = true
+			return nil
+		}); err != nil {
+			t.Fatalf("ListMultipartUploads after abort: %v", err)
+		}
+		if after[sPrefix+"a.bin"] {
+			t.Errorf("aborted session still listed — the sweep would never reclaim it")
+		}
+		if !after[sPrefix+"b.bin"] {
+			t.Errorf("surviving session missing from listing")
+		}
 	})
 
 	t.Run("copy-object", func(t *testing.T) {

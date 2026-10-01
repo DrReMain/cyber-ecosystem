@@ -281,12 +281,12 @@ call `view(error)` internally and branch only on `silent`; catchers pass
 
 UI surfaces split by scale:
 
-- **Base full page** (`features/app/error-page`): the brand-screen sibling
-  of NotFoundPage — same deep-space canvas, amber reserved as the error
+- **Base full page** (`features/app/error/error-page`): the brand-screen sibling
+  of NotFoundPage — same deep-space canvas, rose reserved as the error
   semantics' only seat. The hero numeral is the envelope's wire `http`
   (kind-profile default when local); silent words render a quiet page
   without error chrome. Wired only at `__root`'s `errorComponent`.
-- **Base embedded** (`features/app/error-fallback`): single-scale,
+- **Base embedded** (`features/app/error/error-fallback`): single-scale,
   zero-skin — one row (badge + title + optional retry link) on the
   currentColor ladder, zero motion; pairs with `pending-fallback` as the
   uncertainty pair (halted/live halves), style-neutral so any area can
@@ -296,7 +296,7 @@ UI surfaces split by scale:
   where the host height is definite, `grow` where it is a flex column;
   slots that center them supply one of the two (the content-area
   watermark wrapper is a flex column, the root slot a min-h-svh rail).
-- **Base component-level** (`features/app/base-error-boundary`):
+- **Base component-level** (`features/app/error/base-error-boundary`):
   react-error-boundary with `resetKeys=[leafRouteId]` — TanStack Router
   swaps outlet children without remounting the boundary, so without a
   route-scoped reset key a rendered fallback sticks across navigation.

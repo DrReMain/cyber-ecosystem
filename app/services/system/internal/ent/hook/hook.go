@@ -8,6 +8,18 @@ import (
 	"fmt"
 )
 
+// The AuditExportFunc type is an adapter to allow the use of ordinary
+// function as AuditExport mutator.
+type AuditExportFunc func(context.Context, *ent.AuditExportMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AuditExportFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AuditExportMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AuditExportMutation", m)
+}
+
 // The AuditLogFunc type is an adapter to allow the use of ordinary
 // function as AuditLog mutator.
 type AuditLogFunc func(context.Context, *ent.AuditLogMutation) (ent.Value, error)

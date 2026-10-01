@@ -28,5 +28,6 @@
   "common_column_settings_reset": "リセット",
   "common_save": "保存",
   "common_cancel": "キャンセル",
-  "common_user_deleted": "削除済み"
+  "common_user_deleted": "削除済み",
+  "common_upload_too_large": "ファイルがアップロード上限 {max} を超えています"
 }

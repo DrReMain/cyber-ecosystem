@@ -1,7 +1,8 @@
 import type { CardProps, TableProps } from "antd";
-import { Button, Card, Empty, Flex, Space, Table, Typography } from "antd";
+import { Alert, Button, Card, Empty, Flex, Space, Table, Tooltip } from "antd";
+import { ListChecks } from "lucide-react";
 import type { ComponentProps, ReactNode, Ref } from "react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { ColumnSettingsConfig, ColumnSettingsEntry } from "./column-settings";
 import { ColumnSettingsPopover, useColumnVisibility } from "./column-settings";
 import type { TableToolbarLabels } from "./table-toolbar";
@@ -16,9 +17,11 @@ import { useTable } from "./use-table";
 // Wiring points for capabilities that are business decisions, not defaults:
 //   - toolbar.tools        — right-cluster slot (export and friends)
 //   - toolbar.extra        — left slot (create button, counters…)
-//   - selection.actions    — batch-action buttons shown while rows are
-//                            selected (the bar itself renders on any
-//                            non-empty controlled rowSelection)
+//   - selection            — opts into explicit select mode: a toolbar
+//                            toggle (placed before column settings) reveals
+//                            the checkbox column and an alert bar; leaving
+//                            the mode resets the caller-held keys through
+//                            the standard onChange channel
 //   - columnSettings       — per-table visibility dropdown over column ids
 //                            (key ?? dataIndex, arrays joined with "."),
 //                            persisted as the hidden list so new columns
@@ -39,6 +42,7 @@ export interface DataTableSelection {
   labels?: {
     selected?: (count: number) => string;
     clear?: string;
+    mode?: string;
   };
 }
 
@@ -121,7 +125,24 @@ export function DataTable<T extends object>({
         ),
       }
     : table.locale;
+  // A selection prop opts the table into explicit select mode: the checkbox
+  // column and the alert bar exist only while the mode is on, and leaving
+  // the mode resets the caller-held keys through the standard onChange
+  // channel — the table never owns the selection itself.
+  const selectionEnabled = selection !== undefined;
+  const [selectMode, setSelectMode] = useState(false);
   const selectedCount = rowSelection?.selectedRowKeys?.length ?? 0;
+  const clearSelection = () => rowSelection?.onChange?.([], [], { type: "none" });
+  const exitSelectMode = () => {
+    clearSelection();
+    setSelectMode(false);
+  };
+  const modeLabel = selection?.labels?.mode ?? "Select rows";
+  const activeRowSelection = selectionEnabled
+    ? selectMode
+      ? rowSelection
+      : undefined
+    : rowSelection;
   return (
     <Card {...cardProps}>
       <Flex gap={16} vertical>
@@ -133,36 +154,50 @@ export function DataTable<T extends object>({
           onSizeChange={setTableSize}
           size={tableSize}
           tools={
-            columnSettings ? (
-              <>
-                <ColumnSettingsPopover
-                  config={columnSettings}
-                  entries={settingsEntries}
-                  visibleIds={visibleIds}
-                />
-                {toolbar?.tools}
-              </>
-            ) : (
-              toolbar?.tools
-            )
+            <>
+              {selectionEnabled && (
+                <Tooltip title={modeLabel}>
+                  <span className="inline-flex">
+                    <Button
+                      aria-label={modeLabel}
+                      color={selectMode ? "primary" : "default"}
+                      icon={<ListChecks size={14} />}
+                      onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
+                      variant="filled"
+                    />
+                  </span>
+                </Tooltip>
+              )}
+              {columnSettings ? (
+                <>
+                  <ColumnSettingsPopover
+                    config={columnSettings}
+                    entries={settingsEntries}
+                    visibleIds={visibleIds}
+                  />
+                  {toolbar?.tools}
+                </>
+              ) : (
+                toolbar?.tools
+              )}
+            </>
           }
         />
-        {rowSelection && selectedCount > 0 && (
-          <Flex align="center" gap={12} justify="space-between">
-            <Space size={12}>
-              <Typography.Text type="secondary">
-                {(selection?.labels?.selected ?? ((n) => `Selected ${n}`))(selectedCount)}
-              </Typography.Text>
-              <Button
-                onClick={() => rowSelection.onChange?.([], [], { type: "none" })}
-                size="small"
-                type="link"
-              >
-                {selection?.labels?.clear ?? "Clear"}
-              </Button>
-            </Space>
-            <Space>{selection?.actions}</Space>
-          </Flex>
+        {selectionEnabled && selectMode && (
+          <Alert
+            action={
+              <Space size={12}>
+                <Button onClick={clearSelection} size="small" type="link">
+                  {selection?.labels?.clear ?? "Clear"}
+                </Button>
+                {selection?.actions}
+              </Space>
+            }
+            closable={{ onClose: exitSelectMode }}
+            title={(selection?.labels?.selected ?? ((n) => `Selected ${n}`))(selectedCount)}
+            type="info"
+            variant="filled"
+          />
         )}
         {/* Spread first, defaults after: host props always win over the
             no-ops, while size stays owned by the global density. */}
@@ -172,7 +207,7 @@ export function DataTable<T extends object>({
           locale={locale}
           pagination={table.pagination ?? false}
           ref={ref}
-          rowSelection={rowSelection}
+          rowSelection={activeRowSelection}
           scroll={table.scroll ?? { x: "max-content" }}
           size={tableSize}
         />

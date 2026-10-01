@@ -68,7 +68,7 @@ export function TableToolbar({
         )}
         {onRefresh && (
           <Tooltip title={refreshLabel}>
-            <span>
+            <span className="inline-flex">
               <Button
                 aria-label={refreshLabel}
                 color="default"

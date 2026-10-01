@@ -17,15 +17,23 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationAuditServiceExportAuditLogs = "/cyber.system.v1.AuditService/ExportAuditLogs"
+const OperationAuditServiceListAuditExports = "/cyber.system.v1.AuditService/ListAuditExports"
 const OperationAuditServiceListAuditLogs = "/cyber.system.v1.AuditService/ListAuditLogs"
 
 type AuditServiceHTTPServer interface {
+	// ExportAuditLogs Export is asynchronous: registers a generation job and returns
+	// immediately.
+	ExportAuditLogs(context.Context, *ExportAuditLogsRequest) (*ExportAuditLogsResponse, error)
+	ListAuditExports(context.Context, *ListAuditExportsRequest) (*ListAuditExportsResponse, error)
 	ListAuditLogs(context.Context, *ListAuditLogsRequest) (*ListAuditLogsResponse, error)
 }
 
 func RegisterAuditServiceHTTPServer(s *http.Server, srv AuditServiceHTTPServer) {
 	r := s.Route("/")
 	r.Handle("GET", "/api/v1/system/audit-logs", _AuditService_ListAuditLogs0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/audit-logs/export", _AuditService_ExportAuditLogs0_HTTP_Handler(srv))
+	r.Handle("GET", "/api/v1/system/audit-logs/exports", _AuditService_ListAuditExports0_HTTP_Handler(srv))
 }
 
 func _AuditService_ListAuditLogs0_HTTP_Handler(srv AuditServiceHTTPServer) func(ctx http.Context) error {
@@ -47,7 +55,49 @@ func _AuditService_ListAuditLogs0_HTTP_Handler(srv AuditServiceHTTPServer) func(
 	}
 }
 
+func _AuditService_ExportAuditLogs0_HTTP_Handler(srv AuditServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ExportAuditLogsRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuditServiceExportAuditLogs)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ExportAuditLogs(ctx, req.(*ExportAuditLogsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ExportAuditLogsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuditService_ListAuditExports0_HTTP_Handler(srv AuditServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListAuditExportsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuditServiceListAuditExports)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListAuditExports(ctx, req.(*ListAuditExportsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListAuditExportsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AuditServiceHTTPClient interface {
+	// ExportAuditLogs Export is asynchronous: registers a generation job and returns
+	// immediately.
+	ExportAuditLogs(ctx context.Context, req *ExportAuditLogsRequest, opts ...http.CallOption) (rsp *ExportAuditLogsResponse, err error)
+	ListAuditExports(ctx context.Context, req *ListAuditExportsRequest, opts ...http.CallOption) (rsp *ListAuditExportsResponse, err error)
 	ListAuditLogs(ctx context.Context, req *ListAuditLogsRequest, opts ...http.CallOption) (rsp *ListAuditLogsResponse, err error)
 }
 
@@ -57,6 +107,41 @@ type AuditServiceHTTPClientImpl struct {
 
 func NewAuditServiceHTTPClient(client *http.Client) AuditServiceHTTPClient {
 	return &AuditServiceHTTPClientImpl{client}
+}
+
+// ExportAuditLogs Export is asynchronous: registers a generation job and returns
+// immediately.
+func (c *AuditServiceHTTPClientImpl) ExportAuditLogs(ctx context.Context, in *ExportAuditLogsRequest, opts ...http.CallOption) (*ExportAuditLogsResponse, error) {
+	var out ExportAuditLogsResponse
+	pattern := "/api/v1/system/audit-logs/export"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuditServiceExportAuditLogs),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuditServiceHTTPClientImpl) ListAuditExports(ctx context.Context, in *ListAuditExportsRequest, opts ...http.CallOption) (*ListAuditExportsResponse, error) {
+	var out ListAuditExportsResponse
+	pattern := "/api/v1/system/audit-logs/exports"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationAuditServiceListAuditExports),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *AuditServiceHTTPClientImpl) ListAuditLogs(ctx context.Context, in *ListAuditLogsRequest, opts ...http.CallOption) (*ListAuditLogsResponse, error) {
