@@ -45,8 +45,8 @@ func newApp(logger *slog.Logger, gs *grpc.Server, hs *http.Server, cs *connect.S
 		kratos.Metadata(map[string]string{}),
 		kratos.Logger(logger),
 		kratos.Server(gs, hs, cs),
-		kratos.BeforeStart(seeder.Run),
 		kratos.BeforeStart(lc.Start),
+		kratos.BeforeStart(seeder.Run),
 		kratos.AfterStop(lc.Stop),
 	}, health.Mount(hs)...)...)
 }
