@@ -49,6 +49,7 @@ export function Filter<T extends Record<string, unknown> = Record<string, unknow
 
   // Date ranges live in the form as one tuple key; the outside world (URL
   // search, request input) sees the flat name pair. Compose on the way in.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: rangeSignature pins the content of options
   const composedInitialValues = useMemo(() => {
     if (!initialValues) return initialValues;
     const iv = { ...(initialValues as Record<string, unknown>) };
@@ -59,7 +60,6 @@ export function Filter<T extends Record<string, unknown> = Record<string, unknow
       delete iv[z];
     }
     return iv as T;
-    // biome-ignore lint/correctness/useExhaustiveDependencies: rangeSignature pins the content of options
   }, [initialValues, rangeSignature]);
 
   // Sync form with URL-derived initialValues

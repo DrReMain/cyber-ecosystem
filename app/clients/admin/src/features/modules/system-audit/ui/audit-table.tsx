@@ -55,9 +55,7 @@ export function AuditTable({
       render: (_, event) => {
         const view = userRefView(event.actor, actorName, actorKnown);
         if (view.kind === "empty") {
-          return (
-            <span className="text-black/40 dark:text-white/40">{m.system_audit_anonymous()}</span>
-          );
+          return <span className="text-ink-tertiary">{m.system_audit_anonymous()}</span>;
         }
         if (view.kind === "raw") {
           return (
@@ -79,7 +77,7 @@ export function AuditTable({
         const namespace = sp?.pop();
         return (
           <span className="inline-flex items-baseline gap-0.5 text-[12px]">
-            <span className="text-black/45 dark:text-white/45">{`/${namespace}/`}</span>
+            <span className="text-ink-tertiary">{`/${namespace}/`}</span>
             <span className="font-black">{rpc}</span>
           </span>
         );

@@ -12,7 +12,7 @@
 services:
   system-migrate: # applies atlas versioned migrations, then exits
     profiles: ["app"]
-    image: arigaio/atlas:1.3.2 # version-aligned with the local @ariga/atlas CLI
+    image: arigaio/atlas:1.3.3 # version-aligned with the local @ariga/atlas CLI
     command:
       - migrate
       - apply

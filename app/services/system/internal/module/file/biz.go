@@ -41,6 +41,16 @@ const (
 	sweepTTLFactor  = 4
 	sweepKeyPrefix  = "f/"
 	retentionPeriod = 7 * 24 * time.Hour
+
+	// Beyond any live writer's max PROCESSING lifetime (generationTimeout +
+	// cleanupTimeout), with slack for scheduler slop and clock skew — older
+	// rows belong to a dead writer.
+	staleGenerationAfter = generationTimeout + cleanupTimeout + 5*time.Minute
+	recoveryInterval     = 5 * time.Minute
+
+	// Reviewed non-empty factory message: the ambient-tx guard fires only on
+	// developer misuse, where the message is the whole diagnosis.
+	errGenerateAmbientTx = "Generate must run outside a transaction; put domain rows in the record callback"
 )
 
 type countingReader struct {
@@ -107,7 +117,7 @@ type FileRP interface {
 	DeleteObject(ctx context.Context, key string) error
 	MarkGenerated(ctx context.Context, id string, size int64, etag string) error
 	MarkFailed(ctx context.Context, id string) error
-	FailProcessing(ctx context.Context) (int, error)
+	FailStaleProcessing(ctx context.Context, createdBefore time.Time) (int, error)
 	ListStaleUploading(ctx context.Context, createdBefore time.Time, afterID string, limit int) ([]*File, error)
 	ClaimUploading(ctx context.Context, id string, createdBefore time.Time) (bool, error)
 	FindByKey(ctx context.Context, key string) (*File, error)
@@ -117,6 +127,7 @@ type FileRP interface {
 	FindRefByKey(ctx context.Context, key string) (*File, error)
 	ListSoftDeleted(ctx context.Context, deletedBefore time.Time, afterID string, limit int) ([]*File, error)
 	ReclaimDeleted(ctx context.Context, id string, deletedBefore time.Time) (bool, error)
+	InAmbientTx(ctx context.Context) bool
 }
 
 // UC ------------------------------------------------------------------------------------------------------------------
@@ -145,7 +156,6 @@ func NewFileUC(logger *slog.Logger, tm shared.Transaction, fileRP FileRP, lc sha
 		sweepCtx:    sweepCtx,
 		sweepCancel: sweepCancel,
 	}
-	lc.OnStart(uc.RecoverGenerations)
 	lc.OnStart(uc.StartSweep)
 	lc.OnStop(uc.ShutdownGenerations)
 	lc.OnStop(uc.StopSweep)
@@ -217,6 +227,12 @@ func (uc *FileUC) MintUrls(ctx context.Context, ids []string) ([]*UrlMint, error
 }
 
 func (uc *FileUC) Generate(ctx context.Context, spec *GenerationSpec, record func(context.Context, *File) error) (*File, error) {
+	// Fail loud, not late: InTx joins an ambient tx, so a caller-side tx
+	// would have the task launch before that tx commits — writing against a
+	// row that may never exist. Domain rows ride the record callback.
+	if uc.fileRP.InAmbientTx(ctx) {
+		return nil, errorspb.ErrorGeneralErrorInternal(errGenerateAmbientTx)
+	}
 	ownerID, err := subjectUserID(ctx)
 	if err != nil {
 		return nil, err
@@ -245,23 +261,10 @@ func (uc *FileUC) Generate(ctx context.Context, spec *GenerationSpec, record fun
 		return nil, err
 	}
 	// Post-commit launch: the task must not write against a rolled-back row.
-	// InTx joins an ambient transaction, so Generate assumes it is the
-	// top-level entry — a caller-side tx would launch before its own commit.
+	// The entry guard rejects ambient transactions, so the row is committed
+	// by the time InTx returns here.
 	uc.runGeneration(f, spec)
 	return f, nil
-}
-
-func (uc *FileUC) RecoverGenerations(ctx context.Context) error {
-	// The only writer of PROCESSING died with the previous process;
-	// re-requesting a generation is cheap, so boot fails them outright.
-	n, err := uc.fileRP.FailProcessing(ctx)
-	if err != nil {
-		return err
-	}
-	if n > 0 {
-		uc.Log.Info("recovered stale generations", "count", n)
-	}
-	return nil
 }
 
 func (uc *FileUC) ShutdownGenerations(context.Context) error {
@@ -282,8 +285,9 @@ func (uc *FileUC) ShutdownGenerations(context.Context) error {
 }
 
 func (uc *FileUC) StartSweep(ctx context.Context) error {
-	uc.sweepWG.Add(1)
+	uc.sweepWG.Add(2)
 	go uc.sweepLoop()
+	go uc.recoveryLoop()
 	return nil
 }
 
@@ -298,16 +302,14 @@ func (uc *FileUC) StopSweep(context.Context) error {
 // Private -------------------------------------------------------------------------------------------------------------
 
 func (uc *FileUC) runGeneration(f *File, spec *GenerationSpec) {
-	uc.genWG.Add(1)
-	go func() {
-		defer uc.genWG.Done()
+	uc.genWG.Go(func() {
 		// genCtx is cancelled at shutdown; the timeout caps a runaway job.
 		ctx, cancel := context.WithTimeout(uc.genCtx, generationTimeout)
 		defer cancel()
 		if err := uc.generate(ctx, f, spec); err != nil {
 			uc.Log.Warn("file generation failed", "id", f.ID, "key", f.Key, "error", err)
 		}
-	}()
+	})
 }
 
 func (uc *FileUC) generate(ctx context.Context, f *File, spec *GenerationSpec) error {
@@ -356,6 +358,35 @@ func (uc *FileUC) sweepLoop() {
 		case <-t.C:
 			uc.runSweep(uc.sweepCtx)
 		}
+	}
+}
+
+func (uc *FileUC) recoveryLoop() {
+	defer uc.sweepWG.Done()
+	// Same catch-up semantics as the sweep loop, but bounded by age — never by
+	// boot assumptions: a live replica may be mid-generation elsewhere.
+	uc.runRecovery(uc.sweepCtx)
+	t := time.NewTicker(recoveryInterval)
+	defer t.Stop()
+	for {
+		select {
+		case <-uc.sweepCtx.Done():
+			return
+		case <-t.C:
+			uc.runRecovery(uc.sweepCtx)
+		}
+	}
+}
+
+func (uc *FileUC) runRecovery(ctx context.Context) {
+	cut := time.Now().Add(-staleGenerationAfter)
+	n, err := uc.fileRP.FailStaleProcessing(ctx, cut)
+	if err != nil {
+		uc.Log.Warn("generation recovery: fail stale processing", "error", err)
+		return
+	}
+	if n > 0 {
+		uc.Log.Info("recovered stale generations", "count", n)
 	}
 }
 

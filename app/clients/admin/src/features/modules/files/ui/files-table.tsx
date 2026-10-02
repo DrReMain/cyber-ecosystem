@@ -208,9 +208,7 @@ export function FilesTable({
             <span className="inline-flex min-w-0 items-center gap-1">
               <span
                 className={
-                  view.deleted
-                    ? "font-mono text-[12px]"
-                    : "font-mono text-[12px] text-black/40 dark:text-white/40"
+                  view.deleted ? "font-mono text-[12px]" : "font-mono text-[12px] text-ink-tertiary"
                 }
               >
                 {view.id}
@@ -219,7 +217,7 @@ export function FilesTable({
             </span>
           );
         }
-        return <span className="text-black/40 dark:text-white/40">-</span>;
+        return <span className="text-ink-tertiary">-</span>;
       },
     },
     {

@@ -84,7 +84,7 @@ function DenyCell({ deny }: Readonly<{ deny: string | undefined }>) {
     <span className="flex flex-col items-start">
       <span className="flex items-baseline gap-1.5">
         {denyLabel(deny)}
-        <span className="font-mono text-[12px] text-black/45 dark:text-white/45">{deny}</span>
+        <span className="font-mono text-[12px] text-ink-tertiary">{deny}</span>
       </span>
       {hint !== undefined && (
         <Typography.Text className="text-[12px]" type="secondary">

@@ -155,7 +155,9 @@ message RoleGrant {
   repeated string policy_ids = 3 [(buf.validate.field).repeated = {
     max_items: 16
     unique: true
-    items: {string: {len: 20}}
+    items: {
+      string: {len: 20}
+    }
   }];
 }
 
@@ -205,7 +207,9 @@ message UpdateRoleRequest {
   repeated string fields_mask = 100 [(buf.validate.field).repeated = {
     min_items: 1
     unique: true
-    items: {string: {pattern: "^(name|remark|grants)$"}}
+    items: {
+      string: {pattern: "^(name|remark|grants)$"}
+    }
   }];
 }
 

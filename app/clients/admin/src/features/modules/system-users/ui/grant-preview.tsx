@@ -67,7 +67,7 @@ export function GrantPreview({ operations, catalog, loading }: Readonly<GrantPre
   }
   if (operations.length === 0) {
     return (
-      <div className="rounded-lg bg-black/3 px-3 py-3 dark:bg-white/5">
+      <div className="rounded-lg bg-fill-quaternary px-3 py-3">
         <Typography.Text className="text-[12px]" type="secondary">
           {m.system_users_preview_empty()}
         </Typography.Text>
@@ -78,7 +78,7 @@ export function GrantPreview({ operations, catalog, loading }: Readonly<GrantPre
   return (
     <div
       className={clsx(
-        "flex flex-col gap-2 rounded-lg bg-black/3 px-3 py-2 transition-opacity dark:bg-white/5",
+        "flex flex-col gap-2 rounded-lg bg-fill-quaternary px-3 py-2 transition-opacity",
         loading && "opacity-60",
       )}
     >
@@ -89,7 +89,7 @@ export function GrantPreview({ operations, catalog, loading }: Readonly<GrantPre
         <>
           <span className="flex items-baseline gap-2">
             <span className="font-medium text-[13px]">{m.system_users_preview_all_services()}</span>
-            <span className="font-mono text-[11px] text-black/40 dark:text-white/40">/*</span>
+            <span className="font-mono text-[11px] text-ink-tertiary">/*</span>
           </span>
           {foldedServices > 0 && (
             <Typography.Text className="text-[12px]" type="secondary">

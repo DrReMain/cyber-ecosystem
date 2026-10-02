@@ -48,6 +48,8 @@ func (r *authzRP) hydrateScopes(ctx context.Context, userID string, views []Gran
 }
 
 func (r *authzRP) resolveDeptSubtree(ctx context.Context, client *ent.Client, deptID string) ([]string, error) {
+	// Full dept scan per call — every Decide of a dept_tree holder pays it;
+	// the first authz hot path to fold into the versioned snapshot.
 	rows, err := client.Dept.Query().Select(dept.FieldID, dept.FieldParentID).All(ctx)
 	if err != nil {
 		return nil, r.Platform.HandleEntError(fmt.Errorf("authz hydrate: load dept tree: %w", err))

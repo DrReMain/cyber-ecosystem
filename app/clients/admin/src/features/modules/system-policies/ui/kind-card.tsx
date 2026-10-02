@@ -28,7 +28,7 @@ export function KindCard({ selected, icon, title, desc, onSelect }: Readonly<Kin
         {title}
         {selected ? <Check className="ms-auto" color={token.colorPrimary} size={14} /> : null}
       </span>
-      <span className="text-[12px] text-black/45 dark:text-white/45">{desc}</span>
+      <span className="text-[12px] text-ink-tertiary">{desc}</span>
     </button>
   );
 }

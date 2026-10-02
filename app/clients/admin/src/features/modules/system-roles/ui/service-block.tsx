@@ -59,8 +59,8 @@ export function ServiceBlock({
     expanded.has(op) || (grants[op]?.policies.length ?? 0) > 0;
 
   return (
-    <div className="rounded-lg border border-black/8 dark:border-white/8">
-      <div className="flex items-center gap-2 border-black/5 border-b px-3 py-2 dark:border-white/5">
+    <div className="rounded-lg border border-line-soft">
+      <div className="flex items-center gap-2 border-line-soft border-b px-3 py-2">
         <Checkbox
           checked={covered === svc.methods.length && covered > 0}
           disabled={globalOn}
@@ -78,11 +78,11 @@ export function ServiceBlock({
           onClick={onToggle}
           type="button"
         >
-          <span className="min-w-0 flex-1 truncate font-mono text-[13px] text-black/40 dark:text-white/40">
+          <span className="min-w-0 flex-1 truncate font-mono text-[13px] text-ink-tertiary">
             {svc.fullName}
           </span>
           <ChevronDown
-            className={`size-3.5 shrink-0 text-black/35 transition-transform dark:text-white/35 ${open ? "" : "-rotate-90"}`}
+            className={`size-3.5 shrink-0 text-ink-quaternary transition-transform ${open ? "" : "-rotate-90"}`}
           />
         </button>
       </div>
@@ -93,7 +93,7 @@ export function ServiceBlock({
               <div className="flex flex-col gap-1">
                 <div className="flex gap-2">
                   <span className="text-[14px]">{m.system_roles_perm_wildcard()}</span>
-                  <span className="inline-flex items-center gap-2 rounded bg-black/9 px-1.5 py-0.5 font-mono text-[12px] dark:bg-black">
+                  <span className="inline-flex items-center gap-2 rounded bg-fill-secondary px-1.5 py-0.5 font-mono text-[12px]">
                     {svc.fullName}/*
                   </span>
                 </div>

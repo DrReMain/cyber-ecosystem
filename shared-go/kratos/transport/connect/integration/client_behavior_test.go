@@ -14,9 +14,7 @@ package integration
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
-	"net"
 	"net/http"
 	"sync/atomic"
 	"testing"
@@ -26,7 +24,6 @@ import (
 	kerrors "github.com/go-kratos/kratos/v3/errors"
 	"github.com/go-kratos/kratos/v3/middleware"
 	"github.com/go-kratos/kratos/v3/transport"
-	"golang.org/x/net/http2"
 
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 	testpb "cyber-ecosystem/shared-go/kratos/transport/connect/testpb"
@@ -203,13 +200,9 @@ func (c *countingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 // test server is h2c-only) in a counter and assert RoundTrip is invoked for a
 // unary call.
 func TestClientCustomTransport(t *testing.T) {
-	h2cRT := &http2.Transport{
-		AllowHTTP: true,
-		DialTLSContext: func(ctx context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
-			var d net.Dialer
-			return d.DialContext(ctx, network, addr)
-		},
-	}
+	var protos http.Protocols
+	protos.SetUnencryptedHTTP2(true)
+	h2cRT := &http.Transport{Protocols: &protos}
 	counter := &countingRoundTripper{next: h2cRT}
 
 	cli, stop := startServerWithClient(t, connect.WithTransport(counter))

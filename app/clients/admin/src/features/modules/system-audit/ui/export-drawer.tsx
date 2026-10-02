@@ -98,9 +98,7 @@ export function ExportDrawer({
             </Typography.Text>
           </span>
         ) : (
-          <span className="text-black/40 dark:text-white/40">
-            {m.system_audit_export_file_deleted()}
-          </span>
+          <span className="text-ink-tertiary">{m.system_audit_export_file_deleted()}</span>
         ),
     },
     {

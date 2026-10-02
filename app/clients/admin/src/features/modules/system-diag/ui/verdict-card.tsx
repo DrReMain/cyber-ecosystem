@@ -83,7 +83,7 @@ export function VerdictCard({ result, roleByCode }: Readonly<VerdictCardProps>) 
                       className="flex flex-wrap items-center gap-2"
                       key={`${hit.roleCode}${hit.pattern}`}
                     >
-                      <span className="rounded bg-black/5 px-1.5 py-0.5 font-mono text-[12px] dark:bg-black/40">
+                      <span className="rounded bg-fill-tertiary px-1.5 py-0.5 font-mono text-[12px]">
                         {hit.pattern}
                       </span>
                       <Tag>

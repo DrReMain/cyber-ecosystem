@@ -20,6 +20,7 @@ function DefaultProvider({
     <ConfigProvider
       theme={{
         algorithm: compact ? [base, antdTheme.compactAlgorithm] : base,
+        token: tokens,
         components: {
           Layout: {
             bodyBg: tokens.colorBgLayout,

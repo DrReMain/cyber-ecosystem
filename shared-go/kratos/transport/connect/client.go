@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	stderrors "errors"
 	"io"
-	"net"
 	"net/http"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/go-kratos/kratos/v3/selector"
 	"github.com/go-kratos/kratos/v3/selector/wrr"
 	"github.com/go-kratos/kratos/v3/transport"
-	"golang.org/x/net/http2"
 )
 
 func init() {
@@ -335,13 +333,11 @@ func (rt *clientRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 
 func defaultRoundTripper(insecure bool, tlsConf *tls.Config, enableH2C bool) http.RoundTripper {
 	if insecure && enableH2C {
-		return &http2.Transport{
-			AllowHTTP: true,
-			DialTLSContext: func(ctx context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
-				var d net.Dialer
-				return d.DialContext(ctx, network, addr)
-			},
-		}
+		// UnencryptedHTTP2 without HTTP1 keeps the prior-knowledge h2c
+		// semantics of the legacy x/net/http2 AllowHTTP transport.
+		var protos http.Protocols
+		protos.SetUnencryptedHTTP2(true)
+		return &http.Transport{Protocols: &protos}
 	}
 	tr := &http.Transport{}
 	if tlsConf != nil {

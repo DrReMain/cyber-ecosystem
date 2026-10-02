@@ -9,7 +9,7 @@ export interface StoreDefinition<T = unknown> {
   key: string;
   initial: T;
   persist: boolean;
-  schema?: ZodType<T>;
+  schema?: ZodType<T, unknown>;
   immerAtom: WritableAtom<T, [value: T | ((draft: Draft<T>) => void)], void>;
   atom: WritableAtom<T, [update: T | ((draft: Draft<T>) => void)], void>;
 }
@@ -17,7 +17,7 @@ export interface StoreDefinition<T = unknown> {
 export interface StoreOptions<T = unknown> {
   persist?: boolean;
   debugLabel?: string;
-  schema?: ZodType<T>;
+  schema?: ZodType<T, unknown>;
 }
 
 const registry: StoreDefinition[] = [];

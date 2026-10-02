@@ -75,7 +75,7 @@ export function GrantTree({ catalog, grants, policies, onChange }: Readonly<Gran
   return (
     <div className="flex flex-col gap-3">
       {globalOn && (
-        <div className="flex flex-col gap-1 rounded-lg border border-black/8 px-3 py-2 dark:border-white/8">
+        <div className="flex flex-col gap-1 rounded-lg border border-line-soft px-3 py-2">
           <div className="flex min-h-9 items-center gap-2">
             <span className="text-[13px]">{m.system_roles_perm_global()}</span>
             {catalogDatascopeAny(catalog) && (
@@ -123,7 +123,7 @@ export function GrantTree({ catalog, grants, policies, onChange }: Readonly<Gran
           svc={svc}
         />
       ))}
-      <div className="rounded-md bg-black/3 px-3 py-2 dark:bg-white/5">
+      <div className="rounded-md bg-fill-quaternary px-3 py-2">
         <Typography.Text className="text-sm" type="secondary">
           {summary.global
             ? m.system_roles_perm_summary_global({ m: summary.services })

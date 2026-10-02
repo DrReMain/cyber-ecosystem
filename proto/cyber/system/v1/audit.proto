@@ -91,7 +91,9 @@ message ListAuditLogsResponse {
 message ExportAuditLogsRequest {
   repeated string ids = 1 [(buf.validate.field).repeated = {
     unique: true
-    items: {string: {len: 20}}
+    items: {
+      string: {len: 20}
+    }
   }];
 }
 

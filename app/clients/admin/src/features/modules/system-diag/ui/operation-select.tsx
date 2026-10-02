@@ -14,9 +14,7 @@ function operationOptions(services: GrantableView[]) {
         label: (
           <span className="flex items-center gap-2">
             <span>{mt.comment || mt.name}</span>
-            <span className="font-mono text-[12px] text-black/40 dark:text-white/40">
-              {mt.name}
-            </span>
+            <span className="font-mono text-[12px] text-ink-tertiary">{mt.name}</span>
           </span>
         ),
         search: `${mt.name} ${mt.comment ?? ""} ${svc.fullName}`,

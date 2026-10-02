@@ -153,7 +153,9 @@ message UpdateUserRequest {
   repeated string fields_mask = 100 [(buf.validate.field).repeated = {
     min_items: 1
     unique: true
-    items: {string: {pattern: "^(email|password|dept_id|roles|avatar)$"}}
+    items: {
+      string: {pattern: "^(email|password|dept_id|roles|avatar)$"}
+    }
   }];
 }
 

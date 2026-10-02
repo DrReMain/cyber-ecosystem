@@ -27,7 +27,8 @@
     "zod": "^4"
   },
   "devDependencies": {
-    "@types/react-dom": "^19",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "typescript": "7.0.2"
   }
 }

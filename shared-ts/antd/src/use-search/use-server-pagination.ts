@@ -21,7 +21,7 @@ function readNumber(
   fallback: number,
 ): number {
   if (!key) return fallback;
-  return ((state[key] as number | undefined) ?? (defaults[key] as number | undefined)) ?? fallback;
+  return (state[key] as number | undefined) ?? (defaults[key] as number | undefined) ?? fallback;
 }
 
 export function useServerPagination<T extends Record<string, unknown>>(

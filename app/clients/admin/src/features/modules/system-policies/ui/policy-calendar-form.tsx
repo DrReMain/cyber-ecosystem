@@ -50,7 +50,7 @@ export function PolicyCalendarForm({ draft, onChange }: Readonly<PolicyCalendarF
       <Typography.Text className="text-[12px]" type="secondary">
         {baseHint(draft.base)}
       </Typography.Text>
-      <div className="flex flex-col gap-2 border-black/8 border-t pt-3 dark:border-white/8">
+      <div className="flex flex-col gap-2 border-line-soft border-t pt-3">
         <span className="font-medium text-[13px]">{m.system_policies_cal_overrides_label()}</span>
         {draft.overrides.map((o, i) => {
           const bad = dups.has(o.date) || !isDateValid(o.date);

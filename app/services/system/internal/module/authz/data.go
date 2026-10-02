@@ -273,6 +273,12 @@ func (r *authzRP) rebuild(ctx context.Context, version int64) error {
 }
 
 func (r *authzRP) compileFromDB(ctx context.Context, version int64) (*snapshot, error) {
+	// Scaling posture: a version-gated full-table reload is deliberate —
+	// idempotent, multi-replica safe, no delta ordering; it runs at
+	// policy-edit frequency, not ticker frequency. The first pressure point
+	// under load is not this compile but hydrateScopes' per-request dept
+	// scan — snapshot the tree there (a dept change bumps the version)
+	// before touching anything here.
 	client := r.Platform.GetClient(ctx)
 	roles, err := client.Role.Query().All(ctx)
 	if err != nil {

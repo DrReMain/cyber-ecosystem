@@ -31,7 +31,7 @@ export function DeptMembers({ members, pendingId, onRemove }: Readonly<DeptMembe
         allowClear
         onChange={(e) => setQuery(e.target.value)}
         placeholder={m.system_depts_member_search_placeholder()}
-        prefix={<Search className="text-black/35 dark:text-white/35" size={14} />}
+        prefix={<Search className="text-ink-quaternary" size={14} />}
         value={query}
       />
       {visible.length === 0 ? (
@@ -47,7 +47,7 @@ export function DeptMembers({ members, pendingId, onRemove }: Readonly<DeptMembe
         <div className="flex flex-col gap-2">
           {visible.map((member) => (
             <div
-              className="flex items-center justify-between gap-2 rounded-lg border border-black/8 px-3 py-2 dark:border-white/8"
+              className="flex items-center justify-between gap-2 rounded-lg border border-line-soft px-3 py-2"
               key={member.userId}
             >
               <span className="text-[13px]">{member.email}</span>

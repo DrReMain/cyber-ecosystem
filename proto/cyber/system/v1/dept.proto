@@ -127,7 +127,9 @@ message UpdateDeptRequest {
   repeated string fields_mask = 100 [(buf.validate.field).repeated = {
     min_items: 1
     unique: true
-    items: {string: {pattern: "^(name|parent_id|remark)$"}}
+    items: {
+      string: {pattern: "^(name|parent_id|remark)$"}
+    }
   }];
 }
 

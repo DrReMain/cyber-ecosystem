@@ -105,7 +105,7 @@ export function RoleDrawer({
             mode === "edit" ? (
               <>
                 {m.system_roles_form_code()}
-                <span className="ms-1.5 font-normal text-[11px] text-black/40 dark:text-white/40">
+                <span className="ms-1.5 font-normal text-[11px] text-ink-tertiary">
                   {m.system_roles_form_code_hint()}
                 </span>
               </>

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 export const SIDEBAR_WIDTH_MIN = 160;
 export const SIDEBAR_WIDTH_MAX = 320;
+export const SIDEBAR_WIDTH_STEP = 10;
 export const SIDEBAR_COLLAPSED_WIDTH = 64;
 const SIDEBAR_WIDTH_DEFAULT = 220;
 
@@ -54,4 +55,8 @@ export const sidebarWidthAtom = atom(
     set(dashboardPreferencesStore.atom, (d) => {
       d.sidebar.width = Math.min(SIDEBAR_WIDTH_MAX, Math.max(SIDEBAR_WIDTH_MIN, Math.round(width)));
     }),
+);
+
+export const watermarkEnabledAtom = atom(
+  (get) => get(dashboardPreferencesStore.atom).watermark.enabled,
 );

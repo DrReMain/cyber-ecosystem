@@ -3,6 +3,7 @@ syntax = "proto3";
 package cyber.system.v1;
 
 import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/api/httpbody.proto";
@@ -93,6 +94,7 @@ service TransferService {
       action: ACTION_READ
     };
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
     option (google.api.http) = {get: "/api/v1/system/transfer/subscribe"};
   }
   // Echo back a summary of received messages.
@@ -102,6 +104,7 @@ service TransferService {
       action: ACTION_READ
     };
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
     option (google.api.http) = {get: "/api/v1/system/transfer/echo"};
   }
   // Bidirectional data pipe via WebSocket.
@@ -111,6 +114,7 @@ service TransferService {
       action: ACTION_READ
     };
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
     option (google.api.http) = {get: "/api/v1/system/transfer/pipe"};
   }
   // Return raw bytes via HttpBody.
@@ -121,6 +125,7 @@ service TransferService {
       action: ACTION_READ
     };
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
     option (google.api.http) = {
       post: "/api/v1/system/transfer/raw"
       body: "*"

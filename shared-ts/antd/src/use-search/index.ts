@@ -1,6 +1,6 @@
+export { makeSearchParser } from "./parse";
 export type { SearchPartition } from "./schema";
 export { getPartition, pageNoField, pageSizeField, sortField } from "./schema";
-export { makeSearchParser } from "./parse";
 export type { FilterControls, SearchStore, SortControls } from "./types";
 export { useFilter } from "./use-filter";
 export type { ServerPageEcho, ServerPaginationOptions } from "./use-server-pagination";

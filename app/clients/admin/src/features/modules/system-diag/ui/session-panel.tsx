@@ -26,7 +26,7 @@ export function SessionPanel({ email, permissions }: Readonly<SessionPanelProps>
                     <span className="flex flex-wrap gap-1">
                       {permissions.map((p) => (
                         <span
-                          className="rounded bg-black/5 px-1.5 py-0.5 font-mono text-[12px] dark:bg-black/40"
+                          className="rounded bg-fill-tertiary px-1.5 py-0.5 font-mono text-[12px]"
                           key={p}
                         >
                           {p}

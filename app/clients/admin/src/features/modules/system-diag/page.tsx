@@ -56,9 +56,7 @@ export function DiagPage() {
         label: (
           <span className="flex items-center gap-2">
             <span>{u.email?.split("@")[0]}</span>
-            <span className="font-mono text-[12px] text-black/40 dark:text-white/40">
-              {u.email}
-            </span>
+            <span className="font-mono text-[12px] text-ink-tertiary">{u.email}</span>
             {(u.roles ?? []).length === 0 && (
               <Typography.Text className="text-[12px]" type="secondary">
                 {m.system_users_unassigned()}

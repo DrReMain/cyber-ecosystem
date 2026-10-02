@@ -468,7 +468,7 @@ var File_cyber_system_v1_transfer_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_transfer_proto_rawDesc = "" +
 	"\n" +
-	"\x1ecyber/system/v1/transfer.proto\x12\x0fcyber.system.v1\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x19google/api/httpbody.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"L\n" +
+	"\x1ecyber/system/v1/transfer.proto\x12\x0fcyber.system.v1\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x19google/api/httpbody.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"L\n" +
 	"\x10SubscribeRequest\x12\x14\n" +
 	"\x05topic\x18\x01 \x01(\tR\x05topic\x12\"\n" +
 	"\rlast_event_id\x18\x02 \x01(\tR\vlastEventId\"\x9b\x01\n" +
@@ -499,15 +499,15 @@ const file_cyber_system_v1_transfer_proto_rawDesc = "" +
 	"\n" +
 	"RawRequest\x12!\n" +
 	"\fcontent_type\x18\x01 \x01(\tR\vcontentType\x12\x12\n" +
-	"\x04data\x18\x02 \x01(\fR\x04data2\xda\x04\n" +
-	"\x0fTransferService\x12\x9a\x01\n" +
-	"\tSubscribe\x12!.cyber.system.v1.SubscribeRequest\x1a\".cyber.system.v1.SubscribeResponse\"D\x88\xf1\x04\x02\x8a\xd3\x0e\x13\n" +
-	"\x0f订阅事件流\x10\x01\x82\xd3\xe4\x93\x02#\x12!/api/v1/system/transfer/subscribe0\x01\x12\x83\x01\n" +
-	"\x04Echo\x12\x1c.cyber.system.v1.EchoRequest\x1a\x1d.cyber.system.v1.EchoResponse\"<\x88\xf1\x04\x02\x8a\xd3\x0e\x10\n" +
-	"\f流式回显\x10\x01\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/system/transfer/echo(\x01\x12\x8b\x01\n" +
-	"\x04Pipe\x12\x1c.cyber.system.v1.PipeRequest\x1a\x1d.cyber.system.v1.PipeResponse\"B\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
-	"\x12双向数据管道\x10\x01\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/system/transfer/pipe(\x010\x01\x12~\n" +
-	"\x03Raw\x12\x1b.cyber.system.v1.RawRequest\x1a\x14.google.api.HttpBody\"D\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
+	"\x04data\x18\x02 \x01(\fR\x04data2\xeb\x04\n" +
+	"\x0fTransferService\x12\x9e\x01\n" +
+	"\tSubscribe\x12!.cyber.system.v1.SubscribeRequest\x1a\".cyber.system.v1.SubscribeResponse\"H\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x13\n" +
+	"\x0f订阅事件流\x10\x01\x82\xd3\xe4\x93\x02#\x12!/api/v1/system/transfer/subscribe0\x01\x12\x87\x01\n" +
+	"\x04Echo\x12\x1c.cyber.system.v1.EchoRequest\x1a\x1d.cyber.system.v1.EchoResponse\"@\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x10\n" +
+	"\f流式回显\x10\x01\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/system/transfer/echo(\x01\x12\x8f\x01\n" +
+	"\x04Pipe\x12\x1c.cyber.system.v1.PipeRequest\x1a\x1d.cyber.system.v1.PipeResponse\"F\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
+	"\x12双向数据管道\x10\x01\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/system/transfer/pipe(\x010\x01\x12\x82\x01\n" +
+	"\x03Raw\x12\x1b.cyber.system.v1.RawRequest\x1a\x14.google.api.HttpBody\"H\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
 	"\x12原始字节响应\x10\x01\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/system/transfer/raw\x1a\x16\x8a\xe2\t\x12流式传输原语B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (

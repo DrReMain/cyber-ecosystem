@@ -4,6 +4,54 @@
  * only place that knows antd exists - swapping the token source only touches
  * the right-hand column, business code stays unaware.
  */
+:root {
+  --fb-text: rgba(0, 0, 0, 0.88);
+  --fb-text-secondary: rgba(0, 0, 0, 0.65);
+  --fb-text-tertiary: rgba(0, 0, 0, 0.45);
+  --fb-text-quaternary: rgba(0, 0, 0, 0.25);
+  --fb-text-disabled: rgba(0, 0, 0, 0.25);
+  --fb-text-placeholder: rgba(0, 0, 0, 0.25);
+  --fb-text-inverse: #fff;
+  --fb-border: #d9d9d9;
+  --fb-border-secondary: #f0f0f0;
+  --fb-fill: rgba(0, 0, 0, 0.15);
+  --fb-fill-secondary: rgba(0, 0, 0, 0.06);
+  --fb-fill-tertiary: rgba(0, 0, 0, 0.04);
+  --fb-fill-quaternary: rgba(0, 0, 0, 0.02);
+  --fb-canvas: #fff;
+  --fb-container: #ffffff;
+  --fb-elevated: #ffffff;
+  --fb-layout: #f5f5f5;
+  --fb-primary: #1677ff;
+  --fb-primary-hover: #4096ff;
+  --fb-success: #52c41a;
+  --fb-warning: #faad14;
+  --fb-error: #ff4d4f;
+}
+.dark {
+  --fb-text: rgba(255, 255, 255, 0.85);
+  --fb-text-secondary: rgba(255, 255, 255, 0.65);
+  --fb-text-tertiary: rgba(255, 255, 255, 0.45);
+  --fb-text-quaternary: rgba(255, 255, 255, 0.25);
+  --fb-text-disabled: rgba(255, 255, 255, 0.25);
+  --fb-text-placeholder: rgba(255, 255, 255, 0.25);
+  --fb-text-inverse: #fff;
+  --fb-border: #424242;
+  --fb-border-secondary: #303030;
+  --fb-fill: rgba(255, 255, 255, 0.18);
+  --fb-fill-secondary: rgba(255, 255, 255, 0.12);
+  --fb-fill-tertiary: rgba(255, 255, 255, 0.08);
+  --fb-fill-quaternary: rgba(255, 255, 255, 0.04);
+  --fb-canvas: #000;
+  --fb-container: #141414;
+  --fb-elevated: #1f1f1f;
+  --fb-layout: #000000;
+  --fb-primary: #1668dc;
+  --fb-primary-hover: #3c89e8;
+  --fb-success: #49aa19;
+  --fb-warning: #d89614;
+  --fb-error: #dc4446;
+}
 
 /*
  * `inline` bakes the right-hand expression into each utility at its usage
@@ -13,34 +61,40 @@
  * :root-level variables (plain @theme) would resolve empty in this app.
  */
 @theme inline {
-  --color-primary: var(--ant-color-primary, #2563eb);
-  --color-success: var(--ant-color-success);
-  --color-warning: var(--ant-color-warning);
-  --color-error: var(--ant-color-error);
-  --color-primary-bright: color-mix(in srgb, var(--ant-color-primary, #2563eb) 85%, white);
+  --color-primary: var(--ant-color-primary, var(--fb-primary));
+  --color-success: var(--ant-color-success, var(--fb-success));
+  --color-warning: var(--ant-color-warning, var(--fb-warning));
+  --color-error: var(--ant-color-error, var(--fb-error));
+  --color-primary-bright: color-mix(
+    in srgb,
+    var(--ant-color-primary, var(--fb-primary)) 85%,
+    white
+  );
   /* Surfaces */
-  --color-canvas: var(--ant-color-bg-base);
-  --color-container: var(--ant-color-bg-container);
-  --color-elevated: var(--ant-color-bg-elevated);
-  --color-layout: var(--ant-color-bg-layout);
+  --color-canvas: var(--ant-color-bg-base, var(--fb-canvas));
+  --color-container: var(--ant-color-bg-container, var(--fb-container));
+  --color-elevated: var(--ant-color-bg-elevated, var(--fb-elevated));
+  --color-layout: var(--ant-color-bg-layout, var(--fb-layout));
   /* Ink scale */
-  --color-ink: var(--ant-color-text);
-  --color-ink-secondary: var(--ant-color-text-secondary);
-  --color-ink-tertiary: var(--ant-color-text-tertiary);
-  --color-ink-quaternary: var(--ant-color-text-quaternary);
-  --color-ink-heading: var(--ant-color-text-heading);
-  --color-ink-label: var(--ant-color-text-label);
-  --color-ink-description: var(--ant-color-text-description);
-  --color-ink-disabled: var(--ant-color-text-disabled);
-  --color-ink-placeholder: var(--ant-color-text-placeholder);
-  --color-ink-inverse: var(--ant-color-text-light-solid);
+  --color-ink: var(--ant-color-text, var(--fb-text));
+  --color-ink-secondary: var(--ant-color-text-secondary, var(--fb-text-secondary));
+  --color-ink-tertiary: var(--ant-color-text-tertiary, var(--fb-text-tertiary));
+  --color-ink-quaternary: var(--ant-color-text-quaternary, var(--fb-text-quaternary));
+  --color-ink-heading: var(--ant-color-text-heading, var(--fb-text));
+  --color-ink-label: var(--ant-color-text-label, var(--fb-text-secondary));
+  --color-ink-description: var(--ant-color-text-description, var(--fb-text-tertiary));
+  --color-ink-disabled: var(--ant-color-text-disabled, var(--fb-text-disabled));
+  --color-ink-placeholder: var(--ant-color-text-placeholder, var(--fb-text-placeholder));
+  --color-ink-inverse: var(--ant-color-text-light-solid, var(--fb-text-inverse));
   /* Hairlines */
-  --color-line: var(--ant-color-border);
-  --color-line-soft: var(--ant-color-border-secondary);
+  --color-line: var(--ant-color-border, var(--fb-border));
+  --color-line-soft: var(--ant-color-border-secondary, var(--fb-border-secondary));
+  --color-line-hover: var(--ant-color-primary-hover, var(--fb-primary-hover));
   /* Fills */
-  --color-fill: var(--ant-color-fill);
-  --color-fill-secondary: var(--ant-color-fill-secondary);
-  --color-fill-tertiary: var(--ant-color-fill-tertiary);
+  --color-fill: var(--ant-color-fill, var(--fb-fill));
+  --color-fill-secondary: var(--ant-color-fill-secondary, var(--fb-fill-secondary));
+  --color-fill-tertiary: var(--ant-color-fill-tertiary, var(--fb-fill-tertiary));
+  --color-fill-quaternary: var(--ant-color-fill-quaternary, var(--fb-fill-quaternary));
   /* Control radii (namespaced so Tailwind's default rounded-* stays intact) */
   --radius-control-sm: var(--ant-border-radius-sm);
   --radius-control: var(--ant-border-radius);

@@ -72,7 +72,7 @@ export function PolicyTimeWindowForm({ draft, onChange }: Readonly<PolicyTimeWin
           </Typography.Text>
         ) : null}
       </div>
-      <div className="flex flex-col gap-2 border-black/8 border-t pt-3 dark:border-white/8">
+      <div className="flex flex-col gap-2 border-line-soft border-t pt-3">
         <div className="flex items-center justify-center gap-1">
           {DAY_ORDER.map((d) => (
             <Checkbox

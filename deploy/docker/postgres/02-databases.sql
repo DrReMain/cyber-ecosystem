@@ -4,5 +4,9 @@
 --   system    -> ent/Atlas migrations (system:migrate:apply)
 -- Names are shared facts with the service configs (db_name / mq dsn).
 CREATE DATABASE atlas_dev;
+\connect atlas_dev
+DO $$ BEGIN EXECUTE 'CREATE EXTENSION IF NOT EXISTS vector'; EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'vector not installed, skipping'; END $$;
+\connect postgres
+
 CREATE DATABASE mq;
 CREATE DATABASE system;

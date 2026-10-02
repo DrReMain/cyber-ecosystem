@@ -145,7 +145,7 @@ export function PolicyDrawer({
               onChange={(calendar) => setTouched({ ...draft, calendar })}
             />
           )}
-          <div className="flex flex-col gap-1 border-black/8 border-t pt-3 dark:border-white/8">
+          <div className="flex flex-col gap-1 border-line-soft border-t pt-3">
             <div className="flex items-center gap-2">
               <Switch
                 checked={draft.enabled}

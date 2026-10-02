@@ -1,11 +1,11 @@
 # Custom PostgreSQL Image (pgvector + PostGIS)
 
-Extended PostgreSQL image based on `postgres:18.3-trixie` with pgvector and PostGIS pre-installed.
+Extended PostgreSQL image based on `postgres:18.6-trixie` with pgvector and PostGIS pre-installed.
 
 ## Build
 
 ```bash
-docker build -t pg-extended:18.3 .
+docker build -t pg-extended:18.6 .
 ```
 
 ## Usage

@@ -133,7 +133,7 @@ export function UserDrawer({
             mode === "edit" ? (
               <>
                 {m.system_users_form_email()}
-                <span className="ms-1.5 font-normal text-[11px] text-black/40 dark:text-white/40">
+                <span className="ms-1.5 font-normal text-[11px] text-ink-tertiary">
                   {m.system_users_form_email_hint()}
                 </span>
               </>
@@ -158,7 +158,7 @@ export function UserDrawer({
           <Form.Item label={m.system_users_form_password()} required>
             <div className="flex items-center gap-2">
               <Typography.Text
-                className="flex min-h-8 flex-1 items-center rounded-md border border-black/8 bg-black/2 px-3 font-mono text-[13px] dark:border-white/8 dark:bg-white/5"
+                className="flex min-h-8 flex-1 items-center rounded-md border border-line-soft bg-fill-quaternary px-3 font-mono text-[13px]"
                 copyable={{ text: password, tooltips: m.system_users_password_copy() }}
               >
                 {password}
@@ -226,7 +226,7 @@ export function UserDrawer({
           {resetResult !== null ? (
             <div className="flex items-center gap-2">
               <Typography.Text
-                className="flex min-h-8 flex-1 items-center rounded-md border border-black/8 bg-black/2 px-3 font-mono text-[13px] dark:border-white/8 dark:bg-white/5"
+                className="flex min-h-8 flex-1 items-center rounded-md border border-line-soft bg-fill-quaternary px-3 font-mono text-[13px]"
                 copyable={{ text: resetResult, tooltips: m.system_users_password_copy() }}
               >
                 {resetResult}

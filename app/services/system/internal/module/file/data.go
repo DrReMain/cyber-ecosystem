@@ -156,9 +156,12 @@ func (rp *fileRP) MarkFailed(ctx context.Context, id string) error {
 	return nil
 }
 
-func (rp *fileRP) FailProcessing(ctx context.Context) (int, error) {
+func (rp *fileRP) FailStaleProcessing(ctx context.Context, createdBefore time.Time) (int, error) {
 	n, err := rp.Platform.GetClient(ctx).File.Update().
-		Where(entfile.StatusEQ(StatusProcessing)).
+		Where(
+			entfile.StatusEQ(StatusProcessing),
+			entfile.CreatedAtLT(createdBefore),
+		).
 		SetStatus(StatusFailed).
 		Save(ctx)
 	if err != nil {
@@ -284,6 +287,10 @@ func (rp *fileRP) ReclaimDeleted(ctx context.Context, id string, deletedBefore t
 		return false, rp.Platform.HandleEntError(err)
 	}
 	return n > 0, nil
+}
+
+func (rp *fileRP) InAmbientTx(ctx context.Context) bool {
+	return ent.TxFromContext(ctx) != nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

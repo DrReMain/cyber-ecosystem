@@ -35,7 +35,7 @@ export function RoleMembers({ members, pendingId, onUnbind }: Readonly<RoleMembe
         allowClear
         onChange={(e) => setQuery(e.target.value)}
         placeholder={m.system_roles_member_search_placeholder()}
-        prefix={<Search className="text-black/35 dark:text-white/35" size={14} />}
+        prefix={<Search className="text-ink-quaternary" size={14} />}
         value={query}
       />
       {visible.length === 0 ? (
@@ -51,7 +51,7 @@ export function RoleMembers({ members, pendingId, onUnbind }: Readonly<RoleMembe
         <div className="flex flex-col gap-2">
           {visible.map((member) => (
             <div
-              className="flex items-center gap-3 rounded-lg border border-black/8 px-3 py-2 dark:border-white/8"
+              className="flex items-center gap-3 rounded-lg border border-line-soft px-3 py-2"
               key={`${member.principalType}:${member.principalId}`}
             >
               {member.principalType === "user" ? (
@@ -60,10 +60,8 @@ export function RoleMembers({ members, pendingId, onUnbind }: Readonly<RoleMembe
                 <Tag color="geekblue">{member.principalType}</Tag>
               )}
               <span className="text-[13px]">{member.displayName}</span>
-              <span className="font-mono text-[12px] text-black/40 dark:text-white/40">
-                {member.principalId}
-              </span>
-              <span className="ms-auto font-mono text-[12px] text-black/40 dark:text-white/40">
+              <span className="font-mono text-[12px] text-ink-tertiary">{member.principalId}</span>
+              <span className="ms-auto font-mono text-[12px] text-ink-tertiary">
                 {formatTime(member.createdAt)}
               </span>
               <Popconfirm

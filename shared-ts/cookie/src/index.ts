@@ -24,7 +24,7 @@ export function writeCookie(key: string, value: unknown, options?: CookieOptions
 
 export function readCookie<T>(
   raw: string | undefined,
-  schema: ZodType<T> | undefined,
+  schema: ZodType<T, unknown> | undefined,
   fallback: T,
 ): T {
   // Return a clone of the fallback so callers can't mutate the shared default

@@ -18,13 +18,11 @@ export function DashboardLayoutBody() {
   const setPreferences = useSetAtom(dashboardPreferencesStore.atom);
   const narrow = useIsNarrowViewport();
 
-  // Mount-time reconciliation covers entering the area (login, account
-  // switch); intra-area SPA navigation never remounts, so live tabs survive.
   useEffect(() => {
     reconcileTabSession(user.id);
   }, [user.id]);
 
-  if (sidebar.visible && sidebar.fixed) {
+  if (sidebar.fixed) {
     return (
       <FixedLayout
         collapsed={sidebar.collapsed || narrow}
@@ -34,6 +32,7 @@ export function DashboardLayoutBody() {
             d.sidebar.collapsed = !d.sidebar.collapsed;
           })
         }
+        visible={sidebar.visible}
       />
     );
   }

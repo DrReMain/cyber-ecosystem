@@ -86,7 +86,7 @@ export function LocaleSelect() {
 
   return (
     <span
-      className="relative inline-flex font-normal font-sans text-[13px] text-black normal-case not-italic leading-none tracking-normal dark:text-white"
+      className="relative inline-flex font-normal font-sans text-[13px] text-ink normal-case not-italic leading-none tracking-normal"
       ref={rootRef}
     >
       <button
@@ -94,7 +94,7 @@ export function LocaleSelect() {
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label="Language"
-        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-black/3 px-3.5 py-2 font-mono text-[11px] text-black/55 leading-none tracking-[0.16em] outline-none backdrop-blur-[6px] transition-colors hover:border-black/40 hover:text-black focus-visible:border-primary focus-visible:text-black dark:border-white/10 dark:bg-white/4 dark:text-white/55 dark:focus-visible:text-white dark:hover:border-white/40 dark:hover:text-white"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-fill-quaternary px-3.5 py-2 font-mono text-[11px] text-ink-secondary leading-none tracking-[0.16em] outline-none backdrop-blur-[6px] transition-colors hover:border-line-hover hover:text-ink focus-visible:border-primary focus-visible:text-ink"
         onClick={() => setOpen((value) => !value)}
         onKeyDown={onTriggerKeyDown}
         ref={triggerRef}
@@ -108,7 +108,7 @@ export function LocaleSelect() {
         <div
           aria-activedescendant={`${listId}-${locales[active]}`}
           aria-label="Language"
-          className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-black/10 bg-white p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] outline-none backdrop-blur-xl dark:border-white/10 dark:bg-[#0a0f1a]/95 dark:shadow-[0_12px_40px_rgba(0,0,0,0.5)]"
+          className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-xl border border-line bg-elevated p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] outline-none backdrop-blur-xl dark:shadow-[0_12px_40px_rgba(0,0,0,0.5)]"
           id={listId}
           onKeyDown={onListKeyDown}
           ref={listRef}
@@ -123,9 +123,9 @@ export function LocaleSelect() {
                 aria-selected={isSelected}
                 className={clsx(
                   "flex cursor-pointer items-center justify-between gap-6 rounded-lg px-3 py-2 text-[13px] leading-normal outline-none transition-colors",
-                  isFocused && "bg-black/6 text-black dark:bg-white/6 dark:text-white",
-                  !isFocused && isSelected && "text-black dark:text-white",
-                  !(isFocused || isSelected) && "text-black/70 dark:text-white/70",
+                  isFocused && "bg-fill-tertiary text-ink",
+                  !isFocused && isSelected && "text-ink",
+                  !(isFocused || isSelected) && "text-ink-secondary",
                 )}
                 id={`${listId}-${locale}`}
                 key={locale}
@@ -143,7 +143,7 @@ export function LocaleSelect() {
                 <span className="truncate" dir="auto">
                   {m.common_locale_name({ locale })}
                 </span>
-                <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-black/35 tracking-[0.16em] dark:text-white/35">
+                <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-ink-quaternary tracking-[0.16em]">
                   {locale}
                 </span>
               </div>

@@ -113,7 +113,7 @@ export function DeptDrawer({
         </Form.Item>
       </Form>
       {mode === "edit" && (
-        <div className="flex flex-col gap-2 border-black/8 border-t pt-3 dark:border-white/8">
+        <div className="flex flex-col gap-2 border-line-soft border-t pt-3">
           <span className="font-medium text-[13px]">{m.system_depts_members_label()}</span>
           <DeptMembers
             deptId={source?.id ?? ""}

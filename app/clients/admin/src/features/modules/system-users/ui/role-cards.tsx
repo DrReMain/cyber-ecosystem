@@ -32,7 +32,7 @@ export function RoleCards({ roles, selected, onChange }: Readonly<RoleCardsProps
     <div className="grid grid-cols-2 gap-2">
       {roles.map((role) => (
         <div
-          className={`flex flex-col gap-1 rounded-lg border border-black/8 px-3 py-2 dark:border-white/8 ${
+          className={`flex flex-col gap-1 rounded-lg border border-line-soft px-3 py-2 ${
             role.enabled ? "" : "opacity-50"
           }`}
           key={role.code}
@@ -49,9 +49,7 @@ export function RoleCards({ roles, selected, onChange }: Readonly<RoleCardsProps
             </Typography.Text>
             {!role.enabled && <Tag className="ms-auto">{m.system_users_role_disabled()}</Tag>}
           </div>
-          <div className="ps-6 text-[12px] text-black/45 dark:text-white/45">
-            {grantsSummary(role)}
-          </div>
+          <div className="ps-6 text-[12px] text-ink-tertiary">{grantsSummary(role)}</div>
         </div>
       ))}
     </div>

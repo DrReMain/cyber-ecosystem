@@ -10,7 +10,7 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
-  // Settings,
+  Settings,
   Sun,
 } from "lucide-react";
 import { useLayoutEffect, useState } from "react";
@@ -21,7 +21,7 @@ import { dashboardPreferencesUiStore } from "#/stores/dashboard-preferences/ui-s
 import { useLogout } from "../auth/use-logout";
 import { Breadcrumb } from "./breadcrumb";
 import { ChipIconButton } from "./chip-icon-button";
-import { SettingsDrawer } from "./settings-drawer";
+import { SettingsDrawer } from "./settings/settings-drawer";
 
 interface TopbarProps {
   className?: string;
@@ -95,8 +95,7 @@ export function Topbar({ className }: Readonly<TopbarProps>) {
           )}
         </ChipIconButton>
 
-        {/* TODO */}
-        {/* <ChipIconButton
+        <ChipIconButton
           label={m.layout_dashboard_topbar_settings()}
           onClick={() =>
             setPreferencesUi((d) => {
@@ -105,7 +104,7 @@ export function Topbar({ className }: Readonly<TopbarProps>) {
           }
         >
           <Settings aria-hidden className="size-3" />
-        </ChipIconButton> */}
+        </ChipIconButton>
 
         <ChipIconButton
           label={m.layout_dashboard_logout()}
