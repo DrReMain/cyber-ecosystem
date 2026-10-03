@@ -1,0 +1,11 @@
+{
+  "agents_connections_title": "إدارة الاتصالات",
+  "agents_connections_col_user": "المستخدم",
+  "agents_connections_col_base_url": "عنوان URL الأساسي",
+  "agents_connections_col_api_key": "مفتاح API",
+  "agents_connections_col_created_at": "تاريخ الإنشاء",
+  "agents_connections_key_set": "مُعيَّن",
+  "agents_connections_key_unset": "غير مُعيَّن",
+  "agents_connections_empty": "لا توجد اتصالات وكلاء بعد",
+  "agents_connections_total": "الإجمالي {n}"
+}

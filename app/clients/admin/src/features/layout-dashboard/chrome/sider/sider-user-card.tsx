@@ -1,22 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
 import { Avatar, Tooltip } from "antd";
 import clsx from "clsx";
 import { useFileUrl } from "#/features/app/file/use-file-url";
+import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import { sessionQuery } from "../../auth/session.fn";
 
 export function SiderUserCard({ collapsed }: Readonly<{ collapsed: boolean }>) {
+  const router = useRouter();
   const { data } = useQuery(sessionQuery);
   const email = data?.status === "authed" ? data.user.email : "";
   const name = email.split("@")[0] ?? "";
   const avatarUrl = useFileUrl(data?.status === "authed" ? data.user.avatar : undefined);
 
   return (
-    <div
+    <button
+      aria-label={m.layout_dashboard_sidebar_profile()}
       className={clsx(
-        "flex h-16 flex-none items-center border-line-soft border-t px-4",
+        "flex h-16 w-full flex-none cursor-pointer items-center border-line-soft border-t px-4 text-start transition-colors hover:bg-fill-secondary focus-visible:outline-2 focus-visible:outline-primary",
         collapsed ? "justify-center px-0" : "gap-2.5",
       )}
+      onClick={() => router.navigate({ to: "/dashboard/profile" })}
+      type="button"
     >
       <Tooltip
         placement={getTextDirection() === "rtl" ? "left" : "right"}
@@ -32,6 +38,6 @@ export function SiderUserCard({ collapsed }: Readonly<{ collapsed: boolean }>) {
           <span className="truncate font-mono text-[11px] text-ink-tertiary">{email}</span>
         </div>
       )}
-    </div>
+    </button>
   );
 }

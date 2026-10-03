@@ -13,7 +13,7 @@ export function ContentWatermark({ children }: Readonly<PropsWithChildren>) {
 
   return (
     <Watermark
-      className="flex min-h-full w-full flex-col"
+      className="overflow-visible! flex min-h-full w-full flex-col"
       content={enabled ? [APP_NAME, user.email ?? ""] : undefined}
       font={{ color: token.colorTextQuaternary }}
       zIndex={20}

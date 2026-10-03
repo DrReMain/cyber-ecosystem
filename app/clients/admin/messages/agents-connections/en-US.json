@@ -1,0 +1,11 @@
+{
+  "agents_connections_title": "Connections",
+  "agents_connections_col_user": "User",
+  "agents_connections_col_base_url": "Base URL",
+  "agents_connections_col_api_key": "API Key",
+  "agents_connections_col_created_at": "Created At",
+  "agents_connections_key_set": "Set",
+  "agents_connections_key_unset": "Not set",
+  "agents_connections_empty": "No agent connections yet",
+  "agents_connections_total": "Total {n}"
+}

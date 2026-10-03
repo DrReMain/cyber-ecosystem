@@ -944,7 +944,7 @@ const file_cyber_system_v1_dept_proto_rawDesc = "" +
 	"DeptMember\x125\n" +
 	"\auser_id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x06userId\x122\n" +
 	"\x05email\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\x124\n" +
-	"\aenabled\x18\x03 \x01(\v2\x1a.google.protobuf.BoolValueR\aenabled2\x95\t\n" +
+	"\aenabled\x18\x03 \x01(\v2\x1a.google.protobuf.BoolValueR\aenabled2\x8f\t\n" +
 	"\vDeptService\x12\x8e\x01\n" +
 	"\n" +
 	"CreateDept\x12\".cyber.system.v1.CreateDeptRequest\x1a#.cyber.system.v1.CreateDeptResponse\"7\x88\xf1\x04\x02\x8a\xd3\x0e\x10\n" +
@@ -962,7 +962,7 @@ const file_cyber_system_v1_dept_proto_rawDesc = "" +
 	"\x10RemoveDeptMember\x12(.cyber.system.v1.RemoveDeptMemberRequest\x1a).cyber.system.v1.RemoveDeptMemberResponse\"Z\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
 	"\x12移出部门成员\x10\x02\x82\xd3\xe4\x93\x022*0/api/v1/system/depts/{dept_id}/members/{user_id}\x12\xbc\x01\n" +
 	"\x0fListDeptMembers\x12'.cyber.system.v1.ListDeptMembersRequest\x1a(.cyber.system.v1.ListDeptMembersResponse\"V\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x1c\n" +
-	"\x18查询部门成员列表\x10\x01\x82\xd3\xe4\x93\x02(\x12&/api/v1/system/depts/{dept_id}/members\x1a\x16\x8a\xe2\t\x12部门组织管理B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"\x18查询部门成员列表\x10\x01\x82\xd3\xe4\x93\x02(\x12&/api/v1/system/depts/{dept_id}/members\x1a\x10\x8a\xe2\t\f部门管理B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_dept_proto_rawDescOnce sync.Once

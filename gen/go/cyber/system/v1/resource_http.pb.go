@@ -20,7 +20,6 @@ const _ = http.SupportPackageIsVersion3
 const OperationResourceServiceListResource = "/cyber.system.v1.ResourceService/ListResource"
 
 type ResourceServiceHTTPServer interface {
-	// ListResource List all RPC service and method info.
 	ListResource(context.Context, *ListResourceRequest) (*ListResourceResponse, error)
 }
 
@@ -49,7 +48,6 @@ func _ResourceService_ListResource0_HTTP_Handler(srv ResourceServiceHTTPServer) 
 }
 
 type ResourceServiceHTTPClient interface {
-	// ListResource List all RPC service and method info.
 	ListResource(ctx context.Context, req *ListResourceRequest, opts ...http.CallOption) (rsp *ListResourceResponse, err error)
 }
 
@@ -61,7 +59,6 @@ func NewResourceServiceHTTPClient(client *http.Client) ResourceServiceHTTPClient
 	return &ResourceServiceHTTPClientImpl{client}
 }
 
-// ListResource List all RPC service and method info.
 func (c *ResourceServiceHTTPClientImpl) ListResource(ctx context.Context, in *ListResourceRequest, opts ...http.CallOption) (*ListResourceResponse, error) {
 	var out ListResourceResponse
 	pattern := "/api/v1/system/resource"

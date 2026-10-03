@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { m } from "#/paraglide/messages";
 import { AREA_PATH } from "../area";
 import { isOperationAllowed } from "../auth/permissions";
-import type { NoParamMessageKey, RouteMenuMeta } from "./route-meta";
+import type { MessageKey, RouteMenuMeta } from "./route-meta";
 
 export interface NavRoute {
   fullPath: string;
@@ -14,14 +14,15 @@ export interface NavRoute {
 
 export interface NavNode {
   path: string;
-  title: NoParamMessageKey;
+  title: MessageKey;
   meta: RouteMenuMeta | undefined;
   children: NavNode[];
 }
 
 export const isHome = (path: string) => path === AREA_PATH;
 
-export const text = (key: NoParamMessageKey) => m[key]();
+export const text = (key: MessageKey, params?: Record<string, string>): string =>
+  (m[key] as (inputs?: Record<string, string>) => string)(params);
 
 export function navTo(router: ReturnType<typeof useRouter>, target: string) {
   if (target.includes("?")) router.navigate({ href: target });
@@ -79,6 +80,14 @@ export function useNavNodes(): NavNode[] {
 export function useNavIndex(): Map<string, NavNode> {
   const nodes = useNavNodes();
   return useMemo(() => indexByPath(nodes), [nodes]);
+}
+
+export function useAllNavIndex(): Map<string, NavNode> {
+  const router = useRouter();
+  return useMemo(
+    () => indexByPath(buildNavNodes(router.routeTree as unknown as NavRoute, ["/*"])),
+    [router],
+  );
 }
 
 export function firstLeafOf(nodes: NavNode[]): NavNode | null {

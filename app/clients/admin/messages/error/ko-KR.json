@@ -59,6 +59,7 @@
   "error_FLOW_ERROR_CONCURRENT_LIMIT": "동시 작업이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
   "error_SYSTEM_UNSPECIFIED": "내부 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
   "error_SYSTEM_LOGIN_FAILED": "이메일 또는 비밀번호가 올바르지 않습니다.",
+  "error_SYSTEM_PASSWORD_MISMATCH": "현재 비밀번호가 올바르지 않습니다.",
   "error_SYSTEM_DEPT_SELF_PARENT": "부서는 자기 자신의 상위가 될 수 없습니다.",
   "error_SYSTEM_DEPT_CYCLE": "순환되는 부서 계층은 만들 수 없습니다.",
   "error_SYSTEM_DEPT_HAS_CHILDREN": "먼저 이 부서의 하위 부서를 처리해 주세요.",

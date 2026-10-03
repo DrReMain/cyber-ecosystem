@@ -102,6 +102,31 @@ touched surface is the route config; page code carries zero permission
 logic. Menu filtering reads session `permissions` (the session source of
 truth).
 
+**Tab identity (dashboard chrome).** A route owns a tabbar tab iff its
+`staticData` declares a `title`; title-less routes render inside the nearest
+titled ancestor's tab (the profile group pattern). `key` = resolved pathname
+(search excluded, one tab per param-route instance, e.g. each `/order/$id`
+id), `href` = full href including search, `pattern` = route `fullPath` kept
+for permission-filtered restore. Activation, close, and href capture compare
+the **exact key** derived from `tabFromMatches` — path-prefix ownership is
+forbidden (it once made the area root the fallback owner of every URL).
+Router `location` and `matches` are separate subscriptions that lag each
+other by a commit during navigations (location flips optimistically at
+navigation start); every tab decision derived from matches is gated behind
+`matchesAgreeWith(matches, pathname)` so torn frames can neither capture a
+foreign href nor re-append a just-closed tab. Session restore resolves
+`pattern` against the permission-filtered nav index; hidden routes
+(`menu.hide`) restore via their persisted title, but a pattern present in
+the unfiltered index is a permission-dropped visible route and stays closed.
+The active tab seeds through the same pattern rule, so a direct URL load
+lands in the bar even with no persisted record — the restore effect rebuilds
+membership after the append effect's mount run and must not drop it.
+The home tab is seeded only when a titled leaf exists at the area root —
+apps without a workbench start with an empty bar. Default post-login
+landing is `defaultLanding(permissions)` — the first permission-surviving
+leaf, never a hardcoded area root. Parameterized titles interpolate
+`match.params` (`compactParams`, `text(key, params)`).
+
 ## 4) Domains admission
 
 A directory earns `src/domains/<name>/` only by being either:
@@ -328,6 +353,9 @@ strands a background kick on the old page — a stranded kick then only
 recovers via focus-refetch, which `staleTime` can suppress inside its
 window. Any other hidden-tab transition abort is normalized to the
 silent `canceled` word by the domain's view-transition source adapter.
+Every session exit — guard redirect, watcher kick, and deliberate logout
+alike — hands the current href to the login page as `?redirect=` so
+re-login returns to the origin.
 
 An unreachable backend is a session verdict, not an auth one: the
 session fn returns `unreachable` on `network`-kind failures, the guard

@@ -8,9 +8,6 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
 )
 
-// Behavioral mixins compose in declaration order, and SoftDeleteMixin's
-// delete→update rewrite relies on DatascopeMixin guarding OpUpdate — so the
-// order Tenant → Datascope → SoftDelete is a contract, not a style choice.
 func TestMixinOrder(t *testing.T) {
 	rank := func(m ent.Mixin) int {
 		switch m.(type) {

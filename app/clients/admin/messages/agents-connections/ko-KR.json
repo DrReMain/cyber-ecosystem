@@ -1,0 +1,11 @@
+{
+  "agents_connections_title": "연결 관리",
+  "agents_connections_col_user": "사용자",
+  "agents_connections_col_base_url": "베이스 URL",
+  "agents_connections_col_api_key": "API 키",
+  "agents_connections_col_created_at": "생성 시간",
+  "agents_connections_key_set": "설정됨",
+  "agents_connections_key_unset": "미설정",
+  "agents_connections_empty": "아직 에이전트 연결이 없습니다",
+  "agents_connections_total": "총 {n}건"
+}

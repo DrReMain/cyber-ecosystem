@@ -16,8 +16,6 @@ func NewStorage(c *conf.Data) (*storage.Storage, func(), error) {
 		return nil, nil, fmt.Errorf("storage config is required")
 	}
 	cfg := toStorageConfig(sc)
-	// S3Options() appends the aws-sdk-v2 OTel middlewares (trace + metrics) to
-	// the client; storage/s3 stays free of the observability import.
 	client, publicPresigner, closeFn, err := storageS3.NewClient(&cfg, observability.S3Options())
 	if err != nil {
 		return nil, nil, err

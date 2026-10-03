@@ -4,6 +4,51 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
+export type CyberAgentV1AgentConfig = {
+    id?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    userId?: string;
+    baseUrl?: string;
+    apiKeySet?: boolean;
+};
+
+export type CyberAgentV1AgentConfigView = {
+    id?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    userId?: string;
+    userEmail?: string;
+    userAvatar?: string;
+    baseUrl?: string;
+    apiKeySet?: boolean;
+};
+
+export type CyberAgentV1DeleteMyAgentConfigResponse = {
+    [key: string]: unknown;
+};
+
+export type CyberAgentV1GetMyAgentConfigResponse = {
+    agentConfig?: CyberAgentV1AgentConfig;
+};
+
+export type CyberAgentV1ListAgentConfigsResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    list?: Array<CyberAgentV1AgentConfigView>;
+};
+
+/**
+ * update
+ */
+export type CyberAgentV1UpdateMyAgentConfigRequest = {
+    baseUrl?: string;
+    apiKey?: string;
+};
+
+export type CyberAgentV1UpdateMyAgentConfigResponse = {
+    [key: string]: unknown;
+};
+
 /**
  * Pagination response.
  */
@@ -85,6 +130,23 @@ export type CyberSystemV1CalendarParams = {
      * At most one entry per date (deep-validated on save).
      */
     overrides?: Array<CyberSystemV1CalendarOverride>;
+};
+
+/**
+ * changePassword
+ */
+export type CyberSystemV1ChangePasswordRequest = {
+    oldPassword?: string;
+    newPassword?: string;
+};
+
+export type CyberSystemV1ChangePasswordResponse = {
+    [key: string]: unknown;
+};
+
+export type CyberSystemV1CheckOperationResponse = {
+    allowed?: boolean;
+    reason?: string;
 };
 
 /**
@@ -861,6 +923,106 @@ export type CyberSystemV1User = {
     avatar?: string;
 };
 
+export type CyberSystemV1VerifySessionResponse = {
+    userId?: string;
+    tenantId?: string;
+    sessionId?: string;
+    email?: string;
+};
+
+export type AgentConfigAdminServiceListAgentConfigsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/agent/agent-configs';
+};
+
+export type AgentConfigAdminServiceListAgentConfigsResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1ListAgentConfigsResponse;
+};
+
+export type AgentConfigAdminServiceListAgentConfigsResponse = AgentConfigAdminServiceListAgentConfigsResponses[keyof AgentConfigAdminServiceListAgentConfigsResponses];
+
+export type AgentConfigServiceDeleteMyAgentConfigData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/agent/me/agent-config';
+};
+
+export type AgentConfigServiceDeleteMyAgentConfigResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1DeleteMyAgentConfigResponse;
+};
+
+export type AgentConfigServiceDeleteMyAgentConfigResponse = AgentConfigServiceDeleteMyAgentConfigResponses[keyof AgentConfigServiceDeleteMyAgentConfigResponses];
+
+export type AgentConfigServiceGetMyAgentConfigData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/agent/me/agent-config';
+};
+
+export type AgentConfigServiceGetMyAgentConfigResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1GetMyAgentConfigResponse;
+};
+
+export type AgentConfigServiceGetMyAgentConfigResponse = AgentConfigServiceGetMyAgentConfigResponses[keyof AgentConfigServiceGetMyAgentConfigResponses];
+
+export type AgentConfigServiceUpdateMyAgentConfigData = {
+    body: CyberAgentV1UpdateMyAgentConfigRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/agent/me/agent-config';
+};
+
+export type AgentConfigServiceUpdateMyAgentConfigResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1UpdateMyAgentConfigResponse;
+};
+
+export type AgentConfigServiceUpdateMyAgentConfigResponse = AgentConfigServiceUpdateMyAgentConfigResponses[keyof AgentConfigServiceUpdateMyAgentConfigResponses];
+
 export type AuditServiceListAuditLogsData = {
     body?: never;
     path?: never;
@@ -1379,6 +1541,56 @@ export type AuthServiceGetCurrentUserResponses = {
 };
 
 export type AuthServiceGetCurrentUserResponse = AuthServiceGetCurrentUserResponses[keyof AuthServiceGetCurrentUserResponses];
+
+export type IntrospectServiceVerifySessionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/me/introspect';
+};
+
+export type IntrospectServiceVerifySessionResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1VerifySessionResponse;
+};
+
+export type IntrospectServiceVerifySessionResponse = IntrospectServiceVerifySessionResponses[keyof IntrospectServiceVerifySessionResponses];
+
+export type IntrospectServiceCheckOperationData = {
+    body?: never;
+    path?: never;
+    query?: {
+        operation?: string;
+    };
+    url: '/api/v1/system/me/introspect/operation';
+};
+
+export type IntrospectServiceCheckOperationResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1CheckOperationResponse;
+};
+
+export type IntrospectServiceCheckOperationResponse = IntrospectServiceCheckOperationResponses[keyof IntrospectServiceCheckOperationResponses];
+
+export type UserServiceChangePasswordData = {
+    body: CyberSystemV1ChangePasswordRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/me/password';
+};
+
+export type UserServiceChangePasswordResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ChangePasswordResponse;
+};
+
+export type UserServiceChangePasswordResponse = UserServiceChangePasswordResponses[keyof UserServiceChangePasswordResponses];
 
 export type PolicyServiceListPoliciesData = {
     body?: never;

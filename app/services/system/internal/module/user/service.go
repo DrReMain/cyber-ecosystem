@@ -73,6 +73,13 @@ func (s *UserService) UpdateUserStatus(ctx context.Context, in *systempb.UpdateU
 	return &systempb.UpdateUserStatusResponse{}, nil
 }
 
+func (s *UserService) ChangePassword(ctx context.Context, in *systempb.ChangePasswordRequest) (*systempb.ChangePasswordResponse, error) {
+	if err := s.userUC.ChangePassword(ctx, *in.OldPassword, *in.NewPassword); err != nil {
+		return nil, err
+	}
+	return &systempb.ChangePasswordResponse{}, nil
+}
+
 func (s *UserService) DeleteUser(ctx context.Context, in *systempb.DeleteUserRequest) (*systempb.DeleteUserResponse, error) {
 	if _, err := s.userUC.Delete(ctx, in.Id); err != nil {
 		return nil, err

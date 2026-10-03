@@ -372,10 +372,10 @@ const file_cyber_system_v1_resource_proto_rawDesc = "" +
 	"\amethods\x18\x06 \x03(\v2\x17.cyber.system.v1.MethodR\amethods\"\x15\n" +
 	"\x13ListResourceRequest\"D\n" +
 	"\x14ListResourceResponse\x12,\n" +
-	"\x04list\x18\x01 \x03(\v2\x18.cyber.system.v1.ServiceR\x04list2\xc9\x01\n" +
+	"\x04list\x18\x01 \x03(\v2\x18.cyber.system.v1.ServiceR\x04list2\xc3\x01\n" +
 	"\x0fResourceService\x12\x9d\x01\n" +
 	"\fListResource\x12$.cyber.system.v1.ListResourceRequest\x1a%.cyber.system.v1.ListResourceResponse\"@\x88\xf1\x04\x02\x8a\xd3\x0e\x19\n" +
-	"\x15获取所有rpc信息\x10\x01\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/system/resource\x1a\x16\x8a\xe2\t\x12资源目录内省B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"\x15获取所有rpc信息\x10\x01\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/system/resource\x1a\x10\x8a\xe2\t\f资源目录B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_resource_proto_rawDescOnce sync.Once

@@ -6,10 +6,6 @@ export const env = createEnv({
   emptyStringAsUndefined: true,
   runtimeEnv: {
     ...import.meta.env,
-    CONNECT_API_URL: process.env.CONNECT_API_URL,
-  },
-  server: {
-    CONNECT_API_URL: z.url(),
   },
   clientPrefix: "VITE_",
   client: {
@@ -17,10 +13,6 @@ export const env = createEnv({
     VITE_GLITCHTIP_DSN: z.url().optional(),
   },
 });
-
-export const resolveCONNECTBaseUrl = createIsomorphicFn()
-  .server(() => env.CONNECT_API_URL)
-  .client(() => env.VITE_CONNECT_API_PROXY);
 
 export const getSiteUrl = createIsomorphicFn()
   .server(async () => {

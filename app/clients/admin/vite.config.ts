@@ -15,8 +15,13 @@ const config = defineConfig(({ mode }) => {
     resolve: { tsconfigPaths: true },
     server: {
       proxy: {
-        "/connect": {
-          target: env.CONNECT_API_URL,
+        "^/connect/cyber\\.system\\.": {
+          target: env.SYSTEM_CONNECT_API_URL,
+          ws: true,
+          rewrite: (path) => path.replace(/^\/connect/, ""),
+        },
+        "^/connect/cyber\\.agent\\.": {
+          target: env.AGENT_CONNECT_API_URL,
           ws: true,
           rewrite: (path) => path.replace(/^\/connect/, ""),
         },

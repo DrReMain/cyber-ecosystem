@@ -29,10 +29,6 @@ type Platform struct {
 	handleMQError      MQErrorHandler
 }
 
-// NewPlatform assembles the platform resources behind a single facade. It does
-// not own their lifecycle: each resource provider returns its own cleanup, and
-// wire chains those cleanups for both graceful shutdown and partial injection
-// failure.
 func NewPlatform(
 	cache *cache.Cache,
 	handleCacheError CacheErrorHandler,

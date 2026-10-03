@@ -1,7 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { pageTitle } from "#/config";
-import { AREA_PATH, LOGIN_PATH } from "#/features/layout-dashboard/area";
+import { LOGIN_PATH } from "#/features/layout-dashboard/area";
+import { defaultLanding } from "#/features/layout-dashboard/auth/landing";
 import { sessionQuery } from "#/features/layout-dashboard/auth/session.fn";
 import { LoginPage } from "#/features/layout-dashboard/login/login-page";
 import { safeRedirect } from "#/features/login-default";
@@ -23,7 +24,10 @@ export const Route = createFileRoute("/login/")({
     const session = await context.queryClient.query(sessionQuery);
     if (session.status === "authed") {
       throw redirect({
-        href: safeRedirect(search.redirect, { home: AREA_PATH, self: LOGIN_PATH }),
+        href: safeRedirect(search.redirect, {
+          home: defaultLanding(session.permissions),
+          self: LOGIN_PATH,
+        }),
       });
     }
   },

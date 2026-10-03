@@ -2,13 +2,13 @@ import { useMatches, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { LayoutDashboard } from "lucide-react";
 import { useMemo } from "react";
-import { m } from "#/paraglide/messages";
 import { AREA_PATH } from "../area";
-import { firstLeafOf, navTo, useNavIndex } from "../protocol/nav";
-import type { NoParamMessageKey } from "../protocol/route-meta";
+import { firstLeafOf, navTo, text, useNavIndex } from "../protocol/nav";
+import { compactParams, type MessageKey } from "../protocol/route-meta";
 
 interface Crumb {
-  title: NoParamMessageKey;
+  params?: Record<string, string>;
+  title: MessageKey;
   path: string;
 }
 
@@ -51,7 +51,7 @@ export function Breadcrumb() {
       const title = mt.staticData.title;
       const path = mt.pathname.replace(/\/$/, "");
       if (title && path.startsWith(`${AREA_PATH}/`)) {
-        trail.push({ title, path });
+        trail.push({ params: compactParams(mt.params), title, path });
       }
     }
     return trail;
@@ -68,7 +68,7 @@ export function Breadcrumb() {
 
   if (crumbs.length <= 1) return null;
 
-  const label = (crumb: Crumb) => m[crumb.title]();
+  const label = (crumb: Crumb) => text(crumb.title, crumb.params);
 
   return (
     <nav aria-label="breadcrumb" className="hidden items-center leading-none lg:flex">

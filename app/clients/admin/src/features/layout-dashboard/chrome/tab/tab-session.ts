@@ -1,23 +1,29 @@
 import type { LucideIcon } from "lucide-react";
+import { m } from "#/paraglide/messages";
 import { AREA_PATH } from "../../area";
 import { isHome, type NavNode } from "../../protocol/nav";
-import type { NoParamMessageKey, RouteMenuMeta } from "../../protocol/route-meta";
+import { compactParams, type MessageKey, type RouteMenuMeta } from "../../protocol/route-meta";
 
 export interface TabRecord {
   affix: boolean;
   href?: string;
   icon?: LucideIcon;
   key: string;
-  title: NoParamMessageKey;
+  pattern: string;
+  title: MessageKey;
+  titleParams?: Record<string, string>;
 }
 
 const SESSION_KEY = "session_tabbar";
 const SESSION_UID_KEY = "session_tabbar_uid";
 
-const recordOf = (path: string, title: NoParamMessageKey, icon?: LucideIcon): TabRecord => ({
+export const stripSlash = (path: string) => path.replace(/\/$/, "") || "/";
+
+const recordOf = (path: string, title: MessageKey, icon?: LucideIcon): TabRecord => ({
   affix: isHome(path),
   icon,
   key: path,
+  pattern: path,
   title,
 });
 
@@ -25,17 +31,37 @@ export function tabFromNav(node: NavNode): TabRecord {
   return recordOf(node.path, node.title, node.meta?.icon);
 }
 
-export function tabFromMatches(
-  matches: ReadonlyArray<{
-    pathname?: string;
-    staticData?: { menu?: RouteMenuMeta; title?: NoParamMessageKey };
-  }>,
-): TabRecord | null {
+interface MatchLike {
+  fullPath?: string;
+  params?: Record<string, string | undefined>;
+  pathname?: string;
+  staticData?: { menu?: RouteMenuMeta; title?: MessageKey };
+}
+
+export function matchesAgreeWith(matches: ReadonlyArray<MatchLike>, pathname: string): boolean {
+  const deepest = matches[matches.length - 1]?.pathname ?? "";
+  return stripSlash(deepest) === stripSlash(pathname);
+}
+
+export function activeTabOf(matches: ReadonlyArray<MatchLike>, pathname: string): TabRecord | null {
+  return matchesAgreeWith(matches, pathname) ? tabFromMatches(matches) : null;
+}
+
+export function tabFromMatches(matches: ReadonlyArray<MatchLike>): TabRecord | null {
   for (let i = matches.length - 1; i >= 0; i--) {
     const match = matches[i];
     const data = match?.staticData;
     if (match && data?.title) {
-      return recordOf(match.pathname?.replace(/\/$/, "") || "/", data.title, data.menu?.icon);
+      const key = stripSlash(match.pathname ?? "/");
+      const titleParams = compactParams(match.params);
+      return {
+        affix: isHome(key),
+        icon: data.menu?.icon,
+        key,
+        pattern: stripSlash(match.fullPath ?? key),
+        title: data.title,
+        ...(titleParams && { titleParams }),
+      };
     }
   }
   return null;
@@ -123,45 +149,73 @@ export function movedTabs(
   return rest.toSpliced(to, 0, a);
 }
 
-interface TabSession {
-  keys: string[];
-  pinned: string[];
-  hrefs: Record<string, string>;
+interface SessionRecord {
+  href?: string;
+  key: string;
+  pattern: string;
+  pinned?: boolean;
+  title: string;
+  titleParams?: Record<string, string>;
 }
+
+interface TabSession {
+  records: SessionRecord[];
+}
+
+const EMPTY_SESSION: TabSession = { records: [] };
+
+const isParamRecord = (v: unknown): v is Record<string, string> =>
+  typeof v === "object" &&
+  v !== null &&
+  !Array.isArray(v) &&
+  Object.values(v).every((x) => typeof x === "string");
 
 export function readTabSession(): TabSession {
   try {
     const parsed: unknown = JSON.parse(sessionStorage.getItem(SESSION_KEY) ?? "null");
-    if (parsed && typeof parsed === "object") {
-      const { keys, pinned, hrefs } = parsed as {
-        keys?: unknown;
-        pinned?: unknown;
-        hrefs?: unknown;
-      };
-      const list = (v: unknown) =>
-        Array.isArray(v) ? v.filter((k): k is string => typeof k === "string") : [];
-      const hrefMap = (v: unknown) => {
-        const out: Record<string, string> = {};
-        if (v && typeof v === "object") {
-          for (const [k, val] of Object.entries(v)) {
-            if (typeof val === "string") out[k] = val;
-          }
-        }
-        return out;
-      };
-      return { keys: list(keys), pinned: list(pinned), hrefs: hrefMap(hrefs) };
+    if (!parsed || typeof parsed !== "object") return EMPTY_SESSION;
+    const { records } = parsed as { records?: unknown };
+    if (!Array.isArray(records)) return EMPTY_SESSION; // legacy payload: degrade to empty
+    const out: SessionRecord[] = [];
+    for (const entry of records) {
+      if (!entry || typeof entry !== "object") continue;
+      const r = entry as Record<string, unknown>;
+      if (
+        typeof r.key !== "string" ||
+        typeof r.pattern !== "string" ||
+        typeof r.title !== "string"
+      ) {
+        continue;
+      }
+      out.push({
+        key: r.key,
+        pattern: r.pattern,
+        title: r.title,
+        ...(typeof r.href === "string" && { href: r.href }),
+        ...(r.pinned === true && { pinned: true }),
+        ...(isParamRecord(r.titleParams) && { titleParams: r.titleParams }),
+      });
     }
-    return { keys: [], pinned: [], hrefs: {} };
+    return { records: out };
   } catch {
-    return { keys: [], pinned: [], hrefs: {} };
+    return EMPTY_SESSION;
   }
 }
 
 export function writeTabSession(tabs: readonly TabRecord[]): void {
-  const keys = tabs.map((t) => t.key);
-  const pinned = tabs.filter((t) => t.affix && !isHome(t.key)).map((t) => t.key);
-  const hrefs = Object.fromEntries(tabs.flatMap((t) => (t.href ? [[t.key, t.href]] : [])));
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ keys, pinned, hrefs }));
+  try {
+    const records: SessionRecord[] = tabs.map((t) => ({
+      key: t.key,
+      pattern: t.pattern,
+      title: t.title,
+      ...(t.titleParams && { titleParams: t.titleParams }),
+      ...(t.href && { href: t.href }),
+      ...(t.affix && !isHome(t.key) && { pinned: true }),
+    }));
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ records }));
+  } catch {
+    // storage unavailable - same tolerance as readTabSession
+  }
 }
 
 export function reconcileTabSession(userId: string): void {
@@ -175,29 +229,63 @@ export function reconcileTabSession(userId: string): void {
   }
 }
 
+// Hidden-route records (menu.hide, e.g. the profile group) restore entirely
+// from the persisted payload: pattern absent from every index, title kept
+// only if it is still a message key.
+const hiddenRecord = (r: SessionRecord): TabRecord => ({
+  affix: r.pinned === true,
+  ...(r.href && { href: r.href }),
+  key: r.key,
+  pattern: r.pattern,
+  title: r.title as MessageKey,
+  ...(r.titleParams && { titleParams: r.titleParams }),
+});
+
+// Membership is rebuilt from storage + nav; hrefs are live per-key state and
+// carried over from the previous list so a rebuild never discards a href the
+// capture effect just wrote for the currently-shown tab.
 export function restoredTabs(
   navIndex: Map<string, NavNode>,
+  allIndex: Map<string, NavNode>,
   current: TabRecord | null,
+  prev: readonly TabRecord[] = [],
 ): TabRecord[] {
-  const home = navIndex.get(AREA_PATH);
-  const tabs = [home ? tabFromNav(home) : recordOf(AREA_PATH, "layout_dashboard_workbench")];
-  const { keys, pinned, hrefs } = readTabSession();
-  const pinnedSet = new Set(pinned);
-  const restore = (key: string): TabRecord | null => {
-    const node = navIndex.get(key);
-    if (!node || node.children.length > 0 || isHome(key)) return null;
-    return { ...tabFromNav(node), affix: pinnedSet.has(key), href: hrefs[key] };
+  const homeNode = navIndex.get(AREA_PATH);
+  const tabs: TabRecord[] =
+    homeNode && homeNode.children.length === 0 ? [tabFromNav(homeNode)] : [];
+  const { records } = readTabSession();
+  const restore = (r: SessionRecord): TabRecord | null => {
+    if (isHome(r.key)) return null;
+    const node = navIndex.get(r.pattern);
+    if (node) {
+      if (node.children.length > 0) return null; // menu groups never become tabs
+      // Title/icon re-derived from the live tree; instance key/params/href
+      // from the payload.
+      return {
+        ...tabFromNav(node),
+        key: r.key,
+        ...(r.titleParams && { titleParams: r.titleParams }),
+        ...(r.href && { href: r.href }),
+        ...(r.pinned && { affix: true }),
+      };
+    }
+    // A pattern present in the unfiltered index is a permission-dropped
+    // visible route, not a hidden one; it must stay closed.
+    if (allIndex.has(r.pattern)) return null;
+    return r.title in m ? hiddenRecord(r) : null;
   };
-  const records = keys.map(restore).filter((r): r is TabRecord => r !== null);
-  tabs.push(...records.filter((r) => r.affix), ...records.filter((r) => !r.affix));
-  const currentRestorable =
-    current !== null &&
+  const restored = records.map(restore).filter((t): t is TabRecord => t !== null);
+  tabs.push(...restored.filter((t) => t.affix), ...restored.filter((t) => !t.affix));
+  const currentNode = current === null ? undefined : navIndex.get(current.pattern);
+  if (
+    current &&
     !isHome(current.key) &&
-    !keys.includes(current.key) &&
-    (() => {
-      const node = navIndex.get(current.key);
-      return node === undefined || node.children.length === 0;
-    })();
-  if (currentRestorable && current) tabs.push(current);
-  return tabs;
+    (currentNode !== undefined || !allIndex.has(current.pattern)) &&
+    !(currentNode && currentNode.children.length > 0) &&
+    !tabs.some((t) => t.key === current.key)
+  ) {
+    tabs.push(current);
+  }
+  const liveHref = (key: string) => prev.find((t) => t.key === key)?.href;
+  return tabs.map((t) => (t.href || !liveHref(t.key) ? t : { ...t, href: liveHref(t.key) }));
 }

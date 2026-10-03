@@ -23,7 +23,6 @@ export function FieldRenderer({
     case "select":
       return (
         <Select
-          allowClear
           options={option.options}
           placeholder={option.placeholder}
           mode={option.mode}

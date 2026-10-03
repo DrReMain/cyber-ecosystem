@@ -14,7 +14,7 @@ import "google/protobuf/wrappers.proto";
 option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 
 service DeptService {
-  option (cyber.ext.v1.service_comment) = "部门组织管理";
+  option (cyber.ext.v1.service_comment) = "部门管理";
   rpc CreateDept(CreateDeptRequest) returns (CreateDeptResponse) {
     option (cyber.ext.v1.method) = {
       comment: "创建部门"

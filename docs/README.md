@@ -22,7 +22,7 @@ Entry points:
 
 ---
 
-## 2) The six laws
+## 2) The laws
 
 ### 2.1 Admission
 
@@ -69,6 +69,10 @@ This extends the definition of done (AGENTS.md §6 item 6): a paradigm/mechanism
 ### 2.7 Roadmap isolation & conventions self-containment
 
 The working lane is temporary by contract and **fully isolated**: `AGENTS.md`, `CLAUDE.md`, skills, and conventions `MUST NOT` reference roadmap content — no `docs/roadmap/` paths, no section or ruling citations. A durable rule never depends on a roadmap doc to be understood or complete; backfill (§2.3) is the only bridge, and it *moves* text out of the working lane. Active fronts are introduced by the user in conversation, not by root docs. Conventions record rules only — self-contained, no narrative or decision logs (`docs:check` check 5 enforces the path ban).
+
+### 2.8 Instance state lives in its owning source
+
+The skeleton forks: the service set, client set, locale set, ports, and middleware dials are per-fork values a deployment can change without a rule changing. Conventions state the invariant and point at where the current value lives (settings file, compose files, directory tree); rule text stays fork-neutral. Never transcribe a current enumeration into a rule — "copy in all five locales" rots the moment a fork registers one or ten; "copy in every locale registered in `project.inlang/settings.json`" cannot rot. A current value may appear only as orientation that names its source ("currently …; the compose files are the truth"), never as the rule. `e.g.`-marked examples of a rule's shape are fine; enumeration as the rule's content is drift by construction.
 
 ---
 

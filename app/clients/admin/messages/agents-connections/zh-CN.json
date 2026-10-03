@@ -1,0 +1,11 @@
+{
+  "agents_connections_title": "连接管理",
+  "agents_connections_col_user": "用户",
+  "agents_connections_col_base_url": "服务地址",
+  "agents_connections_col_api_key": "API Key",
+  "agents_connections_col_created_at": "创建时间",
+  "agents_connections_key_set": "已设置",
+  "agents_connections_key_unset": "未设置",
+  "agents_connections_empty": "暂无 agent 连接",
+  "agents_connections_total": "共 {n} 条"
+}

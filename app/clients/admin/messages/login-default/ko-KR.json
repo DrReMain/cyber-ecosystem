@@ -1,9 +1,9 @@
 {
   "login_default_title": "로그인",
   "login_default_description": "",
-  "login_default_hero_title_a": "스마트 ",
+  "login_default_hero_title_a": "AI Native ",
   "login_default_hero_title_b": "관리 콘솔",
-  "login_default_hero_sub": "AI 기반의 범용 관리 플랫폼. 하나의 계정으로 모든 하위 시스템과 지능형 도구를 연결합니다.",
+  "login_default_hero_sub": "계약 우선 운영 기반: 신원·권한·진입점을 하나로, 서비스는 필요에 따라 조합하며 비즈니스와 함께 성장합니다.",
   "login_default_form_title": "로그인",
   "login_default_form_sub": "회사 이메일로 계속",
   "login_default_label_email": "이메일",

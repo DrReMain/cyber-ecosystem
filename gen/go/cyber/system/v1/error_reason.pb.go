@@ -30,7 +30,8 @@ type System int32
 const (
 	System_SYSTEM_UNSPECIFIED System = 0
 	// 600x: auth
-	System_SYSTEM_LOGIN_FAILED System = 6000
+	System_SYSTEM_LOGIN_FAILED      System = 6000
+	System_SYSTEM_PASSWORD_MISMATCH System = 6001
 	// 601x: dept
 	System_SYSTEM_DEPT_SELF_PARENT      System = 6010
 	System_SYSTEM_DEPT_CYCLE            System = 6011
@@ -65,6 +66,7 @@ var (
 	System_name = map[int32]string{
 		0:    "SYSTEM_UNSPECIFIED",
 		6000: "SYSTEM_LOGIN_FAILED",
+		6001: "SYSTEM_PASSWORD_MISMATCH",
 		6010: "SYSTEM_DEPT_SELF_PARENT",
 		6011: "SYSTEM_DEPT_CYCLE",
 		6012: "SYSTEM_DEPT_HAS_CHILDREN",
@@ -89,6 +91,7 @@ var (
 	System_value = map[string]int32{
 		"SYSTEM_UNSPECIFIED":                  0,
 		"SYSTEM_LOGIN_FAILED":                 6000,
+		"SYSTEM_PASSWORD_MISMATCH":            6001,
 		"SYSTEM_DEPT_SELF_PARENT":             6010,
 		"SYSTEM_DEPT_CYCLE":                   6011,
 		"SYSTEM_DEPT_HAS_CHILDREN":            6012,
@@ -143,10 +146,11 @@ var File_cyber_system_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xbc\x06\n" +
+	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xe1\x06\n" +
 	"\x06System\x12\x1c\n" +
 	"\x12SYSTEM_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12\x1e\n" +
-	"\x13SYSTEM_LOGIN_FAILED\x10\xf0.\x1a\x04\xa8E\x90\x03\x12\"\n" +
+	"\x13SYSTEM_LOGIN_FAILED\x10\xf0.\x1a\x04\xa8E\x90\x03\x12#\n" +
+	"\x18SYSTEM_PASSWORD_MISMATCH\x10\xf1.\x1a\x04\xa8E\x90\x03\x12\"\n" +
 	"\x17SYSTEM_DEPT_SELF_PARENT\x10\xfa.\x1a\x04\xa8E\x90\x03\x12\x1c\n" +
 	"\x11SYSTEM_DEPT_CYCLE\x10\xfb.\x1a\x04\xa8E\x90\x03\x12#\n" +
 	"\x18SYSTEM_DEPT_HAS_CHILDREN\x10\xfc.\x1a\x04\xa8E\x90\x03\x12 \n" +

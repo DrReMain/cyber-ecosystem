@@ -37,6 +37,18 @@ func ErrorSystemLoginFailed(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, System_SYSTEM_LOGIN_FAILED.String(), fmt.Sprintf(format, args...))
 }
 
+func IsSystemPasswordMismatch(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_PASSWORD_MISMATCH.String() && e.Code == 400
+}
+
+func ErrorSystemPasswordMismatch(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_PASSWORD_MISMATCH.String(), fmt.Sprintf(format, args...))
+}
+
 // 601x: dept
 func IsSystemDeptSelfParent(err error) bool {
 	if err == nil {

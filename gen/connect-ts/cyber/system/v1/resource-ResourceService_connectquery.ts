@@ -5,8 +5,6 @@
 import { ResourceService } from "./resource_pb";
 
 /**
- * List all RPC service and method info.
- *
  * @generated from rpc cyber.system.v1.ResourceService.ListResource
  */
 export const listResource = ResourceService.method.listResource;

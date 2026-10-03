@@ -40,7 +40,6 @@ const (
 
 // ResourceServiceClient is a client for the cyber.system.v1.ResourceService service.
 type ResourceServiceClient interface {
-	// List all RPC service and method info.
 	ListResource(context.Context, *connect.Request[v1.ListResourceRequest]) (*connect.Response[v1.ListResourceResponse], error)
 }
 
@@ -76,7 +75,6 @@ func (c *resourceServiceClient) ListResource(ctx context.Context, req *connect.R
 
 // ResourceServiceHandler is an implementation of the cyber.system.v1.ResourceService service.
 type ResourceServiceHandler interface {
-	// List all RPC service and method info.
 	ListResource(context.Context, *connect.Request[v1.ListResourceRequest]) (*connect.Response[v1.ListResourceResponse], error)
 }
 

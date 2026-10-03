@@ -15,7 +15,6 @@ import (
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
 )
 
-// Map framework middleware errors onto the shared error scheme.
 func init() {
 	sanitize.ErrUnexpected = errorspb.ErrorGeneralErrorInternal("")
 

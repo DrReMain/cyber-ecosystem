@@ -1,9 +1,9 @@
 {
   "login_default_title": "تسجيل الدخول",
   "login_default_description": "",
-  "login_default_hero_title_a": "وحدة تحكم ",
-  "login_default_hero_title_b": "إدارية ذكية",
-  "login_default_hero_sub": "قاعدة إدارة عامة مدعومة بالذكاء الاصطناعي - مدخل موحّد يربط كل الأنظمة الفرعية والأدوات الذكية.",
+  "login_default_hero_title_a": "AI Native ",
+  "login_default_hero_title_b": "منصة إدارة",
+  "login_default_hero_sub": "قاعدة تشغيلية بمنهج العقد أولاً: هوية وصلاحيات ومدخل موحّد، خدمات تُركَّب حسب الحاجة وتنمو مع أعمالك.",
   "login_default_form_title": "تسجيل الدخول",
   "login_default_form_sub": "تابع باستخدام بريدك الإلكتروني للعمل",
   "login_default_label_email": "البريد الإلكتروني",

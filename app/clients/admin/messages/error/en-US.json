@@ -59,6 +59,7 @@
   "error_FLOW_ERROR_CONCURRENT_LIMIT": "Too many concurrent operations. Please try again shortly.",
   "error_SYSTEM_UNSPECIFIED": "An internal error occurred. Please try again shortly.",
   "error_SYSTEM_LOGIN_FAILED": "Incorrect email or password.",
+  "error_SYSTEM_PASSWORD_MISMATCH": "Current password is incorrect.",
   "error_SYSTEM_DEPT_SELF_PARENT": "A department cannot be its own parent.",
   "error_SYSTEM_DEPT_CYCLE": "Circular department hierarchies are not allowed.",
   "error_SYSTEM_DEPT_HAS_CHILDREN": "Please handle the sub-departments under this department first.",

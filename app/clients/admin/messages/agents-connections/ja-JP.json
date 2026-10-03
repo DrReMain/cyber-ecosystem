@@ -1,0 +1,11 @@
+{
+  "agents_connections_title": "接続管理",
+  "agents_connections_col_user": "ユーザー",
+  "agents_connections_col_base_url": "ベース URL",
+  "agents_connections_col_api_key": "API キー",
+  "agents_connections_col_created_at": "作成日時",
+  "agents_connections_key_set": "設定済み",
+  "agents_connections_key_unset": "未設定",
+  "agents_connections_empty": "agent 接続はまだありません",
+  "agents_connections_total": "全 {n} 件"
+}

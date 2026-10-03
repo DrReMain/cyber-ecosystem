@@ -1,6 +1,6 @@
 import { useQuery } from "@connectrpc/connect-query";
 import { getFileUrls } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file-FileService_connectquery";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const STALE_MS = 10 * 60 * 1000; // must stay under the s3 presign TTL (15m default)
 
@@ -29,5 +29,8 @@ export function useFileUrls(ids: readonly string[]): Map<string, string> {
 
 export function useFileUrl(id: string | undefined): string | undefined {
   const urls = useFileUrls(id === undefined || id === "" ? EMPTY : [id]);
-  return id === undefined || id === "" ? undefined : urls.get(id);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  if (!hydrated || id === undefined || id === "") return undefined;
+  return urls.get(id);
 }

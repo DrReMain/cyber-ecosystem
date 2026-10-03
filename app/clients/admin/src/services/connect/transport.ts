@@ -5,7 +5,7 @@ import { addStaticKeyToTransport } from "@connectrpc/connect-query";
 import { createConnectTransport } from "@connectrpc/connect-web";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { normalize } from "#/domains/error";
-import { resolveCONNECTBaseUrl } from "#/env";
+import { env, getSiteUrl } from "#/env";
 import { getLocale } from "#/paraglide/runtime";
 import { wsStreamCall } from "./ws-stream";
 
@@ -59,16 +59,10 @@ function normalizedStream<I extends DescMessage, O extends DescMessage>(
   };
 }
 
-export function createKratosTransport({
-  baseUrl = resolveCONNECTBaseUrl(),
-  interceptors,
-}: {
-  baseUrl?: string;
-  interceptors?: Interceptor[];
-} = {}): Transport {
+function singleConnectTransport(baseUrl: string, interceptors: Interceptor[]): Transport {
   const connect = createConnectTransport({
     baseUrl,
-    interceptors: [localeInterceptor, cookieForwarder, ...(interceptors ?? [])],
+    interceptors: [localeInterceptor, cookieForwarder, ...interceptors],
   });
   return {
     unary: async (method, signal, timeoutMs, header, input, contextValues) => {
@@ -103,7 +97,46 @@ export function createKratosTransport({
   };
 }
 
-export const connectTransport = addStaticKeyToTransport(
-  createKratosTransport({ baseUrl: resolveCONNECTBaseUrl() }),
-  "connect",
-);
+const serverTransports = new Map<string, Transport>();
+
+async function serverConnectTransport(): Promise<Transport> {
+  const origin = await getSiteUrl();
+  let transport = serverTransports.get(origin);
+  if (!transport) {
+    transport = singleConnectTransport(`${origin}${env.VITE_CONNECT_API_PROXY}`, []);
+    serverTransports.set(origin, transport);
+  }
+  return transport;
+}
+
+function lazyServerConnectTransport(): Transport {
+  return {
+    unary: async (method, signal, timeoutMs, header, input, contextValues) => {
+      const transport = await serverConnectTransport();
+      return transport.unary(method, signal, timeoutMs, header, input, contextValues);
+    },
+    stream: async (method, signal, timeoutMs, header, input, contextValues) => {
+      const transport = await serverConnectTransport();
+      return transport.stream(method, signal, timeoutMs, header, input, contextValues);
+    },
+  };
+}
+
+const defaultConnectTransport = createIsomorphicFn()
+  .server(() => lazyServerConnectTransport())
+  .client(() => singleConnectTransport(env.VITE_CONNECT_API_PROXY, []));
+
+export function createKratosTransport({
+  baseUrl,
+  interceptors = [],
+}: {
+  baseUrl?: string;
+  interceptors?: Interceptor[];
+} = {}): Transport {
+  if (baseUrl !== undefined) {
+    return singleConnectTransport(baseUrl, interceptors);
+  }
+  return defaultConnectTransport();
+}
+
+export const connectTransport = addStaticKeyToTransport(createKratosTransport(), "connect");

@@ -134,6 +134,7 @@
         {
           "projects": [
             "system",
+            "agent",
             "@cyber-ecosystem/admin"
           ],
           "target": "image"
@@ -148,14 +149,14 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app rm -sf system admin system-migrate"
+        "command": "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app rm -sf system admin system-migrate agent agent-migrate"
       }
     },
     "app:status": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app ps -a system admin system-migrate"
+        "command": "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app ps -a system admin system-migrate agent agent-migrate"
       }
     },
     "pre:start": {
@@ -164,6 +165,7 @@
         {
           "projects": [
             "system",
+            "agent",
             "@cyber-ecosystem/admin"
           ],
           "target": "image"
@@ -184,6 +186,7 @@
         {
           "projects": [
             "system",
+            "agent",
             "@cyber-ecosystem/admin"
           ],
           "target": "image"
@@ -204,7 +207,7 @@
         "cwd": "{workspaceRoot}",
         "commands": [
           "docker compose -f deploy/docker/compose.edge.yaml down",
-          "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app rm -sf system admin system-migrate"
+          "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app rm -sf system admin system-migrate agent agent-migrate"
         ],
         "parallel": false
       }

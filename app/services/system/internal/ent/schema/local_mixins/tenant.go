@@ -16,10 +16,6 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/intercept"
 )
 
-// TenantMixin adds a tenant_id column and an interceptor that injects
-// WHERE tenant_id from the authenticated Subject in ctx. It lives in
-// local_mixins (like SoftDeleteMixin) because the interceptor depends on
-// generated ent types.
 type TenantMixin struct {
 	mixin.Schema
 }

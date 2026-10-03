@@ -40,6 +40,9 @@ const (
 	// UserServiceUpdateUserStatusProcedure is the fully-qualified name of the UserService's
 	// UpdateUserStatus RPC.
 	UserServiceUpdateUserStatusProcedure = "/cyber.system.v1.UserService/UpdateUserStatus"
+	// UserServiceChangePasswordProcedure is the fully-qualified name of the UserService's
+	// ChangePassword RPC.
+	UserServiceChangePasswordProcedure = "/cyber.system.v1.UserService/ChangePassword"
 	// UserServiceDeleteUserProcedure is the fully-qualified name of the UserService's DeleteUser RPC.
 	UserServiceDeleteUserProcedure = "/cyber.system.v1.UserService/DeleteUser"
 	// UserServiceListUsersProcedure is the fully-qualified name of the UserService's ListUsers RPC.
@@ -53,6 +56,7 @@ type UserServiceClient interface {
 	CreateUser(context.Context, *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error)
 	UpdateUser(context.Context, *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error)
 	UpdateUserStatus(context.Context, *connect.Request[v1.UpdateUserStatusRequest]) (*connect.Response[v1.UpdateUserStatusResponse], error)
+	ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error)
 	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
 	ListUsers(context.Context, *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error)
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
@@ -87,6 +91,12 @@ func NewUserServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(userServiceMethods.ByName("UpdateUserStatus")),
 			connect.WithClientOptions(opts...),
 		),
+		changePassword: connect.NewClient[v1.ChangePasswordRequest, v1.ChangePasswordResponse](
+			httpClient,
+			baseURL+UserServiceChangePasswordProcedure,
+			connect.WithSchema(userServiceMethods.ByName("ChangePassword")),
+			connect.WithClientOptions(opts...),
+		),
 		deleteUser: connect.NewClient[v1.DeleteUserRequest, v1.DeleteUserResponse](
 			httpClient,
 			baseURL+UserServiceDeleteUserProcedure,
@@ -113,6 +123,7 @@ type userServiceClient struct {
 	createUser       *connect.Client[v1.CreateUserRequest, v1.CreateUserResponse]
 	updateUser       *connect.Client[v1.UpdateUserRequest, v1.UpdateUserResponse]
 	updateUserStatus *connect.Client[v1.UpdateUserStatusRequest, v1.UpdateUserStatusResponse]
+	changePassword   *connect.Client[v1.ChangePasswordRequest, v1.ChangePasswordResponse]
 	deleteUser       *connect.Client[v1.DeleteUserRequest, v1.DeleteUserResponse]
 	listUsers        *connect.Client[v1.ListUsersRequest, v1.ListUsersResponse]
 	getUser          *connect.Client[v1.GetUserRequest, v1.GetUserResponse]
@@ -131,6 +142,11 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, req *connect.Request
 // UpdateUserStatus calls cyber.system.v1.UserService.UpdateUserStatus.
 func (c *userServiceClient) UpdateUserStatus(ctx context.Context, req *connect.Request[v1.UpdateUserStatusRequest]) (*connect.Response[v1.UpdateUserStatusResponse], error) {
 	return c.updateUserStatus.CallUnary(ctx, req)
+}
+
+// ChangePassword calls cyber.system.v1.UserService.ChangePassword.
+func (c *userServiceClient) ChangePassword(ctx context.Context, req *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error) {
+	return c.changePassword.CallUnary(ctx, req)
 }
 
 // DeleteUser calls cyber.system.v1.UserService.DeleteUser.
@@ -153,6 +169,7 @@ type UserServiceHandler interface {
 	CreateUser(context.Context, *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error)
 	UpdateUser(context.Context, *connect.Request[v1.UpdateUserRequest]) (*connect.Response[v1.UpdateUserResponse], error)
 	UpdateUserStatus(context.Context, *connect.Request[v1.UpdateUserStatusRequest]) (*connect.Response[v1.UpdateUserStatusResponse], error)
+	ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error)
 	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
 	ListUsers(context.Context, *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error)
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
@@ -183,6 +200,12 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(userServiceMethods.ByName("UpdateUserStatus")),
 		connect.WithHandlerOptions(opts...),
 	)
+	userServiceChangePasswordHandler := connect.NewUnaryHandler(
+		UserServiceChangePasswordProcedure,
+		svc.ChangePassword,
+		connect.WithSchema(userServiceMethods.ByName("ChangePassword")),
+		connect.WithHandlerOptions(opts...),
+	)
 	userServiceDeleteUserHandler := connect.NewUnaryHandler(
 		UserServiceDeleteUserProcedure,
 		svc.DeleteUser,
@@ -209,6 +232,8 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect.HandlerOption
 			userServiceUpdateUserHandler.ServeHTTP(w, r)
 		case UserServiceUpdateUserStatusProcedure:
 			userServiceUpdateUserStatusHandler.ServeHTTP(w, r)
+		case UserServiceChangePasswordProcedure:
+			userServiceChangePasswordHandler.ServeHTTP(w, r)
 		case UserServiceDeleteUserProcedure:
 			userServiceDeleteUserHandler.ServeHTTP(w, r)
 		case UserServiceListUsersProcedure:
@@ -234,6 +259,10 @@ func (UnimplementedUserServiceHandler) UpdateUser(context.Context, *connect.Requ
 
 func (UnimplementedUserServiceHandler) UpdateUserStatus(context.Context, *connect.Request[v1.UpdateUserStatusRequest]) (*connect.Response[v1.UpdateUserStatusResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.UserService.UpdateUserStatus is not implemented"))
+}
+
+func (UnimplementedUserServiceHandler) ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.UserService.ChangePassword is not implemented"))
 }
 
 func (UnimplementedUserServiceHandler) DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error) {

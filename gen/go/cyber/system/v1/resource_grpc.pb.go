@@ -25,11 +25,7 @@ const (
 // ResourceServiceClient is the client API for ResourceService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Resource introspection service. Lists all RPC service/method info by
-// reflecting on the registered proto descriptors.
 type ResourceServiceClient interface {
-	// List all RPC service and method info.
 	ListResource(ctx context.Context, in *ListResourceRequest, opts ...grpc.CallOption) (*ListResourceResponse, error)
 }
 
@@ -54,11 +50,7 @@ func (c *resourceServiceClient) ListResource(ctx context.Context, in *ListResour
 // ResourceServiceServer is the server API for ResourceService service.
 // All implementations must embed UnimplementedResourceServiceServer
 // for forward compatibility.
-//
-// Resource introspection service. Lists all RPC service/method info by
-// reflecting on the registered proto descriptors.
 type ResourceServiceServer interface {
-	// List all RPC service and method info.
 	ListResource(context.Context, *ListResourceRequest) (*ListResourceResponse, error)
 	mustEmbedUnimplementedResourceServiceServer()
 }

@@ -1,0 +1,76 @@
+[
+  {
+    "name": "AgentConfigAdminService",
+    "full_name": "cyber.agent.v1.AgentConfigAdminService",
+    "package": "cyber.agent.v1",
+    "source_file": "cyber/agent/v1/agent_config_admin.proto",
+    "comment": "agent连接管理",
+    "methods": [
+      {
+        "name": "ListAgentConfigs",
+        "full_name": "cyber.agent.v1.AgentConfigAdminService.ListAgentConfigs",
+        "request_name": "ListAgentConfigsRequest",
+        "request_full_name": "cyber.agent.v1.ListAgentConfigsRequest",
+        "response_name": "ListAgentConfigsResponse",
+        "response_full_name": "cyber.agent.v1.ListAgentConfigsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/agent/agent-configs",
+        "comment": "查询agent连接",
+        "builtin": false,
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "AgentConfigService",
+    "full_name": "cyber.agent.v1.AgentConfigService",
+    "package": "cyber.agent.v1",
+    "source_file": "cyber/agent/v1/agent_config.proto",
+    "comment": "agent连接配置",
+    "methods": [
+      {
+        "name": "DeleteMyAgentConfig",
+        "full_name": "cyber.agent.v1.AgentConfigService.DeleteMyAgentConfig",
+        "request_name": "DeleteMyAgentConfigRequest",
+        "request_full_name": "cyber.agent.v1.DeleteMyAgentConfigRequest",
+        "response_name": "DeleteMyAgentConfigResponse",
+        "response_full_name": "cyber.agent.v1.DeleteMyAgentConfigResponse",
+        "http_method": "DELETE",
+        "http_path": "/api/v1/agent/me/agent-config",
+        "comment": "清除agent连接",
+        "builtin": true,
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "GetMyAgentConfig",
+        "full_name": "cyber.agent.v1.AgentConfigService.GetMyAgentConfig",
+        "request_name": "GetMyAgentConfigRequest",
+        "request_full_name": "cyber.agent.v1.GetMyAgentConfigRequest",
+        "response_name": "GetMyAgentConfigResponse",
+        "response_full_name": "cyber.agent.v1.GetMyAgentConfigResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/agent/me/agent-config",
+        "comment": "查询agent连接",
+        "builtin": true,
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "UpdateMyAgentConfig",
+        "full_name": "cyber.agent.v1.AgentConfigService.UpdateMyAgentConfig",
+        "request_name": "UpdateMyAgentConfigRequest",
+        "request_full_name": "cyber.agent.v1.UpdateMyAgentConfigRequest",
+        "response_name": "UpdateMyAgentConfigResponse",
+        "response_full_name": "cyber.agent.v1.UpdateMyAgentConfigResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/agent/me/agent-config",
+        "comment": "配置agent连接",
+        "builtin": true,
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  }
+]

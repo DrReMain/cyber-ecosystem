@@ -4,7 +4,7 @@
 
 **Scope:** containerization and deployment of everything in this repo — app images, `deploy/`, the compose stacks, the edge. Prescriptive — `MUST` / `SHOULD` / `MAY`.
 
-This repo is a **generic skeleton**: every rule below is a per-app pattern, not tied to any specific app. Current instances: one kratos service (`app/services/system`), one tanstack client (`app/clients/admin`) — when they are renamed, removed, or joined by more apps, the rules apply unchanged. Instance state (service names, URLs, ports) lives in the compose files and `deploy/docker/traefik/dynamic.yaml` themselves — read those for what exists, read this for how it fits together.
+This repo is a **generic skeleton**: every rule below is a per-app pattern, not tied to any specific app. Instance state (service set, client set, URLs, ports) lives in the compose files and `deploy/docker/traefik/dynamic.yaml` themselves — read those for what exists, read this for how it fits together.
 
 ---
 
@@ -16,7 +16,7 @@ This repo is a **generic skeleton**: every rule below is a per-app pattern, not 
 | pre (= local prod rehearsal) | dev stack + `deploy/docker/compose.app.yaml` + `deploy/docker/compose.edge.yaml` | edge-only, `*.cyber.test` |
 | prod compose / prod k3s | parameterized compose / k8s translation (`deploy/k8s/`, empty placeholder) | edge / ingress |
 
-- pre has two middleware dials: **minimal** (`deploy:pre:start` = the app layer's hard deps only — currently db + storage + app + edge; mq runs in pg mode, so NATS/realtime/media/observability are all optional) and **full** (`deploy:pre:full:start` = all six middleware profiles + app + edge).
+- pre has two middleware dials: **minimal** (`deploy:pre:start` = the app layer's hard deps only — the compose `depends_on` graph is the truth; mq runs in pg mode, so the realtime/media/observability profiles are optional) and **full** (`deploy:pre:full:start` = all middleware profiles + app + edge).
 - pre runs **on top of** the dev stack (one compose project, shared volumes) — deliberate; split only when data isolation actually hurts. The edge, by contrast, is its **own compose project** joining the middleware network as `external` — it can only start after the middleware stack exists (the `pre:*` targets encode that order).
 - Named volumes persist across `down`; only `down -v` (`deploy:reset`) wipes them.
 - `MUST` keep the shapes aligned: same discovery names, same edge semantics, same images; compose artifacts carry **zero k8s residue**.
@@ -44,7 +44,7 @@ Every `app:start` **rolls all app containers**: docker builds stamp a fresh time
 - `deploy/` owns orchestration: compose files, edge, migration wiring, start/stop targets.
 - `deploy/images/<name>/` = infra-derived custom images only (e.g. `pg-extended`), never app images.
 - Both image kinds use the **workspace root as build context** (single Go module + pnpm workspace). The root `.dockerignore` is the **single trim surface** — `MUST NOT` scatter per-directory ignores.
-- pnpm-workspace installs inside image builds `MUST` run with the **full workspace source present** (`COPY` before `install`; a BuildKit store cache mount recovers the lost layer cache). A manifests-only install layer changes pnpm's node_modules shape, and vite's server environment then hashes `?url` css assets differently than the client emits — phantom css names that 404 at runtime (first-paint flash). Verified both directions; the admin Dockerfile comment marks the spot.
+- pnpm-workspace installs inside image builds `MUST` run with the **full workspace source present** (`COPY` before `install`; a BuildKit store cache mount recovers the lost layer cache). A manifests-only install layer changes pnpm's node_modules shape, and vite's server environment then hashes `?url` css assets differently than the client emits — phantom css names that 404 at runtime (first-paint flash). The admin Dockerfile comment marks the spot.
 
 ## 4. Discovery names
 
@@ -58,17 +58,19 @@ Every `app:start` **rolls all app containers**: docker builds stamp a fresh time
 
 ## 6. App configuration
 
-- **kratos services** keep two bootstrap configs of identical shape at the app root: `configs/config.yaml` (bare-metal dev, `localhost` endpoints) and `container/config.yaml` (network aliases, baked into the image). **Mirror every key change across the two.** `configs/` is the dev source directory — kratos reads *every* file in it, so it MUST contain nothing but the dev config.
+- **kratos services** keep two bootstrap configs of identical shape at the app root: `configs/config.yaml` (bare-metal dev, `localhost` endpoints) and `container/config.yaml` (network aliases, baked into the image). **Mirror every key change across the two.** `configs/` is the dev source directory — kratos reads *every* file in it, so it MUST contain nothing but the dev config. **Relative paths in the dev config anchor at `<service>/cmd/app`** — `kratos run` executes the built binary with the main package's directory as cwd (that is why `-conf ../../configs` resolves); counting dot-dots from `app/services/<svc>` is off by one.
 - Deployment-sensitive values are kratos `${VAR:default}` placeholders, overridden at runtime by `APP_`-prefixed env vars (`APP_DB_HOST=…`). This is the **only** env-override channel: kratos's env source does flat keys, not nested overrides — `APP_DATA_DATABASE_HOST` is silently discarded; the yaml placeholder is what makes an env var reachable. Booleans included (`WithResolveActualTypes` is wired in `main.go`); keep placeholders opt-in — only keys a deployment actually flips.
-- **tanstack clients** read runtime env only (API URL, PORT) and derive the site origin per request (`getSiteUrl`: request URL server-side, `window.location.origin` client-side) — nothing environment-specific is baked; one image serves every deployment. A `server.mjs` host mounts the fetch-handler build output (the vite plugin emits `export default { fetch }`, not a self-starting server): zero-dep node:http + static client serving + WHATWG bridging.
+- **The system image bakes `gen/catalog/`** (the federated grant manifests) to `/etc/cyber/catalog` and normalizes perms with `RUN chmod -R a+rX` — the pipeline tools write at gosec ceilings (0600/0750, root-owned after COPY) while the process runs as `nobody`; repo filesystem and image multi-user semantics are different worlds, and public derived data gets its read grant at the delivery layer. Mounting a subset of manifests instead of the baked set is the config-level composition knob for trimming the service surface.
+- **tanstack clients** read runtime env only (API URL, PORT) and derive the site origin per request (`getSiteUrl`: request URL server-side, `window.location.origin` client-side) — nothing environment-specific is baked; one image serves every deployment. A `server.mjs` host mounts the fetch-handler build output (the vite plugin emits `export default { fetch }`, not a self-starting server): zero-dep node:http + static client serving + WHATWG bridging. SSR calls loop back through the same origin's `/connect` (the edge splits by package prefix), so clients never learn service addresses — the multiservice split has exactly one consumer: the edge.
 
 ## 7. Adding an application
 
 1. App side (self-contained): `Dockerfile` + `image` target at the app root — use the existing kratos service / tanstack client as the template; kratos adds `container/config.yaml` (§6).
-2. `deploy/docker/compose.app.yaml`: service block under the `app` profile — `<service>.<domain>` alias, healthcheck (kratos: `/healthz` on its http port; client: a static asset), `depends_on` (incl. its migration job, if any), resource limits, `image: cyber-ecosystem/<name>:local`, **no host ports**.
-3. Edge (`deploy/docker/traefik/dynamic.yaml`): `Host(<name>.cyber.test)` → the service; for clients calling same-origin `/connect`, add the `Host && PathPrefix(/connect)` rule → the target service's connect port + `stripprefix` middleware (mirrors the dev vite proxy; length-based priority needs no explicit ranks).
-4. Migrations (kratos + ent): one-shot atlas job (§10).
+2. `deploy/docker/compose.app.yaml`: service block under the `app` profile — `<service>.api` network alias, healthcheck (kratos: `/healthz` on its http port; client: a static asset), `depends_on` (incl. its migration job, if any), resource limits, `image: cyber-ecosystem/<name>:local`, **no host ports**.
+3. Edge (`deploy/docker/traefik/dynamic.yaml`): a second backend service on existing hosts splits by **package prefix**, not a new host — `Host(admin.cyber.test) && PathPrefix(/connect) && PathRegexp(^/connect/cyber\.<svc>\.)` → the service's connect port + `stripprefix` (length-based priority puts it above the bare `/connect` rule), and `Host(api.cyber.test) && PathRegexp(^/cyber\.<svc>\.)` → the same port **without** stripping (that face takes bare procedure paths). Mirror both as a dev vite proxy regex key **before** the plain `/connect` key, with a `*_CONNECT_API_URL` env entry per service (dev-only). A genuinely new product surface may still claim a new host.
+4. Migrations (kratos + ent): one-shot atlas job (§10). Add the database shell to `deploy/docker/postgres/02-databases.sql`; a retained volume needs the `CREATE DATABASE` once by hand (initdb only runs on fresh volumes).
 5. Local pre access: one hosts entry per edge router — the `cyber.test` line in `/etc/hosts` mirrors `dynamic.yaml`'s router set, extend both together.
+6. `deploy/project.json`: add the service to the `image` `dependsOn` lists and the `app:stop`/`app:status`/`pre:stop` container lists (package-prefix routing means no new hosts, but the lifecycle lists are explicit per service).
 
 ## 8. The presign dual-path pattern
 

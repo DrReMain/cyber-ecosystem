@@ -42,9 +42,6 @@ func toMQConfig(n *conf.Data_MQ_NATS) *mqnats.Config {
 		MaxAckPending: int(n.GetMaxAckPending()),
 		DLQMaxBytes:   n.GetDlqMaxBytes(),
 	}
-	// Duration fields are *durationpb.Duration pointers (nil = unset, so the
-	// backend applies its default); scalars are read via Get* and fall through to
-	// the backend's *OrDefault helpers on a zero value.
 	if n.MaxAge != nil {
 		cfg.MaxAge = n.GetMaxAge().AsDuration()
 	}

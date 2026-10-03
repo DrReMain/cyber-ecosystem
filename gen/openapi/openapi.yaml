@@ -6,6 +6,100 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/v1/agent/agent-configs:
+        get:
+            tags:
+                - AgentConfigAdminService
+            operationId: AgentConfigAdminService_ListAgentConfigs
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.ListAgentConfigsResponse'
+    /api/v1/agent/me/agent-config:
+        get:
+            tags:
+                - AgentConfigService
+            operationId: AgentConfigService_GetMyAgentConfig
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.GetMyAgentConfigResponse'
+        put:
+            tags:
+                - AgentConfigService
+            operationId: AgentConfigService_UpdateMyAgentConfig
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.agent.v1.UpdateMyAgentConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.UpdateMyAgentConfigResponse'
+        delete:
+            tags:
+                - AgentConfigService
+            operationId: AgentConfigService_DeleteMyAgentConfig
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.DeleteMyAgentConfigResponse'
     /api/v1/system/audit-logs:
         get:
             tags:
@@ -665,6 +759,53 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.GetCurrentUserResponse'
+    /api/v1/system/me/introspect:
+        get:
+            tags:
+                - IntrospectService
+            operationId: IntrospectService_VerifySession
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.VerifySessionResponse'
+    /api/v1/system/me/introspect/operation:
+        get:
+            tags:
+                - IntrospectService
+            operationId: IntrospectService_CheckOperation
+            parameters:
+                - name: operation
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CheckOperationResponse'
+    /api/v1/system/me/password:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_ChangePassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ChangePasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ChangePasswordResponse'
     /api/v1/system/policies:
         get:
             tags:
@@ -839,7 +980,6 @@ paths:
         get:
             tags:
                 - ResourceService
-            description: List all RPC service and method info.
             operationId: ResourceService_ListResource
             responses:
                 "200":
@@ -1455,6 +1595,72 @@ paths:
                                 $ref: '#/components/schemas/cyber.system.v1.UpdateUserStatusResponse'
 components:
     schemas:
+        cyber.agent.v1.AgentConfig:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                userId:
+                    type: string
+                baseUrl:
+                    type: string
+                apiKeySet:
+                    type: boolean
+        cyber.agent.v1.AgentConfigView:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                userId:
+                    type: string
+                userEmail:
+                    type: string
+                userAvatar:
+                    type: string
+                baseUrl:
+                    type: string
+                apiKeySet:
+                    type: boolean
+        cyber.agent.v1.DeleteMyAgentConfigResponse:
+            type: object
+            properties: {}
+        cyber.agent.v1.GetMyAgentConfigResponse:
+            type: object
+            properties:
+                agentConfig:
+                    $ref: '#/components/schemas/cyber.agent.v1.AgentConfig'
+        cyber.agent.v1.ListAgentConfigsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.agent.v1.AgentConfigView'
+        cyber.agent.v1.UpdateMyAgentConfigRequest:
+            type: object
+            properties:
+                baseUrl:
+                    type: string
+                apiKey:
+                    type: string
+            description: update
+        cyber.agent.v1.UpdateMyAgentConfigResponse:
+            type: object
+            properties: {}
         cyber.shared.common.v1.PageResponse:
             type: object
             properties:
@@ -1549,6 +1755,24 @@ components:
                  it. Three forms: WEEKDAYS + deny overrides = workday calendar (holidays);
                  NONE + allow overrides = on-call/inspection calendar; ALL + deny
                  overrides = lockdown calendar.
+        cyber.system.v1.ChangePasswordRequest:
+            type: object
+            properties:
+                oldPassword:
+                    type: string
+                newPassword:
+                    type: string
+            description: changePassword
+        cyber.system.v1.ChangePasswordResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.CheckOperationResponse:
+            type: object
+            properties:
+                allowed:
+                    type: boolean
+                reason:
+                    type: string
         cyber.system.v1.ConfirmUploadPart:
             type: object
             properties:
@@ -2512,7 +2736,20 @@ components:
                     type: boolean
                 avatar:
                     type: string
+        cyber.system.v1.VerifySessionResponse:
+            type: object
+            properties:
+                userId:
+                    type: string
+                tenantId:
+                    type: string
+                sessionId:
+                    type: string
+                email:
+                    type: string
 tags:
+    - name: AgentConfigAdminService
+    - name: AgentConfigService
     - name: AuditService
     - name: AuthService
     - name: DeptService
@@ -2544,11 +2781,9 @@ tags:
          file id, access URLs are minted at render time, and storage
          backends can migrate without touching stored references.
     - name: FileService
+    - name: IntrospectService
     - name: PolicyService
     - name: ResourceService
-      description: |-
-        Resource introspection service. Lists all RPC service/method info by
-         reflecting on the registered proto descriptors.
     - name: RoleService
     - name: TransferService
       description: |-

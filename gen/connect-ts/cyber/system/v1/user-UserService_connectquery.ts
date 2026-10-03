@@ -20,6 +20,11 @@ export const updateUser = UserService.method.updateUser;
 export const updateUserStatus = UserService.method.updateUserStatus;
 
 /**
+ * @generated from rpc cyber.system.v1.UserService.ChangePassword
+ */
+export const changePassword = UserService.method.changePassword;
+
+/**
  * @generated from rpc cyber.system.v1.UserService.DeleteUser
  */
 export const deleteUser = UserService.method.deleteUser;

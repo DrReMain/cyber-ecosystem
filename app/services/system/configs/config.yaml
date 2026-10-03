@@ -78,6 +78,9 @@ observability:
 #      max_age_days: 30 # 天 (最大保留天数)
 #      compress: true
 
+catalog:
+  dir: ../../../../../gen/catalog   # 生成物清单
+
 authz:
   super_admins:
     - admin1@cyber.local            # 邮箱 (种子超管)

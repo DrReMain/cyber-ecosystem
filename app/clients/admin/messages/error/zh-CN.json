@@ -59,6 +59,7 @@
   "error_FLOW_ERROR_CONCURRENT_LIMIT": "当前操作人数过多，请稍后重试",
   "error_SYSTEM_UNSPECIFIED": "服务内部错误，请稍后重试",
   "error_SYSTEM_LOGIN_FAILED": "邮箱或密码错误",
+  "error_SYSTEM_PASSWORD_MISMATCH": "旧密码不正确",
   "error_SYSTEM_DEPT_SELF_PARENT": "部门不能作为自己的上级",
   "error_SYSTEM_DEPT_CYCLE": "不能创建循环的部门层级",
   "error_SYSTEM_DEPT_HAS_CHILDREN": "请先处理该部门下的子部门",

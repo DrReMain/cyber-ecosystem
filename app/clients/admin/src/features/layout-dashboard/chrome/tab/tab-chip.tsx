@@ -69,7 +69,7 @@ export function TabChip({
         tabIndex={isActive ? 0 : -1}
       >
         {Icon ? <Icon aria-hidden className="size-3.5 flex-none" /> : null}
-        <span className="max-w-40 truncate">{text(tab.title)}</span>
+        <span className="max-w-40 truncate">{text(tab.title, tab.titleParams)}</span>
         {!tab.affix && siblingCount > 1 ? (
           <button
             aria-label={m.layout_dashboard_tab_close()}

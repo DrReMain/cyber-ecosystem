@@ -1,0 +1,68 @@
+server:
+  http: {addr: 0.0.0.0:11002, timeout: 1s}
+  grpc: {addr: 0.0.0.0:12002, timeout: 1s}
+  connect: {addr: 0.0.0.0:13002, timeout: 1s}
+data:
+  database:
+    driver: postgres
+    host: localhost
+    port: 5432
+    user: postgres
+    password: postgres
+    db_name: agent
+    max_open_conns: 100        # 个 (最大连接数)
+    max_idle_conns: 50         # 个 (最大空闲连接数)
+    conn_max_lifetime: 3600s   # 时长 (连接最大存活)
+  redis:
+    network: tcp
+    addr: localhost:6379
+    password: ""
+    db: 1                      # 序号 (与 system 的 db 0 隔离；本服务暂无缓存读写)
+    pool_size: 50              # 个 (连接池大小)
+    min_idle_conns: 5          # 个 (最小空闲连接数)
+    conn_max_lifetime: 1800s   # 时长 (连接最大存活)
+    read_timeout: 0.2s         # 时长 (读超时)
+    write_timeout: 0.2s        # 时长 (写超时)
+    dial_timeout: 5s           # 时长 (拨号超时)
+    pool_timeout: 1.2s         # 时长 (池等待超时)
+  storage:
+    s3:
+      endpoint: http://localhost:8333
+      public_endpoint: http://192.168.50.203:8333 # presign 铸造基址（浏览器可达；LAN/边缘域）；空=endpoint
+      access_key: admin@cyber-ecosystem.com
+      secret_key: Cyber-Ecosystem123
+      bucket: core
+      region: us-east-1
+      use_path_style: true
+      multipart_threshold: 8388608  # 8 MiB
+      part_size: 5242880            # 5 MiB
+      presign_ttl: 900s
+      max_file_size: 2147483648     # 2 GiB
+  mq:
+    pg: # 与 nats 二选一；无 NATS 部署用；需预先 CREATE DATABASE mq
+      dsn: postgres://postgres:postgres@localhost:5432/mq?sslmode=disable
+      poll_interval: 0.5s
+      visibility_timeout: 30s
+      max_retries: 5
+      retention: 604800s         # 7 天
+      batch_size: 16
+observability:
+  endpoint: localhost:4318        # SigNoz OTLP HTTP
+  insecure: true
+  trace:
+    enabled: false
+  metrics:
+    enabled: false
+  slow_query:
+    db: 0.2s
+    cache: 0.05s
+  log:
+    level: debug
+    console: true
+    otlp: false
+
+remote:
+  system_connect: localhost:13001 # system connect
+
+crypto:
+  master_key: agent-dev-master-key # 仅裸机 dev；容器走 APP_AGENT_MASTER_KEY 覆盖

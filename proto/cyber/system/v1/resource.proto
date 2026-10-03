@@ -8,11 +8,9 @@ import "google/api/annotations.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 
-// Resource introspection service. Lists all RPC service/method info by
-// reflecting on the registered proto descriptors.
 service ResourceService {
-  option (cyber.ext.v1.service_comment) = "资源目录内省";
-  // List all RPC service and method info.
+  option (cyber.ext.v1.service_comment) = "资源目录";
+
   rpc ListResource(ListResourceRequest) returns (ListResourceResponse) {
     option (cyber.ext.v1.method) = {
       comment: "获取所有rpc信息"

@@ -1,9 +1,9 @@
 {
   "login_default_title": "登录",
   "login_default_description": "",
-  "login_default_hero_title_a": "智能",
-  "login_default_hero_title_b": "管理控制台",
-  "login_default_hero_sub": "AI 驱动的通用管理底座：统一入口，连接所有子系统与智能工具。",
+  "login_default_hero_title_a": "AI Native ",
+  "login_default_hero_title_b": "管理系统",
+  "login_default_hero_sub": "契约先行的通用底座：统一身份、权限与入口，服务按需组合、随业务生长。",
   "login_default_form_title": "登录",
   "login_default_form_sub": "使用工作邮箱继续",
   "login_default_label_email": "邮箱",

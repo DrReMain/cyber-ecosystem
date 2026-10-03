@@ -14,7 +14,7 @@ import "google/protobuf/wrappers.proto";
 option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 
 service UserService {
-  option (cyber.ext.v1.service_comment) = "用户账号管理";
+  option (cyber.ext.v1.service_comment) = "用户管理";
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
     option (cyber.ext.v1.method) = {
       comment: "创建用户"
@@ -47,6 +47,18 @@ service UserService {
     option (cyber.ext.v1.datascope) = true;
     option (google.api.http) = {
       put: "/api/v1/system/users/{id}/status"
+      body: "*"
+    };
+  }
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "修改密码"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {
+      post: "/api/v1/system/me/password"
       body: "*"
     };
   }
@@ -171,6 +183,23 @@ message UpdateUserStatusRequest {
 }
 
 message UpdateUserStatusResponse {}
+
+// changePassword
+message ChangePasswordRequest {
+  optional string old_password = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string new_password = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 128
+    }
+  ];
+}
+
+message ChangePasswordResponse {}
 
 // delete
 message DeleteUserRequest {

@@ -29,17 +29,19 @@ import {
   RotateCw,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import { dashboardPreferencesUiStore } from "#/stores/dashboard-preferences/ui-store";
-import { isHome, navTo, useNavIndex } from "../../protocol/nav";
+import { isHome, navTo, useAllNavIndex, useNavIndex } from "../../protocol/nav";
 import { ScrollFade } from "../scroll-fade";
 import { SortableTabChip } from "./sortable-tab-chip";
 import { TabChip } from "./tab-chip";
 import {
+  activeTabOf,
   closedBulk,
   closedTabs,
+  matchesAgreeWith,
   movedTabs,
   pinnedTabs,
   restoredTabs,
@@ -136,6 +138,23 @@ interface TabbarProps {
   scrolled?: boolean;
 }
 
+function useActiveTabHref(
+  matches: ReturnType<typeof useMatches>,
+  href: string,
+  pathname: string,
+  setTabs: Dispatch<SetStateAction<TabRecord[]>>,
+): void {
+  useEffect(() => {
+    if (!matchesAgreeWith(matches, pathname)) return;
+    const record = tabFromMatches(matches);
+    if (!record) return;
+    setTabs((prev) => {
+      if (!prev.some((t) => t.key === record.key && t.href !== href)) return prev;
+      return prev.map((t) => (t.key === record.key ? { ...t, href } : t));
+    });
+  }, [href, matches, pathname, setTabs]);
+}
+
 export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -146,33 +165,31 @@ export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
   const [tabs, setTabs] = useState<TabRecord[]>([]);
   const [ready, setReady] = useState(false);
   const navIndex = useNavIndex();
+  const allIndex = useAllNavIndex();
+  const activeRecord = activeTabOf(matches, pathname);
+  const activeKey = activeRecord?.key;
 
+  // Writes even an empty list: in apps without an affixed home tab, skipping
+  // the write on the last close would let a stale session resurrect tabs.
   useEffect(() => {
-    if (!ready || tabs.length === 0) return;
+    if (!ready) return;
     writeTabSession(tabs);
   }, [ready, tabs]);
 
-  useEffect(() => {
-    setTabs((prev) =>
-      prev.some((t) => t.key === pathname && t.href !== href)
-        ? prev.map((t) => (t.key === pathname ? { ...t, href } : t))
-        : prev,
-    );
-  }, [href, pathname]);
+  useActiveTabHref(matches, href, pathname, setTabs);
 
   const navKey = useMemo(() => [...navIndex.keys()].sort().join("|"), [navIndex]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: navIndex is read fresh inside; the dep is its content digest
   useEffect(() => {
-    setTabs(restoredTabs(navIndex, tabFromMatches(matches)));
+    setTabs((prev) => restoredTabs(navIndex, allIndex, activeRecord, prev));
     setReady(true);
   }, [navKey]);
 
   useIsomorphicLayoutEffect(() => {
+    if (!matchesAgreeWith(matches, pathname)) return;
     const record = tabFromMatches(matches);
-    if (!record || record.key !== pathname) return;
-    const node = navIndex.get(record.key);
-    if (node && node.children.length > 0) return;
+    if (!record || navIndex.get(record.pattern)?.children.length) return;
     setTabs((prev) => (prev.some((t) => t.key === record.key) ? prev : [...prev, record]));
   }, [matches, pathname, navIndex]);
 
@@ -186,14 +203,15 @@ export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
     if (!result) return;
     setTabs(result.tabs);
     const fallback = hrefOf(result.fallback);
-    if (key === pathname && fallback) navTo(router, fallback);
-    setPendingFocus(key === pathname ? result.fallback : pathname);
+    const wasActive = key === activeKey;
+    if (wasActive && fallback) navTo(router, fallback);
+    setPendingFocus(wasActive ? result.fallback : pathname);
   };
 
   const runBulk = (action: string, tab: TabRecord) => {
     const scope = BULK_SCOPES[action as keyof typeof BULK_SCOPES];
     if (!scope) return;
-    const result = closedBulk(tabs, tab.key, scope, pathname);
+    const result = closedBulk(tabs, tab.key, scope, activeKey ?? pathname);
     if (!result) return;
     setTabs(result.tabs);
     const fallback = hrefOf(result.fallback);
@@ -218,11 +236,10 @@ export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
   };
 
   const { atEnd, atStart, overflow, ref, scroll } = useTabScroll({
-    activeKey: pathname,
+    activeKey: activeKey ?? pathname,
     count: tabs.length,
   });
 
-  const activeRecord = tabFromMatches(matches);
   const activeMenu = activeRecord
     ? (() => {
         const tab = tabs.find((t) => t.key === activeRecord.key) ?? activeRecord;
@@ -260,9 +277,9 @@ export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
   }, [pendingFocus, ref, tabs]);
 
   const chipProps = (tab: TabRecord) => ({
-    isActive: tab.key === pathname,
+    isActive: tab.key === activeKey,
     menu: {
-      items: contextMenuItems(tab, tabs, pathname),
+      items: contextMenuItems(tab, tabs, activeKey ?? pathname),
       onClick: ({ key }: { key: string }) => runAction(key, tab),
     },
     onActivate: () => {
@@ -270,7 +287,7 @@ export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
         didDragRef.current = false;
         return;
       }
-      if (tab.key !== pathname) navTo(router, tab.href ?? tab.key);
+      if (tab.key !== activeKey) navTo(router, tab.href ?? tab.key);
     },
     onClose: () => close(tab.key),
     siblingCount: tabs.length,

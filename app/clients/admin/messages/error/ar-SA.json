@@ -59,6 +59,7 @@
   "error_FLOW_ERROR_CONCURRENT_LIMIT": "عمليات متزامنة كثيرة جدًا. حاول مجددًا بعد قليل.",
   "error_SYSTEM_UNSPECIFIED": "حدث خطأ داخلي. حاول مجددًا بعد قليل.",
   "error_SYSTEM_LOGIN_FAILED": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+  "error_SYSTEM_PASSWORD_MISMATCH": "كلمة المرور الحالية غير صحيحة.",
   "error_SYSTEM_DEPT_SELF_PARENT": "لا يمكن أن يكون القسم رئيسًا لنفسه.",
   "error_SYSTEM_DEPT_CYCLE": "لا يُسمح بتسلسل هرمي دائري للأقسام.",
   "error_SYSTEM_DEPT_HAS_CHILDREN": "يرجى معالجة الأقسام الفرعية تحت هذا القسم أولًا.",

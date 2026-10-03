@@ -5,8 +5,8 @@ description: TanStack client change & verification — use when creating or edit
 
 # TanStack client change
 
-Page creation: `docs/conventions/tanstack/CONVENTIONS.md §3` — route tiers and the page read-set contract (`staticData.operations` = every query the page issues, whole-set judged); §5 — one component per file, naming grammar; §6 — i18n ownership (directory registration in `project.inlang/settings.json`, key prefix = directory name, deliberate key order).
+Page creation: `docs/conventions/tanstack/CONVENTIONS.md §3` (route tiers & the page read-set contract), §5 (component & naming grammar), §6 (i18n ownership).
 
-Verification: `docs/conventions/tanstack/CONVENTIONS.md §11` — build FIRST (regenerates routeTree + paraglide), then typecheck, then check; all `--skip-nx-cache` with exit codes checked; delete `*.tsbuildinfo` after any regeneration (incremental cache reports stale greens).
+Verification: §11 — order and cache rules live there (build-first, `*.tsbuildinfo`); follow exactly.
 
-Reachable-surface rule: `docs/conventions/tanstack/CONVENTIONS.md §11` — login-reachable surfaces get e2e before done; auth-only surfaces carry an explicit user-verification list in the change report.
+Reachable-surface rule: §11 (login pages, guard redirects, SSR entry) — applies before reporting done.

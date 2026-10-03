@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service IntrospectService {
+  option (cyber.ext.v1.service_comment) = "跨服务会话与授权内省";
+  rpc VerifySession(VerifySessionRequest) returns (VerifySessionResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "会话自省（调用方转发用户 cookie）"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {get: "/api/v1/system/me/introspect"};
+  }
+  rpc CheckOperation(CheckOperationRequest) returns (CheckOperationResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "授权自省（对当前用户裁决一个 operation）"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {get: "/api/v1/system/me/introspect/operation"};
+  }
+}
+
+// verifySession
+message VerifySessionRequest {}
+
+message VerifySessionResponse {
+  google.protobuf.StringValue user_id = 1;
+  google.protobuf.StringValue tenant_id = 2;
+  google.protobuf.StringValue session_id = 3;
+  google.protobuf.StringValue email = 4;
+}
+
+// checkOperation
+message CheckOperationRequest {
+  string operation = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message CheckOperationResponse {
+  bool allowed = 1;
+  string reason = 2; // NO_GRANT | ABAC_CONSTRAINT | BUILTIN; empty when allowed by grants
+}

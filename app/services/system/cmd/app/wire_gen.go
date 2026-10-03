@@ -16,6 +16,7 @@ import (
 	"cyber-ecosystem/app/services/system/internal/module/file"
 	"cyber-ecosystem/app/services/system/internal/module/filepresign"
 	"cyber-ecosystem/app/services/system/internal/module/fileproxy"
+	"cyber-ecosystem/app/services/system/internal/module/introspect"
 	"cyber-ecosystem/app/services/system/internal/module/policy"
 	"cyber-ecosystem/app/services/system/internal/module/resource"
 	"cyber-ecosystem/app/services/system/internal/module/role"
@@ -30,7 +31,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, logger *slog.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, catalog *conf.Catalog, logger *slog.Logger) (*kratos.App, func(), error) {
 	cache, cleanup, err := platform.NewCache(data, logger)
 	if err != nil {
 		return nil, nil, err
@@ -85,7 +86,14 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, lo
 	deptRP := dept.NewDeptRP(logger, platformPlatform)
 	deptUC := dept.NewDeptUC(logger, platformPlatform, deptRP)
 	deptService := dept.NewDeptService(logger, deptUC)
-	resourceRP := resource.NewResourceRP(logger, platformPlatform)
+	resourceRP, err := resource.NewResourceRP(logger, platformPlatform, catalog)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	resourceUC := resource.NewResourceUC(logger, platformPlatform, resourceRP)
 	resourceService := resource.NewResourceService(logger, resourceUC)
 	userRP := user.NewUserRP(logger, platformPlatform)
@@ -122,8 +130,9 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, lo
 	filePresignRP := filepresign.NewFilePresignRP(logger, platformPlatform)
 	filePresignUC := filepresign.NewFilePresignUC(logger, platformPlatform, filePresignRP)
 	filePresignService := filepresign.NewFilePresignService(logger, filePresignUC)
-	v := server.NewRegistrarList(deptService, resourceService, userService, transferService, authService, roleService, policyService, auditService, fileService, fileProxyService, filePresignService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, authzRP, lifecycle)
+	introspectService := introspect.NewIntrospectService(logger, authzUC)
+	v := server.NewRegistrarList(deptService, resourceService, userService, transferService, authService, roleService, policyService, auditService, fileService, fileProxyService, filePresignService, introspectService)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, authUC, authzUC, auditUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, authUC, authzUC, auditUC)
 	connectServer := server.NewConnectServer(confServer, logger, v, authUC, authzUC, auditUC)

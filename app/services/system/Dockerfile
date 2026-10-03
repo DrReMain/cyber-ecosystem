@@ -18,6 +18,8 @@ FROM alpine:3.23
 # busybox (wget) backs the container healthcheck; the binary is static (CGO off).
 COPY --from=build /out/system /system
 COPY app/services/system/container/ /configs/
+COPY gen/catalog/ /etc/cyber/catalog/
+RUN chmod -R a+rX /etc/cyber/catalog
 USER nobody
 ENTRYPOINT ["/system"]
 CMD ["-conf", "/configs"]

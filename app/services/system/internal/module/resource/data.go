@@ -2,19 +2,17 @@ package resource
 
 import (
 	"context"
+	"fmt"
+	"io/fs"
 	"log/slog"
+	"os"
 	"sort"
 	"strings"
+	"sync"
 
-	"google.golang.org/genproto/googleapis/api/annotations"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
+	"cyber-ecosystem/shared-go/utils"
 
-	"cyber-ecosystem/shared-go/helper"
-
-	extv1 "cyber-ecosystem/gen/go/cyber/ext/v1"
-
+	"cyber-ecosystem/app/services/system/internal/conf"
 	"cyber-ecosystem/app/services/system/internal/platform"
 	"cyber-ecosystem/app/services/system/internal/shared"
 )
@@ -23,77 +21,107 @@ import (
 
 type resourceRP struct {
 	shared.RP
+
+	fsys     fs.FS
+	dirLabel string
+
+	mu       sync.Mutex
+	stamp    string
+	services []*ServiceMeta
 }
 
-func NewResourceRP(logger *slog.Logger, p *platform.Platform) ResourceRP {
-	return &resourceRP{
-		RP: shared.NewRP(logger.With("module", "module/resource_rp"), p),
+func NewResourceRP(logger *slog.Logger, p *platform.Platform, c *conf.Catalog) (ResourceRP, error) {
+	if c == nil || c.GetDir() == "" {
+		return nil, fmt.Errorf("catalog.dir is required")
 	}
+	rp := &resourceRP{
+		RP:       shared.NewRP(logger.With("module", "module/resource_rp"), p),
+		fsys:     os.DirFS(c.GetDir()),
+		dirLabel: c.GetDir(),
+	}
+	if _, err := rp.load(); err != nil {
+		return nil, err
+	}
+	return rp, nil
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
 
 func (rp *resourceRP) ListResource(ctx context.Context) ([]*ServiceMeta, error) {
-	const protoPrefix = "cyber/system/v1/"
-	var services []*ServiceMeta
-
-	protoregistry.GlobalFiles.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
-		if !strings.HasPrefix(fd.Path(), protoPrefix) {
-			return true
+	stamp, err := rp.statStamp()
+	if err != nil {
+		return nil, err
+	}
+	rp.mu.Lock()
+	defer rp.mu.Unlock()
+	if stamp != rp.stamp {
+		rp.stamp = stamp
+		if _, err := rp.reload(); err != nil {
+			return nil, err
 		}
-		for i := 0; i < fd.Services().Len(); i++ {
-			services = append(services, buildServiceMeta(fd.Services().Get(i), fd))
-		}
-		return true
-	})
-	sort.Slice(services, func(i, j int) bool { return services[i].FullName < services[j].FullName })
-
-	return services, nil
+	}
+	return rp.services, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
 
-func buildServiceMeta(sd protoreflect.ServiceDescriptor, fd protoreflect.FileDescriptor) *ServiceMeta {
-	svc := &ServiceMeta{
-		Name:       string(sd.Name()),
-		FullName:   string(sd.FullName()),
-		Package:    string(fd.Package()),
-		SourceFile: fd.Path(),
-		Comment:    helper.GetServiceComment(sd),
-	}
-
-	methods := make([]*ResourceMethod, sd.Methods().Len())
-	for i := 0; i < sd.Methods().Len(); i++ {
-		methods[i] = buildResourceMethod(sd.Methods().Get(i))
-	}
-	sort.Slice(methods, func(i, j int) bool { return methods[i].Name < methods[j].Name })
-	svc.Methods = methods
-
-	return svc
+func (rp *resourceRP) load() ([]*ServiceMeta, error) {
+	rp.mu.Lock()
+	defer rp.mu.Unlock()
+	rp.stamp, _ = rp.statStamp()
+	return rp.reload()
 }
 
-func buildResourceMethod(md protoreflect.MethodDescriptor) *ResourceMethod {
-	m := &ResourceMethod{
-		Name:             string(md.Name()),
-		FullName:         string(md.FullName()),
-		RequestName:      string(md.Input().Name()),
-		RequestFullName:  string(md.Input().FullName()),
-		ResponseName:     string(md.Output().Name()),
-		ResponseFullName: string(md.Output().FullName()),
-		Comment:          helper.GetMethodComment(md),
+func (rp *resourceRP) reload() ([]*ServiceMeta, error) {
+	entries, err := fs.ReadDir(rp.fsys, ".")
+	if err != nil {
+		return nil, fmt.Errorf("catalog: read dir %s: %w", rp.dirLabel, err)
 	}
-
-	if options := md.Options(); options != nil {
-		if rule, ok := proto.GetExtension(options, annotations.E_Http).(*annotations.HttpRule); ok && rule != nil {
-			m.HttpMethod, m.HttpPath = helper.ExtractHTTP(rule)
+	var services []*ServiceMeta
+	seen := make(map[string]string)
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".json") {
+			continue
 		}
-		m.Builtin = proto.GetExtension(options, extv1.E_Builtin).(bool)
-		m.Datascope = proto.GetExtension(options, extv1.E_Datascope).(bool)
-		if proto.HasExtension(options, extv1.E_Access) {
-			acc := proto.GetExtension(options, extv1.E_Access).(extv1.Access)
-			m.Access = strings.TrimPrefix(acc.String(), "ACCESS_")
+		raw, err := fs.ReadFile(rp.fsys, e.Name())
+		if err != nil {
+			return nil, fmt.Errorf("catalog: read %s: %w", e.Name(), err)
+		}
+		batch, err := utils.Unmarshal[[]*ServiceMeta](raw)
+		if err != nil {
+			return nil, fmt.Errorf("catalog: parse %s: %w", e.Name(), err)
+		}
+		for _, s := range batch {
+			if prev, dup := seen[s.FullName]; dup {
+				return nil, fmt.Errorf("catalog: service %s declared in both %s and %s", s.FullName, prev, e.Name())
+			}
+			seen[s.FullName] = e.Name()
+			services = append(services, s)
 		}
 	}
+	if len(services) == 0 {
+		return nil, fmt.Errorf("catalog: no manifests under %s", rp.dirLabel)
+	}
+	sort.Slice(services, func(i, j int) bool { return services[i].FullName < services[j].FullName })
+	rp.services = services
+	return services, nil
+}
 
-	return m
+func (rp *resourceRP) statStamp() (string, error) {
+	entries, err := fs.ReadDir(rp.fsys, ".")
+	if err != nil {
+		return "", fmt.Errorf("catalog: read dir %s: %w", rp.dirLabel, err)
+	}
+	var b strings.Builder
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".json") {
+			continue
+		}
+		info, err := e.Info()
+		if err != nil {
+			return "", fmt.Errorf("catalog: stat %s: %w", e.Name(), err)
+		}
+		fmt.Fprintf(&b, "%s:%d:%d;", e.Name(), info.ModTime().UnixNano(), info.Size())
+	}
+	return b.String(), nil
 }

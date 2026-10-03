@@ -177,6 +177,26 @@ func (uc *UserUC) UpdateStatus(ctx context.Context, id string, enabled bool) (ou
 	return out, nil
 }
 
+func (uc *UserUC) ChangePassword(ctx context.Context, oldPassword, newPassword string) error {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("change password requires an authenticated caller"))
+	}
+	u, err := uc.userRP.FindByID(ctx, subject.UserID)
+	if err != nil {
+		return err
+	}
+	if !utils.Verify(oldPassword, *u.PasswordHash) {
+		return systempb.ErrorSystemPasswordMismatch("").WithCause(fmt.Errorf("old password mismatch: user %s", subject.UserID))
+	}
+	hash, err := utils.Hash(newPassword)
+	if err != nil {
+		return errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", err))
+	}
+	_, err = uc.userRP.Update(ctx, []string{"password"}, &User{ID: subject.UserID, PasswordHash: &hash})
+	return err
+}
+
 func (uc *UserUC) Delete(ctx context.Context, id string) (out string, err error) {
 	if subject, ok := security.SubjectFromCtx(ctx); ok && subject.UserID == id {
 		return "", systempb.ErrorSystemUserSelfDelete("")

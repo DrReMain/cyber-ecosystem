@@ -13,7 +13,7 @@ import "google/protobuf/wrappers.proto";
 option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 
 service PolicyService {
-  option (cyber.ext.v1.service_comment) = "ABAC 策略管理";
+  option (cyber.ext.v1.service_comment) = "策略管理";
   rpc CreatePolicy(CreatePolicyRequest) returns (CreatePolicyResponse) {
     option (cyber.ext.v1.method) = {
       comment: "创建策略"

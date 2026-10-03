@@ -3,10 +3,6 @@ import type { m } from "#/paraglide/messages";
 
 export type MessageKey = keyof typeof m;
 
-export type NoParamMessageKey = {
-  [K in MessageKey]: (typeof m)[K] extends (inputs?: never, options?: never) => unknown ? K : never;
-}[MessageKey];
-
 export interface RouteMenuMeta {
   icon?: LucideIcon;
   type?: "group";
@@ -15,9 +11,20 @@ export interface RouteMenuMeta {
   order?: number;
 }
 
+export const compactParams = (
+  params: Record<string, string | undefined> | undefined,
+): Record<string, string> | undefined => {
+  if (!params) return undefined;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(params)) {
+    if (typeof v === "string") out[k] = v;
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+};
+
 declare module "@tanstack/react-router" {
   interface StaticDataRouteOption {
-    title?: NoParamMessageKey;
+    title?: MessageKey;
     menu?: RouteMenuMeta;
     operations?: readonly string[];
   }

@@ -102,6 +102,8 @@ The `(errors.code)` option comes from the vendored `proto/errors/errors.proto` (
 - `cyber/shared/errors/v1/error_detail.proto` is an **anchor file** (no messages, by design): its `google/rpc/error_details.proto` import is what pulls `error_details_pb` into `gen/connect-ts` via `--include-imports`. Excluded from Go codegen (`--exclude-path` in `proto/project.json`); its `go_package` exists only to satisfy the package-wide buf lint rule. Do not delete.
 - `gen/` is **derived**: change proto → regenerate via the owning Nx target (e.g. `./nx run proto:generate`), never hand-edit gen.
 - Proto is the single source of truth; Go struct fields / JSON tags follow generated code.
+- **Pipeline tools are Go, under `proto/cmd/`** — the pipeline's own tooling lives with the pipeline, in the repo's single Go module: `cmd/catalog` (derives the per-package operation manifests below) and `cmd/clean-gen` (pre-regen wipe; hand-maintained root files and `node_modules` survive; all filesystem access goes through `os.Root`, sandbox-confined by construction). The Node scripts era is retired; pnpm/openapi-ts invocations stay in target commands — package-manager calls are orchestration, not tool logic.
+- **Operation manifests (`gen/catalog/<package>.json`) are derived output** — `proto:generate:catalog` feeds `buf build`'s image to `cmd/catalog`, which emits one manifest per service-bearing proto package (services, methods, comment/access/builtin/datascope/http faces). The system service live-loads them as its federated grant catalog: a new service enters the grant tree when its manifest ships — no system code change, no restart. The JSON tags are a contract between `cmd/catalog` and system's resource module; both sides carry the sync note.
 
 ---
 
@@ -111,16 +113,16 @@ The `(errors.code)` option comes from the vendored `proto/errors/errors.proto` (
 2. New RPC: `<Verb><Entity>` + `Request`/`Response` messages + `google.api.http` + `method` desc (comment + action) + `access` (both required on every business RPC — see §5). Follow the verb order.
 3. New error reason: generic → `cyber.shared.errors.v1`; service-specific → `cyber.<service>/v1/error_reason.proto` (6xxx). Both with `errors.code`.
 4. Regenerate everything from the one source: `./nx run proto:generate` (gates on lint + format:check, then Go + connect-ts + OpenAPI/openapi-ts). Review the `gen/` diff — it must contain only what the source change implies; exclude unintended churn. `./nx run proto:check-drift` proves sync when in doubt.
-5. A new error reason also means client copy: add `error_<ValueName>` to the client error vocabulary (`messages/error/`) in **all three locales** (en/zh/ar) — a reason without copy renders raw on the client.
-6. `./nx run proto:breaking` before merging (FILE rules vs `origin/main`). Blind spot: it cannot see protovalidate rule removals/weakenings — review validation rules explicitly (§9).
+5. A new error reason also means client copy: add `error_<ValueName>` to the client error vocabulary (`messages/error/`) in **every locale registered in the client's paraglide settings** (`project.inlang/settings.json` — the registered set is per-fork and that file is the truth) — a reason without copy renders raw on the client.
+6. `./nx run proto:breaking` before merging (FILE rules vs `HEAD`). Blind spot: it cannot see protovalidate rule removals/weakenings — review validation rules explicitly (§9).
 7. Build the affected service (`./nx run <service>:build`); if the client surface changed, run the client verification chain (`docs/conventions/tanstack/CONVENTIONS.md §11`).
 
-Done = every command's exit code checked; breaking green (or weakenings consciously reviewed); gen diff clean; error copy present in three locales.
+Done = every command's exit code checked; breaking green (or weakenings consciously reviewed); gen diff clean; error copy present in every registered locale.
 
 ---
 
 ## 9. Versioning & breaking changes
 
-v1 is the only version so far. `./nx run proto:breaking` diffs against `origin/main` (FILE rules, the strongest tier) and `proto:generate` now gates on `lint` + `format:check` — run breaking before merging proto changes; its verdict is only as fresh as your last `git fetch`. Known blind spot: `buf breaking` does not diff custom option values, so **protovalidate rule removals/weakenings are invisible to it** — treat validation rules as behavior contract and review them explicitly (or cover them with per-rule rejection tests).
+v1 is the only version so far. `./nx run proto:breaking` diffs against **`HEAD`** (`--against .git#ref=HEAD,subdir=proto`) with FILE rules, the strongest tier — the gate answers "is this working tree a pure increment over the last commit's contracts?", which keeps it green-able on every change instead of drifting red against a stale remote branch. A deliberate breaking change (rename, migration) goes through the same gate consciously: verify every finding is the intended change, commit, and the gate re-arms. Cross-release checks against published baselines are a separate, deliberate invocation. Known blind spot: `buf breaking` does not diff custom option values, so **protovalidate rule removals/weakenings are invisible to it** — treat validation rules as behavior contract and review them explicitly (or cover them with per-rule rejection tests).
 
 Conventions for v2 / deprecation policy are not yet defined — add before a second version lands.

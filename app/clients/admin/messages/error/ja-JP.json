@@ -59,6 +59,7 @@
   "error_FLOW_ERROR_CONCURRENT_LIMIT": "同時操作が多すぎます。しばらくしてからもう一度お試しください。",
   "error_SYSTEM_UNSPECIFIED": "内部エラーが発生しました。しばらくしてからもう一度お試しください。",
   "error_SYSTEM_LOGIN_FAILED": "メールアドレスまたはパスワードが正しくありません。",
+  "error_SYSTEM_PASSWORD_MISMATCH": "現在のパスワードが正しくありません。",
   "error_SYSTEM_DEPT_SELF_PARENT": "部門を自分自身の上位にはできません。",
   "error_SYSTEM_DEPT_CYCLE": "部門階層を循環させることはできません。",
   "error_SYSTEM_DEPT_HAS_CHILDREN": "まずこの部門配下の子部門を処理してください。",

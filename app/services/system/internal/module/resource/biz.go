@@ -10,27 +10,27 @@ import (
 // DO ------------------------------------------------------------------------------------------------------------------
 
 type ResourceMethod struct {
-	Name             string
-	FullName         string
-	RequestName      string
-	RequestFullName  string
-	ResponseName     string
-	ResponseFullName string
-	HttpMethod       string
-	HttpPath         string
-	Comment          string
-	Builtin          bool   // builtin baseline op: not grantable
-	Access           string // audience annotation as declared
-	Datascope        bool   // row-level narrowing applies: scope selection is offered
+	Name             string `json:"name"`
+	FullName         string `json:"full_name"`
+	RequestName      string `json:"request_name"`
+	RequestFullName  string `json:"request_full_name"`
+	ResponseName     string `json:"response_name"`
+	ResponseFullName string `json:"response_full_name"`
+	HttpMethod       string `json:"http_method"`
+	HttpPath         string `json:"http_path"`
+	Comment          string `json:"comment"`
+	Builtin          bool   `json:"builtin"`   // builtin baseline op: not grantable
+	Access           string `json:"access"`    // audience annotation as declared
+	Datascope        bool   `json:"datascope"` // row-level narrowing applies: scope selection is offered
 }
 
 type ServiceMeta struct {
-	Name       string
-	FullName   string
-	Package    string
-	SourceFile string
-	Comment    string
-	Methods    []*ResourceMethod
+	Name       string            `json:"name"`
+	FullName   string            `json:"full_name"`
+	Package    string            `json:"package"`
+	SourceFile string            `json:"source_file"`
+	Comment    string            `json:"comment"`
+	Methods    []*ResourceMethod `json:"methods"`
 }
 
 // Port ----------------------------------------------------------------------------------------------------------------

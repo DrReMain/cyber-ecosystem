@@ -41,11 +41,14 @@ func buildLogger(cfg Config, name, version, instanceID string, res *resource.Res
 	}
 	var handlers []slog.Handler
 
-	// console/file carry no level option — the fanout gates all sinks uniformly
-	// by `level`. Each is wrapped in a localSink so records gain trace correlation
-	// from their context; service identity is baked in via WithAttrs.
+	// console/file carry the same explicit Level as the fanout gate: slog
+	// checks Enabled twice (Logger → fanout, then per-sink inside Handle), and
+	// a zero-value HandlerOptions defaults to Info — silently filtering Debug
+	// even when `level: debug` is configured. Each sink is wrapped in a
+	// localSink so records gain trace correlation from their context; service
+	// identity is baked in via WithAttrs.
 	if cfg.Log.Console {
-		base := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true})
+		base := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true, Level: level})
 		handlers = append(handlers, &localSink{inner: base.WithAttrs(svcAttrs)})
 	}
 	if cfg.Log.File != nil && cfg.Log.File.Path != "" {
@@ -56,7 +59,7 @@ func buildLogger(cfg Config, name, version, instanceID string, res *resource.Res
 			MaxAge:     cfg.Log.File.MaxAgeDays,
 			Compress:   cfg.Log.File.Compress,
 		}
-		base := slog.NewJSONHandler(w, &slog.HandlerOptions{AddSource: true})
+		base := slog.NewJSONHandler(w, &slog.HandlerOptions{AddSource: true, Level: level})
 		handlers = append(handlers, &localSink{inner: base.WithAttrs(svcAttrs)})
 	}
 	if cfg.Log.OTLP && cfg.Endpoint != "" {

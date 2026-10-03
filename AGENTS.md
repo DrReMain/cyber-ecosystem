@@ -84,14 +84,7 @@ Before closing any change:
 
 ## 7) Documentation — Three Lanes
 
-Knowledge lives in three lanes; each kind of knowledge has exactly one home. Full governance law (admission, promotion, backfill, pointer discipline, drift checks): `docs/README.md`.
-
-| Lane | Home | Holds | Language |
-|---|---|---|---|
-| Durable — rules & mechanisms | `docs/conventions/<area>/CONVENTIONS.md` | what you MUST follow; how the system works | EN |
-| Procedural — workflows | `.claude/skills/<name>/SKILL.md` | dispatchers: trigger + pointers + assembly; never content | EN |
-
-The third lane — working docs for active fronts — is temporary by contract and fully isolated from everything an agent loads; its home and lifecycle are defined only in `docs/README.md`.
+Knowledge lives in three lanes; each kind of knowledge has exactly one home — durable rules (`docs/conventions/<area>/CONVENTIONS.md`, EN), procedural skill dispatchers (`.claude/skills/<name>/SKILL.md`, EN; trigger + pointers, never content), and a temporary, fully isolated working lane for active fronts (defined only in `docs/README.md`). Full governance law (admission, promotion, backfill, pointer discipline, instance-state, drift checks): `docs/README.md`.
 
 Lane rules:
 
@@ -115,7 +108,7 @@ Adding a new tech stack: create `docs/conventions/<area>/CONVENTIONS.md` **with 
 
 ## 8) Multi-app composition
 
-One shared base, many business applications (2026-09-26 rulings; merged into root rules 2026-09-30):
+One shared base, many business applications:
 
 - **`system` is the mandatory base service** every application deploys: authentication, user identity, org (dept), roles, authz engine, resource catalog. Each application adds services under `app/services/<name>` with contracts under `proto/cyber/<name>/v1`, owning its aggregates end-to-end (schema, migrations, biz, RPC).
 - Cross-service reads at runtime go through the owning service's RPCs — from clients, or behind a `<Remote>RP` ACL adapter in the consuming service. Business services `MUST NOT` grow identity/auth concerns; those live in `system` and are shared by all apps.

@@ -16,6 +16,7 @@ enum System {
 
   // 600x: auth
   SYSTEM_LOGIN_FAILED = 6000 [(.errors.code) = 400];
+  SYSTEM_PASSWORD_MISMATCH = 6001 [(.errors.code) = 400];
 
   // 601x: dept
   SYSTEM_DEPT_SELF_PARENT = 6010 [(.errors.code) = 400];

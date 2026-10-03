@@ -36,10 +36,6 @@ data:
     pool_timeout: 1.2s         # duration (pool wait timeout)
   storage:
     s3:
-      # Browser-facing presigned URLs are signed against this endpoint, so it
-      # must be the EXTERNAL name (edge host route). In-network callers reach
-      # the same name directly via the s3.cyber.test network alias on the
-      # seaweedfs container (see deploy/docker/compose.dev.yaml).
       endpoint: ${S3_ENDPOINT:http://s3.cyber.test}
       public_endpoint: ${S3_ENDPOINT:http://s3.cyber.test}
       access_key: ${S3_ACCESS_KEY:admin@cyber-ecosystem.com}
@@ -75,7 +71,10 @@ observability:
     console: true
     otlp: false
 
+catalog:
+  dir: ${CATALOG_DIR:/etc/cyber/catalog}
+
 authz:
   super_admins:
-    - admin@cyber.pre          
+    - admin@cyber.pre
   initial_password: "admin123456"

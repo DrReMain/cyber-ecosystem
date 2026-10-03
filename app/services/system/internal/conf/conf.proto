@@ -10,7 +10,8 @@ message Bootstrap {
   Server server = 1;
   Data data = 2;
   Observability observability = 3;
-  Authz authz = 4;
+  Catalog catalog = 4;
+  Authz authz = 5;
 }
 
 message Server {
@@ -136,6 +137,10 @@ message Observability {
   Metrics metrics = 4;
   Log log = 5;
   SlowQuery slow_query = 6;
+}
+
+message Catalog {
+  string dir = 1;
 }
 
 message Authz {

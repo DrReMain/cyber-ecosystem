@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package cyber.agent.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/agent/v1";
+
+service AgentConfigService {
+  option (cyber.ext.v1.service_comment) = "agent连接配置";
+  rpc UpdateMyAgentConfig(UpdateMyAgentConfigRequest) returns (UpdateMyAgentConfigResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "配置agent连接"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {
+      put: "/api/v1/agent/me/agent-config"
+      body: "*"
+    };
+  }
+  rpc DeleteMyAgentConfig(DeleteMyAgentConfigRequest) returns (DeleteMyAgentConfigResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "清除agent连接"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {delete: "/api/v1/agent/me/agent-config"};
+  }
+  rpc GetMyAgentConfig(GetMyAgentConfigRequest) returns (GetMyAgentConfigResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询agent连接"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {get: "/api/v1/agent/me/agent-config"};
+  }
+}
+
+message AgentConfig {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue user_id = 4;
+  google.protobuf.StringValue base_url = 5;
+  google.protobuf.BoolValue api_key_set = 6;
+}
+
+// update
+message UpdateMyAgentConfigRequest {
+  optional string base_url = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 8
+      max_len: 512
+      pattern: "^https?://"
+    }
+  ];
+  optional string api_key = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 512
+  }];
+}
+
+message UpdateMyAgentConfigResponse {}
+
+// delete
+message DeleteMyAgentConfigRequest {}
+
+message DeleteMyAgentConfigResponse {}
+
+// get
+message GetMyAgentConfigRequest {}
+
+message GetMyAgentConfigResponse {
+  AgentConfig agent_config = 1;
+}

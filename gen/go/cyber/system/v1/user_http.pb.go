@@ -17,6 +17,7 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationUserServiceChangePassword = "/cyber.system.v1.UserService/ChangePassword"
 const OperationUserServiceCreateUser = "/cyber.system.v1.UserService/CreateUser"
 const OperationUserServiceDeleteUser = "/cyber.system.v1.UserService/DeleteUser"
 const OperationUserServiceGetUser = "/cyber.system.v1.UserService/GetUser"
@@ -25,6 +26,7 @@ const OperationUserServiceUpdateUser = "/cyber.system.v1.UserService/UpdateUser"
 const OperationUserServiceUpdateUserStatus = "/cyber.system.v1.UserService/UpdateUserStatus"
 
 type UserServiceHTTPServer interface {
+	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
@@ -38,6 +40,7 @@ func RegisterUserServiceHTTPServer(s *http.Server, srv UserServiceHTTPServer) {
 	r.Handle("POST", "/api/v1/system/users", _UserService_CreateUser0_HTTP_Handler(srv))
 	r.Handle("PUT", "/api/v1/system/users/{id}", _UserService_UpdateUser0_HTTP_Handler(srv))
 	r.Handle("PUT", "/api/v1/system/users/{id}/status", _UserService_UpdateUserStatus0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/me/password", _UserService_ChangePassword0_HTTP_Handler(srv))
 	r.Handle("DELETE", "/api/v1/system/users/{id}", _UserService_DeleteUser0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/users", _UserService_ListUsers0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/users/{id}", _UserService_GetUser0_HTTP_Handler(srv))
@@ -106,6 +109,25 @@ func _UserService_UpdateUserStatus0_HTTP_Handler(srv UserServiceHTTPServer) func
 	}
 }
 
+func _UserService_ChangePassword0_HTTP_Handler(srv UserServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ChangePasswordRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserServiceChangePassword)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ChangePassword(ctx, req.(*ChangePasswordRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ChangePasswordResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _UserService_DeleteUser0_HTTP_Handler(srv UserServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in DeleteUserRequest
@@ -170,6 +192,7 @@ func _UserService_GetUser0_HTTP_Handler(srv UserServiceHTTPServer) func(ctx http
 }
 
 type UserServiceHTTPClient interface {
+	ChangePassword(ctx context.Context, req *ChangePasswordRequest, opts ...http.CallOption) (rsp *ChangePasswordResponse, err error)
 	CreateUser(ctx context.Context, req *CreateUserRequest, opts ...http.CallOption) (rsp *CreateUserResponse, err error)
 	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *DeleteUserResponse, err error)
 	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *GetUserResponse, err error)
@@ -184,6 +207,23 @@ type UserServiceHTTPClientImpl struct {
 
 func NewUserServiceHTTPClient(client *http.Client) UserServiceHTTPClient {
 	return &UserServiceHTTPClientImpl{client}
+}
+
+func (c *UserServiceHTTPClientImpl) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...http.CallOption) (*ChangePasswordResponse, error) {
+	var out ChangePasswordResponse
+	pattern := "/api/v1/system/me/password"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationUserServiceChangePassword),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *UserServiceHTTPClientImpl) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...http.CallOption) (*CreateUserResponse, error) {

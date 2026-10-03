@@ -1026,7 +1026,7 @@ const file_cyber_system_v1_policy_proto_rawDesc = "" +
 	"\x10GetPolicyRequest\x12\x1b\n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"D\n" +
 	"\x11GetPolicyResponse\x12/\n" +
-	"\x06policy\x18\x01 \x01(\v2\x17.cyber.system.v1.PolicyR\x06policy2\xb1\x06\n" +
+	"\x06policy\x18\x01 \x01(\v2\x17.cyber.system.v1.PolicyR\x06policy2\xac\x06\n" +
 	"\rPolicyService\x12\x97\x01\n" +
 	"\fCreatePolicy\x12$.cyber.system.v1.CreatePolicyRequest\x1a%.cyber.system.v1.CreatePolicyResponse\":\x88\xf1\x04\x02\x8a\xd3\x0e\x10\n" +
 	"\f创建策略\x10\x02\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/v1/system/policies\x12\x9c\x01\n" +
@@ -1037,7 +1037,7 @@ const file_cyber_system_v1_policy_proto_rawDesc = "" +
 	"\fListPolicies\x12$.cyber.system.v1.ListPoliciesRequest\x1a%.cyber.system.v1.ListPoliciesResponse\"=\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
 	"\x12查询策略列表\x10\x01\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/system/policies\x12\x96\x01\n" +
 	"\tGetPolicy\x12!.cyber.system.v1.GetPolicyRequest\x1a\".cyber.system.v1.GetPolicyResponse\"B\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
-	"\x12查询策略详情\x10\x01\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/system/policies/{id}\x1a\x15\x8a\xe2\t\x11ABAC 策略管理B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"\x12查询策略详情\x10\x01\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/system/policies/{id}\x1a\x10\x8a\xe2\t\f策略管理B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_policy_proto_rawDescOnce sync.Once

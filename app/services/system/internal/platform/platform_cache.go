@@ -20,8 +20,6 @@ func NewCache(c *conf.Data, logger *slog.Logger) (*cache.Cache, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	// Attach redisotel tracing + metrics (reads global providers set by
-	// observability.Init; no-op when trace/metrics disabled).
 	if err := observability.InstrumentRedis(client); err != nil {
 		closeFn()
 		return nil, nil, fmt.Errorf("redis instrumentation: %w", err)
