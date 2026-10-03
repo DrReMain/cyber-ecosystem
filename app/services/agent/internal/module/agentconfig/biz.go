@@ -66,7 +66,7 @@ type AgentConfigRP interface {
 
 // UserRP hydrates user identity via system RPCs (cross-service read).
 type UserRP interface {
-	FindByID(ctx context.Context, id string) (*UserBrief, error)
+	Hydrate(ctx context.Context, ids []string) map[string]*UserBrief
 }
 
 // UC ------------------------------------------------------------------------------------------------------------------
@@ -153,18 +153,18 @@ func (uc *AgentConfigUC) List(ctx context.Context, in *ListIn) (*ListOut, error)
 	if err != nil {
 		return nil, err
 	}
-	// Hydration is per unique user; a denied or missing profile renders as
-	// absent fields, never a failed row.
-	briefs := make(map[string]*UserBrief)
+	// Hydration is one eligibility check plus one read set per request; a
+	// denied or missing profile renders as absent fields, never a failed row.
+	ids := make([]string, 0, len(out.List))
+	seen := make(map[string]struct{}, len(out.List))
 	for _, it := range out.List {
-		if _, seen := briefs[it.Config.UserID]; !seen {
-			brief, herr := uc.userRP.FindByID(ctx, it.Config.UserID)
-			if herr != nil {
-				uc.Log.Warn("user hydration degraded", "user_id", it.Config.UserID, "error", herr)
-				brief = nil
-			}
-			briefs[it.Config.UserID] = brief
+		if _, ok := seen[it.Config.UserID]; !ok {
+			seen[it.Config.UserID] = struct{}{}
+			ids = append(ids, it.Config.UserID)
 		}
+	}
+	briefs := uc.userRP.Hydrate(ctx, ids)
+	for _, it := range out.List {
 		it.User = briefs[it.Config.UserID]
 	}
 	return out, nil

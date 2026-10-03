@@ -47,7 +47,7 @@ data:
       retention: 604800s         # 7 天
       batch_size: 16
 observability:
-  endpoint: localhost:4318        # SigNoz OTLP HTTP
+  endpoint: localhost:4318
   insecure: true
   trace:
     enabled: false

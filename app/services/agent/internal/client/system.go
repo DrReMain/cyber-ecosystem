@@ -68,29 +68,42 @@ func (c *systemClient) CheckGrants(ctx context.Context, subject *security.Subjec
 	return &kauthz.Decision{Allowed: resp.Msg.GetAllowed(), Reason: resp.Msg.GetReason()}, nil
 }
 
-func (c *systemClient) FindByID(ctx context.Context, id string) (*agentconfig.UserBrief, error) {
+func (c *systemClient) Hydrate(ctx context.Context, ids []string) map[string]*agentconfig.UserBrief {
+	briefs := make(map[string]*agentconfig.UserBrief, len(ids))
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok {
-		return nil, nil
+		return briefs
 	}
-	resp, err := c.users.GetUser(withSessionToken(ctx, subject.SessionID), connectrpc.NewRequest(&systempb.GetUserRequest{Id: id}))
+	decision, err := c.CheckGrants(ctx, subject, systemv1connect.UserServiceGetUserProcedure)
 	if err != nil {
-		if errorspb.IsGeneralErrorPermissionDenied(err) {
-			c.log.Debug("user hydration skipped: viewer ungranted", "user_id", id)
-		} else {
-			c.log.Warn("user hydration degraded", "user_id", id, "error", err)
+		c.log.Warn("hydration eligibility degraded", "error", err)
+		return briefs
+	}
+	if !decision.Allowed {
+		c.log.Debug("hydration skipped: viewer ungranted")
+		return briefs
+	}
+	for _, id := range ids {
+		resp, err := c.users.GetUser(withSessionToken(ctx, subject.SessionID), connectrpc.NewRequest(&systempb.GetUserRequest{Id: id}))
+		if err != nil {
+			if errorspb.IsGeneralErrorPermissionDenied(err) {
+				c.log.Debug("user hydration skipped: viewer ungranted", "user_id", id)
+			} else {
+				c.log.Warn("user hydration degraded", "user_id", id, "error", err)
+			}
+			continue
 		}
-		return nil, nil
+		u := resp.Msg.GetUser()
+		if u == nil {
+			continue
+		}
+		briefs[id] = &agentconfig.UserBrief{
+			ID:     utils.Deref(utils.Unwrap[string](u.GetId()), ""),
+			Email:  utils.Unwrap[string](u.GetEmail()),
+			Avatar: utils.Unwrap[string](u.GetAvatar()),
+		}
 	}
-	u := resp.Msg.GetUser()
-	if u == nil {
-		return nil, nil
-	}
-	return &agentconfig.UserBrief{
-		ID:     utils.Deref(utils.Unwrap[string](u.GetId()), ""),
-		Email:  utils.Unwrap[string](u.GetEmail()),
-		Avatar: utils.Unwrap[string](u.GetAvatar()),
-	}, nil
+	return briefs
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

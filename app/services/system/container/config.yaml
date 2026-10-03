@@ -46,10 +46,9 @@ data:
       multipart_threshold: 8388608 # bytes (8 MiB)
       part_size: 5242880           # bytes (5 MiB)
       presign_ttl: 900s            # duration (presign validity)
-      max_file_size: 52428800      # bytes (50 MiB)
+      max_file_size: 2147483648
   mq:
-    pg: # pg mode like the dev config; needs the mq database (created by the
-        # postgres bootstrap SQL) — schemas are created on first connect
+    pg:
       dsn: ${MQ_DSN:postgres://postgres:postgres@postgresql.db:5432/mq?sslmode=disable}
       poll_interval: 0.5s
       visibility_timeout: 30s
