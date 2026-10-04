@@ -28,6 +28,7 @@
   "common_column_settings_reset": "Reset",
   "common_save": "Save",
   "common_cancel": "Cancel",
+  "common_confirm": "Confirm",
   "common_user_deleted": "Deleted",
   "common_upload_too_large": "File exceeds the {max} upload limit"
 }

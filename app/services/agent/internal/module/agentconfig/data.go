@@ -25,20 +25,6 @@ func NewAgentConfigRP(logger *slog.Logger, p *platform.Platform) AgentConfigRP {
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (rp *agentConfigRP) FindByUserID(ctx context.Context, userID string) (*AgentConfig, error) {
-	// The partial unique index guarantees at most one live row per user.
-	d, err := rp.Platform.GetClient(ctx).AgentConfig.Query().
-		Where(entagentconfig.UserIDEQ(userID)).
-		Only(ctx)
-	if ent.IsNotFound(err) {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, rp.Platform.HandleEntError(err)
-	}
-	return mapAgentConfig(d), nil
-}
-
 func (rp *agentConfigRP) Create(ctx context.Context, mc *AgentConfig, apiKeySealed string) (*AgentConfig, error) {
 	created, err := rp.Platform.GetClient(ctx).AgentConfig.Create().
 		SetUserID(mc.UserID).
@@ -90,6 +76,20 @@ func (rp *agentConfigRP) List(ctx context.Context, in *ListIn) (*ListOut, error)
 			return &ListItem{Config: mapAgentConfig(d)}
 		}),
 	}, nil
+}
+
+func (rp *agentConfigRP) FindSealedByUserID(ctx context.Context, userID string) (*AgentConfig, string, error) {
+	// The partial unique index guarantees at most one live row per user.
+	d, err := rp.Platform.GetClient(ctx).AgentConfig.Query().
+		Where(entagentconfig.UserIDEQ(userID)).
+		Only(ctx)
+	if ent.IsNotFound(err) {
+		return nil, "", nil
+	}
+	if err != nil {
+		return nil, "", rp.Platform.HandleEntError(err)
+	}
+	return mapAgentConfig(d), d.APIKey, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

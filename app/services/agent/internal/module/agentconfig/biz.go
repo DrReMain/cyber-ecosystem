@@ -57,11 +57,11 @@ type UpdateIn struct {
 // Port ----------------------------------------------------------------------------------------------------------------
 
 type AgentConfigRP interface {
-	FindByUserID(ctx context.Context, userID string) (*AgentConfig, error) // nil, nil = not configured
 	Create(ctx context.Context, mc *AgentConfig, apiKeySealed string) (*AgentConfig, error)
 	Update(ctx context.Context, mc *AgentConfig, apiKeySealed *string) error // nil = keep
 	DeleteByUserID(ctx context.Context, userID string) error
 	List(ctx context.Context, in *ListIn) (*ListOut, error)
+	FindSealedByUserID(ctx context.Context, userID string) (*AgentConfig, string, error)
 }
 
 // UserRP hydrates user identity via system RPCs (cross-service read).
@@ -95,14 +95,6 @@ func NewAgentConfigUC(logger *slog.Logger, tm shared.Transaction, c *conf.Crypto
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *AgentConfigUC) Get(ctx context.Context) (*AgentConfig, error) {
-	subject, err := uc.subject(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return uc.agentConfigRP.FindByUserID(ctx, subject.UserID)
-}
-
 func (uc *AgentConfigUC) Update(ctx context.Context, in *UpdateIn) error {
 	subject, err := uc.subject(ctx)
 	if err != nil {
@@ -119,7 +111,7 @@ func (uc *AgentConfigUC) Update(ctx context.Context, in *UpdateIn) error {
 	// Upsert: one live row per user, so absent means create, present means
 	// rewrite — both inside one transaction.
 	return uc.Tm.InTx(ctx, func(tctx context.Context) error {
-		mc, ferr := uc.agentConfigRP.FindByUserID(tctx, subject.UserID)
+		mc, _, ferr := uc.agentConfigRP.FindSealedByUserID(tctx, subject.UserID)
 		if ferr != nil {
 			return ferr
 		}
@@ -168,6 +160,18 @@ func (uc *AgentConfigUC) List(ctx context.Context, in *ListIn) (*ListOut, error)
 		it.User = briefs[it.Config.UserID]
 	}
 	return out, nil
+}
+
+func (uc *AgentConfigUC) Get(ctx context.Context) (*AgentConfig, error) {
+	subject, err := uc.subject(ctx)
+	if err != nil {
+		return nil, err
+	}
+	mc, _, err := uc.agentConfigRP.FindSealedByUserID(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return mc, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

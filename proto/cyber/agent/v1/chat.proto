@@ -1,0 +1,193 @@
+syntax = "proto3";
+
+package cyber.agent.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/agent/v1";
+
+service ChatService {
+  option (cyber.ext.v1.service_comment) = "智能体对话";
+  rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "删除会话"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {delete: "/api/v1/agent/me/chat/sessions/{session_id}"};
+  }
+  rpc ListModels(ListModelsRequest) returns (ListModelsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "列出可用模型"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {get: "/api/v1/agent/me/models"};
+  }
+  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询会话列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {get: "/api/v1/agent/me/chat/sessions"};
+  }
+  rpc GetSessionMessages(GetSessionMessagesRequest) returns (GetSessionMessagesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询会话消息"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {get: "/api/v1/agent/me/chat/sessions/{session_id}/messages"};
+  }
+  rpc UpdateSession(UpdateSessionRequest) returns (UpdateSessionResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "重命名会话"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {
+      put: "/api/v1/agent/me/chat/sessions/{session_id}"
+      body: "*"
+    };
+  }
+  rpc Chat(ChatRequest) returns (stream ChatResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "流式对话"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.builtin) = true;
+    option (google.api.http) = {
+      post: "/api/v1/agent/me/chat"
+      body: "*"
+    };
+  }
+}
+
+// Constraints are enforced by explicit checks in the service handler: the
+// unary protovalidate middleware never sees streaming requests, so annotations
+// here would be dead rules.
+message ChatRequest {
+  // Model id as named by the user's endpoint (GET /v1/models vocabulary);
+  // required, 1..128 chars.
+  optional string model = 1;
+  // Existing session id (max 20 chars); empty = the server creates a session
+  // for this exchange.
+  string session_id = 2;
+  // The new user turn; required, 1..32768 chars. History is loaded
+  // server-side from the session.
+  optional string content = 3;
+}
+
+// One streaming frame: deltas are incremental (append-only) and at most one
+// is set per frame; the final frame carries finish_reason with empty deltas.
+// Failures terminate the stream as a Connect error, never as a frame.
+message ChatResponse {
+  // Incremental assistant text since the previous frame.
+  string content_delta = 1;
+  // Incremental model reasoning (thinking output) since the previous frame.
+  string reasoning_delta = 2;
+  // Present only on the final frame ("stop"/"length"/...), empty while streaming.
+  string finish_reason = 3;
+  // Present only on the first frame of a newly created session (strictly
+  // before any delta); unset otherwise — protojson omits it.
+  string session_id = 4;
+}
+
+// list models
+message ListModelsRequest {}
+
+message ListModelsResponse {
+  // Model ids exposed by the user's endpoint, order preserved.
+  repeated string models = 1;
+}
+
+// delete session
+message DeleteSessionRequest {
+  // Session id; absent and unowned both resolve to not found (no existence leak).
+  string session_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message DeleteSessionResponse {}
+
+// list sessions
+message ChatSession {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  // First user message clipped server-side at creation; user-renamable.
+  google.protobuf.StringValue title = 4;
+}
+
+message ListSessionsRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+}
+
+message ListSessionsResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  // Fixed order: updated_at DESC (latest activity first).
+  repeated ChatSession list = 2;
+}
+
+// get session messages
+message SessionMessage {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  // Free-form role vocabulary (user/assistant today; tool parts are the S4
+  // evolution) — deliberately unpatterned.
+  google.protobuf.StringValue role = 3;
+  google.protobuf.StringValue content = 4;
+  // Accumulated model reasoning on the assistant turn; empty on user turns.
+  google.protobuf.StringValue reasoning = 5;
+  // Model id that produced the assistant turn; empty on user turns.
+  google.protobuf.StringValue model = 6;
+}
+
+message GetSessionMessagesRequest {
+  string session_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  cyber.shared.common.v1.PageRequest page = 2;
+}
+
+message GetSessionMessagesResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  // Fixed order: created_at DESC (page 1 = newest turns; later pages go back).
+  repeated SessionMessage list = 2;
+}
+
+// update session
+message UpdateSessionRequest {
+  // Session id; absent and unowned both resolve to not found (no existence leak).
+  string session_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  // New title; replaces the creation-time clip.
+  optional string title = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 64
+    }
+  ];
+}
+
+message UpdateSessionResponse {}

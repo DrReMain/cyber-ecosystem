@@ -20,6 +20,30 @@ func (f AgentConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AgentConfigMutation", m)
 }
 
+// The ChatMessageFunc type is an adapter to allow the use of ordinary
+// function as ChatMessage mutator.
+type ChatMessageFunc func(context.Context, *ent.ChatMessageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChatMessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ChatMessageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChatMessageMutation", m)
+}
+
+// The ChatSessionFunc type is an adapter to allow the use of ordinary
+// function as ChatSession mutator.
+type ChatSessionFunc func(context.Context, *ent.ChatSessionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChatSessionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ChatSessionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChatSessionMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

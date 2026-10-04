@@ -16,6 +16,7 @@
       "./messages/layout-dashboard/{locale}.json",
       "./messages/profile/{locale}.json",
       "./messages/agents/{locale}.json",
+      "./messages/agents-chat/{locale}.json",
       "./messages/agents-connections/{locale}.json",
       "./messages/system/{locale}.json",
       "./messages/system-depts/{locale}.json",

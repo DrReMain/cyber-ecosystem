@@ -17,6 +17,7 @@ import (
 	"cyber-ecosystem/app/services/agent/internal/module/agentconfig"
 	"cyber-ecosystem/app/services/agent/internal/module/agentconfigadmin"
 	"cyber-ecosystem/app/services/agent/internal/module/authz"
+	"cyber-ecosystem/app/services/agent/internal/module/chat"
 	"cyber-ecosystem/app/services/agent/internal/platform"
 	"cyber-ecosystem/app/services/agent/internal/server"
 	"cyber-ecosystem/app/services/agent/internal/shared"
@@ -33,6 +34,7 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Crypto, *slog.Logger)
 		authz.ProviderSet,
 		agentconfig.ProviderSet,
 		agentconfigadmin.ProviderSet,
+		chat.ProviderSet,
 		newApp,
 	))
 }

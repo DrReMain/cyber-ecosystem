@@ -151,6 +151,17 @@ Align proto optional fields, DO fields, and the service/data mapping around poin
 
 **client** — outbound adapter for a remote repo, the counterpart of `data`. `<remote>Client` dials one connection (`grpc.NewClient` / `connect.DialInsecure`, with `standardMiddleware`), implements `<Remote>RP`. **`MUST NOT` let biz import the provider's proto** — only the client layer maps provider types → the port's neutral ACL type. Outbound middleware assembly lives in `client.go` per-service (not `shared-go`), mirroring the server: `shared-go` supplies components, the service owns the chain.
 
+**LLM provider seam (eino)** — model access goes through
+`eino-ext/components/model/openai`, constructed **per request** in the owning
+UC: base_url comes from per-user sealed config, so a pooled ChatModel would
+cross users. `ChatModelConfig.BaseURL` must already end in `/v1` (the
+component appends `/chat/completions` directly). `schema.Message` is
+dual-channel — `Content` and `ReasoningContent` both stream, and a
+reasoning-only tick yields an empty-content delta, not a skipped frame. The
+decrypted api key exists only inside the eino config and never reaches a log
+line. Model listing is outside eino's scope: a plain `GET <baseURL>/models`
+with an explicit timeout.
+
 **Transports are symmetric to the app.** gRPC and Connect clients both surface errors as **kratos `*errors.Error`**, not transport-specific types — so biz/service/middleware handle one error shape regardless of transport. (gRPC does this natively; Connect normalizes at its boundary.) `web/JS` clients are out of scope here — they use `@connectrpc/connect` directly against the Connect *server*.
 
 ---

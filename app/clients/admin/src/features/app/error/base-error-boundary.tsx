@@ -4,12 +4,25 @@ import { ErrorBoundary } from "react-error-boundary";
 import { capture } from "#/domains/error";
 import { ErrorFallback } from "./error-fallback";
 
-export function BaseErrorBoundary({ children }: Readonly<PropsWithChildren>) {
+export function BaseErrorBoundary({
+  children,
+  onReset,
+}: Readonly<PropsWithChildren & { onReset?: () => void }>) {
   const leafRouteId = useRouterState({ select: (s) => s.matches.at(-1)?.routeId });
   return (
     <ErrorBoundary
       fallbackRender={({ error, resetErrorBoundary }) => (
-        <ErrorFallback error={error} onRetry={resetErrorBoundary} />
+        <ErrorFallback
+          error={error}
+          onRetry={
+            onReset === undefined
+              ? resetErrorBoundary
+              : () => {
+                  onReset();
+                  resetErrorBoundary();
+                }
+          }
+        />
       )}
       onError={(error) => capture(error, { feedback: false })}
       resetKeys={[leafRouteId]}

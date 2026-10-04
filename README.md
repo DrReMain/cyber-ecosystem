@@ -1,191 +1,293 @@
 # Cyber Ecosystem
 
+[English](./README.md) · [简体中文](./README.zh-CN.md)
+
 [![Go](https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white)](https://go.dev) [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A524-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org) [![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)](https://pnpm.io) [![Nx](https://img.shields.io/badge/Nx-monorepo-143055?logo=nx&logoColor=white)](https://nx.dev) [![License: MIT](https://img.shields.io/github/license/DrReMain/cyber-ecosystem?color=blue)](./LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/DrReMain/cyber-ecosystem)](https://github.com/DrReMain/cyber-ecosystem/commits)
 
-> A contract-first full-stack monorepo for networked applications: a Go (Kratos v3) backend, Connect-RPC contracts, real-time & media infrastructure, and a TanStack Start web client.
+> A contract-first, AI-native-oriented full-stack skeleton for long-lived products: a Go/Kratos base service, a second-service reference implementation, Connect-RPC contracts, realtime and media infrastructure, and a TanStack Start web client.
 
 ## What it is
 
-Cyber Ecosystem is a full-stack monorepo for building networked applications. It is a generic development skeleton rather than a vertical product: one shared base, with business applications composed on top.
+Cyber Ecosystem is a **product-development skeleton**, not a vertical SaaS product. It exists so a team can fork long-lived applications from one governed base instead of repeatedly assembling — and then diverging — identity, authorization, transport, file, realtime, and admin patterns.
 
-`system`, the base service every application deploys, owns the identity core — authentication and sessions, users, org structure, roles, an authorization engine (RBAC / ABAC / data scopes), and the resource catalog. Each application adds its own services under `app/services/` with contracts under `proto/`, owning its aggregates end to end.
+The repository currently contains three coordinated pieces:
 
-Protobuf contracts in `proto/` are the single source of truth; the Go server, TypeScript client, and shared libraries are derived from them.
+- **`system`** — the mandatory base service. It owns authentication and sessions, users, organization structure, roles, the RBAC / ABAC / data-scope authorization engine, the operation catalog, files, audit, and the cross-service identity/authorization surface.
+- **`agent`** — the second-service reference implementation. It owns per-user agent configuration and chat aggregates, consumes identity and authorization from `system` through introspection, and demonstrates how to add an application-facing AI workflow without duplicating IAM.
+- **`admin`** — the TanStack Start management/workbench client, including cookie-custody SSR, permission-derived routing, typed errors, localization, file upload, and streaming chat consumption.
+
+The skeleton supplies the shared product base; business behavior belongs in product services.
 
 ## Console preview
 
-| Sign-in | Users | Policies (Arabic, RTL) |
+| Sign-in | Agent initial | Policies (Arabic, RTL) |
 | :---: | :---: | :---: |
-| ![Sign-in](docs/screens/login.png) | ![Users](docs/screens/users.png) | ![Policies](docs/screens/policies-rtl.png) |
+| ![Sign-in](docs/screens/login.png) | ![Agent initial](docs/screens/agents-chat-init.png) | ![Policies](docs/screens/policies-rtl.png) |
 
-Each image is one screen with its light and dark renderings merged along the diagonal.
+| Agent conversation | Audit logs | Files & preferences |
+| :---: | :---: | :---: |
+| ![Agent conversation](docs/screens/agents-chat-session.png) | ![Audit logs](docs/screens/audit.png) | ![Files and preferences](docs/screens/files.png) |
+
+Sign-in, Agent initial, and Policies merge their light and dark renderings along the same diagonal. Agent conversation, Audit logs, and Files & preferences are single live-interface screenshots.
 
 ## Architecture
 
-### Contracts first
+### Contract-first control plane
 
-`proto/` is the single source of truth. Each service's contracts live under `proto/cyber/<service>/v1/`, and one Buf pipeline derives three consumers from them: the Go server bindings, the Connect TypeScript client, and an OpenAPI document. Error reasons are declared beside the services that raise them (per-package `error_reason.proto`), so codes and their localized copy can be checked against the contract instead of being scattered across call sites.
+`proto/` is the single source of truth. One contract derives:
 
-### Service anatomy
+- Go gRPC and HTTP bindings;
+- Connect server registration;
+- the Connect TypeScript client;
+- an OpenAPI document;
+- per-package operation manifests for the authorization catalog;
+- the operation names consumed by backend middleware and frontend routing.
 
-Every Go service follows one layering, assembled by Wire:
+Method options also declare access audience, builtin status, and datascope applicability. A forgotten access annotation is rejected by a deny-by-default guard rather than silently exposed.
 
+This turns the contract into a control plane: adding a service operation also makes it visible to role management, runtime authorization, diagnostics, and the admin route model.
+
+### Clean architecture and DDD
+
+Every Go service follows the same application boundary:
+
+```text
+proto / Connect / gRPC / HTTP
+        ↓
+service.go    — transport adapter; proto ↔ domain mapping
+biz.go        — use cases, domain objects, and ports
+data.go       — repository adapters
+platform      — service-owned infrastructure facade
 ```
-cmd/app ─ server ─ module/<domain> ─ platform
-                      │                │
-                      │                └─ one facade over db / cache / storage / mq
-                      │                   + the service's error adapter for each
-                      ├─ service.go       RPC surface; thin handlers, no logic
-                      ├─ biz.go           use cases against narrow port interfaces
-                      └─ repo (data)      ent queries, cache and storage access
+
+More precisely:
+
+- **Transport is an adapter.** `service.go` keeps RPC handlers thin and maps generated messages to domain objects.
+- **Use cases depend on ports.** A module depends on narrow interfaces such as `TokenRP`, `UserRP`, or `AuthzRP`; it does not depend directly on Redis, Ent, S3, or another service client.
+- **Repositories are adapters.** `data.go` implements the ports with Ent and platform capabilities.
+- **Infrastructure belongs to the service boundary.** Wire composes the platform, providers, cleanup functions, and servers without leaking infrastructure concerns into use cases.
+- **Boundaries follow DDD.** `system` and `agent` are separate bounded contexts. `system.User` is the authentication identity; an application service owns its own application aggregates and refers to users by ID. It does not copy or extend the system user table.
+- **Cross-service reads use remote adapters.** A business service consumes identity and authorization through the `system` RPC surface; it does not query another service's database.
+
+The result is a deliberate dependency rule:
+
+```text
+transport → use case → port ← adapter
+                       ↓
+                  platform capability
 ```
 
-- Use cases depend on **ports, not implementations** — auth's session store, for example, is a four-method `TokenRP` interface; Redis satisfies it in production and a test double satisfies it anywhere else.
-- The `platform` facade centralizes infrastructure handles and their error mappings but owns no lifecycle: Wire chains each provider's cleanup for graceful shutdown and partial injection failure.
-- Eleven modules exist today (`user`, `role`, `dept`, `policy`, `authz`, `audit`, `file`, `fileproxy`, `resource`, `auth`, `transfer`). `transfer` is the transport proving ground — echo / pipe / raw / subscribe RPCs exercising unary and streaming paths over all three protocols.
-
-### Capability families
-
-`shared-go/capability` packages infrastructure as **self-contained families**: an interface root (`cache`, `mq`, `storage`) plus backends (`redis`; `nats` and `pg`; `s3`). A family depends only on the stdlib and its own root — it copies out as a unit and never imports service code.
-
-- Interfaces are split by concern, not lumped: `cache.Cache` composes ten sub-interfaces (KV, Hash, List, Set, SortedSet, Counter, Lock, RateLimiter, PubSub, Session); `storage.Storage` exposes a bucket-scoped `View` (Object / List / Presign / Multipart), per-bucket views via `For()`, and a `Limits` query so modules route uploads without touching backend config.
-- Each family defines a **backend-agnostic error contract** — sentinels like `ErrCacheMiss` or `ErrNotFound`. The mapping mechanism lives in the family; the concrete app-error instances are injected by each service's platform layer, so a capability never imports a service's error proto while every backend failure still surfaces as a typed, cause-preserving application error.
-- Every family ships a **conformance suite** that runs against live infrastructure (Redis, NATS/PostgreSQL parity, S3). Replacing a backend means re-running the suite, not re-reviewing call sites.
-
-### Web client
-
-The `admin` client is feature-sliced along a one-way dependency chain, `libs → stores → domains → services → features → routes`:
-
-- **Routing carries the contract.** Route `staticData` declares a typed title key, menu metadata, and the `operations` a page requires. The nav builder drops any node whose operations are not all granted — an ungranted page never appears in the menu.
-- **Typed i18n.** Paraglide compiles five locales (English, Chinese, Arabic, Japanese, Korean) into typed message functions; a missing key is a type error. RTL is expressed as Tailwind `rtl:` variants — no locale-conditional code.
-- **Theming via tokens.** One token set drives the light and dark Ant Design themes; component classes carry matching `dark:` variants.
-- **Keep-alive tabbed workbench** — affix tabs, history-aware reloads, session-persisted tab state.
-- **SSR with server-side custody.** TanStack Start loaders call server functions; session cookies stay HttpOnly on the server and only derived state crosses to the client.
+Business modules can be tested with port fakes, replaced behind interfaces, and eventually extracted without rewriting their use cases.
 
 ### Authorization model
 
-Roles carry **grants**: an operation pattern, a data-scope kind (`ALL` / `DEPT_TREE` / `SELF`), and optional constraint policies under AND semantics — evaluation fail-closes if a linked policy disappears. Constraint policies are time windows (daily ranges plus weekday sets) or calendars (periodic basis with dated exceptions). Decisions are inspectable: the diagnostics view calls `ExplainOperation` and traces the rules that produced an allow or deny, and administrative actions land in the audit log.
+Roles carry grants: an operation pattern, a data-scope kind, and optional constraint policies.
 
-## How mistakes surface early
+- **Operation patterns** support exact RPC names, service wildcards, and the global `/*` administrator pattern.
+- **Data scopes** support all, self, and department-tree narrowing.
+- **Constraint policies** are evaluated with AND semantics; time-window and calendar policies are currently implemented.
+- **Evaluation fails closed** when a policy kind is unknown, attribute resolution fails, or policy evaluation errors.
+- **Decisions are inspectable.** The diagnostics view explains the roles, grants, scopes, and policy states behind an allow or deny.
+- **Changes are versioned.** Authorization tables compile into an in-memory snapshot; version bumps and notifications rebuild replicas, with periodic reconciliation as a safety net.
 
-The codebase leans on compile-time checks and a fixed toolchain so that mistakes — including those introduced by AI-assisted editing — surface at build or generation time rather than at runtime:
+### AI-native direction
 
-- **Strict types end to end** — ent schemas on the server; TanStack Start's strict TypeScript consuming Connect-RPC types generated from proto on the client.
-- **One contract, three derived consumers** — a field changed in proto fails the Go build, the client build, or the OpenAPI diff; nothing is hand-synchronized.
-- **Typed errors end to end** — error reasons declared beside their services; generated predicates and exhaustively-checked localized copy keep failures actionable on both sides of the wire.
-- **Locked toolchain** — Nx runs all generation / build / test steps; generated code in `gen/` is never hand-edited.
+AI-native has two layers in this skeleton:
 
-## Highlights
+- **Development time.** Repository rules, area conventions, generated artifacts, and Nx targets give humans and coding agents the same executable boundaries. Fast AI-generated changes should still surface contract, permission, generation, and documentation drift before runtime.
+- **Runtime.** The current `agent` service is a real vertical slice: per-user OpenAI-compatible providers, model listing, chat sessions, and server-streamed responses. The platform direction is to model agents, credentials, tools, tasks, and retrieval as first-class principals and IAM operations rather than treating an agent as a chat-only feature. Those capabilities are directional and are not yet current platform guarantees.
 
-- **Broad scope** — CRUD through realtime (streaming, media, meetings) and IoT are all in scope.
-- **Identity base service** — `system`: authentication and sessions, users / org / roles, the RBAC + ABAC + data-scope engine, resource catalog, file metadata plane, audit log.
-- **Inspectable authorization** — every allow / deny decision traces back to the rules that produced it.
-- **Themed, localized console** — light / dark from one token set; five locales including full RTL; keep-alive tabbed navigation; per-session watermark.
-- **Type-safe end to end** — contracts flow from proto through Connect-RPC into strict TypeScript; types hold on both sides.
-- **Multi-transport, multi-client** — gRPC, HTTP, and Connect from one contract; the web client is current, and the same contracts target React Native, Flutter, and native apps.
-- **Capability packs with conformance** — `cache` / `mq` / `storage` families in `shared-go`, verified against live infrastructure.
-- **Dual-channel file handling** — service-proxied small uploads, presigned large ones, one metadata plane.
-- **Self-hosted infra** — SeaweedFS, Redis, PostgreSQL, NATS, Centrifugo, LiveKit, OpenTelemetry as Docker Compose profiles; managed equivalents can be substituted.
-- **Current-generation, single-toolchain** — Go 1.26, TypeScript 7, Nx, Kratos v3, Connect-RPC, Atlas, TanStack Start, Ant Design 6.
+### Capability families
 
-## Tech stack
+`shared-go/capability` packages infrastructure as self-contained families:
 
-| Layer | Stack |
+- `cache`: KV, hash, list, set, sorted set, counter, lock, rate limiter, pub/sub, and session interfaces, with a Redis backend.
+- `storage`: object, list, presign, multipart, bucket, per-bucket views, and operational limits, with an S3-compatible backend.
+- `mq`: durable at-least-once producer/consumer semantics, retry and DLQ behavior, with NATS and PostgreSQL backends.
+
+A capability family depends only on the standard library, its third-party providers, and its own interface root. It never imports service code, so a family can be copied or extracted as a unit.
+
+### Web client
+
+The `admin` client is feature-sliced along a one-way dependency chain:
+
+```text
+libs → stores → domains → services → features → routes
+```
+
+It provides:
+
+- HttpOnly cookie custody on the server;
+- SSR loaders and server functions;
+- permission-derived menus and route guards;
+- typed generated Connect clients;
+- unified error classification and feedback;
+- light/dark theming, five locales, and RTL support;
+- keep-alive tabs, breadcrumbs, and a workbench layout;
+- server-streaming chat consumption and resumable direct uploads.
+
+## Why these technologies
+
+| Technology | Advantage in this skeleton |
 |---|---|
-| Backend | Go · Kratos v3 · Connect-RPC · ent / Atlas migrations |
-| Realtime / Media | Centrifugo · LiveKit · NATS |
-| Data & Infra | PostgreSQL · Redis · SeaweedFS |
-| Observability | OpenTelemetry · SigNoz |
-| Frontend | TypeScript · TanStack Start (SSR) · Ant Design · Tailwind CSS · Connect-RPC (web) · Paraglide i18n |
-| Tooling | Nx monorepo · Buf · pnpm · Biome |
+| **Protobuf / Buf** | One typed contract across Go, TypeScript, OpenAPI, authorization, and generated tooling. Reduces hand-synchronized surface area and contract drift. |
+| **Go / Kratos** | Compiled performance, lightweight concurrency, and composable transport/middleware architecture. The service layout stays stable as modules grow. |
+| **Connect-RPC** | A modern RPC boundary across browser, server, gRPC, and HTTP while preserving protobuf typing and efficient serialization. |
+| **ent / Atlas** | Typed schema and query generation with versioned migrations, reducing raw-SQL drift and making data ownership explicit. |
+| **TanStack Start** | SSR, nested routing, typed routing context, and server functions provide a strong application shell without abandoning SPA-style navigation. |
+| **React Query / Connect Query** | Request de-duplication, cache lifetimes, mutation state, and streaming integration keep data flow predictable. |
+| **Ant Design + Tailwind** | Dense administrative UI components plus token-based styling and dark/RTL variants. |
+| **Redis / S3-compatible storage / NATS or PG-MQ** | The capability seams support local development, self-hosting, and managed-provider substitution. |
+| **OpenTelemetry / SigNoz** | Traces, metrics, logs, and slow-query hooks are built into service wiring rather than bolted on later. |
+| **Nx** | Declared workflows keep generation, migration, tests, builds, and deployment composable and reproducible. |
+
+## Performance profile
+
+This is an architectural profile, not a benchmark claim. Actual results depend on schemas, indexes, providers, deployment, and workload.
+
+### Backend
+
+- **Go and Kratos** provide a compiled, concurrently efficient service runtime with relatively low per-request overhead.
+- **Connect with protobuf** avoids hand-parsed JSON on internal RPC paths and preserves compact binary encoding where supported.
+- **Authorization uses an in-memory compiled snapshot**, so normal decisions do not query the role, permission, policy, and binding tables on every request.
+- **Ent generates typed SQL**, while connection pooling, explicit indexes, and Atlas migrations keep the database access path inspectable.
+- **Presigned uploads and downloads** move large object bytes directly between the browser and S3-compatible storage; the app server coordinates metadata and confirmation instead of proxying every byte.
+- **Audit publishing is asynchronous**, decoupling the request path from MQ persistence.
+- **Streaming chat** emits deltas as the model produces them instead of waiting for the full answer.
+
+Likely bottlenecks are external and workload-specific: model providers, database queries, object storage, cross-service introspection, and policy/data volume. Those are also the surfaces with explicit seams for measurement and optimization.
+
+### Frontend
+
+- **SSR** improves first meaningful render and keeps session cookies server-custodied.
+- **Route-level code splitting** limits the JavaScript and feature modules loaded for the current page.
+- **React Query caching and de-duplication** reduce repeated requests and make mutation invalidation explicit.
+- **Generated Connect clients** avoid per-call hand serialization and preserve compile-time operation typing.
+- **Direct file transfer** avoids pushing large files through the admin server.
+- **Streaming UI state** presents model and transfer progress without waiting for a final response.
+
+The admin stack therefore favors predictable interaction under I/O-bound work: loading data, uploading files, and consuming streams. Rendering-heavy grids should still be paginated, indexed, and selectively virtualized by the product.
 
 ## Repository layout
 
-```
-proto/            Protobuf contracts (source of truth) + errors + generation scripts
-gen/              Generated Go / TypeScript — derived, do not edit
+```text
+proto/             Protobuf contracts, extensions, generation scripts, and catalog generator
+gen/               Generated Go, Connect TypeScript, OpenAPI, and operation catalogs
 app/
-  services/system   Go base service (Kratos v3): auth, users / org / roles, authz engine, resource catalog, files
-  clients/admin     Web client — TanStack Start + Ant Design
-shared-go/        Reusable Go packages: cache · mq · storage (capability packs) + orm · kratos · codegen · helper · utils
-shared-ts/        Shared TypeScript packages: error · antd · theme · store · cookie · router-progress · storybook
-deploy/           Docker Compose stacks (profile-scoped) + Traefik edge + Postgres bootstrap
-tools/            Dev tooling — env init, Go lint / test / format (Nx targets)
-docs/             Engineering conventions by area + console screenshots (`docs/screens/`)
+  services/system  Mandatory base service: IAM, authz, resource catalog, files, audit, introspection
+  services/agent   Second-service reference: per-user agent config and streaming chat
+  clients/admin    TanStack Start management/workbench client
+shared-go/         Reusable Go packages: capability families, orm, kratos, codegen, helpers
+shared-ts/         Shared TypeScript packages: error, antd, theme, store, cookie, progress
+deploy/            Compose profiles, Traefik edge, and migration wiring
+tools/             Repository bootstrap and Go tooling targets
+docs/              Engineering conventions and screenshots
 ```
 
 ## Quickstart
 
-> Everything runs through **Nx**; each target is declared in the owning project's `project.json`.
+Everything with a declared workflow runs through Nx.
 
 ### Prerequisites
 
-- **Go** 1.26+, **Node.js** 24.15+, **pnpm** 11+ (Atlas runs through the workspace via `pnpm exec` — no separate install)
-- **Docker** with Compose v2 — for the infra stacks
-- Infra reachable at the addresses in `app/services/system/configs/config.yaml` (defaults: Postgres `localhost:5432`, Redis `localhost:6379`; override via env or adjust the config)
+- Go 1.26+
+- Node.js 24.15+
+- pnpm 11+
+- Docker with Compose v2
 
-### 1. Initialize the environment
-
-Installs the toolchain (grpcurl, buf) and language dependencies (Go modules, pnpm):
+### 1. Initialize tooling and dependencies
 
 ```bash
 ./nx run tools:init
 ```
 
-### 2. Generate code from contracts
+### 2. Generate derived code
 
 ```bash
-./nx run system:generate   # ent + wire + go mod tidy
+./nx run system:generate
+./nx run agent:generate
 ```
 
-### 3. Start the default infra stacks
+Review the `gen/` diff. Generated files are never edited directly.
 
-Raises the Postgres / Redis / SeaweedFS / NATS Compose profiles (realtime / media / observability are opt-in). The Postgres container bootstraps the `system`, `mq`, and `atlas_dev` databases on first start — no manual database creation:
+### 3. Start local infrastructure
 
 ```bash
 ./nx run deploy:start
-./nx run deploy:status     # verify containers are ready
+./nx run deploy:status
 ```
+
+The default profile raises PostgreSQL, Redis, SeaweedFS, and NATS. The Postgres container creates the `system`, `agent`, `mq`, and `atlas_dev` databases.
 
 ### 4. Apply migrations
 
 ```bash
 ./nx run system:migrate:apply
+./nx run agent:migrate:apply
 ```
 
-### 5. Run it
+### 5. Run the services
+
+Use one shell per process:
 
 ```bash
-./nx run system:dev       # Go backend (Kratos v3)
-./nx admin:dev            # Web client (Vite)
+./nx run system:dev
+./nx run agent:dev
+./nx admin:dev
 ```
+
+The development proxy expects `system` on `localhost:13001` and `agent` on `localhost:13002`. A user can configure an OpenAI-compatible provider from the admin profile; the API key is encrypted server-side and never returned by an API.
+
+The checked-in configuration contains development-only defaults, including seeded administrators and the agent master key. Change them before any shared or internet-reachable deployment.
 
 ### Common tasks
 
-- Lint / test / format Go → `./nx run tools:go:lint` · `tools:go:test` · `tools:go:format`.
-- Lint proto → `./nx run proto:lint`.
-- Edit contracts → `./nx run proto:generate` (review the `gen/` diff).
-- Change ent schemas → `./nx run system:generate:ent`.
-- Create a migration → `NAME=add_x ./nx run system:migrate:diff`.
-- Opt-in stacks → `./nx run deploy:realtime:start` · `deploy:media:start` · `deploy:observability:start`.
-- Full stack behind the edge → `./nx run deploy:pre:start` (or `pre:full:start` with every profile).
-- Tear down / wipe → `./nx run deploy:stop` · `deploy:reset`.
+- Proto lint / generation: `./nx run proto:lint` · `proto:generate`
+- Go lint / tests / format: `./nx run tools:go:lint` · `tools:go:test` · `tools:go:format`
+- Ent generation: `./nx run system:generate:ent` or `agent:generate:ent`
+- Migration diff: `NAME=add_x ./nx run system:migrate:diff` or `agent:migrate:diff`
+- Optional stacks: `deploy:realtime:start` · `deploy:media:start` · `deploy:observability:start`
+- Edge stack: `deploy:pre:start` or `deploy:pre:full:start`
+- Teardown: `deploy:stop` · `deploy:reset`
 
-<details>
-<summary><strong>Deployment shapes</strong></summary>
+## Using it as a product base
 
-The `deploy/` stacks are Docker Compose files, profile-scoped. Two shapes exist today:
+The intended workflow is:
 
-- **dev** — infra (db / storage / mq, opt-in realtime / media / observability) runs in Compose while services run on the host via `system:dev` and the Vite dev server (`deploy:start`).
-- **pre** — application images join the Compose stack behind a Traefik edge with host routing and TLS (`deploy:pre:start`; `deploy:pre:full:start` includes every infra profile).
+1. Start from a released skeleton snapshot or tag.
+2. Keep a private product repository or isolated product branch.
+3. Add services under `app/services/<name>` and contracts under `proto/cyber/<name>/v1`.
+4. Keep business aggregates out of `system`.
+5. Consume identity and authorization through the `system` surface.
+6. Periodically merge or cherry-pick a released skeleton tag.
+7. Do not merge product-specific behavior back into the skeleton. Promote a capability only when it has a second real consumer and carries tests, observability, and a copyable pattern.
 
-`deploy:reset` tears everything down and removes volumes.
+## Open-source model
 
-</details>
+This GitHub repository is a **curated public snapshot** of a privately maintained skeleton. Development history, active roadmap, and implementation fronts remain private.
+
+Public issues are welcome. Public pull requests are not the primary development path; materially useful changes are applied to the private upstream and released in a later snapshot.
 
 ## Status
 
-Active development. The foundation is complete — capability packs in `shared-go/`, six infra stacks as Compose profiles (db / storage / mq / realtime / media / observability), full Kratos layering, and contract-first generation across Go and TypeScript. The `system` base service is implemented end to end — authentication and sessions, users / org / roles, the RBAC + ABAC + data-scope authorization engine, resource catalog, and the file metadata plane — together with the `admin` web client. Beyond the base, the repository is a skeleton: business applications are meant to grow on it. It is not a finished product.
+Active development; the foundation is usable but not finished.
+
+Currently implemented:
+
+- `system`: authentication, sessions, users, organization, roles, authorization, resource catalog, files, audit, and cross-service introspection.
+- `agent`: per-user provider configuration, model listing, chat sessions, and server-streamed responses.
+- `admin`: permission-derived management/workbench UI, localization, file workflows, and streaming chat.
+
+Future platform work includes runtime agent principals, API-key credentials, tool authorization, task orchestration, retrieval integration, and additional vertical slices.
+
+## Documentation
+
+Area conventions live in:
+
+- [`docs/conventions/proto/CONVENTIONS.md`](./docs/conventions/proto/CONVENTIONS.md)
+- [`docs/conventions/kratos/CONVENTIONS.md`](./docs/conventions/kratos/CONVENTIONS.md)
+- [`docs/conventions/tanstack/CONVENTIONS.md`](./docs/conventions/tanstack/CONVENTIONS.md)
+- [`docs/conventions/deploy/CONVENTIONS.md`](./docs/conventions/deploy/CONVENTIONS.md)
 
 ## License
 

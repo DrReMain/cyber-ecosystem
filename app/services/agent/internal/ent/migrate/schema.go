@@ -51,14 +51,95 @@ var (
 			},
 		},
 	}
+	// ChatMessageColumns holds the columns for the "chat_message" table.
+	ChatMessageColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "session_id", Type: field.TypeString, Size: 20, Comment: "owning chat_session id; no FK — ownership is enforced by querying through the owner-filtered session"},
+		{Name: "role", Type: field.TypeString, Size: 16, Comment: "OpenAI-compatible role vocabulary; free-form so S4 tool roles need no migration", Default: ""},
+		{Name: "content", Type: field.TypeString, Size: 2147483647, Comment: "turn text; unbounded by design — parts-JSONB is the additive S4+ evolution for multimodal", Default: ""},
+		{Name: "reasoning", Type: field.TypeString, Size: 2147483647, Comment: "accumulated model reasoning on the assistant turn; empty on user turns", Default: ""},
+		{Name: "model", Type: field.TypeString, Size: 128, Comment: "model id that produced the assistant turn; empty on user turns", Default: ""},
+		{Name: "finish", Type: field.TypeString, Size: 16, Comment: "upstream finish_reason on the assistant turn (stop/length/aborted); empty on user turns", Default: ""},
+	}
+	// ChatMessageTable holds the schema information for the "chat_message" table.
+	ChatMessageTable = &schema.Table{
+		Name:       "chat_message",
+		Columns:    ChatMessageColumns,
+		PrimaryKey: []*schema.Column{ChatMessageColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "chatmessage_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ChatMessageColumns[1]},
+			},
+			{
+				Name:    "chatmessage_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{ChatMessageColumns[2]},
+			},
+			{
+				Name:    "chatmessage_session_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ChatMessageColumns[5], ChatMessageColumns[1]},
+			},
+		},
+	}
+	// ChatSessionColumns holds the columns for the "chat_session" table.
+	ChatSessionColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "owner_id", Type: field.TypeString, Size: 20, Comment: "owning user; me-face — every query filters owner_id"},
+		{Name: "title", Type: field.TypeString, Size: 64, Comment: "first user message clipped to 20 runes + ellipsis; written once at creation", Default: ""},
+	}
+	// ChatSessionTable holds the schema information for the "chat_session" table.
+	ChatSessionTable = &schema.Table{
+		Name:       "chat_session",
+		Columns:    ChatSessionColumns,
+		PrimaryKey: []*schema.Column{ChatSessionColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "chatsession_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ChatSessionColumns[1]},
+			},
+			{
+				Name:    "chatsession_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{ChatSessionColumns[2]},
+			},
+			{
+				Name:    "chatsession_owner_id_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{ChatSessionColumns[5], ChatSessionColumns[2]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AgentConfigTable,
+		ChatMessageTable,
+		ChatSessionTable,
 	}
 )
 
 func init() {
 	AgentConfigTable.Annotation = &entsql.Annotation{
 		Table: "agent_config",
+	}
+	ChatMessageTable.Annotation = &entsql.Annotation{
+		Table: "chat_message",
+	}
+	ChatSessionTable.Annotation = &entsql.Annotation{
+		Table: "chat_session",
 	}
 }

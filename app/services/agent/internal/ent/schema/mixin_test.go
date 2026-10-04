@@ -20,6 +20,8 @@ func TestMixinOrder(t *testing.T) {
 	}
 	schemas := []interface{ Mixin() []ent.Mixin }{
 		AgentConfig{},
+		ChatSession{},
+		ChatMessage{},
 	}
 	for _, s := range schemas {
 		last := 0

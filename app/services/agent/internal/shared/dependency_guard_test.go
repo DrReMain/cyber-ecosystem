@@ -24,7 +24,7 @@ import (
 var bannedImports = map[string][]string{
 	// The engine floor is module-free infrastructure and never reads
 	// business aggregates.
-	"module/authz": {"module/agentconfig", "module/agentconfigadmin"},
+	"module/authz": {"module/agentconfig", "module/agentconfigadmin", "module/chat"},
 	// The operator face is a strippable unit (its proto lives in its own
 	// file); the business module must survive its deletion untouched.
 	"module/agentconfig": {"module/agentconfigadmin"},

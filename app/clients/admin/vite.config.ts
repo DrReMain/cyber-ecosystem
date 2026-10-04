@@ -13,6 +13,9 @@ const config = defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   return {
     resolve: { tsconfigPaths: true },
+    ssr: {
+      noExternal: ["@ant-design/x-markdown"],
+    },
     server: {
       proxy: {
         "^/connect/cyber\\.system\\.": {

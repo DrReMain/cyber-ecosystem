@@ -32,6 +32,17 @@ generated TS types claim Message/Map shapes the runtime does not deliver —
 consume accordingly (`Object.entries` over maps, string/index access for
 enums).
 
+**Server-streaming is consumed imperatively, outside the query cache.** The
+transport's stream entry takes a generated method descriptor (`*_pb.ts`) plus
+one `AbortController` per stream; a feature hook drives it directly and
+accumulates frames into component state (or a store interface the page
+injects — the chat hook takes a `ConversationStore` precisely so the backing
+impl can change without touching the hook). Frame intake normalizes protojson
+omissions (`frame.contentDelta ?? ""` — unset scalars are absent, not ""),
+and cancellation is the normal close: abort, drop the abort error, release
+the controller in `finally`; a controller map keyed by stream id guards
+against double-fire.
+
 ## 2) Area model
 
 An **area** is a private zone of the app (e.g. `/dashboard`). It consists of

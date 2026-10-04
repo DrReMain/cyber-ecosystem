@@ -13,6 +13,7 @@ import (
 	"cyber-ecosystem/app/services/agent/internal/module/agentconfig"
 	"cyber-ecosystem/app/services/agent/internal/module/agentconfigadmin"
 	"cyber-ecosystem/app/services/agent/internal/module/authz"
+	"cyber-ecosystem/app/services/agent/internal/module/chat"
 	"cyber-ecosystem/app/services/agent/internal/platform"
 	"cyber-ecosystem/app/services/agent/internal/server"
 	"github.com/go-kratos/kratos/v3"
@@ -94,7 +95,18 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, cryp
 	}
 	agentConfigService := agentconfig.NewAgentConfigService(logger, agentConfigUC)
 	agentConfigAdminService := agentconfigadmin.NewAgentConfigAdminService(logger, agentConfigUC)
-	v := server.NewRegistrarList(agentConfigService, agentConfigAdminService)
+	chatRP := chat.NewChatRP(logger, platformPlatform)
+	chatUC, err := chat.NewChatUC(logger, platformPlatform, crypto, agentConfigRP, chatRP)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	chatService := chat.NewChatService(logger, chatUC)
+	v := server.NewRegistrarList(agentConfigService, agentConfigAdminService, chatService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

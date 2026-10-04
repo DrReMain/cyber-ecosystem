@@ -4,6 +4,8 @@ package runtime
 
 import (
 	"cyber-ecosystem/app/services/agent/internal/ent/agentconfig"
+	"cyber-ecosystem/app/services/agent/internal/ent/chatmessage"
+	"cyber-ecosystem/app/services/agent/internal/ent/chatsession"
 	"cyber-ecosystem/app/services/agent/internal/ent/schema"
 	"time"
 )
@@ -91,6 +93,148 @@ func init() {
 	agentconfig.DefaultID = agentconfigDescID.Default.(func() string)
 	// agentconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	agentconfig.IDValidator = agentconfigDescID.Validators[0].(func(string) error)
+	chatmessageMixin := schema.ChatMessage{}.Mixin()
+	chatmessageMixinHooks2 := chatmessageMixin[2].Hooks()
+	chatmessageMixinHooks3 := chatmessageMixin[3].Hooks()
+	chatmessage.Hooks[0] = chatmessageMixinHooks2[0]
+	chatmessage.Hooks[1] = chatmessageMixinHooks3[0]
+	chatmessageMixinInters2 := chatmessageMixin[2].Interceptors()
+	chatmessageMixinInters3 := chatmessageMixin[3].Interceptors()
+	chatmessage.Interceptors[0] = chatmessageMixinInters2[0]
+	chatmessage.Interceptors[1] = chatmessageMixinInters3[0]
+	chatmessageMixinFields0 := chatmessageMixin[0].Fields()
+	_ = chatmessageMixinFields0
+	chatmessageMixinFields1 := chatmessageMixin[1].Fields()
+	_ = chatmessageMixinFields1
+	chatmessageMixinFields2 := chatmessageMixin[2].Fields()
+	_ = chatmessageMixinFields2
+	chatmessageFields := schema.ChatMessage{}.Fields()
+	_ = chatmessageFields
+	// chatmessageDescCreatedAt is the schema descriptor for created_at field.
+	chatmessageDescCreatedAt := chatmessageMixinFields1[0].Descriptor()
+	// chatmessage.DefaultCreatedAt holds the default value on creation for the created_at field.
+	chatmessage.DefaultCreatedAt = chatmessageDescCreatedAt.Default.(func() time.Time)
+	// chatmessageDescUpdatedAt is the schema descriptor for updated_at field.
+	chatmessageDescUpdatedAt := chatmessageMixinFields1[1].Descriptor()
+	// chatmessage.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	chatmessage.DefaultUpdatedAt = chatmessageDescUpdatedAt.Default.(func() time.Time)
+	// chatmessage.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	chatmessage.UpdateDefaultUpdatedAt = chatmessageDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// chatmessageDescTenantID is the schema descriptor for tenant_id field.
+	chatmessageDescTenantID := chatmessageMixinFields2[0].Descriptor()
+	// chatmessage.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	chatmessage.TenantIDValidator = chatmessageDescTenantID.Validators[0].(func(string) error)
+	// chatmessageDescSessionID is the schema descriptor for session_id field.
+	chatmessageDescSessionID := chatmessageFields[0].Descriptor()
+	// chatmessage.SessionIDValidator is a validator for the "session_id" field. It is called by the builders before save.
+	chatmessage.SessionIDValidator = func() func(string) error {
+		validators := chatmessageDescSessionID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(session_id string) error {
+			for _, fn := range fns {
+				if err := fn(session_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// chatmessageDescRole is the schema descriptor for role field.
+	chatmessageDescRole := chatmessageFields[1].Descriptor()
+	// chatmessage.DefaultRole holds the default value on creation for the role field.
+	chatmessage.DefaultRole = chatmessageDescRole.Default.(string)
+	// chatmessage.RoleValidator is a validator for the "role" field. It is called by the builders before save.
+	chatmessage.RoleValidator = chatmessageDescRole.Validators[0].(func(string) error)
+	// chatmessageDescContent is the schema descriptor for content field.
+	chatmessageDescContent := chatmessageFields[2].Descriptor()
+	// chatmessage.DefaultContent holds the default value on creation for the content field.
+	chatmessage.DefaultContent = chatmessageDescContent.Default.(string)
+	// chatmessageDescReasoning is the schema descriptor for reasoning field.
+	chatmessageDescReasoning := chatmessageFields[3].Descriptor()
+	// chatmessage.DefaultReasoning holds the default value on creation for the reasoning field.
+	chatmessage.DefaultReasoning = chatmessageDescReasoning.Default.(string)
+	// chatmessageDescModel is the schema descriptor for model field.
+	chatmessageDescModel := chatmessageFields[4].Descriptor()
+	// chatmessage.DefaultModel holds the default value on creation for the model field.
+	chatmessage.DefaultModel = chatmessageDescModel.Default.(string)
+	// chatmessage.ModelValidator is a validator for the "model" field. It is called by the builders before save.
+	chatmessage.ModelValidator = chatmessageDescModel.Validators[0].(func(string) error)
+	// chatmessageDescFinish is the schema descriptor for finish field.
+	chatmessageDescFinish := chatmessageFields[5].Descriptor()
+	// chatmessage.DefaultFinish holds the default value on creation for the finish field.
+	chatmessage.DefaultFinish = chatmessageDescFinish.Default.(string)
+	// chatmessage.FinishValidator is a validator for the "finish" field. It is called by the builders before save.
+	chatmessage.FinishValidator = chatmessageDescFinish.Validators[0].(func(string) error)
+	// chatmessageDescID is the schema descriptor for id field.
+	chatmessageDescID := chatmessageMixinFields0[0].Descriptor()
+	// chatmessage.DefaultID holds the default value on creation for the id field.
+	chatmessage.DefaultID = chatmessageDescID.Default.(func() string)
+	// chatmessage.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	chatmessage.IDValidator = chatmessageDescID.Validators[0].(func(string) error)
+	chatsessionMixin := schema.ChatSession{}.Mixin()
+	chatsessionMixinHooks2 := chatsessionMixin[2].Hooks()
+	chatsessionMixinHooks3 := chatsessionMixin[3].Hooks()
+	chatsession.Hooks[0] = chatsessionMixinHooks2[0]
+	chatsession.Hooks[1] = chatsessionMixinHooks3[0]
+	chatsessionMixinInters2 := chatsessionMixin[2].Interceptors()
+	chatsessionMixinInters3 := chatsessionMixin[3].Interceptors()
+	chatsession.Interceptors[0] = chatsessionMixinInters2[0]
+	chatsession.Interceptors[1] = chatsessionMixinInters3[0]
+	chatsessionMixinFields0 := chatsessionMixin[0].Fields()
+	_ = chatsessionMixinFields0
+	chatsessionMixinFields1 := chatsessionMixin[1].Fields()
+	_ = chatsessionMixinFields1
+	chatsessionMixinFields2 := chatsessionMixin[2].Fields()
+	_ = chatsessionMixinFields2
+	chatsessionFields := schema.ChatSession{}.Fields()
+	_ = chatsessionFields
+	// chatsessionDescCreatedAt is the schema descriptor for created_at field.
+	chatsessionDescCreatedAt := chatsessionMixinFields1[0].Descriptor()
+	// chatsession.DefaultCreatedAt holds the default value on creation for the created_at field.
+	chatsession.DefaultCreatedAt = chatsessionDescCreatedAt.Default.(func() time.Time)
+	// chatsessionDescUpdatedAt is the schema descriptor for updated_at field.
+	chatsessionDescUpdatedAt := chatsessionMixinFields1[1].Descriptor()
+	// chatsession.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	chatsession.DefaultUpdatedAt = chatsessionDescUpdatedAt.Default.(func() time.Time)
+	// chatsession.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	chatsession.UpdateDefaultUpdatedAt = chatsessionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// chatsessionDescTenantID is the schema descriptor for tenant_id field.
+	chatsessionDescTenantID := chatsessionMixinFields2[0].Descriptor()
+	// chatsession.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	chatsession.TenantIDValidator = chatsessionDescTenantID.Validators[0].(func(string) error)
+	// chatsessionDescOwnerID is the schema descriptor for owner_id field.
+	chatsessionDescOwnerID := chatsessionFields[0].Descriptor()
+	// chatsession.OwnerIDValidator is a validator for the "owner_id" field. It is called by the builders before save.
+	chatsession.OwnerIDValidator = func() func(string) error {
+		validators := chatsessionDescOwnerID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(owner_id string) error {
+			for _, fn := range fns {
+				if err := fn(owner_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// chatsessionDescTitle is the schema descriptor for title field.
+	chatsessionDescTitle := chatsessionFields[1].Descriptor()
+	// chatsession.DefaultTitle holds the default value on creation for the title field.
+	chatsession.DefaultTitle = chatsessionDescTitle.Default.(string)
+	// chatsession.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	chatsession.TitleValidator = chatsessionDescTitle.Validators[0].(func(string) error)
+	// chatsessionDescID is the schema descriptor for id field.
+	chatsessionDescID := chatsessionMixinFields0[0].Descriptor()
+	// chatsession.DefaultID holds the default value on creation for the id field.
+	chatsession.DefaultID = chatsessionDescID.Default.(func() string)
+	// chatsession.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	chatsession.IDValidator = chatsessionDescID.Validators[0].(func(string) error)
 }
 
 const (

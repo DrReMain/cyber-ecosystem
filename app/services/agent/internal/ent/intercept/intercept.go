@@ -8,6 +8,8 @@ import (
 
 	"cyber-ecosystem/app/services/agent/internal/ent"
 	"cyber-ecosystem/app/services/agent/internal/ent/agentconfig"
+	"cyber-ecosystem/app/services/agent/internal/ent/chatmessage"
+	"cyber-ecosystem/app/services/agent/internal/ent/chatsession"
 	"cyber-ecosystem/app/services/agent/internal/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
@@ -96,11 +98,69 @@ func (f TraverseAgentConfig) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.AgentConfigQuery", q)
 }
 
+// The ChatMessageFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ChatMessageFunc func(context.Context, *ent.ChatMessageQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ChatMessageFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ChatMessageQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ChatMessageQuery", q)
+}
+
+// The TraverseChatMessage type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseChatMessage func(context.Context, *ent.ChatMessageQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseChatMessage) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseChatMessage) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ChatMessageQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ChatMessageQuery", q)
+}
+
+// The ChatSessionFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ChatSessionFunc func(context.Context, *ent.ChatSessionQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ChatSessionFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ChatSessionQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ChatSessionQuery", q)
+}
+
+// The TraverseChatSession type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseChatSession func(context.Context, *ent.ChatSessionQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseChatSession) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseChatSession) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ChatSessionQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ChatSessionQuery", q)
+}
+
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
 	case *ent.AgentConfigQuery:
 		return &query[*ent.AgentConfigQuery, predicate.AgentConfig, agentconfig.OrderOption]{typ: ent.TypeAgentConfig, tq: q}, nil
+	case *ent.ChatMessageQuery:
+		return &query[*ent.ChatMessageQuery, predicate.ChatMessage, chatmessage.OrderOption]{typ: ent.TypeChatMessage, tq: q}, nil
+	case *ent.ChatSessionQuery:
+		return &query[*ent.ChatSessionQuery, predicate.ChatSession, chatsession.OrderOption]{typ: ent.TypeChatSession, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}

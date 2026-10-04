@@ -27,5 +27,6 @@ declare module "@tanstack/react-router" {
     title?: MessageKey;
     menu?: RouteMenuMeta;
     operations?: readonly string[];
+    fullHeight?: boolean;
   }
 }

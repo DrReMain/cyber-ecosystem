@@ -16,6 +16,10 @@ type Tx struct {
 	config
 	// AgentConfig is the client for interacting with the AgentConfig builders.
 	AgentConfig *AgentConfigClient
+	// ChatMessage is the client for interacting with the ChatMessage builders.
+	ChatMessage *ChatMessageClient
+	// ChatSession is the client for interacting with the ChatSession builders.
+	ChatSession *ChatSessionClient
 
 	// lazily loaded.
 	client     *Client
@@ -148,6 +152,8 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AgentConfig = NewAgentConfigClient(tx.config)
+	tx.ChatMessage = NewChatMessageClient(tx.config)
+	tx.ChatSession = NewChatSessionClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

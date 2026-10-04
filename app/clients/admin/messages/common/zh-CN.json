@@ -28,6 +28,7 @@
   "common_column_settings_reset": "恢复",
   "common_save": "保存",
   "common_cancel": "取消",
+  "common_confirm": "确定",
   "common_user_deleted": "已删除",
   "common_upload_too_large": "文件超出 {max} 的上传上限"
 }

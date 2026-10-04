@@ -100,6 +100,192 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.agent.v1.DeleteMyAgentConfigResponse'
+    /api/v1/agent/me/chat:
+        post:
+            tags:
+                - ChatService
+            operationId: ChatService_Chat
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.agent.v1.ChatRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.ChatResponse'
+    /api/v1/agent/me/chat/sessions:
+        get:
+            tags:
+                - ChatService
+            operationId: ChatService_ListSessions
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.ListSessionsResponse'
+    /api/v1/agent/me/chat/sessions/{sessionId}:
+        put:
+            tags:
+                - ChatService
+            operationId: ChatService_UpdateSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  description: Session id; absent and unowned both resolve to not found (no existence leak).
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.agent.v1.UpdateSessionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.UpdateSessionResponse'
+        delete:
+            tags:
+                - ChatService
+            operationId: ChatService_DeleteSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  description: Session id; absent and unowned both resolve to not found (no existence leak).
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.DeleteSessionResponse'
+    /api/v1/agent/me/chat/sessions/{sessionId}/messages:
+        get:
+            tags:
+                - ChatService
+            operationId: ChatService_GetSessionMessages
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.GetSessionMessagesResponse'
+    /api/v1/agent/me/models:
+        get:
+            tags:
+                - ChatService
+            operationId: ChatService_ListModels
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.ListModelsResponse'
     /api/v1/system/audit-logs:
         get:
             tags:
@@ -1633,7 +1819,69 @@ components:
                     type: string
                 apiKeySet:
                     type: boolean
+        cyber.agent.v1.ChatRequest:
+            type: object
+            properties:
+                model:
+                    type: string
+                    description: |-
+                        Model id as named by the user's endpoint (GET /v1/models vocabulary);
+                         required, 1..128 chars.
+                sessionId:
+                    type: string
+                    description: |-
+                        Existing session id (max 20 chars); empty = the server creates a session
+                         for this exchange.
+                content:
+                    type: string
+                    description: |-
+                        The new user turn; required, 1..32768 chars. History is loaded
+                         server-side from the session.
+            description: |-
+                chat
+                 Constraints are enforced by explicit checks in the service handler: the
+                 unary protovalidate middleware never sees streaming requests, so annotations
+                 here would be dead rules.
+        cyber.agent.v1.ChatResponse:
+            type: object
+            properties:
+                contentDelta:
+                    type: string
+                    description: Incremental assistant text since the previous frame.
+                reasoningDelta:
+                    type: string
+                    description: Incremental model reasoning (thinking output) since the previous frame.
+                finishReason:
+                    type: string
+                    description: Present only on the final frame ("stop"/"length"/...), empty while streaming.
+                sessionId:
+                    type: string
+                    description: |-
+                        Present only on the first frame of a newly created session (strictly
+                         before any delta); unset otherwise — protojson omits it.
+            description: |-
+                One streaming frame: deltas are incremental (append-only) and at most one
+                 is set per frame; the final frame carries finish_reason with empty deltas.
+                 Failures terminate the stream as a Connect error, never as a frame.
+        cyber.agent.v1.ChatSession:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                title:
+                    type: string
+                    description: First user message clipped server-side at creation; user-renamable.
+            description: list sessions
         cyber.agent.v1.DeleteMyAgentConfigResponse:
+            type: object
+            properties: {}
+        cyber.agent.v1.DeleteSessionResponse:
             type: object
             properties: {}
         cyber.agent.v1.GetMyAgentConfigResponse:
@@ -1641,6 +1889,16 @@ components:
             properties:
                 agentConfig:
                     $ref: '#/components/schemas/cyber.agent.v1.AgentConfig'
+        cyber.agent.v1.GetSessionMessagesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.agent.v1.SessionMessage'
+                    description: 'Fixed order: created_at DESC (page 1 = newest turns; later pages go back).'
         cyber.agent.v1.ListAgentConfigsResponse:
             type: object
             properties:
@@ -1650,6 +1908,46 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.agent.v1.AgentConfigView'
+        cyber.agent.v1.ListModelsResponse:
+            type: object
+            properties:
+                models:
+                    type: array
+                    items:
+                        type: string
+                    description: Model ids exposed by the user's endpoint, order preserved.
+        cyber.agent.v1.ListSessionsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.agent.v1.ChatSession'
+                    description: 'Fixed order: updated_at DESC (latest activity first).'
+        cyber.agent.v1.SessionMessage:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                role:
+                    type: string
+                    description: |-
+                        Free-form role vocabulary (user/assistant today; tool parts are the S4
+                         evolution) — deliberately unpatterned.
+                content:
+                    type: string
+                reasoning:
+                    type: string
+                    description: Accumulated model reasoning on the assistant turn; empty on user turns.
+                model:
+                    type: string
+                    description: Model id that produced the assistant turn; empty on user turns.
+            description: get session messages
         cyber.agent.v1.UpdateMyAgentConfigRequest:
             type: object
             properties:
@@ -1659,6 +1957,19 @@ components:
                     type: string
             description: update
         cyber.agent.v1.UpdateMyAgentConfigResponse:
+            type: object
+            properties: {}
+        cyber.agent.v1.UpdateSessionRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                    description: Session id; absent and unowned both resolve to not found (no existence leak).
+                title:
+                    type: string
+                    description: New title; replaces the creation-time clip.
+            description: update session
+        cyber.agent.v1.UpdateSessionResponse:
             type: object
             properties: {}
         cyber.shared.common.v1.PageResponse:
@@ -2752,6 +3063,7 @@ tags:
     - name: AgentConfigService
     - name: AuditService
     - name: AuthService
+    - name: ChatService
     - name: DeptService
     - name: FilePresignService
       description: |-

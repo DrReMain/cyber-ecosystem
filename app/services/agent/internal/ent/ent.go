@@ -5,6 +5,8 @@ package ent
 import (
 	"context"
 	"cyber-ecosystem/app/services/agent/internal/ent/agentconfig"
+	"cyber-ecosystem/app/services/agent/internal/ent/chatmessage"
+	"cyber-ecosystem/app/services/agent/internal/ent/chatsession"
 	"errors"
 	"fmt"
 	"reflect"
@@ -74,6 +76,8 @@ func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			agentconfig.Table: agentconfig.ValidColumn,
+			chatmessage.Table: chatmessage.ValidColumn,
+			chatsession.Table: chatsession.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

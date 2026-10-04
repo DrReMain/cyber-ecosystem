@@ -24,7 +24,73 @@ export type CyberAgentV1AgentConfigView = {
     apiKeySet?: boolean;
 };
 
+/**
+ * chat
+ * Constraints are enforced by explicit checks in the service handler: the
+ * unary protovalidate middleware never sees streaming requests, so annotations
+ * here would be dead rules.
+ */
+export type CyberAgentV1ChatRequest = {
+    /**
+     * Model id as named by the user's endpoint (GET /v1/models vocabulary);
+     * required, 1..128 chars.
+     */
+    model?: string;
+    /**
+     * Existing session id (max 20 chars); empty = the server creates a session
+     * for this exchange.
+     */
+    sessionId?: string;
+    /**
+     * The new user turn; required, 1..32768 chars. History is loaded
+     * server-side from the session.
+     */
+    content?: string;
+};
+
+/**
+ * One streaming frame: deltas are incremental (append-only) and at most one
+ * is set per frame; the final frame carries finish_reason with empty deltas.
+ * Failures terminate the stream as a Connect error, never as a frame.
+ */
+export type CyberAgentV1ChatResponse = {
+    /**
+     * Incremental assistant text since the previous frame.
+     */
+    contentDelta?: string;
+    /**
+     * Incremental model reasoning (thinking output) since the previous frame.
+     */
+    reasoningDelta?: string;
+    /**
+     * Present only on the final frame ("stop"/"length"/...), empty while streaming.
+     */
+    finishReason?: string;
+    /**
+     * Present only on the first frame of a newly created session (strictly
+     * before any delta); unset otherwise — protojson omits it.
+     */
+    sessionId?: string;
+};
+
+/**
+ * list sessions
+ */
+export type CyberAgentV1ChatSession = {
+    id?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    /**
+     * First user message clipped server-side at creation; user-renamable.
+     */
+    title?: string;
+};
+
 export type CyberAgentV1DeleteMyAgentConfigResponse = {
+    [key: string]: unknown;
+};
+
+export type CyberAgentV1DeleteSessionResponse = {
     [key: string]: unknown;
 };
 
@@ -32,9 +98,54 @@ export type CyberAgentV1GetMyAgentConfigResponse = {
     agentConfig?: CyberAgentV1AgentConfig;
 };
 
+export type CyberAgentV1GetSessionMessagesResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    /**
+     * Fixed order: created_at DESC (page 1 = newest turns; later pages go back).
+     */
+    list?: Array<CyberAgentV1SessionMessage>;
+};
+
 export type CyberAgentV1ListAgentConfigsResponse = {
     page?: CyberSharedCommonV1PageResponse;
     list?: Array<CyberAgentV1AgentConfigView>;
+};
+
+export type CyberAgentV1ListModelsResponse = {
+    /**
+     * Model ids exposed by the user's endpoint, order preserved.
+     */
+    models?: Array<string>;
+};
+
+export type CyberAgentV1ListSessionsResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    /**
+     * Fixed order: updated_at DESC (latest activity first).
+     */
+    list?: Array<CyberAgentV1ChatSession>;
+};
+
+/**
+ * get session messages
+ */
+export type CyberAgentV1SessionMessage = {
+    id?: string;
+    createdAt?: string;
+    /**
+     * Free-form role vocabulary (user/assistant today; tool parts are the S4
+     * evolution) — deliberately unpatterned.
+     */
+    role?: string;
+    content?: string;
+    /**
+     * Accumulated model reasoning on the assistant turn; empty on user turns.
+     */
+    reasoning?: string;
+    /**
+     * Model id that produced the assistant turn; empty on user turns.
+     */
+    model?: string;
 };
 
 /**
@@ -46,6 +157,24 @@ export type CyberAgentV1UpdateMyAgentConfigRequest = {
 };
 
 export type CyberAgentV1UpdateMyAgentConfigResponse = {
+    [key: string]: unknown;
+};
+
+/**
+ * update session
+ */
+export type CyberAgentV1UpdateSessionRequest = {
+    /**
+     * Session id; absent and unowned both resolve to not found (no existence leak).
+     */
+    sessionId?: string;
+    /**
+     * New title; replaces the creation-time clip.
+     */
+    title?: string;
+};
+
+export type CyberAgentV1UpdateSessionResponse = {
     [key: string]: unknown;
 };
 
@@ -1022,6 +1151,172 @@ export type AgentConfigServiceUpdateMyAgentConfigResponses = {
 };
 
 export type AgentConfigServiceUpdateMyAgentConfigResponse = AgentConfigServiceUpdateMyAgentConfigResponses[keyof AgentConfigServiceUpdateMyAgentConfigResponses];
+
+export type ChatServiceChatData = {
+    body: CyberAgentV1ChatRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/agent/me/chat';
+};
+
+export type ChatServiceChatResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1ChatResponse;
+};
+
+export type ChatServiceChatResponse = ChatServiceChatResponses[keyof ChatServiceChatResponses];
+
+export type ChatServiceListSessionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/agent/me/chat/sessions';
+};
+
+export type ChatServiceListSessionsResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1ListSessionsResponse;
+};
+
+export type ChatServiceListSessionsResponse = ChatServiceListSessionsResponses[keyof ChatServiceListSessionsResponses];
+
+export type ChatServiceDeleteSessionData = {
+    body?: never;
+    path: {
+        /**
+         * Session id; absent and unowned both resolve to not found (no existence leak).
+         */
+        sessionId: string;
+    };
+    query?: never;
+    url: '/api/v1/agent/me/chat/sessions/{sessionId}';
+};
+
+export type ChatServiceDeleteSessionResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1DeleteSessionResponse;
+};
+
+export type ChatServiceDeleteSessionResponse = ChatServiceDeleteSessionResponses[keyof ChatServiceDeleteSessionResponses];
+
+export type ChatServiceUpdateSessionData = {
+    body: CyberAgentV1UpdateSessionRequest;
+    path: {
+        /**
+         * Session id; absent and unowned both resolve to not found (no existence leak).
+         */
+        sessionId: string;
+    };
+    query?: never;
+    url: '/api/v1/agent/me/chat/sessions/{sessionId}';
+};
+
+export type ChatServiceUpdateSessionResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1UpdateSessionResponse;
+};
+
+export type ChatServiceUpdateSessionResponse = ChatServiceUpdateSessionResponses[keyof ChatServiceUpdateSessionResponses];
+
+export type ChatServiceGetSessionMessagesData = {
+    body?: never;
+    path: {
+        sessionId: string;
+    };
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/agent/me/chat/sessions/{sessionId}/messages';
+};
+
+export type ChatServiceGetSessionMessagesResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1GetSessionMessagesResponse;
+};
+
+export type ChatServiceGetSessionMessagesResponse = ChatServiceGetSessionMessagesResponses[keyof ChatServiceGetSessionMessagesResponses];
+
+export type ChatServiceListModelsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/agent/me/models';
+};
+
+export type ChatServiceListModelsResponses = {
+    /**
+     * OK
+     */
+    200: CyberAgentV1ListModelsResponse;
+};
+
+export type ChatServiceListModelsResponse = ChatServiceListModelsResponses[keyof ChatServiceListModelsResponses];
 
 export type AuditServiceListAuditLogsData = {
     body?: never;

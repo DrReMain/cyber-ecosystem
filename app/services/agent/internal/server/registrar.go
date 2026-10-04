@@ -8,6 +8,7 @@ import (
 
 	"cyber-ecosystem/app/services/agent/internal/module/agentconfig"
 	"cyber-ecosystem/app/services/agent/internal/module/agentconfigadmin"
+	"cyber-ecosystem/app/services/agent/internal/module/chat"
 )
 
 type Registrar interface {
@@ -16,6 +17,6 @@ type Registrar interface {
 	RegisterConnect(*connect.Server)
 }
 
-func NewRegistrarList(s1 *agentconfig.AgentConfigService, s2 *agentconfigadmin.AgentConfigAdminService) []Registrar {
-	return []Registrar{s1, s2}
+func NewRegistrarList(s1 *agentconfig.AgentConfigService, s2 *agentconfigadmin.AgentConfigAdminService, s3 *chat.ChatService) []Registrar {
+	return []Registrar{s1, s2, s3}
 }

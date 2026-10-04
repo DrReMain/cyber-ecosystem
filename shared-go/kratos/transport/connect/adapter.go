@@ -17,13 +17,15 @@ var errMissingSendAndClose = errors.New("connect: client streaming handler retur
 // grpc applies stream middleware per-message. Connect runs BOTH, so it is
 // never weaker than either official binding. req mirrors the http generators:
 // the bound request for server-streaming (validator sees it), nil otherwise.
-func (s *Server) chainUnary(ctx context.Context, operation string, req any, fn func() error) error {
+// fn receives the middleware-enriched ctx; stream wrappers must be built
+// inside it so stream.Context() exposes the injected values (Subject, …).
+func (s *Server) chainUnary(ctx context.Context, operation string, req any, fn func(context.Context) error) error {
 	m := s.middleware.Match(operation)
 	if len(m) == 0 {
-		return fn()
+		return fn(ctx)
 	}
-	h := func(context.Context, any) (any, error) {
-		return nil, fn()
+	h := func(mctx context.Context, _ any) (any, error) {
+		return nil, fn(mctx)
 	}
 	_, err := middleware.Chain(m...)(h)(ctx, req)
 	return err
@@ -58,8 +60,8 @@ func HandleServerStream[Req, Res any](
 		func(ctx context.Context, req *connect.Request[Req], stream *connect.ServerStream[Res]) error {
 			w := newServerStream(ctx, stream.Conn())
 			defer w.flushTrailer()
-			mw := newMiddlewareStream(ctx, w, srv.streamMatcher())
-			return srv.chainUnary(ctx, procedure, req.Msg, func() error {
+			return srv.chainUnary(ctx, procedure, req.Msg, func(mctx context.Context) error {
+				mw := newMiddlewareStream(mctx, w, srv.streamMatcher())
 				return fn(req.Msg, &grpc.GenericServerStream[Req, Res]{ServerStream: mw})
 			})
 		},
@@ -79,10 +81,10 @@ func HandleClientStream[Req, Res any](
 		func(ctx context.Context, stream *connect.ClientStream[Req]) (*connect.Response[Res], error) {
 			w := newServerStream(ctx, stream.Conn())
 			defer w.flushTrailer()
-			mw := newMiddlewareStream(ctx, w, srv.streamMatcher())
 			var closeMsg *Res
-			bridge := &clientStreamBridge[Req, Res]{middlewareStream: mw, closeMsg: &closeMsg}
-			if err := srv.chainUnary(ctx, procedure, nil, func() error {
+			if err := srv.chainUnary(ctx, procedure, nil, func(mctx context.Context) error {
+				mw := newMiddlewareStream(mctx, w, srv.streamMatcher())
+				bridge := &clientStreamBridge[Req, Res]{middlewareStream: mw, closeMsg: &closeMsg}
 				return fn(bridge)
 			}); err != nil {
 				return nil, err
@@ -131,8 +133,8 @@ func HandleBidiStream[Req, Res any](
 		func(ctx context.Context, stream *connect.BidiStream[Req, Res]) error {
 			w := newServerStream(ctx, stream.Conn())
 			defer w.flushTrailer()
-			mw := newMiddlewareStream(ctx, w, srv.streamMatcher())
-			return srv.chainUnary(ctx, procedure, nil, func() error {
+			return srv.chainUnary(ctx, procedure, nil, func(mctx context.Context) error {
+				mw := newMiddlewareStream(mctx, w, srv.streamMatcher())
 				return fn(&grpc.GenericServerStream[Req, Res]{ServerStream: mw})
 			})
 		},

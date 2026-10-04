@@ -72,5 +72,98 @@
         "datascope": false
       }
     ]
+  },
+  {
+    "name": "ChatService",
+    "full_name": "cyber.agent.v1.ChatService",
+    "package": "cyber.agent.v1",
+    "source_file": "cyber/agent/v1/chat.proto",
+    "comment": "智能体对话",
+    "methods": [
+      {
+        "name": "Chat",
+        "full_name": "cyber.agent.v1.ChatService.Chat",
+        "request_name": "ChatRequest",
+        "request_full_name": "cyber.agent.v1.ChatRequest",
+        "response_name": "ChatResponse",
+        "response_full_name": "cyber.agent.v1.ChatResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/agent/me/chat",
+        "comment": "流式对话",
+        "builtin": true,
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "DeleteSession",
+        "full_name": "cyber.agent.v1.ChatService.DeleteSession",
+        "request_name": "DeleteSessionRequest",
+        "request_full_name": "cyber.agent.v1.DeleteSessionRequest",
+        "response_name": "DeleteSessionResponse",
+        "response_full_name": "cyber.agent.v1.DeleteSessionResponse",
+        "http_method": "DELETE",
+        "http_path": "/api/v1/agent/me/chat/sessions/{session_id}",
+        "comment": "删除会话",
+        "builtin": true,
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "GetSessionMessages",
+        "full_name": "cyber.agent.v1.ChatService.GetSessionMessages",
+        "request_name": "GetSessionMessagesRequest",
+        "request_full_name": "cyber.agent.v1.GetSessionMessagesRequest",
+        "response_name": "GetSessionMessagesResponse",
+        "response_full_name": "cyber.agent.v1.GetSessionMessagesResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/agent/me/chat/sessions/{session_id}/messages",
+        "comment": "查询会话消息",
+        "builtin": true,
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListModels",
+        "full_name": "cyber.agent.v1.ChatService.ListModels",
+        "request_name": "ListModelsRequest",
+        "request_full_name": "cyber.agent.v1.ListModelsRequest",
+        "response_name": "ListModelsResponse",
+        "response_full_name": "cyber.agent.v1.ListModelsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/agent/me/models",
+        "comment": "列出可用模型",
+        "builtin": true,
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListSessions",
+        "full_name": "cyber.agent.v1.ChatService.ListSessions",
+        "request_name": "ListSessionsRequest",
+        "request_full_name": "cyber.agent.v1.ListSessionsRequest",
+        "response_name": "ListSessionsResponse",
+        "response_full_name": "cyber.agent.v1.ListSessionsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/agent/me/chat/sessions",
+        "comment": "查询会话列表",
+        "builtin": true,
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "UpdateSession",
+        "full_name": "cyber.agent.v1.ChatService.UpdateSession",
+        "request_name": "UpdateSessionRequest",
+        "request_full_name": "cyber.agent.v1.UpdateSessionRequest",
+        "response_name": "UpdateSessionResponse",
+        "response_full_name": "cyber.agent.v1.UpdateSessionResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/agent/me/chat/sessions/{session_id}",
+        "comment": "重命名会话",
+        "builtin": true,
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
   }
 ]
