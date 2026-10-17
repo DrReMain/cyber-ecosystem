@@ -31,6 +31,14 @@ func (r *tokenRP) Get(ctx context.Context, key string) ([]byte, error) {
 	return val, nil
 }
 
+func (r *tokenRP) GetDel(ctx context.Context, key string) ([]byte, error) {
+	val, err := r.Platform.GetCache().KV.GetDel(ctx, key)
+	if err != nil {
+		return nil, r.Platform.HandleCacheError(err)
+	}
+	return val, nil
+}
+
 func (r *tokenRP) Set(ctx context.Context, key string, val []byte, ttl time.Duration) error {
 	if err := r.Platform.GetCache().KV.Set(ctx, key, val, ttl); err != nil {
 		return r.Platform.HandleCacheError(err)

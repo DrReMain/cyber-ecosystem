@@ -6,6 +6,7 @@ import {
   ScopeKind,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/role_pb";
 import { m } from "#/paraglide/messages";
+import { WILDCARD_SUFFIX } from "../../layout-dashboard/auth/permissions";
 
 export interface RoleDraft {
   name: string;
@@ -38,7 +39,7 @@ export interface PolicyOptionView {
   enabled: boolean;
 }
 
-const WILDCARD_SUFFIX = "/*";
+export const GLOBAL_WILDCARD = WILDCARD_SUFFIX;
 
 export const opOf = (service: string, method: string): string => `/${service}/${method}`;
 
@@ -50,7 +51,9 @@ export function grantableServices(catalog: readonly Service[]): GrantableView[] 
       name: svc.name,
       fullName: svc.fullName,
       comment: svc.comment,
-      methods: (svc.methods ?? []).filter((mt) => mt.access === "ADMIN" && !mt.builtin),
+      methods: (svc.methods ?? []).filter(
+        (mt) => mt.access === "ADMIN" || mt.access === "PLATFORM",
+      ),
     }))
     .filter((svc) => svc.methods.length > 0);
 }
@@ -92,8 +95,6 @@ export function roleGrantsOf(map: GrantMap): RoleGrant[] {
     }),
   );
 }
-
-export const GLOBAL_WILDCARD = "/*";
 
 const NARROWING: ReadonlySet<ScopeKind> = new Set([ScopeKind.SELF, ScopeKind.DEPT_TREE]);
 
@@ -159,8 +160,10 @@ export function summarizeGrants(
 }
 
 export function summarizePatterns(operations: string[]): GrantsSummary {
-  const global = operations.includes("/*");
-  const wildcards = operations.filter((op) => op.endsWith("/*") && op !== "/*").length;
+  const global = operations.includes(GLOBAL_WILDCARD);
+  const wildcards = operations.filter(
+    (op) => op.endsWith(WILDCARD_SUFFIX) && op !== GLOBAL_WILDCARD,
+  ).length;
   return summarizeGrants(global, operations.length, wildcards);
 }
 

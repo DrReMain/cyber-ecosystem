@@ -19,7 +19,6 @@ type ResourceMethod struct {
 	HttpMethod       string `json:"http_method"`
 	HttpPath         string `json:"http_path"`
 	Comment          string `json:"comment"`
-	Builtin          bool   `json:"builtin"`   // builtin baseline op: not grantable
 	Access           string `json:"access"`    // audience annotation as declared
 	Datascope        bool   `json:"datascope"` // row-level narrowing applies: scope selection is offered
 }

@@ -48,7 +48,6 @@ type methodMeta struct {
 	HttpMethod       string `json:"http_method"`
 	HttpPath         string `json:"http_path"`
 	Comment          string `json:"comment"`
-	Builtin          bool   `json:"builtin"`
 	Access           string `json:"access"`
 	Datascope        bool   `json:"datascope"`
 }
@@ -131,7 +130,6 @@ func buildMethod(serviceFullName string, md *descriptorpb.MethodDescriptorProto)
 		if rule, ok := proto.GetExtension(opts, annotations.E_Http).(*annotations.HttpRule); ok && rule != nil {
 			m.HttpMethod, m.HttpPath = helper.ExtractHTTP(rule)
 		}
-		m.Builtin, _ = proto.GetExtension(opts, extv1.E_Builtin).(bool)
 		m.Datascope, _ = proto.GetExtension(opts, extv1.E_Datascope).(bool)
 		if proto.HasExtension(opts, extv1.E_Access) {
 			acc, _ := proto.GetExtension(opts, extv1.E_Access).(extv1.Access)

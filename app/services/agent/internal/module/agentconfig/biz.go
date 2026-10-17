@@ -80,9 +80,10 @@ type AgentConfigUC struct {
 }
 
 func NewAgentConfigUC(logger *slog.Logger, tm shared.Transaction, c *conf.Crypto, agentConfigRP AgentConfigRP, userRP UserRP) (*AgentConfigUC, error) {
-	// Fail at boot, not at first seal: an empty master key bricks every write.
-	if c == nil || c.GetMasterKey() == "" {
-		return nil, fmt.Errorf("crypto.master_key is required")
+	// Fail at boot, not at first seal: an empty or too-short master key
+	// bricks every write — HKDF stretches the key but cannot conjure entropy.
+	if c == nil || len(c.GetMasterKey()) < 16 {
+		return nil, fmt.Errorf("crypto.master_key is required (min 16 bytes)")
 	}
 	return &AgentConfigUC{
 		UC:        shared.NewUC(logger.With("module", "module/agentconfig"), tm),

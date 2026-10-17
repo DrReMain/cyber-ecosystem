@@ -19,6 +19,10 @@ type HookRegistry interface {
 	OnStop(fn func(context.Context) error)
 }
 
+type TenantDomainSource interface {
+	ListTenantCodes(ctx context.Context) ([]string, error)
+}
+
 // Base ----------------------------------------------------------------------------------------------------------------
 
 type UC struct {

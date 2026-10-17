@@ -12,6 +12,7 @@ import (
 	kratoshttp "github.com/go-kratos/kratos/v3/transport/http"
 	"google.golang.org/grpc"
 
+	"cyber-ecosystem/shared-go/helper"
 	connecttransport "cyber-ecosystem/shared-go/kratos/transport/connect"
 	"cyber-ecosystem/shared-go/utils"
 
@@ -65,7 +66,7 @@ func (s *ChatService) ListModels(ctx context.Context, in *agentpb.ListModelsRequ
 }
 
 func (s *ChatService) ListSessions(ctx context.Context, in *agentpb.ListSessionsRequest) (*agentpb.ListSessionsResponse, error) {
-	out, err := s.chatUC.ListSessions(ctx, in.GetPage())
+	out, err := s.chatUC.ListSessions(ctx, helper.EnsurePageRequest(in.GetPage()))
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +77,7 @@ func (s *ChatService) ListSessions(ctx context.Context, in *agentpb.ListSessions
 }
 
 func (s *ChatService) GetSessionMessages(ctx context.Context, in *agentpb.GetSessionMessagesRequest) (*agentpb.GetSessionMessagesResponse, error) {
-	out, err := s.chatUC.ListMessages(ctx, in.GetSessionId(), in.GetPage())
+	out, err := s.chatUC.ListMessages(ctx, in.GetSessionId(), helper.EnsurePageRequest(in.GetPage()))
 	if err != nil {
 		return nil, err
 	}

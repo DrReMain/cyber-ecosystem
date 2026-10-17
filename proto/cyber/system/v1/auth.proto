@@ -5,7 +5,6 @@ package cyber.system.v1;
 import "buf/validate/validate.proto";
 import "cyber/system/v1/user.proto";
 import "ext/v1/access.proto";
-import "ext/v1/authz.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -25,13 +24,45 @@ service AuthService {
       body: "*"
     };
   }
+  rpc LoginByIdentity(LoginByIdentityRequest) returns (LoginByIdentityResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "身份交换登录：第三方凭证换会话"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/login-by-identity"
+      body: "*"
+    };
+  }
+  rpc BeginIdentityLogin(BeginIdentityLoginRequest) returns (BeginIdentityLoginResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "发起身份登录：铸造授权跳转"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/begin-identity-login"
+      body: "*"
+    };
+  }
+  rpc BindCredential(BindCredentialRequest) returns (BindCredentialResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "绑定第三方身份凭证"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/bind-credential"
+      body: "*"
+    };
+  }
   rpc Logout(LogoutRequest) returns (LogoutResponse) {
     option (cyber.ext.v1.method) = {
       comment: "登出"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {
       post: "/api/v1/system/auth/logout"
       body: "*"
@@ -42,8 +73,7 @@ service AuthService {
       comment: "获取当前登录用户"
       action: ACTION_READ
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/system/me"};
   }
 }
@@ -65,6 +95,75 @@ message LoginResponse {
   google.protobuf.Timestamp expires_at = 3;
 }
 
+// identity exchange --------------------------------------------------------------
+
+message LoginByIdentityRequest {
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  oneof payload {
+    option (buf.validate.oneof).required = true;
+    WeChatIdentityPayload wechat = 2;
+  }
+  optional string state = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message WeChatIdentityPayload {
+  // OAuth authorization code from the wechat redirect.
+  optional string code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+message LoginByIdentityResponse {
+  string session_token = 1;
+  google.protobuf.Timestamp issued_at = 2;
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+message BeginIdentityLoginRequest {
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  optional string redirect_uri = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+message BeginIdentityLoginResponse {
+  string authorize_url = 1;
+}
+
+message BindCredentialRequest {
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  oneof payload {
+    option (buf.validate.oneof).required = true;
+    WeChatIdentityPayload wechat = 2;
+  }
+  optional string state = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message BindCredentialResponse {}
+
 message LogoutRequest {}
 
 message LogoutResponse {}
@@ -75,4 +174,12 @@ message GetCurrentUserRequest {}
 message GetCurrentUserResponse {
   cyber.system.v1.User user = 1;
   repeated string permissions = 2;
+  repeated Membership memberships = 3;
+}
+
+// Plain scalars by the success-implies-present carve-out: a seat row always
+// carries its two join keys.
+message Membership {
+  string tenant = 1;
+  string population = 2;
 }

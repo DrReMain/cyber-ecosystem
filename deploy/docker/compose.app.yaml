@@ -3,7 +3,7 @@
 # middleware network, volumes, and compose project with dev:
 #
 #   docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml \
-#     --profile db --profile storage --profile mq --profile app up -d --build --wait
+#     --profile db --profile storage --profile app up -d --wait
 #
 # App containers publish NO host ports — the edge (compose.edge.yaml) is the
 # only way in, mirroring the prod access shape. Use the deploy Nx targets
@@ -18,8 +18,10 @@ services:
       - apply
       - --dir
       - file:///migrations
+      # The DSN interpolates the same APP_DB_* knobs the service config reads,
+      # so one override moves both the migration and the runtime connection.
       - --url
-      - postgres://postgres:postgres@postgresql.db:5432/system?sslmode=disable
+      - postgres://${APP_DB_USER:-postgres}:${APP_DB_PASS:-postgres}@postgresql.db:5432/system?sslmode=disable
     volumes:
       - ../../app/services/system/internal/ent/migrate/migrations:/migrations:ro
     depends_on:
@@ -35,10 +37,24 @@ services:
       args:
         VERSION: "${VERSION:-dev}"
     image: cyber-ecosystem/system:local
+    environment:
+      - APP_DB_HOST
+      - APP_DB_PORT
+      - APP_DB_USER
+      - APP_DB_PASS
+      - APP_DB_NAME
+      - APP_SEED_INITIAL_PASSWORD
+      - APP_OTLP_ENDPOINT
+      - APP_S3_PUBLIC_ENDPOINT
+      - APP_WECHAT_ENABLED
+      - APP_WECHAT_ENDPOINT
+      - APP_WECHAT_APPID
+      - APP_WECHAT_SECRET
     networks:
       default:
         aliases: ["system.api"]
     healthcheck:
+      # port mirrors system config.yaml server.http.addr
       test: ["CMD", "wget", "-qO-", "http://localhost:11001/healthz"]
       interval: 10s
       timeout: 5s
@@ -71,8 +87,10 @@ services:
       - apply
       - --dir
       - file:///migrations
+      # Same APP_DB_* interpolation as system-migrate; the database name
+      # defaults per service.
       - --url
-      - postgres://postgres:postgres@postgresql.db:5432/agent?sslmode=disable
+      - postgres://${APP_DB_USER:-postgres}:${APP_DB_PASS:-postgres}@postgresql.db:5432/agent?sslmode=disable
     volumes:
       - ../../app/services/agent/internal/ent/migrate/migrations:/migrations:ro
     depends_on:
@@ -88,10 +106,19 @@ services:
       args:
         VERSION: "${VERSION:-dev}"
     image: cyber-ecosystem/agent:local
+    environment:
+      - APP_AGENT_MASTER_KEY=${AGENT_MASTER_KEY:-agent-insecure-dev-key}
+      - APP_DB_HOST
+      - APP_DB_PORT
+      - APP_DB_USER
+      - APP_DB_PASS
+      - APP_DB_NAME
+      - APP_OTLP_ENDPOINT
     networks:
       default:
         aliases: ["agent.api"]
     healthcheck:
+      # port mirrors agent config.yaml server.http.addr
       test: ["CMD", "wget", "-qO-", "http://localhost:11002/healthz"]
       interval: 10s
       timeout: 5s
@@ -101,10 +128,6 @@ services:
       agent-migrate:
         condition: service_completed_successfully
       postgresql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      seaweedfs:
         condition: service_healthy
     deploy:
       resources:

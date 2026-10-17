@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@connectrpc/connect-query";
 import { listDepts } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/dept-DeptService_connectquery";
+import { listPopulations } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/population-PopulationService_connectquery";
 import { listResource } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/resource-ResourceService_connectquery";
 import {
   listRoles,
@@ -108,6 +109,7 @@ function useUsersActions({
         createMut.mutate({
           email: draft.email,
           password: draft.password,
+          population: draft.population,
           deptId: draft.deptId,
           roles: draft.roles,
           avatar: draft.avatar,
@@ -151,6 +153,10 @@ export function UsersPage() {
   );
   const rolesQuery = useQuery(listRoles, { orderBy: ["createdAt:asc"], page: { all: true } });
   const deptsQuery = useQuery(listDepts, { page: { all: true } });
+  const populationsQuery = useQuery(listPopulations, {
+    orderBy: ["code:asc"],
+    page: { all: true },
+  });
   const catalogQuery = useQuery(listResource, {});
   const catalog = useMemo<OperationCatalog>(
     () => buildOperationCatalog(catalogQuery.data?.list ?? []),
@@ -258,6 +264,7 @@ export function UsersPage() {
           onUploadAvatar={avatarUpload.upload}
           open={editing.open}
           pending={actions.saving}
+          populations={populationsQuery.data?.list ?? []}
           previewLoading={previewQuery.isFetching}
           previewOperations={previewQuery.data?.operations ?? []}
           resetPending={actions.resetPending}

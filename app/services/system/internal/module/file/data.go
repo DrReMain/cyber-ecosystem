@@ -92,11 +92,11 @@ func (rp *fileRP) FindRef(ctx context.Context, id string) (*File, error) {
 }
 
 func (rp *fileRP) Limits() storage.Limits {
-	return rp.Platform.GetStorage().Limits()
+	return rp.Platform.GetStorageLimits()
 }
 
 func (rp *fileRP) PresignDownload(ctx context.Context, key string, ttl time.Duration, opts storage.DownloadOptions) (string, error) {
-	url, err := rp.Platform.GetStorage().Presign.PresignDownload(ctx, key, ttl, opts)
+	url, err := rp.Platform.GetStorageFor(ctx).Presign.PresignDownload(ctx, key, ttl, opts)
 	if err != nil {
 		return "", rp.Platform.HandleStorageError(err)
 	}
@@ -120,7 +120,7 @@ func (rp *fileRP) CreateGeneration(ctx context.Context, f *File) (*File, error) 
 
 func (rp *fileRP) UploadObject(ctx context.Context, key, contentType string, r io.Reader) (*storage.ObjectInfo, error) {
 	// size<0: unknown at produce time, enforced by the streaming counter.
-	info, err := rp.Platform.GetStorage().Object.Upload(ctx, key, r, -1, contentType)
+	info, err := rp.Platform.GetStorageFor(ctx).Object.Upload(ctx, key, r, -1, contentType)
 	if err != nil {
 		return nil, rp.Platform.HandleStorageError(err)
 	}
@@ -128,7 +128,7 @@ func (rp *fileRP) UploadObject(ctx context.Context, key, contentType string, r i
 }
 
 func (rp *fileRP) DeleteObject(ctx context.Context, key string) error {
-	if err := rp.Platform.GetStorage().Object.Delete(ctx, key); err != nil {
+	if err := rp.Platform.GetStorageFor(ctx).Object.Delete(ctx, key); err != nil {
 		return rp.Platform.HandleStorageError(err)
 	}
 	return nil
@@ -219,14 +219,14 @@ func (rp *fileRP) FindByKey(ctx context.Context, key string) (*File, error) {
 }
 
 func (rp *fileRP) ListMultipartUploads(ctx context.Context, prefix string, visit func(storage.PendingUpload) error) error {
-	if err := rp.Platform.GetStorage().Multipart.ListMultipartUploads(ctx, prefix, visit); err != nil {
+	if err := rp.Platform.GetStorageFor(ctx).Multipart.ListMultipartUploads(ctx, prefix, visit); err != nil {
 		return rp.Platform.HandleStorageError(err)
 	}
 	return nil
 }
 
 func (rp *fileRP) AbortSession(ctx context.Context, key, uploadID string) error {
-	err := rp.Platform.GetStorage().Multipart.Abort(ctx, key, uploadID)
+	err := rp.Platform.GetStorageFor(ctx).Multipart.Abort(ctx, key, uploadID)
 	// Already completed or aborted is the sweep's goal state, not a failure.
 	if errors.Is(err, storage.ErrNotFound) {
 		return nil
@@ -238,7 +238,7 @@ func (rp *fileRP) AbortSession(ctx context.Context, key, uploadID string) error 
 }
 
 func (rp *fileRP) ListObjects(ctx context.Context, prefix, cursor string, maxKeys int32) (*storage.ListResult, error) {
-	res, err := rp.Platform.GetStorage().List.List(ctx, prefix, cursor, maxKeys)
+	res, err := rp.Platform.GetStorageFor(ctx).List.List(ctx, prefix, cursor, maxKeys)
 	if err != nil {
 		return nil, rp.Platform.HandleStorageError(err)
 	}

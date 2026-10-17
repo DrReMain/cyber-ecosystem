@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type FileCreate struct {
 	config
 	mutation *FileMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -400,6 +403,7 @@ func (_c *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 		_node = &File{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(file.Table, sqlgraph.NewFieldSpec(file.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -459,11 +463,465 @@ func (_c *FileCreate) createSpec() (*File, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.File.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.FileUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *FileCreate) OnConflict(opts ...sql.ConflictOption) *FileUpsertOne {
+	_c.conflict = opts
+	return &FileUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.File.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *FileCreate) OnConflictColumns(columns ...string) *FileUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &FileUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// FileUpsertOne is the builder for "upsert"-ing
+	//  one File node.
+	FileUpsertOne struct {
+		create *FileCreate
+	}
+
+	// FileUpsert is the "OnConflict" setter.
+	FileUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *FileUpsert) SetUpdatedAt(v time.Time) *FileUpsert {
+	u.Set(file.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *FileUpsert) UpdateUpdatedAt() *FileUpsert {
+	u.SetExcluded(file.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *FileUpsert) SetDeletedAt(v time.Time) *FileUpsert {
+	u.Set(file.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *FileUpsert) UpdateDeletedAt() *FileUpsert {
+	u.SetExcluded(file.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *FileUpsert) ClearDeletedAt() *FileUpsert {
+	u.SetNull(file.FieldDeletedAt)
+	return u
+}
+
+// SetKey sets the "key" field.
+func (u *FileUpsert) SetKey(v string) *FileUpsert {
+	u.Set(file.FieldKey, v)
+	return u
+}
+
+// UpdateKey sets the "key" field to the value that was provided on create.
+func (u *FileUpsert) UpdateKey() *FileUpsert {
+	u.SetExcluded(file.FieldKey)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *FileUpsert) SetName(v string) *FileUpsert {
+	u.Set(file.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *FileUpsert) UpdateName() *FileUpsert {
+	u.SetExcluded(file.FieldName)
+	return u
+}
+
+// SetContentType sets the "content_type" field.
+func (u *FileUpsert) SetContentType(v string) *FileUpsert {
+	u.Set(file.FieldContentType, v)
+	return u
+}
+
+// UpdateContentType sets the "content_type" field to the value that was provided on create.
+func (u *FileUpsert) UpdateContentType() *FileUpsert {
+	u.SetExcluded(file.FieldContentType)
+	return u
+}
+
+// SetSize sets the "size" field.
+func (u *FileUpsert) SetSize(v int64) *FileUpsert {
+	u.Set(file.FieldSize, v)
+	return u
+}
+
+// UpdateSize sets the "size" field to the value that was provided on create.
+func (u *FileUpsert) UpdateSize() *FileUpsert {
+	u.SetExcluded(file.FieldSize)
+	return u
+}
+
+// AddSize adds v to the "size" field.
+func (u *FileUpsert) AddSize(v int64) *FileUpsert {
+	u.Add(file.FieldSize, v)
+	return u
+}
+
+// SetSource sets the "source" field.
+func (u *FileUpsert) SetSource(v string) *FileUpsert {
+	u.Set(file.FieldSource, v)
+	return u
+}
+
+// UpdateSource sets the "source" field to the value that was provided on create.
+func (u *FileUpsert) UpdateSource() *FileUpsert {
+	u.SetExcluded(file.FieldSource)
+	return u
+}
+
+// SetStatus sets the "status" field.
+func (u *FileUpsert) SetStatus(v string) *FileUpsert {
+	u.Set(file.FieldStatus, v)
+	return u
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *FileUpsert) UpdateStatus() *FileUpsert {
+	u.SetExcluded(file.FieldStatus)
+	return u
+}
+
+// SetUploadID sets the "upload_id" field.
+func (u *FileUpsert) SetUploadID(v string) *FileUpsert {
+	u.Set(file.FieldUploadID, v)
+	return u
+}
+
+// UpdateUploadID sets the "upload_id" field to the value that was provided on create.
+func (u *FileUpsert) UpdateUploadID() *FileUpsert {
+	u.SetExcluded(file.FieldUploadID)
+	return u
+}
+
+// SetEtag sets the "etag" field.
+func (u *FileUpsert) SetEtag(v string) *FileUpsert {
+	u.Set(file.FieldEtag, v)
+	return u
+}
+
+// UpdateEtag sets the "etag" field to the value that was provided on create.
+func (u *FileUpsert) UpdateEtag() *FileUpsert {
+	u.SetExcluded(file.FieldEtag)
+	return u
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (u *FileUpsert) SetOwnerID(v string) *FileUpsert {
+	u.Set(file.FieldOwnerID, v)
+	return u
+}
+
+// UpdateOwnerID sets the "owner_id" field to the value that was provided on create.
+func (u *FileUpsert) UpdateOwnerID() *FileUpsert {
+	u.SetExcluded(file.FieldOwnerID)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.File.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(file.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *FileUpsertOne) UpdateNewValues() *FileUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(file.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(file.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(file.FieldTenantID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.File.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *FileUpsertOne) Ignore() *FileUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *FileUpsertOne) DoNothing() *FileUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the FileCreate.OnConflict
+// documentation for more info.
+func (u *FileUpsertOne) Update(set func(*FileUpsert)) *FileUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&FileUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *FileUpsertOne) SetUpdatedAt(v time.Time) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateUpdatedAt() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *FileUpsertOne) SetDeletedAt(v time.Time) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateDeletedAt() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *FileUpsertOne) ClearDeletedAt() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetKey sets the "key" field.
+func (u *FileUpsertOne) SetKey(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetKey(v)
+	})
+}
+
+// UpdateKey sets the "key" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateKey() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateKey()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *FileUpsertOne) SetName(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateName() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetContentType sets the "content_type" field.
+func (u *FileUpsertOne) SetContentType(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetContentType(v)
+	})
+}
+
+// UpdateContentType sets the "content_type" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateContentType() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateContentType()
+	})
+}
+
+// SetSize sets the "size" field.
+func (u *FileUpsertOne) SetSize(v int64) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetSize(v)
+	})
+}
+
+// AddSize adds v to the "size" field.
+func (u *FileUpsertOne) AddSize(v int64) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.AddSize(v)
+	})
+}
+
+// UpdateSize sets the "size" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateSize() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateSize()
+	})
+}
+
+// SetSource sets the "source" field.
+func (u *FileUpsertOne) SetSource(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetSource(v)
+	})
+}
+
+// UpdateSource sets the "source" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateSource() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateSource()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *FileUpsertOne) SetStatus(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateStatus() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetUploadID sets the "upload_id" field.
+func (u *FileUpsertOne) SetUploadID(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetUploadID(v)
+	})
+}
+
+// UpdateUploadID sets the "upload_id" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateUploadID() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateUploadID()
+	})
+}
+
+// SetEtag sets the "etag" field.
+func (u *FileUpsertOne) SetEtag(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetEtag(v)
+	})
+}
+
+// UpdateEtag sets the "etag" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateEtag() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateEtag()
+	})
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (u *FileUpsertOne) SetOwnerID(v string) *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.SetOwnerID(v)
+	})
+}
+
+// UpdateOwnerID sets the "owner_id" field to the value that was provided on create.
+func (u *FileUpsertOne) UpdateOwnerID() *FileUpsertOne {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateOwnerID()
+	})
+}
+
+// Exec executes the query.
+func (u *FileUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for FileCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *FileUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *FileUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: FileUpsertOne.ID is not supported by MySQL driver. Use FileUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *FileUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // FileCreateBulk is the builder for creating many File entities in bulk.
 type FileCreateBulk struct {
 	config
 	err      error
 	builders []*FileCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the File entities in the database.
@@ -493,6 +951,7 @@ func (_c *FileCreateBulk) Save(ctx context.Context) ([]*File, error) {
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -539,6 +998,294 @@ func (_c *FileCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *FileCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.File.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.FileUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *FileCreateBulk) OnConflict(opts ...sql.ConflictOption) *FileUpsertBulk {
+	_c.conflict = opts
+	return &FileUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.File.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *FileCreateBulk) OnConflictColumns(columns ...string) *FileUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &FileUpsertBulk{
+		create: _c,
+	}
+}
+
+// FileUpsertBulk is the builder for "upsert"-ing
+// a bulk of File nodes.
+type FileUpsertBulk struct {
+	create *FileCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.File.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(file.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *FileUpsertBulk) UpdateNewValues() *FileUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(file.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(file.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(file.FieldTenantID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.File.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *FileUpsertBulk) Ignore() *FileUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *FileUpsertBulk) DoNothing() *FileUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the FileCreateBulk.OnConflict
+// documentation for more info.
+func (u *FileUpsertBulk) Update(set func(*FileUpsert)) *FileUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&FileUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *FileUpsertBulk) SetUpdatedAt(v time.Time) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateUpdatedAt() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *FileUpsertBulk) SetDeletedAt(v time.Time) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateDeletedAt() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *FileUpsertBulk) ClearDeletedAt() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetKey sets the "key" field.
+func (u *FileUpsertBulk) SetKey(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetKey(v)
+	})
+}
+
+// UpdateKey sets the "key" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateKey() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateKey()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *FileUpsertBulk) SetName(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateName() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetContentType sets the "content_type" field.
+func (u *FileUpsertBulk) SetContentType(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetContentType(v)
+	})
+}
+
+// UpdateContentType sets the "content_type" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateContentType() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateContentType()
+	})
+}
+
+// SetSize sets the "size" field.
+func (u *FileUpsertBulk) SetSize(v int64) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetSize(v)
+	})
+}
+
+// AddSize adds v to the "size" field.
+func (u *FileUpsertBulk) AddSize(v int64) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.AddSize(v)
+	})
+}
+
+// UpdateSize sets the "size" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateSize() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateSize()
+	})
+}
+
+// SetSource sets the "source" field.
+func (u *FileUpsertBulk) SetSource(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetSource(v)
+	})
+}
+
+// UpdateSource sets the "source" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateSource() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateSource()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *FileUpsertBulk) SetStatus(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateStatus() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetUploadID sets the "upload_id" field.
+func (u *FileUpsertBulk) SetUploadID(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetUploadID(v)
+	})
+}
+
+// UpdateUploadID sets the "upload_id" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateUploadID() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateUploadID()
+	})
+}
+
+// SetEtag sets the "etag" field.
+func (u *FileUpsertBulk) SetEtag(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetEtag(v)
+	})
+}
+
+// UpdateEtag sets the "etag" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateEtag() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateEtag()
+	})
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (u *FileUpsertBulk) SetOwnerID(v string) *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.SetOwnerID(v)
+	})
+}
+
+// UpdateOwnerID sets the "owner_id" field to the value that was provided on create.
+func (u *FileUpsertBulk) UpdateOwnerID() *FileUpsertBulk {
+	return u.Update(func(s *FileUpsert) {
+		s.UpdateOwnerID()
+	})
+}
+
+// Exec executes the query.
+func (u *FileUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the FileCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for FileCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *FileUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

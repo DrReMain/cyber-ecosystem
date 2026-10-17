@@ -82,7 +82,6 @@ func toProtoMethods(methods []*ResourceMethod) []*systempb.Method {
 			HttpMethod:       m.HttpMethod,
 			HttpPath:         m.HttpPath,
 			Comment:          m.Comment,
-			Builtin:          m.Builtin,
 			Access:           m.Access,
 			Datascope:        m.Datascope,
 		}

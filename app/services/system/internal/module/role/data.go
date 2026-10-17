@@ -2,6 +2,8 @@ package role
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"log/slog"
 	"slices"
 
@@ -195,20 +197,26 @@ func (rp *roleRP) ReplaceGrants(ctx context.Context, roleID string, grants []*Pe
 	for op, g := range wantedByOp {
 		existing, ok := storedByOp[op]
 		if !ok {
-			created, cerr := client.Permission.Create().
+			cerr := client.Permission.Create().
 				SetRoleID(roleID).
 				SetOperation(op).
 				SetScopeKind(g.ScopeKind).
-				Save(ctx)
+				OnConflictColumns(permission.FieldRoleID, permission.FieldOperation).
+				DoNothing().
+				Exec(ctx)
 			if cerr != nil {
-				// A racing writer may have won the unique (role_id, operation);
-				// treat the constraint as convergence, not failure.
-				if !ent.IsConstraintError(cerr) {
-					return rp.Platform.HandleEntError(cerr)
+				if errors.Is(cerr, sql.ErrNoRows) {
+					continue
 				}
-				continue
+				return rp.Platform.HandleEntError(cerr)
 			}
-			if err := rp.replacePolicyLinks(ctx, client, created.ID, g.PolicyIDs); err != nil {
+			row, qerr := client.Permission.Query().
+				Where(permission.RoleID(roleID), permission.Operation(op)).
+				Only(ctx)
+			if qerr != nil {
+				return rp.Platform.HandleEntError(qerr)
+			}
+			if err := rp.replacePolicyLinks(ctx, client, row.ID, g.PolicyIDs); err != nil {
 				return err
 			}
 			continue
@@ -364,18 +372,15 @@ func (rp *roleRP) policyLinks(ctx context.Context, client *ent.Client, permissio
 }
 
 func (rp *roleRP) replacePolicyLinks(ctx context.Context, client *ent.Client, permissionID string, policyIDs []string) error {
-	// Delete-then-insert beats an intersection diff at this size — a grant
-	// carries at most a handful of links.
 	if _, err := client.PermissionPolicy.Delete().Where(permissionpolicy.PermissionID(permissionID)).Exec(ctx); err != nil {
 		return rp.Platform.HandleEntError(err)
 	}
 	for _, pid := range policyIDs {
-		if _, err := client.PermissionPolicy.Create().SetPermissionID(permissionID).SetPolicyID(pid).Save(ctx); err != nil {
-			// Mirror ReplaceGrants: a unique race means another writer set
-			// the same link, which is the convergence we wanted anyway.
-			if !ent.IsConstraintError(err) {
-				return rp.Platform.HandleEntError(err)
-			}
+		if err := client.PermissionPolicy.Create().SetPermissionID(permissionID).SetPolicyID(pid).
+			OnConflictColumns(permissionpolicy.FieldPermissionID, permissionpolicy.FieldPolicyID).
+			DoNothing().
+			Exec(ctx); err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return rp.Platform.HandleEntError(err)
 		}
 	}
 	return nil

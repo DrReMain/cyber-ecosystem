@@ -5,7 +5,6 @@ package cyber.agent.v1;
 import "buf/validate/validate.proto";
 import "cyber/shared/common/v1/pagination.proto";
 import "ext/v1/access.proto";
-import "ext/v1/authz.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -20,8 +19,7 @@ service ChatService {
       comment: "删除会话"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {delete: "/api/v1/agent/me/chat/sessions/{session_id}"};
   }
   rpc ListModels(ListModelsRequest) returns (ListModelsResponse) {
@@ -29,8 +27,7 @@ service ChatService {
       comment: "列出可用模型"
       action: ACTION_READ
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/agent/me/models"};
   }
   rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse) {
@@ -38,8 +35,7 @@ service ChatService {
       comment: "查询会话列表"
       action: ACTION_READ
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/agent/me/chat/sessions"};
   }
   rpc GetSessionMessages(GetSessionMessagesRequest) returns (GetSessionMessagesResponse) {
@@ -47,8 +43,7 @@ service ChatService {
       comment: "查询会话消息"
       action: ACTION_READ
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/agent/me/chat/sessions/{session_id}/messages"};
   }
   rpc UpdateSession(UpdateSessionRequest) returns (UpdateSessionResponse) {
@@ -56,8 +51,7 @@ service ChatService {
       comment: "重命名会话"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {
       put: "/api/v1/agent/me/chat/sessions/{session_id}"
       body: "*"
@@ -68,8 +62,7 @@ service ChatService {
       comment: "流式对话"
       action: ACTION_READ
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {
       post: "/api/v1/agent/me/chat"
       body: "*"

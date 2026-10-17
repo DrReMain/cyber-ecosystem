@@ -8,20 +8,22 @@ import "google/protobuf/descriptor.proto";
 option go_package = "cyber-ecosystem/gen/go/cyber/ext/v1";
 
 // Method access policy: which audience may call an RPC. Each value is a label
-// the auth selector matches (auth.MatchAccess) to pick a middleware chain. The
+// the auth selector matches (security.MatchAccess) to pick a middleware chain. The
 // enum is standalone — adding a value only enables a selector branch; it
 // enforces nothing on its own. Wiring (which chain each audience gets, and what
 // that chain does) lives in each service's server setup.
-//   PUBLIC — opt out of auth (login, public endpoints)
-//   ADMIN  — admin audience
-//   APP    — app / end-user audience
+//   PUBLIC   — no authentication (login, open endpoints)
+//   ADMIN    — grant-gated operator audience
+//   PLATFORM — platform-plane faces, additionally sealed by tenant structure
+//   BUILTIN  — session contracts that authenticate but never consult grants
 // ACCESS_UNSPECIFIED is the zero value (no annotation set); how it is handled
 // is the caller's decision, not the enum's.
 enum Access {
   ACCESS_UNSPECIFIED = 0;
   ACCESS_PUBLIC = 1;
   ACCESS_ADMIN = 2;
-  ACCESS_APP = 3;
+  ACCESS_PLATFORM = 3;
+  ACCESS_BUILTIN = 4;
 }
 
 extend google.protobuf.MethodOptions {

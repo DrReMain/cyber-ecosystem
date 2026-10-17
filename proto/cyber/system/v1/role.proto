@@ -349,8 +349,7 @@ message ExplainOperationRequest {
 message ExplainOperationResponse {
   // "ALLOW" | "DENY".
   string verdict = 1;
-  // Covered by the session-contract baseline rather than any grant.
-  bool builtin = 2;
+  reserved 2; // builtin flag retired with the engine baseline (ACCESS_BUILTIN faces carry no grants surface)
   // Role bindings held (disabled roles included — they bind but contribute
   // no grants).
   repeated string role_codes = 3;

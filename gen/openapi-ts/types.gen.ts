@@ -25,7 +25,6 @@ export type CyberAgentV1AgentConfigView = {
 };
 
 /**
- * chat
  * Constraints are enforced by explicit checks in the service handler: the
  * unary protovalidate middleware never sees streaming requests, so annotations
  * here would be dead rules.
@@ -234,6 +233,46 @@ export type CyberSystemV1AuditLog = {
 };
 
 /**
+ * batchGet
+ */
+export type CyberSystemV1BatchGetUsersRequest = {
+    /**
+     * max_items matches the page_size cap (shared/common/v1 pagination.proto):
+     * one page of ids hydrates in one call — keep the two in lockstep.
+     */
+    ids?: Array<string>;
+};
+
+export type CyberSystemV1BatchGetUsersResponse = {
+    /**
+     * key = requested id; an absent key = no row or outside the viewer's data
+     * scope — skip semantics, no per-item error channel.
+     */
+    users?: {
+        [key: string]: CyberSystemV1UserBrief;
+    };
+};
+
+export type CyberSystemV1BeginIdentityLoginRequest = {
+    provider?: string;
+    redirectUri?: string;
+};
+
+export type CyberSystemV1BeginIdentityLoginResponse = {
+    authorizeUrl?: string;
+};
+
+export type CyberSystemV1BindCredentialRequest = {
+    provider?: string;
+    wechat?: CyberSystemV1WeChatIdentityPayload;
+    state?: string;
+};
+
+export type CyberSystemV1BindCredentialResponse = {
+    [key: string]: unknown;
+};
+
+/**
  * A single-date exception on the calendar; dates are server-local.
  */
 export type CyberSystemV1CalendarOverride = {
@@ -330,6 +369,27 @@ export type CyberSystemV1CreatePolicyResponse = {
 /**
  * create
  */
+export type CyberSystemV1CreatePopulationRequest = {
+    /**
+     * Same charset law as the tenant join key; the ent schema enforces it at
+     * the write as the backstop.
+     */
+    code?: string;
+    name?: string;
+    /**
+     * engine | patron — the compile-time vocabulary; membership in the word
+     * set is validated in code, the single source of the vocabulary.
+     */
+    archetype?: string;
+};
+
+export type CyberSystemV1CreatePopulationResponse = {
+    population?: CyberSystemV1Population;
+};
+
+/**
+ * create
+ */
 export type CyberSystemV1CreateRoleRequest = {
     code?: string;
     name?: string;
@@ -370,6 +430,12 @@ export type CyberSystemV1CreateUserRequest = {
     deptId?: string;
     roles?: Array<string>;
     avatar?: string;
+    /**
+     * Seat population for the identity's birth seat; empty = the default user
+     * population. Validated against the registry — a seat is never born on a
+     * code that does not exist.
+     */
+    population?: string;
 };
 
 export type CyberSystemV1CreateUserResponse = {
@@ -455,10 +521,6 @@ export type CyberSystemV1ExplainOperationResponse = {
      */
     verdict?: string;
     /**
-     * Covered by the session-contract baseline rather than any grant.
-     */
-    builtin?: boolean;
-    /**
      * Role bindings held (disabled roles included — they bind but contribute
      * no grants).
      */
@@ -526,6 +588,7 @@ export type CyberSystemV1FileUrl = {
 export type CyberSystemV1GetCurrentUserResponse = {
     user?: CyberSystemV1User;
     permissions?: Array<string>;
+    memberships?: Array<CyberSystemV1Membership>;
 };
 
 export type CyberSystemV1GetDeptResponse = {
@@ -556,6 +619,10 @@ export type CyberSystemV1GetPolicyResponse = {
 export type CyberSystemV1GetRoleResponse = {
     role?: CyberSystemV1Role;
     grants?: Array<CyberSystemV1RoleGrant>;
+};
+
+export type CyberSystemV1GetTenantResponse = {
+    tenant?: CyberSystemV1Tenant;
 };
 
 export type CyberSystemV1GetUserResponse = {
@@ -592,6 +659,11 @@ export type CyberSystemV1ListPoliciesResponse = {
     list?: Array<CyberSystemV1Policy>;
 };
 
+export type CyberSystemV1ListPopulationsResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    list?: Array<CyberSystemV1Population>;
+};
+
 /**
  * ListResource response.
  */
@@ -616,6 +688,11 @@ export type CyberSystemV1ListRolesResponse = {
     list?: Array<CyberSystemV1Role>;
 };
 
+export type CyberSystemV1ListTenantsResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    list?: Array<CyberSystemV1Tenant>;
+};
+
 export type CyberSystemV1ListUploadedPartsResponse = {
     file?: CyberSystemV1File;
     /**
@@ -630,6 +707,18 @@ export type CyberSystemV1ListUploadedPartsResponse = {
 export type CyberSystemV1ListUsersResponse = {
     page?: CyberSharedCommonV1PageResponse;
     list?: Array<CyberSystemV1User>;
+};
+
+export type CyberSystemV1LoginByIdentityRequest = {
+    provider?: string;
+    wechat?: CyberSystemV1WeChatIdentityPayload;
+    state?: string;
+};
+
+export type CyberSystemV1LoginByIdentityResponse = {
+    sessionToken?: string;
+    issuedAt?: string;
+    expiresAt?: string;
 };
 
 export type CyberSystemV1LoginRequest = {
@@ -649,6 +738,15 @@ export type CyberSystemV1LogoutRequest = {
 
 export type CyberSystemV1LogoutResponse = {
     [key: string]: unknown;
+};
+
+/**
+ * Plain scalars by the success-implies-present carve-out: a seat row always
+ * carries its two join keys.
+ */
+export type CyberSystemV1Membership = {
+    tenant?: string;
+    population?: string;
 };
 
 /**
@@ -691,10 +789,6 @@ export type CyberSystemV1Method = {
      * Method description.
      */
     comment?: string;
-    /**
-     * Session-contract baseline op (cyber.ext.v1.builtin annotation)
-     */
-    builtin?: boolean;
     /**
      * Audience annotation value as declared on the method.
      */
@@ -742,6 +836,15 @@ export type CyberSystemV1Policy = {
 export type CyberSystemV1PolicyParams = {
     timeWindow?: CyberSystemV1TimeWindowParams;
     calendar?: CyberSystemV1CalendarParams;
+};
+
+export type CyberSystemV1Population = {
+    id?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    code?: string;
+    name?: string;
+    archetype?: string;
 };
 
 export type CyberSystemV1PresignedPut = {
@@ -879,6 +982,15 @@ export type CyberSystemV1SubscribeResponse = {
     timestamp?: string;
 };
 
+export type CyberSystemV1Tenant = {
+    id?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    code?: string;
+    name?: string;
+    enabled?: boolean;
+};
+
 /**
  * Daily allowed windows, OR within one policy — the reason multi-segment is
  * a list and not two linked policies (linking ANDs). Times are "HH:MM" local
@@ -958,6 +1070,18 @@ export type CyberSystemV1UpdateRoleStatusRequest = {
 };
 
 export type CyberSystemV1UpdateRoleStatusResponse = {
+    [key: string]: unknown;
+};
+
+/**
+ * status
+ */
+export type CyberSystemV1UpdateTenantStatusRequest = {
+    id?: string;
+    enabled?: boolean;
+};
+
+export type CyberSystemV1UpdateTenantStatusResponse = {
     [key: string]: unknown;
 };
 
@@ -1052,11 +1176,29 @@ export type CyberSystemV1User = {
     avatar?: string;
 };
 
+/**
+ * Rendering-grade identity summary for hydration; deliberately narrower than
+ * User (no roles, no lifecycle fields).
+ */
+export type CyberSystemV1UserBrief = {
+    id?: string;
+    email?: string;
+    avatar?: string;
+};
+
 export type CyberSystemV1VerifySessionResponse = {
     userId?: string;
     tenantId?: string;
     sessionId?: string;
     email?: string;
+    population?: string;
+};
+
+export type CyberSystemV1WeChatIdentityPayload = {
+    /**
+     * OAuth authorization code from the wechat redirect.
+     */
+    code?: string;
 };
 
 export type AgentConfigAdminServiceListAgentConfigsData = {
@@ -1431,6 +1573,38 @@ export type AuditServiceListAuditExportsResponses = {
 
 export type AuditServiceListAuditExportsResponse = AuditServiceListAuditExportsResponses[keyof AuditServiceListAuditExportsResponses];
 
+export type AuthServiceBeginIdentityLoginData = {
+    body: CyberSystemV1BeginIdentityLoginRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/begin-identity-login';
+};
+
+export type AuthServiceBeginIdentityLoginResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1BeginIdentityLoginResponse;
+};
+
+export type AuthServiceBeginIdentityLoginResponse = AuthServiceBeginIdentityLoginResponses[keyof AuthServiceBeginIdentityLoginResponses];
+
+export type AuthServiceBindCredentialData = {
+    body: CyberSystemV1BindCredentialRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/bind-credential';
+};
+
+export type AuthServiceBindCredentialResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1BindCredentialResponse;
+};
+
+export type AuthServiceBindCredentialResponse = AuthServiceBindCredentialResponses[keyof AuthServiceBindCredentialResponses];
+
 export type AuthServiceLoginData = {
     body: CyberSystemV1LoginRequest;
     path?: never;
@@ -1446,6 +1620,22 @@ export type AuthServiceLoginResponses = {
 };
 
 export type AuthServiceLoginResponse = AuthServiceLoginResponses[keyof AuthServiceLoginResponses];
+
+export type AuthServiceLoginByIdentityData = {
+    body: CyberSystemV1LoginByIdentityRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/login-by-identity';
+};
+
+export type AuthServiceLoginByIdentityResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1LoginByIdentityResponse;
+};
+
+export type AuthServiceLoginByIdentityResponse = AuthServiceLoginByIdentityResponses[keyof AuthServiceLoginByIdentityResponses];
 
 export type AuthServiceLogoutData = {
     body: CyberSystemV1LogoutRequest;
@@ -2006,6 +2196,70 @@ export type PolicyServiceUpdatePolicyResponses = {
 
 export type PolicyServiceUpdatePolicyResponse = PolicyServiceUpdatePolicyResponses[keyof PolicyServiceUpdatePolicyResponses];
 
+export type PopulationServiceListPopulationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        code?: string;
+        name?: string;
+        orderBy?: Array<string>;
+    };
+    url: '/api/v1/system/populations';
+};
+
+export type PopulationServiceListPopulationsResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ListPopulationsResponse;
+};
+
+export type PopulationServiceListPopulationsResponse = PopulationServiceListPopulationsResponses[keyof PopulationServiceListPopulationsResponses];
+
+export type PopulationServiceCreatePopulationData = {
+    body: CyberSystemV1CreatePopulationRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/populations';
+};
+
+export type PopulationServiceCreatePopulationResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1CreatePopulationResponse;
+};
+
+export type PopulationServiceCreatePopulationResponse = PopulationServiceCreatePopulationResponses[keyof PopulationServiceCreatePopulationResponses];
+
 export type RoleServiceListRolesByPrincipalData = {
     body?: never;
     path: {
@@ -2245,6 +2499,90 @@ export type RoleServiceRemoveRoleMemberResponses = {
 
 export type RoleServiceRemoveRoleMemberResponse = RoleServiceRemoveRoleMemberResponses[keyof RoleServiceRemoveRoleMemberResponses];
 
+export type TenantServiceListTenantsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        code?: string;
+        name?: string;
+        orderBy?: Array<string>;
+    };
+    url: '/api/v1/system/tenants';
+};
+
+export type TenantServiceListTenantsResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ListTenantsResponse;
+};
+
+export type TenantServiceListTenantsResponse = TenantServiceListTenantsResponses[keyof TenantServiceListTenantsResponses];
+
+export type TenantServiceGetTenantData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/system/tenants/{id}';
+};
+
+export type TenantServiceGetTenantResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1GetTenantResponse;
+};
+
+export type TenantServiceGetTenantResponse = TenantServiceGetTenantResponses[keyof TenantServiceGetTenantResponses];
+
+export type TenantServiceUpdateTenantStatusData = {
+    body: CyberSystemV1UpdateTenantStatusRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/system/tenants/{id}/status';
+};
+
+export type TenantServiceUpdateTenantStatusResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1UpdateTenantStatusResponse;
+};
+
+export type TenantServiceUpdateTenantStatusResponse = TenantServiceUpdateTenantStatusResponses[keyof TenantServiceUpdateTenantStatusResponses];
+
 export type TransferServiceEchoData = {
     body?: never;
     path?: never;
@@ -2472,6 +2810,22 @@ export type UserServiceCreateUserResponses = {
 };
 
 export type UserServiceCreateUserResponse = UserServiceCreateUserResponses[keyof UserServiceCreateUserResponses];
+
+export type UserServiceBatchGetUsersData = {
+    body: CyberSystemV1BatchGetUsersRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/users/batch-get';
+};
+
+export type UserServiceBatchGetUsersResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1BatchGetUsersResponse;
+};
+
+export type UserServiceBatchGetUsersResponse = UserServiceBatchGetUsersResponses[keyof UserServiceBatchGetUsersResponses];
 
 export type UserServiceDeleteUserData = {
     body?: never;

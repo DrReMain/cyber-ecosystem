@@ -35,6 +35,15 @@ const (
 const (
 	// AuthServiceLoginProcedure is the fully-qualified name of the AuthService's Login RPC.
 	AuthServiceLoginProcedure = "/cyber.system.v1.AuthService/Login"
+	// AuthServiceLoginByIdentityProcedure is the fully-qualified name of the AuthService's
+	// LoginByIdentity RPC.
+	AuthServiceLoginByIdentityProcedure = "/cyber.system.v1.AuthService/LoginByIdentity"
+	// AuthServiceBeginIdentityLoginProcedure is the fully-qualified name of the AuthService's
+	// BeginIdentityLogin RPC.
+	AuthServiceBeginIdentityLoginProcedure = "/cyber.system.v1.AuthService/BeginIdentityLogin"
+	// AuthServiceBindCredentialProcedure is the fully-qualified name of the AuthService's
+	// BindCredential RPC.
+	AuthServiceBindCredentialProcedure = "/cyber.system.v1.AuthService/BindCredential"
 	// AuthServiceLogoutProcedure is the fully-qualified name of the AuthService's Logout RPC.
 	AuthServiceLogoutProcedure = "/cyber.system.v1.AuthService/Logout"
 	// AuthServiceGetCurrentUserProcedure is the fully-qualified name of the AuthService's
@@ -45,6 +54,9 @@ const (
 // AuthServiceClient is a client for the cyber.system.v1.AuthService service.
 type AuthServiceClient interface {
 	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
+	LoginByIdentity(context.Context, *connect.Request[v1.LoginByIdentityRequest]) (*connect.Response[v1.LoginByIdentityResponse], error)
+	BeginIdentityLogin(context.Context, *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error)
+	BindCredential(context.Context, *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
 }
@@ -66,6 +78,24 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("Login")),
 			connect.WithClientOptions(opts...),
 		),
+		loginByIdentity: connect.NewClient[v1.LoginByIdentityRequest, v1.LoginByIdentityResponse](
+			httpClient,
+			baseURL+AuthServiceLoginByIdentityProcedure,
+			connect.WithSchema(authServiceMethods.ByName("LoginByIdentity")),
+			connect.WithClientOptions(opts...),
+		),
+		beginIdentityLogin: connect.NewClient[v1.BeginIdentityLoginRequest, v1.BeginIdentityLoginResponse](
+			httpClient,
+			baseURL+AuthServiceBeginIdentityLoginProcedure,
+			connect.WithSchema(authServiceMethods.ByName("BeginIdentityLogin")),
+			connect.WithClientOptions(opts...),
+		),
+		bindCredential: connect.NewClient[v1.BindCredentialRequest, v1.BindCredentialResponse](
+			httpClient,
+			baseURL+AuthServiceBindCredentialProcedure,
+			connect.WithSchema(authServiceMethods.ByName("BindCredential")),
+			connect.WithClientOptions(opts...),
+		),
 		logout: connect.NewClient[v1.LogoutRequest, v1.LogoutResponse](
 			httpClient,
 			baseURL+AuthServiceLogoutProcedure,
@@ -83,14 +113,32 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 
 // authServiceClient implements AuthServiceClient.
 type authServiceClient struct {
-	login          *connect.Client[v1.LoginRequest, v1.LoginResponse]
-	logout         *connect.Client[v1.LogoutRequest, v1.LogoutResponse]
-	getCurrentUser *connect.Client[v1.GetCurrentUserRequest, v1.GetCurrentUserResponse]
+	login              *connect.Client[v1.LoginRequest, v1.LoginResponse]
+	loginByIdentity    *connect.Client[v1.LoginByIdentityRequest, v1.LoginByIdentityResponse]
+	beginIdentityLogin *connect.Client[v1.BeginIdentityLoginRequest, v1.BeginIdentityLoginResponse]
+	bindCredential     *connect.Client[v1.BindCredentialRequest, v1.BindCredentialResponse]
+	logout             *connect.Client[v1.LogoutRequest, v1.LogoutResponse]
+	getCurrentUser     *connect.Client[v1.GetCurrentUserRequest, v1.GetCurrentUserResponse]
 }
 
 // Login calls cyber.system.v1.AuthService.Login.
 func (c *authServiceClient) Login(ctx context.Context, req *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
 	return c.login.CallUnary(ctx, req)
+}
+
+// LoginByIdentity calls cyber.system.v1.AuthService.LoginByIdentity.
+func (c *authServiceClient) LoginByIdentity(ctx context.Context, req *connect.Request[v1.LoginByIdentityRequest]) (*connect.Response[v1.LoginByIdentityResponse], error) {
+	return c.loginByIdentity.CallUnary(ctx, req)
+}
+
+// BeginIdentityLogin calls cyber.system.v1.AuthService.BeginIdentityLogin.
+func (c *authServiceClient) BeginIdentityLogin(ctx context.Context, req *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error) {
+	return c.beginIdentityLogin.CallUnary(ctx, req)
+}
+
+// BindCredential calls cyber.system.v1.AuthService.BindCredential.
+func (c *authServiceClient) BindCredential(ctx context.Context, req *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error) {
+	return c.bindCredential.CallUnary(ctx, req)
 }
 
 // Logout calls cyber.system.v1.AuthService.Logout.
@@ -106,6 +154,9 @@ func (c *authServiceClient) GetCurrentUser(ctx context.Context, req *connect.Req
 // AuthServiceHandler is an implementation of the cyber.system.v1.AuthService service.
 type AuthServiceHandler interface {
 	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
+	LoginByIdentity(context.Context, *connect.Request[v1.LoginByIdentityRequest]) (*connect.Response[v1.LoginByIdentityResponse], error)
+	BeginIdentityLogin(context.Context, *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error)
+	BindCredential(context.Context, *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
 }
@@ -121,6 +172,24 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		AuthServiceLoginProcedure,
 		svc.Login,
 		connect.WithSchema(authServiceMethods.ByName("Login")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceLoginByIdentityHandler := connect.NewUnaryHandler(
+		AuthServiceLoginByIdentityProcedure,
+		svc.LoginByIdentity,
+		connect.WithSchema(authServiceMethods.ByName("LoginByIdentity")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceBeginIdentityLoginHandler := connect.NewUnaryHandler(
+		AuthServiceBeginIdentityLoginProcedure,
+		svc.BeginIdentityLogin,
+		connect.WithSchema(authServiceMethods.ByName("BeginIdentityLogin")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceBindCredentialHandler := connect.NewUnaryHandler(
+		AuthServiceBindCredentialProcedure,
+		svc.BindCredential,
+		connect.WithSchema(authServiceMethods.ByName("BindCredential")),
 		connect.WithHandlerOptions(opts...),
 	)
 	authServiceLogoutHandler := connect.NewUnaryHandler(
@@ -139,6 +208,12 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		switch r.URL.Path {
 		case AuthServiceLoginProcedure:
 			authServiceLoginHandler.ServeHTTP(w, r)
+		case AuthServiceLoginByIdentityProcedure:
+			authServiceLoginByIdentityHandler.ServeHTTP(w, r)
+		case AuthServiceBeginIdentityLoginProcedure:
+			authServiceBeginIdentityLoginHandler.ServeHTTP(w, r)
+		case AuthServiceBindCredentialProcedure:
+			authServiceBindCredentialHandler.ServeHTTP(w, r)
 		case AuthServiceLogoutProcedure:
 			authServiceLogoutHandler.ServeHTTP(w, r)
 		case AuthServiceGetCurrentUserProcedure:
@@ -154,6 +229,18 @@ type UnimplementedAuthServiceHandler struct{}
 
 func (UnimplementedAuthServiceHandler) Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.Login is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) LoginByIdentity(context.Context, *connect.Request[v1.LoginByIdentityRequest]) (*connect.Response[v1.LoginByIdentityResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.LoginByIdentity is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) BeginIdentityLogin(context.Context, *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.BeginIdentityLogin is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) BindCredential(context.Context, *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.BindCredential is not implemented"))
 }
 
 func (UnimplementedAuthServiceHandler) Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error) {

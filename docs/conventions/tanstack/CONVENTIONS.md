@@ -22,7 +22,12 @@ Applies to web clients built on TanStack Start (`app/clients/*`).
 | Infra | `src/stores/`, `src/services/`, `src/libs/` | As conventional — `libs` holds app-agnostic utilities (zero app semantics, import nothing app-internal) |
 
 Dependency direction: `routes → features → domains → services/stores/lib`.
-Features may import each other only along the area-pair direction (§2).
+Features may import each other only along the area-pair direction (§2), plus one
+hosting direction: a formal-page module (`features/modules/*`,
+`features/app/*`) imports its area's layout utilities — guard types, route
+context, `permissions`/`op`, area search stores — and base helpers. The
+layout never imports a module back; modules of different areas never import
+each other.
 
 **Transport responses are JSON-shaped, not message instances.** The connect
 transport (`services/connect/transport.ts`) re-serializes every unary
@@ -42,6 +47,11 @@ omissions (`frame.contentDelta ?? ""` — unset scalars are absent, not ""),
 and cancellation is the normal close: abort, drop the abort error, release
 the controller in `finally`; a controller map keyed by stream id guards
 against double-fire.
+
+**Persisted store state is superjson-wrapped.** Cookie-persisted stores
+serialize through superjson (a `{"json":…}` envelope, `shared-ts/store`); a raw
+`JSON.parse` on the payload silently yields `undefined` — hydration goes through
+the store's own deserialize path, never a hand-rolled parse.
 
 ## 2) Area model
 
@@ -103,40 +113,25 @@ Three tiers:
    `staticData`, so deleting a route file removes its menu item
    automatically; drop the menu message keys alongside.
 
-**Page read-set contract.** Every formal-page route declares
-`staticData.operations` = the page's **read set** — the operations of every
-query the page actually issues for data. Menu visibility and route guards
-judge the **whole set**: all granted → page reachable; a page is never
-designed for partial-grant degradation. Mutations are not in the read set —
-an unauthorized action surfaces through the error domain (toast). The only
-touched surface is the route config; page code carries zero permission
-logic. Menu filtering reads session `permissions` (the session source of
-truth).
+**Page read-set contract.**
 
-**Tab identity (dashboard chrome).** A route owns a tabbar tab iff its
-`staticData` declares a `title`; title-less routes render inside the nearest
-titled ancestor's tab (the profile group pattern). `key` = resolved pathname
-(search excluded, one tab per param-route instance, e.g. each `/order/$id`
-id), `href` = full href including search, `pattern` = route `fullPath` kept
-for permission-filtered restore. Activation, close, and href capture compare
-the **exact key** derived from `tabFromMatches` — path-prefix ownership is
-forbidden (it once made the area root the fallback owner of every URL).
-Router `location` and `matches` are separate subscriptions that lag each
-other by a commit during navigations (location flips optimistically at
-navigation start); every tab decision derived from matches is gated behind
-`matchesAgreeWith(matches, pathname)` so torn frames can neither capture a
-foreign href nor re-append a just-closed tab. Session restore resolves
-`pattern` against the permission-filtered nav index; hidden routes
-(`menu.hide`) restore via their persisted title, but a pattern present in
-the unfiltered index is a permission-dropped visible route and stays closed.
-The active tab seeds through the same pattern rule, so a direct URL load
-lands in the bar even with no persisted record — the restore effect rebuilds
-membership after the append effect's mount run and must not drop it.
-The home tab is seeded only when a titled leaf exists at the area root —
-apps without a workbench start with an empty bar. Default post-login
-landing is `defaultLanding(permissions)` — the first permission-surviving
-leaf, never a hardcoded area root. Parameterized titles interpolate
-`match.params` (`compactParams`, `text(key, params)`).
+- Every formal-page route declares `staticData.operations` = the page's **read set** — the operations of every grant-gated query the page actually issues for data.
+- Builtin faces (`ACCESS_BUILTIN`) never enter a read set — authentication-guaranteed, the builtin chain never consults grants; a builtin member would make the page unreachable for every non-wildcard user (an upload probe's `ListUploadedParts` is the cautionary example).
+- Menu visibility and route guards judge the **whole set**: all granted → page reachable. A page is never designed for partial-grant degradation.
+- Mutations are not in the read set — an unauthorized action surfaces through the error domain (toast).
+- The only touched surface is the route config; page code carries zero permission logic. Menu filtering reads session `permissions` (the session source of truth).
+
+**Tab identity (dashboard chrome).**
+
+- A route owns a tabbar tab iff its `staticData` declares a `title`; title-less routes render inside the nearest titled ancestor's tab (the profile group pattern).
+- `key` = resolved pathname (search excluded; one tab per param-route instance, e.g. each `/order/$id` id); `href` = full href including search; `pattern` = route `fullPath`, kept for permission-filtered restore.
+- Activation, close, and href capture compare the **exact key** from `tabFromMatches` — path-prefix ownership is forbidden (it once made the area root the fallback owner of every URL).
+- Router `location` and `matches` are separate subscriptions that lag each other by one commit during navigations (location flips optimistically at navigation start); every matches-derived tab decision gates behind `matchesAgreeWith(matches, pathname)` — torn frames can neither capture a foreign href nor re-append a just-closed tab.
+- Session restore resolves `pattern` against the permission-filtered nav index; hidden routes (`menu.hide`) restore via their persisted title; a pattern present in the unfiltered index is a permission-dropped visible route and stays closed.
+- The active tab seeds through the same pattern rule — a direct URL load lands in the bar even with no persisted record; the restore effect rebuilds membership after the append effect's mount run and must not drop it.
+- The home tab is seeded only when a titled leaf exists at the area root — apps without a workbench start with an empty bar.
+- Default post-login landing is `defaultLanding(permissions)` — the first permission-surviving leaf, never a hardcoded area root.
+- Parameterized titles interpolate `match.params` (`compactParams`, `text(key, params)`).
 
 ## 4) Domains admission
 
@@ -183,6 +178,10 @@ transport the app actually uses.
   are allowed with a reasoned `biome-ignore noComponentHookFactories`:
   route options evaluate once at module scope, so component identity is
   stable.
+- **Render-path state reads go through state, never a ref.** React Compiler
+  caches render output — a render that dereferences a ref renders that ref's
+  stale value until an unrelated re-render (ghost state). Refs are read in
+  effects, callbacks, and event handlers only.
 
 **Naming grammar** (directories are `role-variant` (`layout-dashboard`);
 entry components follow component-name=file-name (`DashboardLayout` in
@@ -206,6 +205,15 @@ nested subpaths per the ≥4-graduation rule below).
 - Prop types are named `<Component>Props` — never `IProps`.
 - Same-family files share a kebab prefix; the prefix is the future
   subdirectory name (a family of ≥4 files graduates to a subdirectory).
+
+**UI-library integration laws** (each pinned by a live regression): antd
+`Watermark` wraps children in an inline `overflow: hidden` — sticky descendants
+never stick inside one; keep sticky elements outside the watermark. antd v6
+`Drawer` sizes via `size` presets — numeric `width` is the retired v5
+vocabulary. antdx composition pieces (`Creation` regions, `Sender` attachments)
+mount through their declared slots, never children injection. Tailwind v4's
+class extractor tokenizes on dots — arbitrary values containing decimal points
+split into dead classes; prefer scale values or CSS variables.
 
 ## 6) i18n ownership
 
@@ -244,9 +252,12 @@ render vocabulary → status vocabulary → `act_` → empty states.
 Adding a message directory requires registering it in
 `project.inlang/settings.json` `pathPattern` (explicit list — globs are not
 supported). After renaming/moving/deleting keys, force regeneration
-(`rm -rf src/paraglide`, rebuild) and grep the output: the build may skip
-regeneration, and it does not type-check message references — typecheck
-does, and it is the guard that catches stale key references (including
+(`rm -rf src/paraglide`, rebuild) and verify — the build may skip
+regeneration, and compiled files are named **lowercased id + numeric dedup
+suffix** (`error_SYSTEM_TENANT_DISABLED` → `error_system_tenant_disabled20.js`),
+so an exact-case grep of the output is always a false negative (`grep -i` at
+minimum). The build does not type-check message references — typecheck does,
+and it is the guard that catches stale key references (including
 `staticData` title strings typed as `NoParamMessageKey`).
 
 Adding a locale is a three-point registration: the `locales` array in
@@ -280,7 +291,15 @@ Shared data hooks follow the batching discipline: a page-batching hook
 (one call per visible list, e.g. avatar URLs) keys its query on a
 sorted-unique signature, not array identity; when the payload is a
 time-limited URL, `staleTime` stays under the server TTL so a cached entry
-never outlives its signature.
+never outlives its signature. A singular URL hook (one object's URL,
+`use-file-url.ts`) gates on id presence before hydrating — an absent id is
+render state, not a fetch error.
+
+**Browser direct uploads PUT through XHR** (`put-url.ts`), never fetch:
+upload progress rides `xhr.upload`, and the ETag header multipart confirm
+needs is only readable through a CORS-exposed XHR response. `Content-Type`
+is declared client-side — the presign does not sign it and the backend
+stores the header verbatim.
 
 ## 8) Typed route constants
 
@@ -347,15 +366,12 @@ UI surfaces split by scale:
   context by design, which is one reason area-dialect error faces stay
   out.
 
-Verified behavior: SSR first paint of route errors renders server-side
-with locale-correct copy; across the server-fn boundary connect's native
-error JSON reconstructs a real `ConnectError` client-side, but every
-other thrown value resolves as data (the boundary rethrows only
-`instanceof Error`) — so server fns return status values instead of
-throwing envelopes. Telemetry groups by `[kind, reason]` so error storms
-aggregate into one issue. Route error recovery needs
-`router.invalidate()` — the boundary's `reset` alone never re-runs
-loaders.
+Verified behavior (pinned laws, not observations):
+
+- SSR first paint of route errors renders server-side with locale-correct copy.
+- Across the server-fn boundary: connect's native error JSON reconstructs a real `ConnectError` client-side; every other thrown value resolves as data (the boundary rethrows only `instanceof Error`) — so server fns return status values instead of throwing envelopes.
+- Telemetry groups by `[kind, reason]` — error storms aggregate into one issue.
+- Route error recovery needs `router.invalidate()` — the boundary's `reset` alone never re-runs loaders.
 
 Session-flow navigations (kick mirror, self-kick, logout, expired-param
 strip) pass `viewTransition: false`: the View Transitions API skips the
@@ -367,6 +383,11 @@ silent `canceled` word by the domain's view-transition source adapter.
 Every session exit — guard redirect, watcher kick, and deliberate logout
 alike — hands the current href to the login page as `?redirect=` so
 re-login returns to the origin.
+
+View-transition geometry is percentage-based, never px (px resolves against
+the snapshot containing block and drifts); DOM mutations in transition
+callbacks flush with `flushSync` before capture; morphing frames get
+`transition: none` — the three recurring VT bugs.
 
 An unreachable backend is a session verdict, not an auth one: the
 session fn returns `unreachable` on `network`-kind failures, the guard

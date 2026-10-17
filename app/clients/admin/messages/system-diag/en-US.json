@@ -27,5 +27,6 @@
   "system_diag_note_preview": "Effective operations are the authorization union, without live time-constraint evaluation",
   "system_diag_effective": "Effective operations (current role set)",
   "system_diag_session": "Session payload (current caller)",
+  "system_diag_session_seats": "Membership (tenant / user type)",
   "system_diag_role_disabled": "Disabled"
 }

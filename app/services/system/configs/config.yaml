@@ -5,18 +5,18 @@ server:
 data:
   database:
     driver: postgres
-    host: localhost
-    port: 5432
-    user: postgres
-    password: postgres
-    db_name: system
+    host: ${DB_HOST:localhost}
+    port: ${DB_PORT:5432}
+    user: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+    db_name: ${DB_NAME:system}
     max_open_conns: 100        # 个 (最大连接数)
     max_idle_conns: 50         # 个 (最大空闲连接数)
     conn_max_lifetime: 3600s   # 时长 (连接最大存活)
   redis:
     network: tcp
-    addr: localhost:6379
-    password: ""
+    addr: ${REDIS_ADDR:localhost:6379}
+    password: ${REDIS_PASS:}
     db: 0                      # 序号 (Redis 数据库 0–15)
     pool_size: 50              # 个 (连接池大小)
     min_idle_conns: 5          # 个 (最小空闲连接数)
@@ -27,12 +27,12 @@ data:
     pool_timeout: 1.2s         # 时长 (池等待超时)
   storage:
     s3:
-      endpoint: http://localhost:8333
-      public_endpoint: http://192.168.50.203:8333 # presign 铸造基址（浏览器可达；LAN/边缘域）；空=endpoint
-      access_key: admin@cyber-ecosystem.com
-      secret_key: Cyber-Ecosystem123
-      bucket: core
-      region: us-east-1
+      endpoint: ${S3_ENDPOINT:http://localhost:8333}
+      public_endpoint: ${S3_PUBLIC_ENDPOINT:} # presign 铸造基址（浏览器可达；LAN 场景导出 APP_S3_PUBLIC_ENDPOINT）；空=endpoint
+      access_key: ${S3_ACCESS_KEY:admin@cyber-ecosystem.com}
+      secret_key: ${S3_SECRET_KEY:Cyber-Ecosystem123}
+      bucket: ${S3_BUCKET:core}
+      region: ${S3_REGION:us-east-1}
       use_path_style: true
       multipart_threshold: 8388608  # 8 MiB；直传单发/会话裁决 + 服务端 transfermanager 大文件自动分片
       part_size: 5242880            # 5 MiB；直传分片规划 + 服务端 multipart 分片规划
@@ -40,7 +40,7 @@ data:
       max_file_size: 2147483648     # 2 GiB；直传预检 + 服务端流式上限（代理通道 4MiB 上限是 proto 契约常量，不在此处）
   mq:
     pg: # 与 nats 二选一；无 NATS 部署用；需预先 CREATE DATABASE mq
-      dsn: postgres://postgres:postgres@localhost:5432/mq?sslmode=disable
+      dsn: ${MQ_DSN:postgres://postgres:postgres@localhost:5432/mq?sslmode=disable}
       poll_interval: 0.5s
       visibility_timeout: 30s
       max_retries: 5
@@ -58,12 +58,12 @@ data:
 #      dlq_max_bytes: 1073741824   # 1 GiB (DLQ 流容量)
 #      nak_backoff_step: 0.5s      # 线性退避步长 (Nak 重投延迟)
 observability:
-  endpoint: localhost:4318        # SigNoz OTLP HTTP
+  endpoint: ${OTLP_ENDPOINT:localhost:4318} # SigNoz OTLP HTTP
   insecure: true
   trace:
-    enabled: false
+    enabled: ${TRACE_ENABLED:false}
   metrics:
-    enabled: false
+    enabled: ${METRICS_ENABLED:false}
   slow_query:
     db: 0.2s
     cache: 0.05s
@@ -79,10 +79,19 @@ observability:
 #      compress: true
 
 catalog:
-  dir: ../../../../../gen/catalog   # 生成物清单
+  dir: ${CATALOG_DIR:../../../../../gen/catalog} # 生成物清单
 
 authz:
   super_admins:
     - admin1@cyber.local            # 邮箱 (种子超管)
     - admin2@cyber.local
-  initial_password: "Admin@123456" # 口令
+  initial_password: ${SEED_INITIAL_PASSWORD:Admin@123456} # 种子超管口令
+auth:
+  providers:
+    - key: wechat                   # 实例注册键 (登录请求的 provider 参数)
+      kind: wechat                  # 代码注册的 kind
+      enabled: ${WECHAT_ENABLED:true}
+      endpoint: ${WECHAT_ENDPOINT:} # 交换端点；空 = 官方默认 (e2e 覆写指向 mock)
+      wechat:
+        appid: ${WECHAT_APPID:wx-dev-placeholder} # 测试号占位
+        secret: ${WECHAT_SECRET:dev-only-placeholder} # 机密走环境注入

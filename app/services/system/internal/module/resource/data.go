@@ -55,10 +55,10 @@ func (rp *resourceRP) ListResource(ctx context.Context) ([]*ServiceMeta, error) 
 	rp.mu.Lock()
 	defer rp.mu.Unlock()
 	if stamp != rp.stamp {
-		rp.stamp = stamp
 		if _, err := rp.reload(); err != nil {
 			return nil, err
 		}
+		rp.stamp = stamp
 	}
 	return rp.services, nil
 }

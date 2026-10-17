@@ -155,7 +155,6 @@ func (s *RoleService) ExplainOperation(ctx context.Context, in *systempb.Explain
 	}
 	return &systempb.ExplainOperationResponse{
 		Verdict:   verdict,
-		Builtin:   res.Builtin,
 		RoleCodes: res.RoleCodes,
 		Hits:      utils.SliceMap(res.Hits, toProtoHit),
 	}, nil

@@ -1,6 +1,6 @@
 # The docker build context for app images is the workspace root (single Go
 # module + pnpm workspace); this file is the single trim surface for it.
-# Keep in sync with docs/deploy/CONVENTIONS.md.
+# Keep in sync with docs/conventions/deploy/CONVENTIONS.md.
 
 # VCS / tooling state
 .git

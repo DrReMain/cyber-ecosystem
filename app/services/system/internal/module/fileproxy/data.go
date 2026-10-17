@@ -46,18 +46,18 @@ func (rp *fileProxyRP) Create(ctx context.Context, f *file.File) (*file.File, er
 }
 
 func (rp *fileProxyRP) DeleteObject(ctx context.Context, key string) error {
-	if err := rp.Platform.GetStorage().Object.Delete(ctx, key); err != nil {
+	if err := rp.Platform.GetStorageFor(ctx).Object.Delete(ctx, key); err != nil {
 		return rp.Platform.HandleStorageError(err)
 	}
 	return nil
 }
 
 func (rp *fileProxyRP) Limits() storage.Limits {
-	return rp.Platform.GetStorage().Limits()
+	return rp.Platform.GetStorageLimits()
 }
 
 func (rp *fileProxyRP) PutObject(ctx context.Context, key string, data []byte, contentType string) (*storage.ObjectInfo, error) {
-	obj, err := rp.Platform.GetStorage().Object.Upload(ctx, key, bytes.NewReader(data), int64(len(data)), contentType)
+	obj, err := rp.Platform.GetStorageFor(ctx).Object.Upload(ctx, key, bytes.NewReader(data), int64(len(data)), contentType)
 	if err != nil {
 		return nil, rp.Platform.HandleStorageError(err)
 	}

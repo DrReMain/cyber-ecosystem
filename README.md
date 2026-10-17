@@ -4,7 +4,7 @@
 
 [![Go](https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white)](https://go.dev) [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A524-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org) [![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)](https://pnpm.io) [![Nx](https://img.shields.io/badge/Nx-monorepo-143055?logo=nx&logoColor=white)](https://nx.dev) [![License: MIT](https://img.shields.io/github/license/DrReMain/cyber-ecosystem?color=blue)](./LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/DrReMain/cyber-ecosystem)](https://github.com/DrReMain/cyber-ecosystem/commits)
 
-> A contract-first, AI-native-oriented full-stack skeleton for long-lived products: a Go/Kratos base service, a second-service reference implementation, Connect-RPC contracts, realtime and media infrastructure, and a TanStack Start web client.
+> A contract-first, AI-native-oriented full-stack skeleton for long-lived products: a multi-tenant Go/Kratos IAM base service, a second-service reference implementation, Connect-RPC contracts, realtime and media infrastructure, and a TanStack Start web client.
 
 ## What it is
 
@@ -12,7 +12,7 @@ Cyber Ecosystem is a **product-development skeleton**, not a vertical SaaS produ
 
 The repository currently contains three coordinated pieces:
 
-- **`system`** — the mandatory base service. It owns authentication and sessions, users, organization structure, roles, the RBAC / ABAC / data-scope authorization engine, the operation catalog, files, audit, and the cross-service identity/authorization surface.
+- **`system`** — the mandatory base service. It owns authentication and sessions (password login plus OAuth identity login with provider binding), users, tenants and populations (user types with memberships), organization structure, roles, the RBAC / ABAC / data-scope authorization engine, the operation catalog, files, audit, and the cross-service identity/authorization surface.
 - **`agent`** — the second-service reference implementation. It owns per-user agent configuration and chat aggregates, consumes identity and authorization from `system` through introspection, and demonstrates how to add an application-facing AI workflow without duplicating IAM.
 - **`admin`** — the TanStack Start management/workbench client, including cookie-custody SSR, permission-derived routing, typed errors, localization, file upload, and streaming chat consumption.
 
@@ -43,7 +43,7 @@ Sign-in, Agent initial, and Policies merge their light and dark renderings along
 - per-package operation manifests for the authorization catalog;
 - the operation names consumed by backend middleware and frontend routing.
 
-Method options also declare access audience, builtin status, and datascope applicability. A forgotten access annotation is rejected by a deny-by-default guard rather than silently exposed.
+Method options also declare access audience (public / admin / platform / builtin) and datascope applicability. A forgotten access annotation is rejected by a deny-by-default guard rather than silently exposed.
 
 This turns the contract into a control plane: adding a service operation also makes it visible to role management, runtime authorization, diagnostics, and the admin route model.
 
@@ -86,6 +86,7 @@ Roles carry grants: an operation pattern, a data-scope kind, and optional constr
 - **Operation patterns** support exact RPC names, service wildcards, and the global `/*` administrator pattern.
 - **Data scopes** support all, self, and department-tree narrowing.
 - **Constraint policies** are evaluated with AND semantics; time-window and calendar policies are currently implemented.
+- **Tenancy narrows access through memberships.** The session's tenant context scopes list and by-ID faces to the seats the caller holds; a foreign seat is refused rather than silently filtered.
 - **Evaluation fails closed** when a policy kind is unknown, attribute resolution fails, or policy evaluation errors.
 - **Decisions are inspectable.** The diagnostics view explains the roles, grants, scopes, and policy states behind an allow or deny.
 - **Changes are versioned.** Authorization tables compile into an in-memory snapshot; version bumps and notifications rebuild replicas, with periodic reconciliation as a safety net.
@@ -174,7 +175,7 @@ The admin stack therefore favors predictable interaction under I/O-bound work: l
 proto/             Protobuf contracts, extensions, generation scripts, and catalog generator
 gen/               Generated Go, Connect TypeScript, OpenAPI, and operation catalogs
 app/
-  services/system  Mandatory base service: IAM, authz, resource catalog, files, audit, introspection
+  services/system  Mandatory base service: multi-tenant IAM, authz, resource catalog, files, audit, introspection
   services/agent   Second-service reference: per-user agent config and streaming chat
   clients/admin    TanStack Start management/workbench client
 shared-go/         Reusable Go packages: capability families, orm, kratos, codegen, helpers
@@ -217,7 +218,7 @@ Review the `gen/` diff. Generated files are never edited directly.
 ./nx run deploy:status
 ```
 
-The default profile raises PostgreSQL, Redis, SeaweedFS, and NATS. The Postgres container creates the `system`, `agent`, `mq`, and `atlas_dev` databases.
+The default profile raises PostgreSQL, Redis, SeaweedFS, and NATS. The Postgres container creates the `system`, `agent`, `mq`, and `atlas_dev` databases. On first start the custom PostgreSQL image (`pg-extended`, with pgvector and PostGIS) is built automatically — a one-time, network-bound step.
 
 ### 4. Apply migrations
 
@@ -233,12 +234,12 @@ Use one shell per process:
 ```bash
 ./nx run system:dev
 ./nx run agent:dev
-./nx admin:dev
+./nx run admin:dev
 ```
 
-The development proxy expects `system` on `localhost:13001` and `agent` on `localhost:13002`. A user can configure an OpenAI-compatible provider from the admin profile; the API key is encrypted server-side and never returned by an API.
+The development proxy expects `system` on `localhost:13001` and `agent` on `localhost:13002`. Open `http://localhost:5173` and sign in with the seeded administrator — `admin1@cyber.local`, default password `Admin@123456` (`SEED_INITIAL_PASSWORD` overrides it; see `app/services/system/configs/config.yaml`). A user can configure an OpenAI-compatible provider from the admin profile; the API key is encrypted server-side and never returned by an API.
 
-The checked-in configuration contains development-only defaults, including seeded administrators and the agent master key. Change them before any shared or internet-reachable deployment.
+The checked-in configuration contains development-only defaults — seeded administrators, the agent master key, and the dev stack's middleware credentials (postgres/redis/seaweedfs/nats/centrifugo/livekit/signoz/glitchtip). Host ports bind to loopback only, except the browser-dialed faces — the SeaweedFS S3 API (8333), Centrifugo (8000), and LiveKit (7880 + the UDP media range) — which publish for cross-machine development; cross-machine direct uploads additionally need `APP_S3_PUBLIC_ENDPOINT=http://<dev-host-LAN-IP>:8333` so presigned URLs stop pointing at localhost. None are production secrets, but override them before any shared or internet-reachable deployment.
 
 ### Common tasks
 
@@ -274,7 +275,7 @@ Active development; the foundation is usable but not finished.
 
 Currently implemented:
 
-- `system`: authentication, sessions, users, organization, roles, authorization, resource catalog, files, audit, and cross-service introspection.
+- `system`: authentication and identity login, sessions, users, tenants and populations, organization, roles, authorization, resource catalog, files, audit, and cross-service introspection.
 - `agent`: per-user provider configuration, model listing, chat sessions, and server-streamed responses.
 - `admin`: permission-derived management/workbench UI, localization, file workflows, and streaming chat.
 

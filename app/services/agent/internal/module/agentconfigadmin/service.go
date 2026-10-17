@@ -7,6 +7,7 @@ import (
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 	"github.com/go-kratos/kratos/v3/transport/http"
 
+	"cyber-ecosystem/shared-go/helper"
 	connecttransport "cyber-ecosystem/shared-go/kratos/transport/connect"
 	"cyber-ecosystem/shared-go/utils"
 
@@ -46,7 +47,7 @@ func (s *AgentConfigAdminService) RegisterConnect(srv *connecttransport.Server) 
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *AgentConfigAdminService) ListAgentConfigs(ctx context.Context, in *agentpb.ListAgentConfigsRequest) (*agentpb.ListAgentConfigsResponse, error) {
-	out, err := s.agentConfigUC.List(ctx, &agentconfig.ListIn{PageRequest: in.GetPage()})
+	out, err := s.agentConfigUC.List(ctx, &agentconfig.ListIn{PageRequest: helper.EnsurePageRequest(in.GetPage())})
 	if err != nil {
 		return nil, err
 	}

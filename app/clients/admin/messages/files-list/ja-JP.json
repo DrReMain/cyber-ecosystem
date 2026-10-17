@@ -11,6 +11,7 @@
   "files_delete_confirm": "このファイルをソフト削除しますか？保存されたオブジェクトは保持されます",
   "files_rename_title": "ファイル名を変更",
   "files_rename_label": "新しい名前",
+  "files_ph_rename": "新しい名前を入力",
   "files_col_name": "ファイル名",
   "files_col_type": "種別",
   "files_col_size": "サイズ",

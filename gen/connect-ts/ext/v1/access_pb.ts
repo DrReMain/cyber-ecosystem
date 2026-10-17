@@ -13,17 +13,18 @@ import { file_google_protobuf_descriptor } from "@bufbuild/protobuf/wkt";
  * Describes the file ext/v1/access.proto.
  */
 export const file_ext_v1_access: GenFile = /*@__PURE__*/
-  fileDesc("ChNleHQvdjEvYWNjZXNzLnByb3RvEgxjeWJlci5leHQudjEqVQoGQWNjZXNzEhYKEkFDQ0VTU19VTlNQRUNJRklFRBAAEhEKDUFDQ0VTU19QVUJMSUMQARIQCgxBQ0NFU1NfQURNSU4QAhIOCgpBQ0NFU1NfQVBQEAM6TQoGYWNjZXNzEh4uZ29vZ2xlLnByb3RvYnVmLk1ldGhvZE9wdGlvbnMYkU4gASgOMhQuY3liZXIuZXh0LnYxLkFjY2Vzc1IGYWNjZXNzQiVaI2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXh0L3YxYgZwcm90bzM", [file_google_protobuf_descriptor]);
+  fileDesc("ChNleHQvdjEvYWNjZXNzLnByb3RvEgxjeWJlci5leHQudjEqbgoGQWNjZXNzEhYKEkFDQ0VTU19VTlNQRUNJRklFRBAAEhEKDUFDQ0VTU19QVUJMSUMQARIQCgxBQ0NFU1NfQURNSU4QAhITCg9BQ0NFU1NfUExBVEZPUk0QAxISCg5BQ0NFU1NfQlVJTFRJThAEOk0KBmFjY2VzcxIeLmdvb2dsZS5wcm90b2J1Zi5NZXRob2RPcHRpb25zGJFOIAEoDjIULmN5YmVyLmV4dC52MS5BY2Nlc3NSBmFjY2Vzc0IlWiNjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL2V4dC92MWIGcHJvdG8z", [file_google_protobuf_descriptor]);
 
 /**
  * Method access policy: which audience may call an RPC. Each value is a label
- * the auth selector matches (auth.MatchAccess) to pick a middleware chain. The
+ * the auth selector matches (security.MatchAccess) to pick a middleware chain. The
  * enum is standalone — adding a value only enables a selector branch; it
  * enforces nothing on its own. Wiring (which chain each audience gets, and what
  * that chain does) lives in each service's server setup.
- *   PUBLIC — opt out of auth (login, public endpoints)
- *   ADMIN  — admin audience
- *   APP    — app / end-user audience
+ *   PUBLIC   — no authentication (login, open endpoints)
+ *   ADMIN    — grant-gated operator audience
+ *   PLATFORM — platform-plane faces, additionally sealed by tenant structure
+ *   BUILTIN  — session contracts that authenticate but never consult grants
  * ACCESS_UNSPECIFIED is the zero value (no annotation set); how it is handled
  * is the caller's decision, not the enum's.
  *
@@ -46,9 +47,14 @@ export enum Access {
   ADMIN = 2,
 
   /**
-   * @generated from enum value: ACCESS_APP = 3;
+   * @generated from enum value: ACCESS_PLATFORM = 3;
    */
-  APP = 3,
+  PLATFORM = 3,
+
+  /**
+   * @generated from enum value: ACCESS_BUILTIN = 4;
+   */
+  BUILTIN = 4,
 }
 
 /**

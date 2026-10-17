@@ -11,6 +11,7 @@
   "files_delete_confirm": "软删除该文件？存储对象将保留",
   "files_rename_title": "重命名文件",
   "files_rename_label": "新名称",
+  "files_ph_rename": "输入新名称",
   "files_col_name": "文件名",
   "files_col_type": "类型",
   "files_col_size": "大小",

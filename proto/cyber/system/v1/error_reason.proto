@@ -17,6 +17,10 @@ enum System {
   // 600x: auth
   SYSTEM_LOGIN_FAILED = 6000 [(.errors.code) = 400];
   SYSTEM_PASSWORD_MISMATCH = 6001 [(.errors.code) = 400];
+  SYSTEM_LOGIN_SEAT_REQUIRED = 6002 [(.errors.code) = 400];
+  SYSTEM_IDENTITY_PROVIDER_UNKNOWN = 6003 [(.errors.code) = 400];
+  SYSTEM_IDENTITY_EXCHANGE_FAILED = 6004 [(.errors.code) = 401];
+  SYSTEM_IDENTITY_ALREADY_BOUND = 6005 [(.errors.code) = 409];
 
   // 601x: dept
   SYSTEM_DEPT_SELF_PARENT = 6010 [(.errors.code) = 400];
@@ -44,9 +48,21 @@ enum System {
   SYSTEM_USER_SELF_DELETE = 6070 [(.errors.code) = 400];
   SYSTEM_USER_SELF_DISABLE = 6071 [(.errors.code) = 400];
   SYSTEM_USER_DISABLED = 6072 [(.errors.code) = 403];
+  SYSTEM_USER_NOT_FOUND = 6073 [(.errors.code) = 404];
+  SYSTEM_USER_EMAIL_TAKEN = 6074 [(.errors.code) = 409];
   // 608x: file
   SYSTEM_FILE_NOT_FOUND = 6080 [(.errors.code) = 404];
   SYSTEM_FILE_TOO_LARGE = 6081 [(.errors.code) = 400];
   SYSTEM_FILE_SIZE_MISMATCH = 6082 [(.errors.code) = 400];
   SYSTEM_FILE_INVALID_STATE = 6083 [(.errors.code) = 400];
+  // 609x: tenant registry
+  SYSTEM_TENANT_DISABLED = 6090 [(.errors.code) = 403];
+  SYSTEM_TENANT_NOT_FOUND = 6091 [(.errors.code) = 404];
+  SYSTEM_TENANT_PROTECTED = 6092 [(.errors.code) = 400];
+  reserved 6093; // was SYSTEM_LOGIN_SEAT_REQUIRED until it moved home to the 600x login segment
+  // 610x: population registry
+  SYSTEM_POPULATION_EXISTS = 6100 [(.errors.code) = 409];
+  SYSTEM_POPULATION_PROTECTED = 6101 [(.errors.code) = 400];
+  SYSTEM_POPULATION_INVALID_ARCHETYPE = 6102 [(.errors.code) = 400];
+  SYSTEM_POPULATION_NOT_FOUND = 6103 [(.errors.code) = 404];
 }

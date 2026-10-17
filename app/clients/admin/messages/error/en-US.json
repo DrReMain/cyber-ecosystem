@@ -76,8 +76,21 @@
   "error_SYSTEM_USER_SELF_DELETE": "You cannot delete the account you are signed in with.",
   "error_SYSTEM_USER_SELF_DISABLE": "Cannot disable the account you are signed in with.",
   "error_SYSTEM_USER_DISABLED": "This account is disabled - contact an administrator.",
+  "error_SYSTEM_USER_NOT_FOUND": "This account does not exist.",
+  "error_SYSTEM_USER_EMAIL_TAKEN": "This email is already in use",
   "error_SYSTEM_FILE_NOT_FOUND": "File not found.",
   "error_SYSTEM_FILE_TOO_LARGE": "File exceeds the size limit.",
   "error_SYSTEM_FILE_SIZE_MISMATCH": "Uploaded size does not match the declaration.",
-  "error_SYSTEM_FILE_INVALID_STATE": "Invalid file state for this operation."
+  "error_SYSTEM_FILE_INVALID_STATE": "Invalid file state for this operation.",
+  "error_SYSTEM_TENANT_DISABLED": "This tenant has been disabled",
+  "error_SYSTEM_TENANT_NOT_FOUND": "Tenant not found",
+  "error_SYSTEM_TENANT_PROTECTED": "The default tenant cannot be disabled",
+  "error_SYSTEM_LOGIN_SEAT_REQUIRED": "This account holds multiple memberships; choose one to continue",
+  "error_SYSTEM_POPULATION_EXISTS": "This user type code already exists",
+  "error_SYSTEM_POPULATION_PROTECTED": "The default user type is seed-born and cannot be created by hand",
+  "error_SYSTEM_POPULATION_INVALID_ARCHETYPE": "Unknown auth mode",
+  "error_SYSTEM_POPULATION_NOT_FOUND": "User type not found",
+  "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "Identity provider is not configured or disabled",
+  "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "Third-party identity exchange failed",
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "This third-party identity is already bound to another account"
 }

@@ -27,5 +27,6 @@
   "system_diag_note_preview": "有效操作为授权并集，不含时间约束的实时判定",
   "system_diag_effective": "有效操作（当前角色集）",
   "system_diag_session": "会话载荷（当前登录者）",
+  "system_diag_session_seats": "所属（租户 / 用户类型）",
   "system_diag_role_disabled": "已停用"
 }

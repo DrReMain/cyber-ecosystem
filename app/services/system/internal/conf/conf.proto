@@ -12,6 +12,7 @@ message Bootstrap {
   Observability observability = 3;
   Catalog catalog = 4;
   Authz authz = 5;
+  Auth auth = 6;
 }
 
 message Server {
@@ -146,4 +147,19 @@ message Catalog {
 message Authz {
   repeated string super_admins = 1;
   string initial_password = 2;
+}
+
+message Auth {
+  message Provider {
+    message WeChat {
+      string appid = 1;
+      string secret = 2;
+    }
+    string key = 1;      // instance registry key
+    string kind = 2;     // code-registered kind; boot fails otherwise
+    bool enabled = 3;
+    string endpoint = 4; // exchange base URL; empty = the kind's default (tests override here)
+    WeChat wechat = 5;
+  }
+  repeated Provider providers = 1;
 }

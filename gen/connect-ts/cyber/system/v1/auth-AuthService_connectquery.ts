@@ -10,6 +10,21 @@ import { AuthService } from "./auth_pb";
 export const login = AuthService.method.login;
 
 /**
+ * @generated from rpc cyber.system.v1.AuthService.LoginByIdentity
+ */
+export const loginByIdentity = AuthService.method.loginByIdentity;
+
+/**
+ * @generated from rpc cyber.system.v1.AuthService.BeginIdentityLogin
+ */
+export const beginIdentityLogin = AuthService.method.beginIdentityLogin;
+
+/**
+ * @generated from rpc cyber.system.v1.AuthService.BindCredential
+ */
+export const bindCredential = AuthService.method.bindCredential;
+
+/**
  * @generated from rpc cyber.system.v1.AuthService.Logout
  */
 export const logout = AuthService.method.logout;

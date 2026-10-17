@@ -12,7 +12,7 @@ For Go-side consumption (mapping, error handling, import aliases) see `docs/conv
 
 - **Per-service domain:** `proto/cyber/<service>/v1/*.proto` — a service's own contracts (entities, service, service-specific errors).
 - **Shared kernel:** `proto/cyber/shared/<area>/v1/*.proto` — cross-service types: `shared/common/v1` (pagination + shared value types), `shared/errors/v1` (generic error enums).
-- **Custom annotations:** `proto/ext/v1/*.proto` — repo-specific proto options (`method` desc, `access`, `builtin`, `datascope`).
+- **Custom annotations:** `proto/ext/v1/*.proto` — repo-specific proto options (`method` desc, `access`, `datascope`).
 - **Kratos errors option:** `proto/errors/errors.proto` (vendored) — provides `errors.code` / `errors.default_code` for error enums.
 
 A service MUST own its proto under `cyber/<service>/v1/`; shared types go under `cyber/shared/...`, never duplicated per service.
@@ -72,7 +72,7 @@ Two layers of error enums, both using the kratos `errors.proto` option (`errors.
 
 **Wire reason shape & i18n.** The wire reason is the bare proto value name (e.g. `SYSTEM_INVALID_STATUS_TRANSITION`) — protobuf APIv2's `String()` emits no Go type prefix. `ENUM_VALUE_PREFIX` makes the value name unique across services, so it doubles as the client-side error identity: i18n catalogs key error copy as `error_<ValueName>` and the frontend looks it up directly, no transformation.
 
-**Removing an error value reserves its number** (`reserved 6050;`, mirroring `reserved 6031;`): a deleted number left unreserved lets a future value silently reuse it, deserializing old wire data into the wrong semantics. The reserved line replaces the entry in place; the three i18n copies are deleted in the same change.
+**Removing an error value reserves its number** (`reserved 6050;`, mirroring `reserved 6031;`): a deleted number left unreserved lets a future value silently reuse it, deserializing old wire data into the wrong semantics. The reserved line replaces the entry in place and carries a trailing why-comment naming the departed value — `// was X until it moved home to …` for a moved reason, the provision-cleared shape already on `6050` otherwise; the error-copy keys are deleted from every locale file in the same change.
 
 Go side consumes generated `errorspb.ErrorXxx("")` (see kratos CONVENTIONS §5/§6).
 
@@ -85,7 +85,7 @@ The `(errors.code)` option comes from the vendored `proto/errors/errors.proto` (
 - **REST mapping:** every RPC has `option (google.api.http)` — `/api/v1/<service>/<resources>[/{id}]`, verb by CRUD (POST create / GET list-or-get / PUT update / DELETE delete).
 - **Repeated input ⇒ POST + body, not GET query:** the transport's GET-query binding does not reliably carry `repeated` fields (they arrive empty and fail `min_items`). Batch reads marshal ids in a POST body — minting-style batch reads are action-shaped anyway.
 - **Method desc (facts):** `option (cyber.ext.v1.method) = {comment, action}` — `comment` is the human-readable one-liner (Chinese OK), `action` (`ACTION_READ` / `ACTION_WRITE`) is the effect semantics the audit layer classifies on (allow side collects WRITE only). Facts only — policy knobs (audit toggles etc.) never live here. Mandatory on every business RPC, machine-enforced by `TestEveryBusinessRPCDeclaresAction` (`shared-go/kratos/security`, no exemptions). Consumed at runtime via proto reflection (`shared-go/helper/proto_reflect.go` reads the comment face; the Resource catalog transcribes it), not by codegen/docs. Custom option value types are compile-time contracts: reshaping one is a coordinated one-shot across all declarations and consumers, never a runtime-compat concern. See `proto/ext/v1/desc.proto`.
-- **Access policy:** `option (cyber.ext.v1.access)` — `ACCESS_PUBLIC` / `ACCESS_ADMIN` / `ACCESS_APP`. **MUST be declared on every business RPC — there is no default level.** An unannotated RPC resolves to `ACCESS_UNSPECIFIED`, which servers wire to the deny-by-default guard: it fails loud at runtime (`MISSING_ANNOTATION`, 503) rather than silently falling back to ADMIN. Only framework built-ins outside `cyber.*` bypass the guard. Machine-enforced by `TestEveryBusinessRPCDeclaresAccess` (`shared-go/kratos/security`), whose exemption list holds one deliberate entry: `cyber.system.v1.ResourceService.ListResource` exercises the 503 path on purpose. See `proto/ext/v1/access.proto`.
+- **Access policy:** `option (cyber.ext.v1.access)` — `ACCESS_PUBLIC` / `ACCESS_BUILTIN` / `ACCESS_PLATFORM` / `ACCESS_ADMIN`. **MUST be declared on every business RPC — there is no default level.** An unannotated RPC resolves to `ACCESS_UNSPECIFIED`, which servers wire to the deny-by-default guard: it fails loud at runtime (`MISSING_ANNOTATION`, 503) rather than silently falling back to ADMIN. Only framework built-ins outside `cyber.*` bypass the guard. Machine-enforced by `TestEveryBusinessRPCDeclaresAccess` (`shared-go/kratos/security`), whose exemption list holds one deliberate entry: `cyber.system.v1.ResourceService.ListResource` exercises the 503 path on purpose. See `proto/ext/v1/access.proto`.
 
 ---
 
@@ -103,7 +103,7 @@ The `(errors.code)` option comes from the vendored `proto/errors/errors.proto` (
 - `gen/` is **derived**: change proto → regenerate via the owning Nx target (e.g. `./nx run proto:generate`), never hand-edit gen.
 - Proto is the single source of truth; Go struct fields / JSON tags follow generated code.
 - **Pipeline tools are Go, under `proto/cmd/`** — the pipeline's own tooling lives with the pipeline, in the repo's single Go module: `cmd/catalog` (derives the per-package operation manifests below) and `cmd/clean-gen` (pre-regen wipe; hand-maintained root files and `node_modules` survive; all filesystem access goes through `os.Root`, sandbox-confined by construction). The Node scripts era is retired; pnpm/openapi-ts invocations stay in target commands — package-manager calls are orchestration, not tool logic.
-- **Operation manifests (`gen/catalog/<package>.json`) are derived output** — `proto:generate:catalog` feeds `buf build`'s image to `cmd/catalog`, which emits one manifest per service-bearing proto package (services, methods, comment/access/builtin/datascope/http faces). The system service live-loads them as its federated grant catalog: a new service enters the grant tree when its manifest ships — no system code change, no restart. The JSON tags are a contract between `cmd/catalog` and system's resource module; both sides carry the sync note.
+- **Operation manifests (`gen/catalog/<package>.json`) are derived output** — `proto:generate:catalog` feeds `buf build`'s image to `cmd/catalog`, which emits one manifest per service-bearing proto package (services, methods, comment/access/datascope/http faces). The system service live-loads them as its federated grant catalog: a new service enters the grant tree when its manifest ships — no system code change, no restart. The JSON tags are a contract between `cmd/catalog` and system's resource module; both sides carry the sync note.
 
 ---
 

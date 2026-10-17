@@ -184,6 +184,9 @@ func (uc *RoleUC) UpdateStatus(ctx context.Context, id string, enabled bool) (ou
 }
 
 func (uc *RoleUC) Delete(ctx context.Context, id string) (string, error) {
+	if err := uc.ensureRole(ctx, id); err != nil {
+		return "", err
+	}
 	var out string
 	err := uc.Tm.InTx(ctx, func(ctx context.Context) error {
 		if exists, err := uc.roleRP.ExistsBindings(ctx, id); err != nil {

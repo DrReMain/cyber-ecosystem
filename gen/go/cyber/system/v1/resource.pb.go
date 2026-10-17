@@ -44,8 +44,6 @@ type Method struct {
 	HttpPath string `protobuf:"bytes,8,opt,name=http_path,json=httpPath,proto3" json:"http_path,omitempty"`
 	// Method description.
 	Comment string `protobuf:"bytes,9,opt,name=comment,proto3" json:"comment,omitempty"`
-	// Session-contract baseline op (cyber.ext.v1.builtin annotation)
-	Builtin bool `protobuf:"varint,10,opt,name=builtin,proto3" json:"builtin,omitempty"`
 	// Audience annotation value as declared on the method.
 	Access string `protobuf:"bytes,11,opt,name=access,proto3" json:"access,omitempty"`
 	// Row-level narrowing applies to this op (cyber.ext.v1.datascope annotation)
@@ -145,13 +143,6 @@ func (x *Method) GetComment() string {
 		return x.Comment
 	}
 	return ""
-}
-
-func (x *Method) GetBuiltin() bool {
-	if x != nil {
-		return x.Builtin
-	}
-	return false
 }
 
 func (x *Method) GetAccess() string {
@@ -346,7 +337,7 @@ var File_cyber_system_v1_resource_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_resource_proto_rawDesc = "" +
 	"\n" +
-	"\x1ecyber/system/v1/resource.proto\x12\x0fcyber.system.v1\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\"\x83\x03\n" +
+	"\x1ecyber/system/v1/resource.proto\x12\x0fcyber.system.v1\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\"\xef\x02\n" +
 	"\x06Method\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
 	"\tfull_name\x18\x02 \x01(\tR\bfullName\x12!\n" +
@@ -357,11 +348,10 @@ const file_cyber_system_v1_resource_proto_rawDesc = "" +
 	"\vhttp_method\x18\a \x01(\tR\n" +
 	"httpMethod\x12\x1b\n" +
 	"\thttp_path\x18\b \x01(\tR\bhttpPath\x12\x18\n" +
-	"\acomment\x18\t \x01(\tR\acomment\x12\x18\n" +
-	"\abuiltin\x18\n" +
-	" \x01(\bR\abuiltin\x12\x16\n" +
+	"\acomment\x18\t \x01(\tR\acomment\x12\x16\n" +
 	"\x06access\x18\v \x01(\tR\x06access\x12\x1c\n" +
-	"\tdatascope\x18\f \x01(\bR\tdatascope\"\xc2\x01\n" +
+	"\tdatascope\x18\f \x01(\bR\tdatascopeJ\x04\b\n" +
+	"\x10\v\"\xc2\x01\n" +
 	"\aService\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
 	"\tfull_name\x18\x02 \x01(\tR\bfullName\x12\x18\n" +

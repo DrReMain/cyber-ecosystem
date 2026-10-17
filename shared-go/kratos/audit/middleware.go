@@ -22,12 +22,13 @@ import (
 // read that passes is not audit material, a denied read always is (probe
 // detection is the point).
 //
-// Position contract: inside the ADMIN audience block it must sit between
-// SessionAuth and OperationAuthz — after the former so subject attribution
-// is in the context, outside the latter so denial errors return through it.
-// A 401 from the outer SessionAuth never reaches this middleware. Should an
-// unauthenticated audience ever carry it, subject-less events keep the
-// attribution columns empty.
+// Position contract: inside an authenticated audience block it must sit
+// between SessionAuth and OperationAuthz — after the former so subject
+// attribution is in the context, outside the latter (where the audience
+// carries one) so denial errors return through it. A 401 from the outer
+// SessionAuth never reaches this middleware. Should an unauthenticated
+// audience ever carry it, subject-less events keep the attribution
+// columns empty.
 func Audit(sink Sink) middleware.Middleware {
 	if sink == nil {
 		// Wiring breakage: an audit middleware with nowhere to send events

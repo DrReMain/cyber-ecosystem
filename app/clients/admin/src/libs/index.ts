@@ -1,3 +1,4 @@
+export { avatarColor } from "./avatar";
 export type { Channel } from "./channel";
 export { createChannel } from "./channel";
 export { zodValidator } from "./form-validator";

@@ -17,19 +17,28 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationAuthServiceBeginIdentityLogin = "/cyber.system.v1.AuthService/BeginIdentityLogin"
+const OperationAuthServiceBindCredential = "/cyber.system.v1.AuthService/BindCredential"
 const OperationAuthServiceGetCurrentUser = "/cyber.system.v1.AuthService/GetCurrentUser"
 const OperationAuthServiceLogin = "/cyber.system.v1.AuthService/Login"
+const OperationAuthServiceLoginByIdentity = "/cyber.system.v1.AuthService/LoginByIdentity"
 const OperationAuthServiceLogout = "/cyber.system.v1.AuthService/Logout"
 
 type AuthServiceHTTPServer interface {
+	BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error)
+	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	LoginByIdentity(context.Context, *LoginByIdentityRequest) (*LoginByIdentityResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 }
 
 func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
 	r := s.Route("/")
 	r.Handle("POST", "/api/v1/system/auth/login", _AuthService_Login0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/login-by-identity", _AuthService_LoginByIdentity0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/begin-identity-login", _AuthService_BeginIdentityLogin0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/bind-credential", _AuthService_BindCredential0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/logout", _AuthService_Logout0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me", _AuthService_GetCurrentUser0_HTTP_Handler(srv))
 }
@@ -49,6 +58,63 @@ func _AuthService_Login0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.C
 			return err
 		}
 		reply := out.(*LoginResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthService_LoginByIdentity0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LoginByIdentityRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceLoginByIdentity)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.LoginByIdentity(ctx, req.(*LoginByIdentityRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LoginByIdentityResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthService_BeginIdentityLogin0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in BeginIdentityLoginRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceBeginIdentityLogin)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.BeginIdentityLogin(ctx, req.(*BeginIdentityLoginRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*BeginIdentityLoginResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthService_BindCredential0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in BindCredentialRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceBindCredential)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.BindCredential(ctx, req.(*BindCredentialRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*BindCredentialResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -92,8 +158,11 @@ func _AuthService_GetCurrentUser0_HTTP_Handler(srv AuthServiceHTTPServer) func(c
 }
 
 type AuthServiceHTTPClient interface {
+	BeginIdentityLogin(ctx context.Context, req *BeginIdentityLoginRequest, opts ...http.CallOption) (rsp *BeginIdentityLoginResponse, err error)
+	BindCredential(ctx context.Context, req *BindCredentialRequest, opts ...http.CallOption) (rsp *BindCredentialResponse, err error)
 	GetCurrentUser(ctx context.Context, req *GetCurrentUserRequest, opts ...http.CallOption) (rsp *GetCurrentUserResponse, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginResponse, err error)
+	LoginByIdentity(ctx context.Context, req *LoginByIdentityRequest, opts ...http.CallOption) (rsp *LoginByIdentityResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutResponse, err error)
 }
 
@@ -103,6 +172,40 @@ type AuthServiceHTTPClientImpl struct {
 
 func NewAuthServiceHTTPClient(client *http.Client) AuthServiceHTTPClient {
 	return &AuthServiceHTTPClientImpl{client}
+}
+
+func (c *AuthServiceHTTPClientImpl) BeginIdentityLogin(ctx context.Context, in *BeginIdentityLoginRequest, opts ...http.CallOption) (*BeginIdentityLoginResponse, error) {
+	var out BeginIdentityLoginResponse
+	pattern := "/api/v1/system/auth/begin-identity-login"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceBeginIdentityLogin),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) BindCredential(ctx context.Context, in *BindCredentialRequest, opts ...http.CallOption) (*BindCredentialResponse, error) {
+	var out BindCredentialResponse
+	pattern := "/api/v1/system/auth/bind-credential"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceBindCredential),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *AuthServiceHTTPClientImpl) GetCurrentUser(ctx context.Context, in *GetCurrentUserRequest, opts ...http.CallOption) (*GetCurrentUserResponse, error) {
@@ -129,6 +232,23 @@ func (c *AuthServiceHTTPClientImpl) Login(ctx context.Context, in *LoginRequest,
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationAuthServiceLogin),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) LoginByIdentity(ctx context.Context, in *LoginByIdentityRequest, opts ...http.CallOption) (*LoginByIdentityResponse, error) {
+	var out LoginByIdentityResponse
+	pattern := "/api/v1/system/auth/login-by-identity"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceLoginByIdentity),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

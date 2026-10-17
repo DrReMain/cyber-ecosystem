@@ -134,7 +134,8 @@ type FileRP interface {
 
 type FileUC struct {
 	shared.UC
-	fileRP FileRP
+	fileRP  FileRP
+	domains shared.TenantDomainSource
 
 	genCtx    context.Context
 	genCancel context.CancelFunc
@@ -145,12 +146,13 @@ type FileUC struct {
 	sweepWG     sync.WaitGroup
 }
 
-func NewFileUC(logger *slog.Logger, tm shared.Transaction, fileRP FileRP, lc shared.HookRegistry) *FileUC {
+func NewFileUC(logger *slog.Logger, tm shared.Transaction, fileRP FileRP, domains shared.TenantDomainSource, lc shared.HookRegistry) *FileUC {
 	genCtx, genCancel := context.WithCancel(context.Background())
 	sweepCtx, sweepCancel := context.WithCancel(context.Background())
 	uc := &FileUC{
 		UC:          shared.NewUC(logger.With("module", "module/file"), tm),
 		fileRP:      fileRP,
+		domains:     domains,
 		genCtx:      genCtx,
 		genCancel:   genCancel,
 		sweepCtx:    sweepCtx,
@@ -313,6 +315,9 @@ func (uc *FileUC) runGeneration(f *File, spec *GenerationSpec) {
 }
 
 func (uc *FileUC) generate(ctx context.Context, f *File, spec *GenerationSpec) error {
+	// The task runs detached from the request that scheduled it; re-pin the
+	// row's tenant so the upload lands in the owning tenant's bucket.
+	ctx = security.WithTenant(ctx, f.TenantID)
 	pr, pw := io.Pipe()
 	go func() {
 		// nil → EOF for the reader; an error propagates through Upload.
@@ -392,13 +397,32 @@ func (uc *FileUC) runRecovery(ctx context.Context) {
 
 func (uc *FileUC) runSweep(ctx context.Context) {
 	cut := time.Now().Add(-time.Duration(sweepTTLFactor) * uc.fileRP.Limits().PresignTTL)
-	rows := uc.sweepStaleRows(ctx, cut)
-	sessions := uc.sweepOrphanSessions(ctx)
-	objects := uc.sweepOrphanObjects(ctx, cut)
-	reclaimed := uc.sweepExpiredDeleted(ctx, time.Now().Add(-retentionPeriod))
-	if rows+sessions+objects+reclaimed > 0 {
-		uc.Log.Info("file sweep", "rows", rows, "sessions", sessions, "objects", objects, "reclaimed", reclaimed)
+	for _, domain := range uc.sweepDomains(ctx) {
+		// One domain per pass: the domain switch drives row filtering (the
+		// tenant mixin) and bucket routing (TenantStorage) on the same axis,
+		// so a pass never sees one tenant's rows against another's objects.
+		tctx := security.WithTenant(ctx, domain)
+		rows := uc.sweepStaleRows(tctx, cut)
+		sessions := uc.sweepOrphanSessions(tctx)
+		objects := uc.sweepOrphanObjects(tctx, cut)
+		reclaimed := uc.sweepExpiredDeleted(tctx, time.Now().Add(-retentionPeriod))
+		if n := rows + sessions + objects + reclaimed; n > 0 {
+			uc.Log.Info("file sweep", "tenant", domain, "rows", rows, "sessions", sessions, "objects", objects, "reclaimed", reclaimed)
+		}
 	}
+}
+
+// sweepDomains lists every registry domain with a bucket to sweep — the
+// platform tenant's seeded row included. A domain that has opened no bucket
+// simply has nothing to sweep; the storage-driven passes tolerate its
+// absence quietly.
+func (uc *FileUC) sweepDomains(ctx context.Context) []string {
+	domains, err := uc.domains.ListTenantCodes(ctx)
+	if err != nil {
+		uc.Log.Warn("file sweep: list tenant domains", "error", err)
+		return nil
+	}
+	return domains
 }
 
 func (uc *FileUC) sweepStaleRows(ctx context.Context, cut time.Time) int {
@@ -467,7 +491,8 @@ func (uc *FileUC) sweepOrphanSessions(ctx context.Context) int {
 		aborted++
 		return nil
 	})
-	if err != nil && !errors.Is(err, context.Canceled) {
+	// A never-provisioned bucket has nothing to sweep; anything else stays loud.
+	if err != nil && !errors.Is(err, context.Canceled) && !errorspb.IsInfraErrorStorageNotFound(err) {
 		uc.Log.Warn("file sweep: list sessions", "error", err)
 	}
 	return aborted
@@ -482,7 +507,11 @@ func (uc *FileUC) sweepOrphanObjects(ctx context.Context, cut time.Time) int {
 		}
 		res, err := uc.fileRP.ListObjects(ctx, sweepKeyPrefix, cursor, sweepBatch)
 		if err != nil {
-			uc.Log.Warn("file sweep: list objects", "error", err)
+			// A never-provisioned bucket has nothing to sweep; anything else
+			// aborts the pass loudly.
+			if !errorspb.IsInfraErrorStorageNotFound(err) {
+				uc.Log.Warn("file sweep: list objects", "error", err)
+			}
 			return deleted
 		}
 		for _, obj := range res.Objects {

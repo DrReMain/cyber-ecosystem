@@ -33,6 +33,8 @@
   "system_users_form_email_invalid": "有効なメールアドレスではありません",
   "system_users_form_email_hint": "メールアドレスはログインIDであり、変更できません",
   "system_users_form_password": "初期パスワード",
+  "system_users_form_population": "ユーザータイプ",
+  "system_users_ph_population": "任意。空欄で既定",
   "system_users_form_dept": "部門",
   "system_users_form_avatar": "プロフィール画像",
   "system_users_form_avatar_upload": "画像をアップロード",

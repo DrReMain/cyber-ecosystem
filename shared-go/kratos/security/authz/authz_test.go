@@ -43,7 +43,7 @@ func TestOperationAuthz(t *testing.T) {
 	}
 
 	scoped := &authz.Decision{Allowed: true, Scopes: []authz.ScopeDescriptor{{Entity: "user", Kind: "self"}}}
-	builtin := &authz.Decision{Allowed: true, Reason: authz.AllowBuiltin}
+	unscoped := &authz.Decision{Allowed: true} // allowed with no narrowing
 	tests := []struct {
 		name        string
 		ctx         context.Context
@@ -115,9 +115,9 @@ func TestOperationAuthz(t *testing.T) {
 			wantHandler: true,
 		},
 		{
-			name:        "builtin allow passes through without scopes",
+			name:        "scopeless allow passes through without scopes",
 			ctx:         authedCtx(),
-			authorizer:  &fakeAuthorizer{decision: builtin},
+			authorizer:  &fakeAuthorizer{decision: unscoped},
 			wantErr:     "",
 			wantHandler: true,
 		},

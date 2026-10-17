@@ -11,6 +11,7 @@
   "files_delete_confirm": "حذف ناعم لهذا الملف؟ سيُحتفظ بالكائن المخزن.",
   "files_rename_title": "إعادة تسمية الملف",
   "files_rename_label": "الاسم الجديد",
+  "files_ph_rename": "أدخل الاسم الجديد",
   "files_col_name": "الاسم",
   "files_col_type": "النوع",
   "files_col_size": "الحجم",

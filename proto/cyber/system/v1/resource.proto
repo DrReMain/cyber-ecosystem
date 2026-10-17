@@ -41,8 +41,7 @@ message Method {
   string http_path = 8;
   // Method description.
   string comment = 9;
-  // Session-contract baseline op (cyber.ext.v1.builtin annotation)
-  bool builtin = 10;
+  reserved 10; // builtin flag retired with the engine baseline (ACCESS_BUILTIN on the access axis now)
   // Audience annotation value as declared on the method.
   string access = 11;
   // Row-level narrowing applies to this op (cyber.ext.v1.datascope annotation)

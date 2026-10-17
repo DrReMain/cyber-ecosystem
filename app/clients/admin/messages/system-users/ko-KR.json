@@ -33,6 +33,8 @@
   "system_users_form_email_invalid": "올바른 이메일 주소가 아닙니다",
   "system_users_form_email_hint": "이메일은 로그인 식별자이며 변경할 수 없습니다",
   "system_users_form_password": "초기 비밀번호",
+  "system_users_form_population": "사용자 유형",
+  "system_users_ph_population": "선택. 비워두면 기본값",
   "system_users_form_dept": "부서",
   "system_users_form_avatar": "프로필 이미지",
   "system_users_form_avatar_upload": "이미지 업로드",

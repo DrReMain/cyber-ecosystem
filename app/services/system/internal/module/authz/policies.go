@@ -2,13 +2,13 @@ package authz
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"maps"
 
 	"cyber-ecosystem/shared-go/kratos/security"
 	kauthz "cyber-ecosystem/shared-go/kratos/security/authz"
+	"cyber-ecosystem/shared-go/utils"
 )
 
 const (
@@ -33,11 +33,11 @@ func decodeParams(params map[string]any, target any) error {
 	// A JSON roundtrip lands map-decoded numbers (float64) in typed fields —
 	// plugins never read raw map values; dirt from direct DB writes surfaces
 	// here and fails closed upstream.
-	raw, err := json.Marshal(params)
+	raw, err := utils.Marshal(params)
 	if err != nil {
 		return fmt.Errorf("encode params: %w", err)
 	}
-	if err := json.Unmarshal(raw, target); err != nil {
+	if err := utils.UnmarshalInto(raw, target); err != nil {
 		return fmt.Errorf("decode params: %w", err)
 	}
 	return nil

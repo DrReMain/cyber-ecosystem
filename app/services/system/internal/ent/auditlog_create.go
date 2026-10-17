@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type AuditLogCreate struct {
 	config
 	mutation *AuditLogMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -445,6 +448,7 @@ func (_c *AuditLogCreate) createSpec() (*AuditLog, *sqlgraph.CreateSpec) {
 		_node = &AuditLog{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(auditlog.Table, sqlgraph.NewFieldSpec(auditlog.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -508,11 +512,212 @@ func (_c *AuditLogCreate) createSpec() (*AuditLog, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.AuditLog.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AuditLogUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *AuditLogCreate) OnConflict(opts ...sql.ConflictOption) *AuditLogUpsertOne {
+	_c.conflict = opts
+	return &AuditLogUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.AuditLog.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *AuditLogCreate) OnConflictColumns(columns ...string) *AuditLogUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &AuditLogUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// AuditLogUpsertOne is the builder for "upsert"-ing
+	//  one AuditLog node.
+	AuditLogUpsertOne struct {
+		create *AuditLogCreate
+	}
+
+	// AuditLogUpsert is the "OnConflict" setter.
+	AuditLogUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AuditLogUpsert) SetUpdatedAt(v time.Time) *AuditLogUpsert {
+	u.Set(auditlog.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AuditLogUpsert) UpdateUpdatedAt() *AuditLogUpsert {
+	u.SetExcluded(auditlog.FieldUpdatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.AuditLog.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(auditlog.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *AuditLogUpsertOne) UpdateNewValues() *AuditLogUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(auditlog.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(auditlog.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.Tenant(); exists {
+			s.SetIgnore(auditlog.FieldTenant)
+		}
+		if _, exists := u.create.mutation.Actor(); exists {
+			s.SetIgnore(auditlog.FieldActor)
+		}
+		if _, exists := u.create.mutation.PrincipalType(); exists {
+			s.SetIgnore(auditlog.FieldPrincipalType)
+		}
+		if _, exists := u.create.mutation.Operation(); exists {
+			s.SetIgnore(auditlog.FieldOperation)
+		}
+		if _, exists := u.create.mutation.HTTPMethod(); exists {
+			s.SetIgnore(auditlog.FieldHTTPMethod)
+		}
+		if _, exists := u.create.mutation.HTTPPath(); exists {
+			s.SetIgnore(auditlog.FieldHTTPPath)
+		}
+		if _, exists := u.create.mutation.Status(); exists {
+			s.SetIgnore(auditlog.FieldStatus)
+		}
+		if _, exists := u.create.mutation.LatencyMs(); exists {
+			s.SetIgnore(auditlog.FieldLatencyMs)
+		}
+		if _, exists := u.create.mutation.IP(); exists {
+			s.SetIgnore(auditlog.FieldIP)
+		}
+		if _, exists := u.create.mutation.UserAgent(); exists {
+			s.SetIgnore(auditlog.FieldUserAgent)
+		}
+		if _, exists := u.create.mutation.DenyReason(); exists {
+			s.SetIgnore(auditlog.FieldDenyReason)
+		}
+		if _, exists := u.create.mutation.EventID(); exists {
+			s.SetIgnore(auditlog.FieldEventID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.AuditLog.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *AuditLogUpsertOne) Ignore() *AuditLogUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AuditLogUpsertOne) DoNothing() *AuditLogUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AuditLogCreate.OnConflict
+// documentation for more info.
+func (u *AuditLogUpsertOne) Update(set func(*AuditLogUpsert)) *AuditLogUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AuditLogUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AuditLogUpsertOne) SetUpdatedAt(v time.Time) *AuditLogUpsertOne {
+	return u.Update(func(s *AuditLogUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AuditLogUpsertOne) UpdateUpdatedAt() *AuditLogUpsertOne {
+	return u.Update(func(s *AuditLogUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *AuditLogUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AuditLogCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AuditLogUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *AuditLogUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: AuditLogUpsertOne.ID is not supported by MySQL driver. Use AuditLogUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *AuditLogUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // AuditLogCreateBulk is the builder for creating many AuditLog entities in bulk.
 type AuditLogCreateBulk struct {
 	config
 	err      error
 	builders []*AuditLogCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the AuditLog entities in the database.
@@ -542,6 +747,7 @@ func (_c *AuditLogCreateBulk) Save(ctx context.Context) ([]*AuditLog, error) {
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -588,6 +794,173 @@ func (_c *AuditLogCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *AuditLogCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.AuditLog.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AuditLogUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *AuditLogCreateBulk) OnConflict(opts ...sql.ConflictOption) *AuditLogUpsertBulk {
+	_c.conflict = opts
+	return &AuditLogUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.AuditLog.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *AuditLogCreateBulk) OnConflictColumns(columns ...string) *AuditLogUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &AuditLogUpsertBulk{
+		create: _c,
+	}
+}
+
+// AuditLogUpsertBulk is the builder for "upsert"-ing
+// a bulk of AuditLog nodes.
+type AuditLogUpsertBulk struct {
+	create *AuditLogCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.AuditLog.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(auditlog.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *AuditLogUpsertBulk) UpdateNewValues() *AuditLogUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(auditlog.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(auditlog.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.Tenant(); exists {
+				s.SetIgnore(auditlog.FieldTenant)
+			}
+			if _, exists := b.mutation.Actor(); exists {
+				s.SetIgnore(auditlog.FieldActor)
+			}
+			if _, exists := b.mutation.PrincipalType(); exists {
+				s.SetIgnore(auditlog.FieldPrincipalType)
+			}
+			if _, exists := b.mutation.Operation(); exists {
+				s.SetIgnore(auditlog.FieldOperation)
+			}
+			if _, exists := b.mutation.HTTPMethod(); exists {
+				s.SetIgnore(auditlog.FieldHTTPMethod)
+			}
+			if _, exists := b.mutation.HTTPPath(); exists {
+				s.SetIgnore(auditlog.FieldHTTPPath)
+			}
+			if _, exists := b.mutation.Status(); exists {
+				s.SetIgnore(auditlog.FieldStatus)
+			}
+			if _, exists := b.mutation.LatencyMs(); exists {
+				s.SetIgnore(auditlog.FieldLatencyMs)
+			}
+			if _, exists := b.mutation.IP(); exists {
+				s.SetIgnore(auditlog.FieldIP)
+			}
+			if _, exists := b.mutation.UserAgent(); exists {
+				s.SetIgnore(auditlog.FieldUserAgent)
+			}
+			if _, exists := b.mutation.DenyReason(); exists {
+				s.SetIgnore(auditlog.FieldDenyReason)
+			}
+			if _, exists := b.mutation.EventID(); exists {
+				s.SetIgnore(auditlog.FieldEventID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.AuditLog.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *AuditLogUpsertBulk) Ignore() *AuditLogUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AuditLogUpsertBulk) DoNothing() *AuditLogUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AuditLogCreateBulk.OnConflict
+// documentation for more info.
+func (u *AuditLogUpsertBulk) Update(set func(*AuditLogUpsert)) *AuditLogUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AuditLogUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AuditLogUpsertBulk) SetUpdatedAt(v time.Time) *AuditLogUpsertBulk {
+	return u.Update(func(s *AuditLogUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AuditLogUpsertBulk) UpdateUpdatedAt() *AuditLogUpsertBulk {
+	return u.Update(func(s *AuditLogUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *AuditLogUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AuditLogCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AuditLogCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AuditLogUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

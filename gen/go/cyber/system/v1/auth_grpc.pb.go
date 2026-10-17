@@ -19,9 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Login_FullMethodName          = "/cyber.system.v1.AuthService/Login"
-	AuthService_Logout_FullMethodName         = "/cyber.system.v1.AuthService/Logout"
-	AuthService_GetCurrentUser_FullMethodName = "/cyber.system.v1.AuthService/GetCurrentUser"
+	AuthService_Login_FullMethodName              = "/cyber.system.v1.AuthService/Login"
+	AuthService_LoginByIdentity_FullMethodName    = "/cyber.system.v1.AuthService/LoginByIdentity"
+	AuthService_BeginIdentityLogin_FullMethodName = "/cyber.system.v1.AuthService/BeginIdentityLogin"
+	AuthService_BindCredential_FullMethodName     = "/cyber.system.v1.AuthService/BindCredential"
+	AuthService_Logout_FullMethodName             = "/cyber.system.v1.AuthService/Logout"
+	AuthService_GetCurrentUser_FullMethodName     = "/cyber.system.v1.AuthService/GetCurrentUser"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -29,6 +32,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	LoginByIdentity(ctx context.Context, in *LoginByIdentityRequest, opts ...grpc.CallOption) (*LoginByIdentityResponse, error)
+	BeginIdentityLogin(ctx context.Context, in *BeginIdentityLoginRequest, opts ...grpc.CallOption) (*BeginIdentityLoginResponse, error)
+	BindCredential(ctx context.Context, in *BindCredentialRequest, opts ...grpc.CallOption) (*BindCredentialResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	GetCurrentUser(ctx context.Context, in *GetCurrentUserRequest, opts ...grpc.CallOption) (*GetCurrentUserResponse, error)
 }
@@ -45,6 +51,36 @@ func (c *authServiceClient) Login(ctx context.Context, in *LoginRequest, opts ..
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LoginResponse)
 	err := c.cc.Invoke(ctx, AuthService_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) LoginByIdentity(ctx context.Context, in *LoginByIdentityRequest, opts ...grpc.CallOption) (*LoginByIdentityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginByIdentityResponse)
+	err := c.cc.Invoke(ctx, AuthService_LoginByIdentity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) BeginIdentityLogin(ctx context.Context, in *BeginIdentityLoginRequest, opts ...grpc.CallOption) (*BeginIdentityLoginResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BeginIdentityLoginResponse)
+	err := c.cc.Invoke(ctx, AuthService_BeginIdentityLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) BindCredential(ctx context.Context, in *BindCredentialRequest, opts ...grpc.CallOption) (*BindCredentialResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BindCredentialResponse)
+	err := c.cc.Invoke(ctx, AuthService_BindCredential_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,6 +112,9 @@ func (c *authServiceClient) GetCurrentUser(ctx context.Context, in *GetCurrentUs
 // for forward compatibility.
 type AuthServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	LoginByIdentity(context.Context, *LoginByIdentityRequest) (*LoginByIdentityResponse, error)
+	BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error)
+	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
@@ -90,6 +129,15 @@ type UnimplementedAuthServiceServer struct{}
 
 func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedAuthServiceServer) LoginByIdentity(context.Context, *LoginByIdentityRequest) (*LoginByIdentityResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LoginByIdentity not implemented")
+}
+func (UnimplementedAuthServiceServer) BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BeginIdentityLogin not implemented")
+}
+func (UnimplementedAuthServiceServer) BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BindCredential not implemented")
 }
 func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
@@ -132,6 +180,60 @@ func _AuthService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_LoginByIdentity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginByIdentityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).LoginByIdentity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_LoginByIdentity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).LoginByIdentity(ctx, req.(*LoginByIdentityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_BeginIdentityLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BeginIdentityLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).BeginIdentityLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_BeginIdentityLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).BeginIdentityLogin(ctx, req.(*BeginIdentityLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_BindCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BindCredentialRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).BindCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_BindCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).BindCredential(ctx, req.(*BindCredentialRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -182,6 +284,18 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _AuthService_Login_Handler,
+		},
+		{
+			MethodName: "LoginByIdentity",
+			Handler:    _AuthService_LoginByIdentity_Handler,
+		},
+		{
+			MethodName: "BeginIdentityLogin",
+			Handler:    _AuthService_BeginIdentityLogin_Handler,
+		},
+		{
+			MethodName: "BindCredential",
+			Handler:    _AuthService_BindCredential_Handler,
 		},
 		{
 			MethodName: "Logout",

@@ -2,12 +2,19 @@ package user
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"log/slog"
 
+	entsql "entgo.io/ent/dialect/sql"
+
 	"cyber-ecosystem/shared-go/helper"
+	"cyber-ecosystem/shared-go/kratos/security"
 	"cyber-ecosystem/shared-go/utils"
 
 	"cyber-ecosystem/app/services/system/internal/ent"
+	"cyber-ecosystem/app/services/system/internal/ent/credential"
+	"cyber-ecosystem/app/services/system/internal/ent/membership"
 	"cyber-ecosystem/app/services/system/internal/ent/predicate"
 	"cyber-ecosystem/app/services/system/internal/ent/principalrole"
 	"cyber-ecosystem/app/services/system/internal/ent/role"
@@ -91,6 +98,13 @@ func (rp *userRP) Delete(ctx context.Context, id string) (string, error) {
 
 func (rp *userRP) List(ctx context.Context, in *UserListIn) (*UserListOut, error) {
 	query := rp.Platform.GetClient(ctx).User.Query()
+	// The admin face lists the caller's tenant's members — seats, not
+	// birthplace: an identity seated here is visible regardless of where
+	// the row originates. A subjectless context (seed, framework paths)
+	// lists the registry.
+	if subject, ok := security.SubjectFromCtx(ctx); ok {
+		query.Where(seatNarrowing(subject.TenantID))
+	}
 	helper.WherePtr(query, utils.FromTimestamp(in.CreatedAtA), user.CreatedAtGTE)
 	helper.WherePtr(query, utils.FromTimestamp(in.CreatedAtZ), user.CreatedAtLTE)
 	helper.WherePtr(query, utils.FromTimestamp(in.UpdatedAtA), user.UpdatedAtGTE)
@@ -119,9 +133,13 @@ func (rp *userRP) List(ctx context.Context, in *UserListIn) (*UserListOut, error
 }
 
 func (rp *userRP) FindByEmail(ctx context.Context, email string) (*User, error) {
-	d, err := rp.Platform.GetClient(ctx).User.Query().
+	// Registry-plane lookup: the plane flag must ride the query execution
+	// too — the tenant interceptor fires at Only/All with the context it is
+	// handed.
+	globctx := security.RegistryPlane(ctx)
+	d, err := rp.Platform.GetClient(globctx).User.Query().
 		Where(user.EmailEQ(email)).
-		Only(ctx)
+		Only(globctx)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
@@ -134,6 +152,84 @@ func (rp *userRP) FindByID(ctx context.Context, id string) (*User, error) {
 		return nil, rp.Platform.HandleEntError(err)
 	}
 	return mapUser(d), nil
+}
+
+func (rp *userRP) FindSeated(ctx context.Context, id string) (*User, error) {
+	query := rp.Platform.GetClient(ctx).User.Query().Where(user.IDEQ(id))
+	if subject, ok := security.SubjectFromCtx(ctx); ok {
+		query.Where(seatNarrowing(subject.TenantID))
+	}
+	d, err := query.Only(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return mapUser(d), nil
+}
+
+func (rp *userRP) FindByIDs(ctx context.Context, ids []string) (map[string]*User, error) {
+	rows, err := rp.Platform.GetClient(ctx).User.Query().Where(user.IDIn(ids...)).All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	byID := make(map[string]*User, len(rows))
+	for _, d := range rows {
+		byID[d.ID] = mapUser(d)
+	}
+	return byID, nil
+}
+
+func (rp *userRP) FindCredential(ctx context.Context, kind, identifier string) (*Credential, error) {
+	c, err := rp.Platform.GetClient(ctx).Credential.Query().
+		Where(credential.Kind(kind), credential.Identifier(identifier)).
+		Only(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return mapCredential(c), nil
+}
+
+func (rp *userRP) CreateCredential(ctx context.Context, c *Credential) error {
+	if _, err := rp.Platform.GetClient(ctx).Credential.Create().
+		SetKind(c.Kind).SetIdentifier(c.Identifier).SetUserID(c.UserID).
+		Save(ctx); err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
+}
+
+func (rp *userRP) DeleteCredentialsByUser(ctx context.Context, userID string) error {
+	if _, err := rp.Platform.GetClient(ctx).Credential.Delete().Where(credential.UserID(userID)).Exec(ctx); err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
+}
+
+// EnsureSeat inserts the seat unless it already exists — the unique index
+// is the idempotence, so a lost race is the same statement as a no-op.
+func (rp *userRP) EnsureSeat(ctx context.Context, seat *Seat) error {
+	if err := rp.Platform.GetClient(ctx).Membership.Create().
+		SetUserID(seat.UserID).SetTenantID(seat.TenantID).SetPopulation(seat.Population).
+		OnConflictColumns(membership.FieldUserID, membership.FieldTenantID, membership.FieldPopulation).
+		DoNothing().
+		Exec(ctx); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
+}
+
+func (rp *userRP) DeleteSeatsByUser(ctx context.Context, userID string) error {
+	if _, err := rp.Platform.GetClient(ctx).Membership.Delete().Where(membership.UserID(userID)).Exec(ctx); err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
+}
+
+func (rp *userRP) ListSeatsByUser(ctx context.Context, userID string) ([]*Seat, error) {
+	rows, err := rp.Platform.GetClient(ctx).Membership.Query().Where(membership.UserID(userID)).All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return utils.SliceMap(rows, mapSeat), nil
 }
 
 func (rp *userRP) FindRoleIDsByCodes(ctx context.Context, codes []string) (map[string]string, error) {
@@ -169,15 +265,14 @@ func (rp *userRP) SetUserRoles(ctx context.Context, userID string, wanted []stri
 		if _, ok := storedByID[id]; ok {
 			continue
 		}
-		if _, err := client.PrincipalRole.Create().
+		if err := client.PrincipalRole.Create().
 			SetPrincipalType(shared.PrincipalTypeUser).
 			SetPrincipalID(userID).
 			SetRoleID(id).
-			Save(ctx); err != nil {
-			// A racing writer won the unique; the binding exists either way.
-			if !ent.IsConstraintError(err) {
-				return rp.Platform.HandleEntError(err)
-			}
+			OnConflictColumns(principalrole.FieldPrincipalType, principalrole.FieldPrincipalID, principalrole.FieldRoleID).
+			DoNothing().
+			Exec(ctx); err != nil && !errors.Is(err, sql.ErrNoRows) {
+			return rp.Platform.HandleEntError(err)
 		}
 	}
 	for _, b := range stored {
@@ -247,16 +342,41 @@ func (rp *userRP) RevokeUserSessions(ctx context.Context, userID string) error {
 
 // Private -------------------------------------------------------------------------------------------------------------
 
+func seatNarrowing(tenantID string) predicate.User {
+	return predicate.User(func(s *entsql.Selector) {
+		m := entsql.Table(membership.Table)
+		s.Where(entsql.Exists(entsql.Select(m.C(membership.FieldUserID)).From(m).Where(entsql.And(
+			entsql.EQ(m.C(membership.FieldTenantID), tenantID),
+			entsql.EQ(m.C(membership.FieldUserID), entsql.Raw(s.C(user.FieldID))),
+		))))
+	})
+}
+
 func mapUser(d *ent.User) *User {
 	return &User{
 		ID:           d.ID,
 		CreatedAt:    d.CreatedAt,
 		UpdatedAt:    d.UpdatedAt,
-		TenantID:     d.TenantID,
 		DeptID:       d.DeptID,
 		Avatar:       d.Avatar,
 		Email:        &d.Email,
 		PasswordHash: &d.PasswordHash,
 		Enabled:      d.Enabled,
+	}
+}
+
+func mapCredential(d *ent.Credential) *Credential {
+	return &Credential{
+		Kind:       d.Kind,
+		Identifier: d.Identifier,
+		UserID:     d.UserID,
+	}
+}
+
+func mapSeat(d *ent.Membership) *Seat {
+	return &Seat{
+		UserID:     d.UserID,
+		TenantID:   d.TenantID,
+		Population: d.Population,
 	}
 }

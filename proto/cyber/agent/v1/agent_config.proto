@@ -4,7 +4,6 @@ package cyber.agent.v1;
 
 import "buf/validate/validate.proto";
 import "ext/v1/access.proto";
-import "ext/v1/authz.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -19,8 +18,7 @@ service AgentConfigService {
       comment: "配置agent连接"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {
       put: "/api/v1/agent/me/agent-config"
       body: "*"
@@ -31,8 +29,7 @@ service AgentConfigService {
       comment: "清除agent连接"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {delete: "/api/v1/agent/me/agent-config"};
   }
   rpc GetMyAgentConfig(GetMyAgentConfigRequest) returns (GetMyAgentConfigResponse) {
@@ -40,8 +37,7 @@ service AgentConfigService {
       comment: "查询agent连接"
       action: ACTION_READ
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/agent/me/agent-config"};
   }
 }

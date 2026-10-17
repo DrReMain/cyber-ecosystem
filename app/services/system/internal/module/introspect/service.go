@@ -54,10 +54,11 @@ func (s *IntrospectService) VerifySession(ctx context.Context, in *systempb.Veri
 	}
 	email, _ := subject.Extra[shared.ExtraEmail].(string)
 	return &systempb.VerifySessionResponse{
-		UserId:    utils.StringW(subject.UserID),
-		TenantId:  utils.StringW(subject.TenantID),
-		SessionId: utils.StringW(subject.SessionID),
-		Email:     utils.StringW(email),
+		UserId:     utils.StringW(subject.UserID),
+		TenantId:   utils.StringW(subject.TenantID),
+		SessionId:  utils.StringW(subject.SessionID),
+		Email:      utils.StringW(email),
+		Population: utils.StringW(subject.Population),
 	}, nil
 }
 

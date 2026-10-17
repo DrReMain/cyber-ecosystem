@@ -45,7 +45,7 @@ func (s *UserService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *UserService) CreateUser(ctx context.Context, in *systempb.CreateUserRequest) (*systempb.CreateUserResponse, error) {
-	created, err := s.userUC.Create(ctx, in.Email, in.Password, in.DeptId, in.Avatar, in.Roles)
+	created, err := s.userUC.Create(ctx, in.Email, in.Password, in.DeptId, in.Avatar, in.GetPopulation(), in.Roles)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +112,22 @@ func (s *UserService) GetUser(ctx context.Context, in *systempb.GetUserRequest) 
 	return &systempb.GetUserResponse{
 		User: toProtoUser(a),
 	}, nil
+}
+
+func (s *UserService) BatchGetUsers(ctx context.Context, in *systempb.BatchGetUsersRequest) (*systempb.BatchGetUsersResponse, error) {
+	users, err := s.userUC.BatchGet(ctx, in.Ids)
+	if err != nil {
+		return nil, err
+	}
+	briefs := make(map[string]*systempb.UserBrief, len(users))
+	for id, u := range users {
+		briefs[id] = &systempb.UserBrief{
+			Id:     utils.StringW(u.ID),
+			Email:  utils.Wrap(u.Email, utils.StringW),
+			Avatar: utils.Wrap(u.Avatar, utils.StringW),
+		}
+	}
+	return &systempb.BatchGetUsersResponse{Users: briefs}, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

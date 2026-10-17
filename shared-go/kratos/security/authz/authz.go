@@ -24,7 +24,6 @@ var (
 const (
 	DenyNoGrant        = "NO_GRANT"
 	DenyAbacConstraint = "ABAC_CONSTRAINT"
-	AllowBuiltin       = "BUILTIN"
 )
 
 const (
@@ -44,7 +43,7 @@ type Authorizer interface {
 // Decision is the outcome of one authorization check.
 type Decision struct {
 	Allowed bool
-	Reason  string // deny reason; AllowBuiltin on a baseline allow; empty when allowed by grants
+	Reason  string // deny reason; empty when allowed by grants
 	Scopes  []ScopeDescriptor
 }
 

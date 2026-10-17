@@ -27,7 +27,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// chat
 // Constraints are enforced by explicit checks in the service handler: the
 // unary protovalidate middleware never sees streaming requests, so annotations
 // here would be dead rules.
@@ -793,7 +792,7 @@ var File_cyber_agent_v1_chat_proto protoreflect.FileDescriptor
 
 const file_cyber_agent_v1_chat_proto_rawDesc = "" +
 	"\n" +
-	"\x19cyber/agent/v1/chat.proto\x12\x0ecyber.agent.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"|\n" +
+	"\x19cyber/agent/v1/chat.proto\x12\x0ecyber.agent.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"|\n" +
 	"\vChatRequest\x12\x19\n" +
 	"\x05model\x18\x01 \x01(\tH\x00R\x05model\x88\x01\x01\x12\x1d\n" +
 	"\n" +
@@ -847,20 +846,20 @@ const file_cyber_agent_v1_chat_proto_rawDesc = "" +
 	"session_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\tsessionId\x12'\n" +
 	"\x05title\x18\x02 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x00R\x05title\x88\x01\x01B\b\n" +
 	"\x06_title\"\x17\n" +
-	"\x15UpdateSessionResponse2\x99\b\n" +
-	"\vChatService\x12\xad\x01\n" +
-	"\rDeleteSession\x12$.cyber.agent.v1.DeleteSessionRequest\x1a%.cyber.agent.v1.DeleteSessionResponse\"O\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x10\n" +
-	"\f删除会话\x10\x02\x82\xd3\xe4\x93\x02-*+/api/v1/agent/me/chat/sessions/{session_id}\x12\x96\x01\n" +
+	"\x15UpdateSessionResponse2\x80\b\n" +
+	"\vChatService\x12\xa9\x01\n" +
+	"\rDeleteSession\x12$.cyber.agent.v1.DeleteSessionRequest\x1a%.cyber.agent.v1.DeleteSessionResponse\"K\x88\xf1\x04\x04\x8a\xd3\x0e\x10\n" +
+	"\f删除会话\x10\x02\x82\xd3\xe4\x93\x02-*+/api/v1/agent/me/chat/sessions/{session_id}\x12\x92\x01\n" +
 	"\n" +
-	"ListModels\x12!.cyber.agent.v1.ListModelsRequest\x1a\".cyber.agent.v1.ListModelsResponse\"A\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
-	"\x12列出可用模型\x10\x01\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/agent/me/models\x12\xa3\x01\n" +
-	"\fListSessions\x12#.cyber.agent.v1.ListSessionsRequest\x1a$.cyber.agent.v1.ListSessionsResponse\"H\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
-	"\x12查询会话列表\x10\x01\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/agent/me/chat/sessions\x12\xcb\x01\n" +
-	"\x12GetSessionMessages\x12).cyber.agent.v1.GetSessionMessagesRequest\x1a*.cyber.agent.v1.GetSessionMessagesResponse\"^\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
-	"\x12查询会话消息\x10\x01\x82\xd3\xe4\x93\x026\x124/api/v1/agent/me/chat/sessions/{session_id}/messages\x12\xb3\x01\n" +
-	"\rUpdateSession\x12$.cyber.agent.v1.UpdateSessionRequest\x1a%.cyber.agent.v1.UpdateSessionResponse\"U\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x13\n" +
-	"\x0f重命名会话\x10\x02\x82\xd3\xe4\x93\x020:\x01*\x1a+/api/v1/agent/me/chat/sessions/{session_id}\x12\x81\x01\n" +
-	"\x04Chat\x12\x1b.cyber.agent.v1.ChatRequest\x1a\x1c.cyber.agent.v1.ChatResponse\"<\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x10\n" +
+	"ListModels\x12!.cyber.agent.v1.ListModelsRequest\x1a\".cyber.agent.v1.ListModelsResponse\"=\x88\xf1\x04\x04\x8a\xd3\x0e\x16\n" +
+	"\x12列出可用模型\x10\x01\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/agent/me/models\x12\x9f\x01\n" +
+	"\fListSessions\x12#.cyber.agent.v1.ListSessionsRequest\x1a$.cyber.agent.v1.ListSessionsResponse\"D\x88\xf1\x04\x04\x8a\xd3\x0e\x16\n" +
+	"\x12查询会话列表\x10\x01\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/agent/me/chat/sessions\x12\xc7\x01\n" +
+	"\x12GetSessionMessages\x12).cyber.agent.v1.GetSessionMessagesRequest\x1a*.cyber.agent.v1.GetSessionMessagesResponse\"Z\x88\xf1\x04\x04\x8a\xd3\x0e\x16\n" +
+	"\x12查询会话消息\x10\x01\x82\xd3\xe4\x93\x026\x124/api/v1/agent/me/chat/sessions/{session_id}/messages\x12\xaf\x01\n" +
+	"\rUpdateSession\x12$.cyber.agent.v1.UpdateSessionRequest\x1a%.cyber.agent.v1.UpdateSessionResponse\"Q\x88\xf1\x04\x04\x8a\xd3\x0e\x13\n" +
+	"\x0f重命名会话\x10\x02\x82\xd3\xe4\x93\x020:\x01*\x1a+/api/v1/agent/me/chat/sessions/{session_id}\x12}\n" +
+	"\x04Chat\x12\x1b.cyber.agent.v1.ChatRequest\x1a\x1c.cyber.agent.v1.ChatResponse\"8\x88\xf1\x04\x04\x8a\xd3\x0e\x10\n" +
 	"\f流式对话\x10\x01\x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/agent/me/chat0\x01\x1a\x13\x8a\xe2\t\x0f智能体对话B'Z%cyber-ecosystem/gen/go/cyber/agent/v1b\x06proto3"
 
 var (

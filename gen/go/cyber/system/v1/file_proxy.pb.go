@@ -138,7 +138,7 @@ var File_cyber_system_v1_file_proxy_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_file_proxy_proto_rawDesc = "" +
 	"\n" +
-	" cyber/system/v1/file_proxy.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/file.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\"\xba\x01\n" +
+	" cyber/system/v1/file_proxy.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/file.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\"\xba\x01\n" +
 	"\x11UploadFileRequest\x12&\n" +
 	"\x04name\x18\x01 \x01(\tB\r\xbaH\n" +
 	"\xc8\x01\x01r\x05\x10\x01\x18\xff\x01H\x00R\x04name\x88\x01\x01\x120\n" +
@@ -148,10 +148,10 @@ const file_cyber_system_v1_file_proxy_proto_rawDesc = "" +
 	"\r_content_typeB\a\n" +
 	"\x05_data\"?\n" +
 	"\x12UploadFileResponse\x12)\n" +
-	"\x04file\x18\x01 \x01(\v2\x15.cyber.system.v1.FileR\x04file2\xcf\x01\n" +
-	"\x10FileProxyService\x12\xa2\x01\n" +
+	"\x04file\x18\x01 \x01(\v2\x15.cyber.system.v1.FileR\x04file2\xcb\x01\n" +
+	"\x10FileProxyService\x12\x9e\x01\n" +
 	"\n" +
-	"UploadFile\x12\".cyber.system.v1.UploadFileRequest\x1a#.cyber.system.v1.UploadFileResponse\"K\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x19\n" +
+	"UploadFile\x12\".cyber.system.v1.UploadFileRequest\x1a#.cyber.system.v1.UploadFileResponse\"G\x88\xf1\x04\x04\x8a\xd3\x0e\x19\n" +
 	"\x15代理上传小文件\x10\x02\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/system/files/upload\x1a\x16\x8a\xe2\t\x12文件代理上传B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (

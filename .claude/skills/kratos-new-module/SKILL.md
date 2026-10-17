@@ -5,8 +5,10 @@ description: Domain module creation — use when creating a kratos module/<d>/ f
 
 # New domain module (aggregate root)
 
-Procedure: `docs/conventions/kratos/CONVENTIONS.md §7` "Adding a new domain module" — follow it exactly through schema, migrations, wiring, and build. Step 6 carries the wire-pruning trap; read it before wiring anything startup-shaped.
+Read first: `docs/conventions/kratos/CONVENTIONS.md` §1 (layering & module-dependency law), §2 (naming table), §3 (file structure & ordering), §4 (comment discipline).
 
-Rules in force: §1 (layering & module-dependency paradigm), §2 (naming), §3 (file structure & ordering), §4 (comment discipline), §5 (layer specifics).
+Procedure: §7 "Adding a new domain module" — steps 1–6 exactly. Trap before step 6: wire prunes unconsumed providers — anything startup-shaped must hang off a live dependency chain (a `newApp` param or HookRegistry self-registration).
+
+Gates (all exit 0): `./nx run <service>:generate:ent` → `:migrate:diff` → `:migrate:apply` → `:generate:wire` → `:build`, plus `:test` (TestMixinOrder guards the mixin order).
 
 Finish with §7 "Pre-completion self-check" before reporting done.

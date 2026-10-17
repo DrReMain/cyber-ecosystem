@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type AuthzPolicyCreate struct {
 	config
 	mutation *AuthzPolicyMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -239,6 +242,7 @@ func (_c *AuthzPolicyCreate) createSpec() (*AuthzPolicy, *sqlgraph.CreateSpec) {
 		_node = &AuthzPolicy{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(authzpolicy.Table, sqlgraph.NewFieldSpec(authzpolicy.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -274,11 +278,260 @@ func (_c *AuthzPolicyCreate) createSpec() (*AuthzPolicy, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.AuthzPolicy.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AuthzPolicyUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *AuthzPolicyCreate) OnConflict(opts ...sql.ConflictOption) *AuthzPolicyUpsertOne {
+	_c.conflict = opts
+	return &AuthzPolicyUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.AuthzPolicy.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *AuthzPolicyCreate) OnConflictColumns(columns ...string) *AuthzPolicyUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &AuthzPolicyUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// AuthzPolicyUpsertOne is the builder for "upsert"-ing
+	//  one AuthzPolicy node.
+	AuthzPolicyUpsertOne struct {
+		create *AuthzPolicyCreate
+	}
+
+	// AuthzPolicyUpsert is the "OnConflict" setter.
+	AuthzPolicyUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AuthzPolicyUpsert) SetUpdatedAt(v time.Time) *AuthzPolicyUpsert {
+	u.Set(authzpolicy.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AuthzPolicyUpsert) UpdateUpdatedAt() *AuthzPolicyUpsert {
+	u.SetExcluded(authzpolicy.FieldUpdatedAt)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *AuthzPolicyUpsert) SetName(v string) *AuthzPolicyUpsert {
+	u.Set(authzpolicy.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *AuthzPolicyUpsert) UpdateName() *AuthzPolicyUpsert {
+	u.SetExcluded(authzpolicy.FieldName)
+	return u
+}
+
+// SetParams sets the "params" field.
+func (u *AuthzPolicyUpsert) SetParams(v map[string]interface{}) *AuthzPolicyUpsert {
+	u.Set(authzpolicy.FieldParams, v)
+	return u
+}
+
+// UpdateParams sets the "params" field to the value that was provided on create.
+func (u *AuthzPolicyUpsert) UpdateParams() *AuthzPolicyUpsert {
+	u.SetExcluded(authzpolicy.FieldParams)
+	return u
+}
+
+// SetEnabled sets the "enabled" field.
+func (u *AuthzPolicyUpsert) SetEnabled(v bool) *AuthzPolicyUpsert {
+	u.Set(authzpolicy.FieldEnabled, v)
+	return u
+}
+
+// UpdateEnabled sets the "enabled" field to the value that was provided on create.
+func (u *AuthzPolicyUpsert) UpdateEnabled() *AuthzPolicyUpsert {
+	u.SetExcluded(authzpolicy.FieldEnabled)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.AuthzPolicy.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(authzpolicy.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *AuthzPolicyUpsertOne) UpdateNewValues() *AuthzPolicyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(authzpolicy.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(authzpolicy.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(authzpolicy.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.Kind(); exists {
+			s.SetIgnore(authzpolicy.FieldKind)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.AuthzPolicy.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *AuthzPolicyUpsertOne) Ignore() *AuthzPolicyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AuthzPolicyUpsertOne) DoNothing() *AuthzPolicyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AuthzPolicyCreate.OnConflict
+// documentation for more info.
+func (u *AuthzPolicyUpsertOne) Update(set func(*AuthzPolicyUpsert)) *AuthzPolicyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AuthzPolicyUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AuthzPolicyUpsertOne) SetUpdatedAt(v time.Time) *AuthzPolicyUpsertOne {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AuthzPolicyUpsertOne) UpdateUpdatedAt() *AuthzPolicyUpsertOne {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *AuthzPolicyUpsertOne) SetName(v string) *AuthzPolicyUpsertOne {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *AuthzPolicyUpsertOne) UpdateName() *AuthzPolicyUpsertOne {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetParams sets the "params" field.
+func (u *AuthzPolicyUpsertOne) SetParams(v map[string]interface{}) *AuthzPolicyUpsertOne {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.SetParams(v)
+	})
+}
+
+// UpdateParams sets the "params" field to the value that was provided on create.
+func (u *AuthzPolicyUpsertOne) UpdateParams() *AuthzPolicyUpsertOne {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.UpdateParams()
+	})
+}
+
+// SetEnabled sets the "enabled" field.
+func (u *AuthzPolicyUpsertOne) SetEnabled(v bool) *AuthzPolicyUpsertOne {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.SetEnabled(v)
+	})
+}
+
+// UpdateEnabled sets the "enabled" field to the value that was provided on create.
+func (u *AuthzPolicyUpsertOne) UpdateEnabled() *AuthzPolicyUpsertOne {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.UpdateEnabled()
+	})
+}
+
+// Exec executes the query.
+func (u *AuthzPolicyUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AuthzPolicyCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AuthzPolicyUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *AuthzPolicyUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: AuthzPolicyUpsertOne.ID is not supported by MySQL driver. Use AuthzPolicyUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *AuthzPolicyUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // AuthzPolicyCreateBulk is the builder for creating many AuthzPolicy entities in bulk.
 type AuthzPolicyCreateBulk struct {
 	config
 	err      error
 	builders []*AuthzPolicyCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the AuthzPolicy entities in the database.
@@ -308,6 +561,7 @@ func (_c *AuthzPolicyCreateBulk) Save(ctx context.Context) ([]*AuthzPolicy, erro
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -354,6 +608,185 @@ func (_c *AuthzPolicyCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *AuthzPolicyCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.AuthzPolicy.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AuthzPolicyUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *AuthzPolicyCreateBulk) OnConflict(opts ...sql.ConflictOption) *AuthzPolicyUpsertBulk {
+	_c.conflict = opts
+	return &AuthzPolicyUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.AuthzPolicy.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *AuthzPolicyCreateBulk) OnConflictColumns(columns ...string) *AuthzPolicyUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &AuthzPolicyUpsertBulk{
+		create: _c,
+	}
+}
+
+// AuthzPolicyUpsertBulk is the builder for "upsert"-ing
+// a bulk of AuthzPolicy nodes.
+type AuthzPolicyUpsertBulk struct {
+	create *AuthzPolicyCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.AuthzPolicy.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(authzpolicy.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *AuthzPolicyUpsertBulk) UpdateNewValues() *AuthzPolicyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(authzpolicy.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(authzpolicy.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(authzpolicy.FieldTenantID)
+			}
+			if _, exists := b.mutation.Kind(); exists {
+				s.SetIgnore(authzpolicy.FieldKind)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.AuthzPolicy.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *AuthzPolicyUpsertBulk) Ignore() *AuthzPolicyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AuthzPolicyUpsertBulk) DoNothing() *AuthzPolicyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AuthzPolicyCreateBulk.OnConflict
+// documentation for more info.
+func (u *AuthzPolicyUpsertBulk) Update(set func(*AuthzPolicyUpsert)) *AuthzPolicyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AuthzPolicyUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AuthzPolicyUpsertBulk) SetUpdatedAt(v time.Time) *AuthzPolicyUpsertBulk {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AuthzPolicyUpsertBulk) UpdateUpdatedAt() *AuthzPolicyUpsertBulk {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *AuthzPolicyUpsertBulk) SetName(v string) *AuthzPolicyUpsertBulk {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *AuthzPolicyUpsertBulk) UpdateName() *AuthzPolicyUpsertBulk {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetParams sets the "params" field.
+func (u *AuthzPolicyUpsertBulk) SetParams(v map[string]interface{}) *AuthzPolicyUpsertBulk {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.SetParams(v)
+	})
+}
+
+// UpdateParams sets the "params" field to the value that was provided on create.
+func (u *AuthzPolicyUpsertBulk) UpdateParams() *AuthzPolicyUpsertBulk {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.UpdateParams()
+	})
+}
+
+// SetEnabled sets the "enabled" field.
+func (u *AuthzPolicyUpsertBulk) SetEnabled(v bool) *AuthzPolicyUpsertBulk {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.SetEnabled(v)
+	})
+}
+
+// UpdateEnabled sets the "enabled" field to the value that was provided on create.
+func (u *AuthzPolicyUpsertBulk) UpdateEnabled() *AuthzPolicyUpsertBulk {
+	return u.Update(func(s *AuthzPolicyUpsert) {
+		s.UpdateEnabled()
+	})
+}
+
+// Exec executes the query.
+func (u *AuthzPolicyUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AuthzPolicyCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AuthzPolicyCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AuthzPolicyUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

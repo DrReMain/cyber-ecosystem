@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type PermissionPolicyCreate struct {
 	config
 	mutation *PermissionPolicyMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -209,6 +212,7 @@ func (_c *PermissionPolicyCreate) createSpec() (*PermissionPolicy, *sqlgraph.Cre
 		_node = &PermissionPolicy{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(permissionpolicy.Table, sqlgraph.NewFieldSpec(permissionpolicy.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -236,11 +240,185 @@ func (_c *PermissionPolicyCreate) createSpec() (*PermissionPolicy, *sqlgraph.Cre
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.PermissionPolicy.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.PermissionPolicyUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *PermissionPolicyCreate) OnConflict(opts ...sql.ConflictOption) *PermissionPolicyUpsertOne {
+	_c.conflict = opts
+	return &PermissionPolicyUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.PermissionPolicy.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *PermissionPolicyCreate) OnConflictColumns(columns ...string) *PermissionPolicyUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &PermissionPolicyUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// PermissionPolicyUpsertOne is the builder for "upsert"-ing
+	//  one PermissionPolicy node.
+	PermissionPolicyUpsertOne struct {
+		create *PermissionPolicyCreate
+	}
+
+	// PermissionPolicyUpsert is the "OnConflict" setter.
+	PermissionPolicyUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *PermissionPolicyUpsert) SetUpdatedAt(v time.Time) *PermissionPolicyUpsert {
+	u.Set(permissionpolicy.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *PermissionPolicyUpsert) UpdateUpdatedAt() *PermissionPolicyUpsert {
+	u.SetExcluded(permissionpolicy.FieldUpdatedAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.PermissionPolicy.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(permissionpolicy.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *PermissionPolicyUpsertOne) UpdateNewValues() *PermissionPolicyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(permissionpolicy.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(permissionpolicy.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(permissionpolicy.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.PermissionID(); exists {
+			s.SetIgnore(permissionpolicy.FieldPermissionID)
+		}
+		if _, exists := u.create.mutation.PolicyID(); exists {
+			s.SetIgnore(permissionpolicy.FieldPolicyID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.PermissionPolicy.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *PermissionPolicyUpsertOne) Ignore() *PermissionPolicyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *PermissionPolicyUpsertOne) DoNothing() *PermissionPolicyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the PermissionPolicyCreate.OnConflict
+// documentation for more info.
+func (u *PermissionPolicyUpsertOne) Update(set func(*PermissionPolicyUpsert)) *PermissionPolicyUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&PermissionPolicyUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *PermissionPolicyUpsertOne) SetUpdatedAt(v time.Time) *PermissionPolicyUpsertOne {
+	return u.Update(func(s *PermissionPolicyUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *PermissionPolicyUpsertOne) UpdateUpdatedAt() *PermissionPolicyUpsertOne {
+	return u.Update(func(s *PermissionPolicyUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *PermissionPolicyUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for PermissionPolicyCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *PermissionPolicyUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *PermissionPolicyUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: PermissionPolicyUpsertOne.ID is not supported by MySQL driver. Use PermissionPolicyUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *PermissionPolicyUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // PermissionPolicyCreateBulk is the builder for creating many PermissionPolicy entities in bulk.
 type PermissionPolicyCreateBulk struct {
 	config
 	err      error
 	builders []*PermissionPolicyCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the PermissionPolicy entities in the database.
@@ -270,6 +448,7 @@ func (_c *PermissionPolicyCreateBulk) Save(ctx context.Context) ([]*PermissionPo
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -316,6 +495,146 @@ func (_c *PermissionPolicyCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *PermissionPolicyCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.PermissionPolicy.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.PermissionPolicyUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *PermissionPolicyCreateBulk) OnConflict(opts ...sql.ConflictOption) *PermissionPolicyUpsertBulk {
+	_c.conflict = opts
+	return &PermissionPolicyUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.PermissionPolicy.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *PermissionPolicyCreateBulk) OnConflictColumns(columns ...string) *PermissionPolicyUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &PermissionPolicyUpsertBulk{
+		create: _c,
+	}
+}
+
+// PermissionPolicyUpsertBulk is the builder for "upsert"-ing
+// a bulk of PermissionPolicy nodes.
+type PermissionPolicyUpsertBulk struct {
+	create *PermissionPolicyCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.PermissionPolicy.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(permissionpolicy.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *PermissionPolicyUpsertBulk) UpdateNewValues() *PermissionPolicyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(permissionpolicy.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(permissionpolicy.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(permissionpolicy.FieldTenantID)
+			}
+			if _, exists := b.mutation.PermissionID(); exists {
+				s.SetIgnore(permissionpolicy.FieldPermissionID)
+			}
+			if _, exists := b.mutation.PolicyID(); exists {
+				s.SetIgnore(permissionpolicy.FieldPolicyID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.PermissionPolicy.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *PermissionPolicyUpsertBulk) Ignore() *PermissionPolicyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *PermissionPolicyUpsertBulk) DoNothing() *PermissionPolicyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the PermissionPolicyCreateBulk.OnConflict
+// documentation for more info.
+func (u *PermissionPolicyUpsertBulk) Update(set func(*PermissionPolicyUpsert)) *PermissionPolicyUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&PermissionPolicyUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *PermissionPolicyUpsertBulk) SetUpdatedAt(v time.Time) *PermissionPolicyUpsertBulk {
+	return u.Update(func(s *PermissionPolicyUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *PermissionPolicyUpsertBulk) UpdateUpdatedAt() *PermissionPolicyUpsertBulk {
+	return u.Update(func(s *PermissionPolicyUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *PermissionPolicyUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the PermissionPolicyCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for PermissionPolicyCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *PermissionPolicyUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

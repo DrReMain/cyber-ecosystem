@@ -16,11 +16,14 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAgentsRouteRouteImport } from './routes/dashboard/agents/route'
 import { Route as DashboardFilesRouteRouteImport } from './routes/dashboard/files/route'
+import { Route as DashboardPlatformRouteRouteImport } from './routes/dashboard/platform/route'
 import { Route as DashboardProfileRouteRouteImport } from './routes/dashboard/profile/route'
 import { Route as DashboardSystemRouteRouteImport } from './routes/dashboard/system/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as DashboardAgentsConnectionsRouteImport } from './routes/dashboard/agents/connections'
 import { Route as DashboardFilesListRouteImport } from './routes/dashboard/files/list'
+import { Route as DashboardPlatformPopulationsRouteImport } from './routes/dashboard/platform/populations'
+import { Route as DashboardPlatformTenantsRouteImport } from './routes/dashboard/platform/tenants'
 import { Route as DashboardProfileIndexRouteImport } from './routes/dashboard/profile/index'
 import { Route as DashboardProfileAgentsRouteImport } from './routes/dashboard/profile/agents'
 import { Route as DashboardProfilePasswordRouteImport } from './routes/dashboard/profile/password'
@@ -66,6 +69,11 @@ const DashboardFilesRouteRoute = DashboardFilesRouteRouteImport.update({
   path: '/files',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardPlatformRouteRoute = DashboardPlatformRouteRouteImport.update({
+  id: '/platform',
+  path: '/platform',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardProfileRouteRoute = DashboardProfileRouteRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -92,6 +100,18 @@ const DashboardFilesListRoute = DashboardFilesListRouteImport.update({
   path: '/list',
   getParentRoute: () => DashboardFilesRouteRoute,
 } as any)
+const DashboardPlatformPopulationsRoute =
+  DashboardPlatformPopulationsRouteImport.update({
+    id: '/populations',
+    path: '/populations',
+    getParentRoute: () => DashboardPlatformRouteRoute,
+  } as any)
+const DashboardPlatformTenantsRoute =
+  DashboardPlatformTenantsRouteImport.update({
+    id: '/tenants',
+    path: '/tenants',
+    getParentRoute: () => DashboardPlatformRouteRoute,
+  } as any)
 const DashboardProfileIndexRoute = DashboardProfileIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -146,12 +166,15 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
+  '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
   '/dashboard/profile': typeof DashboardProfileRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
   '/dashboard/agents/connections': typeof DashboardAgentsConnectionsRoute
   '/dashboard/files/list': typeof DashboardFilesListRoute
+  '/dashboard/platform/populations': typeof DashboardPlatformPopulationsRoute
+  '/dashboard/platform/tenants': typeof DashboardPlatformTenantsRoute
   '/dashboard/profile/agents': typeof DashboardProfileAgentsRoute
   '/dashboard/profile/password': typeof DashboardProfilePasswordRoute
   '/dashboard/system/audit': typeof DashboardSystemAuditRoute
@@ -168,11 +191,14 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
+  '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard': typeof DashboardIndexRoute
   '/login': typeof LoginIndexRoute
   '/dashboard/agents/connections': typeof DashboardAgentsConnectionsRoute
   '/dashboard/files/list': typeof DashboardFilesListRoute
+  '/dashboard/platform/populations': typeof DashboardPlatformPopulationsRoute
+  '/dashboard/platform/tenants': typeof DashboardPlatformTenantsRoute
   '/dashboard/profile/agents': typeof DashboardProfileAgentsRoute
   '/dashboard/profile/password': typeof DashboardProfilePasswordRoute
   '/dashboard/system/audit': typeof DashboardSystemAuditRoute
@@ -191,12 +217,15 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
+  '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
   '/dashboard/profile': typeof DashboardProfileRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
   '/dashboard/agents/connections': typeof DashboardAgentsConnectionsRoute
   '/dashboard/files/list': typeof DashboardFilesListRoute
+  '/dashboard/platform/populations': typeof DashboardPlatformPopulationsRoute
+  '/dashboard/platform/tenants': typeof DashboardPlatformTenantsRoute
   '/dashboard/profile/agents': typeof DashboardProfileAgentsRoute
   '/dashboard/profile/password': typeof DashboardProfilePasswordRoute
   '/dashboard/system/audit': typeof DashboardSystemAuditRoute
@@ -216,12 +245,15 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard/agents'
     | '/dashboard/files'
+    | '/dashboard/platform'
     | '/dashboard/profile'
     | '/dashboard/system'
     | '/dashboard/'
     | '/login/'
     | '/dashboard/agents/connections'
     | '/dashboard/files/list'
+    | '/dashboard/platform/populations'
+    | '/dashboard/platform/tenants'
     | '/dashboard/profile/agents'
     | '/dashboard/profile/password'
     | '/dashboard/system/audit'
@@ -238,11 +270,14 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard/agents'
     | '/dashboard/files'
+    | '/dashboard/platform'
     | '/dashboard/system'
     | '/dashboard'
     | '/login'
     | '/dashboard/agents/connections'
     | '/dashboard/files/list'
+    | '/dashboard/platform/populations'
+    | '/dashboard/platform/tenants'
     | '/dashboard/profile/agents'
     | '/dashboard/profile/password'
     | '/dashboard/system/audit'
@@ -260,12 +295,15 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/dashboard/agents'
     | '/dashboard/files'
+    | '/dashboard/platform'
     | '/dashboard/profile'
     | '/dashboard/system'
     | '/dashboard/'
     | '/login/'
     | '/dashboard/agents/connections'
     | '/dashboard/files/list'
+    | '/dashboard/platform/populations'
+    | '/dashboard/platform/tenants'
     | '/dashboard/profile/agents'
     | '/dashboard/profile/password'
     | '/dashboard/system/audit'
@@ -336,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardFilesRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/platform': {
+      id: '/dashboard/platform'
+      path: '/platform'
+      fullPath: '/dashboard/platform'
+      preLoaderRoute: typeof DashboardPlatformRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/profile': {
       id: '/dashboard/profile'
       path: '/profile'
@@ -370,6 +415,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/files/list'
       preLoaderRoute: typeof DashboardFilesListRouteImport
       parentRoute: typeof DashboardFilesRouteRoute
+    }
+    '/dashboard/platform/populations': {
+      id: '/dashboard/platform/populations'
+      path: '/populations'
+      fullPath: '/dashboard/platform/populations'
+      preLoaderRoute: typeof DashboardPlatformPopulationsRouteImport
+      parentRoute: typeof DashboardPlatformRouteRoute
+    }
+    '/dashboard/platform/tenants': {
+      id: '/dashboard/platform/tenants'
+      path: '/tenants'
+      fullPath: '/dashboard/platform/tenants'
+      preLoaderRoute: typeof DashboardPlatformTenantsRouteImport
+      parentRoute: typeof DashboardPlatformRouteRoute
     }
     '/dashboard/profile/': {
       id: '/dashboard/profile/'
@@ -459,6 +518,22 @@ const DashboardFilesRouteRouteChildren: DashboardFilesRouteRouteChildren = {
 const DashboardFilesRouteRouteWithChildren =
   DashboardFilesRouteRoute._addFileChildren(DashboardFilesRouteRouteChildren)
 
+interface DashboardPlatformRouteRouteChildren {
+  DashboardPlatformPopulationsRoute: typeof DashboardPlatformPopulationsRoute
+  DashboardPlatformTenantsRoute: typeof DashboardPlatformTenantsRoute
+}
+
+const DashboardPlatformRouteRouteChildren: DashboardPlatformRouteRouteChildren =
+  {
+    DashboardPlatformPopulationsRoute: DashboardPlatformPopulationsRoute,
+    DashboardPlatformTenantsRoute: DashboardPlatformTenantsRoute,
+  }
+
+const DashboardPlatformRouteRouteWithChildren =
+  DashboardPlatformRouteRoute._addFileChildren(
+    DashboardPlatformRouteRouteChildren,
+  )
+
 interface DashboardProfileRouteRouteChildren {
   DashboardProfileAgentsRoute: typeof DashboardProfileAgentsRoute
   DashboardProfilePasswordRoute: typeof DashboardProfilePasswordRoute
@@ -500,6 +575,7 @@ const DashboardSystemRouteRouteWithChildren =
 interface DashboardRouteRouteChildren {
   DashboardAgentsRouteRoute: typeof DashboardAgentsRouteRouteWithChildren
   DashboardFilesRouteRoute: typeof DashboardFilesRouteRouteWithChildren
+  DashboardPlatformRouteRoute: typeof DashboardPlatformRouteRouteWithChildren
   DashboardProfileRouteRoute: typeof DashboardProfileRouteRouteWithChildren
   DashboardSystemRouteRoute: typeof DashboardSystemRouteRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -508,6 +584,7 @@ interface DashboardRouteRouteChildren {
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAgentsRouteRoute: DashboardAgentsRouteRouteWithChildren,
   DashboardFilesRouteRoute: DashboardFilesRouteRouteWithChildren,
+  DashboardPlatformRouteRoute: DashboardPlatformRouteRouteWithChildren,
   DashboardProfileRouteRoute: DashboardProfileRouteRouteWithChildren,
   DashboardSystemRouteRoute: DashboardSystemRouteRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,

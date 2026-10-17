@@ -1,10 +1,11 @@
 import type { Dept } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/dept_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TableProps } from "antd";
-import { Button, Popconfirm, Space, Typography } from "antd";
+import { Button, Space, Typography } from "antd";
+import { GitBranchPlus, Pencil, Trash } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ActionIconButton } from "#/components/action-icon-button";
 import { m } from "#/paraglide/messages";
-import { getTextDirection } from "#/paraglide/runtime";
 import { collectRowKeys, type DeptRow } from "../types";
 
 interface DeptsTableProps {
@@ -64,24 +65,26 @@ export function DeptsTable({
     fieldAction<DeptRow>(
       (_, row) => (
         <Space size={0}>
-          <Button color="primary" onClick={() => onEdit(row.dept)} size="small" variant="text">
-            {m.system_depts_act_edit()}
-          </Button>
-          <Button color="default" onClick={() => onAddChild(row.dept)} size="small" variant="text">
-            {m.system_depts_act_add_child()}
-          </Button>
-          <Popconfirm
-            cancelButtonProps={{ variant: "filled", color: "default" }}
-            description={m.system_depts_delete_confirm_desc()}
-            okButtonProps={{ variant: "filled", color: "danger" }}
-            onConfirm={() => onDelete(row.dept)}
-            placement={getTextDirection() === "rtl" ? "right" : "left"}
-            title={m.system_depts_delete_confirm()}
-          >
-            <Button color="danger" disabled={pendingId === row.dept.id} size="small" variant="text">
-              {m.system_depts_act_delete()}
-            </Button>
-          </Popconfirm>
+          <ActionIconButton
+            icon={Pencil}
+            label={m.system_depts_act_edit()}
+            onClick={() => onEdit(row.dept)}
+          />
+          <ActionIconButton
+            icon={GitBranchPlus}
+            label={m.system_depts_act_add_child()}
+            onClick={() => onAddChild(row.dept)}
+          />
+          <ActionIconButton
+            confirm={{
+              description: m.system_depts_delete_confirm_desc(),
+              onConfirm: () => onDelete(row.dept),
+              title: m.system_depts_delete_confirm(),
+            }}
+            disabled={pendingId === row.dept.id}
+            icon={Trash}
+            label={m.system_depts_act_delete()}
+          />
         </Space>
       ),
       { title: m.system_depts_col_actions() },

@@ -76,8 +76,21 @@
   "error_SYSTEM_USER_SELF_DELETE": "لا يمكن حذف الحساب المسجّل به حاليًا.",
   "error_SYSTEM_USER_SELF_DISABLE": "لا يمكن إيقاف الحساب الذي سجّلت الدخول به.",
   "error_SYSTEM_USER_DISABLED": "هذا الحساب موقوف - تواصل مع المسؤول.",
+  "error_SYSTEM_USER_NOT_FOUND": "هذا الحساب غير موجود.",
+  "error_SYSTEM_USER_EMAIL_TAKEN": "هذا البريد الإلكتروني مستخدم بالفعل",
   "error_SYSTEM_FILE_NOT_FOUND": "الملف غير موجود.",
   "error_SYSTEM_FILE_TOO_LARGE": "الملف يتجاوز حد الحجم.",
   "error_SYSTEM_FILE_SIZE_MISMATCH": "حجم الملف المرفوع لا يطابق الحجم المصرّح به.",
-  "error_SYSTEM_FILE_INVALID_STATE": "حالة الملف لا تسمح بهذه العملية."
+  "error_SYSTEM_FILE_INVALID_STATE": "حالة الملف لا تسمح بهذه العملية.",
+  "error_SYSTEM_TENANT_DISABLED": "تم تعطيل هذا المستأجر",
+  "error_SYSTEM_TENANT_NOT_FOUND": "المستأجر غير موجود",
+  "error_SYSTEM_TENANT_PROTECTED": "لا يمكن تعطيل المستأجر الافتراضي",
+  "error_SYSTEM_LOGIN_SEAT_REQUIRED": "يحمل هذا الحساب عدة انتماءات؛ اختر واحدًا للمتابعة",
+  "error_SYSTEM_POPULATION_EXISTS": "رمز نوع المستخدم هذا موجود بالفعل",
+  "error_SYSTEM_POPULATION_PROTECTED": "النوع الافتراضي من المستخدمين يُنشأ بالتهيئة ولا يمكن إنشاؤه يدويًا",
+  "error_SYSTEM_POPULATION_INVALID_ARCHETYPE": "وضع صلاحيات غير معروف",
+  "error_SYSTEM_POPULATION_NOT_FOUND": "نوع المستخدم غير موجود",
+  "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "مزود الهوية غير مكون أو معطل",
+  "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "فشل تبادل الهوية من طرف ثالث",
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "هذه الهوية الخارجية مرتبطة بالفعل بحساب آخر"
 }

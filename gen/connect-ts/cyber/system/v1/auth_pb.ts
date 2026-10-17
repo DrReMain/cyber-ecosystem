@@ -8,7 +8,6 @@ import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
 import type { User } from "./user_pb";
 import { file_cyber_system_v1_user } from "./user_pb";
 import { file_ext_v1_access } from "../../../ext/v1/access_pb";
-import { file_ext_v1_authz } from "../../../ext/v1/authz_pb";
 import { file_ext_v1_desc } from "../../../ext/v1/desc_pb";
 import { file_google_api_annotations } from "../../../google/api/annotations_pb";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
@@ -19,7 +18,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/system/v1/auth.proto.
  */
 export const file_cyber_system_v1_auth: GenFile = /*@__PURE__*/
-  fileDesc("ChpjeWJlci9zeXN0ZW0vdjEvYXV0aC5wcm90bxIPY3liZXIuc3lzdGVtLnYxImgKDExvZ2luUmVxdWVzdBIeCgVlbWFpbBgBIAEoCUIKukgHyAEBcgIQAUgAiAEBEiEKCHBhc3N3b3JkGAIgASgJQgq6SAfIAQFyAhABSAGIAQFCCAoGX2VtYWlsQgsKCV9wYXNzd29yZCKFAQoNTG9naW5SZXNwb25zZRIVCg1zZXNzaW9uX3Rva2VuGAEgASgJEi0KCWlzc3VlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiDwoNTG9nb3V0UmVxdWVzdCIQCg5Mb2dvdXRSZXNwb25zZSIXChVHZXRDdXJyZW50VXNlclJlcXVlc3QiUgoWR2V0Q3VycmVudFVzZXJSZXNwb25zZRIjCgR1c2VyGAEgASgLMhUuY3liZXIuc3lzdGVtLnYxLlVzZXISEwoLcGVybWlzc2lvbnMYAiADKAky0gMKC0F1dGhTZXJ2aWNlEn4KBUxvZ2luEh0uY3liZXIuc3lzdGVtLnYxLkxvZ2luUmVxdWVzdBoeLmN5YmVyLnN5c3RlbS52MS5Mb2dpblJlc3BvbnNlIjaI8QQBitMOCgoG55m75b2VEAKC0+STAh46ASoiGS9hcGkvdjEvc3lzdGVtL2F1dGgvbG9naW4ShgEKBkxvZ291dBIeLmN5YmVyLnN5c3RlbS52MS5Mb2dvdXRSZXF1ZXN0Gh8uY3liZXIuc3lzdGVtLnYxLkxvZ291dFJlc3BvbnNlIjuI8QQCkPEEAYrTDgoKBueZu+WHuhACgtPkkwIfOgEqIhovYXBpL3YxL3N5c3RlbS9hdXRoL2xvZ291dBKkAQoOR2V0Q3VycmVudFVzZXISJi5jeWJlci5zeXN0ZW0udjEuR2V0Q3VycmVudFVzZXJSZXF1ZXN0GicuY3liZXIuc3lzdGVtLnYxLkdldEN1cnJlbnRVc2VyUmVzcG9uc2UiQYjxBAKQ8QQBitMOHAoY6I635Y+W5b2T5YmN55m75b2V55So5oi3EAGC0+STAhMSES9hcGkvdjEvc3lzdGVtL21lGhOK4gkP6K6k6K+B5LiO5Lya6K+dQihaJmN5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvc3lzdGVtL3YxYgZwcm90bzM", [file_buf_validate_validate, file_cyber_system_v1_user, file_ext_v1_access, file_ext_v1_authz, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp]);
+  fileDesc("ChpjeWJlci9zeXN0ZW0vdjEvYXV0aC5wcm90bxIPY3liZXIuc3lzdGVtLnYxImgKDExvZ2luUmVxdWVzdBIeCgVlbWFpbBgBIAEoCUIKukgHyAEBcgIQAUgAiAEBEiEKCHBhc3N3b3JkGAIgASgJQgq6SAfIAQFyAhABSAGIAQFCCAoGX2VtYWlsQgsKCV9wYXNzd29yZCKFAQoNTG9naW5SZXNwb25zZRIVCg1zZXNzaW9uX3Rva2VuGAEgASgJEi0KCWlzc3VlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiwwEKFkxvZ2luQnlJZGVudGl0eVJlcXVlc3QSIwoIcHJvdmlkZXIYASABKAlCDLpICcgBAXIEEAEYQEgBiAEBEjgKBndlY2hhdBgCIAEoCzImLmN5YmVyLnN5c3RlbS52MS5XZUNoYXRJZGVudGl0eVBheWxvYWRIABIhCgVzdGF0ZRgDIAEoCUINukgKyAEBcgUQARiAAUgCiAEBQhAKB3BheWxvYWQSBbpIAggBQgsKCV9wcm92aWRlckIICgZfc3RhdGUiPwoVV2VDaGF0SWRlbnRpdHlQYXlsb2FkEh0KBGNvZGUYASABKAlCCrpIB8gBAXICEAFIAIgBAUIHCgVfY29kZSKPAQoXTG9naW5CeUlkZW50aXR5UmVzcG9uc2USFQoNc2Vzc2lvbl90b2tlbhgBIAEoCRItCglpc3N1ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIogBChlCZWdpbklkZW50aXR5TG9naW5SZXF1ZXN0EiMKCHByb3ZpZGVyGAEgASgJQgy6SAnIAQFyBBABGEBIAIgBARIoCgxyZWRpcmVjdF91cmkYAiABKAlCDbpICsgBAXIFEAEYgARIAYgBAUILCglfcHJvdmlkZXJCDwoNX3JlZGlyZWN0X3VyaSIzChpCZWdpbklkZW50aXR5TG9naW5SZXNwb25zZRIVCg1hdXRob3JpemVfdXJsGAEgASgJIsIBChVCaW5kQ3JlZGVudGlhbFJlcXVlc3QSIwoIcHJvdmlkZXIYASABKAlCDLpICcgBAXIEEAEYQEgBiAEBEjgKBndlY2hhdBgCIAEoCzImLmN5YmVyLnN5c3RlbS52MS5XZUNoYXRJZGVudGl0eVBheWxvYWRIABIhCgVzdGF0ZRgDIAEoCUINukgKyAEBcgUQARiAAUgCiAEBQhAKB3BheWxvYWQSBbpIAggBQgsKCV9wcm92aWRlckIICgZfc3RhdGUiGAoWQmluZENyZWRlbnRpYWxSZXNwb25zZSIPCg1Mb2dvdXRSZXF1ZXN0IhAKDkxvZ291dFJlc3BvbnNlIhcKFUdldEN1cnJlbnRVc2VyUmVxdWVzdCKEAQoWR2V0Q3VycmVudFVzZXJSZXNwb25zZRIjCgR1c2VyGAEgASgLMhUuY3liZXIuc3lzdGVtLnYxLlVzZXISEwoLcGVybWlzc2lvbnMYAiADKAkSMAoLbWVtYmVyc2hpcHMYAyADKAsyGy5jeWJlci5zeXN0ZW0udjEuTWVtYmVyc2hpcCIwCgpNZW1iZXJzaGlwEg4KBnRlbmFudBgBIAEoCRISCgpwb3B1bGF0aW9uGAIgASgJMq8ICgtBdXRoU2VydmljZRJ+CgVMb2dpbhIdLmN5YmVyLnN5c3RlbS52MS5Mb2dpblJlcXVlc3QaHi5jeWJlci5zeXN0ZW0udjEuTG9naW5SZXNwb25zZSI2iPEEAYrTDgoKBueZu+W9lRACgtPkkwIeOgEqIhkvYXBpL3YxL3N5c3RlbS9hdXRoL2xvZ2luEs8BCg9Mb2dpbkJ5SWRlbnRpdHkSJy5jeWJlci5zeXN0ZW0udjEuTG9naW5CeUlkZW50aXR5UmVxdWVzdBooLmN5YmVyLnN5c3RlbS52MS5Mb2dpbkJ5SWRlbnRpdHlSZXNwb25zZSJpiPEEAYrTDjEKLei6q+S7veS6pOaNoueZu+W9le+8muesrOS4ieaWueWHreivgeaNouS8muivnRACgtPkkwIqOgEqIiUvYXBpL3YxL3N5c3RlbS9hdXRoL2xvZ2luLWJ5LWlkZW50aXR5EtUBChJCZWdpbklkZW50aXR5TG9naW4SKi5jeWJlci5zeXN0ZW0udjEuQmVnaW5JZGVudGl0eUxvZ2luUmVxdWVzdBorLmN5YmVyLnN5c3RlbS52MS5CZWdpbklkZW50aXR5TG9naW5SZXNwb25zZSJmiPEEAYrTDisKJ+WPkei1t+i6q+S7veeZu+W9le+8mumTuOmAoOaOiOadg+i3s+i9rBABgtPkkwItOgEqIigvYXBpL3YxL3N5c3RlbS9hdXRoL2JlZ2luLWlkZW50aXR5LWxvZ2luErgBCg5CaW5kQ3JlZGVudGlhbBImLmN5YmVyLnN5c3RlbS52MS5CaW5kQ3JlZGVudGlhbFJlcXVlc3QaJy5jeWJlci5zeXN0ZW0udjEuQmluZENyZWRlbnRpYWxSZXNwb25zZSJViPEEBIrTDh8KG+e7keWumuesrOS4ieaWuei6q+S7veWHreivgRACgtPkkwIoOgEqIiMvYXBpL3YxL3N5c3RlbS9hdXRoL2JpbmQtY3JlZGVudGlhbBKCAQoGTG9nb3V0Eh4uY3liZXIuc3lzdGVtLnYxLkxvZ291dFJlcXVlc3QaHy5jeWJlci5zeXN0ZW0udjEuTG9nb3V0UmVzcG9uc2UiN4jxBASK0w4KCgbnmbvlh7oQAoLT5JMCHzoBKiIaL2FwaS92MS9zeXN0ZW0vYXV0aC9sb2dvdXQSoAEKDkdldEN1cnJlbnRVc2VyEiYuY3liZXIuc3lzdGVtLnYxLkdldEN1cnJlbnRVc2VyUmVxdWVzdBonLmN5YmVyLnN5c3RlbS52MS5HZXRDdXJyZW50VXNlclJlc3BvbnNlIj2I8QQEitMOHAoY6I635Y+W5b2T5YmN55m75b2V55So5oi3EAGC0+STAhMSES9hcGkvdjEvc3lzdGVtL21lGhOK4gkP6K6k6K+B5LiO5Lya6K+dQihaJmN5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvc3lzdGVtL3YxYgZwcm90bzM", [file_buf_validate_validate, file_cyber_system_v1_user, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message cyber.system.v1.LoginRequest
@@ -71,6 +70,170 @@ export const LoginResponseSchema: GenMessage<LoginResponse> = /*@__PURE__*/
   messageDesc(file_cyber_system_v1_auth, 1);
 
 /**
+ * @generated from message cyber.system.v1.LoginByIdentityRequest
+ */
+export type LoginByIdentityRequest = Message<"cyber.system.v1.LoginByIdentityRequest"> & {
+  /**
+   * @generated from field: optional string provider = 1;
+   */
+  provider?: string | undefined;
+
+  /**
+   * @generated from oneof cyber.system.v1.LoginByIdentityRequest.payload
+   */
+  payload: {
+    /**
+     * @generated from field: cyber.system.v1.WeChatIdentityPayload wechat = 2;
+     */
+    value: WeChatIdentityPayload;
+    case: "wechat";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * @generated from field: optional string state = 3;
+   */
+  state?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.LoginByIdentityRequest.
+ * Use `create(LoginByIdentityRequestSchema)` to create a new message.
+ */
+export const LoginByIdentityRequestSchema: GenMessage<LoginByIdentityRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 2);
+
+/**
+ * @generated from message cyber.system.v1.WeChatIdentityPayload
+ */
+export type WeChatIdentityPayload = Message<"cyber.system.v1.WeChatIdentityPayload"> & {
+  /**
+   * OAuth authorization code from the wechat redirect.
+   *
+   * @generated from field: optional string code = 1;
+   */
+  code?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.WeChatIdentityPayload.
+ * Use `create(WeChatIdentityPayloadSchema)` to create a new message.
+ */
+export const WeChatIdentityPayloadSchema: GenMessage<WeChatIdentityPayload> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 3);
+
+/**
+ * @generated from message cyber.system.v1.LoginByIdentityResponse
+ */
+export type LoginByIdentityResponse = Message<"cyber.system.v1.LoginByIdentityResponse"> & {
+  /**
+   * @generated from field: string session_token = 1;
+   */
+  sessionToken: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp issued_at = 2;
+   */
+  issuedAt?: Timestamp | undefined;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp expires_at = 3;
+   */
+  expiresAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.LoginByIdentityResponse.
+ * Use `create(LoginByIdentityResponseSchema)` to create a new message.
+ */
+export const LoginByIdentityResponseSchema: GenMessage<LoginByIdentityResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 4);
+
+/**
+ * @generated from message cyber.system.v1.BeginIdentityLoginRequest
+ */
+export type BeginIdentityLoginRequest = Message<"cyber.system.v1.BeginIdentityLoginRequest"> & {
+  /**
+   * @generated from field: optional string provider = 1;
+   */
+  provider?: string | undefined;
+
+  /**
+   * @generated from field: optional string redirect_uri = 2;
+   */
+  redirectUri?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.BeginIdentityLoginRequest.
+ * Use `create(BeginIdentityLoginRequestSchema)` to create a new message.
+ */
+export const BeginIdentityLoginRequestSchema: GenMessage<BeginIdentityLoginRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 5);
+
+/**
+ * @generated from message cyber.system.v1.BeginIdentityLoginResponse
+ */
+export type BeginIdentityLoginResponse = Message<"cyber.system.v1.BeginIdentityLoginResponse"> & {
+  /**
+   * @generated from field: string authorize_url = 1;
+   */
+  authorizeUrl: string;
+};
+
+/**
+ * Describes the message cyber.system.v1.BeginIdentityLoginResponse.
+ * Use `create(BeginIdentityLoginResponseSchema)` to create a new message.
+ */
+export const BeginIdentityLoginResponseSchema: GenMessage<BeginIdentityLoginResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 6);
+
+/**
+ * @generated from message cyber.system.v1.BindCredentialRequest
+ */
+export type BindCredentialRequest = Message<"cyber.system.v1.BindCredentialRequest"> & {
+  /**
+   * @generated from field: optional string provider = 1;
+   */
+  provider?: string | undefined;
+
+  /**
+   * @generated from oneof cyber.system.v1.BindCredentialRequest.payload
+   */
+  payload: {
+    /**
+     * @generated from field: cyber.system.v1.WeChatIdentityPayload wechat = 2;
+     */
+    value: WeChatIdentityPayload;
+    case: "wechat";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * @generated from field: optional string state = 3;
+   */
+  state?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.BindCredentialRequest.
+ * Use `create(BindCredentialRequestSchema)` to create a new message.
+ */
+export const BindCredentialRequestSchema: GenMessage<BindCredentialRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 7);
+
+/**
+ * @generated from message cyber.system.v1.BindCredentialResponse
+ */
+export type BindCredentialResponse = Message<"cyber.system.v1.BindCredentialResponse"> & {
+};
+
+/**
+ * Describes the message cyber.system.v1.BindCredentialResponse.
+ * Use `create(BindCredentialResponseSchema)` to create a new message.
+ */
+export const BindCredentialResponseSchema: GenMessage<BindCredentialResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 8);
+
+/**
  * @generated from message cyber.system.v1.LogoutRequest
  */
 export type LogoutRequest = Message<"cyber.system.v1.LogoutRequest"> & {
@@ -81,7 +244,7 @@ export type LogoutRequest = Message<"cyber.system.v1.LogoutRequest"> & {
  * Use `create(LogoutRequestSchema)` to create a new message.
  */
 export const LogoutRequestSchema: GenMessage<LogoutRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_auth, 2);
+  messageDesc(file_cyber_system_v1_auth, 9);
 
 /**
  * @generated from message cyber.system.v1.LogoutResponse
@@ -94,7 +257,7 @@ export type LogoutResponse = Message<"cyber.system.v1.LogoutResponse"> & {
  * Use `create(LogoutResponseSchema)` to create a new message.
  */
 export const LogoutResponseSchema: GenMessage<LogoutResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_auth, 3);
+  messageDesc(file_cyber_system_v1_auth, 10);
 
 /**
  * getCurrentUser
@@ -109,7 +272,7 @@ export type GetCurrentUserRequest = Message<"cyber.system.v1.GetCurrentUserReque
  * Use `create(GetCurrentUserRequestSchema)` to create a new message.
  */
 export const GetCurrentUserRequestSchema: GenMessage<GetCurrentUserRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_auth, 4);
+  messageDesc(file_cyber_system_v1_auth, 11);
 
 /**
  * @generated from message cyber.system.v1.GetCurrentUserResponse
@@ -124,6 +287,11 @@ export type GetCurrentUserResponse = Message<"cyber.system.v1.GetCurrentUserResp
    * @generated from field: repeated string permissions = 2;
    */
   permissions: string[];
+
+  /**
+   * @generated from field: repeated cyber.system.v1.Membership memberships = 3;
+   */
+  memberships: Membership[];
 };
 
 /**
@@ -131,7 +299,32 @@ export type GetCurrentUserResponse = Message<"cyber.system.v1.GetCurrentUserResp
  * Use `create(GetCurrentUserResponseSchema)` to create a new message.
  */
 export const GetCurrentUserResponseSchema: GenMessage<GetCurrentUserResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_auth, 5);
+  messageDesc(file_cyber_system_v1_auth, 12);
+
+/**
+ * Plain scalars by the success-implies-present carve-out: a seat row always
+ * carries its two join keys.
+ *
+ * @generated from message cyber.system.v1.Membership
+ */
+export type Membership = Message<"cyber.system.v1.Membership"> & {
+  /**
+   * @generated from field: string tenant = 1;
+   */
+  tenant: string;
+
+  /**
+   * @generated from field: string population = 2;
+   */
+  population: string;
+};
+
+/**
+ * Describes the message cyber.system.v1.Membership.
+ * Use `create(MembershipSchema)` to create a new message.
+ */
+export const MembershipSchema: GenMessage<Membership> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 13);
 
 /**
  * @generated from service cyber.system.v1.AuthService
@@ -144,6 +337,30 @@ export const AuthService: GenService<{
     methodKind: "unary";
     input: typeof LoginRequestSchema;
     output: typeof LoginResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.LoginByIdentity
+   */
+  loginByIdentity: {
+    methodKind: "unary";
+    input: typeof LoginByIdentityRequestSchema;
+    output: typeof LoginByIdentityResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.BeginIdentityLogin
+   */
+  beginIdentityLogin: {
+    methodKind: "unary";
+    input: typeof BeginIdentityLoginRequestSchema;
+    output: typeof BeginIdentityLoginResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.BindCredential
+   */
+  bindCredential: {
+    methodKind: "unary";
+    input: typeof BindCredentialRequestSchema;
+    output: typeof BindCredentialResponseSchema;
   },
   /**
    * @generated from rpc cyber.system.v1.AuthService.Logout

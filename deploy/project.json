@@ -3,6 +3,13 @@
   "name": "deploy",
   "root": "deploy",
   "targets": {
+    "image:pg-extended": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "docker image inspect --format ok pg-extended:18.6 || docker build -t pg-extended:18.6 deploy/images/pg-extended"
+      }
+    },
     "edge:start": {
       "executor": "nx:run-commands",
       "options": {
@@ -19,6 +26,14 @@
     },
     "db:start": {
       "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": [
+            "deploy"
+          ],
+          "target": "image:pg-extended"
+        }
+      ],
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "docker compose -f deploy/docker/compose.dev.yaml --profile db up -d --wait"
@@ -89,6 +104,14 @@
     },
     "observability:start": {
       "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": [
+            "deploy"
+          ],
+          "target": "image:pg-extended"
+        }
+      ],
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "docker compose -f deploy/docker/compose.dev.yaml --profile db --profile observability up -d --wait"
@@ -103,6 +126,14 @@
     },
     "start": {
       "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": [
+            "deploy"
+          ],
+          "target": "image:pg-extended"
+        }
+      ],
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "docker compose -f deploy/docker/compose.dev.yaml --profile db --profile storage --profile mq up -d --wait"
@@ -133,6 +164,12 @@
       "dependsOn": [
         {
           "projects": [
+            "deploy"
+          ],
+          "target": "image:pg-extended"
+        },
+        {
+          "projects": [
             "system",
             "agent",
             "@cyber-ecosystem/admin"
@@ -142,7 +179,7 @@
       ],
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "VERSION=$(git describe --tags --always) docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait"
+        "command": "VERSION=$(git describe --tags --always --match 'v*') docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait"
       }
     },
     "app:stop": {
@@ -164,25 +201,10 @@
       "dependsOn": [
         {
           "projects": [
-            "system",
-            "agent",
-            "@cyber-ecosystem/admin"
+            "deploy"
           ],
-          "target": "image"
-        }
-      ],
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "commands": [
-          "VERSION=$(git describe --tags --always) docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait",
-          "docker compose -f deploy/docker/compose.edge.yaml up -d --wait"
-        ],
-        "parallel": false
-      }
-    },
-    "pre:full:start": {
-      "executor": "nx:run-commands",
-      "dependsOn": [
+          "target": "image:pg-extended"
+        },
         {
           "projects": [
             "system",
@@ -195,7 +217,34 @@
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          "VERSION=$(git describe --tags --always) docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile mq --profile realtime --profile media --profile observability --profile app up -d --wait",
+          "VERSION=$(git describe --tags --always --match 'v*') docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait",
+          "docker compose -f deploy/docker/compose.edge.yaml up -d --wait"
+        ],
+        "parallel": false
+      }
+    },
+    "pre:full:start": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": [
+            "deploy"
+          ],
+          "target": "image:pg-extended"
+        },
+        {
+          "projects": [
+            "system",
+            "agent",
+            "@cyber-ecosystem/admin"
+          ],
+          "target": "image"
+        }
+      ],
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "VERSION=$(git describe --tags --always --match 'v*') docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile mq --profile realtime --profile media --profile observability --profile app up -d --wait",
           "docker compose -f deploy/docker/compose.edge.yaml up -d --wait"
         ],
         "parallel": false

@@ -845,7 +845,7 @@ const file_cyber_system_v1_file_proto_rawDesc = "" +
 	"FileSource\x12\x1b\n" +
 	"\x17FILE_SOURCE_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19FILE_SOURCE_CLIENT_UPLOAD\x10\x01\x12 \n" +
-	"\x1cFILE_SOURCE_SERVER_GENERATED\x10\x022\xb6\x06\n" +
+	"\x1cFILE_SOURCE_SERVER_GENERATED\x10\x022\xb2\x06\n" +
 	"\vFileService\x12\x9f\x01\n" +
 	"\n" +
 	"RenameFile\x12\".cyber.system.v1.RenameFileRequest\x1a#.cyber.system.v1.RenameFileResponse\"H\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x13\n" +
@@ -856,8 +856,8 @@ const file_cyber_system_v1_file_proto_rawDesc = "" +
 	"\tListFiles\x12!.cyber.system.v1.ListFilesRequest\x1a\".cyber.system.v1.ListFilesResponse\">\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
 	"\x12查询文件列表\x10\x01\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/system/files\x12\x91\x01\n" +
 	"\aGetFile\x12\x1f.cyber.system.v1.GetFileRequest\x1a .cyber.system.v1.GetFileResponse\"C\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
-	"\x12查询文件详情\x10\x01\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/files/{id}\x12\xb2\x01\n" +
-	"\vGetFileUrls\x12#.cyber.system.v1.GetFileUrlsRequest\x1a$.cyber.system.v1.GetFileUrlsResponse\"X\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e(\n" +
+	"\x12查询文件详情\x10\x01\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/files/{id}\x12\xae\x01\n" +
+	"\vGetFileUrls\x12#.cyber.system.v1.GetFileUrlsRequest\x1a$.cyber.system.v1.GetFileUrlsResponse\"T\x88\xf1\x04\x04\x8a\xd3\x0e(\n" +
 	"$铸造文件下载地址（批量）\x10\x01\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/system/files/urls\x1a\x10\x8a\xe2\t\f文件管理B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (

@@ -21,38 +21,22 @@ type Authenticator interface {
 // ErrMissingSession denies requests without a usable session credential.
 var ErrMissingSession = errors.Unauthorized("MISSING_SESSION", "")
 
-type Option func(*options)
-
-type options struct {
-	cookieName string
-}
-
-// SessionCookie sets the cookie the middleware reads the session token
-// from; it is required.
-func SessionCookie(name string) Option {
-	return func(o *options) { o.cookieName = name }
-}
+// SessionCookieName is the session cookie's wire contract across every
+// server, outbound forwarder, and client in the ecosystem — the single
+// home. Consumers reference it; a re-spelled literal drifts silently.
+const SessionCookieName = "session_token"
 
 // SessionAuth authenticates requests by their session cookie and injects
 // the resolved subject into the context. Everything fails closed: missing
 // transport, missing cookie, and a nil subject all deny.
-func SessionAuth(authn Authenticator, opts ...Option) middleware.Middleware {
-	o := &options{}
-	for _, opt := range opts {
-		opt(o)
-	}
-	// Without a cookie name every request would fail with a confusing
-	// MISSING_SESSION; that is wiring breakage, so it fails loudly here.
-	if o.cookieName == "" {
-		panic("SessionAuth: SessionCookie(name) is required")
-	}
+func SessionAuth(authn Authenticator) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
 			tr, ok := transport.FromServerContext(ctx)
 			if !ok {
 				return nil, ErrMissingSession
 			}
-			token := cookieValue(tr.RequestHeader(), o.cookieName)
+			token := cookieValue(tr.RequestHeader(), SessionCookieName)
 			if token == "" {
 				return nil, ErrMissingSession
 			}

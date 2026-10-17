@@ -9,18 +9,14 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware/metadata"
 	"github.com/go-kratos/kratos/v3/middleware/ratelimit"
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
-	"github.com/go-kratos/kratos/v3/middleware/selector"
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 
 	kaudit "cyber-ecosystem/shared-go/kratos/audit"
 	"cyber-ecosystem/shared-go/kratos/middleware/sanitize"
 	"cyber-ecosystem/shared-go/kratos/middleware/validator"
 	"cyber-ecosystem/shared-go/kratos/observability"
-	"cyber-ecosystem/shared-go/kratos/security"
 	krauth "cyber-ecosystem/shared-go/kratos/security/auth"
 	kauthz "cyber-ecosystem/shared-go/kratos/security/authz"
-
-	extv1 "cyber-ecosystem/gen/go/cyber/ext/v1"
 
 	"cyber-ecosystem/app/services/system/internal/conf"
 )
@@ -42,12 +38,7 @@ func NewGRPCServer(
 	middlewares = append(middlewares, recovery.Recovery(recovery.WithLogger(observability.PrettyProto(logger))))
 	middlewares = append(middlewares, ratelimit.Server())
 	middlewares = append(middlewares, metadata.Server())
-	middlewares = append(middlewares, selector.Server(security.DefaultGuard()).Match(security.MatchAccess(extv1.Access_ACCESS_UNSPECIFIED)).Build())
-	middlewares = append(middlewares, selector.Server(
-		krauth.SessionAuth(authn, krauth.SessionCookie("session_token")),
-		kaudit.Audit(auditSink),
-		kauthz.OperationAuthz(authorizer),
-	).Match(security.MatchAccess(extv1.Access_ACCESS_ADMIN)).Build())
+	middlewares = append(middlewares, accessLadder(authn, auditSink, authorizer)...)
 	middlewares = append(middlewares, validator.Server())
 
 	var opts = []grpc.ServerOption{

@@ -20,7 +20,7 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("email").NotEmpty().MaxRuneLen(128),
 		field.String("password_hash").Sensitive().MaxRuneLen(128).
-			Comment("argon2 digest; plaintext is never stored"),
+			Comment("argon2id digest; plaintext is never stored; legacy bcrypt digests upgrade on next login"),
 		field.String("dept_id").Optional().Nillable().MaxRuneLen(20),
 		field.String("avatar").Optional().Nillable().MaxRuneLen(20).
 			Comment("referenced file id; display URLs are minted at read time"),
@@ -37,7 +37,6 @@ func (User) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
 		mixins.CreatedUpdatedMixin{},
-		local_mixins.TenantMixin{},
 		local_mixins.DatascopeMixin{UserField: "id", DeptField: "dept_id"},
 		local_mixins.SoftDeleteMixin{},
 	}
@@ -45,7 +44,9 @@ func (User) Mixin() []ent.Mixin {
 
 func (User) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("tenant_id", "email").Unique().
+		// Email is the global identity key: one email is one person, whose
+		// tenancy lives in membership seats — never in a second row.
+		index.Fields("email").Unique().
 			Annotations(entsql.IndexWhere("deleted_at IS NULL")),
 	}
 }

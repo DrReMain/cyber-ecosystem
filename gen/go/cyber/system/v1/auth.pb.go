@@ -137,6 +137,407 @@ func (x *LoginResponse) GetExpiresAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type LoginByIdentityRequest struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Provider *string                `protobuf:"bytes,1,opt,name=provider,proto3,oneof" json:"provider,omitempty"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*LoginByIdentityRequest_Wechat
+	Payload       isLoginByIdentityRequest_Payload `protobuf_oneof:"payload"`
+	State         *string                          `protobuf:"bytes,3,opt,name=state,proto3,oneof" json:"state,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginByIdentityRequest) Reset() {
+	*x = LoginByIdentityRequest{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginByIdentityRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginByIdentityRequest) ProtoMessage() {}
+
+func (x *LoginByIdentityRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginByIdentityRequest.ProtoReflect.Descriptor instead.
+func (*LoginByIdentityRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *LoginByIdentityRequest) GetProvider() string {
+	if x != nil && x.Provider != nil {
+		return *x.Provider
+	}
+	return ""
+}
+
+func (x *LoginByIdentityRequest) GetPayload() isLoginByIdentityRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *LoginByIdentityRequest) GetWechat() *WeChatIdentityPayload {
+	if x != nil {
+		if x, ok := x.Payload.(*LoginByIdentityRequest_Wechat); ok {
+			return x.Wechat
+		}
+	}
+	return nil
+}
+
+func (x *LoginByIdentityRequest) GetState() string {
+	if x != nil && x.State != nil {
+		return *x.State
+	}
+	return ""
+}
+
+type isLoginByIdentityRequest_Payload interface {
+	isLoginByIdentityRequest_Payload()
+}
+
+type LoginByIdentityRequest_Wechat struct {
+	Wechat *WeChatIdentityPayload `protobuf:"bytes,2,opt,name=wechat,proto3,oneof"`
+}
+
+func (*LoginByIdentityRequest_Wechat) isLoginByIdentityRequest_Payload() {}
+
+type WeChatIdentityPayload struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// OAuth authorization code from the wechat redirect.
+	Code          *string `protobuf:"bytes,1,opt,name=code,proto3,oneof" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WeChatIdentityPayload) Reset() {
+	*x = WeChatIdentityPayload{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WeChatIdentityPayload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WeChatIdentityPayload) ProtoMessage() {}
+
+func (x *WeChatIdentityPayload) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WeChatIdentityPayload.ProtoReflect.Descriptor instead.
+func (*WeChatIdentityPayload) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *WeChatIdentityPayload) GetCode() string {
+	if x != nil && x.Code != nil {
+		return *x.Code
+	}
+	return ""
+}
+
+type LoginByIdentityResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionToken  string                 `protobuf:"bytes,1,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
+	IssuedAt      *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=issued_at,json=issuedAt,proto3" json:"issued_at,omitempty"`
+	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginByIdentityResponse) Reset() {
+	*x = LoginByIdentityResponse{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginByIdentityResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginByIdentityResponse) ProtoMessage() {}
+
+func (x *LoginByIdentityResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginByIdentityResponse.ProtoReflect.Descriptor instead.
+func (*LoginByIdentityResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *LoginByIdentityResponse) GetSessionToken() string {
+	if x != nil {
+		return x.SessionToken
+	}
+	return ""
+}
+
+func (x *LoginByIdentityResponse) GetIssuedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.IssuedAt
+	}
+	return nil
+}
+
+func (x *LoginByIdentityResponse) GetExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return nil
+}
+
+type BeginIdentityLoginRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Provider      *string                `protobuf:"bytes,1,opt,name=provider,proto3,oneof" json:"provider,omitempty"`
+	RedirectUri   *string                `protobuf:"bytes,2,opt,name=redirect_uri,json=redirectUri,proto3,oneof" json:"redirect_uri,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BeginIdentityLoginRequest) Reset() {
+	*x = BeginIdentityLoginRequest{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BeginIdentityLoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BeginIdentityLoginRequest) ProtoMessage() {}
+
+func (x *BeginIdentityLoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BeginIdentityLoginRequest.ProtoReflect.Descriptor instead.
+func (*BeginIdentityLoginRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *BeginIdentityLoginRequest) GetProvider() string {
+	if x != nil && x.Provider != nil {
+		return *x.Provider
+	}
+	return ""
+}
+
+func (x *BeginIdentityLoginRequest) GetRedirectUri() string {
+	if x != nil && x.RedirectUri != nil {
+		return *x.RedirectUri
+	}
+	return ""
+}
+
+type BeginIdentityLoginResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AuthorizeUrl  string                 `protobuf:"bytes,1,opt,name=authorize_url,json=authorizeUrl,proto3" json:"authorize_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BeginIdentityLoginResponse) Reset() {
+	*x = BeginIdentityLoginResponse{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BeginIdentityLoginResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BeginIdentityLoginResponse) ProtoMessage() {}
+
+func (x *BeginIdentityLoginResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BeginIdentityLoginResponse.ProtoReflect.Descriptor instead.
+func (*BeginIdentityLoginResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *BeginIdentityLoginResponse) GetAuthorizeUrl() string {
+	if x != nil {
+		return x.AuthorizeUrl
+	}
+	return ""
+}
+
+type BindCredentialRequest struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Provider *string                `protobuf:"bytes,1,opt,name=provider,proto3,oneof" json:"provider,omitempty"`
+	// Types that are valid to be assigned to Payload:
+	//
+	//	*BindCredentialRequest_Wechat
+	Payload       isBindCredentialRequest_Payload `protobuf_oneof:"payload"`
+	State         *string                         `protobuf:"bytes,3,opt,name=state,proto3,oneof" json:"state,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BindCredentialRequest) Reset() {
+	*x = BindCredentialRequest{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BindCredentialRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BindCredentialRequest) ProtoMessage() {}
+
+func (x *BindCredentialRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BindCredentialRequest.ProtoReflect.Descriptor instead.
+func (*BindCredentialRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *BindCredentialRequest) GetProvider() string {
+	if x != nil && x.Provider != nil {
+		return *x.Provider
+	}
+	return ""
+}
+
+func (x *BindCredentialRequest) GetPayload() isBindCredentialRequest_Payload {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *BindCredentialRequest) GetWechat() *WeChatIdentityPayload {
+	if x != nil {
+		if x, ok := x.Payload.(*BindCredentialRequest_Wechat); ok {
+			return x.Wechat
+		}
+	}
+	return nil
+}
+
+func (x *BindCredentialRequest) GetState() string {
+	if x != nil && x.State != nil {
+		return *x.State
+	}
+	return ""
+}
+
+type isBindCredentialRequest_Payload interface {
+	isBindCredentialRequest_Payload()
+}
+
+type BindCredentialRequest_Wechat struct {
+	Wechat *WeChatIdentityPayload `protobuf:"bytes,2,opt,name=wechat,proto3,oneof"`
+}
+
+func (*BindCredentialRequest_Wechat) isBindCredentialRequest_Payload() {}
+
+type BindCredentialResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BindCredentialResponse) Reset() {
+	*x = BindCredentialResponse{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BindCredentialResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BindCredentialResponse) ProtoMessage() {}
+
+func (x *BindCredentialResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BindCredentialResponse.ProtoReflect.Descriptor instead.
+func (*BindCredentialResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{8}
+}
+
 type LogoutRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -145,7 +546,7 @@ type LogoutRequest struct {
 
 func (x *LogoutRequest) Reset() {
 	*x = LogoutRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[2]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -157,7 +558,7 @@ func (x *LogoutRequest) String() string {
 func (*LogoutRequest) ProtoMessage() {}
 
 func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[2]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -170,7 +571,7 @@ func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
 func (*LogoutRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{2}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{9}
 }
 
 type LogoutResponse struct {
@@ -181,7 +582,7 @@ type LogoutResponse struct {
 
 func (x *LogoutResponse) Reset() {
 	*x = LogoutResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[3]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -193,7 +594,7 @@ func (x *LogoutResponse) String() string {
 func (*LogoutResponse) ProtoMessage() {}
 
 func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[3]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -206,7 +607,7 @@ func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutResponse.ProtoReflect.Descriptor instead.
 func (*LogoutResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{3}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{10}
 }
 
 // getCurrentUser
@@ -218,7 +619,7 @@ type GetCurrentUserRequest struct {
 
 func (x *GetCurrentUserRequest) Reset() {
 	*x = GetCurrentUserRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[4]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -230,7 +631,7 @@ func (x *GetCurrentUserRequest) String() string {
 func (*GetCurrentUserRequest) ProtoMessage() {}
 
 func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[4]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -243,20 +644,21 @@ func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCurrentUserRequest.ProtoReflect.Descriptor instead.
 func (*GetCurrentUserRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{4}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{11}
 }
 
 type GetCurrentUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	Permissions   []string               `protobuf:"bytes,2,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	Memberships   []*Membership          `protobuf:"bytes,3,rep,name=memberships,proto3" json:"memberships,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetCurrentUserResponse) Reset() {
 	*x = GetCurrentUserResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[5]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -268,7 +670,7 @@ func (x *GetCurrentUserResponse) String() string {
 func (*GetCurrentUserResponse) ProtoMessage() {}
 
 func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[5]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -281,7 +683,7 @@ func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCurrentUserResponse.ProtoReflect.Descriptor instead.
 func (*GetCurrentUserResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{5}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetCurrentUserResponse) GetUser() *User {
@@ -298,11 +700,72 @@ func (x *GetCurrentUserResponse) GetPermissions() []string {
 	return nil
 }
 
+func (x *GetCurrentUserResponse) GetMemberships() []*Membership {
+	if x != nil {
+		return x.Memberships
+	}
+	return nil
+}
+
+// Plain scalars by the success-implies-present carve-out: a seat row always
+// carries its two join keys.
+type Membership struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Tenant        string                 `protobuf:"bytes,1,opt,name=tenant,proto3" json:"tenant,omitempty"`
+	Population    string                 `protobuf:"bytes,2,opt,name=population,proto3" json:"population,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Membership) Reset() {
+	*x = Membership{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Membership) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Membership) ProtoMessage() {}
+
+func (x *Membership) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Membership.ProtoReflect.Descriptor instead.
+func (*Membership) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *Membership) GetTenant() string {
+	if x != nil {
+		return x.Tenant
+	}
+	return ""
+}
+
+func (x *Membership) GetPopulation() string {
+	if x != nil {
+		return x.Population
+	}
+	return ""
+}
+
 var File_cyber_system_v1_auth_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x1acyber/system/v1/auth.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/user.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"y\n" +
+	"\x1acyber/system/v1/auth.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/user.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"y\n" +
 	"\fLoginRequest\x12%\n" +
 	"\x05email\x18\x01 \x01(\tB\n" +
 	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\x05email\x88\x01\x01\x12+\n" +
@@ -314,21 +777,68 @@ const file_cyber_system_v1_auth_proto_rawDesc = "" +
 	"\rsession_token\x18\x01 \x01(\tR\fsessionToken\x127\n" +
 	"\tissued_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bissuedAt\x129\n" +
 	"\n" +
-	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"\x0f\n" +
+	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"\xdc\x01\n" +
+	"\x16LoginByIdentityRequest\x12-\n" +
+	"\bprovider\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x01R\bprovider\x88\x01\x01\x12@\n" +
+	"\x06wechat\x18\x02 \x01(\v2&.cyber.system.v1.WeChatIdentityPayloadH\x00R\x06wechat\x12(\n" +
+	"\x05state\x18\x03 \x01(\tB\r\xbaH\n" +
+	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x02R\x05state\x88\x01\x01B\x10\n" +
+	"\apayload\x12\x05\xbaH\x02\b\x01B\v\n" +
+	"\t_providerB\b\n" +
+	"\x06_state\"E\n" +
+	"\x15WeChatIdentityPayload\x12#\n" +
+	"\x04code\x18\x01 \x01(\tB\n" +
+	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\x04code\x88\x01\x01B\a\n" +
+	"\x05_code\"\xb2\x01\n" +
+	"\x17LoginByIdentityResponse\x12#\n" +
+	"\rsession_token\x18\x01 \x01(\tR\fsessionToken\x127\n" +
+	"\tissued_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bissuedAt\x129\n" +
+	"\n" +
+	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"\x9f\x01\n" +
+	"\x19BeginIdentityLoginRequest\x12-\n" +
+	"\bprovider\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x00R\bprovider\x88\x01\x01\x125\n" +
+	"\fredirect_uri\x18\x02 \x01(\tB\r\xbaH\n" +
+	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x04H\x01R\vredirectUri\x88\x01\x01B\v\n" +
+	"\t_providerB\x0f\n" +
+	"\r_redirect_uri\"A\n" +
+	"\x1aBeginIdentityLoginResponse\x12#\n" +
+	"\rauthorize_url\x18\x01 \x01(\tR\fauthorizeUrl\"\xdb\x01\n" +
+	"\x15BindCredentialRequest\x12-\n" +
+	"\bprovider\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x01R\bprovider\x88\x01\x01\x12@\n" +
+	"\x06wechat\x18\x02 \x01(\v2&.cyber.system.v1.WeChatIdentityPayloadH\x00R\x06wechat\x12(\n" +
+	"\x05state\x18\x03 \x01(\tB\r\xbaH\n" +
+	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x02R\x05state\x88\x01\x01B\x10\n" +
+	"\apayload\x12\x05\xbaH\x02\b\x01B\v\n" +
+	"\t_providerB\b\n" +
+	"\x06_state\"\x18\n" +
+	"\x16BindCredentialResponse\"\x0f\n" +
 	"\rLogoutRequest\"\x10\n" +
 	"\x0eLogoutResponse\"\x17\n" +
-	"\x15GetCurrentUserRequest\"e\n" +
+	"\x15GetCurrentUserRequest\"\xa4\x01\n" +
 	"\x16GetCurrentUserResponse\x12)\n" +
 	"\x04user\x18\x01 \x01(\v2\x15.cyber.system.v1.UserR\x04user\x12 \n" +
-	"\vpermissions\x18\x02 \x03(\tR\vpermissions2\xd2\x03\n" +
+	"\vpermissions\x18\x02 \x03(\tR\vpermissions\x12=\n" +
+	"\vmemberships\x18\x03 \x03(\v2\x1b.cyber.system.v1.MembershipR\vmemberships\"D\n" +
+	"\n" +
+	"Membership\x12\x16\n" +
+	"\x06tenant\x18\x01 \x01(\tR\x06tenant\x12\x1e\n" +
+	"\n" +
+	"population\x18\x02 \x01(\tR\n" +
+	"population2\xaf\b\n" +
 	"\vAuthService\x12~\n" +
 	"\x05Login\x12\x1d.cyber.system.v1.LoginRequest\x1a\x1e.cyber.system.v1.LoginResponse\"6\x88\xf1\x04\x01\x8a\xd3\x0e\n" +
 	"\n" +
-	"\x06登录\x10\x02\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/system/auth/login\x12\x86\x01\n" +
-	"\x06Logout\x12\x1e.cyber.system.v1.LogoutRequest\x1a\x1f.cyber.system.v1.LogoutResponse\";\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\n" +
+	"\x06登录\x10\x02\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/system/auth/login\x12\xcf\x01\n" +
+	"\x0fLoginByIdentity\x12'.cyber.system.v1.LoginByIdentityRequest\x1a(.cyber.system.v1.LoginByIdentityResponse\"i\x88\xf1\x04\x01\x8a\xd3\x0e1\n" +
+	"-身份交换登录：第三方凭证换会话\x10\x02\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/system/auth/login-by-identity\x12\xd5\x01\n" +
+	"\x12BeginIdentityLogin\x12*.cyber.system.v1.BeginIdentityLoginRequest\x1a+.cyber.system.v1.BeginIdentityLoginResponse\"f\x88\xf1\x04\x01\x8a\xd3\x0e+\n" +
+	"'发起身份登录：铸造授权跳转\x10\x01\x82\xd3\xe4\x93\x02-:\x01*\"(/api/v1/system/auth/begin-identity-login\x12\xb8\x01\n" +
+	"\x0eBindCredential\x12&.cyber.system.v1.BindCredentialRequest\x1a'.cyber.system.v1.BindCredentialResponse\"U\x88\xf1\x04\x04\x8a\xd3\x0e\x1f\n" +
+	"\x1b绑定第三方身份凭证\x10\x02\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/system/auth/bind-credential\x12\x82\x01\n" +
+	"\x06Logout\x12\x1e.cyber.system.v1.LogoutRequest\x1a\x1f.cyber.system.v1.LogoutResponse\"7\x88\xf1\x04\x04\x8a\xd3\x0e\n" +
 	"\n" +
-	"\x06登出\x10\x02\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/system/auth/logout\x12\xa4\x01\n" +
-	"\x0eGetCurrentUser\x12&.cyber.system.v1.GetCurrentUserRequest\x1a'.cyber.system.v1.GetCurrentUserResponse\"A\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x1c\n" +
+	"\x06登出\x10\x02\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/system/auth/logout\x12\xa0\x01\n" +
+	"\x0eGetCurrentUser\x12&.cyber.system.v1.GetCurrentUserRequest\x1a'.cyber.system.v1.GetCurrentUserResponse\"=\x88\xf1\x04\x04\x8a\xd3\x0e\x1c\n" +
 	"\x18获取当前登录用户\x10\x01\x82\xd3\xe4\x93\x02\x13\x12\x11/api/v1/system/me\x1a\x13\x8a\xe2\t\x0f认证与会话B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
@@ -343,32 +853,51 @@ func file_cyber_system_v1_auth_proto_rawDescGZIP() []byte {
 	return file_cyber_system_v1_auth_proto_rawDescData
 }
 
-var file_cyber_system_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_cyber_system_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_cyber_system_v1_auth_proto_goTypes = []any{
-	(*LoginRequest)(nil),           // 0: cyber.system.v1.LoginRequest
-	(*LoginResponse)(nil),          // 1: cyber.system.v1.LoginResponse
-	(*LogoutRequest)(nil),          // 2: cyber.system.v1.LogoutRequest
-	(*LogoutResponse)(nil),         // 3: cyber.system.v1.LogoutResponse
-	(*GetCurrentUserRequest)(nil),  // 4: cyber.system.v1.GetCurrentUserRequest
-	(*GetCurrentUserResponse)(nil), // 5: cyber.system.v1.GetCurrentUserResponse
-	(*timestamppb.Timestamp)(nil),  // 6: google.protobuf.Timestamp
-	(*User)(nil),                   // 7: cyber.system.v1.User
+	(*LoginRequest)(nil),               // 0: cyber.system.v1.LoginRequest
+	(*LoginResponse)(nil),              // 1: cyber.system.v1.LoginResponse
+	(*LoginByIdentityRequest)(nil),     // 2: cyber.system.v1.LoginByIdentityRequest
+	(*WeChatIdentityPayload)(nil),      // 3: cyber.system.v1.WeChatIdentityPayload
+	(*LoginByIdentityResponse)(nil),    // 4: cyber.system.v1.LoginByIdentityResponse
+	(*BeginIdentityLoginRequest)(nil),  // 5: cyber.system.v1.BeginIdentityLoginRequest
+	(*BeginIdentityLoginResponse)(nil), // 6: cyber.system.v1.BeginIdentityLoginResponse
+	(*BindCredentialRequest)(nil),      // 7: cyber.system.v1.BindCredentialRequest
+	(*BindCredentialResponse)(nil),     // 8: cyber.system.v1.BindCredentialResponse
+	(*LogoutRequest)(nil),              // 9: cyber.system.v1.LogoutRequest
+	(*LogoutResponse)(nil),             // 10: cyber.system.v1.LogoutResponse
+	(*GetCurrentUserRequest)(nil),      // 11: cyber.system.v1.GetCurrentUserRequest
+	(*GetCurrentUserResponse)(nil),     // 12: cyber.system.v1.GetCurrentUserResponse
+	(*Membership)(nil),                 // 13: cyber.system.v1.Membership
+	(*timestamppb.Timestamp)(nil),      // 14: google.protobuf.Timestamp
+	(*User)(nil),                       // 15: cyber.system.v1.User
 }
 var file_cyber_system_v1_auth_proto_depIdxs = []int32{
-	6, // 0: cyber.system.v1.LoginResponse.issued_at:type_name -> google.protobuf.Timestamp
-	6, // 1: cyber.system.v1.LoginResponse.expires_at:type_name -> google.protobuf.Timestamp
-	7, // 2: cyber.system.v1.GetCurrentUserResponse.user:type_name -> cyber.system.v1.User
-	0, // 3: cyber.system.v1.AuthService.Login:input_type -> cyber.system.v1.LoginRequest
-	2, // 4: cyber.system.v1.AuthService.Logout:input_type -> cyber.system.v1.LogoutRequest
-	4, // 5: cyber.system.v1.AuthService.GetCurrentUser:input_type -> cyber.system.v1.GetCurrentUserRequest
-	1, // 6: cyber.system.v1.AuthService.Login:output_type -> cyber.system.v1.LoginResponse
-	3, // 7: cyber.system.v1.AuthService.Logout:output_type -> cyber.system.v1.LogoutResponse
-	5, // 8: cyber.system.v1.AuthService.GetCurrentUser:output_type -> cyber.system.v1.GetCurrentUserResponse
-	6, // [6:9] is the sub-list for method output_type
-	3, // [3:6] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	14, // 0: cyber.system.v1.LoginResponse.issued_at:type_name -> google.protobuf.Timestamp
+	14, // 1: cyber.system.v1.LoginResponse.expires_at:type_name -> google.protobuf.Timestamp
+	3,  // 2: cyber.system.v1.LoginByIdentityRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
+	14, // 3: cyber.system.v1.LoginByIdentityResponse.issued_at:type_name -> google.protobuf.Timestamp
+	14, // 4: cyber.system.v1.LoginByIdentityResponse.expires_at:type_name -> google.protobuf.Timestamp
+	3,  // 5: cyber.system.v1.BindCredentialRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
+	15, // 6: cyber.system.v1.GetCurrentUserResponse.user:type_name -> cyber.system.v1.User
+	13, // 7: cyber.system.v1.GetCurrentUserResponse.memberships:type_name -> cyber.system.v1.Membership
+	0,  // 8: cyber.system.v1.AuthService.Login:input_type -> cyber.system.v1.LoginRequest
+	2,  // 9: cyber.system.v1.AuthService.LoginByIdentity:input_type -> cyber.system.v1.LoginByIdentityRequest
+	5,  // 10: cyber.system.v1.AuthService.BeginIdentityLogin:input_type -> cyber.system.v1.BeginIdentityLoginRequest
+	7,  // 11: cyber.system.v1.AuthService.BindCredential:input_type -> cyber.system.v1.BindCredentialRequest
+	9,  // 12: cyber.system.v1.AuthService.Logout:input_type -> cyber.system.v1.LogoutRequest
+	11, // 13: cyber.system.v1.AuthService.GetCurrentUser:input_type -> cyber.system.v1.GetCurrentUserRequest
+	1,  // 14: cyber.system.v1.AuthService.Login:output_type -> cyber.system.v1.LoginResponse
+	4,  // 15: cyber.system.v1.AuthService.LoginByIdentity:output_type -> cyber.system.v1.LoginByIdentityResponse
+	6,  // 16: cyber.system.v1.AuthService.BeginIdentityLogin:output_type -> cyber.system.v1.BeginIdentityLoginResponse
+	8,  // 17: cyber.system.v1.AuthService.BindCredential:output_type -> cyber.system.v1.BindCredentialResponse
+	10, // 18: cyber.system.v1.AuthService.Logout:output_type -> cyber.system.v1.LogoutResponse
+	12, // 19: cyber.system.v1.AuthService.GetCurrentUser:output_type -> cyber.system.v1.GetCurrentUserResponse
+	14, // [14:20] is the sub-list for method output_type
+	8,  // [8:14] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_auth_proto_init() }
@@ -378,13 +907,21 @@ func file_cyber_system_v1_auth_proto_init() {
 	}
 	file_cyber_system_v1_user_proto_init()
 	file_cyber_system_v1_auth_proto_msgTypes[0].OneofWrappers = []any{}
+	file_cyber_system_v1_auth_proto_msgTypes[2].OneofWrappers = []any{
+		(*LoginByIdentityRequest_Wechat)(nil),
+	}
+	file_cyber_system_v1_auth_proto_msgTypes[3].OneofWrappers = []any{}
+	file_cyber_system_v1_auth_proto_msgTypes[5].OneofWrappers = []any{}
+	file_cyber_system_v1_auth_proto_msgTypes[7].OneofWrappers = []any{
+		(*BindCredentialRequest_Wechat)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_system_v1_auth_proto_rawDesc), len(file_cyber_system_v1_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

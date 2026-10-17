@@ -129,12 +129,16 @@ func (x *User) GetAvatar() *wrapperspb.StringValue {
 
 // create
 type CreateUserRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         *string                `protobuf:"bytes,1,opt,name=email,proto3,oneof" json:"email,omitempty"`
-	Password      *string                `protobuf:"bytes,2,opt,name=password,proto3,oneof" json:"password,omitempty"`
-	DeptId        *string                `protobuf:"bytes,3,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
-	Roles         []string               `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`
-	Avatar        *string                `protobuf:"bytes,5,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Email    *string                `protobuf:"bytes,1,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	Password *string                `protobuf:"bytes,2,opt,name=password,proto3,oneof" json:"password,omitempty"`
+	DeptId   *string                `protobuf:"bytes,3,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
+	Roles    []string               `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`
+	Avatar   *string                `protobuf:"bytes,5,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
+	// Seat population for the identity's birth seat; empty = the default user
+	// population. Validated against the registry — a seat is never born on a
+	// code that does not exist.
+	Population    *string `protobuf:"bytes,6,opt,name=population,proto3,oneof" json:"population,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -200,6 +204,13 @@ func (x *CreateUserRequest) GetRoles() []string {
 func (x *CreateUserRequest) GetAvatar() string {
 	if x != nil && x.Avatar != nil {
 		return *x.Avatar
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetPopulation() string {
+	if x != nil && x.Population != nil {
+		return *x.Population
 	}
 	return ""
 }
@@ -854,6 +865,161 @@ func (x *GetUserResponse) GetUser() *User {
 	return nil
 }
 
+// batchGet
+type BatchGetUsersRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// max_items matches the page_size cap (shared/common/v1 pagination.proto):
+	// one page of ids hydrates in one call — keep the two in lockstep.
+	Ids           []string `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchGetUsersRequest) Reset() {
+	*x = BatchGetUsersRequest{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchGetUsersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchGetUsersRequest) ProtoMessage() {}
+
+func (x *BatchGetUsersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchGetUsersRequest.ProtoReflect.Descriptor instead.
+func (*BatchGetUsersRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *BatchGetUsersRequest) GetIds() []string {
+	if x != nil {
+		return x.Ids
+	}
+	return nil
+}
+
+type BatchGetUsersResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// key = requested id; an absent key = no row or outside the viewer's data
+	// scope — skip semantics, no per-item error channel.
+	Users         map[string]*UserBrief `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchGetUsersResponse) Reset() {
+	*x = BatchGetUsersResponse{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchGetUsersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchGetUsersResponse) ProtoMessage() {}
+
+func (x *BatchGetUsersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchGetUsersResponse.ProtoReflect.Descriptor instead.
+func (*BatchGetUsersResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *BatchGetUsersResponse) GetUsers() map[string]*UserBrief {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
+// Rendering-grade identity summary for hydration; deliberately narrower than
+// User (no roles, no lifecycle fields).
+type UserBrief struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Id            *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Email         *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Avatar        *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserBrief) Reset() {
+	*x = UserBrief{}
+	mi := &file_cyber_system_v1_user_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserBrief) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserBrief) ProtoMessage() {}
+
+func (x *UserBrief) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_user_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserBrief.ProtoReflect.Descriptor instead.
+func (*UserBrief) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *UserBrief) GetId() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Id
+	}
+	return nil
+}
+
+func (x *UserBrief) GetEmail() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Email
+	}
+	return nil
+}
+
+func (x *UserBrief) GetAvatar() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Avatar
+	}
+	return nil
+}
+
 var File_cyber_system_v1_user_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_user_proto_rawDesc = "" +
@@ -869,7 +1035,7 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\adept_id\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\x06deptId\x12\x14\n" +
 	"\x05roles\x18\x06 \x03(\tR\x05roles\x124\n" +
 	"\aenabled\x18\a \x01(\v2\x1a.google.protobuf.BoolValueR\aenabled\x124\n" +
-	"\x06avatar\x18\b \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar\"\x94\x02\n" +
+	"\x06avatar\x18\b \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar\"\xd1\x02\n" +
 	"\x11CreateUserRequest\x12(\n" +
 	"\x05email\x18\x01 \x01(\tB\r\xbaH\n" +
 	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x00R\x05email\x88\x01\x01\x12.\n" +
@@ -877,12 +1043,16 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x01R\bpassword\x88\x01\x01\x12&\n" +
 	"\adept_id\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x02R\x06deptId\x88\x01\x01\x12(\n" +
 	"\x05roles\x18\x04 \x03(\tB\x12\xbaH\x0f\x92\x01\f\x10@\x18\x01\"\x06r\x04\x10\x01\x18@R\x05roles\x12%\n" +
-	"\x06avatar\x18\x05 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x03R\x06avatar\x88\x01\x01B\b\n" +
+	"\x06avatar\x18\x05 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x03R\x06avatar\x88\x01\x01\x12,\n" +
+	"\n" +
+	"population\x18\x06 \x01(\tB\a\xbaH\x04r\x02\x18\x14H\x04R\n" +
+	"population\x88\x01\x01B\b\n" +
 	"\x06_emailB\v\n" +
 	"\t_passwordB\n" +
 	"\n" +
 	"\b_dept_idB\t\n" +
-	"\a_avatar\"B\n" +
+	"\a_avatarB\r\n" +
+	"\v_population\"B\n" +
 	"\x12CreateUserResponse\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"\xf1\x02\n" +
 	"\x11UpdateUserRequest\x12\x1b\n" +
@@ -937,7 +1107,20 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\x0eGetUserRequest\x12\x1b\n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"<\n" +
 	"\x0fGetUserResponse\x12)\n" +
-	"\x04user\x18\x01 \x01(\v2\x15.cyber.system.v1.UserR\x04user2\xe4\b\n" +
+	"\x04user\x18\x01 \x01(\v2\x15.cyber.system.v1.UserR\x04user\"=\n" +
+	"\x14BatchGetUsersRequest\x12%\n" +
+	"\x03ids\x18\x01 \x03(\tB\x13\xbaH\x10\x92\x01\r\b\x01\x10d\x18\x01\"\x05r\x03\x98\x01\x14R\x03ids\"\xb6\x01\n" +
+	"\x15BatchGetUsersResponse\x12G\n" +
+	"\x05users\x18\x01 \x03(\v21.cyber.system.v1.BatchGetUsersResponse.UsersEntryR\x05users\x1aT\n" +
+	"\n" +
+	"UsersEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x120\n" +
+	"\x05value\x18\x02 \x01(\v2\x1a.cyber.system.v1.UserBriefR\x05value:\x028\x01\"\xa3\x01\n" +
+	"\tUserBrief\x12,\n" +
+	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x122\n" +
+	"\x05email\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\x124\n" +
+	"\x06avatar\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar2\x94\n" +
+	"\n" +
 	"\vUserService\x12\x8e\x01\n" +
 	"\n" +
 	"CreateUser\x12\".cyber.system.v1.CreateUserRequest\x1a#.cyber.system.v1.CreateUserResponse\"7\x88\xf1\x04\x02\x8a\xd3\x0e\x10\n" +
@@ -946,8 +1129,8 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"UpdateUser\x12\".cyber.system.v1.UpdateUserRequest\x1a#.cyber.system.v1.UpdateUserResponse\"@\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x10\n" +
 	"\f修改用户\x10\x02\x82\xd3\xe4\x93\x02\x1e:\x01*\x1a\x19/api/v1/system/users/{id}\x12\xb0\x01\n" +
 	"\x10UpdateUserStatus\x12(.cyber.system.v1.UpdateUserStatusRequest\x1a).cyber.system.v1.UpdateUserStatusResponse\"G\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x10\n" +
-	"\f启停用户\x10\x02\x82\xd3\xe4\x93\x02%:\x01*\x1a /api/v1/system/users/{id}/status\x12\xa4\x01\n" +
-	"\x0eChangePassword\x12&.cyber.system.v1.ChangePasswordRequest\x1a'.cyber.system.v1.ChangePasswordResponse\"A\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x10\n" +
+	"\f启停用户\x10\x02\x82\xd3\xe4\x93\x02%:\x01*\x1a /api/v1/system/users/{id}/status\x12\xa0\x01\n" +
+	"\x0eChangePassword\x12&.cyber.system.v1.ChangePasswordRequest\x1a'.cyber.system.v1.ChangePasswordResponse\"=\x88\xf1\x04\x04\x8a\xd3\x0e\x10\n" +
 	"\f修改密码\x10\x02\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/system/me/password\x12\x94\x01\n" +
 	"\n" +
 	"DeleteUser\x12\".cyber.system.v1.DeleteUserRequest\x1a#.cyber.system.v1.DeleteUserResponse\"=\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x10\n" +
@@ -955,7 +1138,9 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\tListUsers\x12!.cyber.system.v1.ListUsersRequest\x1a\".cyber.system.v1.ListUsersResponse\">\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
 	"\x12查询用户列表\x10\x01\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/system/users\x12\x91\x01\n" +
 	"\aGetUser\x12\x1f.cyber.system.v1.GetUserRequest\x1a .cyber.system.v1.GetUserResponse\"C\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x16\n" +
-	"\x12查询用户详情\x10\x01\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/users/{id}\x1a\x10\x8a\xe2\t\f用户管理B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"\x12查询用户详情\x10\x01\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/system/users/{id}\x12\xb1\x01\n" +
+	"\rBatchGetUsers\x12%.cyber.system.v1.BatchGetUsersRequest\x1a&.cyber.system.v1.BatchGetUsersResponse\"Q\x88\xf1\x04\x02\xa0\xf1\x04\x01\x8a\xd3\x0e\x1c\n" +
+	"\x18批量查询用户概要\x10\x01\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/system/users/batch-get\x1a\x10\x8a\xe2\t\f用户管理B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_user_proto_rawDescOnce sync.Once
@@ -969,7 +1154,7 @@ func file_cyber_system_v1_user_proto_rawDescGZIP() []byte {
 	return file_cyber_system_v1_user_proto_rawDescData
 }
 
-var file_cyber_system_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_cyber_system_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_cyber_system_v1_user_proto_goTypes = []any{
 	(*User)(nil),                     // 0: cyber.system.v1.User
 	(*CreateUserRequest)(nil),        // 1: cyber.system.v1.CreateUserRequest
@@ -986,44 +1171,55 @@ var file_cyber_system_v1_user_proto_goTypes = []any{
 	(*ListUsersResponse)(nil),        // 12: cyber.system.v1.ListUsersResponse
 	(*GetUserRequest)(nil),           // 13: cyber.system.v1.GetUserRequest
 	(*GetUserResponse)(nil),          // 14: cyber.system.v1.GetUserResponse
-	(*wrapperspb.StringValue)(nil),   // 15: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),    // 16: google.protobuf.Timestamp
-	(*wrapperspb.BoolValue)(nil),     // 17: google.protobuf.BoolValue
-	(*v1.PageRequest)(nil),           // 18: cyber.shared.common.v1.PageRequest
-	(*v1.PageResponse)(nil),          // 19: cyber.shared.common.v1.PageResponse
+	(*BatchGetUsersRequest)(nil),     // 15: cyber.system.v1.BatchGetUsersRequest
+	(*BatchGetUsersResponse)(nil),    // 16: cyber.system.v1.BatchGetUsersResponse
+	(*UserBrief)(nil),                // 17: cyber.system.v1.UserBrief
+	nil,                              // 18: cyber.system.v1.BatchGetUsersResponse.UsersEntry
+	(*wrapperspb.StringValue)(nil),   // 19: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),    // 20: google.protobuf.Timestamp
+	(*wrapperspb.BoolValue)(nil),     // 21: google.protobuf.BoolValue
+	(*v1.PageRequest)(nil),           // 22: cyber.shared.common.v1.PageRequest
+	(*v1.PageResponse)(nil),          // 23: cyber.shared.common.v1.PageResponse
 }
 var file_cyber_system_v1_user_proto_depIdxs = []int32{
-	15, // 0: cyber.system.v1.User.id:type_name -> google.protobuf.StringValue
-	16, // 1: cyber.system.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	16, // 2: cyber.system.v1.User.updated_at:type_name -> google.protobuf.Timestamp
-	15, // 3: cyber.system.v1.User.email:type_name -> google.protobuf.StringValue
-	15, // 4: cyber.system.v1.User.dept_id:type_name -> google.protobuf.StringValue
-	17, // 5: cyber.system.v1.User.enabled:type_name -> google.protobuf.BoolValue
-	15, // 6: cyber.system.v1.User.avatar:type_name -> google.protobuf.StringValue
-	15, // 7: cyber.system.v1.CreateUserResponse.id:type_name -> google.protobuf.StringValue
-	18, // 8: cyber.system.v1.ListUsersRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	19, // 9: cyber.system.v1.ListUsersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	19, // 0: cyber.system.v1.User.id:type_name -> google.protobuf.StringValue
+	20, // 1: cyber.system.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	20, // 2: cyber.system.v1.User.updated_at:type_name -> google.protobuf.Timestamp
+	19, // 3: cyber.system.v1.User.email:type_name -> google.protobuf.StringValue
+	19, // 4: cyber.system.v1.User.dept_id:type_name -> google.protobuf.StringValue
+	21, // 5: cyber.system.v1.User.enabled:type_name -> google.protobuf.BoolValue
+	19, // 6: cyber.system.v1.User.avatar:type_name -> google.protobuf.StringValue
+	19, // 7: cyber.system.v1.CreateUserResponse.id:type_name -> google.protobuf.StringValue
+	22, // 8: cyber.system.v1.ListUsersRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	23, // 9: cyber.system.v1.ListUsersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
 	0,  // 10: cyber.system.v1.ListUsersResponse.list:type_name -> cyber.system.v1.User
 	0,  // 11: cyber.system.v1.GetUserResponse.user:type_name -> cyber.system.v1.User
-	1,  // 12: cyber.system.v1.UserService.CreateUser:input_type -> cyber.system.v1.CreateUserRequest
-	3,  // 13: cyber.system.v1.UserService.UpdateUser:input_type -> cyber.system.v1.UpdateUserRequest
-	5,  // 14: cyber.system.v1.UserService.UpdateUserStatus:input_type -> cyber.system.v1.UpdateUserStatusRequest
-	7,  // 15: cyber.system.v1.UserService.ChangePassword:input_type -> cyber.system.v1.ChangePasswordRequest
-	9,  // 16: cyber.system.v1.UserService.DeleteUser:input_type -> cyber.system.v1.DeleteUserRequest
-	11, // 17: cyber.system.v1.UserService.ListUsers:input_type -> cyber.system.v1.ListUsersRequest
-	13, // 18: cyber.system.v1.UserService.GetUser:input_type -> cyber.system.v1.GetUserRequest
-	2,  // 19: cyber.system.v1.UserService.CreateUser:output_type -> cyber.system.v1.CreateUserResponse
-	4,  // 20: cyber.system.v1.UserService.UpdateUser:output_type -> cyber.system.v1.UpdateUserResponse
-	6,  // 21: cyber.system.v1.UserService.UpdateUserStatus:output_type -> cyber.system.v1.UpdateUserStatusResponse
-	8,  // 22: cyber.system.v1.UserService.ChangePassword:output_type -> cyber.system.v1.ChangePasswordResponse
-	10, // 23: cyber.system.v1.UserService.DeleteUser:output_type -> cyber.system.v1.DeleteUserResponse
-	12, // 24: cyber.system.v1.UserService.ListUsers:output_type -> cyber.system.v1.ListUsersResponse
-	14, // 25: cyber.system.v1.UserService.GetUser:output_type -> cyber.system.v1.GetUserResponse
-	19, // [19:26] is the sub-list for method output_type
-	12, // [12:19] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	18, // 12: cyber.system.v1.BatchGetUsersResponse.users:type_name -> cyber.system.v1.BatchGetUsersResponse.UsersEntry
+	19, // 13: cyber.system.v1.UserBrief.id:type_name -> google.protobuf.StringValue
+	19, // 14: cyber.system.v1.UserBrief.email:type_name -> google.protobuf.StringValue
+	19, // 15: cyber.system.v1.UserBrief.avatar:type_name -> google.protobuf.StringValue
+	17, // 16: cyber.system.v1.BatchGetUsersResponse.UsersEntry.value:type_name -> cyber.system.v1.UserBrief
+	1,  // 17: cyber.system.v1.UserService.CreateUser:input_type -> cyber.system.v1.CreateUserRequest
+	3,  // 18: cyber.system.v1.UserService.UpdateUser:input_type -> cyber.system.v1.UpdateUserRequest
+	5,  // 19: cyber.system.v1.UserService.UpdateUserStatus:input_type -> cyber.system.v1.UpdateUserStatusRequest
+	7,  // 20: cyber.system.v1.UserService.ChangePassword:input_type -> cyber.system.v1.ChangePasswordRequest
+	9,  // 21: cyber.system.v1.UserService.DeleteUser:input_type -> cyber.system.v1.DeleteUserRequest
+	11, // 22: cyber.system.v1.UserService.ListUsers:input_type -> cyber.system.v1.ListUsersRequest
+	13, // 23: cyber.system.v1.UserService.GetUser:input_type -> cyber.system.v1.GetUserRequest
+	15, // 24: cyber.system.v1.UserService.BatchGetUsers:input_type -> cyber.system.v1.BatchGetUsersRequest
+	2,  // 25: cyber.system.v1.UserService.CreateUser:output_type -> cyber.system.v1.CreateUserResponse
+	4,  // 26: cyber.system.v1.UserService.UpdateUser:output_type -> cyber.system.v1.UpdateUserResponse
+	6,  // 27: cyber.system.v1.UserService.UpdateUserStatus:output_type -> cyber.system.v1.UpdateUserStatusResponse
+	8,  // 28: cyber.system.v1.UserService.ChangePassword:output_type -> cyber.system.v1.ChangePasswordResponse
+	10, // 29: cyber.system.v1.UserService.DeleteUser:output_type -> cyber.system.v1.DeleteUserResponse
+	12, // 30: cyber.system.v1.UserService.ListUsers:output_type -> cyber.system.v1.ListUsersResponse
+	14, // 31: cyber.system.v1.UserService.GetUser:output_type -> cyber.system.v1.GetUserResponse
+	16, // 32: cyber.system.v1.UserService.BatchGetUsers:output_type -> cyber.system.v1.BatchGetUsersResponse
+	25, // [25:33] is the sub-list for method output_type
+	17, // [17:25] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_user_proto_init() }
@@ -1042,7 +1238,7 @@ func file_cyber_system_v1_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_system_v1_user_proto_rawDesc), len(file_cyber_system_v1_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

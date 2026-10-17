@@ -18,6 +18,10 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
       status: "authed",
       user: { id: res.user?.id ?? "", email: res.user?.email ?? "", avatar: res.user?.avatar },
       permissions: [...(res.permissions ?? [])],
+      memberships: (res.memberships ?? []).map((seat) => ({
+        tenant: seat.tenant,
+        population: seat.population,
+      })),
     } as const;
   } catch (error) {
     const { kind, reason } = normalize(error);

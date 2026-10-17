@@ -5,7 +5,6 @@ package cyber.system.v1;
 import "buf/validate/validate.proto";
 import "cyber/system/v1/file.proto";
 import "ext/v1/access.proto";
-import "ext/v1/authz.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -32,8 +31,7 @@ service FilePresignService {
       comment: "创建直传会话（登记元数据并铸造上传地址）"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {
       post: "/api/v1/system/uploads"
       body: "*"
@@ -45,8 +43,7 @@ service FilePresignService {
       comment: "确认直传（校验对象与大小，回填元数据）"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {
       post: "/api/v1/system/uploads/{id}/confirm"
       body: "*"
@@ -58,8 +55,7 @@ service FilePresignService {
       comment: "放弃直传会话（终止分片会话并删除记录）"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {delete: "/api/v1/system/uploads/{id}"};
   }
 
@@ -68,8 +64,7 @@ service FilePresignService {
       comment: "查询已传分片（断点续传恢复，补铸缺失分片地址）"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/system/uploads/{id}/parts"};
   }
 }

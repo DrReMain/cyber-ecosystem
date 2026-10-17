@@ -30,8 +30,12 @@ type System int32
 const (
 	System_SYSTEM_UNSPECIFIED System = 0
 	// 600x: auth
-	System_SYSTEM_LOGIN_FAILED      System = 6000
-	System_SYSTEM_PASSWORD_MISMATCH System = 6001
+	System_SYSTEM_LOGIN_FAILED              System = 6000
+	System_SYSTEM_PASSWORD_MISMATCH         System = 6001
+	System_SYSTEM_LOGIN_SEAT_REQUIRED       System = 6002
+	System_SYSTEM_IDENTITY_PROVIDER_UNKNOWN System = 6003
+	System_SYSTEM_IDENTITY_EXCHANGE_FAILED  System = 6004
+	System_SYSTEM_IDENTITY_ALREADY_BOUND    System = 6005
 	// 601x: dept
 	System_SYSTEM_DEPT_SELF_PARENT      System = 6010
 	System_SYSTEM_DEPT_CYCLE            System = 6011
@@ -54,11 +58,22 @@ const (
 	System_SYSTEM_USER_SELF_DELETE  System = 6070
 	System_SYSTEM_USER_SELF_DISABLE System = 6071
 	System_SYSTEM_USER_DISABLED     System = 6072
+	System_SYSTEM_USER_NOT_FOUND    System = 6073
+	System_SYSTEM_USER_EMAIL_TAKEN  System = 6074
 	// 608x: file
 	System_SYSTEM_FILE_NOT_FOUND     System = 6080
 	System_SYSTEM_FILE_TOO_LARGE     System = 6081
 	System_SYSTEM_FILE_SIZE_MISMATCH System = 6082
 	System_SYSTEM_FILE_INVALID_STATE System = 6083
+	// 609x: tenant registry
+	System_SYSTEM_TENANT_DISABLED  System = 6090
+	System_SYSTEM_TENANT_NOT_FOUND System = 6091
+	System_SYSTEM_TENANT_PROTECTED System = 6092
+	// 610x: population registry
+	System_SYSTEM_POPULATION_EXISTS            System = 6100
+	System_SYSTEM_POPULATION_PROTECTED         System = 6101
+	System_SYSTEM_POPULATION_INVALID_ARCHETYPE System = 6102
+	System_SYSTEM_POPULATION_NOT_FOUND         System = 6103
 )
 
 // Enum value maps for System.
@@ -67,6 +82,10 @@ var (
 		0:    "SYSTEM_UNSPECIFIED",
 		6000: "SYSTEM_LOGIN_FAILED",
 		6001: "SYSTEM_PASSWORD_MISMATCH",
+		6002: "SYSTEM_LOGIN_SEAT_REQUIRED",
+		6003: "SYSTEM_IDENTITY_PROVIDER_UNKNOWN",
+		6004: "SYSTEM_IDENTITY_EXCHANGE_FAILED",
+		6005: "SYSTEM_IDENTITY_ALREADY_BOUND",
 		6010: "SYSTEM_DEPT_SELF_PARENT",
 		6011: "SYSTEM_DEPT_CYCLE",
 		6012: "SYSTEM_DEPT_HAS_CHILDREN",
@@ -83,15 +102,28 @@ var (
 		6070: "SYSTEM_USER_SELF_DELETE",
 		6071: "SYSTEM_USER_SELF_DISABLE",
 		6072: "SYSTEM_USER_DISABLED",
+		6073: "SYSTEM_USER_NOT_FOUND",
+		6074: "SYSTEM_USER_EMAIL_TAKEN",
 		6080: "SYSTEM_FILE_NOT_FOUND",
 		6081: "SYSTEM_FILE_TOO_LARGE",
 		6082: "SYSTEM_FILE_SIZE_MISMATCH",
 		6083: "SYSTEM_FILE_INVALID_STATE",
+		6090: "SYSTEM_TENANT_DISABLED",
+		6091: "SYSTEM_TENANT_NOT_FOUND",
+		6092: "SYSTEM_TENANT_PROTECTED",
+		6100: "SYSTEM_POPULATION_EXISTS",
+		6101: "SYSTEM_POPULATION_PROTECTED",
+		6102: "SYSTEM_POPULATION_INVALID_ARCHETYPE",
+		6103: "SYSTEM_POPULATION_NOT_FOUND",
 	}
 	System_value = map[string]int32{
 		"SYSTEM_UNSPECIFIED":                  0,
 		"SYSTEM_LOGIN_FAILED":                 6000,
 		"SYSTEM_PASSWORD_MISMATCH":            6001,
+		"SYSTEM_LOGIN_SEAT_REQUIRED":          6002,
+		"SYSTEM_IDENTITY_PROVIDER_UNKNOWN":    6003,
+		"SYSTEM_IDENTITY_EXCHANGE_FAILED":     6004,
+		"SYSTEM_IDENTITY_ALREADY_BOUND":       6005,
 		"SYSTEM_DEPT_SELF_PARENT":             6010,
 		"SYSTEM_DEPT_CYCLE":                   6011,
 		"SYSTEM_DEPT_HAS_CHILDREN":            6012,
@@ -108,10 +140,19 @@ var (
 		"SYSTEM_USER_SELF_DELETE":             6070,
 		"SYSTEM_USER_SELF_DISABLE":            6071,
 		"SYSTEM_USER_DISABLED":                6072,
+		"SYSTEM_USER_NOT_FOUND":               6073,
+		"SYSTEM_USER_EMAIL_TAKEN":             6074,
 		"SYSTEM_FILE_NOT_FOUND":               6080,
 		"SYSTEM_FILE_TOO_LARGE":               6081,
 		"SYSTEM_FILE_SIZE_MISMATCH":           6082,
 		"SYSTEM_FILE_INVALID_STATE":           6083,
+		"SYSTEM_TENANT_DISABLED":              6090,
+		"SYSTEM_TENANT_NOT_FOUND":             6091,
+		"SYSTEM_TENANT_PROTECTED":             6092,
+		"SYSTEM_POPULATION_EXISTS":            6100,
+		"SYSTEM_POPULATION_PROTECTED":         6101,
+		"SYSTEM_POPULATION_INVALID_ARCHETYPE": 6102,
+		"SYSTEM_POPULATION_NOT_FOUND":         6103,
 	}
 )
 
@@ -146,11 +187,16 @@ var File_cyber_system_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xe1\x06\n" +
+	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xe9\n" +
+	"\n" +
 	"\x06System\x12\x1c\n" +
 	"\x12SYSTEM_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12\x1e\n" +
 	"\x13SYSTEM_LOGIN_FAILED\x10\xf0.\x1a\x04\xa8E\x90\x03\x12#\n" +
-	"\x18SYSTEM_PASSWORD_MISMATCH\x10\xf1.\x1a\x04\xa8E\x90\x03\x12\"\n" +
+	"\x18SYSTEM_PASSWORD_MISMATCH\x10\xf1.\x1a\x04\xa8E\x90\x03\x12%\n" +
+	"\x1aSYSTEM_LOGIN_SEAT_REQUIRED\x10\xf2.\x1a\x04\xa8E\x90\x03\x12+\n" +
+	" SYSTEM_IDENTITY_PROVIDER_UNKNOWN\x10\xf3.\x1a\x04\xa8E\x90\x03\x12*\n" +
+	"\x1fSYSTEM_IDENTITY_EXCHANGE_FAILED\x10\xf4.\x1a\x04\xa8E\x91\x03\x12(\n" +
+	"\x1dSYSTEM_IDENTITY_ALREADY_BOUND\x10\xf5.\x1a\x04\xa8E\x99\x03\x12\"\n" +
 	"\x17SYSTEM_DEPT_SELF_PARENT\x10\xfa.\x1a\x04\xa8E\x90\x03\x12\x1c\n" +
 	"\x11SYSTEM_DEPT_CYCLE\x10\xfb.\x1a\x04\xa8E\x90\x03\x12#\n" +
 	"\x18SYSTEM_DEPT_HAS_CHILDREN\x10\xfc.\x1a\x04\xa8E\x90\x03\x12 \n" +
@@ -167,10 +213,19 @@ const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\x17SYSTEM_USER_SELF_DELETE\x10\xb6/\x1a\x04\xa8E\x90\x03\x12#\n" +
 	"\x18SYSTEM_USER_SELF_DISABLE\x10\xb7/\x1a\x04\xa8E\x90\x03\x12\x1f\n" +
 	"\x14SYSTEM_USER_DISABLED\x10\xb8/\x1a\x04\xa8E\x93\x03\x12 \n" +
+	"\x15SYSTEM_USER_NOT_FOUND\x10\xb9/\x1a\x04\xa8E\x94\x03\x12\"\n" +
+	"\x17SYSTEM_USER_EMAIL_TAKEN\x10\xba/\x1a\x04\xa8E\x99\x03\x12 \n" +
 	"\x15SYSTEM_FILE_NOT_FOUND\x10\xc0/\x1a\x04\xa8E\x94\x03\x12 \n" +
 	"\x15SYSTEM_FILE_TOO_LARGE\x10\xc1/\x1a\x04\xa8E\x90\x03\x12$\n" +
 	"\x19SYSTEM_FILE_SIZE_MISMATCH\x10\xc2/\x1a\x04\xa8E\x90\x03\x12$\n" +
-	"\x19SYSTEM_FILE_INVALID_STATE\x10\xc3/\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03\"\x06\b\x8f/\x10\x8f/\"\x06\b\xa2/\x10\xa2/B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"\x19SYSTEM_FILE_INVALID_STATE\x10\xc3/\x1a\x04\xa8E\x90\x03\x12!\n" +
+	"\x16SYSTEM_TENANT_DISABLED\x10\xca/\x1a\x04\xa8E\x93\x03\x12\"\n" +
+	"\x17SYSTEM_TENANT_NOT_FOUND\x10\xcb/\x1a\x04\xa8E\x94\x03\x12\"\n" +
+	"\x17SYSTEM_TENANT_PROTECTED\x10\xcc/\x1a\x04\xa8E\x90\x03\x12#\n" +
+	"\x18SYSTEM_POPULATION_EXISTS\x10\xd4/\x1a\x04\xa8E\x99\x03\x12&\n" +
+	"\x1bSYSTEM_POPULATION_PROTECTED\x10\xd5/\x1a\x04\xa8E\x90\x03\x12.\n" +
+	"#SYSTEM_POPULATION_INVALID_ARCHETYPE\x10\xd6/\x1a\x04\xa8E\x90\x03\x12&\n" +
+	"\x1bSYSTEM_POPULATION_NOT_FOUND\x10\xd7/\x1a\x04\xa8E\x94\x03\x1a\x04\xa0E\x90\x03\"\x06\b\x8f/\x10\x8f/\"\x06\b\xa2/\x10\xa2/\"\x06\b\xcd/\x10\xcd/B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_error_reason_proto_rawDescOnce sync.Once

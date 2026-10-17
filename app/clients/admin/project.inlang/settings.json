@@ -26,7 +26,10 @@
       "./messages/system-diag/{locale}.json",
       "./messages/system-audit/{locale}.json",
       "./messages/files/{locale}.json",
-      "./messages/files-list/{locale}.json"
+      "./messages/files-list/{locale}.json",
+      "./messages/platform/{locale}.json",
+      "./messages/platform-tenants/{locale}.json",
+      "./messages/platform-populations/{locale}.json"
     ]
   }
 }

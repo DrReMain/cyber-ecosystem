@@ -1,7 +1,9 @@
 import type { Policy } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/policy_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TableProps } from "antd";
-import { Button, Popconfirm, Space, Tag } from "antd";
+import { Button, Space, Tag } from "antd";
+import { Pencil, Power, PowerOff, Trash } from "lucide-react";
+import { ActionIconButton } from "#/components/action-icon-button";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import { KindTag } from "./kind-tag";
@@ -68,57 +70,47 @@ export function PoliciesTable({
     fieldAction<Policy>(
       (_, policy) => (
         <Space size={0}>
-          <Button color="primary" onClick={() => onEdit(policy)} size="small" variant="text">
-            {m.system_policies_act_edit()}
-          </Button>
+          <ActionIconButton
+            icon={Pencil}
+            label={m.system_policies_act_edit()}
+            onClick={() => onEdit(policy)}
+          />
           {policy.enabled ? (
-            <Popconfirm
-              cancelButtonProps={{ variant: "filled", color: "default" }}
-              okButtonProps={{ variant: "filled", color: "danger" }}
-              onConfirm={() => onToggle(policy, false)}
-              placement={getTextDirection() === "rtl" ? "right" : "left"}
-              title={m.system_policies_disable_confirm()}
-            >
-              <Button
-                color="danger"
-                disabled={pendingId === (policy.id ?? "")}
-                size="small"
-                variant="text"
-              >
-                {m.system_policies_act_disable()}
-              </Button>
-            </Popconfirm>
-          ) : (
-            <Button
-              color="primary"
+            <ActionIconButton
+              confirm={{
+                onConfirm: () => onToggle(policy, false),
+                title: m.system_policies_disable_confirm(),
+              }}
               disabled={pendingId === (policy.id ?? "")}
+              icon={PowerOff}
+              label={m.system_policies_act_disable()}
+            />
+          ) : (
+            <ActionIconButton
+              disabled={pendingId === (policy.id ?? "")}
+              icon={Power}
+              label={m.system_policies_act_enable()}
               onClick={() => onToggle(policy, true)}
-              size="small"
-              variant="text"
-            >
-              {m.system_policies_act_enable()}
-            </Button>
+            />
           )}
-          <Popconfirm
-            cancelButtonProps={{ variant: "filled", color: "default" }}
-            okButtonProps={{ variant: "filled", color: "danger" }}
-            onConfirm={() => onDelete(policy)}
-            placement={getTextDirection() === "rtl" ? "right" : "left"}
-            title={
-              <span className="max-w-64">
-                {Number(policy.boundCount ?? 0) > 0
-                  ? m.system_policies_delete_confirm_bound({
-                      name: policy.name ?? "",
-                      n: Number(policy.boundCount ?? 0),
-                    })
-                  : m.system_policies_delete_confirm({ name: policy.name ?? "" })}
-              </span>
-            }
-          >
-            <Button color="danger" disabled={pendingId === policy.id} size="small" variant="text">
-              {m.system_policies_act_delete()}
-            </Button>
-          </Popconfirm>
+          <ActionIconButton
+            confirm={{
+              onConfirm: () => onDelete(policy),
+              title: (
+                <span className="max-w-64">
+                  {Number(policy.boundCount ?? 0) > 0
+                    ? m.system_policies_delete_confirm_bound({
+                        name: policy.name ?? "",
+                        n: Number(policy.boundCount ?? 0),
+                      })
+                    : m.system_policies_delete_confirm({ name: policy.name ?? "" })}
+                </span>
+              ),
+            }}
+            disabled={pendingId === policy.id}
+            icon={Trash}
+            label={m.system_policies_act_delete()}
+          />
         </Space>
       ),
       { title: m.system_policies_col_actions() },

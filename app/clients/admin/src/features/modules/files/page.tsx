@@ -32,7 +32,7 @@ const AREA = "/dashboard/files/list";
 
 export function FilesPage() {
   const search = useSearch({ from: AREA });
-  const { permissions } = useRouteContext({ from: AREA });
+  const { permissions, user } = useRouteContext({ from: AREA });
   const store = useAreaSearchStore(AREA, search, parseFilesSearch);
   const { values, onFilter, onReset } = useFilter(store, filesSearchSchema);
   const [renaming, setRenaming] = useState<{ id: string; name: string } | null>(null);
@@ -193,6 +193,7 @@ export function FilesPage() {
         emptyDescription={filtersActive ? m.files_empty_filtered() : m.files_empty()}
         files={filesQuery.data?.list ?? []}
         loading={filesQuery.isFetching}
+        meId={user.id ?? ""}
         onAbort={onAbortFile}
         onDelete={(file) => deleteMutation.mutate({ id: file.id ?? "" })}
         onRefresh={refetch}
@@ -219,7 +220,7 @@ export function FilesPage() {
       >
         <Input
           onChange={(e) => setRenaming((prev) => (prev ? { ...prev, name: e.target.value } : prev))}
-          placeholder={m.files_rename_label()}
+          placeholder={m.files_ph_rename()}
           value={renaming?.name}
         />
       </Modal>

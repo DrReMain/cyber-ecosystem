@@ -9,6 +9,7 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	commonpb "cyber-ecosystem/gen/go/cyber/shared/common/v1"
+	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
 	"cyber-ecosystem/app/services/agent/internal/ent"
 	"cyber-ecosystem/app/services/agent/internal/ent/chatmessage"
@@ -34,10 +35,11 @@ func (rp *chatRP) FindSessionByID(ctx context.Context, ownerID, sessionID string
 		Where(chatsession.IDEQ(sessionID), chatsession.OwnerIDEQ(ownerID)).
 		Only(ctx)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, nil
+		err = rp.Platform.HandleEntError(err)
+		if !errorspb.IsInfraErrorDbNotFound(err) {
+			return nil, err
 		}
-		return nil, rp.Platform.HandleEntError(err)
+		return nil, nil
 	}
 	return mapChatSession(d), nil
 }

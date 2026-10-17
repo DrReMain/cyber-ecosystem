@@ -1,6 +1,8 @@
 import type { DescMethod, DescService } from "@bufbuild/protobuf";
 import { makeEnvelope } from "@cyber-ecosystem/shared-error";
 
+export const WILDCARD_SUFFIX = "/*";
+
 // Derives an operation string from a generated proto service descriptor, so
 // typos in service or method names fail at compile time. Method keys are the
 // camelCase local names of the generated service object (e.g. "listUsers").
@@ -14,7 +16,7 @@ export function isOperationAllowed(patterns: readonly string[], operation: strin
   return patterns.some(
     (pattern) =>
       operation === pattern ||
-      (pattern.endsWith("/*") && operation.startsWith(pattern.slice(0, -1))),
+      (pattern.endsWith(WILDCARD_SUFFIX) && operation.startsWith(pattern.slice(0, -1))),
   );
 }
 

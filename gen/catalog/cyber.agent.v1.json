@@ -16,7 +16,6 @@
         "http_method": "GET",
         "http_path": "/api/v1/agent/agent-configs",
         "comment": "查询agent连接",
-        "builtin": false,
         "access": "ADMIN",
         "datascope": false
       }
@@ -39,8 +38,7 @@
         "http_method": "DELETE",
         "http_path": "/api/v1/agent/me/agent-config",
         "comment": "清除agent连接",
-        "builtin": true,
-        "access": "ADMIN",
+        "access": "BUILTIN",
         "datascope": false
       },
       {
@@ -53,8 +51,7 @@
         "http_method": "GET",
         "http_path": "/api/v1/agent/me/agent-config",
         "comment": "查询agent连接",
-        "builtin": true,
-        "access": "ADMIN",
+        "access": "BUILTIN",
         "datascope": false
       },
       {
@@ -67,8 +64,7 @@
         "http_method": "PUT",
         "http_path": "/api/v1/agent/me/agent-config",
         "comment": "配置agent连接",
-        "builtin": true,
-        "access": "ADMIN",
+        "access": "BUILTIN",
         "datascope": false
       }
     ]
@@ -90,8 +86,7 @@
         "http_method": "POST",
         "http_path": "/api/v1/agent/me/chat",
         "comment": "流式对话",
-        "builtin": true,
-        "access": "ADMIN",
+        "access": "BUILTIN",
         "datascope": false
       },
       {
@@ -104,8 +99,7 @@
         "http_method": "DELETE",
         "http_path": "/api/v1/agent/me/chat/sessions/{session_id}",
         "comment": "删除会话",
-        "builtin": true,
-        "access": "ADMIN",
+        "access": "BUILTIN",
         "datascope": false
       },
       {
@@ -118,8 +112,7 @@
         "http_method": "GET",
         "http_path": "/api/v1/agent/me/chat/sessions/{session_id}/messages",
         "comment": "查询会话消息",
-        "builtin": true,
-        "access": "ADMIN",
+        "access": "BUILTIN",
         "datascope": false
       },
       {
@@ -132,8 +125,7 @@
         "http_method": "GET",
         "http_path": "/api/v1/agent/me/models",
         "comment": "列出可用模型",
-        "builtin": true,
-        "access": "ADMIN",
+        "access": "BUILTIN",
         "datascope": false
       },
       {
@@ -146,8 +138,7 @@
         "http_method": "GET",
         "http_path": "/api/v1/agent/me/chat/sessions",
         "comment": "查询会话列表",
-        "builtin": true,
-        "access": "ADMIN",
+        "access": "BUILTIN",
         "datascope": false
       },
       {
@@ -160,8 +151,7 @@
         "http_method": "PUT",
         "http_path": "/api/v1/agent/me/chat/sessions/{session_id}",
         "comment": "重命名会话",
-        "builtin": true,
-        "access": "ADMIN",
+        "access": "BUILTIN",
         "datascope": false
       }
     ]

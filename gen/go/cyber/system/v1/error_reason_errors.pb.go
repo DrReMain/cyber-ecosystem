@@ -49,6 +49,54 @@ func ErrorSystemPasswordMismatch(format string, args ...interface{}) *errors.Err
 	return errors.New(400, System_SYSTEM_PASSWORD_MISMATCH.String(), fmt.Sprintf(format, args...))
 }
 
+func IsSystemLoginSeatRequired(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_LOGIN_SEAT_REQUIRED.String() && e.Code == 400
+}
+
+func ErrorSystemLoginSeatRequired(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_LOGIN_SEAT_REQUIRED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemIdentityProviderUnknown(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_IDENTITY_PROVIDER_UNKNOWN.String() && e.Code == 400
+}
+
+func ErrorSystemIdentityProviderUnknown(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_IDENTITY_PROVIDER_UNKNOWN.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemIdentityExchangeFailed(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_IDENTITY_EXCHANGE_FAILED.String() && e.Code == 401
+}
+
+func ErrorSystemIdentityExchangeFailed(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, System_SYSTEM_IDENTITY_EXCHANGE_FAILED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemIdentityAlreadyBound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_IDENTITY_ALREADY_BOUND.String() && e.Code == 409
+}
+
+func ErrorSystemIdentityAlreadyBound(format string, args ...interface{}) *errors.Error {
+	return errors.New(409, System_SYSTEM_IDENTITY_ALREADY_BOUND.String(), fmt.Sprintf(format, args...))
+}
+
 // 601x: dept
 func IsSystemDeptSelfParent(err error) bool {
 	if err == nil {
@@ -253,6 +301,30 @@ func ErrorSystemUserDisabled(format string, args ...interface{}) *errors.Error {
 	return errors.New(403, System_SYSTEM_USER_DISABLED.String(), fmt.Sprintf(format, args...))
 }
 
+func IsSystemUserNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_USER_NOT_FOUND.String() && e.Code == 404
+}
+
+func ErrorSystemUserNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, System_SYSTEM_USER_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemUserEmailTaken(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_USER_EMAIL_TAKEN.String() && e.Code == 409
+}
+
+func ErrorSystemUserEmailTaken(format string, args ...interface{}) *errors.Error {
+	return errors.New(409, System_SYSTEM_USER_EMAIL_TAKEN.String(), fmt.Sprintf(format, args...))
+}
+
 // 608x: file
 func IsSystemFileNotFound(err error) bool {
 	if err == nil {
@@ -301,4 +373,92 @@ func IsSystemFileInvalidState(err error) bool {
 
 func ErrorSystemFileInvalidState(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, System_SYSTEM_FILE_INVALID_STATE.String(), fmt.Sprintf(format, args...))
+}
+
+// 609x: tenant registry
+func IsSystemTenantDisabled(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_TENANT_DISABLED.String() && e.Code == 403
+}
+
+// 609x: tenant registry
+func ErrorSystemTenantDisabled(format string, args ...interface{}) *errors.Error {
+	return errors.New(403, System_SYSTEM_TENANT_DISABLED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemTenantNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_TENANT_NOT_FOUND.String() && e.Code == 404
+}
+
+func ErrorSystemTenantNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, System_SYSTEM_TENANT_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemTenantProtected(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_TENANT_PROTECTED.String() && e.Code == 400
+}
+
+func ErrorSystemTenantProtected(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_TENANT_PROTECTED.String(), fmt.Sprintf(format, args...))
+}
+
+// 610x: population registry
+func IsSystemPopulationExists(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_POPULATION_EXISTS.String() && e.Code == 409
+}
+
+// 610x: population registry
+func ErrorSystemPopulationExists(format string, args ...interface{}) *errors.Error {
+	return errors.New(409, System_SYSTEM_POPULATION_EXISTS.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemPopulationProtected(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_POPULATION_PROTECTED.String() && e.Code == 400
+}
+
+func ErrorSystemPopulationProtected(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_POPULATION_PROTECTED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemPopulationInvalidArchetype(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_POPULATION_INVALID_ARCHETYPE.String() && e.Code == 400
+}
+
+func ErrorSystemPopulationInvalidArchetype(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_POPULATION_INVALID_ARCHETYPE.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemPopulationNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_POPULATION_NOT_FOUND.String() && e.Code == 404
+}
+
+func ErrorSystemPopulationNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, System_SYSTEM_POPULATION_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }

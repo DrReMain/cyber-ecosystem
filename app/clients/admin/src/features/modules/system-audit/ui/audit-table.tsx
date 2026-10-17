@@ -2,8 +2,10 @@ import type { AuditLog } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/a
 import type { DataTableProps } from "@cyber-ecosystem/shared-antd/table";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TablePaginationConfig, TableProps } from "antd";
-import { Button, Tag } from "antd";
+import { Tag } from "antd";
+import { Eye } from "lucide-react";
 import type { ReactNode } from "react";
+import { ActionIconButton } from "#/components/action-icon-button";
 import { UserDeletedTag } from "#/features/app/user/user-deleted-tag";
 import { userRefView } from "#/features/app/user/user-ref";
 import { m } from "#/paraglide/messages";
@@ -131,9 +133,11 @@ export function AuditTable({
     },
     fieldAction<AuditLog>(
       (_, event) => (
-        <Button color="primary" onClick={() => onDetail(event)} size="small" variant="text">
-          {m.system_audit_act_detail()}
-        </Button>
+        <ActionIconButton
+          icon={Eye}
+          label={m.system_audit_act_detail()}
+          onClick={() => onDetail(event)}
+        />
       ),
       { title: m.system_audit_col_action() },
     ),

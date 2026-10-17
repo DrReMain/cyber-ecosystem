@@ -11,6 +11,7 @@
   "files_delete_confirm": "이 파일을 소프트 삭제할까요? 저장된 오브젝트는 유지됩니다",
   "files_rename_title": "파일 이름 바꾸기",
   "files_rename_label": "새 이름",
+  "files_ph_rename": "새 이름 입력",
   "files_col_name": "파일명",
   "files_col_type": "유형",
   "files_col_size": "크기",

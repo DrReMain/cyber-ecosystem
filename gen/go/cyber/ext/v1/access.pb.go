@@ -25,14 +25,15 @@ const (
 )
 
 // Method access policy: which audience may call an RPC. Each value is a label
-// the auth selector matches (auth.MatchAccess) to pick a middleware chain. The
+// the auth selector matches (security.MatchAccess) to pick a middleware chain. The
 // enum is standalone — adding a value only enables a selector branch; it
 // enforces nothing on its own. Wiring (which chain each audience gets, and what
 // that chain does) lives in each service's server setup.
 //
-//	PUBLIC — opt out of auth (login, public endpoints)
-//	ADMIN  — admin audience
-//	APP    — app / end-user audience
+//	PUBLIC   — no authentication (login, open endpoints)
+//	ADMIN    — grant-gated operator audience
+//	PLATFORM — platform-plane faces, additionally sealed by tenant structure
+//	BUILTIN  — session contracts that authenticate but never consult grants
 //
 // ACCESS_UNSPECIFIED is the zero value (no annotation set); how it is handled
 // is the caller's decision, not the enum's.
@@ -42,7 +43,8 @@ const (
 	Access_ACCESS_UNSPECIFIED Access = 0
 	Access_ACCESS_PUBLIC      Access = 1
 	Access_ACCESS_ADMIN       Access = 2
-	Access_ACCESS_APP         Access = 3
+	Access_ACCESS_PLATFORM    Access = 3
+	Access_ACCESS_BUILTIN     Access = 4
 )
 
 // Enum value maps for Access.
@@ -51,13 +53,15 @@ var (
 		0: "ACCESS_UNSPECIFIED",
 		1: "ACCESS_PUBLIC",
 		2: "ACCESS_ADMIN",
-		3: "ACCESS_APP",
+		3: "ACCESS_PLATFORM",
+		4: "ACCESS_BUILTIN",
 	}
 	Access_value = map[string]int32{
 		"ACCESS_UNSPECIFIED": 0,
 		"ACCESS_PUBLIC":      1,
 		"ACCESS_ADMIN":       2,
-		"ACCESS_APP":         3,
+		"ACCESS_PLATFORM":    3,
+		"ACCESS_BUILTIN":     4,
 	}
 )
 
@@ -109,13 +113,13 @@ var File_ext_v1_access_proto protoreflect.FileDescriptor
 
 const file_ext_v1_access_proto_rawDesc = "" +
 	"\n" +
-	"\x13ext/v1/access.proto\x12\fcyber.ext.v1\x1a google/protobuf/descriptor.proto*U\n" +
+	"\x13ext/v1/access.proto\x12\fcyber.ext.v1\x1a google/protobuf/descriptor.proto*n\n" +
 	"\x06Access\x12\x16\n" +
 	"\x12ACCESS_UNSPECIFIED\x10\x00\x12\x11\n" +
 	"\rACCESS_PUBLIC\x10\x01\x12\x10\n" +
-	"\fACCESS_ADMIN\x10\x02\x12\x0e\n" +
-	"\n" +
-	"ACCESS_APP\x10\x03:M\n" +
+	"\fACCESS_ADMIN\x10\x02\x12\x13\n" +
+	"\x0fACCESS_PLATFORM\x10\x03\x12\x12\n" +
+	"\x0eACCESS_BUILTIN\x10\x04:M\n" +
 	"\x06access\x12\x1e.google.protobuf.MethodOptions\x18\x91N \x01(\x0e2\x14.cyber.ext.v1.AccessR\x06accessB%Z#cyber-ecosystem/gen/go/cyber/ext/v1b\x06proto3"
 
 var (

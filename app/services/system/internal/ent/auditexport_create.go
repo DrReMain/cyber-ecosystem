@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type AuditExportCreate struct {
 	config
 	mutation *AuditExportMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -209,6 +212,7 @@ func (_c *AuditExportCreate) createSpec() (*AuditExport, *sqlgraph.CreateSpec) {
 		_node = &AuditExport{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(auditexport.Table, sqlgraph.NewFieldSpec(auditexport.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -236,11 +240,231 @@ func (_c *AuditExportCreate) createSpec() (*AuditExport, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.AuditExport.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AuditExportUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *AuditExportCreate) OnConflict(opts ...sql.ConflictOption) *AuditExportUpsertOne {
+	_c.conflict = opts
+	return &AuditExportUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.AuditExport.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *AuditExportCreate) OnConflictColumns(columns ...string) *AuditExportUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &AuditExportUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// AuditExportUpsertOne is the builder for "upsert"-ing
+	//  one AuditExport node.
+	AuditExportUpsertOne struct {
+		create *AuditExportCreate
+	}
+
+	// AuditExportUpsert is the "OnConflict" setter.
+	AuditExportUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AuditExportUpsert) SetUpdatedAt(v time.Time) *AuditExportUpsert {
+	u.Set(auditexport.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AuditExportUpsert) UpdateUpdatedAt() *AuditExportUpsert {
+	u.SetExcluded(auditexport.FieldUpdatedAt)
+	return u
+}
+
+// SetFileID sets the "file_id" field.
+func (u *AuditExportUpsert) SetFileID(v string) *AuditExportUpsert {
+	u.Set(auditexport.FieldFileID, v)
+	return u
+}
+
+// UpdateFileID sets the "file_id" field to the value that was provided on create.
+func (u *AuditExportUpsert) UpdateFileID() *AuditExportUpsert {
+	u.SetExcluded(auditexport.FieldFileID)
+	return u
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (u *AuditExportUpsert) SetOwnerID(v string) *AuditExportUpsert {
+	u.Set(auditexport.FieldOwnerID, v)
+	return u
+}
+
+// UpdateOwnerID sets the "owner_id" field to the value that was provided on create.
+func (u *AuditExportUpsert) UpdateOwnerID() *AuditExportUpsert {
+	u.SetExcluded(auditexport.FieldOwnerID)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.AuditExport.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(auditexport.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *AuditExportUpsertOne) UpdateNewValues() *AuditExportUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(auditexport.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(auditexport.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(auditexport.FieldTenantID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.AuditExport.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *AuditExportUpsertOne) Ignore() *AuditExportUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AuditExportUpsertOne) DoNothing() *AuditExportUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AuditExportCreate.OnConflict
+// documentation for more info.
+func (u *AuditExportUpsertOne) Update(set func(*AuditExportUpsert)) *AuditExportUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AuditExportUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AuditExportUpsertOne) SetUpdatedAt(v time.Time) *AuditExportUpsertOne {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AuditExportUpsertOne) UpdateUpdatedAt() *AuditExportUpsertOne {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetFileID sets the "file_id" field.
+func (u *AuditExportUpsertOne) SetFileID(v string) *AuditExportUpsertOne {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.SetFileID(v)
+	})
+}
+
+// UpdateFileID sets the "file_id" field to the value that was provided on create.
+func (u *AuditExportUpsertOne) UpdateFileID() *AuditExportUpsertOne {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.UpdateFileID()
+	})
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (u *AuditExportUpsertOne) SetOwnerID(v string) *AuditExportUpsertOne {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.SetOwnerID(v)
+	})
+}
+
+// UpdateOwnerID sets the "owner_id" field to the value that was provided on create.
+func (u *AuditExportUpsertOne) UpdateOwnerID() *AuditExportUpsertOne {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.UpdateOwnerID()
+	})
+}
+
+// Exec executes the query.
+func (u *AuditExportUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AuditExportCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AuditExportUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *AuditExportUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: AuditExportUpsertOne.ID is not supported by MySQL driver. Use AuditExportUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *AuditExportUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // AuditExportCreateBulk is the builder for creating many AuditExport entities in bulk.
 type AuditExportCreateBulk struct {
 	config
 	err      error
 	builders []*AuditExportCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the AuditExport entities in the database.
@@ -270,6 +494,7 @@ func (_c *AuditExportCreateBulk) Save(ctx context.Context) ([]*AuditExport, erro
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -316,6 +541,168 @@ func (_c *AuditExportCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *AuditExportCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.AuditExport.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.AuditExportUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *AuditExportCreateBulk) OnConflict(opts ...sql.ConflictOption) *AuditExportUpsertBulk {
+	_c.conflict = opts
+	return &AuditExportUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.AuditExport.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *AuditExportCreateBulk) OnConflictColumns(columns ...string) *AuditExportUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &AuditExportUpsertBulk{
+		create: _c,
+	}
+}
+
+// AuditExportUpsertBulk is the builder for "upsert"-ing
+// a bulk of AuditExport nodes.
+type AuditExportUpsertBulk struct {
+	create *AuditExportCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.AuditExport.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(auditexport.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *AuditExportUpsertBulk) UpdateNewValues() *AuditExportUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(auditexport.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(auditexport.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(auditexport.FieldTenantID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.AuditExport.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *AuditExportUpsertBulk) Ignore() *AuditExportUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *AuditExportUpsertBulk) DoNothing() *AuditExportUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the AuditExportCreateBulk.OnConflict
+// documentation for more info.
+func (u *AuditExportUpsertBulk) Update(set func(*AuditExportUpsert)) *AuditExportUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&AuditExportUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *AuditExportUpsertBulk) SetUpdatedAt(v time.Time) *AuditExportUpsertBulk {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *AuditExportUpsertBulk) UpdateUpdatedAt() *AuditExportUpsertBulk {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetFileID sets the "file_id" field.
+func (u *AuditExportUpsertBulk) SetFileID(v string) *AuditExportUpsertBulk {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.SetFileID(v)
+	})
+}
+
+// UpdateFileID sets the "file_id" field to the value that was provided on create.
+func (u *AuditExportUpsertBulk) UpdateFileID() *AuditExportUpsertBulk {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.UpdateFileID()
+	})
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (u *AuditExportUpsertBulk) SetOwnerID(v string) *AuditExportUpsertBulk {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.SetOwnerID(v)
+	})
+}
+
+// UpdateOwnerID sets the "owner_id" field to the value that was provided on create.
+func (u *AuditExportUpsertBulk) UpdateOwnerID() *AuditExportUpsertBulk {
+	return u.Update(func(s *AuditExportUpsert) {
+		s.UpdateOwnerID()
+	})
+}
+
+// Exec executes the query.
+func (u *AuditExportUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the AuditExportCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for AuditExportCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *AuditExportUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

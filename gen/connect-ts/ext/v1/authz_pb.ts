@@ -13,17 +13,11 @@ import { file_google_protobuf_descriptor } from "@bufbuild/protobuf/wkt";
  * Describes the file ext/v1/authz.proto.
  */
 export const file_ext_v1_authz: GenFile = /*@__PURE__*/
-  fileDesc("ChJleHQvdjEvYXV0aHoucHJvdG8SDGN5YmVyLmV4dC52MTo5CgdidWlsdGluEh4uZ29vZ2xlLnByb3RvYnVmLk1ldGhvZE9wdGlvbnMYkk4gASgIUgdidWlsdGluOj0KCWRhdGFzY29wZRIeLmdvb2dsZS5wcm90b2J1Zi5NZXRob2RPcHRpb25zGJROIAEoCFIJZGF0YXNjb3BlQiVaI2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXh0L3YxYgZwcm90bzM", [file_google_protobuf_descriptor]);
-
-/**
- * @generated from extension: bool builtin = 10002;
- */
-export const builtin: GenExtension<MethodOptions, boolean> = /*@__PURE__*/
-  extDesc(file_ext_v1_authz, 0);
+  fileDesc("ChJleHQvdjEvYXV0aHoucHJvdG8SDGN5YmVyLmV4dC52MTo9CglkYXRhc2NvcGUSHi5nb29nbGUucHJvdG9idWYuTWV0aG9kT3B0aW9ucxiUTiABKAhSCWRhdGFzY29wZUIlWiNjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL2V4dC92MWIGcHJvdG8z", [file_google_protobuf_descriptor]);
 
 /**
  * @generated from extension: bool datascope = 10004;
  */
 export const datascope: GenExtension<MethodOptions, boolean> = /*@__PURE__*/
-  extDesc(file_ext_v1_authz, 1);
+  extDesc(file_ext_v1_authz, 0);
 

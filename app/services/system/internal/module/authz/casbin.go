@@ -31,9 +31,10 @@ m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && matchOp(r.obj, p.obj)
 const roleSubjectPrefix = "role:"
 
 type snapshot struct {
-	version int64
-	enf     *casbin.Enforcer
-	grants  map[grantKey]grantMeta
+	version     int64
+	enf         *casbin.Enforcer
+	grants      map[grantKey]grantMeta
+	populations map[string]string // code → archetype; compiled with the snapshot so archetype reads cost no query
 }
 
 type grantRow struct {
@@ -85,7 +86,7 @@ func matchOpFunc(args ...any) (any, error) {
 	return matchOperation(op, pattern), nil
 }
 
-func compile(version int64, grants []grantRow, bindings []bindingRow) (*snapshot, error) {
+func compile(version int64, grants []grantRow, bindings []bindingRow, populations map[string]string) (*snapshot, error) {
 	// matchOp is registered as the matcher function so casbin's Enforce and
 	// the biz-side matching share one implementation.
 	m, err := model.NewModelFromString(modelText)
@@ -128,5 +129,5 @@ func compile(version int64, grants []grantRow, bindings []bindingRow) (*snapshot
 			return nil, fmt.Errorf("authz compile: add groupings: %w", err)
 		}
 	}
-	return &snapshot{version: version, enf: enf, grants: meta}, nil
+	return &snapshot{version: version, enf: enf, grants: meta, populations: populations}, nil
 }

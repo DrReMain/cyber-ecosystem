@@ -1,10 +1,10 @@
 import type { File as FileView } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TablePaginationConfig, TableProps } from "antd";
-import { Button, Popconfirm, Progress, Tag, Tooltip } from "antd";
-import { RotateCw, X } from "lucide-react";
+import { Progress, Tag } from "antd";
+import { Eye, Pencil, RotateCw, Trash, X } from "lucide-react";
 import type { ReactNode } from "react";
-import { isPreviewable } from "#/features/app/file/is-previewable";
+import { ActionIconButton } from "#/components/action-icon-button";
 import { useFileUrls } from "#/features/app/file/use-file-url";
 import type { UploadProgress } from "#/features/app/file/use-upload";
 import { UserDeletedTag } from "#/features/app/user/user-deleted-tag";
@@ -59,6 +59,7 @@ function sourceLabel(source: string): string {
 interface FilesTableProps {
   files: FileView[];
   loading: boolean;
+  meId: string;
   pagination: TablePaginationConfig;
   emptyDescription: string;
   ownerName: (id: string) => string | undefined;
@@ -77,6 +78,7 @@ interface FilesTableProps {
 export function FilesTable({
   files,
   loading,
+  meId,
   pagination,
   emptyDescription,
   ownerName,
@@ -100,25 +102,12 @@ export function FilesTable({
   );
 
   const renderCancel = (file: FileView) => (
-    <Popconfirm
-      cancelButtonProps={{ variant: "filled", color: "default" }}
-      okButtonProps={{ variant: "filled", color: "danger" }}
-      onConfirm={() => onAbort(file)}
-      title={m.files_abort_confirm()}
-    >
-      <Tooltip title={m.common_cancel()}>
-        <span className="inline-flex">
-          <Button
-            aria-label={m.common_cancel()}
-            color="danger"
-            disabled={pendingAbortId === (file.id ?? "")}
-            icon={<X size={14} />}
-            size="small"
-            variant="text"
-          />
-        </span>
-      </Tooltip>
-    </Popconfirm>
+    <ActionIconButton
+      confirm={{ onConfirm: () => onAbort(file), title: m.files_abort_confirm() }}
+      disabled={pendingAbortId === (file.id ?? "")}
+      icon={X}
+      label={m.common_cancel()}
+    />
   );
 
   const columns: TableProps<FileView>["columns"] = [
@@ -171,24 +160,20 @@ export function FilesTable({
         if (status === "failed") {
           return <Progress percent={100} showInfo={false} size="small" status="exception" />;
         }
+        if (file.ownerId !== meId) {
+          return null;
+        }
         const p = progressById[file.id ?? ""];
         const pct = p && p.total > 0 ? Math.min(100, Math.floor((p.loaded / p.total) * 100)) : 0;
         return (
           <div className="flex items-center gap-2">
             {p ? <Progress percent={pct} size="small" /> : <UploadProbe file={file} />}
-            <Tooltip title={m.files_act_resume()}>
-              <span className="inline-flex">
-                <Button
-                  aria-label={m.files_act_resume()}
-                  color="primary"
-                  disabled={Boolean(p)}
-                  icon={<RotateCw size={14} />}
-                  onClick={() => onResume(file)}
-                  size="small"
-                  variant="text"
-                />
-              </span>
-            </Tooltip>
+            <ActionIconButton
+              disabled={Boolean(p)}
+              icon={RotateCw}
+              label={m.files_act_resume()}
+              onClick={() => onResume(file)}
+            />
             {renderCancel(file)}
           </div>
         );
@@ -235,38 +220,25 @@ export function FilesTable({
         const url = confirmed ? urls.get(file.id ?? "") : undefined;
         return (
           <div className="flex items-center gap-1">
-            <Button
-              color="primary"
+            <ActionIconButton
               disabled={!url}
               href={url}
+              icon={Eye}
+              label={m.files_act_preview()}
               rel="noreferrer"
-              size="small"
               target="_blank"
-              variant="text"
-            >
-              {isPreviewable(file.contentType ?? "")
-                ? m.files_act_preview()
-                : m.files_act_preview()}
-            </Button>
-            <Button color="primary" onClick={() => onRename(file)} size="small" variant="text">
-              {m.files_act_rename()}
-            </Button>
-            <Popconfirm
-              cancelButtonProps={{ variant: "filled", color: "default" }}
-              okButtonProps={{ variant: "filled", color: "danger" }}
-              onConfirm={() => onDelete(file)}
-              placement={getTextDirection() === "rtl" ? "right" : "left"}
-              title={m.files_delete_confirm()}
-            >
-              <Button
-                color="danger"
-                disabled={!deletable || pendingDeleteId === (file.id ?? "")}
-                size="small"
-                variant="text"
-              >
-                {m.files_act_delete()}
-              </Button>
-            </Popconfirm>
+            />
+            <ActionIconButton
+              icon={Pencil}
+              label={m.files_act_rename()}
+              onClick={() => onRename(file)}
+            />
+            <ActionIconButton
+              confirm={{ onConfirm: () => onDelete(file), title: m.files_delete_confirm() }}
+              disabled={!deletable || pendingDeleteId === (file.id ?? "")}
+              icon={Trash}
+              label={m.files_act_delete()}
+            />
           </div>
         );
       },

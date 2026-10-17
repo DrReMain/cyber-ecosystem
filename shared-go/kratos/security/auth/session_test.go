@@ -92,7 +92,7 @@ func TestSessionAuth(t *testing.T) {
 				authn = &fakeAuthenticator{}
 			}
 			var gotSubject *security.Subject
-			handler := SessionAuth(authn, SessionCookie("session_token"))(func(ctx context.Context, _ any) (any, error) {
+			handler := SessionAuth(authn)(func(ctx context.Context, _ any) (any, error) {
 				var ok bool
 				gotSubject, ok = security.SubjectFromCtx(ctx)
 				if !ok {
@@ -118,20 +118,11 @@ func TestSessionAuth(t *testing.T) {
 }
 
 func TestSessionAuthNoTransport(t *testing.T) {
-	handler := SessionAuth(&fakeAuthenticator{}, SessionCookie("session_token"))(func(ctx context.Context, _ any) (any, error) {
+	handler := SessionAuth(&fakeAuthenticator{})(func(ctx context.Context, _ any) (any, error) {
 		t.Fatal("handler must not run without a server transport")
 		return nil, nil
 	})
 	if _, err := handler(context.Background(), nil); err == nil || err.Error() != ErrMissingSession.Error() {
 		t.Fatalf("err = %v; want %v", err, ErrMissingSession)
 	}
-}
-
-func TestSessionAuthRequiresCookieName(t *testing.T) {
-	defer func() {
-		if recover() == nil {
-			t.Fatal("SessionAuth without SessionCookie must panic at construction")
-		}
-	}()
-	_ = SessionAuth(&fakeAuthenticator{})
 }

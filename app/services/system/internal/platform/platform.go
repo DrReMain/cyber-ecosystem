@@ -23,7 +23,7 @@ type Platform struct {
 	handleCacheError   CacheErrorHandler
 	db                 *ent.Client
 	handleEntError     EntErrorHandler
-	storage            *storage.Storage
+	storage            *TenantStorage
 	handleStorageError StorageErrorHandler
 	mq                 *mq.MQ
 	handleMQError      MQErrorHandler
@@ -34,7 +34,7 @@ func NewPlatform(
 	handleCacheError CacheErrorHandler,
 	db *ent.Client,
 	handleEntError EntErrorHandler,
-	storage *storage.Storage,
+	storage *TenantStorage,
 	handleStorageError StorageErrorHandler,
 	mq *mq.MQ,
 	handleMQError MQErrorHandler,
@@ -63,7 +63,13 @@ func (p *Platform) HandleEntError(err error) error { return p.handleEntError(err
 func (p *Platform) GetCache() *cache.Cache           { return p.cache }
 func (p *Platform) HandleCacheError(err error) error { return p.handleCacheError(err) }
 
-func (p *Platform) GetStorage() *storage.Storage       { return p.storage }
+// GetStorageFor is the object plane's only entrance: the caller's context
+// decides the bucket, so no call site can bypass the tenancy axis.
+func (p *Platform) GetStorageFor(ctx context.Context) *storage.View {
+	return p.storage.ForTenant(ctx)
+}
+
+func (p *Platform) GetStorageLimits() storage.Limits   { return p.storage.Limits() }
 func (p *Platform) HandleStorageError(err error) error { return p.handleStorageError(err) }
 
 func (p *Platform) GetMQ() *mq.MQ                 { return p.mq }

@@ -4,7 +4,7 @@
  *
  * Checks:
  *   1. every literal docs/... or .claude/... path referenced from AGENTS.md,
- *      CLAUDE.md, and every doc/skill body exists on disk;
+ *      CLAUDE.md, the root READMEs, and every doc/skill body exists on disk;
  *   2. every same-line "docs/<file>.md <section N>" pointer resolves to a real
  *      "## N." / "## N)" heading in the target (quoted heading names verified
  *      as substrings) -- this is the pointer grammar skills must use;
@@ -22,7 +22,12 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const fail = [];
 const bad = (msg) => fail.push(msg);
 
-const refFiles = [path.join(ROOT, "AGENTS.md"), path.join(ROOT, "CLAUDE.md")];
+const refFiles = [
+  path.join(ROOT, "AGENTS.md"),
+  path.join(ROOT, "CLAUDE.md"),
+  path.join(ROOT, "README.md"),
+  path.join(ROOT, "README.zh-CN.md"),
+];
 const skillsDir = path.join(ROOT, ".claude", "skills");
 if (fs.existsSync(skillsDir)) {
   for (const name of fs.readdirSync(skillsDir).sort()) {

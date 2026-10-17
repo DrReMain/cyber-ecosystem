@@ -1,5 +1,7 @@
 import { getRequest, getRequestHeader, setResponseHeader } from "@tanstack/react-start/server";
 
+// Mirrors shared-go/kratos/security/auth.SessionCookieName — the server-side
+// extractor recognizes exactly that spelling; rename the two together.
 const SESSION_COOKIE = "session_token";
 
 function isSecureRequest(): boolean {

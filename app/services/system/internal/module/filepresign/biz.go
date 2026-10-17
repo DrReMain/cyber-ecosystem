@@ -71,6 +71,7 @@ type ResumeOut struct {
 type FilePresignRP interface {
 	Create(ctx context.Context, f *file.File) (*file.File, error)
 	MarkConfirmed(ctx context.Context, id string, size int64, contentType, etag string) (*file.File, error)
+	SetUploadID(ctx context.Context, id, uploadID string) error
 	Delete(ctx context.Context, id string) error
 	FindByID(ctx context.Context, id string) (*file.File, error)
 	Limits() storage.Limits
@@ -254,7 +255,18 @@ func (uc *FilePresignUC) ListParts(ctx context.Context, id string) (*ResumeOut, 
 	}
 	uploaded, err := uc.fileRP.ListParts(ctx, f.Key, f.UploadID)
 	if err != nil {
-		return nil, err
+		if !errorspb.IsInfraErrorStorageNotFound(err) {
+			return nil, err
+		}
+		fresh, ierr := uc.fileRP.CreateMultipart(ctx, f.Key, f.ContentType)
+		if ierr != nil {
+			return nil, ierr
+		}
+		if uerr := uc.fileRP.SetUploadID(ctx, f.ID, fresh); uerr != nil {
+			return nil, uerr
+		}
+		f.UploadID = fresh
+		uploaded = nil
 	}
 	partSize, partCount := planOf(limits, f.Size)
 	uploadedSet := make(map[int32]struct{}, len(uploaded))

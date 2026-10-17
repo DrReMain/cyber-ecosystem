@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"slices"
@@ -16,8 +17,13 @@ import (
 
 	"cyber-ecosystem/app/services/system/internal/module/dept"
 	"cyber-ecosystem/app/services/system/internal/module/file"
+	"cyber-ecosystem/app/services/system/internal/module/population"
 	"cyber-ecosystem/app/services/system/internal/shared"
 )
+
+// errBirthLost marks the one retryable failure in Create: a concurrent
+// birth won the email's unique. Internal control flow, never returned.
+var errBirthLost = fmt.Errorf("identity birth lost the email unique")
 
 // DO ------------------------------------------------------------------------------------------------------------------
 
@@ -25,13 +31,29 @@ type User struct {
 	ID           string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
-	TenantID     string
 	DeptID       *string
 	Avatar       *string // referenced file id; nil on Update-mask = clear
 	Email        *string
 	PasswordHash *string  // biz-only (never in proto); nil on Update = leave unchanged
 	Roles        []string // role codes; list enrichment, filled by List/Get
 	Enabled      bool
+}
+
+// Credential is a third-party identity binding: one external identifier
+// resolves to exactly one global identity. Identity-plane data — the kind
+// vocabulary is code (provider_<kind>.go), instances live in conf rows.
+type Credential struct {
+	Kind       string
+	Identifier string
+	UserID     string
+}
+
+// Seat is one tenancy of an identity — a membership row. The identity is
+// global (email); every tenancy it holds is a seat.
+type Seat struct {
+	UserID     string
+	TenantID   string
+	Population string
 }
 
 type UserListIn struct {
@@ -57,6 +79,14 @@ type UserRP interface {
 	List(ctx context.Context, in *UserListIn) (*UserListOut, error)
 	FindByEmail(ctx context.Context, email string) (*User, error)
 	FindByID(ctx context.Context, id string) (*User, error)
+	FindSeated(ctx context.Context, id string) (*User, error)
+	FindByIDs(ctx context.Context, ids []string) (map[string]*User, error)
+	FindCredential(ctx context.Context, kind, identifier string) (*Credential, error)
+	CreateCredential(ctx context.Context, c *Credential) error
+	DeleteCredentialsByUser(ctx context.Context, userID string) error
+	EnsureSeat(ctx context.Context, seat *Seat) error
+	DeleteSeatsByUser(ctx context.Context, userID string) error
+	ListSeatsByUser(ctx context.Context, userID string) ([]*Seat, error)
 	FindRoleIDsByCodes(ctx context.Context, codes []string) (map[string]string, error)
 	SetUserRoles(ctx context.Context, userID string, roleIDs []string) error
 	DeleteUserRoles(ctx context.Context, userID string) (bool, error)
@@ -69,50 +99,99 @@ type UserRP interface {
 
 type UserUC struct {
 	shared.UC
-	userRP UserRP
-	deptRP dept.DeptRP
-	fileRP file.FileRP
+	userRP       UserRP
+	deptRP       dept.DeptRP
+	fileRP       file.FileRP
+	populationRP population.PopulationRP
 }
 
-func NewUserUC(logger *slog.Logger, tm shared.Transaction, userRP UserRP, deptRP dept.DeptRP, fileRP file.FileRP) *UserUC {
+func NewUserUC(logger *slog.Logger, tm shared.Transaction, userRP UserRP, deptRP dept.DeptRP, fileRP file.FileRP, populationRP population.PopulationRP) *UserUC {
 	return &UserUC{
-		UC:     shared.NewUC(logger.With("module", "module/user"), tm),
-		userRP: userRP,
-		deptRP: deptRP,
-		fileRP: fileRP,
+		UC:           shared.NewUC(logger.With("module", "module/user"), tm),
+		userRP:       userRP,
+		deptRP:       deptRP,
+		fileRP:       fileRP,
+		populationRP: populationRP,
 	}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *UserUC) Create(ctx context.Context, email, password, deptID, avatar *string, roles []string) (out *User, err error) {
-	if err = uc.ensureDept(ctx, deptID); err != nil {
-		return nil, err
-	}
-	if err = uc.ensureAvatar(ctx, avatar); err != nil {
-		return nil, err
-	}
-	hash, err := utils.Hash(*password)
+func (uc *UserUC) Create(ctx context.Context, email, password, deptID, avatar *string, population string, roles []string) (out *User, err error) {
+	seatPopulation, err := uc.resolveSeatPopulation(ctx, population)
 	if err != nil {
-		return nil, errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", err))
+		return nil, err
 	}
 	roleIDs, err := uc.resolveRoles(ctx, roles)
 	if err != nil {
 		return nil, err
 	}
+	// Email is the global identity key: an identity that already exists
+	// gains a seat in the creating admin's tenant — a second row is never
+	// born. Profile params (password, dept, avatar) belong to identity
+	// birth alone and are inert on the seat path.
+	existing, ferr := uc.userRP.FindByEmail(ctx, *email)
+	if ferr != nil && !errorspb.IsInfraErrorDbNotFound(ferr) {
+		return nil, ferr
+	}
+	birth := ferr != nil
+	if birth {
+		if err = uc.ensureDept(ctx, deptID); err != nil {
+			return nil, err
+		}
+		if err = uc.ensureAvatar(ctx, avatar); err != nil {
+			return nil, err
+		}
+		hash, herr := utils.Hash(*password)
+		if herr != nil {
+			return nil, errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", herr))
+		}
+		password = &hash
+	} else {
+		out = existing
+	}
+	// The seat lands in the creating admin's tenant; an identity born here
+	// is never seatless.
+	seat := &Seat{TenantID: security.TenantFromCtx(ctx), Population: seatPopulation}
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
-		if out, err = uc.userRP.Create(ctx, &User{DeptID: deptID, Avatar: avatar, Email: email, PasswordHash: &hash}); err != nil {
+		if birth {
+			created, cerr := uc.userRP.Create(ctx, &User{DeptID: deptID, Avatar: avatar, Email: email, PasswordHash: password})
+			if cerr != nil {
+				if errorspb.IsInfraErrorDbConstraint(cerr) {
+					return errBirthLost
+				}
+				return cerr
+			}
+			out = created
+		}
+		seat.UserID = out.ID
+		if err = uc.userRP.EnsureSeat(ctx, seat); err != nil {
 			return err
 		}
-		return uc.userRP.SetUserRoles(ctx, out.ID, roleIDs)
+		// An empty role ask leaves the identity's bindings untouched — the
+		// seat is the ask, not a binding replace.
+		if len(roleIDs) > 0 {
+			return uc.userRP.SetUserRoles(ctx, out.ID, roleIDs)
+		}
+		return nil
 	})
-	if err == nil && len(roles) > 0 {
+	if err != nil {
+		// The winner exists now, so the same ask lands as its seat.
+		if errors.Is(err, errBirthLost) {
+			return uc.Create(ctx, email, password, deptID, avatar, population, roles)
+		}
+		return nil, err
+	}
+	if len(roleIDs) > 0 {
 		uc.userRP.NotifyChanged(ctx)
 	}
 	return
 }
 
 func (uc *UserUC) Update(ctx context.Context, fieldsMask []string, u *User, password *string, roles []string) (out *User, err error) {
+	if _, err = uc.ensureSeatedUser(ctx, u.ID); err != nil {
+		return nil, err
+	}
 	if slices.Contains(fieldsMask, "dept_id") {
 		if err = uc.ensureDept(ctx, u.DeptID); err != nil {
 			return nil, err
@@ -139,6 +218,11 @@ func (uc *UserUC) Update(ctx context.Context, fieldsMask []string, u *User, pass
 	}
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
 		if out, err = uc.userRP.Update(ctx, fieldsMask, u); err != nil {
+			// The email unique is the only constraint an email mask can
+			// trip — the race backstop classifies, never an infra leak.
+			if errorspb.IsInfraErrorDbConstraint(err) && slices.Contains(fieldsMask, "email") {
+				return systempb.ErrorSystemUserEmailTaken("")
+			}
 			return err
 		}
 		if setRoles {
@@ -156,7 +240,7 @@ func (uc *UserUC) UpdateStatus(ctx context.Context, id string, enabled bool) (ou
 	if subject, ok := security.SubjectFromCtx(ctx); ok && !enabled && subject.UserID == id {
 		return nil, systempb.ErrorSystemUserSelfDisable("")
 	}
-	if _, err = uc.userRP.FindByID(ctx, id); err != nil {
+	if _, err = uc.ensureSeatedUser(ctx, id); err != nil {
 		return nil, err
 	}
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
@@ -182,7 +266,7 @@ func (uc *UserUC) ChangePassword(ctx context.Context, oldPassword, newPassword s
 	if !ok {
 		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("change password requires an authenticated caller"))
 	}
-	u, err := uc.userRP.FindByID(ctx, subject.UserID)
+	u, err := uc.ensureUser(ctx, subject.UserID)
 	if err != nil {
 		return err
 	}
@@ -193,18 +277,28 @@ func (uc *UserUC) ChangePassword(ctx context.Context, oldPassword, newPassword s
 	if err != nil {
 		return errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", err))
 	}
-	_, err = uc.userRP.Update(ctx, []string{"password"}, &User{ID: subject.UserID, PasswordHash: &hash})
-	return err
+	if _, err = uc.userRP.Update(ctx, []string{"password"}, &User{ID: subject.UserID, PasswordHash: &hash}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (uc *UserUC) Delete(ctx context.Context, id string) (out string, err error) {
 	if subject, ok := security.SubjectFromCtx(ctx); ok && subject.UserID == id {
 		return "", systempb.ErrorSystemUserSelfDelete("")
 	}
+	if _, err = uc.ensureSeatedUser(ctx, id); err != nil {
+		return "", err
+	}
 	hadRoles := false
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
-		// Bindings go with the user — no orphan principal_role rows.
 		if hadRoles, err = uc.userRP.DeleteUserRoles(ctx, id); err != nil {
+			return err
+		}
+		if err = uc.userRP.DeleteSeatsByUser(ctx, id); err != nil {
+			return err
+		}
+		if err = uc.userRP.DeleteCredentialsByUser(ctx, id); err != nil {
 			return err
 		}
 		out, err = uc.userRP.Delete(ctx, id)
@@ -245,7 +339,7 @@ func (uc *UserUC) List(ctx context.Context, in *UserListIn) (*UserListOut, error
 }
 
 func (uc *UserUC) Get(ctx context.Context, id string) (*User, error) {
-	out, err := uc.userRP.FindByID(ctx, id)
+	out, err := uc.ensureSeatedUser(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +351,33 @@ func (uc *UserUC) Get(ctx context.Context, id string) (*User, error) {
 	return out, nil
 }
 
+func (uc *UserUC) BatchGet(ctx context.Context, ids []string) (map[string]*User, error) {
+	return uc.userRP.FindByIDs(ctx, ids)
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
+
+func (uc *UserUC) ensureUser(ctx context.Context, id string) (*User, error) {
+	u, err := uc.userRP.FindByID(ctx, id)
+	if err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return nil, systempb.ErrorSystemUserNotFound("")
+		}
+		return nil, err
+	}
+	return u, nil
+}
+
+func (uc *UserUC) ensureSeatedUser(ctx context.Context, id string) (*User, error) {
+	u, err := uc.userRP.FindSeated(ctx, id)
+	if err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return nil, systempb.ErrorSystemUserNotFound("")
+		}
+		return nil, err
+	}
+	return u, nil
+}
 
 func (uc *UserUC) ensureAvatar(ctx context.Context, avatar *string) error {
 	if avatar == nil {
@@ -274,6 +394,19 @@ func (uc *UserUC) ensureAvatar(ctx context.Context, avatar *string) error {
 		return systempb.ErrorSystemFileInvalidState("")
 	}
 	return nil
+}
+
+func (uc *UserUC) resolveSeatPopulation(ctx context.Context, population string) (string, error) {
+	if population == "" {
+		return security.DefaultPopulation, nil
+	}
+	if _, err := uc.populationRP.FindByCode(ctx, population); err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return "", systempb.ErrorSystemPopulationNotFound("")
+		}
+		return "", err
+	}
+	return population, nil
 }
 
 func (uc *UserUC) resolveRoles(ctx context.Context, codes []string) ([]string, error) {

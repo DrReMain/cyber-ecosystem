@@ -58,7 +58,7 @@ Content moves; it is never duplicated. Sections that skills point to owe **stabl
 
 `./nx run docs:check` verifies:
 
-1. every file path referenced by `AGENTS.md` / `CLAUDE.md` / skills exists;
+1. every file path referenced by `AGENTS.md` / `CLAUDE.md` / the root READMEs / skills exists;
 2. every heading targeted by a skill pointer exists;
 3. the `AGENTS.md` area index ↔ `docs/conventions/*/CONVENTIONS.md` agree in both directions;
 4. durable docs carry a `Status:` line; working docs carry a destination header;

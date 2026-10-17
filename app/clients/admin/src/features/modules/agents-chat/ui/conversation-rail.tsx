@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { Ellipsis, Loader2, MessageSquare, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { m } from "#/paraglide/messages";
+import { getTextDirection } from "#/paraglide/runtime";
 import type { Conversation } from "../conversations";
 import { conversationTitle } from "../conversations";
 
@@ -174,7 +175,7 @@ export function ConversationRail({
         closable={false}
         onClose={onClose}
         open={open}
-        placement="left"
+        placement={getTextDirection() === "rtl" ? "right" : "left"}
         size={288}
         styles={{ body: { padding: 0 } }}
       >

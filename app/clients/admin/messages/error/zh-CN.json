@@ -76,8 +76,21 @@
   "error_SYSTEM_USER_SELF_DELETE": "不能删除当前登录的账号",
   "error_SYSTEM_USER_SELF_DISABLE": "不能停用当前登录的账号",
   "error_SYSTEM_USER_DISABLED": "账号已停用，请联系管理员",
+  "error_SYSTEM_USER_NOT_FOUND": "账号不存在",
+  "error_SYSTEM_USER_EMAIL_TAKEN": "该邮箱已被使用",
   "error_SYSTEM_FILE_NOT_FOUND": "文件不存在",
   "error_SYSTEM_FILE_TOO_LARGE": "文件超出大小限制",
   "error_SYSTEM_FILE_SIZE_MISMATCH": "上传大小与声明不符",
-  "error_SYSTEM_FILE_INVALID_STATE": "当前文件状态不支持该操作"
+  "error_SYSTEM_FILE_INVALID_STATE": "当前文件状态不支持该操作",
+  "error_SYSTEM_TENANT_DISABLED": "该租户已被停用",
+  "error_SYSTEM_TENANT_NOT_FOUND": "租户不存在",
+  "error_SYSTEM_TENANT_PROTECTED": "默认租户不可停用",
+  "error_SYSTEM_LOGIN_SEAT_REQUIRED": "该账号存在多重归属，请选择后登录",
+  "error_SYSTEM_POPULATION_EXISTS": "该用户类型编码已存在",
+  "error_SYSTEM_POPULATION_PROTECTED": "默认用户类型由系统初始化，不可手工创建",
+  "error_SYSTEM_POPULATION_INVALID_ARCHETYPE": "未知的授权模式",
+  "error_SYSTEM_POPULATION_NOT_FOUND": "用户类型不存在",
+  "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "身份提供方未配置或已停用",
+  "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "第三方身份交换失败",
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "该第三方身份已绑定其他账号"
 }

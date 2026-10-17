@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"slices"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -13,7 +12,10 @@ import (
 	"cyber-ecosystem/shared-go/capability/cache"
 	"cyber-ecosystem/shared-go/kratos/security"
 
+	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
+
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
+	"cyber-ecosystem/app/services/system/internal/ent/membership"
 	"cyber-ecosystem/app/services/system/internal/ent/user"
 	"cyber-ecosystem/app/services/system/internal/platform"
 	"cyber-ecosystem/app/services/system/internal/shared"
@@ -56,10 +58,7 @@ func (r *authzRP) ImplicitGrants(ctx context.Context, userID, tenant string) ([]
 	if err != nil {
 		return nil, fmt.Errorf("authz rp: resolve grants for %q: %w", userID, err)
 	}
-	views := make([]GrantView, 0, len(rows)+len(builtinOperations))
-	for _, op := range builtinOperations {
-		views = append(views, GrantView{Pattern: op})
-	}
+	views := make([]GrantView, 0, len(rows))
 	for _, row := range rows {
 		if len(row) < 3 {
 			continue
@@ -76,11 +75,34 @@ func (r *authzRP) ImplicitGrants(ctx context.Context, userID, tenant string) ([]
 }
 
 func (r *authzRP) EffectiveGrants(ctx context.Context, subject *security.Subject) ([]GrantView, error) {
+	patron, err := r.PatronSubject(subject)
+	if err != nil {
+		return nil, err
+	}
+	if patron {
+		// The archetype is the whole permission surface; the grant tables
+		// are never read.
+		return []GrantView{}, nil
+	}
 	views, err := r.ImplicitGrants(ctx, subject.UserID, subject.TenantID)
 	if err != nil {
 		return nil, err
 	}
 	return survivingGrants(ctx, r.Log, subject, views), nil
+}
+func (r *authzRP) PatronSubject(subject *security.Subject) (bool, error) {
+	// Patron means identity is the whole permission — the grant tables are
+	// never read. A population absent from the snapshot is a broken
+	// registry invariant: it fails closed as infra, never as a policy
+	// verdict.
+	if subject.Population == "" {
+		return false, nil
+	}
+	arch, ok := r.snap.Load().populations[subject.Population]
+	if !ok {
+		return false, errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("population %q missing from the compiled registry", subject.Population))
+	}
+	return arch == security.ArchetypePatron, nil
 }
 
 func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID, tenant, operation string) (*ExplainResult, error) {
@@ -88,7 +110,21 @@ func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID,
 	if snap == nil {
 		return nil, fmt.Errorf("authz rp: snapshot not compiled")
 	}
-	out := &ExplainResult{Builtin: slices.Contains(builtinOperations, operation)}
+	out := &ExplainResult{}
+	if principalType == shared.PrincipalTypeUser {
+		population, err := r.seatPopulation(ctx, principalID, tenant)
+		if err != nil {
+			return nil, err
+		}
+		patron, err := r.PatronSubject(&security.Subject{UserID: principalID, TenantID: tenant, Population: population})
+		if err != nil {
+			return nil, err
+		}
+		if patron {
+			out.Allowed = false
+			return out, nil
+		}
+	}
 	subj := principalSubject(principalType, principalID)
 	// Grouping rows survive a role's disable, so the held-bindings list stays
 	// honest about what the principal holds even when grants are gone.
@@ -117,9 +153,6 @@ func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID,
 		})
 		codes = append(codes, strings.TrimPrefix(row[0], roleSubjectPrefix))
 	}
-	// Explain evaluates at explain time with the same kernel as Decide, so
-	// the verdict and the per-policy states agree with what enforcement
-	// would do this instant.
 	subject := &security.Subject{UserID: principalID, TenantID: tenant}
 	var attrs map[string]any
 	if anyLinkedPolicy(views) {
@@ -145,7 +178,7 @@ func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID,
 			Policies:  states,
 		})
 	}
-	out.Allowed = out.Builtin || survivedAny
+	out.Allowed = survivedAny
 	return out, nil
 }
 
@@ -157,8 +190,6 @@ func (r *authzRP) PreviewGrants(ctx context.Context, tenant string, roleCodes []
 	seen := make(map[string]struct{}, 2*len(roleCodes))
 	ops := make([]string, 0, len(roleCodes))
 	for _, code := range roleCodes {
-		// The role's own policy rows: a disabled (or grantless) role simply
-		// contributes nothing — the same outcome enforcement would produce.
 		rows, err := snap.enf.GetPermissionsForUser(roleSubject(code), tenant)
 		if err != nil {
 			return nil, fmt.Errorf("authz rp: preview role %q: %w", code, err)
@@ -182,6 +213,9 @@ func (r *authzRP) StartWatch(context.Context) error {
 		r.Log.Warn("authz: pubsub subscribe failed; periodic reconcile only", "error", err)
 	} else {
 		r.watchSub = s
+		// Pubsub has no backlog: a change published between the constructor's
+		// compile and this subscription is otherwise invisible until the tick.
+		r.reconcile()
 	}
 	r.watchDone = make(chan struct{})
 	go func() {
@@ -262,6 +296,23 @@ func (r *authzRP) remoteVersionSafe(ctx context.Context) int64 {
 	return ver
 }
 
+func (r *authzRP) seatPopulation(ctx context.Context, userID, tenant string) (string, error) {
+	rows, err := r.Platform.GetClient(ctx).Membership.Query().
+		Where(membership.UserID(userID), membership.TenantID(tenant)).
+		All(ctx)
+	if err != nil {
+		return "", r.Platform.HandleEntError(err)
+	}
+	single := ""
+	for _, row := range rows {
+		if single != "" && single != row.Population {
+			return "", nil // mixed: no single archetype speaks for the identity
+		}
+		single = row.Population
+	}
+	return single, nil
+}
+
 func (r *authzRP) rebuild(ctx context.Context, version int64) error {
 	snap, err := r.compileFromDB(ctx, version)
 	if err != nil {
@@ -299,6 +350,14 @@ func (r *authzRP) compileFromDB(ctx context.Context, version int64) (*snapshot, 
 	bindings, err := client.PrincipalRole.Query().All(ctx)
 	if err != nil {
 		return nil, r.Platform.HandleEntError(fmt.Errorf("authz compile: load bindings: %w", err))
+	}
+	popRows, err := client.Population.Query().All(ctx)
+	if err != nil {
+		return nil, r.Platform.HandleEntError(fmt.Errorf("authz compile: load populations: %w", err))
+	}
+	populations := make(map[string]string, len(popRows))
+	for _, po := range popRows {
+		populations[po.Code] = po.Archetype
 	}
 	disabledUsers, err := client.User.Query().Where(user.EnabledEQ(false)).All(ctx)
 	if err != nil {
@@ -375,7 +434,7 @@ func (r *authzRP) compileFromDB(ctx context.Context, version int64) (*snapshot, 
 			Enabled:       enabled,
 		})
 	}
-	return compile(version, grants, rows)
+	return compile(version, grants, rows, populations)
 }
 
 func policyViews(polys []policyMeta) []PolicyView {

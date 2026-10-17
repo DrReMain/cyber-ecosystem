@@ -21,13 +21,11 @@ type User struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// tenant scope; back-filled on insert and filtered from the request subject
-	TenantID string `json:"tenant_id,omitempty"`
 	// soft-delete marker; null = live row (delete becomes an update)
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
-	// argon2 digest; plaintext is never stored
+	// argon2id digest; plaintext is never stored; legacy bcrypt digests upgrade on next login
 	PasswordHash string `json:"-"`
 	// DeptID holds the value of the "dept_id" field.
 	DeptID *string `json:"dept_id,omitempty"`
@@ -45,7 +43,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldEnabled:
 			values[i] = new(sql.NullBool)
-		case user.FieldID, user.FieldTenantID, user.FieldEmail, user.FieldPasswordHash, user.FieldDeptID, user.FieldAvatar:
+		case user.FieldID, user.FieldEmail, user.FieldPasswordHash, user.FieldDeptID, user.FieldAvatar:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -81,12 +79,6 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
-			}
-		case user.FieldTenantID:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
-			} else if value.Valid {
-				_m.TenantID = value.String
 			}
 		case user.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -168,9 +160,6 @@ func (_m *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("tenant_id=")
-	builder.WriteString(_m.TenantID)
 	builder.WriteString(", ")
 	if v := _m.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")

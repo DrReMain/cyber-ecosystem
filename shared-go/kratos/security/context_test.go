@@ -32,3 +32,24 @@ func TestTenantFromCtx(t *testing.T) {
 		t.Fatalf("tenant = %q, want %q", got, "acme")
 	}
 }
+
+// The explicit domain switch outranks the subject: row routing (the tenant
+// mixin) and bucket routing (per-tenant storage) resolve tenancy through
+// this one precedence, so a pass over a domain hits that domain's rows and
+// that domain's bucket regardless of whose subject rides the context.
+func TestExplicitTenantCtx(t *testing.T) {
+	ctx := security.WithTenant(context.Background(), "acme")
+	if got, ok := security.ExplicitTenantFromCtx(ctx); !ok || got != "acme" {
+		t.Fatalf("explicit tenant = %q, %v; want acme", got, ok)
+	}
+	if got := security.TenantFromCtx(ctx); got != "acme" {
+		t.Fatalf("tenant = %q, want acme", got)
+	}
+	sub := security.WithSubject(ctx, &security.Subject{UserID: "u1", TenantID: "default"})
+	if got := security.TenantFromCtx(sub); got != "acme" {
+		t.Fatalf("explicit vs subject: tenant = %q, want acme", got)
+	}
+	if got, ok := security.ExplicitTenantFromCtx(security.WithTenant(context.Background(), "")); ok {
+		t.Fatalf("empty switch: explicit tenant = %q, %v; want unset", got, ok)
+	}
+}

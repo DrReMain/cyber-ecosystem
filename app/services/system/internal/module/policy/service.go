@@ -2,7 +2,6 @@ package policy
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 
@@ -141,8 +140,8 @@ func paramsFromProto(in *systempb.PolicyParams) (string, map[string]any, error) 
 		if err != nil {
 			return "", nil, errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("encode policy params: %w", err))
 		}
-		var params map[string]any
-		if err := json.Unmarshal(raw, &params); err != nil {
+		params, err := utils.Unmarshal[map[string]any](raw)
+		if err != nil {
 			return "", nil, errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("decode policy params: %w", err))
 		}
 		return string(fd.Name()), params, nil
@@ -158,7 +157,7 @@ func paramsToProto(kind string, params map[string]any) *systempb.PolicyParams {
 	// message, so a new kind needs no edit here. Errors degrade to nil params
 	// rather than failing the read — the kind still shows, unknown keys are
 	// discarded, and evaluation fail-closes at the engine.
-	raw, err := json.Marshal(params)
+	raw, err := utils.Marshal(params)
 	if err != nil {
 		return nil
 	}

@@ -10,13 +10,17 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
+	"cyber-ecosystem/app/services/system/internal/ent/credential"
 	"cyber-ecosystem/app/services/system/internal/ent/dept"
 	"cyber-ecosystem/app/services/system/internal/ent/file"
+	"cyber-ecosystem/app/services/system/internal/ent/membership"
 	"cyber-ecosystem/app/services/system/internal/ent/permission"
 	"cyber-ecosystem/app/services/system/internal/ent/permissionpolicy"
+	"cyber-ecosystem/app/services/system/internal/ent/population"
 	"cyber-ecosystem/app/services/system/internal/ent/predicate"
 	"cyber-ecosystem/app/services/system/internal/ent/principalrole"
 	"cyber-ecosystem/app/services/system/internal/ent/role"
+	"cyber-ecosystem/app/services/system/internal/ent/tenant"
 	"cyber-ecosystem/app/services/system/internal/ent/user"
 
 	"entgo.io/ent/dialect/sql"
@@ -159,6 +163,33 @@ func (f TraverseAuthzPolicy) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.AuthzPolicyQuery", q)
 }
 
+// The CredentialFunc type is an adapter to allow the use of ordinary function as a Querier.
+type CredentialFunc func(context.Context, *ent.CredentialQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f CredentialFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.CredentialQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.CredentialQuery", q)
+}
+
+// The TraverseCredential type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseCredential func(context.Context, *ent.CredentialQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseCredential) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseCredential) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.CredentialQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.CredentialQuery", q)
+}
+
 // The DeptFunc type is an adapter to allow the use of ordinary function as a Querier.
 type DeptFunc func(context.Context, *ent.DeptQuery) (ent.Value, error)
 
@@ -211,6 +242,33 @@ func (f TraverseFile) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.FileQuery", q)
+}
+
+// The MembershipFunc type is an adapter to allow the use of ordinary function as a Querier.
+type MembershipFunc func(context.Context, *ent.MembershipQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f MembershipFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.MembershipQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.MembershipQuery", q)
+}
+
+// The TraverseMembership type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseMembership func(context.Context, *ent.MembershipQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseMembership) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseMembership) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.MembershipQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.MembershipQuery", q)
 }
 
 // The PermissionFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -267,6 +325,33 @@ func (f TraversePermissionPolicy) Traverse(ctx context.Context, q ent.Query) err
 	return fmt.Errorf("unexpected query type %T. expect *ent.PermissionPolicyQuery", q)
 }
 
+// The PopulationFunc type is an adapter to allow the use of ordinary function as a Querier.
+type PopulationFunc func(context.Context, *ent.PopulationQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f PopulationFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.PopulationQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.PopulationQuery", q)
+}
+
+// The TraversePopulation type is an adapter to allow the use of ordinary function as Traverser.
+type TraversePopulation func(context.Context, *ent.PopulationQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraversePopulation) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraversePopulation) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.PopulationQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.PopulationQuery", q)
+}
+
 // The PrincipalRoleFunc type is an adapter to allow the use of ordinary function as a Querier.
 type PrincipalRoleFunc func(context.Context, *ent.PrincipalRoleQuery) (ent.Value, error)
 
@@ -321,6 +406,33 @@ func (f TraverseRole) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.RoleQuery", q)
 }
 
+// The TenantFunc type is an adapter to allow the use of ordinary function as a Querier.
+type TenantFunc func(context.Context, *ent.TenantQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f TenantFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.TenantQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.TenantQuery", q)
+}
+
+// The TraverseTenant type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseTenant func(context.Context, *ent.TenantQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseTenant) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseTenant) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TenantQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.TenantQuery", q)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary function as a Querier.
 type UserFunc func(context.Context, *ent.UserQuery) (ent.Value, error)
 
@@ -357,18 +469,26 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.AuditLogQuery, predicate.AuditLog, auditlog.OrderOption]{typ: ent.TypeAuditLog, tq: q}, nil
 	case *ent.AuthzPolicyQuery:
 		return &query[*ent.AuthzPolicyQuery, predicate.AuthzPolicy, authzpolicy.OrderOption]{typ: ent.TypeAuthzPolicy, tq: q}, nil
+	case *ent.CredentialQuery:
+		return &query[*ent.CredentialQuery, predicate.Credential, credential.OrderOption]{typ: ent.TypeCredential, tq: q}, nil
 	case *ent.DeptQuery:
 		return &query[*ent.DeptQuery, predicate.Dept, dept.OrderOption]{typ: ent.TypeDept, tq: q}, nil
 	case *ent.FileQuery:
 		return &query[*ent.FileQuery, predicate.File, file.OrderOption]{typ: ent.TypeFile, tq: q}, nil
+	case *ent.MembershipQuery:
+		return &query[*ent.MembershipQuery, predicate.Membership, membership.OrderOption]{typ: ent.TypeMembership, tq: q}, nil
 	case *ent.PermissionQuery:
 		return &query[*ent.PermissionQuery, predicate.Permission, permission.OrderOption]{typ: ent.TypePermission, tq: q}, nil
 	case *ent.PermissionPolicyQuery:
 		return &query[*ent.PermissionPolicyQuery, predicate.PermissionPolicy, permissionpolicy.OrderOption]{typ: ent.TypePermissionPolicy, tq: q}, nil
+	case *ent.PopulationQuery:
+		return &query[*ent.PopulationQuery, predicate.Population, population.OrderOption]{typ: ent.TypePopulation, tq: q}, nil
 	case *ent.PrincipalRoleQuery:
 		return &query[*ent.PrincipalRoleQuery, predicate.PrincipalRole, principalrole.OrderOption]{typ: ent.TypePrincipalRole, tq: q}, nil
 	case *ent.RoleQuery:
 		return &query[*ent.RoleQuery, predicate.Role, role.OrderOption]{typ: ent.TypeRole, tq: q}, nil
+	case *ent.TenantQuery:
+		return &query[*ent.TenantQuery, predicate.Tenant, tenant.OrderOption]{typ: ent.TypeTenant, tq: q}, nil
 	case *ent.UserQuery:
 		return &query[*ent.UserQuery, predicate.User, user.OrderOption]{typ: ent.TypeUser, tq: q}, nil
 	default:

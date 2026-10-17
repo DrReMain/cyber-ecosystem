@@ -70,38 +70,6 @@ func TestEveryBusinessRPCDeclaresAccess(t *testing.T) {
 	}
 }
 
-// TestBuiltinImpliesAdmin asserts builtin operations sit on the ADMIN
-// audience: a PUBLIC method never needs builtin (it is reachable without
-// a session, so the baseline grant would be meaningless there).
-func TestBuiltinImpliesAdmin(t *testing.T) {
-	builtins := 0
-	protoregistry.GlobalFiles.RangeFiles(func(fd protoreflect.FileDescriptor) bool {
-		pkg := string(fd.Package())
-		if !strings.HasPrefix(pkg, "cyber.") || pkg == "cyber.ext.v1" {
-			return true
-		}
-		services := fd.Services()
-		for i := 0; i < services.Len(); i++ {
-			methods := services.Get(i).Methods()
-			for j := 0; j < methods.Len(); j++ {
-				m := methods.Get(j)
-				if !proto.GetExtension(m.Options(), extv1.E_Builtin).(bool) {
-					continue
-				}
-				builtins++
-				acc, ok := proto.GetExtension(m.Options(), extv1.E_Access).(extv1.Access)
-				if !ok || acc != extv1.Access_ACCESS_ADMIN {
-					t.Errorf("%s: builtin must be ACCESS_ADMIN — PUBLIC needs no builtin", m.FullName())
-				}
-			}
-		}
-		return true
-	})
-	if builtins == 0 {
-		t.Fatal("no builtin operations discovered — descriptor registration may be broken")
-	}
-}
-
 // TestAccessImportsComplete guards the blank-import list above: it diffs the
 // packages under gen/go/cyber (per `go list`) against what protoregistry
 // actually has registered. A new service without its import line fails here

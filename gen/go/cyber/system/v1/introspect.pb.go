@@ -68,6 +68,7 @@ type VerifySessionResponse struct {
 	TenantId      *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
 	SessionId     *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	Email         *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	Population    *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=population,proto3" json:"population,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -130,6 +131,13 @@ func (x *VerifySessionResponse) GetEmail() *wrapperspb.StringValue {
 	return nil
 }
 
+func (x *VerifySessionResponse) GetPopulation() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Population
+	}
+	return nil
+}
+
 // checkOperation
 type CheckOperationRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -178,7 +186,7 @@ func (x *CheckOperationRequest) GetOperation() string {
 type CheckOperationResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Allowed       bool                   `protobuf:"varint,1,opt,name=allowed,proto3" json:"allowed,omitempty"`
-	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"` // NO_GRANT | ABAC_CONSTRAINT | BUILTIN; empty when allowed by grants
+	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"` // NO_GRANT | ABAC_CONSTRAINT; empty when allowed by grants
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -231,24 +239,27 @@ var File_cyber_system_v1_introspect_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_introspect_proto_rawDesc = "" +
 	"\n" +
-	" cyber/system/v1/introspect.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x16\n" +
-	"\x14VerifySessionRequest\"\xfa\x01\n" +
+	" cyber/system/v1/introspect.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x16\n" +
+	"\x14VerifySessionRequest\"\xb8\x02\n" +
 	"\x15VerifySessionResponse\x125\n" +
 	"\auser_id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x06userId\x129\n" +
 	"\ttenant_id\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\btenantId\x12;\n" +
 	"\n" +
 	"session_id\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\tsessionId\x122\n" +
-	"\x05email\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\"A\n" +
+	"\x05email\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\x12<\n" +
+	"\n" +
+	"population\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\n" +
+	"population\"A\n" +
 	"\x15CheckOperationRequest\x12(\n" +
 	"\toperation\x18\x01 \x01(\tB\n" +
 	"\xbaH\a\xc8\x01\x01r\x02\x10\x01R\toperation\"J\n" +
 	"\x16CheckOperationResponse\x12\x18\n" +
 	"\aallowed\x18\x01 \x01(\bR\aallowed\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reason2\xd7\x03\n" +
-	"\x11IntrospectService\x12\xc2\x01\n" +
-	"\rVerifySession\x12%.cyber.system.v1.VerifySessionRequest\x1a&.cyber.system.v1.VerifySessionResponse\"b\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e2\n" +
-	".会话自省（调用方转发用户 cookie）\x10\x01\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/system/me/introspect\x12\xd8\x01\n" +
-	"\x0eCheckOperation\x12&.cyber.system.v1.CheckOperationRequest\x1a'.cyber.system.v1.CheckOperationResponse\"u\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e;\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason2\xcf\x03\n" +
+	"\x11IntrospectService\x12\xbe\x01\n" +
+	"\rVerifySession\x12%.cyber.system.v1.VerifySessionRequest\x1a&.cyber.system.v1.VerifySessionResponse\"^\x88\xf1\x04\x04\x8a\xd3\x0e2\n" +
+	".会话自省（调用方转发用户 cookie）\x10\x01\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/system/me/introspect\x12\xd4\x01\n" +
+	"\x0eCheckOperation\x12&.cyber.system.v1.CheckOperationRequest\x1a'.cyber.system.v1.CheckOperationResponse\"q\x88\xf1\x04\x04\x8a\xd3\x0e;\n" +
 	"7授权自省（对当前用户裁决一个 operation）\x10\x01\x82\xd3\xe4\x93\x02(\x12&/api/v1/system/me/introspect/operation\x1a\"\x8a\xe2\t\x1e跨服务会话与授权内省B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
@@ -276,15 +287,16 @@ var file_cyber_system_v1_introspect_proto_depIdxs = []int32{
 	4, // 1: cyber.system.v1.VerifySessionResponse.tenant_id:type_name -> google.protobuf.StringValue
 	4, // 2: cyber.system.v1.VerifySessionResponse.session_id:type_name -> google.protobuf.StringValue
 	4, // 3: cyber.system.v1.VerifySessionResponse.email:type_name -> google.protobuf.StringValue
-	0, // 4: cyber.system.v1.IntrospectService.VerifySession:input_type -> cyber.system.v1.VerifySessionRequest
-	2, // 5: cyber.system.v1.IntrospectService.CheckOperation:input_type -> cyber.system.v1.CheckOperationRequest
-	1, // 6: cyber.system.v1.IntrospectService.VerifySession:output_type -> cyber.system.v1.VerifySessionResponse
-	3, // 7: cyber.system.v1.IntrospectService.CheckOperation:output_type -> cyber.system.v1.CheckOperationResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	4, // 4: cyber.system.v1.VerifySessionResponse.population:type_name -> google.protobuf.StringValue
+	0, // 5: cyber.system.v1.IntrospectService.VerifySession:input_type -> cyber.system.v1.VerifySessionRequest
+	2, // 6: cyber.system.v1.IntrospectService.CheckOperation:input_type -> cyber.system.v1.CheckOperationRequest
+	1, // 7: cyber.system.v1.IntrospectService.VerifySession:output_type -> cyber.system.v1.VerifySessionResponse
+	3, // 8: cyber.system.v1.IntrospectService.CheckOperation:output_type -> cyber.system.v1.CheckOperationResponse
+	7, // [7:9] is the sub-list for method output_type
+	5, // [5:7] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_introspect_proto_init() }

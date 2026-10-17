@@ -1330,8 +1330,6 @@ type ExplainOperationResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// "ALLOW" | "DENY".
 	Verdict string `protobuf:"bytes,1,opt,name=verdict,proto3" json:"verdict,omitempty"`
-	// Covered by the session-contract baseline rather than any grant.
-	Builtin bool `protobuf:"varint,2,opt,name=builtin,proto3" json:"builtin,omitempty"`
 	// Role bindings held (disabled roles included — they bind but contribute
 	// no grants).
 	RoleCodes []string `protobuf:"bytes,3,rep,name=role_codes,json=roleCodes,proto3" json:"role_codes,omitempty"`
@@ -1376,13 +1374,6 @@ func (x *ExplainOperationResponse) GetVerdict() string {
 		return x.Verdict
 	}
 	return ""
-}
-
-func (x *ExplainOperationResponse) GetBuiltin() bool {
-	if x != nil {
-		return x.Builtin
-	}
-	return false
 }
 
 func (x *ExplainOperationResponse) GetRoleCodes() []string {
@@ -1726,13 +1717,12 @@ const file_cyber_system_v1_role_proto_rawDesc = "" +
 	"\x17ExplainOperationRequest\x123\n" +
 	"\x0eprincipal_type\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18\x10R\rprincipalType\x12.\n" +
 	"\fprincipal_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\vprincipalId\x123\n" +
-	"\toperation\x18\x03 \x01(\tB\x15\xbaH\x12\xc8\x01\x01r\r\x10\x01\x18\xff\x012\x06^/\\S+$R\toperation\"\x9e\x01\n" +
+	"\toperation\x18\x03 \x01(\tB\x15\xbaH\x12\xc8\x01\x01r\r\x10\x01\x18\xff\x012\x06^/\\S+$R\toperation\"\x8a\x01\n" +
 	"\x18ExplainOperationResponse\x12\x18\n" +
-	"\averdict\x18\x01 \x01(\tR\averdict\x12\x18\n" +
-	"\abuiltin\x18\x02 \x01(\bR\abuiltin\x12\x1d\n" +
+	"\averdict\x18\x01 \x01(\tR\averdict\x12\x1d\n" +
 	"\n" +
 	"role_codes\x18\x03 \x03(\tR\troleCodes\x12/\n" +
-	"\x04hits\x18\x04 \x03(\v2\x1b.cyber.system.v1.ExplainHitR\x04hits\"\xba\x01\n" +
+	"\x04hits\x18\x04 \x03(\v2\x1b.cyber.system.v1.ExplainHitR\x04hitsJ\x04\b\x02\x10\x03\"\xba\x01\n" +
 	"\n" +
 	"ExplainHit\x12\x18\n" +
 	"\apattern\x18\x01 \x01(\tR\apattern\x12\x1b\n" +

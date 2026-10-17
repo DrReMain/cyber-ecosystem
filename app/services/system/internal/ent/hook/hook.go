@@ -44,6 +44,18 @@ func (f AuthzPolicyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AuthzPolicyMutation", m)
 }
 
+// The CredentialFunc type is an adapter to allow the use of ordinary
+// function as Credential mutator.
+type CredentialFunc func(context.Context, *ent.CredentialMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CredentialFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CredentialMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CredentialMutation", m)
+}
+
 // The DeptFunc type is an adapter to allow the use of ordinary
 // function as Dept mutator.
 type DeptFunc func(context.Context, *ent.DeptMutation) (ent.Value, error)
@@ -66,6 +78,18 @@ func (f FileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FileMutation", m)
+}
+
+// The MembershipFunc type is an adapter to allow the use of ordinary
+// function as Membership mutator.
+type MembershipFunc func(context.Context, *ent.MembershipMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MembershipFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MembershipMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MembershipMutation", m)
 }
 
 // The PermissionFunc type is an adapter to allow the use of ordinary
@@ -92,6 +116,18 @@ func (f PermissionPolicyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.V
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PermissionPolicyMutation", m)
 }
 
+// The PopulationFunc type is an adapter to allow the use of ordinary
+// function as Population mutator.
+type PopulationFunc func(context.Context, *ent.PopulationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PopulationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PopulationMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PopulationMutation", m)
+}
+
 // The PrincipalRoleFunc type is an adapter to allow the use of ordinary
 // function as PrincipalRole mutator.
 type PrincipalRoleFunc func(context.Context, *ent.PrincipalRoleMutation) (ent.Value, error)
@@ -114,6 +150,18 @@ func (f RoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RoleMutation", m)
+}
+
+// The TenantFunc type is an adapter to allow the use of ordinary
+// function as Tenant mutator.
+type TenantFunc func(context.Context, *ent.TenantMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TenantFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TenantMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TenantMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary

@@ -1,0 +1,18 @@
+{
+  "platform_tenants_title": "테넌트 관리",
+  "platform_tenants_filter_keyword": "키워드",
+  "platform_tenants_filter_keyword_placeholder": "이름 또는 코드",
+  "platform_tenants_filter_status": "상태",
+  "platform_tenants_filter_any": "전체",
+  "platform_tenants_col_tenant": "테넌트",
+  "platform_tenants_col_status": "상태",
+  "platform_tenants_col_created_at": "생성일",
+  "platform_tenants_col_updated_at": "갱신일",
+  "platform_tenants_col_actions": "작업",
+  "platform_tenants_status_on": "활성화됨",
+  "platform_tenants_status_off": "비활성화됨",
+  "platform_tenants_act_enable": "활성화",
+  "platform_tenants_act_disable": "비활성화",
+  "platform_tenants_disable_confirm": "이 테넌트를 비활성화하시겠습니까?",
+  "platform_tenants_empty": "아직 테넌트가 없습니다"
+}

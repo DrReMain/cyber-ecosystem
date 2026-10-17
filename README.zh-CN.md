@@ -4,7 +4,7 @@
 
 [![Go](https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white)](https://go.dev) [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A524-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org) [![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)](https://pnpm.io) [![Nx](https://img.shields.io/badge/Nx-monorepo-143055?logo=nx&logoColor=white)](https://nx.dev) [![License: MIT](https://img.shields.io/github/license/DrReMain/cyber-ecosystem?color=blue)](./LICENSE) [![Last Commit](https://img.shields.io/github/last-commit/DrReMain/cyber-ecosystem)](https://github.com/DrReMain/cyber-ecosystem/commits)
 
-> 面向长期产品的契约先行、AI-native 方向全栈骨架：Go/Kratos 基础服务、第二服务参考实现、Connect-RPC 契约、实时与媒体基础设施，以及 TanStack Start Web 客户端。
+> 面向长期产品的契约先行、AI-native 方向全栈骨架：多租户 Go/Kratos IAM 基础服务、第二服务参考实现、Connect-RPC 契约、实时与媒体基础设施，以及 TanStack Start Web 客户端。
 
 ## 这是什么
 
@@ -12,7 +12,7 @@ Cyber Ecosystem 是一个**产品开发骨架**，不是一个垂直 SaaS 产品
 
 当前仓库包含三个协同部分：
 
-- **`system`**：强制基础服务，拥有认证与会话、用户、组织、角色、RBAC / ABAC / 数据范围授权引擎、操作目录、文件、审计，以及跨服务身份与授权面。
+- **`system`**：强制基础服务，拥有认证与会话（密码登录与 OAuth 身份登录及 provider 绑定）、用户、租户与 population（用户类型及 membership）、组织、角色、RBAC / ABAC / 数据范围授权引擎、操作目录、文件、审计，以及跨服务身份与授权面。
 - **`agent`**：第二服务参考实现，拥有每个用户的 Agent 配置和聊天聚合，通过 system introspection 消费身份与授权，示范业务服务如何增加面向用户的 AI 工作流而不复制 IAM。
 - **`admin`**：TanStack Start 管理 / 工作台客户端，包含服务端 cookie 保管、权限派生路由、类型化错误、国际化、文件上传与流式聊天消费。
 
@@ -43,7 +43,7 @@ Cyber Ecosystem 是一个**产品开发骨架**，不是一个垂直 SaaS 产品
 - 用于授权目录的 per-package operation manifest；
 - 后端中间件和前端路由消费的 operation 名称。
 
-Method option 还声明 access audience、builtin 状态和 datascope 适用性。漏写 access 注解的业务 RPC 会被 deny-by-default guard 拒绝，而不是静默暴露。
+Method option 还声明 access audience（public / admin / platform / builtin）和 datascope 适用性。漏写 access 注解的业务 RPC 会被 deny-by-default guard 拒绝，而不是静默暴露。
 
 因此契约成为控制面：新增服务 operation 时，角色管理、运行时授权、诊断界面和前端路由模型可以同源更新。
 
@@ -86,6 +86,7 @@ transport → use case → port ← adapter
 - **Operation pattern** 支持精确 RPC、服务通配符和全局 `/*` 管理员模式。
 - **数据范围** 支持 all、self、department-tree。
 - **约束策略** 按 AND 语义求值；当前实现包含时间窗口和日历策略。
+- **多租户通过 membership 收窄访问。** 会话的租户上下文将列表与按 ID 访问的面限定在调用者持有的座位内；外来座位被拒绝而非静默过滤。
 - **失败关闭。** 未知策略类型、属性解析失败或策略求值错误都不会放行。
 - **决策可解释。** 诊断界面展示 allow / deny 背后的角色、grant、scope 和每个策略状态。
 - **变更版本化。** 授权表编译为内存 snapshot；版本 bump 和通知驱动副本重建，并保留低频 reconcile 兜底。
@@ -174,7 +175,7 @@ libs → stores → domains → services → features → routes
 proto/             Protobuf 契约、扩展、生成脚本和 catalog 生成器
 gen/               生成的 Go、Connect TypeScript、OpenAPI 和操作目录
 app/
-  services/system  强制基础服务：IAM、authz、资源目录、文件、审计、introspection
+  services/system  强制基础服务：多租户 IAM、authz、资源目录、文件、审计、introspection
   services/agent   第二服务参考：每用户 Agent 配置与流式聊天
   clients/admin    TanStack Start 管理 / 工作台客户端
 shared-go/         可复用 Go 包：能力族、orm、kratos、codegen、helper
@@ -217,7 +218,7 @@ docs/              工程约定与截图
 ./nx run deploy:status
 ```
 
-默认 profile 启动 PostgreSQL、Redis、SeaweedFS 和 NATS。Postgres 容器会创建 `system`、`agent`、`mq` 和 `atlas_dev` 数据库。
+默认 profile 启动 PostgreSQL、Redis、SeaweedFS 和 NATS。Postgres 容器会创建 `system`、`agent`、`mq` 和 `atlas_dev` 数据库。首次启动会自动构建自定义 PostgreSQL 镜像（`pg-extended`，内置 pgvector 与 PostGIS）——这是一次性的、依赖网络的步骤。
 
 ### 4. 应用迁移
 
@@ -233,12 +234,12 @@ docs/              工程约定与截图
 ```bash
 ./nx run system:dev
 ./nx run agent:dev
-./nx admin:dev
+./nx run admin:dev
 ```
 
-开发代理默认连接 `localhost:13001` 的 system 和 `localhost:13002` 的 agent。用户可以在 admin profile 中配置 OpenAI-compatible provider；API key 在服务端加密，API 永不回显。
+开发代理默认连接 `localhost:13001` 的 system 和 `localhost:13002` 的 agent。打开 `http://localhost:5173`，使用种子管理员登录——`admin1@cyber.local`，默认口令 `Admin@123456`（可用 `SEED_INITIAL_PASSWORD` 覆写，见 `app/services/system/configs/config.yaml`）。用户可以在 admin profile 中配置 OpenAI-compatible provider；API key 在服务端加密，API 永不回显。
 
-仓库内配置包含仅用于开发的默认值，包括种子管理员和 agent master key。任何共享或公网可达部署前必须修改。
+仓库内配置包含仅用于开发的默认值——种子管理员、agent master key，以及 dev 栈的中间件凭据（postgres/redis/seaweedfs/nats/centrifugo/livekit/signoz/glitchtip）。宿主端口仅绑定 loopback，例外是浏览器直连的服务面——SeaweedFS S3 API（8333）、Centrifugo（8000）、LiveKit（7880 + UDP 媒体段）——它们为跨机开发而发布；跨机直传还需设置 `APP_S3_PUBLIC_ENDPOINT=http://<开发机局域网IP>:8333`，否则预签名 URL 会指向 localhost。它们都不是生产密钥，但任何共享或公网可达部署前必须覆写。
 
 ### 常用任务
 
@@ -274,7 +275,7 @@ docs/              工程约定与截图
 
 当前已实现：
 
-- `system`：认证、会话、用户、组织、角色、授权、资源目录、文件、审计和跨服务 introspection。
+- `system`：认证与身份登录、会话、用户、租户与用户类型（population）、组织、角色、授权、资源目录、文件、审计和跨服务 introspection。
 - `agent`：每用户 provider 配置、模型列表、聊天会话和服务端流式响应。
 - `admin`：权限派生管理 / 工作台 UI、国际化、文件工作流和流式聊天。
 

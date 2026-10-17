@@ -12,10 +12,11 @@ import (
 // — a slow or dead carrier costs queue headroom first, then drops.
 type PublishFunc func(ctx context.Context, ev *Event) error
 
-var (
+const (
 	defaultCapacity = 1024
 	publishTimeout  = 5 * time.Second
 	stopTimeout     = 3 * time.Second
+	dropLogEvery    = 128
 )
 
 type EmitterOption func(*Emitter)
@@ -66,7 +67,7 @@ func (e *Emitter) Emit(_ context.Context, ev *Event) {
 		// Sampling the log keeps a dead carrier from amplifying itself into
 		// a log storm; the count stays exact.
 		n := e.dropped.Add(1)
-		if n == 1 || n%128 == 0 {
+		if n == 1 || n%dropLogEvery == 0 {
 			e.log.Warn("audit: queue full, dropping events", "dropped", n)
 		}
 	}
@@ -117,6 +118,6 @@ func (e *Emitter) stop() {
 	case <-time.After(stopTimeout):
 		// A publish stuck past the budget abandons the remaining queue —
 		// shutdown must not be held hostage by the audit carrier.
-		e.log.Warn("audit: drain timed out, remaining events dropped", "dropped", e.Dropped())
+		e.log.Warn("audit: drain timed out, queued events dropped", "dropped", len(e.ch))
 	}
 }

@@ -11,6 +11,7 @@
   "files_delete_confirm": "Soft-delete this file? The stored object is retained.",
   "files_rename_title": "Rename file",
   "files_rename_label": "New name",
+  "files_ph_rename": "Enter the new name",
   "files_col_name": "Name",
   "files_col_type": "Type",
   "files_col_size": "Size",

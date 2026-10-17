@@ -357,7 +357,7 @@ var File_cyber_agent_v1_agent_config_proto protoreflect.FileDescriptor
 
 const file_cyber_agent_v1_agent_config_proto_rawDesc = "" +
 	"\n" +
-	"!cyber/agent/v1/agent_config.proto\x12\x0ecyber.agent.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xdd\x02\n" +
+	"!cyber/agent/v1/agent_config.proto\x12\x0ecyber.agent.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xdd\x02\n" +
 	"\vAgentConfig\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
 	"\n" +
@@ -380,13 +380,13 @@ const file_cyber_agent_v1_agent_config_proto_rawDesc = "" +
 	"\x1bDeleteMyAgentConfigResponse\"\x19\n" +
 	"\x17GetMyAgentConfigRequest\"Z\n" +
 	"\x18GetMyAgentConfigResponse\x12>\n" +
-	"\fagent_config\x18\x01 \x01(\v2\x1b.cyber.agent.v1.AgentConfigR\vagentConfig2\xd0\x04\n" +
-	"\x12AgentConfigService\x12\xb9\x01\n" +
-	"\x13UpdateMyAgentConfig\x12*.cyber.agent.v1.UpdateMyAgentConfigRequest\x1a+.cyber.agent.v1.UpdateMyAgentConfigResponse\"I\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x15\n" +
-	"\x11配置agent连接\x10\x02\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/api/v1/agent/me/agent-config\x12\xb6\x01\n" +
-	"\x13DeleteMyAgentConfig\x12*.cyber.agent.v1.DeleteMyAgentConfigRequest\x1a+.cyber.agent.v1.DeleteMyAgentConfigResponse\"F\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x15\n" +
-	"\x11清除agent连接\x10\x02\x82\xd3\xe4\x93\x02\x1f*\x1d/api/v1/agent/me/agent-config\x12\xad\x01\n" +
-	"\x10GetMyAgentConfig\x12'.cyber.agent.v1.GetMyAgentConfigRequest\x1a(.cyber.agent.v1.GetMyAgentConfigResponse\"F\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e\x15\n" +
+	"\fagent_config\x18\x01 \x01(\v2\x1b.cyber.agent.v1.AgentConfigR\vagentConfig2\xc4\x04\n" +
+	"\x12AgentConfigService\x12\xb5\x01\n" +
+	"\x13UpdateMyAgentConfig\x12*.cyber.agent.v1.UpdateMyAgentConfigRequest\x1a+.cyber.agent.v1.UpdateMyAgentConfigResponse\"E\x88\xf1\x04\x04\x8a\xd3\x0e\x15\n" +
+	"\x11配置agent连接\x10\x02\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/api/v1/agent/me/agent-config\x12\xb2\x01\n" +
+	"\x13DeleteMyAgentConfig\x12*.cyber.agent.v1.DeleteMyAgentConfigRequest\x1a+.cyber.agent.v1.DeleteMyAgentConfigResponse\"B\x88\xf1\x04\x04\x8a\xd3\x0e\x15\n" +
+	"\x11清除agent连接\x10\x02\x82\xd3\xe4\x93\x02\x1f*\x1d/api/v1/agent/me/agent-config\x12\xa9\x01\n" +
+	"\x10GetMyAgentConfig\x12'.cyber.agent.v1.GetMyAgentConfigRequest\x1a(.cyber.agent.v1.GetMyAgentConfigResponse\"B\x88\xf1\x04\x04\x8a\xd3\x0e\x15\n" +
 	"\x11查询agent连接\x10\x01\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/agent/me/agent-config\x1a\x15\x8a\xe2\t\x11agent连接配置B'Z%cyber-ecosystem/gen/go/cyber/agent/v1b\x06proto3"
 
 var (

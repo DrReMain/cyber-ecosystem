@@ -27,14 +27,6 @@ var file_ext_v1_authz_proto_extTypes = []protoimpl.ExtensionInfo{
 	{
 		ExtendedType:  (*descriptorpb.MethodOptions)(nil),
 		ExtensionType: (*bool)(nil),
-		Field:         10002,
-		Name:          "cyber.ext.v1.builtin",
-		Tag:           "varint,10002,opt,name=builtin",
-		Filename:      "ext/v1/authz.proto",
-	},
-	{
-		ExtendedType:  (*descriptorpb.MethodOptions)(nil),
-		ExtensionType: (*bool)(nil),
 		Field:         10004,
 		Name:          "cyber.ext.v1.datascope",
 		Tag:           "varint,10004,opt,name=datascope",
@@ -44,30 +36,26 @@ var file_ext_v1_authz_proto_extTypes = []protoimpl.ExtensionInfo{
 
 // Extension fields to descriptorpb.MethodOptions.
 var (
-	// optional bool builtin = 10002;
-	E_Builtin = &file_ext_v1_authz_proto_extTypes[0]
 	// optional bool datascope = 10004;
-	E_Datascope = &file_ext_v1_authz_proto_extTypes[1]
+	E_Datascope = &file_ext_v1_authz_proto_extTypes[0]
 )
 
 var File_ext_v1_authz_proto protoreflect.FileDescriptor
 
 const file_ext_v1_authz_proto_rawDesc = "" +
 	"\n" +
-	"\x12ext/v1/authz.proto\x12\fcyber.ext.v1\x1a google/protobuf/descriptor.proto:9\n" +
-	"\abuiltin\x12\x1e.google.protobuf.MethodOptions\x18\x92N \x01(\bR\abuiltin:=\n" +
+	"\x12ext/v1/authz.proto\x12\fcyber.ext.v1\x1a google/protobuf/descriptor.proto:=\n" +
 	"\tdatascope\x12\x1e.google.protobuf.MethodOptions\x18\x94N \x01(\bR\tdatascopeB%Z#cyber-ecosystem/gen/go/cyber/ext/v1b\x06proto3"
 
 var file_ext_v1_authz_proto_goTypes = []any{
 	(*descriptorpb.MethodOptions)(nil), // 0: google.protobuf.MethodOptions
 }
 var file_ext_v1_authz_proto_depIdxs = []int32{
-	0, // 0: cyber.ext.v1.builtin:extendee -> google.protobuf.MethodOptions
-	0, // 1: cyber.ext.v1.datascope:extendee -> google.protobuf.MethodOptions
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	0, // [0:2] is the sub-list for extension extendee
+	0, // 0: cyber.ext.v1.datascope:extendee -> google.protobuf.MethodOptions
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	0, // [0:1] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
 
@@ -83,7 +71,7 @@ func file_ext_v1_authz_proto_init() {
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ext_v1_authz_proto_rawDesc), len(file_ext_v1_authz_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   0,
-			NumExtensions: 2,
+			NumExtensions: 1,
 			NumServices:   0,
 		},
 		GoTypes:           file_ext_v1_authz_proto_goTypes,

@@ -34,6 +34,16 @@ func (TenantMixin) Indexes() []ent.Index {
 func (TenantMixin) Interceptors() []gen.Interceptor {
 	return []gen.Interceptor{
 		intercept.TraverseFunc(func(ctx context.Context, q intercept.Query) error {
+			if security.IsRegistryPlane(ctx) {
+				return nil
+			}
+			// An explicit domain switch wins over the subject — the same
+			// precedence the per-tenant storage routing reads, so a domain
+			// pass filters rows and buckets on one axis.
+			if tenant, ok := security.ExplicitTenantFromCtx(ctx); ok {
+				applyTenant(q, tenant)
+				return nil
+			}
 			subject, ok := security.SubjectFromCtx(ctx)
 			if !ok || subject.TenantID == "" {
 				return nil // no subject (framework/health) → skip
@@ -53,6 +63,9 @@ func (TenantMixin) Hooks() []gen.Hook {
 		hook.On(
 			func(next gen.Mutator) gen.Mutator {
 				return gen.MutateFunc(func(ctx context.Context, m gen.Mutation) (ent.Value, error) {
+					if security.IsRegistryPlane(ctx) {
+						return nil, fmt.Errorf("tenant mixin: a registry-plane context must not write")
+					}
 					if cur, ok := m.Field("tenant_id"); !ok || cur == "" {
 						if err := m.SetField("tenant_id", security.TenantFromCtx(ctx)); err != nil {
 							return nil, fmt.Errorf("tenant mixin: set tenant_id: %w", err)

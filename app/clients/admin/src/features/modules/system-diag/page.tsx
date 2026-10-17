@@ -190,7 +190,11 @@ export function DiagPage() {
         )}
         {session.data?.status === "authed" && (
           <Card>
-            <SessionPanel email={session.data.user.email} permissions={session.data.permissions} />
+            <SessionPanel
+              email={session.data.user.email}
+              memberships={session.data.memberships}
+              permissions={session.data.permissions}
+            />
           </Card>
         )}
       </div>

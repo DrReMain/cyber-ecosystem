@@ -1,4 +1,5 @@
 import { DeptService } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/dept_pb";
+import { PopulationService } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/population_pb";
 import { ResourceService } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/resource_pb";
 import { RoleService } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/role_pb";
 import { UserService } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/user_pb";
@@ -13,6 +14,7 @@ const operations = [
   op(UserService, "listUsers"),
   op(RoleService, "listRoles"),
   op(DeptService, "listDepts"),
+  op(PopulationService, "listPopulations"),
   op(ResourceService, "listResource"),
   op(RoleService, "previewGrants"),
 ];

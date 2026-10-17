@@ -18,8 +18,10 @@ import (
 	"cyber-ecosystem/app/services/system/internal/module/fileproxy"
 	"cyber-ecosystem/app/services/system/internal/module/introspect"
 	"cyber-ecosystem/app/services/system/internal/module/policy"
+	"cyber-ecosystem/app/services/system/internal/module/population"
 	"cyber-ecosystem/app/services/system/internal/module/resource"
 	"cyber-ecosystem/app/services/system/internal/module/role"
+	"cyber-ecosystem/app/services/system/internal/module/tenant"
 	"cyber-ecosystem/app/services/system/internal/module/transfer"
 	"cyber-ecosystem/app/services/system/internal/module/user"
 	"cyber-ecosystem/app/services/system/internal/platform"
@@ -31,7 +33,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, catalog *conf.Catalog, logger *slog.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, catalog *conf.Catalog, confAuth *conf.Auth, logger *slog.Logger) (*kratos.App, func(), error) {
 	cache, cleanup, err := platform.NewCache(data, logger)
 	if err != nil {
 		return nil, nil, err
@@ -47,7 +49,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, ca
 		return nil, nil, err
 	}
 	entErrorHandler := platform.NewEntErrorHandler()
-	storage, cleanup3, err := platform.NewStorage(data)
+	tenantStorage, cleanup3, err := platform.NewStorage(data)
 	if err != nil {
 		cleanup2()
 		cleanup()
@@ -75,7 +77,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, ca
 		cleanup()
 		return nil, nil, err
 	}
-	platformPlatform, err := platform.NewPlatform(cache, cacheErrorHandler, client, entErrorHandler, storage, storageErrorHandler, mq, mqErrorHandler)
+	platformPlatform, err := platform.NewPlatform(cache, cacheErrorHandler, client, entErrorHandler, tenantStorage, storageErrorHandler, mq, mqErrorHandler)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -98,7 +100,8 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, ca
 	resourceService := resource.NewResourceService(logger, resourceUC)
 	userRP := user.NewUserRP(logger, platformPlatform)
 	fileRP := file.NewFileRP(logger, platformPlatform)
-	userUC := user.NewUserUC(logger, platformPlatform, userRP, deptRP, fileRP)
+	populationRP := population.NewPopulationRP(logger, platformPlatform)
+	userUC := user.NewUserUC(logger, platformPlatform, userRP, deptRP, fileRP, populationRP)
 	userService := user.NewUserService(logger, userUC)
 	transferService := transfer.NewTransferService(logger)
 	authzRP, err := authz.NewAuthzRP(logger, platformPlatform)
@@ -109,8 +112,16 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, ca
 		cleanup()
 		return nil, nil, err
 	}
+	tenantRP := tenant.NewTenantRP(logger, platformPlatform)
 	tokenRP := auth.NewTokenRP(logger, platformPlatform)
-	authUC := auth.NewAuthUC(logger, platformPlatform, userRP, authzRP, tokenRP)
+	authUC, err := auth.NewAuthUC(logger, platformPlatform, confAuth, userRP, authzRP, tenantRP, tokenRP)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	authService := auth.NewAuthService(logger, authUC)
 	roleRP := role.NewRoleRP(logger, platformPlatform)
 	policyRP := policy.NewPolicyRP(logger, platformPlatform)
@@ -119,8 +130,9 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, ca
 	policyUC := policy.NewPolicyUC(logger, platformPlatform, policyRP)
 	policyService := policy.NewPolicyService(logger, policyUC)
 	auditRP, cleanup5 := audit.NewAuditRP(logger, platformPlatform)
+	tenantUC := tenant.NewTenantUC(logger, platformPlatform, tenantRP)
 	lifecycle := bootstrap.NewLifecycle()
-	fileUC := file.NewFileUC(logger, platformPlatform, fileRP, lifecycle)
+	fileUC := file.NewFileUC(logger, platformPlatform, fileRP, tenantUC, lifecycle)
 	auditUC := audit.NewAuditUC(logger, platformPlatform, auditRP, fileUC)
 	auditService := audit.NewAuditService(logger, auditUC)
 	fileService := file.NewFileService(logger, fileUC)
@@ -132,7 +144,10 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, ca
 	filePresignService := filepresign.NewFilePresignService(logger, filePresignUC)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, authzRP, lifecycle)
 	introspectService := introspect.NewIntrospectService(logger, authzUC)
-	v := server.NewRegistrarList(deptService, resourceService, userService, transferService, authService, roleService, policyService, auditService, fileService, fileProxyService, filePresignService, introspectService)
+	tenantService := tenant.NewTenantService(logger, tenantUC)
+	populationUC := population.NewPopulationUC(logger, platformPlatform, populationRP)
+	populationService := population.NewPopulationService(logger, populationUC)
+	v := server.NewRegistrarList(deptService, resourceService, userService, transferService, authService, roleService, policyService, auditService, fileService, fileProxyService, filePresignService, introspectService, tenantService, populationService)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, authUC, authzUC, auditUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, authUC, authzUC, auditUC)
 	connectServer := server.NewConnectServer(confServer, logger, v, authUC, authzUC, auditUC)

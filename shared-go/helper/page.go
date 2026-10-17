@@ -11,7 +11,11 @@ import (
 	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 )
 
-var (
+// DefaultPageSizeMax couples to the proto contract: it must equal the
+// page_size lte cap (shared/common/v1 pagination.proto), and batch faces
+// size their max_items on the same number — one page of ids hydrates in
+// one call. Keep the three in lockstep.
+const (
 	DefaultPageSize        = 10
 	DefaultPageSizeMax     = 100
 	DefaultPageSizeUnlimit = 0
@@ -60,8 +64,7 @@ func ApplyPagination[Q QueryPaginator[Q]](ctx context.Context, query Q, req *com
 		if config.MaxSize > 0 {
 			return 0, 0, 0, ce
 		}
-		// Count may trigger query interceptors that append predicates in-place.
-		// Use a clone so the original query builder can still be reused safely.
+		// Clone: count may append interceptor predicates in place.
 		total, err = query.Clone().Count(ctx)
 		return total, 0, 0, err
 	}

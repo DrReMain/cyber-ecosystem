@@ -65,8 +65,7 @@ service FileService {
       comment: "铸造文件下载地址（批量）"
       action: ACTION_READ
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {
       post: "/api/v1/system/files/urls"
       body: "*"

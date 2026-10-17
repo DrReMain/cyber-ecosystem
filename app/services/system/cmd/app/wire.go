@@ -22,8 +22,10 @@ import (
 	"cyber-ecosystem/app/services/system/internal/module/fileproxy"
 	"cyber-ecosystem/app/services/system/internal/module/introspect"
 	"cyber-ecosystem/app/services/system/internal/module/policy"
+	"cyber-ecosystem/app/services/system/internal/module/population"
 	"cyber-ecosystem/app/services/system/internal/module/resource"
 	"cyber-ecosystem/app/services/system/internal/module/role"
+	"cyber-ecosystem/app/services/system/internal/module/tenant"
 	"cyber-ecosystem/app/services/system/internal/module/transfer"
 	"cyber-ecosystem/app/services/system/internal/module/user"
 	"cyber-ecosystem/app/services/system/internal/platform"
@@ -32,7 +34,7 @@ import (
 )
 
 // wireApp init kratos application.
-func wireApp(*conf.Server, *conf.Data, *conf.Authz, *conf.Catalog, *slog.Logger) (*kratos.App, func(), error) {
+func wireApp(*conf.Server, *conf.Data, *conf.Authz, *conf.Catalog, *conf.Auth, *slog.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		wire.Bind(new(shared.Transaction), new(*platform.Platform)),
 		wire.Bind(new(shared.HookRegistry), new(*bootstrap.Lifecycle)),
@@ -41,8 +43,10 @@ func wireApp(*conf.Server, *conf.Data, *conf.Authz, *conf.Catalog, *slog.Logger)
 		authz.ProviderSet,
 		bootstrap.ProviderSet,
 		audit.ProviderSet,
+		population.ProviderSet,
 		user.ProviderSet,
 		auth.ProviderSet,
+		tenant.ProviderSet,
 		dept.ProviderSet,
 		file.ProviderSet,
 		filepresign.ProviderSet,

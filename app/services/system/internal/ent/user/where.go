@@ -74,11 +74,6 @@ func UpdatedAt(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
-func TenantID(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldTenantID, v))
-}
-
 // DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
 func DeletedAt(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldDeletedAt, v))
@@ -187,71 +182,6 @@ func UpdatedAtLT(v time.Time) predicate.User {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldUpdatedAt, v))
-}
-
-// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
-func TenantIDEQ(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldTenantID, v))
-}
-
-// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
-func TenantIDNEQ(v string) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldTenantID, v))
-}
-
-// TenantIDIn applies the In predicate on the "tenant_id" field.
-func TenantIDIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldIn(FieldTenantID, vs...))
-}
-
-// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
-func TenantIDNotIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldTenantID, vs...))
-}
-
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v string) predicate.User {
-	return predicate.User(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v string) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v string) predicate.User {
-	return predicate.User(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v string) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldTenantID, v))
-}
-
-// TenantIDContains applies the Contains predicate on the "tenant_id" field.
-func TenantIDContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldTenantID, v))
-}
-
-// TenantIDHasPrefix applies the HasPrefix predicate on the "tenant_id" field.
-func TenantIDHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldTenantID, v))
-}
-
-// TenantIDHasSuffix applies the HasSuffix predicate on the "tenant_id" field.
-func TenantIDHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldTenantID, v))
-}
-
-// TenantIDEqualFold applies the EqualFold predicate on the "tenant_id" field.
-func TenantIDEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldTenantID, v))
-}
-
-// TenantIDContainsFold applies the ContainsFold predicate on the "tenant_id" field.
-func TenantIDContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldTenantID, v))
 }
 
 // DeletedAtEQ applies the EQ predicate on the "deleted_at" field.

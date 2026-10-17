@@ -4,7 +4,6 @@ package cyber.system.v1;
 
 import "buf/validate/validate.proto";
 import "ext/v1/access.proto";
-import "ext/v1/authz.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
@@ -18,8 +17,7 @@ service IntrospectService {
       comment: "会话自省（调用方转发用户 cookie）"
       action: ACTION_READ
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/system/me/introspect"};
   }
   rpc CheckOperation(CheckOperationRequest) returns (CheckOperationResponse) {
@@ -27,8 +25,7 @@ service IntrospectService {
       comment: "授权自省（对当前用户裁决一个 operation）"
       action: ACTION_READ
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/system/me/introspect/operation"};
   }
 }
@@ -41,6 +38,7 @@ message VerifySessionResponse {
   google.protobuf.StringValue tenant_id = 2;
   google.protobuf.StringValue session_id = 3;
   google.protobuf.StringValue email = 4;
+  google.protobuf.StringValue population = 5;
 }
 
 // checkOperation
@@ -53,5 +51,5 @@ message CheckOperationRequest {
 
 message CheckOperationResponse {
   bool allowed = 1;
-  string reason = 2; // NO_GRANT | ABAC_CONSTRAINT | BUILTIN; empty when allowed by grants
+  string reason = 2; // NO_GRANT | ABAC_CONSTRAINT; empty when allowed by grants
 }

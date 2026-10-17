@@ -1,9 +1,10 @@
 import type { User } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/user_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TableProps } from "antd";
-import { Button, Popconfirm, Space, Tag, Tooltip, Typography } from "antd";
+import { Button, Space, Tag, Tooltip, Typography } from "antd";
+import { Pencil, Power, PowerOff, Trash } from "lucide-react";
+import { ActionIconButton } from "#/components/action-icon-button";
 import { m } from "#/paraglide/messages";
-import { getTextDirection } from "#/paraglide/runtime";
 import type { UserRow } from "../types";
 import { localPart, UserAvatar } from "./user-avatar";
 
@@ -90,48 +91,38 @@ export function UsersTable({
     fieldAction<UserRow>(
       (_, row) => (
         <Space size={0}>
-          <Button color="primary" onClick={() => onEdit(row.user)} size="small" variant="text">
-            {m.system_users_act_edit()}
-          </Button>
+          <ActionIconButton
+            icon={Pencil}
+            label={m.system_users_act_edit()}
+            onClick={() => onEdit(row.user)}
+          />
           {row.user.enabled ? (
-            <Popconfirm
-              cancelButtonProps={{ variant: "filled", color: "default" }}
-              okButtonProps={{ variant: "filled", color: "danger" }}
-              onConfirm={() => onToggle(row.user, false)}
-              placement={getTextDirection() === "rtl" ? "right" : "left"}
-              title={m.system_users_disable_confirm()}
-            >
-              <Button
-                color="danger"
-                disabled={pendingId === (row.user.id ?? "")}
-                size="small"
-                variant="text"
-              >
-                {m.system_users_act_disable()}
-              </Button>
-            </Popconfirm>
-          ) : (
-            <Button
-              color="primary"
+            <ActionIconButton
+              confirm={{
+                onConfirm: () => onToggle(row.user, false),
+                title: m.system_users_disable_confirm(),
+              }}
               disabled={pendingId === (row.user.id ?? "")}
+              icon={PowerOff}
+              label={m.system_users_act_disable()}
+            />
+          ) : (
+            <ActionIconButton
+              disabled={pendingId === (row.user.id ?? "")}
+              icon={Power}
+              label={m.system_users_act_enable()}
               onClick={() => onToggle(row.user, true)}
-              size="small"
-              variant="text"
-            >
-              {m.system_users_act_enable()}
-            </Button>
+            />
           )}
-          <Popconfirm
-            cancelButtonProps={{ variant: "filled", color: "default" }}
-            okButtonProps={{ variant: "filled", color: "danger" }}
-            onConfirm={() => onDelete(row.user)}
-            placement={getTextDirection() === "rtl" ? "right" : "left"}
-            title={m.system_users_delete_confirm()}
-          >
-            <Button color="danger" disabled={pendingId === row.user.id} size="small" variant="text">
-              {m.system_users_act_delete()}
-            </Button>
-          </Popconfirm>
+          <ActionIconButton
+            confirm={{
+              onConfirm: () => onDelete(row.user),
+              title: m.system_users_delete_confirm(),
+            }}
+            disabled={pendingId === row.user.id}
+            icon={Trash}
+            label={m.system_users_act_delete()}
+          />
         </Space>
       ),
       { title: m.system_users_col_actions() },

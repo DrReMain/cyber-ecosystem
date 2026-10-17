@@ -126,6 +126,43 @@ var (
 			},
 		},
 	}
+	// CredentialColumns holds the columns for the "credential" table.
+	CredentialColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "kind", Type: field.TypeString, Size: 16, Comment: "code-registered exchange kind (provider_<kind>.go)"},
+		{Name: "identifier", Type: field.TypeString, Size: 191, Comment: "the external identifier the kind exchanged (e.g. wechat openid)"},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "logical reference to user.id"},
+	}
+	// CredentialTable holds the schema information for the "credential" table.
+	CredentialTable = &schema.Table{
+		Name:       "credential",
+		Columns:    CredentialColumns,
+		PrimaryKey: []*schema.Column{CredentialColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "credential_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{CredentialColumns[1]},
+			},
+			{
+				Name:    "credential_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{CredentialColumns[2]},
+			},
+			{
+				Name:    "credential_kind_identifier",
+				Unique:  true,
+				Columns: []*schema.Column{CredentialColumns[3], CredentialColumns[4]},
+			},
+			{
+				Name:    "credential_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{CredentialColumns[5]},
+			},
+		},
+	}
 	// DeptColumns holds the columns for the "dept" table.
 	DeptColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -211,6 +248,43 @@ var (
 			},
 		},
 	}
+	// MembershipColumns holds the columns for the "membership" table.
+	MembershipColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "logical reference to user.id"},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant code — the join key, mirroring tenant-scoped rows everywhere"},
+		{Name: "population", Type: field.TypeString, Size: 20, Comment: "population code — the archetype instance this seat carries"},
+	}
+	// MembershipTable holds the schema information for the "membership" table.
+	MembershipTable = &schema.Table{
+		Name:       "membership",
+		Columns:    MembershipColumns,
+		PrimaryKey: []*schema.Column{MembershipColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "membership_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{MembershipColumns[1]},
+			},
+			{
+				Name:    "membership_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{MembershipColumns[2]},
+			},
+			{
+				Name:    "membership_user_id_tenant_id_population",
+				Unique:  true,
+				Columns: []*schema.Column{MembershipColumns[3], MembershipColumns[4], MembershipColumns[5]},
+			},
+			{
+				Name:    "membership_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{MembershipColumns[3]},
+			},
+		},
+	}
 	// PermissionColumns holds the columns for the "permission" table.
 	PermissionColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -275,6 +349,38 @@ var (
 				Name:    "permissionpolicy_permission_id_policy_id",
 				Unique:  true,
 				Columns: []*schema.Column{PermissionPolicyColumns[4], PermissionPolicyColumns[5]},
+			},
+		},
+	}
+	// PopulationColumns holds the columns for the "population" table.
+	PopulationColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "code", Type: field.TypeString, Size: 20, Comment: "join key: membership rows carry this value in population"},
+		{Name: "name", Type: field.TypeString, Size: 128},
+		{Name: "archetype", Type: field.TypeString, Size: 16, Comment: "compile-time vocabulary: engine (organizational grants) | patron (identity-is-permission)"},
+	}
+	// PopulationTable holds the schema information for the "population" table.
+	PopulationTable = &schema.Table{
+		Name:       "population",
+		Columns:    PopulationColumns,
+		PrimaryKey: []*schema.Column{PopulationColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "population_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{PopulationColumns[1]},
+			},
+			{
+				Name:    "population_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{PopulationColumns[2]},
+			},
+			{
+				Name:    "population_code",
+				Unique:  true,
+				Columns: []*schema.Column{PopulationColumns[3]},
 			},
 		},
 	}
@@ -345,15 +451,46 @@ var (
 			},
 		},
 	}
+	// TenantColumns holds the columns for the "tenant" table.
+	TenantColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "code", Type: field.TypeString, Size: 20, Comment: "join key: tenant-scoped rows carry this value in tenant_id"},
+		{Name: "name", Type: field.TypeString, Size: 128},
+		{Name: "enabled", Type: field.TypeBool, Comment: "false rejects the tenant's inhabitants at login and verification (a check, not a revocation)", Default: true},
+	}
+	// TenantTable holds the schema information for the "tenant" table.
+	TenantTable = &schema.Table{
+		Name:       "tenant",
+		Columns:    TenantColumns,
+		PrimaryKey: []*schema.Column{TenantColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "tenant_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TenantColumns[1]},
+			},
+			{
+				Name:    "tenant_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{TenantColumns[2]},
+			},
+			{
+				Name:    "tenant_code",
+				Unique:  true,
+				Columns: []*schema.Column{TenantColumns[3]},
+			},
+		},
+	}
 	// UserColumns holds the columns for the "user" table.
 	UserColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
 		{Name: "email", Type: field.TypeString, Size: 128},
-		{Name: "password_hash", Type: field.TypeString, Size: 128, Comment: "argon2 digest; plaintext is never stored"},
+		{Name: "password_hash", Type: field.TypeString, Size: 128, Comment: "argon2id digest; plaintext is never stored; legacy bcrypt digests upgrade on next login"},
 		{Name: "dept_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "avatar", Type: field.TypeString, Nullable: true, Size: 20, Comment: "referenced file id; display URLs are minted at read time"},
 		{Name: "enabled", Type: field.TypeBool, Comment: "false rejects login and drops grants at engine compile", Default: true},
@@ -375,9 +512,9 @@ var (
 				Columns: []*schema.Column{UserColumns[2]},
 			},
 			{
-				Name:    "user_tenant_id_email",
+				Name:    "user_email",
 				Unique:  true,
-				Columns: []*schema.Column{UserColumns[3], UserColumns[5]},
+				Columns: []*schema.Column{UserColumns[4]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "deleted_at IS NULL",
 				},
@@ -389,12 +526,16 @@ var (
 		AuditExportTable,
 		AuditLogTable,
 		PolicyTable,
+		CredentialTable,
 		DeptTable,
 		FileTable,
+		MembershipTable,
 		PermissionTable,
 		PermissionPolicyTable,
+		PopulationTable,
 		PrincipalRoleTable,
 		RoleTable,
+		TenantTable,
 		UserTable,
 	}
 )
@@ -409,11 +550,17 @@ func init() {
 	PolicyTable.Annotation = &entsql.Annotation{
 		Table: "policy",
 	}
+	CredentialTable.Annotation = &entsql.Annotation{
+		Table: "credential",
+	}
 	DeptTable.Annotation = &entsql.Annotation{
 		Table: "dept",
 	}
 	FileTable.Annotation = &entsql.Annotation{
 		Table: "file",
+	}
+	MembershipTable.Annotation = &entsql.Annotation{
+		Table: "membership",
 	}
 	PermissionTable.Annotation = &entsql.Annotation{
 		Table: "permission",
@@ -421,11 +568,17 @@ func init() {
 	PermissionPolicyTable.Annotation = &entsql.Annotation{
 		Table: "permission_policy",
 	}
+	PopulationTable.Annotation = &entsql.Annotation{
+		Table: "population",
+	}
 	PrincipalRoleTable.Annotation = &entsql.Annotation{
 		Table: "principal_role",
 	}
 	RoleTable.Annotation = &entsql.Annotation{
 		Table: "role",
+	}
+	TenantTable.Annotation = &entsql.Annotation{
+		Table: "tenant",
 	}
 	UserTable.Annotation = &entsql.Annotation{
 		Table: "user",

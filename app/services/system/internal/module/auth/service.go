@@ -11,6 +11,8 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
+
+	"cyber-ecosystem/app/services/system/internal/module/user"
 )
 
 // Struct --------------------------------------------------------------------------------------------------------------
@@ -55,6 +57,33 @@ func (s *AuthService) Login(ctx context.Context, in *systempb.LoginRequest) (*sy
 	}, nil
 }
 
+func (s *AuthService) LoginByIdentity(ctx context.Context, in *systempb.LoginByIdentityRequest) (*systempb.LoginByIdentityResponse, error) {
+	token, issuedAt, expiresAt, err := s.authUC.LoginByIdentity(ctx, in.GetProvider(), in.GetState(), in)
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.LoginByIdentityResponse{
+		SessionToken: token,
+		IssuedAt:     utils.ToTimestamp(&issuedAt),
+		ExpiresAt:    utils.ToTimestamp(&expiresAt),
+	}, nil
+}
+
+func (s *AuthService) BeginIdentityLogin(ctx context.Context, in *systempb.BeginIdentityLoginRequest) (*systempb.BeginIdentityLoginResponse, error) {
+	redirect, err := s.authUC.BeginIdentityLogin(ctx, in.GetProvider(), in.GetRedirectUri())
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.BeginIdentityLoginResponse{AuthorizeUrl: redirect}, nil
+}
+
+func (s *AuthService) BindCredential(ctx context.Context, in *systempb.BindCredentialRequest) (*systempb.BindCredentialResponse, error) {
+	if err := s.authUC.BindCredential(ctx, in.GetProvider(), in.GetState(), in); err != nil {
+		return nil, err
+	}
+	return &systempb.BindCredentialResponse{}, nil
+}
+
 func (s *AuthService) Logout(ctx context.Context, in *systempb.LogoutRequest) (*systempb.LogoutResponse, error) {
 	if err := s.authUC.Logout(ctx); err != nil {
 		return nil, err
@@ -74,5 +103,8 @@ func (s *AuthService) GetCurrentUser(ctx context.Context, in *systempb.GetCurren
 			Avatar: utils.Wrap(u.Avatar, utils.StringW),
 		},
 		Permissions: u.Permissions,
+		Memberships: utils.SliceMap(u.Seats, func(seat *user.Seat) *systempb.Membership {
+			return &systempb.Membership{Tenant: seat.TenantID, Population: seat.Population}
+		}),
 	}, nil
 }

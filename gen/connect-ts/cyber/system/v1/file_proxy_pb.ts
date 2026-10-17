@@ -8,7 +8,6 @@ import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
 import type { File } from "./file_pb";
 import { file_cyber_system_v1_file } from "./file_pb";
 import { file_ext_v1_access } from "../../../ext/v1/access_pb";
-import { file_ext_v1_authz } from "../../../ext/v1/authz_pb";
 import { file_ext_v1_desc } from "../../../ext/v1/desc_pb";
 import { file_google_api_annotations } from "../../../google/api/annotations_pb";
 import type { Message } from "@bufbuild/protobuf";
@@ -17,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/system/v1/file_proxy.proto.
  */
 export const file_cyber_system_v1_file_proxy: GenFile = /*@__PURE__*/
-  fileDesc("CiBjeWJlci9zeXN0ZW0vdjEvZmlsZV9wcm94eS5wcm90bxIPY3liZXIuc3lzdGVtLnYxIqEBChFVcGxvYWRGaWxlUmVxdWVzdBIgCgRuYW1lGAEgASgJQg26SArIAQFyBRABGP8BSACIAQESIwoMY29udGVudF90eXBlGAIgASgJQgi6SAVyAxiAAUgBiAEBEiIKBGRhdGEYAyABKAxCD7pIDMgBAXoHEAEYgICAAkgCiAEBQgcKBV9uYW1lQg8KDV9jb250ZW50X3R5cGVCBwoFX2RhdGEiOQoSVXBsb2FkRmlsZVJlc3BvbnNlEiMKBGZpbGUYASABKAsyFS5jeWJlci5zeXN0ZW0udjEuRmlsZTLPAQoQRmlsZVByb3h5U2VydmljZRKiAQoKVXBsb2FkRmlsZRIiLmN5YmVyLnN5c3RlbS52MS5VcGxvYWRGaWxlUmVxdWVzdBojLmN5YmVyLnN5c3RlbS52MS5VcGxvYWRGaWxlUmVzcG9uc2UiS4jxBAKQ8QQBitMOGQoV5Luj55CG5LiK5Lyg5bCP5paH5Lu2EAKC0+STAiA6ASoiGy9hcGkvdjEvc3lzdGVtL2ZpbGVzL3VwbG9hZBoWiuIJEuaWh+S7tuS7o+eQhuS4iuS8oEIoWiZjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL3N5c3RlbS92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_system_v1_file, file_ext_v1_access, file_ext_v1_authz, file_ext_v1_desc, file_google_api_annotations]);
+  fileDesc("CiBjeWJlci9zeXN0ZW0vdjEvZmlsZV9wcm94eS5wcm90bxIPY3liZXIuc3lzdGVtLnYxIqEBChFVcGxvYWRGaWxlUmVxdWVzdBIgCgRuYW1lGAEgASgJQg26SArIAQFyBRABGP8BSACIAQESIwoMY29udGVudF90eXBlGAIgASgJQgi6SAVyAxiAAUgBiAEBEiIKBGRhdGEYAyABKAxCD7pIDMgBAXoHEAEYgICAAkgCiAEBQgcKBV9uYW1lQg8KDV9jb250ZW50X3R5cGVCBwoFX2RhdGEiOQoSVXBsb2FkRmlsZVJlc3BvbnNlEiMKBGZpbGUYASABKAsyFS5jeWJlci5zeXN0ZW0udjEuRmlsZTLLAQoQRmlsZVByb3h5U2VydmljZRKeAQoKVXBsb2FkRmlsZRIiLmN5YmVyLnN5c3RlbS52MS5VcGxvYWRGaWxlUmVxdWVzdBojLmN5YmVyLnN5c3RlbS52MS5VcGxvYWRGaWxlUmVzcG9uc2UiR4jxBASK0w4ZChXku6PnkIbkuIrkvKDlsI/mlofku7YQAoLT5JMCIDoBKiIbL2FwaS92MS9zeXN0ZW0vZmlsZXMvdXBsb2FkGhaK4gkS5paH5Lu25Luj55CG5LiK5LygQihaJmN5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvc3lzdGVtL3YxYgZwcm90bzM", [file_buf_validate_validate, file_cyber_system_v1_file, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations]);
 
 /**
  * uploadFile

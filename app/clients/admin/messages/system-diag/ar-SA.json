@@ -27,5 +27,6 @@
   "system_diag_note_preview": "العمليات الفعّالة هي اتحاد التخويلات دون تقييم زمني مباشر",
   "system_diag_effective": "العمليات الفعّالة (مجموعة الأدوار الحالية)",
   "system_diag_session": "حمولة الجلسة (المتصل الحالي)",
+  "system_diag_session_seats": "الانتماء (المستأجر / نوع المستخدم)",
   "system_diag_role_disabled": "موقوف"
 }

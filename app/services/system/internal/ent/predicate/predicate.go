@@ -15,11 +15,17 @@ type AuditLog func(*sql.Selector)
 // AuthzPolicy is the predicate function for authzpolicy builders.
 type AuthzPolicy func(*sql.Selector)
 
+// Credential is the predicate function for credential builders.
+type Credential func(*sql.Selector)
+
 // Dept is the predicate function for dept builders.
 type Dept func(*sql.Selector)
 
 // File is the predicate function for file builders.
 type File func(*sql.Selector)
+
+// Membership is the predicate function for membership builders.
+type Membership func(*sql.Selector)
 
 // Permission is the predicate function for permission builders.
 type Permission func(*sql.Selector)
@@ -27,11 +33,17 @@ type Permission func(*sql.Selector)
 // PermissionPolicy is the predicate function for permissionpolicy builders.
 type PermissionPolicy func(*sql.Selector)
 
+// Population is the predicate function for population builders.
+type Population func(*sql.Selector)
+
 // PrincipalRole is the predicate function for principalrole builders.
 type PrincipalRole func(*sql.Selector)
 
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)
+
+// Tenant is the predicate function for tenant builders.
+type Tenant func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

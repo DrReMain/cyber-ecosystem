@@ -55,8 +55,7 @@ service UserService {
       comment: "修改密码"
       action: ACTION_WRITE
     };
-    option (cyber.ext.v1.access) = ACCESS_ADMIN;
-    option (cyber.ext.v1.builtin) = true;
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {
       post: "/api/v1/system/me/password"
       body: "*"
@@ -88,6 +87,18 @@ service UserService {
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (cyber.ext.v1.datascope) = true;
     option (google.api.http) = {get: "/api/v1/system/users/{id}"};
+  }
+  rpc BatchGetUsers(BatchGetUsersRequest) returns (BatchGetUsersResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "批量查询用户概要"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {
+      post: "/api/v1/system/users/batch-get"
+      body: "*"
+    };
   }
 }
 
@@ -130,6 +141,10 @@ message CreateUserRequest {
     }
   }];
   optional string avatar = 5 [(buf.validate.field).string.len = 20];
+  // Seat population for the identity's birth seat; empty = the default user
+  // population. Validated against the registry — a seat is never born on a
+  // code that does not exist.
+  optional string population = 6 [(buf.validate.field).string.max_len = 20];
 }
 
 message CreateUserResponse {
@@ -239,4 +254,32 @@ message GetUserRequest {
 
 message GetUserResponse {
   User user = 1;
+}
+
+// batchGet
+message BatchGetUsersRequest {
+  // max_items matches the page_size cap (shared/common/v1 pagination.proto):
+  // one page of ids hydrates in one call — keep the two in lockstep.
+  repeated string ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    unique: true
+    items: {
+      string: {len: 20}
+    }
+  }];
+}
+
+message BatchGetUsersResponse {
+  // key = requested id; an absent key = no row or outside the viewer's data
+  // scope — skip semantics, no per-item error channel.
+  map<string, UserBrief> users = 1;
+}
+
+// Rendering-grade identity summary for hydration; deliberately narrower than
+// User (no roles, no lifecycle fields).
+message UserBrief {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.StringValue email = 2;
+  google.protobuf.StringValue avatar = 3;
 }

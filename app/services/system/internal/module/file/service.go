@@ -122,6 +122,8 @@ func ToProtoFile(f *File) *systempb.File {
 
 func toProtoStatus(s string) systempb.FileStatus {
 	switch s {
+	case StatusUploading:
+		return systempb.FileStatus_FILE_STATUS_UPLOADING
 	case StatusConfirmed:
 		return systempb.FileStatus_FILE_STATUS_CONFIRMED
 	case StatusProcessing:
@@ -134,6 +136,8 @@ func toProtoStatus(s string) systempb.FileStatus {
 
 func statusToString(s systempb.FileStatus) string {
 	switch s {
+	case systempb.FileStatus_FILE_STATUS_UPLOADING:
+		return StatusUploading
 	case systempb.FileStatus_FILE_STATUS_CONFIRMED:
 		return StatusConfirmed
 	case systempb.FileStatus_FILE_STATUS_PROCESSING:

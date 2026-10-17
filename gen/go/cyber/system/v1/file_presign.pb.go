@@ -778,7 +778,7 @@ var File_cyber_system_v1_file_presign_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_file_presign_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/system/v1/file_presign.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/file.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb7\x01\n" +
+	"\"cyber/system/v1/file_presign.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/file.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb7\x01\n" +
 	"\x13CreateUploadRequest\x12&\n" +
 	"\x04name\x18\x01 \x01(\tB\r\xbaH\n" +
 	"\xc8\x01\x01r\x05\x10\x01\x18\xff\x01H\x00R\x04name\x88\x01\x01\x120\n" +
@@ -835,15 +835,15 @@ const file_cyber_system_v1_file_presign_proto_rawDesc = "" +
 	"expires_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"1\n" +
 	"\x12AbortUploadRequest\x12\x1b\n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"\x15\n" +
-	"\x13AbortUploadResponse2\x89\a\n" +
-	"\x12FilePresignService\x12\xca\x01\n" +
-	"\fCreateUpload\x12$.cyber.system.v1.CreateUploadRequest\x1a%.cyber.system.v1.CreateUploadResponse\"m\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e@\n" +
-	"<创建直传会话（登记元数据并铸造上传地址）\x10\x02\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/system/uploads\x12\xd7\x01\n" +
-	"\rConfirmUpload\x12%.cyber.system.v1.ConfirmUploadRequest\x1a&.cyber.system.v1.ConfirmUploadResponse\"w\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e=\n" +
-	"9确认直传（校验对象与大小，回填元数据）\x10\x02\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/system/uploads/{id}/confirm\x12\xc6\x01\n" +
-	"\vAbortUpload\x12#.cyber.system.v1.AbortUploadRequest\x1a$.cyber.system.v1.AbortUploadResponse\"l\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0e=\n" +
-	"9放弃直传会话（终止分片会话并删除记录）\x10\x02\x82\xd3\xe4\x93\x02\x1d*\x1b/api/v1/system/uploads/{id}\x12\xea\x01\n" +
-	"\x11ListUploadedParts\x12).cyber.system.v1.ListUploadedPartsRequest\x1a*.cyber.system.v1.ListUploadedPartsResponse\"~\x88\xf1\x04\x02\x90\xf1\x04\x01\x8a\xd3\x0eI\n" +
+	"\x13AbortUploadResponse2\xf9\x06\n" +
+	"\x12FilePresignService\x12\xc6\x01\n" +
+	"\fCreateUpload\x12$.cyber.system.v1.CreateUploadRequest\x1a%.cyber.system.v1.CreateUploadResponse\"i\x88\xf1\x04\x04\x8a\xd3\x0e@\n" +
+	"<创建直传会话（登记元数据并铸造上传地址）\x10\x02\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/system/uploads\x12\xd3\x01\n" +
+	"\rConfirmUpload\x12%.cyber.system.v1.ConfirmUploadRequest\x1a&.cyber.system.v1.ConfirmUploadResponse\"s\x88\xf1\x04\x04\x8a\xd3\x0e=\n" +
+	"9确认直传（校验对象与大小，回填元数据）\x10\x02\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/system/uploads/{id}/confirm\x12\xc2\x01\n" +
+	"\vAbortUpload\x12#.cyber.system.v1.AbortUploadRequest\x1a$.cyber.system.v1.AbortUploadResponse\"h\x88\xf1\x04\x04\x8a\xd3\x0e=\n" +
+	"9放弃直传会话（终止分片会话并删除记录）\x10\x02\x82\xd3\xe4\x93\x02\x1d*\x1b/api/v1/system/uploads/{id}\x12\xe6\x01\n" +
+	"\x11ListUploadedParts\x12).cyber.system.v1.ListUploadedPartsRequest\x1a*.cyber.system.v1.ListUploadedPartsResponse\"z\x88\xf1\x04\x04\x8a\xd3\x0eI\n" +
 	"E查询已传分片（断点续传恢复，补铸缺失分片地址）\x10\x02\x82\xd3\xe4\x93\x02#\x12!/api/v1/system/uploads/{id}/parts\x1a\x16\x8a\xe2\t\x12文件直传上传B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (

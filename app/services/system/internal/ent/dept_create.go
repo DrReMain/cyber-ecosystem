@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type DeptCreate struct {
 	config
 	mutation *DeptMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -254,6 +257,7 @@ func (_c *DeptCreate) createSpec() (*Dept, *sqlgraph.CreateSpec) {
 		_node = &Dept{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(dept.Table, sqlgraph.NewFieldSpec(dept.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -289,11 +293,309 @@ func (_c *DeptCreate) createSpec() (*Dept, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Dept.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.DeptUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *DeptCreate) OnConflict(opts ...sql.ConflictOption) *DeptUpsertOne {
+	_c.conflict = opts
+	return &DeptUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Dept.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *DeptCreate) OnConflictColumns(columns ...string) *DeptUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &DeptUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// DeptUpsertOne is the builder for "upsert"-ing
+	//  one Dept node.
+	DeptUpsertOne struct {
+		create *DeptCreate
+	}
+
+	// DeptUpsert is the "OnConflict" setter.
+	DeptUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *DeptUpsert) SetUpdatedAt(v time.Time) *DeptUpsert {
+	u.Set(dept.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *DeptUpsert) UpdateUpdatedAt() *DeptUpsert {
+	u.SetExcluded(dept.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *DeptUpsert) SetDeletedAt(v time.Time) *DeptUpsert {
+	u.Set(dept.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *DeptUpsert) UpdateDeletedAt() *DeptUpsert {
+	u.SetExcluded(dept.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *DeptUpsert) ClearDeletedAt() *DeptUpsert {
+	u.SetNull(dept.FieldDeletedAt)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *DeptUpsert) SetName(v string) *DeptUpsert {
+	u.Set(dept.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *DeptUpsert) UpdateName() *DeptUpsert {
+	u.SetExcluded(dept.FieldName)
+	return u
+}
+
+// SetParentID sets the "parent_id" field.
+func (u *DeptUpsert) SetParentID(v string) *DeptUpsert {
+	u.Set(dept.FieldParentID, v)
+	return u
+}
+
+// UpdateParentID sets the "parent_id" field to the value that was provided on create.
+func (u *DeptUpsert) UpdateParentID() *DeptUpsert {
+	u.SetExcluded(dept.FieldParentID)
+	return u
+}
+
+// ClearParentID clears the value of the "parent_id" field.
+func (u *DeptUpsert) ClearParentID() *DeptUpsert {
+	u.SetNull(dept.FieldParentID)
+	return u
+}
+
+// SetRemark sets the "remark" field.
+func (u *DeptUpsert) SetRemark(v string) *DeptUpsert {
+	u.Set(dept.FieldRemark, v)
+	return u
+}
+
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *DeptUpsert) UpdateRemark() *DeptUpsert {
+	u.SetExcluded(dept.FieldRemark)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Dept.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(dept.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *DeptUpsertOne) UpdateNewValues() *DeptUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(dept.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(dept.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(dept.FieldTenantID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Dept.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *DeptUpsertOne) Ignore() *DeptUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *DeptUpsertOne) DoNothing() *DeptUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the DeptCreate.OnConflict
+// documentation for more info.
+func (u *DeptUpsertOne) Update(set func(*DeptUpsert)) *DeptUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&DeptUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *DeptUpsertOne) SetUpdatedAt(v time.Time) *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *DeptUpsertOne) UpdateUpdatedAt() *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *DeptUpsertOne) SetDeletedAt(v time.Time) *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *DeptUpsertOne) UpdateDeletedAt() *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *DeptUpsertOne) ClearDeletedAt() *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *DeptUpsertOne) SetName(v string) *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *DeptUpsertOne) UpdateName() *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetParentID sets the "parent_id" field.
+func (u *DeptUpsertOne) SetParentID(v string) *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetParentID(v)
+	})
+}
+
+// UpdateParentID sets the "parent_id" field to the value that was provided on create.
+func (u *DeptUpsertOne) UpdateParentID() *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateParentID()
+	})
+}
+
+// ClearParentID clears the value of the "parent_id" field.
+func (u *DeptUpsertOne) ClearParentID() *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.ClearParentID()
+	})
+}
+
+// SetRemark sets the "remark" field.
+func (u *DeptUpsertOne) SetRemark(v string) *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetRemark(v)
+	})
+}
+
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *DeptUpsertOne) UpdateRemark() *DeptUpsertOne {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateRemark()
+	})
+}
+
+// Exec executes the query.
+func (u *DeptUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for DeptCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *DeptUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *DeptUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: DeptUpsertOne.ID is not supported by MySQL driver. Use DeptUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *DeptUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // DeptCreateBulk is the builder for creating many Dept entities in bulk.
 type DeptCreateBulk struct {
 	config
 	err      error
 	builders []*DeptCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Dept entities in the database.
@@ -323,6 +625,7 @@ func (_c *DeptCreateBulk) Save(ctx context.Context) ([]*Dept, error) {
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -369,6 +672,210 @@ func (_c *DeptCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *DeptCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Dept.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.DeptUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *DeptCreateBulk) OnConflict(opts ...sql.ConflictOption) *DeptUpsertBulk {
+	_c.conflict = opts
+	return &DeptUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Dept.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *DeptCreateBulk) OnConflictColumns(columns ...string) *DeptUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &DeptUpsertBulk{
+		create: _c,
+	}
+}
+
+// DeptUpsertBulk is the builder for "upsert"-ing
+// a bulk of Dept nodes.
+type DeptUpsertBulk struct {
+	create *DeptCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Dept.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(dept.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *DeptUpsertBulk) UpdateNewValues() *DeptUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(dept.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(dept.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(dept.FieldTenantID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Dept.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *DeptUpsertBulk) Ignore() *DeptUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *DeptUpsertBulk) DoNothing() *DeptUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the DeptCreateBulk.OnConflict
+// documentation for more info.
+func (u *DeptUpsertBulk) Update(set func(*DeptUpsert)) *DeptUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&DeptUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *DeptUpsertBulk) SetUpdatedAt(v time.Time) *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *DeptUpsertBulk) UpdateUpdatedAt() *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *DeptUpsertBulk) SetDeletedAt(v time.Time) *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *DeptUpsertBulk) UpdateDeletedAt() *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *DeptUpsertBulk) ClearDeletedAt() *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *DeptUpsertBulk) SetName(v string) *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *DeptUpsertBulk) UpdateName() *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetParentID sets the "parent_id" field.
+func (u *DeptUpsertBulk) SetParentID(v string) *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetParentID(v)
+	})
+}
+
+// UpdateParentID sets the "parent_id" field to the value that was provided on create.
+func (u *DeptUpsertBulk) UpdateParentID() *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateParentID()
+	})
+}
+
+// ClearParentID clears the value of the "parent_id" field.
+func (u *DeptUpsertBulk) ClearParentID() *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.ClearParentID()
+	})
+}
+
+// SetRemark sets the "remark" field.
+func (u *DeptUpsertBulk) SetRemark(v string) *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.SetRemark(v)
+	})
+}
+
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *DeptUpsertBulk) UpdateRemark() *DeptUpsertBulk {
+	return u.Update(func(s *DeptUpsert) {
+		s.UpdateRemark()
+	})
+}
+
+// Exec executes the query.
+func (u *DeptUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the DeptCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for DeptCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *DeptUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

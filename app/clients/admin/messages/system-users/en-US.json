@@ -33,6 +33,8 @@
   "system_users_form_email_invalid": "Not a valid email address",
   "system_users_form_email_hint": "The email is the login identity and cannot change",
   "system_users_form_password": "Initial password",
+  "system_users_form_population": "User type",
+  "system_users_ph_population": "Optional; empty = default",
   "system_users_form_dept": "Department",
   "system_users_form_avatar": "Avatar",
   "system_users_form_avatar_upload": "Upload avatar",

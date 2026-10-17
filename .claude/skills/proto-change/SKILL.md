@@ -1,14 +1,16 @@
 ---
 name: proto-change
-description: Contract change workflow — use when editing any .proto file or adding RPCs, messages, or error enums (regenerate all ends, locale-complete error copy, breaking check, affected builds).
+description: Contract change workflow — use when editing any .proto under proto/ or adding RPCs, messages, error enums, or validation rules. Never hand-edit gen/ — regenerate instead.
 ---
 
 # Proto contract change
 
-Procedure: `docs/conventions/proto/CONVENTIONS.md §8` — the changing-contracts checklist; read it and follow it exactly.
+Read first: `docs/conventions/proto/CONVENTIONS.md` §3 (optionality & the null/zero contract), §4 (error enums, reserved law, locale copy), §5 (access annotation is mandatory on every business RPC).
 
-Rules in force: §3 (optionality & the null/zero contract), §4 (error enums & i18n keys), §5 (access annotation is mandatory on every business RPC).
+Procedure: §8 "Checklist — changing contracts" — follow it exactly.
 
-Blind spot: §9 — protovalidate rule changes are invisible to `buf breaking`; read it before merging.
+Gates (all exit 0, in order): `./nx run proto:generate` → `./nx run proto:breaking` → `./nx run <service>:build`. Client surface changed → also the admin chain (tanstack §11: build → typecheck → check).
 
-Done = per the checklist's closing line.
+Trap: §9 — protovalidate rule removals/weakenings are invisible to `buf breaking`; review validation rules explicitly before merging.
+
+Done = per the §8 closing line: every exit code checked, gen diff clean, error copy present in every registered locale.

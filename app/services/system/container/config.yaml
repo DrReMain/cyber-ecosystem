@@ -4,8 +4,10 @@
 # serves every container shape. Deployment-sensitive values are
 # ${VAR:default} placeholders overridden by APP_-prefixed env vars (e.g.
 # APP_DB_HOST=prod-db reconfigures without a rebuild); booleans included —
-# main.go wires WithResolveActualTypes for the string→bool conversion. Keep
-# placeholders opt-in (only keys a deployment actually flips). When a key
+# main.go wires WithResolveActualTypes for the string→bool conversion.
+# Placeholder coverage is field-aligned with configs/config.yaml — a key
+# that carries one here carries the same one there (defaults differ per
+# environment); a key stays literal in both when neither flips. When a key
 # changes in configs/config.yaml, mirror it here.
 server:
   http: {addr: 0.0.0.0:11001, timeout: 1s}
@@ -37,7 +39,7 @@ data:
   storage:
     s3:
       endpoint: ${S3_ENDPOINT:http://s3.cyber.test}
-      public_endpoint: ${S3_ENDPOINT:http://s3.cyber.test}
+      public_endpoint: ${S3_PUBLIC_ENDPOINT:http://s3.cyber.test}
       access_key: ${S3_ACCESS_KEY:admin@cyber-ecosystem.com}
       secret_key: ${S3_SECRET_KEY:Cyber-Ecosystem123}
       bucket: ${S3_BUCKET:core}
@@ -76,4 +78,13 @@ catalog:
 authz:
   super_admins:
     - admin@cyber.pre
-  initial_password: "admin123456"
+  initial_password: ${SEED_INITIAL_PASSWORD:admin123456}
+auth:
+  providers:
+    - key: wechat
+      kind: wechat
+      enabled: ${WECHAT_ENABLED:false}
+      endpoint: ${WECHAT_ENDPOINT:}
+      wechat:
+        appid: ${WECHAT_APPID:}
+        secret: ${WECHAT_SECRET:}

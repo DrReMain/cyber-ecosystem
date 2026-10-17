@@ -14,8 +14,10 @@ import (
 	"cyber-ecosystem/app/services/system/internal/module/fileproxy"
 	"cyber-ecosystem/app/services/system/internal/module/introspect"
 	"cyber-ecosystem/app/services/system/internal/module/policy"
+	"cyber-ecosystem/app/services/system/internal/module/population"
 	"cyber-ecosystem/app/services/system/internal/module/resource"
 	"cyber-ecosystem/app/services/system/internal/module/role"
+	"cyber-ecosystem/app/services/system/internal/module/tenant"
 	"cyber-ecosystem/app/services/system/internal/module/transfer"
 	"cyber-ecosystem/app/services/system/internal/module/user"
 )
@@ -39,6 +41,8 @@ func NewRegistrarList(
 	s10 *fileproxy.FileProxyService,
 	s11 *filepresign.FilePresignService,
 	s12 *introspect.IntrospectService,
+	s13 *tenant.TenantService,
+	s14 *population.PopulationService,
 ) []Registrar {
-	return []Registrar{s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12}
+	return []Registrar{s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14}
 }

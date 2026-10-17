@@ -43,7 +43,7 @@ services:
       default:
         aliases: ["postgresql.db"]
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 10s
@@ -89,7 +89,7 @@ services:
       default:
         aliases: ["redis.db"]
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -121,13 +121,10 @@ services:
       - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
     networks:
       default:
-        # s3.cyber.test: the public edge name doubles as an in-network alias so
-        # presigned URLs (signed against the external name) work from inside
-        # the network too — see docs/deploy/CONVENTIONS.md §6.
         aliases: ["seaweedfs.storage", "s3.cyber.test"]
     ports:
-      - "8333:80" # S3 API (container listens on 80; host port unchanged for dev)
-      - "8888:8888" # filer UI
+      - "8333:80"
+      - "127.0.0.1:8888:8888" # filer UI
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "80"]
       interval: 10s
@@ -160,7 +157,7 @@ services:
       default:
         aliases: ["nats.mq"]
     ports:
-      - "4222:4222"
+      - "127.0.0.1:4222:4222"
     deploy:
       resources:
         limits:
@@ -364,8 +361,8 @@ services:
       default:
         aliases: ["signoz-otel-collector.observability"]
     ports:
-      - "4317:4317" # OTLP gRPC
-      - "4318:4318" # OTLP HTTP
+      - "127.0.0.1:4317:4317" # OTLP gRPC
+      - "127.0.0.1:4318:4318" # OTLP HTTP
     healthcheck: # bash /dev/tcp probe (no wget/curl in image)
       test: ["CMD", "bash", "-c", "echo > /dev/tcp/127.0.0.1/13133"]
       interval: 10s
@@ -403,7 +400,7 @@ services:
       default:
         aliases: ["signoz.observability"]
     ports:
-      - "8080:8080" # web UI
+      - "127.0.0.1:8080:8080" # web UI
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8080/api/v1/health"]
       interval: 10s
@@ -489,7 +486,7 @@ services:
       default:
         aliases: ["glitchtip.observability"]
     ports:
-      - "8100:8000" # web UI (host 8100: centrifugo owns 8000)
+      - "127.0.0.1:8100:8000" # web UI (host 8100: centrifugo owns 8000)
     healthcheck:
       test:
         [

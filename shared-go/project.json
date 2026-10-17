@@ -6,8 +6,8 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "go test ./shared-go/..."
+        "cwd": "{projectRoot}",
+        "command": "go test ./..."
       }
     }
   }

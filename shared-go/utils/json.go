@@ -25,3 +25,7 @@ func Unmarshal[T any](data []byte) (T, error) {
 	var v T
 	return v, json.Unmarshal(data, &v)
 }
+
+func UnmarshalInto(data []byte, target any) error {
+	return json.Unmarshal(data, target)
+}

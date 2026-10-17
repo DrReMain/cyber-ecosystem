@@ -55,14 +55,14 @@
       "outputs": ["{projectRoot}/bin"],
       "options": {
         "cwd": "{projectRoot}",
-        "command": "go build -ldflags \"-X main.Version=$(git describe --tags --always)\" -o ./bin/ ./..."
+        "command": "go build -ldflags \"-X main.Version=$(git describe --tags --always --match 'v*')\" -o ./bin/ ./..."
       }
     },
     "image": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "docker build -f app/services/system/Dockerfile --build-arg VERSION=$(git describe --tags --always) --build-arg GOPROXY=\"$(go env GOPROXY)\" -t cyber-ecosystem/system:local ."
+        "command": "docker build -f app/services/system/Dockerfile --build-arg VERSION=$(git describe --tags --always --match 'v*') --build-arg GOPROXY=\"$(go env GOPROXY)\" -t cyber-ecosystem/system:local ."
       }
     },
     "migrate:diff": {

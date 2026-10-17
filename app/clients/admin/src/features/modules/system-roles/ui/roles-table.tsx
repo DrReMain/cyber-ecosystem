@@ -1,18 +1,13 @@
 import type { Role } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/role_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TableProps } from "antd";
-import { Avatar, Button, Popconfirm, Space, Tag, Typography } from "antd";
+import { Avatar, Button, Space, Tag, Typography } from "antd";
+import { Pencil, Power, PowerOff, Trash } from "lucide-react";
+import { ActionIconButton } from "#/components/action-icon-button";
+import { avatarColor } from "#/libs";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import { formatGrantsSummary, summarizeGrants } from "../grants";
-
-const AVATAR_COLORS = ["#1677ff", "#722ed1", "#13c2c2", "#fa8c16", "#eb2f96", "#52c41a"];
-
-function avatarColor(code: string): string {
-  let sum = 0;
-  for (const ch of code) sum += ch.charCodeAt(0);
-  return AVATAR_COLORS[sum % AVATAR_COLORS.length] ?? "#1677ff";
-}
 
 interface RolesTableProps {
   roles: Role[];
@@ -103,48 +98,38 @@ export function RolesTable({
     fieldAction<Role>(
       (_, role) => (
         <Space size={0}>
-          <Button color="primary" onClick={() => onEdit(role)} size="small" variant="text">
-            {m.system_roles_act_edit()}
-          </Button>
+          <ActionIconButton
+            icon={Pencil}
+            label={m.system_roles_act_edit()}
+            onClick={() => onEdit(role)}
+          />
           {role.enabled ? (
-            <Popconfirm
-              cancelButtonProps={{ variant: "filled", color: "default" }}
-              okButtonProps={{ variant: "filled", color: "danger" }}
-              onConfirm={() => onToggle(role, false)}
-              placement={getTextDirection() === "rtl" ? "right" : "left"}
-              title={m.system_roles_disable_confirm()}
-            >
-              <Button
-                color="danger"
-                disabled={pendingId === (role.id ?? "")}
-                size="small"
-                variant="text"
-              >
-                {m.system_roles_act_disable()}
-              </Button>
-            </Popconfirm>
-          ) : (
-            <Button
-              color="primary"
+            <ActionIconButton
+              confirm={{
+                onConfirm: () => onToggle(role, false),
+                title: m.system_roles_disable_confirm(),
+              }}
               disabled={pendingId === (role.id ?? "")}
+              icon={PowerOff}
+              label={m.system_roles_act_disable()}
+            />
+          ) : (
+            <ActionIconButton
+              disabled={pendingId === (role.id ?? "")}
+              icon={Power}
+              label={m.system_roles_act_enable()}
               onClick={() => onToggle(role, true)}
-              size="small"
-              variant="text"
-            >
-              {m.system_roles_act_enable()}
-            </Button>
+            />
           )}
-          <Popconfirm
-            cancelButtonProps={{ variant: "filled", color: "default" }}
-            okButtonProps={{ variant: "filled", color: "danger" }}
-            onConfirm={() => onDelete(role)}
-            placement={getTextDirection() === "rtl" ? "right" : "left"}
-            title={m.system_roles_delete_confirm({ name: role.name ?? "" })}
-          >
-            <Button color="danger" disabled={pendingId === role.id} size="small" variant="text">
-              {m.system_roles_act_delete()}
-            </Button>
-          </Popconfirm>
+          <ActionIconButton
+            confirm={{
+              onConfirm: () => onDelete(role),
+              title: m.system_roles_delete_confirm({ name: role.name ?? "" }),
+            }}
+            disabled={pendingId === role.id}
+            icon={Trash}
+            label={m.system_roles_act_delete()}
+          />
         </Space>
       ),
       { title: m.system_roles_col_actions() },

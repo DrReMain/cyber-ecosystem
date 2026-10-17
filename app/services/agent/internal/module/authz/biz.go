@@ -3,7 +3,6 @@ package authz
 import (
 	"context"
 	"log/slog"
-	"slices"
 
 	"cyber-ecosystem/shared-go/kratos/security"
 	kauthz "cyber-ecosystem/shared-go/kratos/security/authz"
@@ -34,8 +33,5 @@ func NewAuthzUC(logger *slog.Logger, tm shared.Transaction, authzRP AuthzRP) *Au
 // Method --------------------------------------------------------------------------------------------------------------
 
 func (uc *AuthzUC) Decide(ctx context.Context, subject *security.Subject, operation string) (*kauthz.Decision, error) {
-	if slices.Contains(builtinOperations, operation) {
-		return &kauthz.Decision{Allowed: true, Reason: kauthz.AllowBuiltin}, nil
-	}
 	return uc.authzRP.CheckGrants(ctx, subject, operation)
 }
