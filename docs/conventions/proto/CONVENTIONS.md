@@ -53,7 +53,7 @@ Requests don't need this (input is presence-based), so they use the lighter `opt
 
 - **Time:** `google.protobuf.Timestamp`.
 - **Path-bound fields** (bound from `{xxx}` in `google.api.http`): MUST be plain (non-`optional`, non-wrapper). Always present from the URL; `optional`/wrapper generates a proto oneof that conflicts with `body:"*"` decode ("field already set for oneof").
-- **Validation:** `(buf.validate.field)` rules inline, correct and reasonable — `required` for mandatory, `string.min_len`/`max_len`/`pattern` for format, `cel` for cross-field. Validate at the boundary (server inbound); do not re-validate in biz.
+- **Validation:** `(buf.validate.field)` rules inline, correct and reasonable — `required` for mandatory, `string.min_len`/`max_len`/`pattern` for format, `cel` for cross-field. Cross-field rules are **message-level** (`(buf.validate.message).cel`): field-level `this` binds the field *value* — buf lint rejects field selection on a scalar at compile time. Validate at the boundary (server inbound); do not re-validate in biz.
 
 > **Client note.** On the client, empty is represented per transport: Connect (protobuf-es) → `undefined`; HTTP (hey-api SDK) → `null` (wire value preserved). Known deviation: gnostic renders WKT wrappers as plain types without `nullable`, so hey-api types say `id?: string` while the wire may carry an explicit `null` — consumer code must not non-null-assert these fields. gnostic is upstream low-maintenance; do not expect this to be fixed there.
 >
@@ -68,7 +68,7 @@ Requests don't need this (input is presence-based), so they use the lighter `opt
 Two layers of error enums, both using the kratos `errors.proto` option (`errors.code` = HTTP status):
 
 - **Shared generic** (`cyber.shared.errors.v1`): `GeneralError` (enum values mirror HTTP status: 4xx client / 5xx server), `InfraError` (3xxx db/cache/storage/mq/network), `FlowError`. Reused by every service — do not redefine generic codes per service.
-- **Service business** (`cyber.<service>/v1/error_reason.proto`): a service-semantic enum — `System` for system, e.g. `SYSTEM_INVALID_STATUS_TRANSITION` (6xxx range). **The enum name carries the service identity**: buf's `ENUM_VALUE_PREFIX` then forces every value to start with the service prefix, so the wire reason is unique across services by construction. Do not name this enum `ErrorReason` (generic prefix collides the moment a second service copies the template).
+- **Service business** (`cyber.<service>/v1/error_reason.proto`): a service-semantic enum — `System` for system, e.g. `SYSTEM_INVALID_STATUS_TRANSITION` (6xxx range as **disjoint per-service blocks**: system 60xx, esports 61xx; a new service takes the next free block and records it in the enum's header comment). **The enum name carries the service identity**: buf's `ENUM_VALUE_PREFIX` then forces every value to start with the service prefix, so the wire reason is unique across services by construction. Do not name this enum `ErrorReason` (generic prefix collides the moment a second service copies the template).
 
 **Wire reason shape & i18n.** The wire reason is the bare proto value name (e.g. `SYSTEM_INVALID_STATUS_TRANSITION`) — protobuf APIv2's `String()` emits no Go type prefix. `ENUM_VALUE_PREFIX` makes the value name unique across services, so it doubles as the client-side error identity: i18n catalogs key error copy as `error_<ValueName>` and the frontend looks it up directly, no transformation.
 
