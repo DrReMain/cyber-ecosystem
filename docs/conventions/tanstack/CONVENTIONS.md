@@ -113,6 +113,11 @@ Three tiers:
    `staticData`, so deleting a route file removes its menu item
    automatically; drop the menu message keys alongside.
 
+**Dot-named nesting.**
+
+- A dot-named route file (`login.wechat.callback.tsx`) is a child of each shorter prefix (`/login/wechat`, `/login`): every parent on that chain must be a layout route — its component renders `<Outlet />`, and the parent's own page lives in `login.index.tsx`.
+- A parent with a direct `component` never mounts the child while the child's `head` still applies — a correct SSR title over the parent's view is the drift symptom (right URL, parent's render), not a router bug.
+
 **Page read-set contract.**
 
 - Every formal-page route declares `staticData.operations` = the page's **read set** — the operations of every grant-gated query the page actually issues for data.
