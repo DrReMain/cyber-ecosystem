@@ -237,7 +237,7 @@ Use one shell per process:
 ./nx run admin:dev
 ```
 
-The development proxy expects `system` on `localhost:13001` and `agent` on `localhost:13002`. Open `http://localhost:5173` and sign in with the seeded administrator — `admin1@cyber.local`, default password `Admin@123456` (`SEED_INITIAL_PASSWORD` overrides it; see `app/services/system/configs/config.yaml`). A user can configure an OpenAI-compatible provider from the admin profile; the API key is encrypted server-side and never returned by an API.
+The development proxy expects `system` on `localhost:13001` and `agent` on `localhost:13002`. Open `http://localhost:5173` and sign in with the seeded administrator — `admin@cyber.local`, default password `admin123456` (`SEED_INITIAL_PASSWORD` overrides it; see `app/services/system/configs/config.yaml`). A user can configure an OpenAI-compatible provider from the admin profile; the API key is encrypted server-side and never returned by an API.
 
 The checked-in configuration contains development-only defaults — seeded administrators, the agent master key, and the dev stack's middleware credentials (postgres/redis/seaweedfs/nats/centrifugo/livekit/signoz/glitchtip). Host ports bind to loopback only, except the browser-dialed faces — the SeaweedFS S3 API (8333), Centrifugo (8000), and LiveKit (7880 + the UDP media range) — which publish for cross-machine development; cross-machine direct uploads additionally need `APP_S3_PUBLIC_ENDPOINT=http://<dev-host-LAN-IP>:8333` so presigned URLs stop pointing at localhost. None are production secrets, but override them before any shared or internet-reachable deployment.
 

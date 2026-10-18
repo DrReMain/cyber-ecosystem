@@ -77,7 +77,7 @@ catalog:
 
 authz:
   super_admins:
-    - admin@cyber.pre
+    - admin@cyber.local
   initial_password: ${SEED_INITIAL_PASSWORD:admin123456}
 auth:
   providers:

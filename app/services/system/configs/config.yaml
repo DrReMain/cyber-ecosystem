@@ -83,9 +83,8 @@ catalog:
 
 authz:
   super_admins:
-    - admin1@cyber.local            # 邮箱 (种子超管)
-    - admin2@cyber.local
-  initial_password: ${SEED_INITIAL_PASSWORD:Admin@123456} # 种子超管口令
+    - admin@cyber.local            # 邮箱 (种子超管)
+  initial_password: ${SEED_INITIAL_PASSWORD:admin123456} # 种子超管口令
 auth:
   providers:
     - key: wechat                   # 实例注册键 (登录请求的 provider 参数)

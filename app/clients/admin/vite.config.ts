@@ -31,7 +31,7 @@ const config = defineConfig(({ mode }) => {
       },
     },
     plugins: [
-      devtools(),
+      devtools({ consolePiping: { enabled: false } }),
       paraglideVitePlugin({
         project: "./project.inlang",
         outdir: "./src/paraglide",
