@@ -72,7 +72,7 @@ Two layers of error enums, both using the kratos `errors.proto` option (`errors.
 
 **Wire reason shape & i18n.** The wire reason is the bare proto value name (e.g. `SYSTEM_INVALID_STATUS_TRANSITION`) — protobuf APIv2's `String()` emits no Go type prefix. `ENUM_VALUE_PREFIX` makes the value name unique across services, so it doubles as the client-side error identity: i18n catalogs key error copy as `error_<ValueName>` and the frontend looks it up directly, no transformation.
 
-**Removing an error value reserves its number** (`reserved 6050;`, mirroring `reserved 6031;`): a deleted number left unreserved lets a future value silently reuse it, deserializing old wire data into the wrong semantics. The reserved line replaces the entry in place and carries a trailing why-comment naming the departed value — `// was X until it moved home to …` for a moved reason, the provision-cleared shape already on `6050` otherwise; the error-copy keys are deleted from every locale file in the same change.
+**Removing an error value before first release deletes it outright**: the number returns to the pool (later values may take the vacated slot, e.g. `6101` after its block emptied), and the error-copy keys are deleted from every locale file in the same change. Tombstones (`reserved N;` with a trailing why-comment naming the departed value) exist only for enums whose wire carries history — once old wire data is in the wild, an unreserved number lets a future value silently reuse it and deserialize that data into the wrong semantics.
 
 Go side consumes generated `errorspb.ErrorXxx("")` (see kratos CONVENTIONS §5/§6).
 
