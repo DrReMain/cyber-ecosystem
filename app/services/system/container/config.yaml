@@ -75,15 +75,16 @@ observability:
 catalog:
   dir: ${CATALOG_DIR:/etc/cyber/catalog}
 
-authz:
+seed:
   super_admins:
-    - admin@cyber.local
+    - admin
   initial_password: ${SEED_INITIAL_PASSWORD:admin123456}
 auth:
   providers:
     - key: wechat
-      kind: wechat
+      kind: wechat_mp
       enabled: ${WECHAT_ENABLED:false}
+      auto_register: ${WECHAT_AUTO_REGISTER:false}
       endpoint: ${WECHAT_ENDPOINT:}
       wechat:
         appid: ${WECHAT_APPID:}

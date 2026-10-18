@@ -49,6 +49,7 @@ services:
       - APP_WECHAT_ENABLED
       - APP_WECHAT_ENDPOINT
       - APP_WECHAT_APPID
+      - APP_WECHAT_AUTO_REGISTER
       - APP_WECHAT_SECRET
     networks:
       default:

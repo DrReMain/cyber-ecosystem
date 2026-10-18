@@ -1,7 +1,7 @@
 import type { User } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/user_pb";
 
 export interface UserDraft {
-  email: string;
+  account: string;
   password: string;
   population?: string;
   deptId?: string;

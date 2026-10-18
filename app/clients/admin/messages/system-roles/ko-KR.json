@@ -27,7 +27,7 @@
   "system_roles_drawer_edit_title": "역할 편집",
   "system_roles_tab_grants": "권한 설정",
   "system_roles_tab_members": "구성원",
-  "system_roles_member_search_placeholder": "이메일 또는 ID 검색",
+  "system_roles_member_search_placeholder": "계정 또는 ID 검색",
   "system_roles_member_act_unbind": "해제",
   "system_roles_member_user": "사용자",
   "system_roles_members_empty": "아직 구성원이 없습니다",

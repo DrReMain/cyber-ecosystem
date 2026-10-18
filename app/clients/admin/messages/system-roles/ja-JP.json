@@ -27,7 +27,7 @@
   "system_roles_drawer_edit_title": "ロールを編集",
   "system_roles_tab_grants": "権限設定",
   "system_roles_tab_members": "メンバー",
-  "system_roles_member_search_placeholder": "メールアドレスまたはIDで検索",
+  "system_roles_member_search_placeholder": "アカウントまたはIDで検索",
   "system_roles_member_act_unbind": "解除",
   "system_roles_member_user": "ユーザー",
   "system_roles_members_empty": "メンバーはまだいません",

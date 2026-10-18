@@ -489,7 +489,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
-		{Name: "email", Type: field.TypeString, Size: 128},
+		{Name: "account", Type: field.TypeString, Size: 128, Comment: "global identity handle; email and phone are bindable credentials, never the identity key"},
 		{Name: "password_hash", Type: field.TypeString, Size: 128, Comment: "argon2id digest; plaintext is never stored; legacy bcrypt digests upgrade on next login"},
 		{Name: "dept_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "avatar", Type: field.TypeString, Nullable: true, Size: 20, Comment: "referenced file id; display URLs are minted at read time"},
@@ -512,7 +512,7 @@ var (
 				Columns: []*schema.Column{UserColumns[2]},
 			},
 			{
-				Name:    "user_email",
+				Name:    "user_account",
 				Unique:  true,
 				Columns: []*schema.Column{UserColumns[4]},
 				Annotation: &entsql.IndexAnnotation{

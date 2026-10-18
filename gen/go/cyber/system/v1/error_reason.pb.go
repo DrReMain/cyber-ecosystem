@@ -59,7 +59,6 @@ const (
 	System_SYSTEM_USER_SELF_DISABLE System = 6071
 	System_SYSTEM_USER_DISABLED     System = 6072
 	System_SYSTEM_USER_NOT_FOUND    System = 6073
-	System_SYSTEM_USER_EMAIL_TAKEN  System = 6074
 	// 608x: file
 	System_SYSTEM_FILE_NOT_FOUND     System = 6080
 	System_SYSTEM_FILE_TOO_LARGE     System = 6081
@@ -100,7 +99,6 @@ var (
 		6071: "SYSTEM_USER_SELF_DISABLE",
 		6072: "SYSTEM_USER_DISABLED",
 		6073: "SYSTEM_USER_NOT_FOUND",
-		6074: "SYSTEM_USER_EMAIL_TAKEN",
 		6080: "SYSTEM_FILE_NOT_FOUND",
 		6081: "SYSTEM_FILE_TOO_LARGE",
 		6082: "SYSTEM_FILE_SIZE_MISMATCH",
@@ -135,7 +133,6 @@ var (
 		"SYSTEM_USER_SELF_DISABLE":            6071,
 		"SYSTEM_USER_DISABLED":                6072,
 		"SYSTEM_USER_NOT_FOUND":               6073,
-		"SYSTEM_USER_EMAIL_TAKEN":             6074,
 		"SYSTEM_FILE_NOT_FOUND":               6080,
 		"SYSTEM_FILE_TOO_LARGE":               6081,
 		"SYSTEM_FILE_SIZE_MISMATCH":           6082,
@@ -178,7 +175,7 @@ var File_cyber_system_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xd4\t\n" +
+	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xb0\t\n" +
 	"\x06System\x12\x1c\n" +
 	"\x12SYSTEM_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12\x1e\n" +
 	"\x13SYSTEM_LOGIN_FAILED\x10\xf0.\x1a\x04\xa8E\x90\x03\x12#\n" +
@@ -203,8 +200,7 @@ const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\x17SYSTEM_USER_SELF_DELETE\x10\xb6/\x1a\x04\xa8E\x90\x03\x12#\n" +
 	"\x18SYSTEM_USER_SELF_DISABLE\x10\xb7/\x1a\x04\xa8E\x90\x03\x12\x1f\n" +
 	"\x14SYSTEM_USER_DISABLED\x10\xb8/\x1a\x04\xa8E\x93\x03\x12 \n" +
-	"\x15SYSTEM_USER_NOT_FOUND\x10\xb9/\x1a\x04\xa8E\x94\x03\x12\"\n" +
-	"\x17SYSTEM_USER_EMAIL_TAKEN\x10\xba/\x1a\x04\xa8E\x99\x03\x12 \n" +
+	"\x15SYSTEM_USER_NOT_FOUND\x10\xb9/\x1a\x04\xa8E\x94\x03\x12 \n" +
 	"\x15SYSTEM_FILE_NOT_FOUND\x10\xc0/\x1a\x04\xa8E\x94\x03\x12 \n" +
 	"\x15SYSTEM_FILE_TOO_LARGE\x10\xc1/\x1a\x04\xa8E\x90\x03\x12$\n" +
 	"\x19SYSTEM_FILE_SIZE_MISMATCH\x10\xc2/\x1a\x04\xa8E\x90\x03\x12$\n" +

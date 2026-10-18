@@ -80,20 +80,20 @@ export function UserDrawer({
   onSave,
   onResetPassword,
 }: Readonly<UserDrawerProps>) {
-  const [form] = Form.useForm<{ email: string; population?: string; deptId?: string }>();
+  const [form] = Form.useForm<{ account: string; population?: string; deptId?: string }>();
   const [password, setPassword] = useState(generatePassword);
   const [avatarId, setAvatarId] = useState<string | undefined>(user?.avatar);
   const previewUrl = useFileUrl(avatarId);
   const initialValues =
     mode === "edit"
-      ? { email: user?.email ?? "", deptId: user?.deptId ?? undefined }
-      : { email: "", deptId: undefined };
+      ? { account: user?.account ?? "", deptId: user?.deptId ?? undefined }
+      : { account: "", deptId: undefined };
 
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
       onSave({
-        email: values.email,
+        account: values.account,
         password,
         population: mode === "create" ? values.population : undefined,
         deptId: values.deptId,
@@ -137,25 +137,22 @@ export function UserDrawer({
           label={
             mode === "edit" ? (
               <>
-                {m.system_users_form_email()}
+                {m.system_users_form_account()}
                 <span className="ms-1.5 font-normal text-[11px] text-ink-tertiary">
-                  {m.system_users_form_email_hint()}
+                  {m.system_users_form_account_hint()}
                 </span>
               </>
             ) : (
-              m.system_users_form_email()
+              m.system_users_form_account()
             )
           }
-          name="email"
-          rules={[
-            { required: true, message: m.system_users_form_email_required() },
-            { type: "email", message: m.system_users_form_email_invalid() },
-          ]}
+          name="account"
+          rules={[{ required: true, message: m.system_users_form_account_required() }]}
         >
           <Input
             disabled={mode === "edit"}
             maxLength={128}
-            placeholder={m.system_users_ph_email()}
+            placeholder={m.system_users_ph_account()}
             showCount
           />
         </Form.Item>
@@ -194,7 +191,7 @@ export function UserDrawer({
         )}
         <Form.Item label={m.system_users_form_avatar()}>
           <div className="flex items-center gap-3">
-            <UserAvatar email={user?.email ?? ""} size={48} url={previewUrl} />
+            <UserAvatar account={user?.account ?? ""} size={48} url={previewUrl} />
             <Upload
               beforeUpload={(file) => {
                 void onUploadAvatar(file).then((f) => {

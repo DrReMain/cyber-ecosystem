@@ -313,18 +313,6 @@ func ErrorSystemUserNotFound(format string, args ...interface{}) *errors.Error {
 	return errors.New(404, System_SYSTEM_USER_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
 
-func IsSystemUserEmailTaken(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == System_SYSTEM_USER_EMAIL_TAKEN.String() && e.Code == 409
-}
-
-func ErrorSystemUserEmailTaken(format string, args ...interface{}) *errors.Error {
-	return errors.New(409, System_SYSTEM_USER_EMAIL_TAKEN.String(), fmt.Sprintf(format, args...))
-}
-
 // 608x: file
 func IsSystemFileNotFound(err error) bool {
 	if err == nil {

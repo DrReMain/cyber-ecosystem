@@ -6,7 +6,7 @@ import { Pencil, Power, PowerOff, Trash } from "lucide-react";
 import { ActionIconButton } from "#/components/action-icon-button";
 import { m } from "#/paraglide/messages";
 import type { UserRow } from "../types";
-import { localPart, UserAvatar } from "./user-avatar";
+import { displayName, UserAvatar } from "./user-avatar";
 
 interface UsersTableProps {
   rows: UserRow[];
@@ -41,13 +41,13 @@ export function UsersTable({
       render: (_, row) => (
         <Space>
           <UserAvatar
-            email={row.user.email ?? ""}
+            account={row.user.account ?? ""}
             url={row.user.avatar ? avatarUrls.get(row.user.avatar) : undefined}
           />
           <div className="flex flex-col">
-            <span>{localPart(row.user.email ?? "")}</span>
+            <span>{displayName(row.user.account ?? "")}</span>
             <Typography.Text className="font-mono" type="secondary">
-              {row.user.email}
+              {row.user.account}
             </Typography.Text>
           </div>
         </Space>

@@ -10,8 +10,8 @@ import { sessionQuery } from "../../auth/session.fn";
 export function SiderUserCard({ collapsed }: Readonly<{ collapsed: boolean }>) {
   const router = useRouter();
   const { data } = useQuery(sessionQuery);
-  const email = data?.status === "authed" ? data.user.email : "";
-  const name = email.split("@")[0] ?? "";
+  const account = data?.status === "authed" ? data.user.account : "";
+  const name = account.split("@")[0] ?? "";
   const avatarUrl = useFileUrl(data?.status === "authed" ? data.user.avatar : undefined);
 
   return (
@@ -26,7 +26,7 @@ export function SiderUserCard({ collapsed }: Readonly<{ collapsed: boolean }>) {
     >
       <Tooltip
         placement={getTextDirection() === "rtl" ? "left" : "right"}
-        title={email || undefined}
+        title={account || undefined}
       >
         <Avatar className="flex-none" size={collapsed ? 30 : 34} src={avatarUrl}>
           {name.charAt(0).toUpperCase()}
@@ -35,7 +35,7 @@ export function SiderUserCard({ collapsed }: Readonly<{ collapsed: boolean }>) {
       {collapsed ? null : (
         <div className="flex min-w-0 flex-col">
           <span className="truncate font-medium text-[13px]">{name}</span>
-          <span className="truncate font-mono text-[11px] text-ink-tertiary">{email}</span>
+          <span className="truncate font-mono text-[11px] text-ink-tertiary">{account}</span>
         </div>
       )}
     </button>

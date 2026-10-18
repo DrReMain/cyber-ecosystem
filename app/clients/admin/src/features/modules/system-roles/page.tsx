@@ -171,14 +171,14 @@ export function RolesPage() {
     [policiesQuery.data],
   );
   const members = useMemo(() => {
-    const emailById = new Map(
-      (usersQuery.data?.list ?? []).map((u) => [u.id ?? "", u.email ?? ""] as const),
+    const accountById = new Map(
+      (usersQuery.data?.list ?? []).map((u) => [u.id ?? "", u.account ?? ""] as const),
     );
     return (membersQuery.data?.list ?? []).map((mem) => ({
       principalType: mem.principalType ?? "user",
       principalId: mem.principalId ?? "",
       createdAt: mem.createdAt,
-      displayName: emailById.get(mem.principalId ?? "") || (mem.principalId ?? ""),
+      displayName: accountById.get(mem.principalId ?? "") || (mem.principalId ?? ""),
     }));
   }, [membersQuery.data, usersQuery.data]);
 

@@ -2,20 +2,20 @@ import { Avatar } from "antd";
 
 import { avatarColor } from "#/libs";
 
-export function localPart(email: string): string {
-  return email.split("@")[0] ?? email;
+export function displayName(account: string): string {
+  return account.split("@")[0] ?? account;
 }
 
 interface UserAvatarProps {
   url: string | undefined;
-  email: string;
+  account: string;
   size?: number;
 }
 
-export function UserAvatar({ url, email, size }: Readonly<UserAvatarProps>) {
+export function UserAvatar({ url, account, size }: Readonly<UserAvatarProps>) {
   return (
-    <Avatar size={size} src={url} style={{ backgroundColor: avatarColor(email), flexShrink: 0 }}>
-      {localPart(email).charAt(0).toUpperCase()}
+    <Avatar size={size} src={url} style={{ backgroundColor: avatarColor(account), flexShrink: 0 }}>
+      {displayName(account).charAt(0).toUpperCase()}
     </Avatar>
   );
 }

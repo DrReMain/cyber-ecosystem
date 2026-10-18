@@ -43,7 +43,7 @@ type fakeUserRP struct {
 
 	creates     int
 	createdHash string
-	// createErr is one-shot: the first Create fails (the email-unique race),
+	// createErr is one-shot: the first Create fails (the account-unique race),
 	// later calls succeed — the retry lands as a seat.
 	createErr error
 
@@ -66,18 +66,18 @@ type fakeUserRP struct {
 	list           *UserListOut
 	hadRoles       bool
 	listRolesErr   error
-	findEmailErr   error
+	findAccountErr error
 	notSeated      map[string]bool
 }
 
-// FindByEmail answers the registry-plane lookup: a row whose email matches,
+// FindByAccount answers the registry-plane lookup: a row whose account matches,
 // the classified not-found miss, or the injected infra failure.
-func (f *fakeUserRP) FindByEmail(_ context.Context, email string) (*User, error) {
-	if f.findEmailErr != nil {
-		return nil, f.findEmailErr
+func (f *fakeUserRP) FindByAccount(_ context.Context, account string) (*User, error) {
+	if f.findAccountErr != nil {
+		return nil, f.findAccountErr
 	}
 	for _, u := range f.rows {
-		if u.Email != nil && *u.Email == email {
+		if u.Account != nil && *u.Account == account {
 			return u, nil
 		}
 	}
@@ -141,7 +141,7 @@ func (f *fakeUserRP) Create(_ context.Context, u *User) (*User, error) {
 		}
 		winner := *u
 		winner.ID = "u1"
-		f.rows[*u.Email] = &winner
+		f.rows[*u.Account] = &winner
 		return nil, err
 	}
 	f.createdHash = utils.Deref(u.PasswordHash, "")
@@ -334,7 +334,7 @@ func TestByIdFacesRefuseForeignSeat(t *testing.T) {
 	if _, err := uc.Get(context.Background(), "u1"); !systempb.IsSystemUserNotFound(err) {
 		t.Fatalf("get: want USER_NOT_FOUND, got %v", err)
 	}
-	if _, err := uc.Update(context.Background(), []string{"email"}, &User{ID: "u1"}, nil, nil); !systempb.IsSystemUserNotFound(err) {
+	if _, err := uc.Update(context.Background(), []string{"password"}, &User{ID: "u1"}, nil, nil); !systempb.IsSystemUserNotFound(err) {
 		t.Fatalf("update: want USER_NOT_FOUND, got %v", err)
 	}
 	if _, err := uc.UpdateStatus(context.Background(), "u1", false); !systempb.IsSystemUserNotFound(err) {
@@ -377,12 +377,12 @@ func TestDeleteRevokesSessions(t *testing.T) {
 // ChangePassword ------------------------------------------------------------------------------------------------------
 
 func TestChangePasswordOldMismatch(t *testing.T) {
-	email := "a@x.co"
+	account := "a@x.co"
 	oldHash, err := utils.Hash("right-old")
 	if err != nil {
 		t.Fatalf("seed hash: %v", err)
 	}
-	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Email: &email, PasswordHash: &oldHash}}}
+	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Account: &account, PasswordHash: &oldHash}}}
 	uc := newUserUC(rp)
 
 	if err := uc.ChangePassword(selfCtx("u1"), "wrong-old", "NewPass123"); !systempb.IsSystemPasswordMismatch(err) {
@@ -402,8 +402,8 @@ func TestCreateResolvesRefsAndRoles(t *testing.T) {
 		&fakeFileRP{ref: &file.File{Status: file.StatusConfirmed}},
 	)
 
-	email, password, deptID, avatar := "a@x.co", "pw-123456", "d1", "f1"
-	out, err := uc.Create(context.Background(), &email, &password, &deptID, &avatar, "", []string{"admin"})
+	account, password, deptID, avatar := "a@x.co", "pw-123456", "d1", "f1"
+	out, err := uc.Create(context.Background(), &account, &password, &deptID, &avatar, "", []string{"admin"})
 	if err != nil {
 		t.Fatalf("create: %v", err)
 	}
@@ -425,8 +425,8 @@ func TestCreateRejectsUnknownDept(t *testing.T) {
 	rp := &fakeUserRP{}
 	uc := newUserUCWith(rp, &fakeDeptRP{err: errorspb.ErrorInfraErrorDbNotFound("")}, nil)
 
-	email, password, deptID := "a@x.co", "pw-123456", "d1"
-	if _, err := uc.Create(context.Background(), &email, &password, &deptID, nil, "", nil); !systempb.IsSystemDeptNotFound(err) {
+	account, password, deptID := "a@x.co", "pw-123456", "d1"
+	if _, err := uc.Create(context.Background(), &account, &password, &deptID, nil, "", nil); !systempb.IsSystemDeptNotFound(err) {
 		t.Fatalf("unknown dept: want DEPT_NOT_FOUND, got %v", err)
 	}
 	if rp.creates != 0 {
@@ -438,8 +438,8 @@ func TestCreateRejectsUnknownAvatar(t *testing.T) {
 	rp := &fakeUserRP{}
 	uc := newUserUCWith(rp, nil, &fakeFileRP{err: errorspb.ErrorInfraErrorDbNotFound("")})
 
-	email, password, avatar := "a@x.co", "pw-123456", "ghost"
-	if _, err := uc.Create(context.Background(), &email, &password, nil, &avatar, "", nil); !systempb.IsSystemFileNotFound(err) {
+	account, password, avatar := "a@x.co", "pw-123456", "ghost"
+	if _, err := uc.Create(context.Background(), &account, &password, nil, &avatar, "", nil); !systempb.IsSystemFileNotFound(err) {
 		t.Fatalf("unknown avatar: want FILE_NOT_FOUND, got %v", err)
 	}
 	if rp.creates != 0 {
@@ -451,8 +451,8 @@ func TestCreateRejectsUnconfirmedAvatar(t *testing.T) {
 	rp := &fakeUserRP{}
 	uc := newUserUCWith(rp, nil, &fakeFileRP{ref: &file.File{Status: "uploading"}})
 
-	email, password, avatar := "a@x.co", "pw-123456", "f1"
-	if _, err := uc.Create(context.Background(), &email, &password, nil, &avatar, "", nil); !systempb.IsSystemFileInvalidState(err) {
+	account, password, avatar := "a@x.co", "pw-123456", "f1"
+	if _, err := uc.Create(context.Background(), &account, &password, nil, &avatar, "", nil); !systempb.IsSystemFileInvalidState(err) {
 		t.Fatalf("unconfirmed avatar: want FILE_INVALID_STATE, got %v", err)
 	}
 	if rp.creates != 0 {
@@ -464,8 +464,8 @@ func TestCreateRejectsUnknownRole(t *testing.T) {
 	rp := &fakeUserRP{roleIDsByCode: map[string]string{}}
 	uc := newUserUC(rp)
 
-	email, password := "a@x.co", "pw-123456"
-	if _, err := uc.Create(context.Background(), &email, &password, nil, nil, "", []string{"ghost"}); !systempb.IsSystemRoleNotFound(err) {
+	account, password := "a@x.co", "pw-123456"
+	if _, err := uc.Create(context.Background(), &account, &password, nil, nil, "", []string{"ghost"}); !systempb.IsSystemRoleNotFound(err) {
 		t.Fatalf("unknown role: want ROLE_NOT_FOUND, got %v", err)
 	}
 	if rp.creates != 0 {
@@ -477,8 +477,8 @@ func TestCreateSetRolesFailureSurfaces(t *testing.T) {
 	rp := &fakeUserRP{roleIDsByCode: map[string]string{"admin": "r1"}, setRolesErr: errorspb.ErrorInfraErrorDbConstraint("")}
 	uc := newUserUC(rp)
 
-	email, password := "a@x.co", "pw-123456"
-	if _, err := uc.Create(context.Background(), &email, &password, nil, nil, "", []string{"admin"}); !errorspb.IsInfraErrorDbConstraint(err) {
+	account, password := "a@x.co", "pw-123456"
+	if _, err := uc.Create(context.Background(), &account, &password, nil, nil, "", []string{"admin"}); !errorspb.IsInfraErrorDbConstraint(err) {
 		t.Fatalf("setRoles failure: want infra DbConstraint passthrough, got %v", err)
 	}
 	if rp.notifyCalls != 0 {
@@ -510,33 +510,25 @@ func TestUpdateFullMask(t *testing.T) {
 	}
 }
 
-func TestUpdateEmailOnly(t *testing.T) {
+func TestUpdatePasswordOnly(t *testing.T) {
 	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1"}}}
 	uc := newUserUC(rp)
 
-	if _, err := uc.Update(context.Background(), []string{"email"}, &User{ID: "u1"}, nil, nil); err != nil {
+	if _, err := uc.Update(context.Background(), []string{"password"}, &User{ID: "u1"}, nil, nil); err != nil {
 		t.Fatalf("update: %v", err)
 	}
 	if rp.updates != 1 || len(rp.setRolesCalls) != 0 || rp.notifyCalls != 0 {
-		t.Fatalf("email-only: updates=%d setRoles=%v notify=%d", rp.updates, rp.setRolesCalls, rp.notifyCalls)
+		t.Fatalf("password-only: updates=%d setRoles=%v notify=%d", rp.updates, rp.setRolesCalls, rp.notifyCalls)
 	}
 }
 
-// An email-masked unique race lands as EMAIL_TAKEN at the choke; the same
-// constraint outside an email mask stays an infra passthrough, and a failed
-// update never touches bindings.
-func TestUpdateEmailTakenClassifiesAtChoke(t *testing.T) {
+// A constraint tripped by an update is an infra passthrough — the account is
+// immutable and births classify their own races at the Create choke.
+func TestUpdateConstraintStaysInfra(t *testing.T) {
 	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1"}}}
 	uc := newUserUC(rp)
-	constraint := errorspb.ErrorInfraErrorDbConstraint("")
+	rp.updateErr = errorspb.ErrorInfraErrorDbConstraint("")
 
-	// The unique race under an email mask lands as the email-taken reason.
-	rp.updateErr = constraint
-	if _, err := uc.Update(context.Background(), []string{"email"}, &User{ID: "u1"}, nil, nil); !systempb.IsSystemUserEmailTaken(err) {
-		t.Fatalf("email mask: want EMAIL_TAKEN, got %v", err)
-	}
-
-	// The same constraint outside an email mask stays an infra passthrough.
 	if _, err := uc.Update(context.Background(), []string{"dept_id"}, &User{ID: "u1"}, nil, nil); !errorspb.IsInfraErrorDbConstraint(err) {
 		t.Fatalf("dept mask: want infra passthrough, got %v", err)
 	}
@@ -607,12 +599,12 @@ func (s *stubFindByIDs) FindByIDs(context.Context, []string) (map[string]*User, 
 // ChangePassword ------------------------------------------------------------------------------------------------------
 
 func TestChangePasswordRewritesDigest(t *testing.T) {
-	email := "a@x.co"
+	account := "a@x.co"
 	oldHash, err := utils.Hash("right-old")
 	if err != nil {
 		t.Fatalf("seed hash: %v", err)
 	}
-	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Email: &email, PasswordHash: &oldHash}}, updates: 0}
+	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Account: &account, PasswordHash: &oldHash}}, updates: 0}
 	uc := newUserUC(rp)
 
 	if err := uc.ChangePassword(selfCtx("u1"), "right-old", "NewPass123"); err != nil {
@@ -681,9 +673,9 @@ func TestListRolesErrorSurfaces(t *testing.T) {
 func TestCreateBirthsSeat(t *testing.T) {
 	rp := &fakeUserRP{}
 	uc := newUserUCWith(rp, nil, nil)
-	email, pw := "a@x.co", "pw123456"
+	account, pw := "a@x.co", "pw123456"
 
-	out, err := uc.Create(context.Background(), &email, &pw, nil, nil, "", nil)
+	out, err := uc.Create(context.Background(), &account, &pw, nil, nil, "", nil)
 	if err != nil {
 		t.Fatalf("create: %v", err)
 	}
@@ -701,9 +693,9 @@ func TestCreatePopulationSeatBorn(t *testing.T) {
 	uc := newUserUCWith(rp, nil, nil, &fakePopRP{found: map[string]*population.Population{
 		"guest": {Code: "guest", Archetype: security.ArchetypePatron},
 	}})
-	email, pw := "b@x.co", "pw123456"
+	account, pw := "b@x.co", "pw123456"
 
-	if _, err := uc.Create(context.Background(), &email, &pw, nil, nil, "guest", nil); err != nil {
+	if _, err := uc.Create(context.Background(), &account, &pw, nil, nil, "guest", nil); err != nil {
 		t.Fatalf("create: %v", err)
 	}
 	seat := rp.seats[0]
@@ -715,9 +707,9 @@ func TestCreatePopulationSeatBorn(t *testing.T) {
 func TestCreateRejectsUnknownPopulation(t *testing.T) {
 	rp := &fakeUserRP{}
 	uc := newUserUCWith(rp, nil, nil)
-	email, pw := "c@x.co", "pw123456"
+	account, pw := "c@x.co", "pw123456"
 
-	if _, err := uc.Create(context.Background(), &email, &pw, nil, nil, "ghost", nil); !systempb.IsSystemPopulationNotFound(err) {
+	if _, err := uc.Create(context.Background(), &account, &pw, nil, nil, "ghost", nil); !systempb.IsSystemPopulationNotFound(err) {
 		t.Fatalf("unknown population: want POPULATION_NOT_FOUND, got %v", err)
 	}
 	if rp.creates != 0 || len(rp.seats) != 0 {
@@ -730,14 +722,14 @@ func TestCreateRejectsUnknownPopulation(t *testing.T) {
 func TestCreateSeatsExistingIdentity(t *testing.T) {
 	twin := "twin@x.co"
 	rp := &fakeUserRP{
-		rows:          map[string]*User{"u1": {ID: "u1", Email: &twin}},
+		rows:          map[string]*User{"u1": {ID: "u1", Account: &twin}},
 		roleIDsByCode: map[string]string{"admin": "r1"},
 	}
 	uc := newUserUCWith(rp, nil, nil)
-	email, password := twin, "pw123456"
+	account, password := twin, "pw123456"
 	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "admin1", TenantID: "acme"})
 
-	out, err := uc.Create(ctx, &email, &password, nil, nil, "", []string{"admin"})
+	out, err := uc.Create(ctx, &account, &password, nil, nil, "", []string{"admin"})
 	if err != nil {
 		t.Fatalf("seat: %v", err)
 	}
@@ -758,12 +750,12 @@ func TestCreateSeatsExistingIdentity(t *testing.T) {
 
 func TestCreateSeatWithoutRoleAskLeavesBindings(t *testing.T) {
 	twin := "twin@x.co"
-	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Email: &twin}}}
+	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Account: &twin}}}
 	uc := newUserUCWith(rp, nil, nil)
-	email, password := twin, "pw123456"
+	account, password := twin, "pw123456"
 	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "admin1", TenantID: "acme"})
 
-	if _, err := uc.Create(ctx, &email, &password, nil, nil, "", nil); err != nil {
+	if _, err := uc.Create(ctx, &account, &password, nil, nil, "", nil); err != nil {
 		t.Fatalf("seat: %v", err)
 	}
 	if len(rp.ensures) != 1 {
@@ -776,14 +768,14 @@ func TestCreateSeatWithoutRoleAskLeavesBindings(t *testing.T) {
 
 func TestCreateSeatCarriesPopulation(t *testing.T) {
 	twin := "twin@x.co"
-	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Email: &twin}}}
+	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Account: &twin}}}
 	uc := newUserUCWith(rp, nil, nil, &fakePopRP{found: map[string]*population.Population{
 		"guest": {Code: "guest", Archetype: security.ArchetypePatron},
 	}})
-	email, password := twin, "pw123456"
+	account, password := twin, "pw123456"
 	ctx := security.WithSubject(context.Background(), &security.Subject{TenantID: "default"})
 
-	if _, err := uc.Create(ctx, &email, &password, nil, nil, "guest", nil); err != nil {
+	if _, err := uc.Create(ctx, &account, &password, nil, nil, "guest", nil); err != nil {
 		t.Fatalf("seat population: %v", err)
 	}
 	if len(rp.seats) != 1 || rp.seats[0].Population != "guest" {
@@ -794,16 +786,16 @@ func TestCreateSeatCarriesPopulation(t *testing.T) {
 func TestCreateDuplicateSeatCosmetic(t *testing.T) {
 	twin := "twin@x.co"
 	rp := &fakeUserRP{
-		rows:          map[string]*User{"u1": {ID: "u1", Email: &twin}},
+		rows:          map[string]*User{"u1": {ID: "u1", Account: &twin}},
 		roleIDsByCode: map[string]string{"admin": "r1"},
 		seats: []*Seat{
 			{UserID: "u1", TenantID: security.DefaultTenant, Population: security.DefaultPopulation},
 		},
 	}
 	uc := newUserUCWith(rp, nil, nil)
-	email, password := twin, "pw123456"
+	account, password := twin, "pw123456"
 
-	out, err := uc.Create(context.Background(), &email, &password, nil, nil, "", []string{"admin"})
+	out, err := uc.Create(context.Background(), &account, &password, nil, nil, "", []string{"admin"})
 	if err != nil {
 		t.Fatalf("cosmetic: %v", err)
 	}
@@ -825,9 +817,9 @@ func TestCreateBirthRaceLosesToSeat(t *testing.T) {
 		createErr: errorspb.ErrorInfraErrorDbConstraint(""),
 	}
 	uc := newUserUCWith(rp, nil, nil)
-	email, password := twin, "pw123456"
+	account, password := twin, "pw123456"
 
-	out, err := uc.Create(context.Background(), &email, &password, nil, nil, "", nil)
+	out, err := uc.Create(context.Background(), &account, &password, nil, nil, "", nil)
 	if err != nil {
 		t.Fatalf("race loser: %v", err)
 	}
@@ -839,12 +831,12 @@ func TestCreateBirthRaceLosesToSeat(t *testing.T) {
 	}
 }
 
-func TestCreateEmailLookupFailureSurfaces(t *testing.T) {
-	rp := &fakeUserRP{findEmailErr: errorspb.ErrorInfraErrorDbInternal("")}
+func TestCreateAccountLookupFailureSurfaces(t *testing.T) {
+	rp := &fakeUserRP{findAccountErr: errorspb.ErrorInfraErrorDbInternal("")}
 	uc := newUserUCWith(rp, nil, nil)
-	email, password := "twin@x.co", "pw123456"
+	account, password := "twin@x.co", "pw123456"
 
-	if _, err := uc.Create(context.Background(), &email, &password, nil, nil, "", nil); !errorspb.IsInfraErrorDbInternal(err) {
+	if _, err := uc.Create(context.Background(), &account, &password, nil, nil, "", nil); !errorspb.IsInfraErrorDbInternal(err) {
 		t.Fatalf("lookup failure: err = %v, want passthrough", err)
 	}
 	if rp.creates != 0 || len(rp.seats) != 0 {

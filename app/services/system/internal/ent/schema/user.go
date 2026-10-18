@@ -18,7 +18,8 @@ type User struct {
 
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("email").NotEmpty().MaxRuneLen(128),
+		field.String("account").NotEmpty().MaxRuneLen(128).
+			Comment("global identity handle; email and phone are bindable credentials, never the identity key"),
 		field.String("password_hash").Sensitive().MaxRuneLen(128).
 			Comment("argon2id digest; plaintext is never stored; legacy bcrypt digests upgrade on next login"),
 		field.String("dept_id").Optional().Nillable().MaxRuneLen(20),
@@ -44,9 +45,9 @@ func (User) Mixin() []ent.Mixin {
 
 func (User) Indexes() []ent.Index {
 	return []ent.Index{
-		// Email is the global identity key: one email is one person, whose
-		// tenancy lives in membership seats — never in a second row.
-		index.Fields("email").Unique().
+		// The account is the global identity key: one account is one person,
+		// whose tenancy lives in membership seats — never in a second row.
+		index.Fields("account").Unique().
 			Annotations(entsql.IndexWhere("deleted_at IS NULL")),
 	}
 }

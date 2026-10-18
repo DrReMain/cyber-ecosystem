@@ -8,19 +8,19 @@ export function useUserDirectory(enabled: boolean) {
     const map = new Map<string, string>();
     for (const user of usersQuery.data?.list ?? []) {
       if (user.id !== undefined && user.id !== "") {
-        map.set(user.id, user.email ?? user.id);
+        map.set(user.id, user.account ?? user.id);
       }
     }
     return map;
   }, [usersQuery.data]);
-  const byEmail = useMemo(() => {
+  const byAccount = useMemo(() => {
     const map = new Map<string, string>();
     for (const user of usersQuery.data?.list ?? []) {
-      if (user.email !== undefined && user.email !== "") {
-        map.set(user.email, user.id ?? user.email);
+      if (user.account !== undefined && user.account !== "") {
+        map.set(user.account, user.id ?? user.account);
       }
     }
     return map;
   }, [usersQuery.data]);
-  return { known: usersQuery.isSuccess, byId, byEmail };
+  return { known: usersQuery.isSuccess, byId, byAccount };
 }

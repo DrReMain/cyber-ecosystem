@@ -30,9 +30,9 @@ type AgentConfig struct {
 }
 
 type UserBrief struct {
-	ID     string
-	Email  *string
-	Avatar *string
+	ID      string
+	Account *string
+	Avatar  *string
 }
 
 type ListIn struct {

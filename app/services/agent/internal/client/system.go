@@ -68,7 +68,7 @@ func (c *systemClient) AuthenticateSession(ctx context.Context, token string) (*
 		Population: utils.Deref(utils.Unwrap[string](resp.Msg.GetPopulation()), ""),
 		Archetype:  utils.Deref(utils.Unwrap[string](resp.Msg.GetArchetype()), ""),
 		SessionID:  utils.Deref(utils.Unwrap[string](resp.Msg.GetSessionId()), ""),
-		Extra:      map[string]any{shared.ExtraEmail: utils.Deref(utils.Unwrap[string](resp.Msg.GetEmail()), "")},
+		Extra:      map[string]any{shared.ExtraAccount: utils.Deref(utils.Unwrap[string](resp.Msg.GetAccount()), "")},
 	}, nil
 }
 
@@ -110,9 +110,9 @@ func (c *systemClient) Hydrate(ctx context.Context, ids []string) map[string]*ag
 	}
 	for id, u := range resp.Msg.GetUsers() {
 		briefs[id] = &agentconfig.UserBrief{
-			ID:     utils.Deref(utils.Unwrap[string](u.GetId()), ""),
-			Email:  utils.Unwrap[string](u.GetEmail()),
-			Avatar: utils.Unwrap[string](u.GetAvatar()),
+			ID:      utils.Deref(utils.Unwrap[string](u.GetId()), ""),
+			Account: utils.Unwrap[string](u.GetAccount()),
+			Avatar:  utils.Unwrap[string](u.GetAvatar()),
 		}
 	}
 	return briefs

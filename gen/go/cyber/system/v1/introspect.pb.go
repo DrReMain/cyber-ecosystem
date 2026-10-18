@@ -67,7 +67,7 @@ type VerifySessionResponse struct {
 	UserId        *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	TenantId      *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
 	SessionId     *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	Email         *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	Account       *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=account,proto3" json:"account,omitempty"`
 	Population    *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=population,proto3" json:"population,omitempty"`
 	Archetype     *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=archetype,proto3" json:"archetype,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -125,9 +125,9 @@ func (x *VerifySessionResponse) GetSessionId() *wrapperspb.StringValue {
 	return nil
 }
 
-func (x *VerifySessionResponse) GetEmail() *wrapperspb.StringValue {
+func (x *VerifySessionResponse) GetAccount() *wrapperspb.StringValue {
 	if x != nil {
-		return x.Email
+		return x.Account
 	}
 	return nil
 }
@@ -248,13 +248,13 @@ var File_cyber_system_v1_introspect_proto protoreflect.FileDescriptor
 const file_cyber_system_v1_introspect_proto_rawDesc = "" +
 	"\n" +
 	" cyber/system/v1/introspect.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x16\n" +
-	"\x14VerifySessionRequest\"\xf4\x02\n" +
+	"\x14VerifySessionRequest\"\xf8\x02\n" +
 	"\x15VerifySessionResponse\x125\n" +
 	"\auser_id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x06userId\x129\n" +
 	"\ttenant_id\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\btenantId\x12;\n" +
 	"\n" +
-	"session_id\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\tsessionId\x122\n" +
-	"\x05email\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\x12<\n" +
+	"session_id\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\tsessionId\x126\n" +
+	"\aaccount\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\aaccount\x12<\n" +
 	"\n" +
 	"population\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\n" +
 	"population\x12:\n" +
@@ -295,7 +295,7 @@ var file_cyber_system_v1_introspect_proto_depIdxs = []int32{
 	4, // 0: cyber.system.v1.VerifySessionResponse.user_id:type_name -> google.protobuf.StringValue
 	4, // 1: cyber.system.v1.VerifySessionResponse.tenant_id:type_name -> google.protobuf.StringValue
 	4, // 2: cyber.system.v1.VerifySessionResponse.session_id:type_name -> google.protobuf.StringValue
-	4, // 3: cyber.system.v1.VerifySessionResponse.email:type_name -> google.protobuf.StringValue
+	4, // 3: cyber.system.v1.VerifySessionResponse.account:type_name -> google.protobuf.StringValue
 	4, // 4: cyber.system.v1.VerifySessionResponse.population:type_name -> google.protobuf.StringValue
 	4, // 5: cyber.system.v1.VerifySessionResponse.archetype:type_name -> google.protobuf.StringValue
 	0, // 6: cyber.system.v1.IntrospectService.VerifySession:input_type -> cyber.system.v1.VerifySessionRequest

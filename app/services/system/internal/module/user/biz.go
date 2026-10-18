@@ -22,8 +22,8 @@ import (
 )
 
 // errBirthLost marks the one retryable failure in Create: a concurrent
-// birth won the email's unique. Internal control flow, never returned.
-var errBirthLost = fmt.Errorf("identity birth lost the email unique")
+// birth won the account's unique. Internal control flow, never returned.
+var errBirthLost = fmt.Errorf("identity birth lost the account unique")
 
 // DO ------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ type User struct {
 	UpdatedAt    time.Time
 	DeptID       *string
 	Avatar       *string // referenced file id; nil on Update-mask = clear
-	Email        *string
+	Account      *string
 	PasswordHash *string  // biz-only (never in proto); nil on Update = leave unchanged
 	Roles        []string // role codes; list enrichment, filled by List/Get
 	Enabled      bool
@@ -49,7 +49,7 @@ type Credential struct {
 }
 
 // Seat is one tenancy of an identity — a membership row. The identity is
-// global (email); every tenancy it holds is a seat.
+// global (account); every tenancy it holds is a seat.
 type Seat struct {
 	UserID     string
 	TenantID   string
@@ -59,7 +59,7 @@ type Seat struct {
 type UserListIn struct {
 	*commonpb.PageRequest
 	OrderBy []string
-	Email   *string
+	Account *string
 	Enabled *bool
 	DeptID  *string
 }
@@ -77,7 +77,7 @@ type UserRP interface {
 	UpdateStatus(ctx context.Context, id string, enabled bool) (*User, error)
 	Delete(ctx context.Context, id string) (string, error)
 	List(ctx context.Context, in *UserListIn) (*UserListOut, error)
-	FindByEmail(ctx context.Context, email string) (*User, error)
+	FindByAccount(ctx context.Context, account string) (*User, error)
 	FindByID(ctx context.Context, id string) (*User, error)
 	FindSeated(ctx context.Context, id string) (*User, error)
 	FindByIDs(ctx context.Context, ids []string) (map[string]*User, error)
@@ -117,7 +117,7 @@ func NewUserUC(logger *slog.Logger, tm shared.Transaction, userRP UserRP, deptRP
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *UserUC) Create(ctx context.Context, email, password, deptID, avatar *string, population string, roles []string) (out *User, err error) {
+func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar *string, population string, roles []string) (out *User, err error) {
 	seatPopulation, err := uc.resolveSeatPopulation(ctx, population)
 	if err != nil {
 		return nil, err
@@ -126,11 +126,11 @@ func (uc *UserUC) Create(ctx context.Context, email, password, deptID, avatar *s
 	if err != nil {
 		return nil, err
 	}
-	// Email is the global identity key: an identity that already exists
+	// Account is the global identity key: an identity that already exists
 	// gains a seat in the creating admin's tenant — a second row is never
 	// born. Profile params (password, dept, avatar) belong to identity
 	// birth alone and are inert on the seat path.
-	existing, ferr := uc.userRP.FindByEmail(ctx, *email)
+	existing, ferr := uc.userRP.FindByAccount(ctx, *account)
 	if ferr != nil && !errorspb.IsInfraErrorDbNotFound(ferr) {
 		return nil, ferr
 	}
@@ -155,7 +155,7 @@ func (uc *UserUC) Create(ctx context.Context, email, password, deptID, avatar *s
 	seat := &Seat{TenantID: security.TenantFromCtx(ctx), Population: seatPopulation}
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
 		if birth {
-			created, cerr := uc.userRP.Create(ctx, &User{DeptID: deptID, Avatar: avatar, Email: email, PasswordHash: password})
+			created, cerr := uc.userRP.Create(ctx, &User{DeptID: deptID, Avatar: avatar, Account: account, PasswordHash: password})
 			if cerr != nil {
 				if errorspb.IsInfraErrorDbConstraint(cerr) {
 					return errBirthLost
@@ -178,7 +178,7 @@ func (uc *UserUC) Create(ctx context.Context, email, password, deptID, avatar *s
 	if err != nil {
 		// The winner exists now, so the same ask lands as its seat.
 		if errors.Is(err, errBirthLost) {
-			return uc.Create(ctx, email, password, deptID, avatar, population, roles)
+			return uc.Create(ctx, account, password, deptID, avatar, population, roles)
 		}
 		return nil, err
 	}
@@ -218,11 +218,6 @@ func (uc *UserUC) Update(ctx context.Context, fieldsMask []string, u *User, pass
 	}
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
 		if out, err = uc.userRP.Update(ctx, fieldsMask, u); err != nil {
-			// The email unique is the only constraint an email mask can
-			// trip — the race backstop classifies, never an infra leak.
-			if errorspb.IsInfraErrorDbConstraint(err) && slices.Contains(fieldsMask, "email") {
-				return systempb.ErrorSystemUserEmailTaken("")
-			}
 			return err
 		}
 		if setRoles {

@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	wechatKind         = "wechat"
+	wechatKind         = "wechat_mp"
 	wechatEntryURL     = "https://open.weixin.qq.com/connect/oauth2/authorize"
 	wechatExchangePath = "/sns/oauth2/access_token"
 	wechatTimeout      = 5 * time.Second

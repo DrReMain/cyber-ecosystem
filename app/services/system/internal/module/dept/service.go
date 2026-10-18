@@ -140,7 +140,7 @@ func toProtoDept(d *Dept) *systempb.Dept {
 func toProtoMember(m *DeptMember) *systempb.DeptMember {
 	return &systempb.DeptMember{
 		UserId:  utils.StringW(m.UserID),
-		Email:   utils.StringW(m.Email),
+		Account: utils.StringW(m.Account),
 		Enabled: utils.BoolW(m.Enabled),
 	}
 }

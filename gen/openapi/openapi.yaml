@@ -1887,7 +1887,7 @@ paths:
                   schema:
                     type: string
                     format: date-time
-                - name: email
+                - name: account
                   in: query
                   schema:
                     type: string
@@ -2061,7 +2061,7 @@ components:
                     format: date-time
                 userId:
                     type: string
-                userEmail:
+                userAccount:
                     type: string
                 userAvatar:
                     type: string
@@ -2480,7 +2480,7 @@ components:
         cyber.system.v1.CreateUserRequest:
             type: object
             properties:
-                email:
+                account:
                     type: string
                 password:
                     type: string
@@ -2543,7 +2543,7 @@ components:
             properties:
                 userId:
                     type: string
-                email:
+                account:
                     type: string
                 enabled:
                     type: boolean
@@ -2909,7 +2909,7 @@ components:
         cyber.system.v1.LoginRequest:
             type: object
             properties:
-                email:
+                account:
                     type: string
                 password:
                     type: string
@@ -3330,8 +3330,6 @@ components:
             properties:
                 id:
                     type: string
-                email:
-                    type: string
                 password:
                     type: string
                 deptId:
@@ -3433,7 +3431,7 @@ components:
                 updatedAt:
                     type: string
                     format: date-time
-                email:
+                account:
                     type: string
                 deptId:
                     type: string
@@ -3450,7 +3448,7 @@ components:
             properties:
                 id:
                     type: string
-                email:
+                account:
                     type: string
                 avatar:
                     type: string
@@ -3466,7 +3464,7 @@ components:
                     type: string
                 sessionId:
                     type: string
-                email:
+                account:
                     type: string
                 population:
                     type: string

@@ -18,7 +18,7 @@ export type CyberAgentV1AgentConfigView = {
     createdAt?: string;
     updatedAt?: string;
     userId?: string;
-    userEmail?: string;
+    userAccount?: string;
     userAvatar?: string;
     baseUrl?: string;
     apiKeySet?: boolean;
@@ -404,7 +404,7 @@ export type CyberSystemV1CreateUploadResponse = {
  * create
  */
 export type CyberSystemV1CreateUserRequest = {
-    email?: string;
+    account?: string;
     password?: string;
     deptId?: string;
     roles?: Array<string>;
@@ -457,7 +457,7 @@ export type CyberSystemV1Dept = {
  */
 export type CyberSystemV1DeptMember = {
     userId?: string;
-    email?: string;
+    account?: string;
     enabled?: boolean;
 };
 
@@ -701,7 +701,7 @@ export type CyberSystemV1LoginByIdentityResponse = {
 };
 
 export type CyberSystemV1LoginRequest = {
-    email?: string;
+    account?: string;
     password?: string;
     population?: string;
 };
@@ -1070,7 +1070,6 @@ export type CyberSystemV1UpdateTenantStatusResponse = {
  */
 export type CyberSystemV1UpdateUserRequest = {
     id?: string;
-    email?: string;
     password?: string;
     deptId?: string;
     roles?: Array<string>;
@@ -1149,7 +1148,7 @@ export type CyberSystemV1User = {
     id?: string;
     createdAt?: string;
     updatedAt?: string;
-    email?: string;
+    account?: string;
     deptId?: string;
     roles?: Array<string>;
     enabled?: boolean;
@@ -1162,7 +1161,7 @@ export type CyberSystemV1User = {
  */
 export type CyberSystemV1UserBrief = {
     id?: string;
-    email?: string;
+    account?: string;
     avatar?: string;
 };
 
@@ -1170,7 +1169,7 @@ export type CyberSystemV1VerifySessionResponse = {
     userId?: string;
     tenantId?: string;
     sessionId?: string;
-    email?: string;
+    account?: string;
     population?: string;
     archetype?: string;
 };
@@ -2743,7 +2742,7 @@ export type UserServiceListUsersData = {
          * Filter by updated_at <= this value.
          */
         'page.updatedAtZ'?: string;
-        email?: string;
+        account?: string;
         enabled?: boolean;
         deptId?: string;
         orderBy?: Array<string>;

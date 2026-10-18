@@ -24,11 +24,11 @@ export function ConnectionsTable({
   const columns: TableProps<AgentConfigView>["columns"] = [
     {
       title: () => m.agents_connections_col_user(),
-      dataIndex: "userEmail",
+      dataIndex: "userAccount",
       width: 240,
       render: (_, row) =>
-        row.userEmail ? (
-          <span>{row.userEmail}</span>
+        row.userAccount ? (
+          <span>{row.userAccount}</span>
         ) : (
           <span className="font-mono text-[12px] text-ink-tertiary">{row.userId}</span>
         ),

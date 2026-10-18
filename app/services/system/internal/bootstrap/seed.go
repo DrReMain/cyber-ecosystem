@@ -173,8 +173,8 @@ func (s *Seed) seedSuperAdmins(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("seed: hash initial password: %w", err)
 	}
-	for _, email := range s.cfg.GetSuperAdmins() {
-		u, err := s.ensureUser(ctx, client, tenant, email, hash)
+	for _, account := range s.cfg.GetSuperAdmins() {
+		u, err := s.ensureUser(ctx, client, tenant, account, hash)
 		if err != nil {
 			return err
 		}
@@ -223,31 +223,33 @@ func (s *Seed) ensureSuperGrant(ctx context.Context, client *ent.Client, tenant,
 	return nil
 }
 
-func (s *Seed) ensureUser(ctx context.Context, client *ent.Client, tenant, email, hash string) (*ent.User, error) {
-	u, err := client.User.Query().Where(user.Email(email)).Only(ctx)
+func (s *Seed) ensureUser(ctx context.Context, client *ent.Client, tenant, account, hash string) (*ent.User, error) {
+	u, err := client.User.Query().Where(user.Account(account)).Only(ctx)
 	if u != nil {
 		return s.ensureSeat(ctx, client, tenant, u) // password is owned by admin flows, never reset here
 	}
 	if !ent.IsNotFound(err) {
-		return nil, s.plat.HandleEntError(fmt.Errorf("seed: query user %q: %w", email, err))
+		return nil, s.plat.HandleEntError(fmt.Errorf("seed: query user %q: %w", account, err))
 	}
-	if u, err = client.User.Create().SetEmail(email).SetPasswordHash(hash).Save(ctx); err != nil {
+	if u, err = client.User.Create().SetAccount(account).SetPasswordHash(hash).Save(ctx); err != nil {
 		if ent.IsConstraintError(err) {
-			if u, err = client.User.Query().Where(user.Email(email)).Only(ctx); err != nil {
-				return nil, s.plat.HandleEntError(fmt.Errorf("seed: requery user %q: %w", email, err))
+			if u, err = client.User.Query().Where(user.Account(account)).Only(ctx); err != nil {
+				return nil, s.plat.HandleEntError(fmt.Errorf("seed: requery user %q: %w", account, err))
 			}
 			return s.ensureSeat(ctx, client, tenant, u)
 		}
-		return nil, s.plat.HandleEntError(fmt.Errorf("seed: create user %q: %w", email, err))
+		return nil, s.plat.HandleEntError(fmt.Errorf("seed: create user %q: %w", account, err))
 	}
-	s.log.Info("seed: super admin created", "email", email)
+	s.log.Info("seed: super admin created", "account", account)
 	return s.ensureSeat(ctx, client, tenant, u)
 }
 
 func (s *Seed) ensureSeat(ctx context.Context, client *ent.Client, tenant string, u *ent.User) (*ent.User, error) {
-	n, err := client.Membership.Query().Where(membership.UserID(u.ID), membership.TenantID(tenant)).Count(ctx)
+	n, err := client.Membership.Query().Where(
+		membership.UserID(u.ID), membership.TenantID(tenant), membership.Population(security.DefaultPopulation),
+	).Count(ctx)
 	if err != nil {
-		return nil, s.plat.HandleEntError(fmt.Errorf("seed: query seat for %q: %w", u.Email, err))
+		return nil, s.plat.HandleEntError(fmt.Errorf("seed: query seat for %q: %w", u.Account, err))
 	}
 	if n == 0 {
 		if _, err := client.Membership.Create().
@@ -255,7 +257,7 @@ func (s *Seed) ensureSeat(ctx context.Context, client *ent.Client, tenant string
 			if ent.IsConstraintError(err) {
 				return u, nil
 			}
-			return nil, s.plat.HandleEntError(fmt.Errorf("seed: create seat for %q: %w", u.Email, err))
+			return nil, s.plat.HandleEntError(fmt.Errorf("seed: create seat for %q: %w", u.Account, err))
 		}
 	}
 	return u, nil

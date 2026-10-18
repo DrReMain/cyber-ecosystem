@@ -62,7 +62,7 @@ func (s *AgentConfigAdminService) ListAgentConfigs(ctx context.Context, in *agen
 			ApiKeySet: utils.BoolW(it.Config.APIKeySet),
 		}
 		if it.User != nil {
-			v.UserEmail = utils.Wrap(it.User.Email, utils.StringW)
+			v.UserAccount = utils.Wrap(it.User.Account, utils.StringW)
 			v.UserAvatar = utils.Wrap(it.User.Avatar, utils.StringW)
 		}
 		list = append(list, v)

@@ -25,12 +25,12 @@ export function LoginForm({ onSubmit, pending }: Readonly<LoginFormProps>) {
 
   return (
     <Form onSubmit={(event) => onSubmit?.(event as SubmitEvent<HTMLFormElement>)}>
-      <TextField className={STYLES.field} name="email" type="text">
+      <TextField className={STYLES.field} name="account" type="text">
         <Label className={STYLES.label}>
-          {m.login_default_label_email()}
-          <span className={STYLES.labelHint}>EMAIL</span>
+          {m.login_default_label_account()}
+          <span className={STYLES.labelHint}>ACCOUNT</span>
         </Label>
-        <Input className={STYLES.input} placeholder="cyber@example.com" />
+        <Input className={STYLES.input} placeholder="your-account" />
       </TextField>
 
       <TextField
