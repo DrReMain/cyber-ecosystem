@@ -4,10 +4,9 @@ import type {
   MessageInitShape,
   MessageShape,
 } from "@bufbuild/protobuf";
+import { type StreamStatus, useServerStream } from "@cyber-ecosystem/shared-transport";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import type { StreamStatus } from "./use-server-stream";
-import { useServerStream } from "./use-server-stream";
 
 // Server-streaming as a query: the stream writes projected messages into the
 // query cache (the external-write paradigm - the canonical bridge between

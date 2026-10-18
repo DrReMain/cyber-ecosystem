@@ -17,6 +17,8 @@ const config = defineConfig(({ mode }) => {
       noExternal: ["@ant-design/x-markdown"],
     },
     server: {
+      port: 5173,
+      strictPort: true,
       proxy: {
         "^/connect/cyber\\.system\\.": {
           target: env.SYSTEM_CONNECT_API_URL,

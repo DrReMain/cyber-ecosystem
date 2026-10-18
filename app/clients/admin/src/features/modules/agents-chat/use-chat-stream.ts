@@ -1,9 +1,9 @@
 import type { MessageInitShape, MessageShape } from "@bufbuild/protobuf";
 import { useTransport } from "@connectrpc/connect-query";
 import { ChatService } from "@cyber-ecosystem/gen-connect-ts/cyber/agent/v1/chat_pb";
+import { runStream } from "@cyber-ecosystem/shared-transport";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { view } from "#/domains/error";
-import { runStream } from "#/services/connect/run-stream";
 import type { ChatTurn, ConversationStore } from "./conversations";
 
 export type ChatOutcome = "finished" | "aborted" | "failed";
