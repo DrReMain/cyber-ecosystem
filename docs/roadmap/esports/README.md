@@ -77,6 +77,12 @@
 | D-O | UI 参考原型但**不逐像素复现**,以更合理方式实施;验收为语义级(流程/状态/数据完整),非像素级 |
 | D-P | 部署沿用旧域名/旧服务器(细节迁移窗口前定);旧系统即刻冻结(仅致命 bug),切换后停机封存 2 周(可回滚),期满下线归档 |
 | D-Q | **大框架冻结纪律**:里程碑边界/范围/裁决不再口头改,任何调整必须登记本台账并标注影响面(动了哪个检查点/切片),三人 + AI 一律照台账执行 |
+| D-R | ctr UI 基座 = react-aria + tailwind,不消费 shared-ts/antd 与 storybook(per-client 基座二分,antd 留 admin);E6 拆 E6a 纯壳(零 RPC 可先行)/E6b 登录+画像流(画像流半片仍等 E0)。影响面:E0 依赖仅余 E6b,CP1 口径不变 |
+| D-S | ctr 主题 dark-only(旧仓同构,dark 值即经验数据全集;无 light、无切换面);i18n=paraglide zh-CN+en-US(baseLocale zh-CN)。影响面:E6a 验收「双主题切换可用」改「dark-only 单套语义 token 就位」,shared-ts 消费面 theme 出列(五包→四包);E6b/E7 不受影响 |
+| D-T | ctr 壳期路由/UI 面=仅根路由+一空白落地页:路由+页面+消息目录+title 接线为可复制范式(新路由照此生长,login/profile/test 目录随路由移除,E6b 登录片按范式重建);token 层/样式基线保留为能力面,不出 demo UI;react-aria 为声明基座,首个消费者随业务片。影响面:E6a 验收不要求多路由与 UI demo 载体;消息收敛至最必要字段(home 另留 description 作落地页 SEO meta,DISALLOW_PREFIXES 随路由清空),common/error/not-found 为机制消费键全保留 |
+| D-U | E0 改增量推进:种子片=画像域+游戏目录读面(画像 Get/Update 局部更新、age_band 服务端派生 8 档词表、未满 13 监护硬闸、偏好整组替换;目录不分页),后续每增一片独立评审冻结(测试读面→提交面→匹配/报告→entitlement),proto 加法演进。影响面:E0 交付形态改逐片冻结——种子片 2026-10-18 评审落 proto(四结论按证据链修正:性别不入选转 ljr 待裁 P8、avatar 入画像、8 档词表定案、昵称 2-12);CP1 口径不变 |
+| D-V | **业务前置律**:前后端接通闭环先行——接通验证前 esports 服务保持最小形态(E1 骨架+探针读面,零业务实现);业务代码待接通验证后按片堆砌,堆砌期不分神兼顾非业务完善。依据:业务堆砌快且随需求推演反复重写,接通层(骨架/cookie/会话/水合)才是长命资产。2026-10-18 首次执行:已落的业务实现撤回(game 聚合+种子/画像写面全规则,备份 /tmp/e2-loop-backup/,重启后失效可按冻结契约重建);冻结契约 proto 不撤(决策存档,零运行时) |
+| D-W | **population 贯通滞后**:C 端会员现落 DefaultPopulation(engine 的 user 人群)——admin 用户管理混排+patron 语义悬空为已知债;修复=骨架演进四件(provider 行 member_population 配置/ListUsers population 过滤/member 人群行建法/存量座位迁移),与 agent 侧 guard 测试注释清理同批滞后,触发器=population 维度首个真实消费者(E8 权益面或会员治理面)。三裁决点存档:①member 行建法(admin 人群页手动 vs esports 引导种子经 CreatePopulation RPC)②admin 用户管理人群可见性(筛选器默认 user vs 硬排除 patron)③存量 wechat 用户座位迁移方式 |
 
 ### 2.2 待裁(Owner + 时点;背景与候选案在 prd.md 对应条目展开)
 
@@ -89,6 +95,8 @@
 | P5 | 营销渠道域范围与 SKU 一套 vs 两套 | ljr | 上线后(已按 D-M 梯①移出承诺窗口) |
 | P6 | cutover 演练日程与回滚预案确认 | 用户 | 12-07(W8)前 |
 | P7 | 会员态付费墙视觉稿(期内隐藏单次只留续费) | ljr | **12-02 前支付联调依赖** |
+| P8 | C 端画像性别字段(旧仓仅设计未实现、新仓三处冻结口径均无;E5 同龄基准是否分性别为唯一潜在消费者) | ljr | E5 规格定稿前(W4 末) |
+| P9 | target_recognition 主能力归属:旧仓 DDL=trackingStability,交互原型(_state.js)=reactionSpeed;契约不设 enum 不受阻,但 E2 种子与报告能力覆盖随归属定(2026-10-18 增量2 对比发现,种子暂按设计侧 reactionSpeed) | ljr | E2 种子落库前 |
 
 ---
 
@@ -120,3 +128,10 @@
 - 2026-10-18 立项:五路旧仓分析+三路审计完成;D-A..D-I 裁决;M1-M5 里程碑与切片池定稿;待裁项移交 Owner。
 - 2026-10-18 目录化(D-J):单档拆为 README/plan/prd/progress/migration 五档;docs 治理法同步「前沿可为目录」。
 - 2026-10-18 grill 定稿(D-K..D-Q):对外承诺 12-17 上线含支付;60 天作战计划落 plan.md;大框架冻结,变更走本台账。
+- 2026-10-18 D-R:ctr 技术栈定案 + E6 拆片(E6a 纯壳/E6b 登录+画像流),壳先行开工(lzx)。
+- 2026-10-18 D-S:ctr 主题 dark-only + i18n zh-CN/en-US 定案;E6a 验收口径与 shared-ts 消费面同步修订。
+- 2026-10-18 D-T:ctr 壳期收敛为仅根路由+空白落地页——能力配置(token/i18n/SEO/错误域/store 机制)为交付面,路由与 UI 随业务片生长。
+- 2026-10-18 E6a 范围补充(用户指令):C 端 H5 为公网站点,SEO 全量面(robots/sitemap hreflang/noindex/逐页 title)纳入壳片并当日收口。
+- 2026-10-18 D-U:E0 契约首刀改增量推进——种子片(画像+游戏目录)评审冻结落 proto,后续逐片跟进;P8(画像性别)入待裁表。
+- 2026-10-19 D-V:前后端最小闭环验证达成(微信真人链路全绿),业务堆砌期开启。
+- 2026-10-19 D-W:population 贯通修复与 agent 侧 guard 注释清理打包滞后(均骨架演进件);三裁决点入台账待触发。

@@ -6,13 +6,14 @@
 
 | 片 | 认领人 | 分支 | 状态 | 备注 |
 |---|---|---|---|---|
-| E0 契约首刀 | — | — | 未认领 | 契约冻结前 E3/E5/E6 只做设计稿;建议用户 |
-| E1 服务骨架 | — | — | 未认领 | 兼 hzy onboarding 切片 |
-| E2 schema+种子 | — | — | 未认领 | |
+| E0 契约首刀 | lzx | esports/dev-lzx | 种子片完成(待评审);增量2 完成(待评审) | D-U 增量推进;2026-10-18 种子=画像域+游戏目录读面(proto 3 文件,生成/lint/breaking/ctr 链全绿,catalog manifest 已挂联邦树);性别不入选转 P8(ljr);错误码 61xx 段;2026-10-18 增量2=测试域读面冻结落盘:test.proto 三读(ListTests 水合源/GetTest 详情+introduction/GetTestConfig 引擎启动包 duration 镜像+background_invalid 机制阈值+engine_params KV);设计侧对比修正 5 处(ability 六词 camelCase 原形、档位百分位服务端判 GradeBand 撤回、unit_score_label 补、introduction per-test 超集、ListTests 角色重定位水合源);max_score 删除获设计侧先例(admin test-type 已删满分);ESPORTS_TEST_NOT_FOUND=6110(404 码系)+ctr 双语文案;全链绿(generate/breaking/esports build+test/ctr build→typecheck→check);target_recognition 能力冲突转 P9;题库两读出列随 E7 |
+| E1 服务骨架 | lzx | esports/dev-lzx | 完成(待评审) | 2026-10-18 kratos-new-service 八步全走:profile schema 从 E2 前拉(ent 零 schema 不可生成,键形按 AGENTS §8=user_id+租户列);init 迁移已 apply;catalog 经 manifest 自动挂树;部署面全接(compose/traefik/02-databases/deploy 目标/admin vite 代理);shared-go 注解测试纳入 esports;会员链探针 e2e 绿(登录→自省座位→GET profile 200 全 null 惰性态,无 cookie 401)。GameService 注册随 E2(目录种子先行才有意义) |
+| E2 schema+种子 | lzx | esports/dev-lzx | **已撤回(D-V 业务前置律)** | 2026-10-18 当日先落地后撤回:game 聚合+9 款种子+画像写面全规则曾全绿(探针 16 断言),用户裁决接通先行后整体撤回(备份 /tmp/e2-loop-backup/ 至重启,契约重建即据冻结 proto;探针脚本 /tmp/probe_loop.py);服务回到 E1 探针形态复验绿(login→401→惰性 GET;写面 501)。重启时机=接通闭环验证过 |
 | E3 评分引擎 | — | — | 未认领 | XL,可分批(Tier A 前半/后半、Tier B、档位层) |
 | E4 匹配引擎 | — | — | 未认领 | |
 | E5 报告框架+能力报告 | — | — | 未认领 | 服务/客户端两半可并行 |
-| E6 ctr 骨架 | — | — | 未认领 | 建议 hzy 主力 |
+| E6a ctr 纯壳 | lzx | esports/dev-lzx | 完成(待评审) | 2026-10-18 先行开工(例会追认);技术栈 D-R;主题 dark-only + i18n zh/en(D-S);同日补入 SEO 全量面(public:robots/sitemap hreflang/noindex 流程页/逐页 title);对照 admin 全量审计:20/33 字节级一致,13 处偏离全部参数化有据(生成器前置标准),4 处漂移当日修正;收口:三链绿 + live 冒烟全绿(含 404 错误面 LocaleSelect);同日 D-T:收敛为仅根路由+空白落地页(能力配置为交付面),login/profile/test 路由/页面/消息目录随之移除(E6b 登录片按范式重建),home 消息留 title+SEO description |
+| E6b 登录+画像流 | lzx 主刀 | esports/dev-lzx | **接通片完成(待评审)=前后端最小闭环打通** | 2026-10-19 微信真人链路全绿:手机点按钮→静默授权→回调→服务端 code 交换→自动注册(首次)→HttpOnly cookie→/profile 渲染惰性画像;日志+DB 双证(LoginByIdentity 200→0.3s 后 GetProfile 200;user wechat.{openid}@id.local+credential 落库)。关键修复:①回调路由 Outlet 缺失(login.tsx 降布局+login.index.tsx,点命名子路由的正典拆法)②system 落 config 门控自动注册(auto_register,合成邮箱/无密码/默认租户 user 人群,事务内 user+seat+credential)③vite 端口钉死 strictPort(回调域名承重)④ctr 对齐 admin:shared-transport 消费+Sentry 接入+机制面零差;测试号凭据入 dev config(用户裁定非敏感)。**D-V 接通验证达成——后续切片进入纯业务堆砌期**。骨架演进件已按分支纪律拆出:dev 4 笔(e9c006c0 shared-transport 抽取+admin 消费/4242f533 system 自动注册+测试/e739a081 env 追踪例外/2655b539 tanstack 点命名嵌套法)cherry-pick 回流本支(658ce098..7e261422);5 维 review 修出 autoRegister 零测试、注释纪律违律×2、测试夹具业务 gen 依赖(dev 态暴露) |
 | E7 游戏框架+13 款 | — | — | 未认领 | XL 三批,批内可并行 |
 | E8 权益最小面 | — | — | 未认领 | |
 | E9 最小 admin 面 | — | — | 未认领 | |
@@ -41,3 +42,4 @@
 
 - 2026-10-18 立项+目录化;M1 切片池就绪。
 - 2026-10-18 grill 定稿(D-K..D-Q):60 天作战计划落档,承诺日 12-17(含支付);大框架冻结,变更走 README 台账。
+- 2026-10-18 D-R:ctr UI 基座 = react-aria+tailwind(无 antd);E6 拆 E6a 纯壳/E6b 登录+画像流,lzx 先行建壳。

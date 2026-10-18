@@ -15,7 +15,7 @@
 ## 逐表口径
 
 - **身份列 → system**:username/phone/open_id/微信身份迁为会员身份+identity;credential 密码 verify-then-rehash(MD5 无法验证者强制重置);微信资料 4 列合并为一条画像 JSON。
-- **画像/偏好/溯源 → esports**:出生年月/年龄段/头像/游戏偏好(含待归类项保持待归类)/邀请关系/登录溯源九件套(随 login_record 语义迁或冷存)。
+- **画像/偏好/溯源 → esports**:出生年月/年龄段/头像/游戏偏好(含待归类项保持待归类)/邀请关系/登录溯源九件套(随 login_record 语义迁或冷存)。存量「仅年龄段无出生年月」用户(旧 API 允许)6→8 档不可精确映射:迁为画像不完整态(档位置空),首个画像触点补填出生年月后服务端重派生。
 - **权益翻译**:解锁三旗标与 activation_records → entitlement 解锁记录;未核销激活码 → 新兑换码批次(保留 report_type 语义);已核销/过期码丢弃靠流水保历史。
 - **不迁重算**:user 统计四列/ability_score/platform_analytics/game_analytics(由 test_record 重算)。
 - **保真搬运(D-C2)**:报告 JSON 快照(user_career_profile/school_report)= 旧算法产物+R3 永久可查看语义,原样只读迁入;consent/审计从零。
