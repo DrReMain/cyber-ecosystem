@@ -26,7 +26,7 @@
   "system_depts_col_user_count": "Users",
   "system_depts_col_remark": "Remark",
   "system_depts_members_label": "Members",
-  "system_depts_member_search_placeholder": "Search email or ID",
+  "system_depts_member_search_placeholder": "Search account or ID",
   "system_depts_members_empty": "No members yet",
   "system_depts_members_no_match": "No members match the search",
   "system_depts_member_disabled": "Disabled",

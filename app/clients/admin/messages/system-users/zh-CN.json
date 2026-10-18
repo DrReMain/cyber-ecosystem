@@ -1,7 +1,7 @@
 {
   "system_users_title": "用户管理",
-  "system_users_filter_keyword": "邮箱",
-  "system_users_filter_keyword_placeholder": "搜索邮箱",
+  "system_users_filter_keyword": "账号",
+  "system_users_filter_keyword_placeholder": "搜索账号",
   "system_users_filter_status": "状态",
   "system_users_filter_any": "全部状态",
   "system_users_filter_dept": "部门",

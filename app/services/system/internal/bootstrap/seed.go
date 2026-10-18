@@ -245,7 +245,9 @@ func (s *Seed) ensureUser(ctx context.Context, client *ent.Client, tenant, accou
 }
 
 func (s *Seed) ensureSeat(ctx context.Context, client *ent.Client, tenant string, u *ent.User) (*ent.User, error) {
-	n, err := client.Membership.Query().Where(membership.UserID(u.ID), membership.TenantID(tenant)).Count(ctx)
+	n, err := client.Membership.Query().Where(
+		membership.UserID(u.ID), membership.TenantID(tenant), membership.Population(security.DefaultPopulation),
+	).Count(ctx)
 	if err != nil {
 		return nil, s.plat.HandleEntError(fmt.Errorf("seed: query seat for %q: %w", u.Account, err))
 	}

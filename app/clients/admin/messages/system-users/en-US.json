@@ -1,7 +1,7 @@
 {
   "system_users_title": "Users",
-  "system_users_filter_keyword": "Email",
-  "system_users_filter_keyword_placeholder": "Search email",
+  "system_users_filter_keyword": "Account",
+  "system_users_filter_keyword_placeholder": "Search account",
   "system_users_filter_status": "Status",
   "system_users_filter_any": "Any status",
   "system_users_filter_dept": "Department",

@@ -1,7 +1,7 @@
 {
   "system_users_title": "إدارة المستخدمين",
-  "system_users_filter_keyword": "البريد الإلكتروني",
-  "system_users_filter_keyword_placeholder": "ابحث في البريد الإلكتروني",
+  "system_users_filter_keyword": "الحساب",
+  "system_users_filter_keyword_placeholder": "ابحث في الحساب",
   "system_users_filter_status": "الحالة",
   "system_users_filter_any": "كل الحالات",
   "system_users_filter_dept": "القسم",

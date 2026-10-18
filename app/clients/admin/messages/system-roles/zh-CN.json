@@ -27,7 +27,7 @@
   "system_roles_drawer_edit_title": "编辑角色",
   "system_roles_tab_grants": "权限配置",
   "system_roles_tab_members": "成员",
-  "system_roles_member_search_placeholder": "搜索邮箱或 ID",
+  "system_roles_member_search_placeholder": "搜索账号或 ID",
   "system_roles_member_act_unbind": "解绑",
   "system_roles_member_user": "用户",
   "system_roles_members_empty": "暂无成员",

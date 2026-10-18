@@ -167,7 +167,7 @@ export function AuditPage() {
               element: canListUsers ? (
                 <Select
                   allowClear
-                  options={Array.from(usersById, ([id, email]) => ({ label: email, value: id }))}
+                  options={Array.from(usersById, ([id, account]) => ({ label: account, value: id }))}
                   placeholder={m.system_audit_filter_actor_ph()}
                   showSearch
                   style={{ width: "100%" }}

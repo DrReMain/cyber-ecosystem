@@ -24,7 +24,7 @@ export function ConnectionsTable({
   const columns: TableProps<AgentConfigView>["columns"] = [
     {
       title: () => m.agents_connections_col_user(),
-      dataIndex: "userEmail",
+      dataIndex: "userAccount",
       width: 240,
       render: (_, row) =>
         row.userAccount ? (

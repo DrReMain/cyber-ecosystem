@@ -26,7 +26,7 @@
   "system_depts_col_user_count": "ユーザー数",
   "system_depts_col_remark": "備考",
   "system_depts_members_label": "メンバー",
-  "system_depts_member_search_placeholder": "メールアドレスまたはIDで検索",
+  "system_depts_member_search_placeholder": "アカウントまたはIDで検索",
   "system_depts_members_empty": "メンバーはまだいません",
   "system_depts_members_no_match": "検索に一致するメンバーがいません",
   "system_depts_member_disabled": "無効",

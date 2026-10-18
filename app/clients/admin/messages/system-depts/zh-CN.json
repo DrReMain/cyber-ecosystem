@@ -26,7 +26,7 @@
   "system_depts_col_user_count": "用户数",
   "system_depts_col_remark": "备注",
   "system_depts_members_label": "成员",
-  "system_depts_member_search_placeholder": "搜索邮箱或 ID",
+  "system_depts_member_search_placeholder": "搜索账号或 ID",
   "system_depts_members_empty": "暂无成员",
   "system_depts_members_no_match": "没有匹配的成员",
   "system_depts_member_disabled": "已停用",

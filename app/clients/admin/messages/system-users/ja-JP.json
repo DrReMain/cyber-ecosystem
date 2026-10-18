@@ -1,7 +1,7 @@
 {
   "system_users_title": "ユーザー管理",
-  "system_users_filter_keyword": "メールアドレス",
-  "system_users_filter_keyword_placeholder": "メールアドレスを検索",
+  "system_users_filter_keyword": "アカウント",
+  "system_users_filter_keyword_placeholder": "アカウントを検索",
   "system_users_filter_status": "ステータス",
   "system_users_filter_any": "すべてのステータス",
   "system_users_filter_dept": "部門",

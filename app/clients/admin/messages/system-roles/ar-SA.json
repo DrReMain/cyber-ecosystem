@@ -27,7 +27,7 @@
   "system_roles_drawer_edit_title": "تعديل الدور",
   "system_roles_tab_grants": "الأذونات",
   "system_roles_tab_members": "الأعضاء",
-  "system_roles_member_search_placeholder": "ابحث بالبريد أو المعرّف",
+  "system_roles_member_search_placeholder": "ابحث بالحساب أو المعرّف",
   "system_roles_member_act_unbind": "إلغاء الربط",
   "system_roles_member_user": "مستخدم",
   "system_roles_members_empty": "لا يوجد أعضاء",

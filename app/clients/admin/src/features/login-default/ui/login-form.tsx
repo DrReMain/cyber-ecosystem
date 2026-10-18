@@ -28,9 +28,9 @@ export function LoginForm({ onSubmit, pending }: Readonly<LoginFormProps>) {
       <TextField className={STYLES.field} name="account" type="text">
         <Label className={STYLES.label}>
           {m.login_default_label_account()}
-          <span className={STYLES.labelHint}>EMAIL</span>
+          <span className={STYLES.labelHint}>ACCOUNT</span>
         </Label>
-        <Input className={STYLES.input} placeholder="cyber@example.com" />
+        <Input className={STYLES.input} placeholder="your-account" />
       </TextField>
 
       <TextField

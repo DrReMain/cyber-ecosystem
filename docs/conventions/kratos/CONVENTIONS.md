@@ -29,7 +29,7 @@ conf             config (proto-defined, generated)
 
 - `MUST` keep business logic in `biz`; `service` is thin; `data`/`client` are adapters only.
 - `MUST NOT` let `biz` import `data`/`client`/`service`/`server`/`platform`. Direction is `data → biz` and `client → biz` (both import biz to satisfy ports), never reverse. biz depends on its ports + `gen/` + `shared-go/`, and MAY take `*conf.X` in its constructor (same pattern as `server`/`platform`).
-- **A UC depends on repo ports, never on another UC — injection is repo-port-only.** Cross-module *read* → the other module's repo port (e.g. `auth` uses `user.UserRP.FindByEmail`; `user` uses `dept.DeptRP.Get` to reject dangling dept references; read-only, no side-effect — binding a UC behind an `*RP`-shaped dependency blurs the layering). Cross-module *write* is forbidden as a direct call → a **domain event** instead (the other module subscribes). A cross-module business-rule need (not a query) is a design smell — raise it, don't wire UC→UC.
+- **A UC depends on repo ports, never on another UC — injection is repo-port-only.** Cross-module *read* → the other module's repo port (e.g. `auth` uses `user.UserRP.FindByAccount`; `user` uses `dept.DeptRP.Get` to reject dangling dept references; read-only, no side-effect — binding a UC behind an `*RP`-shaped dependency blurs the layering). Cross-module *write* is forbidden as a direct call → a **domain event** instead (the other module subscribes). A cross-module business-rule need (not a query) is a design smell — raise it, don't wire UC→UC.
 - The four files are a required-by-role set, not an exclusive list: `data.go` may be
   omitted (pure ACL facade), `service.go` may be omitted (module exposes no RPCs), and a
   module MAY add one extra file per cohesive non-layer concern when its content belongs
@@ -124,7 +124,7 @@ Align proto optional fields, DO fields, and the service/data mapping around poin
 - **DO**: optional / proto-bound fields are `*T` (align with proto); mandatory system fields (`ID`, `CreatedAt`, `UpdatedAt`, `TenantID`) stay non-pointer.
 - **service**: proto `*T` → DO `*T` **passed straight through — no deref, no nil-check**.
 - **data**: optional fields `SetNillableX(*T)` / `ClearX`; mandatory NOT-NULL fields `SetX(*p)` (validate guarantees `*p` non-nil).
-- **ent schema**: constraints by need — mandatory `.NotEmpty()` (NOT NULL), optional `.Optional().Nillable()`. Do **not** force everything Nillable: DB integrity (NOT NULL on mandatory fields) outweighs saving one deref. Field semantics a DB reader cannot infer from the name go in `.Comment("...")` — English, and the schema's `entsql.WithComments(true)` flows them into DDL column comments — never in Go line comments on the field chain. Self-evident fields (name, email, remark…) get none.
+- **ent schema**: constraints by need — mandatory `.NotEmpty()` (NOT NULL), optional `.Optional().Nillable()`. Do **not** force everything Nillable: DB integrity (NOT NULL on mandatory fields) outweighs saving one deref. Field semantics a DB reader cannot infer from the name go in `.Comment("...")` — English, and the schema's `entsql.WithComments(true)` flows them into DDL column comments — never in Go line comments on the field chain. Self-evident fields (name, account, remark…) get none.
 - **biz**: nil-semantics (e.g. update-leave-unchanged) live in the UC.
 
 ---
@@ -232,7 +232,7 @@ The IAM engine is a **mechanism every service replicates**, not a system-service
 - **Seeds are service-level.**
   - The seed job lives in `internal/bootstrap`, mounts `kratos.BeforeStart` explicitly after `lc.Start` (its completion publishes a fire-and-forget change notification, so the subscriptions it notifies must already exist).
   - Idempotent ensure (query → create; unique-index conflict → re-query), multi-replica safe without advisory locks.
-  - The superadmin triplet is conf-driven (`Authz{super_admins, initial_password}`) — under deny-by-default, a fresh environment could otherwise never create its first user.
+  - The superadmin triplet is conf-driven (`Seed{super_admins, initial_password, populations}`) — under deny-by-default, a fresh environment could otherwise never create its first user.
 
 ### Non-system services (IAM consumers)
 
@@ -254,7 +254,7 @@ Every non-system service consumes IAM remotely and grows no identity of its own:
 - Domain-rule violation → bare factory, no cause: the reason is the whole story.
 - `WithCause` carries the classification, via one of two channels:
   - **factory**: fuzzy identity over a specific internal factory — `ErrorGeneralErrorUnauthenticated("").WithCause(ErrorGeneralErrorNotFound(""))`;
-  - **authored prose**: `fmt.Errorf("user not found: %s", email)` — always `fmt.Errorf` (no `errors.New`), lowercase start, no trailing punctuation, `%w` to chain an underlying error. `SCREAMING_SNAKE` is reserved for reason alone; splits finer than reason go to structured fields/metrics labels, never string prefixes.
+  - **authored prose**: `fmt.Errorf("user not found: %s", account)` — always `fmt.Errorf` (no `errors.New`), lowercase start, no trailing punctuation, `%w` to chain an underlying error. `SCREAMING_SNAKE` is reserved for reason alone; splits finer than reason go to structured fields/metrics labels, never string prefixes.
 - Cause never crosses the wire (`ErrorToConnect`/`GRPCStatus` emit message/reason/metadata only) — the fuzzy-out/specific-collected split is safe by construction.
 - Infra is classified at choke points, not call sites: `HandleEntError` (ent; classified kratos errors pass through), `HandleCacheError`/`HandleStorageError`/`HandleMQError` (capabilities), `MapUpstreamErr` (remotes, behind `sanitize.Client`); each attaches the original as cause. A UC never returns a raw upstream error.
 - **Postgres transaction poisoning (25P02).** A failed statement poisons every later statement in its transaction (`current transaction is aborted`, SQLSTATE 25P02) — Postgres has no statement-level rollback. Ensure-semantics (an insert that may already exist) uses `ON CONFLICT DO NOTHING` (ent upsert, the `sql/upsert` feature) — no error fires, so nothing can poison; a tolerated failure is the fallback shape only where the statement is not a plain insert: hoist the existence guard before the transaction, or return from the body at the tolerance (the race loser skips the rest). Fake-RP unit tests cannot catch this class — a fake does not poison shared state; the law is live-e2e jurisdiction.

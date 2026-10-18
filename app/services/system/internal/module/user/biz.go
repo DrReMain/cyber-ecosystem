@@ -126,7 +126,7 @@ func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar 
 	if err != nil {
 		return nil, err
 	}
-	// Email is the global identity key: an identity that already exists
+	// Account is the global identity key: an identity that already exists
 	// gains a seat in the creating admin's tenant — a second row is never
 	// born. Profile params (password, dept, avatar) belong to identity
 	// birth alone and are inert on the seat path.

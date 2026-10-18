@@ -26,7 +26,7 @@
   "system_depts_col_user_count": "المستخدمون",
   "system_depts_col_remark": "ملاحظة",
   "system_depts_members_label": "الأعضاء",
-  "system_depts_member_search_placeholder": "ابحث بالبريد أو المعرّف",
+  "system_depts_member_search_placeholder": "ابحث بالحساب أو المعرّف",
   "system_depts_members_empty": "لا يوجد أعضاء",
   "system_depts_members_no_match": "لا يوجد أعضاء مطابقون للبحث",
   "system_depts_member_disabled": "موقوف",

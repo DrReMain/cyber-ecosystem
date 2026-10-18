@@ -27,7 +27,7 @@
   "system_roles_drawer_edit_title": "Edit Role",
   "system_roles_tab_grants": "Permissions",
   "system_roles_tab_members": "Members",
-  "system_roles_member_search_placeholder": "Search email or ID",
+  "system_roles_member_search_placeholder": "Search account or ID",
   "system_roles_member_act_unbind": "Unbind",
   "system_roles_member_user": "User",
   "system_roles_members_empty": "No members yet",
