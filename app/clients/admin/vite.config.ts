@@ -14,7 +14,15 @@ const config = defineConfig(({ mode }) => {
   return {
     resolve: { tsconfigPaths: true },
     ssr: {
-      noExternal: ["@ant-design/x-markdown"],
+      noExternal: [
+        "@ant-design/x-markdown",
+        "@ant-design/x",
+        "react-syntax-highlighter",
+        "@rc-component/util",
+      ],
+      optimizeDeps: {
+        include: ["@rc-component/util", "@ant-design/x", "react-syntax-highlighter"],
+      },
     },
     server: {
       port: 5173,
@@ -27,6 +35,11 @@ const config = defineConfig(({ mode }) => {
         },
         "^/connect/cyber\\.agent\\.": {
           target: env.AGENT_CONNECT_API_URL,
+          ws: true,
+          rewrite: (path) => path.replace(/^\/connect/, ""),
+        },
+        "^/connect/cyber\\.esports\\.": {
+          target: env.ESPORTS_CONNECT_API_URL,
           ws: true,
           rewrite: (path) => path.replace(/^\/connect/, ""),
         },

@@ -12,6 +12,7 @@ import (
 	// Register the generated cyber.* descriptors so the walk below sees the
 	// whole contract surface. A new service adds one import line here.
 	_ "cyber-ecosystem/gen/go/cyber/agent/v1"
+	_ "cyber-ecosystem/gen/go/cyber/esports/v1"
 	extv1 "cyber-ecosystem/gen/go/cyber/ext/v1"
 	_ "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	_ "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
