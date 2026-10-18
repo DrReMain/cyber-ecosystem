@@ -90,7 +90,8 @@ auth:
     - key: wechat                   # 实例注册键 (登录请求的 provider 参数)
       kind: wechat                  # 代码注册的 kind
       enabled: ${WECHAT_ENABLED:true}
+      auto_register: ${WECHAT_AUTO_REGISTER:true} # 无绑定交换=注册新会员
       endpoint: ${WECHAT_ENDPOINT:} # 交换端点；空 = 官方默认 (e2e 覆写指向 mock)
       wechat:
-        appid: ${WECHAT_APPID:wx-dev-placeholder} # 测试号占位
-        secret: ${WECHAT_SECRET:dev-only-placeholder} # 机密走环境注入
+        appid: ${WECHAT_APPID:wxfda597a14a57bf08} # 测试号
+        secret: ${WECHAT_SECRET:da1ce920bfcee3db140f431d2c1f3a5b}

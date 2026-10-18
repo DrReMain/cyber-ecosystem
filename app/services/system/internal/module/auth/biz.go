@@ -114,9 +114,18 @@ func (uc *AuthUC) LoginByIdentity(ctx context.Context, providerKey, state string
 	}
 	c, err := uc.userRP.FindCredential(ctx, id.Kind, id.Identifier)
 	if err != nil {
-		// A completed exchange with no binding reads as a failed exchange —
-		// the face never confirms which external identities exist.
 		if errorspb.IsInfraErrorDbNotFound(err) {
+			if row.AutoRegister {
+				u, aerr := uc.autoRegister(ctx, id)
+				if aerr != nil {
+					return "", time.Time{}, time.Time{}, aerr
+				}
+				seat, serr := uc.resolveSeat(ctx, u)
+				if serr != nil {
+					return "", time.Time{}, time.Time{}, serr
+				}
+				return uc.mintSession(ctx, u, seat)
+			}
 			return "", time.Time{}, time.Time{}, systempb.ErrorSystemIdentityExchangeFailed("").WithCause(
 				fmt.Errorf("identity %s %s has no binding", id.Kind, id.Identifier))
 		}
@@ -146,6 +155,47 @@ func (uc *AuthUC) BeginIdentityLogin(ctx context.Context, providerKey, redirectU
 		return "", err
 	}
 	return p.AuthorizeURL(row, redirectURI, state), nil
+}
+
+func (uc *AuthUC) autoRegister(ctx context.Context, id *exchangedIdentity) (*user.User, error) {
+	email := fmt.Sprintf("%s.%s@id.local", id.Kind, id.Identifier)
+	hash := ""
+	var u *user.User
+	err := uc.Tm.InTx(ctx, func(ctx context.Context) error {
+		existing, ferr := uc.userRP.FindByEmail(ctx, email)
+		if ferr != nil && !errorspb.IsInfraErrorDbNotFound(ferr) {
+			return ferr
+		}
+		if existing != nil {
+			u = existing
+		} else {
+			created, cerr := uc.userRP.Create(ctx, &user.User{
+				Email:        &email,
+				PasswordHash: &hash,
+				Enabled:      true,
+			})
+			if cerr != nil {
+				return cerr
+			}
+			u = created
+		}
+		if serr := uc.userRP.EnsureSeat(ctx, &user.Seat{
+			UserID:     u.ID,
+			TenantID:   security.DefaultTenant,
+			Population: security.DefaultPopulation,
+		}); serr != nil {
+			return serr
+		}
+		return uc.userRP.CreateCredential(ctx, &user.Credential{
+			Kind:       id.Kind,
+			Identifier: id.Identifier,
+			UserID:     u.ID,
+		})
+	})
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
 }
 
 func (uc *AuthUC) BindCredential(ctx context.Context, providerKey, state string, payload identityPayload) error {

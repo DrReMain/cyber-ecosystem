@@ -98,6 +98,9 @@ type fakeUserRP struct {
 	createdCreds   []*user.Credential
 	deletedCredFor []string
 	findIDErr      error
+
+	// createdUsers records the auto-register births.
+	createdUsers []*user.User
 }
 
 func (f *fakeUserRP) ListSeatsByUser(_ context.Context, _ string) ([]*user.Seat, error) {
@@ -135,6 +138,19 @@ func (f *fakeUserRP) FindByEmail(_ context.Context, email string) (*user.User, e
 		return f.row, nil
 	}
 	return nil, errorspb.ErrorInfraErrorDbNotFound("")
+}
+
+func (f *fakeUserRP) Create(_ context.Context, u *user.User) (*user.User, error) {
+	u.ID = "u-born"
+	f.createdUsers = append(f.createdUsers, u)
+	return u, nil
+}
+
+// EnsureSeat mirrors the ensure semantics: the seat becomes visible to the
+// seat list, and a second ensure for the same row is idempotent noise.
+func (f *fakeUserRP) EnsureSeat(_ context.Context, s *user.Seat) error {
+	f.seats = append(f.seats, s)
+	return nil
 }
 
 func (f *fakeUserRP) FindByID(_ context.Context, id string) (*user.User, error) {
@@ -177,14 +193,21 @@ func newAuthUCTenant(u *fakeUserRP, a *fakeAuthzRP, t *fakeTokenRP, tn *fakeTena
 	return newAuthUCConf(nil, u, a, t, tn)
 }
 
-func newAuthUCConf(auth *conf.Auth, u *fakeUserRP, a *fakeAuthzRP, t *fakeTokenRP, tn *fakeTenantRP) *AuthUC {
-	// The default seat mirrors the degenerate world: one seat on t1 for u1.
+// passthroughTx runs the unit inline — the auth slice asserts transaction
+// semantics through the fakes, not a real store.
+type passthroughTx struct{}
+
+func (passthroughTx) InTx(ctx context.Context, fn func(context.Context) error) error {
+	return fn(ctx)
+}
+
+func newAuthUCConf(auth *conf.Auth, u *fakeUserRP, a *fakeAuthzRP, t *fakeTokenRP, tn *fakeTenantRP) *AuthUC { // The default seat mirrors the degenerate world: one seat on t1 for u1.
 	if u.seats == nil {
 		u.seats = []*user.Seat{{UserID: "u1", TenantID: "t1", Population: security.DefaultPopulation}}
 	}
 	uc, err := NewAuthUC(
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
-		nil, auth, u, a, tn, t,
+		passthroughTx{}, auth, u, a, tn, t,
 	)
 	if err != nil {
 		panic(err)

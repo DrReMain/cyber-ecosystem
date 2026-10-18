@@ -14,9 +14,19 @@ const config = defineConfig(({ mode }) => {
   return {
     resolve: { tsconfigPaths: true },
     ssr: {
-      noExternal: ["@ant-design/x-markdown"],
+      noExternal: [
+        "@ant-design/x-markdown",
+        "@ant-design/x",
+        "react-syntax-highlighter",
+        "@rc-component/util",
+      ],
+      optimizeDeps: {
+        include: ["@rc-component/util", "@ant-design/x", "react-syntax-highlighter"],
+      },
     },
     server: {
+      port: 5173,
+      strictPort: true,
       proxy: {
         "^/connect/cyber\\.system\\.": {
           target: env.SYSTEM_CONNECT_API_URL,

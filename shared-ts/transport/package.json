@@ -1,0 +1,36 @@
+{
+  "name": "@cyber-ecosystem/shared-transport",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./connect": "./src/connect/index.ts"
+  },
+  "scripts": {
+    "check": "biome check",
+    "format": "biome format",
+    "lint": "biome lint",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "@bufbuild/protobuf": "^2.16.0",
+    "@connectrpc/connect": "^2.2.0",
+    "@connectrpc/connect-query": "^2.3.1",
+    "@connectrpc/connect-web": "^2.2.0",
+    "@tanstack/react-start": "^1",
+    "@types/react": "^19",
+    "react": "^19"
+  },
+  "devDependencies": {
+    "@cyber-ecosystem/gen-connect-ts": "workspace:*",
+    "@testing-library/react": "16.3.3",
+    "@vitest/coverage-v8": "5.0.3",
+    "jsdom": "30.1.1",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  }
+}

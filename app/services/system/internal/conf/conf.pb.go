@@ -1588,6 +1588,7 @@ type Auth_Provider struct {
 	Kind          string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"` // code-registered kind; boot fails otherwise
 	Enabled       bool                   `protobuf:"varint,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	Endpoint      string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"` // exchange base URL; empty = the kind's default (tests override here)
+	AutoRegister  bool                   `protobuf:"varint,6,opt,name=auto_register,json=autoRegister,proto3" json:"auto_register,omitempty"`
 	Wechat        *Auth_Provider_WeChat  `protobuf:"bytes,5,opt,name=wechat,proto3" json:"wechat,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1649,6 +1650,13 @@ func (x *Auth_Provider) GetEndpoint() string {
 		return x.Endpoint
 	}
 	return ""
+}
+
+func (x *Auth_Provider) GetAutoRegister() bool {
+	if x != nil {
+		return x.AutoRegister
+	}
+	return false
 }
 
 func (x *Auth_Provider) GetWechat() *Auth_Provider_WeChat {
@@ -1844,14 +1852,15 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\x03dir\x18\x01 \x01(\tR\x03dir\"U\n" +
 	"\x05Authz\x12!\n" +
 	"\fsuper_admins\x18\x01 \x03(\tR\vsuperAdmins\x12)\n" +
-	"\x10initial_password\x18\x02 \x01(\tR\x0finitialPassword\"\x9a\x02\n" +
+	"\x10initial_password\x18\x02 \x01(\tR\x0finitialPassword\"\xbf\x02\n" +
 	"\x04Auth\x127\n" +
-	"\tproviders\x18\x01 \x03(\v2\x19.cyber.conf.Auth.ProviderR\tproviders\x1a\xd8\x01\n" +
+	"\tproviders\x18\x01 \x03(\v2\x19.cyber.conf.Auth.ProviderR\tproviders\x1a\xfd\x01\n" +
 	"\bProvider\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x12\n" +
 	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x18\n" +
 	"\aenabled\x18\x03 \x01(\bR\aenabled\x12\x1a\n" +
-	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x128\n" +
+	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12#\n" +
+	"\rauto_register\x18\x06 \x01(\bR\fautoRegister\x128\n" +
 	"\x06wechat\x18\x05 \x01(\v2 .cyber.conf.Auth.Provider.WeChatR\x06wechat\x1a6\n" +
 	"\x06WeChat\x12\x14\n" +
 	"\x05appid\x18\x01 \x01(\tR\x05appid\x12\x16\n" +

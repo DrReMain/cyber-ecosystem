@@ -159,6 +159,7 @@ message Auth {
     string kind = 2;     // code-registered kind; boot fails otherwise
     bool enabled = 3;
     string endpoint = 4; // exchange base URL; empty = the kind's default (tests override here)
+    bool auto_register = 6;
     WeChat wechat = 5;
   }
   repeated Provider providers = 1;

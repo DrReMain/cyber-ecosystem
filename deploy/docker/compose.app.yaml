@@ -129,6 +129,8 @@ services:
         condition: service_completed_successfully
       postgresql:
         condition: service_healthy
+      system:
+        condition: service_healthy
     deploy:
       resources:
         limits:
