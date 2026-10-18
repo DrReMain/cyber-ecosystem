@@ -114,9 +114,6 @@ func (uc *AuthUC) LoginByIdentity(ctx context.Context, providerKey, state string
 	}
 	c, err := uc.userRP.FindCredential(ctx, id.Kind, id.Identifier)
 	if err != nil {
-		// A completed exchange with no binding reads as a failed exchange —
-		// the face never confirms which external identities exist — unless
-		// the provider row opens the auto-register gate.
 		if errorspb.IsInfraErrorDbNotFound(err) {
 			if row.AutoRegister {
 				u, aerr := uc.autoRegister(ctx, id)
@@ -161,10 +158,6 @@ func (uc *AuthUC) BeginIdentityLogin(ctx context.Context, providerKey, redirectU
 }
 
 func (uc *AuthUC) autoRegister(ctx context.Context, id *exchangedIdentity) (*user.User, error) {
-	// The C-end rule: an exchange proving provider ownership with no binding
-	// births the account. The email is synthetic — kind + identifier on a
-	// non-routable local domain, deterministic so retries converge — and the
-	// empty hash leaves the provider as the only way in.
 	email := fmt.Sprintf("%s.%s@id.local", id.Kind, id.Identifier)
 	hash := ""
 	var u *user.User

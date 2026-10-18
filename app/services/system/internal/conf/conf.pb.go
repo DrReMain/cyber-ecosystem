@@ -1583,16 +1583,13 @@ func (x *Observability_Log_FileOutput) GetCompress() bool {
 }
 
 type Auth_Provider struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	Key      string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`   // instance registry key
-	Kind     string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"` // code-registered kind; boot fails otherwise
-	Enabled  bool                   `protobuf:"varint,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Endpoint string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"` // exchange base URL; empty = the kind's default (tests override here)
-	// A completed exchange with no binding births the member account
-	// (C-end rule: openid not in store = new member) instead of reading as
-	// a failed exchange. Population is the default member population.
-	AutoRegister  bool                  `protobuf:"varint,6,opt,name=auto_register,json=autoRegister,proto3" json:"auto_register,omitempty"`
-	Wechat        *Auth_Provider_WeChat `protobuf:"bytes,5,opt,name=wechat,proto3" json:"wechat,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`   // instance registry key
+	Kind          string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"` // code-registered kind; boot fails otherwise
+	Enabled       bool                   `protobuf:"varint,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Endpoint      string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"` // exchange base URL; empty = the kind's default (tests override here)
+	AutoRegister  bool                   `protobuf:"varint,6,opt,name=auto_register,json=autoRegister,proto3" json:"auto_register,omitempty"`
+	Wechat        *Auth_Provider_WeChat  `protobuf:"bytes,5,opt,name=wechat,proto3" json:"wechat,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
