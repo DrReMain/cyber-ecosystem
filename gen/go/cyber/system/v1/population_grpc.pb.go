@@ -19,19 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PopulationService_CreatePopulation_FullMethodName = "/cyber.system.v1.PopulationService/CreatePopulation"
-	PopulationService_ListPopulations_FullMethodName  = "/cyber.system.v1.PopulationService/ListPopulations"
+	PopulationService_ListPopulations_FullMethodName = "/cyber.system.v1.PopulationService/ListPopulations"
 )
 
 // PopulationServiceClient is the client API for PopulationService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// Population registry write face: instances of the compile-time archetype
+// Population registry read face: instances of the compile-time archetype
 // vocabulary (engine | patron). Codes are join keys — immutable once born.
-// The default population is born by seed and protected here.
+// Rows are deploy-declared state, born and reconciled by the seed.
 type PopulationServiceClient interface {
-	CreatePopulation(ctx context.Context, in *CreatePopulationRequest, opts ...grpc.CallOption) (*CreatePopulationResponse, error)
 	ListPopulations(ctx context.Context, in *ListPopulationsRequest, opts ...grpc.CallOption) (*ListPopulationsResponse, error)
 }
 
@@ -41,16 +39,6 @@ type populationServiceClient struct {
 
 func NewPopulationServiceClient(cc grpc.ClientConnInterface) PopulationServiceClient {
 	return &populationServiceClient{cc}
-}
-
-func (c *populationServiceClient) CreatePopulation(ctx context.Context, in *CreatePopulationRequest, opts ...grpc.CallOption) (*CreatePopulationResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreatePopulationResponse)
-	err := c.cc.Invoke(ctx, PopulationService_CreatePopulation_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *populationServiceClient) ListPopulations(ctx context.Context, in *ListPopulationsRequest, opts ...grpc.CallOption) (*ListPopulationsResponse, error) {
@@ -67,11 +55,10 @@ func (c *populationServiceClient) ListPopulations(ctx context.Context, in *ListP
 // All implementations must embed UnimplementedPopulationServiceServer
 // for forward compatibility.
 //
-// Population registry write face: instances of the compile-time archetype
+// Population registry read face: instances of the compile-time archetype
 // vocabulary (engine | patron). Codes are join keys — immutable once born.
-// The default population is born by seed and protected here.
+// Rows are deploy-declared state, born and reconciled by the seed.
 type PopulationServiceServer interface {
-	CreatePopulation(context.Context, *CreatePopulationRequest) (*CreatePopulationResponse, error)
 	ListPopulations(context.Context, *ListPopulationsRequest) (*ListPopulationsResponse, error)
 	mustEmbedUnimplementedPopulationServiceServer()
 }
@@ -83,9 +70,6 @@ type PopulationServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPopulationServiceServer struct{}
 
-func (UnimplementedPopulationServiceServer) CreatePopulation(context.Context, *CreatePopulationRequest) (*CreatePopulationResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreatePopulation not implemented")
-}
 func (UnimplementedPopulationServiceServer) ListPopulations(context.Context, *ListPopulationsRequest) (*ListPopulationsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListPopulations not implemented")
 }
@@ -108,24 +92,6 @@ func RegisterPopulationServiceServer(s grpc.ServiceRegistrar, srv PopulationServ
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&PopulationService_ServiceDesc, srv)
-}
-
-func _PopulationService_CreatePopulation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreatePopulationRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PopulationServiceServer).CreatePopulation(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PopulationService_CreatePopulation_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PopulationServiceServer).CreatePopulation(ctx, req.(*CreatePopulationRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _PopulationService_ListPopulations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -153,10 +119,6 @@ var PopulationService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "cyber.system.v1.PopulationService",
 	HandlerType: (*PopulationServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "CreatePopulation",
-			Handler:    _PopulationService_CreatePopulation_Handler,
-		},
 		{
 			MethodName: "ListPopulations",
 			Handler:    _PopulationService_ListPopulations_Handler,

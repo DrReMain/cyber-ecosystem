@@ -18,7 +18,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/system/v1/population.proto.
  */
 export const file_cyber_system_v1_population: GenFile = /*@__PURE__*/
-  fileDesc("CiBjeWJlci9zeXN0ZW0vdjEvcG9wdWxhdGlvbi5wcm90bxIPY3liZXIuc3lzdGVtLnYxIp8CCgpQb3B1bGF0aW9uEigKAmlkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCmNyZWF0ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEioKBGNvZGUYBCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSKgoEbmFtZRgFIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIvCglhcmNoZXR5cGUYBiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUiwAEKF0NyZWF0ZVBvcHVsYXRpb25SZXF1ZXN0Ej8KBGNvZGUYASABKAlCLLpIKcgBAXIkEAIYFDIeXlthLXpdW2EtejAtOS1dezAsMTh9W2EtejAtOV0kSACIAQESIAoEbmFtZRgCIAEoCUINukgKyAEBcgUQARiAAUgBiAEBEiIKCWFyY2hldHlwZRgDIAEoCUIKukgHyAEBcgIYEEgCiAEBQgcKBV9jb2RlQgcKBV9uYW1lQgwKCl9hcmNoZXR5cGUiSwoYQ3JlYXRlUG9wdWxhdGlvblJlc3BvbnNlEi8KCnBvcHVsYXRpb24YASABKAsyGy5jeWJlci5zeXN0ZW0udjEuUG9wdWxhdGlvbiKlAgoWTGlzdFBvcHVsYXRpb25zUmVxdWVzdBIxCgRwYWdlGAEgASgLMiMuY3liZXIuc2hhcmVkLmNvbW1vbi52MS5QYWdlUmVxdWVzdBIRCgRjb2RlGAIgASgJSACIAQESEQoEbmFtZRgDIAEoCUgBiAEBEp8BCghvcmRlcl9ieRhkIAMoCUKMAbpIiAG6AYQBCh9MaXN0UG9wdWxhdGlvbnNSZXF1ZXN0Lm9yZGVyX2J5EgAaX3RoaXMuYWxsKGl0ZW0sIHNpemUoaXRlbSkgPT0gMCB8fCBpdGVtLm1hdGNoZXMoJ14oY29kZXxuYW1lfGNyZWF0ZWRBdHx1cGRhdGVkQXQpOihhc2N8ZGVzYykkJykpQgcKBV9jb2RlQgcKBV9uYW1lIngKF0xpc3RQb3B1bGF0aW9uc1Jlc3BvbnNlEjIKBHBhZ2UYASABKAsyJC5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXNwb25zZRIpCgRsaXN0GAIgAygLMhsuY3liZXIuc3lzdGVtLnYxLlBvcHVsYXRpb24y8QIKEVBvcHVsYXRpb25TZXJ2aWNlEqYBChBDcmVhdGVQb3B1bGF0aW9uEiguY3liZXIuc3lzdGVtLnYxLkNyZWF0ZVBvcHVsYXRpb25SZXF1ZXN0GikuY3liZXIuc3lzdGVtLnYxLkNyZWF0ZVBvcHVsYXRpb25SZXNwb25zZSI9iPEEA4rTDhAKDOWIm+W7uuS6uuWPoxACgtPkkwIfOgEqIhovYXBpL3YxL3N5c3RlbS9wb3B1bGF0aW9ucxKgAQoPTGlzdFBvcHVsYXRpb25zEicuY3liZXIuc3lzdGVtLnYxLkxpc3RQb3B1bGF0aW9uc1JlcXVlc3QaKC5jeWJlci5zeXN0ZW0udjEuTGlzdFBvcHVsYXRpb25zUmVzcG9uc2UiOojxBAOK0w4QCgzkurrlj6PliJfooagQAYLT5JMCHBIaL2FwaS92MS9zeXN0ZW0vcG9wdWxhdGlvbnMaEIriCQzkurrlj6PnrqHnkIZCKFomY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9zeXN0ZW0vdjFiBnByb3RvMw", [file_buf_validate_validate, file_cyber_shared_common_v1_pagination, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("CiBjeWJlci9zeXN0ZW0vdjEvcG9wdWxhdGlvbi5wcm90bxIPY3liZXIuc3lzdGVtLnYxIp8CCgpQb3B1bGF0aW9uEigKAmlkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCmNyZWF0ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEioKBGNvZGUYBCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSKgoEbmFtZRgFIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIvCglhcmNoZXR5cGUYBiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUipQIKFkxpc3RQb3B1bGF0aW9uc1JlcXVlc3QSMQoEcGFnZRgBIAEoCzIjLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlcXVlc3QSEQoEY29kZRgCIAEoCUgAiAEBEhEKBG5hbWUYAyABKAlIAYgBARKfAQoIb3JkZXJfYnkYZCADKAlCjAG6SIgBugGEAQofTGlzdFBvcHVsYXRpb25zUmVxdWVzdC5vcmRlcl9ieRIAGl90aGlzLmFsbChpdGVtLCBzaXplKGl0ZW0pID09IDAgfHwgaXRlbS5tYXRjaGVzKCdeKGNvZGV8bmFtZXxjcmVhdGVkQXR8dXBkYXRlZEF0KTooYXNjfGRlc2MpJCcpKUIHCgVfY29kZUIHCgVfbmFtZSJ4ChdMaXN0UG9wdWxhdGlvbnNSZXNwb25zZRIyCgRwYWdlGAEgASgLMiQuY3liZXIuc2hhcmVkLmNvbW1vbi52MS5QYWdlUmVzcG9uc2USKQoEbGlzdBgCIAMoCzIbLmN5YmVyLnN5c3RlbS52MS5Qb3B1bGF0aW9uMs4BChFQb3B1bGF0aW9uU2VydmljZRKmAQoPTGlzdFBvcHVsYXRpb25zEicuY3liZXIuc3lzdGVtLnYxLkxpc3RQb3B1bGF0aW9uc1JlcXVlc3QaKC5jeWJlci5zeXN0ZW0udjEuTGlzdFBvcHVsYXRpb25zUmVzcG9uc2UiQIjxBAOK0w4WChLnlKjmiLfnsbvlnovliJfooagQAYLT5JMCHBIaL2FwaS92MS9zeXN0ZW0vcG9wdWxhdGlvbnMaEIriCQznlKjmiLfnsbvlnotCKFomY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9zeXN0ZW0vdjFiBnByb3RvMw", [file_buf_validate_validate, file_cyber_shared_common_v1_pagination, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * @generated from message cyber.system.v1.Population
@@ -63,58 +63,6 @@ export const PopulationSchema: GenMessage<Population> = /*@__PURE__*/
   messageDesc(file_cyber_system_v1_population, 0);
 
 /**
- * create
- *
- * @generated from message cyber.system.v1.CreatePopulationRequest
- */
-export type CreatePopulationRequest = Message<"cyber.system.v1.CreatePopulationRequest"> & {
-  /**
-   * Same charset law as the tenant join key; the ent schema enforces it at
-   * the write as the backstop.
-   *
-   * @generated from field: optional string code = 1;
-   */
-  code?: string | undefined;
-
-  /**
-   * @generated from field: optional string name = 2;
-   */
-  name?: string | undefined;
-
-  /**
-   * engine | patron — the compile-time vocabulary; membership in the word
-   * set is validated in code, the single source of the vocabulary.
-   *
-   * @generated from field: optional string archetype = 3;
-   */
-  archetype?: string | undefined;
-};
-
-/**
- * Describes the message cyber.system.v1.CreatePopulationRequest.
- * Use `create(CreatePopulationRequestSchema)` to create a new message.
- */
-export const CreatePopulationRequestSchema: GenMessage<CreatePopulationRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_population, 1);
-
-/**
- * @generated from message cyber.system.v1.CreatePopulationResponse
- */
-export type CreatePopulationResponse = Message<"cyber.system.v1.CreatePopulationResponse"> & {
-  /**
-   * @generated from field: cyber.system.v1.Population population = 1;
-   */
-  population?: Population | undefined;
-};
-
-/**
- * Describes the message cyber.system.v1.CreatePopulationResponse.
- * Use `create(CreatePopulationResponseSchema)` to create a new message.
- */
-export const CreatePopulationResponseSchema: GenMessage<CreatePopulationResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_population, 2);
-
-/**
  * list
  *
  * @generated from message cyber.system.v1.ListPopulationsRequest
@@ -146,7 +94,7 @@ export type ListPopulationsRequest = Message<"cyber.system.v1.ListPopulationsReq
  * Use `create(ListPopulationsRequestSchema)` to create a new message.
  */
 export const ListPopulationsRequestSchema: GenMessage<ListPopulationsRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_population, 3);
+  messageDesc(file_cyber_system_v1_population, 1);
 
 /**
  * @generated from message cyber.system.v1.ListPopulationsResponse
@@ -168,24 +116,16 @@ export type ListPopulationsResponse = Message<"cyber.system.v1.ListPopulationsRe
  * Use `create(ListPopulationsResponseSchema)` to create a new message.
  */
 export const ListPopulationsResponseSchema: GenMessage<ListPopulationsResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_population, 4);
+  messageDesc(file_cyber_system_v1_population, 2);
 
 /**
- * Population registry write face: instances of the compile-time archetype
+ * Population registry read face: instances of the compile-time archetype
  * vocabulary (engine | patron). Codes are join keys — immutable once born.
- * The default population is born by seed and protected here.
+ * Rows are deploy-declared state, born and reconciled by the seed.
  *
  * @generated from service cyber.system.v1.PopulationService
  */
 export const PopulationService: GenService<{
-  /**
-   * @generated from rpc cyber.system.v1.PopulationService.CreatePopulation
-   */
-  createPopulation: {
-    methodKind: "unary";
-    input: typeof CreatePopulationRequestSchema;
-    output: typeof CreatePopulationResponseSchema;
-  },
   /**
    * @generated from rpc cyber.system.v1.PopulationService.ListPopulations
    */

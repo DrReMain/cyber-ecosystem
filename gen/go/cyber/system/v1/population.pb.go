@@ -111,115 +111,6 @@ func (x *Population) GetArchetype() *wrapperspb.StringValue {
 	return nil
 }
 
-// create
-type CreatePopulationRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Same charset law as the tenant join key; the ent schema enforces it at
-	// the write as the backstop.
-	Code *string `protobuf:"bytes,1,opt,name=code,proto3,oneof" json:"code,omitempty"`
-	Name *string `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
-	// engine | patron — the compile-time vocabulary; membership in the word
-	// set is validated in code, the single source of the vocabulary.
-	Archetype     *string `protobuf:"bytes,3,opt,name=archetype,proto3,oneof" json:"archetype,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreatePopulationRequest) Reset() {
-	*x = CreatePopulationRequest{}
-	mi := &file_cyber_system_v1_population_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreatePopulationRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreatePopulationRequest) ProtoMessage() {}
-
-func (x *CreatePopulationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_population_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreatePopulationRequest.ProtoReflect.Descriptor instead.
-func (*CreatePopulationRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_population_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *CreatePopulationRequest) GetCode() string {
-	if x != nil && x.Code != nil {
-		return *x.Code
-	}
-	return ""
-}
-
-func (x *CreatePopulationRequest) GetName() string {
-	if x != nil && x.Name != nil {
-		return *x.Name
-	}
-	return ""
-}
-
-func (x *CreatePopulationRequest) GetArchetype() string {
-	if x != nil && x.Archetype != nil {
-		return *x.Archetype
-	}
-	return ""
-}
-
-type CreatePopulationResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Population    *Population            `protobuf:"bytes,1,opt,name=population,proto3" json:"population,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreatePopulationResponse) Reset() {
-	*x = CreatePopulationResponse{}
-	mi := &file_cyber_system_v1_population_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreatePopulationResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreatePopulationResponse) ProtoMessage() {}
-
-func (x *CreatePopulationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_population_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreatePopulationResponse.ProtoReflect.Descriptor instead.
-func (*CreatePopulationResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_population_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *CreatePopulationResponse) GetPopulation() *Population {
-	if x != nil {
-		return x.Population
-	}
-	return nil
-}
-
 // list
 type ListPopulationsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -233,7 +124,7 @@ type ListPopulationsRequest struct {
 
 func (x *ListPopulationsRequest) Reset() {
 	*x = ListPopulationsRequest{}
-	mi := &file_cyber_system_v1_population_proto_msgTypes[3]
+	mi := &file_cyber_system_v1_population_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -245,7 +136,7 @@ func (x *ListPopulationsRequest) String() string {
 func (*ListPopulationsRequest) ProtoMessage() {}
 
 func (x *ListPopulationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_population_proto_msgTypes[3]
+	mi := &file_cyber_system_v1_population_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -258,7 +149,7 @@ func (x *ListPopulationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPopulationsRequest.ProtoReflect.Descriptor instead.
 func (*ListPopulationsRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_population_proto_rawDescGZIP(), []int{3}
+	return file_cyber_system_v1_population_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ListPopulationsRequest) GetPage() *v1.PageRequest {
@@ -299,7 +190,7 @@ type ListPopulationsResponse struct {
 
 func (x *ListPopulationsResponse) Reset() {
 	*x = ListPopulationsResponse{}
-	mi := &file_cyber_system_v1_population_proto_msgTypes[4]
+	mi := &file_cyber_system_v1_population_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -311,7 +202,7 @@ func (x *ListPopulationsResponse) String() string {
 func (*ListPopulationsResponse) ProtoMessage() {}
 
 func (x *ListPopulationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_population_proto_msgTypes[4]
+	mi := &file_cyber_system_v1_population_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -324,7 +215,7 @@ func (x *ListPopulationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPopulationsResponse.ProtoReflect.Descriptor instead.
 func (*ListPopulationsResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_population_proto_rawDescGZIP(), []int{4}
+	return file_cyber_system_v1_population_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListPopulationsResponse) GetPage() *v1.PageResponse {
@@ -355,21 +246,7 @@ const file_cyber_system_v1_population_proto_rawDesc = "" +
 	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x120\n" +
 	"\x04code\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x04code\x120\n" +
 	"\x04name\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\x04name\x12:\n" +
-	"\tarchetype\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\tarchetype\"\xd7\x01\n" +
-	"\x17CreatePopulationRequest\x12E\n" +
-	"\x04code\x18\x01 \x01(\tB,\xbaH)\xc8\x01\x01r$\x10\x02\x18\x142\x1e^[a-z][a-z0-9-]{0,18}[a-z0-9]$H\x00R\x04code\x88\x01\x01\x12&\n" +
-	"\x04name\x18\x02 \x01(\tB\r\xbaH\n" +
-	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x01R\x04name\x88\x01\x01\x12-\n" +
-	"\tarchetype\x18\x03 \x01(\tB\n" +
-	"\xbaH\a\xc8\x01\x01r\x02\x18\x10H\x02R\tarchetype\x88\x01\x01B\a\n" +
-	"\x05_codeB\a\n" +
-	"\x05_nameB\f\n" +
-	"\n" +
-	"_archetype\"W\n" +
-	"\x18CreatePopulationResponse\x12;\n" +
-	"\n" +
-	"population\x18\x01 \x01(\v2\x1b.cyber.system.v1.PopulationR\n" +
-	"population\"\xc0\x02\n" +
+	"\tarchetype\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\tarchetype\"\xc0\x02\n" +
 	"\x16ListPopulationsRequest\x127\n" +
 	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12\x17\n" +
 	"\x04code\x18\x02 \x01(\tH\x00R\x04code\x88\x01\x01\x12\x17\n" +
@@ -380,12 +257,10 @@ const file_cyber_system_v1_population_proto_rawDesc = "" +
 	"\x05_name\"\x84\x01\n" +
 	"\x17ListPopulationsResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x12/\n" +
-	"\x04list\x18\x02 \x03(\v2\x1b.cyber.system.v1.PopulationR\x04list2\xf1\x02\n" +
+	"\x04list\x18\x02 \x03(\v2\x1b.cyber.system.v1.PopulationR\x04list2\xce\x01\n" +
 	"\x11PopulationService\x12\xa6\x01\n" +
-	"\x10CreatePopulation\x12(.cyber.system.v1.CreatePopulationRequest\x1a).cyber.system.v1.CreatePopulationResponse\"=\x88\xf1\x04\x03\x8a\xd3\x0e\x10\n" +
-	"\f创建人口\x10\x02\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/system/populations\x12\xa0\x01\n" +
-	"\x0fListPopulations\x12'.cyber.system.v1.ListPopulationsRequest\x1a(.cyber.system.v1.ListPopulationsResponse\":\x88\xf1\x04\x03\x8a\xd3\x0e\x10\n" +
-	"\f人口列表\x10\x01\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/system/populations\x1a\x10\x8a\xe2\t\f人口管理B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"\x0fListPopulations\x12'.cyber.system.v1.ListPopulationsRequest\x1a(.cyber.system.v1.ListPopulationsResponse\"@\x88\xf1\x04\x03\x8a\xd3\x0e\x16\n" +
+	"\x12用户类型列表\x10\x01\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/system/populations\x1a\x10\x8a\xe2\t\f用户类型B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_population_proto_rawDescOnce sync.Once
@@ -399,38 +274,33 @@ func file_cyber_system_v1_population_proto_rawDescGZIP() []byte {
 	return file_cyber_system_v1_population_proto_rawDescData
 }
 
-var file_cyber_system_v1_population_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_cyber_system_v1_population_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_cyber_system_v1_population_proto_goTypes = []any{
-	(*Population)(nil),               // 0: cyber.system.v1.Population
-	(*CreatePopulationRequest)(nil),  // 1: cyber.system.v1.CreatePopulationRequest
-	(*CreatePopulationResponse)(nil), // 2: cyber.system.v1.CreatePopulationResponse
-	(*ListPopulationsRequest)(nil),   // 3: cyber.system.v1.ListPopulationsRequest
-	(*ListPopulationsResponse)(nil),  // 4: cyber.system.v1.ListPopulationsResponse
-	(*wrapperspb.StringValue)(nil),   // 5: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),    // 6: google.protobuf.Timestamp
-	(*v1.PageRequest)(nil),           // 7: cyber.shared.common.v1.PageRequest
-	(*v1.PageResponse)(nil),          // 8: cyber.shared.common.v1.PageResponse
+	(*Population)(nil),              // 0: cyber.system.v1.Population
+	(*ListPopulationsRequest)(nil),  // 1: cyber.system.v1.ListPopulationsRequest
+	(*ListPopulationsResponse)(nil), // 2: cyber.system.v1.ListPopulationsResponse
+	(*wrapperspb.StringValue)(nil),  // 3: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),   // 4: google.protobuf.Timestamp
+	(*v1.PageRequest)(nil),          // 5: cyber.shared.common.v1.PageRequest
+	(*v1.PageResponse)(nil),         // 6: cyber.shared.common.v1.PageResponse
 }
 var file_cyber_system_v1_population_proto_depIdxs = []int32{
-	5,  // 0: cyber.system.v1.Population.id:type_name -> google.protobuf.StringValue
-	6,  // 1: cyber.system.v1.Population.created_at:type_name -> google.protobuf.Timestamp
-	6,  // 2: cyber.system.v1.Population.updated_at:type_name -> google.protobuf.Timestamp
-	5,  // 3: cyber.system.v1.Population.code:type_name -> google.protobuf.StringValue
-	5,  // 4: cyber.system.v1.Population.name:type_name -> google.protobuf.StringValue
-	5,  // 5: cyber.system.v1.Population.archetype:type_name -> google.protobuf.StringValue
-	0,  // 6: cyber.system.v1.CreatePopulationResponse.population:type_name -> cyber.system.v1.Population
-	7,  // 7: cyber.system.v1.ListPopulationsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	8,  // 8: cyber.system.v1.ListPopulationsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	0,  // 9: cyber.system.v1.ListPopulationsResponse.list:type_name -> cyber.system.v1.Population
-	1,  // 10: cyber.system.v1.PopulationService.CreatePopulation:input_type -> cyber.system.v1.CreatePopulationRequest
-	3,  // 11: cyber.system.v1.PopulationService.ListPopulations:input_type -> cyber.system.v1.ListPopulationsRequest
-	2,  // 12: cyber.system.v1.PopulationService.CreatePopulation:output_type -> cyber.system.v1.CreatePopulationResponse
-	4,  // 13: cyber.system.v1.PopulationService.ListPopulations:output_type -> cyber.system.v1.ListPopulationsResponse
-	12, // [12:14] is the sub-list for method output_type
-	10, // [10:12] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	3,  // 0: cyber.system.v1.Population.id:type_name -> google.protobuf.StringValue
+	4,  // 1: cyber.system.v1.Population.created_at:type_name -> google.protobuf.Timestamp
+	4,  // 2: cyber.system.v1.Population.updated_at:type_name -> google.protobuf.Timestamp
+	3,  // 3: cyber.system.v1.Population.code:type_name -> google.protobuf.StringValue
+	3,  // 4: cyber.system.v1.Population.name:type_name -> google.protobuf.StringValue
+	3,  // 5: cyber.system.v1.Population.archetype:type_name -> google.protobuf.StringValue
+	5,  // 6: cyber.system.v1.ListPopulationsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	6,  // 7: cyber.system.v1.ListPopulationsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	0,  // 8: cyber.system.v1.ListPopulationsResponse.list:type_name -> cyber.system.v1.Population
+	1,  // 9: cyber.system.v1.PopulationService.ListPopulations:input_type -> cyber.system.v1.ListPopulationsRequest
+	2,  // 10: cyber.system.v1.PopulationService.ListPopulations:output_type -> cyber.system.v1.ListPopulationsResponse
+	10, // [10:11] is the sub-list for method output_type
+	9,  // [9:10] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_population_proto_init() }
@@ -439,14 +309,13 @@ func file_cyber_system_v1_population_proto_init() {
 		return
 	}
 	file_cyber_system_v1_population_proto_msgTypes[1].OneofWrappers = []any{}
-	file_cyber_system_v1_population_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_system_v1_population_proto_rawDesc), len(file_cyber_system_v1_population_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

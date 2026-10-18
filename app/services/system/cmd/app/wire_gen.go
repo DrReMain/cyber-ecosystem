@@ -33,7 +33,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, catalog *conf.Catalog, confAuth *conf.Auth, logger *slog.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, data *conf.Data, catalog *conf.Catalog, confAuth *conf.Auth, seed *conf.Seed, logger *slog.Logger) (*kratos.App, func(), error) {
 	cache, cleanup, err := platform.NewCache(data, logger)
 	if err != nil {
 		return nil, nil, err
@@ -114,7 +114,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, ca
 	}
 	tenantRP := tenant.NewTenantRP(logger, platformPlatform)
 	tokenRP := auth.NewTokenRP(logger, platformPlatform)
-	authUC, err := auth.NewAuthUC(logger, platformPlatform, confAuth, userRP, authzRP, tenantRP, tokenRP)
+	authUC, err := auth.NewAuthUC(logger, platformPlatform, confAuth, userRP, authzRP, tenantRP, populationRP, tokenRP)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -151,7 +151,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, ca
 	grpcServer := server.NewGRPCServer(confServer, logger, v, authUC, authzUC, auditUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, authUC, authzUC, auditUC)
 	connectServer := server.NewConnectServer(confServer, logger, v, authUC, authzUC, auditUC)
-	seed, err := bootstrap.NewSeed(confAuthz, platformPlatform, logger)
+	bootstrapSeed, err := bootstrap.NewSeed(seed, platformPlatform, logger)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -160,7 +160,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, confAuthz *conf.Authz, ca
 		cleanup()
 		return nil, nil, err
 	}
-	app := newApp(logger, grpcServer, httpServer, connectServer, seed, lifecycle)
+	app := newApp(logger, grpcServer, httpServer, connectServer, bootstrapSeed, lifecycle)
 	return app, func() {
 		cleanup5()
 		cleanup4()

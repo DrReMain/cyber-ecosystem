@@ -1,18 +1,14 @@
-import { useMutation, useQuery } from "@connectrpc/connect-query";
+import { useQuery } from "@connectrpc/connect-query";
 import type { Population } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/population_pb";
-import {
-  createPopulation,
-  listPopulations,
-} from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/population-PopulationService_connectquery";
+import { listPopulations } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/population-PopulationService_connectquery";
 import { Filter } from "@cyber-ecosystem/shared-antd/filter";
 import { useFilter } from "@cyber-ecosystem/shared-antd/use-search";
 import { useSearch } from "@tanstack/react-router";
 import { Card } from "antd";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
 import { parsePopulationsSearch, populationsSearchSchema } from "./search";
-import { PopulationDrawer } from "./ui/population-drawer";
 import { PopulationsTable } from "./ui/populations-table";
 
 const POPULATIONS_INPUT = { orderBy: ["code:asc"], page: { all: true } };
@@ -30,15 +26,8 @@ export function PopulationsPage() {
   const search = useSearch({ from: AREA });
   const store = useAreaSearchStore(AREA, search, parsePopulationsSearch);
   const { values, onFilter, onReset } = useFilter(store, populationsSearchSchema);
-  const [creating, setCreating] = useState(false);
 
   const populationsQuery = useQuery(listPopulations, POPULATIONS_INPUT);
-  const createMut = useMutation(createPopulation, {
-    onSuccess: () => {
-      void populationsQuery.refetch();
-      setCreating(false);
-    },
-  });
 
   const populations = useMemo(
     () =>
@@ -73,18 +62,9 @@ export function PopulationsPage() {
       </Card>
       <PopulationsTable
         loading={populationsQuery.isFetching}
-        onCreate={() => setCreating(true)}
         onRefresh={() => void populationsQuery.refetch()}
         populations={populations}
       />
-      {creating ? (
-        <PopulationDrawer
-          onClose={() => setCreating(false)}
-          onSave={(draft) => createMut.mutate(draft)}
-          open
-          pending={createMut.isPending}
-        />
-      ) : null}
     </div>
   );
 }

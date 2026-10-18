@@ -12,25 +12,14 @@ import "google/protobuf/wrappers.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 
-// Population registry write face: instances of the compile-time archetype
+// Population registry read face: instances of the compile-time archetype
 // vocabulary (engine | patron). Codes are join keys — immutable once born.
-// The default population is born by seed and protected here.
+// Rows are deploy-declared state, born and reconciled by the seed.
 service PopulationService {
-  option (cyber.ext.v1.service_comment) = "人口管理";
-  rpc CreatePopulation(CreatePopulationRequest) returns (CreatePopulationResponse) {
-    option (cyber.ext.v1.method) = {
-      comment: "创建人口"
-      action: ACTION_WRITE
-    };
-    option (cyber.ext.v1.access) = ACCESS_PLATFORM;
-    option (google.api.http) = {
-      post: "/api/v1/system/populations"
-      body: "*"
-    };
-  }
+  option (cyber.ext.v1.service_comment) = "用户类型";
   rpc ListPopulations(ListPopulationsRequest) returns (ListPopulationsResponse) {
     option (cyber.ext.v1.method) = {
-      comment: "人口列表"
+      comment: "用户类型列表"
       action: ACTION_READ
     };
     option (cyber.ext.v1.access) = ACCESS_PLATFORM;
@@ -45,37 +34,6 @@ message Population {
   google.protobuf.StringValue code = 4;
   google.protobuf.StringValue name = 5;
   google.protobuf.StringValue archetype = 6;
-}
-
-// create
-message CreatePopulationRequest {
-  // Same charset law as the tenant join key; the ent schema enforces it at
-  // the write as the backstop.
-  optional string code = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string = {
-      min_len: 2
-      max_len: 20
-      pattern: "^[a-z][a-z0-9-]{0,18}[a-z0-9]$"
-    }
-  ];
-  optional string name = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string = {
-      min_len: 1
-      max_len: 128
-    }
-  ];
-  // engine | patron — the compile-time vocabulary; membership in the word
-  // set is validated in code, the single source of the vocabulary.
-  optional string archetype = 3 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.max_len = 16
-  ];
-}
-
-message CreatePopulationResponse {
-  Population population = 1;
 }
 
 // list

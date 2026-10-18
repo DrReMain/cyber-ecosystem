@@ -33,9 +33,6 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// PopulationServiceCreatePopulationProcedure is the fully-qualified name of the PopulationService's
-	// CreatePopulation RPC.
-	PopulationServiceCreatePopulationProcedure = "/cyber.system.v1.PopulationService/CreatePopulation"
 	// PopulationServiceListPopulationsProcedure is the fully-qualified name of the PopulationService's
 	// ListPopulations RPC.
 	PopulationServiceListPopulationsProcedure = "/cyber.system.v1.PopulationService/ListPopulations"
@@ -43,7 +40,6 @@ const (
 
 // PopulationServiceClient is a client for the cyber.system.v1.PopulationService service.
 type PopulationServiceClient interface {
-	CreatePopulation(context.Context, *connect.Request[v1.CreatePopulationRequest]) (*connect.Response[v1.CreatePopulationResponse], error)
 	ListPopulations(context.Context, *connect.Request[v1.ListPopulationsRequest]) (*connect.Response[v1.ListPopulationsResponse], error)
 }
 
@@ -58,12 +54,6 @@ func NewPopulationServiceClient(httpClient connect.HTTPClient, baseURL string, o
 	baseURL = strings.TrimRight(baseURL, "/")
 	populationServiceMethods := v1.File_cyber_system_v1_population_proto.Services().ByName("PopulationService").Methods()
 	return &populationServiceClient{
-		createPopulation: connect.NewClient[v1.CreatePopulationRequest, v1.CreatePopulationResponse](
-			httpClient,
-			baseURL+PopulationServiceCreatePopulationProcedure,
-			connect.WithSchema(populationServiceMethods.ByName("CreatePopulation")),
-			connect.WithClientOptions(opts...),
-		),
 		listPopulations: connect.NewClient[v1.ListPopulationsRequest, v1.ListPopulationsResponse](
 			httpClient,
 			baseURL+PopulationServiceListPopulationsProcedure,
@@ -75,13 +65,7 @@ func NewPopulationServiceClient(httpClient connect.HTTPClient, baseURL string, o
 
 // populationServiceClient implements PopulationServiceClient.
 type populationServiceClient struct {
-	createPopulation *connect.Client[v1.CreatePopulationRequest, v1.CreatePopulationResponse]
-	listPopulations  *connect.Client[v1.ListPopulationsRequest, v1.ListPopulationsResponse]
-}
-
-// CreatePopulation calls cyber.system.v1.PopulationService.CreatePopulation.
-func (c *populationServiceClient) CreatePopulation(ctx context.Context, req *connect.Request[v1.CreatePopulationRequest]) (*connect.Response[v1.CreatePopulationResponse], error) {
-	return c.createPopulation.CallUnary(ctx, req)
+	listPopulations *connect.Client[v1.ListPopulationsRequest, v1.ListPopulationsResponse]
 }
 
 // ListPopulations calls cyber.system.v1.PopulationService.ListPopulations.
@@ -91,7 +75,6 @@ func (c *populationServiceClient) ListPopulations(ctx context.Context, req *conn
 
 // PopulationServiceHandler is an implementation of the cyber.system.v1.PopulationService service.
 type PopulationServiceHandler interface {
-	CreatePopulation(context.Context, *connect.Request[v1.CreatePopulationRequest]) (*connect.Response[v1.CreatePopulationResponse], error)
 	ListPopulations(context.Context, *connect.Request[v1.ListPopulationsRequest]) (*connect.Response[v1.ListPopulationsResponse], error)
 }
 
@@ -102,12 +85,6 @@ type PopulationServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewPopulationServiceHandler(svc PopulationServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	populationServiceMethods := v1.File_cyber_system_v1_population_proto.Services().ByName("PopulationService").Methods()
-	populationServiceCreatePopulationHandler := connect.NewUnaryHandler(
-		PopulationServiceCreatePopulationProcedure,
-		svc.CreatePopulation,
-		connect.WithSchema(populationServiceMethods.ByName("CreatePopulation")),
-		connect.WithHandlerOptions(opts...),
-	)
 	populationServiceListPopulationsHandler := connect.NewUnaryHandler(
 		PopulationServiceListPopulationsProcedure,
 		svc.ListPopulations,
@@ -116,8 +93,6 @@ func NewPopulationServiceHandler(svc PopulationServiceHandler, opts ...connect.H
 	)
 	return "/cyber.system.v1.PopulationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case PopulationServiceCreatePopulationProcedure:
-			populationServiceCreatePopulationHandler.ServeHTTP(w, r)
 		case PopulationServiceListPopulationsProcedure:
 			populationServiceListPopulationsHandler.ServeHTTP(w, r)
 		default:
@@ -128,10 +103,6 @@ func NewPopulationServiceHandler(svc PopulationServiceHandler, opts ...connect.H
 
 // UnimplementedPopulationServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedPopulationServiceHandler struct{}
-
-func (UnimplementedPopulationServiceHandler) CreatePopulation(context.Context, *connect.Request[v1.CreatePopulationRequest]) (*connect.Response[v1.CreatePopulationResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.PopulationService.CreatePopulation is not implemented"))
-}
 
 func (UnimplementedPopulationServiceHandler) ListPopulations(context.Context, *connect.Request[v1.ListPopulationsRequest]) (*connect.Response[v1.ListPopulationsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.PopulationService.ListPopulations is not implemented"))

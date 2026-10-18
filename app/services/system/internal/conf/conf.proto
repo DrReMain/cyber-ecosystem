@@ -11,8 +11,8 @@ message Bootstrap {
   Data data = 2;
   Observability observability = 3;
   Catalog catalog = 4;
-  Authz authz = 5;
-  Auth auth = 6;
+  Auth auth = 5;
+  Seed seed = 6;
 }
 
 message Server {
@@ -144,11 +144,6 @@ message Catalog {
   string dir = 1;
 }
 
-message Authz {
-  repeated string super_admins = 1;
-  string initial_password = 2;
-}
-
 message Auth {
   message Provider {
     message WeChat {
@@ -161,6 +156,19 @@ message Auth {
     string endpoint = 4; // exchange base URL; empty = the kind's default (tests override here)
     bool auto_register = 6;
     WeChat wechat = 5;
+    string population = 7; // landing population for this provider's logins (births and bound entries); empty = the default population
   }
   repeated Provider providers = 1;
+}
+
+message Seed {
+  message Population {
+    string code = 1;      // join key; declaring the default population is a config error
+    string name = 2;
+    string archetype = 3; // engine | patron
+  }
+  // the floor that lets a fresh deployment grant its first user
+  repeated string super_admins = 1;
+  string initial_password = 2;
+  repeated Population populations = 3;
 }

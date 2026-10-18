@@ -35,13 +35,10 @@ enum System {
   SYSTEM_ROLE_HAS_BINDINGS = 6021 [(.errors.code) = 400];
   // 603x: permission
   SYSTEM_PERMISSION_INVALID_OPERATION = 6030 [(.errors.code) = 400];
-  reserved 6031;
   // 604x: policy
   SYSTEM_POLICY_UNKNOWN_KIND = 6040 [(.errors.code) = 400];
   SYSTEM_POLICY_INVALID_PARAMS = 6041 [(.errors.code) = 400];
   SYSTEM_POLICY_NOT_FOUND = 6042 [(.errors.code) = 404];
-  // 605x: apikey (provision cleared 2026-09-29; number stays reserved)
-  reserved 6050;
   // 606x: authz runtime
   SYSTEM_AUTHZ_POLICY_DENIED = 6060 [(.errors.code) = 403];
   // 607x: user
@@ -59,10 +56,6 @@ enum System {
   SYSTEM_TENANT_DISABLED = 6090 [(.errors.code) = 403];
   SYSTEM_TENANT_NOT_FOUND = 6091 [(.errors.code) = 404];
   SYSTEM_TENANT_PROTECTED = 6092 [(.errors.code) = 400];
-  reserved 6093; // was SYSTEM_LOGIN_SEAT_REQUIRED until it moved home to the 600x login segment
   // 610x: population registry
-  SYSTEM_POPULATION_EXISTS = 6100 [(.errors.code) = 409];
-  SYSTEM_POPULATION_PROTECTED = 6101 [(.errors.code) = 400];
-  SYSTEM_POPULATION_INVALID_ARCHETYPE = 6102 [(.errors.code) = 400];
-  SYSTEM_POPULATION_NOT_FOUND = 6103 [(.errors.code) = 404];
+  SYSTEM_POPULATION_NOT_FOUND = 6101 [(.errors.code) = 404];
 }

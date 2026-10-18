@@ -15,6 +15,7 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent"
 	"cyber-ecosystem/app/services/system/internal/ent/credential"
 	"cyber-ecosystem/app/services/system/internal/ent/membership"
+	"cyber-ecosystem/app/services/system/internal/ent/population"
 	"cyber-ecosystem/app/services/system/internal/ent/predicate"
 	"cyber-ecosystem/app/services/system/internal/ent/principalrole"
 	"cyber-ecosystem/app/services/system/internal/ent/role"
@@ -345,9 +346,16 @@ func (rp *userRP) RevokeUserSessions(ctx context.Context, userID string) error {
 func seatNarrowing(tenantID string) predicate.User {
 	return predicate.User(func(s *entsql.Selector) {
 		m := entsql.Table(membership.Table)
+		pops := entsql.Table(population.Table)
 		s.Where(entsql.Exists(entsql.Select(m.C(membership.FieldUserID)).From(m).Where(entsql.And(
 			entsql.EQ(m.C(membership.FieldTenantID), tenantID),
 			entsql.EQ(m.C(membership.FieldUserID), entsql.Raw(s.C(user.FieldID))),
+			entsql.NotIn(
+				m.C(membership.FieldPopulation),
+				entsql.Select(pops.C(population.FieldCode)).From(pops).Where(
+					entsql.EQ(pops.C(population.FieldArchetype), security.ArchetypePatron),
+				),
+			),
 		))))
 	})
 }

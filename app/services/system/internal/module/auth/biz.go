@@ -14,6 +14,7 @@ import (
 
 	"cyber-ecosystem/app/services/system/internal/conf"
 	"cyber-ecosystem/app/services/system/internal/module/authz"
+	"cyber-ecosystem/app/services/system/internal/module/population"
 	"cyber-ecosystem/app/services/system/internal/module/tenant"
 	"cyber-ecosystem/app/services/system/internal/module/user"
 	"cyber-ecosystem/app/services/system/internal/shared"
@@ -61,14 +62,15 @@ type TokenRP interface {
 
 type AuthUC struct {
 	shared.UC
-	auth     *conf.Auth
-	userRP   user.UserRP
-	authzRP  authz.AuthzRP
-	tenantRP tenant.TenantRP
-	tokenRP  TokenRP
+	auth         *conf.Auth
+	userRP       user.UserRP
+	authzRP      authz.AuthzRP
+	tenantRP     tenant.TenantRP
+	populationRP population.PopulationRP
+	tokenRP      TokenRP
 }
 
-func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, userRP user.UserRP, authzRP authz.AuthzRP, tenantRP tenant.TenantRP, tokenRP TokenRP) (*AuthUC, error) {
+func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, userRP user.UserRP, authzRP authz.AuthzRP, tenantRP tenant.TenantRP, populationRP population.PopulationRP, tokenRP TokenRP) (*AuthUC, error) {
 	if auth != nil {
 		for _, row := range auth.GetProviders() {
 			if _, ok := identityProviders[row.GetKind()]; !ok {
@@ -77,23 +79,24 @@ func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, user
 		}
 	}
 	return &AuthUC{
-		UC:       shared.NewUC(logger.With("module", "module/auth"), tm),
-		auth:     auth,
-		userRP:   userRP,
-		authzRP:  authzRP,
-		tenantRP: tenantRP,
-		tokenRP:  tokenRP,
+		UC:           shared.NewUC(logger.With("module", "module/auth"), tm),
+		auth:         auth,
+		userRP:       userRP,
+		authzRP:      authzRP,
+		tenantRP:     tenantRP,
+		populationRP: populationRP,
+		tokenRP:      tokenRP,
 	}, nil
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *AuthUC) Login(ctx context.Context, email, password string) (token string, issuedAt, expiresAt time.Time, err error) {
+func (uc *AuthUC) Login(ctx context.Context, email, password, seatPopulation string) (token string, issuedAt, expiresAt time.Time, err error) {
 	u, err := uc.exchangePassword(ctx, email, password)
 	if err != nil {
 		return "", time.Time{}, time.Time{}, err
 	}
-	seat, err := uc.resolveSeat(ctx, u)
+	seat, err := uc.resolveSeat(ctx, u, seatPopulation)
 	if err != nil {
 		return "", time.Time{}, time.Time{}, err
 	}
@@ -102,6 +105,10 @@ func (uc *AuthUC) Login(ctx context.Context, email, password string) (token stri
 
 func (uc *AuthUC) LoginByIdentity(ctx context.Context, providerKey, state string, payload identityPayload) (token string, issuedAt, expiresAt time.Time, err error) {
 	row, p, err := uc.providerRow(providerKey)
+	if err != nil {
+		return "", time.Time{}, time.Time{}, err
+	}
+	birthPopulation, err := uc.landingPopulation(ctx, row)
 	if err != nil {
 		return "", time.Time{}, time.Time{}, err
 	}
@@ -120,7 +127,7 @@ func (uc *AuthUC) LoginByIdentity(ctx context.Context, providerKey, state string
 				if aerr != nil {
 					return "", time.Time{}, time.Time{}, aerr
 				}
-				seat, serr := uc.resolveSeat(ctx, u)
+				seat, serr := uc.resolveProviderSeat(ctx, u, birthPopulation)
 				if serr != nil {
 					return "", time.Time{}, time.Time{}, serr
 				}
@@ -135,7 +142,7 @@ func (uc *AuthUC) LoginByIdentity(ctx context.Context, providerKey, state string
 	if err != nil {
 		return "", time.Time{}, time.Time{}, err
 	}
-	seat, err := uc.resolveSeat(ctx, u)
+	seat, err := uc.resolveProviderSeat(ctx, u, birthPopulation)
 	if err != nil {
 		return "", time.Time{}, time.Time{}, err
 	}
@@ -178,13 +185,6 @@ func (uc *AuthUC) autoRegister(ctx context.Context, id *exchangedIdentity) (*use
 				return cerr
 			}
 			u = created
-		}
-		if serr := uc.userRP.EnsureSeat(ctx, &user.Seat{
-			UserID:     u.ID,
-			TenantID:   security.DefaultTenant,
-			Population: security.DefaultPopulation,
-		}); serr != nil {
-			return serr
 		}
 		return uc.userRP.CreateCredential(ctx, &user.Credential{
 			Kind:       id.Kind,
@@ -307,7 +307,11 @@ func (uc *AuthUC) AuthenticateSession(ctx context.Context, token string) (*secur
 	if err := uc.tokenRP.Expire(ctx, sessionPrefix+token, slide); err != nil {
 		return nil, err
 	}
-	return &security.Subject{UserID: sess.UserID, TenantID: sess.TenantID, Population: sess.Population, SessionID: token, Extra: map[string]any{shared.ExtraEmail: sess.Email}}, nil
+	archetype, err := uc.authzRP.ArchetypeOf(sess.Population)
+	if err != nil {
+		return nil, err
+	}
+	return &security.Subject{UserID: sess.UserID, TenantID: sess.TenantID, Population: sess.Population, Archetype: archetype, SessionID: token, Extra: map[string]any{shared.ExtraEmail: sess.Email}}, nil
 }
 
 func (uc *AuthUC) GetCurrentUser(ctx context.Context) (*CurrentUser, error) {
@@ -401,7 +405,7 @@ func (uc *AuthUC) exchangePassword(ctx context.Context, email, password string) 
 	return u, nil
 }
 
-func (uc *AuthUC) resolveSeat(ctx context.Context, u *user.User) (*user.Seat, error) {
+func (uc *AuthUC) resolveSeat(ctx context.Context, u *user.User, hint string) (*user.Seat, error) {
 	if !u.Enabled {
 		return nil, systempb.ErrorSystemUserDisabled("").WithCause(fmt.Errorf("user disabled: %s", utils.Deref(u.Email, "")))
 	}
@@ -412,10 +416,75 @@ func (uc *AuthUC) resolveSeat(ctx context.Context, u *user.User) (*user.Seat, er
 	if len(seats) == 0 {
 		return nil, errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("identity without a seat: %s", u.ID))
 	}
+	if hint != "" {
+		for _, seat := range seats {
+			if seat.Population == hint {
+				return uc.liveSeat(ctx, seat)
+			}
+		}
+		return nil, systempb.ErrorSystemLoginSeatRequired("").WithCause(fmt.Errorf("identity holds no seat in population %q", hint))
+	}
 	if len(seats) > 1 {
 		return nil, systempb.ErrorSystemLoginSeatRequired("").WithCause(fmt.Errorf("identity holds %d seats; a choice is required", len(seats)))
 	}
-	seat := seats[0]
+	return uc.liveSeat(ctx, seats[0])
+}
+
+func (uc *AuthUC) resolveProviderSeat(ctx context.Context, u *user.User, population string) (*user.Seat, error) {
+	if !u.Enabled {
+		return nil, systempb.ErrorSystemUserDisabled("").WithCause(fmt.Errorf("user disabled: %s", utils.Deref(u.Email, "")))
+	}
+	seat, err := uc.seatInPopulation(ctx, u.ID, population)
+	if err != nil {
+		return nil, err
+	}
+	if seat != nil {
+		return uc.liveSeat(ctx, seat)
+	}
+	// A bound identity enters the provider's population here — entering the
+	// face is the provider's doing, never a prior administrative act. The
+	// unique index makes the ensure idempotent.
+	if serr := uc.userRP.EnsureSeat(ctx, &user.Seat{UserID: u.ID, TenantID: security.DefaultTenant, Population: population}); serr != nil {
+		return nil, serr
+	}
+	seat, err = uc.seatInPopulation(ctx, u.ID, population)
+	if err != nil {
+		return nil, err
+	}
+	if seat == nil {
+		return nil, errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("seat ensure left no seat: %s %s", u.ID, population))
+	}
+	return uc.liveSeat(ctx, seat)
+}
+
+func (uc *AuthUC) landingPopulation(ctx context.Context, row *conf.Auth_Provider) (string, error) {
+	code := row.GetPopulation()
+	if code == "" {
+		return security.DefaultPopulation, nil
+	}
+	if _, err := uc.populationRP.FindByCode(ctx, code); err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return "", systempb.ErrorSystemPopulationNotFound("").WithCause(fmt.Errorf("provider %q references population %q", row.GetKey(), code))
+		}
+		return "", err
+	}
+	return code, nil
+}
+
+func (uc *AuthUC) seatInPopulation(ctx context.Context, userID, population string) (*user.Seat, error) {
+	seats, err := uc.userRP.ListSeatsByUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	for _, seat := range seats {
+		if seat.Population == population {
+			return seat, nil
+		}
+	}
+	return nil, nil
+}
+
+func (uc *AuthUC) liveSeat(ctx context.Context, seat *user.Seat) (*user.Seat, error) {
 	live, err := uc.tenantLive(ctx, seat.TenantID)
 	if err != nil {
 		return nil, err

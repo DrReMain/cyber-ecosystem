@@ -12,13 +12,13 @@ import (
 	"testing"
 )
 
-// Static guards for the dependency rules kratos CONVENTIONS §2/§3 spell out
-// as prose: the module DAG, the shared-contract seams that must hold until
-// the multi-service split, and the composition layering (cmd/app wires
-// through bootstrap; shared stays a contracts-only kernel; injected app
-// contracts land in module biz constructors). A pure-function property like
-// compile() is review-enforced — a file walk cannot see it; the rest is
-// checked here, plus single-sourcing of the ABAC vocabulary.
+// Static guards for the dependency rules as code: the module DAG, the
+// shared-contract seams that must hold until the multi-service split, and
+// the composition layering (cmd/app wires through bootstrap; shared stays a
+// contracts-only kernel; injected app contracts land in module biz
+// constructors). A pure-function property like compile() is
+// review-enforced — a file walk cannot see it; the rest is checked here,
+// plus single-sourcing of the ABAC vocabulary.
 
 // bannedImports maps a package directory (relative to internal/, prefix
 // match) to import markers it must not contain. Direct imports only: a
@@ -38,7 +38,8 @@ var bannedImports = map[string][]string{
 	// Seam 1: the session-auth closure stays free of ent so it can move to
 	// shared-go at the split as-is.
 	"module/auth": {"internal/ent"},
-	// CONVENTIONS §3: shared → platform → ent closes a cycle.
+	// The kernel-to-schema direction is one-way (shared → platform → ent);
+	// an import back closes the cycle.
 	"ent/schema": {"internal/shared"},
 	// Bootstrap sits below business modules.
 	"bootstrap": {"module/"},
@@ -73,7 +74,7 @@ func TestModuleDependencyDAG(t *testing.T) {
 			for _, imp := range f.imports {
 				for _, ban := range bans {
 					if strings.Contains(imp, "/"+ban) {
-						t.Errorf("%s imports %q — %s must not depend on %s (CONVENTIONS §3 DAG)",
+						t.Errorf("%s imports %q — %s must not depend on %s (module DAG)",
 							f.rel, imp, dir, ban)
 					}
 				}

@@ -105,6 +105,17 @@ func (r *authzRP) PatronSubject(subject *security.Subject) (bool, error) {
 	return arch == security.ArchetypePatron, nil
 }
 
+func (r *authzRP) ArchetypeOf(population string) (string, error) {
+	if population == "" {
+		return "", nil
+	}
+	arch, ok := r.snap.Load().populations[population]
+	if !ok {
+		return "", errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("population %q missing from the compiled registry", population))
+	}
+	return arch, nil
+}
+
 func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID, tenant, operation string) (*ExplainResult, error) {
 	snap := r.snap.Load()
 	if snap == nil {

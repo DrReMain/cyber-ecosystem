@@ -44,14 +44,6 @@ func (s *PopulationService) RegisterConnect(srv *connecttransport.Server) {
 
 // Handler -------------------------------------------------------------------------------------------------------------
 
-func (s *PopulationService) CreatePopulation(ctx context.Context, in *systempb.CreatePopulationRequest) (*systempb.CreatePopulationResponse, error) {
-	out, err := s.populationUC.Create(ctx, in.GetCode(), in.GetName(), in.GetArchetype())
-	if err != nil {
-		return nil, err
-	}
-	return &systempb.CreatePopulationResponse{Population: toProtoPopulation(out)}, nil
-}
-
 func (s *PopulationService) ListPopulations(ctx context.Context, in *systempb.ListPopulationsRequest) (*systempb.ListPopulationsResponse, error) {
 	out, err := s.populationUC.List(ctx, &PopulationListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),

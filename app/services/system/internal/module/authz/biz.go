@@ -53,6 +53,7 @@ type AuthzRP interface {
 	ImplicitGrants(ctx context.Context, userID, tenant string) ([]GrantView, error)
 	EffectiveGrants(ctx context.Context, subject *security.Subject) ([]GrantView, error)
 	PatronSubject(subject *security.Subject) (bool, error)
+	ArchetypeOf(population string) (string, error)
 	ExplainGrants(ctx context.Context, principalType, principalID, tenant, operation string) (*ExplainResult, error)
 	PreviewGrants(ctx context.Context, tenant string, roleCodes []string) ([]string, error)
 	StartWatch(ctx context.Context) error
