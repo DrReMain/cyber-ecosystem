@@ -1,0 +1,107 @@
+[
+  {
+    "name": "GameService",
+    "full_name": "cyber.esports.v1.GameService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/game.proto",
+    "comment": "游戏目录",
+    "methods": [
+      {
+        "name": "ListGames",
+        "full_name": "cyber.esports.v1.GameService.ListGames",
+        "request_name": "ListGamesRequest",
+        "request_full_name": "cyber.esports.v1.ListGamesRequest",
+        "response_name": "ListGamesResponse",
+        "response_full_name": "cyber.esports.v1.ListGamesResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/games",
+        "comment": "游戏目录列表",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "ProfileService",
+    "full_name": "cyber.esports.v1.ProfileService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/profile.proto",
+    "comment": "玩家画像",
+    "methods": [
+      {
+        "name": "GetProfile",
+        "full_name": "cyber.esports.v1.ProfileService.GetProfile",
+        "request_name": "GetProfileRequest",
+        "request_full_name": "cyber.esports.v1.GetProfileRequest",
+        "response_name": "GetProfileResponse",
+        "response_full_name": "cyber.esports.v1.GetProfileResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/profile",
+        "comment": "获取当前玩家画像",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "UpdateProfile",
+        "full_name": "cyber.esports.v1.ProfileService.UpdateProfile",
+        "request_name": "UpdateProfileRequest",
+        "request_full_name": "cyber.esports.v1.UpdateProfileRequest",
+        "response_name": "UpdateProfileResponse",
+        "response_full_name": "cyber.esports.v1.UpdateProfileResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/profile",
+        "comment": "保存当前玩家画像",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "TestService",
+    "full_name": "cyber.esports.v1.TestService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/test.proto",
+    "comment": "测试项",
+    "methods": [
+      {
+        "name": "GetTest",
+        "full_name": "cyber.esports.v1.TestService.GetTest",
+        "request_name": "GetTestRequest",
+        "request_full_name": "cyber.esports.v1.GetTestRequest",
+        "response_name": "GetTestResponse",
+        "response_full_name": "cyber.esports.v1.GetTestResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/tests/{id}",
+        "comment": "测试项详情",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "GetTestConfig",
+        "full_name": "cyber.esports.v1.TestService.GetTestConfig",
+        "request_name": "GetTestConfigRequest",
+        "request_full_name": "cyber.esports.v1.GetTestConfigRequest",
+        "response_name": "GetTestConfigResponse",
+        "response_full_name": "cyber.esports.v1.GetTestConfigResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/tests/{id}/config",
+        "comment": "测试项运行配置",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "ListTests",
+        "full_name": "cyber.esports.v1.TestService.ListTests",
+        "request_name": "ListTestsRequest",
+        "request_full_name": "cyber.esports.v1.ListTestsRequest",
+        "response_name": "ListTestsResponse",
+        "response_full_name": "cyber.esports.v1.ListTestsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/tests",
+        "comment": "测试项列表",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  }
+]

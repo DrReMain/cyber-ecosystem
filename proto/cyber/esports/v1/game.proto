@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// Esports title catalog — game names the played title, never the test item
+// (naming split). Preference voting and draw weights key off this catalog;
+// the C-end never hardcodes it. Admin management and classification live on
+// the admin face, not this read model.
+service GameService {
+  option (cyber.ext.v1.service_comment) = "游戏目录";
+  rpc ListGames(ListGamesRequest) returns (ListGamesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "游戏目录列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/games"};
+  }
+}
+
+message Game {
+  // Immutable code join key (e.g. "lol") — same law as tenant/population
+  // codes: born once, referenced forever.
+  google.protobuf.StringValue id = 1;
+  google.protobuf.StringValue name = 2;
+  // Seeded fps/moba; the vocabulary is admin-managed and open — new
+  // categories classify in without a contract change.
+  google.protobuf.StringValue category = 3;
+  google.protobuf.StringValue icon_url = 4;
+  google.protobuf.StringValue description = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// listGames — catalog-scale (9 titles at seed), so no pagination by design;
+// a page face is an additive change if the catalog ever grows into one.
+message ListGamesRequest {
+  optional string category = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 16
+  }];
+}
+
+message ListGamesResponse {
+  repeated Game games = 1;
+}

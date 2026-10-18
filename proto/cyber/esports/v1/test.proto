@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// Test catalog and per-test runtime delivery — test names the scored item,
+// never the played title (naming split). The C-end surfaces tests through
+// the matching flow, not a browse page: the list face is the hydration
+// source resolving match-step codes into display metadata, and the detail
+// face carries the long-form copy; the config face is the engine boot bag.
+// Grades are percentile-tiered server-side at submit time — the client
+// renders returned grades, never judges them.
+service TestService {
+  option (cyber.ext.v1.service_comment) = "测试项";
+  rpc ListTests(ListTestsRequest) returns (ListTestsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "测试项列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/tests"};
+  }
+  rpc GetTest(GetTestRequest) returns (GetTestResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "测试项详情"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/tests/{id}"};
+  }
+  rpc GetTestConfig(GetTestConfigRequest) returns (GetTestConfigResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "测试项运行配置"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/tests/{id}/config"};
+  }
+}
+
+message Test {
+  // Row address; the code below is the join key.
+  google.protobuf.StringValue id = 1;
+  // Immutable code join key (e.g. "red_dot") — engine registry, seeds, and
+  // cross-domain references key off the code, same law as game codes.
+  google.protobuf.StringValue code = 2;
+  google.protobuf.StringValue name = 3;
+  // Vocabulary {fps | moba | universal} — universal feeds every genre pool
+  // (skill_trajectory ruling). Open vocabulary, admin-managed; the word set
+  // is seed data, not a contract enum, so new categories classify in
+  // without touching this contract.
+  google.protobuf.StringValue category = 4;
+  // Primary ability, fixed six-word vocabulary shared with admin:
+  // reactionSpeed | aimingAccuracy | trackingStability |
+  // skillReleaseAccuracy | resourceAllocation | decisionEfficiency.
+  // Labels and colors are client-side vocabulary; contribution weights are
+  // report-domain, not this entity.
+  google.protobuf.StringValue ability = 5;
+  google.protobuf.StringValue description = 6;
+  // Display form of the unit score (e.g. "10 分/命中") — rendering copy
+  // only; the numeric unit score is a server-side scoring input and never
+  // crosses this contract.
+  google.protobuf.StringValue unit_score_label = 7;
+  // Canonical test length, seconds — single source for the engine
+  // countdown; mirrored into TestConfig so engine boot is one call.
+  int32 duration_seconds = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+// listTests — catalog-scale (13 items at seed), no pagination by design;
+// flat by design too: grouping is a rendering concern and the six-ability
+// vocabulary lives client-side, so regrouping never touches the contract.
+message ListTestsRequest {}
+
+message ListTestsResponse {
+  repeated Test tests = 1;
+}
+
+message GetTestRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetTestResponse {
+  Test test = 1;
+  // Long-form how-to copy, per test — seeded from the six ability texts
+  // and free to diverge per test; copy changes are content, never contract.
+  google.protobuf.StringValue introduction = 2;
+}
+
+message GetTestConfigRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetTestConfigResponse {
+  TestConfig config = 1;
+}
+
+message TestConfig {
+  google.protobuf.StringValue test_id = 1;
+  // Mirror of Test.duration_seconds — the boot bag is self-sufficient.
+  int32 duration_seconds = 2;
+  // Client-side mechanics threshold: backgrounding longer than this
+  // invalidates the run (server-configurable). The engine only marks the
+  // attempt; validity is judged server-side at submit.
+  int32 background_invalid_seconds = 3;
+  // Engine tuning bag — spawn intervals, speeds, sizes; keys are content
+  // owned by the engine registry (metric spec doc), values are strings.
+  // The KV shape keeps tuning ops-only: no contract churn, no regen, no
+  // client release for a spawn-interval change.
+  map<string, string> engine_params = 4;
+}

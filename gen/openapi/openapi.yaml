@@ -286,6 +286,100 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.agent.v1.ListModelsResponse'
+    /api/v1/esports/games:
+        get:
+            tags:
+                - GameService
+            operationId: GameService_ListGames
+            parameters:
+                - name: category
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListGamesResponse'
+    /api/v1/esports/profile:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetProfile
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetProfileResponse'
+        put:
+            tags:
+                - ProfileService
+            operationId: ProfileService_UpdateProfile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.UpdateProfileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.UpdateProfileResponse'
+    /api/v1/esports/tests:
+        get:
+            tags:
+                - TestService
+            operationId: TestService_ListTests
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListTestsResponse'
+    /api/v1/esports/tests/{id}:
+        get:
+            tags:
+                - TestService
+            operationId: TestService_GetTest
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetTestResponse'
+    /api/v1/esports/tests/{id}/config:
+        get:
+            tags:
+                - TestService
+            operationId: TestService_GetTestConfig
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetTestConfigResponse'
     /api/v1/system/audit-logs:
         get:
             tags:
@@ -2238,6 +2332,241 @@ components:
         cyber.agent.v1.UpdateSessionResponse:
             type: object
             properties: {}
+        cyber.esports.v1.Game:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: |-
+                        Immutable code join key (e.g. "lol") — same law as tenant/population
+                         codes: born once, referenced forever.
+                name:
+                    type: string
+                category:
+                    type: string
+                    description: |-
+                        Seeded fps/moba; the vocabulary is admin-managed and open — new
+                         categories classify in without a contract change.
+                iconUrl:
+                    type: string
+                description:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        cyber.esports.v1.GamePreferenceInput:
+            type: object
+            properties:
+                gameIds:
+                    type: array
+                    items:
+                        type: string
+                customNames:
+                    type: array
+                    items:
+                        type: string
+        cyber.esports.v1.GetProfileResponse:
+            type: object
+            properties:
+                profile:
+                    $ref: '#/components/schemas/cyber.esports.v1.Profile'
+        cyber.esports.v1.GetTestConfigResponse:
+            type: object
+            properties:
+                config:
+                    $ref: '#/components/schemas/cyber.esports.v1.TestConfig'
+        cyber.esports.v1.GetTestResponse:
+            type: object
+            properties:
+                test:
+                    $ref: '#/components/schemas/cyber.esports.v1.Test'
+                introduction:
+                    type: string
+                    description: |-
+                        Long-form how-to copy, per test — seeded from the six ability texts
+                         and free to diverge per test; copy changes are content, never contract.
+        cyber.esports.v1.ListGamesResponse:
+            type: object
+            properties:
+                games:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Game'
+        cyber.esports.v1.ListTestsResponse:
+            type: object
+            properties:
+                tests:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Test'
+        cyber.esports.v1.Profile:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: Owning key resolved from the session; never client-supplied.
+                nickname:
+                    type: string
+                    description: |-
+                        2-12 chars once set — the onboarding display constraint, carried from
+                         legacy experience data.
+                birthYear:
+                    type: integer
+                    format: int32
+                birthMonth:
+                    type: integer
+                    description: |-
+                        1-12. Year+month is the collected granularity: a day would be fabricated
+                         precision nothing consumes (bands are year-granular).
+                    format: int32
+                ageBand:
+                    type: string
+                    description: |-
+                        Server-derived from birth year/month; null while birth is unknown. Word
+                         set (frozen 8-band split): under12 | 12-14 | 15-17 | 18-22 | 23-25 |
+                         26-29 | 30-40 | over40. Clients render, never compute.
+                avatarUrl:
+                    type: string
+                guardianConsentedAt:
+                    type: string
+                    description: |-
+                        Stamped server-side when guardian_accepted arrives with a derived age
+                         under 13; null = not consented. The under-13 hard gate refuses saves
+                         without it (ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED).
+                    format: date-time
+                games:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ProfileGame'
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+            description: |-
+                The member's own profile. Entity fields are wrappers: null means "not set
+                 yet" (the row is born lazily on first save), never a zero value.
+        cyber.esports.v1.ProfileGame:
+            type: object
+            properties:
+                gameId:
+                    type: string
+                customName:
+                    type: string
+            description: |-
+                One preference entry: exactly one of the pair is set — a catalog reference
+                 or a user-typed name awaiting admin classification.
+        cyber.esports.v1.Test:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: Row address; the code below is the join key.
+                code:
+                    type: string
+                    description: |-
+                        Immutable code join key (e.g. "red_dot") — engine registry, seeds, and
+                         cross-domain references key off the code, same law as game codes.
+                name:
+                    type: string
+                category:
+                    type: string
+                    description: |-
+                        Vocabulary {fps | moba | universal} — universal feeds every genre pool
+                         (skill_trajectory ruling). Open vocabulary, admin-managed; the word set
+                         is seed data, not a contract enum, so new categories classify in
+                         without touching this contract.
+                ability:
+                    type: string
+                    description: |-
+                        Primary ability, fixed six-word vocabulary shared with admin:
+                         reactionSpeed | aimingAccuracy | trackingStability |
+                         skillReleaseAccuracy | resourceAllocation | decisionEfficiency.
+                         Labels and colors are client-side vocabulary; contribution weights are
+                         report-domain, not this entity.
+                description:
+                    type: string
+                unitScoreLabel:
+                    type: string
+                    description: |-
+                        Display form of the unit score (e.g. "10 分/命中") — rendering copy
+                         only; the numeric unit score is a server-side scoring input and never
+                         crosses this contract.
+                durationSeconds:
+                    type: integer
+                    description: |-
+                        Canonical test length, seconds — single source for the engine
+                         countdown; mirrored into TestConfig so engine boot is one call.
+                    format: int32
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        cyber.esports.v1.TestConfig:
+            type: object
+            properties:
+                testId:
+                    type: string
+                durationSeconds:
+                    type: integer
+                    description: Mirror of Test.duration_seconds — the boot bag is self-sufficient.
+                    format: int32
+                backgroundInvalidSeconds:
+                    type: integer
+                    description: |-
+                        Client-side mechanics threshold: backgrounding longer than this
+                         invalidates the run (server-configurable). The engine only marks the
+                         attempt; validity is judged server-side at submit.
+                    format: int32
+                engineParams:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: |-
+                        Engine tuning bag — spawn intervals, speeds, sizes; keys are content
+                         owned by the engine registry (metric spec doc), values are strings.
+                         The KV shape keeps tuning ops-only: no contract churn, no regen, no
+                         client release for a spawn-interval change.
+        cyber.esports.v1.UpdateProfileRequest:
+            type: object
+            properties:
+                nickname:
+                    type: string
+                avatarUrl:
+                    type: string
+                birthYear:
+                    type: integer
+                    format: int32
+                birthMonth:
+                    type: integer
+                    format: int32
+                guardianAccepted:
+                    type: boolean
+                    description: |-
+                        True stamps guardian_consented_at server-side — the server is the only
+                         writer of that timestamp.
+                gamePreference:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.GamePreferenceInput'
+                    description: |-
+                        Replace-set: presence rewrites the whole preference list (present with
+                         empty lists clears it). The business custom-game cap is config-driven
+                         and enforced server-side (ESPORTS_PROFILE_CUSTOM_GAME_CAP); the
+                         repeated bounds below are static backstops only.
+            description: |-
+                updateProfile — presence-based partial update: a field left out stays
+                 untouched; each onboarding step saves its own slice.
+        cyber.esports.v1.UpdateProfileResponse:
+            type: object
+            properties:
+                profile:
+                    $ref: '#/components/schemas/cyber.esports.v1.Profile'
         cyber.shared.common.v1.PageResponse:
             type: object
             properties:
@@ -3547,6 +3876,12 @@ tags:
          file id, access URLs are minted at render time, and storage
          backends can migrate without touching stored references.
     - name: FileService
+    - name: GameService
+      description: |-
+        Esports title catalog — game names the played title, never the test item
+         (naming split). Preference voting and draw weights key off this catalog;
+         the C-end never hardcodes it. Admin management and classification live on
+         the admin face, not this read model.
     - name: IntrospectService
     - name: PolicyService
     - name: PopulationService
@@ -3554,9 +3889,25 @@ tags:
         Population registry write face: instances of the compile-time archetype
          vocabulary (engine | patron). Codes are join keys — immutable once born.
          The default population is born by seed and protected here.
+    - name: ProfileService
+      description: |-
+        Player profile, the C-end onboarding aggregate: nickname, birth year/month,
+         the age band derived from it, guardian consent for under-13s, and game
+         preference. Identity stays in system — every face here is caller-scoped:
+         the owning key resolves from the session seat (system introspection) and
+         never appears in a request.
     - name: ResourceService
     - name: RoleService
     - name: TenantService
+    - name: TestService
+      description: |-
+        Test catalog and per-test runtime delivery — test names the scored item,
+         never the played title (naming split). The C-end surfaces tests through
+         the matching flow, not a browse page: the list face is the hydration
+         source resolving match-step codes into display metadata, and the detail
+         face carries the long-form copy; the config face is the engine boot bag.
+         Grades are percentile-tiered server-side at submit time — the client
+         renders returned grades, never judges them.
     - name: TransferService
       description: |-
         Transfer service. Exposes the streaming transport primitives

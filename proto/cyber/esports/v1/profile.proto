@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// Player profile, the C-end onboarding aggregate: nickname, birth year/month,
+// the age band derived from it, guardian consent for under-13s, and game
+// preference. Identity stays in system — every face here is caller-scoped:
+// the owning key resolves from the session seat (system introspection) and
+// never appears in a request.
+service ProfileService {
+  option (cyber.ext.v1.service_comment) = "玩家画像";
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "获取当前玩家画像"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/profile"};
+  }
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "保存当前玩家画像"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/profile"
+      body: "*"
+    };
+  }
+}
+
+// The member's own profile. Entity fields are wrappers: null means "not set
+// yet" (the row is born lazily on first save), never a zero value.
+message Profile {
+  // Owning key resolved from the session; never client-supplied.
+  google.protobuf.StringValue id = 1;
+  // 2-12 chars once set — the onboarding display constraint, carried from
+  // legacy experience data.
+  google.protobuf.StringValue nickname = 2;
+  google.protobuf.Int32Value birth_year = 3;
+  // 1-12. Year+month is the collected granularity: a day would be fabricated
+  // precision nothing consumes (bands are year-granular).
+  google.protobuf.Int32Value birth_month = 4;
+  // Server-derived from birth year/month; null while birth is unknown. Word
+  // set (frozen 8-band split): under12 | 12-14 | 15-17 | 18-22 | 23-25 |
+  // 26-29 | 30-40 | over40. Clients render, never compute.
+  google.protobuf.StringValue age_band = 5;
+  google.protobuf.StringValue avatar_url = 6;
+  // Stamped server-side when guardian_accepted arrives with a derived age
+  // under 13; null = not consented. The under-13 hard gate refuses saves
+  // without it (ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED).
+  google.protobuf.Timestamp guardian_consented_at = 7;
+  repeated ProfileGame games = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+// One preference entry: exactly one of the pair is set — a catalog reference
+// or a user-typed name awaiting admin classification.
+message ProfileGame {
+  google.protobuf.StringValue game_id = 1;
+  google.protobuf.StringValue custom_name = 2;
+}
+
+// getProfile
+message GetProfileRequest {}
+
+message GetProfileResponse {
+  Profile profile = 1;
+}
+
+// updateProfile — presence-based partial update: a field left out stays
+// untouched; each onboarding step saves its own slice.
+message UpdateProfileRequest {
+  option (buf.validate.message).cel = {
+    id: "UpdateProfileRequest.birth_pair"
+    message: "birth_year and birth_month must be set together"
+    expression: "has(this.birth_year) == has(this.birth_month)"
+  };
+
+  optional string nickname = 1 [(buf.validate.field).string = {
+    min_len: 2
+    max_len: 12
+  }];
+  optional string avatar_url = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 500
+  }];
+  optional int32 birth_year = 3 [(buf.validate.field).int32 = {
+    gte: 1900
+    lte: 2100
+  }];
+  optional int32 birth_month = 4 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 12
+  }];
+  // True stamps guardian_consented_at server-side — the server is the only
+  // writer of that timestamp.
+  optional bool guardian_accepted = 5;
+  // Replace-set: presence rewrites the whole preference list (present with
+  // empty lists clears it). The business custom-game cap is config-driven
+  // and enforced server-side (ESPORTS_PROFILE_CUSTOM_GAME_CAP); the
+  // repeated bounds below are static backstops only.
+  optional GamePreferenceInput game_preference = 6;
+}
+
+message GamePreferenceInput {
+  repeated string game_ids = 1 [(buf.validate.field).repeated = {
+    max_items: 50
+    items: {
+      string: {
+        min_len: 1
+        max_len: 64
+      }
+    }
+  }];
+  repeated string custom_names = 2 [(buf.validate.field).repeated = {
+    max_items: 20
+    items: {
+      string: {
+        min_len: 1
+        max_len: 40
+      }
+    }
+  }];
+}
+
+message UpdateProfileResponse {
+  Profile profile = 1;
+}

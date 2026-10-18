@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// business errors (service-level): domain-specific failures the service
+// layer returns actively, distinct from the generic codes in
+// cyber/shared/errors. Service blocks inside 6xxx are disjoint — system
+// holds 60xx, esports holds 61xx; a third service takes the next free
+// block, at which point this note graduates to the proto conventions.
+enum Esports {
+  option (.errors.default_code) = 400;
+
+  ESPORTS_UNSPECIFIED = 0 [(.errors.code) = 500];
+
+  // 610x: profile
+  ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED = 6100 [(.errors.code) = 400];
+  ESPORTS_PROFILE_GAME_UNKNOWN = 6101 [(.errors.code) = 400];
+  ESPORTS_PROFILE_CUSTOM_GAME_CAP = 6102 [(.errors.code) = 400];
+
+  // 611x: test
+  ESPORTS_TEST_NOT_FOUND = 6110 [(.errors.code) = 404];
+}

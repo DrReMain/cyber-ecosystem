@@ -177,6 +177,193 @@ export type CyberAgentV1UpdateSessionResponse = {
     [key: string]: unknown;
 };
 
+export type CyberEsportsV1Game = {
+    /**
+     * Immutable code join key (e.g. "lol") — same law as tenant/population
+     * codes: born once, referenced forever.
+     */
+    id?: string;
+    name?: string;
+    /**
+     * Seeded fps/moba; the vocabulary is admin-managed and open — new
+     * categories classify in without a contract change.
+     */
+    category?: string;
+    iconUrl?: string;
+    description?: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+export type CyberEsportsV1GamePreferenceInput = {
+    gameIds?: Array<string>;
+    customNames?: Array<string>;
+};
+
+export type CyberEsportsV1GetProfileResponse = {
+    profile?: CyberEsportsV1Profile;
+};
+
+export type CyberEsportsV1GetTestConfigResponse = {
+    config?: CyberEsportsV1TestConfig;
+};
+
+export type CyberEsportsV1GetTestResponse = {
+    test?: CyberEsportsV1Test;
+    /**
+     * Long-form how-to copy, per test — seeded from the six ability texts
+     * and free to diverge per test; copy changes are content, never contract.
+     */
+    introduction?: string;
+};
+
+export type CyberEsportsV1ListGamesResponse = {
+    games?: Array<CyberEsportsV1Game>;
+};
+
+export type CyberEsportsV1ListTestsResponse = {
+    tests?: Array<CyberEsportsV1Test>;
+};
+
+/**
+ * The member's own profile. Entity fields are wrappers: null means "not set
+ * yet" (the row is born lazily on first save), never a zero value.
+ */
+export type CyberEsportsV1Profile = {
+    /**
+     * Owning key resolved from the session; never client-supplied.
+     */
+    id?: string;
+    /**
+     * 2-12 chars once set — the onboarding display constraint, carried from
+     * legacy experience data.
+     */
+    nickname?: string;
+    birthYear?: number;
+    /**
+     * 1-12. Year+month is the collected granularity: a day would be fabricated
+     * precision nothing consumes (bands are year-granular).
+     */
+    birthMonth?: number;
+    /**
+     * Server-derived from birth year/month; null while birth is unknown. Word
+     * set (frozen 8-band split): under12 | 12-14 | 15-17 | 18-22 | 23-25 |
+     * 26-29 | 30-40 | over40. Clients render, never compute.
+     */
+    ageBand?: string;
+    avatarUrl?: string;
+    /**
+     * Stamped server-side when guardian_accepted arrives with a derived age
+     * under 13; null = not consented. The under-13 hard gate refuses saves
+     * without it (ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED).
+     */
+    guardianConsentedAt?: string;
+    games?: Array<CyberEsportsV1ProfileGame>;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+/**
+ * One preference entry: exactly one of the pair is set — a catalog reference
+ * or a user-typed name awaiting admin classification.
+ */
+export type CyberEsportsV1ProfileGame = {
+    gameId?: string;
+    customName?: string;
+};
+
+export type CyberEsportsV1Test = {
+    /**
+     * Row address; the code below is the join key.
+     */
+    id?: string;
+    /**
+     * Immutable code join key (e.g. "red_dot") — engine registry, seeds, and
+     * cross-domain references key off the code, same law as game codes.
+     */
+    code?: string;
+    name?: string;
+    /**
+     * Vocabulary {fps | moba | universal} — universal feeds every genre pool
+     * (skill_trajectory ruling). Open vocabulary, admin-managed; the word set
+     * is seed data, not a contract enum, so new categories classify in
+     * without touching this contract.
+     */
+    category?: string;
+    /**
+     * Primary ability, fixed six-word vocabulary shared with admin:
+     * reactionSpeed | aimingAccuracy | trackingStability |
+     * skillReleaseAccuracy | resourceAllocation | decisionEfficiency.
+     * Labels and colors are client-side vocabulary; contribution weights are
+     * report-domain, not this entity.
+     */
+    ability?: string;
+    description?: string;
+    /**
+     * Display form of the unit score (e.g. "10 分/命中") — rendering copy
+     * only; the numeric unit score is a server-side scoring input and never
+     * crosses this contract.
+     */
+    unitScoreLabel?: string;
+    /**
+     * Canonical test length, seconds — single source for the engine
+     * countdown; mirrored into TestConfig so engine boot is one call.
+     */
+    durationSeconds?: number;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+export type CyberEsportsV1TestConfig = {
+    testId?: string;
+    /**
+     * Mirror of Test.duration_seconds — the boot bag is self-sufficient.
+     */
+    durationSeconds?: number;
+    /**
+     * Client-side mechanics threshold: backgrounding longer than this
+     * invalidates the run (server-configurable). The engine only marks the
+     * attempt; validity is judged server-side at submit.
+     */
+    backgroundInvalidSeconds?: number;
+    /**
+     * Engine tuning bag — spawn intervals, speeds, sizes; keys are content
+     * owned by the engine registry (metric spec doc), values are strings.
+     * The KV shape keeps tuning ops-only: no contract churn, no regen, no
+     * client release for a spawn-interval change.
+     */
+    engineParams?: {
+        [key: string]: string;
+    };
+};
+
+/**
+ * updateProfile — presence-based partial update: a field left out stays
+ * untouched; each onboarding step saves its own slice.
+ */
+export type CyberEsportsV1UpdateProfileRequest = {
+    nickname?: string;
+    avatarUrl?: string;
+    birthYear?: number;
+    birthMonth?: number;
+    /**
+     * True stamps guardian_consented_at server-side — the server is the only
+     * writer of that timestamp.
+     */
+    guardianAccepted?: boolean;
+    /**
+     * Replace-set: presence rewrites the whole preference list (present with
+     * empty lists clears it). The business custom-game cap is config-driven
+     * and enforced server-side (ESPORTS_PROFILE_CUSTOM_GAME_CAP); the
+     * repeated bounds below are static backstops only.
+     */
+    gamePreference?: CyberEsportsV1GamePreferenceInput;
+};
+
+export type CyberEsportsV1UpdateProfileResponse = {
+    profile?: CyberEsportsV1Profile;
+};
+
 /**
  * Pagination response.
  */
@@ -1459,6 +1646,108 @@ export type ChatServiceListModelsResponses = {
 };
 
 export type ChatServiceListModelsResponse = ChatServiceListModelsResponses[keyof ChatServiceListModelsResponses];
+
+export type GameServiceListGamesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        category?: string;
+    };
+    url: '/api/v1/esports/games';
+};
+
+export type GameServiceListGamesResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListGamesResponse;
+};
+
+export type GameServiceListGamesResponse = GameServiceListGamesResponses[keyof GameServiceListGamesResponses];
+
+export type ProfileServiceGetProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/profile';
+};
+
+export type ProfileServiceGetProfileResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetProfileResponse;
+};
+
+export type ProfileServiceGetProfileResponse = ProfileServiceGetProfileResponses[keyof ProfileServiceGetProfileResponses];
+
+export type ProfileServiceUpdateProfileData = {
+    body: CyberEsportsV1UpdateProfileRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/profile';
+};
+
+export type ProfileServiceUpdateProfileResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1UpdateProfileResponse;
+};
+
+export type ProfileServiceUpdateProfileResponse = ProfileServiceUpdateProfileResponses[keyof ProfileServiceUpdateProfileResponses];
+
+export type TestServiceListTestsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/tests';
+};
+
+export type TestServiceListTestsResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListTestsResponse;
+};
+
+export type TestServiceListTestsResponse = TestServiceListTestsResponses[keyof TestServiceListTestsResponses];
+
+export type TestServiceGetTestData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/tests/{id}';
+};
+
+export type TestServiceGetTestResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetTestResponse;
+};
+
+export type TestServiceGetTestResponse = TestServiceGetTestResponses[keyof TestServiceGetTestResponses];
+
+export type TestServiceGetTestConfigData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/tests/{id}/config';
+};
+
+export type TestServiceGetTestConfigResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetTestConfigResponse;
+};
+
+export type TestServiceGetTestConfigResponse = TestServiceGetTestConfigResponses[keyof TestServiceGetTestConfigResponses];
 
 export type AuditServiceListAuditLogsData = {
     body?: never;
