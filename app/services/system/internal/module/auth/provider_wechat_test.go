@@ -16,7 +16,7 @@ import (
 
 func wechatRow(endpoint string) *conf.Auth_Provider {
 	return &conf.Auth_Provider{
-		Key: "wechat", Kind: "wechat", Enabled: true, Endpoint: endpoint,
+		Key: "wechat", Kind: "wechat_mp", Enabled: true, Endpoint: endpoint,
 		Wechat: &conf.Auth_Provider_WeChat{Appid: "wx-test", Secret: "s3cr3t"},
 	}
 }
@@ -43,7 +43,7 @@ func TestWeChatExchangeContract(t *testing.T) {
 	if err != nil {
 		t.Fatalf("exchange: %v", err)
 	}
-	if id.Kind != "wechat" || id.Identifier != "oid-live" {
+	if id.Kind != "wechat_mp" || id.Identifier != "oid-live" {
 		t.Fatalf("exchange: identity = %+v", id)
 	}
 	for _, want := range []string{"appid=wx-test", "secret=s3cr3t", "code=the-code", "grant_type=authorization_code"} {

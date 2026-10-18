@@ -13,8 +13,8 @@ import { ProfileMenu, type ProfileMenuItem } from "./ui/profile-menu";
 export function ProfileLayout() {
   const { data } = useQuery(sessionQuery);
   const user = data?.status === "authed" ? data.user : undefined;
-  const email = user?.email ?? "";
-  const name = email.split("@")[0] ?? "";
+  const account = user?.account ?? "";
+  const name = account.split("@")[0] ?? "";
   const avatarUrl = useFileUrl(user?.avatar);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { maximized } = useAtomValue(dashboardPreferencesUiStore.atom);
@@ -32,7 +32,7 @@ export function ProfileLayout() {
           maximized ? "lg:top-13.5" : "lg:top-27.5",
         )}
       >
-        <ProfileIdentity avatarUrl={avatarUrl} email={email} name={name} />
+        <ProfileIdentity account={account} avatarUrl={avatarUrl} name={name} />
         <ProfileMenu activePath={pathname} items={items} />
       </aside>
       <div className="min-w-0">

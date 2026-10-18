@@ -79,7 +79,7 @@ service AuthService {
 }
 
 message LoginRequest {
-  optional string email = 1 [
+  optional string account = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 1
   ];

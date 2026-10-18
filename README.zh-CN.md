@@ -237,7 +237,7 @@ docs/              工程约定与截图
 ./nx run admin:dev
 ```
 
-开发代理默认连接 `localhost:13001` 的 system 和 `localhost:13002` 的 agent。打开 `http://localhost:5173`，使用种子管理员登录——`admin@cyber.local`，默认口令 `admin123456`（可用 `SEED_INITIAL_PASSWORD` 覆写，见 `app/services/system/configs/config.yaml`）。用户可以在 admin profile 中配置 OpenAI-compatible provider；API key 在服务端加密，API 永不回显。
+开发代理默认连接 `localhost:13001` 的 system 和 `localhost:13002` 的 agent。打开 `http://localhost:5173`，使用种子管理员登录——`admin`，默认口令 `admin123456`（可用 `SEED_INITIAL_PASSWORD` 覆写，见 `app/services/system/configs/config.yaml`）。用户可以在 admin profile 中配置 OpenAI-compatible provider；API key 在服务端加密，API 永不回显。
 
 仓库内配置包含仅用于开发的默认值——种子管理员、agent master key，以及 dev 栈的中间件凭据（postgres/redis/seaweedfs/nats/centrifugo/livekit/signoz/glitchtip）。宿主端口仅绑定 loopback，例外是浏览器直连的服务面——SeaweedFS S3 API（8333）、Centrifugo（8000）、LiveKit（7880 + UDP 媒体段）——它们为跨机开发而发布；跨机直传还需设置 `APP_S3_PUBLIC_ENDPOINT=http://<开发机局域网IP>:8333`，否则预签名 URL 会指向 localhost。它们都不是生产密钥，但任何共享或公网可达部署前必须覆写。
 

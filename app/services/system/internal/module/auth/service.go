@@ -46,7 +46,7 @@ func (s *AuthService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *AuthService) Login(ctx context.Context, in *systempb.LoginRequest) (*systempb.LoginResponse, error) {
-	token, issuedAt, expiresAt, err := s.authUC.Login(ctx, *in.Email, *in.Password, in.GetPopulation())
+	token, issuedAt, expiresAt, err := s.authUC.Login(ctx, *in.Account, *in.Password, in.GetPopulation())
 	if err != nil {
 		return nil, err
 	}
@@ -98,9 +98,9 @@ func (s *AuthService) GetCurrentUser(ctx context.Context, in *systempb.GetCurren
 	}
 	return &systempb.GetCurrentUserResponse{
 		User: &systempb.User{
-			Id:     utils.StringW(u.ID),
-			Email:  utils.StringW(u.Email),
-			Avatar: utils.Wrap(u.Avatar, utils.StringW),
+			Id:      utils.StringW(u.ID),
+			Account: utils.StringW(u.Account),
+			Avatar:  utils.Wrap(u.Avatar, utils.StringW),
 		},
 		Permissions: u.Permissions,
 		Memberships: utils.SliceMap(u.Seats, func(seat *user.Seat) *systempb.Membership {

@@ -65,9 +65,9 @@ func (_c *UserCreate) SetNillableDeletedAt(v *time.Time) *UserCreate {
 	return _c
 }
 
-// SetEmail sets the "email" field.
-func (_c *UserCreate) SetEmail(v string) *UserCreate {
-	_c.mutation.SetEmail(v)
+// SetAccount sets the "account" field.
+func (_c *UserCreate) SetAccount(v string) *UserCreate {
+	_c.mutation.SetAccount(v)
 	return _c
 }
 
@@ -206,12 +206,12 @@ func (_c *UserCreate) check() error {
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "User.updated_at"`)}
 	}
-	if _, ok := _c.mutation.Email(); !ok {
-		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
+	if _, ok := _c.mutation.Account(); !ok {
+		return &ValidationError{Name: "account", err: errors.New(`ent: missing required field "User.account"`)}
 	}
-	if v, ok := _c.mutation.Email(); ok {
-		if err := user.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
+	if v, ok := _c.mutation.Account(); ok {
+		if err := user.AccountValidator(v); err != nil {
+			return &ValidationError{Name: "account", err: fmt.Errorf(`ent: validator failed for field "User.account": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.PasswordHash(); !ok {
@@ -288,9 +288,9 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
-	if value, ok := _c.mutation.Email(); ok {
-		_spec.SetField(user.FieldEmail, field.TypeString, value)
-		_node.Email = value
+	if value, ok := _c.mutation.Account(); ok {
+		_spec.SetField(user.FieldAccount, field.TypeString, value)
+		_node.Account = value
 	}
 	if value, ok := _c.mutation.PasswordHash(); ok {
 		_spec.SetField(user.FieldPasswordHash, field.TypeString, value)
@@ -390,15 +390,15 @@ func (u *UserUpsert) ClearDeletedAt() *UserUpsert {
 	return u
 }
 
-// SetEmail sets the "email" field.
-func (u *UserUpsert) SetEmail(v string) *UserUpsert {
-	u.Set(user.FieldEmail, v)
+// SetAccount sets the "account" field.
+func (u *UserUpsert) SetAccount(v string) *UserUpsert {
+	u.Set(user.FieldAccount, v)
 	return u
 }
 
-// UpdateEmail sets the "email" field to the value that was provided on create.
-func (u *UserUpsert) UpdateEmail() *UserUpsert {
-	u.SetExcluded(user.FieldEmail)
+// UpdateAccount sets the "account" field to the value that was provided on create.
+func (u *UserUpsert) UpdateAccount() *UserUpsert {
+	u.SetExcluded(user.FieldAccount)
 	return u
 }
 
@@ -548,17 +548,17 @@ func (u *UserUpsertOne) ClearDeletedAt() *UserUpsertOne {
 	})
 }
 
-// SetEmail sets the "email" field.
-func (u *UserUpsertOne) SetEmail(v string) *UserUpsertOne {
+// SetAccount sets the "account" field.
+func (u *UserUpsertOne) SetAccount(v string) *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
-		s.SetEmail(v)
+		s.SetAccount(v)
 	})
 }
 
-// UpdateEmail sets the "email" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateEmail() *UserUpsertOne {
+// UpdateAccount sets the "account" field to the value that was provided on create.
+func (u *UserUpsertOne) UpdateAccount() *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
-		s.UpdateEmail()
+		s.UpdateAccount()
 	})
 }
 
@@ -885,17 +885,17 @@ func (u *UserUpsertBulk) ClearDeletedAt() *UserUpsertBulk {
 	})
 }
 
-// SetEmail sets the "email" field.
-func (u *UserUpsertBulk) SetEmail(v string) *UserUpsertBulk {
+// SetAccount sets the "account" field.
+func (u *UserUpsertBulk) SetAccount(v string) *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
-		s.SetEmail(v)
+		s.SetAccount(v)
 	})
 }
 
-// UpdateEmail sets the "email" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateEmail() *UserUpsertBulk {
+// UpdateAccount sets the "account" field to the value that was provided on create.
+func (u *UserUpsertBulk) UpdateAccount() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
-		s.UpdateEmail()
+		s.UpdateAccount()
 	})
 }
 

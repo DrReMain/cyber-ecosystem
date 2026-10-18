@@ -77,7 +77,7 @@ func (f *fakeTokenRP) Expire(_ context.Context, key string, ttl time.Duration) e
 	return nil
 }
 
-// fakeUserRP backs the Login slice: one seeded row, email lookup. updates
+// fakeUserRP backs the Login slice: one seeded row, account lookup. updates
 // captures what the lazy rehash writes.
 type fakeUserRP struct {
 	user.UserRP
@@ -131,11 +131,11 @@ func (f *fakeUserRP) DeleteCredentialsByUser(_ context.Context, userID string) e
 	return nil
 }
 
-func (f *fakeUserRP) FindByEmail(_ context.Context, email string) (*user.User, error) {
+func (f *fakeUserRP) FindByAccount(_ context.Context, account string) (*user.User, error) {
 	if f.findErr != nil {
 		return nil, f.findErr
 	}
-	if f.row != nil && *f.row.Email == email {
+	if f.row != nil && *f.row.Account == account {
 		return f.row, nil
 	}
 	return nil, errorspb.ErrorInfraErrorDbNotFound("")
@@ -265,14 +265,14 @@ func (f *fakeTenantRP) FindByCode(_ context.Context, code string) (*tenant.Tenan
 	return f.row, nil
 }
 
-func seedRow(t *testing.T, email, password string) *user.User {
+func seedRow(t *testing.T, account, password string) *user.User {
 	t.Helper()
 	hash, err := utils.Hash(password)
 	if err != nil {
 		t.Fatalf("seed hash: %v", err)
 	}
 	return &user.User{
-		ID: "u1", Email: &email, PasswordHash: &hash, Enabled: true,
+		ID: "u1", Account: &account, PasswordHash: &hash, Enabled: true,
 	}
 }
 
@@ -295,16 +295,16 @@ func authCtx(subject *security.Subject) context.Context {
 
 // Login ---------------------------------------------------------------------------------------------------------------
 
-// Anti-enumeration: an unknown email and a wrong password answer in the same
-// shape — which emails exist is not probeable from the wire (the not-found
+// Anti-enumeration: an unknown account and a wrong password answer in the same
+// shape — which accounts exist is not probeable from the wire (the not-found
 // branch burns the dummy digest so timing carries no signal either; that half
 // is not unit-assertable, the shape half is).
-func TestLoginUnknownEmailSameShapeAsWrongPassword(t *testing.T) {
+func TestLoginUnknownAccountSameShapeAsWrongPassword(t *testing.T) {
 	uc := newAuthUC(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, &fakeAuthzRP{}, &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}})
 
 	_, _, _, errUnknown := uc.Login(context.Background(), "ghost@x.co", "right", "")
 	if !systempb.IsSystemLoginFailed(errUnknown) {
-		t.Fatalf("unknown email: want LOGIN_FAILED, got %v", errUnknown)
+		t.Fatalf("unknown account: want LOGIN_FAILED, got %v", errUnknown)
 	}
 	_, _, _, errWrong := uc.Login(context.Background(), "a@x.co", "wrong", "")
 	if !systempb.IsSystemLoginFailed(errWrong) {
@@ -335,9 +335,9 @@ func TestLoginRehashesLegacyBcrypt(t *testing.T) {
 	if err != nil {
 		t.Fatalf("bcrypt seed: %v", err)
 	}
-	email := "a@x.co"
+	account := "a@x.co"
 	legacyStr := string(legacy)
-	row := &user.User{ID: "u1", Email: &email, PasswordHash: &legacyStr, Enabled: true}
+	row := &user.User{ID: "u1", Account: &account, PasswordHash: &legacyStr, Enabled: true}
 	rp := &fakeUserRP{row: row}
 	uc := newAuthUC(rp, &fakeAuthzRP{}, &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}})
 
@@ -383,7 +383,7 @@ func TestLoginMintsSessionShape(t *testing.T) {
 	if err != nil {
 		t.Fatalf("mint: payload: %v", err)
 	}
-	if sess.UserID != row.ID || sess.Email != "a@x.co" {
+	if sess.UserID != row.ID || sess.Account != "a@x.co" {
 		t.Fatalf("mint: payload = %+v", sess)
 	}
 }
@@ -498,7 +498,7 @@ func TestLogoutDeletesSessionKey(t *testing.T) {
 // session whose grants cannot resolve must never read as "no permissions".
 func TestGetCurrentUserEngineFailureIsInternal(t *testing.T) {
 	uc := newAuthUC(&fakeUserRP{}, &fakeAuthzRP{err: errorspb.ErrorInfraErrorNetworkConnection("")}, &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}})
-	subject := &security.Subject{UserID: "u1", SessionID: "tok-1", Extra: map[string]any{shared.ExtraEmail: "a@x.co"}}
+	subject := &security.Subject{UserID: "u1", SessionID: "tok-1", Extra: map[string]any{shared.ExtraAccount: "a@x.co"}}
 
 	if _, err := uc.GetCurrentUser(authCtx(subject)); !errorspb.IsGeneralErrorInternal(err) {
 		t.Fatalf("engine failure: want INTERNAL, got %v", err)
@@ -540,7 +540,7 @@ func TestAuthenticateSessionDirtyMarkerSurfaces(t *testing.T) {
 
 // A user lookup that fails beyond not-found (store down) passes through — the
 // login path never invents a domain shape for infra trouble.
-func TestLoginFindByEmailGenericErrorPassthrough(t *testing.T) {
+func TestLoginFindByAccountGenericErrorPassthrough(t *testing.T) {
 	uc := newAuthUC(&fakeUserRP{findErr: errorspb.ErrorInfraErrorNetworkConnection("")}, &fakeAuthzRP{}, &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}})
 
 	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "pw", ""); !errorspb.IsInfraErrorNetworkConnection(err) {
@@ -555,13 +555,13 @@ func TestGetCurrentUserHydrates(t *testing.T) {
 	avatar := "f1"
 	row.Avatar = &avatar
 	uc := newAuthUC(&fakeUserRP{row: row}, &fakeAuthzRP{grants: []authz.GrantView{{Pattern: "/svc/*"}}}, &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}})
-	subject := &security.Subject{UserID: "u1", SessionID: "tok-1", Extra: map[string]any{shared.ExtraEmail: "a@x.co"}}
+	subject := &security.Subject{UserID: "u1", SessionID: "tok-1", Extra: map[string]any{shared.ExtraAccount: "a@x.co"}}
 
 	out, err := uc.GetCurrentUser(authCtx(subject))
 	if err != nil {
 		t.Fatalf("me: %v", err)
 	}
-	if out.Email != "a@x.co" || len(out.Permissions) != 1 || out.Permissions[0] != "/svc/*" || out.Avatar == nil || *out.Avatar != "f1" {
+	if out.Account != "a@x.co" || len(out.Permissions) != 1 || out.Permissions[0] != "/svc/*" || out.Avatar == nil || *out.Avatar != "f1" {
 		t.Fatalf("me: out = %+v", out)
 	}
 
@@ -623,7 +623,7 @@ func TestLoginTenantGenericPassthrough(t *testing.T) {
 // missing row answers in the same shape.
 func TestAuthenticateSessionTenantGate(t *testing.T) {
 	rp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
-	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Email: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour)})
+	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour)})
 	tn := &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: false}}
 	uc := newAuthUCTenant(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, &fakeAuthzRP{}, rp, tn)
 
@@ -656,7 +656,7 @@ func TestAuthenticateSessionTenantGate(t *testing.T) {
 // disable path's best-effort marker write.
 func TestAuthenticateSessionUserGate(t *testing.T) {
 	rp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
-	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Email: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour)})
+	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour)})
 	row := seedRow(t, "a@x.co", "right")
 	uf := &fakeUserRP{row: row}
 	uc := newAuthUCTenant(uf, &fakeAuthzRP{}, rp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
@@ -797,7 +797,7 @@ func TestLoginHintPicksHeldSeat(t *testing.T) {
 // The verified subject carries the seat's population downstream.
 func TestAuthenticateSessionCarriesPopulation(t *testing.T) {
 	rp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
-	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Population: "user", Email: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour)})
+	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Population: "user", Account: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour)})
 	uc := newAuthUCTenant(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, &fakeAuthzRP{}, rp,
 		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 

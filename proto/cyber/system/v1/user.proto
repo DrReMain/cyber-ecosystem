@@ -106,7 +106,7 @@ message User {
   google.protobuf.StringValue id = 1;
   google.protobuf.Timestamp created_at = 2;
   google.protobuf.Timestamp updated_at = 3;
-  google.protobuf.StringValue email = 4;
+  google.protobuf.StringValue account = 4;
   google.protobuf.StringValue dept_id = 5;
   repeated string roles = 6;
   google.protobuf.BoolValue enabled = 7;
@@ -115,7 +115,7 @@ message User {
 
 // create
 message CreateUserRequest {
-  optional string email = 1 [
+  optional string account = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string = {
       min_len: 1
@@ -157,16 +157,12 @@ message UpdateUserRequest {
     (buf.validate.field).required = true,
     (buf.validate.field).string.len = 20
   ];
-  optional string email = 2 [(buf.validate.field).string = {
+  optional string password = 2 [(buf.validate.field).string = {
     min_len: 1
     max_len: 128
   }];
-  optional string password = 3 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 128
-  }];
-  optional string dept_id = 4;
-  repeated string roles = 5 [(buf.validate.field).repeated = {
+  optional string dept_id = 3;
+  repeated string roles = 4 [(buf.validate.field).repeated = {
     max_items: 64
     unique: true
     items: {
@@ -176,12 +172,12 @@ message UpdateUserRequest {
       }
     }
   }];
-  optional string avatar = 6;
+  optional string avatar = 5;
   repeated string fields_mask = 100 [(buf.validate.field).repeated = {
     min_items: 1
     unique: true
     items: {
-      string: {pattern: "^(email|password|dept_id|roles|avatar)$"}
+      string: {pattern: "^(password|dept_id|roles|avatar)$"}
     }
   }];
 }
@@ -229,13 +225,13 @@ message DeleteUserResponse {}
 // list
 message ListUsersRequest {
   cyber.shared.common.v1.PageRequest page = 1;
-  optional string email = 2;
+  optional string account = 2;
   optional bool enabled = 3;
   optional string dept_id = 4 [(buf.validate.field).string.len = 20];
   repeated string order_by = 100 [(buf.validate.field).cel = {
     id: "ListUsersRequest.order_by"
     message: ""
-    expression: "this.all(item, size(item) == 0 || item.matches('^(email|createdAt|updatedAt):(asc|desc)$'))"
+    expression: "this.all(item, size(item) == 0 || item.matches('^(account|createdAt|updatedAt):(asc|desc)$'))"
   }];
 }
 
@@ -280,6 +276,6 @@ message BatchGetUsersResponse {
 // User (no roles, no lifecycle fields).
 message UserBrief {
   google.protobuf.StringValue id = 1;
-  google.protobuf.StringValue email = 2;
+  google.protobuf.StringValue account = 2;
   google.protobuf.StringValue avatar = 3;
 }

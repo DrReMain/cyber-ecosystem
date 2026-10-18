@@ -819,7 +819,7 @@ func (x *ListDeptMembersResponse) GetList() []*DeptMember {
 type DeptMember struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
 	UserId        *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Email         *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Account       *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=account,proto3" json:"account,omitempty"`
 	Enabled       *wrapperspb.BoolValue   `protobuf:"bytes,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -862,9 +862,9 @@ func (x *DeptMember) GetUserId() *wrapperspb.StringValue {
 	return nil
 }
 
-func (x *DeptMember) GetEmail() *wrapperspb.StringValue {
+func (x *DeptMember) GetAccount() *wrapperspb.StringValue {
 	if x != nil {
-		return x.Email
+		return x.Account
 	}
 	return nil
 }
@@ -939,11 +939,11 @@ const file_cyber_system_v1_dept_proto_rawDesc = "" +
 	"\x04page\x18\x02 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\"\x84\x01\n" +
 	"\x17ListDeptMembersResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x12/\n" +
-	"\x04list\x18\x02 \x03(\v2\x1b.cyber.system.v1.DeptMemberR\x04list\"\xad\x01\n" +
+	"\x04list\x18\x02 \x03(\v2\x1b.cyber.system.v1.DeptMemberR\x04list\"\xb1\x01\n" +
 	"\n" +
 	"DeptMember\x125\n" +
-	"\auser_id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x06userId\x122\n" +
-	"\x05email\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\x124\n" +
+	"\auser_id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x06userId\x126\n" +
+	"\aaccount\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\aaccount\x124\n" +
 	"\aenabled\x18\x03 \x01(\v2\x1a.google.protobuf.BoolValueR\aenabled2\x8f\t\n" +
 	"\vDeptService\x12\x8e\x01\n" +
 	"\n" +
@@ -1018,7 +1018,7 @@ var file_cyber_system_v1_dept_proto_depIdxs = []int32{
 	20, // 13: cyber.system.v1.ListDeptMembersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
 	15, // 14: cyber.system.v1.ListDeptMembersResponse.list:type_name -> cyber.system.v1.DeptMember
 	16, // 15: cyber.system.v1.DeptMember.user_id:type_name -> google.protobuf.StringValue
-	16, // 16: cyber.system.v1.DeptMember.email:type_name -> google.protobuf.StringValue
+	16, // 16: cyber.system.v1.DeptMember.account:type_name -> google.protobuf.StringValue
 	21, // 17: cyber.system.v1.DeptMember.enabled:type_name -> google.protobuf.BoolValue
 	1,  // 18: cyber.system.v1.DeptService.CreateDept:input_type -> cyber.system.v1.CreateDeptRequest
 	3,  // 19: cyber.system.v1.DeptService.UpdateDept:input_type -> cyber.system.v1.UpdateDeptRequest

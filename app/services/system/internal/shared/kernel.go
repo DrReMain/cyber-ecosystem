@@ -7,7 +7,7 @@ import (
 	"cyber-ecosystem/app/services/system/internal/platform"
 )
 
-const ExtraEmail = "email"
+const ExtraAccount = "account"
 const PrincipalTypeUser = "user"
 
 type Transaction interface {

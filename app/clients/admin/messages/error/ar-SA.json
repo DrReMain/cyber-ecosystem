@@ -77,7 +77,6 @@
   "error_SYSTEM_USER_SELF_DISABLE": "لا يمكن إيقاف الحساب الذي سجّلت الدخول به.",
   "error_SYSTEM_USER_DISABLED": "هذا الحساب موقوف - تواصل مع المسؤول.",
   "error_SYSTEM_USER_NOT_FOUND": "هذا الحساب غير موجود.",
-  "error_SYSTEM_USER_EMAIL_TAKEN": "هذا البريد الإلكتروني مستخدم بالفعل",
   "error_SYSTEM_FILE_NOT_FOUND": "الملف غير موجود.",
   "error_SYSTEM_FILE_TOO_LARGE": "الملف يتجاوز حد الحجم.",
   "error_SYSTEM_FILE_SIZE_MISMATCH": "حجم الملف المرفوع لا يطابق الحجم المصرّح به.",

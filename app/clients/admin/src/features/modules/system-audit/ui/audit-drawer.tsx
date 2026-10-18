@@ -69,7 +69,7 @@ function ActorCell({
   }
   return (
     <span className="flex flex-col items-start">
-      <span>{view.email}</span>
+      <span>{view.account}</span>
       <Typography.Text className="font-mono text-[12px]" type="secondary">
         {view.id}
       </Typography.Text>

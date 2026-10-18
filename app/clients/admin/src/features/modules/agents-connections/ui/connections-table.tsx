@@ -27,8 +27,8 @@ export function ConnectionsTable({
       dataIndex: "userEmail",
       width: 240,
       render: (_, row) =>
-        row.userEmail ? (
-          <span>{row.userEmail}</span>
+        row.userAccount ? (
+          <span>{row.userAccount}</span>
         ) : (
           <span className="font-mono text-[12px] text-ink-tertiary">{row.userId}</span>
         ),

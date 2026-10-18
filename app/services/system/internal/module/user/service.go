@@ -45,7 +45,7 @@ func (s *UserService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *UserService) CreateUser(ctx context.Context, in *systempb.CreateUserRequest) (*systempb.CreateUserResponse, error) {
-	created, err := s.userUC.Create(ctx, in.Email, in.Password, in.DeptId, in.Avatar, in.GetPopulation(), in.Roles)
+	created, err := s.userUC.Create(ctx, in.Account, in.Password, in.DeptId, in.Avatar, in.GetPopulation(), in.Roles)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,6 @@ func (s *UserService) CreateUser(ctx context.Context, in *systempb.CreateUserReq
 func (s *UserService) UpdateUser(ctx context.Context, in *systempb.UpdateUserRequest) (*systempb.UpdateUserResponse, error) {
 	if _, err := s.userUC.Update(ctx, in.FieldsMask, &User{
 		ID:     in.Id,
-		Email:  in.Email,
 		DeptID: in.DeptId,
 		Avatar: in.Avatar,
 	}, in.Password, in.Roles); err != nil {
@@ -91,7 +90,7 @@ func (s *UserService) ListUsers(ctx context.Context, in *systempb.ListUsersReque
 	out, err := s.userUC.List(ctx, &UserListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
-		Email:       in.Email,
+		Account:     in.Account,
 		Enabled:     in.Enabled,
 		DeptID:      in.DeptId,
 	})
@@ -122,9 +121,9 @@ func (s *UserService) BatchGetUsers(ctx context.Context, in *systempb.BatchGetUs
 	briefs := make(map[string]*systempb.UserBrief, len(users))
 	for id, u := range users {
 		briefs[id] = &systempb.UserBrief{
-			Id:     utils.StringW(u.ID),
-			Email:  utils.Wrap(u.Email, utils.StringW),
-			Avatar: utils.Wrap(u.Avatar, utils.StringW),
+			Id:      utils.StringW(u.ID),
+			Account: utils.Wrap(u.Account, utils.StringW),
+			Avatar:  utils.Wrap(u.Avatar, utils.StringW),
 		}
 	}
 	return &systempb.BatchGetUsersResponse{Users: briefs}, nil
@@ -137,7 +136,7 @@ func toProtoUser(a *User) *systempb.User {
 		Id:        utils.StringW(a.ID),
 		CreatedAt: utils.ToTimestamp(&a.CreatedAt),
 		UpdatedAt: utils.ToTimestamp(&a.UpdatedAt),
-		Email:     utils.Wrap(a.Email, utils.StringW),
+		Account:   utils.Wrap(a.Account, utils.StringW),
 		DeptId:    utils.Wrap(a.DeptID, utils.StringW),
 		Avatar:    utils.Wrap(a.Avatar, utils.StringW),
 		Roles:     a.Roles,

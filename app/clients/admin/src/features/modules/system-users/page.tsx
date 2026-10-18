@@ -37,7 +37,7 @@ function usersInput(values: { keyword?: string; status?: string; deptId?: string
   return {
     orderBy: ["createdAt:asc"],
     page: { all: true },
-    email: values.keyword?.trim() || undefined,
+    account: values.keyword?.trim() || undefined,
     enabled: values.status === "on" ? true : values.status === "off" ? false : undefined,
     deptId: values.deptId || undefined,
   };
@@ -107,7 +107,7 @@ function useUsersActions({
     handleSave: (draft: UserDraft) => {
       if (editId === undefined) {
         createMut.mutate({
-          email: draft.email,
+          account: draft.account,
           password: draft.password,
           population: draft.population,
           deptId: draft.deptId,

@@ -46,7 +46,6 @@ enum System {
   SYSTEM_USER_SELF_DISABLE = 6071 [(.errors.code) = 400];
   SYSTEM_USER_DISABLED = 6072 [(.errors.code) = 403];
   SYSTEM_USER_NOT_FOUND = 6073 [(.errors.code) = 404];
-  SYSTEM_USER_EMAIL_TAKEN = 6074 [(.errors.code) = 409];
   // 608x: file
   SYSTEM_FILE_NOT_FOUND = 6080 [(.errors.code) = 404];
   SYSTEM_FILE_TOO_LARGE = 6081 [(.errors.code) = 400];

@@ -55,8 +55,8 @@ export function DiagPage() {
         value: u.id ?? "",
         label: (
           <span className="flex items-center gap-2">
-            <span>{u.email?.split("@")[0]}</span>
-            <span className="font-mono text-[12px] text-ink-tertiary">{u.email}</span>
+            <span>{u.account?.split("@")[0]}</span>
+            <span className="font-mono text-[12px] text-ink-tertiary">{u.account}</span>
             {(u.roles ?? []).length === 0 && (
               <Typography.Text className="text-[12px]" type="secondary">
                 {m.system_users_unassigned()}
@@ -64,7 +64,7 @@ export function DiagPage() {
             )}
           </span>
         ),
-        search: u.email ?? "",
+        search: u.account ?? "",
       })),
     [usersQuery.data],
   );
@@ -191,7 +191,7 @@ export function DiagPage() {
         {session.data?.status === "authed" && (
           <Card>
             <SessionPanel
-              email={session.data.user.email}
+              account={session.data.user.account}
               memberships={session.data.memberships}
               permissions={session.data.permissions}
             />

@@ -172,7 +172,7 @@ export function RolesPage() {
   );
   const members = useMemo(() => {
     const emailById = new Map(
-      (usersQuery.data?.list ?? []).map((u) => [u.id ?? "", u.email ?? ""] as const),
+      (usersQuery.data?.list ?? []).map((u) => [u.id ?? "", u.account ?? ""] as const),
     );
     return (membersQuery.data?.list ?? []).map((mem) => ({
       principalType: mem.principalType ?? "user",

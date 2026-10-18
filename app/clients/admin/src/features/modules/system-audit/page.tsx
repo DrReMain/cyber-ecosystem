@@ -53,7 +53,7 @@ export function AuditPage() {
   });
 
   const canListUsers = isOperationAllowed(permissions, op(UserService, "listUsers"));
-  const { byId: usersById, byEmail, known: actorKnown } = useUserDirectory(canListUsers);
+  const { byId: usersById, byAccount, known: actorKnown } = useUserDirectory(canListUsers);
   const actorName = (id: string) => usersById.get(id);
 
   const input = useMemo(() => {
@@ -68,13 +68,13 @@ export function AuditPage() {
           values.createdAtZ !== undefined ? timestampFromMs(values.createdAtZ) : undefined,
       },
       orderBy: [search.sort ?? "createdAt:desc"],
-      actor: actor === undefined ? undefined : (byEmail.get(actor) ?? actor),
+      actor: actor === undefined ? undefined : (byAccount.get(actor) ?? actor),
       operation: clean(values.operation?.trim()),
       status: values.status,
       denyReason: clean(values.denyReason),
       denied: values.lens === "denied" ? true : undefined,
     };
-  }, [values, search.pageNo, search.pageSize, search.sort, byEmail]);
+  }, [values, search.pageNo, search.pageSize, search.sort, byAccount]);
 
   const auditQuery = useQuery(listAuditLogs, input);
   const pagination = useServerPagination(store, auditSearchSchema, auditQuery.data?.page, {

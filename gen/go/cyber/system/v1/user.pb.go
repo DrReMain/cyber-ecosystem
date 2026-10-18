@@ -32,7 +32,7 @@ type User struct {
 	Id            *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	CreatedAt     *timestamppb.Timestamp  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Email         *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	Account       *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=account,proto3" json:"account,omitempty"`
 	DeptId        *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=dept_id,json=deptId,proto3" json:"dept_id,omitempty"`
 	Roles         []string                `protobuf:"bytes,6,rep,name=roles,proto3" json:"roles,omitempty"`
 	Enabled       *wrapperspb.BoolValue   `protobuf:"bytes,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -92,9 +92,9 @@ func (x *User) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *User) GetEmail() *wrapperspb.StringValue {
+func (x *User) GetAccount() *wrapperspb.StringValue {
 	if x != nil {
-		return x.Email
+		return x.Account
 	}
 	return nil
 }
@@ -130,7 +130,7 @@ func (x *User) GetAvatar() *wrapperspb.StringValue {
 // create
 type CreateUserRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
-	Email    *string                `protobuf:"bytes,1,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	Account  *string                `protobuf:"bytes,1,opt,name=account,proto3,oneof" json:"account,omitempty"`
 	Password *string                `protobuf:"bytes,2,opt,name=password,proto3,oneof" json:"password,omitempty"`
 	DeptId   *string                `protobuf:"bytes,3,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
 	Roles    []string               `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`
@@ -173,9 +173,9 @@ func (*CreateUserRequest) Descriptor() ([]byte, []int) {
 	return file_cyber_system_v1_user_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateUserRequest) GetEmail() string {
-	if x != nil && x.Email != nil {
-		return *x.Email
+func (x *CreateUserRequest) GetAccount() string {
+	if x != nil && x.Account != nil {
+		return *x.Account
 	}
 	return ""
 }
@@ -263,11 +263,10 @@ func (x *CreateUserResponse) GetId() *wrapperspb.StringValue {
 type UpdateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Email         *string                `protobuf:"bytes,2,opt,name=email,proto3,oneof" json:"email,omitempty"`
-	Password      *string                `protobuf:"bytes,3,opt,name=password,proto3,oneof" json:"password,omitempty"`
-	DeptId        *string                `protobuf:"bytes,4,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
-	Roles         []string               `protobuf:"bytes,5,rep,name=roles,proto3" json:"roles,omitempty"`
-	Avatar        *string                `protobuf:"bytes,6,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
+	Password      *string                `protobuf:"bytes,2,opt,name=password,proto3,oneof" json:"password,omitempty"`
+	DeptId        *string                `protobuf:"bytes,3,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
+	Roles         []string               `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`
+	Avatar        *string                `protobuf:"bytes,5,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
 	FieldsMask    []string               `protobuf:"bytes,100,rep,name=fields_mask,json=fieldsMask,proto3" json:"fields_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -306,13 +305,6 @@ func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
 func (x *UpdateUserRequest) GetId() string {
 	if x != nil {
 		return x.Id
-	}
-	return ""
-}
-
-func (x *UpdateUserRequest) GetEmail() string {
-	if x != nil && x.Email != nil {
-		return *x.Email
 	}
 	return ""
 }
@@ -651,7 +643,7 @@ func (*DeleteUserResponse) Descriptor() ([]byte, []int) {
 type ListUsersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          *v1.PageRequest        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
-	Email         *string                `protobuf:"bytes,2,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	Account       *string                `protobuf:"bytes,2,opt,name=account,proto3,oneof" json:"account,omitempty"`
 	Enabled       *bool                  `protobuf:"varint,3,opt,name=enabled,proto3,oneof" json:"enabled,omitempty"`
 	DeptId        *string                `protobuf:"bytes,4,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
 	OrderBy       []string               `protobuf:"bytes,100,rep,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
@@ -696,9 +688,9 @@ func (x *ListUsersRequest) GetPage() *v1.PageRequest {
 	return nil
 }
 
-func (x *ListUsersRequest) GetEmail() string {
-	if x != nil && x.Email != nil {
-		return *x.Email
+func (x *ListUsersRequest) GetAccount() string {
+	if x != nil && x.Account != nil {
+		return *x.Account
 	}
 	return ""
 }
@@ -963,7 +955,7 @@ func (x *BatchGetUsersResponse) GetUsers() map[string]*UserBrief {
 type UserBrief struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
 	Id            *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Email         *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Account       *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=account,proto3" json:"account,omitempty"`
 	Avatar        *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=avatar,proto3" json:"avatar,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1006,9 +998,9 @@ func (x *UserBrief) GetId() *wrapperspb.StringValue {
 	return nil
 }
 
-func (x *UserBrief) GetEmail() *wrapperspb.StringValue {
+func (x *UserBrief) GetAccount() *wrapperspb.StringValue {
 	if x != nil {
-		return x.Email
+		return x.Account
 	}
 	return nil
 }
@@ -1024,21 +1016,21 @@ var File_cyber_system_v1_user_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x1acyber/system/v1/user.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x97\x03\n" +
+	"\x1acyber/system/v1/user.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x9b\x03\n" +
 	"\x04User\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
 	"\n" +
 	"created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x122\n" +
-	"\x05email\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\x125\n" +
+	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x126\n" +
+	"\aaccount\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\aaccount\x125\n" +
 	"\adept_id\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\x06deptId\x12\x14\n" +
 	"\x05roles\x18\x06 \x03(\tR\x05roles\x124\n" +
 	"\aenabled\x18\a \x01(\v2\x1a.google.protobuf.BoolValueR\aenabled\x124\n" +
-	"\x06avatar\x18\b \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar\"\xd1\x02\n" +
-	"\x11CreateUserRequest\x12(\n" +
-	"\x05email\x18\x01 \x01(\tB\r\xbaH\n" +
-	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x00R\x05email\x88\x01\x01\x12.\n" +
+	"\x06avatar\x18\b \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar\"\xd7\x02\n" +
+	"\x11CreateUserRequest\x12,\n" +
+	"\aaccount\x18\x01 \x01(\tB\r\xbaH\n" +
+	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x00R\aaccount\x88\x01\x01\x12.\n" +
 	"\bpassword\x18\x02 \x01(\tB\r\xbaH\n" +
 	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x01R\bpassword\x88\x01\x01\x12&\n" +
 	"\adept_id\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x02R\x06deptId\x88\x01\x01\x12(\n" +
@@ -1046,27 +1038,25 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\x06avatar\x18\x05 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x03R\x06avatar\x88\x01\x01\x12,\n" +
 	"\n" +
 	"population\x18\x06 \x01(\tB\a\xbaH\x04r\x02\x18\x14H\x04R\n" +
-	"population\x88\x01\x01B\b\n" +
-	"\x06_emailB\v\n" +
+	"population\x88\x01\x01B\n" +
+	"\n" +
+	"\b_accountB\v\n" +
 	"\t_passwordB\n" +
 	"\n" +
 	"\b_dept_idB\t\n" +
 	"\a_avatarB\r\n" +
 	"\v_population\"B\n" +
 	"\x12CreateUserResponse\x12,\n" +
-	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"\xf1\x02\n" +
+	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"\xba\x02\n" +
 	"\x11UpdateUserRequest\x12\x1b\n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\x12%\n" +
-	"\x05email\x18\x02 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x01\x18\x80\x01H\x00R\x05email\x88\x01\x01\x12+\n" +
-	"\bpassword\x18\x03 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x01\x18\x80\x01H\x01R\bpassword\x88\x01\x01\x12\x1c\n" +
-	"\adept_id\x18\x04 \x01(\tH\x02R\x06deptId\x88\x01\x01\x12(\n" +
-	"\x05roles\x18\x05 \x03(\tB\x12\xbaH\x0f\x92\x01\f\x10@\x18\x01\"\x06r\x04\x10\x01\x18@R\x05roles\x12\x1b\n" +
-	"\x06avatar\x18\x06 \x01(\tH\x03R\x06avatar\x88\x01\x01\x12X\n" +
-	"\vfields_mask\x18d \x03(\tB7\xbaH4\x92\x011\b\x01\x18\x01\"+r)2'^(email|password|dept_id|roles|avatar)$R\n" +
-	"fieldsMaskB\b\n" +
-	"\x06_emailB\v\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\x12+\n" +
+	"\bpassword\x18\x02 \x01(\tB\n" +
+	"\xbaH\ar\x05\x10\x01\x18\x80\x01H\x00R\bpassword\x88\x01\x01\x12\x1c\n" +
+	"\adept_id\x18\x03 \x01(\tH\x01R\x06deptId\x88\x01\x01\x12(\n" +
+	"\x05roles\x18\x04 \x03(\tB\x12\xbaH\x0f\x92\x01\f\x10@\x18\x01\"\x06r\x04\x10\x01\x18@R\x05roles\x12\x1b\n" +
+	"\x06avatar\x18\x05 \x01(\tH\x02R\x06avatar\x88\x01\x01\x12R\n" +
+	"\vfields_mask\x18d \x03(\tB1\xbaH.\x92\x01+\b\x01\x18\x01\"%r#2!^(password|dept_id|roles|avatar)$R\n" +
+	"fieldsMaskB\v\n" +
 	"\t_passwordB\n" +
 	"\n" +
 	"\b_dept_idB\t\n" +
@@ -1088,15 +1078,16 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\x16ChangePasswordResponse\"0\n" +
 	"\x11DeleteUserRequest\x12\x1b\n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x02id\"\x14\n" +
-	"\x12DeleteUserResponse\"\xee\x02\n" +
+	"\x12DeleteUserResponse\"\xf6\x02\n" +
 	"\x10ListUsersRequest\x127\n" +
-	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12\x19\n" +
-	"\x05email\x18\x02 \x01(\tH\x00R\x05email\x88\x01\x01\x12\x1d\n" +
+	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12\x1d\n" +
+	"\aaccount\x18\x02 \x01(\tH\x00R\aaccount\x88\x01\x01\x12\x1d\n" +
 	"\aenabled\x18\x03 \x01(\bH\x01R\aenabled\x88\x01\x01\x12&\n" +
-	"\adept_id\x18\x04 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x02R\x06deptId\x88\x01\x01\x12\x9c\x01\n" +
-	"\border_by\x18d \x03(\tB\x80\x01\xbaH}\xba\x01z\n" +
-	"\x19ListUsersRequest.order_by\x12\x00\x1a[this.all(item, size(item) == 0 || item.matches('^(email|createdAt|updatedAt):(asc|desc)$'))R\aorderByB\b\n" +
-	"\x06_emailB\n" +
+	"\adept_id\x18\x04 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x02R\x06deptId\x88\x01\x01\x12\x9e\x01\n" +
+	"\border_by\x18d \x03(\tB\x82\x01\xbaH\x7f\xba\x01|\n" +
+	"\x19ListUsersRequest.order_by\x12\x00\x1a]this.all(item, size(item) == 0 || item.matches('^(account|createdAt|updatedAt):(asc|desc)$'))R\aorderByB\n" +
+	"\n" +
+	"\b_accountB\n" +
 	"\n" +
 	"\b_enabledB\n" +
 	"\n" +
@@ -1115,10 +1106,10 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\n" +
 	"UsersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x120\n" +
-	"\x05value\x18\x02 \x01(\v2\x1a.cyber.system.v1.UserBriefR\x05value:\x028\x01\"\xa3\x01\n" +
+	"\x05value\x18\x02 \x01(\v2\x1a.cyber.system.v1.UserBriefR\x05value:\x028\x01\"\xa7\x01\n" +
 	"\tUserBrief\x12,\n" +
-	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x122\n" +
-	"\x05email\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\x05email\x124\n" +
+	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x126\n" +
+	"\aaccount\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\aaccount\x124\n" +
 	"\x06avatar\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar2\x94\n" +
 	"\n" +
 	"\vUserService\x12\x8e\x01\n" +
@@ -1185,7 +1176,7 @@ var file_cyber_system_v1_user_proto_depIdxs = []int32{
 	19, // 0: cyber.system.v1.User.id:type_name -> google.protobuf.StringValue
 	20, // 1: cyber.system.v1.User.created_at:type_name -> google.protobuf.Timestamp
 	20, // 2: cyber.system.v1.User.updated_at:type_name -> google.protobuf.Timestamp
-	19, // 3: cyber.system.v1.User.email:type_name -> google.protobuf.StringValue
+	19, // 3: cyber.system.v1.User.account:type_name -> google.protobuf.StringValue
 	19, // 4: cyber.system.v1.User.dept_id:type_name -> google.protobuf.StringValue
 	21, // 5: cyber.system.v1.User.enabled:type_name -> google.protobuf.BoolValue
 	19, // 6: cyber.system.v1.User.avatar:type_name -> google.protobuf.StringValue
@@ -1196,7 +1187,7 @@ var file_cyber_system_v1_user_proto_depIdxs = []int32{
 	0,  // 11: cyber.system.v1.GetUserResponse.user:type_name -> cyber.system.v1.User
 	18, // 12: cyber.system.v1.BatchGetUsersResponse.users:type_name -> cyber.system.v1.BatchGetUsersResponse.UsersEntry
 	19, // 13: cyber.system.v1.UserBrief.id:type_name -> google.protobuf.StringValue
-	19, // 14: cyber.system.v1.UserBrief.email:type_name -> google.protobuf.StringValue
+	19, // 14: cyber.system.v1.UserBrief.account:type_name -> google.protobuf.StringValue
 	19, // 15: cyber.system.v1.UserBrief.avatar:type_name -> google.protobuf.StringValue
 	17, // 16: cyber.system.v1.BatchGetUsersResponse.UsersEntry.value:type_name -> cyber.system.v1.UserBrief
 	1,  // 17: cyber.system.v1.UserService.CreateUser:input_type -> cyber.system.v1.CreateUserRequest

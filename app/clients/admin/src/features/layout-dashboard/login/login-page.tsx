@@ -34,7 +34,7 @@ export function LoginPage() {
     const form = new FormData(event.currentTarget);
     await login
       .mutateAsync({
-        email: String(form.get("email")),
+        account: String(form.get("account")),
         password: String(form.get("password")),
       })
       .catch(() => {});

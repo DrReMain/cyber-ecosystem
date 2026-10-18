@@ -12,7 +12,7 @@ export function usePasswordLogin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: { email: string; password: string }) => loginFn({ data: input }),
+    mutationFn: (input: { account: string; password: string }) => loginFn({ data: input }),
     onSuccess: async () => {
       queryClient.clear();
       const home =

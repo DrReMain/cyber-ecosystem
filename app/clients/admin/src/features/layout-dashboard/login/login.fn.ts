@@ -7,10 +7,10 @@ import { createKratosTransport } from "#/services/connect";
 import { save } from "../auth/custody.server";
 
 export const loginFn = createServerFn({ method: "POST" })
-  .validator(zodValidator(z.object({ email: z.string().min(1), password: z.string().min(1) })))
+  .validator(zodValidator(z.object({ account: z.string().min(1), password: z.string().min(1) })))
   .handler(async ({ data }) => {
     const res = await createClient(AuthService, createKratosTransport()).login({
-      email: data.email,
+      account: data.account,
       password: data.password,
     });
     save(res.sessionToken);

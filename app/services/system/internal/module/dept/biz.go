@@ -38,7 +38,7 @@ type DeptListOut struct {
 
 type DeptMember struct {
 	UserID  string
-	Email   string
+	Account string
 	Enabled bool
 }
 

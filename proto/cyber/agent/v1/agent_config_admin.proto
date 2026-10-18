@@ -38,7 +38,7 @@ message AgentConfigView {
   google.protobuf.Timestamp created_at = 2;
   google.protobuf.Timestamp updated_at = 3;
   google.protobuf.StringValue user_id = 4;
-  google.protobuf.StringValue user_email = 5;
+  google.protobuf.StringValue user_account = 5;
   google.protobuf.StringValue user_avatar = 6;
   google.protobuf.StringValue base_url = 7;
   google.protobuf.BoolValue api_key_set = 8;

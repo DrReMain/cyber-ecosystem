@@ -186,7 +186,7 @@ export function FilesTable({
       render: (_, file) => {
         const view = userRefView(file.ownerId, ownerName, ownerKnown);
         if (view.kind === "known") {
-          return <span>{view.email}</span>;
+          return <span>{view.account}</span>;
         }
         if (view.kind === "raw") {
           return (

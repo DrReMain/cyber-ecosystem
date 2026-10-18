@@ -129,7 +129,7 @@ type AgentConfigView struct {
 	CreatedAt     *timestamppb.Timestamp  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	UserId        *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	UserEmail     *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
+	UserAccount   *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=user_account,json=userAccount,proto3" json:"user_account,omitempty"`
 	UserAvatar    *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=user_avatar,json=userAvatar,proto3" json:"user_avatar,omitempty"`
 	BaseUrl       *wrapperspb.StringValue `protobuf:"bytes,7,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
 	ApiKeySet     *wrapperspb.BoolValue   `protobuf:"bytes,8,opt,name=api_key_set,json=apiKeySet,proto3" json:"api_key_set,omitempty"`
@@ -195,9 +195,9 @@ func (x *AgentConfigView) GetUserId() *wrapperspb.StringValue {
 	return nil
 }
 
-func (x *AgentConfigView) GetUserEmail() *wrapperspb.StringValue {
+func (x *AgentConfigView) GetUserAccount() *wrapperspb.StringValue {
 	if x != nil {
-		return x.UserEmail
+		return x.UserAccount
 	}
 	return nil
 }
@@ -232,16 +232,15 @@ const file_cyber_agent_v1_agent_config_admin_proto_rawDesc = "" +
 	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\"\x89\x01\n" +
 	"\x18ListAgentConfigsResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x123\n" +
-	"\x04list\x18\x02 \x03(\v2\x1f.cyber.agent.v1.AgentConfigViewR\x04list\"\xdd\x03\n" +
+	"\x04list\x18\x02 \x03(\v2\x1f.cyber.agent.v1.AgentConfigViewR\x04list\"\xe1\x03\n" +
 	"\x0fAgentConfigView\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
 	"\n" +
 	"created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x125\n" +
-	"\auser_id\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x06userId\x12;\n" +
-	"\n" +
-	"user_email\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\tuserEmail\x12=\n" +
+	"\auser_id\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x06userId\x12?\n" +
+	"\fuser_account\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\vuserAccount\x12=\n" +
 	"\vuser_avatar\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\n" +
 	"userAvatar\x127\n" +
 	"\bbase_url\x18\a \x01(\v2\x1c.google.protobuf.StringValueR\abaseUrl\x12:\n" +
@@ -281,7 +280,7 @@ var file_cyber_agent_v1_agent_config_admin_proto_depIdxs = []int32{
 	6,  // 4: cyber.agent.v1.AgentConfigView.created_at:type_name -> google.protobuf.Timestamp
 	6,  // 5: cyber.agent.v1.AgentConfigView.updated_at:type_name -> google.protobuf.Timestamp
 	5,  // 6: cyber.agent.v1.AgentConfigView.user_id:type_name -> google.protobuf.StringValue
-	5,  // 7: cyber.agent.v1.AgentConfigView.user_email:type_name -> google.protobuf.StringValue
+	5,  // 7: cyber.agent.v1.AgentConfigView.user_account:type_name -> google.protobuf.StringValue
 	5,  // 8: cyber.agent.v1.AgentConfigView.user_avatar:type_name -> google.protobuf.StringValue
 	5,  // 9: cyber.agent.v1.AgentConfigView.base_url:type_name -> google.protobuf.StringValue
 	7,  // 10: cyber.agent.v1.AgentConfigView.api_key_set:type_name -> google.protobuf.BoolValue

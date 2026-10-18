@@ -1097,18 +1097,18 @@ func init() {
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// userDescEmail is the schema descriptor for email field.
-	userDescEmail := userFields[0].Descriptor()
-	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	user.EmailValidator = func() func(string) error {
-		validators := userDescEmail.Validators
+	// userDescAccount is the schema descriptor for account field.
+	userDescAccount := userFields[0].Descriptor()
+	// user.AccountValidator is a validator for the "account" field. It is called by the builders before save.
+	user.AccountValidator = func() func(string) error {
+		validators := userDescAccount.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
 		}
-		return func(email string) error {
+		return func(account string) error {
 			for _, fn := range fns {
-				if err := fn(email); err != nil {
+				if err := fn(account); err != nil {
 					return err
 				}
 			}

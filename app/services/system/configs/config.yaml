@@ -83,7 +83,7 @@ catalog:
 auth:
   providers:
     - key: wechat                   # 实例注册键 (登录请求的 provider 参数)
-      kind: wechat                  # 代码注册的 kind
+      kind: wechat_mp               # 代码注册的 kind (公众号网页授权)
       enabled: ${WECHAT_ENABLED:true}
       auto_register: ${WECHAT_AUTO_REGISTER:true} # 无绑定交换=注册新会员
       endpoint: ${WECHAT_ENDPOINT:} # 交换端点；空 = 官方默认 (e2e 覆写指向 mock)
@@ -92,5 +92,5 @@ auth:
         secret: ${WECHAT_SECRET:da1ce920bfcee3db140f431d2c1f3a5b}
 seed:
   super_admins:
-    - admin@cyber.local            # 邮箱 (种子超管)
+    - admin                       # 账号 (种子超管)
   initial_password: ${SEED_INITIAL_PASSWORD:admin123456} # 种子超管口令

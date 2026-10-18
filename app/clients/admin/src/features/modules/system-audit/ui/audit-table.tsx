@@ -67,7 +67,7 @@ export function AuditTable({
             </span>
           );
         }
-        return <span>{view.email}</span>;
+        return <span>{view.account}</span>;
       },
     },
     {

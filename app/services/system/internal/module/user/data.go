@@ -42,7 +42,7 @@ func (rp *userRP) Create(ctx context.Context, u *User) (*User, error) {
 	created, err := rp.Platform.GetClient(ctx).User.Create().
 		SetNillableDeptID(u.DeptID).
 		SetNillableAvatar(u.Avatar).
-		SetEmail(*u.Email).
+		SetAccount(*u.Account).
 		SetPasswordHash(*u.PasswordHash).
 		Save(ctx)
 	if err != nil {
@@ -54,11 +54,6 @@ func (rp *userRP) Create(ctx context.Context, u *User) (*User, error) {
 func (rp *userRP) Update(ctx context.Context, fieldsMask []string, u *User) (*User, error) {
 	updater := rp.Platform.GetClient(ctx).User.UpdateOneID(u.ID)
 	helper.Handler{
-		"email": {
-			Condition: u.Email != nil,
-			OnTrue:    func() { updater.SetEmail(*u.Email) },
-			OnFalse:   func() {},
-		},
 		"password": {
 			Condition: u.PasswordHash != nil,
 			OnTrue:    func() { updater.SetPasswordHash(*u.PasswordHash) },
@@ -110,11 +105,11 @@ func (rp *userRP) List(ctx context.Context, in *UserListIn) (*UserListOut, error
 	helper.WherePtr(query, utils.FromTimestamp(in.CreatedAtZ), user.CreatedAtLTE)
 	helper.WherePtr(query, utils.FromTimestamp(in.UpdatedAtA), user.UpdatedAtGTE)
 	helper.WherePtr(query, utils.FromTimestamp(in.UpdatedAtZ), user.UpdatedAtLTE)
-	helper.Where(query, in.Email != nil, func() predicate.User { return user.EmailContainsFold(*in.Email) })
+	helper.Where(query, in.Account != nil, func() predicate.User { return user.AccountContainsFold(*in.Account) })
 	helper.Where(query, in.Enabled != nil, func() predicate.User { return user.EnabledEQ(*in.Enabled) })
 	helper.Where(query, in.DeptID != nil, func() predicate.User { return user.DeptIDEQ(*in.DeptID) })
 	helper.ApplyOrderBy(helper.ParseOrderBy(in.OrderBy), ent.Asc, ent.Desc, helper.FOMapping{
-		"email":     func(sel helper.SQLSelector) { query.Order(sel(user.FieldEmail)) },
+		"account":   func(sel helper.SQLSelector) { query.Order(sel(user.FieldAccount)) },
 		"createdAt": func(sel helper.SQLSelector) { query.Order(sel(user.FieldCreatedAt)) },
 		"updatedAt": func(sel helper.SQLSelector) { query.Order(sel(user.FieldUpdatedAt)) },
 	})
@@ -133,13 +128,13 @@ func (rp *userRP) List(ctx context.Context, in *UserListIn) (*UserListOut, error
 	}, nil
 }
 
-func (rp *userRP) FindByEmail(ctx context.Context, email string) (*User, error) {
+func (rp *userRP) FindByAccount(ctx context.Context, account string) (*User, error) {
 	// Registry-plane lookup: the plane flag must ride the query execution
 	// too — the tenant interceptor fires at Only/All with the context it is
 	// handed.
 	globctx := security.RegistryPlane(ctx)
 	d, err := rp.Platform.GetClient(globctx).User.Query().
-		Where(user.EmailEQ(email)).
+		Where(user.AccountEQ(account)).
 		Only(globctx)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
@@ -367,7 +362,7 @@ func mapUser(d *ent.User) *User {
 		UpdatedAt:    d.UpdatedAt,
 		DeptID:       d.DeptID,
 		Avatar:       d.Avatar,
-		Email:        &d.Email,
+		Account:      &d.Account,
 		PasswordHash: &d.PasswordHash,
 		Enabled:      d.Enabled,
 	}

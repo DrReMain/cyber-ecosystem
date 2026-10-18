@@ -77,7 +77,6 @@
   "error_SYSTEM_USER_SELF_DISABLE": "Cannot disable the account you are signed in with.",
   "error_SYSTEM_USER_DISABLED": "This account is disabled - contact an administrator.",
   "error_SYSTEM_USER_NOT_FOUND": "This account does not exist.",
-  "error_SYSTEM_USER_EMAIL_TAKEN": "This email is already in use",
   "error_SYSTEM_FILE_NOT_FOUND": "File not found.",
   "error_SYSTEM_FILE_TOO_LARGE": "File exceeds the size limit.",
   "error_SYSTEM_FILE_SIZE_MISMATCH": "Uploaded size does not match the declaration.",

@@ -82,7 +82,7 @@ export function ExportDrawer({
           );
         }
         if (view.kind === "known") {
-          return <span>{view.email}</span>;
+          return <span>{view.account}</span>;
         }
         return null;
       },

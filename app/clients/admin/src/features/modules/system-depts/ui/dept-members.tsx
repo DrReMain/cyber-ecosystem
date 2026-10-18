@@ -6,7 +6,7 @@ import { getTextDirection } from "#/paraglide/runtime";
 
 export interface DeptMemberView {
   userId: string;
-  email: string;
+  account: string;
   enabled: boolean;
 }
 
@@ -22,7 +22,7 @@ export function DeptMembers({ members, pendingId, onRemove }: Readonly<DeptMembe
   const needle = query.trim().toLowerCase();
   const visible = members.filter(
     (member) =>
-      member.email.toLowerCase().includes(needle) || member.userId.toLowerCase().includes(needle),
+      member.account.toLowerCase().includes(needle) || member.userId.toLowerCase().includes(needle),
   );
 
   return (
@@ -50,7 +50,7 @@ export function DeptMembers({ members, pendingId, onRemove }: Readonly<DeptMembe
               className="flex items-center justify-between gap-2 rounded-lg border border-line-soft px-3 py-2"
               key={member.userId}
             >
-              <span className="text-[13px]">{member.email}</span>
+              <span className="text-[13px]">{member.account}</span>
 
               <div className="flex items-center gap-2">
                 {!member.enabled && <Tag>{m.system_depts_member_disabled()}</Tag>}

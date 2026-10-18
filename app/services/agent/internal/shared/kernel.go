@@ -7,7 +7,7 @@ import (
 	"cyber-ecosystem/app/services/agent/internal/platform"
 )
 
-const ExtraEmail = "email"
+const ExtraAccount = "account"
 
 type Transaction interface {
 	InTx(ctx context.Context, fn func(context.Context) error) error

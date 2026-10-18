@@ -65,7 +65,7 @@ export function DeptsPage() {
     () =>
       (membersQuery.data?.list ?? []).map((mem) => ({
         userId: mem.userId ?? "",
-        email: mem.email ?? "",
+        account: mem.account ?? "",
         enabled: mem.enabled ?? false,
       })),
     [membersQuery.data],

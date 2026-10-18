@@ -77,7 +77,6 @@
   "error_SYSTEM_USER_SELF_DISABLE": "現在ログイン中のアカウントは無効化できません。",
   "error_SYSTEM_USER_DISABLED": "このアカウントは無効化されています。管理者に連絡してください。",
   "error_SYSTEM_USER_NOT_FOUND": "このアカウントは存在しません。",
-  "error_SYSTEM_USER_EMAIL_TAKEN": "このメールアドレスは既に使用されています",
   "error_SYSTEM_FILE_NOT_FOUND": "ファイルが見つかりません。",
   "error_SYSTEM_FILE_TOO_LARGE": "ファイルがサイズ上限を超えています。",
   "error_SYSTEM_FILE_SIZE_MISMATCH": "アップロードされたサイズが宣言と一致しません。",

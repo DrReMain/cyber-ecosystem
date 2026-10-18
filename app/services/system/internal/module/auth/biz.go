@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/rs/xid"
+
 	"cyber-ecosystem/shared-go/kratos/security"
 	"cyber-ecosystem/shared-go/utils"
 
@@ -37,12 +39,12 @@ type Session struct {
 	Population string
 	ExpiresAt  time.Time
 	IssuedAt   time.Time
-	Email      string
+	Account    string
 }
 
 type CurrentUser struct {
 	ID          string
-	Email       string
+	Account     string
 	Avatar      *string
 	Permissions []string
 	Seats       []*user.Seat
@@ -91,8 +93,8 @@ func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, user
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *AuthUC) Login(ctx context.Context, email, password, seatPopulation string) (token string, issuedAt, expiresAt time.Time, err error) {
-	u, err := uc.exchangePassword(ctx, email, password)
+func (uc *AuthUC) Login(ctx context.Context, account, password, seatPopulation string) (token string, issuedAt, expiresAt time.Time, err error) {
+	u, err := uc.exchangePassword(ctx, account, password)
 	if err != nil {
 		return "", time.Time{}, time.Time{}, err
 	}
@@ -165,27 +167,19 @@ func (uc *AuthUC) BeginIdentityLogin(ctx context.Context, providerKey, redirectU
 }
 
 func (uc *AuthUC) autoRegister(ctx context.Context, id *exchangedIdentity) (*user.User, error) {
-	email := fmt.Sprintf("%s.%s@id.local", id.Kind, id.Identifier)
+	account := xid.New().String()
 	hash := ""
 	var u *user.User
 	err := uc.Tm.InTx(ctx, func(ctx context.Context) error {
-		existing, ferr := uc.userRP.FindByEmail(ctx, email)
-		if ferr != nil && !errorspb.IsInfraErrorDbNotFound(ferr) {
-			return ferr
+		created, cerr := uc.userRP.Create(ctx, &user.User{
+			Account:      &account,
+			PasswordHash: &hash,
+			Enabled:      true,
+		})
+		if cerr != nil {
+			return cerr
 		}
-		if existing != nil {
-			u = existing
-		} else {
-			created, cerr := uc.userRP.Create(ctx, &user.User{
-				Email:        &email,
-				PasswordHash: &hash,
-				Enabled:      true,
-			})
-			if cerr != nil {
-				return cerr
-			}
-			u = created
-		}
+		u = created
 		return uc.userRP.CreateCredential(ctx, &user.Credential{
 			Kind:       id.Kind,
 			Identifier: id.Identifier,
@@ -311,7 +305,7 @@ func (uc *AuthUC) AuthenticateSession(ctx context.Context, token string) (*secur
 	if err != nil {
 		return nil, err
 	}
-	return &security.Subject{UserID: sess.UserID, TenantID: sess.TenantID, Population: sess.Population, Archetype: archetype, SessionID: token, Extra: map[string]any{shared.ExtraEmail: sess.Email}}, nil
+	return &security.Subject{UserID: sess.UserID, TenantID: sess.TenantID, Population: sess.Population, Archetype: archetype, SessionID: token, Extra: map[string]any{shared.ExtraAccount: sess.Account}}, nil
 }
 
 func (uc *AuthUC) GetCurrentUser(ctx context.Context) (*CurrentUser, error) {
@@ -319,7 +313,7 @@ func (uc *AuthUC) GetCurrentUser(ctx context.Context) (*CurrentUser, error) {
 	if !ok {
 		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("no subject in context"))
 	}
-	email, _ := subject.Extra[shared.ExtraEmail].(string)
+	account, _ := subject.Extra[shared.ExtraAccount].(string)
 	grants, err := uc.authzRP.EffectiveGrants(ctx, subject)
 	if err != nil {
 		// A session without a resolved grant set would silently masquerade
@@ -340,7 +334,7 @@ func (uc *AuthUC) GetCurrentUser(ctx context.Context) (*CurrentUser, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &CurrentUser{ID: subject.UserID, Email: email, Avatar: avatar, Permissions: perms, Seats: seats}, nil
+	return &CurrentUser{ID: subject.UserID, Account: account, Avatar: avatar, Permissions: perms, Seats: seats}, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
@@ -379,17 +373,17 @@ func (uc *AuthUC) cashState(ctx context.Context, providerKey, state string) erro
 	return nil
 }
 
-func (uc *AuthUC) exchangePassword(ctx context.Context, email, password string) (*user.User, error) {
-	u, err := uc.userRP.FindByEmail(ctx, email)
+func (uc *AuthUC) exchangePassword(ctx context.Context, account, password string) (*user.User, error) {
+	u, err := uc.userRP.FindByAccount(ctx, account)
 	if err != nil {
 		if errorspb.IsInfraErrorDbNotFound(err) {
 			utils.Verify(password, dummyDigest)
-			return nil, systempb.ErrorSystemLoginFailed("").WithCause(fmt.Errorf("user not found: %s", email))
+			return nil, systempb.ErrorSystemLoginFailed("").WithCause(fmt.Errorf("account not found: %s", account))
 		}
 		return nil, err
 	}
 	if !utils.Verify(password, *u.PasswordHash) {
-		return nil, systempb.ErrorSystemLoginFailed("").WithCause(fmt.Errorf("password mismatch: %s", email))
+		return nil, systempb.ErrorSystemLoginFailed("").WithCause(fmt.Errorf("password mismatch: %s", account))
 	}
 	// Lazy digest upgrade: a legacy row re-hashes as argon2id on the login
 	// that verified it; a failed upgrade warns and never blocks the login.
@@ -407,7 +401,7 @@ func (uc *AuthUC) exchangePassword(ctx context.Context, email, password string) 
 
 func (uc *AuthUC) resolveSeat(ctx context.Context, u *user.User, hint string) (*user.Seat, error) {
 	if !u.Enabled {
-		return nil, systempb.ErrorSystemUserDisabled("").WithCause(fmt.Errorf("user disabled: %s", utils.Deref(u.Email, "")))
+		return nil, systempb.ErrorSystemUserDisabled("").WithCause(fmt.Errorf("user disabled: %s", utils.Deref(u.Account, "")))
 	}
 	seats, err := uc.userRP.ListSeatsByUser(ctx, u.ID)
 	if err != nil {
@@ -432,7 +426,7 @@ func (uc *AuthUC) resolveSeat(ctx context.Context, u *user.User, hint string) (*
 
 func (uc *AuthUC) resolveProviderSeat(ctx context.Context, u *user.User, population string) (*user.Seat, error) {
 	if !u.Enabled {
-		return nil, systempb.ErrorSystemUserDisabled("").WithCause(fmt.Errorf("user disabled: %s", utils.Deref(u.Email, "")))
+		return nil, systempb.ErrorSystemUserDisabled("").WithCause(fmt.Errorf("user disabled: %s", utils.Deref(u.Account, "")))
 	}
 	seat, err := uc.seatInPopulation(ctx, u.ID, population)
 	if err != nil {
@@ -502,7 +496,7 @@ func (uc *AuthUC) mintSession(ctx context.Context, u *user.User, seat *user.Seat
 	}
 	issuedAt = time.Now()
 	expiresAt = issuedAt.Add(shared.SessionMax)
-	sess := &Session{UserID: u.ID, TenantID: seat.TenantID, Population: seat.Population, ExpiresAt: expiresAt, IssuedAt: issuedAt, Email: utils.Deref(u.Email, "")}
+	sess := &Session{UserID: u.ID, TenantID: seat.TenantID, Population: seat.Population, ExpiresAt: expiresAt, IssuedAt: issuedAt, Account: utils.Deref(u.Account, "")}
 	if err = uc.tokenRP.Set(ctx, sessionPrefix+token, utils.MustMarshal(sess), sessionIdle); err != nil {
 		return "", time.Time{}, time.Time{}, err
 	}

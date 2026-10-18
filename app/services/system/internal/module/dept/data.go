@@ -216,7 +216,7 @@ func mapDept(d *ent.Dept) *Dept {
 func mapMember(d *ent.User) *DeptMember {
 	return &DeptMember{
 		UserID:  d.ID,
-		Email:   d.Email,
+		Account: d.Account,
 		Enabled: d.Enabled,
 	}
 }

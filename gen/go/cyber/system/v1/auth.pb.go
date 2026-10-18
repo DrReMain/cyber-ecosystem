@@ -27,7 +27,7 @@ const (
 
 type LoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         *string                `protobuf:"bytes,1,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	Account       *string                `protobuf:"bytes,1,opt,name=account,proto3,oneof" json:"account,omitempty"`
 	Password      *string                `protobuf:"bytes,2,opt,name=password,proto3,oneof" json:"password,omitempty"`
 	Population    *string                `protobuf:"bytes,3,opt,name=population,proto3,oneof" json:"population,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -64,9 +64,9 @@ func (*LoginRequest) Descriptor() ([]byte, []int) {
 	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *LoginRequest) GetEmail() string {
-	if x != nil && x.Email != nil {
-		return *x.Email
+func (x *LoginRequest) GetAccount() string {
+	if x != nil && x.Account != nil {
+		return *x.Account
 	}
 	return ""
 }
@@ -773,16 +773,17 @@ var File_cyber_system_v1_auth_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x1acyber/system/v1/auth.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/user.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xad\x01\n" +
-	"\fLoginRequest\x12%\n" +
-	"\x05email\x18\x01 \x01(\tB\n" +
-	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\x05email\x88\x01\x01\x12+\n" +
+	"\x1acyber/system/v1/auth.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/user.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb3\x01\n" +
+	"\fLoginRequest\x12)\n" +
+	"\aaccount\x18\x01 \x01(\tB\n" +
+	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\aaccount\x88\x01\x01\x12+\n" +
 	"\bpassword\x18\x02 \x01(\tB\n" +
 	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x01R\bpassword\x88\x01\x01\x12#\n" +
 	"\n" +
 	"population\x18\x03 \x01(\tH\x02R\n" +
-	"population\x88\x01\x01B\b\n" +
-	"\x06_emailB\v\n" +
+	"population\x88\x01\x01B\n" +
+	"\n" +
+	"\b_accountB\v\n" +
 	"\t_passwordB\r\n" +
 	"\v_population\"\xa8\x01\n" +
 	"\rLoginResponse\x12#\n" +

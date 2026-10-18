@@ -52,12 +52,12 @@ func (s *IntrospectService) VerifySession(ctx context.Context, in *systempb.Veri
 	if !ok {
 		return nil, kauthz.ErrMissingSubject
 	}
-	email, _ := subject.Extra[shared.ExtraEmail].(string)
+	account, _ := subject.Extra[shared.ExtraAccount].(string)
 	return &systempb.VerifySessionResponse{
 		UserId:     utils.StringW(subject.UserID),
 		TenantId:   utils.StringW(subject.TenantID),
 		SessionId:  utils.StringW(subject.SessionID),
-		Email:      utils.StringW(email),
+		Account:    utils.StringW(account),
 		Population: utils.StringW(subject.Population),
 		Archetype:  utils.StringW(subject.Archetype),
 	}, nil

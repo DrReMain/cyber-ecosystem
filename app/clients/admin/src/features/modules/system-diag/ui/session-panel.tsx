@@ -7,12 +7,12 @@ interface MembershipView {
 }
 
 interface SessionPanelProps {
-  email: string;
+  account: string;
   permissions: string[];
   memberships: readonly MembershipView[];
 }
 
-export function SessionPanel({ email, permissions, memberships }: Readonly<SessionPanelProps>) {
+export function SessionPanel({ account, permissions, memberships }: Readonly<SessionPanelProps>) {
   return (
     <Collapse
       items={[
@@ -24,7 +24,7 @@ export function SessionPanel({ email, permissions, memberships }: Readonly<Sessi
               colon={false}
               column={1}
               items={[
-                { key: "email", label: "GetCurrentUser", children: email },
+                { key: "account", label: "GetCurrentUser", children: account },
                 {
                   key: "memberships",
                   label: m.system_diag_session_seats(),

@@ -205,6 +205,6 @@ message ListDeptMembersResponse {
 // view carries the user's live account fields.
 message DeptMember {
   google.protobuf.StringValue user_id = 1;
-  google.protobuf.StringValue email = 2;
+  google.protobuf.StringValue account = 2;
   google.protobuf.BoolValue enabled = 3;
 }

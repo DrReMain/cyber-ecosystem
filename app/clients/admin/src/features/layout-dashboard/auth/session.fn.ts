@@ -16,7 +16,7 @@ export const getCurrentUserFn = createServerFn({ method: "GET" }).handler(async 
     const res = await createClient(AuthService, createKratosTransport()).getCurrentUser({});
     return {
       status: "authed",
-      user: { id: res.user?.id ?? "", email: res.user?.email ?? "", avatar: res.user?.avatar },
+      user: { id: res.user?.id ?? "", account: res.user?.account ?? "", avatar: res.user?.avatar },
       permissions: [...(res.permissions ?? [])],
       memberships: (res.memberships ?? []).map((seat) => ({
         tenant: seat.tenant,

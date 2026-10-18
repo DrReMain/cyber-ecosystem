@@ -224,7 +224,7 @@ func autoUC(t *testing.T, uf *fakeUserRP) (*AuthUC, *fakeTokenRP) {
 }
 
 // The auto-register gate births the member the C-end product promises: an
-// unbound exchange on a gated row creates the synthetic-email user — no
+// unbound exchange on a gated row creates the generated-account user — no
 // password, so the provider is the only way in — lands the declared seat,
 // binds the credential, and mints from that seat, the same derivation and
 // minter as every other login face.
@@ -241,8 +241,8 @@ func TestLoginByIdentityAutoRegisterBirthsMember(t *testing.T) {
 		t.Fatalf("auto-register: %d users created, want the one birth", len(uf.createdUsers))
 	}
 	born := uf.createdUsers[0]
-	if born.Email == nil || *born.Email != fakeKind+".oid-x@id.local" {
-		t.Fatalf("auto-register: email = %v, want the synthetic %s.oid-x@id.local", born.Email, fakeKind)
+	if born.Account == nil || *born.Account == "" {
+		t.Fatalf("auto-register: account = %v, want a generated handle", born.Account)
 	}
 	if born.PasswordHash == nil || *born.PasswordHash != "" {
 		t.Fatalf("auto-register: hash = %v, want empty for provider-only auth", born.PasswordHash)
@@ -267,11 +267,11 @@ func TestLoginByIdentityAutoRegisterBirthsMember(t *testing.T) {
 	}
 }
 
-// A synthetic-email row whose credential is gone (a deleted binding)
-// converges instead of duplicating: the existing user is reused, the seat
-// ensure stays idempotent, and the fresh binding re-attaches the identity.
-func TestLoginByIdentityAutoRegisterConverges(t *testing.T) {
-	row := seedRow(t, fakeKind+".oid-x@id.local", "pw")
+// A deleted binding severs the tie: a later login of the same external
+// identity births a fresh user instead of resurrecting the unclaimable row —
+// generated accounts are not derivable, so nothing correlates the two.
+func TestLoginByIdentityUnboundBirthsFresh(t *testing.T) {
+	row := seedRow(t, "leftover", "pw")
 	row.ID = "u-syn"
 	uf := &fakeUserRP{row: row}
 	uc, trp := autoUC(t, uf)
@@ -279,20 +279,24 @@ func TestLoginByIdentityAutoRegisterConverges(t *testing.T) {
 
 	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
 	if err != nil {
-		t.Fatalf("converge: %v", err)
+		t.Fatalf("unbound re-login: %v", err)
 	}
-	if len(uf.createdUsers) != 0 {
-		t.Fatalf("converge: %d users created, want the existing row reused", len(uf.createdUsers))
+	if len(uf.createdUsers) != 1 {
+		t.Fatalf("unbound re-login: %d users created, want the fresh birth", len(uf.createdUsers))
 	}
-	if len(uf.createdCreds) != 1 || uf.createdCreds[0].UserID != "u-syn" {
-		t.Fatalf("converge: credentials = %+v, want the identity re-bound to u-syn", uf.createdCreds)
+	born := uf.createdUsers[0]
+	if born.ID != "u-born" || born.ID == row.ID {
+		t.Fatalf("unbound re-login: born = %s, want a row distinct from the severed one", born.ID)
+	}
+	if len(uf.createdCreds) != 1 || uf.createdCreds[0].UserID != born.ID {
+		t.Fatalf("unbound re-login: credentials = %+v, want the identity on the birth", uf.createdCreds)
 	}
 	sess, err := utils.Unmarshal[Session](trp.vals[sessionPrefix+token])
 	if err != nil {
 		t.Fatal(err)
 	}
-	if sess.UserID != "u-syn" || sess.Population != "member" {
-		t.Fatalf("converge: session = %+v, want u-syn on the declared seat", sess)
+	if sess.UserID != born.ID || sess.Population != "member" {
+		t.Fatalf("unbound re-login: session = %+v, want the fresh birth on the declared seat", sess)
 	}
 }
 

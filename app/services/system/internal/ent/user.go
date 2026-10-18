@@ -23,8 +23,8 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// soft-delete marker; null = live row (delete becomes an update)
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
-	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
+	// global identity handle; email and phone are bindable credentials, never the identity key
+	Account string `json:"account,omitempty"`
 	// argon2id digest; plaintext is never stored; legacy bcrypt digests upgrade on next login
 	PasswordHash string `json:"-"`
 	// DeptID holds the value of the "dept_id" field.
@@ -43,7 +43,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldEnabled:
 			values[i] = new(sql.NullBool)
-		case user.FieldID, user.FieldEmail, user.FieldPasswordHash, user.FieldDeptID, user.FieldAvatar:
+		case user.FieldID, user.FieldAccount, user.FieldPasswordHash, user.FieldDeptID, user.FieldAvatar:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -87,11 +87,11 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				_m.DeletedAt = new(time.Time)
 				*_m.DeletedAt = value.Time
 			}
-		case user.FieldEmail:
+		case user.FieldAccount:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field email", values[i])
+				return fmt.Errorf("unexpected type %T for field account", values[i])
 			} else if value.Valid {
-				_m.Email = value.String
+				_m.Account = value.String
 			}
 		case user.FieldPasswordHash:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -166,8 +166,8 @@ func (_m *User) String() string {
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("email=")
-	builder.WriteString(_m.Email)
+	builder.WriteString("account=")
+	builder.WriteString(_m.Account)
 	builder.WriteString(", ")
 	builder.WriteString("password_hash=<sensitive>")
 	builder.WriteString(", ")
