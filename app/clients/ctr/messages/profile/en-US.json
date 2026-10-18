@@ -1,0 +1,10 @@
+{
+  "profile_title": "My Profile",
+  "profile_id_label": "Member ID",
+  "profile_nickname_label": "Nickname",
+  "profile_birth_label": "Birth date",
+  "profile_band_label": "Age band",
+  "profile_games_label": "Game preference",
+  "profile_unset": "Not set",
+  "profile_error_generic": "Failed to load profile, please try again later"
+}

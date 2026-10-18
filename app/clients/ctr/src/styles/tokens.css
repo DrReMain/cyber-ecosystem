@@ -1,0 +1,153 @@
+/*
+ * ctr design tokens — the single source of truth for the visual system,
+ * dark-only and written statically in @theme: no .dark blocks, no
+ * indirection. Chart- and report-specific palettes extend this file when
+ * their consumers arrive.
+ */
+@theme {
+  /* Canvas & surfaces */
+  --color-canvas: #000000;
+  --color-surface-card: rgba(17, 24, 39, 0.92); /* glass card */
+  --color-surface-content: rgba(31, 41, 55, 0.5); /* content card */
+  --color-surface-deep: rgba(17, 24, 39, 0.6); /* nested deep card */
+  --color-surface-input: #1f2937; /* inputs / secondary buttons */
+  --color-surface-active: #374151; /* pressed / hover fill */
+
+  /* Ink */
+  --color-ink: #ffffff;
+  --color-ink-secondary: #d1d5db;
+  --color-ink-tertiary: #6b7280;
+
+  /* Lines */
+  --color-line: #374151;
+  --color-line-soft: rgba(55, 65, 81, 0.6);
+  --color-line-accent-purple: rgba(168, 85, 247, 0.35);
+  --color-line-accent-cyan: rgba(6, 182, 212, 0.4);
+
+  /* Focus (input focus ring / selected states) */
+  --color-focus: #3b82f6;
+  --color-focus-ring: rgba(59, 130, 246, 0.2);
+
+  /* Danger */
+  --color-danger: #dc2626;
+  --color-danger-border: #b91c1c;
+  --color-danger-text: #f87171;
+
+  /* Grades — percentile tiers, color is the semantic */
+  --color-grade-s: #fde047;
+  --color-grade-a: #22c55e;
+  --color-grade-b: #3b82f6;
+  --color-grade-c: #f97316;
+
+  /* Ability identity — six business-bound colors */
+  --color-ability-reaction: #991b1b;
+  --color-ability-aiming: #ea580c;
+  --color-ability-decision: #1d4ed8;
+  --color-ability-resource: #15803d;
+  --color-ability-tracking: #0e7490;
+  --color-ability-skill: #7e22ce;
+
+  /* Status labels (the only wording set per status) */
+  --color-status-ok: #22c55e;
+  --color-status-ok-bg: rgba(34, 197, 94, 0.15);
+  --color-status-lock: #9ca3af;
+  --color-status-lock-bg: rgba(107, 114, 128, 0.18);
+  --color-status-soon: #c4b5fd;
+  --color-status-soon-bg: rgba(126, 34, 206, 0.18);
+  --color-status-member: #e9d5ff;
+  --color-status-member-bg: rgba(126, 34, 206, 0.25);
+  --color-status-pending: #fcd34d;
+  --color-status-pending-bg: rgba(245, 158, 11, 0.18);
+  --color-status-off: #6b7280;
+  --color-status-off-bg: rgba(107, 114, 128, 0.12);
+
+  /* Lock veil (paywall visuals) */
+  --color-veil: rgba(11, 18, 32, 0.72);
+
+  /* Radii — namespaced so Tailwind's default rounded-* stays intact */
+  --radius-tile: 8px;
+  --radius-control: 12px;
+  --radius-card: 16px;
+
+  /* Shadows */
+  --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-cta-primary: 0 10px 24px rgba(37, 99, 235, 0.3);
+  --shadow-cta-success: 0 10px 24px rgba(22, 163, 74, 0.3);
+  --shadow-cta-practice: 0 10px 24px rgba(234, 88, 12, 0.35);
+  --shadow-cta-member: 0 10px 24px rgba(126, 34, 206, 0.35);
+
+  /* Motion constants (expo-out easing, two duration tiers) */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Type */
+  --font-sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", sans-serif;
+}
+
+/*
+ * Semantic gradients (CTA color = consequence; ability cards lay their whole
+ * identity gradient). Declared as plain vars + @utility wrappers because
+ * Tailwind has no background-image theme namespace.
+ */
+:root {
+  --grad-ability-reaction: linear-gradient(135deg, #7f1d1d, #991b1b);
+  --grad-ability-aiming: linear-gradient(135deg, #ea580c, #f97316);
+  --grad-ability-decision: linear-gradient(135deg, #1d4ed8, #2563eb);
+  --grad-ability-resource: linear-gradient(135deg, #15803d, #16a34a);
+  --grad-ability-tracking: linear-gradient(135deg, #0e7490, #0891b2);
+  --grad-ability-skill: linear-gradient(135deg, #7e22ce, #9333ea);
+  --grad-cta-primary: linear-gradient(to right, #2563eb, #06b6d4);
+  --grad-cta-success: linear-gradient(to right, #16a34a, #10b981);
+  --grad-cta-practice: linear-gradient(to right, #ea580c, #f59e0b);
+  --grad-cta-personal: linear-gradient(to right, #9333ea, #2563eb);
+  --grad-cta-fps: linear-gradient(to right, #4f46e5, #06b6d4);
+  --grad-cta-moba: linear-gradient(to right, #1d4ed8, #7c3aed);
+  --grad-cta-member: linear-gradient(to right, #7e22ce, #a855f7);
+  --grad-lock-stripes: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0 8px,
+    transparent 8px 16px
+  );
+}
+
+@utility bg-ability-reaction {
+  background-image: var(--grad-ability-reaction);
+}
+@utility bg-ability-aiming {
+  background-image: var(--grad-ability-aiming);
+}
+@utility bg-ability-decision {
+  background-image: var(--grad-ability-decision);
+}
+@utility bg-ability-resource {
+  background-image: var(--grad-ability-resource);
+}
+@utility bg-ability-tracking {
+  background-image: var(--grad-ability-tracking);
+}
+@utility bg-ability-skill {
+  background-image: var(--grad-ability-skill);
+}
+@utility bg-cta-primary {
+  background-image: var(--grad-cta-primary);
+}
+@utility bg-cta-success {
+  background-image: var(--grad-cta-success);
+}
+@utility bg-cta-practice {
+  background-image: var(--grad-cta-practice);
+}
+@utility bg-cta-personal {
+  background-image: var(--grad-cta-personal);
+}
+@utility bg-cta-fps {
+  background-image: var(--grad-cta-fps);
+}
+@utility bg-cta-moba {
+  background-image: var(--grad-cta-moba);
+}
+@utility bg-cta-member {
+  background-image: var(--grad-cta-member);
+}
+@utility bg-lock-stripes {
+  background-image: var(--grad-lock-stripes);
+}

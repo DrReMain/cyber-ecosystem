@@ -1,0 +1,53 @@
+/*
+ * H5 baseline, inherited semantically from the legacy client: no rem/vw
+ * scheme — fixed px + breakpoints, viewport-unit cascades where full-height
+ * is needed, and WebView hardening (no system font scaling, no tap
+ * highlights, no double-tap zoom, no rubber-band overscroll).
+ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    touch-action: manipulation;
+  }
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  }
+}
+
+/* Viewport-height helpers with the cascade fallback: an invalid unit drops
+ * only its own declaration, so each line upgrades when supported. */
+@utility h-app {
+  height: 100vh;
+  height: 100dvh;
+  height: 100svh;
+}
+@utility min-h-app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100svh;
+}
+
+/* Safe-area helpers: env() clamped by a legible padding floor. */
+@utility safe-px {
+  padding-inline: max(env(safe-area-inset-left, 0px), 16px)
+    max(env(safe-area-inset-right, 0px), 16px);
+}
+@utility safe-pt {
+  padding-top: max(env(safe-area-inset-top, 0px), 14px);
+}
+@utility safe-pb {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 14px);
+}

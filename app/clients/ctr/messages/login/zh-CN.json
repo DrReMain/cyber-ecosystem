@@ -1,0 +1,14 @@
+{
+  "login_title": "登录",
+  "login_email_label": "邮箱",
+  "login_password_label": "密码",
+  "login_submit": "登录",
+  "login_pending": "登录中…",
+  "login_error_bad_credentials": "邮箱或密码不正确",
+  "login_error_generic": "登录失败,请稍后重试",
+  "login_wechat_button": "微信一键登录",
+  "login_divider": "或",
+  "login_error_wechat": "微信登录失败,请重试",
+  "login_callback_pending": "正在登录…",
+  "login_back": "返回登录"
+}

@@ -1,0 +1,10 @@
+{
+  "profile_title": "我的画像",
+  "profile_id_label": "成员标识",
+  "profile_nickname_label": "昵称",
+  "profile_birth_label": "出生年月",
+  "profile_band_label": "年龄段",
+  "profile_games_label": "游戏偏好",
+  "profile_unset": "未设置",
+  "profile_error_generic": "画像加载失败,请稍后重试"
+}

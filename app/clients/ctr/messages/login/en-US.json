@@ -1,0 +1,14 @@
+{
+  "login_title": "Sign in",
+  "login_email_label": "Email",
+  "login_password_label": "Password",
+  "login_submit": "Sign in",
+  "login_pending": "Signing in…",
+  "login_error_bad_credentials": "Incorrect email or password",
+  "login_error_generic": "Sign-in failed, please try again later",
+  "login_wechat_button": "Sign in with WeChat",
+  "login_divider": "or",
+  "login_error_wechat": "WeChat sign-in failed, please try again",
+  "login_callback_pending": "Signing in…",
+  "login_back": "Back to login"
+}

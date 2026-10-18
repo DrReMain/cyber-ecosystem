@@ -1,0 +1,15 @@
+{
+  "common_locale_name": [
+    {
+      "declarations": ["input locale"],
+      "selectors": ["locale"],
+      "match": {
+        "locale=zh-CN": "简体中文",
+        "locale=en-US": "English",
+        "locale=*": "{locale}"
+      }
+    }
+  ],
+  "common_loading": "加载中",
+  "common_retry": "重试"
+}
