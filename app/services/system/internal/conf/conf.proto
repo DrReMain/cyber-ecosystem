@@ -159,6 +159,10 @@ message Auth {
     string kind = 2;     // code-registered kind; boot fails otherwise
     bool enabled = 3;
     string endpoint = 4; // exchange base URL; empty = the kind's default (tests override here)
+    // A completed exchange with no binding births the member account
+    // (C-end rule: openid not in store = new member) instead of reading as
+    // a failed exchange. Population is the default member population.
+    bool auto_register = 6;
     WeChat wechat = 5;
   }
   repeated Provider providers = 1;

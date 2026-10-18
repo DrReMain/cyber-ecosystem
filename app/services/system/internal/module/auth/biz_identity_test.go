@@ -198,13 +198,101 @@ func TestLoginByIdentityUnknownProvider(t *testing.T) {
 }
 
 // A completed exchange with no binding reads as a failed exchange — the
-// face never confirms which external identities exist.
+// face never confirms which external identities exist. The rows here leave
+// the auto-register gate closed; the gated row births instead.
 func TestLoginByIdentityUnboundFailsAsExchange(t *testing.T) {
 	uc, trp := identityUC(t, &fakeUserRP{})
 	state := issueState(t, trp, "fake")
 
 	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("unbound: want EXCHANGE_FAILED, got %v", err)
+	}
+}
+
+// autoUC wires the gated row under test: the exchange resolves, nothing
+// binds, and the provider row opens the auto-register gate.
+func autoUC(t *testing.T, uf *fakeUserRP) (*AuthUC, *fakeTokenRP) {
+	t.Helper()
+	// The birth owns its seat — no degenerate default for the gated face.
+	if uf.seats == nil {
+		uf.seats = []*user.Seat{}
+	}
+	trp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
+	return newAuthUCConf(&conf.Auth{Providers: []*conf.Auth_Provider{
+		{Key: "auto", Kind: fakeKind, Enabled: true, AutoRegister: true},
+	}}, uf, &fakeAuthzRP{}, trp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}}), trp
+}
+
+// The auto-register gate births the member the C-end product promises: an
+// unbound exchange on a gated row creates the synthetic-email user — no
+// password, so the provider is the only way in — ensures the default seat,
+// binds the credential, and mints from that seat, the same derivation and
+// minter as every other login face.
+func TestLoginByIdentityAutoRegisterBirthsMember(t *testing.T) {
+	uf := &fakeUserRP{}
+	uc, trp := autoUC(t, uf)
+	state := issueState(t, trp, "auto")
+
+	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	if err != nil {
+		t.Fatalf("auto-register: %v", err)
+	}
+	if len(uf.createdUsers) != 1 {
+		t.Fatalf("auto-register: %d users created, want the one birth", len(uf.createdUsers))
+	}
+	born := uf.createdUsers[0]
+	if born.Email == nil || *born.Email != fakeKind+".oid-x@id.local" {
+		t.Fatalf("auto-register: email = %v, want the synthetic %s.oid-x@id.local", born.Email, fakeKind)
+	}
+	if born.PasswordHash == nil || *born.PasswordHash != "" {
+		t.Fatalf("auto-register: hash = %v, want empty for provider-only auth", born.PasswordHash)
+	}
+	if !born.Enabled {
+		t.Fatal("auto-register: the birth lands disabled")
+	}
+	if len(uf.seats) != 1 || uf.seats[0].UserID != born.ID ||
+		uf.seats[0].TenantID != security.DefaultTenant || uf.seats[0].Population != security.DefaultPopulation {
+		t.Fatalf("auto-register: seats = %+v, want the default seat for %s", uf.seats, born.ID)
+	}
+	if len(uf.createdCreds) != 1 || uf.createdCreds[0].UserID != born.ID ||
+		uf.createdCreds[0].Kind != fakeKind || uf.createdCreds[0].Identifier != "oid-x" {
+		t.Fatalf("auto-register: credentials = %+v, want the identity bound to the birth", uf.createdCreds)
+	}
+	sess, err := utils.Unmarshal[Session](trp.vals[sessionPrefix+token])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if sess.UserID != born.ID || sess.Population != security.DefaultPopulation {
+		t.Fatalf("auto-register: session = %+v, want the born member", sess)
+	}
+}
+
+// A synthetic-email row whose credential is gone (a deleted binding)
+// converges instead of duplicating: the existing user is reused, the seat
+// ensure stays idempotent, and the fresh binding re-attaches the identity.
+func TestLoginByIdentityAutoRegisterConverges(t *testing.T) {
+	row := seedRow(t, fakeKind+".oid-x@id.local", "pw")
+	row.ID = "u-syn"
+	uf := &fakeUserRP{row: row}
+	uc, trp := autoUC(t, uf)
+	state := issueState(t, trp, "auto")
+
+	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	if err != nil {
+		t.Fatalf("converge: %v", err)
+	}
+	if len(uf.createdUsers) != 0 {
+		t.Fatalf("converge: %d users created, want the existing row reused", len(uf.createdUsers))
+	}
+	if len(uf.createdCreds) != 1 || uf.createdCreds[0].UserID != "u-syn" {
+		t.Fatalf("converge: credentials = %+v, want the identity re-bound to u-syn", uf.createdCreds)
+	}
+	sess, err := utils.Unmarshal[Session](trp.vals[sessionPrefix+token])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if sess.UserID != "u-syn" {
+		t.Fatalf("converge: session user = %s, want u-syn", sess.UserID)
 	}
 }
 
