@@ -68,7 +68,7 @@
     },
     "generate:oapi-ts": {
       "executor": "nx:run-commands",
-      "dependsOn": ["generate:oapi"],
+      "dependsOn": ["generate:oapi", "generate:connect-ts"],
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
@@ -80,6 +80,7 @@
     },
     "generate:catalog": {
       "executor": "nx:run-commands",
+      "dependsOn": ["generate:go"],
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
