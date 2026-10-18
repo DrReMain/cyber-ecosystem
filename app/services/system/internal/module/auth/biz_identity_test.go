@@ -95,11 +95,11 @@ func identityUC(t *testing.T, uf *fakeUserRP) (*AuthUC, *fakeTokenRP) {
 }
 
 // The exchange resolves the identity, the binding resolves the row, and the
-// session mints from the seat — the same derivation and minter as the
-// password plane; the face is population-agnostic because the seat decides.
+// session mints from the seat the provider's landing picks — here the
+// undeclared landing of the default seat, the staff-binding shape.
 func TestLoginByIdentityMintsFromSeat(t *testing.T) {
 	trp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
-	uf := boundUser(t, []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "guest"}})
+	uf := boundUser(t, []*user.Seat{{UserID: "u9", TenantID: "t1", Population: security.DefaultPopulation}})
 	uc := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, trp,
 		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 	state := issueState(t, trp, "fake")
@@ -112,8 +112,8 @@ func TestLoginByIdentityMintsFromSeat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if sess.UserID != "u9" || sess.TenantID != "t1" || sess.Population != "guest" {
-		t.Fatalf("mint: session = %+v, want the seat's t1/guest for u9", sess)
+	if sess.UserID != "u9" || sess.TenantID != "t1" || sess.Population != security.DefaultPopulation {
+		t.Fatalf("mint: session = %+v, want the seat's t1/%s for u9", sess, security.DefaultPopulation)
 	}
 }
 
@@ -219,13 +219,13 @@ func autoUC(t *testing.T, uf *fakeUserRP) (*AuthUC, *fakeTokenRP) {
 	}
 	trp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
 	return newAuthUCConf(&conf.Auth{Providers: []*conf.Auth_Provider{
-		{Key: "auto", Kind: fakeKind, Enabled: true, AutoRegister: true},
+		{Key: "auto", Kind: fakeKind, Enabled: true, AutoRegister: true, Population: "member"},
 	}}, uf, &fakeAuthzRP{}, trp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}}), trp
 }
 
 // The auto-register gate births the member the C-end product promises: an
 // unbound exchange on a gated row creates the synthetic-email user — no
-// password, so the provider is the only way in — ensures the default seat,
+// password, so the provider is the only way in — lands the declared seat,
 // binds the credential, and mints from that seat, the same derivation and
 // minter as every other login face.
 func TestLoginByIdentityAutoRegisterBirthsMember(t *testing.T) {
@@ -251,8 +251,8 @@ func TestLoginByIdentityAutoRegisterBirthsMember(t *testing.T) {
 		t.Fatal("auto-register: the birth lands disabled")
 	}
 	if len(uf.seats) != 1 || uf.seats[0].UserID != born.ID ||
-		uf.seats[0].TenantID != security.DefaultTenant || uf.seats[0].Population != security.DefaultPopulation {
-		t.Fatalf("auto-register: seats = %+v, want the default seat for %s", uf.seats, born.ID)
+		uf.seats[0].TenantID != security.DefaultTenant || uf.seats[0].Population != "member" {
+		t.Fatalf("auto-register: seats = %+v, want the declared seat for %s", uf.seats, born.ID)
 	}
 	if len(uf.createdCreds) != 1 || uf.createdCreds[0].UserID != born.ID ||
 		uf.createdCreds[0].Kind != fakeKind || uf.createdCreds[0].Identifier != "oid-x" {
@@ -262,7 +262,7 @@ func TestLoginByIdentityAutoRegisterBirthsMember(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if sess.UserID != born.ID || sess.Population != security.DefaultPopulation {
+	if sess.UserID != born.ID || sess.Population != "member" {
 		t.Fatalf("auto-register: session = %+v, want the born member", sess)
 	}
 }
@@ -291,8 +291,8 @@ func TestLoginByIdentityAutoRegisterConverges(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if sess.UserID != "u-syn" {
-		t.Fatalf("converge: session user = %s, want u-syn", sess.UserID)
+	if sess.UserID != "u-syn" || sess.Population != "member" {
+		t.Fatalf("converge: session = %+v, want u-syn on the declared seat", sess)
 	}
 }
 
@@ -306,18 +306,78 @@ func TestLoginByIdentityExchangeFailureSurfaces(t *testing.T) {
 	}
 }
 
-// Several seats refuse with the seat-required reason — the client chooses
-// the seat; the server never guesses. Same law as the password plane.
-func TestLoginByIdentityMultiSeatRequiresChoice(t *testing.T) {
+// The provider's declared landing directs the pick among an identity's
+// seats: the member seat serves the member-declaring provider while the
+// engine seat stays invisible to it — a held seat of another population is
+// another face's key, not ambiguity.
+func TestLoginByIdentityPicksProviderSeat(t *testing.T) {
 	uf := boundUser(t, []*user.Seat{
 		{UserID: "u9", TenantID: "t1", Population: "user"},
-		{UserID: "u9", TenantID: "t2", Population: "member"},
+		{UserID: "u9", TenantID: "t1", Population: "member"},
 	})
-	uc, trp := identityUC(t, uf)
-	state := issueState(t, trp, "fake")
+	trp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
+	uc := newAuthUCConf(&conf.Auth{Providers: []*conf.Auth_Provider{
+		{Key: "auto", Kind: fakeKind, Enabled: true, Population: "member"},
+	}}, uf, &fakeAuthzRP{}, trp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+	state := issueState(t, trp, "auto")
 
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemLoginSeatRequired(err) {
-		t.Fatalf("multi-seat: want SEAT_REQUIRED, got %v", err)
+	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	if err != nil {
+		t.Fatalf("directed seat: %v", err)
+	}
+	sess, err := utils.Unmarshal[Session](trp.vals[sessionPrefix+token])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if sess.Population != "member" || len(uf.seats) != 2 {
+		t.Fatalf("directed seat: session = %+v seats = %+v, want the member seat without an ensure", sess, uf.seats)
+	}
+}
+
+// A bound identity without a seat in the provider's population gains it on
+// entry — entering the face is the provider's doing, never a prior
+// administrative act. The same identity keeps its other seats untouched.
+func TestLoginByIdentityEnsuresSeatForBoundIdentity(t *testing.T) {
+	uf := boundUser(t, []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "user"}})
+	trp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
+	uc := newAuthUCConf(&conf.Auth{Providers: []*conf.Auth_Provider{
+		{Key: "auto", Kind: fakeKind, Enabled: true, Population: "member"},
+	}}, uf, &fakeAuthzRP{}, trp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+	state := issueState(t, trp, "auto")
+
+	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	if err != nil {
+		t.Fatalf("bound entry: %v", err)
+	}
+	if len(uf.seats) != 2 || uf.seats[1].Population != "member" || uf.seats[1].TenantID != security.DefaultTenant {
+		t.Fatalf("bound entry: seats = %+v, want the member seat ensured on the default tenant", uf.seats)
+	}
+	sess, err := utils.Unmarshal[Session](trp.vals[sessionPrefix+token])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if sess.UserID != "u9" || sess.Population != "member" {
+		t.Fatalf("bound entry: session = %+v, want u9 on the member seat", sess)
+	}
+}
+
+// A declared landing that does not resolve is a config fact: the login names
+// it precisely instead of seating into a silent default — and the refusal
+// lands before the exchange, so a code is never spent on a broken provider.
+func TestLoginByIdentityUnknownPopulation(t *testing.T) {
+	uf := &fakeUserRP{}
+	trp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
+	uc := newAuthUCConf(&conf.Auth{Providers: []*conf.Auth_Provider{
+		{Key: "auto", Kind: fakeKind, Enabled: true, AutoRegister: true, Population: "ghost-pop"},
+	}}, uf, &fakeAuthzRP{}, trp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+	state := issueState(t, trp, "auto")
+
+	before := fakeExchanges
+	if _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state)); !systempb.IsSystemPopulationNotFound(err) {
+		t.Fatalf("unknown population: want POPULATION_NOT_FOUND, got %v", err)
+	}
+	if fakeExchanges != before || len(uf.createdCreds) != 0 {
+		t.Fatal("unknown population: the exchange ran or a credential landed")
 	}
 }
 
@@ -402,7 +462,7 @@ func TestLoginByIdentityStateCashInfraPassthrough(t *testing.T) {
 // fails the construction, not the first login.
 func TestNewAuthUCRejectsUnregisteredKind(t *testing.T) {
 	bad := &conf.Auth{Providers: []*conf.Auth_Provider{{Key: "x", Kind: "ghost"}}}
-	if _, err := NewAuthUC(slog.New(slog.NewTextHandler(io.Discard, nil)), nil, bad, nil, nil, nil, nil); err == nil {
+	if _, err := NewAuthUC(slog.New(slog.NewTextHandler(io.Discard, nil)), nil, bad, nil, nil, nil, nil, nil); err == nil {
 		t.Fatal("unregistered kind: want construction error")
 	}
 }

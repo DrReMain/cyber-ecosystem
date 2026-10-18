@@ -34,7 +34,7 @@ import (
 )
 
 // wireApp init kratos application.
-func wireApp(*conf.Server, *conf.Data, *conf.Authz, *conf.Catalog, *conf.Auth, *slog.Logger) (*kratos.App, func(), error) {
+func wireApp(*conf.Server, *conf.Data, *conf.Catalog, *conf.Auth, *conf.Seed, *slog.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		wire.Bind(new(shared.Transaction), new(*platform.Platform)),
 		wire.Bind(new(shared.HookRegistry), new(*bootstrap.Lifecycle)),

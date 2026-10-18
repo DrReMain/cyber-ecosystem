@@ -87,6 +87,7 @@ message LoginRequest {
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 1
   ];
+  optional string population = 3;
 }
 
 message LoginResponse {

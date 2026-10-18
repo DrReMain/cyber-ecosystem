@@ -17,6 +17,7 @@ import (
 
 	"cyber-ecosystem/app/services/system/internal/conf"
 	"cyber-ecosystem/app/services/system/internal/module/authz"
+	"cyber-ecosystem/app/services/system/internal/module/population"
 	"cyber-ecosystem/app/services/system/internal/module/tenant"
 	"cyber-ecosystem/app/services/system/internal/module/user"
 	"cyber-ecosystem/app/services/system/internal/shared"
@@ -177,10 +178,23 @@ type fakeAuthzRP struct {
 	authz.AuthzRP
 	grants []authz.GrantView
 	err    error
+	// archetypes answers the vocabulary read session verification stamps
+	// onto subjects; populations absent from the map read as engine.
+	archetypes map[string]string
 }
 
 func (f *fakeAuthzRP) EffectiveGrants(_ context.Context, _ *security.Subject) ([]authz.GrantView, error) {
 	return f.grants, f.err
+}
+
+func (f *fakeAuthzRP) ArchetypeOf(population string) (string, error) {
+	if population == "" {
+		return "", nil
+	}
+	if arch, ok := f.archetypes[population]; ok {
+		return arch, nil
+	}
+	return security.ArchetypeEngine, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
@@ -201,13 +215,31 @@ func (passthroughTx) InTx(ctx context.Context, fn func(context.Context) error) e
 	return fn(ctx)
 }
 
+// fakePopulationRP answers the registry read a declared landing costs: rows
+// keyed by code, a miss classified as not-found the adapter would return.
+type fakePopulationRP struct {
+	population.PopulationRP
+	rows map[string]*population.Population
+}
+
+func (f *fakePopulationRP) FindByCode(_ context.Context, code string) (*population.Population, error) {
+	if p, ok := f.rows[code]; ok {
+		return p, nil
+	}
+	return nil, errorspb.ErrorInfraErrorDbNotFound("")
+}
+
 func newAuthUCConf(auth *conf.Auth, u *fakeUserRP, a *fakeAuthzRP, t *fakeTokenRP, tn *fakeTenantRP) *AuthUC { // The default seat mirrors the degenerate world: one seat on t1 for u1.
 	if u.seats == nil {
 		u.seats = []*user.Seat{{UserID: "u1", TenantID: "t1", Population: security.DefaultPopulation}}
 	}
 	uc, err := NewAuthUC(
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
-		passthroughTx{}, auth, u, a, tn, t,
+		passthroughTx{}, auth, u, a, tn,
+		&fakePopulationRP{rows: map[string]*population.Population{
+			"member": {Code: "member", Name: "Member", Archetype: security.ArchetypePatron},
+		}},
+		t,
 	)
 	if err != nil {
 		panic(err)
@@ -270,11 +302,11 @@ func authCtx(subject *security.Subject) context.Context {
 func TestLoginUnknownEmailSameShapeAsWrongPassword(t *testing.T) {
 	uc := newAuthUC(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, &fakeAuthzRP{}, &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}})
 
-	_, _, _, errUnknown := uc.Login(context.Background(), "ghost@x.co", "right")
+	_, _, _, errUnknown := uc.Login(context.Background(), "ghost@x.co", "right", "")
 	if !systempb.IsSystemLoginFailed(errUnknown) {
 		t.Fatalf("unknown email: want LOGIN_FAILED, got %v", errUnknown)
 	}
-	_, _, _, errWrong := uc.Login(context.Background(), "a@x.co", "wrong")
+	_, _, _, errWrong := uc.Login(context.Background(), "a@x.co", "wrong", "")
 	if !systempb.IsSystemLoginFailed(errWrong) {
 		t.Fatalf("wrong password: want LOGIN_FAILED, got %v", errWrong)
 	}
@@ -288,10 +320,10 @@ func TestLoginDisabledUserStatusAfterCredential(t *testing.T) {
 	row.Enabled = false
 	uc := newAuthUC(&fakeUserRP{row: row}, &fakeAuthzRP{}, &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}})
 
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "wrong"); !systempb.IsSystemLoginFailed(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "wrong", ""); !systempb.IsSystemLoginFailed(err) {
 		t.Fatalf("wrong password on disabled account: want LOGIN_FAILED, got %v", err)
 	}
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right"); !systempb.IsSystemUserDisabled(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); !systempb.IsSystemUserDisabled(err) {
 		t.Fatalf("right password on disabled account: want USER_DISABLED, got %v", err)
 	}
 }
@@ -309,7 +341,7 @@ func TestLoginRehashesLegacyBcrypt(t *testing.T) {
 	rp := &fakeUserRP{row: row}
 	uc := newAuthUC(rp, &fakeAuthzRP{}, &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}})
 
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right"); err != nil {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); err != nil {
 		t.Fatalf("legacy verify: %v", err)
 	}
 	if len(rp.updates) != 1 {
@@ -322,7 +354,7 @@ func TestLoginRehashesLegacyBcrypt(t *testing.T) {
 
 	// A failing upgrade is a warning, never a login blocker.
 	rp.updateErr = errorspb.ErrorInfraErrorNetworkConnection("")
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right"); err != nil {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); err != nil {
 		t.Fatalf("upgrade failure must not block login: %v", err)
 	}
 }
@@ -334,7 +366,7 @@ func TestLoginMintsSessionShape(t *testing.T) {
 	trp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
 	uc := newAuthUC(&fakeUserRP{row: row}, &fakeAuthzRP{}, trp)
 
-	token, issuedAt, expiresAt, err := uc.Login(context.Background(), "a@x.co", "right")
+	token, issuedAt, expiresAt, err := uc.Login(context.Background(), "a@x.co", "right", "")
 	if err != nil {
 		t.Fatalf("login: %v", err)
 	}
@@ -511,7 +543,7 @@ func TestAuthenticateSessionDirtyMarkerSurfaces(t *testing.T) {
 func TestLoginFindByEmailGenericErrorPassthrough(t *testing.T) {
 	uc := newAuthUC(&fakeUserRP{findErr: errorspb.ErrorInfraErrorNetworkConnection("")}, &fakeAuthzRP{}, &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}})
 
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "pw"); !errorspb.IsInfraErrorNetworkConnection(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "pw", ""); !errorspb.IsInfraErrorNetworkConnection(err) {
 		t.Fatalf("generic lookup error: want infra passthrough, got %v", err)
 	}
 }
@@ -553,10 +585,10 @@ func TestLoginDisabledTenantAfterCredential(t *testing.T) {
 	uc := newAuthUCTenant(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, &fakeAuthzRP{}, tok,
 		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: false}})
 
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "wrong"); !systempb.IsSystemLoginFailed(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "wrong", ""); !systempb.IsSystemLoginFailed(err) {
 		t.Fatalf("wrong password on disabled tenant: want LOGIN_FAILED, got %v", err)
 	}
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right"); !systempb.IsSystemTenantDisabled(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); !systempb.IsSystemTenantDisabled(err) {
 		t.Fatalf("right password on disabled tenant: want TENANT_DISABLED, got %v", err)
 	}
 	if len(tok.vals) != 0 {
@@ -570,7 +602,7 @@ func TestLoginMissingTenantFailsClosed(t *testing.T) {
 	uc := newAuthUCTenant(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, &fakeAuthzRP{},
 		&fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}, &fakeTenantRP{})
 
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right"); !systempb.IsSystemTenantDisabled(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); !systempb.IsSystemTenantDisabled(err) {
 		t.Fatalf("missing registry row: want TENANT_DISABLED, got %v", err)
 	}
 }
@@ -581,7 +613,7 @@ func TestLoginTenantGenericPassthrough(t *testing.T) {
 		&fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}},
 		&fakeTenantRP{err: errorspb.ErrorInfraErrorNetworkConnection("")})
 
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right"); !errorspb.IsInfraErrorNetworkConnection(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); !errorspb.IsInfraErrorNetworkConnection(err) {
 		t.Fatalf("generic registry error: want passthrough, got %v", err)
 	}
 }
@@ -693,7 +725,7 @@ func TestLoginMintsFromSeat(t *testing.T) {
 		seats: []*user.Seat{{UserID: "u1", TenantID: "t9", Population: "user"}}}, &fakeAuthzRP{}, rp,
 		&fakeTenantRP{row: &tenant.Tenant{Code: "t9", Enabled: true}})
 
-	token, _, _, err := uc.Login(context.Background(), "a@x.co", "right")
+	token, _, _, err := uc.Login(context.Background(), "a@x.co", "right", "")
 	if err != nil {
 		t.Fatalf("login: %v", err)
 	}
@@ -713,7 +745,7 @@ func TestLoginSeatlessIsInternal(t *testing.T) {
 		&fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}},
 		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right"); !errorspb.IsGeneralErrorInternal(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); !errorspb.IsGeneralErrorInternal(err) {
 		t.Fatalf("seatless: want INTERNAL, got %v", err)
 	}
 }
@@ -729,8 +761,36 @@ func TestLoginMultiSeatRequiresChoice(t *testing.T) {
 		&fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}},
 		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right"); !systempb.IsSystemLoginSeatRequired(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); !systempb.IsSystemLoginSeatRequired(err) {
 		t.Fatalf("multi-seat: want SEAT_REQUIRED, got %v", err)
+	}
+}
+
+// The hint narrows a multi-seat login to the held seat it names — a
+// preference among held seats, never a grant: a code the identity does not
+// hold keeps the choice required.
+func TestLoginHintPicksHeldSeat(t *testing.T) {
+	uf := &fakeUserRP{row: seedRow(t, "a@x.co", "right"), seats: []*user.Seat{
+		{UserID: "u1", TenantID: "t1", Population: "user"},
+		{UserID: "u1", TenantID: "t1", Population: "member"},
+	}}
+	rp := &fakeTokenRP{vals: map[string][]byte{}, ttls: map[string]time.Duration{}}
+	uc := newAuthUCTenant(uf, &fakeAuthzRP{}, rp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+
+	token, _, _, err := uc.Login(context.Background(), "a@x.co", "right", "member")
+	if err != nil {
+		t.Fatalf("hinted login: %v", err)
+	}
+	sess, err := utils.Unmarshal[Session](rp.vals[sessionPrefix+token])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if sess.Population != "member" {
+		t.Fatalf("hinted login: session population = %q, want member", sess.Population)
+	}
+
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", "ghost"); !systempb.IsSystemLoginSeatRequired(err) {
+		t.Fatalf("unheld hint: want SEAT_REQUIRED, got %v", err)
 	}
 }
 

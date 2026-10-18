@@ -77,14 +77,9 @@ observability:
 #      max_backups: 10 # 个 (保留备份数)
 #      max_age_days: 30 # 天 (最大保留天数)
 #      compress: true
-
 catalog:
   dir: ${CATALOG_DIR:../../../../../gen/catalog} # 生成物清单
 
-authz:
-  super_admins:
-    - admin@cyber.local            # 邮箱 (种子超管)
-  initial_password: ${SEED_INITIAL_PASSWORD:admin123456} # 种子超管口令
 auth:
   providers:
     - key: wechat                   # 实例注册键 (登录请求的 provider 参数)
@@ -95,3 +90,7 @@ auth:
       wechat:
         appid: ${WECHAT_APPID:wxfda597a14a57bf08} # 测试号
         secret: ${WECHAT_SECRET:da1ce920bfcee3db140f431d2c1f3a5b}
+seed:
+  super_admins:
+    - admin@cyber.local            # 邮箱 (种子超管)
+  initial_password: ${SEED_INITIAL_PASSWORD:admin123456} # 种子超管口令

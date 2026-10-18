@@ -5,11 +5,6 @@
 import { PopulationService } from "./population_pb";
 
 /**
- * @generated from rpc cyber.system.v1.PopulationService.CreatePopulation
- */
-export const createPopulation = PopulationService.method.createPopulation;
-
-/**
  * @generated from rpc cyber.system.v1.PopulationService.ListPopulations
  */
 export const listPopulations = PopulationService.method.listPopulations;

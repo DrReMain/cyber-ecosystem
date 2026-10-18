@@ -28,8 +28,8 @@ type Bootstrap struct {
 	Data          *Data                  `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	Observability *Observability         `protobuf:"bytes,3,opt,name=observability,proto3" json:"observability,omitempty"`
 	Catalog       *Catalog               `protobuf:"bytes,4,opt,name=catalog,proto3" json:"catalog,omitempty"`
-	Authz         *Authz                 `protobuf:"bytes,5,opt,name=authz,proto3" json:"authz,omitempty"`
-	Auth          *Auth                  `protobuf:"bytes,6,opt,name=auth,proto3" json:"auth,omitempty"`
+	Auth          *Auth                  `protobuf:"bytes,5,opt,name=auth,proto3" json:"auth,omitempty"`
+	Seed          *Seed                  `protobuf:"bytes,6,opt,name=seed,proto3" json:"seed,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -92,16 +92,16 @@ func (x *Bootstrap) GetCatalog() *Catalog {
 	return nil
 }
 
-func (x *Bootstrap) GetAuthz() *Authz {
+func (x *Bootstrap) GetAuth() *Auth {
 	if x != nil {
-		return x.Authz
+		return x.Auth
 	}
 	return nil
 }
 
-func (x *Bootstrap) GetAuth() *Auth {
+func (x *Bootstrap) GetSeed() *Seed {
 	if x != nil {
-		return x.Auth
+		return x.Seed
 	}
 	return nil
 }
@@ -362,58 +362,6 @@ func (x *Catalog) GetDir() string {
 	return ""
 }
 
-type Authz struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	SuperAdmins     []string               `protobuf:"bytes,1,rep,name=super_admins,json=superAdmins,proto3" json:"super_admins,omitempty"`
-	InitialPassword string                 `protobuf:"bytes,2,opt,name=initial_password,json=initialPassword,proto3" json:"initial_password,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
-}
-
-func (x *Authz) Reset() {
-	*x = Authz{}
-	mi := &file_internal_conf_conf_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Authz) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Authz) ProtoMessage() {}
-
-func (x *Authz) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Authz.ProtoReflect.Descriptor instead.
-func (*Authz) Descriptor() ([]byte, []int) {
-	return file_internal_conf_conf_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *Authz) GetSuperAdmins() []string {
-	if x != nil {
-		return x.SuperAdmins
-	}
-	return nil
-}
-
-func (x *Authz) GetInitialPassword() string {
-	if x != nil {
-		return x.InitialPassword
-	}
-	return ""
-}
-
 type Auth struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Providers     []*Auth_Provider       `protobuf:"bytes,1,rep,name=providers,proto3" json:"providers,omitempty"`
@@ -423,7 +371,7 @@ type Auth struct {
 
 func (x *Auth) Reset() {
 	*x = Auth{}
-	mi := &file_internal_conf_conf_proto_msgTypes[6]
+	mi := &file_internal_conf_conf_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -435,7 +383,7 @@ func (x *Auth) String() string {
 func (*Auth) ProtoMessage() {}
 
 func (x *Auth) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[6]
+	mi := &file_internal_conf_conf_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -448,12 +396,73 @@ func (x *Auth) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Auth.ProtoReflect.Descriptor instead.
 func (*Auth) Descriptor() ([]byte, []int) {
-	return file_internal_conf_conf_proto_rawDescGZIP(), []int{6}
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Auth) GetProviders() []*Auth_Provider {
 	if x != nil {
 		return x.Providers
+	}
+	return nil
+}
+
+type Seed struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// the floor that lets a fresh deployment grant its first user
+	SuperAdmins     []string           `protobuf:"bytes,1,rep,name=super_admins,json=superAdmins,proto3" json:"super_admins,omitempty"`
+	InitialPassword string             `protobuf:"bytes,2,opt,name=initial_password,json=initialPassword,proto3" json:"initial_password,omitempty"`
+	Populations     []*Seed_Population `protobuf:"bytes,3,rep,name=populations,proto3" json:"populations,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *Seed) Reset() {
+	*x = Seed{}
+	mi := &file_internal_conf_conf_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Seed) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Seed) ProtoMessage() {}
+
+func (x *Seed) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Seed.ProtoReflect.Descriptor instead.
+func (*Seed) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *Seed) GetSuperAdmins() []string {
+	if x != nil {
+		return x.SuperAdmins
+	}
+	return nil
+}
+
+func (x *Seed) GetInitialPassword() string {
+	if x != nil {
+		return x.InitialPassword
+	}
+	return ""
+}
+
+func (x *Seed) GetPopulations() []*Seed_Population {
+	if x != nil {
+		return x.Populations
 	}
 	return nil
 }
@@ -1590,6 +1599,7 @@ type Auth_Provider struct {
 	Endpoint      string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"` // exchange base URL; empty = the kind's default (tests override here)
 	AutoRegister  bool                   `protobuf:"varint,6,opt,name=auto_register,json=autoRegister,proto3" json:"auto_register,omitempty"`
 	Wechat        *Auth_Provider_WeChat  `protobuf:"bytes,5,opt,name=wechat,proto3" json:"wechat,omitempty"`
+	Population    string                 `protobuf:"bytes,7,opt,name=population,proto3" json:"population,omitempty"` // landing population for this provider's logins (births and bound entries); empty = the default population
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1621,7 +1631,7 @@ func (x *Auth_Provider) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Auth_Provider.ProtoReflect.Descriptor instead.
 func (*Auth_Provider) Descriptor() ([]byte, []int) {
-	return file_internal_conf_conf_proto_rawDescGZIP(), []int{6, 0}
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{5, 0}
 }
 
 func (x *Auth_Provider) GetKey() string {
@@ -1666,6 +1676,13 @@ func (x *Auth_Provider) GetWechat() *Auth_Provider_WeChat {
 	return nil
 }
 
+func (x *Auth_Provider) GetPopulation() string {
+	if x != nil {
+		return x.Population
+	}
+	return ""
+}
+
 type Auth_Provider_WeChat struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Appid         string                 `protobuf:"bytes,1,opt,name=appid,proto3" json:"appid,omitempty"`
@@ -1701,7 +1718,7 @@ func (x *Auth_Provider_WeChat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Auth_Provider_WeChat.ProtoReflect.Descriptor instead.
 func (*Auth_Provider_WeChat) Descriptor() ([]byte, []int) {
-	return file_internal_conf_conf_proto_rawDescGZIP(), []int{6, 0, 0}
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{5, 0, 0}
 }
 
 func (x *Auth_Provider_WeChat) GetAppid() string {
@@ -1718,19 +1735,79 @@ func (x *Auth_Provider_WeChat) GetSecret() string {
 	return ""
 }
 
+type Seed_Population struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"` // join key; declaring the default population is a config error
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Archetype     string                 `protobuf:"bytes,3,opt,name=archetype,proto3" json:"archetype,omitempty"` // engine | patron
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Seed_Population) Reset() {
+	*x = Seed_Population{}
+	mi := &file_internal_conf_conf_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Seed_Population) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Seed_Population) ProtoMessage() {}
+
+func (x *Seed_Population) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Seed_Population.ProtoReflect.Descriptor instead.
+func (*Seed_Population) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{6, 0}
+}
+
+func (x *Seed_Population) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *Seed_Population) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Seed_Population) GetArchetype() string {
+	if x != nil {
+		return x.Archetype
+	}
+	return ""
+}
+
 var File_internal_conf_conf_proto protoreflect.FileDescriptor
 
 const file_internal_conf_conf_proto_rawDesc = "" +
 	"\n" +
 	"\x18internal/conf/conf.proto\x12\n" +
-	"cyber.conf\x1a\x1egoogle/protobuf/duration.proto\"\x9c\x02\n" +
+	"cyber.conf\x1a\x1egoogle/protobuf/duration.proto\"\x99\x02\n" +
 	"\tBootstrap\x12*\n" +
 	"\x06server\x18\x01 \x01(\v2\x12.cyber.conf.ServerR\x06server\x12$\n" +
 	"\x04data\x18\x02 \x01(\v2\x10.cyber.conf.DataR\x04data\x12?\n" +
 	"\robservability\x18\x03 \x01(\v2\x19.cyber.conf.ObservabilityR\robservability\x12-\n" +
-	"\acatalog\x18\x04 \x01(\v2\x13.cyber.conf.CatalogR\acatalog\x12'\n" +
-	"\x05authz\x18\x05 \x01(\v2\x11.cyber.conf.AuthzR\x05authz\x12$\n" +
-	"\x04auth\x18\x06 \x01(\v2\x10.cyber.conf.AuthR\x04auth\"\xdc\x03\n" +
+	"\acatalog\x18\x04 \x01(\v2\x13.cyber.conf.CatalogR\acatalog\x12$\n" +
+	"\x04auth\x18\x05 \x01(\v2\x10.cyber.conf.AuthR\x04auth\x12$\n" +
+	"\x04seed\x18\x06 \x01(\v2\x10.cyber.conf.SeedR\x04seed\"\xdc\x03\n" +
 	"\x06Server\x12+\n" +
 	"\x04http\x18\x01 \x01(\v2\x17.cyber.conf.Server.HTTPR\x04http\x12+\n" +
 	"\x04grpc\x18\x02 \x01(\v2\x17.cyber.conf.Server.GRPCR\x04grpc\x124\n" +
@@ -1849,22 +1926,31 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\x02db\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x02db\x12/\n" +
 	"\x05cache\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x05cache\"\x1b\n" +
 	"\aCatalog\x12\x10\n" +
-	"\x03dir\x18\x01 \x01(\tR\x03dir\"U\n" +
-	"\x05Authz\x12!\n" +
-	"\fsuper_admins\x18\x01 \x03(\tR\vsuperAdmins\x12)\n" +
-	"\x10initial_password\x18\x02 \x01(\tR\x0finitialPassword\"\xbf\x02\n" +
+	"\x03dir\x18\x01 \x01(\tR\x03dir\"\xdf\x02\n" +
 	"\x04Auth\x127\n" +
-	"\tproviders\x18\x01 \x03(\v2\x19.cyber.conf.Auth.ProviderR\tproviders\x1a\xfd\x01\n" +
+	"\tproviders\x18\x01 \x03(\v2\x19.cyber.conf.Auth.ProviderR\tproviders\x1a\x9d\x02\n" +
 	"\bProvider\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x12\n" +
 	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x18\n" +
 	"\aenabled\x18\x03 \x01(\bR\aenabled\x12\x1a\n" +
 	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12#\n" +
 	"\rauto_register\x18\x06 \x01(\bR\fautoRegister\x128\n" +
-	"\x06wechat\x18\x05 \x01(\v2 .cyber.conf.Auth.Provider.WeChatR\x06wechat\x1a6\n" +
+	"\x06wechat\x18\x05 \x01(\v2 .cyber.conf.Auth.Provider.WeChatR\x06wechat\x12\x1e\n" +
+	"\n" +
+	"population\x18\a \x01(\tR\n" +
+	"population\x1a6\n" +
 	"\x06WeChat\x12\x14\n" +
 	"\x05appid\x18\x01 \x01(\tR\x05appid\x12\x16\n" +
-	"\x06secret\x18\x02 \x01(\tR\x06secretB8Z6cyber-ecosystem/app/services/system/internal/conf;confb\x06proto3"
+	"\x06secret\x18\x02 \x01(\tR\x06secret\"\xe7\x01\n" +
+	"\x04Seed\x12!\n" +
+	"\fsuper_admins\x18\x01 \x03(\tR\vsuperAdmins\x12)\n" +
+	"\x10initial_password\x18\x02 \x01(\tR\x0finitialPassword\x12=\n" +
+	"\vpopulations\x18\x03 \x03(\v2\x1b.cyber.conf.Seed.PopulationR\vpopulations\x1aR\n" +
+	"\n" +
+	"Population\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\tR\x04code\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
+	"\tarchetype\x18\x03 \x01(\tR\tarchetypeB8Z6cyber-ecosystem/app/services/system/internal/conf;confb\x06proto3"
 
 var (
 	file_internal_conf_conf_proto_rawDescOnce sync.Once
@@ -1878,15 +1964,15 @@ func file_internal_conf_conf_proto_rawDescGZIP() []byte {
 	return file_internal_conf_conf_proto_rawDescData
 }
 
-var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_internal_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),                    // 0: cyber.conf.Bootstrap
 	(*Server)(nil),                       // 1: cyber.conf.Server
 	(*Data)(nil),                         // 2: cyber.conf.Data
 	(*Observability)(nil),                // 3: cyber.conf.Observability
 	(*Catalog)(nil),                      // 4: cyber.conf.Catalog
-	(*Authz)(nil),                        // 5: cyber.conf.Authz
-	(*Auth)(nil),                         // 6: cyber.conf.Auth
+	(*Auth)(nil),                         // 5: cyber.conf.Auth
+	(*Seed)(nil),                         // 6: cyber.conf.Seed
 	(*Server_HTTP)(nil),                  // 7: cyber.conf.Server.HTTP
 	(*Server_GRPC)(nil),                  // 8: cyber.conf.Server.GRPC
 	(*Server_Connect)(nil),               // 9: cyber.conf.Server.Connect
@@ -1904,15 +1990,16 @@ var file_internal_conf_conf_proto_goTypes = []any{
 	(*Observability_Log_FileOutput)(nil), // 21: cyber.conf.Observability.Log.FileOutput
 	(*Auth_Provider)(nil),                // 22: cyber.conf.Auth.Provider
 	(*Auth_Provider_WeChat)(nil),         // 23: cyber.conf.Auth.Provider.WeChat
-	(*durationpb.Duration)(nil),          // 24: google.protobuf.Duration
+	(*Seed_Population)(nil),              // 24: cyber.conf.Seed.Population
+	(*durationpb.Duration)(nil),          // 25: google.protobuf.Duration
 }
 var file_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber.conf.Bootstrap.server:type_name -> cyber.conf.Server
 	2,  // 1: cyber.conf.Bootstrap.data:type_name -> cyber.conf.Data
 	3,  // 2: cyber.conf.Bootstrap.observability:type_name -> cyber.conf.Observability
 	4,  // 3: cyber.conf.Bootstrap.catalog:type_name -> cyber.conf.Catalog
-	5,  // 4: cyber.conf.Bootstrap.authz:type_name -> cyber.conf.Authz
-	6,  // 5: cyber.conf.Bootstrap.auth:type_name -> cyber.conf.Auth
+	5,  // 4: cyber.conf.Bootstrap.auth:type_name -> cyber.conf.Auth
+	6,  // 5: cyber.conf.Bootstrap.seed:type_name -> cyber.conf.Seed
 	7,  // 6: cyber.conf.Server.http:type_name -> cyber.conf.Server.HTTP
 	8,  // 7: cyber.conf.Server.grpc:type_name -> cyber.conf.Server.GRPC
 	9,  // 8: cyber.conf.Server.connect:type_name -> cyber.conf.Server.Connect
@@ -1925,35 +2012,36 @@ var file_internal_conf_conf_proto_depIdxs = []int32{
 	19, // 15: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
 	20, // 16: cyber.conf.Observability.slow_query:type_name -> cyber.conf.Observability.SlowQuery
 	22, // 17: cyber.conf.Auth.providers:type_name -> cyber.conf.Auth.Provider
-	24, // 18: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	24, // 19: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	24, // 20: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	24, // 21: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	24, // 22: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
-	24, // 23: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	24, // 24: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	24, // 25: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
-	24, // 26: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
-	14, // 27: cyber.conf.Data.Storage.s3:type_name -> cyber.conf.Data.Storage.S3
-	15, // 28: cyber.conf.Data.MQ.nats:type_name -> cyber.conf.Data.MQ.NATS
-	16, // 29: cyber.conf.Data.MQ.pg:type_name -> cyber.conf.Data.MQ.PG
-	24, // 30: cyber.conf.Data.Storage.S3.presign_ttl:type_name -> google.protobuf.Duration
-	24, // 31: cyber.conf.Data.MQ.NATS.max_age:type_name -> google.protobuf.Duration
-	24, // 32: cyber.conf.Data.MQ.NATS.ack_wait:type_name -> google.protobuf.Duration
-	24, // 33: cyber.conf.Data.MQ.NATS.dlq_max_age:type_name -> google.protobuf.Duration
-	24, // 34: cyber.conf.Data.MQ.NATS.nak_backoff_step:type_name -> google.protobuf.Duration
-	24, // 35: cyber.conf.Data.MQ.PG.poll_interval:type_name -> google.protobuf.Duration
-	24, // 36: cyber.conf.Data.MQ.PG.visibility_timeout:type_name -> google.protobuf.Duration
-	24, // 37: cyber.conf.Data.MQ.PG.retention:type_name -> google.protobuf.Duration
-	21, // 38: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
-	24, // 39: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
-	24, // 40: cyber.conf.Observability.SlowQuery.cache:type_name -> google.protobuf.Duration
-	23, // 41: cyber.conf.Auth.Provider.wechat:type_name -> cyber.conf.Auth.Provider.WeChat
-	42, // [42:42] is the sub-list for method output_type
-	42, // [42:42] is the sub-list for method input_type
-	42, // [42:42] is the sub-list for extension type_name
-	42, // [42:42] is the sub-list for extension extendee
-	0,  // [0:42] is the sub-list for field type_name
+	24, // 18: cyber.conf.Seed.populations:type_name -> cyber.conf.Seed.Population
+	25, // 19: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	25, // 20: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	25, // 21: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	25, // 22: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	25, // 23: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
+	25, // 24: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	25, // 25: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	25, // 26: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
+	25, // 27: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
+	14, // 28: cyber.conf.Data.Storage.s3:type_name -> cyber.conf.Data.Storage.S3
+	15, // 29: cyber.conf.Data.MQ.nats:type_name -> cyber.conf.Data.MQ.NATS
+	16, // 30: cyber.conf.Data.MQ.pg:type_name -> cyber.conf.Data.MQ.PG
+	25, // 31: cyber.conf.Data.Storage.S3.presign_ttl:type_name -> google.protobuf.Duration
+	25, // 32: cyber.conf.Data.MQ.NATS.max_age:type_name -> google.protobuf.Duration
+	25, // 33: cyber.conf.Data.MQ.NATS.ack_wait:type_name -> google.protobuf.Duration
+	25, // 34: cyber.conf.Data.MQ.NATS.dlq_max_age:type_name -> google.protobuf.Duration
+	25, // 35: cyber.conf.Data.MQ.NATS.nak_backoff_step:type_name -> google.protobuf.Duration
+	25, // 36: cyber.conf.Data.MQ.PG.poll_interval:type_name -> google.protobuf.Duration
+	25, // 37: cyber.conf.Data.MQ.PG.visibility_timeout:type_name -> google.protobuf.Duration
+	25, // 38: cyber.conf.Data.MQ.PG.retention:type_name -> google.protobuf.Duration
+	21, // 39: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
+	25, // 40: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
+	25, // 41: cyber.conf.Observability.SlowQuery.cache:type_name -> google.protobuf.Duration
+	23, // 42: cyber.conf.Auth.Provider.wechat:type_name -> cyber.conf.Auth.Provider.WeChat
+	43, // [43:43] is the sub-list for method output_type
+	43, // [43:43] is the sub-list for method input_type
+	43, // [43:43] is the sub-list for extension type_name
+	43, // [43:43] is the sub-list for extension extendee
+	0,  // [0:43] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }
@@ -1967,7 +2055,7 @@ func file_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_conf_conf_proto_rawDesc), len(file_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -1261,23 +1261,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ListPopulationsResponse'
-        post:
-            tags:
-                - PopulationService
-            operationId: PopulationService_CreatePopulation
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/cyber.system.v1.CreatePopulationRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/cyber.system.v1.CreatePopulationResponse'
     /api/v1/system/principals/{principalType}/{principalId}/roles:
         get:
             tags:
@@ -2452,27 +2435,6 @@ components:
             properties:
                 id:
                     type: string
-        cyber.system.v1.CreatePopulationRequest:
-            type: object
-            properties:
-                code:
-                    type: string
-                    description: |-
-                        Same charset law as the tenant join key; the ent schema enforces it at
-                         the write as the backstop.
-                name:
-                    type: string
-                archetype:
-                    type: string
-                    description: |-
-                        engine | patron — the compile-time vocabulary; membership in the word
-                         set is validated in code, the single source of the vocabulary.
-            description: create
-        cyber.system.v1.CreatePopulationResponse:
-            type: object
-            properties:
-                population:
-                    $ref: '#/components/schemas/cyber.system.v1.Population'
         cyber.system.v1.CreateRoleRequest:
             type: object
             properties:
@@ -2950,6 +2912,8 @@ components:
                 email:
                     type: string
                 password:
+                    type: string
+                population:
                     type: string
         cyber.system.v1.LoginResponse:
             type: object
@@ -3506,6 +3470,8 @@ components:
                     type: string
                 population:
                     type: string
+                archetype:
+                    type: string
         cyber.system.v1.WeChatIdentityPayload:
             type: object
             properties:
@@ -3551,9 +3517,9 @@ tags:
     - name: PolicyService
     - name: PopulationService
       description: |-
-        Population registry write face: instances of the compile-time archetype
+        Population registry read face: instances of the compile-time archetype
          vocabulary (engine | patron). Codes are join keys — immutable once born.
-         The default population is born by seed and protected here.
+         Rows are deploy-declared state, born and reconciled by the seed.
     - name: ResourceService
     - name: RoleService
     - name: TenantService

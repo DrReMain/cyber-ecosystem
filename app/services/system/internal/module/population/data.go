@@ -28,15 +28,6 @@ func NewPopulationRP(logger *slog.Logger, p *platform.Platform) PopulationRP {
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (rp *populationRP) Create(ctx context.Context, p *Population) (*Population, error) {
-	r, err := rp.Platform.GetClient(ctx).Population.Create().
-		SetCode(p.Code).SetName(p.Name).SetArchetype(p.Archetype).Save(ctx)
-	if err != nil {
-		return nil, rp.Platform.HandleEntError(err)
-	}
-	return mapPopulation(r), nil
-}
-
 func (rp *populationRP) List(ctx context.Context, in *PopulationListIn) (*PopulationListOut, error) {
 	query := rp.Platform.GetClient(ctx).Population.Query()
 	helper.Where(query, in.Code != nil, func() predicate.Population { return population.CodeContainsFold(*in.Code) })
@@ -67,10 +58,6 @@ func (rp *populationRP) FindByCode(ctx context.Context, code string) (*Populatio
 		return nil, rp.Platform.HandleEntError(err)
 	}
 	return mapPopulation(r), nil
-}
-
-func (rp *populationRP) NotifyChanged(ctx context.Context) {
-	shared.NotifyPolicyChanged(ctx, rp.Platform.GetCache(), rp.Log)
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

@@ -414,43 +414,6 @@ func ErrorSystemTenantProtected(format string, args ...interface{}) *errors.Erro
 }
 
 // 610x: population registry
-func IsSystemPopulationExists(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == System_SYSTEM_POPULATION_EXISTS.String() && e.Code == 409
-}
-
-// 610x: population registry
-func ErrorSystemPopulationExists(format string, args ...interface{}) *errors.Error {
-	return errors.New(409, System_SYSTEM_POPULATION_EXISTS.String(), fmt.Sprintf(format, args...))
-}
-
-func IsSystemPopulationProtected(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == System_SYSTEM_POPULATION_PROTECTED.String() && e.Code == 400
-}
-
-func ErrorSystemPopulationProtected(format string, args ...interface{}) *errors.Error {
-	return errors.New(400, System_SYSTEM_POPULATION_PROTECTED.String(), fmt.Sprintf(format, args...))
-}
-
-func IsSystemPopulationInvalidArchetype(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == System_SYSTEM_POPULATION_INVALID_ARCHETYPE.String() && e.Code == 400
-}
-
-func ErrorSystemPopulationInvalidArchetype(format string, args ...interface{}) *errors.Error {
-	return errors.New(400, System_SYSTEM_POPULATION_INVALID_ARCHETYPE.String(), fmt.Sprintf(format, args...))
-}
-
 func IsSystemPopulationNotFound(err error) bool {
 	if err == nil {
 		return false
@@ -459,6 +422,7 @@ func IsSystemPopulationNotFound(err error) bool {
 	return e.Reason == System_SYSTEM_POPULATION_NOT_FOUND.String() && e.Code == 404
 }
 
+// 610x: population registry
 func ErrorSystemPopulationNotFound(format string, args ...interface{}) *errors.Error {
 	return errors.New(404, System_SYSTEM_POPULATION_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }

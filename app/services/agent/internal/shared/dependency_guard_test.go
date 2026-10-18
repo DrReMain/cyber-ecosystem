@@ -12,10 +12,10 @@ import (
 	"testing"
 )
 
-// Static guards for the dependency rules kratos CONVENTIONS spell out as
-// prose: the module DAG and the composition layering (cmd/app wires through
-// bootstrap; shared stays a contracts-only kernel; injected app contracts
-// land in module biz constructors).
+// Static guards for the dependency rules as code: the module DAG and the
+// composition layering (cmd/app wires through bootstrap; shared stays a
+// contracts-only kernel; injected app contracts land in module biz
+// constructors).
 
 // bannedImports maps a package directory (relative to internal/, prefix
 // match) to import markers it must not contain. Direct imports only: a
@@ -32,7 +32,8 @@ var bannedImports = map[string][]string{
 	// module for the interface is the designed direction; the reverse is the
 	// leak), and stay ent-free so the closure can move to shared-go as-is.
 	"client": {"internal/ent"},
-	// CONVENTIONS §3: shared → platform → ent closes a cycle.
+	// The kernel-to-schema direction is one-way (shared → platform → ent);
+	// an import back closes the cycle.
 	"ent/schema": {"internal/shared"},
 	// Bootstrap sits below business modules.
 	"bootstrap": {"module/"},
@@ -54,7 +55,7 @@ func TestModuleDependencyDAG(t *testing.T) {
 			for _, imp := range f.imports {
 				for _, ban := range bans {
 					if strings.Contains(imp, "/"+ban) {
-						t.Errorf("%s imports %q — %s must not depend on %s (CONVENTIONS DAG)",
+						t.Errorf("%s imports %q — %s must not depend on %s (module DAG)",
 							f.rel, imp, dir, ban)
 					}
 				}

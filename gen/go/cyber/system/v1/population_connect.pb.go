@@ -9,6 +9,5 @@ import (
 // RegisterPopulationServiceConnectServer registers the cyber.system.v1.PopulationService service on a
 // Kratos Connect transport server, bridging a gRPC-style implementation.
 func RegisterPopulationServiceConnectServer(srv *connect.Server, svc PopulationServiceServer) {
-	connect.HandleUnary(srv, "/cyber.system.v1.PopulationService/CreatePopulation", svc.CreatePopulation)
 	connect.HandleUnary(srv, "/cyber.system.v1.PopulationService/ListPopulations", svc.ListPopulations)
 }

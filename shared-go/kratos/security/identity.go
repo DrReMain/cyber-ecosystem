@@ -9,6 +9,7 @@ type Subject struct {
 	UserID     string
 	TenantID   string
 	Population string
+	Archetype  string
 	SessionID  string
 	Extra      map[string]any
 }

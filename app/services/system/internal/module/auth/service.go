@@ -46,7 +46,7 @@ func (s *AuthService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *AuthService) Login(ctx context.Context, in *systempb.LoginRequest) (*systempb.LoginResponse, error) {
-	token, issuedAt, expiresAt, err := s.authUC.Login(ctx, *in.Email, *in.Password)
+	token, issuedAt, expiresAt, err := s.authUC.Login(ctx, *in.Email, *in.Password, in.GetPopulation())
 	if err != nil {
 		return nil, err
 	}

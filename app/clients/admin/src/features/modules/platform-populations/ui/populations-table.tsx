@@ -1,7 +1,7 @@
 import type { Population } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/population_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TableProps } from "antd";
-import { Avatar, Button, Space, Tag, Typography } from "antd";
+import { Avatar, Space, Tag, Typography } from "antd";
 import { avatarColor } from "#/libs";
 import { m } from "#/paraglide/messages";
 
@@ -17,14 +17,12 @@ function archetypeTag(archetype: string | undefined) {
 interface PopulationsTableProps {
   populations: Population[];
   loading?: boolean;
-  onCreate: () => void;
   onRefresh: () => void;
 }
 
 export function PopulationsTable({
   populations,
   loading,
-  onCreate,
   onRefresh,
 }: Readonly<PopulationsTableProps>) {
   const { fieldTimestamp, fixed } = useColumns();
@@ -68,20 +66,10 @@ export function PopulationsTable({
       }}
       columns={columns}
       dataSource={populations}
-      emptyAction={
-        <Button color="primary" onClick={onCreate} variant="filled">
-          {m.platform_populations_create()}
-        </Button>
-      }
       emptyDescription={m.platform_populations_empty()}
       loading={loading}
       rowKey="id"
       toolbar={{
-        extra: (
-          <Button color="primary" onClick={onCreate} variant="filled">
-            {m.platform_populations_create()}
-          </Button>
-        ),
         labels: {
           density: m.common_toolbar_density(),
           densityLarge: m.common_toolbar_density_large(),

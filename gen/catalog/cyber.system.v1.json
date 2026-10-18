@@ -505,21 +505,8 @@
     "full_name": "cyber.system.v1.PopulationService",
     "package": "cyber.system.v1",
     "source_file": "cyber/system/v1/population.proto",
-    "comment": "人口管理",
+    "comment": "用户类型",
     "methods": [
-      {
-        "name": "CreatePopulation",
-        "full_name": "cyber.system.v1.PopulationService.CreatePopulation",
-        "request_name": "CreatePopulationRequest",
-        "request_full_name": "cyber.system.v1.CreatePopulationRequest",
-        "response_name": "CreatePopulationResponse",
-        "response_full_name": "cyber.system.v1.CreatePopulationResponse",
-        "http_method": "POST",
-        "http_path": "/api/v1/system/populations",
-        "comment": "创建人口",
-        "access": "PLATFORM",
-        "datascope": false
-      },
       {
         "name": "ListPopulations",
         "full_name": "cyber.system.v1.PopulationService.ListPopulations",
@@ -529,7 +516,7 @@
         "response_full_name": "cyber.system.v1.ListPopulationsResponse",
         "http_method": "GET",
         "http_path": "/api/v1/system/populations",
-        "comment": "人口列表",
+        "comment": "用户类型列表",
         "access": "PLATFORM",
         "datascope": false
       }

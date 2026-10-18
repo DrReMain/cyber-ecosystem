@@ -17,37 +17,15 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
-const OperationPopulationServiceCreatePopulation = "/cyber.system.v1.PopulationService/CreatePopulation"
 const OperationPopulationServiceListPopulations = "/cyber.system.v1.PopulationService/ListPopulations"
 
 type PopulationServiceHTTPServer interface {
-	CreatePopulation(context.Context, *CreatePopulationRequest) (*CreatePopulationResponse, error)
 	ListPopulations(context.Context, *ListPopulationsRequest) (*ListPopulationsResponse, error)
 }
 
 func RegisterPopulationServiceHTTPServer(s *http.Server, srv PopulationServiceHTTPServer) {
 	r := s.Route("/")
-	r.Handle("POST", "/api/v1/system/populations", _PopulationService_CreatePopulation0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/populations", _PopulationService_ListPopulations0_HTTP_Handler(srv))
-}
-
-func _PopulationService_CreatePopulation0_HTTP_Handler(srv PopulationServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in CreatePopulationRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationPopulationServiceCreatePopulation)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.CreatePopulation(ctx, req.(*CreatePopulationRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*CreatePopulationResponse)
-		return ctx.Result(200, reply)
-	}
 }
 
 func _PopulationService_ListPopulations0_HTTP_Handler(srv PopulationServiceHTTPServer) func(ctx http.Context) error {
@@ -70,7 +48,6 @@ func _PopulationService_ListPopulations0_HTTP_Handler(srv PopulationServiceHTTPS
 }
 
 type PopulationServiceHTTPClient interface {
-	CreatePopulation(ctx context.Context, req *CreatePopulationRequest, opts ...http.CallOption) (rsp *CreatePopulationResponse, err error)
 	ListPopulations(ctx context.Context, req *ListPopulationsRequest, opts ...http.CallOption) (rsp *ListPopulationsResponse, err error)
 }
 
@@ -80,23 +57,6 @@ type PopulationServiceHTTPClientImpl struct {
 
 func NewPopulationServiceHTTPClient(client *http.Client) PopulationServiceHTTPClient {
 	return &PopulationServiceHTTPClientImpl{client}
-}
-
-func (c *PopulationServiceHTTPClientImpl) CreatePopulation(ctx context.Context, in *CreatePopulationRequest, opts ...http.CallOption) (*CreatePopulationResponse, error) {
-	var out CreatePopulationResponse
-	pattern := "/api/v1/system/populations"
-	path := http.BuildPath(pattern, in)
-	opts = append([]http.CallOption{
-		http.Accept("application/protojson"),
-		http.ContentType("application/protojson"),
-		http.Operation(OperationPopulationServiceCreatePopulation),
-		http.PathTemplate(pattern),
-	}, opts...)
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
 }
 
 func (c *PopulationServiceHTTPClientImpl) ListPopulations(ctx context.Context, in *ListPopulationsRequest, opts ...http.CallOption) (*ListPopulationsResponse, error) {

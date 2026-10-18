@@ -30,10 +30,10 @@ const (
 type Seed struct {
 	log  *slog.Logger
 	plat *platform.Platform
-	cfg  *conf.Authz
+	cfg  *conf.Seed
 }
 
-func NewSeed(cfg *conf.Authz, p *platform.Platform, logger *slog.Logger) (*Seed, error) {
+func NewSeed(cfg *conf.Seed, p *platform.Platform, logger *slog.Logger) (*Seed, error) {
 	return &Seed{log: logger, plat: p, cfg: cfg}, nil
 }
 
@@ -44,6 +44,9 @@ func (s *Seed) Run(ctx context.Context) error {
 		return err
 	}
 	if err := s.ensureDefaultPopulation(ctx); err != nil {
+		return err
+	}
+	if err := s.ensureDeclaredPopulations(ctx); err != nil {
 		return err
 	}
 	return s.seedSuperAdmins(ctx)
@@ -71,6 +74,64 @@ func (s *Seed) ensureDefaultPopulation(ctx context.Context) error {
 	return nil
 }
 
+func (s *Seed) ensureDeclaredPopulations(ctx context.Context) error {
+	if s.cfg == nil {
+		return nil
+	}
+	rows := s.cfg.GetPopulations()
+	if err := validateDeclaredPopulations(rows); err != nil {
+		return err
+	}
+	client := s.plat.GetClient(ctx)
+	created := false
+	for _, row := range rows {
+		existing, err := client.Population.Query().Where(population.Code(row.GetCode())).Only(ctx)
+		if err == nil {
+			if existing.Name != row.GetName() || existing.Archetype != row.GetArchetype() {
+				return fmt.Errorf("seed: declared population %q is %s/%s but the registry holds %s/%s",
+					row.GetCode(), row.GetName(), row.GetArchetype(), existing.Name, existing.Archetype)
+			}
+			continue
+		}
+		if !ent.IsNotFound(err) {
+			return s.plat.HandleEntError(fmt.Errorf("seed: query declared population %q: %w", row.GetCode(), err))
+		}
+		if _, err := client.Population.Create().
+			SetCode(row.GetCode()).SetName(row.GetName()).SetArchetype(row.GetArchetype()).
+			Save(ctx); err != nil {
+			if !ent.IsConstraintError(err) {
+				return s.plat.HandleEntError(fmt.Errorf("seed: create declared population %q: %w", row.GetCode(), err))
+			}
+			if _, err = client.Population.Query().Where(population.Code(row.GetCode())).Only(ctx); err != nil {
+				return s.plat.HandleEntError(fmt.Errorf("seed: requery declared population %q: %w", row.GetCode(), err))
+			}
+		}
+		created = true
+	}
+	if created {
+		shared.NotifyPolicyChanged(ctx, s.plat.GetCache(), s.log)
+	}
+	return nil
+}
+
+func validateDeclaredPopulations(rows []*conf.Seed_Population) error {
+	seen := make(map[string]bool, len(rows))
+	for _, row := range rows {
+		switch {
+		case row.GetCode() == "":
+			return fmt.Errorf("seed: declared population with an empty code")
+		case row.GetCode() == security.DefaultPopulation:
+			return fmt.Errorf("seed: population %q is seed-born with a fixed shape; redeclaring it is a config error", row.GetCode())
+		case !security.ValidArchetype(row.GetArchetype()):
+			return fmt.Errorf("seed: declared population %q carries unknown archetype %q", row.GetCode(), row.GetArchetype())
+		case seen[row.GetCode()]:
+			return fmt.Errorf("seed: population %q declared twice", row.GetCode())
+		}
+		seen[row.GetCode()] = true
+	}
+	return nil
+}
+
 func (s *Seed) ensureDefaultTenant(ctx context.Context) error {
 	client := s.plat.GetClient(ctx)
 	_, err := client.Tenant.Query().Where(tenant.Code(security.DefaultTenant)).Only(ctx)
@@ -92,8 +153,6 @@ func (s *Seed) ensureDefaultTenant(ctx context.Context) error {
 }
 
 func (s *Seed) seedSuperAdmins(ctx context.Context) error {
-	// Without this floor a fresh deployment denies every request — including
-	// the RPC that would create the first user — with no way out.
 	if s.cfg == nil || len(s.cfg.GetSuperAdmins()) == 0 {
 		return nil
 	}
@@ -123,8 +182,6 @@ func (s *Seed) seedSuperAdmins(ctx context.Context) error {
 			return err
 		}
 	}
-	// Bump + notify so every replica — including this one — recompiles from
-	// the seeded tables.
 	shared.NotifyPolicyChanged(ctx, s.plat.GetCache(), s.log)
 	return nil
 }
@@ -167,8 +224,6 @@ func (s *Seed) ensureSuperGrant(ctx context.Context, client *ent.Client, tenant,
 }
 
 func (s *Seed) ensureUser(ctx context.Context, client *ent.Client, tenant, email, hash string) (*ent.User, error) {
-	// The identity key is global: discovery and the create backstop resolve
-	// by email alone — the superadmin may already exist under another tenant.
 	u, err := client.User.Query().Where(user.Email(email)).Only(ctx)
 	if u != nil {
 		return s.ensureSeat(ctx, client, tenant, u) // password is owned by admin flows, never reset here
@@ -190,8 +245,6 @@ func (s *Seed) ensureUser(ctx context.Context, client *ent.Client, tenant, email
 }
 
 func (s *Seed) ensureSeat(ctx context.Context, client *ent.Client, tenant string, u *ent.User) (*ent.User, error) {
-	// Counted in the platform tenant: a seat held elsewhere must not leave
-	// the binding without its seat.
 	n, err := client.Membership.Query().Where(membership.UserID(u.ID), membership.TenantID(tenant)).Count(ctx)
 	if err != nil {
 		return nil, s.plat.HandleEntError(fmt.Errorf("seed: query seat for %q: %w", u.Email, err))

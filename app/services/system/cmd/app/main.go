@@ -119,7 +119,7 @@ func main() {
 	}
 	defer shutdownObs()
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Authz, bc.Catalog, bc.Auth, logger)
+	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Catalog, bc.Auth, bc.Seed, logger)
 	if err != nil {
 		panic(err)
 	}

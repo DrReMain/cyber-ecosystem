@@ -369,27 +369,6 @@ export type CyberSystemV1CreatePolicyResponse = {
 /**
  * create
  */
-export type CyberSystemV1CreatePopulationRequest = {
-    /**
-     * Same charset law as the tenant join key; the ent schema enforces it at
-     * the write as the backstop.
-     */
-    code?: string;
-    name?: string;
-    /**
-     * engine | patron — the compile-time vocabulary; membership in the word
-     * set is validated in code, the single source of the vocabulary.
-     */
-    archetype?: string;
-};
-
-export type CyberSystemV1CreatePopulationResponse = {
-    population?: CyberSystemV1Population;
-};
-
-/**
- * create
- */
 export type CyberSystemV1CreateRoleRequest = {
     code?: string;
     name?: string;
@@ -724,6 +703,7 @@ export type CyberSystemV1LoginByIdentityResponse = {
 export type CyberSystemV1LoginRequest = {
     email?: string;
     password?: string;
+    population?: string;
 };
 
 export type CyberSystemV1LoginResponse = {
@@ -1192,6 +1172,7 @@ export type CyberSystemV1VerifySessionResponse = {
     sessionId?: string;
     email?: string;
     population?: string;
+    archetype?: string;
 };
 
 export type CyberSystemV1WeChatIdentityPayload = {
@@ -2243,22 +2224,6 @@ export type PopulationServiceListPopulationsResponses = {
 };
 
 export type PopulationServiceListPopulationsResponse = PopulationServiceListPopulationsResponses[keyof PopulationServiceListPopulationsResponses];
-
-export type PopulationServiceCreatePopulationData = {
-    body: CyberSystemV1CreatePopulationRequest;
-    path?: never;
-    query?: never;
-    url: '/api/v1/system/populations';
-};
-
-export type PopulationServiceCreatePopulationResponses = {
-    /**
-     * OK
-     */
-    200: CyberSystemV1CreatePopulationResponse;
-};
-
-export type PopulationServiceCreatePopulationResponse = PopulationServiceCreatePopulationResponses[keyof PopulationServiceCreatePopulationResponses];
 
 export type RoleServiceListRolesByPrincipalData = {
     body?: never;
