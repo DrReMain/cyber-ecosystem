@@ -29,7 +29,10 @@
       "./messages/files-list/{locale}.json",
       "./messages/platform/{locale}.json",
       "./messages/platform-tenants/{locale}.json",
-      "./messages/platform-populations/{locale}.json"
+      "./messages/platform-populations/{locale}.json",
+      "./messages/esports/{locale}.json",
+      "./messages/esports-users/{locale}.json",
+      "./messages/esports-user-detail/{locale}.json"
     ]
   }
 }

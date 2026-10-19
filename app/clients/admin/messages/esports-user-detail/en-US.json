@@ -1,0 +1,23 @@
+{
+  "esports_user_detail_title": "Member detail",
+  "esports_user_detail_back": "Back",
+  "esports_user_detail_error": "Member not found or unreachable",
+  "esports_user_detail_not_open": "Not available yet",
+  "esports_user_detail_tab_overview": "Overview",
+  "esports_user_detail_tab_trace": "Trace",
+  "esports_user_detail_tab_assessments": "Assessments & reports",
+  "esports_user_detail_tab_membership": "Membership",
+  "esports_user_detail_tab_messages": "Messages & feedback",
+  "esports_user_detail_tab_account": "Account",
+  "esports_user_detail_kv_account": "Account",
+  "esports_user_detail_kv_nickname": "Nickname",
+  "esports_user_detail_kv_age_band": "Age band",
+  "esports_user_detail_kv_birth": "Birth",
+  "esports_user_detail_birth_unset": "Unset",
+  "esports_user_detail_birth_uncollected": "Not collected",
+  "esports_user_detail_kv_registered_at": "Registered",
+  "esports_user_detail_kv_games": "Game preferences",
+  "esports_user_detail_kv_user_id": "User ID",
+  "esports_user_detail_kv_status": "Status",
+  "esports_user_detail_kv_population": "Population"
+}

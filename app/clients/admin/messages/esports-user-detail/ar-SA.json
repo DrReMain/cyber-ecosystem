@@ -1,0 +1,23 @@
+{
+  "esports_user_detail_title": "تفاصيل العضو",
+  "esports_user_detail_back": "رجوع",
+  "esports_user_detail_error": "العضو غير موجود أو يتعذر الوصول إليه",
+  "esports_user_detail_not_open": "غير متاح بعد",
+  "esports_user_detail_tab_overview": "نظرة عامة",
+  "esports_user_detail_tab_trace": "التتبع",
+  "esports_user_detail_tab_assessments": "التقييمات والتقارير",
+  "esports_user_detail_tab_membership": "العضوية",
+  "esports_user_detail_tab_messages": "الرسائل والملاحظات",
+  "esports_user_detail_tab_account": "الحساب",
+  "esports_user_detail_kv_account": "الحساب",
+  "esports_user_detail_kv_nickname": "الاسم المستعار",
+  "esports_user_detail_kv_age_band": "الفئة العمرية",
+  "esports_user_detail_kv_birth": "تاريخ الميلاد",
+  "esports_user_detail_birth_unset": "غير محدد",
+  "esports_user_detail_birth_uncollected": "لم يُجمع",
+  "esports_user_detail_kv_registered_at": "تاريخ التسجيل",
+  "esports_user_detail_kv_games": "تفضيلات الألعاب",
+  "esports_user_detail_kv_user_id": "معرّف المستخدم",
+  "esports_user_detail_kv_status": "الحالة",
+  "esports_user_detail_kv_population": "الفئة"
+}

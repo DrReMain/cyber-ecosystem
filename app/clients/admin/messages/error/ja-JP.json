@@ -88,5 +88,11 @@
   "error_SYSTEM_POPULATION_NOT_FOUND": "ユーザータイプが見つかりません",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "IDプロバイダーが未設定または無効です",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "サードパーティID連携に失敗しました",
-  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "このサードパーティIDは既に別のアカウントに紐づいています"
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "このサードパーティIDは既に別のアカウントに紐づいています",
+  "error_ESPORTS_UNSPECIFIED": "eスポーツサービスエラー",
+  "error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED": "13歳未満は続行に保護者の同意が必要です",
+  "error_ESPORTS_PROFILE_GAME_UNKNOWN": "選択したゲームが見つかりません。一覧を更新して再試行してください",
+  "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "カスタムゲームの上限に達しました",
+  "error_ESPORTS_TEST_NOT_FOUND": "テストが見つからないか利用できません",
+  "error_ESPORTS_MEMBER_NOT_FOUND": "メンバーが見つかりません"
 }

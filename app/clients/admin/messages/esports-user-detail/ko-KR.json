@@ -1,0 +1,23 @@
+{
+  "esports_user_detail_title": "회원 상세",
+  "esports_user_detail_back": "뒤로",
+  "esports_user_detail_error": "회원이 없거나 접근할 수 없습니다",
+  "esports_user_detail_not_open": "아직 제공되지 않음",
+  "esports_user_detail_tab_overview": "개요",
+  "esports_user_detail_tab_trace": "추적",
+  "esports_user_detail_tab_assessments": "평가 및 리포트",
+  "esports_user_detail_tab_membership": "멤버십",
+  "esports_user_detail_tab_messages": "메시지 및 피드백",
+  "esports_user_detail_tab_account": "계정",
+  "esports_user_detail_kv_account": "계정",
+  "esports_user_detail_kv_nickname": "닉네임",
+  "esports_user_detail_kv_age_band": "연령대",
+  "esports_user_detail_kv_birth": "생년월",
+  "esports_user_detail_birth_unset": "미설정",
+  "esports_user_detail_birth_uncollected": "미수집",
+  "esports_user_detail_kv_registered_at": "등록 시간",
+  "esports_user_detail_kv_games": "게임 선호",
+  "esports_user_detail_kv_user_id": "사용자 ID",
+  "esports_user_detail_kv_status": "상태",
+  "esports_user_detail_kv_population": "집단"
+}

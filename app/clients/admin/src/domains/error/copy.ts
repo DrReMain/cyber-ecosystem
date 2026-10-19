@@ -1,3 +1,4 @@
+import type { Esports } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/error_reason_pb";
 import type { FlowError } from "@cyber-ecosystem/gen-connect-ts/cyber/shared/errors/v1/flow_pb";
 import type { GeneralError } from "@cyber-ecosystem/gen-connect-ts/cyber/shared/errors/v1/general_pb";
 import type { InfraError } from "@cyber-ecosystem/gen-connect-ts/cyber/shared/errors/v1/infra_pb";
@@ -9,7 +10,8 @@ export type ConnectReason =
   | `GENERAL_ERROR_${Extract<keyof typeof GeneralError, string>}`
   | `INFRA_ERROR_${Extract<keyof typeof InfraError, string>}`
   | `FLOW_ERROR_${Extract<keyof typeof FlowError, string>}`
-  | `SYSTEM_${Extract<keyof typeof System, string>}`;
+  | `SYSTEM_${Extract<keyof typeof System, string>}`
+  | `ESPORTS_${Extract<keyof typeof Esports, string>}`;
 
 const REASON_COPY: Record<ConnectReason, () => string> = {
   // General (shared)
@@ -98,6 +100,13 @@ const REASON_COPY: Record<ConnectReason, () => string> = {
   SYSTEM_IDENTITY_EXCHANGE_FAILED: m.error_SYSTEM_IDENTITY_EXCHANGE_FAILED,
   SYSTEM_IDENTITY_ALREADY_BOUND: m.error_SYSTEM_IDENTITY_ALREADY_BOUND,
   SYSTEM_POPULATION_NOT_FOUND: m.error_SYSTEM_POPULATION_NOT_FOUND,
+  // Esports (service business)
+  ESPORTS_UNSPECIFIED: m.error_ESPORTS_UNSPECIFIED,
+  ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED: m.error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED,
+  ESPORTS_PROFILE_GAME_UNKNOWN: m.error_ESPORTS_PROFILE_GAME_UNKNOWN,
+  ESPORTS_PROFILE_CUSTOM_GAME_CAP: m.error_ESPORTS_PROFILE_CUSTOM_GAME_CAP,
+  ESPORTS_TEST_NOT_FOUND: m.error_ESPORTS_TEST_NOT_FOUND,
+  ESPORTS_MEMBER_NOT_FOUND: m.error_ESPORTS_MEMBER_NOT_FOUND,
 };
 
 const TITLES: Record<ErrorKind, () => string> = {

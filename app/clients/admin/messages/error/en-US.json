@@ -88,5 +88,11 @@
   "error_SYSTEM_POPULATION_NOT_FOUND": "User type not found",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "Identity provider is not configured or disabled",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "Third-party identity exchange failed",
-  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "This third-party identity is already bound to another account"
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "This third-party identity is already bound to another account",
+  "error_ESPORTS_UNSPECIFIED": "Esports service error",
+  "error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED": "Users under 13 need guardian consent to continue",
+  "error_ESPORTS_PROFILE_GAME_UNKNOWN": "Selected game not found; refresh the list and try again",
+  "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "Custom game limit reached",
+  "error_ESPORTS_TEST_NOT_FOUND": "Test not found or no longer available",
+  "error_ESPORTS_MEMBER_NOT_FOUND": "Member not found"
 }

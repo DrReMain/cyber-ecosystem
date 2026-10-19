@@ -98,6 +98,13 @@ func (f *fakeUserRP) FindSeated(ctx context.Context, id string) (*User, error) {
 	return f.FindByID(ctx, id)
 }
 
+func (f *fakeUserRP) FindSeatedAnyPlane(ctx context.Context, id string) (*User, error) {
+	if f.notSeated[id] {
+		return nil, errorspb.ErrorInfraErrorDbNotFound("")
+	}
+	return f.FindByID(ctx, id)
+}
+
 func (f *fakeUserRP) UpdateStatus(_ context.Context, id string, enabled bool) (*User, error) {
 	f.flips = append(f.flips, struct {
 		id      string

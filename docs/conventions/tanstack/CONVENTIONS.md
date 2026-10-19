@@ -110,6 +110,11 @@ Three tiers:
    `staticData`, so deleting a route file removes its menu item
    automatically; drop the menu message keys alongside.
 
+**`staticData.title` is a typed message key** — `MessageKey` = `keyof typeof m`
+(`route-meta.ts`): the bare key literal is the only legal form; typos,
+template strings, and variables (type `string`) all fail typecheck. No
+constant table — the key set has no second source.
+
 **Dot-named nesting.**
 
 - A dot-named route file (`login.wechat.callback.tsx`) is a child of each shorter prefix (`/login/wechat`, `/login`): every parent on that chain must be a layout route — its component renders `<Outlet />`, and the parent's own page lives in `login.index.tsx`.
@@ -125,7 +130,7 @@ Three tiers:
 
 **Tab identity (dashboard chrome).**
 
-- A route owns a tabbar tab iff its `staticData` declares a `title`; title-less routes render inside the nearest titled ancestor's tab (the profile group pattern).
+- A route owns a tabbar tab iff its `staticData` declares a `title`; title-less routes render inside the nearest titled ancestor's tab (the profile group pattern). A detail page joins its list's tab by nesting under the titled route as a `menu.hide` child with no `title` of its own (its `head` carries the page title); the titled route is then a layout whose own page lives in `index.tsx` — and a menu-bearing layout whose children are all deliberately hidden stays a leaf nav entry (children dropped for grants still prune it — hide-by-default holds).
 - `key` = resolved pathname (search excluded; one tab per param-route instance, e.g. each `/order/$id` id); `href` = full href including search; `pattern` = route `fullPath`, kept for permission-filtered restore.
 - Activation, close, and href capture compare the **exact key** from `tabFromMatches` — path-prefix ownership is forbidden.
 - Router `location` and `matches` lag each other by one commit during navigations; every matches-derived tab decision gates behind `matchesAgreeWith(matches, pathname)` — torn frames can neither capture a foreign href nor re-append a just-closed tab.

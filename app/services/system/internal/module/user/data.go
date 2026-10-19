@@ -189,6 +189,18 @@ func (rp *userRP) FindSeated(ctx context.Context, id string) (*User, error) {
 	return mapUser(d), nil
 }
 
+func (rp *userRP) FindSeatedAnyPlane(ctx context.Context, id string) (*User, error) {
+	query := rp.Platform.GetClient(ctx).User.Query().Where(user.IDEQ(id))
+	if subject, ok := security.SubjectFromCtx(ctx); ok {
+		query.Where(tenantSeatNarrowing(subject.TenantID))
+	}
+	d, err := query.Only(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return mapUser(d), nil
+}
+
 func (rp *userRP) FindByIDs(ctx context.Context, ids []string) (map[string]*User, error) {
 	rows, err := rp.Platform.GetClient(ctx).User.Query().Where(user.IDIn(ids...)).All(ctx)
 	if err != nil {
@@ -388,6 +400,19 @@ func populationNarrowing(tenantID, populationCode string) predicate.User {
 			entsql.EQ(m.C(membership.FieldTenantID), tenantID),
 			entsql.EQ(m.C(membership.FieldUserID), entsql.Raw(s.C(user.FieldID))),
 			entsql.EQ(m.C(membership.FieldPopulation), populationCode),
+		))))
+	})
+}
+
+func tenantSeatNarrowing(tenantID string) predicate.User {
+	// Tenant-only seat match — member plane included: governance writes
+	// reach every identity seated in the caller's tenant, while the plane
+	// filter stays a visibility law for list/get faces.
+	return predicate.User(func(s *entsql.Selector) {
+		m := entsql.Table(membership.Table)
+		s.Where(entsql.Exists(entsql.Select(m.C(membership.FieldUserID)).From(m).Where(entsql.And(
+			entsql.EQ(m.C(membership.FieldTenantID), tenantID),
+			entsql.EQ(m.C(membership.FieldUserID), entsql.Raw(s.C(user.FieldID))),
 		))))
 	})
 }

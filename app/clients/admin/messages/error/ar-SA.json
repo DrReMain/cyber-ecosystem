@@ -88,5 +88,11 @@
   "error_SYSTEM_POPULATION_NOT_FOUND": "نوع المستخدم غير موجود",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "مزود الهوية غير مكون أو معطل",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "فشل تبادل الهوية من طرف ثالث",
-  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "هذه الهوية الخارجية مرتبطة بالفعل بحساب آخر"
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "هذه الهوية الخارجية مرتبطة بالفعل بحساب آخر",
+  "error_ESPORTS_UNSPECIFIED": "خطأ في خدمة الرياضات الإلكترونية",
+  "error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED": "يحتاج المستخدمون دون 13 عامًا إلى موافقة الوصي للمتابعة",
+  "error_ESPORTS_PROFILE_GAME_UNKNOWN": "اللعبة المختارة غير موجودة؛ حدّث القائمة وحاول مجددًا",
+  "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "تم بلوغ حد الألعاب المخصصة",
+  "error_ESPORTS_TEST_NOT_FOUND": "الاختبار غير موجود أو لم يعد متاحًا",
+  "error_ESPORTS_MEMBER_NOT_FOUND": "العضو غير موجود"
 }

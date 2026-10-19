@@ -88,5 +88,11 @@
   "error_SYSTEM_POPULATION_NOT_FOUND": "用户类型不存在",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "身份提供方未配置或已停用",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "第三方身份交换失败",
-  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "该第三方身份已绑定其他账号"
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "该第三方身份已绑定其他账号",
+  "error_ESPORTS_UNSPECIFIED": "电竞服务错误",
+  "error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED": "未满 13 岁需要监护人同意后才能继续",
+  "error_ESPORTS_PROFILE_GAME_UNKNOWN": "所选游戏不存在，请刷新列表后重试",
+  "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "自定义游戏数量已达上限",
+  "error_ESPORTS_TEST_NOT_FOUND": "测试项不存在或已下线",
+  "error_ESPORTS_MEMBER_NOT_FOUND": "会员不存在"
 }

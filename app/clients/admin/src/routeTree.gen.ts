@@ -15,12 +15,14 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAgentsRouteRouteImport } from './routes/dashboard/agents/route'
+import { Route as DashboardEsportsRouteRouteImport } from './routes/dashboard/esports/route'
 import { Route as DashboardFilesRouteRouteImport } from './routes/dashboard/files/route'
 import { Route as DashboardPlatformRouteRouteImport } from './routes/dashboard/platform/route'
 import { Route as DashboardProfileRouteRouteImport } from './routes/dashboard/profile/route'
 import { Route as DashboardSystemRouteRouteImport } from './routes/dashboard/system/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as DashboardAgentsConnectionsRouteImport } from './routes/dashboard/agents/connections'
+import { Route as DashboardEsportsUsersRouteRouteImport } from './routes/dashboard/esports/users/route'
 import { Route as DashboardFilesListRouteImport } from './routes/dashboard/files/list'
 import { Route as DashboardPlatformPopulationsRouteImport } from './routes/dashboard/platform/populations'
 import { Route as DashboardPlatformTenantsRouteImport } from './routes/dashboard/platform/tenants'
@@ -33,6 +35,8 @@ import { Route as DashboardSystemDiagRouteImport } from './routes/dashboard/syst
 import { Route as DashboardSystemPoliciesRouteImport } from './routes/dashboard/system/policies'
 import { Route as DashboardSystemRolesRouteImport } from './routes/dashboard/system/roles'
 import { Route as DashboardSystemUsersRouteImport } from './routes/dashboard/system/users'
+import { Route as DashboardEsportsUsersIndexRouteImport } from './routes/dashboard/esports/users/index'
+import { Route as DashboardEsportsUsersIdRouteImport } from './routes/dashboard/esports/users/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -62,6 +66,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
 const DashboardAgentsRouteRoute = DashboardAgentsRouteRouteImport.update({
   id: '/agents',
   path: '/agents',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardEsportsRouteRoute = DashboardEsportsRouteRouteImport.update({
+  id: '/esports',
+  path: '/esports',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardFilesRouteRoute = DashboardFilesRouteRouteImport.update({
@@ -94,6 +103,12 @@ const DashboardAgentsConnectionsRoute =
     id: '/connections',
     path: '/connections',
     getParentRoute: () => DashboardAgentsRouteRoute,
+  } as any)
+const DashboardEsportsUsersRouteRoute =
+  DashboardEsportsUsersRouteRouteImport.update({
+    id: '/users',
+    path: '/users',
+    getParentRoute: () => DashboardEsportsRouteRoute,
   } as any)
 const DashboardFilesListRoute = DashboardFilesListRouteImport.update({
   id: '/list',
@@ -158,6 +173,17 @@ const DashboardSystemUsersRoute = DashboardSystemUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => DashboardSystemRouteRoute,
 } as any)
+const DashboardEsportsUsersIndexRoute =
+  DashboardEsportsUsersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardEsportsUsersRouteRoute,
+  } as any)
+const DashboardEsportsUsersIdRoute = DashboardEsportsUsersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DashboardEsportsUsersRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -165,12 +191,14 @@ export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
+  '/dashboard/esports': typeof DashboardEsportsRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
   '/dashboard/profile': typeof DashboardProfileRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/dashboard/esports/users': typeof DashboardEsportsUsersRouteRouteWithChildren
   '/dashboard/agents/connections': typeof DashboardAgentsConnectionsRoute
   '/dashboard/files/list': typeof DashboardFilesListRoute
   '/dashboard/platform/populations': typeof DashboardPlatformPopulationsRoute
@@ -184,12 +212,15 @@ export interface FileRoutesByFullPath {
   '/dashboard/system/roles': typeof DashboardSystemRolesRoute
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
+  '/dashboard/esports/users/$id': typeof DashboardEsportsUsersIdRoute
+  '/dashboard/esports/users/': typeof DashboardEsportsUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
+  '/dashboard/esports': typeof DashboardEsportsRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
@@ -208,6 +239,8 @@ export interface FileRoutesByTo {
   '/dashboard/system/roles': typeof DashboardSystemRolesRoute
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile': typeof DashboardProfileIndexRoute
+  '/dashboard/esports/users/$id': typeof DashboardEsportsUsersIdRoute
+  '/dashboard/esports/users': typeof DashboardEsportsUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -216,12 +249,14 @@ export interface FileRoutesById {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
+  '/dashboard/esports': typeof DashboardEsportsRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
   '/dashboard/profile': typeof DashboardProfileRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/dashboard/esports/users': typeof DashboardEsportsUsersRouteRouteWithChildren
   '/dashboard/agents/connections': typeof DashboardAgentsConnectionsRoute
   '/dashboard/files/list': typeof DashboardFilesListRoute
   '/dashboard/platform/populations': typeof DashboardPlatformPopulationsRoute
@@ -235,6 +270,8 @@ export interface FileRoutesById {
   '/dashboard/system/roles': typeof DashboardSystemRolesRoute
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
+  '/dashboard/esports/users/$id': typeof DashboardEsportsUsersIdRoute
+  '/dashboard/esports/users/': typeof DashboardEsportsUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -244,12 +281,14 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/dashboard/agents'
+    | '/dashboard/esports'
     | '/dashboard/files'
     | '/dashboard/platform'
     | '/dashboard/profile'
     | '/dashboard/system'
     | '/dashboard/'
     | '/login/'
+    | '/dashboard/esports/users'
     | '/dashboard/agents/connections'
     | '/dashboard/files/list'
     | '/dashboard/platform/populations'
@@ -263,12 +302,15 @@ export interface FileRouteTypes {
     | '/dashboard/system/roles'
     | '/dashboard/system/users'
     | '/dashboard/profile/'
+    | '/dashboard/esports/users/$id'
+    | '/dashboard/esports/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/dashboard/agents'
+    | '/dashboard/esports'
     | '/dashboard/files'
     | '/dashboard/platform'
     | '/dashboard/system'
@@ -287,6 +329,8 @@ export interface FileRouteTypes {
     | '/dashboard/system/roles'
     | '/dashboard/system/users'
     | '/dashboard/profile'
+    | '/dashboard/esports/users/$id'
+    | '/dashboard/esports/users'
   id:
     | '__root__'
     | '/'
@@ -294,12 +338,14 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/dashboard/agents'
+    | '/dashboard/esports'
     | '/dashboard/files'
     | '/dashboard/platform'
     | '/dashboard/profile'
     | '/dashboard/system'
     | '/dashboard/'
     | '/login/'
+    | '/dashboard/esports/users'
     | '/dashboard/agents/connections'
     | '/dashboard/files/list'
     | '/dashboard/platform/populations'
@@ -313,6 +359,8 @@ export interface FileRouteTypes {
     | '/dashboard/system/roles'
     | '/dashboard/system/users'
     | '/dashboard/profile/'
+    | '/dashboard/esports/users/$id'
+    | '/dashboard/esports/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -367,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAgentsRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/esports': {
+      id: '/dashboard/esports'
+      path: '/esports'
+      fullPath: '/dashboard/esports'
+      preLoaderRoute: typeof DashboardEsportsRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/files': {
       id: '/dashboard/files'
       path: '/files'
@@ -408,6 +463,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/agents/connections'
       preLoaderRoute: typeof DashboardAgentsConnectionsRouteImport
       parentRoute: typeof DashboardAgentsRouteRoute
+    }
+    '/dashboard/esports/users': {
+      id: '/dashboard/esports/users'
+      path: '/users'
+      fullPath: '/dashboard/esports/users'
+      preLoaderRoute: typeof DashboardEsportsUsersRouteRouteImport
+      parentRoute: typeof DashboardEsportsRouteRoute
     }
     '/dashboard/files/list': {
       id: '/dashboard/files/list'
@@ -493,6 +555,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSystemUsersRouteImport
       parentRoute: typeof DashboardSystemRouteRoute
     }
+    '/dashboard/esports/users/': {
+      id: '/dashboard/esports/users/'
+      path: '/'
+      fullPath: '/dashboard/esports/users/'
+      preLoaderRoute: typeof DashboardEsportsUsersIndexRouteImport
+      parentRoute: typeof DashboardEsportsUsersRouteRoute
+    }
+    '/dashboard/esports/users/$id': {
+      id: '/dashboard/esports/users/$id'
+      path: '/$id'
+      fullPath: '/dashboard/esports/users/$id'
+      preLoaderRoute: typeof DashboardEsportsUsersIdRouteImport
+      parentRoute: typeof DashboardEsportsUsersRouteRoute
+    }
   }
 }
 
@@ -506,6 +582,35 @@ const DashboardAgentsRouteRouteChildren: DashboardAgentsRouteRouteChildren = {
 
 const DashboardAgentsRouteRouteWithChildren =
   DashboardAgentsRouteRoute._addFileChildren(DashboardAgentsRouteRouteChildren)
+
+interface DashboardEsportsUsersRouteRouteChildren {
+  DashboardEsportsUsersIdRoute: typeof DashboardEsportsUsersIdRoute
+  DashboardEsportsUsersIndexRoute: typeof DashboardEsportsUsersIndexRoute
+}
+
+const DashboardEsportsUsersRouteRouteChildren: DashboardEsportsUsersRouteRouteChildren =
+  {
+    DashboardEsportsUsersIdRoute: DashboardEsportsUsersIdRoute,
+    DashboardEsportsUsersIndexRoute: DashboardEsportsUsersIndexRoute,
+  }
+
+const DashboardEsportsUsersRouteRouteWithChildren =
+  DashboardEsportsUsersRouteRoute._addFileChildren(
+    DashboardEsportsUsersRouteRouteChildren,
+  )
+
+interface DashboardEsportsRouteRouteChildren {
+  DashboardEsportsUsersRouteRoute: typeof DashboardEsportsUsersRouteRouteWithChildren
+}
+
+const DashboardEsportsRouteRouteChildren: DashboardEsportsRouteRouteChildren = {
+  DashboardEsportsUsersRouteRoute: DashboardEsportsUsersRouteRouteWithChildren,
+}
+
+const DashboardEsportsRouteRouteWithChildren =
+  DashboardEsportsRouteRoute._addFileChildren(
+    DashboardEsportsRouteRouteChildren,
+  )
 
 interface DashboardFilesRouteRouteChildren {
   DashboardFilesListRoute: typeof DashboardFilesListRoute
@@ -574,6 +679,7 @@ const DashboardSystemRouteRouteWithChildren =
 
 interface DashboardRouteRouteChildren {
   DashboardAgentsRouteRoute: typeof DashboardAgentsRouteRouteWithChildren
+  DashboardEsportsRouteRoute: typeof DashboardEsportsRouteRouteWithChildren
   DashboardFilesRouteRoute: typeof DashboardFilesRouteRouteWithChildren
   DashboardPlatformRouteRoute: typeof DashboardPlatformRouteRouteWithChildren
   DashboardProfileRouteRoute: typeof DashboardProfileRouteRouteWithChildren
@@ -583,6 +689,7 @@ interface DashboardRouteRouteChildren {
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAgentsRouteRoute: DashboardAgentsRouteRouteWithChildren,
+  DashboardEsportsRouteRoute: DashboardEsportsRouteRouteWithChildren,
   DashboardFilesRouteRoute: DashboardFilesRouteRouteWithChildren,
   DashboardPlatformRouteRoute: DashboardPlatformRouteRouteWithChildren,
   DashboardProfileRouteRoute: DashboardProfileRouteRouteWithChildren,

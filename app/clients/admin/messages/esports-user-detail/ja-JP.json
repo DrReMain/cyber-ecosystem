@@ -1,0 +1,23 @@
+{
+  "esports_user_detail_title": "メンバー詳細",
+  "esports_user_detail_back": "戻る",
+  "esports_user_detail_error": "メンバーが見つからないかアクセスできません",
+  "esports_user_detail_not_open": "現在未提供",
+  "esports_user_detail_tab_overview": "概要",
+  "esports_user_detail_tab_trace": "追跡",
+  "esports_user_detail_tab_assessments": "評価とレポート",
+  "esports_user_detail_tab_membership": "メンバーシップ",
+  "esports_user_detail_tab_messages": "メッセージとフィードバック",
+  "esports_user_detail_tab_account": "アカウント",
+  "esports_user_detail_kv_account": "アカウント",
+  "esports_user_detail_kv_nickname": "ニックネーム",
+  "esports_user_detail_kv_age_band": "年齢層",
+  "esports_user_detail_kv_birth": "生年月",
+  "esports_user_detail_birth_unset": "未設定",
+  "esports_user_detail_birth_uncollected": "未収集",
+  "esports_user_detail_kv_registered_at": "登録日時",
+  "esports_user_detail_kv_games": "ゲームの好み",
+  "esports_user_detail_kv_user_id": "ユーザー ID",
+  "esports_user_detail_kv_status": "状態",
+  "esports_user_detail_kv_population": "集団"
+}

@@ -1,0 +1,23 @@
+{
+  "esports_user_detail_title": "会员详情",
+  "esports_user_detail_back": "返回",
+  "esports_user_detail_error": "会员不存在或无法访问",
+  "esports_user_detail_not_open": "暂未开放",
+  "esports_user_detail_tab_overview": "总览",
+  "esports_user_detail_tab_trace": "溯源",
+  "esports_user_detail_tab_assessments": "测评与报告",
+  "esports_user_detail_tab_membership": "会员",
+  "esports_user_detail_tab_messages": "消息与反馈",
+  "esports_user_detail_tab_account": "账号",
+  "esports_user_detail_kv_account": "账号",
+  "esports_user_detail_kv_nickname": "昵称",
+  "esports_user_detail_kv_age_band": "年龄段",
+  "esports_user_detail_kv_birth": "出生年月",
+  "esports_user_detail_birth_unset": "未设置",
+  "esports_user_detail_birth_uncollected": "出生未采集",
+  "esports_user_detail_kv_registered_at": "注册时间",
+  "esports_user_detail_kv_games": "游戏偏好",
+  "esports_user_detail_kv_user_id": "用户 ID",
+  "esports_user_detail_kv_status": "状态",
+  "esports_user_detail_kv_population": "人群"
+}
