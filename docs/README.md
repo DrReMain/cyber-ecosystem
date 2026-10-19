@@ -5,6 +5,7 @@ This directory is the durable knowledge base of the skeleton, written for two au
 Entry points:
 
 - **`AGENTS.md`** (repo root) — root rules + area routing index; auto-loaded by coding agents. `CLAUDE.md` is a Claude Code import shell over it.
+- **`.claude/rules/`** — path-scoped delivery shells; injected automatically when Claude reads or edits a file matching the frontmatter `paths` globs; pointer-only (§2.9).
 - **`.claude/skills/`** — procedural workflow dispatchers; Claude Code triggers them by description, everyone else reads them as plain markdown.
 - **This file** — the governance law; read on demand.
 
@@ -16,9 +17,9 @@ Entry points:
 |---|---|---|---|---|
 | **Durable** | `docs/conventions/<area>/CONVENTIONS.md` | rules and mechanisms — what you MUST follow, how the system works | EN | long-lived; changes follow the paradigm-change discipline (AGENTS.md §6) |
 | **Working** | `docs/roadmap/*.md` (single doc) or `docs/roadmap/<front>/` (directory: `README.md` front index + sub-docs split by concern) | in-flight design, milestone acceptance records, backlog pools — one front = one doc or one doc set, plus `vision.md` (north-star) | ZH | temporary by contract: every item carries a destination (§2.4) |
-| **Procedural** | `.claude/skills/<name>/SKILL.md` | workflow dispatchers — trigger, pointers, cross-doc assembly; never rule text or step text | EN | evolves with code; git-versioned; directory names are stable identifiers |
+| **Procedural** | `.claude/skills/<name>/SKILL.md` | workflow dispatchers — trigger, pointers, cross-doc assembly, one-line trap annotations (warning + home pointer, no steps); never rule text or step text | EN | evolves with code; git-versioned; directory names are stable identifiers |
 
-**Single-source law.** Content is never copied. Where two audiences need the same knowledge, both read the same file. A skill contributes only a trigger and pointers; procedures (checklists) live in docs, and skills point at them. Duplication is the one failure mode this law exists to prevent — one fact, one home, everything else a pointer.
+**Single-source law.** Content is never copied. Where two audiences need the same knowledge, both read the same file. A skill contributes only a trigger, pointers, and one-line trap annotations (a warning naming the trap and its home section — never the rule text or the steps); procedures (checklists) live in docs, and skills point at them. Duplication is the one failure mode this law exists to prevent — one fact, one home, everything else a pointer.
 
 ---
 
@@ -62,7 +63,10 @@ Content moves; it is never duplicated. Sections that skills point to owe **stabl
 2. every heading targeted by a skill pointer exists;
 3. the `AGENTS.md` area index ↔ `docs/conventions/*/CONVENTIONS.md` agree in both directions;
 4. durable docs carry a `Status:` line; working docs carry a destination header;
-5. the durable lane is roadmap-clean (§2.7): no `docs/roadmap/` reference in `AGENTS.md`, `CLAUDE.md`, skills, or conventions.
+5. the durable lane is roadmap-clean (§2.7): no `docs/roadmap/` reference in `AGENTS.md`, `CLAUDE.md`, skills, or conventions;
+6. every gate row ID (`K-XXX-N`) cited by a skill exists in the owning conventions gate (kratos §7 today).
+
+The sentinel walks all of `docs/` (conventions and roadmap) plus `AGENTS.md`, `CLAUDE.md`, the root READMEs, and every skill and rule-shell body.
 
 This extends the definition of done (AGENTS.md §6 item 6): a paradigm/mechanism change is done when the durable lane is synced and affected skill pointers verify green.
 
@@ -73,6 +77,10 @@ The working lane is temporary by contract and **fully isolated**: `AGENTS.md`, `
 ### 2.8 Instance state lives in its owning source
 
 The skeleton forks: the service set, client set, locale set, ports, and middleware dials are per-fork values a deployment can change without a rule changing. Conventions state the invariant and point at where the current value lives (settings file, compose files, directory tree); rule text stays fork-neutral. Never transcribe a current enumeration into a rule — "copy in all five locales" rots the moment a fork registers one or ten; "copy in every locale registered in `project.inlang/settings.json`" cannot rot. A current value may appear only as orientation that names its source ("currently …; the compose files are the truth"), never as the rule. `e.g.`-marked examples of a rule's shape are fine; enumeration as the rule's content is drift by construction.
+
+### 2.9 Delivery shells (`.claude/rules/`)
+
+A rule shell is the path axis of delivery: frontmatter `paths` (repo-tree globs) decides when its card injects — automatically, as Claude reads or edits a matching file. The body holds pointers and one-line trap annotations only (same content law as skills, §1); the conventions doc it points to stays the single source. English. Dead pointers are `docs:check` failures; directories with no card route through the area index (`AGENTS.md` §7) as before.
 
 ---
 

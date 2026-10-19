@@ -22,7 +22,7 @@ var (
 
 // guardDirs are the §4-enforced zones; ent/schema (own comment class) and
 // this kernel package keep their own conventions.
-var guardDirs = []string{"module", "client", "server", "bootstrap"}
+var guardDirs = []string{"module", "client", "server", "platform", "bootstrap"}
 
 func guardGoFiles(t *testing.T) map[string]string {
 	t.Helper()

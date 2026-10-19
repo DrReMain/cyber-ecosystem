@@ -1,6 +1,6 @@
 ---
 name: kratos-new-module
-description: Domain module creation — use when creating a kratos module/<d>/ four-file set or a new ent schema in app/services/*.
+description: Domain module creation — use when creating a kratos module/<d>/ four-file set or a new ent schema in app/services/*. Trigger phrases include aggregate root, new table, new entity.
 ---
 
 # New domain module (aggregate root)

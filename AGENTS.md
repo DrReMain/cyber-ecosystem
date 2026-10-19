@@ -89,7 +89,7 @@ Knowledge lives in three lanes; each kind of knowledge has exactly one home — 
 Lane rules:
 
 - `MUST` read the relevant `CONVENTIONS.md` before writing code in an area, and follow it exactly (structure, naming, ordering, comments, dependency rules).
-- `MUST NOT` duplicate content across lanes or into skills — pointers only. Rule text and step text live in docs; a skill body holds a trigger, pointers, and completion pointers.
+- `MUST NOT` duplicate content across lanes or into skills — pointers only. Rule text and step text live in docs; a skill body holds a trigger, pointers, completion pointers, and one-line trap annotations (a warning naming the trap and its home — never the rule or the steps).
 - `MUST NOT` reference roadmap content from here, `CLAUDE.md`, skills, or conventions — the working lane is temporary and fully isolated (law: `docs/README.md` §2.7); active fronts are introduced by the user, not by root docs.
 - Skills auto-trigger by description (Claude Code); any agent or human can read `.claude/skills/*/SKILL.md` as plain markdown.
 
@@ -98,7 +98,7 @@ Area index — read before writing code in the area:
 | Area | Doc | Read when |
 |---|---|---|
 | proto (contracts) | `docs/conventions/proto/CONVENTIONS.md` | touching any `.proto`, or code that consumes `gen/` |
-| kratos (Go services) | `docs/conventions/kratos/CONVENTIONS.md` | writing Go under `app/services/*` or `shared-go/` |
+| kratos (Go services) | `docs/conventions/kratos/CONVENTIONS.md` | writing Go under `app/services/*` or `shared-go/` — start at §0 |
 | tanstack (web clients) | `docs/conventions/tanstack/CONVENTIONS.md` | writing code under `app/clients/*` |
 | deploy (containers & pipelines) | `docs/conventions/deploy/CONVENTIONS.md` | touching `deploy/`, Dockerfiles, compose, edge, migrations |
 

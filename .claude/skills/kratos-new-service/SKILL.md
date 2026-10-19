@@ -1,6 +1,6 @@
 ---
 name: kratos-new-service
-description: New service derivation — use when creating a new service under app/services/* (copy-set from system, ent two-pass generation, wire cold start, IAM consumption, catalog federation, deploy plane).
+description: New service derivation — use when creating a new service under app/services/* (copy-set from system, ent two-pass generation, wire cold start, IAM consumption, catalog federation, deploy plane). Trigger phrases include derive, scaffold, new service skeleton.
 ---
 
 # Deriving a new service

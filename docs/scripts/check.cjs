@@ -15,8 +15,9 @@
  *      carries a destination (归宿) header near the top;
  *   5. roadmap isolation (docs/README.md 2.7): no docs/roadmap reference in
  *      AGENTS.md, CLAUDE.md, skills, or conventions;
- *   6. every gate row ID (K-XXX-N) cited by a skill exists in the kratos
- *      conventions gate (CONVENTIONS.md §7).
+ *   6. every gate row ID (K-XXX-N kratos §7, T-XXX-N tanstack §12) cited by
+ *      a skill, rule shell, or conventions doc exists in its owning gate;
+ *      a bare K-XXX/T-XXX group reference must have at least one row.
  */
 const fs = require("node:fs");
 const path = require("node:path");
@@ -36,6 +37,12 @@ if (fs.existsSync(skillsDir)) {
   for (const name of fs.readdirSync(skillsDir).sort()) {
     const p = path.join(skillsDir, name, "SKILL.md");
     if (fs.existsSync(p)) refFiles.push(p);
+  }
+}
+const rulesDir = path.join(ROOT, ".claude", "rules");
+if (fs.existsSync(rulesDir)) {
+  for (const name of fs.readdirSync(rulesDir).sort()) {
+    if (name.endsWith(".md")) refFiles.push(path.join(rulesDir, name));
   }
 }
 const walk = (dir) => {
@@ -73,21 +80,40 @@ for (const f of refFiles) {
     if (quoted) {
       const headingLines = [...content.matchAll(/^#{2,6}\s+.*$/gm)].map((h) => h[0]);
       if (!headingLines.some((h) => h.includes(quoted)))
-        bad(`${rel}: \`${p} §${sec} "${quoted}"\` -- heading text not found on any heading line in target`);
+        bad(
+          `${rel}: \`${p} §${sec} "${quoted}"\` -- heading text not found on any heading line in target`,
+        );
     }
   }
 }
 
-// gate row IDs cited by skills must exist in the kratos gate (check 6)
-const kratosConvPath = path.join(ROOT, "docs", "conventions", "kratos", "CONVENTIONS.md");
-const kratosConv = fs.readFileSync(kratosConvPath, "utf8");
+// gate row IDs cited by skills, rule shells, or conventions docs must exist
+// in their owning gate; a bare group reference must have rows (check 6)
+const GATES = {
+  K: path.join(ROOT, "docs", "conventions", "kratos", "CONVENTIONS.md"),
+  T: path.join(ROOT, "docs", "conventions", "tanstack", "CONVENTIONS.md"),
+};
+const gateTexts = {};
+for (const [prefix, gp] of Object.entries(GATES)) gateTexts[prefix] = fs.readFileSync(gp, "utf8");
+const pointerFiles = [];
 for (const name of fs.readdirSync(skillsDir).sort()) {
   const p = path.join(skillsDir, name, "SKILL.md");
-  if (!fs.existsSync(p)) continue;
-  const text = fs.readFileSync(p, "utf8");
-  for (const m of text.matchAll(/K-[A-Z]{2,4}-\d+/g)) {
-    if (!kratosConv.includes(m[0]))
-      bad(`.claude/skills/${name}/SKILL.md: gate row \`${m[0]}\` not found in ${path.relative(ROOT, kratosConvPath)} §7`);
+  if (fs.existsSync(p)) pointerFiles.push(p);
+}
+for (const name of fs.readdirSync(rulesDir).sort()) {
+  if (name.endsWith(".md")) pointerFiles.push(path.join(rulesDir, name));
+}
+pointerFiles.push(...walk(path.join(ROOT, "docs", "conventions")));
+for (const f of pointerFiles) {
+  const rel = path.relative(ROOT, f);
+  const text = fs.readFileSync(f, "utf8");
+  for (const m of text.matchAll(/\b([KT])-[A-Z]{2,4}-\d+/g)) {
+    if (!gateTexts[m[1]].includes(m[0]))
+      bad(`${rel}: gate row \`${m[0]}\` not found in its owning conventions gate`);
+  }
+  for (const m of text.matchAll(/(?<![\w-])([KT])-[A-Z]{2,4}(?![\w-])/g)) {
+    if (!gateTexts[m[1]].includes(`${m[0]}-`))
+      bad(`${rel}: gate id \`${m[0]}\` has no rows in its owning conventions gate`);
   }
 }
 
@@ -131,10 +157,15 @@ for (const name of fs.readdirSync(skillsDir).sort()) {
   const p = path.join(skillsDir, name, "SKILL.md");
   if (fs.existsSync(p)) durableFiles.push(p);
 }
+for (const name of fs.readdirSync(rulesDir).sort()) {
+  if (name.endsWith(".md")) durableFiles.push(path.join(rulesDir, name));
+}
 durableFiles.push(...walk(convRoot));
 for (const f of durableFiles) {
   if (/docs\/roadmap/.test(fs.readFileSync(f, "utf8")))
-    bad(`${path.relative(ROOT, f)}: references roadmap content (isolation law, docs/README.md 2.7)`);
+    bad(
+      `${path.relative(ROOT, f)}: references roadmap content (isolation law, docs/README.md 2.7)`,
+    );
 }
 
 if (fail.length) {

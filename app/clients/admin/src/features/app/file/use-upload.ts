@@ -448,7 +448,7 @@ function mergeETags(local: PartETag[], server: UploadedPart[]): PartETag[] {
 // so it never dies silently.
 function toastS3Failure(err: unknown) {
   if (err instanceof S3Error) {
-    toast.error(m.files_upload_failed());
+    toast.error(m.files_list_upload_failed());
     return;
   }
   console.error("[upload] orchestration failure", err);
