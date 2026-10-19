@@ -9,6 +9,55 @@ import (
 )
 
 var (
+	// AbilityScoreColumns holds the columns for the "ability_score" table.
+	AbilityScoreColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "record_id", Type: field.TypeString, Size: 20, Comment: "owning attempt (join into test_record.id) — plain id, not an edge: soft-delete cascade and future cross-service aggregation both favor the loose join"},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "denormalized owner so cross-attempt aggregation (historical best, same-age percentile) never joins through test_record"},
+		{Name: "ability", Type: field.TypeString, Size: 32, Comment: "six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency — one row per ability an attempt feeds"},
+		{Name: "score", Type: field.TypeFloat64, Comment: "the ability contribution this attempt scored — written by the E3 scoring engine, never the client"},
+		{Name: "percentile", Type: field.TypeFloat64, Nullable: true, Comment: "same-age percentile once the E5 cohort math lands; null until then"},
+	}
+	// AbilityScoreTable holds the schema information for the "ability_score" table.
+	AbilityScoreTable = &schema.Table{
+		Name:       "ability_score",
+		Columns:    AbilityScoreColumns,
+		PrimaryKey: []*schema.Column{AbilityScoreColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "abilityscore_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AbilityScoreColumns[1]},
+			},
+			{
+				Name:    "abilityscore_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{AbilityScoreColumns[2]},
+			},
+			{
+				Name:    "abilityscore_tenant_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AbilityScoreColumns[3], AbilityScoreColumns[1]},
+			},
+			{
+				Name:    "abilityscore_record_id_ability",
+				Unique:  true,
+				Columns: []*schema.Column{AbilityScoreColumns[5], AbilityScoreColumns[7]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+			{
+				Name:    "abilityscore_user_id_ability_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AbilityScoreColumns[6], AbilityScoreColumns[7], AbilityScoreColumns[1]},
+			},
+		},
+	}
 	// GameColumns holds the columns for the "game" table.
 	GameColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -100,18 +149,225 @@ var (
 			},
 		},
 	}
+	// QuestionBankColumns holds the columns for the "question_bank" table.
+	QuestionBankColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "test_code", Type: field.TypeString, Size: 50, Comment: "owning test (join into test.code) — the scenario answer key lives with the test it grades"},
+		{Name: "scenario_code", Type: field.TypeString, Size: 64, Comment: "scenario join key — the identifier attempts echo back in their decision facts"},
+		{Name: "payload", Type: field.TypeJSON, Nullable: true, Comment: "question face — scenario content for rendering; shape is test-owned content, not contract"},
+		{Name: "answer", Type: field.TypeJSON, Comment: "answer key — correctness of submitted choices is judged against this server-side, never asserted by the client"},
+	}
+	// QuestionBankTable holds the schema information for the "question_bank" table.
+	QuestionBankTable = &schema.Table{
+		Name:       "question_bank",
+		Columns:    QuestionBankColumns,
+		PrimaryKey: []*schema.Column{QuestionBankColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "questionbank_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{QuestionBankColumns[1]},
+			},
+			{
+				Name:    "questionbank_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{QuestionBankColumns[2]},
+			},
+			{
+				Name:    "questionbank_tenant_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{QuestionBankColumns[3], QuestionBankColumns[1]},
+			},
+			{
+				Name:    "questionbank_test_code_scenario_code",
+				Unique:  true,
+				Columns: []*schema.Column{QuestionBankColumns[5], QuestionBankColumns[6]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+		},
+	}
+	// TestColumns holds the columns for the "test" table.
+	TestColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "code", Type: field.TypeString, Size: 50, Comment: "immutable catalog code join key (e.g. red_dot); engines, seeds, and cross-domain references key off the code, same law as game codes"},
+		{Name: "name", Type: field.TypeString, Size: 100, Comment: "display title; seeds carry the placeholder code until the E3 metric sheet calibrates"},
+		{Name: "category", Type: field.TypeString, Nullable: true, Size: 16, Comment: "vocabulary fps|moba|universal — universal feeds every genre pool; open word set, admin-managed, classification is content not contract"},
+		{Name: "ability", Type: field.TypeString, Nullable: true, Size: 32, Comment: "primary ability, six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency; attribution is metric-sheet data, calibrated with E3"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 500, Comment: "short catalog blurb"},
+		{Name: "unit_score_label", Type: field.TypeString, Nullable: true, Size: 50, Comment: "display form of the unit score (rendering copy only; the numeric itself never crosses the contract)"},
+		{Name: "duration_seconds", Type: field.TypeInt, Comment: "canonical test length — the single source TestConfig mirrors so engine boot is one call; 30 is the placeholder until the metric sheet calibrates", Default: 30},
+		{Name: "introduction", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "long-form how-to copy, per test; copy changes are content, never contract"},
+	}
+	// TestTable holds the schema information for the "test" table.
+	TestTable = &schema.Table{
+		Name:       "test",
+		Columns:    TestColumns,
+		PrimaryKey: []*schema.Column{TestColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "test_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestColumns[1]},
+			},
+			{
+				Name:    "test_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestColumns[2]},
+			},
+			{
+				Name:    "test_tenant_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestColumns[3], TestColumns[1]},
+			},
+			{
+				Name:    "test_code",
+				Unique:  true,
+				Columns: []*schema.Column{TestColumns[5]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+		},
+	}
+	// TestConfigColumns holds the columns for the "test_config" table.
+	TestConfigColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "test_code", Type: field.TypeString, Size: 50, Comment: "join key into test.code — same aggregate, one row per test, joined plain by code (the contract's join-key law), not an edge: the pair is born together but read and tuned on different cadences"},
+		{Name: "duration_seconds", Type: field.TypeInt, Comment: "mirror of test.duration_seconds — the engine boot bag is self-sufficient behind one config call", Default: 30},
+		{Name: "background_invalid_seconds", Type: field.TypeInt, Comment: "client-side mechanics threshold: backgrounding longer than this invalidates the run; the engine only marks spans, validity is judged at submit", Default: 10},
+		{Name: "engine_params", Type: field.TypeJSON, Nullable: true, Comment: "engine tuning bag — spawn intervals, speeds, sizes; keys are content owned by the engine registry (metric spec sheet), the KV shape keeps tuning ops-only"},
+	}
+	// TestConfigTable holds the schema information for the "test_config" table.
+	TestConfigTable = &schema.Table{
+		Name:       "test_config",
+		Columns:    TestConfigColumns,
+		PrimaryKey: []*schema.Column{TestConfigColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "testconfig_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestConfigColumns[1]},
+			},
+			{
+				Name:    "testconfig_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestConfigColumns[2]},
+			},
+			{
+				Name:    "testconfig_tenant_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestConfigColumns[3], TestConfigColumns[1]},
+			},
+			{
+				Name:    "testconfig_test_code",
+				Unique:  true,
+				Columns: []*schema.Column{TestConfigColumns[5]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+		},
+	}
+	// TestRecordColumns holds the columns for the "test_record" table.
+	TestRecordColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "test_code", Type: field.TypeString, Size: 50, Comment: "the attempted test (join into test.code)"},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "owning member identity (system user id), logical reference — same key law as profile"},
+		{Name: "attempt_no", Type: field.TypeInt, Comment: "attempt ordinal inside the match session; uniqueness is the E4 session law, not a DB constraint yet"},
+		{Name: "session_id", Type: field.TypeString, Nullable: true, Size: 64, Comment: "match session reference — null until the E4 session aggregate lands, then backfilled"},
+		{Name: "started_at", Type: field.TypeTime, Comment: "attempt start (wall clock, server-stamped from the submitted anchor)"},
+		{Name: "ended_at", Type: field.TypeTime, Comment: "attempt end"},
+		{Name: "backgrounds", Type: field.TypeJSON, Nullable: true, Comment: "engine-marked backgrounding spans; validity is judged against test_config.background_invalid_seconds"},
+		{Name: "raw_detail", Type: field.TypeJSON, Comment: "the oneof fact stream verbatim (e.g. {'red_dot': {'events': [...]}}) — facts only, every aggregate is recomputed from it; the detail kind is the map's single key"},
+		{Name: "raw_score", Type: field.TypeFloat64, Nullable: true, Comment: "linear uncapped track — null on invalid attempts (nothing scores)"},
+		{Name: "authoritative_score", Type: field.TypeFloat64, Nullable: true, Comment: "percentile-tiered authoritative track — null on invalid attempts"},
+		{Name: "grade", Type: field.TypeEnum, Nullable: true, Comment: "percentile tier — top 5 / 15 / 40 percent / rest; enum-bounded at the ent layer so drift fails the write, not the report", Enums: []string{"S", "A", "B", "C"}},
+		{Name: "valid", Type: field.TypeBool, Comment: "server-side validity verdict — background over budget or incomplete detail invalidates the attempt", Default: true},
+		{Name: "invalid_reason", Type: field.TypeString, Nullable: true, Size: 64, Comment: "ops vocabulary code when valid=false (user copy resolves client-side)"},
+	}
+	// TestRecordTable holds the schema information for the "test_record" table.
+	TestRecordTable = &schema.Table{
+		Name:       "test_record",
+		Columns:    TestRecordColumns,
+		PrimaryKey: []*schema.Column{TestRecordColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "testrecord_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestRecordColumns[1]},
+			},
+			{
+				Name:    "testrecord_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestRecordColumns[2]},
+			},
+			{
+				Name:    "testrecord_tenant_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestRecordColumns[3], TestRecordColumns[1]},
+			},
+			{
+				Name:    "testrecord_user_id_test_code_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestRecordColumns[6], TestRecordColumns[5], TestRecordColumns[1]},
+			},
+			{
+				Name:    "testrecord_test_code_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TestRecordColumns[5], TestRecordColumns[1]},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AbilityScoreTable,
 		GameTable,
 		ProfileTable,
+		QuestionBankTable,
+		TestTable,
+		TestConfigTable,
+		TestRecordTable,
 	}
 )
 
 func init() {
+	AbilityScoreTable.Annotation = &entsql.Annotation{
+		Table: "ability_score",
+	}
 	GameTable.Annotation = &entsql.Annotation{
 		Table: "game",
 	}
 	ProfileTable.Annotation = &entsql.Annotation{
 		Table: "profile",
+	}
+	QuestionBankTable.Annotation = &entsql.Annotation{
+		Table: "question_bank",
+	}
+	TestTable.Annotation = &entsql.Annotation{
+		Table: "test",
+	}
+	TestConfigTable.Annotation = &entsql.Annotation{
+		Table: "test_config",
+	}
+	TestRecordTable.Annotation = &entsql.Annotation{
+		Table: "test_record",
 	}
 }

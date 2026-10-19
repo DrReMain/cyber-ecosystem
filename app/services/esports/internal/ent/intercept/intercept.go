@@ -7,9 +7,14 @@ import (
 	"fmt"
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
+	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/predicate"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
+	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
+	"cyber-ecosystem/app/services/esports/internal/ent/test"
+	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -70,6 +75,33 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 	return f(ctx, query)
 }
 
+// The AbilityScoreFunc type is an adapter to allow the use of ordinary function as a Querier.
+type AbilityScoreFunc func(context.Context, *ent.AbilityScoreQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f AbilityScoreFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.AbilityScoreQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.AbilityScoreQuery", q)
+}
+
+// The TraverseAbilityScore type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseAbilityScore func(context.Context, *ent.AbilityScoreQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseAbilityScore) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseAbilityScore) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.AbilityScoreQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.AbilityScoreQuery", q)
+}
+
 // The GameFunc type is an adapter to allow the use of ordinary function as a Querier.
 type GameFunc func(context.Context, *ent.GameQuery) (ent.Value, error)
 
@@ -124,13 +156,131 @@ func (f TraverseProfile) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.ProfileQuery", q)
 }
 
+// The QuestionBankFunc type is an adapter to allow the use of ordinary function as a Querier.
+type QuestionBankFunc func(context.Context, *ent.QuestionBankQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f QuestionBankFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.QuestionBankQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.QuestionBankQuery", q)
+}
+
+// The TraverseQuestionBank type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseQuestionBank func(context.Context, *ent.QuestionBankQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseQuestionBank) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseQuestionBank) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.QuestionBankQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.QuestionBankQuery", q)
+}
+
+// The TestFunc type is an adapter to allow the use of ordinary function as a Querier.
+type TestFunc func(context.Context, *ent.TestQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f TestFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.TestQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.TestQuery", q)
+}
+
+// The TraverseTest type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseTest func(context.Context, *ent.TestQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseTest) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseTest) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TestQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.TestQuery", q)
+}
+
+// The TestConfigFunc type is an adapter to allow the use of ordinary function as a Querier.
+type TestConfigFunc func(context.Context, *ent.TestConfigQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f TestConfigFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.TestConfigQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.TestConfigQuery", q)
+}
+
+// The TraverseTestConfig type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseTestConfig func(context.Context, *ent.TestConfigQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseTestConfig) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseTestConfig) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TestConfigQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.TestConfigQuery", q)
+}
+
+// The TestRecordFunc type is an adapter to allow the use of ordinary function as a Querier.
+type TestRecordFunc func(context.Context, *ent.TestRecordQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f TestRecordFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.TestRecordQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.TestRecordQuery", q)
+}
+
+// The TraverseTestRecord type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseTestRecord func(context.Context, *ent.TestRecordQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseTestRecord) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseTestRecord) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.TestRecordQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.TestRecordQuery", q)
+}
+
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
+	case *ent.AbilityScoreQuery:
+		return &query[*ent.AbilityScoreQuery, predicate.AbilityScore, abilityscore.OrderOption]{typ: ent.TypeAbilityScore, tq: q}, nil
 	case *ent.GameQuery:
 		return &query[*ent.GameQuery, predicate.Game, game.OrderOption]{typ: ent.TypeGame, tq: q}, nil
 	case *ent.ProfileQuery:
 		return &query[*ent.ProfileQuery, predicate.Profile, profile.OrderOption]{typ: ent.TypeProfile, tq: q}, nil
+	case *ent.QuestionBankQuery:
+		return &query[*ent.QuestionBankQuery, predicate.QuestionBank, questionbank.OrderOption]{typ: ent.TypeQuestionBank, tq: q}, nil
+	case *ent.TestQuery:
+		return &query[*ent.TestQuery, predicate.Test, test.OrderOption]{typ: ent.TypeTest, tq: q}, nil
+	case *ent.TestConfigQuery:
+		return &query[*ent.TestConfigQuery, predicate.TestConfig, testconfig.OrderOption]{typ: ent.TypeTestConfig, tq: q}, nil
+	case *ent.TestRecordQuery:
+		return &query[*ent.TestRecordQuery, predicate.TestRecord, testrecord.OrderOption]{typ: ent.TypeTestRecord, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}

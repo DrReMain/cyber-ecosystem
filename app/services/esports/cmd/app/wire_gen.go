@@ -14,6 +14,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
+	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/server"
 	"github.com/go-kratos/kratos/v3"
@@ -47,7 +48,10 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, logg
 	}
 	memberUC := member.NewMemberUC(logger, platformPlatform, systemClient, profileRP)
 	memberService := member.NewMemberService(logger, memberUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService)
+	testRP := test.NewTestRP(logger, platformPlatform)
+	testUC := test.NewTestUC(logger, platformPlatform, testRP)
+	testService := test.NewTestService(logger, testUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

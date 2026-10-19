@@ -11,8 +11,13 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/ent/migrate"
 
+	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
+	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
+	"cyber-ecosystem/app/services/esports/internal/ent/test"
+	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -26,10 +31,20 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AbilityScore is the client for interacting with the AbilityScore builders.
+	AbilityScore *AbilityScoreClient
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
 	// Profile is the client for interacting with the Profile builders.
 	Profile *ProfileClient
+	// QuestionBank is the client for interacting with the QuestionBank builders.
+	QuestionBank *QuestionBankClient
+	// Test is the client for interacting with the Test builders.
+	Test *TestClient
+	// TestConfig is the client for interacting with the TestConfig builders.
+	TestConfig *TestConfigClient
+	// TestRecord is the client for interacting with the TestRecord builders.
+	TestRecord *TestRecordClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -41,8 +56,13 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AbilityScore = NewAbilityScoreClient(c.config)
 	c.Game = NewGameClient(c.config)
 	c.Profile = NewProfileClient(c.config)
+	c.QuestionBank = NewQuestionBankClient(c.config)
+	c.Test = NewTestClient(c.config)
+	c.TestConfig = NewTestConfigClient(c.config)
+	c.TestRecord = NewTestRecordClient(c.config)
 }
 
 type (
@@ -133,10 +153,15 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Game:    NewGameClient(cfg),
-		Profile: NewProfileClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		AbilityScore: NewAbilityScoreClient(cfg),
+		Game:         NewGameClient(cfg),
+		Profile:      NewProfileClient(cfg),
+		QuestionBank: NewQuestionBankClient(cfg),
+		Test:         NewTestClient(cfg),
+		TestConfig:   NewTestConfigClient(cfg),
+		TestRecord:   NewTestRecordClient(cfg),
 	}, nil
 }
 
@@ -154,17 +179,22 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Game:    NewGameClient(cfg),
-		Profile: NewProfileClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		AbilityScore: NewAbilityScoreClient(cfg),
+		Game:         NewGameClient(cfg),
+		Profile:      NewProfileClient(cfg),
+		QuestionBank: NewQuestionBankClient(cfg),
+		Test:         NewTestClient(cfg),
+		TestConfig:   NewTestConfigClient(cfg),
+		TestRecord:   NewTestRecordClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Game.
+//		AbilityScore.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -186,26 +216,179 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Game.Use(hooks...)
-	c.Profile.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AbilityScore, c.Game, c.Profile, c.QuestionBank, c.Test, c.TestConfig,
+		c.TestRecord,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Game.Intercept(interceptors...)
-	c.Profile.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AbilityScore, c.Game, c.Profile, c.QuestionBank, c.Test, c.TestConfig,
+		c.TestRecord,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *AbilityScoreMutation:
+		return c.AbilityScore.mutate(ctx, m)
 	case *GameMutation:
 		return c.Game.mutate(ctx, m)
 	case *ProfileMutation:
 		return c.Profile.mutate(ctx, m)
+	case *QuestionBankMutation:
+		return c.QuestionBank.mutate(ctx, m)
+	case *TestMutation:
+		return c.Test.mutate(ctx, m)
+	case *TestConfigMutation:
+		return c.TestConfig.mutate(ctx, m)
+	case *TestRecordMutation:
+		return c.TestRecord.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// AbilityScoreClient is a client for the AbilityScore schema.
+type AbilityScoreClient struct {
+	config
+}
+
+// NewAbilityScoreClient returns a client for the AbilityScore from the given config.
+func NewAbilityScoreClient(c config) *AbilityScoreClient {
+	return &AbilityScoreClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `abilityscore.Hooks(f(g(h())))`.
+func (c *AbilityScoreClient) Use(hooks ...Hook) {
+	c.hooks.AbilityScore = append(c.hooks.AbilityScore, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `abilityscore.Intercept(f(g(h())))`.
+func (c *AbilityScoreClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AbilityScore = append(c.inters.AbilityScore, interceptors...)
+}
+
+// Create returns a builder for creating a AbilityScore entity.
+func (c *AbilityScoreClient) Create() *AbilityScoreCreate {
+	mutation := newAbilityScoreMutation(c.config, OpCreate)
+	return &AbilityScoreCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AbilityScore entities.
+func (c *AbilityScoreClient) CreateBulk(builders ...*AbilityScoreCreate) *AbilityScoreCreateBulk {
+	return &AbilityScoreCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AbilityScoreClient) MapCreateBulk(slice any, setFunc func(*AbilityScoreCreate, int)) *AbilityScoreCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AbilityScoreCreateBulk{err: fmt.Errorf("calling to AbilityScoreClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AbilityScoreCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AbilityScoreCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AbilityScore.
+func (c *AbilityScoreClient) Update() *AbilityScoreUpdate {
+	mutation := newAbilityScoreMutation(c.config, OpUpdate)
+	return &AbilityScoreUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AbilityScoreClient) UpdateOne(_m *AbilityScore) *AbilityScoreUpdateOne {
+	mutation := newAbilityScoreMutation(c.config, OpUpdateOne, withAbilityScore(_m))
+	return &AbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AbilityScoreClient) UpdateOneID(id string) *AbilityScoreUpdateOne {
+	mutation := newAbilityScoreMutation(c.config, OpUpdateOne, withAbilityScoreID(id))
+	return &AbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AbilityScore.
+func (c *AbilityScoreClient) Delete() *AbilityScoreDelete {
+	mutation := newAbilityScoreMutation(c.config, OpDelete)
+	return &AbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AbilityScoreClient) DeleteOne(_m *AbilityScore) *AbilityScoreDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AbilityScoreClient) DeleteOneID(id string) *AbilityScoreDeleteOne {
+	builder := c.Delete().Where(abilityscore.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AbilityScoreDeleteOne{builder}
+}
+
+// Query returns a query builder for AbilityScore.
+func (c *AbilityScoreClient) Query() *AbilityScoreQuery {
+	return &AbilityScoreQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAbilityScore},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AbilityScore entity by its id.
+func (c *AbilityScoreClient) Get(ctx context.Context, id string) (*AbilityScore, error) {
+	return c.Query().Where(abilityscore.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AbilityScoreClient) GetX(ctx context.Context, id string) *AbilityScore {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AbilityScoreClient) Hooks() []Hook {
+	hooks := c.hooks.AbilityScore
+	return append(hooks[:len(hooks):len(hooks)], abilityscore.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *AbilityScoreClient) Interceptors() []Interceptor {
+	inters := c.inters.AbilityScore
+	return append(inters[:len(inters):len(inters)], abilityscore.Interceptors[:]...)
+}
+
+func (c *AbilityScoreClient) mutate(ctx context.Context, m *AbilityScoreMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AbilityScoreCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AbilityScoreUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AbilityScore mutation op: %q", m.Op())
 	}
 }
 
@@ -479,13 +662,555 @@ func (c *ProfileClient) mutate(ctx context.Context, m *ProfileMutation) (Value, 
 	}
 }
 
+// QuestionBankClient is a client for the QuestionBank schema.
+type QuestionBankClient struct {
+	config
+}
+
+// NewQuestionBankClient returns a client for the QuestionBank from the given config.
+func NewQuestionBankClient(c config) *QuestionBankClient {
+	return &QuestionBankClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `questionbank.Hooks(f(g(h())))`.
+func (c *QuestionBankClient) Use(hooks ...Hook) {
+	c.hooks.QuestionBank = append(c.hooks.QuestionBank, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `questionbank.Intercept(f(g(h())))`.
+func (c *QuestionBankClient) Intercept(interceptors ...Interceptor) {
+	c.inters.QuestionBank = append(c.inters.QuestionBank, interceptors...)
+}
+
+// Create returns a builder for creating a QuestionBank entity.
+func (c *QuestionBankClient) Create() *QuestionBankCreate {
+	mutation := newQuestionBankMutation(c.config, OpCreate)
+	return &QuestionBankCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of QuestionBank entities.
+func (c *QuestionBankClient) CreateBulk(builders ...*QuestionBankCreate) *QuestionBankCreateBulk {
+	return &QuestionBankCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *QuestionBankClient) MapCreateBulk(slice any, setFunc func(*QuestionBankCreate, int)) *QuestionBankCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &QuestionBankCreateBulk{err: fmt.Errorf("calling to QuestionBankClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*QuestionBankCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &QuestionBankCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for QuestionBank.
+func (c *QuestionBankClient) Update() *QuestionBankUpdate {
+	mutation := newQuestionBankMutation(c.config, OpUpdate)
+	return &QuestionBankUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *QuestionBankClient) UpdateOne(_m *QuestionBank) *QuestionBankUpdateOne {
+	mutation := newQuestionBankMutation(c.config, OpUpdateOne, withQuestionBank(_m))
+	return &QuestionBankUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *QuestionBankClient) UpdateOneID(id string) *QuestionBankUpdateOne {
+	mutation := newQuestionBankMutation(c.config, OpUpdateOne, withQuestionBankID(id))
+	return &QuestionBankUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for QuestionBank.
+func (c *QuestionBankClient) Delete() *QuestionBankDelete {
+	mutation := newQuestionBankMutation(c.config, OpDelete)
+	return &QuestionBankDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *QuestionBankClient) DeleteOne(_m *QuestionBank) *QuestionBankDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *QuestionBankClient) DeleteOneID(id string) *QuestionBankDeleteOne {
+	builder := c.Delete().Where(questionbank.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &QuestionBankDeleteOne{builder}
+}
+
+// Query returns a query builder for QuestionBank.
+func (c *QuestionBankClient) Query() *QuestionBankQuery {
+	return &QuestionBankQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeQuestionBank},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a QuestionBank entity by its id.
+func (c *QuestionBankClient) Get(ctx context.Context, id string) (*QuestionBank, error) {
+	return c.Query().Where(questionbank.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *QuestionBankClient) GetX(ctx context.Context, id string) *QuestionBank {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *QuestionBankClient) Hooks() []Hook {
+	hooks := c.hooks.QuestionBank
+	return append(hooks[:len(hooks):len(hooks)], questionbank.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *QuestionBankClient) Interceptors() []Interceptor {
+	inters := c.inters.QuestionBank
+	return append(inters[:len(inters):len(inters)], questionbank.Interceptors[:]...)
+}
+
+func (c *QuestionBankClient) mutate(ctx context.Context, m *QuestionBankMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&QuestionBankCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&QuestionBankUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&QuestionBankUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&QuestionBankDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown QuestionBank mutation op: %q", m.Op())
+	}
+}
+
+// TestClient is a client for the Test schema.
+type TestClient struct {
+	config
+}
+
+// NewTestClient returns a client for the Test from the given config.
+func NewTestClient(c config) *TestClient {
+	return &TestClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `test.Hooks(f(g(h())))`.
+func (c *TestClient) Use(hooks ...Hook) {
+	c.hooks.Test = append(c.hooks.Test, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `test.Intercept(f(g(h())))`.
+func (c *TestClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Test = append(c.inters.Test, interceptors...)
+}
+
+// Create returns a builder for creating a Test entity.
+func (c *TestClient) Create() *TestCreate {
+	mutation := newTestMutation(c.config, OpCreate)
+	return &TestCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Test entities.
+func (c *TestClient) CreateBulk(builders ...*TestCreate) *TestCreateBulk {
+	return &TestCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TestClient) MapCreateBulk(slice any, setFunc func(*TestCreate, int)) *TestCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TestCreateBulk{err: fmt.Errorf("calling to TestClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TestCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TestCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Test.
+func (c *TestClient) Update() *TestUpdate {
+	mutation := newTestMutation(c.config, OpUpdate)
+	return &TestUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TestClient) UpdateOne(_m *Test) *TestUpdateOne {
+	mutation := newTestMutation(c.config, OpUpdateOne, withTest(_m))
+	return &TestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TestClient) UpdateOneID(id string) *TestUpdateOne {
+	mutation := newTestMutation(c.config, OpUpdateOne, withTestID(id))
+	return &TestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Test.
+func (c *TestClient) Delete() *TestDelete {
+	mutation := newTestMutation(c.config, OpDelete)
+	return &TestDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TestClient) DeleteOne(_m *Test) *TestDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TestClient) DeleteOneID(id string) *TestDeleteOne {
+	builder := c.Delete().Where(test.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TestDeleteOne{builder}
+}
+
+// Query returns a query builder for Test.
+func (c *TestClient) Query() *TestQuery {
+	return &TestQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTest},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Test entity by its id.
+func (c *TestClient) Get(ctx context.Context, id string) (*Test, error) {
+	return c.Query().Where(test.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TestClient) GetX(ctx context.Context, id string) *Test {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TestClient) Hooks() []Hook {
+	hooks := c.hooks.Test
+	return append(hooks[:len(hooks):len(hooks)], test.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *TestClient) Interceptors() []Interceptor {
+	inters := c.inters.Test
+	return append(inters[:len(inters):len(inters)], test.Interceptors[:]...)
+}
+
+func (c *TestClient) mutate(ctx context.Context, m *TestMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TestCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TestUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TestDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Test mutation op: %q", m.Op())
+	}
+}
+
+// TestConfigClient is a client for the TestConfig schema.
+type TestConfigClient struct {
+	config
+}
+
+// NewTestConfigClient returns a client for the TestConfig from the given config.
+func NewTestConfigClient(c config) *TestConfigClient {
+	return &TestConfigClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `testconfig.Hooks(f(g(h())))`.
+func (c *TestConfigClient) Use(hooks ...Hook) {
+	c.hooks.TestConfig = append(c.hooks.TestConfig, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `testconfig.Intercept(f(g(h())))`.
+func (c *TestConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TestConfig = append(c.inters.TestConfig, interceptors...)
+}
+
+// Create returns a builder for creating a TestConfig entity.
+func (c *TestConfigClient) Create() *TestConfigCreate {
+	mutation := newTestConfigMutation(c.config, OpCreate)
+	return &TestConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TestConfig entities.
+func (c *TestConfigClient) CreateBulk(builders ...*TestConfigCreate) *TestConfigCreateBulk {
+	return &TestConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TestConfigClient) MapCreateBulk(slice any, setFunc func(*TestConfigCreate, int)) *TestConfigCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TestConfigCreateBulk{err: fmt.Errorf("calling to TestConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TestConfigCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TestConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TestConfig.
+func (c *TestConfigClient) Update() *TestConfigUpdate {
+	mutation := newTestConfigMutation(c.config, OpUpdate)
+	return &TestConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TestConfigClient) UpdateOne(_m *TestConfig) *TestConfigUpdateOne {
+	mutation := newTestConfigMutation(c.config, OpUpdateOne, withTestConfig(_m))
+	return &TestConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TestConfigClient) UpdateOneID(id string) *TestConfigUpdateOne {
+	mutation := newTestConfigMutation(c.config, OpUpdateOne, withTestConfigID(id))
+	return &TestConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TestConfig.
+func (c *TestConfigClient) Delete() *TestConfigDelete {
+	mutation := newTestConfigMutation(c.config, OpDelete)
+	return &TestConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TestConfigClient) DeleteOne(_m *TestConfig) *TestConfigDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TestConfigClient) DeleteOneID(id string) *TestConfigDeleteOne {
+	builder := c.Delete().Where(testconfig.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TestConfigDeleteOne{builder}
+}
+
+// Query returns a query builder for TestConfig.
+func (c *TestConfigClient) Query() *TestConfigQuery {
+	return &TestConfigQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTestConfig},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TestConfig entity by its id.
+func (c *TestConfigClient) Get(ctx context.Context, id string) (*TestConfig, error) {
+	return c.Query().Where(testconfig.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TestConfigClient) GetX(ctx context.Context, id string) *TestConfig {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TestConfigClient) Hooks() []Hook {
+	hooks := c.hooks.TestConfig
+	return append(hooks[:len(hooks):len(hooks)], testconfig.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *TestConfigClient) Interceptors() []Interceptor {
+	inters := c.inters.TestConfig
+	return append(inters[:len(inters):len(inters)], testconfig.Interceptors[:]...)
+}
+
+func (c *TestConfigClient) mutate(ctx context.Context, m *TestConfigMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TestConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TestConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TestConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TestConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TestConfig mutation op: %q", m.Op())
+	}
+}
+
+// TestRecordClient is a client for the TestRecord schema.
+type TestRecordClient struct {
+	config
+}
+
+// NewTestRecordClient returns a client for the TestRecord from the given config.
+func NewTestRecordClient(c config) *TestRecordClient {
+	return &TestRecordClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `testrecord.Hooks(f(g(h())))`.
+func (c *TestRecordClient) Use(hooks ...Hook) {
+	c.hooks.TestRecord = append(c.hooks.TestRecord, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `testrecord.Intercept(f(g(h())))`.
+func (c *TestRecordClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TestRecord = append(c.inters.TestRecord, interceptors...)
+}
+
+// Create returns a builder for creating a TestRecord entity.
+func (c *TestRecordClient) Create() *TestRecordCreate {
+	mutation := newTestRecordMutation(c.config, OpCreate)
+	return &TestRecordCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TestRecord entities.
+func (c *TestRecordClient) CreateBulk(builders ...*TestRecordCreate) *TestRecordCreateBulk {
+	return &TestRecordCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TestRecordClient) MapCreateBulk(slice any, setFunc func(*TestRecordCreate, int)) *TestRecordCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TestRecordCreateBulk{err: fmt.Errorf("calling to TestRecordClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TestRecordCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TestRecordCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TestRecord.
+func (c *TestRecordClient) Update() *TestRecordUpdate {
+	mutation := newTestRecordMutation(c.config, OpUpdate)
+	return &TestRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TestRecordClient) UpdateOne(_m *TestRecord) *TestRecordUpdateOne {
+	mutation := newTestRecordMutation(c.config, OpUpdateOne, withTestRecord(_m))
+	return &TestRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TestRecordClient) UpdateOneID(id string) *TestRecordUpdateOne {
+	mutation := newTestRecordMutation(c.config, OpUpdateOne, withTestRecordID(id))
+	return &TestRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TestRecord.
+func (c *TestRecordClient) Delete() *TestRecordDelete {
+	mutation := newTestRecordMutation(c.config, OpDelete)
+	return &TestRecordDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TestRecordClient) DeleteOne(_m *TestRecord) *TestRecordDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TestRecordClient) DeleteOneID(id string) *TestRecordDeleteOne {
+	builder := c.Delete().Where(testrecord.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TestRecordDeleteOne{builder}
+}
+
+// Query returns a query builder for TestRecord.
+func (c *TestRecordClient) Query() *TestRecordQuery {
+	return &TestRecordQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTestRecord},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TestRecord entity by its id.
+func (c *TestRecordClient) Get(ctx context.Context, id string) (*TestRecord, error) {
+	return c.Query().Where(testrecord.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TestRecordClient) GetX(ctx context.Context, id string) *TestRecord {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TestRecordClient) Hooks() []Hook {
+	hooks := c.hooks.TestRecord
+	return append(hooks[:len(hooks):len(hooks)], testrecord.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *TestRecordClient) Interceptors() []Interceptor {
+	inters := c.inters.TestRecord
+	return append(inters[:len(inters):len(inters)], testrecord.Interceptors[:]...)
+}
+
+func (c *TestRecordClient) mutate(ctx context.Context, m *TestRecordMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TestRecordCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TestRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TestRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TestRecordDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TestRecord mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Game, Profile []ent.Hook
+		AbilityScore, Game, Profile, QuestionBank, Test, TestConfig,
+		TestRecord []ent.Hook
 	}
 	inters struct {
-		Game, Profile []ent.Interceptor
+		AbilityScore, Game, Profile, QuestionBank, Test, TestConfig,
+		TestRecord []ent.Interceptor
 	}
 )
 

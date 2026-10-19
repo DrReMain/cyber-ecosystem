@@ -13,3 +13,11 @@ type GameEntry struct {
 	GameID     string `json:"game_id,omitempty"`
 	CustomName string `json:"custom_name,omitempty"`
 }
+
+// BackgroundSpan is the engine-marked backgrounding record riding an
+// attempt: when it began (elapsed from attempt start) and how long it ran.
+// Validity is judged server-side at submit against the config threshold.
+type BackgroundSpan struct {
+	ElapsedMS  int `json:"elapsed_ms"`
+	DurationMS int `json:"duration_ms"`
+}

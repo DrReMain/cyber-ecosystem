@@ -14,10 +14,20 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AbilityScore is the client for interacting with the AbilityScore builders.
+	AbilityScore *AbilityScoreClient
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
 	// Profile is the client for interacting with the Profile builders.
 	Profile *ProfileClient
+	// QuestionBank is the client for interacting with the QuestionBank builders.
+	QuestionBank *QuestionBankClient
+	// Test is the client for interacting with the Test builders.
+	Test *TestClient
+	// TestConfig is the client for interacting with the TestConfig builders.
+	TestConfig *TestConfigClient
+	// TestRecord is the client for interacting with the TestRecord builders.
+	TestRecord *TestRecordClient
 
 	// lazily loaded.
 	client     *Client
@@ -149,8 +159,13 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Game = NewGameClient(tx.config)
 	tx.Profile = NewProfileClient(tx.config)
+	tx.QuestionBank = NewQuestionBankClient(tx.config)
+	tx.Test = NewTestClient(tx.config)
+	tx.TestConfig = NewTestConfigClient(tx.config)
+	tx.TestRecord = NewTestRecordClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -160,7 +175,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Game.QueryXXX(), the query will be executed
+// applies a query, for example: AbilityScore.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

@@ -3,9 +3,14 @@
 package runtime
 
 import (
+	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
+	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema"
+	"cyber-ecosystem/app/services/esports/internal/ent/test"
+	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 	"time"
 )
 
@@ -13,6 +18,97 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	abilityscoreMixin := schema.AbilityScore{}.Mixin()
+	abilityscoreMixinHooks2 := abilityscoreMixin[2].Hooks()
+	abilityscoreMixinHooks3 := abilityscoreMixin[3].Hooks()
+	abilityscore.Hooks[0] = abilityscoreMixinHooks2[0]
+	abilityscore.Hooks[1] = abilityscoreMixinHooks3[0]
+	abilityscoreMixinInters2 := abilityscoreMixin[2].Interceptors()
+	abilityscoreMixinInters3 := abilityscoreMixin[3].Interceptors()
+	abilityscore.Interceptors[0] = abilityscoreMixinInters2[0]
+	abilityscore.Interceptors[1] = abilityscoreMixinInters3[0]
+	abilityscoreMixinFields0 := abilityscoreMixin[0].Fields()
+	_ = abilityscoreMixinFields0
+	abilityscoreMixinFields1 := abilityscoreMixin[1].Fields()
+	_ = abilityscoreMixinFields1
+	abilityscoreMixinFields2 := abilityscoreMixin[2].Fields()
+	_ = abilityscoreMixinFields2
+	abilityscoreFields := schema.AbilityScore{}.Fields()
+	_ = abilityscoreFields
+	// abilityscoreDescCreatedAt is the schema descriptor for created_at field.
+	abilityscoreDescCreatedAt := abilityscoreMixinFields1[0].Descriptor()
+	// abilityscore.DefaultCreatedAt holds the default value on creation for the created_at field.
+	abilityscore.DefaultCreatedAt = abilityscoreDescCreatedAt.Default.(func() time.Time)
+	// abilityscoreDescUpdatedAt is the schema descriptor for updated_at field.
+	abilityscoreDescUpdatedAt := abilityscoreMixinFields1[1].Descriptor()
+	// abilityscore.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	abilityscore.DefaultUpdatedAt = abilityscoreDescUpdatedAt.Default.(func() time.Time)
+	// abilityscore.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	abilityscore.UpdateDefaultUpdatedAt = abilityscoreDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// abilityscoreDescTenantID is the schema descriptor for tenant_id field.
+	abilityscoreDescTenantID := abilityscoreMixinFields2[0].Descriptor()
+	// abilityscore.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	abilityscore.TenantIDValidator = abilityscoreDescTenantID.Validators[0].(func(string) error)
+	// abilityscoreDescRecordID is the schema descriptor for record_id field.
+	abilityscoreDescRecordID := abilityscoreFields[0].Descriptor()
+	// abilityscore.RecordIDValidator is a validator for the "record_id" field. It is called by the builders before save.
+	abilityscore.RecordIDValidator = func() func(string) error {
+		validators := abilityscoreDescRecordID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(record_id string) error {
+			for _, fn := range fns {
+				if err := fn(record_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// abilityscoreDescUserID is the schema descriptor for user_id field.
+	abilityscoreDescUserID := abilityscoreFields[1].Descriptor()
+	// abilityscore.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	abilityscore.UserIDValidator = func() func(string) error {
+		validators := abilityscoreDescUserID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(user_id string) error {
+			for _, fn := range fns {
+				if err := fn(user_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// abilityscoreDescAbility is the schema descriptor for ability field.
+	abilityscoreDescAbility := abilityscoreFields[2].Descriptor()
+	// abilityscore.AbilityValidator is a validator for the "ability" field. It is called by the builders before save.
+	abilityscore.AbilityValidator = func() func(string) error {
+		validators := abilityscoreDescAbility.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(ability string) error {
+			for _, fn := range fns {
+				if err := fn(ability); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// abilityscoreDescID is the schema descriptor for id field.
+	abilityscoreDescID := abilityscoreMixinFields0[0].Descriptor()
+	// abilityscore.DefaultID holds the default value on creation for the id field.
+	abilityscore.DefaultID = abilityscoreDescID.Default.(func() string)
+	// abilityscore.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	abilityscore.IDValidator = abilityscoreDescID.Validators[0].(func(string) error)
 	gameMixin := schema.Game{}.Mixin()
 	gameMixinHooks2 := gameMixin[2].Hooks()
 	gameMixinHooks3 := gameMixin[3].Hooks()
@@ -183,6 +279,324 @@ func init() {
 	profile.DefaultID = profileDescID.Default.(func() string)
 	// profile.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	profile.IDValidator = profileDescID.Validators[0].(func(string) error)
+	questionbankMixin := schema.QuestionBank{}.Mixin()
+	questionbankMixinHooks2 := questionbankMixin[2].Hooks()
+	questionbankMixinHooks3 := questionbankMixin[3].Hooks()
+	questionbank.Hooks[0] = questionbankMixinHooks2[0]
+	questionbank.Hooks[1] = questionbankMixinHooks3[0]
+	questionbankMixinInters2 := questionbankMixin[2].Interceptors()
+	questionbankMixinInters3 := questionbankMixin[3].Interceptors()
+	questionbank.Interceptors[0] = questionbankMixinInters2[0]
+	questionbank.Interceptors[1] = questionbankMixinInters3[0]
+	questionbankMixinFields0 := questionbankMixin[0].Fields()
+	_ = questionbankMixinFields0
+	questionbankMixinFields1 := questionbankMixin[1].Fields()
+	_ = questionbankMixinFields1
+	questionbankMixinFields2 := questionbankMixin[2].Fields()
+	_ = questionbankMixinFields2
+	questionbankFields := schema.QuestionBank{}.Fields()
+	_ = questionbankFields
+	// questionbankDescCreatedAt is the schema descriptor for created_at field.
+	questionbankDescCreatedAt := questionbankMixinFields1[0].Descriptor()
+	// questionbank.DefaultCreatedAt holds the default value on creation for the created_at field.
+	questionbank.DefaultCreatedAt = questionbankDescCreatedAt.Default.(func() time.Time)
+	// questionbankDescUpdatedAt is the schema descriptor for updated_at field.
+	questionbankDescUpdatedAt := questionbankMixinFields1[1].Descriptor()
+	// questionbank.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	questionbank.DefaultUpdatedAt = questionbankDescUpdatedAt.Default.(func() time.Time)
+	// questionbank.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	questionbank.UpdateDefaultUpdatedAt = questionbankDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// questionbankDescTenantID is the schema descriptor for tenant_id field.
+	questionbankDescTenantID := questionbankMixinFields2[0].Descriptor()
+	// questionbank.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	questionbank.TenantIDValidator = questionbankDescTenantID.Validators[0].(func(string) error)
+	// questionbankDescTestCode is the schema descriptor for test_code field.
+	questionbankDescTestCode := questionbankFields[0].Descriptor()
+	// questionbank.TestCodeValidator is a validator for the "test_code" field. It is called by the builders before save.
+	questionbank.TestCodeValidator = func() func(string) error {
+		validators := questionbankDescTestCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(test_code string) error {
+			for _, fn := range fns {
+				if err := fn(test_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// questionbankDescScenarioCode is the schema descriptor for scenario_code field.
+	questionbankDescScenarioCode := questionbankFields[1].Descriptor()
+	// questionbank.ScenarioCodeValidator is a validator for the "scenario_code" field. It is called by the builders before save.
+	questionbank.ScenarioCodeValidator = func() func(string) error {
+		validators := questionbankDescScenarioCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(scenario_code string) error {
+			for _, fn := range fns {
+				if err := fn(scenario_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// questionbankDescID is the schema descriptor for id field.
+	questionbankDescID := questionbankMixinFields0[0].Descriptor()
+	// questionbank.DefaultID holds the default value on creation for the id field.
+	questionbank.DefaultID = questionbankDescID.Default.(func() string)
+	// questionbank.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	questionbank.IDValidator = questionbankDescID.Validators[0].(func(string) error)
+	testMixin := schema.Test{}.Mixin()
+	testMixinHooks2 := testMixin[2].Hooks()
+	testMixinHooks3 := testMixin[3].Hooks()
+	test.Hooks[0] = testMixinHooks2[0]
+	test.Hooks[1] = testMixinHooks3[0]
+	testMixinInters2 := testMixin[2].Interceptors()
+	testMixinInters3 := testMixin[3].Interceptors()
+	test.Interceptors[0] = testMixinInters2[0]
+	test.Interceptors[1] = testMixinInters3[0]
+	testMixinFields0 := testMixin[0].Fields()
+	_ = testMixinFields0
+	testMixinFields1 := testMixin[1].Fields()
+	_ = testMixinFields1
+	testMixinFields2 := testMixin[2].Fields()
+	_ = testMixinFields2
+	testFields := schema.Test{}.Fields()
+	_ = testFields
+	// testDescCreatedAt is the schema descriptor for created_at field.
+	testDescCreatedAt := testMixinFields1[0].Descriptor()
+	// test.DefaultCreatedAt holds the default value on creation for the created_at field.
+	test.DefaultCreatedAt = testDescCreatedAt.Default.(func() time.Time)
+	// testDescUpdatedAt is the schema descriptor for updated_at field.
+	testDescUpdatedAt := testMixinFields1[1].Descriptor()
+	// test.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	test.DefaultUpdatedAt = testDescUpdatedAt.Default.(func() time.Time)
+	// test.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	test.UpdateDefaultUpdatedAt = testDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// testDescTenantID is the schema descriptor for tenant_id field.
+	testDescTenantID := testMixinFields2[0].Descriptor()
+	// test.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	test.TenantIDValidator = testDescTenantID.Validators[0].(func(string) error)
+	// testDescCode is the schema descriptor for code field.
+	testDescCode := testFields[0].Descriptor()
+	// test.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	test.CodeValidator = func() func(string) error {
+		validators := testDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// testDescName is the schema descriptor for name field.
+	testDescName := testFields[1].Descriptor()
+	// test.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	test.NameValidator = func() func(string) error {
+		validators := testDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// testDescCategory is the schema descriptor for category field.
+	testDescCategory := testFields[2].Descriptor()
+	// test.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
+	test.CategoryValidator = testDescCategory.Validators[0].(func(string) error)
+	// testDescAbility is the schema descriptor for ability field.
+	testDescAbility := testFields[3].Descriptor()
+	// test.AbilityValidator is a validator for the "ability" field. It is called by the builders before save.
+	test.AbilityValidator = testDescAbility.Validators[0].(func(string) error)
+	// testDescDescription is the schema descriptor for description field.
+	testDescDescription := testFields[4].Descriptor()
+	// test.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	test.DescriptionValidator = testDescDescription.Validators[0].(func(string) error)
+	// testDescUnitScoreLabel is the schema descriptor for unit_score_label field.
+	testDescUnitScoreLabel := testFields[5].Descriptor()
+	// test.UnitScoreLabelValidator is a validator for the "unit_score_label" field. It is called by the builders before save.
+	test.UnitScoreLabelValidator = testDescUnitScoreLabel.Validators[0].(func(string) error)
+	// testDescDurationSeconds is the schema descriptor for duration_seconds field.
+	testDescDurationSeconds := testFields[6].Descriptor()
+	// test.DefaultDurationSeconds holds the default value on creation for the duration_seconds field.
+	test.DefaultDurationSeconds = testDescDurationSeconds.Default.(int)
+	// testDescID is the schema descriptor for id field.
+	testDescID := testMixinFields0[0].Descriptor()
+	// test.DefaultID holds the default value on creation for the id field.
+	test.DefaultID = testDescID.Default.(func() string)
+	// test.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	test.IDValidator = testDescID.Validators[0].(func(string) error)
+	testconfigMixin := schema.TestConfig{}.Mixin()
+	testconfigMixinHooks2 := testconfigMixin[2].Hooks()
+	testconfigMixinHooks3 := testconfigMixin[3].Hooks()
+	testconfig.Hooks[0] = testconfigMixinHooks2[0]
+	testconfig.Hooks[1] = testconfigMixinHooks3[0]
+	testconfigMixinInters2 := testconfigMixin[2].Interceptors()
+	testconfigMixinInters3 := testconfigMixin[3].Interceptors()
+	testconfig.Interceptors[0] = testconfigMixinInters2[0]
+	testconfig.Interceptors[1] = testconfigMixinInters3[0]
+	testconfigMixinFields0 := testconfigMixin[0].Fields()
+	_ = testconfigMixinFields0
+	testconfigMixinFields1 := testconfigMixin[1].Fields()
+	_ = testconfigMixinFields1
+	testconfigMixinFields2 := testconfigMixin[2].Fields()
+	_ = testconfigMixinFields2
+	testconfigFields := schema.TestConfig{}.Fields()
+	_ = testconfigFields
+	// testconfigDescCreatedAt is the schema descriptor for created_at field.
+	testconfigDescCreatedAt := testconfigMixinFields1[0].Descriptor()
+	// testconfig.DefaultCreatedAt holds the default value on creation for the created_at field.
+	testconfig.DefaultCreatedAt = testconfigDescCreatedAt.Default.(func() time.Time)
+	// testconfigDescUpdatedAt is the schema descriptor for updated_at field.
+	testconfigDescUpdatedAt := testconfigMixinFields1[1].Descriptor()
+	// testconfig.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	testconfig.DefaultUpdatedAt = testconfigDescUpdatedAt.Default.(func() time.Time)
+	// testconfig.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	testconfig.UpdateDefaultUpdatedAt = testconfigDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// testconfigDescTenantID is the schema descriptor for tenant_id field.
+	testconfigDescTenantID := testconfigMixinFields2[0].Descriptor()
+	// testconfig.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	testconfig.TenantIDValidator = testconfigDescTenantID.Validators[0].(func(string) error)
+	// testconfigDescTestCode is the schema descriptor for test_code field.
+	testconfigDescTestCode := testconfigFields[0].Descriptor()
+	// testconfig.TestCodeValidator is a validator for the "test_code" field. It is called by the builders before save.
+	testconfig.TestCodeValidator = func() func(string) error {
+		validators := testconfigDescTestCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(test_code string) error {
+			for _, fn := range fns {
+				if err := fn(test_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// testconfigDescDurationSeconds is the schema descriptor for duration_seconds field.
+	testconfigDescDurationSeconds := testconfigFields[1].Descriptor()
+	// testconfig.DefaultDurationSeconds holds the default value on creation for the duration_seconds field.
+	testconfig.DefaultDurationSeconds = testconfigDescDurationSeconds.Default.(int)
+	// testconfigDescBackgroundInvalidSeconds is the schema descriptor for background_invalid_seconds field.
+	testconfigDescBackgroundInvalidSeconds := testconfigFields[2].Descriptor()
+	// testconfig.DefaultBackgroundInvalidSeconds holds the default value on creation for the background_invalid_seconds field.
+	testconfig.DefaultBackgroundInvalidSeconds = testconfigDescBackgroundInvalidSeconds.Default.(int)
+	// testconfigDescID is the schema descriptor for id field.
+	testconfigDescID := testconfigMixinFields0[0].Descriptor()
+	// testconfig.DefaultID holds the default value on creation for the id field.
+	testconfig.DefaultID = testconfigDescID.Default.(func() string)
+	// testconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	testconfig.IDValidator = testconfigDescID.Validators[0].(func(string) error)
+	testrecordMixin := schema.TestRecord{}.Mixin()
+	testrecordMixinHooks2 := testrecordMixin[2].Hooks()
+	testrecordMixinHooks3 := testrecordMixin[3].Hooks()
+	testrecord.Hooks[0] = testrecordMixinHooks2[0]
+	testrecord.Hooks[1] = testrecordMixinHooks3[0]
+	testrecordMixinInters2 := testrecordMixin[2].Interceptors()
+	testrecordMixinInters3 := testrecordMixin[3].Interceptors()
+	testrecord.Interceptors[0] = testrecordMixinInters2[0]
+	testrecord.Interceptors[1] = testrecordMixinInters3[0]
+	testrecordMixinFields0 := testrecordMixin[0].Fields()
+	_ = testrecordMixinFields0
+	testrecordMixinFields1 := testrecordMixin[1].Fields()
+	_ = testrecordMixinFields1
+	testrecordMixinFields2 := testrecordMixin[2].Fields()
+	_ = testrecordMixinFields2
+	testrecordFields := schema.TestRecord{}.Fields()
+	_ = testrecordFields
+	// testrecordDescCreatedAt is the schema descriptor for created_at field.
+	testrecordDescCreatedAt := testrecordMixinFields1[0].Descriptor()
+	// testrecord.DefaultCreatedAt holds the default value on creation for the created_at field.
+	testrecord.DefaultCreatedAt = testrecordDescCreatedAt.Default.(func() time.Time)
+	// testrecordDescUpdatedAt is the schema descriptor for updated_at field.
+	testrecordDescUpdatedAt := testrecordMixinFields1[1].Descriptor()
+	// testrecord.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	testrecord.DefaultUpdatedAt = testrecordDescUpdatedAt.Default.(func() time.Time)
+	// testrecord.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	testrecord.UpdateDefaultUpdatedAt = testrecordDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// testrecordDescTenantID is the schema descriptor for tenant_id field.
+	testrecordDescTenantID := testrecordMixinFields2[0].Descriptor()
+	// testrecord.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	testrecord.TenantIDValidator = testrecordDescTenantID.Validators[0].(func(string) error)
+	// testrecordDescTestCode is the schema descriptor for test_code field.
+	testrecordDescTestCode := testrecordFields[0].Descriptor()
+	// testrecord.TestCodeValidator is a validator for the "test_code" field. It is called by the builders before save.
+	testrecord.TestCodeValidator = func() func(string) error {
+		validators := testrecordDescTestCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(test_code string) error {
+			for _, fn := range fns {
+				if err := fn(test_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// testrecordDescUserID is the schema descriptor for user_id field.
+	testrecordDescUserID := testrecordFields[1].Descriptor()
+	// testrecord.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	testrecord.UserIDValidator = func() func(string) error {
+		validators := testrecordDescUserID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(user_id string) error {
+			for _, fn := range fns {
+				if err := fn(user_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// testrecordDescAttemptNo is the schema descriptor for attempt_no field.
+	testrecordDescAttemptNo := testrecordFields[2].Descriptor()
+	// testrecord.AttemptNoValidator is a validator for the "attempt_no" field. It is called by the builders before save.
+	testrecord.AttemptNoValidator = testrecordDescAttemptNo.Validators[0].(func(int) error)
+	// testrecordDescSessionID is the schema descriptor for session_id field.
+	testrecordDescSessionID := testrecordFields[3].Descriptor()
+	// testrecord.SessionIDValidator is a validator for the "session_id" field. It is called by the builders before save.
+	testrecord.SessionIDValidator = testrecordDescSessionID.Validators[0].(func(string) error)
+	// testrecordDescValid is the schema descriptor for valid field.
+	testrecordDescValid := testrecordFields[11].Descriptor()
+	// testrecord.DefaultValid holds the default value on creation for the valid field.
+	testrecord.DefaultValid = testrecordDescValid.Default.(bool)
+	// testrecordDescInvalidReason is the schema descriptor for invalid_reason field.
+	testrecordDescInvalidReason := testrecordFields[12].Descriptor()
+	// testrecord.InvalidReasonValidator is a validator for the "invalid_reason" field. It is called by the builders before save.
+	testrecord.InvalidReasonValidator = testrecordDescInvalidReason.Validators[0].(func(string) error)
+	// testrecordDescID is the schema descriptor for id field.
+	testrecordDescID := testrecordMixinFields0[0].Descriptor()
+	// testrecord.DefaultID holds the default value on creation for the id field.
+	testrecord.DefaultID = testrecordDescID.Default.(func() string)
+	// testrecord.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	testrecord.IDValidator = testrecordDescID.Validators[0].(func(string) error)
 }
 
 const (

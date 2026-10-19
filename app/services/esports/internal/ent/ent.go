@@ -4,8 +4,13 @@ package ent
 
 import (
 	"context"
+	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
+	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
+	"cyber-ecosystem/app/services/esports/internal/ent/test"
+	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 	"errors"
 	"fmt"
 	"reflect"
@@ -74,8 +79,13 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			game.Table:    game.ValidColumn,
-			profile.Table: profile.ValidColumn,
+			abilityscore.Table: abilityscore.ValidColumn,
+			game.Table:         game.ValidColumn,
+			profile.Table:      profile.ValidColumn,
+			questionbank.Table: questionbank.ValidColumn,
+			test.Table:         test.ValidColumn,
+			testconfig.Table:   testconfig.ValidColumn,
+			testrecord.Table:   testrecord.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

@@ -6,8 +6,23 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// AbilityScore is the predicate function for abilityscore builders.
+type AbilityScore func(*sql.Selector)
+
 // Game is the predicate function for game builders.
 type Game func(*sql.Selector)
 
 // Profile is the predicate function for profile builders.
 type Profile func(*sql.Selector)
+
+// QuestionBank is the predicate function for questionbank builders.
+type QuestionBank func(*sql.Selector)
+
+// Test is the predicate function for test builders.
+type Test func(*sql.Selector)
+
+// TestConfig is the predicate function for testconfig builders.
+type TestConfig func(*sql.Selector)
+
+// TestRecord is the predicate function for testrecord builders.
+type TestRecord func(*sql.Selector)

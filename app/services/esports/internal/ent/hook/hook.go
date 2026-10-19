@@ -8,6 +8,18 @@ import (
 	"fmt"
 )
 
+// The AbilityScoreFunc type is an adapter to allow the use of ordinary
+// function as AbilityScore mutator.
+type AbilityScoreFunc func(context.Context, *ent.AbilityScoreMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AbilityScoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AbilityScoreMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityScoreMutation", m)
+}
+
 // The GameFunc type is an adapter to allow the use of ordinary
 // function as Game mutator.
 type GameFunc func(context.Context, *ent.GameMutation) (ent.Value, error)
@@ -30,6 +42,54 @@ func (f ProfileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProfileMutation", m)
+}
+
+// The QuestionBankFunc type is an adapter to allow the use of ordinary
+// function as QuestionBank mutator.
+type QuestionBankFunc func(context.Context, *ent.QuestionBankMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f QuestionBankFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.QuestionBankMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.QuestionBankMutation", m)
+}
+
+// The TestFunc type is an adapter to allow the use of ordinary
+// function as Test mutator.
+type TestFunc func(context.Context, *ent.TestMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TestFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TestMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestMutation", m)
+}
+
+// The TestConfigFunc type is an adapter to allow the use of ordinary
+// function as TestConfig mutator.
+type TestConfigFunc func(context.Context, *ent.TestConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TestConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TestConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestConfigMutation", m)
+}
+
+// The TestRecordFunc type is an adapter to allow the use of ordinary
+// function as TestRecord mutator.
+type TestRecordFunc func(context.Context, *ent.TestRecordMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TestRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TestRecordMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestRecordMutation", m)
 }
 
 // Condition is a hook condition function.
