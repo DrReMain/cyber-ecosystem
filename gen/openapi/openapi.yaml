@@ -303,6 +303,102 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.ListGamesResponse'
+    /api/v1/esports/members:
+        get:
+            tags:
+                - MemberService
+            operationId: MemberService_ListMembers
+            parameters:
+                - name: keyword
+                  in: query
+                  description: |-
+                    Nickname substring — the operationally meaningful search key for
+                     xid-account members.
+                  schema:
+                    type: string
+                - name: enabled
+                  in: query
+                  description: Account status; absent lists both.
+                  schema:
+                    type: boolean
+                - name: population
+                  in: query
+                  description: Roster population; absent lists the member-plane population "member".
+                  schema:
+                    type: string
+                - name: ageBand
+                  in: query
+                  description: |-
+                    Equality against the profile's derived band; a lazy profile never
+                     matches a band filter.
+                  schema:
+                    type: string
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListMembersResponse'
+    /api/v1/esports/members/{userId}:
+        get:
+            tags:
+                - MemberService
+            operationId: MemberService_GetMember
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetMemberResponse'
     /api/v1/esports/profile:
         get:
             tags:
@@ -2369,6 +2465,11 @@ components:
                     type: array
                     items:
                         type: string
+        cyber.esports.v1.GetMemberResponse:
+            type: object
+            properties:
+                member:
+                    $ref: '#/components/schemas/cyber.esports.v1.Member'
         cyber.esports.v1.GetProfileResponse:
             type: object
             properties:
@@ -2396,6 +2497,15 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Game'
+        cyber.esports.v1.ListMembersResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                members:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Member'
         cyber.esports.v1.ListTestsResponse:
             type: object
             properties:
@@ -2403,6 +2513,39 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Test'
+        cyber.esports.v1.Member:
+            type: object
+            properties:
+                userId:
+                    type: string
+                    description: Identity part, hydrated from the system roster.
+                account:
+                    type: string
+                avatar:
+                    type: string
+                enabled:
+                    type: boolean
+                registeredAt:
+                    type: string
+                    description: |-
+                        The identity row's creation time — the registration trace the
+                         identity core carries.
+                    format: date-time
+                nickname:
+                    type: string
+                    description: Profile part; an absent profile row renders as all-unset fields.
+                birthYear:
+                    type: integer
+                    format: int32
+                birthMonth:
+                    type: integer
+                    format: int32
+                ageBand:
+                    type: string
+                games:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ProfileGame'
         cyber.esports.v1.Profile:
             type: object
             properties:
@@ -3262,6 +3405,18 @@ components:
                     type: string
                 page:
                     $ref: '#/components/schemas/cyber.shared.common.v1.PageRequest'
+                enabled:
+                    type: boolean
+                    description: Account status; absent lists both.
+                userIds:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        Exact roster narrowing to these identities; absent or empty = no
+                         narrowing. A caller resolves its own domain-local filters into this
+                         id set first, so filtering, ordering, and pagination all stay at the
+                         query level.
                 orderBy:
                     type: array
                     items:
@@ -3913,6 +4068,14 @@ tags:
          the C-end never hardcodes it. Admin management and classification live on
          the admin face, not this read model.
     - name: IntrospectService
+    - name: MemberService
+      description: |-
+        Member read face for operations — the composition of a system roster
+         (identities seated in a population) with the local player profiles. The
+         roster is enumerated from system with the caller's own credential; an
+         absent profile row is the lazy onboarding shape, never an error. One
+         face one consumer grade: this is the admin plane; the C-end member
+         reads their own profile through ProfileService.
     - name: PolicyService
     - name: PopulationService
       description: |-

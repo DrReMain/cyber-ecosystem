@@ -23,4 +23,7 @@ enum Esports {
 
   // 611x: test
   ESPORTS_TEST_NOT_FOUND = 6110 [(.errors.code) = 404];
+
+  // 612x: member
+  ESPORTS_MEMBER_NOT_FOUND = 6120 [(.errors.code) = 404];
 }

@@ -12,6 +12,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
+	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/server"
@@ -39,12 +40,14 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, logg
 	profileService := profile.NewProfileService(logger, profileUC)
 	gameUC := game.NewGameUC(logger, platformPlatform, gameRP)
 	gameService := game.NewGameService(logger, gameUC)
-	v := server.NewRegistrarList(profileService, gameService)
 	systemClient, cleanup2, err := client.NewSystemClient(remote, logger)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
+	memberUC := member.NewMemberUC(logger, platformPlatform, systemClient, profileRP)
+	memberService := member.NewMemberService(logger, memberUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

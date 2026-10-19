@@ -6,14 +6,17 @@
  *   1. every literal docs/... or .claude/... path referenced from AGENTS.md,
  *      CLAUDE.md, the root READMEs, and every doc/skill body exists on disk;
  *   2. every same-line "docs/<file>.md <section N>" pointer resolves to a real
- *      "## N." / "## N)" heading in the target (quoted heading names verified
- *      as substrings) -- this is the pointer grammar skills must use;
+ *      "## N." / "## N)" heading in the target; a quoted heading name must
+ *      occur on a heading line (never inside prose) -- this is the pointer
+ *      grammar skills must use;
  *   3. the AGENTS.md area index and the conventions area directories agree
  *      in both directions;
  *   4. every conventions doc carries a Status line; every roadmap doc
  *      carries a destination (归宿) header near the top;
  *   5. roadmap isolation (docs/README.md 2.7): no docs/roadmap reference in
- *      AGENTS.md, CLAUDE.md, skills, or conventions.
+ *      AGENTS.md, CLAUDE.md, skills, or conventions;
+ *   6. every gate row ID (K-XXX-N) cited by a skill exists in the kratos
+ *      conventions gate (CONVENTIONS.md §7).
  */
 const fs = require("node:fs");
 const path = require("node:path");
@@ -67,8 +70,24 @@ for (const f of refFiles) {
     const content = fs.readFileSync(t, "utf8");
     const heads = new Set([...content.matchAll(HEAD_RE)].map((h) => h[1]));
     if (!heads.has(sec)) bad(`${rel}: \`${p} §${sec}\` -- no "## ${sec}." heading in target`);
-    if (quoted && !content.includes(quoted))
-      bad(`${rel}: \`${p} §${sec} "${quoted}"\` -- heading text not found in target`);
+    if (quoted) {
+      const headingLines = [...content.matchAll(/^#{2,6}\s+.*$/gm)].map((h) => h[0]);
+      if (!headingLines.some((h) => h.includes(quoted)))
+        bad(`${rel}: \`${p} §${sec} "${quoted}"\` -- heading text not found on any heading line in target`);
+    }
+  }
+}
+
+// gate row IDs cited by skills must exist in the kratos gate (check 6)
+const kratosConvPath = path.join(ROOT, "docs", "conventions", "kratos", "CONVENTIONS.md");
+const kratosConv = fs.readFileSync(kratosConvPath, "utf8");
+for (const name of fs.readdirSync(skillsDir).sort()) {
+  const p = path.join(skillsDir, name, "SKILL.md");
+  if (!fs.existsSync(p)) continue;
+  const text = fs.readFileSync(p, "utf8");
+  for (const m of text.matchAll(/K-[A-Z]{2,4}-\d+/g)) {
+    if (!kratosConv.includes(m[0]))
+      bad(`.claude/skills/${name}/SKILL.md: gate row \`${m[0]}\` not found in ${path.relative(ROOT, kratosConvPath)} §7`);
   }
 }
 

@@ -1,0 +1,89 @@
+package shared
+
+import (
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"testing"
+)
+
+// Convention guards: the recurring violation classes (CONVENTIONS.md §4
+// declaration comments, §6 reason predicates, §1 serialization) as machine
+// gates — the §7 rows K-CMT-1, K-ERR-2, K-UTL-1 run green here.
+
+var (
+	guardDividerRE   = regexp.MustCompile(`^// [A-Za-z][A-Za-z0-9 /]* -{8,}\s*$`)
+	guardDirectiveRE = regexp.MustCompile(`^//[a-z]+:`)
+	guardDeclRE      = regexp.MustCompile(`^(type|func|const|var)\b`)
+	guardKratosCode  = regexp.MustCompile(`errors\.Is(NotFound|InvalidArgument|Unauthorized|Forbidden|Conflict|BadRequest|InternalServerError|FailedPrecondition)\(`)
+	guardJSON        = regexp.MustCompile(`json\.(Marshal|Unmarshal|NewEncoder|NewDecoder)\(`)
+)
+
+// guardDirs are the §4-enforced zones; ent/schema (own comment class) and
+// this kernel package keep their own conventions.
+var guardDirs = []string{"module", "client", "server", "bootstrap"}
+
+func guardGoFiles(t *testing.T) map[string]string {
+	t.Helper()
+	out := make(map[string]string)
+	for _, dir := range guardDirs {
+		root := filepath.Join("..", dir)
+		if _, statErr := os.Stat(root); statErr != nil {
+			continue // a service may lack the layer (system has no client/)
+		}
+		err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+				return nil
+			}
+			data, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			out[path] = string(data)
+			return nil
+		})
+		if err != nil {
+			t.Fatalf("walk %s: %v", dir, err)
+		}
+	}
+	return out
+}
+
+func TestNoDeclarationComments(t *testing.T) {
+	for f, src := range guardGoFiles(t) {
+		lines := strings.Split(src, "\n")
+		for i, line := range lines {
+			s := strings.TrimSpace(line)
+			if !strings.HasPrefix(s, "//") || guardDividerRE.MatchString(s) || guardDirectiveRE.MatchString(s) {
+				continue
+			}
+			j := i + 1
+			for j < len(lines) && strings.TrimSpace(lines[j]) == "" {
+				j++
+			}
+			if j < len(lines) && guardDeclRE.MatchString(strings.TrimSpace(lines[j])) {
+				t.Errorf("%s:%d declaration comment (CONVENTIONS.md §4): %q", f, i+1, s)
+			}
+		}
+	}
+}
+
+func TestReasonPredicates(t *testing.T) {
+	for f, src := range guardGoFiles(t) {
+		if hit := guardKratosCode.FindString(src); hit != "" {
+			t.Errorf("%s kratos code check %q — use the generated reason predicate (CONVENTIONS.md §6)", f, hit)
+		}
+	}
+}
+
+func TestSerializationViaUtils(t *testing.T) {
+	for f, src := range guardGoFiles(t) {
+		if guardJSON.MatchString(src) {
+			t.Errorf("%s direct encoding/json — serialize via shared-go/utils (CONVENTIONS.md §1)", f)
+		}
+	}
+}

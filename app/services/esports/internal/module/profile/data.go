@@ -4,9 +4,11 @@ import (
 	"context"
 	"log/slog"
 
+	"cyber-ecosystem/shared-go/helper"
 	"cyber-ecosystem/shared-go/utils"
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
+	"cyber-ecosystem/app/services/esports/internal/ent/predicate"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
@@ -35,6 +37,30 @@ func (rp *profileRP) FindByUserID(ctx context.Context, userID string) (*Profile,
 		return nil, rp.Platform.HandleEntError(err)
 	}
 	return mapProfile(row), nil
+}
+
+func (rp *profileRP) ListByUserIDs(ctx context.Context, userIDs []string) ([]*Profile, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
+	rows, err := rp.Platform.GetClient(ctx).Profile.Query().
+		Where(profile.UserIDIn(userIDs...)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return utils.SliceMap(rows, mapProfile), nil
+}
+
+func (rp *profileRP) ListUserIDs(ctx context.Context, keyword, ageBand *string) ([]string, error) {
+	query := rp.Platform.GetClient(ctx).Profile.Query()
+	helper.Where(query, keyword != nil, func() predicate.Profile { return profile.NicknameContainsFold(*keyword) })
+	helper.Where(query, ageBand != nil, func() predicate.Profile { return profile.AgeBandEQ(*ageBand) })
+	ids, err := query.Unique(true).Select(profile.FieldUserID).Strings(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return ids, nil
 }
 
 func (rp *profileRP) Save(ctx context.Context, p *Profile) (*Profile, error) {

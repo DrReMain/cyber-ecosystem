@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/esports/v1/profile.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// Member read face for operations — the composition of a system roster
+// (identities seated in a population) with the local player profiles. The
+// roster is enumerated from system with the caller's own credential; an
+// absent profile row is the lazy onboarding shape, never an error. One
+// face one consumer grade: this is the admin plane; the C-end member
+// reads their own profile through ProfileService.
+service MemberService {
+  option (cyber.ext.v1.service_comment) = "会员";
+  rpc ListMembers(ListMembersRequest) returns (ListMembersResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "会员列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/members"};
+  }
+  rpc GetMember(GetMemberRequest) returns (GetMemberResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "会员详情"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/members/{user_id}"};
+  }
+}
+
+message Member {
+  // Identity part, hydrated from the system roster.
+  google.protobuf.StringValue user_id = 1;
+  google.protobuf.StringValue account = 2;
+  google.protobuf.StringValue avatar = 3;
+  google.protobuf.BoolValue enabled = 4;
+  // The identity row's creation time — the registration trace the
+  // identity core carries.
+  google.protobuf.Timestamp registered_at = 5;
+  // Profile part; an absent profile row renders as all-unset fields.
+  google.protobuf.StringValue nickname = 6;
+  google.protobuf.Int32Value birth_year = 7;
+  google.protobuf.Int32Value birth_month = 8;
+  google.protobuf.StringValue age_band = 9;
+  repeated ProfileGame games = 10;
+}
+
+// listMembers — default order: registered_at desc.
+message ListMembersRequest {
+  // Nickname substring — the operationally meaningful search key for
+  // xid-account members.
+  optional string keyword = 1 [(buf.validate.field).string.min_len = 1];
+  // Account status; absent lists both.
+  optional bool enabled = 2;
+  // Roster population; absent lists the member-plane population "member".
+  optional string population = 3 [(buf.validate.field).string.min_len = 1];
+  // Equality against the profile's derived band; a lazy profile never
+  // matches a band filter.
+  optional string age_band = 4 [(buf.validate.field).string.min_len = 1];
+  cyber.shared.common.v1.PageRequest page = 5;
+}
+
+message ListMembersResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated Member members = 2;
+}
+
+message GetMemberRequest {
+  string user_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetMemberResponse {
+  Member member = 1;
+}

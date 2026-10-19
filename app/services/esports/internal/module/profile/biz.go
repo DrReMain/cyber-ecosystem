@@ -6,9 +6,10 @@ import (
 	"log/slog"
 	"time"
 
+	"cyber-ecosystem/shared-go/kratos/security"
+
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
-	"cyber-ecosystem/shared-go/kratos/security"
 
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
@@ -51,6 +52,8 @@ type UpdateIn struct {
 
 type ProfileRP interface {
 	FindByUserID(ctx context.Context, userID string) (*Profile, error)
+	ListByUserIDs(ctx context.Context, userIDs []string) ([]*Profile, error)
+	ListUserIDs(ctx context.Context, keyword, ageBand *string) ([]string, error)
 	Save(ctx context.Context, p *Profile) (*Profile, error)
 }
 

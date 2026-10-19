@@ -258,6 +258,18 @@ message ListUsersByPopulationRequest {
     (buf.validate.field).string.min_len = 1
   ];
   cyber.shared.common.v1.PageRequest page = 2;
+  // Account status; absent lists both.
+  optional bool enabled = 3;
+  // Exact roster narrowing to these identities; absent or empty = no
+  // narrowing. A caller resolves its own domain-local filters into this
+  // id set first, so filtering, ordering, and pagination all stay at the
+  // query level.
+  repeated string user_ids = 4 [(buf.validate.field).repeated = {
+    unique: true
+    items: {
+      string: {len: 20}
+    }
+  }];
   repeated string order_by = 100 [(buf.validate.field).cel = {
     id: "ListUsersByPopulationRequest.order_by"
     message: ""

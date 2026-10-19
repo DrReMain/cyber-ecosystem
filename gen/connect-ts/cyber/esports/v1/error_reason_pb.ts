@@ -10,7 +10,7 @@ import { file_errors_errors } from "../../../errors/errors_pb";
  * Describes the file cyber/esports/v1/error_reason.proto.
  */
 export const file_cyber_esports_v1_error_reason: GenFile = /*@__PURE__*/
-  fileDesc("CiNjeWJlci9lc3BvcnRzL3YxL2Vycm9yX3JlYXNvbi5wcm90bxIQY3liZXIuZXNwb3J0cy52MSrcAQoHRXNwb3J0cxIdChNFU1BPUlRTX1VOU1BFQ0lGSUVEEAAaBKhF9AMSNAopRVNQT1JUU19QUk9GSUxFX0dVQVJESUFOX0NPTlNFTlRfUkVRVUlSRUQQ1C8aBKhFkAMSJwocRVNQT1JUU19QUk9GSUxFX0dBTUVfVU5LTk9XThDVLxoEqEWQAxIqCh9FU1BPUlRTX1BST0ZJTEVfQ1VTVE9NX0dBTUVfQ0FQENYvGgSoRZADEiEKFkVTUE9SVFNfVEVTVF9OT1RfRk9VTkQQ3i8aBKhFlAMaBKBFkANCKVonY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9lc3BvcnRzL3YxYgZwcm90bzM", [file_errors_errors]);
+  fileDesc("CiNjeWJlci9lc3BvcnRzL3YxL2Vycm9yX3JlYXNvbi5wcm90bxIQY3liZXIuZXNwb3J0cy52MSqBAgoHRXNwb3J0cxIdChNFU1BPUlRTX1VOU1BFQ0lGSUVEEAAaBKhF9AMSNAopRVNQT1JUU19QUk9GSUxFX0dVQVJESUFOX0NPTlNFTlRfUkVRVUlSRUQQ1C8aBKhFkAMSJwocRVNQT1JUU19QUk9GSUxFX0dBTUVfVU5LTk9XThDVLxoEqEWQAxIqCh9FU1BPUlRTX1BST0ZJTEVfQ1VTVE9NX0dBTUVfQ0FQENYvGgSoRZADEiEKFkVTUE9SVFNfVEVTVF9OT1RfRk9VTkQQ3i8aBKhFlAMSIwoYRVNQT1JUU19NRU1CRVJfTk9UX0ZPVU5EEOgvGgSoRZQDGgSgRZADQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_errors_errors]);
 
 /**
  * business errors (service-level): domain-specific failures the service
@@ -50,6 +50,13 @@ export enum Esports {
    * @generated from enum value: ESPORTS_TEST_NOT_FOUND = 6110;
    */
   TEST_NOT_FOUND = 6110,
+
+  /**
+   * 612x: member
+   *
+   * @generated from enum value: ESPORTS_MEMBER_NOT_FOUND = 6120;
+   */
+  MEMBER_NOT_FOUND = 6120,
 }
 
 /**

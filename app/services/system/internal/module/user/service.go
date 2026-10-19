@@ -108,6 +108,8 @@ func (s *UserService) ListUsersByPopulation(ctx context.Context, in *systempb.Li
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Population:  in.Population,
+		Enabled:     in.Enabled,
+		UserIDs:     in.UserIds,
 	})
 	if err != nil {
 		return nil, err

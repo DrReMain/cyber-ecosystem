@@ -14,6 +14,7 @@ import (
 	krauth "cyber-ecosystem/shared-go/kratos/security/auth"
 
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
+	"cyber-ecosystem/app/services/esports/internal/module/member"
 )
 
 func standardMiddleware(logger *slog.Logger) []middleware.Middleware {
@@ -30,4 +31,5 @@ var ProviderSet = wire.NewSet(
 	NewSystemClient,
 	wire.Bind(new(krauth.Authenticator), new(*systemClient)),
 	wire.Bind(new(authz.AuthzRP), new(*systemClient)),
+	wire.Bind(new(member.SystemRP), new(*systemClient)),
 )

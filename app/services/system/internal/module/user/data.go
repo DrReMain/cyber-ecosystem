@@ -133,6 +133,8 @@ func (rp *userRP) ListByPopulation(ctx context.Context, in *UserListIn) (*UserLi
 	if subject, ok := security.SubjectFromCtx(ctx); ok {
 		query.Where(populationNarrowing(subject.TenantID, utils.Deref(in.Population, "")))
 	}
+	helper.Where(query, in.Enabled != nil, func() predicate.User { return user.EnabledEQ(*in.Enabled) })
+	helper.Where(query, len(in.UserIDs) > 0, func() predicate.User { return user.IDIn(in.UserIDs...) })
 	helper.ApplyOrderBy(helper.ParseOrderBy(in.OrderBy), ent.Asc, ent.Desc, helper.FOMapping{
 		"account":   func(sel helper.SQLSelector) { query.Order(sel(user.FieldAccount)) },
 		"createdAt": func(sel helper.SQLSelector) { query.Order(sel(user.FieldCreatedAt)) },

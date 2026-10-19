@@ -22,6 +22,41 @@
     ]
   },
   {
+    "name": "MemberService",
+    "full_name": "cyber.esports.v1.MemberService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/member.proto",
+    "comment": "会员",
+    "methods": [
+      {
+        "name": "GetMember",
+        "full_name": "cyber.esports.v1.MemberService.GetMember",
+        "request_name": "GetMemberRequest",
+        "request_full_name": "cyber.esports.v1.GetMemberRequest",
+        "response_name": "GetMemberResponse",
+        "response_full_name": "cyber.esports.v1.GetMemberResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/members/{user_id}",
+        "comment": "会员详情",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListMembers",
+        "full_name": "cyber.esports.v1.MemberService.ListMembers",
+        "request_name": "ListMembersRequest",
+        "request_full_name": "cyber.esports.v1.ListMembersRequest",
+        "response_name": "ListMembersResponse",
+        "response_full_name": "cyber.esports.v1.ListMembersResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/members",
+        "comment": "会员列表",
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "ProfileService",
     "full_name": "cyber.esports.v1.ProfileService",
     "package": "cyber.esports.v1",

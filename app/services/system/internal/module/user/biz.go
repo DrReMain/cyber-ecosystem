@@ -53,6 +53,7 @@ type UserListIn struct {
 	Enabled    *bool
 	DeptID     *string
 	Population *string
+	UserIDs    []string
 }
 
 type UserListOut struct {

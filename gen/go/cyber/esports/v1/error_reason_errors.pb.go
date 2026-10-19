@@ -74,3 +74,17 @@ func IsEsportsTestNotFound(err error) bool {
 func ErrorEsportsTestNotFound(format string, args ...interface{}) *errors.Error {
 	return errors.New(404, Esports_ESPORTS_TEST_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
+
+// 612x: member
+func IsEsportsMemberNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_MEMBER_NOT_FOUND.String() && e.Code == 404
+}
+
+// 612x: member
+func ErrorEsportsMemberNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, Esports_ESPORTS_MEMBER_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}

@@ -93,5 +93,6 @@
   "error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED": "Users under 13 need guardian consent to continue",
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "Selected game not found; refresh the list and try again",
   "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "Custom game limit reached",
-  "error_ESPORTS_TEST_NOT_FOUND": "Test not found or no longer available"
+  "error_ESPORTS_TEST_NOT_FOUND": "Test not found or no longer available",
+  "error_ESPORTS_MEMBER_NOT_FOUND": "Member not found"
 }

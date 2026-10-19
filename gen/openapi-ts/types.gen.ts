@@ -200,6 +200,10 @@ export type CyberEsportsV1GamePreferenceInput = {
     customNames?: Array<string>;
 };
 
+export type CyberEsportsV1GetMemberResponse = {
+    member?: CyberEsportsV1Member;
+};
+
 export type CyberEsportsV1GetProfileResponse = {
     profile?: CyberEsportsV1Profile;
 };
@@ -221,8 +225,36 @@ export type CyberEsportsV1ListGamesResponse = {
     games?: Array<CyberEsportsV1Game>;
 };
 
+export type CyberEsportsV1ListMembersResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    members?: Array<CyberEsportsV1Member>;
+};
+
 export type CyberEsportsV1ListTestsResponse = {
     tests?: Array<CyberEsportsV1Test>;
+};
+
+export type CyberEsportsV1Member = {
+    /**
+     * Identity part, hydrated from the system roster.
+     */
+    userId?: string;
+    account?: string;
+    avatar?: string;
+    enabled?: boolean;
+    /**
+     * The identity row's creation time — the registration trace the
+     * identity core carries.
+     */
+    registeredAt?: string;
+    /**
+     * Profile part; an absent profile row renders as all-unset fields.
+     */
+    nickname?: string;
+    birthYear?: number;
+    birthMonth?: number;
+    ageBand?: string;
+    games?: Array<CyberEsportsV1ProfileGame>;
 };
 
 /**
@@ -907,6 +939,17 @@ export type CyberSystemV1ListUploadedPartsResponse = {
 export type CyberSystemV1ListUsersByPopulationRequest = {
     population?: string;
     page?: CyberSharedCommonV1PageRequest;
+    /**
+     * Account status; absent lists both.
+     */
+    enabled?: boolean;
+    /**
+     * Exact roster narrowing to these identities; absent or empty = no
+     * narrowing. A caller resolves its own domain-local filters into this
+     * id set first, so filtering, ordering, and pagination all stay at the
+     * query level.
+     */
+    userIds?: Array<string>;
     orderBy?: Array<string>;
 };
 
@@ -1685,6 +1728,87 @@ export type GameServiceListGamesResponses = {
 };
 
 export type GameServiceListGamesResponse = GameServiceListGamesResponses[keyof GameServiceListGamesResponses];
+
+export type MemberServiceListMembersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Nickname substring — the operationally meaningful search key for
+         * xid-account members.
+         */
+        keyword?: string;
+        /**
+         * Account status; absent lists both.
+         */
+        enabled?: boolean;
+        /**
+         * Roster population; absent lists the member-plane population "member".
+         */
+        population?: string;
+        /**
+         * Equality against the profile's derived band; a lazy profile never
+         * matches a band filter.
+         */
+        ageBand?: string;
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/esports/members';
+};
+
+export type MemberServiceListMembersResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListMembersResponse;
+};
+
+export type MemberServiceListMembersResponse = MemberServiceListMembersResponses[keyof MemberServiceListMembersResponses];
+
+export type MemberServiceGetMemberData = {
+    body?: never;
+    path: {
+        userId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/members/{userId}';
+};
+
+export type MemberServiceGetMemberResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetMemberResponse;
+};
+
+export type MemberServiceGetMemberResponse = MemberServiceGetMemberResponses[keyof MemberServiceGetMemberResponses];
 
 export type ProfileServiceGetProfileData = {
     body?: never;

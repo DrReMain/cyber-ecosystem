@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -12,10 +13,12 @@ import (
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 	"cyber-ecosystem/shared-go/utils"
 
+	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
 	systemv1connect "cyber-ecosystem/gen/go/cyber/system/v1/v1connect"
 
 	"cyber-ecosystem/app/services/esports/internal/conf"
+	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
@@ -24,6 +27,7 @@ import (
 type systemClient struct {
 	log        *slog.Logger
 	introspect systemv1connect.IntrospectServiceClient
+	users      systemv1connect.UserServiceClient
 }
 
 func NewSystemClient(c *conf.Remote, logger *slog.Logger) (*systemClient, func(), error) {
@@ -39,6 +43,7 @@ func NewSystemClient(c *conf.Remote, logger *slog.Logger) (*systemClient, func()
 	return &systemClient{
 		log:        logger.With("module", "client/system"),
 		introspect: systemv1connect.NewIntrospectServiceClient(conn.HTTPClient(), conn.BaseURL(), conn.ClientOptions()...),
+		users:      systemv1connect.NewUserServiceClient(conn.HTTPClient(), conn.BaseURL(), conn.ClientOptions()...),
 	}, cleanup, nil
 }
 
@@ -73,4 +78,45 @@ func (c *systemClient) CheckGrants(ctx context.Context, subject *security.Subjec
 		return nil, err
 	}
 	return &kauthz.Decision{Allowed: resp.Msg.GetAllowed(), Reason: resp.Msg.GetReason()}, nil
+}
+
+func (c *systemClient) ListRoster(ctx context.Context, q *member.RosterQuery) (*member.RosterPage, error) {
+	ctx, err := withCallerSession(ctx)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.users.ListUsersByPopulation(ctx, connectrpc.NewRequest(&systempb.ListUsersByPopulationRequest{
+		Population: &q.Population,
+		Enabled:    q.Enabled,
+		UserIds:    q.UserIDs,
+		OrderBy:    q.OrderBy,
+		Page:       q.Page,
+	}))
+	if err != nil {
+		return nil, err
+	}
+	return &member.RosterPage{
+		PageResponse: resp.Msg.GetPage(),
+		Users:        utils.SliceMap(resp.Msg.GetList(), mapUser),
+	}, nil
+}
+
+// Private -------------------------------------------------------------------------------------------------------------
+
+func withCallerSession(ctx context.Context) (context.Context, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("no subject in context"))
+	}
+	return connect.WithSessionToken(ctx, subject.SessionID), nil
+}
+
+func mapUser(u *systempb.User) *member.RosterUser {
+	return &member.RosterUser{
+		ID:        utils.Deref(utils.Unwrap[string](u.GetId()), ""),
+		Account:   utils.Unwrap[string](u.GetAccount()),
+		Avatar:    utils.Unwrap[string](u.GetAvatar()),
+		Enabled:   utils.Deref(utils.Unwrap[bool](u.GetEnabled()), false),
+		CreatedAt: utils.Deref(utils.FromTimestamp(u.GetCreatedAt()), time.Time{}),
+	}
 }
