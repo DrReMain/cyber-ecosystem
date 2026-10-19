@@ -504,6 +504,2294 @@ func (x *TestConfig) GetEngineParams() map[string]string {
 	return nil
 }
 
+type Point struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	X             float64                `protobuf:"fixed64,1,opt,name=x,proto3" json:"x,omitempty"`
+	Y             float64                `protobuf:"fixed64,2,opt,name=y,proto3" json:"y,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Point) Reset() {
+	*x = Point{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Point) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Point) ProtoMessage() {}
+
+func (x *Point) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Point.ProtoReflect.Descriptor instead.
+func (*Point) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *Point) GetX() float64 {
+	if x != nil {
+		return x.X
+	}
+	return 0
+}
+
+func (x *Point) GetY() float64 {
+	if x != nil {
+		return x.Y
+	}
+	return 0
+}
+
+// The engine marks backgrounding spans; validity is judged server-side at
+// submit against TestConfig.background_invalid_seconds.
+type BackgroundSpan struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ElapsedMs     int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"` // legacy: timestamp
+	DurationMs    int32                  `protobuf:"varint,2,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BackgroundSpan) Reset() {
+	*x = BackgroundSpan{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BackgroundSpan) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BackgroundSpan) ProtoMessage() {}
+
+func (x *BackgroundSpan) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BackgroundSpan.ProtoReflect.Descriptor instead.
+func (*BackgroundSpan) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *BackgroundSpan) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+func (x *BackgroundSpan) GetDurationMs() int32 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
+type SubmitTestAttemptRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Code join key (e.g. "red_dot") — same law as Test.code.
+	TestCode string `protobuf:"bytes,1,opt,name=test_code,json=testCode,proto3" json:"test_code,omitempty"`
+	// Attempt ordinal inside the match session — the E4 session law owns the
+	// semantics (lockdown, retest budget); this contract only carries the key.
+	AttemptNo   int32                  `protobuf:"varint,2,opt,name=attempt_no,json=attemptNo,proto3" json:"attempt_no,omitempty"`
+	StartedAt   *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	EndedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	Backgrounds []*BackgroundSpan      `protobuf:"bytes,5,rep,name=backgrounds,proto3" json:"backgrounds,omitempty"`
+	// Types that are valid to be assigned to RawDetail:
+	//
+	//	*SubmitTestAttemptRequest_RedDot
+	//	*SubmitTestAttemptRequest_FlashAiming
+	//	*SubmitTestAttemptRequest_MultiTarget
+	//	*SubmitTestAttemptRequest_TargetRecognition
+	//	*SubmitTestAttemptRequest_TrackingMoving
+	//	*SubmitTestAttemptRequest_MovingTarget
+	//	*SubmitTestAttemptRequest_SkillTrajectory
+	//	*SubmitTestAttemptRequest_DualZone
+	//	*SubmitTestAttemptRequest_NumberStars
+	//	*SubmitTestAttemptRequest_OffenseDefense
+	//	*SubmitTestAttemptRequest_CharacterCounter
+	//	*SubmitTestAttemptRequest_ResourceMatch
+	//	*SubmitTestAttemptRequest_EconomicSim
+	RawDetail     isSubmitTestAttemptRequest_RawDetail `protobuf_oneof:"raw_detail"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubmitTestAttemptRequest) Reset() {
+	*x = SubmitTestAttemptRequest{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitTestAttemptRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitTestAttemptRequest) ProtoMessage() {}
+
+func (x *SubmitTestAttemptRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubmitTestAttemptRequest.ProtoReflect.Descriptor instead.
+func (*SubmitTestAttemptRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *SubmitTestAttemptRequest) GetTestCode() string {
+	if x != nil {
+		return x.TestCode
+	}
+	return ""
+}
+
+func (x *SubmitTestAttemptRequest) GetAttemptNo() int32 {
+	if x != nil {
+		return x.AttemptNo
+	}
+	return 0
+}
+
+func (x *SubmitTestAttemptRequest) GetStartedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartedAt
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetEndedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndedAt
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetBackgrounds() []*BackgroundSpan {
+	if x != nil {
+		return x.Backgrounds
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetRawDetail() isSubmitTestAttemptRequest_RawDetail {
+	if x != nil {
+		return x.RawDetail
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetRedDot() *RedDotDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_RedDot); ok {
+			return x.RedDot
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetFlashAiming() *FlashAimingDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_FlashAiming); ok {
+			return x.FlashAiming
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetMultiTarget() *MultiTargetDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_MultiTarget); ok {
+			return x.MultiTarget
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetTargetRecognition() *TargetRecognitionDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_TargetRecognition); ok {
+			return x.TargetRecognition
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetTrackingMoving() *TrackingMovingDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_TrackingMoving); ok {
+			return x.TrackingMoving
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetMovingTarget() *MovingTargetDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_MovingTarget); ok {
+			return x.MovingTarget
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetSkillTrajectory() *SkillTrajectoryDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_SkillTrajectory); ok {
+			return x.SkillTrajectory
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetDualZone() *DualZoneDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_DualZone); ok {
+			return x.DualZone
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetNumberStars() *NumberStarsDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_NumberStars); ok {
+			return x.NumberStars
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetOffenseDefense() *OffenseDefenseDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_OffenseDefense); ok {
+			return x.OffenseDefense
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetCharacterCounter() *CharacterCounterDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_CharacterCounter); ok {
+			return x.CharacterCounter
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetResourceMatch() *ResourceMatchDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_ResourceMatch); ok {
+			return x.ResourceMatch
+		}
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptRequest) GetEconomicSim() *EconomicSimDetail {
+	if x != nil {
+		if x, ok := x.RawDetail.(*SubmitTestAttemptRequest_EconomicSim); ok {
+			return x.EconomicSim
+		}
+	}
+	return nil
+}
+
+type isSubmitTestAttemptRequest_RawDetail interface {
+	isSubmitTestAttemptRequest_RawDetail()
+}
+
+type SubmitTestAttemptRequest_RedDot struct {
+	RedDot *RedDotDetail `protobuf:"bytes,10,opt,name=red_dot,json=redDot,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_FlashAiming struct {
+	FlashAiming *FlashAimingDetail `protobuf:"bytes,11,opt,name=flash_aiming,json=flashAiming,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_MultiTarget struct {
+	MultiTarget *MultiTargetDetail `protobuf:"bytes,12,opt,name=multi_target,json=multiTarget,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_TargetRecognition struct {
+	TargetRecognition *TargetRecognitionDetail `protobuf:"bytes,13,opt,name=target_recognition,json=targetRecognition,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_TrackingMoving struct {
+	TrackingMoving *TrackingMovingDetail `protobuf:"bytes,14,opt,name=tracking_moving,json=trackingMoving,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_MovingTarget struct {
+	MovingTarget *MovingTargetDetail `protobuf:"bytes,15,opt,name=moving_target,json=movingTarget,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_SkillTrajectory struct {
+	SkillTrajectory *SkillTrajectoryDetail `protobuf:"bytes,16,opt,name=skill_trajectory,json=skillTrajectory,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_DualZone struct {
+	DualZone *DualZoneDetail `protobuf:"bytes,17,opt,name=dual_zone,json=dualZone,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_NumberStars struct {
+	NumberStars *NumberStarsDetail `protobuf:"bytes,18,opt,name=number_stars,json=numberStars,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_OffenseDefense struct {
+	OffenseDefense *OffenseDefenseDetail `protobuf:"bytes,19,opt,name=offense_defense,json=offenseDefense,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_CharacterCounter struct {
+	CharacterCounter *CharacterCounterDetail `protobuf:"bytes,20,opt,name=character_counter,json=characterCounter,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_ResourceMatch struct {
+	ResourceMatch *ResourceMatchDetail `protobuf:"bytes,21,opt,name=resource_match,json=resourceMatch,proto3,oneof"`
+}
+
+type SubmitTestAttemptRequest_EconomicSim struct {
+	EconomicSim *EconomicSimDetail `protobuf:"bytes,22,opt,name=economic_sim,json=economicSim,proto3,oneof"`
+}
+
+func (*SubmitTestAttemptRequest_RedDot) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_FlashAiming) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_MultiTarget) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_TargetRecognition) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_TrackingMoving) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_MovingTarget) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_SkillTrajectory) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_DualZone) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_NumberStars) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_OffenseDefense) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_CharacterCounter) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_ResourceMatch) isSubmitTestAttemptRequest_RawDetail() {}
+
+func (*SubmitTestAttemptRequest_EconomicSim) isSubmitTestAttemptRequest_RawDetail() {}
+
+type SubmitTestAttemptResponse struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	RecordId string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
+	// Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
+	// authoritative score with its grade — neither is client-computable.
+	RawScore           float64 `protobuf:"fixed64,2,opt,name=raw_score,json=rawScore,proto3" json:"raw_score,omitempty"`
+	AuthoritativeScore float64 `protobuf:"fixed64,3,opt,name=authoritative_score,json=authoritativeScore,proto3" json:"authoritative_score,omitempty"`
+	// Open vocabulary {S | A | B | C} — the four-color tier law.
+	Grade string `protobuf:"bytes,4,opt,name=grade,proto3" json:"grade,omitempty"`
+	// Ability attribution receipt, six-word vocabulary shared with Test.ability.
+	Ability string `protobuf:"bytes,5,opt,name=ability,proto3" json:"ability,omitempty"`
+	// False when the attempt fails server-side validity (background over
+	// budget, incomplete detail) — an invalid attempt scores nothing; the
+	// reason code is ops vocabulary, not user copy.
+	Valid         bool                    `protobuf:"varint,6,opt,name=valid,proto3" json:"valid,omitempty"`
+	InvalidReason *wrapperspb.StringValue `protobuf:"bytes,7,opt,name=invalid_reason,json=invalidReason,proto3" json:"invalid_reason,omitempty"`
+	// Retest budget receipt for the "N/3 remaining" UI; E4 owns enforcement.
+	RetestLeft    int32 `protobuf:"varint,8,opt,name=retest_left,json=retestLeft,proto3" json:"retest_left,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubmitTestAttemptResponse) Reset() {
+	*x = SubmitTestAttemptResponse{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitTestAttemptResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitTestAttemptResponse) ProtoMessage() {}
+
+func (x *SubmitTestAttemptResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubmitTestAttemptResponse.ProtoReflect.Descriptor instead.
+func (*SubmitTestAttemptResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *SubmitTestAttemptResponse) GetRecordId() string {
+	if x != nil {
+		return x.RecordId
+	}
+	return ""
+}
+
+func (x *SubmitTestAttemptResponse) GetRawScore() float64 {
+	if x != nil {
+		return x.RawScore
+	}
+	return 0
+}
+
+func (x *SubmitTestAttemptResponse) GetAuthoritativeScore() float64 {
+	if x != nil {
+		return x.AuthoritativeScore
+	}
+	return 0
+}
+
+func (x *SubmitTestAttemptResponse) GetGrade() string {
+	if x != nil {
+		return x.Grade
+	}
+	return ""
+}
+
+func (x *SubmitTestAttemptResponse) GetAbility() string {
+	if x != nil {
+		return x.Ability
+	}
+	return ""
+}
+
+func (x *SubmitTestAttemptResponse) GetValid() bool {
+	if x != nil {
+		return x.Valid
+	}
+	return false
+}
+
+func (x *SubmitTestAttemptResponse) GetInvalidReason() *wrapperspb.StringValue {
+	if x != nil {
+		return x.InvalidReason
+	}
+	return nil
+}
+
+func (x *SubmitTestAttemptResponse) GetRetestLeft() int32 {
+	if x != nil {
+		return x.RetestLeft
+	}
+	return 0
+}
+
+// red_dot — reaction tap on a moving spot.
+type RedDotDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Events        []*RedDotEvent         `protobuf:"bytes,1,rep,name=events,proto3" json:"events,omitempty"` // legacy: detailList
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RedDotDetail) Reset() {
+	*x = RedDotDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RedDotDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RedDotDetail) ProtoMessage() {}
+
+func (x *RedDotDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RedDotDetail.ProtoReflect.Descriptor instead.
+func (*RedDotDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *RedDotDetail) GetEvents() []*RedDotEvent {
+	if x != nil {
+		return x.Events
+	}
+	return nil
+}
+
+type RedDotEvent struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Target         *Point                 `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"` // legacy: targetX/targetY
+	Click          *Point                 `protobuf:"bytes,2,opt,name=click,proto3" json:"click,omitempty"`   // legacy: clickX/clickY
+	ReactionTimeMs int32                  `protobuf:"varint,3,opt,name=reaction_time_ms,json=reactionTimeMs,proto3" json:"reaction_time_ms,omitempty"`
+	Deviation      float64                `protobuf:"fixed64,4,opt,name=deviation,proto3" json:"deviation,omitempty"`
+	IsHit          bool                   `protobuf:"varint,5,opt,name=is_hit,json=isHit,proto3" json:"is_hit,omitempty"` // geometric fact (inside radius), not a scoring verdict
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RedDotEvent) Reset() {
+	*x = RedDotEvent{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RedDotEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RedDotEvent) ProtoMessage() {}
+
+func (x *RedDotEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RedDotEvent.ProtoReflect.Descriptor instead.
+func (*RedDotEvent) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *RedDotEvent) GetTarget() *Point {
+	if x != nil {
+		return x.Target
+	}
+	return nil
+}
+
+func (x *RedDotEvent) GetClick() *Point {
+	if x != nil {
+		return x.Click
+	}
+	return nil
+}
+
+func (x *RedDotEvent) GetReactionTimeMs() int32 {
+	if x != nil {
+		return x.ReactionTimeMs
+	}
+	return 0
+}
+
+func (x *RedDotEvent) GetDeviation() float64 {
+	if x != nil {
+		return x.Deviation
+	}
+	return 0
+}
+
+func (x *RedDotEvent) GetIsHit() bool {
+	if x != nil {
+		return x.IsHit
+	}
+	return false
+}
+
+// flash_aiming — snap shots at flashing targets.
+type FlashAimingDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Shots         []*FlashAimingShot     `protobuf:"bytes,1,rep,name=shots,proto3" json:"shots,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FlashAimingDetail) Reset() {
+	*x = FlashAimingDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FlashAimingDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlashAimingDetail) ProtoMessage() {}
+
+func (x *FlashAimingDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlashAimingDetail.ProtoReflect.Descriptor instead.
+func (*FlashAimingDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *FlashAimingDetail) GetShots() []*FlashAimingShot {
+	if x != nil {
+		return x.Shots
+	}
+	return nil
+}
+
+type FlashAimingShot struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TargetId      string                 `protobuf:"bytes,1,opt,name=target_id,json=targetId,proto3" json:"target_id,omitempty"`
+	Target        *Point                 `protobuf:"bytes,2,opt,name=target,proto3" json:"target,omitempty"` // + legacy targetSize
+	TargetSize    float64                `protobuf:"fixed64,3,opt,name=target_size,json=targetSize,proto3" json:"target_size,omitempty"`
+	Click         *Point                 `protobuf:"bytes,4,opt,name=click,proto3" json:"click,omitempty"`
+	Deviation     float64                `protobuf:"fixed64,5,opt,name=deviation,proto3" json:"deviation,omitempty"`
+	AimTimeMs     int32                  `protobuf:"varint,6,opt,name=aim_time_ms,json=aimTimeMs,proto3" json:"aim_time_ms,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FlashAimingShot) Reset() {
+	*x = FlashAimingShot{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FlashAimingShot) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlashAimingShot) ProtoMessage() {}
+
+func (x *FlashAimingShot) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlashAimingShot.ProtoReflect.Descriptor instead.
+func (*FlashAimingShot) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *FlashAimingShot) GetTargetId() string {
+	if x != nil {
+		return x.TargetId
+	}
+	return ""
+}
+
+func (x *FlashAimingShot) GetTarget() *Point {
+	if x != nil {
+		return x.Target
+	}
+	return nil
+}
+
+func (x *FlashAimingShot) GetTargetSize() float64 {
+	if x != nil {
+		return x.TargetSize
+	}
+	return 0
+}
+
+func (x *FlashAimingShot) GetClick() *Point {
+	if x != nil {
+		return x.Click
+	}
+	return nil
+}
+
+func (x *FlashAimingShot) GetDeviation() float64 {
+	if x != nil {
+		return x.Deviation
+	}
+	return 0
+}
+
+func (x *FlashAimingShot) GetAimTimeMs() int32 {
+	if x != nil {
+		return x.AimTimeMs
+	}
+	return 0
+}
+
+// multi_target — priority firing under value tiers. The legacy pick stream
+// carried no tier; the tier rides here now so the server can rebuild every
+// priority aggregate from facts.
+type MultiTargetDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Picks         []*MultiTargetPick     `protobuf:"bytes,1,rep,name=picks,proto3" json:"picks,omitempty"` // legacy: targetSelectionOrder
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MultiTargetDetail) Reset() {
+	*x = MultiTargetDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MultiTargetDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MultiTargetDetail) ProtoMessage() {}
+
+func (x *MultiTargetDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MultiTargetDetail.ProtoReflect.Descriptor instead.
+func (*MultiTargetDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *MultiTargetDetail) GetPicks() []*MultiTargetPick {
+	if x != nil {
+		return x.Picks
+	}
+	return nil
+}
+
+type MultiTargetPick struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	TargetId string                 `protobuf:"bytes,1,opt,name=target_id,json=targetId,proto3" json:"target_id,omitempty"`
+	// Open vocabulary {high | medium | low | trap}.
+	Tier          string `protobuf:"bytes,2,opt,name=tier,proto3" json:"tier,omitempty"`
+	IsHit         bool   `protobuf:"varint,3,opt,name=is_hit,json=isHit,proto3" json:"is_hit,omitempty"`
+	ElapsedMs     int32  `protobuf:"varint,4,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"` // legacy: timestamp
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MultiTargetPick) Reset() {
+	*x = MultiTargetPick{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MultiTargetPick) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MultiTargetPick) ProtoMessage() {}
+
+func (x *MultiTargetPick) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MultiTargetPick.ProtoReflect.Descriptor instead.
+func (*MultiTargetPick) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *MultiTargetPick) GetTargetId() string {
+	if x != nil {
+		return x.TargetId
+	}
+	return ""
+}
+
+func (x *MultiTargetPick) GetTier() string {
+	if x != nil {
+		return x.Tier
+	}
+	return ""
+}
+
+func (x *MultiTargetPick) GetIsHit() bool {
+	if x != nil {
+		return x.IsHit
+	}
+	return false
+}
+
+func (x *MultiTargetPick) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+// target_recognition — friend/foe discrimination; correctness is judged
+// server-side against the target type, never asserted by the client.
+type TargetRecognitionDetail struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Clicks        []*TargetRecognitionClick `protobuf:"bytes,1,rep,name=clicks,proto3" json:"clicks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TargetRecognitionDetail) Reset() {
+	*x = TargetRecognitionDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TargetRecognitionDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TargetRecognitionDetail) ProtoMessage() {}
+
+func (x *TargetRecognitionDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TargetRecognitionDetail.ProtoReflect.Descriptor instead.
+func (*TargetRecognitionDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *TargetRecognitionDetail) GetClicks() []*TargetRecognitionClick {
+	if x != nil {
+		return x.Clicks
+	}
+	return nil
+}
+
+type TargetRecognitionClick struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	TargetId string                 `protobuf:"bytes,1,opt,name=target_id,json=targetId,proto3" json:"target_id,omitempty"`
+	// Open vocabulary {friendly | enemy | neutral}.
+	TargetType     string `protobuf:"bytes,2,opt,name=target_type,json=targetType,proto3" json:"target_type,omitempty"`
+	ReactionTimeMs *int32 `protobuf:"varint,3,opt,name=reaction_time_ms,json=reactionTimeMs,proto3,oneof" json:"reaction_time_ms,omitempty"` // absent = no reaction
+	ElapsedMs      int32  `protobuf:"varint,4,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *TargetRecognitionClick) Reset() {
+	*x = TargetRecognitionClick{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TargetRecognitionClick) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TargetRecognitionClick) ProtoMessage() {}
+
+func (x *TargetRecognitionClick) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TargetRecognitionClick.ProtoReflect.Descriptor instead.
+func (*TargetRecognitionClick) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *TargetRecognitionClick) GetTargetId() string {
+	if x != nil {
+		return x.TargetId
+	}
+	return ""
+}
+
+func (x *TargetRecognitionClick) GetTargetType() string {
+	if x != nil {
+		return x.TargetType
+	}
+	return ""
+}
+
+func (x *TargetRecognitionClick) GetReactionTimeMs() int32 {
+	if x != nil && x.ReactionTimeMs != nil {
+		return *x.ReactionTimeMs
+	}
+	return 0
+}
+
+func (x *TargetRecognitionClick) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+// tracking_moving — sustained tracking of a moving target.
+type TrackingMovingDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Frames        []*TrackingMovingFrame `protobuf:"bytes,1,rep,name=frames,proto3" json:"frames,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TrackingMovingDetail) Reset() {
+	*x = TrackingMovingDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrackingMovingDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrackingMovingDetail) ProtoMessage() {}
+
+func (x *TrackingMovingDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrackingMovingDetail.ProtoReflect.Descriptor instead.
+func (*TrackingMovingDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *TrackingMovingDetail) GetFrames() []*TrackingMovingFrame {
+	if x != nil {
+		return x.Frames
+	}
+	return nil
+}
+
+type TrackingMovingFrame struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ElapsedMs     int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"`
+	Target        *Point                 `protobuf:"bytes,2,opt,name=target,proto3" json:"target,omitempty"`
+	Crosshair     *Point                 `protobuf:"bytes,3,opt,name=crosshair,proto3" json:"crosshair,omitempty"`
+	Deviation     float64                `protobuf:"fixed64,4,opt,name=deviation,proto3" json:"deviation,omitempty"`
+	Player        *Point                 `protobuf:"bytes,5,opt,name=player,proto3" json:"player,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TrackingMovingFrame) Reset() {
+	*x = TrackingMovingFrame{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrackingMovingFrame) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrackingMovingFrame) ProtoMessage() {}
+
+func (x *TrackingMovingFrame) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrackingMovingFrame.ProtoReflect.Descriptor instead.
+func (*TrackingMovingFrame) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *TrackingMovingFrame) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+func (x *TrackingMovingFrame) GetTarget() *Point {
+	if x != nil {
+		return x.Target
+	}
+	return nil
+}
+
+func (x *TrackingMovingFrame) GetCrosshair() *Point {
+	if x != nil {
+		return x.Crosshair
+	}
+	return nil
+}
+
+func (x *TrackingMovingFrame) GetDeviation() float64 {
+	if x != nil {
+		return x.Deviation
+	}
+	return 0
+}
+
+func (x *TrackingMovingFrame) GetPlayer() *Point {
+	if x != nil {
+		return x.Player
+	}
+	return nil
+}
+
+// moving_target — tracking across movement patterns; the pattern phase is a
+// fact the server needs to reproduce per-pattern aggregates (legacy had it
+// only as a client-side summary).
+type MovingTargetDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Shots         []*MovingTargetShot    `protobuf:"bytes,1,rep,name=shots,proto3" json:"shots,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MovingTargetDetail) Reset() {
+	*x = MovingTargetDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MovingTargetDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MovingTargetDetail) ProtoMessage() {}
+
+func (x *MovingTargetDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MovingTargetDetail.ProtoReflect.Descriptor instead.
+func (*MovingTargetDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *MovingTargetDetail) GetShots() []*MovingTargetShot {
+	if x != nil {
+		return x.Shots
+	}
+	return nil
+}
+
+type MovingTargetShot struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	ElapsedMs int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"` // legacy: timestamp
+	Target    *Point                 `protobuf:"bytes,2,opt,name=target,proto3" json:"target,omitempty"`
+	Crosshair *Point                 `protobuf:"bytes,3,opt,name=crosshair,proto3" json:"crosshair,omitempty"`
+	Deviation float64                `protobuf:"fixed64,4,opt,name=deviation,proto3" json:"deviation,omitempty"`
+	Hit       bool                   `protobuf:"varint,5,opt,name=hit,proto3" json:"hit,omitempty"`
+	// Open vocabulary {straight | curve | zigzag | circle | random | variable}.
+	Pattern       string `protobuf:"bytes,6,opt,name=pattern,proto3" json:"pattern,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MovingTargetShot) Reset() {
+	*x = MovingTargetShot{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MovingTargetShot) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MovingTargetShot) ProtoMessage() {}
+
+func (x *MovingTargetShot) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MovingTargetShot.ProtoReflect.Descriptor instead.
+func (*MovingTargetShot) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *MovingTargetShot) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+func (x *MovingTargetShot) GetTarget() *Point {
+	if x != nil {
+		return x.Target
+	}
+	return nil
+}
+
+func (x *MovingTargetShot) GetCrosshair() *Point {
+	if x != nil {
+		return x.Crosshair
+	}
+	return nil
+}
+
+func (x *MovingTargetShot) GetDeviation() float64 {
+	if x != nil {
+		return x.Deviation
+	}
+	return 0
+}
+
+func (x *MovingTargetShot) GetHit() bool {
+	if x != nil {
+		return x.Hit
+	}
+	return false
+}
+
+func (x *MovingTargetShot) GetPattern() string {
+	if x != nil {
+		return x.Pattern
+	}
+	return ""
+}
+
+// skill_trajectory — placement precision over draggable graphics; the seed
+// reproduces the board server-side.
+type SkillTrajectoryDetail struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	RandomSeed    int64                   `protobuf:"varint,1,opt,name=random_seed,json=randomSeed,proto3" json:"random_seed,omitempty"` // legacy: randomSeed
+	Rounds        []*SkillTrajectoryRound `protobuf:"bytes,2,rep,name=rounds,proto3" json:"rounds,omitempty"`                            // legacy: rounds (was untyped)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkillTrajectoryDetail) Reset() {
+	*x = SkillTrajectoryDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillTrajectoryDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillTrajectoryDetail) ProtoMessage() {}
+
+func (x *SkillTrajectoryDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillTrajectoryDetail.ProtoReflect.Descriptor instead.
+func (*SkillTrajectoryDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *SkillTrajectoryDetail) GetRandomSeed() int64 {
+	if x != nil {
+		return x.RandomSeed
+	}
+	return 0
+}
+
+func (x *SkillTrajectoryDetail) GetRounds() []*SkillTrajectoryRound {
+	if x != nil {
+		return x.Rounds
+	}
+	return nil
+}
+
+type SkillTrajectoryRound struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	RoundNumber int32                  `protobuf:"varint,1,opt,name=round_number,json=roundNumber,proto3" json:"round_number,omitempty"`
+	GraphicId   string                 `protobuf:"bytes,2,opt,name=graphic_id,json=graphicId,proto3" json:"graphic_id,omitempty"`
+	// Open vocabulary {circle | square | triangle | pentagon | hexagon | star}.
+	Shape            string   `protobuf:"bytes,3,opt,name=shape,proto3" json:"shape,omitempty"`
+	GraphicSize      float64  `protobuf:"fixed64,4,opt,name=graphic_size,json=graphicSize,proto3" json:"graphic_size,omitempty"`
+	ColorName        string   `protobuf:"bytes,5,opt,name=color_name,json=colorName,proto3" json:"color_name,omitempty"` // semantic name, not a hex string
+	OriginalPosition *Point   `protobuf:"bytes,6,opt,name=original_position,json=originalPosition,proto3" json:"original_position,omitempty"`
+	Trajectory       []*Point `protobuf:"bytes,7,rep,name=trajectory,proto3" json:"trajectory,omitempty"`
+	PlayerPlacement  *Point   `protobuf:"bytes,8,opt,name=player_placement,json=playerPlacement,proto3" json:"player_placement,omitempty"` // null = not placed
+	Deviation        float64  `protobuf:"fixed64,9,opt,name=deviation,proto3" json:"deviation,omitempty"`
+	PlacementTimeMs  int32    `protobuf:"varint,10,opt,name=placement_time_ms,json=placementTimeMs,proto3" json:"placement_time_ms,omitempty"`
+	Selected         bool     `protobuf:"varint,11,opt,name=selected,proto3" json:"selected,omitempty"`
+	Placed           bool     `protobuf:"varint,12,opt,name=placed,proto3" json:"placed,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *SkillTrajectoryRound) Reset() {
+	*x = SkillTrajectoryRound{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillTrajectoryRound) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillTrajectoryRound) ProtoMessage() {}
+
+func (x *SkillTrajectoryRound) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillTrajectoryRound.ProtoReflect.Descriptor instead.
+func (*SkillTrajectoryRound) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *SkillTrajectoryRound) GetRoundNumber() int32 {
+	if x != nil {
+		return x.RoundNumber
+	}
+	return 0
+}
+
+func (x *SkillTrajectoryRound) GetGraphicId() string {
+	if x != nil {
+		return x.GraphicId
+	}
+	return ""
+}
+
+func (x *SkillTrajectoryRound) GetShape() string {
+	if x != nil {
+		return x.Shape
+	}
+	return ""
+}
+
+func (x *SkillTrajectoryRound) GetGraphicSize() float64 {
+	if x != nil {
+		return x.GraphicSize
+	}
+	return 0
+}
+
+func (x *SkillTrajectoryRound) GetColorName() string {
+	if x != nil {
+		return x.ColorName
+	}
+	return ""
+}
+
+func (x *SkillTrajectoryRound) GetOriginalPosition() *Point {
+	if x != nil {
+		return x.OriginalPosition
+	}
+	return nil
+}
+
+func (x *SkillTrajectoryRound) GetTrajectory() []*Point {
+	if x != nil {
+		return x.Trajectory
+	}
+	return nil
+}
+
+func (x *SkillTrajectoryRound) GetPlayerPlacement() *Point {
+	if x != nil {
+		return x.PlayerPlacement
+	}
+	return nil
+}
+
+func (x *SkillTrajectoryRound) GetDeviation() float64 {
+	if x != nil {
+		return x.Deviation
+	}
+	return 0
+}
+
+func (x *SkillTrajectoryRound) GetPlacementTimeMs() int32 {
+	if x != nil {
+		return x.PlacementTimeMs
+	}
+	return 0
+}
+
+func (x *SkillTrajectoryRound) GetSelected() bool {
+	if x != nil {
+		return x.Selected
+	}
+	return false
+}
+
+func (x *SkillTrajectoryRound) GetPlaced() bool {
+	if x != nil {
+		return x.Placed
+	}
+	return false
+}
+
+// dual_zone — two-lane dodging; the behavior stream carries zone sides and
+// collision/dodge events with optional geometry.
+type DualZoneDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Behaviors     []*DualZoneBehavior    `protobuf:"bytes,1,rep,name=behaviors,proto3" json:"behaviors,omitempty"` // legacy: behaviorRecords
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DualZoneDetail) Reset() {
+	*x = DualZoneDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DualZoneDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DualZoneDetail) ProtoMessage() {}
+
+func (x *DualZoneDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DualZoneDetail.ProtoReflect.Descriptor instead.
+func (*DualZoneDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *DualZoneDetail) GetBehaviors() []*DualZoneBehavior {
+	if x != nil {
+		return x.Behaviors
+	}
+	return nil
+}
+
+type DualZoneBehavior struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	ElapsedMs int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"` // legacy: timestamp
+	// Open vocabulary {left | right} — legacy LEFT/RIGHT lowercased.
+	Zone string `protobuf:"bytes,2,opt,name=zone,proto3" json:"zone,omitempty"`
+	// Open vocabulary {collision | dodge}.
+	Event         string `protobuf:"bytes,3,opt,name=event,proto3" json:"event,omitempty"`
+	Position      *Point `protobuf:"bytes,4,opt,name=position,proto3,oneof" json:"position,omitempty"` // legacy: positionX/positionY
+	ObstacleId    *int32 `protobuf:"varint,5,opt,name=obstacle_id,json=obstacleId,proto3,oneof" json:"obstacle_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DualZoneBehavior) Reset() {
+	*x = DualZoneBehavior{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DualZoneBehavior) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DualZoneBehavior) ProtoMessage() {}
+
+func (x *DualZoneBehavior) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DualZoneBehavior.ProtoReflect.Descriptor instead.
+func (*DualZoneBehavior) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *DualZoneBehavior) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+func (x *DualZoneBehavior) GetZone() string {
+	if x != nil {
+		return x.Zone
+	}
+	return ""
+}
+
+func (x *DualZoneBehavior) GetEvent() string {
+	if x != nil {
+		return x.Event
+	}
+	return ""
+}
+
+func (x *DualZoneBehavior) GetPosition() *Point {
+	if x != nil {
+		return x.Position
+	}
+	return nil
+}
+
+func (x *DualZoneBehavior) GetObstacleId() int32 {
+	if x != nil && x.ObstacleId != nil {
+		return *x.ObstacleId
+	}
+	return 0
+}
+
+// number_stars — numeric sequence tapping; the round's target sequence plus
+// the click stream let the server rebuild accuracy and decision intervals
+// (legacy asserted isCorrect/expectedNumber client-side — now derived).
+type NumberStarsDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Rounds        []*NumberStarsRound    `protobuf:"bytes,1,rep,name=rounds,proto3" json:"rounds,omitempty"` // legacy: roundHistory (was untyped)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NumberStarsDetail) Reset() {
+	*x = NumberStarsDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NumberStarsDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NumberStarsDetail) ProtoMessage() {}
+
+func (x *NumberStarsDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NumberStarsDetail.ProtoReflect.Descriptor instead.
+func (*NumberStarsDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *NumberStarsDetail) GetRounds() []*NumberStarsRound {
+	if x != nil {
+		return x.Rounds
+	}
+	return nil
+}
+
+type NumberStarsRound struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RoundNumber   int32                  `protobuf:"varint,1,opt,name=round_number,json=roundNumber,proto3" json:"round_number,omitempty"`
+	Numbers       []int32                `protobuf:"varint,2,rep,packed,name=numbers,proto3" json:"numbers,omitempty"` // the target sequence
+	Clicks        []*NumberStarsClick    `protobuf:"bytes,3,rep,name=clicks,proto3" json:"clicks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NumberStarsRound) Reset() {
+	*x = NumberStarsRound{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NumberStarsRound) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NumberStarsRound) ProtoMessage() {}
+
+func (x *NumberStarsRound) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NumberStarsRound.ProtoReflect.Descriptor instead.
+func (*NumberStarsRound) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *NumberStarsRound) GetRoundNumber() int32 {
+	if x != nil {
+		return x.RoundNumber
+	}
+	return 0
+}
+
+func (x *NumberStarsRound) GetNumbers() []int32 {
+	if x != nil {
+		return x.Numbers
+	}
+	return nil
+}
+
+func (x *NumberStarsRound) GetClicks() []*NumberStarsClick {
+	if x != nil {
+		return x.Clicks
+	}
+	return nil
+}
+
+type NumberStarsClick struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Number        int32                  `protobuf:"varint,1,opt,name=number,proto3" json:"number,omitempty"`
+	ElapsedMs     int32                  `protobuf:"varint,2,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"` // legacy: timestamp
+	Position      *Point                 `protobuf:"bytes,3,opt,name=position,proto3" json:"position,omitempty"`                     // legacy: x/y
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NumberStarsClick) Reset() {
+	*x = NumberStarsClick{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NumberStarsClick) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NumberStarsClick) ProtoMessage() {}
+
+func (x *NumberStarsClick) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NumberStarsClick.ProtoReflect.Descriptor instead.
+func (*NumberStarsClick) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *NumberStarsClick) GetNumber() int32 {
+	if x != nil {
+		return x.Number
+	}
+	return 0
+}
+
+func (x *NumberStarsClick) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+func (x *NumberStarsClick) GetPosition() *Point {
+	if x != nil {
+		return x.Position
+	}
+	return nil
+}
+
+// offense_defense — scenario decisions; correctness is judged server-side
+// against the scenario answer key (legacy isCorrect dropped).
+type OffenseDefenseDetail struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Decisions     []*OffenseDefenseDecision `protobuf:"bytes,1,rep,name=decisions,proto3" json:"decisions,omitempty"` // legacy: decisions
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OffenseDefenseDetail) Reset() {
+	*x = OffenseDefenseDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OffenseDefenseDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OffenseDefenseDetail) ProtoMessage() {}
+
+func (x *OffenseDefenseDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OffenseDefenseDetail.ProtoReflect.Descriptor instead.
+func (*OffenseDefenseDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *OffenseDefenseDetail) GetDecisions() []*OffenseDefenseDecision {
+	if x != nil {
+		return x.Decisions
+	}
+	return nil
+}
+
+type OffenseDefenseDecision struct {
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	ScenarioId string                 `protobuf:"bytes,1,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
+	// Open vocabulary {attack | defense | retreat}; absent = unanswered.
+	Choice         *string `protobuf:"bytes,2,opt,name=choice,proto3,oneof" json:"choice,omitempty"`
+	DecisionTimeMs int32   `protobuf:"varint,3,opt,name=decision_time_ms,json=decisionTimeMs,proto3" json:"decision_time_ms,omitempty"`
+	Timeout        bool    `protobuf:"varint,4,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *OffenseDefenseDecision) Reset() {
+	*x = OffenseDefenseDecision{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OffenseDefenseDecision) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OffenseDefenseDecision) ProtoMessage() {}
+
+func (x *OffenseDefenseDecision) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OffenseDefenseDecision.ProtoReflect.Descriptor instead.
+func (*OffenseDefenseDecision) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *OffenseDefenseDecision) GetScenarioId() string {
+	if x != nil {
+		return x.ScenarioId
+	}
+	return ""
+}
+
+func (x *OffenseDefenseDecision) GetChoice() string {
+	if x != nil && x.Choice != nil {
+		return *x.Choice
+	}
+	return ""
+}
+
+func (x *OffenseDefenseDecision) GetDecisionTimeMs() int32 {
+	if x != nil {
+		return x.DecisionTimeMs
+	}
+	return 0
+}
+
+func (x *OffenseDefenseDecision) GetTimeout() bool {
+	if x != nil {
+		return x.Timeout
+	}
+	return false
+}
+
+// character_counter — lineup counter-picking; the counter score is a
+// server-side judgment against the counter matrix.
+type CharacterCounterDetail struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Rounds        []*CharacterCounterRound `protobuf:"bytes,1,rep,name=rounds,proto3" json:"rounds,omitempty"` // legacy: rounds
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CharacterCounterDetail) Reset() {
+	*x = CharacterCounterDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CharacterCounterDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CharacterCounterDetail) ProtoMessage() {}
+
+func (x *CharacterCounterDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CharacterCounterDetail.ProtoReflect.Descriptor instead.
+func (*CharacterCounterDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *CharacterCounterDetail) GetRounds() []*CharacterCounterRound {
+	if x != nil {
+		return x.Rounds
+	}
+	return nil
+}
+
+type CharacterCounterRound struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	RoundNumber    int32                  `protobuf:"varint,1,opt,name=round_number,json=roundNumber,proto3" json:"round_number,omitempty"`
+	EnemyLineup    []string               `protobuf:"bytes,2,rep,name=enemy_lineup,json=enemyLineup,proto3" json:"enemy_lineup,omitempty"`
+	SelectedLineup []string               `protobuf:"bytes,3,rep,name=selected_lineup,json=selectedLineup,proto3" json:"selected_lineup,omitempty"`
+	TimeSpentMs    int32                  `protobuf:"varint,4,opt,name=time_spent_ms,json=timeSpentMs,proto3" json:"time_spent_ms,omitempty"` // legacy: timeSpent
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *CharacterCounterRound) Reset() {
+	*x = CharacterCounterRound{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CharacterCounterRound) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CharacterCounterRound) ProtoMessage() {}
+
+func (x *CharacterCounterRound) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CharacterCounterRound.ProtoReflect.Descriptor instead.
+func (*CharacterCounterRound) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *CharacterCounterRound) GetRoundNumber() int32 {
+	if x != nil {
+		return x.RoundNumber
+	}
+	return 0
+}
+
+func (x *CharacterCounterRound) GetEnemyLineup() []string {
+	if x != nil {
+		return x.EnemyLineup
+	}
+	return nil
+}
+
+func (x *CharacterCounterRound) GetSelectedLineup() []string {
+	if x != nil {
+		return x.SelectedLineup
+	}
+	return nil
+}
+
+func (x *CharacterCounterRound) GetTimeSpentMs() int32 {
+	if x != nil {
+		return x.TimeSpentMs
+	}
+	return 0
+}
+
+// resource_match — collecting resources on a field; trajectory plus the
+// collect sequence (kind + time) rebuild every efficiency aggregate.
+type ResourceMatchDetail struct {
+	state         protoimpl.MessageState          `protogen:"open.v1"`
+	Trajectory    []*ResourceMatchTrajectoryPoint `protobuf:"bytes,1,rep,name=trajectory,proto3" json:"trajectory,omitempty"` // legacy: trajectory
+	Collects      []*ResourceMatchCollect         `protobuf:"bytes,2,rep,name=collects,proto3" json:"collects,omitempty"`     // legacy: collectSequence (was bare numbers)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResourceMatchDetail) Reset() {
+	*x = ResourceMatchDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResourceMatchDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResourceMatchDetail) ProtoMessage() {}
+
+func (x *ResourceMatchDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResourceMatchDetail.ProtoReflect.Descriptor instead.
+func (*ResourceMatchDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *ResourceMatchDetail) GetTrajectory() []*ResourceMatchTrajectoryPoint {
+	if x != nil {
+		return x.Trajectory
+	}
+	return nil
+}
+
+func (x *ResourceMatchDetail) GetCollects() []*ResourceMatchCollect {
+	if x != nil {
+		return x.Collects
+	}
+	return nil
+}
+
+type ResourceMatchTrajectoryPoint struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Position      *Point                 `protobuf:"bytes,1,opt,name=position,proto3" json:"position,omitempty"`                           // legacy: x/y
+	ElapsedMs     *int32                 `protobuf:"varint,2,opt,name=elapsed_ms,json=elapsedMs,proto3,oneof" json:"elapsed_ms,omitempty"` // legacy: optional timestamp
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResourceMatchTrajectoryPoint) Reset() {
+	*x = ResourceMatchTrajectoryPoint{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResourceMatchTrajectoryPoint) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResourceMatchTrajectoryPoint) ProtoMessage() {}
+
+func (x *ResourceMatchTrajectoryPoint) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResourceMatchTrajectoryPoint.ProtoReflect.Descriptor instead.
+func (*ResourceMatchTrajectoryPoint) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *ResourceMatchTrajectoryPoint) GetPosition() *Point {
+	if x != nil {
+		return x.Position
+	}
+	return nil
+}
+
+func (x *ResourceMatchTrajectoryPoint) GetElapsedMs() int32 {
+	if x != nil && x.ElapsedMs != nil {
+		return *x.ElapsedMs
+	}
+	return 0
+}
+
+type ResourceMatchCollect struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Open vocabulary {minion | monster | dragon} — the resource kinds.
+	Kind          string `protobuf:"bytes,1,opt,name=kind,proto3" json:"kind,omitempty"`
+	ElapsedMs     int32  `protobuf:"varint,2,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResourceMatchCollect) Reset() {
+	*x = ResourceMatchCollect{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResourceMatchCollect) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResourceMatchCollect) ProtoMessage() {}
+
+func (x *ResourceMatchCollect) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResourceMatchCollect.ProtoReflect.Descriptor instead.
+func (*ResourceMatchCollect) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *ResourceMatchCollect) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *ResourceMatchCollect) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+// economic_sim — last-hitting and spending economy.
+type EconomicSimDetail struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	LastHits      []*EconomicSimLastHit  `protobuf:"bytes,1,rep,name=last_hits,json=lastHits,proto3" json:"last_hits,omitempty"` // legacy: lastHitEvents
+	Purchases     []*EconomicSimPurchase `protobuf:"bytes,2,rep,name=purchases,proto3" json:"purchases,omitempty"`               // legacy: purchases
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EconomicSimDetail) Reset() {
+	*x = EconomicSimDetail{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EconomicSimDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EconomicSimDetail) ProtoMessage() {}
+
+func (x *EconomicSimDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EconomicSimDetail.ProtoReflect.Descriptor instead.
+func (*EconomicSimDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *EconomicSimDetail) GetLastHits() []*EconomicSimLastHit {
+	if x != nil {
+		return x.LastHits
+	}
+	return nil
+}
+
+func (x *EconomicSimDetail) GetPurchases() []*EconomicSimPurchase {
+	if x != nil {
+		return x.Purchases
+	}
+	return nil
+}
+
+type EconomicSimLastHit struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ElapsedMs     int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"` // legacy: timestamp
+	IsLastHit     bool                   `protobuf:"varint,2,opt,name=is_last_hit,json=isLastHit,proto3" json:"is_last_hit,omitempty"`
+	GoldEarned    int32                  `protobuf:"varint,3,opt,name=gold_earned,json=goldEarned,proto3" json:"gold_earned,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EconomicSimLastHit) Reset() {
+	*x = EconomicSimLastHit{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EconomicSimLastHit) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EconomicSimLastHit) ProtoMessage() {}
+
+func (x *EconomicSimLastHit) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EconomicSimLastHit.ProtoReflect.Descriptor instead.
+func (*EconomicSimLastHit) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *EconomicSimLastHit) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+func (x *EconomicSimLastHit) GetIsLastHit() bool {
+	if x != nil {
+		return x.IsLastHit
+	}
+	return false
+}
+
+func (x *EconomicSimLastHit) GetGoldEarned() int32 {
+	if x != nil {
+		return x.GoldEarned
+	}
+	return 0
+}
+
+type EconomicSimPurchase struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ElapsedMs     int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"` // legacy: timestamp
+	ItemName      string                 `protobuf:"bytes,2,opt,name=item_name,json=itemName,proto3" json:"item_name,omitempty"`
+	Cost          int32                  `protobuf:"varint,3,opt,name=cost,proto3" json:"cost,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EconomicSimPurchase) Reset() {
+	*x = EconomicSimPurchase{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EconomicSimPurchase) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EconomicSimPurchase) ProtoMessage() {}
+
+func (x *EconomicSimPurchase) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EconomicSimPurchase.ProtoReflect.Descriptor instead.
+func (*EconomicSimPurchase) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *EconomicSimPurchase) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
+func (x *EconomicSimPurchase) GetItemName() string {
+	if x != nil {
+		return x.ItemName
+	}
+	return ""
+}
+
+func (x *EconomicSimPurchase) GetCost() int32 {
+	if x != nil {
+		return x.Cost
+	}
+	return 0
+}
+
 var File_cyber_esports_v1_test_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_test_proto_rawDesc = "" +
@@ -543,14 +2831,203 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"\rengine_params\x18\x04 \x03(\v2..cyber.esports.v1.TestConfig.EngineParamsEntryR\fengineParams\x1a?\n" +
 	"\x11EngineParamsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xec\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"#\n" +
+	"\x05Point\x12\f\n" +
+	"\x01x\x18\x01 \x01(\x01R\x01x\x12\f\n" +
+	"\x01y\x18\x02 \x01(\x01R\x01y\"b\n" +
+	"\x0eBackgroundSpan\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12(\n" +
+	"\vduration_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\n" +
+	"durationMs\"\xbd\n" +
+	"\n" +
+	"\x18SubmitTestAttemptRequest\x12)\n" +
+	"\ttest_code\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@R\btestCode\x12&\n" +
+	"\n" +
+	"attempt_no\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x01R\tattemptNo\x12A\n" +
+	"\n" +
+	"started_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\tstartedAt\x12=\n" +
+	"\bended_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\aendedAt\x12L\n" +
+	"\vbackgrounds\x18\x05 \x03(\v2 .cyber.esports.v1.BackgroundSpanB\b\xbaH\x05\x92\x01\x02\x10@R\vbackgrounds\x129\n" +
+	"\ared_dot\x18\n" +
+	" \x01(\v2\x1e.cyber.esports.v1.RedDotDetailH\x00R\x06redDot\x12H\n" +
+	"\fflash_aiming\x18\v \x01(\v2#.cyber.esports.v1.FlashAimingDetailH\x00R\vflashAiming\x12H\n" +
+	"\fmulti_target\x18\f \x01(\v2#.cyber.esports.v1.MultiTargetDetailH\x00R\vmultiTarget\x12Z\n" +
+	"\x12target_recognition\x18\r \x01(\v2).cyber.esports.v1.TargetRecognitionDetailH\x00R\x11targetRecognition\x12Q\n" +
+	"\x0ftracking_moving\x18\x0e \x01(\v2&.cyber.esports.v1.TrackingMovingDetailH\x00R\x0etrackingMoving\x12K\n" +
+	"\rmoving_target\x18\x0f \x01(\v2$.cyber.esports.v1.MovingTargetDetailH\x00R\fmovingTarget\x12T\n" +
+	"\x10skill_trajectory\x18\x10 \x01(\v2'.cyber.esports.v1.SkillTrajectoryDetailH\x00R\x0fskillTrajectory\x12?\n" +
+	"\tdual_zone\x18\x11 \x01(\v2 .cyber.esports.v1.DualZoneDetailH\x00R\bdualZone\x12H\n" +
+	"\fnumber_stars\x18\x12 \x01(\v2#.cyber.esports.v1.NumberStarsDetailH\x00R\vnumberStars\x12Q\n" +
+	"\x0foffense_defense\x18\x13 \x01(\v2&.cyber.esports.v1.OffenseDefenseDetailH\x00R\x0eoffenseDefense\x12W\n" +
+	"\x11character_counter\x18\x14 \x01(\v2(.cyber.esports.v1.CharacterCounterDetailH\x00R\x10characterCounter\x12N\n" +
+	"\x0eresource_match\x18\x15 \x01(\v2%.cyber.esports.v1.ResourceMatchDetailH\x00R\rresourceMatch\x12H\n" +
+	"\feconomic_sim\x18\x16 \x01(\v2#.cyber.esports.v1.EconomicSimDetailH\x00R\veconomicSimB\f\n" +
+	"\n" +
+	"raw_detail\"\xb2\x02\n" +
+	"\x19SubmitTestAttemptResponse\x12\x1b\n" +
+	"\trecord_id\x18\x01 \x01(\tR\brecordId\x12\x1b\n" +
+	"\traw_score\x18\x02 \x01(\x01R\brawScore\x12/\n" +
+	"\x13authoritative_score\x18\x03 \x01(\x01R\x12authoritativeScore\x12\x14\n" +
+	"\x05grade\x18\x04 \x01(\tR\x05grade\x12\x18\n" +
+	"\aability\x18\x05 \x01(\tR\aability\x12\x14\n" +
+	"\x05valid\x18\x06 \x01(\bR\x05valid\x12C\n" +
+	"\x0einvalid_reason\x18\a \x01(\v2\x1c.google.protobuf.StringValueR\rinvalidReason\x12\x1f\n" +
+	"\vretest_left\x18\b \x01(\x05R\n" +
+	"retestLeft\"P\n" +
+	"\fRedDotDetail\x12@\n" +
+	"\x06events\x18\x01 \x03(\v2\x1d.cyber.esports.v1.RedDotEventB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x06events\"\xd5\x01\n" +
+	"\vRedDotEvent\x12/\n" +
+	"\x06target\x18\x01 \x01(\v2\x17.cyber.esports.v1.PointR\x06target\x12-\n" +
+	"\x05click\x18\x02 \x01(\v2\x17.cyber.esports.v1.PointR\x05click\x121\n" +
+	"\x10reaction_time_ms\x18\x03 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\x0ereactionTimeMs\x12\x1c\n" +
+	"\tdeviation\x18\x04 \x01(\x01R\tdeviation\x12\x15\n" +
+	"\x06is_hit\x18\x05 \x01(\bR\x05isHit\"W\n" +
+	"\x11FlashAimingDetail\x12B\n" +
+	"\x05shots\x18\x01 \x03(\v2!.cyber.esports.v1.FlashAimingShotB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x05shots\"\xf6\x01\n" +
+	"\x0fFlashAimingShot\x12\x1b\n" +
+	"\ttarget_id\x18\x01 \x01(\tR\btargetId\x12/\n" +
+	"\x06target\x18\x02 \x01(\v2\x17.cyber.esports.v1.PointR\x06target\x12\x1f\n" +
+	"\vtarget_size\x18\x03 \x01(\x01R\n" +
+	"targetSize\x12-\n" +
+	"\x05click\x18\x04 \x01(\v2\x17.cyber.esports.v1.PointR\x05click\x12\x1c\n" +
+	"\tdeviation\x18\x05 \x01(\x01R\tdeviation\x12'\n" +
+	"\vaim_time_ms\x18\x06 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\taimTimeMs\"W\n" +
+	"\x11MultiTargetDetail\x12B\n" +
+	"\x05picks\x18\x01 \x03(\v2!.cyber.esports.v1.MultiTargetPickB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x05picks\"\x8c\x01\n" +
+	"\x0fMultiTargetPick\x12\x1b\n" +
+	"\ttarget_id\x18\x01 \x01(\tR\btargetId\x12\x1d\n" +
+	"\x04tier\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\x04tier\x12\x15\n" +
+	"\x06is_hit\x18\x03 \x01(\bR\x05isHit\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x04 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"f\n" +
+	"\x17TargetRecognitionDetail\x12K\n" +
+	"\x06clicks\x18\x01 \x03(\v2(.cyber.esports.v1.TargetRecognitionClickB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x06clicks\"\xd6\x01\n" +
+	"\x16TargetRecognitionClick\x12\x1b\n" +
+	"\ttarget_id\x18\x01 \x01(\tR\btargetId\x12*\n" +
+	"\vtarget_type\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\n" +
+	"targetType\x126\n" +
+	"\x10reaction_time_ms\x18\x03 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00H\x00R\x0ereactionTimeMs\x88\x01\x01\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x04 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMsB\x13\n" +
+	"\x11_reaction_time_ms\"`\n" +
+	"\x14TrackingMovingDetail\x12H\n" +
+	"\x06frames\x18\x01 \x03(\v2%.cyber.esports.v1.TrackingMovingFrameB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x06frames\"\xf4\x01\n" +
+	"\x13TrackingMovingFrame\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12/\n" +
+	"\x06target\x18\x02 \x01(\v2\x17.cyber.esports.v1.PointR\x06target\x125\n" +
+	"\tcrosshair\x18\x03 \x01(\v2\x17.cyber.esports.v1.PointR\tcrosshair\x12\x1c\n" +
+	"\tdeviation\x18\x04 \x01(\x01R\tdeviation\x12/\n" +
+	"\x06player\x18\x05 \x01(\v2\x17.cyber.esports.v1.PointR\x06player\"Y\n" +
+	"\x12MovingTargetDetail\x12C\n" +
+	"\x05shots\x18\x01 \x03(\v2\".cyber.esports.v1.MovingTargetShotB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x05shots\"\xf7\x01\n" +
+	"\x10MovingTargetShot\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12/\n" +
+	"\x06target\x18\x02 \x01(\v2\x17.cyber.esports.v1.PointR\x06target\x125\n" +
+	"\tcrosshair\x18\x03 \x01(\v2\x17.cyber.esports.v1.PointR\tcrosshair\x12\x1c\n" +
+	"\tdeviation\x18\x04 \x01(\x01R\tdeviation\x12\x10\n" +
+	"\x03hit\x18\x05 \x01(\bR\x03hit\x12#\n" +
+	"\apattern\x18\x06 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\apattern\"\x83\x01\n" +
+	"\x15SkillTrajectoryDetail\x12\x1f\n" +
+	"\vrandom_seed\x18\x01 \x01(\x03R\n" +
+	"randomSeed\x12I\n" +
+	"\x06rounds\x18\x02 \x03(\v2&.cyber.esports.v1.SkillTrajectoryRoundB\t\xbaH\x06\x92\x01\x03\x10\x80\x02R\x06rounds\"\x90\x04\n" +
+	"\x14SkillTrajectoryRound\x12!\n" +
+	"\fround_number\x18\x01 \x01(\x05R\vroundNumber\x12\x1d\n" +
+	"\n" +
+	"graphic_id\x18\x02 \x01(\tR\tgraphicId\x12\x1f\n" +
+	"\x05shape\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\x05shape\x12!\n" +
+	"\fgraphic_size\x18\x04 \x01(\x01R\vgraphicSize\x12\x1d\n" +
+	"\n" +
+	"color_name\x18\x05 \x01(\tR\tcolorName\x12D\n" +
+	"\x11original_position\x18\x06 \x01(\v2\x17.cyber.esports.v1.PointR\x10originalPosition\x12B\n" +
+	"\n" +
+	"trajectory\x18\a \x03(\v2\x17.cyber.esports.v1.PointB\t\xbaH\x06\x92\x01\x03\x10\x80 R\n" +
+	"trajectory\x12B\n" +
+	"\x10player_placement\x18\b \x01(\v2\x17.cyber.esports.v1.PointR\x0fplayerPlacement\x12\x1c\n" +
+	"\tdeviation\x18\t \x01(\x01R\tdeviation\x123\n" +
+	"\x11placement_time_ms\x18\n" +
+	" \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\x0fplacementTimeMs\x12\x1a\n" +
+	"\bselected\x18\v \x01(\bR\bselected\x12\x16\n" +
+	"\x06placed\x18\f \x01(\bR\x06placed\"]\n" +
+	"\x0eDualZoneDetail\x12K\n" +
+	"\tbehaviors\x18\x01 \x03(\v2\".cyber.esports.v1.DualZoneBehaviorB\t\xbaH\x06\x92\x01\x03\x10\x80 R\tbehaviors\"\xf7\x01\n" +
+	"\x10DualZoneBehavior\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12\x1d\n" +
+	"\x04zone\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\x04zone\x12\x1f\n" +
+	"\x05event\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\x05event\x128\n" +
+	"\bposition\x18\x04 \x01(\v2\x17.cyber.esports.v1.PointH\x00R\bposition\x88\x01\x01\x12$\n" +
+	"\vobstacle_id\x18\x05 \x01(\x05H\x01R\n" +
+	"obstacleId\x88\x01\x01B\v\n" +
+	"\t_positionB\x0e\n" +
+	"\f_obstacle_id\"Z\n" +
+	"\x11NumberStarsDetail\x12E\n" +
+	"\x06rounds\x18\x01 \x03(\v2\".cyber.esports.v1.NumberStarsRoundB\t\xbaH\x06\x92\x01\x03\x10\x80\x02R\x06rounds\"\xa1\x01\n" +
+	"\x10NumberStarsRound\x12!\n" +
+	"\fround_number\x18\x01 \x01(\x05R\vroundNumber\x12#\n" +
+	"\anumbers\x18\x02 \x03(\x05B\t\xbaH\x06\x92\x01\x03\x10\x80\x01R\anumbers\x12E\n" +
+	"\x06clicks\x18\x03 \x03(\v2\".cyber.esports.v1.NumberStarsClickB\t\xbaH\x06\x92\x01\x03\x10\x80\bR\x06clicks\"\x87\x01\n" +
+	"\x10NumberStarsClick\x12\x16\n" +
+	"\x06number\x18\x01 \x01(\x05R\x06number\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x123\n" +
+	"\bposition\x18\x03 \x01(\v2\x17.cyber.esports.v1.PointR\bposition\"i\n" +
+	"\x14OffenseDefenseDetail\x12Q\n" +
+	"\tdecisions\x18\x01 \x03(\v2(.cyber.esports.v1.OffenseDefenseDecisionB\t\xbaH\x06\x92\x01\x03\x10\x80\bR\tdecisions\"\xb7\x01\n" +
+	"\x16OffenseDefenseDecision\x12\x1f\n" +
+	"\vscenario_id\x18\x01 \x01(\tR\n" +
+	"scenarioId\x12$\n" +
+	"\x06choice\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x18\x10H\x00R\x06choice\x88\x01\x01\x121\n" +
+	"\x10decision_time_ms\x18\x03 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\x0edecisionTimeMs\x12\x18\n" +
+	"\atimeout\x18\x04 \x01(\bR\atimeoutB\t\n" +
+	"\a_choice\"d\n" +
+	"\x16CharacterCounterDetail\x12J\n" +
+	"\x06rounds\x18\x01 \x03(\v2'.cyber.esports.v1.CharacterCounterRoundB\t\xbaH\x06\x92\x01\x03\x10\x80\x02R\x06rounds\"\xc7\x01\n" +
+	"\x15CharacterCounterRound\x12!\n" +
+	"\fround_number\x18\x01 \x01(\x05R\vroundNumber\x12+\n" +
+	"\fenemy_lineup\x18\x02 \x03(\tB\b\xbaH\x05\x92\x01\x02\x10\bR\venemyLineup\x121\n" +
+	"\x0fselected_lineup\x18\x03 \x03(\tB\b\xbaH\x05\x92\x01\x02\x10\bR\x0eselectedLineup\x12+\n" +
+	"\rtime_spent_ms\x18\x04 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\vtimeSpentMs\"\xbf\x01\n" +
+	"\x13ResourceMatchDetail\x12Y\n" +
+	"\n" +
+	"trajectory\x18\x01 \x03(\v2..cyber.esports.v1.ResourceMatchTrajectoryPointB\t\xbaH\x06\x92\x01\x03\x10\x80@R\n" +
+	"trajectory\x12M\n" +
+	"\bcollects\x18\x02 \x03(\v2&.cyber.esports.v1.ResourceMatchCollectB\t\xbaH\x06\x92\x01\x03\x10\x80\bR\bcollects\"\x8f\x01\n" +
+	"\x1cResourceMatchTrajectoryPoint\x123\n" +
+	"\bposition\x18\x01 \x01(\v2\x17.cyber.esports.v1.PointR\bposition\x12+\n" +
+	"\n" +
+	"elapsed_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00H\x00R\telapsedMs\x88\x01\x01B\r\n" +
+	"\v_elapsed_ms\"]\n" +
+	"\x14ResourceMatchCollect\x12\x1d\n" +
+	"\x04kind\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\x04kind\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"\xb1\x01\n" +
+	"\x11EconomicSimDetail\x12L\n" +
+	"\tlast_hits\x18\x01 \x03(\v2$.cyber.esports.v1.EconomicSimLastHitB\t\xbaH\x06\x92\x01\x03\x10\x80 R\blastHits\x12N\n" +
+	"\tpurchases\x18\x02 \x03(\v2%.cyber.esports.v1.EconomicSimPurchaseB\t\xbaH\x06\x92\x01\x03\x10\x80\bR\tpurchases\"}\n" +
+	"\x12EconomicSimLastHit\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12\x1e\n" +
+	"\vis_last_hit\x18\x02 \x01(\bR\tisLastHit\x12\x1f\n" +
+	"\vgold_earned\x18\x03 \x01(\x05R\n" +
+	"goldEarned\"\x82\x01\n" +
+	"\x13EconomicSimPurchase\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12&\n" +
+	"\titem_name\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@R\bitemName\x12\x1b\n" +
+	"\x04cost\x18\x03 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\x04cost2\xa4\x05\n" +
 	"\vTestService\x12\x8e\x01\n" +
 	"\tListTests\x12\".cyber.esports.v1.ListTestsRequest\x1a#.cyber.esports.v1.ListTestsResponse\"8\x88\xf1\x04\x04\x8a\xd3\x0e\x13\n" +
 	"\x0f测试项列表\x10\x01\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/esports/tests\x12\x8d\x01\n" +
 	"\aGetTest\x12 .cyber.esports.v1.GetTestRequest\x1a!.cyber.esports.v1.GetTestResponse\"=\x88\xf1\x04\x04\x8a\xd3\x0e\x13\n" +
 	"\x0f测试项详情\x10\x01\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/esports/tests/{id}\x12\xac\x01\n" +
 	"\rGetTestConfig\x12&.cyber.esports.v1.GetTestConfigRequest\x1a'.cyber.esports.v1.GetTestConfigResponse\"J\x88\xf1\x04\x04\x8a\xd3\x0e\x19\n" +
-	"\x15测试项运行配置\x10\x01\x82\xd3\xe4\x93\x02#\x12!/api/v1/esports/tests/{id}/config\x1a\r\x8a\xe2\t\t测试项B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	"\x15测试项运行配置\x10\x01\x82\xd3\xe4\x93\x02#\x12!/api/v1/esports/tests/{id}/config\x12\xb5\x01\n" +
+	"\x11SubmitTestAttempt\x12*.cyber.esports.v1.SubmitTestAttemptRequest\x1a+.cyber.esports.v1.SubmitTestAttemptResponse\"G\x88\xf1\x04\x04\x8a\xd3\x0e\x16\n" +
+	"\x12提交测试尝试\x10\x02\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/esports/tests/attempts\x1a\r\x8a\xe2\t\t测试项B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_test_proto_rawDescOnce sync.Once
@@ -564,47 +3041,130 @@ func file_cyber_esports_v1_test_proto_rawDescGZIP() []byte {
 	return file_cyber_esports_v1_test_proto_rawDescData
 }
 
-var file_cyber_esports_v1_test_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_cyber_esports_v1_test_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
 var file_cyber_esports_v1_test_proto_goTypes = []any{
-	(*Test)(nil),                   // 0: cyber.esports.v1.Test
-	(*ListTestsRequest)(nil),       // 1: cyber.esports.v1.ListTestsRequest
-	(*ListTestsResponse)(nil),      // 2: cyber.esports.v1.ListTestsResponse
-	(*GetTestRequest)(nil),         // 3: cyber.esports.v1.GetTestRequest
-	(*GetTestResponse)(nil),        // 4: cyber.esports.v1.GetTestResponse
-	(*GetTestConfigRequest)(nil),   // 5: cyber.esports.v1.GetTestConfigRequest
-	(*GetTestConfigResponse)(nil),  // 6: cyber.esports.v1.GetTestConfigResponse
-	(*TestConfig)(nil),             // 7: cyber.esports.v1.TestConfig
-	nil,                            // 8: cyber.esports.v1.TestConfig.EngineParamsEntry
-	(*wrapperspb.StringValue)(nil), // 9: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),  // 10: google.protobuf.Timestamp
+	(*Test)(nil),                         // 0: cyber.esports.v1.Test
+	(*ListTestsRequest)(nil),             // 1: cyber.esports.v1.ListTestsRequest
+	(*ListTestsResponse)(nil),            // 2: cyber.esports.v1.ListTestsResponse
+	(*GetTestRequest)(nil),               // 3: cyber.esports.v1.GetTestRequest
+	(*GetTestResponse)(nil),              // 4: cyber.esports.v1.GetTestResponse
+	(*GetTestConfigRequest)(nil),         // 5: cyber.esports.v1.GetTestConfigRequest
+	(*GetTestConfigResponse)(nil),        // 6: cyber.esports.v1.GetTestConfigResponse
+	(*TestConfig)(nil),                   // 7: cyber.esports.v1.TestConfig
+	(*Point)(nil),                        // 8: cyber.esports.v1.Point
+	(*BackgroundSpan)(nil),               // 9: cyber.esports.v1.BackgroundSpan
+	(*SubmitTestAttemptRequest)(nil),     // 10: cyber.esports.v1.SubmitTestAttemptRequest
+	(*SubmitTestAttemptResponse)(nil),    // 11: cyber.esports.v1.SubmitTestAttemptResponse
+	(*RedDotDetail)(nil),                 // 12: cyber.esports.v1.RedDotDetail
+	(*RedDotEvent)(nil),                  // 13: cyber.esports.v1.RedDotEvent
+	(*FlashAimingDetail)(nil),            // 14: cyber.esports.v1.FlashAimingDetail
+	(*FlashAimingShot)(nil),              // 15: cyber.esports.v1.FlashAimingShot
+	(*MultiTargetDetail)(nil),            // 16: cyber.esports.v1.MultiTargetDetail
+	(*MultiTargetPick)(nil),              // 17: cyber.esports.v1.MultiTargetPick
+	(*TargetRecognitionDetail)(nil),      // 18: cyber.esports.v1.TargetRecognitionDetail
+	(*TargetRecognitionClick)(nil),       // 19: cyber.esports.v1.TargetRecognitionClick
+	(*TrackingMovingDetail)(nil),         // 20: cyber.esports.v1.TrackingMovingDetail
+	(*TrackingMovingFrame)(nil),          // 21: cyber.esports.v1.TrackingMovingFrame
+	(*MovingTargetDetail)(nil),           // 22: cyber.esports.v1.MovingTargetDetail
+	(*MovingTargetShot)(nil),             // 23: cyber.esports.v1.MovingTargetShot
+	(*SkillTrajectoryDetail)(nil),        // 24: cyber.esports.v1.SkillTrajectoryDetail
+	(*SkillTrajectoryRound)(nil),         // 25: cyber.esports.v1.SkillTrajectoryRound
+	(*DualZoneDetail)(nil),               // 26: cyber.esports.v1.DualZoneDetail
+	(*DualZoneBehavior)(nil),             // 27: cyber.esports.v1.DualZoneBehavior
+	(*NumberStarsDetail)(nil),            // 28: cyber.esports.v1.NumberStarsDetail
+	(*NumberStarsRound)(nil),             // 29: cyber.esports.v1.NumberStarsRound
+	(*NumberStarsClick)(nil),             // 30: cyber.esports.v1.NumberStarsClick
+	(*OffenseDefenseDetail)(nil),         // 31: cyber.esports.v1.OffenseDefenseDetail
+	(*OffenseDefenseDecision)(nil),       // 32: cyber.esports.v1.OffenseDefenseDecision
+	(*CharacterCounterDetail)(nil),       // 33: cyber.esports.v1.CharacterCounterDetail
+	(*CharacterCounterRound)(nil),        // 34: cyber.esports.v1.CharacterCounterRound
+	(*ResourceMatchDetail)(nil),          // 35: cyber.esports.v1.ResourceMatchDetail
+	(*ResourceMatchTrajectoryPoint)(nil), // 36: cyber.esports.v1.ResourceMatchTrajectoryPoint
+	(*ResourceMatchCollect)(nil),         // 37: cyber.esports.v1.ResourceMatchCollect
+	(*EconomicSimDetail)(nil),            // 38: cyber.esports.v1.EconomicSimDetail
+	(*EconomicSimLastHit)(nil),           // 39: cyber.esports.v1.EconomicSimLastHit
+	(*EconomicSimPurchase)(nil),          // 40: cyber.esports.v1.EconomicSimPurchase
+	nil,                                  // 41: cyber.esports.v1.TestConfig.EngineParamsEntry
+	(*wrapperspb.StringValue)(nil),       // 42: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),        // 43: google.protobuf.Timestamp
 }
 var file_cyber_esports_v1_test_proto_depIdxs = []int32{
-	9,  // 0: cyber.esports.v1.Test.id:type_name -> google.protobuf.StringValue
-	9,  // 1: cyber.esports.v1.Test.code:type_name -> google.protobuf.StringValue
-	9,  // 2: cyber.esports.v1.Test.name:type_name -> google.protobuf.StringValue
-	9,  // 3: cyber.esports.v1.Test.category:type_name -> google.protobuf.StringValue
-	9,  // 4: cyber.esports.v1.Test.ability:type_name -> google.protobuf.StringValue
-	9,  // 5: cyber.esports.v1.Test.description:type_name -> google.protobuf.StringValue
-	9,  // 6: cyber.esports.v1.Test.unit_score_label:type_name -> google.protobuf.StringValue
-	10, // 7: cyber.esports.v1.Test.created_at:type_name -> google.protobuf.Timestamp
-	10, // 8: cyber.esports.v1.Test.updated_at:type_name -> google.protobuf.Timestamp
+	42, // 0: cyber.esports.v1.Test.id:type_name -> google.protobuf.StringValue
+	42, // 1: cyber.esports.v1.Test.code:type_name -> google.protobuf.StringValue
+	42, // 2: cyber.esports.v1.Test.name:type_name -> google.protobuf.StringValue
+	42, // 3: cyber.esports.v1.Test.category:type_name -> google.protobuf.StringValue
+	42, // 4: cyber.esports.v1.Test.ability:type_name -> google.protobuf.StringValue
+	42, // 5: cyber.esports.v1.Test.description:type_name -> google.protobuf.StringValue
+	42, // 6: cyber.esports.v1.Test.unit_score_label:type_name -> google.protobuf.StringValue
+	43, // 7: cyber.esports.v1.Test.created_at:type_name -> google.protobuf.Timestamp
+	43, // 8: cyber.esports.v1.Test.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 9: cyber.esports.v1.ListTestsResponse.tests:type_name -> cyber.esports.v1.Test
 	0,  // 10: cyber.esports.v1.GetTestResponse.test:type_name -> cyber.esports.v1.Test
-	9,  // 11: cyber.esports.v1.GetTestResponse.introduction:type_name -> google.protobuf.StringValue
+	42, // 11: cyber.esports.v1.GetTestResponse.introduction:type_name -> google.protobuf.StringValue
 	7,  // 12: cyber.esports.v1.GetTestConfigResponse.config:type_name -> cyber.esports.v1.TestConfig
-	9,  // 13: cyber.esports.v1.TestConfig.test_id:type_name -> google.protobuf.StringValue
-	8,  // 14: cyber.esports.v1.TestConfig.engine_params:type_name -> cyber.esports.v1.TestConfig.EngineParamsEntry
-	1,  // 15: cyber.esports.v1.TestService.ListTests:input_type -> cyber.esports.v1.ListTestsRequest
-	3,  // 16: cyber.esports.v1.TestService.GetTest:input_type -> cyber.esports.v1.GetTestRequest
-	5,  // 17: cyber.esports.v1.TestService.GetTestConfig:input_type -> cyber.esports.v1.GetTestConfigRequest
-	2,  // 18: cyber.esports.v1.TestService.ListTests:output_type -> cyber.esports.v1.ListTestsResponse
-	4,  // 19: cyber.esports.v1.TestService.GetTest:output_type -> cyber.esports.v1.GetTestResponse
-	6,  // 20: cyber.esports.v1.TestService.GetTestConfig:output_type -> cyber.esports.v1.GetTestConfigResponse
-	18, // [18:21] is the sub-list for method output_type
-	15, // [15:18] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	42, // 13: cyber.esports.v1.TestConfig.test_id:type_name -> google.protobuf.StringValue
+	41, // 14: cyber.esports.v1.TestConfig.engine_params:type_name -> cyber.esports.v1.TestConfig.EngineParamsEntry
+	43, // 15: cyber.esports.v1.SubmitTestAttemptRequest.started_at:type_name -> google.protobuf.Timestamp
+	43, // 16: cyber.esports.v1.SubmitTestAttemptRequest.ended_at:type_name -> google.protobuf.Timestamp
+	9,  // 17: cyber.esports.v1.SubmitTestAttemptRequest.backgrounds:type_name -> cyber.esports.v1.BackgroundSpan
+	12, // 18: cyber.esports.v1.SubmitTestAttemptRequest.red_dot:type_name -> cyber.esports.v1.RedDotDetail
+	14, // 19: cyber.esports.v1.SubmitTestAttemptRequest.flash_aiming:type_name -> cyber.esports.v1.FlashAimingDetail
+	16, // 20: cyber.esports.v1.SubmitTestAttemptRequest.multi_target:type_name -> cyber.esports.v1.MultiTargetDetail
+	18, // 21: cyber.esports.v1.SubmitTestAttemptRequest.target_recognition:type_name -> cyber.esports.v1.TargetRecognitionDetail
+	20, // 22: cyber.esports.v1.SubmitTestAttemptRequest.tracking_moving:type_name -> cyber.esports.v1.TrackingMovingDetail
+	22, // 23: cyber.esports.v1.SubmitTestAttemptRequest.moving_target:type_name -> cyber.esports.v1.MovingTargetDetail
+	24, // 24: cyber.esports.v1.SubmitTestAttemptRequest.skill_trajectory:type_name -> cyber.esports.v1.SkillTrajectoryDetail
+	26, // 25: cyber.esports.v1.SubmitTestAttemptRequest.dual_zone:type_name -> cyber.esports.v1.DualZoneDetail
+	28, // 26: cyber.esports.v1.SubmitTestAttemptRequest.number_stars:type_name -> cyber.esports.v1.NumberStarsDetail
+	31, // 27: cyber.esports.v1.SubmitTestAttemptRequest.offense_defense:type_name -> cyber.esports.v1.OffenseDefenseDetail
+	33, // 28: cyber.esports.v1.SubmitTestAttemptRequest.character_counter:type_name -> cyber.esports.v1.CharacterCounterDetail
+	35, // 29: cyber.esports.v1.SubmitTestAttemptRequest.resource_match:type_name -> cyber.esports.v1.ResourceMatchDetail
+	38, // 30: cyber.esports.v1.SubmitTestAttemptRequest.economic_sim:type_name -> cyber.esports.v1.EconomicSimDetail
+	42, // 31: cyber.esports.v1.SubmitTestAttemptResponse.invalid_reason:type_name -> google.protobuf.StringValue
+	13, // 32: cyber.esports.v1.RedDotDetail.events:type_name -> cyber.esports.v1.RedDotEvent
+	8,  // 33: cyber.esports.v1.RedDotEvent.target:type_name -> cyber.esports.v1.Point
+	8,  // 34: cyber.esports.v1.RedDotEvent.click:type_name -> cyber.esports.v1.Point
+	15, // 35: cyber.esports.v1.FlashAimingDetail.shots:type_name -> cyber.esports.v1.FlashAimingShot
+	8,  // 36: cyber.esports.v1.FlashAimingShot.target:type_name -> cyber.esports.v1.Point
+	8,  // 37: cyber.esports.v1.FlashAimingShot.click:type_name -> cyber.esports.v1.Point
+	17, // 38: cyber.esports.v1.MultiTargetDetail.picks:type_name -> cyber.esports.v1.MultiTargetPick
+	19, // 39: cyber.esports.v1.TargetRecognitionDetail.clicks:type_name -> cyber.esports.v1.TargetRecognitionClick
+	21, // 40: cyber.esports.v1.TrackingMovingDetail.frames:type_name -> cyber.esports.v1.TrackingMovingFrame
+	8,  // 41: cyber.esports.v1.TrackingMovingFrame.target:type_name -> cyber.esports.v1.Point
+	8,  // 42: cyber.esports.v1.TrackingMovingFrame.crosshair:type_name -> cyber.esports.v1.Point
+	8,  // 43: cyber.esports.v1.TrackingMovingFrame.player:type_name -> cyber.esports.v1.Point
+	23, // 44: cyber.esports.v1.MovingTargetDetail.shots:type_name -> cyber.esports.v1.MovingTargetShot
+	8,  // 45: cyber.esports.v1.MovingTargetShot.target:type_name -> cyber.esports.v1.Point
+	8,  // 46: cyber.esports.v1.MovingTargetShot.crosshair:type_name -> cyber.esports.v1.Point
+	25, // 47: cyber.esports.v1.SkillTrajectoryDetail.rounds:type_name -> cyber.esports.v1.SkillTrajectoryRound
+	8,  // 48: cyber.esports.v1.SkillTrajectoryRound.original_position:type_name -> cyber.esports.v1.Point
+	8,  // 49: cyber.esports.v1.SkillTrajectoryRound.trajectory:type_name -> cyber.esports.v1.Point
+	8,  // 50: cyber.esports.v1.SkillTrajectoryRound.player_placement:type_name -> cyber.esports.v1.Point
+	27, // 51: cyber.esports.v1.DualZoneDetail.behaviors:type_name -> cyber.esports.v1.DualZoneBehavior
+	8,  // 52: cyber.esports.v1.DualZoneBehavior.position:type_name -> cyber.esports.v1.Point
+	29, // 53: cyber.esports.v1.NumberStarsDetail.rounds:type_name -> cyber.esports.v1.NumberStarsRound
+	30, // 54: cyber.esports.v1.NumberStarsRound.clicks:type_name -> cyber.esports.v1.NumberStarsClick
+	8,  // 55: cyber.esports.v1.NumberStarsClick.position:type_name -> cyber.esports.v1.Point
+	32, // 56: cyber.esports.v1.OffenseDefenseDetail.decisions:type_name -> cyber.esports.v1.OffenseDefenseDecision
+	34, // 57: cyber.esports.v1.CharacterCounterDetail.rounds:type_name -> cyber.esports.v1.CharacterCounterRound
+	36, // 58: cyber.esports.v1.ResourceMatchDetail.trajectory:type_name -> cyber.esports.v1.ResourceMatchTrajectoryPoint
+	37, // 59: cyber.esports.v1.ResourceMatchDetail.collects:type_name -> cyber.esports.v1.ResourceMatchCollect
+	8,  // 60: cyber.esports.v1.ResourceMatchTrajectoryPoint.position:type_name -> cyber.esports.v1.Point
+	39, // 61: cyber.esports.v1.EconomicSimDetail.last_hits:type_name -> cyber.esports.v1.EconomicSimLastHit
+	40, // 62: cyber.esports.v1.EconomicSimDetail.purchases:type_name -> cyber.esports.v1.EconomicSimPurchase
+	1,  // 63: cyber.esports.v1.TestService.ListTests:input_type -> cyber.esports.v1.ListTestsRequest
+	3,  // 64: cyber.esports.v1.TestService.GetTest:input_type -> cyber.esports.v1.GetTestRequest
+	5,  // 65: cyber.esports.v1.TestService.GetTestConfig:input_type -> cyber.esports.v1.GetTestConfigRequest
+	10, // 66: cyber.esports.v1.TestService.SubmitTestAttempt:input_type -> cyber.esports.v1.SubmitTestAttemptRequest
+	2,  // 67: cyber.esports.v1.TestService.ListTests:output_type -> cyber.esports.v1.ListTestsResponse
+	4,  // 68: cyber.esports.v1.TestService.GetTest:output_type -> cyber.esports.v1.GetTestResponse
+	6,  // 69: cyber.esports.v1.TestService.GetTestConfig:output_type -> cyber.esports.v1.GetTestConfigResponse
+	11, // 70: cyber.esports.v1.TestService.SubmitTestAttempt:output_type -> cyber.esports.v1.SubmitTestAttemptResponse
+	67, // [67:71] is the sub-list for method output_type
+	63, // [63:67] is the sub-list for method input_type
+	63, // [63:63] is the sub-list for extension type_name
+	63, // [63:63] is the sub-list for extension extendee
+	0,  // [0:63] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_test_proto_init() }
@@ -612,13 +3172,32 @@ func file_cyber_esports_v1_test_proto_init() {
 	if File_cyber_esports_v1_test_proto != nil {
 		return
 	}
+	file_cyber_esports_v1_test_proto_msgTypes[10].OneofWrappers = []any{
+		(*SubmitTestAttemptRequest_RedDot)(nil),
+		(*SubmitTestAttemptRequest_FlashAiming)(nil),
+		(*SubmitTestAttemptRequest_MultiTarget)(nil),
+		(*SubmitTestAttemptRequest_TargetRecognition)(nil),
+		(*SubmitTestAttemptRequest_TrackingMoving)(nil),
+		(*SubmitTestAttemptRequest_MovingTarget)(nil),
+		(*SubmitTestAttemptRequest_SkillTrajectory)(nil),
+		(*SubmitTestAttemptRequest_DualZone)(nil),
+		(*SubmitTestAttemptRequest_NumberStars)(nil),
+		(*SubmitTestAttemptRequest_OffenseDefense)(nil),
+		(*SubmitTestAttemptRequest_CharacterCounter)(nil),
+		(*SubmitTestAttemptRequest_ResourceMatch)(nil),
+		(*SubmitTestAttemptRequest_EconomicSim)(nil),
+	}
+	file_cyber_esports_v1_test_proto_msgTypes[19].OneofWrappers = []any{}
+	file_cyber_esports_v1_test_proto_msgTypes[27].OneofWrappers = []any{}
+	file_cyber_esports_v1_test_proto_msgTypes[32].OneofWrappers = []any{}
+	file_cyber_esports_v1_test_proto_msgTypes[36].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_test_proto_rawDesc), len(file_cyber_esports_v1_test_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   42,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -12,4 +12,5 @@ func RegisterTestServiceConnectServer(srv *connect.Server, svc TestServiceServer
 	connect.HandleUnary(srv, "/cyber.esports.v1.TestService/ListTests", svc.ListTests)
 	connect.HandleUnary(srv, "/cyber.esports.v1.TestService/GetTest", svc.GetTest)
 	connect.HandleUnary(srv, "/cyber.esports.v1.TestService/GetTestConfig", svc.GetTestConfig)
+	connect.HandleUnary(srv, "/cyber.esports.v1.TestService/SubmitTestAttempt", svc.SubmitTestAttempt)
 }

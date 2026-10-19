@@ -40,6 +40,9 @@ const (
 	// TestServiceGetTestConfigProcedure is the fully-qualified name of the TestService's GetTestConfig
 	// RPC.
 	TestServiceGetTestConfigProcedure = "/cyber.esports.v1.TestService/GetTestConfig"
+	// TestServiceSubmitTestAttemptProcedure is the fully-qualified name of the TestService's
+	// SubmitTestAttempt RPC.
+	TestServiceSubmitTestAttemptProcedure = "/cyber.esports.v1.TestService/SubmitTestAttempt"
 )
 
 // TestServiceClient is a client for the cyber.esports.v1.TestService service.
@@ -47,6 +50,14 @@ type TestServiceClient interface {
 	ListTests(context.Context, *connect.Request[v1.ListTestsRequest]) (*connect.Response[v1.ListTestsResponse], error)
 	GetTest(context.Context, *connect.Request[v1.GetTestRequest]) (*connect.Response[v1.GetTestResponse], error)
 	GetTestConfig(context.Context, *connect.Request[v1.GetTestConfigRequest]) (*connect.Response[v1.GetTestConfigResponse], error)
+	// The unified attempt submission — one RPC replacing the legacy fourteen
+	// per-game endpoints. Facts up, verdicts down: the client sends only
+	// event facts (coordinates, timings, choices, environment); every
+	// aggregate score is recomputed server-side from the detail stream and
+	// returned as the dual-track verdict (§0.5). The admin record read face
+	// (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+	// contract's stored shape and lands with E9.
+	SubmitTestAttempt(context.Context, *connect.Request[v1.SubmitTestAttemptRequest]) (*connect.Response[v1.SubmitTestAttemptResponse], error)
 }
 
 // NewTestServiceClient constructs a client for the cyber.esports.v1.TestService service. By
@@ -78,14 +89,21 @@ func NewTestServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(testServiceMethods.ByName("GetTestConfig")),
 			connect.WithClientOptions(opts...),
 		),
+		submitTestAttempt: connect.NewClient[v1.SubmitTestAttemptRequest, v1.SubmitTestAttemptResponse](
+			httpClient,
+			baseURL+TestServiceSubmitTestAttemptProcedure,
+			connect.WithSchema(testServiceMethods.ByName("SubmitTestAttempt")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // testServiceClient implements TestServiceClient.
 type testServiceClient struct {
-	listTests     *connect.Client[v1.ListTestsRequest, v1.ListTestsResponse]
-	getTest       *connect.Client[v1.GetTestRequest, v1.GetTestResponse]
-	getTestConfig *connect.Client[v1.GetTestConfigRequest, v1.GetTestConfigResponse]
+	listTests         *connect.Client[v1.ListTestsRequest, v1.ListTestsResponse]
+	getTest           *connect.Client[v1.GetTestRequest, v1.GetTestResponse]
+	getTestConfig     *connect.Client[v1.GetTestConfigRequest, v1.GetTestConfigResponse]
+	submitTestAttempt *connect.Client[v1.SubmitTestAttemptRequest, v1.SubmitTestAttemptResponse]
 }
 
 // ListTests calls cyber.esports.v1.TestService.ListTests.
@@ -103,11 +121,24 @@ func (c *testServiceClient) GetTestConfig(ctx context.Context, req *connect.Requ
 	return c.getTestConfig.CallUnary(ctx, req)
 }
 
+// SubmitTestAttempt calls cyber.esports.v1.TestService.SubmitTestAttempt.
+func (c *testServiceClient) SubmitTestAttempt(ctx context.Context, req *connect.Request[v1.SubmitTestAttemptRequest]) (*connect.Response[v1.SubmitTestAttemptResponse], error) {
+	return c.submitTestAttempt.CallUnary(ctx, req)
+}
+
 // TestServiceHandler is an implementation of the cyber.esports.v1.TestService service.
 type TestServiceHandler interface {
 	ListTests(context.Context, *connect.Request[v1.ListTestsRequest]) (*connect.Response[v1.ListTestsResponse], error)
 	GetTest(context.Context, *connect.Request[v1.GetTestRequest]) (*connect.Response[v1.GetTestResponse], error)
 	GetTestConfig(context.Context, *connect.Request[v1.GetTestConfigRequest]) (*connect.Response[v1.GetTestConfigResponse], error)
+	// The unified attempt submission — one RPC replacing the legacy fourteen
+	// per-game endpoints. Facts up, verdicts down: the client sends only
+	// event facts (coordinates, timings, choices, environment); every
+	// aggregate score is recomputed server-side from the detail stream and
+	// returned as the dual-track verdict (§0.5). The admin record read face
+	// (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+	// contract's stored shape and lands with E9.
+	SubmitTestAttempt(context.Context, *connect.Request[v1.SubmitTestAttemptRequest]) (*connect.Response[v1.SubmitTestAttemptResponse], error)
 }
 
 // NewTestServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -135,6 +166,12 @@ func NewTestServiceHandler(svc TestServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(testServiceMethods.ByName("GetTestConfig")),
 		connect.WithHandlerOptions(opts...),
 	)
+	testServiceSubmitTestAttemptHandler := connect.NewUnaryHandler(
+		TestServiceSubmitTestAttemptProcedure,
+		svc.SubmitTestAttempt,
+		connect.WithSchema(testServiceMethods.ByName("SubmitTestAttempt")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.TestService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TestServiceListTestsProcedure:
@@ -143,6 +180,8 @@ func NewTestServiceHandler(svc TestServiceHandler, opts ...connect.HandlerOption
 			testServiceGetTestHandler.ServeHTTP(w, r)
 		case TestServiceGetTestConfigProcedure:
 			testServiceGetTestConfigHandler.ServeHTTP(w, r)
+		case TestServiceSubmitTestAttemptProcedure:
+			testServiceSubmitTestAttemptHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -162,4 +201,8 @@ func (UnimplementedTestServiceHandler) GetTest(context.Context, *connect.Request
 
 func (UnimplementedTestServiceHandler) GetTestConfig(context.Context, *connect.Request[v1.GetTestConfigRequest]) (*connect.Response[v1.GetTestConfigResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.TestService.GetTestConfig is not implemented"))
+}
+
+func (UnimplementedTestServiceHandler) SubmitTestAttempt(context.Context, *connect.Request[v1.SubmitTestAttemptRequest]) (*connect.Response[v1.SubmitTestAttemptResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.TestService.SubmitTestAttempt is not implemented"))
 }

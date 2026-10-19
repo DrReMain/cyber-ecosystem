@@ -177,6 +177,88 @@ export type CyberAgentV1UpdateSessionResponse = {
     [key: string]: unknown;
 };
 
+/**
+ * The engine marks backgrounding spans; validity is judged server-side at
+ * submit against TestConfig.background_invalid_seconds.
+ */
+export type CyberEsportsV1BackgroundSpan = {
+    elapsedMs?: number;
+    durationMs?: number;
+};
+
+/**
+ * character_counter — lineup counter-picking; the counter score is a
+ * server-side judgment against the counter matrix.
+ */
+export type CyberEsportsV1CharacterCounterDetail = {
+    rounds?: Array<CyberEsportsV1CharacterCounterRound>;
+};
+
+export type CyberEsportsV1CharacterCounterRound = {
+    roundNumber?: number;
+    enemyLineup?: Array<string>;
+    selectedLineup?: Array<string>;
+    timeSpentMs?: number;
+};
+
+export type CyberEsportsV1DualZoneBehavior = {
+    elapsedMs?: number;
+    /**
+     * Open vocabulary {left | right} — legacy LEFT/RIGHT lowercased.
+     */
+    zone?: string;
+    /**
+     * Open vocabulary {collision | dodge}.
+     */
+    event?: string;
+    position?: CyberEsportsV1Point;
+    obstacleId?: number;
+};
+
+/**
+ * dual_zone — two-lane dodging; the behavior stream carries zone sides and
+ * collision/dodge events with optional geometry.
+ */
+export type CyberEsportsV1DualZoneDetail = {
+    behaviors?: Array<CyberEsportsV1DualZoneBehavior>;
+};
+
+/**
+ * economic_sim — last-hitting and spending economy.
+ */
+export type CyberEsportsV1EconomicSimDetail = {
+    lastHits?: Array<CyberEsportsV1EconomicSimLastHit>;
+    purchases?: Array<CyberEsportsV1EconomicSimPurchase>;
+};
+
+export type CyberEsportsV1EconomicSimLastHit = {
+    elapsedMs?: number;
+    isLastHit?: boolean;
+    goldEarned?: number;
+};
+
+export type CyberEsportsV1EconomicSimPurchase = {
+    elapsedMs?: number;
+    itemName?: string;
+    cost?: number;
+};
+
+/**
+ * flash_aiming — snap shots at flashing targets.
+ */
+export type CyberEsportsV1FlashAimingDetail = {
+    shots?: Array<CyberEsportsV1FlashAimingShot>;
+};
+
+export type CyberEsportsV1FlashAimingShot = {
+    targetId?: string;
+    target?: CyberEsportsV1Point;
+    targetSize?: number;
+    click?: CyberEsportsV1Point;
+    deviation?: number;
+    aimTimeMs?: number;
+};
+
 export type CyberEsportsV1Game = {
     /**
      * Immutable code join key (e.g. "lol") — same law as tenant/population
@@ -258,6 +340,90 @@ export type CyberEsportsV1Member = {
 };
 
 /**
+ * moving_target — tracking across movement patterns; the pattern phase is a
+ * fact the server needs to reproduce per-pattern aggregates (legacy had it
+ * only as a client-side summary).
+ */
+export type CyberEsportsV1MovingTargetDetail = {
+    shots?: Array<CyberEsportsV1MovingTargetShot>;
+};
+
+export type CyberEsportsV1MovingTargetShot = {
+    elapsedMs?: number;
+    target?: CyberEsportsV1Point;
+    crosshair?: CyberEsportsV1Point;
+    deviation?: number;
+    hit?: boolean;
+    /**
+     * Open vocabulary {straight | curve | zigzag | circle | random | variable}.
+     */
+    pattern?: string;
+};
+
+/**
+ * multi_target — priority firing under value tiers. The legacy pick stream
+ * carried no tier; the tier rides here now so the server can rebuild every
+ * priority aggregate from facts.
+ */
+export type CyberEsportsV1MultiTargetDetail = {
+    picks?: Array<CyberEsportsV1MultiTargetPick>;
+};
+
+export type CyberEsportsV1MultiTargetPick = {
+    targetId?: string;
+    /**
+     * Open vocabulary {high | medium | low | trap}.
+     */
+    tier?: string;
+    isHit?: boolean;
+    elapsedMs?: number;
+};
+
+export type CyberEsportsV1NumberStarsClick = {
+    number?: number;
+    elapsedMs?: number;
+    position?: CyberEsportsV1Point;
+};
+
+/**
+ * number_stars — numeric sequence tapping; the round's target sequence plus
+ * the click stream let the server rebuild accuracy and decision intervals
+ * (legacy asserted isCorrect/expectedNumber client-side — now derived).
+ */
+export type CyberEsportsV1NumberStarsDetail = {
+    rounds?: Array<CyberEsportsV1NumberStarsRound>;
+};
+
+export type CyberEsportsV1NumberStarsRound = {
+    roundNumber?: number;
+    numbers?: Array<number>;
+    clicks?: Array<CyberEsportsV1NumberStarsClick>;
+};
+
+export type CyberEsportsV1OffenseDefenseDecision = {
+    scenarioId?: string;
+    /**
+     * Open vocabulary {attack | defense | retreat}; absent = unanswered.
+     */
+    choice?: string;
+    decisionTimeMs?: number;
+    timeout?: boolean;
+};
+
+/**
+ * offense_defense — scenario decisions; correctness is judged server-side
+ * against the scenario answer key (legacy isCorrect dropped).
+ */
+export type CyberEsportsV1OffenseDefenseDetail = {
+    decisions?: Array<CyberEsportsV1OffenseDefenseDecision>;
+};
+
+export type CyberEsportsV1Point = {
+    x?: number;
+    y?: number;
+};
+
+/**
  * The member's own profile. Entity fields are wrappers: null means "not set
  * yet" (the row is born lazily on first save), never a zero value.
  */
@@ -302,6 +468,145 @@ export type CyberEsportsV1Profile = {
 export type CyberEsportsV1ProfileGame = {
     gameId?: string;
     customName?: string;
+};
+
+/**
+ * red_dot — reaction tap on a moving spot.
+ */
+export type CyberEsportsV1RedDotDetail = {
+    events?: Array<CyberEsportsV1RedDotEvent>;
+};
+
+export type CyberEsportsV1RedDotEvent = {
+    target?: CyberEsportsV1Point;
+    click?: CyberEsportsV1Point;
+    reactionTimeMs?: number;
+    deviation?: number;
+    isHit?: boolean;
+};
+
+export type CyberEsportsV1ResourceMatchCollect = {
+    /**
+     * Open vocabulary {minion | monster | dragon} — the resource kinds.
+     */
+    kind?: string;
+    elapsedMs?: number;
+};
+
+/**
+ * resource_match — collecting resources on a field; trajectory plus the
+ * collect sequence (kind + time) rebuild every efficiency aggregate.
+ */
+export type CyberEsportsV1ResourceMatchDetail = {
+    trajectory?: Array<CyberEsportsV1ResourceMatchTrajectoryPoint>;
+    collects?: Array<CyberEsportsV1ResourceMatchCollect>;
+};
+
+export type CyberEsportsV1ResourceMatchTrajectoryPoint = {
+    position?: CyberEsportsV1Point;
+    elapsedMs?: number;
+};
+
+/**
+ * skill_trajectory — placement precision over draggable graphics; the seed
+ * reproduces the board server-side.
+ */
+export type CyberEsportsV1SkillTrajectoryDetail = {
+    randomSeed?: string;
+    rounds?: Array<CyberEsportsV1SkillTrajectoryRound>;
+};
+
+export type CyberEsportsV1SkillTrajectoryRound = {
+    roundNumber?: number;
+    graphicId?: string;
+    /**
+     * Open vocabulary {circle | square | triangle | pentagon | hexagon | star}.
+     */
+    shape?: string;
+    graphicSize?: number;
+    colorName?: string;
+    originalPosition?: CyberEsportsV1Point;
+    trajectory?: Array<CyberEsportsV1Point>;
+    playerPlacement?: CyberEsportsV1Point;
+    deviation?: number;
+    placementTimeMs?: number;
+    selected?: boolean;
+    placed?: boolean;
+};
+
+export type CyberEsportsV1SubmitTestAttemptRequest = {
+    /**
+     * Code join key (e.g. "red_dot") — same law as Test.code.
+     */
+    testCode?: string;
+    /**
+     * Attempt ordinal inside the match session — the E4 session law owns the
+     * semantics (lockdown, retest budget); this contract only carries the key.
+     */
+    attemptNo?: number;
+    startedAt?: string;
+    endedAt?: string;
+    backgrounds?: Array<CyberEsportsV1BackgroundSpan>;
+    redDot?: CyberEsportsV1RedDotDetail;
+    flashAiming?: CyberEsportsV1FlashAimingDetail;
+    multiTarget?: CyberEsportsV1MultiTargetDetail;
+    targetRecognition?: CyberEsportsV1TargetRecognitionDetail;
+    trackingMoving?: CyberEsportsV1TrackingMovingDetail;
+    movingTarget?: CyberEsportsV1MovingTargetDetail;
+    skillTrajectory?: CyberEsportsV1SkillTrajectoryDetail;
+    dualZone?: CyberEsportsV1DualZoneDetail;
+    numberStars?: CyberEsportsV1NumberStarsDetail;
+    offenseDefense?: CyberEsportsV1OffenseDefenseDetail;
+    characterCounter?: CyberEsportsV1CharacterCounterDetail;
+    resourceMatch?: CyberEsportsV1ResourceMatchDetail;
+    economicSim?: CyberEsportsV1EconomicSimDetail;
+};
+
+export type CyberEsportsV1SubmitTestAttemptResponse = {
+    recordId?: string;
+    /**
+     * Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
+     * authoritative score with its grade — neither is client-computable.
+     */
+    rawScore?: number;
+    authoritativeScore?: number;
+    /**
+     * Open vocabulary {S | A | B | C} — the four-color tier law.
+     */
+    grade?: string;
+    /**
+     * Ability attribution receipt, six-word vocabulary shared with Test.ability.
+     */
+    ability?: string;
+    /**
+     * False when the attempt fails server-side validity (background over
+     * budget, incomplete detail) — an invalid attempt scores nothing; the
+     * reason code is ops vocabulary, not user copy.
+     */
+    valid?: boolean;
+    invalidReason?: string;
+    /**
+     * Retest budget receipt for the "N/3 remaining" UI; E4 owns enforcement.
+     */
+    retestLeft?: number;
+};
+
+export type CyberEsportsV1TargetRecognitionClick = {
+    targetId?: string;
+    /**
+     * Open vocabulary {friendly | enemy | neutral}.
+     */
+    targetType?: string;
+    reactionTimeMs?: number;
+    elapsedMs?: number;
+};
+
+/**
+ * target_recognition — friend/foe discrimination; correctness is judged
+ * server-side against the target type, never asserted by the client.
+ */
+export type CyberEsportsV1TargetRecognitionDetail = {
+    clicks?: Array<CyberEsportsV1TargetRecognitionClick>;
 };
 
 export type CyberEsportsV1Test = {
@@ -367,6 +672,21 @@ export type CyberEsportsV1TestConfig = {
     engineParams?: {
         [key: string]: string;
     };
+};
+
+/**
+ * tracking_moving — sustained tracking of a moving target.
+ */
+export type CyberEsportsV1TrackingMovingDetail = {
+    frames?: Array<CyberEsportsV1TrackingMovingFrame>;
+};
+
+export type CyberEsportsV1TrackingMovingFrame = {
+    elapsedMs?: number;
+    target?: CyberEsportsV1Point;
+    crosshair?: CyberEsportsV1Point;
+    deviation?: number;
+    player?: CyberEsportsV1Point;
 };
 
 /**
@@ -1857,6 +2177,22 @@ export type TestServiceListTestsResponses = {
 };
 
 export type TestServiceListTestsResponse = TestServiceListTestsResponses[keyof TestServiceListTestsResponses];
+
+export type TestServiceSubmitTestAttemptData = {
+    body: CyberEsportsV1SubmitTestAttemptRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/tests/attempts';
+};
+
+export type TestServiceSubmitTestAttemptResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SubmitTestAttemptResponse;
+};
+
+export type TestServiceSubmitTestAttemptResponse = TestServiceSubmitTestAttemptResponses[keyof TestServiceSubmitTestAttemptResponses];
 
 export type TestServiceGetTestData = {
     body?: never;

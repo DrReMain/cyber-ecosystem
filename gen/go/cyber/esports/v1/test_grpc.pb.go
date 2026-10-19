@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TestService_ListTests_FullMethodName     = "/cyber.esports.v1.TestService/ListTests"
-	TestService_GetTest_FullMethodName       = "/cyber.esports.v1.TestService/GetTest"
-	TestService_GetTestConfig_FullMethodName = "/cyber.esports.v1.TestService/GetTestConfig"
+	TestService_ListTests_FullMethodName         = "/cyber.esports.v1.TestService/ListTests"
+	TestService_GetTest_FullMethodName           = "/cyber.esports.v1.TestService/GetTest"
+	TestService_GetTestConfig_FullMethodName     = "/cyber.esports.v1.TestService/GetTestConfig"
+	TestService_SubmitTestAttempt_FullMethodName = "/cyber.esports.v1.TestService/SubmitTestAttempt"
 )
 
 // TestServiceClient is the client API for TestService service.
@@ -39,6 +40,14 @@ type TestServiceClient interface {
 	ListTests(ctx context.Context, in *ListTestsRequest, opts ...grpc.CallOption) (*ListTestsResponse, error)
 	GetTest(ctx context.Context, in *GetTestRequest, opts ...grpc.CallOption) (*GetTestResponse, error)
 	GetTestConfig(ctx context.Context, in *GetTestConfigRequest, opts ...grpc.CallOption) (*GetTestConfigResponse, error)
+	// The unified attempt submission — one RPC replacing the legacy fourteen
+	// per-game endpoints. Facts up, verdicts down: the client sends only
+	// event facts (coordinates, timings, choices, environment); every
+	// aggregate score is recomputed server-side from the detail stream and
+	// returned as the dual-track verdict (§0.5). The admin record read face
+	// (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+	// contract's stored shape and lands with E9.
+	SubmitTestAttempt(ctx context.Context, in *SubmitTestAttemptRequest, opts ...grpc.CallOption) (*SubmitTestAttemptResponse, error)
 }
 
 type testServiceClient struct {
@@ -79,6 +88,16 @@ func (c *testServiceClient) GetTestConfig(ctx context.Context, in *GetTestConfig
 	return out, nil
 }
 
+func (c *testServiceClient) SubmitTestAttempt(ctx context.Context, in *SubmitTestAttemptRequest, opts ...grpc.CallOption) (*SubmitTestAttemptResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SubmitTestAttemptResponse)
+	err := c.cc.Invoke(ctx, TestService_SubmitTestAttempt_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TestServiceServer is the server API for TestService service.
 // All implementations must embed UnimplementedTestServiceServer
 // for forward compatibility.
@@ -94,6 +113,14 @@ type TestServiceServer interface {
 	ListTests(context.Context, *ListTestsRequest) (*ListTestsResponse, error)
 	GetTest(context.Context, *GetTestRequest) (*GetTestResponse, error)
 	GetTestConfig(context.Context, *GetTestConfigRequest) (*GetTestConfigResponse, error)
+	// The unified attempt submission — one RPC replacing the legacy fourteen
+	// per-game endpoints. Facts up, verdicts down: the client sends only
+	// event facts (coordinates, timings, choices, environment); every
+	// aggregate score is recomputed server-side from the detail stream and
+	// returned as the dual-track verdict (§0.5). The admin record read face
+	// (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+	// contract's stored shape and lands with E9.
+	SubmitTestAttempt(context.Context, *SubmitTestAttemptRequest) (*SubmitTestAttemptResponse, error)
 	mustEmbedUnimplementedTestServiceServer()
 }
 
@@ -112,6 +139,9 @@ func (UnimplementedTestServiceServer) GetTest(context.Context, *GetTestRequest) 
 }
 func (UnimplementedTestServiceServer) GetTestConfig(context.Context, *GetTestConfigRequest) (*GetTestConfigResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetTestConfig not implemented")
+}
+func (UnimplementedTestServiceServer) SubmitTestAttempt(context.Context, *SubmitTestAttemptRequest) (*SubmitTestAttemptResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SubmitTestAttempt not implemented")
 }
 func (UnimplementedTestServiceServer) mustEmbedUnimplementedTestServiceServer() {}
 func (UnimplementedTestServiceServer) testEmbeddedByValue()                     {}
@@ -188,6 +218,24 @@ func _TestService_GetTestConfig_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TestService_SubmitTestAttempt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubmitTestAttemptRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TestServiceServer).SubmitTestAttempt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TestService_SubmitTestAttempt_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TestServiceServer).SubmitTestAttempt(ctx, req.(*SubmitTestAttemptRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TestService_ServiceDesc is the grpc.ServiceDesc for TestService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +254,10 @@ var TestService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTestConfig",
 			Handler:    _TestService_GetTestConfig_Handler,
+		},
+		{
+			MethodName: "SubmitTestAttempt",
+			Handler:    _TestService_SubmitTestAttempt_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

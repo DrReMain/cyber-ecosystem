@@ -20,11 +20,20 @@ const _ = http.SupportPackageIsVersion3
 const OperationTestServiceGetTest = "/cyber.esports.v1.TestService/GetTest"
 const OperationTestServiceGetTestConfig = "/cyber.esports.v1.TestService/GetTestConfig"
 const OperationTestServiceListTests = "/cyber.esports.v1.TestService/ListTests"
+const OperationTestServiceSubmitTestAttempt = "/cyber.esports.v1.TestService/SubmitTestAttempt"
 
 type TestServiceHTTPServer interface {
 	GetTest(context.Context, *GetTestRequest) (*GetTestResponse, error)
 	GetTestConfig(context.Context, *GetTestConfigRequest) (*GetTestConfigResponse, error)
 	ListTests(context.Context, *ListTestsRequest) (*ListTestsResponse, error)
+	// SubmitTestAttempt The unified attempt submission — one RPC replacing the legacy fourteen
+	// per-game endpoints. Facts up, verdicts down: the client sends only
+	// event facts (coordinates, timings, choices, environment); every
+	// aggregate score is recomputed server-side from the detail stream and
+	// returned as the dual-track verdict (§0.5). The admin record read face
+	// (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+	// contract's stored shape and lands with E9.
+	SubmitTestAttempt(context.Context, *SubmitTestAttemptRequest) (*SubmitTestAttemptResponse, error)
 }
 
 func RegisterTestServiceHTTPServer(s *http.Server, srv TestServiceHTTPServer) {
@@ -32,6 +41,7 @@ func RegisterTestServiceHTTPServer(s *http.Server, srv TestServiceHTTPServer) {
 	r.Handle("GET", "/api/v1/esports/tests", _TestService_ListTests0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/tests/{id}", _TestService_GetTest0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/tests/{id}/config", _TestService_GetTestConfig0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/tests/attempts", _TestService_SubmitTestAttempt0_HTTP_Handler(srv))
 }
 
 func _TestService_ListTests0_HTTP_Handler(srv TestServiceHTTPServer) func(ctx http.Context) error {
@@ -97,10 +107,37 @@ func _TestService_GetTestConfig0_HTTP_Handler(srv TestServiceHTTPServer) func(ct
 	}
 }
 
+func _TestService_SubmitTestAttempt0_HTTP_Handler(srv TestServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SubmitTestAttemptRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTestServiceSubmitTestAttempt)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SubmitTestAttempt(ctx, req.(*SubmitTestAttemptRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SubmitTestAttemptResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type TestServiceHTTPClient interface {
 	GetTest(ctx context.Context, req *GetTestRequest, opts ...http.CallOption) (rsp *GetTestResponse, err error)
 	GetTestConfig(ctx context.Context, req *GetTestConfigRequest, opts ...http.CallOption) (rsp *GetTestConfigResponse, err error)
 	ListTests(ctx context.Context, req *ListTestsRequest, opts ...http.CallOption) (rsp *ListTestsResponse, err error)
+	// SubmitTestAttempt The unified attempt submission — one RPC replacing the legacy fourteen
+	// per-game endpoints. Facts up, verdicts down: the client sends only
+	// event facts (coordinates, timings, choices, environment); every
+	// aggregate score is recomputed server-side from the detail stream and
+	// returned as the dual-track verdict (§0.5). The admin record read face
+	// (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+	// contract's stored shape and lands with E9.
+	SubmitTestAttempt(ctx context.Context, req *SubmitTestAttemptRequest, opts ...http.CallOption) (rsp *SubmitTestAttemptResponse, err error)
 }
 
 type TestServiceHTTPClientImpl struct {
@@ -153,6 +190,30 @@ func (c *TestServiceHTTPClientImpl) ListTests(ctx context.Context, in *ListTests
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SubmitTestAttempt The unified attempt submission — one RPC replacing the legacy fourteen
+// per-game endpoints. Facts up, verdicts down: the client sends only
+// event facts (coordinates, timings, choices, environment); every
+// aggregate score is recomputed server-side from the detail stream and
+// returned as the dual-track verdict (§0.5). The admin record read face
+// (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+// contract's stored shape and lands with E9.
+func (c *TestServiceHTTPClientImpl) SubmitTestAttempt(ctx context.Context, in *SubmitTestAttemptRequest, opts ...http.CallOption) (*SubmitTestAttemptResponse, error) {
+	var out SubmitTestAttemptResponse
+	pattern := "/api/v1/esports/tests/attempts"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTestServiceSubmitTestAttempt),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

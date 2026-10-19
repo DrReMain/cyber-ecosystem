@@ -44,6 +44,24 @@ service TestService {
     option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/esports/tests/{id}/config"};
   }
+  // The unified attempt submission — one RPC replacing the legacy fourteen
+  // per-game endpoints. Facts up, verdicts down: the client sends only
+  // event facts (coordinates, timings, choices, environment); every
+  // aggregate score is recomputed server-side from the detail stream and
+  // returned as the dual-track verdict (§0.5). The admin record read face
+  // (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+  // contract's stored shape and lands with E9.
+  rpc SubmitTestAttempt(SubmitTestAttemptRequest) returns (SubmitTestAttemptResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "提交测试尝试"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/tests/attempts"
+      body: "*"
+    };
+  }
 }
 
 message Test {
@@ -123,4 +141,288 @@ message TestConfig {
   // The KV shape keeps tuning ops-only: no contract churn, no regen, no
   // client release for a spawn-interval change.
   map<string, string> engine_params = 4;
+}
+
+// ─── Unified attempt submission ─────────────────────────────────────────────
+// Events carry elapsed_ms — milliseconds relative to the attempt's
+// started_at, one engine clock: comparable across runs and free of the
+// wall-clock tampering surface. Coordinates are engine logical pixels.
+// Legacy field names ride along as comments (the per-game review anchor).
+
+message Point {
+  double x = 1;
+  double y = 2;
+}
+
+// The engine marks backgrounding spans; validity is judged server-side at
+// submit against TestConfig.background_invalid_seconds.
+message BackgroundSpan {
+  int32 elapsed_ms = 1 [(buf.validate.field).int32.gte = 0]; // legacy: timestamp
+  int32 duration_ms = 2 [(buf.validate.field).int32.gte = 0];
+}
+
+message SubmitTestAttemptRequest {
+  // Code join key (e.g. "red_dot") — same law as Test.code.
+  string test_code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 64
+    }
+  ];
+  // Attempt ordinal inside the match session — the E4 session law owns the
+  // semantics (lockdown, retest budget); this contract only carries the key.
+  int32 attempt_no = 2 [(buf.validate.field).int32.gte = 1];
+  google.protobuf.Timestamp started_at = 3 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp ended_at = 4 [(buf.validate.field).required = true];
+  repeated BackgroundSpan backgrounds = 5 [(buf.validate.field).repeated.max_items = 64];
+  oneof raw_detail {
+    RedDotDetail red_dot = 10;
+    FlashAimingDetail flash_aiming = 11;
+    MultiTargetDetail multi_target = 12;
+    TargetRecognitionDetail target_recognition = 13;
+    TrackingMovingDetail tracking_moving = 14;
+    MovingTargetDetail moving_target = 15;
+    SkillTrajectoryDetail skill_trajectory = 16;
+    DualZoneDetail dual_zone = 17;
+    NumberStarsDetail number_stars = 18;
+    OffenseDefenseDetail offense_defense = 19;
+    CharacterCounterDetail character_counter = 20;
+    ResourceMatchDetail resource_match = 21;
+    EconomicSimDetail economic_sim = 22;
+  }
+}
+
+message SubmitTestAttemptResponse {
+  string record_id = 1;
+  // Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
+  // authoritative score with its grade — neither is client-computable.
+  double raw_score = 2;
+  double authoritative_score = 3;
+  // Open vocabulary {S | A | B | C} — the four-color tier law.
+  string grade = 4;
+  // Ability attribution receipt, six-word vocabulary shared with Test.ability.
+  string ability = 5;
+  // False when the attempt fails server-side validity (background over
+  // budget, incomplete detail) — an invalid attempt scores nothing; the
+  // reason code is ops vocabulary, not user copy.
+  bool valid = 6;
+  google.protobuf.StringValue invalid_reason = 7;
+  // Retest budget receipt for the "N/3 remaining" UI; E4 owns enforcement.
+  int32 retest_left = 8;
+}
+
+// red_dot — reaction tap on a moving spot.
+message RedDotDetail {
+  repeated RedDotEvent events = 1 [(buf.validate.field).repeated.max_items = 4096]; // legacy: detailList
+}
+message RedDotEvent {
+  Point target = 1; // legacy: targetX/targetY
+  Point click = 2; // legacy: clickX/clickY
+  int32 reaction_time_ms = 3 [(buf.validate.field).int32.gte = 0];
+  double deviation = 4;
+  bool is_hit = 5; // geometric fact (inside radius), not a scoring verdict
+}
+
+// flash_aiming — snap shots at flashing targets.
+message FlashAimingDetail {
+  repeated FlashAimingShot shots = 1 [(buf.validate.field).repeated.max_items = 4096];
+}
+message FlashAimingShot {
+  string target_id = 1;
+  Point target = 2; // + legacy targetSize
+  double target_size = 3;
+  Point click = 4;
+  double deviation = 5;
+  int32 aim_time_ms = 6 [(buf.validate.field).int32.gte = 0];
+}
+
+// multi_target — priority firing under value tiers. The legacy pick stream
+// carried no tier; the tier rides here now so the server can rebuild every
+// priority aggregate from facts.
+message MultiTargetDetail {
+  repeated MultiTargetPick picks = 1 [(buf.validate.field).repeated.max_items = 4096]; // legacy: targetSelectionOrder
+}
+message MultiTargetPick {
+  string target_id = 1;
+  // Open vocabulary {high | medium | low | trap}.
+  string tier = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 16
+  }];
+  bool is_hit = 3;
+  int32 elapsed_ms = 4 [(buf.validate.field).int32.gte = 0]; // legacy: timestamp
+}
+
+// target_recognition — friend/foe discrimination; correctness is judged
+// server-side against the target type, never asserted by the client.
+message TargetRecognitionDetail {
+  repeated TargetRecognitionClick clicks = 1 [(buf.validate.field).repeated.max_items = 4096];
+}
+message TargetRecognitionClick {
+  string target_id = 1;
+  // Open vocabulary {friendly | enemy | neutral}.
+  string target_type = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 16
+  }];
+  optional int32 reaction_time_ms = 3 [(buf.validate.field).int32.gte = 0]; // absent = no reaction
+  int32 elapsed_ms = 4 [(buf.validate.field).int32.gte = 0];
+}
+
+// tracking_moving — sustained tracking of a moving target.
+message TrackingMovingDetail {
+  repeated TrackingMovingFrame frames = 1 [(buf.validate.field).repeated.max_items = 4096];
+}
+message TrackingMovingFrame {
+  int32 elapsed_ms = 1 [(buf.validate.field).int32.gte = 0];
+  Point target = 2;
+  Point crosshair = 3;
+  double deviation = 4;
+  Point player = 5;
+}
+
+// moving_target — tracking across movement patterns; the pattern phase is a
+// fact the server needs to reproduce per-pattern aggregates (legacy had it
+// only as a client-side summary).
+message MovingTargetDetail {
+  repeated MovingTargetShot shots = 1 [(buf.validate.field).repeated.max_items = 4096];
+}
+message MovingTargetShot {
+  int32 elapsed_ms = 1 [(buf.validate.field).int32.gte = 0]; // legacy: timestamp
+  Point target = 2;
+  Point crosshair = 3;
+  double deviation = 4;
+  bool hit = 5;
+  // Open vocabulary {straight | curve | zigzag | circle | random | variable}.
+  string pattern = 6 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 16
+  }];
+}
+
+// skill_trajectory — placement precision over draggable graphics; the seed
+// reproduces the board server-side.
+message SkillTrajectoryDetail {
+  int64 random_seed = 1; // legacy: randomSeed
+  repeated SkillTrajectoryRound rounds = 2 [(buf.validate.field).repeated.max_items = 256]; // legacy: rounds (was untyped)
+}
+message SkillTrajectoryRound {
+  int32 round_number = 1;
+  string graphic_id = 2;
+  // Open vocabulary {circle | square | triangle | pentagon | hexagon | star}.
+  string shape = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 16
+  }];
+  double graphic_size = 4;
+  string color_name = 5; // semantic name, not a hex string
+  Point original_position = 6;
+  repeated Point trajectory = 7 [(buf.validate.field).repeated.max_items = 4096];
+  Point player_placement = 8; // null = not placed
+  double deviation = 9;
+  int32 placement_time_ms = 10 [(buf.validate.field).int32.gte = 0];
+  bool selected = 11;
+  bool placed = 12;
+}
+
+// dual_zone — two-lane dodging; the behavior stream carries zone sides and
+// collision/dodge events with optional geometry.
+message DualZoneDetail {
+  repeated DualZoneBehavior behaviors = 1 [(buf.validate.field).repeated.max_items = 4096]; // legacy: behaviorRecords
+}
+message DualZoneBehavior {
+  int32 elapsed_ms = 1 [(buf.validate.field).int32.gte = 0]; // legacy: timestamp
+  // Open vocabulary {left | right} — legacy LEFT/RIGHT lowercased.
+  string zone = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 16
+  }];
+  // Open vocabulary {collision | dodge}.
+  string event = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 16
+  }];
+  optional Point position = 4; // legacy: positionX/positionY
+  optional int32 obstacle_id = 5;
+}
+
+// number_stars — numeric sequence tapping; the round's target sequence plus
+// the click stream let the server rebuild accuracy and decision intervals
+// (legacy asserted isCorrect/expectedNumber client-side — now derived).
+message NumberStarsDetail {
+  repeated NumberStarsRound rounds = 1 [(buf.validate.field).repeated.max_items = 256]; // legacy: roundHistory (was untyped)
+}
+message NumberStarsRound {
+  int32 round_number = 1;
+  repeated int32 numbers = 2 [(buf.validate.field).repeated.max_items = 128]; // the target sequence
+  repeated NumberStarsClick clicks = 3 [(buf.validate.field).repeated.max_items = 1024];
+}
+message NumberStarsClick {
+  int32 number = 1;
+  int32 elapsed_ms = 2 [(buf.validate.field).int32.gte = 0]; // legacy: timestamp
+  Point position = 3; // legacy: x/y
+}
+
+// offense_defense — scenario decisions; correctness is judged server-side
+// against the scenario answer key (legacy isCorrect dropped).
+message OffenseDefenseDetail {
+  repeated OffenseDefenseDecision decisions = 1 [(buf.validate.field).repeated.max_items = 1024]; // legacy: decisions
+}
+message OffenseDefenseDecision {
+  string scenario_id = 1;
+  // Open vocabulary {attack | defense | retreat}; absent = unanswered.
+  optional string choice = 2 [(buf.validate.field).string.max_len = 16];
+  int32 decision_time_ms = 3 [(buf.validate.field).int32.gte = 0];
+  bool timeout = 4;
+}
+
+// character_counter — lineup counter-picking; the counter score is a
+// server-side judgment against the counter matrix.
+message CharacterCounterDetail {
+  repeated CharacterCounterRound rounds = 1 [(buf.validate.field).repeated.max_items = 256]; // legacy: rounds
+}
+message CharacterCounterRound {
+  int32 round_number = 1;
+  repeated string enemy_lineup = 2 [(buf.validate.field).repeated.max_items = 8];
+  repeated string selected_lineup = 3 [(buf.validate.field).repeated.max_items = 8];
+  int32 time_spent_ms = 4 [(buf.validate.field).int32.gte = 0]; // legacy: timeSpent
+}
+
+// resource_match — collecting resources on a field; trajectory plus the
+// collect sequence (kind + time) rebuild every efficiency aggregate.
+message ResourceMatchDetail {
+  repeated ResourceMatchTrajectoryPoint trajectory = 1 [(buf.validate.field).repeated.max_items = 8192]; // legacy: trajectory
+  repeated ResourceMatchCollect collects = 2 [(buf.validate.field).repeated.max_items = 1024]; // legacy: collectSequence (was bare numbers)
+}
+message ResourceMatchTrajectoryPoint {
+  Point position = 1; // legacy: x/y
+  optional int32 elapsed_ms = 2 [(buf.validate.field).int32.gte = 0]; // legacy: optional timestamp
+}
+message ResourceMatchCollect {
+  // Open vocabulary {minion | monster | dragon} — the resource kinds.
+  string kind = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 16
+  }];
+  int32 elapsed_ms = 2 [(buf.validate.field).int32.gte = 0];
+}
+
+// economic_sim — last-hitting and spending economy.
+message EconomicSimDetail {
+  repeated EconomicSimLastHit last_hits = 1 [(buf.validate.field).repeated.max_items = 4096]; // legacy: lastHitEvents
+  repeated EconomicSimPurchase purchases = 2 [(buf.validate.field).repeated.max_items = 1024]; // legacy: purchases
+}
+message EconomicSimLastHit {
+  int32 elapsed_ms = 1 [(buf.validate.field).int32.gte = 0]; // legacy: timestamp
+  bool is_last_hit = 2;
+  int32 gold_earned = 3;
+}
+message EconomicSimPurchase {
+  int32 elapsed_ms = 1 [(buf.validate.field).int32.gte = 0]; // legacy: timestamp
+  string item_name = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 64
+  }];
+  int32 cost = 3 [(buf.validate.field).int32.gte = 0];
 }

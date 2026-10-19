@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/esports/v1/test.proto.
  */
 export const file_cyber_esports_v1_test: GenFile = /*@__PURE__*/
-  fileDesc("ChtjeWJlci9lc3BvcnRzL3YxL3Rlc3QucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEizAMKBFRlc3QSKAoCaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSKgoEY29kZRgCIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIqCgRuYW1lGAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCGNhdGVnb3J5GAQgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi0KB2FiaWxpdHkYBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLZGVzY3JpcHRpb24YBiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSNgoQdW5pdF9zY29yZV9sYWJlbBgHIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIYChBkdXJhdGlvbl9zZWNvbmRzGAggASgFEi4KCmNyZWF0ZWRfYXQYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYCiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIhIKEExpc3RUZXN0c1JlcXVlc3QiOgoRTGlzdFRlc3RzUmVzcG9uc2USJQoFdGVzdHMYASADKAsyFi5jeWJlci5lc3BvcnRzLnYxLlRlc3QiKQoOR2V0VGVzdFJlcXVlc3QSFwoCaWQYASABKAlCC7pICMgBAXIDmAEUImsKD0dldFRlc3RSZXNwb25zZRIkCgR0ZXN0GAEgASgLMhYuY3liZXIuZXNwb3J0cy52MS5UZXN0EjIKDGludHJvZHVjdGlvbhgCIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZSIvChRHZXRUZXN0Q29uZmlnUmVxdWVzdBIXCgJpZBgBIAEoCUILukgIyAEBcgOYARQiRQoVR2V0VGVzdENvbmZpZ1Jlc3BvbnNlEiwKBmNvbmZpZxgBIAEoCzIcLmN5YmVyLmVzcG9ydHMudjEuVGVzdENvbmZpZyL1AQoKVGVzdENvbmZpZxItCgd0ZXN0X2lkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEhgKEGR1cmF0aW9uX3NlY29uZHMYAiABKAUSIgoaYmFja2dyb3VuZF9pbnZhbGlkX3NlY29uZHMYAyABKAUSRQoNZW5naW5lX3BhcmFtcxgEIAMoCzIuLmN5YmVyLmVzcG9ydHMudjEuVGVzdENvbmZpZy5FbmdpbmVQYXJhbXNFbnRyeRozChFFbmdpbmVQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBMuwDCgtUZXN0U2VydmljZRKOAQoJTGlzdFRlc3RzEiIuY3liZXIuZXNwb3J0cy52MS5MaXN0VGVzdHNSZXF1ZXN0GiMuY3liZXIuZXNwb3J0cy52MS5MaXN0VGVzdHNSZXNwb25zZSI4iPEEBIrTDhMKD+a1i+ivlemhueWIl+ihqBABgtPkkwIXEhUvYXBpL3YxL2VzcG9ydHMvdGVzdHMSjQEKB0dldFRlc3QSIC5jeWJlci5lc3BvcnRzLnYxLkdldFRlc3RSZXF1ZXN0GiEuY3liZXIuZXNwb3J0cy52MS5HZXRUZXN0UmVzcG9uc2UiPYjxBASK0w4TCg/mtYvor5Xpobnor6bmg4UQAYLT5JMCHBIaL2FwaS92MS9lc3BvcnRzL3Rlc3RzL3tpZH0SrAEKDUdldFRlc3RDb25maWcSJi5jeWJlci5lc3BvcnRzLnYxLkdldFRlc3RDb25maWdSZXF1ZXN0GicuY3liZXIuZXNwb3J0cy52MS5HZXRUZXN0Q29uZmlnUmVzcG9uc2UiSojxBASK0w4ZChXmtYvor5Xpobnov5DooYzphY3nva4QAYLT5JMCIxIhL2FwaS92MS9lc3BvcnRzL3Rlc3RzL3tpZH0vY29uZmlnGg2K4gkJ5rWL6K+V6aG5QilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("ChtjeWJlci9lc3BvcnRzL3YxL3Rlc3QucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEizAMKBFRlc3QSKAoCaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSKgoEY29kZRgCIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIqCgRuYW1lGAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCGNhdGVnb3J5GAQgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi0KB2FiaWxpdHkYBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLZGVzY3JpcHRpb24YBiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSNgoQdW5pdF9zY29yZV9sYWJlbBgHIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIYChBkdXJhdGlvbl9zZWNvbmRzGAggASgFEi4KCmNyZWF0ZWRfYXQYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYCiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIhIKEExpc3RUZXN0c1JlcXVlc3QiOgoRTGlzdFRlc3RzUmVzcG9uc2USJQoFdGVzdHMYASADKAsyFi5jeWJlci5lc3BvcnRzLnYxLlRlc3QiKQoOR2V0VGVzdFJlcXVlc3QSFwoCaWQYASABKAlCC7pICMgBAXIDmAEUImsKD0dldFRlc3RSZXNwb25zZRIkCgR0ZXN0GAEgASgLMhYuY3liZXIuZXNwb3J0cy52MS5UZXN0EjIKDGludHJvZHVjdGlvbhgCIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZSIvChRHZXRUZXN0Q29uZmlnUmVxdWVzdBIXCgJpZBgBIAEoCUILukgIyAEBcgOYARQiRQoVR2V0VGVzdENvbmZpZ1Jlc3BvbnNlEiwKBmNvbmZpZxgBIAEoCzIcLmN5YmVyLmVzcG9ydHMudjEuVGVzdENvbmZpZyL1AQoKVGVzdENvbmZpZxItCgd0ZXN0X2lkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEhgKEGR1cmF0aW9uX3NlY29uZHMYAiABKAUSIgoaYmFja2dyb3VuZF9pbnZhbGlkX3NlY29uZHMYAyABKAUSRQoNZW5naW5lX3BhcmFtcxgEIAMoCzIuLmN5YmVyLmVzcG9ydHMudjEuVGVzdENvbmZpZy5FbmdpbmVQYXJhbXNFbnRyeRozChFFbmdpbmVQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIh0KBVBvaW50EgkKAXgYASABKAESCQoBeRgCIAEoASJLCg5CYWNrZ3JvdW5kU3BhbhIbCgplbGFwc2VkX21zGAEgASgFQge6SAQaAigAEhwKC2R1cmF0aW9uX21zGAIgASgFQge6SAQaAigAIs4IChhTdWJtaXRUZXN0QXR0ZW1wdFJlcXVlc3QSHwoJdGVzdF9jb2RlGAEgASgJQgy6SAnIAQFyBBABGEASGwoKYXR0ZW1wdF9ubxgCIAEoBUIHukgEGgIoARI2CgpzdGFydGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIGukgDyAEBEjQKCGVuZGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIGukgDyAEBEj8KC2JhY2tncm91bmRzGAUgAygLMiAuY3liZXIuZXNwb3J0cy52MS5CYWNrZ3JvdW5kU3BhbkIIukgFkgECEEASMQoHcmVkX2RvdBgKIAEoCzIeLmN5YmVyLmVzcG9ydHMudjEuUmVkRG90RGV0YWlsSAASOwoMZmxhc2hfYWltaW5nGAsgASgLMiMuY3liZXIuZXNwb3J0cy52MS5GbGFzaEFpbWluZ0RldGFpbEgAEjsKDG11bHRpX3RhcmdldBgMIAEoCzIjLmN5YmVyLmVzcG9ydHMudjEuTXVsdGlUYXJnZXREZXRhaWxIABJHChJ0YXJnZXRfcmVjb2duaXRpb24YDSABKAsyKS5jeWJlci5lc3BvcnRzLnYxLlRhcmdldFJlY29nbml0aW9uRGV0YWlsSAASQQoPdHJhY2tpbmdfbW92aW5nGA4gASgLMiYuY3liZXIuZXNwb3J0cy52MS5UcmFja2luZ01vdmluZ0RldGFpbEgAEj0KDW1vdmluZ190YXJnZXQYDyABKAsyJC5jeWJlci5lc3BvcnRzLnYxLk1vdmluZ1RhcmdldERldGFpbEgAEkMKEHNraWxsX3RyYWplY3RvcnkYECABKAsyJy5jeWJlci5lc3BvcnRzLnYxLlNraWxsVHJhamVjdG9yeURldGFpbEgAEjUKCWR1YWxfem9uZRgRIAEoCzIgLmN5YmVyLmVzcG9ydHMudjEuRHVhbFpvbmVEZXRhaWxIABI7CgxudW1iZXJfc3RhcnMYEiABKAsyIy5jeWJlci5lc3BvcnRzLnYxLk51bWJlclN0YXJzRGV0YWlsSAASQQoPb2ZmZW5zZV9kZWZlbnNlGBMgASgLMiYuY3liZXIuZXNwb3J0cy52MS5PZmZlbnNlRGVmZW5zZURldGFpbEgAEkUKEWNoYXJhY3Rlcl9jb3VudGVyGBQgASgLMiguY3liZXIuZXNwb3J0cy52MS5DaGFyYWN0ZXJDb3VudGVyRGV0YWlsSAASPwoOcmVzb3VyY2VfbWF0Y2gYFSABKAsyJS5jeWJlci5lc3BvcnRzLnYxLlJlc291cmNlTWF0Y2hEZXRhaWxIABI7CgxlY29ub21pY19zaW0YFiABKAsyIy5jeWJlci5lc3BvcnRzLnYxLkVjb25vbWljU2ltRGV0YWlsSABCDAoKcmF3X2RldGFpbCLYAQoZU3VibWl0VGVzdEF0dGVtcHRSZXNwb25zZRIRCglyZWNvcmRfaWQYASABKAkSEQoJcmF3X3Njb3JlGAIgASgBEhsKE2F1dGhvcml0YXRpdmVfc2NvcmUYAyABKAESDQoFZ3JhZGUYBCABKAkSDwoHYWJpbGl0eRgFIAEoCRINCgV2YWxpZBgGIAEoCBI0Cg5pbnZhbGlkX3JlYXNvbhgHIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRITCgtyZXRlc3RfbGVmdBgIIAEoBSJICgxSZWREb3REZXRhaWwSOAoGZXZlbnRzGAEgAygLMh0uY3liZXIuZXNwb3J0cy52MS5SZWREb3RFdmVudEIJukgGkgEDEIAgIqQBCgtSZWREb3RFdmVudBInCgZ0YXJnZXQYASABKAsyFy5jeWJlci5lc3BvcnRzLnYxLlBvaW50EiYKBWNsaWNrGAIgASgLMhcuY3liZXIuZXNwb3J0cy52MS5Qb2ludBIhChByZWFjdGlvbl90aW1lX21zGAMgASgFQge6SAQaAigAEhEKCWRldmlhdGlvbhgEIAEoARIOCgZpc19oaXQYBSABKAgiUAoRRmxhc2hBaW1pbmdEZXRhaWwSOwoFc2hvdHMYASADKAsyIS5jeWJlci5lc3BvcnRzLnYxLkZsYXNoQWltaW5nU2hvdEIJukgGkgEDEIAgIrsBCg9GbGFzaEFpbWluZ1Nob3QSEQoJdGFyZ2V0X2lkGAEgASgJEicKBnRhcmdldBgCIAEoCzIXLmN5YmVyLmVzcG9ydHMudjEuUG9pbnQSEwoLdGFyZ2V0X3NpemUYAyABKAESJgoFY2xpY2sYBCABKAsyFy5jeWJlci5lc3BvcnRzLnYxLlBvaW50EhEKCWRldmlhdGlvbhgFIAEoARIcCgthaW1fdGltZV9tcxgGIAEoBUIHukgEGgIoACJQChFNdWx0aVRhcmdldERldGFpbBI7CgVwaWNrcxgBIAMoCzIhLmN5YmVyLmVzcG9ydHMudjEuTXVsdGlUYXJnZXRQaWNrQgm6SAaSAQMQgCAiagoPTXVsdGlUYXJnZXRQaWNrEhEKCXRhcmdldF9pZBgBIAEoCRIXCgR0aWVyGAIgASgJQgm6SAZyBBABGBASDgoGaXNfaGl0GAMgASgIEhsKCmVsYXBzZWRfbXMYBCABKAVCB7pIBBoCKAAiXgoXVGFyZ2V0UmVjb2duaXRpb25EZXRhaWwSQwoGY2xpY2tzGAEgAygLMiguY3liZXIuZXNwb3J0cy52MS5UYXJnZXRSZWNvZ25pdGlvbkNsaWNrQgm6SAaSAQMQgCAipQEKFlRhcmdldFJlY29nbml0aW9uQ2xpY2sSEQoJdGFyZ2V0X2lkGAEgASgJEh4KC3RhcmdldF90eXBlGAIgASgJQgm6SAZyBBABGBASJgoQcmVhY3Rpb25fdGltZV9tcxgDIAEoBUIHukgEGgIoAEgAiAEBEhsKCmVsYXBzZWRfbXMYBCABKAVCB7pIBBoCKABCEwoRX3JlYWN0aW9uX3RpbWVfbXMiWAoUVHJhY2tpbmdNb3ZpbmdEZXRhaWwSQAoGZnJhbWVzGAEgAygLMiUuY3liZXIuZXNwb3J0cy52MS5UcmFja2luZ01vdmluZ0ZyYW1lQgm6SAaSAQMQgCAiwwEKE1RyYWNraW5nTW92aW5nRnJhbWUSGwoKZWxhcHNlZF9tcxgBIAEoBUIHukgEGgIoABInCgZ0YXJnZXQYAiABKAsyFy5jeWJlci5lc3BvcnRzLnYxLlBvaW50EioKCWNyb3NzaGFpchgDIAEoCzIXLmN5YmVyLmVzcG9ydHMudjEuUG9pbnQSEQoJZGV2aWF0aW9uGAQgASgBEicKBnBsYXllchgFIAEoCzIXLmN5YmVyLmVzcG9ydHMudjEuUG9pbnQiUgoSTW92aW5nVGFyZ2V0RGV0YWlsEjwKBXNob3RzGAEgAygLMiIuY3liZXIuZXNwb3J0cy52MS5Nb3ZpbmdUYXJnZXRTaG90Qgm6SAaSAQMQgCAiwAEKEE1vdmluZ1RhcmdldFNob3QSGwoKZWxhcHNlZF9tcxgBIAEoBUIHukgEGgIoABInCgZ0YXJnZXQYAiABKAsyFy5jeWJlci5lc3BvcnRzLnYxLlBvaW50EioKCWNyb3NzaGFpchgDIAEoCzIXLmN5YmVyLmVzcG9ydHMudjEuUG9pbnQSEQoJZGV2aWF0aW9uGAQgASgBEgsKA2hpdBgFIAEoCBIaCgdwYXR0ZXJuGAYgASgJQgm6SAZyBBABGBAibwoVU2tpbGxUcmFqZWN0b3J5RGV0YWlsEhMKC3JhbmRvbV9zZWVkGAEgASgDEkEKBnJvdW5kcxgCIAMoCzImLmN5YmVyLmVzcG9ydHMudjEuU2tpbGxUcmFqZWN0b3J5Um91bmRCCbpIBpIBAxCAAiL8AgoUU2tpbGxUcmFqZWN0b3J5Um91bmQSFAoMcm91bmRfbnVtYmVyGAEgASgFEhIKCmdyYXBoaWNfaWQYAiABKAkSGAoFc2hhcGUYAyABKAlCCbpIBnIEEAEYEBIUCgxncmFwaGljX3NpemUYBCABKAESEgoKY29sb3JfbmFtZRgFIAEoCRIyChFvcmlnaW5hbF9wb3NpdGlvbhgGIAEoCzIXLmN5YmVyLmVzcG9ydHMudjEuUG9pbnQSNgoKdHJhamVjdG9yeRgHIAMoCzIXLmN5YmVyLmVzcG9ydHMudjEuUG9pbnRCCbpIBpIBAxCAIBIxChBwbGF5ZXJfcGxhY2VtZW50GAggASgLMhcuY3liZXIuZXNwb3J0cy52MS5Qb2ludBIRCglkZXZpYXRpb24YCSABKAESIgoRcGxhY2VtZW50X3RpbWVfbXMYCiABKAVCB7pIBBoCKAASEAoIc2VsZWN0ZWQYCyABKAgSDgoGcGxhY2VkGAwgASgIIlIKDkR1YWxab25lRGV0YWlsEkAKCWJlaGF2aW9ycxgBIAMoCzIiLmN5YmVyLmVzcG9ydHMudjEuRHVhbFpvbmVCZWhhdmlvckIJukgGkgEDEIAgIskBChBEdWFsWm9uZUJlaGF2aW9yEhsKCmVsYXBzZWRfbXMYASABKAVCB7pIBBoCKAASFwoEem9uZRgCIAEoCUIJukgGcgQQARgQEhgKBWV2ZW50GAMgASgJQgm6SAZyBBABGBASLgoIcG9zaXRpb24YBCABKAsyFy5jeWJlci5lc3BvcnRzLnYxLlBvaW50SACIAQESGAoLb2JzdGFjbGVfaWQYBSABKAVIAYgBAUILCglfcG9zaXRpb25CDgoMX29ic3RhY2xlX2lkIlIKEU51bWJlclN0YXJzRGV0YWlsEj0KBnJvdW5kcxgBIAMoCzIiLmN5YmVyLmVzcG9ydHMudjEuTnVtYmVyU3RhcnNSb3VuZEIJukgGkgEDEIACIoMBChBOdW1iZXJTdGFyc1JvdW5kEhQKDHJvdW5kX251bWJlchgBIAEoBRIaCgdudW1iZXJzGAIgAygFQgm6SAaSAQMQgAESPQoGY2xpY2tzGAMgAygLMiIuY3liZXIuZXNwb3J0cy52MS5OdW1iZXJTdGFyc0NsaWNrQgm6SAaSAQMQgAgiagoQTnVtYmVyU3RhcnNDbGljaxIOCgZudW1iZXIYASABKAUSGwoKZWxhcHNlZF9tcxgCIAEoBUIHukgEGgIoABIpCghwb3NpdGlvbhgDIAEoCzIXLmN5YmVyLmVzcG9ydHMudjEuUG9pbnQiXgoUT2ZmZW5zZURlZmVuc2VEZXRhaWwSRgoJZGVjaXNpb25zGAEgAygLMiguY3liZXIuZXNwb3J0cy52MS5PZmZlbnNlRGVmZW5zZURlY2lzaW9uQgm6SAaSAQMQgAgiigEKFk9mZmVuc2VEZWZlbnNlRGVjaXNpb24SEwoLc2NlbmFyaW9faWQYASABKAkSHAoGY2hvaWNlGAIgASgJQge6SARyAhgQSACIAQESIQoQZGVjaXNpb25fdGltZV9tcxgDIAEoBUIHukgEGgIoABIPCgd0aW1lb3V0GAQgASgIQgkKB19jaG9pY2UiXAoWQ2hhcmFjdGVyQ291bnRlckRldGFpbBJCCgZyb3VuZHMYASADKAsyJy5jeWJlci5lc3BvcnRzLnYxLkNoYXJhY3RlckNvdW50ZXJSb3VuZEIJukgGkgEDEIACIpABChVDaGFyYWN0ZXJDb3VudGVyUm91bmQSFAoMcm91bmRfbnVtYmVyGAEgASgFEh4KDGVuZW15X2xpbmV1cBgCIAMoCUIIukgFkgECEAgSIQoPc2VsZWN0ZWRfbGluZXVwGAMgAygJQgi6SAWSAQIQCBIeCg10aW1lX3NwZW50X21zGAQgASgFQge6SAQaAigAIqkBChNSZXNvdXJjZU1hdGNoRGV0YWlsEk0KCnRyYWplY3RvcnkYASADKAsyLi5jeWJlci5lc3BvcnRzLnYxLlJlc291cmNlTWF0Y2hUcmFqZWN0b3J5UG9pbnRCCbpIBpIBAxCAQBJDCghjb2xsZWN0cxgCIAMoCzImLmN5YmVyLmVzcG9ydHMudjEuUmVzb3VyY2VNYXRjaENvbGxlY3RCCbpIBpIBAxCACCJ6ChxSZXNvdXJjZU1hdGNoVHJhamVjdG9yeVBvaW50EikKCHBvc2l0aW9uGAEgASgLMhcuY3liZXIuZXNwb3J0cy52MS5Qb2ludBIgCgplbGFwc2VkX21zGAIgASgFQge6SAQaAigASACIAQFCDQoLX2VsYXBzZWRfbXMiTAoUUmVzb3VyY2VNYXRjaENvbGxlY3QSFwoEa2luZBgBIAEoCUIJukgGcgQQARgQEhsKCmVsYXBzZWRfbXMYAiABKAVCB7pIBBoCKAAinAEKEUVjb25vbWljU2ltRGV0YWlsEkIKCWxhc3RfaGl0cxgBIAMoCzIkLmN5YmVyLmVzcG9ydHMudjEuRWNvbm9taWNTaW1MYXN0SGl0Qgm6SAaSAQMQgCASQwoJcHVyY2hhc2VzGAIgAygLMiUuY3liZXIuZXNwb3J0cy52MS5FY29ub21pY1NpbVB1cmNoYXNlQgm6SAaSAQMQgAgiWwoSRWNvbm9taWNTaW1MYXN0SGl0EhsKCmVsYXBzZWRfbXMYASABKAVCB7pIBBoCKAASEwoLaXNfbGFzdF9oaXQYAiABKAgSEwoLZ29sZF9lYXJuZWQYAyABKAUiZwoTRWNvbm9taWNTaW1QdXJjaGFzZRIbCgplbGFwc2VkX21zGAEgASgFQge6SAQaAigAEhwKCWl0ZW1fbmFtZRgCIAEoCUIJukgGcgQQARhAEhUKBGNvc3QYAyABKAVCB7pIBBoCKAAypAUKC1Rlc3RTZXJ2aWNlEo4BCglMaXN0VGVzdHMSIi5jeWJlci5lc3BvcnRzLnYxLkxpc3RUZXN0c1JlcXVlc3QaIy5jeWJlci5lc3BvcnRzLnYxLkxpc3RUZXN0c1Jlc3BvbnNlIjiI8QQEitMOEwoP5rWL6K+V6aG55YiX6KGoEAGC0+STAhcSFS9hcGkvdjEvZXNwb3J0cy90ZXN0cxKNAQoHR2V0VGVzdBIgLmN5YmVyLmVzcG9ydHMudjEuR2V0VGVzdFJlcXVlc3QaIS5jeWJlci5lc3BvcnRzLnYxLkdldFRlc3RSZXNwb25zZSI9iPEEBIrTDhMKD+a1i+ivlemhueivpuaDhRABgtPkkwIcEhovYXBpL3YxL2VzcG9ydHMvdGVzdHMve2lkfRKsAQoNR2V0VGVzdENvbmZpZxImLmN5YmVyLmVzcG9ydHMudjEuR2V0VGVzdENvbmZpZ1JlcXVlc3QaJy5jeWJlci5lc3BvcnRzLnYxLkdldFRlc3RDb25maWdSZXNwb25zZSJKiPEEBIrTDhkKFea1i+ivlemhuei/kOihjOmFjee9rhABgtPkkwIjEiEvYXBpL3YxL2VzcG9ydHMvdGVzdHMve2lkfS9jb25maWcStQEKEVN1Ym1pdFRlc3RBdHRlbXB0EiouY3liZXIuZXNwb3J0cy52MS5TdWJtaXRUZXN0QXR0ZW1wdFJlcXVlc3QaKy5jeWJlci5lc3BvcnRzLnYxLlN1Ym1pdFRlc3RBdHRlbXB0UmVzcG9uc2UiR4jxBASK0w4WChLmj5DkuqTmtYvor5XlsJ3or5UQAoLT5JMCIzoBKiIeL2FwaS92MS9lc3BvcnRzL3Rlc3RzL2F0dGVtcHRzGg2K4gkJ5rWL6K+V6aG5QilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * @generated from message cyber.esports.v1.Test
@@ -257,6 +257,1144 @@ export const TestConfigSchema: GenMessage<TestConfig> = /*@__PURE__*/
   messageDesc(file_cyber_esports_v1_test, 7);
 
 /**
+ * @generated from message cyber.esports.v1.Point
+ */
+export type Point = Message<"cyber.esports.v1.Point"> & {
+  /**
+   * @generated from field: double x = 1;
+   */
+  x: number;
+
+  /**
+   * @generated from field: double y = 2;
+   */
+  y: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.Point.
+ * Use `create(PointSchema)` to create a new message.
+ */
+export const PointSchema: GenMessage<Point> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 8);
+
+/**
+ * The engine marks backgrounding spans; validity is judged server-side at
+ * submit against TestConfig.background_invalid_seconds.
+ *
+ * @generated from message cyber.esports.v1.BackgroundSpan
+ */
+export type BackgroundSpan = Message<"cyber.esports.v1.BackgroundSpan"> & {
+  /**
+   * legacy: timestamp
+   *
+   * @generated from field: int32 elapsed_ms = 1;
+   */
+  elapsedMs: number;
+
+  /**
+   * @generated from field: int32 duration_ms = 2;
+   */
+  durationMs: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.BackgroundSpan.
+ * Use `create(BackgroundSpanSchema)` to create a new message.
+ */
+export const BackgroundSpanSchema: GenMessage<BackgroundSpan> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 9);
+
+/**
+ * @generated from message cyber.esports.v1.SubmitTestAttemptRequest
+ */
+export type SubmitTestAttemptRequest = Message<"cyber.esports.v1.SubmitTestAttemptRequest"> & {
+  /**
+   * Code join key (e.g. "red_dot") — same law as Test.code.
+   *
+   * @generated from field: string test_code = 1;
+   */
+  testCode: string;
+
+  /**
+   * Attempt ordinal inside the match session — the E4 session law owns the
+   * semantics (lockdown, retest budget); this contract only carries the key.
+   *
+   * @generated from field: int32 attempt_no = 2;
+   */
+  attemptNo: number;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp started_at = 3;
+   */
+  startedAt?: Timestamp | undefined;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp ended_at = 4;
+   */
+  endedAt?: Timestamp | undefined;
+
+  /**
+   * @generated from field: repeated cyber.esports.v1.BackgroundSpan backgrounds = 5;
+   */
+  backgrounds: BackgroundSpan[];
+
+  /**
+   * @generated from oneof cyber.esports.v1.SubmitTestAttemptRequest.raw_detail
+   */
+  rawDetail: {
+    /**
+     * @generated from field: cyber.esports.v1.RedDotDetail red_dot = 10;
+     */
+    value: RedDotDetail;
+    case: "redDot";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.FlashAimingDetail flash_aiming = 11;
+     */
+    value: FlashAimingDetail;
+    case: "flashAiming";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.MultiTargetDetail multi_target = 12;
+     */
+    value: MultiTargetDetail;
+    case: "multiTarget";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.TargetRecognitionDetail target_recognition = 13;
+     */
+    value: TargetRecognitionDetail;
+    case: "targetRecognition";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.TrackingMovingDetail tracking_moving = 14;
+     */
+    value: TrackingMovingDetail;
+    case: "trackingMoving";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.MovingTargetDetail moving_target = 15;
+     */
+    value: MovingTargetDetail;
+    case: "movingTarget";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.SkillTrajectoryDetail skill_trajectory = 16;
+     */
+    value: SkillTrajectoryDetail;
+    case: "skillTrajectory";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.DualZoneDetail dual_zone = 17;
+     */
+    value: DualZoneDetail;
+    case: "dualZone";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.NumberStarsDetail number_stars = 18;
+     */
+    value: NumberStarsDetail;
+    case: "numberStars";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.OffenseDefenseDetail offense_defense = 19;
+     */
+    value: OffenseDefenseDetail;
+    case: "offenseDefense";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.CharacterCounterDetail character_counter = 20;
+     */
+    value: CharacterCounterDetail;
+    case: "characterCounter";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.ResourceMatchDetail resource_match = 21;
+     */
+    value: ResourceMatchDetail;
+    case: "resourceMatch";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.EconomicSimDetail economic_sim = 22;
+     */
+    value: EconomicSimDetail;
+    case: "economicSim";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message cyber.esports.v1.SubmitTestAttemptRequest.
+ * Use `create(SubmitTestAttemptRequestSchema)` to create a new message.
+ */
+export const SubmitTestAttemptRequestSchema: GenMessage<SubmitTestAttemptRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 10);
+
+/**
+ * @generated from message cyber.esports.v1.SubmitTestAttemptResponse
+ */
+export type SubmitTestAttemptResponse = Message<"cyber.esports.v1.SubmitTestAttemptResponse"> & {
+  /**
+   * @generated from field: string record_id = 1;
+   */
+  recordId: string;
+
+  /**
+   * Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
+   * authoritative score with its grade — neither is client-computable.
+   *
+   * @generated from field: double raw_score = 2;
+   */
+  rawScore: number;
+
+  /**
+   * @generated from field: double authoritative_score = 3;
+   */
+  authoritativeScore: number;
+
+  /**
+   * Open vocabulary {S | A | B | C} — the four-color tier law.
+   *
+   * @generated from field: string grade = 4;
+   */
+  grade: string;
+
+  /**
+   * Ability attribution receipt, six-word vocabulary shared with Test.ability.
+   *
+   * @generated from field: string ability = 5;
+   */
+  ability: string;
+
+  /**
+   * False when the attempt fails server-side validity (background over
+   * budget, incomplete detail) — an invalid attempt scores nothing; the
+   * reason code is ops vocabulary, not user copy.
+   *
+   * @generated from field: bool valid = 6;
+   */
+  valid: boolean;
+
+  /**
+   * @generated from field: google.protobuf.StringValue invalid_reason = 7;
+   */
+  invalidReason?: string | undefined;
+
+  /**
+   * Retest budget receipt for the "N/3 remaining" UI; E4 owns enforcement.
+   *
+   * @generated from field: int32 retest_left = 8;
+   */
+  retestLeft: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.SubmitTestAttemptResponse.
+ * Use `create(SubmitTestAttemptResponseSchema)` to create a new message.
+ */
+export const SubmitTestAttemptResponseSchema: GenMessage<SubmitTestAttemptResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 11);
+
+/**
+ * red_dot — reaction tap on a moving spot.
+ *
+ * @generated from message cyber.esports.v1.RedDotDetail
+ */
+export type RedDotDetail = Message<"cyber.esports.v1.RedDotDetail"> & {
+  /**
+   * legacy: detailList
+   *
+   * @generated from field: repeated cyber.esports.v1.RedDotEvent events = 1;
+   */
+  events: RedDotEvent[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.RedDotDetail.
+ * Use `create(RedDotDetailSchema)` to create a new message.
+ */
+export const RedDotDetailSchema: GenMessage<RedDotDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 12);
+
+/**
+ * @generated from message cyber.esports.v1.RedDotEvent
+ */
+export type RedDotEvent = Message<"cyber.esports.v1.RedDotEvent"> & {
+  /**
+   * legacy: targetX/targetY
+   *
+   * @generated from field: cyber.esports.v1.Point target = 1;
+   */
+  target?: Point | undefined;
+
+  /**
+   * legacy: clickX/clickY
+   *
+   * @generated from field: cyber.esports.v1.Point click = 2;
+   */
+  click?: Point | undefined;
+
+  /**
+   * @generated from field: int32 reaction_time_ms = 3;
+   */
+  reactionTimeMs: number;
+
+  /**
+   * @generated from field: double deviation = 4;
+   */
+  deviation: number;
+
+  /**
+   * geometric fact (inside radius), not a scoring verdict
+   *
+   * @generated from field: bool is_hit = 5;
+   */
+  isHit: boolean;
+};
+
+/**
+ * Describes the message cyber.esports.v1.RedDotEvent.
+ * Use `create(RedDotEventSchema)` to create a new message.
+ */
+export const RedDotEventSchema: GenMessage<RedDotEvent> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 13);
+
+/**
+ * flash_aiming — snap shots at flashing targets.
+ *
+ * @generated from message cyber.esports.v1.FlashAimingDetail
+ */
+export type FlashAimingDetail = Message<"cyber.esports.v1.FlashAimingDetail"> & {
+  /**
+   * @generated from field: repeated cyber.esports.v1.FlashAimingShot shots = 1;
+   */
+  shots: FlashAimingShot[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.FlashAimingDetail.
+ * Use `create(FlashAimingDetailSchema)` to create a new message.
+ */
+export const FlashAimingDetailSchema: GenMessage<FlashAimingDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 14);
+
+/**
+ * @generated from message cyber.esports.v1.FlashAimingShot
+ */
+export type FlashAimingShot = Message<"cyber.esports.v1.FlashAimingShot"> & {
+  /**
+   * @generated from field: string target_id = 1;
+   */
+  targetId: string;
+
+  /**
+   * + legacy targetSize
+   *
+   * @generated from field: cyber.esports.v1.Point target = 2;
+   */
+  target?: Point | undefined;
+
+  /**
+   * @generated from field: double target_size = 3;
+   */
+  targetSize: number;
+
+  /**
+   * @generated from field: cyber.esports.v1.Point click = 4;
+   */
+  click?: Point | undefined;
+
+  /**
+   * @generated from field: double deviation = 5;
+   */
+  deviation: number;
+
+  /**
+   * @generated from field: int32 aim_time_ms = 6;
+   */
+  aimTimeMs: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.FlashAimingShot.
+ * Use `create(FlashAimingShotSchema)` to create a new message.
+ */
+export const FlashAimingShotSchema: GenMessage<FlashAimingShot> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 15);
+
+/**
+ * multi_target — priority firing under value tiers. The legacy pick stream
+ * carried no tier; the tier rides here now so the server can rebuild every
+ * priority aggregate from facts.
+ *
+ * @generated from message cyber.esports.v1.MultiTargetDetail
+ */
+export type MultiTargetDetail = Message<"cyber.esports.v1.MultiTargetDetail"> & {
+  /**
+   * legacy: targetSelectionOrder
+   *
+   * @generated from field: repeated cyber.esports.v1.MultiTargetPick picks = 1;
+   */
+  picks: MultiTargetPick[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.MultiTargetDetail.
+ * Use `create(MultiTargetDetailSchema)` to create a new message.
+ */
+export const MultiTargetDetailSchema: GenMessage<MultiTargetDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 16);
+
+/**
+ * @generated from message cyber.esports.v1.MultiTargetPick
+ */
+export type MultiTargetPick = Message<"cyber.esports.v1.MultiTargetPick"> & {
+  /**
+   * @generated from field: string target_id = 1;
+   */
+  targetId: string;
+
+  /**
+   * Open vocabulary {high | medium | low | trap}.
+   *
+   * @generated from field: string tier = 2;
+   */
+  tier: string;
+
+  /**
+   * @generated from field: bool is_hit = 3;
+   */
+  isHit: boolean;
+
+  /**
+   * legacy: timestamp
+   *
+   * @generated from field: int32 elapsed_ms = 4;
+   */
+  elapsedMs: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.MultiTargetPick.
+ * Use `create(MultiTargetPickSchema)` to create a new message.
+ */
+export const MultiTargetPickSchema: GenMessage<MultiTargetPick> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 17);
+
+/**
+ * target_recognition — friend/foe discrimination; correctness is judged
+ * server-side against the target type, never asserted by the client.
+ *
+ * @generated from message cyber.esports.v1.TargetRecognitionDetail
+ */
+export type TargetRecognitionDetail = Message<"cyber.esports.v1.TargetRecognitionDetail"> & {
+  /**
+   * @generated from field: repeated cyber.esports.v1.TargetRecognitionClick clicks = 1;
+   */
+  clicks: TargetRecognitionClick[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.TargetRecognitionDetail.
+ * Use `create(TargetRecognitionDetailSchema)` to create a new message.
+ */
+export const TargetRecognitionDetailSchema: GenMessage<TargetRecognitionDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 18);
+
+/**
+ * @generated from message cyber.esports.v1.TargetRecognitionClick
+ */
+export type TargetRecognitionClick = Message<"cyber.esports.v1.TargetRecognitionClick"> & {
+  /**
+   * @generated from field: string target_id = 1;
+   */
+  targetId: string;
+
+  /**
+   * Open vocabulary {friendly | enemy | neutral}.
+   *
+   * @generated from field: string target_type = 2;
+   */
+  targetType: string;
+
+  /**
+   * absent = no reaction
+   *
+   * @generated from field: optional int32 reaction_time_ms = 3;
+   */
+  reactionTimeMs?: number | undefined;
+
+  /**
+   * @generated from field: int32 elapsed_ms = 4;
+   */
+  elapsedMs: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.TargetRecognitionClick.
+ * Use `create(TargetRecognitionClickSchema)` to create a new message.
+ */
+export const TargetRecognitionClickSchema: GenMessage<TargetRecognitionClick> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 19);
+
+/**
+ * tracking_moving — sustained tracking of a moving target.
+ *
+ * @generated from message cyber.esports.v1.TrackingMovingDetail
+ */
+export type TrackingMovingDetail = Message<"cyber.esports.v1.TrackingMovingDetail"> & {
+  /**
+   * @generated from field: repeated cyber.esports.v1.TrackingMovingFrame frames = 1;
+   */
+  frames: TrackingMovingFrame[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.TrackingMovingDetail.
+ * Use `create(TrackingMovingDetailSchema)` to create a new message.
+ */
+export const TrackingMovingDetailSchema: GenMessage<TrackingMovingDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 20);
+
+/**
+ * @generated from message cyber.esports.v1.TrackingMovingFrame
+ */
+export type TrackingMovingFrame = Message<"cyber.esports.v1.TrackingMovingFrame"> & {
+  /**
+   * @generated from field: int32 elapsed_ms = 1;
+   */
+  elapsedMs: number;
+
+  /**
+   * @generated from field: cyber.esports.v1.Point target = 2;
+   */
+  target?: Point | undefined;
+
+  /**
+   * @generated from field: cyber.esports.v1.Point crosshair = 3;
+   */
+  crosshair?: Point | undefined;
+
+  /**
+   * @generated from field: double deviation = 4;
+   */
+  deviation: number;
+
+  /**
+   * @generated from field: cyber.esports.v1.Point player = 5;
+   */
+  player?: Point | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.TrackingMovingFrame.
+ * Use `create(TrackingMovingFrameSchema)` to create a new message.
+ */
+export const TrackingMovingFrameSchema: GenMessage<TrackingMovingFrame> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 21);
+
+/**
+ * moving_target — tracking across movement patterns; the pattern phase is a
+ * fact the server needs to reproduce per-pattern aggregates (legacy had it
+ * only as a client-side summary).
+ *
+ * @generated from message cyber.esports.v1.MovingTargetDetail
+ */
+export type MovingTargetDetail = Message<"cyber.esports.v1.MovingTargetDetail"> & {
+  /**
+   * @generated from field: repeated cyber.esports.v1.MovingTargetShot shots = 1;
+   */
+  shots: MovingTargetShot[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.MovingTargetDetail.
+ * Use `create(MovingTargetDetailSchema)` to create a new message.
+ */
+export const MovingTargetDetailSchema: GenMessage<MovingTargetDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 22);
+
+/**
+ * @generated from message cyber.esports.v1.MovingTargetShot
+ */
+export type MovingTargetShot = Message<"cyber.esports.v1.MovingTargetShot"> & {
+  /**
+   * legacy: timestamp
+   *
+   * @generated from field: int32 elapsed_ms = 1;
+   */
+  elapsedMs: number;
+
+  /**
+   * @generated from field: cyber.esports.v1.Point target = 2;
+   */
+  target?: Point | undefined;
+
+  /**
+   * @generated from field: cyber.esports.v1.Point crosshair = 3;
+   */
+  crosshair?: Point | undefined;
+
+  /**
+   * @generated from field: double deviation = 4;
+   */
+  deviation: number;
+
+  /**
+   * @generated from field: bool hit = 5;
+   */
+  hit: boolean;
+
+  /**
+   * Open vocabulary {straight | curve | zigzag | circle | random | variable}.
+   *
+   * @generated from field: string pattern = 6;
+   */
+  pattern: string;
+};
+
+/**
+ * Describes the message cyber.esports.v1.MovingTargetShot.
+ * Use `create(MovingTargetShotSchema)` to create a new message.
+ */
+export const MovingTargetShotSchema: GenMessage<MovingTargetShot> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 23);
+
+/**
+ * skill_trajectory — placement precision over draggable graphics; the seed
+ * reproduces the board server-side.
+ *
+ * @generated from message cyber.esports.v1.SkillTrajectoryDetail
+ */
+export type SkillTrajectoryDetail = Message<"cyber.esports.v1.SkillTrajectoryDetail"> & {
+  /**
+   * legacy: randomSeed
+   *
+   * @generated from field: int64 random_seed = 1;
+   */
+  randomSeed: bigint;
+
+  /**
+   * legacy: rounds (was untyped)
+   *
+   * @generated from field: repeated cyber.esports.v1.SkillTrajectoryRound rounds = 2;
+   */
+  rounds: SkillTrajectoryRound[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.SkillTrajectoryDetail.
+ * Use `create(SkillTrajectoryDetailSchema)` to create a new message.
+ */
+export const SkillTrajectoryDetailSchema: GenMessage<SkillTrajectoryDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 24);
+
+/**
+ * @generated from message cyber.esports.v1.SkillTrajectoryRound
+ */
+export type SkillTrajectoryRound = Message<"cyber.esports.v1.SkillTrajectoryRound"> & {
+  /**
+   * @generated from field: int32 round_number = 1;
+   */
+  roundNumber: number;
+
+  /**
+   * @generated from field: string graphic_id = 2;
+   */
+  graphicId: string;
+
+  /**
+   * Open vocabulary {circle | square | triangle | pentagon | hexagon | star}.
+   *
+   * @generated from field: string shape = 3;
+   */
+  shape: string;
+
+  /**
+   * @generated from field: double graphic_size = 4;
+   */
+  graphicSize: number;
+
+  /**
+   * semantic name, not a hex string
+   *
+   * @generated from field: string color_name = 5;
+   */
+  colorName: string;
+
+  /**
+   * @generated from field: cyber.esports.v1.Point original_position = 6;
+   */
+  originalPosition?: Point | undefined;
+
+  /**
+   * @generated from field: repeated cyber.esports.v1.Point trajectory = 7;
+   */
+  trajectory: Point[];
+
+  /**
+   * null = not placed
+   *
+   * @generated from field: cyber.esports.v1.Point player_placement = 8;
+   */
+  playerPlacement?: Point | undefined;
+
+  /**
+   * @generated from field: double deviation = 9;
+   */
+  deviation: number;
+
+  /**
+   * @generated from field: int32 placement_time_ms = 10;
+   */
+  placementTimeMs: number;
+
+  /**
+   * @generated from field: bool selected = 11;
+   */
+  selected: boolean;
+
+  /**
+   * @generated from field: bool placed = 12;
+   */
+  placed: boolean;
+};
+
+/**
+ * Describes the message cyber.esports.v1.SkillTrajectoryRound.
+ * Use `create(SkillTrajectoryRoundSchema)` to create a new message.
+ */
+export const SkillTrajectoryRoundSchema: GenMessage<SkillTrajectoryRound> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 25);
+
+/**
+ * dual_zone — two-lane dodging; the behavior stream carries zone sides and
+ * collision/dodge events with optional geometry.
+ *
+ * @generated from message cyber.esports.v1.DualZoneDetail
+ */
+export type DualZoneDetail = Message<"cyber.esports.v1.DualZoneDetail"> & {
+  /**
+   * legacy: behaviorRecords
+   *
+   * @generated from field: repeated cyber.esports.v1.DualZoneBehavior behaviors = 1;
+   */
+  behaviors: DualZoneBehavior[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.DualZoneDetail.
+ * Use `create(DualZoneDetailSchema)` to create a new message.
+ */
+export const DualZoneDetailSchema: GenMessage<DualZoneDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 26);
+
+/**
+ * @generated from message cyber.esports.v1.DualZoneBehavior
+ */
+export type DualZoneBehavior = Message<"cyber.esports.v1.DualZoneBehavior"> & {
+  /**
+   * legacy: timestamp
+   *
+   * @generated from field: int32 elapsed_ms = 1;
+   */
+  elapsedMs: number;
+
+  /**
+   * Open vocabulary {left | right} — legacy LEFT/RIGHT lowercased.
+   *
+   * @generated from field: string zone = 2;
+   */
+  zone: string;
+
+  /**
+   * Open vocabulary {collision | dodge}.
+   *
+   * @generated from field: string event = 3;
+   */
+  event: string;
+
+  /**
+   * legacy: positionX/positionY
+   *
+   * @generated from field: optional cyber.esports.v1.Point position = 4;
+   */
+  position?: Point | undefined;
+
+  /**
+   * @generated from field: optional int32 obstacle_id = 5;
+   */
+  obstacleId?: number | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.DualZoneBehavior.
+ * Use `create(DualZoneBehaviorSchema)` to create a new message.
+ */
+export const DualZoneBehaviorSchema: GenMessage<DualZoneBehavior> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 27);
+
+/**
+ * number_stars — numeric sequence tapping; the round's target sequence plus
+ * the click stream let the server rebuild accuracy and decision intervals
+ * (legacy asserted isCorrect/expectedNumber client-side — now derived).
+ *
+ * @generated from message cyber.esports.v1.NumberStarsDetail
+ */
+export type NumberStarsDetail = Message<"cyber.esports.v1.NumberStarsDetail"> & {
+  /**
+   * legacy: roundHistory (was untyped)
+   *
+   * @generated from field: repeated cyber.esports.v1.NumberStarsRound rounds = 1;
+   */
+  rounds: NumberStarsRound[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.NumberStarsDetail.
+ * Use `create(NumberStarsDetailSchema)` to create a new message.
+ */
+export const NumberStarsDetailSchema: GenMessage<NumberStarsDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 28);
+
+/**
+ * @generated from message cyber.esports.v1.NumberStarsRound
+ */
+export type NumberStarsRound = Message<"cyber.esports.v1.NumberStarsRound"> & {
+  /**
+   * @generated from field: int32 round_number = 1;
+   */
+  roundNumber: number;
+
+  /**
+   * the target sequence
+   *
+   * @generated from field: repeated int32 numbers = 2;
+   */
+  numbers: number[];
+
+  /**
+   * @generated from field: repeated cyber.esports.v1.NumberStarsClick clicks = 3;
+   */
+  clicks: NumberStarsClick[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.NumberStarsRound.
+ * Use `create(NumberStarsRoundSchema)` to create a new message.
+ */
+export const NumberStarsRoundSchema: GenMessage<NumberStarsRound> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 29);
+
+/**
+ * @generated from message cyber.esports.v1.NumberStarsClick
+ */
+export type NumberStarsClick = Message<"cyber.esports.v1.NumberStarsClick"> & {
+  /**
+   * @generated from field: int32 number = 1;
+   */
+  number: number;
+
+  /**
+   * legacy: timestamp
+   *
+   * @generated from field: int32 elapsed_ms = 2;
+   */
+  elapsedMs: number;
+
+  /**
+   * legacy: x/y
+   *
+   * @generated from field: cyber.esports.v1.Point position = 3;
+   */
+  position?: Point | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.NumberStarsClick.
+ * Use `create(NumberStarsClickSchema)` to create a new message.
+ */
+export const NumberStarsClickSchema: GenMessage<NumberStarsClick> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 30);
+
+/**
+ * offense_defense — scenario decisions; correctness is judged server-side
+ * against the scenario answer key (legacy isCorrect dropped).
+ *
+ * @generated from message cyber.esports.v1.OffenseDefenseDetail
+ */
+export type OffenseDefenseDetail = Message<"cyber.esports.v1.OffenseDefenseDetail"> & {
+  /**
+   * legacy: decisions
+   *
+   * @generated from field: repeated cyber.esports.v1.OffenseDefenseDecision decisions = 1;
+   */
+  decisions: OffenseDefenseDecision[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.OffenseDefenseDetail.
+ * Use `create(OffenseDefenseDetailSchema)` to create a new message.
+ */
+export const OffenseDefenseDetailSchema: GenMessage<OffenseDefenseDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 31);
+
+/**
+ * @generated from message cyber.esports.v1.OffenseDefenseDecision
+ */
+export type OffenseDefenseDecision = Message<"cyber.esports.v1.OffenseDefenseDecision"> & {
+  /**
+   * @generated from field: string scenario_id = 1;
+   */
+  scenarioId: string;
+
+  /**
+   * Open vocabulary {attack | defense | retreat}; absent = unanswered.
+   *
+   * @generated from field: optional string choice = 2;
+   */
+  choice?: string | undefined;
+
+  /**
+   * @generated from field: int32 decision_time_ms = 3;
+   */
+  decisionTimeMs: number;
+
+  /**
+   * @generated from field: bool timeout = 4;
+   */
+  timeout: boolean;
+};
+
+/**
+ * Describes the message cyber.esports.v1.OffenseDefenseDecision.
+ * Use `create(OffenseDefenseDecisionSchema)` to create a new message.
+ */
+export const OffenseDefenseDecisionSchema: GenMessage<OffenseDefenseDecision> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 32);
+
+/**
+ * character_counter — lineup counter-picking; the counter score is a
+ * server-side judgment against the counter matrix.
+ *
+ * @generated from message cyber.esports.v1.CharacterCounterDetail
+ */
+export type CharacterCounterDetail = Message<"cyber.esports.v1.CharacterCounterDetail"> & {
+  /**
+   * legacy: rounds
+   *
+   * @generated from field: repeated cyber.esports.v1.CharacterCounterRound rounds = 1;
+   */
+  rounds: CharacterCounterRound[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.CharacterCounterDetail.
+ * Use `create(CharacterCounterDetailSchema)` to create a new message.
+ */
+export const CharacterCounterDetailSchema: GenMessage<CharacterCounterDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 33);
+
+/**
+ * @generated from message cyber.esports.v1.CharacterCounterRound
+ */
+export type CharacterCounterRound = Message<"cyber.esports.v1.CharacterCounterRound"> & {
+  /**
+   * @generated from field: int32 round_number = 1;
+   */
+  roundNumber: number;
+
+  /**
+   * @generated from field: repeated string enemy_lineup = 2;
+   */
+  enemyLineup: string[];
+
+  /**
+   * @generated from field: repeated string selected_lineup = 3;
+   */
+  selectedLineup: string[];
+
+  /**
+   * legacy: timeSpent
+   *
+   * @generated from field: int32 time_spent_ms = 4;
+   */
+  timeSpentMs: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.CharacterCounterRound.
+ * Use `create(CharacterCounterRoundSchema)` to create a new message.
+ */
+export const CharacterCounterRoundSchema: GenMessage<CharacterCounterRound> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 34);
+
+/**
+ * resource_match — collecting resources on a field; trajectory plus the
+ * collect sequence (kind + time) rebuild every efficiency aggregate.
+ *
+ * @generated from message cyber.esports.v1.ResourceMatchDetail
+ */
+export type ResourceMatchDetail = Message<"cyber.esports.v1.ResourceMatchDetail"> & {
+  /**
+   * legacy: trajectory
+   *
+   * @generated from field: repeated cyber.esports.v1.ResourceMatchTrajectoryPoint trajectory = 1;
+   */
+  trajectory: ResourceMatchTrajectoryPoint[];
+
+  /**
+   * legacy: collectSequence (was bare numbers)
+   *
+   * @generated from field: repeated cyber.esports.v1.ResourceMatchCollect collects = 2;
+   */
+  collects: ResourceMatchCollect[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.ResourceMatchDetail.
+ * Use `create(ResourceMatchDetailSchema)` to create a new message.
+ */
+export const ResourceMatchDetailSchema: GenMessage<ResourceMatchDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 35);
+
+/**
+ * @generated from message cyber.esports.v1.ResourceMatchTrajectoryPoint
+ */
+export type ResourceMatchTrajectoryPoint = Message<"cyber.esports.v1.ResourceMatchTrajectoryPoint"> & {
+  /**
+   * legacy: x/y
+   *
+   * @generated from field: cyber.esports.v1.Point position = 1;
+   */
+  position?: Point | undefined;
+
+  /**
+   * legacy: optional timestamp
+   *
+   * @generated from field: optional int32 elapsed_ms = 2;
+   */
+  elapsedMs?: number | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.ResourceMatchTrajectoryPoint.
+ * Use `create(ResourceMatchTrajectoryPointSchema)` to create a new message.
+ */
+export const ResourceMatchTrajectoryPointSchema: GenMessage<ResourceMatchTrajectoryPoint> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 36);
+
+/**
+ * @generated from message cyber.esports.v1.ResourceMatchCollect
+ */
+export type ResourceMatchCollect = Message<"cyber.esports.v1.ResourceMatchCollect"> & {
+  /**
+   * Open vocabulary {minion | monster | dragon} — the resource kinds.
+   *
+   * @generated from field: string kind = 1;
+   */
+  kind: string;
+
+  /**
+   * @generated from field: int32 elapsed_ms = 2;
+   */
+  elapsedMs: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.ResourceMatchCollect.
+ * Use `create(ResourceMatchCollectSchema)` to create a new message.
+ */
+export const ResourceMatchCollectSchema: GenMessage<ResourceMatchCollect> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 37);
+
+/**
+ * economic_sim — last-hitting and spending economy.
+ *
+ * @generated from message cyber.esports.v1.EconomicSimDetail
+ */
+export type EconomicSimDetail = Message<"cyber.esports.v1.EconomicSimDetail"> & {
+  /**
+   * legacy: lastHitEvents
+   *
+   * @generated from field: repeated cyber.esports.v1.EconomicSimLastHit last_hits = 1;
+   */
+  lastHits: EconomicSimLastHit[];
+
+  /**
+   * legacy: purchases
+   *
+   * @generated from field: repeated cyber.esports.v1.EconomicSimPurchase purchases = 2;
+   */
+  purchases: EconomicSimPurchase[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.EconomicSimDetail.
+ * Use `create(EconomicSimDetailSchema)` to create a new message.
+ */
+export const EconomicSimDetailSchema: GenMessage<EconomicSimDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 38);
+
+/**
+ * @generated from message cyber.esports.v1.EconomicSimLastHit
+ */
+export type EconomicSimLastHit = Message<"cyber.esports.v1.EconomicSimLastHit"> & {
+  /**
+   * legacy: timestamp
+   *
+   * @generated from field: int32 elapsed_ms = 1;
+   */
+  elapsedMs: number;
+
+  /**
+   * @generated from field: bool is_last_hit = 2;
+   */
+  isLastHit: boolean;
+
+  /**
+   * @generated from field: int32 gold_earned = 3;
+   */
+  goldEarned: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.EconomicSimLastHit.
+ * Use `create(EconomicSimLastHitSchema)` to create a new message.
+ */
+export const EconomicSimLastHitSchema: GenMessage<EconomicSimLastHit> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 39);
+
+/**
+ * @generated from message cyber.esports.v1.EconomicSimPurchase
+ */
+export type EconomicSimPurchase = Message<"cyber.esports.v1.EconomicSimPurchase"> & {
+  /**
+   * legacy: timestamp
+   *
+   * @generated from field: int32 elapsed_ms = 1;
+   */
+  elapsedMs: number;
+
+  /**
+   * @generated from field: string item_name = 2;
+   */
+  itemName: string;
+
+  /**
+   * @generated from field: int32 cost = 3;
+   */
+  cost: number;
+};
+
+/**
+ * Describes the message cyber.esports.v1.EconomicSimPurchase.
+ * Use `create(EconomicSimPurchaseSchema)` to create a new message.
+ */
+export const EconomicSimPurchaseSchema: GenMessage<EconomicSimPurchase> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_test, 40);
+
+/**
  * Test catalog and per-test runtime delivery — test names the scored item,
  * never the played title (naming split). The C-end surfaces tests through
  * the matching flow, not a browse page: the list face is the hydration
@@ -291,6 +1429,22 @@ export const TestService: GenService<{
     methodKind: "unary";
     input: typeof GetTestConfigRequestSchema;
     output: typeof GetTestConfigResponseSchema;
+  },
+  /**
+   * The unified attempt submission — one RPC replacing the legacy fourteen
+   * per-game endpoints. Facts up, verdicts down: the client sends only
+   * event facts (coordinates, timings, choices, environment); every
+   * aggregate score is recomputed server-side from the detail stream and
+   * returned as the dual-track verdict (§0.5). The admin record read face
+   * (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+   * contract's stored shape and lands with E9.
+   *
+   * @generated from rpc cyber.esports.v1.TestService.SubmitTestAttempt
+   */
+  submitTestAttempt: {
+    methodKind: "unary";
+    input: typeof SubmitTestAttemptRequestSchema;
+    output: typeof SubmitTestAttemptResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_cyber_esports_v1_test, 0);

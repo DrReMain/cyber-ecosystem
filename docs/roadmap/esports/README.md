@@ -45,7 +45,7 @@
 
 - **双服务**:system(既有 IAM/文件/身份)+ esports(新建,业务域);一 PG 容器两逻辑库。
 - **esports 双面**:Admin* 面(员工会话+grants,selector 走 ADMIN 链)/ C 端面(会员会话+归属强制,MEMBER 链);population 不互通;accessLadder 按每服务 server 包自装配范式接线。
-- **身份模型**:C 端用户 = system 第二身份聚合(membership/population 机制已落地);玩家画像 = esports 聚合 keyed by member_id;微信登录 provider 住 system(code 交换必须在服务端);短信 = 阿里云 dysmsapi(密钥/签名/模板照旧配置)。
+- **身份模型**:C 端用户 = system 第二身份聚合(membership/population 机制已落地);玩家画像 = esports 聚合 keyed by member_id;微信登录 provider 住 system(code 交换必须在服务端);短信 = 阿里云 dysmsapi(密钥/签名/模板照旧配置)。**短信分层(2026-10-20 裁决)**:发送管道=platform capability(shared-go/capability 短信家族,双实现 dysmsapi+mock/log 供开发与 e2e),验证码登录=system 新 provider(与微信 provider 同层,消费该能力);触发=E6b 余面 SMS 骨架片。
 - **租户模型**:default = 公版租户;专版(首家 HL)= 租户轴数据分区;admin 客户端暂载平台运营面。
 - **前端两工程**:后台复用 admin client(新挂 esports 业务模块);前台新建 ctr client(TanStack Start,微信 WebView 单 cookie 会话模型)。
 

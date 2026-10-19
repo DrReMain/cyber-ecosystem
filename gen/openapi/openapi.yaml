@@ -440,6 +440,32 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.ListTestsResponse'
+    /api/v1/esports/tests/attempts:
+        post:
+            tags:
+                - TestService
+            description: |-
+                The unified attempt submission — one RPC replacing the legacy fourteen
+                 per-game endpoints. Facts up, verdicts down: the client sends only
+                 event facts (coordinates, timings, choices, environment); every
+                 aggregate score is recomputed server-side from the detail stream and
+                 returned as the dual-track verdict (§0.5). The admin record read face
+                 (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+                 contract's stored shape and lands with E9.
+            operationId: TestService_SubmitTestAttempt
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SubmitTestAttemptRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SubmitTestAttemptResponse'
     /api/v1/esports/tests/{id}:
         get:
             tags:
@@ -2429,6 +2455,132 @@ components:
         cyber.agent.v1.UpdateSessionResponse:
             type: object
             properties: {}
+        cyber.esports.v1.BackgroundSpan:
+            type: object
+            properties:
+                elapsedMs:
+                    type: integer
+                    format: int32
+                durationMs:
+                    type: integer
+                    format: int32
+            description: |-
+                The engine marks backgrounding spans; validity is judged server-side at
+                 submit against TestConfig.background_invalid_seconds.
+        cyber.esports.v1.CharacterCounterDetail:
+            type: object
+            properties:
+                rounds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.CharacterCounterRound'
+            description: |-
+                character_counter — lineup counter-picking; the counter score is a
+                 server-side judgment against the counter matrix.
+        cyber.esports.v1.CharacterCounterRound:
+            type: object
+            properties:
+                roundNumber:
+                    type: integer
+                    format: int32
+                enemyLineup:
+                    type: array
+                    items:
+                        type: string
+                selectedLineup:
+                    type: array
+                    items:
+                        type: string
+                timeSpentMs:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.DualZoneBehavior:
+            type: object
+            properties:
+                elapsedMs:
+                    type: integer
+                    format: int32
+                zone:
+                    type: string
+                    description: Open vocabulary {left | right} — legacy LEFT/RIGHT lowercased.
+                event:
+                    type: string
+                    description: Open vocabulary {collision | dodge}.
+                position:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                obstacleId:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.DualZoneDetail:
+            type: object
+            properties:
+                behaviors:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.DualZoneBehavior'
+            description: |-
+                dual_zone — two-lane dodging; the behavior stream carries zone sides and
+                 collision/dodge events with optional geometry.
+        cyber.esports.v1.EconomicSimDetail:
+            type: object
+            properties:
+                lastHits:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.EconomicSimLastHit'
+                purchases:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.EconomicSimPurchase'
+            description: economic_sim — last-hitting and spending economy.
+        cyber.esports.v1.EconomicSimLastHit:
+            type: object
+            properties:
+                elapsedMs:
+                    type: integer
+                    format: int32
+                isLastHit:
+                    type: boolean
+                goldEarned:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.EconomicSimPurchase:
+            type: object
+            properties:
+                elapsedMs:
+                    type: integer
+                    format: int32
+                itemName:
+                    type: string
+                cost:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.FlashAimingDetail:
+            type: object
+            properties:
+                shots:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.FlashAimingShot'
+            description: flash_aiming — snap shots at flashing targets.
+        cyber.esports.v1.FlashAimingShot:
+            type: object
+            properties:
+                targetId:
+                    type: string
+                target:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                targetSize:
+                    type: number
+                    format: double
+                click:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                deviation:
+                    type: number
+                    format: double
+                aimTimeMs:
+                    type: integer
+                    format: int32
         cyber.esports.v1.Game:
             type: object
             properties:
@@ -2546,6 +2698,128 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.ProfileGame'
+        cyber.esports.v1.MovingTargetDetail:
+            type: object
+            properties:
+                shots:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.MovingTargetShot'
+            description: |-
+                moving_target — tracking across movement patterns; the pattern phase is a
+                 fact the server needs to reproduce per-pattern aggregates (legacy had it
+                 only as a client-side summary).
+        cyber.esports.v1.MovingTargetShot:
+            type: object
+            properties:
+                elapsedMs:
+                    type: integer
+                    format: int32
+                target:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                crosshair:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                deviation:
+                    type: number
+                    format: double
+                hit:
+                    type: boolean
+                pattern:
+                    type: string
+                    description: Open vocabulary {straight | curve | zigzag | circle | random | variable}.
+        cyber.esports.v1.MultiTargetDetail:
+            type: object
+            properties:
+                picks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.MultiTargetPick'
+            description: |-
+                multi_target — priority firing under value tiers. The legacy pick stream
+                 carried no tier; the tier rides here now so the server can rebuild every
+                 priority aggregate from facts.
+        cyber.esports.v1.MultiTargetPick:
+            type: object
+            properties:
+                targetId:
+                    type: string
+                tier:
+                    type: string
+                    description: Open vocabulary {high | medium | low | trap}.
+                isHit:
+                    type: boolean
+                elapsedMs:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.NumberStarsClick:
+            type: object
+            properties:
+                number:
+                    type: integer
+                    format: int32
+                elapsedMs:
+                    type: integer
+                    format: int32
+                position:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+        cyber.esports.v1.NumberStarsDetail:
+            type: object
+            properties:
+                rounds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.NumberStarsRound'
+            description: |-
+                number_stars — numeric sequence tapping; the round's target sequence plus
+                 the click stream let the server rebuild accuracy and decision intervals
+                 (legacy asserted isCorrect/expectedNumber client-side — now derived).
+        cyber.esports.v1.NumberStarsRound:
+            type: object
+            properties:
+                roundNumber:
+                    type: integer
+                    format: int32
+                numbers:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                clicks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.NumberStarsClick'
+        cyber.esports.v1.OffenseDefenseDecision:
+            type: object
+            properties:
+                scenarioId:
+                    type: string
+                choice:
+                    type: string
+                    description: Open vocabulary {attack | defense | retreat}; absent = unanswered.
+                decisionTimeMs:
+                    type: integer
+                    format: int32
+                timeout:
+                    type: boolean
+        cyber.esports.v1.OffenseDefenseDetail:
+            type: object
+            properties:
+                decisions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.OffenseDefenseDecision'
+            description: |-
+                offense_defense — scenario decisions; correctness is judged server-side
+                 against the scenario answer key (legacy isCorrect dropped).
+        cyber.esports.v1.Point:
+            type: object
+            properties:
+                x:
+                    type: number
+                    format: double
+                y:
+                    type: number
+                    format: double
         cyber.esports.v1.Profile:
             type: object
             properties:
@@ -2604,6 +2878,210 @@ components:
             description: |-
                 One preference entry: exactly one of the pair is set — a catalog reference
                  or a user-typed name awaiting admin classification.
+        cyber.esports.v1.RedDotDetail:
+            type: object
+            properties:
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.RedDotEvent'
+            description: red_dot — reaction tap on a moving spot.
+        cyber.esports.v1.RedDotEvent:
+            type: object
+            properties:
+                target:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                click:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                reactionTimeMs:
+                    type: integer
+                    format: int32
+                deviation:
+                    type: number
+                    format: double
+                isHit:
+                    type: boolean
+        cyber.esports.v1.ResourceMatchCollect:
+            type: object
+            properties:
+                kind:
+                    type: string
+                    description: Open vocabulary {minion | monster | dragon} — the resource kinds.
+                elapsedMs:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.ResourceMatchDetail:
+            type: object
+            properties:
+                trajectory:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ResourceMatchTrajectoryPoint'
+                collects:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ResourceMatchCollect'
+            description: |-
+                resource_match — collecting resources on a field; trajectory plus the
+                 collect sequence (kind + time) rebuild every efficiency aggregate.
+        cyber.esports.v1.ResourceMatchTrajectoryPoint:
+            type: object
+            properties:
+                position:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                elapsedMs:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.SkillTrajectoryDetail:
+            type: object
+            properties:
+                randomSeed:
+                    type: string
+                rounds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.SkillTrajectoryRound'
+            description: |-
+                skill_trajectory — placement precision over draggable graphics; the seed
+                 reproduces the board server-side.
+        cyber.esports.v1.SkillTrajectoryRound:
+            type: object
+            properties:
+                roundNumber:
+                    type: integer
+                    format: int32
+                graphicId:
+                    type: string
+                shape:
+                    type: string
+                    description: Open vocabulary {circle | square | triangle | pentagon | hexagon | star}.
+                graphicSize:
+                    type: number
+                    format: double
+                colorName:
+                    type: string
+                originalPosition:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                trajectory:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Point'
+                playerPlacement:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                deviation:
+                    type: number
+                    format: double
+                placementTimeMs:
+                    type: integer
+                    format: int32
+                selected:
+                    type: boolean
+                placed:
+                    type: boolean
+        cyber.esports.v1.SubmitTestAttemptRequest:
+            type: object
+            properties:
+                testCode:
+                    type: string
+                    description: Code join key (e.g. "red_dot") — same law as Test.code.
+                attemptNo:
+                    type: integer
+                    description: |-
+                        Attempt ordinal inside the match session — the E4 session law owns the
+                         semantics (lockdown, retest budget); this contract only carries the key.
+                    format: int32
+                startedAt:
+                    type: string
+                    format: date-time
+                endedAt:
+                    type: string
+                    format: date-time
+                backgrounds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.BackgroundSpan'
+                redDot:
+                    $ref: '#/components/schemas/cyber.esports.v1.RedDotDetail'
+                flashAiming:
+                    $ref: '#/components/schemas/cyber.esports.v1.FlashAimingDetail'
+                multiTarget:
+                    $ref: '#/components/schemas/cyber.esports.v1.MultiTargetDetail'
+                targetRecognition:
+                    $ref: '#/components/schemas/cyber.esports.v1.TargetRecognitionDetail'
+                trackingMoving:
+                    $ref: '#/components/schemas/cyber.esports.v1.TrackingMovingDetail'
+                movingTarget:
+                    $ref: '#/components/schemas/cyber.esports.v1.MovingTargetDetail'
+                skillTrajectory:
+                    $ref: '#/components/schemas/cyber.esports.v1.SkillTrajectoryDetail'
+                dualZone:
+                    $ref: '#/components/schemas/cyber.esports.v1.DualZoneDetail'
+                numberStars:
+                    $ref: '#/components/schemas/cyber.esports.v1.NumberStarsDetail'
+                offenseDefense:
+                    $ref: '#/components/schemas/cyber.esports.v1.OffenseDefenseDetail'
+                characterCounter:
+                    $ref: '#/components/schemas/cyber.esports.v1.CharacterCounterDetail'
+                resourceMatch:
+                    $ref: '#/components/schemas/cyber.esports.v1.ResourceMatchDetail'
+                economicSim:
+                    $ref: '#/components/schemas/cyber.esports.v1.EconomicSimDetail'
+        cyber.esports.v1.SubmitTestAttemptResponse:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                rawScore:
+                    type: number
+                    description: |-
+                        Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
+                         authoritative score with its grade — neither is client-computable.
+                    format: double
+                authoritativeScore:
+                    type: number
+                    format: double
+                grade:
+                    type: string
+                    description: Open vocabulary {S | A | B | C} — the four-color tier law.
+                ability:
+                    type: string
+                    description: Ability attribution receipt, six-word vocabulary shared with Test.ability.
+                valid:
+                    type: boolean
+                    description: |-
+                        False when the attempt fails server-side validity (background over
+                         budget, incomplete detail) — an invalid attempt scores nothing; the
+                         reason code is ops vocabulary, not user copy.
+                invalidReason:
+                    type: string
+                retestLeft:
+                    type: integer
+                    description: Retest budget receipt for the "N/3 remaining" UI; E4 owns enforcement.
+                    format: int32
+        cyber.esports.v1.TargetRecognitionClick:
+            type: object
+            properties:
+                targetId:
+                    type: string
+                targetType:
+                    type: string
+                    description: Open vocabulary {friendly | enemy | neutral}.
+                reactionTimeMs:
+                    type: integer
+                    format: int32
+                elapsedMs:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.TargetRecognitionDetail:
+            type: object
+            properties:
+                clicks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.TargetRecognitionClick'
+            description: |-
+                target_recognition — friend/foe discrimination; correctness is judged
+                 server-side against the target type, never asserted by the client.
         cyber.esports.v1.Test:
             type: object
             properties:
@@ -2677,6 +3155,29 @@ components:
                          owned by the engine registry (metric spec doc), values are strings.
                          The KV shape keeps tuning ops-only: no contract churn, no regen, no
                          client release for a spawn-interval change.
+        cyber.esports.v1.TrackingMovingDetail:
+            type: object
+            properties:
+                frames:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.TrackingMovingFrame'
+            description: tracking_moving — sustained tracking of a moving target.
+        cyber.esports.v1.TrackingMovingFrame:
+            type: object
+            properties:
+                elapsedMs:
+                    type: integer
+                    format: int32
+                target:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                crosshair:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
+                deviation:
+                    type: number
+                    format: double
+                player:
+                    $ref: '#/components/schemas/cyber.esports.v1.Point'
         cyber.esports.v1.UpdateProfileRequest:
             type: object
             properties:

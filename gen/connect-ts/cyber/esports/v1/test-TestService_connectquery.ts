@@ -18,3 +18,16 @@ export const getTest = TestService.method.getTest;
  * @generated from rpc cyber.esports.v1.TestService.GetTestConfig
  */
 export const getTestConfig = TestService.method.getTestConfig;
+
+/**
+ * The unified attempt submission — one RPC replacing the legacy fourteen
+ * per-game endpoints. Facts up, verdicts down: the client sends only
+ * event facts (coordinates, timings, choices, environment); every
+ * aggregate score is recomputed server-side from the detail stream and
+ * returned as the dual-track verdict (§0.5). The admin record read face
+ * (list/detail over stored attempts, ACCESS_ADMIN) consumes this
+ * contract's stored shape and lands with E9.
+ *
+ * @generated from rpc cyber.esports.v1.TestService.SubmitTestAttempt
+ */
+export const submitTestAttempt = TestService.method.submitTestAttempt;

@@ -136,6 +136,19 @@
         "comment": "测试项列表",
         "access": "BUILTIN",
         "datascope": false
+      },
+      {
+        "name": "SubmitTestAttempt",
+        "full_name": "cyber.esports.v1.TestService.SubmitTestAttempt",
+        "request_name": "SubmitTestAttemptRequest",
+        "request_full_name": "cyber.esports.v1.SubmitTestAttemptRequest",
+        "response_name": "SubmitTestAttemptResponse",
+        "response_full_name": "cyber.esports.v1.SubmitTestAttemptResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/tests/attempts",
+        "comment": "提交测试尝试",
+        "access": "BUILTIN",
+        "datascope": false
       }
     ]
   }
