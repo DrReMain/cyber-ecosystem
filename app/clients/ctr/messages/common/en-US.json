@@ -11,5 +11,11 @@
     }
   ],
   "common_loading": "Loading",
-  "common_retry": "Retry"
+  "common_retry": "Retry",
+  "common_state_empty_title": "Nothing here yet",
+  "common_state_empty_desc": "There's nothing to show yet",
+  "common_exit_title": "Exit now?",
+  "common_exit_desc": "Your current progress will not be saved",
+  "common_exit_cancel": "Cancel",
+  "common_exit_confirm": "Exit"
 }

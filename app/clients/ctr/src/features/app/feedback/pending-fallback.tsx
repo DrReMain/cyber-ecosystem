@@ -3,15 +3,6 @@ import { m } from "#/paraglide/messages";
 export function PendingFallback() {
   return (
     <div className="relative flex size-full min-h-24 grow items-center justify-center">
-      <style>{`
-@keyframes ctr-sweep {
-  from { transform: translateX(0); }
-  to { transform: translateX(350%); }
-}
-@keyframes ctr-sweep-rev {
-  from { transform: translateX(0); }
-  to { transform: translateX(-350%); }
-}`}</style>
       <div className="relative w-[min(200px,60%)]" role="status">
         <span className="sr-only">{m.common_loading()}</span>
         <div
@@ -25,7 +16,7 @@ export function PendingFallback() {
           aria-hidden
           className="relative mt-2 block h-0.5 overflow-hidden rounded bg-current/12"
         >
-          <span className="absolute inset-s-[-40%] inset-y-0 w-2/5 bg-linear-to-r from-transparent via-current/70 to-transparent motion-safe:animate-[ctr-sweep_2.6s_ease-in-out_infinite] rtl:motion-safe:animate-[ctr-sweep-rev_2.6s_ease-in-out_infinite]" />
+          <span className="absolute inset-s-[-40%] inset-y-0 w-2/5 bg-linear-to-r from-transparent via-current/70 to-transparent motion-safe:animate-sweep rtl:motion-safe:animate-sweep-rev" />
         </span>
       </div>
     </div>

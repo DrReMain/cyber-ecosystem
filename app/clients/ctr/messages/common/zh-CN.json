@@ -11,5 +11,11 @@
     }
   ],
   "common_loading": "加载中",
-  "common_retry": "重试"
+  "common_retry": "重试",
+  "common_state_empty_title": "暂无数据",
+  "common_state_empty_desc": "暂时没有可展示的内容",
+  "common_exit_title": "确认退出?",
+  "common_exit_desc": "当前进度将不会被保存",
+  "common_exit_cancel": "取消",
+  "common_exit_confirm": "确认退出"
 }

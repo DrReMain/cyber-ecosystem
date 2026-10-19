@@ -18,7 +18,7 @@
 | E8 权益最小面 | — | — | 未认领 | |
 | E9 最小 admin 面 | — | — | 未认领 | |
 | E10 全链 e2e | — | — | 未认领 | |
-| H1 ctr 系统态件 | hzy | esports/dev-hzy | 未开工 | 2026-10-19 增补(hzy 外围启动线,分支自 dev-lzx 现尖拉):error/empty/loading/退出确认+骨架屏+氛围布局(旧版 UserFlowAmbientLayout 语义级,D-O);零 RPC;兼 onboarding 首片(走 tanstack 三链+切片节奏法) |
+| H1 ctr 系统态件 | hzy | esports/dev-hzy | 完成(待评审) | 2026-10-20 交付 features/app 五件:AmbientBackdrop/AmbientLayout(scroll page\|inside+dense 三态,maxWidth 四档)、StateScreen(empty\|loading,loading 承 PendingFallback 血统 mono+扫光)、Skeleton(原子块,宿主组 a11y)、ExitConfirmDialog(受控,首个 react-aria-components 消费者;仓内 1.21.1 无 AlertDialog/OverlayTrigger,实配 ModalOverlay+Dialog role=alertdialog;ESC/遮罩/取消键统一走 onCancel,confirm 不自动关,cancel=autoFocus 防误触);error 件沿用 E6a 既有族不重复造;tokens 增 ambient 三色+漂移/扫光 keyframes(@theme 单源,PendingFallback 内联 keyframes 收敛入 tokens);common 增 6 键双语;三链绿+SSR 走查断言 10/10(临时挂 home 后还原);命中 §6 paraglide 陷阱一次(build 跳过再生掏空 _index,rm -rf 强制再生修复) |
 | H2 协议页+版本化承载 | hzy | esports/dev-hzy | 未开工 | agreement/age-required 页面+路由+版本参数;文案占位等 ljr 定稿;consent 裁决面归 E6b(lzx),开工前向 lzx 要一句 URL 形状约定 |
 | H-A 引擎框架片 | hzy | esports/dev-hzy | 未开工 | E7 框架前拉:GameClock 单实现(墙钟+暂停顺延,fake timers 可测;旧版 13 处手搓计时收敛为 1)+参数化路由 /test/:code+GameModule 插件契约(运行时禁 import auth/services)+overlay 族;config 消费用 gen 真类型(GetTest/GetTestConfig 已冻结,mock 只落 transport 缝);验收=mock config 下 red_dot 可玩+时钟正确性测试 |
 | H-B 反应瞄准批 | hzy | esports/dev-hzy | 未开工 | E7 首批前拉:red_dot/flash_aiming/multi_target/target_recognition;harness 免登录;每款=运行时+rawDetail 采集+本地结果页;不烤权威指标(评分归服务端,旧架构同构);判定阈值来自 config;rawDetail shape 反哺 E0 统一提交契约;玩法语义级对照旧版(D-O);提交适配器等 E0 冻结后薄接,游戏零改动 |
@@ -48,3 +48,4 @@
 - 2026-10-18 grill 定稿(D-K..D-Q):60 天作战计划落档,承诺日 12-17(含支付);大框架冻结,变更走 README 台账。
 - 2026-10-18 D-R:ctr UI 基座 = react-aria+tailwind(无 antd);E6 拆 E6a 纯壳/E6b 登录+画像流,lzx 先行建壳。
 - 2026-10-19 hzy 外围启动线定形(H1/H2/H-A/H-B):登录重构与 E0 余面为承重面留 lzx,hzy 全部切片圈定 ctr 非登录区(文件面与 lzx 线不相交,合流点仅 routeTree.gen+未来一次提交适配器);E7 框架与首批经 H-A/H-B 前拉,rawDetail 采集面反哺 E0 统一提交契约。admin 只读面前拉提案否决:BUILTIN 会员面(ListTests 等)不得作运营消费面,一面一消费等级,运营读面随 E0 余面/E9 契约设计走。
+- 2026-10-20 H1 完成(待评审):系统态五件落 features/app(ambient/states/dialog 三族),首个 RAC 消费者随 D-T 落地;走 tanstack 三链+切片节奏法 onboarding 全程走通。
