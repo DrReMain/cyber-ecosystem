@@ -28,7 +28,7 @@ export function LoginPage() {
     try {
       await loginFn({
         data: {
-          email: String(form.get("email") ?? ""),
+          account: String(form.get("account") ?? ""),
           password: String(form.get("password") ?? ""),
         },
       });
@@ -72,8 +72,10 @@ export function LoginPage() {
           <span className="flex-1 border-line-soft border-t" />
         </div>
         <Form className="flex flex-col gap-4" onSubmit={onSubmit}>
-          <TextField autoComplete="email" isRequired name="email" type="email">
-            <Label className="mb-1 block text-ink-secondary text-sm">{m.login_email_label()}</Label>
+          <TextField autoComplete="username" isRequired name="account" type="text">
+            <Label className="mb-1 block text-ink-secondary text-sm">
+              {m.login_account_label()}
+            </Label>
             <Input className="w-full rounded-sm border border-line bg-surface-input px-3 py-2.5 text-ink outline-none focus:border-focus" />
           </TextField>
           <TextField autoComplete="current-password" isRequired name="password" type="password">
