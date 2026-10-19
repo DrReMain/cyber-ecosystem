@@ -60,5 +60,5 @@
 - 2026-10-18 D-R:ctr UI 基座 = react-aria+tailwind(无 antd);E6 拆 E6a 纯壳/E6b 登录+画像流,lzx 先行建壳。
 - 2026-10-19 hzy 外围启动线定形(H1/H2/H-A/H-B):登录重构与 E0 余面为承重面留 lzx,hzy 全部切片圈定 ctr 非登录区(文件面与 lzx 线不相交,合流点仅 routeTree.gen+未来一次提交适配器);E7 框架与首批经 H-A/H-B 前拉,rawDetail 采集面反哺 E0 统一提交契约。admin 只读面前拉提案否决:BUILTIN 会员面(ListTests 等)不得作运营消费面,一面一消费等级,运营读面随 E0 余面/E9 契约设计走。
 - 2026-10-20 H1 完成(待评审):系统态五件落 features/app(ambient/states/dialog 三族),首个 RAC 消费者随 D-T 落地;走 tanstack 三链+切片节奏法 onboarding 全程走通。
-- 2026-10-20 精修基线盘点:微信真人复验过、最小闭环收口(c9f7924c 已合 main);coverage.md 建立(44 页交互基线全量×新版状态矩阵,语义锚=prototype/_check.js rules 逐条搬进承接片评审锚);抓到缺口=version-update 无承接片,例会定归属。
+- 2026-10-20 精修基线盘点:微信真人复验过、最小闭环收口(c9f7924c 已合 main);coverage.md 建立(44 页交互基线全量×新版状态矩阵,语义锚=prototype/_check.js rules 逐条搬进承接片评审锚);抓到缺口=version-update 无承接片,例会定归属。同日增补(用户三指示):D-O2 验收四要素落台账(布局一样/细节接近/文案一样/视觉接近——原型系 AI 产出+组件库约束,不追像素级);admin 端 41 页×9 组矩阵并入(双端覆盖,系统与合规组=IAM 底座面复用);语料版本律(引用先过 DESIGN_DOC_MAP 权威表,快照 09-18 后演进文档经 ljr 定级,评分数值档 E3 单源化后才可依赖)。
 - 2026-10-20 E6b 完整形态片契约缺口登记(M1 语义降级已落,契约到位后增量激活):SMS 验证码登录/忘记密码/手机绑定=system 无契约(dysmsapi provider+SendCode+phone credential,建议独立骨架片);协议 consent 版本记录=openspec agreement-consent 未落(H2 页面先行,checkbox 门已客户端执法);性别采集=P8(ljr);年龄段次级口径=UpdateProfile 无 band 入参(仅出生年月单口径);昵称加权 24=契约已冻 2-12 码点(原型 09-16 裁决冲突,待 ljr 追认);自定义游戏上限=服务端常量 20/产品口径 3(客户端按 3 展示,config 读面缺)。

@@ -2,7 +2,7 @@
 
 > 归属:esports 前沿档,2026-10-20 建立。三人+各自的 coding agent 共用同一基线:精修期每片开工前,对照本矩阵对应行的语义锚做逐条核对;谁落地谁把该行状态改为「已实现」并注差异。矩阵错漏当场修正,不另立流程。
 > 语料真相源(旧仓 manage,只读):页面映射=manage 仓 docs 下的 DESIGN_DOC_MAP §二(交互基线↔视觉基线);**每页语义规则=ctr 交互原型的 `_check.js`(逐条引 PRD 节号)**;裁决台账=同目录 LOGIC_AUDIT(L1/L2/L3);PRD=block3/block4 各自的 PRD。FEATURE_LIST 自标部分过时,仅作检索辅助。
-> 验收口径=D-O 语义级(流程/状态/数据完整),非像素级;UI 不承担高保真复原(D-O+§0.2 资产三级),业务语义必须对齐(§0.5 十一条口径)。
+> 验收口径=D-O 语义级 + **D-O2 四要素(2026-10-20)**:布局一样、细节接近、文案一样、视觉接近——原型为 AI 产出非专业 UI/UX 设计,且受新栈组件库(RAC+tailwind)约束,不追像素级;语义锚(rules 面板/PRD 规则)仍逐条对齐(§0.5 十一条口径)。
 > 状态图例:✅ 已实现(语义级) · 🟡 骨架/占位 · ⬜ 未开工。
 
 ---
@@ -65,12 +65,36 @@
 
 ---
 
-## 五、盘点发现的缺口(切片池漏网/待归属)
+## 五、admin 端矩阵(原型=admin/outputs/prototype 41 页;侧栏 9 组权威=_nav.js)
 
-1. **version-update 无承接片**:原型有页、admin 侧有 app-version 后台概念,但 E0-E10/H-*/PAY/M2 均未排。前置=system/esports 是否有版本契约;归属建议下次例会定(admin 面随 E9?ctr 面随 M2?)。
-2. **每页语义锚的消费纪律**:`prototype/_check.js` 的 rules 面板(逐条引 PRD 节号)是防偷懒的现成抓手——承接片开工时把对应页的 rules 逐条搬进该片评审锚,逐条对上才算语义级完成(E0 测试读面片已示范此法)。
+> admin 原型的「系统与合规」组大部分是**底座 IAM 既有面**(角色/权限/管理员/审计/菜单随 system 模块复用,不重做);esports 业务面按 M2 核心/余组与 E9 承接。原型自带「非本期」灰标四项(报告配置/渠道管理/落地页/归因)与新版 M2 余组(梯①)高度重合,映射照旧。
+
+| 侧栏组(原型页) | 状态 | 承接片 | 注记 |
+|---|---|---|---|
+| 仪表盘(dashboard/user-portrait) | ⬜ | M2 余(梯①) | 运营总览+用户画像 |
+| 用户与会员(01-user-list/01-member-list/02-\*-detail/09-user-import/announcement) | 🟡 | **用户列表 ✅**(esports users 模块,列表+6 Tab 详情骨架+封禁);会员管理→M2 核心;导入/公告→余组 | 会员详情 Tab 余面随 E8/PAY 补 |
+| 题库与测试(question-bank/question-detail/test-type/test-record/08-test-record-detail/game-config/game-category) | ⬜ | E9(激活码+测试项/配置+题库种子查看);test-record 随 E2/E3 | 游戏与因子配置=配置驱动运行时面 |
+| 定价与订单(sku-manage/04-order-record/04/05-order-detail/payment-channel) | ⬜ | PAY1+M2 核心 | SKU 原价/现价结构(D-F) |
+| ToB 租户(tob-tenant-list/detail) | ⬜ | M3/P4 | 专版 buffer 窗 |
+| 报告与内容(report-config,原型非本期) | ⬜ | M2 余(梯①) | 报告板块配置面 |
+| 渠道与推广(activation-code(-detail)/channel-manage/landing-material/attribution,后三者原型非本期) | ⬜ | 激活码→E8+E9+M2 核心;渠道/落地/归因→M2 余(增长裂变) | 激活码=承诺窗口内(兑换防超卖 e2e) |
+| 反馈与客服(feedback-manage/07-feedback-detail) | ⬜ | M2 余(梯①) | 与 ctr 消息中心同族 |
+| 系统与合规(audit-log/role/permission/admin-user/menu-manage/system-config=**底座 IAM 既有面复用**;compliance-config/agreement-manage/agreement-consent/rating-manage→esports 域⬜ 随 M2 余+H2 consent 契约;app-version→**见缺口①**) | 🟡 | 底座面复用;esports 域随 M2 余 | 评级管理 P2;同意记录=consent 版本化契约缺口 |
+
+## 六、语料版本律(防过时引用)
+
+1. **引用先过权威表**:任何设计/需求文档作为对照锚前,先核 DESIGN_DOC_MAP §四权威等级——✅ 权威可用;⚠️ 过时(FEATURE_LIST/DESIGN.md 评分档位口径等)不得单独为据,须与 PRD/_check.js 交叉;🗄️ 归档只作历史证据。
+2. **滞后窗口事实**:权威地图快照=2026-09-18,归档整理=09-26,其后 manage/docs(GAME_LOGIC_SPEC_DRAFT/SKILL_INTERACTION_SPEC 等)与 ctr 原型个别页仍在演进——**表外或快照后变动的文档,引用前先经 ljr 确认权威级**,不直接消费。
+3. **数值档单独律**:评分/校准族(UNIT_SCORE/METRIC_SPEC 族/CALIBRATION_PLAN/TRACKING_DESIGN/FLASH_AIMING_TEST_STANDARD,位于 design-systems/admin/)=§0.2 经验数据层,E3 开工时按 README §3 收入评分规格单源档后才可依赖,原文档即失效(单源化)。
+
+## 七、盘点发现的缺口(切片池漏网/待归属)
+
+1. **version-update 无承接片**:原型有页、admin 侧有 app-version 页面(`app-version.html`,系统与合规组),但 E0-E10/H-*/PAY/M2 均未排。前置=system/esports 是否有版本契约;归属建议下次例会定(admin 面随 E9?ctr 面随 M2?)。
+2. **每页语义锚的消费纪律**:ctr 交互原型的 `_check.js` rules 面板(逐条引 PRD 节号)是防偷懒的现成抓手——承接片开工时把对应页的 rules 逐条搬进该片评审锚,逐条对上才算语义级完成(E0 测试读面片已示范此法);admin 原型无同款面板,以对应 PRD 节+BLOCK5_ADMIN_REFORM_PRD 为锚。
 3. **迁移口径同步律**:本矩阵行所属聚合落地时,当日回 migration.md 对应表补行(不积压到 cutover)。
+4. **权威地图滞后**(2026-10-20 核查):DESIGN_DOC_MAP 快照(09-18)之后 manage/docs 与 ctr 原型仍有演进——处理见 §六语料版本律,不视为 ljr 侧缺陷,以流程消化。
 
-## 六、变更记录
+## 八、变更记录
 
-- 2026-10-20 建立:44 页交互基线全量盘点;抓到缺口①(version-update 无承接片)。
+- 2026-10-20 建立:ctr 44 页交互基线全量盘点;抓到缺口①(version-update 无承接片)。
+- 2026-10-20 增补:admin 端 41 页×9 组矩阵(用户指示双端覆盖);语料版本律(权威表前置+滞后窗口+数值档单源化);验收口径落 D-O2 四要素。
