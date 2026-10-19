@@ -1,0 +1,3564 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /api/v1/agent/agent-configs:
+        get:
+            tags:
+                - AgentConfigAdminService
+            operationId: AgentConfigAdminService_ListAgentConfigs
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.ListAgentConfigsResponse'
+    /api/v1/agent/me/agent-config:
+        get:
+            tags:
+                - AgentConfigService
+            operationId: AgentConfigService_GetMyAgentConfig
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.GetMyAgentConfigResponse'
+        put:
+            tags:
+                - AgentConfigService
+            operationId: AgentConfigService_UpdateMyAgentConfig
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.agent.v1.UpdateMyAgentConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.UpdateMyAgentConfigResponse'
+        delete:
+            tags:
+                - AgentConfigService
+            operationId: AgentConfigService_DeleteMyAgentConfig
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.DeleteMyAgentConfigResponse'
+    /api/v1/agent/me/chat:
+        post:
+            tags:
+                - ChatService
+            operationId: ChatService_Chat
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.agent.v1.ChatRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.ChatResponse'
+    /api/v1/agent/me/chat/sessions:
+        get:
+            tags:
+                - ChatService
+            operationId: ChatService_ListSessions
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.ListSessionsResponse'
+    /api/v1/agent/me/chat/sessions/{sessionId}:
+        put:
+            tags:
+                - ChatService
+            operationId: ChatService_UpdateSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  description: Session id; absent and unowned both resolve to not found (no existence leak).
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.agent.v1.UpdateSessionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.UpdateSessionResponse'
+        delete:
+            tags:
+                - ChatService
+            operationId: ChatService_DeleteSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  description: Session id; absent and unowned both resolve to not found (no existence leak).
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.DeleteSessionResponse'
+    /api/v1/agent/me/chat/sessions/{sessionId}/messages:
+        get:
+            tags:
+                - ChatService
+            operationId: ChatService_GetSessionMessages
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.GetSessionMessagesResponse'
+    /api/v1/agent/me/models:
+        get:
+            tags:
+                - ChatService
+            operationId: ChatService_ListModels
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.agent.v1.ListModelsResponse'
+    /api/v1/system/audit-logs:
+        get:
+            tags:
+                - AuditService
+            operationId: AuditService_ListAuditLogs
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: actor
+                  in: query
+                  schema:
+                    type: string
+                - name: operation
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: denyReason
+                  in: query
+                  schema:
+                    type: string
+                - name: denied
+                  in: query
+                  schema:
+                    type: boolean
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListAuditLogsResponse'
+    /api/v1/system/audit-logs/export:
+        post:
+            tags:
+                - AuditService
+            description: |-
+                Export is asynchronous: registers a generation job and returns
+                 immediately.
+            operationId: AuditService_ExportAuditLogs
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ExportAuditLogsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ExportAuditLogsResponse'
+    /api/v1/system/audit-logs/exports:
+        get:
+            tags:
+                - AuditService
+            operationId: AuditService_ListAuditExports
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListAuditExportsResponse'
+    /api/v1/system/auth/begin-identity-login:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_BeginIdentityLogin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.BeginIdentityLoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.BeginIdentityLoginResponse'
+    /api/v1/system/auth/bind-credential:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_BindCredential
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.BindCredentialRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.BindCredentialResponse'
+    /api/v1/system/auth/login:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.LoginResponse'
+    /api/v1/system/auth/login-by-identity:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_LoginByIdentity
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.LoginByIdentityRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.LoginByIdentityResponse'
+    /api/v1/system/auth/logout:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_Logout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.LogoutRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.LogoutResponse'
+    /api/v1/system/authz/explain:
+        get:
+            tags:
+                - RoleService
+            operationId: RoleService_ExplainOperation
+            parameters:
+                - name: principalType
+                  in: query
+                  schema:
+                    type: string
+                - name: principalId
+                  in: query
+                  schema:
+                    type: string
+                - name: operation
+                  in: query
+                  description: Full operation name, e.g. "/cyber.system.v1.UserService/ListUsers".
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ExplainOperationResponse'
+    /api/v1/system/authz/preview:
+        post:
+            tags:
+                - RoleService
+            operationId: RoleService_PreviewGrants
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.PreviewGrantsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.PreviewGrantsResponse'
+    /api/v1/system/depts:
+        get:
+            tags:
+                - DeptService
+            operationId: DeptService_ListDepts
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListDeptsResponse'
+        post:
+            tags:
+                - DeptService
+            operationId: DeptService_CreateDept
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreateDeptRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreateDeptResponse'
+    /api/v1/system/depts/{deptId}/members:
+        get:
+            tags:
+                - DeptService
+            operationId: DeptService_ListDeptMembers
+            parameters:
+                - name: deptId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListDeptMembersResponse'
+    /api/v1/system/depts/{deptId}/members/{userId}:
+        delete:
+            tags:
+                - DeptService
+            operationId: DeptService_RemoveDeptMember
+            parameters:
+                - name: deptId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.RemoveDeptMemberResponse'
+    /api/v1/system/depts/{id}:
+        get:
+            tags:
+                - DeptService
+            operationId: DeptService_GetDept
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetDeptResponse'
+        put:
+            tags:
+                - DeptService
+            operationId: DeptService_UpdateDept
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateDeptRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateDeptResponse'
+        delete:
+            tags:
+                - DeptService
+            operationId: DeptService_DeleteDept
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.DeleteDeptResponse'
+    /api/v1/system/files:
+        get:
+            tags:
+                - FileService
+            operationId: FileService_ListFiles
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: contentType
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    enum:
+                        - FILE_STATUS_UNSPECIFIED
+                        - FILE_STATUS_UPLOADING
+                        - FILE_STATUS_CONFIRMED
+                        - FILE_STATUS_PROCESSING
+                        - FILE_STATUS_FAILED
+                    type: string
+                    format: enum
+                - name: source
+                  in: query
+                  schema:
+                    enum:
+                        - FILE_SOURCE_UNSPECIFIED
+                        - FILE_SOURCE_CLIENT_UPLOAD
+                        - FILE_SOURCE_SERVER_GENERATED
+                    type: string
+                    format: enum
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListFilesResponse'
+    /api/v1/system/files/upload:
+        post:
+            tags:
+                - FileProxyService
+            operationId: FileProxyService_UploadFile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UploadFileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UploadFileResponse'
+    /api/v1/system/files/urls:
+        post:
+            tags:
+                - FileService
+            operationId: FileService_GetFileUrls
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.GetFileUrlsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetFileUrlsResponse'
+    /api/v1/system/files/{id}:
+        get:
+            tags:
+                - FileService
+            operationId: FileService_GetFile
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetFileResponse'
+        delete:
+            tags:
+                - FileService
+            description: 'Soft delete: the row enters the recycle state, the stored object is retained.'
+            operationId: FileService_DeleteFile
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.DeleteFileResponse'
+    /api/v1/system/files/{id}/name:
+        put:
+            tags:
+                - FileService
+            operationId: FileService_RenameFile
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.RenameFileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.RenameFileResponse'
+    /api/v1/system/me:
+        get:
+            tags:
+                - AuthService
+            operationId: AuthService_GetCurrentUser
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetCurrentUserResponse'
+    /api/v1/system/me/introspect:
+        get:
+            tags:
+                - IntrospectService
+            operationId: IntrospectService_VerifySession
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.VerifySessionResponse'
+    /api/v1/system/me/introspect/operation:
+        get:
+            tags:
+                - IntrospectService
+            operationId: IntrospectService_CheckOperation
+            parameters:
+                - name: operation
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CheckOperationResponse'
+    /api/v1/system/me/password:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_ChangePassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ChangePasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ChangePasswordResponse'
+    /api/v1/system/policies:
+        get:
+            tags:
+                - PolicyService
+            operationId: PolicyService_ListPolicies
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: kind
+                  in: query
+                  schema:
+                    type: string
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: enabled
+                  in: query
+                  schema:
+                    type: boolean
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListPoliciesResponse'
+        post:
+            tags:
+                - PolicyService
+            operationId: PolicyService_CreatePolicy
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreatePolicyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreatePolicyResponse'
+    /api/v1/system/policies/{id}:
+        get:
+            tags:
+                - PolicyService
+            operationId: PolicyService_GetPolicy
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetPolicyResponse'
+        put:
+            tags:
+                - PolicyService
+            operationId: PolicyService_UpdatePolicy
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UpdatePolicyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UpdatePolicyResponse'
+        delete:
+            tags:
+                - PolicyService
+            operationId: PolicyService_DeletePolicy
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.DeletePolicyResponse'
+    /api/v1/system/populations:
+        get:
+            tags:
+                - PopulationService
+            operationId: PopulationService_ListPopulations
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: code
+                  in: query
+                  schema:
+                    type: string
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListPopulationsResponse'
+        post:
+            tags:
+                - PopulationService
+            operationId: PopulationService_CreatePopulation
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreatePopulationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreatePopulationResponse'
+    /api/v1/system/principals/{principalType}/{principalId}/roles:
+        get:
+            tags:
+                - RoleService
+            operationId: RoleService_ListRolesByPrincipal
+            parameters:
+                - name: principalType
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: principalId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListRolesByPrincipalResponse'
+    /api/v1/system/resource:
+        get:
+            tags:
+                - ResourceService
+            operationId: ResourceService_ListResource
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListResourceResponse'
+    /api/v1/system/roles:
+        get:
+            tags:
+                - RoleService
+            operationId: RoleService_ListRoles
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: code
+                  in: query
+                  schema:
+                    type: string
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListRolesResponse'
+        post:
+            tags:
+                - RoleService
+            operationId: RoleService_CreateRole
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreateRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreateRoleResponse'
+    /api/v1/system/roles/{id}:
+        get:
+            tags:
+                - RoleService
+            operationId: RoleService_GetRole
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetRoleResponse'
+        put:
+            tags:
+                - RoleService
+            operationId: RoleService_UpdateRole
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateRoleResponse'
+        delete:
+            tags:
+                - RoleService
+            operationId: RoleService_DeleteRole
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.DeleteRoleResponse'
+    /api/v1/system/roles/{id}/status:
+        put:
+            tags:
+                - RoleService
+            operationId: RoleService_UpdateRoleStatus
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateRoleStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateRoleStatusResponse'
+    /api/v1/system/roles/{roleId}/members:
+        get:
+            tags:
+                - RoleService
+            operationId: RoleService_ListRoleMembers
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: principalType
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListRoleMembersResponse'
+    /api/v1/system/roles/{roleId}/members/{principalType}/{principalId}:
+        delete:
+            tags:
+                - RoleService
+            operationId: RoleService_RemoveRoleMember
+            parameters:
+                - name: roleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: principalType
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: principalId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.RemoveRoleMemberResponse'
+    /api/v1/system/tenants:
+        get:
+            tags:
+                - TenantService
+            operationId: TenantService_ListTenants
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: code
+                  in: query
+                  schema:
+                    type: string
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListTenantsResponse'
+    /api/v1/system/tenants/{id}:
+        get:
+            tags:
+                - TenantService
+            operationId: TenantService_GetTenant
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetTenantResponse'
+    /api/v1/system/tenants/{id}/status:
+        put:
+            tags:
+                - TenantService
+            operationId: TenantService_UpdateTenantStatus
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateTenantStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateTenantStatusResponse'
+    /api/v1/system/transfer/echo:
+        get:
+            tags:
+                - TransferService
+            description: Echo back a summary of received messages.
+            operationId: TransferService_Echo
+            parameters:
+                - name: data
+                  in: query
+                  description: Message payload.
+                  schema:
+                    type: string
+                    format: bytes
+                - name: sequence
+                  in: query
+                  description: Sequence number.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.EchoResponse'
+    /api/v1/system/transfer/pipe:
+        get:
+            tags:
+                - TransferService
+            description: Bidirectional data pipe via WebSocket.
+            operationId: TransferService_Pipe
+            parameters:
+                - name: data
+                  in: query
+                  description: Message payload.
+                  schema:
+                    type: string
+                    format: bytes
+                - name: type
+                  in: query
+                  description: Message type.
+                  schema:
+                    type: string
+                - name: sequence
+                  in: query
+                  description: Sequence number.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.PipeResponse'
+    /api/v1/system/transfer/raw:
+        post:
+            tags:
+                - TransferService
+            description: |-
+                Return raw bytes via HttpBody.
+                 buf:lint:ignore RPC_RESPONSE_STANDARD_NAME -- HttpBody is intentional: raw binary response, not a conventional *Response message.
+            operationId: TransferService_Raw
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.RawRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        '*/*': {}
+    /api/v1/system/transfer/subscribe:
+        get:
+            tags:
+                - TransferService
+            description: Subscribe to events via SSE.
+            operationId: TransferService_Subscribe
+            parameters:
+                - name: topic
+                  in: query
+                  description: Topic to subscribe.
+                  schema:
+                    type: string
+                - name: lastEventId
+                  in: query
+                  description: Last event ID for reconnection.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.SubscribeResponse'
+    /api/v1/system/uploads:
+        post:
+            tags:
+                - FilePresignService
+            operationId: FilePresignService_CreateUpload
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreateUploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreateUploadResponse'
+    /api/v1/system/uploads/{id}:
+        delete:
+            tags:
+                - FilePresignService
+            operationId: FilePresignService_AbortUpload
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.AbortUploadResponse'
+    /api/v1/system/uploads/{id}/confirm:
+        post:
+            tags:
+                - FilePresignService
+            operationId: FilePresignService_ConfirmUpload
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ConfirmUploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ConfirmUploadResponse'
+    /api/v1/system/uploads/{id}/parts:
+        get:
+            tags:
+                - FilePresignService
+            operationId: FilePresignService_ListUploadedParts
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListUploadedPartsResponse'
+    /api/v1/system/users:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_ListUsers
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: email
+                  in: query
+                  schema:
+                    type: string
+                - name: enabled
+                  in: query
+                  schema:
+                    type: boolean
+                - name: deptId
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListUsersResponse'
+        post:
+            tags:
+                - UserService
+            operationId: UserService_CreateUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreateUserResponse'
+    /api/v1/system/users/batch-get:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_BatchGetUsers
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.BatchGetUsersRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.BatchGetUsersResponse'
+    /api/v1/system/users/{id}:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_GetUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetUserResponse'
+        put:
+            tags:
+                - UserService
+            operationId: UserService_UpdateUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateUserResponse'
+        delete:
+            tags:
+                - UserService
+            operationId: UserService_DeleteUser
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.DeleteUserResponse'
+    /api/v1/system/users/{id}/status:
+        put:
+            tags:
+                - UserService
+            operationId: UserService_UpdateUserStatus
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UpdateUserStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UpdateUserStatusResponse'
+components:
+    schemas:
+        cyber.agent.v1.AgentConfig:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                userId:
+                    type: string
+                baseUrl:
+                    type: string
+                apiKeySet:
+                    type: boolean
+        cyber.agent.v1.AgentConfigView:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                userId:
+                    type: string
+                userEmail:
+                    type: string
+                userAvatar:
+                    type: string
+                baseUrl:
+                    type: string
+                apiKeySet:
+                    type: boolean
+        cyber.agent.v1.ChatRequest:
+            type: object
+            properties:
+                model:
+                    type: string
+                    description: |-
+                        Model id as named by the user's endpoint (GET /v1/models vocabulary);
+                         required, 1..128 chars.
+                sessionId:
+                    type: string
+                    description: |-
+                        Existing session id (max 20 chars); empty = the server creates a session
+                         for this exchange.
+                content:
+                    type: string
+                    description: |-
+                        The new user turn; required, 1..32768 chars. History is loaded
+                         server-side from the session.
+            description: |-
+                Constraints are enforced by explicit checks in the service handler: the
+                 unary protovalidate middleware never sees streaming requests, so annotations
+                 here would be dead rules.
+        cyber.agent.v1.ChatResponse:
+            type: object
+            properties:
+                contentDelta:
+                    type: string
+                    description: Incremental assistant text since the previous frame.
+                reasoningDelta:
+                    type: string
+                    description: Incremental model reasoning (thinking output) since the previous frame.
+                finishReason:
+                    type: string
+                    description: Present only on the final frame ("stop"/"length"/...), empty while streaming.
+                sessionId:
+                    type: string
+                    description: |-
+                        Present only on the first frame of a newly created session (strictly
+                         before any delta); unset otherwise — protojson omits it.
+            description: |-
+                One streaming frame: deltas are incremental (append-only) and at most one
+                 is set per frame; the final frame carries finish_reason with empty deltas.
+                 Failures terminate the stream as a Connect error, never as a frame.
+        cyber.agent.v1.ChatSession:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                title:
+                    type: string
+                    description: First user message clipped server-side at creation; user-renamable.
+            description: list sessions
+        cyber.agent.v1.DeleteMyAgentConfigResponse:
+            type: object
+            properties: {}
+        cyber.agent.v1.DeleteSessionResponse:
+            type: object
+            properties: {}
+        cyber.agent.v1.GetMyAgentConfigResponse:
+            type: object
+            properties:
+                agentConfig:
+                    $ref: '#/components/schemas/cyber.agent.v1.AgentConfig'
+        cyber.agent.v1.GetSessionMessagesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.agent.v1.SessionMessage'
+                    description: 'Fixed order: created_at DESC (page 1 = newest turns; later pages go back).'
+        cyber.agent.v1.ListAgentConfigsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.agent.v1.AgentConfigView'
+        cyber.agent.v1.ListModelsResponse:
+            type: object
+            properties:
+                models:
+                    type: array
+                    items:
+                        type: string
+                    description: Model ids exposed by the user's endpoint, order preserved.
+        cyber.agent.v1.ListSessionsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.agent.v1.ChatSession'
+                    description: 'Fixed order: updated_at DESC (latest activity first).'
+        cyber.agent.v1.SessionMessage:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                role:
+                    type: string
+                    description: |-
+                        Free-form role vocabulary (user/assistant today; tool parts are the S4
+                         evolution) — deliberately unpatterned.
+                content:
+                    type: string
+                reasoning:
+                    type: string
+                    description: Accumulated model reasoning on the assistant turn; empty on user turns.
+                model:
+                    type: string
+                    description: Model id that produced the assistant turn; empty on user turns.
+            description: get session messages
+        cyber.agent.v1.UpdateMyAgentConfigRequest:
+            type: object
+            properties:
+                baseUrl:
+                    type: string
+                apiKey:
+                    type: string
+            description: update
+        cyber.agent.v1.UpdateMyAgentConfigResponse:
+            type: object
+            properties: {}
+        cyber.agent.v1.UpdateSessionRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                    description: Session id; absent and unowned both resolve to not found (no existence leak).
+                title:
+                    type: string
+                    description: New title; replaces the creation-time clip.
+            description: update session
+        cyber.agent.v1.UpdateSessionResponse:
+            type: object
+            properties: {}
+        cyber.shared.common.v1.PageResponse:
+            type: object
+            properties:
+                pageNo:
+                    type: integer
+                    description: Current page number.
+                    format: int32
+                pageSize:
+                    type: integer
+                    description: Page size.
+                    format: int32
+                total:
+                    type: integer
+                    description: Total count.
+                    format: int32
+                more:
+                    type: boolean
+                    description: Whether more results exist.
+            description: Pagination response.
+        cyber.system.v1.AbortUploadResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.AuditExport:
+            type: object
+            properties:
+                fileId:
+                    type: string
+                    description: Both ids are always present on the row.
+                createdAt:
+                    type: string
+                    format: date-time
+                ownerId:
+                    type: string
+                file:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.system.v1.File'
+                    description: Absent when the file row was deleted.
+        cyber.system.v1.AuditLog:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                tenant:
+                    type: string
+                actor:
+                    type: string
+                principalType:
+                    type: string
+                operation:
+                    type: string
+                httpMethod:
+                    type: string
+                httpPath:
+                    type: string
+                status:
+                    type: integer
+                    format: int32
+                latencyMs:
+                    type: integer
+                    format: int32
+                ip:
+                    type: string
+                userAgent:
+                    type: string
+                denyReason:
+                    type: string
+        cyber.system.v1.BatchGetUsersRequest:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        max_items matches the page_size cap (shared/common/v1 pagination.proto):
+                         one page of ids hydrates in one call — keep the two in lockstep.
+            description: batchGet
+        cyber.system.v1.BatchGetUsersResponse:
+            type: object
+            properties:
+                users:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/cyber.system.v1.UserBrief'
+                    description: |-
+                        key = requested id; an absent key = no row or outside the viewer's data
+                         scope — skip semantics, no per-item error channel.
+        cyber.system.v1.BeginIdentityLoginRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                redirectUri:
+                    type: string
+        cyber.system.v1.BeginIdentityLoginResponse:
+            type: object
+            properties:
+                authorizeUrl:
+                    type: string
+        cyber.system.v1.BindCredentialRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                wechat:
+                    $ref: '#/components/schemas/cyber.system.v1.WeChatIdentityPayload'
+                state:
+                    type: string
+        cyber.system.v1.BindCredentialResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.CalendarOverride:
+            type: object
+            properties:
+                date:
+                    type: string
+                allowed:
+                    type: boolean
+                    description: true = allowed on this date, false = denied.
+            description: A single-date exception on the calendar; dates are server-local.
+        cyber.system.v1.CalendarParams:
+            type: object
+            properties:
+                base:
+                    type: string
+                    description: Periodic default when no override matches the day.
+                overrides:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.CalendarOverride'
+                    description: At most one entry per date (deep-validated on save).
+            description: |-
+                Calendar constraint: a periodic base plus per-date overrides that win over
+                 it. Three forms: WEEKDAYS + deny overrides = workday calendar (holidays);
+                 NONE + allow overrides = on-call/inspection calendar; ALL + deny
+                 overrides = lockdown calendar.
+        cyber.system.v1.ChangePasswordRequest:
+            type: object
+            properties:
+                oldPassword:
+                    type: string
+                newPassword:
+                    type: string
+            description: changePassword
+        cyber.system.v1.ChangePasswordResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.CheckOperationResponse:
+            type: object
+            properties:
+                allowed:
+                    type: boolean
+                reason:
+                    type: string
+        cyber.system.v1.ConfirmUploadPart:
+            type: object
+            properties:
+                partNumber:
+                    type: integer
+                    format: int32
+                etag:
+                    type: string
+            description: confirmUpload
+        cyber.system.v1.ConfirmUploadRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                parts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.ConfirmUploadPart'
+                    description: |-
+                        Collected from part PUT response headers; empty on the single-PUT path.
+                         Claims are validated against backend part truth before completion;
+                         integrity beyond the size check is a future contract extension — a
+                         resumed upload of a same-size, different-content file would otherwise
+                         assemble and confirm spliced content undetectably.
+        cyber.system.v1.ConfirmUploadResponse:
+            type: object
+            properties:
+                file:
+                    $ref: '#/components/schemas/cyber.system.v1.File'
+        cyber.system.v1.CreateDeptRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                parentId:
+                    type: string
+                remark:
+                    type: string
+            description: create
+        cyber.system.v1.CreateDeptResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+        cyber.system.v1.CreatePolicyRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                params:
+                    $ref: '#/components/schemas/cyber.system.v1.PolicyParams'
+            description: create
+        cyber.system.v1.CreatePolicyResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+        cyber.system.v1.CreatePopulationRequest:
+            type: object
+            properties:
+                code:
+                    type: string
+                    description: |-
+                        Same charset law as the tenant join key; the ent schema enforces it at
+                         the write as the backstop.
+                name:
+                    type: string
+                archetype:
+                    type: string
+                    description: |-
+                        engine | patron — the compile-time vocabulary; membership in the word
+                         set is validated in code, the single source of the vocabulary.
+            description: create
+        cyber.system.v1.CreatePopulationResponse:
+            type: object
+            properties:
+                population:
+                    $ref: '#/components/schemas/cyber.system.v1.Population'
+        cyber.system.v1.CreateRoleRequest:
+            type: object
+            properties:
+                code:
+                    type: string
+                name:
+                    type: string
+                remark:
+                    type: string
+                grants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.RoleGrant'
+            description: create
+        cyber.system.v1.CreateRoleResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+        cyber.system.v1.CreateUploadRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                contentType:
+                    type: string
+                size:
+                    type: string
+                    description: |-
+                        Declared size routes the channel (single PUT below the multipart
+                         threshold, session at/above) and anchors the confirm-time size check —
+                         the minted URLs enforce no Content-Length themselves.
+            description: createUpload
+        cyber.system.v1.CreateUploadResponse:
+            type: object
+            properties:
+                file:
+                    $ref: '#/components/schemas/cyber.system.v1.File'
+                single:
+                    $ref: '#/components/schemas/cyber.system.v1.PresignedPut'
+                multipart:
+                    $ref: '#/components/schemas/cyber.system.v1.UploadSession'
+        cyber.system.v1.CreateUserRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                password:
+                    type: string
+                deptId:
+                    type: string
+                roles:
+                    type: array
+                    items:
+                        type: string
+                avatar:
+                    type: string
+                population:
+                    type: string
+                    description: |-
+                        Seat population for the identity's birth seat; empty = the default user
+                         population. Validated against the registry — a seat is never born on a
+                         code that does not exist.
+            description: create
+        cyber.system.v1.CreateUserResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+        cyber.system.v1.DeleteDeptResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.DeleteFileResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.DeletePolicyResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.DeleteRoleResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.DeleteUserResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.Dept:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                name:
+                    type: string
+                parentId:
+                    type: string
+                remark:
+                    type: string
+                userCount:
+                    type: string
+        cyber.system.v1.DeptMember:
+            type: object
+            properties:
+                userId:
+                    type: string
+                email:
+                    type: string
+                enabled:
+                    type: boolean
+            description: |-
+                Membership is the user's dept_id attribute, not a join row — the member
+                 view carries the user's live account fields.
+        cyber.system.v1.EchoResponse:
+            type: object
+            properties:
+                totalMessages:
+                    type: integer
+                    description: Total messages received.
+                    format: int32
+                totalBytes:
+                    type: string
+                    description: Total bytes received.
+                lastSequence:
+                    type: string
+                    description: Last sequence number.
+                durationNs:
+                    type: string
+                    description: Round-trip duration in nanoseconds.
+            description: Echo response summary.
+        cyber.system.v1.ExplainHit:
+            type: object
+            properties:
+                pattern:
+                    type: string
+                roleCode:
+                    type: string
+                scopeKind:
+                    enum:
+                        - SCOPE_KIND_UNSPECIFIED
+                        - SCOPE_KIND_ALL
+                        - SCOPE_KIND_SELF
+                        - SCOPE_KIND_DEPT_TREE
+                    type: string
+                    format: enum
+                policies:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.ExplainPolicy'
+                    description: |-
+                        Per-policy verdicts for this grant at explain time (empty = unconstrained
+                         grant; disabled policies are compiled out and do not appear).
+        cyber.system.v1.ExplainOperationResponse:
+            type: object
+            properties:
+                verdict:
+                    type: string
+                    description: '"ALLOW" | "DENY".'
+                roleCodes:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        Role bindings held (disabled roles included — they bind but contribute
+                         no grants).
+                hits:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.ExplainHit'
+                    description: Matched grant patterns with role attribution and per-policy verdicts.
+        cyber.system.v1.ExplainPolicy:
+            type: object
+            properties:
+                kind:
+                    type: string
+                name:
+                    type: string
+                state:
+                    type: string
+                    description: |-
+                        passed | failed | indeterminate. indeterminate is reserved for
+                         source-type attributes the subject cannot know (future ip/geo plugins);
+                         v1 plugins always resolve.
+            description: |-
+                One linked policy's evaluation at explain time. A failed policy eliminates
+                 the hit's grant; the verdict survives only on hits with no failed policy.
+        cyber.system.v1.ExportAuditLogsRequest:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: string
+            description: |-
+                exportAuditLogs
+                 Empty ids = full export; non-empty = the selected rows only. No cap; cost
+                 is O(result set). Authorization is the operation itself — the caller's
+                 datascope does not narrow it.
+        cyber.system.v1.ExportAuditLogsResponse:
+            type: object
+            properties:
+                file:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.system.v1.File'
+                    description: |-
+                        PROCESSING at return; the file row lands CONFIRMED or FAILED when the
+                         background generation ends.
+        cyber.system.v1.File:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                name:
+                    type: string
+                contentType:
+                    type: string
+                    description: |-
+                        Actually stored Content-Type (backfilled from HEAD at confirm; may differ
+                         from the declaration — storage wins).
+                size:
+                    type: string
+                source:
+                    enum:
+                        - FILE_SOURCE_UNSPECIFIED
+                        - FILE_SOURCE_CLIENT_UPLOAD
+                        - FILE_SOURCE_SERVER_GENERATED
+                    type: string
+                    format: enum
+                status:
+                    enum:
+                        - FILE_STATUS_UNSPECIFIED
+                        - FILE_STATUS_UPLOADING
+                        - FILE_STATUS_CONFIRMED
+                        - FILE_STATUS_PROCESSING
+                        - FILE_STATUS_FAILED
+                    type: string
+                    format: enum
+                ownerId:
+                    type: string
+        cyber.system.v1.FileUrl:
+            type: object
+            properties:
+                url:
+                    type: string
+                expiresAt:
+                    type: string
+                    format: date-time
+        cyber.system.v1.GetCurrentUserResponse:
+            type: object
+            properties:
+                user:
+                    $ref: '#/components/schemas/cyber.system.v1.User'
+                permissions:
+                    type: array
+                    items:
+                        type: string
+                memberships:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Membership'
+        cyber.system.v1.GetDeptResponse:
+            type: object
+            properties:
+                dept:
+                    $ref: '#/components/schemas/cyber.system.v1.Dept'
+        cyber.system.v1.GetFileResponse:
+            type: object
+            properties:
+                file:
+                    $ref: '#/components/schemas/cyber.system.v1.File'
+        cyber.system.v1.GetFileUrlsRequest:
+            type: object
+            properties:
+                ids:
+                    type: array
+                    items:
+                        type: string
+            description: getFileUrls
+        cyber.system.v1.GetFileUrlsResponse:
+            type: object
+            properties:
+                urls:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/cyber.system.v1.FileUrl'
+        cyber.system.v1.GetPolicyResponse:
+            type: object
+            properties:
+                policy:
+                    $ref: '#/components/schemas/cyber.system.v1.Policy'
+        cyber.system.v1.GetRoleResponse:
+            type: object
+            properties:
+                role:
+                    $ref: '#/components/schemas/cyber.system.v1.Role'
+                grants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.RoleGrant'
+        cyber.system.v1.GetTenantResponse:
+            type: object
+            properties:
+                tenant:
+                    $ref: '#/components/schemas/cyber.system.v1.Tenant'
+        cyber.system.v1.GetUserResponse:
+            type: object
+            properties:
+                user:
+                    $ref: '#/components/schemas/cyber.system.v1.User'
+        cyber.system.v1.ListAuditExportsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.AuditExport'
+        cyber.system.v1.ListAuditLogsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.AuditLog'
+        cyber.system.v1.ListDeptMembersResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.DeptMember'
+        cyber.system.v1.ListDeptsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Dept'
+        cyber.system.v1.ListFilesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.File'
+        cyber.system.v1.ListPoliciesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Policy'
+        cyber.system.v1.ListPopulationsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Population'
+        cyber.system.v1.ListResourceResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Service'
+                    description: Service list.
+            description: ListResource response.
+        cyber.system.v1.ListRoleMembersResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.RoleMember'
+        cyber.system.v1.ListRolesByPrincipalResponse:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Role'
+        cyber.system.v1.ListRolesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Role'
+        cyber.system.v1.ListTenantsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Tenant'
+        cyber.system.v1.ListUploadedPartsResponse:
+            type: object
+            properties:
+                file:
+                    $ref: '#/components/schemas/cyber.system.v1.File'
+                partSize:
+                    type: string
+                    description: 'Re-slice basis for the resuming client (plain: success implies present).'
+                uploaded:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.UploadedPart'
+                missing:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.UploadPartUrl'
+                expiresAt:
+                    type: string
+                    format: date-time
+        cyber.system.v1.ListUsersResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.User'
+        cyber.system.v1.LoginByIdentityRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                wechat:
+                    $ref: '#/components/schemas/cyber.system.v1.WeChatIdentityPayload'
+                state:
+                    type: string
+        cyber.system.v1.LoginByIdentityResponse:
+            type: object
+            properties:
+                sessionToken:
+                    type: string
+                issuedAt:
+                    type: string
+                    format: date-time
+                expiresAt:
+                    type: string
+                    format: date-time
+        cyber.system.v1.LoginRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                password:
+                    type: string
+        cyber.system.v1.LoginResponse:
+            type: object
+            properties:
+                sessionToken:
+                    type: string
+                issuedAt:
+                    type: string
+                    format: date-time
+                expiresAt:
+                    type: string
+                    format: date-time
+        cyber.system.v1.LogoutRequest:
+            type: object
+            properties: {}
+        cyber.system.v1.LogoutResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.Membership:
+            type: object
+            properties:
+                tenant:
+                    type: string
+                population:
+                    type: string
+            description: |-
+                Plain scalars by the success-implies-present carve-out: a seat row always
+                 carries its two join keys.
+        cyber.system.v1.Method:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Method short name.
+                fullName:
+                    type: string
+                    description: Method fully qualified name.
+                requestName:
+                    type: string
+                    description: Request message short name.
+                requestFullName:
+                    type: string
+                    description: Request message fully qualified name.
+                responseName:
+                    type: string
+                    description: Response message short name.
+                responseFullName:
+                    type: string
+                    description: Response message fully qualified name.
+                httpMethod:
+                    type: string
+                    description: HTTP method (GET, POST, PUT, DELETE).
+                httpPath:
+                    type: string
+                    description: HTTP path pattern.
+                comment:
+                    type: string
+                    description: Method description.
+                access:
+                    type: string
+                    description: Audience annotation value as declared on the method.
+                datascope:
+                    type: boolean
+                    description: Row-level narrowing applies to this op (cyber.ext.v1.datascope annotation)
+            description: RPC method descriptor.
+        cyber.system.v1.PipeResponse:
+            type: object
+            properties:
+                data:
+                    type: string
+                    description: Message payload.
+                    format: bytes
+                type:
+                    type: string
+                    description: Message type.
+                sequence:
+                    type: string
+                    description: Sequence number.
+            description: Bidirectional pipe response.
+        cyber.system.v1.Policy:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                kind:
+                    type: string
+                name:
+                    type: string
+                params:
+                    $ref: '#/components/schemas/cyber.system.v1.PolicyParams'
+                enabled:
+                    type: boolean
+                boundCount:
+                    type: string
+        cyber.system.v1.PolicyParams:
+            type: object
+            properties:
+                timeWindow:
+                    $ref: '#/components/schemas/cyber.system.v1.TimeWindowParams'
+                calendar:
+                    $ref: '#/components/schemas/cyber.system.v1.CalendarParams'
+            description: |-
+                Typed constraint params: the oneof case doubles as the policy kind, so an
+                 unregistered kind cannot even be expressed. New kinds = new oneof members
+                 (a proto addition, non-breaking).
+        cyber.system.v1.Population:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                code:
+                    type: string
+                name:
+                    type: string
+                archetype:
+                    type: string
+        cyber.system.v1.PresignedPut:
+            type: object
+            properties:
+                url:
+                    type: string
+                    description: 'Present whenever creation succeeds (carve-out: success implies present).'
+                expiresAt:
+                    type: string
+                    format: date-time
+        cyber.system.v1.PreviewGrantsRequest:
+            type: object
+            properties:
+                roleCodes:
+                    type: array
+                    items:
+                        type: string
+        cyber.system.v1.PreviewGrantsResponse:
+            type: object
+            properties:
+                operations:
+                    type: array
+                    items:
+                        type: string
+        cyber.system.v1.RawRequest:
+            type: object
+            properties:
+                contentType:
+                    type: string
+                    description: Desired content type for the response.
+                data:
+                    type: string
+                    description: Request body.
+                    format: bytes
+            description: Raw bytes request.
+        cyber.system.v1.RemoveDeptMemberResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.RemoveRoleMemberResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.RenameFileRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+            description: renameFile
+        cyber.system.v1.RenameFileResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.Role:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                code:
+                    type: string
+                name:
+                    type: string
+                enabled:
+                    type: boolean
+                remark:
+                    type: string
+                grantCount:
+                    type: string
+                boundCount:
+                    type: string
+                globalGrant:
+                    type: boolean
+                wildcardCount:
+                    type: string
+                narrowedCount:
+                    type: string
+                policyCount:
+                    type: string
+        cyber.system.v1.RoleGrant:
+            type: object
+            properties:
+                operation:
+                    type: string
+                scopeKind:
+                    enum:
+                        - SCOPE_KIND_UNSPECIFIED
+                        - SCOPE_KIND_ALL
+                        - SCOPE_KIND_SELF
+                        - SCOPE_KIND_DEPT_TREE
+                    type: string
+                    format: enum
+                policyIds:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        Constraint policies attached to this grant (AND semantics). Resolved and
+                         tenant-checked on save; evaluation fail-closes if a linked policy is
+                         later removed (the join row goes with the policy).
+        cyber.system.v1.RoleMember:
+            type: object
+            properties:
+                principalType:
+                    type: string
+                principalId:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+        cyber.system.v1.Service:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Service short name.
+                fullName:
+                    type: string
+                    description: Service fully qualified name.
+                package:
+                    type: string
+                    description: Proto package name.
+                sourceFile:
+                    type: string
+                    description: Source proto file path.
+                comment:
+                    type: string
+                    description: Service description.
+                methods:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.Method'
+                    description: Service methods.
+            description: RPC service descriptor.
+        cyber.system.v1.SubscribeResponse:
+            type: object
+            properties:
+                eventId:
+                    type: string
+                    description: Event ID for SSE reconnection.
+                eventType:
+                    type: string
+                    description: Event type for SSE client-side filtering.
+                data:
+                    type: string
+                    description: Event payload.
+                    format: bytes
+                timestamp:
+                    type: string
+                    description: Event timestamp.
+                    format: date-time
+            description: Subscribe event response.
+        cyber.system.v1.Tenant:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                code:
+                    type: string
+                name:
+                    type: string
+                enabled:
+                    type: boolean
+        cyber.system.v1.TimeWindowParams:
+            type: object
+            properties:
+                windows:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.TimeWindowSpan'
+                days:
+                    type: array
+                    items:
+                        type: integer
+                        format: uint32
+                    description: 'Go time.Weekday order: 0=Sunday … 6=Saturday. Empty = every day.'
+            description: |-
+                Daily allowed windows, OR within one policy — the reason multi-segment is
+                 a list and not two linked policies (linking ANDs). Times are "HH:MM" local
+                 to the operating timezone (v1: server-local). Spans are same-day only:
+                 a cross-midnight schedule is two explicit windows (e.g. 22:00–24:00 and
+                 00:00–06:00), which OR into the nightly shape.
+        cyber.system.v1.TimeWindowSpan:
+            type: object
+            properties:
+                start:
+                    type: string
+                end:
+                    type: string
+            description: |-
+                Half-open [start, end) span of minutes within a day; start < end is
+                 deep-validated on save. end also accepts the sentinel "24:00": through
+                 the end of the day (a plain clock has no 24:00).
+        cyber.system.v1.UpdateDeptRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                parentId:
+                    type: string
+                remark:
+                    type: string
+                fieldsMask:
+                    type: array
+                    items:
+                        type: string
+            description: update
+        cyber.system.v1.UpdateDeptResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.UpdatePolicyRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                enabled:
+                    type: boolean
+                params:
+                    $ref: '#/components/schemas/cyber.system.v1.PolicyParams'
+                fieldsMask:
+                    type: array
+                    items:
+                        type: string
+            description: update
+        cyber.system.v1.UpdatePolicyResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.UpdateRoleRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                remark:
+                    type: string
+                grants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.RoleGrant'
+                fieldsMask:
+                    type: array
+                    items:
+                        type: string
+            description: update
+        cyber.system.v1.UpdateRoleResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.UpdateRoleStatusRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                enabled:
+                    type: boolean
+            description: updateRoleStatus
+        cyber.system.v1.UpdateRoleStatusResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.UpdateTenantStatusRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                enabled:
+                    type: boolean
+            description: status
+        cyber.system.v1.UpdateTenantStatusResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.UpdateUserRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+                deptId:
+                    type: string
+                roles:
+                    type: array
+                    items:
+                        type: string
+                avatar:
+                    type: string
+                fieldsMask:
+                    type: array
+                    items:
+                        type: string
+            description: update
+        cyber.system.v1.UpdateUserResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.UpdateUserStatusRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                enabled:
+                    type: boolean
+            description: updateUserStatus
+        cyber.system.v1.UpdateUserStatusResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.UploadFileRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                contentType:
+                    type: string
+                data:
+                    type: string
+                    description: |-
+                        The 4 MiB cap is a contract constant, deliberately matched to the
+                         native gRPC default receive cap so the gRPC leg needs no
+                         MaxRecvMsgSize override. A file near the cap can still overflow the
+                         framed message by its field overhead — the connect/HTTP path (the
+                         primary consumer) has no such limit; gRPC callers keep headroom.
+                    format: bytes
+            description: uploadFile
+        cyber.system.v1.UploadFileResponse:
+            type: object
+            properties:
+                file:
+                    $ref: '#/components/schemas/cyber.system.v1.File'
+        cyber.system.v1.UploadPartUrl:
+            type: object
+            properties:
+                partNumber:
+                    type: integer
+                    description: Same carve-out as PresignedPut.url.
+                    format: int32
+                url:
+                    type: string
+        cyber.system.v1.UploadSession:
+            type: object
+            properties:
+                uploadId:
+                    type: string
+                    description: Same carve-out family; opaque backend session id.
+                partSize:
+                    type: string
+                partCount:
+                    type: integer
+                    format: int32
+                partUrls:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.UploadPartUrl'
+                    description: |-
+                        All part URLs minted upfront (signing is local and cheap); expiry
+                         mid-flight is recovered via ListUploadedParts re-minting.
+                expiresAt:
+                    type: string
+                    format: date-time
+        cyber.system.v1.UploadedPart:
+            type: object
+            properties:
+                partNumber:
+                    type: integer
+                    description: Same carve-out as PresignedPut.url.
+                    format: int32
+                etag:
+                    type: string
+        cyber.system.v1.User:
+            type: object
+            properties:
+                id:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                email:
+                    type: string
+                deptId:
+                    type: string
+                roles:
+                    type: array
+                    items:
+                        type: string
+                enabled:
+                    type: boolean
+                avatar:
+                    type: string
+        cyber.system.v1.UserBrief:
+            type: object
+            properties:
+                id:
+                    type: string
+                email:
+                    type: string
+                avatar:
+                    type: string
+            description: |-
+                Rendering-grade identity summary for hydration; deliberately narrower than
+                 User (no roles, no lifecycle fields).
+        cyber.system.v1.VerifySessionResponse:
+            type: object
+            properties:
+                userId:
+                    type: string
+                tenantId:
+                    type: string
+                sessionId:
+                    type: string
+                email:
+                    type: string
+                population:
+                    type: string
+        cyber.system.v1.WeChatIdentityPayload:
+            type: object
+            properties:
+                code:
+                    type: string
+                    description: OAuth authorization code from the wechat redirect.
+tags:
+    - name: AgentConfigAdminService
+    - name: AgentConfigService
+    - name: AuditService
+    - name: AuthService
+    - name: ChatService
+    - name: DeptService
+    - name: FilePresignService
+      description: |-
+        File presign channel: the client-direct upload path. The
+         service registers metadata and mints time-limited presigned URLs; bytes
+         travel client → object storage without crossing this stack. Addressing is
+         compiled into every minted URL (minted against the storage backend's
+         advertised public endpoint), so the client holds no storage configuration
+         of its own — CreateUpload's response shape IS the routing decision.
+         Same audience as the proxy channel: a builtin capability every
+         authenticated principal holds, while FileService stays the admin
+         management plane.
+         Resume needs no client-side persistence: multipart sessions live in the
+         file row + the backend's part set, and ListUploadedParts replays both
+         (uploaded parts with ETags, fresh URLs for the missing ones).
+    - name: FileProxyService
+      description: |-
+        File proxy channel: the app-generic small-file upload path.
+         Bytes ride the unary RPC body through the service to object storage — no
+         presigning, no CORS, no client-side S3 surface. The payload cap is a
+         contract constant, not a tunable. This lives in its own proto because its
+         audience is the opposite of FileService's: a builtin capability every
+         authenticated principal holds — an operator must not be able to lock a
+         user out of their own file space — while FileService stays the admin
+         management plane.
+         The response carries the File entity, never a URL: callers persist the
+         file id, access URLs are minted at render time, and storage
+         backends can migrate without touching stored references.
+    - name: FileService
+    - name: IntrospectService
+    - name: PolicyService
+    - name: PopulationService
+      description: |-
+        Population registry write face: instances of the compile-time archetype
+         vocabulary (engine | patron). Codes are join keys — immutable once born.
+         The default population is born by seed and protected here.
+    - name: ResourceService
+    - name: RoleService
+    - name: TenantService
+    - name: TransferService
+      description: |-
+        Transfer service. Exposes the streaming transport primitives
+         (SSE / client-stream / bidi / HttpBody) to clients.
+    - name: UserService

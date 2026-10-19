@@ -1,0 +1,18 @@
+{
+  "platform_tenants_title": "إدارة المستأجرين",
+  "platform_tenants_filter_keyword": "الكلمة المفتاحية",
+  "platform_tenants_filter_keyword_placeholder": "الاسم أو الرمز",
+  "platform_tenants_filter_status": "الحالة",
+  "platform_tenants_filter_any": "الكل",
+  "platform_tenants_col_tenant": "المستأجر",
+  "platform_tenants_col_status": "الحالة",
+  "platform_tenants_col_created_at": "تاريخ الإنشاء",
+  "platform_tenants_col_updated_at": "تاريخ التحديث",
+  "platform_tenants_col_actions": "الإجراءات",
+  "platform_tenants_status_on": "مُفعّل",
+  "platform_tenants_status_off": "موقوف",
+  "platform_tenants_act_enable": "تفعيل",
+  "platform_tenants_act_disable": "إيقاف",
+  "platform_tenants_disable_confirm": "إيقاف هذا المستأجر؟",
+  "platform_tenants_empty": "لا يوجد مستأجرون بعد"
+}

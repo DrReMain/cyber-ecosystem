@@ -1,0 +1,34 @@
+server:
+  http: {addr: 0.0.0.0:11002, timeout: 1s}
+  grpc: {addr: 0.0.0.0:12002, timeout: 1s}
+  connect: {addr: 0.0.0.0:13002, timeout: 1s}
+data:
+  database:
+    driver: postgres
+    host: ${DB_HOST:localhost}
+    port: ${DB_PORT:5432}
+    user: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+    db_name: ${DB_NAME:agent}
+    max_open_conns: 100        # 个 (最大连接数)
+    max_idle_conns: 50         # 个 (最大空闲连接数)
+    conn_max_lifetime: 3600s   # 时长 (连接最大存活)
+observability:
+  endpoint: ${OTLP_ENDPOINT:localhost:4318}
+  insecure: true
+  trace:
+    enabled: ${TRACE_ENABLED:false}
+  metrics:
+    enabled: ${METRICS_ENABLED:false}
+  slow_query:
+    db: 0.2s
+  log:
+    level: debug
+    console: true
+    otlp: false
+
+remote:
+  system_connect: ${SYSTEM_CONNECT:localhost:13001} # system connect
+
+crypto:
+  master_key: ${AGENT_MASTER_KEY:agent-dev-master-key} # dev 默认值；两形态均可经 APP_AGENT_MASTER_KEY 覆写

@@ -1,0 +1,107 @@
+# Host routes for the HTTP/WS edge (traefik :80).
+# The edge is the prod routing shape; in dev it coexists with direct
+# port access and exists to keep these routes verified.
+http:
+  routers:
+    seaweedfs-s3:
+      rule: "Host(`s3.cyber.test`)"
+      entryPoints: ["web"]
+      service: seaweedfs-s3
+    centrifugo:
+      rule: "Host(`realtime.cyber.test`)"
+      entryPoints: ["web"]
+      service: centrifugo
+    signoz:
+      rule: "Host(`observe.cyber.test`)"
+      entryPoints: ["web"]
+      service: signoz
+    signoz-otlp:
+      rule: "Host(`otlp.cyber.test`)"
+      entryPoints: ["web"]
+      service: signoz-otlp
+    glitchtip:
+      rule: "Host(`errors.cyber.test`)"
+      entryPoints: ["web"]
+      service: glitchtip
+    livekit-signal:
+      rule: "Host(`rtc.cyber.test`)"
+      entryPoints: ["web"]
+      service: livekit-signal
+    admin-connect:
+      rule: "Host(`admin.cyber.test`) && PathPrefix(`/connect`) && PathRegexp(`^/connect/cyber\\.system\\.`)"
+      entryPoints: ["web"]
+      service: system-connect
+      middlewares: [strip-connect]
+    admin-agent-connect:
+      rule: "Host(`admin.cyber.test`) && PathPrefix(`/connect`) && PathRegexp(`^/connect/cyber\\.agent\\.`)"
+      entryPoints: ["web"]
+      service: agent-connect
+      middlewares: [strip-connect]
+    admin:
+      rule: "Host(`admin.cyber.test`)"
+      entryPoints: ["web"]
+      service: admin
+      middlewares: [compress]
+    api-system:
+      rule: "Host(`api.cyber.test`) && PathRegexp(`^/cyber\\.system\\.`)"
+      entryPoints: ["web"]
+      service: system-connect
+    api-agent:
+      rule: "Host(`api.cyber.test`) && PathRegexp(`^/cyber\\.agent\\.`)"
+      entryPoints: ["web"]
+      service: agent-connect
+    internal-connect-system:
+      rule: "PathPrefix(`/connect`) && PathRegexp(`^/connect/cyber\\.system\\.`)"
+      entryPoints: ["web"]
+      service: system-connect
+      middlewares: [strip-connect]
+    internal-connect-agent:
+      rule: "PathPrefix(`/connect`) && PathRegexp(`^/connect/cyber\\.agent\\.`)"
+      entryPoints: ["web"]
+      service: agent-connect
+      middlewares: [strip-connect]
+
+  middlewares:
+    strip-connect:
+      stripPrefix:
+        prefixes: ["/connect"]
+    compress:
+      compress: {}
+
+  services:
+    seaweedfs-s3:
+      loadBalancer:
+        servers:
+          - url: "http://seaweedfs:80"
+    centrifugo:
+      loadBalancer:
+        servers:
+          - url: "http://centrifugo:8000"
+    signoz:
+      loadBalancer:
+        servers:
+          - url: "http://signoz:8080"
+    signoz-otlp:
+      loadBalancer:
+        servers:
+          - url: "http://signoz-otel-collector:4318"
+    glitchtip:
+      loadBalancer:
+        servers:
+          - url: "http://glitchtip:8000"
+    livekit-signal:
+      loadBalancer:
+        servers:
+          - url: "http://livekit:7880"
+    system-connect:
+      loadBalancer:
+        servers:
+          - url: "http://system:13001"
+    agent-connect:
+      loadBalancer:
+        servers:
+          - url: "http://agent:13002"
+    admin:
+      loadBalancer:
+        servers:
+          - url: "http://admin:3000"

@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package connecttest.v1;
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "cyber-ecosystem/shared-go/kratos/transport/connect/testpb;testpb";
+
+// Self-contained Connect-transport test fixture. Mirrors the streaming method
+// kinds (server/client/bidi stream + HttpBody) and a unary introspection RPC so
+// the transport tests exercise every call shape without depending on any
+// service's business proto. Lives with the transport package; if this package is
+// lifted out, the fixture travels with it.
+
+message SubscribeRequest {
+  string topic = 1;
+  string last_event_id = 2;
+}
+
+message SubscribeResponse {
+  string event_id = 1;
+  string event_type = 2;
+  bytes data = 3;
+  google.protobuf.Timestamp timestamp = 4;
+}
+
+message EchoRequest {
+  bytes data = 1;
+  int64 sequence = 2;
+}
+
+message EchoResponse {
+  int32 total_messages = 1;
+  int64 total_bytes = 2;
+  int64 last_sequence = 3;
+  int64 duration_ns = 4;
+}
+
+message PipeRequest {
+  bytes data = 1;
+  string type = 2;
+  int64 sequence = 3;
+}
+
+message PipeResponse {
+  bytes data = 1;
+  string type = 2;
+  int64 sequence = 3;
+}
+
+message RawRequest {
+  string content_type = 1;
+  bytes data = 2;
+}
+
+service TransferService {
+  rpc Subscribe(SubscribeRequest) returns (stream SubscribeResponse) {
+    option (google.api.http) = {get: "/test/transfer/subscribe"};
+  }
+  rpc Echo(stream EchoRequest) returns (EchoResponse) {
+    option (google.api.http) = {get: "/test/transfer/echo"};
+  }
+  rpc Pipe(stream PipeRequest) returns (stream PipeResponse) {
+    option (google.api.http) = {get: "/test/transfer/pipe"};
+  }
+  rpc Raw(RawRequest) returns (google.api.HttpBody) {
+    option (google.api.http) = {
+      post: "/test/transfer/raw"
+      body: "*"
+    };
+  }
+}
+
+message Method {
+  string name = 1;
+  string full_name = 2;
+  string request_name = 3;
+  string request_full_name = 4;
+  string response_name = 5;
+  string response_full_name = 6;
+  string http_method = 7;
+  string http_path = 8;
+  string comment = 9;
+}
+
+message Service {
+  string name = 1;
+  string full_name = 2;
+  string package = 3;
+  string source_file = 4;
+  string comment = 5;
+  repeated Method methods = 6;
+}
+
+message ListResourceRequest {}
+
+message ListResourceResponse {
+  repeated Service list = 1;
+}
+
+service ResourceService {
+  rpc ListResource(ListResourceRequest) returns (ListResourceResponse) {
+    option (google.api.http) = {get: "/test/resource"};
+  }
+}

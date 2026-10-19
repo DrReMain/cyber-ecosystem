@@ -1,0 +1,32 @@
+/* Theme toggle circle animation */
+[data-theme-transition]::view-transition-old(root),
+[data-theme-transition]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+[data-theme-transition]::view-transition-old(root) {
+  z-index: 9999;
+}
+[data-theme-transition]::view-transition-new(root) {
+  z-index: 1;
+}
+.dark[data-theme-transition]::view-transition-old(root) {
+  z-index: 1;
+}
+.dark[data-theme-transition]::view-transition-new(root) {
+  z-index: 9999;
+}
+
+/* Snapshots require a settled DOM: transition-colors/transition-all
+   utilities interpolate the flip over ~0.2s, so the new snapshot would
+   capture the interpolation's first frame — the old colors — and the
+   teardown would snap to the final ones. Freeze transitions for the
+   morph's duration: the flip lands instantly and the snapshot is the
+   final state. */
+:root[data-theme-transition],
+:root[data-theme-transition] *,
+:root[data-theme-transition] *::before,
+:root[data-theme-transition] *::after {
+  /* biome-ignore lint/complexity/noImportantStyles: must beat utility classes and framework-injected inline styles */
+  transition: none !important;
+}

@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package cyber.conf;
+
+import "google/protobuf/duration.proto";
+
+option go_package = "cyber-ecosystem/app/services/agent/internal/conf;conf";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+  Observability observability = 3;
+  Remote remote = 4;
+  Crypto crypto = 5;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message Connect {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+  Connect connect = 3;
+}
+
+message Data {
+  message Database {
+    string driver = 1;
+    string host = 2;
+    int32 port = 3;
+    string user = 4;
+    string password = 5;
+    string db_name = 6;
+    int32 max_open_conns = 7;
+    int32 max_idle_conns = 8;
+    google.protobuf.Duration conn_max_lifetime = 9;
+  }
+  Database database = 1;
+}
+
+message Observability {
+  message Trace {
+    bool enabled = 1;
+    double sampling_ratio = 2;
+  }
+  message Metrics {
+    bool enabled = 1;
+  }
+  message Log {
+    message FileOutput {
+      string path = 1;
+      int32 max_size_mb = 2;
+      int32 max_backups = 3;
+      int32 max_age_days = 4;
+      bool compress = 5;
+    }
+    string level = 1;
+    bool console = 2;
+    bool otlp = 3;
+    FileOutput file = 4;
+  }
+  message SlowQuery {
+    google.protobuf.Duration db = 1; // slow SQL threshold; 0/omit = disabled
+  }
+  string endpoint = 1;
+  bool insecure = 2;
+  Trace trace = 3;
+  Metrics metrics = 4;
+  Log log = 5;
+  SlowQuery slow_query = 6;
+}
+
+// Remote holds endpoints of other services this service calls (ACL targets).
+message Remote {
+  string system_connect = 1; // system service connect face (session introspection)
+}
+
+// Crypto holds keys for at-rest encryption of service-held secrets.
+message Crypto {
+  string master_key = 1; // api_key column encryption; high-entropy secret injected via env (HKDF-derived to AES-256-GCM); never a human passphrase, never committed
+}

@@ -1,0 +1,48 @@
+# Container-mode bootstrap config (baked by the Dockerfile; configs/ holds
+# only the bare-metal dev config). Endpoints are network discovery aliases
+# (<service>.<domain> — the same names k8s Service DNS resolves), so one file
+# serves every container shape. Deployment-sensitive values are
+# ${VAR:default} placeholders overridden by APP_-prefixed env vars (e.g
+# APP_DB_HOST=prod-db reconfigures without a rebuild); booleans included —
+# main.go wires WithResolveActualTypes for the string→bool conversion.
+# Placeholder coverage is field-aligned with configs/config.yaml — a key
+# that carries one here carries the same one there (defaults differ per
+# environment); a key stays literal in both when neither flips. When a key
+# changes in configs/config.yaml, mirror it here.
+server:
+  http: {addr: 0.0.0.0:11002, timeout: 1s}
+  grpc: {addr: 0.0.0.0:12002, timeout: 1s}
+  connect: {addr: 0.0.0.0:13002, timeout: 1s}
+data:
+  database:
+    driver: postgres
+    host: ${DB_HOST:postgresql.db}
+    port: ${DB_PORT:5432}
+    user: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+    db_name: ${DB_NAME:agent}
+    max_open_conns: 100        # connections (max)
+    max_idle_conns: 50         # connections (max idle)
+    conn_max_lifetime: 3600s   # duration (max connection lifetime)
+observability:
+  endpoint: ${OTLP_ENDPOINT:signoz-otel-collector.observability:4318} # SigNoz OTLP HTTP
+  insecure: true
+  trace:
+    enabled: ${TRACE_ENABLED:false}
+  metrics:
+    enabled: ${METRICS_ENABLED:false}
+  slow_query:
+    db: 0.2s
+  log:
+    level: info
+    console: true
+    otlp: false
+
+remote:
+  system_connect: ${SYSTEM_CONNECT:http://system.api:13001} # system connect
+
+crypto:
+  # Empty default: the boot guard rejects an unset key, so a bare docker run
+  # without the env fails loudly instead of encrypting with a known key; the
+  # app compose injects the dev key through APP_AGENT_MASTER_KEY.
+  master_key: ${AGENT_MASTER_KEY:}

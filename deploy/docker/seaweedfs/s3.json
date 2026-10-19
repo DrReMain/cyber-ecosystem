@@ -1,0 +1,11 @@
+{
+  "identities": [
+    {
+      "name": "core",
+      "credentials": [
+        { "accessKey": "admin@cyber-ecosystem.com", "secretKey": "Cyber-Ecosystem123" }
+      ],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+# ==================== Nx ====================
+.nx/installation
+.nx/cache
+.nx/workspace-data
+.nx/migrate-runs
+
+# ==================== Operating System ====================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+
+# Linux
+*~
+
+# ==================== IDE & Editors ====================
+# JetBrains IDEs
+.idea/
+
+# Vim
+*.swp
+*.swo
+*~
+
+# =================== Rust ===================
+# Build artifacts
+target/
+
+# Lock files (binary projects; library projects should commit these)
+Cargo.lock
+.cargo-lock
+
+# ==================== Go ====================
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.txt
+coverage.html
+
+# Dependency directories
+vendor/
+
+# Compiled Object files, Static and Dynamic libs
+*.o
+*.a
+*.so
+
+# ==================== Node.js ====================
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+*.local
+
+# ==================== Environment & Secrets ====================
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Secrets & Certificates
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+
+# ==================== Logs & Databases ====================
+logs/
+*.log
+*.sql
+# ent/atlas versioned migrations are source — must be tracked, not ignored
+!**/ent/migrate/migrations/*.sql
+# postgres bootstrap SQL (deploy initdb) is source — must be tracked, not ignored
+!deploy/docker/postgres/*.sql
+*.sqlite
+*.db
+
+# ==================== Build Artifacts ====================
+# Binary output directories
+bin/
+out/
+demos/
+
+# ==================== Framework Specific ====================
+# Vite / Vinxi
+.nitro/
+.output/
+.vinxi/
+.wrangler/
+
+# TanStack
+.tanstack/
+
+# Paraglide (generated)
+**/src/paraglide/
+
+# ==================== AI Tools ====================
+.memsearch/
+.codegraph
+
+# ==================== Misc ====================
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Yarn
+.yarn-integrity
+
+# Next.js
+.next/
+out/
+
+# Nuxt.js
+.nuxt/
+dist/

@@ -1,0 +1,14 @@
+{
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "github-publish",
+  "root": "github-publish",
+  "targets": {
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "bash github-publish/publish-github.sh"
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "platform_tenants_title": "Tenant Management",
+  "platform_tenants_filter_keyword": "Keyword",
+  "platform_tenants_filter_keyword_placeholder": "Name or code",
+  "platform_tenants_filter_status": "Status",
+  "platform_tenants_filter_any": "Any",
+  "platform_tenants_col_tenant": "Tenant",
+  "platform_tenants_col_status": "Status",
+  "platform_tenants_col_created_at": "Created",
+  "platform_tenants_col_updated_at": "Updated",
+  "platform_tenants_col_actions": "Actions",
+  "platform_tenants_status_on": "Enabled",
+  "platform_tenants_status_off": "Disabled",
+  "platform_tenants_act_enable": "Enable",
+  "platform_tenants_act_disable": "Disable",
+  "platform_tenants_disable_confirm": "Disable this tenant?",
+  "platform_tenants_empty": "No tenants yet"
+}

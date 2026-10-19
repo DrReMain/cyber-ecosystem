@@ -1,0 +1,18 @@
+{
+  "platform_tenants_title": "租户管理",
+  "platform_tenants_filter_keyword": "关键词",
+  "platform_tenants_filter_keyword_placeholder": "名称或编码",
+  "platform_tenants_filter_status": "状态",
+  "platform_tenants_filter_any": "全部",
+  "platform_tenants_col_tenant": "租户",
+  "platform_tenants_col_status": "状态",
+  "platform_tenants_col_created_at": "创建时间",
+  "platform_tenants_col_updated_at": "更新时间",
+  "platform_tenants_col_actions": "操作",
+  "platform_tenants_status_on": "已启用",
+  "platform_tenants_status_off": "已停用",
+  "platform_tenants_act_enable": "启用",
+  "platform_tenants_act_disable": "停用",
+  "platform_tenants_disable_confirm": "停用该租户？",
+  "platform_tenants_empty": "暂无租户"
+}

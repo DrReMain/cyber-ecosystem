@@ -1,0 +1,18 @@
+{
+  "platform_tenants_title": "テナント管理",
+  "platform_tenants_filter_keyword": "キーワード",
+  "platform_tenants_filter_keyword_placeholder": "名前またはコード",
+  "platform_tenants_filter_status": "ステータス",
+  "platform_tenants_filter_any": "すべて",
+  "platform_tenants_col_tenant": "テナント",
+  "platform_tenants_col_status": "ステータス",
+  "platform_tenants_col_created_at": "作成日時",
+  "platform_tenants_col_updated_at": "更新日時",
+  "platform_tenants_col_actions": "操作",
+  "platform_tenants_status_on": "有効",
+  "platform_tenants_status_off": "無効",
+  "platform_tenants_act_enable": "有効化",
+  "platform_tenants_act_disable": "無効化",
+  "platform_tenants_disable_confirm": "このテナントを無効化しますか？",
+  "platform_tenants_empty": "テナントはまだありません"
+}

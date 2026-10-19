@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package cyber.shared.errors.v1;
+
+import "errors/errors.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/shared/errors/v1";
+
+enum InfraError {
+  option (.errors.default_code) = 500;
+
+  INFRA_ERROR_UNSPECIFIED = 0 [(.errors.code) = 500];
+
+  // 30xx: Network
+  INFRA_ERROR_NETWORK_TIMEOUT = 3000 [(.errors.code) = 504];
+  INFRA_ERROR_NETWORK_CONNECTION = 3001 [(.errors.code) = 503];
+  INFRA_ERROR_NETWORK_DNS = 3002 [(.errors.code) = 503];
+  INFRA_ERROR_NETWORK_TLS = 3003 [(.errors.code) = 503];
+
+  // 31xx: Database
+  INFRA_ERROR_DB_NOT_FOUND = 3100 [(.errors.code) = 404];
+  INFRA_ERROR_DB_VALIDATION = 3101 [(.errors.code) = 400];
+  INFRA_ERROR_DB_CONSTRAINT = 3102 [(.errors.code) = 409];
+  INFRA_ERROR_DB_NOT_SINGULAR = 3103 [(.errors.code) = 400];
+  INFRA_ERROR_DB_NOT_LOADED = 3104 [(.errors.code) = 500];
+  INFRA_ERROR_DB_INTERNAL = 3105 [(.errors.code) = 500];
+  INFRA_ERROR_DB_DEADLOCK = 3106 [(.errors.code) = 409];
+  INFRA_ERROR_DB_CONNECTION = 3107 [(.errors.code) = 503];
+
+  // 32xx: Cache
+  INFRA_ERROR_CACHE_MISS = 3200 [(.errors.code) = 404];
+  INFRA_ERROR_CACHE_KEY_NOT_FOUND = 3201 [(.errors.code) = 404];
+  INFRA_ERROR_CACHE_SESSION_NOT_FOUND = 3202 [(.errors.code) = 404];
+  INFRA_ERROR_CACHE_QUOTA_EXCEEDED = 3203 [(.errors.code) = 429];
+  INFRA_ERROR_CACHE_INVALID_ARGUMENT = 3204 [(.errors.code) = 400];
+  INFRA_ERROR_CACHE_UNAVAILABLE = 3205 [(.errors.code) = 503];
+  INFRA_ERROR_CACHE_LOCK_NOT_ACQUIRED = 3206 [(.errors.code) = 423];
+
+  // 33xx: Storage
+  INFRA_ERROR_STORAGE_NOT_FOUND = 3300 [(.errors.code) = 404];
+  INFRA_ERROR_STORAGE_FORBIDDEN = 3301 [(.errors.code) = 403];
+  INFRA_ERROR_STORAGE_SIZE_EXCEED = 3302 [(.errors.code) = 413];
+  INFRA_ERROR_STORAGE_UNAVAILABLE = 3303 [(.errors.code) = 503];
+  INFRA_ERROR_STORAGE_INVALID_ARGUMENT = 3304 [(.errors.code) = 400];
+
+  // 34xx: MQ
+  INFRA_ERROR_MQ_INVALID_ARGUMENT = 3400 [(.errors.code) = 400];
+  INFRA_ERROR_MQ_UNAVAILABLE = 3401 [(.errors.code) = 503];
+  INFRA_ERROR_MQ_TIMEOUT = 3402 [(.errors.code) = 504];
+}

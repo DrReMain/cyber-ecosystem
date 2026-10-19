@@ -1,0 +1,49 @@
+version: "2"
+
+# Single Go quality gate: default set + a strict, low-noise selection.
+# Selection criteria: catches real bugs or dangerous patterns that coding
+# agents produce (error-comparison habits, literal status codes, shadowing,
+# insecure idioms) with near-zero false positives.
+linters:
+  default: standard
+  enable:
+    - revive          # golint successor: naming, exported API hygiene
+    - gocritic        # deeper flow/simplification diagnostics
+    - errorlint       # errors.Is/As over ==, %w over %v
+    - nilerr          # err != nil but return nil
+    - unconvert       # redundant type conversions
+    - predeclared     # shadowing predeclared identifiers
+    - usestdlibvars   # http.StatusOK over 200, http.MethodGet over "GET"
+    - copyloopvar     # needless loop-variable copies (post go1.22)
+    - misspell        # common misspellings
+    - asciicheck      # non-ascii identifiers
+    - bidichk         # bidi characters in source (security)
+    - wastedassign    # assigned but never used
+    - nolintlint      # nolint directives must be used and explained
+    - gosec           # insecure patterns (G101 hardcoded creds, G404 weak rand, ...)
+  settings:
+    revive:
+      rules:
+        # comment-forcing rules conflict with the repo's stance that
+        # comments are explanatory, never ritual
+        - name: exported
+          disabled: true
+        - name: package-comments
+          disabled: true
+
+formatters:
+  enable:
+    - gci
+  settings:
+    gci:
+      # custom-order keeps the section sequence as declared below;
+      # without it gci reorders prefix sections lexicographically.
+      custom-order: true
+      # Section order encodes the layering rule:
+      # stdlib -> third-party -> shared-go -> generated -> application code.
+      sections:
+        - standard
+        - default
+        - Prefix(cyber-ecosystem/shared-go)
+        - Prefix(cyber-ecosystem/gen/go)
+        - Prefix(cyber-ecosystem/app)

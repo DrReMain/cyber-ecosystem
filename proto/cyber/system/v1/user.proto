@@ -1,0 +1,285 @@
+syntax = "proto3";
+
+package cyber.system.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/authz.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
+
+service UserService {
+  option (cyber.ext.v1.service_comment) = "用户管理";
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "创建用户"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/users"
+      body: "*"
+    };
+  }
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "修改用户"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {
+      put: "/api/v1/system/users/{id}"
+      body: "*"
+    };
+  }
+  rpc UpdateUserStatus(UpdateUserStatusRequest) returns (UpdateUserStatusResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "启停用户"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {
+      put: "/api/v1/system/users/{id}/status"
+      body: "*"
+    };
+  }
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "修改密码"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/me/password"
+      body: "*"
+    };
+  }
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "删除用户"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {delete: "/api/v1/system/users/{id}"};
+  }
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询用户列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {get: "/api/v1/system/users"};
+  }
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "查询用户详情"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {get: "/api/v1/system/users/{id}"};
+  }
+  rpc BatchGetUsers(BatchGetUsersRequest) returns (BatchGetUsersResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "批量查询用户概要"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {
+      post: "/api/v1/system/users/batch-get"
+      body: "*"
+    };
+  }
+}
+
+message User {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.StringValue email = 4;
+  google.protobuf.StringValue dept_id = 5;
+  repeated string roles = 6;
+  google.protobuf.BoolValue enabled = 7;
+  google.protobuf.StringValue avatar = 8;
+}
+
+// create
+message CreateUserRequest {
+  optional string email = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 128
+    }
+  ];
+  optional string password = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 128
+    }
+  ];
+  optional string dept_id = 3 [(buf.validate.field).string.len = 20];
+  repeated string roles = 4 [(buf.validate.field).repeated = {
+    max_items: 64
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 64
+      }
+    }
+  }];
+  optional string avatar = 5 [(buf.validate.field).string.len = 20];
+  // Seat population for the identity's birth seat; empty = the default user
+  // population. Validated against the registry — a seat is never born on a
+  // code that does not exist.
+  optional string population = 6 [(buf.validate.field).string.max_len = 20];
+}
+
+message CreateUserResponse {
+  google.protobuf.StringValue id = 1;
+}
+
+// update
+message UpdateUserRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string email = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 128
+  }];
+  optional string password = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 128
+  }];
+  optional string dept_id = 4;
+  repeated string roles = 5 [(buf.validate.field).repeated = {
+    max_items: 64
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 64
+      }
+    }
+  }];
+  optional string avatar = 6;
+  repeated string fields_mask = 100 [(buf.validate.field).repeated = {
+    min_items: 1
+    unique: true
+    items: {
+      string: {pattern: "^(email|password|dept_id|roles|avatar)$"}
+    }
+  }];
+}
+
+message UpdateUserResponse {}
+
+// updateUserStatus
+message UpdateUserStatusRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional bool enabled = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateUserStatusResponse {}
+
+// changePassword
+message ChangePasswordRequest {
+  optional string old_password = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string new_password = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 128
+    }
+  ];
+}
+
+message ChangePasswordResponse {}
+
+// delete
+message DeleteUserRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message DeleteUserResponse {}
+
+// list
+message ListUsersRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional string email = 2;
+  optional bool enabled = 3;
+  optional string dept_id = 4 [(buf.validate.field).string.len = 20];
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListUsersRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(email|createdAt|updatedAt):(asc|desc)$'))"
+  }];
+}
+
+message ListUsersResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated User list = 2;
+}
+
+// get
+message GetUserRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+// batchGet
+message BatchGetUsersRequest {
+  // max_items matches the page_size cap (shared/common/v1 pagination.proto):
+  // one page of ids hydrates in one call — keep the two in lockstep.
+  repeated string ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 100
+    unique: true
+    items: {
+      string: {len: 20}
+    }
+  }];
+}
+
+message BatchGetUsersResponse {
+  // key = requested id; an absent key = no row or outside the viewer's data
+  // scope — skip semantics, no per-item error channel.
+  map<string, UserBrief> users = 1;
+}
+
+// Rendering-grade identity summary for hydration; deliberately narrower than
+// User (no roles, no lifecycle fields).
+message UserBrief {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.StringValue email = 2;
+  google.protobuf.StringValue avatar = 3;
+}

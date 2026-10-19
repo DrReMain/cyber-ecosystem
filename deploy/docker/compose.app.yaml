@@ -1,0 +1,170 @@
+# Application layer: the system service, the admin client, and the one-shot
+# atlas migration job. Layered over compose.dev.yaml so apps share the
+# middleware network, volumes, and compose project with dev:
+#
+#   docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml \
+#     --profile db --profile storage --profile app up -d --wait
+#
+# App containers publish NO host ports — the edge (compose.edge.yaml) is the
+# only way in, mirroring the prod access shape. Use the deploy Nx targets
+# (deploy:app:start, deploy:pre:start) instead of raw compose.
+
+services:
+  system-migrate:
+    profiles: ["app"]
+    image: arigaio/atlas:1.3.3 # version-aligned with the local @ariga/atlas CLI
+    command:
+      - migrate
+      - apply
+      - --dir
+      - file:///migrations
+      # The DSN interpolates the same APP_DB_* knobs the service config reads,
+      # so one override moves both the migration and the runtime connection.
+      - --url
+      - postgres://${APP_DB_USER:-postgres}:${APP_DB_PASS:-postgres}@postgresql.db:5432/system?sslmode=disable
+    volumes:
+      - ../../app/services/system/internal/ent/migrate/migrations:/migrations:ro
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: "no"
+
+  system:
+    profiles: ["app"]
+    build:
+      context: ../..
+      dockerfile: app/services/system/Dockerfile
+      args:
+        VERSION: "${VERSION:-dev}"
+    image: cyber-ecosystem/system:local
+    environment:
+      - APP_DB_HOST
+      - APP_DB_PORT
+      - APP_DB_USER
+      - APP_DB_PASS
+      - APP_DB_NAME
+      - APP_SEED_INITIAL_PASSWORD
+      - APP_OTLP_ENDPOINT
+      - APP_S3_PUBLIC_ENDPOINT
+      - APP_WECHAT_ENABLED
+      - APP_WECHAT_ENDPOINT
+      - APP_WECHAT_APPID
+      - APP_WECHAT_SECRET
+    networks:
+      default:
+        aliases: ["system.api"]
+    healthcheck:
+      # port mirrors system config.yaml server.http.addr
+      test: ["CMD", "wget", "-qO-", "http://localhost:11001/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+    depends_on:
+      system-migrate:
+        condition: service_completed_successfully
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      seaweedfs:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+    restart: unless-stopped
+
+  agent-migrate:
+    profiles: ["app"]
+    image: arigaio/atlas:1.3.3 # version-aligned with the local @ariga/atlas CLI
+    command:
+      - migrate
+      - apply
+      - --dir
+      - file:///migrations
+      # Same APP_DB_* interpolation as system-migrate; the database name
+      # defaults per service.
+      - --url
+      - postgres://${APP_DB_USER:-postgres}:${APP_DB_PASS:-postgres}@postgresql.db:5432/agent?sslmode=disable
+    volumes:
+      - ../../app/services/agent/internal/ent/migrate/migrations:/migrations:ro
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: "no"
+
+  agent:
+    profiles: ["app"]
+    build:
+      context: ../..
+      dockerfile: app/services/agent/Dockerfile
+      args:
+        VERSION: "${VERSION:-dev}"
+    image: cyber-ecosystem/agent:local
+    environment:
+      - APP_AGENT_MASTER_KEY=${AGENT_MASTER_KEY:-agent-insecure-dev-key}
+      - APP_DB_HOST
+      - APP_DB_PORT
+      - APP_DB_USER
+      - APP_DB_PASS
+      - APP_DB_NAME
+      - APP_OTLP_ENDPOINT
+    networks:
+      default:
+        aliases: ["agent.api"]
+    healthcheck:
+      # port mirrors agent config.yaml server.http.addr
+      test: ["CMD", "wget", "-qO-", "http://localhost:11002/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+    depends_on:
+      agent-migrate:
+        condition: service_completed_successfully
+      postgresql:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+    restart: unless-stopped
+
+  admin:
+    profiles: ["app"]
+    build:
+      context: ../..
+      dockerfile: app/clients/admin/Dockerfile
+    image: cyber-ecosystem/admin:local
+    environment:
+      PORT: "3000"
+    networks:
+      default:
+        aliases: ["admin.web"]
+    healthcheck: # static asset probe — no SSR render cost
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/favicon.ico"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+    depends_on:
+      system:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+    restart: unless-stopped

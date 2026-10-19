@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH — repo-level extension, not a cyber domain directory
+package cyber.ext.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/ext/v1";
+
+// Row-level narrowing applicability: the operation's result rows / target
+// rows are filtered by the ctx Decision's scopes — an entity with
+// DatascopeMixin consumes them. Create-style methods never qualify (no row
+// to narrow yet). The catalog relays the flag; the grant editor offers
+// scope selection only on annotated rows — never offer configuration that
+// will not take effect. Guard tests enforce datascope => ACCESS_ADMIN
+// (BUILTIN faces carry no grants surface to narrow).
+extend google.protobuf.MethodOptions {
+  bool datascope = 10004;
+}

@@ -1,0 +1,14 @@
+{
+  "installation": {
+    "version": "23.1.1"
+  },
+  "analytics": false,
+  "cli": {
+    "packageManager": "pnpm"
+  },
+  "targetDefaults": {
+    "dev": {
+      "cache": false
+    }
+  }
+}

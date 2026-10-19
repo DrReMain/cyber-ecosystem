@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package cyber.shared.common.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/shared/common/v1";
+
+// Pagination request.
+message PageRequest {
+  // Page number (1-based).
+  optional int32 page_no = 1 [(buf.validate.field).int32 = {gt: 0}];
+  // Page size.
+  optional int32 page_size = 2 [(buf.validate.field).int32 = {
+    gt: 0
+    lte: 100
+  }];
+  // Return all results without pagination.
+  optional bool all = 3;
+  // Filter by created_at >= this value.
+  google.protobuf.Timestamp created_at_a = 4;
+  // Filter by created_at <= this value.
+  google.protobuf.Timestamp created_at_z = 5;
+  // Filter by updated_at >= this value.
+  google.protobuf.Timestamp updated_at_a = 6;
+  // Filter by updated_at <= this value.
+  google.protobuf.Timestamp updated_at_z = 7;
+}
+
+// Pagination response.
+message PageResponse {
+  // Current page number.
+  int32 page_no = 1;
+  // Page size.
+  int32 page_size = 2;
+  // Total count.
+  int32 total = 3;
+  // Whether more results exist.
+  bool more = 4;
+}

@@ -1,0 +1,24 @@
+version: v2
+plugins:
+  # Go — module option maps output to go_package paths within the module
+  - local: [go, tool, protoc-gen-go]
+    out: .
+    opt: module=cyber-ecosystem
+  - local: [go, tool, protoc-gen-go-grpc]
+    out: .
+    opt: module=cyber-ecosystem
+  - local: [go, tool, protoc-gen-go-http]
+    out: .
+    opt: module=cyber-ecosystem
+  # protoc-gen-go-connect — local Kratos plugin; emits *_connect.pb.go files with
+  # Register{Service}ConnectServer bridging gRPC-style impls to the Kratos Connect
+  # transport server. Distinct from the upstream protoc-gen-connect-go (v1connect/).
+  - local: [go, tool, protoc-gen-go-connect]
+    out: .
+    opt: module=cyber-ecosystem
+  - local: [go, tool, protoc-gen-connect-go]
+    out: .
+    opt: module=cyber-ecosystem
+  - local: [go, tool, protoc-gen-go-errors]
+    out: .
+    opt: module=cyber-ecosystem

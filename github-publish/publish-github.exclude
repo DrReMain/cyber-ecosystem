@@ -1,0 +1,9 @@
+# Paths excluded from public GitHub snapshots (one per line).
+# Consumed by publish-github.sh; an entry that matches
+# nothing in the source tree prints a warning (likely a typo).
+
+# Working-lane docs: strategy and active-front decisions stay private.
+docs/roadmap
+
+# The publish mechanism itself is private-repo-only.
+github-publish

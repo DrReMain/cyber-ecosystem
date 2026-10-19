@@ -1,0 +1,31 @@
+{
+  "name": "@cyber-ecosystem/shared-store",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "biome check",
+    "format": "biome format",
+    "lint": "biome lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cyber-ecosystem/shared-cookie": "workspace:*"
+  },
+  "peerDependencies": {
+    "@types/react": "^19",
+    "immer": "^11",
+    "jotai": "^2",
+    "jotai-devtools": "^0.14",
+    "jotai-immer": "^0.4",
+    "react": "^19",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

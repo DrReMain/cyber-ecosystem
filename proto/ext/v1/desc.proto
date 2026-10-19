@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+// buf:lint:ignore PACKAGE_DIRECTORY_MATCH — repo-level extension, not a cyber domain directory
+package cyber.ext.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/ext/v1";
+
+// Effect semantics of a method. The audit layer classifies on it: the allow
+// side collects WRITE only, the deny side collects everything.
+enum Action {
+  ACTION_UNSPECIFIED = 0;
+  ACTION_READ = 1;
+  ACTION_WRITE = 2;
+}
+
+// Facts about a method: comment is the human face (catalog text), action is
+// the machine face. Policy knobs never live here.
+message MethodDesc {
+  string comment = 1;
+  Action action = 2;
+}
+
+extend google.protobuf.ServiceOptions {
+  string service_comment = 20001;
+}
+
+extend google.protobuf.MethodOptions {
+  MethodDesc method = 30001;
+}

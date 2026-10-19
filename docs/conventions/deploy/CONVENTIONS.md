@@ -1,0 +1,98 @@
+# Deploy Conventions
+
+**Status:** ACTIVE
+
+**Scope:** containerization and deployment of everything in this repo — app images, `deploy/`, the compose stacks, the edge. Prescriptive — `MUST` / `SHOULD` / `MAY`.
+
+This repo is a **generic skeleton**: every rule below is a per-app pattern, not tied to any specific app. Instance state (service set, client set, URLs, ports) lives in the compose files and `deploy/docker/traefik/dynamic.yaml` themselves — read those for what exists, read this for how it fits together.
+
+---
+
+## 1. Shapes & dials
+
+| Shape | Stack | Access |
+|---|---|---|
+| dev | `deploy/docker/compose.dev.yaml` (middleware) + apps bare-metal | host-direct ports |
+| pre (= local prod rehearsal) | dev stack + `deploy/docker/compose.app.yaml` + `deploy/docker/compose.edge.yaml` | edge-only, `*.cyber.test` |
+| prod compose / prod k3s | parameterized compose / k8s translation (`deploy/k8s/`, empty placeholder) | edge / ingress |
+
+- pre has two middleware dials: **minimal** (`deploy:pre:start` = the app layer's hard deps only — the compose `depends_on` graph is the truth; mq runs in pg mode, so the realtime/media/observability profiles are optional) and **full** (`deploy:pre:full:start` = all middleware profiles + app + edge).
+- pre runs **on top of** the dev stack (one compose project, shared volumes) — deliberate; split only when data isolation actually hurts. The edge, by contrast, is its **own compose project** joining the middleware network as `external` — it can only start after the middleware stack exists (the `pre:*` targets encode that order).
+- Named volumes persist across `down`; only `down -v` (`deploy:reset`) wipes them.
+- `MUST` keep the shapes aligned: same discovery names, same edge semantics, same images; compose artifacts carry **zero k8s residue**.
+- App containers publish **no host ports** in pre — the edge is the only way in.
+
+## 2. Usage (all through Nx)
+
+| Target | Effect |
+|---|---|
+| `<app>:image` (on each app project) | build that app's image → `cyber-ecosystem/<name>:local`; follows host `GOPROXY` / npm registry |
+| `deploy:image:<name>` | build an infra-derived image (`deploy/images/<name>/`) **only when its tag is missing locally** (existence guard); wired as a `dependsOn` of every start target that activates the `db` profile |
+| `deploy:start` / `deploy:stop` | middleware core (db+storage+mq) |
+| `deploy:<domain>:start/stop` | middleware per domain (`db storage mq realtime media observability`) |
+| `deploy:app:start/stop/status` | app layer + its hard middleware deps; start builds the app images first (Nx `dependsOn` → `<app>:image`, version-stamped) — compose `up` never builds, so the stamp survives |
+| `deploy:pre:start` / `deploy:pre:full:start` | pre, minimal / full dial (app layer + edge) |
+| `deploy:pre:stop` | edge down + app containers **removed** (middleware untouched) |
+| `deploy:reset` | both compose projects down `-v` — clean slate, images and unrelated projects kept |
+
+App-layer stop is **remove, not stop**: `deploy:stop` (dev-file-only `down`) removes the shared network, and stopped app containers left referencing it make the next `up` fail with "network not found".
+
+Every `app:start` **rolls all app containers**: docker builds stamp a fresh timestamp into the image config, so even a content-identical rebuild yields a new image ID and compose recreates every app service (a seconds-long blip). Per-service rollout granularity, if ever needed, is a per-service `up`.
+
+## 3. Ownership: build self-contained, orchestration central
+
+- Each app owns its image definition: `Dockerfile` + `image` Nx target at the app root. Adding an app touches its own project plus §7's deploy-side wiring — nothing else.
+- `deploy/` owns orchestration: compose files, edge, migration wiring, start/stop targets.
+- `deploy/images/<name>/` = infra-derived custom images only (e.g. `pg-extended`), never app images. Each gets an `image:<name>` target in `deploy/project.json` with an existence guard (build-if-missing), depended on by every start target that activates the relevant profile — compose `up` then never faces a local-only tag (its pull-first fallback is registry-dependent and stalls on unreachable registries). Same-tag Dockerfile edits rebuild via `docker image rm` + rerun; a tag bump misses the guard naturally. Upstream tag styles vary — some publish without the `v` prefix (glitchtip) — so verify the exact tag exists before bumping any pin.
+- Both image kinds use the **workspace root as build context** (single Go module + pnpm workspace). The root `.dockerignore` is the **single trim surface** — `MUST NOT` scatter per-directory ignores.
+- pnpm-workspace installs inside image builds `MUST` run with the **full workspace source present** (`COPY` before `install`; a BuildKit store cache mount recovers the lost layer cache). A manifests-only install layer changes pnpm's node_modules shape, and vite's server environment then hashes `?url` css assets differently than the client emits — phantom css names that 404 at runtime (first-paint flash). The admin Dockerfile comment marks the spot.
+
+## 4. Discovery names
+
+- Discovery is **by naming discipline, not a registry**: every compose service carries a `<service>.<domain>` network alias (`postgresql.db`, `system.api`, `admin.web`). These are exactly the two-label short names k8s Service DNS resolves — a container-mode config (§6) serves every container shape unchanged.
+- `MUST NOT` introduce a service registry / config center at the current scale. Revisit triggers: (a) ≥3 mutually-calling services with dynamic topology, (b) a real need to change config without a release.
+
+## 5. Ports
+
+- Middleware host ports classify by **who dials them**: a face that a party off the machine dials — browser direct-upload S3, websocket Centrifugo, WebRTC LiveKit signaling + UDP media — publishes beyond loopback (cross-machine dev); every backend-only face (pg/redis/nats/otlp/observability; NATS included — browser realtime rides Centrifugo's websocket, NATS is backend fabric) binds `127.0.0.1` only. The app layer publishes nothing.
+- The edge never rewrites `Host` (S3 presign SigV4 depends on it) and terminates nothing (plain :80; TLS is §9).
+
+## 6. App configuration
+
+- **kratos services** keep two bootstrap configs of identical shape at the app root: `configs/config.yaml` (bare-metal dev, `localhost` endpoints) and `container/config.yaml` (network aliases, baked into the image). **Mirror every key change across the two.** `configs/` is the dev source directory — kratos reads *every* file in it, so it MUST contain nothing but the dev config. **Relative paths in the dev config anchor at `<service>/cmd/app`** — `kratos run` executes the built binary with the main package's directory as cwd (that is why `-conf ../../configs` resolves); counting dot-dots from `app/services/<svc>` is off by one.
+- Deployment-sensitive values are kratos `${VAR:default}` placeholders, overridden at runtime by `APP_`-prefixed env vars (`APP_DB_HOST=…`). This is the **only** env-override channel: kratos's env source does flat keys, not nested overrides — `APP_DATA_DATABASE_HOST` is silently discarded; the yaml placeholder is what makes an env var reachable. Booleans included (`WithResolveActualTypes` is wired in `main.go`). **One placeholder per value** — the interpolator expands the first `${…}` in a value and returns, so a value composing two placeholders silently truncates; constants compose inside the yaml literal, never across placeholders. Placeholder coverage is **field-aligned** across the two files: a key that carries a placeholder in one carries the same placeholder in the other (defaults differ per environment); a key stays literal in both when neither environment flips it.
+- **The system image bakes `gen/catalog/`** (the federated grant manifests) to `/etc/cyber/catalog` and normalizes perms with `RUN chmod -R a+rX` — the pipeline tools write at gosec ceilings (0600/0750, root-owned after COPY) while the process runs as `nobody`; repo filesystem and image multi-user semantics are different worlds, and public derived data gets its read grant at the delivery layer. Mounting a subset of manifests instead of the baked set is the config-level composition knob for trimming the service surface.
+- **tanstack clients** read runtime env only (API URL, PORT) and derive the site origin per request (`getSiteUrl`: request URL server-side, `window.location.origin` client-side) — nothing environment-specific is baked; one image serves every deployment. A `server.mjs` host mounts the fetch-handler build output (the vite plugin emits `export default { fetch }`, not a self-starting server): zero-dep node:http + static client serving + WHATWG bridging. SSR calls loop back through the same origin's `/connect` (the edge splits by package prefix), so clients never learn service addresses — the multiservice split has exactly one consumer: the edge.
+
+## 7. Adding an application
+
+1. App side (self-contained): `Dockerfile` + `image` target at the app root — use the existing kratos service / tanstack client as the template; kratos adds `container/config.yaml` (§6).
+2. `deploy/docker/compose.app.yaml`: service block under the `app` profile — `<service>.api` network alias, healthcheck (kratos: `/healthz` on its http port; client: a static asset), `depends_on` (incl. its migration job, if any), resource limits, `image: cyber-ecosystem/<name>:local`, **no host ports**.
+3. Edge (`deploy/docker/traefik/dynamic.yaml`): a second backend service on existing hosts splits by **package prefix**, not a new host — `Host(admin.cyber.test) && PathPrefix(/connect) && PathRegexp(^/connect/cyber\.<svc>\.)` → the service's connect port + `stripprefix` (length-based priority puts it above the bare `/connect` rule), and `Host(api.cyber.test) && PathRegexp(^/cyber\.<svc>\.)` → the same port **without** stripping (that face takes bare procedure paths). Mirror both as a dev vite proxy regex key **before** the plain `/connect` key, with a `*_CONNECT_API_URL` env entry per service (dev-only). A genuinely new product surface may still claim a new host.
+4. Migrations (kratos + ent): one-shot atlas job (§10). Add the database shell to `deploy/docker/postgres/02-databases.sql`; a retained volume needs the `CREATE DATABASE` once by hand (initdb only runs on fresh volumes).
+5. Local pre access: one hosts entry per edge router — the `cyber.test` line in `/etc/hosts` mirrors `dynamic.yaml`'s router set, extend both together.
+6. `deploy/project.json`: add the service to the `image` `dependsOn` lists and the `app:stop`/`app:status`/`pre:stop` container lists (package-prefix routing means no new hosts, but the lifecycle lists are explicit per service).
+
+## 8. The presign dual-path pattern
+
+A service that hands **presigned URLs to browsers** (S3 today) must sign against the *external* name, while the same URL is also used server-side inside the network:
+
+1. the external edge name doubles as an **in-network alias** on the target container (`s3.cyber.test` on seaweedfs);
+2. the target listens on container port **80**, so the port-less URL connects on both paths (browser → hosts/DNS → edge; in-network → alias → container);
+3. the host-port publish adapts (`8333:80` keeps dev's `localhost:8333` working).
+
+`MUST` apply this pattern before pointing any presign-capable endpoint at an edge name.
+
+## 9. Stances
+
+- **Edge engine: traefik** (measured 17MB with the file provider; k3s first-party ingress). Switch only on: k8s support dropped from the product plan; a ≤2GB customer VM where the footprint is decisive; edge complexity outgrowing the file provider. Pre-TLS, when needed, prefers mkcert certs mounted into traefik.
+- **CI: intentionally none in the skeleton phase.** The eventual shape is GitHub Actions on a backup mirror (origin is GitLab) and/or an **offline install bundle** (images + parameterized compose + scripts, USB/file-transfer delivery to customer LAN servers); the Nx image targets and placeholder parameterization are its foundation.
+- **Environment matrix** (no-domain / intranet IP / plain http): minimal mode (§1) is the resource-limited-server baseline; full offline delivery lands with the install bundle.
+- **k8s manifests:** keep `deploy/k8s/` empty until the compose shapes settle.
+- **Build args** (`GOPROXY`, `NPM_REGISTRY`, `VERSION`, client site URL): defaults stay official/neutral; hosts override at invocation.
+
+## 10. Migrations
+
+- Schema migrations run as a **one-shot compose job**: `arigaio/atlas:<version aligned with the local @ariga/atlas CLI>` (the official image; the npm package serves only the bare-metal dev workflow), bound read-only to the service's `internal/ent/migrate/migrations` directory — an offline bundle ships that directory alongside the compose files.
+- The job precedes its service via `depends_on: service_completed_successfully`, so `--wait` stacks wait for schema readiness too. On a retained volume the job is a no-op ("No migration files to execute").
+- A fresh postgres volume is bootstrapped by `deploy/docker/postgres/*.sql` (extensions + database shells); database names are shared facts with the consuming services' configs. Schemas are owned by their consumers: atlas migrations for kratos services, first-connect for the mq capability, setup jobs for the observability tools. Extension ownership follows the same consumer line: init SQL covers the default database and the diff scratch `atlas_dev` (fault-tolerant, skipped on a vanilla image); a service database's extensions land in its own first atlas migration.
