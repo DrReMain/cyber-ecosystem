@@ -1739,7 +1739,7 @@ type Seed_Population struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"` // join key; declaring the default population is a config error
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Archetype     string                 `protobuf:"bytes,3,opt,name=archetype,proto3" json:"archetype,omitempty"` // engine | patron
+	Plane         string                 `protobuf:"bytes,3,opt,name=plane,proto3" json:"plane,omitempty"` // backend | member
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1788,9 +1788,9 @@ func (x *Seed_Population) GetName() string {
 	return ""
 }
 
-func (x *Seed_Population) GetArchetype() string {
+func (x *Seed_Population) GetPlane() string {
 	if x != nil {
-		return x.Archetype
+		return x.Plane
 	}
 	return ""
 }
@@ -1941,16 +1941,16 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"population\x1a6\n" +
 	"\x06WeChat\x12\x14\n" +
 	"\x05appid\x18\x01 \x01(\tR\x05appid\x12\x16\n" +
-	"\x06secret\x18\x02 \x01(\tR\x06secret\"\xe7\x01\n" +
+	"\x06secret\x18\x02 \x01(\tR\x06secret\"\xdf\x01\n" +
 	"\x04Seed\x12!\n" +
 	"\fsuper_admins\x18\x01 \x03(\tR\vsuperAdmins\x12)\n" +
 	"\x10initial_password\x18\x02 \x01(\tR\x0finitialPassword\x12=\n" +
-	"\vpopulations\x18\x03 \x03(\v2\x1b.cyber.conf.Seed.PopulationR\vpopulations\x1aR\n" +
+	"\vpopulations\x18\x03 \x03(\v2\x1b.cyber.conf.Seed.PopulationR\vpopulations\x1aJ\n" +
 	"\n" +
 	"Population\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
-	"\tarchetype\x18\x03 \x01(\tR\tarchetypeB8Z6cyber-ecosystem/app/services/system/internal/conf;confb\x06proto3"
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05plane\x18\x03 \x01(\tR\x05planeB8Z6cyber-ecosystem/app/services/system/internal/conf;confb\x06proto3"
 
 var (
 	file_internal_conf_conf_proto_rawDescOnce sync.Once

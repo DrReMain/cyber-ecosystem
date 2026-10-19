@@ -67,7 +67,7 @@ func toProtoPopulation(p *Population) *systempb.Population {
 		Id:        utils.StringW(p.ID),
 		Code:      utils.StringW(p.Code),
 		Name:      utils.StringW(p.Name),
-		Archetype: utils.StringW(p.Archetype),
+		Plane:     utils.StringW(p.Plane),
 		CreatedAt: utils.ToTimestamp(&p.CreatedAt),
 		UpdatedAt: utils.ToTimestamp(&p.UpdatedAt),
 	}

@@ -891,6 +891,19 @@
         "datascope": true
       },
       {
+        "name": "ListUsersByPopulation",
+        "full_name": "cyber.system.v1.UserService.ListUsersByPopulation",
+        "request_name": "ListUsersByPopulationRequest",
+        "request_full_name": "cyber.system.v1.ListUsersByPopulationRequest",
+        "response_name": "ListUsersByPopulationResponse",
+        "response_full_name": "cyber.system.v1.ListUsersByPopulationResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/users/by-population",
+        "comment": "按人群枚举用户(组合面)",
+        "access": "ADMIN",
+        "datascope": true
+      },
+      {
         "name": "UpdateUser",
         "full_name": "cyber.system.v1.UserService.UpdateUser",
         "request_name": "UpdateUserRequest",

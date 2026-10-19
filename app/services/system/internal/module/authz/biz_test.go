@@ -13,15 +13,15 @@ import (
 )
 
 // fakeAuthzRP answers the engine slice with a fixed grant set — or the
-// injected engine error; implicitCalls pins the "patron never consults the
+// injected engine error; implicitCalls pins the "member never consults the
 // engine" law.
 type fakeAuthzRP struct {
 	AuthzRP
 	grants        []GrantView
 	err           error
 	implicitCalls int
-	patron        bool
-	patronErr     error
+	member        bool
+	memberErr     error
 }
 
 func (f *fakeAuthzRP) ImplicitGrants(context.Context, string, string) ([]GrantView, error) {
@@ -29,15 +29,15 @@ func (f *fakeAuthzRP) ImplicitGrants(context.Context, string, string) ([]GrantVi
 	return f.grants, f.err
 }
 
-func (f *fakeAuthzRP) PatronSubject(subject *security.Subject) (bool, error) {
-	// Mirrors the port: an empty population is an engine subject.
+func (f *fakeAuthzRP) MemberSubject(subject *security.Subject) (bool, error) {
+	// Mirrors the port: an empty population is a backend subject.
 	if subject.Population == "" {
 		return false, nil
 	}
-	if f.patronErr != nil {
-		return false, f.patronErr
+	if f.memberErr != nil {
+		return false, f.memberErr
 	}
-	return f.patron, nil
+	return f.member, nil
 }
 
 // hookSink discards lifecycle hooks — the watch loop is not under test here.
@@ -55,26 +55,26 @@ func newAuthzUC(rp *fakeAuthzRP) *AuthzUC {
 
 // Decide --------------------------------------------------------------------------------------------------------------
 
-// Patron subjects are structurally grantless — identity is their whole
-// permission; the engine is never consulted.
-func TestDecidePatronNeverConsultsEngine(t *testing.T) {
+// Member-plane seats are structurally denied every gated face — the plane
+// is the permission strategy; the engine is never consulted.
+func TestDecideMemberNeverConsultsEngine(t *testing.T) {
 	rp := &fakeAuthzRP{grants: []GrantView{{Pattern: "/*"}}}
-	uc := newAuthzUC(&fakeAuthzRP{patron: true})
+	uc := newAuthzUC(&fakeAuthzRP{member: true})
 
 	d, err := uc.Decide(context.Background(), &security.Subject{UserID: "u1", Population: "guest"}, "system:user:list")
 	if err != nil {
 		t.Fatalf("decide: %v", err)
 	}
 	if d.Allowed || d.Reason != kauthz.DenyNoGrant {
-		t.Fatalf("patron: decision = %+v, want deny/no-grant", d)
+		t.Fatalf("member: decision = %+v, want deny/no-grant", d)
 	}
 	if rp.implicitCalls != 0 {
-		t.Fatal("patron: the engine must not be consulted")
+		t.Fatal("member: the engine must not be consulted")
 	}
 
 	// A snapshot failure surfaces as itself — never a deny that would read
 	// as policy.
-	uc2 := newAuthzUC(&fakeAuthzRP{patronErr: errorspb.ErrorGeneralErrorInternal("")})
+	uc2 := newAuthzUC(&fakeAuthzRP{memberErr: errorspb.ErrorGeneralErrorInternal("")})
 	if _, err := uc2.Decide(context.Background(), &security.Subject{UserID: "u1", Population: "guest"}, "op"); !errorspb.IsGeneralErrorInternal(err) {
 		t.Fatalf("snapshot failure: want INTERNAL, got %v", err)
 	}

@@ -87,7 +87,7 @@ func (rp *deptRP) List(ctx context.Context, in *DeptListIn) (*DeptListOut, error
 		"updatedAt": func(sel helper.SQLSelector) { query.Order(sel(dept.FieldUpdatedAt)) },
 	})
 
-	total, offset, limit, err := shared.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
+	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
@@ -185,7 +185,7 @@ func (rp *deptRP) ListMembers(ctx context.Context, in *MemberListIn) (*MemberLis
 	query := rp.Platform.GetClient(ctx).User.Query().
 		Where(user.DeptIDEQ(in.DeptID)).
 		Order(ent.Asc(user.FieldCreatedAt))
-	total, offset, limit, err := shared.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
+	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}

@@ -34,7 +34,7 @@ type Population struct {
 	UpdatedAt     *timestamppb.Timestamp  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Code          *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=code,proto3" json:"code,omitempty"`
 	Name          *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
-	Archetype     *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=archetype,proto3" json:"archetype,omitempty"`
+	Plane         *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=plane,proto3" json:"plane,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -104,9 +104,9 @@ func (x *Population) GetName() *wrapperspb.StringValue {
 	return nil
 }
 
-func (x *Population) GetArchetype() *wrapperspb.StringValue {
+func (x *Population) GetPlane() *wrapperspb.StringValue {
 	if x != nil {
-		return x.Archetype
+		return x.Plane
 	}
 	return nil
 }
@@ -236,7 +236,7 @@ var File_cyber_system_v1_population_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_population_proto_rawDesc = "" +
 	"\n" +
-	" cyber/system/v1/population.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xd0\x02\n" +
+	" cyber/system/v1/population.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xc8\x02\n" +
 	"\n" +
 	"Population\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
@@ -245,8 +245,8 @@ const file_cyber_system_v1_population_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x120\n" +
 	"\x04code\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x04code\x120\n" +
-	"\x04name\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\x04name\x12:\n" +
-	"\tarchetype\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\tarchetype\"\xc0\x02\n" +
+	"\x04name\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\x04name\x122\n" +
+	"\x05plane\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\x05plane\"\xc0\x02\n" +
 	"\x16ListPopulationsRequest\x127\n" +
 	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12\x17\n" +
 	"\x04code\x18\x02 \x01(\tH\x00R\x04code\x88\x01\x01\x12\x17\n" +
@@ -290,7 +290,7 @@ var file_cyber_system_v1_population_proto_depIdxs = []int32{
 	4,  // 2: cyber.system.v1.Population.updated_at:type_name -> google.protobuf.Timestamp
 	3,  // 3: cyber.system.v1.Population.code:type_name -> google.protobuf.StringValue
 	3,  // 4: cyber.system.v1.Population.name:type_name -> google.protobuf.StringValue
-	3,  // 5: cyber.system.v1.Population.archetype:type_name -> google.protobuf.StringValue
+	3,  // 5: cyber.system.v1.Population.plane:type_name -> google.protobuf.StringValue
 	5,  // 6: cyber.system.v1.ListPopulationsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
 	6,  // 7: cyber.system.v1.ListPopulationsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
 	0,  // 8: cyber.system.v1.ListPopulationsResponse.list:type_name -> cyber.system.v1.Population

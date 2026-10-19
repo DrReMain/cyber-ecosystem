@@ -52,6 +52,9 @@ const (
 	// UserServiceBatchGetUsersProcedure is the fully-qualified name of the UserService's BatchGetUsers
 	// RPC.
 	UserServiceBatchGetUsersProcedure = "/cyber.system.v1.UserService/BatchGetUsers"
+	// UserServiceListUsersByPopulationProcedure is the fully-qualified name of the UserService's
+	// ListUsersByPopulation RPC.
+	UserServiceListUsersByPopulationProcedure = "/cyber.system.v1.UserService/ListUsersByPopulation"
 )
 
 // UserServiceClient is a client for the cyber.system.v1.UserService service.
@@ -64,6 +67,7 @@ type UserServiceClient interface {
 	ListUsers(context.Context, *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error)
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
 	BatchGetUsers(context.Context, *connect.Request[v1.BatchGetUsersRequest]) (*connect.Response[v1.BatchGetUsersResponse], error)
+	ListUsersByPopulation(context.Context, *connect.Request[v1.ListUsersByPopulationRequest]) (*connect.Response[v1.ListUsersByPopulationResponse], error)
 }
 
 // NewUserServiceClient constructs a client for the cyber.system.v1.UserService service. By default,
@@ -125,19 +129,26 @@ func NewUserServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(userServiceMethods.ByName("BatchGetUsers")),
 			connect.WithClientOptions(opts...),
 		),
+		listUsersByPopulation: connect.NewClient[v1.ListUsersByPopulationRequest, v1.ListUsersByPopulationResponse](
+			httpClient,
+			baseURL+UserServiceListUsersByPopulationProcedure,
+			connect.WithSchema(userServiceMethods.ByName("ListUsersByPopulation")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // userServiceClient implements UserServiceClient.
 type userServiceClient struct {
-	createUser       *connect.Client[v1.CreateUserRequest, v1.CreateUserResponse]
-	updateUser       *connect.Client[v1.UpdateUserRequest, v1.UpdateUserResponse]
-	updateUserStatus *connect.Client[v1.UpdateUserStatusRequest, v1.UpdateUserStatusResponse]
-	changePassword   *connect.Client[v1.ChangePasswordRequest, v1.ChangePasswordResponse]
-	deleteUser       *connect.Client[v1.DeleteUserRequest, v1.DeleteUserResponse]
-	listUsers        *connect.Client[v1.ListUsersRequest, v1.ListUsersResponse]
-	getUser          *connect.Client[v1.GetUserRequest, v1.GetUserResponse]
-	batchGetUsers    *connect.Client[v1.BatchGetUsersRequest, v1.BatchGetUsersResponse]
+	createUser            *connect.Client[v1.CreateUserRequest, v1.CreateUserResponse]
+	updateUser            *connect.Client[v1.UpdateUserRequest, v1.UpdateUserResponse]
+	updateUserStatus      *connect.Client[v1.UpdateUserStatusRequest, v1.UpdateUserStatusResponse]
+	changePassword        *connect.Client[v1.ChangePasswordRequest, v1.ChangePasswordResponse]
+	deleteUser            *connect.Client[v1.DeleteUserRequest, v1.DeleteUserResponse]
+	listUsers             *connect.Client[v1.ListUsersRequest, v1.ListUsersResponse]
+	getUser               *connect.Client[v1.GetUserRequest, v1.GetUserResponse]
+	batchGetUsers         *connect.Client[v1.BatchGetUsersRequest, v1.BatchGetUsersResponse]
+	listUsersByPopulation *connect.Client[v1.ListUsersByPopulationRequest, v1.ListUsersByPopulationResponse]
 }
 
 // CreateUser calls cyber.system.v1.UserService.CreateUser.
@@ -180,6 +191,11 @@ func (c *userServiceClient) BatchGetUsers(ctx context.Context, req *connect.Requ
 	return c.batchGetUsers.CallUnary(ctx, req)
 }
 
+// ListUsersByPopulation calls cyber.system.v1.UserService.ListUsersByPopulation.
+func (c *userServiceClient) ListUsersByPopulation(ctx context.Context, req *connect.Request[v1.ListUsersByPopulationRequest]) (*connect.Response[v1.ListUsersByPopulationResponse], error) {
+	return c.listUsersByPopulation.CallUnary(ctx, req)
+}
+
 // UserServiceHandler is an implementation of the cyber.system.v1.UserService service.
 type UserServiceHandler interface {
 	CreateUser(context.Context, *connect.Request[v1.CreateUserRequest]) (*connect.Response[v1.CreateUserResponse], error)
@@ -190,6 +206,7 @@ type UserServiceHandler interface {
 	ListUsers(context.Context, *connect.Request[v1.ListUsersRequest]) (*connect.Response[v1.ListUsersResponse], error)
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
 	BatchGetUsers(context.Context, *connect.Request[v1.BatchGetUsersRequest]) (*connect.Response[v1.BatchGetUsersResponse], error)
+	ListUsersByPopulation(context.Context, *connect.Request[v1.ListUsersByPopulationRequest]) (*connect.Response[v1.ListUsersByPopulationResponse], error)
 }
 
 // NewUserServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -247,6 +264,12 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(userServiceMethods.ByName("BatchGetUsers")),
 		connect.WithHandlerOptions(opts...),
 	)
+	userServiceListUsersByPopulationHandler := connect.NewUnaryHandler(
+		UserServiceListUsersByPopulationProcedure,
+		svc.ListUsersByPopulation,
+		connect.WithSchema(userServiceMethods.ByName("ListUsersByPopulation")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.system.v1.UserService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case UserServiceCreateUserProcedure:
@@ -265,6 +288,8 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect.HandlerOption
 			userServiceGetUserHandler.ServeHTTP(w, r)
 		case UserServiceBatchGetUsersProcedure:
 			userServiceBatchGetUsersHandler.ServeHTTP(w, r)
+		case UserServiceListUsersByPopulationProcedure:
+			userServiceListUsersByPopulationHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -304,4 +329,8 @@ func (UnimplementedUserServiceHandler) GetUser(context.Context, *connect.Request
 
 func (UnimplementedUserServiceHandler) BatchGetUsers(context.Context, *connect.Request[v1.BatchGetUsersRequest]) (*connect.Response[v1.BatchGetUsersResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.UserService.BatchGetUsers is not implemented"))
+}
+
+func (UnimplementedUserServiceHandler) ListUsersByPopulation(context.Context, *connect.Request[v1.ListUsersByPopulationRequest]) (*connect.Response[v1.ListUsersByPopulationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.UserService.ListUsersByPopulation is not implemented"))
 }

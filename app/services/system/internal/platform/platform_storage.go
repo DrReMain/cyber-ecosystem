@@ -13,13 +13,6 @@ import (
 	"cyber-ecosystem/app/services/system/internal/conf"
 )
 
-// TenantStorage routes the object plane per tenancy domain. The platform
-// tenant (security.DefaultTenant, the seeded registry row) rides the
-// configured default bucket; every other domain rides the default bucket's
-// name with the domain suffixed, provisioned lazily once per process. The
-// resolution is the tenant mixin's precedence — an explicit domain switch
-// over the subject — so a pass over a domain's rows hits the same domain's
-// bucket.
 type TenantStorage struct {
 	*storage.Storage
 
@@ -32,6 +25,7 @@ func (t *TenantStorage) ForTenant(ctx context.Context) *storage.View {
 	if tenant == security.DefaultTenant {
 		return &t.View
 	}
+	// explicit domain switch wins over the subject (tenant mixin precedence)
 	bucket := t.defaultBucket + "-" + tenant
 	if _, loaded := t.ensured.LoadOrStore(bucket, struct{}{}); !loaded {
 		// Best-effort provisioning: a failure un-marks the bucket and lets

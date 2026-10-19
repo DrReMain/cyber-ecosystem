@@ -818,18 +818,18 @@ func init() {
 			return nil
 		}
 	}()
-	// populationDescArchetype is the schema descriptor for archetype field.
-	populationDescArchetype := populationFields[2].Descriptor()
-	// population.ArchetypeValidator is a validator for the "archetype" field. It is called by the builders before save.
-	population.ArchetypeValidator = func() func(string) error {
-		validators := populationDescArchetype.Validators
+	// populationDescPlane is the schema descriptor for plane field.
+	populationDescPlane := populationFields[2].Descriptor()
+	// population.PlaneValidator is a validator for the "plane" field. It is called by the builders before save.
+	population.PlaneValidator = func() func(string) error {
+		validators := populationDescPlane.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
 		}
-		return func(archetype string) error {
+		return func(plane string) error {
 			for _, fn := range fns {
-				if err := fn(archetype); err != nil {
+				if err := fn(plane); err != nil {
 					return err
 				}
 			}

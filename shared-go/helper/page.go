@@ -9,6 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v3/errors"
 
 	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
+	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 )
 
 // DefaultPageSizeMax couples to the proto contract: it must equal the
@@ -85,6 +86,15 @@ func ApplyPagination[Q QueryPaginator[Q]](ctx context.Context, query Q, req *com
 
 	query.Offset(offset).Limit(limit)
 	return total, offset, limit, nil
+}
+
+// Paginate binds a page request onto a query with the default page size and
+// the given max; an invalid page yields the shared pagination error.
+func Paginate[Q QueryPaginator[Q]](ctx context.Context, query Q, req *commonv1.PageRequest, maxSize int) (total, offset, limit int, err error) {
+	return ApplyPagination(ctx, query, req,
+		NewPageConfig(DefaultPageSize, maxSize),
+		errorspb.ErrorGeneralErrorPaginationInvalidArgument(""),
+	)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

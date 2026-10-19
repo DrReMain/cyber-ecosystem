@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"slices"
@@ -21,10 +20,6 @@ import (
 	"cyber-ecosystem/app/services/system/internal/shared"
 )
 
-// errBirthLost marks the one retryable failure in Create: a concurrent
-// birth won the account's unique. Internal control flow, never returned.
-var errBirthLost = fmt.Errorf("identity birth lost the account unique")
-
 // DO ------------------------------------------------------------------------------------------------------------------
 
 type User struct {
@@ -39,17 +34,12 @@ type User struct {
 	Enabled      bool
 }
 
-// Credential is a third-party identity binding: one external identifier
-// resolves to exactly one global identity. Identity-plane data — the kind
-// vocabulary is code (provider_<kind>.go), instances live in conf rows.
 type Credential struct {
 	Kind       string
 	Identifier string
 	UserID     string
 }
 
-// Seat is one tenancy of an identity — a membership row. The identity is
-// global (account); every tenancy it holds is a seat.
 type Seat struct {
 	UserID     string
 	TenantID   string
@@ -58,10 +48,11 @@ type Seat struct {
 
 type UserListIn struct {
 	*commonpb.PageRequest
-	OrderBy []string
-	Account *string
-	Enabled *bool
-	DeptID  *string
+	OrderBy    []string
+	Account    *string
+	Enabled    *bool
+	DeptID     *string
+	Population *string
 }
 
 type UserListOut struct {
@@ -77,6 +68,7 @@ type UserRP interface {
 	UpdateStatus(ctx context.Context, id string, enabled bool) (*User, error)
 	Delete(ctx context.Context, id string) (string, error)
 	List(ctx context.Context, in *UserListIn) (*UserListOut, error)
+	ListByPopulation(ctx context.Context, in *UserListIn) (*UserListOut, error)
 	FindByAccount(ctx context.Context, account string) (*User, error)
 	FindByID(ctx context.Context, id string) (*User, error)
 	FindSeated(ctx context.Context, id string) (*User, error)
@@ -118,7 +110,7 @@ func NewUserUC(logger *slog.Logger, tm shared.Transaction, userRP UserRP, deptRP
 // Method --------------------------------------------------------------------------------------------------------------
 
 func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar *string, population string, roles []string) (out *User, err error) {
-	seatPopulation, err := uc.resolveSeatPopulation(ctx, population)
+	seatPopulation, seatPop, err := uc.resolveSeatPopulation(ctx, population)
 	if err != nil {
 		return nil, err
 	}
@@ -126,10 +118,13 @@ func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar 
 	if err != nil {
 		return nil, err
 	}
-	// Account is the global identity key: an identity that already exists
-	// gains a seat in the creating admin's tenant — a second row is never
-	// born. Profile params (password, dept, avatar) belong to identity
-	// birth alone and are inert on the seat path.
+	// Member-plane seats are engine-denied; a role binding on one is
+	// rejected here.
+	if seatPop != nil && seatPop.Plane == security.PlaneMember && len(roles) > 0 {
+		return nil, errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("role bindings are forbidden on the member-plane population %q", seatPopulation))
+	}
+	// An existing account gains a seat in the creating admin's tenant
+	// instead of a new row; profile params apply only to identity creation.
 	existing, ferr := uc.userRP.FindByAccount(ctx, *account)
 	if ferr != nil && !errorspb.IsInfraErrorDbNotFound(ferr) {
 		return nil, ferr
@@ -153,12 +148,13 @@ func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar 
 	// The seat lands in the creating admin's tenant; an identity born here
 	// is never seatless.
 	seat := &Seat{TenantID: security.TenantFromCtx(ctx), Population: seatPopulation}
+	birthLost := false
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
 		if birth {
 			created, cerr := uc.userRP.Create(ctx, &User{DeptID: deptID, Avatar: avatar, Account: account, PasswordHash: password})
 			if cerr != nil {
 				if errorspb.IsInfraErrorDbConstraint(cerr) {
-					return errBirthLost
+					birthLost = true
 				}
 				return cerr
 			}
@@ -177,7 +173,7 @@ func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar 
 	})
 	if err != nil {
 		// The winner exists now, so the same ask lands as its seat.
-		if errors.Is(err, errBirthLost) {
+		if birthLost {
 			return uc.Create(ctx, account, password, deptID, avatar, population, roles)
 		}
 		return nil, err
@@ -311,6 +307,12 @@ func (uc *UserUC) Delete(ctx context.Context, id string) (out string, err error)
 	return
 }
 
+func (uc *UserUC) ListByPopulation(ctx context.Context, in *UserListIn) (*UserListOut, error) {
+	// Roster enumeration skips the IAM flavor: a member row carries no
+	// grants to hydrate.
+	return uc.userRP.ListByPopulation(ctx, in)
+}
+
 func (uc *UserUC) List(ctx context.Context, in *UserListIn) (*UserListOut, error) {
 	out, err := uc.userRP.List(ctx, in)
 	if err != nil {
@@ -391,17 +393,18 @@ func (uc *UserUC) ensureAvatar(ctx context.Context, avatar *string) error {
 	return nil
 }
 
-func (uc *UserUC) resolveSeatPopulation(ctx context.Context, population string) (string, error) {
+func (uc *UserUC) resolveSeatPopulation(ctx context.Context, population string) (string, *population.Population, error) {
 	if population == "" {
-		return security.DefaultPopulation, nil
+		return security.DefaultPopulation, nil, nil
 	}
-	if _, err := uc.populationRP.FindByCode(ctx, population); err != nil {
+	p, err := uc.populationRP.FindByCode(ctx, population)
+	if err != nil {
 		if errorspb.IsInfraErrorDbNotFound(err) {
-			return "", systempb.ErrorSystemPopulationNotFound("")
+			return "", nil, systempb.ErrorSystemPopulationNotFound("")
 		}
-		return "", err
+		return "", nil, err
 	}
-	return population, nil
+	return population, p, nil
 }
 
 func (uc *UserUC) resolveRoles(ctx context.Context, codes []string) ([]string, error) {

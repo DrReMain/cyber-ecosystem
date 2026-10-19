@@ -17,14 +17,8 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/intercept"
 )
 
-// DatascopeMixin narrows queries and mutations to the rows permitted by the
-// ctx Decision's scopes, compiled by shared-go/orm/ent/scopes — the same law
-// remote scope consumers obey. Expressible kinds OR-union into one predicate;
-// a tenant-wide descriptor lifts filtering; a set with nothing honorable
-// (unknown kinds, or kinds this entity cannot express) fails closed to the
-// empty set, never to unfiltered. Paths without a Decision (seed, login,
-// engine compilation, builtin baseline) skip filtering, mirroring
-// TenantMixin's no-subject skip.
+// DatascopeMixin narrows rows to the ctx Decision's scopes; kinds OR-union
+// into one predicate, and nothing expressible fails closed — never unfiltered.
 type DatascopeMixin struct {
 	mixin.Schema
 	UserField string // owner column for self scopes ("id" on user); empty = self not expressible

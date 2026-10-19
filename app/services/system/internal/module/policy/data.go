@@ -91,7 +91,7 @@ func (rp *policyRP) List(ctx context.Context, in *PolicyListIn) (*PolicyListOut,
 		"createdAt": func(sel helper.SQLSelector) { query.Order(sel(authzpolicy.FieldCreatedAt)) },
 		"updatedAt": func(sel helper.SQLSelector) { query.Order(sel(authzpolicy.FieldUpdatedAt)) },
 	})
-	total, offset, limit, err := shared.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
+	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}

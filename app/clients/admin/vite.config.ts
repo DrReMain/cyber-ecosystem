@@ -38,6 +38,11 @@ const config = defineConfig(({ mode }) => {
           ws: true,
           rewrite: (path) => path.replace(/^\/connect/, ""),
         },
+        "^/connect/cyber\\.esports\\.": {
+          target: env.ESPORTS_CONNECT_API_URL,
+          ws: true,
+          rewrite: (path) => path.replace(/^\/connect/, ""),
+        },
       },
     },
     plugins: [

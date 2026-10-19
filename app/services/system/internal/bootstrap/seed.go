@@ -63,7 +63,7 @@ func (s *Seed) ensureDefaultPopulation(ctx context.Context) error {
 	if !ent.IsNotFound(err) {
 		return s.plat.HandleEntError(fmt.Errorf("seed: query default population: %w", err))
 	}
-	if _, err := client.Population.Create().SetCode(security.DefaultPopulation).SetName("User").SetArchetype(security.ArchetypeEngine).Save(ctx); err != nil {
+	if _, err := client.Population.Create().SetCode(security.DefaultPopulation).SetName("User").SetPlane(security.PlaneBackend).Save(ctx); err != nil {
 		if !ent.IsConstraintError(err) {
 			return s.plat.HandleEntError(fmt.Errorf("seed: create default population: %w", err))
 		}
@@ -87,9 +87,9 @@ func (s *Seed) ensureDeclaredPopulations(ctx context.Context) error {
 	for _, row := range rows {
 		existing, err := client.Population.Query().Where(population.Code(row.GetCode())).Only(ctx)
 		if err == nil {
-			if existing.Name != row.GetName() || existing.Archetype != row.GetArchetype() {
+			if existing.Name != row.GetName() || existing.Plane != row.GetPlane() {
 				return fmt.Errorf("seed: declared population %q is %s/%s but the registry holds %s/%s",
-					row.GetCode(), row.GetName(), row.GetArchetype(), existing.Name, existing.Archetype)
+					row.GetCode(), row.GetName(), row.GetPlane(), existing.Name, existing.Plane)
 			}
 			continue
 		}
@@ -97,7 +97,7 @@ func (s *Seed) ensureDeclaredPopulations(ctx context.Context) error {
 			return s.plat.HandleEntError(fmt.Errorf("seed: query declared population %q: %w", row.GetCode(), err))
 		}
 		if _, err := client.Population.Create().
-			SetCode(row.GetCode()).SetName(row.GetName()).SetArchetype(row.GetArchetype()).
+			SetCode(row.GetCode()).SetName(row.GetName()).SetPlane(row.GetPlane()).
 			Save(ctx); err != nil {
 			if !ent.IsConstraintError(err) {
 				return s.plat.HandleEntError(fmt.Errorf("seed: create declared population %q: %w", row.GetCode(), err))
@@ -122,8 +122,8 @@ func validateDeclaredPopulations(rows []*conf.Seed_Population) error {
 			return fmt.Errorf("seed: declared population with an empty code")
 		case row.GetCode() == security.DefaultPopulation:
 			return fmt.Errorf("seed: population %q is seed-born with a fixed shape; redeclaring it is a config error", row.GetCode())
-		case !security.ValidArchetype(row.GetArchetype()):
-			return fmt.Errorf("seed: declared population %q carries unknown archetype %q", row.GetCode(), row.GetArchetype())
+		case !security.ValidPlane(row.GetPlane()):
+			return fmt.Errorf("seed: declared population %q carries unknown plane %q", row.GetCode(), row.GetPlane())
 		case seen[row.GetCode()]:
 			return fmt.Errorf("seed: population %q declared twice", row.GetCode())
 		}

@@ -63,9 +63,9 @@ func (_c *PopulationCreate) SetName(v string) *PopulationCreate {
 	return _c
 }
 
-// SetArchetype sets the "archetype" field.
-func (_c *PopulationCreate) SetArchetype(v string) *PopulationCreate {
-	_c.mutation.SetArchetype(v)
+// SetPlane sets the "plane" field.
+func (_c *PopulationCreate) SetPlane(v string) *PopulationCreate {
+	_c.mutation.SetPlane(v)
 	return _c
 }
 
@@ -156,12 +156,12 @@ func (_c *PopulationCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Population.name": %w`, err)}
 		}
 	}
-	if _, ok := _c.mutation.Archetype(); !ok {
-		return &ValidationError{Name: "archetype", err: errors.New(`ent: missing required field "Population.archetype"`)}
+	if _, ok := _c.mutation.Plane(); !ok {
+		return &ValidationError{Name: "plane", err: errors.New(`ent: missing required field "Population.plane"`)}
 	}
-	if v, ok := _c.mutation.Archetype(); ok {
-		if err := population.ArchetypeValidator(v); err != nil {
-			return &ValidationError{Name: "archetype", err: fmt.Errorf(`ent: validator failed for field "Population.archetype": %w`, err)}
+	if v, ok := _c.mutation.Plane(); ok {
+		if err := population.PlaneValidator(v); err != nil {
+			return &ValidationError{Name: "plane", err: fmt.Errorf(`ent: validator failed for field "Population.plane": %w`, err)}
 		}
 	}
 	if v, ok := _c.mutation.ID(); ok {
@@ -221,9 +221,9 @@ func (_c *PopulationCreate) createSpec() (*Population, *sqlgraph.CreateSpec) {
 		_spec.SetField(population.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := _c.mutation.Archetype(); ok {
-		_spec.SetField(population.FieldArchetype, field.TypeString, value)
-		_node.Archetype = value
+	if value, ok := _c.mutation.Plane(); ok {
+		_spec.SetField(population.FieldPlane, field.TypeString, value)
+		_node.Plane = value
 	}
 	return _node, _spec
 }
@@ -301,15 +301,15 @@ func (u *PopulationUpsert) UpdateName() *PopulationUpsert {
 	return u
 }
 
-// SetArchetype sets the "archetype" field.
-func (u *PopulationUpsert) SetArchetype(v string) *PopulationUpsert {
-	u.Set(population.FieldArchetype, v)
+// SetPlane sets the "plane" field.
+func (u *PopulationUpsert) SetPlane(v string) *PopulationUpsert {
+	u.Set(population.FieldPlane, v)
 	return u
 }
 
-// UpdateArchetype sets the "archetype" field to the value that was provided on create.
-func (u *PopulationUpsert) UpdateArchetype() *PopulationUpsert {
-	u.SetExcluded(population.FieldArchetype)
+// UpdatePlane sets the "plane" field to the value that was provided on create.
+func (u *PopulationUpsert) UpdatePlane() *PopulationUpsert {
+	u.SetExcluded(population.FieldPlane)
 	return u
 }
 
@@ -395,17 +395,17 @@ func (u *PopulationUpsertOne) UpdateName() *PopulationUpsertOne {
 	})
 }
 
-// SetArchetype sets the "archetype" field.
-func (u *PopulationUpsertOne) SetArchetype(v string) *PopulationUpsertOne {
+// SetPlane sets the "plane" field.
+func (u *PopulationUpsertOne) SetPlane(v string) *PopulationUpsertOne {
 	return u.Update(func(s *PopulationUpsert) {
-		s.SetArchetype(v)
+		s.SetPlane(v)
 	})
 }
 
-// UpdateArchetype sets the "archetype" field to the value that was provided on create.
-func (u *PopulationUpsertOne) UpdateArchetype() *PopulationUpsertOne {
+// UpdatePlane sets the "plane" field to the value that was provided on create.
+func (u *PopulationUpsertOne) UpdatePlane() *PopulationUpsertOne {
 	return u.Update(func(s *PopulationUpsert) {
-		s.UpdateArchetype()
+		s.UpdatePlane()
 	})
 }
 
@@ -658,17 +658,17 @@ func (u *PopulationUpsertBulk) UpdateName() *PopulationUpsertBulk {
 	})
 }
 
-// SetArchetype sets the "archetype" field.
-func (u *PopulationUpsertBulk) SetArchetype(v string) *PopulationUpsertBulk {
+// SetPlane sets the "plane" field.
+func (u *PopulationUpsertBulk) SetPlane(v string) *PopulationUpsertBulk {
 	return u.Update(func(s *PopulationUpsert) {
-		s.SetArchetype(v)
+		s.SetPlane(v)
 	})
 }
 
-// UpdateArchetype sets the "archetype" field to the value that was provided on create.
-func (u *PopulationUpsertBulk) UpdateArchetype() *PopulationUpsertBulk {
+// UpdatePlane sets the "plane" field to the value that was provided on create.
+func (u *PopulationUpsertBulk) UpdatePlane() *PopulationUpsertBulk {
 	return u.Update(func(s *PopulationUpsert) {
-		s.UpdateArchetype()
+		s.UpdatePlane()
 	})
 }
 

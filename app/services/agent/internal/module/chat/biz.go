@@ -30,7 +30,7 @@ import (
 
 const (
 	maxHistoryTurns = 48     // replayed-context turn cap: coherent multi-turn follow-ups without unbounded request size
-	maxHistoryChars = 24_000 // ≈6k replayed tokens (4 bytes ≈ 1 token heuristic); the S4 harness swaps this for error-adaptive shrinking
+	maxHistoryChars = 24_000 // ≈6k replayed tokens (4 bytes ≈ 1 token heuristic)
 )
 
 type modelsResp struct {

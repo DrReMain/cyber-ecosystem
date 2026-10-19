@@ -3,10 +3,10 @@
   "platform_populations_filter_keyword": "キーワード",
   "platform_populations_filter_keyword_placeholder": "名前またはコード",
   "platform_populations_col_population": "ユーザータイプ",
-  "platform_populations_col_archetype": "認可モード",
+  "platform_populations_col_plane": "プレーン",
   "platform_populations_col_created_at": "作成日時",
   "platform_populations_col_updated_at": "更新日時",
   "platform_populations_empty": "ユーザータイプがありません",
-  "platform_populations_arch_engine": "エンジン付与",
-  "platform_populations_arch_patron": "免除"
+  "platform_populations_plane_backend": "バックエンド",
+  "platform_populations_plane_member": "メンバー"
 }

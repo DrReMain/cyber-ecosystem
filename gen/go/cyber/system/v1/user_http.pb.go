@@ -23,6 +23,7 @@ const OperationUserServiceCreateUser = "/cyber.system.v1.UserService/CreateUser"
 const OperationUserServiceDeleteUser = "/cyber.system.v1.UserService/DeleteUser"
 const OperationUserServiceGetUser = "/cyber.system.v1.UserService/GetUser"
 const OperationUserServiceListUsers = "/cyber.system.v1.UserService/ListUsers"
+const OperationUserServiceListUsersByPopulation = "/cyber.system.v1.UserService/ListUsersByPopulation"
 const OperationUserServiceUpdateUser = "/cyber.system.v1.UserService/UpdateUser"
 const OperationUserServiceUpdateUserStatus = "/cyber.system.v1.UserService/UpdateUserStatus"
 
@@ -33,6 +34,7 @@ type UserServiceHTTPServer interface {
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
+	ListUsersByPopulation(context.Context, *ListUsersByPopulationRequest) (*ListUsersByPopulationResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	UpdateUserStatus(context.Context, *UpdateUserStatusRequest) (*UpdateUserStatusResponse, error)
 }
@@ -47,6 +49,7 @@ func RegisterUserServiceHTTPServer(s *http.Server, srv UserServiceHTTPServer) {
 	r.Handle("GET", "/api/v1/system/users", _UserService_ListUsers0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/users/{id}", _UserService_GetUser0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/users/batch-get", _UserService_BatchGetUsers0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/users/by-population", _UserService_ListUsersByPopulation0_HTTP_Handler(srv))
 }
 
 func _UserService_CreateUser0_HTTP_Handler(srv UserServiceHTTPServer) func(ctx http.Context) error {
@@ -213,6 +216,25 @@ func _UserService_BatchGetUsers0_HTTP_Handler(srv UserServiceHTTPServer) func(ct
 	}
 }
 
+func _UserService_ListUsersByPopulation0_HTTP_Handler(srv UserServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListUsersByPopulationRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserServiceListUsersByPopulation)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListUsersByPopulation(ctx, req.(*ListUsersByPopulationRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListUsersByPopulationResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserServiceHTTPClient interface {
 	BatchGetUsers(ctx context.Context, req *BatchGetUsersRequest, opts ...http.CallOption) (rsp *BatchGetUsersResponse, err error)
 	ChangePassword(ctx context.Context, req *ChangePasswordRequest, opts ...http.CallOption) (rsp *ChangePasswordResponse, err error)
@@ -220,6 +242,7 @@ type UserServiceHTTPClient interface {
 	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *DeleteUserResponse, err error)
 	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *GetUserResponse, err error)
 	ListUsers(ctx context.Context, req *ListUsersRequest, opts ...http.CallOption) (rsp *ListUsersResponse, err error)
+	ListUsersByPopulation(ctx context.Context, req *ListUsersByPopulationRequest, opts ...http.CallOption) (rsp *ListUsersByPopulationResponse, err error)
 	UpdateUser(ctx context.Context, req *UpdateUserRequest, opts ...http.CallOption) (rsp *UpdateUserResponse, err error)
 	UpdateUserStatus(ctx context.Context, req *UpdateUserStatusRequest, opts ...http.CallOption) (rsp *UpdateUserStatusResponse, err error)
 }
@@ -325,6 +348,23 @@ func (c *UserServiceHTTPClientImpl) ListUsers(ctx context.Context, in *ListUsers
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *UserServiceHTTPClientImpl) ListUsersByPopulation(ctx context.Context, in *ListUsersByPopulationRequest, opts ...http.CallOption) (*ListUsersByPopulationResponse, error) {
+	var out ListUsersByPopulationResponse
+	pattern := "/api/v1/system/users/by-population"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationUserServiceListUsersByPopulation),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

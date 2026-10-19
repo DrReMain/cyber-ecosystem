@@ -3,10 +3,10 @@
   "platform_populations_filter_keyword": "키워드",
   "platform_populations_filter_keyword_placeholder": "이름 또는 코드",
   "platform_populations_col_population": "사용자 유형",
-  "platform_populations_col_archetype": "권한 모드",
+  "platform_populations_col_plane": "플레인",
   "platform_populations_col_created_at": "생성일",
   "platform_populations_col_updated_at": "갱신일",
   "platform_populations_empty": "사용자 유형이 없습니다",
-  "platform_populations_arch_engine": "엔진 부여",
-  "platform_populations_arch_patron": "면제"
+  "platform_populations_plane_backend": "백엔드",
+  "platform_populations_plane_member": "멤버"
 }

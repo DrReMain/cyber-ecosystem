@@ -5,13 +5,12 @@ import { Avatar, Space, Tag, Typography } from "antd";
 import { avatarColor } from "#/libs";
 import { m } from "#/paraglide/messages";
 
-// The compile-time archetype vocabulary rendered as its two labels.
-function archetypeTag(archetype: string | undefined) {
-  if (archetype === "engine")
-    return <Tag color="processing">{m.platform_populations_arch_engine()}</Tag>;
-  if (archetype === "patron")
-    return <Tag color="purple">{m.platform_populations_arch_patron()}</Tag>;
-  return <Tag>{archetype}</Tag>;
+// The compile-time plane vocabulary rendered as its two labels.
+function planeTag(plane: string | undefined) {
+  if (plane === "backend")
+    return <Tag color="processing">{m.platform_populations_plane_backend()}</Tag>;
+  if (plane === "member") return <Tag color="purple">{m.platform_populations_plane_member()}</Tag>;
+  return <Tag>{plane}</Tag>;
 }
 
 interface PopulationsTableProps {
@@ -48,9 +47,9 @@ export function PopulationsTable({
     },
     {
       align: "center",
-      title: () => m.platform_populations_col_archetype(),
+      title: () => m.platform_populations_col_plane(),
       width: 140,
-      render: (_, population) => archetypeTag(population.archetype),
+      render: (_, population) => planeTag(population.plane),
     },
     fieldTimestamp<Population>("createdAt", { title: m.platform_populations_col_created_at() }),
     fieldTimestamp<Population>("updatedAt", { title: m.platform_populations_col_updated_at() }),

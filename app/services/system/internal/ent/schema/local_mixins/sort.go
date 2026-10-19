@@ -15,55 +15,13 @@ import (
 	gen "cyber-ecosystem/app/services/system/internal/ent"
 )
 
-// SortMixin equips a table with a fractional-index "sort" field for drag-to-
-// reorder, and auto-assigns a key on create — appended after the current max —
-// when the caller did not set one. Inserting a row between two others later is
-// O(1) via fracdex (it never rewrites neighbours); the auto-assigned key merely
-// gives new rows a stable "at the end" position until someone drags them.
-//
-// Table is the SQL table name: a generic mixin cannot derive it from the Go
-// type, and it must match the schema's entsql table annotation.
-//
-// Concurrency — the create path is a non-atomic read-modify-write (query max →
-// derive key → insert). Left unprotected, concurrent creates read the same max,
-// derive the same key, and the loser is rejected by the unique index. This mixin
-// serializes them instead with a PostgreSQL advisory lock. The conditions below
-// decide whether the lock actually protects you:
-//
-//   - PostgreSQL only. Advisory locks are a PG feature; this mixin is already
-//     PG-bound (its sort field relies on the "C" collation, and it queries the
-//     max via raw SQL).
-//   - The create MUST run inside a transaction. pg_advisory_xact_lock is
-//     transaction-scoped: under autocommit it is released the moment the
-//     statement ends and becomes a silent no-op, leaving the create unprotected
-//     with no error. This repo guarantees a transaction by wrapping every UC
-//     mutation in biz.Transaction.InTx; a direct client.Create() that bypasses
-//     the UC silently loses protection. See biz.Transaction.
-//   - Lock key = hashtext(table). Concurrent creates of the SAME table serialize;
-//     different tables proceed in parallel. A hash collision is harmless — two
-//     unrelated tables would merely wait on each other.
-//
-// Reach across replicas: the lock lives in PG shared memory, so it is shared by
-// every connection to that PG, including different replicas of this service
-// behind a load balancer. That is precisely where it outperforms an in-process
-// mutex, which could only serialize within a single replica. Because sort is
-// sovereign data of this service and lives in this one PG, this remains a local
-// transaction — it does not involve distributed transactions. The one setting
-// where the lock is insufficient is sharding sort writes across multiple PG
-// instances, which is a separate, larger problem and out of scope here.
-//
-// Coverage — only the single-Create path (client.X.Create().Save()) is protected,
-// which is all the UCs in this repo use:
-//   - CreateBulk is NOT supported. ent runs every builder's hook BEFORE the
-//     batch insert, so each builder's queryMaxSort reads the same pre-batch max
-//     and derives the same key; the unique index then rejects the whole batch as
-//     a ConstraintError (surfaced as 409). Fail-safe — no corrupt rows — but the
-//     bulk fails, so set sort explicitly on each builder when bulk-inserting a
-//     sorted table. The hook cannot detect bulk context, so this is a documented
-//     boundary, not a runtime check.
-//   - OnConflict (upsert) is only generated for schemas that opt into
-//     FeatureUpsert; none here do. Where enabled, sort auto-assign under upsert
-//     is undefined — set sort explicitly.
+// SortMixin equips a table with a fractional-index "sort" field for
+// drag-to-reorder. Create auto-assigns a key appended after the current
+// max; the read-modify-write is serialized by a PG advisory lock
+// (hashtext(table), transaction-scoped) — the surrounding UC transaction
+// MUST exist or the lock is a no-op. CreateBulk and upsert paths are not
+// protected; set sort explicitly there. Lock reach is per-PG-instance,
+// shared across replicas.
 type SortMixin struct {
 	mixin.Schema
 	SoftDelete bool

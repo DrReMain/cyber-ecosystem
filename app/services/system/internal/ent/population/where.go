@@ -84,9 +84,9 @@ func Name(v string) predicate.Population {
 	return predicate.Population(sql.FieldEQ(FieldName, v))
 }
 
-// Archetype applies equality check predicate on the "archetype" field. It's identical to ArchetypeEQ.
-func Archetype(v string) predicate.Population {
-	return predicate.Population(sql.FieldEQ(FieldArchetype, v))
+// Plane applies equality check predicate on the "plane" field. It's identical to PlaneEQ.
+func Plane(v string) predicate.Population {
+	return predicate.Population(sql.FieldEQ(FieldPlane, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -299,69 +299,69 @@ func NameContainsFold(v string) predicate.Population {
 	return predicate.Population(sql.FieldContainsFold(FieldName, v))
 }
 
-// ArchetypeEQ applies the EQ predicate on the "archetype" field.
-func ArchetypeEQ(v string) predicate.Population {
-	return predicate.Population(sql.FieldEQ(FieldArchetype, v))
+// PlaneEQ applies the EQ predicate on the "plane" field.
+func PlaneEQ(v string) predicate.Population {
+	return predicate.Population(sql.FieldEQ(FieldPlane, v))
 }
 
-// ArchetypeNEQ applies the NEQ predicate on the "archetype" field.
-func ArchetypeNEQ(v string) predicate.Population {
-	return predicate.Population(sql.FieldNEQ(FieldArchetype, v))
+// PlaneNEQ applies the NEQ predicate on the "plane" field.
+func PlaneNEQ(v string) predicate.Population {
+	return predicate.Population(sql.FieldNEQ(FieldPlane, v))
 }
 
-// ArchetypeIn applies the In predicate on the "archetype" field.
-func ArchetypeIn(vs ...string) predicate.Population {
-	return predicate.Population(sql.FieldIn(FieldArchetype, vs...))
+// PlaneIn applies the In predicate on the "plane" field.
+func PlaneIn(vs ...string) predicate.Population {
+	return predicate.Population(sql.FieldIn(FieldPlane, vs...))
 }
 
-// ArchetypeNotIn applies the NotIn predicate on the "archetype" field.
-func ArchetypeNotIn(vs ...string) predicate.Population {
-	return predicate.Population(sql.FieldNotIn(FieldArchetype, vs...))
+// PlaneNotIn applies the NotIn predicate on the "plane" field.
+func PlaneNotIn(vs ...string) predicate.Population {
+	return predicate.Population(sql.FieldNotIn(FieldPlane, vs...))
 }
 
-// ArchetypeGT applies the GT predicate on the "archetype" field.
-func ArchetypeGT(v string) predicate.Population {
-	return predicate.Population(sql.FieldGT(FieldArchetype, v))
+// PlaneGT applies the GT predicate on the "plane" field.
+func PlaneGT(v string) predicate.Population {
+	return predicate.Population(sql.FieldGT(FieldPlane, v))
 }
 
-// ArchetypeGTE applies the GTE predicate on the "archetype" field.
-func ArchetypeGTE(v string) predicate.Population {
-	return predicate.Population(sql.FieldGTE(FieldArchetype, v))
+// PlaneGTE applies the GTE predicate on the "plane" field.
+func PlaneGTE(v string) predicate.Population {
+	return predicate.Population(sql.FieldGTE(FieldPlane, v))
 }
 
-// ArchetypeLT applies the LT predicate on the "archetype" field.
-func ArchetypeLT(v string) predicate.Population {
-	return predicate.Population(sql.FieldLT(FieldArchetype, v))
+// PlaneLT applies the LT predicate on the "plane" field.
+func PlaneLT(v string) predicate.Population {
+	return predicate.Population(sql.FieldLT(FieldPlane, v))
 }
 
-// ArchetypeLTE applies the LTE predicate on the "archetype" field.
-func ArchetypeLTE(v string) predicate.Population {
-	return predicate.Population(sql.FieldLTE(FieldArchetype, v))
+// PlaneLTE applies the LTE predicate on the "plane" field.
+func PlaneLTE(v string) predicate.Population {
+	return predicate.Population(sql.FieldLTE(FieldPlane, v))
 }
 
-// ArchetypeContains applies the Contains predicate on the "archetype" field.
-func ArchetypeContains(v string) predicate.Population {
-	return predicate.Population(sql.FieldContains(FieldArchetype, v))
+// PlaneContains applies the Contains predicate on the "plane" field.
+func PlaneContains(v string) predicate.Population {
+	return predicate.Population(sql.FieldContains(FieldPlane, v))
 }
 
-// ArchetypeHasPrefix applies the HasPrefix predicate on the "archetype" field.
-func ArchetypeHasPrefix(v string) predicate.Population {
-	return predicate.Population(sql.FieldHasPrefix(FieldArchetype, v))
+// PlaneHasPrefix applies the HasPrefix predicate on the "plane" field.
+func PlaneHasPrefix(v string) predicate.Population {
+	return predicate.Population(sql.FieldHasPrefix(FieldPlane, v))
 }
 
-// ArchetypeHasSuffix applies the HasSuffix predicate on the "archetype" field.
-func ArchetypeHasSuffix(v string) predicate.Population {
-	return predicate.Population(sql.FieldHasSuffix(FieldArchetype, v))
+// PlaneHasSuffix applies the HasSuffix predicate on the "plane" field.
+func PlaneHasSuffix(v string) predicate.Population {
+	return predicate.Population(sql.FieldHasSuffix(FieldPlane, v))
 }
 
-// ArchetypeEqualFold applies the EqualFold predicate on the "archetype" field.
-func ArchetypeEqualFold(v string) predicate.Population {
-	return predicate.Population(sql.FieldEqualFold(FieldArchetype, v))
+// PlaneEqualFold applies the EqualFold predicate on the "plane" field.
+func PlaneEqualFold(v string) predicate.Population {
+	return predicate.Population(sql.FieldEqualFold(FieldPlane, v))
 }
 
-// ArchetypeContainsFold applies the ContainsFold predicate on the "archetype" field.
-func ArchetypeContainsFold(v string) predicate.Population {
-	return predicate.Population(sql.FieldContainsFold(FieldArchetype, v))
+// PlaneContainsFold applies the ContainsFold predicate on the "plane" field.
+func PlaneContainsFold(v string) predicate.Population {
+	return predicate.Population(sql.FieldContainsFold(FieldPlane, v))
 }
 
 // And groups predicates with the AND operator between them.

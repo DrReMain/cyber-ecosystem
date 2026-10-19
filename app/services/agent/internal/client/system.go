@@ -8,7 +8,6 @@ import (
 	connectrpc "connectrpc.com/connect"
 
 	"cyber-ecosystem/shared-go/kratos/security"
-	krauth "cyber-ecosystem/shared-go/kratos/security/auth"
 	kauthz "cyber-ecosystem/shared-go/kratos/security/authz"
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 	"cyber-ecosystem/shared-go/utils"
@@ -34,7 +33,7 @@ func NewSystemClient(c *conf.Remote, logger *slog.Logger) (*systemClient, func()
 	conn, err := connect.DialInsecure(context.Background(),
 		connect.WithEndpoint(c.GetSystemConnect()),
 		connect.WithMiddleware(standardMiddleware(logger)...),
-		connect.WithInterceptors(sessionCookieInterceptor()),
+		connect.WithInterceptors(connect.SessionCookieInterceptor()),
 	)
 	if err != nil {
 		return nil, nil, err
@@ -58,7 +57,7 @@ const (
 func (c *systemClient) AuthenticateSession(ctx context.Context, token string) (*security.Subject, error) {
 	ctx, cancel := context.WithTimeout(ctx, verifyTimeout)
 	defer cancel()
-	resp, err := c.introspect.VerifySession(withSessionToken(ctx, token), connectrpc.NewRequest(&systempb.VerifySessionRequest{}))
+	resp, err := c.introspect.VerifySession(connect.WithSessionToken(ctx, token), connectrpc.NewRequest(&systempb.VerifySessionRequest{}))
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +65,7 @@ func (c *systemClient) AuthenticateSession(ctx context.Context, token string) (*
 		UserID:     utils.Deref(utils.Unwrap[string](resp.Msg.GetUserId()), ""),
 		TenantID:   utils.Deref(utils.Unwrap[string](resp.Msg.GetTenantId()), ""),
 		Population: utils.Deref(utils.Unwrap[string](resp.Msg.GetPopulation()), ""),
-		Archetype:  utils.Deref(utils.Unwrap[string](resp.Msg.GetArchetype()), ""),
+		Plane:      utils.Deref(utils.Unwrap[string](resp.Msg.GetPlane()), ""),
 		SessionID:  utils.Deref(utils.Unwrap[string](resp.Msg.GetSessionId()), ""),
 		Extra:      map[string]any{shared.ExtraAccount: utils.Deref(utils.Unwrap[string](resp.Msg.GetAccount()), "")},
 	}, nil
@@ -75,7 +74,7 @@ func (c *systemClient) AuthenticateSession(ctx context.Context, token string) (*
 func (c *systemClient) CheckGrants(ctx context.Context, subject *security.Subject, operation string) (*kauthz.Decision, error) {
 	ctx, cancel := context.WithTimeout(ctx, checkTimeout)
 	defer cancel()
-	resp, err := c.introspect.CheckOperation(withSessionToken(ctx, subject.SessionID), connectrpc.NewRequest(&systempb.CheckOperationRequest{Operation: operation}))
+	resp, err := c.introspect.CheckOperation(connect.WithSessionToken(ctx, subject.SessionID), connectrpc.NewRequest(&systempb.CheckOperationRequest{Operation: operation}))
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +98,7 @@ func (c *systemClient) Hydrate(ctx context.Context, ids []string) map[string]*ag
 	}
 	ctx, cancel := context.WithTimeout(ctx, hydrateTimeout)
 	defer cancel()
-	resp, err := c.users.BatchGetUsers(withSessionToken(ctx, subject.SessionID), connectrpc.NewRequest(&systempb.BatchGetUsersRequest{Ids: ids}))
+	resp, err := c.users.BatchGetUsers(connect.WithSessionToken(ctx, subject.SessionID), connectrpc.NewRequest(&systempb.BatchGetUsersRequest{Ids: ids}))
 	if err != nil {
 		if errorspb.IsGeneralErrorPermissionDenied(err) {
 			c.log.Debug("user hydration skipped: viewer ungranted")
@@ -116,23 +115,4 @@ func (c *systemClient) Hydrate(ctx context.Context, ids []string) map[string]*ag
 		}
 	}
 	return briefs
-}
-
-// Private -------------------------------------------------------------------------------------------------------------
-
-type sessionTokenKey struct{}
-
-func withSessionToken(ctx context.Context, token string) context.Context {
-	return context.WithValue(ctx, sessionTokenKey{}, token)
-}
-
-func sessionCookieInterceptor() connectrpc.Interceptor {
-	return connectrpc.UnaryInterceptorFunc(func(next connectrpc.UnaryFunc) connectrpc.UnaryFunc {
-		return func(ctx context.Context, req connectrpc.AnyRequest) (connectrpc.AnyResponse, error) {
-			if token, ok := ctx.Value(sessionTokenKey{}).(string); ok && token != "" {
-				req.Header().Set("Cookie", krauth.SessionCookieName+"="+token)
-			}
-			return next(ctx, req)
-		}
-	})
 }

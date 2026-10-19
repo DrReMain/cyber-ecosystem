@@ -359,7 +359,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "code", Type: field.TypeString, Size: 20, Comment: "join key: membership rows carry this value in population"},
 		{Name: "name", Type: field.TypeString, Size: 128},
-		{Name: "archetype", Type: field.TypeString, Size: 16, Comment: "compile-time vocabulary: engine (organizational grants) | patron (identity-is-permission)"},
+		{Name: "plane", Type: field.TypeString, Size: 16, Comment: "compile-time vocabulary: backend (organizational grants) | member (engine-denied consumer seats)"},
 	}
 	// PopulationTable holds the schema information for the "population" table.
 	PopulationTable = &schema.Table{

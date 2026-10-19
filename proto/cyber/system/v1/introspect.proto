@@ -39,7 +39,7 @@ message VerifySessionResponse {
   google.protobuf.StringValue session_id = 3;
   google.protobuf.StringValue account = 4;
   google.protobuf.StringValue population = 5;
-  google.protobuf.StringValue archetype = 6;
+  google.protobuf.StringValue plane = 6;
 }
 
 // checkOperation

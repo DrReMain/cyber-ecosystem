@@ -19,10 +19,10 @@ const isCommitKey = (key: string) => key === "Enter" || key === " ";
 const isOpenKey = (key: string) => key === "ArrowDown" || isCommitKey(key);
 
 // Self-contained dropdown (APG listbox pattern: generic elements + explicit
-// roles, container-managed focus). The previous react-aria-components Select
-// pulled a ~180kB headless-primitive closure into every first-paint graph —
-// this widget renders in __root error faces and both chrome surfaces. The
-// hand-rolled version keeps the observable contract: trigger keys open,
+// roles, container-managed focus). Deliberately not a react-aria-components
+// Select — that primitive pulls a ~180kB headless-primitive closure into
+// every first-paint graph; this widget renders in __root error faces and
+// both chrome surfaces. The observable contract: trigger keys open,
 // arrows wrap, Enter/Space/click commit, Escape/outside-pointer closes and
 // returns focus, focus moves into the list with aria-activedescendant while
 // open, and the panel anchors to the logical end so RTL layouts mirror.

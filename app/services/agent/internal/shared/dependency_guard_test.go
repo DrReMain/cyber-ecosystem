@@ -25,12 +25,12 @@ var bannedImports = map[string][]string{
 	// The engine floor is module-free infrastructure and never reads
 	// business aggregates.
 	"module/authz": {"module/agentconfig", "module/agentconfigadmin", "module/chat"},
-	// The operator face is a strippable unit (its proto lives in its own
-	// file); the business module must survive its deletion untouched.
+	// The operator face is a strippable unit; the business module must
+	// survive its deletion untouched.
 	"module/agentconfig": {"module/agentconfigadmin"},
 	// ACL adapters implement biz-declared ports (importing the declaring
 	// module for the interface is the designed direction; the reverse is the
-	// leak), and stay ent-free so the closure can move to shared-go as-is.
+	// leak), and stay ent-free.
 	"client": {"internal/ent"},
 	// The kernel-to-schema direction is one-way (shared → platform → ent);
 	// an import back closes the cycle.

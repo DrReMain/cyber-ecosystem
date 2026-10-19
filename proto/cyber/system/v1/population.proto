@@ -12,8 +12,8 @@ import "google/protobuf/wrappers.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 
-// Population registry read face: instances of the compile-time archetype
-// vocabulary (engine | patron). Codes are join keys — immutable once born.
+// Population registry read face: instances of the compile-time plane
+// vocabulary (backend | member). Codes are join keys — immutable once born.
 // Rows are deploy-declared state, born and reconciled by the seed.
 service PopulationService {
   option (cyber.ext.v1.service_comment) = "用户类型";
@@ -33,7 +33,7 @@ message Population {
   google.protobuf.Timestamp updated_at = 3;
   google.protobuf.StringValue code = 4;
   google.protobuf.StringValue name = 5;
-  google.protobuf.StringValue archetype = 6;
+  google.protobuf.StringValue plane = 6;
 }
 
 // list

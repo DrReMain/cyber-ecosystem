@@ -30,8 +30,7 @@ func (Credential) Edges() []ent.Edge {
 }
 
 // Identity-plane registry data: one external identifier resolves to one
-// global identity — no tenant, no soft delete (a deleted row must not hold
-// the unique hostage).
+// global identity; no tenant, no soft delete — deletion frees the unique.
 func (Credential) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},

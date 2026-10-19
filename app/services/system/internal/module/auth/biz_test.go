@@ -178,23 +178,23 @@ type fakeAuthzRP struct {
 	authz.AuthzRP
 	grants []authz.GrantView
 	err    error
-	// archetypes answers the vocabulary read session verification stamps
-	// onto subjects; populations absent from the map read as engine.
-	archetypes map[string]string
+	// planes answers the vocabulary read session verification stamps
+	// onto subjects; populations absent from the map read as backend.
+	planes map[string]string
 }
 
 func (f *fakeAuthzRP) EffectiveGrants(_ context.Context, _ *security.Subject) ([]authz.GrantView, error) {
 	return f.grants, f.err
 }
 
-func (f *fakeAuthzRP) ArchetypeOf(population string) (string, error) {
+func (f *fakeAuthzRP) PlaneOf(population string) (string, error) {
 	if population == "" {
-		return "", nil
+		return security.PlaneBackend, nil
 	}
-	if arch, ok := f.archetypes[population]; ok {
-		return arch, nil
+	if plane, ok := f.planes[population]; ok {
+		return plane, nil
 	}
-	return security.ArchetypeEngine, nil
+	return security.PlaneBackend, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
@@ -237,7 +237,7 @@ func newAuthUCConf(auth *conf.Auth, u *fakeUserRP, a *fakeAuthzRP, t *fakeTokenR
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
 		passthroughTx{}, auth, u, a, tn,
 		&fakePopulationRP{rows: map[string]*population.Population{
-			"member": {Code: "member", Name: "Member", Archetype: security.ArchetypePatron},
+			"member": {Code: "member", Name: "Member", Plane: security.PlaneMember},
 		}},
 		t,
 	)

@@ -301,11 +301,11 @@ func (uc *AuthUC) AuthenticateSession(ctx context.Context, token string) (*secur
 	if err := uc.tokenRP.Expire(ctx, sessionPrefix+token, slide); err != nil {
 		return nil, err
 	}
-	archetype, err := uc.authzRP.ArchetypeOf(sess.Population)
+	plane, err := uc.authzRP.PlaneOf(sess.Population)
 	if err != nil {
 		return nil, err
 	}
-	return &security.Subject{UserID: sess.UserID, TenantID: sess.TenantID, Population: sess.Population, Archetype: archetype, SessionID: token, Extra: map[string]any{shared.ExtraAccount: sess.Account}}, nil
+	return &security.Subject{UserID: sess.UserID, TenantID: sess.TenantID, Population: sess.Population, Plane: plane, SessionID: token, Extra: map[string]any{shared.ExtraAccount: sess.Account}}, nil
 }
 
 func (uc *AuthUC) GetCurrentUser(ctx context.Context) (*CurrentUser, error) {

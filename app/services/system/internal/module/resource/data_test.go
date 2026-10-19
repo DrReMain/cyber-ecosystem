@@ -31,8 +31,7 @@ func newRP(t *testing.T, dir string) ResourceRP {
 	return rp
 }
 
-// A service declared by two manifests is a catalog bug, not a merge — the
-// loader refuses at boot rather than serve an ambiguous grant tree.
+// A service declared by two manifests is refused at boot.
 func TestCatalogDuplicateServiceFails(t *testing.T) {
 	dir := t.TempDir()
 	writeManifest(t, dir, "a.json", svcA)

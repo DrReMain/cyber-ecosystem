@@ -64,7 +64,7 @@ func (rp *agentConfigRP) DeleteByUserID(ctx context.Context, userID string) erro
 func (rp *agentConfigRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).AgentConfig.Query().
 		Order(ent.Desc(entagentconfig.FieldCreatedAt))
-	total, offset, limit, err := shared.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeMax)
+	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeMax)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}

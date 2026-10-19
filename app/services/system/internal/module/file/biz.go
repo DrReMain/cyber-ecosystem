@@ -9,8 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rs/xid"
-
 	"cyber-ecosystem/shared-go/capability/storage"
 	"cyber-ecosystem/shared-go/kratos/security"
 
@@ -229,20 +227,18 @@ func (uc *FileUC) MintUrls(ctx context.Context, ids []string) ([]*UrlMint, error
 }
 
 func (uc *FileUC) Generate(ctx context.Context, spec *GenerationSpec, record func(context.Context, *File) error) (*File, error) {
-	// Fail loud, not late: InTx joins an ambient tx, so a caller-side tx
-	// would have the task launch before that tx commits — writing against a
-	// row that may never exist. Domain rows ride the record callback.
+	// InTx joins an ambient tx; a caller-side tx would launch the task before commit.
 	if uc.fileRP.InAmbientTx(ctx) {
 		return nil, errorspb.ErrorGeneralErrorInternal(errGenerateAmbientTx)
 	}
-	ownerID, err := subjectUserID(ctx)
+	ownerID, err := shared.SubjectUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
 	var f *File
 	if err := uc.Tm.InTx(ctx, func(tctx context.Context) error {
 		created, err := uc.fileRP.CreateGeneration(tctx, &File{
-			Key:         newKey(),
+			Key:         shared.NewKey(),
 			Name:        spec.Name,
 			ContentType: spec.ContentType,
 			Source:      SourceServerGenerated,
@@ -345,10 +341,6 @@ func (uc *FileUC) generate(ctx context.Context, f *File, spec *GenerationSpec) e
 	return err
 }
 
-func newKey() string {
-	return "f/" + xid.New().String()
-}
-
 func (uc *FileUC) sweepLoop() {
 	defer uc.sweepWG.Done()
 	// First pass runs immediately: interval semantics catch up after downtime,
@@ -412,10 +404,6 @@ func (uc *FileUC) runSweep(ctx context.Context) {
 	}
 }
 
-// sweepDomains lists every registry domain with a bucket to sweep — the
-// platform tenant's seeded row included. A domain that has opened no bucket
-// simply has nothing to sweep; the storage-driven passes tolerate its
-// absence quietly.
 func (uc *FileUC) sweepDomains(ctx context.Context) []string {
 	domains, err := uc.domains.ListTenantCodes(ctx)
 	if err != nil {
@@ -588,14 +576,6 @@ func (uc *FileUC) sweepExpiredDeleted(ctx context.Context, cut time.Time) int {
 		}
 		afterID = rows[len(rows)-1].ID
 	}
-}
-
-func subjectUserID(ctx context.Context) (string, error) {
-	subject, ok := security.SubjectFromCtx(ctx)
-	if !ok {
-		return "", errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("no subject in context"))
-	}
-	return subject.UserID, nil
 }
 
 func (c *countingReader) Read(p []byte) (int, error) {

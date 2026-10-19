@@ -29,7 +29,7 @@ conf             config (proto-defined, generated)
 
 - `MUST` keep business logic in `biz`; `service` is thin; `data`/`client` are adapters only.
 - `MUST NOT` let `biz` import `data`/`client`/`service`/`server`/`platform`. Direction is `data → biz` and `client → biz` (both import biz to satisfy ports), never reverse. biz depends on its ports + `gen/` + `shared-go/`, and MAY take `*conf.X` in its constructor (same pattern as `server`/`platform`).
-- **A UC depends on repo ports, never on another UC — injection is repo-port-only.** Cross-module *read* → the other module's repo port (e.g. `auth` uses `user.UserRP.FindByAccount`; `user` uses `dept.DeptRP.Get` to reject dangling dept references; read-only, no side-effect — binding a UC behind an `*RP`-shaped dependency blurs the layering). Cross-module *write* is forbidden as a direct call → a **domain event** instead (the other module subscribes). A cross-module business-rule need (not a query) is a design smell — raise it, don't wire UC→UC.
+- **A UC depends on repo ports, never on another UC — injection is repo-port-only.** Cross-module *read* → the other module's repo port (read-only, no side-effect). Cross-module *write* is forbidden as a direct call → a **domain event** instead (the other module subscribes). A cross-module business-rule need (not a query) is a design smell — raise it, don't wire UC→UC.
 - The four files are a required-by-role set, not an exclusive list: `data.go` may be
   omitted (pure ACL facade), `service.go` may be omitted (module exposes no RPCs), and a
   module MAY add one extra file per cohesive non-layer concern when its content belongs
@@ -72,6 +72,7 @@ conf             config (proto-defined, generated)
 - A remote RP is named for the **provider** (the provider *is* the "table"); its payloads use a **neutral ACL value type**, not a consumer DO, so several consumers share one RP.
 - Two views, two names for one object: the **port** is a repo (`<Remote>RP`, biz's view — "a store I call"); the **adapter** implementing it is a client (`<remote>Client`, the client layer's view — "a thing that dials a remote").
 - DO names carry no service prefix (`User`, not `SystemUser`) — the package gives context. Infra fields keep conventional short names (`log`); the lowercase-type rule is for domain deps only.
+- A module package exports **types, `New*` constructors, and methods only** — never a package-level exported function. A helper needed by several modules of one service lives in `internal/shared` (single source — scattered magic values drift); a module-internal helper stays private.
 
 ---
 
@@ -141,10 +142,8 @@ Align proto optional fields, DO fields, and the service/data mapping around poin
 
 **platform**
 
-- Assembles **exactly the capabilities its modules consume** — the module set is the capability matrix, stated once per service.
-- An unneeded capability is not assembled: no file, no `ProviderSet` entry, no getter, no conf field.
-- A module calling a missing capability fails the **build** (never a runtime nil); an assembled capability without its conf block fails the **boot** with a clean wiring error.
-- Deriving a service trims the platform package (capability file + error handler + ProviderSet entry + getters + conf field) to the module set; adding one restores that same set.
+- Assembles **exactly the capabilities its modules consume** — the module set is the capability matrix, stated once per service. An unneeded capability is not assembled: no file, no `ProviderSet` entry, no getter, no conf field.
+- A module calling a missing capability fails the **build** (never a runtime nil); an assembled capability without its conf block fails the **boot** with a clean wiring error. Deriving a service trims the platform package to the module set; adding a capability restores that same set.
 - The storage object plane has no context-free getter: `GetStorageFor(ctx)` resolves the tenancy domain (`security.WithTenant` over the subject, the tenant mixin's precedence) — platform tenant → configured default bucket; every other registry domain → default name + domain suffix, provisioned lazily once per process.
 - Rows and buckets resolve one axis; a domain pass never crosses tenants.
 
@@ -177,12 +176,13 @@ Align proto optional fields, DO fields, and the service/data mapping around poin
 
 - Embeds `Unimplemented<X>Server`, implements `Registrar` (`RegisterGRPC/HTTP/Connect`).
 - Thin: `in.GetXxx()` → UC → map to proto. No direct repo access.
+- Mapping helpers come from `shared-go/utils` first — `Wrap`/`Unwrap`/`Ptr`/`Deref`/`PtrApply`/`ConvPtr`/`ConvNum`, the `*W` wrapper constructors, `ToTimestamp`/`FromTimestamp`, `StringWEmptyNil`, `SliceMap`. A hand-rolled nil-guard wrapper around a utils call is a duplicate — call utils directly; a missing generic primitive gets added to utils, never re-implemented per service.
 
 **client**
 
 - `<remote>Client` dials one connection (`grpc.NewClient` / `connect.DialInsecure`, `standardMiddleware`) and implements `<Remote>RP` — the outbound counterpart of `data`.
 - **`MUST NOT` let biz import the provider's proto**; only the client layer maps provider types → the port's neutral ACL type.
-- Outbound middleware assembly lives in per-service `client.go`, not `shared-go` — components from `shared-go`, chain owned by the service.
+- Outbound middleware assembly lives in per-service `client.go`, not `shared-go` — components from `shared-go`, chain owned by the service (session forwarding is a component: `transport/connect`'s `WithSessionToken` + `SessionCookieInterceptor`).
 - Before deleting an apparently-unreferenced RPC, message, or error value, replay the remote-consumer scenario — a sibling service may reach it through a `<Remote>RP` adapter invisible to this service's imports.
 
 **LLM provider seam (eino)**
@@ -259,6 +259,7 @@ Every non-system service consumes IAM remotely and grows no identity of its own:
 - Infra is classified at choke points, not call sites: `HandleEntError` (ent; classified kratos errors pass through), `HandleCacheError`/`HandleStorageError`/`HandleMQError` (capabilities), `MapUpstreamErr` (remotes, behind `sanitize.Client`); each attaches the original as cause. A UC never returns a raw upstream error.
 - **Postgres transaction poisoning (25P02).** A failed statement poisons every later statement in its transaction (`current transaction is aborted`, SQLSTATE 25P02) — Postgres has no statement-level rollback. Ensure-semantics (an insert that may already exist) uses `ON CONFLICT DO NOTHING` (ent upsert, the `sql/upsert` feature) — no error fires, so nothing can poison; a tolerated failure is the fallback shape only where the statement is not a plain insert: hoist the existence guard before the transaction, or return from the body at the tolerance (the race loser skips the rest). Fake-RP unit tests cannot catch this class — a fake does not poison shared state; the law is live-e2e jurisdiction.
 - Identity checks on errors that passed a choke point use the **generated reason predicates**, never kratos code checks: `errorspb.IsInfraErrorDbNotFound(err)` (reason identity), not `errors.IsNotFound(err)` — the latter matches on HTTP code and only works while the mapped code happens to be 404.
+- Intra-transaction control flow (retry vs abort on a classified failure) travels as a closure-scoped flag set at the failing statement — never as a circulating sentinel error; a reason predicate alone cannot say which statement in the transaction failed.
 - shared-go middleware sentinels declare internal-code reasons (`errors.Unauthorized("MISSING_SESSION", "")`) and are rebound onto catalog factories at service assembly (`server.go` init, original kept as cause): shared-go holds no generated-code knowledge, vocabulary drift = compile error at the rebind.
 
 **Wire boundary.** Only predefined enums leave the service. `sanitize.Server()` (chain outermost) masks any non-kratos outbound error to a `GeneralError`; `sanitize.Client()`/`MapUpstreamErr` remap any provider error by HTTP code into this service's space — no upstream reason or transport detail crosses back.
@@ -282,7 +283,7 @@ sanitize → tracing → metrics → logging(RenderErrors(logger)) → ErrorTele
 - The Exception event itself stays with the stock tracing middleware — recording a second one would split every failure into two error groups.
 - Framework middleware errors are pre-mapped in `internal/server/server.go` `init()`: recovery → `GENERAL_ERROR_UNSPECIFIED`, ratelimit → `FLOW_ERROR_RATE_LIMITED`, validator → `GENERAL_ERROR_VALIDATION_FAILED`, missing access annotation → `GENERAL_ERROR_INTERNAL`.
 - biz does not log errors — the observability outlet is complete by construction; `Log` on UC/RP carries flow info only.
-  - Defensible exception — **fail-closed swallow paths**: where an engine must keep serving past an internal failure (policy evaluation error, unregistered kind, dirty params, attribute resolution), the engine/RP layer logs ERROR/WARN at the swallow site; for a dropped decision input, that line is its only telemetry outlet.
+  - Defensible exception — **swallow paths whose log line is the only outlet**: (a) fail-closed engine/RP swallows (policy evaluation error, unregistered kind, dirty params, attribute resolution) log ERROR/WARN at the swallow site — the dropped input's only telemetry; (b) best-effort follow-ups in a UC after the primary action succeeded (revoke-sessions after disable/delete, orphan cleanup after a committed write, sweep/generation loop skips) log WARN at the swallow site — same only-outlet rationale.
 - Aggregation keys: wire & counter = `reason`; spans = `error.reason` + `error.internal`; log attrs = `reason` + `internal`.
 
 **Client side (when a remote RP client lands):** mirror the server — an `ErrorTelemetryClient` inside `sanitize.Client`, observing the pre-map upstream error (counter `kratos.client.errors`); `RenderErrors` already covers `logging.Client`.
@@ -300,16 +301,16 @@ Before reporting done on any Go change under `app/services/*`, walk the diff aga
 - **§2 naming** — every new symbol matches the table: `DO` unprefixed, `<DO>RP`/`<Remote>RP` ports, `<Name>UC`, `<do>RP` repo, `map<DO>` mapping; CRUD UC/repo methods take bare verbs; aspect blocks ordered (core methods first, aspect blocks by noun alphabet, infra hooks last).
 - **§3 structure** — four-file shape intact (no `<d>_uc.go` fragments; extra files only per the aux-file rule); section order + dividers per the table; imports in the five groups; proto import aliases `<scope>pb`, never bare `pb`; struct fields embedded base → `log` → dependencies.
 - **§4 comments** — no declaration-level comments on symbols; dividers are the only top-level markers; inline comments state non-obvious *why* only. (Service-internal rule — `shared-go` keeps its godoc conventions.)
-- **§5 layers** — business logic in biz; `data`/`client` adapters only; no business rules in data; no repo access in service; direction never reversed (biz imports neither `data`/`client` nor `service`/`server`/`platform`); cross-module access is a read via repo port.
-- **§6 errors** — identity only from catalog factories (`errorspb.ErrorXxx("")`); cause via factory-chain or authored `fmt.Errorf` prose; infra classified at choke points, never at call sites; a UC never returns a raw upstream error; biz does not log errors.
+- **§5 layers** — business logic in biz; `data`/`client` adapters only; no business rules in data; no repo access in service; direction never reversed (biz imports neither `data`/`client` nor `service`/`server`/`platform`); cross-module access is a read via repo port; mapping helpers come from `utils`, never hand-rolled.
+- **§6 errors** — identity only from catalog factories (`errorspb.ErrorXxx("")`); cause via factory-chain or authored `fmt.Errorf` prose; infra classified at choke points, never at call sites; a UC never returns a raw upstream error; no circulating sentinels (closure flags carry intra-tx control flow); biz logs errors nowhere outside the swallow-path exception.
 
 Done = every bullet answered for every hunk in the diff. For `shared-go` changes only the §6-errors and dependency-direction bullets apply, plus the capability self-containment rule (`AGENTS.md` §4).
 
-**Editor diagnostics lag codegen** — after ent/proto/wire regeneration the editor's LSP frequently reports `undefined` on freshly generated symbols (stale index, observed repeatedly after schema additions). The compile truth is `go build` / the Nx targets, never the diagnostics panel: red LSP + green build means a stale panel, not a broken tree.
+**Editor diagnostics lag codegen** — after ent/proto/wire regeneration the editor's LSP frequently reports `undefined` on freshly generated symbols (stale index). The compile truth is `go build` / the Nx targets, never the diagnostics panel: red LSP + green build means a stale panel, not a broken tree.
 
 **Review pass (pre-amend / pre-squash)** — review the *combined* diff (uncommitted changes plus the commit(s) being merged into), not the working tree alone:
 
-- **Same-recipe consistency sweep** — sibling functions of one family (`ensure*`, classify wrappers, sweep stages) must share the same race and error law; a difference is either a bug (missing `IsConstraintError` tolerance next to kin that has it) or a distinction worth a comment. Found by横向对照, not by reading logic.
+- **Same-recipe consistency sweep** — sibling functions of one family (`ensure*`, classify wrappers, sweep stages) must share the same race and error law; a difference is either a bug (missing `IsConstraintError` tolerance next to kin that has it) or a distinction worth a comment. Find these by comparing siblings side by side, not by reading each in isolation.
 - **Test code** — comments state the law only (no process narration); fixtures carry no unused fields; assertions use the generated `Is<Reason>` predicates, never message text.
 - **Every hunk must be meaningful** — formatter round-trips on untouched content (JSON re-indent, import re-sorting via a script) get reverted, not committed as churn.
 - **Fixture defaults must mirror the real degenerate world** — a default fake that answers differently from what production data looks like silently red-shifts every unrelated test.
@@ -334,7 +335,7 @@ Done = every bullet answered for every hunk in the diff. For `shared-go` changes
 
 1. **Copy-set**: `project.json` / `Dockerfile` / both `config.yamls` / `conf.proto`(+buf.gen.conf) / `cmd/app` / `bootstrap` (lifecycle only, no seed) / `shared` (kernel trimmed + `dependency_guard_test` rewritten) / `platform` (trimmed to the module set — §5 platform law) / `server` (five files) / `client` (once the service calls out) / `ent` schema + `local_mixins`. Deliberately NOT copied: `seed.go`, system business modules, the authz engine internals (casbin/attrs/policies), audit.
 2. **Dials**: the port triple advances **+1 per service** (system 11001/12001/13001 → agent 11002/…; the service configs are the truth). A service assembling redis isolates its db index from non-service consumers of the same redis (the current pairing lives in the compose files).
-3. **ent first generation is a two-pass stub dance**: `local_mixins` import the generated tree (chicken-and-egg), so stub the mixins (nil `Hooks`/`Interceptors` over entgo-level types) → generate → restore the real mixins → regenerate. entc also refuses an empty schema package ("no Go files"), so the derive slice must land its first aggregate's schema — deferring all schemas to the data slice is not an option (esports carried `profile` for exactly this). After removing an entity, nuke the whole generated tree first — the loader reads the stale tree.
+3. **ent first generation is a two-pass stub dance**: `local_mixins` import the generated tree (chicken-and-egg), so stub the mixins (nil `Hooks`/`Interceptors` over entgo-level types) → generate → restore the real mixins → regenerate. entc also refuses an empty schema package ("no Go files"), so the derive slice must land its first aggregate's schema — deferring all schemas to the data slice is not an option. After removing an entity, nuke the whole generated tree first — the loader reads the stale tree.
 4. **wire cold start**: the `go:generate` directive lives in `wire_gen.go` itself — a fresh service runs `go run github.com/google/wire/cmd/wire` manually; wire rejects interface bindings with no consumer in the graph (comment the bind out until its consumer exists).
 5. **First migration**: `NAME=init <svc>:migrate:diff` → hand-prepend `CREATE EXTENSION` lines the atlas scratch already has (a service database owns its extensions) → `:migrate:hash` → `:migrate:apply`. Recreate the service database rather than fighting a drifted init. Squashing the directory into one init requires resetting the atlas dev database first (`DROP DATABASE atlas_dev; CREATE DATABASE atlas_dev`) — the diff runs against its residual schema, so a stale dev database yields a delta fragment instead of the full schema.
 6. **IAM**: consume per §5a "Non-system services"; blank-import the service's gen in `shared-go/kratos/security/access_annotation_test.go`.

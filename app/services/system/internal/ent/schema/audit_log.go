@@ -11,8 +11,7 @@ import (
 )
 
 // Append-only: inserts only, no updates, no soft delete. tenant is a plain
-// column so denied and subject-less requests can audit too; the
-// subject-derived TenantMixin does not apply.
+// column (no TenantMixin): denied and subject-less requests audit too.
 type AuditLog struct {
 	ent.Schema
 }

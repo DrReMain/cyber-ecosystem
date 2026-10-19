@@ -52,8 +52,8 @@ type PolicyState struct {
 type AuthzRP interface {
 	ImplicitGrants(ctx context.Context, userID, tenant string) ([]GrantView, error)
 	EffectiveGrants(ctx context.Context, subject *security.Subject) ([]GrantView, error)
-	PatronSubject(subject *security.Subject) (bool, error)
-	ArchetypeOf(population string) (string, error)
+	MemberSubject(subject *security.Subject) (bool, error)
+	PlaneOf(population string) (string, error)
 	ExplainGrants(ctx context.Context, principalType, principalID, tenant, operation string) (*ExplainResult, error)
 	PreviewGrants(ctx context.Context, tenant string, roleCodes []string) ([]string, error)
 	StartWatch(ctx context.Context) error
@@ -76,13 +76,11 @@ func NewAuthzUC(logger *slog.Logger, tm shared.Transaction, authzRP AuthzRP, lc 
 // Method --------------------------------------------------------------------------------------------------------------
 
 func (uc *AuthzUC) Decide(ctx context.Context, subject *security.Subject, operation string) (*kauthz.Decision, error) {
-	// Patron subjects are structurally grantless — identity is their whole
-	// permission; the engine is never consulted.
-	patron, err := uc.authzRP.PatronSubject(subject)
+	member, err := uc.authzRP.MemberSubject(subject)
 	if err != nil {
 		return nil, err
 	}
-	if patron {
+	if member {
 		return &kauthz.Decision{Reason: kauthz.DenyNoGrant}, nil
 	}
 	grants, err := uc.authzRP.ImplicitGrants(ctx, subject.UserID, subject.TenantID)

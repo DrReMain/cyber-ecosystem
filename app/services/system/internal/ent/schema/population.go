@@ -22,8 +22,8 @@ func (Population) Fields() []ent.Field {
 			Match(regexp.MustCompile(codeJoinKeyPattern)).
 			Comment("join key: membership rows carry this value in population"),
 		field.String("name").NotEmpty().MaxRuneLen(128),
-		field.String("archetype").NotEmpty().MaxRuneLen(16).
-			Comment("compile-time vocabulary: engine (organizational grants) | patron (identity-is-permission)"),
+		field.String("plane").NotEmpty().MaxRuneLen(16).
+			Comment("compile-time vocabulary: backend (organizational grants) | member (engine-denied consumer seats)"),
 	}
 }
 
@@ -31,7 +31,7 @@ func (Population) Edges() []ent.Edge {
 	return nil
 }
 
-// No SoftDelete: a deleted row must not hold the code unique hostage.
+// No SoftDelete: a deleted row frees the code unique.
 func (Population) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},

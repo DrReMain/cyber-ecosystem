@@ -8,20 +8,10 @@ import (
 	"cyber-ecosystem/app/services/system/internal/conf"
 )
 
-// Identity exchange providers. The kind vocabulary is code — one file per
-// kind (provider_<kind>.go), init-registered, duplicate kinds panic at
-// boot; the file list IS the registry. Instances are conf rows: a project
-// picks its methods by keeping provider files and conf rows, and deleting
-// a kind removes its registration with the file.
-
-// identityPayload is the request face's oneof member — every exchange
-// request carries exactly one typed payload.
 type identityPayload interface {
 	GetWechat() *systempb.WeChatIdentityPayload
 }
 
-// exchangedIdentity is the verified external identity: what the kind
-// exchanged for, globally unique within the kind.
 type exchangedIdentity struct {
 	Kind       string
 	Identifier string

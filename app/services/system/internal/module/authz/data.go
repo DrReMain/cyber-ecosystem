@@ -75,12 +75,12 @@ func (r *authzRP) ImplicitGrants(ctx context.Context, userID, tenant string) ([]
 }
 
 func (r *authzRP) EffectiveGrants(ctx context.Context, subject *security.Subject) ([]GrantView, error) {
-	patron, err := r.PatronSubject(subject)
+	member, err := r.MemberSubject(subject)
 	if err != nil {
 		return nil, err
 	}
-	if patron {
-		// The archetype is the whole permission surface; the grant tables
+	if member {
+		// The plane is the whole permission surface; the grant tables
 		// are never read.
 		return []GrantView{}, nil
 	}
@@ -90,30 +90,31 @@ func (r *authzRP) EffectiveGrants(ctx context.Context, subject *security.Subject
 	}
 	return survivingGrants(ctx, r.Log, subject, views), nil
 }
-func (r *authzRP) PatronSubject(subject *security.Subject) (bool, error) {
-	// Patron means identity is the whole permission — the grant tables are
-	// never read. A population absent from the snapshot is a broken
-	// registry invariant: it fails closed as infra, never as a policy
-	// verdict.
+func (r *authzRP) MemberSubject(subject *security.Subject) (bool, error) {
+	// Member means the seat is structurally denied every gated face — the
+	// grant tables are never read. An empty population is the backend
+	// default. A population absent from the snapshot is a broken registry
+	// invariant: it fails closed as infra, never as a policy verdict.
 	if subject.Population == "" {
 		return false, nil
 	}
-	arch, ok := r.snap.Load().populations[subject.Population]
+	plane, ok := r.snap.Load().populations[subject.Population]
 	if !ok {
 		return false, errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("population %q missing from the compiled registry", subject.Population))
 	}
-	return arch == security.ArchetypePatron, nil
+	return plane == security.PlaneMember, nil
 }
 
-func (r *authzRP) ArchetypeOf(population string) (string, error) {
+func (r *authzRP) PlaneOf(population string) (string, error) {
+	// An empty population resolves as backend.
 	if population == "" {
-		return "", nil
+		return security.PlaneBackend, nil
 	}
-	arch, ok := r.snap.Load().populations[population]
+	plane, ok := r.snap.Load().populations[population]
 	if !ok {
 		return "", errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("population %q missing from the compiled registry", population))
 	}
-	return arch, nil
+	return plane, nil
 }
 
 func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID, tenant, operation string) (*ExplainResult, error) {
@@ -127,11 +128,11 @@ func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID,
 		if err != nil {
 			return nil, err
 		}
-		patron, err := r.PatronSubject(&security.Subject{UserID: principalID, TenantID: tenant, Population: population})
+		member, err := r.MemberSubject(&security.Subject{UserID: principalID, TenantID: tenant, Population: population})
 		if err != nil {
 			return nil, err
 		}
-		if patron {
+		if member {
 			out.Allowed = false
 			return out, nil
 		}
@@ -290,10 +291,13 @@ func (r *authzRP) version() int64 {
 
 func (r *authzRP) remoteVersion(ctx context.Context) (int64, error) {
 	ver, err := r.Platform.GetCache().Counter.Get(ctx, shared.PolicyVersionKey)
-	if errors.Is(err, cache.ErrKeyNotFound) {
-		return 0, nil // never bumped yet: version zero
+	if err != nil {
+		if errors.Is(err, cache.ErrKeyNotFound) {
+			return 0, nil // never bumped yet: version zero
+		}
+		return 0, r.Platform.HandleCacheError(err)
 	}
-	return ver, err
+	return ver, nil
 }
 
 func (r *authzRP) remoteVersionSafe(ctx context.Context) int64 {
@@ -317,7 +321,7 @@ func (r *authzRP) seatPopulation(ctx context.Context, userID, tenant string) (st
 	single := ""
 	for _, row := range rows {
 		if single != "" && single != row.Population {
-			return "", nil // mixed: no single archetype speaks for the identity
+			return "", nil // mixed: no single plane speaks for the identity (any backend seat keeps grants explainable)
 		}
 		single = row.Population
 	}
@@ -335,12 +339,10 @@ func (r *authzRP) rebuild(ctx context.Context, version int64) error {
 }
 
 func (r *authzRP) compileFromDB(ctx context.Context, version int64) (*snapshot, error) {
-	// Scaling posture: a version-gated full-table reload is deliberate —
-	// idempotent, multi-replica safe, no delta ordering; it runs at
-	// policy-edit frequency, not ticker frequency. The first pressure point
-	// under load is not this compile but hydrateScopes' per-request dept
-	// scan — snapshot the tree there (a dept change bumps the version)
-	// before touching anything here.
+	// Reload is version-gated and full-table: idempotent, multi-replica
+	// safe, no delta ordering; frequency is policy-edit rate. The first
+	// pressure point under load is hydrateScopes' per-request dept scan,
+	// not this compile.
 	client := r.Platform.GetClient(ctx)
 	roles, err := client.Role.Query().All(ctx)
 	if err != nil {
@@ -368,7 +370,7 @@ func (r *authzRP) compileFromDB(ctx context.Context, version int64) (*snapshot, 
 	}
 	populations := make(map[string]string, len(popRows))
 	for _, po := range popRows {
-		populations[po.Code] = po.Archetype
+		populations[po.Code] = po.Plane
 	}
 	disabledUsers, err := client.User.Query().Where(user.EnabledEQ(false)).All(ctx)
 	if err != nil {

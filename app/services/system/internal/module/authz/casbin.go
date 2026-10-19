@@ -34,7 +34,7 @@ type snapshot struct {
 	version     int64
 	enf         *casbin.Enforcer
 	grants      map[grantKey]grantMeta
-	populations map[string]string // code → archetype; compiled with the snapshot so archetype reads cost no query
+	populations map[string]string // code → plane; compiled with the snapshot so plane reads cost no query
 }
 
 type grantRow struct {

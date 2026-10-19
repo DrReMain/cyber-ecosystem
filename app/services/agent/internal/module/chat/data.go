@@ -106,7 +106,7 @@ func (rp *chatRP) ListSessions(ctx context.Context, ownerID string, page *common
 	query := rp.Platform.GetClient(ctx).ChatSession.Query().
 		Where(chatsession.OwnerIDEQ(ownerID)).
 		Order(ent.Desc(chatsession.FieldUpdatedAt), ent.Desc(chatsession.FieldID))
-	total, offset, limit, err := shared.Paginate(ctx, query, page, helper.DefaultPageSizeMax)
+	total, offset, limit, err := helper.Paginate(ctx, query, page, helper.DefaultPageSizeMax)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (rp *chatRP) ListMessages(ctx context.Context, sessionID string, page *comm
 	query := rp.Platform.GetClient(ctx).ChatMessage.Query().
 		Where(chatmessage.SessionIDEQ(sessionID)).
 		Order(ent.Desc(chatmessage.FieldCreatedAt), ent.Desc(chatmessage.FieldID))
-	total, offset, limit, err := shared.Paginate(ctx, query, page, helper.DefaultPageSizeMax)
+	total, offset, limit, err := helper.Paginate(ctx, query, page, helper.DefaultPageSizeMax)
 	if err != nil {
 		return nil, err
 	}

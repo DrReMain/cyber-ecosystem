@@ -9,7 +9,7 @@ type Subject struct {
 	UserID     string
 	TenantID   string
 	Population string
-	Archetype  string
+	Plane      string
 	SessionID  string
 	Extra      map[string]any
 }
@@ -22,12 +22,8 @@ func WithSubject(ctx context.Context, s *Subject) context.Context {
 
 type registryPlaneKey struct{}
 
-// RegistryPlane marks a read as registry-plane: subject-derived narrowing
-// (tenant, datascope) lifts for its query — the registry reads scoped rows
-// as plain data, identity discovery by a global key being the shape. Write
-// hooks reject the plane outright: a registry read must never birth or
-// mutate a scoped row, and the silent default-tenant back-fill is exactly
-// the bug that law prevents.
+// RegistryPlane lifts subject-derived narrowing (tenant, datascope) for one
+// read; write hooks reject the plane — registry reads never write scoped rows.
 func RegistryPlane(ctx context.Context) context.Context {
 	return context.WithValue(ctx, registryPlaneKey{}, true)
 }

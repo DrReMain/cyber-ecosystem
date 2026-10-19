@@ -178,6 +178,40 @@ export type CyberAgentV1UpdateSessionResponse = {
 };
 
 /**
+ * Pagination request.
+ */
+export type CyberSharedCommonV1PageRequest = {
+    /**
+     * Page number (1-based).
+     */
+    pageNo?: number;
+    /**
+     * Page size.
+     */
+    pageSize?: number;
+    /**
+     * Return all results without pagination.
+     */
+    all?: boolean;
+    /**
+     * Filter by created_at >= this value.
+     */
+    createdAtA?: string;
+    /**
+     * Filter by created_at <= this value.
+     */
+    createdAtZ?: string;
+    /**
+     * Filter by updated_at >= this value.
+     */
+    updatedAtA?: string;
+    /**
+     * Filter by updated_at <= this value.
+     */
+    updatedAtZ?: string;
+};
+
+/**
  * Pagination response.
  */
 export type CyberSharedCommonV1PageResponse = {
@@ -683,6 +717,17 @@ export type CyberSystemV1ListUploadedPartsResponse = {
     expiresAt?: string;
 };
 
+export type CyberSystemV1ListUsersByPopulationRequest = {
+    population?: string;
+    page?: CyberSharedCommonV1PageRequest;
+    orderBy?: Array<string>;
+};
+
+export type CyberSystemV1ListUsersByPopulationResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    list?: Array<CyberSystemV1User>;
+};
+
 export type CyberSystemV1ListUsersResponse = {
     page?: CyberSharedCommonV1PageResponse;
     list?: Array<CyberSystemV1User>;
@@ -824,7 +869,7 @@ export type CyberSystemV1Population = {
     updatedAt?: string;
     code?: string;
     name?: string;
-    archetype?: string;
+    plane?: string;
 };
 
 export type CyberSystemV1PresignedPut = {
@@ -1155,10 +1200,6 @@ export type CyberSystemV1User = {
     avatar?: string;
 };
 
-/**
- * Rendering-grade identity summary for hydration; deliberately narrower than
- * User (no roles, no lifecycle fields).
- */
 export type CyberSystemV1UserBrief = {
     id?: string;
     account?: string;
@@ -1171,7 +1212,7 @@ export type CyberSystemV1VerifySessionResponse = {
     sessionId?: string;
     account?: string;
     population?: string;
-    archetype?: string;
+    plane?: string;
 };
 
 export type CyberSystemV1WeChatIdentityPayload = {
@@ -2790,6 +2831,22 @@ export type UserServiceBatchGetUsersResponses = {
 };
 
 export type UserServiceBatchGetUsersResponse = UserServiceBatchGetUsersResponses[keyof UserServiceBatchGetUsersResponses];
+
+export type UserServiceListUsersByPopulationData = {
+    body: CyberSystemV1ListUsersByPopulationRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/users/by-population';
+};
+
+export type UserServiceListUsersByPopulationResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ListUsersByPopulationResponse;
+};
+
+export type UserServiceListUsersByPopulationResponse = UserServiceListUsersByPopulationResponses[keyof UserServiceListUsersByPopulationResponses];
 
 export type UserServiceDeleteUserData = {
     body?: never;
