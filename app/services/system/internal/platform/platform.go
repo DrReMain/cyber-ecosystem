@@ -63,8 +63,6 @@ func (p *Platform) HandleEntError(err error) error { return p.handleEntError(err
 func (p *Platform) GetCache() *cache.Cache           { return p.cache }
 func (p *Platform) HandleCacheError(err error) error { return p.handleCacheError(err) }
 
-// GetStorageFor is the object plane's only entrance: the caller's context
-// decides the bucket, so no call site can bypass the tenancy axis.
 func (p *Platform) GetStorageFor(ctx context.Context) *storage.View {
 	return p.storage.ForTenant(ctx)
 }

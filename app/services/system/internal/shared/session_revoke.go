@@ -8,11 +8,9 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 )
 
+// TTL derived from SessionMax.
 const RevokedMarkerPrefix = "auth:web:revoked:"
 
-// SessionMax is the absolute session lifetime cap. It lives here — beside
-// the revocation marker — because the marker's TTL derives from it: one
-// home, one derivation, never two constants to keep in sync.
 const SessionMax = 30 * 24 * time.Hour
 
 func RevokeSessions(ctx context.Context, c *cache.Cache, userID string) error {

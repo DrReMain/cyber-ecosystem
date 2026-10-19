@@ -68,8 +68,8 @@ func (uc *TenantUC) UpdateStatus(ctx context.Context, id string, enabled bool) (
 	if err != nil {
 		return nil, err
 	}
-	// The default tenant is the degenerate mode's whole world — disabling it
-	// locks out every inhabitant including the admin who could undo it.
+	// The default tenant cannot be disabled: it would lock out every
+	// inhabitant, including the admin who could undo it.
 	if t.Code == security.DefaultTenant && !enabled {
 		return nil, systempb.ErrorSystemTenantProtected("")
 	}

@@ -165,7 +165,7 @@ message Seed {
   message Population {
     string code = 1;      // join key; declaring the default population is a config error
     string name = 2;
-    string archetype = 3; // engine | patron
+    string plane = 3;     // backend | member
   }
   // the floor that lets a fresh deployment grant its first user
   repeated string super_admins = 1;

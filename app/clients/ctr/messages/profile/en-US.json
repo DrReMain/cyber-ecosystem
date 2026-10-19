@@ -6,5 +6,13 @@
   "profile_band_label": "Age band",
   "profile_games_label": "Game preference",
   "profile_unset": "Not set",
-  "profile_error_generic": "Failed to load profile, please try again later"
+  "profile_error_generic": "Failed to load profile, please try again later",
+  "profile_edit": "Edit profile",
+  "profile_save": "Save",
+  "profile_cancel": "Cancel",
+  "profile_birth_year": "Birth year",
+  "profile_birth_month": "Birth month",
+  "profile_guardian": "I have guardian consent",
+  "profile_custom_placeholder": "Type a custom game name and press Enter",
+  "profile_logout": "Sign out"
 }

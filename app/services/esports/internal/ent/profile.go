@@ -4,6 +4,8 @@ package ent
 
 import (
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
+	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -33,11 +35,15 @@ type Profile struct {
 	BirthYear *int `json:"birth_year,omitempty"`
 	// birth month 1-12
 	BirthMonth *int `json:"birth_month,omitempty"`
+	// derived at write from birth year/month; 8-band word set under12|12-14|15-17|18-22|23-25|26-29|30-40|over40; null while birth unknown
+	AgeBand *string `json:"age_band,omitempty"`
 	// avatar URL; wechat prefill hydrates identity-side, storage lives here
 	AvatarURL *string `json:"avatar_url,omitempty"`
 	// under-13 hard-gate stamp, server-written only; null = not consented
 	GuardianConsentedAt *time.Time `json:"guardian_consented_at,omitempty"`
-	selectValues        sql.SelectValues
+	// replace-set preference entries (catalog ref or custom name, exactly one set per entry)
+	Games        []types.GameEntry `json:"games,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -45,9 +51,11 @@ func (*Profile) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case profile.FieldGames:
+			values[i] = new([]byte)
 		case profile.FieldBirthYear, profile.FieldBirthMonth:
 			values[i] = new(sql.NullInt64)
-		case profile.FieldID, profile.FieldTenantID, profile.FieldUserID, profile.FieldNickname, profile.FieldAvatarURL:
+		case profile.FieldID, profile.FieldTenantID, profile.FieldUserID, profile.FieldNickname, profile.FieldAgeBand, profile.FieldAvatarURL:
 			values[i] = new(sql.NullString)
 		case profile.FieldCreatedAt, profile.FieldUpdatedAt, profile.FieldDeletedAt, profile.FieldGuardianConsentedAt:
 			values[i] = new(sql.NullTime)
@@ -124,6 +132,13 @@ func (_m *Profile) assignValues(columns []string, values []any) error {
 				_m.BirthMonth = new(int)
 				*_m.BirthMonth = int(value.Int64)
 			}
+		case profile.FieldAgeBand:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field age_band", values[i])
+			} else if value.Valid {
+				_m.AgeBand = new(string)
+				*_m.AgeBand = value.String
+			}
 		case profile.FieldAvatarURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field avatar_url", values[i])
@@ -137,6 +152,14 @@ func (_m *Profile) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.GuardianConsentedAt = new(time.Time)
 				*_m.GuardianConsentedAt = value.Time
+			}
+		case profile.FieldGames:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field games", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.Games); err != nil {
+					return fmt.Errorf("unmarshal field games: %w", err)
+				}
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -206,6 +229,11 @@ func (_m *Profile) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
+	if v := _m.AgeBand; v != nil {
+		builder.WriteString("age_band=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
 	if v := _m.AvatarURL; v != nil {
 		builder.WriteString("avatar_url=")
 		builder.WriteString(*v)
@@ -215,6 +243,9 @@ func (_m *Profile) String() string {
 		builder.WriteString("guardian_consented_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("games=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Games))
 	builder.WriteByte(')')
 	return builder.String()
 }

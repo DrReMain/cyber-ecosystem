@@ -26,8 +26,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// Population registry read face: instances of the compile-time archetype
-// vocabulary (engine | patron). Codes are join keys — immutable once born.
+// Population registry read face: instances of the compile-time plane
+// vocabulary (backend | member). Codes are join keys — immutable once born.
 // Rows are deploy-declared state, born and reconciled by the seed.
 type PopulationServiceClient interface {
 	ListPopulations(ctx context.Context, in *ListPopulationsRequest, opts ...grpc.CallOption) (*ListPopulationsResponse, error)
@@ -55,8 +55,8 @@ func (c *populationServiceClient) ListPopulations(ctx context.Context, in *ListP
 // All implementations must embed UnimplementedPopulationServiceServer
 // for forward compatibility.
 //
-// Population registry read face: instances of the compile-time archetype
-// vocabulary (engine | patron). Codes are join keys — immutable once born.
+// Population registry read face: instances of the compile-time plane
+// vocabulary (backend | member). Codes are join keys — immutable once born.
 // Rows are deploy-declared state, born and reconciled by the seed.
 type PopulationServiceServer interface {
 	ListPopulations(context.Context, *ListPopulationsRequest) (*ListPopulationsResponse, error)

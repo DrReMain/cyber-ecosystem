@@ -87,6 +87,7 @@ auth:
       enabled: ${WECHAT_ENABLED:true}
       auto_register: ${WECHAT_AUTO_REGISTER:true} # 无绑定交换=注册新会员
       endpoint: ${WECHAT_ENDPOINT:} # 交换端点；空 = 官方默认 (e2e 覆写指向 mock)
+      population: member           # 落座人群
       wechat:
         appid: ${WECHAT_APPID:wxfda597a14a57bf08} # 测试号
         secret: ${WECHAT_SECRET:da1ce920bfcee3db140f431d2c1f3a5b}
@@ -94,3 +95,7 @@ seed:
   super_admins:
     - admin                       # 账号 (种子超管)
   initial_password: ${SEED_INITIAL_PASSWORD:admin123456} # 种子超管口令
+  populations:
+    - code: member                # C 端会员人群 (member 面: 引擎拒后台, 组合面枚举)
+      name: Member
+      plane: member

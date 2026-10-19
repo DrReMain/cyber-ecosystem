@@ -2041,6 +2041,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.BatchGetUsersResponse'
+    /api/v1/system/users/by-population:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_ListUsersByPopulation
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ListUsersByPopulationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ListUsersByPopulationResponse'
     /api/v1/system/users/{id}:
         get:
             tags:
@@ -2550,6 +2568,37 @@ components:
             properties:
                 profile:
                     $ref: '#/components/schemas/cyber.esports.v1.Profile'
+        cyber.shared.common.v1.PageRequest:
+            type: object
+            properties:
+                pageNo:
+                    type: integer
+                    description: Page number (1-based).
+                    format: int32
+                pageSize:
+                    type: integer
+                    description: Page size.
+                    format: int32
+                all:
+                    type: boolean
+                    description: Return all results without pagination.
+                createdAtA:
+                    type: string
+                    description: Filter by created_at >= this value.
+                    format: date-time
+                createdAtZ:
+                    type: string
+                    description: Filter by created_at <= this value.
+                    format: date-time
+                updatedAtA:
+                    type: string
+                    description: Filter by updated_at >= this value.
+                    format: date-time
+                updatedAtZ:
+                    type: string
+                    description: Filter by updated_at <= this value.
+                    format: date-time
+            description: Pagination request.
         cyber.shared.common.v1.PageResponse:
             type: object
             properties:
@@ -3206,6 +3255,26 @@ components:
                 expiresAt:
                     type: string
                     format: date-time
+        cyber.system.v1.ListUsersByPopulationRequest:
+            type: object
+            properties:
+                population:
+                    type: string
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageRequest'
+                orderBy:
+                    type: array
+                    items:
+                        type: string
+        cyber.system.v1.ListUsersByPopulationResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.User'
         cyber.system.v1.ListUsersResponse:
             type: object
             properties:
@@ -3369,7 +3438,7 @@ components:
                     type: string
                 name:
                     type: string
-                archetype:
+                plane:
                     type: string
         cyber.system.v1.PresignedPut:
             type: object
@@ -3781,9 +3850,6 @@ components:
                     type: string
                 avatar:
                     type: string
-            description: |-
-                Rendering-grade identity summary for hydration; deliberately narrower than
-                 User (no roles, no lifecycle fields).
         cyber.system.v1.VerifySessionResponse:
             type: object
             properties:
@@ -3797,7 +3863,7 @@ components:
                     type: string
                 population:
                     type: string
-                archetype:
+                plane:
                     type: string
         cyber.system.v1.WeChatIdentityPayload:
             type: object
@@ -3850,8 +3916,8 @@ tags:
     - name: PolicyService
     - name: PopulationService
       description: |-
-        Population registry read face: instances of the compile-time archetype
-         vocabulary (engine | patron). Codes are join keys — immutable once born.
+        Population registry read face: instances of the compile-time plane
+         vocabulary (backend | member). Codes are join keys — immutable once born.
          Rows are deploy-declared state, born and reconciled by the seed.
     - name: ProfileService
       description: |-

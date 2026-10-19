@@ -43,3 +43,8 @@ export const getUser = UserService.method.getUser;
  * @generated from rpc cyber.system.v1.UserService.BatchGetUsers
  */
 export const batchGetUsers = UserService.method.batchGetUsers;
+
+/**
+ * @generated from rpc cyber.system.v1.UserService.ListUsersByPopulation
+ */
+export const listUsersByPopulation = UserService.method.listUsersByPopulation;

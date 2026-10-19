@@ -107,7 +107,7 @@ func (rp *roleRP) List(ctx context.Context, in *RoleListIn) (*RoleListOut, error
 		"createdAt": func(sel helper.SQLSelector) { query.Order(sel(role.FieldCreatedAt)) },
 		"updatedAt": func(sel helper.SQLSelector) { query.Order(sel(role.FieldUpdatedAt)) },
 	})
-	total, offset, limit, err := shared.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
+	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
@@ -285,7 +285,7 @@ func (rp *roleRP) RemoveMember(ctx context.Context, roleID, principalType, princ
 func (rp *roleRP) ListMembers(ctx context.Context, in *MemberListIn) (*MemberListOut, error) {
 	query := rp.Platform.GetClient(ctx).PrincipalRole.Query().Where(principalrole.RoleID(in.RoleID))
 	helper.Where(query, in.PrincipalType != nil, func() predicate.PrincipalRole { return principalrole.PrincipalTypeEQ(*in.PrincipalType) })
-	total, offset, limit, err := shared.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
+	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}

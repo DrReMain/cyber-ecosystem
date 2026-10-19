@@ -82,7 +82,9 @@
 | D-T | ctr 壳期路由/UI 面=仅根路由+一空白落地页:路由+页面+消息目录+title 接线为可复制范式(新路由照此生长,login/profile/test 目录随路由移除,E6b 登录片按范式重建);token 层/样式基线保留为能力面,不出 demo UI;react-aria 为声明基座,首个消费者随业务片。影响面:E6a 验收不要求多路由与 UI demo 载体;消息收敛至最必要字段(home 另留 description 作落地页 SEO meta,DISALLOW_PREFIXES 随路由清空),common/error/not-found 为机制消费键全保留 |
 | D-U | E0 改增量推进:种子片=画像域+游戏目录读面(画像 Get/Update 局部更新、age_band 服务端派生 8 档词表、未满 13 监护硬闸、偏好整组替换;目录不分页),后续每增一片独立评审冻结(测试读面→提交面→匹配/报告→entitlement),proto 加法演进。影响面:E0 交付形态改逐片冻结——种子片 2026-10-18 评审落 proto(四结论按证据链修正:性别不入选转 ljr 待裁 P8、avatar 入画像、8 档词表定案、昵称 2-12);CP1 口径不变 |
 | D-V | **业务前置律**:前后端接通闭环先行——接通验证前 esports 服务保持最小形态(E1 骨架+探针读面,零业务实现);业务代码待接通验证后按片堆砌,堆砌期不分神兼顾非业务完善。依据:业务堆砌快且随需求推演反复重写,接通层(骨架/cookie/会话/水合)才是长命资产。2026-10-18 首次执行:已落的业务实现撤回(game 聚合+种子/画像写面全规则,备份 /tmp/e2-loop-backup/,重启后失效可按冻结契约重建);冻结契约 proto 不撤(决策存档,零运行时) |
-| D-W | **population 贯通滞后**:C 端会员现落 DefaultPopulation(engine 的 user 人群)——admin 用户管理混排+patron 语义悬空为已知债;修复=骨架演进四件(provider 行 member_population 配置/ListUsers population 过滤/member 人群行建法/存量座位迁移),与 agent 侧 guard 测试注释清理同批滞后,触发器=population 维度首个真实消费者(E8 权益面或会员治理面)。三裁决点存档:①member 行建法(admin 人群页手动 vs esports 引导种子经 CreatePopulation RPC)②admin 用户管理人群可见性(筛选器默认 user vs 硬排除 patron)③存量 wechat 用户座位迁移方式 |
+| D-W | **population 贯通滞后**:C 端会员现落 DefaultPopulation(engine 的 user 人群)——admin 用户管理混排+patron 语义悬空为已知债;修复=骨架演进四件(provider 行 member_population 配置/ListUsers population 过滤/member 人群行建法/存量座位迁移),与 agent 侧 guard 测试注释清理同批滞后,触发器=population 维度首个真实消费者(E8 权益面或会员治理面)。三裁决点存档:①member 行建法(admin 人群页手动 vs esports 引导种子经 CreatePopulation RPC)②admin 用户管理人群可见性(筛选器默认 user vs 硬排除 patron)③存量 wechat 用户座位迁移方式。**2026-10-19 D-X 修正:四件之"ListUsers population 过滤"作废,该件重述为独立组合缝** |
+| D-X | **系统管理模块纯度律**:"系统管理"=大后台通用管理模块(IAM 为主)的辖区——不得涉及任何用户端/其他端的信息,后台自身其他业务模块亦不得进入该区;组合消费需求(如按人群枚举名册)不得焊在系统管理的消费面上。首案执行(2026-10-19):ListUsers population 过滤曾落后当日撤回(dev/esports 双支本地提交整体回退);会员名册组合缝独立落位=ListUsersByPopulation 组合面+member 人群分离,已落地(a8b9f0a4) |
+| D-Y | **骨架一步到位法**(2026-10-19 用户裁定,废除底座面的"第二消费者才抽象"):底座按已声明场景全集一次做对——多应用组合/C 端会员面/SaaS 多租户/ToB 专版是底座既定需求非未来投机;底座容不下已声明场景=机制级缺陷,修模型、不打补丁、不递延。业务应用内部仍具体先行、重复才提取(2026-08-26 教训保留,作用域收窄到应用内)。AGENTS §8 已同步改法。首案=**人群面统一**:population 的 archetype(engine|patron)+member 旗标收拢为单一 plane(backend\|platform\|member),权限求值方式与后台可见性全部由 plane 推导;触发=本裁定即刻,规模=一骨架片 |
 
 ### 2.2 待裁(Owner + 时点;背景与候选案在 prd.md 对应条目展开)
 
@@ -135,3 +137,5 @@
 - 2026-10-18 D-U:E0 契约首刀改增量推进——种子片(画像+游戏目录)评审冻结落 proto,后续逐片跟进;P8(画像性别)入待裁表。
 - 2026-10-19 D-V:前后端最小闭环验证达成(微信真人链路全绿),业务堆砌期开启。
 - 2026-10-19 D-W:population 贯通修复与 agent 侧 guard 注释清理打包滞后(均骨架演进件);三裁决点入台账待触发。
+- 2026-10-19 D-X:系统管理模块纯度律立档(ListUsers population 过滤片整体撤回,双支本地提交回退、探针证据作废);会员名册组合缝定案中。
+- 2026-10-19 D-Y:骨架一步到位法立档(AGENTS §8 同步改法);"第二消费者"触发器废除于底座面、保留于业务应用内部;首案人群面统一即刻排程为切片0。

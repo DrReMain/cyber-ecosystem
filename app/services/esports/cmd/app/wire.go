@@ -15,6 +15,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/client"
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
+	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/server"
@@ -31,6 +32,7 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *slog.Logger) (*kratos.App,
 		client.ProviderSet,
 		authz.ProviderSet,
 		profile.ProviderSet,
+		game.ProviderSet,
 		newApp,
 	))
 }

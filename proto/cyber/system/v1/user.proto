@@ -100,6 +100,18 @@ service UserService {
       body: "*"
     };
   }
+  rpc ListUsersByPopulation(ListUsersByPopulationRequest) returns (ListUsersByPopulationResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "按人群枚举用户(组合面)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (cyber.ext.v1.datascope) = true;
+    option (google.api.http) = {
+      post: "/api/v1/system/users/by-population"
+      body: "*"
+    };
+  }
 }
 
 message User {
@@ -240,6 +252,24 @@ message ListUsersResponse {
   repeated User list = 2;
 }
 
+message ListUsersByPopulationRequest {
+  optional string population = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  cyber.shared.common.v1.PageRequest page = 2;
+  repeated string order_by = 100 [(buf.validate.field).cel = {
+    id: "ListUsersByPopulationRequest.order_by"
+    message: ""
+    expression: "this.all(item, size(item) == 0 || item.matches('^(account|createdAt|updatedAt):(asc|desc)$'))"
+  }];
+}
+
+message ListUsersByPopulationResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated User list = 2;
+}
+
 // get
 message GetUserRequest {
   string id = 1 [
@@ -272,8 +302,6 @@ message BatchGetUsersResponse {
   map<string, UserBrief> users = 1;
 }
 
-// Rendering-grade identity summary for hydration; deliberately narrower than
-// User (no roles, no lifecycle fields).
 message UserBrief {
   google.protobuf.StringValue id = 1;
   google.protobuf.StringValue account = 2;

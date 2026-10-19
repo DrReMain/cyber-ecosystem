@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
+	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
 	"errors"
 	"fmt"
 	"time"
@@ -116,6 +117,20 @@ func (_c *ProfileCreate) SetNillableBirthMonth(v *int) *ProfileCreate {
 	return _c
 }
 
+// SetAgeBand sets the "age_band" field.
+func (_c *ProfileCreate) SetAgeBand(v string) *ProfileCreate {
+	_c.mutation.SetAgeBand(v)
+	return _c
+}
+
+// SetNillableAgeBand sets the "age_band" field if the given value is not nil.
+func (_c *ProfileCreate) SetNillableAgeBand(v *string) *ProfileCreate {
+	if v != nil {
+		_c.SetAgeBand(*v)
+	}
+	return _c
+}
+
 // SetAvatarURL sets the "avatar_url" field.
 func (_c *ProfileCreate) SetAvatarURL(v string) *ProfileCreate {
 	_c.mutation.SetAvatarURL(v)
@@ -141,6 +156,12 @@ func (_c *ProfileCreate) SetNillableGuardianConsentedAt(v *time.Time) *ProfileCr
 	if v != nil {
 		_c.SetGuardianConsentedAt(*v)
 	}
+	return _c
+}
+
+// SetGames sets the "games" field.
+func (_c *ProfileCreate) SetGames(v []types.GameEntry) *ProfileCreate {
+	_c.mutation.SetGames(v)
 	return _c
 }
 
@@ -253,6 +274,11 @@ func (_c *ProfileCreate) check() error {
 			return &ValidationError{Name: "birth_month", err: fmt.Errorf(`ent: validator failed for field "Profile.birth_month": %w`, err)}
 		}
 	}
+	if v, ok := _c.mutation.AgeBand(); ok {
+		if err := profile.AgeBandValidator(v); err != nil {
+			return &ValidationError{Name: "age_band", err: fmt.Errorf(`ent: validator failed for field "Profile.age_band": %w`, err)}
+		}
+	}
 	if v, ok := _c.mutation.AvatarURL(); ok {
 		if err := profile.AvatarURLValidator(v); err != nil {
 			return &ValidationError{Name: "avatar_url", err: fmt.Errorf(`ent: validator failed for field "Profile.avatar_url": %w`, err)}
@@ -330,6 +356,10 @@ func (_c *ProfileCreate) createSpec() (*Profile, *sqlgraph.CreateSpec) {
 		_spec.SetField(profile.FieldBirthMonth, field.TypeInt, value)
 		_node.BirthMonth = &value
 	}
+	if value, ok := _c.mutation.AgeBand(); ok {
+		_spec.SetField(profile.FieldAgeBand, field.TypeString, value)
+		_node.AgeBand = &value
+	}
 	if value, ok := _c.mutation.AvatarURL(); ok {
 		_spec.SetField(profile.FieldAvatarURL, field.TypeString, value)
 		_node.AvatarURL = &value
@@ -337,6 +367,10 @@ func (_c *ProfileCreate) createSpec() (*Profile, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.GuardianConsentedAt(); ok {
 		_spec.SetField(profile.FieldGuardianConsentedAt, field.TypeTime, value)
 		_node.GuardianConsentedAt = &value
+	}
+	if value, ok := _c.mutation.Games(); ok {
+		_spec.SetField(profile.FieldGames, field.TypeJSON, value)
+		_node.Games = value
 	}
 	return _node, _spec
 }

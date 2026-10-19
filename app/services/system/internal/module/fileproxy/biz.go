@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/rs/xid"
-
 	"cyber-ecosystem/shared-go/capability/storage"
 	"cyber-ecosystem/shared-go/kratos/security"
 
@@ -61,7 +59,7 @@ func (uc *FileProxyUC) Create(ctx context.Context, in *CreateIn) (*file.File, er
 		return nil, systempb.ErrorSystemFileTooLarge("")
 	}
 	f := &file.File{
-		Key:         newKey(),
+		Key:         shared.NewKey(),
 		Name:        in.Name,
 		ContentType: in.ContentType,
 		Size:        size,
@@ -82,10 +80,4 @@ func (uc *FileProxyUC) Create(ctx context.Context, in *CreateIn) (*file.File, er
 		return nil, err
 	}
 	return created, nil
-}
-
-// Private -------------------------------------------------------------------------------------------------------------
-
-func newKey() string {
-	return "f/" + xid.New().String()
 }

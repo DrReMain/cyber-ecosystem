@@ -79,6 +79,10 @@ seed:
   super_admins:
     - admin
   initial_password: ${SEED_INITIAL_PASSWORD:admin123456}
+  populations:
+    - code: member # C-end member plane (composition-face enumeration)
+      name: Member
+      plane: member
 auth:
   providers:
     - key: wechat
@@ -86,6 +90,7 @@ auth:
       enabled: ${WECHAT_ENABLED:false}
       auto_register: ${WECHAT_AUTO_REGISTER:false}
       endpoint: ${WECHAT_ENDPOINT:}
+      population: ${WECHAT_POPULATION:member} # landing population (member plane)
       wechat:
         appid: ${WECHAT_APPID:}
         secret: ${WECHAT_SECRET:}

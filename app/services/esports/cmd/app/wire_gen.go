@@ -11,6 +11,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/client"
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
+	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/server"
@@ -32,9 +33,13 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, logg
 		cleanup()
 		return nil, nil, err
 	}
-	profileUC := profile.NewProfileUC(logger, platformPlatform)
+	profileRP := profile.NewProfileRP(logger, platformPlatform)
+	gameRP := game.NewGameRP(logger, platformPlatform)
+	profileUC := profile.NewProfileUC(logger, platformPlatform, profileRP, gameRP)
 	profileService := profile.NewProfileService(logger, profileUC)
-	v := server.NewRegistrarList(profileService)
+	gameUC := game.NewGameUC(logger, platformPlatform, gameRP)
+	gameService := game.NewGameService(logger, gameUC)
+	v := server.NewRegistrarList(profileService, gameService)
 	systemClient, cleanup2, err := client.NewSystemClient(remote, logger)
 	if err != nil {
 		cleanup()
@@ -44,8 +49,14 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, logg
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)
 	connectServer := server.NewConnectServer(confServer, logger, v, systemClient, authzUC)
+	seed, err := bootstrap.NewSeed(platformPlatform, logger)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	lifecycle := bootstrap.NewLifecycle()
-	app := newApp(logger, grpcServer, httpServer, connectServer, lifecycle)
+	app := newApp(logger, grpcServer, httpServer, connectServer, seed, lifecycle)
 	return app, func() {
 		cleanup2()
 		cleanup()

@@ -3,6 +3,7 @@
 package runtime
 
 import (
+	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema"
 	"time"
@@ -12,6 +13,91 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	gameMixin := schema.Game{}.Mixin()
+	gameMixinHooks2 := gameMixin[2].Hooks()
+	gameMixinHooks3 := gameMixin[3].Hooks()
+	game.Hooks[0] = gameMixinHooks2[0]
+	game.Hooks[1] = gameMixinHooks3[0]
+	gameMixinInters2 := gameMixin[2].Interceptors()
+	gameMixinInters3 := gameMixin[3].Interceptors()
+	game.Interceptors[0] = gameMixinInters2[0]
+	game.Interceptors[1] = gameMixinInters3[0]
+	gameMixinFields0 := gameMixin[0].Fields()
+	_ = gameMixinFields0
+	gameMixinFields1 := gameMixin[1].Fields()
+	_ = gameMixinFields1
+	gameMixinFields2 := gameMixin[2].Fields()
+	_ = gameMixinFields2
+	gameFields := schema.Game{}.Fields()
+	_ = gameFields
+	// gameDescCreatedAt is the schema descriptor for created_at field.
+	gameDescCreatedAt := gameMixinFields1[0].Descriptor()
+	// game.DefaultCreatedAt holds the default value on creation for the created_at field.
+	game.DefaultCreatedAt = gameDescCreatedAt.Default.(func() time.Time)
+	// gameDescUpdatedAt is the schema descriptor for updated_at field.
+	gameDescUpdatedAt := gameMixinFields1[1].Descriptor()
+	// game.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	game.DefaultUpdatedAt = gameDescUpdatedAt.Default.(func() time.Time)
+	// game.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	game.UpdateDefaultUpdatedAt = gameDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// gameDescTenantID is the schema descriptor for tenant_id field.
+	gameDescTenantID := gameMixinFields2[0].Descriptor()
+	// game.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	game.TenantIDValidator = gameDescTenantID.Validators[0].(func(string) error)
+	// gameDescCode is the schema descriptor for code field.
+	gameDescCode := gameFields[0].Descriptor()
+	// game.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	game.CodeValidator = func() func(string) error {
+		validators := gameDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// gameDescName is the schema descriptor for name field.
+	gameDescName := gameFields[1].Descriptor()
+	// game.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	game.NameValidator = func() func(string) error {
+		validators := gameDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// gameDescCategory is the schema descriptor for category field.
+	gameDescCategory := gameFields[2].Descriptor()
+	// game.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
+	game.CategoryValidator = gameDescCategory.Validators[0].(func(string) error)
+	// gameDescIconURL is the schema descriptor for icon_url field.
+	gameDescIconURL := gameFields[3].Descriptor()
+	// game.IconURLValidator is a validator for the "icon_url" field. It is called by the builders before save.
+	game.IconURLValidator = gameDescIconURL.Validators[0].(func(string) error)
+	// gameDescDescription is the schema descriptor for description field.
+	gameDescDescription := gameFields[4].Descriptor()
+	// game.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	game.DescriptionValidator = gameDescDescription.Validators[0].(func(string) error)
+	// gameDescID is the schema descriptor for id field.
+	gameDescID := gameMixinFields0[0].Descriptor()
+	// game.DefaultID holds the default value on creation for the id field.
+	game.DefaultID = gameDescID.Default.(func() string)
+	// game.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	game.IDValidator = gameDescID.Validators[0].(func(string) error)
 	profileMixin := schema.Profile{}.Mixin()
 	profileMixinHooks2 := profileMixin[2].Hooks()
 	profileMixinHooks3 := profileMixin[3].Hooks()
@@ -83,8 +169,12 @@ func init() {
 			return nil
 		}
 	}()
+	// profileDescAgeBand is the schema descriptor for age_band field.
+	profileDescAgeBand := profileFields[4].Descriptor()
+	// profile.AgeBandValidator is a validator for the "age_band" field. It is called by the builders before save.
+	profile.AgeBandValidator = profileDescAgeBand.Validators[0].(func(string) error)
 	// profileDescAvatarURL is the schema descriptor for avatar_url field.
-	profileDescAvatarURL := profileFields[4].Descriptor()
+	profileDescAvatarURL := profileFields[5].Descriptor()
 	// profile.AvatarURLValidator is a validator for the "avatar_url" field. It is called by the builders before save.
 	profile.AvatarURLValidator = profileDescAvatarURL.Validators[0].(func(string) error)
 	// profileDescID is the schema descriptor for id field.

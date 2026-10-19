@@ -21,8 +21,8 @@ const (
 	FieldCode = "code"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldArchetype holds the string denoting the archetype field in the database.
-	FieldArchetype = "archetype"
+	// FieldPlane holds the string denoting the plane field in the database.
+	FieldPlane = "plane"
 	// Table holds the table name of the population in the database.
 	Table = "population"
 )
@@ -34,7 +34,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldCode,
 	FieldName,
-	FieldArchetype,
+	FieldPlane,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -58,8 +58,8 @@ var (
 	CodeValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
-	// ArchetypeValidator is a validator for the "archetype" field. It is called by the builders before save.
-	ArchetypeValidator func(string) error
+	// PlaneValidator is a validator for the "plane" field. It is called by the builders before save.
+	PlaneValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -94,7 +94,7 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByArchetype orders the results by the archetype field.
-func ByArchetype(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldArchetype, opts...).ToFunc()
+// ByPlane orders the results by the plane field.
+func ByPlane(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPlane, opts...).ToFunc()
 }

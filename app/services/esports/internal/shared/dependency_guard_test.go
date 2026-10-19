@@ -26,7 +26,7 @@ var bannedImports = map[string][]string{
 	"module/authz": {"module/profile"},
 	// ACL adapters implement biz-declared ports (importing the declaring
 	// module for the interface is the designed direction; the reverse is the
-	// leak), and stay ent-free so the closure can move to shared-go as-is.
+	// leak), and stay ent-free.
 	"client": {"internal/ent"},
 	// The kernel-to-schema direction is one-way (shared → platform →
 	// ent/schema); an import back closes the cycle.

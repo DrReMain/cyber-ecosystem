@@ -691,7 +691,7 @@ func TestCreateBirthsSeat(t *testing.T) {
 func TestCreatePopulationSeatBorn(t *testing.T) {
 	rp := &fakeUserRP{}
 	uc := newUserUCWith(rp, nil, nil, &fakePopRP{found: map[string]*population.Population{
-		"guest": {Code: "guest", Archetype: security.ArchetypePatron},
+		"guest": {Code: "guest", Plane: security.PlaneMember},
 	}})
 	account, pw := "b@x.co", "pw123456"
 
@@ -770,7 +770,7 @@ func TestCreateSeatCarriesPopulation(t *testing.T) {
 	twin := "twin@x.co"
 	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Account: &twin}}}
 	uc := newUserUCWith(rp, nil, nil, &fakePopRP{found: map[string]*population.Population{
-		"guest": {Code: "guest", Archetype: security.ArchetypePatron},
+		"guest": {Code: "guest", Plane: security.PlaneMember},
 	}})
 	account, password := twin, "pw123456"
 	ctx := security.WithSubject(context.Background(), &security.Subject{TenantID: "default"})

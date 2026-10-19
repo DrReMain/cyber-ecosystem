@@ -4,8 +4,10 @@ package ent
 
 import (
 	"context"
+	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/predicate"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
+	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
 	"errors"
 	"fmt"
 	"sync"
@@ -24,8 +26,852 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeGame    = "Game"
 	TypeProfile = "Profile"
 )
+
+// GameMutation represents an operation that mutates the Game nodes in the graph.
+type GameMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	tenant_id     *string
+	deleted_at    *time.Time
+	code          *string
+	name          *string
+	category      *string
+	icon_url      *string
+	description   *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Game, error)
+	predicates    []predicate.Game
+}
+
+var _ ent.Mutation = (*GameMutation)(nil)
+
+// gameOption allows management of the mutation configuration using functional options.
+type gameOption func(*GameMutation)
+
+// newGameMutation creates new mutation for the Game entity.
+func newGameMutation(c config, op Op, opts ...gameOption) *GameMutation {
+	m := &GameMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeGame,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withGameID sets the ID field of the mutation.
+func withGameID(id string) gameOption {
+	return func(m *GameMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Game
+		)
+		m.oldValue = func(ctx context.Context) (*Game, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Game.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withGame sets the old Game of the mutation.
+func withGame(node *Game) gameOption {
+	return func(m *GameMutation) {
+		m.oldValue = func(context.Context) (*Game, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m GameMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m GameMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Game entities.
+func (m *GameMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *GameMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *GameMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Game.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *GameMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *GameMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *GameMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *GameMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *GameMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *GameMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *GameMutation) SetTenantID(s string) {
+	m.tenant_id = &s
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *GameMutation) TenantID() (r string, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldTenantID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *GameMutation) ResetTenantID() {
+	m.tenant_id = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *GameMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *GameMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *GameMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[game.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *GameMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[game.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *GameMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, game.FieldDeletedAt)
+}
+
+// SetCode sets the "code" field.
+func (m *GameMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *GameMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *GameMutation) ResetCode() {
+	m.code = nil
+}
+
+// SetName sets the "name" field.
+func (m *GameMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *GameMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *GameMutation) ResetName() {
+	m.name = nil
+}
+
+// SetCategory sets the "category" field.
+func (m *GameMutation) SetCategory(s string) {
+	m.category = &s
+}
+
+// Category returns the value of the "category" field in the mutation.
+func (m *GameMutation) Category() (r string, exists bool) {
+	v := m.category
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCategory returns the old "category" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldCategory(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCategory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCategory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCategory: %w", err)
+	}
+	return oldValue.Category, nil
+}
+
+// ClearCategory clears the value of the "category" field.
+func (m *GameMutation) ClearCategory() {
+	m.category = nil
+	m.clearedFields[game.FieldCategory] = struct{}{}
+}
+
+// CategoryCleared returns if the "category" field was cleared in this mutation.
+func (m *GameMutation) CategoryCleared() bool {
+	_, ok := m.clearedFields[game.FieldCategory]
+	return ok
+}
+
+// ResetCategory resets all changes to the "category" field.
+func (m *GameMutation) ResetCategory() {
+	m.category = nil
+	delete(m.clearedFields, game.FieldCategory)
+}
+
+// SetIconURL sets the "icon_url" field.
+func (m *GameMutation) SetIconURL(s string) {
+	m.icon_url = &s
+}
+
+// IconURL returns the value of the "icon_url" field in the mutation.
+func (m *GameMutation) IconURL() (r string, exists bool) {
+	v := m.icon_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIconURL returns the old "icon_url" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldIconURL(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIconURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIconURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIconURL: %w", err)
+	}
+	return oldValue.IconURL, nil
+}
+
+// ClearIconURL clears the value of the "icon_url" field.
+func (m *GameMutation) ClearIconURL() {
+	m.icon_url = nil
+	m.clearedFields[game.FieldIconURL] = struct{}{}
+}
+
+// IconURLCleared returns if the "icon_url" field was cleared in this mutation.
+func (m *GameMutation) IconURLCleared() bool {
+	_, ok := m.clearedFields[game.FieldIconURL]
+	return ok
+}
+
+// ResetIconURL resets all changes to the "icon_url" field.
+func (m *GameMutation) ResetIconURL() {
+	m.icon_url = nil
+	delete(m.clearedFields, game.FieldIconURL)
+}
+
+// SetDescription sets the "description" field.
+func (m *GameMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *GameMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Game entity.
+// If the Game object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GameMutation) OldDescription(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *GameMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[game.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *GameMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[game.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *GameMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, game.FieldDescription)
+}
+
+// Where appends a list predicates to the GameMutation builder.
+func (m *GameMutation) Where(ps ...predicate.Game) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the GameMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *GameMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Game, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *GameMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *GameMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Game).
+func (m *GameMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *GameMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.created_at != nil {
+		fields = append(fields, game.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, game.FieldUpdatedAt)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, game.FieldTenantID)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, game.FieldDeletedAt)
+	}
+	if m.code != nil {
+		fields = append(fields, game.FieldCode)
+	}
+	if m.name != nil {
+		fields = append(fields, game.FieldName)
+	}
+	if m.category != nil {
+		fields = append(fields, game.FieldCategory)
+	}
+	if m.icon_url != nil {
+		fields = append(fields, game.FieldIconURL)
+	}
+	if m.description != nil {
+		fields = append(fields, game.FieldDescription)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *GameMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case game.FieldCreatedAt:
+		return m.CreatedAt()
+	case game.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case game.FieldTenantID:
+		return m.TenantID()
+	case game.FieldDeletedAt:
+		return m.DeletedAt()
+	case game.FieldCode:
+		return m.Code()
+	case game.FieldName:
+		return m.Name()
+	case game.FieldCategory:
+		return m.Category()
+	case game.FieldIconURL:
+		return m.IconURL()
+	case game.FieldDescription:
+		return m.Description()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *GameMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case game.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case game.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case game.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case game.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case game.FieldCode:
+		return m.OldCode(ctx)
+	case game.FieldName:
+		return m.OldName(ctx)
+	case game.FieldCategory:
+		return m.OldCategory(ctx)
+	case game.FieldIconURL:
+		return m.OldIconURL(ctx)
+	case game.FieldDescription:
+		return m.OldDescription(ctx)
+	}
+	return nil, fmt.Errorf("unknown Game field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *GameMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case game.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case game.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case game.FieldTenantID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case game.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case game.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
+	case game.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case game.FieldCategory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCategory(v)
+		return nil
+	case game.FieldIconURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIconURL(v)
+		return nil
+	case game.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Game field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *GameMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *GameMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *GameMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Game numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *GameMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(game.FieldDeletedAt) {
+		fields = append(fields, game.FieldDeletedAt)
+	}
+	if m.FieldCleared(game.FieldCategory) {
+		fields = append(fields, game.FieldCategory)
+	}
+	if m.FieldCleared(game.FieldIconURL) {
+		fields = append(fields, game.FieldIconURL)
+	}
+	if m.FieldCleared(game.FieldDescription) {
+		fields = append(fields, game.FieldDescription)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *GameMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *GameMutation) ClearField(name string) error {
+	switch name {
+	case game.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case game.FieldCategory:
+		m.ClearCategory()
+		return nil
+	case game.FieldIconURL:
+		m.ClearIconURL()
+		return nil
+	case game.FieldDescription:
+		m.ClearDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Game nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *GameMutation) ResetField(name string) error {
+	switch name {
+	case game.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case game.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case game.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case game.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case game.FieldCode:
+		m.ResetCode()
+		return nil
+	case game.FieldName:
+		m.ResetName()
+		return nil
+	case game.FieldCategory:
+		m.ResetCategory()
+		return nil
+	case game.FieldIconURL:
+		m.ResetIconURL()
+		return nil
+	case game.FieldDescription:
+		m.ResetDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Game field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *GameMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *GameMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *GameMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *GameMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *GameMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *GameMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *GameMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Game unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *GameMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Game edge %s", name)
+}
 
 // ProfileMutation represents an operation that mutates the Profile nodes in the graph.
 type ProfileMutation struct {
@@ -43,8 +889,11 @@ type ProfileMutation struct {
 	addbirth_year         *int
 	birth_month           *int
 	addbirth_month        *int
+	age_band              *string
 	avatar_url            *string
 	guardian_consented_at *time.Time
+	games                 *[]types.GameEntry
+	appendgames           []types.GameEntry
 	clearedFields         map[string]struct{}
 	done                  bool
 	oldValue              func(context.Context) (*Profile, error)
@@ -537,6 +1386,55 @@ func (m *ProfileMutation) ResetBirthMonth() {
 	delete(m.clearedFields, profile.FieldBirthMonth)
 }
 
+// SetAgeBand sets the "age_band" field.
+func (m *ProfileMutation) SetAgeBand(s string) {
+	m.age_band = &s
+}
+
+// AgeBand returns the value of the "age_band" field in the mutation.
+func (m *ProfileMutation) AgeBand() (r string, exists bool) {
+	v := m.age_band
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAgeBand returns the old "age_band" field's value of the Profile entity.
+// If the Profile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProfileMutation) OldAgeBand(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAgeBand is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAgeBand requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAgeBand: %w", err)
+	}
+	return oldValue.AgeBand, nil
+}
+
+// ClearAgeBand clears the value of the "age_band" field.
+func (m *ProfileMutation) ClearAgeBand() {
+	m.age_band = nil
+	m.clearedFields[profile.FieldAgeBand] = struct{}{}
+}
+
+// AgeBandCleared returns if the "age_band" field was cleared in this mutation.
+func (m *ProfileMutation) AgeBandCleared() bool {
+	_, ok := m.clearedFields[profile.FieldAgeBand]
+	return ok
+}
+
+// ResetAgeBand resets all changes to the "age_band" field.
+func (m *ProfileMutation) ResetAgeBand() {
+	m.age_band = nil
+	delete(m.clearedFields, profile.FieldAgeBand)
+}
+
 // SetAvatarURL sets the "avatar_url" field.
 func (m *ProfileMutation) SetAvatarURL(s string) {
 	m.avatar_url = &s
@@ -635,6 +1533,71 @@ func (m *ProfileMutation) ResetGuardianConsentedAt() {
 	delete(m.clearedFields, profile.FieldGuardianConsentedAt)
 }
 
+// SetGames sets the "games" field.
+func (m *ProfileMutation) SetGames(te []types.GameEntry) {
+	m.games = &te
+	m.appendgames = nil
+}
+
+// Games returns the value of the "games" field in the mutation.
+func (m *ProfileMutation) Games() (r []types.GameEntry, exists bool) {
+	v := m.games
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGames returns the old "games" field's value of the Profile entity.
+// If the Profile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProfileMutation) OldGames(ctx context.Context) (v []types.GameEntry, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGames is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGames requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGames: %w", err)
+	}
+	return oldValue.Games, nil
+}
+
+// AppendGames adds te to the "games" field.
+func (m *ProfileMutation) AppendGames(te []types.GameEntry) {
+	m.appendgames = append(m.appendgames, te...)
+}
+
+// AppendedGames returns the list of values that were appended to the "games" field in this mutation.
+func (m *ProfileMutation) AppendedGames() ([]types.GameEntry, bool) {
+	if len(m.appendgames) == 0 {
+		return nil, false
+	}
+	return m.appendgames, true
+}
+
+// ClearGames clears the value of the "games" field.
+func (m *ProfileMutation) ClearGames() {
+	m.games = nil
+	m.appendgames = nil
+	m.clearedFields[profile.FieldGames] = struct{}{}
+}
+
+// GamesCleared returns if the "games" field was cleared in this mutation.
+func (m *ProfileMutation) GamesCleared() bool {
+	_, ok := m.clearedFields[profile.FieldGames]
+	return ok
+}
+
+// ResetGames resets all changes to the "games" field.
+func (m *ProfileMutation) ResetGames() {
+	m.games = nil
+	m.appendgames = nil
+	delete(m.clearedFields, profile.FieldGames)
+}
+
 // Where appends a list predicates to the ProfileMutation builder.
 func (m *ProfileMutation) Where(ps ...predicate.Profile) {
 	m.predicates = append(m.predicates, ps...)
@@ -669,7 +1632,7 @@ func (m *ProfileMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProfileMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 12)
 	if m.created_at != nil {
 		fields = append(fields, profile.FieldCreatedAt)
 	}
@@ -694,11 +1657,17 @@ func (m *ProfileMutation) Fields() []string {
 	if m.birth_month != nil {
 		fields = append(fields, profile.FieldBirthMonth)
 	}
+	if m.age_band != nil {
+		fields = append(fields, profile.FieldAgeBand)
+	}
 	if m.avatar_url != nil {
 		fields = append(fields, profile.FieldAvatarURL)
 	}
 	if m.guardian_consented_at != nil {
 		fields = append(fields, profile.FieldGuardianConsentedAt)
+	}
+	if m.games != nil {
+		fields = append(fields, profile.FieldGames)
 	}
 	return fields
 }
@@ -724,10 +1693,14 @@ func (m *ProfileMutation) Field(name string) (ent.Value, bool) {
 		return m.BirthYear()
 	case profile.FieldBirthMonth:
 		return m.BirthMonth()
+	case profile.FieldAgeBand:
+		return m.AgeBand()
 	case profile.FieldAvatarURL:
 		return m.AvatarURL()
 	case profile.FieldGuardianConsentedAt:
 		return m.GuardianConsentedAt()
+	case profile.FieldGames:
+		return m.Games()
 	}
 	return nil, false
 }
@@ -753,10 +1726,14 @@ func (m *ProfileMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldBirthYear(ctx)
 	case profile.FieldBirthMonth:
 		return m.OldBirthMonth(ctx)
+	case profile.FieldAgeBand:
+		return m.OldAgeBand(ctx)
 	case profile.FieldAvatarURL:
 		return m.OldAvatarURL(ctx)
 	case profile.FieldGuardianConsentedAt:
 		return m.OldGuardianConsentedAt(ctx)
+	case profile.FieldGames:
+		return m.OldGames(ctx)
 	}
 	return nil, fmt.Errorf("unknown Profile field %s", name)
 }
@@ -822,6 +1799,13 @@ func (m *ProfileMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetBirthMonth(v)
 		return nil
+	case profile.FieldAgeBand:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAgeBand(v)
+		return nil
 	case profile.FieldAvatarURL:
 		v, ok := value.(string)
 		if !ok {
@@ -835,6 +1819,13 @@ func (m *ProfileMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetGuardianConsentedAt(v)
+		return nil
+	case profile.FieldGames:
+		v, ok := value.([]types.GameEntry)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGames(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Profile field %s", name)
@@ -905,11 +1896,17 @@ func (m *ProfileMutation) ClearedFields() []string {
 	if m.FieldCleared(profile.FieldBirthMonth) {
 		fields = append(fields, profile.FieldBirthMonth)
 	}
+	if m.FieldCleared(profile.FieldAgeBand) {
+		fields = append(fields, profile.FieldAgeBand)
+	}
 	if m.FieldCleared(profile.FieldAvatarURL) {
 		fields = append(fields, profile.FieldAvatarURL)
 	}
 	if m.FieldCleared(profile.FieldGuardianConsentedAt) {
 		fields = append(fields, profile.FieldGuardianConsentedAt)
+	}
+	if m.FieldCleared(profile.FieldGames) {
+		fields = append(fields, profile.FieldGames)
 	}
 	return fields
 }
@@ -937,11 +1934,17 @@ func (m *ProfileMutation) ClearField(name string) error {
 	case profile.FieldBirthMonth:
 		m.ClearBirthMonth()
 		return nil
+	case profile.FieldAgeBand:
+		m.ClearAgeBand()
+		return nil
 	case profile.FieldAvatarURL:
 		m.ClearAvatarURL()
 		return nil
 	case profile.FieldGuardianConsentedAt:
 		m.ClearGuardianConsentedAt()
+		return nil
+	case profile.FieldGames:
+		m.ClearGames()
 		return nil
 	}
 	return fmt.Errorf("unknown Profile nullable field %s", name)
@@ -975,11 +1978,17 @@ func (m *ProfileMutation) ResetField(name string) error {
 	case profile.FieldBirthMonth:
 		m.ResetBirthMonth()
 		return nil
+	case profile.FieldAgeBand:
+		m.ResetAgeBand()
+		return nil
 	case profile.FieldAvatarURL:
 		m.ResetAvatarURL()
 		return nil
 	case profile.FieldGuardianConsentedAt:
 		m.ResetGuardianConsentedAt()
+		return nil
+	case profile.FieldGames:
+		m.ResetGames()
 		return nil
 	}
 	return fmt.Errorf("unknown Profile field %s", name)

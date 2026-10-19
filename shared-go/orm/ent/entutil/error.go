@@ -57,16 +57,16 @@ func HandleEntError(err error, checker EntErrorChecker, errs *DefaultError) erro
 
 func validateReasons(errs *DefaultError) error {
 	if errs.NotFound == nil {
-		return fmt.Errorf("NotFound is nil")
+		return fmt.Errorf("default error slot NotFound is nil")
 	}
 	if errs.Validation == nil {
 		return fmt.Errorf("validation is nil")
 	}
 	if errs.NotSingular == nil {
-		return fmt.Errorf("NotSingular is nil")
+		return fmt.Errorf("default error slot NotSingular is nil")
 	}
 	if errs.NotLoaded == nil {
-		return fmt.Errorf("NotLoaded is nil")
+		return fmt.Errorf("default error slot NotLoaded is nil")
 	}
 	if errs.Constraint == nil {
 		return fmt.Errorf("constraint is nil")

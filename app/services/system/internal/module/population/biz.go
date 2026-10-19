@@ -18,7 +18,7 @@ type Population struct {
 	UpdatedAt time.Time
 	Code      string
 	Name      string
-	Archetype string
+	Plane     string
 }
 
 type PopulationListIn struct {

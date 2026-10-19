@@ -64,7 +64,6 @@ type AgentConfigRP interface {
 	FindSealedByUserID(ctx context.Context, userID string) (*AgentConfig, string, error)
 }
 
-// UserRP hydrates user identity via system RPCs (cross-service read).
 type UserRP interface {
 	Hydrate(ctx context.Context, ids []string) map[string]*UserBrief
 }
@@ -80,8 +79,7 @@ type AgentConfigUC struct {
 }
 
 func NewAgentConfigUC(logger *slog.Logger, tm shared.Transaction, c *conf.Crypto, agentConfigRP AgentConfigRP, userRP UserRP) (*AgentConfigUC, error) {
-	// Fail at boot, not at first seal: an empty or too-short master key
-	// bricks every write — HKDF stretches the key but cannot conjure entropy.
+	// Empty or too-short master key fails construction; HKDF cannot add entropy.
 	if c == nil || len(c.GetMasterKey()) < 16 {
 		return nil, fmt.Errorf("crypto.master_key is required (min 16 bytes)")
 	}

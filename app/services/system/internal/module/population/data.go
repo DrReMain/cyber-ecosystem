@@ -38,7 +38,7 @@ func (rp *populationRP) List(ctx context.Context, in *PopulationListIn) (*Popula
 		"createdAt": func(sel helper.SQLSelector) { query.Order(sel(population.FieldCreatedAt)) },
 		"updatedAt": func(sel helper.SQLSelector) { query.Order(sel(population.FieldUpdatedAt)) },
 	})
-	total, offset, limit, err := shared.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
+	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
@@ -69,6 +69,6 @@ func mapPopulation(d *ent.Population) *Population {
 		UpdatedAt: d.UpdatedAt,
 		Code:      d.Code,
 		Name:      d.Name,
-		Archetype: d.Archetype,
+		Plane:     d.Plane,
 	}
 }

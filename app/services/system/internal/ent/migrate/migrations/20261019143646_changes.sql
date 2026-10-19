@@ -263,7 +263,7 @@ CREATE TABLE "public"."population" (
   "updated_at" timestamptz NOT NULL,
   "code" character varying NOT NULL,
   "name" character varying NOT NULL,
-  "archetype" character varying NOT NULL,
+  "plane" character varying NOT NULL,
   PRIMARY KEY ("id")
 );
 -- Create index "population_code" to table: "population"
@@ -274,8 +274,8 @@ CREATE INDEX "population_created_at" ON "public"."population" ("created_at");
 CREATE INDEX "population_updated_at" ON "public"."population" ("updated_at");
 -- Set comment to column: "code" on table: "population"
 COMMENT ON COLUMN "public"."population"."code" IS 'join key: membership rows carry this value in population';
--- Set comment to column: "archetype" on table: "population"
-COMMENT ON COLUMN "public"."population"."archetype" IS 'compile-time vocabulary: engine (organizational grants) | patron (identity-is-permission)';
+-- Set comment to column: "plane" on table: "population"
+COMMENT ON COLUMN "public"."population"."plane" IS 'compile-time vocabulary: backend (organizational grants) | member (engine-denied consumer seats)';
 -- Create "principal_role" table
 CREATE TABLE "public"."principal_role" (
   "id" character varying NOT NULL,

@@ -104,6 +104,11 @@ func BirthMonth(v int) predicate.Profile {
 	return predicate.Profile(sql.FieldEQ(FieldBirthMonth, v))
 }
 
+// AgeBand applies equality check predicate on the "age_band" field. It's identical to AgeBandEQ.
+func AgeBand(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldEQ(FieldAgeBand, v))
+}
+
 // AvatarURL applies equality check predicate on the "avatar_url" field. It's identical to AvatarURLEQ.
 func AvatarURL(v string) predicate.Profile {
 	return predicate.Profile(sql.FieldEQ(FieldAvatarURL, v))
@@ -549,6 +554,81 @@ func BirthMonthNotNil() predicate.Profile {
 	return predicate.Profile(sql.FieldNotNull(FieldBirthMonth))
 }
 
+// AgeBandEQ applies the EQ predicate on the "age_band" field.
+func AgeBandEQ(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldEQ(FieldAgeBand, v))
+}
+
+// AgeBandNEQ applies the NEQ predicate on the "age_band" field.
+func AgeBandNEQ(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldNEQ(FieldAgeBand, v))
+}
+
+// AgeBandIn applies the In predicate on the "age_band" field.
+func AgeBandIn(vs ...string) predicate.Profile {
+	return predicate.Profile(sql.FieldIn(FieldAgeBand, vs...))
+}
+
+// AgeBandNotIn applies the NotIn predicate on the "age_band" field.
+func AgeBandNotIn(vs ...string) predicate.Profile {
+	return predicate.Profile(sql.FieldNotIn(FieldAgeBand, vs...))
+}
+
+// AgeBandGT applies the GT predicate on the "age_band" field.
+func AgeBandGT(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldGT(FieldAgeBand, v))
+}
+
+// AgeBandGTE applies the GTE predicate on the "age_band" field.
+func AgeBandGTE(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldGTE(FieldAgeBand, v))
+}
+
+// AgeBandLT applies the LT predicate on the "age_band" field.
+func AgeBandLT(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldLT(FieldAgeBand, v))
+}
+
+// AgeBandLTE applies the LTE predicate on the "age_band" field.
+func AgeBandLTE(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldLTE(FieldAgeBand, v))
+}
+
+// AgeBandContains applies the Contains predicate on the "age_band" field.
+func AgeBandContains(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldContains(FieldAgeBand, v))
+}
+
+// AgeBandHasPrefix applies the HasPrefix predicate on the "age_band" field.
+func AgeBandHasPrefix(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldHasPrefix(FieldAgeBand, v))
+}
+
+// AgeBandHasSuffix applies the HasSuffix predicate on the "age_band" field.
+func AgeBandHasSuffix(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldHasSuffix(FieldAgeBand, v))
+}
+
+// AgeBandIsNil applies the IsNil predicate on the "age_band" field.
+func AgeBandIsNil() predicate.Profile {
+	return predicate.Profile(sql.FieldIsNull(FieldAgeBand))
+}
+
+// AgeBandNotNil applies the NotNil predicate on the "age_band" field.
+func AgeBandNotNil() predicate.Profile {
+	return predicate.Profile(sql.FieldNotNull(FieldAgeBand))
+}
+
+// AgeBandEqualFold applies the EqualFold predicate on the "age_band" field.
+func AgeBandEqualFold(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldEqualFold(FieldAgeBand, v))
+}
+
+// AgeBandContainsFold applies the ContainsFold predicate on the "age_band" field.
+func AgeBandContainsFold(v string) predicate.Profile {
+	return predicate.Profile(sql.FieldContainsFold(FieldAgeBand, v))
+}
+
 // AvatarURLEQ applies the EQ predicate on the "avatar_url" field.
 func AvatarURLEQ(v string) predicate.Profile {
 	return predicate.Profile(sql.FieldEQ(FieldAvatarURL, v))
@@ -672,6 +752,16 @@ func GuardianConsentedAtIsNil() predicate.Profile {
 // GuardianConsentedAtNotNil applies the NotNil predicate on the "guardian_consented_at" field.
 func GuardianConsentedAtNotNil() predicate.Profile {
 	return predicate.Profile(sql.FieldNotNull(FieldGuardianConsentedAt))
+}
+
+// GamesIsNil applies the IsNil predicate on the "games" field.
+func GamesIsNil() predicate.Profile {
+	return predicate.Profile(sql.FieldIsNull(FieldGames))
+}
+
+// GamesNotNil applies the NotNil predicate on the "games" field.
+func GamesNotNil() predicate.Profile {
+	return predicate.Profile(sql.FieldNotNull(FieldGames))
 }
 
 // And groups predicates with the AND operator between them.

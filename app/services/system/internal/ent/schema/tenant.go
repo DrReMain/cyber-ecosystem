@@ -34,7 +34,7 @@ func (Tenant) Edges() []ent.Edge {
 }
 
 func (Tenant) Mixin() []ent.Mixin {
-	// No SoftDelete: a deleted row must not hold the code unique hostage.
+	// No SoftDelete: a deleted row frees the code unique.
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
 		mixins.CreatedUpdatedMixin{},

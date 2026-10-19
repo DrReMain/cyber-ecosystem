@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
+	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/predicate"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 
@@ -69,6 +70,33 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 	return f(ctx, query)
 }
 
+// The GameFunc type is an adapter to allow the use of ordinary function as a Querier.
+type GameFunc func(context.Context, *ent.GameQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f GameFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.GameQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.GameQuery", q)
+}
+
+// The TraverseGame type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseGame func(context.Context, *ent.GameQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseGame) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseGame) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.GameQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.GameQuery", q)
+}
+
 // The ProfileFunc type is an adapter to allow the use of ordinary function as a Querier.
 type ProfileFunc func(context.Context, *ent.ProfileQuery) (ent.Value, error)
 
@@ -99,6 +127,8 @@ func (f TraverseProfile) Traverse(ctx context.Context, q ent.Query) error {
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
+	case *ent.GameQuery:
+		return &query[*ent.GameQuery, predicate.Game, game.OrderOption]{typ: ent.TypeGame, tq: q}, nil
 	case *ent.ProfileQuery:
 		return &query[*ent.ProfileQuery, predicate.Profile, profile.OrderOption]{typ: ent.TypeProfile, tq: q}, nil
 	default:

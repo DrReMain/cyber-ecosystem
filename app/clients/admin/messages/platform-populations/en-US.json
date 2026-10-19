@@ -3,10 +3,10 @@
   "platform_populations_filter_keyword": "Keyword",
   "platform_populations_filter_keyword_placeholder": "Name or code",
   "platform_populations_col_population": "User type",
-  "platform_populations_col_archetype": "Auth mode",
+  "platform_populations_col_plane": "Plane",
   "platform_populations_col_created_at": "Created",
   "platform_populations_col_updated_at": "Updated",
   "platform_populations_empty": "No user types yet",
-  "platform_populations_arch_engine": "Engine-granted",
-  "platform_populations_arch_patron": "Exempt"
+  "platform_populations_plane_backend": "Backend",
+  "platform_populations_plane_member": "Member"
 }

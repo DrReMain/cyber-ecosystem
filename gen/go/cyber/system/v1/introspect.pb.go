@@ -69,7 +69,7 @@ type VerifySessionResponse struct {
 	SessionId     *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	Account       *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=account,proto3" json:"account,omitempty"`
 	Population    *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=population,proto3" json:"population,omitempty"`
-	Archetype     *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=archetype,proto3" json:"archetype,omitempty"`
+	Plane         *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=plane,proto3" json:"plane,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -139,9 +139,9 @@ func (x *VerifySessionResponse) GetPopulation() *wrapperspb.StringValue {
 	return nil
 }
 
-func (x *VerifySessionResponse) GetArchetype() *wrapperspb.StringValue {
+func (x *VerifySessionResponse) GetPlane() *wrapperspb.StringValue {
 	if x != nil {
-		return x.Archetype
+		return x.Plane
 	}
 	return nil
 }
@@ -248,7 +248,7 @@ var File_cyber_system_v1_introspect_proto protoreflect.FileDescriptor
 const file_cyber_system_v1_introspect_proto_rawDesc = "" +
 	"\n" +
 	" cyber/system/v1/introspect.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x16\n" +
-	"\x14VerifySessionRequest\"\xf8\x02\n" +
+	"\x14VerifySessionRequest\"\xf0\x02\n" +
 	"\x15VerifySessionResponse\x125\n" +
 	"\auser_id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x06userId\x129\n" +
 	"\ttenant_id\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\btenantId\x12;\n" +
@@ -257,8 +257,8 @@ const file_cyber_system_v1_introspect_proto_rawDesc = "" +
 	"\aaccount\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\aaccount\x12<\n" +
 	"\n" +
 	"population\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\n" +
-	"population\x12:\n" +
-	"\tarchetype\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\tarchetype\"A\n" +
+	"population\x122\n" +
+	"\x05plane\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\x05plane\"A\n" +
 	"\x15CheckOperationRequest\x12(\n" +
 	"\toperation\x18\x01 \x01(\tB\n" +
 	"\xbaH\a\xc8\x01\x01r\x02\x10\x01R\toperation\"J\n" +
@@ -297,7 +297,7 @@ var file_cyber_system_v1_introspect_proto_depIdxs = []int32{
 	4, // 2: cyber.system.v1.VerifySessionResponse.session_id:type_name -> google.protobuf.StringValue
 	4, // 3: cyber.system.v1.VerifySessionResponse.account:type_name -> google.protobuf.StringValue
 	4, // 4: cyber.system.v1.VerifySessionResponse.population:type_name -> google.protobuf.StringValue
-	4, // 5: cyber.system.v1.VerifySessionResponse.archetype:type_name -> google.protobuf.StringValue
+	4, // 5: cyber.system.v1.VerifySessionResponse.plane:type_name -> google.protobuf.StringValue
 	0, // 6: cyber.system.v1.IntrospectService.VerifySession:input_type -> cyber.system.v1.VerifySessionRequest
 	2, // 7: cyber.system.v1.IntrospectService.CheckOperation:input_type -> cyber.system.v1.CheckOperationRequest
 	1, // 8: cyber.system.v1.IntrospectService.VerifySession:output_type -> cyber.system.v1.VerifySessionResponse

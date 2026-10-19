@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"errors"
 	"fmt"
@@ -73,6 +74,7 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			game.Table:    game.ValidColumn,
 			profile.Table: profile.ValidColumn,
 		})
 	})

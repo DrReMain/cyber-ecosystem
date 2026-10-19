@@ -6,5 +6,13 @@
   "profile_band_label": "年龄段",
   "profile_games_label": "游戏偏好",
   "profile_unset": "未设置",
-  "profile_error_generic": "画像加载失败,请稍后重试"
+  "profile_error_generic": "画像加载失败,请稍后重试",
+  "profile_edit": "编辑资料",
+  "profile_save": "保存",
+  "profile_cancel": "取消",
+  "profile_birth_year": "出生年",
+  "profile_birth_month": "出生月",
+  "profile_guardian": "我已获得监护人同意",
+  "profile_custom_placeholder": "输入自定义游戏名后回车添加",
+  "profile_logout": "退出登录"
 }

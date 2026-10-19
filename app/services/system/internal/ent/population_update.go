@@ -49,16 +49,16 @@ func (_u *PopulationUpdate) SetNillableName(v *string) *PopulationUpdate {
 	return _u
 }
 
-// SetArchetype sets the "archetype" field.
-func (_u *PopulationUpdate) SetArchetype(v string) *PopulationUpdate {
-	_u.mutation.SetArchetype(v)
+// SetPlane sets the "plane" field.
+func (_u *PopulationUpdate) SetPlane(v string) *PopulationUpdate {
+	_u.mutation.SetPlane(v)
 	return _u
 }
 
-// SetNillableArchetype sets the "archetype" field if the given value is not nil.
-func (_u *PopulationUpdate) SetNillableArchetype(v *string) *PopulationUpdate {
+// SetNillablePlane sets the "plane" field if the given value is not nil.
+func (_u *PopulationUpdate) SetNillablePlane(v *string) *PopulationUpdate {
 	if v != nil {
-		_u.SetArchetype(*v)
+		_u.SetPlane(*v)
 	}
 	return _u
 }
@@ -111,9 +111,9 @@ func (_u *PopulationUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Population.name": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.Archetype(); ok {
-		if err := population.ArchetypeValidator(v); err != nil {
-			return &ValidationError{Name: "archetype", err: fmt.Errorf(`ent: validator failed for field "Population.archetype": %w`, err)}
+	if v, ok := _u.mutation.Plane(); ok {
+		if err := population.PlaneValidator(v); err != nil {
+			return &ValidationError{Name: "plane", err: fmt.Errorf(`ent: validator failed for field "Population.plane": %w`, err)}
 		}
 	}
 	return nil
@@ -143,8 +143,8 @@ func (_u *PopulationUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(population.FieldName, field.TypeString, value)
 	}
-	if value, ok := _u.mutation.Archetype(); ok {
-		_spec.SetField(population.FieldArchetype, field.TypeString, value)
+	if value, ok := _u.mutation.Plane(); ok {
+		_spec.SetField(population.FieldPlane, field.TypeString, value)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -188,16 +188,16 @@ func (_u *PopulationUpdateOne) SetNillableName(v *string) *PopulationUpdateOne {
 	return _u
 }
 
-// SetArchetype sets the "archetype" field.
-func (_u *PopulationUpdateOne) SetArchetype(v string) *PopulationUpdateOne {
-	_u.mutation.SetArchetype(v)
+// SetPlane sets the "plane" field.
+func (_u *PopulationUpdateOne) SetPlane(v string) *PopulationUpdateOne {
+	_u.mutation.SetPlane(v)
 	return _u
 }
 
-// SetNillableArchetype sets the "archetype" field if the given value is not nil.
-func (_u *PopulationUpdateOne) SetNillableArchetype(v *string) *PopulationUpdateOne {
+// SetNillablePlane sets the "plane" field if the given value is not nil.
+func (_u *PopulationUpdateOne) SetNillablePlane(v *string) *PopulationUpdateOne {
 	if v != nil {
-		_u.SetArchetype(*v)
+		_u.SetPlane(*v)
 	}
 	return _u
 }
@@ -263,9 +263,9 @@ func (_u *PopulationUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Population.name": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.Archetype(); ok {
-		if err := population.ArchetypeValidator(v); err != nil {
-			return &ValidationError{Name: "archetype", err: fmt.Errorf(`ent: validator failed for field "Population.archetype": %w`, err)}
+	if v, ok := _u.mutation.Plane(); ok {
+		if err := population.PlaneValidator(v); err != nil {
+			return &ValidationError{Name: "plane", err: fmt.Errorf(`ent: validator failed for field "Population.plane": %w`, err)}
 		}
 	}
 	return nil
@@ -312,8 +312,8 @@ func (_u *PopulationUpdateOne) sqlSave(ctx context.Context) (_node *Population, 
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(population.FieldName, field.TypeString, value)
 	}
-	if value, ok := _u.mutation.Archetype(); ok {
-		_spec.SetField(population.FieldArchetype, field.TypeString, value)
+	if value, ok := _u.mutation.Plane(); ok {
+		_spec.SetField(population.FieldPlane, field.TypeString, value)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &Population{config: _u.config}

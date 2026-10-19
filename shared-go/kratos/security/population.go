@@ -1,22 +1,24 @@
 package security
 
-// The population archetype vocabulary is the compile-time half of the
-// population axis (pattern: small vocabulary at compile time, instances as
-// data rows). engine = organizational grants semantics; patron =
-// identity-is-permission. A third word (service, non-human principals) has
-// a reserved slot but no resident until its second consumer exists.
+// The population plane vocabulary is the compile-time half of the population
+// axis (pattern: small vocabulary at compile time, instances as data rows).
+// backend = the operator world: seats read organizational grants. member =
+// the consumer world: seats are structurally denied every gated face —
+// C-end access rides the builtin (session-only) rung plus app-domain logic.
+// Platform supers are backend seats in the default tenant sealed by the
+// platform guard and a seeded super grant; no third identity lane exists.
 const (
-	ArchetypeEngine = "engine"
-	ArchetypePatron = "patron"
+	PlaneBackend = "backend"
+	PlaneMember  = "member"
 )
 
-// ValidArchetype reports membership in the compile-time vocabulary — the
-// single source every archetype input validates against.
-func ValidArchetype(a string) bool {
-	return a == ArchetypeEngine || a == ArchetypePatron
+// ValidPlane reports membership in the compile-time vocabulary — the single
+// source every plane input validates against.
+func ValidPlane(p string) bool {
+	return p == PlaneBackend || p == PlaneMember
 }
 
-// DefaultPopulation is the first engine instance and the degenerate mode's
+// DefaultPopulation is the first backend instance and the degenerate mode's
 // whole vocabulary: products that never configure populations run everyone
 // as this single row, unaware it exists.
 const DefaultPopulation = "user"

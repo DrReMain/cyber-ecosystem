@@ -6481,7 +6481,7 @@ type PopulationMutation struct {
 	updated_at    *time.Time
 	code          *string
 	name          *string
-	archetype     *string
+	plane         *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Population, error)
@@ -6736,40 +6736,40 @@ func (m *PopulationMutation) ResetName() {
 	m.name = nil
 }
 
-// SetArchetype sets the "archetype" field.
-func (m *PopulationMutation) SetArchetype(s string) {
-	m.archetype = &s
+// SetPlane sets the "plane" field.
+func (m *PopulationMutation) SetPlane(s string) {
+	m.plane = &s
 }
 
-// Archetype returns the value of the "archetype" field in the mutation.
-func (m *PopulationMutation) Archetype() (r string, exists bool) {
-	v := m.archetype
+// Plane returns the value of the "plane" field in the mutation.
+func (m *PopulationMutation) Plane() (r string, exists bool) {
+	v := m.plane
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldArchetype returns the old "archetype" field's value of the Population entity.
+// OldPlane returns the old "plane" field's value of the Population entity.
 // If the Population object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PopulationMutation) OldArchetype(ctx context.Context) (v string, err error) {
+func (m *PopulationMutation) OldPlane(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldArchetype is only allowed on UpdateOne operations")
+		return v, errors.New("OldPlane is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldArchetype requires an ID field in the mutation")
+		return v, errors.New("OldPlane requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldArchetype: %w", err)
+		return v, fmt.Errorf("querying old value for OldPlane: %w", err)
 	}
-	return oldValue.Archetype, nil
+	return oldValue.Plane, nil
 }
 
-// ResetArchetype resets all changes to the "archetype" field.
-func (m *PopulationMutation) ResetArchetype() {
-	m.archetype = nil
+// ResetPlane resets all changes to the "plane" field.
+func (m *PopulationMutation) ResetPlane() {
+	m.plane = nil
 }
 
 // Where appends a list predicates to the PopulationMutation builder.
@@ -6819,8 +6819,8 @@ func (m *PopulationMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, population.FieldName)
 	}
-	if m.archetype != nil {
-		fields = append(fields, population.FieldArchetype)
+	if m.plane != nil {
+		fields = append(fields, population.FieldPlane)
 	}
 	return fields
 }
@@ -6838,8 +6838,8 @@ func (m *PopulationMutation) Field(name string) (ent.Value, bool) {
 		return m.Code()
 	case population.FieldName:
 		return m.Name()
-	case population.FieldArchetype:
-		return m.Archetype()
+	case population.FieldPlane:
+		return m.Plane()
 	}
 	return nil, false
 }
@@ -6857,8 +6857,8 @@ func (m *PopulationMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldCode(ctx)
 	case population.FieldName:
 		return m.OldName(ctx)
-	case population.FieldArchetype:
-		return m.OldArchetype(ctx)
+	case population.FieldPlane:
+		return m.OldPlane(ctx)
 	}
 	return nil, fmt.Errorf("unknown Population field %s", name)
 }
@@ -6896,12 +6896,12 @@ func (m *PopulationMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case population.FieldArchetype:
+	case population.FieldPlane:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetArchetype(v)
+		m.SetPlane(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Population field %s", name)
@@ -6964,8 +6964,8 @@ func (m *PopulationMutation) ResetField(name string) error {
 	case population.FieldName:
 		m.ResetName()
 		return nil
-	case population.FieldArchetype:
-		m.ResetArchetype()
+	case population.FieldPlane:
+		m.ResetPlane()
 		return nil
 	}
 	return fmt.Errorf("unknown Population field %s", name)

@@ -119,9 +119,8 @@ func TestListDelegates(t *testing.T) {
 
 // SetEnabled -----------------------------------------------------------------------------------------------------------
 
-// The default tenant is the degenerate mode's whole world: disabling it
-// bricks every login including the admin who could undo it. The registry
-// refuses at the only write entrance.
+// The default tenant cannot be disabled: it would lock out every login,
+// including the admin who could undo it.
 func TestSetEnabledDefaultDisableProtected(t *testing.T) {
 	rp := &fakeTenantRP{rows: map[string]*Tenant{"t-default": defaultRow(true)}}
 	uc := newTenantUC(rp)

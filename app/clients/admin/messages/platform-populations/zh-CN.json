@@ -3,10 +3,10 @@
   "platform_populations_filter_keyword": "关键词",
   "platform_populations_filter_keyword_placeholder": "名称或编码",
   "platform_populations_col_population": "用户类型",
-  "platform_populations_col_archetype": "授权模式",
+  "platform_populations_col_plane": "身份面",
   "platform_populations_col_created_at": "创建时间",
   "platform_populations_col_updated_at": "更新时间",
   "platform_populations_empty": "暂无用户类型",
-  "platform_populations_arch_engine": "引擎授权",
-  "platform_populations_arch_patron": "免授权"
+  "platform_populations_plane_backend": "后台",
+  "platform_populations_plane_member": "会员"
 }

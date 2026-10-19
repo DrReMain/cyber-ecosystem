@@ -114,7 +114,32 @@ func (rp *userRP) List(ctx context.Context, in *UserListIn) (*UserListOut, error
 		"updatedAt": func(sel helper.SQLSelector) { query.Order(sel(user.FieldUpdatedAt)) },
 	})
 
-	total, offset, limit, err := shared.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
+	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	us, err := query.All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return &UserListOut{
+		PageResponse: helper.BuildPageResponse(total, offset, limit),
+		List:         utils.SliceMap(us, mapUser),
+	}, nil
+}
+
+func (rp *userRP) ListByPopulation(ctx context.Context, in *UserListIn) (*UserListOut, error) {
+	query := rp.Platform.GetClient(ctx).User.Query()
+	if subject, ok := security.SubjectFromCtx(ctx); ok {
+		query.Where(populationNarrowing(subject.TenantID, utils.Deref(in.Population, "")))
+	}
+	helper.ApplyOrderBy(helper.ParseOrderBy(in.OrderBy), ent.Asc, ent.Desc, helper.FOMapping{
+		"account":   func(sel helper.SQLSelector) { query.Order(sel(user.FieldAccount)) },
+		"createdAt": func(sel helper.SQLSelector) { query.Order(sel(user.FieldCreatedAt)) },
+		"updatedAt": func(sel helper.SQLSelector) { query.Order(sel(user.FieldUpdatedAt)) },
+	})
+
+	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeUnlimit)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
@@ -200,9 +225,8 @@ func (rp *userRP) DeleteCredentialsByUser(ctx context.Context, userID string) er
 	return nil
 }
 
-// EnsureSeat inserts the seat unless it already exists — the unique index
-// is the idempotence, so a lost race is the same statement as a no-op.
 func (rp *userRP) EnsureSeat(ctx context.Context, seat *Seat) error {
+	// the unique index is the idempotence; a lost race is a no-op
 	if err := rp.Platform.GetClient(ctx).Membership.Create().
 		SetUserID(seat.UserID).SetTenantID(seat.TenantID).SetPopulation(seat.Population).
 		OnConflictColumns(membership.FieldUserID, membership.FieldTenantID, membership.FieldPopulation).
@@ -348,9 +372,20 @@ func seatNarrowing(tenantID string) predicate.User {
 			entsql.NotIn(
 				m.C(membership.FieldPopulation),
 				entsql.Select(pops.C(population.FieldCode)).From(pops).Where(
-					entsql.EQ(pops.C(population.FieldArchetype), security.ArchetypePatron),
+					entsql.EQ(pops.C(population.FieldPlane), security.PlaneMember),
 				),
 			),
+		))))
+	})
+}
+
+func populationNarrowing(tenantID, populationCode string) predicate.User {
+	return predicate.User(func(s *entsql.Selector) {
+		m := entsql.Table(membership.Table)
+		s.Where(entsql.Exists(entsql.Select(m.C(membership.FieldUserID)).From(m).Where(entsql.And(
+			entsql.EQ(m.C(membership.FieldTenantID), tenantID),
+			entsql.EQ(m.C(membership.FieldUserID), entsql.Raw(s.C(user.FieldID))),
+			entsql.EQ(m.C(membership.FieldPopulation), populationCode),
 		))))
 	})
 }

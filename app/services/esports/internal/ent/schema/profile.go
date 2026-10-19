@@ -10,6 +10,7 @@ import (
 	"cyber-ecosystem/shared-go/orm/ent/mixins"
 
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/local_mixins"
+	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
 )
 
 type Profile struct {
@@ -26,10 +27,14 @@ func (Profile) Fields() []ent.Field {
 			Comment("birth year; year+month is the collected granularity, a day is fabricated precision"),
 		field.Int("birth_month").Optional().Nillable().Min(1).Max(12).
 			Comment("birth month 1-12"),
+		field.String("age_band").Optional().Nillable().MaxRuneLen(16).
+			Comment("derived at write from birth year/month; 8-band word set under12|12-14|15-17|18-22|23-25|26-29|30-40|over40; null while birth unknown"),
 		field.String("avatar_url").Optional().Nillable().MaxRuneLen(500).
 			Comment("avatar URL; wechat prefill hydrates identity-side, storage lives here"),
 		field.Time("guardian_consented_at").Optional().Nillable().
 			Comment("under-13 hard-gate stamp, server-written only; null = not consented"),
+		field.JSON("games", []types.GameEntry{}).Optional().
+			Comment("replace-set preference entries (catalog ref or custom name, exactly one set per entry)"),
 	}
 }
 

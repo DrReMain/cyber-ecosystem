@@ -25,8 +25,8 @@ type Population struct {
 	Code string `json:"code,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// compile-time vocabulary: engine (organizational grants) | patron (identity-is-permission)
-	Archetype    string `json:"archetype,omitempty"`
+	// compile-time vocabulary: backend (organizational grants) | member (engine-denied consumer seats)
+	Plane        string `json:"plane,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -35,7 +35,7 @@ func (*Population) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case population.FieldID, population.FieldCode, population.FieldName, population.FieldArchetype:
+		case population.FieldID, population.FieldCode, population.FieldName, population.FieldPlane:
 			values[i] = new(sql.NullString)
 		case population.FieldCreatedAt, population.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -84,11 +84,11 @@ func (_m *Population) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Name = value.String
 			}
-		case population.FieldArchetype:
+		case population.FieldPlane:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field archetype", values[i])
+				return fmt.Errorf("unexpected type %T for field plane", values[i])
 			} else if value.Valid {
-				_m.Archetype = value.String
+				_m.Plane = value.String
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -138,8 +138,8 @@ func (_m *Population) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
-	builder.WriteString("archetype=")
-	builder.WriteString(_m.Archetype)
+	builder.WriteString("plane=")
+	builder.WriteString(_m.Plane)
 	builder.WriteByte(')')
 	return builder.String()
 }

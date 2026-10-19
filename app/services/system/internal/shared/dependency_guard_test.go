@@ -13,12 +13,11 @@ import (
 )
 
 // Static guards for the dependency rules as code: the module DAG, the
-// shared-contract seams that must hold until the multi-service split, and
-// the composition layering (cmd/app wires through bootstrap; shared stays a
-// contracts-only kernel; injected app contracts land in module biz
-// constructors). A pure-function property like compile() is
-// review-enforced — a file walk cannot see it; the rest is checked here,
-// plus single-sourcing of the ABAC vocabulary.
+// shared-contract seams, and the composition layering (cmd/app wires
+// through bootstrap; shared stays a contracts-only kernel; injected app
+// contracts land in module biz constructors). A pure-function property like
+// compile() is review-enforced — a file walk cannot see it; the rest is
+// checked here, plus single-sourcing of the ABAC vocabulary.
 
 // bannedImports maps a package directory (relative to internal/, prefix
 // match) to import markers it must not contain. Direct imports only: a
@@ -35,8 +34,7 @@ var bannedImports = map[string][]string{
 	"module/dept":   {"module/authz"},
 	"module/user":   {"module/authz", "module/auth"},
 	"module/role":   {"module/user"},
-	// Seam 1: the session-auth closure stays free of ent so it can move to
-	// shared-go at the split as-is.
+	// Seam 1: the session-auth closure stays free of ent.
 	"module/auth": {"internal/ent"},
 	// The kernel-to-schema direction is one-way (shared → platform → ent);
 	// an import back closes the cycle.
@@ -65,8 +63,8 @@ func TestModuleDependencyDAG(t *testing.T) {
 		if len(files) == 0 {
 			if _, statErr := os.Stat(filepath.Join("..", dir)); statErr == nil {
 				// The directory exists but matched nothing: renamed files or
-				// an empty package. A not-yet-created module (e.g. policy
-				// before S2) is expected to match nothing for now.
+				// an empty package. A not-yet-created module is expected to
+				// match nothing.
 				t.Errorf("rule %q matched no files — stale directory name?", dir)
 			}
 		}

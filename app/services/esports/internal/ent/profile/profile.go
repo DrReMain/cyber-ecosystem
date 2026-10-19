@@ -30,10 +30,14 @@ const (
 	FieldBirthYear = "birth_year"
 	// FieldBirthMonth holds the string denoting the birth_month field in the database.
 	FieldBirthMonth = "birth_month"
+	// FieldAgeBand holds the string denoting the age_band field in the database.
+	FieldAgeBand = "age_band"
 	// FieldAvatarURL holds the string denoting the avatar_url field in the database.
 	FieldAvatarURL = "avatar_url"
 	// FieldGuardianConsentedAt holds the string denoting the guardian_consented_at field in the database.
 	FieldGuardianConsentedAt = "guardian_consented_at"
+	// FieldGames holds the string denoting the games field in the database.
+	FieldGames = "games"
 	// Table holds the table name of the profile in the database.
 	Table = "profile"
 )
@@ -49,8 +53,10 @@ var Columns = []string{
 	FieldNickname,
 	FieldBirthYear,
 	FieldBirthMonth,
+	FieldAgeBand,
 	FieldAvatarURL,
 	FieldGuardianConsentedAt,
+	FieldGames,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -85,6 +91,8 @@ var (
 	NicknameValidator func(string) error
 	// BirthMonthValidator is a validator for the "birth_month" field. It is called by the builders before save.
 	BirthMonthValidator func(int) error
+	// AgeBandValidator is a validator for the "age_band" field. It is called by the builders before save.
+	AgeBandValidator func(string) error
 	// AvatarURLValidator is a validator for the "avatar_url" field. It is called by the builders before save.
 	AvatarURLValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
@@ -139,6 +147,11 @@ func ByBirthYear(opts ...sql.OrderTermOption) OrderOption {
 // ByBirthMonth orders the results by the birth_month field.
 func ByBirthMonth(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBirthMonth, opts...).ToFunc()
+}
+
+// ByAgeBand orders the results by the age_band field.
+func ByAgeBand(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAgeBand, opts...).ToFunc()
 }
 
 // ByAvatarURL orders the results by the avatar_url field.

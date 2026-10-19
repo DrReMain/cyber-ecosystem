@@ -59,7 +59,7 @@ func (s *IntrospectService) VerifySession(ctx context.Context, in *systempb.Veri
 		SessionId:  utils.StringW(subject.SessionID),
 		Account:    utils.StringW(account),
 		Population: utils.StringW(subject.Population),
-		Archetype:  utils.StringW(subject.Archetype),
+		Plane:      utils.StringW(subject.Plane),
 	}, nil
 }
 

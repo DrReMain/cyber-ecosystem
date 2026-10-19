@@ -6,12 +6,14 @@ import (
 	"context"
 	"cyber-ecosystem/app/services/esports/internal/ent/predicate"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
+	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
 	"errors"
 	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 )
 
@@ -129,6 +131,26 @@ func (_u *ProfileUpdate) ClearBirthMonth() *ProfileUpdate {
 	return _u
 }
 
+// SetAgeBand sets the "age_band" field.
+func (_u *ProfileUpdate) SetAgeBand(v string) *ProfileUpdate {
+	_u.mutation.SetAgeBand(v)
+	return _u
+}
+
+// SetNillableAgeBand sets the "age_band" field if the given value is not nil.
+func (_u *ProfileUpdate) SetNillableAgeBand(v *string) *ProfileUpdate {
+	if v != nil {
+		_u.SetAgeBand(*v)
+	}
+	return _u
+}
+
+// ClearAgeBand clears the value of the "age_band" field.
+func (_u *ProfileUpdate) ClearAgeBand() *ProfileUpdate {
+	_u.mutation.ClearAgeBand()
+	return _u
+}
+
 // SetAvatarURL sets the "avatar_url" field.
 func (_u *ProfileUpdate) SetAvatarURL(v string) *ProfileUpdate {
 	_u.mutation.SetAvatarURL(v)
@@ -166,6 +188,24 @@ func (_u *ProfileUpdate) SetNillableGuardianConsentedAt(v *time.Time) *ProfileUp
 // ClearGuardianConsentedAt clears the value of the "guardian_consented_at" field.
 func (_u *ProfileUpdate) ClearGuardianConsentedAt() *ProfileUpdate {
 	_u.mutation.ClearGuardianConsentedAt()
+	return _u
+}
+
+// SetGames sets the "games" field.
+func (_u *ProfileUpdate) SetGames(v []types.GameEntry) *ProfileUpdate {
+	_u.mutation.SetGames(v)
+	return _u
+}
+
+// AppendGames appends value to the "games" field.
+func (_u *ProfileUpdate) AppendGames(v []types.GameEntry) *ProfileUpdate {
+	_u.mutation.AppendGames(v)
+	return _u
+}
+
+// ClearGames clears the value of the "games" field.
+func (_u *ProfileUpdate) ClearGames() *ProfileUpdate {
+	_u.mutation.ClearGames()
 	return _u
 }
 
@@ -228,6 +268,11 @@ func (_u *ProfileUpdate) check() error {
 			return &ValidationError{Name: "birth_month", err: fmt.Errorf(`ent: validator failed for field "Profile.birth_month": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.AgeBand(); ok {
+		if err := profile.AgeBandValidator(v); err != nil {
+			return &ValidationError{Name: "age_band", err: fmt.Errorf(`ent: validator failed for field "Profile.age_band": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.AvatarURL(); ok {
 		if err := profile.AvatarURLValidator(v); err != nil {
 			return &ValidationError{Name: "avatar_url", err: fmt.Errorf(`ent: validator failed for field "Profile.avatar_url": %w`, err)}
@@ -287,6 +332,12 @@ func (_u *ProfileUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.BirthMonthCleared() {
 		_spec.ClearField(profile.FieldBirthMonth, field.TypeInt)
 	}
+	if value, ok := _u.mutation.AgeBand(); ok {
+		_spec.SetField(profile.FieldAgeBand, field.TypeString, value)
+	}
+	if _u.mutation.AgeBandCleared() {
+		_spec.ClearField(profile.FieldAgeBand, field.TypeString)
+	}
 	if value, ok := _u.mutation.AvatarURL(); ok {
 		_spec.SetField(profile.FieldAvatarURL, field.TypeString, value)
 	}
@@ -298,6 +349,17 @@ func (_u *ProfileUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.GuardianConsentedAtCleared() {
 		_spec.ClearField(profile.FieldGuardianConsentedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Games(); ok {
+		_spec.SetField(profile.FieldGames, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedGames(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, profile.FieldGames, value)
+		})
+	}
+	if _u.mutation.GamesCleared() {
+		_spec.ClearField(profile.FieldGames, field.TypeJSON)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -421,6 +483,26 @@ func (_u *ProfileUpdateOne) ClearBirthMonth() *ProfileUpdateOne {
 	return _u
 }
 
+// SetAgeBand sets the "age_band" field.
+func (_u *ProfileUpdateOne) SetAgeBand(v string) *ProfileUpdateOne {
+	_u.mutation.SetAgeBand(v)
+	return _u
+}
+
+// SetNillableAgeBand sets the "age_band" field if the given value is not nil.
+func (_u *ProfileUpdateOne) SetNillableAgeBand(v *string) *ProfileUpdateOne {
+	if v != nil {
+		_u.SetAgeBand(*v)
+	}
+	return _u
+}
+
+// ClearAgeBand clears the value of the "age_band" field.
+func (_u *ProfileUpdateOne) ClearAgeBand() *ProfileUpdateOne {
+	_u.mutation.ClearAgeBand()
+	return _u
+}
+
 // SetAvatarURL sets the "avatar_url" field.
 func (_u *ProfileUpdateOne) SetAvatarURL(v string) *ProfileUpdateOne {
 	_u.mutation.SetAvatarURL(v)
@@ -458,6 +540,24 @@ func (_u *ProfileUpdateOne) SetNillableGuardianConsentedAt(v *time.Time) *Profil
 // ClearGuardianConsentedAt clears the value of the "guardian_consented_at" field.
 func (_u *ProfileUpdateOne) ClearGuardianConsentedAt() *ProfileUpdateOne {
 	_u.mutation.ClearGuardianConsentedAt()
+	return _u
+}
+
+// SetGames sets the "games" field.
+func (_u *ProfileUpdateOne) SetGames(v []types.GameEntry) *ProfileUpdateOne {
+	_u.mutation.SetGames(v)
+	return _u
+}
+
+// AppendGames appends value to the "games" field.
+func (_u *ProfileUpdateOne) AppendGames(v []types.GameEntry) *ProfileUpdateOne {
+	_u.mutation.AppendGames(v)
+	return _u
+}
+
+// ClearGames clears the value of the "games" field.
+func (_u *ProfileUpdateOne) ClearGames() *ProfileUpdateOne {
+	_u.mutation.ClearGames()
 	return _u
 }
 
@@ -531,6 +631,11 @@ func (_u *ProfileUpdateOne) check() error {
 	if v, ok := _u.mutation.BirthMonth(); ok {
 		if err := profile.BirthMonthValidator(v); err != nil {
 			return &ValidationError{Name: "birth_month", err: fmt.Errorf(`ent: validator failed for field "Profile.birth_month": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.AgeBand(); ok {
+		if err := profile.AgeBandValidator(v); err != nil {
+			return &ValidationError{Name: "age_band", err: fmt.Errorf(`ent: validator failed for field "Profile.age_band": %w`, err)}
 		}
 	}
 	if v, ok := _u.mutation.AvatarURL(); ok {
@@ -609,6 +714,12 @@ func (_u *ProfileUpdateOne) sqlSave(ctx context.Context) (_node *Profile, err er
 	if _u.mutation.BirthMonthCleared() {
 		_spec.ClearField(profile.FieldBirthMonth, field.TypeInt)
 	}
+	if value, ok := _u.mutation.AgeBand(); ok {
+		_spec.SetField(profile.FieldAgeBand, field.TypeString, value)
+	}
+	if _u.mutation.AgeBandCleared() {
+		_spec.ClearField(profile.FieldAgeBand, field.TypeString)
+	}
 	if value, ok := _u.mutation.AvatarURL(); ok {
 		_spec.SetField(profile.FieldAvatarURL, field.TypeString, value)
 	}
@@ -620,6 +731,17 @@ func (_u *ProfileUpdateOne) sqlSave(ctx context.Context) (_node *Profile, err er
 	}
 	if _u.mutation.GuardianConsentedAtCleared() {
 		_spec.ClearField(profile.FieldGuardianConsentedAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Games(); ok {
+		_spec.SetField(profile.FieldGames, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedGames(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, profile.FieldGames, value)
+		})
+	}
+	if _u.mutation.GamesCleared() {
+		_spec.ClearField(profile.FieldGames, field.TypeJSON)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &Profile{config: _u.config}

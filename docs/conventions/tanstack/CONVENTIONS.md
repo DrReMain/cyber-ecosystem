@@ -40,13 +40,11 @@ enums).
 **Server-streaming is consumed imperatively, outside the query cache.** The
 transport's stream entry takes a generated method descriptor (`*_pb.ts`) plus
 one `AbortController` per stream; a feature hook drives it directly and
-accumulates frames into component state (or a store interface the page
-injects — the chat hook takes a `ConversationStore` precisely so the backing
-impl can change without touching the hook). Frame intake normalizes protojson
-omissions (`frame.contentDelta ?? ""` — unset scalars are absent, not ""),
-and cancellation is the normal close: abort, drop the abort error, release
-the controller in `finally`; a controller map keyed by stream id guards
-against double-fire.
+accumulates frames into component state or a page-injected store interface.
+Frame intake normalizes protojson omissions (`frame.contentDelta ?? ""` —
+unset scalars are absent, not ""). Abort is the normal close: drop the abort
+error, release the controller in `finally`; a controller map keyed by stream
+id guards against double-fire.
 
 **Persisted store state is superjson-wrapped.** Cookie-persisted stores
 serialize through superjson (a `{"json":…}` envelope, `shared-ts/store`); a raw
@@ -65,13 +63,12 @@ a layout directory plus a login UI kit:
   mutation hook, the assembled login page), and a root `area.ts` — the
   single source of the area's binding (namespace, paths, login route id).
   The layout mounts the area's UI-library provider itself. Stores live in
-  `src/stores/` under the single eager-registration barrel — load-bearing:
-  the defineStore registry drives server-side cookie collection, and a
-  late code-split registration would miss hydration. One store per file;
-  an area-scoped store carries the area namespace in directory, variable,
-  and cookie-key names (`dashboard-preferences/` →
-  `dashboardPreferencesStore` → `store_dashboard_preferences`) so sibling
-  layouts never collide.
+  `src/stores/` under the single eager-registration barrel (the registry
+  drives server-side cookie collection — a late code-split registration
+  misses hydration); one store per file; an area-scoped store carries the
+  area namespace in directory, variable, and cookie-key names
+  (`dashboard-preferences` → `dashboardPreferencesStore` →
+  `store_dashboard_preferences`) so sibling layouts never collide.
 - `features/login-<name>/` — a pure UI kit: `login-shell.tsx` (canvas +
   panel slots), `ui/` (form, brand pieces, stub affordances),
   `redirect.ts` (open-redirect hygiene, zero area knowledge). No layout
@@ -130,8 +127,8 @@ Three tiers:
 
 - A route owns a tabbar tab iff its `staticData` declares a `title`; title-less routes render inside the nearest titled ancestor's tab (the profile group pattern).
 - `key` = resolved pathname (search excluded; one tab per param-route instance, e.g. each `/order/$id` id); `href` = full href including search; `pattern` = route `fullPath`, kept for permission-filtered restore.
-- Activation, close, and href capture compare the **exact key** from `tabFromMatches` — path-prefix ownership is forbidden (it once made the area root the fallback owner of every URL).
-- Router `location` and `matches` are separate subscriptions that lag each other by one commit during navigations (location flips optimistically at navigation start); every matches-derived tab decision gates behind `matchesAgreeWith(matches, pathname)` — torn frames can neither capture a foreign href nor re-append a just-closed tab.
+- Activation, close, and href capture compare the **exact key** from `tabFromMatches` — path-prefix ownership is forbidden.
+- Router `location` and `matches` lag each other by one commit during navigations; every matches-derived tab decision gates behind `matchesAgreeWith(matches, pathname)` — torn frames can neither capture a foreign href nor re-append a just-closed tab.
 - Session restore resolves `pattern` against the permission-filtered nav index; hidden routes (`menu.hide`) restore via their persisted title; a pattern present in the unfiltered index is a permission-dropped visible route and stays closed.
 - The active tab seeds through the same pattern rule — a direct URL load lands in the bar even with no persisted record; the restore effect rebuilds membership after the append effect's mount run and must not drop it.
 - The home tab is seeded only when a titled leaf exists at the area root — apps without a workbench start with an empty bar.
@@ -255,15 +252,15 @@ render vocabulary → status vocabulary → `act_` → empty states.
   deleted with it.
 
 Adding a message directory requires registering it in
-`project.inlang/settings.json` `pathPattern` (explicit list — globs are not
-supported). After renaming/moving/deleting keys, force regeneration
-(`rm -rf src/paraglide`, rebuild) and verify — the build may skip
-regeneration, and compiled files are named **lowercased id + numeric dedup
-suffix** (`error_SYSTEM_TENANT_DISABLED` → `error_system_tenant_disabled20.js`),
-so an exact-case grep of the output is always a false negative (`grep -i` at
-minimum). The build does not type-check message references — typecheck does,
-and it is the guard that catches stale key references (including
-`staticData` title strings typed as `NoParamMessageKey`).
+`project.inlang/settings.json` `pathPattern` (explicit list — no globs).
+After renaming/moving/deleting keys, force regeneration (`rm -rf
+src/paraglide`, rebuild) and verify: the build may skip regeneration, and
+compiled files are named **lowercased id + numeric dedup suffix**
+(`error_SYSTEM_TENANT_DISABLED` → `error_system_tenant_disabled20.js`), so an
+exact-case grep of the output is always a false negative. The build does not
+type-check message references — typecheck does, and it is the guard that
+catches stale key references (including `staticData` titles typed as
+`NoParamMessageKey`).
 
 Adding a locale is a three-point registration: the `locales` array in
 `project.inlang/settings.json` (the `{locale}` pathPattern entries pick the
@@ -380,14 +377,12 @@ Verified behavior (pinned laws, not observations):
 
 Session-flow navigations (kick mirror, self-kick, logout, expired-param
 strip) pass `viewTransition: false`: the View Transitions API skips the
-**entire commit** in a hidden document (spec InvalidStateError), which
-strands a background kick on the old page — a stranded kick then only
-recovers via focus-refetch, which `staleTime` can suppress inside its
-window. Any other hidden-tab transition abort is normalized to the
-silent `canceled` word by the domain's view-transition source adapter.
-Every session exit — guard redirect, watcher kick, and deliberate logout
-alike — hands the current href to the login page as `?redirect=` so
-re-login returns to the origin.
+**entire commit** in a hidden document (spec InvalidStateError), stranding a
+background kick on the old page — its only recovery is focus-refetch, which
+`staleTime` can suppress. Any other hidden-tab transition abort normalizes
+to the silent `canceled` word. Every session exit — guard redirect, watcher
+kick, deliberate logout — hands the current href to the login page as
+`?redirect=` so re-login returns to the origin.
 
 View-transition geometry is percentage-based, never px (px resolves against
 the snapshot containing block and drifts); DOM mutations in transition

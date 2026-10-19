@@ -9,6 +9,50 @@ import (
 )
 
 var (
+	// GameColumns holds the columns for the "game" table.
+	GameColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "code", Type: field.TypeString, Size: 50, Comment: "immutable catalog code join key (e.g. lol); born once, referenced forever"},
+		{Name: "name", Type: field.TypeString, Size: 100, Comment: "display title, legacy experience data"},
+		{Name: "category", Type: field.TypeString, Nullable: true, Size: 16, Comment: "vocabulary fps|moba|... — open word set, admin-managed; new categories classify in without a contract change"},
+		{Name: "icon_url", Type: field.TypeString, Nullable: true, Size: 500, Comment: "icon URL; hydrated from file service at render"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 500, Comment: "short catalog blurb"},
+	}
+	// GameTable holds the schema information for the "game" table.
+	GameTable = &schema.Table{
+		Name:       "game",
+		Columns:    GameColumns,
+		PrimaryKey: []*schema.Column{GameColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "game_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{GameColumns[1]},
+			},
+			{
+				Name:    "game_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{GameColumns[2]},
+			},
+			{
+				Name:    "game_tenant_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{GameColumns[3], GameColumns[1]},
+			},
+			{
+				Name:    "game_code",
+				Unique:  true,
+				Columns: []*schema.Column{GameColumns[5]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+		},
+	}
 	// ProfileColumns holds the columns for the "profile" table.
 	ProfileColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -20,8 +64,10 @@ var (
 		{Name: "nickname", Type: field.TypeString, Nullable: true, Size: 12, Comment: "display name; 2-12 chars once set (boundary-validated, not a DB concern)"},
 		{Name: "birth_year", Type: field.TypeInt, Nullable: true, Comment: "birth year; year+month is the collected granularity, a day is fabricated precision"},
 		{Name: "birth_month", Type: field.TypeInt, Nullable: true, Comment: "birth month 1-12"},
+		{Name: "age_band", Type: field.TypeString, Nullable: true, Size: 16, Comment: "derived at write from birth year/month; 8-band word set under12|12-14|15-17|18-22|23-25|26-29|30-40|over40; null while birth unknown"},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true, Size: 500, Comment: "avatar URL; wechat prefill hydrates identity-side, storage lives here"},
 		{Name: "guardian_consented_at", Type: field.TypeTime, Nullable: true, Comment: "under-13 hard-gate stamp, server-written only; null = not consented"},
+		{Name: "games", Type: field.TypeJSON, Nullable: true, Comment: "replace-set preference entries (catalog ref or custom name, exactly one set per entry)"},
 	}
 	// ProfileTable holds the schema information for the "profile" table.
 	ProfileTable = &schema.Table{
@@ -56,11 +102,15 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		GameTable,
 		ProfileTable,
 	}
 )
 
 func init() {
+	GameTable.Annotation = &entsql.Annotation{
+		Table: "game",
+	}
 	ProfileTable.Annotation = &entsql.Annotation{
 		Table: "profile",
 	}

@@ -103,6 +103,21 @@ func (s *UserService) ListUsers(ctx context.Context, in *systempb.ListUsersReque
 	}, nil
 }
 
+func (s *UserService) ListUsersByPopulation(ctx context.Context, in *systempb.ListUsersByPopulationRequest) (*systempb.ListUsersByPopulationResponse, error) {
+	out, err := s.userUC.ListByPopulation(ctx, &UserListIn{
+		PageRequest: helper.EnsurePageRequest(in.Page),
+		OrderBy:     in.OrderBy,
+		Population:  in.Population,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.ListUsersByPopulationResponse{
+		Page: out.PageResponse,
+		List: utils.SliceMap(out.List, toProtoUser),
+	}, nil
+}
+
 func (s *UserService) GetUser(ctx context.Context, in *systempb.GetUserRequest) (*systempb.GetUserResponse, error) {
 	a, err := s.userUC.Get(ctx, in.Id)
 	if err != nil {
