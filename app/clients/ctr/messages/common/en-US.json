@@ -17,5 +17,12 @@
   "common_exit_title": "Exit now?",
   "common_exit_desc": "Your current progress will not be saved",
   "common_exit_cancel": "Cancel",
-  "common_exit_confirm": "Exit"
+  "common_exit_confirm": "Exit",
+  "common_soon": "Coming soon",
+  "common_soon_badge": "Coming soon",
+  "common_back": "Back",
+  "common_tab_home": "Home",
+  "common_tab_records": "Records",
+  "common_tab_messages": "Messages",
+  "common_tab_me": "Me"
 }

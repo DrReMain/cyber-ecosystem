@@ -30,13 +30,24 @@ export function ExitConfirmDialog({
   confirmLabel = m.common_exit_confirm(),
   cancelLabel = m.common_exit_cancel(),
 }: Readonly<ExitConfirmDialogProps>) {
+  // Mount-conditional: RAC 1.21's exit-animation state machine can deadlock
+  // on close (an exiting ref never resolves, so isOpen=false never unmounts
+  // the overlay) — the caller's open flag owns the mount cycle directly.
+  if (!open) {
+    return null;
+  }
   return (
     <ModalOverlay
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6 backdrop-blur-md motion-safe:data-[entering]:duration-200 motion-safe:data-[entering]:ease-out-expo"
       isDismissable
-      isOpen={open}
+      isOpen
       onOpenChange={(isOpen) => {
         if (!isOpen) onCancel();
+      }}
+      onPointerDown={(e) => {
+        if (e.target === e.currentTarget) {
+          onCancel();
+        }
       }}
     >
       <Dialog

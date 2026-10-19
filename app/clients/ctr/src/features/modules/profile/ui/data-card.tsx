@@ -1,0 +1,64 @@
+import type { Profile as ProfilePB } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile_pb";
+import { useNavigate } from "@tanstack/react-router";
+import { ChevronRight } from "lucide-react";
+import { m } from "#/paraglide/messages";
+
+const CARD_CLASS = "rounded-lg border border-line bg-surface-card p-4";
+
+/**
+ * The editable profile facts: one row per setup step, each hopping into the
+ * wizard's matching step (edit path).
+ */
+export function DataCard({ profile }: Readonly<{ profile: ProfilePB | undefined }>) {
+  const navigate = useNavigate();
+  const games = profile?.games ?? [];
+  // A year without a month renders the year alone — the pair is only shown
+  // as a pair (the birth gate in after-login.ts treats it as incomplete).
+  const birth =
+    profile?.birthYear == null
+      ? m.profile_unset()
+      : profile.birthMonth == null
+        ? String(profile.birthYear)
+        : `${profile.birthYear} · ${profile.birthMonth}`;
+  const rows: { key: string; label: string; value: string; to: string }[] = [
+    {
+      key: "nickname",
+      label: m.profile_nickname_label(),
+      to: "/profile/setup/nickname",
+      value: profile?.nickname ?? m.profile_unset(),
+    },
+    {
+      key: "birth",
+      label: m.profile_birth_label(),
+      to: "/profile/setup/age",
+      value: birth,
+    },
+    {
+      key: "games",
+      label: m.profile_games_label(),
+      to: "/profile/setup/games",
+      value: games.length > 0 ? m.profile_games_count({ n: games.length }) : m.profile_unset(),
+    },
+  ];
+  return (
+    <div className={CARD_CLASS}>
+      <div className="mb-1 font-extrabold text-ink text-sm">{m.profile_card_data()}</div>
+      {rows.map((row, index) => (
+        <button
+          className={`flex w-full items-center justify-between py-3 text-left active:opacity-60 ${
+            index < rows.length - 1 ? "border-line-soft border-b" : ""
+          }`}
+          key={row.key}
+          onClick={() => void navigate({ to: row.to })}
+          type="button"
+        >
+          <span className="text-ink-secondary text-sm">{row.label}</span>
+          <span className="ml-3 flex min-w-0 items-center gap-1.5">
+            <span className="truncate text-ink text-sm">{row.value}</span>
+            <ChevronRight aria-hidden className="shrink-0 text-ink-tertiary" size={14} />
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}

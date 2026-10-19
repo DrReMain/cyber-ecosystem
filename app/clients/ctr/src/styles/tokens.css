@@ -23,10 +23,19 @@
   --color-line-soft: rgba(55, 65, 81, 0.6);
   --color-line-accent-purple: rgba(168, 85, 247, 0.35);
   --color-line-accent-cyan: rgba(6, 182, 212, 0.4);
+  --color-line-accent-blue: rgba(80, 102, 160, 0.55);
 
   /* Focus (input focus ring / selected states) */
   --color-focus: #3b82f6;
   --color-focus-ring: rgba(59, 130, 246, 0.2);
+
+  /* Category accents — the fps/moba voting vocabulary and selection emphasis */
+  --color-accent-fps: #818cf8;
+  --color-accent-moba: #60a5fa;
+  --color-accent-info: #93c5fd;
+
+  /* WeChat brand green — the platform's mark, not a palette choice */
+  --color-wechat: #07c160;
 
   /* Danger */
   --color-danger: #dc2626;
@@ -174,6 +183,7 @@
   --grad-cta-fps: linear-gradient(to right, #4f46e5, #06b6d4);
   --grad-cta-moba: linear-gradient(to right, #1d4ed8, #7c3aed);
   --grad-cta-member: linear-gradient(to right, #7e22ce, #a855f7);
+  --grad-identity: linear-gradient(to bottom, rgba(36, 49, 94, 0.55), rgba(17, 23, 41, 0.95));
   --grad-lock-stripes: repeating-linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.03) 0 8px,
@@ -222,6 +232,9 @@
 }
 @utility bg-cta-member {
   background-image: var(--grad-cta-member);
+}
+@utility bg-identity {
+  background-image: var(--grad-identity);
 }
 @utility bg-lock-stripes {
   background-image: var(--grad-lock-stripes);

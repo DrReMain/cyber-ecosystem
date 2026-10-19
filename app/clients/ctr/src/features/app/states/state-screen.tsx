@@ -33,14 +33,20 @@ export function StateScreen({ variant, title, description, action }: Readonly<St
       role="status"
     >
       {loading ? (
-        <div className="w-[min(200px,60%)]" dir="ltr">
-          <div className="text-center font-mono text-[11px] text-ink-tertiary uppercase tracking-[0.18em]">
-            LOADING
+        <>
+          {/* The mono LOADING strip is decorative (English by design, like
+              the ERR chips); the localized label is what assistive tech
+              reads under the container's role="status". */}
+          <span className="sr-only">{m.common_loading()}</span>
+          <div aria-hidden className="w-[min(200px,60%)]" dir="ltr">
+            <div className="text-center font-mono text-[11px] text-ink-tertiary uppercase tracking-[0.18em]">
+              LOADING
+            </div>
+            <span className="relative mt-2 block h-0.5 overflow-hidden rounded bg-ink/12">
+              <span className="absolute inset-s-[-40%] inset-y-0 w-2/5 bg-linear-to-r from-transparent via-ink/70 to-transparent motion-safe:animate-sweep rtl:motion-safe:animate-sweep-rev" />
+            </span>
           </div>
-          <span className="relative mt-2 block h-0.5 overflow-hidden rounded bg-ink/12">
-            <span className="absolute inset-s-[-40%] inset-y-0 w-2/5 bg-linear-to-r from-transparent via-ink/70 to-transparent motion-safe:animate-sweep rtl:motion-safe:animate-sweep-rev" />
-          </span>
-        </div>
+        </>
       ) : (
         <span className="flex size-14 items-center justify-center rounded-card border border-line-soft bg-surface-content text-ink-tertiary">
           <Inbox aria-hidden className="size-6" strokeWidth={1.5} />

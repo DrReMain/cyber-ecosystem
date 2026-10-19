@@ -17,5 +17,12 @@
   "common_exit_title": "确认退出?",
   "common_exit_desc": "当前进度将不会被保存",
   "common_exit_cancel": "取消",
-  "common_exit_confirm": "确认退出"
+  "common_exit_confirm": "确认退出",
+  "common_soon": "即将开放",
+  "common_soon_badge": "敬请期待",
+  "common_back": "返回",
+  "common_tab_home": "首页",
+  "common_tab_records": "记录",
+  "common_tab_messages": "消息",
+  "common_tab_me": "我的"
 }

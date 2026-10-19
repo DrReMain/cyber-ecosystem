@@ -1,4 +1,17 @@
 {
   "home_title": "Home",
-  "home_description": "Esports talent assessment platform"
+  "home_description": "Esports talent assessment platform",
+  "home_greet_logged": "Welcome back",
+  "home_greet_guest": "Not signed in",
+  "home_guest_name": "Not signed in",
+  "home_cta_title": "Your assessment lineup",
+  "home_cta_desc_ready": "Arranged by your game preferences · ~30s each · ability report on completion",
+  "home_cta_desc_need_games": "Pick a few games you play first, then we arrange the assessment",
+  "home_cta_login": "Sign in to start",
+  "home_cta_pick": "Pick game preferences",
+  "home_cta_start": "Start assessment",
+  "home_hint_login": "Not signed in — tapping goes to sign-in first",
+  "home_hint_games": "No game preferences yet — tapping goes to the picker",
+  "home_soon_title": "Assessments & reports",
+  "home_soon_desc": "Ability assessments, the report center, and statistics are coming"
 }

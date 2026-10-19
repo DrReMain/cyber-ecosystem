@@ -25,6 +25,11 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
   }
+  /* Browser visitors read every enabled control as clickable; the pure-touch
+     path never shows a cursor and is unaffected. */
+  button:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 /* Viewport-height helpers with the cascade fallback: an invalid unit drops
@@ -50,4 +55,25 @@
 }
 @utility safe-pb {
   padding-bottom: max(env(safe-area-inset-bottom, 0px), 14px);
+}
+/* Bottom-inset spacers for fixed chrome: no floor here — the inset IS the
+   intent, zero must stay zero. */
+@utility safe-hb {
+  height: env(safe-area-inset-bottom, 0px);
+}
+/* Bottom-docked overlays keep their resting gap even where env() reports
+   zero (desktop, some webviews): the floor is the prototype's m-3 gap, the
+   inset takes over wherever it is larger. */
+@utility safe-mb {
+  margin-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+}
+/* Small visual controls keep a full-size touch heat: the pseudo-element
+   extends the hit area without growing the painted chrome. */
+@utility tap-zone {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -9px -6px;
+  }
 }

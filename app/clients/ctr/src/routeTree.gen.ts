@@ -15,7 +15,11 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
+import { Route as ProfileIndexRouteImport } from './routes/profile.index'
 import { Route as LoginWechatCallbackRouteImport } from './routes/login.wechat.callback'
+import { Route as ProfileSetupAgeRouteImport } from './routes/profile.setup.age'
+import { Route as ProfileSetupGamesRouteImport } from './routes/profile.setup.games'
+import { Route as ProfileSetupNicknameRouteImport } from './routes/profile.setup.nickname'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,38 +51,69 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LoginRoute,
 } as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfileRoute,
+} as any)
 const LoginWechatCallbackRoute = LoginWechatCallbackRouteImport.update({
   id: '/wechat/callback',
   path: '/wechat/callback',
   getParentRoute: () => LoginRoute,
 } as any)
+const ProfileSetupAgeRoute = ProfileSetupAgeRouteImport.update({
+  id: '/setup/age',
+  path: '/setup/age',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileSetupGamesRoute = ProfileSetupGamesRouteImport.update({
+  id: '/setup/games',
+  path: '/setup/games',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileSetupNicknameRoute = ProfileSetupNicknameRouteImport.update({
+  id: '/setup/nickname',
+  path: '/setup/nickname',
+  getParentRoute: () => ProfileRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRouteWithChildren
-  '/profile': typeof ProfileRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/login/': typeof LoginIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
+  '/profile/setup/age': typeof ProfileSetupAgeRoute
+  '/profile/setup/games': typeof ProfileSetupGamesRoute
+  '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/profile': typeof ProfileRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/login': typeof LoginIndexRoute
+  '/profile': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
+  '/profile/setup/age': typeof ProfileSetupAgeRoute
+  '/profile/setup/games': typeof ProfileSetupGamesRoute
+  '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRouteWithChildren
-  '/profile': typeof ProfileRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/login/': typeof LoginIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
+  '/profile/setup/age': typeof ProfileSetupAgeRoute
+  '/profile/setup/games': typeof ProfileSetupGamesRoute
+  '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -89,15 +124,22 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/login/'
+    | '/profile/'
     | '/login/wechat/callback'
+    | '/profile/setup/age'
+    | '/profile/setup/games'
+    | '/profile/setup/nickname'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/profile'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/login'
+    | '/profile'
     | '/login/wechat/callback'
+    | '/profile/setup/age'
+    | '/profile/setup/games'
+    | '/profile/setup/nickname'
   id:
     | '__root__'
     | '/'
@@ -106,13 +148,17 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/login/'
+    | '/profile/'
     | '/login/wechat/callback'
+    | '/profile/setup/age'
+    | '/profile/setup/games'
+    | '/profile/setup/nickname'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRouteWithChildren
-  ProfileRoute: typeof ProfileRoute
+  ProfileRoute: typeof ProfileRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
@@ -161,12 +207,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof LoginRoute
     }
+    '/profile/': {
+      id: '/profile/'
+      path: '/'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof ProfileRoute
+    }
     '/login/wechat/callback': {
       id: '/login/wechat/callback'
       path: '/wechat/callback'
       fullPath: '/login/wechat/callback'
       preLoaderRoute: typeof LoginWechatCallbackRouteImport
       parentRoute: typeof LoginRoute
+    }
+    '/profile/setup/age': {
+      id: '/profile/setup/age'
+      path: '/setup/age'
+      fullPath: '/profile/setup/age'
+      preLoaderRoute: typeof ProfileSetupAgeRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/setup/games': {
+      id: '/profile/setup/games'
+      path: '/setup/games'
+      fullPath: '/profile/setup/games'
+      preLoaderRoute: typeof ProfileSetupGamesRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/setup/nickname': {
+      id: '/profile/setup/nickname'
+      path: '/setup/nickname'
+      fullPath: '/profile/setup/nickname'
+      preLoaderRoute: typeof ProfileSetupNicknameRouteImport
+      parentRoute: typeof ProfileRoute
     }
   }
 }
@@ -183,10 +257,27 @@ const LoginRouteChildren: LoginRouteChildren = {
 
 const LoginRouteWithChildren = LoginRoute._addFileChildren(LoginRouteChildren)
 
+interface ProfileRouteChildren {
+  ProfileIndexRoute: typeof ProfileIndexRoute
+  ProfileSetupAgeRoute: typeof ProfileSetupAgeRoute
+  ProfileSetupGamesRoute: typeof ProfileSetupGamesRoute
+  ProfileSetupNicknameRoute: typeof ProfileSetupNicknameRoute
+}
+
+const ProfileRouteChildren: ProfileRouteChildren = {
+  ProfileIndexRoute: ProfileIndexRoute,
+  ProfileSetupAgeRoute: ProfileSetupAgeRoute,
+  ProfileSetupGamesRoute: ProfileSetupGamesRoute,
+  ProfileSetupNicknameRoute: ProfileSetupNicknameRoute,
+}
+
+const ProfileRouteWithChildren =
+  ProfileRoute._addFileChildren(ProfileRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRouteWithChildren,
-  ProfileRoute: ProfileRoute,
+  ProfileRoute: ProfileRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
