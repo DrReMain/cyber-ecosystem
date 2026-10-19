@@ -45,7 +45,15 @@ function collect(route: NavRoute, patterns: readonly string[]): NavNode | null {
     .map((child) => collect(child, patterns))
     .filter((node): node is NavNode => node !== null)
     .sort(byOrder);
-  if (rawChildren.length > 0 && children.length === 0) return null;
+  if (rawChildren.length > 0 && children.length === 0) {
+    // A menu-bearing layout whose sub-pages are all deliberately hidden
+    // (menu.hide — the titled-parent tab pattern) stays a leaf entry;
+    // children dropped for grants still prune the parent (hide-by-default).
+    const allDeliberatelyHidden = rawChildren.every(
+      (child) => child.options?.staticData?.menu?.hide === true,
+    );
+    if (!allDeliberatelyHidden) return null;
+  }
 
   return { path: route.fullPath.replace(/\/$/, "") || "/", title, meta, children };
 }

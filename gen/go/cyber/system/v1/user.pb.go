@@ -769,10 +769,17 @@ func (x *ListUsersResponse) GetList() []*User {
 }
 
 type ListUsersByPopulationRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Population    *string                `protobuf:"bytes,1,opt,name=population,proto3,oneof" json:"population,omitempty"`
-	Page          *v1.PageRequest        `protobuf:"bytes,2,opt,name=page,proto3" json:"page,omitempty"`
-	OrderBy       []string               `protobuf:"bytes,100,rep,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Population *string                `protobuf:"bytes,1,opt,name=population,proto3,oneof" json:"population,omitempty"`
+	Page       *v1.PageRequest        `protobuf:"bytes,2,opt,name=page,proto3" json:"page,omitempty"`
+	// Account status; absent lists both.
+	Enabled *bool `protobuf:"varint,3,opt,name=enabled,proto3,oneof" json:"enabled,omitempty"`
+	// Exact roster narrowing to these identities; absent or empty = no
+	// narrowing. A caller resolves its own domain-local filters into this
+	// id set first, so filtering, ordering, and pagination all stay at the
+	// query level.
+	UserIds       []string `protobuf:"bytes,4,rep,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	OrderBy       []string `protobuf:"bytes,100,rep,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -817,6 +824,20 @@ func (x *ListUsersByPopulationRequest) GetPopulation() string {
 func (x *ListUsersByPopulationRequest) GetPage() *v1.PageRequest {
 	if x != nil {
 		return x.Page
+	}
+	return nil
+}
+
+func (x *ListUsersByPopulationRequest) GetEnabled() bool {
+	if x != nil && x.Enabled != nil {
+		return *x.Enabled
+	}
+	return false
+}
+
+func (x *ListUsersByPopulationRequest) GetUserIds() []string {
+	if x != nil {
+		return x.UserIds
 	}
 	return nil
 }
@@ -1204,16 +1225,20 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\b_dept_id\"x\n" +
 	"\x11ListUsersResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x12)\n" +
-	"\x04list\x18\x02 \x03(\v2\x15.cyber.system.v1.UserR\x04list\"\xc6\x02\n" +
+	"\x04list\x18\x02 \x03(\v2\x15.cyber.system.v1.UserR\x04list\"\x9d\x03\n" +
 	"\x1cListUsersByPopulationRequest\x12/\n" +
 	"\n" +
 	"population\x18\x01 \x01(\tB\n" +
 	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\n" +
 	"population\x88\x01\x01\x127\n" +
-	"\x04page\x18\x02 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12\xac\x01\n" +
+	"\x04page\x18\x02 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12\x1d\n" +
+	"\aenabled\x18\x03 \x01(\bH\x01R\aenabled\x88\x01\x01\x12*\n" +
+	"\buser_ids\x18\x04 \x03(\tB\x0f\xbaH\f\x92\x01\t\x18\x01\"\x05r\x03\x98\x01\x14R\auserIds\x12\xac\x01\n" +
 	"\border_by\x18d \x03(\tB\x90\x01\xbaH\x8c\x01\xba\x01\x88\x01\n" +
 	"%ListUsersByPopulationRequest.order_by\x12\x00\x1a]this.all(item, size(item) == 0 || item.matches('^(account|createdAt|updatedAt):(asc|desc)$'))R\aorderByB\r\n" +
-	"\v_population\"\x84\x01\n" +
+	"\v_populationB\n" +
+	"\n" +
+	"\b_enabled\"\x84\x01\n" +
 	"\x1dListUsersByPopulationResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x12)\n" +
 	"\x04list\x18\x02 \x03(\v2\x15.cyber.system.v1.UserR\x04list\"-\n" +

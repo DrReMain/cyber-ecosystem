@@ -1,12 +1,14 @@
 ---
 name: kratos-selfcheck
-description: Pre-completion conventions pass — use before reporting done on any Go change under app/services/* or shared-go (compile-green is not convention-green).
+description: Kratos convention gate — use when creating or editing any .go file under app/services/* (load the dispatch row before writing) and again before reporting done (emit the gate table).
 ---
 
-# Kratos pre-completion self-check
+# Kratos convention gate
 
-Procedure: `docs/conventions/kratos/CONVENTIONS.md` §7 "Pre-completion self-check" — walk every hunk of the diff against its five bullets (§2–§6).
+Before writing: `docs/conventions/kratos/CONVENTIONS.md` §0 execution contract — load the dispatch row for the artifact being touched; those sections are the law for the edit.
 
-Scope: full walk for `app/services/*`; for `shared-go` only the §6-errors, dependency-direction, and capability self-containment bullets apply.
+Before done: §7 "Pre-completion gate" — run every row over the combined diff and emit the report table (`item | verdict | evidence`) verbatim in the final message. No gate table = not done, whatever the build says.
 
-Done = every bullet answered for every hunk. Editor diagnostics lag codegen — trust `go build` / the Nx targets, never the LSP panel (§7).
+Machine rows already enforced by tests (still report them): `TestNoDeclarationComments`, `TestReasonPredicates`, `TestSerializationViaUtils`, `TestModuleDependencyDAG`. For `shared-go` changes emit only K-ERR, K-DEP, and the capability self-containment rule (root §4).
+
+Editor diagnostics lag codegen — trust `go build` / the Nx targets, never the LSP panel (`docs/conventions/kratos/RUNBOOKS.md` §5).

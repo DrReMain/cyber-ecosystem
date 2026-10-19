@@ -2933,6 +2933,18 @@ components:
                     type: string
                 page:
                     $ref: '#/components/schemas/cyber.shared.common.v1.PageRequest'
+                enabled:
+                    type: boolean
+                    description: Account status; absent lists both.
+                userIds:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        Exact roster narrowing to these identities; absent or empty = no
+                         narrowing. A caller resolves its own domain-local filters into this
+                         id set first, so filtering, ordering, and pagination all stay at the
+                         query level.
                 orderBy:
                     type: array
                     items:

@@ -720,6 +720,17 @@ export type CyberSystemV1ListUploadedPartsResponse = {
 export type CyberSystemV1ListUsersByPopulationRequest = {
     population?: string;
     page?: CyberSharedCommonV1PageRequest;
+    /**
+     * Account status; absent lists both.
+     */
+    enabled?: boolean;
+    /**
+     * Exact roster narrowing to these identities; absent or empty = no
+     * narrowing. A caller resolves its own domain-local filters into this
+     * id set first, so filtering, ordering, and pagination all stay at the
+     * query level.
+     */
+    userIds?: Array<string>;
     orderBy?: Array<string>;
 };
 

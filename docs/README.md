@@ -15,7 +15,7 @@ Entry points:
 | Lane | Home | Holds | Language | Lifecycle |
 |---|---|---|---|---|
 | **Durable** | `docs/conventions/<area>/CONVENTIONS.md` | rules and mechanisms — what you MUST follow, how the system works | EN | long-lived; changes follow the paradigm-change discipline (AGENTS.md §6) |
-| **Working** | `docs/roadmap/*.md` | in-flight design, milestone acceptance records, backlog pools — one doc per active work front, plus `vision.md` (north-star) | ZH | temporary by contract: every item carries a destination (§2.4) |
+| **Working** | `docs/roadmap/*.md` (single doc) or `docs/roadmap/<front>/` (directory: `README.md` front index + sub-docs split by concern) | in-flight design, milestone acceptance records, backlog pools — one front = one doc or one doc set, plus `vision.md` (north-star) | ZH | temporary by contract: every item carries a destination (§2.4) |
 | **Procedural** | `.claude/skills/<name>/SKILL.md` | workflow dispatchers — trigger, pointers, cross-doc assembly; never rule text or step text | EN | evolves with code; git-versioned; directory names are stable identifiers |
 
 **Single-source law.** Content is never copied. Where two audiences need the same knowledge, both read the same file. A skill contributes only a trigger and pointers; procedures (checklists) live in docs, and skills point at them. Duplication is the one failure mode this law exists to prevent — one fact, one home, everything else a pointer.
@@ -48,7 +48,7 @@ When a milestone (or a ruling) closes:
 
 ### 2.4 Destination
 
-Every working-lane item declares where it ends up: **backfilled / cleared / archived**. A closed front's doc is pruned or deleted; `docs/roadmap/` holds only `vision.md` plus the active fronts (target: ≤4 docs).
+Every working-lane item declares where it ends up: **backfilled / cleared / archived**. A closed front's doc (or directory) is pruned or deleted; `docs/roadmap/` holds only `vision.md` plus the active fronts (target: ≤4 fronts — a directory front counts as one front, its `README.md` is the index).
 
 ### 2.5 Pointer discipline
 

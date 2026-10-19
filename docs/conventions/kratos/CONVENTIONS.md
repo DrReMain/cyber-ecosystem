@@ -8,6 +8,26 @@ This document states **constraints, rationale, and anti-patterns** — the thing
 
 ---
 
+## 0. Execution contract
+
+In force for every change under `app/services/*`; rules here win over precedent in code.
+
+1. Before writing a file below, load the sections in its dispatch row — they are the law for that artifact.
+2. Before reporting done, run the §7 gate over the combined diff and emit its report table in the final message. No gate table = not done, whatever the build says.
+3. Gate = exit code 0 or the Nx "Successfully ran" banner — a log tail is not a gate.
+
+| About to write | Load first | Gate rows |
+|---|---|---|
+| `module/<d>/biz.go` | §1, §2, §3 biz row, §3a, §4 | K-NAM K-STR K-CMT K-ERR |
+| `module/<d>/data.go` | §2 repo rows, §3 data row, §5 data | K-NAM K-STR K-LAY K-UTL K-ERR |
+| `module/<d>/service.go` | §2, §3 service row, §5 service | K-NAM K-STR K-CMT K-UTL K-ERR |
+| `client/<remote>.go` | §2 client rows, §5 client, §5a | K-NAM K-LAY K-ERR |
+| any other `.go` under `app/services/*` | §4, §6, the touched layer's §5 block | full §7 |
+
+Procedures (new module, remote dependency, service derivation, operating facts) live in `RUNBOOKS.md`.
+
+---
+
 ## 1. Layering & dependencies
 
 Each service is a **modular monolith**: one self-contained module per aggregate root under `module/`, shared infra at the top. Dependencies point **inward** (outer → inner, never reverse), and **across modules only via port read / domain event** (the module-dependency bullets below).
@@ -132,9 +152,16 @@ Align proto optional fields, DO fields, and the service/data mapping around poin
 
 ## 4. Comments
 
-- **Section dividers are the ONLY top-level markers.** `MUST NOT` add godoc-style declaration comments on symbols within a section (no `// <Type> describes ...` above a type).
-- **Divider format** — `// <Name>` + `-` to ~110 chars (`biz`/`data`) or ~120 (`service`). Copy a neighbor's dash run.
-- **Inline comments** — only non-obvious *why* (trade-off, gotcha, concurrency). `MUST NOT` restate the code.
+Two comment kinds are legal under `app/services/*`; a comment that is neither is a violation.
+
+| Kind | Shape | Where |
+|---|---|---|
+| Divider | `// <Name>` + `-` run (~110 chars `biz`/`data`, ~120 `service`; equal ±5 to a same-file neighbor's run) | section boundaries only (§3 table) |
+| Inline | states non-obvious *why* only (trade-off, gotcha, concurrency); `MUST NOT` restate the code | inside a function, beside the line it explains |
+
+**Violation signature — declaration comment**: a `//` line whose next non-blank line opens a declaration (`type` / `func` / `const` / `var`) and whose text names or describes that symbol. Machine-enforced in `module/`, `client/`, `server/`, `bootstrap/` by `TestNoDeclarationComments` (conventions guard, `internal/shared`).
+
+Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the DDL), never Go line comments (§3a); test files state the law under test, never process narration; `shared-go/` keeps godoc conventions — this section binds `app/services/*` only.
 
 ---
 
@@ -239,7 +266,8 @@ The IAM engine is a **mechanism every service replicates**, not a system-service
 Every non-system service consumes IAM remotely and grows no identity of its own:
 
 - **Identity travels by user credential, never by claim.** The `client` layer forwards the inbound session cookie upstream (`IntrospectService/VerifySession`) and the engine decides grants (`IntrospectService/CheckOperation`); system re-authenticates on its own chain. Identity always derives from the credential, never from a downstream-asserted parameter — that law is what keeps the introspection faces safe to expose at all. Decide is a single remote `CheckGrants` through the `AuthzRP` port; the remote port fails closed (an engine error is a 5xx, never an allow).
-- **The client middleware order is load-bearing**: `tracing → circuitbreaker → metadata → sanitize.Client → logging.Client`. The chain wraps the raw transport call; `logging.Client` (innermost) sees the provider's original error first (kratos-rendered, so an upstream connect error logs with its message even when the code renders as a bare 500); `sanitize.Client` re-mints it into this service's catalog (provider reason dropped, detail only in cause); `circuitbreaker` (outermost of the three) judges the translated code — semantic 401/403 count as success, only 500/503/504 accumulate. `ConnectToError` sits at the chain exit: an already-translated kratos error passes through untouched, anything raw gets a final conversion. Reorder any two and either the logs lose fidelity or the breaker arms on denied logins.
+- **Member-plane identities are read through the population composition face.** The seat-oriented identity faces (`GetUser`/`ListUsers`) exclude member-plane seats by design — a member-view composition (roster, member list/detail) reads identities only via `ListUsersByPopulation` with the caller's forwarded credential, and derives its not-found errors from the local result.
+- **The client middleware order is load-bearing**: `tracing → circuitbreaker → metadata → sanitize.Client → logging.Client`. The chain wraps the raw transport call; `logging.Client` (innermost) sees the provider's original error first (kratos-rendered, so an upstream connect error logs with its message even when the code renders as a bare 500); `sanitize.Client` re-mints it into this service's catalog (provider reason dropped, detail only in cause); `circuitbreaker` (outermost of the three) judges the translated code — semantic 401/403 count as success, only 500/503/504 accumulate. `ConnectToError` sits at the chain exit: an already-translated kratos error passes through untouched, anything raw gets a final conversion. A call site therefore never predicates on a provider-specific upstream reason — the re-mint drops it before any predicate sees it (`ConnectToError` cannot recover it); shared-classification reasons (401/403/404…) re-mint to the same shared name and stay predicate-safe. Derive domain errors from local facts. Reorder any two and either the logs lose fidelity or the breaker arms on denied logins.
 - **Degraded hydration is grant-aware and graded.** An ungranted viewer is a normal audience state, so it must never be *reached* through the denial channel: the adapter decides eligibility once per request via `CheckOperation` (payload decision — an allow-side read that leaves no audit trail; the operation is named by the generated `<Service><Method>Procedure` constant, never a hand-written string — a drifted literal reads as permanently ungranted and silently blanks hydration) and skips the reads entirely; an ungranted viewer reaching the read face would land one audit denial — probe signal — per id per page view, polluting exactly the signal audit exists to collect. When granted, hydration reuses the normal user-facing RPC with the caller's own credential (never a privileged batch-lookup face — that would be a directory-enumeration surface); per-id failures then grade debug (denied — an ABAC flip between check and read) vs warn (any other failure); the row always renders with absent fields.
 - **Service credentials are a seam, not a feature.** Per-request identity rides the ctx-key → interceptor pattern (cookie header today; the same slot forwards Bearer when app clients land). A future service identity lands as a sibling interceptor on the same `WithInterceptors` list plus a credentials block in `conf.Remote` — do not pre-scaffold it; the two identities (on-behalf-of vs service-principal) never merge (see root §8 user-split law and the capability-token reservation in the platform vision).
 
@@ -292,52 +320,53 @@ sanitize → tracing → metrics → logging(RenderErrors(logger)) → ErrorTele
 
 ---
 
-## 7. Checklist
+## 7. Pre-completion gate
 
-### Pre-completion self-check (any Go change)
+Run over the combined diff (working tree plus the commits being amended into). One row per item, emitted verbatim in the final report:
 
-Before reporting done on any Go change under `app/services/*`, walk the diff against §2–§6 — compile-green is not convention-green:
+| item | verdict | evidence |
+|---|---|---|
+| K-CMT-1 | PASS | guard green; 3 added `//` lines in module files, all dividers (file:line each) |
 
-- **§2 naming** — every new symbol matches the table: `DO` unprefixed, `<DO>RP`/`<Remote>RP` ports, `<Name>UC`, `<do>RP` repo, `map<DO>` mapping; CRUD UC/repo methods take bare verbs; aspect blocks ordered (core methods first, aspect blocks by noun alphabet, infra hooks last).
-- **§3 structure** — four-file shape intact (no `<d>_uc.go` fragments; extra files only per the aux-file rule); section order + dividers per the table; imports in the five groups; proto import aliases `<scope>pb`, never bare `pb`; struct fields embedded base → `log` → dependencies.
-- **§4 comments** — no declaration-level comments on symbols; dividers are the only top-level markers; inline comments state non-obvious *why* only. (Service-internal rule — `shared-go` keeps its godoc conventions.)
-- **§5 layers** — business logic in biz; `data`/`client` adapters only; no business rules in data; no repo access in service; direction never reversed (biz imports neither `data`/`client` nor `service`/`server`/`platform`); cross-module access is a read via repo port; mapping helpers come from `utils`, never hand-rolled.
-- **§6 errors** — identity only from catalog factories (`errorspb.ErrorXxx("")`); cause via factory-chain or authored `fmt.Errorf` prose; infra classified at choke points, never at call sites; a UC never returns a raw upstream error; no circulating sentinels (closure flags carry intra-tx control flow); biz logs errors nowhere outside the swallow-path exception.
+PASS / FAIL / N/A are legal verdicts; an absent row is not. N/A names its glob and shows it empty. `shared-go` changes emit only K-ERR, K-DEP, and the capability self-containment rule (`AGENTS.md` §4). `lint:` rows scan the added lines of the combined diff; `eye:` rows cite file:line.
 
-Done = every bullet answered for every hunk in the diff. For `shared-go` changes only the §6-errors and dependency-direction bullets apply, plus the capability self-containment rule (`AGENTS.md` §4).
+### Naming — law §2
 
-**Editor diagnostics lag codegen** — after ent/proto/wire regeneration the editor's LSP frequently reports `undefined` on freshly generated symbols (stale index). The compile truth is `go build` / the Nx targets, never the diagnostics panel: red LSP + green build means a stale panel, not a broken tree.
+- **K-NAM-1** — every new symbol matches its §2 table row (`DO` unprefixed, `<DO>RP`/`<Remote>RP` ports, `<Name>UC`, `<do>RP`, `map<DO>`; provider-named remote ports; `map<ProviderDO>` in client). eye: symbol → row.
+- **K-NAM-2** — CRUD UC/repo methods take bare verbs; aspect blocks ordered (core first, noun alphabet, infra hooks last). eye.
+- **K-NAM-3** — no package-level exported function in `module/` (types, `New*`, methods only). eye.
 
-**Review pass (pre-amend / pre-squash)** — review the *combined* diff (uncommitted changes plus the commit(s) being merged into), not the working tree alone:
+### Structure — law §3
 
-- **Same-recipe consistency sweep** — sibling functions of one family (`ensure*`, classify wrappers, sweep stages) must share the same race and error law; a difference is either a bug (missing `IsConstraintError` tolerance next to kin that has it) or a distinction worth a comment. Find these by comparing siblings side by side, not by reading each in isolation.
-- **Test code** — comments state the law only (no process narration); fixtures carry no unused fields; assertions use the generated `Is<Reason>` predicates, never message text.
-- **Every hunk must be meaningful** — formatter round-trips on untouched content (JSON re-indent, import re-sorting via a script) get reverted, not committed as churn.
-- **Fixture defaults must mirror the real degenerate world** — a default fake that answers differently from what production data looks like silently red-shifts every unrelated test.
+- **K-STR-1** — four-file shape intact (no `<d>_uc.go` fragments; extra files only per the aux-file rule); section order + dividers per the §3 table; `Private` = private methods then functions, no type/const inside. eye.
+- **K-STR-2** — imports in the five groups; proto import aliases `<scope>pb`, never bare `pb`; struct fields embedded base → `log` → dependencies. lint: `gofmt -l` empty + alias grep.
 
-**Adding a new domain module (aggregate root):**
-1. `module/<d>/biz.go`: `DO` → `Port` → `UC` → `Method` (→ `Private`); UC embeds `shared.UC` (`uc.Tm` / `uc.Log`).
-2. ent `schema/<do>.go`: fields + mixins; `./nx run <service>:generate:ent`, `:migrate:diff`, `:migrate:apply` (persisted only).
-3. `module/<d>/data.go`: `<do>RP` + `New<DO>RP` + `map<DO>` (embed `shared.RP`, use `rp.Platform`). **Omit** this file for a pure ACL facade (no persistence).
-4. `module/<d>/service.go`: `<Name>Service` + handlers + Registrar. `module/<d>/module.go`: `ProviderSet{New<Name>UC, New<DO>RP, New<Name>Service}`.
-5. Wire it in: add the module's `ProviderSet` to `wireApp`; add its `*<Name>Service` param to `server.NewRegistrarList`.
-6. `./nx run <service>:generate:wire` then `:build`. If it imports another module, keep it a **read** (port query) — cross-module writes go via domain event. Verify dependency direction (UC→port; UC→UC only toward foundation modules — user/authz/file). **Wire prunes unconsumed providers**: a startup-shaped component (seed job, engine watch loop) must hang off a live dependency chain — a `newApp` param or self-registration on `shared.HookRegistry` in a UC constructor — or it silently never instantiates.
+### Comments — law §4
 
-**Adding a remote-service dependency (treat as a repo):**
-1. biz: declare `<Remote>RP` with neutral ACL payloads; inject into the UC like any repo.
-2. client `<remote>.go`: `<remote>Client` + `New<Remote>Client` + `map<ProviderDO>` over one connection. Register `New<Remote>Client` in `client.ProviderSet`. One file per remote.
-3. conf `conf.proto` `Remote`: add endpoint field; `configs/config.yaml`: set it. `./nx run <service>:proto:conf`.
-4. `./nx run <service>:generate:wire` then `:build`. Verify biz never imports the provider's proto.
+- **K-CMT-1** — no added declaration comment (§4 violation signature). lint: `TestNoDeclarationComments` green; evidence = guard output or diff-grep pairing.
+- **K-CMT-2** — every added divider's dash run equals a same-file neighbor's (±5). eye: file:line per divider.
+- **K-CMT-3** — every other added `//` line states why, not mechanics. eye: quote the lines.
 
-**Pure ACL facade** (no own persistence): the module has **no `data.go`**; its UC depends on a `<Remote>RP` satisfied by the `client` layer. Its `module.go` `ProviderSet` lists only `New<Name>UC` + `New<Name>Service`.
+### Layers — law §5, §5a
 
-**Deriving a new service** (from `system`, the mandatory base and reference skeleton):
+- **K-LAY-1** — direction never reversed (biz imports neither `data`/`client` nor `service`/`server`/`platform`); cross-module access is a read via repo port. lint: `TestModuleDependencyDAG` green.
+- **K-LAY-2** — business logic in biz; no business rules in data; no repo access in service. eye.
 
-1. **Copy-set**: `project.json` / `Dockerfile` / both `config.yamls` / `conf.proto`(+buf.gen.conf) / `cmd/app` / `bootstrap` (lifecycle only, no seed) / `shared` (kernel trimmed + `dependency_guard_test` rewritten) / `platform` (trimmed to the module set — §5 platform law) / `server` (five files) / `client` (once the service calls out) / `ent` schema + `local_mixins`. Deliberately NOT copied: `seed.go`, system business modules, the authz engine internals (casbin/attrs/policies), audit.
-2. **Dials**: the port triple advances **+1 per service** (system 11001/12001/13001 → agent 11002/…; the service configs are the truth). A service assembling redis isolates its db index from non-service consumers of the same redis (the current pairing lives in the compose files).
-3. **ent first generation is a two-pass stub dance**: `local_mixins` import the generated tree (chicken-and-egg), so stub the mixins (nil `Hooks`/`Interceptors` over entgo-level types) → generate → restore the real mixins → regenerate. entc also refuses an empty schema package ("no Go files"), so the derive slice must land its first aggregate's schema — deferring all schemas to the data slice is not an option. After removing an entity, nuke the whole generated tree first — the loader reads the stale tree.
-4. **wire cold start**: the `go:generate` directive lives in `wire_gen.go` itself — a fresh service runs `go run github.com/google/wire/cmd/wire` manually; wire rejects interface bindings with no consumer in the graph (comment the bind out until its consumer exists).
-5. **First migration**: `NAME=init <svc>:migrate:diff` → hand-prepend `CREATE EXTENSION` lines the atlas scratch already has (a service database owns its extensions) → `:migrate:hash` → `:migrate:apply`. Recreate the service database rather than fighting a drifted init. Squashing the directory into one init requires resetting the atlas dev database first (`DROP DATABASE atlas_dev; CREATE DATABASE atlas_dev`) — the diff runs against its residual schema, so a stale dev database yields a delta fragment instead of the full schema.
-6. **IAM**: consume per §5a "Non-system services"; blank-import the service's gen in `shared-go/kratos/security/access_annotation_test.go`.
-7. **Catalog**: nothing to wire — the grant tree picks the new service up when `proto:generate:catalog` emits its manifest; system live-loads it (no restart, no import).
-8. **Deploy plane**: compose migrate job + service block (network alias `<svc>.api`, healthz, no host ports), traefik package-prefix routers on the admin/api hosts, `02-databases.sql` shell (existing volumes need a one-time manual `CREATE DATABASE`), `deploy/project.json` target lists, vite proxy key + dev env entry.
+### Reuse — law §1, §5
+
+- **K-UTL-1** — no `encoding/json` outside the §1 exemptions. lint: `TestSerializationViaUtils` green.
+- **K-UTL-2** — mapping and pagination helpers come from `shared-go/utils` and `shared-go/helper`; a hand-rolled nil-guard wrapper or private re-implementation is a duplicate. eye: added function signatures vs the utils/helper surface.
+- **K-UTL-3** — sibling predicates in one data-layer function share one shape (`helper.Where`/`helper.WherePtr` uniformly; no bare `if query.Where` next to kin). eye: compare side by side.
+
+### Errors — law §6
+
+- **K-ERR-1** — identity only from catalog factories, message `""`. lint: added-line grep for `Error[A-Za-z]+\("[^"]` (non-empty message = FAIL).
+- **K-ERR-2** — reason predicates, never kratos code checks (`errors.IsNotFound` & siblings banned). lint: `TestReasonPredicates` green.
+- **K-ERR-3** — infra classified at choke points; a UC never returns a raw upstream error; no circulating sentinels; biz logs errors nowhere outside the swallow-path exception. eye.
+
+### Review — pre-amend
+
+- **K-REV-1** — same-recipe consistency: sibling functions of one family (`ensure*`, classify wrappers, sweep stages) share the same race and error law; a difference is either a bug or a distinction worth a comment. eye: compare side by side, never in isolation.
+- **K-REV-2** — test comments state the law only; fixtures carry no unused fields; assertions use generated `Is<Reason>` predicates, never message text. eye.
+- **K-REV-3** — every hunk meaningful; formatter round-trips on untouched content get reverted, not committed as churn. eye.
+- **K-REV-4** — fixture defaults mirror the real degenerate world (a default fake answering differently from production data red-shifts unrelated tests). eye.

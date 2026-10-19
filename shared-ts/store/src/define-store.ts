@@ -66,9 +66,8 @@ export function getRegistry(): ReadonlyArray<StoreDefinition> {
 }
 
 // RPC-boundary serializability: server fns returning this data must satisfy
-// TanStack's serializable validation — `unknown` values don't (the original
-// app-side `Serializable` cast was load-bearing). Values come from readCookie
-// (superjson parse), serializable by construction.
+// TanStack's serializable validation — `unknown` values don't. Values come
+// from readCookie (superjson parse), serializable by construction.
 export type StoreSerializable =
   | null
   | boolean

@@ -53,6 +53,7 @@ type UserListIn struct {
 	Enabled    *bool
 	DeptID     *string
 	Population *string
+	UserIDs    []string
 }
 
 type UserListOut struct {
@@ -72,6 +73,7 @@ type UserRP interface {
 	FindByAccount(ctx context.Context, account string) (*User, error)
 	FindByID(ctx context.Context, id string) (*User, error)
 	FindSeated(ctx context.Context, id string) (*User, error)
+	FindSeatedAnyPlane(ctx context.Context, id string) (*User, error)
 	FindByIDs(ctx context.Context, ids []string) (map[string]*User, error)
 	FindCredential(ctx context.Context, kind, identifier string) (*Credential, error)
 	CreateCredential(ctx context.Context, c *Credential) error
@@ -231,7 +233,9 @@ func (uc *UserUC) UpdateStatus(ctx context.Context, id string, enabled bool) (ou
 	if subject, ok := security.SubjectFromCtx(ctx); ok && !enabled && subject.UserID == id {
 		return nil, systempb.ErrorSystemUserSelfDisable("")
 	}
-	if _, err = uc.ensureSeatedUser(ctx, id); err != nil {
+	// Governance reach: every identity seated in the caller's tenant,
+	// member plane included — the plane filter stays a visibility law.
+	if _, err = uc.ensureTenantSeatedUser(ctx, id); err != nil {
 		return nil, err
 	}
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
@@ -367,6 +371,17 @@ func (uc *UserUC) ensureUser(ctx context.Context, id string) (*User, error) {
 
 func (uc *UserUC) ensureSeatedUser(ctx context.Context, id string) (*User, error) {
 	u, err := uc.userRP.FindSeated(ctx, id)
+	if err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return nil, systempb.ErrorSystemUserNotFound("")
+		}
+		return nil, err
+	}
+	return u, nil
+}
+
+func (uc *UserUC) ensureTenantSeatedUser(ctx context.Context, id string) (*User, error) {
+	u, err := uc.userRP.FindSeatedAnyPlane(ctx, id)
 	if err != nil {
 		if errorspb.IsInfraErrorDbNotFound(err) {
 			return nil, systempb.ErrorSystemUserNotFound("")
