@@ -157,3 +157,9 @@ out/
 # Nuxt.js
 .nuxt/
 dist/
+
+# Local agent memory (project-local, not repository content)
+/memory/
+
+# npm lockfile — the workspace uses pnpm (pnpm-lock.yaml is the tracked lockfile)
+/package-lock.json
