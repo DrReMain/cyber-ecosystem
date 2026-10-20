@@ -5,9 +5,10 @@ import (
 	"log/slog"
 	"time"
 
+	"cyber-ecosystem/shared-go/helper"
+
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
-	"cyber-ecosystem/shared-go/helper"
 
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/shared"
