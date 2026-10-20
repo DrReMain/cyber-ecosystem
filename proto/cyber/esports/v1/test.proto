@@ -163,7 +163,7 @@ message BackgroundSpan {
 
 message SubmitTestAttemptRequest {
   // Code join key (e.g. "red_dot") — same law as Test.code.
-  string test_code = 1 [
+  optional string test_code = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string = {
       min_len: 1
@@ -172,9 +172,9 @@ message SubmitTestAttemptRequest {
   ];
   // Attempt ordinal inside the match session — the E4 session law owns the
   // semantics (lockdown, retest budget); this contract only carries the key.
-  int32 attempt_no = 2 [(buf.validate.field).int32.gte = 1];
-  google.protobuf.Timestamp started_at = 3 [(buf.validate.field).required = true];
-  google.protobuf.Timestamp ended_at = 4 [(buf.validate.field).required = true];
+  optional int32 attempt_no = 2 [(buf.validate.field).int32.gte = 1];
+  optional google.protobuf.Timestamp started_at = 3 [(buf.validate.field).required = true];
+  optional google.protobuf.Timestamp ended_at = 4 [(buf.validate.field).required = true];
   repeated BackgroundSpan backgrounds = 5 [(buf.validate.field).repeated.max_items = 64];
   oneof raw_detail {
     RedDotDetail red_dot = 10;
@@ -197,12 +197,12 @@ message SubmitTestAttemptResponse {
   string record_id = 1;
   // Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
   // authoritative score with its grade — neither is client-computable.
-  double raw_score = 2;
-  double authoritative_score = 3;
+  google.protobuf.DoubleValue raw_score = 2;
+  google.protobuf.DoubleValue authoritative_score = 3;
   // Open vocabulary {S | A | B | C} — the four-color tier law.
-  string grade = 4;
+  google.protobuf.StringValue grade = 4;
   // Ability attribution receipt, six-word vocabulary shared with Test.ability.
-  string ability = 5;
+  google.protobuf.StringValue ability = 5;
   // False when the attempt fails server-side validity (background over
   // budget, incomplete detail) — an invalid attempt scores nothing; the
   // reason code is ops vocabulary, not user copy.

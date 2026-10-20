@@ -613,12 +613,12 @@ func (x *BackgroundSpan) GetDurationMs() int32 {
 type SubmitTestAttemptRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Code join key (e.g. "red_dot") — same law as Test.code.
-	TestCode string `protobuf:"bytes,1,opt,name=test_code,json=testCode,proto3" json:"test_code,omitempty"`
+	TestCode *string `protobuf:"bytes,1,opt,name=test_code,json=testCode,proto3,oneof" json:"test_code,omitempty"`
 	// Attempt ordinal inside the match session — the E4 session law owns the
 	// semantics (lockdown, retest budget); this contract only carries the key.
-	AttemptNo   int32                  `protobuf:"varint,2,opt,name=attempt_no,json=attemptNo,proto3" json:"attempt_no,omitempty"`
-	StartedAt   *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
-	EndedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	AttemptNo   *int32                 `protobuf:"varint,2,opt,name=attempt_no,json=attemptNo,proto3,oneof" json:"attempt_no,omitempty"`
+	StartedAt   *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=started_at,json=startedAt,proto3,oneof" json:"started_at,omitempty"`
+	EndedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=ended_at,json=endedAt,proto3,oneof" json:"ended_at,omitempty"`
 	Backgrounds []*BackgroundSpan      `protobuf:"bytes,5,rep,name=backgrounds,proto3" json:"backgrounds,omitempty"`
 	// Types that are valid to be assigned to RawDetail:
 	//
@@ -671,15 +671,15 @@ func (*SubmitTestAttemptRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *SubmitTestAttemptRequest) GetTestCode() string {
-	if x != nil {
-		return x.TestCode
+	if x != nil && x.TestCode != nil {
+		return *x.TestCode
 	}
 	return ""
 }
 
 func (x *SubmitTestAttemptRequest) GetAttemptNo() int32 {
-	if x != nil {
-		return x.AttemptNo
+	if x != nil && x.AttemptNo != nil {
+		return *x.AttemptNo
 	}
 	return 0
 }
@@ -916,12 +916,12 @@ type SubmitTestAttemptResponse struct {
 	RecordId string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
 	// Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
 	// authoritative score with its grade — neither is client-computable.
-	RawScore           float64 `protobuf:"fixed64,2,opt,name=raw_score,json=rawScore,proto3" json:"raw_score,omitempty"`
-	AuthoritativeScore float64 `protobuf:"fixed64,3,opt,name=authoritative_score,json=authoritativeScore,proto3" json:"authoritative_score,omitempty"`
+	RawScore           *wrapperspb.DoubleValue `protobuf:"bytes,2,opt,name=raw_score,json=rawScore,proto3" json:"raw_score,omitempty"`
+	AuthoritativeScore *wrapperspb.DoubleValue `protobuf:"bytes,3,opt,name=authoritative_score,json=authoritativeScore,proto3" json:"authoritative_score,omitempty"`
 	// Open vocabulary {S | A | B | C} — the four-color tier law.
-	Grade string `protobuf:"bytes,4,opt,name=grade,proto3" json:"grade,omitempty"`
+	Grade *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=grade,proto3" json:"grade,omitempty"`
 	// Ability attribution receipt, six-word vocabulary shared with Test.ability.
-	Ability string `protobuf:"bytes,5,opt,name=ability,proto3" json:"ability,omitempty"`
+	Ability *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=ability,proto3" json:"ability,omitempty"`
 	// False when the attempt fails server-side validity (background over
 	// budget, incomplete detail) — an invalid attempt scores nothing; the
 	// reason code is ops vocabulary, not user copy.
@@ -970,32 +970,32 @@ func (x *SubmitTestAttemptResponse) GetRecordId() string {
 	return ""
 }
 
-func (x *SubmitTestAttemptResponse) GetRawScore() float64 {
+func (x *SubmitTestAttemptResponse) GetRawScore() *wrapperspb.DoubleValue {
 	if x != nil {
 		return x.RawScore
 	}
-	return 0
+	return nil
 }
 
-func (x *SubmitTestAttemptResponse) GetAuthoritativeScore() float64 {
+func (x *SubmitTestAttemptResponse) GetAuthoritativeScore() *wrapperspb.DoubleValue {
 	if x != nil {
 		return x.AuthoritativeScore
 	}
-	return 0
+	return nil
 }
 
-func (x *SubmitTestAttemptResponse) GetGrade() string {
+func (x *SubmitTestAttemptResponse) GetGrade() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Grade
 	}
-	return ""
+	return nil
 }
 
-func (x *SubmitTestAttemptResponse) GetAbility() string {
+func (x *SubmitTestAttemptResponse) GetAbility() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Ability
 	}
-	return ""
+	return nil
 }
 
 func (x *SubmitTestAttemptResponse) GetValid() bool {
@@ -2839,15 +2839,14 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"\n" +
 	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12(\n" +
 	"\vduration_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\n" +
-	"durationMs\"\xbd\n" +
+	"durationMs\"\x8a\v\n" +
+	"\x18SubmitTestAttemptRequest\x12.\n" +
+	"\ttest_code\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x01R\btestCode\x88\x01\x01\x12+\n" +
 	"\n" +
-	"\x18SubmitTestAttemptRequest\x12)\n" +
-	"\ttest_code\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@R\btestCode\x12&\n" +
+	"attempt_no\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x01H\x02R\tattemptNo\x88\x01\x01\x12F\n" +
 	"\n" +
-	"attempt_no\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x01R\tattemptNo\x12A\n" +
-	"\n" +
-	"started_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\tstartedAt\x12=\n" +
-	"\bended_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\aendedAt\x12L\n" +
+	"started_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x03R\tstartedAt\x88\x01\x01\x12B\n" +
+	"\bended_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x04R\aendedAt\x88\x01\x01\x12L\n" +
 	"\vbackgrounds\x18\x05 \x03(\v2 .cyber.esports.v1.BackgroundSpanB\b\xbaH\x05\x92\x01\x02\x10@R\vbackgrounds\x129\n" +
 	"\ared_dot\x18\n" +
 	" \x01(\v2\x1e.cyber.esports.v1.RedDotDetailH\x00R\x06redDot\x12H\n" +
@@ -2864,13 +2863,18 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"\x0eresource_match\x18\x15 \x01(\v2%.cyber.esports.v1.ResourceMatchDetailH\x00R\rresourceMatch\x12H\n" +
 	"\feconomic_sim\x18\x16 \x01(\v2#.cyber.esports.v1.EconomicSimDetailH\x00R\veconomicSimB\f\n" +
 	"\n" +
-	"raw_detail\"\xb2\x02\n" +
+	"raw_detailB\f\n" +
+	"\n" +
+	"_test_codeB\r\n" +
+	"\v_attempt_noB\r\n" +
+	"\v_started_atB\v\n" +
+	"\t_ended_at\"\xaa\x03\n" +
 	"\x19SubmitTestAttemptResponse\x12\x1b\n" +
-	"\trecord_id\x18\x01 \x01(\tR\brecordId\x12\x1b\n" +
-	"\traw_score\x18\x02 \x01(\x01R\brawScore\x12/\n" +
-	"\x13authoritative_score\x18\x03 \x01(\x01R\x12authoritativeScore\x12\x14\n" +
-	"\x05grade\x18\x04 \x01(\tR\x05grade\x12\x18\n" +
-	"\aability\x18\x05 \x01(\tR\aability\x12\x14\n" +
+	"\trecord_id\x18\x01 \x01(\tR\brecordId\x129\n" +
+	"\traw_score\x18\x02 \x01(\v2\x1c.google.protobuf.DoubleValueR\brawScore\x12M\n" +
+	"\x13authoritative_score\x18\x03 \x01(\v2\x1c.google.protobuf.DoubleValueR\x12authoritativeScore\x122\n" +
+	"\x05grade\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x05grade\x126\n" +
+	"\aability\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\aability\x12\x14\n" +
 	"\x05valid\x18\x06 \x01(\bR\x05valid\x12C\n" +
 	"\x0einvalid_reason\x18\a \x01(\v2\x1c.google.protobuf.StringValueR\rinvalidReason\x12\x1f\n" +
 	"\vretest_left\x18\b \x01(\x05R\n" +
@@ -3087,6 +3091,7 @@ var file_cyber_esports_v1_test_proto_goTypes = []any{
 	nil,                                  // 41: cyber.esports.v1.TestConfig.EngineParamsEntry
 	(*wrapperspb.StringValue)(nil),       // 42: google.protobuf.StringValue
 	(*timestamppb.Timestamp)(nil),        // 43: google.protobuf.Timestamp
+	(*wrapperspb.DoubleValue)(nil),       // 44: google.protobuf.DoubleValue
 }
 var file_cyber_esports_v1_test_proto_depIdxs = []int32{
 	42, // 0: cyber.esports.v1.Test.id:type_name -> google.protobuf.StringValue
@@ -3120,51 +3125,55 @@ var file_cyber_esports_v1_test_proto_depIdxs = []int32{
 	33, // 28: cyber.esports.v1.SubmitTestAttemptRequest.character_counter:type_name -> cyber.esports.v1.CharacterCounterDetail
 	35, // 29: cyber.esports.v1.SubmitTestAttemptRequest.resource_match:type_name -> cyber.esports.v1.ResourceMatchDetail
 	38, // 30: cyber.esports.v1.SubmitTestAttemptRequest.economic_sim:type_name -> cyber.esports.v1.EconomicSimDetail
-	42, // 31: cyber.esports.v1.SubmitTestAttemptResponse.invalid_reason:type_name -> google.protobuf.StringValue
-	13, // 32: cyber.esports.v1.RedDotDetail.events:type_name -> cyber.esports.v1.RedDotEvent
-	8,  // 33: cyber.esports.v1.RedDotEvent.target:type_name -> cyber.esports.v1.Point
-	8,  // 34: cyber.esports.v1.RedDotEvent.click:type_name -> cyber.esports.v1.Point
-	15, // 35: cyber.esports.v1.FlashAimingDetail.shots:type_name -> cyber.esports.v1.FlashAimingShot
-	8,  // 36: cyber.esports.v1.FlashAimingShot.target:type_name -> cyber.esports.v1.Point
-	8,  // 37: cyber.esports.v1.FlashAimingShot.click:type_name -> cyber.esports.v1.Point
-	17, // 38: cyber.esports.v1.MultiTargetDetail.picks:type_name -> cyber.esports.v1.MultiTargetPick
-	19, // 39: cyber.esports.v1.TargetRecognitionDetail.clicks:type_name -> cyber.esports.v1.TargetRecognitionClick
-	21, // 40: cyber.esports.v1.TrackingMovingDetail.frames:type_name -> cyber.esports.v1.TrackingMovingFrame
-	8,  // 41: cyber.esports.v1.TrackingMovingFrame.target:type_name -> cyber.esports.v1.Point
-	8,  // 42: cyber.esports.v1.TrackingMovingFrame.crosshair:type_name -> cyber.esports.v1.Point
-	8,  // 43: cyber.esports.v1.TrackingMovingFrame.player:type_name -> cyber.esports.v1.Point
-	23, // 44: cyber.esports.v1.MovingTargetDetail.shots:type_name -> cyber.esports.v1.MovingTargetShot
-	8,  // 45: cyber.esports.v1.MovingTargetShot.target:type_name -> cyber.esports.v1.Point
-	8,  // 46: cyber.esports.v1.MovingTargetShot.crosshair:type_name -> cyber.esports.v1.Point
-	25, // 47: cyber.esports.v1.SkillTrajectoryDetail.rounds:type_name -> cyber.esports.v1.SkillTrajectoryRound
-	8,  // 48: cyber.esports.v1.SkillTrajectoryRound.original_position:type_name -> cyber.esports.v1.Point
-	8,  // 49: cyber.esports.v1.SkillTrajectoryRound.trajectory:type_name -> cyber.esports.v1.Point
-	8,  // 50: cyber.esports.v1.SkillTrajectoryRound.player_placement:type_name -> cyber.esports.v1.Point
-	27, // 51: cyber.esports.v1.DualZoneDetail.behaviors:type_name -> cyber.esports.v1.DualZoneBehavior
-	8,  // 52: cyber.esports.v1.DualZoneBehavior.position:type_name -> cyber.esports.v1.Point
-	29, // 53: cyber.esports.v1.NumberStarsDetail.rounds:type_name -> cyber.esports.v1.NumberStarsRound
-	30, // 54: cyber.esports.v1.NumberStarsRound.clicks:type_name -> cyber.esports.v1.NumberStarsClick
-	8,  // 55: cyber.esports.v1.NumberStarsClick.position:type_name -> cyber.esports.v1.Point
-	32, // 56: cyber.esports.v1.OffenseDefenseDetail.decisions:type_name -> cyber.esports.v1.OffenseDefenseDecision
-	34, // 57: cyber.esports.v1.CharacterCounterDetail.rounds:type_name -> cyber.esports.v1.CharacterCounterRound
-	36, // 58: cyber.esports.v1.ResourceMatchDetail.trajectory:type_name -> cyber.esports.v1.ResourceMatchTrajectoryPoint
-	37, // 59: cyber.esports.v1.ResourceMatchDetail.collects:type_name -> cyber.esports.v1.ResourceMatchCollect
-	8,  // 60: cyber.esports.v1.ResourceMatchTrajectoryPoint.position:type_name -> cyber.esports.v1.Point
-	39, // 61: cyber.esports.v1.EconomicSimDetail.last_hits:type_name -> cyber.esports.v1.EconomicSimLastHit
-	40, // 62: cyber.esports.v1.EconomicSimDetail.purchases:type_name -> cyber.esports.v1.EconomicSimPurchase
-	1,  // 63: cyber.esports.v1.TestService.ListTests:input_type -> cyber.esports.v1.ListTestsRequest
-	3,  // 64: cyber.esports.v1.TestService.GetTest:input_type -> cyber.esports.v1.GetTestRequest
-	5,  // 65: cyber.esports.v1.TestService.GetTestConfig:input_type -> cyber.esports.v1.GetTestConfigRequest
-	10, // 66: cyber.esports.v1.TestService.SubmitTestAttempt:input_type -> cyber.esports.v1.SubmitTestAttemptRequest
-	2,  // 67: cyber.esports.v1.TestService.ListTests:output_type -> cyber.esports.v1.ListTestsResponse
-	4,  // 68: cyber.esports.v1.TestService.GetTest:output_type -> cyber.esports.v1.GetTestResponse
-	6,  // 69: cyber.esports.v1.TestService.GetTestConfig:output_type -> cyber.esports.v1.GetTestConfigResponse
-	11, // 70: cyber.esports.v1.TestService.SubmitTestAttempt:output_type -> cyber.esports.v1.SubmitTestAttemptResponse
-	67, // [67:71] is the sub-list for method output_type
-	63, // [63:67] is the sub-list for method input_type
-	63, // [63:63] is the sub-list for extension type_name
-	63, // [63:63] is the sub-list for extension extendee
-	0,  // [0:63] is the sub-list for field type_name
+	44, // 31: cyber.esports.v1.SubmitTestAttemptResponse.raw_score:type_name -> google.protobuf.DoubleValue
+	44, // 32: cyber.esports.v1.SubmitTestAttemptResponse.authoritative_score:type_name -> google.protobuf.DoubleValue
+	42, // 33: cyber.esports.v1.SubmitTestAttemptResponse.grade:type_name -> google.protobuf.StringValue
+	42, // 34: cyber.esports.v1.SubmitTestAttemptResponse.ability:type_name -> google.protobuf.StringValue
+	42, // 35: cyber.esports.v1.SubmitTestAttemptResponse.invalid_reason:type_name -> google.protobuf.StringValue
+	13, // 36: cyber.esports.v1.RedDotDetail.events:type_name -> cyber.esports.v1.RedDotEvent
+	8,  // 37: cyber.esports.v1.RedDotEvent.target:type_name -> cyber.esports.v1.Point
+	8,  // 38: cyber.esports.v1.RedDotEvent.click:type_name -> cyber.esports.v1.Point
+	15, // 39: cyber.esports.v1.FlashAimingDetail.shots:type_name -> cyber.esports.v1.FlashAimingShot
+	8,  // 40: cyber.esports.v1.FlashAimingShot.target:type_name -> cyber.esports.v1.Point
+	8,  // 41: cyber.esports.v1.FlashAimingShot.click:type_name -> cyber.esports.v1.Point
+	17, // 42: cyber.esports.v1.MultiTargetDetail.picks:type_name -> cyber.esports.v1.MultiTargetPick
+	19, // 43: cyber.esports.v1.TargetRecognitionDetail.clicks:type_name -> cyber.esports.v1.TargetRecognitionClick
+	21, // 44: cyber.esports.v1.TrackingMovingDetail.frames:type_name -> cyber.esports.v1.TrackingMovingFrame
+	8,  // 45: cyber.esports.v1.TrackingMovingFrame.target:type_name -> cyber.esports.v1.Point
+	8,  // 46: cyber.esports.v1.TrackingMovingFrame.crosshair:type_name -> cyber.esports.v1.Point
+	8,  // 47: cyber.esports.v1.TrackingMovingFrame.player:type_name -> cyber.esports.v1.Point
+	23, // 48: cyber.esports.v1.MovingTargetDetail.shots:type_name -> cyber.esports.v1.MovingTargetShot
+	8,  // 49: cyber.esports.v1.MovingTargetShot.target:type_name -> cyber.esports.v1.Point
+	8,  // 50: cyber.esports.v1.MovingTargetShot.crosshair:type_name -> cyber.esports.v1.Point
+	25, // 51: cyber.esports.v1.SkillTrajectoryDetail.rounds:type_name -> cyber.esports.v1.SkillTrajectoryRound
+	8,  // 52: cyber.esports.v1.SkillTrajectoryRound.original_position:type_name -> cyber.esports.v1.Point
+	8,  // 53: cyber.esports.v1.SkillTrajectoryRound.trajectory:type_name -> cyber.esports.v1.Point
+	8,  // 54: cyber.esports.v1.SkillTrajectoryRound.player_placement:type_name -> cyber.esports.v1.Point
+	27, // 55: cyber.esports.v1.DualZoneDetail.behaviors:type_name -> cyber.esports.v1.DualZoneBehavior
+	8,  // 56: cyber.esports.v1.DualZoneBehavior.position:type_name -> cyber.esports.v1.Point
+	29, // 57: cyber.esports.v1.NumberStarsDetail.rounds:type_name -> cyber.esports.v1.NumberStarsRound
+	30, // 58: cyber.esports.v1.NumberStarsRound.clicks:type_name -> cyber.esports.v1.NumberStarsClick
+	8,  // 59: cyber.esports.v1.NumberStarsClick.position:type_name -> cyber.esports.v1.Point
+	32, // 60: cyber.esports.v1.OffenseDefenseDetail.decisions:type_name -> cyber.esports.v1.OffenseDefenseDecision
+	34, // 61: cyber.esports.v1.CharacterCounterDetail.rounds:type_name -> cyber.esports.v1.CharacterCounterRound
+	36, // 62: cyber.esports.v1.ResourceMatchDetail.trajectory:type_name -> cyber.esports.v1.ResourceMatchTrajectoryPoint
+	37, // 63: cyber.esports.v1.ResourceMatchDetail.collects:type_name -> cyber.esports.v1.ResourceMatchCollect
+	8,  // 64: cyber.esports.v1.ResourceMatchTrajectoryPoint.position:type_name -> cyber.esports.v1.Point
+	39, // 65: cyber.esports.v1.EconomicSimDetail.last_hits:type_name -> cyber.esports.v1.EconomicSimLastHit
+	40, // 66: cyber.esports.v1.EconomicSimDetail.purchases:type_name -> cyber.esports.v1.EconomicSimPurchase
+	1,  // 67: cyber.esports.v1.TestService.ListTests:input_type -> cyber.esports.v1.ListTestsRequest
+	3,  // 68: cyber.esports.v1.TestService.GetTest:input_type -> cyber.esports.v1.GetTestRequest
+	5,  // 69: cyber.esports.v1.TestService.GetTestConfig:input_type -> cyber.esports.v1.GetTestConfigRequest
+	10, // 70: cyber.esports.v1.TestService.SubmitTestAttempt:input_type -> cyber.esports.v1.SubmitTestAttemptRequest
+	2,  // 71: cyber.esports.v1.TestService.ListTests:output_type -> cyber.esports.v1.ListTestsResponse
+	4,  // 72: cyber.esports.v1.TestService.GetTest:output_type -> cyber.esports.v1.GetTestResponse
+	6,  // 73: cyber.esports.v1.TestService.GetTestConfig:output_type -> cyber.esports.v1.GetTestConfigResponse
+	11, // 74: cyber.esports.v1.TestService.SubmitTestAttempt:output_type -> cyber.esports.v1.SubmitTestAttemptResponse
+	71, // [71:75] is the sub-list for method output_type
+	67, // [67:71] is the sub-list for method input_type
+	67, // [67:67] is the sub-list for extension type_name
+	67, // [67:67] is the sub-list for extension extendee
+	0,  // [0:67] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_test_proto_init() }

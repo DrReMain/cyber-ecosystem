@@ -31,7 +31,7 @@
 |---|---|---|---|
 | E0 契约首刀 | esports v1 proto:测试域(类型/配置读面、统一提交(建议单 RPC + oneof 明细)、明细/成绩上报、排行)、画像、匹配、单次报告读面、entitlement 最小面。nullable 语义显式(optional),判定阈值随配置下发。验收:proto 全链生成+lint+breaking 绿,评审冻结(D-U:增量推进——种子片=画像+游戏目录已于 2026-10-18 冻结,余面逐片评审) | README §0 | M |
 | E1 服务骨架 | kratos-new-service 复制集:双面 accessLadder(ADMIN/MEMBER)、catalog 注册、deploy compose 面、system 消费(登录/会员链)。验收:服务起活,会员链探针 e2e 绿(**兼作 hzy onboarding 切片**) | E0 | M |
-| E2 schema+种子 | ent 首批:test/game/preference/config/contribution/题库/test_record/ability_score/entitlement 事件;种子重放(修坑:dual_zone 枚举统一、multi_target 补行、skill_prediction 不入、枚举约束防回归)。验收:migrate 归一+种子 e2e | E1 | M |
+| E2 schema+种子 | ent 首批:test/game/preference/config/contribution/题库/test_record/ability_score/entitlement 事件;种子重放(修坑:dual_zone 枚举统一、multi_target 补行、skill_prediction 不入、枚举约束防回归)。验收:migrate 归一+种子 e2e。2026-10-20 缩围补登(D-AA:entitlement→E8、contribution→E3;multi_target 补行落 D-Z) | E1 | M |
 | E3 评分引擎 | 三层落位:指标层(13 款指标定义单源档,本片创建)/门槛层(百分位档位)/评分层(无上限线性+权威分位双轨);Tier A 九款全量重算 + Tier B 四款闸门;red_dot 锚点初始校准常量;ScorerRegistry 插件契约(加测试零改主干)。验收:域函数单测+提交→重算→报告分 e2e | E0,E2 | XL |
 | E4 匹配引擎 | match_config(预留 scenario 维度)+类型轴多数投票+两层编排+当日 seed+session 锁死落库+重测 3/1。验收:同日稳定/跨日变化/重排换 seed e2e | E2 | M |
 | E5 报告框架+能力报告 | 板块插件化(supports)+缺维度不渲染七硬约束+完整度指示+同龄百分位(Z-score CDF+置信分层)+档位四色;M1 只实现单次能力报告所需板块。验收:缺维场景渲染收拢 e2e | E3 | L |

@@ -88,6 +88,8 @@
 | D-W | **population 贯通滞后**:C 端会员现落 DefaultPopulation(engine 的 user 人群)——admin 用户管理混排+patron 语义悬空为已知债;修复=骨架演进四件(provider 行 member_population 配置/ListUsers population 过滤/member 人群行建法/存量座位迁移),与 agent 侧 guard 测试注释清理同批滞后,触发器=population 维度首个真实消费者(E8 权益面或会员治理面)。三裁决点存档:①member 行建法(admin 人群页手动 vs esports 引导种子经 CreatePopulation RPC)②admin 用户管理人群可见性(筛选器默认 user vs 硬排除 patron)③存量 wechat 用户座位迁移方式。**2026-10-19 D-X 修正:四件之"ListUsers population 过滤"作废,该件重述为独立组合缝** |
 | D-X | **系统管理模块纯度律**:"系统管理"=大后台通用管理模块(IAM 为主)的辖区——不得涉及任何用户端/其他端的信息,后台自身其他业务模块亦不得进入该区;组合消费需求(如按人群枚举名册)不得焊在系统管理的消费面上。首案执行(2026-10-19):ListUsers population 过滤曾落后当日撤回(dev/esports 双支本地提交整体回退);会员名册组合缝独立落位=ListUsersByPopulation 组合面+member 人群分离,已落地(a8b9f0a4) |
 | D-Y | **骨架一步到位法**(2026-10-19 用户裁定,废除底座面的"第二消费者才抽象"):底座按已声明场景全集一次做对——多应用组合/C 端会员面/SaaS 多租户/ToB 专版是底座既定需求非未来投机;底座容不下已声明场景=机制级缺陷,修模型、不打补丁、不递延。业务应用内部仍具体先行、重复才提取(2026-08-26 教训保留,作用域收窄到应用内)。AGENTS §8 已同步改法。首案=**人群面统一**:population 的 archetype(engine|patron)+member 旗标收拢为单一 plane(backend\|platform\|member),权限求值方式与后台可见性全部由 plane 推导;触发=本裁定即刻,规模=一骨架片 |
+| D-Z | **种子 category 口径=genre-order 编码**(2026-10-20 批量追审定案):原型池法=按能力全局建池(POOL 不滤 genre)、genre 只定 render_order(ORDER:fps=反应/瞄准/追踪/技能,moba=资源/决策/反应/技能);catalog 层编码为 category∈{fps,moba,universal}——双 genre 共跑的能力族(reactionSpeed 四款+skill_trajectory)标 universal,单 genre 能力族保持原生标记(瞄准/追踪=fps,决策/资源=moba)。multi_target 补行=fps/aimingAccuracy(依据 _state.js 权威行+metric.md §四 瞄准;plan.md E2 修坑项本就要求),b6e135f3「P9 同族留空」为错误扩展(P9 仅涉 target_recognition),随之废除。影响面:E2 种子数据、seed 注释、ctr arranger 注释;lineup 零变化(created-order 首选不变) |
+| D-AA | **E2 缩围补登(迟,遵 D-Q)**:entitlement 事件面→E8(P1 定形)、contribution 表→E3(权重矩阵属评分数据)——aee354e0 落地时仅 progress 记录、README 台账缺痕,本条补齐;plan.md E2 行同步注记。影响面:CP 口径不变 |
 
 ### 2.2 待裁(Owner + 时点;背景与候选案在 prd.md 对应条目展开)
 

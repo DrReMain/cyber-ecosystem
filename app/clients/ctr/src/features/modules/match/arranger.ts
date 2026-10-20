@@ -27,7 +27,7 @@ export const GENRE_ORDER: Readonly<Record<Genre, readonly string[]>> = {
 
 // A genre pool = its own category plus universal; per ability the first
 // catalog row (created order) wins. Tests without an ability attribution
-// (multi_target pending P9) never enter a pool.
+// never enter a pool.
 export function arrange(tests: CatalogTest[], genre: Genre): ArrangedStep[] {
   return GENRE_ORDER[genre]
     .map((ability) =>

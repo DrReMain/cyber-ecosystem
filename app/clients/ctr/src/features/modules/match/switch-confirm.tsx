@@ -1,4 +1,5 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
@@ -37,7 +38,7 @@ export function SwitchConfirmPage() {
               <div className="text-[10.5px] text-ink-tertiary">{m.match_switch_cur()}</div>
               <div className="mt-1 font-extrabold text-ink text-sm">{genreLabel(cur)}</div>
             </div>
-            <div className="shrink-0 text-ink-tertiary">→</div>
+            <ArrowRight aria-hidden className="shrink-0 text-ink-tertiary" size={16} />
             <div className="flex-1 rounded-tile border border-line-accent-purple/60 bg-surface-deep p-3 text-center">
               <div className="text-[10.5px] text-ink-tertiary">{m.match_switch_tgt()}</div>
               <div className="mt-1 font-extrabold text-ink text-sm">{genreLabel(tgt)}</div>

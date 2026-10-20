@@ -1,5 +1,5 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { FolderOpen } from "lucide-react";
+import { ChevronRight, FolderOpen } from "lucide-react";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
@@ -88,9 +88,7 @@ export function GenrePickPage() {
                 </div>
                 <div className="mt-0.5 text-[11px] text-ink-tertiary">{m.match_pick_sub()}</div>
               </div>
-              <span aria-hidden className="text-ink-tertiary">
-                ›
-              </span>
+              <ChevronRight aria-hidden className="text-ink-tertiary" size={16} />
             </div>
             <div className="mt-1.5">
               {GENRE_ORDER[genre].map((ability) => {

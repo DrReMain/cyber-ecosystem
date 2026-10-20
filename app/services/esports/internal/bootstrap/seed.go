@@ -46,7 +46,7 @@ var seedTests = []struct {
 	{"resource_match", "资源配对测试", "moba", "resourceAllocation"},
 	{"character_counter", "角色Counter测试", "moba", "resourceAllocation"},
 	{"economic_sim", "经济模拟测试", "moba", "resourceAllocation"},
-	{"multi_target", "multi_target", "", ""},
+	{"multi_target", "多目标点击测试", "fps", "aimingAccuracy"},
 }
 
 type Seed struct {
@@ -63,12 +63,12 @@ func NewSeed(p *platform.Platform, logger *slog.Logger) (*Seed, error) {
 func (s *Seed) Run(ctx context.Context) error {
 	client := s.plat.GetClient(ctx)
 	for _, g := range seedGames {
-		exists, err := client.Game.Query().Where(game.CodeEQ(g.Code)).Exist(ctx)
-		if err != nil {
-			return s.plat.HandleEntError(fmt.Errorf("seed: query game %q: %w", g.Code, err))
-		}
-		if exists {
+		_, err := client.Game.Query().Where(game.CodeEQ(g.Code)).Only(ctx)
+		if err == nil {
 			continue
+		}
+		if !ent.IsNotFound(err) {
+			return s.plat.HandleEntError(fmt.Errorf("seed: query game %q: %w", g.Code, err))
 		}
 		if _, err := client.Game.Create().
 			SetCode(g.Code).
@@ -76,18 +76,27 @@ func (s *Seed) Run(ctx context.Context) error {
 			SetCategory(g.Category).
 			SetDescription(g.Description).
 			Save(ctx); err != nil {
+			// Multi-replica boot race: a concurrent seed may have inserted
+			// the unique row between the miss and this create — re-query
+			// before failing (the same arm the test loop carries).
+			if ent.IsConstraintError(err) {
+				if _, reErr := client.Game.Query().Where(game.CodeEQ(g.Code)).Only(ctx); reErr == nil {
+					continue
+				}
+			}
 			return s.plat.HandleEntError(fmt.Errorf("seed: create game %q: %w", g.Code, err))
 		}
 		s.log.Info("seeded game", "code", g.Code)
 	}
 	for _, t := range seedTests {
-		// Names/categories/abilities are adopted verbatim from the legacy
-		// interactive baseline (_state.js, an authority-table source);
-		// category follows the genre-order rule (abilities on both genre
-		// pools are universal). multi_target has no legacy row — its
-		// attribution rides the P9-family ruling and stays empty. Durations,
-		// engine params, unit labels, and introductions remain metric-sheet
-		// data landing with E3.
+		// Names and abilities are adopted verbatim from the legacy
+		// interactive baseline (_state.js GAMES, an authority-table source —
+		// multi_target included). Categories encode the prototype's pool law
+		// (genre-order rule, D-Z): lineups draw per-ability pools the genre
+		// order runs, so families both orders draw (reactionSpeed,
+		// skillReleaseAccuracy) are universal while single-genre families
+		// keep their native mark. Durations, engine params, unit labels,
+		// and introductions remain metric-sheet data landing with E3.
 		row, err := client.Test.Query().Where(test.CodeEQ(t.Code)).Only(ctx)
 		if err != nil && !ent.IsNotFound(err) {
 			return s.plat.HandleEntError(fmt.Errorf("seed: query test %q: %w", t.Code, err))
@@ -100,6 +109,13 @@ func (s *Seed) Run(ctx context.Context) error {
 				SetNillableAbility(strPtr(t.Ability)).
 				Save(ctx)
 			if err != nil {
+				// Multi-replica boot race: see the game loop's arm — the
+				// winning replica created the config row too.
+				if ent.IsConstraintError(err) {
+					if _, reErr := client.Test.Query().Where(test.CodeEQ(t.Code)).Only(ctx); reErr == nil {
+						continue
+					}
+				}
 				return s.plat.HandleEntError(fmt.Errorf("seed: create test %q: %w", t.Code, err))
 			}
 			if _, err := client.TestConfig.Create().
