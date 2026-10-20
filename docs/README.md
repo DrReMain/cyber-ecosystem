@@ -7,6 +7,7 @@ Entry points:
 - **`AGENTS.md`** (repo root) — root rules + area routing index; auto-loaded by coding agents. `CLAUDE.md` is a Claude Code import shell over it.
 - **`.claude/rules/`** — path-scoped delivery shells; injected automatically when Claude reads or edits a file matching the frontmatter `paths` globs; pointer-only (§2.9).
 - **`.claude/skills/`** — procedural workflow dispatchers; Claude Code triggers them by description, everyone else reads them as plain markdown.
+- **`docs/environment.md`** — the recommended agent environment: optional tooling, each entry naming what its absence degrades; a root-level durable doc (no stack area owns it).
 - **This file** — the governance law; read on demand.
 
 ---
@@ -20,6 +21,8 @@ Entry points:
 | **Procedural** | `.claude/skills/<name>/SKILL.md` | workflow dispatchers — trigger, pointers, cross-doc assembly, one-line trap annotations (warning + home pointer, no steps); never rule text or step text | EN | evolves with code; git-versioned; directory names are stable identifiers |
 
 **Single-source law.** Content is never copied. Where two audiences need the same knowledge, both read the same file. A skill contributes only a trigger, pointers, and one-line trap annotations (a warning naming the trap and its home section — never the rule text or the steps); procedures (checklists) live in docs, and skills point at them. Duplication is the one failure mode this law exists to prevent — one fact, one home, everything else a pointer.
+
+**Root tier of the Durable lane.** Durable knowledge with no stack area lives in the root rules (`AGENTS.md`) when it is rules, or as a root-level `docs/<topic>.md` registered in the entry list when it is a recommendation layer — currently `docs/environment.md`. This is the Durable lane's root tier, not a fourth lane.
 
 ---
 
