@@ -1,7 +1,7 @@
 # Agent 能力前沿（P3 第一刀）
 
 > 状态：活跃（2026-10-01 开启；用户裁决 Agent 切片先于 IoT，vision §3 P3 顺序已同步翻转）。
-> 归宿：收口时 durable 规则回灌对应 conventions（kratos/proto/tanstack/deploy），本档按治理法删除。
+> destination: 收口时 durable 规则回灌对应 conventions（kratos/proto/tanstack/deploy），本档按治理法删除。
 > 范围对齐 vision §3 P3：会话 → SSE 流式回答 → 工具调用一次；压测面 = 流式 + 事件 + storage + LLM 网关扩展位 + 向量存储。
 
 ## 0) 开局裁决（2026-10-01）
