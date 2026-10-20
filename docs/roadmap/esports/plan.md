@@ -11,8 +11,8 @@
 
 | 窗口 | 日期 | 服务线(建议用户) | 客户端线(建议 hzy) | 产品线(ljr) |
 |---|---|---|---|---|
-| W1 | 10.19-10.25 | E6b 登录重构(裁决落地:sms/绑定/合并)——骨架演进后最小闭环按 esports 设计重做 | hzy 外围启动线开工:H1 系统态件(onboarding 首片)→H2 协议页→H-A 引擎框架启动 | P1 分析启动;支付商户号/凭据打包确认 |
-| W2 | 10.26-11.01 | E6b 重构收口 + E0 余面推进(统一提交/报告读面/entitlement;H-B rawDetail 反哺) + E2 重启(接通闭环已验,备份重放) | H-A 收口(mock config 下 red_dot 可玩+时钟正确性)→H-B 反应瞄准批起步 | **P1 定案(10-28 前)** |
+| W1 | 10.19-10.25 | E6b 登录重构(裁决落地:sms/绑定/合并)——骨架演进后最小闭环按 esports 设计重做 | hzy 外围启动线开工:H1 系统态件(onboarding 首片)→H2 协议页→H-A 引擎框架启动 | P1 分析启动(✅ 10-21 定案);支付商户号/凭据打包确认 |
+| W2 | 10.26-11.01 | E6b 重构收口 + E0 余面推进(统一提交/报告读面/entitlement;H-B rawDetail 反哺) + E2 重启(接通闭环已验,备份重放) | H-A 收口(mock config 下 red_dot 可玩+时钟正确性)→H-B 反应瞄准批起步 | **P1 定案 ✅ 10-21(D-AB/D-AC)** |
 | W3 | 11.02-11.08 | E3 评分引擎(框架+Tier A 前半) | E7 游戏引擎框架 + 反应瞄准批起步 | P3 完成页/付费墙交互项 |
 | W4 | 11.09-11.15 | E3 收口(13 款 Scorer+档位层)、E4 匹配 | E7 反应瞄准批收口(4 款)、E9 最小 admin 面 | — |
 | W5 | 11.16-11.22 | E8 权益、PAY1 订单域 | E7 追踪技能批(4 款)、E5 报告前端 | P7 会员态付费墙稿启动 |
@@ -29,7 +29,7 @@
 
 | 片 | 内容与验收要点(语义级验收,D-O) | 依赖 | 规模 |
 |---|---|---|---|
-| E0 契约首刀 | esports v1 proto:测试域(类型/配置读面、统一提交(建议单 RPC + oneof 明细)、明细/成绩上报、排行)、画像、匹配、单次报告读面、entitlement 最小面。nullable 语义显式(optional),判定阈值随配置下发。验收:proto 全链生成+lint+breaking 绿,评审冻结(D-U:增量推进——种子片=画像+游戏目录已于 2026-10-18 冻结,余面逐片评审) | README §0 | M |
+| E0 契约首刀 | esports v1 proto:测试域(类型/配置读面、统一提交(建议单 RPC + oneof 明细)、明细/成绩上报、排行)、画像、匹配、单次报告读面、entitlement 最小面(scope_kind/scope_ref,付费只发 trial;D-AB)。nullable 语义显式(optional),判定阈值随配置下发。验收:proto 全链生成+lint+breaking 绿,评审冻结(D-U:增量推进——种子片=画像+游戏目录已于 2026-10-18 冻结,余面逐片评审) | README §0 | M |
 | E1 服务骨架 | kratos-new-service 复制集:双面 accessLadder(ADMIN/MEMBER)、catalog 注册、deploy compose 面、system 消费(登录/会员链)。验收:服务起活,会员链探针 e2e 绿(**兼作 hzy onboarding 切片**) | E0 | M |
 | E2 schema+种子 | ent 首批:test/game/preference/config/contribution/题库/test_record/ability_score/entitlement 事件;种子重放(修坑:dual_zone 枚举统一、multi_target 补行、skill_prediction 不入、枚举约束防回归)。验收:migrate 归一+种子 e2e。2026-10-20 缩围补登(D-AA:entitlement→E8、contribution→E3;multi_target 补行落 D-Z) | E1 | M |
 | E3 评分引擎 | 三层落位:指标层(13 款指标定义单源档,本片创建)/门槛层(百分位档位)/评分层(无上限线性+权威分位双轨);Tier A 九款全量重算 + Tier B 四款闸门;red_dot 锚点初始校准常量;ScorerRegistry 插件契约(加测试零改主干)。验收:域函数单测+提交→重算→报告分 e2e | E0,E2 | XL |
@@ -38,8 +38,8 @@
 | E6a ctr 纯壳 | 零 RPC:TanStack Start 新工程(Nx 目标面)+ react-aria/tailwind 接线(D-R)+ token 层(旧仓 DESIGN.md 为经验数据输入,按 D-O 合理实施;D-S dark-only 单套)+ 路由骨架(仅根路由+空白落地页,D-T:能力配置为交付面) + 微信 WebView 适配基线(safe-area/键盘 vh/无 hover 假设/横竖屏地基)+ shared-ts UI-free 四包(error/cookie/store/router-progress)接线;i18n=paraglide zh-CN+en-US(baseLocale zh-CN);**SEO 全量面(2026-10-18 补入,C 端公网)**:robots.txt + sitemap(hreflang/x-default)+ 流程页 noindex + 逐页 title。验收:dev/build/typecheck/lint 全绿,dark-only 语义 token 就位 | — | M |
 | E6b 登录+画像流 | 微信/手机登录(消费 system 既有契约,不等 E0)、画像流(昵称必填/出生年月 8 档/未满 13 监护人硬闸/游戏偏好) | E6a,E0(画像流半片) | L |
 | E7 游戏框架+13 款 | 统一引擎框架(rAF+dt+refs 或 canvas,墙钟计时+暂停顺延单实现)、遥测采集(新契约)、参数化单流程路由、配置驱动运行时、真响应式横竖屏。三批:反应瞄准(red_dot/flash_aiming/multi_target/target_recognition)W3-W4;追踪技能(tracking_moving/moving_target/skill_trajectory/dual_zone)W5;决策资源(number_stars/offense_defense/character_counter/resource_match/economic_sim)W6。验收:每批 live 冒烟+遥测字段对齐(语义级) | E6,E3 | XL |
-| E8 权益最小面 | entitlement 事件模型+激活码全生命周期(生成/批量/兑换原子守卫防超卖)+报告解锁判定(策略接口,终态按 P1)。验收:兑换并发不超卖 e2e | E2 | M |
-| E9 最小 admin 面 | admin client 挂 esports 模块:激活码+测试项/配置管理+题库种子查看;复用既有表格/搜索/动作列范式与 O-1/2/3 裁定。验收:开码→兑换→解锁闭环 e2e | E0 | M |
+| E8 权益最小面 | entitlement 事件模型+激活码全生命周期(生成/批量/兑换原子守卫防超卖)+报告访问判定(policy open/membership/tenant/closed + scope 覆盖;D-AB)。验收:兑换并发不超卖 e2e | E2 | M |
+| E9 最小 admin 面 | admin client 挂 esports 模块:激活码+测试项/配置管理+报告访问策略(职业/认知 open/membership/closed)+题库种子查看;复用既有表格/搜索/动作列范式与 O-1/2/3 裁定。验收:开码→兑换→解锁闭环 e2e | E0 | M |
 | E10 全链 e2e | 登录→画像→匹配→4 款→完成→单次报告→激活码解锁全链 live e2e;原型断言按语义级移植为验收基线(D-O);docs:check | 全部 | M |
 
 ## hzy 外围启动线(2026-10-19 增补;W1-W2 桥接,定义归此、状态记 progress)
@@ -57,13 +57,13 @@
 
 | 片 | 内容与验收 | 依赖 | 规模 |
 |---|---|---|---|
-| PAY1 订单域 | 订单/幂等(同单复用+结算幂等)/状态机;SKU 读面(原价/现价结构,D-F 无立减展示) | **P1(10-28)** | M |
+| PAY1 订单域 | 订单/幂等(同单复用+结算幂等)/状态机;订单行带 scope_kind/scope_ref(单次=trial,会员=period);SKU 读面(原价/现价结构,D-F 无立减展示) | **P1 已定(D-AB/D-AC,10-21)** | M |
 | PAY2 微信支付接入 | JSAPI(微信内)+H5(独立网页)统一下单/回调验签/对账;沙箱全流程→生产联调;**商户号 W1 即确认** | PAY1 | L |
 | PAY3 合规执法+付费墙 | 未成年拦截执法点(付费补填+18 岁禁付)/仅人工退款入口/会员态付费墙(P7 视觉稿,期内隐藏单次只留续费) | PAY2,P7(12-02) | M |
 
 ## M2 运营与变现(核心组 W5-W7;余组 W8 可降级梯①)
 
-- **核心组(承诺窗口内)**:会员/权益终态(按 P1)+SKU 多档;激活码全面(批次/导出/核销视图);订单+解锁记录;用户列表+档案核心 Tab。
+- **核心组(承诺窗口内)**:会员/权益终态(按 D-AB)+SKU 多档;激活码全面(批次/导出/核销视图);订单+解锁记录;用户列表+档案核心 Tab。
 - **余组(梯①候选,上线后首迭代)**:评级管理(P2)/增长裂变(分享卡+ref HMAC+归因)/消息中心/反馈客服/ToB 租户视图/仪表盘/报告配置面。
 
 ## M3 专版(承诺日外 buffer:12 月底-1 月中)
