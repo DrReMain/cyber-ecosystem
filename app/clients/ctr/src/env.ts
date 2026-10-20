@@ -12,6 +12,7 @@ export const env = createEnv({
     VITE_CONNECT_API_PROXY: z.string().default("/connect"),
     VITE_GLITCHTIP_DSN: z.url().optional(),
     // "1" swaps the transport for the dev-only test-service mock (test-mock.ts).
+    // TODO(mock-removal): temporary key — removed with the mock teardown.
     VITE_TEST_MOCK: z.string().optional(),
   },
 });

@@ -1,3 +1,5 @@
+// TODO(mock-removal): tests of temporary instrumentation — deleted together
+// with test-mock.ts (its header carries the teardown checklist).
 import { createClient } from "@connectrpc/connect";
 import { TestService } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_pb";
 import { describe, expect, it } from "vitest";

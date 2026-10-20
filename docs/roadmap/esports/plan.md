@@ -51,7 +51,7 @@
 | H1 ctr 系统态件 | error/empty/loading/退出确认+骨架屏+氛围布局(旧版 UserFlowAmbientLayout 语义级);兼 hzy onboarding 首片。验收:三链绿+走查 | E6a | S |
 | H2 协议页+版本化承载 | agreement/age-required 页面+路由+版本参数;文案占位等 ljr 定稿;URL 形状开工前与 lzx 定约。验收:三链绿+走查 | H1 | S |
 | H-A 引擎框架片 | E7 框架前拉:GameClock 单实现(墙钟+暂停顺延,fake timers 可测;旧版 13 处手搓计时收敛为 1)+参数化路由 /test/:code+GameModule 插件契约+overlay 族。验收:mock config 下 red_dot 可玩+时钟正确性测试 | H1 | M |
-| H-B 反应瞄准批 | E7 首批前拉:red_dot/flash_aiming/multi_target/target_recognition;harness 免登录;rawDetail 采集反哺 E0 统一提交契约;玩法语义级对照旧版(D-O)。验收:每款 harness 可玩+明细字段与旧版 per-game SubmitData 语义对齐+mock 插桩净拔除(test-mock.ts 与其测试删除、transport.ts/env.ts 插桩还原、VITE_TEST_MOCK 零残留——2026-10-20 用户裁定临时插桩不常驻) | H-A | M-L |
+| H-B 反应瞄准批 | E7 首批前拉:red_dot/flash_aiming/multi_target/target_recognition;harness 免登录;rawDetail 采集反哺 E0 统一提交契约;玩法语义级对照旧版(D-O)。验收:每款 harness 可玩+明细字段与旧版 per-game SubmitData 语义对齐+mock 插桩净拔除(test-mock.ts 与其测试删除、transport.ts/env.ts 插桩还原、VITE_TEST_MOCK 零残留;拔除前插桩点全带 TODO(mock-removal) 标记——2026-10-20 用户裁定:临时插桩不常驻且必须 TODO 可寻) | H-A | M-L |
 
 ## 支付片(D-B2:纳入承诺窗口,保持可插拔)
 

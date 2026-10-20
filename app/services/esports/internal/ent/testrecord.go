@@ -31,9 +31,9 @@ type TestRecord struct {
 	TestCode string `json:"test_code,omitempty"`
 	// owning member identity (system user id), logical reference — same key law as profile
 	UserID string `json:"user_id,omitempty"`
-	// attempt ordinal inside the match session; uniqueness is the E4 session law, not a DB constraint yet
+	// attempt ordinal inside the match session; uniqueness is the match-session law, not a DB constraint yet
 	AttemptNo int `json:"attempt_no,omitempty"`
-	// match session reference — null until the E4 session aggregate lands, then backfilled
+	// match session reference — null until the match-session aggregate lands, then backfilled
 	SessionID *string `json:"session_id,omitempty"`
 	// attempt start (wall clock, server-stamped from the submitted anchor)
 	StartedAt time.Time `json:"started_at,omitempty"`

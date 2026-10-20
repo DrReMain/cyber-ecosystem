@@ -21,11 +21,11 @@ func (Test) Fields() []ent.Field {
 		field.String("code").NotEmpty().MaxRuneLen(50).Immutable().
 			Comment("immutable catalog code join key (e.g. red_dot); engines, seeds, and cross-domain references key off the code, same law as game codes"),
 		field.String("name").NotEmpty().MaxRuneLen(100).
-			Comment("display title; seeds carry the placeholder code until the E3 metric sheet calibrates"),
+			Comment("display title; seeds carry the placeholder code until the metric sheet calibrates"),
 		field.String("category").Optional().Nillable().MaxRuneLen(16).
 			Comment("vocabulary fps|moba|universal — universal feeds every genre pool; open word set, admin-managed, classification is content not contract"),
 		field.String("ability").Optional().Nillable().MaxRuneLen(32).
-			Comment("primary ability, six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency; attribution is metric-sheet data, calibrated with E3"),
+			Comment("primary ability, six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency; attribution is metric-sheet data pending calibration"),
 		field.String("description").Optional().Nillable().MaxRuneLen(500).
 			Comment("short catalog blurb"),
 		field.String("unit_score_label").Optional().Nillable().MaxRuneLen(50).

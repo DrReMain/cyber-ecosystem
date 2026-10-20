@@ -10,7 +10,7 @@ import { genreLabel } from "./vocabulary";
 /**
  * The switch confirmation (prototype match-switch-confirm): current →
  * target cards, the three-rule card, confirm/cancel. The progress warning
- * face exists in the prototype but stays unrendered until the E4 session
+ * face exists in the prototype but stays unrendered until the match session
  * carries real progress — this session's done count is always zero now.
  */
 export function SwitchConfirmPage() {

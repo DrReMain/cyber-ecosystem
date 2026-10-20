@@ -27,7 +27,6 @@ export const SEO_MODE: "public" | "private" = "public";
 /** Indexable routes fed into the sitemap (public mode only). */
 export const SITEMAP_ROUTES: readonly SitemapRoute[] = [
   { path: HOME_PATH, changefreq: "weekly", priority: 1.0 },
-  // The public legal face (H2): crawled yearly, low priority.
   { path: "/agreement/user", changefreq: "yearly", priority: 0.3 },
   { path: "/agreement/privacy", changefreq: "yearly", priority: 0.3 },
 ];

@@ -1,8 +1,13 @@
-// Dev-only test-service mock at the transport seam (the roadmap's "mock 落
-// transport 缝" — this file is its first landing). Serves the frozen read
-// face (ListTests/GetTest/GetTestConfig) from the seed baseline so the game
-// engine runs without a backend; the submit seam stays Unimplemented until
-// E0 freezes. Never active outside DEV (see transport.ts).
+// TODO(mock-removal): temporary dev-only instrumentation at the transport
+// seam — when the four reaction-aiming games run against the real service,
+// delete this file and its test, revert the VITE_TEST_MOCK gate in
+// transport.ts to the plain factory passthrough, and drop the env key
+// (VITE_TEST_MOCK must leave zero residue).
+//
+// Serves the frozen read face (ListTests/GetTest/GetTestConfig) from the
+// seed baseline so the game engine runs without a backend; the submit seam
+// stays Unimplemented until the submit contract freezes. Never active
+// outside DEV (see transport.ts).
 //
 // Field-shape note: this service's payloads are int32/string/bool/double
 // and map<string,string> only — shapes whose Message runtime equals the

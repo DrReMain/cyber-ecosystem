@@ -8,7 +8,7 @@ interface EndFaceProps {
   onExit: () => void;
 }
 
-/** The post-run face: facts only (tap/hit counts) — scoring is server-side and the result page is H-B's. */
+/** The post-run face: facts only (tap/hit counts) — scoring is server-side. */
 export function EndFace({ record, onRetry, onExit }: Readonly<EndFaceProps>) {
   const clicks = record.events.length;
   const hits = record.events.filter((event) => event.isHit === true).length;

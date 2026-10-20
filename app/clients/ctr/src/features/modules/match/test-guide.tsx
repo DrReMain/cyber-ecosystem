@@ -7,11 +7,11 @@ import { FlowHeader } from "./ui/flow-header";
 /**
  * The pre-assessment notice (prototype test-guide): first/second-session
  * head, the five rules, the scoring-basis card, and the ready CTA. The
- * first/second distinction rides the E4 session — every session is the
+ * first/second distinction rides the match session — every session is the
  * first one until then.
  */
 export function TestGuidePage() {
-  // isFirstSession arrives with the E4 session law; until then the face
+  // isFirstSession arrives with the match-session law; until then the face
   // is permanently the first-assessment one.
   const first = true;
   const count = 4;

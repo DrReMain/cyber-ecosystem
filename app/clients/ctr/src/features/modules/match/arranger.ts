@@ -1,8 +1,8 @@
 // The client-side stand-in arranger: composes the four-ability lineup from
 // the test catalog by the genre order rule. Every rule here mirrors the
 // frozen domain law (§0.5: per-ability one test, genre pools by category,
-// universal feeds both) and is replaced wholesale by the E4 session engine
-// — same shape, server authority.
+// universal feeds both) and is replaced wholesale by the server-side
+// session engine — same shape, server authority.
 
 export type Genre = "fps" | "moba";
 

@@ -25,9 +25,9 @@ func (AbilityScore) Fields() []ent.Field {
 		field.String("ability").NotEmpty().MaxRuneLen(32).
 			Comment("six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency — one row per ability an attempt feeds"),
 		field.Float("score").
-			Comment("the ability contribution this attempt scored — written by the E3 scoring engine, never the client"),
+			Comment("the ability contribution this attempt scored — written by the scoring engine, never the client"),
 		field.Float("percentile").Optional().Nillable().
-			Comment("same-age percentile once the E5 cohort math lands; null until then"),
+			Comment("same-age percentile once the cohort math lands; null until then"),
 	}
 }
 

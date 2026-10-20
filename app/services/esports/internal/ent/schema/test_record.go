@@ -24,9 +24,9 @@ func (TestRecord) Fields() []ent.Field {
 		field.String("user_id").NotEmpty().MaxRuneLen(20).Immutable().
 			Comment("owning member identity (system user id), logical reference — same key law as profile"),
 		field.Int("attempt_no").Positive().
-			Comment("attempt ordinal inside the match session; uniqueness is the E4 session law, not a DB constraint yet"),
+			Comment("attempt ordinal inside the match session; uniqueness is the match-session law, not a DB constraint yet"),
 		field.String("session_id").Optional().Nillable().MaxRuneLen(64).
-			Comment("match session reference — null until the E4 session aggregate lands, then backfilled"),
+			Comment("match session reference — null until the match-session aggregate lands, then backfilled"),
 		field.Time("started_at").Immutable().
 			Comment("attempt start (wall clock, server-stamped from the submitted anchor)"),
 		field.Time("ended_at").Immutable().

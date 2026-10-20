@@ -19,8 +19,8 @@ var (
 		{Name: "record_id", Type: field.TypeString, Size: 20, Comment: "owning attempt (join into test_record.id) — plain id, not an edge: soft-delete cascade and future cross-service aggregation both favor the loose join"},
 		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "denormalized owner so cross-attempt aggregation (historical best, same-age percentile) never joins through test_record"},
 		{Name: "ability", Type: field.TypeString, Size: 32, Comment: "six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency — one row per ability an attempt feeds"},
-		{Name: "score", Type: field.TypeFloat64, Comment: "the ability contribution this attempt scored — written by the E3 scoring engine, never the client"},
-		{Name: "percentile", Type: field.TypeFloat64, Nullable: true, Comment: "same-age percentile once the E5 cohort math lands; null until then"},
+		{Name: "score", Type: field.TypeFloat64, Comment: "the ability contribution this attempt scored — written by the scoring engine, never the client"},
+		{Name: "percentile", Type: field.TypeFloat64, Nullable: true, Comment: "same-age percentile once the cohort math lands; null until then"},
 	}
 	// AbilityScoreTable holds the schema information for the "ability_score" table.
 	AbilityScoreTable = &schema.Table{
@@ -200,9 +200,9 @@ var (
 		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
 		{Name: "code", Type: field.TypeString, Size: 50, Comment: "immutable catalog code join key (e.g. red_dot); engines, seeds, and cross-domain references key off the code, same law as game codes"},
-		{Name: "name", Type: field.TypeString, Size: 100, Comment: "display title; seeds carry the placeholder code until the E3 metric sheet calibrates"},
+		{Name: "name", Type: field.TypeString, Size: 100, Comment: "display title; seeds carry the placeholder code until the metric sheet calibrates"},
 		{Name: "category", Type: field.TypeString, Nullable: true, Size: 16, Comment: "vocabulary fps|moba|universal — universal feeds every genre pool; open word set, admin-managed, classification is content not contract"},
-		{Name: "ability", Type: field.TypeString, Nullable: true, Size: 32, Comment: "primary ability, six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency; attribution is metric-sheet data, calibrated with E3"},
+		{Name: "ability", Type: field.TypeString, Nullable: true, Size: 32, Comment: "primary ability, six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency; attribution is metric-sheet data pending calibration"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 500, Comment: "short catalog blurb"},
 		{Name: "unit_score_label", Type: field.TypeString, Nullable: true, Size: 50, Comment: "display form of the unit score (rendering copy only; the numeric itself never crosses the contract)"},
 		{Name: "duration_seconds", Type: field.TypeInt, Comment: "canonical test length — the single source TestConfig mirrors so engine boot is one call; 30 is the placeholder until the metric sheet calibrates", Default: 30},
@@ -291,8 +291,8 @@ var (
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
 		{Name: "test_code", Type: field.TypeString, Size: 50, Comment: "the attempted test (join into test.code)"},
 		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "owning member identity (system user id), logical reference — same key law as profile"},
-		{Name: "attempt_no", Type: field.TypeInt, Comment: "attempt ordinal inside the match session; uniqueness is the E4 session law, not a DB constraint yet"},
-		{Name: "session_id", Type: field.TypeString, Nullable: true, Size: 64, Comment: "match session reference — null until the E4 session aggregate lands, then backfilled"},
+		{Name: "attempt_no", Type: field.TypeInt, Comment: "attempt ordinal inside the match session; uniqueness is the match-session law, not a DB constraint yet"},
+		{Name: "session_id", Type: field.TypeString, Nullable: true, Size: 64, Comment: "match session reference — null until the match-session aggregate lands, then backfilled"},
 		{Name: "started_at", Type: field.TypeTime, Comment: "attempt start (wall clock, server-stamped from the submitted anchor)"},
 		{Name: "ended_at", Type: field.TypeTime, Comment: "attempt end"},
 		{Name: "backgrounds", Type: field.TypeJSON, Nullable: true, Comment: "engine-marked backgrounding spans; validity is judged against test_config.background_invalid_seconds"},

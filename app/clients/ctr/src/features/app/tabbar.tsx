@@ -15,8 +15,8 @@ interface TabSpec {
 
 const TABS: readonly TabSpec[] = [
   { key: "home", label: () => m.common_tab_home(), icon: House, to: "/", live: true },
-  // Records and messages stay skeleton tabs until their owning slices land
-  // (E5/E7) — the shape is the prototype's; the faces are not ours to build.
+  // Records and messages stay skeleton tabs — the shape is the prototype's;
+  // the faces are not ours to build yet.
   {
     key: "records",
     label: () => m.common_tab_records(),

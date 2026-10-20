@@ -16,9 +16,8 @@ const selectClass =
   "w-full appearance-none rounded-sm border border-line bg-surface-input px-3 py-3 text-ink outline-none focus:border-focus";
 
 /**
- * The pre-payment birth backfill (prototype age-required): the pay flow's
- * hard-gate wiring lands with PAY3 — until then the page carries its full
- * form (save via UpdateProfile, honest exits), reachable by direct URL.
+ * The pre-payment birth backfill (prototype age-required): the full form
+ * (save via UpdateProfile, honest exits), reachable by direct URL.
  */
 export function AgeRequiredPage() {
   const navigate = useNavigate();
@@ -30,8 +29,7 @@ export function AgeRequiredPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Under the current completeness gate every profile carries birth, so this
-  // backfill re-edits for direct visits; the band-only cohort arrives when
-  // PAY3 mounts the hard gate.
+  // backfill re-edits for direct visits.
   useEffect(() => {
     const p = profileQuery.data?.profile;
     if (!ready && p?.birthYear != null && p?.birthMonth != null) {
@@ -46,8 +44,7 @@ export function AgeRequiredPage() {
       setError(m.age_required_err_incomplete());
       return;
     }
-    // The pay hard gate (< 18 cannot buy) blocks here; PAY3 reroutes to the
-    // pay page's inline interception with its own exits.
+    // The pay hard gate (< 18 cannot buy) blocks here.
     if (ageOf(Number(year), Number(month)) < 18) {
       setError(null);
       toast.error(m.age_required_minor_toast());
@@ -65,7 +62,6 @@ export function AgeRequiredPage() {
       return;
     }
     toast.success(m.age_required_saved_toast());
-    // PAY3: reroute to pay-confirm?sku=…
     await navigate({ to: "/" });
   }
 

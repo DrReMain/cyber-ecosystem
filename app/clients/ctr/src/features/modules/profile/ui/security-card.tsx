@@ -5,8 +5,8 @@ import { m } from "#/paraglide/messages";
 const CARD_CLASS = "rounded-lg border border-line bg-surface-card p-4";
 
 /**
- * Account-security rows whose faces are contract-gated (SMS provider, H2):
- * every row stays visible with an honest not-yet-open state.
+ * Account-security rows whose faces are contract-gated: every row stays
+ * visible with an honest not-yet-open state.
  */
 export function SecurityCard() {
   const rows = [

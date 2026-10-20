@@ -1,7 +1,3 @@
-// Same 6–60 law as profile/setup/age.tsx (the range must reach below 13 or
-// the guardian gate has no reachable input); re-declared here because
-// modules never import each other's internals.
-
 export const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 
 export function years(): number[] {

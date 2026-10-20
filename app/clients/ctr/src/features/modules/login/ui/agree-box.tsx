@@ -7,7 +7,7 @@ interface AgreeBoxProps {
 
 /**
  * The visual checkbox square of the login agreement rows — aria-hidden
- * decoration; the RAC Checkbox wrapping it owns the role and state.
+ * decoration; the RAC CheckboxButton wrapping it owns the role and state.
  */
 export function AgreeBox({ checked, indeterminate = false }: Readonly<AgreeBoxProps>) {
   return (

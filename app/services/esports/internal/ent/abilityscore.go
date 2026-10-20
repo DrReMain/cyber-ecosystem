@@ -31,9 +31,9 @@ type AbilityScore struct {
 	UserID string `json:"user_id,omitempty"`
 	// six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency — one row per ability an attempt feeds
 	Ability string `json:"ability,omitempty"`
-	// the ability contribution this attempt scored — written by the E3 scoring engine, never the client
+	// the ability contribution this attempt scored — written by the scoring engine, never the client
 	Score float64 `json:"score,omitempty"`
-	// same-age percentile once the E5 cohort math lands; null until then
+	// same-age percentile once the cohort math lands; null until then
 	Percentile   *float64 `json:"percentile,omitempty"`
 	selectValues sql.SelectValues
 }

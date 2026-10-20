@@ -27,11 +27,11 @@ type Test struct {
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// immutable catalog code join key (e.g. red_dot); engines, seeds, and cross-domain references key off the code, same law as game codes
 	Code string `json:"code,omitempty"`
-	// display title; seeds carry the placeholder code until the E3 metric sheet calibrates
+	// display title; seeds carry the placeholder code until the metric sheet calibrates
 	Name string `json:"name,omitempty"`
 	// vocabulary fps|moba|universal — universal feeds every genre pool; open word set, admin-managed, classification is content not contract
 	Category *string `json:"category,omitempty"`
-	// primary ability, six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency; attribution is metric-sheet data, calibrated with E3
+	// primary ability, six-word vocabulary reactionSpeed|aimingAccuracy|trackingStability|skillReleaseAccuracy|resourceAllocation|decisionEfficiency; attribution is metric-sheet data pending calibration
 	Ability *string `json:"ability,omitempty"`
 	// short catalog blurb
 	Description *string `json:"description,omitempty"`

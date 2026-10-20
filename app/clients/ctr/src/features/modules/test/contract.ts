@@ -1,7 +1,7 @@
 import type { GameClock } from "./clock";
 
 // Engine-params keys are owned by the engine registry (single source: the
-// metric spec, E3): the client consumes them, never defines them. Values are
+// metric spec): the client consumes them, never defines them. Values are
 // strings on the wire; parsing goes through EngineParams, and a missing or
 // non-numeric entry falls back to the game's compiled-in default — the
 // legacy-calibrated constants, which are the semantic anchor.
@@ -35,7 +35,8 @@ export type GameExit = "completed" | "aborted" | "failed";
 
 // The one attempt-shaped record a run accumulates. Events are per-game
 // shapes mirroring the frozen proto Detail items (gen types at the game
-// side); the submit seam itself stays deferred until E0 freezes.
+// side); the submit seam itself stays deferred until the submit contract
+// freezes.
 export interface AttemptRecord {
   readonly events: readonly Record<string, unknown>[];
   readonly backgroundSpans: readonly { elapsedMs: number; durationMs: number }[];

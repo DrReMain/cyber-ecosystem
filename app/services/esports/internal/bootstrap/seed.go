@@ -92,11 +92,11 @@ func (s *Seed) Run(ctx context.Context) error {
 		// Names and abilities are adopted verbatim from the legacy
 		// interactive baseline (_state.js GAMES, an authority-table source —
 		// multi_target included). Categories encode the prototype's pool law
-		// (genre-order rule, D-Z): lineups draw per-ability pools the genre
+		// (genre-order rule): lineups draw per-ability pools the genre
 		// order runs, so families both orders draw (reactionSpeed,
 		// skillReleaseAccuracy) are universal while single-genre families
 		// keep their native mark. Durations, engine params, unit labels,
-		// and introductions remain metric-sheet data landing with E3.
+		// and introductions remain metric-sheet data.
 		row, err := client.Test.Query().Where(test.CodeEQ(t.Code)).Only(ctx)
 		if err != nil && !ent.IsNotFound(err) {
 			return s.plat.HandleEntError(fmt.Errorf("seed: query test %q: %w", t.Code, err))
@@ -127,8 +127,8 @@ func (s *Seed) Run(ctx context.Context) error {
 			continue
 		}
 		// Upsert keeps already-seeded rows in step with adopted baseline
-		// data; admin-tuned values (E3 calibration) will move out of this
-		// table's seed path entirely.
+		// data; admin-tuned values will move out of this table's seed path
+		// entirely.
 		if _, err := row.Update().
 			SetName(t.Name).
 			SetNillableCategory(strPtr(t.Category)).

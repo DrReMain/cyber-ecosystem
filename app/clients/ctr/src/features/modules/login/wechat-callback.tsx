@@ -12,7 +12,7 @@ import { wechatLoginFn } from "./wechat.fn";
 // post-login router. search.next is validated by the route but never
 // arrives today — the redirect_uri carries no query (wechat rejects it),
 // so the post-login hop always falls through to the completeness branch;
-// the seat stays for a future state-relay (roadmap: Review 遗留转交).
+// the seat stays for a future state-relay.
 export function WechatCallbackPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();

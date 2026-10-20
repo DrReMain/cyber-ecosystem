@@ -3,7 +3,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { Zap } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button, Checkbox, Form, Input, Label, TextField } from "react-aria-components";
+import {
+  Button,
+  CheckboxButton,
+  CheckboxField,
+  Form,
+  Input,
+  Label,
+  TextField,
+} from "react-aria-components";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
@@ -61,7 +69,7 @@ export function LoginPage() {
     return `flex items-start gap-2 py-1.5 ${missing[field] ? "text-danger-text" : "text-ink-secondary"}`;
   }
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!agreeOK()) {
       return;
@@ -169,14 +177,14 @@ export function LoginPage() {
           )}
 
           <div className="flex flex-col gap-1.5">
-            <Checkbox
+            <CheckboxField
               isSelected={agree.user}
               onChange={(selected) => {
                 setAgree((prev) => ({ ...prev, user: selected }));
                 setMissing((prev) => ({ ...prev, user: false }));
               }}
             >
-              {() => (
+              <CheckboxButton>
                 <div className={agreeRowClass("user")}>
                   <AgreeBox checked={agree.user} />
                   <span className="text-sm leading-snug">
@@ -191,16 +199,16 @@ export function LoginPage() {
                     </Link>
                   </span>
                 </div>
-              )}
-            </Checkbox>
-            <Checkbox
+              </CheckboxButton>
+            </CheckboxField>
+            <CheckboxField
               isSelected={agree.privacy}
               onChange={(selected) => {
                 setAgree((prev) => ({ ...prev, privacy: selected }));
                 setMissing((prev) => ({ ...prev, privacy: false }));
               }}
             >
-              {() => (
+              <CheckboxButton>
                 <div className={agreeRowClass("privacy")}>
                   <AgreeBox checked={agree.privacy} />
                   <span className="text-sm leading-snug">
@@ -214,14 +222,14 @@ export function LoginPage() {
                     </Link>
                   </span>
                 </div>
-              )}
-            </Checkbox>
+              </CheckboxButton>
+            </CheckboxField>
             {/* Select-all rides the user row's line: one tap covers both. */}
             <div className="flex items-start justify-between gap-2.5">
               <span className="ml-6 text-[10.5px] text-ink-tertiary leading-snug">
                 {m.login_agree_minor_note()}
               </span>
-              <Checkbox
+              <CheckboxField
                 isIndeterminate={agree.user !== agree.privacy}
                 isSelected={agree.user && agree.privacy}
                 onChange={(selected) => {
@@ -229,7 +237,7 @@ export function LoginPage() {
                   setMissing({ privacy: false, user: false });
                 }}
               >
-                {() => (
+                <CheckboxButton>
                   <div className="flex items-center gap-2 whitespace-nowrap font-bold text-ink-secondary">
                     <AgreeBox
                       checked={agree.user && agree.privacy}
@@ -237,8 +245,8 @@ export function LoginPage() {
                     />
                     <span className="text-sm">{m.login_agree_all()}</span>
                   </div>
-                )}
-              </Checkbox>
+                </CheckboxButton>
+              </CheckboxField>
             </div>
           </div>
 

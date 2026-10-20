@@ -16,7 +16,7 @@ import { abilityWord, genreLabel, genreMeta } from "./vocabulary";
  * The match guide (prototype match-guide): genre header card, the
  * four-ability lineup, and the flow actions. The genre resolves from the
  * URL override, else the preference majority vote; a tie routes to the
- * pick page. Progress marks (done/best) arrive with the E4 session — the
+ * pick page. Progress marks (done/best) arrive with the match session — the
  * lineup renders the fresh-session face until then.
  */
 export function MatchPage() {
@@ -54,7 +54,6 @@ export function MatchPage() {
   const Icon = genre === "moba" ? Hexagon : Crosshair;
 
   function onStart() {
-    // The engine runtime lands with H-A; the guide holds the flow shape.
     toast.info(m.match_flow_soon());
   }
 

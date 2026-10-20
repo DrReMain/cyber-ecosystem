@@ -11,8 +11,7 @@ interface AgreementPageProps {
  * The legal face (prototype agreement.html): one page component, two static
  * routes — /agreement/user and /agreement/privacy each pass their document.
  * Chapter copy is the prototype's demo placeholder until ljr's final legal
- * text lands; the version line reads versions.ts (server truth arrives with
- * the E6b consent contract).
+ * text lands; the version line reads versions.ts.
  */
 export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
   const meta = AGREEMENT_DOC_META[doc];
