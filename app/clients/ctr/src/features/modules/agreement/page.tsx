@@ -1,19 +1,20 @@
-import { useSearch } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
 import { AGREEMENT_DOC_META, type AgreementDoc } from "./versions";
 
+interface AgreementPageProps {
+  doc: AgreementDoc;
+}
+
 /**
- * The legal face (prototype agreement.html): one route, two documents —
- * `?p=privacy` renders the privacy policy, anything else the user agreement.
+ * The legal face (prototype agreement.html): one page component, two static
+ * routes — /agreement/user and /agreement/privacy each pass their document.
  * Chapter copy is the prototype's demo placeholder until ljr's final legal
  * text lands; the version line reads versions.ts (server truth arrives with
  * the E6b consent contract).
  */
-export function AgreementPage() {
-  const search = useSearch({ from: "/agreement" });
-  const doc: AgreementDoc = search.p ?? "user";
+export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
   const meta = AGREEMENT_DOC_META[doc];
   const title = doc === "privacy" ? m.agreement_privacy_title() : m.agreement_user_title();
   const chapters =

@@ -11,12 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AgeRequiredRouteImport } from './routes/age-required'
-import { Route as AgreementRouteImport } from './routes/agreement'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MatchRouteImport } from './routes/match'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AgreementPrivacyRouteImport } from './routes/agreement.privacy'
+import { Route as AgreementUserRouteImport } from './routes/agreement.user'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as MatchIndexRouteImport } from './routes/match.index'
 import { Route as MatchGuideRouteImport } from './routes/match.guide'
@@ -37,11 +38,6 @@ const IndexRoute = IndexRouteImport.update({
 const AgeRequiredRoute = AgeRequiredRouteImport.update({
   id: '/age-required',
   path: '/age-required',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AgreementRoute = AgreementRouteImport.update({
-  id: '/agreement',
-  path: '/agreement',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -67,6 +63,16 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgreementPrivacyRoute = AgreementPrivacyRouteImport.update({
+  id: '/agreement/privacy',
+  path: '/agreement/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgreementUserRoute = AgreementUserRouteImport.update({
+  id: '/agreement/user',
+  path: '/agreement/user',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
@@ -128,12 +134,13 @@ const ProfileSetupNicknameRoute = ProfileSetupNicknameRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/age-required': typeof AgeRequiredRoute
-  '/agreement': typeof AgreementRoute
   '/login': typeof LoginRouteWithChildren
   '/match': typeof MatchRouteWithChildren
   '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/agreement/privacy': typeof AgreementPrivacyRoute
+  '/agreement/user': typeof AgreementUserRoute
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
@@ -149,9 +156,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/age-required': typeof AgeRequiredRoute
-  '/agreement': typeof AgreementRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/agreement/privacy': typeof AgreementPrivacyRoute
+  '/agreement/user': typeof AgreementUserRoute
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
@@ -168,12 +176,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/age-required': typeof AgeRequiredRoute
-  '/agreement': typeof AgreementRoute
   '/login': typeof LoginRouteWithChildren
   '/match': typeof MatchRouteWithChildren
   '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/agreement/privacy': typeof AgreementPrivacyRoute
+  '/agreement/user': typeof AgreementUserRoute
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
@@ -191,12 +200,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/age-required'
-    | '/agreement'
     | '/login'
     | '/match'
     | '/profile'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/agreement/privacy'
+    | '/agreement/user'
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
@@ -212,9 +222,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/age-required'
-    | '/agreement'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/agreement/privacy'
+    | '/agreement/user'
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
@@ -230,12 +241,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/age-required'
-    | '/agreement'
     | '/login'
     | '/match'
     | '/profile'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/agreement/privacy'
+    | '/agreement/user'
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
@@ -252,12 +264,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AgeRequiredRoute: typeof AgeRequiredRoute
-  AgreementRoute: typeof AgreementRoute
   LoginRoute: typeof LoginRouteWithChildren
   MatchRoute: typeof MatchRouteWithChildren
   ProfileRoute: typeof ProfileRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AgreementPrivacyRoute: typeof AgreementPrivacyRoute
+  AgreementUserRoute: typeof AgreementUserRoute
   TestCodeRoute: typeof TestCodeRoute
 }
 
@@ -275,13 +288,6 @@ declare module '@tanstack/react-router' {
       path: '/age-required'
       fullPath: '/age-required'
       preLoaderRoute: typeof AgeRequiredRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/agreement': {
-      id: '/agreement'
-      path: '/agreement'
-      fullPath: '/agreement'
-      preLoaderRoute: typeof AgreementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -317,6 +323,20 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agreement/privacy': {
+      id: '/agreement/privacy'
+      path: '/agreement/privacy'
+      fullPath: '/agreement/privacy'
+      preLoaderRoute: typeof AgreementPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agreement/user': {
+      id: '/agreement/user'
+      path: '/agreement/user'
+      fullPath: '/agreement/user'
+      preLoaderRoute: typeof AgreementUserRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login/': {
@@ -447,12 +467,13 @@ const ProfileRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgeRequiredRoute: AgeRequiredRoute,
-  AgreementRoute: AgreementRoute,
   LoginRoute: LoginRouteWithChildren,
   MatchRoute: MatchRouteWithChildren,
   ProfileRoute: ProfileRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AgreementPrivacyRoute: AgreementPrivacyRoute,
+  AgreementUserRoute: AgreementUserRoute,
   TestCodeRoute: TestCodeRoute,
 }
 export const routeTree = rootRouteImport

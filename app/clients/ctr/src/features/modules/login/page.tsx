@@ -181,12 +181,11 @@ export function LoginPage() {
                   <AgreeBox checked={agree.user} />
                   <span className="text-sm leading-snug">
                     {m.login_agree_prefix()}
-                    {/* H2 link swap; the tap must navigate without flipping
-                        the checkbox. */}
+                    {/* The tap must navigate without flipping the checkbox. */}
                     <Link
                       className="underline active:opacity-60"
                       onClick={(event) => event.stopPropagation()}
-                      to="/agreement"
+                      to="/agreement/user"
                     >
                       {m.login_agree_user_name()}
                     </Link>
@@ -209,8 +208,7 @@ export function LoginPage() {
                     <Link
                       className="underline active:opacity-60"
                       onClick={(event) => event.stopPropagation()}
-                      search={{ p: "privacy" }}
-                      to="/agreement"
+                      to="/agreement/privacy"
                     >
                       {m.login_agree_privacy_name()}
                     </Link>
@@ -266,9 +264,7 @@ export function LoginPage() {
           <p className="text-center text-[11px] text-ink-tertiary">{m.login_wechat_env_note()}</p>
         )}
 
-        {/* Forgot-password stays contract-gated (SMS provider); the
-            agreement links went live with H2 (authorized 2026-10-20, lzx
-            agreed). */}
+        {/* Forgot-password stays contract-gated (SMS provider). */}
         <div className="text-center text-[10.5px] text-ink-tertiary leading-relaxed">
           <button
             className="tap-zone py-1 underline active:opacity-60"
@@ -278,15 +274,11 @@ export function LoginPage() {
             {m.login_forgot()}
           </button>
           <span className="mx-1.5">·</span>
-          <Link className="tap-zone py-1 underline active:opacity-60" to="/agreement">
+          <Link className="tap-zone py-1 underline active:opacity-60" to="/agreement/user">
             {m.login_agree_user_name()}
           </Link>
           <span className="mx-1.5">·</span>
-          <Link
-            className="tap-zone py-1 underline active:opacity-60"
-            search={{ p: "privacy" }}
-            to="/agreement"
-          >
+          <Link className="tap-zone py-1 underline active:opacity-60" to="/agreement/privacy">
             {m.login_agree_privacy_name()}
           </Link>
         </div>
