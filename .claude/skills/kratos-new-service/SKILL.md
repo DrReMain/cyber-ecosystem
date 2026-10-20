@@ -13,4 +13,4 @@ Procedure: `docs/conventions/kratos/RUNBOOKS.md` §4 "Deriving a new service" �
 
 Deploy wiring: `docs/conventions/deploy/CONVENTIONS.md` §7.
 
-Gates (all exit 0): `./nx run <service>:build` and `:test`; after the deploy-plane step, the compose merge validation. Green means the Nx "Successfully ran" banner or a checked exit code — a bare log tail is not a gate. Finish with the §7 gate table.
+Gates (all exit 0): `./nx run <service>:build` and `:test`; after the deploy-plane step, the compose merge validation. Green means the Nx "Successfully ran" banner or a checked exit code — a bare log tail is not a gate. Finish with the §7 gate table; final line: the root `AGENTS.md` §6.1 declaration — change-kind + counted evidence.

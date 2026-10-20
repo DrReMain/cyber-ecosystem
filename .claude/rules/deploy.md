@@ -1,5 +1,5 @@
 ---
-paths: ["deploy/**", "**/Dockerfile"]
+paths: ["deploy/**", "**/Dockerfile", "**/ent/migrate/migrations/**"]
 ---
 
 # Deploy law card

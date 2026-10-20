@@ -12,8 +12,8 @@ const BYPASSES = [
     "buf workflows are Nx targets — use ./nx run proto:<generate|lint|format|breaking>",
   ],
   [
-    /\bgo\s+(build|test|generate|vet)\b/,
-    "Go build/test workflows are Nx targets — use ./nx run tools:go:test / tools:go:lint or the owning service's targets",
+    /\bgo\s+(build|generate)\b/,
+    "Go build/generate workflows are Nx targets — use the owning service's targets (ad-hoc go test/vet for scoped verification stay allowed)",
   ],
   [/\bgolangci-lint\b/, "golangci-lint runs through ./nx run tools:go:lint"],
 ];

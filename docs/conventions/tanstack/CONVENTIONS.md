@@ -11,11 +11,12 @@ Applies to web clients built on TanStack Start (`app/clients/*`).
 
 ## 0. Execution contract
 
-In force for every change under `app/clients/*`; rules here win over precedent in code.
+In force for every change under `app/clients/*` and `shared-ts/**`; rules here win over precedent in code.
 
 1. Before writing a file below, load the sections in its dispatch row — they are the law for that artifact.
 2. Before reporting done, run the §12 gate over the combined diff and emit its report table in the final message. No gate table = not done, whatever the build says.
 3. Gate = exit code 0 or the Nx "Successfully ran" banner — a log tail is not a gate.
+4. The §12 close runs for every change regardless of dispatch row — the chain row T-VER-1 is always in force.
 
 | About to write | Load first | Gate rows |
 |---|---|---|
@@ -25,7 +26,7 @@ In force for every change under `app/clients/*`; rules here win over precedent i
 | `features/layout-*/**`, `features/login-*/**` | §2, §5 grammar, §10 | T-LAY-2 T-STR-4 T-ERR-1 |
 | `messages/**` (any locale file) | §6 | T-I18N-1 T-I18N-2 T-I18N-3 T-I18N-5 T-I18N-6 |
 | `domains/**` | §4, §9 | T-LAY-1 T-ERR-1 |
-| anything else under `app/clients/*` | §1, the touched layer's section, §11 | full §12 |
+| anything else under `app/clients/*` or `shared-ts/**` | §1, the touched layer's section, §7 for `shared-ts/<domain>/src/**`, §11 | full §12 |
 
 ---
 
@@ -515,6 +516,8 @@ Run over the combined diff (working tree plus the commits being amended into), p
 
 PASS / FAIL / N/A are legal verdicts; an absent row is not. N/A names its glob and shows it empty. `lint:` rows scan the added lines of the combined diff; `eye:` rows cite file:line.
 
+Posture (root `AGENTS.md` §6.1): declare the change-kind and close with the counted-evidence line. Kinds here — surface: this table plus browser closed loop (viewports, locales, zero console; no browser-automation tool → `docs/environment.md`, manual walkthrough is the degraded form); logic / refactor: this table, refactor with cache bypass and counterexample replay. Absorb-time mechanical checks: deleted tokens/keys grepped for remaining consumers; new utility classes traced to their token source.
+
 ### Structure — law §5
 
 - **T-STR-1** — one React component per `.tsx` file; helper components get their own file and export. eye.
@@ -558,3 +561,5 @@ PASS / FAIL / N/A are legal verdicts; an absent row is not. N/A names its glob a
 - **T-VER-1** — per owning client: build → typecheck → check, all exit 0, `--skip-nx-cache` (the Nx cache replays stale greens). lint: gate outputs.
 - **T-VER-3** — behavior changes on surfaces reachable without login e2e-verified before done; auth-only surfaces carry an explicit user-verification list. eye: links or the list.
 - **T-VER-4** — library-seam changes get the §11 behavioral pairing review (the library's observable contract enumerated next to our implementation, each pair checked). eye.
+
+T-VER-2 is retired (the tsbuildinfo ritual it named never existed — §11); IDs do not renumber.

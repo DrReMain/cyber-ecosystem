@@ -120,9 +120,9 @@
 
 ## 5) 协作规约
 
-- **分支流**:认领切片(记入 progress.md)→ 各自 dev 分支(dev-lzx/dev-hzy/dev-ljr)→ MR 评审(契约面变更须另一人评审)→ esports/main;发布节奏由用户定。
+- **分支流**:认领切片(记入 progress.md)→ 各自 dev 分支(dev-lzx/dev-hzy/dev-ljr)→ MR 评审(契约面变更须另一人评审)→ esports/main;发布节奏由用户定。absorb/冻结档核查=`AGENTS.md` §6.1 trigger tiers(整合机械核查+整合差=被吸收片文件集;里程碑=e2e 大战役+fresh 门禁矩阵+活栈健康)。
 - **冲突面隔离**:认领时按切片文件面避让;E0 契约冻结前,E3/E5/E6 只做设计稿不动契约;proto+gen 为共享敏感面,变更走 proto-change skill 全链。
-- **完成门禁**:对应 skill(proto-change/kratos-new-module/kratos-selfcheck/tanstack-change)+ 声明的 Nx 目标 + docs:check;提交信息事实级;骨架期内容纪律适用(业务无关/过程无关/可复用)。
+- **完成门禁**:对应 skill(proto-change/kratos-new-module/kratos-selfcheck/tanstack-change)+ 声明的 Nx 目标 + docs:check;提交信息事实级;骨架期内容纪律适用(业务无关/过程无关/可复用)。**验证姿态律(性质×体制×proven-by 声明行)= `AGENTS.md` §6.1;当前体制 A(用户严人审),转体制 B 时改本行声明。**
 - **AI 协作**:切片描述自包含可独立执行;裁决一律落 §2 台账再实施,不散落对话;旧仓文档只读,以本档 §0 对齐口径为冲突时的基准。
 - **双服务启动**:pgmq schema 竞态——先起 system 稳后再起 esports。
 

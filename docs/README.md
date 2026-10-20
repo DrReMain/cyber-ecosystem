@@ -53,7 +53,7 @@ Every working-lane item declares where it ends up: **backfilled / cleared / arch
 
 ### 2.5 Pointer discipline
 
-Content moves; it is never duplicated. Sections that skills point to owe **stable anchors**: headings are not renamed casually; a rename fixes every pointer in the same change (`docs:check` turns red otherwise).
+Content moves; it is never duplicated. The one sanctioned instantiation is a skill's gates line — the owning chain's concrete commands, instantiated from the conventions that stay the source; rule shells carry no commands at all. Sections that skills point to owe **stable anchors**: headings are not renamed casually; a rename fixes every pointer in the same change (`docs:check` turns red otherwise).
 
 ### 2.6 Drift checking
 
@@ -64,7 +64,7 @@ Content moves; it is never duplicated. Sections that skills point to owe **stabl
 3. the `AGENTS.md` area index ↔ `docs/conventions/*/CONVENTIONS.md` agree in both directions;
 4. durable docs carry a `Status:` line; working docs carry a destination header;
 5. the durable lane is roadmap-clean (§2.7): no `docs/roadmap/` reference in `AGENTS.md`, `CLAUDE.md`, skills, or conventions;
-6. every gate row ID (`K-XXX-N`) cited by a skill exists in the owning conventions gate (kratos §7 today).
+6. every gate row ID (`K-XXX-N` / `T-XXX-N`) cited by a skill or rule shell exists in the owning conventions gate (kratos §7, tanstack §12).
 
 The sentinel walks all of `docs/` (conventions and roadmap) plus `AGENTS.md`, `CLAUDE.md`, the root READMEs, and every skill and rule-shell body.
 
@@ -81,6 +81,10 @@ The skeleton forks: the service set, client set, locale set, ports, and middlewa
 ### 2.9 Delivery shells (`.claude/rules/`)
 
 A rule shell is the path axis of delivery: frontmatter `paths` (repo-tree globs) decides when its card injects — automatically, as Claude reads or edits a matching file. The body holds pointers and one-line trap annotations only (same content law as skills, §1); the conventions doc it points to stays the single source. English. Dead pointers are `docs:check` failures; directories with no card route through the area index (`AGENTS.md` §7) as before.
+
+### 2.10 Enforcement admission
+
+A verification mechanism (hook, CI gate, checker script) is admitted only on evidence: a demonstrated silent-failure face — the failure it catches passes every other gate silently — or ≥2 real misses of the standing law it would enforce. Mechanisms are cost: rarely-changing areas get no standing mechanism. Evidence declarations (`AGENTS.md` §6.1) are reviewed, never regex-linted — the vocabulary is dense with domain false-friends.
 
 ---
 

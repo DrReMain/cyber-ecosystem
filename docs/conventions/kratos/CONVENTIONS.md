@@ -10,7 +10,7 @@ This document states **constraints, rationale, and anti-patterns** — the thing
 
 ## 0. Execution contract
 
-In force for every change under `app/services/*`; rules here win over precedent in code.
+In force for every change under `app/services/*` and `shared-go/**`; rules here win over precedent in code.
 
 1. Before writing a file below, load the sections in its dispatch row — they are the law for that artifact.
 2. Before reporting done, run the §7 gate over the combined diff and emit its report table in the final message. No gate table = not done, whatever the build says.
@@ -22,6 +22,7 @@ In force for every change under `app/services/*`; rules here win over precedent 
 | `module/<d>/data.go` | §2 repo rows, §3 data row, §5 data | K-NAM K-STR K-LAY K-UTL K-ERR |
 | `module/<d>/service.go` | §2, §3 service row, §5 service | K-NAM K-STR K-CMT K-UTL K-ERR |
 | `client/<remote>.go` | §2 client rows, §5 client, §5a | K-NAM K-LAY K-ERR |
+| `shared-go/**` capability code | root `AGENTS.md` §4, §6 errors | K-ERR, K-DEP-1 |
 | any other `.go` under `app/services/*` | §4, §6, the touched layer's §5 block | full §7 |
 
 Procedures (new module, remote dependency, service derivation, operating facts) live in `RUNBOOKS.md`.
@@ -329,6 +330,8 @@ Run over the combined diff (working tree plus the commits being amended into). O
 | K-CMT-1 | PASS | guard green; 3 added `//` lines in module files, all dividers (file:line each) |
 
 PASS / FAIL / N/A are legal verdicts; an absent row is not. N/A names its glob and shows it empty. `shared-go` changes emit only K-ERR and K-DEP-1 (capability self-containment, root `AGENTS.md` §4). `lint:` rows scan the added lines of the combined diff; `eye:` rows cite file:line.
+
+Posture (root `AGENTS.md` §6.1): declare the change-kind and close with the counted-evidence line. Kinds here — contract: proto §8 chain plus consumer regeneration; aggregate: this table plus migration applied plus refused-path probe; capability: this table plus declared conformance, probe/smoke; refactor: this table with cache bypass and counterexample replay; logic / chore: this table. Runtime verification = live RPC probe; probe scripts are throwaway, never repo assets.
 
 ### Naming — law §2
 

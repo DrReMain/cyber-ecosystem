@@ -9,6 +9,6 @@ Read first: the §0 dispatch row for your artifact — `docs/conventions/tanstac
 
 Gates (order is law, all exit 0, all `--skip-nx-cache`) — run for each client under `app/clients/*` affected by the change: `./nx run <client>:build` FIRST (regenerates routeTree + paraglide) → `./nx run <client>:typecheck` → `./nx run <client>:check` (§11).
 
-Traps: §11 reachable-surface rule — changes on login pages, guard redirects, or the SSR entry need e2e verification before done. Library-seam changes (dnd, scroll physics, menus, toasts) get the §11 behavioral pairing review.
+Traps: §11 reachable-surface rule — changes on login pages, guard redirects, or the SSR entry need e2e verification before done. Library-seam changes (dnd, scroll physics, menus, toasts) get the §11 behavioral pairing review. No browser-automation MCP connected when live verification is due → recommend docs/environment.md (never auto-install); a manual developer walkthrough is the degraded form.
 
-Finish with the §12 pre-completion gate table (one row per item, emitted verbatim) before reporting done.
+Finish with the §12 pre-completion gate table (one row per item, emitted verbatim) before reporting done. Final line: the root `AGENTS.md` §6.1 declaration — change-kind + counted evidence.
