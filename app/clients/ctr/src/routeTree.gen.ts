@@ -23,6 +23,7 @@ import { Route as MatchGuideRouteImport } from './routes/match.guide'
 import { Route as MatchPickRouteImport } from './routes/match.pick'
 import { Route as MatchSwitchRouteImport } from './routes/match.switch'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as TestCodeRouteImport } from './routes/test.$code'
 import { Route as LoginWechatCallbackRouteImport } from './routes/login.wechat.callback'
 import { Route as ProfileSetupAgeRouteImport } from './routes/profile.setup.age'
 import { Route as ProfileSetupGamesRouteImport } from './routes/profile.setup.games'
@@ -98,6 +99,11 @@ const ProfileIndexRoute = ProfileIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProfileRoute,
 } as any)
+const TestCodeRoute = TestCodeRouteImport.update({
+  id: '/test/$code',
+  path: '/test/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginWechatCallbackRoute = LoginWechatCallbackRouteImport.update({
   id: '/wechat/callback',
   path: '/wechat/callback',
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
   '/profile/': typeof ProfileIndexRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/test/$code': typeof TestCodeRoute
   '/login': typeof LoginIndexRoute
   '/match': typeof MatchIndexRoute
   '/profile': typeof ProfileIndexRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
   '/profile/': typeof ProfileIndexRoute
@@ -191,6 +200,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/test/$code'
     | '/login/'
     | '/match/'
     | '/profile/'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/test/$code'
     | '/login'
     | '/match'
     | '/profile'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/test/$code'
     | '/login/'
     | '/match/'
     | '/profile/'
@@ -246,6 +258,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TestCodeRoute: typeof TestCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -348,6 +361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof ProfileRoute
     }
+    '/test/$code': {
+      id: '/test/$code'
+      path: '/test/$code'
+      fullPath: '/test/$code'
+      preLoaderRoute: typeof TestCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login/wechat/callback': {
       id: '/login/wechat/callback'
       path: '/wechat/callback'
@@ -433,6 +453,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TestCodeRoute: TestCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

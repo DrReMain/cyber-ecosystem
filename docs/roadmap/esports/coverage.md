@@ -31,9 +31,9 @@
 | `match-genre-pick`(16,?why=) | ✅ | 前段 UI 片 | tie/empty/normal 三面齐;平票由编排判定跳入 |
 | `test-guide`(06/18+retest 变体) | 🟡 | 前段 UI 片(首测面)+E4 | 五规则+成绩口径已落;首次/二次切换与重测文案激活随 E4 会话 |
 | `test-intro`(8 张→?ab=) | ⬜ | E7/H-A | 四段进度条;「继续」进本体 |
-| `test-running`(唯一横屏) | ⬜ | E7/H-A | GameClock+暂停顺延;遥测采集新契约 |
+| `test-running`(唯一横屏) | ✅(引擎面) | E7/H-A | 引擎已立:/test/$code+GameClock(暂停顺延)+overlay 族+red_dot 可玩(mock config);真响应式横竖屏(无 rotate hack);遥测=rawDetail 事件累积+BackgroundSpan 后台段标记(服务端判);H-B 逐款长游戏+本地结果页 |
 | `test-result`(8 张→?ab=) | ⬜ | E7 | 大分数+S/A/B/C+重测机会 N/3+取最高 |
-| `exit-confirm`(31) | 🟡 | H1→H-A | **ExitConfirmDialog kit 件已交付零消费者**;原型为整页落地,kit 为弹层——形态以 D-O 由消费片定 |
+| `exit-confirm`(31) | ✅ | H1→H-A | kit 弹层形态由 H-A 消费定形(/test 退出确认首用);续测文案半句留 E4 |
 | `test-done`(27c/27c-moba) | ⬜ | E7 | 亮眼结果页;P3 交互决策(ljr) |
 | `scheme-b-*`(block4/16-19,渠道版 3 页) | ⬜ | M3/P4 | 6 能力直测+渠道报告 |
 

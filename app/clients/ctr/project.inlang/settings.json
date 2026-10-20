@@ -16,7 +16,8 @@
       "./messages/not-found/{locale}.json",
       "./messages/error/{locale}.json",
       "./messages/agreement/{locale}.json",
-      "./messages/age-required/{locale}.json"
+      "./messages/age-required/{locale}.json",
+      "./messages/test/{locale}.json"
     ]
   }
 }
