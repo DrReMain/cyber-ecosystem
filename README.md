@@ -178,11 +178,11 @@ app/
   services/system  Mandatory base service: multi-tenant IAM, authz, resource catalog, files, audit, introspection
   services/agent   Second-service reference: per-user agent config and streaming chat
   clients/admin    TanStack Start management/workbench client
-shared-go/         Reusable Go packages: capability families, orm, kratos, codegen, helpers
-shared-ts/         Shared TypeScript packages: error, antd, theme, store, cookie, progress
+shared-go/         Reusable Go packages: capability families, orm, kratos, codegen, utils, helpers
+shared-ts/         Shared TypeScript packages: error, antd, theme, store, cookie, router-progress, transport, storybook
 deploy/            Compose profiles, Traefik edge, and migration wiring
 tools/             Repository bootstrap and Go tooling targets
-docs/              Engineering conventions and screenshots
+docs/              Engineering conventions, the docs map and governance law, agent-environment recommendations, and screenshots
 ```
 
 ## Quickstart
@@ -285,7 +285,7 @@ Future platform work includes runtime agent principals, API-key credentials, too
 
 ## Documentation
 
-Area conventions live in:
+The documentation map and governance law live in [`docs/README.md`](./docs/README.md). Area conventions live in:
 
 - [`docs/conventions/proto/CONVENTIONS.md`](./docs/conventions/proto/CONVENTIONS.md)
 - [`docs/conventions/kratos/CONVENTIONS.md`](./docs/conventions/kratos/CONVENTIONS.md)

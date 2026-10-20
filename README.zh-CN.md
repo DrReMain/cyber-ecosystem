@@ -178,11 +178,11 @@ app/
   services/system  强制基础服务：多租户 IAM、authz、资源目录、文件、审计、introspection
   services/agent   第二服务参考：每用户 Agent 配置与流式聊天
   clients/admin    TanStack Start 管理 / 工作台客户端
-shared-go/         可复用 Go 包：能力族、orm、kratos、codegen、helper
-shared-ts/         共享 TypeScript 包：error、antd、theme、store、cookie、progress
+shared-go/         可复用 Go 包：能力族、orm、kratos、codegen、utils、helper
+shared-ts/         共享 TypeScript 包：error、antd、theme、store、cookie、router-progress、transport、storybook
 deploy/            Compose profile、Traefik edge 和迁移 wiring
 tools/             仓库初始化与 Go 工具目标
-docs/              工程约定与截图
+docs/              工程约定、文档地图与治理法、agent 环境建议与截图
 ```
 
 ## 快速开始
@@ -195,6 +195,8 @@ docs/              工程约定与截图
 - Node.js 24.15+
 - pnpm 11+
 - Docker Compose v2
+
+可选的 agent 工具（推荐为 coding agent 配置）：`docs/environment.md`。
 
 ### 1. 初始化工具和依赖
 
@@ -283,7 +285,7 @@ docs/              工程约定与截图
 
 ## 文档
 
-领域约定见：
+文档地图与治理法见 [`docs/README.md`](./docs/README.md)。领域约定见：
 
 - [`docs/conventions/proto/CONVENTIONS.md`](./docs/conventions/proto/CONVENTIONS.md)
 - [`docs/conventions/kratos/CONVENTIONS.md`](./docs/conventions/kratos/CONVENTIONS.md)

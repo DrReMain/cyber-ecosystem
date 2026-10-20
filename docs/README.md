@@ -7,6 +7,7 @@ Entry points:
 - **`AGENTS.md`** (repo root) — root rules + area routing index; auto-loaded by coding agents. `CLAUDE.md` is a Claude Code import shell over it.
 - **`.claude/rules/`** — path-scoped delivery shells; injected automatically when Claude reads or edits a file matching the frontmatter `paths` globs; pointer-only (§2.9).
 - **`.claude/skills/`** — procedural workflow dispatchers; Claude Code triggers them by description, everyone else reads them as plain markdown.
+- **`docs/environment.md`** — the recommended agent environment: optional tooling, each entry naming what its absence degrades; a root-level durable doc (no stack area owns it).
 - **This file** — the governance law; read on demand.
 
 ---
@@ -16,10 +17,12 @@ Entry points:
 | Lane | Home | Holds | Language | Lifecycle |
 |---|---|---|---|---|
 | **Durable** | `docs/conventions/<area>/CONVENTIONS.md` | rules and mechanisms — what you MUST follow, how the system works | EN | long-lived; changes follow the paradigm-change discipline (AGENTS.md §6) |
-| **Working** | `docs/roadmap/*.md` (single doc) or `docs/roadmap/<front>/` (directory: `README.md` front index + sub-docs split by concern) | in-flight design, milestone acceptance records, backlog pools — one front = one doc or one doc set, plus `vision.md` (north-star) | ZH | temporary by contract: every item carries a destination (§2.4) |
+| **Working** | `docs/roadmap/*.md` (single doc) or `docs/roadmap/<front>/` (directory: `README.md` front index + sub-docs split by concern) | in-flight design, milestone acceptance records, backlog pools — one front = one doc or one doc set, plus `vision.md` (north-star) | the owning team's language — any, per front (§4) | temporary by contract: every item carries a destination (§2.4) |
 | **Procedural** | `.claude/skills/<name>/SKILL.md` | workflow dispatchers — trigger, pointers, cross-doc assembly, one-line trap annotations (warning + home pointer, no steps); never rule text or step text | EN | evolves with code; git-versioned; directory names are stable identifiers |
 
 **Single-source law.** Content is never copied. Where two audiences need the same knowledge, both read the same file. A skill contributes only a trigger, pointers, and one-line trap annotations (a warning naming the trap and its home section — never the rule text or the steps); procedures (checklists) live in docs, and skills point at them. Duplication is the one failure mode this law exists to prevent — one fact, one home, everything else a pointer.
+
+**Root tier of the Durable lane.** Durable knowledge with no stack area lives in the root rules (`AGENTS.md`) when it is rules, or as a root-level `docs/<topic>.md` registered in the entry list when it is a recommendation layer — currently `docs/environment.md`. This is the Durable lane's root tier, not a fourth lane.
 
 ---
 
@@ -49,7 +52,7 @@ When a milestone (or a ruling) closes:
 
 ### 2.4 Destination
 
-Every working-lane item declares where it ends up: **backfilled / cleared / archived**. A closed front's doc (or directory) is pruned or deleted; `docs/roadmap/` holds only `vision.md` plus the active fronts (target: ≤4 fronts — a directory front counts as one front, its `README.md` is the index).
+Every working-lane item declares where it ends up: **backfilled / cleared / archived**. The declaration is a `> destination:` line near the top of the front's index — the doc itself for a single-doc front, the `README.md` for a directory front: an English protocol keyword (§4) whose payload is the team's own language. A closed front's doc (or directory) is pruned or deleted; `docs/roadmap/` holds only `vision.md` plus the active fronts (target: ≤4 fronts — a directory front counts as one front, its `README.md` is the index).
 
 ### 2.5 Pointer discipline
 
@@ -62,7 +65,7 @@ Content moves; it is never duplicated. The one sanctioned instantiation is a ski
 1. every file path referenced by `AGENTS.md` / `CLAUDE.md` / the root READMEs / skills exists;
 2. every heading targeted by a skill pointer exists;
 3. the `AGENTS.md` area index ↔ `docs/conventions/*/CONVENTIONS.md` agree in both directions;
-4. durable docs carry a `Status:` line; working docs carry a destination header;
+4. durable docs carry a `Status:` line; a working front's index (top-level doc or `<front>/README.md`) carries a `destination:` line;
 5. the durable lane is roadmap-clean (§2.7): no `docs/roadmap/` reference in `AGENTS.md`, `CLAUDE.md`, skills, or conventions;
 6. every gate row ID (`K-XXX-N` / `T-XXX-N`) cited by a skill or rule shell exists in the owning conventions gate (kratos §7, tanstack §12).
 
@@ -99,4 +102,4 @@ A verification mechanism (hook, CI gate, checker script) is admitted only on evi
 
 ## 4) Language law
 
-Durable and procedural docs are written in English. Working-lane (roadmap) docs are written in Chinese.
+English is the platform's first language: durable and procedural docs are written in English, and so are the protocol keywords mechanisms verify — `Status:` lines, gate row IDs (`K-XXX-N`), the working lane's `destination:` marker. Protocol keywords are to docs what identifiers are to code: fixed vocabulary, regardless of the prose language around them. The working lane is written in the owning team's language — any language, chosen per front; the platform constrains nothing there. Roadmap isolation (§2.7) is what makes this safe: working-lane language never leaks into the durable surface, and the public snapshot strips the lane entirely (github-publish exclusion). Root README translations (`README.zh-CN.md`) are courtesy mirrors of the English source, kept section-for-section in lockstep.

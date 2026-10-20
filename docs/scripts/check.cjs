@@ -11,13 +11,20 @@
  *      grammar skills must use;
  *   3. the AGENTS.md area index and the conventions area directories agree
  *      in both directions;
- *   4. every conventions doc carries a Status line; every roadmap doc
- *      carries a destination (归宿) header near the top;
+ *   4. every conventions doc carries a Status line; every working front's
+ *      index (top-level doc or <front>/README.md) carries a `destination:`
+ *      line near the top — English protocol keyword (docs/README.md §4),
+ *      payload in the owning team's language;
  *   5. roadmap isolation (docs/README.md 2.7): no docs/roadmap reference in
  *      AGENTS.md, CLAUDE.md, skills, or conventions;
  *   6. every gate row ID (K-XXX-N kratos §7, T-XXX-N tanstack §12) cited by
  *      a skill, rule shell, or conventions doc exists in its owning gate;
  *      a bare K-XXX/T-XXX group reference must have at least one row.
+ *
+ * Public snapshots strip docs/roadmap (github-publish/publish-github.exclude):
+ * with the lane absent, its root-location mentions in the map stay legal and
+ * the destination-header check is skipped — the sentinel must stay green on a
+ * fresh public clone, never crash on a missing lane.
  */
 const fs = require("node:fs");
 const path = require("node:path");
@@ -25,6 +32,9 @@ const path = require("node:path");
 const ROOT = path.resolve(__dirname, "..", "..");
 const fail = [];
 const bad = (msg) => fail.push(msg);
+
+const roadmapDir = path.join(ROOT, "docs", "roadmap");
+const hasRoadmap = fs.existsSync(roadmapDir);
 
 const refFiles = [
   path.join(ROOT, "AGENTS.md"),
@@ -68,7 +78,12 @@ for (const f of refFiles) {
   const rel = path.relative(ROOT, f);
   for (const m of text.matchAll(PATH_RE)) {
     const p = m[1].replace(/\.$/, "");
-    if (!fs.existsSync(path.join(ROOT, p))) bad(`${rel}: dangling path \`${p}\``);
+    // the map lawfully names the working lane's root location (lane table,
+    // §2.7 prose); on a snapshot tree the lane itself is stripped, so those
+    // mentions are lane definitions, not dangling pointers
+    const laneRootMention = p === "docs/roadmap" || p.startsWith("docs/roadmap/");
+    if (!fs.existsSync(path.join(ROOT, p)) && !(laneRootMention && !hasRoadmap))
+      bad(`${rel}: dangling path \`${p}\``);
   }
   for (const m of text.matchAll(REF_RE)) {
     const [_ref, p, sec, quoted] = m;
@@ -140,14 +155,21 @@ for (const area of [...actual].sort()) {
   if (!fs.readFileSync(p, "utf8").includes("**Status:**"))
     bad(`${area}: missing \`**Status:**\` line`);
 }
-const roadmapDir = path.join(ROOT, "docs", "roadmap");
-for (const name of fs
-  .readdirSync(roadmapDir)
-  .filter((n) => n.endsWith(".md"))
-  .sort()) {
-  const head = fs.readFileSync(path.join(roadmapDir, name), "utf8").slice(0, 900);
-  if (!head.includes("归宿"))
-    bad(`docs/roadmap/${name}: missing 归宿 (destination) header near the top`);
+if (hasRoadmap) {
+  const frontDocs = fs
+    .readdirSync(roadmapDir)
+    .filter((n) => n.endsWith(".md"))
+    .map((n) => path.join(roadmapDir, n));
+  for (const e of fs.readdirSync(roadmapDir, { withFileTypes: true })) {
+    if (!e.isDirectory()) continue;
+    const idx = path.join(roadmapDir, e.name, "README.md");
+    if (fs.existsSync(idx)) frontDocs.push(idx);
+  }
+  for (const p of frontDocs.sort()) {
+    const rel = path.relative(ROOT, p);
+    if (!fs.readFileSync(p, "utf8").slice(0, 900).includes("destination:"))
+      bad(`${rel}: missing \`destination:\` line near the top (docs/README.md §4)`);
+  }
 }
 
 // roadmap isolation (docs/README.md 2.7): the durable lane never references

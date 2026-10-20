@@ -1,5 +1,7 @@
 # Recommended agent environment
 
+**Status:** ACTIVE
+
 Optional. The repo is fully functional without any tool listed here — each entry states what its absence degrades, so a developer can decide. Setup is manual by design: follow the upstream docs; an agent recommends but never executes the installation.
 
 | Tool | Identity | Serves | Absent → |

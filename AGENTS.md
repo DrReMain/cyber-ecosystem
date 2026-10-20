@@ -23,7 +23,7 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 | `app/services/<name>/` | Kratos Go services; `system` = the mandatory base service (IAM) |
 | `app/clients/<name>/` | TanStack Start web clients (`admin`) |
 | `shared-go/` | Cross-service Go capabilities (transport, security, capability facades) |
-| `shared-ts/` | Cross-client TS capabilities (error, antd, theme, store, cookie, router-progress, storybook) |
+| `shared-ts/` | Cross-client TS capabilities (error, antd, theme, store, cookie, router-progress, transport, storybook) |
 | `deploy/` | Compose stacks, traefik edge, migration wiring |
 | `tools/` | Repo bootstrap & tooling Nx targets |
 | `docs/` | Documentation — three lanes (§7) |
