@@ -4,6 +4,8 @@ import (
 	"context"
 	"log/slog"
 
+	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
@@ -40,7 +42,7 @@ func (rp *testRP) List(ctx context.Context) ([]*Test, error) {
 func (rp *testRP) GetByID(ctx context.Context, id string) (*Test, error) {
 	row, err := rp.Platform.GetClient(ctx).Test.Get(ctx, id)
 	if err != nil {
-		return nil, rp.Platform.HandleEntError(err)
+		return nil, mapTestLoadError(rp, err)
 	}
 	return mapTest(row), nil
 }
@@ -50,13 +52,13 @@ func (rp *testRP) GetConfigByID(ctx context.Context, id string) (*TestConfig, er
 	// the request carries the test id, so the owning row resolves first.
 	owned, err := rp.Platform.GetClient(ctx).Test.Get(ctx, id)
 	if err != nil {
-		return nil, rp.Platform.HandleEntError(err)
+		return nil, mapTestLoadError(rp, err)
 	}
 	row, err := rp.Platform.GetClient(ctx).TestConfig.Query().
 		Where(testconfig.TestCodeEQ(owned.Code)).
 		Only(ctx)
 	if err != nil {
-		return nil, rp.Platform.HandleEntError(err)
+		return nil, mapTestLoadError(rp, err)
 	}
 	return &TestConfig{
 		TestID:               owned.ID,
@@ -67,6 +69,15 @@ func (rp *testRP) GetConfigByID(ctx context.Context, id string) (*TestConfig, er
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
+
+func mapTestLoadError(rp *testRP, err error) error {
+	// A missing row is the domain's not-found, not the generic infra word —
+	// both read paths resolve through the catalog first.
+	if ent.IsNotFound(err) {
+		return esportspb.ErrorEsportsTestNotFound("")
+	}
+	return rp.Platform.HandleEntError(err)
+}
 
 func mapTest(row *ent.Test) *Test {
 	return &Test{
