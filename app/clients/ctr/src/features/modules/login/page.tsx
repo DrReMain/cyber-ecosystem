@@ -2,7 +2,7 @@ import { useTransport } from "@connectrpc/connect-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { Zap } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type SyntheticEvent, useEffect, useState } from "react";
 import {
   Button,
   CheckboxButton,
@@ -30,7 +30,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const transport = useTransport();
-  const search = useSearch({ from: "/login/" });
+  const { expired, next } = useSearch({ from: "/login/" });
   const [pending, setPending] = useState(false);
   const [wechatPending, setWechatPending] = useState(false);
   const [wechatEnv, setWechatEnv] = useState(false);
@@ -44,6 +44,21 @@ export function LoginPage() {
   useEffect(() => {
     setWechatEnv(/MicroMessenger/i.test(navigator.userAgent));
   }, []);
+
+  // A session killed server-side (ban, revoke) lands here with the notice;
+  // the param strips once fired so a refresh or shared link never re-toasts.
+  useEffect(() => {
+    if (!expired) {
+      return;
+    }
+    toast(m.login_session_expired(), { id: "session-expired" });
+    void navigate({
+      replace: true,
+      search: (prev) => ({ next: prev.next }),
+      to: "/login",
+      viewTransition: false,
+    });
+  }, [expired, navigate]);
 
   function agreeOK(): boolean {
     const miss = {
@@ -69,7 +84,7 @@ export function LoginPage() {
     return `flex items-start gap-2 py-1.5 ${missing[field] ? "text-danger-text" : "text-ink-secondary"}`;
   }
 
-  async function onSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+  async function onSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!agreeOK()) {
       return;
@@ -90,7 +105,7 @@ export function LoginPage() {
         },
       });
       toast.success(m.login_success());
-      await routeAfterLogin({ navigate, queryClient, transport }, search.next);
+      await routeAfterLogin({ navigate, queryClient, transport }, next);
     } catch {
       setError("bad");
     } finally {

@@ -29,7 +29,15 @@ export async function sessionGuard(args: {
     throw makeEnvelope("network", "session backend unreachable");
   }
   if (session.status !== "authed") {
-    throw redirect({ to: "/login", search: { next: args.location.href } });
+    // Only a dead session is "expired" — a fresh anonymous visit logs in
+    // without the notice.
+    throw redirect({
+      search:
+        session.status === "expired"
+          ? { expired: true, next: args.location.href }
+          : { next: args.location.href },
+      to: "/login",
+    });
   }
 }
 

@@ -11,6 +11,7 @@ import type { PropsWithChildren } from "react";
 import { APP_NAME, HOME_PATH } from "#/config";
 import { LocaleSelect } from "#/domains/i18n";
 import { ErrorPage, FeedbackSonner, NotFoundPage } from "#/features/app";
+import { AppLayout } from "#/features/layout-app/app-layout";
 import { getLocale, getTextDirection } from "#/paraglide/runtime";
 import { TransportProvider } from "#/services/connect";
 import { TailwindIndicator } from "../components/tailwind-indicator";
@@ -49,6 +50,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       document.documentElement.setAttribute("dir", getTextDirection());
     }
   },
+  component: AppLayout,
   loader: async () => {
     const storeData = await getStoreCookies();
     return { storeData };

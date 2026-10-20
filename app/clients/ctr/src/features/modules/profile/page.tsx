@@ -8,6 +8,7 @@ import { SoonCard } from "#/components/soon-card";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { TabBar } from "#/features/app/tabbar";
+import { broadcastSessionKick } from "#/features/auth/session-kick";
 import { m } from "#/paraglide/messages";
 import { logoutFn } from "./logout.fn";
 import { LogoutSheet } from "./logout-sheet";
@@ -41,6 +42,9 @@ export function ProfilePage() {
     try {
       await logoutFn();
       queryClient.clear();
+      // Boots the other tabs off the dead session (no expired notice — a
+      // deliberate sign-out is expected, not a surprise).
+      broadcastSessionKick();
       await navigate({ to: "/login" });
     } finally {
       setLoggingOut(false);
