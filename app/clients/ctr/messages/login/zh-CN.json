@@ -17,7 +17,6 @@
   "login_session_expired": "登录已过期，请重新登录",
   "login_wechat_button": "微信一键登录",
   "login_error_wechat_env": "请在微信中打开",
-  "login_wechat_env_note": "当前非微信环境,微信登录需在微信中打开",
   "login_error_wechat": "微信登录失败,请重试",
   "login_callback_pending": "正在登录…",
   "login_back": "返回登录",

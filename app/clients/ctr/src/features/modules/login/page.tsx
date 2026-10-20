@@ -283,9 +283,6 @@ export function LoginPage() {
         >
           {wechatPending ? m.login_pending() : m.login_wechat_button()}
         </Button>
-        {wechatEnv || (
-          <p className="text-center text-[11px] text-ink-tertiary">{m.login_wechat_env_note()}</p>
-        )}
 
         {/* Forgot-password stays contract-gated (SMS provider). */}
         <div className="text-center text-[10.5px] text-ink-tertiary leading-relaxed">

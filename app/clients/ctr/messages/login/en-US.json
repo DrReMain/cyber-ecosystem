@@ -17,7 +17,6 @@
   "login_session_expired": "Your session has expired, please sign in again",
   "login_wechat_button": "Sign in with WeChat",
   "login_error_wechat_env": "Please open in WeChat",
-  "login_wechat_env_note": "Not inside WeChat — WeChat sign-in opens there",
   "login_error_wechat": "WeChat sign-in failed, please try again",
   "login_callback_pending": "Signing in…",
   "login_back": "Back to login",
