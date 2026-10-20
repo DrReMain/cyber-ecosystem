@@ -181,8 +181,8 @@ export function LoginPage() {
                   <AgreeBox checked={agree.user} />
                   <span className="text-sm leading-snug">
                     {m.login_agree_prefix()}
-                    {/* H2 link swap (authorized 2026-10-20, lzx agreed); the
-                        tap must navigate without flipping the checkbox. */}
+                    {/* H2 link swap; the tap must navigate without flipping
+                        the checkbox. */}
                     <Link
                       className="underline active:opacity-60"
                       onClick={(event) => event.stopPropagation()}
