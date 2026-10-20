@@ -23,7 +23,7 @@
 
 | 去向 | 事项 | 出处 |
 |---|---|---|
-| ljr | 首页未登录文案:问候行与标题均渲染「未登录」叠字(home_greet_guest/home_guest_name),请定文案方向(如问候行改「先登录再开始」/标题改「玩家」) | review D6 |
+| ~~ljr~~ → lzx | 首页未登录文案**已定(2026-10-21 ljr)**:问候行=「你好」(EN Hello)、标题=「电竞挑战者」(EN Challenger)——头部回归身份语义,登录行动留在 CTA 卡(按钮+提示行),消除三重「未登录」冗余;键位 home_greet_guest/home_guest_name 改值即可。前向注记:M2 会员片落地时 greet 会员态=「专属会员 · 有效期内」(原型语义),届时加 home_greet_member 键 | review D6 |
 | ljr/部署确认 | CSP `frame-ancestors 'none'`(start.ts)与「租户 app iframe 内嵌」场景冲突待确认;微信/原生 webview 顶层浏览不受影响,若需 iframe 内嵌须改租户域白名单 | review B3 |
 | hzy | StateScreen loading 的 LOADING 扫光条与 PendingFallback markup 双份复制,lzx 已跨界最小修 sr-only 播报(features/app/states/state-screen.tsx);视觉收敛(抽共享扫光条)归 features/app 领地自决 | review C3 |
 | 后续片 | 微信回调 next 丢失:redirect_uri 不能带 query(微信 authorize 校验拒),微信登录后回跳意图丢失,固定走向导/首页;如需保 next 须 state 中转,微信链路设计时定 | review A6 |
