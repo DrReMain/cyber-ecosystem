@@ -12,7 +12,7 @@
 | prototype 页(视觉锚) | 状态 | 承接片 | 差异与缺口注记 |
 |---|---|---|---|
 | `login`(block3/01+变体) | ✅ | E6b | 密码 tab 完整+协议双勾+微信环境门控+法务尾。**SMS tab=占位**(system 无契约);微信昵称一键(02-wechat 变体)未做——依赖绑定契约 |
-| `agreement`(user-agreement+privacy-policy) | ⬜ | H2 | URL 形状已定约 `/agreement?p=user\|privacy`(2026-10-20 lzx);登录页协议链接现为占位 toast;consent 版本记录=契约缺口(progress 已登记) |
+| `agreement`(user-agreement+privacy-policy) | ✅ | H2 | 已落 `/agreement?p=user\|privacy`(宽容收窄非法值剥参回落 user;入 sitemap+可索引;head SSR 动态 title);登录页两处协议链接已切真链(H2 授权注记);文案=原型演示文本占位(ljr 定稿后换);版本参数/consent 版本记录=契约缺口随 E6b(progress 已登记) |
 | `profile-nickname`(block3/02) | ✅ | E6b | 2-12 码点+规则卡;原型「禁 emoji」未显式实现(服务端校验兜底);昵称加权 24 冲突待 ljr 追认 |
 | `profile-age`(block3/03) | ✅ | E6b | 8 档派生 ✓;**性别三选未做**(P8);次级年龄段口径=新版仅出生年月单口径(UpdateProfile 无 band 入参,已登记) |
 | `profile-setup`(block3/04+custom) | ✅ | E6b | 分组多选+类型投票注+自定义 ≤3;服务端 cap=20 config 读面缺(已登记) |
@@ -48,7 +48,7 @@
 | `report-trend`(31+subscription-popup) | ⬜ | M2 余 | 依赖 practice_record(P2 数据源待定) |
 | `share-invite`(25 两态) | ⬜ | M2 余(梯①) | D-F 立减已删;ref HMAC 归因 |
 | `pay-confirm` / `pay-result`(20-22/26/27) | ⬜ | PAY1-3 | 单次/会员;微信 JSAPI+H5 |
-| `age-required`(23) | ⬜ | H2+PAY3 | 弹层→整页形态差;付费补填硬闸 |
+| `age-required`(23) | ✅(页面) | H2+PAY3 | 整页已立 `/age-required`(sessionGuard+noindex;保存走 UpdateProfile,<18 拦截;年范围 6-60 法则);当前仅直连 URL 可达——付费硬闸挂接与入口归 PAY3 |
 | `member-detail`(24) | ⬜ | PAY/E8 | 权益+价格+FAQ |
 
 ## 四、个人中心 / 消息 / 通用

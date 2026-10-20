@@ -42,7 +42,7 @@
   "match_guide_rule1_t": "Keep the screen on",
   "match_guide_rule1_d": "Backgrounding interrupts sampling and voids that run",
   "match_guide_rule2_t": "About 30s each, {n} total",
-  "match_guide_rule2_d": "No skipping; finishing the set unlocks the report",
+  "match_guide_rule2_d": "No skipping; the full {n}-game set unlocks the report",
   "match_guide_rule3_t_first": "3 retakes per test",
   "match_guide_rule3_t_second": "1 retake per test",
   "match_guide_rule3_d": "Each retake spends one chance; the button grays out at zero",

@@ -14,7 +14,9 @@
       "./messages/login/{locale}.json",
       "./messages/profile/{locale}.json",
       "./messages/not-found/{locale}.json",
-      "./messages/error/{locale}.json"
+      "./messages/error/{locale}.json",
+      "./messages/agreement/{locale}.json",
+      "./messages/age-required/{locale}.json"
     ]
   }
 }

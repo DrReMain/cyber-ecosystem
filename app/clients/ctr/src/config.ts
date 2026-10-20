@@ -27,10 +27,12 @@ export const SEO_MODE: "public" | "private" = "public";
 /** Indexable routes fed into the sitemap (public mode only). */
 export const SITEMAP_ROUTES: readonly SitemapRoute[] = [
   { path: HOME_PATH, changefreq: "weekly", priority: 1.0 },
+  // The public legal face (H2): crawled yearly, low priority.
+  { path: "/agreement", changefreq: "yearly", priority: 0.3 },
 ];
 
 /**
  * Path prefixes robots.txt disallows in every locale form (the generator
  * localizes each prefix). Personal flow pages never surface in search.
  */
-export const DISALLOW_PREFIXES: readonly string[] = ["/login", "/profile"];
+export const DISALLOW_PREFIXES: readonly string[] = ["/login", "/profile", "/age-required"];

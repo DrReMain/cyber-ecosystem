@@ -1,6 +1,6 @@
 import { useTransport } from "@connectrpc/connect-query";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, Checkbox, Form, Input, Label, TextField } from "react-aria-components";
@@ -181,7 +181,15 @@ export function LoginPage() {
                   <AgreeBox checked={agree.user} />
                   <span className="text-sm leading-snug">
                     {m.login_agree_prefix()}
-                    {m.login_agree_user_name()}
+                    {/* H2 link swap (authorized 2026-10-20, lzx agreed); the
+                        tap must navigate without flipping the checkbox. */}
+                    <Link
+                      className="underline active:opacity-60"
+                      onClick={(event) => event.stopPropagation()}
+                      to="/agreement"
+                    >
+                      {m.login_agree_user_name()}
+                    </Link>
                   </span>
                 </div>
               )}
@@ -198,7 +206,14 @@ export function LoginPage() {
                   <AgreeBox checked={agree.privacy} />
                   <span className="text-sm leading-snug">
                     {m.login_agree_prefix()}
-                    {m.login_agree_privacy_name()}
+                    <Link
+                      className="underline active:opacity-60"
+                      onClick={(event) => event.stopPropagation()}
+                      search={{ p: "privacy" }}
+                      to="/agreement"
+                    >
+                      {m.login_agree_privacy_name()}
+                    </Link>
                   </span>
                 </div>
               )}
@@ -251,8 +266,9 @@ export function LoginPage() {
           <p className="text-center text-[11px] text-ink-tertiary">{m.login_wechat_env_note()}</p>
         )}
 
-        {/* Forgot-password and the agreement pages are contract-gated (SMS
-            provider / H2); the slots stay visible with an honest state. */}
+        {/* Forgot-password stays contract-gated (SMS provider); the
+            agreement links went live with H2 (authorized 2026-10-20, lzx
+            agreed). */}
         <div className="text-center text-[10.5px] text-ink-tertiary leading-relaxed">
           <button
             className="tap-zone py-1 underline active:opacity-60"
@@ -262,21 +278,17 @@ export function LoginPage() {
             {m.login_forgot()}
           </button>
           <span className="mx-1.5">·</span>
-          <button
-            className="tap-zone py-1 underline active:opacity-60"
-            onClick={() => toast.info(m.common_soon())}
-            type="button"
-          >
+          <Link className="tap-zone py-1 underline active:opacity-60" to="/agreement">
             {m.login_agree_user_name()}
-          </button>
+          </Link>
           <span className="mx-1.5">·</span>
-          <button
+          <Link
             className="tap-zone py-1 underline active:opacity-60"
-            onClick={() => toast.info(m.common_soon())}
-            type="button"
+            search={{ p: "privacy" }}
+            to="/agreement"
           >
             {m.login_agree_privacy_name()}
-          </button>
+          </Link>
         </div>
         <div className="text-center text-[10.5px] text-ink-tertiary leading-loose">
           {m.login_footer_company()}
