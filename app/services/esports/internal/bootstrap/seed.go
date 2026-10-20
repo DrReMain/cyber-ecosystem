@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -27,20 +28,25 @@ var seedGames = []struct {
 	{"fortnite", "Fortnite", "fps", "大逃杀射击游戏"},
 }
 
-var seedTests = []string{
-	"red_dot",
-	"flash_aiming",
-	"multi_target",
-	"target_recognition",
-	"tracking_moving",
-	"moving_target",
-	"skill_trajectory",
-	"dual_zone",
-	"number_stars",
-	"offense_defense",
-	"character_counter",
-	"resource_match",
-	"economic_sim",
+var seedTests = []struct {
+	Code     string
+	Name     string
+	Category string
+	Ability  string
+}{
+	{"red_dot", "随机红点触摸测试", "universal", "reactionSpeed"},
+	{"number_stars", "数字星空", "universal", "reactionSpeed"},
+	{"dual_zone", "双区同步躲避", "universal", "reactionSpeed"},
+	{"target_recognition", "目标识别测试", "universal", "reactionSpeed"},
+	{"flash_aiming", "闪现瞄准测试", "fps", "aimingAccuracy"},
+	{"moving_target", "移动靶射击测试", "fps", "trackingStability"},
+	{"tracking_moving", "追踪移动目标测试", "fps", "trackingStability"},
+	{"skill_trajectory", "技能轨迹测试", "universal", "skillReleaseAccuracy"},
+	{"offense_defense", "攻防决策测试", "moba", "decisionEfficiency"},
+	{"resource_match", "资源配对测试", "moba", "resourceAllocation"},
+	{"character_counter", "角色Counter测试", "moba", "resourceAllocation"},
+	{"economic_sim", "经济模拟测试", "moba", "resourceAllocation"},
+	{"multi_target", "multi_target", "", ""},
 }
 
 type Seed struct {
@@ -74,29 +80,53 @@ func (s *Seed) Run(ctx context.Context) error {
 		}
 		s.log.Info("seeded game", "code", g.Code)
 	}
-	for _, code := range seedTests {
-		exists, err := client.Test.Query().Where(test.CodeEQ(code)).Exist(ctx)
-		if err != nil {
-			return s.plat.HandleEntError(fmt.Errorf("seed: query test %q: %w", code, err))
+	for _, t := range seedTests {
+		// Names/categories/abilities are adopted verbatim from the legacy
+		// interactive baseline (_state.js, an authority-table source);
+		// category follows the genre-order rule (abilities on both genre
+		// pools are universal). multi_target has no legacy row — its
+		// attribution rides the P9-family ruling and stays empty. Durations,
+		// engine params, unit labels, and introductions remain metric-sheet
+		// data landing with E3.
+		row, err := client.Test.Query().Where(test.CodeEQ(t.Code)).Only(ctx)
+		if err != nil && !ent.IsNotFound(err) {
+			return s.plat.HandleEntError(fmt.Errorf("seed: query test %q: %w", t.Code, err))
 		}
-		if exists {
+		if row == nil {
+			row, err = client.Test.Create().
+				SetCode(t.Code).
+				SetName(t.Name).
+				SetNillableCategory(strPtr(t.Category)).
+				SetNillableAbility(strPtr(t.Ability)).
+				Save(ctx)
+			if err != nil {
+				return s.plat.HandleEntError(fmt.Errorf("seed: create test %q: %w", t.Code, err))
+			}
+			if _, err := client.TestConfig.Create().
+				SetTestCode(t.Code).
+				Save(ctx); err != nil {
+				return s.plat.HandleEntError(fmt.Errorf("seed: create test config %q: %w", t.Code, err))
+			}
+			s.log.Info("seeded test", "code", t.Code, "id", row.ID)
 			continue
 		}
-		row, err := client.Test.Create().
-			SetCode(code).
-			// Placeholder until the E3 metric sheet calibrates; the code is
-			// the honest name while no calibrated one exists.
-			SetName(code).
-			Save(ctx)
-		if err != nil {
-			return s.plat.HandleEntError(fmt.Errorf("seed: create test %q: %w", code, err))
-		}
-		if _, err := client.TestConfig.Create().
-			SetTestCode(code).
+		// Upsert keeps already-seeded rows in step with adopted baseline
+		// data; admin-tuned values (E3 calibration) will move out of this
+		// table's seed path entirely.
+		if _, err := row.Update().
+			SetName(t.Name).
+			SetNillableCategory(strPtr(t.Category)).
+			SetNillableAbility(strPtr(t.Ability)).
 			Save(ctx); err != nil {
-			return s.plat.HandleEntError(fmt.Errorf("seed: create test config %q: %w", code, err))
+			return s.plat.HandleEntError(fmt.Errorf("seed: update test %q: %w", t.Code, err))
 		}
-		s.log.Info("seeded test", "code", code, "id", row.ID)
 	}
 	return nil
+}
+
+func strPtr(v string) *string {
+	if v == "" {
+		return nil
+	}
+	return &v
 }

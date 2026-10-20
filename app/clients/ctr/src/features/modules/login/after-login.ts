@@ -3,20 +3,12 @@ import { createQueryOptions } from "@connectrpc/connect-query";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import type { QueryClient } from "@tanstack/react-query";
 import type { useNavigate } from "@tanstack/react-router";
+import { profileComplete } from "#/features/auth/guard";
 import { sessionQuery } from "#/features/auth/session.fn";
 
 type Navigate = ReturnType<typeof useNavigate>;
 
-// The completeness law behind the onboarding gate: nickname plus a complete
-// birth pair. Sex stays out until P8; a band-only entry has no contract
-// (birth is the only age input UpdateProfile accepts), so birth is the gate.
-export function profileComplete(profile: {
-  birthMonth?: number | null;
-  birthYear?: number | null;
-  nickname?: string | null;
-}): boolean {
-  return profile.nickname != null && profile.birthYear != null && profile.birthMonth != null;
-}
+export { profileComplete };
 
 // Everything the shared post-login router needs; callers assemble it with
 // the hooks they already own (useQueryClient, useTransport, useNavigate).

@@ -30,7 +30,7 @@ export function HomePage() {
       void navigate({ to: "/profile/setup/games" });
       return;
     }
-    toast.info(m.common_soon());
+    void navigate({ to: "/match" });
   }
 
   return (

@@ -26,10 +26,10 @@
 | prototype 页(视觉锚) | 状态 | 承接片 | 差异与缺口注记 |
 |---|---|---|---|
 | `home`(future/03-home) | ✅ | E6b | 问候态机+双门控 CTA+TabBar 四槽两活;首页不在 block3/4 视觉范围,原型即权威 |
-| `match-guide`(05/17,?genre=) | ⬜ | E4+E7 | steps=每能力 1 款按 render_order;D-E 匹配语义已冻 |
-| `match-switch-confirm`(15) | ⬜ | E4+E7 | 会话生效不覆盖默认;已测不再编排 |
-| `match-genre-pick`(16,?why=) | ⬜ | E4 | 平票/无偏好手动改选;空编排兜底 |
-| `test-guide`(06/18+retest 变体) | ⬜ | E7 | 首次 3 次重测/二次 1 次;四提醒卡 |
+| `match-guide`(05/17,?genre=) | ✅ | 前段 UI 片(2026-10-20)+E4 会话 | steps=每能力 1 款按 render_order;客户端临时编排器(arranger,E4 整体替换),类型 URL ?genre= 覆盖 |
+| `match-switch-confirm`(15) | ✅ | 前段 UI 片+E4 | 会话生效不覆盖默认;进度警告面留 E4(done 恒 0) |
+| `match-genre-pick`(16,?why=) | ✅ | 前段 UI 片 | tie/empty/normal 三面齐;平票由编排判定跳入 |
+| `test-guide`(06/18+retest 变体) | 🟡 | 前段 UI 片(首测面)+E4 | 五规则+成绩口径已落;首次/二次切换与重测文案激活随 E4 会话 |
 | `test-intro`(8 张→?ab=) | ⬜ | E7/H-A | 四段进度条;「继续」进本体 |
 | `test-running`(唯一横屏) | ⬜ | E7/H-A | GameClock+暂停顺延;遥测采集新契约 |
 | `test-result`(8 张→?ab=) | ⬜ | E7 | 大分数+S/A/B/C+重测机会 N/3+取最高 |

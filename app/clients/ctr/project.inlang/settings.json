@@ -10,6 +10,7 @@
     "pathPattern": [
       "./messages/common/{locale}.json",
       "./messages/home/{locale}.json",
+      "./messages/match/{locale}.json",
       "./messages/login/{locale}.json",
       "./messages/profile/{locale}.json",
       "./messages/not-found/{locale}.json",
