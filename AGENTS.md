@@ -77,8 +77,33 @@ Before closing any change:
 2. Touched projects were validated with declared Nx targets.
 3. If a needed validation step has no Nx target yet, note the gap explicitly.
 4. Generated outputs were reviewed; unrelated churn was excluded.
-5. Any skipped step or pre-existing failure is called out.
+5. Any skipped step or pre-existing failure is called out in the §6.1 declaration line.
 6. Paradigm or mechanism changes: the owning `docs/conventions/<area>/CONVENTIONS.md` is updated and affected skill pointers are verified — `./nx run docs:check` is green.
+
+### 6.1) Verification posture — declare, then close
+
+Every change closes with a one-line declaration: change-kind + the verification actually executed, with counted evidence ("proven by: 2/2 refused-path probes; chain green"). The declaration closes the slice's final report and rides into the commit message. A closed change without its evidence line is not done — missing verification shows up as silence, so the positive statement is mandatory, not the exemption.
+
+Kind set (closed; classify by substance, not the commit verb — a "refactor" that changes contracts is a contract change; a full-stack vertical slice takes the posture of its highest-risk face, aggregate > logic > surface):
+`contract · aggregate · logic · surface · capability · refactor · chore · docs`
+
+Default posture (the owning conventions instantiate each cell with concrete commands):
+
+| kind | gates | runtime verification | tests | review |
+|---|---|---|---|---|
+| contract | drift gate + consumer chains | counterexample e2e, both sides | the drift gate is the test | full, second reviewer |
+| aggregate | chain + migration applied | live RPC probe incl. the refused path | none by default | full |
+| logic | chain | live probe, counterexamples at the same bar as tests | silent-regression guards where a regression would be invisible at runtime | normal |
+| surface | client chain | browser closed loop (viewports, locales, zero console) | none | visual + mechanical checklist |
+| capability | chain + declared conformance | probe / smoke | probe suites + silent-regression guards | multi-expert adversarial, two rounds |
+| refactor | chain, cache bypassed | counterexample replay — pin the baseline before the change | existing only | diff shape |
+| chore / docs | owning chain / docs gate | none | none | skim |
+
+Test posture is a function of the review regime, not a constant: under strict human review the human carries the verification (defaults above); when output is agent-heavy and review is light, the burden moves into executable form — test-first becomes the default for behavior-bearing kinds, and the reviewer reviews the spec rather than the implementation. The active regime is declared in the active working lane's collaboration section (lane law: docs/README.md §1), not here. Runtime verification escalates with blast radius: single-surface smoke → protocol matrix → full-flow e2e → cross-commit integration e2e.
+
+Trigger tiers: **slice close** (the table above) · **absorb** (integrating a reviewed slice: the mechanical checklist runs — deleted exports grepped for remaining consumers, new magic values traced to their source — and the integration diff equals exactly the absorbed slice's files) · **freeze** (pre-milestone: multi-stage e2e campaign with counterexamples, fresh-cache gate matrix, live-stack health; campaign scripts are throwaway, never repo assets).
+
+Ordering: self-check walks its own diff before gates run · e2e precedes doc codification · a slice stops for review before commit · under strict review, review precedes test-writing; under test-first, the spec is what review reads first.
 
 ---
 
@@ -89,16 +114,17 @@ Knowledge lives in three lanes; each kind of knowledge has exactly one home — 
 Lane rules:
 
 - `MUST` read the relevant `CONVENTIONS.md` before writing code in an area, and follow it exactly (structure, naming, ordering, comments, dependency rules).
-- `MUST NOT` duplicate content across lanes or into skills — pointers only. Rule text and step text live in docs; a skill body holds a trigger, pointers, and completion pointers.
+- `MUST NOT` duplicate content across lanes or into skills — pointers only. Rule text and step text live in docs; a skill body holds a trigger, pointers, completion pointers, one-line trap annotations (a warning naming the trap and its home — never the rule or the steps), and its gates line — the owning chain's concrete commands, instantiated from the conventions, which stay the source.
 - `MUST NOT` reference roadmap content from here, `CLAUDE.md`, skills, or conventions — the working lane is temporary and fully isolated (law: `docs/README.md` §2.7); active fronts are introduced by the user, not by root docs.
 - Skills auto-trigger by description (Claude Code); any agent or human can read `.claude/skills/*/SKILL.md` as plain markdown.
+- Path-scoped rule shells (`.claude/rules/*.md`) inject their law card automatically when a matching file is read or edited (delivery law: `docs/README.md` §2.9).
 
 Area index — read before writing code in the area:
 
 | Area | Doc | Read when |
 |---|---|---|
 | proto (contracts) | `docs/conventions/proto/CONVENTIONS.md` | touching any `.proto`, or code that consumes `gen/` |
-| kratos (Go services) | `docs/conventions/kratos/CONVENTIONS.md` | writing Go under `app/services/*` or `shared-go/` |
+| kratos (Go services) | `docs/conventions/kratos/CONVENTIONS.md` | writing Go under `app/services/*` or `shared-go/` — start at §0 |
 | tanstack (web clients) | `docs/conventions/tanstack/CONVENTIONS.md` | writing code under `app/clients/*` |
 | deploy (containers & pipelines) | `docs/conventions/deploy/CONVENTIONS.md` | touching `deploy/`, Dockerfiles, compose, edge, migrations |
 

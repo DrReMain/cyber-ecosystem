@@ -1,6 +1,6 @@
 ---
 name: kratos-new-module
-description: Domain module creation — use when creating a kratos module/<d>/ four-file set or a new ent schema in app/services/*.
+description: Domain module creation — use when creating a kratos module/<d>/ four-file set or a new ent schema in app/services/*. Trigger phrases include aggregate root, new table, new entity.
 ---
 
 # New domain module (aggregate root)
@@ -11,4 +11,4 @@ Procedure: `docs/conventions/kratos/RUNBOOKS.md` §1 "New domain module" — ste
 
 Gates (all exit 0): `./nx run <service>:generate:ent` → `:migrate:diff` → `:migrate:apply` → `:generate:wire` → `:build`, plus `:test` (TestMixinOrder guards the mixin order; the conventions guard must stay green).
 
-Finish with the §7 gate table before reporting done.
+Finish with the §7 gate table before reporting done; final line: the root `AGENTS.md` §6.1 declaration — change-kind + counted evidence.

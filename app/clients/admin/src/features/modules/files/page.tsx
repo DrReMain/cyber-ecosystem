@@ -59,7 +59,7 @@ export function FilesPage() {
   const filesQuery = useQuery(listFiles, input);
   const pagination = useServerPagination(store, filesSearchSchema, filesQuery.data?.page, {
     pageSizeOptions: [20, 50, 100],
-    showTotal: (t) => m.files_total({ n: t }),
+    showTotal: (t) => m.files_list_total({ n: t }),
   });
   const refetch = () => void filesQuery.refetch();
   const deleteMutation = useMutation(deleteFile, { onSuccess: refetch });
@@ -77,7 +77,7 @@ export function FilesPage() {
   const onUploaded = (f: FileView | undefined) => {
     if (!f) return;
     refetch();
-    toast.success(m.files_upload_done({ name: f.name ?? "" }));
+    toast.success(m.files_list_upload_done({ name: f.name ?? "" }));
   };
   const onAbortFile = (file: FileView) => {
     cancelUpload(file.id ?? "");
@@ -93,7 +93,7 @@ export function FilesPage() {
         showUploadList={false}
       >
         <Button color="primary" icon={<FileUp size={14} />} loading={proxyPending} variant="filled">
-          {m.files_upload()}
+          {m.files_list_upload()}
         </Button>
       </Upload>
       <Upload
@@ -109,7 +109,7 @@ export function FilesPage() {
           loading={uploading}
           variant="filled"
         >
-          {m.files_upload_direct()}
+          {m.files_list_upload_direct()}
         </Button>
       </Upload>
     </div>
@@ -126,7 +126,7 @@ export function FilesPage() {
     e.target.value = "";
     if (!(picked && resumeTarget)) return;
     if (picked.name !== resumeTarget.name || picked.size !== Number(resumeTarget.size ?? 0)) {
-      toast.error(m.files_resume_mismatch());
+      toast.error(m.files_list_resume_mismatch());
       return;
     }
     const target = resumeTarget;
@@ -155,42 +155,42 @@ export function FilesPage() {
           onReset={onReset}
           options={[
             {
-              label: m.files_filter_name(),
+              label: m.files_list_filter_name(),
               name: "name",
-              placeholder: m.files_filter_name_ph(),
+              placeholder: m.files_list_filter_name_ph(),
             },
             {
-              label: m.files_filter_type(),
+              label: m.files_list_filter_type(),
               name: "contentType",
-              placeholder: m.files_filter_type_ph(),
+              placeholder: m.files_list_filter_type_ph(),
             },
             {
-              label: m.files_filter_status(),
+              label: m.files_list_filter_status(),
               name: "status",
-              placeholder: m.files_filter_status_ph(),
+              placeholder: m.files_list_filter_status_ph(),
               type: "select",
               options: [
-                { label: m.files_status_confirmed(), value: "CONFIRMED" },
-                { label: m.files_status_uploading(), value: "UPLOADING" },
-                { label: m.files_status_processing(), value: "PROCESSING" },
-                { label: m.files_status_failed(), value: "FAILED" },
+                { label: m.files_list_status_confirmed(), value: "CONFIRMED" },
+                { label: m.files_list_status_uploading(), value: "UPLOADING" },
+                { label: m.files_list_status_processing(), value: "PROCESSING" },
+                { label: m.files_list_status_failed(), value: "FAILED" },
               ],
             },
             {
-              label: m.files_filter_source(),
+              label: m.files_list_filter_source(),
               name: "source",
-              placeholder: m.files_filter_source_ph(),
+              placeholder: m.files_list_filter_source_ph(),
               type: "select",
               options: [
-                { label: m.files_source_client(), value: "CLIENT_UPLOAD" },
-                { label: m.files_source_server(), value: "SERVER_GENERATED" },
+                { label: m.files_list_source_client(), value: "CLIENT_UPLOAD" },
+                { label: m.files_list_source_server(), value: "SERVER_GENERATED" },
               ],
             },
           ]}
         />
       </Card>
       <FilesTable
-        emptyDescription={filtersActive ? m.files_empty_filtered() : m.files_empty()}
+        emptyDescription={filtersActive ? m.files_list_empty_filtered() : m.files_list_empty()}
         files={filesQuery.data?.list ?? []}
         loading={filesQuery.isFetching}
         meId={user.id ?? ""}
@@ -216,11 +216,11 @@ export function FilesPage() {
         onCancel={() => setRenaming(null)}
         onOk={() => renaming && renameMutation.mutate({ id: renaming.id, name: renaming.name })}
         open={renaming !== null}
-        title={m.files_rename_title()}
+        title={m.files_list_rename_title()}
       >
         <Input
           onChange={(e) => setRenaming((prev) => (prev ? { ...prev, name: e.target.value } : prev))}
-          placeholder={m.files_ph_rename()}
+          placeholder={m.files_list_ph_rename()}
           value={renaming?.name}
         />
       </Modal>

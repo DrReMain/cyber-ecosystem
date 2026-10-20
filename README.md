@@ -196,6 +196,8 @@ Everything with a declared workflow runs through Nx.
 - pnpm 11+
 - Docker with Compose v2
 
+Optional agent tooling (recommended for coding agents): `docs/environment.md`.
+
 ### 1. Initialize tooling and dependencies
 
 ```bash

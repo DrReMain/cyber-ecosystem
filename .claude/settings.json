@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node tools/hooks/nx-first-guard.cjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

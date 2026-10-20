@@ -10,12 +10,12 @@ const operations = [op(FileService, "listFiles")];
 
 export const Route = createFileRoute("/dashboard/files/list")({
   staticData: {
-    title: "files_title",
+    title: "files_list_title",
     menu: { icon: List, order: 10 },
     operations,
   },
   validateSearch: parseFilesSearch,
-  head: () => ({ meta: [{ title: pageTitle(m.files_title()) }] }),
+  head: () => ({ meta: [{ title: pageTitle(m.files_list_title()) }] }),
   beforeLoad: ({ context }) => requireOperations(operations, context.permissions),
   component: FilesPage,
 });

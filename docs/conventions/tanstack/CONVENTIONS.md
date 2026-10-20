@@ -9,7 +9,28 @@ Applies to web clients built on TanStack Start (`app/clients/*`).
 
 ---
 
-## 1) Layering model
+## 0. Execution contract
+
+In force for every change under `app/clients/*` and `shared-ts/**`; rules here win over precedent in code.
+
+1. Before writing a file below, load the sections in its dispatch row — they are the law for that artifact.
+2. Before reporting done, run the §12 gate over the combined diff and emit its report table in the final message. No gate table = not done, whatever the build says.
+3. Gate = exit code 0 or the Nx "Successfully ran" banner — a log tail is not a gate.
+4. The §12 close runs for every change regardless of dispatch row — the chain row T-VER-1 is always in force.
+
+| About to write | Load first | Gate rows |
+|---|---|---|
+| `src/routes/**` | §3 | T-STR-3 T-RTE-1 T-RTE-2 T-RTE-3 T-RTE-4 |
+| `features/modules/<m>/page.tsx` | §1 transport shapes, §3 read-set, §5 UI/logic split | T-LAY-1 T-RTE-1 T-REA-2 |
+| `features/modules/<m>/ui/**`, flat module `.ts` logic | §5 | T-STR-1 T-STR-2 T-REA-1 T-REA-2 |
+| `features/layout-*/**`, `features/login-*/**` | §2, §5 grammar, §10 | T-LAY-2 T-STR-4 T-ERR-1 |
+| `messages/**` (any locale file) | §6 | T-I18N-1 T-I18N-2 T-I18N-3 T-I18N-5 T-I18N-6 |
+| `domains/**` | §4, §9 | T-LAY-1 T-ERR-1 |
+| anything else under `app/clients/*` or `shared-ts/**` | §1, the touched layer's section, §7 for `shared-ts/<domain>/src/**`, §11 | full §12 |
+
+---
+
+## 1. Layering model
 
 | Layer | Location | Rule |
 |---|---|---|
@@ -21,7 +42,10 @@ Applies to web clients built on TanStack Start (`app/clients/*`).
 | Domains | `src/domains/` | Admission-gated (§4) |
 | Infra | `src/stores/`, `src/services/`, `src/libs/` | As conventional — `libs` holds app-agnostic utilities (zero app semantics, import nothing app-internal) |
 
-Dependency direction: `routes → features → domains → services/stores/lib`.
+Dependency direction: `routes → features → domains → services/stores/lib`. One
+recorded counter-flow: `services/connect` mounts `domains/error`'s `normalize`
+into the transport factory — the transport seam, and the sole exception the
+conformance guard enforces.
 Features may import each other only along the area-pair direction (§2), plus one
 hosting direction: a formal-page module (`features/modules/*`,
 `features/app/*`) imports its area's layout utilities — guard types, route
@@ -222,6 +246,40 @@ mount through their declared slots, never children injection. Tailwind v4's
 class extractor tokenizes on dots — arbitrary values containing decimal points
 split into dead classes; prefer scale values or CSS variables.
 
+### Skin presets (`shared-ts/antd/src/skin-presets/`)
+
+Law for adding or modifying skins — the shared-ts capability directory, recorded here as the client-stack home.
+
+**System map**
+
+- A skin is a `SkinPlugin` (`../skins/types.ts`): `{ id, name, bodyBg: { light, dark }, Provider }`. `bodyBg` feeds Storybook's canvas; the app reads surface colors from tokens, not from this field.
+- One file per skin, default-exported (`skin-presets/<id>.tsx`). Registration is the only wiring step — the import + entry in `SKINS` (`../skins/registry.tsx`); every consumer (settings drawer grid, Storybook toolbar, `SkinSwitcher`) derives from `getAllSkins()`.
+- Providers stay pure and cheap: props (`isDark`, `compact`, `children`) only — the settings drawer renders every thumbnail inside that skin's own Provider, so expensive providers multiply across the grid.
+
+**Three styling channels — escalate in order**
+
+1. `theme.token` (global) and `theme.components.<C>` — cheapest, cascades to every instance; prefer for colors, radius, motion, fonts.
+2. Semantic style slots on ConfigProvider (`<component>: { styles: { <slot>: CSSProperties } }`, v6 semantic DOM) — for values antd hardcodes on real elements (Switch track radius, popup surfaces, panel paddings); slot names are typed — typecheck is the drift alarm when antd upgrades rename slots.
+3. `createStyles` selectors (`antd-style`) — the only channel reaching pseudo-elements and internal descendants (`.ant-switch-handle::before`, `.ant-steps-item-icon`); React style objects cannot target `::before`; `cssVar.*` works only inside createStyles, static `CSSProperties` use `var(--ant-*)` strings.
+
+**Token risk classes** — colors are layout-inert; geometry and metric tokens change box sizes and therefore layouts: `borderRadius*`, `controlHeight`, `fontSize`/`lineHeight`, paddings, `fontFamily` (mono stacks run ~10% wider), motion durations. Every geometry token change demands a Storybook sweep, not a spot look.
+
+**Chrome token contract** — the app chrome consumes a fixed contract each skin fills in its own palette: `Layout: { bodyBg, headerBg: <mode container>, headerHeight: 56, siderBg + lightSiderBg: <mode container> }`, `Menu: { itemHeight: 40, darkItemBg/darkSubMenuItemBg: "transparent" }`. `skin-presets/default.tsx` plus lyra/luma are the checklist; a skin missing any slot falls back to antd defaults (wrong hue or geometry) somewhere in the layout.
+
+**Anti-patterns** (symptom → cause → fix):
+
+- Default skin's thumbnail ghosts the active skin — nested ConfigProviders merge; a skin with an empty `token` renders as a tinted clone of whatever is active → the default skin passes its full resolved map (`LIGHT_TOKENS | DARK_TOKENS`), the others set every seed the visible surfaces derive from; never `theme.inherit: false` here (it drops the domain provider's breakpoint alignment tokens).
+- Blue-black patch on the dark-mode sider — antd's generic dark-menu background paints over the skin → `Menu: { darkItemBg/darkSubMenuItemBg: "transparent" }`.
+- Topbar 64px under one skin, 56px under another — `Layout.Header` height is the `headerHeight` token (antd default 64) → pin 56 in every skin.
+- Floating sider painted with generic antd colors in one mode — `Layout.Sider` reads `lightSiderBg` under `theme="light"` but `siderBg` under `theme="dark"` → pin both.
+- Switch stays round in a square skin — geometry-intrinsic shapes (Switch, Steps icons, Slider handles) ignore the global `borderRadius` → reshape via all three channels at once (root/content slots for track and clip, a createStyles selector for `.ant-switch-handle::before` — the semantic `indicator` slot is the invisible positioning wrapper).
+- Blue hover/selection in Select options — option tokens don't inherit `colorPrimary` for backgrounds → pin `optionSelectedColor/optionSelectedBg/optionActiveBg` to the skin primary.
+- Button overrides misfire on colored/danger buttons — variant + color + type interact; the `utils.pickButtonVariant` dispatch encodes tested per-variant decisions → keep the dispatch structure verbatim from lyra/luma, restyle only the mapped style objects; dedupe keys only on byte-identical CSS.
+- Text truncates, rows wrap, scrollbars appear under one skin — a geometry token moved a box; keep `borderRadiusXS` under half the smallest chip height; the compact algorithm compounds tightness — check normal × compact; diagnose on the Storybook density surfaces, not in the app.
+- Layout regressions under a skin — providers render exactly one sanctioned DOM wrapper (the Steps/Slider patch); more wrappers break `h-svh`/flex chains.
+
+Procedure (new-skin recipe, tuning loop): docs/conventions/tanstack/RUNBOOKS.md §1 "New skin".
+
 ## 6) i18n ownership
 
 Message keys are globally flat (paraglide); **the directory is the
@@ -277,18 +335,22 @@ locale) passes.
 
 ## 7) features/app (base utilities home)
 
-Two resident kinds:
+Four resident directories:
 
-- **Presentation stubs** (`notfound-page`, `pending-fallback`): zero
-  project-internal imports. Data comes in as props, behavior as function
-  props, composition as ReactNode slots — wiring happens at the usage
-  site (`__root.tsx` is the composition root). Framework/infrastructure
-  imports (react, tanstack, sonner, paraglide, `shared-*`) do not count
-  as external.
-- **Base wiring screens and boundaries** (`error-page`, `error-fallback`,
-  `base-error-boundary`): render through the error engine's `view`
-  directly — no resolve-injection ceremony; catchers pass only
-  `{error, onRetry?}`.
+- **`error/`** — the error-engine faces: `error-page` (brand-screen full
+  page), `error-fallback` (single-scale embedded row), `base-error-boundary`
+  (route-scoped boundary) render through the error engine's `view` directly —
+  no resolve-injection ceremony; catchers pass only `{error, onRetry?}`.
+  `notfound-page` is the brand-screen sibling — props-only, zero
+  project-internal imports.
+- **`feedback/`** — `feedback-sonner` (toast wiring) and `pending-fallback`
+  (the uncertainty pair's live half): presentation stubs — props-only,
+  zero project-internal imports. Framework/infrastructure imports (react,
+  tanstack, sonner, paraglide, `shared-*`) do not count as internal.
+- **`file/`** — the upload surface (`put-url.ts` XHR direct PUT, presign
+  confirm, `use-file-url` id gating, the proxy/upload hooks).
+- **`user/`** — identity display utilities (directory hydration,
+  deleted-tag, user-ref).
 
 App-agnostic utilities with zero app semantics (`channel`,
 `form-validator`) live in `src/libs/` (§1), not here. Error fallback
@@ -409,14 +471,19 @@ directional offsets. Translatable text that changes length per locale needs
 
 ## 11) Verification
 
-Per change: `admin:typecheck`, `admin:check`, `admin:build` — all with
+Per change: for each client under `app/clients/*` affected by the change,
+its `<client>:typecheck`, `<client>:check`, `<client>:build` — all with
 `--skip-nx-cache`, all exit codes checked. Order matters after route or
 message edits: **build first** (regenerates `routeTree.gen.ts` and
 paraglide output), then typecheck (build alone does not type-check message
-or route-tree references). Regenerating those outputs does not dirty the
-source files that import them, so tsc's incremental cache (`*.tsbuildinfo`)
-skips them and reports stale greens — delete the tsbuildinfo before the
-typecheck that follows a regeneration.
+or route-tree references). The clients run tsc without `incremental` — there
+is no `*.tsbuildinfo` to go stale; every typecheck is a full check. The
+stale-green risk lives one level up, in the Nx task cache — hence
+`--skip-nx-cache` on every gate leg.
+
+Per change, also run `./nx run tools:paraglide:check` — the build compiles a key
+missing from one locale from the base locale and exits 0, so locale parity has
+no other gate.
 
 **Behavioral review for library seams** (typecheck cannot see these — they
 are the recurring bug class): whenever code wires into, migrates between,
@@ -426,7 +493,8 @@ implementation and check each pair — semantics, axis, direction, ordering,
 identity. Adapters that survive a runtime migration (e.g. HTML5 DnD →
 dnd-kit) are the classic hiding place: the old semantics only agrees with
 the new contract in one direction. Pure model functions at these seams get
-unit tests pinning the semantics (`tab-session.test.ts` is the pattern).
+unit tests pinning the semantics (the `domains/error` source-adapter
+tests are the pattern).
 
 **Reachable-surface rule**: any behavior change on a surface reachable
 without login (login page, guard redirects, SSR entry) gets e2e-verified
@@ -435,3 +503,63 @@ self-contained script installed before the event (a from-document-start
 MutationObserver for one-shot notices), never with after-the-fact polling.
 Auth-only surfaces (tabbar interactions, chrome) carry an explicit
 user-verification list in the change report instead.
+
+---
+
+## 12. Pre-completion gate
+
+Run over the combined diff (working tree plus the commits being amended into), per owning client under `app/clients/*`. One row per item, emitted verbatim in the final report:
+
+| item | verdict | evidence |
+|---|---|---|
+| T-VER-1 | PASS | `<client>` chain exit 0 (build → typecheck → check, `--skip-nx-cache`) |
+
+PASS / FAIL / N/A are legal verdicts; an absent row is not. N/A names its glob and shows it empty. `lint:` rows scan the added lines of the combined diff; `eye:` rows cite file:line.
+
+Posture (root `AGENTS.md` §6.1): declare the change-kind and close with the counted-evidence line. Kinds here — surface: this table plus browser closed loop (viewports, locales, zero console; no browser-automation tool → `docs/environment.md`, manual walkthrough is the degraded form); logic / refactor: this table, refactor with cache bypass and counterexample replay. Absorb-time mechanical checks: deleted tokens/keys grepped for remaining consumers; new utility classes traced to their token source.
+
+### Structure — law §5
+
+- **T-STR-1** — one React component per `.tsx` file; helper components get their own file and export. eye.
+- **T-STR-2** — exported component name = file name, PascalCase export, kebab file. eye.
+- **T-STR-3** — route files hold only `createFileRoute` options (§3 tiers); `__root` and tagged temporary routes are the recorded exceptions. eye.
+- **T-STR-4** — file-suffix grammar honored (`*.fn.ts`, `*.server.ts`, `use-*.ts`, `*-store.ts`); prop types `<Component>Props`, never `IProps`. eye.
+
+### Layering — law §1, §2, §7
+
+- **T-LAY-1** — dependency direction `routes → features → domains → services/stores/libs`; feature-to-feature imports only along the area-pair and hosting directions; the transport seam is the sole counter-flow. eye: import list per added file.
+- **T-LAY-2** — area isolation: the layout never imports a module back; no cross-layout imports; the login kit imports no layout code; area-scoped stores namespace directory, variable, and cookie key. eye.
+- **T-LAY-3** — `libs/` stays app-agnostic — local imports reach only siblings and paraglide. eye.
+
+### React law — law §5
+
+- **T-REA-1** — render-path state reads go through state, never a ref (React Compiler ghost-state). eye: added render bodies.
+- **T-REA-2** — UI/logic split: `ui/` components props-only (no server calls, no navigation); framework-free logic in flat module-root `.ts` files. eye.
+
+### Routes — law §3
+
+- **T-RTE-1** — every formal-page route declares `staticData.operations` = the page's full read set; reachability judges the whole set; page code carries zero permission logic. eye.
+- **T-RTE-2** — builtin faces (`ACCESS_BUILTIN`) never enter a read set. eye.
+- **T-RTE-3** — `staticData.title` is a bare typed `MessageKey` literal; typos and variables fail typecheck. lint: `<client>:typecheck` green after regeneration.
+- **T-RTE-4** — dot-named nesting: every parent on the chain is a layout route rendering `<Outlet />`; the parent's own page lives in `index.tsx`; a detail page joins its list's tab as a `menu.hide` child without its own `title`. eye.
+
+### i18n — law §6
+
+- **T-I18N-1** — every new key's prefix equals its owning directory name in snake_case. lint: `./nx run tools:paraglide:check`.
+- **T-I18N-2** — new keys inserted inside their semantic group; files never re-sorted. eye.
+- **T-I18N-3** — every touched directory holds a complete file per registered locale; key set, key order, and `{placeholder}` parity against the base locale. lint: `./nx run tools:paraglide:check`.
+- **T-I18N-4** — a new locale registers at all three points (inlang settings, antd/dayjs entry, native-name arm). eye.
+- **T-I18N-5** — after key moves/renames/deletes, paraglide output force-regenerated (`rm -rf src/paraglide` + build) before the typecheck. lint: typecheck green post-regen.
+- **T-I18N-6** — position copy never reused across surfaces (`…_col_`/`…_filter_`/`…_form_` forks); only domain vocabulary shared. eye.
+
+### Errors & sessions — law §9
+
+- **T-ERR-1** — business code consumes the error engine zero-ceremony; catchers pass `{error, onRetry?}` only; renderers branch on `view` output; session-exit navigations pass `viewTransition: false` and hand the current href off as `?redirect=`. eye.
+
+### Verification — law §11
+
+- **T-VER-1** — per owning client: build → typecheck → check, all exit 0, `--skip-nx-cache` (the Nx cache replays stale greens). lint: gate outputs.
+- **T-VER-3** — behavior changes on surfaces reachable without login e2e-verified before done; auth-only surfaces carry an explicit user-verification list. eye: links or the list.
+- **T-VER-4** — library-seam changes get the §11 behavioral pairing review (the library's observable contract enumerated next to our implementation, each pair checked). eye.
+
+T-VER-2 is retired (the tsbuildinfo ritual it named never existed — §11); IDs do not renumber.

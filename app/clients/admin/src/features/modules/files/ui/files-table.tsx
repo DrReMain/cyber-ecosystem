@@ -34,13 +34,13 @@ function fileStatus(file: FileView): FileStatusView {
 function statusTag(status: FileStatusView) {
   switch (status) {
     case "confirmed":
-      return <Tag color="success">{m.files_status_confirmed()}</Tag>;
+      return <Tag color="success">{m.files_list_status_confirmed()}</Tag>;
     case "processing":
-      return <Tag color="processing">{m.files_status_processing()}</Tag>;
+      return <Tag color="processing">{m.files_list_status_processing()}</Tag>;
     case "failed":
-      return <Tag color="error">{m.files_status_failed()}</Tag>;
+      return <Tag color="error">{m.files_list_status_failed()}</Tag>;
     default:
-      return <Tag>{m.files_status_uploading()}</Tag>;
+      return <Tag>{m.files_list_status_uploading()}</Tag>;
   }
 }
 
@@ -51,9 +51,9 @@ const SOURCE_COLORS: Record<string, string> = {
 
 function sourceLabel(source: string): string {
   if (source === "FILE_SOURCE_SERVER_GENERATED") {
-    return m.files_source_server();
+    return m.files_list_source_server();
   }
-  return m.files_source_client();
+  return m.files_list_source_client();
 }
 
 interface FilesTableProps {
@@ -103,7 +103,7 @@ export function FilesTable({
 
   const renderCancel = (file: FileView) => (
     <ActionIconButton
-      confirm={{ onConfirm: () => onAbort(file), title: m.files_abort_confirm() }}
+      confirm={{ onConfirm: () => onAbort(file), title: m.files_list_abort_confirm() }}
       disabled={pendingAbortId === (file.id ?? "")}
       icon={X}
       label={m.common_cancel()}
@@ -112,25 +112,25 @@ export function FilesTable({
 
   const columns: TableProps<FileView>["columns"] = [
     {
-      title: () => m.files_col_name(),
+      title: () => m.files_list_col_name(),
       dataIndex: "name",
       render: (_, file) => <span className="font-medium">{file.name}</span>,
     },
     {
-      title: () => m.files_col_type(),
+      title: () => m.files_list_col_type(),
       dataIndex: "contentType",
       width: 170,
       render: (_, file) => <Tag>{file.contentType || "-"}</Tag>,
     },
     {
-      title: () => m.files_col_size(),
+      title: () => m.files_list_col_size(),
       dataIndex: "size",
       width: 110,
       align: getTextDirection() === "rtl" ? "left" : "right",
       render: (_, file) => formatSize(Number(file.size ?? 0)),
     },
     {
-      title: () => m.files_col_source(),
+      title: () => m.files_list_col_source(),
       dataIndex: "source",
       width: 130,
       render: (_, file) => (
@@ -140,14 +140,14 @@ export function FilesTable({
       ),
     },
     {
-      title: () => m.files_col_status(),
+      title: () => m.files_list_col_status(),
       dataIndex: "status",
       width: 110,
       render: (_, file) => statusTag(fileStatus(file)),
     },
     {
       key: "progress",
-      title: () => m.files_col_progress(),
+      title: () => m.files_list_col_progress(),
       width: 220,
       render: (_, file) => {
         const status = fileStatus(file);
@@ -171,7 +171,7 @@ export function FilesTable({
             <ActionIconButton
               disabled={Boolean(p)}
               icon={RotateCw}
-              label={m.files_act_resume()}
+              label={m.files_list_act_resume()}
               onClick={() => onResume(file)}
             />
             {renderCancel(file)}
@@ -180,7 +180,7 @@ export function FilesTable({
       },
     },
     {
-      title: () => m.files_col_owner(),
+      title: () => m.files_list_col_owner(),
       dataIndex: "ownerId",
       width: 200,
       render: (_, file) => {
@@ -207,7 +207,7 @@ export function FilesTable({
     },
     {
       ...fieldTimestamp<FileView>("createdAt", {
-        title: m.files_col_created(),
+        title: m.files_list_col_created(),
         format: { time: "second" },
       }),
       width: 180,
@@ -224,25 +224,25 @@ export function FilesTable({
               disabled={!url}
               href={url}
               icon={Eye}
-              label={m.files_act_preview()}
+              label={m.files_list_act_preview()}
               rel="noreferrer"
               target="_blank"
             />
             <ActionIconButton
               icon={Pencil}
-              label={m.files_act_rename()}
+              label={m.files_list_act_rename()}
               onClick={() => onRename(file)}
             />
             <ActionIconButton
-              confirm={{ onConfirm: () => onDelete(file), title: m.files_delete_confirm() }}
+              confirm={{ onConfirm: () => onDelete(file), title: m.files_list_delete_confirm() }}
               disabled={!deletable || pendingDeleteId === (file.id ?? "")}
               icon={Trash}
-              label={m.files_act_delete()}
+              label={m.files_list_act_delete()}
             />
           </div>
         );
       },
-      { title: m.files_col_actions() },
+      { title: m.files_list_col_actions() },
     ),
   ];
 

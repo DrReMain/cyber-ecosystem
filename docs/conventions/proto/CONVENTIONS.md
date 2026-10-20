@@ -117,7 +117,7 @@ The `(errors.code)` option comes from the vendored `proto/errors/errors.proto` (
 6. `./nx run proto:breaking` before merging (FILE rules vs `HEAD`). Blind spot: it cannot see protovalidate rule removals/weakenings — review validation rules explicitly (§9).
 7. Build the affected service (`./nx run <service>:build`); if the client surface changed, run the client verification chain (`docs/conventions/tanstack/CONVENTIONS.md §11`).
 
-Done = every command's exit code checked; breaking green (or weakenings consciously reviewed); gen diff clean; error copy present in every registered locale.
+Done = every command's exit code checked; breaking green (or weakenings consciously reviewed); gen diff clean; error copy present in every registered locale. Contract posture (root `AGENTS.md` §6.1): close with the counted-evidence declaration line; gates = this checklist's chain plus `proto:check-drift` at close; runtime verification = counterexample e2e on the producer and one consumer.
 
 ---
 

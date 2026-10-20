@@ -10,7 +10,7 @@ This document states **constraints, rationale, and anti-patterns** — the thing
 
 ## 0. Execution contract
 
-In force for every change under `app/services/*`; rules here win over precedent in code.
+In force for every change under `app/services/*` and `shared-go/**`; rules here win over precedent in code.
 
 1. Before writing a file below, load the sections in its dispatch row — they are the law for that artifact.
 2. Before reporting done, run the §7 gate over the combined diff and emit its report table in the final message. No gate table = not done, whatever the build says.
@@ -22,6 +22,7 @@ In force for every change under `app/services/*`; rules here win over precedent 
 | `module/<d>/data.go` | §2 repo rows, §3 data row, §5 data | K-NAM K-STR K-LAY K-UTL K-ERR |
 | `module/<d>/service.go` | §2, §3 service row, §5 service | K-NAM K-STR K-CMT K-UTL K-ERR |
 | `client/<remote>.go` | §2 client rows, §5 client, §5a | K-NAM K-LAY K-ERR |
+| `shared-go/**` capability code | root `AGENTS.md` §4, §6 errors | K-ERR, K-DEP-1 |
 | any other `.go` under `app/services/*` | §4, §6, the touched layer's §5 block | full §7 |
 
 Procedures (new module, remote dependency, service derivation, operating facts) live in `RUNBOOKS.md`.
@@ -159,7 +160,7 @@ Two comment kinds are legal under `app/services/*`; a comment that is neither is
 | Divider | `// <Name>` + `-` run (~110 chars `biz`/`data`, ~120 `service`; equal ±5 to a same-file neighbor's run) | section boundaries only (§3 table) |
 | Inline | states non-obvious *why* only (trade-off, gotcha, concurrency); `MUST NOT` restate the code | inside a function, beside the line it explains |
 
-**Violation signature — declaration comment**: a `//` line whose next non-blank line opens a declaration (`type` / `func` / `const` / `var`) and whose text names or describes that symbol. Machine-enforced in `module/`, `client/`, `server/`, `bootstrap/` by `TestNoDeclarationComments` (conventions guard, `internal/shared`).
+**Violation signature — declaration comment**: a `//` line whose next non-blank line opens a declaration (`type` / `func` / `const` / `var`) and whose text names or describes that symbol. Machine-enforced in `module/`, `client/`, `server/`, `platform/`, `bootstrap/` by `TestNoDeclarationComments` (conventions guard, `internal/shared`).
 
 Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the DDL), never Go line comments (§3a); test files state the law under test, never process narration; `shared-go/` keeps godoc conventions — this section binds `app/services/*` only.
 
@@ -328,7 +329,9 @@ Run over the combined diff (working tree plus the commits being amended into). O
 |---|---|---|
 | K-CMT-1 | PASS | guard green; 3 added `//` lines in module files, all dividers (file:line each) |
 
-PASS / FAIL / N/A are legal verdicts; an absent row is not. N/A names its glob and shows it empty. `shared-go` changes emit only K-ERR, K-DEP, and the capability self-containment rule (`AGENTS.md` §4). `lint:` rows scan the added lines of the combined diff; `eye:` rows cite file:line.
+PASS / FAIL / N/A are legal verdicts; an absent row is not. N/A names its glob and shows it empty. `shared-go` changes emit only K-ERR and K-DEP-1 (capability self-containment, root `AGENTS.md` §4). `lint:` rows scan the added lines of the combined diff; `eye:` rows cite file:line.
+
+Posture (root `AGENTS.md` §6.1): declare the change-kind and close with the counted-evidence line. Kinds here — contract: proto §8 chain plus consumer regeneration; aggregate: this table plus migration applied plus refused-path probe; capability: this table plus declared conformance, probe/smoke; refactor: this table with cache bypass and counterexample replay; logic / chore: this table. Runtime verification = live RPC probe; probe scripts are throwaway, never repo assets.
 
 ### Naming — law §2
 
@@ -363,6 +366,10 @@ PASS / FAIL / N/A are legal verdicts; an absent row is not. N/A names its glob a
 - **K-ERR-1** — identity only from catalog factories, message `""`. lint: added-line grep for `Error[A-Za-z]+\("[^"]` (non-empty message = FAIL).
 - **K-ERR-2** — reason predicates, never kratos code checks (`errors.IsNotFound` & siblings banned). lint: `TestReasonPredicates` green.
 - **K-ERR-3** — infra classified at choke points; a UC never returns a raw upstream error; no circulating sentinels; biz logs errors nowhere outside the swallow-path exception. eye.
+
+### Shared-go — root §4
+
+- **K-DEP-1** — a changed capability package stays self-contained: its imports are stdlib, third-party providers, and its own capability family (the parent interface package — `mq/pg` → `mq`) only; never `utils`, `kratos`, `orm`, or any other shared-go package; in-package substitutes (`encoding/json` directly, explicit bounds guards) instead of cross-family helpers. eye: the import block of each changed package.
 
 ### Review — pre-amend
 

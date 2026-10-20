@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -22,7 +23,7 @@ var (
 
 // guardDirs are the §4-enforced zones; ent/schema (own comment class) and
 // this kernel package keep their own conventions.
-var guardDirs = []string{"module", "client", "server", "bootstrap"}
+var guardDirs = []string{"module", "client", "server", "platform", "bootstrap"}
 
 func guardGoFiles(t *testing.T) map[string]string {
 	t.Helper()
@@ -32,18 +33,22 @@ func guardGoFiles(t *testing.T) map[string]string {
 		if _, statErr := os.Stat(root); statErr != nil {
 			continue // a service may lack the layer (system has no client/)
 		}
-		err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		// DirFS confines reads to the walked root (it rejects .. and
+		// absolute paths), so the variable-path read carries no traversal
+		// surface — the property G304 asks for, held structurally.
+		fsys := os.DirFS(root)
+		err := fs.WalkDir(fsys, ".", func(p string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
-			if d.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			if d.IsDir() || !strings.HasSuffix(p, ".go") || strings.HasSuffix(p, "_test.go") {
 				return nil
 			}
-			data, err := os.ReadFile(path)
+			data, err := fs.ReadFile(fsys, p)
 			if err != nil {
 				return err
 			}
-			out[path] = string(data)
+			out[p] = string(data)
 			return nil
 		})
 		if err != nil {

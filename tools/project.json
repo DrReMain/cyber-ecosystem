@@ -44,6 +44,15 @@
         "cwd": "{workspaceRoot}",
         "commands": ["go test ./..."]
       }
+    },
+    "paraglide:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "commands": [
+          "for d in app/clients/*/; do node tools/scripts/paraglide-parity.cjs \"$d\" || exit 1; done"
+        ]
+      }
     }
   }
 }
