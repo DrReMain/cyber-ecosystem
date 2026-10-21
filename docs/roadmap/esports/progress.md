@@ -23,8 +23,8 @@
 
 | 去向 | 事项 | 出处 |
 |---|---|---|
-| ~~ljr~~ → lzx | 首页未登录文案**已定(2026-10-21 ljr)**:问候行=「你好」(EN Hello)、标题=「电竞挑战者」(EN Challenger)——头部回归身份语义,登录行动留在 CTA 卡(按钮+提示行),消除三重「未登录」冗余;键位 home_greet_guest/home_guest_name 改值即可。前向注记:M2 会员片落地时 greet 会员态=「专属会员 · 有效期内」(原型语义),届时加 home_greet_member 键 | review D6 |
-| ~~ljr~~ → lzx | CSP frame-ancestors **已定(2026-10-21 ljr):参数化留缝**——ctr 的 `frame-ancestors` 改服务端环境变量可配,**默认 'none'**(安全默认;微信/WebView 顶层浏览本就不受限);P4 裁 ToB 入口形态时若含 iframe 内嵌,由部署侧下发租户域白名单值,零代码改动。admin 后台无 iframe 场景,维持硬编码 'none' 不参数化 | review B3 |
+| ~~ljr~~ → lzx ✅已落地(2026-10-21) | 首页未登录文案**已定(2026-10-21 ljr)**:问候行=「你好」(EN Hello)、标题=「电竞挑战者」(EN Challenger)——头部回归身份语义,登录行动留在 CTA 卡(按钮+提示行),消除三重「未登录」冗余;键位 home_greet_guest/home_guest_name 改值即可。前向注记:M2 会员片落地时 greet 会员态=「专属会员 · 有效期内」(原型语义),届时加 home_greet_member 键 | review D6 |
+| ~~ljr~~ → lzx ✅已落地(2026-10-21) | CSP frame-ancestors **已定(2026-10-21 ljr):参数化留缝**——ctr 的 `frame-ancestors` 改服务端环境变量可配,**默认 'none'**(安全默认;微信/WebView 顶层浏览本就不受限);P4 裁 ToB 入口形态时若含 iframe 内嵌,由部署侧下发租户域白名单值,零代码改动。admin 后台无 iframe 场景,维持硬编码 'none' 不参数化 | review B3 |
 | hzy | StateScreen loading 的 LOADING 扫光条与 PendingFallback markup 双份复制,lzx 已跨界最小修 sr-only 播报(features/app/states/state-screen.tsx);视觉收敛(抽共享扫光条)归 features/app 领地自决 | review C3 |
 | 后续片 | 微信回调 next 丢失:redirect_uri 不能带 query(微信 authorize 校验拒),微信登录后回跳意图丢失,固定走向导/首页;如需保 next 须 state 中转,微信链路设计时定 | review A6 |
 
@@ -75,3 +75,5 @@
 - 2026-10-21 P9 定案(D-AD):target_recognition 主能力=reactionSpeed(证据 7/8 源一致+玩法语义判据,详见 prd.md P9;test_type 冗余列判陈旧值);E2 种子零改动;metric.md 标注收敛转 lzx 随 E3 增量b;0.50 次要行递延 E3 权重矩阵。
 - 2026-10-21 D-AE 小程序端需求登记(甲方提出):C 端增微信小程序表面,业务同 ctr H5、只服务公版不做专版;ctr H5 完成后再栈设计+移植,承诺窗口/CP 零变化;现仅登记(plan.md M5 候选区占位),无切片。
 - 2026-10-21 工具链纪律升根法条:pnpm 唯一,package-lock.json 不应存在(出现=有人跑了 npm,删文件+修命令,禁以 ignore 掩盖)——AGENTS §4 法条+README §5 指针;根 .gitignore 排除行已移除。ljr 侧 agent 注意。
+- 2026-10-21 小程序栈选型初步讨论(lzx):Taro 4.x 锚定(React 19 支持待验)/复用三档/连续族 canvas=测量保真下限非体验项/webview 内嵌撤案(审核风险)/交付优先基调;同日落 D-AF 骨架演进一等公民裁定(试水→沉淀重构两段式)。结论全文=plan.md M5(评审锚点非定案);参考仓 cyber-mini/cyber-mini-staff 定性只读范式参考。无切片,12-17 零影响。
+- 2026-10-21 review 转交件 D6+B3 落地(lzx):D6=游客问候改值(home_greet_guest=你好/Hello、home_guest_name=电竞挑战者/Challenger;「未登录」三重冗余归一为 CTA 提示行仅存一处;登录未采集昵称的兜底顺带由「未登录」错话修正为「电竞挑战者」身份降格);B3=ctr CSP frame-ancestors 参数化留缝(CSP_FRAME_ANCESTORS 服务端 env,缺省/空白回落 'none';admin 维持硬编码不参数化)。验证=ctr build→typecheck→check 全绿 skip-cache+paraglide:check 绿+SSR 双语断言 python 计数(zh 你好×1/电竞挑战者×1/未登录×1;en Hello×1/Challenger×1/Not signed in×1)+CSP 头双腿 curl(默认 'none';覆写双域名逐字透传且 object-src/base-uri 共指印不动)+390 隔离上下文页面走查(DOM 断言+零 console)。

@@ -7,9 +7,10 @@ const csrfMiddleware = createCsrfMiddleware({
 });
 
 const securityHeadersMiddleware = createMiddleware().server(async (ctx) => {
+  const frameAncestors = process.env.CSP_FRAME_ANCESTORS?.trim() || "'none'";
   setResponseHeader(
     "Content-Security-Policy",
-    "frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
+    `frame-ancestors ${frameAncestors}; object-src 'none'; base-uri 'self'`,
   );
   setResponseHeader("X-Content-Type-Options", "nosniff");
   setResponseHeader("Referrer-Policy", "same-origin");

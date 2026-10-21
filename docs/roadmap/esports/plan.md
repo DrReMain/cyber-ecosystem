@@ -77,6 +77,13 @@ P4 裁决(11 月底前)→企业 App 授权登录→租户发码额度/功能差
 ## M5 上线后候选(未排程,仅登记;开工时补切片定义)
 
 - **微信小程序端**(D-AE,2026-10-21 甲方需求):C 端第二表面,业务与 ctr H5 相同;只服务公版,不做专版。前置=ctr H5 完成(12-17 上线);开工=先小程序栈设计评审(栈区 CONVENTIONS 随首批真实代码立档,AGENTS §7)再移植业务。
+- **小程序栈选型初步讨论(2026-10-21,评审锚点非定案;正式定案走 D-AE 预埋的栈设计评审)**:
+  - **Taro 4.x 锚定**:React+TS 跨端路线无对手(uni-app React 二等/Remax 停维/原生 WXML 弃资产);5.x 未开源不押注,开源后作升级窗重评。最大版本风险=React 19 未官宣支持(ctr 现挂 19.3+Compiler,spike 首验;降 18 估可控)。
+  - **复用三档**(证据等级:旧仓仅方向性,新栈全量重验):①真复用=13 款 games logic.ts(framework-free)+paraglide messages+gen-connect-ts+shared-error;②缝适配=transport(Taro.request 注入 fetch)+react-query v5(接管 focus/online manager)+store 持久化(Taro.setStorage)+Tailwind(weapp-tailwindcss,v4 支持待验——旧仓验的是 WindiCSS v3 语法族,不迁移);③不可用=RAC/TanStack Router/cookie/SSR/Sentry-react,组件库候选 NutUI 当前线。
+  - **渲染分族**:ctr 引擎=手撕 DOM 非 canvas(red-dot 直摸 createElement);离散族(反应瞄准/决策资源)→Taro View 声明式(React diff 天然合规「禁动态标签」);连续族(追踪技能)→必须 canvas,**帧率=测量保真下限非体验项**(测试原始数据即产品输出)。渲染缝(共享指令层 vs 每端独立 renderer)=评审头号议题;上线前不动 H5 引擎(D-Q)。
+  - **平台缝三件(比 UI 重)**:登录(wx.login code2session;openid≠公众号 openid,互通需 UnionID 同主体+system 新 provider 面)、会话(无 cookie→Bearer,2026-09-13 定案已预留,核 system 发 token 契约)、支付(商户号绑小程序 appid)+request 域名白名单+分包(13 款按 subpackage)。
+  - **webview 内嵌 H5 撤案**:审核打击空壳 webview,整体划掉不留兜底(用户裁定)。
+  - **节奏(交付优先+骨架一等公民 D-AF)**:开工首片=spike(壳+transport 适配+一款连续族 canvas 真机+一款离散族对照);参考仓 cyber-mini/cyber-mini-staff(Taro 3.6 系)定性只读范式参考,同 lab/esports 地位。**待 ljr/甲方**:appid/主体是否与公众号同主体、H5/小程序账号是否互通、首发 13 款全量还是子集(子集首发对齐降级梯② hot-add 形态)。
 
 ---
 
