@@ -35,10 +35,11 @@ export type GameExit = "completed" | "aborted" | "failed";
 
 // The one attempt-shaped record a run accumulates. Events are per-game
 // shapes mirroring the frozen proto Detail items (gen types at the game
-// side); the submit seam itself stays deferred until the submit contract
-// freezes. Stats are game-local counters the fact stream cannot express
-// (flash_aiming's expired targets) — local display facts only, never
-// submitted.
+// side); the submit seam itself stays deferred until the submit adapter
+// lands. Stats are game-local counters the fact stream cannot express —
+// misses / missedHigh / spawned_enemy are contract facts (the detail
+// messages carry them) awaiting the adapter; the rest stay local-display
+// facts with no upstream consumer.
 export interface AttemptRecord {
   readonly events: readonly Record<string, unknown>[];
   readonly backgroundSpans: readonly { elapsedMs: number; durationMs: number }[];

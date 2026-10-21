@@ -1142,8 +1142,11 @@ func (x *RedDotEvent) GetIsHit() bool {
 
 // flash_aiming — snap shots at flashing targets.
 type FlashAimingDetail struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Shots         []*FlashAimingShot     `protobuf:"bytes,1,rep,name=shots,proto3" json:"shots,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Shots []*FlashAimingShot     `protobuf:"bytes,1,rep,name=shots,proto3" json:"shots,omitempty"`
+	// Expired-or-replaced targets, legacy: targetsMissed. No click exists for
+	// these, so the shot stream can never rebuild the count.
+	Misses        int32 `protobuf:"varint,2,opt,name=misses,proto3" json:"misses,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1183,6 +1186,13 @@ func (x *FlashAimingDetail) GetShots() []*FlashAimingShot {
 		return x.Shots
 	}
 	return nil
+}
+
+func (x *FlashAimingDetail) GetMisses() int32 {
+	if x != nil {
+		return x.Misses
+	}
+	return 0
 }
 
 type FlashAimingShot struct {
@@ -1273,8 +1283,11 @@ func (x *FlashAimingShot) GetAimTimeMs() int32 {
 // carried no tier; the tier rides here now so the server can rebuild every
 // priority aggregate from facts.
 type MultiTargetDetail struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Picks         []*MultiTargetPick     `protobuf:"bytes,1,rep,name=picks,proto3" json:"picks,omitempty"` // legacy: targetSelectionOrder
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Picks []*MultiTargetPick     `protobuf:"bytes,1,rep,name=picks,proto3" json:"picks,omitempty"` // legacy: targetSelectionOrder
+	// High-tier targets lost to expiry, legacy: missedHighValue. The picks
+	// stream carries only picked targets, so the loss count has no other carrier.
+	MissedHigh    int32 `protobuf:"varint,2,opt,name=missed_high,json=missedHigh,proto3" json:"missed_high,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1314,6 +1327,13 @@ func (x *MultiTargetDetail) GetPicks() []*MultiTargetPick {
 		return x.Picks
 	}
 	return nil
+}
+
+func (x *MultiTargetDetail) GetMissedHigh() int32 {
+	if x != nil {
+		return x.MissedHigh
+	}
+	return 0
 }
 
 type MultiTargetPick struct {
@@ -1388,8 +1408,11 @@ func (x *MultiTargetPick) GetElapsedMs() int32 {
 // target_recognition — friend/foe discrimination; correctness is judged
 // server-side against the target type, never asserted by the client.
 type TargetRecognitionDetail struct {
-	state         protoimpl.MessageState    `protogen:"open.v1"`
-	Clicks        []*TargetRecognitionClick `protobuf:"bytes,1,rep,name=clicks,proto3" json:"clicks,omitempty"`
+	state  protoimpl.MessageState    `protogen:"open.v1"`
+	Clicks []*TargetRecognitionClick `protobuf:"bytes,1,rep,name=clicks,proto3" json:"clicks,omitempty"`
+	// Enemies that existed this attempt — the hit-rate denominator legacy sent
+	// pre-cooked as enemyHitRate. Blank taps stay local: target_id cannot name air.
+	SpawnedEnemy  int32 `protobuf:"varint,2,opt,name=spawned_enemy,json=spawnedEnemy,proto3" json:"spawned_enemy,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1429,6 +1452,13 @@ func (x *TargetRecognitionDetail) GetClicks() []*TargetRecognitionClick {
 		return x.Clicks
 	}
 	return nil
+}
+
+func (x *TargetRecognitionDetail) GetSpawnedEnemy() int32 {
+	if x != nil {
+		return x.SpawnedEnemy
+	}
+	return 0
 }
 
 type TargetRecognitionClick struct {
@@ -2886,9 +2916,10 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"\x05click\x18\x02 \x01(\v2\x17.cyber.esports.v1.PointR\x05click\x121\n" +
 	"\x10reaction_time_ms\x18\x03 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\x0ereactionTimeMs\x12\x1c\n" +
 	"\tdeviation\x18\x04 \x01(\x01R\tdeviation\x12\x15\n" +
-	"\x06is_hit\x18\x05 \x01(\bR\x05isHit\"W\n" +
+	"\x06is_hit\x18\x05 \x01(\bR\x05isHit\"x\n" +
 	"\x11FlashAimingDetail\x12B\n" +
-	"\x05shots\x18\x01 \x03(\v2!.cyber.esports.v1.FlashAimingShotB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x05shots\"\xf6\x01\n" +
+	"\x05shots\x18\x01 \x03(\v2!.cyber.esports.v1.FlashAimingShotB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x05shots\x12\x1f\n" +
+	"\x06misses\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\x06misses\"\xf6\x01\n" +
 	"\x0fFlashAimingShot\x12\x1b\n" +
 	"\ttarget_id\x18\x01 \x01(\tR\btargetId\x12/\n" +
 	"\x06target\x18\x02 \x01(\v2\x17.cyber.esports.v1.PointR\x06target\x12\x1f\n" +
@@ -2896,17 +2927,20 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"targetSize\x12-\n" +
 	"\x05click\x18\x04 \x01(\v2\x17.cyber.esports.v1.PointR\x05click\x12\x1c\n" +
 	"\tdeviation\x18\x05 \x01(\x01R\tdeviation\x12'\n" +
-	"\vaim_time_ms\x18\x06 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\taimTimeMs\"W\n" +
+	"\vaim_time_ms\x18\x06 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\taimTimeMs\"\x81\x01\n" +
 	"\x11MultiTargetDetail\x12B\n" +
-	"\x05picks\x18\x01 \x03(\v2!.cyber.esports.v1.MultiTargetPickB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x05picks\"\x8c\x01\n" +
+	"\x05picks\x18\x01 \x03(\v2!.cyber.esports.v1.MultiTargetPickB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x05picks\x12(\n" +
+	"\vmissed_high\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\n" +
+	"missedHigh\"\x8c\x01\n" +
 	"\x0fMultiTargetPick\x12\x1b\n" +
 	"\ttarget_id\x18\x01 \x01(\tR\btargetId\x12\x1d\n" +
 	"\x04tier\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\x04tier\x12\x15\n" +
 	"\x06is_hit\x18\x03 \x01(\bR\x05isHit\x12&\n" +
 	"\n" +
-	"elapsed_ms\x18\x04 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"f\n" +
+	"elapsed_ms\x18\x04 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"\x94\x01\n" +
 	"\x17TargetRecognitionDetail\x12K\n" +
-	"\x06clicks\x18\x01 \x03(\v2(.cyber.esports.v1.TargetRecognitionClickB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x06clicks\"\xd6\x01\n" +
+	"\x06clicks\x18\x01 \x03(\v2(.cyber.esports.v1.TargetRecognitionClickB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x06clicks\x12,\n" +
+	"\rspawned_enemy\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\fspawnedEnemy\"\xd6\x01\n" +
 	"\x16TargetRecognitionClick\x12\x1b\n" +
 	"\ttarget_id\x18\x01 \x01(\tR\btargetId\x12*\n" +
 	"\vtarget_type\x18\x02 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\n" +

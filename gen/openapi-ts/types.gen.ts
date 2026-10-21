@@ -248,6 +248,11 @@ export type CyberEsportsV1EconomicSimPurchase = {
  */
 export type CyberEsportsV1FlashAimingDetail = {
     shots?: Array<CyberEsportsV1FlashAimingShot>;
+    /**
+     * Expired-or-replaced targets, legacy: targetsMissed. No click exists for
+     * these, so the shot stream can never rebuild the count.
+     */
+    misses?: number;
 };
 
 export type CyberEsportsV1FlashAimingShot = {
@@ -367,6 +372,11 @@ export type CyberEsportsV1MovingTargetShot = {
  */
 export type CyberEsportsV1MultiTargetDetail = {
     picks?: Array<CyberEsportsV1MultiTargetPick>;
+    /**
+     * High-tier targets lost to expiry, legacy: missedHighValue. The picks
+     * stream carries only picked targets, so the loss count has no other carrier.
+     */
+    missedHigh?: number;
 };
 
 export type CyberEsportsV1MultiTargetPick = {
@@ -607,6 +617,11 @@ export type CyberEsportsV1TargetRecognitionClick = {
  */
 export type CyberEsportsV1TargetRecognitionDetail = {
     clicks?: Array<CyberEsportsV1TargetRecognitionClick>;
+    /**
+     * Enemies that existed this attempt — the hit-rate denominator legacy sent
+     * pre-cooked as enemyHitRate. Blank taps stay local: target_id cannot name air.
+     */
+    spawnedEnemy?: number;
 };
 
 export type CyberEsportsV1Test = {
