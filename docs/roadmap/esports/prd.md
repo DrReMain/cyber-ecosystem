@@ -198,6 +198,37 @@
 
 裁决④:会员有效期内隐藏 ¥19.9 单次、只留续费 ¥29.9——现无对应视觉稿(旧仓仅 20-pay-confirm-member 支付确认变体);需补会员态付费墙/续费态设计。
 
+## P9 target_recognition 主能力归属【E2 种子落库前】
+
+> 状态:**已定稿 2026-10-21**(主能力 = reactionSpeed;README §2.1 登记 D-AD,P9 移出 §2.2)。
+
+### P9.1 证据清单(旧仓逐源核对,2026-10-21)
+
+| # | 来源 | 口径 | 权重说明 |
+|---|---|---|---|
+| ① | `test_type` DDL(init.sql:541) | 主能力列 = **trackingStability** | 一列冗余文本;与同库 ② 直接矛盾,属旧仓已知的陈旧值类问题 |
+| ② | `game_ability_contribution` DDL(init.sql:1067-1068) | **reactionSpeed 权重 1.00,is_primary=1**;trackingStability 0.50,is_primary=0 | 能力图聚合的真消费源(block3 §8·29③:副能力由 is_primary=0 行聚合) |
+| ③ | 原型 `_state.js`(TESTS+POOL) | ab=**reactionSpeed**;reaction 池 = [red_dot, number_stars, dual_zone, target_recognition] | 匹配编排能力池的权威(编排即消费它) |
+| ④ | METRIC_SPEC_BATCH §1.4 | 归**反应类**章节;M1-M10 反应类适配;评级主锚点=识别正确率+反应时;专有指标=干扰抑制率(选择性注意范式) | 设计侧指标规格单源 |
+| ⑤ | Java `TargetRecognitionScorer` | Tier B 闸门=**逐 click 反应时合理性**校验 | 评分实现锚 |
+| ⑥ | 前端结算 `targetRecognitionScoring.ts` | 分数=准确率分+识别速度分+视觉处理分(平均反应时推导)−误击/错过惩罚 | 玩法本体:离散识别点击,无持续追踪成分 |
+| ⑦ | 新仓 metric.md(E3 增量a) | 「反应/追踪(P9)」标注,归反应类 | 已预登记待裁 |
+| ⑧ | 新仓 seed.go(E2 增量a) | ability=**reactionSpeed** | 暂按设计侧 |
+
+**语义判据**:追踪类(moving_target/tracking_moving)的定义是「10 分/秒**完美追踪**」= 对移动目标的持续跟随;target_recognition 是「干扰物中出现目标→识别点击」= 离散的选择性注意/反应任务。二者范式不同,玩法本体不含追踪成分。
+
+### P9.2 候选与推荐
+
+- **A(推荐)主能力 = reactionSpeed**:②-⑧ 共 7 源一致,唯一反例 ① 是与 ② 同库矛盾的陈旧列;玩法语义判据独立支持。影响面:E2 种子零改动(已是 reactionSpeed)、编排池零改动、metric.md 去掉「(P9)」标注即可。
+- B 主能力 = trackingStability:仅 ① 支持;需改 E2 种子+metric.md+编排池,且与玩法语义冲突,无任何下游消费方要求。
+- C 双归属(主 reactionSpeed + 副 trackingStability 沿 ② 的 0.50 次要行):主归属仍定 reactionSpeed;次要贡献行不是 P9 范畴——contribution 表按 D-AA 已递延 E3(权重矩阵属评分数据),届时按证据决定是否保留 0.50 行。
+
+### P9.3 定案后动作
+
+1. ✅ 2026-10-21 已定案(A 案):README §2.2 移除 P9,§2.1 登记裁决号 **D-AD**。
+2. 转交 lzx:metric.md「反应/追踪(P9)」标注收敛为「反应」(E3 增量b 顺手);E2 种子无改动(已按 reactionSpeed)。
+3. ② 的 trackingStability 0.50 次要行按 D-AA 递延 E3 权重矩阵,届时按证据定,不阻塞。
+
 ---
 
 ## 新 PRD 演进区
