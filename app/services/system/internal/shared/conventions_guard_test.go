@@ -10,8 +10,9 @@ import (
 )
 
 // Convention guards: the recurring violation classes (CONVENTIONS.md §4
-// declaration comments, §6 reason predicates, §1 serialization) as machine
-// gates — the §7 rows K-CMT-1, K-ERR-2, K-UTL-1 run green here.
+// declaration comments, §6 reason predicates, §1 serialization, §5a plane
+// gates) as machine gates — the §7 rows K-CMT-1, K-ERR-2, K-UTL-1, K-LAD-1
+// run green here.
 
 var (
 	guardDividerRE   = regexp.MustCompile(`^// [A-Za-z][A-Za-z0-9 /]* -{8,}\s*$`)
@@ -91,4 +92,40 @@ func TestSerializationViaUtils(t *testing.T) {
 			t.Errorf("%s direct encoding/json — serialize via shared-go/utils (CONVENTIONS.md §1)", f)
 		}
 	}
+}
+
+// TestAdminRungPlaneGate locks the §5a plane-gate law: the ADMIN rung seals
+// to the backend plane ahead of authz (K-LAD-1).
+func TestAdminRungPlaneGate(t *testing.T) {
+	src, ok := guardGoFiles(t)["server.go"]
+	if !ok {
+		t.Fatalf("server.go missing from the guard walk")
+	}
+	if !rungCarries(src, "ACCESS_ADMIN", "security.BackendPlaneGuard()") {
+		t.Errorf("server.go ADMIN rung lacks the backend plane gate (CONVENTIONS.md §5a)")
+	}
+	if !rungCarries(src, "ACCESS_PLATFORM", "security.BackendPlaneGuard()") {
+		t.Errorf("server.go PLATFORM rung lacks the backend plane gate (CONVENTIONS.md §5a)")
+	}
+}
+
+func rungCarries(src, tier, gate string) bool {
+	lines := strings.Split(src, "\n")
+	for i, line := range lines {
+		if !strings.Contains(line, tier) {
+			continue
+		}
+		for j := i; j >= 0; j-- {
+			if !strings.Contains(lines[j], "selector.Server(") {
+				continue
+			}
+			for _, l := range lines[j : i+1] {
+				if strings.Contains(l, gate) {
+					return true
+				}
+			}
+			return false
+		}
+	}
+	return false
 }

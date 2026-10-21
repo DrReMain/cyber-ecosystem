@@ -118,6 +118,7 @@ demos/
 **/src/paraglide/
 
 # ==================== AI Tools ====================
+/memory/
 .memsearch/
 .codegraph
 

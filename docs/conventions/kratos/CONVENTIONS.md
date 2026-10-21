@@ -300,6 +300,7 @@ sanitize → tracing → metrics → logging(RenderErrors(logger)) → ErrorTele
 ```
 
 - The `guard` slot is layered: `DefaultGuard` (matched on `ACCESS_UNSPECIFIED` — no annotation fails closed) plus one selector layer per credential family, e.g. `krauth.SessionAuth(authn, krauth.SessionCookie(...))` matched on `ACCESS_ADMIN`. `authn` arrives as the `krauth.Authenticator` interface — the module's UC satisfies it via `wire.Bind`, so `server` never imports the module.
+- Plane gates ride the credential rungs: the ADMIN rung carries `security.BackendPlaneGuard()` ahead of authz — a wrong-plane session is rejected as wrong-plane, never as a missing grant — and a rung whose audience is one world carries that world's gate (a C-end BUILTIN rung takes `security.MemberPlaneGuard()`; a rung serving both worlds — the session verifier, presign, transfer — stays session-only). The plane always derives from the verified seat, never from request input.
 - `RenderErrors(logger)` wraps the logger handed to the stock logging middleware (an slog handler):
   - the `error` attr becomes the factual root;
   - `internal` and a non-empty `message` become their own attrs;
@@ -354,6 +355,7 @@ Posture (root `AGENTS.md` §6.1): declare the change-kind and close with the cou
 
 - **K-LAY-1** — direction never reversed (biz imports neither `data`/`client` nor `service`/`server`/`platform`); cross-module access is a read via repo port. lint: `TestModuleDependencyDAG` green.
 - **K-LAY-2** — business logic in biz; no business rules in data; no repo access in service. eye.
+- **K-LAD-1** — the access ladder carries its plane gates: every ADMIN rung holds the backend gate ahead of authz, and a single-world BUILTIN rung holds its own. lint: `TestAdminRungPlaneGate` green (`TestBuiltinRungPlaneGate` where a member rung exists).
 
 ### Reuse — law §1, §5
 

@@ -1,6 +1,7 @@
 {
   "login_default_title": "로그인",
   "login_default_description": "",
+  "login_default_error_switch_account": "계정 변경",
   "login_default_hero_title_a": "AI Native ",
   "login_default_hero_title_b": "관리 콘솔",
   "login_default_hero_sub": "계약 우선 운영 기반: 신원·권한·진입점을 하나로, 서비스는 필요에 따라 조합하며 비즈니스와 함께 성장합니다.",

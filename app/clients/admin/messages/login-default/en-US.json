@@ -1,6 +1,7 @@
 {
   "login_default_title": "Sign in",
   "login_default_description": "",
+  "login_default_error_switch_account": "Switch account",
   "login_default_hero_title_a": "AI Native ",
   "login_default_hero_title_b": "Management Console",
   "login_default_hero_sub": "A contracts-first operating base - unified identity, permissions and entry, composed on demand, growing with your business.",

@@ -20,17 +20,17 @@ func WithSubject(ctx context.Context, s *Subject) context.Context {
 	return context.WithValue(ctx, subjectKey{}, s)
 }
 
-type registryPlaneKey struct{}
+type registryReadKey struct{}
 
-// RegistryPlane lifts subject-derived narrowing (tenant, datascope) for one
-// read; write hooks reject the plane — registry reads never write scoped rows.
-func RegistryPlane(ctx context.Context) context.Context {
-	return context.WithValue(ctx, registryPlaneKey{}, true)
+// RegistryRead lifts subject-derived narrowing (tenant, datascope) for one
+// read; write hooks reject the lift — registry reads never write scoped rows.
+func RegistryRead(ctx context.Context) context.Context {
+	return context.WithValue(ctx, registryReadKey{}, true)
 }
 
-func IsRegistryPlane(ctx context.Context) bool {
-	_, plane := ctx.Value(registryPlaneKey{}).(bool)
-	return plane
+func IsRegistryRead(ctx context.Context) bool {
+	_, lift := ctx.Value(registryReadKey{}).(bool)
+	return lift
 }
 
 func SubjectFromCtx(ctx context.Context) (*Subject, bool) {

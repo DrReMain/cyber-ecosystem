@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { ChevronDown, Globe } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 import { m } from "#/paraglide/messages";
 import { getLocale, isLocale, locales, setLocale } from "#/paraglide/runtime";
 
@@ -54,7 +54,7 @@ export function LocaleSelect() {
     if (isLocale(locale) && locale !== current) void setLocale(locale);
   };
 
-  const onTriggerKeyDown = (event: React.KeyboardEvent) => {
+  const onTriggerKeyDown = (event: KeyboardEvent) => {
     const key: string = event.key;
     if (isOpenKey(key)) {
       event.preventDefault();
@@ -62,7 +62,7 @@ export function LocaleSelect() {
     }
   };
 
-  const onListKeyDown = (event: React.KeyboardEvent) => {
+  const onListKeyDown = (event: KeyboardEvent) => {
     const key: string = event.key;
     if (key === "Escape" || key === "Tab") {
       setOpen(false);

@@ -1,4 +1,4 @@
-import { type SubmitEvent, useState } from "react";
+import { type SubmitEvent, useRef, useState } from "react";
 import { Button, Form, Input, Label, TextField } from "react-aria-components";
 import { m } from "#/paraglide/messages";
 
@@ -15,16 +15,28 @@ const STYLES = {
     "h-11.5 w-full cursor-pointer rounded-xl bg-linear-to-r from-primary to-primary-bright font-semibold text-[14.5px] text-white tracking-[0.06em] shadow-[0_4px_28px] shadow-primary/35 transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_36px] hover:shadow-primary/50 rtl:bg-linear-to-l rtl:tracking-normal",
 };
 
+interface LoginFormFeedbackAction {
+  label: string;
+  onAction: () => void;
+}
+
+interface LoginFormFeedback {
+  copy: string;
+  action?: LoginFormFeedbackAction;
+}
+
 interface LoginFormProps {
   onSubmit?: (event: SubmitEvent<HTMLFormElement>) => void;
   pending?: boolean;
+  feedback?: LoginFormFeedback | null;
 }
 
-export function LoginForm({ onSubmit, pending }: Readonly<LoginFormProps>) {
+export function LoginForm({ onSubmit, pending, feedback }: Readonly<LoginFormProps>) {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   return (
-    <Form onSubmit={(event) => onSubmit?.(event as SubmitEvent<HTMLFormElement>)}>
+    <Form onSubmit={(event) => onSubmit?.(event as SubmitEvent<HTMLFormElement>)} ref={formRef}>
       <TextField className={STYLES.field} name="account" type="text">
         <Label className={STYLES.label}>
           {m.login_default_label_account()}
@@ -54,6 +66,24 @@ export function LoginForm({ onSubmit, pending }: Readonly<LoginFormProps>) {
         </div>
       </TextField>
 
+      {feedback != null && (
+        <div className="mb-4.5 flex items-start justify-between gap-2" role="alert">
+          <p className="text-red-600 text-sm leading-snug dark:text-red-400">{feedback.copy}</p>
+          {feedback.action !== undefined && (
+            <button
+              className="shrink-0 cursor-pointer border-0 bg-transparent font-medium text-[12.5px] text-black/55 underline underline-offset-2 hover:text-black dark:text-white/55 dark:hover:text-white"
+              onClick={() => {
+                formRef.current?.reset();
+                formRef.current?.querySelector<HTMLInputElement>("input[name='account']")?.focus();
+                feedback.action?.onAction();
+              }}
+              type="button"
+            >
+              {feedback.action.label}
+            </button>
+          )}
+        </div>
+      )}
       <Button className={STYLES.submit} isDisabled={pending} type="submit">
         {m.login_default_submit()}
       </Button>

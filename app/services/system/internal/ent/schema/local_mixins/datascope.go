@@ -82,7 +82,7 @@ func (d DatascopeMixin) scopePredicate(ctx context.Context) func(*sql.Selector) 
 	if _, lifted := ctx.Value(unscopedKey{}).(bool); lifted {
 		return nil
 	}
-	if security.IsRegistryPlane(ctx) {
+	if security.IsRegistryRead(ctx) {
 		return nil
 	}
 	dn, ok := kauthz.DecisionFromCtx(ctx)

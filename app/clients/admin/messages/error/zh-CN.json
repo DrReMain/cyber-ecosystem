@@ -84,7 +84,7 @@
   "error_SYSTEM_TENANT_DISABLED": "该租户已被停用",
   "error_SYSTEM_TENANT_NOT_FOUND": "租户不存在",
   "error_SYSTEM_TENANT_PROTECTED": "默认租户不可停用",
-  "error_SYSTEM_LOGIN_SEAT_REQUIRED": "该账号存在多重归属，请选择后登录",
+  "error_SYSTEM_LOGIN_SEAT_REQUIRED": "该账号无此端访问资格，请更换账号",
   "error_SYSTEM_POPULATION_NOT_FOUND": "用户类型不存在",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "身份提供方未配置或已停用",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "第三方身份交换失败",

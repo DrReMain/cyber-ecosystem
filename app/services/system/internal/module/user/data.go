@@ -156,10 +156,10 @@ func (rp *userRP) ListByPopulation(ctx context.Context, in *UserListIn) (*UserLi
 }
 
 func (rp *userRP) FindByAccount(ctx context.Context, account string) (*User, error) {
-	// Registry-plane lookup: the plane flag must ride the query execution
+	// Registry-read lookup: the lift flag must ride the query execution
 	// too — the tenant interceptor fires at Only/All with the context it is
 	// handed.
-	globctx := security.RegistryPlane(ctx)
+	globctx := security.RegistryRead(ctx)
 	d, err := rp.Platform.GetClient(globctx).User.Query().
 		Where(user.AccountEQ(account)).
 		Only(globctx)

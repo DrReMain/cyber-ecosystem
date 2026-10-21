@@ -11,6 +11,7 @@ export const env = createEnv({
   client: {
     VITE_CONNECT_API_PROXY: z.string().default("/connect"),
     VITE_GLITCHTIP_DSN: z.url().optional(),
+    VITE_POPULATION: z.string().default("user"),
   },
 });
 

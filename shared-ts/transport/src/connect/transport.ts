@@ -17,9 +17,23 @@ export interface TransportBindings {
   // the browser returns it synchronously; the transport awaits either.
   getSiteUrl: () => string | Promise<string>;
   proxyPath: string;
+  // The client world's credential slot, riding every request so the server
+  // reads the right namespaced session cookie. An untrusted selection among
+  // cookies the browser already sent; mirrors shared-go's
+  // SessionNamespaceHeader — rename the two together.
+  getSessionNamespace: () => string;
   // Returns the client error domain's envelope; thrown in place of the
   // raw transport error so consumers always receive the normalized shape.
   normalize: (error: unknown) => unknown;
+}
+
+// The session credential's wire contract, mirroring shared-go's
+// krauth.SessionNamespaceHeader / SessionCookieNameFor — the one place this
+// language spells them; rename the two languages together.
+export const SESSION_NAMESPACE_HEADER = "x-session-namespace";
+
+export function sessionCookieNameFor(namespace: string): string {
+  return namespace === "" ? "session_token" : `session_token_${namespace}`;
 }
 
 export interface TransportFactory {
@@ -45,6 +59,16 @@ export function createTransportFactory(bindings: TransportBindings): TransportFa
     return async (req) => {
       const cookie = await forwardedCookie();
       if (cookie) req.header.set("cookie", cookie);
+      return await next(req);
+    };
+  };
+
+  const sessionNamespaceInterceptor: Interceptor = (next) => {
+    return async (req) => {
+      const namespace = bindings.getSessionNamespace();
+      if (namespace !== "") {
+        req.header.set(SESSION_NAMESPACE_HEADER, namespace);
+      }
       return await next(req);
     };
   };
@@ -83,7 +107,12 @@ export function createTransportFactory(bindings: TransportBindings): TransportFa
   function singleConnectTransport(baseUrl: string, interceptors: Interceptor[]): Transport {
     const connect = createConnectTransport({
       baseUrl,
-      interceptors: [localeInterceptor, cookieForwarder, ...interceptors],
+      interceptors: [
+        localeInterceptor,
+        cookieForwarder,
+        sessionNamespaceInterceptor,
+        ...interceptors,
+      ],
     });
     return {
       unary: async (method, signal, timeoutMs, header, input, contextValues) => {

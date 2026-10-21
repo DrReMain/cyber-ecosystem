@@ -98,7 +98,11 @@ const wktMethod = {
 } as unknown as DescMethod & { methodKind: "unary" };
 
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { createTransportFactory } from "./transport";
+import {
+  createTransportFactory,
+  SESSION_NAMESPACE_HEADER,
+  sessionCookieNameFor,
+} from "./transport";
 
 const normalize = vi.fn((error: unknown) => new Error(`normalized:${String(error)}`));
 
@@ -106,6 +110,7 @@ const bindings = {
   getLocale: () => "zh-CN",
   getSiteUrl: async () => originHolder.origin,
   proxyPath: "/connect",
+  getSessionNamespace: () => "member",
   normalize,
 };
 
@@ -154,6 +159,34 @@ describe("createTransportFactory", () => {
     const req = { header: new Headers() };
     await runInterceptors(req);
     expect(req.header.get("Accept-Language")).toBe("zh-CN");
+  });
+
+  it("stamps the session-namespace header from the binding, or omits it when empty", async () => {
+    const transport = makeFactory().createTransport({ baseUrl: "http://api" });
+    okUnary();
+    await transport.unary(unaryMethod, undefined, undefined, new Headers(), {}, undefined);
+    const req = { header: new Headers() };
+    await runInterceptors(req);
+    expect(req.header.get(SESSION_NAMESPACE_HEADER)).toBe("member");
+    const bare = createTransportFactory({
+      getLocale: () => "zh-CN",
+      getSiteUrl: () => "http://sync-origin",
+      proxyPath: "/connect",
+      getSessionNamespace: () => "",
+      normalize,
+    });
+    bare.createTransport({ baseUrl: "http://api" });
+    const bareReq = { header: new Headers() };
+    await runInterceptors(bareReq);
+    expect(bareReq.header.has(SESSION_NAMESPACE_HEADER)).toBe(false);
+  });
+
+  it("composes the session cookie name per namespace", () => {
+    // The wire rule's per-language anchor — Go's SessionCookieNameFor must
+    // compose the identical names; the live login chain is the cross-check.
+    expect(sessionCookieNameFor("")).toBe("session_token");
+    expect(sessionCookieNameFor("member")).toBe("session_token_member");
+    expect(sessionCookieNameFor("user")).toBe("session_token_user");
   });
 
   it("forwards an explicit baseUrl to the underlying connect transport", () => {
@@ -617,6 +650,7 @@ describe("server transport resolution", () => {
       getLocale: () => "zh-CN",
       getSiteUrl: () => "http://sync-origin",
       proxyPath: "/connect",
+      getSessionNamespace: () => "member",
       normalize,
     });
     await factory
