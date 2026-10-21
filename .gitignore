@@ -158,3 +158,6 @@ out/
 # Nuxt.js
 .nuxt/
 dist/
+
+# npm lockfile — the workspace uses pnpm (pnpm-lock.yaml is the tracked lockfile)
+/package-lock.json
