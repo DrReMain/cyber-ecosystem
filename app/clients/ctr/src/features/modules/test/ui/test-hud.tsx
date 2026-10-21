@@ -14,13 +14,14 @@ export function TestHud({ remainingMs, canPause, onPause }: Readonly<TestHudProp
   const low = remainingMs < 10_000;
   return (
     <div className="flex items-center justify-between border-line border-b px-4 py-2">
+      {/* The round fab look (prototype .fab: #1F2937 fill, secondary ink, circle). */}
       <Button
         aria-label={m.test_pause_action()}
-        className="tap-zone cursor-pointer rounded-sm border border-line text-ink-secondary disabled:opacity-40"
+        className="tap-zone flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-input text-ink-secondary disabled:opacity-40"
         isDisabled={!canPause}
         onPress={onPause}
       >
-        <Pause aria-hidden size={18} />
+        <Pause aria-hidden size={16} />
       </Button>
       <div
         className={`flex items-center gap-1.5 font-bold text-sm tabular-nums ${
