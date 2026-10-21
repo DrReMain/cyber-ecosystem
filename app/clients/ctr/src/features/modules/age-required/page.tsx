@@ -1,14 +1,12 @@
-import { useMutation, useQuery } from "@connectrpc/connect-query";
-import {
-  getProfile,
-  updateProfile,
-} from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import { useQuery } from "@connectrpc/connect-query";
+import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
 import { Cake } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { useProfileUpdate } from "#/features/modules/profile/use-profile-update";
 import { m } from "#/paraglide/messages";
 import { ageOf, MONTHS, years } from "./birth";
 
@@ -22,7 +20,7 @@ const selectClass =
 export function AgeRequiredPage() {
   const navigate = useNavigate();
   const profileQuery = useQuery(getProfile, {});
-  const updateMutation = useMutation(updateProfile);
+  const updateMutation = useProfileUpdate();
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [ready, setReady] = useState(false);

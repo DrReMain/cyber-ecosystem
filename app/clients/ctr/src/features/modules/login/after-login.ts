@@ -32,19 +32,20 @@ export async function routeAfterLogin(
   { queryClient, transport, navigate }: AfterLoginDeps,
   next: string | undefined,
 ): Promise<void> {
-  // The login just minted the session cookie: drop any cached anonymous
-  // verdict before any navigation — a guarded landing target reads the same
-  // cache (60s staleTime) and would bounce straight back to login.
-  queryClient.removeQueries({ queryKey: sessionQuery.queryKey });
+  // The login just minted the session cookie: re-verify the session query
+  // before any navigation — a guarded landing target reads the same cache
+  // (60s staleTime) and would bounce straight back to login. Invalidate,
+  // never remove: removing the query strands the watcher's observer on the
+  // dead instance (removal does not re-subscribe observers), and every
+  // later invalidation — the dead-session re-verification — would miss it.
+  void queryClient.invalidateQueries({ queryKey: sessionQuery.queryKey });
   if (typeof next === "string" && isSafeNext(next) && next !== "/profile" && next !== "/") {
     await navigate({ href: next });
     return;
   }
   let complete = false;
   try {
-    const data = await queryClient.ensureQueryData(
-      createQueryOptions(getProfile, {}, { transport }),
-    );
+    const data = await queryClient.query(createQueryOptions(getProfile, {}, { transport }));
     complete = data.profile !== undefined && profileComplete(data.profile);
   } catch {
     // A profile fetch failure never blocks the login itself — the overview

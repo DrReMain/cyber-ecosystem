@@ -11,6 +11,7 @@ import type { PropsWithChildren } from "react";
 import { APP_NAME, HOME_PATH } from "#/config";
 import { LocaleSelect } from "#/domains/i18n";
 import { ErrorPage, FeedbackSonner, NotFoundPage } from "#/features/app";
+import { sessionQuery } from "#/features/auth/session.fn";
 import { AppLayout } from "#/features/layout-app/app-layout";
 import { getLocale, getTextDirection } from "#/paraglide/runtime";
 import { TransportProvider } from "#/services/connect";
@@ -44,11 +45,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
     links: [{ rel: "stylesheet", href: style }],
   }),
-  beforeLoad: () => {
+  beforeLoad: async ({ context }) => {
     if (typeof document !== "undefined") {
       document.documentElement.setAttribute("lang", getLocale());
       document.documentElement.setAttribute("dir", getTextDirection());
     }
+    await context.queryClient.query(sessionQuery).catch(() => undefined);
   },
   component: AppLayout,
   loader: async () => {

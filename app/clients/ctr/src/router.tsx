@@ -9,16 +9,20 @@ import {
   shouldThrow,
 } from "#/domains/error";
 import { ErrorFallback, PendingFallback } from "#/features/app";
+import { sessionQuery } from "#/features/auth/session.fn";
 import { deLocalizeUrl, localizeUrl } from "#/paraglide/runtime";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
+  const reverifySession = () =>
+    void queryClient.invalidateQueries({ queryKey: sessionQuery.queryKey });
+
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { throwOnError: shouldThrow, retry: shouldRetry },
     },
-    queryCache: errorQueryCache(),
-    mutationCache: errorMutationCache(),
+    queryCache: errorQueryCache(reverifySession),
+    mutationCache: errorMutationCache(reverifySession),
   });
 
   const router = createTanStackRouter({

@@ -27,7 +27,8 @@ func init() {
 	validator.ErrValidator = errorspb.ErrorGeneralErrorValidationFailed("").WithCause(validator.ErrValidator)
 
 	security.ErrMissingAnnotation = errorspb.ErrorGeneralErrorInternal("").WithCause(security.ErrMissingAnnotation)
-	security.ErrNotPlatformPlane = errorspb.ErrorGeneralErrorPermissionDenied("").WithCause(security.ErrNotPlatformPlane)
+	security.ErrNotPlatformTenant = errorspb.ErrorGeneralErrorPermissionDenied("").WithCause(security.ErrNotPlatformTenant)
+	security.ErrNotBackendPlane = errorspb.ErrorGeneralErrorPermissionDenied("").WithCause(security.ErrNotBackendPlane)
 	krauth.ErrMissingSession = errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(krauth.ErrMissingSession)
 	kauthz.ErrMissingSubject = errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(kauthz.ErrMissingSubject)
 	kauthz.ErrPermissionDenied = errorspb.ErrorGeneralErrorPermissionDenied("").WithCause(kauthz.ErrPermissionDenied)
@@ -46,13 +47,15 @@ func accessLadder(authn krauth.Authenticator, auditSink kaudit.Sink, authorizer 
 		selector.Server(
 			krauth.SessionAuth(authn),
 			kaudit.Audit(auditSink),
-			kauthz.OperationAuthz(authorizer),
+			security.BackendPlaneGuard(),
 			security.PlatformGuard(),
+			kauthz.OperationAuthz(authorizer),
 		).Match(security.MatchAccess(extv1.Access_ACCESS_PLATFORM)).Build(),
 
 		selector.Server(
 			krauth.SessionAuth(authn),
 			kaudit.Audit(auditSink),
+			security.BackendPlaneGuard(),
 			kauthz.OperationAuthz(authorizer),
 		).Match(security.MatchAccess(extv1.Access_ACCESS_ADMIN)).Build(),
 	}

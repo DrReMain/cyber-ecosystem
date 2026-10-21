@@ -1,6 +1,7 @@
 {
   "login_default_title": "ログイン",
   "login_default_description": "",
+  "login_default_error_switch_account": "アカウントを変更",
   "login_default_hero_title_a": "AI Native ",
   "login_default_hero_title_b": "管理コンソール",
   "login_default_hero_sub": "契約を起点とする汎用基盤：ID・権限・入口を統一し、サービスを必要に応じて組み合わせ、ビジネスとともに成長します。",

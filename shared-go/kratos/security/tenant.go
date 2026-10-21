@@ -4,8 +4,8 @@ import "context"
 
 // DefaultTenant is the tenant used when a context carries no subject or the
 // subject has no tenant (internal paths, framework handlers). It is also the
-// platform tenant — the seeded registry row whose seat faces the platform
-// plane — so the default bucket and the platform plane share one constant.
+// platform tier's home — the tenant the platform guard seals platform-scope
+// faces to — so the default bucket and the platform home share one constant.
 const DefaultTenant = "default"
 
 type tenantKey struct{}

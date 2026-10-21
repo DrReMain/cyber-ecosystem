@@ -1,13 +1,11 @@
-import { useMutation, useQuery } from "@connectrpc/connect-query";
-import {
-  getProfile,
-  updateProfile,
-} from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import { useQuery } from "@connectrpc/connect-query";
+import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import { m } from "#/paraglide/messages";
 import { bandLabel, bandOfAge } from "../bands";
+import { useProfileUpdate } from "../use-profile-update";
 import { StepFrame } from "./step-frame";
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -30,7 +28,7 @@ function ageOf(year: number, month: number): number {
 export function SetupAgePage() {
   const navigate = useNavigate();
   const profileQuery = useQuery(getProfile, {});
-  const updateMutation = useMutation(updateProfile);
+  const updateMutation = useProfileUpdate();
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [guardian, setGuardian] = useState(false);

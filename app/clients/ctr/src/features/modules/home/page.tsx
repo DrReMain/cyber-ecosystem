@@ -1,5 +1,3 @@
-import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
-import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
@@ -13,12 +11,13 @@ import { m } from "#/paraglide/messages";
 export function HomePage() {
   const navigate = useNavigate();
   const session = useQuery({ ...sessionQuery, throwOnError: false });
-  const authed = session.data?.status === "authed";
-  // The profile fetch rides the session verdict — anonymous never fires it,
-  // so the member probe cannot 401 its way into the route boundary. While
-  // authed-but-loading the greet still shows the guest name for a beat.
-  const profileQuery = useConnectQuery(getProfile, {}, { enabled: authed });
-  const profile = profileQuery.data?.profile;
+  // One session truth: the probe carries the profile (it proves the
+  // credential with getProfile), so the greet, the nickname, and the games
+  // gate all read it — profile writes invalidate it, and the dehydrated
+  // SSR verdict delivers the final state on first paint.
+  const authedSession = session.data?.status === "authed" ? session.data : undefined;
+  const authed = authedSession !== undefined;
+  const profile = authedSession?.profile;
   const hasGames = (profile?.games ?? []).length > 0;
 
   function onStart() {

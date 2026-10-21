@@ -18,8 +18,8 @@ func TestPlatformGuard(t *testing.T) {
 		want error
 	}{
 		{"platform inhabitant passes", &security.Subject{UserID: "u1", TenantID: security.DefaultTenant}, nil},
-		{"foreign tenant rejected", &security.Subject{UserID: "u1", TenantID: "acme"}, security.ErrNotPlatformPlane},
-		{"no subject rejected", nil, security.ErrNotPlatformPlane},
+		{"foreign tenant rejected", &security.Subject{UserID: "u1", TenantID: "acme"}, security.ErrNotPlatformTenant},
+		{"no subject rejected", nil, security.ErrNotPlatformTenant},
 	}
 	for _, tc := range cases {
 		ctx := context.Background()

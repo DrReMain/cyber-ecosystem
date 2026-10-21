@@ -1,8 +1,10 @@
+import { sessionCookieNameFor } from "@cyber-ecosystem/shared-transport";
 import { getRequest, getRequestHeader, setResponseHeader } from "@tanstack/react-start/server";
+import { env } from "#/env";
 
-// Mirrors shared-go/kratos/security/auth.SessionCookieName — the server-side
-// extractor recognizes exactly that spelling; rename the two together.
-const SESSION_COOKIE = "session_token";
+// This client world holds its own credential slot, named by its population;
+// the wire rule lives in shared-transport (one home per language).
+const SESSION_COOKIE = sessionCookieNameFor(env.VITE_POPULATION);
 
 function isSecureRequest(): boolean {
   const forwarded = getRequestHeader("x-forwarded-proto");

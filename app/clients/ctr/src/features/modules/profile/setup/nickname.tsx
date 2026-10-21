@@ -1,12 +1,10 @@
-import { useMutation, useQuery } from "@connectrpc/connect-query";
-import {
-  getProfile,
-  updateProfile,
-} from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import { useQuery } from "@connectrpc/connect-query";
+import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import { m } from "#/paraglide/messages";
+import { useProfileUpdate } from "../use-profile-update";
 import { StepFrame } from "./step-frame";
 
 const MAX_LEN = 12;
@@ -35,7 +33,7 @@ function validate(value: string): string | null {
 export function SetupNicknamePage() {
   const navigate = useNavigate();
   const profileQuery = useQuery(getProfile, {});
-  const updateMutation = useMutation(updateProfile);
+  const updateMutation = useProfileUpdate();
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);

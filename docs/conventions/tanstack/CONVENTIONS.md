@@ -20,7 +20,7 @@ In force for every change under `app/clients/*` and `shared-ts/**`; rules here w
 
 | About to write | Load first | Gate rows |
 |---|---|---|
-| `src/routes/**` | §3 | T-STR-3 T-RTE-1 T-RTE-2 T-RTE-3 T-RTE-4 |
+| `src/routes/**` | §3 | T-STR-3 T-RTE-1 T-RTE-2 T-RTE-3 T-RTE-4 T-RTE-5 |
 | `features/modules/<m>/page.tsx` | §1 transport shapes, §3 read-set, §5 UI/logic split | T-LAY-1 T-RTE-1 T-REA-2 |
 | `features/modules/<m>/ui/**`, flat module `.ts` logic | §5 | T-STR-1 T-STR-2 T-REA-1 T-REA-2 |
 | `features/layout-*/**`, `features/login-*/**` | §2, §5 grammar, §10 | T-LAY-2 T-STR-4 T-ERR-1 |
@@ -163,6 +163,13 @@ constant table — the key set has no second source.
 - The home tab is seeded only when a titled leaf exists at the area root — apps without a workbench start with an empty bar.
 - Default post-login landing is `defaultLanding(permissions)` — the first permission-surviving leaf, never a hardcoded area root.
 - Parameterized titles interpolate `match.params` (`compactParams`, `text(key, params)`).
+
+### First-paint data (SSR)
+
+- Only queries **awaited in a route hook** (`beforeLoad`/`loader`) reach the dehydrated state. A `useQuery` fired during the SSR render races the stream close, never dehydrates, and the client refetches — the first paint flips. A surface whose visuals depend on the session (dual-state pages) or on page data (content tabs) resolves that data in a route hook, never by render-time `useQuery` alone.
+- A session-consuming client resolves the session probe once at the root route's `beforeLoad`, failure swallowed — the probe never blocks the shell. Guards and pages then read the warm cache.
+- Loader prefetch rides the transport factory's static-keyed `connectTransport` singleton; a `createTransport()` instance mints a unique cache key per reference and silently splits the cache across server and client.
+- A query that embeds mutable state (the session probe embeds the profile) is invalidated by its write seam — every successful write to the embedded state invalidates the owning query.
 
 ## 4) Domains admission
 
@@ -439,6 +446,7 @@ Verified behavior (pinned laws, not observations):
 
 - SSR first paint of route errors renders server-side with locale-correct copy.
 - Across the server-fn boundary: connect's native error JSON reconstructs a real `ConnectError` client-side; every other thrown value resolves as data (the boundary rethrows only `instanceof Error`) — so server fns return status values instead of throwing envelopes.
+- A verdict's discriminant crossing the server-fn boundary is a **string tag, never a boolean**: the framed serialization delivers booleans as truthy strings — a `{ok:false}` payload reads as success client-side (observed live: a rejected login took the success branch with the rejection reason riding along unexamined).
 - Telemetry groups by `[kind, reason]` — error storms aggregate into one issue.
 - Route error recovery needs `router.invalidate()` — the boundary's `reset` alone never re-runs loaders.
 
@@ -542,6 +550,7 @@ Posture (root `AGENTS.md` §6.1): declare the change-kind and close with the cou
 - **T-RTE-2** — builtin faces (`ACCESS_BUILTIN`) never enter a read set. eye.
 - **T-RTE-3** — `staticData.title` is a bare typed `MessageKey` literal; typos and variables fail typecheck. lint: `<client>:typecheck` green after regeneration.
 - **T-RTE-4** — dot-named nesting: every parent on the chain is a layout route rendering `<Outlet />`; the parent's own page lives in `index.tsx`; a detail page joins its list's tab as a `menu.hide` child without its own `title`. eye.
+- **T-RTE-5** — a first paint that depends on the session or on page data resolves in a route hook (root `beforeLoad` for the session probe, page `loader` for content), never render-time `useQuery`; loader prefetch uses the static-keyed `connectTransport` singleton; a query embedding mutable state is invalidated by its write seam. eye.
 
 ### i18n — law §6
 

@@ -9,6 +9,7 @@ const factory = createTransportFactory({
   getLocale,
   getSiteUrl,
   proxyPath: env.VITE_CONNECT_API_PROXY,
+  getSessionNamespace: () => env.VITE_POPULATION,
   normalize,
 });
 

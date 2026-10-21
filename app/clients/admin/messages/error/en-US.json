@@ -84,7 +84,7 @@
   "error_SYSTEM_TENANT_DISABLED": "This tenant has been disabled",
   "error_SYSTEM_TENANT_NOT_FOUND": "Tenant not found",
   "error_SYSTEM_TENANT_PROTECTED": "The default tenant cannot be disabled",
-  "error_SYSTEM_LOGIN_SEAT_REQUIRED": "This account holds multiple memberships; choose one to continue",
+  "error_SYSTEM_LOGIN_SEAT_REQUIRED": "This account has no access on this app - try a different account",
   "error_SYSTEM_POPULATION_NOT_FOUND": "User type not found",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "Identity provider is not configured or disabled",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "Third-party identity exchange failed",

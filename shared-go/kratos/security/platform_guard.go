@@ -7,11 +7,11 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware"
 )
 
-// ErrNotPlatformPlane is the platform guard's rejection; rebound onto a
+// ErrNotPlatformTenant is the platform guard's rejection; rebound onto a
 // catalog factory at service assembly.
-var ErrNotPlatformPlane = errors.Forbidden("NOT_PLATFORM_PLANE", "")
+var ErrNotPlatformTenant = errors.Forbidden("NOT_PLATFORM_TENANT", "")
 
-// PlatformGuard gates the platform plane: registry and other platform-scope
+// PlatformGuard gates the platform tier: registry and other platform-scope
 // faces answer only to inhabitants of the default tenant. Grants alone are
 // not enough — a broadly granted tenant admin must not reach across tenants.
 func PlatformGuard() middleware.Middleware {
@@ -19,7 +19,7 @@ func PlatformGuard() middleware.Middleware {
 		return func(ctx context.Context, req any) (any, error) {
 			subject, ok := SubjectFromCtx(ctx)
 			if !ok || subject.TenantID != DefaultTenant {
-				return nil, ErrNotPlatformPlane
+				return nil, ErrNotPlatformTenant
 			}
 			return handler(ctx, req)
 		}

@@ -1,8 +1,9 @@
 import { useTransport } from "@connectrpc/connect-query";
+import { System } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/error_reason_pb";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { Zap } from "lucide-react";
-import { type SyntheticEvent, useEffect, useState } from "react";
+import { type SyntheticEvent, useEffect, useRef, useState } from "react";
 import {
   Button,
   CheckboxButton,
@@ -13,6 +14,7 @@ import {
   TextField,
 } from "react-aria-components";
 import { toast } from "sonner";
+import { systemReason } from "#/domains/error";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
 import { getLocale } from "#/paraglide/runtime";
@@ -21,7 +23,29 @@ import { loginFn } from "./login.fn";
 import { AgreeBox } from "./ui/agree-box";
 import { beginWechatLoginFn } from "./wechat.fn";
 
-type FieldError = "bad" | "short" | "generic" | null;
+type FieldError = "short" | "generic" | null;
+
+// The login verdict branches per reason — wrong password, no seat at this
+// client's door, a disabled account, a disabled tenant are different stories
+// with different next actions; none of them collapses into "bad credentials".
+function failureCopy(error: FieldError, reason: string | undefined): string | null {
+  if (error === "short") return m.login_password_short();
+  if (error === "generic") return m.login_error_generic();
+  switch (systemReason(reason)) {
+    case System.LOGIN_FAILED:
+      return m.login_error_bad_credentials();
+    case System.LOGIN_SEAT_REQUIRED:
+      return m.error_SYSTEM_LOGIN_SEAT_REQUIRED();
+    case System.USER_DISABLED:
+      return m.error_SYSTEM_USER_DISABLED();
+    case System.TENANT_DISABLED:
+      return m.error_SYSTEM_TENANT_DISABLED();
+    case undefined:
+      return null;
+    default:
+      return m.login_error_generic();
+  }
+}
 
 const inputClass =
   "w-full rounded-sm border border-line bg-surface-input px-3 py-3 text-ink outline-none focus:border-focus";
@@ -35,6 +59,8 @@ export function LoginPage() {
   const [wechatPending, setWechatPending] = useState(false);
   const [wechatEnv, setWechatEnv] = useState(false);
   const [error, setError] = useState<FieldError>(null);
+  const [serverReason, setServerReason] = useState<string | undefined>(undefined);
+  const formRef = useRef<HTMLFormElement>(null);
   const [agree, setAgree] = useState({ privacy: false, user: false });
   const [missing, setMissing] = useState({ privacy: false, user: false });
 
@@ -97,17 +123,22 @@ export function LoginPage() {
     }
     setPending(true);
     setError(null);
+    setServerReason(undefined);
     try {
-      await loginFn({
+      const res = await loginFn({
         data: {
           account: String(form.get("account") ?? ""),
           password,
         },
       });
+      if (res.status === "rejected") {
+        setServerReason(res.reason);
+        return;
+      }
       toast.success(m.login_success());
       await routeAfterLogin({ navigate, queryClient, transport }, next);
     } catch {
-      setError("bad");
+      setError("generic");
     } finally {
       setPending(false);
     }
@@ -135,14 +166,7 @@ export function LoginPage() {
     }
   }
 
-  const errorCopy =
-    error === "bad"
-      ? m.login_error_bad_credentials()
-      : error === "short"
-        ? m.login_password_short()
-        : error === "generic"
-          ? m.login_error_generic()
-          : null;
+  const errorCopy = failureCopy(error, serverReason);
 
   return (
     <AmbientLayout dense>
@@ -172,7 +196,7 @@ export function LoginPage() {
           </button>
         </div>
 
-        <Form className="flex flex-col gap-4" onSubmit={onSubmit}>
+        <Form className="flex flex-col gap-4" onSubmit={onSubmit} ref={formRef}>
           <TextField autoComplete="username" isRequired name="account" type="text">
             <Label className="sr-only">{m.login_account_label()}</Label>
             <Input className={inputClass} placeholder={m.login_account_placeholder()} />
@@ -186,9 +210,24 @@ export function LoginPage() {
             />
           </TextField>
           {errorCopy !== null && (
-            <p className="text-danger-text text-sm" role="alert">
-              {errorCopy}
-            </p>
+            <div className="flex items-start justify-between gap-2" role="alert">
+              <p className="text-danger-text text-sm leading-snug">{errorCopy}</p>
+              {systemReason(serverReason) === System.LOGIN_SEAT_REQUIRED && (
+                <button
+                  className="tap-zone shrink-0 font-bold text-ink-secondary underline active:opacity-60"
+                  onClick={() => {
+                    formRef.current?.reset();
+                    setServerReason(undefined);
+                    formRef.current
+                      ?.querySelector<HTMLInputElement>("input[name='account']")
+                      ?.focus();
+                  }}
+                  type="button"
+                >
+                  {m.login_error_switch_account()}
+                </button>
+              )}
+            </div>
           )}
 
           <div className="flex flex-col gap-1.5">

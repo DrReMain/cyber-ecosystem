@@ -7,6 +7,7 @@ import { viewTransitionSource } from "./view-transition-source";
 import { installWindowCapture } from "./window-capture";
 
 export { errorMutationCache, errorQueryCache, shouldRetry, shouldThrow } from "./react-query";
+export { systemReason } from "./system-reason";
 
 export const errorDomain = createErrorDomain({
   sources: [connectSource, viewTransitionSource],
