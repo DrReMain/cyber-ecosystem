@@ -2,6 +2,7 @@ import { createClient } from "@connectrpc/connect";
 import { AuthService } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth_pb";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { normalize } from "#/domains/error";
 import { save } from "#/features/auth/custody.server";
 import { createCtrTransport } from "#/services/connect/transport";
 
@@ -25,11 +26,17 @@ const exchange = z.object({ code: z.string().min(1), state: z.string().min(1) })
 export const wechatLoginFn = createServerFn({ method: "POST" })
   .validator((raw) => exchange.parse(raw))
   .handler(async ({ data }) => {
-    const res = await createClient(AuthService, createCtrTransport()).loginByIdentity({
-      provider: "wechat",
-      payload: { case: "wechat", value: { code: data.code } },
-      state: data.state,
-    });
-    save(res.sessionToken);
-    return { ok: true } as const;
+    try {
+      const res = await createClient(AuthService, createCtrTransport()).loginByIdentity({
+        provider: "wechat",
+        payload: { case: "wechat", value: { code: data.code } },
+        state: data.state,
+      });
+      save(res.sessionToken);
+      // Same verdict-as-data law as the password leg: the rejection reason
+      // survives the serialization boundary only as data.
+      return { status: "ok" } as const;
+    } catch (error) {
+      return { status: "rejected", reason: normalize(error).reason } as const;
+    }
   });

@@ -65,6 +65,7 @@ func (c *systemClient) AuthenticateSession(ctx context.Context, token string) (*
 		UserID:     utils.Deref(utils.Unwrap[string](resp.Msg.GetUserId()), ""),
 		TenantID:   utils.Deref(utils.Unwrap[string](resp.Msg.GetTenantId()), ""),
 		Population: utils.Deref(utils.Unwrap[string](resp.Msg.GetPopulation()), ""),
+		Plane:      utils.Deref(utils.Unwrap[string](resp.Msg.GetPlane()), ""),
 		SessionID:  utils.Deref(utils.Unwrap[string](resp.Msg.GetSessionId()), ""),
 		Extra:      map[string]any{shared.ExtraAccount: utils.Deref(utils.Unwrap[string](resp.Msg.GetAccount()), "")},
 	}, nil

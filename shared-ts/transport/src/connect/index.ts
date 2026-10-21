@@ -6,6 +6,8 @@ export { createPushable, type Pushable } from "./pushable";
 export { runStream } from "./run-stream";
 export {
   createTransportFactory,
+  SESSION_NAMESPACE_HEADER,
+  sessionCookieNameFor,
   type TransportBindings,
   type TransportFactory,
 } from "./transport";

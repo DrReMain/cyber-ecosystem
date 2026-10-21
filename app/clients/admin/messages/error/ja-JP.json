@@ -84,7 +84,7 @@
   "error_SYSTEM_TENANT_DISABLED": "このテナントは無効化されています",
   "error_SYSTEM_TENANT_NOT_FOUND": "テナントが見つかりません",
   "error_SYSTEM_TENANT_PROTECTED": "既定のテナントは無効化できません",
-  "error_SYSTEM_LOGIN_SEAT_REQUIRED": "このアカウントは複数の所属を持っています。選択してログインしてください",
+  "error_SYSTEM_LOGIN_SEAT_REQUIRED": "このアカウントにはこのアプリへのアクセス権がありません。別のアカウントでお試しください",
   "error_SYSTEM_POPULATION_NOT_FOUND": "ユーザータイプが見つかりません",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "IDプロバイダーが未設定または無効です",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "サードパーティID連携に失敗しました",

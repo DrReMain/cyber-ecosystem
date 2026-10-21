@@ -13,7 +13,8 @@ export function usePasswordLogin() {
 
   return useMutation({
     mutationFn: (input: { account: string; password: string }) => loginFn({ data: input }),
-    onSuccess: async () => {
+    onSuccess: async (result) => {
+      if (result.status === "rejected") return;
       queryClient.clear();
       const home =
         search.redirect === undefined

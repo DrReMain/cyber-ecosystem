@@ -13,6 +13,7 @@
   "login_pending": "Signing in…",
   "login_error_bad_credentials": "Incorrect account or password",
   "login_error_generic": "Sign-in failed, please try again later",
+  "login_error_switch_account": "Switch account",
   "login_success": "Signed in",
   "login_session_expired": "Your session has expired, please sign in again",
   "login_wechat_button": "Sign in with WeChat",

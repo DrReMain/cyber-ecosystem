@@ -26,15 +26,21 @@ export function useSessionWatcher() {
   useEffect(() => {
     const status = data?.status ?? null;
     if (status === "unreachable") return;
-    if (prevStatus.current === "authed" && status !== null && status !== "authed") {
-      if (!isOnLogin(router.state.location.pathname)) {
-        broadcastSessionKick();
-        void router.navigate({
-          search: { expired: true, next: router.state.location.href },
-          to: "/login",
-          viewTransition: false,
-        });
-      }
+    // An expired verdict means the browser still holds a credential the
+    // server has killed — boot unconditionally off-login, no arming needed:
+    // the SPA-login path may leave this watcher's cached belief at
+    // anonymous while the app runs authed, and a ban must still land.
+    // authed→anonymous (cookie vanished) boots too; anonymous alone is the
+    // normal public state and never boots.
+    const wasAuthed = prevStatus.current === "authed";
+    const bootOffLogin = status === "expired" || (wasAuthed && status === "anonymous");
+    if (bootOffLogin && !isOnLogin(router.state.location.pathname)) {
+      broadcastSessionKick();
+      void router.navigate({
+        search: { expired: true, next: router.state.location.href },
+        to: "/login",
+        viewTransition: false,
+      });
     }
     prevStatus.current = status;
   }, [data, router]);

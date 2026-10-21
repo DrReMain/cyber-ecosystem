@@ -1,6 +1,7 @@
 {
   "login_default_title": "登录",
   "login_default_description": "",
+  "login_default_error_switch_account": "更换账号",
   "login_default_hero_title_a": "AI Native ",
   "login_default_hero_title_b": "管理系统",
   "login_default_hero_sub": "契约先行的通用底座：统一身份、权限与入口，服务按需组合、随业务生长。",

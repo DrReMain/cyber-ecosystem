@@ -439,6 +439,7 @@ Verified behavior (pinned laws, not observations):
 
 - SSR first paint of route errors renders server-side with locale-correct copy.
 - Across the server-fn boundary: connect's native error JSON reconstructs a real `ConnectError` client-side; every other thrown value resolves as data (the boundary rethrows only `instanceof Error`) — so server fns return status values instead of throwing envelopes.
+- A verdict's discriminant crossing the server-fn boundary is a **string tag, never a boolean**: the framed serialization delivers booleans as truthy strings — a `{ok:false}` payload reads as success client-side (observed live: a rejected login took the success branch with the rejection reason riding along unexamined).
 - Telemetry groups by `[kind, reason]` — error storms aggregate into one issue.
 - Route error recovery needs `router.invalidate()` — the boundary's `reset` alone never re-runs loaders.
 

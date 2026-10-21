@@ -1,7 +1,9 @@
 import { useTransport } from "@connectrpc/connect-query";
+import { System } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/error_reason_pb";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { systemReason } from "#/domains/error";
 import { m } from "#/paraglide/messages";
 import { routeAfterLogin } from "./after-login";
 import { wechatLoginFn } from "./wechat.fn";
@@ -19,6 +21,7 @@ export function WechatCallbackPage() {
   const transport = useTransport();
   const search = useSearch({ from: "/login/wechat/callback" });
   const [failed, setFailed] = useState(false);
+  const [serverReason, setServerReason] = useState<string | undefined>(undefined);
   const started = useRef(false);
 
   useEffect(() => {
@@ -32,16 +35,34 @@ export function WechatCallbackPage() {
       return;
     }
     wechatLoginFn({ data: { code, state } })
-      .then(() => routeAfterLogin({ navigate, queryClient, transport }, search.next))
+      .then((res) => {
+        if (res.status === "rejected") {
+          setServerReason(res.reason);
+          return;
+        }
+        return routeAfterLogin({ navigate, queryClient, transport }, search.next);
+      })
       .catch(() => {
         setFailed(true);
       });
   }, [navigate, queryClient, search, transport]);
 
-  if (failed) {
+  if (failed || serverReason !== undefined) {
+    // The verdict branches per reason like the password leg — a disabled
+    // account is a different story from a failed exchange.
+    const copy = (() => {
+      switch (systemReason(serverReason)) {
+        case System.USER_DISABLED:
+          return m.error_SYSTEM_USER_DISABLED();
+        case System.TENANT_DISABLED:
+          return m.error_SYSTEM_TENANT_DISABLED();
+        default:
+          return m.login_error_wechat();
+      }
+    })();
     return (
       <main className="safe-px safe-pt flex min-h-app flex-col items-center justify-center gap-3">
-        <p className="text-danger-text">{m.login_error_wechat()}</p>
+        <p className="text-danger-text">{copy}</p>
         <Link className="text-ink-secondary text-sm underline" to="/login">
           {m.login_back()}
         </Link>

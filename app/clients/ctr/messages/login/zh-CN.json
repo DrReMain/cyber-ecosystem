@@ -13,6 +13,7 @@
   "login_pending": "登录中…",
   "login_error_bad_credentials": "账号或密码不正确",
   "login_error_generic": "登录失败,请稍后重试",
+  "login_error_switch_account": "更换账号",
   "login_success": "登录成功",
   "login_session_expired": "登录已过期，请重新登录",
   "login_wechat_button": "微信一键登录",
