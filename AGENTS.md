@@ -56,6 +56,8 @@ Recurring build, test, lint, generation, dev, and automation workflows `SHOULD` 
 
 **DO NOT hardcode secrets or environment-specific credentials.**
 
+**DO NOT use npm or yarn — pnpm is the only package manager.** `pnpm-lock.yaml` is the sole lockfile; a `package-lock.json` or `yarn.lock` appearing anywhere means some command bypassed pnpm — delete the artifact and fix the command, never add an ignore rule to hide it.
+
 ---
 
 ## 5) Source-First Workflow
