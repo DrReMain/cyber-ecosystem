@@ -36,10 +36,13 @@ export type GameExit = "completed" | "aborted" | "failed";
 // The one attempt-shaped record a run accumulates. Events are per-game
 // shapes mirroring the frozen proto Detail items (gen types at the game
 // side); the submit seam itself stays deferred until the submit contract
-// freezes.
+// freezes. Stats are game-local counters the fact stream cannot express
+// (flash_aiming's expired targets) — local display facts only, never
+// submitted.
 export interface AttemptRecord {
   readonly events: readonly Record<string, unknown>[];
   readonly backgroundSpans: readonly { elapsedMs: number; durationMs: number }[];
+  readonly stats: Readonly<Record<string, number>>;
   readonly exit: GameExit;
 }
 
@@ -56,6 +59,8 @@ export interface GameModuleCtx {
   now(): number;
   /** Append one raw-detail event (per-game proto Detail shape). Capped at 4096. */
   collect(event: Record<string, unknown>): void;
+  /** Report a local counter (per-game key vocabulary, e.g. "misses"); last write wins. */
+  stat(key: string, value: number): void;
   /** A game's own natural end (unused when the clock alone ends the run). */
   end(exit: GameExit): void;
 }

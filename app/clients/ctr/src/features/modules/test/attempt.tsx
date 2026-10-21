@@ -118,7 +118,13 @@ export function TestAttempt({
         <PauseOverlay onExit={() => setExitOpen(true)} onResume={resumeRun} />
       )}
       {phase === "ended" && endRecord !== null && (
-        <EndFace onExit={backToFlow} onRetry={onRetry} record={endRecord} />
+        <EndFace
+          code={gameModule.code}
+          engineParams={bootParams}
+          onExit={backToFlow}
+          onRetry={onRetry}
+          record={endRecord}
+        />
       )}
 
       <ExitConfirmDialog

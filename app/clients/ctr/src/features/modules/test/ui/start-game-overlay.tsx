@@ -64,13 +64,13 @@ export function StartGameOverlay({
           </div>
           <div className="mt-6 flex gap-3">
             <Button
-              className="flex-1 cursor-pointer rounded-sm border border-line px-4 py-3 font-semibold text-ink-secondary active:opacity-80"
+              className="flex-1 cursor-pointer rounded-control border border-line px-4 py-3 font-semibold text-ink-secondary active:opacity-80"
               onPress={onBack}
             >
               {m.test_intro_back()}
             </Button>
             <Button
-              className="flex-1 cursor-pointer rounded-sm bg-cta-primary px-4 py-3 font-semibold text-white active:opacity-80"
+              className="flex-1 cursor-pointer rounded-control bg-cta-primary px-4 py-3 font-semibold text-white active:opacity-80"
               onPress={() => setCountdown(3)}
             >
               {m.test_start_action()}

@@ -48,6 +48,21 @@
   --color-grade-b: #3b82f6;
   --color-grade-c: #f97316;
 
+  /* multi_target value tiers — the priority game's four target classes
+   * (legacy red-600 / yellow-600 / blue-600 / gray-800-with-red-border;
+   * fills are the legacy gradient mids, the ring marks the trap) */
+  --color-tier-high: #dc2626;
+  --color-tier-medium: #eab308;
+  --color-tier-low: #2563eb;
+  --color-tier-trap: #1f2937;
+
+  /* target_recognition classes — enemy/friendly/neutral (legacy palette;
+   * values coincide with the tier family by legacy accident, semantics
+   * stay separate) */
+  --color-rec-enemy: #dc2626;
+  --color-rec-friendly: #2563eb;
+  --color-rec-neutral: #eab308;
+
   /* Ability identity — six business-bound colors */
   --color-ability-reaction: #991b1b;
   --color-ability-aiming: #ea580c;

@@ -14,13 +14,13 @@ export function PauseOverlay({ onResume, onExit }: Readonly<PauseOverlayProps>) 
         <h2 className="text-center font-bold text-ink text-lg">{m.test_pause_title()}</h2>
         <div className="mt-6 flex flex-col gap-3">
           <Button
-            className="w-full cursor-pointer rounded-sm bg-cta-primary px-4 py-3 font-semibold text-white active:opacity-80"
+            className="w-full cursor-pointer rounded-control bg-cta-primary px-4 py-3 font-semibold text-white active:opacity-80"
             onPress={onResume}
           >
             {m.test_pause_resume()}
           </Button>
           <Button
-            className="w-full cursor-pointer rounded-sm border border-line px-4 py-3 font-semibold text-ink-secondary active:opacity-80"
+            className="w-full cursor-pointer rounded-control border border-line px-4 py-3 font-semibold text-ink-secondary active:opacity-80"
             onPress={onExit}
           >
             {m.test_pause_exit()}

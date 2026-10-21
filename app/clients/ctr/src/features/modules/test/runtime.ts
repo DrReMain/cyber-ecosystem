@@ -43,6 +43,7 @@ function defaultBindVisibility(handler: (hidden: boolean) => void): () => void {
 export class TestRunHost {
   private readonly events: Record<string, unknown>[] = [];
   private readonly spans: { elapsedMs: number; durationMs: number }[] = [];
+  private readonly stats: Record<string, number> = {};
   private readonly now: () => number;
   private readonly clock: GameClock;
   private readonly instance: GameInstance;
@@ -70,6 +71,9 @@ export class TestRunHost {
       locale: options.locale,
       now: options.now,
       collect: (event) => this.collect(event),
+      stat: (key, value) => {
+        this.stats[key] = value;
+      },
       end: (exit) => this.endByGame(exit),
     };
     this.instance = options.module.create(ctx);
@@ -109,6 +113,7 @@ export class TestRunHost {
     return {
       events: [...this.events],
       backgroundSpans: [...this.spans],
+      stats: { ...this.stats },
       exit: this.exit ?? "aborted",
     };
   }
