@@ -1,16 +1,14 @@
-import { useMutation, useQuery } from "@connectrpc/connect-query";
+import { useQuery } from "@connectrpc/connect-query";
 import type { Game } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/game_pb";
 import { listGames } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/game-GameService_connectquery";
-import {
-  getProfile,
-  updateProfile,
-} from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "react-aria-components";
 import { toast } from "sonner";
 import { m } from "#/paraglide/messages";
+import { useProfileUpdate } from "../use-profile-update";
 import { StepFrame } from "./step-frame";
 
 // The product cap for custom titles. The server cap is config-driven and
@@ -50,7 +48,7 @@ export function SetupGamesPage() {
   const navigate = useNavigate();
   const profileQuery = useQuery(getProfile, {});
   const gamesQuery = useQuery(listGames, {});
-  const updateMutation = useMutation(updateProfile);
+  const updateMutation = useProfileUpdate();
   const [picked, setPicked] = useState<string[]>([]);
   const [customs, setCustoms] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
