@@ -16,7 +16,7 @@ export function SecurityCard() {
   ];
   return (
     <div className={CARD_CLASS}>
-      <div className="mb-1 font-extrabold text-ink text-sm">{m.profile_card_account()}</div>
+      <div className="text-ink mb-1 text-sm font-extrabold">{m.profile_card_account()}</div>
       {rows.map((row, index) => (
         <div
           className={`flex items-center justify-between py-3 ${
@@ -24,12 +24,12 @@ export function SecurityCard() {
           }`}
           key={row.key}
         >
-          <span className="flex items-center gap-2 font-bold text-ink text-sm">
+          <span className="text-ink flex items-center gap-2 text-sm font-bold">
             <row.Icon aria-hidden size={16} />
             {row.label}
           </span>
           <button
-            className="tap-zone rounded-full bg-status-soon-bg px-2.5 py-1 text-[10px] text-status-soon active:opacity-60"
+            className="tap-zone bg-status-soon-bg text-status-soon rounded-full px-2.5 py-1 text-[10px] active:opacity-60"
             onClick={() => toast.info(m.common_soon())}
             type="button"
           >

@@ -68,16 +68,16 @@ export function SetupNicknamePage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile" })} step={1}>
-      <div className="rounded-lg border border-line bg-surface-card p-4">
-        <div className="mb-1 font-extrabold text-ink text-sm">
+      <div className="border-line bg-surface-card rounded-lg border p-4">
+        <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_nickname_title()}
         </div>
-        <p className="mb-3 text-[11.5px] text-ink-tertiary leading-relaxed">
+        <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed">
           {m.profile_setup_nickname_desc()}
         </p>
         <input
           aria-label={m.profile_nickname_label()}
-          className="w-full rounded-sm border border-line bg-surface-input px-3 py-3 text-ink outline-none focus:border-focus"
+          className="border-line bg-surface-input text-ink focus:border-focus w-full rounded-sm border px-3 py-3 outline-none"
           // Double the contract cap in characters so the counter can show
           // the over-limit state instead of silently truncating input.
           maxLength={24}
@@ -110,8 +110,8 @@ export function SetupNicknamePage() {
         </div>
       </div>
 
-      <div className="whitespace-pre-line rounded-lg border border-line bg-surface-deep p-3.5 text-[11.5px] text-ink-tertiary leading-relaxed">
-        <span className="font-bold text-ink-secondary">
+      <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[11.5px] leading-relaxed whitespace-pre-line">
+        <span className="text-ink-secondary font-bold">
           {m.profile_setup_nickname_rules_title()}
         </span>
         <br />
@@ -119,7 +119,7 @@ export function SetupNicknamePage() {
       </div>
 
       <Button
-        className="rounded-sm bg-cta-primary px-4 py-3 font-semibold text-white disabled:opacity-50"
+        className="bg-cta-primary rounded-sm px-4 py-3 font-semibold text-white disabled:opacity-50"
         isDisabled={updateMutation.isPending}
         onPress={() => void onNext()}
       >

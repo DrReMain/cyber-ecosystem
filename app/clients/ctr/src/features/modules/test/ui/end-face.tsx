@@ -42,30 +42,30 @@ export function EndFace({ code, record, engineParams, onRetry, onExit }: Readonl
   return (
     <div className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-black/80 p-6 backdrop-blur-sm">
       <div className="mx-auto flex w-full max-w-xs flex-1 flex-col justify-center py-6">
-        <h2 className="text-center font-extrabold text-ink text-xl">{m.test_end_title()}</h2>
+        <h2 className="text-ink text-center text-xl font-extrabold">{m.test_end_title()}</h2>
         <div className="mt-5 grid grid-cols-2 gap-2.5">
           {rows.map((row) => (
             <div
-              className="rounded-card border border-line bg-surface-card px-3 py-2.5"
+              className="rounded-card border-line bg-surface-card border px-3 py-2.5"
               key={row.key}
             >
               <div className="text-ink-tertiary text-xs">
                 {(ROW_LABELS[row.key] ?? m.test_result_taps)()}
               </div>
-              <div className="mt-0.5 font-bold text-ink text-lg">{row.value}</div>
+              <div className="text-ink mt-0.5 text-lg font-bold">{row.value}</div>
             </div>
           ))}
         </div>
         <div className="mt-6 flex flex-col gap-3">
           {/* Retry is the practice/orange CTA (prototype btn-org), not the primary blue. */}
           <Button
-            className="w-full cursor-pointer rounded-control bg-cta-practice px-4 py-3 font-semibold text-white active:opacity-80"
+            className="rounded-control bg-cta-practice w-full cursor-pointer px-4 py-3 font-semibold text-white active:opacity-80"
             onPress={onRetry}
           >
             {m.test_end_retry()}
           </Button>
           <Button
-            className="w-full cursor-pointer rounded-control border border-line px-4 py-3 font-semibold text-ink-secondary active:opacity-80"
+            className="rounded-control border-line text-ink-secondary w-full cursor-pointer border px-4 py-3 font-semibold active:opacity-80"
             onPress={onExit}
           >
             {m.test_end_exit()}

@@ -51,7 +51,7 @@ export function RoleMembers({ members, pendingId, onUnbind }: Readonly<RoleMembe
         <div className="flex flex-col gap-2">
           {visible.map((member) => (
             <div
-              className="flex items-center gap-3 rounded-lg border border-line-soft px-3 py-2"
+              className="border-line-soft flex items-center gap-3 rounded-lg border px-3 py-2"
               key={`${member.principalType}:${member.principalId}`}
             >
               {member.principalType === "user" ? (
@@ -60,8 +60,8 @@ export function RoleMembers({ members, pendingId, onUnbind }: Readonly<RoleMembe
                 <Tag color="geekblue">{member.principalType}</Tag>
               )}
               <span className="text-[13px]">{member.displayName}</span>
-              <span className="font-mono text-[12px] text-ink-tertiary">{member.principalId}</span>
-              <span className="ms-auto font-mono text-[12px] text-ink-tertiary">
+              <span className="text-ink-tertiary font-mono text-[12px]">{member.principalId}</span>
+              <span className="text-ink-tertiary ms-auto font-mono text-[12px]">
                 {formatTime(member.createdAt)}
               </span>
               <Popconfirm

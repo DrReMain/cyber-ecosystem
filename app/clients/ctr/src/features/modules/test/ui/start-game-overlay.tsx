@@ -42,10 +42,10 @@ export function StartGameOverlay({
     <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm">
       {countdown !== null ? (
         <div className="flex flex-col items-center gap-3">
-          <div className="font-extrabold text-7xl text-ink tabular-nums">{countdown}</div>
+          <div className="text-ink text-7xl font-extrabold tabular-nums">{countdown}</div>
           <div className="text-ink-secondary text-sm">{m.test_countdown_ready()}</div>
           <button
-            className="mt-4 text-ink-tertiary text-sm underline active:opacity-60"
+            className="text-ink-tertiary mt-4 text-sm underline active:opacity-60"
             onClick={onBack}
             type="button"
           >
@@ -53,24 +53,24 @@ export function StartGameOverlay({
           </button>
         </div>
       ) : (
-        <div className="w-full max-w-md rounded-card border border-line bg-surface-card p-6">
-          <h1 className="text-center font-extrabold text-ink text-xl">{testName}</h1>
-          <p className="mt-3 text-center text-ink-secondary text-sm leading-relaxed">
+        <div className="rounded-card border-line bg-surface-card w-full max-w-md border p-6">
+          <h1 className="text-ink text-center text-xl font-extrabold">{testName}</h1>
+          <p className="text-ink-secondary mt-3 text-center text-sm leading-relaxed">
             {introduction}
           </p>
-          <div className="mt-4 flex items-center justify-center gap-2 rounded-sm border border-[rgba(245,158,11,0.5)] bg-surface-deep px-3 py-2 text-status-pending text-xs">
+          <div className="bg-surface-deep text-status-pending mt-4 flex items-center justify-center gap-2 rounded-sm border border-[rgba(245,158,11,0.5)] px-3 py-2 text-xs">
             <Timer aria-hidden size={14} />
             {m.test_start_duration({ n: durationSeconds })}
           </div>
           <div className="mt-6 flex gap-3">
             <Button
-              className="flex-1 cursor-pointer rounded-control border border-line px-4 py-3 font-semibold text-ink-secondary active:opacity-80"
+              className="rounded-control border-line text-ink-secondary flex-1 cursor-pointer border px-4 py-3 font-semibold active:opacity-80"
               onPress={onBack}
             >
               {m.test_intro_back()}
             </Button>
             <Button
-              className="flex-1 cursor-pointer rounded-control bg-cta-primary px-4 py-3 font-semibold text-white active:opacity-80"
+              className="rounded-control bg-cta-primary flex-1 cursor-pointer px-4 py-3 font-semibold text-white active:opacity-80"
               onPress={() => setCountdown(3)}
             >
               {m.test_start_action()}

@@ -126,18 +126,18 @@ export function SetupGamesPage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/age" })} step={3}>
-      <div className="rounded-lg border border-line bg-surface-card p-4">
-        <div className="mb-1 font-extrabold text-ink text-sm">
+      <div className="border-line bg-surface-card rounded-lg border p-4">
+        <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_games_title()} <span className="text-danger-text">*</span>
         </div>
-        <p className="mb-3 text-[11.5px] text-ink-tertiary leading-relaxed">
+        <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed">
           {m.profile_setup_games_desc()}
         </p>
         {groups.order.map((category) => (
           <section key={category}>
             {hasCategoryHeader(category) && (
               <div
-                className={`mt-2 mb-1.5 font-bold text-[11.5px] first:mt-0 ${
+                className={`mt-2 mb-1.5 text-[11.5px] font-bold first:mt-0 ${
                   category === "fps" ? "text-accent-fps" : "text-accent-moba"
                 }`}
               >
@@ -152,7 +152,7 @@ export function SetupGamesPage() {
                     aria-pressed={on}
                     className={`rounded-lg border px-2 py-3 text-center text-[12.5px] active:opacity-60 ${
                       on
-                        ? "border-focus bg-focus/20 font-bold text-accent-info"
+                        ? "border-focus bg-focus/20 text-accent-info font-bold"
                         : "border-line bg-surface-content text-ink-secondary"
                     }`}
                     key={game.id ?? game.name}
@@ -167,7 +167,7 @@ export function SetupGamesPage() {
           </section>
         ))}
         {totalPicked > 0 && (
-          <p className="mt-3 text-[11px] text-ink-tertiary">
+          <p className="text-ink-tertiary mt-3 text-[11px]">
             {m.profile_setup_games_vote({
               fps: fpsVotes,
               moba: mobaVotes,
@@ -180,17 +180,17 @@ export function SetupGamesPage() {
         )}
       </div>
 
-      <div className="rounded-lg border border-line bg-surface-card p-4">
-        <div className="mb-1 font-extrabold text-ink text-sm">
+      <div className="border-line bg-surface-card rounded-lg border p-4">
+        <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_games_custom_title()}
         </div>
-        <p className="mb-3 text-[11.5px] text-ink-tertiary leading-relaxed">
+        <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed">
           {m.profile_setup_games_custom_desc()}
         </p>
         <div className="flex gap-2">
           <input
             aria-label={m.profile_setup_games_custom_title()}
-            className="min-w-0 flex-1 rounded-sm border border-line bg-surface-input px-3 py-3 text-ink text-sm outline-none focus:border-focus"
+            className="border-line bg-surface-input text-ink focus:border-focus min-w-0 flex-1 rounded-sm border px-3 py-3 text-sm outline-none"
             maxLength={30}
             name="customGame"
             onChange={(event) => setDraft(event.target.value)}
@@ -205,7 +205,7 @@ export function SetupGamesPage() {
             value={draft}
           />
           <button
-            className="w-20 shrink-0 rounded-sm border border-line px-3 py-3 font-bold text-[13px] text-accent-info disabled:text-ink-tertiary disabled:opacity-45"
+            className="border-line text-accent-info disabled:text-ink-tertiary w-20 shrink-0 rounded-sm border px-3 py-3 text-[13px] font-bold disabled:opacity-45"
             disabled={customs.length >= CUSTOM_CAP}
             onClick={addCustom}
             type="button"
@@ -230,13 +230,13 @@ export function SetupGamesPage() {
             {customs.map((name) => (
               <button
                 aria-label={m.profile_setup_games_remove({ name })}
-                className="tap-zone flex items-start gap-1.5 rounded-lg border border-line bg-surface-content px-2.5 py-1.5 text-ink-secondary text-xs active:opacity-60"
+                className="tap-zone border-line bg-surface-content text-ink-secondary flex items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs active:opacity-60"
                 key={name}
                 onClick={() => removeCustom(name)}
                 type="button"
               >
-                <span className="min-w-0 break-all text-left leading-snug">{name}</span>
-                <X aria-hidden className="mt-0.5 shrink-0 text-ink-tertiary" size={12} />
+                <span className="min-w-0 text-left leading-snug break-all">{name}</span>
+                <X aria-hidden className="text-ink-tertiary mt-0.5 shrink-0" size={12} />
               </button>
             ))}
           </div>
@@ -250,7 +250,7 @@ export function SetupGamesPage() {
       )}
 
       <Button
-        className="rounded-sm bg-cta-primary px-4 py-3 font-semibold text-white disabled:opacity-50"
+        className="bg-cta-primary rounded-sm px-4 py-3 font-semibold text-white disabled:opacity-50"
         isDisabled={updateMutation.isPending}
         onPress={() => void onDone()}
       >

@@ -103,7 +103,7 @@ export function PolicyDrawer({
             </Form.Item>
           </Form>
           <div className="flex flex-col gap-2">
-            <span className="font-medium text-[13px]">{m.system_policies_form_kind()}</span>
+            <span className="text-[13px] font-medium">{m.system_policies_form_kind()}</span>
             {mode === "edit" ? (
               <div className="flex items-center gap-2">
                 <Tag>
@@ -145,7 +145,7 @@ export function PolicyDrawer({
               onChange={(calendar) => setTouched({ ...draft, calendar })}
             />
           )}
-          <div className="flex flex-col gap-1 border-line-soft border-t pt-3">
+          <div className="border-line-soft flex flex-col gap-1 border-t pt-3">
             <div className="flex items-center gap-2">
               <Switch
                 checked={draft.enabled}

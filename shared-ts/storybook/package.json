@@ -3,14 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "scripts": {
-    "check": "biome check",
-    "format": "biome format",
-    "lint": "biome lint",
-    "typecheck": "tsc --noEmit",
-    "dev": "storybook dev -p 6006",
-    "build": "storybook build"
-  },
   "dependencies": {
     "@cyber-ecosystem/shared-antd": "workspace:*"
   },

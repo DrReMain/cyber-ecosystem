@@ -38,7 +38,7 @@ export function ExitConfirmDialog({
   }
   return (
     <ModalOverlay
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6 backdrop-blur-md motion-safe:data-[entering]:duration-200 motion-safe:data-[entering]:ease-out-expo"
+      className="motion-safe:data-[entering]:ease-out-expo fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6 backdrop-blur-md motion-safe:data-[entering]:duration-200"
       isDismissable
       isOpen
       onOpenChange={(isOpen) => {
@@ -51,23 +51,23 @@ export function ExitConfirmDialog({
       }}
     >
       <Dialog
-        className="w-full max-w-md rounded-card border border-danger/40 bg-surface-card p-8 shadow-card motion-safe:data-[entering]:scale-95 motion-safe:data-[entering]:opacity-0 motion-safe:data-[entering]:duration-200 motion-safe:data-[entering]:ease-out-expo"
+        className="rounded-card border-danger/40 bg-surface-card shadow-card motion-safe:data-[entering]:ease-out-expo w-full max-w-md border p-8 motion-safe:data-[entering]:scale-95 motion-safe:data-[entering]:opacity-0 motion-safe:data-[entering]:duration-200"
         role="alertdialog"
       >
-        <h2 className="text-center font-bold text-ink text-xl tracking-[0.02em] rtl:tracking-normal">
+        <h2 className="text-ink text-center text-xl font-bold tracking-[0.02em] rtl:tracking-normal">
           {title}
         </h2>
-        <p className="mt-3 text-center text-ink-secondary text-sm leading-relaxed">{description}</p>
+        <p className="text-ink-secondary mt-3 text-center text-sm leading-relaxed">{description}</p>
         <div className="mt-8 flex gap-4">
           <Button
             autoFocus
-            className="flex-1 cursor-pointer rounded-control bg-surface-input px-6 py-3.5 font-semibold text-ink text-sm transition-transform duration-200 ease-out-expo hover:bg-surface-active active:scale-95"
+            className="rounded-control bg-surface-input text-ink ease-out-expo hover:bg-surface-active flex-1 cursor-pointer px-6 py-3.5 text-sm font-semibold transition-transform duration-200 active:scale-95"
             onPress={onCancel}
           >
             {cancelLabel}
           </Button>
           <Button
-            className="flex-1 cursor-pointer rounded-control bg-danger px-6 py-3.5 font-semibold text-sm text-white shadow-cta-primary transition-transform duration-200 ease-out-expo hover:bg-danger/90 active:scale-95"
+            className="rounded-control bg-danger shadow-cta-primary ease-out-expo hover:bg-danger/90 flex-1 cursor-pointer px-6 py-3.5 text-sm font-semibold text-white transition-transform duration-200 active:scale-95"
             onPress={onConfirm}
           >
             {confirmLabel}

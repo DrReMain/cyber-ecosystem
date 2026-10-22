@@ -36,7 +36,7 @@ export function LoadingStrip({ tone }: Readonly<LoadingStripProps>) {
     <div aria-hidden className={"justify-center"} dir="ltr">
       <div
         className={clsx(
-          "text-center font-mono text-[11px] uppercase tracking-[0.18em]",
+          "text-center font-mono text-[11px] tracking-[0.18em] uppercase",
           classes.label,
         )}
       >
@@ -45,7 +45,7 @@ export function LoadingStrip({ tone }: Readonly<LoadingStripProps>) {
       <span className={clsx("relative mt-2 block h-0.5 overflow-hidden rounded", classes.track)}>
         <span
           className={clsx(
-            "absolute inset-s-[-40%] inset-y-0 w-2/5 bg-linear-to-r from-transparent to-transparent motion-safe:animate-sweep rtl:motion-safe:animate-sweep-rev",
+            "motion-safe:animate-sweep rtl:motion-safe:animate-sweep-rev absolute inset-y-0 inset-s-[-40%] w-2/5 bg-linear-to-r from-transparent to-transparent",
             classes.sweep,
           )}
         />

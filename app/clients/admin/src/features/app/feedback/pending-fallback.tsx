@@ -16,7 +16,7 @@ export function PendingFallback() {
         <span className="sr-only">{m.common_loading()}</span>
         <div
           aria-hidden
-          className="text-center font-mono text-[11px] text-current/50 uppercase tracking-[0.18em]"
+          className="text-center font-mono text-[11px] tracking-[0.18em] text-current/50 uppercase"
           dir="ltr"
         >
           LOADING
@@ -25,7 +25,7 @@ export function PendingFallback() {
           aria-hidden
           className="relative mt-2 block h-0.5 overflow-hidden rounded bg-current/12"
         >
-          <span className="absolute inset-s-[-40%] inset-y-0 w-2/5 bg-linear-to-r from-transparent via-current/70 to-transparent motion-safe:animate-[nc-sweep_2.6s_ease-in-out_infinite] rtl:motion-safe:animate-[nc-sweep-rev_2.6s_ease-in-out_infinite]" />
+          <span className="absolute inset-y-0 inset-s-[-40%] w-2/5 bg-linear-to-r from-transparent via-current/70 to-transparent motion-safe:animate-[nc-sweep_2.6s_ease-in-out_infinite] rtl:motion-safe:animate-[nc-sweep-rev_2.6s_ease-in-out_infinite]" />
         </span>
       </div>
     </div>

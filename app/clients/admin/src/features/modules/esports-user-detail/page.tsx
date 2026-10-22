@@ -117,7 +117,7 @@ function MemberHeader({
         <UserAvatar account={member.account ?? member.userId ?? ""} size={48} url={undefined} />
         <div className="flex flex-col gap-1">
           <Space size={8}>
-            <span className="font-semibold text-base">
+            <span className="text-base font-semibold">
               {member.nickname ?? m.esports_users_nickname_unset()}
             </span>
             {member.ageBand !== undefined && <Tag className="m-0">{bandLabel(member.ageBand)}</Tag>}

@@ -23,7 +23,7 @@ export function ChipIconButton({
     <button
       aria-label={label}
       className={clsx(
-        "inline-flex cursor-pointer items-center justify-center rounded-full border border-line bg-fill-quaternary p-2 text-ink-secondary outline-none backdrop-blur-[6px] transition-colors hover:border-ink-tertiary hover:text-ink focus-visible:border-primary focus-visible:text-ink disabled:cursor-not-allowed disabled:opacity-40",
+        "border-line bg-fill-quaternary text-ink-secondary hover:border-ink-tertiary hover:text-ink focus-visible:border-primary focus-visible:text-ink inline-flex cursor-pointer items-center justify-center rounded-full border p-2 backdrop-blur-[6px] transition-colors outline-none disabled:cursor-not-allowed disabled:opacity-40",
         className,
       )}
       disabled={disabled || undefined}

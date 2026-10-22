@@ -7,9 +7,9 @@
 export function AmbientBackdrop() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-      <div className="absolute top-[-14%] left-[-18%] size-[min(78vw,440px)] rounded-full bg-ambient-a opacity-[0.42] blur-[68px] motion-safe:animate-ambient-a" />
-      <div className="absolute right-[-16%] bottom-[-22%] size-[min(85vw,480px)] rounded-full bg-ambient-b opacity-[0.36] blur-[68px] motion-safe:animate-ambient-b" />
-      <div className="absolute top-[38%] left-[32%] size-[min(55vw,320px)] rounded-full bg-ambient-c opacity-[0.32] blur-[68px] motion-safe:animate-ambient-c" />
+      <div className="bg-ambient-a motion-safe:animate-ambient-a absolute top-[-14%] left-[-18%] size-[min(78vw,440px)] rounded-full opacity-[0.42] blur-[68px]" />
+      <div className="bg-ambient-b motion-safe:animate-ambient-b absolute right-[-16%] bottom-[-22%] size-[min(85vw,480px)] rounded-full opacity-[0.36] blur-[68px]" />
+      <div className="bg-ambient-c motion-safe:animate-ambient-c absolute top-[38%] left-[32%] size-[min(55vw,320px)] rounded-full opacity-[0.32] blur-[68px]" />
     </div>
   );
 }

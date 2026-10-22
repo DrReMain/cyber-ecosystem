@@ -57,9 +57,9 @@ export function ProfilePage() {
     <AmbientLayout>
       <div className="flex w-full flex-col gap-3 pb-20">
         <div className="flex items-center justify-between">
-          <h1 className="font-extrabold text-ink text-lg">{m.profile_title()}</h1>
+          <h1 className="text-ink text-lg font-extrabold">{m.profile_title()}</h1>
           <button
-            className="tap-zone rounded-full border border-danger/60 px-3 py-1.5 font-bold text-[11.5px] text-danger-text active:opacity-60 disabled:opacity-50"
+            className="tap-zone border-danger/60 text-danger-text rounded-full border px-3 py-1.5 text-[11.5px] font-bold active:opacity-60 disabled:opacity-50"
             disabled={loggingOut}
             onClick={() => setSheetOpen(true)}
             type="button"
@@ -73,9 +73,9 @@ export function ProfilePage() {
         <SecurityCard />
         <SoonCard description={m.profile_soon_desc()} title={m.profile_soon_title()} />
 
-        <div className="rounded-lg border border-line bg-surface-card p-4">
-          <div className="mb-2 font-extrabold text-ink text-sm">{m.profile_about()}</div>
-          <div className="flex gap-3.5 text-ink-tertiary text-xs">
+        <div className="border-line bg-surface-card rounded-lg border p-4">
+          <div className="text-ink mb-2 text-sm font-extrabold">{m.profile_about()}</div>
+          <div className="text-ink-tertiary flex gap-3.5 text-xs">
             {[m.login_agree_user_name(), m.login_agree_privacy_name(), m.profile_about_icp()].map(
               (label) => (
                 <button
@@ -91,7 +91,7 @@ export function ProfilePage() {
           </div>
         </div>
 
-        <div className="mt-2 text-center text-[10.5px] text-ink-tertiary leading-loose">
+        <div className="text-ink-tertiary mt-2 text-center text-[10.5px] leading-loose">
           {m.login_footer_company()}
           <br />
           {m.login_footer_icp()}

@@ -32,7 +32,7 @@ export function RoleCards({ roles, selected, onChange }: Readonly<RoleCardsProps
     <div className="grid grid-cols-2 gap-2">
       {roles.map((role) => (
         <div
-          className={`flex flex-col gap-1 rounded-lg border border-line-soft px-3 py-2 ${
+          className={`border-line-soft flex flex-col gap-1 rounded-lg border px-3 py-2 ${
             role.enabled ? "" : "opacity-50"
           }`}
           key={role.code}
@@ -41,7 +41,7 @@ export function RoleCards({ roles, selected, onChange }: Readonly<RoleCardsProps
             checked={selected.includes(role.code ?? "")}
             onChange={(e) => toggle(role.code ?? "", e.target.checked)}
           >
-            <span className="font-medium text-[13px]">{role.name}</span>
+            <span className="text-[13px] font-medium">{role.name}</span>
           </Checkbox>
           <div className="flex items-center gap-2 ps-6">
             <Typography.Text className="font-mono text-[12px]" type="secondary">
@@ -49,7 +49,7 @@ export function RoleCards({ roles, selected, onChange }: Readonly<RoleCardsProps
             </Typography.Text>
             {!role.enabled && <Tag className="ms-auto">{m.system_users_role_disabled()}</Tag>}
           </div>
-          <div className="ps-6 text-[12px] text-ink-tertiary">{grantsSummary(role)}</div>
+          <div className="text-ink-tertiary ps-6 text-[12px]">{grantsSummary(role)}</div>
         </div>
       ))}
     </div>

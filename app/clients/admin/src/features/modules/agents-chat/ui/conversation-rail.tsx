@@ -58,7 +58,7 @@ export function ConversationRail({
     label: conversation.title ?? conversationTitle(conversation),
     // Streaming swaps the glyph in place so labels never shift.
     icon: streamingIds.includes(conversation.id) ? (
-      <Loader2 className="size-3.5 animate-spin text-primary" />
+      <Loader2 className="text-primary size-3.5 animate-spin" />
     ) : (
       <MessageSquare className="size-3.5" />
     ),
@@ -140,7 +140,7 @@ export function ConversationRail({
         )}
       </div>
       {conversations.length === 0 && !loadingMore && (
-        <p className="px-4 py-3 text-[12px] text-ink-quaternary leading-relaxed">
+        <p className="text-ink-quaternary px-4 py-3 text-[12px] leading-relaxed">
           {m.agents_chat_rail_empty()}
         </p>
       )}

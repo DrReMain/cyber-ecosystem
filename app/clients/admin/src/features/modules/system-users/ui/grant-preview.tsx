@@ -67,7 +67,7 @@ export function GrantPreview({ operations, catalog, loading }: Readonly<GrantPre
   }
   if (operations.length === 0) {
     return (
-      <div className="rounded-lg bg-fill-quaternary px-3 py-3">
+      <div className="bg-fill-quaternary rounded-lg px-3 py-3">
         <Typography.Text className="text-[12px]" type="secondary">
           {m.system_users_preview_empty()}
         </Typography.Text>
@@ -78,7 +78,7 @@ export function GrantPreview({ operations, catalog, loading }: Readonly<GrantPre
   return (
     <div
       className={clsx(
-        "flex flex-col gap-2 rounded-lg bg-fill-quaternary px-3 py-2 transition-opacity",
+        "bg-fill-quaternary flex flex-col gap-2 rounded-lg px-3 py-2 transition-opacity",
         loading && "opacity-60",
       )}
     >
@@ -88,8 +88,8 @@ export function GrantPreview({ operations, catalog, loading }: Readonly<GrantPre
       {global ? (
         <>
           <span className="flex items-baseline gap-2">
-            <span className="font-medium text-[13px]">{m.system_users_preview_all_services()}</span>
-            <span className="font-mono text-[11px] text-ink-tertiary">/*</span>
+            <span className="text-[13px] font-medium">{m.system_users_preview_all_services()}</span>
+            <span className="text-ink-tertiary font-mono text-[11px]">/*</span>
           </span>
           {foldedServices > 0 && (
             <Typography.Text className="text-[12px]" type="secondary">
@@ -103,7 +103,7 @@ export function GrantPreview({ operations, catalog, loading }: Readonly<GrantPre
           return (
             <div className="flex flex-col gap-1" key={g.key}>
               <span className="flex items-baseline gap-2">
-                <span className="font-medium text-[13px]">
+                <span className="text-[13px] font-medium">
                   {meta?.comment || g.key.split(".").pop()}
                 </span>
                 <Typography.Text className="font-mono text-[11px]" type="secondary">

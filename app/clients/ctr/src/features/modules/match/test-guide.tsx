@@ -39,16 +39,16 @@ export function TestGuidePage() {
       <div className="flex w-full flex-col gap-3 pb-6">
         <FlowHeader onBack={() => void history.back()} title={m.match_guide_title()} />
 
-        <div className="rounded-lg border border-line bg-surface-card p-4">
+        <div className="border-line bg-surface-card rounded-lg border p-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-tile bg-cta-practice">
+            <div className="rounded-tile bg-cta-practice flex h-10 w-10 shrink-0 items-center justify-center">
               <Save aria-hidden className="text-white" size={18} />
             </div>
             <div>
-              <div className="font-extrabold text-[14.5px] text-ink">
+              <div className="text-ink text-[14.5px] font-extrabold">
                 {first ? m.match_guide_first() : m.match_guide_second()}
               </div>
-              <div className="mt-0.5 text-[11px] text-ink-tertiary">
+              <div className="text-ink-tertiary mt-0.5 text-[11px]">
                 {first
                   ? m.match_guide_first_sub({ n: count })
                   : m.match_guide_second_sub({ n: count })}
@@ -58,13 +58,13 @@ export function TestGuidePage() {
           <div className="mt-2">
             {rules.map(({ Icon, key, title, desc }) => (
               <div
-                className="flex gap-2.5 border-line-soft border-b py-2 last:border-b-0"
+                className="border-line-soft flex gap-2.5 border-b py-2 last:border-b-0"
                 key={key}
               >
-                <Icon aria-hidden className="mt-0.5 shrink-0 text-ink-secondary" size={17} />
+                <Icon aria-hidden className="text-ink-secondary mt-0.5 shrink-0" size={17} />
                 <div>
-                  <div className="font-bold text-[12.5px] text-ink">{title}</div>
-                  <div className="mt-0.5 text-[10.5px] text-ink-tertiary leading-relaxed">
+                  <div className="text-ink text-[12.5px] font-bold">{title}</div>
+                  <div className="text-ink-tertiary mt-0.5 text-[10.5px] leading-relaxed">
                     {desc}
                   </div>
                 </div>
@@ -73,19 +73,19 @@ export function TestGuidePage() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-line bg-surface-deep p-3.5 text-[11.5px] text-ink-tertiary leading-relaxed">
-          <span className="font-bold text-ink-secondary">{m.match_guide_score_t()}</span>：
+        <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[11.5px] leading-relaxed">
+          <span className="text-ink-secondary font-bold">{m.match_guide_score_t()}</span>：
           {m.match_guide_score_d()}
         </div>
 
         <button
-          className="w-full rounded-sm bg-cta-primary px-4 py-3 font-semibold text-white active:opacity-80"
+          className="bg-cta-primary w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80"
           onClick={() => toast.info(m.match_flow_soon())}
           type="button"
         >
           {m.match_guide_ready()}
         </button>
-        <div className="text-center text-[11px] text-ink-tertiary">{m.match_guide_keep()}</div>
+        <div className="text-ink-tertiary text-center text-[11px]">{m.match_guide_keep()}</div>
       </div>
     </AmbientLayout>
   );

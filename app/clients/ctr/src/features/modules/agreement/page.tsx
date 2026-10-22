@@ -43,29 +43,29 @@ export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
         <div className="flex items-center gap-3">
           <button
             aria-label={m.common_back()}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line text-ink-secondary active:opacity-60"
+            className="border-line text-ink-secondary flex h-11 w-11 shrink-0 items-center justify-center rounded-full border active:opacity-60"
             onClick={() => void history.back()}
             type="button"
           >
             <ChevronLeft aria-hidden size={18} />
           </button>
-          <h1 className="font-extrabold text-ink text-lg">{title}</h1>
+          <h1 className="text-ink text-lg font-extrabold">{title}</h1>
         </div>
 
-        <div className="text-[11.5px] text-ink-tertiary">
+        <div className="text-ink-tertiary text-[11.5px]">
           {m.agreement_version_line({ date: meta.effectiveDate, no: meta.no })}
           {" · "}
           {m.agreement_demo_note()}
         </div>
 
         {chapters.map((chapter) => (
-          <div className="rounded-lg border border-line bg-surface-card p-4" key={chapter.key}>
-            <div className="mb-1.5 font-extrabold text-[13.5px] text-ink">{chapter.title}</div>
-            <div className="text-[12.5px] text-ink-tertiary leading-[1.8]">{chapter.body}</div>
+          <div className="border-line bg-surface-card rounded-lg border p-4" key={chapter.key}>
+            <div className="text-ink mb-1.5 text-[13.5px] font-extrabold">{chapter.title}</div>
+            <div className="text-ink-tertiary text-[12.5px] leading-[1.8]">{chapter.body}</div>
           </div>
         ))}
 
-        <div className="rounded-lg border border-line bg-surface-deep p-3.5 text-[11.5px] text-ink-tertiary leading-relaxed">
+        <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[11.5px] leading-relaxed">
           {m.agreement_consent_note()}
         </div>
       </div>

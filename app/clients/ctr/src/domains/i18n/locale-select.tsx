@@ -85,7 +85,7 @@ export function LocaleSelect() {
 
   return (
     <span
-      className="relative inline-flex font-normal text-[13px] text-ink normal-case not-italic leading-none tracking-normal"
+      className="text-ink relative inline-flex text-[13px] leading-none font-normal tracking-normal normal-case not-italic"
       ref={rootRef}
     >
       <button
@@ -93,7 +93,7 @@ export function LocaleSelect() {
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-label="Language"
-        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-surface-input px-3.5 py-2 font-mono text-[11px] text-ink-secondary leading-none tracking-[0.16em] outline-none backdrop-blur-xs transition-colors hover:border-focus hover:text-ink focus-visible:border-focus focus-visible:text-ink"
+        className="border-line bg-surface-input text-ink-secondary hover:border-focus hover:text-ink focus-visible:border-focus focus-visible:text-ink inline-flex cursor-pointer items-center gap-2 rounded-full border px-3.5 py-2 font-mono text-[11px] leading-none tracking-[0.16em] backdrop-blur-xs transition-colors outline-none"
         onClick={() => setOpen((value) => !value)}
         onKeyDown={onTriggerKeyDown}
         ref={triggerRef}
@@ -107,7 +107,7 @@ export function LocaleSelect() {
         <div
           aria-activedescendant={`${listId}-${locales[active]}`}
           aria-label="Language"
-          className="absolute inset-e-0 top-full z-50 mt-2 min-w-50 rounded-control border border-line bg-surface-card p-1.5 shadow-card outline-none backdrop-blur-md"
+          className="rounded-control border-line bg-surface-card shadow-card absolute inset-e-0 top-full z-50 mt-2 min-w-50 border p-1.5 backdrop-blur-md outline-none"
           id={listId}
           onKeyDown={onListKeyDown}
           ref={listRef}
@@ -121,7 +121,7 @@ export function LocaleSelect() {
               <div
                 aria-selected={isSelected}
                 className={clsx(
-                  "flex cursor-pointer items-center justify-between gap-6 rounded-tile px-3 py-2 text-[13px] leading-normal outline-none transition-colors",
+                  "rounded-tile flex cursor-pointer items-center justify-between gap-6 px-3 py-2 text-[13px] leading-normal transition-colors outline-none",
                   isFocused && "bg-surface-active text-ink",
                   !isFocused && isSelected && "text-ink",
                   !(isFocused || isSelected) && "text-ink-secondary",
@@ -142,7 +142,7 @@ export function LocaleSelect() {
                 <span className="truncate" dir="auto">
                   {m.common_locale_name({ locale })}
                 </span>
-                <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-ink-tertiary tracking-[0.16em]">
+                <span className="text-ink-tertiary inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.16em]">
                   {locale}
                 </span>
               </div>

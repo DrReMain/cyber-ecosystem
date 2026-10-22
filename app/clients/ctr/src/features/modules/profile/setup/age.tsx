@@ -80,9 +80,9 @@ export function SetupAgePage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/nickname" })} step={2}>
-      <div className="rounded-lg border border-line bg-surface-card p-4">
-        <div className="mb-1 font-extrabold text-ink text-sm">{m.profile_birth_label()}</div>
-        <p className="mb-3 text-[11.5px] text-ink-tertiary leading-relaxed">
+      <div className="border-line bg-surface-card rounded-lg border p-4">
+        <div className="text-ink mb-1 text-sm font-extrabold">{m.profile_birth_label()}</div>
+        <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed">
           {m.profile_setup_birth_desc()}
         </p>
         <div className="flex gap-3">
@@ -122,24 +122,24 @@ export function SetupAgePage() {
           </select>
         </div>
         {complete && derivedBand !== null && (
-          <p className="mt-2 text-[10.5px] text-accent-info">
+          <p className="text-accent-info mt-2 text-[10.5px]">
             {m.profile_setup_band_derived({ band: bandLabel(derivedBand) ?? "" })}
           </p>
         )}
       </div>
 
       {needGuardian || minorNote ? (
-        <div className="rounded-lg border border-[rgba(245,158,11,0.5)] bg-surface-deep p-3.5 text-[11.5px] text-status-pending leading-relaxed">
+        <div className="bg-surface-deep text-status-pending rounded-lg border border-[rgba(245,158,11,0.5)] p-3.5 text-[11.5px] leading-relaxed">
           {needGuardian ? m.profile_minor_u13() : m.profile_minor_u18()}
         </div>
       ) : null}
 
       {needGuardian ? (
-        <label className="flex flex-col gap-1.5 rounded-lg border border-line bg-surface-deep p-3.5">
-          <span className="flex items-start gap-2 text-ink-secondary">
+        <label className="border-line bg-surface-deep flex flex-col gap-1.5 rounded-lg border p-3.5">
+          <span className="text-ink-secondary flex items-start gap-2">
             <input
               checked={guardian}
-              className="mt-0.5 h-4 w-4 shrink-0 accent-focus"
+              className="accent-focus mt-0.5 h-4 w-4 shrink-0"
               onChange={(event) => {
                 setGuardian(event.target.checked);
                 setError(null);
@@ -148,7 +148,7 @@ export function SetupAgePage() {
             />
             <span className="text-sm leading-snug">{m.profile_guardian()}</span>
           </span>
-          <span className="ml-6 text-[10.5px] text-ink-tertiary leading-snug">
+          <span className="text-ink-tertiary ml-6 text-[10.5px] leading-snug">
             {m.profile_guardian_note()}
           </span>
         </label>
@@ -161,7 +161,7 @@ export function SetupAgePage() {
       )}
 
       <Button
-        className="rounded-sm bg-cta-primary px-4 py-3 font-semibold text-white disabled:opacity-50"
+        className="bg-cta-primary rounded-sm px-4 py-3 font-semibold text-white disabled:opacity-50"
         isDisabled={updateMutation.isPending}
         onPress={() => void onNext()}
       >

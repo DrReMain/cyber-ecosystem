@@ -33,7 +33,7 @@ export function TestPage() {
       <StateScreen
         action={
           <button
-            className="cursor-pointer rounded-sm border border-line px-5 py-2.5 font-semibold text-ink-secondary text-sm active:opacity-80"
+            className="border-line text-ink-secondary cursor-pointer rounded-sm border px-5 py-2.5 text-sm font-semibold active:opacity-80"
             onClick={() => void navigate({ to: "/match" })}
             type="button"
           >

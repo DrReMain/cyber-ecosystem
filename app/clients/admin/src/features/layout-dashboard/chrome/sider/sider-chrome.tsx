@@ -34,7 +34,7 @@ export function SiderChrome({ collapsed, onToggleCollapse }: Readonly<SiderChrom
     <>
       <div
         className={clsx(
-          "flex h-14 flex-none items-center border-line-soft border-b font-mono font-semibold text-[12.5px] tracking-[0.2em]",
+          "border-line-soft flex h-14 flex-none items-center border-b font-mono text-[12.5px] font-semibold tracking-[0.2em]",
           collapsed ? "justify-center" : "gap-2.75 px-4",
         )}
       >
@@ -63,7 +63,7 @@ export function SiderChrome({ collapsed, onToggleCollapse }: Readonly<SiderChrom
 
       <div
         className={clsx(
-          "hidden h-12 flex-none items-center border-line-soft border-t px-3 lg:flex",
+          "border-line-soft hidden h-12 flex-none items-center border-t px-3 lg:flex",
           collapsed ? "justify-center" : "justify-between",
         )}
       >

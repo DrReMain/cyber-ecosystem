@@ -10,12 +10,6 @@
     ".": "./src/index.ts",
     "./route-transition": "./src/route-transition/index.ts"
   },
-  "scripts": {
-    "check": "biome check",
-    "format": "biome format",
-    "lint": "biome lint",
-    "typecheck": "tsc --noEmit"
-  },
   "dependencies": {
     "@cyber-ecosystem/shared-cookie": "workspace:*"
   },

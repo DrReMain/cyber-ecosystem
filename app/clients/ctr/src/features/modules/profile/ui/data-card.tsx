@@ -42,7 +42,7 @@ export function DataCard({ profile }: Readonly<{ profile: ProfilePB | undefined 
   ];
   return (
     <div className={CARD_CLASS}>
-      <div className="mb-1 font-extrabold text-ink text-sm">{m.profile_card_data()}</div>
+      <div className="text-ink mb-1 text-sm font-extrabold">{m.profile_card_data()}</div>
       {rows.map((row, index) => (
         <button
           className={`flex w-full items-center justify-between py-3 text-left active:opacity-60 ${
@@ -54,8 +54,8 @@ export function DataCard({ profile }: Readonly<{ profile: ProfilePB | undefined 
         >
           <span className="text-ink-secondary text-sm">{row.label}</span>
           <span className="ml-3 flex min-w-0 items-center gap-1.5">
-            <span className="truncate text-ink text-sm">{row.value}</span>
-            <ChevronRight aria-hidden className="shrink-0 text-ink-tertiary" size={14} />
+            <span className="text-ink truncate text-sm">{row.value}</span>
+            <ChevronRight aria-hidden className="text-ink-tertiary shrink-0" size={14} />
           </span>
         </button>
       ))}

@@ -32,36 +32,36 @@ export function SwitchConfirmPage() {
           title={m.match_switch_title()}
         />
 
-        <div className="rounded-lg border border-line bg-surface-card p-4">
+        <div className="border-line bg-surface-card rounded-lg border p-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex-1 rounded-tile bg-surface-deep p-3 text-center">
-              <div className="text-[10.5px] text-ink-tertiary">{m.match_switch_cur()}</div>
-              <div className="mt-1 font-extrabold text-ink text-sm">{genreLabel(cur)}</div>
+            <div className="rounded-tile bg-surface-deep flex-1 p-3 text-center">
+              <div className="text-ink-tertiary text-[10.5px]">{m.match_switch_cur()}</div>
+              <div className="text-ink mt-1 text-sm font-extrabold">{genreLabel(cur)}</div>
             </div>
-            <ArrowRight aria-hidden className="shrink-0 text-ink-tertiary" size={16} />
-            <div className="flex-1 rounded-tile border border-line-accent-purple/60 bg-surface-deep p-3 text-center">
-              <div className="text-[10.5px] text-ink-tertiary">{m.match_switch_tgt()}</div>
-              <div className="mt-1 font-extrabold text-ink text-sm">{genreLabel(tgt)}</div>
+            <ArrowRight aria-hidden className="text-ink-tertiary shrink-0" size={16} />
+            <div className="rounded-tile border-line-accent-purple/60 bg-surface-deep flex-1 border p-3 text-center">
+              <div className="text-ink-tertiary text-[10.5px]">{m.match_switch_tgt()}</div>
+              <div className="text-ink mt-1 text-sm font-extrabold">{genreLabel(tgt)}</div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-line bg-surface-deep p-3.5 text-[12px] text-ink-tertiary leading-relaxed">
-          <div className="font-bold text-ink-secondary">{m.match_switch_rules()}</div>
+        <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[12px] leading-relaxed">
+          <div className="text-ink-secondary font-bold">{m.match_switch_rules()}</div>
           <div className="mt-1.5">· {m.match_switch_rule1()}</div>
           <div>· {m.match_switch_rule2()}</div>
           <div>· {m.match_switch_rule3()}</div>
         </div>
 
         <button
-          className="w-full rounded-sm bg-cta-primary px-4 py-3 font-semibold text-white active:opacity-80"
+          className="bg-cta-primary w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80"
           onClick={onConfirm}
           type="button"
         >
           {m.match_switch_ok()}
         </button>
         <button
-          className="w-full rounded-sm border border-line bg-surface-content px-4 py-3 font-semibold text-ink active:opacity-60"
+          className="border-line bg-surface-content text-ink w-full rounded-sm border px-4 py-3 font-semibold active:opacity-60"
           onClick={() => void navigate({ to: "/match", search: { genre: cur } })}
           type="button"
         >

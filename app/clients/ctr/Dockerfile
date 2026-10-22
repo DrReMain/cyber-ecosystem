@@ -13,7 +13,7 @@ COPY . .
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm install --frozen-lockfile --ignore-scripts --store-dir /pnpm/store \
     --filter @cyber-ecosystem/ctr... --registry="${NPM_REGISTRY}"
-RUN pnpm --filter @cyber-ecosystem/ctr build
+RUN pnpm --filter @cyber-ecosystem/ctr exec vite build
 
 FROM node:24-alpine
 ARG NPM_REGISTRY=https://registry.npmjs.org/

@@ -41,25 +41,25 @@ export function LogoutSheet({ open, onCancel, onConfirm }: Readonly<LogoutSheetP
       }}
     >
       <Dialog
-        className="safe-mb mx-3 w-full max-w-md rounded-2xl border border-line bg-surface-card p-4 pb-6 outline-none"
+        className="safe-mb border-line bg-surface-card mx-3 w-full max-w-md rounded-2xl border p-4 pb-6 outline-none"
         role="alertdialog"
       >
         <div className="flex flex-col items-center gap-1 pb-4">
-          <div className="font-bold text-ink text-sm">{m.profile_logout_title()}</div>
-          <p className="text-center text-[11.5px] text-ink-tertiary leading-relaxed">
+          <div className="text-ink text-sm font-bold">{m.profile_logout_title()}</div>
+          <p className="text-ink-tertiary text-center text-[11.5px] leading-relaxed">
             {m.profile_logout_body()}
           </p>
         </div>
         <div className="flex gap-3">
           <Button
             autoFocus
-            className="flex-1 rounded-sm border border-line px-4 py-2.5 text-ink-secondary text-sm"
+            className="border-line text-ink-secondary flex-1 rounded-sm border px-4 py-2.5 text-sm"
             onPress={onCancel}
           >
             {m.profile_logout_cancel()}
           </Button>
           <Button
-            className="flex-1 rounded-sm border border-danger-border bg-danger/20 px-4 py-2.5 font-bold text-danger-text text-sm"
+            className="border-danger-border bg-danger/20 text-danger-text flex-1 rounded-sm border px-4 py-2.5 text-sm font-bold"
             onPress={onConfirm}
           >
             {m.profile_logout_confirm()}

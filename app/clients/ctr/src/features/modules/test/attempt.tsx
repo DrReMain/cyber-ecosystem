@@ -97,7 +97,7 @@ export function TestAttempt({
   }, [navigate]);
 
   return (
-    <div className="safe-pb safe-pt relative isolate flex h-app flex-col overflow-hidden bg-canvas text-ink">
+    <div className="safe-pb safe-pt h-app bg-canvas text-ink relative isolate flex flex-col overflow-hidden">
       <TestHud
         canPause={phase === "running" && !paused}
         onPause={pauseRun}

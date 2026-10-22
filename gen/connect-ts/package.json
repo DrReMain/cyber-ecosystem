@@ -6,9 +6,6 @@
   "dependencies": {
     "@bufbuild/protobuf": "2.16.0"
   },
-  "scripts": {
-    "typecheck": "tsc -p ."
-  },
   "devDependencies": {
     "typescript": "7.0.2"
   }

@@ -30,7 +30,7 @@ export function ErrorFallback({
   return (
     <div className="flex size-full min-h-24 grow flex-col items-center justify-center gap-2 p-4 text-center">
       <span
-        className="rounded-full border border-current/15 px-2.5 py-0.75 font-mono text-[9.5px] text-current/40 uppercase tracking-[0.18em]"
+        className="rounded-full border border-current/15 px-2.5 py-0.75 font-mono text-[9.5px] tracking-[0.18em] text-current/40 uppercase"
         dir="ltr"
       >
         {`ERR · ${resolved.kind.toUpperCase()}`}

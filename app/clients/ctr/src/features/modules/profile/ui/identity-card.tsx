@@ -17,19 +17,19 @@ export function IdentityCard({ profile }: Readonly<{ profile: ProfilePB | undefi
     .filter((part): part is string => part !== null && part !== undefined)
     .join(" · ");
   return (
-    <div className="rounded-2xl border border-line-accent-blue bg-identity p-4">
+    <div className="border-line-accent-blue bg-identity rounded-2xl border p-4">
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cta-primary">
+        <div className="bg-cta-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
           <User aria-hidden className="text-white" size={20} />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="truncate font-black text-base text-ink">
+          <div className="text-ink truncate text-base font-black">
             {profile?.nickname ?? m.profile_unset()}
           </div>
           <div className="mt-1.5 flex gap-1.5">
             {[m.profile_msg(), m.profile_feedback()].map((label) => (
               <button
-                className="tap-zone rounded-full bg-ink/8 px-3 py-1 text-ink-secondary text-xs active:opacity-60"
+                className="tap-zone bg-ink/8 text-ink-secondary rounded-full px-3 py-1 text-xs active:opacity-60"
                 key={label}
                 onClick={() => toast.info(m.common_soon())}
                 type="button"
@@ -40,7 +40,7 @@ export function IdentityCard({ profile }: Readonly<{ profile: ProfilePB | undefi
           </div>
         </div>
       </div>
-      {meta !== "" && <p className="mt-3 text-[11px] text-ink-tertiary">{meta}</p>}
+      {meta !== "" && <p className="text-ink-tertiary mt-3 text-[11px]">{meta}</p>}
     </div>
   );
 }

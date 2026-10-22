@@ -61,7 +61,7 @@ export function WechatCallbackPage() {
       }
     })();
     return (
-      <main className="safe-px safe-pt flex min-h-app flex-col items-center justify-center gap-3">
+      <main className="safe-px safe-pt min-h-app flex flex-col items-center justify-center gap-3">
         <p className="text-danger-text">{copy}</p>
         <Link className="text-ink-secondary text-sm underline" to="/login">
           {m.login_back()}
@@ -71,7 +71,7 @@ export function WechatCallbackPage() {
   }
 
   return (
-    <main className="safe-px safe-pt flex min-h-app items-center justify-center">
+    <main className="safe-px safe-pt min-h-app flex items-center justify-center">
       <p className="text-ink-tertiary">{m.login_callback_pending()}</p>
     </main>
   );

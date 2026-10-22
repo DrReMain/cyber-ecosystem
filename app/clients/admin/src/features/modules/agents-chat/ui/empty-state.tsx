@@ -29,10 +29,10 @@ export function EmptyState({ model, onSuggest, onConfigure }: Readonly<EmptyStat
   ];
 
   return (
-    <div className="relative flex grow items-center justify-center overflow-y-auto overflow-x-hidden">
+    <div className="relative flex grow items-center justify-center overflow-x-hidden overflow-y-auto">
       <div
         aria-hidden
-        className="absolute top-0 left-1/2 h-140 w-140 -translate-x-1/2 -translate-y-35 rounded-full bg-primary/10 blur-3xl"
+        className="bg-primary/10 absolute top-0 left-1/2 h-140 w-140 -translate-x-1/2 -translate-y-35 rounded-full blur-3xl"
       />
       <div className="relative flex max-w-2xl flex-col items-center px-6 py-8 text-center">
         <Welcome
@@ -50,8 +50,8 @@ export function EmptyState({ model, onSuggest, onConfigure }: Readonly<EmptyStat
           </Button>
         ) : (
           <>
-            <span className="mt-4 inline-flex h-6 items-center gap-1.5 rounded-control-sm border border-line-soft px-2 text-[11.5px] text-primary">
-              <i className="size-1.5 rounded-full bg-success" />
+            <span className="rounded-control-sm border-line-soft text-primary mt-4 inline-flex h-6 items-center gap-1.5 border px-2 text-[11.5px]">
+              <i className="bg-success size-1.5 rounded-full" />
               {m.agents_chat_welcome_ready({ model: model ?? "" })}
             </span>
             <Prompts
@@ -60,7 +60,7 @@ export function EmptyState({ model, onSuggest, onConfigure }: Readonly<EmptyStat
                 key,
                 description,
                 icon: (
-                  <span className="flex size-7 items-center justify-center rounded-control-sm bg-fill-quaternary text-primary">
+                  <span className="rounded-control-sm bg-fill-quaternary text-primary flex size-7 items-center justify-center">
                     <Icon className="size-4" />
                   </span>
                 ),
@@ -68,7 +68,7 @@ export function EmptyState({ model, onSuggest, onConfigure }: Readonly<EmptyStat
               }))}
               onItemClick={({ data }) => onSuggest?.(data.key)}
               title={
-                <span className="text-[12px] text-ink-quaternary">
+                <span className="text-ink-quaternary text-[12px]">
                   {m.agents_chat_suggest_label()}
                 </span>
               }
@@ -76,7 +76,7 @@ export function EmptyState({ model, onSuggest, onConfigure }: Readonly<EmptyStat
             />
           </>
         )}
-        <div className="mt-6 text-[11.5px] text-ink-quaternary">
+        <div className="text-ink-quaternary mt-6 text-[11.5px]">
           {m.agents_chat_welcome_privacy()}
         </div>
       </div>

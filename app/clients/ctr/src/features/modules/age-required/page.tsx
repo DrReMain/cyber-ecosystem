@@ -67,23 +67,23 @@ export function AgeRequiredPage() {
   return (
     <AmbientLayout>
       <div className="flex w-full flex-col gap-3 pb-6">
-        <h1 className="text-center font-extrabold text-ink text-lg">{m.age_required_title()}</h1>
+        <h1 className="text-ink text-center text-lg font-extrabold">{m.age_required_title()}</h1>
 
-        <div className="rounded-lg border border-line bg-surface-card p-4">
+        <div className="border-line bg-surface-card rounded-lg border p-4">
           <div className="mb-3 flex items-center gap-2.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-tile bg-cta-practice">
+            <div className="rounded-tile bg-cta-practice flex h-10 w-10 shrink-0 items-center justify-center">
               <Cake aria-hidden className="text-white" size={20} />
             </div>
             <div>
-              <div className="font-extrabold text-[14px] text-ink">
+              <div className="text-ink text-[14px] font-extrabold">
                 {m.age_required_card_title()}
               </div>
-              <div className="mt-0.5 text-[11px] text-ink-tertiary">
+              <div className="text-ink-tertiary mt-0.5 text-[11px]">
                 {m.age_required_card_sub()}
               </div>
             </div>
           </div>
-          <p className="mb-3 text-[11.5px] text-ink-tertiary leading-[1.75]">
+          <p className="text-ink-tertiary mb-3 text-[11.5px] leading-[1.75]">
             {m.age_required_desc()}
           </p>
           <div className="flex gap-3">
@@ -123,33 +123,33 @@ export function AgeRequiredPage() {
             </select>
           </div>
           {error !== null && (
-            <p className="mt-2 text-danger-text text-sm" role="alert">
+            <p className="text-danger-text mt-2 text-sm" role="alert">
               {error}
             </p>
           )}
         </div>
 
-        <div className="rounded-lg border border-line bg-surface-deep p-3.5 text-[11.5px] text-ink-tertiary leading-[1.85]">
-          <span className="font-bold text-ink-secondary">{m.age_required_warn_must()}</span>
+        <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[11.5px] leading-[1.85]">
+          <span className="text-ink-secondary font-bold">{m.age_required_warn_must()}</span>
           <br />
           {m.age_required_warn_exit()}
         </div>
 
         <Button
-          className="w-full rounded-sm bg-cta-practice px-4 py-3 font-semibold text-white active:opacity-80 disabled:opacity-50"
+          className="bg-cta-practice w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80 disabled:opacity-50"
           isDisabled={updateMutation.isPending}
           onPress={() => void onSave()}
         >
           {updateMutation.isPending ? m.common_loading() : m.age_required_btn_save()}
         </Button>
         <Button
-          className="w-full rounded-sm bg-cta-primary px-4 py-3 font-semibold text-white active:opacity-80"
+          className="bg-cta-primary w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80"
           onPress={() => void navigate({ to: "/" })}
         >
           {m.age_required_btn_free()}
         </Button>
         <Button
-          className="w-full rounded-sm border border-line px-4 py-3 font-semibold text-ink-secondary active:opacity-80"
+          className="border-line text-ink-secondary w-full rounded-sm border px-4 py-3 font-semibold active:opacity-80"
           onPress={() => void navigate({ to: "/" })}
         >
           {m.age_required_btn_home()}

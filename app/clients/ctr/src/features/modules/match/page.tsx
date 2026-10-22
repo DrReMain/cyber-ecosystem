@@ -66,25 +66,25 @@ export function MatchPage() {
         {meta !== null && genre !== null ? (
           <>
             <div
-              className={`${meta.gradient} flex items-center gap-3 overflow-hidden rounded-card border border-line p-4`}
+              className={`${meta.gradient} rounded-card border-line flex items-center gap-3 overflow-hidden border p-4`}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-black/25 text-white text-xl">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-black/25 text-xl text-white">
                 <Icon aria-hidden size={22} />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="font-black text-[17px] text-white leading-tight">{meta.cn}</div>
-                <div className="mt-0.5 text-[10.5px] text-white/80 tracking-[1.6px]">{meta.en}</div>
+                <div className="text-[17px] leading-tight font-black text-white">{meta.cn}</div>
+                <div className="mt-0.5 text-[10.5px] tracking-[1.6px] text-white/80">{meta.en}</div>
               </div>
-              <span className="shrink-0 rounded-full bg-white/20 px-2.5 py-1 font-extrabold text-[10.5px] text-white">
+              <span className="shrink-0 rounded-full bg-white/20 px-2.5 py-1 text-[10.5px] font-extrabold text-white">
                 {switched ? m.match_tag_switched() : m.match_tag_default()}
               </span>
             </div>
 
             <div className="mb-1 flex items-baseline justify-between px-0.5">
-              <span className="text-[11.5px] text-ink-tertiary">
+              <span className="text-ink-tertiary text-[11.5px]">
                 {m.match_sub({ n: steps.length })}
               </span>
-              <span className="font-extrabold text-[12.5px] text-status-ok">
+              <span className="text-status-ok text-[12.5px] font-extrabold">
                 {m.match_done({ done: 0, total: steps.length })}
               </span>
             </div>
@@ -94,23 +94,23 @@ export function MatchPage() {
                 const word = abilityWord(step.ability);
                 return (
                   <div
-                    className="flex items-center gap-2.5 rounded-lg border border-line bg-surface-card p-3"
+                    className="border-line bg-surface-card flex items-center gap-2.5 rounded-lg border p-3"
                     key={step.code}
                   >
                     <div
-                      className={`${word.gradient} flex h-9 w-9 shrink-0 items-center justify-center rounded-tile font-bold text-[15px] text-white`}
+                      className={`${word.gradient} rounded-tile flex h-9 w-9 shrink-0 items-center justify-center text-[15px] font-bold text-white`}
                     >
                       {i + 1}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="font-extrabold text-ink text-sm">{word.cn}</div>
-                      <div className="mt-0.5 text-[9.5px] text-ink-tertiary tracking-[0.9px]">
+                      <div className="text-ink text-sm font-extrabold">{word.cn}</div>
+                      <div className="text-ink-tertiary mt-0.5 text-[9.5px] tracking-[0.9px]">
                         {word.en}
                       </div>
                     </div>
                     <div className="shrink-0 text-right">
-                      <div className="text-[12px] text-ink-secondary">{step.name}</div>
-                      <div className="mt-0.5 text-[10px] text-ink-tertiary">
+                      <div className="text-ink-secondary text-[12px]">{step.name}</div>
+                      <div className="text-ink-tertiary mt-0.5 text-[10px]">
                         {m.match_step_time()}
                       </div>
                     </div>
@@ -120,7 +120,7 @@ export function MatchPage() {
             </div>
 
             <button
-              className="mt-2 w-full rounded-sm bg-cta-primary px-4 py-3 font-semibold text-white active:opacity-80"
+              className="bg-cta-primary mt-2 w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80"
               onClick={onStart}
               type="button"
             >
@@ -128,14 +128,14 @@ export function MatchPage() {
             </button>
             <div className="flex gap-2">
               <button
-                className="flex-1 rounded-sm border border-line bg-surface-content px-3 py-2.5 font-semibold text-[12.5px] text-ink active:opacity-60"
+                className="border-line bg-surface-content text-ink flex-1 rounded-sm border px-3 py-2.5 text-[12.5px] font-semibold active:opacity-60"
                 onClick={() => void navigate({ to: "/match/guide" })}
                 type="button"
               >
                 {m.match_btn_guide()}
               </button>
               <button
-                className="flex-1 rounded-sm border border-line bg-surface-content px-3 py-2.5 font-semibold text-[12.5px] text-ink active:opacity-60"
+                className="border-line bg-surface-content text-ink flex-1 rounded-sm border px-3 py-2.5 text-[12.5px] font-semibold active:opacity-60"
                 onClick={() =>
                   void navigate({ to: "/match/switch", search: genre ? { from: genre } : {} })
                 }

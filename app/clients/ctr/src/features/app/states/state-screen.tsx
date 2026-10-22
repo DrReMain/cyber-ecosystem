@@ -41,21 +41,21 @@ export function StateScreen({ variant, title, description, action }: Readonly<St
           <LoadingStrip tone="ink" />
         </>
       ) : (
-        <span className="flex size-14 items-center justify-center rounded-card border border-line-soft bg-surface-content text-ink-tertiary">
+        <span className="rounded-card border-line-soft bg-surface-content text-ink-tertiary flex size-14 items-center justify-center border">
           <Inbox aria-hidden className="size-6" strokeWidth={1.5} />
         </span>
       )}
 
       <h2
         className={clsx(
-          "text-balance font-semibold text-ink tracking-[0.02em] rtl:tracking-normal",
-          loading ? "mt-5 text-base text-ink-secondary" : "mt-5 text-lg",
+          "text-ink font-semibold tracking-[0.02em] text-balance rtl:tracking-normal",
+          loading ? "text-ink-secondary mt-5 text-base" : "mt-5 text-lg",
         )}
       >
         {heading}
       </h2>
       {body ? (
-        <p className="mt-2 max-w-sm text-balance text-ink-secondary text-sm leading-relaxed">
+        <p className="text-ink-secondary mt-2 max-w-sm text-sm leading-relaxed text-balance">
           {body}
         </p>
       ) : null}

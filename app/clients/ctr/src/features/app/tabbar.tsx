@@ -42,7 +42,7 @@ const TABS: readonly TabSpec[] = [
 export function TabBar({ active }: Readonly<{ active: TabKey }>) {
   const navigate = useNavigate();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-line-soft border-t bg-surface-card/95 backdrop-blur-md">
+    <nav className="border-line-soft bg-surface-card/95 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-md items-stretch">
         {TABS.map((tab) => {
           const Icon = tab.icon;

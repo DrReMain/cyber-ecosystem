@@ -172,23 +172,23 @@ export function LoginPage() {
     <AmbientLayout dense>
       <div className="flex w-full flex-col gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cta-primary">
+          <div className="bg-cta-primary flex h-11 w-11 items-center justify-center rounded-xl">
             <Zap aria-hidden className="text-white" size={22} />
           </div>
           <div>
-            <div className="font-extrabold text-ink text-xl">{m.login_brand_name()}</div>
-            <div className="mt-0.5 text-[11.5px] text-ink-tertiary">{m.login_brand_tagline()}</div>
+            <div className="text-ink text-xl font-extrabold">{m.login_brand_name()}</div>
+            <div className="text-ink-tertiary mt-0.5 text-[11.5px]">{m.login_brand_tagline()}</div>
           </div>
         </div>
 
         {/* Segment keeps the prototype's two-mode shape; the SMS tab is a
             disabled slot until the system SMS contract exists. */}
-        <div className="flex overflow-hidden rounded-sm border border-line text-sm">
-          <div className="flex-1 bg-surface-content py-2.5 text-center font-bold text-ink">
+        <div className="border-line flex overflow-hidden rounded-sm border text-sm">
+          <div className="bg-surface-content text-ink flex-1 py-2.5 text-center font-bold">
             {m.login_tab_password()}
           </div>
           <button
-            className="flex-1 py-2.5 text-center text-ink-tertiary/60 active:opacity-60"
+            className="text-ink-tertiary/60 flex-1 py-2.5 text-center active:opacity-60"
             onClick={() => toast.info(m.common_soon())}
             type="button"
           >
@@ -214,7 +214,7 @@ export function LoginPage() {
               <p className="text-danger-text text-sm leading-snug">{errorCopy}</p>
               {systemReason(serverReason) === System.LOGIN_SEAT_REQUIRED && (
                 <button
-                  className="tap-zone shrink-0 font-bold text-ink-secondary underline active:opacity-60"
+                  className="tap-zone text-ink-secondary shrink-0 font-bold underline active:opacity-60"
                   onClick={() => {
                     formRef.current?.reset();
                     setServerReason(undefined);
@@ -280,7 +280,7 @@ export function LoginPage() {
             </CheckboxField>
             {/* Select-all rides the user row's line: one tap covers both. */}
             <div className="flex items-start justify-between gap-2.5">
-              <span className="ml-6 text-[10.5px] text-ink-tertiary leading-snug">
+              <span className="text-ink-tertiary ml-6 text-[10.5px] leading-snug">
                 {m.login_agree_minor_note()}
               </span>
               <CheckboxField
@@ -292,7 +292,7 @@ export function LoginPage() {
                 }}
               >
                 <CheckboxButton>
-                  <div className="flex items-center gap-2 whitespace-nowrap font-bold text-ink-secondary">
+                  <div className="text-ink-secondary flex items-center gap-2 font-bold whitespace-nowrap">
                     <AgreeBox
                       checked={agree.user && agree.privacy}
                       indeterminate={agree.user !== agree.privacy}
@@ -314,7 +314,7 @@ export function LoginPage() {
         </Form>
 
         <Button
-          className={`rounded-sm bg-wechat px-4 py-3 font-semibold text-white disabled:opacity-50 ${
+          className={`bg-wechat rounded-sm px-4 py-3 font-semibold text-white disabled:opacity-50 ${
             wechatEnv ? "" : "opacity-55"
           }`}
           isDisabled={wechatPending}
@@ -324,7 +324,7 @@ export function LoginPage() {
         </Button>
 
         {/* Forgot-password stays contract-gated (SMS provider). */}
-        <div className="text-center text-[10.5px] text-ink-tertiary leading-relaxed">
+        <div className="text-ink-tertiary text-center text-[10.5px] leading-relaxed">
           <button
             className="tap-zone py-1 underline active:opacity-60"
             onClick={() => toast.info(m.common_soon())}
@@ -341,7 +341,7 @@ export function LoginPage() {
             {m.login_agree_privacy_name()}
           </Link>
         </div>
-        <div className="text-center text-[10.5px] text-ink-tertiary leading-loose">
+        <div className="text-ink-tertiary text-center text-[10.5px] leading-loose">
           {m.login_footer_company()}
           <br />
           {m.login_footer_icp()}

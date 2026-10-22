@@ -33,7 +33,7 @@ export function TestBootstrap({ id, code, fallbackName }: Readonly<TestBootstrap
       <StateScreen
         action={
           <Button
-            className="cursor-pointer rounded-sm bg-cta-primary px-5 py-2.5 font-semibold text-sm text-white active:opacity-80"
+            className="bg-cta-primary cursor-pointer rounded-sm px-5 py-2.5 text-sm font-semibold text-white active:opacity-80"
             onPress={() => {
               void testQuery.refetch();
               void configQuery.refetch();
@@ -53,7 +53,7 @@ export function TestBootstrap({ id, code, fallbackName }: Readonly<TestBootstrap
       <StateScreen
         action={
           <Button
-            className="cursor-pointer rounded-sm border border-line px-5 py-2.5 font-semibold text-ink-secondary text-sm active:opacity-80"
+            className="border-line text-ink-secondary cursor-pointer rounded-sm border px-5 py-2.5 text-sm font-semibold active:opacity-80"
             onPress={() => void navigate({ to: "/match" })}
           >
             {m.test_no_engine_exit()}

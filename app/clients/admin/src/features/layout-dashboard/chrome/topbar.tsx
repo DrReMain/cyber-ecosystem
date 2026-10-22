@@ -43,7 +43,7 @@ export function Topbar({ className }: Readonly<TopbarProps>) {
   return (
     <Layout.Header
       className={clsx(
-        "sticky top-0 z-40 flex items-center justify-between border-line-soft border-b px-4",
+        "border-line-soft sticky top-0 z-40 flex items-center justify-between border-b px-4",
         className,
       )}
     >

@@ -35,7 +35,7 @@ export function AmbientLayout({
   return (
     <div
       className={clsx(
-        "safe-pb safe-pt relative isolate flex flex-col overflow-hidden bg-canvas text-ink",
+        "safe-pb safe-pt bg-canvas text-ink relative isolate flex flex-col overflow-hidden",
         capped ? "h-app" : "min-h-app",
       )}
     >

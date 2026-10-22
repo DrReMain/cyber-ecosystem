@@ -59,8 +59,8 @@ export function ServiceBlock({
     expanded.has(op) || (grants[op]?.policies.length ?? 0) > 0;
 
   return (
-    <div className="rounded-lg border border-line-soft">
-      <div className="flex items-center gap-2 border-line-soft border-b px-3 py-2">
+    <div className="border-line-soft rounded-lg border">
+      <div className="border-line-soft flex items-center gap-2 border-b px-3 py-2">
         <Checkbox
           checked={covered === svc.methods.length && covered > 0}
           disabled={globalOn}
@@ -78,22 +78,22 @@ export function ServiceBlock({
           onClick={onToggle}
           type="button"
         >
-          <span className="min-w-0 flex-1 truncate font-mono text-[13px] text-ink-tertiary">
+          <span className="text-ink-tertiary min-w-0 flex-1 truncate font-mono text-[13px]">
             {svc.fullName}
           </span>
           <ChevronDown
-            className={`size-3.5 shrink-0 text-ink-quaternary transition-transform ${open ? "" : "-rotate-90"}`}
+            className={`text-ink-quaternary size-3.5 shrink-0 transition-transform ${open ? "" : "-rotate-90"}`}
           />
         </button>
       </div>
       {open ? (
         <div className="flex flex-col">
           {wildOn && (
-            <div className="m-2 flex min-h-9 flex-col gap-1 rounded border border-primary border-dashed bg-primary/5 px-3 py-2">
+            <div className="border-primary bg-primary/5 m-2 flex min-h-9 flex-col gap-1 rounded border border-dashed px-3 py-2">
               <div className="flex flex-col gap-1">
                 <div className="flex gap-2">
                   <span className="text-[14px]">{m.system_roles_perm_wildcard()}</span>
-                  <span className="inline-flex items-center gap-2 rounded bg-fill-secondary px-1.5 py-0.5 font-mono text-[12px]">
+                  <span className="bg-fill-secondary inline-flex items-center gap-2 rounded px-1.5 py-0.5 font-mono text-[12px]">
                     {svc.fullName}/*
                   </span>
                 </div>

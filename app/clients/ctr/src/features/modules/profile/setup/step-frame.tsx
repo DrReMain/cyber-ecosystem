@@ -27,14 +27,14 @@ export function StepFrame({ step, onBack, children }: Readonly<StepFrameProps>) 
         <div className="flex items-center gap-3">
           <button
             aria-label={m.common_back()}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line text-ink-secondary active:opacity-60"
+            className="border-line text-ink-secondary flex h-11 w-11 shrink-0 items-center justify-center rounded-full border active:opacity-60"
             onClick={onBack}
             type="button"
           >
             <ChevronLeft aria-hidden size={18} />
           </button>
-          <h1 className="font-extrabold text-ink text-lg">{m.profile_setup_title()}</h1>
-          <span className="ml-auto text-ink-tertiary text-xs">
+          <h1 className="text-ink text-lg font-extrabold">{m.profile_setup_title()}</h1>
+          <span className="text-ink-tertiary ml-auto text-xs">
             {m.profile_setup_step({ n: step, total: TOTAL_STEPS })}
           </span>
         </div>

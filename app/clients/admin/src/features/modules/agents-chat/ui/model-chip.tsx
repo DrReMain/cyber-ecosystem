@@ -15,7 +15,7 @@ interface ModelChipProps {
 // instead of a hand-rolled popover.
 export function ModelChip({ models, model, loading, onModelChange }: Readonly<ModelChipProps>) {
   const items = models.map((id) => ({
-    extra: id === model ? <Check className="size-3.5 text-primary" /> : undefined,
+    extra: id === model ? <Check className="text-primary size-3.5" /> : undefined,
     label: <span className="max-w-48 truncate">{id}</span>,
     value: id,
   }));
@@ -25,7 +25,7 @@ export function ModelChip({ models, model, loading, onModelChange }: Readonly<Mo
       {({ onTrigger, onKeyDown, open }) => (
         <button
           className={clsx(
-            "inline-flex h-7 max-w-56 items-center gap-1.5 rounded-control border border-line-soft px-2.5 text-[12px] text-ink-secondary transition-colors hover:border-line hover:text-ink",
+            "rounded-control border-line-soft text-ink-secondary hover:border-line hover:text-ink inline-flex h-7 max-w-56 items-center gap-1.5 border px-2.5 text-[12px] transition-colors",
             open && "border-line bg-fill-quaternary text-ink",
           )}
           onClick={() => (open ? onTrigger(false) : onTrigger())}
@@ -35,14 +35,14 @@ export function ModelChip({ models, model, loading, onModelChange }: Readonly<Mo
           {loading && model === undefined ? (
             <Loader2 className="size-3.5 animate-spin" />
           ) : (
-            <Zap className="size-3.5 text-ink-quaternary" />
+            <Zap className="text-ink-quaternary size-3.5" />
           )}
           <span className="truncate">
             {model ?? (loading ? m.agents_chat_model_loading() : m.agents_chat_model_empty())}
           </span>
           <ChevronDown
             className={clsx(
-              "size-3 shrink-0 text-ink-quaternary transition-transform",
+              "text-ink-quaternary size-3 shrink-0 transition-transform",
               open && "rotate-180",
             )}
           />

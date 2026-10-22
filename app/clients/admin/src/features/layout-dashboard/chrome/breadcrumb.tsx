@@ -29,13 +29,13 @@ const appendages = (isFirst: boolean, isLast: boolean) => (
     {isFirst ? null : (
       <span
         aria-hidden
-        className={clsx("absolute -inset-s-7 inset-y-0 w-7.25 bg-inherit", NOTCH)}
+        className={clsx("absolute inset-y-0 -inset-s-7 w-7.25 bg-inherit", NOTCH)}
       />
     )}
     {isLast ? null : (
       <span
         aria-hidden
-        className={clsx("absolute -inset-e-3.5 inset-y-0 w-3.75 bg-inherit", TIP)}
+        className={clsx("absolute inset-y-0 -inset-e-3.5 w-3.75 bg-inherit", TIP)}
       />
     )}
   </>
@@ -80,7 +80,7 @@ export function Breadcrumb() {
             <li
               aria-current={isLast ? "page" : undefined}
               className={clsx(
-                "relative flex h-7 select-none items-center gap-1.5 bg-layout text-ink-secondary",
+                "bg-layout text-ink-secondary relative flex h-7 items-center gap-1.5 select-none",
                 capFor(isFirst, isLast),
                 isFirst ? "ps-3.75" : "ps-1.25",
                 isLast ? "pe-3.75" : "pe-2",
@@ -96,7 +96,7 @@ export function Breadcrumb() {
                 <button
                   className={clsx(
                     LABEL,
-                    "cursor-pointer text-start outline-none focus-visible:bg-fill-secondary",
+                    "focus-visible:bg-fill-secondary cursor-pointer text-start outline-none",
                   )}
                   onClick={() => navTo(router, targets.get(crumb.path) ?? crumb.path)}
                   type="button"

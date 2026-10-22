@@ -1,0 +1,36 @@
+{
+  "$schema": "../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "@cyber-ecosystem/shared-store",
+  "root": "shared-ts/store",
+  "projectType": "library",
+  "targets": {
+    "check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm exec biome check"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm exec biome format"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm exec biome lint"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm exec tsc --noEmit"
+      }
+    }
+  }
+}
