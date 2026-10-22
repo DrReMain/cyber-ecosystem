@@ -8,7 +8,7 @@
 |---|---|---|
 | lzx | E0 契约(种子+增量2/3/4)、E1 骨架、E2 schema+种子、E3 评分(框架+Tier A 六款+提交缝,ce763107)、E6a/E6b、会员读面+admin 用户管理(88bcd9ba/3f272b28)、system 组合缝 ListUsersByPopulation(a8b9f0a4) | **▶ 视觉对齐批 V1 ✅ V2 ✅ V3 ✅(首页+编排+个人中心,genre 120°/mcard 族/fab 全族;待提交)→ admin 交互/文案对齐批(D-AK)**;后排:Tier A 余款四款(W3,首片 number_stars 补 CP1「过半」)→ E4(W4)→ PAY1+E8(W5) |
 | hzy | H1 系统态件、H2 协议页、H-A 引擎框架、H-B 反应瞄准批(四款引擎,mock 净拔除)、10-22 精修批(控制台三红根治/profile 写缝/D-AG 落地/C3) | **H-C 判定回路闭环(已分配 10-23,D-AJ 首例,冒烟唯一硬断点)** → E7 追踪技能批(W2-3 起);挂起:D-AG/C3 实机走查随下次登录 |
-| ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:**性别字段(原型必选 vs 契约无,W2)**、P8(E5 前,W4 末;含协议正文联动)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
+| ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:**P13 窗外豁免签认(CP2 前)、P15 报告簇窗口(E5b 前)**、P8 性别(E5 前,W4 末;含协议正文联动)、P11(B 批前)、P12(E4 前)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
 
 **M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ⏳(Tier A 6/10);E7 引擎 4/13(判定回路待 H-C);E4/E5/E8/E9/E10 未认领;M2 用户列表+档案首面已前拉落地;支付 PAY1-3 全未启动。**CP1(11-08)前瞻:达标面基本在手,风险面=支付沙箱零启动。**
 
@@ -34,6 +34,9 @@
 | H-B 反应瞄准批 | hzy | ✅ 10-21 | 三款引擎语义锚钉死+本地结果面;mock 插桩净拔除零残留;E0 增量4 反哺闭环 |
 | H-C 判定回路闭环 | hzy | ▶ 已分配 10-23 | D-AJ 首例;提交缝适配器+服务端判分回执;验收=真人全链(登录→/match→red_dot→分数回执) |
 | PAY1-3 支付片 | — | 未认领 | P1 已定(D-AB/AC);商户资质就绪;遗留=经营类目补设+H5 支付权限申请(建议即办);**CP1 门含支付沙箱通=当前风险项** |
+| MIG1 迁移工具片 | — | 未认领 | 2026-10-23 终局对账立片;W6-W7 建/W8 预演;school 步时序=P14;依赖 E8/PAY1/E5 |
+| E5b 报告簇扩片 | — | 未认领 | 2026-10-23 终局对账立片;P15 裁后开工;8 维公式源已锚 plan 行 |
+| E6c 账号域收口 | — | 未认领 | 2026-10-23 终局对账立片;SMS+密码+绑定合并;收编 SMS 散遗留行 |
 
 ## 开放遗留清单(防丢网;完成即删行)
 
@@ -44,7 +47,7 @@
 | birth.ts 上收共享层(原拟随 H-B,未随落) | 触文件者 | 顺手清 |
 | conventions guard 正则精度修正回流 dev 兄弟服务 | lzx | 下次定期镜像批 |
 | D-AG/C3 实机视觉走查 | hzy+用户 | 下次微信登录同场 |
-| SMS 骨架片(system provider+capability) | lzx | E6b 余面,排期待定 |
+| SMS 骨架片(system provider+capability) | lzx | E6c(2026-10-23 立片收口) |
 | 协议 consent 版本记录契约 | lzx | H2 versions.ts 真源 GET /agreements/current |
 | 自定义游戏偏好上限:服务端 20/产品口径 3 | ljr | config 读面缺口,随 E9 或裁 |
 | D-W population 余件(provider 行 member_population/座位迁移/guard 注释清理) | lzx | E8 权益面触发 |
@@ -55,6 +58,7 @@
 | ICP 备案号权威串(LOGIC_AUDIT 2.5b「浙ICP2026028293号」vs MEMBERSHIP §九「浙ICP备2026028293号」) | ljr | 随 B 批 |
 | 微信登录回填昵称/头像(2.5b-⑫;需 system identity 持久化+向导去向联动) | lzx | E6b 余面小片(S1 登记) |
 | B 批修正清单已修订(两撤四增一 V4,coverage §七.5/§九) | lzx | 校准战役 S2/S3 后随 V4 一并排 |
+| 版本检查页+app-version/内容块管理(coverage 缺口①;S4 终局对账低优) | 待排 | P13 签认后随 M2 余组/E9 增量 |
 | 走查注:admin 工作台 ERR·NETWORK(dev 栈缺数据源,非 esports 面) | lzx | pre 部署前查 |
 | hzy 台账评审标记销项(H1/H-B 行曾滞「待评审」,本表已并) | — | 已随本档剪枝闭 |
 
@@ -90,3 +94,4 @@
 - 10-23 E3-f:number_stars 定稿(进度指针+三闸+诚实零),Tier A 7/10=CP1「过半」;live 探针 raw 330 黄金逐位吻合。
 - 10-23 D-AL:ljr 材料全量吸收+roadmap 校准批(DESIGN_DOC_MAP/DOC_INVENTORY 为导览;LOGIC_AUDIT/GAME_LOGIC_SPEC/溯源 PRD/admin IA/BLOCK5/题库表/openspec 指针入档;E3 七款×单位分吻合零返工,metric.md 零改动;B 批清单落 coverage §七.5;P11/备案串/迁移基线注登记)。
 - 10-23 校准战役 S1-S3:S1 ctr 语义 14 面全绿(B 批两撤四增一 V4 一 admin 文案);S2 admin 面合规(6-Tab=F2 逐一对上);S3 契约种子全对(game 九款逐字/13 款 D-Z 逐行)唯 moving_target 主能力两源冲突→P12 提裁;满岁月粒度口径锚 PAY3。台账=coverage §九。
+- 10-23 S4 终局对账(四列融合:旧后端 33 表端点级/旧前端 admin20+ctr60 路由/新原型 ctr43+admin41/新 PRD 全量):总判定=承诺窗(M1+M2 核心+PAY+M4)基本可达,前提=支付即启+H-C 落地+未认领片有人接;全量原型需 P13 豁免签认。立片 MIG1/E5b/E6c+E9 增量锚;提裁 P13/P14/P15;档位四档疑点解除(=BLOCK5 §7.7 逐字,§7.3 六级=系统套称号并行词汇);旧库复核=无支付网关、基线 V15(b4「V16+wx_jsapi」=新版前向编号无存量面)。

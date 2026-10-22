@@ -114,6 +114,9 @@
 | P11 | 画像年龄采集:契约单轨 birth(D-U 冻结)vs 原型双轨(band-only 亦合法+birth 自动带出档,LOGIC_AUDIT ⑭;V2 视觉批曾自创「降级卡」=PRD 未定义形态) | ljr | B 批修正片前(E3-f 收口后) |
 | P12 | moving_target 主能力归属:交互权威(_state.js POOL=编排消费方)归 trackingStability(我方种子现状)vs 数据权威(game_ability_contribution 主行 aimingAccuracy 1.0 + B2 次贡献 TS 0.5「次增强」注释)归 aimingAccuracy——ljr 仓两源自相矛盾 | ljr | **E4 匹配引擎开工前**(池分布:FPS AA 池 2↔3 款、TS 池 2↔1 款) |
 | P10 | ctr 语言切换常驻入口形态(候选:无常驻/头部轻量/个人中心设置行;原型无锚,EN 经 URL 前缀可达) | ljr | 随 P4(11 月底前) |
+| P13 | 窗外豁免签认单(S4 终局对账,2026-10-23):消息中心+反馈(双端)、分享裂变、渠道版 scheme-b、rank·pk/upload 补传废弃、学校报告读面(随 P14)、报告配置面/协议版本管理/compliance-config admin 页(BLOCK5 §九 Phase2 期望 vs D-M 梯①错位)——逐项签认窗外或召回;评级管理不入此单(D-M 梯①已裁) | ljr+用户 | **CP2(11-22)前** |
+| P14 | school→租户迁移时序(S4):migration.md 顺序第 2 步「组织」排 W9 切换日,但租户模型属 M3 窗外——候选 A=school 冷存保真+M3 二次迁移(与 D-C2 一致,推荐)/B=M3 最小模型前拉;连带报告快照读面归属(E5b 或 M3) | 用户+开发 | MIG1 开工前(建议 W6) |
+| P15 | 报告簇窗口归属(S4):D-AB 职业默认 open+b4 趋势基础免费=语义上窗内可见,而 plan E5 定义单次-only、coverage 挂 M2 余;b4 认知标 P0 但 D-AB 定 ToC 默认 closed(无入口)+6→8 权重矩阵算法待定(GL D1)——候选 A=窗内最小面(career 只读+trend 基础,认知零入口)(推荐)/B=全量窗外签认(需改 D-AB)/C=E5b 全量入窗 | ljr | **E5b 开工前(CP2 前)** |
 
 ---
 

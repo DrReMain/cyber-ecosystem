@@ -37,11 +37,13 @@
 | ⏳ E3 评分引擎 | 三层落位:指标层(13 款指标定义单源档,本片创建)/门槛层(百分位档位)/评分层(无上限线性+权威分位双轨);Tier A 九款全量重算 + Tier B 四款闸门;red_dot 锚点初始校准常量;ScorerRegistry 插件契约(加测试零改主干)。验收:域函数单测+提交→重算→报告分 e2e。W3 三款(offense_defense/resource_match/character_counter)依赖题库种子增量:offense_scenario(optimal_choice/complexity/difficulty)+moba_character/character_counter_relation(counter_score)——内容=旧库经验数据(D-AL) | E0,E2 | XL |
 | E4 匹配引擎 | match_config(预留 scenario 维度)+类型轴多数投票+两层编排+当日 seed+session 锁死落库+重测 3/1。细锚(D-AL):续测 7 天不重排、超窗以 test_record 反推、重测次数不恢复;切后台无效=阈值可配(>3s)+is_valid/invalid_reason 入库;done=缓存写入后有新 test_record;跳步=未测可跳、done 只看结果、前端不可指定款;游戏池=contribution(is_primary=1)∩category∈(genre,通用)。验收:同日稳定/跨日变化/重排换 seed e2e | E2 | M |
 | E5 报告框架+能力报告 | 板块插件化(supports)+缺维度不渲染七硬约束+完整度指示+同龄百分位(Z-score CDF+置信分层)+档位四色;M1 只实现单次能力报告所需板块。细锚(D-AL):同龄基准=同龄同性别(待确定只同龄;仅年龄段=区间基准标近似;性别=P8);完整度主指标 X/8 维;档位快照解锁时固化(已解锁不随口径变);较上局=该能力上一场测评(非同场次上次尝试);报告文案五区可后台配置。验收:缺维场景渲染收拢 e2e | E3 | L |
+| E5b 报告簇扩片(2026-10-23 终局对账立片,P15 裁后开工) | 报告中心入口+成长趋势基础层(b4 裁免费)+职业聚合页(D-AB 默认 open)+认知策略渲染面(ToC 默认 closed 零入口,策略面归 E8);服务端聚合=GL D1-D3,8 维公式源=旧仓 esport-server 的 docs 目录 OpenAPI_用户端接口文档.md(§3757 区)+REPORT_FRONTEND_SPEC §3 命名,三源合一入 metric.md 权重矩阵;系统套 6 级称号映射随 P2。验收=缺维渲染收拢+策略翻转 e2e | E5,P15,P2 | L |
 | ✅ E6a ctr 纯壳 | 零 RPC:TanStack Start 新工程(Nx 目标面)+ react-aria/tailwind 接线(D-R)+ token 层(旧仓 DESIGN.md 为经验数据输入,按 D-O 合理实施;D-S dark-only 单套)+ 路由骨架(仅根路由+空白落地页,D-T:能力配置为交付面) + 微信 WebView 适配基线(safe-area/键盘 vh/无 hover 假设/横竖屏地基)+ shared-ts UI-free 四包(error/cookie/store/router-progress)接线;i18n=paraglide zh-CN+en-US(baseLocale zh-CN);**SEO 全量面(2026-10-18 补入,C 端公网)**:robots.txt + sitemap(hreflang/x-default)+ 流程页 noindex + 逐页 title。验收:dev/build/typecheck/lint 全绿,dark-only 语义 token 就位 | — | M |
 | ✅ E6b 登录+画像流 | 微信/手机登录(消费 system 既有契约,不等 E0)、画像流(昵称必填/出生年月 8 档/未满 13 监护人硬闸/游戏偏好) | E6a,E0(画像流半片) | L |
+| E6c 账号域收口(2026-10-23 终局对账立片) | SMS 骨架落地(README §1 已裁分层:capability+system provider)+密码登录/密码管理页(b3 §01 三路收齐)+绑定/合并流(b3 §02b:PHONE_EXIST/WECHAT_OPENID_EXIST 冲突拦截/自绑幂等/重绑解绑走客服/富吞贫一次性+审计)+account-security 聚合页;收编遗留清单 SMS 散行。验收=三登录路 e2e+合并反例(双方有数据不自动并)+冲突拦截反例 | E6b,system provider 片,E0 增量(绑定契约) | M-L |
 | E7 游戏框架+13 款 | 统一引擎框架(rAF+dt+refs 或 canvas,墙钟计时+暂停顺延单实现)、遥测采集(新契约)、参数化单流程路由、配置驱动运行时、真响应式横竖屏。三批:反应瞄准(red_dot/flash_aiming/multi_target/target_recognition)W3-W4;追踪技能(tracking_moving/moving_target/skill_trajectory/dual_zone)W5;决策资源(number_stars/offense_defense/character_counter/resource_match/economic_sim)W6。验收:每批 live 冒烟+遥测字段对齐(语义级) | E6,E3 | XL |
 | E8 权益最小面 | entitlement 事件模型+激活码全生命周期(生成/批量/兑换原子守卫防超卖)+报告访问判定(policy open/membership/tenant/closed + scope 覆盖;D-AB)。R7=会员 31 天计/第 32 天过期+每日定时扫描(D-AL)。验收:兑换并发不超卖 e2e | E2 | M |
-| E9 最小 admin 面 | admin client 挂 esports 模块:激活码+测试项/配置管理+报告访问策略(职业/认知 open/membership/closed)+题库种子查看;复用既有表格/搜索/动作列范式与 O-1/2/3 裁定。验收:开码→兑换→解锁闭环 e2e | E0 | M |
+| E9 最小 admin 面 | admin client 挂 esports 模块:激活码+测试项/配置管理+报告访问策略(职业/认知 open/membership/closed)+题库种子查看;复用既有表格/搜索/动作列范式与 O-1/2/3 裁定。验收:开码→兑换→解锁闭环 e2e。**S4 增量锚(2026-10-23)**:题库 CRUD+Excel 导入、game-category 归类页(V19 自定义归类语义)、test-record 明细浏览(b3 §08⑤ 全 attempts)、批量导入、compliance-config(出生采集开关/付费年龄线/备案文案)、协议版本管理——剪裁随 P13 签认定 | E0 | M |
 | E10 全链 e2e | 登录→画像→匹配→4 款→完成→单次报告→激活码解锁全链 live e2e;原型断言按语义级移植为验收基线(D-O);docs:check | 全部 | M |
 
 ## hzy 外围启动线(2026-10-19 增补;W1-W2 桥接,定义归此、状态记 progress)
@@ -74,6 +76,10 @@
 P4 裁决(11 月底前)→企业 App 授权登录→租户发码额度/功能差异配置;依赖 HL 文档(W1 跟进确认到位时点)。
 
 ## M4 存量迁移 cutover(预演 W8,切换 W9)
+
+| 片 | 内容与验收要点 | 依赖 | 规模 |
+|---|---|---|---|
+| MIG1 迁移工具片(2026-10-23 终局对账立片) | 导入器落地 migration.md 全部口径:旧↔新 ID 映射持久化(覆盖软删行)、四档重算重放(A 明细/B 聚合/C 平移+legacy 标/D 作废)、身份翻译(密码 verify-then-rehash)、权益翻译(旧库已核实无支付网关无订单)、画像不完整态、报告快照保真搬运、种子重放、对账 SQL 族(行数+抽样逐字段+分布);W6-W7 建造、W8 生产副本脱敏预演(P6 日程+nginx 仿真)。验收=migration.md 血泪清单逐条过+预演对账全绿。**school→租户步时序=P14 裁后定** | E8(权益翻译目标面)、PAY1(订单域对齐)、E5(重算报告读面) | L |
 
 详见 migration.md;P6 演练日程确认(12-07 前);旧栈切换后停机封存 2 周(可回滚)期满下线归档(D-P)。
 
