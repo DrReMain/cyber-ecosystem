@@ -28,6 +28,7 @@
   "match_pick_normal_head": "Pick this session's type. It does not change your game preferences.",
   "match_pick_fps": "FPS assessment",
   "match_pick_moba": "MOBA assessment",
+  "match_pick_recommended": "Recommended",
   "match_pick_sub": "4 abilities · about 4 min",
   "match_pick_toast": "{type} assessment selected",
   "match_pick_empty_title": "Nothing to arrange",

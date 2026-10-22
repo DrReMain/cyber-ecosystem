@@ -11,6 +11,13 @@ import { StepFrame } from "./step-frame";
 const MAX_LEN = 12;
 const MIN_LEN = 2;
 
+// Emoji family the client gates visibly: pictographics, skin-tone
+// modifiers, ZWJ sequences, and the variation selector. The server's
+// contract validation stays the authority; this is the UX arm. Alternation,
+// not one class — astral ranges in a class never match (biome's
+// noMisleadingCharacterClass pins this).
+const EMOJI_RE = /\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}]|\u{200D}|\u{FE0F}/u;
+
 // Mirrors the frozen contract (UpdateProfileRequest.nickname 2..12) — code
 // points, so 12 CJK characters pass exactly like 12 latin letters.
 function weightLen(value: string): number {
@@ -20,6 +27,9 @@ function weightLen(value: string): number {
 function validate(value: string): string | null {
   if (value !== value.trim()) {
     return m.profile_nickname_err_trim();
+  }
+  if (EMOJI_RE.test(value)) {
+    return m.profile_nickname_err_emoji();
   }
   const len = weightLen(value);
   if (len > MAX_LEN) {

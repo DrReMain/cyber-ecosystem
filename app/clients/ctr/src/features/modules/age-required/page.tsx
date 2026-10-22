@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { ageOf, MONTHS, years } from "#/features/app/birth";
 import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { useProfileUpdate } from "#/features/modules/profile/use-profile-update";
 import { m } from "#/paraglide/messages";
-import { ageOf, MONTHS, years } from "./birth";
 
 const selectClass =
-  "w-full appearance-none rounded-sm border border-line bg-surface-input px-3 py-3 text-ink outline-none focus:border-focus";
+  "w-full appearance-none rounded-control border border-line bg-surface-input px-2.5 py-[13px] text-[15px] text-ink outline-none focus:border-focus";
 
 /**
  * The pre-payment birth backfill (prototype age-required): the full form
@@ -69,7 +69,7 @@ export function AgeRequiredPage() {
       <div className="flex w-full flex-col gap-3 pb-6">
         <h1 className="text-ink text-center text-lg font-extrabold">{m.age_required_title()}</h1>
 
-        <div className="border-line bg-surface-card rounded-lg border p-4">
+        <div className="border-line bg-surface-card rounded-card border p-4">
           <div className="mb-3 flex items-center gap-2.5">
             <div className="rounded-tile bg-cta-practice flex h-10 w-10 shrink-0 items-center justify-center">
               <Cake aria-hidden className="text-white" size={20} />
@@ -129,27 +129,27 @@ export function AgeRequiredPage() {
           )}
         </div>
 
-        <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[11.5px] leading-[1.85]">
+        <div className="border-line bg-surface-deep text-ink-tertiary rounded-control border p-3.5 text-[11.5px] leading-[1.85]">
           <span className="text-ink-secondary font-bold">{m.age_required_warn_must()}</span>
           <br />
           {m.age_required_warn_exit()}
         </div>
 
         <Button
-          className="bg-cta-practice w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80 disabled:opacity-50"
+          className="bg-cta-practice rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
           isDisabled={updateMutation.isPending}
           onPress={() => void onSave()}
         >
           {updateMutation.isPending ? m.common_loading() : m.age_required_btn_save()}
         </Button>
         <Button
-          className="bg-cta-primary w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80"
+          className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
           onPress={() => void navigate({ to: "/" })}
         >
           {m.age_required_btn_free()}
         </Button>
         <Button
-          className="border-line text-ink-secondary w-full rounded-sm border px-4 py-3 font-semibold active:opacity-80"
+          className="border-line text-ink-secondary rounded-control w-full border px-4 py-[14px] text-[15px] font-bold active:opacity-80"
           onPress={() => void navigate({ to: "/" })}
         >
           {m.age_required_btn_home()}

@@ -39,17 +39,17 @@ export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
     <AmbientLayout>
       <div className="flex w-full flex-col gap-3 pb-6">
         {/* Inline header — match's FlowHeader is another module's territory;
-            same shape declared here. */}
+            same shape (the §4.7 fab: 40px, borderless) declared here. */}
         <div className="flex items-center gap-3">
           <button
             aria-label={m.common_back()}
-            className="border-line text-ink-secondary flex h-11 w-11 shrink-0 items-center justify-center rounded-full border active:opacity-60"
+            className="bg-surface-input text-ink-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-full active:opacity-60"
             onClick={() => void history.back()}
             type="button"
           >
-            <ChevronLeft aria-hidden size={18} />
+            <ChevronLeft aria-hidden size={20} />
           </button>
-          <h1 className="text-ink text-lg font-extrabold">{title}</h1>
+          <h1 className="text-ink text-[19px] font-bold">{title}</h1>
         </div>
 
         <div className="text-ink-tertiary text-[11.5px]">
@@ -59,13 +59,13 @@ export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
         </div>
 
         {chapters.map((chapter) => (
-          <div className="border-line bg-surface-card rounded-lg border p-4" key={chapter.key}>
+          <div className="border-line bg-surface-card rounded-card border p-4" key={chapter.key}>
             <div className="text-ink mb-1.5 text-[13.5px] font-extrabold">{chapter.title}</div>
             <div className="text-ink-tertiary text-[12.5px] leading-[1.8]">{chapter.body}</div>
           </div>
         ))}
 
-        <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[11.5px] leading-relaxed">
+        <div className="border-line bg-surface-deep text-ink-tertiary rounded-control border p-3.5 text-[11.5px] leading-relaxed">
           {m.agreement_consent_note()}
         </div>
       </div>

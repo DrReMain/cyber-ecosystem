@@ -28,6 +28,7 @@
   "match_pick_normal_head": "手动选择本次测评的类型。这是本次会话的选择，不改你的游戏偏好。",
   "match_pick_fps": "FPS 测评",
   "match_pick_moba": "MOBA 测评",
+  "match_pick_recommended": "推荐",
   "match_pick_sub": "4 项能力 · 约 4 分钟",
   "match_pick_toast": "已选择 {type} 测评",
   "match_pick_empty_title": "没有可编排的测试",

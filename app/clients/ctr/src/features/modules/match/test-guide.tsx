@@ -39,7 +39,7 @@ export function TestGuidePage() {
       <div className="flex w-full flex-col gap-3 pb-6">
         <FlowHeader onBack={() => void history.back()} title={m.match_guide_title()} />
 
-        <div className="border-line bg-surface-card rounded-lg border p-4">
+        <div className="border-line bg-surface-card rounded-card border p-4">
           <div className="flex items-center gap-2.5">
             <div className="rounded-tile bg-cta-practice flex h-10 w-10 shrink-0 items-center justify-center">
               <Save aria-hidden className="text-white" size={18} />
@@ -73,13 +73,13 @@ export function TestGuidePage() {
           </div>
         </div>
 
-        <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[11.5px] leading-relaxed">
+        <div className="border-line bg-surface-deep text-ink-tertiary rounded-control border p-3.5 text-[11.5px] leading-relaxed">
           <span className="text-ink-secondary font-bold">{m.match_guide_score_t()}</span>：
           {m.match_guide_score_d()}
         </div>
 
         <button
-          className="bg-cta-primary w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80"
+          className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
           onClick={() => toast.info(m.match_flow_soon())}
           type="button"
         >

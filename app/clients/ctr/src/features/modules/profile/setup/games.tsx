@@ -121,7 +121,9 @@ export function SetupGamesPage() {
       // rejection keeps it out of the window capture (Sentry noise).
       return;
     }
-    await navigate({ to: "/" });
+    // The prototype's flow lands the finished profile straight into the
+    // match guide (block3 §1: 04 → 05), not home.
+    await navigate({ to: "/match" });
   }
 
   return (

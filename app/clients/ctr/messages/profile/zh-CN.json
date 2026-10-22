@@ -38,6 +38,7 @@
   "profile_setup_nickname_rules_title": "规则",
   "profile_setup_nickname_rules": "· 必填,不设默认值,可重名(不做唯一性校验)\n· 最长 12 个字符,首尾不能有空格",
   "profile_nickname_err_trim": "昵称首尾不能有空格",
+  "profile_nickname_err_emoji": "昵称暂不支持 emoji 表情",
   "profile_nickname_err_min": "昵称至少 2 个字符",
   "profile_nickname_err_max": "昵称最长 12 个字符",
   "profile_setup_age_head": "完善资料 · 年龄",

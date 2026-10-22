@@ -32,7 +32,7 @@ export function SwitchConfirmPage() {
           title={m.match_switch_title()}
         />
 
-        <div className="border-line bg-surface-card rounded-lg border p-4">
+        <div className="border-line bg-surface-card rounded-card border p-4">
           <div className="flex items-center gap-2.5">
             <div className="rounded-tile bg-surface-deep flex-1 p-3 text-center">
               <div className="text-ink-tertiary text-[10.5px]">{m.match_switch_cur()}</div>
@@ -46,7 +46,7 @@ export function SwitchConfirmPage() {
           </div>
         </div>
 
-        <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[12px] leading-relaxed">
+        <div className="border-line bg-surface-deep text-ink-tertiary rounded-control border p-3.5 text-[12px] leading-relaxed">
           <div className="text-ink-secondary font-bold">{m.match_switch_rules()}</div>
           <div className="mt-1.5">· {m.match_switch_rule1()}</div>
           <div>· {m.match_switch_rule2()}</div>
@@ -54,14 +54,14 @@ export function SwitchConfirmPage() {
         </div>
 
         <button
-          className="bg-cta-primary w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80"
+          className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
           onClick={onConfirm}
           type="button"
         >
           {m.match_switch_ok()}
         </button>
         <button
-          className="border-line bg-surface-content text-ink w-full rounded-sm border px-4 py-3 font-semibold active:opacity-60"
+          className="border-line bg-surface-content text-ink rounded-control w-full border px-4 py-[14px] text-[15px] font-bold active:opacity-60"
           onClick={() => void navigate({ to: "/match", search: { genre: cur } })}
           type="button"
         >

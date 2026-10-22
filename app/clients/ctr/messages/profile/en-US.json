@@ -38,6 +38,7 @@
   "profile_setup_nickname_rules_title": "Rules",
   "profile_setup_nickname_rules": "· Required, no default value, duplicates allowed (no uniqueness check)\n· At most 12 characters, no leading or trailing spaces",
   "profile_nickname_err_trim": "Nickname cannot start or end with spaces",
+  "profile_nickname_err_emoji": "Nicknames cannot contain emoji",
   "profile_nickname_err_min": "Nickname needs at least 2 characters",
   "profile_nickname_err_max": "Nickname is at most 12 characters",
   "profile_setup_age_head": "Set up profile · Age",

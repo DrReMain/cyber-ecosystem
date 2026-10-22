@@ -1,6 +1,6 @@
 {
   "esports_user_detail_title": "회원 상세",
-  "esports_user_detail_back": "뒤로",
+  "esports_user_detail_back": "회원 목록으로 돌아가기",
   "esports_user_detail_error": "회원이 없거나 접근할 수 없습니다",
   "esports_user_detail_not_open": "아직 제공되지 않음",
   "esports_user_detail_tab_overview": "개요",

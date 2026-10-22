@@ -170,7 +170,7 @@ export function LoginPage() {
 
   return (
     <AmbientLayout dense>
-      <div className="flex w-full flex-col gap-[14px] pt-7">
+      <div className="flex w-full flex-col gap-3.5 pt-7">
         <div className="flex items-center gap-3">
           <div className="bg-logo shadow-inset-ring flex h-11 w-11 items-center justify-center rounded-xl">
             <Zap aria-hidden className="text-white" size={22} />
@@ -187,11 +187,11 @@ export function LoginPage() {
         {/* Segment keeps the prototype's two-mode shape; the SMS tab is a
             disabled slot until the system SMS contract exists. */}
         <div className="border-line-soft bg-surface-input/90 rounded-control flex gap-1 border p-1">
-          <div className="bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-[11px] text-center text-[13.5px] font-bold">
+          <div className="bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] font-bold">
             {m.login_tab_password()}
           </div>
           <button
-            className="text-ink-muted flex-1 rounded-[9px] py-[11px] text-center text-[13.5px] active:opacity-60"
+            className="text-ink-muted flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] active:opacity-60"
             onClick={() => toast.info(m.common_soon())}
             type="button"
           >
@@ -284,7 +284,7 @@ export function LoginPage() {
             </CheckboxField>
             {/* Select-all rides the user row's line: one tap covers both. */}
             <div className="flex items-start justify-between gap-2.5">
-              <span className="text-ink-tertiary ml-[25px] text-[10.5px] leading-snug">
+              <span className="text-ink-tertiary ml-6.25 text-[10.5px] leading-snug">
                 {m.login_agree_minor_note()}
               </span>
               <CheckboxField
@@ -309,7 +309,7 @@ export function LoginPage() {
           </div>
 
           <Button
-            className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50"
+            className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50"
             isDisabled={pending}
             type="submit"
           >
@@ -318,7 +318,7 @@ export function LoginPage() {
         </Form>
 
         <Button
-          className={`bg-cta-success shadow-cta-success rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50 ${
+          className={`bg-cta-success shadow-cta-success rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50 ${
             wechatEnv ? "" : "opacity-55"
           }`}
           isDisabled={wechatPending}

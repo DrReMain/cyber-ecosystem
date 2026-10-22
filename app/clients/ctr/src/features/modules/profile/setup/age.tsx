@@ -3,28 +3,12 @@ import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/pro
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
+import { ageOf, MONTHS, years } from "#/features/app/birth";
 import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { m } from "#/paraglide/messages";
 import { bandLabel, bandOfAge } from "../bands";
 import { useProfileUpdate } from "../use-profile-update";
 import { StepFrame } from "./step-frame";
-
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-// 6–60 years old: the range must reach below 13 or the guardian gate has no
-// reachable input (the prototype widened it for exactly this reason).
-function years(): number[] {
-  const now = new Date().getFullYear();
-  return Array.from({ length: 55 }, (_, i) => now - 60 + i);
-}
-
-function ageOf(year: number, month: number): number {
-  const now = new Date();
-  let age = now.getFullYear() - year;
-  if (now.getMonth() + 1 < month) {
-    age--;
-  }
-  return age;
-}
 
 export function SetupAgePage() {
   const navigate = useNavigate();
