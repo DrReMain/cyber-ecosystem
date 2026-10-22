@@ -132,7 +132,7 @@
 
 | 游戏 | 双难度因子(体验/正式) | 专有指标 | 重算要点(JAVA 指针) |
 |---|---|---|---|
-| number_stars | 展示 1200ms / 800ms | 无 | avgDecisionInterval 入参秒须 ×1000 |
+| number_stars | 展示 1200ms / 800ms | 无 | 已定稿升卡 → §6.9 |
 | dual_zone_dodge | 预警 800ms / 400ms | 无 | 已定稿升卡 → §6.7 |
 | target_recognition | 干扰物 3 / 6 个 | 干扰抑制率(选择性注意范式) | 已定稿升 A → §6.6 |
 | multi_target | 3 / 6 目标 | 目标切换耗时(注意转移范式) | 已定稿升 A → §6.5 |
@@ -172,6 +172,13 @@
 重算(旧前端 SkillTrajectoryTestPage.tsx:332-374 与 Java 逐行):**哨兵 999=未匹配轮**——进 precision 分母(counted)、计 0 贴合度,不进偏差/速度均值(一轮没匹配不拖死两项,「少打轮不稀释精度分」同律);precision=(perfect+good×0.5)/counted×6(perfect<5/good<15);deviationScore=max(0,(50−avgDev)/10)(仅匹配轮均值);speedScore=max(0,(12000−avgPlace)/1500);composite=clamp(Σ,0,10)。空轮=诚实零(挂机不得分)。
 闸门:shape 词表外/round_number 非严格递增(裁剪流)/deviation<0/placement 与哨兵不对射(placed⇔dev<999 双射;旧匹配上限 40px 使然)=DETAIL_MISMATCH。
 轨一(**唯一非计数式**,§四:8 分/贴合度百分点):贴合度=clamp(1−dev/50, 0, 1) 按全体轮均值(未匹配计 0),raw=贴合百分点×unit_score×难度——零点 50 与偏差分同源,复算 §四表典型区间(贴合 30-80%→240-640)自洽。⚠️ 改编披露:旧 originalPosition 恒记 {0,0}、trajectory 实记玩家放置点(旧客户端未记真原位),故 deviation 作为客户端实测**事实**上报消费(与反应时同族),服务端不做几何重算;E7 引擎落 random_seed 服务端复板后可升全量几何重验。权威轨:曲线未定稿留空,composite 入 extras。
+
+### 6.9 number_stars 定稿卡(E3-f;Tier A,合成式誊录)
+
+事实流:rounds(round_number/numbers 目标序列(引擎每轮 5 个 1-20 唯一)/clicks[]{number, elapsed_ms 回合内偏移, position})。旧 isCorrect/expectedNumber 客户端断言废止,roundsCompleted/correctClicks/incorrectClicks/avgDecisionInterval 四聚合值废止——全部从流重建(数组即真值,灌水回合数无面)。
+重算(Java NumberStarsScorer + 旧前端 NumberStarsTestPage.tsx:225-310 同构):逐回合 expected=升序序列,**进度指针**判定——点击正确 ⟺ number==expected[progress](=「点当前未点数字中的最小值」本义),正确才推进;correct=Σ正确点击;incorrect=Σ(len(clicks)−progress);roundsCompleted=完整回合数(progress==len(numbers));avgDecisionInterval=各回合**正确序列内相邻差**均值(跨回合不连首尾;无相邻对→intervalCount=0 且 speed=0,「按 0ms 代入误给满速度分」的旧前端防呆同律)。公式:base=min(5, rounds/8×5)(Java 上限,前端无上限以 Java 为权威);speed=max(0,(2000−avgMs)/200);accuracy=max(0,3−incorrect×0.5);complexity=max(0,(maxSeqLen−5)×0.3)(引擎恒 5→常态 0,>5 留旧系数);composite=clamp(Σ,0,10)。⚠️ **correct=0→诚实零**(全错局/空局 composite=0;旧 Java 空局白拿 accuracy 3 分的瑕疵就此修掉,§6.5/6.6/6.8 同律)。
+闸门:round_number 非严格递增(裁剪流,ST 同律)/回合内 elapsed_ms **非严格递增**(等值=同帧双击,0 间隔刷满速度分的新闸;降序=编辑流,DZ 同律)/numbers 空回合(引擎恒 5,空序列灌 roundsCompleted)=DETAIL_MISMATCH。⚠️ 改编披露:该款事实流无墙钟字段,无配置锚——伪造上限=满分 10,与旧架构持平(旧版客户端直报聚合值更易假);回合流自证(数组=真值)已封灌回合数的面。展示 1200/800ms 为客户端参数不入分。
+轨一:raw=correct×unit_score(§四:15/正确点击)×难度(15-30 击→225-450,§四表自洽);权威轨:曲线未定稿留空,composite 入 extras。
 
 ## 七、8 维认知权重矩阵(三源合一 🧊:JAVA 常量 = API 公式表 = ST DIM8 逐值核对一致)
 
@@ -241,3 +248,5 @@
 - 2026-10-22 E3-d:multi_target/target_recognition 定稿卡入档(§6.5/§6.6,合成式誊录;决策时间差分改编与 duration 服务端化均披露);TR 升 Tier A(E0 增量4 spawned_enemy 契约落位,缺口闭合);§6.4 批量表缩为八款。
 
 - 2026-10-23 E3-e:dual_zone/skill_trajectory 定稿卡入档(§6.7/§6.8,合成式誊录);净钟单向化+配置锚+终局对齐与哨兵双射闸均披露;无效词表增 ABSURD_TIME_SPAN;§6.4 批量表缩为六款。
+
+- 2026-10-23 E3-f:number_stars 定稿卡入档(§6.9,合成式誊录);进度指针重建正确性、同帧双击新闸、correct=0 诚实零(旧空局 3 分瑕疵修掉)与无配置锚披露;§6.4 批量表缩为五款。Tier A 达 7/10——CP1「E3 过半」门达成。
