@@ -54,9 +54,9 @@
 | offense_defense | 决策 | 25 分/正确决策 | 8-15 个 | 200-375 | 决策类 |
 | resource_match | 资源 | 20 分/有效收集 | 15-30 个 | 300-600 | 资源类 |
 | moving_target | 追踪 | 10 分/秒完美追踪 | 完美追踪 20-30s | 200-300 | 追踪类 |
-| tracking_moving | 追踪 | 10 分/秒完美追踪 | 完美追踪 20-30s | 200-300 | 追踪类 |
+| tracking_moving | 追踪 | 10 分/有效命中 | 20-30 发 | 200-300 | 追踪类 |
 | skill_trajectory | 技能释放 | 8 分/贴合度百分点 | 贴合度 30-80% | 240-640 | 技能类 |
-| economic_sim | 资源 | **待实测定**(资源量级未知) | — | — | 资源类 |
+| economic_sim | 资源 | 15 分/有效正补 | 15-30 补 | 225-450 | 资源类 |
 
 > red_dot 双轨注:展示分走本表线性链;**权威分输入**走 §六校准曲线——两条链并存不互替(总纲 1/3)。
 
@@ -87,8 +87,8 @@
 
 ### 6.0 总表(Tier 名册按 JAVA 代码现实)
 
-**Tier A 十款**(事实流足以全量重算):red_dot · number_stars · dual_zone_dodge · flash_aiming · skill_trajectory · offense_defense · resource_match · character_counter · multi_target · target_recognition。
-**Tier B 三款**(仅聚合数据 → 强一致性闸门通过后采信客户端分):moving_target(逐帧未上报,闸门=自洽/区间) · tracking_moving(缺 hit 标志) · economic_sim(缺 perfectCS/earlyHits/missedMinions,闸门=装备阶梯/金币守恒/HP 合法性)。
+**Tier A 十三款=全员**(事实流足以全量重算):red_dot · number_stars · dual_zone_dodge · flash_aiming · skill_trajectory · offense_defense · resource_match · character_counter · multi_target · target_recognition · moving_target(E3-j 升格,采样流全量重算,§6.3) · tracking_moving(E3-k 升格,契约增量6 补 hit+dot_lifetime 后帧流全量重算,§6.13) · economic_sim(E3-l 升格,契约增量7 补窗口事实后事件流全量重算,§6.14)。
+**Tier B 已消亡**(E3-l:economic_sim 经契约增量7 升 A 后,13 款全量重算——「采信客户端分」在新契约本无落点,E0 facts-only 设计使每款终须重算,三个 B→A 升格=该终局的兑现)。
 新遥测契约(E7)逐款补字段后 B 可升 A(§0.2 领域机制重设计);multi_target 的 Tier A 已按代码现实裁决(README §0.5,覆写 MSB 的 Tier B 标注);target_recognition 同理——E0 增量4 将 spawned_enemy 落进明细契约后缺口闭合,E3-d 升 A 定稿(§6.6)。
 
 ### 6.1 red_dot 定稿卡 🧊(E3 首个权威分输入)
@@ -120,15 +120,18 @@
 评级映射 🔗(主锚点 M1+辅助 M3):顶尖 ≤170ms ≥90% / 职业 ≤200 ≥85% / 准职业 ≤220 ≥80% / 高水平 ≤250 ≥75% / 普通 ≤280 / 入门 >280(百分位 ≥99/95/85/60/30/<30)。
 重算(公式已于 E3-b 2026-10-21 誊录入 `module/test/flash_aiming.go`,锚=旧前端 FlashAimingTestPage.tsx:134-178):`composite = clamp(hitRate + accuracy + deviation + reaction, 0, 10)`,其中 `hitRate = 命中/(命中+失误) × 3`、`accuracy = 中心命中/命中 × 4`(中心命中 = deviation ≤ center_hit_deviation_px,引擎参数键与客户端 boot pack 同源,默认 20px)、`deviation = max(0, (30−平均偏差)/5)`、`reaction = max(0, (800−平均瞄准时)/100)`;空 shots 退化为 平均偏差 30/平均瞄准时 800(两分项归零);平均瞄准时 <80ms 判数据异常拒收。composite 为未来校准曲线的输入;权威分曲线未定稿前 authoritative 留空。
 
-### 6.3 moving_target 定稿卡(MSM)
+### 6.3 moving_target 定稿卡(E3-j;**Tier B→A 升格**,合成式誊录)
 
-机制 🧊 代码确认:单目标持续追踪(非多目标 MOT);30s(GAME_DURATION=30);6 图案各 5s 顺序轮换 straight/curve/zigzag/circle/random/variable;三态机 perfect/good/lost。
-⚠️ **未裁决冲突(旧仓遗留)**:完美/良好偏差阈值前端注 30/80px vs 后端注 5/15px——新系统单源:服务端 test_config 下发,初值 E7 引擎片联调定。
+机制(代码确认):单目标持续追踪(非多目标 MOT);30s;6 图案各 5s 顺序轮换;20Hz 采样流。**阈值冲突解除**:旧注「前端 30/80 vs 后端 5/15」两注皆陈旧注释——前端 metrics 循环实码=perfect ≤20/good ≤30/图案可接受 ≤80(字面值);新系统单源引擎参数键 perfect_deviation_px/good_deviation_px/pattern_deviation_px(默认 20/30/80=实码 parity,E7 联调可调)。
+事实流:shots[](契约名;实为 20Hz 采样点:elapsed_ms+deviation+pattern;target/crosshair/hit 留引擎审计面不入本公式)——E0 契约本就按服务端重算设计,B→A 升格零契约改动(multi_target 经 E0 增量4 同路)。
+重算(对齐旧前端 MovingTargetTestPage 评分区与 Java Tier B 闸门):perfect/good/lost 三态按阈值逐点分类;**时间=计数×采样间隔**(旧版固定步长 0.05s 累积的精确对偶,引擎键 sample_interval_ms 默认 50);lost=转移计数(状态机初值 lost,首样本 lost 不计转移——旧版同臂);patternStats[p]=图案 p 内 dev≤图案阈值的采样秒数(六图案恒全初始化,avg 恒除 6——旧版同臂);coverage=goodTime/total×3(total=config 时长镜像);perfectScore=perfectTime/total×4;stability=max(0,(50−stddev)/10)(总体方差);adaptation=avg(patternStats)×2(秒均 [0,5]→分 [0,10],旧公式原样——该项独大易饱和,曲线吸收);lossPenalty=lossCount×0.3;composite=clamp(Σ,0,10)。
+闸门:词表外 pattern=DETAIL_MISMATCH;deviation<0=DETAIL_MISMATCH;乱序戳=DETAIL_MISMATCH;span>config+1500ms=ABSURD_TIME_SPAN;**密度闸**=count×sample_interval>span+1500ms=ABSURD_TIME_SPAN(计数×间隔不得超流跨度——密集伪造凭空铸造追踪时间的面关闭,§6.5 族);空流→诚实零(旧空流 stability 白送 5 分,E3-f 空局瑕疵同族修掉)。
+轨一:raw=perfectTime(秒)×unit_score(§四:10/秒完美追踪)×难度(完美追踪 20-30s→200-300);权威轨:曲线未定稿留空,composite 入 extras。
 方案因子 📐:体验 200px/s/40px/简单图案/宽松/30s → 正式 400px/s/28px/全 6 图案/严格/60s。
 评级映射 🔗(主锚点 M3 追踪占比+辅助 M4 偏差):顶尖 ≥90% ≤15px / 职业 ≥80% ≤25px / 准职业 ≥70% ≤35px / 高水平 ≥55% ≤45px / 普通 ≥40% / 入门 <40%。追踪类无公开基准,推断成分更高,上线后内部百分位替换优先。
 专有指标:轨迹适应性(6 图案各自 0-100)/最大偏差(需逐帧)/丢失次数。多目标「100 追 10」不属本游戏(归 future)。
 
-### 6.4 批量卡(MSB,机制推断待代码确认;公式誊录随 E3 逐款定稿;九款已升卡出表 → §6.5-§6.12,余 Tier B 二款留表待闸门设计)
+### 6.4 批量卡(MSB,机制推断待代码确认;公式誊录随 E3 逐款定稿;十一款已升卡出表 → §6.5-§6.14,批量表现已清空)
 
 | 游戏 | 双难度因子(体验/正式) | 专有指标 | 重算要点(JAVA 指针) |
 |---|---|---|---|
@@ -140,8 +143,8 @@
 | resource_match | 旧代码无难度差分(时长可配;方案因子待 E7) | 收集速率(collected/span) | 已定稿升卡 → §6.11 |
 | character_counter | 回合数 3(旧硬码)/克制轮盘密度 | 克制命中率 Q+速度乘数 | 已定稿升卡 → §6.12(rework 规格落地) |
 | skill_trajectory | 轨迹速度慢 / 快 | 时机精度(提前/滞后量,能力核心) | 已定稿升卡 → §6.8 |
-| tracking_moving | 速度 200 / 400 px/s(同 moving_target) | 同 moving_target | Tier B:缺 hit 标志 |
-| economic_sim | 待确认(回合数/资源复杂度) | 最终资产、资源转化率 | Tier B:强一致性闸门(装备阶梯/金币守恒/HP) |
+| tracking_moving | 速度 200 / 400 px/s(同 moving_target) | 同 moving_target | 已定稿升卡 → §6.13(契约增量6 补 hit+dot_lifetime) |
+| economic_sim | 待确认(回合数/资源复杂度) | 最终资产、资源转化率 | 已定稿升卡 → §6.14(契约增量7 补窗口事实) |
 
 ### 6.5 multi_target 定稿卡(E3-d;Tier A,合成式誊录)
 
@@ -202,6 +205,23 @@
 ⚠️ 全族唯一 0-10 外曲线输入:150 封顶承重「完美克制×1.5 速度余量」的区分度(饱和治理的目的本身)——100=参考速完美,133.3=不完美但快,150=完美且两倍速。v0 机械锚点映射随曲线片,≥200 条真实数据后分位再校准(rework 原文承袭)。
 闸门:空 rounds→诚实零(Java ZERO 同臂,回合数闸辖非空局);回合数≠round_count(默认 3,引擎参数键) =DETAIL_MISMATCH(旧版硬除 3、少报回合自降分,新律=回合数即契约);round_number 乱序=DETAIL_MISMATCH;阵容内重复/敌我不等长/空阵容=DETAIL_MISMATCH(**跨侧重叠=游戏本律**,6 角色双方各 5 必重叠,合法);词表外=DETAIL_MISMATCH;单回合 time<80ms=ABSURD_REACTION_TIME;Σ回合时长>config+1500ms=ABSURD_TIME_SPAN(回合共享会话钟,§6.5 同族);退化银行(c_max=0)护栏=c_max 置 1(回合无信号不炸除法)。
 轨一:raw=克制命中对数×unit_score(§四:15/克制命中)×难度(典型 3 回合×8 对≈24→360);权威轨:曲线未定稿留空,composite(0-150)入 extras。双难度因子=旧无差分(回合数/时限可配),方案因子待 E7 引擎片定。
+
+### 6.13 tracking_moving 定稿卡(E3-k;**Tier B→A 升格**,合成式誊录)
+
+机制(代码确认):单 dot 存活制追踪射击;30s;点击即 shot(distance=准心到 dot 距离,**hit=distance≤45 实码** HIT_THRESHOLD);dotLifetime=dot 出生→击杀毫秒(玩家获取时间);movement=摇杆采样。**契约增量6**:旧提交=shot 帧与 movement 帧合并流(movement 帧以 target=(0,0)/deviation=0 混入,**无判别器**;且缺 hit/dotLifetime 两事实)——`TrackingMovingFrame` 增 `optional hit`+`optional dot_lifetime_ms`:**hit 存在性=帧判别器**(movement 帧两不设),lifetime 仅 shot 帧载。资源款零客户端消费者,加列即闭。
+重算(对齐旧前端 TrackingMovingTestPage 评分区):accuracy=Σhit/len(shots);avgDev=shot 帧 deviation 均值;moveDist=movement 帧 player 折线累计;avgLifetime=命中发 dotLifetime 均值;multitasking=(accuracy×0.4 + avgLifetime<1500ms?0.3:0 + moveDist>500?0.3:0);composite=clamp(accuracy×4 + max(0,(40−avgDev)/8) + min(1,moveDist/1000)×2 + multitasking×2, 0, 10)。
+闸门:**hit 断言交叉验证**=hit 值须与服务端按 deviation≤hit_threshold_px(引擎键,默认 45 实码)复算一致,不符=DETAIL_MISMATCH(facts-up:hit 是客户端断言,判定权在服务端——较旧版只闸区间前进);shot 帧缺 lifetime/movement 帧带 lifetime=DETAIL_MISMATCH(形状纪律);dotLifetime<80ms=ABSURD_REACTION_TIME(出生→击杀快于反应下限=伪造);乱序戳/负 deviation=DETAIL_MISMATCH;span>config+1500ms=ABSURD_TIME_SPAN;无 shot 帧→诚实零(客户端 totalShots=0 记 0 同臂——stability 项不得为「从不射击」付钱)。
+⚠️ 改编披露:无命中时 avgLifetime 缺省 0<1500 → multitasking 0.3 白拿——旧版同臂原样承袭(曲线吸收);movement 帧的 target/deviation 旧线型恒 (0,0)/0,服务端不读(只读 player),新引擎可填真值不破坏。
+轨一:raw=确认命中发数×unit_score(§四:10/有效命中)×难度(典型 20-30 发→200-300);权威轨:曲线未定稿留空,composite 入 extras。
+
+### 6.14 economic_sim 定稿卡(E3-l;**Tier B→A 升格,E3 十三款收满**,合成式誊录)
+
+机制(代码确认):单兵补刀窗口制;小兵血量衰减,点击补刀按剩余血量四窗口分类——perfect(melee/ranged ≤5,cannon ≤8)/good(≤10/≤15)/early(≤30)/too_early(>30);金币基数 melee/ranged 21、cannon 90,窗口比例 100%/60%/30%/0(floor);perfect/good 计 CS,perfect 另 +1s 时长;too_early 扣血 5%;商店三档 400/800/1200 ≤3 件;终局血 hp 口径 0-1500(health%×15)。
+**契约增量7**:last_hits 增 `minion_type{melee|ranged|cannon}`+`minion_health`(1-100)——**窗口判定与金额复算权收服务端**,is_last_hit/gold_earned 降为交叉验证对象(facts-up:旧版两断言全信客户端);顶层增 `missed_minions`(漏刀无自然事件,计数申报)+`final_health_hp`(required,0-1500)。资源款零客户端消费者,加列即闭。
+重算(对齐旧前端 PRD 2.6 公式):csEfficiency=cs/durationSec×3(分母=config 镜像);accuracy=cs>0?perfectCS/cs×3:0;items=len(purchases)×1.5;health=final_hp/1500×1.5;penalty=earlyHits×0.1+missedMinions×0.05;composite=clamp(Σ,0,10)。
+闸门:词表外兵种=DETAIL_MISMATCH;**判定交叉**=is_last_hit 须与按 minion_health 复算的窗口一致;**金额交叉**=gold_earned 须与窗口复算金额逐一相等(金币守恒的全量版——不只 Σ 守恒,每笔可验);**时间线守恒**=两流按 elapsed 归并走余额,任一 purchase 时点余额<0=DETAIL_MISMATCH(startGold=0);cost 档外(item_cost_1/2/3 默认 400/800/1200)/件数>max_items(3)=DETAIL_MISMATCH(装备阶梯,Java 硬码三档服务端化+配置化);final_hp 非 15 步进=DETAIL_MISMATCH(HP 合法性,Java %15 同臂);两流各自乱序=DETAIL_MISMATCH;span>(config+perfectCS×1s)+1500ms=ABSURD_TIME_SPAN(perfect +1s 加时入上限,§6.5 族)。
+⚠️ 改编披露:纯挂机=1.5 保底(health 项白送,旧版同臂)——composite 是曲线输入非常数分,曲线吸收;missed_minions 为申报计数无事件佐证(漏刀在引擎面不可观测,E7 引擎可加漏刀事件后收紧)。
+轨一:raw=cs×unit_score(§四:15/有效正补)×难度(典型 15-30 补→225-450);权威轨:曲线未定稿留空,composite 入 extras。
 
 ## 七、8 维认知权重矩阵(三源合一 🧊:JAVA 常量 = API 公式表 = ST DIM8 逐值核对一致)
 
@@ -279,3 +299,9 @@
 - 2026-10-23 E3-h:resource_match 定稿卡入档(§6.11,合成式誊录);碰撞事实流补位(E0 增量5:契约注释与公式事实面错位,加 collisions 事件列)、出生经济配置化(42 硬编码→三键)、聚合从流重建、间隔闸/时长锚/死亡经济闸新立、3.0 保底与速率项本义披露;§6.4 批量表余一款。Tier A 达 9/10。
 
 - 2026-10-23 E3-i:character_counter 定稿卡入档(§6.12,**rework 规格落地非旧仓松公式**);c_max 穷举分母/删 3 分 fallback/速度乘数替常数 timeBonus/150 封顶四改编全披露;题库=12 关系行入通用银行(scenario=role|role 对);§6.4 批量表仅余 Tier B 二款。**Tier A 10/10 收满**。
+
+- 2026-10-23 E3-j:moving_target 定稿卡升格(§6.3,Tier B→A:契约采样流本就支持全量重算,零契约改动);阈值冲突代码级解除(20/30/80 实码 vs 两注陈旧注释)、计数×间隔对偶、密度闸、空流诚实零(E3-f 族瑕疵修法)均披露;§6.0 名册 Tier A 十一款/Tier B 二款(tracking_moving 契约增量待立+economic_sim 待侦察)。
+
+- 2026-10-23 E3-k:tracking_moving 定稿卡升格(§6.13,Tier B→A:**契约增量6**=TrackingMovingFrame 增 optional hit+dot_lifetime_ms,hit 存在性兼合并流帧判别器);hit 断言服务端交叉验证(deviation≤45 复算)、lifetime 反应下限闸、无 shot 诚实零、无命中 0.3 白拿臂承袭披露;§6.0 名册 Tier A 十二款/Tier B 一款(仅 economic_sim)。
+
+- 2026-10-23 E3-l:economic_sim 定稿卡升格(§6.14,Tier B→A:**契约增量7**=minion_type/minion_health 上事件+missed_minions/final_health_hp 上顶层);窗口判定与金额复算双交叉、时间线金币守恒、装备阶梯三档配置化、HP 15 步进闸、perfect 加时入 span 上限、挂机 1.5 保底披露;**Tier B 消亡,13 款全量重算,E3 评分面收满**(报告分 e2e 验收随 E5);§6.4 批量表清空。

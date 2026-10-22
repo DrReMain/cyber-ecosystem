@@ -39,8 +39,11 @@ func TestScorerRegistryLookup(t *testing.T) {
 	if _, ok := lookupScorer("flash_aiming"); !ok {
 		t.Error("flash_aiming scorer not registered")
 	}
-	if _, ok := lookupScorer("economic_sim"); ok {
-		t.Error("economic_sim has no scorer yet; lookup must miss")
+	if _, ok := lookupScorer("economic_sim"); !ok {
+		t.Error("economic_sim scorer not registered")
+	}
+	if _, ok := lookupScorer("ghost_game"); ok {
+		t.Error("ghost_game has no scorer; lookup must miss")
 	}
 }
 

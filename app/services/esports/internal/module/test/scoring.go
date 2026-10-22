@@ -72,6 +72,13 @@ func (p scoringParams) num(key string, fallback float64) float64 {
 	return v
 }
 
+func (p scoringParams) effectiveDurationSec() float64 {
+	if p.durationSec <= 0 {
+		return sessionDurationFallbackSec
+	}
+	return float64(p.durationSec)
+}
+
 func (p scoringParams) difficulty() float64 {
 	if p.difficultyFactor > 0 {
 		return p.difficultyFactor

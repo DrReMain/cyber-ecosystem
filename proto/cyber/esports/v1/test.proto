@@ -289,6 +289,11 @@ message TrackingMovingFrame {
   Point crosshair = 3;
   double deviation = 4;
   Point player = 5;
+  // Presence marks a shot frame (movement frames leave both unset) — the
+  // merged legacy stream mixed the two kinds with no discriminator.
+  optional bool hit = 6;
+  // The dot's spawn-to-kill lifetime; rides only on shot frames.
+  optional int32 dot_lifetime_ms = 7 [(buf.validate.field).int32.gte = 0];
 }
 
 // moving_target — tracking across movement patterns; the pattern phase is a
@@ -425,11 +430,33 @@ message ResourceMatchCollision {
 message EconomicSimDetail {
   repeated EconomicSimLastHit last_hits = 1 [(buf.validate.field).repeated.max_items = 4096]; // legacy: lastHitEvents
   repeated EconomicSimPurchase purchases = 2 [(buf.validate.field).repeated.max_items = 1024]; // legacy: purchases
+  // Minions that died untended — a missed lane creep leaves no event, so
+  // the count rides the top level (legacy missedMinions).
+  optional int32 missed_minions = 3 [(buf.validate.field).int32.gte = 0];
+  // Terminal health on the legacy 0-1500 hp wire scale (health% × 15).
+  optional int32 final_health_hp = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32 = {
+      gte: 0
+      lte: 1500
+    }
+  ];
 }
 message EconomicSimLastHit {
   int32 elapsed_ms = 1 [(buf.validate.field).int32.gte = 0]; // legacy: timestamp
   bool is_last_hit = 2;
   int32 gold_earned = 3;
+  // Open vocabulary {melee | ranged | cannon} — the minion on the block.
+  string minion_type = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 16
+  }];
+  // The minion's remaining health at the tap — the window verdict is a
+  // server-side judgment from it (legacy judged client-side).
+  int32 minion_health = 5 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 100
+  }];
 }
 message EconomicSimPurchase {
   int32 elapsed_ms = 1 [(buf.validate.field).int32.gte = 0]; // legacy: timestamp

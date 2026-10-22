@@ -19,7 +19,7 @@
 | E0 契约首刀 | lzx | ✅ 10-21 | 种子(画像+目录)+增量2(测试读面)+增量3(统一提交,4 决策经裁)+增量4(三计数反哺,193a9b7c);余面已裁去向:报告读面随 E5/E9、entitlement 随 E8(D-AA) |
 | E1 服务骨架 | lzx | ✅ 10-18 | kratos-new-service 八步;双面 accessLadder+catalog+部署面;会员链探针 e2e 绿 |
 | E2 schema+种子 | lzx | ✅ 10-20 | D-V 撤回后按冻结契约 clean-room 重建;五表+三读+13 款种子骨架(校准值不杜撰,随 E3 单源);multi_target 补行=D-Z |
-| E3 评分引擎 | lzx | ⏳ | 增量a metric.md 单源档、增量b Registry+纯函数+20 黄金 ✅;增量c 提交缝(4c5f0617)、增量d MT/TR 定稿(5b0160fb)✅,双轴评审两实错已吸收;增量e DZ/ST 定稿 ✅(净钟+哨兵双射闸,metric §6.7/6.8);增量g offense_defense 定稿 ✅(判键式正确性+题库入通用银行,metric §6.10,Tier A 8/10);增量h resource_match 定稿 ✅(碰撞事件流=契约增量5 补位+出生经济闸,metric §6.11,Tier A 9/10);增量i character_counter 定稿 ✅(rework 规格落地=c_max 分母+速度乘数+150 封顶,题库 12 关系行入通用银行,metric §6.12,**Tier A 10/10 收满**);**余:Tier B 三款闸门(moving_target/tracking_moving/economic_sim)**;「报告分 e2e」验收面挂 E5,H-C 前移回执层;guard 正则修正随下次镜像批回流 dev 兄弟服务 |
+| E3 评分引擎 | lzx | ⏳ | 增量a metric.md 单源档、增量b Registry+纯函数+20 黄金 ✅;增量c 提交缝(4c5f0617)、增量d MT/TR 定稿(5b0160fb)✅,双轴评审两实错已吸收;增量e DZ/ST 定稿 ✅(净钟+哨兵双射闸,metric §6.7/6.8);增量g offense_defense 定稿 ✅(判键式正确性+题库入通用银行,metric §6.10,Tier A 8/10);增量h resource_match 定稿 ✅(碰撞事件流=契约增量5 补位+出生经济闸,metric §6.11,Tier A 9/10);增量i character_counter 定稿 ✅(rework 规格落地=c_max 分母+速度乘数+150 封顶,题库 12 关系行入通用银行,metric §6.12,**Tier A 10/10 收满**);增量j moving_target 定稿 ✅(Tier B→A 升格:采样流全量重算+阈值 20/30/80 实码解除冲突,metric §6.3);增量k tracking_moving 定稿 ✅(Tier B→A 升格:契约增量6=optional hit+dot_lifetime_ms,hit 存在性兼帧判别器+断言服务端交叉验证,metric §6.13);增量l economic_sim 定稿 ✅(Tier B→A 升格:契约增量7=窗口事实上事件+漏刀/终局血上顶层,判定与金额双交叉+时间线金币守恒,metric §6.14)——**Tier B 消亡,13 款全量重算,评分面收满**(报告分 e2e 验收随 E5);**余:无 scorer 余款;E3 收口面=报告分 e2e(挂 E5)+guard 正则回流**;「报告分 e2e」验收面挂 E5,H-C 前移回执层;guard 正则修正随下次镜像批回流 dev 兄弟服务 |
 | E4 匹配引擎 | — | 未认领 | 重测 3/1 真律与难度模式轴归属地 |
 | E5 报告框架+能力报告 | — | 未认领 | 服务/客户端两半可并行 |
 | E6a ctr 纯壳 | lzx | ✅ 10-18 | D-R/S/T 全落;SEO 全量面同日收口 |
@@ -97,3 +97,6 @@
 - 10-23 S4 终局对账(四列融合:旧后端 33 表端点级/旧前端 admin20+ctr60 路由/新原型 ctr43+admin41/新 PRD 全量):总判定=承诺窗(M1+M2 核心+PAY+M4)基本可达,前提=支付即启+H-C 落地+未认领片有人接;全量原型需 P13 豁免签认。立片 MIG1/E5b/E6c+E9 增量锚;提裁 P13/P14/P15;档位四档疑点解除(=BLOCK5 §7.7 逐字,§7.3 六级=系统套称号并行词汇);旧库复核=无支付网关、基线 V15(b4「V16+wx_jsapi」=新版前向编号无存量面)。
 - 10-23 E3-h:resource_match 定稿(碰撞事件流补位=契约增量5+出生经济三键配置化+死亡经济闸),Tier A 9/10;§6.4 批量表余 character_counter 一款。
 - 10-23 E3-i:character_counter 定稿(rework 规格落地:96.3% 饱和治理/c_max 穷举分母/速度乘数/150 封顶;题库 12 关系行入通用银行),**Tier A 10/10 收满**;E3 余 Tier B 三款闸门。
+- 10-23 E3-j:moving_target 定稿(Tier B→A 升格:采样流全量重算,阈值 20/30/80 实码解除旧注冲突,计数×间隔对偶+密度闸+空流诚实零),Tier A 十一款;余 Tier B 二款。
+- 10-23 E3-k:tracking_moving 定稿(Tier B→A 升格:契约增量6 补 hit+dot_lifetime,hit 断言服务端交叉验证+lifetime 反应闸),Tier A 十二款;余 economic_sim 一款。
+- 10-23 E3-l:economic_sim 定稿(Tier B→A 升格:契约增量7 补窗口事实,判定/金额双交叉+时间线守恒+装备阶梯配置化),**Tier B 消亡,13 款评分面收满**;E3 余面=报告分 e2e(随 E5)+guard 正则回流。

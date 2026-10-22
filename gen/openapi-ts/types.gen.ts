@@ -229,12 +229,30 @@ export type CyberEsportsV1DualZoneDetail = {
 export type CyberEsportsV1EconomicSimDetail = {
     lastHits?: Array<CyberEsportsV1EconomicSimLastHit>;
     purchases?: Array<CyberEsportsV1EconomicSimPurchase>;
+    /**
+     * Minions that died untended — a missed lane creep leaves no event, so
+     * the count rides the top level (legacy missedMinions).
+     */
+    missedMinions?: number;
+    /**
+     * Terminal health on the legacy 0-1500 hp wire scale (health% × 15).
+     */
+    finalHealthHp?: number;
 };
 
 export type CyberEsportsV1EconomicSimLastHit = {
     elapsedMs?: number;
     isLastHit?: boolean;
     goldEarned?: number;
+    /**
+     * Open vocabulary {melee | ranged | cannon} — the minion on the block.
+     */
+    minionType?: string;
+    /**
+     * The minion's remaining health at the tap — the window verdict is a
+     * server-side judgment from it (legacy judged client-side).
+     */
+    minionHealth?: number;
 };
 
 export type CyberEsportsV1EconomicSimPurchase = {
@@ -707,6 +725,15 @@ export type CyberEsportsV1TrackingMovingFrame = {
     crosshair?: CyberEsportsV1Point;
     deviation?: number;
     player?: CyberEsportsV1Point;
+    /**
+     * Presence marks a shot frame (movement frames leave both unset) — the
+     * merged legacy stream mixed the two kinds with no discriminator.
+     */
+    hit?: boolean;
+    /**
+     * The dot's spawn-to-kill lifetime; rides only on shot frames.
+     */
+    dotLifetimeMs?: number;
 };
 
 /**

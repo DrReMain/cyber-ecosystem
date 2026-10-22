@@ -2532,6 +2532,16 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.EconomicSimPurchase'
+                missedMinions:
+                    type: integer
+                    description: |-
+                        Minions that died untended — a missed lane creep leaves no event, so
+                         the count rides the top level (legacy missedMinions).
+                    format: int32
+                finalHealthHp:
+                    type: integer
+                    description: Terminal health on the legacy 0-1500 hp wire scale (health% × 15).
+                    format: int32
             description: economic_sim — last-hitting and spending economy.
         cyber.esports.v1.EconomicSimLastHit:
             type: object
@@ -2543,6 +2553,15 @@ components:
                     type: boolean
                 goldEarned:
                     type: integer
+                    format: int32
+                minionType:
+                    type: string
+                    description: Open vocabulary {melee | ranged | cannon} — the minion on the block.
+                minionHealth:
+                    type: integer
+                    description: |-
+                        The minion's remaining health at the tap — the window verdict is a
+                         server-side judgment from it (legacy judged client-side).
                     format: int32
         cyber.esports.v1.EconomicSimPurchase:
             type: object
@@ -3206,6 +3225,15 @@ components:
                     format: double
                 player:
                     $ref: '#/components/schemas/cyber.esports.v1.Point'
+                hit:
+                    type: boolean
+                    description: |-
+                        Presence marks a shot frame (movement frames leave both unset) — the
+                         merged legacy stream mixed the two kinds with no discriminator.
+                dotLifetimeMs:
+                    type: integer
+                    description: The dot's spawn-to-kill lifetime; rides only on shot frames.
+                    format: int32
         cyber.esports.v1.UpdateProfileRequest:
             type: object
             properties:

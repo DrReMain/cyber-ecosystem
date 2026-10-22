@@ -1576,12 +1576,17 @@ func (x *TrackingMovingDetail) GetFrames() []*TrackingMovingFrame {
 }
 
 type TrackingMovingFrame struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ElapsedMs     int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"`
-	Target        *Point                 `protobuf:"bytes,2,opt,name=target,proto3" json:"target,omitempty"`
-	Crosshair     *Point                 `protobuf:"bytes,3,opt,name=crosshair,proto3" json:"crosshair,omitempty"`
-	Deviation     float64                `protobuf:"fixed64,4,opt,name=deviation,proto3" json:"deviation,omitempty"`
-	Player        *Point                 `protobuf:"bytes,5,opt,name=player,proto3" json:"player,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	ElapsedMs int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"`
+	Target    *Point                 `protobuf:"bytes,2,opt,name=target,proto3" json:"target,omitempty"`
+	Crosshair *Point                 `protobuf:"bytes,3,opt,name=crosshair,proto3" json:"crosshair,omitempty"`
+	Deviation float64                `protobuf:"fixed64,4,opt,name=deviation,proto3" json:"deviation,omitempty"`
+	Player    *Point                 `protobuf:"bytes,5,opt,name=player,proto3" json:"player,omitempty"`
+	// Presence marks a shot frame (movement frames leave both unset) — the
+	// merged legacy stream mixed the two kinds with no discriminator.
+	Hit *bool `protobuf:"varint,6,opt,name=hit,proto3,oneof" json:"hit,omitempty"`
+	// The dot's spawn-to-kill lifetime; rides only on shot frames.
+	DotLifetimeMs *int32 `protobuf:"varint,7,opt,name=dot_lifetime_ms,json=dotLifetimeMs,proto3,oneof" json:"dot_lifetime_ms,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1649,6 +1654,20 @@ func (x *TrackingMovingFrame) GetPlayer() *Point {
 		return x.Player
 	}
 	return nil
+}
+
+func (x *TrackingMovingFrame) GetHit() bool {
+	if x != nil && x.Hit != nil {
+		return *x.Hit
+	}
+	return false
+}
+
+func (x *TrackingMovingFrame) GetDotLifetimeMs() int32 {
+	if x != nil && x.DotLifetimeMs != nil {
+		return *x.DotLifetimeMs
+	}
+	return 0
 }
 
 // moving_target — tracking across movement patterns; the pattern phase is a
@@ -2703,9 +2722,14 @@ func (x *ResourceMatchCollision) GetElapsedMs() int32 {
 
 // economic_sim — last-hitting and spending economy.
 type EconomicSimDetail struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	LastHits      []*EconomicSimLastHit  `protobuf:"bytes,1,rep,name=last_hits,json=lastHits,proto3" json:"last_hits,omitempty"` // legacy: lastHitEvents
-	Purchases     []*EconomicSimPurchase `protobuf:"bytes,2,rep,name=purchases,proto3" json:"purchases,omitempty"`               // legacy: purchases
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	LastHits  []*EconomicSimLastHit  `protobuf:"bytes,1,rep,name=last_hits,json=lastHits,proto3" json:"last_hits,omitempty"` // legacy: lastHitEvents
+	Purchases []*EconomicSimPurchase `protobuf:"bytes,2,rep,name=purchases,proto3" json:"purchases,omitempty"`               // legacy: purchases
+	// Minions that died untended — a missed lane creep leaves no event, so
+	// the count rides the top level (legacy missedMinions).
+	MissedMinions *int32 `protobuf:"varint,3,opt,name=missed_minions,json=missedMinions,proto3,oneof" json:"missed_minions,omitempty"`
+	// Terminal health on the legacy 0-1500 hp wire scale (health% × 15).
+	FinalHealthHp *int32 `protobuf:"varint,4,opt,name=final_health_hp,json=finalHealthHp,proto3,oneof" json:"final_health_hp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2754,11 +2778,30 @@ func (x *EconomicSimDetail) GetPurchases() []*EconomicSimPurchase {
 	return nil
 }
 
+func (x *EconomicSimDetail) GetMissedMinions() int32 {
+	if x != nil && x.MissedMinions != nil {
+		return *x.MissedMinions
+	}
+	return 0
+}
+
+func (x *EconomicSimDetail) GetFinalHealthHp() int32 {
+	if x != nil && x.FinalHealthHp != nil {
+		return *x.FinalHealthHp
+	}
+	return 0
+}
+
 type EconomicSimLastHit struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ElapsedMs     int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"` // legacy: timestamp
-	IsLastHit     bool                   `protobuf:"varint,2,opt,name=is_last_hit,json=isLastHit,proto3" json:"is_last_hit,omitempty"`
-	GoldEarned    int32                  `protobuf:"varint,3,opt,name=gold_earned,json=goldEarned,proto3" json:"gold_earned,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	ElapsedMs  int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"` // legacy: timestamp
+	IsLastHit  bool                   `protobuf:"varint,2,opt,name=is_last_hit,json=isLastHit,proto3" json:"is_last_hit,omitempty"`
+	GoldEarned int32                  `protobuf:"varint,3,opt,name=gold_earned,json=goldEarned,proto3" json:"gold_earned,omitempty"`
+	// Open vocabulary {melee | ranged | cannon} — the minion on the block.
+	MinionType string `protobuf:"bytes,4,opt,name=minion_type,json=minionType,proto3" json:"minion_type,omitempty"`
+	// The minion's remaining health at the tap — the window verdict is a
+	// server-side judgment from it (legacy judged client-side).
+	MinionHealth  int32 `protobuf:"varint,5,opt,name=minion_health,json=minionHealth,proto3" json:"minion_health,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2810,6 +2853,20 @@ func (x *EconomicSimLastHit) GetIsLastHit() bool {
 func (x *EconomicSimLastHit) GetGoldEarned() int32 {
 	if x != nil {
 		return x.GoldEarned
+	}
+	return 0
+}
+
+func (x *EconomicSimLastHit) GetMinionType() string {
+	if x != nil {
+		return x.MinionType
+	}
+	return ""
+}
+
+func (x *EconomicSimLastHit) GetMinionHealth() int32 {
+	if x != nil {
+		return x.MinionHealth
 	}
 	return 0
 }
@@ -3002,14 +3059,18 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"elapsed_ms\x18\x04 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMsB\x13\n" +
 	"\x11_reaction_time_ms\"`\n" +
 	"\x14TrackingMovingDetail\x12H\n" +
-	"\x06frames\x18\x01 \x03(\v2%.cyber.esports.v1.TrackingMovingFrameB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x06frames\"\xf4\x01\n" +
+	"\x06frames\x18\x01 \x03(\v2%.cyber.esports.v1.TrackingMovingFrameB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x06frames\"\xdd\x02\n" +
 	"\x13TrackingMovingFrame\x12&\n" +
 	"\n" +
 	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12/\n" +
 	"\x06target\x18\x02 \x01(\v2\x17.cyber.esports.v1.PointR\x06target\x125\n" +
 	"\tcrosshair\x18\x03 \x01(\v2\x17.cyber.esports.v1.PointR\tcrosshair\x12\x1c\n" +
 	"\tdeviation\x18\x04 \x01(\x01R\tdeviation\x12/\n" +
-	"\x06player\x18\x05 \x01(\v2\x17.cyber.esports.v1.PointR\x06player\"Y\n" +
+	"\x06player\x18\x05 \x01(\v2\x17.cyber.esports.v1.PointR\x06player\x12\x15\n" +
+	"\x03hit\x18\x06 \x01(\bH\x00R\x03hit\x88\x01\x01\x124\n" +
+	"\x0fdot_lifetime_ms\x18\a \x01(\x05B\a\xbaH\x04\x1a\x02(\x00H\x01R\rdotLifetimeMs\x88\x01\x01B\x06\n" +
+	"\x04_hitB\x12\n" +
+	"\x10_dot_lifetime_ms\"Y\n" +
 	"\x12MovingTargetDetail\x12C\n" +
 	"\x05shots\x18\x01 \x03(\v2\".cyber.esports.v1.MovingTargetShotB\t\xbaH\x06\x92\x01\x03\x10\x80 R\x05shots\"\xf7\x01\n" +
 	"\x10MovingTargetShot\x12&\n" +
@@ -3100,16 +3161,24 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"elapsed_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"@\n" +
 	"\x16ResourceMatchCollision\x12&\n" +
 	"\n" +
-	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"\xb1\x01\n" +
+	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"\xc9\x02\n" +
 	"\x11EconomicSimDetail\x12L\n" +
 	"\tlast_hits\x18\x01 \x03(\v2$.cyber.esports.v1.EconomicSimLastHitB\t\xbaH\x06\x92\x01\x03\x10\x80 R\blastHits\x12N\n" +
-	"\tpurchases\x18\x02 \x03(\v2%.cyber.esports.v1.EconomicSimPurchaseB\t\xbaH\x06\x92\x01\x03\x10\x80\bR\tpurchases\"}\n" +
+	"\tpurchases\x18\x02 \x03(\v2%.cyber.esports.v1.EconomicSimPurchaseB\t\xbaH\x06\x92\x01\x03\x10\x80\bR\tpurchases\x123\n" +
+	"\x0emissed_minions\x18\x03 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00H\x00R\rmissedMinions\x88\x01\x01\x12:\n" +
+	"\x0ffinal_health_hp\x18\x04 \x01(\x05B\r\xbaH\n" +
+	"\xc8\x01\x01\x1a\x05\x18\xdc\v(\x00H\x01R\rfinalHealthHp\x88\x01\x01B\x11\n" +
+	"\x0f_missed_minionsB\x12\n" +
+	"\x10_final_health_hp\"\xd9\x01\n" +
 	"\x12EconomicSimLastHit\x12&\n" +
 	"\n" +
 	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12\x1e\n" +
 	"\vis_last_hit\x18\x02 \x01(\bR\tisLastHit\x12\x1f\n" +
 	"\vgold_earned\x18\x03 \x01(\x05R\n" +
-	"goldEarned\"\x82\x01\n" +
+	"goldEarned\x12*\n" +
+	"\vminion_type\x18\x04 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\n" +
+	"minionType\x12.\n" +
+	"\rminion_health\x18\x05 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x01R\fminionHealth\"\x82\x01\n" +
 	"\x13EconomicSimPurchase\x12&\n" +
 	"\n" +
 	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12&\n" +
@@ -3291,9 +3360,11 @@ func file_cyber_esports_v1_test_proto_init() {
 		(*SubmitTestAttemptRequest_EconomicSim)(nil),
 	}
 	file_cyber_esports_v1_test_proto_msgTypes[19].OneofWrappers = []any{}
+	file_cyber_esports_v1_test_proto_msgTypes[21].OneofWrappers = []any{}
 	file_cyber_esports_v1_test_proto_msgTypes[27].OneofWrappers = []any{}
 	file_cyber_esports_v1_test_proto_msgTypes[32].OneofWrappers = []any{}
 	file_cyber_esports_v1_test_proto_msgTypes[36].OneofWrappers = []any{}
+	file_cyber_esports_v1_test_proto_msgTypes[39].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

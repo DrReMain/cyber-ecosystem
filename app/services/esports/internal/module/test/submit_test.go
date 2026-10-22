@@ -107,9 +107,11 @@ func TestSubmitUnknownCode(t *testing.T) {
 
 func TestSubmitUnscoredGame(t *testing.T) {
 	rp, uc := submitFixture()
-	rp.tests["economic_sim"] = &Test{ID: "t13", Code: "economic_sim", Ability: utils.Ptr("resourceAllocation")}
-	rp.configs["economic_sim"] = &TestConfig{BackgroundInvalidSec: 10}
-	_, err := uc.Submit(memberCtx(), redDotReq("economic_sim", 1))
+	// Every seeded game carries a scorer now, so the unscored arm rides a
+	// code the catalog never knew — the rejection contract is the same.
+	rp.tests["ghost_game"] = &Test{ID: "t13", Code: "ghost_game", Ability: utils.Ptr("resourceAllocation")}
+	rp.configs["ghost_game"] = &TestConfig{BackgroundInvalidSec: 10}
+	_, err := uc.Submit(memberCtx(), redDotReq("ghost_game", 1))
 	if !esportspb.IsEsportsUnspecified(err) {
 		t.Fatalf("err = %v, want ESPORTS_UNSPECIFIED", err)
 	}
