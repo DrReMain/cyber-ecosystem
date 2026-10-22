@@ -1,23 +1,12 @@
 import { m } from "#/paraglide/messages";
+import { LoadingStrip } from "../states/loading-strip";
 
 export function PendingFallback() {
   return (
-    <div className="relative flex size-full min-h-24 grow items-center justify-center">
-      <div className="relative w-[min(200px,60%)]" role="status">
+    <div className="relative flex size-full min-h-app grow items-center justify-center">
+      <div className="w-[min(200px,60%)]" role="status">
         <span className="sr-only">{m.common_loading()}</span>
-        <div
-          aria-hidden
-          className="text-center font-mono text-[11px] text-current/50 uppercase tracking-[0.18em]"
-          dir="ltr"
-        >
-          LOADING
-        </div>
-        <span
-          aria-hidden
-          className="relative mt-2 block h-0.5 overflow-hidden rounded bg-current/12"
-        >
-          <span className="absolute inset-s-[-40%] inset-y-0 w-2/5 bg-linear-to-r from-transparent via-current/70 to-transparent motion-safe:animate-sweep rtl:motion-safe:animate-sweep-rev" />
-        </span>
+        <LoadingStrip tone="inherit" />
       </div>
     </div>
   );
