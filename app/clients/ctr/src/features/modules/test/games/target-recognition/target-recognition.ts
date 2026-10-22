@@ -7,8 +7,9 @@
 // never asserted here — and a blank tap counts locally without a fact
 // (the contract's target_id cannot name air). Positions are
 // container-relative. The run itself is owned by the clock.
-import type { GameInstance, GameModule, GameModuleCtx } from "../../contract";
+
 import { m } from "#/paraglide/messages";
+import type { GameInstance, GameModule, GameModuleCtx } from "../../contract";
 import { createLucideIcon, type IconNode } from "../lucide-icon";
 import {
   distance,
@@ -69,7 +70,6 @@ const LEGEND_LABEL: Record<TargetType, () => string> = {
   friendly: m.test_rec_legend_friendly,
   neutral: m.test_rec_legend_neutral,
 };
-
 
 // Timer accounting follows the engine's pause law: deadlines are parked as
 // remaining-ms at pause and re-armed at resume.

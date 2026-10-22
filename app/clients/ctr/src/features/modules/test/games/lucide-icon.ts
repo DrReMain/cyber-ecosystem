@@ -4,10 +4,7 @@
 // trees (the same [tag, attrs] shape the package ships) and builds the
 // identical SVG, keeping every in-game icon lucide-shaped per the
 // repo's zero-emoji ruling.
-export type IconNode = readonly (readonly [
-  tag: string,
-  attrs: Readonly<Record<string, string>>,
-])[];
+export type IconNode = readonly (readonly [tag: string, attrs: Readonly<Record<string, string>>])[];
 
 export function createLucideIcon(node: IconNode, size: number): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
