@@ -2922,6 +2922,12 @@ components:
                 elapsedMs:
                     type: integer
                     format: int32
+        cyber.esports.v1.ResourceMatchCollision:
+            type: object
+            properties:
+                elapsedMs:
+                    type: integer
+                    format: int32
         cyber.esports.v1.ResourceMatchDetail:
             type: object
             properties:
@@ -2933,9 +2939,13 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.ResourceMatchCollect'
+                collisions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ResourceMatchCollision'
             description: |-
-                resource_match — collecting resources on a field; trajectory plus the
-                 collect sequence (kind + time) rebuild every efficiency aggregate.
+                resource_match — collecting resources on a field; trajectory, the collect
+                 sequence (kind + time), and collisions rebuild every efficiency aggregate.
         cyber.esports.v1.ResourceMatchTrajectoryPoint:
             type: object
             properties:

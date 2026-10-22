@@ -398,11 +398,12 @@ message CharacterCounterRound {
   int32 time_spent_ms = 4 [(buf.validate.field).int32.gte = 0]; // legacy: timeSpent
 }
 
-// resource_match — collecting resources on a field; trajectory plus the
-// collect sequence (kind + time) rebuild every efficiency aggregate.
+// resource_match — collecting resources on a field; trajectory, the collect
+// sequence (kind + time), and collisions rebuild every efficiency aggregate.
 message ResourceMatchDetail {
   repeated ResourceMatchTrajectoryPoint trajectory = 1 [(buf.validate.field).repeated.max_items = 8192]; // legacy: trajectory
   repeated ResourceMatchCollect collects = 2 [(buf.validate.field).repeated.max_items = 1024]; // legacy: collectSequence (was bare numbers)
+  repeated ResourceMatchCollision collisions = 3 [(buf.validate.field).repeated.max_items = 64]; // legacy: stats.encounters (was a bare count)
 }
 message ResourceMatchTrajectoryPoint {
   Point position = 1; // legacy: x/y
@@ -415,6 +416,9 @@ message ResourceMatchCollect {
     max_len: 16
   }];
   int32 elapsed_ms = 2 [(buf.validate.field).int32.gte = 0];
+}
+message ResourceMatchCollision {
+  int32 elapsed_ms = 1 [(buf.validate.field).int32.gte = 0];
 }
 
 // economic_sim — last-hitting and spending economy.

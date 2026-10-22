@@ -2490,12 +2490,13 @@ func (x *CharacterCounterRound) GetTimeSpentMs() int32 {
 	return 0
 }
 
-// resource_match — collecting resources on a field; trajectory plus the
-// collect sequence (kind + time) rebuild every efficiency aggregate.
+// resource_match — collecting resources on a field; trajectory, the collect
+// sequence (kind + time), and collisions rebuild every efficiency aggregate.
 type ResourceMatchDetail struct {
 	state         protoimpl.MessageState          `protogen:"open.v1"`
 	Trajectory    []*ResourceMatchTrajectoryPoint `protobuf:"bytes,1,rep,name=trajectory,proto3" json:"trajectory,omitempty"` // legacy: trajectory
 	Collects      []*ResourceMatchCollect         `protobuf:"bytes,2,rep,name=collects,proto3" json:"collects,omitempty"`     // legacy: collectSequence (was bare numbers)
+	Collisions    []*ResourceMatchCollision       `protobuf:"bytes,3,rep,name=collisions,proto3" json:"collisions,omitempty"` // legacy: stats.encounters (was a bare count)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2540,6 +2541,13 @@ func (x *ResourceMatchDetail) GetTrajectory() []*ResourceMatchTrajectoryPoint {
 func (x *ResourceMatchDetail) GetCollects() []*ResourceMatchCollect {
 	if x != nil {
 		return x.Collects
+	}
+	return nil
+}
+
+func (x *ResourceMatchDetail) GetCollisions() []*ResourceMatchCollision {
+	if x != nil {
+		return x.Collisions
 	}
 	return nil
 }
@@ -2649,6 +2657,50 @@ func (x *ResourceMatchCollect) GetElapsedMs() int32 {
 	return 0
 }
 
+type ResourceMatchCollision struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ElapsedMs     int32                  `protobuf:"varint,1,opt,name=elapsed_ms,json=elapsedMs,proto3" json:"elapsed_ms,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResourceMatchCollision) Reset() {
+	*x = ResourceMatchCollision{}
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResourceMatchCollision) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResourceMatchCollision) ProtoMessage() {}
+
+func (x *ResourceMatchCollision) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResourceMatchCollision.ProtoReflect.Descriptor instead.
+func (*ResourceMatchCollision) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *ResourceMatchCollision) GetElapsedMs() int32 {
+	if x != nil {
+		return x.ElapsedMs
+	}
+	return 0
+}
+
 // economic_sim — last-hitting and spending economy.
 type EconomicSimDetail struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -2660,7 +2712,7 @@ type EconomicSimDetail struct {
 
 func (x *EconomicSimDetail) Reset() {
 	*x = EconomicSimDetail{}
-	mi := &file_cyber_esports_v1_test_proto_msgTypes[38]
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2672,7 +2724,7 @@ func (x *EconomicSimDetail) String() string {
 func (*EconomicSimDetail) ProtoMessage() {}
 
 func (x *EconomicSimDetail) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_test_proto_msgTypes[38]
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2685,7 +2737,7 @@ func (x *EconomicSimDetail) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EconomicSimDetail.ProtoReflect.Descriptor instead.
 func (*EconomicSimDetail) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{38}
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *EconomicSimDetail) GetLastHits() []*EconomicSimLastHit {
@@ -2713,7 +2765,7 @@ type EconomicSimLastHit struct {
 
 func (x *EconomicSimLastHit) Reset() {
 	*x = EconomicSimLastHit{}
-	mi := &file_cyber_esports_v1_test_proto_msgTypes[39]
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2725,7 +2777,7 @@ func (x *EconomicSimLastHit) String() string {
 func (*EconomicSimLastHit) ProtoMessage() {}
 
 func (x *EconomicSimLastHit) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_test_proto_msgTypes[39]
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2738,7 +2790,7 @@ func (x *EconomicSimLastHit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EconomicSimLastHit.ProtoReflect.Descriptor instead.
 func (*EconomicSimLastHit) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{39}
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *EconomicSimLastHit) GetElapsedMs() int32 {
@@ -2773,7 +2825,7 @@ type EconomicSimPurchase struct {
 
 func (x *EconomicSimPurchase) Reset() {
 	*x = EconomicSimPurchase{}
-	mi := &file_cyber_esports_v1_test_proto_msgTypes[40]
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2785,7 +2837,7 @@ func (x *EconomicSimPurchase) String() string {
 func (*EconomicSimPurchase) ProtoMessage() {}
 
 func (x *EconomicSimPurchase) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_test_proto_msgTypes[40]
+	mi := &file_cyber_esports_v1_test_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2798,7 +2850,7 @@ func (x *EconomicSimPurchase) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EconomicSimPurchase.ProtoReflect.Descriptor instead.
 func (*EconomicSimPurchase) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{40}
+	return file_cyber_esports_v1_test_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *EconomicSimPurchase) GetElapsedMs() int32 {
@@ -3028,12 +3080,15 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"\fround_number\x18\x01 \x01(\x05R\vroundNumber\x12+\n" +
 	"\fenemy_lineup\x18\x02 \x03(\tB\b\xbaH\x05\x92\x01\x02\x10\bR\venemyLineup\x121\n" +
 	"\x0fselected_lineup\x18\x03 \x03(\tB\b\xbaH\x05\x92\x01\x02\x10\bR\x0eselectedLineup\x12+\n" +
-	"\rtime_spent_ms\x18\x04 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\vtimeSpentMs\"\xbf\x01\n" +
+	"\rtime_spent_ms\x18\x04 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\vtimeSpentMs\"\x93\x02\n" +
 	"\x13ResourceMatchDetail\x12Y\n" +
 	"\n" +
 	"trajectory\x18\x01 \x03(\v2..cyber.esports.v1.ResourceMatchTrajectoryPointB\t\xbaH\x06\x92\x01\x03\x10\x80@R\n" +
 	"trajectory\x12M\n" +
-	"\bcollects\x18\x02 \x03(\v2&.cyber.esports.v1.ResourceMatchCollectB\t\xbaH\x06\x92\x01\x03\x10\x80\bR\bcollects\"\x8f\x01\n" +
+	"\bcollects\x18\x02 \x03(\v2&.cyber.esports.v1.ResourceMatchCollectB\t\xbaH\x06\x92\x01\x03\x10\x80\bR\bcollects\x12R\n" +
+	"\n" +
+	"collisions\x18\x03 \x03(\v2(.cyber.esports.v1.ResourceMatchCollisionB\b\xbaH\x05\x92\x01\x02\x10@R\n" +
+	"collisions\"\x8f\x01\n" +
 	"\x1cResourceMatchTrajectoryPoint\x123\n" +
 	"\bposition\x18\x01 \x01(\v2\x17.cyber.esports.v1.PointR\bposition\x12+\n" +
 	"\n" +
@@ -3042,7 +3097,10 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"\x14ResourceMatchCollect\x12\x1d\n" +
 	"\x04kind\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x10R\x04kind\x12&\n" +
 	"\n" +
-	"elapsed_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"\xb1\x01\n" +
+	"elapsed_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"@\n" +
+	"\x16ResourceMatchCollision\x12&\n" +
+	"\n" +
+	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\"\xb1\x01\n" +
 	"\x11EconomicSimDetail\x12L\n" +
 	"\tlast_hits\x18\x01 \x03(\v2$.cyber.esports.v1.EconomicSimLastHitB\t\xbaH\x06\x92\x01\x03\x10\x80 R\blastHits\x12N\n" +
 	"\tpurchases\x18\x02 \x03(\v2%.cyber.esports.v1.EconomicSimPurchaseB\t\xbaH\x06\x92\x01\x03\x10\x80\bR\tpurchases\"}\n" +
@@ -3079,7 +3137,7 @@ func file_cyber_esports_v1_test_proto_rawDescGZIP() []byte {
 	return file_cyber_esports_v1_test_proto_rawDescData
 }
 
-var file_cyber_esports_v1_test_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
+var file_cyber_esports_v1_test_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
 var file_cyber_esports_v1_test_proto_goTypes = []any{
 	(*Test)(nil),                         // 0: cyber.esports.v1.Test
 	(*ListTestsRequest)(nil),             // 1: cyber.esports.v1.ListTestsRequest
@@ -3119,32 +3177,33 @@ var file_cyber_esports_v1_test_proto_goTypes = []any{
 	(*ResourceMatchDetail)(nil),          // 35: cyber.esports.v1.ResourceMatchDetail
 	(*ResourceMatchTrajectoryPoint)(nil), // 36: cyber.esports.v1.ResourceMatchTrajectoryPoint
 	(*ResourceMatchCollect)(nil),         // 37: cyber.esports.v1.ResourceMatchCollect
-	(*EconomicSimDetail)(nil),            // 38: cyber.esports.v1.EconomicSimDetail
-	(*EconomicSimLastHit)(nil),           // 39: cyber.esports.v1.EconomicSimLastHit
-	(*EconomicSimPurchase)(nil),          // 40: cyber.esports.v1.EconomicSimPurchase
-	nil,                                  // 41: cyber.esports.v1.TestConfig.EngineParamsEntry
-	(*wrapperspb.StringValue)(nil),       // 42: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),        // 43: google.protobuf.Timestamp
-	(*wrapperspb.DoubleValue)(nil),       // 44: google.protobuf.DoubleValue
+	(*ResourceMatchCollision)(nil),       // 38: cyber.esports.v1.ResourceMatchCollision
+	(*EconomicSimDetail)(nil),            // 39: cyber.esports.v1.EconomicSimDetail
+	(*EconomicSimLastHit)(nil),           // 40: cyber.esports.v1.EconomicSimLastHit
+	(*EconomicSimPurchase)(nil),          // 41: cyber.esports.v1.EconomicSimPurchase
+	nil,                                  // 42: cyber.esports.v1.TestConfig.EngineParamsEntry
+	(*wrapperspb.StringValue)(nil),       // 43: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),        // 44: google.protobuf.Timestamp
+	(*wrapperspb.DoubleValue)(nil),       // 45: google.protobuf.DoubleValue
 }
 var file_cyber_esports_v1_test_proto_depIdxs = []int32{
-	42, // 0: cyber.esports.v1.Test.id:type_name -> google.protobuf.StringValue
-	42, // 1: cyber.esports.v1.Test.code:type_name -> google.protobuf.StringValue
-	42, // 2: cyber.esports.v1.Test.name:type_name -> google.protobuf.StringValue
-	42, // 3: cyber.esports.v1.Test.category:type_name -> google.protobuf.StringValue
-	42, // 4: cyber.esports.v1.Test.ability:type_name -> google.protobuf.StringValue
-	42, // 5: cyber.esports.v1.Test.description:type_name -> google.protobuf.StringValue
-	42, // 6: cyber.esports.v1.Test.unit_score_label:type_name -> google.protobuf.StringValue
-	43, // 7: cyber.esports.v1.Test.created_at:type_name -> google.protobuf.Timestamp
-	43, // 8: cyber.esports.v1.Test.updated_at:type_name -> google.protobuf.Timestamp
+	43, // 0: cyber.esports.v1.Test.id:type_name -> google.protobuf.StringValue
+	43, // 1: cyber.esports.v1.Test.code:type_name -> google.protobuf.StringValue
+	43, // 2: cyber.esports.v1.Test.name:type_name -> google.protobuf.StringValue
+	43, // 3: cyber.esports.v1.Test.category:type_name -> google.protobuf.StringValue
+	43, // 4: cyber.esports.v1.Test.ability:type_name -> google.protobuf.StringValue
+	43, // 5: cyber.esports.v1.Test.description:type_name -> google.protobuf.StringValue
+	43, // 6: cyber.esports.v1.Test.unit_score_label:type_name -> google.protobuf.StringValue
+	44, // 7: cyber.esports.v1.Test.created_at:type_name -> google.protobuf.Timestamp
+	44, // 8: cyber.esports.v1.Test.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 9: cyber.esports.v1.ListTestsResponse.tests:type_name -> cyber.esports.v1.Test
 	0,  // 10: cyber.esports.v1.GetTestResponse.test:type_name -> cyber.esports.v1.Test
-	42, // 11: cyber.esports.v1.GetTestResponse.introduction:type_name -> google.protobuf.StringValue
+	43, // 11: cyber.esports.v1.GetTestResponse.introduction:type_name -> google.protobuf.StringValue
 	7,  // 12: cyber.esports.v1.GetTestConfigResponse.config:type_name -> cyber.esports.v1.TestConfig
-	42, // 13: cyber.esports.v1.TestConfig.test_id:type_name -> google.protobuf.StringValue
-	41, // 14: cyber.esports.v1.TestConfig.engine_params:type_name -> cyber.esports.v1.TestConfig.EngineParamsEntry
-	43, // 15: cyber.esports.v1.SubmitTestAttemptRequest.started_at:type_name -> google.protobuf.Timestamp
-	43, // 16: cyber.esports.v1.SubmitTestAttemptRequest.ended_at:type_name -> google.protobuf.Timestamp
+	43, // 13: cyber.esports.v1.TestConfig.test_id:type_name -> google.protobuf.StringValue
+	42, // 14: cyber.esports.v1.TestConfig.engine_params:type_name -> cyber.esports.v1.TestConfig.EngineParamsEntry
+	44, // 15: cyber.esports.v1.SubmitTestAttemptRequest.started_at:type_name -> google.protobuf.Timestamp
+	44, // 16: cyber.esports.v1.SubmitTestAttemptRequest.ended_at:type_name -> google.protobuf.Timestamp
 	9,  // 17: cyber.esports.v1.SubmitTestAttemptRequest.backgrounds:type_name -> cyber.esports.v1.BackgroundSpan
 	12, // 18: cyber.esports.v1.SubmitTestAttemptRequest.red_dot:type_name -> cyber.esports.v1.RedDotDetail
 	14, // 19: cyber.esports.v1.SubmitTestAttemptRequest.flash_aiming:type_name -> cyber.esports.v1.FlashAimingDetail
@@ -3158,12 +3217,12 @@ var file_cyber_esports_v1_test_proto_depIdxs = []int32{
 	31, // 27: cyber.esports.v1.SubmitTestAttemptRequest.offense_defense:type_name -> cyber.esports.v1.OffenseDefenseDetail
 	33, // 28: cyber.esports.v1.SubmitTestAttemptRequest.character_counter:type_name -> cyber.esports.v1.CharacterCounterDetail
 	35, // 29: cyber.esports.v1.SubmitTestAttemptRequest.resource_match:type_name -> cyber.esports.v1.ResourceMatchDetail
-	38, // 30: cyber.esports.v1.SubmitTestAttemptRequest.economic_sim:type_name -> cyber.esports.v1.EconomicSimDetail
-	44, // 31: cyber.esports.v1.SubmitTestAttemptResponse.raw_score:type_name -> google.protobuf.DoubleValue
-	44, // 32: cyber.esports.v1.SubmitTestAttemptResponse.authoritative_score:type_name -> google.protobuf.DoubleValue
-	42, // 33: cyber.esports.v1.SubmitTestAttemptResponse.grade:type_name -> google.protobuf.StringValue
-	42, // 34: cyber.esports.v1.SubmitTestAttemptResponse.ability:type_name -> google.protobuf.StringValue
-	42, // 35: cyber.esports.v1.SubmitTestAttemptResponse.invalid_reason:type_name -> google.protobuf.StringValue
+	39, // 30: cyber.esports.v1.SubmitTestAttemptRequest.economic_sim:type_name -> cyber.esports.v1.EconomicSimDetail
+	45, // 31: cyber.esports.v1.SubmitTestAttemptResponse.raw_score:type_name -> google.protobuf.DoubleValue
+	45, // 32: cyber.esports.v1.SubmitTestAttemptResponse.authoritative_score:type_name -> google.protobuf.DoubleValue
+	43, // 33: cyber.esports.v1.SubmitTestAttemptResponse.grade:type_name -> google.protobuf.StringValue
+	43, // 34: cyber.esports.v1.SubmitTestAttemptResponse.ability:type_name -> google.protobuf.StringValue
+	43, // 35: cyber.esports.v1.SubmitTestAttemptResponse.invalid_reason:type_name -> google.protobuf.StringValue
 	13, // 36: cyber.esports.v1.RedDotDetail.events:type_name -> cyber.esports.v1.RedDotEvent
 	8,  // 37: cyber.esports.v1.RedDotEvent.target:type_name -> cyber.esports.v1.Point
 	8,  // 38: cyber.esports.v1.RedDotEvent.click:type_name -> cyber.esports.v1.Point
@@ -3192,22 +3251,23 @@ var file_cyber_esports_v1_test_proto_depIdxs = []int32{
 	34, // 61: cyber.esports.v1.CharacterCounterDetail.rounds:type_name -> cyber.esports.v1.CharacterCounterRound
 	36, // 62: cyber.esports.v1.ResourceMatchDetail.trajectory:type_name -> cyber.esports.v1.ResourceMatchTrajectoryPoint
 	37, // 63: cyber.esports.v1.ResourceMatchDetail.collects:type_name -> cyber.esports.v1.ResourceMatchCollect
-	8,  // 64: cyber.esports.v1.ResourceMatchTrajectoryPoint.position:type_name -> cyber.esports.v1.Point
-	39, // 65: cyber.esports.v1.EconomicSimDetail.last_hits:type_name -> cyber.esports.v1.EconomicSimLastHit
-	40, // 66: cyber.esports.v1.EconomicSimDetail.purchases:type_name -> cyber.esports.v1.EconomicSimPurchase
-	1,  // 67: cyber.esports.v1.TestService.ListTests:input_type -> cyber.esports.v1.ListTestsRequest
-	3,  // 68: cyber.esports.v1.TestService.GetTest:input_type -> cyber.esports.v1.GetTestRequest
-	5,  // 69: cyber.esports.v1.TestService.GetTestConfig:input_type -> cyber.esports.v1.GetTestConfigRequest
-	10, // 70: cyber.esports.v1.TestService.SubmitTestAttempt:input_type -> cyber.esports.v1.SubmitTestAttemptRequest
-	2,  // 71: cyber.esports.v1.TestService.ListTests:output_type -> cyber.esports.v1.ListTestsResponse
-	4,  // 72: cyber.esports.v1.TestService.GetTest:output_type -> cyber.esports.v1.GetTestResponse
-	6,  // 73: cyber.esports.v1.TestService.GetTestConfig:output_type -> cyber.esports.v1.GetTestConfigResponse
-	11, // 74: cyber.esports.v1.TestService.SubmitTestAttempt:output_type -> cyber.esports.v1.SubmitTestAttemptResponse
-	71, // [71:75] is the sub-list for method output_type
-	67, // [67:71] is the sub-list for method input_type
-	67, // [67:67] is the sub-list for extension type_name
-	67, // [67:67] is the sub-list for extension extendee
-	0,  // [0:67] is the sub-list for field type_name
+	38, // 64: cyber.esports.v1.ResourceMatchDetail.collisions:type_name -> cyber.esports.v1.ResourceMatchCollision
+	8,  // 65: cyber.esports.v1.ResourceMatchTrajectoryPoint.position:type_name -> cyber.esports.v1.Point
+	40, // 66: cyber.esports.v1.EconomicSimDetail.last_hits:type_name -> cyber.esports.v1.EconomicSimLastHit
+	41, // 67: cyber.esports.v1.EconomicSimDetail.purchases:type_name -> cyber.esports.v1.EconomicSimPurchase
+	1,  // 68: cyber.esports.v1.TestService.ListTests:input_type -> cyber.esports.v1.ListTestsRequest
+	3,  // 69: cyber.esports.v1.TestService.GetTest:input_type -> cyber.esports.v1.GetTestRequest
+	5,  // 70: cyber.esports.v1.TestService.GetTestConfig:input_type -> cyber.esports.v1.GetTestConfigRequest
+	10, // 71: cyber.esports.v1.TestService.SubmitTestAttempt:input_type -> cyber.esports.v1.SubmitTestAttemptRequest
+	2,  // 72: cyber.esports.v1.TestService.ListTests:output_type -> cyber.esports.v1.ListTestsResponse
+	4,  // 73: cyber.esports.v1.TestService.GetTest:output_type -> cyber.esports.v1.GetTestResponse
+	6,  // 74: cyber.esports.v1.TestService.GetTestConfig:output_type -> cyber.esports.v1.GetTestConfigResponse
+	11, // 75: cyber.esports.v1.TestService.SubmitTestAttempt:output_type -> cyber.esports.v1.SubmitTestAttemptResponse
+	72, // [72:76] is the sub-list for method output_type
+	68, // [68:72] is the sub-list for method input_type
+	68, // [68:68] is the sub-list for extension type_name
+	68, // [68:68] is the sub-list for extension extendee
+	0,  // [0:68] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_test_proto_init() }
@@ -3240,7 +3300,7 @@ func file_cyber_esports_v1_test_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_test_proto_rawDesc), len(file_cyber_esports_v1_test_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   42,
+			NumMessages:   43,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

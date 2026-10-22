@@ -19,7 +19,7 @@
 | E0 契约首刀 | lzx | ✅ 10-21 | 种子(画像+目录)+增量2(测试读面)+增量3(统一提交,4 决策经裁)+增量4(三计数反哺,193a9b7c);余面已裁去向:报告读面随 E5/E9、entitlement 随 E8(D-AA) |
 | E1 服务骨架 | lzx | ✅ 10-18 | kratos-new-service 八步;双面 accessLadder+catalog+部署面;会员链探针 e2e 绿 |
 | E2 schema+种子 | lzx | ✅ 10-20 | D-V 撤回后按冻结契约 clean-room 重建;五表+三读+13 款种子骨架(校准值不杜撰,随 E3 单源);multi_target 补行=D-Z |
-| E3 评分引擎 | lzx | ⏳ | 增量a metric.md 单源档、增量b Registry+纯函数+20 黄金 ✅;增量c 提交缝(4c5f0617)、增量d MT/TR 定稿(5b0160fb)✅,双轴评审两实错已吸收;增量e DZ/ST 定稿 ✅(净钟+哨兵双射闸,metric §6.7/6.8);增量g offense_defense 定稿 ✅(判键式正确性+题库入通用银行,metric §6.10,Tier A 8/10);**余:Tier A 二款(resource_match/character_counter)+Tier B 三款闸门(moving_target/tracking_moving/economic_sim)**;「报告分 e2e」验收面挂 E5,H-C 前移回执层;guard 正则修正随下次镜像批回流 dev 兄弟服务 |
+| E3 评分引擎 | lzx | ⏳ | 增量a metric.md 单源档、增量b Registry+纯函数+20 黄金 ✅;增量c 提交缝(4c5f0617)、增量d MT/TR 定稿(5b0160fb)✅,双轴评审两实错已吸收;增量e DZ/ST 定稿 ✅(净钟+哨兵双射闸,metric §6.7/6.8);增量g offense_defense 定稿 ✅(判键式正确性+题库入通用银行,metric §6.10,Tier A 8/10);增量h resource_match 定稿 ✅(碰撞事件流=契约增量5 补位+出生经济闸,metric §6.11,Tier A 9/10);增量i character_counter 定稿 ✅(rework 规格落地=c_max 分母+速度乘数+150 封顶,题库 12 关系行入通用银行,metric §6.12,**Tier A 10/10 收满**);**余:Tier B 三款闸门(moving_target/tracking_moving/economic_sim)**;「报告分 e2e」验收面挂 E5,H-C 前移回执层;guard 正则修正随下次镜像批回流 dev 兄弟服务 |
 | E4 匹配引擎 | — | 未认领 | 重测 3/1 真律与难度模式轴归属地 |
 | E5 报告框架+能力报告 | — | 未认领 | 服务/客户端两半可并行 |
 | E6a ctr 纯壳 | lzx | ✅ 10-18 | D-R/S/T 全落;SEO 全量面同日收口 |
@@ -95,3 +95,5 @@
 - 10-23 D-AL:ljr 材料全量吸收+roadmap 校准批(DESIGN_DOC_MAP/DOC_INVENTORY 为导览;LOGIC_AUDIT/GAME_LOGIC_SPEC/溯源 PRD/admin IA/BLOCK5/题库表/openspec 指针入档;E3 七款×单位分吻合零返工,metric.md 零改动;B 批清单落 coverage §七.5;P11/备案串/迁移基线注登记)。
 - 10-23 校准战役 S1-S3:S1 ctr 语义 14 面全绿(B 批两撤四增一 V4 一 admin 文案);S2 admin 面合规(6-Tab=F2 逐一对上);S3 契约种子全对(game 九款逐字/13 款 D-Z 逐行)唯 moving_target 主能力两源冲突→P12 提裁;满岁月粒度口径锚 PAY3。台账=coverage §九。
 - 10-23 S4 终局对账(四列融合:旧后端 33 表端点级/旧前端 admin20+ctr60 路由/新原型 ctr43+admin41/新 PRD 全量):总判定=承诺窗(M1+M2 核心+PAY+M4)基本可达,前提=支付即启+H-C 落地+未认领片有人接;全量原型需 P13 豁免签认。立片 MIG1/E5b/E6c+E9 增量锚;提裁 P13/P14/P15;档位四档疑点解除(=BLOCK5 §7.7 逐字,§7.3 六级=系统套称号并行词汇);旧库复核=无支付网关、基线 V15(b4「V16+wx_jsapi」=新版前向编号无存量面)。
+- 10-23 E3-h:resource_match 定稿(碰撞事件流补位=契约增量5+出生经济三键配置化+死亡经济闸),Tier A 9/10;§6.4 批量表余 character_counter 一款。
+- 10-23 E3-i:character_counter 定稿(rework 规格落地:96.3% 饱和治理/c_max 穷举分母/速度乘数/150 封顶;题库 12 关系行入通用银行),**Tier A 10/10 收满**;E3 余 Tier B 三款闸门。

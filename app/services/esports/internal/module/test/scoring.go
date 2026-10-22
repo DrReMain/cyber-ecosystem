@@ -25,6 +25,13 @@ const (
 
 	reactionTimeMin = 80.0
 	reactionTimeMax = 60000.0
+
+	// Family-wide span anchors shared by the stream-rebuilt scorers (the
+	// §6.5 fabrication-closure family): event-stream spans sit under the
+	// config mirror plus this grace, and a mirrorless config falls back to
+	// the legacy 30s session baseline.
+	spanGraceMs                = 1500.0
+	sessionDurationFallbackSec = 30.0
 )
 
 type invalidAttemptError struct {
@@ -173,4 +180,19 @@ func answerString(m map[string]any, key string) string {
 	}
 	v, _ := m[key].(string)
 	return v
+}
+
+func answerNumber(m map[string]any, key string) float64 {
+	if m == nil {
+		return 0
+	}
+	switch v := m[key].(type) {
+	case float64:
+		return v
+	case int:
+		return float64(v)
+	case int64:
+		return float64(v)
+	}
+	return 0
 }

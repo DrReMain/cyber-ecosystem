@@ -503,13 +503,18 @@ export type CyberEsportsV1ResourceMatchCollect = {
     elapsedMs?: number;
 };
 
+export type CyberEsportsV1ResourceMatchCollision = {
+    elapsedMs?: number;
+};
+
 /**
- * resource_match — collecting resources on a field; trajectory plus the
- * collect sequence (kind + time) rebuild every efficiency aggregate.
+ * resource_match — collecting resources on a field; trajectory, the collect
+ * sequence (kind + time), and collisions rebuild every efficiency aggregate.
  */
 export type CyberEsportsV1ResourceMatchDetail = {
     trajectory?: Array<CyberEsportsV1ResourceMatchTrajectoryPoint>;
     collects?: Array<CyberEsportsV1ResourceMatchCollect>;
+    collisions?: Array<CyberEsportsV1ResourceMatchCollision>;
 };
 
 export type CyberEsportsV1ResourceMatchTrajectoryPoint = {

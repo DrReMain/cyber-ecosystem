@@ -50,9 +50,9 @@
 | target_recognition | 反应 | 20 分/正确识别 | 10-20 个 | 200-400 | 反应类 |
 | number_stars | 反应 | 15 分/正确数 | 15-30 个 | 225-450 | 反应类 |
 | dual_zone_dodge | 反应 | 15 分/成功闪避 | 15-30 次 | 225-450 | 反应类 |
-| character_counter | 资源 | 15 分/正确计数 | 15-30 个 | 225-450 | 资源类 |
+| character_counter | 资源 | 15 分/克制命中 | 15-30 对 | 225-450 | 资源类 |
 | offense_defense | 决策 | 25 分/正确决策 | 8-15 个 | 200-375 | 决策类 |
-| resource_match | 资源 | 20 分/正确配对 | 10-20 个 | 200-400 | 资源类 |
+| resource_match | 资源 | 20 分/有效收集 | 15-30 个 | 300-600 | 资源类 |
 | moving_target | 追踪 | 10 分/秒完美追踪 | 完美追踪 20-30s | 200-300 | 追踪类 |
 | tracking_moving | 追踪 | 10 分/秒完美追踪 | 完美追踪 20-30s | 200-300 | 追踪类 |
 | skill_trajectory | 技能释放 | 8 分/贴合度百分点 | 贴合度 30-80% | 240-640 | 技能类 |
@@ -128,7 +128,7 @@
 评级映射 🔗(主锚点 M3 追踪占比+辅助 M4 偏差):顶尖 ≥90% ≤15px / 职业 ≥80% ≤25px / 准职业 ≥70% ≤35px / 高水平 ≥55% ≤45px / 普通 ≥40% / 入门 <40%。追踪类无公开基准,推断成分更高,上线后内部百分位替换优先。
 专有指标:轨迹适应性(6 图案各自 0-100)/最大偏差(需逐帧)/丢失次数。多目标「100 追 10」不属本游戏(归 future)。
 
-### 6.4 批量卡(MSB,机制推断待代码确认;公式誊录随 E3 逐款定稿;七款已升卡出表 → §6.5-§6.10,余 resource_match/character_counter 两款)
+### 6.4 批量卡(MSB,机制推断待代码确认;公式誊录随 E3 逐款定稿;九款已升卡出表 → §6.5-§6.12,余 Tier B 二款留表待闸门设计)
 
 | 游戏 | 双难度因子(体验/正式) | 专有指标 | 重算要点(JAVA 指针) |
 |---|---|---|---|
@@ -137,8 +137,8 @@
 | target_recognition | 干扰物 3 / 6 个 | 干扰抑制率(选择性注意范式) | 已定稿升 A → §6.6 |
 | multi_target | 3 / 6 目标 | 目标切换耗时(注意转移范式) | 已定稿升 A → §6.5 |
 | offense_defense | 决策窗口 2000ms / 1200ms | 压力决策正确率(执行控制范式) | 已定稿升卡 → §6.10 |
-| resource_match | 4 对 / 8 对 | 配对效率(正确数/分钟) | 公式对齐旧前端 ResourceMatchTestPage.tsx:174-202 |
-| character_counter | 字符数 15 / 30 | 计数偏差(回答−真实) | 查 moba_character + character_counter_relation 题库判分;已知「96.3% 满分」评分收紧 P0 治理对象 |
+| resource_match | 旧代码无难度差分(时长可配;方案因子待 E7) | 收集速率(collected/span) | 已定稿升卡 → §6.11 |
+| character_counter | 回合数 3(旧硬码)/克制轮盘密度 | 克制命中率 Q+速度乘数 | 已定稿升卡 → §6.12(rework 规格落地) |
 | skill_trajectory | 轨迹速度慢 / 快 | 时机精度(提前/滞后量,能力核心) | 已定稿升卡 → §6.8 |
 | tracking_moving | 速度 200 / 400 px/s(同 moving_target) | 同 moving_target | Tier B:缺 hit 标志 |
 | economic_sim | 待确认(回合数/资源复杂度) | 最终资产、资源转化率 | Tier B:强一致性闸门(装备阶梯/金币守恒/HP) |
@@ -185,6 +185,23 @@
 事实流:decisions[]{scenario_id, choice?{attack|defense|retreat}(缺省=未作答), decision_time_ms, timeout}。旧 isCorrect 客户端断言废止——正确性=choice 对**题库答案键**(question_bank.answer.optimal_choice,EqualFold 等值,垃圾词表自然错);**查无 scenario_id=DETAIL_MISMATCH 硬拒**(旧版降级信客户端 isCorrect 是前端兜底库时代产物,判键不留降级面)。题库=E2 通用银行(test_code+scenario_code+payload 题面+answer 键;旧 offense_scenario+offense_choice_explanation 两表收敛为 payload/answer 两列,内容=旧 init.sql 经验数据逐字:20 场景×60 解析);答案键经提交缝入参(scoringParams.answerKey,TestRP.ListAnswers),scorer 保持纯函数。
 重算(Java OffenseDefenseScorer 同构):correct=Σ等值;timeouts=Σtimeout;quality=correct/len(decisions)×6(**分母=决策数组自身**——旧版信客户端 totalRounds 属缩水分母伪造面,废止);speed=clamp((8000−avgMs)/2000×2, 0, 2)(avg≤6000 饱和);consistency=0.5(旧公式平项常数,曲线 parity 承袭);timeoutPenalty=min(2, timeouts×0.5);composite=clamp(Σ,0,10)。⚠️ 改编披露:旧 complexAccuracy 算而不入公式=死码弃;per-decision <80ms=ABSURD_REACTION_TIME **新闸**(旧版只闸均值,单个瞬时伪造可藏于慢兄弟之下);空 decisions→诚实零(旧 ZERO 同律)。伪造上限=全对+avg≤6000+无超时=8.5,与旧架构持平。
 轨一:raw=correct×unit_score(§四:25/正确决策)×难度(8-15 对→200-375,§四表自洽);权威轨:曲线未定稿留空,composite 入 extras。决策窗口 2000/1200ms 为客户端参数不入分。
+
+### 6.11 resource_match 定稿卡(E3-h;Tier A,合成式誊录)
+
+事实流:trajectory[]{position, elapsed_ms?}(审计几何,不入公式)+collects[]{kind∈{minion|monster|dragon}, elapsed_ms}+**collisions[]{elapsed_ms}**(E0 增量5:冻结契约注释自称「重建全部效率聚合」却漏了碰撞事实——旧版靠客户端直报 collisionCount,恰是 facts-up 要废死的面;资源款零客户端消费者,加列即闭)。counts/encounters 全部从流重算,旧 minionsCollected/monstersCollected/dragonsCollected/collisionCount 直报聚合废止。
+重算(对齐旧前端 ResourceMatchTestPage.tsx:174-202 与 Java ResourceMatchScorer 逐行):collected=Σcollects;resourceEfficiency=collected/optimal×4(optimal=Σ出生上限,引擎参数键 minion_count/monster_count/dragon_count 默认 25/12/5=42——旧 42 硬编码配置化);pathEfficiency=min(1, collected/span/2)×3;riskControl=max(0, 2−collisions×0.1);tactical=1(旧公式平项常数,曲线 parity 承袭,§6.10 consistency 同族);composite=clamp(Σ,0,10)。span=collects∪collisions 末事件 elapsed;无事件回退 config 时长(Java 30s 冷臂同款)。
+闸门:词表外 kind=DETAIL_MISMATCH;出生经济越界(某 kind 计数>出生上限,或碰撞>collision_cap 默认 10=血量 100/每次 −10 的死亡经济)=DETAIL_MISMATCH(Java TEST_DATA_ABNORMAL 服务端化,上限随引擎参数走);乱序/重号戳=DETAIL_MISMATCH(§6.7 同族);相邻 collect 间隔<80ms=ABSURD_REACTION_TIME(§6.5 差分闸同族——出生重叠双拾的罕见真值会误伤,E7 引擎出生间距保证后消);span>config 时长+1500ms=ABSURD_TIME_SPAN(§6.5 duration fabrication closure 同族);有事件而 span<500ms=ABSURD_TIME_SPAN(10 次分离扣血物理上不可能短于半秒)。
+⚠️ 改编披露:pathOptimization 名不副实——旧公式实为收集速率项非路径几何,按本义誊录,trajectory 留审计;span 分母=事件流末点(旧版=会话时长;契约无可信会话钟,末事件 span 是唯一服务端可重建的密度口径)——闲尾局(早拾后空转)可把 pathEff 抬至满格,较旧版至多 +2.25 composite,受完美清场 10.0 上界钳制,曲线以真实分布吸收;零收集活满场=3.0 保底(2 风控+1 战术,Java 同臂),composite 是曲线输入非常数分,曲线以真实分布校准吸收;伪造上限=完美清场 10.0,与旧架构持平。
+轨一:raw=collected×unit_score(§四:20/有效收集)×难度(典型 15-30 个→300-600,完美清场上限 840);权威轨:曲线未定稿留空,composite 入 extras。双难度因子旧代码无差分(时长可配),方案因子待 E7 引擎片定。
+
+### 6.12 character_counter 定稿卡(E3-i;Tier A,**rework 规格落地**——非旧仓已发布公式)
+
+治理史:旧仓已发布公式=饱和公式(本地样本 26/27 满分=96.3%,全场最严重触顶,档位/能力聚合/报告区分度全失效),三根因=分母错配(每回合可达≈205/随机期望≈171,公式分母却按 100/回合)/服务端 3 分 fallback 虚高(查不到关系记 3 分,每回合白送~75 基线;前端同位记 0——移植「对齐前端口径」实际错齐)/timeBonus 常数(全局时限 30s<奖励阈值 30s 恒真)。admin 仓 openspec `scoring-character-counter-rework`(SCORING_TIGHTENING P0-1)立 rework 规格**未实施**——本卡=该规格在新系统落地(b3「denominator rework to land」兑现)。
+事实流:rounds[]{round_number, enemy_lineup[], selected_lineup[], time_spent_ms};词表=克制关系题库的角色并集——种子 12 关系行(scenario=`<role>|<countersRole>`、answer=counter_score=20、payload 含 counter/countered 审计对),roster=六角色;题库走 E2 通用银行,E3-g 判键缝同款(ListAnswers→answerKey,scorer 纯函数)。旧 name→roleType 中文名解析废止——新词表=角色闭集,查无=DETAIL_MISMATCH 硬拒(旧版把裸字符串当 roleType 的降级面不留)。
+重算(rework 规格):c_r=Σ命中对分值(命中=关系行 counter_score,未中=0——**3 分 fallback 删除**);**分母=c_max(E)**=roster 取 lineup 规模全部组合穷举取最优(6 选 5=6 组合,提交内联计算);Q=各回合 c_r/c_max 均值;SF=clamp(speed_ref_sec/avgTime, 0.5, 1.5)(REF 默认 8s,引擎参数键 speed_ref_sec——**常数 timeBonus 删除**);composite=Q×100×SF 封顶 **150**。
+⚠️ 全族唯一 0-10 外曲线输入:150 封顶承重「完美克制×1.5 速度余量」的区分度(饱和治理的目的本身)——100=参考速完美,133.3=不完美但快,150=完美且两倍速。v0 机械锚点映射随曲线片,≥200 条真实数据后分位再校准(rework 原文承袭)。
+闸门:空 rounds→诚实零(Java ZERO 同臂,回合数闸辖非空局);回合数≠round_count(默认 3,引擎参数键) =DETAIL_MISMATCH(旧版硬除 3、少报回合自降分,新律=回合数即契约);round_number 乱序=DETAIL_MISMATCH;阵容内重复/敌我不等长/空阵容=DETAIL_MISMATCH(**跨侧重叠=游戏本律**,6 角色双方各 5 必重叠,合法);词表外=DETAIL_MISMATCH;单回合 time<80ms=ABSURD_REACTION_TIME;Σ回合时长>config+1500ms=ABSURD_TIME_SPAN(回合共享会话钟,§6.5 同族);退化银行(c_max=0)护栏=c_max 置 1(回合无信号不炸除法)。
+轨一:raw=克制命中对数×unit_score(§四:15/克制命中)×难度(典型 3 回合×8 对≈24→360);权威轨:曲线未定稿留空,composite(0-150)入 extras。双难度因子=旧无差分(回合数/时限可配),方案因子待 E7 引擎片定。
 
 ## 七、8 维认知权重矩阵(三源合一 🧊:JAVA 常量 = API 公式表 = ST DIM8 逐值核对一致)
 
@@ -258,3 +275,7 @@
 - 2026-10-23 E3-f:number_stars 定稿卡入档(§6.9,合成式誊录);进度指针重建正确性、同帧双击新闸、correct=0 诚实零(旧空局 3 分瑕疵修掉)与无配置锚披露;§6.4 批量表缩为五款。Tier A 达 7/10——CP1「E3 过半」门达成。
 
 - 2026-10-23 E3-g:offense_defense 定稿卡入档(§6.10,合成式誊录);判键式正确性(question_bank 答案键经缝入参)、查无场景硬拒、分母=数组、per-decision 时间闸新立、complexAccuracy 死码弃、一致性 0.5 常数承袭披露;题库种子=旧 init.sql 20 场景×60 解析逐字入通用银行(两表收敛两列);§6.4 批量表余二款。Tier A 达 8/10。
+
+- 2026-10-23 E3-h:resource_match 定稿卡入档(§6.11,合成式誊录);碰撞事实流补位(E0 增量5:契约注释与公式事实面错位,加 collisions 事件列)、出生经济配置化(42 硬编码→三键)、聚合从流重建、间隔闸/时长锚/死亡经济闸新立、3.0 保底与速率项本义披露;§6.4 批量表余一款。Tier A 达 9/10。
+
+- 2026-10-23 E3-i:character_counter 定稿卡入档(§6.12,**rework 规格落地非旧仓松公式**);c_max 穷举分母/删 3 分 fallback/速度乘数替常数 timeBonus/150 封顶四改编全披露;题库=12 关系行入通用银行(scenario=role|role 对);§6.4 批量表仅余 Tier B 二款。**Tier A 10/10 收满**。

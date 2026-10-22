@@ -331,6 +331,78 @@ var seedQuestions = []questionSeed{
 		},
 		Answer: map[string]any{"complexity": "complex", "difficulty": 3, "optimal_choice": "retreat"},
 	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Tank|Fighter",
+		Payload:  map[string]any{"counter": "Tank", "countered": "Fighter"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Tank|Assassin",
+		Payload:  map[string]any{"counter": "Tank", "countered": "Assassin"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Fighter|Marksman",
+		Payload:  map[string]any{"counter": "Fighter", "countered": "Marksman"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Fighter|Mage",
+		Payload:  map[string]any{"counter": "Fighter", "countered": "Mage"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Mage|Tank",
+		Payload:  map[string]any{"counter": "Mage", "countered": "Tank"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Mage|Marksman",
+		Payload:  map[string]any{"counter": "Mage", "countered": "Marksman"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Marksman|Fighter",
+		Payload:  map[string]any{"counter": "Marksman", "countered": "Fighter"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Marksman|Support",
+		Payload:  map[string]any{"counter": "Marksman", "countered": "Support"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Support|Assassin",
+		Payload:  map[string]any{"counter": "Support", "countered": "Assassin"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Support|Mage",
+		Payload:  map[string]any{"counter": "Support", "countered": "Mage"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Assassin|Marksman",
+		Payload:  map[string]any{"counter": "Assassin", "countered": "Marksman"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
+	{
+		TestCode: "character_counter",
+		Scenario: "Assassin|Mage",
+		Payload:  map[string]any{"counter": "Assassin", "countered": "Mage"},
+		Answer:   map[string]any{"counter_score": 20},
+	},
 }
 
 type questionSeed struct {
