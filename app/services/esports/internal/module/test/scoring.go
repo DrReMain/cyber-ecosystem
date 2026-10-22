@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	reasonAbsurdReactionTime = "ABSURD_REACTION_TIME"
-	reasonDetailMismatch     = "DETAIL_MISMATCH"
+	reasonAbsurdReactionTime   = "ABSURD_REACTION_TIME"
+	reasonDetailMismatch       = "DETAIL_MISMATCH"
+	reasonBackgroundOverBudget = "BACKGROUND_OVER_BUDGET"
 
 	extraCalibrationInput = "calibration_input"
 	extraComposite        = "composite"
@@ -19,12 +20,8 @@ const (
 	bandAMin = 85.0
 	bandBMin = 60.0
 
-	// The sheet-registered engine-param key that recalibrates a game's unit
-	// score (metric.md §四) without a deploy.
 	unitScoreKey = "unit_score"
 
-	// Reaction-time sanity window shared by the fact-based scorers
-	// (metric.md §6 sanity gates; Java ScorerSupport parity).
 	reactionTimeMin = 80.0
 	reactionTimeMax = 60000.0
 )
@@ -137,8 +134,6 @@ func clamp(v, lo, hi float64) float64 {
 }
 
 func linearRaw(count int, p scoringParams, unitDefault float64) float64 {
-	// The shared 轨一 chain, 原始成绩 × 单位分 × 难度系数 (§一/§四);
-	// extracted at its second real consumer.
 	return float64(count) * p.num(unitScoreKey, unitDefault) * p.difficulty()
 }
 

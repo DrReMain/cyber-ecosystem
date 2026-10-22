@@ -76,6 +76,23 @@ func (s *TestService) GetTestConfig(ctx context.Context, in *esportspb.GetTestCo
 	}}, nil
 }
 
+func (s *TestService) SubmitTestAttempt(ctx context.Context, in *esportspb.SubmitTestAttemptRequest) (*esportspb.SubmitTestAttemptResponse, error) {
+	out, err := s.testUC.Submit(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.SubmitTestAttemptResponse{
+		RecordId:           out.RecordID,
+		RawScore:           utils.Wrap(out.RawScore, utils.DoubleW),
+		AuthoritativeScore: utils.Wrap(out.Authoritative, utils.DoubleW),
+		Grade:              utils.Wrap(out.Grade, utils.StringW),
+		Ability:            utils.Wrap(out.Ability, utils.StringW),
+		Valid:              out.Valid,
+		InvalidReason:      utils.Wrap(out.InvalidReason, utils.StringW),
+		RetestLeft:         out.RetestLeft,
+	}, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func mapTestPB(t *Test) *esportspb.Test {

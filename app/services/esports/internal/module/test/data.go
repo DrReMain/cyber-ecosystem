@@ -9,6 +9,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
@@ -60,12 +61,52 @@ func (rp *testRP) GetConfigByID(ctx context.Context, id string) (*TestConfig, er
 	if err != nil {
 		return nil, mapTestLoadError(rp, err)
 	}
-	return &TestConfig{
-		TestID:               owned.ID,
-		DurationSec:          row.DurationSeconds,
-		BackgroundInvalidSec: row.BackgroundInvalidSeconds,
-		EngineParams:         row.EngineParams,
-	}, nil
+	tc := mapTestConfig(row)
+	tc.TestID = owned.ID
+	return tc, nil
+}
+
+func (rp *testRP) GetByCode(ctx context.Context, code string) (*Test, error) {
+	row, err := rp.Platform.GetClient(ctx).Test.Query().
+		Where(test.CodeEQ(code)).
+		Only(ctx)
+	if err != nil {
+		return nil, mapTestLoadError(rp, err)
+	}
+	return mapTest(row), nil
+}
+
+func (rp *testRP) GetConfigByCode(ctx context.Context, code string) (*TestConfig, error) {
+	row, err := rp.Platform.GetClient(ctx).TestConfig.Query().
+		Where(testconfig.TestCodeEQ(code)).
+		Only(ctx)
+	if err != nil {
+		return nil, mapTestLoadError(rp, err)
+	}
+	return mapTestConfig(row), nil
+}
+
+func (rp *testRP) CreateAttempt(ctx context.Context, rec *AttemptRecord) (*AttemptRecord, error) {
+	row, err := rp.Platform.GetClient(ctx).TestRecord.Create().
+		SetTestCode(rec.TestCode).
+		SetUserID(rec.UserID).
+		SetAttemptNo(rec.AttemptNo).
+		SetNillableSessionID(rec.SessionID).
+		SetStartedAt(rec.StartedAt).
+		SetEndedAt(rec.EndedAt).
+		SetBackgrounds(rec.Backgrounds).
+		SetRawDetail(rec.RawDetail).
+		SetNillableRawScore(rec.RawScore).
+		SetNillableAuthoritativeScore(rec.Authoritative).
+		SetNillableGrade((*testrecord.Grade)(rec.Grade)).
+		SetValid(rec.Valid).
+		SetNillableInvalidReason(rec.InvalidReason).
+		Save(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	rec.ID = row.ID
+	return rec, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
@@ -77,6 +118,14 @@ func mapTestLoadError(rp *testRP, err error) error {
 		return esportspb.ErrorEsportsTestNotFound("")
 	}
 	return rp.Platform.HandleEntError(err)
+}
+
+func mapTestConfig(row *ent.TestConfig) *TestConfig {
+	return &TestConfig{
+		DurationSec:          row.DurationSeconds,
+		BackgroundInvalidSec: row.BackgroundInvalidSeconds,
+		EngineParams:         row.EngineParams,
+	}
 }
 
 func mapTest(row *ent.Test) *Test {

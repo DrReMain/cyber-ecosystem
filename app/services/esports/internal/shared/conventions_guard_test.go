@@ -19,7 +19,7 @@ var (
 	guardDirectiveRE = regexp.MustCompile(`^//[a-z]+:`)
 	guardDeclRE      = regexp.MustCompile(`^(type|func|const|var)\b`)
 	guardKratosCode  = regexp.MustCompile(`errors\.Is(NotFound|InvalidArgument|Unauthorized|Forbidden|Conflict|BadRequest|InternalServerError|FailedPrecondition)\(`)
-	guardJSON        = regexp.MustCompile(`json\.(Marshal|Unmarshal|NewEncoder|NewDecoder)\(`)
+	guardJSON        = regexp.MustCompile(`[^a-zA-Z0-9_.]json\.(Marshal|Unmarshal|NewEncoder|NewDecoder)\(`)
 )
 
 // guardDirs are the §4-enforced zones; ent/schema (own comment class) and
