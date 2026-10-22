@@ -227,6 +227,9 @@ message RedDotEvent {
 // flash_aiming — snap shots at flashing targets.
 message FlashAimingDetail {
   repeated FlashAimingShot shots = 1 [(buf.validate.field).repeated.max_items = 4096];
+  // Expired-or-replaced targets, legacy: targetsMissed. No click exists for
+  // these, so the shot stream can never rebuild the count.
+  int32 misses = 2 [(buf.validate.field).int32.gte = 0];
 }
 message FlashAimingShot {
   string target_id = 1;
@@ -242,6 +245,9 @@ message FlashAimingShot {
 // priority aggregate from facts.
 message MultiTargetDetail {
   repeated MultiTargetPick picks = 1 [(buf.validate.field).repeated.max_items = 4096]; // legacy: targetSelectionOrder
+  // High-tier targets lost to expiry, legacy: missedHighValue. The picks
+  // stream carries only picked targets, so the loss count has no other carrier.
+  int32 missed_high = 2 [(buf.validate.field).int32.gte = 0];
 }
 message MultiTargetPick {
   string target_id = 1;
@@ -258,6 +264,9 @@ message MultiTargetPick {
 // server-side against the target type, never asserted by the client.
 message TargetRecognitionDetail {
   repeated TargetRecognitionClick clicks = 1 [(buf.validate.field).repeated.max_items = 4096];
+  // Enemies that existed this attempt — the hit-rate denominator legacy sent
+  // pre-cooked as enemyHitRate. Blank taps stay local: target_id cannot name air.
+  int32 spawned_enemy = 2 [(buf.validate.field).int32.gte = 0];
 }
 message TargetRecognitionClick {
   string target_id = 1;
