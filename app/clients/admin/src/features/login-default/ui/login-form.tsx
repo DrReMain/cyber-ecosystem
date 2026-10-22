@@ -68,10 +68,10 @@ export function LoginForm({ onSubmit, pending, feedback }: Readonly<LoginFormPro
 
       {feedback != null && (
         <div className="mb-4.5 flex items-start justify-between gap-2" role="alert">
-          <p className="text-red-600 text-sm leading-snug dark:text-red-400">{feedback.copy}</p>
+          <p className="text-sm leading-snug text-red-600 dark:text-red-400">{feedback.copy}</p>
           {feedback.action !== undefined && (
             <button
-              className="shrink-0 cursor-pointer border-0 bg-transparent font-medium text-[12.5px] text-black/55 underline underline-offset-2 hover:text-black dark:text-white/55 dark:hover:text-white"
+              className="shrink-0 cursor-pointer border-0 bg-transparent text-[12.5px] font-medium text-black/55 underline underline-offset-2 hover:text-black dark:text-white/55 dark:hover:text-white"
               onClick={() => {
                 formRef.current?.reset();
                 formRef.current?.querySelector<HTMLInputElement>("input[name='account']")?.focus();

@@ -47,7 +47,7 @@ export function DeptMembers({ members, pendingId, onRemove }: Readonly<DeptMembe
         <div className="flex flex-col gap-2">
           {visible.map((member) => (
             <div
-              className="flex items-center justify-between gap-2 rounded-lg border border-line-soft px-3 py-2"
+              className="border-line-soft flex items-center justify-between gap-2 rounded-lg border px-3 py-2"
               key={member.userId}
             >
               <span className="text-[13px]">{member.account}</span>

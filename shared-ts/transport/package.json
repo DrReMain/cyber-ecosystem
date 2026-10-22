@@ -8,14 +8,6 @@
     ".": "./src/index.ts",
     "./connect": "./src/connect/index.ts"
   },
-  "scripts": {
-    "check": "biome check",
-    "format": "biome format",
-    "lint": "biome lint",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "test:coverage": "vitest run --coverage"
-  },
   "peerDependencies": {
     "@bufbuild/protobuf": "^2.16.0",
     "@connectrpc/connect": "^2.2.0",

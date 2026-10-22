@@ -38,7 +38,7 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 ./nx run <project>:<target>
 ```
 
-**How to find targets:** Read the project's `project.json` — every valid target is declared there. Do not assume a target exists. For JS/TS packages, Nx also picks up **every script in `package.json` as a runnable target** (`./nx run <pkg>:<script>`) — check `package.json` scripts before concluding a workflow has no target.
+**How to find targets:** Read the project's `project.json` — every valid target is declared there, for every project, JS/TS packages included. Do not assume a target exists. `package.json` carries package identity (name, dependencies) only — npm scripts are not used anywhere in this repo; a workflow with no target gets one added to `project.json`. In target commands, package-local binaries are invoked through `pnpm exec <bin>` — Nx injects only the workspace-root `.bin` into PATH, and pnpm's isolation keeps vite/vitest/storybook package-local, so a bare binary name fails loudly instead of resolving.
 
 Recurring build, test, lint, generation, dev, and automation workflows `SHOULD` be exposed through Nx targets. If a needed workflow has no target yet, add one to `project.json` instead of running ad-hoc commands.
 

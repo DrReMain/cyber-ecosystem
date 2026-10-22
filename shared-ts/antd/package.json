@@ -12,13 +12,6 @@
     "./table": "./src/table/index.ts",
     "./use-search": "./src/use-search/index.ts"
   },
-  "scripts": {
-    "check": "biome check",
-    "format": "biome format",
-    "lint": "biome lint",
-    "test": "vitest run --passWithNoTests",
-    "typecheck": "tsc --noEmit"
-  },
   "peerDependencies": {
     "@bufbuild/protobuf": "^2",
     "@types/react": "^19",

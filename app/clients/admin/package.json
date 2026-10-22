@@ -5,17 +5,6 @@
   "imports": {
     "#/*": "./src/*"
   },
-  "scripts": {
-    "dev": "vite dev --host",
-    "build": "vite build",
-    "build:analyze": "vite build --mode analyze",
-    "preview": "vite preview --host",
-    "test": "vitest run --passWithNoTests",
-    "format": "biome format",
-    "lint": "biome lint",
-    "check": "biome check",
-    "typecheck": "tsc --noEmit"
-  },
   "dependencies": {
     "@ant-design/cssinjs": "2.1.2",
     "@ant-design/x": "2.9.0",

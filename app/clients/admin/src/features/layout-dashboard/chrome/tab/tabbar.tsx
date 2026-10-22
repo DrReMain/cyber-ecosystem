@@ -297,7 +297,7 @@ export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
   return (
     <div
       className={clsx(
-        "sticky z-30 flex h-9.5 flex-none items-center border-line-soft border-b bg-container",
+        "border-line-soft bg-container sticky z-30 flex h-9.5 flex-none items-center border-b",
         maximized ? "top-0" : "top-14",
       )}
     >
@@ -322,7 +322,7 @@ export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
       <span
         aria-hidden
         className={clsx(
-          "pointer-events-none absolute inset-x-0 top-[calc(100%+1px)] h-10 bg-linear-to-b from-container/85 via-container/40 opacity-0 transition-opacity",
+          "from-container/85 via-container/40 pointer-events-none absolute inset-x-0 top-[calc(100%+1px)] h-10 bg-linear-to-b opacity-0 transition-opacity",
           scrolled && "opacity-100",
         )}
       />
@@ -341,7 +341,7 @@ export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
         <div
           aria-label={m.layout_dashboard_tabs()}
           className={clsx(
-            "flex h-full items-center overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            "flex h-full [scrollbar-width:none] items-center overflow-x-auto overscroll-x-contain [&::-webkit-scrollbar]:hidden",
             !ready && "invisible",
           )}
           onKeyDown={(e) => {
@@ -402,7 +402,7 @@ export function Tabbar({ onRefresh, scrolled }: Readonly<TabbarProps>) {
         </button>
       ) : null}
 
-      <div className="flex h-full flex-none items-center gap-0.5 border-line-soft border-s px-1">
+      <div className="border-line-soft flex h-full flex-none items-center gap-0.5 border-s px-1">
         <Dropdown disabled={!activeMenu} menu={activeMenu ?? { items: [] }} trigger={["click"]}>
           <button
             aria-label={m.layout_dashboard_tab_more()}

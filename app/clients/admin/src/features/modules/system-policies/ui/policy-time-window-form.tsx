@@ -35,7 +35,7 @@ export function PolicyTimeWindowForm({ draft, onChange }: Readonly<PolicyTimeWin
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="font-medium text-[13px]">{m.system_policies_tw_windows()}</span>
+        <span className="text-[13px] font-medium">{m.system_policies_tw_windows()}</span>
         {valid ? (
           <Typography.Text className="text-[12px]" type={active ? "success" : "secondary"}>
             {active ? m.system_policies_now_active() : m.system_policies_now_inactive()}
@@ -72,7 +72,7 @@ export function PolicyTimeWindowForm({ draft, onChange }: Readonly<PolicyTimeWin
           </Typography.Text>
         ) : null}
       </div>
-      <div className="flex flex-col gap-2 border-line-soft border-t pt-3">
+      <div className="border-line-soft flex flex-col gap-2 border-t pt-3">
         <div className="flex items-center justify-center gap-1">
           {DAY_ORDER.map((d) => (
             <Checkbox

@@ -1,0 +1,15 @@
+{
+  "$schema": "../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "@cyber-ecosystem/gen-connect-ts",
+  "root": "gen/connect-ts",
+  "projectType": "library",
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm exec tsc -p ."
+      }
+    }
+  }
+}

@@ -30,7 +30,7 @@ export function ConnectionsTable({
         row.userAccount ? (
           <span>{row.userAccount}</span>
         ) : (
-          <span className="font-mono text-[12px] text-ink-tertiary">{row.userId}</span>
+          <span className="text-ink-tertiary font-mono text-[12px]">{row.userId}</span>
         ),
     },
     {

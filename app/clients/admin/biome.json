@@ -1,6 +1,6 @@
 {
   "root": false,
-  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
   "extends": ["../../../biome.json"],
   "vcs": {
     "enabled": true,
@@ -25,7 +25,8 @@
         "noNestedComponentDefinitions": "error",
         "useExhaustiveDependencies": "error",
         "useHookAtTopLevel": "error",
-        "useJsxKeyInIterable": "error"
+        "useJsxKeyInIterable": "error",
+        "noComponentHookFactories": "error"
       },
       "suspicious": {
         "noDoubleEquals": "error",
@@ -38,10 +39,14 @@
         "noExcessiveCognitiveComplexity": "error",
         "noExcessiveLinesPerFunction": {
           "level": "error",
-          "options": { "maxLines": 200, "skipBlankLines": true }
+          "options": {
+            "maxLines": 200,
+            "skipBlankLines": true
+          }
         },
         "useArrowFunction": "error",
-        "useSimplifiedLogicExpression": "error"
+        "useSimplifiedLogicExpression": "error",
+        "noUnnecessaryTemplateExpression": "error"
       },
       "style": {
         "useConsistentTypeDefinitions": "error",
@@ -55,12 +60,10 @@
         "noBlankTarget": "error"
       },
       "nursery": {
-        "useSortedClasses": "error",
         "noFloatingPromises": "error",
-        "noComponentHookFactories": "error",
         "noMisusedPromises": "error",
         "useExhaustiveSwitchCases": "error",
-        "noUnnecessaryTemplateExpression": "error"
+        "useTailwindSortedClasses": "error"
       }
     }
   },
@@ -75,5 +78,8 @@
     "parser": {
       "tailwindDirectives": true
     }
+  },
+  "tailwind": {
+    "stylesheet": "./src/styles/styles.css"
   }
 }

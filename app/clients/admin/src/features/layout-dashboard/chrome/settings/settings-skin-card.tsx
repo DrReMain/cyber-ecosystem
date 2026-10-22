@@ -33,7 +33,7 @@ export function SettingsSkinCard({ onSelect, selected, skin }: Readonly<Settings
         </SkinProvider>
         {selected ? (
           <span
-            className="absolute inset-e-1.5 top-1.5 flex size-4 items-center justify-center rounded-full text-ink-inverse"
+            className="text-ink-inverse absolute inset-e-1.5 top-1.5 flex size-4 items-center justify-center rounded-full"
             style={{ background: token.colorPrimary }}
           >
             <Check aria-hidden className="size-2.5" strokeWidth={3} />

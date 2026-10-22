@@ -22,7 +22,7 @@ export function SettingsAppearance() {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
-        <span className="font-medium text-[13px]">{m.layout_dashboard_settings_theme()}</span>
+        <span className="text-[13px] font-medium">{m.layout_dashboard_settings_theme()}</span>
         <div className="grid grid-cols-3 gap-2">
           {THEME_OPTIONS.map(({ icon: Icon, label, value }) => {
             const active = mode === value;
@@ -32,7 +32,7 @@ export function SettingsAppearance() {
                 className={clsx(
                   "flex flex-col items-center gap-1.5 rounded-lg border px-2 py-3 text-[12px] transition-colors",
                   active
-                    ? "border-primary bg-primary/6 font-medium text-primary"
+                    ? "border-primary bg-primary/6 text-primary font-medium"
                     : "border-line text-ink-secondary hover:border-line-hover",
                 )}
                 key={value}
@@ -46,8 +46,8 @@ export function SettingsAppearance() {
           })}
         </div>
       </div>
-      <div className="flex flex-col gap-2.5 border-line-soft border-t pt-4">
-        <span className="font-medium text-[13px]">{m.layout_dashboard_settings_skin()}</span>
+      <div className="border-line-soft flex flex-col gap-2.5 border-t pt-4">
+        <span className="text-[13px] font-medium">{m.layout_dashboard_settings_skin()}</span>
         <div className="flex items-center justify-between gap-3">
           <span className="text-[13px]">{m.layout_dashboard_settings_compact()}</span>
           <Switch

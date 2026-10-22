@@ -7,13 +7,6 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "scripts": {
-    "check": "biome check",
-    "format": "biome format",
-    "lint": "biome lint",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit"
-  },
   "peerDependencies": {
     "@tanstack/react-router": "^1",
     "@types/react": "^19",

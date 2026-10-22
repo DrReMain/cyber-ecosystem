@@ -14,8 +14,8 @@ export function ProfileIdentity({ avatarUrl, account, name }: Readonly<ProfileId
           {name.charAt(0).toUpperCase()}
         </Avatar>
         <div className="flex min-w-0 flex-col items-center gap-0.5">
-          <span className="truncate font-medium text-[15px]">{name}</span>
-          <span className="truncate font-mono text-[12px] text-ink-tertiary">{account}</span>
+          <span className="truncate text-[15px] font-medium">{name}</span>
+          <span className="text-ink-tertiary truncate font-mono text-[12px]">{account}</span>
         </div>
       </div>
     </Card>

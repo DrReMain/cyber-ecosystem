@@ -13,7 +13,7 @@ export function FirstLeafRedirect({ of }: Readonly<{ of: string }>) {
 }
 
 export function firstLeafRedirect(of: string) {
-  // biome-ignore lint/nursery/noComponentHookFactories: route options evaluate once at module scope, so the component identity is stable for the app lifetime.
+  // biome-ignore lint/correctness/noComponentHookFactories: route options evaluate once at module scope, so the component identity is stable for the app lifetime.
   return function GroupIndexRedirect() {
     return <FirstLeafRedirect of={of} />;
   };

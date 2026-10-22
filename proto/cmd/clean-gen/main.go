@@ -16,13 +16,14 @@ import (
 
 // handMaintained are root-level files buf/hey-api do NOT produce and that a
 // regen must not wipe: they declare the workspace package (package.json,
-// tsconfig.json) or the generator config co-located in its package
-// (hey-api.config.ts). Matched only at the target root, never inside
-// generated sub-packages.
+// tsconfig.json), its Nx targets (project.json), or the generator config
+// co-located in its package (hey-api.config.ts). Matched only at the target
+// root, never inside generated sub-packages.
 var handMaintained = map[string]bool{
 	"package.json":      true,
 	"tsconfig.json":     true,
 	"hey-api.config.ts": true,
+	"project.json":      true,
 }
 
 func main() {

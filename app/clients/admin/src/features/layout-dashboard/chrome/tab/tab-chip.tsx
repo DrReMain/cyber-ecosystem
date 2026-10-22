@@ -53,7 +53,7 @@ export function TabChip({
           CHIP,
           isActive ? CHIP_ACTIVE : CHIP_IDLE,
           drag && "touch-none",
-          drag?.dragging && "z-20 bg-container shadow-md",
+          drag?.dragging && "bg-container z-20 shadow-md",
         )}
         data-tab-key={tab.key}
         onClick={onActivate}

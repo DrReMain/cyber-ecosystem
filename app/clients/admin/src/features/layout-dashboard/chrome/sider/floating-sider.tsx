@@ -25,7 +25,7 @@ export function FloatingSider() {
   return (
     <Layout.Sider
       className={clsx(
-        "fixed inset-s-0 top-0 bottom-0 z-50 border-line-soft border-e",
+        "border-line-soft fixed inset-s-0 top-0 bottom-0 z-50 border-e",
         hoverExpanded && "shadow-xl",
       )}
       collapsed={!hoverExpanded}

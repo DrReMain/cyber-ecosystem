@@ -42,6 +42,7 @@ function makeTransport(streamImpl: unknown): Transport {
 }
 
 function wrapper(transport: Transport) {
+  // biome-ignore lint/correctness/noComponentHookFactories: one Wrapper per test transport at test setup, not a render-path component.
   return function Wrapper({ children }: Readonly<PropsWithChildren>) {
     return <TransportProvider transport={transport}>{children}</TransportProvider>;
   };

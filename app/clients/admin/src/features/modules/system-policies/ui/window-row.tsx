@@ -22,7 +22,7 @@ export function WindowRow({ index, span, onChange, onRemove }: Readonly<WindowRo
         <span
           className={clsx(
             "text-[12px]",
-            index > 0 ? "text-ink-tertiary" : "select-none text-transparent",
+            index > 0 ? "text-ink-tertiary" : "text-transparent select-none",
           )}
         >
           {m.system_policies_or()}

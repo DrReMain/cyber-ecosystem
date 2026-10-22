@@ -34,7 +34,7 @@ export function PolicyCalendarForm({ draft, onChange }: Readonly<PolicyCalendarF
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="font-medium text-[13px]">{m.system_policies_cal_base()}</span>
+        <span className="text-[13px] font-medium">{m.system_policies_cal_base()}</span>
         {valid ? (
           <Typography.Text className="text-[12px]" type={active ? "success" : "secondary"}>
             {active ? m.system_policies_now_active() : m.system_policies_now_inactive()}
@@ -50,8 +50,8 @@ export function PolicyCalendarForm({ draft, onChange }: Readonly<PolicyCalendarF
       <Typography.Text className="text-[12px]" type="secondary">
         {baseHint(draft.base)}
       </Typography.Text>
-      <div className="flex flex-col gap-2 border-line-soft border-t pt-3">
-        <span className="font-medium text-[13px]">{m.system_policies_cal_overrides_label()}</span>
+      <div className="border-line-soft flex flex-col gap-2 border-t pt-3">
+        <span className="text-[13px] font-medium">{m.system_policies_cal_overrides_label()}</span>
         {draft.overrides.map((o, i) => {
           const bad = dups.has(o.date) || !isDateValid(o.date);
           return (

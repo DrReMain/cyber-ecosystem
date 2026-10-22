@@ -67,7 +67,7 @@ export function ChatView({
           className={
             narrow
               ? "size-0 shrink-0 overflow-hidden"
-              : "flex w-60 shrink-0 flex-col overflow-hidden border-line-soft border-e bg-container"
+              : "border-line-soft bg-container flex w-60 shrink-0 flex-col overflow-hidden border-e"
           }
         >
           {rail({
@@ -76,7 +76,7 @@ export function ChatView({
             onClose: () => setRailOpen(false),
           })}
         </div>
-        <div className="flex min-w-0 grow flex-col bg-canvas">
+        <div className="bg-canvas flex min-w-0 grow flex-col">
           <div className="mx-auto flex min-h-0 w-full grow flex-col px-4">
             {content}
             <div className="pt-2 pb-4">
@@ -93,7 +93,7 @@ export function ChatView({
                   narrow ? (
                     <button
                       aria-label={m.agents_chat_rail_history()}
-                      className="me-1 inline-flex size-8 shrink-0 items-center justify-center rounded-control border border-line-soft text-ink-secondary transition-colors hover:border-line hover:text-ink"
+                      className="rounded-control border-line-soft text-ink-secondary hover:border-line hover:text-ink me-1 inline-flex size-8 shrink-0 items-center justify-center border transition-colors"
                       onClick={() => setRailOpen(true)}
                       type="button"
                     >

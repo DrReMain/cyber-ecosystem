@@ -15,7 +15,7 @@ export function ReasoningStrip({
       onExpand={setPinned}
       title={streaming ? m.agents_chat_thinking() : m.agents_chat_thought()}
     >
-      <div className="whitespace-pre-wrap text-[12px]">{reasoning}</div>
+      <div className="text-[12px] whitespace-pre-wrap">{reasoning}</div>
     </Think>
   );
 }

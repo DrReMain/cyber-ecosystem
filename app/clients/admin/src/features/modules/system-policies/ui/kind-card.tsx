@@ -23,12 +23,12 @@ export function KindCard({ selected, icon, title, desc, onSelect }: Readonly<Kin
       style={style}
       type="button"
     >
-      <span className="flex items-center gap-2 font-medium text-[13px]">
+      <span className="flex items-center gap-2 text-[13px] font-medium">
         {icon}
         {title}
         {selected ? <Check className="ms-auto" color={token.colorPrimary} size={14} /> : null}
       </span>
-      <span className="text-[12px] text-ink-tertiary">{desc}</span>
+      <span className="text-ink-tertiary text-[12px]">{desc}</span>
     </button>
   );
 }
