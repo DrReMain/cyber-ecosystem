@@ -361,12 +361,12 @@ describe("createTransportFactory", () => {
   });
 });
 
-describe("transport flattening law (toJson防腐层)", () => {
+describe("transport flattening law (toJson anti-corruption layer)", () => {
   it("renders StringValue wrappers as plain strings in unary responses", async () => {
     const transport = makeFactory().createTransport({ baseUrl: "http://api" });
     unaryImpl.mockResolvedValue({
       header: new Headers(),
-      message: create(UserSchema, { avatar: "钢枪少年" }),
+      message: create(UserSchema, { avatar: "Sharpshooter" }),
     });
     const res = await transport.unary(
       wktMethod,
@@ -377,7 +377,7 @@ describe("transport flattening law (toJson防腐层)", () => {
       undefined,
     );
     const flat = res.message as unknown as Record<string, unknown>;
-    expect(flat.avatar).toBe("钢枪少年");
+    expect(flat.avatar).toBe("Sharpshooter");
   });
 
   it("renders Timestamp fields as RFC3339 strings in unary responses", async () => {
@@ -431,8 +431,8 @@ describe("transport flattening law (toJson防腐层)", () => {
       header: new Headers(),
       trailer: new Headers(),
       message: (async function* () {
-        yield create(UserSchema, { avatar: "甲" });
-        yield create(UserSchema, { avatar: "乙" });
+        yield create(UserSchema, { avatar: "One" });
+        yield create(UserSchema, { avatar: "Two" });
       })(),
     });
     const res = await transport.stream(
@@ -449,7 +449,7 @@ describe("transport flattening law (toJson防腐层)", () => {
     for await (const message of res.message) {
       seen.push(message);
     }
-    expect(seen.map((m) => (m as Record<string, unknown>).avatar)).toEqual(["甲", "乙"]);
+    expect(seen.map((m) => (m as Record<string, unknown>).avatar)).toEqual(["One", "Two"]);
   });
 });
 
@@ -579,7 +579,7 @@ describe("stream response boundaries", () => {
   });
 });
 
-describe("unary fetch cancellation scoping (收尾abort不外泄)", () => {
+describe("unary fetch cancellation scoping (post-completion abort containment)", () => {
   it("wires the shielded fetch into the unary leg only", () => {
     branch.mode = "client";
     vi.stubGlobal("fetch", vi.fn());
@@ -593,7 +593,7 @@ describe("unary fetch cancellation scoping (收尾abort不外泄)", () => {
   });
 
   it("stops forwarding the caller's abort once headers arrived", async () => {
-    const impl = vi.fn(async () => ({ ok: true }) as Response);
+    const impl = vi.fn(async (_input: unknown, _init?: RequestInit) => ({ ok: true }) as Response);
     vi.stubGlobal("fetch", impl);
     makeFactory().createTransport({ baseUrl: "http://api" });
     const shielded = vi.mocked(createConnectTransport).mock.calls[0]?.[0]
@@ -632,7 +632,7 @@ describe("unary fetch cancellation scoping (收尾abort不外泄)", () => {
   });
 
   it("passes through untouched when no signal rides the call", async () => {
-    const impl = vi.fn(async () => ({ ok: true }) as Response);
+    const impl = vi.fn(async (_input: unknown, _init?: RequestInit) => ({ ok: true }) as Response);
     vi.stubGlobal("fetch", impl);
     makeFactory().createTransport({ baseUrl: "http://api" });
     const shielded = vi.mocked(createConnectTransport).mock.calls[0]?.[0]
@@ -644,7 +644,7 @@ describe("unary fetch cancellation scoping (收尾abort不外泄)", () => {
   });
 });
 
-describe("cookie forwarding (承重墙)", () => {
+describe("cookie forwarding (load-bearing seam)", () => {
   it("forwards the request cookie verbatim on the server branch", async () => {
     branch.mode = "server";
     serverCookie.mockReturnValue("session_token=abc; other=1");

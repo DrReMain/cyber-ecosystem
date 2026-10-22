@@ -17,9 +17,9 @@ describe("useColumns factories", () => {
   it("fieldTimestamp renders fixed-shape stamps from proto timestamps", () => {
     const { result } = renderHook(() => useColumns());
     const col = result.current.fieldTimestamp<Record<string, unknown>>("createdAt", {
-      title: "创建",
+      title: "Created",
     });
-    expect(col.title).toBe("创建");
+    expect(col.title).toBe("Created");
     expect(col.dataIndex).toBe("createdAt");
     expect(col.render?.(ts(0), {}, 0)).toBe(localStamp(0));
   });
@@ -27,7 +27,7 @@ describe("useColumns factories", () => {
   it("fieldTimestamp keeps array dataIndex for nested paths", () => {
     const { result } = renderHook(() => useColumns());
     const col = result.current.fieldTimestamp<Record<string, unknown>>(["user", "createdAt"], {
-      title: "创建",
+      title: "Created",
     });
     expect(col.dataIndex).toEqual(["user", "createdAt"]);
     const fallback = result.current.fieldTimestamp<Record<string, unknown>>(["user", "createdAt"]);
@@ -50,8 +50,10 @@ describe("useColumns factories", () => {
 
   it("fieldAction requires an explicit title and pins right", () => {
     const { result } = renderHook(() => useColumns());
-    const col = result.current.fieldAction<Record<string, unknown>>(() => null, { title: "操作" });
-    expect(col.title).toBe("操作");
+    const col = result.current.fieldAction<Record<string, unknown>>(() => null, {
+      title: "Actions",
+    });
+    expect(col.title).toBe("Actions");
     expect(col.fixed).toBe("right");
   });
 

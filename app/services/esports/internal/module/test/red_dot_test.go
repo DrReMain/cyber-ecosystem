@@ -179,7 +179,7 @@ func TestRedDotDetailMismatch(t *testing.T) {
 	}
 }
 
-// The linear track carries the difficulty factor (§三) and a unit-score
+// The linear track carries the difficulty factor (§3) and a unit-score
 // override from the engine-param KV.
 func TestRedDotLinearTrackFactors(t *testing.T) {
 	events := make([]*esportspb.RedDotEvent, 0, 30)

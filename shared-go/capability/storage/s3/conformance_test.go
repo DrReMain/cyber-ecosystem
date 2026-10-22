@@ -105,7 +105,7 @@ func TestLiveConformance(t *testing.T) {
 			t.Errorf("Size = %d, want %d", obj.Size, len(body))
 		}
 		if obj.ETag == "" {
-			t.Errorf("ETag empty — R2 seam (integrity对照) loses its data source")
+			t.Errorf("ETag empty — R2 seam (integrity comparison) loses its data source")
 		}
 	})
 
