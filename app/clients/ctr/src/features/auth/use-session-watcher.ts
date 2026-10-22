@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
+import { profileQueryKey } from "./profile-cache";
 import { sessionQuery } from "./session.fn";
 import { broadcastSessionKick, subscribeSessionKick } from "./session-kick";
 
@@ -53,6 +54,10 @@ export function useSessionWatcher() {
         if (isOnLogin(router.state.location.pathname)) return;
         if (prevStatus.current !== "authed") return;
         queryClient.removeQueries({ queryKey: sessionQuery.queryKey });
+        // The member plane's cached profile must not survive its seat — the
+        // next login (possibly another member) would read it inside
+        // PROFILE_STALE_MS.
+        queryClient.removeQueries({ queryKey: profileQueryKey });
         void router.navigate({
           search: { next: router.state.location.href },
           to: "/login",

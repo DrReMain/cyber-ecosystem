@@ -40,6 +40,9 @@
   "test_result_friendly_misclicks": "Friendly misclicks",
   "test_result_neutral_misclicks": "Neutral misclicks",
   "test_result_blank_clicks": "Invalid taps",
+  "test_rec_legend_enemy": "Enemy",
+  "test_rec_legend_friendly": "Ally",
+  "test_rec_legend_neutral": "Neutral",
   "test_no_engine_exit": "Back",
   "test_unknown_exit": "Back"
 }

@@ -40,6 +40,9 @@
   "test_result_friendly_misclicks": "误击友军",
   "test_result_neutral_misclicks": "误击中立",
   "test_result_blank_clicks": "无效点击",
+  "test_rec_legend_enemy": "敌人",
+  "test_rec_legend_friendly": "友军",
+  "test_rec_legend_neutral": "中立",
   "test_no_engine_exit": "返回",
   "test_unknown_exit": "返回"
 }

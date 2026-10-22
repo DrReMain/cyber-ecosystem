@@ -3,6 +3,7 @@ import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/pro
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
+import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { m } from "#/paraglide/messages";
 import { bandLabel, bandOfAge } from "../bands";
 import { useProfileUpdate } from "../use-profile-update";
@@ -27,7 +28,7 @@ function ageOf(year: number, month: number): number {
 
 export function SetupAgePage() {
   const navigate = useNavigate();
-  const profileQuery = useQuery(getProfile, {});
+  const profileQuery = useQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
   const updateMutation = useProfileUpdate();
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");

@@ -74,7 +74,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootDocument({ children }: Readonly<PropsWithChildren>) {
   const { storeData } = Route.useLoaderData();
   return (
-    <html dir={getTextDirection()} lang={getLocale()}>
+    // Browser extensions (immersive-translate et al.) stamp attributes onto
+    // <html> before hydration; suppressHydrationWarning covers that one
+    // element's attribute comparison only — real tree mismatches below
+    // still surface. Without it React discards the hydrated root and
+    // client re-renders, aborting every in-flight query at first paint.
+    <html dir={getTextDirection()} lang={getLocale()} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

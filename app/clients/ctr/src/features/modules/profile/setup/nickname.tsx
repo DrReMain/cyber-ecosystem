@@ -3,6 +3,7 @@ import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/pro
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
+import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { m } from "#/paraglide/messages";
 import { useProfileUpdate } from "../use-profile-update";
 import { StepFrame } from "./step-frame";
@@ -32,7 +33,7 @@ function validate(value: string): string | null {
 
 export function SetupNicknamePage() {
   const navigate = useNavigate();
-  const profileQuery = useQuery(getProfile, {});
+  const profileQuery = useQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
   const updateMutation = useProfileUpdate();
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);

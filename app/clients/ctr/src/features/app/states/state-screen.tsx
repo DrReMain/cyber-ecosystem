@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { Inbox } from "lucide-react";
 import type { ReactNode } from "react";
 import { m } from "#/paraglide/messages";
+import { LoadingStrip } from "./loading-strip";
 
 type StateScreenVariant = "empty" | "loading";
 
@@ -29,23 +30,15 @@ export function StateScreen({ variant, title, description, action }: Readonly<St
 
   return (
     <div
-      className="flex w-full flex-col items-center justify-center px-6 py-12 text-center"
+      className="flex w-full grow flex-col items-center justify-center px-6 py-12 text-center"
       role="status"
     >
       {loading ? (
         <>
-          {/* The mono LOADING strip is decorative (English by design, like
-              the ERR chips); the localized label is what assistive tech
-              reads under the container's role="status". */}
+          {/* The localized label is what assistive tech reads under the
+              container's role="status"; the strip itself is decorative. */}
           <span className="sr-only">{m.common_loading()}</span>
-          <div aria-hidden className="w-[min(200px,60%)]" dir="ltr">
-            <div className="text-center font-mono text-[11px] text-ink-tertiary uppercase tracking-[0.18em]">
-              LOADING
-            </div>
-            <span className="relative mt-2 block h-0.5 overflow-hidden rounded bg-ink/12">
-              <span className="absolute inset-s-[-40%] inset-y-0 w-2/5 bg-linear-to-r from-transparent via-ink/70 to-transparent motion-safe:animate-sweep rtl:motion-safe:animate-sweep-rev" />
-            </span>
-          </div>
+          <LoadingStrip tone="ink" />
         </>
       ) : (
         <span className="flex size-14 items-center justify-center rounded-card border border-line-soft bg-surface-content text-ink-tertiary">
