@@ -2,6 +2,7 @@
 
 > 归属:esports 前沿档,2026-10-20 建立。三人+各自的 coding agent 共用同一基线:精修期每片开工前,对照本矩阵对应行的语义锚做逐条核对;谁落地谁把该行状态改为「已实现」并注差异。矩阵错漏当场修正,不另立流程。
 > 语料真相源(旧仓 manage,只读):页面映射=manage 仓 docs 下的 DESIGN_DOC_MAP §二(交互基线↔视觉基线);**每页语义规则=ctr 交互原型的 `_check.js`(逐条引 PRD 节号)**;裁决台账=同目录 LOGIC_AUDIT(L1/L2/L3);PRD=block3/block4 各自的 PRD。FEATURE_LIST 自标部分过时,仅作检索辅助。
+> 2026-10-23 ljr 材料全量吸收(D-AL):新增可用锚=GAME_LOGIC_SPEC_DRAFT(match_config 种子/副能力 4 行 0.5/聚合 D1-D3)、USER_TRACEABILITY_PRD(user:*:view 分区权限点+手动解锁语义)、ADMIN_NAVIGATION_IA(9 模块)+ADMIN_INTERACTION_GUIDE(O-1/2/3)、db/README(36 表全景,V17-19 未发布)、旧仓 esport-server|esport-admin `openspec/changes/`(agreement-consent/membership-pay 等代码变更规格,clean-room 高价值参考);METRIC_SPEC 族仍按 §六.3 单源化消费。
 > 验收口径=D-O 语义级 + **D-O2 四要素(2026-10-20)**:布局一样、细节接近、文案一样、视觉接近——原型为 AI 产出非专业 UI/UX 设计,且受新栈组件库(RAC+tailwind)约束,不追像素级;语义锚(rules 面板/PRD 规则)仍逐条对齐(§0.5 十一条口径)。
 > 状态图例:✅ 已实现(语义级) · 🟡 骨架/占位 · ⬜ 未开工。
 
@@ -11,10 +12,10 @@
 
 | prototype 页(视觉锚) | 状态 | 承接片 | 差异与缺口注记 |
 |---|---|---|---|
-| `login`(block3/01+变体) | ✅ | E6b | 密码 tab 完整+协议双勾+微信环境门控+法务尾。**SMS tab=占位**(system 无契约);微信昵称一键(02-wechat 变体)未做——依赖绑定契约 |
+| `login`(block3/01+变体) | ✅ | E6b | 密码 tab 完整+协议双勾+微信环境门控+法务尾。**SMS tab=占位**(system 无契约);微信昵称一键(02-wechat 变体)未做——依赖绑定契约;双勾拦截 toast 指名缺哪项(§01)+备案四要素权威串核验=**B 批**(§七.5) |
 | `agreement`(user-agreement+privacy-policy) | ✅ | H2 | 已落 `/agreement?p=user\|privacy`(宽容收窄非法值剥参回落 user;入 sitemap+可索引;head SSR 动态 title);登录页两处协议链接已切真链(H2 授权注记);文案=原型演示文本占位(ljr 定稿后换);版本参数/consent 版本记录=契约缺口随 E6b(progress 已登记) |
 | `profile-nickname`(block3/02) | ✅ | E6b | 2-12 码点+规则卡;原型「禁 emoji」未显式实现(服务端校验兜底);昵称加权 24 冲突待 ljr 追认 |
-| `profile-age`(block3/03) | ✅ | E6b | 8 档派生 ✓;**性别三选未做**(P8);次级年龄段口径=新版仅出生年月单口径(UpdateProfile 无 band 入参,已登记) |
+| `profile-age`(block3/03) | ✅ | E6b | 8 档派生 ✓;**性别三选未做**(P8);次级年龄段口径=新版仅出生年月单口径(UpdateProfile 无 band 入参)——原型裁决 LOGIC_AUDIT ⑭=band-only 亦合法(guard 二选一,精确 birth 只在付费强制),与契约单轨相抵 → **P11 待裁** |
 | `profile-setup`(block3/04+custom) | ✅ | E6b | 分组多选+类型投票注+自定义 ≤3;服务端 cap=20 config 读面缺(已登记) |
 | `bind-wechat` / `bind-phone`(含 conflict 变体) | ⬜ | P4 前置 | 互绑=SMS+绑定契约缺口;D-G/G 待裁;profile 安全区三行「未开放」占位已在 |
 | `account-merge-*`(block3/confirm+success) | ⬜ | P4 前置 | 空号并入富号;双方有数据不自动合并 |
@@ -93,8 +94,10 @@
 2. **每页语义锚的消费纪律**:ctr 交互原型的 `_check.js` rules 面板(逐条引 PRD 节号)是防偷懒的现成抓手——承接片开工时把对应页的 rules 逐条搬进该片评审锚,逐条对上才算语义级完成(E0 测试读面片已示范此法);admin 原型无同款面板,以对应 PRD 节+BLOCK5_ADMIN_REFORM_PRD 为锚。
 3. **迁移口径同步律**:本矩阵行所属聚合落地时,当日回 migration.md 对应表补行(不积压到 cutover)。
 4. **权威地图滞后**(2026-10-20 核查):DESIGN_DOC_MAP 快照(09-18)之后 manage/docs 与 ctr 原型仍有演进——处理见 §六语料版本律,不视为 ljr 侧缺陷,以流程消化。
+5. **B 批修正清单(已建面×PRD 细则,2026-10-23 D-AL 吸收后,一片收)**:①login——双勾拦截 toast 指名缺哪项;备案四要素权威串核验(公司主体/ICP 备案号/客服邮箱——LOGIC_AUDIT 2.5b 与 MEMBERSHIP §九「备」字不一,待 ljr 定串);微信登录回填昵称头像+去向按资料完整性(2.5b-⑫)。②profile-nickname——禁 emoji 显式拦截(现服务端兜底)。③profile-setup——游戏清单后端取核验(PRD §04「前端不得硬编码」)+cap config 读面(已登记)。④profile-overview——模块集对核(PRD:训练趋势本期空态/报告中心内嵌 1 条+查看全部/账号安全=微信手机两行绑定)。⑤横屏律=仅 test-running(H-A 已合规,核 match/test 各页无横屏残留)。归属=lzx,E3-f 收口后。
 
 ## 八、变更记录
 
 - 2026-10-20 建立:ctr 44 页交互基线全量盘点;抓到缺口①(version-update 无承接片)。
 - 2026-10-20 增补:admin 端 41 页×9 组矩阵(用户指示双端覆盖);语料版本律(权威表前置+滞后窗口+数值档单源化);验收口径落 D-O2 四要素。
+- 2026-10-23 D-AL 全量吸收:档头注+行注记 3 处(login/profile-age/setup 核验面)+§七.5 B 批清单;metric.md 核对零改动(七款单位分/槽位/档位套吻合)。

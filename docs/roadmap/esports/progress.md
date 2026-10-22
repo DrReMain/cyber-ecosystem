@@ -50,6 +50,9 @@
 | D-W population 余件(provider 行 member_population/座位迁移/guard 注释清理) | lzx | E8 权益面触发 |
 | 走查墙 3:match 编排含无引擎款(tracking/skill 排进四项,流程 4/4 走不完) | hzy(H-C 顺带)或 lzx 小修 | W2 |
 | 走查墙 4:运营测试账号口径——pg2-probe 无 user 座位登不进 admin 端;种子超管=admin/admin123456 | 用户侧 | 即办(SQL 补座位或文档化) |
+| B 批修正清单(login toast 指名/备案串/微信回填昵称;nickname emoji 显式;setup 后端取核验;profile 模块集对核;横屏残留核) | lzx | E3-f 收口后一片收(清单=coverage §七.5,D-AL) |
+| P11 年龄采集单/双轨待裁(契约单轨 vs 原型 band-only 合法) | ljr | B 批修正片前 |
+| ICP 备案号权威串(LOGIC_AUDIT 2.5b「浙ICP2026028293号」vs MEMBERSHIP §九「浙ICP备2026028293号」) | ljr | 随 B 批 |
 | 走查注:admin 工作台 ERR·NETWORK(dev 栈缺数据源,非 esports 面) | lzx | pre 部署前查 |
 | hzy 台账评审标记销项(H1/H-B 行曾滞「待评审」,本表已并) | — | 已随本档剪枝闭 |
 
@@ -82,3 +85,5 @@
 - 10-22 E3 增量c/d(提交缝+MT/TR 定稿,双轴评审吸收两实错);hzy 精修批 MR!4 回流(三红根治/profile 写缝/D-AG 落地/C3);D-AG/AH/AI 裁;让步节制+环境分裂律立(README §5);注释精简批;dev-hzy 全量并入 main。
 - 10-23 D-AJ 任务分配判据+H-C 分配+hzy 线盘点(27f87fb8);本档整体剪枝重梳:状态对齐 git 事实(全部「待评审」滞标改已并 main)、补登会员读面/admin 用户管理行、修切片表结构断裂、开放遗留清单建网。
 - 10-23 E3-e:dual_zone/skill_trajectory scorer 定稿(净钟单向化+配置锚+终局对齐;哨兵双射闸;无效词表增 ABSURD_TIME_SPAN),metric.md §6.7/6.8 入档;自起栈三探针全绿(dz 90/st 521.6/反例 DETAIL_MISMATCH)。
+- 10-23 E3-f:number_stars 定稿(进度指针+三闸+诚实零),Tier A 7/10=CP1「过半」;live 探针 raw 330 黄金逐位吻合。
+- 10-23 D-AL:ljr 材料全量吸收+roadmap 校准批(DESIGN_DOC_MAP/DOC_INVENTORY 为导览;LOGIC_AUDIT/GAME_LOGIC_SPEC/溯源 PRD/admin IA/BLOCK5/题库表/openspec 指针入档;E3 七款×单位分吻合零返工,metric.md 零改动;B 批清单落 coverage §七.5;P11/备案串/迁移基线注登记)。

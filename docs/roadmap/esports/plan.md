@@ -34,13 +34,13 @@
 | ✅ E0 契约首刀 | esports v1 proto:测试域(类型/配置读面、统一提交(建议单 RPC + oneof 明细)、明细/成绩上报、排行)、画像、匹配、单次报告读面、entitlement 最小面(scope_kind/scope_ref,付费只发 trial;D-AB)。nullable 语义显式(optional),判定阈值随配置下发。验收:proto 全链生成+lint+breaking 绿,评审冻结(D-U:增量推进——种子片=画像+游戏目录已于 2026-10-18 冻结,余面逐片评审) | README §0 | M |
 | ✅ E1 服务骨架 | kratos-new-service 复制集:双面 accessLadder(ADMIN/MEMBER)、catalog 注册、deploy compose 面、system 消费(登录/会员链)。验收:服务起活,会员链探针 e2e 绿(**兼作 hzy onboarding 切片**) | E0 | M |
 | ✅ E2 schema+种子 | ent 首批:test/game/preference/config/contribution/题库/test_record/ability_score/entitlement 事件;种子重放(修坑:dual_zone 枚举统一、multi_target 补行、skill_prediction 不入、枚举约束防回归)。验收:migrate 归一+种子 e2e。2026-10-20 缩围补登(D-AA:entitlement→E8、contribution→E3;multi_target 补行落 D-Z) | E1 | M |
-| ⏳ E3 评分引擎 | 三层落位:指标层(13 款指标定义单源档,本片创建)/门槛层(百分位档位)/评分层(无上限线性+权威分位双轨);Tier A 九款全量重算 + Tier B 四款闸门;red_dot 锚点初始校准常量;ScorerRegistry 插件契约(加测试零改主干)。验收:域函数单测+提交→重算→报告分 e2e | E0,E2 | XL |
-| E4 匹配引擎 | match_config(预留 scenario 维度)+类型轴多数投票+两层编排+当日 seed+session 锁死落库+重测 3/1。验收:同日稳定/跨日变化/重排换 seed e2e | E2 | M |
-| E5 报告框架+能力报告 | 板块插件化(supports)+缺维度不渲染七硬约束+完整度指示+同龄百分位(Z-score CDF+置信分层)+档位四色;M1 只实现单次能力报告所需板块。验收:缺维场景渲染收拢 e2e | E3 | L |
+| ⏳ E3 评分引擎 | 三层落位:指标层(13 款指标定义单源档,本片创建)/门槛层(百分位档位)/评分层(无上限线性+权威分位双轨);Tier A 九款全量重算 + Tier B 四款闸门;red_dot 锚点初始校准常量;ScorerRegistry 插件契约(加测试零改主干)。验收:域函数单测+提交→重算→报告分 e2e。W3 三款(offense_defense/resource_match/character_counter)依赖题库种子增量:offense_scenario(optimal_choice/complexity/difficulty)+moba_character/character_counter_relation(counter_score)——内容=旧库经验数据(D-AL) | E0,E2 | XL |
+| E4 匹配引擎 | match_config(预留 scenario 维度)+类型轴多数投票+两层编排+当日 seed+session 锁死落库+重测 3/1。细锚(D-AL):续测 7 天不重排、超窗以 test_record 反推、重测次数不恢复;切后台无效=阈值可配(>3s)+is_valid/invalid_reason 入库;done=缓存写入后有新 test_record;跳步=未测可跳、done 只看结果、前端不可指定款;游戏池=contribution(is_primary=1)∩category∈(genre,通用)。验收:同日稳定/跨日变化/重排换 seed e2e | E2 | M |
+| E5 报告框架+能力报告 | 板块插件化(supports)+缺维度不渲染七硬约束+完整度指示+同龄百分位(Z-score CDF+置信分层)+档位四色;M1 只实现单次能力报告所需板块。细锚(D-AL):同龄基准=同龄同性别(待确定只同龄;仅年龄段=区间基准标近似;性别=P8);完整度主指标 X/8 维;档位快照解锁时固化(已解锁不随口径变);较上局=该能力上一场测评(非同场次上次尝试);报告文案五区可后台配置。验收:缺维场景渲染收拢 e2e | E3 | L |
 | ✅ E6a ctr 纯壳 | 零 RPC:TanStack Start 新工程(Nx 目标面)+ react-aria/tailwind 接线(D-R)+ token 层(旧仓 DESIGN.md 为经验数据输入,按 D-O 合理实施;D-S dark-only 单套)+ 路由骨架(仅根路由+空白落地页,D-T:能力配置为交付面) + 微信 WebView 适配基线(safe-area/键盘 vh/无 hover 假设/横竖屏地基)+ shared-ts UI-free 四包(error/cookie/store/router-progress)接线;i18n=paraglide zh-CN+en-US(baseLocale zh-CN);**SEO 全量面(2026-10-18 补入,C 端公网)**:robots.txt + sitemap(hreflang/x-default)+ 流程页 noindex + 逐页 title。验收:dev/build/typecheck/lint 全绿,dark-only 语义 token 就位 | — | M |
 | ✅ E6b 登录+画像流 | 微信/手机登录(消费 system 既有契约,不等 E0)、画像流(昵称必填/出生年月 8 档/未满 13 监护人硬闸/游戏偏好) | E6a,E0(画像流半片) | L |
 | E7 游戏框架+13 款 | 统一引擎框架(rAF+dt+refs 或 canvas,墙钟计时+暂停顺延单实现)、遥测采集(新契约)、参数化单流程路由、配置驱动运行时、真响应式横竖屏。三批:反应瞄准(red_dot/flash_aiming/multi_target/target_recognition)W3-W4;追踪技能(tracking_moving/moving_target/skill_trajectory/dual_zone)W5;决策资源(number_stars/offense_defense/character_counter/resource_match/economic_sim)W6。验收:每批 live 冒烟+遥测字段对齐(语义级) | E6,E3 | XL |
-| E8 权益最小面 | entitlement 事件模型+激活码全生命周期(生成/批量/兑换原子守卫防超卖)+报告访问判定(policy open/membership/tenant/closed + scope 覆盖;D-AB)。验收:兑换并发不超卖 e2e | E2 | M |
+| E8 权益最小面 | entitlement 事件模型+激活码全生命周期(生成/批量/兑换原子守卫防超卖)+报告访问判定(policy open/membership/tenant/closed + scope 覆盖;D-AB)。R7=会员 31 天计/第 32 天过期+每日定时扫描(D-AL)。验收:兑换并发不超卖 e2e | E2 | M |
 | E9 最小 admin 面 | admin client 挂 esports 模块:激活码+测试项/配置管理+报告访问策略(职业/认知 open/membership/closed)+题库种子查看;复用既有表格/搜索/动作列范式与 O-1/2/3 裁定。验收:开码→兑换→解锁闭环 e2e | E0 | M |
 | E10 全链 e2e | 登录→画像→匹配→4 款→完成→单次报告→激活码解锁全链 live e2e;原型断言按语义级移植为验收基线(D-O);docs:check | 全部 | M |
 
@@ -62,7 +62,7 @@
 |---|---|---|---|
 | PAY1 订单域 | 订单/幂等(同单复用+结算幂等)/状态机;订单行带 scope_kind/scope_ref(单次=trial,会员=period);SKU 读面(原价/现价结构,D-F 无立减展示) | **P1 已定(D-AB/D-AC,10-21)** | M |
 | PAY2 微信支付接入 | JSAPI(微信内)+H5(独立网页)统一下单/回调验签/对账;沙箱全流程→生产联调;**商户号 W1 即确认** | PAY1 | L |
-| PAY3 合规执法+付费墙 | 未成年拦截执法点(付费补填+18 岁禁付)/仅人工退款入口/会员态付费墙(P7 视觉稿,期内隐藏单次只留续费) | PAY2,P7(12-02) | M |
+| PAY3 合规执法+付费墙 | 未成年拦截执法点(付费补填+18 岁禁付)/仅人工退款入口/会员态付费墙(P7 视觉稿,期内隐藏单次只留续费)。细锚(D-AL):年龄计算契约=满 N 岁为生日次日(仅大陆无时区);备案四落点=登录页底/个人中心/付费弹窗+订阅确认/报告页底;幂等参考旧库 openspec membership-pay(CREATED 同单复用+settleOrder 幂等) | PAY2,P7(12-02) | M |
 
 ## M2 运营与变现(核心组 W5-W7;余组 W8 可降级梯①)
 
