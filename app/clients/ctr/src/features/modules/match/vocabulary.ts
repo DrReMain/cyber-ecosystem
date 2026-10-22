@@ -65,12 +65,12 @@ export function genreMeta(genre: Genre): GenreMeta {
     ? {
         cn: m.match_type_fps(),
         en: "FIRST-PERSON SHOOTER",
-        gradient: "bg-cta-fps",
+        gradient: "bg-genre-fps",
       }
     : {
         cn: m.match_type_moba(),
         en: "MULTIPLAYER ONLINE BATTLE ARENA",
-        gradient: "bg-cta-moba",
+        gradient: "bg-genre-moba",
       };
 }
 

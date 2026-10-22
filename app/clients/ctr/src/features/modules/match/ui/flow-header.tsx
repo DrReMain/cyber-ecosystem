@@ -12,13 +12,13 @@ export function FlowHeader({ title, onBack }: Readonly<FlowHeaderProps>) {
     <div className="flex items-center gap-3">
       <button
         aria-label={m.common_back()}
-        className="border-line text-ink-secondary flex h-11 w-11 shrink-0 items-center justify-center rounded-full border active:opacity-60"
+        className="bg-surface-input text-ink-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-full active:opacity-60"
         onClick={onBack}
         type="button"
       >
-        <ChevronLeft aria-hidden size={18} />
+        <ChevronLeft aria-hidden size={20} />
       </button>
-      <h1 className="text-ink text-lg font-extrabold">{title}</h1>
+      <h1 className="text-ink text-[19px] font-bold">{title}</h1>
     </div>
   );
 }

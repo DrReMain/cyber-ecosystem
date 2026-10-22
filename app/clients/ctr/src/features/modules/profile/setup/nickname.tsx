@@ -68,7 +68,7 @@ export function SetupNicknamePage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile" })} step={1}>
-      <div className="border-line bg-surface-card rounded-lg border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
         <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_nickname_title()}
         </div>
@@ -77,7 +77,7 @@ export function SetupNicknamePage() {
         </p>
         <input
           aria-label={m.profile_nickname_label()}
-          className="border-line bg-surface-input text-ink focus:border-focus w-full rounded-sm border px-3 py-3 outline-none"
+          className="border-line bg-surface-input text-ink placeholder:text-ink-tertiary focus:border-focus rounded-control w-full border px-3.5 py-[13px] text-[15px] outline-none"
           // Double the contract cap in characters so the counter can show
           // the over-limit state instead of silently truncating input.
           maxLength={24}
@@ -90,14 +90,14 @@ export function SetupNicknamePage() {
           type="text"
           value={value}
         />
-        <div className="mt-2 flex items-center justify-between">
+        <div className="mt-[7px] flex min-h-[15px] items-start justify-between">
           {error !== null && (
-            <span className="text-danger-text text-sm" role="alert">
+            <span className="text-danger-text text-[11.5px]" role="alert">
               {error}
             </span>
           )}
           <span
-            className={`text-xs ${
+            className={`text-ink-tertiary text-[11px] tabular-nums ${
               len > MAX_LEN
                 ? "text-danger-text"
                 : len >= MIN_LEN
@@ -110,7 +110,7 @@ export function SetupNicknamePage() {
         </div>
       </div>
 
-      <div className="border-line bg-surface-deep text-ink-tertiary rounded-lg border p-3.5 text-[11.5px] leading-relaxed whitespace-pre-line">
+      <div className="border-line bg-surface-content text-ink-muted rounded-control border px-3.5 py-3 text-[11.5px] leading-[1.7] whitespace-pre-line">
         <span className="text-ink-secondary font-bold">
           {m.profile_setup_nickname_rules_title()}
         </span>
@@ -119,7 +119,7 @@ export function SetupNicknamePage() {
       </div>
 
       <Button
-        className="bg-cta-primary rounded-sm px-4 py-3 font-semibold text-white disabled:opacity-50"
+        className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50"
         isDisabled={updateMutation.isPending}
         onPress={() => void onNext()}
       >

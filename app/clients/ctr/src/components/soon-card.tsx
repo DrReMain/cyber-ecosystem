@@ -12,7 +12,7 @@ interface SoonCardProps {
  */
 export function SoonCard({ title, description }: Readonly<SoonCardProps>) {
   return (
-    <div className="border-ink-tertiary/60 bg-surface-deep/50 rounded-lg border-dashed p-4">
+    <div className="border-ink-tertiary/60 bg-surface-deep/50 rounded-card border-dashed p-4">
       <div className="flex items-center justify-between">
         <span className="text-ink-tertiary text-sm font-bold">{title}</span>
         <span className="bg-status-pending-bg text-status-pending rounded-full px-2 py-0.5 text-[10px]">

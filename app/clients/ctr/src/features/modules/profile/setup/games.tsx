@@ -126,7 +126,7 @@ export function SetupGamesPage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/age" })} step={3}>
-      <div className="border-line bg-surface-card rounded-lg border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
         <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_games_title()} <span className="text-danger-text">*</span>
         </div>
@@ -137,7 +137,7 @@ export function SetupGamesPage() {
           <section key={category}>
             {hasCategoryHeader(category) && (
               <div
-                className={`mt-2 mb-1.5 text-[11.5px] font-bold first:mt-0 ${
+                className={`mt-2.5 mb-1.5 text-[11.5px] font-bold first:mt-0 ${
                   category === "fps" ? "text-accent-fps" : "text-accent-moba"
                 }`}
               >
@@ -150,9 +150,9 @@ export function SetupGamesPage() {
                 return (
                   <button
                     aria-pressed={on}
-                    className={`rounded-lg border px-2 py-3 text-center text-[12.5px] active:opacity-60 ${
+                    className={`rounded-control border px-2 py-3 text-center text-[12.5px] active:opacity-60 ${
                       on
-                        ? "border-focus bg-focus/20 text-accent-info font-bold"
+                        ? "border-ambient-blue bg-ambient-blue/18 text-accent-info font-bold"
                         : "border-line bg-surface-content text-ink-secondary"
                     }`}
                     key={game.id ?? game.name}
@@ -166,21 +166,22 @@ export function SetupGamesPage() {
             </div>
           </section>
         ))}
-        {totalPicked > 0 && (
-          <p className="text-ink-tertiary mt-3 text-[11px]">
-            {m.profile_setup_games_vote({
-              fps: fpsVotes,
-              moba: mobaVotes,
-              n: totalPicked,
-            })}
-            {fpsVotes === mobaVotes
-              ? m.profile_setup_games_tie()
-              : ` ${m.profile_setup_games_default({ type: fpsVotes > mobaVotes ? "FPS" : "MOBA" })}`}
-          </p>
-        )}
       </div>
 
-      <div className="border-line bg-surface-card rounded-lg border p-4">
+      {totalPicked > 0 && (
+        <p className="text-ink-tertiary text-center text-[11px]">
+          {m.profile_setup_games_vote({
+            fps: fpsVotes,
+            moba: mobaVotes,
+            n: totalPicked,
+          })}
+          {fpsVotes === mobaVotes
+            ? m.profile_setup_games_tie()
+            : ` ${m.profile_setup_games_default({ type: fpsVotes > mobaVotes ? "FPS" : "MOBA" })}`}
+        </p>
+      )}
+
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
         <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_games_custom_title()}
         </div>
@@ -190,7 +191,7 @@ export function SetupGamesPage() {
         <div className="flex gap-2">
           <input
             aria-label={m.profile_setup_games_custom_title()}
-            className="border-line bg-surface-input text-ink focus:border-focus min-w-0 flex-1 rounded-sm border px-3 py-3 text-sm outline-none"
+            className="border-line bg-surface-input text-ink placeholder:text-ink-tertiary focus:border-focus rounded-control min-w-0 flex-1 border px-3.5 py-[13px] text-[15px] outline-none"
             maxLength={30}
             name="customGame"
             onChange={(event) => setDraft(event.target.value)}
@@ -205,7 +206,7 @@ export function SetupGamesPage() {
             value={draft}
           />
           <button
-            className="border-line text-accent-info disabled:text-ink-tertiary w-20 shrink-0 rounded-sm border px-3 py-3 text-[13px] font-bold disabled:opacity-45"
+            className="border-ambient-blue/60 text-accent-info rounded-control w-[74px] shrink-0 border-[1.5px] py-[13px] text-center text-[13px] font-medium disabled:pointer-events-none disabled:opacity-45"
             disabled={customs.length >= CUSTOM_CAP}
             onClick={addCustom}
             type="button"
@@ -230,13 +231,13 @@ export function SetupGamesPage() {
             {customs.map((name) => (
               <button
                 aria-label={m.profile_setup_games_remove({ name })}
-                className="tap-zone border-line bg-surface-content text-ink-secondary flex items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs active:opacity-60"
+                className="tap-zone border-line bg-surface-content text-ink-muted rounded-tile flex items-start gap-1.5 border px-2.5 py-[7px] text-xs active:opacity-60"
                 key={name}
                 onClick={() => removeCustom(name)}
                 type="button"
               >
-                <span className="min-w-0 text-left leading-snug break-all">{name}</span>
-                <X aria-hidden className="text-ink-tertiary mt-0.5 shrink-0" size={12} />
+                <span className="min-w-0 flex-1 text-left leading-[1.45] break-all">{name}</span>
+                <X aria-hidden className="text-ink-tertiary mt-0.5 shrink-0" size={14} />
               </button>
             ))}
           </div>
@@ -244,13 +245,13 @@ export function SetupGamesPage() {
       </div>
 
       {error !== null && (
-        <p className="text-danger-text text-sm" role="alert">
+        <p className="text-danger-text text-[11.5px]" role="alert">
           {error}
         </p>
       )}
 
       <Button
-        className="bg-cta-primary rounded-sm px-4 py-3 font-semibold text-white disabled:opacity-50"
+        className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50"
         isDisabled={updateMutation.isPending}
         onPress={() => void onDone()}
       >

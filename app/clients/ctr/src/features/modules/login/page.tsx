@@ -48,7 +48,7 @@ function failureCopy(error: FieldError, reason: string | undefined): string | nu
 }
 
 const inputClass =
-  "w-full rounded-sm border border-line bg-surface-input px-3 py-3 text-ink outline-none focus:border-focus";
+  "w-full rounded-control border border-line bg-surface-input px-3.5 py-[13px] text-[15px] text-ink outline-none placeholder:text-ink-tertiary focus:border-focus";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -107,7 +107,7 @@ export function LoginPage() {
   }
 
   function agreeRowClass(field: "user" | "privacy"): string {
-    return `flex items-start gap-2 py-1.5 ${missing[field] ? "text-danger-text" : "text-ink-secondary"}`;
+    return `flex items-start gap-2.5 py-1.5 ${missing[field] ? "text-danger-text" : "text-ink-muted"}`;
   }
 
   async function onSubmit(event: SyntheticEvent<HTMLFormElement>) {
@@ -170,9 +170,9 @@ export function LoginPage() {
 
   return (
     <AmbientLayout dense>
-      <div className="flex w-full flex-col gap-4">
+      <div className="flex w-full flex-col gap-[14px] pt-7">
         <div className="flex items-center gap-3">
-          <div className="bg-cta-primary flex h-11 w-11 items-center justify-center rounded-xl">
+          <div className="bg-logo shadow-inset-ring flex h-11 w-11 items-center justify-center rounded-xl">
             <Zap aria-hidden className="text-white" size={22} />
           </div>
           <div>
@@ -181,14 +181,17 @@ export function LoginPage() {
           </div>
         </div>
 
+        {/* The prototype's .gap8 breathing room between lockup and segment. */}
+        <div aria-hidden className="h-2 shrink-0" />
+
         {/* Segment keeps the prototype's two-mode shape; the SMS tab is a
             disabled slot until the system SMS contract exists. */}
-        <div className="border-line flex overflow-hidden rounded-sm border text-sm">
-          <div className="bg-surface-content text-ink flex-1 py-2.5 text-center font-bold">
+        <div className="border-line-soft bg-surface-input/90 rounded-control flex gap-1 border p-1">
+          <div className="bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-[11px] text-center text-[13.5px] font-bold">
             {m.login_tab_password()}
           </div>
           <button
-            className="text-ink-tertiary/60 flex-1 py-2.5 text-center active:opacity-60"
+            className="text-ink-muted flex-1 rounded-[9px] py-[11px] text-center text-[13.5px] active:opacity-60"
             onClick={() => toast.info(m.common_soon())}
             type="button"
           >
@@ -211,7 +214,7 @@ export function LoginPage() {
           </TextField>
           {errorCopy !== null && (
             <div className="flex items-start justify-between gap-2" role="alert">
-              <p className="text-danger-text text-sm leading-snug">{errorCopy}</p>
+              <p className="text-danger-text text-[11.5px] leading-snug">{errorCopy}</p>
               {systemReason(serverReason) === System.LOGIN_SEAT_REQUIRED && (
                 <button
                   className="tap-zone text-ink-secondary shrink-0 font-bold underline active:opacity-60"
@@ -241,11 +244,11 @@ export function LoginPage() {
               <CheckboxButton>
                 <div className={agreeRowClass("user")}>
                   <AgreeBox checked={agree.user} />
-                  <span className="text-sm leading-snug">
+                  <span className="text-xs leading-[1.6]">
                     {m.login_agree_prefix()}
-                    {/* The tap must navigate without flipping the checkbox. */}
+                    {` `}
                     <Link
-                      className="underline active:opacity-60"
+                      className="text-link underline active:opacity-60"
                       onClick={(event) => event.stopPropagation()}
                       to="/agreement/user"
                     >
@@ -265,10 +268,11 @@ export function LoginPage() {
               <CheckboxButton>
                 <div className={agreeRowClass("privacy")}>
                   <AgreeBox checked={agree.privacy} />
-                  <span className="text-sm leading-snug">
+                  <span className="text-xs leading-[1.6]">
                     {m.login_agree_prefix()}
+                    {` `}
                     <Link
-                      className="underline active:opacity-60"
+                      className="text-link underline active:opacity-60"
                       onClick={(event) => event.stopPropagation()}
                       to="/agreement/privacy"
                     >
@@ -280,7 +284,7 @@ export function LoginPage() {
             </CheckboxField>
             {/* Select-all rides the user row's line: one tap covers both. */}
             <div className="flex items-start justify-between gap-2.5">
-              <span className="text-ink-tertiary ml-6 text-[10.5px] leading-snug">
+              <span className="text-ink-tertiary ml-[25px] text-[10.5px] leading-snug">
                 {m.login_agree_minor_note()}
               </span>
               <CheckboxField
@@ -305,7 +309,7 @@ export function LoginPage() {
           </div>
 
           <Button
-            className="rounded-sm bg-linear-to-r from-[#2563eb] to-[#06b6d4] px-4 py-3 font-semibold text-white disabled:opacity-50"
+            className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50"
             isDisabled={pending}
             type="submit"
           >
@@ -314,7 +318,7 @@ export function LoginPage() {
         </Form>
 
         <Button
-          className={`bg-wechat rounded-sm px-4 py-3 font-semibold text-white disabled:opacity-50 ${
+          className={`bg-cta-success shadow-cta-success rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50 ${
             wechatEnv ? "" : "opacity-55"
           }`}
           isDisabled={wechatPending}
@@ -324,24 +328,30 @@ export function LoginPage() {
         </Button>
 
         {/* Forgot-password stays contract-gated (SMS provider). */}
-        <div className="text-ink-tertiary text-center text-[10.5px] leading-relaxed">
+        <div className="text-ink-tertiary text-center text-[10.5px] leading-[1.95]">
           <button
-            className="tap-zone py-1 underline active:opacity-60"
+            className="tap-zone text-link py-1 underline active:opacity-60"
             onClick={() => toast.info(m.common_soon())}
             type="button"
           >
             {m.login_forgot()}
           </button>
           <span className="mx-1.5">·</span>
-          <Link className="tap-zone py-1 underline active:opacity-60" to="/agreement/user">
+          <Link
+            className="tap-zone text-link py-1 underline active:opacity-60"
+            to="/agreement/user"
+          >
             {m.login_agree_user_name()}
           </Link>
           <span className="mx-1.5">·</span>
-          <Link className="tap-zone py-1 underline active:opacity-60" to="/agreement/privacy">
+          <Link
+            className="tap-zone text-link py-1 underline active:opacity-60"
+            to="/agreement/privacy"
+          >
             {m.login_agree_privacy_name()}
           </Link>
         </div>
-        <div className="text-ink-tertiary text-center text-[10.5px] leading-loose">
+        <div className="text-ink-tertiary text-center text-[10.5px] leading-[1.95]">
           {m.login_footer_company()}
           <br />
           {m.login_footer_icp()}

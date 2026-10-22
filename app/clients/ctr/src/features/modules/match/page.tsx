@@ -6,12 +6,19 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Crosshair, Hexagon } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { m } from "#/paraglide/messages";
 import { arrange, defaultGenre, type Genre } from "./arranger";
 import { FlowHeader } from "./ui/flow-header";
 import { abilityWord, genreLabel, genreMeta } from "./vocabulary";
+
+/* The guide page's own orb pair (prototype match-guide). */
+const guideOrbs: readonly AmbientOrb[] = [
+  { className: "top-[-70px] left-[-50px] size-[min(62vw,240px)]", tone: "blue" },
+  { className: "bottom-[-60px] right-[-70px] size-[min(54vw,210px)]", tone: "cyan" },
+];
 
 /**
  * The match guide (prototype match-guide): genre header card, the
@@ -59,17 +66,17 @@ export function MatchPage() {
   }
 
   return (
-    <AmbientLayout>
+    <AmbientLayout orbs={guideOrbs}>
       <div className="flex w-full flex-col gap-3 pb-6">
         <FlowHeader onBack={() => void navigate({ to: "/" })} title={m.match_title()} />
 
         {meta !== null && genre !== null ? (
           <>
             <div
-              className={`${meta.gradient} rounded-card border-line flex items-center gap-3 overflow-hidden border p-4`}
+              className={`${meta.gradient} rounded-card flex items-center gap-[13px] overflow-hidden p-4`}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-black/25 text-xl text-white">
-                <Icon aria-hidden size={22} />
+              <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[rgba(0,0,0,0.22)] text-xl text-white">
+                <Icon aria-hidden size={20} />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[17px] leading-tight font-black text-white">{meta.cn}</div>
@@ -80,7 +87,7 @@ export function MatchPage() {
               </span>
             </div>
 
-            <div className="mb-1 flex items-baseline justify-between px-0.5">
+            <div className="mt-3 mb-2 flex items-baseline justify-between px-0.5">
               <span className="text-ink-tertiary text-[11.5px]">
                 {m.match_sub({ n: steps.length })}
               </span>
@@ -89,16 +96,16 @@ export function MatchPage() {
               </span>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-[9px]">
               {steps.map((step, i) => {
                 const word = abilityWord(step.ability);
                 return (
                   <div
-                    className="border-line bg-surface-card flex items-center gap-2.5 rounded-lg border p-3"
+                    className="border-line bg-surface-card shadow-card rounded-control flex items-center gap-[11px] border px-[13px] py-[11px]"
                     key={step.code}
                   >
                     <div
-                      className={`${word.gradient} rounded-tile flex h-9 w-9 shrink-0 items-center justify-center text-[15px] font-bold text-white`}
+                      className={`${word.gradient} rounded-control flex h-[38px] w-[38px] shrink-0 items-center justify-center text-[15px] font-bold text-white`}
                     >
                       {i + 1}
                     </div>
@@ -120,22 +127,22 @@ export function MatchPage() {
             </div>
 
             <button
-              className="bg-cta-primary mt-2 w-full rounded-sm px-4 py-3 font-semibold text-white active:opacity-80"
+              className="bg-cta-primary shadow-cta-primary rounded-control mt-3 w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
               onClick={onStart}
               type="button"
             >
               {m.match_go()}
             </button>
-            <div className="flex gap-2">
+            <div className="mt-[9px] flex gap-[9px]">
               <button
-                className="border-line bg-surface-content text-ink flex-1 rounded-sm border px-3 py-2.5 text-[12.5px] font-semibold active:opacity-60"
+                className="bg-surface-input text-ink-secondary rounded-control flex-1 border-[1.5px] border-[#4b5563] py-[11px] text-center text-[12.5px] font-medium active:opacity-60"
                 onClick={() => void navigate({ to: "/match/guide" })}
                 type="button"
               >
                 {m.match_btn_guide()}
               </button>
               <button
-                className="border-line bg-surface-content text-ink flex-1 rounded-sm border px-3 py-2.5 text-[12.5px] font-semibold active:opacity-60"
+                className="bg-surface-input text-ink-secondary rounded-control flex-1 border-[1.5px] border-[#4b5563] py-[11px] text-center text-[12.5px] font-medium active:opacity-60"
                 onClick={() =>
                   void navigate({ to: "/match/switch", search: genre ? { from: genre } : {} })
                 }

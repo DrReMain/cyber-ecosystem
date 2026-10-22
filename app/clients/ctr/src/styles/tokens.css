@@ -16,6 +16,7 @@
   /* Ink */
   --color-ink: #ffffff;
   --color-ink-secondary: #d1d5db;
+  --color-ink-muted: #9ca3af; /* prototype .mut — agree copy, inactive segments */
   --color-ink-tertiary: #6b7280;
 
   /* Lines */
@@ -29,9 +30,10 @@
   --color-focus: #3b82f6;
   --color-focus-ring: rgba(59, 130, 246, 0.2);
 
-  /* Category accents — the fps/moba voting vocabulary and selection emphasis */
-  --color-accent-fps: #818cf8;
-  --color-accent-moba: #60a5fa;
+  /* Category accents — the fps/moba voting vocabulary and selection emphasis
+   * (prototype 04's header hues #4F46E5 / #1D4ED8, matching --grad-cta-fps) */
+  --color-accent-fps: #4f46e5;
+  --color-accent-moba: #1d4ed8;
   --color-accent-info: #93c5fd;
 
   /* WeChat brand green — the platform's mark, not a palette choice */
@@ -88,11 +90,18 @@
   /* Lock veil (paywall visuals) */
   --color-veil: rgba(11, 18, 32, 0.72);
 
-  /* Ambient orbs — page backdrop atmosphere, values inherited from the
-   * legacy client's calibrated drift (experience data, not decoration whims) */
-  --color-ambient-1: rgba(139, 92, 246, 0.5);
-  --color-ambient-2: rgba(37, 99, 235, 0.45);
-  --color-ambient-3: rgba(220, 38, 38, 0.32);
+  /* Ambient orbs — page backdrop atmosphere. The palette is the prototype's
+   * five-tone set; placement is per-page art direction carried by the
+   * AmbientBackdrop props (the login trio is the shared default). Solid
+   * circles at blur 70px / rest opacity .26 = the prototype's .blob form. */
+  --color-ambient-purple: #7c3aed;
+  --color-ambient-blue: #2563eb;
+  --color-ambient-cyan: #06b6d4;
+  --color-ambient-indigo: #1d4ed8;
+  --color-ambient-teal: #0e7490;
+
+  /* Links — the prototype's one .link voice, cyan on every surface */
+  --color-link: #22d3ee;
 
   /* Radii — namespaced so Tailwind's default rounded-* stays intact */
   --radius-tile: 8px;
@@ -105,12 +114,20 @@
   --shadow-cta-success: 0 10px 24px rgba(22, 163, 74, 0.3);
   --shadow-cta-practice: 0 10px 24px rgba(234, 88, 12, 0.35);
   --shadow-cta-member: 0 10px 24px rgba(126, 34, 206, 0.35);
+  --shadow-inset-ring: inset 0 0 0 1px rgba(255, 255, 255, 0.1); /* .iconbox hairline */
+  --shadow-seg-on: 0 4px 12px rgba(37, 99, 235, 0.4); /* selected segment */
+  --shadow-progress-cur: 0 0 10px rgba(245, 159, 11, 0.8); /* §4.7 current-step glow */
+
+  /* Onboarding progress rail, §4.7 tri-state: current = amber + glow,
+   * done = cyan→blue, upcoming = surface */
+  --color-progress-cur: #f59e0b;
 
   /* Motion constants (expo-out easing, two duration tiers) */
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Ambient drift + loading sweep — keyframes live here so Tailwind emits
-   * them with the first animate-* utility use */
+   * them with the first animate-* utility use. Drift rests at the
+   * prototype's static .26 so any frame at 0%/100% is pixel-honest. */
   --animate-ambient-a: ambient-drift-a 15s ease-in-out infinite;
   --animate-ambient-b: ambient-drift-b 19s ease-in-out infinite;
   --animate-ambient-c: ambient-drift-c 17s ease-in-out infinite;
@@ -121,41 +138,41 @@
     0%,
     100% {
       transform: translate(0, 0) scale(1);
-      opacity: 0.42;
+      opacity: 0.26;
     }
     35% {
       transform: translate(5%, -4%) scale(1.08);
-      opacity: 0.58;
+      opacity: 0.4;
     }
     70% {
       transform: translate(-4%, 3%) scale(0.94);
-      opacity: 0.48;
+      opacity: 0.32;
     }
   }
   @keyframes ambient-drift-b {
     0%,
     100% {
       transform: translate(0, 0) scale(1);
-      opacity: 0.36;
+      opacity: 0.26;
     }
     50% {
       transform: translate(-6%, 5%) scale(1.07);
-      opacity: 0.52;
+      opacity: 0.4;
     }
   }
   @keyframes ambient-drift-c {
     0%,
     100% {
       transform: translate(0, 0) scale(1);
-      opacity: 0.32;
+      opacity: 0.26;
     }
     40% {
       transform: translate(4%, 6%) scale(1.12);
-      opacity: 0.5;
+      opacity: 0.38;
     }
     80% {
       transform: translate(-5%, -3%) scale(0.9);
-      opacity: 0.38;
+      opacity: 0.3;
     }
   }
   @keyframes sweep {
@@ -195,18 +212,21 @@
   --grad-cta-success: linear-gradient(to right, #16a34a, #10b981);
   --grad-cta-practice: linear-gradient(to right, #ea580c, #f59e0b);
   --grad-cta-personal: linear-gradient(to right, #9333ea, #2563eb);
-  --grad-cta-fps: linear-gradient(to right, #4f46e5, #06b6d4);
-  --grad-cta-moba: linear-gradient(to right, #1d4ed8, #7c3aed);
+  /* Genre identity headers — 120deg per prototype match-guide (the color is
+   * background identity; the text tag carries the semantics) */
+  --grad-genre-fps: linear-gradient(120deg, #4f46e5, #06b6d4);
+  --grad-genre-moba: linear-gradient(120deg, #1d4ed8, #7c3aed);
   --grad-cta-member: linear-gradient(to right, #7e22ce, #a855f7);
-  --grad-identity: linear-gradient(to bottom, rgba(36, 49, 94, 0.55), rgba(17, 23, 41, 0.95));
+  --grad-identity: linear-gradient(to bottom, rgba(36, 49, 94, 0.55), rgba(17, 23, 41, 0.94));
   --grad-lock-stripes: repeating-linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.03) 0 8px,
     transparent 8px 16px
   );
-  --grad-ambient-a: radial-gradient(circle, var(--color-ambient-1) 0%, transparent 72%);
-  --grad-ambient-b: radial-gradient(circle, var(--color-ambient-2) 0%, transparent 72%);
-  --grad-ambient-c: radial-gradient(circle, var(--color-ambient-3) 0%, transparent 68%);
+  /* The brand mark's own diagonal — distinct from the CTA's to-right flow */
+  --grad-logo: linear-gradient(135deg, #2563eb, #06b6d4);
+  /* §4.7 done-step fill — the CTA gradient's reverse direction */
+  --grad-progress-done: linear-gradient(to right, #22d3ee, #2563eb);
 }
 
 @utility bg-ability-reaction {
@@ -239,11 +259,11 @@
 @utility bg-cta-personal {
   background-image: var(--grad-cta-personal);
 }
-@utility bg-cta-fps {
-  background-image: var(--grad-cta-fps);
+@utility bg-genre-fps {
+  background-image: var(--grad-genre-fps);
 }
-@utility bg-cta-moba {
-  background-image: var(--grad-cta-moba);
+@utility bg-genre-moba {
+  background-image: var(--grad-genre-moba);
 }
 @utility bg-cta-member {
   background-image: var(--grad-cta-member);
@@ -254,12 +274,9 @@
 @utility bg-lock-stripes {
   background-image: var(--grad-lock-stripes);
 }
-@utility bg-ambient-a {
-  background-image: var(--grad-ambient-a);
+@utility bg-logo {
+  background-image: var(--grad-logo);
 }
-@utility bg-ambient-b {
-  background-image: var(--grad-ambient-b);
-}
-@utility bg-ambient-c {
-  background-image: var(--grad-ambient-c);
+@utility bg-progress-done {
+  background-image: var(--grad-progress-done);
 }

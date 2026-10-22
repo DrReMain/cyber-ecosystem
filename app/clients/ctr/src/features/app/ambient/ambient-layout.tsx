@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { ReactNode } from "react";
-import { AmbientBackdrop } from "./ambient-backdrop";
+import { AmbientBackdrop, type AmbientOrb } from "./ambient-backdrop";
 
 const maxWidthCls = {
   md: "max-w-md",
@@ -23,6 +23,8 @@ interface AmbientLayoutProps {
   /** Login-type tight screens: less outer padding, content vertically
    * centered with an inner scroll fallback — same height cap as "inside". */
   dense?: boolean;
+  /** Per-page orb art direction; absent = the shared login trio. */
+  orbs?: readonly AmbientOrb[];
 }
 
 export function AmbientLayout({
@@ -30,6 +32,7 @@ export function AmbientLayout({
   maxWidth = "md",
   scroll = "page",
   dense = false,
+  orbs,
 }: Readonly<AmbientLayoutProps>) {
   const capped = scroll === "inside" || dense;
   return (
@@ -39,7 +42,7 @@ export function AmbientLayout({
         capped ? "h-app" : "min-h-app",
       )}
     >
-      <AmbientBackdrop />
+      <AmbientBackdrop orbs={orbs} />
       <div
         className={clsx(
           "relative z-[1] flex flex-1 items-center justify-center",

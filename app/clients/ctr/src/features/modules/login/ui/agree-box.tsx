@@ -14,7 +14,7 @@ export function AgreeBox({ checked, indeterminate = false }: Readonly<AgreeBoxPr
     <span
       aria-hidden
       className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border text-white ${
-        checked || indeterminate ? "border-focus bg-focus/40" : "border-line"
+        checked || indeterminate ? "border-ambient-blue bg-ambient-blue" : "border-line"
       }`}
     >
       {checked ? (

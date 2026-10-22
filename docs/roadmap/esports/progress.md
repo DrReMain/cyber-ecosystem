@@ -6,7 +6,7 @@
 
 | 人 | 已交付(均已并 esports/main) | 当前 → 下一片 |
 |---|---|---|
-| lzx | E0 契约(种子+增量2/3/4)、E1 骨架、E2 schema+种子、E3 评分(框架+Tier A 六款+提交缝,ce763107)、E6a/E6b、会员读面+admin 用户管理(88bcd9ba/3f272b28)、system 组合缝 ListUsersByPopulation(a8b9f0a4) | **▶ 视觉对齐批 V1(装饰件基座)→ V2(登录+画像)→ V3(编排+个人中心)**;后排:Tier A 余款四款(W3,首片 number_stars 补 CP1「过半」)→ E4(W4)→ PAY1+E8(W5) |
+| lzx | E0 契约(种子+增量2/3/4)、E1 骨架、E2 schema+种子、E3 评分(框架+Tier A 六款+提交缝,ce763107)、E6a/E6b、会员读面+admin 用户管理(88bcd9ba/3f272b28)、system 组合缝 ListUsersByPopulation(a8b9f0a4) | **▶ 视觉对齐批 V1 ✅ V2 ✅ V3 ✅(首页+编排+个人中心,genre 120°/mcard 族/fab 全族;待提交)→ admin 交互/文案对齐批(D-AK)**;后排:Tier A 余款四款(W3,首片 number_stars 补 CP1「过半」)→ E4(W4)→ PAY1+E8(W5) |
 | hzy | H1 系统态件、H2 协议页、H-A 引擎框架、H-B 反应瞄准批(四款引擎,mock 净拔除)、10-22 精修批(控制台三红根治/profile 写缝/D-AG 落地/C3) | **H-C 判定回路闭环(已分配 10-23,D-AJ 首例,冒烟唯一硬断点)** → E7 追踪技能批(W2-3 起);挂起:D-AG/C3 实机走查随下次登录 |
 | ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:**性别字段(原型必选 vs 契约无,W2)**、P8(E5 前,W4 末;含协议正文联动)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
 

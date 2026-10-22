@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { m } from "#/paraglide/messages";
 
-const CARD_CLASS = "rounded-lg border border-line bg-surface-card p-4";
+const CARD_CLASS = "border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]";
 
 /**
  * The editable profile facts: one row per setup step, each hopping into the
@@ -42,19 +42,19 @@ export function DataCard({ profile }: Readonly<{ profile: ProfilePB | undefined 
   ];
   return (
     <div className={CARD_CLASS}>
-      <div className="text-ink mb-1 text-sm font-extrabold">{m.profile_card_data()}</div>
+      <div className="text-ink mb-1 text-[14.5px] font-extrabold">{m.profile_card_data()}</div>
       {rows.map((row, index) => (
         <button
-          className={`flex w-full items-center justify-between py-3 text-left active:opacity-60 ${
-            index < rows.length - 1 ? "border-line-soft border-b" : ""
+          className={`flex w-full items-center justify-between py-[9px] text-left active:opacity-60 ${
+            index < rows.length - 1 ? "border-b border-[rgba(55,65,81,0.4)]" : ""
           }`}
           key={row.key}
           onClick={() => void navigate({ to: row.to })}
           type="button"
         >
-          <span className="text-ink-secondary text-sm">{row.label}</span>
+          <span className="text-ink-secondary text-[13px] font-bold">{row.label}</span>
           <span className="ml-3 flex min-w-0 items-center gap-1.5">
-            <span className="text-ink truncate text-sm">{row.value}</span>
+            <span className="text-ink-muted truncate text-[12px]">{row.value}</span>
             <ChevronRight aria-hidden className="text-ink-tertiary shrink-0" size={14} />
           </span>
         </button>

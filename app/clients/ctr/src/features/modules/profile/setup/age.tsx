@@ -76,16 +76,16 @@ export function SetupAgePage() {
   }
 
   const selectClass =
-    "w-full appearance-none rounded-sm border border-line bg-surface-input px-3 py-3 text-ink outline-none focus:border-focus";
+    "w-full appearance-none rounded-control border border-line bg-surface-input px-2.5 py-[13px] text-[15px] text-ink outline-none focus:border-focus";
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/nickname" })} step={2}>
-      <div className="border-line bg-surface-card rounded-lg border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
         <div className="text-ink mb-1 text-sm font-extrabold">{m.profile_birth_label()}</div>
         <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed">
           {m.profile_setup_birth_desc()}
         </p>
-        <div className="flex gap-3">
+        <div className="flex gap-2.5">
           <select
             aria-label={m.profile_birth_year()}
             className={selectClass}
@@ -122,24 +122,24 @@ export function SetupAgePage() {
           </select>
         </div>
         {complete && derivedBand !== null && (
-          <p className="text-accent-info mt-2 text-[10.5px]">
+          <p className="text-accent-info mt-[9px] text-[10.5px]">
             {m.profile_setup_band_derived({ band: bandLabel(derivedBand) ?? "" })}
           </p>
         )}
       </div>
 
       {needGuardian || minorNote ? (
-        <div className="bg-surface-deep text-status-pending rounded-lg border border-[rgba(245,158,11,0.5)] p-3.5 text-[11.5px] leading-relaxed">
+        <div className="bg-surface-deep text-status-pending rounded-control border border-[rgba(245,158,11,0.5)] p-3.5 text-[11.5px] leading-relaxed">
           {needGuardian ? m.profile_minor_u13() : m.profile_minor_u18()}
         </div>
       ) : null}
 
       {needGuardian ? (
-        <label className="border-line bg-surface-deep flex flex-col gap-1.5 rounded-lg border p-3.5">
+        <label className="border-line bg-surface-deep rounded-control flex flex-col gap-1.5 border p-3.5">
           <span className="text-ink-secondary flex items-start gap-2">
             <input
               checked={guardian}
-              className="accent-focus mt-0.5 h-4 w-4 shrink-0"
+              className="mt-0.5 h-4 w-4 shrink-0 accent-[#2563eb]"
               onChange={(event) => {
                 setGuardian(event.target.checked);
                 setError(null);
@@ -155,13 +155,13 @@ export function SetupAgePage() {
       ) : null}
 
       {error !== null && (
-        <p className="text-danger-text text-sm" role="alert">
+        <p className="text-danger-text text-[11.5px]" role="alert">
           {error}
         </p>
       )}
 
       <Button
-        className="bg-cta-primary rounded-sm px-4 py-3 font-semibold text-white disabled:opacity-50"
+        className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50"
         isDisabled={updateMutation.isPending}
         onPress={() => void onNext()}
       >
