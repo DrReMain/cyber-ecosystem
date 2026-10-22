@@ -8,6 +8,7 @@ import { SoonCard } from "#/components/soon-card";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { TabBar } from "#/features/app/tabbar";
+import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { broadcastSessionKick } from "#/features/auth/session-kick";
 import { m } from "#/paraglide/messages";
 import { logoutFn } from "./logout.fn";
@@ -23,7 +24,7 @@ export function ProfilePage() {
   // guard (features/auth/guard.ts) redirects in beforeLoad, so this query
   // only ever fires authed. Errors escalate to the route boundary per the
   // global throwOnError — this page owns only the pending face.
-  const profileQuery = useQuery(getProfile, {});
+  const profileQuery = useQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
   const [loggingOut, setLoggingOut] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 

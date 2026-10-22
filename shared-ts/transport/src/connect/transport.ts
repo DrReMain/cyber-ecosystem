@@ -104,20 +104,60 @@ export function createTransportFactory(bindings: TransportBindings): TransportFa
     };
   }
 
+  // Unary cancellation must not outlive the response headers. Connect's
+  // run-call cleanup aborts its linked controller after every completed
+  // call, and that abort fires into the fetch's response stream — erroring
+  // any tee branch still being read. Fetch-wrapping browser extensions
+  // clone every response and log the clone's AbortError as a console
+  // error on each RPC. The wrapper detaches the caller's signal from the
+  // actual fetch once headers arrived: in-flight cancellation propagates
+  // untouched, the post-completion cleanup abort no longer reaches the
+  // stream. Unary only — for streams abort is the normal close (§1) and
+  // keeps full semantics.
+  function headerCancellationFetch(
+    fetchImpl: typeof globalThis.fetch,
+  ): typeof globalThis.fetch {
+    return (input, init) => {
+      const outer = init?.signal;
+      if (outer == null) {
+        return fetchImpl(input, init);
+      }
+      const inner = new AbortController();
+      const forward = () => inner.abort(outer.reason);
+      if (outer.aborted) {
+        inner.abort(outer.reason);
+      } else {
+        outer.addEventListener("abort", forward);
+      }
+      return fetchImpl(input, { ...init, signal: inner.signal }).finally(() => {
+        outer.removeEventListener("abort", forward);
+      });
+    };
+  }
+
   function singleConnectTransport(baseUrl: string, interceptors: Interceptor[]): Transport {
-    const connect = createConnectTransport({
+    const interceptorChain = [
+      localeInterceptor,
+      cookieForwarder,
+      sessionNamespaceInterceptor,
+      ...interceptors,
+    ];
+    // One underlying connect transport per leg: unary rides the
+    // shielded fetch, streams keep the platform fetch (abort is their
+    // normal close).
+    const unaryConnect = createConnectTransport({
       baseUrl,
-      interceptors: [
-        localeInterceptor,
-        cookieForwarder,
-        sessionNamespaceInterceptor,
-        ...interceptors,
-      ],
+      fetch: headerCancellationFetch(globalThis.fetch),
+      interceptors: interceptorChain,
+    });
+    const streamConnect = createConnectTransport({
+      baseUrl,
+      interceptors: interceptorChain,
     });
     return {
       unary: async (method, signal, timeoutMs, header, input, contextValues) => {
         try {
-          const response = await connect.unary(
+          const response = await unaryConnect.unary(
             method,
             signal,
             timeoutMs,
@@ -137,7 +177,7 @@ export function createTransportFactory(bindings: TransportBindings): TransportFa
         try {
           const response =
             method.methodKind === "server_streaming"
-              ? await connect.stream(method, signal, timeoutMs, header, input, contextValues)
+              ? await streamConnect.stream(method, signal, timeoutMs, header, input, contextValues)
               : await wsStreamCall(baseUrl, method, signal, input);
           return flattenStream(method.output, normalizedStream(response));
         } catch (error) {
