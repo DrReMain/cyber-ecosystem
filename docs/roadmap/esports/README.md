@@ -112,6 +112,7 @@
 | P7 | 会员态付费墙视觉稿(期内隐藏单次只留续费) | ljr | **12-02 前支付联调依赖** |
 | P8 | C 端画像性别字段(旧仓仅设计未实现、新仓三处冻结口径均无;E5 同龄基准是否分性别为唯一潜在消费者;2026-10-23 D-AL 增证:LOGIC_AUDIT 2.5d 已拍同龄基准=**同龄同性别**,待确定只同龄——性别即其唯一输入,口径备选=旧仓 wechat_sex 1男/2女/0未知/NULL) | ljr | E5 规格定稿前(W4 末);2026-10-22 增:协议 privacy c1 双语正文列有「性别」,若裁不采集须同步删文 |
 | P11 | 画像年龄采集:契约单轨 birth(D-U 冻结)vs 原型双轨(band-only 亦合法+birth 自动带出档,LOGIC_AUDIT ⑭;V2 视觉批曾自创「降级卡」=PRD 未定义形态) | ljr | B 批修正片前(E3-f 收口后) |
+| P12 | moving_target 主能力归属:交互权威(_state.js POOL=编排消费方)归 trackingStability(我方种子现状)vs 数据权威(game_ability_contribution 主行 aimingAccuracy 1.0 + B2 次贡献 TS 0.5「次增强」注释)归 aimingAccuracy——ljr 仓两源自相矛盾 | ljr | **E4 匹配引擎开工前**(池分布:FPS AA 池 2↔3 款、TS 池 2↔1 款) |
 | P10 | ctr 语言切换常驻入口形态(候选:无常驻/头部轻量/个人中心设置行;原型无锚,EN 经 URL 前缀可达) | ljr | 随 P4(11 月底前) |
 
 ---

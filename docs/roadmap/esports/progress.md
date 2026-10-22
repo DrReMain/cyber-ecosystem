@@ -53,6 +53,8 @@
 | B 批修正清单(login toast 指名/备案串/微信回填昵称;nickname emoji 显式;setup 后端取核验;profile 模块集对核;横屏残留核) | lzx | E3-f 收口后一片收(清单=coverage §七.5,D-AL) |
 | P11 年龄采集单/双轨待裁(契约单轨 vs 原型 band-only 合法) | ljr | B 批修正片前 |
 | ICP 备案号权威串(LOGIC_AUDIT 2.5b「浙ICP2026028293号」vs MEMBERSHIP §九「浙ICP备2026028293号」) | ljr | 随 B 批 |
+| 微信登录回填昵称/头像(2.5b-⑫;需 system identity 持久化+向导去向联动) | lzx | E6b 余面小片(S1 登记) |
+| B 批修正清单已修订(两撤四增一 V4,coverage §七.5/§九) | lzx | 校准战役 S2/S3 后随 V4 一并排 |
 | 走查注:admin 工作台 ERR·NETWORK(dev 栈缺数据源,非 esports 面) | lzx | pre 部署前查 |
 | hzy 台账评审标记销项(H1/H-B 行曾滞「待评审」,本表已并) | — | 已随本档剪枝闭 |
 
@@ -87,3 +89,4 @@
 - 10-23 E3-e:dual_zone/skill_trajectory scorer 定稿(净钟单向化+配置锚+终局对齐;哨兵双射闸;无效词表增 ABSURD_TIME_SPAN),metric.md §6.7/6.8 入档;自起栈三探针全绿(dz 90/st 521.6/反例 DETAIL_MISMATCH)。
 - 10-23 E3-f:number_stars 定稿(进度指针+三闸+诚实零),Tier A 7/10=CP1「过半」;live 探针 raw 330 黄金逐位吻合。
 - 10-23 D-AL:ljr 材料全量吸收+roadmap 校准批(DESIGN_DOC_MAP/DOC_INVENTORY 为导览;LOGIC_AUDIT/GAME_LOGIC_SPEC/溯源 PRD/admin IA/BLOCK5/题库表/openspec 指针入档;E3 七款×单位分吻合零返工,metric.md 零改动;B 批清单落 coverage §七.5;P11/备案串/迁移基线注登记)。
+- 10-23 校准战役 S1-S3:S1 ctr 语义 14 面全绿(B 批两撤四增一 V4 一 admin 文案);S2 admin 面合规(6-Tab=F2 逐一对上);S3 契约种子全对(game 九款逐字/13 款 D-Z 逐行)唯 moving_target 主能力两源冲突→P12 提裁;满岁月粒度口径锚 PAY3。台账=coverage §九。

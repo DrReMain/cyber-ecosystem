@@ -94,10 +94,31 @@
 2. **每页语义锚的消费纪律**:ctr 交互原型的 `_check.js` rules 面板(逐条引 PRD 节号)是防偷懒的现成抓手——承接片开工时把对应页的 rules 逐条搬进该片评审锚,逐条对上才算语义级完成(E0 测试读面片已示范此法);admin 原型无同款面板,以对应 PRD 节+BLOCK5_ADMIN_REFORM_PRD 为锚。
 3. **迁移口径同步律**:本矩阵行所属聚合落地时,当日回 migration.md 对应表补行(不积压到 cutover)。
 4. **权威地图滞后**(2026-10-20 核查):DESIGN_DOC_MAP 快照(09-18)之后 manage/docs 与 ctr 原型仍有演进——处理见 §六语料版本律,不视为 ljr 侧缺陷,以流程消化。
-5. **B 批修正清单(已建面×PRD 细则,2026-10-23 D-AL 吸收后,一片收)**:①login——双勾拦截 toast 指名缺哪项;备案四要素权威串核验(公司主体/ICP 备案号/客服邮箱——LOGIC_AUDIT 2.5b 与 MEMBERSHIP §九「备」字不一,待 ljr 定串);微信登录回填昵称头像+去向按资料完整性(2.5b-⑫)。②profile-nickname——禁 emoji 显式拦截(现服务端兜底)。③profile-setup——游戏清单后端取核验(PRD §04「前端不得硬编码」)+cap config 读面(已登记)。④profile-overview——模块集对核(PRD:训练趋势本期空态/报告中心内嵌 1 条+查看全部/账号安全=微信手机两行绑定)。⑤横屏律=仅 test-running(H-A 已合规,核 match/test 各页无横屏残留)。归属=lzx,E3-f 收口后。
+5. **B 批修正清单(已建面×PRD 细则;2026-10-23 S1 校准后修订版,一片收)**:①genre-pick 补「推荐」角标(原型 §16 命中偏好类型带角标,现缺)。②profile-nickname 禁 emoji 显式拦截(现仅 trim+服务端兜底)。③age.tsx 改消费 age-required/birth.ts(现自带本地 years/ageOf 副本=遗留清单「上收」反例)。④向导 games 步完成去向改直连 /match(原型/PRD=04→05;现去首页——若 home 中枢是有意设计需 ljr 一句确认)。⑤profile-overview 模块集对核(PRD:训练趋势本期空态/报告中心内嵌 1 条+查看全部/账号安全=微信手机两行绑定)。⑥V4 视觉值对齐批:match 子页(pick/switch/guide)+agreement+age-required 仍用 rounded-lg/sm 旧词汇(V1-V3 未覆盖)。⑦admin 详情返回文案带目标名(O-1 断言形状「返回 XXX 列表」)。**S1 撤案两枚**:login「toast 指名缺哪项」(已在:agreeOK 拼名 toast)、setup「列表后端取」(已在:listGames 零硬编码)。横屏律=仅 test-running ✓ 已核无残留。归属=lzx。
 
 ## 八、变更记录
 
 - 2026-10-20 建立:ctr 44 页交互基线全量盘点;抓到缺口①(version-update 无承接片)。
 - 2026-10-20 增补:admin 端 41 页×9 组矩阵(用户指示双端覆盖);语料版本律(权威表前置+滞后窗口+数值档单源化);验收口径落 D-O2 四要素。
 - 2026-10-23 D-AL 全量吸收:档头注+行注记 3 处(login/profile-age/setup 核验面)+§七.5 B 批清单;metric.md 核对零改动(七款单位分/槽位/档位套吻合)。
+- 2026-10-23 S1 校准战役(语义层,代码证据):已建 14 面逐条过 _check.js/PRD/LOGIC_AUDIT 判据——大面全绿(登录簇/向导三步/首页/match 簇/协议/补填/hzy 系统态件);B 批清单修订(§七.5:两撤四增一 V4);新登记后续片锚=微信回填昵称头像(需 system identity 支撑)、PAY3 月粒度满岁口径。台账见 §九。
+
+## 九、校准战役台账(2026-10-23 起;S1=ctr 语义,S2=admin 交互文案,S3=契约种子,随片续行)
+
+> 判据四分级:✅对上 / ⚠小修(并入 B 批)/ ❌偏差待裁 / 📋后续片锚。S1 方法=逐面读实现代码×_check.js 规则逐条勾(视觉值层归 V4 批自带探针,不在本战役重复)。
+
+| 面 | 判定 | 证据要点(代码位) |
+|---|---|---|
+| login+回调+守卫 | ✅ | 双勾三态+指名 toast(page.tsx agreeOK)/微信双环境置灰+提示/协议校验盖微信腿/?next= 回跳+开重定向卫生(after-login)/去向=资料完整性(guard.profileComplete 同口径)/备案四要素齐(messages login_footer_*) |
+| profile-nickname | ✅(⚠emoji) | 2-12 码点+计数条+trim 拦+仅真实值预填;emoji 显式拦截缺=B批② |
+| profile-age | ✅ | 6-60 年范围/双下拉+8 档派生提示/未满13 硬闸+guardianAccepted 独立落库/u18 提示;bands 码值=V18 词形;⚠age.tsx 未消费 birth.ts=B批③ |
+| profile-setup(games) | ✅ | listGames 后端取零硬编码/未归类不计投票/平票注/cap 提示+删除×+换行;⚠完成去向=首页非 /match=B批④ |
+| home | ✅ | 游客可浏览/点测评拦+next 回跳/hasGames 门控(profileFlowGuard 承真闸);续测卡/最近成绩=E4/E5 锚 |
+| match 主页 | ✅ | 竖屏/tie+empty 路由/编排序=D-Z/?genre= 覆盖+switched 标/done=0 恒(已登记 E4) |
+| match 子页×3 | ✅(⚠视觉) | switch=整页形态+会话生效;guide=五规则+成绩口径+首测面恒定;pick=tie/empty/normal 三面+整卡可点——缺推荐角标=B批①;rounded 旧词汇=V4 |
+| agreement / age-required | ✅(⚠视觉) | 版本行=versions.ts 占位(已登记)/演示标注诚实;补填页双出路+<18 页内拦+6-60;rounded 旧词汇=V4 |
+| hzy 系统态件(退出弹层/状态屏/HUD) | ✅ | 31 弹层形态+危险语义+cancel 焦点;空态 action 槽(裁决⑳);HUD fab/倒计时/低时红脉冲=旧仓法 |
+| **S2** admin esports-users | ✅(⚠文案×1) | O-1/2/3 全合规(独立详情页/操作列收敛/敏感 Confirm 含审计提示且按真实执法语义);6-Tab=溯源 PRD F2 逐一对应;确认语/列名/空态文案对齐;⚠返回文案「返回」→ 带 O-1 断言形状目标名(并入 B 批);术语差记录:列名「会员」vs 原型「用户」=member plane 有意差不改;缺列/高级筛选/导出/批量导入=数据未到(E5/E8/system/A9)已在 §五注记;报告/溯源行内深链随 E5/E8 |
+| **S3** 契约+种子+服务端 | ✅(❌一枚) | game 九款逐字保真(lol/dota2/honor/csgo/valorant/pubg/apex/overwatch/fortnite);13 款码名逐字+类别=D-Z 逐行吻合+池法全非空;contribution 次贡献 4 行=D-AA 递延在案;target_recognition=RS=D-AD 在案;**❌moving_target 主能力两源冲突**(交互权威 _state.js POOL=TS vs 数据权威 contribution 主行 AA+B2 次贡献注释)→ **P12 提请 ljr 裁**;满岁月粒度口径已锚 PAY3 |
+
+**新登记后续片锚(不在 B 批)**:微信登录回填昵称/头像(LOGIC_AUDIT 2.5b-⑫;需 system identity 持久化+向导去向联动→E6b 余面小片);满岁口径=月粒度近似「生日次日」(契约仅年+月,PAY3 执法时定保守口径);home 内容模块(续测/最近成绩/数据统计)随 E4/E5。

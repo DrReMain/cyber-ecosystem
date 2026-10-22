@@ -270,6 +270,21 @@
 **候选**:A(推荐)维持契约单轨+移除降级卡——契约已冻结、迁移面已有「画像不完整态」兜底(migration 逐表口径),双轨徒增派生歧义;B 契约增量可选 band 入参(服务端同轨派生),对齐原型双轨,代价=E0 增量+表单二态。
 **定案后动作**:A=V2 降级卡随 B 批移除;B=E0 增量片+03 页表单改造。
 
+## P12 moving_target 主能力归属【ljr;E4 匹配引擎开工前(2026-10-23 S3 校准登记)】
+
+**背景**:S3 校准发现旧仓两源对 moving_target 主能力归属**自相矛盾**,我方种子现按交互权威落 TS:
+| 源 | 口径 | 权威性质 |
+|---|---|---|
+| ① `_state.js` POOL | trackingStability 池 = ['moving_target','tracking_moving'];aimingAccuracy 池 = ['flash_aiming','multi_target'] | 交互权威(编排实际消费方;D-Z 池法依据;我方种子现状) |
+| ② `game_ability_contribution` 主行 | moving_target → aimingAccuracy 1.00 is_primary=1 | 数据权威(legacy 能力聚合真消费源,block3 §8·29③) |
+| ③ `test_type.ability` 列 | aimingAccuracy(与 ② 同库一致) | 冗余列(参照 D-AD:该列有陈旧先例) |
+| ④ GAME_LOGIC_SPEC B2 | moving_target → trackingStability 0.50 is_primary=0「FPS 内 TS 主能力的次增强」+明文「主=AA、次=TS」 | 2026-09-26 拍板定稿 |
+| ⑤ 玩法语义 | 10 分/秒完美追踪、连续表现类、M1=重锁定/追踪类槽位 | 语义判据(但 UNIT_SCORE_DESIGN 能力列写「瞄准/追踪」两可) |
+
+**影响面**:E2 种子 ability 列、编排池分布(FPS:AA 池 2↔3 款、TS 池 2↔1 款)、metric.md §四能力列、E3 递延的 contribution 次贡献行(B2 的 moving_target→TS 0.5 行在 TS 主下语义自矛盾应删)。
+**候选**:A(推荐)维持 TS(①编排消费方权威+⑤追踪语义;B2 的 moving_target→TS 0.5 次贡献行判陈旧删除——与 D-AD 处理 target_recognition 同构);B 按 ②④ 改 AA(种子+metric.md 改,TS 池单款化)。
+**定案后动作**:A=零代码(现状即终态),B=E2 种子/metric.md/编排池三处改。
+
 ---
 
 ## P10 ctr 语言切换常驻入口形态【随 P4;不阻塞任何切片】
