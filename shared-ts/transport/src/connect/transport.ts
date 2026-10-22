@@ -7,29 +7,14 @@ import { createIsomorphicFn } from "@tanstack/react-start";
 
 import { wsStreamCall } from "./ws-stream";
 
-// Client-specific bindings the mechanism cannot own: the locale getter
-// (paraglide runtime), the SSR origin resolver (client env), the proxy
-// path, and the error-domain normalizer. Injecting them keeps this package
-// free of client imports while both clients share one full-form transport.
 export interface TransportBindings {
   getLocale: () => string;
-  // Isomorphic by nature: the server resolves the origin asynchronously,
-  // the browser returns it synchronously; the transport awaits either.
   getSiteUrl: () => string | Promise<string>;
   proxyPath: string;
-  // The client world's credential slot, riding every request so the server
-  // reads the right namespaced session cookie. An untrusted selection among
-  // cookies the browser already sent; mirrors shared-go's
-  // SessionNamespaceHeader — rename the two together.
   getSessionNamespace: () => string;
-  // Returns the client error domain's envelope; thrown in place of the
-  // raw transport error so consumers always receive the normalized shape.
   normalize: (error: unknown) => unknown;
 }
 
-// The session credential's wire contract, mirroring shared-go's
-// krauth.SessionNamespaceHeader / SessionCookieNameFor — the one place this
-// language spells them; rename the two languages together.
 export const SESSION_NAMESPACE_HEADER = "x-session-namespace";
 
 export function sessionCookieNameFor(namespace: string): string {
@@ -49,8 +34,6 @@ export function createTransportFactory(bindings: TransportBindings): TransportFa
     };
   };
 
-  // Server-side authenticated calls forward the session cookie verbatim;
-  // browser calls rely on same-origin cookies riding automatically.
   const forwardedCookie = createIsomorphicFn()
     .server(async () => (await import("@tanstack/react-start/server")).getRequestHeader("cookie"))
     .client((): string | null => null);
@@ -87,8 +70,6 @@ export function createTransportFactory(bindings: TransportBindings): TransportFa
     };
   }
 
-  // Stream iteration errors normalize at the exit so consumers receive
-  // envelopes no matter where in the iteration the stream fails.
   function normalizedStream<I extends DescMessage, O extends DescMessage>(
     response: StreamResponse<I, O>,
   ): StreamResponse<I, O> {
@@ -104,20 +85,45 @@ export function createTransportFactory(bindings: TransportBindings): TransportFa
     };
   }
 
+  function headerCancellationFetch(fetchImpl: typeof globalThis.fetch): typeof globalThis.fetch {
+    return (input, init) => {
+      const outer = init?.signal;
+      if (outer == null) {
+        return fetchImpl(input, init);
+      }
+      const inner = new AbortController();
+      const forward = () => inner.abort(outer.reason);
+      if (outer.aborted) {
+        inner.abort(outer.reason);
+      } else {
+        outer.addEventListener("abort", forward);
+      }
+      return fetchImpl(input, { ...init, signal: inner.signal }).finally(() => {
+        outer.removeEventListener("abort", forward);
+      });
+    };
+  }
+
   function singleConnectTransport(baseUrl: string, interceptors: Interceptor[]): Transport {
-    const connect = createConnectTransport({
+    const interceptorChain = [
+      localeInterceptor,
+      cookieForwarder,
+      sessionNamespaceInterceptor,
+      ...interceptors,
+    ];
+    const unaryConnect = createConnectTransport({
       baseUrl,
-      interceptors: [
-        localeInterceptor,
-        cookieForwarder,
-        sessionNamespaceInterceptor,
-        ...interceptors,
-      ],
+      fetch: headerCancellationFetch(globalThis.fetch),
+      interceptors: interceptorChain,
+    });
+    const streamConnect = createConnectTransport({
+      baseUrl,
+      interceptors: interceptorChain,
     });
     return {
       unary: async (method, signal, timeoutMs, header, input, contextValues) => {
         try {
-          const response = await connect.unary(
+          const response = await unaryConnect.unary(
             method,
             signal,
             timeoutMs,
@@ -137,7 +143,7 @@ export function createTransportFactory(bindings: TransportBindings): TransportFa
         try {
           const response =
             method.methodKind === "server_streaming"
-              ? await connect.stream(method, signal, timeoutMs, header, input, contextValues)
+              ? await streamConnect.stream(method, signal, timeoutMs, header, input, contextValues)
               : await wsStreamCall(baseUrl, method, signal, input);
           return flattenStream(method.output, normalizedStream(response));
         } catch (error) {

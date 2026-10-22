@@ -28,9 +28,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [
         {
-          "projects": [
-            "deploy"
-          ],
+          "projects": ["deploy"],
           "target": "image:pg-extended"
         }
       ],
@@ -106,9 +104,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [
         {
-          "projects": [
-            "deploy"
-          ],
+          "projects": ["deploy"],
           "target": "image:pg-extended"
         }
       ],
@@ -128,9 +124,7 @@
       "executor": "nx:run-commands",
       "dependsOn": [
         {
-          "projects": [
-            "deploy"
-          ],
+          "projects": ["deploy"],
           "target": "image:pg-extended"
         }
       ],
@@ -163,17 +157,11 @@
       "executor": "nx:run-commands",
       "dependsOn": [
         {
-          "projects": [
-            "deploy"
-          ],
+          "projects": ["deploy"],
           "target": "image:pg-extended"
         },
         {
-          "projects": [
-            "system",
-            "agent",
-            "@cyber-ecosystem/admin"
-          ],
+          "projects": ["system", "agent", "@cyber-ecosystem/admin"],
           "target": "image"
         }
       ],
@@ -200,17 +188,11 @@
       "executor": "nx:run-commands",
       "dependsOn": [
         {
-          "projects": [
-            "deploy"
-          ],
+          "projects": ["deploy"],
           "target": "image:pg-extended"
         },
         {
-          "projects": [
-            "system",
-            "agent",
-            "@cyber-ecosystem/admin"
-          ],
+          "projects": ["system", "agent", "@cyber-ecosystem/admin"],
           "target": "image"
         }
       ],
@@ -227,17 +209,11 @@
       "executor": "nx:run-commands",
       "dependsOn": [
         {
-          "projects": [
-            "deploy"
-          ],
+          "projects": ["deploy"],
           "target": "image:pg-extended"
         },
         {
-          "projects": [
-            "system",
-            "agent",
-            "@cyber-ecosystem/admin"
-          ],
+          "projects": ["system", "agent", "@cyber-ecosystem/admin"],
           "target": "image"
         }
       ],

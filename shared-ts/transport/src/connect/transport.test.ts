@@ -361,12 +361,12 @@ describe("createTransportFactory", () => {
   });
 });
 
-describe("transport flattening law (toJson防腐层)", () => {
+describe("transport flattening law (toJson anti-corruption layer)", () => {
   it("renders StringValue wrappers as plain strings in unary responses", async () => {
     const transport = makeFactory().createTransport({ baseUrl: "http://api" });
     unaryImpl.mockResolvedValue({
       header: new Headers(),
-      message: create(UserSchema, { avatar: "钢枪少年" }),
+      message: create(UserSchema, { avatar: "Sharpshooter" }),
     });
     const res = await transport.unary(
       wktMethod,
@@ -377,7 +377,7 @@ describe("transport flattening law (toJson防腐层)", () => {
       undefined,
     );
     const flat = res.message as unknown as Record<string, unknown>;
-    expect(flat.avatar).toBe("钢枪少年");
+    expect(flat.avatar).toBe("Sharpshooter");
   });
 
   it("renders Timestamp fields as RFC3339 strings in unary responses", async () => {
@@ -431,8 +431,8 @@ describe("transport flattening law (toJson防腐层)", () => {
       header: new Headers(),
       trailer: new Headers(),
       message: (async function* () {
-        yield create(UserSchema, { avatar: "甲" });
-        yield create(UserSchema, { avatar: "乙" });
+        yield create(UserSchema, { avatar: "One" });
+        yield create(UserSchema, { avatar: "Two" });
       })(),
     });
     const res = await transport.stream(
@@ -449,7 +449,7 @@ describe("transport flattening law (toJson防腐层)", () => {
     for await (const message of res.message) {
       seen.push(message);
     }
-    expect(seen.map((m) => (m as Record<string, unknown>).avatar)).toEqual(["甲", "乙"]);
+    expect(seen.map((m) => (m as Record<string, unknown>).avatar)).toEqual(["One", "Two"]);
   });
 });
 
@@ -579,7 +579,72 @@ describe("stream response boundaries", () => {
   });
 });
 
-describe("cookie forwarding (承重墙)", () => {
+describe("unary fetch cancellation scoping (post-completion abort containment)", () => {
+  it("wires the shielded fetch into the unary leg only", () => {
+    branch.mode = "client";
+    vi.stubGlobal("fetch", vi.fn());
+    makeFactory().createTransport({ baseUrl: "http://api" });
+    const calls = vi.mocked(createConnectTransport).mock.calls;
+    const fetches = calls.map((call) => call[0]?.fetch);
+    vi.unstubAllGlobals();
+    // First created = the unary leg; second = the stream leg.
+    expect(fetches[0]).toBeTypeOf("function");
+    expect(fetches[1]).toBeUndefined();
+  });
+
+  it("stops forwarding the caller's abort once headers arrived", async () => {
+    const impl = vi.fn(async (_input: unknown, _init?: RequestInit) => ({ ok: true }) as Response);
+    vi.stubGlobal("fetch", impl);
+    makeFactory().createTransport({ baseUrl: "http://api" });
+    const shielded = vi.mocked(createConnectTransport).mock.calls[0]?.[0]
+      .fetch as typeof globalThis.fetch;
+    const outer = new AbortController();
+    await shielded("http://api/echo", { method: "POST", signal: outer.signal });
+    // Connect's done() cleanup fires exactly here — post-completion.
+    outer.abort();
+    vi.unstubAllGlobals();
+    const innerSignal = impl.mock.calls[0]?.[1]?.signal;
+    expect(innerSignal?.aborted).toBe(false);
+  });
+
+  it("forwards an in-flight abort (and its reason) to the actual fetch", async () => {
+    const impl = vi.fn(
+      (_input: unknown, init: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init.signal?.addEventListener("abort", () => {
+            reject(new DOMException("aborted", "AbortError"));
+          });
+        }),
+    );
+    vi.stubGlobal("fetch", impl);
+    makeFactory().createTransport({ baseUrl: "http://api" });
+    const shielded = vi.mocked(createConnectTransport).mock.calls[0]?.[0]
+      .fetch as typeof globalThis.fetch;
+    const outer = new AbortController();
+    const pending = shielded("http://api/echo", { method: "POST", signal: outer.signal });
+    const reason = new Error("cancel");
+    outer.abort(reason);
+    await expect(pending).rejects.toThrow("aborted");
+    vi.unstubAllGlobals();
+    const innerSignal = impl.mock.calls[0]?.[1]?.signal;
+    expect(innerSignal?.aborted).toBe(true);
+    expect(innerSignal?.reason).toBe(reason);
+  });
+
+  it("passes through untouched when no signal rides the call", async () => {
+    const impl = vi.fn(async (_input: unknown, _init?: RequestInit) => ({ ok: true }) as Response);
+    vi.stubGlobal("fetch", impl);
+    makeFactory().createTransport({ baseUrl: "http://api" });
+    const shielded = vi.mocked(createConnectTransport).mock.calls[0]?.[0]
+      .fetch as typeof globalThis.fetch;
+    await shielded("http://api/echo", { method: "POST" });
+    vi.unstubAllGlobals();
+    expect(impl).toHaveBeenCalledTimes(1);
+    expect(impl.mock.calls[0]?.[1]?.signal).toBeUndefined();
+  });
+});
+
+describe("cookie forwarding (load-bearing seam)", () => {
   it("forwards the request cookie verbatim on the server branch", async () => {
     branch.mode = "server";
     serverCookie.mockReturnValue("session_token=abc; other=1");
@@ -624,7 +689,9 @@ describe("server transport resolution", () => {
       .createTransport()
       .unary(unaryMethod, undefined, undefined, new Headers(), {}, undefined);
     const baseUrls = vi.mocked(createConnectTransport).mock.calls.map((call) => call[0]?.baseUrl);
-    expect(baseUrls.filter((url) => url === "http://origin/connect").length).toBe(1);
+    // Two underlying instances per cached transport: the unary leg rides
+    // the shielded fetch, the stream leg keeps the platform fetch.
+    expect(baseUrls.filter((url) => url === "http://origin/connect").length).toBe(2);
   });
 
   it("builds a fresh transport when the origin changes", async () => {
@@ -699,6 +766,8 @@ describe("server transport resolution", () => {
         undefined,
       );
     const baseUrls = vi.mocked(createConnectTransport).mock.calls.map((call) => call[0]?.baseUrl);
-    expect(baseUrls.filter((url) => url === "http://origin/connect").length).toBe(1);
+    // Two underlying instances per cached transport — same split as the
+    // unary caching test above.
+    expect(baseUrls.filter((url) => url === "http://origin/connect").length).toBe(2);
   });
 });

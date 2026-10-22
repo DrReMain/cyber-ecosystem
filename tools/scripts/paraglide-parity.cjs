@@ -22,7 +22,9 @@ const bad = (msg) => fail.push(msg);
 const settingsPath = path.join(clientRoot, "project.inlang", "settings.json");
 const messagesDir = path.join(clientRoot, "messages");
 if (!fs.existsSync(settingsPath) || !fs.existsSync(messagesDir)) {
-  console.log(`paraglide-parity: skipped (${path.basename(clientRoot)} — no project.inlang settings)`);
+  console.log(
+    `paraglide-parity: skipped (${path.basename(clientRoot)} — no project.inlang settings)`,
+  );
   process.exit(0);
 } else {
   const settings = JSON.parse(fs.readFileSync(settingsPath, "utf8"));

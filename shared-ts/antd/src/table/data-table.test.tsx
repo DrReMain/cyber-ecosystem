@@ -9,13 +9,13 @@ interface Row {
 }
 
 const rows: Row[] = [
-  { id: "1", name: "甲", code: "a" },
-  { id: "2", name: "乙", code: "b" },
+  { id: "1", name: "Alpha", code: "a" },
+  { id: "2", name: "Beta", code: "b" },
 ];
 
 const baseColumns = [
-  { title: "名称", dataIndex: "name", key: "name" },
-  { title: "编码", dataIndex: "code", key: "code" },
+  { title: "Name", dataIndex: "name", key: "name" },
+  { title: "Code", dataIndex: "code", key: "code" },
 ];
 
 // rc-table renders a hidden measuring row that duplicates header text;
@@ -35,9 +35,9 @@ describe("DataTable", () => {
     const { container } = render(
       <DataTable<Row> columns={baseColumns} dataSource={rows} rowKey="id" />,
     );
-    expect(screen.getByText("甲")).toBeTruthy();
-    expect(screen.getByText("乙")).toBeTruthy();
-    expect(theadTexts(container)).toContain("名称");
+    expect(screen.getByText("Alpha")).toBeTruthy();
+    expect(screen.getByText("Beta")).toBeTruthy();
+    expect(theadTexts(container)).toContain("Name");
   });
 
   it("renders no pagination by default", () => {
@@ -59,13 +59,13 @@ describe("DataTable", () => {
       <DataTable<Row>
         columns={baseColumns}
         dataSource={[]}
-        emptyAction={<button type="button">新建</button>}
-        emptyDescription="暂无数据"
+        emptyAction={<button type="button">Create</button>}
+        emptyDescription="No records"
         rowKey="id"
       />,
     );
-    expect(screen.getByText("暂无数据")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "新建" })).toBeTruthy();
+    expect(screen.getByText("No records")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Create" })).toBeTruthy();
   });
 
   it("hides the checkbox column until select mode is toggled on", () => {
@@ -75,13 +75,13 @@ describe("DataTable", () => {
         dataSource={rows}
         rowKey="id"
         rowSelection={{ selectedRowKeys: [], onChange: vi.fn() }}
-        selection={{ labels: { selected: (n) => `已选择 ${n} 项`, clear: "清空", mode: "选择" } }}
+        selection={{ labels: { selected: (n) => `${n} selected`, clear: "Clear", mode: "Select" } }}
       />,
     );
     expect(container.querySelectorAll(".ant-table-selection-column").length).toBe(0);
-    fireEvent.click(screen.getByRole("button", { name: "选择" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select" }));
     expect(container.querySelectorAll(".ant-table-selection-column").length).toBeGreaterThan(0);
-    expect(screen.getByText("已选择 0 项")).toBeTruthy();
+    expect(screen.getByText("0 selected")).toBeTruthy();
   });
 
   it("shows the alert bar in select mode and clears through onChange", () => {
@@ -92,12 +92,12 @@ describe("DataTable", () => {
         dataSource={rows}
         rowKey="id"
         rowSelection={{ selectedRowKeys: ["1"], onChange }}
-        selection={{ labels: { selected: (n) => `已选择 ${n} 项`, clear: "清空", mode: "选择" } }}
+        selection={{ labels: { selected: (n) => `${n} selected`, clear: "Clear", mode: "Select" } }}
       />,
     );
-    fireEvent.click(screen.getByRole("button", { name: "选择" }));
-    expect(screen.getByText("已选择 1 项")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "清空" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    expect(screen.getByText("1 selected")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Clear" }));
     expect(onChange).toHaveBeenCalledWith([], [], { type: "none" });
   });
 
@@ -109,16 +109,16 @@ describe("DataTable", () => {
         dataSource={rows}
         rowKey="id"
         rowSelection={{ selectedRowKeys: ["1"], onChange }}
-        selection={{ labels: { selected: (n) => `已选择 ${n} 项`, clear: "清空", mode: "选择" } }}
+        selection={{ labels: { selected: (n) => `${n} selected`, clear: "Clear", mode: "Select" } }}
       />,
     );
-    fireEvent.click(screen.getByRole("button", { name: "选择" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select" }));
     const closeBtn = container.querySelector("button.ant-alert-close-icon");
     expect(closeBtn).toBeTruthy();
     fireEvent.click(closeBtn as HTMLButtonElement);
     expect(onChange).toHaveBeenCalledWith([], [], { type: "none" });
     expect(container.querySelectorAll(".ant-table-selection-column").length).toBe(0);
-    expect(screen.queryByText(/已选择/)).toBeNull();
+    expect(screen.queryByText(/selected/)).toBeNull();
   });
 });
 
@@ -130,11 +130,11 @@ describe("DataTable column settings", () => {
   const config = {
     storageKey: "test.dt.columns",
     locked: ["name"],
-    labels: { title: "列设置", reset: "恢复" },
+    labels: { title: "Columns", reset: "Reset" },
   };
 
-  async function openPanel(anchor = "编码") {
-    fireEvent.click(screen.getByRole("button", { name: "列设置" }));
+  async function openPanel(anchor = "Code") {
+    fireEvent.click(screen.getByRole("button", { name: "Columns" }));
     await waitFor(() => {
       const label = screen
         .getAllByText(anchor)
@@ -164,10 +164,10 @@ describe("DataTable column settings", () => {
       />,
     );
     await openPanel();
-    expect(checkboxOf("名称")).toBeDisabled(); // locked
-    fireEvent.click(checkboxOf("编码"));
+    expect(checkboxOf("Name")).toBeDisabled(); // locked
+    fireEvent.click(checkboxOf("Code"));
     await waitFor(() =>
-      expect(theadTexts(first.container).some((t) => t.includes("编码"))).toBe(false),
+      expect(theadTexts(first.container).some((t) => t.includes("Code"))).toBe(false),
     );
     expect(window.localStorage.getItem(config.storageKey)).toBe(JSON.stringify(["code"]));
 
@@ -181,13 +181,13 @@ describe("DataTable column settings", () => {
       />,
     );
     await waitFor(() =>
-      expect(theadTexts(second.container).some((t) => t.includes("编码"))).toBe(false),
+      expect(theadTexts(second.container).some((t) => t.includes("Code"))).toBe(false),
     );
 
     await openPanel();
-    fireEvent.click(await screen.findByRole("button", { name: "恢复" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Reset" }));
     await waitFor(() =>
-      expect(theadTexts(second.container).some((t) => t.includes("编码"))).toBe(true),
+      expect(theadTexts(second.container).some((t) => t.includes("Code"))).toBe(true),
     );
     expect(window.localStorage.getItem(config.storageKey)).toBeNull();
   });
@@ -199,12 +199,12 @@ describe("DataTable column settings", () => {
       meta: { updated: string };
     }
     const nestedRows: NestedRow[] = [
-      { id: "1", name: "甲", meta: { updated: "x" } },
-      { id: "2", name: "乙", meta: { updated: "y" } },
+      { id: "1", name: "Alpha", meta: { updated: "x" } },
+      { id: "2", name: "Beta", meta: { updated: "y" } },
     ];
     const nestedColumns = [
-      { title: "名称", dataIndex: "name", key: "name" },
-      { title: "更新", dataIndex: ["meta", "updated"] },
+      { title: "Name", dataIndex: "name", key: "name" },
+      { title: "Updated", dataIndex: ["meta", "updated"] },
     ];
     const { container } = render(
       <DataTable<NestedRow>
@@ -214,14 +214,16 @@ describe("DataTable column settings", () => {
         rowKey="id"
       />,
     );
-    await openPanel("更新");
-    fireEvent.click(checkboxOf("更新"));
-    await waitFor(() => expect(theadTexts(container).some((t) => t.includes("更新"))).toBe(false));
+    await openPanel("Updated");
+    fireEvent.click(checkboxOf("Updated"));
+    await waitFor(() =>
+      expect(theadTexts(container).some((t) => t.includes("Updated"))).toBe(false),
+    );
     expect(window.localStorage.getItem(config.storageKey)).toBe(JSON.stringify(["meta.updated"]));
   });
 
   it("renders no settings trigger without the config", () => {
     render(<DataTable<Row> columns={baseColumns} dataSource={rows} rowKey="id" />);
-    expect(screen.queryByRole("button", { name: "列设置" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Columns" })).toBeNull();
   });
 });
