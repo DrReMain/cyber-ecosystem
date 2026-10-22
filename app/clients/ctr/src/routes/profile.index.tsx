@@ -18,9 +18,6 @@ export const Route = createFileRoute("/profile/")({
     await context.queryClient
       .query({
         ...createQueryOptions(getProfile, {}, { transport: connectTransport }),
-        // The profile is write-seam fresh (PROFILE_STALE_MS); a stale-time-0
-        // loader fetch would race the route swap and get cancelled with the
-        // departing page's observers.
         staleTime: PROFILE_STALE_MS,
       })
       .catch(() => undefined);
