@@ -45,7 +45,12 @@ export async function routeAfterLogin(
   }
   let complete = false;
   try {
-    const data = await queryClient.query(createQueryOptions(getProfile, {}, { transport }));
+    const data = await queryClient.query({
+      ...createQueryOptions(getProfile, {}, { transport }),
+      // A different member may sit down within PROFILE_STALE_MS — the
+      // login seam always reads the wire, never the previous seat's cache.
+      staleTime: 0,
+    });
     complete = data.profile !== undefined && profileComplete(data.profile);
   } catch {
     // A profile fetch failure never blocks the login itself — the overview

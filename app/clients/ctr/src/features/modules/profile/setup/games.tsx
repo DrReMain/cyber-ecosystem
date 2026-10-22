@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "react-aria-components";
 import { toast } from "sonner";
+import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { m } from "#/paraglide/messages";
 import { useProfileUpdate } from "../use-profile-update";
 import { StepFrame } from "./step-frame";
@@ -46,7 +47,7 @@ const hasCategoryHeader = (category: string): boolean => category === "fps" || c
 
 export function SetupGamesPage() {
   const navigate = useNavigate();
-  const profileQuery = useQuery(getProfile, {});
+  const profileQuery = useQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
   const gamesQuery = useQuery(listGames, {});
   const updateMutation = useProfileUpdate();
   const [picked, setPicked] = useState<string[]>([]);

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { useProfileUpdate } from "#/features/modules/profile/use-profile-update";
 import { m } from "#/paraglide/messages";
 import { ageOf, MONTHS, years } from "./birth";
@@ -19,7 +20,7 @@ const selectClass =
  */
 export function AgeRequiredPage() {
   const navigate = useNavigate();
-  const profileQuery = useQuery(getProfile, {});
+  const profileQuery = useQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
   const updateMutation = useProfileUpdate();
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");

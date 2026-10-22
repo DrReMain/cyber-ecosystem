@@ -7,6 +7,7 @@ import { Crosshair, Hexagon } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { m } from "#/paraglide/messages";
 import { arrange, defaultGenre, type Genre } from "./arranger";
 import { FlowHeader } from "./ui/flow-header";
@@ -24,7 +25,7 @@ export function MatchPage() {
   const search = useSearch({ from: "/match/" }) as { genre?: Genre };
   const testsQuery = useConnectQuery(listTests, {});
   const gamesQuery = useConnectQuery(listGames, {});
-  const profileQuery = useConnectQuery(getProfile, {});
+  const profileQuery = useConnectQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
 
   const tests = testsQuery.data?.tests ?? [];
   const games = gamesQuery.data?.games ?? [];
