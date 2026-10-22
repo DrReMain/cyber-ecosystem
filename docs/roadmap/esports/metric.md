@@ -133,13 +133,13 @@
 | 游戏 | 双难度因子(体验/正式) | 专有指标 | 重算要点(JAVA 指针) |
 |---|---|---|---|
 | number_stars | 展示 1200ms / 800ms | 无 | avgDecisionInterval 入参秒须 ×1000 |
-| dual_zone_dodge | 预警 800ms / 400ms | 无 | baseTime/difficultyWeight/最终分全由服务端 config 决定,忽略客户端值;墙钟一致性校验 |
+| dual_zone_dodge | 预警 800ms / 400ms | 无 | 已定稿升卡 → §6.7 |
 | target_recognition | 干扰物 3 / 6 个 | 干扰抑制率(选择性注意范式) | 已定稿升 A → §6.6 |
 | multi_target | 3 / 6 目标 | 目标切换耗时(注意转移范式) | 已定稿升 A → §6.5 |
 | offense_defense | 决策窗口 2000ms / 1200ms | 压力决策正确率(执行控制范式) | 查题库 scenarioId 服务端判 isCorrect |
 | resource_match | 4 对 / 8 对 | 配对效率(正确数/分钟) | 公式对齐旧前端 ResourceMatchTestPage.tsx:174-202 |
 | character_counter | 字符数 15 / 30 | 计数偏差(回答−真实) | 查 moba_character + character_counter_relation 题库判分;已知「96.3% 满分」评分收紧 P0 治理对象 |
-| skill_trajectory | 轨迹速度慢 / 快 | 时机精度(提前/滞后量,能力核心) | precision/deviation/speed 可从 rounds 重算,本质等同 Tier A(公式对齐旧前端 :332-374) |
+| skill_trajectory | 轨迹速度慢 / 快 | 时机精度(提前/滞后量,能力核心) | 已定稿升卡 → §6.8 |
 | tracking_moving | 速度 200 / 400 px/s(同 moving_target) | 同 moving_target | Tier B:缺 hit 标志 |
 | economic_sim | 待确认(回合数/资源复杂度) | 最终资产、资源转化率 | Tier B:强一致性闸门(装备阶梯/金币守恒/HP) |
 
@@ -157,6 +157,21 @@
 公式(对齐旧仓 targetRecognitionScoring.ts PRD §2.13 与 Java 闸门):accuracy=correct/spawned_enemy×5;speed=max(0,(600−avgRt)/60);visual=min(1,max(0,1−(avgRt−200)/800))×2;composite=clamp(accuracy+speed+visual−0.4×falsePositives−0.2×max(0,spawned−correct),0,10);correct=0 或 spawned=0→诚实零。
 闸门:逐点击 rt∈[80,60000](present 才判);correct>spawned_enemy=DetailMismatch(计数偏差,旧仓客户端钳 [0,100] 的服务端化);靶型词表外值=DetailMismatch。
 轨一:raw=correct×unit_score×难度(§四:20/正确识别);权威轨:曲线未定稿留空,composite 入 extras。
+
+### 6.7 dual_zone 定稿卡(E3-e;Tier A,合成式誊录)
+
+事实流:behaviors(elapsed_ms + zone∈{left,right} + event∈{collision,dodge} + obstacle_id 可选;旧仓大写 LEFT/RIGHT→契约小写)。**别名注**:种子 code=`dual_zone`(E2 统一;旧仓 `dual_zone_dodge` 即 skillPrediction 页面族,同一款)。
+派生:碰撞即终局(legacy triggerCollision 同构)——碰撞后不得有事件且必居末位;dodged=dodge 事件计数;存活=**净墙钟**(span−Σbackgrounds 段,暂停顺延的服务端对偶),不再信客户端聚合值(旧 survivalTime/collisionCount/obstaclesDodged 直报废止,从流+顶层时间戳重建)。
+重算(Java DualZoneScorer 逐行):serverScore=min((净秒/base_score_time)×100×difficulty_weight, 100);引擎参数键 base_score_time(默认 30)/difficulty_weight(默认 1.15;旧三键 simple/normal/hard 单键化——wire 无难度字段,模式轴归 E4 difficultyFactor);composite=serverScore/10。
+闸门:净<500ms 或净超 config 时长+1500ms=ABSURD_TIME_SPAN(新词,词表第三员);乱序戳/词表外/碰撞后事件/碰撞与净钟不对齐(±1500)/流超净钟/obstacle_id 重复=DETAIL_MISMATCH。⚠️ 改编披露:旧 Java 双向 |span−survival|≤1500 在含暂停时误杀——新净钟化+**单向化**(流可早于钟=末尾空转合法,永不可超钟)+配置锚(净超 config 时长拒,§6.5 duration fabrication closure 同族)+终局对齐(碰撞局虚报满时长白拿分的面就此关闭)。
+轨一:raw=dodged×unit_score(§四:15/成功闪避)×难度;权威轨:曲线未定稿留空,composite 入 extras。
+
+### 6.8 skill_trajectory 定稿卡(E3-e;Tier A,合成式誊录)
+
+事实流:rounds(round_number/shape 词表六形{circle|square|triangle|pentagon|hexagon|star}/deviation/placement_time_ms/player_placement 可空)。
+重算(旧前端 SkillTrajectoryTestPage.tsx:332-374 与 Java 逐行):**哨兵 999=未匹配轮**——进 precision 分母(counted)、计 0 贴合度,不进偏差/速度均值(一轮没匹配不拖死两项,「少打轮不稀释精度分」同律);precision=(perfect+good×0.5)/counted×6(perfect<5/good<15);deviationScore=max(0,(50−avgDev)/10)(仅匹配轮均值);speedScore=max(0,(12000−avgPlace)/1500);composite=clamp(Σ,0,10)。空轮=诚实零(挂机不得分)。
+闸门:shape 词表外/round_number 非严格递增(裁剪流)/deviation<0/placement 与哨兵不对射(placed⇔dev<999 双射;旧匹配上限 40px 使然)=DETAIL_MISMATCH。
+轨一(**唯一非计数式**,§四:8 分/贴合度百分点):贴合度=clamp(1−dev/50, 0, 1) 按全体轮均值(未匹配计 0),raw=贴合百分点×unit_score×难度——零点 50 与偏差分同源,复算 §四表典型区间(贴合 30-80%→240-640)自洽。⚠️ 改编披露:旧 originalPosition 恒记 {0,0}、trajectory 实记玩家放置点(旧客户端未记真原位),故 deviation 作为客户端实测**事实**上报消费(与反应时同族),服务端不做几何重算;E7 引擎落 random_seed 服务端复板后可升全量几何重验。权威轨:曲线未定稿留空,composite 入 extras。
 
 ## 七、8 维认知权重矩阵(三源合一 🧊:JAVA 常量 = API 公式表 = ST DIM8 逐值核对一致)
 
@@ -224,3 +239,5 @@
 - 2026-10-20 建立(E3 增量 a):总纲/档位/难度系数/单位分/M 槽位/13 款卡(Tier 名册按代码现实)/8 维权重三源合一/red_dot 锚点/校准计划;裁决两处遗留冲突(moving_target 阈值口径→E7 定;置信样本阈值→E5 定)。各款重算公式誊录与校准曲线定稿随 E3-b/c 逐款增量入档。
 
 - 2026-10-22 E3-d:multi_target/target_recognition 定稿卡入档(§6.5/§6.6,合成式誊录;决策时间差分改编与 duration 服务端化均披露);TR 升 Tier A(E0 增量4 spawned_enemy 契约落位,缺口闭合);§6.4 批量表缩为八款。
+
+- 2026-10-23 E3-e:dual_zone/skill_trajectory 定稿卡入档(§6.7/§6.8,合成式誊录);净钟单向化+配置锚+终局对齐与哨兵双射闸均披露;无效词表增 ABSURD_TIME_SPAN;§6.4 批量表缩为六款。

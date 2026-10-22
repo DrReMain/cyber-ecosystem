@@ -6,11 +6,11 @@
 
 | 人 | 已交付(均已并 esports/main) | 当前 → 下一片 |
 |---|---|---|
-| lzx | E0 契约(种子+增量2/3/4)、E1 骨架、E2 schema+种子、E3 评分(框架+Tier A 四款+提交缝)、E6a/E6b、会员读面+admin 用户管理(88bcd9ba/3f272b28)、system 组合缝 ListUsersByPopulation(a8b9f0a4) | 候选待排:Tier A 余款六款 / E4 匹配 / E5 报告 / 联调栈一键化(deploy 面) |
+| lzx | E0 契约(种子+增量2/3/4)、E1 骨架、E2 schema+种子、E3 评分(框架+Tier A 六款+提交缝)、E6a/E6b、会员读面+admin 用户管理(88bcd9ba/3f272b28)、system 组合缝 ListUsersByPopulation(a8b9f0a4) | 候选待排:Tier A 余款四款 / E4 匹配 / E5 报告 / 联调栈一键化(deploy 面) |
 | hzy | H1 系统态件、H2 协议页、H-A 引擎框架、H-B 反应瞄准批(四款引擎,mock 净拔除)、10-22 精修批(控制台三红根治/profile 写缝/D-AG 落地/C3) | **H-C 判定回路闭环(已分配 10-23,D-AJ 首例)** → E7 追踪技能批;挂起:D-AG/C3 实机走查随下次登录 |
 | ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:P8(E5 前,W4 末;含协议正文联动)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
 
-**M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ⏳(Tier A 4/10);E7 引擎 4/13(判定回路待 H-C);E4/E5/E8/E9/E10 未认领;M2 用户列表+档案首面已前拉落地;支付 PAY1-3 全未启动。**CP1(11-08)前瞻:达标面基本在手,风险面=支付沙箱零启动。**
+**M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ⏳(Tier A 6/10);E7 引擎 4/13(判定回路待 H-C);E4/E5/E8/E9/E10 未认领;M2 用户列表+档案首面已前拉落地;支付 PAY1-3 全未启动。**CP1(11-08)前瞻:达标面基本在手,风险面=支付沙箱零启动。**
 
 ## 切片认领表(窗口与定义见 plan.md)
 
@@ -19,7 +19,7 @@
 | E0 契约首刀 | lzx | ✅ 10-21 | 种子(画像+目录)+增量2(测试读面)+增量3(统一提交,4 决策经裁)+增量4(三计数反哺,193a9b7c);余面已裁去向:报告读面随 E5/E9、entitlement 随 E8(D-AA) |
 | E1 服务骨架 | lzx | ✅ 10-18 | kratos-new-service 八步;双面 accessLadder+catalog+部署面;会员链探针 e2e 绿 |
 | E2 schema+种子 | lzx | ✅ 10-20 | D-V 撤回后按冻结契约 clean-room 重建;五表+三读+13 款种子骨架(校准值不杜撰,随 E3 单源);multi_target 补行=D-Z |
-| E3 评分引擎 | lzx | ⏳ | 增量a metric.md 单源档、增量b Registry+纯函数+20 黄金 ✅;增量c 提交缝(4c5f0617)、增量d MT/TR 定稿(5b0160fb)✅,双轴评审两实错已吸收;**余:Tier A 六款(number_stars/dual_zone_dodge/skill_trajectory/offense_defense/resource_match/character_counter)+Tier B 三款闸门(moving_target/tracking_moving/economic_sim)**;「报告分 e2e」验收面挂 E5,H-C 前移回执层;guard 正则修正随下次镜像批回流 dev 兄弟服务 |
+| E3 评分引擎 | lzx | ⏳ | 增量a metric.md 单源档、增量b Registry+纯函数+20 黄金 ✅;增量c 提交缝(4c5f0617)、增量d MT/TR 定稿(5b0160fb)✅,双轴评审两实错已吸收;增量e DZ/ST 定稿 ✅(净钟+哨兵双射闸,metric §6.7/6.8);**余:Tier A 四款(number_stars/offense_defense/resource_match/character_counter)+Tier B 三款闸门(moving_target/tracking_moving/economic_sim)**;「报告分 e2e」验收面挂 E5,H-C 前移回执层;guard 正则修正随下次镜像批回流 dev 兄弟服务 |
 | E4 匹配引擎 | — | 未认领 | 重测 3/1 真律与难度模式轴归属地 |
 | E5 报告框架+能力报告 | — | 未认领 | 服务/客户端两半可并行 |
 | E6a ctr 纯壳 | lzx | ✅ 10-18 | D-R/S/T 全落;SEO 全量面同日收口 |
@@ -78,3 +78,4 @@
 - 10-21 E0 增量3/4;E3 增量b;H-A/H-B 交付+走查;P1(D-AB/AC)/P9(D-AD)定案;D-AE/D-AF;小程序栈初步讨论(plan.md M5)。
 - 10-22 E3 增量c/d(提交缝+MT/TR 定稿,双轴评审吸收两实错);hzy 精修批 MR!4 回流(三红根治/profile 写缝/D-AG 落地/C3);D-AG/AH/AI 裁;让步节制+环境分裂律立(README §5);注释精简批;dev-hzy 全量并入 main。
 - 10-23 D-AJ 任务分配判据+H-C 分配+hzy 线盘点(27f87fb8);本档整体剪枝重梳:状态对齐 git 事实(全部「待评审」滞标改已并 main)、补登会员读面/admin 用户管理行、修切片表结构断裂、开放遗留清单建网。
+- 10-23 E3-e:dual_zone/skill_trajectory scorer 定稿(净钟单向化+配置锚+终局对齐;哨兵双射闸;无效词表增 ABSURD_TIME_SPAN),metric.md §6.7/6.8 入档;自起栈三探针全绿(dz 90/st 521.6/反例 DETAIL_MISMATCH)。

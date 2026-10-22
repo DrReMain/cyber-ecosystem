@@ -10,6 +10,7 @@ import (
 
 const (
 	reasonAbsurdReactionTime   = "ABSURD_REACTION_TIME"
+	reasonAbsurdTimeSpan       = "ABSURD_TIME_SPAN"
 	reasonDetailMismatch       = "DETAIL_MISMATCH"
 	reasonBackgroundOverBudget = "BACKGROUND_OVER_BUDGET"
 
