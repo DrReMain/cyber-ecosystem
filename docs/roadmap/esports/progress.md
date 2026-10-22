@@ -25,7 +25,7 @@
 |---|---|---|
 | ~~ljr~~ → lzx ✅已落地(2026-10-21) | 首页未登录文案**已定(2026-10-21 ljr)**:问候行=「你好」(EN Hello)、标题=「电竞挑战者」(EN Challenger)——头部回归身份语义,登录行动留在 CTA 卡(按钮+提示行),消除三重「未登录」冗余;键位 home_greet_guest/home_guest_name 改值即可。前向注记:M2 会员片落地时 greet 会员态=「专属会员 · 有效期内」(原型语义),届时加 home_greet_member 键 | review D6 |
 | ~~ljr~~ → lzx ✅已落地(2026-10-21) | CSP frame-ancestors **已定(2026-10-21 ljr):参数化留缝**——ctr 的 `frame-ancestors` 改服务端环境变量可配,**默认 'none'**(安全默认;微信/WebView 顶层浏览本就不受限);P4 裁 ToB 入口形态时若含 iframe 内嵌,由部署侧下发租户域白名单值,零代码改动。admin 后台无 iframe 场景,维持硬编码 'none' 不参数化 | review B3 |
-| hzy | StateScreen loading 的 LOADING 扫光条与 PendingFallback markup 双份复制,lzx 已跨界最小修 sr-only 播报(features/app/states/state-screen.tsx);视觉收敛(抽共享扫光条)归 features/app 领地自决 | review C3 |
+| hzy | ~~StateScreen loading 的 LOADING 扫光条与 PendingFallback markup 双份复制~~ **✅已落地(2026-10-22,3b7c3f5)**:抽共享 features/app/states/loading-strip.tsx(tone=inherit/ink 双色系,两消费方去重,PendingFallback 升 min-h-app、StateScreen 加 grow);lzx 侧跨界最小修 sr-only 播报此前已在 | review C3 |
 | 后续片 | 微信回调 next 丢失:redirect_uri 不能带 query(微信 authorize 校验拒),微信登录后回跳意图丢失,固定走向导/首页;如需保 next 须 state 中转,微信链路设计时定 | review A6 |
 
 接受不改注记:B4 `user-scalable=no`(游戏 H5 防双击缩放,WCAG 张力由产品定位接受);D8 stores 空壳(D-T 能力配置面,机制待命)。
@@ -84,3 +84,5 @@
 - 2026-10-22 docs/environment.md chrome-devtools-mcp 条目补连接实况(8c7a6cb 首役踩坑):Chrome ≥136 默认配置目录禁命令行调试参数且 open --args 无法补挂运行实例,--auto-connect 须浏览器内 chrome://inspect/#remote-debugging 手动开启(144+);接管的是用户真实浏览器——登录态保留,但插件注入是常态(沉浸式翻译改 <html>、ImageAssistant 包 fetch 打红,应用侧已在 8c7a6cb 吸收,他机走查预期同类噪音)。
 - 2026-10-22 D-AI:P3 定案(D1 完成页回退=出口首页+拦截回测试页;D2 出口=分享唯一主 CTA 付费不前置;D5 分享减免解锁预设=分享动作即解锁,恢复时配频控/风控);D6/D7 由 D-AB/D-AC 收敛;材料见 prd.md P3;转 E7 test-done 片与 M2 增长组。
 - 2026-10-22 hzy D-AG 落地(target_recognition 视觉两裁,hzy 分支吸收 main 060d931 后即落):①判定带指示环=每靶白 20% 淡环(border-white/20,直径读引擎参数 click_detection_range_px×2=50px,纯视觉层,logic.ts 零 diff 实证);②靶内形态=lucide 图标(Skull/Shield/User,lucide 1.49 官方几何逐节点搬运)替代分值文本,分值撤出靶面;③底部图例条=黑 60%+毛玻璃,色点+名+分值三项(分值读 TYPE_SPECS 单源,词条 test_rec_legend_* 双语);新 games/lucide-icon.ts 泛化 SVG 渲染助手(纯 DOM 模块用不了 lucide-react,E7 后续款同享)。裁量三处按 D-O2 披露:图标尺寸=直径×0.55、图例条胶囊圆角、环语义照旧仓(显示 slop 区,与旧仓环同义)。验证=paraglide/build/typecheck/check/test 五门 exit 0 skip-nx-cache+裁决逐条对照复核(分值靶面残留负 grep 零)+用户代码级判定「过」;实机视觉走查随下次登录补(当日会话中途失效,微信重扫待用户)。
+- 2026-10-22 hzy C3 收敛提交(3b7c3f5,review 转交件闭环):双份 LOADING 扫光 markup 抽共享 loading-strip.tsx(tone=inherit 随环境色走 route 挂起面 / ink 钉页面 token 走状态屏;两消费方保各自 sr-only 播报于 role=status 下,条体 aria-hidden 纯装饰),顺带两处纵向对齐(PendingFallback min-h-24→min-h-app、StateScreen 补 grow)使两档加载态同系统居中。验证=ctr 四链 exit 0 skip-nx-cache(vitest 41/41 基线不动);扫光动效与横竖屏走查随下次登录与 D-AG 同场补。转交表 C3 行已打 ✅。
+
