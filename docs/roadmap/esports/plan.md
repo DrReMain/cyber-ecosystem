@@ -44,7 +44,7 @@
 
 ## hzy 外围启动线(2026-10-19 增补;W1-W2 桥接,定义归此、状态记 progress)
 
-登录重构与 E0 余面为承重面留 lzx;hzy 切片圈定 ctr 非登录区,文件面与 lzx 线不相交(合流点仅 routeTree.gen 与未来一次提交适配器)。边界四律:①config 消费用 gen 真类型(已冻结 GetTest/GetTestConfig),mock 只落 transport 缝;②游戏运行时禁 import auth/services(插件契约准入);③不烤权威指标——客户端采集 rawDetail,评分归服务端(旧架构同构);④提交缝后置,E0 冻结后薄适配器接上,游戏零改动。
+登录重构与 E0 余面为承重面留 lzx;hzy 切片圈定 ctr 非登录区,文件面与 lzx 线不相交(合流点仅 routeTree.gen 与未来一次提交适配器)。边界四律:①config 消费用 gen 真类型(已冻结 GetTest/GetTestConfig),mock 只落 transport 缝;②游戏运行时禁 import auth/services(插件契约准入);③不烤权威指标——客户端采集 rawDetail,评分归服务端(旧架构同构);④提交缝后置,E0 冻结后薄适配器接上,游戏零改动。任务分配判据(D-AJ,2026-10-23):不涉及骨架/底座(shared-ts/shared-go、proto 契约面、system、deploy)的任务可分配 hzy——不再限于本节圈定的 ctr 非登录区。
 
 | 片 | 内容与验收要点 | 依赖 | 规模 |
 |---|---|---|---|
@@ -52,6 +52,7 @@
 | H2 协议页+版本化承载 | agreement/age-required 页面+路由+版本参数;文案占位等 ljr 定稿;URL 形状开工前与 lzx 定约。验收:三链绿+走查 | H1 | S |
 | H-A 引擎框架片 | E7 框架前拉:GameClock 单实现(墙钟+暂停顺延,fake timers 可测;旧版 13 处手搓计时收敛为 1)+参数化路由 /test/:code+GameModule 插件契约+overlay 族。验收:mock config 下 red_dot 可玩+时钟正确性测试 | H1 | M |
 | H-B 反应瞄准批 | E7 首批前拉:red_dot/flash_aiming/multi_target/target_recognition;harness 免登录;rawDetail 采集反哺 E0 统一提交契约;玩法语义级对照旧版(D-O)。验收:每款 harness 可玩+明细字段与旧版 per-game SubmitData 语义对齐+mock 插桩净拔除(test-mock.ts 与其测试删除、transport.ts/env.ts 插桩还原、VITE_TEST_MOCK 零残留;拔除前插桩点全带 TODO(mock-removal) 标记——2026-10-20 用户裁定:临时插桩不常驻且必须 TODO 可寻) | H-A | M-L |
+| H-C 判定回路闭环 | 边界四律④预定形态兑现:提交缝薄适配器(TestRunHost 终局采集——明细流+契约三计数 misses/missed_high/spawned_enemy+后台段;attempt_no E4 前恒 1,序数真律归 E4 会话)→SubmitTestAttempt 单发,游戏零改动;EndFace 增服务端判分回执卡(原始分/权威分/档位/valid/无效原因/retest_left,无效原因词表双语文案,权威分曲线待校准款按回执降级渲染,本地明细卡降为辅助;重试钮维持本地练习语义,真律归 E4)。验收=真人全链:登录→/match→一局 red_dot→服务端分数回执渲染+会话失效反例——esports 首条人工可 e2e 调试的完整测评闭环(mock 已于 H-B 拔净、读面已真,本片仅余判定回路) | H-B,E3-c | M |
 
 ## 支付片(D-B2:纳入承诺窗口,保持可插拔)
 
