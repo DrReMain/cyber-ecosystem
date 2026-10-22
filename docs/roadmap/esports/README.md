@@ -136,6 +136,7 @@
 - **包管理器纪律(2026-10-21 升根法条)**:工作区 pnpm 唯一,法条=`AGENTS.md` §4;`package-lock.json` 不应存在——出现即有人跑了 npm(删文件+修命令),禁以 ignore 规则掩盖(根 .gitignore 排除行已按此裁决移除)。
 - **进度档剪枝律(2026-10-23 重申)**:progress.md 收口注一行制(状态+日期+hash+关键判定),节奏行一行一事,开放项入遗留清单表;验证证据一律归提交信息 proven-by 尾,档内不存叙述——roadmap 是 agent 的作业上下文,读档成本即团队成本。
 - **让步节制律+环境分裂律(2026-10-22)**:为环境让步只让无正确性价值的面向,承重检查不因环境噪音关闭;dev 必须充分暴露问题,迁就只发生在 prod;任何「为兼容环境而削弱检查」的修法须显式声明让掉的正确性价值与生效环境,未声明不予通过。
+- **目标单源律(2026-10-23 升根法条)**:npm scripts 全弃用——一切 target 只声明于 `project.json`,包内二进制调用一律 `pnpm exec <bin>`(法条=`AGENTS.md` §3 重写版);新工作流无 target 时加到 `project.json`,禁往 `package.json` scripts 回添;客户端 Dockerfile 构建行 `pnpm --filter <pkg> exec <bin>` 为法条形,勿改回 script 调用。
 
 ---
 
@@ -143,3 +144,4 @@
 
 - 2026-10-18 立项:五路旧仓分析+三路审计;M1-M5 与切片池定稿;E6a 壳同日开工收口(SEO 全量面经用户指令纳入)。
 - 2026-10-23 台账整理:D-AF/D-AG 行断裂修复;本节收敛为非裁决事件行——裁决类变更一律见 §2 台账(自带日期与影响面),切片交付事实记 progress.md,证据归提交信息。
+- 2026-10-23 骨架批(biome 2.6.2+target 单源迁移):biome 2.5.15→2.6.2、11 包 npm scripts 全量迁入 project.json、gen 手工壳扩项、双客户端 Dockerfile 改 exec 形、AGENTS §3 重写(见 §5 目标单源律)。**协作者拉取后必做:`pnpm install` + `./nx reset`**——不装新 biome 则 check 对 96 文件类序重排(2.6 官方 Tailwind v4 排序所致,预期 churn 勿修复)必假红;biome 规则晋升已迁移抑制注释组路径(noComponentHookFactories 等 nursery→stable),新增 biome-ignore 须用规则当前组路径。
