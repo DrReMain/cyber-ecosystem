@@ -176,6 +176,11 @@ func (rp *fakeSubmitRP) GetConfigByCode(_ context.Context, code string) (*TestCo
 	return rp.configs[code], nil
 }
 
+func (rp *fakeSubmitRP) ListAnswers(_ context.Context, _ string) (map[string]map[string]any, error) {
+	// The fixture's fact-stream games carry no question bank.
+	return nil, nil
+}
+
 func (rp *fakeSubmitRP) CreateAttempt(_ context.Context, rec *AttemptRecord) (*AttemptRecord, error) {
 	rec.ID = "rec-1"
 	rp.created = append(rp.created, rec)

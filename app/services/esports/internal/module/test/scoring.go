@@ -46,6 +46,11 @@ type scoringParams struct {
 	// durationSec feeds duration-normalized tracks from the config mirror,
 	// never the client's submitted span (§6.5 fabrication closure).
 	durationSec int
+	// answerKey carries the question bank's server-side answer rows for the
+	// test being scored (scenario_code → the bank's answer JSON); empty for
+	// fact-stream games with no bank. Correctness of submitted choices is
+	// judged against this key, never asserted by the client.
+	answerKey map[string]map[string]any
 }
 
 func (p scoringParams) num(key string, fallback float64) float64 {
@@ -160,4 +165,12 @@ func mean(xs []float64) float64 {
 		sum += x
 	}
 	return sum / float64(len(xs))
+}
+
+func answerString(m map[string]any, key string) string {
+	if m == nil {
+		return ""
+	}
+	v, _ := m[key].(string)
+	return v
 }

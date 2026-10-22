@@ -7,6 +7,7 @@ import (
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
+	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
@@ -84,6 +85,22 @@ func (rp *testRP) GetConfigByCode(ctx context.Context, code string) (*TestConfig
 		return nil, mapTestLoadError(rp, err)
 	}
 	return mapTestConfig(row), nil
+}
+
+func (rp *testRP) ListAnswers(ctx context.Context, testCode string) (map[string]map[string]any, error) {
+	// The soft-delete interceptor keeps tombstoned scenarios out; the bank's
+	// unique (test_code, scenario_code) makes the projection a clean map.
+	rows, err := rp.Platform.GetClient(ctx).QuestionBank.Query().
+		Where(questionbank.TestCodeEQ(testCode)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	key := make(map[string]map[string]any, len(rows))
+	for _, row := range rows {
+		key[row.ScenarioCode] = row.Answer
+	}
+	return key, nil
 }
 
 func (rp *testRP) CreateAttempt(ctx context.Context, rec *AttemptRecord) (*AttemptRecord, error) {

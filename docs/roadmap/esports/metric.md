@@ -128,7 +128,7 @@
 评级映射 🔗(主锚点 M3 追踪占比+辅助 M4 偏差):顶尖 ≥90% ≤15px / 职业 ≥80% ≤25px / 准职业 ≥70% ≤35px / 高水平 ≥55% ≤45px / 普通 ≥40% / 入门 <40%。追踪类无公开基准,推断成分更高,上线后内部百分位替换优先。
 专有指标:轨迹适应性(6 图案各自 0-100)/最大偏差(需逐帧)/丢失次数。多目标「100 追 10」不属本游戏(归 future)。
 
-### 6.4 批量卡八款(MSB,机制推断待代码确认;公式誊录随 E3 逐款定稿;multi_target/target_recognition 已升 A 定稿出表 → §6.5/§6.6)
+### 6.4 批量卡(MSB,机制推断待代码确认;公式誊录随 E3 逐款定稿;七款已升卡出表 → §6.5-§6.10,余 resource_match/character_counter 两款)
 
 | 游戏 | 双难度因子(体验/正式) | 专有指标 | 重算要点(JAVA 指针) |
 |---|---|---|---|
@@ -136,7 +136,7 @@
 | dual_zone_dodge | 预警 800ms / 400ms | 无 | 已定稿升卡 → §6.7 |
 | target_recognition | 干扰物 3 / 6 个 | 干扰抑制率(选择性注意范式) | 已定稿升 A → §6.6 |
 | multi_target | 3 / 6 目标 | 目标切换耗时(注意转移范式) | 已定稿升 A → §6.5 |
-| offense_defense | 决策窗口 2000ms / 1200ms | 压力决策正确率(执行控制范式) | 查题库 scenarioId 服务端判 isCorrect |
+| offense_defense | 决策窗口 2000ms / 1200ms | 压力决策正确率(执行控制范式) | 已定稿升卡 → §6.10 |
 | resource_match | 4 对 / 8 对 | 配对效率(正确数/分钟) | 公式对齐旧前端 ResourceMatchTestPage.tsx:174-202 |
 | character_counter | 字符数 15 / 30 | 计数偏差(回答−真实) | 查 moba_character + character_counter_relation 题库判分;已知「96.3% 满分」评分收紧 P0 治理对象 |
 | skill_trajectory | 轨迹速度慢 / 快 | 时机精度(提前/滞后量,能力核心) | 已定稿升卡 → §6.8 |
@@ -179,6 +179,12 @@
 重算(Java NumberStarsScorer + 旧前端 NumberStarsTestPage.tsx:225-310 同构):逐回合 expected=升序序列,**进度指针**判定——点击正确 ⟺ number==expected[progress](=「点当前未点数字中的最小值」本义),正确才推进;correct=Σ正确点击;incorrect=Σ(len(clicks)−progress);roundsCompleted=完整回合数(progress==len(numbers));avgDecisionInterval=各回合**正确序列内相邻差**均值(跨回合不连首尾;无相邻对→intervalCount=0 且 speed=0,「按 0ms 代入误给满速度分」的旧前端防呆同律)。公式:base=min(5, rounds/8×5)(Java 上限,前端无上限以 Java 为权威);speed=max(0,(2000−avgMs)/200);accuracy=max(0,3−incorrect×0.5);complexity=max(0,(maxSeqLen−5)×0.3)(引擎恒 5→常态 0,>5 留旧系数);composite=clamp(Σ,0,10)。⚠️ **correct=0→诚实零**(全错局/空局 composite=0;旧 Java 空局白拿 accuracy 3 分的瑕疵就此修掉,§6.5/6.6/6.8 同律)。
 闸门:round_number 非严格递增(裁剪流,ST 同律)/回合内 elapsed_ms **非严格递增**(等值=同帧双击,0 间隔刷满速度分的新闸;降序=编辑流,DZ 同律)/numbers 空回合(引擎恒 5,空序列灌 roundsCompleted)=DETAIL_MISMATCH。⚠️ 改编披露:该款事实流无墙钟字段,无配置锚——伪造上限=满分 10,与旧架构持平(旧版客户端直报聚合值更易假);回合流自证(数组=真值)已封灌回合数的面。展示 1200/800ms 为客户端参数不入分。
 轨一:raw=correct×unit_score(§四:15/正确点击)×难度(15-30 击→225-450,§四表自洽);权威轨:曲线未定稿留空,composite 入 extras。
+
+### 6.10 offense_defense 定稿卡(E3-g;Tier A,合成式誊录)
+
+事实流:decisions[]{scenario_id, choice?{attack|defense|retreat}(缺省=未作答), decision_time_ms, timeout}。旧 isCorrect 客户端断言废止——正确性=choice 对**题库答案键**(question_bank.answer.optimal_choice,EqualFold 等值,垃圾词表自然错);**查无 scenario_id=DETAIL_MISMATCH 硬拒**(旧版降级信客户端 isCorrect 是前端兜底库时代产物,判键不留降级面)。题库=E2 通用银行(test_code+scenario_code+payload 题面+answer 键;旧 offense_scenario+offense_choice_explanation 两表收敛为 payload/answer 两列,内容=旧 init.sql 经验数据逐字:20 场景×60 解析);答案键经提交缝入参(scoringParams.answerKey,TestRP.ListAnswers),scorer 保持纯函数。
+重算(Java OffenseDefenseScorer 同构):correct=Σ等值;timeouts=Σtimeout;quality=correct/len(decisions)×6(**分母=决策数组自身**——旧版信客户端 totalRounds 属缩水分母伪造面,废止);speed=clamp((8000−avgMs)/2000×2, 0, 2)(avg≤6000 饱和);consistency=0.5(旧公式平项常数,曲线 parity 承袭);timeoutPenalty=min(2, timeouts×0.5);composite=clamp(Σ,0,10)。⚠️ 改编披露:旧 complexAccuracy 算而不入公式=死码弃;per-decision <80ms=ABSURD_REACTION_TIME **新闸**(旧版只闸均值,单个瞬时伪造可藏于慢兄弟之下);空 decisions→诚实零(旧 ZERO 同律)。伪造上限=全对+avg≤6000+无超时=8.5,与旧架构持平。
+轨一:raw=correct×unit_score(§四:25/正确决策)×难度(8-15 对→200-375,§四表自洽);权威轨:曲线未定稿留空,composite 入 extras。决策窗口 2000/1200ms 为客户端参数不入分。
 
 ## 七、8 维认知权重矩阵(三源合一 🧊:JAVA 常量 = API 公式表 = ST DIM8 逐值核对一致)
 
@@ -250,3 +256,5 @@
 - 2026-10-23 E3-e:dual_zone/skill_trajectory 定稿卡入档(§6.7/§6.8,合成式誊录);净钟单向化+配置锚+终局对齐与哨兵双射闸均披露;无效词表增 ABSURD_TIME_SPAN;§6.4 批量表缩为六款。
 
 - 2026-10-23 E3-f:number_stars 定稿卡入档(§6.9,合成式誊录);进度指针重建正确性、同帧双击新闸、correct=0 诚实零(旧空局 3 分瑕疵修掉)与无配置锚披露;§6.4 批量表缩为五款。Tier A 达 7/10——CP1「E3 过半」门达成。
+
+- 2026-10-23 E3-g:offense_defense 定稿卡入档(§6.10,合成式誊录);判键式正确性(question_bank 答案键经缝入参)、查无场景硬拒、分母=数组、per-decision 时间闸新立、complexAccuracy 死码弃、一致性 0.5 常数承袭披露;题库种子=旧 init.sql 20 场景×60 解析逐字入通用银行(两表收敛两列);§6.4 批量表余二款。Tier A 达 8/10。

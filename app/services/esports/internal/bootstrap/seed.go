@@ -7,6 +7,7 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
+	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 )
@@ -47,6 +48,296 @@ var seedTests = []struct {
 	{"character_counter", "角色Counter测试", "moba", "resourceAllocation"},
 	{"economic_sim", "经济模拟测试", "moba", "resourceAllocation"},
 	{"multi_target", "多目标点击测试", "fps", "aimingAccuracy"},
+}
+
+var seedQuestions = []questionSeed{
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_001",
+		Payload: map[string]any{
+			"category":    "中期",
+			"description": "敌方中单消失，我方下路正在推进",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "敌方中单可能来gank，不安全"},
+				{"choice": "defense", "text": "被动防守无法获得优势"},
+				{"choice": "retreat", "text": "✓ 安全撤退，避免被gank"},
+			},
+		},
+		Answer: map[string]any{"complexity": "simple", "difficulty": 1, "optimal_choice": "retreat"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_002",
+		Payload: map[string]any{
+			"category":    "早期",
+			"description": "我方打野在附近，敌人塔下残血",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "✓ 配合打野越塔击杀"},
+				{"choice": "defense", "text": "错失击杀机会"},
+				{"choice": "retreat", "text": "浪费打野gank机会"},
+			},
+		},
+		Answer: map[string]any{"complexity": "medium", "difficulty": 2, "optimal_choice": "attack"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_003",
+		Payload: map[string]any{
+			"category":    "中期",
+			"description": "敌方团队正在打龙，我方队伍分散",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "团队分散无法参战"},
+				{"choice": "defense", "text": "✓ 防守等待时机，避免团灭"},
+				{"choice": "retreat", "text": "放弃龙损失太大"},
+			},
+		},
+		Answer: map[string]any{"complexity": "complex", "difficulty": 3, "optimal_choice": "defense"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_004",
+		Payload: map[string]any{
+			"category":    "早期",
+			"description": "敌方打野上路gank，我方有视野且闪现未用",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "打野在gank无法进攻"},
+				{"choice": "defense", "text": "被gank风险高"},
+				{"choice": "retreat", "text": "✓ 使用视野优势及时撤退"},
+			},
+		},
+		Answer: map[string]any{"complexity": "medium", "difficulty": 2, "optimal_choice": "retreat"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_005",
+		Payload: map[string]any{
+			"category":    "中期",
+			"description": "我方在中路防御塔处5打3人数优势",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "✓ 人数优势推进获胜"},
+				{"choice": "defense", "text": "浪费人数优势"},
+				{"choice": "retreat", "text": "错失优势期"},
+			},
+		},
+		Answer: map[string]any{"complexity": "simple", "difficulty": 1, "optimal_choice": "attack"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_006",
+		Payload: map[string]any{
+			"category":    "早期",
+			"description": "敌方刺客正在游走支援你的线路，无视野",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "无视野容易被击杀"},
+				{"choice": "defense", "text": "被动等待不利"},
+				{"choice": "retreat", "text": "✓ 无视野情况下保守撤退"},
+			},
+		},
+		Answer: map[string]any{"complexity": "medium", "difficulty": 2, "optimal_choice": "retreat"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_007",
+		Payload: map[string]any{
+			"category":    "后期",
+			"description": "我方刚赢下团战，大龙刷新，敌方存活2人",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "人数劣势打龙风险大"},
+				{"choice": "defense", "text": "✓ 守住优势防止翻盘"},
+				{"choice": "retreat", "text": "浪费团战胜利"},
+			},
+		},
+		Answer: map[string]any{"complexity": "complex", "difficulty": 3, "optimal_choice": "defense"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_008",
+		Payload: map[string]any{
+			"category":    "中期",
+			"description": "敌方射手无闪现，我方辅助控制技能已好",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "✓ 抓住技能差击杀ADC"},
+				{"choice": "defense", "text": "错失击杀机会"},
+				{"choice": "retreat", "text": "浪费优势时机"},
+			},
+		},
+		Answer: map[string]any{"complexity": "simple", "difficulty": 1, "optimal_choice": "attack"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_009",
+		Payload: map[string]any{
+			"category":    "后期",
+			"description": "敌方团队正在推我方基地，我方可以偷家",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "偷家速度不够快"},
+				{"choice": "defense", "text": "✓ 回防保护基地"},
+				{"choice": "retreat", "text": "放弃基地必败"},
+			},
+		},
+		Answer: map[string]any{"complexity": "complex", "difficulty": 3, "optimal_choice": "defense"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_010",
+		Payload: map[string]any{
+			"category":    "后期",
+			"description": "后期，双方在大龙处对峙，我方团战能力更强",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "✓ 团战能力强主动开团"},
+				{"choice": "defense", "text": "后期机会难得"},
+				{"choice": "retreat", "text": "错失取胜机会"},
+			},
+		},
+		Answer: map[string]any{"complexity": "complex", "difficulty": 3, "optimal_choice": "attack"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_011",
+		Payload: map[string]any{
+			"category":    "中期",
+			"description": "我方上单正在单带，敌方正在包围他",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "队友被包围无法进攻"},
+				{"choice": "defense", "text": "✓ 防守或支援上单"},
+				{"choice": "retreat", "text": "放弃队友不利"},
+			},
+		},
+		Answer: map[string]any{"complexity": "medium", "difficulty": 2, "optimal_choice": "defense"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_012",
+		Payload: map[string]any{
+			"category":    "早期",
+			"description": "敌方防御塔血量很低，但敌方即将复活",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "敌方复活后危险"},
+				{"choice": "defense", "text": "塔已残血不需防守"},
+				{"choice": "retreat", "text": "✓ 撤退避免被反杀"},
+			},
+		},
+		Answer: map[string]any{"complexity": "medium", "difficulty": 2, "optimal_choice": "retreat"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_013",
+		Payload: map[string]any{
+			"category":    "后期",
+			"description": "我方拥有远古巨龙buff，敌方防守",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "✓ 远古龙buff碾压性推进"},
+				{"choice": "defense", "text": "浪费龙buff时间"},
+				{"choice": "retreat", "text": "放弃绝佳机会"},
+			},
+		},
+		Answer: map[string]any{"complexity": "simple", "difficulty": 1, "optimal_choice": "attack"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_014",
+		Payload: map[string]any{
+			"category":    "中期",
+			"description": "敌方优势核心位置未知，我方想要强开团战",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "核心位置未知风险大"},
+				{"choice": "defense", "text": "✓ 谨慎等待敌方暴露位置"},
+				{"choice": "retreat", "text": "过于保守"},
+			},
+		},
+		Answer: map[string]any{"complexity": "complex", "difficulty": 3, "optimal_choice": "defense"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_015",
+		Payload: map[string]any{
+			"category":    "早期",
+			"description": "在我方野区抓到敌方打野，队友在附近",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "✓ 人多击杀落单打野"},
+				{"choice": "defense", "text": "错失击杀机会"},
+				{"choice": "retreat", "text": "浪费优势"},
+			},
+		},
+		Answer: map[string]any{"complexity": "simple", "difficulty": 1, "optimal_choice": "attack"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_016",
+		Payload: map[string]any{
+			"category":    "中期",
+			"description": "敌方有你的视野，他们正在设置埋伏",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "已被发现会中埋伏"},
+				{"choice": "defense", "text": "被动等待不利"},
+				{"choice": "retreat", "text": "✓ 撤离危险区域"},
+			},
+		},
+		Answer: map[string]any{"complexity": "medium", "difficulty": 2, "optimal_choice": "retreat"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_017",
+		Payload: map[string]any{
+			"category":    "后期",
+			"description": "我方高地水晶已破，超级兵正在推进",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "兵线压力无法进攻"},
+				{"choice": "defense", "text": "✓ 清理超级兵线"},
+				{"choice": "retreat", "text": "放弃防守必败"},
+			},
+		},
+		Answer: map[string]any{"complexity": "simple", "difficulty": 1, "optimal_choice": "defense"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_018",
+		Payload: map[string]any{
+			"category":    "中期",
+			"description": "敌方交出关键大招，我方技能冷却完毕",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "✓ 抓住技能差发起团战"},
+				{"choice": "defense", "text": "错失优势窗口"},
+				{"choice": "retreat", "text": "浪费机会"},
+			},
+		},
+		Answer: map[string]any{"complexity": "medium", "difficulty": 2, "optimal_choice": "attack"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_019",
+		Payload: map[string]any{
+			"category":    "早期",
+			"description": "前期阶段，敌方打野等级领先",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "等级劣势会被反杀"},
+				{"choice": "defense", "text": "前期不需过度防守"},
+				{"choice": "retreat", "text": "✓ 前期发育避免战斗"},
+			},
+		},
+		Answer: map[string]any{"complexity": "simple", "difficulty": 1, "optimal_choice": "retreat"},
+	},
+	{
+		TestCode: "offense_defense",
+		Scenario: "OD_020",
+		Payload: map[string]any{
+			"category":    "中期",
+			"description": "我方实力更强但打完目标后血量较低",
+			"choices": []map[string]string{
+				{"choice": "attack", "text": "血量低容易被反杀"},
+				{"choice": "defense", "text": "已经拿到目标"},
+				{"choice": "retreat", "text": "✓ 安全撤退巩固优势"},
+			},
+		},
+		Answer: map[string]any{"complexity": "complex", "difficulty": 3, "optimal_choice": "retreat"},
+	},
+}
+
+type questionSeed struct {
+	TestCode string
+	Scenario string
+	Payload  map[string]any
+	Answer   map[string]any
 }
 
 type Seed struct {
@@ -135,6 +426,47 @@ func (s *Seed) Run(ctx context.Context) error {
 			SetNillableAbility(strPtr(t.Ability)).
 			Save(ctx); err != nil {
 			return s.plat.HandleEntError(fmt.Errorf("seed: update test %q: %w", t.Code, err))
+		}
+	}
+
+	for _, q := range seedQuestions {
+		// Bank rows follow the tests' keep-in-step law: create when absent,
+		// refresh content when the adopted baseline moves (admin-tuned rows
+		// will leave the seed path entirely, same as test seeds). Content is
+		// the legacy init.sql bank verbatim (experience data) — the legacy
+		// offense_scenario + offense_choice_explanation tables consolidate
+		// into payload (rendering face) and answer (judging key).
+		row, err := client.QuestionBank.Query().
+			Where(questionbank.TestCodeEQ(q.TestCode), questionbank.ScenarioCodeEQ(q.Scenario)).
+			Only(ctx)
+		if err != nil && !ent.IsNotFound(err) {
+			return s.plat.HandleEntError(fmt.Errorf("seed: query question %s/%s: %w", q.TestCode, q.Scenario, err))
+		}
+		if row == nil {
+			if _, err := client.QuestionBank.Create().
+				SetTestCode(q.TestCode).
+				SetScenarioCode(q.Scenario).
+				SetPayload(q.Payload).
+				SetAnswer(q.Answer).
+				Save(ctx); err != nil {
+				// Multi-replica boot race: see the game loop's arm.
+				if ent.IsConstraintError(err) {
+					if _, reErr := client.QuestionBank.Query().
+						Where(questionbank.TestCodeEQ(q.TestCode), questionbank.ScenarioCodeEQ(q.Scenario)).
+						Only(ctx); reErr == nil {
+						continue
+					}
+				}
+				return s.plat.HandleEntError(fmt.Errorf("seed: create question %s/%s: %w", q.TestCode, q.Scenario, err))
+			}
+			s.log.Info("seeded question", "test", q.TestCode, "scenario", q.Scenario)
+			continue
+		}
+		if _, err := row.Update().
+			SetPayload(q.Payload).
+			SetAnswer(q.Answer).
+			Save(ctx); err != nil {
+			return s.plat.HandleEntError(fmt.Errorf("seed: update question %s/%s: %w", q.TestCode, q.Scenario, err))
 		}
 	}
 	return nil

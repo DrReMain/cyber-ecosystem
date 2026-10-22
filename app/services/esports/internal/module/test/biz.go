@@ -80,6 +80,7 @@ type TestRP interface {
 	GetByCode(ctx context.Context, code string) (*Test, error)
 	GetConfigByID(ctx context.Context, id string) (*TestConfig, error)
 	GetConfigByCode(ctx context.Context, code string) (*TestConfig, error)
+	ListAnswers(ctx context.Context, testCode string) (map[string]map[string]any, error)
 	CreateAttempt(ctx context.Context, rec *AttemptRecord) (*AttemptRecord, error)
 }
 
@@ -126,6 +127,13 @@ func (uc *TestUC) Submit(ctx context.Context, in *esportspb.SubmitTestAttemptReq
 	if err != nil {
 		return nil, err
 	}
+	// The bank's answer key rides the params — question-driven correctness
+	// is judged server-side against it (question_bank.answer law); the read
+	// is empty for fact-stream games with no bank.
+	answers, err := uc.testRP.ListAnswers(ctx, t.Code)
+	if err != nil {
+		return nil, err
+	}
 	sc, ok := lookupScorer(t.Code)
 	if !ok {
 		return nil, esportspb.ErrorEsportsUnspecified("").WithCause(fmt.Errorf("no scorer registered for %s", t.Code))
@@ -164,7 +172,11 @@ func (uc *TestUC) Submit(ctx context.Context, in *esportspb.SubmitTestAttemptReq
 		// The mode axis (experience 1.0 / standard 1.5, metric.md §三) is
 		// match-session law (E4); until the session aggregate lands every
 		// attempt scores on the experience baseline.
-		res, serr := sc.recompute(in, scoringParams{engineParams: cfg.EngineParams, durationSec: cfg.DurationSec})
+		res, serr := sc.recompute(in, scoringParams{
+			answerKey:    answers,
+			engineParams: cfg.EngineParams,
+			durationSec:  cfg.DurationSec,
+		})
 		if serr != nil {
 			var invalid *invalidAttemptError
 			if !errors.As(serr, &invalid) {
