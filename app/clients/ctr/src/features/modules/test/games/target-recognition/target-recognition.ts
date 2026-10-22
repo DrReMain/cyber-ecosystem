@@ -8,6 +8,8 @@
 // (the contract's target_id cannot name air). Positions are
 // container-relative. The run itself is owned by the clock.
 import type { GameInstance, GameModule, GameModuleCtx } from "../../contract";
+import { m } from "#/paraglide/messages";
+import { createLucideIcon, type IconNode } from "../lucide-icon";
 import {
   distance,
   drawType,
@@ -17,9 +19,57 @@ import {
   type SpawnArea,
   TARGET_RECOGNITION_DEFAULTS,
   type TargetRecognitionParams,
+  type TargetType,
   TYPE_SPECS,
   type TypeSpec,
 } from "./logic";
+
+// D-AG B1: the in-target form is the type's lucide icon (lucide 1.49
+// skull / shield / user node trees, verbatim geometry) — shape coding
+// reads without color and the value never rides the target; the bottom
+// legend bar teaches the reading. The legacy emoji were placeholder art
+// and stay unbuilt (zero-emoji ruling).
+const SKULL: IconNode = [
+  ["path", { d: "m12.5 17-.5-1-.5 1h1z" }],
+  [
+    "path",
+    {
+      d: "M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z",
+    },
+  ],
+  ["circle", { cx: "15", cy: "12", r: "1" }],
+  ["circle", { cx: "9", cy: "12", r: "1" }],
+];
+const SHIELD: IconNode = [
+  [
+    "path",
+    {
+      d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
+    },
+  ],
+];
+const USER: IconNode = [
+  ["path", { d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" }],
+  ["circle", { cx: "12", cy: "7", r: "4" }],
+];
+const TYPE_ICONS: Record<TargetType, IconNode> = {
+  enemy: SKULL,
+  friendly: SHIELD,
+  neutral: USER,
+};
+
+const TYPE_BG: Record<string, string> = {
+  enemy: "bg-rec-enemy",
+  friendly: "bg-rec-friendly",
+  neutral: "bg-rec-neutral",
+};
+
+const LEGEND_LABEL: Record<TargetType, () => string> = {
+  enemy: m.test_rec_legend_enemy,
+  friendly: m.test_rec_legend_friendly,
+  neutral: m.test_rec_legend_neutral,
+};
+
 
 // Timer accounting follows the engine's pause law: deadlines are parked as
 // remaining-ms at pause and re-armed at resume.
@@ -35,12 +85,6 @@ interface LiveTarget {
   parkedMs: number | null;
   expiryTimer: ReturnType<typeof setTimeout> | null;
 }
-
-const TYPE_BG: Record<string, string> = {
-  enemy: "bg-rec-enemy",
-  friendly: "bg-rec-friendly",
-  neutral: "bg-rec-neutral",
-};
 
 function spawnAreaOf(el: HTMLElement): SpawnArea {
   const rect = el.getBoundingClientRect();
@@ -71,6 +115,25 @@ export const targetRecognitionModule: GameModule = {
 
     const stage = document.createElement("div");
     stage.className = "h-full w-full touch-none overflow-hidden relative select-none";
+    // D-AG B1: the reading lives in the bottom legend bar (legacy form:
+    // black 60% + blur, one entry per type — color dot + name + value) so
+    // the target face stays a spatial field of skull/shield/user shapes.
+    const legend = document.createElement("div");
+    legend.className =
+      "pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-full bg-black/60 px-3.5 py-1.5 backdrop-blur-sm";
+    for (const spec of TYPE_SPECS) {
+      const entry = document.createElement("span");
+      entry.className = "flex items-center gap-1.5";
+      const dot = document.createElement("span");
+      dot.className = `h-2 w-2 rounded-full ${TYPE_BG[spec.type]}`;
+      const label = document.createElement("span");
+      label.className = "text-[10px] font-semibold text-white/90";
+      label.textContent = `${LEGEND_LABEL[spec.type]()} ${
+        spec.value > 0 ? `+${spec.value}` : `−${Math.abs(spec.value)}`
+      }`;
+      entry.append(dot, label);
+      legend.appendChild(entry);
+    }
     let started = false;
     let paused = false;
     let destroyed = false;
@@ -143,14 +206,34 @@ export const targetRecognitionModule: GameModule = {
       const spec = TYPE_SPECS.find((entry) => entry.type === type) as TypeSpec;
       const pos = randomCenter(spawnAreaOf(stage), params.spawnPaddingPx);
       targetSeq += 1;
+      // One anchored wrapper carries both visuals: the target disc and
+      // the faint detection ring — D-AG A1, the legacy "subtle
+      // detection-range indicator" that honestly shows the tap slop the
+      // geometric hit test actually grants (diameter = detection range
+      // × 2, pure visual layer, zero judgment/telemetry impact).
       const el = document.createElement("div");
+      el.className = "pointer-events-none absolute select-none";
+      el.style.left = `${pos.x}px`;
+      el.style.top = `${pos.y}px`;
+      el.style.transform = "translate(-50%, -50%)";
+      const ring = document.createElement("div");
+      const ringSize = `${params.clickDetectionRangePx * 2}px`;
+      ring.className = "absolute rounded-full border border-white/20";
+      ring.style.width = ringSize;
+      ring.style.height = ringSize;
+      ring.style.left = "50%";
+      ring.style.top = "50%";
+      ring.style.transform = "translate(-50%, -50%)";
+      const disc = document.createElement("div");
       const size = `${spec.diameterPx}px`;
-      el.className = `absolute flex items-center justify-center rounded-full border-2 border-white/20 font-bold text-ink text-[10px] select-none ${TYPE_BG[type]}`;
-      el.style.width = size;
-      el.style.height = size;
-      el.style.left = `${pos.x - spec.diameterPx / 2}px`;
-      el.style.top = `${pos.y - spec.diameterPx / 2}px`;
-      el.textContent = spec.value > 0 ? `+${spec.value}` : `${spec.value}`;
+      disc.className = `absolute flex items-center justify-center rounded-full border-2 border-white/20 text-white ${TYPE_BG[type]}`;
+      disc.style.width = size;
+      disc.style.height = size;
+      disc.style.left = "50%";
+      disc.style.top = "50%";
+      disc.style.transform = "translate(-50%, -50%)";
+      disc.appendChild(createLucideIcon(TYPE_ICONS[type], Math.round(spec.diameterPx * 0.55)));
+      el.append(ring, disc);
       removeTarget();
       const state: LiveTarget = {
         id: String(targetSeq),
@@ -203,6 +286,7 @@ export const targetRecognitionModule: GameModule = {
         }
         started = true;
         ctx.mount.appendChild(stage);
+        stage.appendChild(legend);
         stage.addEventListener("pointerdown", onStageTap);
         // The first target shows immediately (legacy law), the cadence after.
         spawnOnce();
