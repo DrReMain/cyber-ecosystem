@@ -73,12 +73,5 @@ func (flashAimingScorer) recompute(req *esportspb.SubmitTestAttemptRequest, para
 	deviationScore := max(0, (flashDeviationPivot-avgDeviation)/flashDeviationDivisor)
 	reactionScore := max(0, (flashAimPivot-avgAimTime)/flashAimDivisor)
 	composite := clamp(hitRateScore+accuracyScore+deviationScore+reactionScore, 0, flashCompositeCap)
-	raw := linearRaw(hits, params, flashUnitScoreDefault)
-	// Authoritative stays nil: flash_aiming's calibration curve is pending
-	// (metric.md §一.3 — red_dot is the only implemented curve); the composite
-	// rides in extras as the future curve's input, ready for audit.
-	return scoreResult{
-		raw:    round1(raw),
-		extras: map[string]float64{extraComposite: round1(composite)},
-	}, nil
+	return curvePendingResult(hits, params, flashUnitScoreDefault, composite), nil
 }

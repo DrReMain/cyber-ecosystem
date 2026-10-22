@@ -42,6 +42,9 @@ type scoringParams struct {
 	// source for both ends (metric.md §五 consistency contract); absent or
 	// non-numeric keys fall back to the scorer's metric-sheet constants.
 	engineParams map[string]string
+	// durationSec feeds duration-normalized tracks from the config mirror,
+	// never the client's submitted span (§6.5 fabrication closure).
+	durationSec int
 }
 
 func (p scoringParams) num(key string, fallback float64) float64 {
@@ -135,6 +138,16 @@ func clamp(v, lo, hi float64) float64 {
 
 func linearRaw(count int, p scoringParams, unitDefault float64) float64 {
 	return float64(count) * p.num(unitScoreKey, unitDefault) * p.difficulty()
+}
+
+func curvePendingResult(count int, p scoringParams, unitDefault, composite float64) scoreResult {
+	// The composite scorers' shared tail: the linear track rides raw while
+	// the authoritative track waits for the game's calibration curve — the
+	// composite travels in extras as the curve input.
+	return scoreResult{
+		raw:    round1(linearRaw(count, p, unitDefault)),
+		extras: map[string]float64{extraComposite: round1(composite)},
+	}
 }
 
 func mean(xs []float64) float64 {

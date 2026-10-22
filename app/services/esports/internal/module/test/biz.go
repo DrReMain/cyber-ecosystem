@@ -164,7 +164,7 @@ func (uc *TestUC) Submit(ctx context.Context, in *esportspb.SubmitTestAttemptReq
 		// The mode axis (experience 1.0 / standard 1.5, metric.md §三) is
 		// match-session law (E4); until the session aggregate lands every
 		// attempt scores on the experience baseline.
-		res, serr := sc.recompute(in, scoringParams{engineParams: cfg.EngineParams})
+		res, serr := sc.recompute(in, scoringParams{engineParams: cfg.EngineParams, durationSec: cfg.DurationSec})
 		if serr != nil {
 			var invalid *invalidAttemptError
 			if !errors.As(serr, &invalid) {

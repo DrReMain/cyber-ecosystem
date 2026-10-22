@@ -87,9 +87,9 @@
 
 ### 6.0 总表(Tier 名册按 JAVA 代码现实)
 
-**Tier A 九款**(事实流足以全量重算):red_dot · number_stars · dual_zone_dodge · flash_aiming · skill_trajectory · offense_defense · resource_match · character_counter · multi_target。
-**Tier B 四款**(仅聚合数据 → 强一致性闸门通过后采信客户端分):target_recognition(缺 enemiesSpawned,闸门=反应时合理性) · moving_target(逐帧未上报,闸门=自洽/区间) · tracking_moving(缺 hit 标志) · economic_sim(缺 perfectCS/earlyHits/missedMinions,闸门=装备阶梯/金币守恒/HP 合法性)。
-新遥测契约(E7)逐款补字段后 B 可升 A(§0.2 领域机制重设计);multi_target 的 Tier A 已按代码现实裁决(README §0.5,覆写 MSB 的 Tier B 标注)。
+**Tier A 十款**(事实流足以全量重算):red_dot · number_stars · dual_zone_dodge · flash_aiming · skill_trajectory · offense_defense · resource_match · character_counter · multi_target · target_recognition。
+**Tier B 三款**(仅聚合数据 → 强一致性闸门通过后采信客户端分):moving_target(逐帧未上报,闸门=自洽/区间) · tracking_moving(缺 hit 标志) · economic_sim(缺 perfectCS/earlyHits/missedMinions,闸门=装备阶梯/金币守恒/HP 合法性)。
+新遥测契约(E7)逐款补字段后 B 可升 A(§0.2 领域机制重设计);multi_target 的 Tier A 已按代码现实裁决(README §0.5,覆写 MSB 的 Tier B 标注);target_recognition 同理——E0 增量4 将 spawned_enemy 落进明细契约后缺口闭合,E3-d 升 A 定稿(§6.6)。
 
 ### 6.1 red_dot 定稿卡 🧊(E3 首个权威分输入)
 
@@ -128,20 +128,35 @@
 评级映射 🔗(主锚点 M3 追踪占比+辅助 M4 偏差):顶尖 ≥90% ≤15px / 职业 ≥80% ≤25px / 准职业 ≥70% ≤35px / 高水平 ≥55% ≤45px / 普通 ≥40% / 入门 <40%。追踪类无公开基准,推断成分更高,上线后内部百分位替换优先。
 专有指标:轨迹适应性(6 图案各自 0-100)/最大偏差(需逐帧)/丢失次数。多目标「100 追 10」不属本游戏(归 future)。
 
-### 6.4 批量卡十款(MSB,机制推断待代码确认;公式誊录随 E3-b/c 逐款定稿)
+### 6.4 批量卡八款(MSB,机制推断待代码确认;公式誊录随 E3 逐款定稿;multi_target/target_recognition 已升 A 定稿出表 → §6.5/§6.6)
 
 | 游戏 | 双难度因子(体验/正式) | 专有指标 | 重算要点(JAVA 指针) |
 |---|---|---|---|
 | number_stars | 展示 1200ms / 800ms | 无 | avgDecisionInterval 入参秒须 ×1000 |
 | dual_zone_dodge | 预警 800ms / 400ms | 无 | baseTime/difficultyWeight/最终分全由服务端 config 决定,忽略客户端值;墙钟一致性校验 |
-| target_recognition | 干扰物 3 / 6 个 | 干扰抑制率(选择性注意范式) | Tier B:闸门=反应时合理性 |
-| multi_target | 3 / 6 目标 | 目标切换耗时(注意转移范式) | 公式对齐旧前端 MultiTargetTestPage.tsx:177-210 |
+| target_recognition | 干扰物 3 / 6 个 | 干扰抑制率(选择性注意范式) | 已定稿升 A → §6.6 |
+| multi_target | 3 / 6 目标 | 目标切换耗时(注意转移范式) | 已定稿升 A → §6.5 |
 | offense_defense | 决策窗口 2000ms / 1200ms | 压力决策正确率(执行控制范式) | 查题库 scenarioId 服务端判 isCorrect |
 | resource_match | 4 对 / 8 对 | 配对效率(正确数/分钟) | 公式对齐旧前端 ResourceMatchTestPage.tsx:174-202 |
 | character_counter | 字符数 15 / 30 | 计数偏差(回答−真实) | 查 moba_character + character_counter_relation 题库判分;已知「96.3% 满分」评分收紧 P0 治理对象 |
 | skill_trajectory | 轨迹速度慢 / 快 | 时机精度(提前/滞后量,能力核心) | precision/deviation/speed 可从 rounds 重算,本质等同 Tier A(公式对齐旧前端 :332-374) |
 | tracking_moving | 速度 200 / 400 px/s(同 moving_target) | 同 moving_target | Tier B:缺 hit 标志 |
 | economic_sim | 待确认(回合数/资源复杂度) | 最终资产、资源转化率 | Tier B:强一致性闸门(装备阶梯/金币守恒/HP) |
+
+### 6.5 multi_target 定稿卡(E3-d;Tier A,合成式誊录)
+
+事实流:picks(target_id/tier/is_hit/elapsed_ms)+ missed_high(E0 增量4)。
+重算:hits=is_hit 拾取数(陷阱拾取计入,旧仓 targetsHit 口径);rawTotal=Σ 档位值(high 100/medium 50/low 25/trap −50;档位值=引擎参数键 tier_value_{high|medium|low|trap} 可调,缺省=本表);决策时间=相邻拾取 elapsed 差分(首枚=距开始)。⚠️ 合成式改编披露:旧仓 avgDecisionTime=点击−该靶出生时刻,冻结契约的 pick 无出生戳,差分重建即「目标切换耗时」本义(本卡范式名同源)。闸门:差分<80ms=捏造(AbsurdReactionTime 拒收;较旧仓均值闸更严,red_dot 逐点法同款);档位词表外值=DetailMismatch(辖全部拾取,is_hit=false 同拒)。差分链跨全部拾取入链入闸。
+公式(对齐旧前端 MultiTargetTestPage.tsx:177-210 与 Java MultiTargetScorer 逐行):value=rawTotal/(max(durationSec,1)×100)×5;priority=highHits/hits×3;speed=max(0,(1500−avgDecision)/150);composite=clamp(value+priority+speed−0.3×trapHits−0.2×missedHigh,0,10);hits=0→诚实零。⚠️ duration 取服务端 test_config(旧仓取客户端起止差,缩 Span 可抬 value 的 fabrication 面就此关闭);durationSec≤0 回退 30s(Java 同款冷臂,种子默认下不触)。
+轨一:raw=hits×unit_score×难度(§四:10/命中);权威轨:曲线未定稿,authoritative 留空,composite 入 extras 待曲线(§6.2 flash_aiming 同款)。
+
+### 6.6 target_recognition 定稿卡(E3-d;Tier A 升格,合成式誊录)
+
+事实流:clicks(target_id/target_type/reaction_time_ms 可缺/elapsed_ms)+ spawned_enemy(E0 增量4——旧 Tier B 缺口即此,升 A 依据)。
+重算:correct=target_type=enemy 的点击数(正确性=服务端按靶型判定,契约明文;旧 isCorrect 客户端断言废止);falsePositives=friendly|neutral 点击;avgRt=敌靶 rt 均值;敌击缺 rt=DetailMismatch(引擎对靶点击恒打 rt,缺=事实被裁剪——杜绝无 rt 拿满速度分的膨胀面);friendly/neutral 的 rt 不入均值。
+公式(对齐旧仓 targetRecognitionScoring.ts PRD §2.13 与 Java 闸门):accuracy=correct/spawned_enemy×5;speed=max(0,(600−avgRt)/60);visual=min(1,max(0,1−(avgRt−200)/800))×2;composite=clamp(accuracy+speed+visual−0.4×falsePositives−0.2×max(0,spawned−correct),0,10);correct=0 或 spawned=0→诚实零。
+闸门:逐点击 rt∈[80,60000](present 才判);correct>spawned_enemy=DetailMismatch(计数偏差,旧仓客户端钳 [0,100] 的服务端化);靶型词表外值=DetailMismatch。
+轨一:raw=correct×unit_score×难度(§四:20/正确识别);权威轨:曲线未定稿留空,composite 入 extras。
 
 ## 七、8 维认知权重矩阵(三源合一 🧊:JAVA 常量 = API 公式表 = ST DIM8 逐值核对一致)
 
@@ -207,3 +222,5 @@
 ## 变更记录
 
 - 2026-10-20 建立(E3 增量 a):总纲/档位/难度系数/单位分/M 槽位/13 款卡(Tier 名册按代码现实)/8 维权重三源合一/red_dot 锚点/校准计划;裁决两处遗留冲突(moving_target 阈值口径→E7 定;置信样本阈值→E5 定)。各款重算公式誊录与校准曲线定稿随 E3-b/c 逐款增量入档。
+
+- 2026-10-22 E3-d:multi_target/target_recognition 定稿卡入档(§6.5/§6.6,合成式誊录;决策时间差分改编与 duration 服务端化均披露);TR 升 Tier A(E0 增量4 spawned_enemy 契约落位,缺口闭合);§6.4 批量表缩为八款。
