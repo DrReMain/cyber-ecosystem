@@ -66,7 +66,9 @@ describe("local result derivation", () => {
       { key: "trap_hits", value: "1" },
       { key: "missed_high", value: "2" },
       { key: "incorrect_clicks", value: "4" },
-      { key: "avg_decision", value: "800ms" },
+      // Differential law (server scorer's rebuildable form): mean of
+      // pick-to-pick deltas [600−0, 800−600, 1000−800] = 1000/3.
+      { key: "avg_decision", value: "333ms" },
     ]);
   });
 

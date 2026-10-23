@@ -44,7 +44,6 @@
 |---|---|---|
 | 微信回调 next 丢失(redirect_uri 不能带 query,保 next 须 state 中转) | 后续微信链路片 | 设计时定(review A6) |
 | birth.ts 上收共享层(原拟随 H-B,未随落) | 触文件者 | 顺手清 |
-| multi_target 本地辅助卡「平均决策」陈旧公式怪值(E7-a 走查注;服务端差分重算为真值,本地卡法定辅助) | hzy | 顺手片(可并 E7 追踪批) |
 | conventions guard 正则精度修正回流 dev 兄弟服务 | lzx | 下次定期镜像批 |
 | SMS 骨架片(system provider+capability) | lzx | E6c(2026-10-23 立片收口) |
 | 协议 consent 版本记录契约 | lzx | H2 versions.ts 真源 GET /agreements/current |
