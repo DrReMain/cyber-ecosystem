@@ -35,6 +35,17 @@ const ROW_LABELS: Record<string, () => string> = {
   friendly_misclicks: m.test_result_friendly_misclicks,
   neutral_misclicks: m.test_result_neutral_misclicks,
   blank_clicks: m.test_result_blank_clicks,
+  samples: m.test_result_samples,
+  avg_deviation: m.test_result_avg_deviation,
+  hold_rate: m.test_result_hold_rate,
+  shots: m.test_result_shots,
+  movement: m.test_result_movement,
+  avg_acquire: m.test_result_avg_acquire,
+  rounds: m.test_result_rounds,
+  matches: m.test_result_matches,
+  avg_place: m.test_result_avg_place,
+  dodges: m.test_result_dodges,
+  survived: m.test_result_survived,
 };
 
 // Ops reason → user copy; the server's reason vocabulary is ops-facing, so

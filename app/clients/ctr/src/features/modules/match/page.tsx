@@ -78,9 +78,7 @@ function GenreHeaderCard({ genre, switched }: Readonly<GenreHeaderCardProps>) {
   const meta = genreMeta(genre);
   const Icon = genre === "moba" ? Hexagon : Crosshair;
   return (
-    <div
-      className={`${meta.gradient} rounded-card flex items-center gap-3.25 overflow-hidden p-4`}
-    >
+    <div className={`${meta.gradient} rounded-card flex items-center gap-3.25 overflow-hidden p-4`}>
       <div className="flex h-11.5 w-11.5 shrink-0 items-center justify-center rounded-xl bg-[rgba(0,0,0,0.22)] text-xl text-white">
         <Icon aria-hidden size={20} />
       </div>

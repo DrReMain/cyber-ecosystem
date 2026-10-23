@@ -102,6 +102,72 @@ function deriveTargetRecognition(record: AttemptRecord): readonly ResultRow[] {
   ];
 }
 
+function deriveMovingTarget(record: AttemptRecord): readonly ResultRow[] {
+  const shots = record.events;
+  const held = shots.filter((event) => event.hit === true).length;
+  return [
+    { key: "samples", value: String(shots.length) },
+    {
+      key: "avg_deviation",
+      value: `${mean(shots.map((event) => num(event.deviation))).toFixed(1)}px`,
+    },
+    { key: "hold_rate", value: pct(held, shots.length) },
+  ];
+}
+
+function deriveSkillTrajectory(record: AttemptRecord): readonly ResultRow[] {
+  const rounds = record.events;
+  const matched = rounds.filter((round) => round.playerPlacement !== undefined);
+  return [
+    { key: "rounds", value: String(rounds.length) },
+    { key: "matches", value: String(matched.length) },
+    {
+      key: "avg_deviation",
+      value: `${mean(matched.map((round) => num(round.deviation))).toFixed(1)}px`,
+    },
+    { key: "avg_place", value: ms(mean(matched.map((round) => num(round.placementTimeMs)))) },
+  ];
+}
+
+function deriveDualZone(record: AttemptRecord): readonly ResultRow[] {
+  const behaviors = record.events;
+  const dodges = behaviors.filter((behavior) => behavior.event === "dodge").length;
+  // Survival reads the last fact's stamp: a collision run ends on its
+  // fatal event, a clean run coasts to its final dodge.
+  const last = behaviors.reduce((max, behavior) => Math.max(max, num(behavior.elapsedMs)), 0);
+  return [
+    { key: "dodges", value: String(dodges) },
+    { key: "survived", value: `${(last / 1000).toFixed(1)}s` },
+  ];
+}
+
+function deriveTrackingMoving(record: AttemptRecord): readonly ResultRow[] {
+  const frames = record.events;
+  const shotFrames = frames.filter((event) => event.hit !== undefined);
+  const hits = shotFrames.filter((event) => event.hit === true).length;
+  // The polyline over every frame's player point: a shot frame repeats
+  // the crosshair it fired from, so consecutive duplicates add nothing.
+  let movement = 0;
+  let prev: { x: number; y: number } | null = null;
+  for (const frame of frames) {
+    const player = frame.player as { x: number; y: number } | undefined;
+    if (player !== undefined && prev !== null) {
+      movement += Math.hypot(player.x - prev.x, player.y - prev.y);
+    }
+    prev = player ?? prev;
+  }
+  const lifetimes = shotFrames
+    .filter((event) => event.hit === true)
+    .map((event) => num(event.dotLifetimeMs));
+  return [
+    { key: "shots", value: String(shotFrames.length) },
+    { key: "hits", value: String(hits) },
+    { key: "hit_rate", value: pct(hits, shotFrames.length) },
+    { key: "movement", value: `${Math.round(movement)}px` },
+    { key: "avg_acquire", value: ms(mean(lifetimes)) },
+  ];
+}
+
 /** Per-game local rows; unknown codes fall back to the generic tap/hit pair. */
 export function deriveLocalResults(
   code: string,
@@ -113,10 +179,18 @@ export function deriveLocalResults(
       return deriveRedDot(record);
     case "flash_aiming":
       return deriveFlashAiming(record, params);
+    case "moving_target":
+      return deriveMovingTarget(record);
     case "multi_target":
       return deriveMultiTarget(record);
     case "target_recognition":
       return deriveTargetRecognition(record);
+    case "tracking_moving":
+      return deriveTrackingMoving(record);
+    case "skill_trajectory":
+      return deriveSkillTrajectory(record);
+    case "dual_zone":
+      return deriveDualZone(record);
     default: {
       const hits = record.events.filter((event) => event.isHit === true).length;
       return [

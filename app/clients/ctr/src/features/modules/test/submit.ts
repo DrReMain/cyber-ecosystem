@@ -1,11 +1,15 @@
 import { create } from "@bufbuild/protobuf";
 import { timestampFromDate } from "@bufbuild/protobuf/wkt";
 import type {
+  DualZoneDetail,
   FlashAimingDetail,
+  MovingTargetDetail,
   MultiTargetDetail,
   RedDotDetail,
+  SkillTrajectoryDetail,
   SubmitTestAttemptRequest,
   TargetRecognitionDetail,
+  TrackingMovingDetail,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_pb";
 import { SubmitTestAttemptRequestSchema } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_pb";
 import type { AttemptRecord } from "./contract";
@@ -27,6 +31,10 @@ const DETAIL_BUILDERS: Readonly<Record<string, DetailBuilder>> = {
     case: "flashAiming",
     value: { shots: r.events, misses: r.stats.misses ?? 0 } as FlashAimingDetail,
   }),
+  moving_target: (r) => ({
+    case: "movingTarget",
+    value: { shots: r.events } as MovingTargetDetail,
+  }),
   multi_target: (r) => ({
     case: "multiTarget",
     value: { picks: r.events, missedHigh: r.stats.missedHigh ?? 0 } as MultiTargetDetail,
@@ -37,6 +45,23 @@ const DETAIL_BUILDERS: Readonly<Record<string, DetailBuilder>> = {
       clicks: r.events,
       spawnedEnemy: r.stats.spawned_enemy ?? 0,
     } as TargetRecognitionDetail,
+  }),
+  tracking_moving: (r) => ({
+    case: "trackingMoving",
+    value: { frames: r.events } as TrackingMovingDetail,
+  }),
+  skill_trajectory: (r) => ({
+    case: "skillTrajectory",
+    // int64 rides the wire as bigint; the game banks the board seed in
+    // its stats so the server can reproduce boards from it.
+    value: {
+      randomSeed: BigInt(Math.trunc(r.stats.random_seed ?? 0)),
+      rounds: r.events,
+    } as SkillTrajectoryDetail,
+  }),
+  dual_zone: (r) => ({
+    case: "dualZone",
+    value: { behaviors: r.events } as DualZoneDetail,
   }),
 };
 
