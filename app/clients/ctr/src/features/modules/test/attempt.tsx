@@ -6,10 +6,13 @@ import { getLocale } from "#/paraglide/runtime";
 import { GameClock } from "./clock";
 import { type AttemptRecord, EngineParams, type GameModule } from "./contract";
 import { TestRunHost } from "./runtime";
+import { buildSubmitAttempt } from "./submit";
 import { EndFace } from "./ui/end-face";
 import { PauseOverlay } from "./ui/pause-overlay";
 import { StartGameOverlay } from "./ui/start-game-overlay";
 import { TestHud } from "./ui/test-hud";
+import type { Verdict } from "./ui/verdict-card";
+import { useSubmitAttempt } from "./use-submit-attempt";
 
 interface TestAttemptProps {
   readonly gameModule: GameModule;
@@ -39,6 +42,13 @@ export function TestAttempt({
   const navigate = useNavigate();
   const mountRef = useRef<HTMLDivElement>(null);
   const hostRef = useRef<TestRunHost | null>(null);
+  const submitAttempt = useSubmitAttempt();
+  // Stable across renders (react-query) — safe as an effect dependency,
+  // unlike the mutation state object it hangs off.
+  const submitMutate = submitAttempt.mutate;
+  // The built request for the attempt that just ended — kept for resubmit
+  // (transport refusals), read only in callbacks, never on the render path.
+  const submittedInputRef = useRef<ReturnType<typeof buildSubmitAttempt>>(null);
   const bootParams = useMemo(() => engineParams, [engineParams]);
   const [phase, setPhase] = useState<Phase>("intro");
   const [paused, setPaused] = useState(false);
@@ -64,6 +74,14 @@ export function TestAttempt({
       onEnd: (record) => {
         setEndRecord(record);
         setPhase("ended");
+        // One submit per natural end, fired from the end event itself (an
+        // effect would double-fire under StrictMode). buildSubmitAttempt
+        // refuses non-completed exits and unmapped codes — those stay local.
+        const input = buildSubmitAttempt({ code: gameModule.code, record });
+        submittedInputRef.current = input;
+        if (input !== null) {
+          submitMutate(input);
+        }
       },
     });
     hostRef.current = host;
@@ -74,7 +92,7 @@ export function TestAttempt({
       host.destroy();
       hostRef.current = null;
     };
-  }, [gameModule, durationSeconds, bootParams]);
+  }, [gameModule, durationSeconds, bootParams, submitMutate]);
 
   const startRun = useCallback(() => {
     hostRef.current?.start();
@@ -95,6 +113,24 @@ export function TestAttempt({
     hostRef.current?.destroy();
     void navigate({ to: "/match" });
   }, [navigate]);
+
+  const resubmit = useCallback(() => {
+    const input = submittedInputRef.current;
+    if (input !== null) {
+      submitMutate(input);
+    }
+  }, [submitMutate]);
+
+  // The verdict the end face renders: pending → error (resubmit-able) →
+  // the receipt. Idle means the attempt never crossed the seam (unmapped
+  // code or non-completed exit) — the face stays local-only, no card.
+  const verdict: Verdict = submitAttempt.isPending
+    ? { phase: "pending" }
+    : submitAttempt.isError
+      ? { phase: "error", error: submitAttempt.error, onResubmit: resubmit }
+      : submitAttempt.isSuccess && submitAttempt.data !== undefined
+        ? { phase: "done", receipt: submitAttempt.data }
+        : { phase: "local" };
 
   return (
     <div className="safe-pb safe-pt h-app bg-canvas text-ink relative isolate flex flex-col overflow-hidden">
@@ -124,6 +160,7 @@ export function TestAttempt({
           onExit={backToFlow}
           onRetry={onRetry}
           record={endRecord}
+          verdict={verdict}
         />
       )}
 

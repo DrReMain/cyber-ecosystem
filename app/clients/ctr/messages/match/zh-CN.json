@@ -60,6 +60,5 @@
   "match_ability_tracking": "追踪稳定性",
   "match_ability_skill": "技能释放精准度",
   "match_ability_resource": "资源分配",
-  "match_ability_decision": "决策效率",
-  "match_flow_soon": "游戏运行时即将上线"
+  "match_ability_decision": "决策效率"
 }

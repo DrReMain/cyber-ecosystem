@@ -1,17 +1,12 @@
-import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
-import { listGames } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/game-GameService_connectquery";
-import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
-import { listTests } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test-TestService_connectquery";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Crosshair, Hexagon } from "lucide-react";
 import { useEffect } from "react";
-import { toast } from "sonner";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
-import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { m } from "#/paraglide/messages";
-import { arrange, defaultGenre, type Genre } from "./arranger";
+import type { Genre } from "./arranger";
 import { FlowHeader } from "./ui/flow-header";
+import { useArrangedSteps } from "./use-arranged-steps";
 import { abilityWord, genreLabel, genreMeta } from "./vocabulary";
 
 /* The guide page's own orb pair (prototype match-guide). */
@@ -21,48 +16,41 @@ const guideOrbs: readonly AmbientOrb[] = [
 ];
 
 /**
- * The match guide (prototype match-guide): genre header card, the
- * four-ability lineup, and the flow actions. The genre resolves from the
- * URL override, else the preference majority vote; a tie routes to the
- * pick page. Progress marks (done/best) arrive with the match session — the
- * lineup renders the fresh-session face until then.
+ * The match guide (prototype match-guide): genre header card, the ability
+ * lineup, and the flow actions. The genre resolves from the URL override,
+ * else the preference majority vote; a tie routes to the pick page. The
+ * lineup walks engine-ready steps only — every row and the start CTA enter
+ * that step's intro (prototype law). Progress marks (done/best) arrive
+ * with the match session; the lineup renders the fresh-session face until
+ * then.
  */
 export function MatchPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/match/" }) as { genre?: Genre };
-  const testsQuery = useConnectQuery(listTests, {});
-  const gamesQuery = useConnectQuery(listGames, {});
-  const profileQuery = useConnectQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
+  const { genre, fallback, steps, pending } = useArrangedSteps(search.genre);
 
-  const tests = testsQuery.data?.tests ?? [];
-  const games = gamesQuery.data?.games ?? [];
-  const preferenceCodes = (profileQuery.data?.profile?.games ?? [])
-    .map((g) => g.gameId)
-    .filter((id): id is string => id != null);
-  const fallback = defaultGenre(preferenceCodes, games);
-  const genre = search.genre ?? fallback;
-  // A tie (or no classified picks) hands the choice to the pick page; an
-  // empty pool would route to the same page's empty face. Both verdicts
-  // wait for the catalog queries to land before navigating.
+  // A tie (or no classified picks) hands the choice to the pick page; a
+  // genre with nothing playable routes to the same page's empty face. Both
+  // verdicts wait for the catalog queries to land before navigating.
   useEffect(() => {
-    if (testsQuery.isPending || gamesQuery.isPending || profileQuery.isPending) {
+    if (pending) {
       return;
     }
     if (genre === null) {
       void navigate({ to: "/match/pick", search: { why: "tie" } });
       return;
     }
-    if (arrange(tests, genre).length === 0) {
+    if (steps.length === 0) {
       void navigate({ to: "/match/pick", search: { why: "empty" } });
     }
-  }, [genre, gamesQuery.isPending, navigate, profileQuery.isPending, tests, testsQuery.isPending]);
-  const steps = genre ? arrange(tests, genre) : [];
-  const meta = genre ? genreMeta(genre) : null;
+  }, [genre, navigate, pending, steps.length]);
+
+  const meta = genre !== null ? genreMeta(genre) : null;
   const switched = search.genre !== undefined && search.genre !== fallback;
   const Icon = genre === "moba" ? Hexagon : Crosshair;
 
-  function onStart() {
-    toast.info(m.match_flow_soon());
+  function enterStep(code: string) {
+    void navigate({ to: "/test/$code", params: { code } });
   }
 
   return (
@@ -100,9 +88,11 @@ export function MatchPage() {
               {steps.map((step, i) => {
                 const word = abilityWord(step.ability);
                 return (
-                  <div
-                    className="border-line bg-surface-card shadow-card rounded-control flex items-center gap-[11px] border px-[13px] py-[11px]"
+                  <button
+                    className="border-line bg-surface-card shadow-card rounded-control flex w-full cursor-pointer items-center gap-[11px] border px-[13px] py-[11px] text-start active:opacity-80"
                     key={step.code}
+                    onClick={() => enterStep(step.code)}
+                    type="button"
                   >
                     <div
                       className={`${word.gradient} rounded-control flex h-[38px] w-[38px] shrink-0 items-center justify-center text-[15px] font-bold text-white`}
@@ -121,14 +111,20 @@ export function MatchPage() {
                         {m.match_step_time()}
                       </div>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
 
             <button
               className="bg-cta-primary shadow-cta-primary rounded-control mt-3 w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
-              onClick={onStart}
+              disabled={steps.length === 0}
+              onClick={() => {
+                const first = steps[0];
+                if (first !== undefined) {
+                  enterStep(first.code);
+                }
+              }}
               type="button"
             >
               {m.match_go()}

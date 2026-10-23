@@ -35,16 +35,19 @@ export type GameExit = "completed" | "aborted" | "failed";
 
 // The one attempt-shaped record a run accumulates. Events are per-game
 // shapes mirroring the frozen proto Detail items (gen types at the game
-// side); the submit seam itself stays deferred until the submit adapter
-// lands. Stats are game-local counters the fact stream cannot express —
+// side); the submit adapter maps them onto the unified attempt contract.
+// Stats are game-local counters the fact stream cannot express —
 // misses / missedHigh / spawned_enemy are contract facts (the detail
-// messages carry them) awaiting the adapter; the rest stay local-display
-// facts with no upstream consumer.
+// messages carry them); the rest stay local-display facts with no
+// upstream consumer. The wall anchors bookend the run for the submit
+// contract's required started_at/ended_at (null before the run starts).
 export interface AttemptRecord {
   readonly events: readonly Record<string, unknown>[];
   readonly backgroundSpans: readonly { elapsedMs: number; durationMs: number }[];
   readonly stats: Readonly<Record<string, number>>;
   readonly exit: GameExit;
+  readonly startedAtMs: number | null;
+  readonly endedAtMs: number | null;
 }
 
 // What a game receives from the host. The mount element is host-owned —

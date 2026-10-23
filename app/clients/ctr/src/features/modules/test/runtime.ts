@@ -52,6 +52,8 @@ export class TestRunHost {
   private readonly onEnd: (record: AttemptRecord) => void;
   private exit: GameExit | null = null;
   private started = false;
+  private startWallMs: number | null = null;
+  private endWallMs: number | null = null;
   private userPaused = false;
   private backgroundOpen = false;
   private spanStartElapsedMs = 0;
@@ -85,6 +87,9 @@ export class TestRunHost {
 
   start(): void {
     this.started = true;
+    // The wall anchor for the submit contract's started_at — captured here,
+    // not at mount, so the intro ritual never inflates the attempt window.
+    this.startWallMs ??= this.now();
     this.clock.start();
     this.instance.start();
   }
@@ -115,6 +120,8 @@ export class TestRunHost {
       backgroundSpans: [...this.spans],
       stats: { ...this.stats },
       exit: this.exit ?? "aborted",
+      startedAtMs: this.startWallMs,
+      endedAtMs: this.endWallMs,
     };
   }
 
@@ -190,6 +197,7 @@ export class TestRunHost {
     }
     this.ended = true;
     this.exit = exit;
+    this.endWallMs = this.now();
     this.unbindVisibility();
     // Freeze the game face at end — without this, a game's own timers
     // (red_dot's target-swap chain) keep firing behind the end overlay.

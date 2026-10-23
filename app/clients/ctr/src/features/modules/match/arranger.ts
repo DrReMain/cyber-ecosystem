@@ -3,6 +3,7 @@
 // frozen domain law (§0.5: per-ability one test, genre pools by category,
 // universal feeds both) and is replaced wholesale by the server-side
 // session engine — same shape, server authority.
+import { getGameModule } from "../test/registry";
 
 export type Genre = "fps" | "moba";
 
@@ -59,4 +60,14 @@ export function defaultGenre(
   }
   if (fps === 0 && moba === 0) return null;
   return fps === moba ? null : fps > moba ? "fps" : "moba";
+}
+
+// The walkable lineup: arranged steps filtered to codes with a landed
+// engine — the catalog carries tests whose engines arrive in later batches,
+// and a step that dead-ends on the no-engine screen is not a flow step.
+// The engine registry is the single source of playability; the server
+// session face replaces this filter with server authority plus per-step
+// engine-state rendering.
+export function arrangePlayable(tests: CatalogTest[], genre: Genre): ArrangedStep[] {
+  return arrange(tests, genre).filter((step) => getGameModule(step.code) !== null);
 }

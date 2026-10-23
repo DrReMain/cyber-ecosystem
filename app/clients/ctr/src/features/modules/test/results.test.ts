@@ -7,7 +7,7 @@ function recordOf(
   stats: Record<string, number> = {},
   exit: AttemptRecord["exit"] = "completed",
 ): AttemptRecord {
-  return { events, backgroundSpans: [], stats, exit };
+  return { events, backgroundSpans: [], stats, exit, startedAtMs: 0, endedAtMs: 0 };
 }
 
 describe("local result derivation", () => {
