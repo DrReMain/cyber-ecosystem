@@ -8,7 +8,7 @@
 |---|---|---|
 | lzx | E0 契约(种子+增量2/3/4)、E1 骨架、E2 schema+种子、E3 评分(框架+Tier A 六款+提交缝,ce763107)、E6a/E6b、会员读面+admin 用户管理(88bcd9ba/3f272b28)、system 组合缝 ListUsersByPopulation(a8b9f0a4) | **▶ 视觉对齐批 V1 ✅ V2 ✅ V3 ✅(首页+编排+个人中心,genre 120°/mcard 族/fab 全族;待提交)→ admin 交互/文案对齐批(D-AK)**;后排:Tier A 余款四款(W3,首片 number_stars 补 CP1「过半」)→ E4(W4)→ PAY1+E8(W5) |
 | hzy | H1 系统态件、H2 协议页、H-A 引擎框架、H-B 反应瞄准批(四款引擎,mock 净拔除)、10-22 精修批(控制台三红根治/profile 写缝/D-AG 落地/C3)、10-23 H-C 全链(提交缝+回执卡+流程可走进场,真人链路验收过) | **下一片:E7 追踪技能批(W2-3 起,追踪批语义锚已备)** |
-| ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:**P13 窗外豁免签认(CP2 前)、P15 报告簇窗口(E5b 前)**、P8 性别(E5 前,W4 末;含协议正文联动)、P11(B 批前)、P12(E4 前)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
+| ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:**P13 窗外豁免签认(CP2 前)、P15 报告簇窗口(E5b 前)**、P8 性别(E5 前,W4 末;含协议正文联动)、P11(B 批前)、P12(E4 前)、P16 待标定款回执等级面(E5 报告面前)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
 
 **M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ✅(13 款评分面收满,报告分 e2e 挂 E5);E7 引擎 4/13(判定回路待 H-C);E4 ⏳(增量a 已落);E5/E8/E9/E10 未认领;M2 用户列表+档案首面已前拉落地;支付 PAY1-3 全未启动。**CP1(11-08)前瞻:达标面基本在手,风险面=支付沙箱零启动。**
 
@@ -105,3 +105,4 @@
 - 10-23 E4-b 复审提交:两轴评审(Standards/Spec 双子代理)吸收十项:硬违规=engine.go 种子直转 int64 补 ConvNum;重复过期律收拢 expireIfStale;难度词目具名 difficultyStandard(端口携字符串,反引成环,注释自含);proto 块注释英文化(切换/重新匹配原型标签移除);schema Comment 去 M1/ToB/交付叙述——迁移两轮重放(match_aggregate 重生成+test_record_session_ordinal 新增部分唯一索引);Spec 三实错=序数索引原子化+storeAttempt 碰撞重数一次(单测×2)、Switch 先验再关(单测)、Get 竞态读回幸存者(单测);attempt_no 残留校验随 c 清号;探针 400 误读一则(connect 错误 reason 在 ErrorInfo details 内,顶层无键)。
 - 10-23 H-C 代码面:提交缝薄适配器落地(submit.ts 四款逐字段映射+契约三计数+墙钟锚点入 AttemptRecord,onEnd 事件内单发防 StrictMode 双发,session id 形状就绪待 E4-c)+verdict 回执卡(四色档位 chip/无效四词双语+兜底/待校准降级/transport 拒绝走 ErrorFallback+重交,回执 toast 静默不双报)+EndFace 本地明细降辅助+match 流可走进场(arrangePlayable 过滤+开始/步骤行/须知 ready 直达首步 intro=原型语义锚,走查墙 3 闭,match_flow_soon 桩键净删);真人全链验收待微信登录,与 D-AG/C3 走查同场。
 - 10-23 H-C 真人链路验收(chrome-devtools 驱动,用户在场):微信登录态下五局面全绿——阵容过滤(fps=红点+闪现瞄准)/三入口直达 intro/正例(raw 550+S+权威 96.5)/无效反例(自动化 116ms 反应被服务端反作弊判 ABSURD_REACTION_TIME,红章双语渲染=四词面实证)/待校准降级 ×2;线上负载核验:257 事件逐字段过线 25KB、每局单发、锚点满程 30.002s;6132 探针(伪造 session id)404+ESPORTS_MATCH_SESSION_NOT_FOUND;D-AG 三件 DOM 断言(环 50px 白/20+lucide svg+图例条)与 C3(横屏 844 无溢出)同场过;控制台全程零红字。自动化勘误一则:MCP click 超时(~10s/次)吃掉首两局局窗致零事件,改单脚本全程驱动后通——游戏与缝零缺陷。
+- 10-23 P16 登记(prd.md,转 ljr):待标定款回执等级面——H-C 验收时用户发现 flash_aiming 回执无等级;基线=服务端标定曲线仅 red_dot 冻结,余 12 款权威/档位 null,ctr 按降级契约渲染;待裁三问=回执形态(原型灰「未评级」chip vs 文案注)/标定生产计划(转 lzx)/文案与称号终稿。
