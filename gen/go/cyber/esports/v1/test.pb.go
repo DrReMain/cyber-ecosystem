@@ -917,7 +917,7 @@ func (*SubmitTestAttemptRequest_EconomicSim) isSubmitTestAttemptRequest_RawDetai
 type SubmitTestAttemptResponse struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	RecordId string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	// Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
+	// Dual-track scoring: linear uncapped raw score, percentile-tiered
 	// authoritative score with its grade — neither is client-computable.
 	RawScore           *wrapperspb.DoubleValue `protobuf:"bytes,2,opt,name=raw_score,json=rawScore,proto3" json:"raw_score,omitempty"`
 	AuthoritativeScore *wrapperspb.DoubleValue `protobuf:"bytes,3,opt,name=authoritative_score,json=authoritativeScore,proto3" json:"authoritative_score,omitempty"`

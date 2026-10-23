@@ -28,7 +28,7 @@ interface StepFrameProps {
 
 /**
  * The shared chrome of the three onboarding steps: back fab, step counter,
- * and the three-segment progress rail (§4.7 tri-state — current amber with
+ * and the three-segment progress rail (tri-state — current amber with
  * glow, done cyan→blue, upcoming surface), over the ambient inside-scroll
  * shape (viewport-capped so the ambient chrome stays fixed while the column
  * scrolls).

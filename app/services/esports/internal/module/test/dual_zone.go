@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	// §6.7 frozen (Java DualZoneScorer + the skillPrediction page settle):
+	// Frozen (Java DualZoneScorer + the skillPrediction page settle):
 	// the survival reference and the preset weight stay ops-tunable through
 	// the base_score_time / difficulty_weight engine-param keys.
 	dualZoneBaseTimeSecDefault      = 30.0
@@ -91,14 +91,14 @@ func (dualZoneScorer) recompute(req *esportspb.SubmitTestAttemptRequest, params 
 	if durationMs := float64(params.durationSec) * 1000; durationMs > 0 &&
 		netMs-durationMs > dualZoneWallClockToleranceMs {
 		// The submitted span cannot exceed the server-configured length
-		// (§6.5 duration fabrication closure); the cold arm keeps a
+		// (a duration fabrication closure); the cold arm keeps a
 		// config-less call path scoreable.
 		return scoreResult{}, &invalidAttemptError{reason: reasonAbsurdTimeSpan}
 	}
 	baseTimeSec := params.num(dualZoneBaseTimeSecKey, dualZoneBaseTimeSecDefault)
 	weight := params.num(dualZoneDifficultyWeightKey, dualZoneDifficultyWeightDefault)
 	serverScore := max(0, min(netMs/1000/baseTimeSec*100*weight, dualZoneCompositeCap))
-	// Authoritative stays nil: the calibration curve is pending (§6.7).
+	// Authoritative stays nil: the calibration curve is pending.
 	return curvePendingResult(dodged, params, dualZoneUnitScoreDefault, round1(serverScore/10)), nil
 }
 

@@ -110,13 +110,13 @@ func (trackingMovingScorer) recompute(req *esportspb.SubmitTestAttemptRequest, p
 	multitasking := accuracy * 0.4
 	if avgLifetime < trackingMovingReactionBonusMs {
 		// The legacy arm pays this bonus to a hitless session too (its mean
-		// defaults to zero) — parity kept, disclosed in §6.13.
+		// defaults to zero) — parity kept, a disclosed carry.
 		multitasking += 0.3
 	}
 	if moveDistance > trackingMovingMoveBonusFloor {
 		multitasking += 0.3
 	}
 	composite := clamp(accuracy*4+stability+movement+multitasking*2, 0, 10)
-	// The linear track counts confirmed hits (§四: 10/有效命中).
+	// The linear track counts confirmed hits.
 	return curvePendingResult(hits, params, trackingMovingUnitScoreDefault, composite), nil
 }

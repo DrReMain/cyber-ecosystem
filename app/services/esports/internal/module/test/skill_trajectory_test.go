@@ -8,9 +8,9 @@ import (
 )
 
 // The law under test: the composite transcribed from the legacy settle
-// (SkillTrajectoryTestPage.tsx:332-374), with the unmatched-round sentinel
+// (the legacy page settle), with the unmatched-round sentinel
 // kept out of the deviation/speed means and inside the precision
-// denominator (§6.8).
+// denominator.
 func skillRound(n int32, dev float64, placeMs int32) *esportspb.SkillTrajectoryRound {
 	r := &esportspb.SkillTrajectoryRound{
 		RoundNumber:     n,
@@ -90,7 +90,7 @@ func TestSkillTrajectorySentinelRounds(t *testing.T) {
 }
 
 // The unit_score override rides the percentage track like every other
-// scorer's (§五 consistency contract).
+// scorer's — one config feeds client and server alike.
 func TestSkillTrajectoryUnitScoreOverride(t *testing.T) {
 	res, err := skillTrajectoryScorer{}.recompute(
 		skillTrajectoryRequest(

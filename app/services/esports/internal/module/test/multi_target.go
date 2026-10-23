@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	// §6.5 frozen (legacy engine TIER_SPECS); tier values stay ops-tunable
+	// Frozen (legacy engine TIER_SPECS); tier values stay ops-tunable
 	// through the tier_value_* engine-param keys without a deploy.
 	multiTargetHighValueDefault   = 100.0
 	multiTargetMediumValueDefault = 50.0
@@ -57,7 +57,7 @@ func (multiTargetScorer) recompute(req *esportspb.SubmitTestAttemptRequest, para
 		elapsed := float64(p.GetElapsedMs())
 		delta := elapsed - prev
 		prev = elapsed
-		// Pick-to-pick switching cost (§6.5): the frozen pick carries no
+		// Pick-to-pick switching cost: the frozen pick carries no
 		// spawn stamp, so the delta is the rebuildable form of legacy's
 		// click-minus-spawn reaction time.
 		if delta < reactionTimeMin {
@@ -100,7 +100,7 @@ func (multiTargetScorer) recompute(req *esportspb.SubmitTestAttemptRequest, para
 		valueScore+priorityScore+speedScore-
 			float64(trapHits)*multiTargetTrapPenalty-missedHigh*multiTargetMissedHighPenalty,
 		0, multiTargetCompositeCap)
-	// Authoritative stays nil: the calibration curve is pending (§6.5).
+	// Authoritative stays nil: the calibration curve is pending.
 	return curvePendingResult(hits, params, multiTargetUnitScoreDefault, composite), nil
 }
 

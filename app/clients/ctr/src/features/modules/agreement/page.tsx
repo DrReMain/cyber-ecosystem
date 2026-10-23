@@ -39,7 +39,7 @@ export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
     <AmbientLayout>
       <div className="flex w-full flex-col gap-3 pb-6">
         {/* Inline header — match's FlowHeader is another module's territory;
-            same shape (the §4.7 fab: 40px, borderless) declared here. */}
+            same shape (the prototype's fab: 40px, borderless) declared here. */}
         <div className="flex items-center gap-3">
           <button
             aria-label={m.common_back()}

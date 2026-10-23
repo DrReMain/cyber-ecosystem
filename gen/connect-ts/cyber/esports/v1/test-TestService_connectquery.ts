@@ -24,7 +24,7 @@ export const getTestConfig = TestService.method.getTestConfig;
  * per-game endpoints. Facts up, verdicts down: the client sends only
  * event facts (coordinates, timings, choices, environment); every
  * aggregate score is recomputed server-side from the detail stream and
- * returned as the dual-track verdict (§0.5). The admin record read face
+ * returned as the dual-track verdict. The admin record read face
  * (list/detail over stored attempts, ACCESS_ADMIN) consumes this
  * contract's stored shape and lands with E9.
  *

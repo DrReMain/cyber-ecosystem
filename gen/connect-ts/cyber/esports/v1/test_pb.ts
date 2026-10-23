@@ -443,7 +443,7 @@ export type SubmitTestAttemptResponse = Message<"cyber.esports.v1.SubmitTestAtte
   recordId: string;
 
   /**
-   * Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
+   * Dual-track scoring: linear uncapped raw score, percentile-tiered
    * authoritative score with its grade — neither is client-computable.
    *
    * @generated from field: google.protobuf.DoubleValue raw_score = 2;
@@ -1531,7 +1531,7 @@ export const TestService: GenService<{
    * per-game endpoints. Facts up, verdicts down: the client sends only
    * event facts (coordinates, timings, choices, environment); every
    * aggregate score is recomputed server-side from the detail stream and
-   * returned as the dual-track verdict (§0.5). The admin record read face
+   * returned as the dual-track verdict. The admin record read face
    * (list/detail over stored attempts, ACCESS_ADMIN) consumes this
    * contract's stored shape and lands with E9.
    *

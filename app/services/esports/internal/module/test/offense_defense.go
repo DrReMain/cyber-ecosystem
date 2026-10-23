@@ -12,7 +12,7 @@ const (
 	offenseDefenseSpeedDivisor  = 2000.0
 	offenseDefenseSpeedCap      = 2.0
 	// The legacy formula's flat consistency term — a constant every attempt
-	// earns; carried for curve parity and disclosed in §6.10.
+	// earns; carried for curve parity, a disclosed carry.
 	offenseDefenseConsistency       = 0.5
 	offenseDefenseTimeoutWeight     = 0.5
 	offenseDefenseTimeoutPenaltyCap = 2.0
@@ -76,6 +76,6 @@ func (offenseDefenseScorer) recompute(req *esportspb.SubmitTestAttemptRequest, p
 	penalty := min(offenseDefenseTimeoutPenaltyCap, float64(timeouts)*offenseDefenseTimeoutWeight)
 	composite := clamp(quality+speed+offenseDefenseConsistency-penalty, 0, 10)
 	// The legacy scorer computed a complex-scenario accuracy it never used;
-	// dead aggregate dropped. Authoritative stays nil (§6.10 curve pending).
+	// dead aggregate dropped. Authoritative stays nil (curve pending).
 	return curvePendingResult(correct, params, offenseDefenseUnitScoreDefault, round1(composite)), nil
 }

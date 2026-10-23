@@ -44,7 +44,7 @@ type TestServiceClient interface {
 	// per-game endpoints. Facts up, verdicts down: the client sends only
 	// event facts (coordinates, timings, choices, environment); every
 	// aggregate score is recomputed server-side from the detail stream and
-	// returned as the dual-track verdict (§0.5). The admin record read face
+	// returned as the dual-track verdict. The admin record read face
 	// (list/detail over stored attempts, ACCESS_ADMIN) consumes this
 	// contract's stored shape and lands with E9.
 	SubmitTestAttempt(ctx context.Context, in *SubmitTestAttemptRequest, opts ...grpc.CallOption) (*SubmitTestAttemptResponse, error)
@@ -117,7 +117,7 @@ type TestServiceServer interface {
 	// per-game endpoints. Facts up, verdicts down: the client sends only
 	// event facts (coordinates, timings, choices, environment); every
 	// aggregate score is recomputed server-side from the detail stream and
-	// returned as the dual-track verdict (§0.5). The admin record read face
+	// returned as the dual-track verdict. The admin record read face
 	// (list/detail over stored attempts, ACCESS_ADMIN) consumes this
 	// contract's stored shape and lands with E9.
 	SubmitTestAttempt(context.Context, *SubmitTestAttemptRequest) (*SubmitTestAttemptResponse, error)

@@ -53,7 +53,7 @@ func TestNumberStarsFastPaceGolden(t *testing.T) {
 	if res.extras[extraComposite] != 10 {
 		t.Errorf("composite = %v, want 10", res.extras[extraComposite])
 	}
-	// 15 correct taps × unit 15 = 225 (§6.4 band mid).
+	// 15 correct taps × unit 15 = 225 (band mid).
 	if res.raw != 225 {
 		t.Errorf("raw = %v, want 225", res.raw)
 	}

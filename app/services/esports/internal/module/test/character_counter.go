@@ -170,7 +170,7 @@ func (characterCounterScorer) recompute(req *esportspb.SubmitTestAttemptRequest,
 	}
 	if spanMs > durationSec*1000+spanGraceMs {
 		// Rounds share one session clock — their sum is bounded by the
-		// config mirror (§6.5 fabrication closure).
+		// config mirror (a fabrication closure).
 		return scoreResult{}, &invalidAttemptError{reason: reasonAbsurdTimeSpan}
 	}
 	avgSec := spanMs / 1000 / float64(len(rounds))

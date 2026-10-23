@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	// §6.1 frozen (Java RedDotScorer, 217-clean-run quantile anchors — an
+	// Frozen (Java RedDotScorer, 217-clean-run quantile anchors — an
 	// absolute standard, not population-drifting); only the unit score is
-	// calibratable (metric.md §四).
+	// calibratable.
 	redDotRTRef              = 500.0 // avgRt=500 → speed factor 1.0
 	redDotRTFloor            = 200.0
 	redDotRTCeil             = 1500.0
@@ -47,7 +47,7 @@ func (redDotScorer) recompute(req *esportspb.SubmitTestAttemptRequest, params sc
 		hits++
 		rt := float64(e.GetReactionTimeMs())
 		// Per-hit sanity window: a value outside it is fabricated data —
-		// the attempt is rejected, never scored zero (§6.1 outlier guard).
+		// the attempt is rejected, never scored zero (an outlier guard).
 		if rt < reactionTimeMin || rt > reactionTimeMax {
 			return scoreResult{}, &invalidAttemptError{reason: reasonAbsurdReactionTime}
 		}

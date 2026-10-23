@@ -7,7 +7,7 @@ import (
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 )
 
-// The band law under test: metric.md §2 top 5/15/40 map onto the C-end
+// The band law under test: the frozen top 5/15/40 map onto the C-end
 // four-band vocabulary through the quantile-frozen score scale.
 func TestBandEdges(t *testing.T) {
 	cases := []struct {
