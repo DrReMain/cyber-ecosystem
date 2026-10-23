@@ -24,7 +24,7 @@
 | E5 报告框架+能力报告 | — | 未认领 | 服务/客户端两半可并行 |
 | E6a ctr 纯壳 | lzx | ✅ 10-18 | D-R/S/T 全落;SEO 全量面同日收口 |
 | E6b 登录+画像流 | lzx | ✅ 10-20 | 接通片(微信真人链路绿)+完整形态(登录/三步向导/个人中心/首页)+机制修复+R1R2+流程前段四页;遗留契约缺口随对应片:SMS 骨架(system provider)、consent 版本记录、自定义游戏上限 3v20 口径 |
-| E7 游戏框架+13 款 | — | ⏳(引擎先行) | 反应瞄准批四款已由 H-A/H-B 前拉交付,批片余面=H-C 后 live 冒烟;追踪技能批/决策资源批未动 |
+| E7 游戏框架+13 款 | lzx(E7-a) | ⏳ 反应瞄准批收口 ✅ E7-a 10-23;余两批未动 | 引擎先行;E7-a=种子 engine_params 四款物化(nil 让渡律)+三款缩放守卫补齐+编排不卡死小修+批验收 live 冒烟(详节奏行);追踪技能批/决策资源批未动 |
 | E8 权益最小面 | — | 未认领 | D-W population 余件触发器=E8 |
 | E9 最小 admin 面 | — | 未认领 | 用户管理子面已另落(下行);本片=激活码+测试项/配置管理+报告策略 |
 | E10 全链 e2e | — | 未认领 | 全部依赖收口 |
@@ -51,7 +51,6 @@
 | 协议 consent 版本记录契约 | lzx | H2 versions.ts 真源 GET /agreements/current |
 | 自定义游戏偏好上限:服务端 20/产品口径 3 | ljr | config 读面缺口,随 E9 或裁 |
 | D-W population 余件(provider 行 member_population/座位迁移/guard 注释清理) | lzx | E8 权益面触发 |
-| 走查墙 3:match 编排含无引擎款(tracking/skill 排进四项,流程 4/4 走不完) | hzy(H-C 顺带)或 lzx 小修 | W2 |
 | 走查墙 4:运营测试账号口径——pg2-probe 无 user 座位登不进 admin 端;种子超管=admin/admin123456 | 用户侧 | 即办(SQL 补座位或文档化) |
 | B 批修正清单(login toast 指名/备案串/微信回填昵称;nickname emoji 显式;setup 后端取核验;profile 模块集对核;横屏残留核) | lzx | E3-f 收口后一片收(清单=coverage §七.5,D-AL) |
 | P11 年龄采集单/双轨待裁(契约单轨 vs 原型 band-only 合法) | ljr | B 批修正片前 |
@@ -108,3 +107,4 @@
 - 10-23 E4-c:ctr 切服务端编排收口:提交适配器落生(引擎事件流→契约 oneof 详情包装,4 款映射表+墙钟锚点入 host record)+会话面真化(arranger.ts 退役词表迁 vocabulary;阵容/done/retest_left 全服务端派生,genre 参数仅种子创建;switch 真调 SwitchMatchGenre+进度警面;guide 页 first/count 真化)+EndFace 判决卡(双轨分/等级/剩余重测/无效 reason 词表双语)+attempt_no 清号(残校随灭);breaking 红处置=骨架期清号合法类按声明线上报,提交后自愈,不设 ignore 豁免(用户裁定);文案纠偏两则+match_flow_soon 占位键退役;live 闭环:resume 局+0 事件局(0/C 仍扣预算)+40/40 局(400/98.7/S)+切 MOBA 新轴预算 1,psql 双会话/序数行锤实。
 - 10-23 E4-d:E4 e2e 收口(三验收全绿,pg7-probe 真人栈):同日稳定=三变体 Get(无参/异 genre 参数)+异 token 逐字节同,6d23h 窗内回拨仍原局复用,超窗重抽同 seed 同阵容(fps 两局 seed 逐位同=同日律穿过过期重生最强形);跨日变化=8 天回拨懒关(旧局 expired/新局 fresh 预算 1+done 空=重测不恢复)+无参投票路命中(csgo+valorant 2:0→fps)+python 逐位复刻 FNV-64a+SplitMix64 公式对三枚存量 seed 与三套阵容全校准后 day+1 反例(seed 三变,多池位实动 red_dot→number_stars/character_counter→resource_match);重排换 seed=Switch 真切 moba 盐 0→1 seed 必异(6544787544462260678→6545213055462283722)+未知 genre 先验再关(6131 拒+活跃局原样存活);附带 live:预算 1→0 重读不恢复、0 事件局 0/C 落库。观察一则(不阻塞):test 目录 List 单键 created_at 排序,种子 13 行同秒并列下池序实际靠 PG 返回序(自 E4-a 复现稳定),加固建议=第二排序键,随下次 schema 触碰带上;探针全 throwaway(/tmp,未入库),历史残迹注记=E4-b 迁移重放抹表致 test_record 三行孤儿 session_id(10-22 晚),非 E4 法缺陷。
 - 10-23 §指针存量清扫(独立机械片,2026-10-23 新法补面):全仓源面清零——esports 评分模块 22 文件(metric.md §6.x/§一..§五 单位分与公式坐标、旧仓文件+行号坐标→自含短语)、test.proto §0.5×2(gen 九文件注释面同步)、ctr 四文件(原型 §4.7/§3/block3 坐标)、conventions_guard×3 服务(执法消息 CONVENTIONS.md §4/§1/§6/§5a 自含化,§7 行键 K-* 保留)、tools 两件(nx-first-guard 拒因改正道提示;paraglide-parity 五处+biome 收行);显式替换表 70 对逐对唯一命中,§与文档名双路 grep 源面零残留;proto generate 注释面/breaking/esports+system+agent test/go lint+format/ctr build→typecheck→check/paraglide:check 自验/biome 全绿。
+- 10-23 E7-a:反应瞄准批收口(lzx)。①种子真化——test_config engine_params 四款物化(客户端 boot 键+服务端判分键,值=编译默认;nil 让渡律:种子不拥有的行 boot 不碰,为 admin 调参留路),upsert keep-in-step 双臂补齐,metric.md 四卡 boot 键行登记(键与卡同源);②真响应式补齐——flash_aiming/multi_target/target_recognition 三款补 ResizeObserver 缩放守卫(出界目标原身份重定位:同 id/同 spawn/同 deadline,miss 计量零接触;red_dot 既有律同族),三 logic 纯谓词+边界钉;③编排不卡死(走查墙 3 销)——match 页 next 跳过无引擎步(引擎注册表判据),无引擎行渲染「即将上线」标签+降透明,跳步=未测可跳既有法;④批验收 live(pg7 隔离上下文,避让共享 Chrome 他人活跃会话):跳步 live(/match→开始测试→唯一引擎步)、target_recognition 绑定局无效路(合成机器点击触发 ABSURD_REACTION_TIME 判无效,判决卡双语 reason 渲染+记录落库 valid=f/spawnedEnemy=24/clicks=6/跨度 30.002s)、flash_aiming 练习局有效路(raw=100=10×10,shots=10/misses=26 逐位对齐,曲线待校准降级渲染「—」法定)、multi_target 练习局双形(0 拾取诚实零 raw=0/missedHigh=6;25 拾取 raw=250 线性轨+本地 1250 复合轨 extras,picks 流 camelCase 契约形状,missedHigh=7 对齐)、配置流真化(DB 调 target_size_px 20→60→页内靶径 40px→120px 实测,复原)、缩放守卫 live(1300→500 宽缩窗,red_dot 单靶重绘界内 987→255,multi_target 五靶缩后零出界残留)。走查注一则:multi_target 本地辅助卡「平均决策」怪值(20341ms,本地陈旧公式;服务端差分重算为真值,本地卡法定辅助)——hzy 顺手清。门禁:esports build/test 绿+gofmt/vet 净,ctr build→typecheck→check 绿+vitest 45/45(42+3 新钉),docs:check 绿。

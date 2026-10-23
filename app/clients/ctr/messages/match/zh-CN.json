@@ -9,6 +9,7 @@
   "match_step_time": "约 30 秒",
   "match_step_left": "剩 {n} 次",
   "match_step_left_zero": "已用完",
+  "match_step_engine_soon": "即将上线",
   "match_step_best": "本次最高 {score}",
   "match_error_title": "场次加载失败",
   "match_error_desc": "请检查网络后重试",

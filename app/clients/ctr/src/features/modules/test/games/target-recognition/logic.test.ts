@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { distance, drawType, isHit, randomCenter, TARGET_RECOGNITION_DEFAULTS } from "./logic";
+import {
+  distance,
+  drawType,
+  isHit,
+  outsidePaddedArea,
+  randomCenter,
+  TARGET_RECOGNITION_DEFAULTS,
+} from "./logic";
 
 const area = { width: 390, height: 700 };
 
@@ -32,5 +39,15 @@ describe("target-recognition logic", () => {
 
   it("measures plain euclidean distance", () => {
     expect(distance({ x: 0, y: 0 }, { x: 3, y: 4 })).toBe(5);
+  });
+
+  it("flags a center stranded past the spawn padding after a shrink", () => {
+    const padding = TARGET_RECOGNITION_DEFAULTS.spawnPaddingPx;
+    const shrunk = { width: 400, height: 500 };
+    // Exactly on the margin stays in-bounds; past it is stranded.
+    expect(outsidePaddedArea({ x: padding, y: padding }, shrunk, padding)).toBe(false);
+    expect(outsidePaddedArea({ x: padding - 0.1, y: padding }, shrunk, padding)).toBe(true);
+    expect(outsidePaddedArea({ x: 380, y: 150 }, shrunk, padding)).toBe(true);
+    expect(outsidePaddedArea({ x: 150, y: 190 }, shrunk, padding)).toBe(false);
   });
 });

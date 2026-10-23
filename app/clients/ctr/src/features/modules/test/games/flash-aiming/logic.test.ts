@@ -3,6 +3,7 @@ import {
   deviationOf,
   FLASH_AIMING_DEFAULTS,
   isCenterHit,
+  outsideSafeArea,
   randomCenter,
   randomLifetime,
   randomSize,
@@ -38,5 +39,15 @@ describe("flash-aiming logic", () => {
   it("keeps deviation raw — no rounding law", () => {
     // √2 stays unrounded (red_dot would round to 1.4).
     expect(deviationOf({ x: 0, y: 0 }, { x: 1, y: 1 })).toBe(Math.SQRT2);
+  });
+
+  it("flags a center stranded past the spawn margin after a shrink", () => {
+    const size = 40;
+    const shrunk = { width: 200, height: 300 };
+    // Exactly on the margin stays in-bounds; past it is stranded.
+    expect(outsideSafeArea({ x: size, y: size }, shrunk, size)).toBe(false);
+    expect(outsideSafeArea({ x: size - 0.1, y: size }, shrunk, size)).toBe(true);
+    expect(outsideSafeArea({ x: 190, y: 150 }, shrunk, size)).toBe(true);
+    expect(outsideSafeArea({ x: 150, y: 250 }, shrunk, size)).toBe(false);
   });
 });

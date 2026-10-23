@@ -11,6 +11,7 @@ import {
   deviationOf,
   FLASH_AIMING_DEFAULTS,
   type FlashAimingParams,
+  outsideSafeArea,
   type Point,
   randomCenter,
   randomLifetime,
@@ -24,7 +25,7 @@ import {
 interface LiveTarget {
   readonly id: string;
   readonly el: HTMLElement;
-  readonly center: Point;
+  center: Point;
   readonly size: number;
   readonly spawnAt: number;
   /** Absolute expiry (ctx.now base); kept fresh by every re-arm. */
@@ -70,6 +71,7 @@ export const flashAimingModule: GameModule = {
     let spawnTimer: ReturnType<typeof setTimeout> | null = null;
     let spawnDeadline = 0;
     let spawnParkedMs: number | null = null;
+    let observer: ResizeObserver | null = null;
 
     function clearTimer(timer: ReturnType<typeof setTimeout> | null): null {
       if (timer !== null) {
@@ -176,6 +178,23 @@ export const flashAimingModule: GameModule = {
       // A click does not pull the next spawn forward — the cadence owns it.
     }
 
+    function onResize(): void {
+      if (destroyed || visible === null) {
+        return;
+      }
+      // A shrunk stage strands the visible target off-screen where no tap
+      // can reach it and its expiry would land an unfair miss — redraw the
+      // same target (same id, spawn, and deadline) at a fresh in-bounds
+      // spot instead of respawning, so the click-or-miss accounting stays
+      // untouched.
+      if (outsideSafeArea(visible.center, spawnAreaOf(stage), visible.size)) {
+        const pos = randomCenter(spawnAreaOf(stage), visible.size);
+        visible.center = pos;
+        visible.el.style.left = `${pos.x - visible.size / 2}px`;
+        visible.el.style.top = `${pos.y - visible.size / 2}px`;
+      }
+    }
+
     return {
       start(): void {
         if (destroyed || started) {
@@ -183,6 +202,8 @@ export const flashAimingModule: GameModule = {
         }
         started = true;
         ctx.mount.appendChild(stage);
+        observer = new ResizeObserver(onResize);
+        observer.observe(stage);
         armSpawn(params.spawnIntervalMs);
       },
       pause(): void {
@@ -224,6 +245,8 @@ export const flashAimingModule: GameModule = {
         }
         pending.clear();
         visible = null;
+        observer?.disconnect();
+        observer = null;
         stage.remove();
       },
     };

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { drawTier, MULTI_TARGET_DEFAULTS, randomCenter, spawnInterval, TIER_SPECS } from "./logic";
+import {
+  drawTier,
+  MULTI_TARGET_DEFAULTS,
+  outsideSafeArea,
+  randomCenter,
+  spawnInterval,
+  TIER_SPECS,
+} from "./logic";
 
 const area = { width: 390, height: 700 };
 
@@ -33,5 +40,15 @@ describe("multi-target logic", () => {
     expect(randomCenter(area, 40, () => 1)).toEqual({ x: 350, y: 660 });
     const tiny = { width: 50, height: 700 };
     expect(randomCenter(tiny, 40, () => 0)).toEqual({ x: 25, y: 350 });
+  });
+
+  it("flags a center stranded past its radius after a shrink", () => {
+    const radius = 40;
+    const shrunk = { width: 200, height: 300 };
+    // Exactly on the margin stays in-bounds; past it is stranded.
+    expect(outsideSafeArea({ x: radius, y: radius }, shrunk, radius)).toBe(false);
+    expect(outsideSafeArea({ x: radius - 0.1, y: radius }, shrunk, radius)).toBe(true);
+    expect(outsideSafeArea({ x: 190, y: 150 }, shrunk, radius)).toBe(true);
+    expect(outsideSafeArea({ x: 150, y: 250 }, shrunk, radius)).toBe(false);
   });
 });

@@ -15,6 +15,7 @@ import {
   distance,
   drawType,
   isHit,
+  outsidePaddedArea,
   type Point,
   randomCenter,
   type SpawnArea,
@@ -76,7 +77,7 @@ const LEGEND_LABEL: Record<TargetType, () => string> = {
 interface LiveTarget {
   readonly id: string;
   readonly el: HTMLElement;
-  readonly center: Point;
+  center: Point;
   readonly spec: TypeSpec;
   readonly spawnAt: number;
   /** Absolute expiry (ctx.now base); kept fresh by every re-arm. */
@@ -144,6 +145,7 @@ export const targetRecognitionModule: GameModule = {
     let spawnTimer: ReturnType<typeof setTimeout> | null = null;
     let spawnDeadline = 0;
     let spawnParkedMs: number | null = null;
+    let observer: ResizeObserver | null = null;
 
     function clearTimer(timer: ReturnType<typeof setTimeout> | null): null {
       if (timer !== null) {
@@ -279,6 +281,22 @@ export const targetRecognitionModule: GameModule = {
       ctx.stat("blankClicks", blankClicks);
     }
 
+    function onResize(): void {
+      if (destroyed || target === null) {
+        return;
+      }
+      // A shrunk stage strands the target off-screen where the hit test
+      // can never be satisfied — move the same target (same id and spawn,
+      // so the reaction clock keeps running truthfully) to a fresh
+      // in-bounds spot.
+      if (outsidePaddedArea(target.center, spawnAreaOf(stage), params.spawnPaddingPx)) {
+        const pos = randomCenter(spawnAreaOf(stage), params.spawnPaddingPx);
+        target.center = pos;
+        target.el.style.left = `${pos.x}px`;
+        target.el.style.top = `${pos.y}px`;
+      }
+    }
+
     return {
       start(): void {
         if (destroyed || started) {
@@ -288,6 +306,8 @@ export const targetRecognitionModule: GameModule = {
         ctx.mount.appendChild(stage);
         stage.appendChild(legend);
         stage.addEventListener("pointerdown", onStageTap);
+        observer = new ResizeObserver(onResize);
+        observer.observe(stage);
         // The first target shows immediately (legacy law), the cadence after.
         spawnOnce();
         armSpawn(params.spawnIntervalMs);
@@ -324,6 +344,8 @@ export const targetRecognitionModule: GameModule = {
         destroyed = true;
         spawnTimer = clearTimer(spawnTimer);
         removeTarget();
+        observer?.disconnect();
+        observer = null;
         stage.removeEventListener("pointerdown", onStageTap);
         stage.remove();
       },

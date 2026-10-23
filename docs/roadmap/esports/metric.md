@@ -106,6 +106,7 @@
 
   分段线性;raw > 59.6 段斜率 = (100−99)/(120−59.6)。离群防护:荒谬反应时直接判数据异常(不记 0 分)。
 - 评级映射:主锚点=平均反应时,辅助=命中率,初始门槛沿用 §6.2 flash_aiming 反应时锚点族(🔗 Human Benchmark:普通人简单反应时 200-250ms,职业 170-200,顶尖 150-170;选择反应时 350-400)。
+- 引擎 boot 键(2026-10-23 E7-a 物化入 test_config KV,值=编译默认,键与本卡同源):target_size_px=20/target_lifetime_ms=1500/spawn_padding_px=50;判分键 unit_score=10。
 
 ### 6.2 flash_aiming 定稿卡(MSF)
 
@@ -121,6 +122,7 @@
 
 评级映射 🔗(主锚点 M1+辅助 M3):顶尖 ≤170ms ≥90% / 职业 ≤200 ≥85% / 准职业 ≤220 ≥80% / 高水平 ≤250 ≥75% / 普通 ≤280 / 入门 >280(百分位 ≥99/95/85/60/30/<30)。
 重算(公式已于 E3-b 2026-10-21 誊录入 `module/test/flash_aiming.go`,锚=旧前端 FlashAimingTestPage.tsx:134-178):`composite = clamp(hitRate + accuracy + deviation + reaction, 0, 10)`,其中 `hitRate = 命中/(命中+失误) × 3`、`accuracy = 中心命中/命中 × 4`(中心命中 = deviation ≤ center_hit_deviation_px,引擎参数键与客户端 boot pack 同源,默认 20px)、`deviation = max(0, (30−平均偏差)/5)`、`reaction = max(0, (800−平均瞄准时)/100)`;空 shots 退化为 平均偏差 30/平均瞄准时 800(两分项归零);平均瞄准时 <80ms 判数据异常拒收。composite 为未来校准曲线的输入;权威分曲线未定稿前 authoritative 留空。
+引擎 boot 键(2026-10-23 E7-a 物化入 test_config KV,值=编译默认):spawn_interval_ms=800/target_size_min_px=30/target_size_span_px=50/target_lifetime_min_ms=500/target_lifetime_span_ms=1000/center_hit_deviation_px=20;判分键 unit_score=10。
 
 ### 6.3 moving_target 定稿卡(E3-j;**Tier B→A 升格**,合成式誊录)
 
@@ -154,6 +156,7 @@
 重算:hits=is_hit 拾取数(陷阱拾取计入,旧仓 targetsHit 口径);rawTotal=Σ 档位值(high 100/medium 50/low 25/trap −50;档位值=引擎参数键 tier_value_{high|medium|low|trap} 可调,缺省=本表);决策时间=相邻拾取 elapsed 差分(首枚=距开始)。⚠️ 合成式改编披露:旧仓 avgDecisionTime=点击−该靶出生时刻,冻结契约的 pick 无出生戳,差分重建即「目标切换耗时」本义(本卡范式名同源)。闸门:差分<80ms=捏造(AbsurdReactionTime 拒收;较旧仓均值闸更严,red_dot 逐点法同款);档位词表外值=DetailMismatch(辖全部拾取,is_hit=false 同拒)。差分链跨全部拾取入链入闸。
 公式(对齐旧前端 MultiTargetTestPage.tsx:177-210 与 Java MultiTargetScorer 逐行):value=rawTotal/(max(durationSec,1)×100)×5;priority=highHits/hits×3;speed=max(0,(1500−avgDecision)/150);composite=clamp(value+priority+speed−0.3×trapHits−0.2×missedHigh,0,10);hits=0→诚实零。⚠️ duration 取服务端 test_config(旧仓取客户端起止差,缩 Span 可抬 value 的 fabrication 面就此关闭);durationSec≤0 回退 30s(Java 同款冷臂,种子默认下不触)。
 轨一:raw=hits×unit_score×难度(§四:10/命中);权威轨:曲线未定稿,authoritative 留空,composite 入 extras 待曲线(§6.2 flash_aiming 同款)。
+引擎 boot 键(2026-10-23 E7-a 物化入 test_config KV,值=编译默认):spawn_interval_min_ms=500/spawn_interval_span_ms=400/target_lifetime_ms=2500/max_on_screen=8;判分键 tier_value_high|medium|low|trap=100/50/25/−50、unit_score=10。
 
 ### 6.6 target_recognition 定稿卡(E3-d;Tier A 升格,合成式誊录)
 
@@ -162,6 +165,7 @@
 公式(对齐旧仓 targetRecognitionScoring.ts PRD §2.13 与 Java 闸门):accuracy=correct/spawned_enemy×5;speed=max(0,(600−avgRt)/60);visual=min(1,max(0,1−(avgRt−200)/800))×2;composite=clamp(accuracy+speed+visual−0.4×falsePositives−0.2×max(0,spawned−correct),0,10);correct=0 或 spawned=0→诚实零。
 闸门:逐点击 rt∈[80,60000](present 才判);correct>spawned_enemy=DetailMismatch(计数偏差,旧仓客户端钳 [0,100] 的服务端化);靶型词表外值=DetailMismatch。
 轨一:raw=correct×unit_score×难度(§四:20/正确识别);权威轨:曲线未定稿留空,composite 入 extras。
+引擎 boot 键(2026-10-23 E7-a 物化入 test_config KV,值=编译默认):spawn_interval_ms=700/spawn_padding_px=100/click_detection_range_px=25/invalid_click_margin_px=2;判分键 unit_score=20。
 
 ### 6.7 dual_zone 定稿卡(E3-e;Tier A,合成式誊录)
 

@@ -9,6 +9,7 @@
   "match_step_time": "About 30s",
   "match_step_left": "Retakes left: {n}",
   "match_step_left_zero": "Spent",
+  "match_step_engine_soon": "Coming soon",
   "match_step_best": "Session best {score}",
   "match_error_title": "Session failed to load",
   "match_error_desc": "Check your connection and retry",

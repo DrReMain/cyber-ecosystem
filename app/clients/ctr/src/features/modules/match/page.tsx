@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
+import { getGameModule } from "#/features/modules/test/registry";
 import { m } from "#/paraglide/messages";
 import { reasonGenreUndecided } from "./session";
 import { FlowHeader } from "./ui/flow-header";
@@ -23,14 +24,20 @@ interface StepRowProps {
   readonly ability: string;
   readonly name: string;
   readonly left: number;
+  readonly ready: boolean;
 }
 
 // One lineup row: the ability face, the drawn test's name, and the retake
-// receipt (the "N/3" face, zero reads as spent).
-function StepRow({ index, ability, name, left }: Readonly<StepRowProps>) {
+// receipt (the "N/3" face, zero reads as spent). A step whose engine has
+// not shipped yet renders dimmed with a coming-soon tag instead of the
+// retake receipt — the flow's start button skips it, so the tag is what
+// keeps the row honest.
+function StepRow({ index, ability, name, left, ready }: Readonly<StepRowProps>) {
   const word = abilityWord(ability);
   return (
-    <div className="border-line bg-surface-card shadow-card rounded-control flex items-center gap-[11px] border px-[13px] py-[11px]">
+    <div
+      className={`border-line bg-surface-card shadow-card rounded-control flex items-center gap-[11px] border px-[13px] py-[11px] ${ready ? "" : "opacity-60"}`}
+    >
       <div
         className={`${word.gradient} rounded-control flex h-[38px] w-[38px] shrink-0 items-center justify-center text-[15px] font-bold text-white`}
       >
@@ -42,15 +49,19 @@ function StepRow({ index, ability, name, left }: Readonly<StepRowProps>) {
       </div>
       <div className="shrink-0 text-right">
         <div className="text-ink-secondary text-[12px]">{name}</div>
-        <div className="text-ink-tertiary mt-0.5 flex items-center justify-end gap-1 text-[10px]">
-          <span>{m.match_step_time()}</span>
-          <span aria-hidden>·</span>
-          {left > 0 ? (
-            <span className="text-status-ok font-bold">{m.match_step_left({ n: left })}</span>
-          ) : (
-            <span>{m.match_step_left_zero()}</span>
-          )}
-        </div>
+        {ready ? (
+          <div className="text-ink-tertiary mt-0.5 flex items-center justify-end gap-1 text-[10px]">
+            <span>{m.match_step_time()}</span>
+            <span aria-hidden>·</span>
+            {left > 0 ? (
+              <span className="text-status-ok font-bold">{m.match_step_left({ n: left })}</span>
+            ) : (
+              <span>{m.match_step_left_zero()}</span>
+            )}
+          </div>
+        ) : (
+          <div className="text-ink-tertiary mt-0.5 text-[10px]">{m.match_step_engine_soon()}</div>
+        )}
       </div>
     </div>
   );
@@ -68,9 +79,9 @@ function GenreHeaderCard({ genre, switched }: Readonly<GenreHeaderCardProps>) {
   const Icon = genre === "moba" ? Hexagon : Crosshair;
   return (
     <div
-      className={`${meta.gradient} rounded-card flex items-center gap-[13px] overflow-hidden p-4`}
+      className={`${meta.gradient} rounded-card flex items-center gap-3.25 overflow-hidden p-4`}
     >
-      <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[rgba(0,0,0,0.22)] text-xl text-white">
+      <div className="flex h-11.5 w-11.5 shrink-0 items-center justify-center rounded-xl bg-[rgba(0,0,0,0.22)] text-xl text-white">
         <Icon aria-hidden size={20} />
       </div>
       <div className="min-w-0 flex-1">
@@ -142,8 +153,14 @@ export function MatchPage() {
   const steps = session?.steps ?? [];
   const leftOf = (code: string): number => session?.retestLeft?.[code] ?? 0;
   const nameOf = (code: string) => tests.find((t) => t.code === code)?.name ?? code;
+  const engineReady = (code: string): boolean => getGameModule(code) !== null;
   const doneCount = (session?.done ?? []).length;
-  const next = steps.find((s) => s.testCode != null && leftOf(s.testCode) > 0);
+  // An untested step is skippable by law, and a step whose engine has not
+  // shipped must be skipped — the start button walks the engine-backed
+  // steps only, never parking the flow on an unplayable one.
+  const next = steps.find(
+    (s) => s.testCode != null && leftOf(s.testCode) > 0 && engineReady(s.testCode),
+  );
   const undecided =
     (sessionQuery.error as { reason?: string } | null)?.reason === reasonGenreUndecided;
   // The session's genre is an open word on the wire; faces narrow it to
@@ -194,6 +211,7 @@ export function MatchPage() {
                   key={step.testCode ?? i}
                   left={leftOf(step.testCode ?? "")}
                   name={nameOf(step.testCode ?? "")}
+                  ready={engineReady(step.testCode ?? "")}
                 />
               ))}
             </div>
