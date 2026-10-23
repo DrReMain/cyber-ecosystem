@@ -3132,14 +3132,6 @@ components:
                 testCode:
                     type: string
                     description: Code join key (e.g. "red_dot") — same law as Test.code.
-                attemptNo:
-                    type: integer
-                    description: |-
-                        Legacy client-carried ordinal — ignored: the session law computes
-                         ordinals server-side (count of prior records in the session for this
-                         test, plus one). Rides for wire stability until the client submitter
-                         drops it.
-                    format: int32
                 matchSessionId:
                     type: string
                     description: |-

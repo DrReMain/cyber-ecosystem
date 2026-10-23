@@ -7,7 +7,11 @@
   "match_sub": "{n} abilities · about {n} min",
   "match_done": "{done} / {total}",
   "match_step_time": "About 30s",
+  "match_step_left": "Retakes left: {n}",
+  "match_step_left_zero": "Spent",
   "match_step_best": "Session best {score}",
+  "match_error_title": "Session failed to load",
+  "match_error_desc": "Check your connection and retry",
   "match_go": "Start",
   "match_go_result": "See results",
   "match_btn_guide": "How it works",
@@ -17,7 +21,7 @@
   "match_switch_tgt": "Switch to",
   "match_switch_rules": "Switch rules",
   "match_switch_rule1": "Applies to this session only — your saved default type is untouched",
-  "match_switch_rule2": "Completed tests are never arranged again (same user, same test)",
+  "match_switch_rule2": "Switching closes this session and redraws — the same test may appear again",
   "match_switch_rule3": "Re-arranged in the new type's ability order",
   "match_switch_ok": "Confirm switch",
   "match_switch_cancel": "Cancel",
@@ -50,7 +54,7 @@
   "match_guide_rule4_t": "Best score shown",
   "match_guide_rule4_d": "Multiple runs of one test show the session best",
   "match_guide_rule5_t": "Resume after exit",
-  "match_guide_rule5_d": "Progress keeps 7 days; a stale cache reconstructs the remaining items without re-arranging",
+  "match_guide_rule5_d": "Progress keeps for 7 days; past that the next visit draws a fresh session",
   "match_guide_score_t": "Scoring",
   "match_guide_score_d": "Retake freely — the session best is shown; the all-time best is the cross-session per-ability maximum.",
   "match_guide_ready": "I'm ready",
@@ -60,6 +64,5 @@
   "match_ability_tracking": "Tracking Stability",
   "match_ability_skill": "Skill Accuracy",
   "match_ability_resource": "Resource Allocation",
-  "match_ability_decision": "Decision Efficiency",
-  "match_flow_soon": "The game runtime is coming soon"
+  "match_ability_decision": "Decision Efficiency"
 }

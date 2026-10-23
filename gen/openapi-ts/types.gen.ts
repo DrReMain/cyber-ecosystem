@@ -626,13 +626,6 @@ export type CyberEsportsV1SubmitTestAttemptRequest = {
      */
     testCode?: string;
     /**
-     * Legacy client-carried ordinal — ignored: the session law computes
-     * ordinals server-side (count of prior records in the session for this
-     * test, plus one). Rides for wire stability until the client submitter
-     * drops it.
-     */
-    attemptNo?: number;
-    /**
      * Presence binds the attempt to that match session: the test must be one
      * of the session's locked steps, the ordinal and retest budget are
      * session law, and the score rides the session's difficulty mode.

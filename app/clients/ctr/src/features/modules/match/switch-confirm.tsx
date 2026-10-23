@@ -1,36 +1,45 @@
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useQuery as useConnectQuery, useMutation } from "@connectrpc/connect-query";
+import {
+  getMatchSession,
+  switchMatchGenre,
+} from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
-import type { Genre } from "./arranger";
+import { invalidateMatchSession } from "./session";
 import { FlowHeader } from "./ui/flow-header";
-import { genreLabel } from "./vocabulary";
+import { genreLabel, narrowGenre } from "./vocabulary";
 
 /**
  * The switch confirmation (prototype match-switch-confirm): current →
- * target cards, the three-rule card, confirm/cancel. The progress warning
- * face exists in the prototype but stays unrendered until the match session
- * carries real progress — this session's done count is always zero now.
+ * target cards read from the live session, the three-rule card, the
+ * progress warning when this session already has stored attempts, and the
+ * real switch call — the server closes the active session (even a fresh
+ * one) and draws a replacement under a forced-new seed.
  */
 export function SwitchConfirmPage() {
   const navigate = useNavigate();
-  const search = useSearch({ from: "/match/switch" }) as { from?: Genre };
-  const cur = search.from === "moba" ? "moba" : "fps";
-  const tgt: Genre = cur === "fps" ? "moba" : "fps";
-
-  function onConfirm() {
-    toast.success(m.match_switch_toast({ type: genreLabel(tgt) }));
-    void navigate({ to: "/match", search: { genre: tgt } });
-  }
+  const queryClient = useQueryClient();
+  const sessionQuery = useConnectQuery(getMatchSession, {});
+  const session = sessionQuery.data?.session ?? null;
+  const doneCount = (session?.done ?? []).length;
+  const cur = narrowGenre(session?.genre) ?? "fps";
+  const tgt = cur === "fps" ? ("moba" as const) : ("fps" as const);
+  const doSwitch = useMutation(switchMatchGenre, {
+    onSuccess: () => {
+      invalidateMatchSession(queryClient);
+      toast.success(m.match_switch_toast({ type: genreLabel(tgt) }));
+      void navigate({ to: "/match" });
+    },
+  });
 
   return (
     <AmbientLayout>
       <div className="flex w-full flex-col gap-3 pb-6">
-        <FlowHeader
-          onBack={() => void navigate({ to: "/match", search: { genre: cur } })}
-          title={m.match_switch_title()}
-        />
+        <FlowHeader onBack={() => void navigate({ to: "/match" })} title={m.match_switch_title()} />
 
         <div className="border-line bg-surface-card rounded-card border p-4">
           <div className="flex items-center gap-2.5">
@@ -46,6 +55,12 @@ export function SwitchConfirmPage() {
           </div>
         </div>
 
+        {doneCount > 0 && (
+          <div className="border-status-pending/45 bg-surface-deep text-status-pending rounded-control border p-3.5 text-[12px] leading-relaxed">
+            {m.match_switch_warn({ n: doneCount, type: genreLabel(tgt) })}
+          </div>
+        )}
+
         <div className="border-line bg-surface-deep text-ink-tertiary rounded-control border p-3.5 text-[12px] leading-relaxed">
           <div className="text-ink-secondary font-bold">{m.match_switch_rules()}</div>
           <div className="mt-1.5">· {m.match_switch_rule1()}</div>
@@ -54,15 +69,16 @@ export function SwitchConfirmPage() {
         </div>
 
         <button
-          className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
-          onClick={onConfirm}
+          className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-40"
+          disabled={doSwitch.isPending}
+          onClick={() => doSwitch.mutate({ genre: tgt })}
           type="button"
         >
           {m.match_switch_ok()}
         </button>
         <button
           className="border-line bg-surface-content text-ink rounded-control w-full border px-4 py-[14px] text-[15px] font-bold active:opacity-60"
-          onClick={() => void navigate({ to: "/match", search: { genre: cur } })}
+          onClick={() => void navigate({ to: "/match" })}
           type="button"
         >
           {m.match_switch_cancel()}

@@ -1,18 +1,16 @@
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
-import { listGames } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/game-GameService_connectquery";
-import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import { listTests } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test-TestService_connectquery";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Crosshair, Hexagon } from "lucide-react";
 import { useEffect } from "react";
-import { toast } from "sonner";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
-import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
+import { StateScreen } from "#/features/app/states/state-screen";
 import { m } from "#/paraglide/messages";
-import { arrange, defaultGenre, type Genre } from "./arranger";
+import { reasonGenreUndecided } from "./session";
 import { FlowHeader } from "./ui/flow-header";
-import { abilityWord, genreLabel, genreMeta } from "./vocabulary";
+import { abilityWord, type Genre, genreLabel, genreMeta, narrowGenre } from "./vocabulary";
 
 /* The guide page's own orb pair (prototype match-guide). */
 const guideOrbs: readonly AmbientOrb[] = [
@@ -20,49 +18,154 @@ const guideOrbs: readonly AmbientOrb[] = [
   { className: "bottom-[-60px] right-[-70px] size-[min(54vw,210px)]", tone: "cyan" },
 ];
 
+interface StepRowProps {
+  readonly index: number;
+  readonly ability: string;
+  readonly name: string;
+  readonly left: number;
+}
+
+// One lineup row: the ability face, the drawn test's name, and the retake
+// receipt (the "N/3" face, zero reads as spent).
+function StepRow({ index, ability, name, left }: Readonly<StepRowProps>) {
+  const word = abilityWord(ability);
+  return (
+    <div className="border-line bg-surface-card shadow-card rounded-control flex items-center gap-[11px] border px-[13px] py-[11px]">
+      <div
+        className={`${word.gradient} rounded-control flex h-[38px] w-[38px] shrink-0 items-center justify-center text-[15px] font-bold text-white`}
+      >
+        {index + 1}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-ink text-sm font-extrabold">{word.cn}</div>
+        <div className="text-ink-tertiary mt-0.5 text-[9.5px] tracking-[0.9px]">{word.en}</div>
+      </div>
+      <div className="shrink-0 text-right">
+        <div className="text-ink-secondary text-[12px]">{name}</div>
+        <div className="text-ink-tertiary mt-0.5 flex items-center justify-end gap-1 text-[10px]">
+          <span>{m.match_step_time()}</span>
+          <span aria-hidden>·</span>
+          {left > 0 ? (
+            <span className="text-status-ok font-bold">{m.match_step_left({ n: left })}</span>
+          ) : (
+            <span>{m.match_step_left_zero()}</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface GenreHeaderCardProps {
+  readonly genre: Genre;
+  readonly switched: boolean;
+}
+
+// The genre banner: icon, bilingual name, and the origin tag (a genre
+// param in the URL marks an explicitly chosen session).
+function GenreHeaderCard({ genre, switched }: Readonly<GenreHeaderCardProps>) {
+  const meta = genreMeta(genre);
+  const Icon = genre === "moba" ? Hexagon : Crosshair;
+  return (
+    <div
+      className={`${meta.gradient} rounded-card flex items-center gap-[13px] overflow-hidden p-4`}
+    >
+      <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[rgba(0,0,0,0.22)] text-xl text-white">
+        <Icon aria-hidden size={20} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-[17px] leading-tight font-black text-white">{meta.cn}</div>
+        <div className="mt-0.5 text-[10.5px] tracking-[1.6px] text-white/80">{meta.en}</div>
+      </div>
+      <span className="shrink-0 rounded-full bg-white/20 px-2.5 py-1 text-[10.5px] font-extrabold text-white">
+        {switched ? m.match_tag_switched() : m.match_tag_default()}
+      </span>
+    </div>
+  );
+}
+
+interface SessionGateProps {
+  readonly pending: boolean;
+  readonly error: boolean;
+  readonly undecided: boolean;
+  readonly onRetry: () => void;
+}
+
+// The session read's non-faces: loading, the brief wait while the tie
+// verdict's redirect is in flight, and the retryable error face.
+function SessionGate({ pending, error, undecided, onRetry }: Readonly<SessionGateProps>) {
+  if (pending || (error && undecided)) {
+    return (
+      <AmbientLayout orbs={guideOrbs}>
+        <StateScreen variant="loading" />
+      </AmbientLayout>
+    );
+  }
+  return (
+    <AmbientLayout orbs={guideOrbs}>
+      <StateScreen
+        action={
+          <button
+            className="bg-cta-primary rounded-control cursor-pointer px-5 py-2.5 text-sm font-semibold text-white active:opacity-80"
+            onClick={onRetry}
+            type="button"
+          >
+            {m.common_retry()}
+          </button>
+        }
+        description={m.match_error_desc()}
+        title={m.match_error_title()}
+        variant="empty"
+      />
+    </AmbientLayout>
+  );
+}
+
 /**
  * The match guide (prototype match-guide): genre header card, the
- * four-ability lineup, and the flow actions. The genre resolves from the
- * URL override, else the preference majority vote; a tie routes to the
- * pick page. Progress marks (done/best) arrive with the match session — the
- * lineup renders the fresh-session face until then.
+ * server-drawn four-ability lineup, and the flow actions. The session is
+ * server truth — the genre param only seeds a creation (a resume ignores
+ * it), the tie verdict routes to the pick page, and the start button
+ * enters the first step with retakes left.
  */
 export function MatchPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/match/" }) as { genre?: Genre };
   const testsQuery = useConnectQuery(listTests, {});
-  const gamesQuery = useConnectQuery(listGames, {});
-  const profileQuery = useConnectQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
+  const sessionQuery = useConnectQuery(
+    getMatchSession,
+    search.genre ? { genre: search.genre } : {},
+  );
 
   const tests = testsQuery.data?.tests ?? [];
-  const games = gamesQuery.data?.games ?? [];
-  const preferenceCodes = (profileQuery.data?.profile?.games ?? [])
-    .map((g) => g.gameId)
-    .filter((id): id is string => id != null);
-  const fallback = defaultGenre(preferenceCodes, games);
-  const genre = search.genre ?? fallback;
-  // A tie (or no classified picks) hands the choice to the pick page; an
-  // empty pool would route to the same page's empty face. Both verdicts
-  // wait for the catalog queries to land before navigating.
-  useEffect(() => {
-    if (testsQuery.isPending || gamesQuery.isPending || profileQuery.isPending) {
-      return;
-    }
-    if (genre === null) {
-      void navigate({ to: "/match/pick", search: { why: "tie" } });
-      return;
-    }
-    if (arrange(tests, genre).length === 0) {
-      void navigate({ to: "/match/pick", search: { why: "empty" } });
-    }
-  }, [genre, gamesQuery.isPending, navigate, profileQuery.isPending, tests, testsQuery.isPending]);
-  const steps = genre ? arrange(tests, genre) : [];
-  const meta = genre ? genreMeta(genre) : null;
-  const switched = search.genre !== undefined && search.genre !== fallback;
-  const Icon = genre === "moba" ? Hexagon : Crosshair;
+  const session = sessionQuery.data?.session ?? null;
+  const steps = session?.steps ?? [];
+  const leftOf = (code: string): number => session?.retestLeft?.[code] ?? 0;
+  const nameOf = (code: string) => tests.find((t) => t.code === code)?.name ?? code;
+  const doneCount = (session?.done ?? []).length;
+  const next = steps.find((s) => s.testCode != null && leftOf(s.testCode) > 0);
+  const undecided =
+    (sessionQuery.error as { reason?: string } | null)?.reason === reasonGenreUndecided;
+  // The session's genre is an open word on the wire; faces narrow it to
+  // the two-genre vocabulary this UI speaks.
+  const genre = narrowGenre(session?.genre);
+  const switched = search.genre !== undefined;
 
-  function onStart() {
-    toast.info(m.match_flow_soon());
+  useEffect(() => {
+    if (undecided) {
+      void navigate({ to: "/match/pick", search: { why: "tie" } });
+    }
+  }, [undecided, navigate]);
+
+  if (sessionQuery.isPending || sessionQuery.isError) {
+    return (
+      <SessionGate
+        error={sessionQuery.isError}
+        onRetry={() => void sessionQuery.refetch()}
+        pending={sessionQuery.isPending}
+        undecided={undecided}
+      />
+    );
   }
 
   return (
@@ -70,65 +173,39 @@ export function MatchPage() {
       <div className="flex w-full flex-col gap-3 pb-6">
         <FlowHeader onBack={() => void navigate({ to: "/" })} title={m.match_title()} />
 
-        {meta !== null && genre !== null ? (
+        {genre !== null ? (
           <>
-            <div
-              className={`${meta.gradient} rounded-card flex items-center gap-[13px] overflow-hidden p-4`}
-            >
-              <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-[rgba(0,0,0,0.22)] text-xl text-white">
-                <Icon aria-hidden size={20} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-[17px] leading-tight font-black text-white">{meta.cn}</div>
-                <div className="mt-0.5 text-[10.5px] tracking-[1.6px] text-white/80">{meta.en}</div>
-              </div>
-              <span className="shrink-0 rounded-full bg-white/20 px-2.5 py-1 text-[10.5px] font-extrabold text-white">
-                {switched ? m.match_tag_switched() : m.match_tag_default()}
-              </span>
-            </div>
+            <GenreHeaderCard genre={genre} switched={switched} />
 
             <div className="mt-3 mb-2 flex items-baseline justify-between px-0.5">
               <span className="text-ink-tertiary text-[11.5px]">
                 {m.match_sub({ n: steps.length })}
               </span>
               <span className="text-status-ok text-[12.5px] font-extrabold">
-                {m.match_done({ done: 0, total: steps.length })}
+                {m.match_done({ done: doneCount, total: steps.length })}
               </span>
             </div>
 
             <div className="flex flex-col gap-[9px]">
-              {steps.map((step, i) => {
-                const word = abilityWord(step.ability);
-                return (
-                  <div
-                    className="border-line bg-surface-card shadow-card rounded-control flex items-center gap-[11px] border px-[13px] py-[11px]"
-                    key={step.code}
-                  >
-                    <div
-                      className={`${word.gradient} rounded-control flex h-[38px] w-[38px] shrink-0 items-center justify-center text-[15px] font-bold text-white`}
-                    >
-                      {i + 1}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-ink text-sm font-extrabold">{word.cn}</div>
-                      <div className="text-ink-tertiary mt-0.5 text-[9.5px] tracking-[0.9px]">
-                        {word.en}
-                      </div>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <div className="text-ink-secondary text-[12px]">{step.name}</div>
-                      <div className="text-ink-tertiary mt-0.5 text-[10px]">
-                        {m.match_step_time()}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {steps.map((step, i) => (
+                <StepRow
+                  ability={step.ability ?? ""}
+                  index={i}
+                  key={step.testCode ?? i}
+                  left={leftOf(step.testCode ?? "")}
+                  name={nameOf(step.testCode ?? "")}
+                />
+              ))}
             </div>
 
             <button
-              className="bg-cta-primary shadow-cta-primary rounded-control mt-3 w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
-              onClick={onStart}
+              className="bg-cta-primary shadow-cta-primary rounded-control mt-3 w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-40"
+              disabled={next?.testCode == null}
+              onClick={() => {
+                if (next?.testCode != null) {
+                  void navigate({ to: "/test/$code", params: { code: next.testCode } });
+                }
+              }}
               type="button"
             >
               {m.match_go()}
@@ -143,9 +220,7 @@ export function MatchPage() {
               </button>
               <button
                 className="bg-surface-input text-ink-secondary rounded-control flex-1 border-[1.5px] border-[#4b5563] py-[11px] text-center text-[12.5px] font-medium active:opacity-60"
-                onClick={() =>
-                  void navigate({ to: "/match/switch", search: genre ? { from: genre } : {} })
-                }
+                onClick={() => void navigate({ to: "/match/switch" })}
                 type="button"
               >
                 {m.match_btn_switch({

@@ -52,6 +52,8 @@ export class TestRunHost {
   private readonly onEnd: (record: AttemptRecord) => void;
   private exit: GameExit | null = null;
   private started = false;
+  private startedWallMs: number | null = null;
+  private endedWallMs: number | null = null;
   private userPaused = false;
   private backgroundOpen = false;
   private spanStartElapsedMs = 0;
@@ -85,6 +87,9 @@ export class TestRunHost {
 
   start(): void {
     this.started = true;
+    // The submit seam's start anchor — wall clock, stamped once the run
+    // actually lives (the intro ritual never starts it).
+    this.startedWallMs = this.now();
     this.clock.start();
     this.instance.start();
   }
@@ -114,6 +119,8 @@ export class TestRunHost {
       events: [...this.events],
       backgroundSpans: [...this.spans],
       stats: { ...this.stats },
+      startedAtMs: this.startedWallMs,
+      endedAtMs: this.endedWallMs,
       exit: this.exit ?? "aborted",
     };
   }
@@ -190,6 +197,7 @@ export class TestRunHost {
     }
     this.ended = true;
     this.exit = exit;
+    this.endedWallMs = this.now();
     this.unbindVisibility();
     // Freeze the game face at end — without this, a game's own timers
     // (red_dot's target-swap chain) keep firing behind the end overlay.

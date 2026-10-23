@@ -614,11 +614,6 @@ type SubmitTestAttemptRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Code join key (e.g. "red_dot") — same law as Test.code.
 	TestCode *string `protobuf:"bytes,1,opt,name=test_code,json=testCode,proto3,oneof" json:"test_code,omitempty"`
-	// Legacy client-carried ordinal — ignored: the session law computes
-	// ordinals server-side (count of prior records in the session for this
-	// test, plus one). Rides for wire stability until the client submitter
-	// drops it.
-	AttemptNo *int32 `protobuf:"varint,2,opt,name=attempt_no,json=attemptNo,proto3,oneof" json:"attempt_no,omitempty"`
 	// Presence binds the attempt to that match session: the test must be one
 	// of the session's locked steps, the ordinal and retest budget are
 	// session law, and the score rides the session's difficulty mode.
@@ -683,13 +678,6 @@ func (x *SubmitTestAttemptRequest) GetTestCode() string {
 		return *x.TestCode
 	}
 	return ""
-}
-
-func (x *SubmitTestAttemptRequest) GetAttemptNo() int32 {
-	if x != nil && x.AttemptNo != nil {
-		return *x.AttemptNo
-	}
-	return 0
 }
 
 func (x *SubmitTestAttemptRequest) GetMatchSessionId() string {
@@ -2993,15 +2981,13 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"\n" +
 	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12(\n" +
 	"\vduration_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\n" +
-	"durationMs\"\xd9\v\n" +
+	"durationMs\"\x9d\v\n" +
 	"\x18SubmitTestAttemptRequest\x12.\n" +
-	"\ttest_code\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x01R\btestCode\x88\x01\x01\x12+\n" +
+	"\ttest_code\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x01R\btestCode\x88\x01\x01\x128\n" +
+	"\x10match_session_id\x18\x06 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@H\x02R\x0ematchSessionId\x88\x01\x01\x12F\n" +
 	"\n" +
-	"attempt_no\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x01H\x02R\tattemptNo\x88\x01\x01\x128\n" +
-	"\x10match_session_id\x18\x06 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@H\x03R\x0ematchSessionId\x88\x01\x01\x12F\n" +
-	"\n" +
-	"started_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x04R\tstartedAt\x88\x01\x01\x12B\n" +
-	"\bended_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x05R\aendedAt\x88\x01\x01\x12L\n" +
+	"started_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x03R\tstartedAt\x88\x01\x01\x12B\n" +
+	"\bended_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x04R\aendedAt\x88\x01\x01\x12L\n" +
 	"\vbackgrounds\x18\x05 \x03(\v2 .cyber.esports.v1.BackgroundSpanB\b\xbaH\x05\x92\x01\x02\x10@R\vbackgrounds\x129\n" +
 	"\ared_dot\x18\n" +
 	" \x01(\v2\x1e.cyber.esports.v1.RedDotDetailH\x00R\x06redDot\x12H\n" +
@@ -3020,8 +3006,7 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"\n" +
 	"raw_detailB\f\n" +
 	"\n" +
-	"_test_codeB\r\n" +
-	"\v_attempt_noB\x13\n" +
+	"_test_codeB\x13\n" +
 	"\x11_match_session_idB\r\n" +
 	"\v_started_atB\v\n" +
 	"\t_ended_at\"\xaa\x03\n" +

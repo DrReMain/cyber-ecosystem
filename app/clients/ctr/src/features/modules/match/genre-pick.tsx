@@ -7,15 +7,15 @@ import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { m } from "#/paraglide/messages";
-import { defaultGenre, GENRE_ORDER, type Genre } from "./arranger";
 import { FlowHeader } from "./ui/flow-header";
-import { abilityWord, genreLabel } from "./vocabulary";
+import { abilityWord, defaultGenre, GENRE_ORDER, type Genre, genreLabel } from "./vocabulary";
 
 /**
  * The manual genre pick (prototype match-genre-pick): tie face, plain
  * face, or the empty-pool face (?why=empty). Choosing rebuilds the
- * lineup via the genre URL param and returns to the guide. The card the
- * preference majority points at carries the prototype's 推荐 corner badge.
+ * lineup by seeding the session creation with that genre (the URL param)
+ * and returns to the guide. The card the preference majority points at
+ * carries the prototype's 推荐 corner badge.
  */
 export function GenrePickPage() {
   const navigate = useNavigate();

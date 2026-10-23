@@ -44,5 +44,13 @@
   "test_rec_legend_friendly": "Ally",
   "test_rec_legend_neutral": "Neutral",
   "test_no_engine_exit": "Back",
-  "test_unknown_exit": "Back"
+  "test_unknown_exit": "Back",
+  "test_verdict_pending": "Scoring…",
+  "test_verdict_invalid": "Attempt voided",
+  "test_verdict_left": "Retakes left: {n}",
+  "test_verdict_left_zero": "Retakes spent",
+  "test_submit_error": "Submit failed",
+  "test_invalid_background": "Backgrounded too long",
+  "test_invalid_absurd": "Implausible sampling",
+  "test_invalid_detail": "Incomplete sampling"
 }
