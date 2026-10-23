@@ -8,6 +8,8 @@ interface TestRunProps {
   readonly introduction: string;
   readonly durationSeconds: number;
   readonly engineParams: Readonly<Record<string, string>>;
+  /** The session step binding — undefined rides the run as practice. */
+  readonly matchSessionId: string | undefined;
 }
 
 /**

@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	// §6.8 frozen (SkillTrajectoryTestPage.tsx:332-374, Java parity): an
+	// Frozen (the legacy skill-trajectory page and Java scorer, in parity): an
 	// unmatched round carries the 999 sentinel and must not pollute the
 	// deviation/speed means; the precision denominator counts it.
 	skillTrajectoryMissDevSentinel = 999.0
@@ -17,7 +17,7 @@ const (
 	skillTrajectorySpeedPivotMs    = 12000.0
 	skillTrajectorySpeedDivisor    = 1500.0
 	skillTrajectoryCompositeCap    = 10.0
-	// The fit zero-point for the linear track (§四: 8 per fit percentage
+	// The fit zero-point for the linear track (eight per fit percentage
 	// point) shares the deviation-score pivot — 50px reads as 0% fit.
 	skillTrajectoryFitZeroDev = 50.0
 

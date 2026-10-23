@@ -626,13 +626,6 @@ export type CyberEsportsV1SubmitTestAttemptRequest = {
      */
     testCode?: string;
     /**
-     * Legacy client-carried ordinal — ignored: the session law computes
-     * ordinals server-side (count of prior records in the session for this
-     * test, plus one). Rides for wire stability until the client submitter
-     * drops it.
-     */
-    attemptNo?: number;
-    /**
      * Presence binds the attempt to that match session: the test must be one
      * of the session's locked steps, the ordinal and retest budget are
      * session law, and the score rides the session's difficulty mode.
@@ -661,7 +654,7 @@ export type CyberEsportsV1SubmitTestAttemptRequest = {
 export type CyberEsportsV1SubmitTestAttemptResponse = {
     recordId?: string;
     /**
-     * Dual-track scoring (§0.5): linear uncapped raw score, percentile-tiered
+     * Dual-track scoring: linear uncapped raw score, percentile-tiered
      * authoritative score with its grade — neither is client-computable.
      */
     rawScore?: number;

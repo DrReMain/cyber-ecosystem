@@ -94,3 +94,13 @@ export function randomCenter(
     y: radius + rng() * spanY,
   };
 }
+
+/** Whether a center still sits its radius from the edges (the spawn margin). */
+export function outsideSafeArea(center: Point, area: SpawnArea, radiusPx: number): boolean {
+  return (
+    center.x < radiusPx ||
+    center.x > area.width - radiusPx ||
+    center.y < radiusPx ||
+    center.y > area.height - radiusPx
+  );
+}

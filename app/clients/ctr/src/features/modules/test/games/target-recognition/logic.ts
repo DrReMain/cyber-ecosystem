@@ -85,6 +85,16 @@ export function randomCenter(
   };
 }
 
+/** Whether a center still sits inside the padded rect (the spawn margin). */
+export function outsidePaddedArea(center: Point, area: SpawnArea, paddingPx: number): boolean {
+  return (
+    center.x < paddingPx ||
+    center.x > area.width - paddingPx ||
+    center.y < paddingPx ||
+    center.y > area.height - paddingPx
+  );
+}
+
 export function distance(a: Point, b: Point): number {
   return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 }

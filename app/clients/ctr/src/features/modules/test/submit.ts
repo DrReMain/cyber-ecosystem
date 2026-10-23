@@ -1,156 +1,87 @@
-// The submit seam's pure half — one attempt record mapped onto the unified
-// attempt contract. Facts up, verdicts down: only event facts, the three
-// contract counters, background spans, and the wall anchors cross the wire;
-// every aggregate is recomputed server-side. Games stay untouched — they
-// already emit gen-shaped camelCase events, and this adapter is the single
-// place that knows how those records become the oneof raw_detail.
-import { create, type MessageInitShape } from "@bufbuild/protobuf";
-import { timestampFromMs } from "@bufbuild/protobuf/wkt";
-import {
-  type SubmitTestAttemptRequest,
-  SubmitTestAttemptRequestSchema,
+import { create } from "@bufbuild/protobuf";
+import { timestampFromDate } from "@bufbuild/protobuf/wkt";
+import type {
+  FlashAimingDetail,
+  MultiTargetDetail,
+  RedDotDetail,
+  SubmitTestAttemptRequest,
+  TargetRecognitionDetail,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_pb";
+import { SubmitTestAttemptRequestSchema } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_pb";
 import type { AttemptRecord } from "./contract";
 
-export interface SubmitAttemptInput {
-  readonly code: string;
-  readonly record: AttemptRecord;
-  /** Present binds the attempt to a match session; absent = local practice.
-   * The session flow feeds this when it lands — the seam is shaped for it. */
-  readonly matchSessionId?: string;
-}
+// The submit adapter: one run record → one SubmitTestAttemptRequest. The
+// engine's event stream already carries proto-Detail item shapes, so the
+// per-game table only names the wrapping oneof arm and folds the
+// contract's top-level counters out of the game-local stats the event
+// stream cannot express. A code without an entry here has no engine and
+// never reaches a run.
+type DetailBuilder = (record: AttemptRecord) => SubmitTestAttemptRequest["rawDetail"];
 
-type RawDetailInit = MessageInitShape<typeof SubmitTestAttemptRequestSchema>["rawDetail"];
-
-type RedDotInit = Extract<NonNullable<RawDetailInit>, { case: "redDot" }>;
-type FlashAimingInit = Extract<NonNullable<RawDetailInit>, { case: "flashAiming" }>;
-type MultiTargetInit = Extract<NonNullable<RawDetailInit>, { case: "multiTarget" }>;
-type TargetRecognitionInit = Extract<NonNullable<RawDetailInit>, { case: "targetRecognition" }>;
-
-// Wire-stability constant: the ordinal is server law (session-scoped count
-// plus one); the field rides at 1 until the client submitter drops it.
-const PRACTICE_ATTEMPT_NO = 1;
-
-function num(value: unknown): number {
-  return typeof value === "number" && Number.isFinite(value) ? value : 0;
-}
-
-function intMs(value: unknown): number {
-  return Math.max(0, Math.round(num(value)));
-}
-
-function point(value: unknown): { x: number; y: number } {
-  const raw = (value ?? {}) as { x?: unknown; y?: unknown };
-  return { x: num(raw.x), y: num(raw.y) };
-}
-
-function stringId(value: unknown): string {
-  return typeof value === "string" ? value : "";
-}
-
-// Each builder mirrors one frozen Detail message field-for-field — the
-// mapping is the review anchor against the contract, pinned by tests.
-function redDotDetail(record: AttemptRecord): RedDotInit {
-  return {
+const DETAIL_BUILDERS: Readonly<Record<string, DetailBuilder>> = {
+  red_dot: (r) => ({
     case: "redDot",
-    value: {
-      events: record.events.map((event) => ({
-        target: point(event.target),
-        click: point(event.click),
-        reactionTimeMs: intMs(event.reactionTimeMs),
-        deviation: num(event.deviation),
-        isHit: event.isHit === true,
-      })),
-    },
-  };
-}
-
-function flashAimingDetail(record: AttemptRecord): FlashAimingInit {
-  return {
+    value: { events: r.events } as RedDotDetail,
+  }),
+  flash_aiming: (r) => ({
     case: "flashAiming",
-    value: {
-      shots: record.events.map((event) => ({
-        targetId: stringId(event.targetId),
-        target: point(event.target),
-        targetSize: num(event.targetSize),
-        click: point(event.click),
-        deviation: num(event.deviation),
-        aimTimeMs: intMs(event.aimTimeMs),
-      })),
-      misses: Math.max(0, Math.round(record.stats.misses ?? 0)),
-    },
-  };
-}
-
-function multiTargetDetail(record: AttemptRecord): MultiTargetInit {
-  return {
+    value: { shots: r.events, misses: r.stats.misses ?? 0 } as FlashAimingDetail,
+  }),
+  multi_target: (r) => ({
     case: "multiTarget",
-    value: {
-      picks: record.events.map((event) => ({
-        targetId: stringId(event.targetId),
-        tier: stringId(event.tier),
-        isHit: event.isHit === true,
-        elapsedMs: intMs(event.elapsedMs),
-      })),
-      missedHigh: Math.max(0, Math.round(record.stats.missedHigh ?? 0)),
-    },
-  };
-}
-
-function targetRecognitionDetail(record: AttemptRecord): TargetRecognitionInit {
-  return {
+    value: { picks: r.events, missedHigh: r.stats.missedHigh ?? 0 } as MultiTargetDetail,
+  }),
+  target_recognition: (r) => ({
     case: "targetRecognition",
     value: {
-      clicks: record.events.map((event) => ({
-        targetId: stringId(event.targetId),
-        targetType: stringId(event.targetType),
-        reactionTimeMs: intMs(event.reactionTimeMs),
-        elapsedMs: intMs(event.elapsedMs),
-      })),
-      // The engine stats one spawned counter per target type; the contract
-      // carries only the enemy denominator (the hit-rate denominator).
-      spawnedEnemy: Math.max(0, Math.round(record.stats["spawned_enemy"] ?? 0)),
-    },
-  };
-}
-
-const DETAIL_BUILDERS: Record<string, (record: AttemptRecord) => RawDetailInit> = {
-  red_dot: redDotDetail,
-  flash_aiming: flashAimingDetail,
-  multi_target: multiTargetDetail,
-  target_recognition: targetRecognitionDetail,
+      clicks: r.events,
+      spawnedEnemy: r.stats.spawned_enemy ?? 0,
+    } as TargetRecognitionDetail,
+  }),
 };
 
-/**
- * Build the submit request from one finished attempt, or null when the
- * attempt must not cross the seam: a code whose detail mapping has not
- * landed (later engine batches), a non-completed exit (an aborted run
- * records nothing — the exit-confirm copy promises exactly that), or
- * missing wall anchors (defensive: the host sets both on every natural
- * end).
- */
-export function buildSubmitAttempt({
-  code,
-  record,
-  matchSessionId,
-}: Readonly<SubmitAttemptInput>): SubmitTestAttemptRequest | null {
-  const builder = DETAIL_BUILDERS[code];
-  if (builder === undefined || record.exit !== "completed") {
+export interface SubmitInput {
+  readonly code: string;
+  readonly record: AttemptRecord;
+  readonly matchSessionId: string | undefined;
+}
+
+export function buildSubmitRequest(input: SubmitInput): SubmitTestAttemptRequest | null {
+  const build = DETAIL_BUILDERS[input.code];
+  if (build === undefined) {
     return null;
   }
-  if (record.startedAtMs === null || record.endedAtMs === null) {
-    return null;
-  }
+  // A completed run always carries both wall anchors; the fallback only
+  // guards the impossible unstarted shape.
+  const endedAtMs = input.record.endedAtMs ?? Date.now();
+  const startedAtMs = input.record.startedAtMs ?? endedAtMs;
   return create(SubmitTestAttemptRequestSchema, {
-    testCode: code,
-    attemptNo: PRACTICE_ATTEMPT_NO,
-    ...(matchSessionId !== undefined ? { matchSessionId } : {}),
-    startedAt: timestampFromMs(record.startedAtMs),
-    endedAt: timestampFromMs(record.endedAtMs),
-    backgrounds: record.backgroundSpans.map((span) => ({
-      elapsedMs: intMs(span.elapsedMs),
-      durationMs: intMs(span.durationMs),
+    testCode: input.code,
+    ...(input.matchSessionId !== undefined ? { matchSessionId: input.matchSessionId } : {}),
+    startedAt: timestampFromDate(new Date(startedAtMs)),
+    endedAt: timestampFromDate(new Date(endedAtMs)),
+    backgrounds: input.record.backgroundSpans.map((span) => ({
+      elapsedMs: span.elapsedMs,
+      durationMs: span.durationMs,
     })),
-    rawDetail: builder(record),
+    rawDetail: build(input.record),
   });
 }
+
+// The server verdict the end face renders: dual-track score and grade on a
+// valid attempt, the ops-vocabulary reason on an invalid one, and the
+// session's retake receipt — zero reads as "budget spent", and the whole
+// retest face hides on practice attempts (no session binding).
+export type SubmitVerdict =
+  | { phase: "idle" }
+  | { phase: "submitting" }
+  | { phase: "error" }
+  | {
+      phase: "done";
+      valid: boolean;
+      invalidReason: string | undefined;
+      authoritativeScore: number | undefined;
+      grade: string | undefined;
+      retestLeft: number;
+      inSession: boolean;
+    };

@@ -23,7 +23,7 @@ import (
 // row, and the record persists the fact stream verbatim under its oneof kind.
 func TestSubmitScoresRedDot(t *testing.T) {
 	rp, _, uc := submitFixture()
-	out, err := uc.Submit(memberCtx(), redDotReq("red_dot", 1, hitEvent(300, 5), hitEvent(400, 20)))
+	out, err := uc.Submit(memberCtx(), redDotReq("red_dot", hitEvent(300, 5), hitEvent(400, 20)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,6 +54,11 @@ func TestSubmitScoresRedDot(t *testing.T) {
 	if rec.UserID != "u1" {
 		t.Fatalf("record user = %s, want u1", rec.UserID)
 	}
+	// The practice shape: no session binding, so the ordinal is the vacuous
+	// one the record carries on its own.
+	if rec.AttemptNo != 1 || rec.SessionID != nil {
+		t.Fatalf("stored record = %+v, want ordinal 1 with no session", rec)
+	}
 	if _, ok := rec.RawDetail["red_dot"].(map[string]any); !ok {
 		t.Fatalf("raw detail = %v, want a red_dot map", rec.RawDetail)
 	}
@@ -64,7 +69,7 @@ func TestSubmitScoresRedDot(t *testing.T) {
 // lost), both score tracks stay null, and the reason rides as ops vocabulary.
 func TestSubmitInvalidOnBackgroundOverBudget(t *testing.T) {
 	rp, _, uc := submitFixture()
-	req := redDotReq("red_dot", 1, hitEvent(300, 5))
+	req := redDotReq("red_dot", hitEvent(300, 5))
 	req.Backgrounds = []*esportspb.BackgroundSpan{{ElapsedMs: 5000, DurationMs: 11000}}
 	out, err := uc.Submit(memberCtx(), req)
 	if err != nil {
@@ -85,7 +90,7 @@ func TestSubmitInvalidOnBackgroundOverBudget(t *testing.T) {
 // as an invalid attempt carrying the scorer's reason, never as a zero score.
 func TestSubmitInvalidOnScorerRejection(t *testing.T) {
 	rp, _, uc := submitFixture()
-	out, err := uc.Submit(memberCtx(), redDotReq("red_dot", 1, hitEvent(10, 5)))
+	out, err := uc.Submit(memberCtx(), redDotReq("red_dot", hitEvent(10, 5)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +107,7 @@ func TestSubmitInvalidOnScorerRejection(t *testing.T) {
 // not the client's — an internal error, never an invalid attempt.
 func TestSubmitUnknownCode(t *testing.T) {
 	_, _, uc := submitFixture()
-	_, err := uc.Submit(memberCtx(), redDotReq("nope", 1, hitEvent(300, 5)))
+	_, err := uc.Submit(memberCtx(), redDotReq("nope", hitEvent(300, 5)))
 	if !esportspb.IsEsportsTestNotFound(err) {
 		t.Fatalf("err = %v, want ESPORTS_TEST_NOT_FOUND", err)
 	}
@@ -114,7 +119,7 @@ func TestSubmitUnscoredGame(t *testing.T) {
 	// code the catalog never knew — the rejection contract is the same.
 	rp.tests["ghost_game"] = &Test{ID: "t13", Code: "ghost_game", Ability: utils.Ptr("resourceAllocation")}
 	rp.configs["ghost_game"] = &TestConfig{BackgroundInvalidSec: 10}
-	_, err := uc.Submit(memberCtx(), redDotReq("ghost_game", 1))
+	_, err := uc.Submit(memberCtx(), redDotReq("ghost_game"))
 	if !esportspb.IsEsportsUnspecified(err) {
 		t.Fatalf("err = %v, want ESPORTS_UNSPECIFIED", err)
 	}
@@ -125,25 +130,9 @@ func TestSubmitUnscoredGame(t *testing.T) {
 
 func TestSubmitRequiresSession(t *testing.T) {
 	_, _, uc := submitFixture()
-	_, err := uc.Submit(context.Background(), redDotReq("red_dot", 1, hitEvent(300, 5)))
+	_, err := uc.Submit(context.Background(), redDotReq("red_dot", hitEvent(300, 5)))
 	if !errorspb.IsGeneralErrorUnauthenticated(err) {
 		t.Fatalf("err = %v, want GENERAL_ERROR_UNAUTHENTICATED", err)
-	}
-}
-
-// The ordinal law under test: the wire ordinal is ignored — a practice
-// attempt stores the vacuous ordinal 1 no matter what the client carried.
-func TestSubmitPracticeOrdinalTruth(t *testing.T) {
-	rp, _, uc := submitFixture()
-	out, err := uc.Submit(memberCtx(), redDotReq("red_dot", 5, hitEvent(300, 5)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(rp.created) != 1 || rp.created[0].AttemptNo != 1 || rp.created[0].SessionID != nil {
-		t.Fatalf("stored record = %+v, want ordinal 1 with no session", rp.created)
-	}
-	if out.RetestLeft != 0 {
-		t.Fatalf("practice retest left = %d, want 0", out.RetestLeft)
 	}
 }
 
@@ -158,7 +147,7 @@ func TestSubmitSessionBudget(t *testing.T) {
 		Steps:        []types.MatchStep{{Ability: "reactionSpeed", TestCode: "red_dot"}},
 	}
 	for i, want := range []int32{2, 1, 0} {
-		out, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", int32(i+1), hitEvent(300, 5)), "sess-1"))
+		out, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", hitEvent(300, 5)), "sess-1"))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -169,7 +158,7 @@ func TestSubmitSessionBudget(t *testing.T) {
 			t.Fatalf("record %d = %+v, want ordinal %d bound to sess-1", i, rp.created[i], i+1)
 		}
 	}
-	_, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", 4, hitEvent(300, 5)), "sess-1"))
+	_, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", hitEvent(300, 5)), "sess-1"))
 	if !esportspb.IsEsportsMatchRetestExhausted(err) {
 		t.Fatalf("err = %v, want ESPORTS_MATCH_RETEST_EXHAUSTED", err)
 	}
@@ -183,7 +172,7 @@ func TestSubmitSessionBudget(t *testing.T) {
 func TestSubmitSessionNotFound(t *testing.T) {
 	rp, law, uc := submitFixture()
 	law.miss = true
-	_, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", 1, hitEvent(300, 5)), "sess-x"))
+	_, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", hitEvent(300, 5)), "sess-x"))
 	if !esportspb.IsEsportsMatchSessionNotFound(err) {
 		t.Fatalf("err = %v, want ESPORTS_MATCH_SESSION_NOT_FOUND", err)
 	}
@@ -201,7 +190,7 @@ func TestSubmitOutsideSessionSteps(t *testing.T) {
 		RetestBudget: 3,
 		Steps:        []types.MatchStep{{Ability: "skillReleaseAccuracy", TestCode: "skill_trajectory"}},
 	}
-	_, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", 1, hitEvent(300, 5)), "sess-1"))
+	_, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", hitEvent(300, 5)), "sess-1"))
 	if !esportspb.IsEsportsMatchTestNotInSession(err) {
 		t.Fatalf("err = %v, want ESPORTS_MATCH_TEST_NOT_IN_SESSION", err)
 	}
@@ -216,7 +205,7 @@ func TestSubmitSessionDifficulty(t *testing.T) {
 		RetestBudget: 1,
 		Steps:        []types.MatchStep{{Ability: "reactionSpeed", TestCode: "red_dot"}},
 	}
-	out, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", 1, hitEvent(300, 5), hitEvent(400, 20)), "sess-1"))
+	out, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", hitEvent(300, 5), hitEvent(400, 20)), "sess-1"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -237,7 +226,7 @@ func TestSubmitSessionCollisionRecounts(t *testing.T) {
 		Steps:        []types.MatchStep{{Ability: "reactionSpeed", TestCode: "red_dot"}},
 	}
 	rp.collideOnce = &AttemptRecord{ID: "rival", TestCode: "red_dot", UserID: "u1", AttemptNo: 1, SessionID: utils.Ptr("sess-1")}
-	out, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", 1, hitEvent(300, 5)), "sess-1"))
+	out, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", hitEvent(300, 5)), "sess-1"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -259,7 +248,7 @@ func TestSubmitSessionCollisionExhausted(t *testing.T) {
 		Steps:        []types.MatchStep{{Ability: "reactionSpeed", TestCode: "red_dot"}},
 	}
 	rp.collideOnce = &AttemptRecord{ID: "rival", TestCode: "red_dot", UserID: "u1", AttemptNo: 1, SessionID: utils.Ptr("sess-1")}
-	_, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", 1, hitEvent(300, 5)), "sess-1"))
+	_, err := uc.Submit(memberCtx(), withSession(redDotReq("red_dot", hitEvent(300, 5)), "sess-1"))
 	if !esportspb.IsEsportsMatchRetestExhausted(err) {
 		t.Fatalf("err = %v, want ESPORTS_MATCH_RETEST_EXHAUSTED", err)
 	}
@@ -352,10 +341,9 @@ func (l *fakeSessionLaw) Resolve(_ context.Context, _, _ string) (*SessionBindin
 	return l.binding, nil
 }
 
-func redDotReq(code string, attemptNo int32, events ...*esportspb.RedDotEvent) *esportspb.SubmitTestAttemptRequest {
+func redDotReq(code string, events ...*esportspb.RedDotEvent) *esportspb.SubmitTestAttemptRequest {
 	return &esportspb.SubmitTestAttemptRequest{
 		TestCode:  utils.Ptr(code),
-		AttemptNo: utils.Ptr(attemptNo),
 		StartedAt: timestamppb.New(time.Unix(1770000000, 0)),
 		EndedAt:   timestamppb.New(time.Unix(1770000030, 0)),
 		RawDetail: &esportspb.SubmitTestAttemptRequest_RedDot{RedDot: &esportspb.RedDotDetail{Events: events}},

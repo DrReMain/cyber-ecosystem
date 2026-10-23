@@ -140,6 +140,18 @@ describe("TestRunHost", () => {
     host.destroy();
   });
 
+  it("stamps the wall anchors only once the run lives", () => {
+    const { host } = makeHost();
+    expect(host.record().startedAtMs).toBeNull();
+    expect(host.record().endedAtMs).toBeNull();
+    host.start();
+    expect(host.record().startedAtMs).toBeTypeOf("number");
+    expect(host.record().endedAtMs).toBeNull();
+    vi.advanceTimersByTime(10_000);
+    expect(host.record().endedAtMs).toBeTypeOf("number");
+    host.destroy();
+  });
+
   it("forwards the clock's natural finish exactly once as completed", () => {
     const { host, onEnd, stub } = makeHost();
     host.start();

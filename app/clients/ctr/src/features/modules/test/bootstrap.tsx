@@ -1,4 +1,5 @@
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
+import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import {
   getTest,
   getTestConfig,
@@ -18,14 +19,23 @@ interface TestBootstrapProps {
 
 // The id-keyed half of the bootstrap: both read-face queries fire once the
 // 20-char row id is resolved (the /test/$code route param is the code, not
-// the id). Faces: loading / retryable error / unknown engine.
+// the id). Faces: loading / retryable error / unknown engine. The match
+// session read binds the run to its step — a session that is missing,
+// undecided, or failed to load degrades the run to practice (unbound
+// submit) rather than blocking the game.
 export function TestBootstrap({ id, code, fallbackName }: Readonly<TestBootstrapProps>) {
   const navigate = useNavigate();
   const testQuery = useConnectQuery(getTest, { id });
   const configQuery = useConnectQuery(getTestConfig, { id });
+  const sessionQuery = useConnectQuery(getMatchSession, {});
   const gameModule = getGameModule(code);
+  const session = sessionQuery.data?.session ?? null;
+  const boundSessionId =
+    session?.id != null && (session.steps ?? []).some((s) => s.testCode === code)
+      ? session.id
+      : undefined;
 
-  if (testQuery.isPending || configQuery.isPending) {
+  if (testQuery.isPending || configQuery.isPending || sessionQuery.isPending) {
     return <StateScreen variant="loading" />;
   }
   if (testQuery.isError || configQuery.isError) {
@@ -77,6 +87,7 @@ export function TestBootstrap({ id, code, fallbackName }: Readonly<TestBootstrap
       engineParams={config?.engineParams ?? {}}
       gameModule={gameModule}
       introduction={testQuery.data?.introduction ?? m.test_start_rule_fallback()}
+      matchSessionId={boundSessionId}
       testName={test?.name ?? fallbackName}
     />
   );

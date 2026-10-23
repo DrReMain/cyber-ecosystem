@@ -58,7 +58,7 @@ func TestOffenseDefenseFastPaceGolden(t *testing.T) {
 	if res.extras[extraComposite] != 8.5 {
 		t.Errorf("composite = %v, want 8.5", res.extras[extraComposite])
 	}
-	// 10 correct decisions × unit 25 = 250 (§6.4 band low).
+	// 10 correct decisions × unit 25 = 250 (band low).
 	if res.raw != 250 {
 		t.Errorf("raw = %v, want 250", res.raw)
 	}

@@ -102,7 +102,7 @@ func TestEconomicSimIdleFloor(t *testing.T) {
 		t.Fatalf("idle session error: %v", err)
 	}
 	// Never tapping still banks the health term — the legacy idle floor of
-	// 1.5 rides for parity (disclosed in §6.14).
+	// 1.5 rides for parity, a disclosed carry.
 	if res.raw != 0 || res.extras[extraComposite] != 1.5 {
 		t.Errorf("idle session: raw = %v composite = %v, want 0/1.5", res.raw, res.extras[extraComposite])
 	}

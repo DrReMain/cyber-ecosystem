@@ -122,7 +122,7 @@ export function SetupGamesPage() {
       return;
     }
     // The prototype's flow lands the finished profile straight into the
-    // match guide (block3 §1: 04 → 05), not home.
+    // match guide next, not home.
     await navigate({ to: "/match" });
   }
 

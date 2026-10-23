@@ -7,7 +7,7 @@ import (
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 )
 
-// The law under test: metric.md §6.1 frozen card — the formula, its clamp
+// The law under test: the frozen red_dot card — the formula, its clamp
 // window, the outlier rejection, and the 217-run quantile anchors.
 func redDotRequest(events ...*esportspb.RedDotEvent) *esportspb.SubmitTestAttemptRequest {
 	return &esportspb.SubmitTestAttemptRequest{
@@ -179,7 +179,7 @@ func TestRedDotDetailMismatch(t *testing.T) {
 	}
 }
 
-// The linear track carries the difficulty factor (§3) and a unit-score
+// The linear track carries the difficulty factor and a unit-score
 // override from the engine-param KV.
 func TestRedDotLinearTrackFactors(t *testing.T) {
 	events := make([]*esportspb.RedDotEvent, 0, 30)

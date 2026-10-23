@@ -10,6 +10,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
+	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 )
 
@@ -31,24 +32,54 @@ var seedGames = []struct {
 }
 
 var seedTests = []struct {
-	Code     string
-	Name     string
-	Category string
-	Ability  string
+	Code         string
+	Name         string
+	Category     string
+	Ability      string
+	EngineParams map[string]string
 }{
-	{"red_dot", "随机红点触摸测试", "universal", "reactionSpeed"},
-	{"number_stars", "数字星空", "universal", "reactionSpeed"},
-	{"dual_zone", "双区同步躲避", "universal", "reactionSpeed"},
-	{"target_recognition", "目标识别测试", "universal", "reactionSpeed"},
-	{"flash_aiming", "闪现瞄准测试", "fps", "aimingAccuracy"},
-	{"moving_target", "移动靶射击测试", "fps", "trackingStability"},
-	{"tracking_moving", "追踪移动目标测试", "fps", "trackingStability"},
-	{"skill_trajectory", "技能轨迹测试", "universal", "skillReleaseAccuracy"},
-	{"offense_defense", "攻防决策测试", "moba", "decisionEfficiency"},
-	{"resource_match", "资源配对测试", "moba", "resourceAllocation"},
-	{"character_counter", "角色Counter测试", "moba", "resourceAllocation"},
-	{"economic_sim", "经济模拟测试", "moba", "resourceAllocation"},
-	{"multi_target", "多目标点击测试", "fps", "aimingAccuracy"},
+	{"red_dot", "随机红点触摸测试", "universal", "reactionSpeed", map[string]string{
+		"target_size_px":     "20",
+		"target_lifetime_ms": "1500",
+		"spawn_padding_px":   "50",
+		"unit_score":         "10",
+	}},
+	{"number_stars", "数字星空", "universal", "reactionSpeed", nil},
+	{"dual_zone", "双区同步躲避", "universal", "reactionSpeed", nil},
+	{"target_recognition", "目标识别测试", "universal", "reactionSpeed", map[string]string{
+		"spawn_interval_ms":        "700",
+		"spawn_padding_px":         "100",
+		"click_detection_range_px": "25",
+		"invalid_click_margin_px":  "2",
+		"unit_score":               "20",
+	}},
+	{"flash_aiming", "闪现瞄准测试", "fps", "aimingAccuracy", map[string]string{
+		"spawn_interval_ms":       "800",
+		"target_size_min_px":      "30",
+		"target_size_span_px":     "50",
+		"target_lifetime_min_ms":  "500",
+		"target_lifetime_span_ms": "1000",
+		"center_hit_deviation_px": "20",
+		"unit_score":              "10",
+	}},
+	{"moving_target", "移动靶射击测试", "fps", "trackingStability", nil},
+	{"tracking_moving", "追踪移动目标测试", "fps", "trackingStability", nil},
+	{"skill_trajectory", "技能轨迹测试", "universal", "skillReleaseAccuracy", nil},
+	{"offense_defense", "攻防决策测试", "moba", "decisionEfficiency", nil},
+	{"resource_match", "资源配对测试", "moba", "resourceAllocation", nil},
+	{"character_counter", "角色Counter测试", "moba", "resourceAllocation", nil},
+	{"economic_sim", "经济模拟测试", "moba", "resourceAllocation", nil},
+	{"multi_target", "多目标点击测试", "fps", "aimingAccuracy", map[string]string{
+		"spawn_interval_min_ms":  "500",
+		"spawn_interval_span_ms": "400",
+		"target_lifetime_ms":     "2500",
+		"max_on_screen":          "8",
+		"tier_value_high":        "100",
+		"tier_value_medium":      "50",
+		"tier_value_low":         "25",
+		"tier_value_trap":        "-50",
+		"unit_score":             "10",
+	}},
 }
 
 var seedMatchConfigs = []struct {
@@ -476,8 +507,11 @@ func (s *Seed) Run(ctx context.Context) error {
 		// (genre-order rule): lineups draw per-ability pools the genre
 		// order runs, so families both orders draw (reactionSpeed,
 		// skillReleaseAccuracy) are universal while single-genre families
-		// keep their native mark. Durations, engine params, unit labels,
-		// and introductions remain metric-sheet data.
+		// keep their native mark. Durations, unit labels, and introductions
+		// remain metric-sheet data; engine params materialize for the
+		// engine-backed games as the same KV the client boot pack and the
+		// server scorers read, values equal to the compiled metric-sheet
+		// constants so the config path goes live without moving a needle.
 		row, err := client.Test.Query().Where(test.CodeEQ(t.Code)).Only(ctx)
 		if err != nil && !ent.IsNotFound(err) {
 			return s.plat.HandleEntError(fmt.Errorf("seed: query test %q: %w", t.Code, err))
@@ -499,9 +533,11 @@ func (s *Seed) Run(ctx context.Context) error {
 				}
 				return s.plat.HandleEntError(fmt.Errorf("seed: create test %q: %w", t.Code, err))
 			}
-			if _, err := client.TestConfig.Create().
-				SetTestCode(t.Code).
-				Save(ctx); err != nil {
+			create := client.TestConfig.Create().SetTestCode(t.Code)
+			if t.EngineParams != nil {
+				create = create.SetEngineParams(t.EngineParams)
+			}
+			if _, err := create.Save(ctx); err != nil {
 				return s.plat.HandleEntError(fmt.Errorf("seed: create test config %q: %w", t.Code, err))
 			}
 			s.log.Info("seeded test", "code", t.Code, "id", row.ID)
@@ -509,13 +545,34 @@ func (s *Seed) Run(ctx context.Context) error {
 		}
 		// Upsert keeps already-seeded rows in step with adopted baseline
 		// data; admin-tuned values will move out of this table's seed path
-		// entirely.
+		// entirely. The same law holds for engine params: a nil entry hands
+		// the row's KV off untouched, so only the games whose params this
+		// table owns get refreshed at boot.
 		if _, err := row.Update().
 			SetName(t.Name).
 			SetNillableCategory(strPtr(t.Category)).
 			SetNillableAbility(strPtr(t.Ability)).
 			Save(ctx); err != nil {
 			return s.plat.HandleEntError(fmt.Errorf("seed: update test %q: %w", t.Code, err))
+		}
+		if t.EngineParams == nil {
+			continue
+		}
+		cfg, cfgErr := client.TestConfig.Query().Where(testconfig.TestCodeEQ(t.Code)).Only(ctx)
+		if cfgErr != nil && !ent.IsNotFound(cfgErr) {
+			return s.plat.HandleEntError(fmt.Errorf("seed: query test config %q: %w", t.Code, cfgErr))
+		}
+		if ent.IsNotFound(cfgErr) {
+			if _, err := client.TestConfig.Create().
+				SetTestCode(t.Code).
+				SetEngineParams(t.EngineParams).
+				Save(ctx); err != nil {
+				return s.plat.HandleEntError(fmt.Errorf("seed: create test config %q: %w", t.Code, err))
+			}
+			continue
+		}
+		if _, err := cfg.Update().SetEngineParams(t.EngineParams).Save(ctx); err != nil {
+			return s.plat.HandleEntError(fmt.Errorf("seed: update test config %q: %w", t.Code, err))
 		}
 	}
 

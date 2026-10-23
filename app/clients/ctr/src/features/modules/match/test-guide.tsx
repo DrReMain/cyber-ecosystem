@@ -1,35 +1,25 @@
+import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
+import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
 import { Repeat, Save, Sun, Timer, Trophy } from "lucide-react";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
 import { FlowHeader } from "./ui/flow-header";
-import { useArrangedSteps } from "./use-arranged-steps";
 
 /**
  * The pre-assessment notice (prototype test-guide): first/second-session
- * head, the five rules, the scoring-basis card, and the ready CTA — which
- * enters the current step's intro (prototype law), not a dead end. The
- * first/second distinction rides the match session — every session is the
- * first one until then.
+ * head, the five rules, the scoring-basis card, and the ready CTA back
+ * into the flow. The first/second distinction and the step count ride the
+ * live session; the face degrades to the first-assessment defaults until
+ * the read lands.
  */
 export function TestGuidePage() {
   const navigate = useNavigate();
-  const { steps, pending } = useArrangedSteps();
-  // isFirstSession arrives with the match-session law; until then the face
-  // is permanently the first-assessment one.
-  const first = true;
+  const sessionQuery = useConnectQuery(getMatchSession, {});
+  const session = sessionQuery.data?.session ?? null;
+  const steps = session?.steps ?? [];
+  const first = (session?.firstSession as boolean | undefined) ?? true;
   const count = steps.length > 0 ? steps.length : 4;
-
-  function onReady() {
-    const firstStep = steps[0];
-    if (firstStep !== undefined) {
-      void navigate({ to: "/test/$code", params: { code: firstStep.code } });
-      return;
-    }
-    // Nothing playable resolves (transient catalog state) — the lineup
-    // page owns that face.
-    void navigate({ to: "/match" });
-  }
 
   const rules = [
     { Icon: Sun, key: "1", title: m.match_guide_rule1_t(), desc: m.match_guide_rule1_d() },
@@ -95,8 +85,7 @@ export function TestGuidePage() {
 
         <button
           className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
-          disabled={pending}
-          onClick={onReady}
+          onClick={() => void navigate({ to: "/match" })}
           type="button"
         >
           {m.match_guide_ready()}

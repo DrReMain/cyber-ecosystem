@@ -98,7 +98,7 @@ func (movingTargetScorer) recompute(req *esportspb.SubmitTestAttemptRequest, par
 		prev = elapsed
 	}
 	if prev > durationSec*1000+spanGraceMs {
-		// The last sample sits inside the config mirror (§6.5 fabrication
+		// The last sample sits inside the config mirror (a fabrication
 		// closure).
 		return scoreResult{}, &invalidAttemptError{reason: reasonAbsurdTimeSpan}
 	}
@@ -132,7 +132,7 @@ func (movingTargetScorer) recompute(req *esportspb.SubmitTestAttemptRequest, par
 	// the vocabulary size, not by the phases the stream happened to carry.
 	adaptation := patternSum / float64(len(movingTargetPatterns)) * 2
 	composite := clamp(coverage+perfectScore+stability+adaptation-float64(losses)*movingTargetLossPenalty, 0, 10)
-	// The linear track counts perfect-tracking seconds (§四: 10/秒完美追踪).
+	// The linear track counts perfect-tracking seconds.
 	raw := round1(perfectSec * params.num(unitScoreKey, movingTargetUnitScoreDefault) * params.difficulty())
 	return scoreResult{raw: raw, extras: map[string]float64{extraComposite: round1(composite)}}, nil
 }

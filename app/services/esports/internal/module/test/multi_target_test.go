@@ -10,7 +10,7 @@ import (
 // The law under test: the composite formula transcribed from the legacy
 // settle (MultiTargetTestPage.tsx:177-210), with hits/tier aggregates and
 // decision times rebuilt from the fact stream — decision time is the
-// pick-to-pick delta because the frozen pick carries no spawn stamp (§6.5).
+// pick-to-pick delta because the frozen pick carries no spawn stamp.
 func multiTargetRequest(missedHigh int32, picks ...*esportspb.MultiTargetPick) *esportspb.SubmitTestAttemptRequest {
 	return &esportspb.SubmitTestAttemptRequest{
 		RawDetail: &esportspb.SubmitTestAttemptRequest_MultiTarget{
@@ -62,7 +62,7 @@ func TestMultiTargetZeroHits(t *testing.T) {
 }
 
 // The pick-to-pick delta gate: a sub-80ms switch is fabricated data — the
-// attempt is rejected, never scored (red_dot's per-point law, §6.5).
+// attempt is rejected, never scored (red_dot's per-point law).
 func TestMultiTargetAbsurdSwitch(t *testing.T) {
 	_, err := multiTargetScorer{}.recompute(
 		multiTargetRequest(0, multiTargetPick("high", 700), multiTargetPick("medium", 730)),
@@ -88,7 +88,7 @@ func TestMultiTargetTierVocabulary(t *testing.T) {
 }
 
 // Tier values read the tier_value_* engine-param keys — ops retunes the
-// value track without a deploy (§6.5, the flash unit_score precedent).
+// value track without a deploy (the flash unit_score precedent).
 func TestMultiTargetTierValueOverride(t *testing.T) {
 	res, err := multiTargetScorer{}.recompute(
 		multiTargetRequest(0, multiTargetPick("high", 700), multiTargetPick("medium", 1500)),

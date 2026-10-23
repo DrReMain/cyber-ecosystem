@@ -43,6 +43,16 @@ export function randomSize(params: FlashAimingParams, rng: () => number = Math.r
   return params.sizeMinPx + rng() * params.sizeSpanPx;
 }
 
+/** Whether a center still sits a full diameter from the edges (the spawn margin). */
+export function outsideSafeArea(center: Point, area: SpawnArea, size: number): boolean {
+  return (
+    center.x < size ||
+    center.x > area.width - size ||
+    center.y < size ||
+    center.y > area.height - size
+  );
+}
+
 /**
  * Center position inside the play rect. Legacy law: a full diameter of
  * margin — x = size + rand·(width − 2·size) — so a target never clips an

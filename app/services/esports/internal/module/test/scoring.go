@@ -27,7 +27,7 @@ const (
 	reactionTimeMax = 60000.0
 
 	// Family-wide span anchors shared by the stream-rebuilt scorers (the
-	// §6.5 fabrication-closure family): event-stream spans sit under the
+	// fabrication-closure family): event-stream spans sit under the
 	// config mirror plus this grace, and a mirrorless config falls back to
 	// the legacy 30s session baseline.
 	spanGraceMs                = 1500.0
@@ -43,15 +43,15 @@ func (e *invalidAttemptError) Error() string {
 }
 
 type scoringParams struct {
-	// difficultyFactor carries metric.md §三 (experience 1.0 / standard 1.5);
+	// difficultyFactor carries the seeded difficulty law (experience 1.0 / standard 1.5);
 	// the zero value means unset and falls back to the experience baseline.
 	difficultyFactor float64
 	// engineParams is the same KV the client boot pack reads — one data
-	// source for both ends (metric.md §五 consistency contract); absent or
+	// source for both ends — one config feeds client and server alike; absent or
 	// non-numeric keys fall back to the scorer's metric-sheet constants.
 	engineParams map[string]string
 	// durationSec feeds duration-normalized tracks from the config mirror,
-	// never the client's submitted span (§6.5 fabrication closure).
+	// never the client's submitted span (fabrication closure).
 	durationSec int
 	// answerKey carries the question bank's server-side answer rows for the
 	// test being scored (scenario_code → the bank's answer JSON); empty for
@@ -87,7 +87,7 @@ func (p scoringParams) difficulty() float64 {
 }
 
 type scoreResult struct {
-	// raw: the uncapped linear track, 原始成绩 × 单位分 × 难度系数 (metric.md §一).
+	// raw: the uncapped linear track, 原始成绩 × 单位分 × 难度系数.
 	raw float64
 	// authoritative: the 0-100 calibrated track grade derives from — nil
 	// while a game's calibration curve is pending.
@@ -134,7 +134,7 @@ func lookupScorer(code string) (scorer, bool) {
 
 func band(score float64) string {
 	// The red_dot curve is quantile-frozen (p95→95), so the score reads as
-	// percentile position and the thresholds mirror §二's top 5/15/40;
+	// percentile position and the thresholds mirror the frozen top 5/15/40;
 	// per-game curves keep the same rule.
 	switch {
 	case score >= bandSMin:

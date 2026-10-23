@@ -12,6 +12,7 @@ import {
   drawTier,
   MULTI_TARGET_DEFAULTS,
   type MultiTargetParams,
+  outsideSafeArea,
   type Point,
   randomCenter,
   type SpawnArea,
@@ -25,7 +26,7 @@ import {
 interface LiveTarget {
   readonly id: string;
   readonly el: HTMLElement;
-  readonly center: Point;
+  center: Point;
   readonly spec: TierSpec;
   readonly spawnAt: number;
   /** Absolute expiry (ctx.now base); kept fresh by every re-arm. */
@@ -82,6 +83,7 @@ export const multiTargetModule: GameModule = {
     let spawnTimer: ReturnType<typeof setTimeout> | null = null;
     let spawnDeadline = 0;
     let spawnParkedMs: number | null = null;
+    let observer: ResizeObserver | null = null;
 
     function clearTimer(timer: ReturnType<typeof setTimeout> | null): null {
       if (timer !== null) {
@@ -208,6 +210,25 @@ export const multiTargetModule: GameModule = {
       ctx.stat("incorrectClicks", incorrectClicks);
     }
 
+    function onResize(): void {
+      if (destroyed) {
+        return;
+      }
+      // A shrunk stage strands targets off-screen where no tap can reach
+      // them and their expiry would land unfair missed-high losses — move
+      // each stranded target (same id, tier, and deadline) to a fresh
+      // in-bounds spot, so the pick/expiry accounting stays untouched.
+      const area = spawnAreaOf(stage);
+      for (const t of targets) {
+        if (outsideSafeArea(t.center, area, t.spec.radiusPx)) {
+          const pos = randomCenter(area, t.spec.radiusPx);
+          t.center = pos;
+          t.el.style.left = `${pos.x - t.spec.radiusPx}px`;
+          t.el.style.top = `${pos.y - t.spec.radiusPx}px`;
+        }
+      }
+    }
+
     return {
       start(): void {
         if (destroyed || started) {
@@ -216,6 +237,8 @@ export const multiTargetModule: GameModule = {
         started = true;
         ctx.mount.appendChild(stage);
         stage.addEventListener("pointerdown", onStageTap);
+        observer = new ResizeObserver(onResize);
+        observer.observe(stage);
         armSpawn();
       },
       pause(): void {
@@ -253,6 +276,8 @@ export const multiTargetModule: GameModule = {
         for (const target of [...targets]) {
           removeTarget(target);
         }
+        observer?.disconnect();
+        observer = null;
         stage.removeEventListener("pointerdown", onStageTap);
         stage.remove();
       },

@@ -96,11 +96,11 @@ func (numberStarsScorer) recompute(req *esportspb.SubmitTestAttemptRequest, para
 	accuracy := max(0, numberStarsAccuracyCap-float64(incorrectTotal)*numberStarsAccuracyWeight)
 	complexity := max(0, float64(maxSeqLen-numberStarsBaselineLen)*numberStarsComplexityStep)
 	if correctTotal == 0 {
-		// Honest zero: idling or blind tapping earns nothing (§6.8 parity) —
+		// Honest zero: idling or blind tapping earns nothing (legacy parity) —
 		// the legacy formula's empty-attempt 3.0 accuracy floor is dropped.
 		return curvePendingResult(0, params, numberStarsUnitScoreDefault, 0), nil
 	}
 	composite := clamp(base+speed+accuracy+complexity, 0, 10)
-	// Authoritative stays nil: the calibration curve is pending (§6.9).
+	// Authoritative stays nil: the calibration curve is pending.
 	return curvePendingResult(correctTotal, params, numberStarsUnitScoreDefault, round1(composite)), nil
 }

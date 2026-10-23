@@ -12,7 +12,7 @@ import (
 // The law under test: friend/foe correctness is judged server-side from the
 // clicked target's type, the spawned_enemy counter closes the old Tier B
 // gap as the accuracy denominator, and the composite transcribes the
-// legacy PRD settle (targetRecognitionScoring.ts §2.13, per §6.6).
+// legacy PRD settle (the legacy scoring module).
 func targetRecognitionRequest(spawnedEnemy int32, clicks ...*esportspb.TargetRecognitionClick) *esportspb.SubmitTestAttemptRequest {
 	return &esportspb.SubmitTestAttemptRequest{
 		RawDetail: &esportspb.SubmitTestAttemptRequest_TargetRecognition{

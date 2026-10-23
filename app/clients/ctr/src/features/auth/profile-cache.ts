@@ -12,7 +12,7 @@ import { connectTransport } from "#/services/connect";
 export const PROFILE_STALE_MS = 30_000;
 
 // Key parity with every consumer — the pages' useQuery and the loaders'
-// prefetch both ride the static-keyed transport singleton (§3), so
+// prefetch both ride the static-keyed transport singleton, so
 // invalidation here reaches every cache entry.
 export const profileQueryKey = createQueryOptions(
   getProfile,

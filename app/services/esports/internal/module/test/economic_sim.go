@@ -180,7 +180,7 @@ func (economicSimScorer) recompute(req *esportspb.SubmitTestAttemptRequest, para
 		spanMs = e.ms
 	}
 	// Perfect taps extend the clock a second each — the span ceiling rides
-	// the config mirror plus that bonus (§6.5 fabrication closure family).
+	// the config mirror plus that bonus (a fabrication closure family).
 	if spanMs > (durationSec+float64(perfectCS)*economicSimPerfectTimeBonusSec)*1000+spanGraceMs {
 		return scoreResult{}, &invalidAttemptError{reason: reasonAbsurdTimeSpan}
 	}
@@ -199,6 +199,6 @@ func (economicSimScorer) recompute(req *esportspb.SubmitTestAttemptRequest, para
 	health := finalHp / economicSimHealthWireScale * 1.5
 	penalty := float64(earlyHits)*0.1 + float64(detail.GetMissedMinions())*0.05
 	composite := clamp(csEfficiency+accuracy+items+health-penalty, 0, 10)
-	// The linear track counts confirmed last hits (§四: 15/有效正补).
+	// The linear track counts confirmed last hits.
 	return curvePendingResult(cs, params, economicSimUnitScoreDefault, composite), nil
 }

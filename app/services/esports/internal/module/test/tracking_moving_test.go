@@ -46,7 +46,7 @@ func tmRequest(frames ...*esportspb.TrackingMovingFrame) *esportspb.SubmitTestAt
 }
 
 // tmMidSession: ten shots (eight hits at 30px, two misses at 60px, kills at
-// 1200ms) over a 800px movement track — the §6.13 mid golden.
+// 1200ms) over a 800px movement track — the mid golden.
 func tmMidSession() []*esportspb.TrackingMovingFrame {
 	frames := []*esportspb.TrackingMovingFrame{
 		tmMove(0, 0, 0), tmMove(500, 400, 0), tmMove(1000, 800, 0),

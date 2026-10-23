@@ -13,7 +13,7 @@ const (
 	resourceMatchCollisionCapDefault = 10.0
 	resourceMatchOptimalDefault      = resourceMatchMinionCapDefault + resourceMatchMonsterCapDefault + resourceMatchDragonCapDefault
 	// The legacy formula's flat tactical term — a constant every attempt
-	// earns; carried for curve parity and disclosed in §6.11.
+	// earns; carried for curve parity, a disclosed carry.
 	resourceMatchTacticalDiversity  = 1.0
 	resourceMatchEfficiencySaturate = 2.0
 	resourceMatchSpanFloorMs        = 500.0
@@ -62,7 +62,7 @@ func (resourceMatchScorer) recompute(req *esportspb.SubmitTestAttemptRequest, pa
 			}
 			if elapsed-lastCollectMs < reactionTimeMin {
 				// Per-collect floor: two picks closer than any movement can
-				// bridge is a fabricated density, the §6.5 diff-gate family.
+				// bridge is a fabricated density, the diff-gate family.
 				return scoreResult{}, &invalidAttemptError{reason: reasonAbsurdReactionTime}
 			}
 		}
@@ -101,7 +101,7 @@ func (resourceMatchScorer) recompute(req *esportspb.SubmitTestAttemptRequest, pa
 	} else {
 		if spanMs > durationSec*1000+spanGraceMs {
 			// The span is bounded by the config mirror, never the client's
-			// clock (§6.5 fabrication closure).
+			// clock (a fabrication closure).
 			return scoreResult{}, &invalidAttemptError{reason: reasonAbsurdTimeSpan}
 		}
 		if spanMs < resourceMatchSpanFloorMs {

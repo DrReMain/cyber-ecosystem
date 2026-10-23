@@ -12,7 +12,7 @@ import (
 
 // The law under test: the survival composite transcribed from the legacy
 // settle (Java DualZoneScorer), with dodges/collisions/survival rebuilt
-// from the behavior stream against the pause-carried net clock (§6.7).
+// from the behavior stream against the pause-carried net clock.
 func dualZoneRequest(spanMs int64, behaviors ...*esportspb.DualZoneBehavior) *esportspb.SubmitTestAttemptRequest {
 	start := time.Unix(1700000000, 0)
 	return &esportspb.SubmitTestAttemptRequest{
@@ -62,7 +62,7 @@ func TestDualZoneSurvivalScore(t *testing.T) {
 }
 
 // The base_score_time override retunes the survival reference without a
-// deploy (§6.7, the tier_value_* precedent).
+// deploy (the tier_value_* precedent).
 func TestDualZoneBaseTimeOverride(t *testing.T) {
 	res, err := dualZoneScorer{}.recompute(
 		dualZoneRequest(18000,
@@ -85,7 +85,7 @@ func TestDualZoneBaseTimeOverride(t *testing.T) {
 
 // A paused run keeps its play time: the wall clock grew by the pause
 // segment, the net clock did not — the tolerance compares against play
-// time (the Java gate would have rejected this shape, §6.7).
+// time (the Java gate would have rejected this shape).
 func TestDualZonePauseCarry(t *testing.T) {
 	req := dualZoneRequest(40000, dualZoneTenDodges()...)
 	req.Backgrounds = []*esportspb.BackgroundSpan{{ElapsedMs: 15000, DurationMs: 10000}}
@@ -123,7 +123,7 @@ func TestDualZoneCollisionEndsRun(t *testing.T) {
 }
 
 // An event-free stream is an idle-but-alive run: zero raw, full survival —
-// the score's numerator is staying alive, not the dodge count (§6.7).
+// the score's numerator is staying alive, not the dodge count.
 func TestDualZoneIdleRunScoresZero(t *testing.T) {
 	res, err := dualZoneScorer{}.recompute(dualZoneRequest(30000), scoringParams{durationSec: 30})
 	if err != nil {
@@ -145,7 +145,7 @@ func TestDualZoneAbsurdTimeSpan(t *testing.T) {
 	}
 }
 
-// The submitted span cannot overrun the server-configured length (§6.5
+// The submitted span cannot overrun the server-configured length (a
 // duration fabrication closure).
 func TestDualZoneSpanOverrunsConfig(t *testing.T) {
 	bs := dualZoneTenDodges()
