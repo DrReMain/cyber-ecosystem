@@ -18,6 +18,10 @@ type Tx struct {
 	AbilityScore *AbilityScoreClient
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
+	// MatchConfig is the client for interacting with the MatchConfig builders.
+	MatchConfig *MatchConfigClient
+	// MatchSession is the client for interacting with the MatchSession builders.
+	MatchSession *MatchSessionClient
 	// Profile is the client for interacting with the Profile builders.
 	Profile *ProfileClient
 	// QuestionBank is the client for interacting with the QuestionBank builders.
@@ -161,6 +165,8 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Game = NewGameClient(tx.config)
+	tx.MatchConfig = NewMatchConfigClient(tx.config)
+	tx.MatchSession = NewMatchSessionClient(tx.config)
 	tx.Profile = NewProfileClient(tx.config)
 	tx.QuestionBank = NewQuestionBankClient(tx.config)
 	tx.Test = NewTestClient(tx.config)

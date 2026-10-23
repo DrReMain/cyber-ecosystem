@@ -39,6 +39,12 @@ const (
 	Esports_ESPORTS_TEST_NOT_FOUND Esports = 6110
 	// 612x: member
 	Esports_ESPORTS_MEMBER_NOT_FOUND Esports = 6120
+	// 613x: match
+	Esports_ESPORTS_MATCH_GENRE_UNDECIDED     Esports = 6130
+	Esports_ESPORTS_MATCH_GENRE_UNKNOWN       Esports = 6131
+	Esports_ESPORTS_MATCH_SESSION_NOT_FOUND   Esports = 6132
+	Esports_ESPORTS_MATCH_TEST_NOT_IN_SESSION Esports = 6133
+	Esports_ESPORTS_MATCH_RETEST_EXHAUSTED    Esports = 6134
 )
 
 // Enum value maps for Esports.
@@ -50,6 +56,11 @@ var (
 		6102: "ESPORTS_PROFILE_CUSTOM_GAME_CAP",
 		6110: "ESPORTS_TEST_NOT_FOUND",
 		6120: "ESPORTS_MEMBER_NOT_FOUND",
+		6130: "ESPORTS_MATCH_GENRE_UNDECIDED",
+		6131: "ESPORTS_MATCH_GENRE_UNKNOWN",
+		6132: "ESPORTS_MATCH_SESSION_NOT_FOUND",
+		6133: "ESPORTS_MATCH_TEST_NOT_IN_SESSION",
+		6134: "ESPORTS_MATCH_RETEST_EXHAUSTED",
 	}
 	Esports_value = map[string]int32{
 		"ESPORTS_UNSPECIFIED":                       0,
@@ -58,6 +69,11 @@ var (
 		"ESPORTS_PROFILE_CUSTOM_GAME_CAP":           6102,
 		"ESPORTS_TEST_NOT_FOUND":                    6110,
 		"ESPORTS_MEMBER_NOT_FOUND":                  6120,
+		"ESPORTS_MATCH_GENRE_UNDECIDED":             6130,
+		"ESPORTS_MATCH_GENRE_UNKNOWN":               6131,
+		"ESPORTS_MATCH_SESSION_NOT_FOUND":           6132,
+		"ESPORTS_MATCH_TEST_NOT_IN_SESSION":         6133,
+		"ESPORTS_MATCH_RETEST_EXHAUSTED":            6134,
 	}
 )
 
@@ -92,14 +108,19 @@ var File_cyber_esports_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\x81\x02\n" +
+	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\xd8\x03\n" +
 	"\aEsports\x12\x1d\n" +
 	"\x13ESPORTS_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x124\n" +
 	")ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED\x10\xd4/\x1a\x04\xa8E\x90\x03\x12'\n" +
 	"\x1cESPORTS_PROFILE_GAME_UNKNOWN\x10\xd5/\x1a\x04\xa8E\x90\x03\x12*\n" +
 	"\x1fESPORTS_PROFILE_CUSTOM_GAME_CAP\x10\xd6/\x1a\x04\xa8E\x90\x03\x12!\n" +
 	"\x16ESPORTS_TEST_NOT_FOUND\x10\xde/\x1a\x04\xa8E\x94\x03\x12#\n" +
-	"\x18ESPORTS_MEMBER_NOT_FOUND\x10\xe8/\x1a\x04\xa8E\x94\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	"\x18ESPORTS_MEMBER_NOT_FOUND\x10\xe8/\x1a\x04\xa8E\x94\x03\x12(\n" +
+	"\x1dESPORTS_MATCH_GENRE_UNDECIDED\x10\xf2/\x1a\x04\xa8E\x90\x03\x12&\n" +
+	"\x1bESPORTS_MATCH_GENRE_UNKNOWN\x10\xf3/\x1a\x04\xa8E\x90\x03\x12*\n" +
+	"\x1fESPORTS_MATCH_SESSION_NOT_FOUND\x10\xf4/\x1a\x04\xa8E\x94\x03\x12,\n" +
+	"!ESPORTS_MATCH_TEST_NOT_IN_SESSION\x10\xf5/\x1a\x04\xa8E\x90\x03\x12)\n" +
+	"\x1eESPORTS_MATCH_RETEST_EXHAUSTED\x10\xf6/\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_error_reason_proto_rawDescOnce sync.Once

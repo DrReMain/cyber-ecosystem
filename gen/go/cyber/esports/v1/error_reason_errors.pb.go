@@ -88,3 +88,65 @@ func IsEsportsMemberNotFound(err error) bool {
 func ErrorEsportsMemberNotFound(format string, args ...interface{}) *errors.Error {
 	return errors.New(404, Esports_ESPORTS_MEMBER_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
+
+// 613x: match
+func IsEsportsMatchGenreUndecided(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_MATCH_GENRE_UNDECIDED.String() && e.Code == 400
+}
+
+// 613x: match
+func ErrorEsportsMatchGenreUndecided(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_MATCH_GENRE_UNDECIDED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsMatchGenreUnknown(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_MATCH_GENRE_UNKNOWN.String() && e.Code == 400
+}
+
+func ErrorEsportsMatchGenreUnknown(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_MATCH_GENRE_UNKNOWN.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsMatchSessionNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_MATCH_SESSION_NOT_FOUND.String() && e.Code == 404
+}
+
+func ErrorEsportsMatchSessionNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, Esports_ESPORTS_MATCH_SESSION_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsMatchTestNotInSession(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_MATCH_TEST_NOT_IN_SESSION.String() && e.Code == 400
+}
+
+func ErrorEsportsMatchTestNotInSession(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_MATCH_TEST_NOT_IN_SESSION.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsMatchRetestExhausted(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_MATCH_RETEST_EXHAUSTED.String() && e.Code == 400
+}
+
+func ErrorEsportsMatchRetestExhausted(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_MATCH_RETEST_EXHAUSTED.String(), fmt.Sprintf(format, args...))
+}

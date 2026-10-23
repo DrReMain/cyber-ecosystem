@@ -13,6 +13,8 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
@@ -35,6 +37,10 @@ type Client struct {
 	AbilityScore *AbilityScoreClient
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
+	// MatchConfig is the client for interacting with the MatchConfig builders.
+	MatchConfig *MatchConfigClient
+	// MatchSession is the client for interacting with the MatchSession builders.
+	MatchSession *MatchSessionClient
 	// Profile is the client for interacting with the Profile builders.
 	Profile *ProfileClient
 	// QuestionBank is the client for interacting with the QuestionBank builders.
@@ -58,6 +64,8 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
 	c.Game = NewGameClient(c.config)
+	c.MatchConfig = NewMatchConfigClient(c.config)
+	c.MatchSession = NewMatchSessionClient(c.config)
 	c.Profile = NewProfileClient(c.config)
 	c.QuestionBank = NewQuestionBankClient(c.config)
 	c.Test = NewTestClient(c.config)
@@ -157,6 +165,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
 		Game:         NewGameClient(cfg),
+		MatchConfig:  NewMatchConfigClient(cfg),
+		MatchSession: NewMatchSessionClient(cfg),
 		Profile:      NewProfileClient(cfg),
 		QuestionBank: NewQuestionBankClient(cfg),
 		Test:         NewTestClient(cfg),
@@ -183,6 +193,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
 		Game:         NewGameClient(cfg),
+		MatchConfig:  NewMatchConfigClient(cfg),
+		MatchSession: NewMatchSessionClient(cfg),
 		Profile:      NewProfileClient(cfg),
 		QuestionBank: NewQuestionBankClient(cfg),
 		Test:         NewTestClient(cfg),
@@ -217,8 +229,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityScore, c.Game, c.Profile, c.QuestionBank, c.Test, c.TestConfig,
-		c.TestRecord,
+		c.AbilityScore, c.Game, c.MatchConfig, c.MatchSession, c.Profile,
+		c.QuestionBank, c.Test, c.TestConfig, c.TestRecord,
 	} {
 		n.Use(hooks...)
 	}
@@ -228,8 +240,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityScore, c.Game, c.Profile, c.QuestionBank, c.Test, c.TestConfig,
-		c.TestRecord,
+		c.AbilityScore, c.Game, c.MatchConfig, c.MatchSession, c.Profile,
+		c.QuestionBank, c.Test, c.TestConfig, c.TestRecord,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -242,6 +254,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AbilityScore.mutate(ctx, m)
 	case *GameMutation:
 		return c.Game.mutate(ctx, m)
+	case *MatchConfigMutation:
+		return c.MatchConfig.mutate(ctx, m)
+	case *MatchSessionMutation:
+		return c.MatchSession.mutate(ctx, m)
 	case *ProfileMutation:
 		return c.Profile.mutate(ctx, m)
 	case *QuestionBankMutation:
@@ -524,6 +540,276 @@ func (c *GameClient) mutate(ctx context.Context, m *GameMutation) (Value, error)
 		return (&GameDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Game mutation op: %q", m.Op())
+	}
+}
+
+// MatchConfigClient is a client for the MatchConfig schema.
+type MatchConfigClient struct {
+	config
+}
+
+// NewMatchConfigClient returns a client for the MatchConfig from the given config.
+func NewMatchConfigClient(c config) *MatchConfigClient {
+	return &MatchConfigClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `matchconfig.Hooks(f(g(h())))`.
+func (c *MatchConfigClient) Use(hooks ...Hook) {
+	c.hooks.MatchConfig = append(c.hooks.MatchConfig, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `matchconfig.Intercept(f(g(h())))`.
+func (c *MatchConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MatchConfig = append(c.inters.MatchConfig, interceptors...)
+}
+
+// Create returns a builder for creating a MatchConfig entity.
+func (c *MatchConfigClient) Create() *MatchConfigCreate {
+	mutation := newMatchConfigMutation(c.config, OpCreate)
+	return &MatchConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MatchConfig entities.
+func (c *MatchConfigClient) CreateBulk(builders ...*MatchConfigCreate) *MatchConfigCreateBulk {
+	return &MatchConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MatchConfigClient) MapCreateBulk(slice any, setFunc func(*MatchConfigCreate, int)) *MatchConfigCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MatchConfigCreateBulk{err: fmt.Errorf("calling to MatchConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MatchConfigCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MatchConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MatchConfig.
+func (c *MatchConfigClient) Update() *MatchConfigUpdate {
+	mutation := newMatchConfigMutation(c.config, OpUpdate)
+	return &MatchConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MatchConfigClient) UpdateOne(_m *MatchConfig) *MatchConfigUpdateOne {
+	mutation := newMatchConfigMutation(c.config, OpUpdateOne, withMatchConfig(_m))
+	return &MatchConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MatchConfigClient) UpdateOneID(id string) *MatchConfigUpdateOne {
+	mutation := newMatchConfigMutation(c.config, OpUpdateOne, withMatchConfigID(id))
+	return &MatchConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MatchConfig.
+func (c *MatchConfigClient) Delete() *MatchConfigDelete {
+	mutation := newMatchConfigMutation(c.config, OpDelete)
+	return &MatchConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MatchConfigClient) DeleteOne(_m *MatchConfig) *MatchConfigDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MatchConfigClient) DeleteOneID(id string) *MatchConfigDeleteOne {
+	builder := c.Delete().Where(matchconfig.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MatchConfigDeleteOne{builder}
+}
+
+// Query returns a query builder for MatchConfig.
+func (c *MatchConfigClient) Query() *MatchConfigQuery {
+	return &MatchConfigQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMatchConfig},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MatchConfig entity by its id.
+func (c *MatchConfigClient) Get(ctx context.Context, id string) (*MatchConfig, error) {
+	return c.Query().Where(matchconfig.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MatchConfigClient) GetX(ctx context.Context, id string) *MatchConfig {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MatchConfigClient) Hooks() []Hook {
+	hooks := c.hooks.MatchConfig
+	return append(hooks[:len(hooks):len(hooks)], matchconfig.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *MatchConfigClient) Interceptors() []Interceptor {
+	inters := c.inters.MatchConfig
+	return append(inters[:len(inters):len(inters)], matchconfig.Interceptors[:]...)
+}
+
+func (c *MatchConfigClient) mutate(ctx context.Context, m *MatchConfigMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MatchConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MatchConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MatchConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MatchConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MatchConfig mutation op: %q", m.Op())
+	}
+}
+
+// MatchSessionClient is a client for the MatchSession schema.
+type MatchSessionClient struct {
+	config
+}
+
+// NewMatchSessionClient returns a client for the MatchSession from the given config.
+func NewMatchSessionClient(c config) *MatchSessionClient {
+	return &MatchSessionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `matchsession.Hooks(f(g(h())))`.
+func (c *MatchSessionClient) Use(hooks ...Hook) {
+	c.hooks.MatchSession = append(c.hooks.MatchSession, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `matchsession.Intercept(f(g(h())))`.
+func (c *MatchSessionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MatchSession = append(c.inters.MatchSession, interceptors...)
+}
+
+// Create returns a builder for creating a MatchSession entity.
+func (c *MatchSessionClient) Create() *MatchSessionCreate {
+	mutation := newMatchSessionMutation(c.config, OpCreate)
+	return &MatchSessionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MatchSession entities.
+func (c *MatchSessionClient) CreateBulk(builders ...*MatchSessionCreate) *MatchSessionCreateBulk {
+	return &MatchSessionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MatchSessionClient) MapCreateBulk(slice any, setFunc func(*MatchSessionCreate, int)) *MatchSessionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MatchSessionCreateBulk{err: fmt.Errorf("calling to MatchSessionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MatchSessionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MatchSessionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MatchSession.
+func (c *MatchSessionClient) Update() *MatchSessionUpdate {
+	mutation := newMatchSessionMutation(c.config, OpUpdate)
+	return &MatchSessionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MatchSessionClient) UpdateOne(_m *MatchSession) *MatchSessionUpdateOne {
+	mutation := newMatchSessionMutation(c.config, OpUpdateOne, withMatchSession(_m))
+	return &MatchSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MatchSessionClient) UpdateOneID(id string) *MatchSessionUpdateOne {
+	mutation := newMatchSessionMutation(c.config, OpUpdateOne, withMatchSessionID(id))
+	return &MatchSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MatchSession.
+func (c *MatchSessionClient) Delete() *MatchSessionDelete {
+	mutation := newMatchSessionMutation(c.config, OpDelete)
+	return &MatchSessionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MatchSessionClient) DeleteOne(_m *MatchSession) *MatchSessionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MatchSessionClient) DeleteOneID(id string) *MatchSessionDeleteOne {
+	builder := c.Delete().Where(matchsession.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MatchSessionDeleteOne{builder}
+}
+
+// Query returns a query builder for MatchSession.
+func (c *MatchSessionClient) Query() *MatchSessionQuery {
+	return &MatchSessionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMatchSession},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MatchSession entity by its id.
+func (c *MatchSessionClient) Get(ctx context.Context, id string) (*MatchSession, error) {
+	return c.Query().Where(matchsession.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MatchSessionClient) GetX(ctx context.Context, id string) *MatchSession {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MatchSessionClient) Hooks() []Hook {
+	hooks := c.hooks.MatchSession
+	return append(hooks[:len(hooks):len(hooks)], matchsession.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *MatchSessionClient) Interceptors() []Interceptor {
+	inters := c.inters.MatchSession
+	return append(inters[:len(inters):len(inters)], matchsession.Interceptors[:]...)
+}
+
+func (c *MatchSessionClient) mutate(ctx context.Context, m *MatchSessionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MatchSessionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MatchSessionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MatchSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MatchSessionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MatchSession mutation op: %q", m.Op())
 	}
 }
 
@@ -1205,12 +1491,12 @@ func (c *TestRecordClient) mutate(ctx context.Context, m *TestRecordMutation) (V
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Game, Profile, QuestionBank, Test, TestConfig,
-		TestRecord []ent.Hook
+		AbilityScore, Game, MatchConfig, MatchSession, Profile, QuestionBank, Test,
+		TestConfig, TestRecord []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Game, Profile, QuestionBank, Test, TestConfig,
-		TestRecord []ent.Interceptor
+		AbilityScore, Game, MatchConfig, MatchSession, Profile, QuestionBank, Test,
+		TestConfig, TestRecord []ent.Interceptor
 	}
 )
 

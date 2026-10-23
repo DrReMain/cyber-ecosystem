@@ -94,5 +94,10 @@
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "اللعبة المختارة غير موجودة؛ حدّث القائمة وحاول مجددًا",
   "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "تم بلوغ حد الألعاب المخصصة",
   "error_ESPORTS_TEST_NOT_FOUND": "الاختبار غير موجود أو لم يعد متاحًا",
-  "error_ESPORTS_MEMBER_NOT_FOUND": "العضو غير موجود"
+  "error_ESPORTS_MEMBER_NOT_FOUND": "العضو غير موجود",
+  "error_ESPORTS_MATCH_GENRE_UNDECIDED": "اختر نوع اللعبة أولاً للبدء",
+  "error_ESPORTS_MATCH_GENRE_UNKNOWN": "نوع لعبة غير مدعوم",
+  "error_ESPORTS_MATCH_SESSION_NOT_FOUND": "انتهت صلاحية جلسة التقييم. ابدأ من جديد",
+  "error_ESPORTS_MATCH_TEST_NOT_IN_SESSION": "هذا الاختبار ليس ضمن الترتيب الحالي",
+  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "استنفدت فرص إعادة هذا الاختبار"
 }

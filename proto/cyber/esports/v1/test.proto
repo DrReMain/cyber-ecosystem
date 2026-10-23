@@ -170,9 +170,20 @@ message SubmitTestAttemptRequest {
       max_len: 64
     }
   ];
-  // Attempt ordinal inside the match session — the E4 session law owns the
-  // semantics (lockdown, retest budget); this contract only carries the key.
+  // Legacy client-carried ordinal — ignored: the session law computes
+  // ordinals server-side (count of prior records in the session for this
+  // test, plus one). Rides for wire stability until the client submitter
+  // drops it.
   optional int32 attempt_no = 2 [(buf.validate.field).int32.gte = 1];
+  // Presence binds the attempt to that match session: the test must be one
+  // of the session's locked steps, the ordinal and retest budget are
+  // session law, and the score rides the session's difficulty mode.
+  // Absence = local practice: no session, vacuous ordinal, experience
+  // baseline, no budget.
+  optional string match_session_id = 6 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 64
+  }];
   optional google.protobuf.Timestamp started_at = 3 [(buf.validate.field).required = true];
   optional google.protobuf.Timestamp ended_at = 4 [(buf.validate.field).required = true];
   repeated BackgroundSpan backgrounds = 5 [(buf.validate.field).repeated.max_items = 64];

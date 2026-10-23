@@ -7,6 +7,7 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -48,6 +49,23 @@ var seedTests = []struct {
 	{"character_counter", "角色Counter测试", "moba", "resourceAllocation"},
 	{"economic_sim", "经济模拟测试", "moba", "resourceAllocation"},
 	{"multi_target", "多目标点击测试", "fps", "aimingAccuracy"},
+}
+
+var seedMatchConfigs = []struct {
+	Genre       string
+	Ability     string
+	RenderOrder int
+}{
+	// The genre capability orders (fps/moba, four abilities each); a
+	// channel scenario axis reuses this table later with no schema change.
+	{"fps", "reactionSpeed", 1},
+	{"fps", "aimingAccuracy", 2},
+	{"fps", "trackingStability", 3},
+	{"fps", "skillReleaseAccuracy", 4},
+	{"moba", "resourceAllocation", 1},
+	{"moba", "decisionEfficiency", 2},
+	{"moba", "reactionSpeed", 3},
+	{"moba", "skillReleaseAccuracy", 4},
 }
 
 var seedQuestions = []questionSeed{
@@ -498,6 +516,42 @@ func (s *Seed) Run(ctx context.Context) error {
 			SetNillableAbility(strPtr(t.Ability)).
 			Save(ctx); err != nil {
 			return s.plat.HandleEntError(fmt.Errorf("seed: update test %q: %w", t.Code, err))
+		}
+	}
+
+	for _, mc := range seedMatchConfigs {
+		// Same keep-in-step law as the tests: create when absent, refresh
+		// render_order when the adopted baseline moves.
+		row, err := client.MatchConfig.Query().
+			Where(matchconfig.GenreEQ(mc.Genre), matchconfig.AbilityEQ(mc.Ability)).
+			Only(ctx)
+		if err != nil && !ent.IsNotFound(err) {
+			return s.plat.HandleEntError(fmt.Errorf("seed: query match config %s/%s: %w", mc.Genre, mc.Ability, err))
+		}
+		if row == nil {
+			if _, err := client.MatchConfig.Create().
+				SetGenre(mc.Genre).
+				SetAbility(mc.Ability).
+				SetRenderOrder(mc.RenderOrder).
+				Save(ctx); err != nil {
+				// Multi-replica boot race: see the game loop's arm — the
+				// winning replica created the row too.
+				if ent.IsConstraintError(err) {
+					if _, reErr := client.MatchConfig.Query().
+						Where(matchconfig.GenreEQ(mc.Genre), matchconfig.AbilityEQ(mc.Ability)).
+						Only(ctx); reErr == nil {
+						continue
+					}
+				}
+				return s.plat.HandleEntError(fmt.Errorf("seed: create match config %s/%s: %w", mc.Genre, mc.Ability, err))
+			}
+			s.log.Info("seeded match config", "genre", mc.Genre, "ability", mc.Ability)
+			continue
+		}
+		if _, err := row.Update().
+			SetRenderOrder(mc.RenderOrder).
+			Save(ctx); err != nil {
+			return s.plat.HandleEntError(fmt.Errorf("seed: update match config %s/%s: %w", mc.Genre, mc.Ability, err))
 		}
 	}
 

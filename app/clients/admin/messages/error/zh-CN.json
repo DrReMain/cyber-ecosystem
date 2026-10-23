@@ -94,5 +94,10 @@
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "所选游戏不存在，请刷新列表后重试",
   "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "自定义游戏数量已达上限",
   "error_ESPORTS_TEST_NOT_FOUND": "测试项不存在或已下线",
-  "error_ESPORTS_MEMBER_NOT_FOUND": "会员不存在"
+  "error_ESPORTS_MEMBER_NOT_FOUND": "会员不存在",
+  "error_ESPORTS_MATCH_GENRE_UNDECIDED": "请先选择你的游戏类型",
+  "error_ESPORTS_MATCH_GENRE_UNKNOWN": "不支持的游戏类型",
+  "error_ESPORTS_MATCH_SESSION_NOT_FOUND": "测评会话已失效，请重新开始",
+  "error_ESPORTS_MATCH_TEST_NOT_IN_SESSION": "该测试不在当前测评编排内",
+  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "该测试的重测机会已用完"
 }

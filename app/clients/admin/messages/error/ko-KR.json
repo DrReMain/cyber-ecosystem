@@ -94,5 +94,10 @@
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "선택한 게임이 없습니다. 목록을 새로고침 후 다시 시도하세요",
   "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "커스텀 게임 한도에 도달했습니다",
   "error_ESPORTS_TEST_NOT_FOUND": "테스트를 찾을 수 없거나 더 이상 제공되지 않습니다",
-  "error_ESPORTS_MEMBER_NOT_FOUND": "회원을 찾을 수 없습니다"
+  "error_ESPORTS_MEMBER_NOT_FOUND": "회원을 찾을 수 없습니다",
+  "error_ESPORTS_MATCH_GENRE_UNDECIDED": "먼저 게임 유형을 선택하세요",
+  "error_ESPORTS_MATCH_GENRE_UNKNOWN": "지원되지 않는 게임 유형입니다",
+  "error_ESPORTS_MATCH_SESSION_NOT_FOUND": "세션이 만료되었습니다. 다시 시작해 주세요",
+  "error_ESPORTS_MATCH_TEST_NOT_IN_SESSION": "이 테스트는 현재 구성에 포함되어 있지 않습니다",
+  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "이 테스트의 재응시 기회를 모두 사용했습니다"
 }

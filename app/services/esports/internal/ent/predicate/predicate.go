@@ -12,6 +12,12 @@ type AbilityScore func(*sql.Selector)
 // Game is the predicate function for game builders.
 type Game func(*sql.Selector)
 
+// MatchConfig is the predicate function for matchconfig builders.
+type MatchConfig func(*sql.Selector)
+
+// MatchSession is the predicate function for matchsession builders.
+type MatchSession func(*sql.Selector)
+
 // Profile is the predicate function for profile builders.
 type Profile func(*sql.Selector)
 

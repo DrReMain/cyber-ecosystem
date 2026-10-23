@@ -305,6 +305,15 @@ export type CyberEsportsV1GamePreferenceInput = {
     customNames?: Array<string>;
 };
 
+export type CyberEsportsV1GetMatchSessionResponse = {
+    session?: CyberEsportsV1MatchSession;
+    /**
+     * True when this call created the session (intro face); false when an
+     * in-window session resumed (continue face). Success implies present.
+     */
+    created?: boolean;
+};
+
 export type CyberEsportsV1GetMemberResponse = {
     member?: CyberEsportsV1Member;
 };
@@ -337,6 +346,50 @@ export type CyberEsportsV1ListMembersResponse = {
 
 export type CyberEsportsV1ListTestsResponse = {
     tests?: Array<CyberEsportsV1Test>;
+};
+
+export type CyberEsportsV1MatchSession = {
+    id?: string;
+    /**
+     * The session's type-axis value (fps|moba|...) — frozen at creation;
+     * changing it is a new session, never a mutation.
+     */
+    genre?: string;
+    /**
+     * Mode-axis word vocabulary: experience | standard; every attempt in
+     * the session scores on this mode.
+     */
+    difficulty?: string;
+    /**
+     * The locked arrangement, emitted in match_config render_order.
+     */
+    steps?: Array<CyberEsportsV1MatchStep>;
+    /**
+     * Step codes with at least one attempt record since session start —
+     * derived from records, never client-asserted.
+     */
+    done?: Array<string>;
+    /**
+     * Remaining attempts per step code (budget minus records); the "N/3" face.
+     */
+    retestLeft?: {
+        [key: string]: number;
+    };
+    createdAt?: string;
+    /**
+     * True when this session is the member's first ever — the 3-vs-1 retest
+     * budget face (the budget itself rides the session row).
+     */
+    firstSession?: boolean;
+};
+
+export type CyberEsportsV1MatchStep = {
+    /**
+     * The ability the step was drawn for (a match_config row) and the drawn
+     * test's catalog code — names hydrate client-side from the test list.
+     */
+    ability?: string;
+    testCode?: string;
 };
 
 export type CyberEsportsV1Member = {
@@ -573,10 +626,20 @@ export type CyberEsportsV1SubmitTestAttemptRequest = {
      */
     testCode?: string;
     /**
-     * Attempt ordinal inside the match session — the E4 session law owns the
-     * semantics (lockdown, retest budget); this contract only carries the key.
+     * Legacy client-carried ordinal — ignored: the session law computes
+     * ordinals server-side (count of prior records in the session for this
+     * test, plus one). Rides for wire stability until the client submitter
+     * drops it.
      */
     attemptNo?: number;
+    /**
+     * Presence binds the attempt to that match session: the test must be one
+     * of the session's locked steps, the ordinal and retest budget are
+     * session law, and the score rides the session's difficulty mode.
+     * Absence = local practice: no session, vacuous ordinal, experience
+     * baseline, no budget.
+     */
+    matchSessionId?: string;
     startedAt?: string;
     endedAt?: string;
     backgrounds?: Array<CyberEsportsV1BackgroundSpan>;
@@ -622,6 +685,14 @@ export type CyberEsportsV1SubmitTestAttemptResponse = {
      * Retest budget receipt for the "N/3 remaining" UI; E4 owns enforcement.
      */
     retestLeft?: number;
+};
+
+export type CyberEsportsV1SwitchMatchGenreRequest = {
+    genre?: string;
+};
+
+export type CyberEsportsV1SwitchMatchGenreResponse = {
+    session?: CyberEsportsV1MatchSession;
 };
 
 export type CyberEsportsV1TargetRecognitionClick = {
@@ -2095,6 +2166,48 @@ export type GameServiceListGamesResponses = {
 };
 
 export type GameServiceListGamesResponse = GameServiceListGamesResponses[keyof GameServiceListGamesResponses];
+
+export type MatchServiceGetMatchSessionData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Seeds session creation only — an active in-window session resumes
+         * regardless of this value (switching is the explicit SwitchMatchGenre
+         * action; Get never closes a session implicitly). Absent → the server
+         * votes the member's preferred-game majority through the catalog
+         * categories; a tie or no classified picks returns
+         * ESPORTS_MATCH_GENRE_UNDECIDED and the pick page owns the manual choice.
+         */
+        genre?: string;
+    };
+    url: '/api/v1/esports/match/session';
+};
+
+export type MatchServiceGetMatchSessionResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetMatchSessionResponse;
+};
+
+export type MatchServiceGetMatchSessionResponse = MatchServiceGetMatchSessionResponses[keyof MatchServiceGetMatchSessionResponses];
+
+export type MatchServiceSwitchMatchGenreData = {
+    body: CyberEsportsV1SwitchMatchGenreRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/match/session/switch';
+};
+
+export type MatchServiceSwitchMatchGenreResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SwitchMatchGenreResponse;
+};
+
+export type MatchServiceSwitchMatchGenreResponse = MatchServiceSwitchMatchGenreResponses[keyof MatchServiceSwitchMatchGenreResponses];
 
 export type MemberServiceListMembersData = {
     body?: never;

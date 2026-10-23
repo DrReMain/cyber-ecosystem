@@ -24,9 +24,9 @@ func (TestRecord) Fields() []ent.Field {
 		field.String("user_id").NotEmpty().MaxRuneLen(20).Immutable().
 			Comment("owning member identity (system user id), logical reference — same key law as profile"),
 		field.Int("attempt_no").Positive().
-			Comment("attempt ordinal inside the match session; uniqueness is the match-session law, not a DB constraint yet"),
+			Comment("attempt ordinal inside the match session; the partial unique (session_id, test_code, attempt_no) makes the count-then-insert claim atomic under concurrent submits"),
 		field.String("session_id").Optional().Nillable().MaxRuneLen(64).
-			Comment("match session reference — null until the match-session aggregate lands, then backfilled"),
+			Comment("match session reference — null on practice attempts, set on session attempts"),
 		field.Time("started_at").Immutable().
 			Comment("attempt start (wall clock, server-stamped from the submitted anchor)"),
 		field.Time("ended_at").Immutable().
@@ -66,6 +66,10 @@ func (TestRecord) Indexes() []ent.Index {
 		index.Fields("tenant_id", "created_at"),
 		index.Fields("user_id", "test_code", "created_at"),
 		index.Fields("test_code", "created_at"),
+		// The ordinal claim: one row per (session, test, ordinal) — practice
+		// attempts carry no session and stay outside the claim.
+		index.Fields("session_id", "test_code", "attempt_no").Unique().
+			Annotations(entsql.IndexWhere("session_id IS NOT NULL")),
 	}
 }
 

@@ -26,4 +26,11 @@ enum Esports {
 
   // 612x: member
   ESPORTS_MEMBER_NOT_FOUND = 6120 [(.errors.code) = 404];
+
+  // 613x: match
+  ESPORTS_MATCH_GENRE_UNDECIDED = 6130 [(.errors.code) = 400];
+  ESPORTS_MATCH_GENRE_UNKNOWN = 6131 [(.errors.code) = 400];
+  ESPORTS_MATCH_SESSION_NOT_FOUND = 6132 [(.errors.code) = 404];
+  ESPORTS_MATCH_TEST_NOT_IN_SESSION = 6133 [(.errors.code) = 400];
+  ESPORTS_MATCH_RETEST_EXHAUSTED = 6134 [(.errors.code) = 400];
 }

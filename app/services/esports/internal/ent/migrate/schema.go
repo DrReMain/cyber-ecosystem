@@ -102,6 +102,104 @@ var (
 			},
 		},
 	}
+	// MatchConfigColumns holds the columns for the "match_config" table.
+	MatchConfigColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "genre", Type: field.TypeString, Size: 16, Comment: "type-axis vocabulary fps|moba|... — the scenario axis (channel batches) joins the same column later; open word set, admin-managed, same law as test.category"},
+		{Name: "ability", Type: field.TypeString, Size: 32, Comment: "six-word vocabulary reactionSpeed|aimingAccuracy|... — the ability this slot draws a test for"},
+		{Name: "render_order", Type: field.TypeInt, Comment: "orchestration position inside the genre; steps emit in this order, so retuning reorders lineups without a contract change", Default: 1},
+	}
+	// MatchConfigTable holds the schema information for the "match_config" table.
+	MatchConfigTable = &schema.Table{
+		Name:       "match_config",
+		Columns:    MatchConfigColumns,
+		PrimaryKey: []*schema.Column{MatchConfigColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "matchconfig_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{MatchConfigColumns[1]},
+			},
+			{
+				Name:    "matchconfig_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{MatchConfigColumns[2]},
+			},
+			{
+				Name:    "matchconfig_tenant_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{MatchConfigColumns[3], MatchConfigColumns[1]},
+			},
+			{
+				Name:    "matchconfig_genre_render_order",
+				Unique:  false,
+				Columns: []*schema.Column{MatchConfigColumns[5], MatchConfigColumns[7]},
+			},
+			{
+				Name:    "matchconfig_genre_ability",
+				Unique:  true,
+				Columns: []*schema.Column{MatchConfigColumns[5], MatchConfigColumns[6]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+		},
+	}
+	// MatchSessionColumns holds the columns for the "match_session" table.
+	MatchSessionColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "owning member identity (system user id), logical reference — same key law as profile and test_record"},
+		{Name: "genre", Type: field.TypeString, Size: 16, Comment: "the session's type-axis value; frozen at creation — changing type is a new session, never a mutation"},
+		{Name: "difficulty", Type: field.TypeEnum, Comment: "mode axis: every attempt in the session scores on this mode at the submit seam; every session is born experience — standard is reserved for a purchasable entry", Enums: []string{"experience", "standard"}, Default: "experience"},
+		{Name: "seed", Type: field.TypeInt64, Comment: "the draw's input entropy (FNV over user|day|genre|salt), stored for audit reproduction only — behavior always replays the locked steps", Default: 0},
+		{Name: "steps", Type: field.TypeJSON, Comment: "the locked arrangement in match_config render_order; frozen at creation, resumes replay it verbatim"},
+		{Name: "retest_budget", Type: field.TypeInt, Comment: "attempts allowed per step inside this session — first-ever session 3, later sessions 1; frozen at birth, each stored attempt spends one valid or not", Default: 3},
+		{Name: "status", Type: field.TypeEnum, Comment: "active resumes inside the seven-day window; switched = explicit re-draw closed it, expired = window passed (closed lazily on read)", Enums: []string{"active", "switched", "expired"}, Default: "active"},
+	}
+	// MatchSessionTable holds the schema information for the "match_session" table.
+	MatchSessionTable = &schema.Table{
+		Name:       "match_session",
+		Columns:    MatchSessionColumns,
+		PrimaryKey: []*schema.Column{MatchSessionColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "matchsession_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{MatchSessionColumns[1]},
+			},
+			{
+				Name:    "matchsession_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{MatchSessionColumns[2]},
+			},
+			{
+				Name:    "matchsession_tenant_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{MatchSessionColumns[3], MatchSessionColumns[1]},
+			},
+			{
+				Name:    "matchsession_user_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{MatchSessionColumns[5], MatchSessionColumns[1]},
+			},
+			{
+				Name:    "matchsession_user_id",
+				Unique:  true,
+				Columns: []*schema.Column{MatchSessionColumns[5]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "status = 'active' AND deleted_at IS NULL",
+				},
+			},
+		},
+	}
 	// ProfileColumns holds the columns for the "profile" table.
 	ProfileColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -291,8 +389,8 @@ var (
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
 		{Name: "test_code", Type: field.TypeString, Size: 50, Comment: "the attempted test (join into test.code)"},
 		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "owning member identity (system user id), logical reference — same key law as profile"},
-		{Name: "attempt_no", Type: field.TypeInt, Comment: "attempt ordinal inside the match session; uniqueness is the match-session law, not a DB constraint yet"},
-		{Name: "session_id", Type: field.TypeString, Nullable: true, Size: 64, Comment: "match session reference — null until the match-session aggregate lands, then backfilled"},
+		{Name: "attempt_no", Type: field.TypeInt, Comment: "attempt ordinal inside the match session; the partial unique (session_id, test_code, attempt_no) makes the count-then-insert claim atomic under concurrent submits"},
+		{Name: "session_id", Type: field.TypeString, Nullable: true, Size: 64, Comment: "match session reference — null on practice attempts, set on session attempts"},
 		{Name: "started_at", Type: field.TypeTime, Comment: "attempt start (wall clock, server-stamped from the submitted anchor)"},
 		{Name: "ended_at", Type: field.TypeTime, Comment: "attempt end"},
 		{Name: "backgrounds", Type: field.TypeJSON, Nullable: true, Comment: "engine-marked backgrounding spans; validity is judged against test_config.background_invalid_seconds"},
@@ -334,12 +432,22 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{TestRecordColumns[5], TestRecordColumns[1]},
 			},
+			{
+				Name:    "testrecord_session_id_test_code_attempt_no",
+				Unique:  true,
+				Columns: []*schema.Column{TestRecordColumns[8], TestRecordColumns[5], TestRecordColumns[7]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "session_id IS NOT NULL",
+				},
+			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoreTable,
 		GameTable,
+		MatchConfigTable,
+		MatchSessionTable,
 		ProfileTable,
 		QuestionBankTable,
 		TestTable,
@@ -354,6 +462,12 @@ func init() {
 	}
 	GameTable.Annotation = &entsql.Annotation{
 		Table: "game",
+	}
+	MatchConfigTable.Annotation = &entsql.Annotation{
+		Table: "match_config",
+	}
+	MatchSessionTable.Annotation = &entsql.Annotation{
+		Table: "match_session",
 	}
 	ProfileTable.Annotation = &entsql.Annotation{
 		Table: "profile",

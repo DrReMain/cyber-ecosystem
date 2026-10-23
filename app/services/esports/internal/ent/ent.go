@@ -6,6 +6,8 @@ import (
 	"context"
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
@@ -81,6 +83,8 @@ func checkColumn(t, c string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			abilityscore.Table: abilityscore.ValidColumn,
 			game.Table:         game.ValidColumn,
+			matchconfig.Table:  matchconfig.ValidColumn,
+			matchsession.Table: matchsession.ValidColumn,
 			profile.Table:      profile.ValidColumn,
 			questionbank.Table: questionbank.ValidColumn,
 			test.Table:         test.ValidColumn,

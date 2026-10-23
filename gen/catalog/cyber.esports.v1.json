@@ -22,6 +22,41 @@
     ]
   },
   {
+    "name": "MatchService",
+    "full_name": "cyber.esports.v1.MatchService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/match.proto",
+    "comment": "匹配会话",
+    "methods": [
+      {
+        "name": "GetMatchSession",
+        "full_name": "cyber.esports.v1.MatchService.GetMatchSession",
+        "request_name": "GetMatchSessionRequest",
+        "request_full_name": "cyber.esports.v1.GetMatchSessionRequest",
+        "response_name": "GetMatchSessionResponse",
+        "response_full_name": "cyber.esports.v1.GetMatchSessionResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/match/session",
+        "comment": "获取匹配会话(无则按偏好多数票编排)",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "SwitchMatchGenre",
+        "full_name": "cyber.esports.v1.MatchService.SwitchMatchGenre",
+        "request_name": "SwitchMatchGenreRequest",
+        "request_full_name": "cyber.esports.v1.SwitchMatchGenreRequest",
+        "response_name": "SwitchMatchGenreResponse",
+        "response_full_name": "cyber.esports.v1.SwitchMatchGenreResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/match/session/switch",
+        "comment": "切换类型重排匹配会话",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "MemberService",
     "full_name": "cyber.esports.v1.MemberService",
     "package": "cyber.esports.v1",

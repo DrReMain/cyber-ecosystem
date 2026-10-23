@@ -9,6 +9,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
 	"cyber-ecosystem/app/services/esports/internal/ent/predicate"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
@@ -127,6 +129,60 @@ func (f TraverseGame) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.GameQuery", q)
+}
+
+// The MatchConfigFunc type is an adapter to allow the use of ordinary function as a Querier.
+type MatchConfigFunc func(context.Context, *ent.MatchConfigQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f MatchConfigFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.MatchConfigQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.MatchConfigQuery", q)
+}
+
+// The TraverseMatchConfig type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseMatchConfig func(context.Context, *ent.MatchConfigQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseMatchConfig) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseMatchConfig) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.MatchConfigQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.MatchConfigQuery", q)
+}
+
+// The MatchSessionFunc type is an adapter to allow the use of ordinary function as a Querier.
+type MatchSessionFunc func(context.Context, *ent.MatchSessionQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f MatchSessionFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.MatchSessionQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.MatchSessionQuery", q)
+}
+
+// The TraverseMatchSession type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseMatchSession func(context.Context, *ent.MatchSessionQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseMatchSession) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseMatchSession) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.MatchSessionQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.MatchSessionQuery", q)
 }
 
 // The ProfileFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -271,6 +327,10 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.AbilityScoreQuery, predicate.AbilityScore, abilityscore.OrderOption]{typ: ent.TypeAbilityScore, tq: q}, nil
 	case *ent.GameQuery:
 		return &query[*ent.GameQuery, predicate.Game, game.OrderOption]{typ: ent.TypeGame, tq: q}, nil
+	case *ent.MatchConfigQuery:
+		return &query[*ent.MatchConfigQuery, predicate.MatchConfig, matchconfig.OrderOption]{typ: ent.TypeMatchConfig, tq: q}, nil
+	case *ent.MatchSessionQuery:
+		return &query[*ent.MatchSessionQuery, predicate.MatchSession, matchsession.OrderOption]{typ: ent.TypeMatchSession, tq: q}, nil
 	case *ent.ProfileQuery:
 		return &query[*ent.ProfileQuery, predicate.Profile, profile.OrderOption]{typ: ent.TypeProfile, tq: q}, nil
 	case *ent.QuestionBankQuery:

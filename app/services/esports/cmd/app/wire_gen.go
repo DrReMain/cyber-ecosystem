@@ -12,6 +12,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
+	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
@@ -49,9 +50,13 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, logg
 	memberUC := member.NewMemberUC(logger, platformPlatform, systemClient, profileRP)
 	memberService := member.NewMemberService(logger, memberUC)
 	testRP := test.NewTestRP(logger, platformPlatform)
-	testUC := test.NewTestUC(logger, platformPlatform, testRP)
+	matchRP := match.NewMatchRP(logger, platformPlatform)
+	matchSessionLaw := match.NewSessionLaw(logger, matchRP)
+	testUC := test.NewTestUC(logger, platformPlatform, testRP, matchSessionLaw)
 	testService := test.NewTestService(logger, testUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService)
+	matchUC := match.NewMatchUC(logger, platformPlatform, matchRP, testRP, profileRP, gameRP)
+	matchService := match.NewMatchService(logger, matchUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

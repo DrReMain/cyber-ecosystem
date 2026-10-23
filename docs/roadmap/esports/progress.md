@@ -10,7 +10,7 @@
 | hzy | H1 系统态件、H2 协议页、H-A 引擎框架、H-B 反应瞄准批(四款引擎,mock 净拔除)、10-22 精修批(控制台三红根治/profile 写缝/D-AG 落地/C3) | **H-C 判定回路闭环(已分配 10-23,D-AJ 首例,冒烟唯一硬断点)** → E7 追踪技能批(W2-3 起);挂起:D-AG/C3 实机走查随下次登录 |
 | ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:**P13 窗外豁免签认(CP2 前)、P15 报告簇窗口(E5b 前)**、P8 性别(E5 前,W4 末;含协议正文联动)、P11(B 批前)、P12(E4 前)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
 
-**M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ⏳(Tier A 6/10);E7 引擎 4/13(判定回路待 H-C);E4/E5/E8/E9/E10 未认领;M2 用户列表+档案首面已前拉落地;支付 PAY1-3 全未启动。**CP1(11-08)前瞻:达标面基本在手,风险面=支付沙箱零启动。**
+**M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ✅(13 款评分面收满,报告分 e2e 挂 E5);E7 引擎 4/13(判定回路待 H-C);E4 ⏳(增量a 已落);E5/E8/E9/E10 未认领;M2 用户列表+档案首面已前拉落地;支付 PAY1-3 全未启动。**CP1(11-08)前瞻:达标面基本在手,风险面=支付沙箱零启动。**
 
 ## 切片认领表(窗口与定义见 plan.md)
 
@@ -20,7 +20,7 @@
 | E1 服务骨架 | lzx | ✅ 10-18 | kratos-new-service 八步;双面 accessLadder+catalog+部署面;会员链探针 e2e 绿 |
 | E2 schema+种子 | lzx | ✅ 10-20 | D-V 撤回后按冻结契约 clean-room 重建;五表+三读+13 款种子骨架(校准值不杜撰,随 E3 单源);multi_target 补行=D-Z |
 | E3 评分引擎 | lzx | ⏳ | 增量a metric.md 单源档、增量b Registry+纯函数+20 黄金 ✅;增量c 提交缝(4c5f0617)、增量d MT/TR 定稿(5b0160fb)✅,双轴评审两实错已吸收;增量e DZ/ST 定稿 ✅(净钟+哨兵双射闸,metric §6.7/6.8);增量g offense_defense 定稿 ✅(判键式正确性+题库入通用银行,metric §6.10,Tier A 8/10);增量h resource_match 定稿 ✅(碰撞事件流=契约增量5 补位+出生经济闸,metric §6.11,Tier A 9/10);增量i character_counter 定稿 ✅(rework 规格落地=c_max 分母+速度乘数+150 封顶,题库 12 关系行入通用银行,metric §6.12,**Tier A 10/10 收满**);增量j moving_target 定稿 ✅(Tier B→A 升格:采样流全量重算+阈值 20/30/80 实码解除冲突,metric §6.3);增量k tracking_moving 定稿 ✅(Tier B→A 升格:契约增量6=optional hit+dot_lifetime_ms,hit 存在性兼帧判别器+断言服务端交叉验证,metric §6.13);增量l economic_sim 定稿 ✅(Tier B→A 升格:契约增量7=窗口事实上事件+漏刀/终局血上顶层,判定与金额双交叉+时间线金币守恒,metric §6.14)——**Tier B 消亡,13 款全量重算,评分面收满**(报告分 e2e 验收随 E5);**余:无 scorer 余款;E3 收口面=报告分 e2e(挂 E5)+guard 正则回流**;「报告分 e2e」验收面挂 E5,H-C 前移回执层;guard 正则修正随下次镜像批回流 dev 兄弟服务 |
-| E4 匹配引擎 | — | 未认领 | 重测 3/1 真律与难度模式轴归属地 |
+| E4 匹配引擎 | lzx | ⏳ | 增量a 聚合出生 ✅(match_config+match_session 两表+迁移+8 行种子;match.proto 双 RPC+错误 6130/6131;编排引擎=render_order 池法+FNVA/SplitMix64 确定性抽款+7 天 resume 窗+切换计数盐;重测 3/1 出生冻结;难度模式轴归属地=会话,metric §三已记;×1.5 偏好权重裁定不落——原型从未实现且新目录无 game→test 亲和轴,偏好影响=类型轴投票);增量b 提交缝接线 ✅(契约增量8=optional match_session_id,存在=会话局/缺省=练习局;序数真律=会话内计数+1,客户端 attempt_no 忽略化待 c 清号;预算执法=RETEST_EXHAUSTED,无效局同扣;阵容闸=TEST_NOT_IN_SESSION;会话失效=6132(归属折叠进 miss);difficultyFactor 消费=experience1.0/standard1.5,练习局恒体验基线;done/retest_left 推导经写入器激活;跨模块执法=test 声明 MatchSessionLaw 端口+match 侧 law.go 实现,wire 咬合零环);双轴评审三实错吸收=test_record (session_id,test_code,attempt_no) 部分唯一索引(count-then-insert 原子化,碰撞重数一次)+Switch 先验目标类型再关旧局+Get 创建竞态读回幸存者;余 c ctr 切换服务端编排(+attempt_no 清号)+d e2e 收口 |
 | E5 报告框架+能力报告 | — | 未认领 | 服务/客户端两半可并行 |
 | E6a ctr 纯壳 | lzx | ✅ 10-18 | D-R/S/T 全落;SEO 全量面同日收口 |
 | E6b 登录+画像流 | lzx | ✅ 10-20 | 接通片(微信真人链路绿)+完整形态(登录/三步向导/个人中心/首页)+机制修复+R1R2+流程前段四页;遗留契约缺口随对应片:SMS 骨架(system provider)、consent 版本记录、自定义游戏上限 3v20 口径 |
@@ -60,6 +60,7 @@
 | B 批修正清单已修订(两撤四增一 V4,coverage §七.5/§九) | lzx | 校准战役 S2/S3 后随 V4 一并排 |
 | 版本检查页+app-version/内容块管理(coverage 缺口①;S4 终局对账低优) | 待排 | P13 签认后随 M2 余组/E9 增量 |
 | 走查注:admin 工作台 ERR·NETWORK(dev 栈缺数据源,非 esports 面) | lzx | pre 部署前查 |
+| §指针存量清扫:已提交代码内 §/文档名+章节引用全量清洗(E3 scorer 族/test.proto/seed.go/test_record schema 等;注释改自含 why) | lzx | 独立机械片(新法 10-23,见节奏行);随下次镜像批或单独排 |
 | hzy 台账评审标记销项(H1/H-B 行曾滞「待评审」,本表已并) | — | 已随本档剪枝闭 |
 
 ## Review 遗留转交(2026-10-20 ctr 全项目 review;开放项已并入上表,此处仅存注记)
@@ -100,3 +101,7 @@
 - 10-23 E3-j:moving_target 定稿(Tier B→A 升格:采样流全量重算,阈值 20/30/80 实码解除旧注冲突,计数×间隔对偶+密度闸+空流诚实零),Tier A 十一款;余 Tier B 二款。
 - 10-23 E3-k:tracking_moving 定稿(Tier B→A 升格:契约增量6 补 hit+dot_lifetime,hit 断言服务端交叉验证+lifetime 反应闸),Tier A 十二款;余 economic_sim 一款。
 - 10-23 E3-l:economic_sim 定稿(Tier B→A 升格:契约增量7 补窗口事实,判定/金额双交叉+时间线守恒+装备阶梯配置化),**Tier B 消亡,13 款评分面收满**;E3 余面=报告分 e2e(随 E5)+guard 正则回流。
+- 10-23 新法(用户裁定):代码内禁一切 § 文档指针与文档名+章节引用(注释/schema Comment/proto 注释同禁),注释自含 why;已提交存量清扫=独立机械片待排。同日 E4-a 已按此法清洗(含迁移 SQL 重放)。
+- 10-23 E4-a:match 聚合出生(镜像 E3-b/c 切法):match_config(fps/moba 各 4 能力序,scenario=渠道轴后并入同列)+match_session(steps 出生锁死/7 天 resume 窗懒关/switched+计数盐强制换 seed/难度模式轴/重测预算 3|1 出生冻结)+部分唯一索引执法「每会员一场活跃会话」;GetMatchSession 缺 genre=偏好多数票,平票→6130 走手选页;错误文案 ctr 双语+admin 五语;P12(moving_target 主能力)不阻塞——翻案=一行种子改动。
+- 10-23 E4-b:提交缝接线:契约增量8(match_session_id 存在性=会话局/练习局分流)+序数真律(会话内记录计数+1,服务端独占)+预算执法(超限 6134,无效局同扣=消耗即真)+阵容闸(6133)+会话失效(6132,所有权折叠进 miss 防泄露)+难度轴消费(standard×1.5 实测 20→30)+done/retest_left 真值化;练习局回执 retest_left 改 0(ctr 当前零消费者,改动零面);探针事故一则:连发 404 系本人探针脚本 URL 少段(MatchService/),非服务端缺陷,已当场更正。
+- 10-23 E4-b 复审提交:两轴评审(Standards/Spec 双子代理)吸收十项:硬违规=engine.go 种子直转 int64 补 ConvNum;重复过期律收拢 expireIfStale;难度词目具名 difficultyStandard(端口携字符串,反引成环,注释自含);proto 块注释英文化(切换/重新匹配原型标签移除);schema Comment 去 M1/ToB/交付叙述——迁移两轮重放(match_aggregate 重生成+test_record_session_ordinal 新增部分唯一索引);Spec 三实错=序数索引原子化+storeAttempt 碰撞重数一次(单测×2)、Switch 先验再关(单测)、Get 竞态读回幸存者(单测);attempt_no 残留校验随 c 清号;探针 400 误读一则(connect 错误 reason 在 ErrorInfo details 内,顶层无键)。

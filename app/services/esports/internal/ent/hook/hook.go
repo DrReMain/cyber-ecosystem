@@ -32,6 +32,30 @@ func (f GameFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GameMutation", m)
 }
 
+// The MatchConfigFunc type is an adapter to allow the use of ordinary
+// function as MatchConfig mutator.
+type MatchConfigFunc func(context.Context, *ent.MatchConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MatchConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MatchConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MatchConfigMutation", m)
+}
+
+// The MatchSessionFunc type is an adapter to allow the use of ordinary
+// function as MatchSession mutator.
+type MatchSessionFunc func(context.Context, *ent.MatchSessionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MatchSessionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MatchSessionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MatchSessionMutation", m)
+}
+
 // The ProfileFunc type is an adapter to allow the use of ordinary
 // function as Profile mutator.
 type ProfileFunc func(context.Context, *ent.ProfileMutation) (ent.Value, error)

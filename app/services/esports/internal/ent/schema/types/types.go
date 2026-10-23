@@ -21,3 +21,12 @@ type BackgroundSpan struct {
 	ElapsedMS  int `json:"elapsed_ms"`
 	DurationMS int `json:"duration_ms"`
 }
+
+// MatchStep is one locked orchestration slot inside a match session: the
+// ability the step was drawn for (a match_config row) and the drawn test's
+// catalog code. The arrangement freezes at creation — resumed sessions
+// replay these rows verbatim, never re-derive them.
+type MatchStep struct {
+	Ability  string `json:"ability"`
+	TestCode string `json:"test_code"`
+}

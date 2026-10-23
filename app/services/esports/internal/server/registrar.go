@@ -7,6 +7,7 @@ import (
 	"cyber-ecosystem/shared-go/kratos/transport/connect"
 
 	"cyber-ecosystem/app/services/esports/internal/module/game"
+	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
@@ -18,6 +19,6 @@ type Registrar interface {
 	RegisterConnect(*connect.Server)
 }
 
-func NewRegistrarList(s1 *profile.ProfileService, s2 *game.GameService, s3 *member.MemberService, s4 *test.TestService) []Registrar {
-	return []Registrar{s1, s2, s3, s4}
+func NewRegistrarList(s1 *profile.ProfileService, s2 *game.GameService, s3 *member.MemberService, s4 *test.TestService, s5 *match.MatchService) []Registrar {
+	return []Registrar{s1, s2, s3, s4, s5}
 }

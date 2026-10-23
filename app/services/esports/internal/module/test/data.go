@@ -103,6 +103,26 @@ func (rp *testRP) ListAnswers(ctx context.Context, testCode string) (map[string]
 	return key, nil
 }
 
+func (rp *testRP) CountBySessionCodes(ctx context.Context, sessionID string) (map[string]int, error) {
+	var rows []struct {
+		TestCode string `json:"test_code"`
+		Count    int    `json:"count"`
+	}
+	err := rp.Platform.GetClient(ctx).TestRecord.Query().
+		Where(testrecord.SessionIDEQ(sessionID)).
+		GroupBy(testrecord.FieldTestCode).
+		Aggregate(ent.Count()).
+		Scan(ctx, &rows)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	counts := make(map[string]int, len(rows))
+	for _, row := range rows {
+		counts[row.TestCode] = row.Count
+	}
+	return counts, nil
+}
+
 func (rp *testRP) CreateAttempt(ctx context.Context, rec *AttemptRecord) (*AttemptRecord, error) {
 	row, err := rp.Platform.GetClient(ctx).TestRecord.Create().
 		SetTestCode(rec.TestCode).

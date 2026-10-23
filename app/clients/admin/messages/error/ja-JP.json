@@ -94,5 +94,10 @@
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "選択したゲームが見つかりません。一覧を更新して再試行してください",
   "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "カスタムゲームの上限に達しました",
   "error_ESPORTS_TEST_NOT_FOUND": "テストが見つからないか利用できません",
-  "error_ESPORTS_MEMBER_NOT_FOUND": "メンバーが見つかりません"
+  "error_ESPORTS_MEMBER_NOT_FOUND": "メンバーが見つかりません",
+  "error_ESPORTS_MATCH_GENRE_UNDECIDED": "先にゲームジャンルを選択してください",
+  "error_ESPORTS_MATCH_GENRE_UNKNOWN": "サポートされていないゲームジャンルです",
+  "error_ESPORTS_MATCH_SESSION_NOT_FOUND": "セッションが無効です。最初からやり直してください",
+  "error_ESPORTS_MATCH_TEST_NOT_IN_SESSION": "このテストは現在の編成に含まれていません",
+  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "このテストの再挑戦回数を使い切りました"
 }

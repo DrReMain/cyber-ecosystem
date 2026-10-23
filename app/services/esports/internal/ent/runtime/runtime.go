@@ -5,6 +5,8 @@ package runtime
 import (
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema"
@@ -194,6 +196,164 @@ func init() {
 	game.DefaultID = gameDescID.Default.(func() string)
 	// game.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	game.IDValidator = gameDescID.Validators[0].(func(string) error)
+	matchconfigMixin := schema.MatchConfig{}.Mixin()
+	matchconfigMixinHooks2 := matchconfigMixin[2].Hooks()
+	matchconfigMixinHooks3 := matchconfigMixin[3].Hooks()
+	matchconfig.Hooks[0] = matchconfigMixinHooks2[0]
+	matchconfig.Hooks[1] = matchconfigMixinHooks3[0]
+	matchconfigMixinInters2 := matchconfigMixin[2].Interceptors()
+	matchconfigMixinInters3 := matchconfigMixin[3].Interceptors()
+	matchconfig.Interceptors[0] = matchconfigMixinInters2[0]
+	matchconfig.Interceptors[1] = matchconfigMixinInters3[0]
+	matchconfigMixinFields0 := matchconfigMixin[0].Fields()
+	_ = matchconfigMixinFields0
+	matchconfigMixinFields1 := matchconfigMixin[1].Fields()
+	_ = matchconfigMixinFields1
+	matchconfigMixinFields2 := matchconfigMixin[2].Fields()
+	_ = matchconfigMixinFields2
+	matchconfigFields := schema.MatchConfig{}.Fields()
+	_ = matchconfigFields
+	// matchconfigDescCreatedAt is the schema descriptor for created_at field.
+	matchconfigDescCreatedAt := matchconfigMixinFields1[0].Descriptor()
+	// matchconfig.DefaultCreatedAt holds the default value on creation for the created_at field.
+	matchconfig.DefaultCreatedAt = matchconfigDescCreatedAt.Default.(func() time.Time)
+	// matchconfigDescUpdatedAt is the schema descriptor for updated_at field.
+	matchconfigDescUpdatedAt := matchconfigMixinFields1[1].Descriptor()
+	// matchconfig.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	matchconfig.DefaultUpdatedAt = matchconfigDescUpdatedAt.Default.(func() time.Time)
+	// matchconfig.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	matchconfig.UpdateDefaultUpdatedAt = matchconfigDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// matchconfigDescTenantID is the schema descriptor for tenant_id field.
+	matchconfigDescTenantID := matchconfigMixinFields2[0].Descriptor()
+	// matchconfig.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	matchconfig.TenantIDValidator = matchconfigDescTenantID.Validators[0].(func(string) error)
+	// matchconfigDescGenre is the schema descriptor for genre field.
+	matchconfigDescGenre := matchconfigFields[0].Descriptor()
+	// matchconfig.GenreValidator is a validator for the "genre" field. It is called by the builders before save.
+	matchconfig.GenreValidator = func() func(string) error {
+		validators := matchconfigDescGenre.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(genre string) error {
+			for _, fn := range fns {
+				if err := fn(genre); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// matchconfigDescAbility is the schema descriptor for ability field.
+	matchconfigDescAbility := matchconfigFields[1].Descriptor()
+	// matchconfig.AbilityValidator is a validator for the "ability" field. It is called by the builders before save.
+	matchconfig.AbilityValidator = func() func(string) error {
+		validators := matchconfigDescAbility.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(ability string) error {
+			for _, fn := range fns {
+				if err := fn(ability); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// matchconfigDescRenderOrder is the schema descriptor for render_order field.
+	matchconfigDescRenderOrder := matchconfigFields[2].Descriptor()
+	// matchconfig.DefaultRenderOrder holds the default value on creation for the render_order field.
+	matchconfig.DefaultRenderOrder = matchconfigDescRenderOrder.Default.(int)
+	// matchconfigDescID is the schema descriptor for id field.
+	matchconfigDescID := matchconfigMixinFields0[0].Descriptor()
+	// matchconfig.DefaultID holds the default value on creation for the id field.
+	matchconfig.DefaultID = matchconfigDescID.Default.(func() string)
+	// matchconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	matchconfig.IDValidator = matchconfigDescID.Validators[0].(func(string) error)
+	matchsessionMixin := schema.MatchSession{}.Mixin()
+	matchsessionMixinHooks2 := matchsessionMixin[2].Hooks()
+	matchsessionMixinHooks3 := matchsessionMixin[3].Hooks()
+	matchsession.Hooks[0] = matchsessionMixinHooks2[0]
+	matchsession.Hooks[1] = matchsessionMixinHooks3[0]
+	matchsessionMixinInters2 := matchsessionMixin[2].Interceptors()
+	matchsessionMixinInters3 := matchsessionMixin[3].Interceptors()
+	matchsession.Interceptors[0] = matchsessionMixinInters2[0]
+	matchsession.Interceptors[1] = matchsessionMixinInters3[0]
+	matchsessionMixinFields0 := matchsessionMixin[0].Fields()
+	_ = matchsessionMixinFields0
+	matchsessionMixinFields1 := matchsessionMixin[1].Fields()
+	_ = matchsessionMixinFields1
+	matchsessionMixinFields2 := matchsessionMixin[2].Fields()
+	_ = matchsessionMixinFields2
+	matchsessionFields := schema.MatchSession{}.Fields()
+	_ = matchsessionFields
+	// matchsessionDescCreatedAt is the schema descriptor for created_at field.
+	matchsessionDescCreatedAt := matchsessionMixinFields1[0].Descriptor()
+	// matchsession.DefaultCreatedAt holds the default value on creation for the created_at field.
+	matchsession.DefaultCreatedAt = matchsessionDescCreatedAt.Default.(func() time.Time)
+	// matchsessionDescUpdatedAt is the schema descriptor for updated_at field.
+	matchsessionDescUpdatedAt := matchsessionMixinFields1[1].Descriptor()
+	// matchsession.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	matchsession.DefaultUpdatedAt = matchsessionDescUpdatedAt.Default.(func() time.Time)
+	// matchsession.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	matchsession.UpdateDefaultUpdatedAt = matchsessionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// matchsessionDescTenantID is the schema descriptor for tenant_id field.
+	matchsessionDescTenantID := matchsessionMixinFields2[0].Descriptor()
+	// matchsession.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	matchsession.TenantIDValidator = matchsessionDescTenantID.Validators[0].(func(string) error)
+	// matchsessionDescUserID is the schema descriptor for user_id field.
+	matchsessionDescUserID := matchsessionFields[0].Descriptor()
+	// matchsession.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	matchsession.UserIDValidator = func() func(string) error {
+		validators := matchsessionDescUserID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(user_id string) error {
+			for _, fn := range fns {
+				if err := fn(user_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// matchsessionDescGenre is the schema descriptor for genre field.
+	matchsessionDescGenre := matchsessionFields[1].Descriptor()
+	// matchsession.GenreValidator is a validator for the "genre" field. It is called by the builders before save.
+	matchsession.GenreValidator = func() func(string) error {
+		validators := matchsessionDescGenre.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(genre string) error {
+			for _, fn := range fns {
+				if err := fn(genre); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// matchsessionDescSeed is the schema descriptor for seed field.
+	matchsessionDescSeed := matchsessionFields[3].Descriptor()
+	// matchsession.DefaultSeed holds the default value on creation for the seed field.
+	matchsession.DefaultSeed = matchsessionDescSeed.Default.(int64)
+	// matchsessionDescRetestBudget is the schema descriptor for retest_budget field.
+	matchsessionDescRetestBudget := matchsessionFields[5].Descriptor()
+	// matchsession.DefaultRetestBudget holds the default value on creation for the retest_budget field.
+	matchsession.DefaultRetestBudget = matchsessionDescRetestBudget.Default.(int)
+	// matchsessionDescID is the schema descriptor for id field.
+	matchsessionDescID := matchsessionMixinFields0[0].Descriptor()
+	// matchsession.DefaultID holds the default value on creation for the id field.
+	matchsession.DefaultID = matchsessionDescID.Default.(func() string)
+	// matchsession.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	matchsession.IDValidator = matchsessionDescID.Validators[0].(func(string) error)
 	profileMixin := schema.Profile{}.Mixin()
 	profileMixinHooks2 := profileMixin[2].Hooks()
 	profileMixinHooks3 := profileMixin[3].Hooks()

@@ -6,6 +6,8 @@ import (
 	"context"
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
+	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
 	"cyber-ecosystem/app/services/esports/internal/ent/predicate"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
@@ -33,6 +35,8 @@ const (
 	// Node types.
 	TypeAbilityScore = "AbilityScore"
 	TypeGame         = "Game"
+	TypeMatchConfig  = "MatchConfig"
+	TypeMatchSession = "MatchSession"
 	TypeProfile      = "Profile"
 	TypeQuestionBank = "QuestionBank"
 	TypeTest         = "Test"
@@ -1756,6 +1760,1699 @@ func (m *GameMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *GameMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Game edge %s", name)
+}
+
+// MatchConfigMutation represents an operation that mutates the MatchConfig nodes in the graph.
+type MatchConfigMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *string
+	created_at      *time.Time
+	updated_at      *time.Time
+	tenant_id       *string
+	deleted_at      *time.Time
+	genre           *string
+	ability         *string
+	render_order    *int
+	addrender_order *int
+	clearedFields   map[string]struct{}
+	done            bool
+	oldValue        func(context.Context) (*MatchConfig, error)
+	predicates      []predicate.MatchConfig
+}
+
+var _ ent.Mutation = (*MatchConfigMutation)(nil)
+
+// matchconfigOption allows management of the mutation configuration using functional options.
+type matchconfigOption func(*MatchConfigMutation)
+
+// newMatchConfigMutation creates new mutation for the MatchConfig entity.
+func newMatchConfigMutation(c config, op Op, opts ...matchconfigOption) *MatchConfigMutation {
+	m := &MatchConfigMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMatchConfig,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMatchConfigID sets the ID field of the mutation.
+func withMatchConfigID(id string) matchconfigOption {
+	return func(m *MatchConfigMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MatchConfig
+		)
+		m.oldValue = func(ctx context.Context) (*MatchConfig, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MatchConfig.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMatchConfig sets the old MatchConfig of the mutation.
+func withMatchConfig(node *MatchConfig) matchconfigOption {
+	return func(m *MatchConfigMutation) {
+		m.oldValue = func(context.Context) (*MatchConfig, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MatchConfigMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MatchConfigMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of MatchConfig entities.
+func (m *MatchConfigMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MatchConfigMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MatchConfigMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MatchConfig.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MatchConfigMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MatchConfigMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the MatchConfig entity.
+// If the MatchConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchConfigMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MatchConfigMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *MatchConfigMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *MatchConfigMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the MatchConfig entity.
+// If the MatchConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchConfigMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *MatchConfigMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *MatchConfigMutation) SetTenantID(s string) {
+	m.tenant_id = &s
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *MatchConfigMutation) TenantID() (r string, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the MatchConfig entity.
+// If the MatchConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchConfigMutation) OldTenantID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *MatchConfigMutation) ResetTenantID() {
+	m.tenant_id = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *MatchConfigMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *MatchConfigMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the MatchConfig entity.
+// If the MatchConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchConfigMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *MatchConfigMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[matchconfig.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *MatchConfigMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[matchconfig.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *MatchConfigMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, matchconfig.FieldDeletedAt)
+}
+
+// SetGenre sets the "genre" field.
+func (m *MatchConfigMutation) SetGenre(s string) {
+	m.genre = &s
+}
+
+// Genre returns the value of the "genre" field in the mutation.
+func (m *MatchConfigMutation) Genre() (r string, exists bool) {
+	v := m.genre
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGenre returns the old "genre" field's value of the MatchConfig entity.
+// If the MatchConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchConfigMutation) OldGenre(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGenre is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGenre requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGenre: %w", err)
+	}
+	return oldValue.Genre, nil
+}
+
+// ResetGenre resets all changes to the "genre" field.
+func (m *MatchConfigMutation) ResetGenre() {
+	m.genre = nil
+}
+
+// SetAbility sets the "ability" field.
+func (m *MatchConfigMutation) SetAbility(s string) {
+	m.ability = &s
+}
+
+// Ability returns the value of the "ability" field in the mutation.
+func (m *MatchConfigMutation) Ability() (r string, exists bool) {
+	v := m.ability
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAbility returns the old "ability" field's value of the MatchConfig entity.
+// If the MatchConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchConfigMutation) OldAbility(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAbility is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAbility requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAbility: %w", err)
+	}
+	return oldValue.Ability, nil
+}
+
+// ResetAbility resets all changes to the "ability" field.
+func (m *MatchConfigMutation) ResetAbility() {
+	m.ability = nil
+}
+
+// SetRenderOrder sets the "render_order" field.
+func (m *MatchConfigMutation) SetRenderOrder(i int) {
+	m.render_order = &i
+	m.addrender_order = nil
+}
+
+// RenderOrder returns the value of the "render_order" field in the mutation.
+func (m *MatchConfigMutation) RenderOrder() (r int, exists bool) {
+	v := m.render_order
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRenderOrder returns the old "render_order" field's value of the MatchConfig entity.
+// If the MatchConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchConfigMutation) OldRenderOrder(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRenderOrder is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRenderOrder requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRenderOrder: %w", err)
+	}
+	return oldValue.RenderOrder, nil
+}
+
+// AddRenderOrder adds i to the "render_order" field.
+func (m *MatchConfigMutation) AddRenderOrder(i int) {
+	if m.addrender_order != nil {
+		*m.addrender_order += i
+	} else {
+		m.addrender_order = &i
+	}
+}
+
+// AddedRenderOrder returns the value that was added to the "render_order" field in this mutation.
+func (m *MatchConfigMutation) AddedRenderOrder() (r int, exists bool) {
+	v := m.addrender_order
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRenderOrder resets all changes to the "render_order" field.
+func (m *MatchConfigMutation) ResetRenderOrder() {
+	m.render_order = nil
+	m.addrender_order = nil
+}
+
+// Where appends a list predicates to the MatchConfigMutation builder.
+func (m *MatchConfigMutation) Where(ps ...predicate.MatchConfig) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the MatchConfigMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *MatchConfigMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.MatchConfig, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *MatchConfigMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *MatchConfigMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (MatchConfig).
+func (m *MatchConfigMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MatchConfigMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, matchconfig.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, matchconfig.FieldUpdatedAt)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, matchconfig.FieldTenantID)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, matchconfig.FieldDeletedAt)
+	}
+	if m.genre != nil {
+		fields = append(fields, matchconfig.FieldGenre)
+	}
+	if m.ability != nil {
+		fields = append(fields, matchconfig.FieldAbility)
+	}
+	if m.render_order != nil {
+		fields = append(fields, matchconfig.FieldRenderOrder)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MatchConfigMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case matchconfig.FieldCreatedAt:
+		return m.CreatedAt()
+	case matchconfig.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case matchconfig.FieldTenantID:
+		return m.TenantID()
+	case matchconfig.FieldDeletedAt:
+		return m.DeletedAt()
+	case matchconfig.FieldGenre:
+		return m.Genre()
+	case matchconfig.FieldAbility:
+		return m.Ability()
+	case matchconfig.FieldRenderOrder:
+		return m.RenderOrder()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MatchConfigMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case matchconfig.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case matchconfig.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case matchconfig.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case matchconfig.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case matchconfig.FieldGenre:
+		return m.OldGenre(ctx)
+	case matchconfig.FieldAbility:
+		return m.OldAbility(ctx)
+	case matchconfig.FieldRenderOrder:
+		return m.OldRenderOrder(ctx)
+	}
+	return nil, fmt.Errorf("unknown MatchConfig field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MatchConfigMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case matchconfig.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case matchconfig.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case matchconfig.FieldTenantID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case matchconfig.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case matchconfig.FieldGenre:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGenre(v)
+		return nil
+	case matchconfig.FieldAbility:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAbility(v)
+		return nil
+	case matchconfig.FieldRenderOrder:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRenderOrder(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MatchConfig field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MatchConfigMutation) AddedFields() []string {
+	var fields []string
+	if m.addrender_order != nil {
+		fields = append(fields, matchconfig.FieldRenderOrder)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MatchConfigMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case matchconfig.FieldRenderOrder:
+		return m.AddedRenderOrder()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MatchConfigMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case matchconfig.FieldRenderOrder:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRenderOrder(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MatchConfig numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MatchConfigMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(matchconfig.FieldDeletedAt) {
+		fields = append(fields, matchconfig.FieldDeletedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MatchConfigMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MatchConfigMutation) ClearField(name string) error {
+	switch name {
+	case matchconfig.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown MatchConfig nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MatchConfigMutation) ResetField(name string) error {
+	switch name {
+	case matchconfig.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case matchconfig.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case matchconfig.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case matchconfig.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case matchconfig.FieldGenre:
+		m.ResetGenre()
+		return nil
+	case matchconfig.FieldAbility:
+		m.ResetAbility()
+		return nil
+	case matchconfig.FieldRenderOrder:
+		m.ResetRenderOrder()
+		return nil
+	}
+	return fmt.Errorf("unknown MatchConfig field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MatchConfigMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MatchConfigMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MatchConfigMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MatchConfigMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MatchConfigMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MatchConfigMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MatchConfigMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown MatchConfig unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MatchConfigMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown MatchConfig edge %s", name)
+}
+
+// MatchSessionMutation represents an operation that mutates the MatchSession nodes in the graph.
+type MatchSessionMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *string
+	created_at       *time.Time
+	updated_at       *time.Time
+	tenant_id        *string
+	deleted_at       *time.Time
+	user_id          *string
+	genre            *string
+	difficulty       *matchsession.Difficulty
+	seed             *int64
+	addseed          *int64
+	steps            *[]types.MatchStep
+	appendsteps      []types.MatchStep
+	retest_budget    *int
+	addretest_budget *int
+	status           *matchsession.Status
+	clearedFields    map[string]struct{}
+	done             bool
+	oldValue         func(context.Context) (*MatchSession, error)
+	predicates       []predicate.MatchSession
+}
+
+var _ ent.Mutation = (*MatchSessionMutation)(nil)
+
+// matchsessionOption allows management of the mutation configuration using functional options.
+type matchsessionOption func(*MatchSessionMutation)
+
+// newMatchSessionMutation creates new mutation for the MatchSession entity.
+func newMatchSessionMutation(c config, op Op, opts ...matchsessionOption) *MatchSessionMutation {
+	m := &MatchSessionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMatchSession,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMatchSessionID sets the ID field of the mutation.
+func withMatchSessionID(id string) matchsessionOption {
+	return func(m *MatchSessionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MatchSession
+		)
+		m.oldValue = func(ctx context.Context) (*MatchSession, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MatchSession.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMatchSession sets the old MatchSession of the mutation.
+func withMatchSession(node *MatchSession) matchsessionOption {
+	return func(m *MatchSessionMutation) {
+		m.oldValue = func(context.Context) (*MatchSession, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MatchSessionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MatchSessionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of MatchSession entities.
+func (m *MatchSessionMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MatchSessionMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MatchSessionMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MatchSession.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MatchSessionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MatchSessionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MatchSessionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *MatchSessionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *MatchSessionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *MatchSessionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *MatchSessionMutation) SetTenantID(s string) {
+	m.tenant_id = &s
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *MatchSessionMutation) TenantID() (r string, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldTenantID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *MatchSessionMutation) ResetTenantID() {
+	m.tenant_id = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *MatchSessionMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *MatchSessionMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *MatchSessionMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[matchsession.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *MatchSessionMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[matchsession.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *MatchSessionMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, matchsession.FieldDeletedAt)
+}
+
+// SetUserID sets the "user_id" field.
+func (m *MatchSessionMutation) SetUserID(s string) {
+	m.user_id = &s
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *MatchSessionMutation) UserID() (r string, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldUserID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *MatchSessionMutation) ResetUserID() {
+	m.user_id = nil
+}
+
+// SetGenre sets the "genre" field.
+func (m *MatchSessionMutation) SetGenre(s string) {
+	m.genre = &s
+}
+
+// Genre returns the value of the "genre" field in the mutation.
+func (m *MatchSessionMutation) Genre() (r string, exists bool) {
+	v := m.genre
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGenre returns the old "genre" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldGenre(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGenre is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGenre requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGenre: %w", err)
+	}
+	return oldValue.Genre, nil
+}
+
+// ResetGenre resets all changes to the "genre" field.
+func (m *MatchSessionMutation) ResetGenre() {
+	m.genre = nil
+}
+
+// SetDifficulty sets the "difficulty" field.
+func (m *MatchSessionMutation) SetDifficulty(value matchsession.Difficulty) {
+	m.difficulty = &value
+}
+
+// Difficulty returns the value of the "difficulty" field in the mutation.
+func (m *MatchSessionMutation) Difficulty() (r matchsession.Difficulty, exists bool) {
+	v := m.difficulty
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDifficulty returns the old "difficulty" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldDifficulty(ctx context.Context) (v matchsession.Difficulty, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDifficulty is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDifficulty requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDifficulty: %w", err)
+	}
+	return oldValue.Difficulty, nil
+}
+
+// ResetDifficulty resets all changes to the "difficulty" field.
+func (m *MatchSessionMutation) ResetDifficulty() {
+	m.difficulty = nil
+}
+
+// SetSeed sets the "seed" field.
+func (m *MatchSessionMutation) SetSeed(i int64) {
+	m.seed = &i
+	m.addseed = nil
+}
+
+// Seed returns the value of the "seed" field in the mutation.
+func (m *MatchSessionMutation) Seed() (r int64, exists bool) {
+	v := m.seed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSeed returns the old "seed" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldSeed(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSeed is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSeed requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSeed: %w", err)
+	}
+	return oldValue.Seed, nil
+}
+
+// AddSeed adds i to the "seed" field.
+func (m *MatchSessionMutation) AddSeed(i int64) {
+	if m.addseed != nil {
+		*m.addseed += i
+	} else {
+		m.addseed = &i
+	}
+}
+
+// AddedSeed returns the value that was added to the "seed" field in this mutation.
+func (m *MatchSessionMutation) AddedSeed() (r int64, exists bool) {
+	v := m.addseed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSeed resets all changes to the "seed" field.
+func (m *MatchSessionMutation) ResetSeed() {
+	m.seed = nil
+	m.addseed = nil
+}
+
+// SetSteps sets the "steps" field.
+func (m *MatchSessionMutation) SetSteps(ts []types.MatchStep) {
+	m.steps = &ts
+	m.appendsteps = nil
+}
+
+// Steps returns the value of the "steps" field in the mutation.
+func (m *MatchSessionMutation) Steps() (r []types.MatchStep, exists bool) {
+	v := m.steps
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSteps returns the old "steps" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldSteps(ctx context.Context) (v []types.MatchStep, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSteps is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSteps requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSteps: %w", err)
+	}
+	return oldValue.Steps, nil
+}
+
+// AppendSteps adds ts to the "steps" field.
+func (m *MatchSessionMutation) AppendSteps(ts []types.MatchStep) {
+	m.appendsteps = append(m.appendsteps, ts...)
+}
+
+// AppendedSteps returns the list of values that were appended to the "steps" field in this mutation.
+func (m *MatchSessionMutation) AppendedSteps() ([]types.MatchStep, bool) {
+	if len(m.appendsteps) == 0 {
+		return nil, false
+	}
+	return m.appendsteps, true
+}
+
+// ResetSteps resets all changes to the "steps" field.
+func (m *MatchSessionMutation) ResetSteps() {
+	m.steps = nil
+	m.appendsteps = nil
+}
+
+// SetRetestBudget sets the "retest_budget" field.
+func (m *MatchSessionMutation) SetRetestBudget(i int) {
+	m.retest_budget = &i
+	m.addretest_budget = nil
+}
+
+// RetestBudget returns the value of the "retest_budget" field in the mutation.
+func (m *MatchSessionMutation) RetestBudget() (r int, exists bool) {
+	v := m.retest_budget
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRetestBudget returns the old "retest_budget" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldRetestBudget(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRetestBudget is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRetestBudget requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRetestBudget: %w", err)
+	}
+	return oldValue.RetestBudget, nil
+}
+
+// AddRetestBudget adds i to the "retest_budget" field.
+func (m *MatchSessionMutation) AddRetestBudget(i int) {
+	if m.addretest_budget != nil {
+		*m.addretest_budget += i
+	} else {
+		m.addretest_budget = &i
+	}
+}
+
+// AddedRetestBudget returns the value that was added to the "retest_budget" field in this mutation.
+func (m *MatchSessionMutation) AddedRetestBudget() (r int, exists bool) {
+	v := m.addretest_budget
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRetestBudget resets all changes to the "retest_budget" field.
+func (m *MatchSessionMutation) ResetRetestBudget() {
+	m.retest_budget = nil
+	m.addretest_budget = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *MatchSessionMutation) SetStatus(value matchsession.Status) {
+	m.status = &value
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *MatchSessionMutation) Status() (r matchsession.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the MatchSession entity.
+// If the MatchSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MatchSessionMutation) OldStatus(ctx context.Context) (v matchsession.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *MatchSessionMutation) ResetStatus() {
+	m.status = nil
+}
+
+// Where appends a list predicates to the MatchSessionMutation builder.
+func (m *MatchSessionMutation) Where(ps ...predicate.MatchSession) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the MatchSessionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *MatchSessionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.MatchSession, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *MatchSessionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *MatchSessionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (MatchSession).
+func (m *MatchSessionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MatchSessionMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.created_at != nil {
+		fields = append(fields, matchsession.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, matchsession.FieldUpdatedAt)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, matchsession.FieldTenantID)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, matchsession.FieldDeletedAt)
+	}
+	if m.user_id != nil {
+		fields = append(fields, matchsession.FieldUserID)
+	}
+	if m.genre != nil {
+		fields = append(fields, matchsession.FieldGenre)
+	}
+	if m.difficulty != nil {
+		fields = append(fields, matchsession.FieldDifficulty)
+	}
+	if m.seed != nil {
+		fields = append(fields, matchsession.FieldSeed)
+	}
+	if m.steps != nil {
+		fields = append(fields, matchsession.FieldSteps)
+	}
+	if m.retest_budget != nil {
+		fields = append(fields, matchsession.FieldRetestBudget)
+	}
+	if m.status != nil {
+		fields = append(fields, matchsession.FieldStatus)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MatchSessionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case matchsession.FieldCreatedAt:
+		return m.CreatedAt()
+	case matchsession.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case matchsession.FieldTenantID:
+		return m.TenantID()
+	case matchsession.FieldDeletedAt:
+		return m.DeletedAt()
+	case matchsession.FieldUserID:
+		return m.UserID()
+	case matchsession.FieldGenre:
+		return m.Genre()
+	case matchsession.FieldDifficulty:
+		return m.Difficulty()
+	case matchsession.FieldSeed:
+		return m.Seed()
+	case matchsession.FieldSteps:
+		return m.Steps()
+	case matchsession.FieldRetestBudget:
+		return m.RetestBudget()
+	case matchsession.FieldStatus:
+		return m.Status()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MatchSessionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case matchsession.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case matchsession.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case matchsession.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case matchsession.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case matchsession.FieldUserID:
+		return m.OldUserID(ctx)
+	case matchsession.FieldGenre:
+		return m.OldGenre(ctx)
+	case matchsession.FieldDifficulty:
+		return m.OldDifficulty(ctx)
+	case matchsession.FieldSeed:
+		return m.OldSeed(ctx)
+	case matchsession.FieldSteps:
+		return m.OldSteps(ctx)
+	case matchsession.FieldRetestBudget:
+		return m.OldRetestBudget(ctx)
+	case matchsession.FieldStatus:
+		return m.OldStatus(ctx)
+	}
+	return nil, fmt.Errorf("unknown MatchSession field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MatchSessionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case matchsession.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case matchsession.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case matchsession.FieldTenantID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case matchsession.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case matchsession.FieldUserID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case matchsession.FieldGenre:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGenre(v)
+		return nil
+	case matchsession.FieldDifficulty:
+		v, ok := value.(matchsession.Difficulty)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDifficulty(v)
+		return nil
+	case matchsession.FieldSeed:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSeed(v)
+		return nil
+	case matchsession.FieldSteps:
+		v, ok := value.([]types.MatchStep)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSteps(v)
+		return nil
+	case matchsession.FieldRetestBudget:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRetestBudget(v)
+		return nil
+	case matchsession.FieldStatus:
+		v, ok := value.(matchsession.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MatchSession field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MatchSessionMutation) AddedFields() []string {
+	var fields []string
+	if m.addseed != nil {
+		fields = append(fields, matchsession.FieldSeed)
+	}
+	if m.addretest_budget != nil {
+		fields = append(fields, matchsession.FieldRetestBudget)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MatchSessionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case matchsession.FieldSeed:
+		return m.AddedSeed()
+	case matchsession.FieldRetestBudget:
+		return m.AddedRetestBudget()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MatchSessionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case matchsession.FieldSeed:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSeed(v)
+		return nil
+	case matchsession.FieldRetestBudget:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRetestBudget(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MatchSession numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MatchSessionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(matchsession.FieldDeletedAt) {
+		fields = append(fields, matchsession.FieldDeletedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MatchSessionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MatchSessionMutation) ClearField(name string) error {
+	switch name {
+	case matchsession.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown MatchSession nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MatchSessionMutation) ResetField(name string) error {
+	switch name {
+	case matchsession.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case matchsession.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case matchsession.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case matchsession.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case matchsession.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case matchsession.FieldGenre:
+		m.ResetGenre()
+		return nil
+	case matchsession.FieldDifficulty:
+		m.ResetDifficulty()
+		return nil
+	case matchsession.FieldSeed:
+		m.ResetSeed()
+		return nil
+	case matchsession.FieldSteps:
+		m.ResetSteps()
+		return nil
+	case matchsession.FieldRetestBudget:
+		m.ResetRetestBudget()
+		return nil
+	case matchsession.FieldStatus:
+		m.ResetStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown MatchSession field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MatchSessionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MatchSessionMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MatchSessionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MatchSessionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MatchSessionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MatchSessionMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MatchSessionMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown MatchSession unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MatchSessionMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown MatchSession edge %s", name)
 }
 
 // ProfileMutation represents an operation that mutates the Profile nodes in the graph.

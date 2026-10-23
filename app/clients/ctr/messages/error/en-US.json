@@ -94,5 +94,10 @@
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "Selected game not found; refresh the list and try again",
   "error_ESPORTS_PROFILE_CUSTOM_GAME_CAP": "Custom game limit reached",
   "error_ESPORTS_TEST_NOT_FOUND": "Test not found or no longer available",
-  "error_ESPORTS_MEMBER_NOT_FOUND": "Member not found"
+  "error_ESPORTS_MEMBER_NOT_FOUND": "Member not found",
+  "error_ESPORTS_MATCH_GENRE_UNDECIDED": "Pick a game type to start",
+  "error_ESPORTS_MATCH_GENRE_UNKNOWN": "Unsupported game type",
+  "error_ESPORTS_MATCH_SESSION_NOT_FOUND": "The assessment session has ended. Start again",
+  "error_ESPORTS_MATCH_TEST_NOT_IN_SESSION": "This test is not part of the current lineup",
+  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "Retest chances for this test are used up"
 }

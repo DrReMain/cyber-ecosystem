@@ -614,12 +614,20 @@ type SubmitTestAttemptRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Code join key (e.g. "red_dot") — same law as Test.code.
 	TestCode *string `protobuf:"bytes,1,opt,name=test_code,json=testCode,proto3,oneof" json:"test_code,omitempty"`
-	// Attempt ordinal inside the match session — the E4 session law owns the
-	// semantics (lockdown, retest budget); this contract only carries the key.
-	AttemptNo   *int32                 `protobuf:"varint,2,opt,name=attempt_no,json=attemptNo,proto3,oneof" json:"attempt_no,omitempty"`
-	StartedAt   *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=started_at,json=startedAt,proto3,oneof" json:"started_at,omitempty"`
-	EndedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=ended_at,json=endedAt,proto3,oneof" json:"ended_at,omitempty"`
-	Backgrounds []*BackgroundSpan      `protobuf:"bytes,5,rep,name=backgrounds,proto3" json:"backgrounds,omitempty"`
+	// Legacy client-carried ordinal — ignored: the session law computes
+	// ordinals server-side (count of prior records in the session for this
+	// test, plus one). Rides for wire stability until the client submitter
+	// drops it.
+	AttemptNo *int32 `protobuf:"varint,2,opt,name=attempt_no,json=attemptNo,proto3,oneof" json:"attempt_no,omitempty"`
+	// Presence binds the attempt to that match session: the test must be one
+	// of the session's locked steps, the ordinal and retest budget are
+	// session law, and the score rides the session's difficulty mode.
+	// Absence = local practice: no session, vacuous ordinal, experience
+	// baseline, no budget.
+	MatchSessionId *string                `protobuf:"bytes,6,opt,name=match_session_id,json=matchSessionId,proto3,oneof" json:"match_session_id,omitempty"`
+	StartedAt      *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=started_at,json=startedAt,proto3,oneof" json:"started_at,omitempty"`
+	EndedAt        *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=ended_at,json=endedAt,proto3,oneof" json:"ended_at,omitempty"`
+	Backgrounds    []*BackgroundSpan      `protobuf:"bytes,5,rep,name=backgrounds,proto3" json:"backgrounds,omitempty"`
 	// Types that are valid to be assigned to RawDetail:
 	//
 	//	*SubmitTestAttemptRequest_RedDot
@@ -682,6 +690,13 @@ func (x *SubmitTestAttemptRequest) GetAttemptNo() int32 {
 		return *x.AttemptNo
 	}
 	return 0
+}
+
+func (x *SubmitTestAttemptRequest) GetMatchSessionId() string {
+	if x != nil && x.MatchSessionId != nil {
+		return *x.MatchSessionId
+	}
+	return ""
 }
 
 func (x *SubmitTestAttemptRequest) GetStartedAt() *timestamppb.Timestamp {
@@ -2978,14 +2993,15 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"\n" +
 	"elapsed_ms\x18\x01 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\telapsedMs\x12(\n" +
 	"\vduration_ms\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x00R\n" +
-	"durationMs\"\x8a\v\n" +
+	"durationMs\"\xd9\v\n" +
 	"\x18SubmitTestAttemptRequest\x12.\n" +
 	"\ttest_code\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x01R\btestCode\x88\x01\x01\x12+\n" +
 	"\n" +
-	"attempt_no\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x01H\x02R\tattemptNo\x88\x01\x01\x12F\n" +
+	"attempt_no\x18\x02 \x01(\x05B\a\xbaH\x04\x1a\x02(\x01H\x02R\tattemptNo\x88\x01\x01\x128\n" +
+	"\x10match_session_id\x18\x06 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@H\x03R\x0ematchSessionId\x88\x01\x01\x12F\n" +
 	"\n" +
-	"started_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x03R\tstartedAt\x88\x01\x01\x12B\n" +
-	"\bended_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x04R\aendedAt\x88\x01\x01\x12L\n" +
+	"started_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x04R\tstartedAt\x88\x01\x01\x12B\n" +
+	"\bended_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01H\x05R\aendedAt\x88\x01\x01\x12L\n" +
 	"\vbackgrounds\x18\x05 \x03(\v2 .cyber.esports.v1.BackgroundSpanB\b\xbaH\x05\x92\x01\x02\x10@R\vbackgrounds\x129\n" +
 	"\ared_dot\x18\n" +
 	" \x01(\v2\x1e.cyber.esports.v1.RedDotDetailH\x00R\x06redDot\x12H\n" +
@@ -3005,7 +3021,8 @@ const file_cyber_esports_v1_test_proto_rawDesc = "" +
 	"raw_detailB\f\n" +
 	"\n" +
 	"_test_codeB\r\n" +
-	"\v_attempt_noB\r\n" +
+	"\v_attempt_noB\x13\n" +
+	"\x11_match_session_idB\r\n" +
 	"\v_started_atB\v\n" +
 	"\t_ended_at\"\xaa\x03\n" +
 	"\x19SubmitTestAttemptResponse\x12\x1b\n" +
