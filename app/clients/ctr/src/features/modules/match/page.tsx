@@ -25,26 +25,37 @@ interface StepRowProps {
   readonly name: string;
   readonly left: number;
   readonly ready: boolean;
+  readonly done: boolean;
+  readonly onEnter: () => void;
 }
 
 // One lineup row: the ability face, the drawn test's name, and the retake
 // receipt (the "N/3" face, zero reads as spent). A step whose engine has
 // not shipped yet renders dimmed with a coming-soon tag instead of the
 // retake receipt — the flow's start button skips it, so the tag is what
-// keeps the row honest.
-function StepRow({ index, ability, name, left, ready }: Readonly<StepRowProps>) {
+// keeps the row honest. A done step wears the prototype's green border and
+// check; a playable one is tappable into its intro (the prototype's step
+// rows navigate; a done step's score read-face waits on the report slice).
+function StepRow({ index, ability, name, left, ready, done, onEnter }: Readonly<StepRowProps>) {
   const word = abilityWord(ability);
+  const playable = ready && left > 0;
   return (
-    <div
-      className={`border-line bg-surface-card shadow-card rounded-control flex items-center gap-[11px] border px-[13px] py-[11px] ${ready ? "" : "opacity-60"}`}
+    <button
+      className={`${done ? "border-[rgba(34,197,94,0.55)]" : "border-line"} bg-surface-card shadow-card rounded-card flex w-full items-center gap-[11px] border px-[13px] py-[11px] text-start ${ready ? "" : "opacity-60"} ${playable ? "cursor-pointer active:opacity-80" : "cursor-default"}`}
+      disabled={!playable}
+      onClick={playable ? onEnter : undefined}
+      type="button"
     >
       <div
-        className={`${word.gradient} rounded-control flex h-[38px] w-[38px] shrink-0 items-center justify-center text-[15px] font-bold text-white`}
+        className={`${word.gradient} flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[12px] text-[15px] font-bold text-white`}
       >
         {index + 1}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-ink text-sm font-extrabold">{word.cn}</div>
+        <div className="text-ink text-sm font-extrabold">
+          {word.cn}
+          {done ? <span className="text-status-ok ml-1 text-xs">✓</span> : null}
+        </div>
         <div className="text-ink-tertiary mt-0.5 text-[9.5px] tracking-[0.9px]">{word.en}</div>
       </div>
       <div className="shrink-0 text-right">
@@ -63,7 +74,7 @@ function StepRow({ index, ability, name, left, ready }: Readonly<StepRowProps>) 
           <div className="text-ink-tertiary mt-0.5 text-[10px]">{m.match_step_engine_soon()}</div>
         )}
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -86,7 +97,7 @@ function GenreHeaderCard({ genre, switched }: Readonly<GenreHeaderCardProps>) {
         <div className="text-[17px] leading-tight font-black text-white">{meta.cn}</div>
         <div className="mt-0.5 text-[10.5px] tracking-[1.6px] text-white/80">{meta.en}</div>
       </div>
-      <span className="shrink-0 rounded-full bg-white/20 px-2.5 py-1 text-[10.5px] font-extrabold text-white">
+      <span className="shrink-0 rounded-full bg-[rgba(255,255,255,0.18)] px-2.5 py-1 text-[10.5px] font-extrabold text-white">
         {switched ? m.match_tag_switched() : m.match_tag_default()}
       </span>
     </div>
@@ -202,16 +213,21 @@ export function MatchPage() {
             </div>
 
             <div className="flex flex-col gap-[9px]">
-              {steps.map((step, i) => (
-                <StepRow
-                  ability={step.ability ?? ""}
-                  index={i}
-                  key={step.testCode ?? i}
-                  left={leftOf(step.testCode ?? "")}
-                  name={nameOf(step.testCode ?? "")}
-                  ready={engineReady(step.testCode ?? "")}
-                />
-              ))}
+              {steps.map((step, i) => {
+                const code = step.testCode ?? "";
+                return (
+                  <StepRow
+                    ability={step.ability ?? ""}
+                    done={(session?.done ?? []).includes(code)}
+                    index={i}
+                    key={code || i}
+                    left={leftOf(code)}
+                    name={nameOf(code)}
+                    onEnter={() => void navigate({ to: "/test/$code", params: { code } })}
+                    ready={engineReady(code)}
+                  />
+                );
+              })}
             </div>
 
             <button
@@ -226,6 +242,14 @@ export function MatchPage() {
             >
               {m.match_go()}
             </button>
+            {/* A dimmed start button with no explanation reads as a bug; the
+                note names the two reasons it can park (retakes spent, engines
+                unshipped) and the way out (switching starts a fresh session). */}
+            {next?.testCode == null && (
+              <div className="text-ink-tertiary mt-1.5 px-0.5 text-center text-[11px] leading-relaxed">
+                {m.match_go_blocked()}
+              </div>
+            )}
             <div className="mt-[9px] flex gap-[9px]">
               <button
                 className="bg-surface-input text-ink-secondary rounded-control flex-1 border-[1.5px] border-[#4b5563] py-[11px] text-center text-[12.5px] font-medium active:opacity-60"
