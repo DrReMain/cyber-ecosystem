@@ -162,4 +162,21 @@ describe("TestRunHost", () => {
     expect(stub.instance.pause).toHaveBeenCalled();
     host.destroy();
   });
+
+  it("bookends the record with wall anchors at start and end", () => {
+    const { host, onEnd } = makeHost();
+    // Before start there is no attempt window to speak of.
+    expect(host.record().startedAtMs).toBeNull();
+    expect(host.record().endedAtMs).toBeNull();
+    host.start();
+    const startWall = Date.now();
+    vi.advanceTimersByTime(10_000);
+    expect(onEnd).toHaveBeenCalledTimes(1);
+    const record = onEnd.mock.calls[0]?.[0];
+    // The submit contract's started_at/ended_at: captured at start and at
+    // the finishing tick, so the anchors bracket the run exactly.
+    expect(record?.startedAtMs).toBe(startWall);
+    expect(record?.endedAtMs).toBe(startWall + 10_000);
+    host.destroy();
+  });
 });

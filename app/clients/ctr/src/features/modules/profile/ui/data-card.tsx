@@ -42,7 +42,7 @@ export function DataCard({ profile }: Readonly<{ profile: ProfilePB | undefined 
   ];
   return (
     <div className={CARD_CLASS}>
-      <div className="text-ink mb-1 text-[14.5px] font-extrabold">{m.profile_card_data()}</div>
+      <div className="text-ink mb-[11px] text-[14.5px] font-extrabold">{m.profile_card_data()}</div>
       {rows.map((row, index) => (
         <button
           className={`flex w-full items-center justify-between py-[9px] text-left active:opacity-60 ${

@@ -1,8 +1,13 @@
+import { useNavigate } from "@tanstack/react-router";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "react-aria-components";
+import { abilityWord } from "#/features/modules/match/vocabulary";
 import { m } from "#/paraglide/messages";
-import { type AttemptRecord, EngineParams } from "../contract";
+import { type AttemptRecord, EngineParams, type StepContext, type StepRef } from "../contract";
+import { getGameModule } from "../registry";
 import { deriveLocalResults } from "../results";
 import type { SubmitVerdict } from "../submit";
+import { ProgStrip } from "./prog-strip";
 
 interface EndFaceProps {
   readonly code: string;
@@ -10,6 +15,9 @@ interface EndFaceProps {
   /** The attempt's boot params — the derivations re-read the same thresholds the game ran with. */
   readonly engineParams: Readonly<Record<string, string>>;
   readonly verdict: SubmitVerdict;
+  /** The live session binding — null after a practice run. */
+  readonly step: StepContext | null;
+  readonly testName: string;
   readonly onResubmit: () => void;
   readonly onRetry: () => void;
   readonly onExit: () => void;
@@ -62,95 +70,231 @@ function invalidCopy(reason: string | undefined): string {
   return copy?.() ?? m.test_verdict_invalid();
 }
 
-// The per-game end face: the server's verdict card (dual-track score and
-// grade, the invalid face, the retake receipt) above the local fact rows.
-// Markup-only; every number comes from results.ts or the submit verdict.
+// The grade chip's four-color ladder (prototype .tier) and its grey off
+// state — the server's curve-pending verdicts render as 未评级.
+const TIERS: Record<string, { readonly cls: string; readonly cn: () => string }> = {
+  S: { cls: "text-grade-s bg-[rgba(253,224,71,0.15)]", cn: m.test_grade_s },
+  A: { cls: "text-grade-a bg-[rgba(34,197,94,0.15)]", cn: m.test_grade_a },
+  B: { cls: "text-grade-b bg-[rgba(59,130,246,0.15)]", cn: m.test_grade_b },
+  C: { cls: "text-grade-c bg-[rgba(249,115,22,0.15)]", cn: m.test_grade_c },
+};
+
+function TierChip({ grade }: Readonly<{ grade: string | undefined }>) {
+  const tier = grade !== undefined ? TIERS[grade] : undefined;
+  if (tier === undefined) {
+    return (
+      <span className="rounded-full bg-[rgba(107,114,128,0.15)] px-2.5 py-[3px] text-[11px] font-extrabold text-[#6b7280]">
+        {m.test_grade_off()}
+      </span>
+    );
+  }
+  return (
+    <span className={`rounded-full px-2.5 py-[3px] text-[11px] font-extrabold ${tier.cls}`}>
+      {grade} · {tier.cn()}
+    </span>
+  );
+}
+
+// The retake receipt chip (prototype .st): grey while chances remain,
+// amber when spent.
+function RetakeChip({ left, max }: Readonly<{ left: number; max: number }>) {
+  const spent = left <= 0;
+  return (
+    <span
+      className={`rounded-full px-2.5 py-[3px] text-[10.5px] font-semibold ${
+        spent
+          ? "text-status-pending bg-[rgba(245,158,11,0.18)]"
+          : "text-ink-muted bg-[rgba(107,114,128,0.18)]"
+      }`}
+    >
+      {m.test_result_retake_chip({ left, max })}
+    </span>
+  );
+}
+
+// The continue CTA's target: the next undone engine-backed step. With
+// the lineup finished it returns undefined and the CTA closes the
+// session flow (the report page the prototype routes to is a later
+// slice).
+function findNextStep(step: StepContext): StepRef | undefined {
+  return step.lineup.find(
+    (s) => !step.doneCodes.includes(s.code) && getGameModule(s.code) !== null,
+  );
+}
+
+// The score card: the ability line, then the submit chain's face — big
+// score with grade chip, the pending pulse, the invalid card, the error
+// card with its retry — and the retake receipt chip.
+function VerdictCard({
+  verdict,
+  step,
+  testName,
+  onResubmit,
+}: Readonly<{
+  verdict: SubmitVerdict;
+  step: StepContext | null;
+  testName: string;
+  onResubmit: () => void;
+}>) {
+  const word = step !== null ? abilityWord(step.ability) : null;
+  const maxRetakes = step !== null ? (step.firstSession ? 3 : 1) : 0;
+  const retakeLeft = verdict.phase === "done" ? verdict.retestLeft : (step?.retestLeft ?? 0);
+  return (
+    <div className="border-line bg-surface-card rounded-card border px-4 py-[18px] text-center">
+      {word !== null ? (
+        <div className="text-ink-tertiary text-[11px]">
+          {m.test_result_ability_line({ ability: word.cn, name: testName })}
+        </div>
+      ) : null}
+      {(verdict.phase === "submitting" || verdict.phase === "idle") && (
+        <div className="text-ink-tertiary mt-3 animate-pulse text-sm">
+          {m.test_verdict_pending()}
+        </div>
+      )}
+      {verdict.phase === "done" && verdict.valid && (
+        <>
+          <div className="mt-1.5 flex items-baseline justify-center gap-1.5">
+            <span className="text-ink text-[58px] leading-none font-black tabular-nums">
+              {verdict.authoritativeScore ?? "—"}
+            </span>
+            <span className="text-ink-tertiary text-sm">{m.test_result_unit()}</span>
+          </div>
+          <div className="mt-2.5">
+            <TierChip grade={verdict.grade} />
+          </div>
+        </>
+      )}
+      {verdict.phase === "done" && !verdict.valid && (
+        <div className="text-status-pending rounded-control mt-3 border border-[rgba(245,158,11,0.45)] bg-transparent px-[13px] py-3 text-left text-[12px] leading-[1.85]">
+          <span className="font-bold">{m.test_verdict_invalid()}</span>
+          <span className="opacity-80"> · {invalidCopy(verdict.invalidReason)}</span>
+        </div>
+      )}
+      {verdict.phase === "error" && (
+        <div className="mt-3">
+          <div className="text-status-pending text-sm font-bold">{m.test_submit_error()}</div>
+          <button
+            className="text-ink-tertiary cursor-pointer text-xs underline active:opacity-60"
+            onClick={onResubmit}
+            type="button"
+          >
+            {m.common_retry()}
+          </button>
+        </div>
+      )}
+      {verdict.phase === "done" && verdict.inSession ? (
+        <div className="mt-3 flex flex-wrap justify-center gap-2">
+          <RetakeChip left={retakeLeft} max={maxRetakes} />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * The result face (prototype test-result): the big score with its grade
+ * chip and retake receipt, the fact rows as label/value lines, and the
+ * two CTAs — the practice/orange retest and the primary continue, which
+ * walks to the next undone engine-backed step or closes the session
+ * flow. Markup-only; every number comes from results.ts or the submit
+ * verdict.
+ */
 export function EndFace({
   code,
   record,
   engineParams,
   verdict,
+  step,
+  testName,
   onResubmit,
   onRetry,
   onExit,
 }: Readonly<EndFaceProps>) {
+  const navigate = useNavigate();
   const rows = deriveLocalResults(code, record, new EngineParams(engineParams));
+  const spent = verdict.phase === "done" && verdict.inSession && verdict.retestLeft <= 0;
+  const next = step !== null ? findNextStep(step) : undefined;
+
   return (
-    <div className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-black/80 p-6 backdrop-blur-sm">
-      <div className="mx-auto flex w-full max-w-xs flex-1 flex-col justify-center py-6">
-        <h2 className="text-ink text-center text-xl font-extrabold">{m.test_end_title()}</h2>
-        <div className="mt-4">
-          {verdict.phase === "submitting" && (
-            <div className="border-line bg-surface-card text-ink-tertiary rounded-card animate-pulse border px-4 py-3 text-center text-sm">
-              {m.test_verdict_pending()}
+    <div className="bg-canvas absolute inset-0 isolate z-40 overflow-y-auto">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-[-80px] left-[-70px] size-[min(69vw,260px)] rounded-full bg-[#2563eb] opacity-26 blur-[70px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-[-70px] bottom-[-60px] size-[min(59vw,220px)] rounded-full bg-[#06b6d4] opacity-26 blur-[70px]"
+      />
+      <div className="relative mx-auto w-full max-w-md px-4 pb-6">
+        <div className="flex items-center gap-3 pt-5 pb-2.5">
+          <button
+            aria-label={m.common_back()}
+            className="bg-surface-input text-ink-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-full active:opacity-60"
+            onClick={onExit}
+            type="button"
+          >
+            <ChevronLeft aria-hidden size={20} />
+          </button>
+          <h1 className="text-ink min-w-0 flex-1 truncate text-[19px] font-bold">
+            {m.test_result_title({ name: testName })}
+          </h1>
+          {step !== null ? (
+            <span className="text-ink-tertiary shrink-0 text-[13px] tabular-nums">
+              {step.index + 1} / {step.lineup.length}
+            </span>
+          ) : null}
+        </div>
+        {step !== null ? (
+          <div className="mb-[14px]">
+            <ProgStrip currentIndex={step.index} doneCodes={step.doneCodes} lineup={step.lineup} />
+          </div>
+        ) : null}
+
+        <div className="flex flex-col gap-3">
+          <VerdictCard onResubmit={onResubmit} step={step} testName={testName} verdict={verdict} />
+
+          <div className="border-line bg-surface-card rounded-card border p-4">
+            <div className="text-ink mb-2.5 text-sm font-extrabold">
+              {m.test_result_detail_title()}
             </div>
-          )}
-          {verdict.phase === "done" && verdict.valid && (
-            <div className="border-line bg-surface-card rounded-card border px-4 py-3 text-center">
-              <div className="text-ink-tertiary text-xs">{m.test_result_score()}</div>
-              <div className="text-ink mt-0.5 text-2xl font-black">
-                {verdict.authoritativeScore ?? "—"}
-                {verdict.grade !== undefined && (
-                  <span className="text-cta-primary ml-2 align-middle text-base font-extrabold">
-                    {verdict.grade}
-                  </span>
-                )}
-              </div>
-              {verdict.inSession ? (
-                <div className="text-status-ok mt-1 text-[11px] font-bold">
-                  {verdict.retestLeft > 0
-                    ? m.test_verdict_left({ n: verdict.retestLeft })
-                    : m.test_verdict_left_zero()}
-                </div>
-              ) : null}
-            </div>
-          )}
-          {verdict.phase === "done" && !verdict.valid && (
-            <div className="border-status-pending/45 bg-surface-card text-status-pending rounded-card border px-4 py-3 text-center text-sm">
-              <span className="font-bold">{m.test_verdict_invalid()}</span>
-              <span className="opacity-80"> · {invalidCopy(verdict.invalidReason)}</span>
-            </div>
-          )}
-          {verdict.phase === "error" && (
-            <div className="border-line bg-surface-card rounded-card border px-4 py-3 text-center">
-              <div className="text-status-pending text-sm font-bold">{m.test_submit_error()}</div>
-              <button
-                className="text-ink-tertiary cursor-pointer text-xs underline active:opacity-60"
-                onClick={onResubmit}
-                type="button"
+            {rows.map((row) => (
+              <div
+                className="flex items-center justify-between border-b border-[rgba(55,65,81,0.45)] py-[9px] last:border-b-0"
+                key={row.key}
               >
-                {m.common_retry()}
-              </button>
-            </div>
-          )}
-        </div>
-        <div className="mt-3 grid grid-cols-2 gap-2.5">
-          {rows.map((row) => (
-            <div
-              className="rounded-card border-line bg-surface-card border px-3 py-2.5"
-              key={row.key}
-            >
-              <div className="text-ink-tertiary text-xs">
-                {(ROW_LABELS[row.key] ?? m.test_result_taps)()}
+                <span className="text-ink-muted text-[12.5px]">
+                  {(ROW_LABELS[row.key] ?? m.test_result_taps)()}
+                </span>
+                <span className="text-ink text-sm font-extrabold tabular-nums">{row.value}</span>
               </div>
-              <div className="text-ink mt-0.5 text-lg font-bold">{row.value}</div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 flex flex-col gap-3">
-          {/* Retry is the practice/orange CTA (prototype btn-org), not the primary blue. */}
-          <Button
-            className="rounded-control bg-cta-practice w-full cursor-pointer px-4 py-3 font-semibold text-white active:opacity-80"
-            onPress={onRetry}
-          >
-            {m.test_end_retry()}
-          </Button>
-          <Button
-            className="rounded-control border-line text-ink-secondary w-full cursor-pointer border px-4 py-3 font-semibold active:opacity-80"
-            onPress={onExit}
-          >
-            {m.test_end_exit()}
-          </Button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Button
+              className={`bg-cta-practice shadow-cta-practice rounded-control w-full cursor-pointer px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 ${
+                spent ? "pointer-events-none opacity-45" : ""
+              }`}
+              onPress={onRetry}
+            >
+              {spent ? m.test_result_retry_disabled() : m.test_end_retry()}
+            </Button>
+            {next !== undefined ? (
+              <Button
+                className="bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+                onPress={() => void navigate({ to: "/test/$code", params: { code: next.code } })}
+              >
+                {m.test_result_next({ ability: abilityWord(next.ability).cn })}
+              </Button>
+            ) : (
+              <Button
+                className="bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+                onPress={onExit}
+              >
+                {m.test_result_finish()}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -31,7 +31,9 @@ export function SecurityCard() {
   ];
   return (
     <div className={CARD_CLASS}>
-      <div className="text-ink mb-1 text-[14.5px] font-extrabold">{m.profile_card_account()}</div>
+      <div className="text-ink mb-[11px] text-[14.5px] font-extrabold">
+        {m.profile_card_account()}
+      </div>
       {rows.map((row, index) => (
         <div
           className={`flex items-center justify-between py-[9px] ${
@@ -39,7 +41,7 @@ export function SecurityCard() {
           }`}
           key={row.key}
         >
-          <span className="text-ink flex items-center gap-2 text-[13px] font-bold">
+          <span className="text-ink flex items-center gap-[9px] text-[13px] font-bold">
             <span
               className={`rounded-control flex h-[30px] w-[30px] shrink-0 items-center justify-center ${row.chip}`}
             >

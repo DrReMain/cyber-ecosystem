@@ -9,14 +9,14 @@
   "login_password_label": "Password",
   "login_password_placeholder": "Password (at least 6 characters)",
   "login_password_short": "Password must be at least 6 characters",
-  "login_submit": "Sign in",
+  "login_submit": "Log in / Sign up",
   "login_pending": "Signing in…",
   "login_error_bad_credentials": "Incorrect account or password",
   "login_error_generic": "Sign-in failed, please try again later",
   "login_error_switch_account": "Switch account",
   "login_success": "Signed in",
   "login_session_expired": "Your session has expired, please sign in again",
-  "login_wechat_button": "Sign in with WeChat",
+  "login_wechat_button": "WeChat authorization login",
   "login_error_wechat_env": "Please open in WeChat",
   "login_error_wechat": "WeChat sign-in failed, please try again",
   "login_callback_pending": "Signing in…",
@@ -30,5 +30,7 @@
   "login_forgot": "Forgot password?",
   "login_footer_company": "星歌未来教育科技（杭州）有限公司",
   "login_footer_icp": "浙ICP2026028293号",
-  "login_footer_email": "客服邮箱 xgwledu@126.com"
+  "login_footer_email": "客服邮箱 xgwledu@126.com",
+  "login_wechat_env_note": "Not inside WeChat — tapping WeChat login will ask you to open in WeChat",
+  "login_footer_home": "Back to start"
 }

@@ -66,8 +66,12 @@ export function SetupAgePage() {
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/nickname" })} step={2}>
       <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
         <div className="text-ink mb-1 text-sm font-extrabold">{m.profile_birth_label()}</div>
-        <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed">
-          {m.profile_setup_birth_desc()}
+        <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed whitespace-pre-line">
+          {m.profile_setup_birth_desc_lead()}
+          <span className="font-bold">{m.profile_setup_birth_desc_auto()}</span>
+          {m.profile_setup_birth_desc_mid()}
+          <span className="font-bold">{m.profile_setup_birth_desc_precise()}</span>
+          {m.profile_setup_birth_desc_tail()}
         </p>
         <div className="flex gap-2.5">
           <select
@@ -83,7 +87,7 @@ export function SetupAgePage() {
             <option value="">{m.profile_birth_year()}</option>
             {years().map((y) => (
               <option key={y} value={y}>
-                {y}
+                {m.profile_birth_year_opt({ y })}
               </option>
             ))}
           </select>
@@ -97,10 +101,10 @@ export function SetupAgePage() {
             }}
             value={month}
           >
-            <option value="">{m.profile_birth_month()}</option>
+            <option value="">{m.profile_birth_month_ph()}</option>
             {MONTHS.map((mo) => (
               <option key={mo} value={mo}>
-                {mo}
+                {m.profile_birth_month_opt({ month: mo })}
               </option>
             ))}
           </select>
@@ -113,29 +117,45 @@ export function SetupAgePage() {
       </div>
 
       {needGuardian || minorNote ? (
-        <div className="bg-surface-deep text-status-pending rounded-control border border-[rgba(245,158,11,0.5)] p-3.5 text-[11.5px] leading-relaxed">
-          {needGuardian ? m.profile_minor_u13() : m.profile_minor_u18()}
+        <div className="bg-surface-content text-status-pending rounded-control border border-[rgba(245,158,11,0.5)] px-[13px] py-[11px] text-[11.5px] leading-[1.7]">
+          {needGuardian ? (
+            <>
+              {m.profile_minor_u13_lead()}
+              <span className="font-bold">{m.profile_minor_u13_bold()}</span>
+              {m.profile_minor_u13_tail()}
+            </>
+          ) : (
+            <>
+              {m.profile_minor_u18_lead()}
+              <span className="font-bold">{m.profile_minor_u18_bold()}</span>
+              {m.profile_minor_u18_tail()}
+            </>
+          )}
         </div>
       ) : null}
 
       {needGuardian ? (
-        <label className="border-line bg-surface-deep rounded-control flex flex-col gap-1.5 border p-3.5">
-          <span className="text-ink-secondary flex items-start gap-2">
+        <div>
+          <label className="text-ink-muted flex cursor-pointer items-start gap-[9px] text-[12px] leading-[1.6]">
             <input
               checked={guardian}
-              className="mt-0.5 h-4 w-4 shrink-0 accent-[#2563eb]"
+              className="mt-px h-4 w-4 shrink-0 accent-[#2563eb]"
               onChange={(event) => {
                 setGuardian(event.target.checked);
                 setError(null);
               }}
               type="checkbox"
             />
-            <span className="text-sm leading-snug">{m.profile_guardian()}</span>
-          </span>
-          <span className="text-ink-tertiary ml-6 text-[10.5px] leading-snug">
+            <span>
+              {m.profile_guardian_lead()}
+              <span className="font-bold">{m.profile_guardian_bold()}</span>
+              {m.profile_guardian_tail()}
+            </span>
+          </label>
+          <p className="text-ink-tertiary ml-[25px] text-[10.5px] leading-snug">
             {m.profile_guardian_note()}
-          </span>
-        </label>
+          </p>
+        </div>
       ) : null}
 
       {error !== null && (

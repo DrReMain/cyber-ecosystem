@@ -76,6 +76,18 @@ function deriveMultiTarget(record: AttemptRecord): readonly ResultRow[] {
     countByTier.set(tier, (countByTier.get(tier) ?? 0) + 1);
     score += valueByTier.get(tier) ?? 0;
   }
+  // Pick-to-pick switching cost, mirroring the server scorer's rebuildable
+  // form: the frozen pick carries no spawn stamp, so the differential of
+  // consecutive run-relative elapsed values (first against zero) is the
+  // decision interval. The raw-elapsed mean this row used to show was a
+  // run-position average, not a decision time.
+  let prev = 0;
+  const deltas: number[] = [];
+  for (const pick of picks) {
+    const elapsed = num(pick.elapsedMs);
+    deltas.push(elapsed - prev);
+    prev = elapsed;
+  }
   return [
     { key: "taps", value: String(picks.length) },
     { key: "score", value: String(score) },
@@ -83,7 +95,7 @@ function deriveMultiTarget(record: AttemptRecord): readonly ResultRow[] {
     { key: "trap_hits", value: String(countByTier.get("trap") ?? 0) },
     { key: "missed_high", value: String(record.stats.missedHigh ?? 0) },
     { key: "incorrect_clicks", value: String(record.stats.incorrectClicks ?? 0) },
-    { key: "avg_decision", value: ms(mean(picks.map((pick) => num(pick.elapsedMs)))) },
+    { key: "avg_decision", value: ms(mean(deltas)) },
   ];
 }
 
