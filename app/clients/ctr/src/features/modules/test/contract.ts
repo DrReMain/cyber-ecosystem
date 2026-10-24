@@ -33,6 +33,32 @@ export class EngineParams {
 
 export type GameExit = "completed" | "aborted" | "failed";
 
+// One lineup slot as the faces render it: the drawn test's code plus the
+// ability it attributes (the contract keeps both as open words).
+export interface StepRef {
+  readonly code: string;
+  readonly ability: string;
+}
+
+/** The session binding a run renders against — null rides the run as
+ * practice. Carries everything the intro/result faces show: the lineup
+ * strip, this test's position, the recorded codes, and the retake
+ * receipt (the bootstrap recomputes it on every session refetch, so the
+ * result face reads the post-submit truth). */
+export interface StepContext {
+  readonly lineup: readonly StepRef[];
+  /** This test's 0-based position in the lineup. */
+  readonly index: number;
+  /** This test's ability (the lineup slot at index). */
+  readonly ability: string;
+  /** Codes with a stored record — any attempt, valid or not (E4-b law). */
+  readonly doneCodes: readonly string[];
+  /** The live retake receipt for this code. */
+  readonly retestLeft: number;
+  /** 3 chances on the first session, 1 after (E4-b). */
+  readonly firstSession: boolean;
+}
+
 // The one attempt-shaped record a run accumulates. Events are per-game
 // shapes mirroring the frozen proto Detail items (gen types at the game
 // side); the submit adapter wraps them into the request's oneof detail.

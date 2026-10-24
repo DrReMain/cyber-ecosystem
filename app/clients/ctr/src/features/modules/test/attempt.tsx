@@ -8,12 +8,12 @@ import { invalidateMatchSession } from "#/features/modules/match/session";
 import { m } from "#/paraglide/messages";
 import { getLocale } from "#/paraglide/runtime";
 import { GameClock } from "./clock";
-import { type AttemptRecord, EngineParams, type GameModule } from "./contract";
+import { type AttemptRecord, EngineParams, type GameModule, type StepContext } from "./contract";
 import { TestRunHost } from "./runtime";
 import { buildSubmitRequest, type SubmitVerdict } from "./submit";
 import { EndFace } from "./ui/end-face";
+import { IntroFace } from "./ui/intro-face";
 import { PauseOverlay } from "./ui/pause-overlay";
-import { StartGameOverlay } from "./ui/start-game-overlay";
 import { TestHud } from "./ui/test-hud";
 
 interface TestAttemptProps {
@@ -22,18 +22,91 @@ interface TestAttemptProps {
   readonly introduction: string;
   readonly durationSeconds: number;
   readonly engineParams: Readonly<Record<string, string>>;
-  /** The session step binding frozen at boot — undefined rides as practice. */
+  /** The session binding frozen at boot — undefined rides as practice. */
   readonly matchSessionId: string | undefined;
+  /** The live session context the faces render (null = practice). */
+  readonly step: StepContext | null;
+  readonly category: string;
+  readonly unitLabel: string;
   readonly onRetry: () => void;
 }
 
 type Phase = "intro" | "running" | "ended";
 
+// The mutation's face — the structural slice verdictOf reads. The plain
+// proto3 scalars (valid, retestLeft) are zero-omitted in the transport's
+// JSON, so they read as optional at runtime and the guard defaults
+// restate the wire truth.
+interface SubmitState {
+  readonly isPending: boolean;
+  readonly isError: boolean;
+  readonly data?: {
+    valid?: boolean;
+    retestLeft?: number;
+    invalidReason?: string;
+    authoritativeScore?: number;
+    grade?: string;
+  };
+}
+
+// The submit chain's verdict as one pure derivation — the WKT wrappers
+// arrive JSON-flattened to scalars on this transport, so the casts
+// restate the runtime shape.
+function verdictOf(
+  endRecord: AttemptRecord | null,
+  submit: SubmitState,
+  inSession: boolean,
+): SubmitVerdict {
+  if (endRecord === null || endRecord.exit !== "completed") {
+    return { phase: "idle" };
+  }
+  if (submit.isPending) {
+    return { phase: "submitting" };
+  }
+  if (submit.isError) {
+    return { phase: "error" };
+  }
+  if (submit.data === undefined) {
+    return { phase: "idle" };
+  }
+  const data = submit.data;
+  return {
+    phase: "done",
+    valid: data.valid ?? false,
+    invalidReason: data.invalidReason as string | undefined,
+    authoritativeScore: data.authoritativeScore as number | undefined,
+    grade: data.grade as string | undefined,
+    retestLeft: data.retestLeft ?? 0,
+    inSession,
+  };
+}
+
+// The time bar under the stage (prototype .bar): elapsed share of the
+// run, cyan→blue, pinned to a 6px minimum once anything has elapsed.
+function elapsedPctOf(remainingMs: number, durationSeconds: number): number {
+  const totalMs = durationSeconds * 1000;
+  return Math.max(0, Math.min(100, ((totalMs - remainingMs) / totalMs) * 100));
+}
+
+function RunTimeBar({ pct }: Readonly<{ pct: number }>) {
+  return (
+    <div className="flex-none px-4 pt-1.5 pb-2">
+      <div className="h-[6px] w-full overflow-hidden rounded-full bg-[#111827]">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-[#0e7490] to-[#22d3ee]"
+          style={{ minWidth: pct > 0 ? "6px" : undefined, width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 /**
  * One attempt's lifetime: host, stage, overlays. Mounted fresh per attempt
  * (the parent keys on runId), so a retry starts from virgin state. The
  * engine params are frozen at mount — an attempt runs on the config it
- * booted with; later refetches never tear down a live run.
+ * booted with; later refetches never tear down a live run. The step
+ * context stays live so the result face reads the post-submit truth.
  */
 export function TestAttempt({
   gameModule,
@@ -42,6 +115,9 @@ export function TestAttempt({
   durationSeconds,
   engineParams,
   matchSessionId,
+  step,
+  category,
+  unitLabel,
   onRetry,
 }: Readonly<TestAttemptProps>) {
   const navigate = useNavigate();
@@ -100,26 +176,7 @@ export function TestAttempt({
     }
   }, [bootSessionId, endRecord, gameModule.code, submitAttempt]);
 
-  const verdict: SubmitVerdict =
-    endRecord === null || endRecord.exit !== "completed"
-      ? { phase: "idle" }
-      : submit.isPending
-        ? { phase: "submitting" }
-        : submit.isError
-          ? { phase: "error" }
-          : submit.data === undefined
-            ? { phase: "idle" }
-            : {
-                // WKT wrappers arrive JSON-flattened to scalars on this
-                // transport — the casts restate the runtime shape.
-                phase: "done",
-                valid: submit.data.valid,
-                invalidReason: submit.data.invalidReason as string | undefined,
-                authoritativeScore: submit.data.authoritativeScore as number | undefined,
-                grade: submit.data.grade as string | undefined,
-                retestLeft: submit.data.retestLeft,
-                inSession: bootSessionId !== undefined,
-              };
+  const verdict = verdictOf(endRecord, submit, bootSessionId !== undefined);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -171,22 +228,35 @@ export function TestAttempt({
     void navigate({ to: "/match" });
   }, [navigate]);
 
+  // The exit dialog names the session's progress when the run is bound.
+  const exitDesc =
+    step !== null
+      ? m.test_exit_desc_session({ done: step.doneCodes.length, total: step.lineup.length })
+      : m.test_exit_desc();
+
   return (
-    <div className="safe-pb safe-pt h-app bg-canvas text-ink relative isolate flex flex-col overflow-hidden">
+    <div className="safe-pb safe-pt bg-canvas text-ink h-app relative isolate flex flex-col overflow-hidden">
       <TestHud
         canPause={phase === "running" && !paused}
         onPause={pauseRun}
         remainingMs={remainingMs}
+        step={step}
+        testName={testName}
       />
       <div className="min-h-0 flex-1" ref={mountRef} />
+      {phase === "running" ? (
+        <RunTimeBar pct={elapsedPctOf(remainingMs, durationSeconds)} />
+      ) : null}
 
       {phase === "intro" && (
-        <StartGameOverlay
-          durationSeconds={durationSeconds}
+        <IntroFace
+          category={category}
           introduction={introduction}
           onBack={backToFlow}
           onStart={startRun}
+          step={step}
           testName={testName}
+          unitLabel={unitLabel}
         />
       )}
       {phase === "running" && paused && (
@@ -200,12 +270,14 @@ export function TestAttempt({
           onResubmit={resubmit}
           onRetry={onRetry}
           record={endRecord}
+          step={step}
+          testName={testName}
           verdict={verdict}
         />
       )}
 
       <ExitConfirmDialog
-        description={m.test_exit_desc()}
+        description={exitDesc}
         onCancel={() => setExitOpen(false)}
         onConfirm={() => {
           setExitOpen(false);

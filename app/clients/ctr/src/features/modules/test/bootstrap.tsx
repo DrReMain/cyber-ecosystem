@@ -1,5 +1,6 @@
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
+import type { MatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match_pb";
 import {
   getTest,
   getTestConfig,
@@ -8,6 +9,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Button } from "react-aria-components";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { m } from "#/paraglide/messages";
+import type { StepContext } from "./contract";
 import { getGameModule } from "./registry";
 import { TestRun } from "./run";
 
@@ -17,12 +19,33 @@ interface TestBootstrapProps {
   readonly fallbackName: string;
 }
 
+// The faces' session binding (null = practice): the lineup, this test's
+// slot, the recorded codes, and the retake receipt. Pure — the bootstrap
+// recomputes it on every session refetch so the result face reads the
+// post-submit truth.
+function buildStepContext(session: MatchSession, code: string): StepContext | null {
+  const steps = session.steps ?? [];
+  const index = steps.findIndex((s) => s.testCode === code);
+  if (index < 0) {
+    return null;
+  }
+  return {
+    lineup: steps.map((s) => ({ ability: s.ability ?? "", code: s.testCode ?? "" })),
+    index,
+    ability: steps[index]?.ability ?? "",
+    doneCodes: session.done ?? [],
+    retestLeft: session.retestLeft?.[code] ?? 0,
+    firstSession: (session.firstSession as boolean | undefined) ?? true,
+  };
+}
+
 // The id-keyed half of the bootstrap: both read-face queries fire once the
 // 20-char row id is resolved (the /test/$code route param is the code, not
 // the id). Faces: loading / retryable error / unknown engine. The match
 // session read binds the run to its step — a session that is missing,
 // undecided, or failed to load degrades the run to practice (unbound
-// submit) rather than blocking the game.
+// submit) rather than blocking the game. The step context recomputes on
+// every session refetch, so the result face reads the post-submit truth.
 export function TestBootstrap({ id, code, fallbackName }: Readonly<TestBootstrapProps>) {
   const navigate = useNavigate();
   const testQuery = useConnectQuery(getTest, { id });
@@ -30,10 +53,8 @@ export function TestBootstrap({ id, code, fallbackName }: Readonly<TestBootstrap
   const sessionQuery = useConnectQuery(getMatchSession, {});
   const gameModule = getGameModule(code);
   const session = sessionQuery.data?.session ?? null;
-  const boundSessionId =
-    session?.id != null && (session.steps ?? []).some((s) => s.testCode === code)
-      ? session.id
-      : undefined;
+  const step = session !== null ? buildStepContext(session, code) : null;
+  const boundSessionId = step !== null && session?.id != null ? session.id : undefined;
 
   if (testQuery.isPending || configQuery.isPending || sessionQuery.isPending) {
     return <StateScreen variant="loading" />;
@@ -83,12 +104,15 @@ export function TestBootstrap({ id, code, fallbackName }: Readonly<TestBootstrap
   const durationSeconds = config?.durationSeconds || test?.durationSeconds || 30;
   return (
     <TestRun
+      category={test?.category ?? ""}
       durationSeconds={durationSeconds}
       engineParams={config?.engineParams ?? {}}
       gameModule={gameModule}
       introduction={testQuery.data?.introduction ?? m.test_start_rule_fallback()}
       matchSessionId={boundSessionId}
+      step={step}
       testName={test?.name ?? fallbackName}
+      unitLabel={test?.unitScoreLabel ?? ""}
     />
   );
 }

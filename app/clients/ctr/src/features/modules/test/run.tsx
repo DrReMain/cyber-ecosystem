@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { TestAttempt } from "./attempt";
-import type { GameModule } from "./contract";
+import type { GameModule, StepContext } from "./contract";
 
 interface TestRunProps {
   readonly gameModule: GameModule;
@@ -10,6 +10,10 @@ interface TestRunProps {
   readonly engineParams: Readonly<Record<string, string>>;
   /** The session step binding — undefined rides the run as practice. */
   readonly matchSessionId: string | undefined;
+  /** The live session context the faces render (null = practice). */
+  readonly step: StepContext | null;
+  readonly category: string;
+  readonly unitLabel: string;
 }
 
 /**
