@@ -7,6 +7,7 @@
 import type { AttemptRecord, EngineParams } from "./contract";
 import { FLASH_AIMING_DEFAULTS } from "./games/flash-aiming/logic";
 import { TIER_SPECS } from "./games/multi-target/logic";
+import { OFFENSE_SCENARIOS } from "./games/offense-defense/scenarios";
 
 export interface ResultRow {
   /** Copy-key suffix under test_result_ (e.g. "hits" → m.test_result_hits). */
@@ -180,6 +181,45 @@ function deriveTrackingMoving(record: AttemptRecord): readonly ResultRow[] {
   ];
 }
 
+function deriveOffenseDefense(record: AttemptRecord): readonly ResultRow[] {
+  const decisions = record.events;
+  // Correctness here reads the bank mirror for the local face only —
+  // the server re-judges every pick against the seeded key.
+  const optimalByCode = new Map(OFFENSE_SCENARIOS.map((s) => [s.code, s.optimal] as const));
+  const correct = decisions.filter((decision) => {
+    const optimal = optimalByCode.get(decision.scenarioId as string);
+    return optimal !== undefined && decision.choice === optimal;
+  }).length;
+  const timeouts = decisions.filter((decision) => decision.timeout === true).length;
+  return [
+    { key: "rounds", value: String(decisions.length) },
+    { key: "correct", value: String(correct) },
+    { key: "timeouts", value: String(timeouts) },
+    {
+      key: "avg_decision",
+      value: ms(mean(decisions.map((decision) => num(decision.decisionTimeMs)))),
+    },
+  ];
+}
+
+function deriveResourceMatch(record: AttemptRecord): readonly ResultRow[] {
+  const byType = (type: string) => record.events.filter((event) => event.type === type);
+  const collects = byType("collect");
+  const collisions = byType("collision");
+  const countKind = (kind: string) => collects.filter((collect) => collect.kind === kind).length;
+  // Survival reads the last fact's stamp across both streams: a death
+  // ends on its fatal collision, a clean run coasts to its final event.
+  const last = record.events.reduce((max, event) => Math.max(max, num(event.elapsedMs)), 0);
+  return [
+    { key: "collected", value: String(collects.length) },
+    { key: "minions", value: String(countKind("minion")) },
+    { key: "monsters", value: String(countKind("monster")) },
+    { key: "dragons", value: String(countKind("dragon")) },
+    { key: "collisions", value: String(collisions.length) },
+    { key: "survived", value: `${(last / 1000).toFixed(1)}s` },
+  ];
+}
+
 /** Per-game local rows; unknown codes fall back to the generic tap/hit pair. */
 export function deriveLocalResults(
   code: string,
@@ -203,6 +243,10 @@ export function deriveLocalResults(
       return deriveSkillTrajectory(record);
     case "dual_zone":
       return deriveDualZone(record);
+    case "offense_defense":
+      return deriveOffenseDefense(record);
+    case "resource_match":
+      return deriveResourceMatch(record);
     default: {
       const hits = record.events.filter((event) => event.isHit === true).length;
       return [

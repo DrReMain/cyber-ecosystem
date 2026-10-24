@@ -5,7 +5,9 @@ import type {
   FlashAimingDetail,
   MovingTargetDetail,
   MultiTargetDetail,
+  OffenseDefenseDetail,
   RedDotDetail,
+  ResourceMatchDetail,
   SkillTrajectoryDetail,
   SubmitTestAttemptRequest,
   TargetRecognitionDetail,
@@ -63,6 +65,37 @@ const DETAIL_BUILDERS: Readonly<Record<string, DetailBuilder>> = {
     case: "dualZone",
     value: { behaviors: r.events } as DualZoneDetail,
   }),
+  offense_defense: (r) => ({
+    case: "offenseDefense",
+    // A timeout decision carries no choice on the wire — absence is the
+    // contract's "unanswered", never an empty string.
+    value: { decisions: r.events } as OffenseDefenseDetail,
+  }),
+  resource_match: (r) => {
+    // The engine tags its mixed stream; the three detail arrays are the
+    // partition of that stream by tag. Items stay plain records — the
+    // request's create() walk converts them into messages, the same
+    // deep conversion every game's plain event shapes already ride.
+    const trajectory: Record<string, unknown>[] = [];
+    const collects: Record<string, unknown>[] = [];
+    const collisions: Record<string, unknown>[] = [];
+    for (const event of r.events) {
+      if (event.type === "collect") {
+        collects.push({ kind: event.kind as string, elapsedMs: event.elapsedMs as number });
+      } else if (event.type === "collision") {
+        collisions.push({ elapsedMs: event.elapsedMs as number });
+      } else if (event.type === "trajectory") {
+        trajectory.push({
+          position: { x: event.x as number, y: event.y as number },
+          elapsedMs: event.elapsedMs as number,
+        });
+      }
+    }
+    return {
+      case: "resourceMatch",
+      value: { trajectory, collects, collisions } as ResourceMatchDetail,
+    };
+  },
 };
 
 export interface SubmitInput {
