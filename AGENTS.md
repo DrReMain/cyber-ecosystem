@@ -38,7 +38,11 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 ./nx run <project>:<target>
 ```
 
+**Fresh clone:** bootstrap once with `./nx run tools:init` — pinned buf and grpcurl CLIs, Go and buf dependencies, and node_modules — before running anything else.
+
 **How to find targets:** Read the project's `project.json` — every valid target is declared there, for every project, JS/TS packages included. Do not assume a target exists. `package.json` carries package identity (name, dependencies) only — npm scripts are not used anywhere in this repo; a workflow with no target gets one added to `project.json`. In target commands, package-local binaries are invoked through `pnpm exec <bin>` — Nx injects only the workspace-root `.bin` into PATH, and pnpm's isolation keeps vite/vitest/storybook package-local, so a bare binary name fails loudly instead of resolving.
+
+**Long-running dev servers:** start with the project's `dev:up` target, stop with `dev:down`. While up, all output streams to `.run/<project>/dev.log` (one directory per project, removed on stop — a log file exists only while its server runs); read or `tail -f` that file for logs. `dev:down` kills exactly the process group recorded at start — never by port — so raw `kill` is never needed.
 
 Recurring build, test, lint, generation, dev, and automation workflows `SHOULD` be exposed through Nx targets. If a needed workflow has no target yet, add one to `project.json` instead of running ad-hoc commands.
 
