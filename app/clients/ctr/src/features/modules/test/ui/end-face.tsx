@@ -147,7 +147,9 @@ function VerdictCard({
         </div>
       ) : null}
       {(verdict.phase === "submitting" || verdict.phase === "idle") && (
-        <div className="text-ink-tertiary mt-3 animate-pulse text-sm">{m.test_verdict_pending()}</div>
+        <div className="text-ink-tertiary mt-3 animate-pulse text-sm">
+          {m.test_verdict_pending()}
+        </div>
       )}
       {verdict.phase === "done" && verdict.valid && (
         <>
@@ -249,12 +251,7 @@ export function EndFace({
         ) : null}
 
         <div className="flex flex-col gap-3">
-          <VerdictCard
-            onResubmit={onResubmit}
-            step={step}
-            testName={testName}
-            verdict={verdict}
-          />
+          <VerdictCard onResubmit={onResubmit} step={step} testName={testName} verdict={verdict} />
 
           <div className="border-line bg-surface-card rounded-card border p-4">
             <div className="text-ink mb-2.5 text-sm font-extrabold">

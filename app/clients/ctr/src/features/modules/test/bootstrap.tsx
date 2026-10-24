@@ -1,6 +1,6 @@
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
-import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import type { MatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match_pb";
+import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import {
   getTest,
   getTestConfig,

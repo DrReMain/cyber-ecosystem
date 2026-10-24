@@ -244,9 +244,7 @@ export function TestAttempt({
         testName={testName}
       />
       <div className="min-h-0 flex-1" ref={mountRef} />
-      {phase === "running" ? (
-        <RunTimeBar pct={elapsedPctOf(remainingMs, durationSeconds)} />
-      ) : null}
+      {phase === "running" ? <RunTimeBar pct={elapsedPctOf(remainingMs, durationSeconds)} /> : null}
 
       {phase === "intro" && (
         <IntroFace
