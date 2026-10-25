@@ -215,6 +215,20 @@ func (rp *payOrderRP) ListStalePending(ctx context.Context, olderThan time.Durat
 	return utils.SliceMap(rows, mapOrder), nil
 }
 
+func (rp *payOrderRP) ListPaid(ctx context.Context, from, to time.Time) ([]*Order, error) {
+	rows, err := rp.Platform.GetClient(ctx).PayOrder.Query().
+		Where(
+			payorder.StateEQ(payorder.StatePaid),
+			payorder.PaidAtGTE(from),
+			payorder.PaidAtLT(to),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return utils.SliceMap(rows, mapOrder), nil
+}
+
 func (rp *entitlementRP) Grant(ctx context.Context, g *EntitlementGrant) error {
 	create := rp.Platform.GetClient(ctx).Entitlement.Create().
 		SetUserID(g.UserID).
@@ -294,6 +308,30 @@ func (rp *payChannelRP) ParseNotification(ctx context.Context, provider string, 
 		return nil, rp.Platform.HandlePaymentError(err)
 	}
 	return event, nil
+}
+
+func (rp *payChannelRP) DownloadBill(ctx context.Context, provider string, in *payment.BillInput) (*payment.BillResult, error) {
+	backend, err := rp.Platform.PaymentFor(provider)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	bill, err := backend.Reports.DownloadBill(ctx, in)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	return bill, nil
+}
+
+func (rp *payChannelRP) ParseTradeBill(ctx context.Context, provider string, raw []byte) ([]payment.BillLine, error) {
+	backend, err := rp.Platform.PaymentFor(provider)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	lines, err := backend.Reports.ParseTradeBill(ctx, raw)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	return lines, nil
 }
 
 func (rp *payChannelRP) Channels(provider string) ([]payment.Channel, error) {

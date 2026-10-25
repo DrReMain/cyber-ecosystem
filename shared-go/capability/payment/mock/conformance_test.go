@@ -565,3 +565,98 @@ func TestBill(t *testing.T) {
 		t.Errorf("fund flow must skip unsettled orders: %s", fund2.Raw)
 	}
 }
+
+func TestBillParse(t *testing.T) {
+	p, ctrl := Open()
+	if _, err := p.Gateway.CreatePayment(context.Background(), jsapi("ord-bp")); err != nil {
+		t.Fatalf("create: %v", err)
+	}
+	if _, err := ctrl.MarkPaid("ord-bp"); err != nil {
+		t.Fatalf("mark paid: %v", err)
+	}
+	if _, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
+		OutRefundNo: "rf-bp", OutTradeNo: "ord-bp", AmountFen: 100, TotalAmountFen: 30000,
+	}); err != nil {
+		t.Fatalf("refund: %v", err)
+	}
+	bill, err := p.Reports.DownloadBill(context.Background(), &payment.BillInput{Date: time.Now(), Kind: payment.BillKindTrade})
+	if err != nil {
+		t.Fatalf("bill: %v", err)
+	}
+	lines, err := p.Reports.ParseTradeBill(context.Background(), bill.Raw)
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	if len(lines) != 1 {
+		t.Fatalf("lines: want 1, got %d", len(lines))
+	}
+	l := lines[0]
+	if l.OutTradeNo != "ord-bp" || l.State != payment.BillLinePaid {
+		t.Errorf("line: %+v", l)
+	}
+	if int64(l.AmountFen) != 30000 || int64(l.RefundFen) != 100 {
+		t.Errorf("amounts: %+v", l)
+	}
+	if _, err := p.Reports.ParseTradeBill(context.Background(), []byte("a,b\n1,2\n")); !errors.Is(err, payment.ErrInvalidArgument) {
+		t.Errorf("malformed: want ErrInvalidArgument, got %v", err)
+	}
+}
+
+func TestBillParseErrorArms(t *testing.T) {
+	p, _ := Open()
+	ctx := context.Background()
+	parse := func(raw string) error {
+		_, err := p.Reports.ParseTradeBill(ctx, []byte(raw))
+		return err
+	}
+	if err := parse("out_trade_no,state,amount_fen,refunded_fen,paid_at\nord-1,paid,1990\n"); !errors.Is(err, payment.ErrInvalidArgument) {
+		t.Errorf("row shape: %v", err)
+	}
+	if err := parse("out_trade_no,state,amount_fen,refunded_fen,paid_at\nord-1,paid,x,0,0001-01-01T00:00:00Z\n"); !errors.Is(err, payment.ErrInvalidArgument) {
+		t.Errorf("amount: %v", err)
+	}
+	if err := parse("out_trade_no,state,amount_fen,refunded_fen,paid_at\nord-1,paid,1990,x,0001-01-01T00:00:00Z\n"); !errors.Is(err, payment.ErrInvalidArgument) {
+		t.Errorf("refunded: %v", err)
+	}
+	if err := parse("out_trade_no,state,amount_fen,refunded_fen,paid_at\nord-1,paid,1990,0,not-a-time\n"); !errors.Is(err, payment.ErrInvalidArgument) {
+		t.Errorf("time: %v", err)
+	}
+	if err := parse("out_trade_no,state,amount_fen,refunded_fen,paid_at\nord-1,weird,1990,0,0001-01-01T00:00:00Z\n"); !errors.Is(err, payment.ErrInvalidArgument) {
+		t.Errorf("state: %v", err)
+	}
+	// A trailing newline is an empty row, not a malformed one.
+	if _, err := p.Reports.ParseTradeBill(ctx, []byte("out_trade_no,state,amount_fen,refunded_fen,paid_at\n")); err != nil {
+		t.Errorf("header only: %v", err)
+	}
+}
+
+func TestParseMalformedEnvelopes(t *testing.T) {
+	p, ctrl := Open()
+	if _, err := p.Gateway.CreatePayment(context.Background(), jsapi("ord-env")); err != nil {
+		t.Fatalf("create: %v", err)
+	}
+	ni, err := ctrl.MarkPaid("ord-env")
+	if err != nil {
+		t.Fatalf("mark paid: %v", err)
+	}
+	ctx := context.Background()
+	// The genuine envelope replays clean, then each corruption folds onto its sentinel.
+	if _, err := p.Notifier.Parse(ctx, ni); err != nil {
+		t.Fatalf("genuine: %v", err)
+	}
+	if _, err := p.Notifier.Parse(ctx, &payment.NotificationInput{Headers: ni.Headers, Body: []byte("not json")}); !errors.Is(err, payment.ErrInvalidSignature) {
+		t.Errorf("tampered body: want ErrInvalidSignature, got %v", err)
+	}
+	tampered := ni.Headers.Clone()
+	tampered.Set("X-Mockpay-Signature", "deadbeef")
+	if _, err := p.Notifier.Parse(ctx, &payment.NotificationInput{Headers: tampered, Body: ni.Body}); !errors.Is(err, payment.ErrInvalidSignature) {
+		t.Errorf("forged signature: want ErrInvalidSignature, got %v", err)
+	}
+	badNonce := []byte(`{"v":1,"nonce":"!!!","payload":"AAAA"}`)
+	forged := http.Header{}
+	forged.Set("X-Mockpay-Signature", "x")
+	ni2 := &payment.NotificationInput{Headers: forged, Body: badNonce}
+	if _, err := p.Notifier.Parse(ctx, ni2); !errors.Is(err, payment.ErrInvalidSignature) {
+		t.Errorf("signed garbage: want ErrInvalidSignature, got %v", err)
+	}
+}

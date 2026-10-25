@@ -10,17 +10,23 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/sha256"
+	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
 	"cyber-ecosystem/shared-go/capability/payment"
 )
+
+// cstZone is the channel's statement timezone — bill days and their row
+// stamps are wall-clock facts in UTC+8.
+var cstZone = time.FixedZone("CST", 8*60*60)
 
 type reports struct {
 	c *client
@@ -139,4 +145,145 @@ type billTicket struct {
 	DownloadURL string `json:"download_url"`
 	HashValue   string `json:"hash_value"`
 	HashType    string `json:"hash_type"`
+}
+
+// The trade bill's column vocabulary — looked up by name, never by position,
+// so a column the channel appends or reorders cannot silently shift meaning.
+const (
+	colBillTime      = "交易时间"
+	colTransactionID = "微信订单号"
+	colOutTradeNo    = "商户订单号"
+	colTradeState    = "交易状态"
+	colRefundAmount  = "退款金额"
+	colFeeAmount     = "手续费金额"
+	colOrderAmount   = "订单金额"
+	colSettlementAmt = "应结订单金额"
+	billTimeLayout   = "2006-01-02 15:04:05"
+)
+
+// ParseTradeBill neutralizes the (already gunzipped) trade statement CSV
+// into contract rows. Every wire word outside the mapped state set and
+// every amount off the yuan-dot-fen format is ErrInvalidArgument — a
+// statement this parser does not understand is data to flag, never to
+// guess at.
+func (r *reports) ParseTradeBill(_ context.Context, raw []byte) ([]payment.BillLine, error) {
+	body := raw
+	if bytes.HasPrefix(body, []byte("\ufeff")) {
+		body = body[len("\ufeff"):]
+	}
+	recs, err := csv.NewReader(bytes.NewReader(body)).ReadAll()
+	if err != nil {
+		return nil, fmt.Errorf("%w: bill csv: %w", payment.ErrInvalidArgument, err)
+	}
+	if len(recs) < 1 {
+		return nil, fmt.Errorf("%w: bill has no header row", payment.ErrInvalidArgument)
+	}
+	col, err := billColumnIndex(recs[0])
+	if err != nil {
+		return nil, err
+	}
+	lines := make([]payment.BillLine, 0, len(recs)-1)
+	for _, rec := range recs[1:] {
+		if len(rec) < len(recs[0]) {
+			return nil, fmt.Errorf("%w: bill row shorter than header", payment.ErrInvalidArgument)
+		}
+		state, err := mapBillState(rec[col[colTradeState]])
+		if err != nil {
+			return nil, err
+		}
+		amount, err := parseYuanFen(rec[col[colOrderAmount]])
+		if err != nil {
+			return nil, err
+		}
+		refund, err := parseYuanFen(rec[col[colRefundAmount]])
+		if err != nil {
+			return nil, err
+		}
+		fee, err := parseYuanFen(rec[col[colFeeAmount]])
+		if err != nil {
+			return nil, err
+		}
+		income, err := parseYuanFen(rec[col[colSettlementAmt]])
+		if err != nil {
+			return nil, err
+		}
+		at, err := time.ParseInLocation(billTimeLayout, rec[col[colBillTime]], cstZone)
+		if err != nil {
+			return nil, fmt.Errorf("%w: bill time %q: %w", payment.ErrInvalidArgument, rec[col[colBillTime]], err)
+		}
+		lines = append(lines, payment.BillLine{
+			OutTradeNo:    rec[col[colOutTradeNo]],
+			TransactionID: rec[col[colTransactionID]],
+			State:         state,
+			AmountFen:     amount,
+			RefundFen:     refund,
+			FeeFen:        fee,
+			IncomeFen:     income,
+			At:            at,
+		})
+	}
+	return lines, nil
+}
+
+func billColumnIndex(header []string) (map[string]int, error) {
+	col := make(map[string]int, len(header))
+	for i, h := range header {
+		col[strings.TrimSpace(h)] = i
+	}
+	for _, need := range []string{colBillTime, colTransactionID, colOutTradeNo, colTradeState, colRefundAmount, colFeeAmount, colOrderAmount, colSettlementAmt} {
+		if _, ok := col[need]; !ok {
+			return nil, fmt.Errorf("%w: bill header lacks column %s", payment.ErrInvalidArgument, need)
+		}
+	}
+	return col, nil
+}
+
+func mapBillState(word string) (payment.BillLineState, error) {
+	switch strings.TrimSpace(word) {
+	case "SUCCESS":
+		return payment.BillLinePaid, nil
+	case "REFUND":
+		return payment.BillLineRefund, nil
+	case "REVOKED", "CLOSED", "PAYERROR":
+		return payment.BillLineClosed, nil
+	case "USERPAYING":
+		return payment.BillLinePending, nil
+	default:
+		return "", fmt.Errorf("%w: bill trade state %q", payment.ErrInvalidArgument, word)
+	}
+}
+
+// parseYuanFen reads the channel's yuan-dot-fen decimal string ("19.90",
+// possibly negative for reversal rows) into fen on integer arithmetic — no
+// float ever touches an amount.
+func parseYuanFen(s string) (payment.AmountFen, error) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return 0, nil
+	}
+	neg := false
+	if strings.HasPrefix(s, "-") {
+		neg, s = true, s[1:]
+	}
+	yuan, frac, _ := strings.Cut(s, ".")
+	if len(frac) > 2 {
+		return 0, fmt.Errorf("%w: bill amount %q", payment.ErrInvalidArgument, s)
+	}
+	frac += strings.Repeat("0", 2-len(frac))
+	if yuan == "" {
+		yuan = "0"
+	}
+	y, err := strconv.ParseInt(yuan, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("%w: bill amount %q: %w", payment.ErrInvalidArgument, s, err)
+	}
+	f, err := strconv.ParseInt(frac, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("%w: bill amount %q: %w", payment.ErrInvalidArgument, s, err)
+	}
+	n := y*100 + f
+	if neg {
+		n = -n
+	}
+	return payment.Fen(n), nil
 }

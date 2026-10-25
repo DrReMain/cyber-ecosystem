@@ -189,3 +189,95 @@ func TestNewAssembles(t *testing.T) {
 		t.Fatalf("bad config: want ErrInvalidArgument, got %v", err)
 	}
 }
+
+func TestParseTradeBill(t *testing.T) {
+	_, r := newTestReports(t)
+
+	header := "交易时间,公众账号ID,商户号,特约商户号,设备号,微信订单号,商户订单号,用户标识,交易类型,交易状态,付款银行,货币种类,应结订单金额,代金券金额,微信退款单号,商户退款单号,退款金额,充值券退款金额,费率,手续费金额,订单金额,费率备注,商户数据包,支付场景"
+	paid := "2026-10-24 12:34:56,wx-app,mch-1,,,tx-1,ord-1,o-user,NATIVE,SUCCESS,CMB,CNY,19.83,0.00,,,,,0.60%,0.07,19.90,,,SHOP"
+	refund := "2026-10-25 09:00:00,wx-app,mch-1,,,tx-1,ord-1,o-user,NATIVE,REFUND,CMB,CNY,0.00,0.00,rf-1,ord-r-1,19.90,0.00,,0.00,19.90,,,"
+
+	t.Run("rows", func(t *testing.T) {
+		raw := []byte("\ufeff" + header + "\n" + paid + "\n" + refund + "\n")
+		lines, err := r.ParseTradeBill(context.Background(), raw)
+		if err != nil {
+			t.Fatalf("parse: %v", err)
+		}
+		if len(lines) != 2 {
+			t.Fatalf("lines: want 2, got %d", len(lines))
+		}
+		l := lines[0]
+		if l.OutTradeNo != "ord-1" || l.TransactionID != "tx-1" || l.State != payment.BillLinePaid {
+			t.Errorf("paid row: %+v", l)
+		}
+		if int64(l.AmountFen) != 1990 || int64(l.FeeFen) != 7 || int64(l.IncomeFen) != 1983 || int64(l.RefundFen) != 0 {
+			t.Errorf("paid amounts: %+v", l)
+		}
+		want := time.Date(2026, 10, 24, 12, 34, 56, 0, cstZone)
+		if !l.At.Equal(want) {
+			t.Errorf("paid time: got %v want %v", l.At, want)
+		}
+		if lines[1].State != payment.BillLineRefund || int64(lines[1].RefundFen) != 1990 {
+			t.Errorf("refund row: %+v", lines[1])
+		}
+	})
+
+	t.Run("column reorder", func(t *testing.T) {
+		// Same facts, columns moved — lookup is by name, position never means anything.
+		raw := []byte("商户订单号,交易状态,订单金额,交易时间,微信订单号,退款金额,手续费金额,应结订单金额\nord-9,SUCCESS,0.05,2026-10-24 08:00:00,tx-9,0.00,0.00,0.05\n")
+		lines, err := r.ParseTradeBill(context.Background(), raw)
+		if err != nil {
+			t.Fatalf("parse: %v", err)
+		}
+		if len(lines) != 1 || int64(lines[0].AmountFen) != 5 || lines[0].TransactionID != "tx-9" {
+			t.Fatalf("lines: %+v err %v", lines, err)
+		}
+	})
+
+	t.Run("missing column", func(t *testing.T) {
+		_, err := r.ParseTradeBill(context.Background(), []byte("交易时间,商户订单号\n2026-10-24 12:00:00,ord-1\n"))
+		if !errors.Is(err, payment.ErrInvalidArgument) {
+			t.Errorf("missing column: want ErrInvalidArgument, got %v", err)
+		}
+	})
+
+	t.Run("bad amount", func(t *testing.T) {
+		raw := []byte("商户订单号,交易状态,订单金额\nord-1,SUCCESS,19.9.0\n")
+		if _, err := r.ParseTradeBill(context.Background(), raw); !errors.Is(err, payment.ErrInvalidArgument) {
+			t.Errorf("bad amount: want ErrInvalidArgument, got %v", err)
+		}
+	})
+
+	t.Run("unknown state", func(t *testing.T) {
+		raw := []byte("商户订单号,交易状态,订单金额\nord-1,WEIRD,19.90\n")
+		if _, err := r.ParseTradeBill(context.Background(), raw); !errors.Is(err, payment.ErrInvalidArgument) {
+			t.Errorf("unknown state: want ErrInvalidArgument, got %v", err)
+		}
+	})
+}
+
+func TestParseYuanFen(t *testing.T) {
+	cases := []struct {
+		in   string
+		want int64
+	}{
+		{"19.90", 1990},
+		{"0.05", 5},
+		{"0.5", 50},
+		{"100", 10000},
+		{"", 0},
+		{"-2.00", -200},
+	}
+	for _, c := range cases {
+		got, err := parseYuanFen(c.in)
+		if err != nil {
+			t.Fatalf("%q: %v", c.in, err)
+		}
+		if int64(got) != c.want {
+			t.Errorf("%q: want %d got %d", c.in, c.want, int64(got))
+		}
+	}
+	if _, err := parseYuanFen("abc"); !errors.Is(err, payment.ErrInvalidArgument) {
+		t.Errorf("abc: want ErrInvalidArgument, got %v", err)
+	}
+}

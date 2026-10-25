@@ -41,7 +41,10 @@ const (
 
 	convergeInterval   = time.Minute
 	convergeStaleAfter = 10 * time.Minute
+	reconcileInterval  = 24 * time.Hour
 )
+
+var billZone = time.FixedZone("CST", 8*60*60) // bill days are wall-clock facts in the channel's timezone, not the host's — WeChat publishes in Beijing time; the mock's day-agnostic snapshot takes the same window so both providers reconcile under one rule
 
 // DO ------------------------------------------------------------------------------------------------------------------
 
@@ -130,6 +133,7 @@ type OrderRP interface {
 	Settle(ctx context.Context, in *SettleIn) (*Order, bool, error)                                // the single write-paid entry; false = a rival settle already won
 	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error) // pending rows past the horizon; expiry is the converger's branch, not the query's
+	ListPaid(ctx context.Context, from, to time.Time) ([]*Order, error)              // paid rows by paid_at window — the reconciliation's local side
 }
 
 type EntitlementRP interface {
@@ -142,6 +146,8 @@ type PayChannelRP interface { // routes to the configured provider's backend; ca
 	QueryPayment(ctx context.Context, provider, outTradeNo string) (*payment.PaymentStatusResult, error)
 	ClosePayment(ctx context.Context, provider, outTradeNo string) error
 	ParseNotification(ctx context.Context, provider string, in *payment.NotificationInput) (*payment.NotificationEvent, error)
+	DownloadBill(ctx context.Context, provider string, in *payment.BillInput) (*payment.BillResult, error) // the day's raw statement; NotFound = the channel has not published it yet
+	ParseTradeBill(ctx context.Context, provider string, raw []byte) ([]payment.BillLine, error)           // neutralized statement rows in the contract's vocabulary
 	Channels(provider string) ([]payment.Channel, error)
 	DefaultProvider() string
 	NotifyBaseURL() string
@@ -160,12 +166,12 @@ func NewSkuUC(logger *slog.Logger, tm shared.Transaction, skuRP SkuRP) *SkuUC {
 
 type OrderUC struct {
 	shared.UC
-	orderRP      OrderRP
-	skuRP        SkuRP
-	entRP        EntitlementRP
-	testRP       test.TestRP
-	channelRP    PayChannelRP
-	stopConverge context.CancelFunc
+	orderRP     OrderRP
+	skuRP       SkuRP
+	entRP       EntitlementRP
+	testRP      test.TestRP
+	channelRP   PayChannelRP
+	loopCancels []context.CancelFunc
 }
 
 func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, orderRP OrderRP, skuRP SkuRP, entRP EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
@@ -177,8 +183,9 @@ func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookReg
 		testRP:    testRP,
 		channelRP: channelRP,
 	}
-	hooks.OnStart(uc.convergeLoop)
-	hooks.OnStop(uc.stopConvergeLoop)
+	hooks.OnStart(uc.runLoop("converge", convergeInterval, uc.ConvergeOnce))
+	hooks.OnStart(uc.runLoop("reconcile", reconcileInterval, uc.reconcileSweep))
+	hooks.OnStop(uc.stopLoops)
 	return uc
 }
 
@@ -455,6 +462,72 @@ func (uc *OrderUC) ConvergeOnce(ctx context.Context) error {
 	return nil
 }
 
+func (uc *OrderUC) ReconcileOnce(ctx context.Context, day time.Time) error {
+	provider := uc.channelRP.DefaultProvider()
+	bill, err := uc.channelRP.DownloadBill(ctx, provider, &payment.BillInput{Date: day, Kind: payment.BillKindTrade})
+	if err != nil {
+		if errorspb.IsInfraErrorPaymentNotFound(err) {
+			// The channel has not published the day yet — a recent day's
+			// absence is the channel being the channel; the next sweep asks
+			// again.
+			uc.Log.Info("payment bill not published", "day", day.Format("2006-01-02"))
+			return nil
+		}
+		return err
+	}
+	lines, err := uc.channelRP.ParseTradeBill(ctx, provider, bill.Raw)
+	if err != nil {
+		return err
+	}
+	start, end := billDayWindow(day)
+	orders, err := uc.orderRP.ListPaid(ctx, start, end)
+	if err != nil {
+		return err
+	}
+	local := make(map[string]*Order, len(orders))
+	for _, o := range orders {
+		local[o.OrderNo] = o
+	}
+	// The reconciliation compares day facts: channel rows the bill dates into
+	// this window against local rows paid in it — the mock's snapshot bill and
+	// WeChat's day bill meet under one rule.
+	billed := make(map[string]payment.BillLine, len(lines))
+	for _, l := range lines {
+		if (l.State == payment.BillLinePaid || l.State == payment.BillLineRefund) && !l.At.Before(start) && l.At.Before(end) {
+			billed[l.OutTradeNo] = l
+		}
+	}
+	mismatch := 0
+	for _, o := range orders {
+		l, ok := billed[o.OrderNo]
+		switch {
+		case !ok:
+			uc.Log.Error("paid order missing from bill", "order_no", o.OrderNo, "day", day.Format("2006-01-02"))
+			mismatch++
+		case int64(l.AmountFen) != o.AmountFen:
+			uc.Log.Error("bill amount mismatch", "order_no", o.OrderNo, "row_fen", o.AmountFen, "bill_fen", int64(l.AmountFen))
+			mismatch++
+		}
+	}
+	for no, l := range billed {
+		if _, ok := local[no]; ok {
+			continue
+		}
+		row, err := uc.orderRP.ByNo(ctx, no)
+		if err != nil {
+			return err
+		}
+		if row == nil {
+			uc.Log.Error("bill order unknown locally", "order_no", no, "bill_fen", int64(l.AmountFen))
+		} else {
+			uc.Log.Error("bill settled an unsettled order", "order_no", no, "local_state", row.State, "bill_fen", int64(l.AmountFen))
+		}
+		mismatch++
+	}
+	uc.Log.Info("payment bill reconciled", "day", day.Format("2006-01-02"), "local", len(orders), "billed", len(billed), "mismatch", mismatch)
+	return nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func (uc *OrderUC) resolveScope(ctx context.Context, userID string, sku *Sku, ref *string) (string, *string, error) {
@@ -495,37 +568,44 @@ func (uc *OrderUC) resolveScope(ctx context.Context, userID string, sku *Sku, re
 	}
 }
 
-func (uc *OrderUC) convergeLoop(ctx context.Context) error {
-	// A boot sweep first — anything that expired while the process was down
-	// folds before the first tick — then the ticker.
-	loopCtx, cancel := context.WithCancel(ctx)
-	uc.stopConverge = cancel
-	go func() {
-		uc.Log.Info("payment converger started", "interval", convergeInterval, "stale_after", convergeStaleAfter)
-		if err := uc.ConvergeOnce(loopCtx); err != nil {
-			uc.Log.Error("payment converge boot sweep failed", "err", err)
-		}
-		ticker := time.NewTicker(convergeInterval)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-loopCtx.Done():
-				return
-			case <-ticker.C:
+func (uc *OrderUC) runLoop(name string, interval time.Duration, sweep func(context.Context) error) func(context.Context) error {
+	// One loop shape for every background sweep: a boot sweep first —
+	// anything that aged while the process was down folds before the first
+	// tick — then the ticker; cancellation rides the lifecycle's context.
+	return func(ctx context.Context) error {
+		loopCtx, cancel := context.WithCancel(ctx)
+		uc.loopCancels = append(uc.loopCancels, cancel)
+		go func() {
+			uc.Log.Info("payment loop started", "loop", name, "interval", interval)
+			if err := sweep(loopCtx); err != nil {
+				uc.Log.Error("payment loop boot sweep failed", "loop", name, "err", err)
 			}
-			if err := uc.ConvergeOnce(loopCtx); err != nil {
-				uc.Log.Error("payment converge sweep failed", "err", err)
+			ticker := time.NewTicker(interval)
+			defer ticker.Stop()
+			for {
+				select {
+				case <-loopCtx.Done():
+					return
+				case <-ticker.C:
+				}
+				if err := sweep(loopCtx); err != nil {
+					uc.Log.Error("payment loop sweep failed", "loop", name, "err", err)
+				}
 			}
-		}
-	}()
+		}()
+		return nil
+	}
+}
+
+func (uc *OrderUC) stopLoops(context.Context) error {
+	for _, cancel := range uc.loopCancels {
+		cancel()
+	}
 	return nil
 }
 
-func (uc *OrderUC) stopConvergeLoop(context.Context) error {
-	if uc.stopConverge != nil {
-		uc.stopConverge()
-	}
-	return nil
+func (uc *OrderUC) reconcileSweep(ctx context.Context) error {
+	return uc.ReconcileOnce(ctx, billDayBefore(time.Now()))
 }
 
 func (uc *OrderUC) convergeQuery(ctx context.Context, order *Order) {
@@ -587,4 +667,17 @@ func channelIn(channels []payment.Channel, want payment.Channel) bool {
 		}
 	}
 	return false
+}
+
+func billDayWindow(day time.Time) (time.Time, time.Time) {
+	d := day.In(billZone)
+	start := time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, billZone)
+	return start, start.Add(24 * time.Hour)
+}
+
+func billDayBefore(t time.Time) time.Time {
+	// A day's statement publishes the following day — the sweep always asks
+	// for yesterday's bill.
+	d := t.In(billZone).AddDate(0, 0, -1)
+	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, billZone)
 }
