@@ -59,13 +59,16 @@ export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
         </div>
 
         {chapters.map((chapter) => (
-          <div className="border-line bg-surface-card rounded-card border p-4" key={chapter.key}>
+          <div
+            className="border-line bg-surface-card rounded-card border px-4 py-3.5"
+            key={chapter.key}
+          >
             <div className="text-ink mb-1.5 text-[13.5px] font-extrabold">{chapter.title}</div>
-            <div className="text-ink-tertiary text-[12.5px] leading-[1.8]">{chapter.body}</div>
+            <div className="text-ink-muted text-[12.5px] leading-[1.8]">{chapter.body}</div>
           </div>
         ))}
 
-        <div className="border-line bg-surface-deep text-ink-tertiary rounded-control border p-3.5 text-[11.5px] leading-relaxed">
+        <div className="border-line bg-surface-content text-ink-muted rounded-control border px-3.5 py-3 text-[11.5px] leading-[1.7]">
           {m.agreement_consent_note()}
         </div>
       </div>

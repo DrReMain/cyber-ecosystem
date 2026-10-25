@@ -65,13 +65,15 @@ export function AgeRequiredPage() {
   }
 
   return (
-    <AmbientLayout>
+    <AmbientLayout
+      orbs={[{ className: "top-[-60px] right-[-60px] size-[min(57vw,220px)]", tone: "orange" }]}
+    >
       <div className="flex w-full flex-col gap-3 pb-6">
-        <h1 className="text-ink text-center text-lg font-extrabold">{m.age_required_title()}</h1>
+        <h1 className="text-ink text-center text-[19px] font-bold">{m.age_required_title()}</h1>
 
-        <div className="border-line bg-surface-card rounded-card border p-4">
+        <div className="border-line bg-surface-card rounded-card border px-4 py-[18px]">
           <div className="mb-3 flex items-center gap-2.5">
-            <div className="rounded-tile bg-cta-practice flex h-10 w-10 shrink-0 items-center justify-center">
+            <div className="bg-cta-practice flex size-11 shrink-0 items-center justify-center rounded-[12px]">
               <Cake aria-hidden className="text-white" size={20} />
             </div>
             <div>
@@ -84,9 +86,13 @@ export function AgeRequiredPage() {
             </div>
           </div>
           <p className="text-ink-tertiary mb-3 text-[11.5px] leading-[1.75]">
-            {m.age_required_desc()}
+            {m.age_required_desc_lead()}
+            <span className="font-bold">{m.age_required_desc_band()}</span>
+            {m.age_required_desc_mid()}
+            <span className="font-bold">{m.age_required_desc_exact()}</span>
+            {m.age_required_desc_tail()}
           </p>
-          <div className="flex gap-3">
+          <div className="flex gap-2.5">
             <select
               aria-label={m.age_required_birth_year()}
               className={selectClass}
@@ -100,7 +106,7 @@ export function AgeRequiredPage() {
               <option value="">{m.age_required_birth_year()}</option>
               {years().map((y) => (
                 <option key={y} value={y}>
-                  {y}
+                  {m.profile_birth_year_opt({ y })}
                 </option>
               ))}
             </select>
@@ -117,39 +123,40 @@ export function AgeRequiredPage() {
               <option value="">{m.age_required_birth_month()}</option>
               {MONTHS.map((mo) => (
                 <option key={mo} value={mo}>
-                  {mo}
+                  {m.profile_birth_month_opt({ month: mo })}
                 </option>
               ))}
             </select>
           </div>
-          {error !== null && (
-            <p className="text-danger-text mt-2 text-sm" role="alert">
-              {error}
-            </p>
-          )}
+          <p className="text-danger-text min-h-[15px] text-[11.5px] leading-[1.4]" role="alert">
+            {error ?? ""}
+          </p>
         </div>
 
-        <div className="border-line bg-surface-deep text-ink-tertiary rounded-control border p-3.5 text-[11.5px] leading-[1.85]">
-          <span className="text-ink-secondary font-bold">{m.age_required_warn_must()}</span>
+        <div className="border-line bg-surface-content text-ink-tertiary rounded-control border px-[13px] py-3 text-[11.5px] leading-[1.85]">
+          <span className="font-bold text-[#e5e7eb]">{m.age_required_warn_must()}</span>
+          {m.age_required_warn_must_tail()}
           <br />
-          {m.age_required_warn_exit()}
+          {m.age_required_warn_exit_lead()}
+          <span className="font-bold text-[#e5e7eb]">{m.age_required_warn_exit_bold()}</span>
+          {m.age_required_warn_exit_tail()}
         </div>
 
         <Button
-          className="bg-cta-practice rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
+          className="bg-cta-practice shadow-cta-practice rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
           isDisabled={updateMutation.isPending}
           onPress={() => void onSave()}
         >
           {updateMutation.isPending ? m.common_loading() : m.age_required_btn_save()}
         </Button>
         <Button
-          className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+          className="bg-cta-primary shadow-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
           onPress={() => void navigate({ to: "/" })}
         >
           {m.age_required_btn_free()}
         </Button>
         <Button
-          className="border-line text-ink-secondary rounded-control w-full border px-4 py-[14px] text-[15px] font-bold active:opacity-80"
+          className="bg-surface-input rounded-control w-full border-[1.5px] border-[#4b5563] px-4 py-[14px] text-[15px] font-medium text-[#d1d5db] active:opacity-80"
           onPress={() => void navigate({ to: "/" })}
         >
           {m.age_required_btn_home()}

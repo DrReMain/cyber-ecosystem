@@ -9,7 +9,7 @@
 
 ## 时间轴总览(检查点与降级梯见文末)
 
-> **实况(2026-10-23,W1 末)**:W1-W2 已超额——E6b 完整形态、E0 统一提交面、E2、E3 前半(Tier A 6/10,ce763107)提前落;H1/H2/H-A/H-B 全交付(mock 净拔除,读面已真);P1/P3/P9 提前定案。10-23 全链走查定调:**唯一硬断点=H-C(hzy 在途,判定回路)**,伴生两小修(编排含无引擎款、运营账号座位);UI 语义层对齐 ~90%,视觉对齐批 V1-V3 排 lzx 即刻——口径按 D-AK 双轨:ctr 已定义高度对齐/未定义可增强,admin 侧另立**交互+文案对齐批**(非像素,V3 后)。**风险:支付线零启动——CP1(11-08)门含「支付沙箱通」,资质文书须即办。**逐片状态见 progress.md 认领表。
+> **实况(2026-10-25,W1 收官)**:W1 大幅超额——E0/E1/E2/E6a/E6b 收;E3 13 款评分面收满(Tier B 消亡);E4 a-d 收口(e2e 三验收绿);**E7 引擎 13 款全量收满**(三批四批五批连收,判定回路已闭);H 线 H1/H2/H-A/H-B/H-C 全交付;视觉对齐 V1-V4+B 批落(余 admin 交互/文案对齐批待排);hzy 设计保真批已并 main(MR!6,599dddce);会员读面+admin 用户管理前拉落。**风险:①支付线零启动(CP1 门 10-25 校准=APIv3 验签握手通,官方无 v3 沙箱;两步走裁定=通道能力沉淀骨架 capability+dev mock 全链,真实通道上线前后接入;APIv3 材料已就绪=GitLab wiki esports 页,余类目补设+H5 权限申请两件行政);②E5/E8/E9/E10 无人认领;③ljr 待裁积压(P8 前置于 E5、P11/P12/P16 Q2·Q3/P17/P18)。**逐片状态见 progress.md 认领表。
 
 | 窗口 | 日期 | 服务线(建议用户) | 客户端线(建议 hzy) | 产品线(ljr) |
 |---|---|---|---|---|
@@ -34,7 +34,7 @@
 | ✅ E0 契约首刀 | esports v1 proto:测试域(类型/配置读面、统一提交(建议单 RPC + oneof 明细)、明细/成绩上报、排行)、画像、匹配、单次报告读面、entitlement 最小面(scope_kind/scope_ref,付费只发 trial;D-AB)。nullable 语义显式(optional),判定阈值随配置下发。验收:proto 全链生成+lint+breaking 绿,评审冻结(D-U:增量推进——种子片=画像+游戏目录已于 2026-10-18 冻结,余面逐片评审) | README §0 | M |
 | ✅ E1 服务骨架 | kratos-new-service 复制集:双面 accessLadder(ADMIN/MEMBER)、catalog 注册、deploy compose 面、system 消费(登录/会员链)。验收:服务起活,会员链探针 e2e 绿(**兼作 hzy onboarding 切片**) | E0 | M |
 | ✅ E2 schema+种子 | ent 首批:test/game/preference/config/contribution/题库/test_record/ability_score/entitlement 事件;种子重放(修坑:dual_zone 枚举统一、multi_target 补行、skill_prediction 不入、枚举约束防回归)。验收:migrate 归一+种子 e2e。2026-10-20 缩围补登(D-AA:entitlement→E8、contribution→E3;multi_target 补行落 D-Z) | E1 | M |
-| ⏳ E3 评分引擎 | 三层落位:指标层(13 款指标定义单源档,本片创建)/门槛层(百分位档位)/评分层(无上限线性+权威分位双轨);Tier A 九款全量重算 + Tier B 四款闸门;red_dot 锚点初始校准常量;ScorerRegistry 插件契约(加测试零改主干)。验收:域函数单测+提交→重算→报告分 e2e。W3 三款(offense_defense/resource_match/character_counter)依赖题库种子增量:offense_scenario(optimal_choice/complexity/difficulty)+moba_character/character_counter_relation(counter_score)——内容=旧库经验数据(D-AL) | E0,E2 | XL |
+| ✅ E3 评分引擎 | 三层落位:指标层(13 款指标定义单源档,本片创建)/门槛层(百分位档位)/评分层(无上限线性+权威分位双轨);Tier A 九款全量重算 + Tier B 四款闸门;red_dot 锚点初始校准常量;ScorerRegistry 插件契约(加测试零改主干)。验收:域函数单测+提交→重算→报告分 e2e。W3 三款(offense_defense/resource_match/character_counter)依赖题库种子增量:offense_scenario(optimal_choice/complexity/difficulty)+moba_character/character_counter_relation(counter_score)——内容=旧库经验数据(D-AL) | E0,E2 | XL |
 | ✅ E4 匹配引擎 | match_config(预留 scenario 维度)+类型轴多数投票+两层编排+当日 seed+session 锁死落库+重测 3/1。细锚(D-AL):续测 7 天不重排、超窗以 test_record 反推、重测次数不恢复;切后台无效=阈值可配(>3s)+is_valid/invalid_reason 入库;done=缓存写入后有新 test_record;跳步=未测可跳、done 只看结果、前端不可指定款;游戏池=contribution(is_primary=1)∩category∈(genre,通用)。验收:同日稳定/跨日变化/重排换 seed e2e | E2 | M |
 | E5 报告框架+能力报告 | 板块插件化(supports)+缺维度不渲染七硬约束+完整度指示+同龄百分位(Z-score CDF+置信分层)+档位四色;M1 只实现单次能力报告所需板块。细锚(D-AL):同龄基准=同龄同性别(待确定只同龄;仅年龄段=区间基准标近似;性别=P8);完整度主指标 X/8 维;档位快照解锁时固化(已解锁不随口径变);较上局=该能力上一场测评(非同场次上次尝试);报告文案五区可后台配置。验收:缺维场景渲染收拢 e2e | E3 | L |
 | E5b 报告簇扩片(2026-10-23 终局对账立片,P15 裁后开工) | 报告中心入口+成长趋势基础层(b4 裁免费)+职业聚合页(D-AB 默认 open)+认知策略渲染面(ToC 默认 closed 零入口,策略面归 E8);服务端聚合=GL D1-D3,8 维公式源=旧仓 esport-server 的 docs 目录 OpenAPI_用户端接口文档.md(§3757 区)+REPORT_FRONTEND_SPEC §3 命名,三源合一入 metric.md 权重矩阵;系统套 6 级称号映射随 P2。验收=缺维渲染收拢+策略翻转 e2e | E5,P15,P2 | L |
@@ -56,14 +56,20 @@
 | ✅ H2 协议页+版本化承载 | agreement/age-required 页面+路由+版本参数;文案占位等 ljr 定稿;URL 形状开工前与 lzx 定约。验收:三链绿+走查 | H1 | S |
 | ✅ H-A 引擎框架片 | E7 框架前拉:GameClock 单实现(墙钟+暂停顺延,fake timers 可测;旧版 13 处手搓计时收敛为 1)+参数化路由 /test/:code+GameModule 插件契约+overlay 族。验收:mock config 下 red_dot 可玩+时钟正确性测试 | H1 | M |
 | ✅ H-B 反应瞄准批 | E7 首批前拉:red_dot/flash_aiming/multi_target/target_recognition;harness 免登录;rawDetail 采集反哺 E0 统一提交契约;玩法语义级对照旧版(D-O)。验收:每款 harness 可玩+明细字段与旧版 per-game SubmitData 语义对齐+mock 插桩净拔除(test-mock.ts 与其测试删除、transport.ts/env.ts 插桩还原、VITE_TEST_MOCK 零残留;拔除前插桩点全带 TODO(mock-removal) 标记——2026-10-20 用户裁定:临时插桩不常驻且必须 TODO 可寻) | H-A | M-L |
-| ▶ H-C 判定回路闭环(已分配 10-23) | 边界四律④预定形态兑现:提交缝薄适配器(TestRunHost 终局采集——明细流+契约三计数 misses/missed_high/spawned_enemy+后台段;attempt_no E4 前恒 1,序数真律归 E4 会话)→SubmitTestAttempt 单发,游戏零改动;EndFace 增服务端判分回执卡(原始分/权威分/档位/valid/无效原因/retest_left,无效原因词表双语文案,权威分曲线待校准款按回执降级渲染,本地明细卡降为辅助;重试钮维持本地练习语义,真律归 E4)。验收=真人全链:登录→/match→一局 red_dot→服务端分数回执渲染+会话失效反例——esports 首条人工可 e2e 调试的完整测评闭环(mock 已于 H-B 拔净、读面已真,本片仅余判定回路) | H-B,E3-c | M |
+| ✅ H-C 判定回路闭环 | 边界四律④预定形态兑现:提交缝薄适配器(TestRunHost 终局采集——明细流+契约三计数 misses/missed_high/spawned_enemy+后台段;attempt_no E4 前恒 1,序数真律归 E4 会话)→SubmitTestAttempt 单发,游戏零改动;EndFace 增服务端判分回执卡(原始分/权威分/档位/valid/无效原因/retest_left,无效原因词表双语文案,权威分曲线待校准款按回执降级渲染,本地明细卡降为辅助;重试钮维持本地练习语义,真律归 E4)。验收=真人全链:登录→/match→一局 red_dot→服务端分数回执渲染+会话失效反例——esports 首条人工可 e2e 调试的完整测评闭环(mock 已于 H-B 拔净、读面已真,本片仅余判定回路) | H-B,E3-c | M |
 
-## 支付片(D-B2:纳入承诺窗口,保持可插拔)
+## 支付片(D-B2:纳入承诺窗口,保持可插拔;2026-10-25 两步走裁定)
+
+**两步走裁定(2026-10-25,用户)**:①在线支付通道(微信/支付宝/银联等多方式多平台)沉淀为骨架可复用资产——cyber-ecosystem 是通用开发基座,esports 只是首个真实业务验证;落 shared-go/capability/payment 家族(cache/mq/storage 同构:父接口+家族错误域+validate conformance+provider 子包),契约形状容纳多平台(已声明需求,非预测性抽象;但实现只做 wechat+mock 两 provider,空 provider 禁)。②开发环境不接真实通道,mock provider 模拟真实链路保支付闭环测试(下单→回调→结算幂等→退款);真实通道仅上线部署前后经 deploy 环境变量面切入,凭据值不入库。**官方实证(10-25 查证):APIv3 无沙箱环境,公众号测试号 appid 亦绑不了商户**——CP1 门=APIv3 验签握手通(零成本),0.01 真实闭环+全额退款归 CP3。
+
+**归属判据(10-25 复议裁定)**:全局共享的是通道技术而非钱流——通道技术=capability(库级复用,全业务共享 provider 实现);订单/退款政策/权益授予=各业务聚合端到端;**不进 system**(身份宪法域无钱;scope 等业务形状禁入基座;订单/支付单跨服务分置=分布式事务陷阱;支付回调域名属 deploy 面,不耦合 system 发布)。同构短信分层先例(10-20 裁决:发送管道=capability,验证码登录=system provider);递延触发器=第二业务真实接入支付→立独立 pay 网关服务(消费 capability),仍非 system。
 
 | 片 | 内容与验收 | 依赖 | 规模 |
 |---|---|---|---|
-| PAY1 订单域 | 订单/幂等(同单复用+结算幂等)/状态机;订单行带 scope_kind/scope_ref(单次=trial,会员=period);SKU 读面(原价/现价结构,D-F 无立减展示) | **P1 已定(D-AB/D-AC,10-21)** | M |
-| PAY2 微信支付接入 | JSAPI(微信内)+H5(独立网页)统一下单/回调验签/对账;沙箱全流程→生产联调;**商户号 W1 即确认** | PAY1 | L |
+| PAY-C0 通道能力契约 | payment 家族:父接口(下单/查单/关单/退款/退款查/通知解析(验签+解密→领域事件)/对账单下载)+家族错误域+mock provider(内存态全链)+validate conformance(mock 全量绿);契约以微信 APIv3 语义为主轴,支付宝/银联可套入不绑死 | cache/mq 家族先例 | M |
+| PAY-C1 微信 provider | APIv3 商户私钥签名/平台证书获取验签轮换/统一下单(JSAPI+H5 两 scene)/查单/关单/退款/回调解析;**零成本握手探针(GET /v3/certificates)=CP1 门实质**;真钱路径(0.01 闭环+退款)上线前联调 | PAY-C0;类目补设(0.01 前置) | M |
+| PAY1 订单域 | 订单/幂等(同单复用+结算幂等)/状态机;订单行带 scope_kind/scope_ref(单次=trial,会员=period);SKU 读面(原价/现价结构,D-F 无立减展示);**消费 payment capability,dev 挂 mock 全链闭环 e2e,不被真实通道阻塞** | **P1 已定(D-AB/D-AC,10-21)**,PAY-C0 | M |
+| PAY2 通道接入与联调 | deploy 环境面切 wechat provider;0.01 真实闭环+全额退款(CP3 门);生产联调+对账;H5 支付权限(行政)就绪后开 H5 scene;**依赖注:JSAPI 要求商户绑定 appid 域 openid→上线前登录须切真实公众号 appid(测试号绑不了商户;登记上线清单+E6c)**;PC 端付费(Native 扫码)未注册,P4 裁决时定 | PAY1,PAY-C1,H5 权限 | M |
 | PAY3 合规执法+付费墙 | 未成年拦截执法点(付费补填+18 岁禁付)/仅人工退款入口/会员态付费墙(P7 视觉稿,期内隐藏单次只留续费)。细锚(D-AL):年龄计算契约=满 N 岁为生日次日(仅大陆无时区);**S1 注:契约仅存年+月无日,「生日次日」须取月粒度近似(建议保守=次月起算满岁),本片定口径**;备案四落点=登录页底/个人中心/付费弹窗+订阅确认/报告页底;幂等参考旧库 openspec membership-pay(CREATED 同单复用+settleOrder 幂等) | PAY2,P7(12-02) | M |
 
 ## M2 运营与变现(核心组 W5-W7;余组 W8 可降级梯①)
@@ -74,6 +80,8 @@
 ## M3 专版(承诺日外 buffer:12 月底-1 月中)
 
 P4 裁决(11 月底前)→企业 App 授权登录→租户发码额度/功能差异配置;依赖 HL 文档(W1 跟进确认到位时点)。
+
+**不分叉铁律(2026-10-25 裁定)**:专版不得与公版代码分叉——分叉即维护双路。登录/支付等对接差异一律落 capability provider 层或配置/模块注册表层(根规 §8 可插拔面最便宜层级优先);物理隔离需求递延至 delivery-time fork 最晚点。专版对接方式未定,本条为前置约束。
 
 ## M4 存量迁移 cutover(预演 W8,切换 W9)
 
@@ -100,7 +108,7 @@ P4 裁决(11 月底前)→企业 App 授权登录→租户发码额度/功能差
 
 | 检查点 | 日期 | 通过标准 | 不过则 |
 |---|---|---|---|
-| CP1 | 11-08 | E0/E1/E2 完成;E3 过半;E6a/E6b 完成(登录+画像可跑);商户号确认+支付沙箱通 | 拉梯①(M2 余组移上线后) |
+| CP1 | 11-08 | E0/E1/E2 完成;E3 过半;E6a/E6b 完成(登录+画像可跑);商户号确认+APIv3 验签握手通(10-25 校准:官方无 v3 沙箱,原「沙箱通」字面永不达;门=GET /v3/certificates 商户签名+平台证书验签全链,零成本) | 拉梯①(M2 余组移上线后) |
 | CP2 | 11-22 | 游戏 ≥8 款(两批);E4/E8 完;E5 框架通;PAY1 完 | 拉梯②(游戏余款上线后两周 hot-add) |
 | CP3 | 12-02 | M1 全链 e2e 绿;PAY2 沙箱全流程;M2 核心组可用 | 拉梯③(分批交付协商)+梯④(支付受阻激活码兜底、支付热补) |
 

@@ -83,7 +83,9 @@ export function SetupNicknamePage() {
           {m.profile_setup_nickname_title()}
         </div>
         <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed">
-          {m.profile_setup_nickname_desc()}
+          {m.profile_setup_nickname_desc_lead()}
+          <span className="font-bold">{m.profile_setup_nickname_desc_must()}</span>
+          {m.profile_setup_nickname_desc_tail()}
         </p>
         <input
           aria-label={m.profile_nickname_label()}
@@ -121,9 +123,7 @@ export function SetupNicknamePage() {
       </div>
 
       <div className="border-line bg-surface-content text-ink-muted rounded-control border px-3.5 py-3 text-[11.5px] leading-[1.7] whitespace-pre-line">
-        <span className="text-ink-secondary font-bold">
-          {m.profile_setup_nickname_rules_title()}
-        </span>
+        <span className="font-bold text-[#e5e7eb]">{m.profile_setup_nickname_rules_title()}</span>
         <br />
         {m.profile_setup_nickname_rules()}
       </div>

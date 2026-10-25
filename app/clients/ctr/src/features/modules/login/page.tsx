@@ -217,7 +217,7 @@ export function LoginPage() {
               <p className="text-danger-text text-[11.5px] leading-snug">{errorCopy}</p>
               {systemReason(serverReason) === System.LOGIN_SEAT_REQUIRED && (
                 <button
-                  className="tap-zone text-ink-secondary shrink-0 font-bold underline active:opacity-60"
+                  className="tap-zone text-ink-secondary shrink-0 font-bold active:opacity-60"
                   onClick={() => {
                     formRef.current?.reset();
                     setServerReason(undefined);
@@ -248,7 +248,7 @@ export function LoginPage() {
                     {m.login_agree_prefix()}
                     {` `}
                     <Link
-                      className="text-link underline active:opacity-60"
+                      className="text-link active:opacity-60"
                       onClick={(event) => event.stopPropagation()}
                       to="/agreement/user"
                     >
@@ -272,7 +272,7 @@ export function LoginPage() {
                     {m.login_agree_prefix()}
                     {` `}
                     <Link
-                      className="text-link underline active:opacity-60"
+                      className="text-link active:opacity-60"
                       onClick={(event) => event.stopPropagation()}
                       to="/agreement/privacy"
                     >
@@ -327,33 +327,39 @@ export function LoginPage() {
           {wechatPending ? m.login_pending() : m.login_wechat_button()}
         </Button>
 
+        {/* Outside WeChat the green button is dimmed; the note says what
+            tapping it does (prototype envNote). */}
+        {!wechatEnv && (
+          <div className="text-ink-tertiary text-center text-[11px] leading-[1.6]">
+            {m.login_wechat_env_note()}
+          </div>
+        )}
+
         {/* Forgot-password stays contract-gated (SMS provider). */}
-        <div className="text-ink-tertiary text-center text-[10.5px] leading-[1.95]">
+        <div className="text-ink-tertiary mt-2 text-center text-[10.5px] leading-[1.95]">
           <button
-            className="tap-zone text-link py-1 underline active:opacity-60"
+            className="tap-zone text-link py-1 active:opacity-60"
             onClick={() => toast.info(m.common_soon())}
             type="button"
           >
             {m.login_forgot()}
           </button>
           <span className="mx-1.5">·</span>
-          <Link
-            className="tap-zone text-link py-1 underline active:opacity-60"
-            to="/agreement/user"
-          >
+          <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/user">
             {m.login_agree_user_name()}
           </Link>
           <span className="mx-1.5">·</span>
-          <Link
-            className="tap-zone text-link py-1 underline active:opacity-60"
-            to="/agreement/privacy"
-          >
+          <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/privacy">
             {m.login_agree_privacy_name()}
+          </Link>
+          <span className="mx-1.5">·</span>
+          <Link className="tap-zone text-link py-1 active:opacity-60" to="/">
+            {m.login_footer_home()}
           </Link>
         </div>
         <div className="text-ink-tertiary text-center text-[10.5px] leading-[1.95]">
           {m.login_footer_company()}
-          <br />
+          {` · `}
           {m.login_footer_icp()}
           <br />
           {m.login_footer_email()}

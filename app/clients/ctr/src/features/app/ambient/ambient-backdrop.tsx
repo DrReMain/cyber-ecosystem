@@ -3,7 +3,7 @@ import clsx from "clsx";
 /*
  * Ambient backdrop — blurred solid-tone orbs bleeding off the page edges.
  * Decorative only (aria-hidden). The prototype art-directs orbs per page (two
- * or three, from a five-tone palette); the shared default is the login trio.
+ * or three, from a seven-tone palette); the shared default is the login trio.
  * Rest state (opacity .26, blur 70px, solid color) is the prototype's .blob
  * form; motion-safe drift keeps that rest as its 0%/100% keyframe so any
  * still frame stays pixel-honest. Position/size classes are dot-free —
@@ -11,7 +11,7 @@ import clsx from "clsx";
  * into dead classes.
  */
 
-export type AmbientTone = "purple" | "blue" | "cyan" | "indigo" | "teal";
+export type AmbientTone = "purple" | "blue" | "cyan" | "indigo" | "teal" | "orange" | "violet";
 
 export interface AmbientOrb {
   /** Position + size utilities (e.g. "top-[-70px] left-[-60px] size-[min(67vw,260px)]"). */
@@ -27,6 +27,8 @@ const toneClass: Record<AmbientTone, string> = {
   cyan: "bg-ambient-cyan",
   indigo: "bg-ambient-indigo",
   teal: "bg-ambient-teal",
+  orange: "bg-ambient-orange",
+  violet: "bg-ambient-violet",
 };
 
 const driftClass = [

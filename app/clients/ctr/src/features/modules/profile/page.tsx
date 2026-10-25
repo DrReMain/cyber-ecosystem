@@ -1,10 +1,9 @@
 import { useQuery } from "@connectrpc/connect-query";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { SoonCard } from "#/components/soon-card";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
@@ -78,30 +77,46 @@ export function ProfilePage() {
         <IdentityCard profile={profile} />
         <DataCard profile={profile} />
         <SecurityCard />
-        <SoonCard description={m.profile_soon_desc()} title={m.profile_soon_title()} />
+
+        {/* ⑦ 训练趋势 — the prototype's own Phase-2 placeholder, dashed. */}
+        <div className="rounded-card border border-dashed border-[rgba(107,114,128,0.6)] bg-[rgba(17,23,41,0.5)] px-4 py-[15px]">
+          <div className="mb-[6px] flex items-center justify-between">
+            <span className="text-[14.5px] font-extrabold text-[#9ca3af]">
+              {m.profile_training_title()}
+            </span>
+            <span className="rounded-full bg-[rgba(234,179,8,0.18)] px-2.5 py-[3px] text-[10px] font-semibold text-[#fde047]">
+              {m.profile_training_soon()}
+            </span>
+          </div>
+          <p className="text-ink-tertiary text-center text-[11.5px] leading-[1.7]">
+            {m.profile_training_desc()}
+          </p>
+        </div>
 
         <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]">
-          <div className="text-ink mb-2 text-[14.5px] font-extrabold">{m.profile_about()}</div>
+          <div className="mb-[9px] flex items-center justify-between">
+            <span className="text-ink text-[14.5px] font-extrabold">{m.profile_about()}</span>
+            <span className="text-ink-tertiary text-xs">›</span>
+          </div>
           <div className="text-ink-muted flex gap-[14px] text-xs">
-            {[m.login_agree_user_name(), m.login_agree_privacy_name(), m.profile_about_icp()].map(
-              (label) => (
-                <button
-                  className="tap-zone py-1 underline active:opacity-60"
-                  key={label}
-                  onClick={() => toast.info(m.common_soon())}
-                  type="button"
-                >
-                  {label}
-                </button>
-              ),
-            )}
+            <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/user">
+              {m.profile_about_user()}
+            </Link>
+            <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/privacy">
+              {m.profile_about_privacy()}
+            </Link>
+            <button
+              className="tap-zone py-1 active:opacity-60"
+              onClick={() => toast.info(m.common_soon())}
+              type="button"
+            >
+              {m.profile_about_icp()}
+            </button>
           </div>
         </div>
 
-        <div className="text-ink-tertiary mt-2 text-center text-[10.5px] leading-[1.95]">
-          {m.login_footer_company()}
-          <br />
-          {m.login_footer_icp()}
+        <div className="text-ink-tertiary mt-[14px] text-center text-[10.5px] leading-[1.7]">
+          {m.login_footer_company()} · {m.login_footer_icp()}
           <br />
           {m.login_footer_email()}
         </div>

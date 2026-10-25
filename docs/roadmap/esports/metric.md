@@ -131,6 +131,7 @@
 重算(对齐旧前端 MovingTargetTestPage 评分区与 Java Tier B 闸门):perfect/good/lost 三态按阈值逐点分类;**时间=计数×采样间隔**(旧版固定步长 0.05s 累积的精确对偶,引擎键 sample_interval_ms 默认 50);lost=转移计数(状态机初值 lost,首样本 lost 不计转移——旧版同臂);patternStats[p]=图案 p 内 dev≤图案阈值的采样秒数(六图案恒全初始化,avg 恒除 6——旧版同臂);coverage=goodTime/total×3(total=config 时长镜像);perfectScore=perfectTime/total×4;stability=max(0,(50−stddev)/10)(总体方差);adaptation=avg(patternStats)×2(秒均 [0,5]→分 [0,10],旧公式原样——该项独大易饱和,曲线吸收);lossPenalty=lossCount×0.3;composite=clamp(Σ,0,10)。
 闸门:词表外 pattern=DETAIL_MISMATCH;deviation<0=DETAIL_MISMATCH;乱序戳=DETAIL_MISMATCH;span>config+1500ms=ABSURD_TIME_SPAN;**密度闸**=count×sample_interval>span+1500ms=ABSURD_TIME_SPAN(计数×间隔不得超流跨度——密集伪造凭空铸造追踪时间的面关闭,§6.5 族);空流→诚实零(旧空流 stability 白送 5 分,E3-f 空局瑕疵同族修掉)。
 轨一:raw=perfectTime(秒)×unit_score(§四:10/秒完美追踪)×难度(完美追踪 20-30s→200-300);权威轨:曲线未定稿留空,composite 入 extras。
+引擎 boot 键(2026-10-23 E7-b 物化入 test_config KV,值=编译默认=旧仓 parity;采样流节拍=sample_interval_ms 与重算的时间对偶同键):sample_interval_ms=50/pattern_duration_ms=5000/target_size_px=60/margin_px=100/perfect_deviation_px=20/good_deviation_px=30;判分键 pattern_deviation_px=80、unit_score=10。
 方案因子 📐:体验 200px/s/40px/简单图案/宽松/30s → 正式 400px/s/28px/全 6 图案/严格/60s。
 评级映射 🔗(主锚点 M3 追踪占比+辅助 M4 偏差):顶尖 ≥90% ≤15px / 职业 ≥80% ≤25px / 准职业 ≥70% ≤35px / 高水平 ≥55% ≤45px / 普通 ≥40% / 入门 <40%。追踪类无公开基准,推断成分更高,上线后内部百分位替换优先。
 专有指标:轨迹适应性(6 图案各自 0-100)/最大偏差(需逐帧)/丢失次数。多目标「100 追 10」不属本游戏(归 future)。
@@ -174,6 +175,7 @@
 重算(Java DualZoneScorer 逐行):serverScore=min((净秒/base_score_time)×100×difficulty_weight, 100);引擎参数键 base_score_time(默认 30)/difficulty_weight(默认 1.15;旧三键 simple/normal/hard 单键化——wire 无难度字段,模式轴归 E4 difficultyFactor);composite=serverScore/10。
 闸门:净<500ms 或净超 config 时长+1500ms=ABSURD_TIME_SPAN(新词,词表第三员);乱序戳/词表外/碰撞后事件/碰撞与净钟不对齐(±1500)/流超净钟/obstacle_id 重复=DETAIL_MISMATCH。⚠️ 改编披露:旧 Java 双向 |span−survival|≤1500 在含暂停时误杀——新净钟化+**单向化**(流可早于钟=末尾空转合法,永不可超钟)+配置锚(净超 config 时长拒,§6.5 duration fabrication closure 同族)+终局对齐(碰撞局虚报满时长白拿分的面就此关闭)。
 轨一:raw=dodged×unit_score(§四:15/成功闪避)×难度;权威轨:曲线未定稿留空,composite 入 extras。
+引擎 boot 键(2026-10-23 E7-c 物化入 test_config KV,值=编译默认=旧仓 parity;旧 left/right_move_speed 两键→单键 obstacle_speed_px_s、旧 spawn 区间 min/max 双键→min+span、旧 graph_size→shape_size_px;杆锚定距离=BAR_INSET_PX 12px 不入键):shape_size_px=36/bar_thickness_px=24/bar_ratio=0.35/obstacle_speed_px_s=120/spawn_interval_min_ms=800/spawn_interval_span_ms=700;判分键 base_score_time=30/difficulty_weight=1.15/unit_score=15。E7 引擎改动:碰撞即 `end("completed")` 引擎自然终局(墙锚盖在致命帧上,净钟与碰撞对齐闸天然合法);闪避判定=过杆面(旧仓右区判定混轴的 bug 弃,轴去镜像);躲避杆随区内触点单轴跟随(旧仓须抓住杆本身,H5 热区放宽,判定面不变)。
 
 ### 6.8 skill_trajectory 定稿卡(E3-e;Tier A,合成式誊录)
 
@@ -181,6 +183,7 @@
 重算(旧前端 SkillTrajectoryTestPage.tsx:332-374 与 Java 逐行):**哨兵 999=未匹配轮**——进 precision 分母(counted)、计 0 贴合度,不进偏差/速度均值(一轮没匹配不拖死两项,「少打轮不稀释精度分」同律);precision=(perfect+good×0.5)/counted×6(perfect<5/good<15);deviationScore=max(0,(50−avgDev)/10)(仅匹配轮均值);speedScore=max(0,(12000−avgPlace)/1500);composite=clamp(Σ,0,10)。空轮=诚实零(挂机不得分)。
 闸门:shape 词表外/round_number 非严格递增(裁剪流)/deviation<0/placement 与哨兵不对射(placed⇔dev<999 双射;旧匹配上限 40px 使然)=DETAIL_MISMATCH。
 轨一(**唯一非计数式**,§四:8 分/贴合度百分点):贴合度=clamp(1−dev/50, 0, 1) 按全体轮均值(未匹配计 0),raw=贴合百分点×unit_score×难度——零点 50 与偏差分同源,复算 §四表典型区间(贴合 30-80%→240-640)自洽。⚠️ 改编披露:旧 originalPosition 恒记 {0,0}、trajectory 实记玩家放置点(旧客户端未记真原位),故 deviation 作为客户端实测**事实**上报消费(与反应时同族),服务端不做几何重算;E7 引擎落 random_seed 服务端复板后可升全量几何重验。权威轨:曲线未定稿留空,composite 入 extras。
+引擎 boot 键(2026-10-23 E7-c 物化入 test_config KV,值=编译默认=旧仓 parity;时长=配置驱动现行 30s——旧仓 60s 局内预算不入键,total_rounds=5 为引擎上限,钟尽即终、未确认回合不铸事实):total_rounds=5/display_time_ms=3000/target_size_px=60/palette_size_px=40/match_distance_px=40;判分键 unit_score=8。E7 引擎改动:棋盘=mulberry32(random_seed) 单源决定(位置→形→色抽取序固定,同种子同盘);回合代表=最优匹配对(旧 first-greedy 亦为最优对),deviation 由「匹配对均值」改为代表对**精确距离**——original/placement/deviation 三元组几何自洽,random_seed 复板几何重验的升级路径就此铺好;color_name=稳定英文 token(事实不随 locale 漂移);trajectory=代表件拖拽折线(旧仓误记放置点数组的脏点弃,originalPosition 记真靶心)。
 
 ### 6.9 number_stars 定稿卡(E3-f;Tier A,合成式誊录)
 
@@ -188,12 +191,14 @@
 重算(Java NumberStarsScorer + 旧前端 NumberStarsTestPage.tsx:225-310 同构):逐回合 expected=升序序列,**进度指针**判定——点击正确 ⟺ number==expected[progress](=「点当前未点数字中的最小值」本义),正确才推进;correct=Σ正确点击;incorrect=Σ(len(clicks)−progress);roundsCompleted=完整回合数(progress==len(numbers));avgDecisionInterval=各回合**正确序列内相邻差**均值(跨回合不连首尾;无相邻对→intervalCount=0 且 speed=0,「按 0ms 代入误给满速度分」的旧前端防呆同律)。公式:base=min(5, rounds/8×5)(Java 上限,前端无上限以 Java 为权威);speed=max(0,(2000−avgMs)/200);accuracy=max(0,3−incorrect×0.5);complexity=max(0,(maxSeqLen−5)×0.3)(引擎恒 5→常态 0,>5 留旧系数);composite=clamp(Σ,0,10)。⚠️ **correct=0→诚实零**(全错局/空局 composite=0;旧 Java 空局白拿 accuracy 3 分的瑕疵就此修掉,§6.5/6.6/6.8 同律)。
 闸门:round_number 非严格递增(裁剪流,ST 同律)/回合内 elapsed_ms **非严格递增**(等值=同帧双击,0 间隔刷满速度分的新闸;降序=编辑流,DZ 同律)/numbers 空回合(引擎恒 5,空序列灌 roundsCompleted)=DETAIL_MISMATCH。⚠️ 改编披露:该款事实流无墙钟字段,无配置锚——伪造上限=满分 10,与旧架构持平(旧版客户端直报聚合值更易假);回合流自证(数组=真值)已封灌回合数的面。展示 1200/800ms 为客户端参数不入分。
 轨一:raw=correct×unit_score(§四:15/正确点击)×难度(15-30 击→225-450,§四表自洽);权威轨:曲线未定稿留空,composite 入 extras。
+引擎 boot 键(2026-10-25 E7-e 物化入 test_config KV,值=编译默认=旧仓 parity):numbers_per_round=5/min_number=1/max_number=20/spawn_padding_px=60/spawn_min_gap_px=80;判分键 unit_score=15。E7 引擎改动:回合事实即铸(round-open 铸 numbers 集+clicks 逐击即铸,钟尽截断局仍完整可判——旧仓仅记完结回合的聚合对照面弃);**错击回合重开时全局回合序号递增**(旧仓失败回合复用 roundsCompleted+1 会铸重复 round_number,服务端严格递增闸必拒——新律收束);数字盘=48px 热区 H5 撒点(min-gap 128-尝试 best-candidate,同 RM 族);布局守卫同律(开场 defer 到 ResizeObserver 首真帧);连击净钟闸 100ms(同帧双击不铸相等戳);闪烁动画纯 CSS 不入键(事实与视觉分离)。
 
 ### 6.10 offense_defense 定稿卡(E3-g;Tier A,合成式誊录)
 
 事实流:decisions[]{scenario_id, choice?{attack|defense|retreat}(缺省=未作答), decision_time_ms, timeout}。旧 isCorrect 客户端断言废止——正确性=choice 对**题库答案键**(question_bank.answer.optimal_choice,EqualFold 等值,垃圾词表自然错);**查无 scenario_id=DETAIL_MISMATCH 硬拒**(旧版降级信客户端 isCorrect 是前端兜底库时代产物,判键不留降级面)。题库=E2 通用银行(test_code+scenario_code+payload 题面+answer 键;旧 offense_scenario+offense_choice_explanation 两表收敛为 payload/answer 两列,内容=旧 init.sql 经验数据逐字:20 场景×60 解析);答案键经提交缝入参(scoringParams.answerKey,TestRP.ListAnswers),scorer 保持纯函数。
 重算(Java OffenseDefenseScorer 同构):correct=Σ等值;timeouts=Σtimeout;quality=correct/len(decisions)×6(**分母=决策数组自身**——旧版信客户端 totalRounds 属缩水分母伪造面,废止);speed=clamp((8000−avgMs)/2000×2, 0, 2)(avg≤6000 饱和);consistency=0.5(旧公式平项常数,曲线 parity 承袭);timeoutPenalty=min(2, timeouts×0.5);composite=clamp(Σ,0,10)。⚠️ 改编披露:旧 complexAccuracy 算而不入公式=死码弃;per-decision <80ms=ABSURD_REACTION_TIME **新闸**(旧版只闸均值,单个瞬时伪造可藏于慢兄弟之下);空 decisions→诚实零(旧 ZERO 同律)。伪造上限=全对+avg≤6000+无超时=8.5,与旧架构持平。
 轨一:raw=correct×unit_score(§四:25/正确决策)×难度(8-15 对→200-375,§四表自洽);权威轨:曲线未定稿留空,composite 入 extras。决策窗口 2000/1200ms 为客户端参数不入分。
+引擎 boot 键(2026-10-25 E7-d 物化入 test_config KV,值=编译默认):total_rounds=10/time_per_round_ms=2000/feedback_ms=800;判分键 unit_score=25。E7 引擎改动:题库=客户端镜像副本(M1 无题库读 RPC,scenarios.ts 逐字镜像种子 20 行题面+答案;内容变更须双改,题库读面缺口随 E9 题库面定形);客户端 optimal 只喂逐回合反馈面,判键永远在服务端(旧 isCorrect 断言废止律不变);决策窗单值 2000ms(卡面 2000/1200 双窗系难度轴,难度面未达引擎,standard 窄窗待难度面接入);超时回合无反馈窗(10×(2000+800)=28s≤30s 配置钟,钟尽截断=已铸决策照判);每局从 20 题银行随机抽 10(Fisher-Yates,无需复板——判键按 scenario_id,不依赖盘序)。
 
 ### 6.11 resource_match 定稿卡(E3-h;Tier A,合成式誊录)
 
@@ -202,6 +207,7 @@
 闸门:词表外 kind=DETAIL_MISMATCH;出生经济越界(某 kind 计数>出生上限,或碰撞>collision_cap 默认 10=血量 100/每次 −10 的死亡经济)=DETAIL_MISMATCH(Java TEST_DATA_ABNORMAL 服务端化,上限随引擎参数走);乱序/重号戳=DETAIL_MISMATCH(§6.7 同族);相邻 collect 间隔<80ms=ABSURD_REACTION_TIME(§6.5 差分闸同族——出生重叠双拾的罕见真值会误伤,E7 引擎出生间距保证后消);span>config 时长+1500ms=ABSURD_TIME_SPAN(§6.5 duration fabrication closure 同族);有事件而 span<500ms=ABSURD_TIME_SPAN(10 次分离扣血物理上不可能短于半秒)。
 ⚠️ 改编披露:pathOptimization 名不副实——旧公式实为收集速率项非路径几何,按本义誊录,trajectory 留审计;span 分母=事件流末点(旧版=会话时长;契约无可信会话钟,末事件 span 是唯一服务端可重建的密度口径)——闲尾局(早拾后空转)可把 pathEff 抬至满格,较旧版至多 +2.25 composite,受完美清场 10.0 上界钳制,曲线以真实分布吸收;零收集活满场=3.0 保底(2 风控+1 战术,Java 同臂),composite 是曲线输入非常数分,曲线以真实分布校准吸收;伪造上限=完美清场 10.0,与旧架构持平。
 轨一:raw=collected×unit_score(§四:20/有效收集)×难度(典型 15-30 个→300-600,完美清场上限 840);权威轨:曲线未定稿留空,composite 入 extras。双难度因子旧代码无差分(时长可配),方案因子待 E7 引擎片定。
+引擎 boot 键(2026-10-25 E7-d 物化入 test_config KV,值=编译默认=旧仓 parity 换算,旧 px/帧@60fps→px_s):判分键 minion_count=25/monster_count=12/dragon_count=5/collision_cap=10、unit_score=20;引擎键 player_speed_px_s=180(旧 3px/帧)/enemy_speed_px_s=100(旧 1.5-2px/帧取中)/player_size_px=40/enemy_size_px=40/resource_size_px=30/collect_radius_px=25/enemy_count=5/on_field_count=6/spawn_min_gap_px=100/trajectory_interval_ms=200。E7 引擎改动:**分波出生**——旧仓全量静态撒 42 点系 800×600 桌面场;移动场宽下 100px 物理间距(拾取带 2×(25+15)px 与 80ms×180px/s 移动下限之和)容不下全量,改为场上常驻 6 件、拾取即从剩余预算补位,每 kind 总出生数仍=三键上限(optimal 分母不变);出生间距保证=本卡「相邻 collect<80ms 误伤」的 registered obligation 兑现(同时保证最早可拾时刻 ≥556ms>500ms span 下限);碰撞=沿接触去重(旧 wasHit 沿同臂),第 collision_cap 次碰撞血尽即引擎自然终局(墙锚盖在致命帧,§6.7 终局对齐同族);trajectory=200ms 时间采样(审计面,30s≈150 点);总血量=collision_cap×10(死亡经济与碰撞上限同源)。
 
 ### 6.12 character_counter 定稿卡(E3-i;Tier A,**rework 规格落地**——非旧仓已发布公式)
 
@@ -211,6 +217,7 @@
 ⚠️ 全族唯一 0-10 外曲线输入:150 封顶承重「完美克制×1.5 速度余量」的区分度(饱和治理的目的本身)——100=参考速完美,133.3=不完美但快,150=完美且两倍速。v0 机械锚点映射随曲线片,≥200 条真实数据后分位再校准(rework 原文承袭)。
 闸门:空 rounds→诚实零(Java ZERO 同臂,回合数闸辖非空局);回合数≠round_count(默认 3,引擎参数键) =DETAIL_MISMATCH(旧版硬除 3、少报回合自降分,新律=回合数即契约);round_number 乱序=DETAIL_MISMATCH;阵容内重复/敌我不等长/空阵容=DETAIL_MISMATCH(**跨侧重叠=游戏本律**,6 角色双方各 5 必重叠,合法);词表外=DETAIL_MISMATCH;单回合 time<80ms=ABSURD_REACTION_TIME;Σ回合时长>config+1500ms=ABSURD_TIME_SPAN(回合共享会话钟,§6.5 同族);退化银行(c_max=0)护栏=c_max 置 1(回合无信号不炸除法)。
 轨一:raw=克制命中对数×unit_score(§四:15/克制命中)×难度(典型 3 回合×8 对≈24→360);权威轨:曲线未定稿留空,composite(0-150)入 extras。双难度因子=旧无差分(回合数/时限可配),方案因子待 E7 引擎片定。
+引擎 boot 键(2026-10-25 E7-e 物化入 test_config KV,值=编译默认):round_count=3/lineup_size=5/speed_ref_sec=8;判分键 unit_score=15。E7 引擎改动:12 关系行客户端镜像副本(logic.ts COUNTER_RELATIONS 逐字镜像种子,内容变更须双改,反馈面本地判分服务端判键——OD 镜像同律);**敌方阵容=六选五不重复**(旧仓随机可重复;服务端阵容内重复闸下新律收束);wire 词表=英文 roleType(旧仓提交时转中文名废止——bank roster=英文,UI 标签本地化另走);钟尽进行中回合不铸(阵容未满铸了必撞阵容闸,空局诚实零服务端同臂);回合流转净钟驱动(反馈窗 900ms 由帧循环判净钟差,暂停冻结不卡死——墙钟 setTimeout 弃);time_spent_ms=净钟差(旧仓手搓 pausedTime 修正废止,GameClock 冻结语义天然对)。
 
 ### 6.13 tracking_moving 定稿卡(E3-k;**Tier B→A 升格**,合成式誊录)
 
@@ -219,6 +226,7 @@
 闸门:**hit 断言交叉验证**=hit 值须与服务端按 deviation≤hit_threshold_px(引擎键,默认 45 实码)复算一致,不符=DETAIL_MISMATCH(facts-up:hit 是客户端断言,判定权在服务端——较旧版只闸区间前进);shot 帧缺 lifetime/movement 帧带 lifetime=DETAIL_MISMATCH(形状纪律);dotLifetime<80ms=ABSURD_REACTION_TIME(出生→击杀快于反应下限=伪造);乱序戳/负 deviation=DETAIL_MISMATCH;span>config+1500ms=ABSURD_TIME_SPAN;无 shot 帧→诚实零(客户端 totalShots=0 记 0 同臂——stability 项不得为「从不射击」付钱)。
 ⚠️ 改编披露:无命中时 avgLifetime 缺省 0<1500 → multitasking 0.3 白拿——旧版同臂原样承袭(曲线吸收);movement 帧的 target/deviation 旧线型恒 (0,0)/0,服务端不读(只读 player),新引擎可填真值不破坏。
 轨一:raw=确认命中发数×unit_score(§四:10/有效命中)×难度(典型 20-30 发→200-300);权威轨:曲线未定稿留空,composite 入 extras。
+引擎 boot 键(2026-10-23 E7-b 物化入 test_config KV,值=编译默认;crosshair_speed_px_s=400=方案因子正式档——旧仓速度为帧率耦合位移,新引擎以该键兑现 200/400 px/s 轴):hit_threshold_px=45/dot_size_px=40/spawn_padding_px=40/crosshair_speed_px_s=400/movement_sample_interval_ms=100/respawn_delay_max_ms=1000;判分键 unit_score=10。
 
 ### 6.14 economic_sim 定稿卡(E3-l;**Tier B→A 升格,E3 十三款收满**,合成式誊录)
 
@@ -228,6 +236,7 @@
 闸门:词表外兵种=DETAIL_MISMATCH;**判定交叉**=is_last_hit 须与按 minion_health 复算的窗口一致;**金额交叉**=gold_earned 须与窗口复算金额逐一相等(金币守恒的全量版——不只 Σ 守恒,每笔可验);**时间线守恒**=两流按 elapsed 归并走余额,任一 purchase 时点余额<0=DETAIL_MISMATCH(startGold=0);cost 档外(item_cost_1/2/3 默认 400/800/1200)/件数>max_items(3)=DETAIL_MISMATCH(装备阶梯,Java 硬码三档服务端化+配置化);final_hp 非 15 步进=DETAIL_MISMATCH(HP 合法性,Java %15 同臂);两流各自乱序=DETAIL_MISMATCH;span>(config+perfectCS×1s)+1500ms=ABSURD_TIME_SPAN(perfect +1s 加时入上限,§6.5 族)。
 ⚠️ 改编披露:纯挂机=1.5 保底(health 项白送,旧版同臂)——composite 是曲线输入非常数分,曲线吸收;missed_minions 为申报计数无事件佐证(漏刀在引擎面不可观测,E7 引擎可加漏刀事件后收紧)。
 轨一:raw=cs×unit_score(§四:15/有效正补)×难度(典型 15-30 补→225-450);权威轨:曲线未定稿留空,composite 入 extras。
+引擎 boot 键(2026-10-25 E7-e 物化入 test_config KV,值=编译默认=旧仓 parity):判分键 perfect_window_melee=5/perfect_window_cannon=8/good_window_melee=10/good_window_cannon=15/gold_melee=21/gold_cannon=90/item_cost_1=400/item_cost_2=800/item_cost_3=1200/max_items=3/unit_score=15;引擎键 decay_interval_ms=100/decay_melee=10/decay_ranged=12/decay_cannon=15/respawn_delay_ms=200/early_health_cap=30/health_penalty_pct=5/perfect_bonus_ms=1000。E7 引擎改动:**步进衰减保真**——血量=100−⌊t/interval⌋×speed(旧仓 setInterval 整数步进,连续化会改难度分布:melee/cannon 步进几何下 perfect 窗不可达、ranged 落 4=全场唯一 perfect 值,logic 边界钉固化此几何);金币与窗口由引擎按同公式铸造(gold=floor(base×share) 与服务端复算逐笔相等,交叉验证构造性通过);perfect +1s=ctx.clock.addTime(GameClock 奖励通道,加时入 span 上限天然合法);**终局血 stat 事件驱动**(每次血变写 final_health_hp,钟尽兜底路径 host 直 finalize 引擎无钩——last-write-wins 保证终值真实);两流各自严格递增(物理点击构造性满足); itemName=稳定 token item-{n}(事实不随 locale 漂移律);购买回满血(旧仓 setHealth(100) 保真)+阶梯价走 item_cost 三键(引擎与服务端同源)。
 
 ## 七、8 维认知权重矩阵(三源合一 🧊:JAVA 常量 = API 公式表 = ST DIM8 逐值核对一致)
 

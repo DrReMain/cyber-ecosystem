@@ -36,8 +36,8 @@ interface StepFrameProps {
 export function StepFrame({ step, onBack, children }: Readonly<StepFrameProps>) {
   return (
     <AmbientLayout orbs={STEP_ORBS[step]} scroll="inside">
-      <div className="flex w-full flex-col gap-3">
-        <div className="flex items-center gap-3">
+      <div className="flex w-full flex-col pb-6">
+        <div className="flex items-center gap-3 pb-[10px]">
           <button
             aria-label={m.common_back()}
             className="bg-surface-input text-ink-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-full active:opacity-60"
@@ -51,7 +51,7 @@ export function StepFrame({ step, onBack, children }: Readonly<StepFrameProps>) 
             {m.profile_setup_step({ n: step, total: TOTAL_STEPS })}
           </span>
         </div>
-        <div className="flex gap-[5px]">
+        <div className="mb-[14px] flex gap-[5px]">
           {PROGRESS_SEGS.map((seg) => (
             <span
               className={`h-[5px] flex-1 rounded-full ${

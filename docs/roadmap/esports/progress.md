@@ -2,15 +2,15 @@
 
 > 归属:esports 前沿进度档,三人共写。**剪枝律(2026-10-23 重申,约束三个 agent)**:片收口即剪枝为一行收口注(状态+日期+提交 hash+关键判定);节奏行一行一事;验证证据一律归提交信息的 proven-by 尾,本档不存叙述——档是给 agent 读的,读档成本即团队成本。长历史随剪枝删除,git log 即存档。检查点每站在下表登记。
 
-## 现状快照(2026-10-23,W1 末)
+## 现状快照(2026-10-25,W1 收官)
 
 | 人 | 已交付(均已并 esports/main) | 当前 → 下一片 |
 |---|---|---|
-| lzx | E0 契约(种子+增量2/3/4)、E1 骨架、E2 schema+种子、E3 评分(框架+Tier A 六款+提交缝,ce763107)、E6a/E6b、会员读面+admin 用户管理(88bcd9ba/3f272b28)、system 组合缝 ListUsersByPopulation(a8b9f0a4) | **▶ 视觉对齐批 V1 ✅ V2 ✅ V3 ✅(首页+编排+个人中心,genre 120°/mcard 族/fab 全族;待提交)→ admin 交互/文案对齐批(D-AK)**;后排:Tier A 余款四款(W3,首片 number_stars 补 CP1「过半」)→ E4(W4)→ PAY1+E8(W5) |
-| hzy | H1 系统态件、H2 协议页、H-A 引擎框架、H-B 反应瞄准批(四款引擎,mock 净拔除)、10-22 精修批(控制台三红根治/profile 写缝/D-AG 落地/C3) | **H-C 判定回路闭环(已分配 10-23,D-AJ 首例,冒烟唯一硬断点)** → E7 追踪技能批(W2-3 起);挂起:D-AG/C3 实机走查随下次登录 |
-| ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:**P13 窗外豁免签认(CP2 前)、P15 报告簇窗口(E5b 前)**、P8 性别(E5 前,W4 末;含协议正文联动)、P11(B 批前)、P12(E4 前)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
+| lzx | E0-E2、E3 评分(13 款收满,71c33f4f;§指针清扫 43fd4b3d)、E4 匹配全量(704c3388/07b87349)、E6a/E6b、E7-a..e 13 款引擎收满(fa866414/dcce4fc6/1ce16289)、V1-V4+B 批(6b98c886/865511c1)、会员读面+admin 用户管理(88bcd9ba/3f272b28)、组合缝(a8b9f0a4)、校准战役 S1-S4+D-AL(9e0478e6/fe73a63a/1c1a8424) | **▶ 待分配**(E7 收满;候选:admin 交互/文案对齐批(D-AK)→ E5 报告框架(候 ljr P8)→ PAY1+E8(W5-W6)) |
+| hzy | H1/H2/H-A/H-B、10-22 精修批、10-23 H-C 判定回路(真人链路验收;撞面合流正身=E4-c 版)、10-23/24 设计保真批(MR!6 于 10-25 并入 main,599dddce) | **下一片:待分配**(原登记 E7 追踪批已由 lzx 10-23 收;顺手项平均决策由 MR 内 12dc76a5 销) |
+| ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:**P13 窗外豁免签认(CP2 前)、P15 报告簇窗口(E5b 前)**、P8 性别(E5 前,W4 末;含协议正文联动)、P11(B 批前)、P12(E4 前)、P16 待标定款回执等级面(E5 报告面前)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
 
-**M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ✅(13 款评分面收满,报告分 e2e 挂 E5);E7 引擎 4/13(判定回路待 H-C);E4 ⏳(增量a 已落);E5/E8/E9/E10 未认领;M2 用户列表+档案首面已前拉落地;支付 PAY1-3 全未启动。**CP1(11-08)前瞻:达标面基本在手,风险面=支付沙箱零启动。**
+**M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ✅(13 款收满,报告分 e2e 挂 E5);E4 ✅(a-d,e2e 三验收);E7 ✅(13 款引擎收满,判定回路已闭);E5/E8/E9/E10 未认领;M2 用户列表+档案首面已前拉;V1-V4+B 批落,admin 对齐批待排;支付 PAY-C0/C1/PAY1-3 全未启动(材料已就绪;10-25 两步走裁定=通道能力沉淀骨架+dev mock 链路)。**CP1(11-08)前瞻:原风险项 H-C 已闭;余风险=支付握手零启动(门 10-25 校准=APIv3 验签握手,官方无 v3 沙箱)+E5/E8 无人认领。**
 
 ## 切片认领表(窗口与定义见 plan.md)
 
@@ -19,12 +19,12 @@
 | E0 契约首刀 | lzx | ✅ 10-21 | 种子(画像+目录)+增量2(测试读面)+增量3(统一提交,4 决策经裁)+增量4(三计数反哺,193a9b7c);余面已裁去向:报告读面随 E5/E9、entitlement 随 E8(D-AA) |
 | E1 服务骨架 | lzx | ✅ 10-18 | kratos-new-service 八步;双面 accessLadder+catalog+部署面;会员链探针 e2e 绿 |
 | E2 schema+种子 | lzx | ✅ 10-20 | D-V 撤回后按冻结契约 clean-room 重建;五表+三读+13 款种子骨架(校准值不杜撰,随 E3 单源);multi_target 补行=D-Z |
-| E3 评分引擎 | lzx | ⏳ | 增量a metric.md 单源档、增量b Registry+纯函数+20 黄金 ✅;增量c 提交缝(4c5f0617)、增量d MT/TR 定稿(5b0160fb)✅,双轴评审两实错已吸收;增量e DZ/ST 定稿 ✅(净钟+哨兵双射闸,metric §6.7/6.8);增量g offense_defense 定稿 ✅(判键式正确性+题库入通用银行,metric §6.10,Tier A 8/10);增量h resource_match 定稿 ✅(碰撞事件流=契约增量5 补位+出生经济闸,metric §6.11,Tier A 9/10);增量i character_counter 定稿 ✅(rework 规格落地=c_max 分母+速度乘数+150 封顶,题库 12 关系行入通用银行,metric §6.12,**Tier A 10/10 收满**);增量j moving_target 定稿 ✅(Tier B→A 升格:采样流全量重算+阈值 20/30/80 实码解除冲突,metric §6.3);增量k tracking_moving 定稿 ✅(Tier B→A 升格:契约增量6=optional hit+dot_lifetime_ms,hit 存在性兼帧判别器+断言服务端交叉验证,metric §6.13);增量l economic_sim 定稿 ✅(Tier B→A 升格:契约增量7=窗口事实上事件+漏刀/终局血上顶层,判定与金额双交叉+时间线金币守恒,metric §6.14)——**Tier B 消亡,13 款全量重算,评分面收满**(报告分 e2e 验收随 E5);**余:无 scorer 余款;E3 收口面=报告分 e2e(挂 E5)+guard 正则回流**;「报告分 e2e」验收面挂 E5,H-C 前移回执层;guard 正则修正随下次镜像批回流 dev 兄弟服务 |
-| E4 匹配引擎 | lzx | ⏳ | 增量a 聚合出生 ✅(match_config+match_session 两表+迁移+8 行种子;match.proto 双 RPC+错误 6130/6131;编排引擎=render_order 池法+FNVA/SplitMix64 确定性抽款+7 天 resume 窗+切换计数盐;重测 3/1 出生冻结;难度模式轴归属地=会话,metric §三已记;×1.5 偏好权重裁定不落——原型从未实现且新目录无 game→test 亲和轴,偏好影响=类型轴投票);增量b 提交缝接线 ✅(契约增量8=optional match_session_id,存在=会话局/缺省=练习局;序数真律=会话内计数+1,客户端 attempt_no 忽略化待 c 清号;预算执法=RETEST_EXHAUSTED,无效局同扣;阵容闸=TEST_NOT_IN_SESSION;会话失效=6132(归属折叠进 miss);difficultyFactor 消费=experience1.0/standard1.5,练习局恒体验基线;done/retest_left 推导经写入器激活;跨模块执法=test 声明 MatchSessionLaw 端口+match 侧 law.go 实现,wire 咬合零环);双轴评审三实错吸收=test_record (session_id,test_code,attempt_no) 部分唯一索引(count-then-insert 原子化,碰撞重数一次)+Switch 先验目标类型再关旧局+Get 创建竞态读回幸存者;余 c ctr 切换服务端编排(+attempt_no 清号)+d e2e 收口 |
+| E3 评分引擎 | lzx | ✅ 10-23 | 13 款全量定稿收满:metric.md 单源+Registry 插件+提交缝(4c5f0617),Tier A 10/10(ce763107/f9ff14d7/5bb5db3f 等)后 Tier B 三款升格消亡(71c33f4f,j/k/l);双轴评审实错吸收族在案;§指针存量清扫同日独立片清零(43fd4b3d);余面=报告分 e2e(挂 E5)+guard 正则回流(随镜像批) |
+| E4 匹配引擎 | lzx | ✅ 10-23 | a 聚合出生+b 提交缝(704c3388,双轴评审十项吸收:序数部分唯一索引原子化/先验再关/竞态读回)+c ctr 切服务端编排+attempt_no 清号(07b87349)+d e2e 三验收全绿(43fd4b3d:同日稳定/跨日变化/重排换 seed);×1.5 偏好权重裁不落;观察=test 目录第二排序键(入开放清单) |
 | E5 报告框架+能力报告 | — | 未认领 | 服务/客户端两半可并行 |
 | E6a ctr 纯壳 | lzx | ✅ 10-18 | D-R/S/T 全落;SEO 全量面同日收口 |
 | E6b 登录+画像流 | lzx | ✅ 10-20 | 接通片(微信真人链路绿)+完整形态(登录/三步向导/个人中心/首页)+机制修复+R1R2+流程前段四页;遗留契约缺口随对应片:SMS 骨架(system provider)、consent 版本记录、自定义游戏上限 3v20 口径 |
-| E7 游戏框架+13 款 | lzx(E7-a) | ⏳ 反应瞄准批收口 ✅ E7-a 10-23;余两批未动 | 引擎先行;E7-a=种子 engine_params 四款物化(nil 让渡律)+三款缩放守卫补齐+编排不卡死小修+批验收 live 冒烟(详节奏行);追踪技能批/决策资源批未动 |
+| E7 游戏框架+13 款 | lzx(E7-a..e) | ✅ 10-25 收满 | 反应瞄准批 E7-a、追踪技能批 E7-b/c、决策资源批 E7-d/e(offense_defense+resource_match 10-25,number_stars+character_counter+economic_sim 10-25 三款收 13);引擎先行;种子 engine_params 全量物化(nil 让渡律)+缩放守卫族+采样网格锚定律+自然终局定律+出生间距定律(E7-d)+开场布局守卫族(E7-d/e)均立;详各节奏行 |
 | E8 权益最小面 | — | 未认领 | D-W population 余件触发器=E8 |
 | E9 最小 admin 面 | — | 未认领 | 用户管理子面已另落(下行);本片=激活码+测试项/配置管理+报告策略 |
 | E10 全链 e2e | — | 未认领 | 全部依赖收口 |
@@ -32,8 +32,8 @@
 | H1-H2(系统态件/协议页) | hzy | ✅ 10-20 | MR!2 双轴评审合并;EN 协议译文 ljr 定稿后整目录换值 |
 | H-A 引擎框架片 | hzy | ✅ 10-20 | GameClock+GameModule 契约+TestRunHost+/test/$code+red_dot;biome 插件契约执法 |
 | H-B 反应瞄准批 | hzy | ✅ 10-21 | 三款引擎语义锚钉死+本地结果面;mock 插桩净拔除零残留;E0 增量4 反哺闭环 |
-| H-C 判定回路闭环 | hzy | ▶ 已分配 10-23 | D-AJ 首例;提交缝适配器+服务端判分回执;验收=真人全链(登录→/match→red_dot→分数回执) |
-| PAY1-3 支付片 | — | 未认领 | P1 已定(D-AB/AC);商户资质就绪;遗留=经营类目补设+H5 支付权限申请(建议即办);**CP1 门含支付沙箱通=当前风险项** |
+| H-C 判定回路闭环 | hzy | ✅ 10-23 | 判定回路=esports 首条人工可走通全链,已闭——**与 lzx E4-c 同日并行交付同一地皮(切片定义重叠的计划期裂缝),合流取 E4-c/E7-a 服务端真值版为正身**(提交适配器/判决卡/会话面/attempt_no 清号,详见 E4-c 节奏行);H-C 侧净贡献=**真人链路验收**(chrome-devtools 驱动+用户在场:阵容过滤/三入口直达/正例 raw 550+S+权威 96.5/无效反例 116ms 机器人反应判 ABSURD_REACTION_TIME 红章双语/待校准降级 ×2/257 事件逐字段过线/单发+锚点满程/6132 探针 404)+P16 登记(转 ljr)+D-AG/C3 走查销项;H-C 自有代码孤件随合流净删,撞面复盘见节奏行 |
+| PAY-C0/C1+PAY1-3 支付片 | — | 未认领 | P1 已定(D-AB/AC);商户资质就绪;**APIv3/短信/旧库材料就绪(GitLab wiki esports 页,10-20;值不入库,deploy 环境变量面)**;遗留=经营类目补设+H5 支付权限申请(建议即办);**CP1 门 10-25 校准=APIv3 验签握手通(官方无 v3 沙箱);两步走裁定=capability 沉淀 shared-go/capability/payment+dev mock 全链,真实通道上线前后接入;新依赖=JSAPI 需商户绑定 appid 域 openid,公众号测试号绑不了商户,上线前登录切真实公众号 appid** |
 | MIG1 迁移工具片 | — | 未认领 | 2026-10-23 终局对账立片;W6-W7 建/W8 预演;school 步时序=P14;依赖 E8/PAY1/E5 |
 | E5b 报告簇扩片 | — | 未认领 | 2026-10-23 终局对账立片;P15 裁后开工;8 维公式源已锚 plan 行 |
 | E6c 账号域收口 | — | 未认领 | 2026-10-23 终局对账立片;SMS+密码+绑定合并;收编 SMS 散遗留行 |
@@ -43,24 +43,20 @@
 | 项 | 归属 | 触发/时点 |
 |---|---|---|
 | 微信回调 next 丢失(redirect_uri 不能带 query,保 next 须 state 中转) | 后续微信链路片 | 设计时定(review A6) |
-| favicon 404(ctr 无 public/ 目录)资产口径 | hzy | 待裁,随手片 |
-| birth.ts 上收共享层(原拟随 H-B,未随落) | 触文件者 | 顺手清 |
 | conventions guard 正则精度修正回流 dev 兄弟服务 | lzx | 下次定期镜像批 |
-| D-AG/C3 实机视觉走查 | hzy+用户 | 下次微信登录同场 |
 | SMS 骨架片(system provider+capability) | lzx | E6c(2026-10-23 立片收口) |
 | 协议 consent 版本记录契约 | lzx | H2 versions.ts 真源 GET /agreements/current |
 | 自定义游戏偏好上限:服务端 20/产品口径 3 | ljr | config 读面缺口,随 E9 或裁 |
 | D-W population 余件(provider 行 member_population/座位迁移/guard 注释清理) | lzx | E8 权益面触发 |
 | 走查墙 4:运营测试账号口径——pg2-probe 无 user 座位登不进 admin 端;种子超管=admin/admin123456 | 用户侧 | 即办(SQL 补座位或文档化) |
-| B 批修正清单(login toast 指名/备案串/微信回填昵称;nickname emoji 显式;setup 后端取核验;profile 模块集对核;横屏残留核) | lzx | E3-f 收口后一片收(清单=coverage §七.5,D-AL) |
 | P11 年龄采集单/双轨待裁(契约单轨 vs 原型 band-only 合法) | ljr | B 批修正片前 |
-| ICP 备案号权威串(LOGIC_AUDIT 2.5b「浙ICP2026028293号」vs MEMBERSHIP §九「浙ICP备2026028293号」) | ljr | 随 B 批 |
+| ICP 备案号权威串(LOGIC_AUDIT 2.5b「浙ICP2026028293号」vs MEMBERSHIP §九「浙ICP备2026028293号」) | ljr | 随 ljr 下轮文案定稿 |
 | 微信登录回填昵称/头像(2.5b-⑫;需 system identity 持久化+向导去向联动) | lzx | E6b 余面小片(S1 登记) |
-| B 批修正清单已修订(两撤四增一 V4,coverage §七.5/§九) | lzx | 校准战役 S2/S3 后随 V4 一并排 |
 | 版本检查页+app-version/内容块管理(coverage 缺口①;S4 终局对账低优) | 待排 | P13 签认后随 M2 余组/E9 增量 |
 | 走查注:admin 工作台 ERR·NETWORK(dev 栈缺数据源,非 esports 面) | lzx | pre 部署前查 |
-| §指针存量清扫:已提交代码内 §/文档名+章节引用全量清洗(E3 scorer 族/test.proto/seed.go/test_record schema 等;注释改自含 why) | lzx | 独立机械片(新法 10-23,见节奏行);随下次镜像批或单独排 |
-| hzy 台账评审标记销项(H1/H-B 行曾滞「待评审」,本表已并) | — | 已随本档剪枝闭 |
+| ✓ 字形残留(match/page.tsx:57 done 步文本「✓」,图标法含字形族,应换 lucide Check) | hzy | 下批顺手 |
+| test 目录 List 单键 created_at 排序,同秒并列池序靠 PG 返回序(E4-d 观察) | lzx | 下次 schema 触碰带上 |
+| Nx 冒号目标名解析(ctr:dev:down 被 Nx 落到 dev target,曾以 devserver.cjs 直调兜底) | lzx | 下次 tools 触碰修 |
 
 ## Review 遗留转交(2026-10-20 ctr 全项目 review;开放项已并入上表,此处仅存注记)
 
@@ -70,7 +66,7 @@
 
 | 检查点 | 日期 | 判定 | 拉闸动作 |
 |---|---|---|---|
-| CP1 | 11-08 | 待检(前瞻:支付沙箱=风险项) | — |
+| CP1 | 11-08 | 待检(前瞻:支付握手=风险项;门已校准为 APIv3 验签握手) | — |
 | CP2 | 11-22 | 待检 | — |
 | CP3 | 12-02 | 待检 | — |
 
@@ -109,3 +105,13 @@
 - 10-23 §指针存量清扫(独立机械片,2026-10-23 新法补面):全仓源面清零——esports 评分模块 22 文件(metric.md §6.x/§一..§五 单位分与公式坐标、旧仓文件+行号坐标→自含短语)、test.proto §0.5×2(gen 九文件注释面同步)、ctr 四文件(原型 §4.7/§3/block3 坐标)、conventions_guard×3 服务(执法消息 CONVENTIONS.md §4/§1/§6/§5a 自含化,§7 行键 K-* 保留)、tools 两件(nx-first-guard 拒因改正道提示;paraglide-parity 五处+biome 收行);显式替换表 70 对逐对唯一命中,§与文档名双路 grep 源面零残留;proto generate 注释面/breaking/esports+system+agent test/go lint+format/ctr build→typecheck→check/paraglide:check 自验/biome 全绿。
 - 10-23 E7-a:反应瞄准批收口(lzx)。①种子真化——test_config engine_params 四款物化(客户端 boot 键+服务端判分键,值=编译默认;nil 让渡律:种子不拥有的行 boot 不碰,为 admin 调参留路),upsert keep-in-step 双臂补齐,metric.md 四卡 boot 键行登记(键与卡同源);②真响应式补齐——flash_aiming/multi_target/target_recognition 三款补 ResizeObserver 缩放守卫(出界目标原身份重定位:同 id/同 spawn/同 deadline,miss 计量零接触;red_dot 既有律同族),三 logic 纯谓词+边界钉;③编排不卡死(走查墙 3 销)——match 页 next 跳过无引擎步(引擎注册表判据),无引擎行渲染「即将上线」标签+降透明,跳步=未测可跳既有法;④批验收 live(pg7 隔离上下文,避让共享 Chrome 他人活跃会话):跳步 live(/match→开始测试→唯一引擎步)、target_recognition 绑定局无效路(合成机器点击触发 ABSURD_REACTION_TIME 判无效,判决卡双语 reason 渲染+记录落库 valid=f/spawnedEnemy=24/clicks=6/跨度 30.002s)、flash_aiming 练习局有效路(raw=100=10×10,shots=10/misses=26 逐位对齐,曲线待校准降级渲染「—」法定)、multi_target 练习局双形(0 拾取诚实零 raw=0/missedHigh=6;25 拾取 raw=250 线性轨+本地 1250 复合轨 extras,picks 流 camelCase 契约形状,missedHigh=7 对齐)、配置流真化(DB 调 target_size_px 20→60→页内靶径 40px→120px 实测,复原)、缩放守卫 live(1300→500 宽缩窗,red_dot 单靶重绘界内 987→255,multi_target 五靶缩后零出界残留)。走查注一则:multi_target 本地辅助卡「平均决策」怪值(20341ms,本地陈旧公式;服务端差分重算为真值,本地卡法定辅助)——hzy 顺手清。门禁:esports build/test 绿+gofmt/vet 净,ctr build→typecheck→check 绿+vitest 45/45(42+3 新钉),docs:check 绿。
 - 2026-10-23 D-AM(ljr):P12 定案 moving_target=trackingStability——S3 材料补证⑥块5 指标规格明文+⑦新仓已冻面后裁 A;零代码,B2 次 0.5 行判陈旧删(与 D-AD 同构)。
+- 10-23 H-C 判定回路闭环(hzy,dev-hzy 线):与 E4-c 并行同日交付同一地皮(切片表 H-C 行与 E4-c 余面本就重叠,双方未同步)——H-C 版=提交缝薄适配器+verdict 回执卡(四色档位 chip/无效四词双语/待校准降级注)+客户端 arrangePlayable 过滤+三入口直达;**真人链路验收过**(chrome-devtools 驱动,用户在场):阵容过滤/三入口直达/正例 raw 550+S+权威 96.5/无效反例(116ms 机器人反应判 ABSURD_REACTION_TIME 红章)/待校准降级 ×2/257 事件逐字段过线 25KB/单发+锚点满程 30.002s/6132 探针 404/D-AG 三件 DOM 断言+C3 横竖屏/控制台零红字;P16(待标定款回执等级面,转 ljr)与 D-AG/C3 走查销项随场产出。
+- 10-23 设计保真批开批(用户令,一页一页来,锚=活原型+_base.css,D-AK 口径):①/agreement 四值档对齐——条款卡 padding 14/16(原 16 四边)、正文色 ink-muted #9CA3AF(原误用 tertiary)、尾注卡 surface-content=原型 card2(原误用 deep)+padding 12/14+lh1.7;计算样式逐位复核全中;后续页按用户点单逐页过。
+- 10-23 H-C×E4-c 合流(dev-hzy 吸收 main):代码面取 E4-c/E7-a 版为正身(服务端真值+契约清号+灰行「即将上线」阵容=超集),H-C 侧孤件净删(arranger/use-arranged-steps/verdict-card/use-submit-attempt/submit.test),消息档死键剥离(14 键,共享键取 main 文案);撞面复盘:H-C 与 E4-c 的切片定义重叠是计划期裂缝,吸收律=零冲突面直接过,冲突面按「服务端真值优先」裁;净保留=真人验收证据(同一行为面在 E4-c 版上由 lzx E7-a live 复验)、P16 登记、D-AG/C3 销项。
+- 10-23 E7-b:追踪技能批首刀(lzx):moving_target+tracking_moving 落地(引擎注册/提交臂/结果行/消息 16 键×2),种子两款 engine_params 物化+metric §6.3/§6.13 boot 键行;采样网格锚定律(网格锚定于介入/首帧而非局始——迟介入回填突发=count×interval 密度闸拒收,首探针 ABSURD_TIME_SPAN 复盘定虫后修);end-face 显式行标签表补六键(表非动态构造,缺键渲染回退「点击数」);live 验收:双款 valid=t 曲线待定「—」,moving 71 发 span 3502/3550 合法,tracking 3/3+平均获取 9537ms+移动折线 1567px+射击帧全带 lifetime,match 追踪位引擎就绪面(剩 N 次,非「即将上线」);陷阱两则:Nx 冒号目标名解析(ctr:dev:down 被 Nx 落到 target dev,devserver.cjs 直调兜底,登记待修)+paraglide build skip 误判(rm src/paraglide 强制重生,旧档陷阱复现)+fa866414 携带 match/page.tsx 格式漂移(biome 本片机械修)。
+- 10-23 E7-c:追踪技能批二刀收批(lzx):skill_trajectory+dual_zone 落地(引擎注册/提交臂——skillTrajectory 臂 randomSeed bigint→wire 字符串/结果行/end-face 标签+5/消息 15 键×2=85 平价),种子两款物化+metric §6.7/§6.8 boot 键行;机制:种子化棋盘(mulberry32,位置→形→色抽取序固定=random_seed 复板契约)、回合代表=最优匹配对精确几何(|original−placement|=deviation 三元组自洽,弃旧仓「匹配对均值+假原位」脏点)、color_name=稳定英文 token、碰撞即 ctx.end 自然终局(引擎首用)、DZ 轴去镜像+过杆面=闪避+杆随区内触点单轴跟随;live:ST 有效局 valid=t raw=720=(4.5 贴合/5)×100×8 逐位命中+5/5 回合(含一发 25.0px 真偏差)+曲线待定「—」+四行标签正确渲染+空流诚实零+RETEST_EXHAUSTED 执法,DZ 两发 valid 45/75=dodges×15+双道双事件全谱+碰撞居末与净钟逐毫秒对齐+左道闪避 6597ms(航程算术吻合),match 双款引擎就绪面(fps 4 位/moba 3、4 位各实证);live 抓虫两枚:合成指针无 active-pointer 条目→setPointerCapture 抛 NotFoundError 于监听器内被 dispatchEvent 吞,capture 改尽力而为(双款同修;tracking_moving 旧形 move 无 drag 守卫故同患无害,不属本片)、rewrite 转录滑点吞 piece.placed=true(类型层/单测双盲——接口字段在+初值假,唯 live 探针可见,探针承重的实证);探针坑:调色板容器全文本恰=「确认」须按 cta-primary 锚定真按钮、介绍面预览「30.00 秒」致起点假阳须以游戏面 chip 锚定、会话预算 3-then-one 探针自耗实录(空流局亦扣,切 genre 换新会话)。
+- 10-24 设计保真批第二日(hzy,用户逐页点单,锚=活原型+_base.css,D-AK 口径;七批成对 live 验收后待用户判定,本日尾用户令提交):①/match 报告页+②/match/guide(橙单 orb/警示卡/规则行/评分卡/CTA 跳步律)+③/match/pick(紫双 orb/平票卡/空态 btn-ghost);ambient 色板扩至七调(orange/violet 入 tokens);④/test/* 三面重构——start-game-overlay 退役→intro-face(52px 渐变图标框/逐步标题/花费硬闸+test_intro_blocked)、prog-strip 三态进度条、test-hud(暂停 fab+标题列+倒计时列)、end-face(单记录 TIERS 四色+未评级灰章/VerdictCard 提取/findNextStep 续测-完成文案/run 花费禁用);两虫连修:retestLeft proto3 零值经传输 toJson 消键→verdictOf ?? 0 守卫(chip 曾显 undefined/1)、已花费 intro 仍可开跑(400 RETEST_EXHAUSTED 实证)→spent 闸;⑤/profile/setup 三步(年龄描述逐字+加粗位/年月选项后缀/未成年警示加粗位/自定义 chip 本体切换+×删除悬停红/添加成功 toast/票行逐字「类型投票·默认类型:平票→需手动选类型」+位置归位/占位逐字);⑥/age-required(单琥珀 orb/h1 19-700/44px 图标框/警示卡 card2 配方/错误行常驻 11.5px/年月后缀/三按钮 ghost 配方+投影;行为:不完整报错/未成年 toast 拦截不落库);⑦/profile 总览页(训练趋势虚线占位卡逐字替换自拟 SoonCard/关于我们协议真路由 text-link 无下划线/页脚两行合一/卡标题 11px/mtitle 边距/统计条结构落位数值待 P18「—」/协议链接去书名号)。B 层登记随片:P16 Q1 用户裁定按原型(方案 A 已落地)、P17(性别卡/年龄段次级卡/微信昵称胶囊——契约无落库位,snsapi_base 实证 provider_wechat.go:53;含游戏种子 9 款不符+×1.5 弃句两问)、P18(个人中心数据面——全 proto 无测评记录读 API,①统计条④能力概览⑤测评历史⑥数据统计四卡待 ListTestAttempts,与 E5 报告面同源双消费);test 结果页 B 层(较上局/历史最佳/本次共测 N 次/test-done 报告页)随 P18 同源。合并:ee064638 吸收 main dcce4fc6(E7-b/c 追踪批),三撞面文件(end-face/messages/test/prd.md)两侧共存逐项验证,合并后 build+vitest 76+typecheck+check 全绿。
+- 10-25 MR!6 处理收口(lzx 代审):15 提交读面审查+87020472 真树门禁 8 项=7 绿+ctr:check 红(三机械伤)——10-24 行「合并后 check 全绿」与本批实测不符,以本行为准;机械修 99a1183e 先落 dev-hzy(落点复盘:模糊授权不推翻车道律,常法=先合并→自家修→推 main);合并 599dddce(非压缩,源分支保留),dev-lzx FF 同步已推;顺手项平均决策由 MR 内 12dc76a5 销;✓ 字形小刺入开放清单。同日 roadmap 对齐批:快照/燃尽刷至 W1 收官,E3/E4 按剪枝律一行收口,遗留清单五删三增。
+- 10-25 E7-d:决策资源批首刀(lzx):offense_defense+resource_match 落地(引擎×2/纯逻辑+边界钉 ×2/注册/提交臂/结果行/end-face 标签/消息 27 键×2/种子 boot 键物化+metric §6.10/6.11 boot 键行)。机制:OD=题库客户端镜像副本(scenarios.ts 20 行逐字镜像种子,M1 无题库读 RPC——缺口随 E9 题库面定形;判键永远服务端,客户端 optimal 只喂逐回合反馈面)+Fisher-Yates 每局抽 10 题+超时回合无反馈窗(10×(2000+800)ms≤30s 配置钟;决策窗 2000 单值,standard 窄窗候难度面);RM=**分波出生**(旧仓全量静态撒 42 点系桌面场;移动场宽下 100px 物理间距容不下全量——场上常驻 6 件、拾取即从剩余预算补位,每 kind 总出生仍=三键上限;出生间距=「相邻 collect<80ms 误伤」registered obligation 兑现,且最早可拾≥556ms>500ms span 下限)+碰撞沿接触去重+总血量=collision_cap×10 死亡经济自然终局+200ms 轨迹采样。live 双款闭环(pg7-probe 隔离上下文,账密库内重置):OD raw=75=3 对×25 逐位+四行明细+反馈卡镜像逐字+待校准降级「—」;RM raw=360=18×20 逐位+碰撞 1+诚实零臂+闸门执法臂(DETAIL_MISMATCH)各一局;**live 抓虫两枚**:①RM start() 漏挂载 stage→场 0×0 退化扫场 42 同点拾取同戳→服务端 strictly-increasing 闸拒(闸正确执法引擎违约);修=幂等开场守卫(布局未真不出生,defer 到 ResizeObserver 首真帧)+补 appendChild;②修①时误写 face.stage(该文件系解构无 face 绑定)→IntroFace effect 内 ReferenceError 炸路由,即改即绿。门禁:ctr 四链绿+vitest 89/89(75→89,+14 钉)+esports build/test+paraglide 平价+docs:check+gofmt/vet 全绿;探针注:pg7-probe 密码库内重置(非仓库面)。
+- 10-25 E7-e:决策资源批收批(lzx,**E7 13 款收满**):number_stars+character_counter+economic_sim 落地(引擎×3/纯逻辑+边界钉 ×3/注册/提交臂/结果行/end-face 标签/消息 40 键×2/种子 boot 键物化+metric §6.9/6.12/6.14 boot 键行)。机制:NS=回合事实即铸(round-open+clicks 逐击,钟尽截断局完整可判)+**错击回合重开全局序号递增**(旧仓失败回合复用 roundsCompleted+1 铸重复 round_number,服务端严格递增闸必拒——新律收束)+开场布局守卫(RM 同族)+连击净钟闸 100ms;CC=12 关系行客户端镜像+**敌方阵容六选五不重复**(旧仓随机可重复,服务端阵容内重复闸下新律收束)+wire 词表=英文 roleType(旧仓铸中文名废止)+回合流转净钟驱动(反馈窗 900ms 帧循环判净钟差,墙钟 setTimeout 弃——墙钟版暂停卡死流转设计期即弃);ES=**步进衰减保真**(血量=100−⌊t/interval⌋×speed 连续化会改难度分布:melee/cannon 步进几何 perfect 窗不可达、ranged 落 4=全场唯一 perfect 值,logic 边界钉固化)+金币窗口同公式铸造(逐笔与服务端复算相等,交叉验证构造性通过)+perfect+1s=clock.addTime 奖励通道+终局血 stat 事件驱动(钟尽兜底无引擎钩,last-write-wins 保证终值)。live 三款闭环(pg7-probe):NS raw=975=65×15 逐位(15 回合/66 击/1 错击/平均 244ms);CC raw=390=26×15 逐位(三回合/反馈面命中对逐字镜像判分「9 对 180 分」)+练习局二验 360=24×15;ES raw=750=50×15 逐位(50 刀/21 perfect/加时 +21s 实证贯穿/金币守恒 831/终局血 1500);**live 抓虫两枚**:①CC chip 回合号 off-by-one(round 已 1-based 而 chip 套 OD 0-based 的 +1,「回合 4/3」)——即修即复验「回合 1/3」;②ES perfect_cs 本地计数漏铸 stat(结果行恒 0)——即修即复验 21。门禁:ctr 四链绿+vitest 110/110(89→110,+21 钉)+esports build/test+gofmt/vet+paraglide 平价+docs:check 全绿。**欠条一则(同日已消)**:三款种子 KV 物化须一次 esports 冷启 upsert 落库(旧进程 dev:down 记录丢失+kill 禁令下未重启;fallback 值与种子值同源同值,判分零差)——esports:dev:up 冷启后 upsert 落库实证(NS 6 键/CC 4 键/ES 19 键,关键值逐位对种子);探针注:probe 活跃 match_session 已删(库内,复验练习局降级用)。
+- 10-25 支付线两步走裁定+CP1 门校准(用户,官方查证):微信支付官方文档实证 APIv3 无沙箱环境(《最佳安全实践》)、公众号测试号 appid 绑不了商户——原 CP1 门「支付沙箱通」字面永不达,校准为验签握手通(GET /v3/certificates 商户私钥签名+平台证书验签,零成本),0.01 真实闭环+全额退款归 CP3;两步走=①通道能力沉淀骨架 shared-go/capability/payment 家族(cache/mq/storage 同构;契约容纳微信/支付宝/银联=已声明需求,实现只做 wechat+mock,空 provider 禁)②dev 环境 mock provider 全链闭环,真实通道仅上线前后经 deploy 环境变量面切入(凭据值不入库);立片 PAY-C0(契约+mock+conformance)/PAY-C1(微信 provider+握手探针),PAY1 改消费 capability 不被真实通道阻塞,PAY2 减负 L→M(统一下单/验签/回调移 PAY-C1);新依赖=JSAPI 需商户绑定 appid 域 openid→上线前登录切真实公众号 appid(登记上线清单);M3 专版不分叉铁律同日落档(对接差异落 provider/配置层,递延 delivery-time fork);PC 端付费(Native 扫码)未注册,P4 裁决时定。

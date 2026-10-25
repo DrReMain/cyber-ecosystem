@@ -91,7 +91,7 @@
   --color-veil: rgba(11, 18, 32, 0.72);
 
   /* Ambient orbs — page backdrop atmosphere. The palette is the prototype's
-   * five-tone set; placement is per-page art direction carried by the
+   * seven-tone set; placement is per-page art direction carried by the
    * AmbientBackdrop props (the login trio is the shared default). Solid
    * circles at blur 70px / rest opacity .26 = the prototype's .blob form. */
   --color-ambient-purple: #7c3aed;
@@ -99,6 +99,8 @@
   --color-ambient-cyan: #06b6d4;
   --color-ambient-indigo: #1d4ed8;
   --color-ambient-teal: #0e7490;
+  --color-ambient-orange: #ea580c;
+  --color-ambient-violet: #4f46e5;
 
   /* Links — the prototype's one .link voice, cyan on every surface */
   --color-link: #22d3ee;

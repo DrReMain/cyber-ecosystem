@@ -88,11 +88,19 @@ export function SetupGamesPage() {
     setCustoms((prev) => [...prev, value]);
     setPicked((prev) => [...prev, value]);
     setDraft("");
+    toast.info(m.profile_setup_games_added_toast({ name: value }));
   }
 
   function removeCustom(name: string): void {
     setCustoms((prev) => prev.filter((x) => x !== name));
     setPicked((prev) => prev.filter((x) => x !== name));
+  }
+
+  // The custom chip body toggles its vote; only the × removes the entry
+  // (the prototype keeps added games listed while unselected).
+  function toggleCustom(name: string): void {
+    setError(null);
+    setPicked((prev) => (prev.includes(name) ? prev.filter((x) => x !== name) : [...prev, name]));
   }
 
   const fpsVotes = picked.filter((id) =>
@@ -102,6 +110,7 @@ export function SetupGamesPage() {
     (groups.byCategory.get("moba") ?? []).some((g) => g.id === id),
   ).length;
   const totalPicked = picked.length;
+  const unclassified = totalPicked - fpsVotes - mobaVotes;
 
   async function onDone() {
     if (totalPicked === 0) {
@@ -170,25 +179,18 @@ export function SetupGamesPage() {
         ))}
       </div>
 
-      {totalPicked > 0 && (
-        <p className="text-ink-tertiary text-center text-[11px]">
-          {m.profile_setup_games_vote({
-            fps: fpsVotes,
-            moba: mobaVotes,
-            n: totalPicked,
-          })}
-          {fpsVotes === mobaVotes
-            ? m.profile_setup_games_tie()
-            : ` ${m.profile_setup_games_default({ type: fpsVotes > mobaVotes ? "FPS" : "MOBA" })}`}
-        </p>
-      )}
-
       <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
         <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_games_custom_title()}
         </div>
-        <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed">
-          {m.profile_setup_games_custom_desc()}
+        <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed whitespace-pre-line">
+          {m.profile_setup_games_custom_desc_lead()}
+          <span className="font-bold">{m.profile_setup_games_custom_desc_un()}</span>
+          {m.profile_setup_games_custom_desc_mid()}
+          <span className="font-bold">{m.profile_setup_games_custom_desc_cap()}</span>
+          {m.profile_setup_games_custom_desc_mid2()}
+          <span className="font-bold">{m.profile_setup_games_custom_desc_x()}</span>
+          {m.profile_setup_games_custom_desc_tail()}
         </p>
         <div className="flex gap-2">
           <input
@@ -222,26 +224,49 @@ export function SetupGamesPage() {
           }`}
         >
           <span>
-            {m.profile_setup_games_cap({
-              cap: CUSTOM_CAP,
-              n: customs.length,
-            })}
+            {customs.length >= CUSTOM_CAP
+              ? m.profile_setup_games_cap_full({
+                  cap: CUSTOM_CAP,
+                  n: customs.length,
+                })
+              : m.profile_setup_games_cap({
+                  cap: CUSTOM_CAP,
+                  n: customs.length,
+                })}
           </span>
         </div>
         {customs.length > 0 && (
           <div className="mt-2.5 flex flex-wrap gap-2">
-            {customs.map((name) => (
-              <button
-                aria-label={m.profile_setup_games_remove({ name })}
-                className="tap-zone border-line bg-surface-content text-ink-muted rounded-tile flex items-start gap-1.5 border px-2.5 py-[7px] text-xs active:opacity-60"
-                key={name}
-                onClick={() => removeCustom(name)}
-                type="button"
-              >
-                <span className="min-w-0 flex-1 text-left leading-[1.45] break-all">{name}</span>
-                <X aria-hidden className="text-ink-tertiary mt-0.5 shrink-0" size={14} />
-              </button>
-            ))}
+            {customs.map((name) => {
+              const on = picked.includes(name);
+              return (
+                <div
+                  className={`rounded-tile flex items-start gap-1.5 border px-2.5 py-[7px] text-xs ${
+                    on
+                      ? "border-ambient-blue bg-ambient-blue/18 text-accent-info font-bold"
+                      : "border-line bg-surface-content text-ink-muted"
+                  }`}
+                  key={name}
+                >
+                  <button
+                    aria-pressed={on}
+                    className="tap-zone min-w-0 flex-1 text-left leading-[1.45] break-all active:opacity-60"
+                    onClick={() => toggleCustom(name)}
+                    type="button"
+                  >
+                    {name}
+                  </button>
+                  <button
+                    aria-label={m.profile_setup_games_remove({ name })}
+                    className="text-ink-tertiary hover:text-danger-text mt-0.5 shrink-0 active:opacity-60"
+                    onClick={() => removeCustom(name)}
+                    type="button"
+                  >
+                    <X aria-hidden size={14} />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -249,6 +274,31 @@ export function SetupGamesPage() {
       {error !== null && (
         <p className="text-danger-text text-[11.5px]" role="alert">
           {error}
+        </p>
+      )}
+
+      {totalPicked > 0 && (
+        <p className="text-ink-tertiary text-center text-[11px]">
+          {unclassified > 0
+            ? m.profile_setup_games_vote_un({
+                fps: fpsVotes,
+                moba: mobaVotes,
+                n: totalPicked,
+                un: unclassified,
+              })
+            : m.profile_setup_games_vote({
+                fps: fpsVotes,
+                moba: mobaVotes,
+                n: totalPicked,
+              })}
+          {` ${m.profile_setup_games_default_lead()}`}
+          <span className="font-bold">
+            {fpsVotes > mobaVotes
+              ? "FPS"
+              : mobaVotes > fpsVotes
+                ? "MOBA"
+                : m.profile_setup_games_tie()}
+          </span>
         </p>
       )}
 
