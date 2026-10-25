@@ -89,6 +89,17 @@ func Open() (*payment.Payment, *Controller) {
 	return &payment.Payment{Gateway: b, Notifier: b, Reports: b}, &Controller{b: b}
 }
 
+// ControllerOf recovers the Controller from a container this package built —
+// the dev/e2e face over a backend a platform assembled from config, where
+// production code reaches only the contract.
+func ControllerOf(p *payment.Payment) (*Controller, bool) {
+	b, ok := p.Gateway.(*backend)
+	if !ok {
+		return nil, false
+	}
+	return &Controller{b: b}, true
+}
+
 func txIDFor(outTradeNo string) string {
 	var nonce [4]byte
 	if _, err := rand.Read(nonce[:]); err != nil {

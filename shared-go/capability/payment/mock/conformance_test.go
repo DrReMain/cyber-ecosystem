@@ -660,3 +660,16 @@ func TestParseMalformedEnvelopes(t *testing.T) {
 		t.Errorf("signed garbage: want ErrInvalidSignature, got %v", err)
 	}
 }
+
+func TestControllerOf(t *testing.T) {
+	p, _ := Open()
+	ctrl, ok := ControllerOf(p)
+	if !ok || ctrl == nil {
+		t.Fatalf("mock container: ok=%v ctrl=%v", ok, ctrl)
+	}
+	// The dev face exists only over a container this package built — a
+	// foreign or half-built container never yields one.
+	if _, ok := ControllerOf(&payment.Payment{}); ok {
+		t.Error("foreign container must not yield a controller")
+	}
+}
