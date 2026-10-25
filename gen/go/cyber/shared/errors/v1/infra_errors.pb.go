@@ -356,3 +356,101 @@ func IsInfraErrorMqTimeout(err error) bool {
 func ErrorInfraErrorMqTimeout(format string, args ...interface{}) *errors.Error {
 	return errors.New(504, InfraError_INFRA_ERROR_MQ_TIMEOUT.String(), fmt.Sprintf(format, args...))
 }
+
+// 35xx: Payment
+func IsInfraErrorPaymentInvalidArgument(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT.String() && e.Code == 400
+}
+
+// 35xx: Payment
+func ErrorInfraErrorPaymentInvalidArgument(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, InfraError_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorPaymentNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_PAYMENT_NOT_FOUND.String() && e.Code == 404
+}
+
+func ErrorInfraErrorPaymentNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, InfraError_INFRA_ERROR_PAYMENT_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorPaymentDuplicate(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_PAYMENT_DUPLICATE.String() && e.Code == 409
+}
+
+func ErrorInfraErrorPaymentDuplicate(format string, args ...interface{}) *errors.Error {
+	return errors.New(409, InfraError_INFRA_ERROR_PAYMENT_DUPLICATE.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorPaymentChannelRejected(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_PAYMENT_CHANNEL_REJECTED.String() && e.Code == 422
+}
+
+func ErrorInfraErrorPaymentChannelRejected(format string, args ...interface{}) *errors.Error {
+	return errors.New(422, InfraError_INFRA_ERROR_PAYMENT_CHANNEL_REJECTED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorPaymentUnavailable(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_PAYMENT_UNAVAILABLE.String() && e.Code == 503
+}
+
+func ErrorInfraErrorPaymentUnavailable(format string, args ...interface{}) *errors.Error {
+	return errors.New(503, InfraError_INFRA_ERROR_PAYMENT_UNAVAILABLE.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorPaymentTimeout(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_PAYMENT_TIMEOUT.String() && e.Code == 504
+}
+
+func ErrorInfraErrorPaymentTimeout(format string, args ...interface{}) *errors.Error {
+	return errors.New(504, InfraError_INFRA_ERROR_PAYMENT_TIMEOUT.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorPaymentInvalidSignature(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE.String() && e.Code == 400
+}
+
+func ErrorInfraErrorPaymentInvalidSignature(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, InfraError_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorPaymentDecryptFailed(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_PAYMENT_DECRYPT_FAILED.String() && e.Code == 400
+}
+
+func ErrorInfraErrorPaymentDecryptFailed(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, InfraError_INFRA_ERROR_PAYMENT_DECRYPT_FAILED.String(), fmt.Sprintf(format, args...))
+}
