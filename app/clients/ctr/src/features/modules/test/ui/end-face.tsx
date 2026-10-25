@@ -99,13 +99,13 @@ function TierChip({ grade }: Readonly<{ grade: string | undefined }>) {
   const tier = grade !== undefined ? TIERS[grade] : undefined;
   if (tier === undefined) {
     return (
-      <span className="rounded-full bg-[rgba(107,114,128,0.15)] px-2.5 py-[3px] text-[11px] font-extrabold text-[#6b7280]">
+      <span className="rounded-full bg-[rgba(107,114,128,0.15)] px-2.5 py-0.75 text-[11px] font-extrabold text-[#6b7280]">
         {m.test_grade_off()}
       </span>
     );
   }
   return (
-    <span className={`rounded-full px-2.5 py-[3px] text-[11px] font-extrabold ${tier.cls}`}>
+    <span className={`rounded-full px-2.5 py-0.75 text-[11px] font-extrabold ${tier.cls}`}>
       {grade} · {tier.cn()}
     </span>
   );
@@ -117,10 +117,8 @@ function RetakeChip({ left, max }: Readonly<{ left: number; max: number }>) {
   const spent = left <= 0;
   return (
     <span
-      className={`rounded-full px-2.5 py-[3px] text-[10.5px] font-semibold ${
-        spent
-          ? "text-status-pending bg-[rgba(245,158,11,0.18)]"
-          : "text-ink-muted bg-[rgba(107,114,128,0.18)]"
+      className={`rounded-full px-2.5 py-0.75 text-[10.5px] font-semibold ${
+        spent ? "text-status-pending bg-status-pending-bg" : "text-ink-muted bg-status-lock-bg"
       }`}
     >
       {m.test_result_retake_chip({ left, max })}
@@ -156,7 +154,7 @@ function VerdictCard({
   const maxRetakes = step !== null ? (step.firstSession ? 3 : 1) : 0;
   const retakeLeft = verdict.phase === "done" ? verdict.retestLeft : (step?.retestLeft ?? 0);
   return (
-    <div className="border-line bg-surface-card rounded-card border px-4 py-[18px] text-center">
+    <div className="border-line bg-surface-card rounded-card border px-4 py-4.5 text-center">
       {word !== null ? (
         <div className="text-ink-tertiary text-[11px]">
           {m.test_result_ability_line({ ability: word.cn, name: testName })}
@@ -181,7 +179,7 @@ function VerdictCard({
         </>
       )}
       {verdict.phase === "done" && !verdict.valid && (
-        <div className="text-status-pending rounded-control mt-3 border border-[rgba(245,158,11,0.45)] bg-transparent px-[13px] py-3 text-left text-[12px] leading-[1.85]">
+        <div className="text-status-pending rounded-control mt-3 border border-[rgba(245,158,11,0.45)] bg-transparent px-3.25 py-3 text-left text-[12px] leading-[1.85]">
           <span className="font-bold">{m.test_verdict_invalid()}</span>
           <span className="opacity-80"> · {invalidCopy(verdict.invalidReason)}</span>
         </div>
@@ -235,11 +233,11 @@ export function EndFace({
     <div className="bg-canvas absolute inset-0 isolate z-40 overflow-y-auto">
       <div
         aria-hidden
-        className="pointer-events-none absolute top-[-80px] left-[-70px] size-[min(69vw,260px)] rounded-full bg-[#2563eb] opacity-26 blur-[70px]"
+        className="pointer-events-none absolute -top-20 -left-17.5 size-[min(69vw,260px)] rounded-full bg-[#2563eb] opacity-26 blur-[70px]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[-70px] bottom-[-60px] size-[min(59vw,220px)] rounded-full bg-[#06b6d4] opacity-26 blur-[70px]"
+        className="bg-ambient-cyan pointer-events-none absolute -right-17.5 -bottom-15 size-[min(59vw,220px)] rounded-full opacity-26 blur-[70px]"
       />
       <div className="relative mx-auto w-full max-w-md px-4 pb-6">
         <div className="flex items-center gap-3 pt-5 pb-2.5">
@@ -261,7 +259,7 @@ export function EndFace({
           ) : null}
         </div>
         {step !== null ? (
-          <div className="mb-[14px]">
+          <div className="mb-3.5">
             <ProgStrip currentIndex={step.index} doneCodes={step.doneCodes} lineup={step.lineup} />
           </div>
         ) : null}
@@ -275,7 +273,7 @@ export function EndFace({
             </div>
             {rows.map((row) => (
               <div
-                className="flex items-center justify-between border-b border-[rgba(55,65,81,0.45)] py-[9px] last:border-b-0"
+                className="flex items-center justify-between border-b border-[rgba(55,65,81,0.45)] py-2.25 last:border-b-0"
                 key={row.key}
               >
                 <span className="text-ink-muted text-[12.5px]">
@@ -288,7 +286,7 @@ export function EndFace({
 
           <div className="flex flex-col gap-3">
             <Button
-              className={`bg-cta-practice shadow-cta-practice rounded-control w-full cursor-pointer px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 ${
+              className={`bg-cta-practice shadow-cta-practice rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80 ${
                 spent ? "pointer-events-none opacity-45" : ""
               }`}
               onPress={onRetry}
@@ -297,14 +295,14 @@ export function EndFace({
             </Button>
             {next !== undefined ? (
               <Button
-                className="bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+                className="bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
                 onPress={() => void navigate({ to: "/test/$code", params: { code: next.code } })}
               >
                 {m.test_result_next({ ability: abilityWord(next.ability).cn })}
               </Button>
             ) : (
               <Button
-                className="bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+                className="bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
                 onPress={onExit}
               >
                 {m.test_result_finish()}
