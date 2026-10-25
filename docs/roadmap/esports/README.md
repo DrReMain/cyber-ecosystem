@@ -101,6 +101,8 @@
 | D-AK | **视觉对齐双轨口径(2026-10-23 用户)**:ctr 侧=设计稿已定义部分高度对齐(像素级,值对齐),未定义部分可增强(动效等,静止帧=像素锚);admin 侧=不做样式像素对齐(antd+皮肤系统),对齐对象=**交互流+文案**(对照 `design-systems/admin/` 原型:行内动作/Tab 结构/确认流程/标题/列名/空态/确认语)。对齐真源=活原型 `manage/design-systems/ctr/prototype/`(44 页交互基线,`_base.css` 单源)与 admin 原型目录 |
 | D-AL | **ljr 材料全量吸收收口(2026-10-23,用户质询「实现与需求/原型偏差」触发)**:manage 仓真源导览=DESIGN_DOC_MAP+DOC_INVENTORY(引用先过权威等级表,coverage §六律不变);本日增量吸收锚=LOGIC_AUDIT 细则(续测 7 天反推/切后台 is_valid 入库/档位快照/较上局=上一场/完整度 X/8)、GAME_LOGIC_SPEC(match_config 种子+副能力 4 行 0.5)、溯源 PRD(user:*:view 分区权限点)、admin IA 9 模块、BLOCK5 三层架构、题库表语义(offense_scenario/角色克制)、旧库 openspec/changes 两份指针(agreement-consent/membership-pay)、备案四落点+年龄计算契约(满 N 岁=生日次日)、FRONTEND_TECH_STANDARD 10-02 两悬案(记录性:新仓 TanStack Start 天然覆盖 SEO 面,不构成约束)。**核对结论:E3 已定稿七款×单位分表逐款吻合零返工;metric.md M1-M10/档位套/校准 C1-C4 已在,零改动**;已建面 B 批修正清单=coverage §七.5。影响面:纯文档校准零代码,CP 口径不变 |
 | D-AM | **P12 定案(2026-10-23 ljr)**:moving_target 主能力=**trackingStability**(维持种子/编排/metric.md 现状,零代码)——判据:①原型编排池(消费方)+⑤玩法语义(每秒完美追踪/三态机/M 槽全追踪语义)+⑥块5 指标规格明文「类 Aimlabs Tracking,追踪能力 trackingStability」(ljr 补证)+⑦新仓已冻面(E3-j 定稿卡/种子/E4 e2e 全按 TS);反方最强证④ B2 拍板「主=AA」属旧聚合模型口径(旧 AA 图表需 Contributors),新仓编排下 AA 池已有两款。影响面:B2 的 moving_target→TS 0.5 次贡献行在 TS 主下语义自矛盾,判陈旧删除(与 D-AD 同构);P12 移出 §2.2 |
+| D-AN | **P17 五问定案(2026-10-25 ljr;连带关闭 P8/P11)**:①性别**进契约**——三态枚举(男/女/待确定),E5 同龄基准=同龄同性别(2.5d 口径),协议 privacy c1 性别行保留,wechat_sex 1/2/0→男/女/待确定,hzy 补性别卡;②年龄**维持单轨 birth**(D-U 不变,V2 降级卡判删)——P11 关闭;③微信昵称胶囊**不入窗**随账号批(scope 升级属 system 基座);④游戏种子**按原型 9 款国服口径重播**(CS2/无畏契约/守望先锋/APEX/和平精英+王者荣耀/英雄联盟/DOTA2/决战平安京);⑤「命中偏好×1.5」句**确认弃**(维持 D-E)——P8 关闭 |
+| D-AO | **杂项批(2026-10-25 ljr)**:①ICP 备案权威串=**浙ICP备2026028293号**(带「备」,工信部标准格式;LOGIC_AUDIT 2.5b 缺「备」版判笔误;上线前 beian.miit.gov.cn 复核一次);②自定义游戏偏好上限=**3**(产品口径,随 E9 config 读面下发;服务端 20 仅为防御性总量上限不动);③P16-Q3:称号词(专业/优秀/良好/待提升)E5 沿用,「未评级」chip 维持+注文案「该款常模积累中,暂无权威档位」 |
 
 ### 2.2 待裁(Owner + 时点;背景与候选案在 prd.md 对应条目展开)
 
@@ -111,8 +113,6 @@
 | P5 | 营销渠道域范围与 SKU 一套 vs 两套 | ljr | 上线后(已按 D-M 梯①移出承诺窗口) |
 | P6 | cutover 演练日程与回滚预案确认 | 用户 | 12-07(W8)前 |
 | P7 | 会员态付费墙视觉稿(期内隐藏单次只留续费) | ljr | **12-02 前支付联调依赖** |
-| P8 | C 端画像性别字段(旧仓仅设计未实现、新仓三处冻结口径均无;E5 同龄基准是否分性别为唯一潜在消费者;2026-10-23 D-AL 增证:LOGIC_AUDIT 2.5d 已拍同龄基准=**同龄同性别**,待确定只同龄——性别即其唯一输入,口径备选=旧仓 wechat_sex 1男/2女/0未知/NULL) | ljr | E5 规格定稿前(W4 末);2026-10-22 增:协议 privacy c1 双语正文列有「性别」,若裁不采集须同步删文 |
-| P11 | 画像年龄采集:契约单轨 birth(D-U 冻结)vs 原型双轨(band-only 亦合法+birth 自动带出档,LOGIC_AUDIT ⑭;V2 视觉批曾自创「降级卡」=PRD 未定义形态) | ljr | B 批修正片前(E3-f 收口后) |
 | P10 | ctr 语言切换常驻入口形态(候选:无常驻/头部轻量/个人中心设置行;原型无锚,EN 经 URL 前缀可达) | ljr | 随 P4(11 月底前) |
 | P13 | 窗外豁免签认单(S4 终局对账,2026-10-23):消息中心+反馈(双端)、分享裂变、渠道版 scheme-b、rank·pk/upload 补传废弃、学校报告读面(随 P14)、报告配置面/协议版本管理/compliance-config admin 页(BLOCK5 §九 Phase2 期望 vs D-M 梯①错位)——逐项签认窗外或召回;评级管理不入此单(D-M 梯①已裁) | ljr+用户 | **CP2(11-22)前** |
 | P14 | school→租户迁移时序(S4):migration.md 顺序第 2 步「组织」排 W9 切换日,但租户模型属 M3 窗外——候选 A=school 冷存保真+M3 二次迁移(与 D-C2 一致,推荐)/B=M3 最小模型前拉;连带报告快照读面归属(E5b 或 M3) | 用户+开发 | MIG1 开工前(建议 W6) |
@@ -153,3 +153,4 @@
 - 2026-10-23 台账整理:D-AF/D-AG 行断裂修复;本节收敛为非裁决事件行——裁决类变更一律见 §2 台账(自带日期与影响面),切片交付事实记 progress.md,证据归提交信息。
 - 2026-10-23 骨架批(biome 2.6.2+target 单源迁移):biome 2.5.15→2.6.2、11 包 npm scripts 全量迁入 project.json、gen 手工壳扩项、双客户端 Dockerfile 改 exec 形、AGENTS §3 重写(见 §5 目标单源律)。**协作者拉取后必做:`pnpm install` + `./nx reset`**——不装新 biome 则 check 对 96 文件类序重排(2.6 官方 Tailwind v4 排序所致,预期 churn 勿修复)必假红;biome 规则晋升已迁移抑制注释组路径(noComponentHookFactories 等 nursery→stable),新增 biome-ignore 须用规则当前组路径。
 - 2026-10-23 D-AM:P12 定案 moving_target 主能力=trackingStability(零代码;B2 次 0.5 行判陈旧删);P12 移出 §2.2。
+- 2026-10-25 D-AN/D-AO:P17 五问+P8/P11 关闭(性别进契约/单轨 birth/胶囊随账号批/种子国服重播/×1.5 弃句);ICP 串带「备」;偏好上限 3 config 下发;P16-Q3 称号沿用。
