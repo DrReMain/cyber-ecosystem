@@ -11,12 +11,13 @@ import (
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
+	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
-const customGameCap = 20
+const customGameHardCap = 20 // the defensive ceiling mirroring the contract's static bound — the business cap is config-borne
 
 // DO ------------------------------------------------------------------------------------------------------------------
 
@@ -61,16 +62,24 @@ type ProfileRP interface {
 
 type ProfileUC struct {
 	shared.UC
-	profileRP ProfileRP
-	gameRP    game.GameRP
+	profileRP     ProfileRP
+	gameRP        game.GameRP
+	customGameCap int
 }
 
-func NewProfileUC(logger *slog.Logger, tm shared.Transaction, profileRP ProfileRP, gameRP game.GameRP) *ProfileUC {
-	return &ProfileUC{
-		UC:        shared.NewUC(logger.With("module", "module/profile"), tm),
-		profileRP: profileRP,
-		gameRP:    gameRP,
+func NewProfileUC(logger *slog.Logger, tm shared.Transaction, profileRP ProfileRP, gameRP game.GameRP, c *conf.Profile) (*ProfileUC, error) {
+	capValue := int(c.GetCustomGameCap())
+	if c == nil || capValue < 1 || capValue > customGameHardCap {
+		// Construction is total, a malformed block fails the boot — the
+		// payment block's law, applied to the preference cap.
+		return nil, fmt.Errorf("profile config: custom_game_cap must sit within 1..%d, got %d", customGameHardCap, capValue)
 	}
+	return &ProfileUC{
+		UC:            shared.NewUC(logger.With("module", "module/profile"), tm),
+		profileRP:     profileRP,
+		gameRP:        gameRP,
+		customGameCap: capValue,
+	}, nil
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -140,7 +149,7 @@ func (uc *ProfileUC) Update(ctx context.Context, in *UpdateIn) (*Profile, error)
 // Private -------------------------------------------------------------------------------------------------------------
 
 func (uc *ProfileUC) buildGames(ctx context.Context, pref *GamePreference) ([]types.GameEntry, error) {
-	if len(pref.CustomNames) > customGameCap {
+	if len(pref.CustomNames) > uc.customGameCap {
 		return nil, esportspb.ErrorEsportsProfileCustomGameCap("")
 	}
 	if len(pref.GameIDs) > 0 {

@@ -21,15 +21,19 @@ var seedGames = []struct {
 	Category    string
 	Description string
 }{
-	{"lol", "英雄联盟", "moba", "MOBA竞技游戏"},
-	{"dota2", "Dota 2", "moba", "MOBA竞技游戏"},
-	{"honor", "王者荣耀", "moba", "MOBA竞技游戏"},
-	{"csgo", "CS:GO", "fps", "第一人称射击游戏"},
-	{"valorant", "Valorant", "fps", "第一人称射击游戏"},
-	{"pubg", "PUBG", "fps", "第一人称射击游戏"},
-	{"apex", "Apex Legends", "fps", "第一人称射击游戏"},
+	// The national-server nine the replay ruling adopted from the
+	// prototype's own defaultGenre pools — the titles this audience
+	// actually runs; codes stay where the title survives and are minted
+	// for the two newcomers (Game for Peace, Onmyoji Arena).
+	{"cs2", "CS2", "fps", "第一人称射击游戏"},
+	{"valorant", "无畏契约", "fps", "第一人称射击游戏"},
 	{"overwatch", "守望先锋", "fps", "第一人称射击游戏"},
-	{"fortnite", "Fortnite", "fps", "大逃杀射击游戏"},
+	{"apex", "APEX", "fps", "第一人称射击游戏"},
+	{"peace", "和平精英", "fps", "第一人称射击游戏"},
+	{"honor", "王者荣耀", "moba", "MOBA竞技游戏"},
+	{"lol", "英雄联盟", "moba", "MOBA竞技游戏"},
+	{"dota2", "DOTA2", "moba", "MOBA竞技游戏"},
+	{"onmyoji_arena", "决战平安京", "moba", "MOBA竞技游戏"},
 }
 
 var seedTests = []struct {
