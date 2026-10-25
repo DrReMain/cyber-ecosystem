@@ -112,12 +112,17 @@ type MatchSessionLaw interface {
 
 type TestUC struct {
 	shared.UC
-	testRP   TestRP
-	matchLaw MatchSessionLaw
+	testRP    TestRP
+	matchLaw  MatchSessionLaw
+	grantHook TrialGrantHook
 }
 
-func NewTestUC(logger *slog.Logger, tm shared.Transaction, testRP TestRP, matchLaw MatchSessionLaw) *TestUC {
-	return &TestUC{UC: shared.NewUC(logger.With("module", "module/test"), tm), testRP: testRP, matchLaw: matchLaw}
+type TrialGrantHook interface { // the entitlement domain's seam into completion; best-effort — it absorbs its own errors so a stored attempt is never lost
+	OnTrialCompleted(ctx context.Context, userID, recordID string)
+}
+
+func NewTestUC(logger *slog.Logger, tm shared.Transaction, testRP TestRP, matchLaw MatchSessionLaw, grantHook TrialGrantHook) *TestUC {
+	return &TestUC{UC: shared.NewUC(logger.With("module", "module/test"), tm), testRP: testRP, matchLaw: matchLaw, grantHook: grantHook}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -250,6 +255,11 @@ func (uc *TestUC) Submit(ctx context.Context, in *esportspb.SubmitTestAttemptReq
 	rec, err = uc.storeAttempt(ctx, rec, binding)
 	if err != nil {
 		return nil, err
+	}
+	if rec.Valid && uc.grantHook != nil {
+		// The stored attempt is the truth; the derived grant rides beside
+		// it best-effort, never in front of it.
+		uc.grantHook.OnTrialCompleted(ctx, rec.UserID, rec.ID)
 	}
 	if rec.SessionID != nil {
 		// The stored ordinal is the claim's truth — a concurrent submit may

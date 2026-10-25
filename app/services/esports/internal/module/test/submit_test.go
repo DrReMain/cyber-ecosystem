@@ -326,7 +326,7 @@ func submitFixture() (*fakeSubmitRP, *fakeSessionLaw, *TestUC) {
 		},
 	}
 	law := &fakeSessionLaw{}
-	return rp, law, NewTestUC(slog.Default(), nil, rp, law)
+	return rp, law, NewTestUC(slog.Default(), nil, rp, law, nil)
 }
 
 type fakeSessionLaw struct {

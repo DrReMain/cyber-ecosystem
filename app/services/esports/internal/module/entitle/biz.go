@@ -307,3 +307,25 @@ func (uc *EntitleUC) SetReportAccessPolicy(ctx context.Context, family, policy s
 	uc.Log.Info("report access policy set", "report_type", family, "policy", policy, "updated_by", subject.UserID)
 	return nil
 }
+
+func (uc *EntitleUC) OnTrialCompleted(ctx context.Context, userID, recordID string) {
+	// The member plane's derived grant: a valid trial finished while a
+	// membership is active unlocks that record permanently. The ruling
+	// names no retroactivity — the hook running at completion time is what
+	// enforces it. Best-effort by contract: the attempt is stored truth no
+	// grant failure may destroy, so errors land as logs, never on the
+	// submit's caller.
+	active, err := uc.entRP.HasActiveMembership(ctx, userID)
+	if err != nil {
+		uc.Log.Error("membership trial grant check failed", "user_id", userID, "record_id", recordID, "err", err)
+		return
+	}
+	if !active {
+		return
+	}
+	if err := uc.entRP.Grant(ctx, &EntitlementGrant{
+		UserID: userID, ScopeKind: shared.ScopeTrial, ScopeRef: &recordID, Source: "membership",
+	}); err != nil {
+		uc.Log.Error("membership trial grant failed", "user_id", userID, "record_id", recordID, "err", err)
+	}
+}

@@ -22,6 +22,7 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/ent"
+	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
@@ -220,6 +221,33 @@ func TestEntitleLiveE2E(t *testing.T) {
 	}
 	if err := uc.SetReportAccessPolicy(adminCtx, reportCognitive, policyTenant); !esportspb.IsEsportsReportPolicyNotReady(err) {
 		t.Fatalf("tenant policy refused: err=%v", err)
+	}
+
+	// The completion hook: userB's membership is active so their trial
+	// mints a permanent grant; the member-less racer stays grant-less, and
+	// a repeat call stays one row.
+	recA := "ente2erecord0000001"
+	uc.OnTrialCompleted(context.Background(), userB, recA)
+	ref := recA
+	if row, err := pf.GetClient(context.Background()).Entitlement.Query().
+		Where(entitlement.UserIDEQ(userB), entitlement.ScopeRefEQ(ref)).Only(context.Background()); err != nil {
+		t.Fatalf("membership trial grant: %v", err)
+	} else if row.ScopeKind != shared.ScopeTrial || row.ExpiresAt != nil || row.Source != "membership" {
+		t.Fatalf("membership trial grant shape: %+v", row)
+	}
+	uc.OnTrialCompleted(context.Background(), winner, recA)
+	n, err := pf.GetClient(context.Background()).Entitlement.Query().
+		Where(entitlement.ScopeRefEQ(ref)).Count(context.Background())
+	if err != nil {
+		t.Fatalf("hook memberless count: %v", err)
+	}
+	if n != 1 {
+		t.Fatalf("hook granted %d rows, want 1 (memberless must not grant)", n)
+	}
+	uc.OnTrialCompleted(context.Background(), userB, recA)
+	if n, err := pf.GetClient(context.Background()).Entitlement.Query().
+		Where(entitlement.ScopeRefEQ(ref)).Count(context.Background()); err != nil || n != 1 {
+		t.Fatalf("hook repeat: n=%d err=%v, want 1", n, err)
 	}
 }
 
