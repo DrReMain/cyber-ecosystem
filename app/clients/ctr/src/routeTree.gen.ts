@@ -29,6 +29,7 @@ import { Route as LoginWechatCallbackRouteImport } from './routes/login.wechat.c
 import { Route as ProfileSetupAgeRouteImport } from './routes/profile.setup.age'
 import { Route as ProfileSetupGamesRouteImport } from './routes/profile.setup.games'
 import { Route as ProfileSetupNicknameRouteImport } from './routes/profile.setup.nickname'
+import { Route as ApiPayProviderNotifyRouteImport } from './routes/api/pay/$provider/notify'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -130,6 +131,11 @@ const ProfileSetupNicknameRoute = ProfileSetupNicknameRouteImport.update({
   path: '/setup/nickname',
   getParentRoute: () => ProfileRoute,
 } as any)
+const ApiPayProviderNotifyRoute = ApiPayProviderNotifyRouteImport.update({
+  id: '/api/pay/$provider/notify',
+  path: '/api/pay/$provider/notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
+  '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
+  '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
+  '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
+    | '/api/pay/$provider/notify'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
+    | '/api/pay/$provider/notify'
   id:
     | '__root__'
     | '/'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
+    | '/api/pay/$provider/notify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   AgreementPrivacyRoute: typeof AgreementPrivacyRoute
   AgreementUserRoute: typeof AgreementUserRoute
   TestCodeRoute: typeof TestCodeRoute
+  ApiPayProviderNotifyRoute: typeof ApiPayProviderNotifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -416,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileSetupNicknameRouteImport
       parentRoute: typeof ProfileRoute
     }
+    '/api/pay/$provider/notify': {
+      id: '/api/pay/$provider/notify'
+      path: '/api/pay/$provider/notify'
+      fullPath: '/api/pay/$provider/notify'
+      preLoaderRoute: typeof ApiPayProviderNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -475,6 +495,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgreementPrivacyRoute: AgreementPrivacyRoute,
   AgreementUserRoute: AgreementUserRoute,
   TestCodeRoute: TestCodeRoute,
+  ApiPayProviderNotifyRoute: ApiPayProviderNotifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

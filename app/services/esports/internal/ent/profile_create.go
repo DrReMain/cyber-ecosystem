@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -19,6 +21,7 @@ type ProfileCreate struct {
 	config
 	mutation *ProfileMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -320,6 +323,7 @@ func (_c *ProfileCreate) createSpec() (*Profile, *sqlgraph.CreateSpec) {
 		_node = &Profile{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(profile.Table, sqlgraph.NewFieldSpec(profile.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -375,11 +379,520 @@ func (_c *ProfileCreate) createSpec() (*Profile, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Profile.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.ProfileUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *ProfileCreate) OnConflict(opts ...sql.ConflictOption) *ProfileUpsertOne {
+	_c.conflict = opts
+	return &ProfileUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Profile.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *ProfileCreate) OnConflictColumns(columns ...string) *ProfileUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &ProfileUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// ProfileUpsertOne is the builder for "upsert"-ing
+	//  one Profile node.
+	ProfileUpsertOne struct {
+		create *ProfileCreate
+	}
+
+	// ProfileUpsert is the "OnConflict" setter.
+	ProfileUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ProfileUpsert) SetUpdatedAt(v time.Time) *ProfileUpsert {
+	u.Set(profile.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateUpdatedAt() *ProfileUpsert {
+	u.SetExcluded(profile.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ProfileUpsert) SetDeletedAt(v time.Time) *ProfileUpsert {
+	u.Set(profile.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateDeletedAt() *ProfileUpsert {
+	u.SetExcluded(profile.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ProfileUpsert) ClearDeletedAt() *ProfileUpsert {
+	u.SetNull(profile.FieldDeletedAt)
+	return u
+}
+
+// SetNickname sets the "nickname" field.
+func (u *ProfileUpsert) SetNickname(v string) *ProfileUpsert {
+	u.Set(profile.FieldNickname, v)
+	return u
+}
+
+// UpdateNickname sets the "nickname" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateNickname() *ProfileUpsert {
+	u.SetExcluded(profile.FieldNickname)
+	return u
+}
+
+// ClearNickname clears the value of the "nickname" field.
+func (u *ProfileUpsert) ClearNickname() *ProfileUpsert {
+	u.SetNull(profile.FieldNickname)
+	return u
+}
+
+// SetBirthYear sets the "birth_year" field.
+func (u *ProfileUpsert) SetBirthYear(v int) *ProfileUpsert {
+	u.Set(profile.FieldBirthYear, v)
+	return u
+}
+
+// UpdateBirthYear sets the "birth_year" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateBirthYear() *ProfileUpsert {
+	u.SetExcluded(profile.FieldBirthYear)
+	return u
+}
+
+// AddBirthYear adds v to the "birth_year" field.
+func (u *ProfileUpsert) AddBirthYear(v int) *ProfileUpsert {
+	u.Add(profile.FieldBirthYear, v)
+	return u
+}
+
+// ClearBirthYear clears the value of the "birth_year" field.
+func (u *ProfileUpsert) ClearBirthYear() *ProfileUpsert {
+	u.SetNull(profile.FieldBirthYear)
+	return u
+}
+
+// SetBirthMonth sets the "birth_month" field.
+func (u *ProfileUpsert) SetBirthMonth(v int) *ProfileUpsert {
+	u.Set(profile.FieldBirthMonth, v)
+	return u
+}
+
+// UpdateBirthMonth sets the "birth_month" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateBirthMonth() *ProfileUpsert {
+	u.SetExcluded(profile.FieldBirthMonth)
+	return u
+}
+
+// AddBirthMonth adds v to the "birth_month" field.
+func (u *ProfileUpsert) AddBirthMonth(v int) *ProfileUpsert {
+	u.Add(profile.FieldBirthMonth, v)
+	return u
+}
+
+// ClearBirthMonth clears the value of the "birth_month" field.
+func (u *ProfileUpsert) ClearBirthMonth() *ProfileUpsert {
+	u.SetNull(profile.FieldBirthMonth)
+	return u
+}
+
+// SetAgeBand sets the "age_band" field.
+func (u *ProfileUpsert) SetAgeBand(v string) *ProfileUpsert {
+	u.Set(profile.FieldAgeBand, v)
+	return u
+}
+
+// UpdateAgeBand sets the "age_band" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateAgeBand() *ProfileUpsert {
+	u.SetExcluded(profile.FieldAgeBand)
+	return u
+}
+
+// ClearAgeBand clears the value of the "age_band" field.
+func (u *ProfileUpsert) ClearAgeBand() *ProfileUpsert {
+	u.SetNull(profile.FieldAgeBand)
+	return u
+}
+
+// SetAvatarURL sets the "avatar_url" field.
+func (u *ProfileUpsert) SetAvatarURL(v string) *ProfileUpsert {
+	u.Set(profile.FieldAvatarURL, v)
+	return u
+}
+
+// UpdateAvatarURL sets the "avatar_url" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateAvatarURL() *ProfileUpsert {
+	u.SetExcluded(profile.FieldAvatarURL)
+	return u
+}
+
+// ClearAvatarURL clears the value of the "avatar_url" field.
+func (u *ProfileUpsert) ClearAvatarURL() *ProfileUpsert {
+	u.SetNull(profile.FieldAvatarURL)
+	return u
+}
+
+// SetGuardianConsentedAt sets the "guardian_consented_at" field.
+func (u *ProfileUpsert) SetGuardianConsentedAt(v time.Time) *ProfileUpsert {
+	u.Set(profile.FieldGuardianConsentedAt, v)
+	return u
+}
+
+// UpdateGuardianConsentedAt sets the "guardian_consented_at" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateGuardianConsentedAt() *ProfileUpsert {
+	u.SetExcluded(profile.FieldGuardianConsentedAt)
+	return u
+}
+
+// ClearGuardianConsentedAt clears the value of the "guardian_consented_at" field.
+func (u *ProfileUpsert) ClearGuardianConsentedAt() *ProfileUpsert {
+	u.SetNull(profile.FieldGuardianConsentedAt)
+	return u
+}
+
+// SetGames sets the "games" field.
+func (u *ProfileUpsert) SetGames(v []types.GameEntry) *ProfileUpsert {
+	u.Set(profile.FieldGames, v)
+	return u
+}
+
+// UpdateGames sets the "games" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateGames() *ProfileUpsert {
+	u.SetExcluded(profile.FieldGames)
+	return u
+}
+
+// ClearGames clears the value of the "games" field.
+func (u *ProfileUpsert) ClearGames() *ProfileUpsert {
+	u.SetNull(profile.FieldGames)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Profile.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(profile.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *ProfileUpsertOne) UpdateNewValues() *ProfileUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(profile.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(profile.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(profile.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.UserID(); exists {
+			s.SetIgnore(profile.FieldUserID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Profile.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *ProfileUpsertOne) Ignore() *ProfileUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *ProfileUpsertOne) DoNothing() *ProfileUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the ProfileCreate.OnConflict
+// documentation for more info.
+func (u *ProfileUpsertOne) Update(set func(*ProfileUpsert)) *ProfileUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&ProfileUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ProfileUpsertOne) SetUpdatedAt(v time.Time) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateUpdatedAt() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ProfileUpsertOne) SetDeletedAt(v time.Time) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateDeletedAt() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ProfileUpsertOne) ClearDeletedAt() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetNickname sets the "nickname" field.
+func (u *ProfileUpsertOne) SetNickname(v string) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetNickname(v)
+	})
+}
+
+// UpdateNickname sets the "nickname" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateNickname() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateNickname()
+	})
+}
+
+// ClearNickname clears the value of the "nickname" field.
+func (u *ProfileUpsertOne) ClearNickname() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearNickname()
+	})
+}
+
+// SetBirthYear sets the "birth_year" field.
+func (u *ProfileUpsertOne) SetBirthYear(v int) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetBirthYear(v)
+	})
+}
+
+// AddBirthYear adds v to the "birth_year" field.
+func (u *ProfileUpsertOne) AddBirthYear(v int) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.AddBirthYear(v)
+	})
+}
+
+// UpdateBirthYear sets the "birth_year" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateBirthYear() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateBirthYear()
+	})
+}
+
+// ClearBirthYear clears the value of the "birth_year" field.
+func (u *ProfileUpsertOne) ClearBirthYear() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearBirthYear()
+	})
+}
+
+// SetBirthMonth sets the "birth_month" field.
+func (u *ProfileUpsertOne) SetBirthMonth(v int) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetBirthMonth(v)
+	})
+}
+
+// AddBirthMonth adds v to the "birth_month" field.
+func (u *ProfileUpsertOne) AddBirthMonth(v int) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.AddBirthMonth(v)
+	})
+}
+
+// UpdateBirthMonth sets the "birth_month" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateBirthMonth() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateBirthMonth()
+	})
+}
+
+// ClearBirthMonth clears the value of the "birth_month" field.
+func (u *ProfileUpsertOne) ClearBirthMonth() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearBirthMonth()
+	})
+}
+
+// SetAgeBand sets the "age_band" field.
+func (u *ProfileUpsertOne) SetAgeBand(v string) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetAgeBand(v)
+	})
+}
+
+// UpdateAgeBand sets the "age_band" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateAgeBand() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateAgeBand()
+	})
+}
+
+// ClearAgeBand clears the value of the "age_band" field.
+func (u *ProfileUpsertOne) ClearAgeBand() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearAgeBand()
+	})
+}
+
+// SetAvatarURL sets the "avatar_url" field.
+func (u *ProfileUpsertOne) SetAvatarURL(v string) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetAvatarURL(v)
+	})
+}
+
+// UpdateAvatarURL sets the "avatar_url" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateAvatarURL() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateAvatarURL()
+	})
+}
+
+// ClearAvatarURL clears the value of the "avatar_url" field.
+func (u *ProfileUpsertOne) ClearAvatarURL() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearAvatarURL()
+	})
+}
+
+// SetGuardianConsentedAt sets the "guardian_consented_at" field.
+func (u *ProfileUpsertOne) SetGuardianConsentedAt(v time.Time) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetGuardianConsentedAt(v)
+	})
+}
+
+// UpdateGuardianConsentedAt sets the "guardian_consented_at" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateGuardianConsentedAt() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateGuardianConsentedAt()
+	})
+}
+
+// ClearGuardianConsentedAt clears the value of the "guardian_consented_at" field.
+func (u *ProfileUpsertOne) ClearGuardianConsentedAt() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearGuardianConsentedAt()
+	})
+}
+
+// SetGames sets the "games" field.
+func (u *ProfileUpsertOne) SetGames(v []types.GameEntry) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetGames(v)
+	})
+}
+
+// UpdateGames sets the "games" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateGames() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateGames()
+	})
+}
+
+// ClearGames clears the value of the "games" field.
+func (u *ProfileUpsertOne) ClearGames() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearGames()
+	})
+}
+
+// Exec executes the query.
+func (u *ProfileUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for ProfileCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *ProfileUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *ProfileUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: ProfileUpsertOne.ID is not supported by MySQL driver. Use ProfileUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *ProfileUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // ProfileCreateBulk is the builder for creating many Profile entities in bulk.
 type ProfileCreateBulk struct {
 	config
 	err      error
 	builders []*ProfileCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Profile entities in the database.
@@ -409,6 +922,7 @@ func (_c *ProfileCreateBulk) Save(ctx context.Context) ([]*Profile, error) {
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -455,6 +969,325 @@ func (_c *ProfileCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *ProfileCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Profile.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.ProfileUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *ProfileCreateBulk) OnConflict(opts ...sql.ConflictOption) *ProfileUpsertBulk {
+	_c.conflict = opts
+	return &ProfileUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Profile.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *ProfileCreateBulk) OnConflictColumns(columns ...string) *ProfileUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &ProfileUpsertBulk{
+		create: _c,
+	}
+}
+
+// ProfileUpsertBulk is the builder for "upsert"-ing
+// a bulk of Profile nodes.
+type ProfileUpsertBulk struct {
+	create *ProfileCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Profile.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(profile.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *ProfileUpsertBulk) UpdateNewValues() *ProfileUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(profile.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(profile.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(profile.FieldTenantID)
+			}
+			if _, exists := b.mutation.UserID(); exists {
+				s.SetIgnore(profile.FieldUserID)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Profile.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *ProfileUpsertBulk) Ignore() *ProfileUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *ProfileUpsertBulk) DoNothing() *ProfileUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the ProfileCreateBulk.OnConflict
+// documentation for more info.
+func (u *ProfileUpsertBulk) Update(set func(*ProfileUpsert)) *ProfileUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&ProfileUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *ProfileUpsertBulk) SetUpdatedAt(v time.Time) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateUpdatedAt() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *ProfileUpsertBulk) SetDeletedAt(v time.Time) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateDeletedAt() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *ProfileUpsertBulk) ClearDeletedAt() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetNickname sets the "nickname" field.
+func (u *ProfileUpsertBulk) SetNickname(v string) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetNickname(v)
+	})
+}
+
+// UpdateNickname sets the "nickname" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateNickname() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateNickname()
+	})
+}
+
+// ClearNickname clears the value of the "nickname" field.
+func (u *ProfileUpsertBulk) ClearNickname() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearNickname()
+	})
+}
+
+// SetBirthYear sets the "birth_year" field.
+func (u *ProfileUpsertBulk) SetBirthYear(v int) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetBirthYear(v)
+	})
+}
+
+// AddBirthYear adds v to the "birth_year" field.
+func (u *ProfileUpsertBulk) AddBirthYear(v int) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.AddBirthYear(v)
+	})
+}
+
+// UpdateBirthYear sets the "birth_year" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateBirthYear() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateBirthYear()
+	})
+}
+
+// ClearBirthYear clears the value of the "birth_year" field.
+func (u *ProfileUpsertBulk) ClearBirthYear() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearBirthYear()
+	})
+}
+
+// SetBirthMonth sets the "birth_month" field.
+func (u *ProfileUpsertBulk) SetBirthMonth(v int) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetBirthMonth(v)
+	})
+}
+
+// AddBirthMonth adds v to the "birth_month" field.
+func (u *ProfileUpsertBulk) AddBirthMonth(v int) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.AddBirthMonth(v)
+	})
+}
+
+// UpdateBirthMonth sets the "birth_month" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateBirthMonth() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateBirthMonth()
+	})
+}
+
+// ClearBirthMonth clears the value of the "birth_month" field.
+func (u *ProfileUpsertBulk) ClearBirthMonth() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearBirthMonth()
+	})
+}
+
+// SetAgeBand sets the "age_band" field.
+func (u *ProfileUpsertBulk) SetAgeBand(v string) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetAgeBand(v)
+	})
+}
+
+// UpdateAgeBand sets the "age_band" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateAgeBand() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateAgeBand()
+	})
+}
+
+// ClearAgeBand clears the value of the "age_band" field.
+func (u *ProfileUpsertBulk) ClearAgeBand() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearAgeBand()
+	})
+}
+
+// SetAvatarURL sets the "avatar_url" field.
+func (u *ProfileUpsertBulk) SetAvatarURL(v string) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetAvatarURL(v)
+	})
+}
+
+// UpdateAvatarURL sets the "avatar_url" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateAvatarURL() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateAvatarURL()
+	})
+}
+
+// ClearAvatarURL clears the value of the "avatar_url" field.
+func (u *ProfileUpsertBulk) ClearAvatarURL() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearAvatarURL()
+	})
+}
+
+// SetGuardianConsentedAt sets the "guardian_consented_at" field.
+func (u *ProfileUpsertBulk) SetGuardianConsentedAt(v time.Time) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetGuardianConsentedAt(v)
+	})
+}
+
+// UpdateGuardianConsentedAt sets the "guardian_consented_at" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateGuardianConsentedAt() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateGuardianConsentedAt()
+	})
+}
+
+// ClearGuardianConsentedAt clears the value of the "guardian_consented_at" field.
+func (u *ProfileUpsertBulk) ClearGuardianConsentedAt() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearGuardianConsentedAt()
+	})
+}
+
+// SetGames sets the "games" field.
+func (u *ProfileUpsertBulk) SetGames(v []types.GameEntry) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetGames(v)
+	})
+}
+
+// UpdateGames sets the "games" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateGames() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateGames()
+	})
+}
+
+// ClearGames clears the value of the "games" field.
+func (u *ProfileUpsertBulk) ClearGames() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearGames()
+	})
+}
+
+// Exec executes the query.
+func (u *ProfileUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the ProfileCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for ProfileCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *ProfileUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

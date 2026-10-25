@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -19,6 +21,7 @@ type TestRecordCreate struct {
 	config
 	mutation *TestRecordMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -377,6 +380,7 @@ func (_c *TestRecordCreate) createSpec() (*TestRecord, *sqlgraph.CreateSpec) {
 		_node = &TestRecord{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(testrecord.Table, sqlgraph.NewFieldSpec(testrecord.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -452,11 +456,581 @@ func (_c *TestRecordCreate) createSpec() (*TestRecord, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TestRecord.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestRecordUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *TestRecordCreate) OnConflict(opts ...sql.ConflictOption) *TestRecordUpsertOne {
+	_c.conflict = opts
+	return &TestRecordUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TestRecord.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *TestRecordCreate) OnConflictColumns(columns ...string) *TestRecordUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &TestRecordUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// TestRecordUpsertOne is the builder for "upsert"-ing
+	//  one TestRecord node.
+	TestRecordUpsertOne struct {
+		create *TestRecordCreate
+	}
+
+	// TestRecordUpsert is the "OnConflict" setter.
+	TestRecordUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestRecordUpsert) SetUpdatedAt(v time.Time) *TestRecordUpsert {
+	u.Set(testrecord.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateUpdatedAt() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TestRecordUpsert) SetDeletedAt(v time.Time) *TestRecordUpsert {
+	u.Set(testrecord.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateDeletedAt() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *TestRecordUpsert) ClearDeletedAt() *TestRecordUpsert {
+	u.SetNull(testrecord.FieldDeletedAt)
+	return u
+}
+
+// SetAttemptNo sets the "attempt_no" field.
+func (u *TestRecordUpsert) SetAttemptNo(v int) *TestRecordUpsert {
+	u.Set(testrecord.FieldAttemptNo, v)
+	return u
+}
+
+// UpdateAttemptNo sets the "attempt_no" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateAttemptNo() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldAttemptNo)
+	return u
+}
+
+// AddAttemptNo adds v to the "attempt_no" field.
+func (u *TestRecordUpsert) AddAttemptNo(v int) *TestRecordUpsert {
+	u.Add(testrecord.FieldAttemptNo, v)
+	return u
+}
+
+// SetSessionID sets the "session_id" field.
+func (u *TestRecordUpsert) SetSessionID(v string) *TestRecordUpsert {
+	u.Set(testrecord.FieldSessionID, v)
+	return u
+}
+
+// UpdateSessionID sets the "session_id" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateSessionID() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldSessionID)
+	return u
+}
+
+// ClearSessionID clears the value of the "session_id" field.
+func (u *TestRecordUpsert) ClearSessionID() *TestRecordUpsert {
+	u.SetNull(testrecord.FieldSessionID)
+	return u
+}
+
+// SetBackgrounds sets the "backgrounds" field.
+func (u *TestRecordUpsert) SetBackgrounds(v []types.BackgroundSpan) *TestRecordUpsert {
+	u.Set(testrecord.FieldBackgrounds, v)
+	return u
+}
+
+// UpdateBackgrounds sets the "backgrounds" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateBackgrounds() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldBackgrounds)
+	return u
+}
+
+// ClearBackgrounds clears the value of the "backgrounds" field.
+func (u *TestRecordUpsert) ClearBackgrounds() *TestRecordUpsert {
+	u.SetNull(testrecord.FieldBackgrounds)
+	return u
+}
+
+// SetRawDetail sets the "raw_detail" field.
+func (u *TestRecordUpsert) SetRawDetail(v map[string]interface{}) *TestRecordUpsert {
+	u.Set(testrecord.FieldRawDetail, v)
+	return u
+}
+
+// UpdateRawDetail sets the "raw_detail" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateRawDetail() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldRawDetail)
+	return u
+}
+
+// SetRawScore sets the "raw_score" field.
+func (u *TestRecordUpsert) SetRawScore(v float64) *TestRecordUpsert {
+	u.Set(testrecord.FieldRawScore, v)
+	return u
+}
+
+// UpdateRawScore sets the "raw_score" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateRawScore() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldRawScore)
+	return u
+}
+
+// AddRawScore adds v to the "raw_score" field.
+func (u *TestRecordUpsert) AddRawScore(v float64) *TestRecordUpsert {
+	u.Add(testrecord.FieldRawScore, v)
+	return u
+}
+
+// ClearRawScore clears the value of the "raw_score" field.
+func (u *TestRecordUpsert) ClearRawScore() *TestRecordUpsert {
+	u.SetNull(testrecord.FieldRawScore)
+	return u
+}
+
+// SetAuthoritativeScore sets the "authoritative_score" field.
+func (u *TestRecordUpsert) SetAuthoritativeScore(v float64) *TestRecordUpsert {
+	u.Set(testrecord.FieldAuthoritativeScore, v)
+	return u
+}
+
+// UpdateAuthoritativeScore sets the "authoritative_score" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateAuthoritativeScore() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldAuthoritativeScore)
+	return u
+}
+
+// AddAuthoritativeScore adds v to the "authoritative_score" field.
+func (u *TestRecordUpsert) AddAuthoritativeScore(v float64) *TestRecordUpsert {
+	u.Add(testrecord.FieldAuthoritativeScore, v)
+	return u
+}
+
+// ClearAuthoritativeScore clears the value of the "authoritative_score" field.
+func (u *TestRecordUpsert) ClearAuthoritativeScore() *TestRecordUpsert {
+	u.SetNull(testrecord.FieldAuthoritativeScore)
+	return u
+}
+
+// SetGrade sets the "grade" field.
+func (u *TestRecordUpsert) SetGrade(v testrecord.Grade) *TestRecordUpsert {
+	u.Set(testrecord.FieldGrade, v)
+	return u
+}
+
+// UpdateGrade sets the "grade" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateGrade() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldGrade)
+	return u
+}
+
+// ClearGrade clears the value of the "grade" field.
+func (u *TestRecordUpsert) ClearGrade() *TestRecordUpsert {
+	u.SetNull(testrecord.FieldGrade)
+	return u
+}
+
+// SetValid sets the "valid" field.
+func (u *TestRecordUpsert) SetValid(v bool) *TestRecordUpsert {
+	u.Set(testrecord.FieldValid, v)
+	return u
+}
+
+// UpdateValid sets the "valid" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateValid() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldValid)
+	return u
+}
+
+// SetInvalidReason sets the "invalid_reason" field.
+func (u *TestRecordUpsert) SetInvalidReason(v string) *TestRecordUpsert {
+	u.Set(testrecord.FieldInvalidReason, v)
+	return u
+}
+
+// UpdateInvalidReason sets the "invalid_reason" field to the value that was provided on create.
+func (u *TestRecordUpsert) UpdateInvalidReason() *TestRecordUpsert {
+	u.SetExcluded(testrecord.FieldInvalidReason)
+	return u
+}
+
+// ClearInvalidReason clears the value of the "invalid_reason" field.
+func (u *TestRecordUpsert) ClearInvalidReason() *TestRecordUpsert {
+	u.SetNull(testrecord.FieldInvalidReason)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.TestRecord.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(testrecord.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *TestRecordUpsertOne) UpdateNewValues() *TestRecordUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(testrecord.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(testrecord.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(testrecord.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.TestCode(); exists {
+			s.SetIgnore(testrecord.FieldTestCode)
+		}
+		if _, exists := u.create.mutation.UserID(); exists {
+			s.SetIgnore(testrecord.FieldUserID)
+		}
+		if _, exists := u.create.mutation.StartedAt(); exists {
+			s.SetIgnore(testrecord.FieldStartedAt)
+		}
+		if _, exists := u.create.mutation.EndedAt(); exists {
+			s.SetIgnore(testrecord.FieldEndedAt)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.TestRecord.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *TestRecordUpsertOne) Ignore() *TestRecordUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestRecordUpsertOne) DoNothing() *TestRecordUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestRecordCreate.OnConflict
+// documentation for more info.
+func (u *TestRecordUpsertOne) Update(set func(*TestRecordUpsert)) *TestRecordUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestRecordUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestRecordUpsertOne) SetUpdatedAt(v time.Time) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateUpdatedAt() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TestRecordUpsertOne) SetDeletedAt(v time.Time) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateDeletedAt() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *TestRecordUpsertOne) ClearDeletedAt() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetAttemptNo sets the "attempt_no" field.
+func (u *TestRecordUpsertOne) SetAttemptNo(v int) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetAttemptNo(v)
+	})
+}
+
+// AddAttemptNo adds v to the "attempt_no" field.
+func (u *TestRecordUpsertOne) AddAttemptNo(v int) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.AddAttemptNo(v)
+	})
+}
+
+// UpdateAttemptNo sets the "attempt_no" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateAttemptNo() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateAttemptNo()
+	})
+}
+
+// SetSessionID sets the "session_id" field.
+func (u *TestRecordUpsertOne) SetSessionID(v string) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetSessionID(v)
+	})
+}
+
+// UpdateSessionID sets the "session_id" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateSessionID() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateSessionID()
+	})
+}
+
+// ClearSessionID clears the value of the "session_id" field.
+func (u *TestRecordUpsertOne) ClearSessionID() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearSessionID()
+	})
+}
+
+// SetBackgrounds sets the "backgrounds" field.
+func (u *TestRecordUpsertOne) SetBackgrounds(v []types.BackgroundSpan) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetBackgrounds(v)
+	})
+}
+
+// UpdateBackgrounds sets the "backgrounds" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateBackgrounds() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateBackgrounds()
+	})
+}
+
+// ClearBackgrounds clears the value of the "backgrounds" field.
+func (u *TestRecordUpsertOne) ClearBackgrounds() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearBackgrounds()
+	})
+}
+
+// SetRawDetail sets the "raw_detail" field.
+func (u *TestRecordUpsertOne) SetRawDetail(v map[string]interface{}) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetRawDetail(v)
+	})
+}
+
+// UpdateRawDetail sets the "raw_detail" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateRawDetail() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateRawDetail()
+	})
+}
+
+// SetRawScore sets the "raw_score" field.
+func (u *TestRecordUpsertOne) SetRawScore(v float64) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetRawScore(v)
+	})
+}
+
+// AddRawScore adds v to the "raw_score" field.
+func (u *TestRecordUpsertOne) AddRawScore(v float64) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.AddRawScore(v)
+	})
+}
+
+// UpdateRawScore sets the "raw_score" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateRawScore() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateRawScore()
+	})
+}
+
+// ClearRawScore clears the value of the "raw_score" field.
+func (u *TestRecordUpsertOne) ClearRawScore() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearRawScore()
+	})
+}
+
+// SetAuthoritativeScore sets the "authoritative_score" field.
+func (u *TestRecordUpsertOne) SetAuthoritativeScore(v float64) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetAuthoritativeScore(v)
+	})
+}
+
+// AddAuthoritativeScore adds v to the "authoritative_score" field.
+func (u *TestRecordUpsertOne) AddAuthoritativeScore(v float64) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.AddAuthoritativeScore(v)
+	})
+}
+
+// UpdateAuthoritativeScore sets the "authoritative_score" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateAuthoritativeScore() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateAuthoritativeScore()
+	})
+}
+
+// ClearAuthoritativeScore clears the value of the "authoritative_score" field.
+func (u *TestRecordUpsertOne) ClearAuthoritativeScore() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearAuthoritativeScore()
+	})
+}
+
+// SetGrade sets the "grade" field.
+func (u *TestRecordUpsertOne) SetGrade(v testrecord.Grade) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetGrade(v)
+	})
+}
+
+// UpdateGrade sets the "grade" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateGrade() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateGrade()
+	})
+}
+
+// ClearGrade clears the value of the "grade" field.
+func (u *TestRecordUpsertOne) ClearGrade() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearGrade()
+	})
+}
+
+// SetValid sets the "valid" field.
+func (u *TestRecordUpsertOne) SetValid(v bool) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetValid(v)
+	})
+}
+
+// UpdateValid sets the "valid" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateValid() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateValid()
+	})
+}
+
+// SetInvalidReason sets the "invalid_reason" field.
+func (u *TestRecordUpsertOne) SetInvalidReason(v string) *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetInvalidReason(v)
+	})
+}
+
+// UpdateInvalidReason sets the "invalid_reason" field to the value that was provided on create.
+func (u *TestRecordUpsertOne) UpdateInvalidReason() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateInvalidReason()
+	})
+}
+
+// ClearInvalidReason clears the value of the "invalid_reason" field.
+func (u *TestRecordUpsertOne) ClearInvalidReason() *TestRecordUpsertOne {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearInvalidReason()
+	})
+}
+
+// Exec executes the query.
+func (u *TestRecordUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestRecordCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestRecordUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *TestRecordUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: TestRecordUpsertOne.ID is not supported by MySQL driver. Use TestRecordUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *TestRecordUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // TestRecordCreateBulk is the builder for creating many TestRecord entities in bulk.
 type TestRecordCreateBulk struct {
 	config
 	err      error
 	builders []*TestRecordCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the TestRecord entities in the database.
@@ -486,6 +1060,7 @@ func (_c *TestRecordCreateBulk) Save(ctx context.Context) ([]*TestRecord, error)
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -532,6 +1107,362 @@ func (_c *TestRecordCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *TestRecordCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TestRecord.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestRecordUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *TestRecordCreateBulk) OnConflict(opts ...sql.ConflictOption) *TestRecordUpsertBulk {
+	_c.conflict = opts
+	return &TestRecordUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TestRecord.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *TestRecordCreateBulk) OnConflictColumns(columns ...string) *TestRecordUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &TestRecordUpsertBulk{
+		create: _c,
+	}
+}
+
+// TestRecordUpsertBulk is the builder for "upsert"-ing
+// a bulk of TestRecord nodes.
+type TestRecordUpsertBulk struct {
+	create *TestRecordCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.TestRecord.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(testrecord.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *TestRecordUpsertBulk) UpdateNewValues() *TestRecordUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(testrecord.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(testrecord.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(testrecord.FieldTenantID)
+			}
+			if _, exists := b.mutation.TestCode(); exists {
+				s.SetIgnore(testrecord.FieldTestCode)
+			}
+			if _, exists := b.mutation.UserID(); exists {
+				s.SetIgnore(testrecord.FieldUserID)
+			}
+			if _, exists := b.mutation.StartedAt(); exists {
+				s.SetIgnore(testrecord.FieldStartedAt)
+			}
+			if _, exists := b.mutation.EndedAt(); exists {
+				s.SetIgnore(testrecord.FieldEndedAt)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.TestRecord.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *TestRecordUpsertBulk) Ignore() *TestRecordUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestRecordUpsertBulk) DoNothing() *TestRecordUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestRecordCreateBulk.OnConflict
+// documentation for more info.
+func (u *TestRecordUpsertBulk) Update(set func(*TestRecordUpsert)) *TestRecordUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestRecordUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestRecordUpsertBulk) SetUpdatedAt(v time.Time) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateUpdatedAt() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TestRecordUpsertBulk) SetDeletedAt(v time.Time) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateDeletedAt() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *TestRecordUpsertBulk) ClearDeletedAt() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetAttemptNo sets the "attempt_no" field.
+func (u *TestRecordUpsertBulk) SetAttemptNo(v int) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetAttemptNo(v)
+	})
+}
+
+// AddAttemptNo adds v to the "attempt_no" field.
+func (u *TestRecordUpsertBulk) AddAttemptNo(v int) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.AddAttemptNo(v)
+	})
+}
+
+// UpdateAttemptNo sets the "attempt_no" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateAttemptNo() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateAttemptNo()
+	})
+}
+
+// SetSessionID sets the "session_id" field.
+func (u *TestRecordUpsertBulk) SetSessionID(v string) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetSessionID(v)
+	})
+}
+
+// UpdateSessionID sets the "session_id" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateSessionID() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateSessionID()
+	})
+}
+
+// ClearSessionID clears the value of the "session_id" field.
+func (u *TestRecordUpsertBulk) ClearSessionID() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearSessionID()
+	})
+}
+
+// SetBackgrounds sets the "backgrounds" field.
+func (u *TestRecordUpsertBulk) SetBackgrounds(v []types.BackgroundSpan) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetBackgrounds(v)
+	})
+}
+
+// UpdateBackgrounds sets the "backgrounds" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateBackgrounds() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateBackgrounds()
+	})
+}
+
+// ClearBackgrounds clears the value of the "backgrounds" field.
+func (u *TestRecordUpsertBulk) ClearBackgrounds() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearBackgrounds()
+	})
+}
+
+// SetRawDetail sets the "raw_detail" field.
+func (u *TestRecordUpsertBulk) SetRawDetail(v map[string]interface{}) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetRawDetail(v)
+	})
+}
+
+// UpdateRawDetail sets the "raw_detail" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateRawDetail() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateRawDetail()
+	})
+}
+
+// SetRawScore sets the "raw_score" field.
+func (u *TestRecordUpsertBulk) SetRawScore(v float64) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetRawScore(v)
+	})
+}
+
+// AddRawScore adds v to the "raw_score" field.
+func (u *TestRecordUpsertBulk) AddRawScore(v float64) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.AddRawScore(v)
+	})
+}
+
+// UpdateRawScore sets the "raw_score" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateRawScore() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateRawScore()
+	})
+}
+
+// ClearRawScore clears the value of the "raw_score" field.
+func (u *TestRecordUpsertBulk) ClearRawScore() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearRawScore()
+	})
+}
+
+// SetAuthoritativeScore sets the "authoritative_score" field.
+func (u *TestRecordUpsertBulk) SetAuthoritativeScore(v float64) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetAuthoritativeScore(v)
+	})
+}
+
+// AddAuthoritativeScore adds v to the "authoritative_score" field.
+func (u *TestRecordUpsertBulk) AddAuthoritativeScore(v float64) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.AddAuthoritativeScore(v)
+	})
+}
+
+// UpdateAuthoritativeScore sets the "authoritative_score" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateAuthoritativeScore() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateAuthoritativeScore()
+	})
+}
+
+// ClearAuthoritativeScore clears the value of the "authoritative_score" field.
+func (u *TestRecordUpsertBulk) ClearAuthoritativeScore() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearAuthoritativeScore()
+	})
+}
+
+// SetGrade sets the "grade" field.
+func (u *TestRecordUpsertBulk) SetGrade(v testrecord.Grade) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetGrade(v)
+	})
+}
+
+// UpdateGrade sets the "grade" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateGrade() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateGrade()
+	})
+}
+
+// ClearGrade clears the value of the "grade" field.
+func (u *TestRecordUpsertBulk) ClearGrade() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearGrade()
+	})
+}
+
+// SetValid sets the "valid" field.
+func (u *TestRecordUpsertBulk) SetValid(v bool) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetValid(v)
+	})
+}
+
+// UpdateValid sets the "valid" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateValid() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateValid()
+	})
+}
+
+// SetInvalidReason sets the "invalid_reason" field.
+func (u *TestRecordUpsertBulk) SetInvalidReason(v string) *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.SetInvalidReason(v)
+	})
+}
+
+// UpdateInvalidReason sets the "invalid_reason" field to the value that was provided on create.
+func (u *TestRecordUpsertBulk) UpdateInvalidReason() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.UpdateInvalidReason()
+	})
+}
+
+// ClearInvalidReason clears the value of the "invalid_reason" field.
+func (u *TestRecordUpsertBulk) ClearInvalidReason() *TestRecordUpsertBulk {
+	return u.Update(func(s *TestRecordUpsert) {
+		s.ClearInvalidReason()
+	})
+}
+
+// Exec executes the query.
+func (u *TestRecordUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TestRecordCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestRecordCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestRecordUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

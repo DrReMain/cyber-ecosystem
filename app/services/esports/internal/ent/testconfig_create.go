@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type TestConfigCreate struct {
 	config
 	mutation *TestConfigMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -257,6 +260,7 @@ func (_c *TestConfigCreate) createSpec() (*TestConfig, *sqlgraph.CreateSpec) {
 		_node = &TestConfig{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(testconfig.Table, sqlgraph.NewFieldSpec(testconfig.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -296,11 +300,338 @@ func (_c *TestConfigCreate) createSpec() (*TestConfig, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TestConfig.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestConfigUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *TestConfigCreate) OnConflict(opts ...sql.ConflictOption) *TestConfigUpsertOne {
+	_c.conflict = opts
+	return &TestConfigUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TestConfig.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *TestConfigCreate) OnConflictColumns(columns ...string) *TestConfigUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &TestConfigUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// TestConfigUpsertOne is the builder for "upsert"-ing
+	//  one TestConfig node.
+	TestConfigUpsertOne struct {
+		create *TestConfigCreate
+	}
+
+	// TestConfigUpsert is the "OnConflict" setter.
+	TestConfigUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestConfigUpsert) SetUpdatedAt(v time.Time) *TestConfigUpsert {
+	u.Set(testconfig.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestConfigUpsert) UpdateUpdatedAt() *TestConfigUpsert {
+	u.SetExcluded(testconfig.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TestConfigUpsert) SetDeletedAt(v time.Time) *TestConfigUpsert {
+	u.Set(testconfig.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TestConfigUpsert) UpdateDeletedAt() *TestConfigUpsert {
+	u.SetExcluded(testconfig.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *TestConfigUpsert) ClearDeletedAt() *TestConfigUpsert {
+	u.SetNull(testconfig.FieldDeletedAt)
+	return u
+}
+
+// SetDurationSeconds sets the "duration_seconds" field.
+func (u *TestConfigUpsert) SetDurationSeconds(v int) *TestConfigUpsert {
+	u.Set(testconfig.FieldDurationSeconds, v)
+	return u
+}
+
+// UpdateDurationSeconds sets the "duration_seconds" field to the value that was provided on create.
+func (u *TestConfigUpsert) UpdateDurationSeconds() *TestConfigUpsert {
+	u.SetExcluded(testconfig.FieldDurationSeconds)
+	return u
+}
+
+// AddDurationSeconds adds v to the "duration_seconds" field.
+func (u *TestConfigUpsert) AddDurationSeconds(v int) *TestConfigUpsert {
+	u.Add(testconfig.FieldDurationSeconds, v)
+	return u
+}
+
+// SetBackgroundInvalidSeconds sets the "background_invalid_seconds" field.
+func (u *TestConfigUpsert) SetBackgroundInvalidSeconds(v int) *TestConfigUpsert {
+	u.Set(testconfig.FieldBackgroundInvalidSeconds, v)
+	return u
+}
+
+// UpdateBackgroundInvalidSeconds sets the "background_invalid_seconds" field to the value that was provided on create.
+func (u *TestConfigUpsert) UpdateBackgroundInvalidSeconds() *TestConfigUpsert {
+	u.SetExcluded(testconfig.FieldBackgroundInvalidSeconds)
+	return u
+}
+
+// AddBackgroundInvalidSeconds adds v to the "background_invalid_seconds" field.
+func (u *TestConfigUpsert) AddBackgroundInvalidSeconds(v int) *TestConfigUpsert {
+	u.Add(testconfig.FieldBackgroundInvalidSeconds, v)
+	return u
+}
+
+// SetEngineParams sets the "engine_params" field.
+func (u *TestConfigUpsert) SetEngineParams(v map[string]string) *TestConfigUpsert {
+	u.Set(testconfig.FieldEngineParams, v)
+	return u
+}
+
+// UpdateEngineParams sets the "engine_params" field to the value that was provided on create.
+func (u *TestConfigUpsert) UpdateEngineParams() *TestConfigUpsert {
+	u.SetExcluded(testconfig.FieldEngineParams)
+	return u
+}
+
+// ClearEngineParams clears the value of the "engine_params" field.
+func (u *TestConfigUpsert) ClearEngineParams() *TestConfigUpsert {
+	u.SetNull(testconfig.FieldEngineParams)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.TestConfig.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(testconfig.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *TestConfigUpsertOne) UpdateNewValues() *TestConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(testconfig.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(testconfig.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(testconfig.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.TestCode(); exists {
+			s.SetIgnore(testconfig.FieldTestCode)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.TestConfig.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *TestConfigUpsertOne) Ignore() *TestConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestConfigUpsertOne) DoNothing() *TestConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestConfigCreate.OnConflict
+// documentation for more info.
+func (u *TestConfigUpsertOne) Update(set func(*TestConfigUpsert)) *TestConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestConfigUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestConfigUpsertOne) SetUpdatedAt(v time.Time) *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestConfigUpsertOne) UpdateUpdatedAt() *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TestConfigUpsertOne) SetDeletedAt(v time.Time) *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TestConfigUpsertOne) UpdateDeletedAt() *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *TestConfigUpsertOne) ClearDeletedAt() *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetDurationSeconds sets the "duration_seconds" field.
+func (u *TestConfigUpsertOne) SetDurationSeconds(v int) *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetDurationSeconds(v)
+	})
+}
+
+// AddDurationSeconds adds v to the "duration_seconds" field.
+func (u *TestConfigUpsertOne) AddDurationSeconds(v int) *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.AddDurationSeconds(v)
+	})
+}
+
+// UpdateDurationSeconds sets the "duration_seconds" field to the value that was provided on create.
+func (u *TestConfigUpsertOne) UpdateDurationSeconds() *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateDurationSeconds()
+	})
+}
+
+// SetBackgroundInvalidSeconds sets the "background_invalid_seconds" field.
+func (u *TestConfigUpsertOne) SetBackgroundInvalidSeconds(v int) *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetBackgroundInvalidSeconds(v)
+	})
+}
+
+// AddBackgroundInvalidSeconds adds v to the "background_invalid_seconds" field.
+func (u *TestConfigUpsertOne) AddBackgroundInvalidSeconds(v int) *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.AddBackgroundInvalidSeconds(v)
+	})
+}
+
+// UpdateBackgroundInvalidSeconds sets the "background_invalid_seconds" field to the value that was provided on create.
+func (u *TestConfigUpsertOne) UpdateBackgroundInvalidSeconds() *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateBackgroundInvalidSeconds()
+	})
+}
+
+// SetEngineParams sets the "engine_params" field.
+func (u *TestConfigUpsertOne) SetEngineParams(v map[string]string) *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetEngineParams(v)
+	})
+}
+
+// UpdateEngineParams sets the "engine_params" field to the value that was provided on create.
+func (u *TestConfigUpsertOne) UpdateEngineParams() *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateEngineParams()
+	})
+}
+
+// ClearEngineParams clears the value of the "engine_params" field.
+func (u *TestConfigUpsertOne) ClearEngineParams() *TestConfigUpsertOne {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.ClearEngineParams()
+	})
+}
+
+// Exec executes the query.
+func (u *TestConfigUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestConfigCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestConfigUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *TestConfigUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: TestConfigUpsertOne.ID is not supported by MySQL driver. Use TestConfigUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *TestConfigUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // TestConfigCreateBulk is the builder for creating many TestConfig entities in bulk.
 type TestConfigCreateBulk struct {
 	config
 	err      error
 	builders []*TestConfigCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the TestConfig entities in the database.
@@ -330,6 +661,7 @@ func (_c *TestConfigCreateBulk) Save(ctx context.Context) ([]*TestConfig, error)
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -376,6 +708,227 @@ func (_c *TestConfigCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *TestConfigCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.TestConfig.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestConfigUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *TestConfigCreateBulk) OnConflict(opts ...sql.ConflictOption) *TestConfigUpsertBulk {
+	_c.conflict = opts
+	return &TestConfigUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.TestConfig.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *TestConfigCreateBulk) OnConflictColumns(columns ...string) *TestConfigUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &TestConfigUpsertBulk{
+		create: _c,
+	}
+}
+
+// TestConfigUpsertBulk is the builder for "upsert"-ing
+// a bulk of TestConfig nodes.
+type TestConfigUpsertBulk struct {
+	create *TestConfigCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.TestConfig.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(testconfig.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *TestConfigUpsertBulk) UpdateNewValues() *TestConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(testconfig.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(testconfig.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(testconfig.FieldTenantID)
+			}
+			if _, exists := b.mutation.TestCode(); exists {
+				s.SetIgnore(testconfig.FieldTestCode)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.TestConfig.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *TestConfigUpsertBulk) Ignore() *TestConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestConfigUpsertBulk) DoNothing() *TestConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestConfigCreateBulk.OnConflict
+// documentation for more info.
+func (u *TestConfigUpsertBulk) Update(set func(*TestConfigUpsert)) *TestConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestConfigUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestConfigUpsertBulk) SetUpdatedAt(v time.Time) *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestConfigUpsertBulk) UpdateUpdatedAt() *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TestConfigUpsertBulk) SetDeletedAt(v time.Time) *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TestConfigUpsertBulk) UpdateDeletedAt() *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *TestConfigUpsertBulk) ClearDeletedAt() *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetDurationSeconds sets the "duration_seconds" field.
+func (u *TestConfigUpsertBulk) SetDurationSeconds(v int) *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetDurationSeconds(v)
+	})
+}
+
+// AddDurationSeconds adds v to the "duration_seconds" field.
+func (u *TestConfigUpsertBulk) AddDurationSeconds(v int) *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.AddDurationSeconds(v)
+	})
+}
+
+// UpdateDurationSeconds sets the "duration_seconds" field to the value that was provided on create.
+func (u *TestConfigUpsertBulk) UpdateDurationSeconds() *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateDurationSeconds()
+	})
+}
+
+// SetBackgroundInvalidSeconds sets the "background_invalid_seconds" field.
+func (u *TestConfigUpsertBulk) SetBackgroundInvalidSeconds(v int) *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetBackgroundInvalidSeconds(v)
+	})
+}
+
+// AddBackgroundInvalidSeconds adds v to the "background_invalid_seconds" field.
+func (u *TestConfigUpsertBulk) AddBackgroundInvalidSeconds(v int) *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.AddBackgroundInvalidSeconds(v)
+	})
+}
+
+// UpdateBackgroundInvalidSeconds sets the "background_invalid_seconds" field to the value that was provided on create.
+func (u *TestConfigUpsertBulk) UpdateBackgroundInvalidSeconds() *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateBackgroundInvalidSeconds()
+	})
+}
+
+// SetEngineParams sets the "engine_params" field.
+func (u *TestConfigUpsertBulk) SetEngineParams(v map[string]string) *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.SetEngineParams(v)
+	})
+}
+
+// UpdateEngineParams sets the "engine_params" field to the value that was provided on create.
+func (u *TestConfigUpsertBulk) UpdateEngineParams() *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.UpdateEngineParams()
+	})
+}
+
+// ClearEngineParams clears the value of the "engine_params" field.
+func (u *TestConfigUpsertBulk) ClearEngineParams() *TestConfigUpsertBulk {
+	return u.Update(func(s *TestConfigUpsert) {
+		s.ClearEngineParams()
+	})
+}
+
+// Exec executes the query.
+func (u *TestConfigUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TestConfigCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestConfigCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestConfigUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

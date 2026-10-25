@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"time"
 
 	"github.com/rs/xid"
@@ -37,6 +38,9 @@ const (
 	// The channel's own default deadline, carried explicitly so the row and
 	// the channel order can never disagree about expiry.
 	payWindow = 2 * time.Hour
+
+	convergeInterval   = time.Minute
+	convergeStaleAfter = 10 * time.Minute
 )
 
 // DO ------------------------------------------------------------------------------------------------------------------
@@ -95,6 +99,22 @@ type ListOut struct {
 	Orders []*Order
 }
 
+type SettleIn struct {
+	OrderNo       string
+	Provider      string
+	TransactionID string
+	AmountFen     int64
+	PaidAt        time.Time
+}
+
+type EntitlementGrant struct {
+	UserID    string
+	ScopeKind string
+	ScopeRef  *string
+	ExpiresAt *time.Time
+	Source    string
+}
+
 // Port ----------------------------------------------------------------------------------------------------------------
 
 type SkuRP interface {
@@ -107,10 +127,13 @@ type OrderRP interface {
 	ByNo(ctx context.Context, orderNo string) (*Order, error)                                      // nil, nil = no such order
 	ActiveByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*Order, error) // nil, nil = none live
 	ClosePending(ctx context.Context, orderNo string) (*Order, error)                              // nil, nil = no longer pending
+	Settle(ctx context.Context, in *SettleIn) (*Order, bool, error)                                // the single write-paid entry; false = a rival settle already won
 	List(ctx context.Context, in *ListIn) (*ListOut, error)
+	ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error) // pending rows past the horizon; expiry is the converger's branch, not the query's
 }
 
 type EntitlementRP interface {
+	Grant(ctx context.Context, g *EntitlementGrant) error // insert-only; a rival grant for the same scope lands as a no-op, never an error
 	Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error)
 }
 
@@ -118,6 +141,7 @@ type PayChannelRP interface { // routes to the configured provider's backend; ca
 	CreatePayment(ctx context.Context, provider string, in *payment.CreatePaymentInput) (*payment.PrepayResult, error)
 	QueryPayment(ctx context.Context, provider, outTradeNo string) (*payment.PaymentStatusResult, error)
 	ClosePayment(ctx context.Context, provider, outTradeNo string) error
+	ParseNotification(ctx context.Context, provider string, in *payment.NotificationInput) (*payment.NotificationEvent, error)
 	Channels(provider string) ([]payment.Channel, error)
 	DefaultProvider() string
 	NotifyBaseURL() string
@@ -136,15 +160,16 @@ func NewSkuUC(logger *slog.Logger, tm shared.Transaction, skuRP SkuRP) *SkuUC {
 
 type OrderUC struct {
 	shared.UC
-	orderRP   OrderRP
-	skuRP     SkuRP
-	entRP     EntitlementRP
-	testRP    test.TestRP
-	channelRP PayChannelRP
+	orderRP      OrderRP
+	skuRP        SkuRP
+	entRP        EntitlementRP
+	testRP       test.TestRP
+	channelRP    PayChannelRP
+	stopConverge context.CancelFunc
 }
 
-func NewOrderUC(logger *slog.Logger, tm shared.Transaction, orderRP OrderRP, skuRP SkuRP, entRP EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
-	return &OrderUC{
+func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, orderRP OrderRP, skuRP SkuRP, entRP EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
+	uc := &OrderUC{
 		UC:        shared.NewUC(logger.With("module", "module/pay"), tm),
 		orderRP:   orderRP,
 		skuRP:     skuRP,
@@ -152,6 +177,9 @@ func NewOrderUC(logger *slog.Logger, tm shared.Transaction, orderRP OrderRP, sku
 		testRP:    testRP,
 		channelRP: channelRP,
 	}
+	hooks.OnStart(uc.convergeLoop)
+	hooks.OnStop(uc.stopConvergeLoop)
+	return uc
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -302,6 +330,131 @@ func (uc *OrderUC) Get(ctx context.Context, orderNo string) (*Order, error) {
 	return order, nil
 }
 
+func (uc *OrderUC) HandleNotification(ctx context.Context, provider string, headers map[string]string, body []byte) (bool, error) {
+	h := http.Header{}
+	for k, v := range headers {
+		h.Set(k, v)
+	}
+	event, err := uc.channelRP.ParseNotification(ctx, provider, &payment.NotificationInput{Headers: h, Body: body})
+	if err != nil {
+		return false, err
+	}
+	switch event.Type {
+	case payment.EventPaymentSucceeded:
+		return uc.SettlePaid(ctx, &SettleIn{
+			OrderNo:       event.OutTradeNo,
+			Provider:      provider,
+			TransactionID: event.TransactionID,
+			AmountFen:     int64(event.AmountFen),
+			PaidAt:        time.Now(),
+		})
+	case payment.EventRefundSucceeded, payment.EventRefundAbnormal:
+		// M1 folds nothing on refunds — the event is the audit trail; the
+		// order stays paid and entitlements never roll back.
+		uc.Log.Info("payment refund event", "channel_type", event.ChannelType, "order_no", event.OutTradeNo, "refund_no", event.OutRefundNo, "refund_id", event.RefundID)
+		return true, nil
+	default:
+		// A channel event this build has never met: no fold, and no ack
+		// either — the channel's retry pressure keeps it visible instead of
+		// swallowing an unknown money movement.
+		uc.Log.Warn("payment event type unrecognized", "channel_type", event.ChannelType, "order_no", event.OutTradeNo)
+		return false, nil
+	}
+}
+
+func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
+	order, err := uc.orderRP.ByNo(ctx, in.OrderNo)
+	if err != nil {
+		return false, err
+	}
+	if order == nil {
+		// A paid channel order with no row — the crash window between the
+		// channel create and the local insert, paid into after the orphan
+		// close missed it. Nothing exists to settle or grant; the alarm and
+		// the reconciliation ledger own the money.
+		uc.Log.Error("payment settled for unknown order", "order_no", in.OrderNo, "provider", in.Provider, "transaction_id", in.TransactionID)
+		return true, nil
+	}
+	if order.Provider != in.Provider {
+		uc.Log.Error("payment provider mismatch", "order_no", in.OrderNo, "row_provider", order.Provider, "notify_provider", in.Provider)
+		return true, nil
+	}
+	if order.AmountFen != in.AmountFen {
+		// Money moved at an amount the row never knew. The money stays
+		// taken, so the channel may stop retrying — but the grant never
+		// follows a mismatched amount.
+		uc.Log.Error("payment amount mismatch", "order_no", in.OrderNo, "row_fen", order.AmountFen, "notify_fen", in.AmountFen)
+		return true, nil
+	}
+	var grant *EntitlementGrant
+	switch order.ScopeKind {
+	case ScopeTrial:
+		if order.ScopeRef == nil {
+			uc.Log.Error("trial order without record reference", "order_no", order.OrderNo)
+			break
+		}
+		grant = &EntitlementGrant{UserID: order.UserID, ScopeKind: EntTrial, ScopeRef: order.ScopeRef, Source: order.OrderNo}
+	case ScopePeriod:
+		sku, err := uc.skuRP.ByCode(ctx, order.SKUCode)
+		if err != nil {
+			return false, err
+		}
+		if sku == nil || sku.PeriodDays == nil {
+			// The sku lost its period between order and settle. The money is
+			// taken, so the order still settles — the missing grant is the
+			// alarm reconciliation reads.
+			uc.Log.Error("membership settle without period", "order_no", order.OrderNo, "sku_code", order.SKUCode)
+			break
+		}
+		expiry := in.PaidAt.AddDate(0, 0, *sku.PeriodDays)
+		grant = &EntitlementGrant{UserID: order.UserID, ScopeKind: EntMembership, ExpiresAt: &expiry, Source: order.OrderNo}
+	default:
+		uc.Log.Error("order scope unknown at settle", "order_no", order.OrderNo, "scope_kind", order.ScopeKind)
+	}
+	settled := false
+	err = uc.Tm.InTx(ctx, func(txCtx context.Context) error {
+		_, updated, err := uc.orderRP.Settle(txCtx, in)
+		if err != nil {
+			return err
+		}
+		settled = updated
+		if !updated || grant == nil {
+			return nil
+		}
+		return uc.entRP.Grant(txCtx, grant)
+	})
+	if err != nil {
+		return false, err
+	}
+	if settled {
+		uc.Log.Info("order settled", "order_no", order.OrderNo, "transaction_id", in.TransactionID)
+	}
+	return true, nil
+}
+
+func (uc *OrderUC) ConvergeOnce(ctx context.Context) error {
+	stale, err := uc.orderRP.ListStalePending(ctx, convergeStaleAfter)
+	if err != nil {
+		return err
+	}
+	for _, order := range stale {
+		if order.ExpiresAt.After(time.Now()) {
+			uc.convergeQuery(ctx, order)
+			continue
+		}
+		if _, err := uc.retire(ctx, order); err != nil {
+			if esportspb.IsEsportsOrderStateConflict(err) {
+				// The channel refused the close — paid in the expiry race.
+				// The query is the truth that settles it.
+				uc.convergeQuery(ctx, order)
+				continue
+			}
+			uc.Log.Warn("converge retire failed", "order_no", order.OrderNo, "err", err)
+		}
+	}
+	return nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func (uc *OrderUC) resolveScope(ctx context.Context, userID string, sku *Sku, ref *string) (string, *string, error) {
@@ -339,6 +492,63 @@ func (uc *OrderUC) resolveScope(ctx context.Context, userID string, sku *Sku, re
 	default:
 		return "", nil, esportspb.ErrorEsportsOrderScopeInvalid("").WithCause(
 			fmt.Errorf("sku kind %q buys nothing", sku.Kind))
+	}
+}
+
+func (uc *OrderUC) convergeLoop(ctx context.Context) error {
+	// A boot sweep first — anything that expired while the process was down
+	// folds before the first tick — then the ticker.
+	loopCtx, cancel := context.WithCancel(ctx)
+	uc.stopConverge = cancel
+	go func() {
+		uc.Log.Info("payment converger started", "interval", convergeInterval, "stale_after", convergeStaleAfter)
+		if err := uc.ConvergeOnce(loopCtx); err != nil {
+			uc.Log.Error("payment converge boot sweep failed", "err", err)
+		}
+		ticker := time.NewTicker(convergeInterval)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-loopCtx.Done():
+				return
+			case <-ticker.C:
+			}
+			if err := uc.ConvergeOnce(loopCtx); err != nil {
+				uc.Log.Error("payment converge sweep failed", "err", err)
+			}
+		}
+	}()
+	return nil
+}
+
+func (uc *OrderUC) stopConvergeLoop(context.Context) error {
+	if uc.stopConverge != nil {
+		uc.stopConverge()
+	}
+	return nil
+}
+
+func (uc *OrderUC) convergeQuery(ctx context.Context, order *Order) {
+	status, err := uc.channelRP.QueryPayment(ctx, order.Provider, order.OrderNo)
+	if err != nil {
+		uc.Log.Warn("converge query failed", "order_no", order.OrderNo, "err", err)
+		return
+	}
+	if status.State != payment.PaymentStatePaid {
+		return
+	}
+	paidAt := status.PaidAt
+	if paidAt.IsZero() {
+		paidAt = time.Now()
+	}
+	if _, err := uc.SettlePaid(ctx, &SettleIn{
+		OrderNo:       order.OrderNo,
+		Provider:      order.Provider,
+		TransactionID: status.TransactionID,
+		AmountFen:     int64(status.AmountFen),
+		PaidAt:        paidAt,
+	}); err != nil {
+		uc.Log.Warn("converge settle failed", "order_no", order.OrderNo, "err", err)
 	}
 }
 

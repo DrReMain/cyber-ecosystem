@@ -32,7 +32,7 @@ remote:
 
 payment:
   default_provider: ${PAY_PROVIDER:mock}
-  notify_base_url: ${PAY_NOTIFY_BASE_URL:http://localhost:3000}
+  notify_base_url: ${PAY_NOTIFY_BASE_URL:http://localhost:5174}
   providers:
     - name: ${PAY_PROVIDER:mock}
       kind: ${PAY_PROVIDER:mock}

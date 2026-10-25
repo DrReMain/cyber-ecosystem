@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type TestCreate struct {
 	config
 	mutation *TestMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -334,6 +337,7 @@ func (_c *TestCreate) createSpec() (*Test, *sqlgraph.CreateSpec) {
 		_node = &Test{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(test.Table, sqlgraph.NewFieldSpec(test.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -389,11 +393,481 @@ func (_c *TestCreate) createSpec() (*Test, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Test.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *TestCreate) OnConflict(opts ...sql.ConflictOption) *TestUpsertOne {
+	_c.conflict = opts
+	return &TestUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Test.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *TestCreate) OnConflictColumns(columns ...string) *TestUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &TestUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// TestUpsertOne is the builder for "upsert"-ing
+	//  one Test node.
+	TestUpsertOne struct {
+		create *TestCreate
+	}
+
+	// TestUpsert is the "OnConflict" setter.
+	TestUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestUpsert) SetUpdatedAt(v time.Time) *TestUpsert {
+	u.Set(test.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestUpsert) UpdateUpdatedAt() *TestUpsert {
+	u.SetExcluded(test.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TestUpsert) SetDeletedAt(v time.Time) *TestUpsert {
+	u.Set(test.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TestUpsert) UpdateDeletedAt() *TestUpsert {
+	u.SetExcluded(test.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *TestUpsert) ClearDeletedAt() *TestUpsert {
+	u.SetNull(test.FieldDeletedAt)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *TestUpsert) SetName(v string) *TestUpsert {
+	u.Set(test.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *TestUpsert) UpdateName() *TestUpsert {
+	u.SetExcluded(test.FieldName)
+	return u
+}
+
+// SetCategory sets the "category" field.
+func (u *TestUpsert) SetCategory(v string) *TestUpsert {
+	u.Set(test.FieldCategory, v)
+	return u
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *TestUpsert) UpdateCategory() *TestUpsert {
+	u.SetExcluded(test.FieldCategory)
+	return u
+}
+
+// ClearCategory clears the value of the "category" field.
+func (u *TestUpsert) ClearCategory() *TestUpsert {
+	u.SetNull(test.FieldCategory)
+	return u
+}
+
+// SetAbility sets the "ability" field.
+func (u *TestUpsert) SetAbility(v string) *TestUpsert {
+	u.Set(test.FieldAbility, v)
+	return u
+}
+
+// UpdateAbility sets the "ability" field to the value that was provided on create.
+func (u *TestUpsert) UpdateAbility() *TestUpsert {
+	u.SetExcluded(test.FieldAbility)
+	return u
+}
+
+// ClearAbility clears the value of the "ability" field.
+func (u *TestUpsert) ClearAbility() *TestUpsert {
+	u.SetNull(test.FieldAbility)
+	return u
+}
+
+// SetDescription sets the "description" field.
+func (u *TestUpsert) SetDescription(v string) *TestUpsert {
+	u.Set(test.FieldDescription, v)
+	return u
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *TestUpsert) UpdateDescription() *TestUpsert {
+	u.SetExcluded(test.FieldDescription)
+	return u
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *TestUpsert) ClearDescription() *TestUpsert {
+	u.SetNull(test.FieldDescription)
+	return u
+}
+
+// SetUnitScoreLabel sets the "unit_score_label" field.
+func (u *TestUpsert) SetUnitScoreLabel(v string) *TestUpsert {
+	u.Set(test.FieldUnitScoreLabel, v)
+	return u
+}
+
+// UpdateUnitScoreLabel sets the "unit_score_label" field to the value that was provided on create.
+func (u *TestUpsert) UpdateUnitScoreLabel() *TestUpsert {
+	u.SetExcluded(test.FieldUnitScoreLabel)
+	return u
+}
+
+// ClearUnitScoreLabel clears the value of the "unit_score_label" field.
+func (u *TestUpsert) ClearUnitScoreLabel() *TestUpsert {
+	u.SetNull(test.FieldUnitScoreLabel)
+	return u
+}
+
+// SetDurationSeconds sets the "duration_seconds" field.
+func (u *TestUpsert) SetDurationSeconds(v int) *TestUpsert {
+	u.Set(test.FieldDurationSeconds, v)
+	return u
+}
+
+// UpdateDurationSeconds sets the "duration_seconds" field to the value that was provided on create.
+func (u *TestUpsert) UpdateDurationSeconds() *TestUpsert {
+	u.SetExcluded(test.FieldDurationSeconds)
+	return u
+}
+
+// AddDurationSeconds adds v to the "duration_seconds" field.
+func (u *TestUpsert) AddDurationSeconds(v int) *TestUpsert {
+	u.Add(test.FieldDurationSeconds, v)
+	return u
+}
+
+// SetIntroduction sets the "introduction" field.
+func (u *TestUpsert) SetIntroduction(v string) *TestUpsert {
+	u.Set(test.FieldIntroduction, v)
+	return u
+}
+
+// UpdateIntroduction sets the "introduction" field to the value that was provided on create.
+func (u *TestUpsert) UpdateIntroduction() *TestUpsert {
+	u.SetExcluded(test.FieldIntroduction)
+	return u
+}
+
+// ClearIntroduction clears the value of the "introduction" field.
+func (u *TestUpsert) ClearIntroduction() *TestUpsert {
+	u.SetNull(test.FieldIntroduction)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Test.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(test.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *TestUpsertOne) UpdateNewValues() *TestUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(test.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(test.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(test.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.Code(); exists {
+			s.SetIgnore(test.FieldCode)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Test.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *TestUpsertOne) Ignore() *TestUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestUpsertOne) DoNothing() *TestUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestCreate.OnConflict
+// documentation for more info.
+func (u *TestUpsertOne) Update(set func(*TestUpsert)) *TestUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestUpsertOne) SetUpdatedAt(v time.Time) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestUpsertOne) UpdateUpdatedAt() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TestUpsertOne) SetDeletedAt(v time.Time) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TestUpsertOne) UpdateDeletedAt() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *TestUpsertOne) ClearDeletedAt() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *TestUpsertOne) SetName(v string) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *TestUpsertOne) UpdateName() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetCategory sets the "category" field.
+func (u *TestUpsertOne) SetCategory(v string) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.SetCategory(v)
+	})
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *TestUpsertOne) UpdateCategory() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateCategory()
+	})
+}
+
+// ClearCategory clears the value of the "category" field.
+func (u *TestUpsertOne) ClearCategory() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearCategory()
+	})
+}
+
+// SetAbility sets the "ability" field.
+func (u *TestUpsertOne) SetAbility(v string) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.SetAbility(v)
+	})
+}
+
+// UpdateAbility sets the "ability" field to the value that was provided on create.
+func (u *TestUpsertOne) UpdateAbility() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateAbility()
+	})
+}
+
+// ClearAbility clears the value of the "ability" field.
+func (u *TestUpsertOne) ClearAbility() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearAbility()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *TestUpsertOne) SetDescription(v string) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *TestUpsertOne) UpdateDescription() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *TestUpsertOne) ClearDescription() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetUnitScoreLabel sets the "unit_score_label" field.
+func (u *TestUpsertOne) SetUnitScoreLabel(v string) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.SetUnitScoreLabel(v)
+	})
+}
+
+// UpdateUnitScoreLabel sets the "unit_score_label" field to the value that was provided on create.
+func (u *TestUpsertOne) UpdateUnitScoreLabel() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateUnitScoreLabel()
+	})
+}
+
+// ClearUnitScoreLabel clears the value of the "unit_score_label" field.
+func (u *TestUpsertOne) ClearUnitScoreLabel() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearUnitScoreLabel()
+	})
+}
+
+// SetDurationSeconds sets the "duration_seconds" field.
+func (u *TestUpsertOne) SetDurationSeconds(v int) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.SetDurationSeconds(v)
+	})
+}
+
+// AddDurationSeconds adds v to the "duration_seconds" field.
+func (u *TestUpsertOne) AddDurationSeconds(v int) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.AddDurationSeconds(v)
+	})
+}
+
+// UpdateDurationSeconds sets the "duration_seconds" field to the value that was provided on create.
+func (u *TestUpsertOne) UpdateDurationSeconds() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateDurationSeconds()
+	})
+}
+
+// SetIntroduction sets the "introduction" field.
+func (u *TestUpsertOne) SetIntroduction(v string) *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.SetIntroduction(v)
+	})
+}
+
+// UpdateIntroduction sets the "introduction" field to the value that was provided on create.
+func (u *TestUpsertOne) UpdateIntroduction() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateIntroduction()
+	})
+}
+
+// ClearIntroduction clears the value of the "introduction" field.
+func (u *TestUpsertOne) ClearIntroduction() *TestUpsertOne {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearIntroduction()
+	})
+}
+
+// Exec executes the query.
+func (u *TestUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *TestUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: TestUpsertOne.ID is not supported by MySQL driver. Use TestUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *TestUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // TestCreateBulk is the builder for creating many Test entities in bulk.
 type TestCreateBulk struct {
 	config
 	err      error
 	builders []*TestCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Test entities in the database.
@@ -423,6 +897,7 @@ func (_c *TestCreateBulk) Save(ctx context.Context) ([]*Test, error) {
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -469,6 +944,304 @@ func (_c *TestCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *TestCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Test.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TestUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *TestCreateBulk) OnConflict(opts ...sql.ConflictOption) *TestUpsertBulk {
+	_c.conflict = opts
+	return &TestUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Test.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *TestCreateBulk) OnConflictColumns(columns ...string) *TestUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &TestUpsertBulk{
+		create: _c,
+	}
+}
+
+// TestUpsertBulk is the builder for "upsert"-ing
+// a bulk of Test nodes.
+type TestUpsertBulk struct {
+	create *TestCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Test.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(test.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *TestUpsertBulk) UpdateNewValues() *TestUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(test.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(test.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(test.FieldTenantID)
+			}
+			if _, exists := b.mutation.Code(); exists {
+				s.SetIgnore(test.FieldCode)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Test.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *TestUpsertBulk) Ignore() *TestUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TestUpsertBulk) DoNothing() *TestUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TestCreateBulk.OnConflict
+// documentation for more info.
+func (u *TestUpsertBulk) Update(set func(*TestUpsert)) *TestUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TestUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TestUpsertBulk) SetUpdatedAt(v time.Time) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TestUpsertBulk) UpdateUpdatedAt() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TestUpsertBulk) SetDeletedAt(v time.Time) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TestUpsertBulk) UpdateDeletedAt() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *TestUpsertBulk) ClearDeletedAt() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *TestUpsertBulk) SetName(v string) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *TestUpsertBulk) UpdateName() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetCategory sets the "category" field.
+func (u *TestUpsertBulk) SetCategory(v string) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.SetCategory(v)
+	})
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *TestUpsertBulk) UpdateCategory() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateCategory()
+	})
+}
+
+// ClearCategory clears the value of the "category" field.
+func (u *TestUpsertBulk) ClearCategory() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearCategory()
+	})
+}
+
+// SetAbility sets the "ability" field.
+func (u *TestUpsertBulk) SetAbility(v string) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.SetAbility(v)
+	})
+}
+
+// UpdateAbility sets the "ability" field to the value that was provided on create.
+func (u *TestUpsertBulk) UpdateAbility() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateAbility()
+	})
+}
+
+// ClearAbility clears the value of the "ability" field.
+func (u *TestUpsertBulk) ClearAbility() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearAbility()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *TestUpsertBulk) SetDescription(v string) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *TestUpsertBulk) UpdateDescription() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *TestUpsertBulk) ClearDescription() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetUnitScoreLabel sets the "unit_score_label" field.
+func (u *TestUpsertBulk) SetUnitScoreLabel(v string) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.SetUnitScoreLabel(v)
+	})
+}
+
+// UpdateUnitScoreLabel sets the "unit_score_label" field to the value that was provided on create.
+func (u *TestUpsertBulk) UpdateUnitScoreLabel() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateUnitScoreLabel()
+	})
+}
+
+// ClearUnitScoreLabel clears the value of the "unit_score_label" field.
+func (u *TestUpsertBulk) ClearUnitScoreLabel() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearUnitScoreLabel()
+	})
+}
+
+// SetDurationSeconds sets the "duration_seconds" field.
+func (u *TestUpsertBulk) SetDurationSeconds(v int) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.SetDurationSeconds(v)
+	})
+}
+
+// AddDurationSeconds adds v to the "duration_seconds" field.
+func (u *TestUpsertBulk) AddDurationSeconds(v int) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.AddDurationSeconds(v)
+	})
+}
+
+// UpdateDurationSeconds sets the "duration_seconds" field to the value that was provided on create.
+func (u *TestUpsertBulk) UpdateDurationSeconds() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateDurationSeconds()
+	})
+}
+
+// SetIntroduction sets the "introduction" field.
+func (u *TestUpsertBulk) SetIntroduction(v string) *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.SetIntroduction(v)
+	})
+}
+
+// UpdateIntroduction sets the "introduction" field to the value that was provided on create.
+func (u *TestUpsertBulk) UpdateIntroduction() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.UpdateIntroduction()
+	})
+}
+
+// ClearIntroduction clears the value of the "introduction" field.
+func (u *TestUpsertBulk) ClearIntroduction() *TestUpsertBulk {
+	return u.Update(func(s *TestUpsert) {
+		s.ClearIntroduction()
+	})
+}
+
+// Exec executes the query.
+func (u *TestUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TestCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TestCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TestUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -122,6 +122,14 @@ func (s *OrderService) CloseOrder(ctx context.Context, in *esportspb.CloseOrderR
 	return &esportspb.CloseOrderResponse{Order: mapOrderPB(order)}, nil
 }
 
+func (s *OrderService) NotifyPayment(ctx context.Context, in *esportspb.NotifyPaymentRequest) (*esportspb.NotifyPaymentResponse, error) {
+	handled, err := s.orderUC.HandleNotification(ctx, in.GetProvider(), in.GetHeaders(), in.GetBody())
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.NotifyPaymentResponse{Handled: handled}, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func mapSkuPB(s *Sku) *esportspb.Sku {

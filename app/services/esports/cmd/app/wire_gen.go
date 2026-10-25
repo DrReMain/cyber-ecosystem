@@ -73,10 +73,11 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	skuRP := pay.NewSkuRP(logger, platformPlatform)
 	skuUC := pay.NewSkuUC(logger, platformPlatform, skuRP)
 	skuService := pay.NewSkuService(logger, skuUC)
+	lifecycle := bootstrap.NewLifecycle()
 	orderRP := pay.NewPayOrderRP(logger, platformPlatform)
 	entitlementRP := pay.NewEntitlementRP(logger, platformPlatform)
 	payChannelRP := pay.NewPayChannelRP(logger, platformPlatform)
-	orderUC := pay.NewOrderUC(logger, platformPlatform, orderRP, skuRP, entitlementRP, testRP, payChannelRP)
+	orderUC := pay.NewOrderUC(logger, platformPlatform, lifecycle, orderRP, skuRP, entitlementRP, testRP, payChannelRP)
 	orderService := pay.NewOrderService(logger, orderUC)
 	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
@@ -90,7 +91,6 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 		cleanup()
 		return nil, nil, err
 	}
-	lifecycle := bootstrap.NewLifecycle()
 	app := newApp(logger, grpcServer, httpServer, connectServer, seed, lifecycle)
 	return app, func() {
 		cleanup3()

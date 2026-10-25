@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type PayOrderCreate struct {
 	config
 	mutation *PayOrderMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -394,6 +397,7 @@ func (_c *PayOrderCreate) createSpec() (*PayOrder, *sqlgraph.CreateSpec) {
 		_node = &PayOrder{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(payorder.Table, sqlgraph.NewFieldSpec(payorder.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -469,11 +473,316 @@ func (_c *PayOrderCreate) createSpec() (*PayOrder, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.PayOrder.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.PayOrderUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *PayOrderCreate) OnConflict(opts ...sql.ConflictOption) *PayOrderUpsertOne {
+	_c.conflict = opts
+	return &PayOrderUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.PayOrder.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *PayOrderCreate) OnConflictColumns(columns ...string) *PayOrderUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &PayOrderUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// PayOrderUpsertOne is the builder for "upsert"-ing
+	//  one PayOrder node.
+	PayOrderUpsertOne struct {
+		create *PayOrderCreate
+	}
+
+	// PayOrderUpsert is the "OnConflict" setter.
+	PayOrderUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *PayOrderUpsert) SetUpdatedAt(v time.Time) *PayOrderUpsert {
+	u.Set(payorder.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdateUpdatedAt() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldUpdatedAt)
+	return u
+}
+
+// SetState sets the "state" field.
+func (u *PayOrderUpsert) SetState(v payorder.State) *PayOrderUpsert {
+	u.Set(payorder.FieldState, v)
+	return u
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdateState() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldState)
+	return u
+}
+
+// SetTransactionID sets the "transaction_id" field.
+func (u *PayOrderUpsert) SetTransactionID(v string) *PayOrderUpsert {
+	u.Set(payorder.FieldTransactionID, v)
+	return u
+}
+
+// UpdateTransactionID sets the "transaction_id" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdateTransactionID() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldTransactionID)
+	return u
+}
+
+// ClearTransactionID clears the value of the "transaction_id" field.
+func (u *PayOrderUpsert) ClearTransactionID() *PayOrderUpsert {
+	u.SetNull(payorder.FieldTransactionID)
+	return u
+}
+
+// SetPaidAt sets the "paid_at" field.
+func (u *PayOrderUpsert) SetPaidAt(v time.Time) *PayOrderUpsert {
+	u.Set(payorder.FieldPaidAt, v)
+	return u
+}
+
+// UpdatePaidAt sets the "paid_at" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdatePaidAt() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldPaidAt)
+	return u
+}
+
+// ClearPaidAt clears the value of the "paid_at" field.
+func (u *PayOrderUpsert) ClearPaidAt() *PayOrderUpsert {
+	u.SetNull(payorder.FieldPaidAt)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.PayOrder.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(payorder.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *PayOrderUpsertOne) UpdateNewValues() *PayOrderUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(payorder.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(payorder.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(payorder.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.OrderNo(); exists {
+			s.SetIgnore(payorder.FieldOrderNo)
+		}
+		if _, exists := u.create.mutation.UserID(); exists {
+			s.SetIgnore(payorder.FieldUserID)
+		}
+		if _, exists := u.create.mutation.SkuCode(); exists {
+			s.SetIgnore(payorder.FieldSkuCode)
+		}
+		if _, exists := u.create.mutation.ScopeKind(); exists {
+			s.SetIgnore(payorder.FieldScopeKind)
+		}
+		if _, exists := u.create.mutation.ScopeRef(); exists {
+			s.SetIgnore(payorder.FieldScopeRef)
+		}
+		if _, exists := u.create.mutation.Provider(); exists {
+			s.SetIgnore(payorder.FieldProvider)
+		}
+		if _, exists := u.create.mutation.Channel(); exists {
+			s.SetIgnore(payorder.FieldChannel)
+		}
+		if _, exists := u.create.mutation.AmountFen(); exists {
+			s.SetIgnore(payorder.FieldAmountFen)
+		}
+		if _, exists := u.create.mutation.CredentialKind(); exists {
+			s.SetIgnore(payorder.FieldCredentialKind)
+		}
+		if _, exists := u.create.mutation.CredentialValue(); exists {
+			s.SetIgnore(payorder.FieldCredentialValue)
+		}
+		if _, exists := u.create.mutation.ExpiresAt(); exists {
+			s.SetIgnore(payorder.FieldExpiresAt)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.PayOrder.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *PayOrderUpsertOne) Ignore() *PayOrderUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *PayOrderUpsertOne) DoNothing() *PayOrderUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the PayOrderCreate.OnConflict
+// documentation for more info.
+func (u *PayOrderUpsertOne) Update(set func(*PayOrderUpsert)) *PayOrderUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&PayOrderUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *PayOrderUpsertOne) SetUpdatedAt(v time.Time) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdateUpdatedAt() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetState sets the "state" field.
+func (u *PayOrderUpsertOne) SetState(v payorder.State) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetState(v)
+	})
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdateState() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateState()
+	})
+}
+
+// SetTransactionID sets the "transaction_id" field.
+func (u *PayOrderUpsertOne) SetTransactionID(v string) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetTransactionID(v)
+	})
+}
+
+// UpdateTransactionID sets the "transaction_id" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdateTransactionID() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateTransactionID()
+	})
+}
+
+// ClearTransactionID clears the value of the "transaction_id" field.
+func (u *PayOrderUpsertOne) ClearTransactionID() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearTransactionID()
+	})
+}
+
+// SetPaidAt sets the "paid_at" field.
+func (u *PayOrderUpsertOne) SetPaidAt(v time.Time) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetPaidAt(v)
+	})
+}
+
+// UpdatePaidAt sets the "paid_at" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdatePaidAt() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdatePaidAt()
+	})
+}
+
+// ClearPaidAt clears the value of the "paid_at" field.
+func (u *PayOrderUpsertOne) ClearPaidAt() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearPaidAt()
+	})
+}
+
+// Exec executes the query.
+func (u *PayOrderUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for PayOrderCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *PayOrderUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *PayOrderUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: PayOrderUpsertOne.ID is not supported by MySQL driver. Use PayOrderUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *PayOrderUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // PayOrderCreateBulk is the builder for creating many PayOrder entities in bulk.
 type PayOrderCreateBulk struct {
 	config
 	err      error
 	builders []*PayOrderCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the PayOrder entities in the database.
@@ -503,6 +812,7 @@ func (_c *PayOrderCreateBulk) Save(ctx context.Context) ([]*PayOrder, error) {
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -549,6 +859,229 @@ func (_c *PayOrderCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *PayOrderCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.PayOrder.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.PayOrderUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *PayOrderCreateBulk) OnConflict(opts ...sql.ConflictOption) *PayOrderUpsertBulk {
+	_c.conflict = opts
+	return &PayOrderUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.PayOrder.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *PayOrderCreateBulk) OnConflictColumns(columns ...string) *PayOrderUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &PayOrderUpsertBulk{
+		create: _c,
+	}
+}
+
+// PayOrderUpsertBulk is the builder for "upsert"-ing
+// a bulk of PayOrder nodes.
+type PayOrderUpsertBulk struct {
+	create *PayOrderCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.PayOrder.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(payorder.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *PayOrderUpsertBulk) UpdateNewValues() *PayOrderUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(payorder.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(payorder.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(payorder.FieldTenantID)
+			}
+			if _, exists := b.mutation.OrderNo(); exists {
+				s.SetIgnore(payorder.FieldOrderNo)
+			}
+			if _, exists := b.mutation.UserID(); exists {
+				s.SetIgnore(payorder.FieldUserID)
+			}
+			if _, exists := b.mutation.SkuCode(); exists {
+				s.SetIgnore(payorder.FieldSkuCode)
+			}
+			if _, exists := b.mutation.ScopeKind(); exists {
+				s.SetIgnore(payorder.FieldScopeKind)
+			}
+			if _, exists := b.mutation.ScopeRef(); exists {
+				s.SetIgnore(payorder.FieldScopeRef)
+			}
+			if _, exists := b.mutation.Provider(); exists {
+				s.SetIgnore(payorder.FieldProvider)
+			}
+			if _, exists := b.mutation.Channel(); exists {
+				s.SetIgnore(payorder.FieldChannel)
+			}
+			if _, exists := b.mutation.AmountFen(); exists {
+				s.SetIgnore(payorder.FieldAmountFen)
+			}
+			if _, exists := b.mutation.CredentialKind(); exists {
+				s.SetIgnore(payorder.FieldCredentialKind)
+			}
+			if _, exists := b.mutation.CredentialValue(); exists {
+				s.SetIgnore(payorder.FieldCredentialValue)
+			}
+			if _, exists := b.mutation.ExpiresAt(); exists {
+				s.SetIgnore(payorder.FieldExpiresAt)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.PayOrder.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *PayOrderUpsertBulk) Ignore() *PayOrderUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *PayOrderUpsertBulk) DoNothing() *PayOrderUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the PayOrderCreateBulk.OnConflict
+// documentation for more info.
+func (u *PayOrderUpsertBulk) Update(set func(*PayOrderUpsert)) *PayOrderUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&PayOrderUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *PayOrderUpsertBulk) SetUpdatedAt(v time.Time) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdateUpdatedAt() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetState sets the "state" field.
+func (u *PayOrderUpsertBulk) SetState(v payorder.State) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetState(v)
+	})
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdateState() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateState()
+	})
+}
+
+// SetTransactionID sets the "transaction_id" field.
+func (u *PayOrderUpsertBulk) SetTransactionID(v string) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetTransactionID(v)
+	})
+}
+
+// UpdateTransactionID sets the "transaction_id" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdateTransactionID() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateTransactionID()
+	})
+}
+
+// ClearTransactionID clears the value of the "transaction_id" field.
+func (u *PayOrderUpsertBulk) ClearTransactionID() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearTransactionID()
+	})
+}
+
+// SetPaidAt sets the "paid_at" field.
+func (u *PayOrderUpsertBulk) SetPaidAt(v time.Time) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetPaidAt(v)
+	})
+}
+
+// UpdatePaidAt sets the "paid_at" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdatePaidAt() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdatePaidAt()
+	})
+}
+
+// ClearPaidAt clears the value of the "paid_at" field.
+func (u *PayOrderUpsertBulk) ClearPaidAt() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearPaidAt()
+	})
+}
+
+// Exec executes the query.
+func (u *PayOrderUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the PayOrderCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for PayOrderCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *PayOrderUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

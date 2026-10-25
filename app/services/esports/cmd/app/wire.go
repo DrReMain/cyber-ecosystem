@@ -30,6 +30,7 @@ import (
 func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Payment, *slog.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		wire.Bind(new(shared.Transaction), new(*platform.Platform)),
+		wire.Bind(new(shared.HookRegistry), new(*bootstrap.Lifecycle)),
 		server.ProviderSet,
 		platform.ProviderSet,
 		bootstrap.ProviderSet,

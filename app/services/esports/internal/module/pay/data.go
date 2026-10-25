@@ -3,6 +3,7 @@ package pay
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"cyber-ecosystem/shared-go/capability/payment"
 	"cyber-ecosystem/shared-go/helper"
@@ -159,6 +160,30 @@ func (rp *payOrderRP) ClosePending(ctx context.Context, orderNo string) (*Order,
 	return rp.ByNo(ctx, orderNo)
 }
 
+func (rp *payOrderRP) Settle(ctx context.Context, in *SettleIn) (*Order, bool, error) {
+	// The conditional update is the whole arbitration: state IN
+	// (pending, closed) → paid, where closed→paid is the channel-truth
+	// correction for a close that raced a payment. Zero rows means a rival
+	// settle already flipped it — the re-read hands the caller the winner.
+	rows, err := rp.Platform.GetClient(ctx).PayOrder.Update().
+		Where(
+			payorder.OrderNoEQ(in.OrderNo),
+			payorder.StateIn(payorder.StatePending, payorder.StateClosed),
+		).
+		SetState(payorder.StatePaid).
+		SetTransactionID(in.TransactionID).
+		SetPaidAt(in.PaidAt).
+		Save(ctx)
+	if err != nil {
+		return nil, false, rp.Platform.HandleEntError(err)
+	}
+	order, err := rp.ByNo(ctx, in.OrderNo)
+	if err != nil {
+		return nil, false, err
+	}
+	return order, rows > 0, nil
+}
+
 func (rp *payOrderRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).PayOrder.Query().
 		Where(payorder.UserIDEQ(in.UserID)).
@@ -175,6 +200,39 @@ func (rp *payOrderRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
 		Orders:       utils.SliceMap(rows, mapOrder),
 	}, nil
+}
+
+func (rp *payOrderRP) ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error) {
+	rows, err := rp.Platform.GetClient(ctx).PayOrder.Query().
+		Where(
+			payorder.StateEQ(payorder.StatePending),
+			payorder.CreatedAtLT(time.Now().Add(-olderThan)),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return utils.SliceMap(rows, mapOrder), nil
+}
+
+func (rp *entitlementRP) Grant(ctx context.Context, g *EntitlementGrant) error {
+	create := rp.Platform.GetClient(ctx).Entitlement.Create().
+		SetUserID(g.UserID).
+		SetScopeKind(entitlement.ScopeKind(g.ScopeKind)).
+		SetSource(g.Source)
+	if g.ScopeRef != nil {
+		create = create.SetScopeRef(*g.ScopeRef)
+	}
+	if g.ExpiresAt != nil {
+		create = create.SetExpiresAt(*g.ExpiresAt)
+	}
+	// ON CONFLICT DO NOTHING keeps the settle transaction unpoisoned: a
+	// rival grant for the same scope is a no-op statement, never an error
+	// the transaction would have to survive.
+	if err := create.OnConflict().DoNothing().Exec(ctx); err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
 }
 
 func (rp *entitlementRP) Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error) {
@@ -224,6 +282,18 @@ func (rp *payChannelRP) ClosePayment(ctx context.Context, provider, outTradeNo s
 		return rp.Platform.HandlePaymentError(err)
 	}
 	return nil
+}
+
+func (rp *payChannelRP) ParseNotification(ctx context.Context, provider string, in *payment.NotificationInput) (*payment.NotificationEvent, error) {
+	backend, err := rp.Platform.PaymentFor(provider)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	event, err := backend.Notifier.Parse(ctx, in)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	return event, nil
 }
 
 func (rp *payChannelRP) Channels(provider string) ([]payment.Channel, error) {

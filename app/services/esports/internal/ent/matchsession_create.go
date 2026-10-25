@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -19,6 +21,7 @@ type MatchSessionCreate struct {
 	config
 	mutation *MatchSessionMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -327,6 +330,7 @@ func (_c *MatchSessionCreate) createSpec() (*MatchSession, *sqlgraph.CreateSpec)
 		_node = &MatchSession{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(matchsession.Table, sqlgraph.NewFieldSpec(matchsession.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -378,11 +382,380 @@ func (_c *MatchSessionCreate) createSpec() (*MatchSession, *sqlgraph.CreateSpec)
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.MatchSession.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.MatchSessionUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *MatchSessionCreate) OnConflict(opts ...sql.ConflictOption) *MatchSessionUpsertOne {
+	_c.conflict = opts
+	return &MatchSessionUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.MatchSession.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *MatchSessionCreate) OnConflictColumns(columns ...string) *MatchSessionUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &MatchSessionUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// MatchSessionUpsertOne is the builder for "upsert"-ing
+	//  one MatchSession node.
+	MatchSessionUpsertOne struct {
+		create *MatchSessionCreate
+	}
+
+	// MatchSessionUpsert is the "OnConflict" setter.
+	MatchSessionUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *MatchSessionUpsert) SetUpdatedAt(v time.Time) *MatchSessionUpsert {
+	u.Set(matchsession.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *MatchSessionUpsert) UpdateUpdatedAt() *MatchSessionUpsert {
+	u.SetExcluded(matchsession.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *MatchSessionUpsert) SetDeletedAt(v time.Time) *MatchSessionUpsert {
+	u.Set(matchsession.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *MatchSessionUpsert) UpdateDeletedAt() *MatchSessionUpsert {
+	u.SetExcluded(matchsession.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *MatchSessionUpsert) ClearDeletedAt() *MatchSessionUpsert {
+	u.SetNull(matchsession.FieldDeletedAt)
+	return u
+}
+
+// SetDifficulty sets the "difficulty" field.
+func (u *MatchSessionUpsert) SetDifficulty(v matchsession.Difficulty) *MatchSessionUpsert {
+	u.Set(matchsession.FieldDifficulty, v)
+	return u
+}
+
+// UpdateDifficulty sets the "difficulty" field to the value that was provided on create.
+func (u *MatchSessionUpsert) UpdateDifficulty() *MatchSessionUpsert {
+	u.SetExcluded(matchsession.FieldDifficulty)
+	return u
+}
+
+// SetSeed sets the "seed" field.
+func (u *MatchSessionUpsert) SetSeed(v int64) *MatchSessionUpsert {
+	u.Set(matchsession.FieldSeed, v)
+	return u
+}
+
+// UpdateSeed sets the "seed" field to the value that was provided on create.
+func (u *MatchSessionUpsert) UpdateSeed() *MatchSessionUpsert {
+	u.SetExcluded(matchsession.FieldSeed)
+	return u
+}
+
+// AddSeed adds v to the "seed" field.
+func (u *MatchSessionUpsert) AddSeed(v int64) *MatchSessionUpsert {
+	u.Add(matchsession.FieldSeed, v)
+	return u
+}
+
+// SetSteps sets the "steps" field.
+func (u *MatchSessionUpsert) SetSteps(v []types.MatchStep) *MatchSessionUpsert {
+	u.Set(matchsession.FieldSteps, v)
+	return u
+}
+
+// UpdateSteps sets the "steps" field to the value that was provided on create.
+func (u *MatchSessionUpsert) UpdateSteps() *MatchSessionUpsert {
+	u.SetExcluded(matchsession.FieldSteps)
+	return u
+}
+
+// SetRetestBudget sets the "retest_budget" field.
+func (u *MatchSessionUpsert) SetRetestBudget(v int) *MatchSessionUpsert {
+	u.Set(matchsession.FieldRetestBudget, v)
+	return u
+}
+
+// UpdateRetestBudget sets the "retest_budget" field to the value that was provided on create.
+func (u *MatchSessionUpsert) UpdateRetestBudget() *MatchSessionUpsert {
+	u.SetExcluded(matchsession.FieldRetestBudget)
+	return u
+}
+
+// AddRetestBudget adds v to the "retest_budget" field.
+func (u *MatchSessionUpsert) AddRetestBudget(v int) *MatchSessionUpsert {
+	u.Add(matchsession.FieldRetestBudget, v)
+	return u
+}
+
+// SetStatus sets the "status" field.
+func (u *MatchSessionUpsert) SetStatus(v matchsession.Status) *MatchSessionUpsert {
+	u.Set(matchsession.FieldStatus, v)
+	return u
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *MatchSessionUpsert) UpdateStatus() *MatchSessionUpsert {
+	u.SetExcluded(matchsession.FieldStatus)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.MatchSession.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(matchsession.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *MatchSessionUpsertOne) UpdateNewValues() *MatchSessionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(matchsession.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(matchsession.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(matchsession.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.UserID(); exists {
+			s.SetIgnore(matchsession.FieldUserID)
+		}
+		if _, exists := u.create.mutation.Genre(); exists {
+			s.SetIgnore(matchsession.FieldGenre)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.MatchSession.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *MatchSessionUpsertOne) Ignore() *MatchSessionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *MatchSessionUpsertOne) DoNothing() *MatchSessionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the MatchSessionCreate.OnConflict
+// documentation for more info.
+func (u *MatchSessionUpsertOne) Update(set func(*MatchSessionUpsert)) *MatchSessionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&MatchSessionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *MatchSessionUpsertOne) SetUpdatedAt(v time.Time) *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *MatchSessionUpsertOne) UpdateUpdatedAt() *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *MatchSessionUpsertOne) SetDeletedAt(v time.Time) *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *MatchSessionUpsertOne) UpdateDeletedAt() *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *MatchSessionUpsertOne) ClearDeletedAt() *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetDifficulty sets the "difficulty" field.
+func (u *MatchSessionUpsertOne) SetDifficulty(v matchsession.Difficulty) *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetDifficulty(v)
+	})
+}
+
+// UpdateDifficulty sets the "difficulty" field to the value that was provided on create.
+func (u *MatchSessionUpsertOne) UpdateDifficulty() *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateDifficulty()
+	})
+}
+
+// SetSeed sets the "seed" field.
+func (u *MatchSessionUpsertOne) SetSeed(v int64) *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetSeed(v)
+	})
+}
+
+// AddSeed adds v to the "seed" field.
+func (u *MatchSessionUpsertOne) AddSeed(v int64) *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.AddSeed(v)
+	})
+}
+
+// UpdateSeed sets the "seed" field to the value that was provided on create.
+func (u *MatchSessionUpsertOne) UpdateSeed() *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateSeed()
+	})
+}
+
+// SetSteps sets the "steps" field.
+func (u *MatchSessionUpsertOne) SetSteps(v []types.MatchStep) *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetSteps(v)
+	})
+}
+
+// UpdateSteps sets the "steps" field to the value that was provided on create.
+func (u *MatchSessionUpsertOne) UpdateSteps() *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateSteps()
+	})
+}
+
+// SetRetestBudget sets the "retest_budget" field.
+func (u *MatchSessionUpsertOne) SetRetestBudget(v int) *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetRetestBudget(v)
+	})
+}
+
+// AddRetestBudget adds v to the "retest_budget" field.
+func (u *MatchSessionUpsertOne) AddRetestBudget(v int) *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.AddRetestBudget(v)
+	})
+}
+
+// UpdateRetestBudget sets the "retest_budget" field to the value that was provided on create.
+func (u *MatchSessionUpsertOne) UpdateRetestBudget() *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateRetestBudget()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *MatchSessionUpsertOne) SetStatus(v matchsession.Status) *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *MatchSessionUpsertOne) UpdateStatus() *MatchSessionUpsertOne {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// Exec executes the query.
+func (u *MatchSessionUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for MatchSessionCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *MatchSessionUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *MatchSessionUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: MatchSessionUpsertOne.ID is not supported by MySQL driver. Use MatchSessionUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *MatchSessionUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // MatchSessionCreateBulk is the builder for creating many MatchSession entities in bulk.
 type MatchSessionCreateBulk struct {
 	config
 	err      error
 	builders []*MatchSessionCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the MatchSession entities in the database.
@@ -412,6 +785,7 @@ func (_c *MatchSessionCreateBulk) Save(ctx context.Context) ([]*MatchSession, er
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -458,6 +832,251 @@ func (_c *MatchSessionCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *MatchSessionCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.MatchSession.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.MatchSessionUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *MatchSessionCreateBulk) OnConflict(opts ...sql.ConflictOption) *MatchSessionUpsertBulk {
+	_c.conflict = opts
+	return &MatchSessionUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.MatchSession.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *MatchSessionCreateBulk) OnConflictColumns(columns ...string) *MatchSessionUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &MatchSessionUpsertBulk{
+		create: _c,
+	}
+}
+
+// MatchSessionUpsertBulk is the builder for "upsert"-ing
+// a bulk of MatchSession nodes.
+type MatchSessionUpsertBulk struct {
+	create *MatchSessionCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.MatchSession.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(matchsession.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *MatchSessionUpsertBulk) UpdateNewValues() *MatchSessionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(matchsession.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(matchsession.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(matchsession.FieldTenantID)
+			}
+			if _, exists := b.mutation.UserID(); exists {
+				s.SetIgnore(matchsession.FieldUserID)
+			}
+			if _, exists := b.mutation.Genre(); exists {
+				s.SetIgnore(matchsession.FieldGenre)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.MatchSession.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *MatchSessionUpsertBulk) Ignore() *MatchSessionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *MatchSessionUpsertBulk) DoNothing() *MatchSessionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the MatchSessionCreateBulk.OnConflict
+// documentation for more info.
+func (u *MatchSessionUpsertBulk) Update(set func(*MatchSessionUpsert)) *MatchSessionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&MatchSessionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *MatchSessionUpsertBulk) SetUpdatedAt(v time.Time) *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *MatchSessionUpsertBulk) UpdateUpdatedAt() *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *MatchSessionUpsertBulk) SetDeletedAt(v time.Time) *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *MatchSessionUpsertBulk) UpdateDeletedAt() *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *MatchSessionUpsertBulk) ClearDeletedAt() *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetDifficulty sets the "difficulty" field.
+func (u *MatchSessionUpsertBulk) SetDifficulty(v matchsession.Difficulty) *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetDifficulty(v)
+	})
+}
+
+// UpdateDifficulty sets the "difficulty" field to the value that was provided on create.
+func (u *MatchSessionUpsertBulk) UpdateDifficulty() *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateDifficulty()
+	})
+}
+
+// SetSeed sets the "seed" field.
+func (u *MatchSessionUpsertBulk) SetSeed(v int64) *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetSeed(v)
+	})
+}
+
+// AddSeed adds v to the "seed" field.
+func (u *MatchSessionUpsertBulk) AddSeed(v int64) *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.AddSeed(v)
+	})
+}
+
+// UpdateSeed sets the "seed" field to the value that was provided on create.
+func (u *MatchSessionUpsertBulk) UpdateSeed() *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateSeed()
+	})
+}
+
+// SetSteps sets the "steps" field.
+func (u *MatchSessionUpsertBulk) SetSteps(v []types.MatchStep) *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetSteps(v)
+	})
+}
+
+// UpdateSteps sets the "steps" field to the value that was provided on create.
+func (u *MatchSessionUpsertBulk) UpdateSteps() *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateSteps()
+	})
+}
+
+// SetRetestBudget sets the "retest_budget" field.
+func (u *MatchSessionUpsertBulk) SetRetestBudget(v int) *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetRetestBudget(v)
+	})
+}
+
+// AddRetestBudget adds v to the "retest_budget" field.
+func (u *MatchSessionUpsertBulk) AddRetestBudget(v int) *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.AddRetestBudget(v)
+	})
+}
+
+// UpdateRetestBudget sets the "retest_budget" field to the value that was provided on create.
+func (u *MatchSessionUpsertBulk) UpdateRetestBudget() *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateRetestBudget()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *MatchSessionUpsertBulk) SetStatus(v matchsession.Status) *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *MatchSessionUpsertBulk) UpdateStatus() *MatchSessionUpsertBulk {
+	return u.Update(func(s *MatchSessionUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// Exec executes the query.
+func (u *MatchSessionUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MatchSessionCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for MatchSessionCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *MatchSessionUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type SkuCreate struct {
 	config
 	mutation *SkuMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -324,6 +327,7 @@ func (_c *SkuCreate) createSpec() (*Sku, *sqlgraph.CreateSpec) {
 		_node = &Sku{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(sku.Table, sqlgraph.NewFieldSpec(sku.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -379,11 +383,445 @@ func (_c *SkuCreate) createSpec() (*Sku, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Sku.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.SkuUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *SkuCreate) OnConflict(opts ...sql.ConflictOption) *SkuUpsertOne {
+	_c.conflict = opts
+	return &SkuUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Sku.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *SkuCreate) OnConflictColumns(columns ...string) *SkuUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &SkuUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// SkuUpsertOne is the builder for "upsert"-ing
+	//  one Sku node.
+	SkuUpsertOne struct {
+		create *SkuCreate
+	}
+
+	// SkuUpsert is the "OnConflict" setter.
+	SkuUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *SkuUpsert) SetUpdatedAt(v time.Time) *SkuUpsert {
+	u.Set(sku.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *SkuUpsert) UpdateUpdatedAt() *SkuUpsert {
+	u.SetExcluded(sku.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *SkuUpsert) SetDeletedAt(v time.Time) *SkuUpsert {
+	u.Set(sku.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *SkuUpsert) UpdateDeletedAt() *SkuUpsert {
+	u.SetExcluded(sku.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *SkuUpsert) ClearDeletedAt() *SkuUpsert {
+	u.SetNull(sku.FieldDeletedAt)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *SkuUpsert) SetName(v string) *SkuUpsert {
+	u.Set(sku.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *SkuUpsert) UpdateName() *SkuUpsert {
+	u.SetExcluded(sku.FieldName)
+	return u
+}
+
+// SetDescription sets the "description" field.
+func (u *SkuUpsert) SetDescription(v string) *SkuUpsert {
+	u.Set(sku.FieldDescription, v)
+	return u
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *SkuUpsert) UpdateDescription() *SkuUpsert {
+	u.SetExcluded(sku.FieldDescription)
+	return u
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *SkuUpsert) ClearDescription() *SkuUpsert {
+	u.SetNull(sku.FieldDescription)
+	return u
+}
+
+// SetPriceFen sets the "price_fen" field.
+func (u *SkuUpsert) SetPriceFen(v int64) *SkuUpsert {
+	u.Set(sku.FieldPriceFen, v)
+	return u
+}
+
+// UpdatePriceFen sets the "price_fen" field to the value that was provided on create.
+func (u *SkuUpsert) UpdatePriceFen() *SkuUpsert {
+	u.SetExcluded(sku.FieldPriceFen)
+	return u
+}
+
+// AddPriceFen adds v to the "price_fen" field.
+func (u *SkuUpsert) AddPriceFen(v int64) *SkuUpsert {
+	u.Add(sku.FieldPriceFen, v)
+	return u
+}
+
+// SetListPriceFen sets the "list_price_fen" field.
+func (u *SkuUpsert) SetListPriceFen(v int64) *SkuUpsert {
+	u.Set(sku.FieldListPriceFen, v)
+	return u
+}
+
+// UpdateListPriceFen sets the "list_price_fen" field to the value that was provided on create.
+func (u *SkuUpsert) UpdateListPriceFen() *SkuUpsert {
+	u.SetExcluded(sku.FieldListPriceFen)
+	return u
+}
+
+// AddListPriceFen adds v to the "list_price_fen" field.
+func (u *SkuUpsert) AddListPriceFen(v int64) *SkuUpsert {
+	u.Add(sku.FieldListPriceFen, v)
+	return u
+}
+
+// SetPeriodDays sets the "period_days" field.
+func (u *SkuUpsert) SetPeriodDays(v int) *SkuUpsert {
+	u.Set(sku.FieldPeriodDays, v)
+	return u
+}
+
+// UpdatePeriodDays sets the "period_days" field to the value that was provided on create.
+func (u *SkuUpsert) UpdatePeriodDays() *SkuUpsert {
+	u.SetExcluded(sku.FieldPeriodDays)
+	return u
+}
+
+// AddPeriodDays adds v to the "period_days" field.
+func (u *SkuUpsert) AddPeriodDays(v int) *SkuUpsert {
+	u.Add(sku.FieldPeriodDays, v)
+	return u
+}
+
+// ClearPeriodDays clears the value of the "period_days" field.
+func (u *SkuUpsert) ClearPeriodDays() *SkuUpsert {
+	u.SetNull(sku.FieldPeriodDays)
+	return u
+}
+
+// SetOnShelf sets the "on_shelf" field.
+func (u *SkuUpsert) SetOnShelf(v bool) *SkuUpsert {
+	u.Set(sku.FieldOnShelf, v)
+	return u
+}
+
+// UpdateOnShelf sets the "on_shelf" field to the value that was provided on create.
+func (u *SkuUpsert) UpdateOnShelf() *SkuUpsert {
+	u.SetExcluded(sku.FieldOnShelf)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Sku.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(sku.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *SkuUpsertOne) UpdateNewValues() *SkuUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(sku.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(sku.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(sku.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.Code(); exists {
+			s.SetIgnore(sku.FieldCode)
+		}
+		if _, exists := u.create.mutation.Kind(); exists {
+			s.SetIgnore(sku.FieldKind)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Sku.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *SkuUpsertOne) Ignore() *SkuUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *SkuUpsertOne) DoNothing() *SkuUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the SkuCreate.OnConflict
+// documentation for more info.
+func (u *SkuUpsertOne) Update(set func(*SkuUpsert)) *SkuUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&SkuUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *SkuUpsertOne) SetUpdatedAt(v time.Time) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *SkuUpsertOne) UpdateUpdatedAt() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *SkuUpsertOne) SetDeletedAt(v time.Time) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *SkuUpsertOne) UpdateDeletedAt() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *SkuUpsertOne) ClearDeletedAt() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *SkuUpsertOne) SetName(v string) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *SkuUpsertOne) UpdateName() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *SkuUpsertOne) SetDescription(v string) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *SkuUpsertOne) UpdateDescription() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *SkuUpsertOne) ClearDescription() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetPriceFen sets the "price_fen" field.
+func (u *SkuUpsertOne) SetPriceFen(v int64) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetPriceFen(v)
+	})
+}
+
+// AddPriceFen adds v to the "price_fen" field.
+func (u *SkuUpsertOne) AddPriceFen(v int64) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.AddPriceFen(v)
+	})
+}
+
+// UpdatePriceFen sets the "price_fen" field to the value that was provided on create.
+func (u *SkuUpsertOne) UpdatePriceFen() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdatePriceFen()
+	})
+}
+
+// SetListPriceFen sets the "list_price_fen" field.
+func (u *SkuUpsertOne) SetListPriceFen(v int64) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetListPriceFen(v)
+	})
+}
+
+// AddListPriceFen adds v to the "list_price_fen" field.
+func (u *SkuUpsertOne) AddListPriceFen(v int64) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.AddListPriceFen(v)
+	})
+}
+
+// UpdateListPriceFen sets the "list_price_fen" field to the value that was provided on create.
+func (u *SkuUpsertOne) UpdateListPriceFen() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateListPriceFen()
+	})
+}
+
+// SetPeriodDays sets the "period_days" field.
+func (u *SkuUpsertOne) SetPeriodDays(v int) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetPeriodDays(v)
+	})
+}
+
+// AddPeriodDays adds v to the "period_days" field.
+func (u *SkuUpsertOne) AddPeriodDays(v int) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.AddPeriodDays(v)
+	})
+}
+
+// UpdatePeriodDays sets the "period_days" field to the value that was provided on create.
+func (u *SkuUpsertOne) UpdatePeriodDays() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdatePeriodDays()
+	})
+}
+
+// ClearPeriodDays clears the value of the "period_days" field.
+func (u *SkuUpsertOne) ClearPeriodDays() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.ClearPeriodDays()
+	})
+}
+
+// SetOnShelf sets the "on_shelf" field.
+func (u *SkuUpsertOne) SetOnShelf(v bool) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetOnShelf(v)
+	})
+}
+
+// UpdateOnShelf sets the "on_shelf" field to the value that was provided on create.
+func (u *SkuUpsertOne) UpdateOnShelf() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateOnShelf()
+	})
+}
+
+// Exec executes the query.
+func (u *SkuUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for SkuCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *SkuUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *SkuUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: SkuUpsertOne.ID is not supported by MySQL driver. Use SkuUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *SkuUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // SkuCreateBulk is the builder for creating many Sku entities in bulk.
 type SkuCreateBulk struct {
 	config
 	err      error
 	builders []*SkuCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Sku entities in the database.
@@ -413,6 +851,7 @@ func (_c *SkuCreateBulk) Save(ctx context.Context) ([]*Sku, error) {
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -459,6 +898,286 @@ func (_c *SkuCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *SkuCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Sku.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.SkuUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *SkuCreateBulk) OnConflict(opts ...sql.ConflictOption) *SkuUpsertBulk {
+	_c.conflict = opts
+	return &SkuUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Sku.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *SkuCreateBulk) OnConflictColumns(columns ...string) *SkuUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &SkuUpsertBulk{
+		create: _c,
+	}
+}
+
+// SkuUpsertBulk is the builder for "upsert"-ing
+// a bulk of Sku nodes.
+type SkuUpsertBulk struct {
+	create *SkuCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Sku.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(sku.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *SkuUpsertBulk) UpdateNewValues() *SkuUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(sku.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(sku.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(sku.FieldTenantID)
+			}
+			if _, exists := b.mutation.Code(); exists {
+				s.SetIgnore(sku.FieldCode)
+			}
+			if _, exists := b.mutation.Kind(); exists {
+				s.SetIgnore(sku.FieldKind)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Sku.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *SkuUpsertBulk) Ignore() *SkuUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *SkuUpsertBulk) DoNothing() *SkuUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the SkuCreateBulk.OnConflict
+// documentation for more info.
+func (u *SkuUpsertBulk) Update(set func(*SkuUpsert)) *SkuUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&SkuUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *SkuUpsertBulk) SetUpdatedAt(v time.Time) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *SkuUpsertBulk) UpdateUpdatedAt() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *SkuUpsertBulk) SetDeletedAt(v time.Time) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *SkuUpsertBulk) UpdateDeletedAt() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *SkuUpsertBulk) ClearDeletedAt() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *SkuUpsertBulk) SetName(v string) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *SkuUpsertBulk) UpdateName() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetDescription sets the "description" field.
+func (u *SkuUpsertBulk) SetDescription(v string) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetDescription(v)
+	})
+}
+
+// UpdateDescription sets the "description" field to the value that was provided on create.
+func (u *SkuUpsertBulk) UpdateDescription() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *SkuUpsertBulk) ClearDescription() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.ClearDescription()
+	})
+}
+
+// SetPriceFen sets the "price_fen" field.
+func (u *SkuUpsertBulk) SetPriceFen(v int64) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetPriceFen(v)
+	})
+}
+
+// AddPriceFen adds v to the "price_fen" field.
+func (u *SkuUpsertBulk) AddPriceFen(v int64) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.AddPriceFen(v)
+	})
+}
+
+// UpdatePriceFen sets the "price_fen" field to the value that was provided on create.
+func (u *SkuUpsertBulk) UpdatePriceFen() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdatePriceFen()
+	})
+}
+
+// SetListPriceFen sets the "list_price_fen" field.
+func (u *SkuUpsertBulk) SetListPriceFen(v int64) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetListPriceFen(v)
+	})
+}
+
+// AddListPriceFen adds v to the "list_price_fen" field.
+func (u *SkuUpsertBulk) AddListPriceFen(v int64) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.AddListPriceFen(v)
+	})
+}
+
+// UpdateListPriceFen sets the "list_price_fen" field to the value that was provided on create.
+func (u *SkuUpsertBulk) UpdateListPriceFen() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateListPriceFen()
+	})
+}
+
+// SetPeriodDays sets the "period_days" field.
+func (u *SkuUpsertBulk) SetPeriodDays(v int) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetPeriodDays(v)
+	})
+}
+
+// AddPeriodDays adds v to the "period_days" field.
+func (u *SkuUpsertBulk) AddPeriodDays(v int) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.AddPeriodDays(v)
+	})
+}
+
+// UpdatePeriodDays sets the "period_days" field to the value that was provided on create.
+func (u *SkuUpsertBulk) UpdatePeriodDays() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdatePeriodDays()
+	})
+}
+
+// ClearPeriodDays clears the value of the "period_days" field.
+func (u *SkuUpsertBulk) ClearPeriodDays() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.ClearPeriodDays()
+	})
+}
+
+// SetOnShelf sets the "on_shelf" field.
+func (u *SkuUpsertBulk) SetOnShelf(v bool) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetOnShelf(v)
+	})
+}
+
+// UpdateOnShelf sets the "on_shelf" field to the value that was provided on create.
+func (u *SkuUpsertBulk) UpdateOnShelf() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateOnShelf()
+	})
+}
+
+// Exec executes the query.
+func (u *SkuUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the SkuCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for SkuCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *SkuUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

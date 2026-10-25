@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type QuestionBankCreate struct {
 	config
 	mutation *QuestionBankMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -238,6 +241,7 @@ func (_c *QuestionBankCreate) createSpec() (*QuestionBank, *sqlgraph.CreateSpec)
 		_node = &QuestionBank{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(questionbank.Table, sqlgraph.NewFieldSpec(questionbank.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -277,11 +281,312 @@ func (_c *QuestionBankCreate) createSpec() (*QuestionBank, *sqlgraph.CreateSpec)
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.QuestionBank.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.QuestionBankUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *QuestionBankCreate) OnConflict(opts ...sql.ConflictOption) *QuestionBankUpsertOne {
+	_c.conflict = opts
+	return &QuestionBankUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.QuestionBank.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *QuestionBankCreate) OnConflictColumns(columns ...string) *QuestionBankUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &QuestionBankUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// QuestionBankUpsertOne is the builder for "upsert"-ing
+	//  one QuestionBank node.
+	QuestionBankUpsertOne struct {
+		create *QuestionBankCreate
+	}
+
+	// QuestionBankUpsert is the "OnConflict" setter.
+	QuestionBankUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *QuestionBankUpsert) SetUpdatedAt(v time.Time) *QuestionBankUpsert {
+	u.Set(questionbank.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *QuestionBankUpsert) UpdateUpdatedAt() *QuestionBankUpsert {
+	u.SetExcluded(questionbank.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *QuestionBankUpsert) SetDeletedAt(v time.Time) *QuestionBankUpsert {
+	u.Set(questionbank.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *QuestionBankUpsert) UpdateDeletedAt() *QuestionBankUpsert {
+	u.SetExcluded(questionbank.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *QuestionBankUpsert) ClearDeletedAt() *QuestionBankUpsert {
+	u.SetNull(questionbank.FieldDeletedAt)
+	return u
+}
+
+// SetScenarioCode sets the "scenario_code" field.
+func (u *QuestionBankUpsert) SetScenarioCode(v string) *QuestionBankUpsert {
+	u.Set(questionbank.FieldScenarioCode, v)
+	return u
+}
+
+// UpdateScenarioCode sets the "scenario_code" field to the value that was provided on create.
+func (u *QuestionBankUpsert) UpdateScenarioCode() *QuestionBankUpsert {
+	u.SetExcluded(questionbank.FieldScenarioCode)
+	return u
+}
+
+// SetPayload sets the "payload" field.
+func (u *QuestionBankUpsert) SetPayload(v map[string]interface{}) *QuestionBankUpsert {
+	u.Set(questionbank.FieldPayload, v)
+	return u
+}
+
+// UpdatePayload sets the "payload" field to the value that was provided on create.
+func (u *QuestionBankUpsert) UpdatePayload() *QuestionBankUpsert {
+	u.SetExcluded(questionbank.FieldPayload)
+	return u
+}
+
+// ClearPayload clears the value of the "payload" field.
+func (u *QuestionBankUpsert) ClearPayload() *QuestionBankUpsert {
+	u.SetNull(questionbank.FieldPayload)
+	return u
+}
+
+// SetAnswer sets the "answer" field.
+func (u *QuestionBankUpsert) SetAnswer(v map[string]interface{}) *QuestionBankUpsert {
+	u.Set(questionbank.FieldAnswer, v)
+	return u
+}
+
+// UpdateAnswer sets the "answer" field to the value that was provided on create.
+func (u *QuestionBankUpsert) UpdateAnswer() *QuestionBankUpsert {
+	u.SetExcluded(questionbank.FieldAnswer)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.QuestionBank.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(questionbank.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *QuestionBankUpsertOne) UpdateNewValues() *QuestionBankUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(questionbank.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(questionbank.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(questionbank.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.TestCode(); exists {
+			s.SetIgnore(questionbank.FieldTestCode)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.QuestionBank.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *QuestionBankUpsertOne) Ignore() *QuestionBankUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *QuestionBankUpsertOne) DoNothing() *QuestionBankUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the QuestionBankCreate.OnConflict
+// documentation for more info.
+func (u *QuestionBankUpsertOne) Update(set func(*QuestionBankUpsert)) *QuestionBankUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&QuestionBankUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *QuestionBankUpsertOne) SetUpdatedAt(v time.Time) *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *QuestionBankUpsertOne) UpdateUpdatedAt() *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *QuestionBankUpsertOne) SetDeletedAt(v time.Time) *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *QuestionBankUpsertOne) UpdateDeletedAt() *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *QuestionBankUpsertOne) ClearDeletedAt() *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetScenarioCode sets the "scenario_code" field.
+func (u *QuestionBankUpsertOne) SetScenarioCode(v string) *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetScenarioCode(v)
+	})
+}
+
+// UpdateScenarioCode sets the "scenario_code" field to the value that was provided on create.
+func (u *QuestionBankUpsertOne) UpdateScenarioCode() *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdateScenarioCode()
+	})
+}
+
+// SetPayload sets the "payload" field.
+func (u *QuestionBankUpsertOne) SetPayload(v map[string]interface{}) *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetPayload(v)
+	})
+}
+
+// UpdatePayload sets the "payload" field to the value that was provided on create.
+func (u *QuestionBankUpsertOne) UpdatePayload() *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdatePayload()
+	})
+}
+
+// ClearPayload clears the value of the "payload" field.
+func (u *QuestionBankUpsertOne) ClearPayload() *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.ClearPayload()
+	})
+}
+
+// SetAnswer sets the "answer" field.
+func (u *QuestionBankUpsertOne) SetAnswer(v map[string]interface{}) *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetAnswer(v)
+	})
+}
+
+// UpdateAnswer sets the "answer" field to the value that was provided on create.
+func (u *QuestionBankUpsertOne) UpdateAnswer() *QuestionBankUpsertOne {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdateAnswer()
+	})
+}
+
+// Exec executes the query.
+func (u *QuestionBankUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for QuestionBankCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *QuestionBankUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *QuestionBankUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: QuestionBankUpsertOne.ID is not supported by MySQL driver. Use QuestionBankUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *QuestionBankUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // QuestionBankCreateBulk is the builder for creating many QuestionBank entities in bulk.
 type QuestionBankCreateBulk struct {
 	config
 	err      error
 	builders []*QuestionBankCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the QuestionBank entities in the database.
@@ -311,6 +616,7 @@ func (_c *QuestionBankCreateBulk) Save(ctx context.Context) ([]*QuestionBank, er
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -357,6 +663,213 @@ func (_c *QuestionBankCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *QuestionBankCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.QuestionBank.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.QuestionBankUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *QuestionBankCreateBulk) OnConflict(opts ...sql.ConflictOption) *QuestionBankUpsertBulk {
+	_c.conflict = opts
+	return &QuestionBankUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.QuestionBank.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *QuestionBankCreateBulk) OnConflictColumns(columns ...string) *QuestionBankUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &QuestionBankUpsertBulk{
+		create: _c,
+	}
+}
+
+// QuestionBankUpsertBulk is the builder for "upsert"-ing
+// a bulk of QuestionBank nodes.
+type QuestionBankUpsertBulk struct {
+	create *QuestionBankCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.QuestionBank.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(questionbank.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *QuestionBankUpsertBulk) UpdateNewValues() *QuestionBankUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(questionbank.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(questionbank.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(questionbank.FieldTenantID)
+			}
+			if _, exists := b.mutation.TestCode(); exists {
+				s.SetIgnore(questionbank.FieldTestCode)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.QuestionBank.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *QuestionBankUpsertBulk) Ignore() *QuestionBankUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *QuestionBankUpsertBulk) DoNothing() *QuestionBankUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the QuestionBankCreateBulk.OnConflict
+// documentation for more info.
+func (u *QuestionBankUpsertBulk) Update(set func(*QuestionBankUpsert)) *QuestionBankUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&QuestionBankUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *QuestionBankUpsertBulk) SetUpdatedAt(v time.Time) *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *QuestionBankUpsertBulk) UpdateUpdatedAt() *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *QuestionBankUpsertBulk) SetDeletedAt(v time.Time) *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *QuestionBankUpsertBulk) UpdateDeletedAt() *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *QuestionBankUpsertBulk) ClearDeletedAt() *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetScenarioCode sets the "scenario_code" field.
+func (u *QuestionBankUpsertBulk) SetScenarioCode(v string) *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetScenarioCode(v)
+	})
+}
+
+// UpdateScenarioCode sets the "scenario_code" field to the value that was provided on create.
+func (u *QuestionBankUpsertBulk) UpdateScenarioCode() *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdateScenarioCode()
+	})
+}
+
+// SetPayload sets the "payload" field.
+func (u *QuestionBankUpsertBulk) SetPayload(v map[string]interface{}) *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetPayload(v)
+	})
+}
+
+// UpdatePayload sets the "payload" field to the value that was provided on create.
+func (u *QuestionBankUpsertBulk) UpdatePayload() *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdatePayload()
+	})
+}
+
+// ClearPayload clears the value of the "payload" field.
+func (u *QuestionBankUpsertBulk) ClearPayload() *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.ClearPayload()
+	})
+}
+
+// SetAnswer sets the "answer" field.
+func (u *QuestionBankUpsertBulk) SetAnswer(v map[string]interface{}) *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.SetAnswer(v)
+	})
+}
+
+// UpdateAnswer sets the "answer" field to the value that was provided on create.
+func (u *QuestionBankUpsertBulk) UpdateAnswer() *QuestionBankUpsertBulk {
+	return u.Update(func(s *QuestionBankUpsert) {
+		s.UpdateAnswer()
+	})
+}
+
+// Exec executes the query.
+func (u *QuestionBankUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the QuestionBankCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for QuestionBankCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *QuestionBankUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

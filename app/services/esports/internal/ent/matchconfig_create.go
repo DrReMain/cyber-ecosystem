@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,7 @@ type MatchConfigCreate struct {
 	config
 	mutation *MatchConfigMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -244,6 +247,7 @@ func (_c *MatchConfigCreate) createSpec() (*MatchConfig, *sqlgraph.CreateSpec) {
 		_node = &MatchConfig{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(matchconfig.Table, sqlgraph.NewFieldSpec(matchconfig.FieldID, field.TypeString))
 	)
+	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -279,11 +283,263 @@ func (_c *MatchConfigCreate) createSpec() (*MatchConfig, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.MatchConfig.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.MatchConfigUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *MatchConfigCreate) OnConflict(opts ...sql.ConflictOption) *MatchConfigUpsertOne {
+	_c.conflict = opts
+	return &MatchConfigUpsertOne{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.MatchConfig.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *MatchConfigCreate) OnConflictColumns(columns ...string) *MatchConfigUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &MatchConfigUpsertOne{
+		create: _c,
+	}
+}
+
+type (
+	// MatchConfigUpsertOne is the builder for "upsert"-ing
+	//  one MatchConfig node.
+	MatchConfigUpsertOne struct {
+		create *MatchConfigCreate
+	}
+
+	// MatchConfigUpsert is the "OnConflict" setter.
+	MatchConfigUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *MatchConfigUpsert) SetUpdatedAt(v time.Time) *MatchConfigUpsert {
+	u.Set(matchconfig.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *MatchConfigUpsert) UpdateUpdatedAt() *MatchConfigUpsert {
+	u.SetExcluded(matchconfig.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *MatchConfigUpsert) SetDeletedAt(v time.Time) *MatchConfigUpsert {
+	u.Set(matchconfig.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *MatchConfigUpsert) UpdateDeletedAt() *MatchConfigUpsert {
+	u.SetExcluded(matchconfig.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *MatchConfigUpsert) ClearDeletedAt() *MatchConfigUpsert {
+	u.SetNull(matchconfig.FieldDeletedAt)
+	return u
+}
+
+// SetRenderOrder sets the "render_order" field.
+func (u *MatchConfigUpsert) SetRenderOrder(v int) *MatchConfigUpsert {
+	u.Set(matchconfig.FieldRenderOrder, v)
+	return u
+}
+
+// UpdateRenderOrder sets the "render_order" field to the value that was provided on create.
+func (u *MatchConfigUpsert) UpdateRenderOrder() *MatchConfigUpsert {
+	u.SetExcluded(matchconfig.FieldRenderOrder)
+	return u
+}
+
+// AddRenderOrder adds v to the "render_order" field.
+func (u *MatchConfigUpsert) AddRenderOrder(v int) *MatchConfigUpsert {
+	u.Add(matchconfig.FieldRenderOrder, v)
+	return u
+}
+
+// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.MatchConfig.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(matchconfig.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *MatchConfigUpsertOne) UpdateNewValues() *MatchConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(matchconfig.FieldID)
+		}
+		if _, exists := u.create.mutation.CreatedAt(); exists {
+			s.SetIgnore(matchconfig.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(matchconfig.FieldTenantID)
+		}
+		if _, exists := u.create.mutation.Genre(); exists {
+			s.SetIgnore(matchconfig.FieldGenre)
+		}
+		if _, exists := u.create.mutation.Ability(); exists {
+			s.SetIgnore(matchconfig.FieldAbility)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.MatchConfig.Create().
+//	    OnConflict(sql.ResolveWithIgnore()).
+//	    Exec(ctx)
+func (u *MatchConfigUpsertOne) Ignore() *MatchConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *MatchConfigUpsertOne) DoNothing() *MatchConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the MatchConfigCreate.OnConflict
+// documentation for more info.
+func (u *MatchConfigUpsertOne) Update(set func(*MatchConfigUpsert)) *MatchConfigUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&MatchConfigUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *MatchConfigUpsertOne) SetUpdatedAt(v time.Time) *MatchConfigUpsertOne {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *MatchConfigUpsertOne) UpdateUpdatedAt() *MatchConfigUpsertOne {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *MatchConfigUpsertOne) SetDeletedAt(v time.Time) *MatchConfigUpsertOne {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *MatchConfigUpsertOne) UpdateDeletedAt() *MatchConfigUpsertOne {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *MatchConfigUpsertOne) ClearDeletedAt() *MatchConfigUpsertOne {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetRenderOrder sets the "render_order" field.
+func (u *MatchConfigUpsertOne) SetRenderOrder(v int) *MatchConfigUpsertOne {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.SetRenderOrder(v)
+	})
+}
+
+// AddRenderOrder adds v to the "render_order" field.
+func (u *MatchConfigUpsertOne) AddRenderOrder(v int) *MatchConfigUpsertOne {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.AddRenderOrder(v)
+	})
+}
+
+// UpdateRenderOrder sets the "render_order" field to the value that was provided on create.
+func (u *MatchConfigUpsertOne) UpdateRenderOrder() *MatchConfigUpsertOne {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.UpdateRenderOrder()
+	})
+}
+
+// Exec executes the query.
+func (u *MatchConfigUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for MatchConfigCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *MatchConfigUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *MatchConfigUpsertOne) ID(ctx context.Context) (id string, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: MatchConfigUpsertOne.ID is not supported by MySQL driver. Use MatchConfigUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *MatchConfigUpsertOne) IDX(ctx context.Context) string {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // MatchConfigCreateBulk is the builder for creating many MatchConfig entities in bulk.
 type MatchConfigCreateBulk struct {
 	config
 	err      error
 	builders []*MatchConfigCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the MatchConfig entities in the database.
@@ -313,6 +569,7 @@ func (_c *MatchConfigCreateBulk) Save(ctx context.Context) ([]*MatchConfig, erro
 					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -359,6 +616,188 @@ func (_c *MatchConfigCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (_c *MatchConfigCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.MatchConfig.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.MatchConfigUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+func (_c *MatchConfigCreateBulk) OnConflict(opts ...sql.ConflictOption) *MatchConfigUpsertBulk {
+	_c.conflict = opts
+	return &MatchConfigUpsertBulk{
+		create: _c,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.MatchConfig.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+func (_c *MatchConfigCreateBulk) OnConflictColumns(columns ...string) *MatchConfigUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
+	return &MatchConfigUpsertBulk{
+		create: _c,
+	}
+}
+
+// MatchConfigUpsertBulk is the builder for "upsert"-ing
+// a bulk of MatchConfig nodes.
+type MatchConfigUpsertBulk struct {
+	create *MatchConfigCreateBulk
+}
+
+// UpdateNewValues updates the mutable fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.MatchConfig.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(matchconfig.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+func (u *MatchConfigUpsertBulk) UpdateNewValues() *MatchConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(matchconfig.FieldID)
+			}
+			if _, exists := b.mutation.CreatedAt(); exists {
+				s.SetIgnore(matchconfig.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(matchconfig.FieldTenantID)
+			}
+			if _, exists := b.mutation.Genre(); exists {
+				s.SetIgnore(matchconfig.FieldGenre)
+			}
+			if _, exists := b.mutation.Ability(); exists {
+				s.SetIgnore(matchconfig.FieldAbility)
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.MatchConfig.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+func (u *MatchConfigUpsertBulk) Ignore() *MatchConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *MatchConfigUpsertBulk) DoNothing() *MatchConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the MatchConfigCreateBulk.OnConflict
+// documentation for more info.
+func (u *MatchConfigUpsertBulk) Update(set func(*MatchConfigUpsert)) *MatchConfigUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&MatchConfigUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *MatchConfigUpsertBulk) SetUpdatedAt(v time.Time) *MatchConfigUpsertBulk {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *MatchConfigUpsertBulk) UpdateUpdatedAt() *MatchConfigUpsertBulk {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *MatchConfigUpsertBulk) SetDeletedAt(v time.Time) *MatchConfigUpsertBulk {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *MatchConfigUpsertBulk) UpdateDeletedAt() *MatchConfigUpsertBulk {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *MatchConfigUpsertBulk) ClearDeletedAt() *MatchConfigUpsertBulk {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetRenderOrder sets the "render_order" field.
+func (u *MatchConfigUpsertBulk) SetRenderOrder(v int) *MatchConfigUpsertBulk {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.SetRenderOrder(v)
+	})
+}
+
+// AddRenderOrder adds v to the "render_order" field.
+func (u *MatchConfigUpsertBulk) AddRenderOrder(v int) *MatchConfigUpsertBulk {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.AddRenderOrder(v)
+	})
+}
+
+// UpdateRenderOrder sets the "render_order" field to the value that was provided on create.
+func (u *MatchConfigUpsertBulk) UpdateRenderOrder() *MatchConfigUpsertBulk {
+	return u.Update(func(s *MatchConfigUpsert) {
+		s.UpdateRenderOrder()
+	})
+}
+
+// Exec executes the query.
+func (u *MatchConfigUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MatchConfigCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for MatchConfigCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *MatchConfigUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
