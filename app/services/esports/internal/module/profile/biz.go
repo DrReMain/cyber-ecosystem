@@ -26,6 +26,7 @@ type Profile struct {
 	Nickname            *string
 	BirthYear           *int32
 	BirthMonth          *int32
+	Sex                 *string
 	AgeBand             *string
 	AvatarURL           *string
 	GuardianConsentedAt *time.Time
@@ -44,6 +45,7 @@ type UpdateIn struct {
 	AvatarURL        *string
 	BirthYear        *int32
 	BirthMonth       *int32
+	Sex              *string
 	GuardianAccepted bool
 	Games            *GamePreference // replace-set: presence rewrites the whole list
 }
@@ -114,6 +116,9 @@ func (uc *ProfileUC) Update(ctx context.Context, in *UpdateIn) (*Profile, error)
 	}
 	if in.BirthMonth != nil {
 		p.BirthMonth = in.BirthMonth
+	}
+	if in.Sex != nil {
+		p.Sex = in.Sex
 	}
 	// The band follows the birth pair wherever it lands — derived, never
 	// client-supplied.

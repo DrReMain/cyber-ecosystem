@@ -63,6 +63,19 @@ message Profile {
   repeated ProfileGame games = 8;
   google.protobuf.Timestamp created_at = 9;
   google.protobuf.Timestamp updated_at = 10;
+  // Three states by the sex ruling: male, female, undetermined — the last
+  // is the honest "not said", never guessed from anything. The report
+  // cohort's same-age-same-sex benchmark reads it; undetermined benches
+  // against the same-age pool不分性别.
+  optional ProfileSex sex = 11;
+}
+
+// The profile's sex vocabulary, three states by ruling.
+enum ProfileSex {
+  PROFILE_SEX_UNSPECIFIED = 0;
+  PROFILE_SEX_MALE = 1;
+  PROFILE_SEX_FEMALE = 2;
+  PROFILE_SEX_UNDETERMINED = 3;
 }
 
 // One preference entry: exactly one of the pair is set — a catalog reference
@@ -112,6 +125,7 @@ message UpdateProfileRequest {
   // constant enforced server-side; the repeated bounds below are static
   // backstops only.
   optional GamePreferenceInput game_preference = 6;
+  optional ProfileSex sex = 7;
 }
 
 message GamePreferenceInput {

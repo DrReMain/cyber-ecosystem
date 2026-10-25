@@ -3610,6 +3610,19 @@ components:
                 updatedAt:
                     type: string
                     format: date-time
+                sex:
+                    enum:
+                        - PROFILE_SEX_UNSPECIFIED
+                        - PROFILE_SEX_MALE
+                        - PROFILE_SEX_FEMALE
+                        - PROFILE_SEX_UNDETERMINED
+                    type: string
+                    description: |-
+                        Three states by the sex ruling: male, female, undetermined — the last
+                         is the honest "not said", never guessed from anything. The report
+                         cohort's same-age-same-sex benchmark reads it; undetermined benches
+                         against the same-age pool不分性别.
+                    format: enum
             description: |-
                 The member's own profile. Entity fields are wrappers: null means "not set
                  yet" (the row is born lazily on first save), never a zero value.
@@ -4158,6 +4171,14 @@ components:
                          empty lists clears it). The business custom-game cap is a product
                          constant enforced server-side; the repeated bounds below are static
                          backstops only.
+                sex:
+                    enum:
+                        - PROFILE_SEX_UNSPECIFIED
+                        - PROFILE_SEX_MALE
+                        - PROFILE_SEX_FEMALE
+                        - PROFILE_SEX_UNDETERMINED
+                    type: string
+                    format: enum
             description: |-
                 updateProfile — presence-based partial update: a field left out stays
                  untouched; each onboarding step saves its own slice.

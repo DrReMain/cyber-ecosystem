@@ -2,8 +2,8 @@
 // @generated from file cyber/esports/v1/profile.proto (package cyber.esports.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
 import { file_ext_v1_access } from "../../../ext/v1/access_pb";
 import { file_ext_v1_desc } from "../../../ext/v1/desc_pb";
@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/esports/v1/profile.proto.
  */
 export const file_cyber_esports_v1_profile: GenFile = /*@__PURE__*/
-  fileDesc("Ch5jeWJlci9lc3BvcnRzL3YxL3Byb2ZpbGUucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEi8QMKB1Byb2ZpbGUSKAoCaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoIbmlja25hbWUYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLwoKYmlydGhfeWVhchgDIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlEjAKC2JpcnRoX21vbnRoGAQgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSLgoIYWdlX2JhbmQYBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMAoKYXZhdGFyX3VybBgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRI5ChVndWFyZGlhbl9jb25zZW50ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKBWdhbWVzGAggAygLMh0uY3liZXIuZXNwb3J0cy52MS5Qcm9maWxlR2FtZRIuCgpjcmVhdGVkX2F0GAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgp1cGRhdGVkX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJvCgtQcm9maWxlR2FtZRItCgdnYW1lX2lkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjEKC2N1c3RvbV9uYW1lGAIgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlIhMKEUdldFByb2ZpbGVSZXF1ZXN0IkAKEkdldFByb2ZpbGVSZXNwb25zZRIqCgdwcm9maWxlGAEgASgLMhkuY3liZXIuZXNwb3J0cy52MS5Qcm9maWxlIv0DChRVcGRhdGVQcm9maWxlUmVxdWVzdBIgCghuaWNrbmFtZRgBIAEoCUIJukgGcgQQAhgMSACIAQESIwoKYXZhdGFyX3VybBgCIAEoCUIKukgHcgUQARj0A0gBiAEBEiQKCmJpcnRoX3llYXIYAyABKAVCC7pICBoGGLQQKOwOSAKIAQESIwoLYmlydGhfbW9udGgYBCABKAVCCbpIBhoEGAwoAUgDiAEBEh4KEWd1YXJkaWFuX2FjY2VwdGVkGAUgASgISASIAQESQwoPZ2FtZV9wcmVmZXJlbmNlGAYgASgLMiUuY3liZXIuZXNwb3J0cy52MS5HYW1lUHJlZmVyZW5jZUlucHV0SAWIAQE6iAG6SIQBGoEBCh9VcGRhdGVQcm9maWxlUmVxdWVzdC5iaXJ0aF9wYWlyEi9iaXJ0aF95ZWFyIGFuZCBiaXJ0aF9tb250aCBtdXN0IGJlIHNldCB0b2dldGhlchotaGFzKHRoaXMuYmlydGhfeWVhcikgPT0gaGFzKHRoaXMuYmlydGhfbW9udGgpQgsKCV9uaWNrbmFtZUINCgtfYXZhdGFyX3VybEINCgtfYmlydGhfeWVhckIOCgxfYmlydGhfbW9udGhCFAoSX2d1YXJkaWFuX2FjY2VwdGVkQhIKEF9nYW1lX3ByZWZlcmVuY2UiYQoTR2FtZVByZWZlcmVuY2VJbnB1dBIiCghnYW1lX2lkcxgBIAMoCUIQukgNkgEKEDIiBnIEEAEYQBImCgxjdXN0b21fbmFtZXMYAiADKAlCELpIDZIBChAUIgZyBBABGCgiQwoVVXBkYXRlUHJvZmlsZVJlc3BvbnNlEioKB3Byb2ZpbGUYASABKAsyGS5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGUy7AIKDlByb2ZpbGVTZXJ2aWNlEpwBCgpHZXRQcm9maWxlEiMuY3liZXIuZXNwb3J0cy52MS5HZXRQcm9maWxlUmVxdWVzdBokLmN5YmVyLmVzcG9ydHMudjEuR2V0UHJvZmlsZVJlc3BvbnNlIkOI8QQEitMOHAoY6I635Y+W5b2T5YmN546p5a6255S75YOPEAGC0+STAhkSFy9hcGkvdjEvZXNwb3J0cy9wcm9maWxlEqgBCg1VcGRhdGVQcm9maWxlEiYuY3liZXIuZXNwb3J0cy52MS5VcGRhdGVQcm9maWxlUmVxdWVzdBonLmN5YmVyLmVzcG9ydHMudjEuVXBkYXRlUHJvZmlsZVJlc3BvbnNlIkaI8QQEitMOHAoY5L+d5a2Y5b2T5YmN546p5a6255S75YOPEAKC0+STAhw6ASoaFy9hcGkvdjEvZXNwb3J0cy9wcm9maWxlGhCK4gkM546p5a6255S75YOPQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("Ch5jeWJlci9lc3BvcnRzL3YxL3Byb2ZpbGUucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEiqQQKB1Byb2ZpbGUSKAoCaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoIbmlja25hbWUYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLwoKYmlydGhfeWVhchgDIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlEjAKC2JpcnRoX21vbnRoGAQgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSLgoIYWdlX2JhbmQYBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMAoKYXZhdGFyX3VybBgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRI5ChVndWFyZGlhbl9jb25zZW50ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKBWdhbWVzGAggAygLMh0uY3liZXIuZXNwb3J0cy52MS5Qcm9maWxlR2FtZRIuCgpjcmVhdGVkX2F0GAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgp1cGRhdGVkX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgNzZXgYCyABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGVTZXhIAIgBAUIGCgRfc2V4Im8KC1Byb2ZpbGVHYW1lEi0KB2dhbWVfaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLY3VzdG9tX25hbWUYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUiEwoRR2V0UHJvZmlsZVJlcXVlc3QiQAoSR2V0UHJvZmlsZVJlc3BvbnNlEioKB3Byb2ZpbGUYASABKAsyGS5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGUitQQKFFVwZGF0ZVByb2ZpbGVSZXF1ZXN0EiAKCG5pY2tuYW1lGAEgASgJQgm6SAZyBBACGAxIAIgBARIjCgphdmF0YXJfdXJsGAIgASgJQgq6SAdyBRABGPQDSAGIAQESJAoKYmlydGhfeWVhchgDIAEoBUILukgIGgYYtBAo7A5IAogBARIjCgtiaXJ0aF9tb250aBgEIAEoBUIJukgGGgQYDCgBSAOIAQESHgoRZ3VhcmRpYW5fYWNjZXB0ZWQYBSABKAhIBIgBARJDCg9nYW1lX3ByZWZlcmVuY2UYBiABKAsyJS5jeWJlci5lc3BvcnRzLnYxLkdhbWVQcmVmZXJlbmNlSW5wdXRIBYgBARIuCgNzZXgYByABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGVTZXhIBogBATqIAbpIhAEagQEKH1VwZGF0ZVByb2ZpbGVSZXF1ZXN0LmJpcnRoX3BhaXISL2JpcnRoX3llYXIgYW5kIGJpcnRoX21vbnRoIG11c3QgYmUgc2V0IHRvZ2V0aGVyGi1oYXModGhpcy5iaXJ0aF95ZWFyKSA9PSBoYXModGhpcy5iaXJ0aF9tb250aClCCwoJX25pY2tuYW1lQg0KC19hdmF0YXJfdXJsQg0KC19iaXJ0aF95ZWFyQg4KDF9iaXJ0aF9tb250aEIUChJfZ3VhcmRpYW5fYWNjZXB0ZWRCEgoQX2dhbWVfcHJlZmVyZW5jZUIGCgRfc2V4ImEKE0dhbWVQcmVmZXJlbmNlSW5wdXQSIgoIZ2FtZV9pZHMYASADKAlCELpIDZIBChAyIgZyBBABGEASJgoMY3VzdG9tX25hbWVzGAIgAygJQhC6SA2SAQoQFCIGcgQQARgoIkMKFVVwZGF0ZVByb2ZpbGVSZXNwb25zZRIqCgdwcm9maWxlGAEgASgLMhkuY3liZXIuZXNwb3J0cy52MS5Qcm9maWxlKnUKClByb2ZpbGVTZXgSGwoXUFJPRklMRV9TRVhfVU5TUEVDSUZJRUQQABIUChBQUk9GSUxFX1NFWF9NQUxFEAESFgoSUFJPRklMRV9TRVhfRkVNQUxFEAISHAoYUFJPRklMRV9TRVhfVU5ERVRFUk1JTkVEEAMy7AIKDlByb2ZpbGVTZXJ2aWNlEpwBCgpHZXRQcm9maWxlEiMuY3liZXIuZXNwb3J0cy52MS5HZXRQcm9maWxlUmVxdWVzdBokLmN5YmVyLmVzcG9ydHMudjEuR2V0UHJvZmlsZVJlc3BvbnNlIkOI8QQEitMOHAoY6I635Y+W5b2T5YmN546p5a6255S75YOPEAGC0+STAhkSFy9hcGkvdjEvZXNwb3J0cy9wcm9maWxlEqgBCg1VcGRhdGVQcm9maWxlEiYuY3liZXIuZXNwb3J0cy52MS5VcGRhdGVQcm9maWxlUmVxdWVzdBonLmN5YmVyLmVzcG9ydHMudjEuVXBkYXRlUHJvZmlsZVJlc3BvbnNlIkaI8QQEitMOHAoY5L+d5a2Y5b2T5YmN546p5a6255S75YOPEAKC0+STAhw6ASoaFy9hcGkvdjEvZXNwb3J0cy9wcm9maWxlGhCK4gkM546p5a6255S75YOPQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * The member's own profile. Entity fields are wrappers: null means "not set
@@ -90,6 +90,16 @@ export type Profile = Message<"cyber.esports.v1.Profile"> & {
    * @generated from field: google.protobuf.Timestamp updated_at = 10;
    */
   updatedAt?: Timestamp | undefined;
+
+  /**
+   * Three states by the sex ruling: male, female, undetermined — the last
+   * is the honest "not said", never guessed from anything. The report
+   * cohort's same-age-same-sex benchmark reads it; undetermined benches
+   * against the same-age pool不分性别.
+   *
+   * @generated from field: optional cyber.esports.v1.ProfileSex sex = 11;
+   */
+  sex?: ProfileSex | undefined;
 };
 
 /**
@@ -200,6 +210,11 @@ export type UpdateProfileRequest = Message<"cyber.esports.v1.UpdateProfileReques
    * @generated from field: optional cyber.esports.v1.GamePreferenceInput game_preference = 6;
    */
   gamePreference?: GamePreferenceInput | undefined;
+
+  /**
+   * @generated from field: optional cyber.esports.v1.ProfileSex sex = 7;
+   */
+  sex?: ProfileSex | undefined;
 };
 
 /**
@@ -247,6 +262,39 @@ export type UpdateProfileResponse = Message<"cyber.esports.v1.UpdateProfileRespo
  */
 export const UpdateProfileResponseSchema: GenMessage<UpdateProfileResponse> = /*@__PURE__*/
   messageDesc(file_cyber_esports_v1_profile, 6);
+
+/**
+ * The profile's sex vocabulary, three states by ruling.
+ *
+ * @generated from enum cyber.esports.v1.ProfileSex
+ */
+export enum ProfileSex {
+  /**
+   * @generated from enum value: PROFILE_SEX_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: PROFILE_SEX_MALE = 1;
+   */
+  MALE = 1,
+
+  /**
+   * @generated from enum value: PROFILE_SEX_FEMALE = 2;
+   */
+  FEMALE = 2,
+
+  /**
+   * @generated from enum value: PROFILE_SEX_UNDETERMINED = 3;
+   */
+  UNDETERMINED = 3,
+}
+
+/**
+ * Describes the enum cyber.esports.v1.ProfileSex.
+ */
+export const ProfileSexSchema: GenEnum<ProfileSex> = /*@__PURE__*/
+  enumDesc(file_cyber_esports_v1_profile, 0);
 
 /**
  * Player profile, the C-end onboarding aggregate: nickname, birth year/month,

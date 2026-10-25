@@ -57,6 +57,7 @@ func (s *ProfileService) UpdateProfile(ctx context.Context, in *esportspb.Update
 		AvatarURL:        in.AvatarUrl,
 		BirthYear:        in.BirthYear,
 		BirthMonth:       in.BirthMonth,
+		Sex:              sexFromPB(in.Sex),
 		GuardianAccepted: in.GetGuardianAccepted(),
 	}
 	if in.GamePreference != nil {
@@ -91,6 +92,7 @@ func mapProfilePB(p *Profile) *esportspb.Profile {
 		Nickname:            utils.Wrap(p.Nickname, utils.StringW),
 		BirthYear:           utils.Wrap(p.BirthYear, utils.Int32W),
 		BirthMonth:          utils.Wrap(p.BirthMonth, utils.Int32W),
+		Sex:                 sexPB(p.Sex),
 		AgeBand:             utils.Wrap(p.AgeBand, utils.StringW),
 		AvatarUrl:           utils.Wrap(p.AvatarURL, utils.StringW),
 		GuardianConsentedAt: utils.ToTimestamp(p.GuardianConsentedAt),
@@ -98,4 +100,32 @@ func mapProfilePB(p *Profile) *esportspb.Profile {
 		CreatedAt:           utils.ToTimestamp(&p.CreatedAt),
 		UpdatedAt:           utils.ToTimestamp(&p.UpdatedAt),
 	}
+}
+
+func sexPB(s *string) *esportspb.ProfileSex {
+	if s == nil {
+		return nil
+	}
+	v := esportspb.ProfileSex_PROFILE_SEX_UNDETERMINED // the honest default — a bad row renders as not-said, never as a guess
+	switch *s {
+	case "male":
+		v = esportspb.ProfileSex_PROFILE_SEX_MALE
+	case "female":
+		v = esportspb.ProfileSex_PROFILE_SEX_FEMALE
+	}
+	return &v
+}
+
+func sexFromPB(s *esportspb.ProfileSex) *string {
+	if s == nil {
+		return nil
+	}
+	v := "undetermined"
+	switch *s {
+	case esportspb.ProfileSex_PROFILE_SEX_MALE:
+		v = "male"
+	case esportspb.ProfileSex_PROFILE_SEX_FEMALE:
+		v = "female"
+	}
+	return &v
 }

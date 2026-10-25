@@ -554,6 +554,36 @@ func BirthMonthNotNil() predicate.Profile {
 	return predicate.Profile(sql.FieldNotNull(FieldBirthMonth))
 }
 
+// SexEQ applies the EQ predicate on the "sex" field.
+func SexEQ(v Sex) predicate.Profile {
+	return predicate.Profile(sql.FieldEQ(FieldSex, v))
+}
+
+// SexNEQ applies the NEQ predicate on the "sex" field.
+func SexNEQ(v Sex) predicate.Profile {
+	return predicate.Profile(sql.FieldNEQ(FieldSex, v))
+}
+
+// SexIn applies the In predicate on the "sex" field.
+func SexIn(vs ...Sex) predicate.Profile {
+	return predicate.Profile(sql.FieldIn(FieldSex, vs...))
+}
+
+// SexNotIn applies the NotIn predicate on the "sex" field.
+func SexNotIn(vs ...Sex) predicate.Profile {
+	return predicate.Profile(sql.FieldNotIn(FieldSex, vs...))
+}
+
+// SexIsNil applies the IsNil predicate on the "sex" field.
+func SexIsNil() predicate.Profile {
+	return predicate.Profile(sql.FieldIsNull(FieldSex))
+}
+
+// SexNotNil applies the NotNil predicate on the "sex" field.
+func SexNotNil() predicate.Profile {
+	return predicate.Profile(sql.FieldNotNull(FieldSex))
+}
+
 // AgeBandEQ applies the EQ predicate on the "age_band" field.
 func AgeBandEQ(v string) predicate.Profile {
 	return predicate.Profile(sql.FieldEQ(FieldAgeBand, v))

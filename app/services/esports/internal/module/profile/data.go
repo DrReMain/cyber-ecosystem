@@ -75,6 +75,7 @@ func (rp *profileRP) Save(ctx context.Context, p *Profile) (*Profile, error) {
 			SetNillableNickname(p.Nickname).
 			SetNillableBirthYear(utils.ConvPtr[int](p.BirthYear)).
 			SetNillableBirthMonth(utils.ConvPtr[int](p.BirthMonth)).
+			SetNillableSex(sexEnt(p.Sex)).
 			SetNillableAgeBand(p.AgeBand).
 			SetNillableAvatarURL(p.AvatarURL).
 			SetNillableGuardianConsentedAt(p.GuardianConsentedAt).
@@ -85,6 +86,7 @@ func (rp *profileRP) Save(ctx context.Context, p *Profile) (*Profile, error) {
 			SetNillableNickname(p.Nickname).
 			SetNillableBirthYear(utils.ConvPtr[int](p.BirthYear)).
 			SetNillableBirthMonth(utils.ConvPtr[int](p.BirthMonth)).
+			SetNillableSex(sexEnt(p.Sex)).
 			SetNillableAgeBand(p.AgeBand).
 			SetNillableAvatarURL(p.AvatarURL).
 			SetNillableGuardianConsentedAt(p.GuardianConsentedAt).
@@ -106,6 +108,7 @@ func mapProfile(row *ent.Profile) *Profile {
 		Nickname:            row.Nickname,
 		BirthYear:           utils.ConvPtr[int32](row.BirthYear),
 		BirthMonth:          utils.ConvPtr[int32](row.BirthMonth),
+		Sex:                 sexFromEnt(row.Sex),
 		AgeBand:             row.AgeBand,
 		AvatarURL:           row.AvatarURL,
 		GuardianConsentedAt: row.GuardianConsentedAt,
@@ -113,4 +116,20 @@ func mapProfile(row *ent.Profile) *Profile {
 		CreatedAt:           row.CreatedAt,
 		UpdatedAt:           row.UpdatedAt,
 	}
+}
+
+func sexEnt(s *string) *profile.Sex {
+	if s == nil {
+		return nil
+	}
+	v := profile.Sex(*s)
+	return &v
+}
+
+func sexFromEnt(s *profile.Sex) *string {
+	if s == nil {
+		return nil
+	}
+	v := string(*s)
+	return &v
 }

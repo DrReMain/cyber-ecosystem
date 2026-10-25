@@ -27,6 +27,8 @@ func (Profile) Fields() []ent.Field {
 			Comment("birth year; year+month is the collected granularity, a day is fabricated precision"),
 		field.Int("birth_month").Optional().Nillable().Min(1).Max(12).
 			Comment("birth month 1-12"),
+		field.Enum("sex").Values("male", "female", "undetermined").Optional().Nillable().
+			Comment("three states by the sex ruling — undetermined is the honest not-said; the report cohort reads it (same-age-same-sex, undetermined benches against the same-age pool)"),
 		field.String("age_band").Optional().Nillable().MaxRuneLen(16).
 			Comment("derived at write from birth year/month; 8-band word set under12|12-14|15-17|18-22|23-25|26-29|30-40|over40; null while birth unknown"),
 		field.String("avatar_url").Optional().Nillable().MaxRuneLen(500).

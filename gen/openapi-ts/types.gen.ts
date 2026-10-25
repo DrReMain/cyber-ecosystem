@@ -741,6 +741,13 @@ export type CyberEsportsV1Profile = {
     games?: Array<CyberEsportsV1ProfileGame>;
     createdAt?: string;
     updatedAt?: string;
+    /**
+     * Three states by the sex ruling: male, female, undetermined — the last
+     * is the honest "not said", never guessed from anything. The report
+     * cohort's same-age-same-sex benchmark reads it; undetermined benches
+     * against the same-age pool不分性别.
+     */
+    sex?: 'PROFILE_SEX_UNSPECIFIED' | 'PROFILE_SEX_MALE' | 'PROFILE_SEX_FEMALE' | 'PROFILE_SEX_UNDETERMINED';
 };
 
 /**
@@ -1118,6 +1125,7 @@ export type CyberEsportsV1UpdateProfileRequest = {
      * backstops only.
      */
     gamePreference?: CyberEsportsV1GamePreferenceInput;
+    sex?: 'PROFILE_SEX_UNSPECIFIED' | 'PROFILE_SEX_MALE' | 'PROFILE_SEX_FEMALE' | 'PROFILE_SEX_UNDETERMINED';
 };
 
 export type CyberEsportsV1UpdateProfileResponse = {

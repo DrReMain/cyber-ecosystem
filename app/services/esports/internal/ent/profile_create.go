@@ -120,6 +120,20 @@ func (_c *ProfileCreate) SetNillableBirthMonth(v *int) *ProfileCreate {
 	return _c
 }
 
+// SetSex sets the "sex" field.
+func (_c *ProfileCreate) SetSex(v profile.Sex) *ProfileCreate {
+	_c.mutation.SetSex(v)
+	return _c
+}
+
+// SetNillableSex sets the "sex" field if the given value is not nil.
+func (_c *ProfileCreate) SetNillableSex(v *profile.Sex) *ProfileCreate {
+	if v != nil {
+		_c.SetSex(*v)
+	}
+	return _c
+}
+
 // SetAgeBand sets the "age_band" field.
 func (_c *ProfileCreate) SetAgeBand(v string) *ProfileCreate {
 	_c.mutation.SetAgeBand(v)
@@ -277,6 +291,11 @@ func (_c *ProfileCreate) check() error {
 			return &ValidationError{Name: "birth_month", err: fmt.Errorf(`ent: validator failed for field "Profile.birth_month": %w`, err)}
 		}
 	}
+	if v, ok := _c.mutation.Sex(); ok {
+		if err := profile.SexValidator(v); err != nil {
+			return &ValidationError{Name: "sex", err: fmt.Errorf(`ent: validator failed for field "Profile.sex": %w`, err)}
+		}
+	}
 	if v, ok := _c.mutation.AgeBand(); ok {
 		if err := profile.AgeBandValidator(v); err != nil {
 			return &ValidationError{Name: "age_band", err: fmt.Errorf(`ent: validator failed for field "Profile.age_band": %w`, err)}
@@ -359,6 +378,10 @@ func (_c *ProfileCreate) createSpec() (*Profile, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.BirthMonth(); ok {
 		_spec.SetField(profile.FieldBirthMonth, field.TypeInt, value)
 		_node.BirthMonth = &value
+	}
+	if value, ok := _c.mutation.Sex(); ok {
+		_spec.SetField(profile.FieldSex, field.TypeEnum, value)
+		_node.Sex = &value
 	}
 	if value, ok := _c.mutation.AgeBand(); ok {
 		_spec.SetField(profile.FieldAgeBand, field.TypeString, value)
@@ -521,6 +544,24 @@ func (u *ProfileUpsert) AddBirthMonth(v int) *ProfileUpsert {
 // ClearBirthMonth clears the value of the "birth_month" field.
 func (u *ProfileUpsert) ClearBirthMonth() *ProfileUpsert {
 	u.SetNull(profile.FieldBirthMonth)
+	return u
+}
+
+// SetSex sets the "sex" field.
+func (u *ProfileUpsert) SetSex(v profile.Sex) *ProfileUpsert {
+	u.Set(profile.FieldSex, v)
+	return u
+}
+
+// UpdateSex sets the "sex" field to the value that was provided on create.
+func (u *ProfileUpsert) UpdateSex() *ProfileUpsert {
+	u.SetExcluded(profile.FieldSex)
+	return u
+}
+
+// ClearSex clears the value of the "sex" field.
+func (u *ProfileUpsert) ClearSex() *ProfileUpsert {
+	u.SetNull(profile.FieldSex)
 	return u
 }
 
@@ -762,6 +803,27 @@ func (u *ProfileUpsertOne) UpdateBirthMonth() *ProfileUpsertOne {
 func (u *ProfileUpsertOne) ClearBirthMonth() *ProfileUpsertOne {
 	return u.Update(func(s *ProfileUpsert) {
 		s.ClearBirthMonth()
+	})
+}
+
+// SetSex sets the "sex" field.
+func (u *ProfileUpsertOne) SetSex(v profile.Sex) *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetSex(v)
+	})
+}
+
+// UpdateSex sets the "sex" field to the value that was provided on create.
+func (u *ProfileUpsertOne) UpdateSex() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateSex()
+	})
+}
+
+// ClearSex clears the value of the "sex" field.
+func (u *ProfileUpsertOne) ClearSex() *ProfileUpsertOne {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearSex()
 	})
 }
 
@@ -1182,6 +1244,27 @@ func (u *ProfileUpsertBulk) UpdateBirthMonth() *ProfileUpsertBulk {
 func (u *ProfileUpsertBulk) ClearBirthMonth() *ProfileUpsertBulk {
 	return u.Update(func(s *ProfileUpsert) {
 		s.ClearBirthMonth()
+	})
+}
+
+// SetSex sets the "sex" field.
+func (u *ProfileUpsertBulk) SetSex(v profile.Sex) *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.SetSex(v)
+	})
+}
+
+// UpdateSex sets the "sex" field to the value that was provided on create.
+func (u *ProfileUpsertBulk) UpdateSex() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.UpdateSex()
+	})
+}
+
+// ClearSex clears the value of the "sex" field.
+func (u *ProfileUpsertBulk) ClearSex() *ProfileUpsertBulk {
+	return u.Update(func(s *ProfileUpsert) {
+		s.ClearSex()
 	})
 }
 

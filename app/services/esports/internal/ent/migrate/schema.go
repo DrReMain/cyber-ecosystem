@@ -349,6 +349,7 @@ var (
 		{Name: "nickname", Type: field.TypeString, Nullable: true, Size: 12, Comment: "display name; 2-12 chars once set (boundary-validated, not a DB concern)"},
 		{Name: "birth_year", Type: field.TypeInt, Nullable: true, Comment: "birth year; year+month is the collected granularity, a day is fabricated precision"},
 		{Name: "birth_month", Type: field.TypeInt, Nullable: true, Comment: "birth month 1-12"},
+		{Name: "sex", Type: field.TypeEnum, Nullable: true, Comment: "three states by the sex ruling — undetermined is the honest not-said; the report cohort reads it (same-age-same-sex, undetermined benches against the same-age pool)", Enums: []string{"male", "female", "undetermined"}},
 		{Name: "age_band", Type: field.TypeString, Nullable: true, Size: 16, Comment: "derived at write from birth year/month; 8-band word set under12|12-14|15-17|18-22|23-25|26-29|30-40|over40; null while birth unknown"},
 		{Name: "avatar_url", Type: field.TypeString, Nullable: true, Size: 500, Comment: "avatar URL; wechat prefill hydrates identity-side, storage lives here"},
 		{Name: "guardian_consented_at", Type: field.TypeTime, Nullable: true, Comment: "under-13 hard-gate stamp, server-written only; null = not consented"},

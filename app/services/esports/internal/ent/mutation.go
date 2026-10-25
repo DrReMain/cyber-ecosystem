@@ -6359,6 +6359,7 @@ type ProfileMutation struct {
 	addbirth_year         *int
 	birth_month           *int
 	addbirth_month        *int
+	sex                   *profile.Sex
 	age_band              *string
 	avatar_url            *string
 	guardian_consented_at *time.Time
@@ -6856,6 +6857,55 @@ func (m *ProfileMutation) ResetBirthMonth() {
 	delete(m.clearedFields, profile.FieldBirthMonth)
 }
 
+// SetSex sets the "sex" field.
+func (m *ProfileMutation) SetSex(pr profile.Sex) {
+	m.sex = &pr
+}
+
+// Sex returns the value of the "sex" field in the mutation.
+func (m *ProfileMutation) Sex() (r profile.Sex, exists bool) {
+	v := m.sex
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSex returns the old "sex" field's value of the Profile entity.
+// If the Profile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProfileMutation) OldSex(ctx context.Context) (v *profile.Sex, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSex is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSex requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSex: %w", err)
+	}
+	return oldValue.Sex, nil
+}
+
+// ClearSex clears the value of the "sex" field.
+func (m *ProfileMutation) ClearSex() {
+	m.sex = nil
+	m.clearedFields[profile.FieldSex] = struct{}{}
+}
+
+// SexCleared returns if the "sex" field was cleared in this mutation.
+func (m *ProfileMutation) SexCleared() bool {
+	_, ok := m.clearedFields[profile.FieldSex]
+	return ok
+}
+
+// ResetSex resets all changes to the "sex" field.
+func (m *ProfileMutation) ResetSex() {
+	m.sex = nil
+	delete(m.clearedFields, profile.FieldSex)
+}
+
 // SetAgeBand sets the "age_band" field.
 func (m *ProfileMutation) SetAgeBand(s string) {
 	m.age_band = &s
@@ -7102,7 +7152,7 @@ func (m *ProfileMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProfileMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, profile.FieldCreatedAt)
 	}
@@ -7126,6 +7176,9 @@ func (m *ProfileMutation) Fields() []string {
 	}
 	if m.birth_month != nil {
 		fields = append(fields, profile.FieldBirthMonth)
+	}
+	if m.sex != nil {
+		fields = append(fields, profile.FieldSex)
 	}
 	if m.age_band != nil {
 		fields = append(fields, profile.FieldAgeBand)
@@ -7163,6 +7216,8 @@ func (m *ProfileMutation) Field(name string) (ent.Value, bool) {
 		return m.BirthYear()
 	case profile.FieldBirthMonth:
 		return m.BirthMonth()
+	case profile.FieldSex:
+		return m.Sex()
 	case profile.FieldAgeBand:
 		return m.AgeBand()
 	case profile.FieldAvatarURL:
@@ -7196,6 +7251,8 @@ func (m *ProfileMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldBirthYear(ctx)
 	case profile.FieldBirthMonth:
 		return m.OldBirthMonth(ctx)
+	case profile.FieldSex:
+		return m.OldSex(ctx)
 	case profile.FieldAgeBand:
 		return m.OldAgeBand(ctx)
 	case profile.FieldAvatarURL:
@@ -7268,6 +7325,13 @@ func (m *ProfileMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBirthMonth(v)
+		return nil
+	case profile.FieldSex:
+		v, ok := value.(profile.Sex)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSex(v)
 		return nil
 	case profile.FieldAgeBand:
 		v, ok := value.(string)
@@ -7366,6 +7430,9 @@ func (m *ProfileMutation) ClearedFields() []string {
 	if m.FieldCleared(profile.FieldBirthMonth) {
 		fields = append(fields, profile.FieldBirthMonth)
 	}
+	if m.FieldCleared(profile.FieldSex) {
+		fields = append(fields, profile.FieldSex)
+	}
 	if m.FieldCleared(profile.FieldAgeBand) {
 		fields = append(fields, profile.FieldAgeBand)
 	}
@@ -7403,6 +7470,9 @@ func (m *ProfileMutation) ClearField(name string) error {
 		return nil
 	case profile.FieldBirthMonth:
 		m.ClearBirthMonth()
+		return nil
+	case profile.FieldSex:
+		m.ClearSex()
 		return nil
 	case profile.FieldAgeBand:
 		m.ClearAgeBand()
@@ -7447,6 +7517,9 @@ func (m *ProfileMutation) ResetField(name string) error {
 		return nil
 	case profile.FieldBirthMonth:
 		m.ResetBirthMonth()
+		return nil
+	case profile.FieldSex:
+		m.ResetSex()
 		return nil
 	case profile.FieldAgeBand:
 		m.ResetAgeBand()

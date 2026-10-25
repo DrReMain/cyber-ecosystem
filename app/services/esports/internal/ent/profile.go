@@ -35,6 +35,8 @@ type Profile struct {
 	BirthYear *int `json:"birth_year,omitempty"`
 	// birth month 1-12
 	BirthMonth *int `json:"birth_month,omitempty"`
+	// three states by the sex ruling — undetermined is the honest not-said; the report cohort reads it (same-age-same-sex, undetermined benches against the same-age pool)
+	Sex *profile.Sex `json:"sex,omitempty"`
 	// derived at write from birth year/month; 8-band word set under12|12-14|15-17|18-22|23-25|26-29|30-40|over40; null while birth unknown
 	AgeBand *string `json:"age_band,omitempty"`
 	// avatar URL; wechat prefill hydrates identity-side, storage lives here
@@ -55,7 +57,7 @@ func (*Profile) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case profile.FieldBirthYear, profile.FieldBirthMonth:
 			values[i] = new(sql.NullInt64)
-		case profile.FieldID, profile.FieldTenantID, profile.FieldUserID, profile.FieldNickname, profile.FieldAgeBand, profile.FieldAvatarURL:
+		case profile.FieldID, profile.FieldTenantID, profile.FieldUserID, profile.FieldNickname, profile.FieldSex, profile.FieldAgeBand, profile.FieldAvatarURL:
 			values[i] = new(sql.NullString)
 		case profile.FieldCreatedAt, profile.FieldUpdatedAt, profile.FieldDeletedAt, profile.FieldGuardianConsentedAt:
 			values[i] = new(sql.NullTime)
@@ -131,6 +133,13 @@ func (_m *Profile) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.BirthMonth = new(int)
 				*_m.BirthMonth = int(value.Int64)
+			}
+		case profile.FieldSex:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field sex", values[i])
+			} else if value.Valid {
+				_m.Sex = new(profile.Sex)
+				*_m.Sex = profile.Sex(value.String)
 			}
 		case profile.FieldAgeBand:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -226,6 +235,11 @@ func (_m *Profile) String() string {
 	builder.WriteString(", ")
 	if v := _m.BirthMonth; v != nil {
 		builder.WriteString("birth_month=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.Sex; v != nil {
+		builder.WriteString("sex=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

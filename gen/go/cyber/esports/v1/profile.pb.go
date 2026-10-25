@@ -26,6 +26,59 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// The profile's sex vocabulary, three states by ruling.
+type ProfileSex int32
+
+const (
+	ProfileSex_PROFILE_SEX_UNSPECIFIED  ProfileSex = 0
+	ProfileSex_PROFILE_SEX_MALE         ProfileSex = 1
+	ProfileSex_PROFILE_SEX_FEMALE       ProfileSex = 2
+	ProfileSex_PROFILE_SEX_UNDETERMINED ProfileSex = 3
+)
+
+// Enum value maps for ProfileSex.
+var (
+	ProfileSex_name = map[int32]string{
+		0: "PROFILE_SEX_UNSPECIFIED",
+		1: "PROFILE_SEX_MALE",
+		2: "PROFILE_SEX_FEMALE",
+		3: "PROFILE_SEX_UNDETERMINED",
+	}
+	ProfileSex_value = map[string]int32{
+		"PROFILE_SEX_UNSPECIFIED":  0,
+		"PROFILE_SEX_MALE":         1,
+		"PROFILE_SEX_FEMALE":       2,
+		"PROFILE_SEX_UNDETERMINED": 3,
+	}
+)
+
+func (x ProfileSex) Enum() *ProfileSex {
+	p := new(ProfileSex)
+	*p = x
+	return p
+}
+
+func (x ProfileSex) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ProfileSex) Descriptor() protoreflect.EnumDescriptor {
+	return file_cyber_esports_v1_profile_proto_enumTypes[0].Descriptor()
+}
+
+func (ProfileSex) Type() protoreflect.EnumType {
+	return &file_cyber_esports_v1_profile_proto_enumTypes[0]
+}
+
+func (x ProfileSex) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ProfileSex.Descriptor instead.
+func (ProfileSex) EnumDescriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{0}
+}
+
 // The member's own profile. Entity fields are wrappers: null means "not set
 // yet" (the row is born lazily on first save), never a zero value.
 type Profile struct {
@@ -51,8 +104,13 @@ type Profile struct {
 	Games               []*ProfileGame         `protobuf:"bytes,8,rep,name=games,proto3" json:"games,omitempty"`
 	CreatedAt           *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt           *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Three states by the sex ruling: male, female, undetermined — the last
+	// is the honest "not said", never guessed from anything. The report
+	// cohort's same-age-same-sex benchmark reads it; undetermined benches
+	// against the same-age pool不分性别.
+	Sex           *ProfileSex `protobuf:"varint,11,opt,name=sex,proto3,enum=cyber.esports.v1.ProfileSex,oneof" json:"sex,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Profile) Reset() {
@@ -153,6 +211,13 @@ func (x *Profile) GetUpdatedAt() *timestamppb.Timestamp {
 		return x.UpdatedAt
 	}
 	return nil
+}
+
+func (x *Profile) GetSex() ProfileSex {
+	if x != nil && x.Sex != nil {
+		return *x.Sex
+	}
+	return ProfileSex_PROFILE_SEX_UNSPECIFIED
 }
 
 // One preference entry: exactly one of the pair is set — a catalog reference
@@ -306,6 +371,7 @@ type UpdateProfileRequest struct {
 	// constant enforced server-side; the repeated bounds below are static
 	// backstops only.
 	GamePreference *GamePreferenceInput `protobuf:"bytes,6,opt,name=game_preference,json=gamePreference,proto3,oneof" json:"game_preference,omitempty"`
+	Sex            *ProfileSex          `protobuf:"varint,7,opt,name=sex,proto3,enum=cyber.esports.v1.ProfileSex,oneof" json:"sex,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -380,6 +446,13 @@ func (x *UpdateProfileRequest) GetGamePreference() *GamePreferenceInput {
 		return x.GamePreference
 	}
 	return nil
+}
+
+func (x *UpdateProfileRequest) GetSex() ProfileSex {
+	if x != nil && x.Sex != nil {
+		return *x.Sex
+	}
+	return ProfileSex_PROFILE_SEX_UNSPECIFIED
 }
 
 type GamePreferenceInput struct {
@@ -482,7 +555,7 @@ var File_cyber_esports_v1_profile_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_profile_proto_rawDesc = "" +
 	"\n" +
-	"\x1ecyber/esports/v1/profile.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xdc\x04\n" +
+	"\x1ecyber/esports/v1/profile.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x99\x05\n" +
 	"\aProfile\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x128\n" +
 	"\bnickname\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\bnickname\x12:\n" +
@@ -499,14 +572,16 @@ const file_cyber_esports_v1_profile_proto_rawDesc = "" +
 	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x83\x01\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x123\n" +
+	"\x03sex\x18\v \x01(\x0e2\x1c.cyber.esports.v1.ProfileSexH\x00R\x03sex\x88\x01\x01B\x06\n" +
+	"\x04_sex\"\x83\x01\n" +
 	"\vProfileGame\x125\n" +
 	"\agame_id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x06gameId\x12=\n" +
 	"\vcustom_name\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\n" +
 	"customName\"\x13\n" +
 	"\x11GetProfileRequest\"I\n" +
 	"\x12GetProfileResponse\x123\n" +
-	"\aprofile\x18\x01 \x01(\v2\x19.cyber.esports.v1.ProfileR\aprofile\"\xcb\x04\n" +
+	"\aprofile\x18\x01 \x01(\v2\x19.cyber.esports.v1.ProfileR\aprofile\"\x88\x05\n" +
 	"\x14UpdateProfileRequest\x12*\n" +
 	"\bnickname\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x02\x18\fH\x00R\bnickname\x88\x01\x01\x12.\n" +
 	"\n" +
@@ -517,21 +592,29 @@ const file_cyber_esports_v1_profile_proto_rawDesc = "" +
 	"\vbirth_month\x18\x04 \x01(\x05B\t\xbaH\x06\x1a\x04\x18\f(\x01H\x03R\n" +
 	"birthMonth\x88\x01\x01\x120\n" +
 	"\x11guardian_accepted\x18\x05 \x01(\bH\x04R\x10guardianAccepted\x88\x01\x01\x12S\n" +
-	"\x0fgame_preference\x18\x06 \x01(\v2%.cyber.esports.v1.GamePreferenceInputH\x05R\x0egamePreference\x88\x01\x01:\x88\x01\xbaH\x84\x01\x1a\x81\x01\n" +
+	"\x0fgame_preference\x18\x06 \x01(\v2%.cyber.esports.v1.GamePreferenceInputH\x05R\x0egamePreference\x88\x01\x01\x123\n" +
+	"\x03sex\x18\a \x01(\x0e2\x1c.cyber.esports.v1.ProfileSexH\x06R\x03sex\x88\x01\x01:\x88\x01\xbaH\x84\x01\x1a\x81\x01\n" +
 	"\x1fUpdateProfileRequest.birth_pair\x12/birth_year and birth_month must be set together\x1a-has(this.birth_year) == has(this.birth_month)B\v\n" +
 	"\t_nicknameB\r\n" +
 	"\v_avatar_urlB\r\n" +
 	"\v_birth_yearB\x0e\n" +
 	"\f_birth_monthB\x14\n" +
 	"\x12_guardian_acceptedB\x12\n" +
-	"\x10_game_preference\"w\n" +
+	"\x10_game_preferenceB\x06\n" +
+	"\x04_sex\"w\n" +
 	"\x13GamePreferenceInput\x12+\n" +
 	"\bgame_ids\x18\x01 \x03(\tB\x10\xbaH\r\x92\x01\n" +
 	"\x102\"\x06r\x04\x10\x01\x18@R\agameIds\x123\n" +
 	"\fcustom_names\x18\x02 \x03(\tB\x10\xbaH\r\x92\x01\n" +
 	"\x10\x14\"\x06r\x04\x10\x01\x18(R\vcustomNames\"L\n" +
 	"\x15UpdateProfileResponse\x123\n" +
-	"\aprofile\x18\x01 \x01(\v2\x19.cyber.esports.v1.ProfileR\aprofile2\xec\x02\n" +
+	"\aprofile\x18\x01 \x01(\v2\x19.cyber.esports.v1.ProfileR\aprofile*u\n" +
+	"\n" +
+	"ProfileSex\x12\x1b\n" +
+	"\x17PROFILE_SEX_UNSPECIFIED\x10\x00\x12\x14\n" +
+	"\x10PROFILE_SEX_MALE\x10\x01\x12\x16\n" +
+	"\x12PROFILE_SEX_FEMALE\x10\x02\x12\x1c\n" +
+	"\x18PROFILE_SEX_UNDETERMINED\x10\x032\xec\x02\n" +
 	"\x0eProfileService\x12\x9c\x01\n" +
 	"\n" +
 	"GetProfile\x12#.cyber.esports.v1.GetProfileRequest\x1a$.cyber.esports.v1.GetProfileResponse\"C\x88\xf1\x04\x04\x8a\xd3\x0e\x1c\n" +
@@ -551,44 +634,48 @@ func file_cyber_esports_v1_profile_proto_rawDescGZIP() []byte {
 	return file_cyber_esports_v1_profile_proto_rawDescData
 }
 
+var file_cyber_esports_v1_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_cyber_esports_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_cyber_esports_v1_profile_proto_goTypes = []any{
-	(*Profile)(nil),                // 0: cyber.esports.v1.Profile
-	(*ProfileGame)(nil),            // 1: cyber.esports.v1.ProfileGame
-	(*GetProfileRequest)(nil),      // 2: cyber.esports.v1.GetProfileRequest
-	(*GetProfileResponse)(nil),     // 3: cyber.esports.v1.GetProfileResponse
-	(*UpdateProfileRequest)(nil),   // 4: cyber.esports.v1.UpdateProfileRequest
-	(*GamePreferenceInput)(nil),    // 5: cyber.esports.v1.GamePreferenceInput
-	(*UpdateProfileResponse)(nil),  // 6: cyber.esports.v1.UpdateProfileResponse
-	(*wrapperspb.StringValue)(nil), // 7: google.protobuf.StringValue
-	(*wrapperspb.Int32Value)(nil),  // 8: google.protobuf.Int32Value
-	(*timestamppb.Timestamp)(nil),  // 9: google.protobuf.Timestamp
+	(ProfileSex)(0),                // 0: cyber.esports.v1.ProfileSex
+	(*Profile)(nil),                // 1: cyber.esports.v1.Profile
+	(*ProfileGame)(nil),            // 2: cyber.esports.v1.ProfileGame
+	(*GetProfileRequest)(nil),      // 3: cyber.esports.v1.GetProfileRequest
+	(*GetProfileResponse)(nil),     // 4: cyber.esports.v1.GetProfileResponse
+	(*UpdateProfileRequest)(nil),   // 5: cyber.esports.v1.UpdateProfileRequest
+	(*GamePreferenceInput)(nil),    // 6: cyber.esports.v1.GamePreferenceInput
+	(*UpdateProfileResponse)(nil),  // 7: cyber.esports.v1.UpdateProfileResponse
+	(*wrapperspb.StringValue)(nil), // 8: google.protobuf.StringValue
+	(*wrapperspb.Int32Value)(nil),  // 9: google.protobuf.Int32Value
+	(*timestamppb.Timestamp)(nil),  // 10: google.protobuf.Timestamp
 }
 var file_cyber_esports_v1_profile_proto_depIdxs = []int32{
-	7,  // 0: cyber.esports.v1.Profile.id:type_name -> google.protobuf.StringValue
-	7,  // 1: cyber.esports.v1.Profile.nickname:type_name -> google.protobuf.StringValue
-	8,  // 2: cyber.esports.v1.Profile.birth_year:type_name -> google.protobuf.Int32Value
-	8,  // 3: cyber.esports.v1.Profile.birth_month:type_name -> google.protobuf.Int32Value
-	7,  // 4: cyber.esports.v1.Profile.age_band:type_name -> google.protobuf.StringValue
-	7,  // 5: cyber.esports.v1.Profile.avatar_url:type_name -> google.protobuf.StringValue
-	9,  // 6: cyber.esports.v1.Profile.guardian_consented_at:type_name -> google.protobuf.Timestamp
-	1,  // 7: cyber.esports.v1.Profile.games:type_name -> cyber.esports.v1.ProfileGame
-	9,  // 8: cyber.esports.v1.Profile.created_at:type_name -> google.protobuf.Timestamp
-	9,  // 9: cyber.esports.v1.Profile.updated_at:type_name -> google.protobuf.Timestamp
-	7,  // 10: cyber.esports.v1.ProfileGame.game_id:type_name -> google.protobuf.StringValue
-	7,  // 11: cyber.esports.v1.ProfileGame.custom_name:type_name -> google.protobuf.StringValue
-	0,  // 12: cyber.esports.v1.GetProfileResponse.profile:type_name -> cyber.esports.v1.Profile
-	5,  // 13: cyber.esports.v1.UpdateProfileRequest.game_preference:type_name -> cyber.esports.v1.GamePreferenceInput
-	0,  // 14: cyber.esports.v1.UpdateProfileResponse.profile:type_name -> cyber.esports.v1.Profile
-	2,  // 15: cyber.esports.v1.ProfileService.GetProfile:input_type -> cyber.esports.v1.GetProfileRequest
-	4,  // 16: cyber.esports.v1.ProfileService.UpdateProfile:input_type -> cyber.esports.v1.UpdateProfileRequest
-	3,  // 17: cyber.esports.v1.ProfileService.GetProfile:output_type -> cyber.esports.v1.GetProfileResponse
-	6,  // 18: cyber.esports.v1.ProfileService.UpdateProfile:output_type -> cyber.esports.v1.UpdateProfileResponse
-	17, // [17:19] is the sub-list for method output_type
-	15, // [15:17] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	8,  // 0: cyber.esports.v1.Profile.id:type_name -> google.protobuf.StringValue
+	8,  // 1: cyber.esports.v1.Profile.nickname:type_name -> google.protobuf.StringValue
+	9,  // 2: cyber.esports.v1.Profile.birth_year:type_name -> google.protobuf.Int32Value
+	9,  // 3: cyber.esports.v1.Profile.birth_month:type_name -> google.protobuf.Int32Value
+	8,  // 4: cyber.esports.v1.Profile.age_band:type_name -> google.protobuf.StringValue
+	8,  // 5: cyber.esports.v1.Profile.avatar_url:type_name -> google.protobuf.StringValue
+	10, // 6: cyber.esports.v1.Profile.guardian_consented_at:type_name -> google.protobuf.Timestamp
+	2,  // 7: cyber.esports.v1.Profile.games:type_name -> cyber.esports.v1.ProfileGame
+	10, // 8: cyber.esports.v1.Profile.created_at:type_name -> google.protobuf.Timestamp
+	10, // 9: cyber.esports.v1.Profile.updated_at:type_name -> google.protobuf.Timestamp
+	0,  // 10: cyber.esports.v1.Profile.sex:type_name -> cyber.esports.v1.ProfileSex
+	8,  // 11: cyber.esports.v1.ProfileGame.game_id:type_name -> google.protobuf.StringValue
+	8,  // 12: cyber.esports.v1.ProfileGame.custom_name:type_name -> google.protobuf.StringValue
+	1,  // 13: cyber.esports.v1.GetProfileResponse.profile:type_name -> cyber.esports.v1.Profile
+	6,  // 14: cyber.esports.v1.UpdateProfileRequest.game_preference:type_name -> cyber.esports.v1.GamePreferenceInput
+	0,  // 15: cyber.esports.v1.UpdateProfileRequest.sex:type_name -> cyber.esports.v1.ProfileSex
+	1,  // 16: cyber.esports.v1.UpdateProfileResponse.profile:type_name -> cyber.esports.v1.Profile
+	3,  // 17: cyber.esports.v1.ProfileService.GetProfile:input_type -> cyber.esports.v1.GetProfileRequest
+	5,  // 18: cyber.esports.v1.ProfileService.UpdateProfile:input_type -> cyber.esports.v1.UpdateProfileRequest
+	4,  // 19: cyber.esports.v1.ProfileService.GetProfile:output_type -> cyber.esports.v1.GetProfileResponse
+	7,  // 20: cyber.esports.v1.ProfileService.UpdateProfile:output_type -> cyber.esports.v1.UpdateProfileResponse
+	19, // [19:21] is the sub-list for method output_type
+	17, // [17:19] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_profile_proto_init() }
@@ -596,19 +683,21 @@ func file_cyber_esports_v1_profile_proto_init() {
 	if File_cyber_esports_v1_profile_proto != nil {
 		return
 	}
+	file_cyber_esports_v1_profile_proto_msgTypes[0].OneofWrappers = []any{}
 	file_cyber_esports_v1_profile_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_profile_proto_rawDesc), len(file_cyber_esports_v1_profile_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_cyber_esports_v1_profile_proto_goTypes,
 		DependencyIndexes: file_cyber_esports_v1_profile_proto_depIdxs,
+		EnumInfos:         file_cyber_esports_v1_profile_proto_enumTypes,
 		MessageInfos:      file_cyber_esports_v1_profile_proto_msgTypes,
 	}.Build()
 	File_cyber_esports_v1_profile_proto = out.File

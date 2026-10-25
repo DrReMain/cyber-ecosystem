@@ -3,6 +3,7 @@
 package profile
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent"
@@ -30,6 +31,8 @@ const (
 	FieldBirthYear = "birth_year"
 	// FieldBirthMonth holds the string denoting the birth_month field in the database.
 	FieldBirthMonth = "birth_month"
+	// FieldSex holds the string denoting the sex field in the database.
+	FieldSex = "sex"
 	// FieldAgeBand holds the string denoting the age_band field in the database.
 	FieldAgeBand = "age_band"
 	// FieldAvatarURL holds the string denoting the avatar_url field in the database.
@@ -53,6 +56,7 @@ var Columns = []string{
 	FieldNickname,
 	FieldBirthYear,
 	FieldBirthMonth,
+	FieldSex,
 	FieldAgeBand,
 	FieldAvatarURL,
 	FieldGuardianConsentedAt,
@@ -101,6 +105,30 @@ var (
 	IDValidator func(string) error
 )
 
+// Sex defines the type for the "sex" enum field.
+type Sex string
+
+// Sex values.
+const (
+	SexMale         Sex = "male"
+	SexFemale       Sex = "female"
+	SexUndetermined Sex = "undetermined"
+)
+
+func (s Sex) String() string {
+	return string(s)
+}
+
+// SexValidator is a validator for the "sex" field enum values. It is called by the builders before save.
+func SexValidator(s Sex) error {
+	switch s {
+	case SexMale, SexFemale, SexUndetermined:
+		return nil
+	default:
+		return fmt.Errorf("profile: invalid enum value for sex field: %q", s)
+	}
+}
+
 // OrderOption defines the ordering options for the Profile queries.
 type OrderOption func(*sql.Selector)
 
@@ -147,6 +175,11 @@ func ByBirthYear(opts ...sql.OrderTermOption) OrderOption {
 // ByBirthMonth orders the results by the birth_month field.
 func ByBirthMonth(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBirthMonth, opts...).ToFunc()
+}
+
+// BySex orders the results by the sex field.
+func BySex(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSex, opts...).ToFunc()
 }
 
 // ByAgeBand orders the results by the age_band field.

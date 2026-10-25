@@ -753,11 +753,11 @@ func init() {
 		}
 	}()
 	// profileDescAgeBand is the schema descriptor for age_band field.
-	profileDescAgeBand := profileFields[4].Descriptor()
+	profileDescAgeBand := profileFields[5].Descriptor()
 	// profile.AgeBandValidator is a validator for the "age_band" field. It is called by the builders before save.
 	profile.AgeBandValidator = profileDescAgeBand.Validators[0].(func(string) error)
 	// profileDescAvatarURL is the schema descriptor for avatar_url field.
-	profileDescAvatarURL := profileFields[5].Descriptor()
+	profileDescAvatarURL := profileFields[6].Descriptor()
 	// profile.AvatarURLValidator is a validator for the "avatar_url" field. It is called by the builders before save.
 	profile.AvatarURLValidator = profileDescAvatarURL.Validators[0].(func(string) error)
 	// profileDescID is the schema descriptor for id field.

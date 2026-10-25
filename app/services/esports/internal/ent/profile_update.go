@@ -131,6 +131,26 @@ func (_u *ProfileUpdate) ClearBirthMonth() *ProfileUpdate {
 	return _u
 }
 
+// SetSex sets the "sex" field.
+func (_u *ProfileUpdate) SetSex(v profile.Sex) *ProfileUpdate {
+	_u.mutation.SetSex(v)
+	return _u
+}
+
+// SetNillableSex sets the "sex" field if the given value is not nil.
+func (_u *ProfileUpdate) SetNillableSex(v *profile.Sex) *ProfileUpdate {
+	if v != nil {
+		_u.SetSex(*v)
+	}
+	return _u
+}
+
+// ClearSex clears the value of the "sex" field.
+func (_u *ProfileUpdate) ClearSex() *ProfileUpdate {
+	_u.mutation.ClearSex()
+	return _u
+}
+
 // SetAgeBand sets the "age_band" field.
 func (_u *ProfileUpdate) SetAgeBand(v string) *ProfileUpdate {
 	_u.mutation.SetAgeBand(v)
@@ -268,6 +288,11 @@ func (_u *ProfileUpdate) check() error {
 			return &ValidationError{Name: "birth_month", err: fmt.Errorf(`ent: validator failed for field "Profile.birth_month": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Sex(); ok {
+		if err := profile.SexValidator(v); err != nil {
+			return &ValidationError{Name: "sex", err: fmt.Errorf(`ent: validator failed for field "Profile.sex": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.AgeBand(); ok {
 		if err := profile.AgeBandValidator(v); err != nil {
 			return &ValidationError{Name: "age_band", err: fmt.Errorf(`ent: validator failed for field "Profile.age_band": %w`, err)}
@@ -331,6 +356,12 @@ func (_u *ProfileUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.BirthMonthCleared() {
 		_spec.ClearField(profile.FieldBirthMonth, field.TypeInt)
+	}
+	if value, ok := _u.mutation.Sex(); ok {
+		_spec.SetField(profile.FieldSex, field.TypeEnum, value)
+	}
+	if _u.mutation.SexCleared() {
+		_spec.ClearField(profile.FieldSex, field.TypeEnum)
 	}
 	if value, ok := _u.mutation.AgeBand(); ok {
 		_spec.SetField(profile.FieldAgeBand, field.TypeString, value)
@@ -480,6 +511,26 @@ func (_u *ProfileUpdateOne) AddBirthMonth(v int) *ProfileUpdateOne {
 // ClearBirthMonth clears the value of the "birth_month" field.
 func (_u *ProfileUpdateOne) ClearBirthMonth() *ProfileUpdateOne {
 	_u.mutation.ClearBirthMonth()
+	return _u
+}
+
+// SetSex sets the "sex" field.
+func (_u *ProfileUpdateOne) SetSex(v profile.Sex) *ProfileUpdateOne {
+	_u.mutation.SetSex(v)
+	return _u
+}
+
+// SetNillableSex sets the "sex" field if the given value is not nil.
+func (_u *ProfileUpdateOne) SetNillableSex(v *profile.Sex) *ProfileUpdateOne {
+	if v != nil {
+		_u.SetSex(*v)
+	}
+	return _u
+}
+
+// ClearSex clears the value of the "sex" field.
+func (_u *ProfileUpdateOne) ClearSex() *ProfileUpdateOne {
+	_u.mutation.ClearSex()
 	return _u
 }
 
@@ -633,6 +684,11 @@ func (_u *ProfileUpdateOne) check() error {
 			return &ValidationError{Name: "birth_month", err: fmt.Errorf(`ent: validator failed for field "Profile.birth_month": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Sex(); ok {
+		if err := profile.SexValidator(v); err != nil {
+			return &ValidationError{Name: "sex", err: fmt.Errorf(`ent: validator failed for field "Profile.sex": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.AgeBand(); ok {
 		if err := profile.AgeBandValidator(v); err != nil {
 			return &ValidationError{Name: "age_band", err: fmt.Errorf(`ent: validator failed for field "Profile.age_band": %w`, err)}
@@ -713,6 +769,12 @@ func (_u *ProfileUpdateOne) sqlSave(ctx context.Context) (_node *Profile, err er
 	}
 	if _u.mutation.BirthMonthCleared() {
 		_spec.ClearField(profile.FieldBirthMonth, field.TypeInt)
+	}
+	if value, ok := _u.mutation.Sex(); ok {
+		_spec.SetField(profile.FieldSex, field.TypeEnum, value)
+	}
+	if _u.mutation.SexCleared() {
+		_spec.ClearField(profile.FieldSex, field.TypeEnum)
 	}
 	if value, ok := _u.mutation.AgeBand(); ok {
 		_spec.SetField(profile.FieldAgeBand, field.TypeString, value)
