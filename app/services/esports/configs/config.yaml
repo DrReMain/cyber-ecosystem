@@ -29,3 +29,10 @@ observability:
 
 remote:
   system_connect: ${SYSTEM_CONNECT:localhost:13001} # system connect
+
+payment:
+  default_provider: ${PAY_PROVIDER:mock}
+  notify_base_url: ${PAY_NOTIFY_BASE_URL:http://localhost:3000}
+  providers:
+    - name: ${PAY_PROVIDER:mock}
+      kind: ${PAY_PROVIDER:mock}

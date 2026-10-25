@@ -28,6 +28,7 @@ type Bootstrap struct {
 	Data          *Data                  `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	Observability *Observability         `protobuf:"bytes,3,opt,name=observability,proto3" json:"observability,omitempty"`
 	Remote        *Remote                `protobuf:"bytes,4,opt,name=remote,proto3" json:"remote,omitempty"`
+	Payment       *Payment               `protobuf:"bytes,5,opt,name=payment,proto3" json:"payment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -86,6 +87,13 @@ func (x *Bootstrap) GetObservability() *Observability {
 func (x *Bootstrap) GetRemote() *Remote {
 	if x != nil {
 		return x.Remote
+	}
+	return nil
+}
+
+func (x *Bootstrap) GetPayment() *Payment {
+	if x != nil {
+		return x.Payment
 	}
 	return nil
 }
@@ -323,6 +331,66 @@ func (x *Remote) GetSystemConnect() string {
 	return ""
 }
 
+type Payment struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	DefaultProvider string                 `protobuf:"bytes,1,opt,name=default_provider,json=defaultProvider,proto3" json:"default_provider,omitempty"` // provider orders are created against; also the callback URL's provider segment
+	NotifyBaseUrl   string                 `protobuf:"bytes,2,opt,name=notify_base_url,json=notifyBaseUrl,proto3" json:"notify_base_url,omitempty"`     // public base the channel pushes notifications to (the client edge's domain)
+	Providers       []*Payment_Provider    `protobuf:"bytes,3,rep,name=providers,proto3" json:"providers,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *Payment) Reset() {
+	*x = Payment{}
+	mi := &file_internal_conf_conf_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Payment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Payment) ProtoMessage() {}
+
+func (x *Payment) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Payment.ProtoReflect.Descriptor instead.
+func (*Payment) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *Payment) GetDefaultProvider() string {
+	if x != nil {
+		return x.DefaultProvider
+	}
+	return ""
+}
+
+func (x *Payment) GetNotifyBaseUrl() string {
+	if x != nil {
+		return x.NotifyBaseUrl
+	}
+	return ""
+}
+
+func (x *Payment) GetProviders() []*Payment_Provider {
+	if x != nil {
+		return x.Providers
+	}
+	return nil
+}
+
 type Server_HTTP struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Network       string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
@@ -334,7 +402,7 @@ type Server_HTTP struct {
 
 func (x *Server_HTTP) Reset() {
 	*x = Server_HTTP{}
-	mi := &file_internal_conf_conf_proto_msgTypes[5]
+	mi := &file_internal_conf_conf_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -346,7 +414,7 @@ func (x *Server_HTTP) String() string {
 func (*Server_HTTP) ProtoMessage() {}
 
 func (x *Server_HTTP) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[5]
+	mi := &file_internal_conf_conf_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -394,7 +462,7 @@ type Server_GRPC struct {
 
 func (x *Server_GRPC) Reset() {
 	*x = Server_GRPC{}
-	mi := &file_internal_conf_conf_proto_msgTypes[6]
+	mi := &file_internal_conf_conf_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -406,7 +474,7 @@ func (x *Server_GRPC) String() string {
 func (*Server_GRPC) ProtoMessage() {}
 
 func (x *Server_GRPC) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[6]
+	mi := &file_internal_conf_conf_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -454,7 +522,7 @@ type Server_Connect struct {
 
 func (x *Server_Connect) Reset() {
 	*x = Server_Connect{}
-	mi := &file_internal_conf_conf_proto_msgTypes[7]
+	mi := &file_internal_conf_conf_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -466,7 +534,7 @@ func (x *Server_Connect) String() string {
 func (*Server_Connect) ProtoMessage() {}
 
 func (x *Server_Connect) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[7]
+	mi := &file_internal_conf_conf_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -520,7 +588,7 @@ type Data_Database struct {
 
 func (x *Data_Database) Reset() {
 	*x = Data_Database{}
-	mi := &file_internal_conf_conf_proto_msgTypes[8]
+	mi := &file_internal_conf_conf_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -532,7 +600,7 @@ func (x *Data_Database) String() string {
 func (*Data_Database) ProtoMessage() {}
 
 func (x *Data_Database) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[8]
+	mi := &file_internal_conf_conf_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -621,7 +689,7 @@ type Observability_Trace struct {
 
 func (x *Observability_Trace) Reset() {
 	*x = Observability_Trace{}
-	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -633,7 +701,7 @@ func (x *Observability_Trace) String() string {
 func (*Observability_Trace) ProtoMessage() {}
 
 func (x *Observability_Trace) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -672,7 +740,7 @@ type Observability_Metrics struct {
 
 func (x *Observability_Metrics) Reset() {
 	*x = Observability_Metrics{}
-	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -684,7 +752,7 @@ func (x *Observability_Metrics) String() string {
 func (*Observability_Metrics) ProtoMessage() {}
 
 func (x *Observability_Metrics) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -719,7 +787,7 @@ type Observability_Log struct {
 
 func (x *Observability_Log) Reset() {
 	*x = Observability_Log{}
-	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -731,7 +799,7 @@ func (x *Observability_Log) String() string {
 func (*Observability_Log) ProtoMessage() {}
 
 func (x *Observability_Log) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -784,7 +852,7 @@ type Observability_SlowQuery struct {
 
 func (x *Observability_SlowQuery) Reset() {
 	*x = Observability_SlowQuery{}
-	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -796,7 +864,7 @@ func (x *Observability_SlowQuery) String() string {
 func (*Observability_SlowQuery) ProtoMessage() {}
 
 func (x *Observability_SlowQuery) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -832,7 +900,7 @@ type Observability_Log_FileOutput struct {
 
 func (x *Observability_Log_FileOutput) Reset() {
 	*x = Observability_Log_FileOutput{}
-	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -844,7 +912,7 @@ func (x *Observability_Log_FileOutput) String() string {
 func (*Observability_Log_FileOutput) ProtoMessage() {}
 
 func (x *Observability_Log_FileOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -895,17 +963,178 @@ func (x *Observability_Log_FileOutput) GetCompress() bool {
 	return false
 }
 
+type Payment_Provider struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"` // provider value orders carry (wechat, mock)
+	Kind          string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"` // constructor dispatch: mock | wechat
+	Wechat        *Payment_Wechat        `protobuf:"bytes,3,opt,name=wechat,proto3" json:"wechat,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Payment_Provider) Reset() {
+	*x = Payment_Provider{}
+	mi := &file_internal_conf_conf_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Payment_Provider) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Payment_Provider) ProtoMessage() {}
+
+func (x *Payment_Provider) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Payment_Provider.ProtoReflect.Descriptor instead.
+func (*Payment_Provider) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{5, 0}
+}
+
+func (x *Payment_Provider) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Payment_Provider) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *Payment_Provider) GetWechat() *Payment_Wechat {
+	if x != nil {
+		return x.Wechat
+	}
+	return nil
+}
+
+type Payment_Wechat struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MchId         string                 `protobuf:"bytes,1,opt,name=mch_id,json=mchId,proto3" json:"mch_id,omitempty"`
+	MchSerial     string                 `protobuf:"bytes,2,opt,name=mch_serial,json=mchSerial,proto3" json:"mch_serial,omitempty"`
+	AppId         string                 `protobuf:"bytes,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	Apiv3Key      string                 `protobuf:"bytes,4,opt,name=apiv3_key,json=apiv3Key,proto3" json:"apiv3_key,omitempty"`                  // 32 bytes
+	PrivateKeyPem string                 `protobuf:"bytes,5,opt,name=private_key_pem,json=privateKeyPem,proto3" json:"private_key_pem,omitempty"` // apiclient_key.pem contents
+	PublicKeyId   string                 `protobuf:"bytes,6,opt,name=public_key_id,json=publicKeyId,proto3" json:"public_key_id,omitempty"`       // PUB_KEY_ID_... (public-key mode, the only mode new merchants get)
+	PublicKeyPem  string                 `protobuf:"bytes,7,opt,name=public_key_pem,json=publicKeyPem,proto3" json:"public_key_pem,omitempty"`    // pub_key.pem contents
+	BaseUrl       string                 `protobuf:"bytes,8,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`                     // override for channel-edge tests
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Payment_Wechat) Reset() {
+	*x = Payment_Wechat{}
+	mi := &file_internal_conf_conf_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Payment_Wechat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Payment_Wechat) ProtoMessage() {}
+
+func (x *Payment_Wechat) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Payment_Wechat.ProtoReflect.Descriptor instead.
+func (*Payment_Wechat) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{5, 1}
+}
+
+func (x *Payment_Wechat) GetMchId() string {
+	if x != nil {
+		return x.MchId
+	}
+	return ""
+}
+
+func (x *Payment_Wechat) GetMchSerial() string {
+	if x != nil {
+		return x.MchSerial
+	}
+	return ""
+}
+
+func (x *Payment_Wechat) GetAppId() string {
+	if x != nil {
+		return x.AppId
+	}
+	return ""
+}
+
+func (x *Payment_Wechat) GetApiv3Key() string {
+	if x != nil {
+		return x.Apiv3Key
+	}
+	return ""
+}
+
+func (x *Payment_Wechat) GetPrivateKeyPem() string {
+	if x != nil {
+		return x.PrivateKeyPem
+	}
+	return ""
+}
+
+func (x *Payment_Wechat) GetPublicKeyId() string {
+	if x != nil {
+		return x.PublicKeyId
+	}
+	return ""
+}
+
+func (x *Payment_Wechat) GetPublicKeyPem() string {
+	if x != nil {
+		return x.PublicKeyPem
+	}
+	return ""
+}
+
+func (x *Payment_Wechat) GetBaseUrl() string {
+	if x != nil {
+		return x.BaseUrl
+	}
+	return ""
+}
+
 var File_internal_conf_conf_proto protoreflect.FileDescriptor
 
 const file_internal_conf_conf_proto_rawDesc = "" +
 	"\n" +
 	"\x18internal/conf/conf.proto\x12\n" +
-	"cyber.conf\x1a\x1egoogle/protobuf/duration.proto\"\xca\x01\n" +
+	"cyber.conf\x1a\x1egoogle/protobuf/duration.proto\"\xf9\x01\n" +
 	"\tBootstrap\x12*\n" +
 	"\x06server\x18\x01 \x01(\v2\x12.cyber.conf.ServerR\x06server\x12$\n" +
 	"\x04data\x18\x02 \x01(\v2\x10.cyber.conf.DataR\x04data\x12?\n" +
 	"\robservability\x18\x03 \x01(\v2\x19.cyber.conf.ObservabilityR\robservability\x12*\n" +
-	"\x06remote\x18\x04 \x01(\v2\x12.cyber.conf.RemoteR\x06remote\"\xdc\x03\n" +
+	"\x06remote\x18\x04 \x01(\v2\x12.cyber.conf.RemoteR\x06remote\x12-\n" +
+	"\apayment\x18\x05 \x01(\v2\x13.cyber.conf.PaymentR\apayment\"\xdc\x03\n" +
 	"\x06Server\x12+\n" +
 	"\x04http\x18\x01 \x01(\v2\x17.cyber.conf.Server.HTTPR\x04http\x12+\n" +
 	"\x04grpc\x18\x02 \x01(\v2\x17.cyber.conf.Server.GRPCR\x04grpc\x124\n" +
@@ -964,7 +1193,25 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\tSlowQuery\x12)\n" +
 	"\x02db\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x02db\"/\n" +
 	"\x06Remote\x12%\n" +
-	"\x0esystem_connect\x18\x01 \x01(\tR\rsystemConnectB9Z7cyber-ecosystem/app/services/esports/internal/conf;confb\x06proto3"
+	"\x0esystem_connect\x18\x01 \x01(\tR\rsystemConnect\"\x82\x04\n" +
+	"\aPayment\x12)\n" +
+	"\x10default_provider\x18\x01 \x01(\tR\x0fdefaultProvider\x12&\n" +
+	"\x0fnotify_base_url\x18\x02 \x01(\tR\rnotifyBaseUrl\x12:\n" +
+	"\tproviders\x18\x03 \x03(\v2\x1c.cyber.conf.Payment.ProviderR\tproviders\x1af\n" +
+	"\bProvider\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
+	"\x04kind\x18\x02 \x01(\tR\x04kind\x122\n" +
+	"\x06wechat\x18\x03 \x01(\v2\x1a.cyber.conf.Payment.WechatR\x06wechat\x1a\xff\x01\n" +
+	"\x06Wechat\x12\x15\n" +
+	"\x06mch_id\x18\x01 \x01(\tR\x05mchId\x12\x1d\n" +
+	"\n" +
+	"mch_serial\x18\x02 \x01(\tR\tmchSerial\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\tR\x05appId\x12\x1b\n" +
+	"\tapiv3_key\x18\x04 \x01(\tR\bapiv3Key\x12&\n" +
+	"\x0fprivate_key_pem\x18\x05 \x01(\tR\rprivateKeyPem\x12\"\n" +
+	"\rpublic_key_id\x18\x06 \x01(\tR\vpublicKeyId\x12$\n" +
+	"\x0epublic_key_pem\x18\a \x01(\tR\fpublicKeyPem\x12\x19\n" +
+	"\bbase_url\x18\b \x01(\tR\abaseUrlB9Z7cyber-ecosystem/app/services/esports/internal/conf;confb\x06proto3"
 
 var (
 	file_internal_conf_conf_proto_rawDescOnce sync.Once
@@ -978,48 +1225,54 @@ func file_internal_conf_conf_proto_rawDescGZIP() []byte {
 	return file_internal_conf_conf_proto_rawDescData
 }
 
-var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_internal_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),                    // 0: cyber.conf.Bootstrap
 	(*Server)(nil),                       // 1: cyber.conf.Server
 	(*Data)(nil),                         // 2: cyber.conf.Data
 	(*Observability)(nil),                // 3: cyber.conf.Observability
 	(*Remote)(nil),                       // 4: cyber.conf.Remote
-	(*Server_HTTP)(nil),                  // 5: cyber.conf.Server.HTTP
-	(*Server_GRPC)(nil),                  // 6: cyber.conf.Server.GRPC
-	(*Server_Connect)(nil),               // 7: cyber.conf.Server.Connect
-	(*Data_Database)(nil),                // 8: cyber.conf.Data.Database
-	(*Observability_Trace)(nil),          // 9: cyber.conf.Observability.Trace
-	(*Observability_Metrics)(nil),        // 10: cyber.conf.Observability.Metrics
-	(*Observability_Log)(nil),            // 11: cyber.conf.Observability.Log
-	(*Observability_SlowQuery)(nil),      // 12: cyber.conf.Observability.SlowQuery
-	(*Observability_Log_FileOutput)(nil), // 13: cyber.conf.Observability.Log.FileOutput
-	(*durationpb.Duration)(nil),          // 14: google.protobuf.Duration
+	(*Payment)(nil),                      // 5: cyber.conf.Payment
+	(*Server_HTTP)(nil),                  // 6: cyber.conf.Server.HTTP
+	(*Server_GRPC)(nil),                  // 7: cyber.conf.Server.GRPC
+	(*Server_Connect)(nil),               // 8: cyber.conf.Server.Connect
+	(*Data_Database)(nil),                // 9: cyber.conf.Data.Database
+	(*Observability_Trace)(nil),          // 10: cyber.conf.Observability.Trace
+	(*Observability_Metrics)(nil),        // 11: cyber.conf.Observability.Metrics
+	(*Observability_Log)(nil),            // 12: cyber.conf.Observability.Log
+	(*Observability_SlowQuery)(nil),      // 13: cyber.conf.Observability.SlowQuery
+	(*Observability_Log_FileOutput)(nil), // 14: cyber.conf.Observability.Log.FileOutput
+	(*Payment_Provider)(nil),             // 15: cyber.conf.Payment.Provider
+	(*Payment_Wechat)(nil),               // 16: cyber.conf.Payment.Wechat
+	(*durationpb.Duration)(nil),          // 17: google.protobuf.Duration
 }
 var file_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber.conf.Bootstrap.server:type_name -> cyber.conf.Server
 	2,  // 1: cyber.conf.Bootstrap.data:type_name -> cyber.conf.Data
 	3,  // 2: cyber.conf.Bootstrap.observability:type_name -> cyber.conf.Observability
 	4,  // 3: cyber.conf.Bootstrap.remote:type_name -> cyber.conf.Remote
-	5,  // 4: cyber.conf.Server.http:type_name -> cyber.conf.Server.HTTP
-	6,  // 5: cyber.conf.Server.grpc:type_name -> cyber.conf.Server.GRPC
-	7,  // 6: cyber.conf.Server.connect:type_name -> cyber.conf.Server.Connect
-	8,  // 7: cyber.conf.Data.database:type_name -> cyber.conf.Data.Database
-	9,  // 8: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
-	10, // 9: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
-	11, // 10: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
-	12, // 11: cyber.conf.Observability.slow_query:type_name -> cyber.conf.Observability.SlowQuery
-	14, // 12: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	14, // 13: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	14, // 14: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	14, // 15: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	13, // 16: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
-	14, // 17: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	5,  // 4: cyber.conf.Bootstrap.payment:type_name -> cyber.conf.Payment
+	6,  // 5: cyber.conf.Server.http:type_name -> cyber.conf.Server.HTTP
+	7,  // 6: cyber.conf.Server.grpc:type_name -> cyber.conf.Server.GRPC
+	8,  // 7: cyber.conf.Server.connect:type_name -> cyber.conf.Server.Connect
+	9,  // 8: cyber.conf.Data.database:type_name -> cyber.conf.Data.Database
+	10, // 9: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
+	11, // 10: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
+	12, // 11: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
+	13, // 12: cyber.conf.Observability.slow_query:type_name -> cyber.conf.Observability.SlowQuery
+	15, // 13: cyber.conf.Payment.providers:type_name -> cyber.conf.Payment.Provider
+	17, // 14: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	17, // 15: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	17, // 16: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	17, // 17: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	14, // 18: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
+	17, // 19: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
+	16, // 20: cyber.conf.Payment.Provider.wechat:type_name -> cyber.conf.Payment.Wechat
+	21, // [21:21] is the sub-list for method output_type
+	21, // [21:21] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }
@@ -1033,7 +1286,7 @@ func file_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_conf_conf_proto_rawDesc), len(file_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

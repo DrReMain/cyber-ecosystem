@@ -97,6 +97,7 @@ type TestRP interface {
 	GetConfigByCode(ctx context.Context, code string) (*TestConfig, error)
 	ListAnswers(ctx context.Context, testCode string) (map[string]map[string]any, error)
 	CountBySessionCodes(ctx context.Context, sessionID string) (map[string]int, error)
+	GetAttempt(ctx context.Context, id string) (*AttemptRecord, error) // nil, nil = no such record
 	CreateAttempt(ctx context.Context, rec *AttemptRecord) (*AttemptRecord, error)
 }
 

@@ -123,6 +123,37 @@ func (rp *testRP) CountBySessionCodes(ctx context.Context, sessionID string) (ma
 	return counts, nil
 }
 
+func (rp *testRP) GetAttempt(ctx context.Context, id string) (*AttemptRecord, error) {
+	row, err := rp.Platform.GetClient(ctx).TestRecord.Get(ctx, id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	grade := (*string)(nil)
+	if row.Grade != nil {
+		g := string(*row.Grade)
+		grade = &g
+	}
+	return &AttemptRecord{
+		ID:            row.ID,
+		TestCode:      row.TestCode,
+		UserID:        row.UserID,
+		AttemptNo:     row.AttemptNo,
+		SessionID:     row.SessionID,
+		StartedAt:     row.StartedAt,
+		EndedAt:       row.EndedAt,
+		Backgrounds:   row.Backgrounds,
+		RawDetail:     row.RawDetail,
+		RawScore:      row.RawScore,
+		Authoritative: row.AuthoritativeScore,
+		Grade:         grade,
+		Valid:         row.Valid,
+		InvalidReason: row.InvalidReason,
+	}, nil
+}
+
 func (rp *testRP) CreateAttempt(ctx context.Context, rec *AttemptRecord) (*AttemptRecord, error) {
 	row, err := rp.Platform.GetClient(ctx).TestRecord.Create().
 		SetTestCode(rec.TestCode).

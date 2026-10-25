@@ -11,6 +11,7 @@ message Bootstrap {
   Data data = 2;
   Observability observability = 3;
   Remote remote = 4;
+  Payment payment = 5;
 }
 
 message Server {
@@ -84,4 +85,27 @@ message Observability {
 // Remote holds endpoints of other services this service calls (ACL targets).
 message Remote {
   string system_connect = 1; // system service connect face (session introspection, grant decide)
+}
+
+message Payment {
+  string default_provider = 1; // provider orders are created against; also the callback URL's provider segment
+  string notify_base_url = 2;  // public base the channel pushes notifications to (the client edge's domain)
+  repeated Provider providers = 3;
+
+  message Provider {
+    string name = 1; // provider value orders carry (wechat, mock)
+    string kind = 2; // constructor dispatch: mock | wechat
+    Wechat wechat = 3;
+  }
+
+  message Wechat {
+    string mch_id = 1;
+    string mch_serial = 2;
+    string app_id = 3;
+    string apiv3_key = 4;           // 32 bytes
+    string private_key_pem = 5;     // apiclient_key.pem contents
+    string public_key_id = 6;       // PUB_KEY_ID_... (public-key mode, the only mode new merchants get)
+    string public_key_pem = 7;      // pub_key.pem contents
+    string base_url = 8;            // override for channel-edge tests
+  }
 }

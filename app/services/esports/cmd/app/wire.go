@@ -18,6 +18,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
+	"cyber-ecosystem/app/services/esports/internal/module/pay"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -26,7 +27,7 @@ import (
 )
 
 // wireApp init kratos application.
-func wireApp(*conf.Server, *conf.Data, *conf.Remote, *slog.Logger) (*kratos.App, func(), error) {
+func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Payment, *slog.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		wire.Bind(new(shared.Transaction), new(*platform.Platform)),
 		server.ProviderSet,
@@ -38,6 +39,7 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *slog.Logger) (*kratos.App,
 		game.ProviderSet,
 		match.ProviderSet,
 		member.ProviderSet,
+		pay.ProviderSet,
 		test.ProviderSet,
 		newApp,
 	))

@@ -14,6 +14,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
+	"cyber-ecosystem/app/services/esports/internal/module/pay"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -25,14 +26,26 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, logger *slog.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, payment *conf.Payment, logger *slog.Logger) (*kratos.App, func(), error) {
 	entClient, cleanup, err := platform.NewEntClient(data, logger)
 	if err != nil {
 		return nil, nil, err
 	}
 	entErrorHandler := platform.NewEntErrorHandler()
-	platformPlatform, err := platform.NewPlatform(entClient, entErrorHandler)
+	payments, cleanup2, err := platform.NewPayments(payment)
 	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	paymentErrorHandler, err := platform.NewPaymentErrorHandler()
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	platformPlatform, err := platform.NewPlatform(entClient, entErrorHandler, payments, paymentErrorHandler)
+	if err != nil {
+		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
@@ -42,8 +55,9 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, logg
 	profileService := profile.NewProfileService(logger, profileUC)
 	gameUC := game.NewGameUC(logger, platformPlatform, gameRP)
 	gameService := game.NewGameService(logger, gameUC)
-	systemClient, cleanup2, err := client.NewSystemClient(remote, logger)
+	systemClient, cleanup3, err := client.NewSystemClient(remote, logger)
 	if err != nil {
+		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
@@ -56,13 +70,22 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, logg
 	testService := test.NewTestService(logger, testUC)
 	matchUC := match.NewMatchUC(logger, platformPlatform, matchRP, testRP, profileRP, gameRP)
 	matchService := match.NewMatchService(logger, matchUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService)
+	skuRP := pay.NewSkuRP(logger, platformPlatform)
+	skuUC := pay.NewSkuUC(logger, platformPlatform, skuRP)
+	skuService := pay.NewSkuService(logger, skuUC)
+	orderRP := pay.NewPayOrderRP(logger, platformPlatform)
+	entitlementRP := pay.NewEntitlementRP(logger, platformPlatform)
+	payChannelRP := pay.NewPayChannelRP(logger, platformPlatform)
+	orderUC := pay.NewOrderUC(logger, platformPlatform, orderRP, skuRP, entitlementRP, testRP, payChannelRP)
+	orderService := pay.NewOrderService(logger, orderUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)
 	connectServer := server.NewConnectServer(confServer, logger, v, systemClient, authzUC)
 	seed, err := bootstrap.NewSeed(platformPlatform, logger)
 	if err != nil {
+		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
@@ -70,6 +93,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, logg
 	lifecycle := bootstrap.NewLifecycle()
 	app := newApp(logger, grpcServer, httpServer, connectServer, seed, lifecycle)
 	return app, func() {
+		cleanup3()
 		cleanup2()
 		cleanup()
 	}, nil
