@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -265,14 +266,14 @@ func parseYuanFen(s string) (payment.AmountFen, error) {
 	if strings.HasPrefix(s, "-") {
 		neg, s = true, s[1:]
 	}
-	yuan, frac, _ := strings.Cut(s, ".")
-	if len(frac) > 2 {
+	yuan, frac, dotted := strings.Cut(s, ".")
+	// The channel's amounts are plain digit strings — a signed or partial
+	// shape ("-1" parsing to a positive, "+1", "5.", ".5") is a corruption
+	// of the cell, not a value to guess.
+	if !allDigits(yuan) || (dotted && (!allDigits(frac) || len(frac) > 2)) {
 		return 0, fmt.Errorf("%w: bill amount %q", payment.ErrInvalidArgument, s)
 	}
 	frac += strings.Repeat("0", 2-len(frac))
-	if yuan == "" {
-		yuan = "0"
-	}
 	y, err := strconv.ParseInt(yuan, 10, 64)
 	if err != nil {
 		return 0, fmt.Errorf("%w: bill amount %q: %w", payment.ErrInvalidArgument, s, err)
@@ -281,9 +282,24 @@ func parseYuanFen(s string) (payment.AmountFen, error) {
 	if err != nil {
 		return 0, fmt.Errorf("%w: bill amount %q: %w", payment.ErrInvalidArgument, s, err)
 	}
+	if y > (math.MaxInt64-f)/100 {
+		return 0, fmt.Errorf("%w: bill amount %q overflows", payment.ErrInvalidArgument, s)
+	}
 	n := y*100 + f
 	if neg {
 		n = -n
 	}
 	return payment.Fen(n), nil
+}
+
+func allDigits(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
 }

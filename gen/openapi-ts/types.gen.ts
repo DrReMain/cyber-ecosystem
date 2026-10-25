@@ -529,9 +529,11 @@ export type CyberEsportsV1NotifyPaymentRequest = {
 
 export type CyberEsportsV1NotifyPaymentResponse = {
     /**
-     * False = parsed and verified but nothing settles (an event kind this
-     * build audits without acting on); the channel is still acked so
-     * redelivery stops — the query surface converges state regardless.
+     * True when this face absorbed the event — settled, or a kind this build
+     * audits by design (a refund logs and acks). False = parsed and verified
+     * but nothing folded: the edge answers non-ack, so the channel's own
+     * retries keep the event visible instead of silently dropping an unknown
+     * money fact.
      */
     handled?: boolean;
 };

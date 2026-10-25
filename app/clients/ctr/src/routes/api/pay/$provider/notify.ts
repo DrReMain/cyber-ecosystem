@@ -12,6 +12,14 @@ export const Route = createFileRoute("/api/pay/$provider/notify")({
   server: {
     handlers: {
       POST: async ({ request, params }) => {
+        // The service's 64KiB body ceiling, enforced before the read: the
+        // edge must not buffer into memory a push the service would only
+        // reject. A chunked push without a declared length still lands on
+        // the service-side check.
+        const declared = Number(request.headers.get("content-length") ?? "0");
+        if (declared > 65536) {
+          return fail(413, "payload too large");
+        }
         const body = new Uint8Array(await request.arrayBuffer());
         const headers: Record<string, string> = {};
         request.headers.forEach((value, key) => {

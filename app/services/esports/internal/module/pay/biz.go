@@ -166,12 +166,14 @@ func NewSkuUC(logger *slog.Logger, tm shared.Transaction, skuRP SkuRP) *SkuUC {
 
 type OrderUC struct {
 	shared.UC
-	orderRP     OrderRP
-	skuRP       SkuRP
-	entRP       EntitlementRP
-	testRP      test.TestRP
-	channelRP   PayChannelRP
-	loopCancels []context.CancelFunc
+	orderRP       OrderRP
+	skuRP         SkuRP
+	entRP         EntitlementRP
+	testRP        test.TestRP
+	channelRP     PayChannelRP
+	loopCancels   []context.CancelFunc
+	nextBillDay   time.Time // the day the next reconcile sweep must still see; owned by the reconcile loop's goroutine
+	nextBillRetry int
 }
 
 func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, orderRP OrderRP, skuRP SkuRP, entRP EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
@@ -353,7 +355,7 @@ func (uc *OrderUC) HandleNotification(ctx context.Context, provider string, head
 			Provider:      provider,
 			TransactionID: event.TransactionID,
 			AmountFen:     int64(event.AmountFen),
-			PaidAt:        time.Now(),
+			PaidAt:        event.SuccessAt,
 		})
 	case payment.EventRefundSucceeded, payment.EventRefundAbnormal:
 		// M1 folds nothing on refunds — the event is the audit trail; the
@@ -370,6 +372,11 @@ func (uc *OrderUC) HandleNotification(ctx context.Context, provider string, head
 }
 
 func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
+	if in.PaidAt.IsZero() {
+		// A channel that stamps no success time still settles — the local
+		// clock is the fallback fact, both settle paths meeting here.
+		in.PaidAt = time.Now()
+	}
 	order, err := uc.orderRP.ByNo(ctx, in.OrderNo)
 	if err != nil {
 		return false, err
@@ -463,16 +470,20 @@ func (uc *OrderUC) ConvergeOnce(ctx context.Context) error {
 }
 
 func (uc *OrderUC) ReconcileOnce(ctx context.Context, day time.Time) error {
+	err := uc.reconcileDay(ctx, day)
+	if errorspb.IsInfraErrorPaymentNotFound(err) {
+		// The channel has not published the day yet — a recent day's
+		// absence is the channel being the channel.
+		uc.Log.Info("payment bill not published", "day", day.Format("2006-01-02"))
+		return nil
+	}
+	return err
+}
+
+func (uc *OrderUC) reconcileDay(ctx context.Context, day time.Time) error {
 	provider := uc.channelRP.DefaultProvider()
 	bill, err := uc.channelRP.DownloadBill(ctx, provider, &payment.BillInput{Date: day, Kind: payment.BillKindTrade})
 	if err != nil {
-		if errorspb.IsInfraErrorPaymentNotFound(err) {
-			// The channel has not published the day yet — a recent day's
-			// absence is the channel being the channel; the next sweep asks
-			// again.
-			uc.Log.Info("payment bill not published", "day", day.Format("2006-01-02"))
-			return nil
-		}
 		return err
 	}
 	lines, err := uc.channelRP.ParseTradeBill(ctx, provider, bill.Raw)
@@ -605,7 +616,35 @@ func (uc *OrderUC) stopLoops(context.Context) error {
 }
 
 func (uc *OrderUC) reconcileSweep(ctx context.Context) error {
-	return uc.ReconcileOnce(ctx, billDayBefore(time.Now()))
+	// A day advances only after a sweep handles it: a transient download
+	// failure or an unpublished bill is retried on the next tick rather
+	// than skipped — a day's bill is the only record of what the channel
+	// believes happened. One retry, then the day is abandoned with an
+	// ERROR: a trade-less day answers not-found forever, and no single
+	// day may wedge the loop.
+	yesterday := billDayBefore(time.Now())
+	if uc.nextBillDay.IsZero() || uc.nextBillDay.After(yesterday) {
+		uc.nextBillDay, uc.nextBillRetry = yesterday, 0
+	}
+	for !uc.nextBillDay.After(yesterday) {
+		day := uc.nextBillDay
+		err := uc.reconcileDay(ctx, day)
+		if errorspb.IsInfraErrorPaymentNotFound(err) {
+			uc.Log.Info("payment bill not published yet", "day", day.Format("2006-01-02"))
+		}
+		if err != nil {
+			uc.nextBillRetry++
+			if uc.nextBillRetry < 2 {
+				return err
+			}
+			uc.Log.Error("payment bill day abandoned", "day", day.Format("2006-01-02"), "err", err)
+			uc.nextBillRetry = 0
+		} else {
+			uc.nextBillRetry = 0
+		}
+		uc.nextBillDay = day.AddDate(0, 0, 1)
+	}
+	return nil
 }
 
 func (uc *OrderUC) convergeQuery(ctx context.Context, order *Order) {

@@ -66,7 +66,9 @@ func newClient(cfg Config) (*client, error) {
 		if err != nil {
 			return nil, fmt.Errorf("%w: wechatpay public key: %w", payment.ErrInvalidArgument, err)
 		}
-		c.pubs[cfg.WechatpayPublicKeyID] = pub
+		// Stored under the upper-cased form the verification lookup uses —
+		// a configured id in any case must still match its own headers.
+		c.pubs[strings.ToUpper(cfg.WechatpayPublicKeyID)] = pub
 	}
 	return c, nil
 }
@@ -240,10 +242,33 @@ func (c *client) refreshCertificates(ctx context.Context) error {
 	if len(fresh) == 0 {
 		return fmt.Errorf("%w: certificate list empty", payment.ErrUnavailable)
 	}
+	// The response carrying these certificates must verify under the table
+	// that now includes them before any is trusted for later notifications;
+	// a failed verification rolls back exactly what this refresh added (a
+	// serial names one certificate, so a key the table already held is
+	// restored, not dropped).
 	c.mu.Lock()
+	saved := make(map[string]*rsa.PublicKey, len(fresh))
+	for k := range fresh {
+		if old, ok := c.pubs[k]; ok {
+			saved[k] = old
+		}
+	}
 	maps.Copy(c.pubs, fresh)
 	c.mu.Unlock()
-	return c.verifySigned(ctx, h, body)
+	if err := c.verifySigned(ctx, h, body); err != nil {
+		c.mu.Lock()
+		for k := range fresh {
+			if old, ok := saved[k]; ok {
+				c.pubs[k] = old
+			} else {
+				delete(c.pubs, k)
+			}
+		}
+		c.mu.Unlock()
+		return err
+	}
+	return nil
 }
 
 func newNonce() (string, error) {

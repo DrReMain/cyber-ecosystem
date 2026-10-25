@@ -280,4 +280,12 @@ func TestParseYuanFen(t *testing.T) {
 	if _, err := parseYuanFen("abc"); !errors.Is(err, payment.ErrInvalidArgument) {
 		t.Errorf("abc: want ErrInvalidArgument, got %v", err)
 	}
+	// Corrupted cells refuse rather than guess: double signs (whose inner
+	// negative once folded to a positive), bare signs, partial decimals,
+	// sub-fen precision, and an overflow that would wrap.
+	for _, bad := range []string{"--1.00", "+1.00", "-", ".5", "5.", "19.904", "92233720368547758.08"} {
+		if _, err := parseYuanFen(bad); !errors.Is(err, payment.ErrInvalidArgument) {
+			t.Errorf("%q: want ErrInvalidArgument, got %v", bad, err)
+		}
+	}
 }

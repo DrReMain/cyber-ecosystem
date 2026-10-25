@@ -71,9 +71,9 @@ func (PayOrder) Indexes() []ent.Index {
 		index.Fields("order_no").Unique(),
 		// Same-grant reuse guard: one live pending order per (user,
 		// scope). Trial scope_refs are non-null so the guard binds; a
-		// period's null ref never conflicts (NULLS DISTINCT) — two
-		// concurrent membership creations may both live, each valid,
-		// and at most one gets paid.
+		// period's null ref never conflicts (NULLS DISTINCT) — concurrent
+		// membership creations may both live and both pay, each purchase
+		// stacking its own grant at settle.
 		index.Fields("tenant_id", "user_id", "scope_kind", "scope_ref").Unique().
 			Annotations(entsql.IndexWhere("state = 'pending'")),
 		index.Fields("state", "expires_at"),
