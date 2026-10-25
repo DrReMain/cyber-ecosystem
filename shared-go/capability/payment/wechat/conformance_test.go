@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"testing"
 	"time"
@@ -109,6 +110,7 @@ func TestLiveConformance(t *testing.T) {
 			t.Fatalf("sign: %v", err)
 		}
 		req.Header.Set("Authorization", BuildAuthorizationHeader(c.cfg.MchID, c.cfg.MchSerial, ts, nonce, sig))
+		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Wechatpay-Serial", c.cfg.WechatpayPublicKeyID)
 		resp, err := c.hc.Do(req)
 		if err != nil {
@@ -119,6 +121,8 @@ func TestLiveConformance(t *testing.T) {
 		if err != nil {
 			t.Fatalf("read response: %v", err)
 		}
+		t.Logf("handshake response: http %d, headers %v, body %s",
+			resp.StatusCode, resp.Header, string(body[:min(len(body), 400)]))
 		if err := c.verifySigned(ctx, resp.Header, body); err != nil {
 			t.Fatalf("response does not verify against the channel key: %v", err)
 		}
@@ -132,7 +136,7 @@ func TestLiveConformance(t *testing.T) {
 		absent := fmt.Sprintf("conf%d", time.Now().UnixNano())
 		err := c.do(ctx, http.MethodGet,
 			"/v3/pay/transactions/out-trade-no/"+absent,
-			nil, nil, nil)
+			url.Values{"mchid": {c.cfg.MchID}}, nil, nil)
 		if !errors.Is(err, payment.ErrNotFound) {
 			t.Fatalf("absent order: want ErrNotFound, got %v", err)
 		}
