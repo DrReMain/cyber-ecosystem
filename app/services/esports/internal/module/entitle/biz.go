@@ -66,6 +66,13 @@ type EntitlementRP interface {
 	HasActiveMembership(ctx context.Context, userID string) (bool, error)
 }
 
+type PolicyRP interface {
+	// Policy reads the operator's override for one family; ok=false means
+	// no row, and the shipped default answers.
+	Policy(ctx context.Context, family string) (policy string, ok bool, err error)
+	SetPolicy(ctx context.Context, family, policy, updatedBy string) error
+}
+
 type EntitlementGrant struct {
 	UserID    string
 	ScopeKind string
@@ -99,6 +106,11 @@ const (
 	reportCareer    = "career"
 	reportSchool    = "school"
 
+	policyOpen       = "open"
+	policyMembership = "membership"
+	policyTenant     = "tenant"
+	policyClosed     = "closed"
+
 	// The code shape mirrors the legacy corpus: a two-letter prefix a
 	// support agent can recognize on the phone plus sixteen characters of
 	// secure random over an alphabet with the look-alikes (0/O, 1/I)
@@ -107,6 +119,12 @@ const (
 	codeBodyLen  = 16
 	codeAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 )
+
+var defaultPolicy = map[string]string{ // shipped defaults; report_policy rows are the only override — career open, cognitive the member plane, school codes-only
+	reportCareer:    policyOpen,
+	reportCognitive: policyMembership,
+	reportSchool:    policyClosed,
+}
 
 type CodeUC struct {
 	shared.UC
@@ -151,12 +169,18 @@ func (uc *CodeUC) List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, err
 
 type EntitleUC struct {
 	shared.UC
-	codeRP CodeRP
-	entRP  EntitlementRP
+	codeRP   CodeRP
+	entRP    EntitlementRP
+	policyRP PolicyRP
 }
 
-func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP CodeRP, entRP EntitlementRP) *EntitleUC {
-	return &EntitleUC{UC: shared.NewUC(logger.With("module", "module/entitle"), tm), codeRP: codeRP, entRP: entRP}
+func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP CodeRP, entRP EntitlementRP, policyRP PolicyRP) *EntitleUC {
+	return &EntitleUC{
+		UC:       shared.NewUC(logger.With("module", "module/entitle"), tm),
+		codeRP:   codeRP,
+		entRP:    entRP,
+		policyRP: policyRP,
+	}
 }
 
 func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error) {
@@ -231,20 +255,8 @@ func (uc *EntitleUC) GetReportAccess(ctx context.Context, family string) (*Acces
 	if !ok || subject == nil {
 		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("report access requires a session"))
 	}
-	// The shipped defaults of the policy ladder; the operator config that
-	// overrides them is the entitlement domain's next face. Career ships
-	// open, cognitive opens for members and codes, school only for codes.
-	switch family {
-	case reportCareer:
-		return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN}, nil
-	case reportCognitive:
-		if ok, err := uc.entRP.HasActiveMembership(ctx, subject.UserID); err != nil {
-			return nil, err
-		} else if ok {
-			return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE}, nil
-		}
-	case reportSchool:
-	}
+	// A redeemed code outranks the policy — a type code is an explicit
+	// grant someone handed out; no config switch revokes it.
 	ref := family
 	grant, err := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &ref)
 	if err != nil {
@@ -253,5 +265,45 @@ func (uc *EntitleUC) GetReportAccess(ctx context.Context, family string) (*Acces
 	if grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now())) {
 		return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_CODE_REDEEMED}, nil
 	}
+	policy, ok, err := uc.policyRP.Policy(ctx, family)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		policy = defaultPolicy[family]
+	}
+	explicitClosed := ok && policy == policyClosed
+	switch policy {
+	case policyOpen:
+		return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN}, nil
+	case policyMembership:
+		if ok, err := uc.entRP.HasActiveMembership(ctx, subject.UserID); err != nil {
+			return nil, err
+		} else if ok {
+			return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE}, nil
+		}
+	case policyTenant, policyClosed:
+	}
+	if explicitClosed {
+		return &AccessOut{Allowed: false, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_CLOSED}, nil
+	}
 	return &AccessOut{Allowed: false, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT}, nil
+}
+
+func (uc *EntitleUC) SetReportAccessPolicy(ctx context.Context, family, policy string) error {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("policy write requires an admin session"))
+	}
+	if policy == policyTenant {
+		// The tenant plane is not here yet — refusing the value keeps the
+		// operator from setting a policy this build would silently answer
+		// as closed.
+		return esportspb.ErrorEsportsReportPolicyNotReady("")
+	}
+	if err := uc.policyRP.SetPolicy(ctx, family, policy, subject.UserID); err != nil {
+		return err
+	}
+	uc.Log.Info("report access policy set", "report_type", family, "policy", policy, "updated_by", subject.UserID)
+	return nil
 }

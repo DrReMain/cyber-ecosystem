@@ -47,6 +47,9 @@ const (
 	// EntitlementServiceGetReportAccessProcedure is the fully-qualified name of the
 	// EntitlementService's GetReportAccess RPC.
 	EntitlementServiceGetReportAccessProcedure = "/cyber.esports.v1.EntitlementService/GetReportAccess"
+	// EntitlementServiceSetReportAccessPolicyProcedure is the fully-qualified name of the
+	// EntitlementService's SetReportAccessPolicy RPC.
+	EntitlementServiceSetReportAccessPolicyProcedure = "/cyber.esports.v1.EntitlementService/SetReportAccessPolicy"
 )
 
 // ActivationCodeServiceClient is a client for the cyber.esports.v1.ActivationCodeService service.
@@ -150,6 +153,7 @@ func (UnimplementedActivationCodeServiceHandler) ListActivationCodes(context.Con
 type EntitlementServiceClient interface {
 	RedeemActivationCode(context.Context, *connect.Request[v1.RedeemActivationCodeRequest]) (*connect.Response[v1.RedeemActivationCodeResponse], error)
 	GetReportAccess(context.Context, *connect.Request[v1.GetReportAccessRequest]) (*connect.Response[v1.GetReportAccessResponse], error)
+	SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error)
 }
 
 // NewEntitlementServiceClient constructs a client for the cyber.esports.v1.EntitlementService
@@ -175,13 +179,20 @@ func NewEntitlementServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(entitlementServiceMethods.ByName("GetReportAccess")),
 			connect.WithClientOptions(opts...),
 		),
+		setReportAccessPolicy: connect.NewClient[v1.SetReportAccessPolicyRequest, v1.SetReportAccessPolicyResponse](
+			httpClient,
+			baseURL+EntitlementServiceSetReportAccessPolicyProcedure,
+			connect.WithSchema(entitlementServiceMethods.ByName("SetReportAccessPolicy")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // entitlementServiceClient implements EntitlementServiceClient.
 type entitlementServiceClient struct {
-	redeemActivationCode *connect.Client[v1.RedeemActivationCodeRequest, v1.RedeemActivationCodeResponse]
-	getReportAccess      *connect.Client[v1.GetReportAccessRequest, v1.GetReportAccessResponse]
+	redeemActivationCode  *connect.Client[v1.RedeemActivationCodeRequest, v1.RedeemActivationCodeResponse]
+	getReportAccess       *connect.Client[v1.GetReportAccessRequest, v1.GetReportAccessResponse]
+	setReportAccessPolicy *connect.Client[v1.SetReportAccessPolicyRequest, v1.SetReportAccessPolicyResponse]
 }
 
 // RedeemActivationCode calls cyber.esports.v1.EntitlementService.RedeemActivationCode.
@@ -194,11 +205,17 @@ func (c *entitlementServiceClient) GetReportAccess(ctx context.Context, req *con
 	return c.getReportAccess.CallUnary(ctx, req)
 }
 
+// SetReportAccessPolicy calls cyber.esports.v1.EntitlementService.SetReportAccessPolicy.
+func (c *entitlementServiceClient) SetReportAccessPolicy(ctx context.Context, req *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error) {
+	return c.setReportAccessPolicy.CallUnary(ctx, req)
+}
+
 // EntitlementServiceHandler is an implementation of the cyber.esports.v1.EntitlementService
 // service.
 type EntitlementServiceHandler interface {
 	RedeemActivationCode(context.Context, *connect.Request[v1.RedeemActivationCodeRequest]) (*connect.Response[v1.RedeemActivationCodeResponse], error)
 	GetReportAccess(context.Context, *connect.Request[v1.GetReportAccessRequest]) (*connect.Response[v1.GetReportAccessResponse], error)
+	SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error)
 }
 
 // NewEntitlementServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -220,12 +237,20 @@ func NewEntitlementServiceHandler(svc EntitlementServiceHandler, opts ...connect
 		connect.WithSchema(entitlementServiceMethods.ByName("GetReportAccess")),
 		connect.WithHandlerOptions(opts...),
 	)
+	entitlementServiceSetReportAccessPolicyHandler := connect.NewUnaryHandler(
+		EntitlementServiceSetReportAccessPolicyProcedure,
+		svc.SetReportAccessPolicy,
+		connect.WithSchema(entitlementServiceMethods.ByName("SetReportAccessPolicy")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.EntitlementService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case EntitlementServiceRedeemActivationCodeProcedure:
 			entitlementServiceRedeemActivationCodeHandler.ServeHTTP(w, r)
 		case EntitlementServiceGetReportAccessProcedure:
 			entitlementServiceGetReportAccessHandler.ServeHTTP(w, r)
+		case EntitlementServiceSetReportAccessPolicyProcedure:
+			entitlementServiceSetReportAccessPolicyHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -241,4 +266,8 @@ func (UnimplementedEntitlementServiceHandler) RedeemActivationCode(context.Conte
 
 func (UnimplementedEntitlementServiceHandler) GetReportAccess(context.Context, *connect.Request[v1.GetReportAccessRequest]) (*connect.Response[v1.GetReportAccessResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitlementService.GetReportAccess is not implemented"))
+}
+
+func (UnimplementedEntitlementServiceHandler) SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitlementService.SetReportAccessPolicy is not implemented"))
 }

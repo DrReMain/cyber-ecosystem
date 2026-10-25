@@ -12,6 +12,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/payorder"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
+	"cyber-ecosystem/app/services/esports/internal/ent/reportpolicy"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema"
 	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
@@ -837,6 +838,57 @@ func init() {
 	questionbank.DefaultID = questionbankDescID.Default.(func() string)
 	// questionbank.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	questionbank.IDValidator = questionbankDescID.Validators[0].(func(string) error)
+	reportpolicyMixin := schema.ReportPolicy{}.Mixin()
+	reportpolicyMixinHooks2 := reportpolicyMixin[2].Hooks()
+	reportpolicy.Hooks[0] = reportpolicyMixinHooks2[0]
+	reportpolicyMixinInters2 := reportpolicyMixin[2].Interceptors()
+	reportpolicy.Interceptors[0] = reportpolicyMixinInters2[0]
+	reportpolicyMixinFields0 := reportpolicyMixin[0].Fields()
+	_ = reportpolicyMixinFields0
+	reportpolicyMixinFields1 := reportpolicyMixin[1].Fields()
+	_ = reportpolicyMixinFields1
+	reportpolicyMixinFields2 := reportpolicyMixin[2].Fields()
+	_ = reportpolicyMixinFields2
+	reportpolicyFields := schema.ReportPolicy{}.Fields()
+	_ = reportpolicyFields
+	// reportpolicyDescCreatedAt is the schema descriptor for created_at field.
+	reportpolicyDescCreatedAt := reportpolicyMixinFields1[0].Descriptor()
+	// reportpolicy.DefaultCreatedAt holds the default value on creation for the created_at field.
+	reportpolicy.DefaultCreatedAt = reportpolicyDescCreatedAt.Default.(func() time.Time)
+	// reportpolicyDescUpdatedAt is the schema descriptor for updated_at field.
+	reportpolicyDescUpdatedAt := reportpolicyMixinFields1[1].Descriptor()
+	// reportpolicy.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	reportpolicy.DefaultUpdatedAt = reportpolicyDescUpdatedAt.Default.(func() time.Time)
+	// reportpolicy.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	reportpolicy.UpdateDefaultUpdatedAt = reportpolicyDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// reportpolicyDescTenantID is the schema descriptor for tenant_id field.
+	reportpolicyDescTenantID := reportpolicyMixinFields2[0].Descriptor()
+	// reportpolicy.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	reportpolicy.TenantIDValidator = reportpolicyDescTenantID.Validators[0].(func(string) error)
+	// reportpolicyDescUpdatedBy is the schema descriptor for updated_by field.
+	reportpolicyDescUpdatedBy := reportpolicyFields[2].Descriptor()
+	// reportpolicy.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	reportpolicy.UpdatedByValidator = func() func(string) error {
+		validators := reportpolicyDescUpdatedBy.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(updated_by string) error {
+			for _, fn := range fns {
+				if err := fn(updated_by); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// reportpolicyDescID is the schema descriptor for id field.
+	reportpolicyDescID := reportpolicyMixinFields0[0].Descriptor()
+	// reportpolicy.DefaultID holds the default value on creation for the id field.
+	reportpolicy.DefaultID = reportpolicyDescID.Default.(func() string)
+	// reportpolicy.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	reportpolicy.IDValidator = reportpolicyDescID.Validators[0].(func(string) error)
 	skuMixin := schema.Sku{}.Mixin()
 	skuMixinHooks2 := skuMixin[2].Hooks()
 	skuMixinHooks3 := skuMixin[3].Hooks()

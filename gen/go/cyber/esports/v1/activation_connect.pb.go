@@ -18,4 +18,5 @@ func RegisterActivationCodeServiceConnectServer(srv *connect.Server, svc Activat
 func RegisterEntitlementServiceConnectServer(srv *connect.Server, svc EntitlementServiceServer) {
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitlementService/RedeemActivationCode", svc.RedeemActivationCode)
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitlementService/GetReportAccess", svc.GetReportAccess)
+	connect.HandleUnary(srv, "/cyber.esports.v1.EntitlementService/SetReportAccessPolicy", svc.SetReportAccessPolicy)
 }

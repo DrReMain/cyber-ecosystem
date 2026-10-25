@@ -117,5 +117,6 @@
   "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "支払い通知の復号に失敗しました。しばらくしてからお試しください",
   "error_ESPORTS_ACTIVATION_CODE_INVALID": "アクティベーションコードが無効です",
   "error_ESPORTS_ACTIVATION_CODE_EXPIRED": "アクティベーションコードの有効期限が切れました",
-  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "アクティベーションコードは使用済みです"
+  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "アクティベーションコードは使用済みです",
+  "error_ESPORTS_REPORT_POLICY_NOT_READY": "このポリシーはまだ利用できません。後でもう一度お試しください"
 }

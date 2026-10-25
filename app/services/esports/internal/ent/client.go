@@ -20,6 +20,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/payorder"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
+	"cyber-ecosystem/app/services/esports/internal/ent/reportpolicy"
 	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
@@ -55,6 +56,8 @@ type Client struct {
 	Profile *ProfileClient
 	// QuestionBank is the client for interacting with the QuestionBank builders.
 	QuestionBank *QuestionBankClient
+	// ReportPolicy is the client for interacting with the ReportPolicy builders.
+	ReportPolicy *ReportPolicyClient
 	// Sku is the client for interacting with the Sku builders.
 	Sku *SkuClient
 	// Test is the client for interacting with the Test builders.
@@ -83,6 +86,7 @@ func (c *Client) init() {
 	c.PayOrder = NewPayOrderClient(c.config)
 	c.Profile = NewProfileClient(c.config)
 	c.QuestionBank = NewQuestionBankClient(c.config)
+	c.ReportPolicy = NewReportPolicyClient(c.config)
 	c.Sku = NewSkuClient(c.config)
 	c.Test = NewTestClient(c.config)
 	c.TestConfig = NewTestConfigClient(c.config)
@@ -188,6 +192,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		PayOrder:       NewPayOrderClient(cfg),
 		Profile:        NewProfileClient(cfg),
 		QuestionBank:   NewQuestionBankClient(cfg),
+		ReportPolicy:   NewReportPolicyClient(cfg),
 		Sku:            NewSkuClient(cfg),
 		Test:           NewTestClient(cfg),
 		TestConfig:     NewTestConfigClient(cfg),
@@ -220,6 +225,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		PayOrder:       NewPayOrderClient(cfg),
 		Profile:        NewProfileClient(cfg),
 		QuestionBank:   NewQuestionBankClient(cfg),
+		ReportPolicy:   NewReportPolicyClient(cfg),
 		Sku:            NewSkuClient(cfg),
 		Test:           NewTestClient(cfg),
 		TestConfig:     NewTestConfigClient(cfg),
@@ -254,8 +260,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.ActivationCode, c.Entitlement, c.Game, c.MatchConfig,
-		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.Sku, c.Test,
-		c.TestConfig, c.TestRecord,
+		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy, c.Sku,
+		c.Test, c.TestConfig, c.TestRecord,
 	} {
 		n.Use(hooks...)
 	}
@@ -266,8 +272,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.ActivationCode, c.Entitlement, c.Game, c.MatchConfig,
-		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.Sku, c.Test,
-		c.TestConfig, c.TestRecord,
+		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy, c.Sku,
+		c.Test, c.TestConfig, c.TestRecord,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -294,6 +300,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Profile.mutate(ctx, m)
 	case *QuestionBankMutation:
 		return c.QuestionBank.mutate(ctx, m)
+	case *ReportPolicyMutation:
+		return c.ReportPolicy.mutate(ctx, m)
 	case *SkuMutation:
 		return c.Sku.mutate(ctx, m)
 	case *TestMutation:
@@ -1522,6 +1530,141 @@ func (c *QuestionBankClient) mutate(ctx context.Context, m *QuestionBankMutation
 	}
 }
 
+// ReportPolicyClient is a client for the ReportPolicy schema.
+type ReportPolicyClient struct {
+	config
+}
+
+// NewReportPolicyClient returns a client for the ReportPolicy from the given config.
+func NewReportPolicyClient(c config) *ReportPolicyClient {
+	return &ReportPolicyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `reportpolicy.Hooks(f(g(h())))`.
+func (c *ReportPolicyClient) Use(hooks ...Hook) {
+	c.hooks.ReportPolicy = append(c.hooks.ReportPolicy, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `reportpolicy.Intercept(f(g(h())))`.
+func (c *ReportPolicyClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ReportPolicy = append(c.inters.ReportPolicy, interceptors...)
+}
+
+// Create returns a builder for creating a ReportPolicy entity.
+func (c *ReportPolicyClient) Create() *ReportPolicyCreate {
+	mutation := newReportPolicyMutation(c.config, OpCreate)
+	return &ReportPolicyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ReportPolicy entities.
+func (c *ReportPolicyClient) CreateBulk(builders ...*ReportPolicyCreate) *ReportPolicyCreateBulk {
+	return &ReportPolicyCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ReportPolicyClient) MapCreateBulk(slice any, setFunc func(*ReportPolicyCreate, int)) *ReportPolicyCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ReportPolicyCreateBulk{err: fmt.Errorf("calling to ReportPolicyClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ReportPolicyCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ReportPolicyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ReportPolicy.
+func (c *ReportPolicyClient) Update() *ReportPolicyUpdate {
+	mutation := newReportPolicyMutation(c.config, OpUpdate)
+	return &ReportPolicyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ReportPolicyClient) UpdateOne(_m *ReportPolicy) *ReportPolicyUpdateOne {
+	mutation := newReportPolicyMutation(c.config, OpUpdateOne, withReportPolicy(_m))
+	return &ReportPolicyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ReportPolicyClient) UpdateOneID(id string) *ReportPolicyUpdateOne {
+	mutation := newReportPolicyMutation(c.config, OpUpdateOne, withReportPolicyID(id))
+	return &ReportPolicyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ReportPolicy.
+func (c *ReportPolicyClient) Delete() *ReportPolicyDelete {
+	mutation := newReportPolicyMutation(c.config, OpDelete)
+	return &ReportPolicyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ReportPolicyClient) DeleteOne(_m *ReportPolicy) *ReportPolicyDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ReportPolicyClient) DeleteOneID(id string) *ReportPolicyDeleteOne {
+	builder := c.Delete().Where(reportpolicy.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ReportPolicyDeleteOne{builder}
+}
+
+// Query returns a query builder for ReportPolicy.
+func (c *ReportPolicyClient) Query() *ReportPolicyQuery {
+	return &ReportPolicyQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeReportPolicy},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ReportPolicy entity by its id.
+func (c *ReportPolicyClient) Get(ctx context.Context, id string) (*ReportPolicy, error) {
+	return c.Query().Where(reportpolicy.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ReportPolicyClient) GetX(ctx context.Context, id string) *ReportPolicy {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ReportPolicyClient) Hooks() []Hook {
+	hooks := c.hooks.ReportPolicy
+	return append(hooks[:len(hooks):len(hooks)], reportpolicy.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *ReportPolicyClient) Interceptors() []Interceptor {
+	inters := c.inters.ReportPolicy
+	return append(inters[:len(inters):len(inters)], reportpolicy.Interceptors[:]...)
+}
+
+func (c *ReportPolicyClient) mutate(ctx context.Context, m *ReportPolicyMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ReportPolicyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ReportPolicyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ReportPolicyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ReportPolicyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ReportPolicy mutation op: %q", m.Op())
+	}
+}
+
 // SkuClient is a client for the Sku schema.
 type SkuClient struct {
 	config
@@ -2066,11 +2209,12 @@ func (c *TestRecordClient) mutate(ctx context.Context, m *TestRecordMutation) (V
 type (
 	hooks struct {
 		AbilityScore, ActivationCode, Entitlement, Game, MatchConfig, MatchSession,
-		PayOrder, Profile, QuestionBank, Sku, Test, TestConfig, TestRecord []ent.Hook
+		PayOrder, Profile, QuestionBank, ReportPolicy, Sku, Test, TestConfig,
+		TestRecord []ent.Hook
 	}
 	inters struct {
 		AbilityScore, ActivationCode, Entitlement, Game, MatchConfig, MatchSession,
-		PayOrder, Profile, QuestionBank, Sku, Test, TestConfig,
+		PayOrder, Profile, QuestionBank, ReportPolicy, Sku, Test, TestConfig,
 		TestRecord []ent.Interceptor
 	}
 )

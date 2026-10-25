@@ -117,5 +117,6 @@
   "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "Payment notification could not be decrypted; try again later",
   "error_ESPORTS_ACTIVATION_CODE_INVALID": "The activation code is not valid",
   "error_ESPORTS_ACTIVATION_CODE_EXPIRED": "The activation code has expired",
-  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "The activation code has already been used"
+  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "The activation code has already been used",
+  "error_ESPORTS_REPORT_POLICY_NOT_READY": "That policy is not available yet; try again later"
 }

@@ -752,6 +752,16 @@ export type CyberEsportsV1ResourceMatchTrajectoryPoint = {
     elapsedMs?: number;
 };
 
+export type CyberEsportsV1SetReportAccessPolicyRequest = {
+    reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+    policy?: 'REPORT_ACCESS_POLICY_UNSPECIFIED' | 'REPORT_ACCESS_POLICY_OPEN' | 'REPORT_ACCESS_POLICY_MEMBERSHIP' | 'REPORT_ACCESS_POLICY_TENANT' | 'REPORT_ACCESS_POLICY_CLOSED';
+};
+
+export type CyberEsportsV1SetReportAccessPolicyResponse = {
+    reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+    policy?: 'REPORT_ACCESS_POLICY_UNSPECIFIED' | 'REPORT_ACCESS_POLICY_OPEN' | 'REPORT_ACCESS_POLICY_MEMBERSHIP' | 'REPORT_ACCESS_POLICY_TENANT' | 'REPORT_ACCESS_POLICY_CLOSED';
+};
+
 /**
  * skill_trajectory — placement precision over draggable graphics; the seed
  * reproduces the board server-side.
@@ -2690,6 +2700,22 @@ export type ProfileServiceUpdateProfileResponses = {
 };
 
 export type ProfileServiceUpdateProfileResponse = ProfileServiceUpdateProfileResponses[keyof ProfileServiceUpdateProfileResponses];
+
+export type EntitlementServiceSetReportAccessPolicyData = {
+    body: CyberEsportsV1SetReportAccessPolicyRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/report-access-policy';
+};
+
+export type EntitlementServiceSetReportAccessPolicyResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SetReportAccessPolicyResponse;
+};
+
+export type EntitlementServiceSetReportAccessPolicyResponse = EntitlementServiceSetReportAccessPolicyResponses[keyof EntitlementServiceSetReportAccessPolicyResponses];
 
 export type EntitlementServiceGetReportAccessData = {
     body?: never;

@@ -705,6 +705,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.UpdateProfileResponse'
+    /api/v1/esports/report-access-policy:
+        post:
+            tags:
+                - EntitlementService
+            operationId: EntitlementService_SetReportAccessPolicy
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SetReportAccessPolicyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SetReportAccessPolicyResponse'
     /api/v1/esports/report-access/{reportType}:
         get:
             tags:
@@ -3602,6 +3620,46 @@ components:
                 elapsedMs:
                     type: integer
                     format: int32
+        cyber.esports.v1.SetReportAccessPolicyRequest:
+            type: object
+            properties:
+                reportType:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+                policy:
+                    enum:
+                        - REPORT_ACCESS_POLICY_UNSPECIFIED
+                        - REPORT_ACCESS_POLICY_OPEN
+                        - REPORT_ACCESS_POLICY_MEMBERSHIP
+                        - REPORT_ACCESS_POLICY_TENANT
+                        - REPORT_ACCESS_POLICY_CLOSED
+                    type: string
+                    format: enum
+        cyber.esports.v1.SetReportAccessPolicyResponse:
+            type: object
+            properties:
+                reportType:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+                policy:
+                    enum:
+                        - REPORT_ACCESS_POLICY_UNSPECIFIED
+                        - REPORT_ACCESS_POLICY_OPEN
+                        - REPORT_ACCESS_POLICY_MEMBERSHIP
+                        - REPORT_ACCESS_POLICY_TENANT
+                        - REPORT_ACCESS_POLICY_CLOSED
+                    type: string
+                    format: enum
         cyber.esports.v1.SkillTrajectoryDetail:
             type: object
             properties:

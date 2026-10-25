@@ -428,6 +428,39 @@ var (
 			},
 		},
 	}
+	// ReportPolicyColumns holds the columns for the "report_policy" table.
+	ReportPolicyColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "report_type", Type: field.TypeEnum, Comment: "the family this row governs — the upsert key, one row per family", Enums: []string{"cognitive", "career", "school"}},
+		{Name: "policy", Type: field.TypeEnum, Comment: "who may enter: everyone, active members, the tenant's own (awaiting the tenant plane), or only explicit grants", Enums: []string{"open", "membership", "tenant", "closed"}},
+		{Name: "updated_by", Type: field.TypeString, Size: 20, Comment: "admin identity that last set the policy (audit join)"},
+	}
+	// ReportPolicyTable holds the schema information for the "report_policy" table.
+	ReportPolicyTable = &schema.Table{
+		Name:       "report_policy",
+		Columns:    ReportPolicyColumns,
+		PrimaryKey: []*schema.Column{ReportPolicyColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "reportpolicy_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ReportPolicyColumns[1]},
+			},
+			{
+				Name:    "reportpolicy_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{ReportPolicyColumns[2]},
+			},
+			{
+				Name:    "reportpolicy_report_type",
+				Unique:  true,
+				Columns: []*schema.Column{ReportPolicyColumns[4]},
+			},
+		},
+	}
 	// SkuColumns holds the columns for the "sku" table.
 	SkuColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -633,6 +666,7 @@ var (
 		PayOrderTable,
 		ProfileTable,
 		QuestionBankTable,
+		ReportPolicyTable,
 		SkuTable,
 		TestTable,
 		TestConfigTable,
@@ -667,6 +701,9 @@ func init() {
 	}
 	QuestionBankTable.Annotation = &entsql.Annotation{
 		Table: "question_bank",
+	}
+	ReportPolicyTable.Annotation = &entsql.Annotation{
+		Table: "report_policy",
 	}
 	SkuTable.Annotation = &entsql.Annotation{
 		Table: "sku",

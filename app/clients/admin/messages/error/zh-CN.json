@@ -117,5 +117,6 @@
   "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "支付通知解密失败，请稍后重试",
   "error_ESPORTS_ACTIVATION_CODE_INVALID": "激活码无效",
   "error_ESPORTS_ACTIVATION_CODE_EXPIRED": "激活码已过期",
-  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "激活码已被使用"
+  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "激活码已被使用",
+  "error_ESPORTS_REPORT_POLICY_NOT_READY": "该策略暂未启用，请稍后再试"
 }

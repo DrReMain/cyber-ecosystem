@@ -68,6 +68,17 @@ service EntitlementService {
     option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/esports/report-access/{report_type}"};
   }
+  rpc SetReportAccessPolicy(SetReportAccessPolicyRequest) returns (SetReportAccessPolicyResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "设置报告访问策略"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/report-access-policy"
+      body: "*"
+    };
+  }
 }
 
 // The report families a type code opens. The two report domains of the
@@ -90,6 +101,18 @@ enum ReportAccessReason {
   REPORT_ACCESS_REASON_CODE_REDEEMED = 3;
   REPORT_ACCESS_REASON_POLICY_CLOSED = 4;
   REPORT_ACCESS_REASON_NO_ENTITLEMENT = 5;
+}
+
+// The operator's access policy for one report family. A redeemed code
+// outranks the policy — a type code is an explicit grant someone handed
+// out, never something a config switch revokes; the policy shapes who
+// else gets in.
+enum ReportAccessPolicy {
+  REPORT_ACCESS_POLICY_UNSPECIFIED = 0;
+  REPORT_ACCESS_POLICY_OPEN = 1;
+  REPORT_ACCESS_POLICY_MEMBERSHIP = 2;
+  REPORT_ACCESS_POLICY_TENANT = 3;
+  REPORT_ACCESS_POLICY_CLOSED = 4;
 }
 
 message ActivationCode {
@@ -172,4 +195,26 @@ message GetReportAccessRequest {
 message GetReportAccessResponse {
   bool allowed = 1;
   ReportAccessReason reason = 2;
+}
+
+message SetReportAccessPolicyRequest {
+  ReportType report_type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }
+  ];
+  ReportAccessPolicy policy = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }
+  ];
+}
+
+message SetReportAccessPolicyResponse {
+  ReportType report_type = 1;
+  ReportAccessPolicy policy = 2;
 }

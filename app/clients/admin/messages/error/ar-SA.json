@@ -117,5 +117,6 @@
   "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "فشل فك تشفير إشعار الدفع، حاول مرة أخرى لاحقًا",
   "error_ESPORTS_ACTIVATION_CODE_INVALID": "رمز التنشيط غير صالح",
   "error_ESPORTS_ACTIVATION_CODE_EXPIRED": "انتهت صلاحية رمز التنشيط",
-  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "تم استخدام رمز التنشيط بالفعل"
+  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "تم استخدام رمز التنشيط بالفعل",
+  "error_ESPORTS_REPORT_POLICY_NOT_READY": "هذه السياسة غير متاحة بعد؛ حاول مرة أخرى لاحقًا"
 }

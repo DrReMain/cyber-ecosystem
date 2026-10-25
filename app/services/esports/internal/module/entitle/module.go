@@ -7,6 +7,7 @@ var ProviderSet = wire.NewSet(
 	NewEntitleUC,
 	NewCodeRP,
 	NewEntitlementRP,
+	NewPolicyRP,
 	NewActivationCodeService,
 	NewEntitlementService,
 )

@@ -12,6 +12,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
+	"cyber-ecosystem/app/services/esports/internal/ent/reportpolicy"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
@@ -32,6 +33,14 @@ type entitlementRP struct {
 
 func NewEntitlementRP(logger *slog.Logger, p *platform.Platform) EntitlementRP {
 	return &entitlementRP{RP: shared.NewRP(logger.With("module", "module/entitle_ent_rp"), p)}
+}
+
+type policyRP struct {
+	shared.RP
+}
+
+func NewPolicyRP(logger *slog.Logger, p *platform.Platform) PolicyRP {
+	return &policyRP{RP: shared.NewRP(logger.With("module", "module/entitle_policy_rp"), p)}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -163,6 +172,36 @@ func (rp *entitlementRP) Exists(ctx context.Context, userID, scopeKind string, s
 		return false, err
 	}
 	return row != nil, nil
+}
+
+func (rp *policyRP) Policy(ctx context.Context, family string) (string, bool, error) {
+	row, err := rp.Platform.GetClient(ctx).ReportPolicy.Query().
+		Where(reportpolicy.ReportTypeEQ(reportpolicy.ReportType(family))).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return "", false, nil
+		}
+		return "", false, rp.Platform.HandleEntError(err)
+	}
+	return string(row.Policy), true, nil
+}
+
+func (rp *policyRP) SetPolicy(ctx context.Context, family, policy, updatedBy string) error {
+	// Upsert in place: the family row is the policy's whole state, so the
+	// conflict target is the unique family and the update rewrites it.
+	if err := rp.Platform.GetClient(ctx).ReportPolicy.Create().
+		SetReportType(reportpolicy.ReportType(family)).
+		SetPolicy(reportpolicy.Policy(policy)).
+		SetUpdatedBy(updatedBy).
+		OnConflict(
+			sql.ConflictColumns(reportpolicy.FieldReportType),
+		).
+		UpdateNewValues().
+		Exec(ctx); err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

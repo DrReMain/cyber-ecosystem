@@ -173,8 +173,9 @@ var ActivationCodeService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	EntitlementService_RedeemActivationCode_FullMethodName = "/cyber.esports.v1.EntitlementService/RedeemActivationCode"
-	EntitlementService_GetReportAccess_FullMethodName      = "/cyber.esports.v1.EntitlementService/GetReportAccess"
+	EntitlementService_RedeemActivationCode_FullMethodName  = "/cyber.esports.v1.EntitlementService/RedeemActivationCode"
+	EntitlementService_GetReportAccess_FullMethodName       = "/cyber.esports.v1.EntitlementService/GetReportAccess"
+	EntitlementService_SetReportAccessPolicy_FullMethodName = "/cyber.esports.v1.EntitlementService/SetReportAccessPolicy"
 )
 
 // EntitlementServiceClient is the client API for EntitlementService service.
@@ -190,6 +191,7 @@ const (
 type EntitlementServiceClient interface {
 	RedeemActivationCode(ctx context.Context, in *RedeemActivationCodeRequest, opts ...grpc.CallOption) (*RedeemActivationCodeResponse, error)
 	GetReportAccess(ctx context.Context, in *GetReportAccessRequest, opts ...grpc.CallOption) (*GetReportAccessResponse, error)
+	SetReportAccessPolicy(ctx context.Context, in *SetReportAccessPolicyRequest, opts ...grpc.CallOption) (*SetReportAccessPolicyResponse, error)
 }
 
 type entitlementServiceClient struct {
@@ -220,6 +222,16 @@ func (c *entitlementServiceClient) GetReportAccess(ctx context.Context, in *GetR
 	return out, nil
 }
 
+func (c *entitlementServiceClient) SetReportAccessPolicy(ctx context.Context, in *SetReportAccessPolicyRequest, opts ...grpc.CallOption) (*SetReportAccessPolicyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetReportAccessPolicyResponse)
+	err := c.cc.Invoke(ctx, EntitlementService_SetReportAccessPolicy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EntitlementServiceServer is the server API for EntitlementService service.
 // All implementations must embed UnimplementedEntitlementServiceServer
 // for forward compatibility.
@@ -233,6 +245,7 @@ func (c *entitlementServiceClient) GetReportAccess(ctx context.Context, in *GetR
 type EntitlementServiceServer interface {
 	RedeemActivationCode(context.Context, *RedeemActivationCodeRequest) (*RedeemActivationCodeResponse, error)
 	GetReportAccess(context.Context, *GetReportAccessRequest) (*GetReportAccessResponse, error)
+	SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error)
 	mustEmbedUnimplementedEntitlementServiceServer()
 }
 
@@ -248,6 +261,9 @@ func (UnimplementedEntitlementServiceServer) RedeemActivationCode(context.Contex
 }
 func (UnimplementedEntitlementServiceServer) GetReportAccess(context.Context, *GetReportAccessRequest) (*GetReportAccessResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetReportAccess not implemented")
+}
+func (UnimplementedEntitlementServiceServer) SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetReportAccessPolicy not implemented")
 }
 func (UnimplementedEntitlementServiceServer) mustEmbedUnimplementedEntitlementServiceServer() {}
 func (UnimplementedEntitlementServiceServer) testEmbeddedByValue()                            {}
@@ -306,6 +322,24 @@ func _EntitlementService_GetReportAccess_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EntitlementService_SetReportAccessPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetReportAccessPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntitlementServiceServer).SetReportAccessPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EntitlementService_SetReportAccessPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntitlementServiceServer).SetReportAccessPolicy(ctx, req.(*SetReportAccessPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EntitlementService_ServiceDesc is the grpc.ServiceDesc for EntitlementService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -320,6 +354,10 @@ var EntitlementService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetReportAccess",
 			Handler:    _EntitlementService_GetReportAccess_Handler,
+		},
+		{
+			MethodName: "SetReportAccessPolicy",
+			Handler:    _EntitlementService_SetReportAccessPolicy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

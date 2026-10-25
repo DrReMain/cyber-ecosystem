@@ -143,6 +143,65 @@ func (ReportAccessReason) EnumDescriptor() ([]byte, []int) {
 	return file_cyber_esports_v1_activation_proto_rawDescGZIP(), []int{1}
 }
 
+// The operator's access policy for one report family. A redeemed code
+// outranks the policy — a type code is an explicit grant someone handed
+// out, never something a config switch revokes; the policy shapes who
+// else gets in.
+type ReportAccessPolicy int32
+
+const (
+	ReportAccessPolicy_REPORT_ACCESS_POLICY_UNSPECIFIED ReportAccessPolicy = 0
+	ReportAccessPolicy_REPORT_ACCESS_POLICY_OPEN        ReportAccessPolicy = 1
+	ReportAccessPolicy_REPORT_ACCESS_POLICY_MEMBERSHIP  ReportAccessPolicy = 2
+	ReportAccessPolicy_REPORT_ACCESS_POLICY_TENANT      ReportAccessPolicy = 3
+	ReportAccessPolicy_REPORT_ACCESS_POLICY_CLOSED      ReportAccessPolicy = 4
+)
+
+// Enum value maps for ReportAccessPolicy.
+var (
+	ReportAccessPolicy_name = map[int32]string{
+		0: "REPORT_ACCESS_POLICY_UNSPECIFIED",
+		1: "REPORT_ACCESS_POLICY_OPEN",
+		2: "REPORT_ACCESS_POLICY_MEMBERSHIP",
+		3: "REPORT_ACCESS_POLICY_TENANT",
+		4: "REPORT_ACCESS_POLICY_CLOSED",
+	}
+	ReportAccessPolicy_value = map[string]int32{
+		"REPORT_ACCESS_POLICY_UNSPECIFIED": 0,
+		"REPORT_ACCESS_POLICY_OPEN":        1,
+		"REPORT_ACCESS_POLICY_MEMBERSHIP":  2,
+		"REPORT_ACCESS_POLICY_TENANT":      3,
+		"REPORT_ACCESS_POLICY_CLOSED":      4,
+	}
+)
+
+func (x ReportAccessPolicy) Enum() *ReportAccessPolicy {
+	p := new(ReportAccessPolicy)
+	*p = x
+	return p
+}
+
+func (x ReportAccessPolicy) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ReportAccessPolicy) Descriptor() protoreflect.EnumDescriptor {
+	return file_cyber_esports_v1_activation_proto_enumTypes[2].Descriptor()
+}
+
+func (ReportAccessPolicy) Type() protoreflect.EnumType {
+	return &file_cyber_esports_v1_activation_proto_enumTypes[2]
+}
+
+func (x ReportAccessPolicy) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ReportAccessPolicy.Descriptor instead.
+func (ReportAccessPolicy) EnumDescriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_proto_rawDescGZIP(), []int{2}
+}
+
 type ActivationCode struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
 	Code          *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
@@ -639,6 +698,110 @@ func (x *GetReportAccessResponse) GetReason() ReportAccessReason {
 	return ReportAccessReason_REPORT_ACCESS_REASON_UNSPECIFIED
 }
 
+type SetReportAccessPolicyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ReportType    ReportType             `protobuf:"varint,1,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType" json:"report_type,omitempty"`
+	Policy        ReportAccessPolicy     `protobuf:"varint,2,opt,name=policy,proto3,enum=cyber.esports.v1.ReportAccessPolicy" json:"policy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetReportAccessPolicyRequest) Reset() {
+	*x = SetReportAccessPolicyRequest{}
+	mi := &file_cyber_esports_v1_activation_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetReportAccessPolicyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetReportAccessPolicyRequest) ProtoMessage() {}
+
+func (x *SetReportAccessPolicyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetReportAccessPolicyRequest.ProtoReflect.Descriptor instead.
+func (*SetReportAccessPolicyRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SetReportAccessPolicyRequest) GetReportType() ReportType {
+	if x != nil {
+		return x.ReportType
+	}
+	return ReportType_REPORT_TYPE_UNSPECIFIED
+}
+
+func (x *SetReportAccessPolicyRequest) GetPolicy() ReportAccessPolicy {
+	if x != nil {
+		return x.Policy
+	}
+	return ReportAccessPolicy_REPORT_ACCESS_POLICY_UNSPECIFIED
+}
+
+type SetReportAccessPolicyResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ReportType    ReportType             `protobuf:"varint,1,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType" json:"report_type,omitempty"`
+	Policy        ReportAccessPolicy     `protobuf:"varint,2,opt,name=policy,proto3,enum=cyber.esports.v1.ReportAccessPolicy" json:"policy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetReportAccessPolicyResponse) Reset() {
+	*x = SetReportAccessPolicyResponse{}
+	mi := &file_cyber_esports_v1_activation_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetReportAccessPolicyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetReportAccessPolicyResponse) ProtoMessage() {}
+
+func (x *SetReportAccessPolicyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetReportAccessPolicyResponse.ProtoReflect.Descriptor instead.
+func (*SetReportAccessPolicyResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *SetReportAccessPolicyResponse) GetReportType() ReportType {
+	if x != nil {
+		return x.ReportType
+	}
+	return ReportType_REPORT_TYPE_UNSPECIFIED
+}
+
+func (x *SetReportAccessPolicyResponse) GetPolicy() ReportAccessPolicy {
+	if x != nil {
+		return x.Policy
+	}
+	return ReportAccessPolicy_REPORT_ACCESS_POLICY_UNSPECIFIED
+}
+
 var File_cyber_esports_v1_activation_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_activation_proto_rawDesc = "" +
@@ -689,7 +852,17 @@ const file_cyber_esports_v1_activation_proto_rawDesc = "" +
 	"reportType\"q\n" +
 	"\x17GetReportAccessResponse\x12\x18\n" +
 	"\aallowed\x18\x01 \x01(\bR\aallowed\x12<\n" +
-	"\x06reason\x18\x02 \x01(\x0e2$.cyber.esports.v1.ReportAccessReasonR\x06reason*t\n" +
+	"\x06reason\x18\x02 \x01(\x0e2$.cyber.esports.v1.ReportAccessReasonR\x06reason\"\xb9\x01\n" +
+	"\x1cSetReportAccessPolicyRequest\x12L\n" +
+	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeB\r\xbaH\n" +
+	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00R\n" +
+	"reportType\x12K\n" +
+	"\x06policy\x18\x02 \x01(\x0e2$.cyber.esports.v1.ReportAccessPolicyB\r\xbaH\n" +
+	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00R\x06policy\"\x9c\x01\n" +
+	"\x1dSetReportAccessPolicyResponse\x12=\n" +
+	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeR\n" +
+	"reportType\x12<\n" +
+	"\x06policy\x18\x02 \x01(\x0e2$.cyber.esports.v1.ReportAccessPolicyR\x06policy*t\n" +
 	"\n" +
 	"ReportType\x12\x1b\n" +
 	"\x17REPORT_TYPE_UNSPECIFIED\x10\x00\x12\x19\n" +
@@ -702,17 +875,25 @@ const file_cyber_esports_v1_activation_proto_rawDesc = "" +
 	"&REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE\x10\x02\x12&\n" +
 	"\"REPORT_ACCESS_REASON_CODE_REDEEMED\x10\x03\x12&\n" +
 	"\"REPORT_ACCESS_REASON_POLICY_CLOSED\x10\x04\x12'\n" +
-	"#REPORT_ACCESS_REASON_NO_ENTITLEMENT\x10\x052\xb8\x03\n" +
+	"#REPORT_ACCESS_REASON_NO_ENTITLEMENT\x10\x05*\xc0\x01\n" +
+	"\x12ReportAccessPolicy\x12$\n" +
+	" REPORT_ACCESS_POLICY_UNSPECIFIED\x10\x00\x12\x1d\n" +
+	"\x19REPORT_ACCESS_POLICY_OPEN\x10\x01\x12#\n" +
+	"\x1fREPORT_ACCESS_POLICY_MEMBERSHIP\x10\x02\x12\x1f\n" +
+	"\x1bREPORT_ACCESS_POLICY_TENANT\x10\x03\x12\x1f\n" +
+	"\x1bREPORT_ACCESS_POLICY_CLOSED\x10\x042\xb8\x03\n" +
 	"\x15ActivationCodeService\x12\xd5\x01\n" +
 	"\x17GenerateActivationCodes\x120.cyber.esports.v1.GenerateActivationCodesRequest\x1a1.cyber.esports.v1.GenerateActivationCodesResponse\"U\x88\xf1\x04\x02\x8a\xd3\x0e\x19\n" +
 	"\x15批量生成激活码\x10\x02\x82\xd3\xe4\x93\x02.:\x01*\")/api/v1/esports/activation-codes/generate\x12\xb7\x01\n" +
 	"\x13ListActivationCodes\x12,.cyber.esports.v1.ListActivationCodesRequest\x1a-.cyber.esports.v1.ListActivationCodesResponse\"C\x88\xf1\x04\x02\x8a\xd3\x0e\x13\n" +
-	"\x0f激活码列表\x10\x01\x82\xd3\xe4\x93\x02\"\x12 /api/v1/esports/activation-codes\x1a\r\x8a\xe2\t\t激活码2\x9f\x03\n" +
+	"\x0f激活码列表\x10\x01\x82\xd3\xe4\x93\x02\"\x12 /api/v1/esports/activation-codes\x1a\r\x8a\xe2\t\t激活码2\xef\x04\n" +
 	"\x12EntitlementService\x12\xc0\x01\n" +
 	"\x14RedeemActivationCode\x12-.cyber.esports.v1.RedeemActivationCodeRequest\x1a..cyber.esports.v1.RedeemActivationCodeResponse\"I\x88\xf1\x04\x04\x8a\xd3\x0e\x13\n" +
 	"\x0f兑换激活码\x10\x02\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/esports/entitlements/redeem\x12\xb9\x01\n" +
 	"\x0fGetReportAccess\x12(.cyber.esports.v1.GetReportAccessRequest\x1a).cyber.esports.v1.GetReportAccessResponse\"Q\x88\xf1\x04\x04\x8a\xd3\x0e\x16\n" +
-	"\x12报告访问判定\x10\x01\x82\xd3\xe4\x93\x02-\x12+/api/v1/esports/report-access/{report_type}\x1a\n" +
+	"\x12报告访问判定\x10\x01\x82\xd3\xe4\x93\x02-\x12+/api/v1/esports/report-access/{report_type}\x12\xcd\x01\n" +
+	"\x15SetReportAccessPolicy\x12..cyber.esports.v1.SetReportAccessPolicyRequest\x1a/.cyber.esports.v1.SetReportAccessPolicyResponse\"S\x88\xf1\x04\x02\x8a\xd3\x0e\x1c\n" +
+	"\x18设置报告访问策略\x10\x02\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/esports/report-access-policy\x1a\n" +
 	"\x8a\xe2\t\x06权益B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
@@ -727,56 +908,65 @@ func file_cyber_esports_v1_activation_proto_rawDescGZIP() []byte {
 	return file_cyber_esports_v1_activation_proto_rawDescData
 }
 
-var file_cyber_esports_v1_activation_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_cyber_esports_v1_activation_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_cyber_esports_v1_activation_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_cyber_esports_v1_activation_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_cyber_esports_v1_activation_proto_goTypes = []any{
 	(ReportType)(0),                         // 0: cyber.esports.v1.ReportType
 	(ReportAccessReason)(0),                 // 1: cyber.esports.v1.ReportAccessReason
-	(*ActivationCode)(nil),                  // 2: cyber.esports.v1.ActivationCode
-	(*GenerateActivationCodesRequest)(nil),  // 3: cyber.esports.v1.GenerateActivationCodesRequest
-	(*GenerateActivationCodesResponse)(nil), // 4: cyber.esports.v1.GenerateActivationCodesResponse
-	(*ListActivationCodesRequest)(nil),      // 5: cyber.esports.v1.ListActivationCodesRequest
-	(*ListActivationCodesResponse)(nil),     // 6: cyber.esports.v1.ListActivationCodesResponse
-	(*RedeemActivationCodeRequest)(nil),     // 7: cyber.esports.v1.RedeemActivationCodeRequest
-	(*RedeemActivationCodeResponse)(nil),    // 8: cyber.esports.v1.RedeemActivationCodeResponse
-	(*GetReportAccessRequest)(nil),          // 9: cyber.esports.v1.GetReportAccessRequest
-	(*GetReportAccessResponse)(nil),         // 10: cyber.esports.v1.GetReportAccessResponse
-	(*wrapperspb.StringValue)(nil),          // 11: google.protobuf.StringValue
-	(*wrapperspb.Int32Value)(nil),           // 12: google.protobuf.Int32Value
-	(*timestamppb.Timestamp)(nil),           // 13: google.protobuf.Timestamp
-	(*v1.PageRequest)(nil),                  // 14: cyber.shared.common.v1.PageRequest
-	(*v1.PageResponse)(nil),                 // 15: cyber.shared.common.v1.PageResponse
+	(ReportAccessPolicy)(0),                 // 2: cyber.esports.v1.ReportAccessPolicy
+	(*ActivationCode)(nil),                  // 3: cyber.esports.v1.ActivationCode
+	(*GenerateActivationCodesRequest)(nil),  // 4: cyber.esports.v1.GenerateActivationCodesRequest
+	(*GenerateActivationCodesResponse)(nil), // 5: cyber.esports.v1.GenerateActivationCodesResponse
+	(*ListActivationCodesRequest)(nil),      // 6: cyber.esports.v1.ListActivationCodesRequest
+	(*ListActivationCodesResponse)(nil),     // 7: cyber.esports.v1.ListActivationCodesResponse
+	(*RedeemActivationCodeRequest)(nil),     // 8: cyber.esports.v1.RedeemActivationCodeRequest
+	(*RedeemActivationCodeResponse)(nil),    // 9: cyber.esports.v1.RedeemActivationCodeResponse
+	(*GetReportAccessRequest)(nil),          // 10: cyber.esports.v1.GetReportAccessRequest
+	(*GetReportAccessResponse)(nil),         // 11: cyber.esports.v1.GetReportAccessResponse
+	(*SetReportAccessPolicyRequest)(nil),    // 12: cyber.esports.v1.SetReportAccessPolicyRequest
+	(*SetReportAccessPolicyResponse)(nil),   // 13: cyber.esports.v1.SetReportAccessPolicyResponse
+	(*wrapperspb.StringValue)(nil),          // 14: google.protobuf.StringValue
+	(*wrapperspb.Int32Value)(nil),           // 15: google.protobuf.Int32Value
+	(*timestamppb.Timestamp)(nil),           // 16: google.protobuf.Timestamp
+	(*v1.PageRequest)(nil),                  // 17: cyber.shared.common.v1.PageRequest
+	(*v1.PageResponse)(nil),                 // 18: cyber.shared.common.v1.PageResponse
 }
 var file_cyber_esports_v1_activation_proto_depIdxs = []int32{
-	11, // 0: cyber.esports.v1.ActivationCode.code:type_name -> google.protobuf.StringValue
+	14, // 0: cyber.esports.v1.ActivationCode.code:type_name -> google.protobuf.StringValue
 	0,  // 1: cyber.esports.v1.ActivationCode.report_type:type_name -> cyber.esports.v1.ReportType
-	12, // 2: cyber.esports.v1.ActivationCode.quantity:type_name -> google.protobuf.Int32Value
-	12, // 3: cyber.esports.v1.ActivationCode.used_count:type_name -> google.protobuf.Int32Value
-	13, // 4: cyber.esports.v1.ActivationCode.expires_at:type_name -> google.protobuf.Timestamp
-	13, // 5: cyber.esports.v1.ActivationCode.created_at:type_name -> google.protobuf.Timestamp
+	15, // 2: cyber.esports.v1.ActivationCode.quantity:type_name -> google.protobuf.Int32Value
+	15, // 3: cyber.esports.v1.ActivationCode.used_count:type_name -> google.protobuf.Int32Value
+	16, // 4: cyber.esports.v1.ActivationCode.expires_at:type_name -> google.protobuf.Timestamp
+	16, // 5: cyber.esports.v1.ActivationCode.created_at:type_name -> google.protobuf.Timestamp
 	0,  // 6: cyber.esports.v1.GenerateActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
-	14, // 7: cyber.esports.v1.ListActivationCodesRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	17, // 7: cyber.esports.v1.ListActivationCodesRequest.page:type_name -> cyber.shared.common.v1.PageRequest
 	0,  // 8: cyber.esports.v1.ListActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
-	15, // 9: cyber.esports.v1.ListActivationCodesResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	2,  // 10: cyber.esports.v1.ListActivationCodesResponse.codes:type_name -> cyber.esports.v1.ActivationCode
+	18, // 9: cyber.esports.v1.ListActivationCodesResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	3,  // 10: cyber.esports.v1.ListActivationCodesResponse.codes:type_name -> cyber.esports.v1.ActivationCode
 	0,  // 11: cyber.esports.v1.RedeemActivationCodeResponse.report_type:type_name -> cyber.esports.v1.ReportType
-	13, // 12: cyber.esports.v1.RedeemActivationCodeResponse.expires_at:type_name -> google.protobuf.Timestamp
-	13, // 13: cyber.esports.v1.RedeemActivationCodeResponse.granted_at:type_name -> google.protobuf.Timestamp
+	16, // 12: cyber.esports.v1.RedeemActivationCodeResponse.expires_at:type_name -> google.protobuf.Timestamp
+	16, // 13: cyber.esports.v1.RedeemActivationCodeResponse.granted_at:type_name -> google.protobuf.Timestamp
 	0,  // 14: cyber.esports.v1.GetReportAccessRequest.report_type:type_name -> cyber.esports.v1.ReportType
 	1,  // 15: cyber.esports.v1.GetReportAccessResponse.reason:type_name -> cyber.esports.v1.ReportAccessReason
-	3,  // 16: cyber.esports.v1.ActivationCodeService.GenerateActivationCodes:input_type -> cyber.esports.v1.GenerateActivationCodesRequest
-	5,  // 17: cyber.esports.v1.ActivationCodeService.ListActivationCodes:input_type -> cyber.esports.v1.ListActivationCodesRequest
-	7,  // 18: cyber.esports.v1.EntitlementService.RedeemActivationCode:input_type -> cyber.esports.v1.RedeemActivationCodeRequest
-	9,  // 19: cyber.esports.v1.EntitlementService.GetReportAccess:input_type -> cyber.esports.v1.GetReportAccessRequest
-	4,  // 20: cyber.esports.v1.ActivationCodeService.GenerateActivationCodes:output_type -> cyber.esports.v1.GenerateActivationCodesResponse
-	6,  // 21: cyber.esports.v1.ActivationCodeService.ListActivationCodes:output_type -> cyber.esports.v1.ListActivationCodesResponse
-	8,  // 22: cyber.esports.v1.EntitlementService.RedeemActivationCode:output_type -> cyber.esports.v1.RedeemActivationCodeResponse
-	10, // 23: cyber.esports.v1.EntitlementService.GetReportAccess:output_type -> cyber.esports.v1.GetReportAccessResponse
-	20, // [20:24] is the sub-list for method output_type
-	16, // [16:20] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	0,  // 16: cyber.esports.v1.SetReportAccessPolicyRequest.report_type:type_name -> cyber.esports.v1.ReportType
+	2,  // 17: cyber.esports.v1.SetReportAccessPolicyRequest.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
+	0,  // 18: cyber.esports.v1.SetReportAccessPolicyResponse.report_type:type_name -> cyber.esports.v1.ReportType
+	2,  // 19: cyber.esports.v1.SetReportAccessPolicyResponse.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
+	4,  // 20: cyber.esports.v1.ActivationCodeService.GenerateActivationCodes:input_type -> cyber.esports.v1.GenerateActivationCodesRequest
+	6,  // 21: cyber.esports.v1.ActivationCodeService.ListActivationCodes:input_type -> cyber.esports.v1.ListActivationCodesRequest
+	8,  // 22: cyber.esports.v1.EntitlementService.RedeemActivationCode:input_type -> cyber.esports.v1.RedeemActivationCodeRequest
+	10, // 23: cyber.esports.v1.EntitlementService.GetReportAccess:input_type -> cyber.esports.v1.GetReportAccessRequest
+	12, // 24: cyber.esports.v1.EntitlementService.SetReportAccessPolicy:input_type -> cyber.esports.v1.SetReportAccessPolicyRequest
+	5,  // 25: cyber.esports.v1.ActivationCodeService.GenerateActivationCodes:output_type -> cyber.esports.v1.GenerateActivationCodesResponse
+	7,  // 26: cyber.esports.v1.ActivationCodeService.ListActivationCodes:output_type -> cyber.esports.v1.ListActivationCodesResponse
+	9,  // 27: cyber.esports.v1.EntitlementService.RedeemActivationCode:output_type -> cyber.esports.v1.RedeemActivationCodeResponse
+	11, // 28: cyber.esports.v1.EntitlementService.GetReportAccess:output_type -> cyber.esports.v1.GetReportAccessResponse
+	13, // 29: cyber.esports.v1.EntitlementService.SetReportAccessPolicy:output_type -> cyber.esports.v1.SetReportAccessPolicyResponse
+	25, // [25:30] is the sub-list for method output_type
+	20, // [20:25] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_activation_proto_init() }
@@ -790,8 +980,8 @@ func file_cyber_esports_v1_activation_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_activation_proto_rawDesc), len(file_cyber_esports_v1_activation_proto_rawDesc)),
-			NumEnums:      2,
-			NumMessages:   9,
+			NumEnums:      3,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

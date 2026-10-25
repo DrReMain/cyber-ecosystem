@@ -32,6 +32,8 @@ type Tx struct {
 	Profile *ProfileClient
 	// QuestionBank is the client for interacting with the QuestionBank builders.
 	QuestionBank *QuestionBankClient
+	// ReportPolicy is the client for interacting with the ReportPolicy builders.
+	ReportPolicy *ReportPolicyClient
 	// Sku is the client for interacting with the Sku builders.
 	Sku *SkuClient
 	// Test is the client for interacting with the Test builders.
@@ -180,6 +182,7 @@ func (tx *Tx) init() {
 	tx.PayOrder = NewPayOrderClient(tx.config)
 	tx.Profile = NewProfileClient(tx.config)
 	tx.QuestionBank = NewQuestionBankClient(tx.config)
+	tx.ReportPolicy = NewReportPolicyClient(tx.config)
 	tx.Sku = NewSkuClient(tx.config)
 	tx.Test = NewTestClient(tx.config)
 	tx.TestConfig = NewTestConfigClient(tx.config)

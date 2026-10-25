@@ -94,6 +94,16 @@ func (s *EntitlementService) GetReportAccess(ctx context.Context, req *esportspb
 	return &esportspb.GetReportAccessResponse{Allowed: out.Allowed, Reason: out.Reason}, nil
 }
 
+func (s *EntitlementService) SetReportAccessPolicy(ctx context.Context, req *esportspb.SetReportAccessPolicyRequest) (*esportspb.SetReportAccessPolicyResponse, error) {
+	if err := s.entitleUC.SetReportAccessPolicy(ctx, mapReportTypeFromPB(req.GetReportType()), mapPolicyFromPB(req.GetPolicy())); err != nil {
+		return nil, err
+	}
+	return &esportspb.SetReportAccessPolicyResponse{
+		ReportType: req.GetReportType(),
+		Policy:     req.GetPolicy(),
+	}, nil
+}
+
 func (s *ActivationCodeService) RegisterGRPC(srv *grpc.Server) {
 	esportspb.RegisterActivationCodeServiceServer(srv, s)
 }
@@ -152,6 +162,20 @@ func mapReportTypeFromPB(t esportspb.ReportType) string {
 		return reportCareer
 	case esportspb.ReportType_REPORT_TYPE_SCHOOL:
 		return reportSchool
+	}
+	return ""
+}
+
+func mapPolicyFromPB(p esportspb.ReportAccessPolicy) string {
+	switch p {
+	case esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_OPEN:
+		return policyOpen
+	case esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_MEMBERSHIP:
+		return policyMembership
+	case esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_TENANT:
+		return policyTenant
+	case esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_CLOSED:
+		return policyClosed
 	}
 	return ""
 }

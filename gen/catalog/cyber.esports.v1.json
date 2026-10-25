@@ -66,6 +66,19 @@
         "comment": "兑换激活码",
         "access": "BUILTIN",
         "datascope": false
+      },
+      {
+        "name": "SetReportAccessPolicy",
+        "full_name": "cyber.esports.v1.EntitlementService.SetReportAccessPolicy",
+        "request_name": "SetReportAccessPolicyRequest",
+        "request_full_name": "cyber.esports.v1.SetReportAccessPolicyRequest",
+        "response_name": "SetReportAccessPolicyResponse",
+        "response_full_name": "cyber.esports.v1.SetReportAccessPolicyResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/report-access-policy",
+        "comment": "设置报告访问策略",
+        "access": "ADMIN",
+        "datascope": false
       }
     ]
   },

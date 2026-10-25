@@ -117,16 +117,19 @@ func (c *ActivationCodeServiceHTTPClientImpl) ListActivationCodes(ctx context.Co
 
 const OperationEntitlementServiceGetReportAccess = "/cyber.esports.v1.EntitlementService/GetReportAccess"
 const OperationEntitlementServiceRedeemActivationCode = "/cyber.esports.v1.EntitlementService/RedeemActivationCode"
+const OperationEntitlementServiceSetReportAccessPolicy = "/cyber.esports.v1.EntitlementService/SetReportAccessPolicy"
 
 type EntitlementServiceHTTPServer interface {
 	GetReportAccess(context.Context, *GetReportAccessRequest) (*GetReportAccessResponse, error)
 	RedeemActivationCode(context.Context, *RedeemActivationCodeRequest) (*RedeemActivationCodeResponse, error)
+	SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error)
 }
 
 func RegisterEntitlementServiceHTTPServer(s *http.Server, srv EntitlementServiceHTTPServer) {
 	r := s.Route("/")
 	r.Handle("POST", "/api/v1/esports/entitlements/redeem", _EntitlementService_RedeemActivationCode0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/report-access/{report_type}", _EntitlementService_GetReportAccess0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/report-access-policy", _EntitlementService_SetReportAccessPolicy0_HTTP_Handler(srv))
 }
 
 func _EntitlementService_RedeemActivationCode0_HTTP_Handler(srv EntitlementServiceHTTPServer) func(ctx http.Context) error {
@@ -170,9 +173,29 @@ func _EntitlementService_GetReportAccess0_HTTP_Handler(srv EntitlementServiceHTT
 	}
 }
 
+func _EntitlementService_SetReportAccessPolicy0_HTTP_Handler(srv EntitlementServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SetReportAccessPolicyRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEntitlementServiceSetReportAccessPolicy)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SetReportAccessPolicy(ctx, req.(*SetReportAccessPolicyRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SetReportAccessPolicyResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type EntitlementServiceHTTPClient interface {
 	GetReportAccess(ctx context.Context, req *GetReportAccessRequest, opts ...http.CallOption) (rsp *GetReportAccessResponse, err error)
 	RedeemActivationCode(ctx context.Context, req *RedeemActivationCodeRequest, opts ...http.CallOption) (rsp *RedeemActivationCodeResponse, err error)
+	SetReportAccessPolicy(ctx context.Context, req *SetReportAccessPolicyRequest, opts ...http.CallOption) (rsp *SetReportAccessPolicyResponse, err error)
 }
 
 type EntitlementServiceHTTPClientImpl struct {
@@ -207,6 +230,23 @@ func (c *EntitlementServiceHTTPClientImpl) RedeemActivationCode(ctx context.Cont
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationEntitlementServiceRedeemActivationCode),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *EntitlementServiceHTTPClientImpl) SetReportAccessPolicy(ctx context.Context, in *SetReportAccessPolicyRequest, opts ...http.CallOption) (*SetReportAccessPolicyResponse, error) {
+	var out SetReportAccessPolicyResponse
+	pattern := "/api/v1/esports/report-access-policy"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationEntitlementServiceSetReportAccessPolicy),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

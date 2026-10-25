@@ -13,3 +13,8 @@ export const redeemActivationCode = EntitlementService.method.redeemActivationCo
  * @generated from rpc cyber.esports.v1.EntitlementService.GetReportAccess
  */
 export const getReportAccess = EntitlementService.method.getReportAccess;
+
+/**
+ * @generated from rpc cyber.esports.v1.EntitlementService.SetReportAccessPolicy
+ */
+export const setReportAccessPolicy = EntitlementService.method.setReportAccessPolicy;

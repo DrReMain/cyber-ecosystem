@@ -274,3 +274,15 @@ func IsEsportsActivationCodeExhausted(err error) bool {
 func ErrorEsportsActivationCodeExhausted(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, Esports_ESPORTS_ACTIVATION_CODE_EXHAUSTED.String(), fmt.Sprintf(format, args...))
 }
+
+func IsEsportsReportPolicyNotReady(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_REPORT_POLICY_NOT_READY.String() && e.Code == 400
+}
+
+func ErrorEsportsReportPolicyNotReady(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_REPORT_POLICY_NOT_READY.String(), fmt.Sprintf(format, args...))
+}
