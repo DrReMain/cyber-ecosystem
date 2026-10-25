@@ -308,6 +308,10 @@ func (uc *EntitleUC) SetReportAccessPolicy(ctx context.Context, family, policy s
 	return nil
 }
 
+type TrialGrantHook interface { // the seam other modules complete through; best-effort — implementations absorb their own errors so a stored attempt is never lost
+	OnTrialCompleted(ctx context.Context, userID, recordID string)
+}
+
 func (uc *EntitleUC) OnTrialCompleted(ctx context.Context, userID, recordID string) {
 	// The member plane's derived grant: a valid trial finished while a
 	// membership is active unlocks that record permanently. The ruling

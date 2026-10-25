@@ -17,6 +17,7 @@ import (
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
+	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
@@ -114,14 +115,10 @@ type TestUC struct {
 	shared.UC
 	testRP    TestRP
 	matchLaw  MatchSessionLaw
-	grantHook TrialGrantHook
+	grantHook entitle.TrialGrantHook
 }
 
-type TrialGrantHook interface { // the entitlement domain's seam into completion; best-effort — it absorbs its own errors so a stored attempt is never lost
-	OnTrialCompleted(ctx context.Context, userID, recordID string)
-}
-
-func NewTestUC(logger *slog.Logger, tm shared.Transaction, testRP TestRP, matchLaw MatchSessionLaw, grantHook TrialGrantHook) *TestUC {
+func NewTestUC(logger *slog.Logger, tm shared.Transaction, testRP TestRP, matchLaw MatchSessionLaw, grantHook entitle.TrialGrantHook) *TestUC {
 	return &TestUC{UC: shared.NewUC(logger.With("module", "module/test"), tm), testRP: testRP, matchLaw: matchLaw, grantHook: grantHook}
 }
 

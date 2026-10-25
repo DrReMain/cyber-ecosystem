@@ -16,6 +16,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
+	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/pay"

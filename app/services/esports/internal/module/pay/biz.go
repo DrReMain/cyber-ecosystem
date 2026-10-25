@@ -111,8 +111,6 @@ type SettleIn struct {
 	PaidAt        time.Time
 }
 
-type EntitlementGrant = entitle.EntitlementGrant // the ledger's own shape; this module is a consumer of it
-
 // Port ----------------------------------------------------------------------------------------------------------------
 
 type SkuRP interface {
@@ -129,11 +127,6 @@ type OrderRP interface {
 	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error) // pending rows past the horizon; expiry is the converger's branch, not the query's
 	ListPaid(ctx context.Context, from, to time.Time) ([]*Order, error)              // paid rows by paid_at window — the reconciliation's local side
-}
-
-type EntitlementRP interface {
-	Grant(ctx context.Context, g *EntitlementGrant) error // insert-only; a rival grant for the same scope lands as a no-op, never an error
-	Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error)
 }
 
 type PayChannelRP interface { // routes to the configured provider's backend; capability errors arrive classified
@@ -163,7 +156,7 @@ type OrderUC struct {
 	shared.UC
 	orderRP       OrderRP
 	skuRP         SkuRP
-	entRP         EntitlementRP
+	entRP         entitle.EntitlementRP
 	testRP        test.TestRP
 	channelRP     PayChannelRP
 	loopCancels   []context.CancelFunc
@@ -171,7 +164,7 @@ type OrderUC struct {
 	nextBillRetry int
 }
 
-func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, orderRP OrderRP, skuRP SkuRP, entRP EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
+func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, orderRP OrderRP, skuRP SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
 	uc := &OrderUC{
 		UC:        shared.NewUC(logger.With("module", "module/pay"), tm),
 		orderRP:   orderRP,
@@ -395,14 +388,14 @@ func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
 		uc.Log.Error("payment amount mismatch", "order_no", in.OrderNo, "row_fen", order.AmountFen, "notify_fen", in.AmountFen)
 		return true, nil
 	}
-	var grant *EntitlementGrant
+	var grant *entitle.EntitlementGrant
 	switch order.ScopeKind {
 	case ScopeTrial:
 		if order.ScopeRef == nil {
 			uc.Log.Error("trial order without record reference", "order_no", order.OrderNo)
 			break
 		}
-		grant = &EntitlementGrant{UserID: order.UserID, ScopeKind: EntTrial, ScopeRef: order.ScopeRef, Source: order.OrderNo}
+		grant = &entitle.EntitlementGrant{UserID: order.UserID, ScopeKind: EntTrial, ScopeRef: order.ScopeRef, Source: order.OrderNo}
 	case ScopePeriod:
 		sku, err := uc.skuRP.ByCode(ctx, order.SKUCode)
 		if err != nil {
@@ -416,7 +409,7 @@ func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
 			break
 		}
 		expiry := in.PaidAt.AddDate(0, 0, *sku.PeriodDays)
-		grant = &EntitlementGrant{UserID: order.UserID, ScopeKind: EntMembership, ExpiresAt: &expiry, Source: order.OrderNo}
+		grant = &entitle.EntitlementGrant{UserID: order.UserID, ScopeKind: EntMembership, ExpiresAt: &expiry, Source: order.OrderNo}
 	default:
 		uc.Log.Error("order scope unknown at settle", "order_no", order.OrderNo, "scope_kind", order.ScopeKind)
 	}
