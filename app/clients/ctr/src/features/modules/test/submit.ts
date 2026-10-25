@@ -1,10 +1,13 @@
 import { create } from "@bufbuild/protobuf";
 import { timestampFromDate } from "@bufbuild/protobuf/wkt";
 import type {
+  CharacterCounterDetail,
   DualZoneDetail,
+  EconomicSimDetail,
   FlashAimingDetail,
   MovingTargetDetail,
   MultiTargetDetail,
+  NumberStarsDetail,
   OffenseDefenseDetail,
   RedDotDetail,
   ResourceMatchDetail,
@@ -94,6 +97,64 @@ const DETAIL_BUILDERS: Readonly<Record<string, DetailBuilder>> = {
     return {
       case: "resourceMatch",
       value: { trajectory, collects, collisions } as ResourceMatchDetail,
+    };
+  },
+  number_stars: (r) => {
+    // The engine streams round-open and click facts; the detail's rounds
+    // are the stream folded round-open → its clicks, so a clock-out
+    // mid-round still carries a complete judgeable history.
+    const rounds: Record<string, unknown>[] = [];
+    for (const event of r.events) {
+      if (event.type === "round") {
+        rounds.push({ roundNumber: event.roundNumber, numbers: event.numbers, clicks: [] });
+      } else {
+        const current = rounds.at(-1);
+        if (event.type === "click" && current !== undefined) {
+          const clicks = current.clicks as Record<string, unknown>[];
+          clicks.push({
+            number: event.number,
+            elapsedMs: event.elapsedMs,
+            position: event.position,
+          });
+        }
+      }
+    }
+    return { case: "numberStars", value: { rounds } as NumberStarsDetail };
+  },
+  character_counter: (r) => ({
+    case: "characterCounter",
+    // Whole rounds minted at confirm — the lineup words are the English
+    // role tokens the server's relation bank judges.
+    value: { rounds: r.events } as CharacterCounterDetail,
+  }),
+  economic_sim: (r) => {
+    const lastHits: Record<string, unknown>[] = [];
+    const purchases: Record<string, unknown>[] = [];
+    for (const event of r.events) {
+      if (event.type === "hit") {
+        lastHits.push({
+          elapsedMs: event.elapsedMs,
+          isLastHit: event.isLastHit,
+          goldEarned: event.goldEarned,
+          minionType: event.minionType,
+          minionHealth: event.minionHealth,
+        });
+      } else if (event.type === "purchase") {
+        purchases.push({
+          elapsedMs: event.elapsedMs,
+          itemName: event.itemName,
+          cost: event.cost,
+        });
+      }
+    }
+    return {
+      case: "economicSim",
+      value: {
+        lastHits,
+        purchases,
+        missedMinions: r.stats.missed_minions ?? 0,
+        finalHealthHp: r.stats.final_health_hp ?? 0,
+      } as EconomicSimDetail,
     };
   },
 };

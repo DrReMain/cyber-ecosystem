@@ -5,8 +5,10 @@
 // stats the fact stream cannot express; formatting is decided here so the
 // component stays markup-only and the derivations stay pinnable.
 import type { AttemptRecord, EngineParams } from "./contract";
+import { hitPairs } from "./games/character-counter/logic";
 import { FLASH_AIMING_DEFAULTS } from "./games/flash-aiming/logic";
 import { TIER_SPECS } from "./games/multi-target/logic";
+import { ascending } from "./games/number-stars/logic";
 import { OFFENSE_SCENARIOS } from "./games/offense-defense/scenarios";
 
 export interface ResultRow {
@@ -220,6 +222,94 @@ function deriveResourceMatch(record: AttemptRecord): readonly ResultRow[] {
   ];
 }
 
+// The same walk the server runs, on the local mirror of the stream:
+// per round an ascending progress pointer decides each click, and the
+// decision intervals ride the correct taps within the round only.
+interface NsRoundScore {
+  readonly correct: number;
+  readonly deltas: number[];
+  readonly done: boolean;
+}
+
+function scoreOneNsRound(
+  numbers: number[],
+  clicks: readonly Record<string, unknown>[],
+): NsRoundScore {
+  const expected = ascending(numbers);
+  const deltas: number[] = [];
+  let progress = 0;
+  let prevCorrectMs: number | null = null;
+  for (const click of clicks) {
+    if (click.number === expected[progress]) {
+      const elapsed = num(click.elapsedMs);
+      if (prevCorrectMs !== null) {
+        deltas.push(elapsed - prevCorrectMs);
+      }
+      prevCorrectMs = elapsed;
+      progress += 1;
+    }
+  }
+  return { correct: progress, deltas, done: progress >= expected.length };
+}
+
+function deriveNumberStars(record: AttemptRecord): readonly ResultRow[] {
+  const groups: { numbers: number[]; clicks: Record<string, unknown>[] }[] = [];
+  for (const event of record.events) {
+    if (event.type === "round") {
+      groups.push({ numbers: event.numbers as number[], clicks: [] });
+    } else if (event.type === "click" && groups.length > 0) {
+      groups[groups.length - 1]?.clicks.push(event);
+    }
+  }
+  let correct = 0;
+  let completed = 0;
+  let clicks = 0;
+  const deltas: number[] = [];
+  for (const group of groups) {
+    const score = scoreOneNsRound(group.numbers, group.clicks);
+    correct += score.correct;
+    clicks += group.clicks.length;
+    deltas.push(...score.deltas);
+    if (score.done) {
+      completed += 1;
+    }
+  }
+  return [
+    { key: "rounds", value: String(completed) },
+    { key: "taps", value: String(clicks) },
+    { key: "correct", value: String(correct) },
+    { key: "incorrect", value: String(clicks - correct) },
+    { key: "avg_interval", value: ms(mean(deltas)) },
+  ];
+}
+
+function deriveCharacterCounter(record: AttemptRecord): readonly ResultRow[] {
+  const rounds = record.events;
+  let pairs = 0;
+  for (const round of rounds) {
+    pairs += hitPairs(round.selectedLineup as string[], round.enemyLineup as string[]).length;
+  }
+  return [
+    { key: "rounds", value: String(rounds.length) },
+    { key: "counter_hits", value: String(pairs) },
+    { key: "avg_time", value: ms(mean(rounds.map((round) => num(round.timeSpentMs)))) },
+  ];
+}
+
+function deriveEconomicSim(record: AttemptRecord): readonly ResultRow[] {
+  const hits = record.events.filter((event) => event.type === "hit");
+  const cs = hits.filter((hit) => hit.isLastHit === true).length;
+  const purchases = record.events.filter((event) => event.type === "purchase");
+  const goldTotal = hits.reduce((sum, hit) => sum + num(hit.goldEarned), 0);
+  return [
+    { key: "cs", value: String(cs) },
+    { key: "perfect", value: String(record.stats.perfect_cs ?? 0) },
+    { key: "gold", value: String(goldTotal) },
+    { key: "items", value: String(purchases.length) },
+    { key: "final_health", value: String(record.stats.final_health_hp ?? 0) },
+  ];
+}
+
 /** Per-game local rows; unknown codes fall back to the generic tap/hit pair. */
 export function deriveLocalResults(
   code: string,
@@ -247,6 +337,12 @@ export function deriveLocalResults(
       return deriveOffenseDefense(record);
     case "resource_match":
       return deriveResourceMatch(record);
+    case "number_stars":
+      return deriveNumberStars(record);
+    case "character_counter":
+      return deriveCharacterCounter(record);
+    case "economic_sim":
+      return deriveEconomicSim(record);
     default: {
       const hits = record.events.filter((event) => event.isHit === true).length;
       return [

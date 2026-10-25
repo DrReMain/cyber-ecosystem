@@ -94,7 +94,7 @@ describe("local result derivation", () => {
 
   it("unknown codes fall back to the generic tap/hit pair", () => {
     const record = recordOf([{ isHit: true }, { isHit: false }]);
-    expect(deriveLocalResults("economic_sim", record, new EngineParams({}))).toEqual([
+    expect(deriveLocalResults("no_such_game", record, new EngineParams({}))).toEqual([
       { key: "taps", value: "2" },
       { key: "hits", value: "1" },
     ]);

@@ -1,8 +1,11 @@
 import type { GameModule } from "./contract";
+import { characterCounterModule } from "./games/character-counter/character-counter";
 import { dualZoneModule } from "./games/dual-zone/dual-zone";
+import { economicSimModule } from "./games/economic-sim/economic-sim";
 import { flashAimingModule } from "./games/flash-aiming/flash-aiming";
 import { movingTargetModule } from "./games/moving-target/moving-target";
 import { multiTargetModule } from "./games/multi-target/multi-target";
+import { numberStarsModule } from "./games/number-stars/number-stars";
 import { offenseDefenseModule } from "./games/offense-defense/offense-defense";
 import { redDotModule } from "./games/red-dot/red-dot";
 import { resourceMatchModule } from "./games/resource-match/resource-match";
@@ -21,6 +24,9 @@ const modules: ReadonlyMap<string, GameModule> = new Map([
   [skillTrajectoryModule.code, skillTrajectoryModule],
   [offenseDefenseModule.code, offenseDefenseModule],
   [resourceMatchModule.code, resourceMatchModule],
+  [numberStarsModule.code, numberStarsModule],
+  [characterCounterModule.code, characterCounterModule],
+  [economicSimModule.code, economicSimModule],
 ]);
 
 export function getGameModule(code: string): GameModule | null {
