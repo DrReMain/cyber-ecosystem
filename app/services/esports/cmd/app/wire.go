@@ -42,6 +42,7 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Payment, *slog.Logger
 		member.ProviderSet,
 		pay.ProviderSet,
 		test.ProviderSet,
+		entitle.ProviderSet,
 		newApp,
 	))
 }

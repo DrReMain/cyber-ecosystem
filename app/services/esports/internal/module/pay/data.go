@@ -10,7 +10,6 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
-	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/payorder"
 	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -33,14 +32,6 @@ type payOrderRP struct {
 
 func NewPayOrderRP(logger *slog.Logger, p *platform.Platform) OrderRP {
 	return &payOrderRP{RP: shared.NewRP(logger.With("module", "module/pay_order_rp"), p)}
-}
-
-type entitlementRP struct {
-	shared.RP
-}
-
-func NewEntitlementRP(logger *slog.Logger, p *platform.Platform) EntitlementRP {
-	return &entitlementRP{RP: shared.NewRP(logger.With("module", "module/pay_ent_rp"), p)}
 }
 
 type payChannelRP struct {
@@ -227,40 +218,6 @@ func (rp *payOrderRP) ListPaid(ctx context.Context, from, to time.Time) ([]*Orde
 		return nil, rp.Platform.HandleEntError(err)
 	}
 	return utils.SliceMap(rows, mapOrder), nil
-}
-
-func (rp *entitlementRP) Grant(ctx context.Context, g *EntitlementGrant) error {
-	create := rp.Platform.GetClient(ctx).Entitlement.Create().
-		SetUserID(g.UserID).
-		SetScopeKind(entitlement.ScopeKind(g.ScopeKind)).
-		SetSource(g.Source)
-	if g.ScopeRef != nil {
-		create = create.SetScopeRef(*g.ScopeRef)
-	}
-	if g.ExpiresAt != nil {
-		create = create.SetExpiresAt(*g.ExpiresAt)
-	}
-	// ON CONFLICT DO NOTHING keeps the settle transaction unpoisoned: a
-	// rival grant for the same scope is a no-op statement, never an error
-	// the transaction would have to survive.
-	if err := create.OnConflict().DoNothing().Exec(ctx); err != nil {
-		return rp.Platform.HandleEntError(err)
-	}
-	return nil
-}
-
-func (rp *entitlementRP) Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error) {
-	query := rp.Platform.GetClient(ctx).Entitlement.Query().
-		Where(
-			entitlement.UserIDEQ(userID),
-			entitlement.ScopeKindEQ(entitlement.ScopeKind(scopeKind)),
-		)
-	if scopeRef != nil {
-		query = query.Where(entitlement.ScopeRefEQ(*scopeRef))
-	} else {
-		query = query.Where(entitlement.ScopeRefIsNil())
-	}
-	return query.Exist(ctx)
 }
 
 func (rp *payChannelRP) CreatePayment(ctx context.Context, provider string, in *payment.CreatePaymentInput) (*payment.PrepayResult, error) {

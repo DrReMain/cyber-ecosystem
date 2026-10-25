@@ -177,6 +177,15 @@ export type CyberAgentV1UpdateSessionResponse = {
     [key: string]: unknown;
 };
 
+export type CyberEsportsV1ActivationCode = {
+    code?: string;
+    reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+    quantity?: number;
+    usedCount?: number;
+    expiresAt?: string;
+    createdAt?: string;
+};
+
 /**
  * The engine marks backgrounding spans; validity is judged server-side at
  * submit against TestConfig.background_invalid_seconds.
@@ -342,6 +351,20 @@ export type CyberEsportsV1GamePreferenceInput = {
     customNames?: Array<string>;
 };
 
+export type CyberEsportsV1GenerateActivationCodesRequest = {
+    reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+    count?: number;
+    expireDays?: number;
+};
+
+export type CyberEsportsV1GenerateActivationCodesResponse = {
+    /**
+     * The codes in full, this once and on every later list — generation
+     * answers what was minted so the operator hands them out.
+     */
+    codes?: Array<string>;
+};
+
 export type CyberEsportsV1GetMatchSessionResponse = {
     session?: CyberEsportsV1MatchSession;
     /**
@@ -363,6 +386,11 @@ export type CyberEsportsV1GetProfileResponse = {
     profile?: CyberEsportsV1Profile;
 };
 
+export type CyberEsportsV1GetReportAccessResponse = {
+    allowed?: boolean;
+    reason?: 'REPORT_ACCESS_REASON_UNSPECIFIED' | 'REPORT_ACCESS_REASON_POLICY_OPEN' | 'REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE' | 'REPORT_ACCESS_REASON_CODE_REDEEMED' | 'REPORT_ACCESS_REASON_POLICY_CLOSED' | 'REPORT_ACCESS_REASON_NO_ENTITLEMENT';
+};
+
 export type CyberEsportsV1GetTestConfigResponse = {
     config?: CyberEsportsV1TestConfig;
 };
@@ -374,6 +402,11 @@ export type CyberEsportsV1GetTestResponse = {
      * and free to diverge per test; copy changes are content, never contract.
      */
     introduction?: string;
+};
+
+export type CyberEsportsV1ListActivationCodesResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    codes?: Array<CyberEsportsV1ActivationCode>;
 };
 
 export type CyberEsportsV1ListGamesResponse = {
@@ -676,6 +709,20 @@ export type CyberEsportsV1RedDotEvent = {
     reactionTimeMs?: number;
     deviation?: number;
     isHit?: boolean;
+};
+
+export type CyberEsportsV1RedeemActivationCodeRequest = {
+    code?: string;
+};
+
+export type CyberEsportsV1RedeemActivationCodeResponse = {
+    reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+    /**
+     * Null when the grant is permanent — a code's grant lasts as long as
+     * the code said, and an absent expiry never ends.
+     */
+    expiresAt?: string;
+    grantedAt?: string;
 };
 
 export type CyberEsportsV1ResourceMatchCollect = {
@@ -2280,6 +2327,84 @@ export type ChatServiceListModelsResponses = {
 
 export type ChatServiceListModelsResponse = ChatServiceListModelsResponses[keyof ChatServiceListModelsResponses];
 
+export type ActivationCodeServiceListActivationCodesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+    };
+    url: '/api/v1/esports/activation-codes';
+};
+
+export type ActivationCodeServiceListActivationCodesResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListActivationCodesResponse;
+};
+
+export type ActivationCodeServiceListActivationCodesResponse = ActivationCodeServiceListActivationCodesResponses[keyof ActivationCodeServiceListActivationCodesResponses];
+
+export type ActivationCodeServiceGenerateActivationCodesData = {
+    body: CyberEsportsV1GenerateActivationCodesRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/activation-codes/generate';
+};
+
+export type ActivationCodeServiceGenerateActivationCodesResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GenerateActivationCodesResponse;
+};
+
+export type ActivationCodeServiceGenerateActivationCodesResponse = ActivationCodeServiceGenerateActivationCodesResponses[keyof ActivationCodeServiceGenerateActivationCodesResponses];
+
+export type EntitlementServiceRedeemActivationCodeData = {
+    body: CyberEsportsV1RedeemActivationCodeRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/entitlements/redeem';
+};
+
+export type EntitlementServiceRedeemActivationCodeResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1RedeemActivationCodeResponse;
+};
+
+export type EntitlementServiceRedeemActivationCodeResponse = EntitlementServiceRedeemActivationCodeResponses[keyof EntitlementServiceRedeemActivationCodeResponses];
+
 export type GameServiceListGamesData = {
     body?: never;
     path?: never;
@@ -2565,6 +2690,24 @@ export type ProfileServiceUpdateProfileResponses = {
 };
 
 export type ProfileServiceUpdateProfileResponse = ProfileServiceUpdateProfileResponses[keyof ProfileServiceUpdateProfileResponses];
+
+export type EntitlementServiceGetReportAccessData = {
+    body?: never;
+    path: {
+        reportType: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+    };
+    query?: never;
+    url: '/api/v1/esports/report-access/{reportType}';
+};
+
+export type EntitlementServiceGetReportAccessResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetReportAccessResponse;
+};
+
+export type EntitlementServiceGetReportAccessResponse = EntitlementServiceGetReportAccessResponses[keyof EntitlementServiceGetReportAccessResponses];
 
 export type SkuServiceListSkusData = {
     body?: never;

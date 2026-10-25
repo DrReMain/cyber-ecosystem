@@ -9,6 +9,9 @@ import (
 // AbilityScore is the predicate function for abilityscore builders.
 type AbilityScore func(*sql.Selector)
 
+// ActivationCode is the predicate function for activationcode builders.
+type ActivationCode func(*sql.Selector)
+
 // Entitlement is the predicate function for entitlement builders.
 type Entitlement func(*sql.Selector)
 

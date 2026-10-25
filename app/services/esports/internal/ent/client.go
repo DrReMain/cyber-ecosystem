@@ -12,6 +12,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/migrate"
 
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -38,6 +39,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// ActivationCode is the client for interacting with the ActivationCode builders.
+	ActivationCode *ActivationCodeClient
 	// Entitlement is the client for interacting with the Entitlement builders.
 	Entitlement *EntitlementClient
 	// Game is the client for interacting with the Game builders.
@@ -72,6 +75,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
+	c.ActivationCode = NewActivationCodeClient(c.config)
 	c.Entitlement = NewEntitlementClient(c.config)
 	c.Game = NewGameClient(c.config)
 	c.MatchConfig = NewMatchConfigClient(c.config)
@@ -173,20 +177,21 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		AbilityScore: NewAbilityScoreClient(cfg),
-		Entitlement:  NewEntitlementClient(cfg),
-		Game:         NewGameClient(cfg),
-		MatchConfig:  NewMatchConfigClient(cfg),
-		MatchSession: NewMatchSessionClient(cfg),
-		PayOrder:     NewPayOrderClient(cfg),
-		Profile:      NewProfileClient(cfg),
-		QuestionBank: NewQuestionBankClient(cfg),
-		Sku:          NewSkuClient(cfg),
-		Test:         NewTestClient(cfg),
-		TestConfig:   NewTestConfigClient(cfg),
-		TestRecord:   NewTestRecordClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		AbilityScore:   NewAbilityScoreClient(cfg),
+		ActivationCode: NewActivationCodeClient(cfg),
+		Entitlement:    NewEntitlementClient(cfg),
+		Game:           NewGameClient(cfg),
+		MatchConfig:    NewMatchConfigClient(cfg),
+		MatchSession:   NewMatchSessionClient(cfg),
+		PayOrder:       NewPayOrderClient(cfg),
+		Profile:        NewProfileClient(cfg),
+		QuestionBank:   NewQuestionBankClient(cfg),
+		Sku:            NewSkuClient(cfg),
+		Test:           NewTestClient(cfg),
+		TestConfig:     NewTestConfigClient(cfg),
+		TestRecord:     NewTestRecordClient(cfg),
 	}, nil
 }
 
@@ -204,20 +209,21 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		AbilityScore: NewAbilityScoreClient(cfg),
-		Entitlement:  NewEntitlementClient(cfg),
-		Game:         NewGameClient(cfg),
-		MatchConfig:  NewMatchConfigClient(cfg),
-		MatchSession: NewMatchSessionClient(cfg),
-		PayOrder:     NewPayOrderClient(cfg),
-		Profile:      NewProfileClient(cfg),
-		QuestionBank: NewQuestionBankClient(cfg),
-		Sku:          NewSkuClient(cfg),
-		Test:         NewTestClient(cfg),
-		TestConfig:   NewTestConfigClient(cfg),
-		TestRecord:   NewTestRecordClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		AbilityScore:   NewAbilityScoreClient(cfg),
+		ActivationCode: NewActivationCodeClient(cfg),
+		Entitlement:    NewEntitlementClient(cfg),
+		Game:           NewGameClient(cfg),
+		MatchConfig:    NewMatchConfigClient(cfg),
+		MatchSession:   NewMatchSessionClient(cfg),
+		PayOrder:       NewPayOrderClient(cfg),
+		Profile:        NewProfileClient(cfg),
+		QuestionBank:   NewQuestionBankClient(cfg),
+		Sku:            NewSkuClient(cfg),
+		Test:           NewTestClient(cfg),
+		TestConfig:     NewTestConfigClient(cfg),
+		TestRecord:     NewTestRecordClient(cfg),
 	}, nil
 }
 
@@ -247,9 +253,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityScore, c.Entitlement, c.Game, c.MatchConfig, c.MatchSession,
-		c.PayOrder, c.Profile, c.QuestionBank, c.Sku, c.Test, c.TestConfig,
-		c.TestRecord,
+		c.AbilityScore, c.ActivationCode, c.Entitlement, c.Game, c.MatchConfig,
+		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.Sku, c.Test,
+		c.TestConfig, c.TestRecord,
 	} {
 		n.Use(hooks...)
 	}
@@ -259,9 +265,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityScore, c.Entitlement, c.Game, c.MatchConfig, c.MatchSession,
-		c.PayOrder, c.Profile, c.QuestionBank, c.Sku, c.Test, c.TestConfig,
-		c.TestRecord,
+		c.AbilityScore, c.ActivationCode, c.Entitlement, c.Game, c.MatchConfig,
+		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.Sku, c.Test,
+		c.TestConfig, c.TestRecord,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -272,6 +278,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AbilityScoreMutation:
 		return c.AbilityScore.mutate(ctx, m)
+	case *ActivationCodeMutation:
+		return c.ActivationCode.mutate(ctx, m)
 	case *EntitlementMutation:
 		return c.Entitlement.mutate(ctx, m)
 	case *GameMutation:
@@ -431,6 +439,141 @@ func (c *AbilityScoreClient) mutate(ctx context.Context, m *AbilityScoreMutation
 		return (&AbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AbilityScore mutation op: %q", m.Op())
+	}
+}
+
+// ActivationCodeClient is a client for the ActivationCode schema.
+type ActivationCodeClient struct {
+	config
+}
+
+// NewActivationCodeClient returns a client for the ActivationCode from the given config.
+func NewActivationCodeClient(c config) *ActivationCodeClient {
+	return &ActivationCodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `activationcode.Hooks(f(g(h())))`.
+func (c *ActivationCodeClient) Use(hooks ...Hook) {
+	c.hooks.ActivationCode = append(c.hooks.ActivationCode, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `activationcode.Intercept(f(g(h())))`.
+func (c *ActivationCodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ActivationCode = append(c.inters.ActivationCode, interceptors...)
+}
+
+// Create returns a builder for creating a ActivationCode entity.
+func (c *ActivationCodeClient) Create() *ActivationCodeCreate {
+	mutation := newActivationCodeMutation(c.config, OpCreate)
+	return &ActivationCodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ActivationCode entities.
+func (c *ActivationCodeClient) CreateBulk(builders ...*ActivationCodeCreate) *ActivationCodeCreateBulk {
+	return &ActivationCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ActivationCodeClient) MapCreateBulk(slice any, setFunc func(*ActivationCodeCreate, int)) *ActivationCodeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ActivationCodeCreateBulk{err: fmt.Errorf("calling to ActivationCodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ActivationCodeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ActivationCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ActivationCode.
+func (c *ActivationCodeClient) Update() *ActivationCodeUpdate {
+	mutation := newActivationCodeMutation(c.config, OpUpdate)
+	return &ActivationCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ActivationCodeClient) UpdateOne(_m *ActivationCode) *ActivationCodeUpdateOne {
+	mutation := newActivationCodeMutation(c.config, OpUpdateOne, withActivationCode(_m))
+	return &ActivationCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ActivationCodeClient) UpdateOneID(id string) *ActivationCodeUpdateOne {
+	mutation := newActivationCodeMutation(c.config, OpUpdateOne, withActivationCodeID(id))
+	return &ActivationCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ActivationCode.
+func (c *ActivationCodeClient) Delete() *ActivationCodeDelete {
+	mutation := newActivationCodeMutation(c.config, OpDelete)
+	return &ActivationCodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ActivationCodeClient) DeleteOne(_m *ActivationCode) *ActivationCodeDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ActivationCodeClient) DeleteOneID(id string) *ActivationCodeDeleteOne {
+	builder := c.Delete().Where(activationcode.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ActivationCodeDeleteOne{builder}
+}
+
+// Query returns a query builder for ActivationCode.
+func (c *ActivationCodeClient) Query() *ActivationCodeQuery {
+	return &ActivationCodeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeActivationCode},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ActivationCode entity by its id.
+func (c *ActivationCodeClient) Get(ctx context.Context, id string) (*ActivationCode, error) {
+	return c.Query().Where(activationcode.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ActivationCodeClient) GetX(ctx context.Context, id string) *ActivationCode {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ActivationCodeClient) Hooks() []Hook {
+	hooks := c.hooks.ActivationCode
+	return append(hooks[:len(hooks):len(hooks)], activationcode.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *ActivationCodeClient) Interceptors() []Interceptor {
+	inters := c.inters.ActivationCode
+	return append(inters[:len(inters):len(inters)], activationcode.Interceptors[:]...)
+}
+
+func (c *ActivationCodeClient) mutate(ctx context.Context, m *ActivationCodeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ActivationCodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ActivationCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ActivationCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ActivationCodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ActivationCode mutation op: %q", m.Op())
 	}
 }
 
@@ -1922,12 +2065,13 @@ func (c *TestRecordClient) mutate(ctx context.Context, m *TestRecordMutation) (V
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Entitlement, Game, MatchConfig, MatchSession, PayOrder, Profile,
-		QuestionBank, Sku, Test, TestConfig, TestRecord []ent.Hook
+		AbilityScore, ActivationCode, Entitlement, Game, MatchConfig, MatchSession,
+		PayOrder, Profile, QuestionBank, Sku, Test, TestConfig, TestRecord []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Entitlement, Game, MatchConfig, MatchSession, PayOrder, Profile,
-		QuestionBank, Sku, Test, TestConfig, TestRecord []ent.Interceptor
+		AbilityScore, ActivationCode, Entitlement, Game, MatchConfig, MatchSession,
+		PayOrder, Profile, QuestionBank, Sku, Test, TestConfig,
+		TestRecord []ent.Interceptor
 	}
 )
 

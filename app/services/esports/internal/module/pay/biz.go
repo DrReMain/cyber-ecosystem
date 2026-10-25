@@ -17,6 +17,7 @@ import (
 	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
+	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
@@ -25,10 +26,10 @@ const (
 	SkuKindTrial      = "trial"
 	SkuKindMembership = "membership"
 
-	ScopeTrial    = "trial"      // order: unlocks one test record permanently
-	ScopePeriod   = "period"     // order: opens the membership window
-	EntTrial      = "trial"      // entitlement: one record, no deadline
-	EntMembership = "membership" // entitlement: a window with an expiry
+	ScopeTrial    = "trial"                // order: unlocks one test record permanently
+	ScopePeriod   = "period"               // order: opens the membership window
+	EntTrial      = shared.ScopeTrial      // the ledger's scope vocabulary lives in the cross-module kernel
+	EntMembership = shared.ScopeMembership // membership: a window with an expiry
 
 	StatePending = "pending"
 	StatePaid    = "paid"
@@ -110,13 +111,7 @@ type SettleIn struct {
 	PaidAt        time.Time
 }
 
-type EntitlementGrant struct {
-	UserID    string
-	ScopeKind string
-	ScopeRef  *string
-	ExpiresAt *time.Time
-	Source    string
-}
+type EntitlementGrant = entitle.EntitlementGrant // the ledger's own shape; this module is a consumer of it
 
 // Port ----------------------------------------------------------------------------------------------------------------
 

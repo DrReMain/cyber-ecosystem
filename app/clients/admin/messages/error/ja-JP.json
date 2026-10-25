@@ -114,5 +114,8 @@
   "error_INFRA_ERROR_PAYMENT_UNAVAILABLE": "決済チャネルが一時的に利用できません。しばらくしてからお試しください",
   "error_INFRA_ERROR_PAYMENT_TIMEOUT": "支払いリクエストがタイムアウトしました。しばらくしてからお試しください",
   "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "支払い通知の検証に失敗しました。しばらくしてからお試しください",
-  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "支払い通知の復号に失敗しました。しばらくしてからお試しください"
+  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "支払い通知の復号に失敗しました。しばらくしてからお試しください",
+  "error_ESPORTS_ACTIVATION_CODE_INVALID": "アクティベーションコードが無効です",
+  "error_ESPORTS_ACTIVATION_CODE_EXPIRED": "アクティベーションコードの有効期限が切れました",
+  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "アクティベーションコードは使用済みです"
 }

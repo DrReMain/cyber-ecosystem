@@ -286,6 +286,106 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.agent.v1.ListModelsResponse'
+    /api/v1/esports/activation-codes:
+        get:
+            tags:
+                - ActivationCodeService
+            operationId: ActivationCodeService_ListActivationCodes
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: reportType
+                  in: query
+                  schema:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListActivationCodesResponse'
+    /api/v1/esports/activation-codes/generate:
+        post:
+            tags:
+                - ActivationCodeService
+            operationId: ActivationCodeService_GenerateActivationCodes
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GenerateActivationCodesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GenerateActivationCodesResponse'
+    /api/v1/esports/entitlements/redeem:
+        post:
+            tags:
+                - EntitlementService
+            operationId: EntitlementService_RedeemActivationCode
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.RedeemActivationCodeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.RedeemActivationCodeResponse'
     /api/v1/esports/games:
         get:
             tags:
@@ -605,6 +705,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.UpdateProfileResponse'
+    /api/v1/esports/report-access/{reportType}:
+        get:
+            tags:
+                - EntitlementService
+            operationId: EntitlementService_GetReportAccess
+            parameters:
+                - name: reportType
+                  in: path
+                  required: true
+                  schema:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetReportAccessResponse'
     /api/v1/esports/skus:
         get:
             tags:
@@ -2644,6 +2768,31 @@ components:
         cyber.agent.v1.UpdateSessionResponse:
             type: object
             properties: {}
+        cyber.esports.v1.ActivationCode:
+            type: object
+            properties:
+                code:
+                    type: string
+                reportType:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+                quantity:
+                    type: integer
+                    format: int32
+                usedCount:
+                    type: integer
+                    format: int32
+                expiresAt:
+                    type: string
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
         cyber.esports.v1.BackgroundSpan:
             type: object
             properties:
@@ -2872,6 +3021,33 @@ components:
                     type: array
                     items:
                         type: string
+        cyber.esports.v1.GenerateActivationCodesRequest:
+            type: object
+            properties:
+                reportType:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+                count:
+                    type: integer
+                    format: int32
+                expireDays:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.GenerateActivationCodesResponse:
+            type: object
+            properties:
+                codes:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        The codes in full, this once and on every later list — generation
+                         answers what was minted so the operator hands them out.
         cyber.esports.v1.GetMatchSessionResponse:
             type: object
             properties:
@@ -2897,6 +3073,21 @@ components:
             properties:
                 profile:
                     $ref: '#/components/schemas/cyber.esports.v1.Profile'
+        cyber.esports.v1.GetReportAccessResponse:
+            type: object
+            properties:
+                allowed:
+                    type: boolean
+                reason:
+                    enum:
+                        - REPORT_ACCESS_REASON_UNSPECIFIED
+                        - REPORT_ACCESS_REASON_POLICY_OPEN
+                        - REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE
+                        - REPORT_ACCESS_REASON_CODE_REDEEMED
+                        - REPORT_ACCESS_REASON_POLICY_CLOSED
+                        - REPORT_ACCESS_REASON_NO_ENTITLEMENT
+                    type: string
+                    format: enum
         cyber.esports.v1.GetTestConfigResponse:
             type: object
             properties:
@@ -2912,6 +3103,15 @@ components:
                     description: |-
                         Long-form how-to copy, per test — seeded from the six ability texts
                          and free to diverge per test; copy changes are content, never contract.
+        cyber.esports.v1.ListActivationCodesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                codes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ActivationCode'
         cyber.esports.v1.ListGamesResponse:
             type: object
             properties:
@@ -3336,6 +3536,31 @@ components:
                     format: double
                 isHit:
                     type: boolean
+        cyber.esports.v1.RedeemActivationCodeRequest:
+            type: object
+            properties:
+                code:
+                    type: string
+        cyber.esports.v1.RedeemActivationCodeResponse:
+            type: object
+            properties:
+                reportType:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+                expiresAt:
+                    type: string
+                    description: |-
+                        Null when the grant is permanent — a code's grant lasts as long as
+                         the code said, and an absent expiry never ends.
+                    format: date-time
+                grantedAt:
+                    type: string
+                    format: date-time
         cyber.esports.v1.ResourceMatchCollect:
             type: object
             properties:
@@ -5037,12 +5262,28 @@ components:
                     type: string
                     description: OAuth authorization code from the wechat redirect.
 tags:
+    - name: ActivationCodeService
+      description: |-
+        The operator faces of the activation-code lifecycle. A code is a type
+         code — the pricing ruling retired single-record codes, so redeeming
+         opens one report family for the redeemer, never one trial's report.
+         Generation mints each code for a single redeem; an operator who needs N
+         hands-out mints N. Codes live in clear text because operators re-copy
+         them for support, which is why both faces stay on the admin ladder.
     - name: AgentConfigAdminService
     - name: AgentConfigService
     - name: AuditService
     - name: AuthService
     - name: ChatService
     - name: DeptService
+    - name: EntitlementService
+      description: |-
+        The member's entitlement faces. Redeem is idempotent per (member,
+         code): handing the same code to the same member again returns the same
+         entitlement, while a rival member's redeem takes the code's single use.
+         Access folds every openable fact — policy config, an active membership,
+         a redeemed code — into one answer with one reason, so the client never
+         re-derives entitlement rules.
     - name: FilePresignService
       description: |-
         File presign channel: the client-direct upload path. The

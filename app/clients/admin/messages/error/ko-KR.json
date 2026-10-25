@@ -114,5 +114,8 @@
   "error_INFRA_ERROR_PAYMENT_UNAVAILABLE": "결제 채널을 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해 주세요",
   "error_INFRA_ERROR_PAYMENT_TIMEOUT": "결제 요청이 시간 초과되었습니다. 잠시 후 다시 시도해 주세요",
   "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "결제 알림 검증에 실패했습니다. 잠시 후 다시 시도해 주세요",
-  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "결제 알림 복호화에 실패했습니다. 잠시 후 다시 시도해 주세요"
+  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "결제 알림 복호화에 실패했습니다. 잠시 후 다시 시도해 주세요",
+  "error_ESPORTS_ACTIVATION_CODE_INVALID": "활성화 코드가 유효하지 않습니다",
+  "error_ESPORTS_ACTIVATION_CODE_EXPIRED": "활성화 코드가 만료되었습니다",
+  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "활성화 코드가 이미 사용되었습니다"
 }

@@ -1,7 +1,9 @@
-h1:nz7qiQvWJ91bAJkszpMHtpCxlAJ9JoD+YSgnZq9Oy/8=
+h1:uKMue0eFdODqN9fzB+FMXPGZ9UHeR09WW6cQiTK72kE=
 20261019143651_changes.sql h1:oPMYX3kqhuyK/EWccRpGa872/AMPG95ej/54EdvSuBI=
 20261019235220_changes.sql h1:AsCq5wuK/PIlR2ZBRIfH3XOpqWCqLSYaixct47nXiZA=
 20261020144604_changes.sql h1:flDrL4AQBLcHnhRZ1F1ccmM5w7AmmvsQOlvlWXBCetQ=
 20261023000934_match_aggregate.sql h1:BKyFJ5jqAtTMxKgT1JKxnvGgi0LpnCi/CqBAcaqyc38=
 20261023001023_test_record_session_ordinal.sql h1:6vujcEqBgQPw+AYG5nKDTtmykky/i90+xbyDyyNUISA=
 20261025045556_pay_domain.sql h1:lskjCiqwX40Un5KUJdz0Urqad6c8e+6iFhUSA37zbYI=
+20261025074702_entitle_activation_code.sql h1:0Fr6OKSTewnhS8ImNvaEMSF2x7CoPPEu+Cv5uYi2zhc=
+20261025074825_entitlement_report_type_scope.sql h1:+i2JJKWAXVFgkErTXjILkM90+4npdczrhrr1aedyCok=

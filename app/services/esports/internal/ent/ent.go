@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -84,18 +85,19 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			abilityscore.Table: abilityscore.ValidColumn,
-			entitlement.Table:  entitlement.ValidColumn,
-			game.Table:         game.ValidColumn,
-			matchconfig.Table:  matchconfig.ValidColumn,
-			matchsession.Table: matchsession.ValidColumn,
-			payorder.Table:     payorder.ValidColumn,
-			profile.Table:      profile.ValidColumn,
-			questionbank.Table: questionbank.ValidColumn,
-			sku.Table:          sku.ValidColumn,
-			test.Table:         test.ValidColumn,
-			testconfig.Table:   testconfig.ValidColumn,
-			testrecord.Table:   testrecord.ValidColumn,
+			abilityscore.Table:   abilityscore.ValidColumn,
+			activationcode.Table: activationcode.ValidColumn,
+			entitlement.Table:    entitlement.ValidColumn,
+			game.Table:           game.ValidColumn,
+			matchconfig.Table:    matchconfig.ValidColumn,
+			matchsession.Table:   matchsession.ValidColumn,
+			payorder.Table:       payorder.ValidColumn,
+			profile.Table:        profile.ValidColumn,
+			questionbank.Table:   questionbank.ValidColumn,
+			sku.Table:            sku.ValidColumn,
+			test.Table:           test.ValidColumn,
+			testconfig.Table:     testconfig.ValidColumn,
+			testrecord.Table:     testrecord.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

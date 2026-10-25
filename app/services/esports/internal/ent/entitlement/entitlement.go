@@ -93,6 +93,7 @@ type ScopeKind string
 const (
 	ScopeKindTrial      ScopeKind = "trial"
 	ScopeKindMembership ScopeKind = "membership"
+	ScopeKindReportType ScopeKind = "report_type"
 )
 
 func (sk ScopeKind) String() string {
@@ -102,7 +103,7 @@ func (sk ScopeKind) String() string {
 // ScopeKindValidator is a validator for the "scope_kind" field enum values. It is called by the builders before save.
 func ScopeKindValidator(sk ScopeKind) error {
 	switch sk {
-	case ScopeKindTrial, ScopeKindMembership:
+	case ScopeKindTrial, ScopeKindMembership, ScopeKindReportType:
 		return nil
 	default:
 		return fmt.Errorf("entitlement: invalid enum value for scope_kind field: %q", sk)

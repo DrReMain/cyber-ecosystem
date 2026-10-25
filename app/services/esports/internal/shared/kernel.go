@@ -9,6 +9,15 @@ import (
 
 const ExtraAccount = "account"
 
+// The entitlement ledger's scope vocabulary — one home because two
+// modules write it (pay grants on settle, entitle grants on redeem) and a
+// drifted literal would silently split the ledger.
+const (
+	ScopeTrial      = "trial"
+	ScopeMembership = "membership"
+	ScopeReportType = "report_type"
+)
+
 type Transaction interface {
 	InTx(ctx context.Context, fn func(context.Context) error) error
 }

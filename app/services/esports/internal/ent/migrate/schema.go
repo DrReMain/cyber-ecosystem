@@ -58,6 +58,47 @@ var (
 			},
 		},
 	}
+	// ActivationCodeColumns holds the columns for the "activation_code" table.
+	ActivationCodeColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "code", Type: field.TypeString, Size: 64, Comment: "operator-handout code string (prefix + secure random); stored clear because support re-copies it"},
+		{Name: "report_type", Type: field.TypeEnum, Comment: "the report family this code opens — the pricing ruling retired single-record codes", Enums: []string{"cognitive", "career", "school"}},
+		{Name: "quantity", Type: field.TypeInt, Comment: "redeems allowed; generation mints single-use codes, the field keeps the redeem guard general", Default: 1},
+		{Name: "used_count", Type: field.TypeInt, Comment: "redeems taken; the conditional UPDATE increments under the quantity guard", Default: 0},
+		{Name: "expires_at", Type: field.TypeTime, Comment: "code validity deadline; a redeem after it refuses even with uses left"},
+		{Name: "created_by", Type: field.TypeString, Size: 20, Comment: "admin identity that minted the batch (audit join)"},
+	}
+	// ActivationCodeTable holds the schema information for the "activation_code" table.
+	ActivationCodeTable = &schema.Table{
+		Name:       "activation_code",
+		Columns:    ActivationCodeColumns,
+		PrimaryKey: []*schema.Column{ActivationCodeColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "activationcode_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ActivationCodeColumns[1]},
+			},
+			{
+				Name:    "activationcode_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{ActivationCodeColumns[2]},
+			},
+			{
+				Name:    "activationcode_code",
+				Unique:  true,
+				Columns: []*schema.Column{ActivationCodeColumns[4]},
+			},
+			{
+				Name:    "activationcode_report_type_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ActivationCodeColumns[5], ActivationCodeColumns[1]},
+			},
+		},
+	}
 	// EntitlementColumns holds the columns for the "entitlement" table.
 	EntitlementColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -65,8 +106,8 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
 		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "holding member identity (system user id), logical reference — same key law as profile"},
-		{Name: "scope_kind", Type: field.TypeEnum, Comment: "grant shape: trial points at one record permanently, membership opens a window", Enums: []string{"trial", "membership"}},
-		{Name: "scope_ref", Type: field.TypeString, Nullable: true, Size: 32, Comment: "trial: the unlocked test record id; membership: null — renewal rows stack instead of dedup"},
+		{Name: "scope_kind", Type: field.TypeEnum, Comment: "grant shape: trial points at one record permanently, membership opens a window, report_type opens a report family via a type code", Enums: []string{"trial", "membership", "report_type"}},
+		{Name: "scope_ref", Type: field.TypeString, Nullable: true, Size: 32, Comment: "trial: the unlocked test record id; report_type: the family name (dedup guard); membership: null — renewal rows stack instead of dedup"},
 		{Name: "expires_at", Type: field.TypeTime, Nullable: true, Comment: "membership window end (paid_at + period days); null on trial rows — permanence is the absence of a deadline"},
 		{Name: "source", Type: field.TypeString, Size: 64, Comment: "granting artifact id — the order number today; activation codes join this column when they land"},
 	}
@@ -584,6 +625,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoreTable,
+		ActivationCodeTable,
 		EntitlementTable,
 		GameTable,
 		MatchConfigTable,
@@ -601,6 +643,9 @@ var (
 func init() {
 	AbilityScoreTable.Annotation = &entsql.Annotation{
 		Table: "ability_score",
+	}
+	ActivationCodeTable.Annotation = &entsql.Annotation{
+		Table: "activation_code",
 	}
 	EntitlementTable.Annotation = &entsql.Annotation{
 		Table: "entitlement",

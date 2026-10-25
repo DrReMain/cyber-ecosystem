@@ -1,5 +1,75 @@
 [
   {
+    "name": "ActivationCodeService",
+    "full_name": "cyber.esports.v1.ActivationCodeService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/activation.proto",
+    "comment": "激活码",
+    "methods": [
+      {
+        "name": "GenerateActivationCodes",
+        "full_name": "cyber.esports.v1.ActivationCodeService.GenerateActivationCodes",
+        "request_name": "GenerateActivationCodesRequest",
+        "request_full_name": "cyber.esports.v1.GenerateActivationCodesRequest",
+        "response_name": "GenerateActivationCodesResponse",
+        "response_full_name": "cyber.esports.v1.GenerateActivationCodesResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/activation-codes/generate",
+        "comment": "批量生成激活码",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListActivationCodes",
+        "full_name": "cyber.esports.v1.ActivationCodeService.ListActivationCodes",
+        "request_name": "ListActivationCodesRequest",
+        "request_full_name": "cyber.esports.v1.ListActivationCodesRequest",
+        "response_name": "ListActivationCodesResponse",
+        "response_full_name": "cyber.esports.v1.ListActivationCodesResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/activation-codes",
+        "comment": "激活码列表",
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "EntitlementService",
+    "full_name": "cyber.esports.v1.EntitlementService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/activation.proto",
+    "comment": "权益",
+    "methods": [
+      {
+        "name": "GetReportAccess",
+        "full_name": "cyber.esports.v1.EntitlementService.GetReportAccess",
+        "request_name": "GetReportAccessRequest",
+        "request_full_name": "cyber.esports.v1.GetReportAccessRequest",
+        "response_name": "GetReportAccessResponse",
+        "response_full_name": "cyber.esports.v1.GetReportAccessResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/report-access/{report_type}",
+        "comment": "报告访问判定",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "RedeemActivationCode",
+        "full_name": "cyber.esports.v1.EntitlementService.RedeemActivationCode",
+        "request_name": "RedeemActivationCodeRequest",
+        "request_full_name": "cyber.esports.v1.RedeemActivationCodeRequest",
+        "response_name": "RedeemActivationCodeResponse",
+        "response_full_name": "cyber.esports.v1.RedeemActivationCodeResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/entitlements/redeem",
+        "comment": "兑换激活码",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "GameService",
     "full_name": "cyber.esports.v1.GameService",
     "package": "cyber.esports.v1",

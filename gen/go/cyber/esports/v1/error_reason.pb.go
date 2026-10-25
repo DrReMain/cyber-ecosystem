@@ -53,6 +53,10 @@ const (
 	Esports_ESPORTS_ORDER_SCOPE_ALREADY_GRANTED Esports = 6144
 	Esports_ESPORTS_ORDER_CHANNEL_INVALID       Esports = 6145
 	Esports_ESPORTS_ORDER_STATE_CONFLICT        Esports = 6146
+	// 615x: activation code & entitlement
+	Esports_ESPORTS_ACTIVATION_CODE_INVALID   Esports = 6150
+	Esports_ESPORTS_ACTIVATION_CODE_EXPIRED   Esports = 6151
+	Esports_ESPORTS_ACTIVATION_CODE_EXHAUSTED Esports = 6152
 )
 
 // Enum value maps for Esports.
@@ -76,6 +80,9 @@ var (
 		6144: "ESPORTS_ORDER_SCOPE_ALREADY_GRANTED",
 		6145: "ESPORTS_ORDER_CHANNEL_INVALID",
 		6146: "ESPORTS_ORDER_STATE_CONFLICT",
+		6150: "ESPORTS_ACTIVATION_CODE_INVALID",
+		6151: "ESPORTS_ACTIVATION_CODE_EXPIRED",
+		6152: "ESPORTS_ACTIVATION_CODE_EXHAUSTED",
 	}
 	Esports_value = map[string]int32{
 		"ESPORTS_UNSPECIFIED":                       0,
@@ -96,6 +103,9 @@ var (
 		"ESPORTS_ORDER_SCOPE_ALREADY_GRANTED":       6144,
 		"ESPORTS_ORDER_CHANNEL_INVALID":             6145,
 		"ESPORTS_ORDER_STATE_CONFLICT":              6146,
+		"ESPORTS_ACTIVATION_CODE_INVALID":           6150,
+		"ESPORTS_ACTIVATION_CODE_EXPIRED":           6151,
+		"ESPORTS_ACTIVATION_CODE_EXHAUSTED":         6152,
 	}
 )
 
@@ -130,7 +140,7 @@ var File_cyber_esports_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\xeb\x05\n" +
+	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\xf1\x06\n" +
 	"\aEsports\x12\x1d\n" +
 	"\x13ESPORTS_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x124\n" +
 	")ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED\x10\xd4/\x1a\x04\xa8E\x90\x03\x12'\n" +
@@ -149,7 +159,10 @@ const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\x1bESPORTS_ORDER_SCOPE_INVALID\x10\xff/\x1a\x04\xa8E\x90\x03\x12.\n" +
 	"#ESPORTS_ORDER_SCOPE_ALREADY_GRANTED\x10\x800\x1a\x04\xa8E\x90\x03\x12(\n" +
 	"\x1dESPORTS_ORDER_CHANNEL_INVALID\x10\x810\x1a\x04\xa8E\x90\x03\x12'\n" +
-	"\x1cESPORTS_ORDER_STATE_CONFLICT\x10\x820\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	"\x1cESPORTS_ORDER_STATE_CONFLICT\x10\x820\x1a\x04\xa8E\x90\x03\x12*\n" +
+	"\x1fESPORTS_ACTIVATION_CODE_INVALID\x10\x860\x1a\x04\xa8E\x90\x03\x12*\n" +
+	"\x1fESPORTS_ACTIVATION_CODE_EXPIRED\x10\x870\x1a\x04\xa8E\x90\x03\x12,\n" +
+	"!ESPORTS_ACTIVATION_CODE_EXHAUSTED\x10\x880\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_error_reason_proto_rawDescOnce sync.Once

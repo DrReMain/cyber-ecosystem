@@ -1,0 +1,175 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The operator faces of the activation-code lifecycle. A code is a type
+// code — the pricing ruling retired single-record codes, so redeeming
+// opens one report family for the redeemer, never one trial's report.
+// Generation mints each code for a single redeem; an operator who needs N
+// hands-out mints N. Codes live in clear text because operators re-copy
+// them for support, which is why both faces stay on the admin ladder.
+service ActivationCodeService {
+  option (cyber.ext.v1.service_comment) = "激活码";
+  rpc GenerateActivationCodes(GenerateActivationCodesRequest) returns (GenerateActivationCodesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "批量生成激活码"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/activation-codes/generate"
+      body: "*"
+    };
+  }
+  rpc ListActivationCodes(ListActivationCodesRequest) returns (ListActivationCodesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "激活码列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/activation-codes"};
+  }
+}
+
+// The member's entitlement faces. Redeem is idempotent per (member,
+// code): handing the same code to the same member again returns the same
+// entitlement, while a rival member's redeem takes the code's single use.
+// Access folds every openable fact — policy config, an active membership,
+// a redeemed code — into one answer with one reason, so the client never
+// re-derives entitlement rules.
+service EntitlementService {
+  option (cyber.ext.v1.service_comment) = "权益";
+  rpc RedeemActivationCode(RedeemActivationCodeRequest) returns (RedeemActivationCodeResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "兑换激活码"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/entitlements/redeem"
+      body: "*"
+    };
+  }
+  rpc GetReportAccess(GetReportAccessRequest) returns (GetReportAccessResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "报告访问判定"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/report-access/{report_type}"};
+  }
+}
+
+// The report families a type code opens. The two report domains of the
+// assessment chain carry over from the legacy corpus, school is the ToB
+// aggregate — the same three families the legacy codes knew.
+enum ReportType {
+  REPORT_TYPE_UNSPECIFIED = 0;
+  REPORT_TYPE_COGNITIVE = 1;
+  REPORT_TYPE_CAREER = 2;
+  REPORT_TYPE_SCHOOL = 3;
+}
+
+// Why a report family is open or closed to the asking member. The policy
+// values come from the operator's config; membership and redemption are
+// the member's own facts — the reason names which fact answered.
+enum ReportAccessReason {
+  REPORT_ACCESS_REASON_UNSPECIFIED = 0;
+  REPORT_ACCESS_REASON_POLICY_OPEN = 1;
+  REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE = 2;
+  REPORT_ACCESS_REASON_CODE_REDEEMED = 3;
+  REPORT_ACCESS_REASON_POLICY_CLOSED = 4;
+  REPORT_ACCESS_REASON_NO_ENTITLEMENT = 5;
+}
+
+message ActivationCode {
+  google.protobuf.StringValue code = 1;
+  ReportType report_type = 2;
+  google.protobuf.Int32Value quantity = 3;
+  google.protobuf.Int32Value used_count = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message GenerateActivationCodesRequest {
+  ReportType report_type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }
+  ];
+  int32 count = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32 = {
+      gte: 1
+      lte: 1000
+    }
+  ];
+  int32 expire_days = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32 = {
+      gte: 1
+      lte: 3650
+    }
+  ];
+}
+
+message GenerateActivationCodesResponse {
+  // The codes in full, this once and on every later list — generation
+  // answers what was minted so the operator hands them out.
+  repeated string codes = 1;
+}
+
+message ListActivationCodesRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional ReportType report_type = 2;
+}
+
+message ListActivationCodesResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated ActivationCode codes = 2;
+}
+
+message RedeemActivationCodeRequest {
+  string code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 2
+      max_len: 64
+    }
+  ];
+}
+
+message RedeemActivationCodeResponse {
+  ReportType report_type = 1;
+  // Null when the grant is permanent — a code's grant lasts as long as
+  // the code said, and an absent expiry never ends.
+  google.protobuf.Timestamp expires_at = 2;
+  google.protobuf.Timestamp granted_at = 3;
+}
+
+message GetReportAccessRequest {
+  ReportType report_type = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }
+  ];
+}
+
+message GetReportAccessResponse {
+  bool allowed = 1;
+  ReportAccessReason reason = 2;
+}

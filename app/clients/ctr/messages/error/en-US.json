@@ -114,5 +114,8 @@
   "error_INFRA_ERROR_PAYMENT_UNAVAILABLE": "The payment channel is temporarily unavailable; try again later",
   "error_INFRA_ERROR_PAYMENT_TIMEOUT": "The payment request timed out; try again later",
   "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "Payment notification failed verification; try again later",
-  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "Payment notification could not be decrypted; try again later"
+  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "Payment notification could not be decrypted; try again later",
+  "error_ESPORTS_ACTIVATION_CODE_INVALID": "The activation code is not valid",
+  "error_ESPORTS_ACTIVATION_CODE_EXPIRED": "The activation code has expired",
+  "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "The activation code has already been used"
 }

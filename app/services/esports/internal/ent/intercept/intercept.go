@@ -8,6 +8,7 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -105,6 +106,33 @@ func (f TraverseAbilityScore) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.AbilityScoreQuery", q)
+}
+
+// The ActivationCodeFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ActivationCodeFunc func(context.Context, *ent.ActivationCodeQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ActivationCodeFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ActivationCodeQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ActivationCodeQuery", q)
+}
+
+// The TraverseActivationCode type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseActivationCode func(context.Context, *ent.ActivationCodeQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseActivationCode) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseActivationCode) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ActivationCodeQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ActivationCodeQuery", q)
 }
 
 // The EntitlementFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -409,6 +437,8 @@ func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
 	case *ent.AbilityScoreQuery:
 		return &query[*ent.AbilityScoreQuery, predicate.AbilityScore, abilityscore.OrderOption]{typ: ent.TypeAbilityScore, tq: q}, nil
+	case *ent.ActivationCodeQuery:
+		return &query[*ent.ActivationCodeQuery, predicate.ActivationCode, activationcode.OrderOption]{typ: ent.TypeActivationCode, tq: q}, nil
 	case *ent.EntitlementQuery:
 		return &query[*ent.EntitlementQuery, predicate.Entitlement, entitlement.OrderOption]{typ: ent.TypeEntitlement, tq: q}, nil
 	case *ent.GameQuery:

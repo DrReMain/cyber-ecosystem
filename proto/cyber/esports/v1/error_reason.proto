@@ -42,4 +42,9 @@ enum Esports {
   ESPORTS_ORDER_SCOPE_ALREADY_GRANTED = 6144 [(.errors.code) = 400];
   ESPORTS_ORDER_CHANNEL_INVALID = 6145 [(.errors.code) = 400];
   ESPORTS_ORDER_STATE_CONFLICT = 6146 [(.errors.code) = 400];
+
+  // 615x: activation code & entitlement
+  ESPORTS_ACTIVATION_CODE_INVALID = 6150 [(.errors.code) = 400];
+  ESPORTS_ACTIVATION_CODE_EXPIRED = 6151 [(.errors.code) = 400];
+  ESPORTS_ACTIVATION_CODE_EXHAUSTED = 6152 [(.errors.code) = 400];
 }

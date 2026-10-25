@@ -25,9 +25,9 @@ type Entitlement struct {
 	TenantID string `json:"tenant_id,omitempty"`
 	// holding member identity (system user id), logical reference — same key law as profile
 	UserID string `json:"user_id,omitempty"`
-	// grant shape: trial points at one record permanently, membership opens a window
+	// grant shape: trial points at one record permanently, membership opens a window, report_type opens a report family via a type code
 	ScopeKind entitlement.ScopeKind `json:"scope_kind,omitempty"`
-	// trial: the unlocked test record id; membership: null — renewal rows stack instead of dedup
+	// trial: the unlocked test record id; report_type: the family name (dedup guard); membership: null — renewal rows stack instead of dedup
 	ScopeRef *string `json:"scope_ref,omitempty"`
 	// membership window end (paid_at + period days); null on trial rows — permanence is the absence of a deadline
 	ExpiresAt *time.Time `json:"expires_at,omitempty"`

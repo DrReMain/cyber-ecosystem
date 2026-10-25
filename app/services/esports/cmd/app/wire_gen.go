@@ -11,6 +11,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/client"
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
+	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
@@ -75,11 +76,16 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	skuService := pay.NewSkuService(logger, skuUC)
 	lifecycle := bootstrap.NewLifecycle()
 	orderRP := pay.NewPayOrderRP(logger, platformPlatform)
-	entitlementRP := pay.NewEntitlementRP(logger, platformPlatform)
+	entitlementRP := entitle.NewEntitlementRP(logger, platformPlatform)
 	payChannelRP := pay.NewPayChannelRP(logger, platformPlatform)
 	orderUC := pay.NewOrderUC(logger, platformPlatform, lifecycle, orderRP, skuRP, entitlementRP, testRP, payChannelRP)
 	orderService := pay.NewOrderService(logger, orderUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService)
+	entitleCodeRP := entitle.NewCodeRP(logger, platformPlatform)
+	entitleCodeUC := entitle.NewCodeUC(logger, platformPlatform, entitleCodeRP)
+	entitleUC := entitle.NewEntitleUC(logger, platformPlatform, entitleCodeRP, entitlementRP)
+	activationCodeService := entitle.NewActivationCodeService(logger, entitleCodeUC)
+	entitlementService := entitle.NewEntitlementService(logger, entitleUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, activationCodeService, entitlementService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

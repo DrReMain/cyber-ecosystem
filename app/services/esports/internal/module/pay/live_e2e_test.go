@@ -25,6 +25,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
+	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 )
@@ -98,7 +99,7 @@ func TestPayLiveE2E(t *testing.T) {
 		t.Fatalf("mock controller: not a mock backend")
 	}
 	uc := NewOrderUC(logger, pf, noopHooks{}, NewPayOrderRP(logger, pf), NewSkuRP(logger, pf),
-		NewEntitlementRP(logger, pf), test.NewTestRP(logger, pf), chanRP)
+		entitle.NewEntitlementRP(logger, pf), test.NewTestRP(logger, pf), chanRP)
 	svc := NewOrderService(logger, uc)
 
 	channels, err := chanRP.Channels("mock")

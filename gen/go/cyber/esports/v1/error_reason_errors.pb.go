@@ -236,3 +236,41 @@ func IsEsportsOrderStateConflict(err error) bool {
 func ErrorEsportsOrderStateConflict(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, Esports_ESPORTS_ORDER_STATE_CONFLICT.String(), fmt.Sprintf(format, args...))
 }
+
+// 615x: activation code & entitlement
+func IsEsportsActivationCodeInvalid(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ACTIVATION_CODE_INVALID.String() && e.Code == 400
+}
+
+// 615x: activation code & entitlement
+func ErrorEsportsActivationCodeInvalid(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ACTIVATION_CODE_INVALID.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsActivationCodeExpired(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ACTIVATION_CODE_EXPIRED.String() && e.Code == 400
+}
+
+func ErrorEsportsActivationCodeExpired(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ACTIVATION_CODE_EXPIRED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsActivationCodeExhausted(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ACTIVATION_CODE_EXHAUSTED.String() && e.Code == 400
+}
+
+func ErrorEsportsActivationCodeExhausted(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ACTIVATION_CODE_EXHAUSTED.String(), fmt.Sprintf(format, args...))
+}
