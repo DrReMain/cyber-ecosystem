@@ -99,5 +99,20 @@
   "error_ESPORTS_MATCH_GENRE_UNKNOWN": "不支持的游戏类型",
   "error_ESPORTS_MATCH_SESSION_NOT_FOUND": "测评会话已失效，请重新开始",
   "error_ESPORTS_MATCH_TEST_NOT_IN_SESSION": "该测试不在当前测评编排内",
-  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "该测试的重测机会已用完"
+  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "该测试的重测机会已用完",
+  "error_ESPORTS_ORDER_NOT_FOUND": "订单不存在或已失效",
+  "error_ESPORTS_SKU_NOT_FOUND": "商品不存在",
+  "error_ESPORTS_SKU_OFF_SHELF": "商品已下架，暂时无法购买",
+  "error_ESPORTS_ORDER_SCOPE_INVALID": "解锁目标无效，请重新进入后再试",
+  "error_ESPORTS_ORDER_SCOPE_ALREADY_GRANTED": "该报告已解锁，无需重复购买",
+  "error_ESPORTS_ORDER_CHANNEL_INVALID": "当前环境不支持该支付方式",
+  "error_ESPORTS_ORDER_STATE_CONFLICT": "订单状态已变化，请刷新后重试",
+  "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "支付请求无效，请稍后重试",
+  "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "支付渠道未找到该交易，请稍后重试",
+  "error_INFRA_ERROR_PAYMENT_DUPLICATE": "重复的支付请求，请稍后重试",
+  "error_INFRA_ERROR_PAYMENT_CHANNEL_REJECTED": "支付渠道拒绝了本次请求，请稍后重试",
+  "error_INFRA_ERROR_PAYMENT_UNAVAILABLE": "支付渠道暂时不可用，请稍后重试",
+  "error_INFRA_ERROR_PAYMENT_TIMEOUT": "支付请求超时，请稍后重试",
+  "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "支付通知校验失败，请稍后重试",
+  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "支付通知解密失败，请稍后重试"
 }

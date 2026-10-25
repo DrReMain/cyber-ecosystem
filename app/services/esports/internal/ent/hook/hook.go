@@ -20,6 +20,18 @@ func (f AbilityScoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityScoreMutation", m)
 }
 
+// The EntitlementFunc type is an adapter to allow the use of ordinary
+// function as Entitlement mutator.
+type EntitlementFunc func(context.Context, *ent.EntitlementMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EntitlementFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EntitlementMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EntitlementMutation", m)
+}
+
 // The GameFunc type is an adapter to allow the use of ordinary
 // function as Game mutator.
 type GameFunc func(context.Context, *ent.GameMutation) (ent.Value, error)
@@ -56,6 +68,18 @@ func (f MatchSessionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MatchSessionMutation", m)
 }
 
+// The PayOrderFunc type is an adapter to allow the use of ordinary
+// function as PayOrder mutator.
+type PayOrderFunc func(context.Context, *ent.PayOrderMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PayOrderFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PayOrderMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PayOrderMutation", m)
+}
+
 // The ProfileFunc type is an adapter to allow the use of ordinary
 // function as Profile mutator.
 type ProfileFunc func(context.Context, *ent.ProfileMutation) (ent.Value, error)
@@ -78,6 +102,18 @@ func (f QuestionBankFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.QuestionBankMutation", m)
+}
+
+// The SkuFunc type is an adapter to allow the use of ordinary
+// function as Sku mutator.
+type SkuFunc func(context.Context, *ent.SkuMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SkuFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SkuMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SkuMutation", m)
 }
 
 // The TestFunc type is an adapter to allow the use of ordinary

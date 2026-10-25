@@ -16,16 +16,22 @@ type Tx struct {
 	config
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// Entitlement is the client for interacting with the Entitlement builders.
+	Entitlement *EntitlementClient
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
 	// MatchConfig is the client for interacting with the MatchConfig builders.
 	MatchConfig *MatchConfigClient
 	// MatchSession is the client for interacting with the MatchSession builders.
 	MatchSession *MatchSessionClient
+	// PayOrder is the client for interacting with the PayOrder builders.
+	PayOrder *PayOrderClient
 	// Profile is the client for interacting with the Profile builders.
 	Profile *ProfileClient
 	// QuestionBank is the client for interacting with the QuestionBank builders.
 	QuestionBank *QuestionBankClient
+	// Sku is the client for interacting with the Sku builders.
+	Sku *SkuClient
 	// Test is the client for interacting with the Test builders.
 	Test *TestClient
 	// TestConfig is the client for interacting with the TestConfig builders.
@@ -164,11 +170,14 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
+	tx.Entitlement = NewEntitlementClient(tx.config)
 	tx.Game = NewGameClient(tx.config)
 	tx.MatchConfig = NewMatchConfigClient(tx.config)
 	tx.MatchSession = NewMatchSessionClient(tx.config)
+	tx.PayOrder = NewPayOrderClient(tx.config)
 	tx.Profile = NewProfileClient(tx.config)
 	tx.QuestionBank = NewQuestionBankClient(tx.config)
+	tx.Sku = NewSkuClient(tx.config)
 	tx.Test = NewTestClient(tx.config)
 	tx.TestConfig = NewTestConfigClient(tx.config)
 	tx.TestRecord = NewTestRecordClient(tx.config)

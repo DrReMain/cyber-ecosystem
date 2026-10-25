@@ -9,6 +9,9 @@ import (
 // AbilityScore is the predicate function for abilityscore builders.
 type AbilityScore func(*sql.Selector)
 
+// Entitlement is the predicate function for entitlement builders.
+type Entitlement func(*sql.Selector)
+
 // Game is the predicate function for game builders.
 type Game func(*sql.Selector)
 
@@ -18,11 +21,17 @@ type MatchConfig func(*sql.Selector)
 // MatchSession is the predicate function for matchsession builders.
 type MatchSession func(*sql.Selector)
 
+// PayOrder is the predicate function for payorder builders.
+type PayOrder func(*sql.Selector)
+
 // Profile is the predicate function for profile builders.
 type Profile func(*sql.Selector)
 
 // QuestionBank is the predicate function for questionbank builders.
 type QuestionBank func(*sql.Selector)
+
+// Sku is the predicate function for sku builders.
+type Sku func(*sql.Selector)
 
 // Test is the predicate function for test builders.
 type Test func(*sql.Selector)

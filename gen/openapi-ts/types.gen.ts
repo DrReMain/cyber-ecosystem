@@ -201,6 +201,43 @@ export type CyberEsportsV1CharacterCounterRound = {
     timeSpentMs?: number;
 };
 
+export type CyberEsportsV1CloseOrderRequest = {
+    orderNo?: string;
+};
+
+export type CyberEsportsV1CloseOrderResponse = {
+    order?: CyberEsportsV1Order;
+};
+
+export type CyberEsportsV1CreateOrderRequest = {
+    skuCode?: string;
+    /**
+     * The access context the client environment decided: in-WeChat pays by
+     * invoke, a phone browser by jump, a desktop by QR. The server validates
+     * it against the active provider's channel set and the hints it needs.
+     */
+    channel?: string;
+    /**
+     * The test record a trial sku unlocks — required for trial, must be
+     * absent for membership; the caller must own the record.
+     */
+    scopeRef?: string;
+    /**
+     * OpenID for in-WeChat payment, supplied by the wechat binding;
+     * required when the channel pays by invoke.
+     */
+    payerOpenid?: string;
+    /**
+     * Post-payment landing page for jump channels.
+     */
+    returnUrl?: string;
+};
+
+export type CyberEsportsV1CreateOrderResponse = {
+    order?: CyberEsportsV1Order;
+    credential?: CyberEsportsV1PayCredential;
+};
+
 export type CyberEsportsV1DualZoneBehavior = {
     elapsedMs?: number;
     /**
@@ -318,6 +355,10 @@ export type CyberEsportsV1GetMemberResponse = {
     member?: CyberEsportsV1Member;
 };
 
+export type CyberEsportsV1GetOrderResponse = {
+    order?: CyberEsportsV1Order;
+};
+
 export type CyberEsportsV1GetProfileResponse = {
     profile?: CyberEsportsV1Profile;
 };
@@ -342,6 +383,15 @@ export type CyberEsportsV1ListGamesResponse = {
 export type CyberEsportsV1ListMembersResponse = {
     page?: CyberSharedCommonV1PageResponse;
     members?: Array<CyberEsportsV1Member>;
+};
+
+export type CyberEsportsV1ListOrdersResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    orders?: Array<CyberEsportsV1Order>;
+};
+
+export type CyberEsportsV1ListSkusResponse = {
+    skus?: Array<CyberEsportsV1Sku>;
 };
 
 export type CyberEsportsV1ListTestsResponse = {
@@ -460,6 +510,32 @@ export type CyberEsportsV1MultiTargetPick = {
     elapsedMs?: number;
 };
 
+export type CyberEsportsV1NotifyPaymentRequest = {
+    /**
+     * Provider name routing to the platform's payment container — the same
+     * value set the platform configures (wechat, mock).
+     */
+    provider?: string;
+    /**
+     * The push exactly as it arrived; the provider's Notifier verifies the
+     * channel signature before anything settles. A map, not entries: the
+     * channels signing payment pushes never repeat a header.
+     */
+    headers?: {
+        [key: string]: string;
+    };
+    body?: string;
+};
+
+export type CyberEsportsV1NotifyPaymentResponse = {
+    /**
+     * False = parsed and verified but nothing settles (an event kind this
+     * build audits without acting on); the channel is still acked so
+     * redelivery stops — the query surface converges state regardless.
+     */
+    handled?: boolean;
+};
+
 export type CyberEsportsV1NumberStarsClick = {
     number?: number;
     elapsedMs?: number;
@@ -497,6 +573,40 @@ export type CyberEsportsV1OffenseDefenseDecision = {
  */
 export type CyberEsportsV1OffenseDefenseDetail = {
     decisions?: Array<CyberEsportsV1OffenseDefenseDecision>;
+};
+
+export type CyberEsportsV1Order = {
+    orderNo?: string;
+    skuCode?: string;
+    scope?: 'ORDER_SCOPE_UNSPECIFIED' | 'ORDER_SCOPE_TRIAL' | 'ORDER_SCOPE_PERIOD';
+    /**
+     * Trial: the test record this order unlocks. Period: null — the window
+     * shape comes from the sku.
+     */
+    scopeRef?: string;
+    provider?: string;
+    channel?: string;
+    amountFen?: string;
+    state?: 'ORDER_STATE_UNSPECIFIED' | 'ORDER_STATE_PENDING' | 'ORDER_STATE_PAID' | 'ORDER_STATE_CLOSED';
+    /**
+     * Channel transaction id once paid; null before.
+     */
+    transactionId?: string;
+    createdAt?: string;
+    /**
+     * Payment deadline; the order is not payable after it.
+     */
+    expiresAt?: string;
+    paidAt?: string;
+};
+
+export type CyberEsportsV1PayCredential = {
+    kind?: 'PAY_CREDENTIAL_KIND_UNSPECIFIED' | 'PAY_CREDENTIAL_KIND_INVOKE' | 'PAY_CREDENTIAL_KIND_JUMP_URL' | 'PAY_CREDENTIAL_KIND_QR_CODE';
+    /**
+     * Success implies present — create answers with the payer's
+     * continuation material or fails.
+     */
+    value?: string;
 };
 
 export type CyberEsportsV1Point = {
@@ -618,6 +728,32 @@ export type CyberEsportsV1SkillTrajectoryRound = {
     placementTimeMs?: number;
     selected?: boolean;
     placed?: boolean;
+};
+
+export type CyberEsportsV1Sku = {
+    /**
+     * Catalog code join key (e.g. member_month) — the row ULID never
+     * crosses the wire, the same law as game codes.
+     */
+    skuCode?: string;
+    name?: string;
+    description?: string;
+    kind?: 'SKU_KIND_UNSPECIFIED' | 'SKU_KIND_TRIAL' | 'SKU_KIND_MEMBERSHIP';
+    /**
+     * Fen amounts (1/100 yuan); money never rides yuan or floats anywhere.
+     */
+    priceFen?: string;
+    /**
+     * List price — equal to price_fen in M1; carried so discounting is
+     * product data, not a schema change.
+     */
+    listPriceFen?: string;
+    /**
+     * Membership window in days; null on trial skus.
+     */
+    periodDays?: number;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 export type CyberEsportsV1SubmitTestAttemptRequest = {
@@ -2283,6 +2419,119 @@ export type MemberServiceGetMemberResponses = {
 
 export type MemberServiceGetMemberResponse = MemberServiceGetMemberResponses[keyof MemberServiceGetMemberResponses];
 
+export type OrderServiceListOrdersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/esports/orders';
+};
+
+export type OrderServiceListOrdersResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListOrdersResponse;
+};
+
+export type OrderServiceListOrdersResponse = OrderServiceListOrdersResponses[keyof OrderServiceListOrdersResponses];
+
+export type OrderServiceCreateOrderData = {
+    body: CyberEsportsV1CreateOrderRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/orders';
+};
+
+export type OrderServiceCreateOrderResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1CreateOrderResponse;
+};
+
+export type OrderServiceCreateOrderResponse = OrderServiceCreateOrderResponses[keyof OrderServiceCreateOrderResponses];
+
+export type OrderServiceGetOrderData = {
+    body?: never;
+    path: {
+        orderNo: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/orders/{orderNo}';
+};
+
+export type OrderServiceGetOrderResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetOrderResponse;
+};
+
+export type OrderServiceGetOrderResponse = OrderServiceGetOrderResponses[keyof OrderServiceGetOrderResponses];
+
+export type OrderServiceCloseOrderData = {
+    body: CyberEsportsV1CloseOrderRequest;
+    path: {
+        orderNo: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/orders/{orderNo}/close';
+};
+
+export type OrderServiceCloseOrderResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1CloseOrderResponse;
+};
+
+export type OrderServiceCloseOrderResponse = OrderServiceCloseOrderResponses[keyof OrderServiceCloseOrderResponses];
+
+export type OrderServiceNotifyPaymentData = {
+    body: CyberEsportsV1NotifyPaymentRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/pay/notify';
+};
+
+export type OrderServiceNotifyPaymentResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1NotifyPaymentResponse;
+};
+
+export type OrderServiceNotifyPaymentResponse = OrderServiceNotifyPaymentResponses[keyof OrderServiceNotifyPaymentResponses];
+
 export type ProfileServiceGetProfileData = {
     body?: never;
     path?: never;
@@ -2314,6 +2563,22 @@ export type ProfileServiceUpdateProfileResponses = {
 };
 
 export type ProfileServiceUpdateProfileResponse = ProfileServiceUpdateProfileResponses[keyof ProfileServiceUpdateProfileResponses];
+
+export type SkuServiceListSkusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/skus';
+};
+
+export type SkuServiceListSkusResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListSkusResponse;
+};
+
+export type SkuServiceListSkusResponse = SkuServiceListSkusResponses[keyof SkuServiceListSkusResponses];
 
 export type TestServiceListTestsData = {
     body?: never;

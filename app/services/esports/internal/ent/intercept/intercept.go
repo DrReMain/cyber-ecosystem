@@ -8,12 +8,15 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
+	"cyber-ecosystem/app/services/esports/internal/ent/payorder"
 	"cyber-ecosystem/app/services/esports/internal/ent/predicate"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
+	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
@@ -104,6 +107,33 @@ func (f TraverseAbilityScore) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.AbilityScoreQuery", q)
 }
 
+// The EntitlementFunc type is an adapter to allow the use of ordinary function as a Querier.
+type EntitlementFunc func(context.Context, *ent.EntitlementQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f EntitlementFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.EntitlementQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.EntitlementQuery", q)
+}
+
+// The TraverseEntitlement type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseEntitlement func(context.Context, *ent.EntitlementQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseEntitlement) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseEntitlement) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.EntitlementQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.EntitlementQuery", q)
+}
+
 // The GameFunc type is an adapter to allow the use of ordinary function as a Querier.
 type GameFunc func(context.Context, *ent.GameQuery) (ent.Value, error)
 
@@ -185,6 +215,33 @@ func (f TraverseMatchSession) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.MatchSessionQuery", q)
 }
 
+// The PayOrderFunc type is an adapter to allow the use of ordinary function as a Querier.
+type PayOrderFunc func(context.Context, *ent.PayOrderQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f PayOrderFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.PayOrderQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.PayOrderQuery", q)
+}
+
+// The TraversePayOrder type is an adapter to allow the use of ordinary function as Traverser.
+type TraversePayOrder func(context.Context, *ent.PayOrderQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraversePayOrder) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraversePayOrder) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.PayOrderQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.PayOrderQuery", q)
+}
+
 // The ProfileFunc type is an adapter to allow the use of ordinary function as a Querier.
 type ProfileFunc func(context.Context, *ent.ProfileQuery) (ent.Value, error)
 
@@ -237,6 +294,33 @@ func (f TraverseQuestionBank) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.QuestionBankQuery", q)
+}
+
+// The SkuFunc type is an adapter to allow the use of ordinary function as a Querier.
+type SkuFunc func(context.Context, *ent.SkuQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f SkuFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.SkuQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SkuQuery", q)
+}
+
+// The TraverseSku type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseSku func(context.Context, *ent.SkuQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseSku) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseSku) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SkuQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.SkuQuery", q)
 }
 
 // The TestFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -325,16 +409,22 @@ func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
 	case *ent.AbilityScoreQuery:
 		return &query[*ent.AbilityScoreQuery, predicate.AbilityScore, abilityscore.OrderOption]{typ: ent.TypeAbilityScore, tq: q}, nil
+	case *ent.EntitlementQuery:
+		return &query[*ent.EntitlementQuery, predicate.Entitlement, entitlement.OrderOption]{typ: ent.TypeEntitlement, tq: q}, nil
 	case *ent.GameQuery:
 		return &query[*ent.GameQuery, predicate.Game, game.OrderOption]{typ: ent.TypeGame, tq: q}, nil
 	case *ent.MatchConfigQuery:
 		return &query[*ent.MatchConfigQuery, predicate.MatchConfig, matchconfig.OrderOption]{typ: ent.TypeMatchConfig, tq: q}, nil
 	case *ent.MatchSessionQuery:
 		return &query[*ent.MatchSessionQuery, predicate.MatchSession, matchsession.OrderOption]{typ: ent.TypeMatchSession, tq: q}, nil
+	case *ent.PayOrderQuery:
+		return &query[*ent.PayOrderQuery, predicate.PayOrder, payorder.OrderOption]{typ: ent.TypePayOrder, tq: q}, nil
 	case *ent.ProfileQuery:
 		return &query[*ent.ProfileQuery, predicate.Profile, profile.OrderOption]{typ: ent.TypeProfile, tq: q}, nil
 	case *ent.QuestionBankQuery:
 		return &query[*ent.QuestionBankQuery, predicate.QuestionBank, questionbank.OrderOption]{typ: ent.TypeQuestionBank, tq: q}, nil
+	case *ent.SkuQuery:
+		return &query[*ent.SkuQuery, predicate.Sku, sku.OrderOption]{typ: ent.TypeSku, tq: q}, nil
 	case *ent.TestQuery:
 		return &query[*ent.TestQuery, predicate.Test, test.OrderOption]{typ: ent.TypeTest, tq: q}, nil
 	case *ent.TestConfigQuery:

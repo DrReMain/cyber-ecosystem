@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// Purchasable catalog read face for the member plane. Values are product
+// territory (P1: a single purchase permanently unlocks one trial's
+// report; membership is a 31-day window); the structure carries both the
+// selling price and the list price so a future discount display is a
+// value change, not a contract change — no discount is displayed either
+// way in M1.
+service SkuService {
+  option (cyber.ext.v1.service_comment) = "SKU";
+  rpc ListSkus(ListSkusRequest) returns (ListSkusResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "在售SKU列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/skus"};
+  }
+}
+
+// What a sku sells: a trial unlocks one test record's report
+// permanently; a membership opens a time window during which reports
+// auto-unlock and stay unlocked forever.
+enum SkuKind {
+  SKU_KIND_UNSPECIFIED = 0;
+  SKU_KIND_TRIAL = 1;
+  SKU_KIND_MEMBERSHIP = 2;
+}
+
+message Sku {
+  // Catalog code join key (e.g. member_month) — the row ULID never
+  // crosses the wire, the same law as game codes.
+  google.protobuf.StringValue sku_code = 1;
+  google.protobuf.StringValue name = 2;
+  google.protobuf.StringValue description = 3;
+  SkuKind kind = 4;
+  // Fen amounts (1/100 yuan); money never rides yuan or floats anywhere.
+  google.protobuf.Int64Value price_fen = 5;
+  // List price — equal to price_fen in M1; carried so discounting is
+  // product data, not a schema change.
+  google.protobuf.Int64Value list_price_fen = 6;
+  // Membership window in days; null on trial skus.
+  google.protobuf.Int32Value period_days = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message ListSkusRequest {}
+
+message ListSkusResponse {
+  repeated Sku skus = 1;
+}

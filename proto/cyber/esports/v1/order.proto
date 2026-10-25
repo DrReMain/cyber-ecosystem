@@ -1,0 +1,237 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The order aggregate's faces. The member plane creates and reads its own
+// orders; creating again for the same grant target while a pending order
+// lives returns that order. NotifyPayment is the service's only public
+// face: its callers are payment channels pushing their envelopes, and
+// they authenticate by the channel signature inside the payload, never by
+// a session — the notification accelerates settlement, the query surface
+// converges it.
+service OrderService {
+  option (cyber.ext.v1.service_comment) = "订单";
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "创建订单"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/orders"
+      body: "*"
+    };
+  }
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "订单详情"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/orders/{order_no}"};
+  }
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "我的订单"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/orders"};
+  }
+  rpc CloseOrder(CloseOrderRequest) returns (CloseOrderResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "取消订单"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/orders/{order_no}/close"
+      body: "*"
+    };
+  }
+  rpc NotifyPayment(NotifyPaymentRequest) returns (NotifyPaymentResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "渠道支付通知"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {
+      post: "/api/v1/esports/pay/notify"
+      body: "*"
+    };
+  }
+}
+
+// What the order's grant points at: a trial unlocks one test record, a
+// period opens the membership window.
+enum OrderScope {
+  ORDER_SCOPE_UNSPECIFIED = 0;
+  ORDER_SCOPE_TRIAL = 1;
+  ORDER_SCOPE_PERIOD = 2;
+}
+
+// The local projection of the channel's payment state; paid is terminal
+// (a refund is a derived fact on a paid order, not a state).
+enum OrderState {
+  ORDER_STATE_UNSPECIFIED = 0;
+  ORDER_STATE_PENDING = 1;
+  ORDER_STATE_PAID = 2;
+  ORDER_STATE_CLOSED = 3;
+}
+
+// How the page continues the payment from the channel's answer.
+enum PayCredentialKind {
+  PAY_CREDENTIAL_KIND_UNSPECIFIED = 0;
+  PAY_CREDENTIAL_KIND_INVOKE = 1;
+  PAY_CREDENTIAL_KIND_JUMP_URL = 2;
+  PAY_CREDENTIAL_KIND_QR_CODE = 3;
+}
+
+message Order {
+  google.protobuf.StringValue order_no = 1;
+  google.protobuf.StringValue sku_code = 2;
+  OrderScope scope = 3;
+  // Trial: the test record this order unlocks. Period: null — the window
+  // shape comes from the sku.
+  google.protobuf.StringValue scope_ref = 4;
+  google.protobuf.StringValue provider = 5;
+  google.protobuf.StringValue channel = 6;
+  google.protobuf.Int64Value amount_fen = 7;
+  OrderState state = 8;
+  // Channel transaction id once paid; null before.
+  google.protobuf.StringValue transaction_id = 9;
+  google.protobuf.Timestamp created_at = 10;
+  // Payment deadline; the order is not payable after it.
+  google.protobuf.Timestamp expires_at = 11;
+  google.protobuf.Timestamp paid_at = 12;
+}
+
+message PayCredential {
+  PayCredentialKind kind = 1;
+  // Success implies present — create answers with the payer's
+  // continuation material or fails.
+  string value = 2;
+}
+
+message CreateOrderRequest {
+  optional string sku_code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 50
+    }
+  ];
+  // The access context the client environment decided: in-WeChat pays by
+  // invoke, a phone browser by jump, a desktop by QR. The server validates
+  // it against the active provider's channel set and the hints it needs.
+  optional string channel = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 32
+    }
+  ];
+  // The test record a trial sku unlocks — required for trial, must be
+  // absent for membership; the caller must own the record.
+  optional string scope_ref = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
+  // OpenID for in-WeChat payment, supplied by the wechat binding;
+  // required when the channel pays by invoke.
+  optional string payer_openid = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 128
+  }];
+  // Post-payment landing page for jump channels.
+  optional string return_url = 5 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 500
+  }];
+}
+
+message CreateOrderResponse {
+  Order order = 1;
+  PayCredential credential = 2;
+}
+
+message GetOrderRequest {
+  string order_no = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 32
+    }
+  ];
+}
+
+message GetOrderResponse {
+  Order order = 1;
+}
+
+// listOrders — the caller's own orders, newest first.
+message ListOrdersRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+}
+
+message ListOrdersResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated Order orders = 2;
+}
+
+message CloseOrderRequest {
+  string order_no = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 32
+    }
+  ];
+}
+
+message CloseOrderResponse {
+  Order order = 1;
+}
+
+message NotifyPaymentRequest {
+  // Provider name routing to the platform's payment container — the same
+  // value set the platform configures (wechat, mock).
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 32
+    }
+  ];
+  // The push exactly as it arrived; the provider's Notifier verifies the
+  // channel signature before anything settles. A map, not entries: the
+  // channels signing payment pushes never repeat a header.
+  map<string, string> headers = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).map.min_pairs = 1
+  ];
+  bytes body = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).bytes = {
+      min_len: 1
+      max_len: 65536
+    }
+  ];
+}
+
+message NotifyPaymentResponse {
+  // False = parsed and verified but nothing settles (an event kind this
+  // build audits without acting on); the channel is still acked so
+  // redelivery stops — the query surface converges state regardless.
+  bool handled = 1;
+}

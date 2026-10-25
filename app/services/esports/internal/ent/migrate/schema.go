@@ -58,6 +58,41 @@ var (
 			},
 		},
 	}
+	// EntitlementColumns holds the columns for the "entitlement" table.
+	EntitlementColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "holding member identity (system user id), logical reference — same key law as profile"},
+		{Name: "scope_kind", Type: field.TypeEnum, Comment: "grant shape: trial points at one record permanently, membership opens a window", Enums: []string{"trial", "membership"}},
+		{Name: "scope_ref", Type: field.TypeString, Nullable: true, Size: 32, Comment: "trial: the unlocked test record id; membership: null — renewal rows stack instead of dedup"},
+		{Name: "expires_at", Type: field.TypeTime, Nullable: true, Comment: "membership window end (paid_at + period days); null on trial rows — permanence is the absence of a deadline"},
+		{Name: "source", Type: field.TypeString, Size: 64, Comment: "granting artifact id — the order number today; activation codes join this column when they land"},
+	}
+	// EntitlementTable holds the schema information for the "entitlement" table.
+	EntitlementTable = &schema.Table{
+		Name:       "entitlement",
+		Columns:    EntitlementColumns,
+		PrimaryKey: []*schema.Column{EntitlementColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "entitlement_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{EntitlementColumns[1]},
+			},
+			{
+				Name:    "entitlement_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{EntitlementColumns[2]},
+			},
+			{
+				Name:    "entitlement_tenant_id_user_id_scope_kind_scope_ref",
+				Unique:  true,
+				Columns: []*schema.Column{EntitlementColumns[3], EntitlementColumns[4], EntitlementColumns[5], EntitlementColumns[6]},
+			},
+		},
+	}
 	// GameColumns holds the columns for the "game" table.
 	GameColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -200,6 +235,68 @@ var (
 			},
 		},
 	}
+	// PayOrderColumns holds the columns for the "pay_order" table.
+	PayOrderColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "order_no", Type: field.TypeString, Size: 32, Comment: "business order number ('P'+ULID) — the channel idempotency key (out_trade_no) and the audit join key into bills"},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "buying member identity (system user id), logical reference — same key law as profile"},
+		{Name: "sku_code", Type: field.TypeString, Size: 50, Comment: "sku catalog code at purchase time (snapshot; later sku edits never rewrite history)"},
+		{Name: "scope_kind", Type: field.TypeEnum, Comment: "grant shape: trial unlocks one test record (scope_ref), period opens the membership window", Enums: []string{"trial", "period"}},
+		{Name: "scope_ref", Type: field.TypeString, Nullable: true, Size: 32, Comment: "trial: the test record id being unlocked; period: null — the window shape comes from the sku"},
+		{Name: "provider", Type: field.TypeString, Size: 16, Comment: "payment provider name (wechat, mock) — the key the platform's container map routes query/close by"},
+		{Name: "channel", Type: field.TypeString, Size: 32, Comment: "access-context channel value (provider vocabulary, e.g. wechat_jsapi); fixes how the credential is consumed"},
+		{Name: "amount_fen", Type: field.TypeInt64, Comment: "agreed amount in fen, frozen at creation; settlement verifies the channel-reported amount against it"},
+		{Name: "state", Type: field.TypeEnum, Comment: "channel-state projection; paid is terminal — refunds are derived facts, not states", Enums: []string{"pending", "paid", "closed"}, Default: "pending"},
+		{Name: "credential_kind", Type: field.TypeString, Size: 16, Comment: "how the page consumes the credential (invoke|jump_url|qr_code), snapshotted with the value"},
+		{Name: "credential_value", Type: field.TypeString, Size: 1024, Comment: "channel credential at creation; same-scope reuse replays it with zero channel round trips"},
+		{Name: "transaction_id", Type: field.TypeString, Nullable: true, Size: 64, Comment: "channel transaction id, backfilled at settlement — the bill-reconciliation join key"},
+		{Name: "expires_at", Type: field.TypeTime, Comment: "payment deadline carried from creation (channel default two hours); expiry closes pending orders"},
+		{Name: "paid_at", Type: field.TypeTime, Nullable: true, Comment: "channel-side payment time; the entitlement window starts here for membership"},
+	}
+	// PayOrderTable holds the schema information for the "pay_order" table.
+	PayOrderTable = &schema.Table{
+		Name:       "pay_order",
+		Columns:    PayOrderColumns,
+		PrimaryKey: []*schema.Column{PayOrderColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "payorder_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{PayOrderColumns[1]},
+			},
+			{
+				Name:    "payorder_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{PayOrderColumns[2]},
+			},
+			{
+				Name:    "payorder_order_no",
+				Unique:  true,
+				Columns: []*schema.Column{PayOrderColumns[4]},
+			},
+			{
+				Name:    "payorder_tenant_id_user_id_scope_kind_scope_ref",
+				Unique:  true,
+				Columns: []*schema.Column{PayOrderColumns[3], PayOrderColumns[5], PayOrderColumns[7], PayOrderColumns[8]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "state = 'pending'",
+				},
+			},
+			{
+				Name:    "payorder_state_expires_at",
+				Unique:  false,
+				Columns: []*schema.Column{PayOrderColumns[12], PayOrderColumns[16]},
+			},
+			{
+				Name:    "payorder_tenant_id_user_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{PayOrderColumns[3], PayOrderColumns[5], PayOrderColumns[1]},
+			},
+		},
+	}
 	// ProfileColumns holds the columns for the "profile" table.
 	ProfileColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -284,6 +381,48 @@ var (
 				Name:    "questionbank_test_code_scenario_code",
 				Unique:  true,
 				Columns: []*schema.Column{QuestionBankColumns[5], QuestionBankColumns[6]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+		},
+	}
+	// SkuColumns holds the columns for the "sku" table.
+	SkuColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "code", Type: field.TypeString, Size: 50, Comment: "catalog code join key (e.g. member_month); orders snapshot it, the row ULID never crosses a boundary"},
+		{Name: "kind", Type: field.TypeEnum, Comment: "what the sku sells: one trial's report permanently vs a membership window", Enums: []string{"trial", "membership"}},
+		{Name: "name", Type: field.TypeString, Size: 100, Comment: "display title (pay sheet line); also the channel order description source"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 200, Comment: "pay-sheet blurb under the title"},
+		{Name: "price_fen", Type: field.TypeInt64, Comment: "selling price in fen (1/100 yuan) — money stays integer fen end to end"},
+		{Name: "list_price_fen", Type: field.TypeInt64, Comment: "list (pre-discount) price; equals price_fen while no discount is shown, carried so discounting stays a value change"},
+		{Name: "period_days", Type: field.TypeInt, Nullable: true, Comment: "membership window in days (31: the 32nd day expires); null on trial skus"},
+		{Name: "on_shelf", Type: field.TypeBool, Comment: "member-plane visibility switch; off-shelf rows stay for order-history joins", Default: true},
+	}
+	// SkuTable holds the schema information for the "sku" table.
+	SkuTable = &schema.Table{
+		Name:       "sku",
+		Columns:    SkuColumns,
+		PrimaryKey: []*schema.Column{SkuColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "sku_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{SkuColumns[1]},
+			},
+			{
+				Name:    "sku_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{SkuColumns[2]},
+			},
+			{
+				Name:    "sku_code",
+				Unique:  true,
+				Columns: []*schema.Column{SkuColumns[5]},
 				Annotation: &entsql.IndexAnnotation{
 					Where: "deleted_at IS NULL",
 				},
@@ -445,11 +584,14 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoreTable,
+		EntitlementTable,
 		GameTable,
 		MatchConfigTable,
 		MatchSessionTable,
+		PayOrderTable,
 		ProfileTable,
 		QuestionBankTable,
+		SkuTable,
 		TestTable,
 		TestConfigTable,
 		TestRecordTable,
@@ -460,6 +602,9 @@ func init() {
 	AbilityScoreTable.Annotation = &entsql.Annotation{
 		Table: "ability_score",
 	}
+	EntitlementTable.Annotation = &entsql.Annotation{
+		Table: "entitlement",
+	}
 	GameTable.Annotation = &entsql.Annotation{
 		Table: "game",
 	}
@@ -469,11 +614,17 @@ func init() {
 	MatchSessionTable.Annotation = &entsql.Annotation{
 		Table: "match_session",
 	}
+	PayOrderTable.Annotation = &entsql.Annotation{
+		Table: "pay_order",
+	}
 	ProfileTable.Annotation = &entsql.Annotation{
 		Table: "profile",
 	}
 	QuestionBankTable.Annotation = &entsql.Annotation{
 		Table: "question_bank",
+	}
+	SkuTable.Annotation = &entsql.Annotation{
+		Table: "sku",
 	}
 	TestTable.Annotation = &entsql.Annotation{
 		Table: "test",

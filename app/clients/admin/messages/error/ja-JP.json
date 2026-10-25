@@ -99,5 +99,20 @@
   "error_ESPORTS_MATCH_GENRE_UNKNOWN": "サポートされていないゲームジャンルです",
   "error_ESPORTS_MATCH_SESSION_NOT_FOUND": "セッションが無効です。最初からやり直してください",
   "error_ESPORTS_MATCH_TEST_NOT_IN_SESSION": "このテストは現在の編成に含まれていません",
-  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "このテストの再挑戦回数を使い切りました"
+  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "このテストの再挑戦回数を使い切りました",
+  "error_ESPORTS_ORDER_NOT_FOUND": "注文が見つからないか、無効になっています",
+  "error_ESPORTS_SKU_NOT_FOUND": "商品が見つかりません",
+  "error_ESPORTS_SKU_OFF_SHELF": "商品は現在販売休止中のため購入できません",
+  "error_ESPORTS_ORDER_SCOPE_INVALID": "ロック解除の対象が無効です。入り直してお試しください",
+  "error_ESPORTS_ORDER_SCOPE_ALREADY_GRANTED": "このレポートは既にロック解除済みのため、再度購入は不要です",
+  "error_ESPORTS_ORDER_CHANNEL_INVALID": "現在の環境ではこの支払い方法をご利用いただけません",
+  "error_ESPORTS_ORDER_STATE_CONFLICT": "注文の状態が変わりました。更新して再試行してください",
+  "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "支払いリクエストが無効です。しばらくしてからお試しください",
+  "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "決済チャネルで該当の取引が見つかりません。しばらくしてからお試しください",
+  "error_INFRA_ERROR_PAYMENT_DUPLICATE": "重複した支払いリクエストです。しばらくしてからお試しください",
+  "error_INFRA_ERROR_PAYMENT_CHANNEL_REJECTED": "決済チャネルに拒否されました。しばらくしてからお試しください",
+  "error_INFRA_ERROR_PAYMENT_UNAVAILABLE": "決済チャネルが一時的に利用できません。しばらくしてからお試しください",
+  "error_INFRA_ERROR_PAYMENT_TIMEOUT": "支払いリクエストがタイムアウトしました。しばらくしてからお試しください",
+  "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "支払い通知の検証に失敗しました。しばらくしてからお試しください",
+  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "支払い通知の復号に失敗しました。しばらくしてからお試しください"
 }

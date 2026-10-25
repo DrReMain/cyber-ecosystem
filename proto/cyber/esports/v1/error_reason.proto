@@ -33,4 +33,13 @@ enum Esports {
   ESPORTS_MATCH_SESSION_NOT_FOUND = 6132 [(.errors.code) = 404];
   ESPORTS_MATCH_TEST_NOT_IN_SESSION = 6133 [(.errors.code) = 400];
   ESPORTS_MATCH_RETEST_EXHAUSTED = 6134 [(.errors.code) = 400];
+
+  // 614x: order & sku
+  ESPORTS_ORDER_NOT_FOUND = 6140 [(.errors.code) = 404];
+  ESPORTS_SKU_NOT_FOUND = 6141 [(.errors.code) = 404];
+  ESPORTS_SKU_OFF_SHELF = 6142 [(.errors.code) = 400];
+  ESPORTS_ORDER_SCOPE_INVALID = 6143 [(.errors.code) = 400];
+  ESPORTS_ORDER_SCOPE_ALREADY_GRANTED = 6144 [(.errors.code) = 400];
+  ESPORTS_ORDER_CHANNEL_INVALID = 6145 [(.errors.code) = 400];
+  ESPORTS_ORDER_STATE_CONFLICT = 6146 [(.errors.code) = 400];
 }

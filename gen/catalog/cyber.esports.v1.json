@@ -92,6 +92,80 @@
     ]
   },
   {
+    "name": "OrderService",
+    "full_name": "cyber.esports.v1.OrderService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/order.proto",
+    "comment": "订单",
+    "methods": [
+      {
+        "name": "CloseOrder",
+        "full_name": "cyber.esports.v1.OrderService.CloseOrder",
+        "request_name": "CloseOrderRequest",
+        "request_full_name": "cyber.esports.v1.CloseOrderRequest",
+        "response_name": "CloseOrderResponse",
+        "response_full_name": "cyber.esports.v1.CloseOrderResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/orders/{order_no}/close",
+        "comment": "取消订单",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "CreateOrder",
+        "full_name": "cyber.esports.v1.OrderService.CreateOrder",
+        "request_name": "CreateOrderRequest",
+        "request_full_name": "cyber.esports.v1.CreateOrderRequest",
+        "response_name": "CreateOrderResponse",
+        "response_full_name": "cyber.esports.v1.CreateOrderResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/orders",
+        "comment": "创建订单",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "GetOrder",
+        "full_name": "cyber.esports.v1.OrderService.GetOrder",
+        "request_name": "GetOrderRequest",
+        "request_full_name": "cyber.esports.v1.GetOrderRequest",
+        "response_name": "GetOrderResponse",
+        "response_full_name": "cyber.esports.v1.GetOrderResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/orders/{order_no}",
+        "comment": "订单详情",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "ListOrders",
+        "full_name": "cyber.esports.v1.OrderService.ListOrders",
+        "request_name": "ListOrdersRequest",
+        "request_full_name": "cyber.esports.v1.ListOrdersRequest",
+        "response_name": "ListOrdersResponse",
+        "response_full_name": "cyber.esports.v1.ListOrdersResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/orders",
+        "comment": "我的订单",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "NotifyPayment",
+        "full_name": "cyber.esports.v1.OrderService.NotifyPayment",
+        "request_name": "NotifyPaymentRequest",
+        "request_full_name": "cyber.esports.v1.NotifyPaymentRequest",
+        "response_name": "NotifyPaymentResponse",
+        "response_full_name": "cyber.esports.v1.NotifyPaymentResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/pay/notify",
+        "comment": "渠道支付通知",
+        "access": "PUBLIC",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "ProfileService",
     "full_name": "cyber.esports.v1.ProfileService",
     "package": "cyber.esports.v1",
@@ -121,6 +195,28 @@
         "http_method": "PUT",
         "http_path": "/api/v1/esports/profile",
         "comment": "保存当前玩家画像",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "SkuService",
+    "full_name": "cyber.esports.v1.SkuService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/sku.proto",
+    "comment": "SKU",
+    "methods": [
+      {
+        "name": "ListSkus",
+        "full_name": "cyber.esports.v1.SkuService.ListSkus",
+        "request_name": "ListSkusRequest",
+        "request_full_name": "cyber.esports.v1.ListSkusRequest",
+        "response_name": "ListSkusResponse",
+        "response_full_name": "cyber.esports.v1.ListSkusResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/skus",
+        "comment": "在售SKU列表",
         "access": "BUILTIN",
         "datascope": false
       }

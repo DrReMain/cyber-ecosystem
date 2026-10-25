@@ -99,5 +99,20 @@
   "error_ESPORTS_MATCH_GENRE_UNKNOWN": "نوع لعبة غير مدعوم",
   "error_ESPORTS_MATCH_SESSION_NOT_FOUND": "انتهت صلاحية جلسة التقييم. ابدأ من جديد",
   "error_ESPORTS_MATCH_TEST_NOT_IN_SESSION": "هذا الاختبار ليس ضمن الترتيب الحالي",
-  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "استنفدت فرص إعادة هذا الاختبار"
+  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "استنفدت فرص إعادة هذا الاختبار",
+  "error_ESPORTS_ORDER_NOT_FOUND": "لم يتم العثور على الطلب أو لم يعد صالحًا",
+  "error_ESPORTS_SKU_NOT_FOUND": "لم يتم العثور على المنتج",
+  "error_ESPORTS_SKU_OFF_SHELF": "المنتج غير متاح للبيع حاليًا فلا يمكن شراؤه",
+  "error_ESPORTS_ORDER_SCOPE_INVALID": "هدف فتح القفل غير صالح، يرجى الدخول مرة أخرى والمحاولة",
+  "error_ESPORTS_ORDER_SCOPE_ALREADY_GRANTED": "تم فتح قفل هذا التقرير بالفعل؛ لا حاجة للشراء مجددًا",
+  "error_ESPORTS_ORDER_CHANNEL_INVALID": "طريقة الدفع هذه غير متاحة في البيئة الحالية",
+  "error_ESPORTS_ORDER_STATE_CONFLICT": "تغيّرت حالة الطلب، يرجى التحديث والمحاولة مرة أخرى",
+  "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "طلب الدفع غير صالح، حاول مرة أخرى لاحقًا",
+  "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "لم يعثر قناة الدفع على هذه المعاملة، حاول مرة أخرى لاحقًا",
+  "error_INFRA_ERROR_PAYMENT_DUPLICATE": "طلب دفع مكرر، حاول مرة أخرى لاحقًا",
+  "error_INFRA_ERROR_PAYMENT_CHANNEL_REJECTED": "رفضت قناة الدفع هذا الطلب، حاول مرة أخرى لاحقًا",
+  "error_INFRA_ERROR_PAYMENT_UNAVAILABLE": "قناة الدفع غير متاحة مؤقتًا، حاول مرة أخرى لاحقًا",
+  "error_INFRA_ERROR_PAYMENT_TIMEOUT": "انتهت مهلة طلب الدفع، حاول مرة أخرى لاحقًا",
+  "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "فشل التحقق من إشعار الدفع، حاول مرة أخرى لاحقًا",
+  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "فشل فك تشفير إشعار الدفع، حاول مرة أخرى لاحقًا"
 }

@@ -12,11 +12,14 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/migrate"
 
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
+	"cyber-ecosystem/app/services/esports/internal/ent/payorder"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
+	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
@@ -35,16 +38,22 @@ type Client struct {
 	Schema *migrate.Schema
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// Entitlement is the client for interacting with the Entitlement builders.
+	Entitlement *EntitlementClient
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
 	// MatchConfig is the client for interacting with the MatchConfig builders.
 	MatchConfig *MatchConfigClient
 	// MatchSession is the client for interacting with the MatchSession builders.
 	MatchSession *MatchSessionClient
+	// PayOrder is the client for interacting with the PayOrder builders.
+	PayOrder *PayOrderClient
 	// Profile is the client for interacting with the Profile builders.
 	Profile *ProfileClient
 	// QuestionBank is the client for interacting with the QuestionBank builders.
 	QuestionBank *QuestionBankClient
+	// Sku is the client for interacting with the Sku builders.
+	Sku *SkuClient
 	// Test is the client for interacting with the Test builders.
 	Test *TestClient
 	// TestConfig is the client for interacting with the TestConfig builders.
@@ -63,11 +72,14 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
+	c.Entitlement = NewEntitlementClient(c.config)
 	c.Game = NewGameClient(c.config)
 	c.MatchConfig = NewMatchConfigClient(c.config)
 	c.MatchSession = NewMatchSessionClient(c.config)
+	c.PayOrder = NewPayOrderClient(c.config)
 	c.Profile = NewProfileClient(c.config)
 	c.QuestionBank = NewQuestionBankClient(c.config)
+	c.Sku = NewSkuClient(c.config)
 	c.Test = NewTestClient(c.config)
 	c.TestConfig = NewTestConfigClient(c.config)
 	c.TestRecord = NewTestRecordClient(c.config)
@@ -164,11 +176,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:          ctx,
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
+		Entitlement:  NewEntitlementClient(cfg),
 		Game:         NewGameClient(cfg),
 		MatchConfig:  NewMatchConfigClient(cfg),
 		MatchSession: NewMatchSessionClient(cfg),
+		PayOrder:     NewPayOrderClient(cfg),
 		Profile:      NewProfileClient(cfg),
 		QuestionBank: NewQuestionBankClient(cfg),
+		Sku:          NewSkuClient(cfg),
 		Test:         NewTestClient(cfg),
 		TestConfig:   NewTestConfigClient(cfg),
 		TestRecord:   NewTestRecordClient(cfg),
@@ -192,11 +207,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:          ctx,
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
+		Entitlement:  NewEntitlementClient(cfg),
 		Game:         NewGameClient(cfg),
 		MatchConfig:  NewMatchConfigClient(cfg),
 		MatchSession: NewMatchSessionClient(cfg),
+		PayOrder:     NewPayOrderClient(cfg),
 		Profile:      NewProfileClient(cfg),
 		QuestionBank: NewQuestionBankClient(cfg),
+		Sku:          NewSkuClient(cfg),
 		Test:         NewTestClient(cfg),
 		TestConfig:   NewTestConfigClient(cfg),
 		TestRecord:   NewTestRecordClient(cfg),
@@ -229,8 +247,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityScore, c.Game, c.MatchConfig, c.MatchSession, c.Profile,
-		c.QuestionBank, c.Test, c.TestConfig, c.TestRecord,
+		c.AbilityScore, c.Entitlement, c.Game, c.MatchConfig, c.MatchSession,
+		c.PayOrder, c.Profile, c.QuestionBank, c.Sku, c.Test, c.TestConfig,
+		c.TestRecord,
 	} {
 		n.Use(hooks...)
 	}
@@ -240,8 +259,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityScore, c.Game, c.MatchConfig, c.MatchSession, c.Profile,
-		c.QuestionBank, c.Test, c.TestConfig, c.TestRecord,
+		c.AbilityScore, c.Entitlement, c.Game, c.MatchConfig, c.MatchSession,
+		c.PayOrder, c.Profile, c.QuestionBank, c.Sku, c.Test, c.TestConfig,
+		c.TestRecord,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -252,16 +272,22 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AbilityScoreMutation:
 		return c.AbilityScore.mutate(ctx, m)
+	case *EntitlementMutation:
+		return c.Entitlement.mutate(ctx, m)
 	case *GameMutation:
 		return c.Game.mutate(ctx, m)
 	case *MatchConfigMutation:
 		return c.MatchConfig.mutate(ctx, m)
 	case *MatchSessionMutation:
 		return c.MatchSession.mutate(ctx, m)
+	case *PayOrderMutation:
+		return c.PayOrder.mutate(ctx, m)
 	case *ProfileMutation:
 		return c.Profile.mutate(ctx, m)
 	case *QuestionBankMutation:
 		return c.QuestionBank.mutate(ctx, m)
+	case *SkuMutation:
+		return c.Sku.mutate(ctx, m)
 	case *TestMutation:
 		return c.Test.mutate(ctx, m)
 	case *TestConfigMutation:
@@ -405,6 +431,141 @@ func (c *AbilityScoreClient) mutate(ctx context.Context, m *AbilityScoreMutation
 		return (&AbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AbilityScore mutation op: %q", m.Op())
+	}
+}
+
+// EntitlementClient is a client for the Entitlement schema.
+type EntitlementClient struct {
+	config
+}
+
+// NewEntitlementClient returns a client for the Entitlement from the given config.
+func NewEntitlementClient(c config) *EntitlementClient {
+	return &EntitlementClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `entitlement.Hooks(f(g(h())))`.
+func (c *EntitlementClient) Use(hooks ...Hook) {
+	c.hooks.Entitlement = append(c.hooks.Entitlement, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `entitlement.Intercept(f(g(h())))`.
+func (c *EntitlementClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Entitlement = append(c.inters.Entitlement, interceptors...)
+}
+
+// Create returns a builder for creating a Entitlement entity.
+func (c *EntitlementClient) Create() *EntitlementCreate {
+	mutation := newEntitlementMutation(c.config, OpCreate)
+	return &EntitlementCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Entitlement entities.
+func (c *EntitlementClient) CreateBulk(builders ...*EntitlementCreate) *EntitlementCreateBulk {
+	return &EntitlementCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EntitlementClient) MapCreateBulk(slice any, setFunc func(*EntitlementCreate, int)) *EntitlementCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EntitlementCreateBulk{err: fmt.Errorf("calling to EntitlementClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EntitlementCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EntitlementCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Entitlement.
+func (c *EntitlementClient) Update() *EntitlementUpdate {
+	mutation := newEntitlementMutation(c.config, OpUpdate)
+	return &EntitlementUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EntitlementClient) UpdateOne(_m *Entitlement) *EntitlementUpdateOne {
+	mutation := newEntitlementMutation(c.config, OpUpdateOne, withEntitlement(_m))
+	return &EntitlementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EntitlementClient) UpdateOneID(id string) *EntitlementUpdateOne {
+	mutation := newEntitlementMutation(c.config, OpUpdateOne, withEntitlementID(id))
+	return &EntitlementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Entitlement.
+func (c *EntitlementClient) Delete() *EntitlementDelete {
+	mutation := newEntitlementMutation(c.config, OpDelete)
+	return &EntitlementDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EntitlementClient) DeleteOne(_m *Entitlement) *EntitlementDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EntitlementClient) DeleteOneID(id string) *EntitlementDeleteOne {
+	builder := c.Delete().Where(entitlement.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EntitlementDeleteOne{builder}
+}
+
+// Query returns a query builder for Entitlement.
+func (c *EntitlementClient) Query() *EntitlementQuery {
+	return &EntitlementQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEntitlement},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Entitlement entity by its id.
+func (c *EntitlementClient) Get(ctx context.Context, id string) (*Entitlement, error) {
+	return c.Query().Where(entitlement.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EntitlementClient) GetX(ctx context.Context, id string) *Entitlement {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *EntitlementClient) Hooks() []Hook {
+	hooks := c.hooks.Entitlement
+	return append(hooks[:len(hooks):len(hooks)], entitlement.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *EntitlementClient) Interceptors() []Interceptor {
+	inters := c.inters.Entitlement
+	return append(inters[:len(inters):len(inters)], entitlement.Interceptors[:]...)
+}
+
+func (c *EntitlementClient) mutate(ctx context.Context, m *EntitlementMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EntitlementCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EntitlementUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EntitlementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EntitlementDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Entitlement mutation op: %q", m.Op())
 	}
 }
 
@@ -813,6 +974,141 @@ func (c *MatchSessionClient) mutate(ctx context.Context, m *MatchSessionMutation
 	}
 }
 
+// PayOrderClient is a client for the PayOrder schema.
+type PayOrderClient struct {
+	config
+}
+
+// NewPayOrderClient returns a client for the PayOrder from the given config.
+func NewPayOrderClient(c config) *PayOrderClient {
+	return &PayOrderClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `payorder.Hooks(f(g(h())))`.
+func (c *PayOrderClient) Use(hooks ...Hook) {
+	c.hooks.PayOrder = append(c.hooks.PayOrder, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `payorder.Intercept(f(g(h())))`.
+func (c *PayOrderClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PayOrder = append(c.inters.PayOrder, interceptors...)
+}
+
+// Create returns a builder for creating a PayOrder entity.
+func (c *PayOrderClient) Create() *PayOrderCreate {
+	mutation := newPayOrderMutation(c.config, OpCreate)
+	return &PayOrderCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of PayOrder entities.
+func (c *PayOrderClient) CreateBulk(builders ...*PayOrderCreate) *PayOrderCreateBulk {
+	return &PayOrderCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PayOrderClient) MapCreateBulk(slice any, setFunc func(*PayOrderCreate, int)) *PayOrderCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PayOrderCreateBulk{err: fmt.Errorf("calling to PayOrderClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PayOrderCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PayOrderCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for PayOrder.
+func (c *PayOrderClient) Update() *PayOrderUpdate {
+	mutation := newPayOrderMutation(c.config, OpUpdate)
+	return &PayOrderUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PayOrderClient) UpdateOne(_m *PayOrder) *PayOrderUpdateOne {
+	mutation := newPayOrderMutation(c.config, OpUpdateOne, withPayOrder(_m))
+	return &PayOrderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PayOrderClient) UpdateOneID(id string) *PayOrderUpdateOne {
+	mutation := newPayOrderMutation(c.config, OpUpdateOne, withPayOrderID(id))
+	return &PayOrderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for PayOrder.
+func (c *PayOrderClient) Delete() *PayOrderDelete {
+	mutation := newPayOrderMutation(c.config, OpDelete)
+	return &PayOrderDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PayOrderClient) DeleteOne(_m *PayOrder) *PayOrderDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PayOrderClient) DeleteOneID(id string) *PayOrderDeleteOne {
+	builder := c.Delete().Where(payorder.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PayOrderDeleteOne{builder}
+}
+
+// Query returns a query builder for PayOrder.
+func (c *PayOrderClient) Query() *PayOrderQuery {
+	return &PayOrderQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePayOrder},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a PayOrder entity by its id.
+func (c *PayOrderClient) Get(ctx context.Context, id string) (*PayOrder, error) {
+	return c.Query().Where(payorder.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PayOrderClient) GetX(ctx context.Context, id string) *PayOrder {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *PayOrderClient) Hooks() []Hook {
+	hooks := c.hooks.PayOrder
+	return append(hooks[:len(hooks):len(hooks)], payorder.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *PayOrderClient) Interceptors() []Interceptor {
+	inters := c.inters.PayOrder
+	return append(inters[:len(inters):len(inters)], payorder.Interceptors[:]...)
+}
+
+func (c *PayOrderClient) mutate(ctx context.Context, m *PayOrderMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PayOrderCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PayOrderUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PayOrderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PayOrderDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown PayOrder mutation op: %q", m.Op())
+	}
+}
+
 // ProfileClient is a client for the Profile schema.
 type ProfileClient struct {
 	config
@@ -1080,6 +1376,141 @@ func (c *QuestionBankClient) mutate(ctx context.Context, m *QuestionBankMutation
 		return (&QuestionBankDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown QuestionBank mutation op: %q", m.Op())
+	}
+}
+
+// SkuClient is a client for the Sku schema.
+type SkuClient struct {
+	config
+}
+
+// NewSkuClient returns a client for the Sku from the given config.
+func NewSkuClient(c config) *SkuClient {
+	return &SkuClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `sku.Hooks(f(g(h())))`.
+func (c *SkuClient) Use(hooks ...Hook) {
+	c.hooks.Sku = append(c.hooks.Sku, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `sku.Intercept(f(g(h())))`.
+func (c *SkuClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Sku = append(c.inters.Sku, interceptors...)
+}
+
+// Create returns a builder for creating a Sku entity.
+func (c *SkuClient) Create() *SkuCreate {
+	mutation := newSkuMutation(c.config, OpCreate)
+	return &SkuCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Sku entities.
+func (c *SkuClient) CreateBulk(builders ...*SkuCreate) *SkuCreateBulk {
+	return &SkuCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SkuClient) MapCreateBulk(slice any, setFunc func(*SkuCreate, int)) *SkuCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SkuCreateBulk{err: fmt.Errorf("calling to SkuClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SkuCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SkuCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Sku.
+func (c *SkuClient) Update() *SkuUpdate {
+	mutation := newSkuMutation(c.config, OpUpdate)
+	return &SkuUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SkuClient) UpdateOne(_m *Sku) *SkuUpdateOne {
+	mutation := newSkuMutation(c.config, OpUpdateOne, withSku(_m))
+	return &SkuUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SkuClient) UpdateOneID(id string) *SkuUpdateOne {
+	mutation := newSkuMutation(c.config, OpUpdateOne, withSkuID(id))
+	return &SkuUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Sku.
+func (c *SkuClient) Delete() *SkuDelete {
+	mutation := newSkuMutation(c.config, OpDelete)
+	return &SkuDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SkuClient) DeleteOne(_m *Sku) *SkuDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SkuClient) DeleteOneID(id string) *SkuDeleteOne {
+	builder := c.Delete().Where(sku.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SkuDeleteOne{builder}
+}
+
+// Query returns a query builder for Sku.
+func (c *SkuClient) Query() *SkuQuery {
+	return &SkuQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSku},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Sku entity by its id.
+func (c *SkuClient) Get(ctx context.Context, id string) (*Sku, error) {
+	return c.Query().Where(sku.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SkuClient) GetX(ctx context.Context, id string) *Sku {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SkuClient) Hooks() []Hook {
+	hooks := c.hooks.Sku
+	return append(hooks[:len(hooks):len(hooks)], sku.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *SkuClient) Interceptors() []Interceptor {
+	inters := c.inters.Sku
+	return append(inters[:len(inters):len(inters)], sku.Interceptors[:]...)
+}
+
+func (c *SkuClient) mutate(ctx context.Context, m *SkuMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SkuCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SkuUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SkuUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SkuDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Sku mutation op: %q", m.Op())
 	}
 }
 
@@ -1491,12 +1922,12 @@ func (c *TestRecordClient) mutate(ctx context.Context, m *TestRecordMutation) (V
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Game, MatchConfig, MatchSession, Profile, QuestionBank, Test,
-		TestConfig, TestRecord []ent.Hook
+		AbilityScore, Entitlement, Game, MatchConfig, MatchSession, PayOrder, Profile,
+		QuestionBank, Sku, Test, TestConfig, TestRecord []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Game, MatchConfig, MatchSession, Profile, QuestionBank, Test,
-		TestConfig, TestRecord []ent.Interceptor
+		AbilityScore, Entitlement, Game, MatchConfig, MatchSession, PayOrder, Profile,
+		QuestionBank, Sku, Test, TestConfig, TestRecord []ent.Interceptor
 	}
 )
 

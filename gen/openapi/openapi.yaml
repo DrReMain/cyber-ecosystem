@@ -445,6 +445,137 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetMemberResponse'
+    /api/v1/esports/orders:
+        get:
+            tags:
+                - OrderService
+            operationId: OrderService_ListOrders
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListOrdersResponse'
+        post:
+            tags:
+                - OrderService
+            operationId: OrderService_CreateOrder
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.CreateOrderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.CreateOrderResponse'
+    /api/v1/esports/orders/{orderNo}:
+        get:
+            tags:
+                - OrderService
+            operationId: OrderService_GetOrder
+            parameters:
+                - name: orderNo
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetOrderResponse'
+    /api/v1/esports/orders/{orderNo}/close:
+        post:
+            tags:
+                - OrderService
+            operationId: OrderService_CloseOrder
+            parameters:
+                - name: orderNo
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.CloseOrderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.CloseOrderResponse'
+    /api/v1/esports/pay/notify:
+        post:
+            tags:
+                - OrderService
+            operationId: OrderService_NotifyPayment
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.NotifyPaymentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.NotifyPaymentResponse'
     /api/v1/esports/profile:
         get:
             tags:
@@ -474,6 +605,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.UpdateProfileResponse'
+    /api/v1/esports/skus:
+        get:
+            tags:
+                - SkuService
+            operationId: SkuService_ListSkus
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListSkusResponse'
     /api/v1/esports/tests:
         get:
             tags:
@@ -2540,6 +2683,47 @@ components:
                 timeSpentMs:
                     type: integer
                     format: int32
+        cyber.esports.v1.CloseOrderRequest:
+            type: object
+            properties:
+                orderNo:
+                    type: string
+        cyber.esports.v1.CloseOrderResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/cyber.esports.v1.Order'
+        cyber.esports.v1.CreateOrderRequest:
+            type: object
+            properties:
+                skuCode:
+                    type: string
+                channel:
+                    type: string
+                    description: |-
+                        The access context the client environment decided: in-WeChat pays by
+                         invoke, a phone browser by jump, a desktop by QR. The server validates
+                         it against the active provider's channel set and the hints it needs.
+                scopeRef:
+                    type: string
+                    description: |-
+                        The test record a trial sku unlocks — required for trial, must be
+                         absent for membership; the caller must own the record.
+                payerOpenid:
+                    type: string
+                    description: |-
+                        OpenID for in-WeChat payment, supplied by the wechat binding;
+                         required when the channel pays by invoke.
+                returnUrl:
+                    type: string
+                    description: Post-payment landing page for jump channels.
+        cyber.esports.v1.CreateOrderResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/cyber.esports.v1.Order'
+                credential:
+                    $ref: '#/components/schemas/cyber.esports.v1.PayCredential'
         cyber.esports.v1.DualZoneBehavior:
             type: object
             properties:
@@ -2703,6 +2887,11 @@ components:
             properties:
                 member:
                     $ref: '#/components/schemas/cyber.esports.v1.Member'
+        cyber.esports.v1.GetOrderResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/cyber.esports.v1.Order'
         cyber.esports.v1.GetProfileResponse:
             type: object
             properties:
@@ -2739,6 +2928,22 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Member'
+        cyber.esports.v1.ListOrdersResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                orders:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Order'
+        cyber.esports.v1.ListSkusResponse:
+            type: object
+            properties:
+                skus:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Sku'
         cyber.esports.v1.ListTestsResponse:
             type: object
             properties:
@@ -2889,6 +3094,34 @@ components:
                 elapsedMs:
                     type: integer
                     format: int32
+        cyber.esports.v1.NotifyPaymentRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                    description: |-
+                        Provider name routing to the platform's payment container — the same
+                         value set the platform configures (wechat, mock).
+                headers:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: |-
+                        The push exactly as it arrived; the provider's Notifier verifies the
+                         channel signature before anything settles. A map, not entries: the
+                         channels signing payment pushes never repeat a header.
+                body:
+                    type: string
+                    format: bytes
+        cyber.esports.v1.NotifyPaymentResponse:
+            type: object
+            properties:
+                handled:
+                    type: boolean
+                    description: |-
+                        False = parsed and verified but nothing settles (an event kind this
+                         build audits without acting on); the channel is still acked so
+                         redelivery stops — the query surface converges state regardless.
         cyber.esports.v1.NumberStarsClick:
             type: object
             properties:
@@ -2949,6 +3182,68 @@ components:
             description: |-
                 offense_defense — scenario decisions; correctness is judged server-side
                  against the scenario answer key (legacy isCorrect dropped).
+        cyber.esports.v1.Order:
+            type: object
+            properties:
+                orderNo:
+                    type: string
+                skuCode:
+                    type: string
+                scope:
+                    enum:
+                        - ORDER_SCOPE_UNSPECIFIED
+                        - ORDER_SCOPE_TRIAL
+                        - ORDER_SCOPE_PERIOD
+                    type: string
+                    format: enum
+                scopeRef:
+                    type: string
+                    description: |-
+                        Trial: the test record this order unlocks. Period: null — the window
+                         shape comes from the sku.
+                provider:
+                    type: string
+                channel:
+                    type: string
+                amountFen:
+                    type: string
+                state:
+                    enum:
+                        - ORDER_STATE_UNSPECIFIED
+                        - ORDER_STATE_PENDING
+                        - ORDER_STATE_PAID
+                        - ORDER_STATE_CLOSED
+                    type: string
+                    format: enum
+                transactionId:
+                    type: string
+                    description: Channel transaction id once paid; null before.
+                createdAt:
+                    type: string
+                    format: date-time
+                expiresAt:
+                    type: string
+                    description: Payment deadline; the order is not payable after it.
+                    format: date-time
+                paidAt:
+                    type: string
+                    format: date-time
+        cyber.esports.v1.PayCredential:
+            type: object
+            properties:
+                kind:
+                    enum:
+                        - PAY_CREDENTIAL_KIND_UNSPECIFIED
+                        - PAY_CREDENTIAL_KIND_INVOKE
+                        - PAY_CREDENTIAL_KIND_JUMP_URL
+                        - PAY_CREDENTIAL_KIND_QR_CODE
+                    type: string
+                    format: enum
+                value:
+                    type: string
+                    description: |-
+                        Success implies present — create answers with the payer's
+                         continuation material or fails.
         cyber.esports.v1.Point:
             type: object
             properties:
@@ -3126,6 +3421,43 @@ components:
                     type: boolean
                 placed:
                     type: boolean
+        cyber.esports.v1.Sku:
+            type: object
+            properties:
+                skuCode:
+                    type: string
+                    description: |-
+                        Catalog code join key (e.g. member_month) — the row ULID never
+                         crosses the wire, the same law as game codes.
+                name:
+                    type: string
+                description:
+                    type: string
+                kind:
+                    enum:
+                        - SKU_KIND_UNSPECIFIED
+                        - SKU_KIND_TRIAL
+                        - SKU_KIND_MEMBERSHIP
+                    type: string
+                    format: enum
+                priceFen:
+                    type: string
+                    description: Fen amounts (1/100 yuan); money never rides yuan or floats anywhere.
+                listPriceFen:
+                    type: string
+                    description: |-
+                        List price — equal to price_fen in M1; carried so discounting is
+                         product data, not a schema change.
+                periodDays:
+                    type: integer
+                    description: Membership window in days; null on trial skus.
+                    format: int32
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
         cyber.esports.v1.SubmitTestAttemptRequest:
             type: object
             properties:
@@ -4761,6 +5093,15 @@ tags:
          absent profile row is the lazy onboarding shape, never an error. One
          face one consumer grade: this is the admin plane; the C-end member
          reads their own profile through ProfileService.
+    - name: OrderService
+      description: |-
+        The order aggregate's faces. The member plane creates and reads its own
+         orders; creating again for the same grant target while a pending order
+         lives returns that order. NotifyPayment is the service's only public
+         face: its callers are payment channels pushing their envelopes, and
+         they authenticate by the channel signature inside the payload, never by
+         a session — the notification accelerates settlement, the query surface
+         converges it.
     - name: PolicyService
     - name: PopulationService
       description: |-
@@ -4776,6 +5117,14 @@ tags:
          never appears in a request.
     - name: ResourceService
     - name: RoleService
+    - name: SkuService
+      description: |-
+        Purchasable catalog read face for the member plane. Values are product
+         territory (P1: a single purchase permanently unlocks one trial's
+         report; membership is a 31-day window); the structure carries both the
+         selling price and the list price so a future discount display is a
+         value change, not a contract change — no discount is displayed either
+         way in M1.
     - name: TenantService
     - name: TestService
       description: |-

@@ -5,11 +5,14 @@ package ent
 import (
 	"context"
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
+	"cyber-ecosystem/app/services/esports/internal/ent/payorder"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
+	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
@@ -82,11 +85,14 @@ func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			abilityscore.Table: abilityscore.ValidColumn,
+			entitlement.Table:  entitlement.ValidColumn,
 			game.Table:         game.ValidColumn,
 			matchconfig.Table:  matchconfig.ValidColumn,
 			matchsession.Table: matchsession.ValidColumn,
+			payorder.Table:     payorder.ValidColumn,
 			profile.Table:      profile.ValidColumn,
 			questionbank.Table: questionbank.ValidColumn,
+			sku.Table:          sku.ValidColumn,
 			test.Table:         test.ValidColumn,
 			testconfig.Table:   testconfig.ValidColumn,
 			testrecord.Table:   testrecord.ValidColumn,

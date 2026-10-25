@@ -4,12 +4,15 @@ package runtime
 
 import (
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
+	"cyber-ecosystem/app/services/esports/internal/ent/payorder"
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema"
+	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
@@ -111,6 +114,79 @@ func init() {
 	abilityscore.DefaultID = abilityscoreDescID.Default.(func() string)
 	// abilityscore.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	abilityscore.IDValidator = abilityscoreDescID.Validators[0].(func(string) error)
+	entitlementMixin := schema.Entitlement{}.Mixin()
+	entitlementMixinHooks2 := entitlementMixin[2].Hooks()
+	entitlement.Hooks[0] = entitlementMixinHooks2[0]
+	entitlementMixinInters2 := entitlementMixin[2].Interceptors()
+	entitlement.Interceptors[0] = entitlementMixinInters2[0]
+	entitlementMixinFields0 := entitlementMixin[0].Fields()
+	_ = entitlementMixinFields0
+	entitlementMixinFields1 := entitlementMixin[1].Fields()
+	_ = entitlementMixinFields1
+	entitlementMixinFields2 := entitlementMixin[2].Fields()
+	_ = entitlementMixinFields2
+	entitlementFields := schema.Entitlement{}.Fields()
+	_ = entitlementFields
+	// entitlementDescCreatedAt is the schema descriptor for created_at field.
+	entitlementDescCreatedAt := entitlementMixinFields1[0].Descriptor()
+	// entitlement.DefaultCreatedAt holds the default value on creation for the created_at field.
+	entitlement.DefaultCreatedAt = entitlementDescCreatedAt.Default.(func() time.Time)
+	// entitlementDescUpdatedAt is the schema descriptor for updated_at field.
+	entitlementDescUpdatedAt := entitlementMixinFields1[1].Descriptor()
+	// entitlement.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	entitlement.DefaultUpdatedAt = entitlementDescUpdatedAt.Default.(func() time.Time)
+	// entitlement.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	entitlement.UpdateDefaultUpdatedAt = entitlementDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// entitlementDescTenantID is the schema descriptor for tenant_id field.
+	entitlementDescTenantID := entitlementMixinFields2[0].Descriptor()
+	// entitlement.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	entitlement.TenantIDValidator = entitlementDescTenantID.Validators[0].(func(string) error)
+	// entitlementDescUserID is the schema descriptor for user_id field.
+	entitlementDescUserID := entitlementFields[0].Descriptor()
+	// entitlement.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	entitlement.UserIDValidator = func() func(string) error {
+		validators := entitlementDescUserID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(user_id string) error {
+			for _, fn := range fns {
+				if err := fn(user_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// entitlementDescScopeRef is the schema descriptor for scope_ref field.
+	entitlementDescScopeRef := entitlementFields[2].Descriptor()
+	// entitlement.ScopeRefValidator is a validator for the "scope_ref" field. It is called by the builders before save.
+	entitlement.ScopeRefValidator = entitlementDescScopeRef.Validators[0].(func(string) error)
+	// entitlementDescSource is the schema descriptor for source field.
+	entitlementDescSource := entitlementFields[4].Descriptor()
+	// entitlement.SourceValidator is a validator for the "source" field. It is called by the builders before save.
+	entitlement.SourceValidator = func() func(string) error {
+		validators := entitlementDescSource.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(source string) error {
+			for _, fn := range fns {
+				if err := fn(source); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// entitlementDescID is the schema descriptor for id field.
+	entitlementDescID := entitlementMixinFields0[0].Descriptor()
+	// entitlement.DefaultID holds the default value on creation for the id field.
+	entitlement.DefaultID = entitlementDescID.Default.(func() string)
+	// entitlement.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	entitlement.IDValidator = entitlementDescID.Validators[0].(func(string) error)
 	gameMixin := schema.Game{}.Mixin()
 	gameMixinHooks2 := gameMixin[2].Hooks()
 	gameMixinHooks3 := gameMixin[3].Hooks()
@@ -354,6 +430,177 @@ func init() {
 	matchsession.DefaultID = matchsessionDescID.Default.(func() string)
 	// matchsession.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	matchsession.IDValidator = matchsessionDescID.Validators[0].(func(string) error)
+	payorderMixin := schema.PayOrder{}.Mixin()
+	payorderMixinHooks2 := payorderMixin[2].Hooks()
+	payorder.Hooks[0] = payorderMixinHooks2[0]
+	payorderMixinInters2 := payorderMixin[2].Interceptors()
+	payorder.Interceptors[0] = payorderMixinInters2[0]
+	payorderMixinFields0 := payorderMixin[0].Fields()
+	_ = payorderMixinFields0
+	payorderMixinFields1 := payorderMixin[1].Fields()
+	_ = payorderMixinFields1
+	payorderMixinFields2 := payorderMixin[2].Fields()
+	_ = payorderMixinFields2
+	payorderFields := schema.PayOrder{}.Fields()
+	_ = payorderFields
+	// payorderDescCreatedAt is the schema descriptor for created_at field.
+	payorderDescCreatedAt := payorderMixinFields1[0].Descriptor()
+	// payorder.DefaultCreatedAt holds the default value on creation for the created_at field.
+	payorder.DefaultCreatedAt = payorderDescCreatedAt.Default.(func() time.Time)
+	// payorderDescUpdatedAt is the schema descriptor for updated_at field.
+	payorderDescUpdatedAt := payorderMixinFields1[1].Descriptor()
+	// payorder.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	payorder.DefaultUpdatedAt = payorderDescUpdatedAt.Default.(func() time.Time)
+	// payorder.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	payorder.UpdateDefaultUpdatedAt = payorderDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// payorderDescTenantID is the schema descriptor for tenant_id field.
+	payorderDescTenantID := payorderMixinFields2[0].Descriptor()
+	// payorder.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	payorder.TenantIDValidator = payorderDescTenantID.Validators[0].(func(string) error)
+	// payorderDescOrderNo is the schema descriptor for order_no field.
+	payorderDescOrderNo := payorderFields[0].Descriptor()
+	// payorder.OrderNoValidator is a validator for the "order_no" field. It is called by the builders before save.
+	payorder.OrderNoValidator = func() func(string) error {
+		validators := payorderDescOrderNo.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(order_no string) error {
+			for _, fn := range fns {
+				if err := fn(order_no); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// payorderDescUserID is the schema descriptor for user_id field.
+	payorderDescUserID := payorderFields[1].Descriptor()
+	// payorder.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	payorder.UserIDValidator = func() func(string) error {
+		validators := payorderDescUserID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(user_id string) error {
+			for _, fn := range fns {
+				if err := fn(user_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// payorderDescSkuCode is the schema descriptor for sku_code field.
+	payorderDescSkuCode := payorderFields[2].Descriptor()
+	// payorder.SkuCodeValidator is a validator for the "sku_code" field. It is called by the builders before save.
+	payorder.SkuCodeValidator = func() func(string) error {
+		validators := payorderDescSkuCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(sku_code string) error {
+			for _, fn := range fns {
+				if err := fn(sku_code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// payorderDescScopeRef is the schema descriptor for scope_ref field.
+	payorderDescScopeRef := payorderFields[4].Descriptor()
+	// payorder.ScopeRefValidator is a validator for the "scope_ref" field. It is called by the builders before save.
+	payorder.ScopeRefValidator = payorderDescScopeRef.Validators[0].(func(string) error)
+	// payorderDescProvider is the schema descriptor for provider field.
+	payorderDescProvider := payorderFields[5].Descriptor()
+	// payorder.ProviderValidator is a validator for the "provider" field. It is called by the builders before save.
+	payorder.ProviderValidator = func() func(string) error {
+		validators := payorderDescProvider.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(provider string) error {
+			for _, fn := range fns {
+				if err := fn(provider); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// payorderDescChannel is the schema descriptor for channel field.
+	payorderDescChannel := payorderFields[6].Descriptor()
+	// payorder.ChannelValidator is a validator for the "channel" field. It is called by the builders before save.
+	payorder.ChannelValidator = func() func(string) error {
+		validators := payorderDescChannel.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(channel string) error {
+			for _, fn := range fns {
+				if err := fn(channel); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// payorderDescAmountFen is the schema descriptor for amount_fen field.
+	payorderDescAmountFen := payorderFields[7].Descriptor()
+	// payorder.AmountFenValidator is a validator for the "amount_fen" field. It is called by the builders before save.
+	payorder.AmountFenValidator = payorderDescAmountFen.Validators[0].(func(int64) error)
+	// payorderDescCredentialKind is the schema descriptor for credential_kind field.
+	payorderDescCredentialKind := payorderFields[9].Descriptor()
+	// payorder.CredentialKindValidator is a validator for the "credential_kind" field. It is called by the builders before save.
+	payorder.CredentialKindValidator = func() func(string) error {
+		validators := payorderDescCredentialKind.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(credential_kind string) error {
+			for _, fn := range fns {
+				if err := fn(credential_kind); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// payorderDescCredentialValue is the schema descriptor for credential_value field.
+	payorderDescCredentialValue := payorderFields[10].Descriptor()
+	// payorder.CredentialValueValidator is a validator for the "credential_value" field. It is called by the builders before save.
+	payorder.CredentialValueValidator = func() func(string) error {
+		validators := payorderDescCredentialValue.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(credential_value string) error {
+			for _, fn := range fns {
+				if err := fn(credential_value); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// payorderDescTransactionID is the schema descriptor for transaction_id field.
+	payorderDescTransactionID := payorderFields[11].Descriptor()
+	// payorder.TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
+	payorder.TransactionIDValidator = payorderDescTransactionID.Validators[0].(func(string) error)
+	// payorderDescID is the schema descriptor for id field.
+	payorderDescID := payorderMixinFields0[0].Descriptor()
+	// payorder.DefaultID holds the default value on creation for the id field.
+	payorder.DefaultID = payorderDescID.Default.(func() string)
+	// payorder.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	payorder.IDValidator = payorderDescID.Validators[0].(func(string) error)
 	profileMixin := schema.Profile{}.Mixin()
 	profileMixinHooks2 := profileMixin[2].Hooks()
 	profileMixinHooks3 := profileMixin[3].Hooks()
@@ -512,6 +759,99 @@ func init() {
 	questionbank.DefaultID = questionbankDescID.Default.(func() string)
 	// questionbank.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	questionbank.IDValidator = questionbankDescID.Validators[0].(func(string) error)
+	skuMixin := schema.Sku{}.Mixin()
+	skuMixinHooks2 := skuMixin[2].Hooks()
+	skuMixinHooks3 := skuMixin[3].Hooks()
+	sku.Hooks[0] = skuMixinHooks2[0]
+	sku.Hooks[1] = skuMixinHooks3[0]
+	skuMixinInters2 := skuMixin[2].Interceptors()
+	skuMixinInters3 := skuMixin[3].Interceptors()
+	sku.Interceptors[0] = skuMixinInters2[0]
+	sku.Interceptors[1] = skuMixinInters3[0]
+	skuMixinFields0 := skuMixin[0].Fields()
+	_ = skuMixinFields0
+	skuMixinFields1 := skuMixin[1].Fields()
+	_ = skuMixinFields1
+	skuMixinFields2 := skuMixin[2].Fields()
+	_ = skuMixinFields2
+	skuFields := schema.Sku{}.Fields()
+	_ = skuFields
+	// skuDescCreatedAt is the schema descriptor for created_at field.
+	skuDescCreatedAt := skuMixinFields1[0].Descriptor()
+	// sku.DefaultCreatedAt holds the default value on creation for the created_at field.
+	sku.DefaultCreatedAt = skuDescCreatedAt.Default.(func() time.Time)
+	// skuDescUpdatedAt is the schema descriptor for updated_at field.
+	skuDescUpdatedAt := skuMixinFields1[1].Descriptor()
+	// sku.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	sku.DefaultUpdatedAt = skuDescUpdatedAt.Default.(func() time.Time)
+	// sku.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	sku.UpdateDefaultUpdatedAt = skuDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// skuDescTenantID is the schema descriptor for tenant_id field.
+	skuDescTenantID := skuMixinFields2[0].Descriptor()
+	// sku.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	sku.TenantIDValidator = skuDescTenantID.Validators[0].(func(string) error)
+	// skuDescCode is the schema descriptor for code field.
+	skuDescCode := skuFields[0].Descriptor()
+	// sku.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	sku.CodeValidator = func() func(string) error {
+		validators := skuDescCode.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(code string) error {
+			for _, fn := range fns {
+				if err := fn(code); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// skuDescName is the schema descriptor for name field.
+	skuDescName := skuFields[2].Descriptor()
+	// sku.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	sku.NameValidator = func() func(string) error {
+		validators := skuDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// skuDescDescription is the schema descriptor for description field.
+	skuDescDescription := skuFields[3].Descriptor()
+	// sku.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	sku.DescriptionValidator = skuDescDescription.Validators[0].(func(string) error)
+	// skuDescPriceFen is the schema descriptor for price_fen field.
+	skuDescPriceFen := skuFields[4].Descriptor()
+	// sku.PriceFenValidator is a validator for the "price_fen" field. It is called by the builders before save.
+	sku.PriceFenValidator = skuDescPriceFen.Validators[0].(func(int64) error)
+	// skuDescListPriceFen is the schema descriptor for list_price_fen field.
+	skuDescListPriceFen := skuFields[5].Descriptor()
+	// sku.ListPriceFenValidator is a validator for the "list_price_fen" field. It is called by the builders before save.
+	sku.ListPriceFenValidator = skuDescListPriceFen.Validators[0].(func(int64) error)
+	// skuDescPeriodDays is the schema descriptor for period_days field.
+	skuDescPeriodDays := skuFields[6].Descriptor()
+	// sku.PeriodDaysValidator is a validator for the "period_days" field. It is called by the builders before save.
+	sku.PeriodDaysValidator = skuDescPeriodDays.Validators[0].(func(int) error)
+	// skuDescOnShelf is the schema descriptor for on_shelf field.
+	skuDescOnShelf := skuFields[7].Descriptor()
+	// sku.DefaultOnShelf holds the default value on creation for the on_shelf field.
+	sku.DefaultOnShelf = skuDescOnShelf.Default.(bool)
+	// skuDescID is the schema descriptor for id field.
+	skuDescID := skuMixinFields0[0].Descriptor()
+	// sku.DefaultID holds the default value on creation for the id field.
+	sku.DefaultID = skuDescID.Default.(func() string)
+	// sku.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	sku.IDValidator = skuDescID.Validators[0].(func(string) error)
 	testMixin := schema.Test{}.Mixin()
 	testMixinHooks2 := testMixin[2].Hooks()
 	testMixinHooks3 := testMixin[3].Hooks()

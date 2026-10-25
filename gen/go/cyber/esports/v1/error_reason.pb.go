@@ -45,6 +45,14 @@ const (
 	Esports_ESPORTS_MATCH_SESSION_NOT_FOUND   Esports = 6132
 	Esports_ESPORTS_MATCH_TEST_NOT_IN_SESSION Esports = 6133
 	Esports_ESPORTS_MATCH_RETEST_EXHAUSTED    Esports = 6134
+	// 614x: order & sku
+	Esports_ESPORTS_ORDER_NOT_FOUND             Esports = 6140
+	Esports_ESPORTS_SKU_NOT_FOUND               Esports = 6141
+	Esports_ESPORTS_SKU_OFF_SHELF               Esports = 6142
+	Esports_ESPORTS_ORDER_SCOPE_INVALID         Esports = 6143
+	Esports_ESPORTS_ORDER_SCOPE_ALREADY_GRANTED Esports = 6144
+	Esports_ESPORTS_ORDER_CHANNEL_INVALID       Esports = 6145
+	Esports_ESPORTS_ORDER_STATE_CONFLICT        Esports = 6146
 )
 
 // Enum value maps for Esports.
@@ -61,6 +69,13 @@ var (
 		6132: "ESPORTS_MATCH_SESSION_NOT_FOUND",
 		6133: "ESPORTS_MATCH_TEST_NOT_IN_SESSION",
 		6134: "ESPORTS_MATCH_RETEST_EXHAUSTED",
+		6140: "ESPORTS_ORDER_NOT_FOUND",
+		6141: "ESPORTS_SKU_NOT_FOUND",
+		6142: "ESPORTS_SKU_OFF_SHELF",
+		6143: "ESPORTS_ORDER_SCOPE_INVALID",
+		6144: "ESPORTS_ORDER_SCOPE_ALREADY_GRANTED",
+		6145: "ESPORTS_ORDER_CHANNEL_INVALID",
+		6146: "ESPORTS_ORDER_STATE_CONFLICT",
 	}
 	Esports_value = map[string]int32{
 		"ESPORTS_UNSPECIFIED":                       0,
@@ -74,6 +89,13 @@ var (
 		"ESPORTS_MATCH_SESSION_NOT_FOUND":           6132,
 		"ESPORTS_MATCH_TEST_NOT_IN_SESSION":         6133,
 		"ESPORTS_MATCH_RETEST_EXHAUSTED":            6134,
+		"ESPORTS_ORDER_NOT_FOUND":                   6140,
+		"ESPORTS_SKU_NOT_FOUND":                     6141,
+		"ESPORTS_SKU_OFF_SHELF":                     6142,
+		"ESPORTS_ORDER_SCOPE_INVALID":               6143,
+		"ESPORTS_ORDER_SCOPE_ALREADY_GRANTED":       6144,
+		"ESPORTS_ORDER_CHANNEL_INVALID":             6145,
+		"ESPORTS_ORDER_STATE_CONFLICT":              6146,
 	}
 )
 
@@ -108,7 +130,7 @@ var File_cyber_esports_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\xd8\x03\n" +
+	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\xeb\x05\n" +
 	"\aEsports\x12\x1d\n" +
 	"\x13ESPORTS_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x124\n" +
 	")ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED\x10\xd4/\x1a\x04\xa8E\x90\x03\x12'\n" +
@@ -120,7 +142,14 @@ const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\x1bESPORTS_MATCH_GENRE_UNKNOWN\x10\xf3/\x1a\x04\xa8E\x90\x03\x12*\n" +
 	"\x1fESPORTS_MATCH_SESSION_NOT_FOUND\x10\xf4/\x1a\x04\xa8E\x94\x03\x12,\n" +
 	"!ESPORTS_MATCH_TEST_NOT_IN_SESSION\x10\xf5/\x1a\x04\xa8E\x90\x03\x12)\n" +
-	"\x1eESPORTS_MATCH_RETEST_EXHAUSTED\x10\xf6/\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	"\x1eESPORTS_MATCH_RETEST_EXHAUSTED\x10\xf6/\x1a\x04\xa8E\x90\x03\x12\"\n" +
+	"\x17ESPORTS_ORDER_NOT_FOUND\x10\xfc/\x1a\x04\xa8E\x94\x03\x12 \n" +
+	"\x15ESPORTS_SKU_NOT_FOUND\x10\xfd/\x1a\x04\xa8E\x94\x03\x12 \n" +
+	"\x15ESPORTS_SKU_OFF_SHELF\x10\xfe/\x1a\x04\xa8E\x90\x03\x12&\n" +
+	"\x1bESPORTS_ORDER_SCOPE_INVALID\x10\xff/\x1a\x04\xa8E\x90\x03\x12.\n" +
+	"#ESPORTS_ORDER_SCOPE_ALREADY_GRANTED\x10\x800\x1a\x04\xa8E\x90\x03\x12(\n" +
+	"\x1dESPORTS_ORDER_CHANNEL_INVALID\x10\x810\x1a\x04\xa8E\x90\x03\x12'\n" +
+	"\x1cESPORTS_ORDER_STATE_CONFLICT\x10\x820\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_error_reason_proto_rawDescOnce sync.Once

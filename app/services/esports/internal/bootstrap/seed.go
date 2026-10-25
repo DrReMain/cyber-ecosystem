@@ -9,6 +9,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
+	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -167,6 +168,22 @@ var seedTests = []struct {
 		"tier_value_trap":        "-50",
 		"unit_score":             "10",
 	}},
+}
+
+var seedSkus = []struct {
+	Code         string
+	Kind         sku.Kind
+	Name         string
+	Description  string
+	PriceFen     int64
+	ListPriceFen int64
+	PeriodDays   int
+}{
+	// Prices are the P1 ruling frozen at seed time (a single ¥19.9 buys
+	// one trial's report permanently; membership is ¥29.9 for 31 days);
+	// list price equals price while no discount is displayed.
+	{"trial_report", sku.KindTrial, "单次能力报告", "解锁当次测评的完整能力报告，永久有效", 1990, 1990, 0},
+	{"member_month", sku.KindMembership, "专属会员·月卡", "会员期内测评报告自动解锁，已解锁报告永久保留", 2990, 2990, 31},
 }
 
 var seedMatchConfigs = []struct {
@@ -738,6 +755,50 @@ func (s *Seed) Run(ctx context.Context) error {
 			Save(ctx); err != nil {
 			return s.plat.HandleEntError(fmt.Errorf("seed: update question %s/%s: %w", q.TestCode, q.Scenario, err))
 		}
+	}
+
+	for _, sk := range seedSkus {
+		// Same keep-in-step law as the tests: create when absent, refresh
+		// display values and prices when the adopted baseline moves — until
+		// the admin face owns them.
+		row, err := client.Sku.Query().Where(sku.CodeEQ(sk.Code)).Only(ctx)
+		if err != nil && !ent.IsNotFound(err) {
+			return s.plat.HandleEntError(fmt.Errorf("seed: query sku %q: %w", sk.Code, err))
+		}
+		if row != nil {
+			upd := row.Update().
+				SetName(sk.Name).
+				SetNillableDescription(strPtr(sk.Description)).
+				SetPriceFen(sk.PriceFen).
+				SetListPriceFen(sk.ListPriceFen)
+			if sk.PeriodDays > 0 {
+				upd = upd.SetPeriodDays(sk.PeriodDays)
+			}
+			if _, err := upd.Save(ctx); err != nil {
+				return s.plat.HandleEntError(fmt.Errorf("seed: update sku %q: %w", sk.Code, err))
+			}
+			continue
+		}
+		create := client.Sku.Create().
+			SetCode(sk.Code).
+			SetKind(sk.Kind).
+			SetName(sk.Name).
+			SetNillableDescription(strPtr(sk.Description)).
+			SetPriceFen(sk.PriceFen).
+			SetListPriceFen(sk.ListPriceFen)
+		if sk.PeriodDays > 0 {
+			create = create.SetPeriodDays(sk.PeriodDays)
+		}
+		if _, err := create.Save(ctx); err != nil {
+			// Multi-replica boot race: see the game loop's arm.
+			if ent.IsConstraintError(err) {
+				if _, reErr := client.Sku.Query().Where(sku.CodeEQ(sk.Code)).Only(ctx); reErr == nil {
+					continue
+				}
+			}
+			return s.plat.HandleEntError(fmt.Errorf("seed: create sku %q: %w", sk.Code, err))
+		}
+		s.log.Info("seeded sku", "code", sk.Code)
 	}
 	return nil
 }

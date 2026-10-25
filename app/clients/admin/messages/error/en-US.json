@@ -99,5 +99,20 @@
   "error_ESPORTS_MATCH_GENRE_UNKNOWN": "Unsupported game type",
   "error_ESPORTS_MATCH_SESSION_NOT_FOUND": "The assessment session has ended. Start again",
   "error_ESPORTS_MATCH_TEST_NOT_IN_SESSION": "This test is not part of the current lineup",
-  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "Retest chances for this test are used up"
+  "error_ESPORTS_MATCH_RETEST_EXHAUSTED": "Retest chances for this test are used up",
+  "error_ESPORTS_ORDER_NOT_FOUND": "Order not found or no longer valid",
+  "error_ESPORTS_SKU_NOT_FOUND": "Product not found",
+  "error_ESPORTS_SKU_OFF_SHELF": "Product is off the shelf and cannot be purchased right now",
+  "error_ESPORTS_ORDER_SCOPE_INVALID": "Unlock target is invalid; re-enter and try again",
+  "error_ESPORTS_ORDER_SCOPE_ALREADY_GRANTED": "This report is already unlocked; no need to buy again",
+  "error_ESPORTS_ORDER_CHANNEL_INVALID": "This payment method is not available in the current environment",
+  "error_ESPORTS_ORDER_STATE_CONFLICT": "Order state changed; refresh and try again",
+  "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "Invalid payment request; try again later",
+  "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "The payment channel has no such transaction; try again later",
+  "error_INFRA_ERROR_PAYMENT_DUPLICATE": "Duplicate payment request; try again later",
+  "error_INFRA_ERROR_PAYMENT_CHANNEL_REJECTED": "The payment channel rejected this request; try again later",
+  "error_INFRA_ERROR_PAYMENT_UNAVAILABLE": "The payment channel is temporarily unavailable; try again later",
+  "error_INFRA_ERROR_PAYMENT_TIMEOUT": "The payment request timed out; try again later",
+  "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "Payment notification failed verification; try again later",
+  "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "Payment notification could not be decrypted; try again later"
 }

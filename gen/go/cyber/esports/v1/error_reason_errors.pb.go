@@ -150,3 +150,89 @@ func IsEsportsMatchRetestExhausted(err error) bool {
 func ErrorEsportsMatchRetestExhausted(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, Esports_ESPORTS_MATCH_RETEST_EXHAUSTED.String(), fmt.Sprintf(format, args...))
 }
+
+// 614x: order & sku
+func IsEsportsOrderNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ORDER_NOT_FOUND.String() && e.Code == 404
+}
+
+// 614x: order & sku
+func ErrorEsportsOrderNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, Esports_ESPORTS_ORDER_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsSkuNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_SKU_NOT_FOUND.String() && e.Code == 404
+}
+
+func ErrorEsportsSkuNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, Esports_ESPORTS_SKU_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsSkuOffShelf(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_SKU_OFF_SHELF.String() && e.Code == 400
+}
+
+func ErrorEsportsSkuOffShelf(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_SKU_OFF_SHELF.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsOrderScopeInvalid(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ORDER_SCOPE_INVALID.String() && e.Code == 400
+}
+
+func ErrorEsportsOrderScopeInvalid(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ORDER_SCOPE_INVALID.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsOrderScopeAlreadyGranted(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ORDER_SCOPE_ALREADY_GRANTED.String() && e.Code == 400
+}
+
+func ErrorEsportsOrderScopeAlreadyGranted(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ORDER_SCOPE_ALREADY_GRANTED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsOrderChannelInvalid(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ORDER_CHANNEL_INVALID.String() && e.Code == 400
+}
+
+func ErrorEsportsOrderChannelInvalid(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ORDER_CHANNEL_INVALID.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsOrderStateConflict(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ORDER_STATE_CONFLICT.String() && e.Code == 400
+}
+
+func ErrorEsportsOrderStateConflict(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ORDER_STATE_CONFLICT.String(), fmt.Sprintf(format, args...))
+}
