@@ -63,6 +63,7 @@ func sameOrderInput(a, b *payment.CreatePaymentInput) bool {
 func sameRefundInput(a, b *payment.RefundInput) bool {
 	return a.OutTradeNo == b.OutTradeNo &&
 		a.AmountFen == b.AmountFen &&
+		a.TotalAmountFen == b.TotalAmountFen &&
 		a.Reason == b.Reason &&
 		a.NotifyURL == b.NotifyURL
 }
@@ -146,6 +147,10 @@ func (b *backend) Refund(_ context.Context, in *payment.RefundInput) (*payment.R
 			return &payment.RefundResult{OutRefundNo: in.OutRefundNo, RefundID: existing.refundID, State: existing.state}, nil
 		}
 		return nil, fmt.Errorf("%w: %s", payment.ErrDuplicate, in.OutRefundNo)
+	}
+	if in.TotalAmountFen != o.in.AmountFen {
+		return nil, fmt.Errorf("%w: declared total %d contradicts order amount %d",
+			payment.ErrInvalidArgument, int64(in.TotalAmountFen), int64(o.in.AmountFen))
 	}
 	if o.state != payment.PaymentStatePaid {
 		return nil, &payment.ChannelError{Code: "TRADE_STATE_ERROR", Message: "only a paid order can be refunded"}

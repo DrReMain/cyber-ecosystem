@@ -96,9 +96,10 @@ func TestValidateCreatePaymentInput(t *testing.T) {
 
 func TestValidateRefundInput(t *testing.T) {
 	base := &RefundInput{
-		OutRefundNo: "ref-1",
-		OutTradeNo:  "ord-1",
-		AmountFen:   Fen(100),
+		OutRefundNo:    "ref-1",
+		OutTradeNo:     "ord-1",
+		AmountFen:      Fen(100),
+		TotalAmountFen: Fen(100),
 	}
 	if err := ValidateRefundInput(base); err != nil {
 		t.Fatalf("baseline: want nil, got %v", err)
@@ -112,12 +113,14 @@ func TestValidateRefundInput(t *testing.T) {
 		{name: "bad_trade_no", mut: func(in *RefundInput) { in.OutTradeNo = "!" }},
 		{name: "zero_amount", mut: func(in *RefundInput) { in.AmountFen = 0 }},
 		{name: "negative_amount", mut: func(in *RefundInput) { in.AmountFen = Fen(-100) }},
+		{name: "zero_total", mut: func(in *RefundInput) { in.TotalAmountFen = 0 }},
+		{name: "refund_exceeds_total", mut: func(in *RefundInput) { in.TotalAmountFen = Fen(99) }},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			var in *RefundInput
 			if c.name != "nil" {
-				in = &RefundInput{OutRefundNo: "ref-1", OutTradeNo: "ord-1", AmountFen: Fen(100)}
+				in = &RefundInput{OutRefundNo: "ref-1", OutTradeNo: "ord-1", AmountFen: Fen(100), TotalAmountFen: Fen(100)}
 			}
 			c.mut(in)
 			if err := ValidateRefundInput(in); !errors.Is(err, ErrInvalidArgument) {
@@ -125,11 +128,13 @@ func TestValidateRefundInput(t *testing.T) {
 			}
 		})
 	}
-	// NotifyURL is optional for refunds — settlement converges via QueryRefund.
+	// A partial refund inside the declared total passes; NotifyURL is
+	// optional for refunds — settlement converges via QueryRefund.
 	base.Reason = "manual refund"
 	base.NotifyURL = ""
+	base.AmountFen = Fen(40)
 	if err := ValidateRefundInput(base); err != nil {
-		t.Errorf("no notify url: want nil, got %v", err)
+		t.Errorf("partial refund: want nil, got %v", err)
 	}
 }
 

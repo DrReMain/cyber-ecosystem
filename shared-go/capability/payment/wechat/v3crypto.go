@@ -127,6 +127,25 @@ func ParsePrivateKeyPEM(pemBytes []byte) (*rsa.PrivateKey, error) {
 	return rk, nil
 }
 
+// ParsePublicKeyPEM reads a bare RSA public key PEM (SubjectPublicKeyInfo
+// block) — the shape the channel's downloadable wechatpay public key ships
+// in, which unlike a certificate carries no serial or expiry of its own.
+func ParsePublicKeyPEM(pemBytes []byte) (*rsa.PublicKey, error) {
+	block, _ := pem.Decode(pemBytes)
+	if block == nil {
+		return nil, stderrors.New("payment: no PEM block in public key")
+	}
+	key, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("payment: parse public key: %w", err)
+	}
+	rk, ok := key.(*rsa.PublicKey)
+	if !ok {
+		return nil, stderrors.New("payment: public key is not RSA")
+	}
+	return rk, nil
+}
+
 // ParseCertificatePEM reads an X.509 certificate PEM (merchant or platform).
 func ParseCertificatePEM(pemBytes []byte) (*x509.Certificate, error) {
 	block, _ := pem.Decode(pemBytes)

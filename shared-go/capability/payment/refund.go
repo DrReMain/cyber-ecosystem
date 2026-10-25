@@ -12,7 +12,11 @@ type RefundInput struct {
 	OutRefundNo string
 	OutTradeNo  string
 	AmountFen   AmountFen
-	Reason      string
+	// TotalAmountFen is the original order amount — refund endpoints require
+	// it (WeChat's amount.total is mandatory), and the caller carries it from
+	// the order row, not from memory.
+	TotalAmountFen AmountFen
+	Reason         string
 	// NotifyURL is optional; without it no refund notification is pushed and
 	// settlement converges through QueryRefund.
 	NotifyURL string

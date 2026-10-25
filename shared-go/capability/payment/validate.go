@@ -57,9 +57,11 @@ func ValidateCreatePaymentInput(in *CreatePaymentInput) error {
 	return nil
 }
 
-// ValidateRefundInput checks the single-request shape. The refund-fits-order
-// invariant (this refund plus prior refunds within the order amount) is
-// stateful and stays with the provider.
+// ValidateRefundInput checks the single-request shape: refund numbers
+// well-formed, the refund itself and the declared original amount positive,
+// the refund within the declared original. The stateful invariant (this
+// refund plus prior refunds within the real order amount) stays with the
+// provider, which also refuses a declared total that contradicts the order.
 func ValidateRefundInput(in *RefundInput) error {
 	if in == nil {
 		return ErrInvalidArgument
@@ -67,7 +69,10 @@ func ValidateRefundInput(in *RefundInput) error {
 	if !isTradeNo(in.OutRefundNo) || !isTradeNo(in.OutTradeNo) {
 		return ErrInvalidArgument
 	}
-	if in.AmountFen <= 0 {
+	if in.AmountFen <= 0 || in.TotalAmountFen <= 0 {
+		return ErrInvalidArgument
+	}
+	if in.AmountFen > in.TotalAmountFen {
 		return ErrInvalidArgument
 	}
 	return nil

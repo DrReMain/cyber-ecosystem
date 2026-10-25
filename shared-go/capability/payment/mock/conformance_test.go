@@ -327,7 +327,7 @@ func TestRefundFlow(t *testing.T) {
 		t.Fatalf("mark paid: %v", err)
 	}
 	half, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
-		OutRefundNo: "ref-1", OutTradeNo: "ord-refund", AmountFen: payment.Fen(15000), Reason: "half",
+		OutRefundNo: "ref-1", OutTradeNo: "ord-refund", AmountFen: payment.Fen(15000), TotalAmountFen: payment.Fen(30000), Reason: "half",
 	})
 	if err != nil || half.State != payment.RefundStateSucceeded {
 		t.Fatalf("first refund: %+v err=%v", half, err)
@@ -337,12 +337,12 @@ func TestRefundFlow(t *testing.T) {
 		t.Errorf("refunded after first: %s, want 150.00", status.RefundedFen)
 	}
 	if _, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
-		OutRefundNo: "ref-2", OutTradeNo: "ord-refund", AmountFen: payment.Fen(15000),
+		OutRefundNo: "ref-2", OutTradeNo: "ord-refund", AmountFen: payment.Fen(15000), TotalAmountFen: payment.Fen(30000),
 	}); err != nil {
 		t.Fatalf("second refund: %v", err)
 	}
 	over, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
-		OutRefundNo: "ref-3", OutTradeNo: "ord-refund", AmountFen: payment.Fen(1),
+		OutRefundNo: "ref-3", OutTradeNo: "ord-refund", AmountFen: payment.Fen(1), TotalAmountFen: payment.Fen(30000),
 	})
 	if !errors.Is(err, payment.ErrChannelRejected) || over != nil {
 		t.Errorf("over-budget refund must be a channel rejection, got %+v err=%v", over, err)
@@ -351,14 +351,21 @@ func TestRefundFlow(t *testing.T) {
 	if !errors.As(err, &ce) || ce.Code != "REFUND_EXCEED_BALANCE" {
 		t.Errorf("over-budget code: %v", err)
 	}
+	// A declared original amount that contradicts the stored order is an
+	// input fault, not a channel verdict.
+	if _, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
+		OutRefundNo: "ref-wrongtotal", OutTradeNo: "ord-refund", AmountFen: payment.Fen(1), TotalAmountFen: payment.Fen(29999),
+	}); !errors.Is(err, payment.ErrInvalidArgument) {
+		t.Errorf("contradicting declared total: want ErrInvalidArgument, got %v", err)
+	}
 	reuse, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
-		OutRefundNo: "ref-1", OutTradeNo: "ord-refund", AmountFen: payment.Fen(15000), Reason: "half",
+		OutRefundNo: "ref-1", OutTradeNo: "ord-refund", AmountFen: payment.Fen(15000), TotalAmountFen: payment.Fen(30000), Reason: "half",
 	})
 	if err != nil || reuse.RefundID != half.RefundID {
 		t.Errorf("refund idempotent reuse: %+v err=%v", reuse, err)
 	}
 	changed, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
-		OutRefundNo: "ref-1", OutTradeNo: "ord-refund", AmountFen: payment.Fen(100),
+		OutRefundNo: "ref-1", OutTradeNo: "ord-refund", AmountFen: payment.Fen(100), TotalAmountFen: payment.Fen(30000),
 	})
 	if !errors.Is(err, payment.ErrDuplicate) || changed != nil {
 		t.Errorf("same refund key different params: want ErrDuplicate, got %v", err)
@@ -375,7 +382,7 @@ func TestRefundFlow(t *testing.T) {
 		t.Fatalf("create pending: %v", err)
 	}
 	if _, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
-		OutRefundNo: "ref-p", OutTradeNo: "ord-pending", AmountFen: payment.Fen(1),
+		OutRefundNo: "ref-p", OutTradeNo: "ord-pending", AmountFen: payment.Fen(1), TotalAmountFen: payment.Fen(30000),
 	}); !errors.Is(err, payment.ErrChannelRejected) {
 		t.Errorf("refund pending order: want ErrChannelRejected, got %v", err)
 	}
@@ -390,7 +397,7 @@ func TestRefundNotificationParse(t *testing.T) {
 		t.Fatalf("mark paid: %v", err)
 	}
 	if _, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
-		OutRefundNo: "ref-n1", OutTradeNo: "ord-rnotify", AmountFen: payment.Fen(10000),
+		OutRefundNo: "ref-n1", OutTradeNo: "ord-rnotify", AmountFen: payment.Fen(10000), TotalAmountFen: payment.Fen(30000),
 	}); err != nil {
 		t.Fatalf("refund: %v", err)
 	}
@@ -454,9 +461,10 @@ func TestConcurrentRefundBudget(t *testing.T) {
 		go func(i int) {
 			defer wg.Done()
 			_, err := p.Gateway.Refund(context.Background(), &payment.RefundInput{
-				OutRefundNo: "ref-b" + strconv.Itoa(i),
-				OutTradeNo:  "ord-budget",
-				AmountFen:   payment.Fen(12000),
+				OutRefundNo:    "ref-b" + strconv.Itoa(i),
+				OutTradeNo:     "ord-budget",
+				AmountFen:      payment.Fen(12000),
+				TotalAmountFen: payment.Fen(30000),
 			})
 			mu.Lock()
 			defer mu.Unlock()
