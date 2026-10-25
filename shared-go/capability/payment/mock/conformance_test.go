@@ -500,7 +500,7 @@ func TestDeliver(t *testing.T) {
 	var mu sync.Mutex
 	got := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
-		r.Body.Close()
+		_ = r.Body.Close()
 		mu.Lock()
 		got++
 		mu.Unlock()

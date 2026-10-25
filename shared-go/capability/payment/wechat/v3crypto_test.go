@@ -120,11 +120,12 @@ func TestSignVerifyRoundTrip(t *testing.T) {
 func TestGCMRoundTrip(t *testing.T) {
 	key := []byte("0123456789abcdef0123456789abcdef") // 32 bytes
 	for _, aad := range []string{"", "transaction"} {
-		ct, err := EncryptAES256GCM(key, []byte("nonce1234567"), aad, []byte(`{"out_trade_no":"ord-1"}`))
+		nonce := freshNonce()
+		ct, err := EncryptAES256GCM(key, []byte(nonce), aad, []byte(`{"out_trade_no":"ord-1"}`))
 		if err != nil {
 			t.Fatalf("encrypt (aad=%q): %v", aad, err)
 		}
-		pt, err := DecryptAES256GCM(key, "nonce1234567", aad, ct)
+		pt, err := DecryptAES256GCM(key, nonce, aad, ct)
 		if err != nil {
 			t.Fatalf("decrypt (aad=%q): %v", aad, err)
 		}
@@ -133,11 +134,12 @@ func TestGCMRoundTrip(t *testing.T) {
 		}
 	}
 
-	ct, err := EncryptAES256GCM(key, []byte("nonce1234567"), "transaction", []byte("x"))
+	nonce := freshNonce()
+	ct, err := EncryptAES256GCM(key, []byte(nonce), "transaction", []byte("x"))
 	if err != nil {
 		t.Fatalf("encrypt: %v", err)
 	}
-	if _, err := DecryptAES256GCM(key, "nonce1234567", "other", ct); err == nil {
+	if _, err := DecryptAES256GCM(key, nonce, "other", ct); err == nil {
 		t.Error("wrong associated data must fail")
 	}
 	if _, err := DecryptAES256GCM(key, "nonce9999999", "transaction", ct); err == nil {

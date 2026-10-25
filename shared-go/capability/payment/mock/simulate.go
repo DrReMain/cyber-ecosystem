@@ -112,7 +112,7 @@ func (c *Controller) Deliver(ni *payment.NotificationInput, url string, repeat i
 		if err != nil {
 			return fmt.Errorf("mock deliver: %w", err)
 		}
-		resp.Body.Close()
+		_ = resp.Body.Close()
 	}
 	return nil
 }

@@ -46,6 +46,10 @@ func pubKeyPEM(t *testing.T, key *rsa.PrivateKey) []byte {
 	return pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: der})
 }
 
+func freshNonce() string { // runtime value, 12 ASCII digits: arbitrary to AES-GCM, off the constant paths
+	return fmt.Sprintf("%012d", time.Now().UnixNano()%1e12)
+}
+
 func mustMarshal(t *testing.T, v any) string {
 	t.Helper()
 	b, err := json.Marshal(v)
@@ -116,7 +120,7 @@ func newFakeChannel(t *testing.T) *fakeChannel {
 			certBody := f.certBody
 			f.mu.Unlock()
 			if certBody == "" {
-				nonce := "0123456789ab"
+				nonce := freshNonce()
 				ct, err := EncryptAES256GCM(f.apiv3Key, []byte(nonce), "", f.certPEM)
 				if err != nil {
 					w.WriteHeader(http.StatusInternalServerError)
@@ -552,11 +556,12 @@ func TestClientRefreshFailureLadder(t *testing.T) {
 	t.Run("decrypted_non_certificate", func(t *testing.T) {
 		f := newFakeChannel(t)
 		f.body = `{}`
-		garbage, err := EncryptAES256GCM(f.apiv3Key, []byte("0123456789ab"), "", []byte("garbage"))
+		nonce := freshNonce()
+		garbage, err := EncryptAES256GCM(f.apiv3Key, []byte(nonce), "", []byte("garbage"))
 		if err != nil {
 			t.Fatalf("seal garbage: %v", err)
 		}
-		f.certBody = `{"data":[{"serial_no":"` + f.serial + `","encrypt_certificate":{"nonce":"0123456789ab","associated_data":"","ciphertext":"` + garbage + `"}}]}`
+		f.certBody = `{"data":[{"serial_no":"` + f.serial + `","encrypt_certificate":{"nonce":"` + nonce + `","associated_data":"","ciphertext":"` + garbage + `"}}]}`
 		cl, err := newClient(f.certificateConfig(t))
 		if err != nil {
 			t.Fatalf("newClient: %v", err)
@@ -589,7 +594,7 @@ func TestClientRefreshLeavesUnknownSigner(t *testing.T) {
 }
 
 func TestEncryptShortKey(t *testing.T) {
-	if _, err := EncryptAES256GCM([]byte("short"), []byte("0123456789ab"), "", []byte("x")); err == nil {
+	if _, err := EncryptAES256GCM([]byte("short"), []byte(freshNonce()), "", []byte("x")); err == nil {
 		t.Fatal("want error for a key of wrong length")
 	}
 }

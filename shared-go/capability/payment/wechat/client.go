@@ -46,14 +46,14 @@ type client struct {
 
 func newClient(cfg Config) (*client, error) {
 	if err := cfg.validate(); err != nil {
-		return nil, fmt.Errorf("%w: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: %w", payment.ErrInvalidArgument, err)
 	}
 	if cfg.BaseURL == "" {
 		cfg.BaseURL = defaultBaseURL
 	}
 	key, err := ParsePrivateKeyPEM(cfg.PrivateKeyPEM)
 	if err != nil {
-		return nil, fmt.Errorf("%w: merchant key: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: merchant key: %w", payment.ErrInvalidArgument, err)
 	}
 	c := &client{
 		cfg:    cfg,
@@ -64,7 +64,7 @@ func newClient(cfg Config) (*client, error) {
 	if len(cfg.WechatpayPublicKeyPEM) > 0 {
 		pub, err := ParsePublicKeyPEM(cfg.WechatpayPublicKeyPEM)
 		if err != nil {
-			return nil, fmt.Errorf("%w: wechatpay public key: %v", payment.ErrInvalidArgument, err)
+			return nil, fmt.Errorf("%w: wechatpay public key: %w", payment.ErrInvalidArgument, err)
 		}
 		c.pubs[cfg.WechatpayPublicKeyID] = pub
 	}
@@ -87,7 +87,7 @@ func (c *client) do(ctx context.Context, method, path string, query url.Values, 
 		return nil
 	}
 	if err := json.Unmarshal(respBody, out); err != nil {
-		return fmt.Errorf("%w: decode response: %v", payment.ErrUnavailable, err)
+		return fmt.Errorf("%w: decode response: %w", payment.ErrUnavailable, err)
 	}
 	return nil
 }
@@ -106,16 +106,16 @@ func (c *client) execute(ctx context.Context, method, path string, query url.Val
 	}
 	req, err := http.NewRequestWithContext(ctx, method, c.cfg.BaseURL+full, rd)
 	if err != nil {
-		return nil, nil, fmt.Errorf("%w: build request: %v", payment.ErrInvalidArgument, err)
+		return nil, nil, fmt.Errorf("%w: build request: %w", payment.ErrInvalidArgument, err)
 	}
 	ts := time.Now().Unix()
 	nonce, err := newNonce()
 	if err != nil {
-		return nil, nil, fmt.Errorf("%w: nonce: %v", payment.ErrUnavailable, err)
+		return nil, nil, fmt.Errorf("%w: nonce: %w", payment.ErrUnavailable, err)
 	}
 	sig, err := SignSHA256RSA(c.mchKey, BuildRequestMessage(method, full, ts, nonce, body))
 	if err != nil {
-		return nil, nil, fmt.Errorf("%w: sign: %v", payment.ErrInvalidArgument, err)
+		return nil, nil, fmt.Errorf("%w: sign: %w", payment.ErrInvalidArgument, err)
 	}
 	req.Header.Set("Authorization", BuildAuthorizationHeader(c.cfg.MchID, c.cfg.MchSerial, ts, nonce, sig))
 	req.Header.Set("Accept", "application/json")
@@ -130,12 +130,12 @@ func (c *client) execute(ctx context.Context, method, path string, query url.Val
 	}
 	resp, err := c.hc.Do(req)
 	if err != nil {
-		return nil, nil, fmt.Errorf("%w: %v", payment.ErrUnavailable, err)
+		return nil, nil, fmt.Errorf("%w: %w", payment.ErrUnavailable, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, nil, fmt.Errorf("%w: read response: %v", payment.ErrUnavailable, err)
+		return nil, nil, fmt.Errorf("%w: read response: %w", payment.ErrUnavailable, err)
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		a := &APIError{Status: resp.StatusCode, RequestID: resp.Header.Get("Request-ID")}
@@ -185,7 +185,7 @@ func (c *client) verifySigned(ctx context.Context, h http.Header, body []byte) e
 		}
 	}
 	if err := VerifySHA256RSA(pub, BuildVerifyMessage(ts, nonce, body), sig); err != nil {
-		return fmt.Errorf("%w: %v", payment.ErrInvalidSignature, err)
+		return fmt.Errorf("%w: %w", payment.ErrInvalidSignature, err)
 	}
 	return nil
 }
@@ -218,18 +218,18 @@ func (c *client) refreshCertificates(ctx context.Context) error {
 		} `json:"data"`
 	}
 	if err := json.Unmarshal(body, &list); err != nil {
-		return fmt.Errorf("%w: decode certificates: %v", payment.ErrUnavailable, err)
+		return fmt.Errorf("%w: decode certificates: %w", payment.ErrUnavailable, err)
 	}
 	fresh := make(map[string]*rsa.PublicKey, len(list.Data))
 	for _, d := range list.Data {
 		pemBytes, err := DecryptAES256GCM(c.cfg.APIv3Key,
 			d.EncryptCertificate.Nonce, d.EncryptCertificate.AssociatedData, d.EncryptCertificate.Ciphertext)
 		if err != nil {
-			return fmt.Errorf("%w: decrypt certificate %s: %v", payment.ErrDecryptFailed, d.SerialNo, err)
+			return fmt.Errorf("%w: decrypt certificate %s: %w", payment.ErrDecryptFailed, d.SerialNo, err)
 		}
 		cert, err := ParseCertificatePEM(pemBytes)
 		if err != nil {
-			return fmt.Errorf("%w: parse certificate %s: %v", payment.ErrUnavailable, d.SerialNo, err)
+			return fmt.Errorf("%w: parse certificate %s: %w", payment.ErrUnavailable, d.SerialNo, err)
 		}
 		pub, ok := cert.PublicKey.(*rsa.PublicKey)
 		if !ok {

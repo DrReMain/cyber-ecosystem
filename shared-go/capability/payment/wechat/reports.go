@@ -74,31 +74,31 @@ func (r *reports) DownloadBill(ctx context.Context, in *payment.BillInput) (*pay
 func (c *client) fetchBill(ctx context.Context, downloadURL string) ([]byte, error) {
 	u, err := url.Parse(downloadURL)
 	if err != nil {
-		return nil, fmt.Errorf("%w: parse download url: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: parse download url: %w", payment.ErrInvalidArgument, err)
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("%w: build request: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: build request: %w", payment.ErrInvalidArgument, err)
 	}
 	ts := time.Now().Unix()
 	nonce, err := newNonce()
 	if err != nil {
-		return nil, fmt.Errorf("%w: nonce: %v", payment.ErrUnavailable, err)
+		return nil, fmt.Errorf("%w: nonce: %w", payment.ErrUnavailable, err)
 	}
 	sig, err := SignSHA256RSA(c.mchKey, BuildRequestMessage(http.MethodGet, u.RequestURI(), ts, nonce, nil))
 	if err != nil {
-		return nil, fmt.Errorf("%w: sign: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: sign: %w", payment.ErrInvalidArgument, err)
 	}
 	req.Header.Set("Authorization", BuildAuthorizationHeader(c.cfg.MchID, c.cfg.MchSerial, ts, nonce, sig))
 	req.Header.Set("Accept", "application/json")
 	resp, err := c.hc.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", payment.ErrUnavailable, err)
+		return nil, fmt.Errorf("%w: %w", payment.ErrUnavailable, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("%w: read response: %v", payment.ErrUnavailable, err)
+		return nil, fmt.Errorf("%w: read response: %w", payment.ErrUnavailable, err)
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		a := &APIError{Status: resp.StatusCode, RequestID: resp.Header.Get("Request-ID")}
@@ -123,12 +123,12 @@ func (c *client) fetchBill(ctx context.Context, downloadURL string) ([]byte, err
 	if strings.Contains(resp.Header.Get("Content-Type"), "gzip") {
 		zr, err := gzip.NewReader(bytes.NewReader(body))
 		if err != nil {
-			return nil, fmt.Errorf("%w: bill gzip: %v", payment.ErrUnavailable, err)
+			return nil, fmt.Errorf("%w: bill gzip: %w", payment.ErrUnavailable, err)
 		}
-		defer zr.Close()
+		defer func() { _ = zr.Close() }()
 		plain, err := io.ReadAll(zr)
 		if err != nil {
-			return nil, fmt.Errorf("%w: bill gunzip: %v", payment.ErrUnavailable, err)
+			return nil, fmt.Errorf("%w: bill gunzip: %w", payment.ErrUnavailable, err)
 		}
 		return plain, nil
 	}

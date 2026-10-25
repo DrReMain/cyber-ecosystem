@@ -84,15 +84,15 @@ func (b *backend) Parse(_ context.Context, in *payment.NotificationInput) (*paym
 	}
 	var envelope wireEnvelope
 	if err := json.Unmarshal(in.Body, &envelope); err != nil {
-		return nil, fmt.Errorf("%w: malformed envelope: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: malformed envelope: %w", payment.ErrInvalidArgument, err)
 	}
 	nonce, err := base64.StdEncoding.DecodeString(envelope.Nonce)
 	if err != nil {
-		return nil, fmt.Errorf("%w: malformed nonce: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: malformed nonce: %w", payment.ErrInvalidArgument, err)
 	}
 	ciphertext, err := base64.StdEncoding.DecodeString(envelope.Payload)
 	if err != nil {
-		return nil, fmt.Errorf("%w: malformed payload: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: malformed payload: %w", payment.ErrInvalidArgument, err)
 	}
 	block, err := aes.NewCipher(b.aead)
 	if err != nil {
@@ -108,7 +108,7 @@ func (b *backend) Parse(_ context.Context, in *payment.NotificationInput) (*paym
 	}
 	var event payment.NotificationEvent
 	if err := json.Unmarshal(plaintext, &event); err != nil {
-		return nil, fmt.Errorf("%w: malformed event: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: malformed event: %w", payment.ErrInvalidArgument, err)
 	}
 	return &event, nil
 }

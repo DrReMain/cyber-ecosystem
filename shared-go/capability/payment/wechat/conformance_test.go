@@ -51,6 +51,7 @@ func conformanceConfig(t *testing.T) (Config, bool) {
 	if cfg.MchSerial == "" || cfg.AppID == "" || len(cfg.APIv3Key) == 0 || keyPath == "" {
 		t.Fatal("WECHAT_PAY_CONFORMANCE_* incomplete: MCH_SERIAL, APPID, APIV3_KEY and PRIVATE_KEY_FILE are required when MCHID is set")
 	}
+	//nolint:gosec // the key path is operator-supplied conformance input, never request data
 	privateKey, err := os.ReadFile(keyPath)
 	if err != nil {
 		t.Fatalf("read private key %s: %v", keyPath, err)
@@ -61,6 +62,7 @@ func conformanceConfig(t *testing.T) (Config, bool) {
 		if pubPath == "" {
 			t.Fatal("WECHAT_PAY_CONFORMANCE_PUBLIC_KEY_FILE is required when PUBLIC_KEY_ID is set")
 		}
+		//nolint:gosec // same operator-supplied conformance path
 		pub, err := os.ReadFile(pubPath)
 		if err != nil {
 			t.Fatalf("read public key %s: %v", pubPath, err)
@@ -116,7 +118,7 @@ func TestLiveConformance(t *testing.T) {
 		if err != nil {
 			t.Fatalf("round trip: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			t.Fatalf("read response: %v", err)

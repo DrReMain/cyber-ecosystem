@@ -93,7 +93,7 @@ func (g *gateway) CreatePayment(ctx context.Context, in *payment.CreatePaymentIn
 	}
 	body, err := json.Marshal(req)
 	if err != nil {
-		return nil, fmt.Errorf("%w: encode order: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: encode order: %w", payment.ErrInvalidArgument, err)
 	}
 	var resp createOrderResponse
 	if err := g.c.do(ctx, http.MethodPost, path, nil, body, &resp); err != nil {
@@ -131,7 +131,7 @@ func (g *gateway) QueryPayment(ctx context.Context, outTradeNo string) (*payment
 	if resp.SuccessTime != "" {
 		paidAt, err := time.Parse(time.RFC3339, resp.SuccessTime)
 		if err != nil {
-			return nil, fmt.Errorf("%w: success_time: %v", payment.ErrUnavailable, err)
+			return nil, fmt.Errorf("%w: success_time: %w", payment.ErrUnavailable, err)
 		}
 		out.PaidAt = paidAt
 	}
@@ -161,7 +161,7 @@ func (g *gateway) Refund(ctx context.Context, in *payment.RefundInput) (*payment
 	req.Amount.Currency = "CNY"
 	body, err := json.Marshal(req)
 	if err != nil {
-		return nil, fmt.Errorf("%w: encode refund: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: encode refund: %w", payment.ErrInvalidArgument, err)
 	}
 	var resp refundResponse
 	if err := g.c.do(ctx, http.MethodPost, "/v3/refund/domestic/refunds", nil, body, &resp); err != nil {
@@ -193,7 +193,7 @@ func (g *gateway) QueryRefund(ctx context.Context, outRefundNo string) (*payment
 	if resp.SuccessTime != "" {
 		at, err := time.Parse(time.RFC3339, resp.SuccessTime)
 		if err != nil {
-			return nil, fmt.Errorf("%w: success_time: %v", payment.ErrUnavailable, err)
+			return nil, fmt.Errorf("%w: success_time: %w", payment.ErrUnavailable, err)
 		}
 		out.SuccessAt = at
 	}

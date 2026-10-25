@@ -30,7 +30,7 @@ func (n *notifier) Parse(ctx context.Context, in *payment.NotificationInput) (*p
 	}
 	var wire notificationWire
 	if err := json.Unmarshal(in.Body, &wire); err != nil {
-		return nil, fmt.Errorf("%w: malformed notification: %v", payment.ErrInvalidArgument, err)
+		return nil, fmt.Errorf("%w: malformed notification: %w", payment.ErrInvalidArgument, err)
 	}
 	if wire.Resource.Algorithm != "AEAD_AES_256_GCM" {
 		return nil, fmt.Errorf("%w: unsupported algorithm %q", payment.ErrInvalidArgument, wire.Resource.Algorithm)
@@ -38,14 +38,14 @@ func (n *notifier) Parse(ctx context.Context, in *payment.NotificationInput) (*p
 	plaintext, err := DecryptAES256GCM(n.c.cfg.APIv3Key,
 		wire.Resource.Nonce, wire.Resource.AssociatedData, wire.Resource.Ciphertext)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", payment.ErrDecryptFailed, err)
+		return nil, fmt.Errorf("%w: %w", payment.ErrDecryptFailed, err)
 	}
 	event := &payment.NotificationEvent{ChannelType: wire.EventType}
 	switch wire.Resource.OriginalType {
 	case "transaction":
 		var tx transactionEventWire
 		if err := json.Unmarshal(plaintext, &tx); err != nil {
-			return nil, fmt.Errorf("%w: malformed transaction: %v", payment.ErrInvalidArgument, err)
+			return nil, fmt.Errorf("%w: malformed transaction: %w", payment.ErrInvalidArgument, err)
 		}
 		state, err := mapTradeState(tx.TradeState)
 		if err != nil {
@@ -62,7 +62,7 @@ func (n *notifier) Parse(ctx context.Context, in *payment.NotificationInput) (*p
 	case "refund":
 		var rf refundEventWire
 		if err := json.Unmarshal(plaintext, &rf); err != nil {
-			return nil, fmt.Errorf("%w: malformed refund: %v", payment.ErrInvalidArgument, err)
+			return nil, fmt.Errorf("%w: malformed refund: %w", payment.ErrInvalidArgument, err)
 		}
 		state, err := mapRefundStatus(rf.RefundStatus)
 		if err != nil {

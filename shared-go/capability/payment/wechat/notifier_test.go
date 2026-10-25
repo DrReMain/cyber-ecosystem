@@ -34,7 +34,7 @@ func mintNotification(t *testing.T, f *fakeChannel, eventType, originalType stri
 	if err != nil {
 		t.Fatalf("marshal payload: %v", err)
 	}
-	nonce := "nonce0123456"
+	nonce := freshNonce()
 	ciphertext, err := EncryptAES256GCM(f.apiv3Key, []byte(nonce), originalType, plaintext)
 	if err != nil {
 		t.Fatalf("seal: %v", err)
