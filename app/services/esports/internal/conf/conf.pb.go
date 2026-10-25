@@ -29,7 +29,6 @@ type Bootstrap struct {
 	Observability *Observability         `protobuf:"bytes,3,opt,name=observability,proto3" json:"observability,omitempty"`
 	Remote        *Remote                `protobuf:"bytes,4,opt,name=remote,proto3" json:"remote,omitempty"`
 	Payment       *Payment               `protobuf:"bytes,5,opt,name=payment,proto3" json:"payment,omitempty"`
-	Profile       *Profile               `protobuf:"bytes,6,opt,name=profile,proto3" json:"profile,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -95,13 +94,6 @@ func (x *Bootstrap) GetRemote() *Remote {
 func (x *Bootstrap) GetPayment() *Payment {
 	if x != nil {
 		return x.Payment
-	}
-	return nil
-}
-
-func (x *Bootstrap) GetProfile() *Profile {
-	if x != nil {
-		return x.Profile
 	}
 	return nil
 }
@@ -399,50 +391,6 @@ func (x *Payment) GetProviders() []*Payment_Provider {
 	return nil
 }
 
-type Profile struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CustomGameCap int32                  `protobuf:"varint,1,opt,name=custom_game_cap,json=customGameCap,proto3" json:"custom_game_cap,omitempty"` // business cap for custom game preferences; the contract's static bounds stay the defensive backstop
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Profile) Reset() {
-	*x = Profile{}
-	mi := &file_internal_conf_conf_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Profile) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Profile) ProtoMessage() {}
-
-func (x *Profile) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Profile.ProtoReflect.Descriptor instead.
-func (*Profile) Descriptor() ([]byte, []int) {
-	return file_internal_conf_conf_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *Profile) GetCustomGameCap() int32 {
-	if x != nil {
-		return x.CustomGameCap
-	}
-	return 0
-}
-
 type Server_HTTP struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Network       string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
@@ -454,7 +402,7 @@ type Server_HTTP struct {
 
 func (x *Server_HTTP) Reset() {
 	*x = Server_HTTP{}
-	mi := &file_internal_conf_conf_proto_msgTypes[7]
+	mi := &file_internal_conf_conf_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -466,7 +414,7 @@ func (x *Server_HTTP) String() string {
 func (*Server_HTTP) ProtoMessage() {}
 
 func (x *Server_HTTP) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[7]
+	mi := &file_internal_conf_conf_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -514,7 +462,7 @@ type Server_GRPC struct {
 
 func (x *Server_GRPC) Reset() {
 	*x = Server_GRPC{}
-	mi := &file_internal_conf_conf_proto_msgTypes[8]
+	mi := &file_internal_conf_conf_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -526,7 +474,7 @@ func (x *Server_GRPC) String() string {
 func (*Server_GRPC) ProtoMessage() {}
 
 func (x *Server_GRPC) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[8]
+	mi := &file_internal_conf_conf_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -574,7 +522,7 @@ type Server_Connect struct {
 
 func (x *Server_Connect) Reset() {
 	*x = Server_Connect{}
-	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	mi := &file_internal_conf_conf_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -586,7 +534,7 @@ func (x *Server_Connect) String() string {
 func (*Server_Connect) ProtoMessage() {}
 
 func (x *Server_Connect) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[9]
+	mi := &file_internal_conf_conf_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -640,7 +588,7 @@ type Data_Database struct {
 
 func (x *Data_Database) Reset() {
 	*x = Data_Database{}
-	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_internal_conf_conf_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -652,7 +600,7 @@ func (x *Data_Database) String() string {
 func (*Data_Database) ProtoMessage() {}
 
 func (x *Data_Database) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_internal_conf_conf_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -741,7 +689,7 @@ type Observability_Trace struct {
 
 func (x *Observability_Trace) Reset() {
 	*x = Observability_Trace{}
-	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -753,7 +701,7 @@ func (x *Observability_Trace) String() string {
 func (*Observability_Trace) ProtoMessage() {}
 
 func (x *Observability_Trace) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -792,7 +740,7 @@ type Observability_Metrics struct {
 
 func (x *Observability_Metrics) Reset() {
 	*x = Observability_Metrics{}
-	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -804,7 +752,7 @@ func (x *Observability_Metrics) String() string {
 func (*Observability_Metrics) ProtoMessage() {}
 
 func (x *Observability_Metrics) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -839,7 +787,7 @@ type Observability_Log struct {
 
 func (x *Observability_Log) Reset() {
 	*x = Observability_Log{}
-	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -851,7 +799,7 @@ func (x *Observability_Log) String() string {
 func (*Observability_Log) ProtoMessage() {}
 
 func (x *Observability_Log) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -904,7 +852,7 @@ type Observability_SlowQuery struct {
 
 func (x *Observability_SlowQuery) Reset() {
 	*x = Observability_SlowQuery{}
-	mi := &file_internal_conf_conf_proto_msgTypes[14]
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -916,7 +864,7 @@ func (x *Observability_SlowQuery) String() string {
 func (*Observability_SlowQuery) ProtoMessage() {}
 
 func (x *Observability_SlowQuery) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[14]
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -952,7 +900,7 @@ type Observability_Log_FileOutput struct {
 
 func (x *Observability_Log_FileOutput) Reset() {
 	*x = Observability_Log_FileOutput{}
-	mi := &file_internal_conf_conf_proto_msgTypes[15]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -964,7 +912,7 @@ func (x *Observability_Log_FileOutput) String() string {
 func (*Observability_Log_FileOutput) ProtoMessage() {}
 
 func (x *Observability_Log_FileOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[15]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1026,7 +974,7 @@ type Payment_Provider struct {
 
 func (x *Payment_Provider) Reset() {
 	*x = Payment_Provider{}
-	mi := &file_internal_conf_conf_proto_msgTypes[16]
+	mi := &file_internal_conf_conf_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1038,7 +986,7 @@ func (x *Payment_Provider) String() string {
 func (*Payment_Provider) ProtoMessage() {}
 
 func (x *Payment_Provider) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[16]
+	mi := &file_internal_conf_conf_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1091,7 +1039,7 @@ type Payment_Wechat struct {
 
 func (x *Payment_Wechat) Reset() {
 	*x = Payment_Wechat{}
-	mi := &file_internal_conf_conf_proto_msgTypes[17]
+	mi := &file_internal_conf_conf_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1103,7 +1051,7 @@ func (x *Payment_Wechat) String() string {
 func (*Payment_Wechat) ProtoMessage() {}
 
 func (x *Payment_Wechat) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[17]
+	mi := &file_internal_conf_conf_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1180,14 +1128,13 @@ var File_internal_conf_conf_proto protoreflect.FileDescriptor
 const file_internal_conf_conf_proto_rawDesc = "" +
 	"\n" +
 	"\x18internal/conf/conf.proto\x12\n" +
-	"cyber.conf\x1a\x1egoogle/protobuf/duration.proto\"\xa8\x02\n" +
+	"cyber.conf\x1a\x1egoogle/protobuf/duration.proto\"\xf9\x01\n" +
 	"\tBootstrap\x12*\n" +
 	"\x06server\x18\x01 \x01(\v2\x12.cyber.conf.ServerR\x06server\x12$\n" +
 	"\x04data\x18\x02 \x01(\v2\x10.cyber.conf.DataR\x04data\x12?\n" +
 	"\robservability\x18\x03 \x01(\v2\x19.cyber.conf.ObservabilityR\robservability\x12*\n" +
 	"\x06remote\x18\x04 \x01(\v2\x12.cyber.conf.RemoteR\x06remote\x12-\n" +
-	"\apayment\x18\x05 \x01(\v2\x13.cyber.conf.PaymentR\apayment\x12-\n" +
-	"\aprofile\x18\x06 \x01(\v2\x13.cyber.conf.ProfileR\aprofile\"\xdc\x03\n" +
+	"\apayment\x18\x05 \x01(\v2\x13.cyber.conf.PaymentR\apayment\"\xdc\x03\n" +
 	"\x06Server\x12+\n" +
 	"\x04http\x18\x01 \x01(\v2\x17.cyber.conf.Server.HTTPR\x04http\x12+\n" +
 	"\x04grpc\x18\x02 \x01(\v2\x17.cyber.conf.Server.GRPCR\x04grpc\x124\n" +
@@ -1264,9 +1211,7 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\x0fprivate_key_pem\x18\x05 \x01(\tR\rprivateKeyPem\x12\"\n" +
 	"\rpublic_key_id\x18\x06 \x01(\tR\vpublicKeyId\x12$\n" +
 	"\x0epublic_key_pem\x18\a \x01(\tR\fpublicKeyPem\x12\x19\n" +
-	"\bbase_url\x18\b \x01(\tR\abaseUrl\"1\n" +
-	"\aProfile\x12&\n" +
-	"\x0fcustom_game_cap\x18\x01 \x01(\x05R\rcustomGameCapB9Z7cyber-ecosystem/app/services/esports/internal/conf;confb\x06proto3"
+	"\bbase_url\x18\b \x01(\tR\abaseUrlB9Z7cyber-ecosystem/app/services/esports/internal/conf;confb\x06proto3"
 
 var (
 	file_internal_conf_conf_proto_rawDescOnce sync.Once
@@ -1280,7 +1225,7 @@ func file_internal_conf_conf_proto_rawDescGZIP() []byte {
 	return file_internal_conf_conf_proto_rawDescData
 }
 
-var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_internal_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),                    // 0: cyber.conf.Bootstrap
 	(*Server)(nil),                       // 1: cyber.conf.Server
@@ -1288,19 +1233,18 @@ var file_internal_conf_conf_proto_goTypes = []any{
 	(*Observability)(nil),                // 3: cyber.conf.Observability
 	(*Remote)(nil),                       // 4: cyber.conf.Remote
 	(*Payment)(nil),                      // 5: cyber.conf.Payment
-	(*Profile)(nil),                      // 6: cyber.conf.Profile
-	(*Server_HTTP)(nil),                  // 7: cyber.conf.Server.HTTP
-	(*Server_GRPC)(nil),                  // 8: cyber.conf.Server.GRPC
-	(*Server_Connect)(nil),               // 9: cyber.conf.Server.Connect
-	(*Data_Database)(nil),                // 10: cyber.conf.Data.Database
-	(*Observability_Trace)(nil),          // 11: cyber.conf.Observability.Trace
-	(*Observability_Metrics)(nil),        // 12: cyber.conf.Observability.Metrics
-	(*Observability_Log)(nil),            // 13: cyber.conf.Observability.Log
-	(*Observability_SlowQuery)(nil),      // 14: cyber.conf.Observability.SlowQuery
-	(*Observability_Log_FileOutput)(nil), // 15: cyber.conf.Observability.Log.FileOutput
-	(*Payment_Provider)(nil),             // 16: cyber.conf.Payment.Provider
-	(*Payment_Wechat)(nil),               // 17: cyber.conf.Payment.Wechat
-	(*durationpb.Duration)(nil),          // 18: google.protobuf.Duration
+	(*Server_HTTP)(nil),                  // 6: cyber.conf.Server.HTTP
+	(*Server_GRPC)(nil),                  // 7: cyber.conf.Server.GRPC
+	(*Server_Connect)(nil),               // 8: cyber.conf.Server.Connect
+	(*Data_Database)(nil),                // 9: cyber.conf.Data.Database
+	(*Observability_Trace)(nil),          // 10: cyber.conf.Observability.Trace
+	(*Observability_Metrics)(nil),        // 11: cyber.conf.Observability.Metrics
+	(*Observability_Log)(nil),            // 12: cyber.conf.Observability.Log
+	(*Observability_SlowQuery)(nil),      // 13: cyber.conf.Observability.SlowQuery
+	(*Observability_Log_FileOutput)(nil), // 14: cyber.conf.Observability.Log.FileOutput
+	(*Payment_Provider)(nil),             // 15: cyber.conf.Payment.Provider
+	(*Payment_Wechat)(nil),               // 16: cyber.conf.Payment.Wechat
+	(*durationpb.Duration)(nil),          // 17: google.protobuf.Duration
 }
 var file_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber.conf.Bootstrap.server:type_name -> cyber.conf.Server
@@ -1308,28 +1252,27 @@ var file_internal_conf_conf_proto_depIdxs = []int32{
 	3,  // 2: cyber.conf.Bootstrap.observability:type_name -> cyber.conf.Observability
 	4,  // 3: cyber.conf.Bootstrap.remote:type_name -> cyber.conf.Remote
 	5,  // 4: cyber.conf.Bootstrap.payment:type_name -> cyber.conf.Payment
-	6,  // 5: cyber.conf.Bootstrap.profile:type_name -> cyber.conf.Profile
-	7,  // 6: cyber.conf.Server.http:type_name -> cyber.conf.Server.HTTP
-	8,  // 7: cyber.conf.Server.grpc:type_name -> cyber.conf.Server.GRPC
-	9,  // 8: cyber.conf.Server.connect:type_name -> cyber.conf.Server.Connect
-	10, // 9: cyber.conf.Data.database:type_name -> cyber.conf.Data.Database
-	11, // 10: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
-	12, // 11: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
-	13, // 12: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
-	14, // 13: cyber.conf.Observability.slow_query:type_name -> cyber.conf.Observability.SlowQuery
-	16, // 14: cyber.conf.Payment.providers:type_name -> cyber.conf.Payment.Provider
-	18, // 15: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	18, // 16: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	18, // 17: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	18, // 18: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	15, // 19: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
-	18, // 20: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
-	17, // 21: cyber.conf.Payment.Provider.wechat:type_name -> cyber.conf.Payment.Wechat
-	22, // [22:22] is the sub-list for method output_type
-	22, // [22:22] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	6,  // 5: cyber.conf.Server.http:type_name -> cyber.conf.Server.HTTP
+	7,  // 6: cyber.conf.Server.grpc:type_name -> cyber.conf.Server.GRPC
+	8,  // 7: cyber.conf.Server.connect:type_name -> cyber.conf.Server.Connect
+	9,  // 8: cyber.conf.Data.database:type_name -> cyber.conf.Data.Database
+	10, // 9: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
+	11, // 10: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
+	12, // 11: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
+	13, // 12: cyber.conf.Observability.slow_query:type_name -> cyber.conf.Observability.SlowQuery
+	15, // 13: cyber.conf.Payment.providers:type_name -> cyber.conf.Payment.Provider
+	17, // 14: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	17, // 15: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	17, // 16: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	17, // 17: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	14, // 18: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
+	17, // 19: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
+	16, // 20: cyber.conf.Payment.Provider.wechat:type_name -> cyber.conf.Payment.Wechat
+	21, // [21:21] is the sub-list for method output_type
+	21, // [21:21] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }
@@ -1343,7 +1286,7 @@ func file_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_conf_conf_proto_rawDesc), len(file_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -36,6 +36,3 @@ payment:
   providers:
     - name: ${PAY_PROVIDER:mock}
       kind: ${PAY_PROVIDER:mock}
-
-profile:
-  custom_game_cap: ${ESPORTS_PROFILE_CUSTOM_GAME_CAP:3} # 自定义游戏偏好业务上限（产品口径 3；契约静态 20 仍为防御底线；导出 APP_ESPORTS_PROFILE_CUSTOM_GAME_CAP）

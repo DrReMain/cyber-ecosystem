@@ -28,7 +28,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, payment *conf.Payment, confProfile *conf.Profile, logger *slog.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, payment *conf.Payment, logger *slog.Logger) (*kratos.App, func(), error) {
 	entClient, cleanup, err := platform.NewEntClient(data, logger)
 	if err != nil {
 		return nil, nil, err
@@ -53,12 +53,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	}
 	profileRP := profile.NewProfileRP(logger, platformPlatform)
 	gameRP := game.NewGameRP(logger, platformPlatform)
-	profileUC, err := profile.NewProfileUC(logger, platformPlatform, profileRP, gameRP, confProfile)
-	if err != nil {
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
+	profileUC := profile.NewProfileUC(logger, platformPlatform, profileRP, gameRP)
 	profileService := profile.NewProfileService(logger, profileUC)
 	gameUC := game.NewGameUC(logger, platformPlatform, gameRP)
 	gameService := game.NewGameService(logger, gameUC)

@@ -12,7 +12,6 @@ message Bootstrap {
   Observability observability = 3;
   Remote remote = 4;
   Payment payment = 5;
-  Profile profile = 6;
 }
 
 message Server {
@@ -109,8 +108,4 @@ message Payment {
     string public_key_pem = 7;      // pub_key.pem contents
     string base_url = 8;            // override for channel-edge tests
   }
-}
-
-message Profile {
-  int32 custom_game_cap = 1; // business cap for custom game preferences; the contract's static bounds stay the defensive backstop
 }

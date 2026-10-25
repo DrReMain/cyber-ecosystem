@@ -302,9 +302,9 @@ type UpdateProfileRequest struct {
 	// writer of that timestamp.
 	GuardianAccepted *bool `protobuf:"varint,5,opt,name=guardian_accepted,json=guardianAccepted,proto3,oneof" json:"guardian_accepted,omitempty"`
 	// Replace-set: presence rewrites the whole preference list (present with
-	// empty lists clears it). The business custom-game cap is config-driven
-	// and enforced server-side (ESPORTS_PROFILE_CUSTOM_GAME_CAP); the
-	// repeated bounds below are static backstops only.
+	// empty lists clears it). The business custom-game cap is a product
+	// constant enforced server-side; the repeated bounds below are static
+	// backstops only.
 	GamePreference *GamePreferenceInput `protobuf:"bytes,6,opt,name=game_preference,json=gamePreference,proto3,oneof" json:"game_preference,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache

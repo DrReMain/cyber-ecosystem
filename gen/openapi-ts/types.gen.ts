@@ -1015,9 +1015,9 @@ export type CyberEsportsV1UpdateProfileRequest = {
     guardianAccepted?: boolean;
     /**
      * Replace-set: presence rewrites the whole preference list (present with
-     * empty lists clears it). The business custom-game cap is config-driven
-     * and enforced server-side (ESPORTS_PROFILE_CUSTOM_GAME_CAP); the
-     * repeated bounds below are static backstops only.
+     * empty lists clears it). The business custom-game cap is a product
+     * constant enforced server-side; the repeated bounds below are static
+     * backstops only.
      */
     gamePreference?: CyberEsportsV1GamePreferenceInput;
 };
