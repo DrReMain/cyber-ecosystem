@@ -21,8 +21,6 @@ type ReportPolicy struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// tenant scope; back-filled on insert and filtered from the request subject
-	TenantID string `json:"tenant_id,omitempty"`
 	// the family this row governs — the upsert key, one row per family
 	ReportType reportpolicy.ReportType `json:"report_type,omitempty"`
 	// who may enter: everyone, active members, the tenant's own (awaiting the tenant plane), or only explicit grants
@@ -37,7 +35,7 @@ func (*ReportPolicy) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case reportpolicy.FieldID, reportpolicy.FieldTenantID, reportpolicy.FieldReportType, reportpolicy.FieldPolicy, reportpolicy.FieldUpdatedBy:
+		case reportpolicy.FieldID, reportpolicy.FieldReportType, reportpolicy.FieldPolicy, reportpolicy.FieldUpdatedBy:
 			values[i] = new(sql.NullString)
 		case reportpolicy.FieldCreatedAt, reportpolicy.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -73,12 +71,6 @@ func (_m *ReportPolicy) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
-			}
-		case reportpolicy.FieldTenantID:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
-			} else if value.Valid {
-				_m.TenantID = value.String
 			}
 		case reportpolicy.FieldReportType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -139,9 +131,6 @@ func (_m *ReportPolicy) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("tenant_id=")
-	builder.WriteString(_m.TenantID)
 	builder.WriteString(", ")
 	builder.WriteString("report_type=")
 	builder.WriteString(fmt.Sprintf("%v", _m.ReportType))

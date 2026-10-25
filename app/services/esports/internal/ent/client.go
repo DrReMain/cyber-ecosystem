@@ -1640,14 +1640,12 @@ func (c *ReportPolicyClient) GetX(ctx context.Context, id string) *ReportPolicy 
 
 // Hooks returns the client hooks.
 func (c *ReportPolicyClient) Hooks() []Hook {
-	hooks := c.hooks.ReportPolicy
-	return append(hooks[:len(hooks):len(hooks)], reportpolicy.Hooks[:]...)
+	return c.hooks.ReportPolicy
 }
 
 // Interceptors returns the client interceptors.
 func (c *ReportPolicyClient) Interceptors() []Interceptor {
-	inters := c.inters.ReportPolicy
-	return append(inters[:len(inters):len(inters)], reportpolicy.Interceptors[:]...)
+	return c.inters.ReportPolicy
 }
 
 func (c *ReportPolicyClient) mutate(ctx context.Context, m *ReportPolicyMutation) (Value, error) {

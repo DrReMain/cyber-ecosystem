@@ -2,6 +2,8 @@ package entitle
 
 import (
 	"context"
+	dbsql "database/sql"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -124,11 +126,16 @@ func (rp *entitlementRP) Grant(ctx context.Context, g *EntitlementGrant) error {
 	}
 	// ON CONFLICT DO NOTHING keeps the caller's transaction unpoisoned: a
 	// rival grant for the same scope is a no-op statement, never an error
-	// the transaction would have to survive.
-	if err := create.OnConflict().DoNothing().Exec(ctx); err != nil {
+	// the transaction would have to survive. ent surfaces the swallowed
+	// insert as ErrNoRows — the RETURNING clause finds no row — and that
+	// is the no-op answer itself, not a failure to report.
+	if err := create.OnConflict().DoNothing().Exec(ctx); err != nil && !errors.Is(err, dbsql.ErrNoRows) {
 		return rp.Platform.HandleEntError(err)
 	}
-	return nil
+	if g.ScopeKind != shared.ScopeReportType || g.ExpiresAt == nil {
+		return nil
+	}
+	return rp.ratchetGrant(ctx, g)
 }
 
 func (rp *entitlementRP) ByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*EntitlementRow, error) {
@@ -234,4 +241,30 @@ func mapEntitlementRow(row *ent.Entitlement) *EntitlementRow {
 		Source:    row.Source,
 		CreatedAt: row.CreatedAt,
 	}
+}
+
+func (rp *entitlementRP) ratchetGrant(ctx context.Context, g *EntitlementGrant) error {
+	// A family's grant is one row, so the insert above may have no-op'd
+	// against a lapsed or shorter one — the ratchet extends forward only,
+	// the TakeUse shape: one arbiter, the loser a no-op, and a replay of
+	// the same grant matches nothing (equal is not less). The columns are
+	// immutable on purpose — ledger rows never rewrite history — so the
+	// forward extension rides raw SQL, the one sanctioned way to move an
+	// immutable column at all; Exec (not Save) because zero rows here is
+	// the no-op outcome, not a miss to surface.
+	if err := rp.Platform.GetClient(ctx).Entitlement.Update().
+		Modify(func(u *sql.UpdateBuilder) {
+			u.Set(entitlement.FieldExpiresAt, *g.ExpiresAt).
+				Set(entitlement.FieldSource, g.Source).
+				Where(sql.And(
+					sql.EQ(entitlement.FieldUserID, g.UserID),
+					sql.EQ(entitlement.FieldScopeKind, g.ScopeKind),
+					sql.EQ(entitlement.FieldScopeRef, *g.ScopeRef),
+					sql.LT(entitlement.FieldExpiresAt, *g.ExpiresAt),
+				))
+		}).
+		Exec(ctx); err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
 }

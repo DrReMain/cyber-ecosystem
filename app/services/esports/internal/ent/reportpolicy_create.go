@@ -51,12 +51,6 @@ func (_c *ReportPolicyCreate) SetNillableUpdatedAt(v *time.Time) *ReportPolicyCr
 	return _c
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *ReportPolicyCreate) SetTenantID(v string) *ReportPolicyCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
 // SetReportType sets the "report_type" field.
 func (_c *ReportPolicyCreate) SetReportType(v reportpolicy.ReportType) *ReportPolicyCreate {
 	_c.mutation.SetReportType(v)
@@ -96,9 +90,7 @@ func (_c *ReportPolicyCreate) Mutation() *ReportPolicyMutation {
 
 // Save creates the ReportPolicy in the database.
 func (_c *ReportPolicyCreate) Save(ctx context.Context) (*ReportPolicy, error) {
-	if err := _c.defaults(); err != nil {
-		return nil, err
-	}
+	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -125,29 +117,19 @@ func (_c *ReportPolicyCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *ReportPolicyCreate) defaults() error {
+func (_c *ReportPolicyCreate) defaults() {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if reportpolicy.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized reportpolicy.DefaultCreatedAt (forgotten import ent/runtime?)")
-		}
 		v := reportpolicy.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		if reportpolicy.DefaultUpdatedAt == nil {
-			return fmt.Errorf("ent: uninitialized reportpolicy.DefaultUpdatedAt (forgotten import ent/runtime?)")
-		}
 		v := reportpolicy.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := _c.mutation.ID(); !ok {
-		if reportpolicy.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized reportpolicy.DefaultID (forgotten import ent/runtime?)")
-		}
 		v := reportpolicy.DefaultID()
 		_c.mutation.SetID(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -157,14 +139,6 @@ func (_c *ReportPolicyCreate) check() error {
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ReportPolicy.updated_at"`)}
-	}
-	if _, ok := _c.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ReportPolicy.tenant_id"`)}
-	}
-	if v, ok := _c.mutation.TenantID(); ok {
-		if err := reportpolicy.TenantIDValidator(v); err != nil {
-			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "ReportPolicy.tenant_id": %w`, err)}
-		}
 	}
 	if _, ok := _c.mutation.ReportType(); !ok {
 		return &ValidationError{Name: "report_type", err: errors.New(`ent: missing required field "ReportPolicy.report_type"`)}
@@ -238,10 +212,6 @@ func (_c *ReportPolicyCreate) createSpec() (*ReportPolicy, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(reportpolicy.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(reportpolicy.FieldTenantID, field.TypeString, value)
-		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.ReportType(); ok {
 		_spec.SetField(reportpolicy.FieldReportType, field.TypeEnum, value)
@@ -362,9 +332,6 @@ func (u *ReportPolicyUpsertOne) UpdateNewValues() *ReportPolicyUpsertOne {
 		}
 		if _, exists := u.create.mutation.CreatedAt(); exists {
 			s.SetIgnore(reportpolicy.FieldCreatedAt)
-		}
-		if _, exists := u.create.mutation.TenantID(); exists {
-			s.SetIgnore(reportpolicy.FieldTenantID)
 		}
 		if _, exists := u.create.mutation.ReportType(); exists {
 			s.SetIgnore(reportpolicy.FieldReportType)
@@ -627,9 +594,6 @@ func (u *ReportPolicyUpsertBulk) UpdateNewValues() *ReportPolicyUpsertBulk {
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(reportpolicy.FieldCreatedAt)
-			}
-			if _, exists := b.mutation.TenantID(); exists {
-				s.SetIgnore(reportpolicy.FieldTenantID)
 			}
 			if _, exists := b.mutation.ReportType(); exists {
 				s.SetIgnore(reportpolicy.FieldReportType)

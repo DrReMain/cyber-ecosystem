@@ -839,16 +839,10 @@ func init() {
 	// questionbank.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	questionbank.IDValidator = questionbankDescID.Validators[0].(func(string) error)
 	reportpolicyMixin := schema.ReportPolicy{}.Mixin()
-	reportpolicyMixinHooks2 := reportpolicyMixin[2].Hooks()
-	reportpolicy.Hooks[0] = reportpolicyMixinHooks2[0]
-	reportpolicyMixinInters2 := reportpolicyMixin[2].Interceptors()
-	reportpolicy.Interceptors[0] = reportpolicyMixinInters2[0]
 	reportpolicyMixinFields0 := reportpolicyMixin[0].Fields()
 	_ = reportpolicyMixinFields0
 	reportpolicyMixinFields1 := reportpolicyMixin[1].Fields()
 	_ = reportpolicyMixinFields1
-	reportpolicyMixinFields2 := reportpolicyMixin[2].Fields()
-	_ = reportpolicyMixinFields2
 	reportpolicyFields := schema.ReportPolicy{}.Fields()
 	_ = reportpolicyFields
 	// reportpolicyDescCreatedAt is the schema descriptor for created_at field.
@@ -861,10 +855,6 @@ func init() {
 	reportpolicy.DefaultUpdatedAt = reportpolicyDescUpdatedAt.Default.(func() time.Time)
 	// reportpolicy.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	reportpolicy.UpdateDefaultUpdatedAt = reportpolicyDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// reportpolicyDescTenantID is the schema descriptor for tenant_id field.
-	reportpolicyDescTenantID := reportpolicyMixinFields2[0].Descriptor()
-	// reportpolicy.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
-	reportpolicy.TenantIDValidator = reportpolicyDescTenantID.Validators[0].(func(string) error)
 	// reportpolicyDescUpdatedBy is the schema descriptor for updated_by field.
 	reportpolicyDescUpdatedBy := reportpolicyFields[2].Descriptor()
 	// reportpolicy.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.

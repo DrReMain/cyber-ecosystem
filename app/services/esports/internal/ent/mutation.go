@@ -8269,7 +8269,6 @@ type ReportPolicyMutation struct {
 	id            *string
 	created_at    *time.Time
 	updated_at    *time.Time
-	tenant_id     *string
 	report_type   *reportpolicy.ReportType
 	policy        *reportpolicy.Policy
 	updated_by    *string
@@ -8455,42 +8454,6 @@ func (m *ReportPolicyMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (m *ReportPolicyMutation) SetTenantID(s string) {
-	m.tenant_id = &s
-}
-
-// TenantID returns the value of the "tenant_id" field in the mutation.
-func (m *ReportPolicyMutation) TenantID() (r string, exists bool) {
-	v := m.tenant_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTenantID returns the old "tenant_id" field's value of the ReportPolicy entity.
-// If the ReportPolicy object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReportPolicyMutation) OldTenantID(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTenantID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
-	}
-	return oldValue.TenantID, nil
-}
-
-// ResetTenantID resets all changes to the "tenant_id" field.
-func (m *ReportPolicyMutation) ResetTenantID() {
-	m.tenant_id = nil
-}
-
 // SetReportType sets the "report_type" field.
 func (m *ReportPolicyMutation) SetReportType(rt reportpolicy.ReportType) {
 	m.report_type = &rt
@@ -8633,15 +8596,12 @@ func (m *ReportPolicyMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ReportPolicyMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, reportpolicy.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, reportpolicy.FieldUpdatedAt)
-	}
-	if m.tenant_id != nil {
-		fields = append(fields, reportpolicy.FieldTenantID)
 	}
 	if m.report_type != nil {
 		fields = append(fields, reportpolicy.FieldReportType)
@@ -8664,8 +8624,6 @@ func (m *ReportPolicyMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case reportpolicy.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case reportpolicy.FieldTenantID:
-		return m.TenantID()
 	case reportpolicy.FieldReportType:
 		return m.ReportType()
 	case reportpolicy.FieldPolicy:
@@ -8685,8 +8643,6 @@ func (m *ReportPolicyMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldCreatedAt(ctx)
 	case reportpolicy.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case reportpolicy.FieldTenantID:
-		return m.OldTenantID(ctx)
 	case reportpolicy.FieldReportType:
 		return m.OldReportType(ctx)
 	case reportpolicy.FieldPolicy:
@@ -8715,13 +8671,6 @@ func (m *ReportPolicyMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
-		return nil
-	case reportpolicy.FieldTenantID:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTenantID(v)
 		return nil
 	case reportpolicy.FieldReportType:
 		v, ok := value.(reportpolicy.ReportType)
@@ -8798,9 +8747,6 @@ func (m *ReportPolicyMutation) ResetField(name string) error {
 		return nil
 	case reportpolicy.FieldUpdatedAt:
 		m.ResetUpdatedAt()
-		return nil
-	case reportpolicy.FieldTenantID:
-		m.ResetTenantID()
 		return nil
 	case reportpolicy.FieldReportType:
 		m.ResetReportType()

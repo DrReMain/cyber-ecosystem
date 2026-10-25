@@ -204,9 +204,13 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 	family := row.ReportType
 	// The same member redeeming their own code again is idempotent — the
 	// grant already exists and the code's single use is already theirs.
+	// A lapsed grant is not that idempotent hit: an expired family row
+	// must not strand the member out of every later code for the family,
+	// so the redeem falls through and the grant ratchets forward — the
+	// access judgement reads the same liveness rule.
 	if grant, err := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &family); err != nil {
 		return nil, err
-	} else if grant != nil {
+	} else if grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now())) {
 		return &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}, nil
 	}
 	var out *RedeemOut

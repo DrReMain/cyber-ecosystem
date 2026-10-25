@@ -8,14 +8,15 @@ import (
 	"entgo.io/ent/schema/index"
 
 	"cyber-ecosystem/shared-go/orm/ent/mixins"
-
-	"cyber-ecosystem/app/services/esports/internal/ent/schema/local_mixins"
 )
 
 // ReportPolicy is the operator's access policy for one report family —
 // one row per family, upserted in place; an absent row means the shipped
 // default, so the table only ever carries overrides. A redeemed code
-// outranks whatever the row says.
+// outranks whatever the row says. The policy is global — one operator
+// plane governs every tenant, so the row carries no tenant column and no
+// tenant filtering: a per-tenant index would let one tenant's upsert
+// silently rewrite the row another tenant reads.
 type ReportPolicy struct {
 	ent.Schema
 }
@@ -39,7 +40,6 @@ func (ReportPolicy) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
 		mixins.CreatedUpdatedMixin{},
-		local_mixins.TenantMixin{},
 	}
 }
 

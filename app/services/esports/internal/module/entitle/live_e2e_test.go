@@ -178,6 +178,51 @@ func TestEntitleLiveE2E(t *testing.T) {
 		t.Fatalf("unknown code: err=%v", err)
 	}
 
+	// The lapsed grant does not strand the member: after the family row
+	// expires, a later code for the same family redeems again and the row
+	// ratchets forward — expiry and source become the new code's, while a
+	// shorter later code neither shortens the row nor burns its use.
+	userC := "ente2euser0000000003"
+	code3 := codes[3]
+	if out, err := uc.Redeem(entSubject(userC), code3); err != nil || out.ExpiresAt == nil {
+		t.Fatalf("first family redeem: out=%+v err=%v", out, err)
+	}
+	if _, err := db.ExecContext(context.Background(),
+		`UPDATE entitlement SET expires_at = now() - interval '1 hour' WHERE user_id = $1 AND scope_kind = $2`,
+		userC, shared.ScopeReportType); err != nil {
+		t.Fatalf("lapse the grant: %v", err)
+	}
+	code4 := codes[4]
+	codeRow4, err := codeRP.ByCode(context.Background(), code4)
+	if err != nil || codeRow4 == nil {
+		t.Fatalf("code4 read: %+v err=%v", codeRow4, err)
+	}
+	out4, err := uc.Redeem(entSubject(userC), code4)
+	if err != nil || out4.ExpiresAt == nil || !out4.ExpiresAt.Equal(codeRow4.ExpiresAt) {
+		t.Fatalf("post-lapse redeem: out=%+v err=%v want expiry %v", out4, err, codeRow4.ExpiresAt)
+	}
+	familySchool := reportSchool
+	rowC, err := entRP.ByScope(entSubject(userC), userC, shared.ScopeReportType, &familySchool)
+	if err != nil || rowC == nil || rowC.Source != code4 || !rowC.ExpiresAt.Equal(codeRow4.ExpiresAt) {
+		t.Fatalf("ratcheted row: %+v err=%v", rowC, err)
+	}
+	for _, c := range []string{code3, code4} {
+		if row, _ := codeRP.ByCode(context.Background(), c); row.UsedCount != 1 {
+			t.Fatalf("use count for %s: %+v", c, row)
+		}
+	}
+	short, err := NewCodeUC(logger, pf, codeRP).Generate(adminCtx, &GenerateIn{ReportType: reportSchool, Count: 1, ExpireDays: 1})
+	if err != nil || len(short) != 1 {
+		t.Fatalf("short generate: %v err=%v", short, err)
+	}
+	outS, err := uc.Redeem(entSubject(userC), short[0])
+	if err != nil || outS.ExpiresAt == nil || !outS.ExpiresAt.Equal(codeRow4.ExpiresAt) {
+		t.Fatalf("short redeem must stay idempotent on the longer row: out=%+v err=%v", outS, err)
+	}
+	if row, _ := codeRP.ByCode(context.Background(), short[0]); row.UsedCount != 0 {
+		t.Fatalf("short code burned a use: %+v", row)
+	}
+
 	// The access judgement under shipped defaults: career open,
 	// cognitive member-gated (closed without one), school codes-only.
 	access := func(uid, family string) *AccessOut {
