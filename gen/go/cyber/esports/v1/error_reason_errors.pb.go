@@ -286,3 +286,41 @@ func IsEsportsReportPolicyNotReady(err error) bool {
 func ErrorEsportsReportPolicyNotReady(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, Esports_ESPORTS_REPORT_POLICY_NOT_READY.String(), fmt.Sprintf(format, args...))
 }
+
+// 616x: report
+func IsEsportsReportRecordNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_REPORT_RECORD_NOT_FOUND.String() && e.Code == 404
+}
+
+// 616x: report
+func ErrorEsportsReportRecordNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, Esports_ESPORTS_REPORT_RECORD_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsReportRecordNotOwned(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_REPORT_RECORD_NOT_OWNED.String() && e.Code == 403
+}
+
+func ErrorEsportsReportRecordNotOwned(format string, args ...interface{}) *errors.Error {
+	return errors.New(403, Esports_ESPORTS_REPORT_RECORD_NOT_OWNED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsReportRecordInvalid(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_REPORT_RECORD_INVALID.String() && e.Code == 400
+}
+
+func ErrorEsportsReportRecordInvalid(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_REPORT_RECORD_INVALID.String(), fmt.Sprintf(format, args...))
+}

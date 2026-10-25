@@ -31,7 +31,7 @@ type Entitlement struct {
 	ScopeRef *string `json:"scope_ref,omitempty"`
 	// membership window end (paid_at + period days); null on trial rows — permanence is the absence of a deadline
 	ExpiresAt *time.Time `json:"expires_at,omitempty"`
-	// granting artifact id — the order number today; activation codes join this column when they land
+	// granting artifact id — the order number on membership rows, the code on report-type rows
 	Source       string `json:"source,omitempty"`
 	selectValues sql.SelectValues
 }

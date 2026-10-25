@@ -395,6 +395,58 @@ export type CyberEsportsV1GetReportAccessResponse = {
     reason?: 'REPORT_ACCESS_REASON_UNSPECIFIED' | 'REPORT_ACCESS_REASON_POLICY_OPEN' | 'REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE' | 'REPORT_ACCESS_REASON_CODE_REDEEMED' | 'REPORT_ACCESS_REASON_POLICY_CLOSED' | 'REPORT_ACCESS_REASON_NO_ENTITLEMENT';
 };
 
+export type CyberEsportsV1GetReportRequest = {
+    recordId?: string;
+};
+
+export type CyberEsportsV1GetReportResponse = {
+    recordId?: string;
+    /**
+     * The unlock state at read time — the ledger's answer, never this face's.
+     */
+    unlocked?: boolean;
+    /**
+     * The tier badge renders in the free tier, S/A/B/C by the composite
+     * percentile (top 5/15/40 percent); once the record is unlocked the
+     * snapshot pins the badge so later rubric changes never move it.
+     */
+    tier?: 'REPORT_TIER_UNSPECIFIED' | 'REPORT_TIER_S' | 'REPORT_TIER_A' | 'REPORT_TIER_B' | 'REPORT_TIER_C';
+    /**
+     * The composite percentile: the equal-weight mean of the measured
+     * abilities' percentiles — a missing ability never counts as zero.
+     * Null when no measured ability carries a percentile at all.
+     */
+    compositePercentile?: number;
+    /**
+     * The measured primary abilities, one radar axis each; a missing
+     * ability is an absent entry, never a zero axis.
+     */
+    abilities?: Array<CyberEsportsV1ReportAbility>;
+    /**
+     * The genre's secondary contributions (fps: decisionEfficiency; moba:
+     * aimingAccuracy and trackingStability) — radar satellites, same shape.
+     */
+    subAbilities?: Array<CyberEsportsV1ReportAbility>;
+    /**
+     * Unlocked-only: how each ability moved against the same ability on
+     * this member's previous attempt — the previous session's record, not
+     * the previous retry inside this one.
+     */
+    comparison?: CyberEsportsV1ReportComparison;
+    /**
+     * Unlocked-only: the improvement board, weakest abilities first. The
+     * target is the tier ladder's excellence line (the A threshold),
+     * expressed in the same percentile currency as everything else.
+     */
+    improvements?: Array<CyberEsportsV1ReportImprovement>;
+    /**
+     * The completeness headline: how many of the record's genre-order
+     * abilities were measured, over how many the genre orders.
+     */
+    testedDimensions?: number;
+    totalDimensions?: number;
+};
+
 export type CyberEsportsV1GetTestConfigResponse = {
     config?: CyberEsportsV1TestConfig;
 };
@@ -727,6 +779,52 @@ export type CyberEsportsV1RedeemActivationCodeResponse = {
      */
     expiresAt?: string;
     grantedAt?: string;
+};
+
+/**
+ * One radar axis: the ability's own numbers plus the cohort answer. The
+ * percentile is the same-age same-sex cohort's; a cohort too thin to say
+ * anything yields a null percentile and a LOW confidence — the axis then
+ * renders score-only, never a made-up percentile.
+ */
+export type CyberEsportsV1ReportAbility = {
+    /**
+     * The six-word ability vocabulary.
+     */
+    ability?: string;
+    /**
+     * The game whose score fed this ability (the axis's provenance).
+     */
+    gameCode?: string;
+    score?: number;
+    percentile?: number;
+    confidence?: 'PEER_CONFIDENCE_UNSPECIFIED' | 'PEER_CONFIDENCE_LOW' | 'PEER_CONFIDENCE_MEDIUM' | 'PEER_CONFIDENCE_HIGH';
+    sampleCount?: number;
+    peerAverage?: number;
+};
+
+export type CyberEsportsV1ReportComparison = {
+    deltas?: Array<CyberEsportsV1ReportComparisonDelta>;
+};
+
+export type CyberEsportsV1ReportComparisonDelta = {
+    ability?: string;
+    /**
+     * The previous attempt's percentile; null when that attempt carried
+     * none — the delta renders as "first measurement", not as zero.
+     */
+    previousPercentile?: number;
+    deltaPercentile?: number;
+};
+
+export type CyberEsportsV1ReportImprovement = {
+    ability?: string;
+    currentPercentile?: number;
+    targetPercentile?: number;
+    /**
+     * How far short of the target, in percent of it.
+     */
+    gapPercent?: number;
 };
 
 export type CyberEsportsV1ResourceMatchCollect = {
@@ -2738,6 +2836,22 @@ export type EntitlementServiceGetReportAccessResponses = {
 };
 
 export type EntitlementServiceGetReportAccessResponse = EntitlementServiceGetReportAccessResponses[keyof EntitlementServiceGetReportAccessResponses];
+
+export type ReportServiceGetReportData = {
+    body: CyberEsportsV1GetReportRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/reports/get';
+};
+
+export type ReportServiceGetReportResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetReportResponse;
+};
+
+export type ReportServiceGetReportResponse = ReportServiceGetReportResponses[keyof ReportServiceGetReportResponses];
 
 export type SkuServiceListSkusData = {
     body?: never;

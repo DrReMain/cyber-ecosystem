@@ -13,6 +13,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/reportpolicy"
+	"cyber-ecosystem/app/services/esports/internal/ent/reportsnapshot"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema"
 	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
@@ -879,6 +880,97 @@ func init() {
 	reportpolicy.DefaultID = reportpolicyDescID.Default.(func() string)
 	// reportpolicy.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	reportpolicy.IDValidator = reportpolicyDescID.Validators[0].(func(string) error)
+	reportsnapshotMixin := schema.ReportSnapshot{}.Mixin()
+	reportsnapshotMixinHooks2 := reportsnapshotMixin[2].Hooks()
+	reportsnapshotMixinHooks3 := reportsnapshotMixin[3].Hooks()
+	reportsnapshot.Hooks[0] = reportsnapshotMixinHooks2[0]
+	reportsnapshot.Hooks[1] = reportsnapshotMixinHooks3[0]
+	reportsnapshotMixinInters2 := reportsnapshotMixin[2].Interceptors()
+	reportsnapshotMixinInters3 := reportsnapshotMixin[3].Interceptors()
+	reportsnapshot.Interceptors[0] = reportsnapshotMixinInters2[0]
+	reportsnapshot.Interceptors[1] = reportsnapshotMixinInters3[0]
+	reportsnapshotMixinFields0 := reportsnapshotMixin[0].Fields()
+	_ = reportsnapshotMixinFields0
+	reportsnapshotMixinFields1 := reportsnapshotMixin[1].Fields()
+	_ = reportsnapshotMixinFields1
+	reportsnapshotMixinFields2 := reportsnapshotMixin[2].Fields()
+	_ = reportsnapshotMixinFields2
+	reportsnapshotFields := schema.ReportSnapshot{}.Fields()
+	_ = reportsnapshotFields
+	// reportsnapshotDescCreatedAt is the schema descriptor for created_at field.
+	reportsnapshotDescCreatedAt := reportsnapshotMixinFields1[0].Descriptor()
+	// reportsnapshot.DefaultCreatedAt holds the default value on creation for the created_at field.
+	reportsnapshot.DefaultCreatedAt = reportsnapshotDescCreatedAt.Default.(func() time.Time)
+	// reportsnapshotDescUpdatedAt is the schema descriptor for updated_at field.
+	reportsnapshotDescUpdatedAt := reportsnapshotMixinFields1[1].Descriptor()
+	// reportsnapshot.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	reportsnapshot.DefaultUpdatedAt = reportsnapshotDescUpdatedAt.Default.(func() time.Time)
+	// reportsnapshot.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	reportsnapshot.UpdateDefaultUpdatedAt = reportsnapshotDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// reportsnapshotDescTenantID is the schema descriptor for tenant_id field.
+	reportsnapshotDescTenantID := reportsnapshotMixinFields2[0].Descriptor()
+	// reportsnapshot.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	reportsnapshot.TenantIDValidator = reportsnapshotDescTenantID.Validators[0].(func(string) error)
+	// reportsnapshotDescRecordID is the schema descriptor for record_id field.
+	reportsnapshotDescRecordID := reportsnapshotFields[0].Descriptor()
+	// reportsnapshot.RecordIDValidator is a validator for the "record_id" field. It is called by the builders before save.
+	reportsnapshot.RecordIDValidator = func() func(string) error {
+		validators := reportsnapshotDescRecordID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(record_id string) error {
+			for _, fn := range fns {
+				if err := fn(record_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// reportsnapshotDescUserID is the schema descriptor for user_id field.
+	reportsnapshotDescUserID := reportsnapshotFields[1].Descriptor()
+	// reportsnapshot.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	reportsnapshot.UserIDValidator = func() func(string) error {
+		validators := reportsnapshotDescUserID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(user_id string) error {
+			for _, fn := range fns {
+				if err := fn(user_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// reportsnapshotDescCohortBasis is the schema descriptor for cohort_basis field.
+	reportsnapshotDescCohortBasis := reportsnapshotFields[5].Descriptor()
+	// reportsnapshot.CohortBasisValidator is a validator for the "cohort_basis" field. It is called by the builders before save.
+	reportsnapshot.CohortBasisValidator = func() func(string) error {
+		validators := reportsnapshotDescCohortBasis.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(cohort_basis string) error {
+			for _, fn := range fns {
+				if err := fn(cohort_basis); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// reportsnapshotDescID is the schema descriptor for id field.
+	reportsnapshotDescID := reportsnapshotMixinFields0[0].Descriptor()
+	// reportsnapshot.DefaultID holds the default value on creation for the id field.
+	reportsnapshot.DefaultID = reportsnapshotDescID.Default.(func() string)
+	// reportsnapshot.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	reportsnapshot.IDValidator = reportsnapshotDescID.Validators[0].(func(string) error)
 	skuMixin := schema.Sku{}.Mixin()
 	skuMixinHooks2 := skuMixin[2].Hooks()
 	skuMixinHooks3 := skuMixin[3].Hooks()

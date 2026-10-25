@@ -109,7 +109,7 @@ var (
 		{Name: "scope_kind", Type: field.TypeEnum, Comment: "grant shape: trial points at one record permanently, membership opens a window, report_type opens a report family via a type code", Enums: []string{"trial", "membership", "report_type"}},
 		{Name: "scope_ref", Type: field.TypeString, Nullable: true, Size: 32, Comment: "trial: the unlocked test record id; report_type: the family name (dedup guard); membership: null — renewal rows stack instead of dedup"},
 		{Name: "expires_at", Type: field.TypeTime, Nullable: true, Comment: "membership window end (paid_at + period days); null on trial rows — permanence is the absence of a deadline"},
-		{Name: "source", Type: field.TypeString, Size: 64, Comment: "granting artifact id — the order number today; activation codes join this column when they land"},
+		{Name: "source", Type: field.TypeString, Size: 64, Comment: "granting artifact id — the order number on membership rows, the code on report-type rows"},
 	}
 	// EntitlementTable holds the schema information for the "entitlement" table.
 	EntitlementTable = &schema.Table{
@@ -460,6 +460,51 @@ var (
 			},
 		},
 	}
+	// ReportSnapshotColumns holds the columns for the "report_snapshot" table.
+	ReportSnapshotColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "soft-delete marker; null = live row (delete becomes an update)"},
+		{Name: "record_id", Type: field.TypeString, Size: 20, Comment: "owning attempt (join into test_record.id) — plain id, not an edge: the loose join keeps soft-delete cascade and future aggregation out of this table's way, the ability_score precedent"},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "denormalized owner, the ability_score precedent — cohort reads never join through test_record"},
+		{Name: "tier", Type: field.TypeEnum, Comment: "the pinned tier badge, judged once at unlock time — the ruling the roadmap froze: an unlocked report never moves with the rubric", Enums: []string{"S", "A", "B", "C"}},
+		{Name: "composite_percentile", Type: field.TypeFloat64, Nullable: true, Comment: "the pinned composite (equal-weight mean, missing abilities never zero) — null when no measured ability carried a percentile at pin time"},
+		{Name: "abilities", Type: field.TypeJSON, Comment: "the pinned radar board: one entry per measured ability (ability, game_code, score, percentile, confidence, sample_count, peer_average) — the exact shape the report face returns"},
+		{Name: "cohort_basis", Type: field.TypeString, Size: 32, Comment: "the cohort rubric this snapshot was computed under (same-age-same-sex exact, or band-approximate when only the band is known) — the audit stamp that makes drift detectable"},
+	}
+	// ReportSnapshotTable holds the schema information for the "report_snapshot" table.
+	ReportSnapshotTable = &schema.Table{
+		Name:       "report_snapshot",
+		Columns:    ReportSnapshotColumns,
+		PrimaryKey: []*schema.Column{ReportSnapshotColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "reportsnapshot_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ReportSnapshotColumns[1]},
+			},
+			{
+				Name:    "reportsnapshot_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{ReportSnapshotColumns[2]},
+			},
+			{
+				Name:    "reportsnapshot_tenant_id_record_id",
+				Unique:  true,
+				Columns: []*schema.Column{ReportSnapshotColumns[3], ReportSnapshotColumns[5]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "deleted_at IS NULL",
+				},
+			},
+			{
+				Name:    "reportsnapshot_tenant_id_user_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ReportSnapshotColumns[3], ReportSnapshotColumns[6], ReportSnapshotColumns[1]},
+			},
+		},
+	}
 	// SkuColumns holds the columns for the "sku" table.
 	SkuColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -666,6 +711,7 @@ var (
 		ProfileTable,
 		QuestionBankTable,
 		ReportPolicyTable,
+		ReportSnapshotTable,
 		SkuTable,
 		TestTable,
 		TestConfigTable,
@@ -703,6 +749,9 @@ func init() {
 	}
 	ReportPolicyTable.Annotation = &entsql.Annotation{
 		Table: "report_policy",
+	}
+	ReportSnapshotTable.Annotation = &entsql.Annotation{
+		Table: "report_snapshot",
 	}
 	SkuTable.Annotation = &entsql.Annotation{
 		Table: "sku",

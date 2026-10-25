@@ -284,6 +284,28 @@
     ]
   },
   {
+    "name": "ReportService",
+    "full_name": "cyber.esports.v1.ReportService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/report.proto",
+    "comment": "报告",
+    "methods": [
+      {
+        "name": "GetReport",
+        "full_name": "cyber.esports.v1.ReportService.GetReport",
+        "request_name": "GetReportRequest",
+        "request_full_name": "cyber.esports.v1.GetReportRequest",
+        "response_name": "GetReportResponse",
+        "response_full_name": "cyber.esports.v1.GetReportResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/reports/get",
+        "comment": "获取单次能力报告",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "SkuService",
     "full_name": "cyber.esports.v1.SkuService",
     "package": "cyber.esports.v1",

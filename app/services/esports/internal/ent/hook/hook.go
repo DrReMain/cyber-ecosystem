@@ -128,6 +128,18 @@ func (f ReportPolicyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReportPolicyMutation", m)
 }
 
+// The ReportSnapshotFunc type is an adapter to allow the use of ordinary
+// function as ReportSnapshot mutator.
+type ReportSnapshotFunc func(context.Context, *ent.ReportSnapshotMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ReportSnapshotFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ReportSnapshotMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReportSnapshotMutation", m)
+}
+
 // The SkuFunc type is an adapter to allow the use of ordinary
 // function as Sku mutator.
 type SkuFunc func(context.Context, *ent.SkuMutation) (ent.Value, error)

@@ -48,4 +48,9 @@ enum Esports {
   ESPORTS_ACTIVATION_CODE_EXPIRED = 6151 [(.errors.code) = 400];
   ESPORTS_ACTIVATION_CODE_EXHAUSTED = 6152 [(.errors.code) = 400];
   ESPORTS_REPORT_POLICY_NOT_READY = 6153 [(.errors.code) = 400];
+
+  // 616x: report
+  ESPORTS_REPORT_RECORD_NOT_FOUND = 6160 [(.errors.code) = 404];
+  ESPORTS_REPORT_RECORD_NOT_OWNED = 6161 [(.errors.code) = 403];
+  ESPORTS_REPORT_RECORD_INVALID = 6162 [(.errors.code) = 400];
 }

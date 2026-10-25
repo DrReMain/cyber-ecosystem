@@ -15,6 +15,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/reportpolicy"
+	"cyber-ecosystem/app/services/esports/internal/ent/reportsnapshot"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
 	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
@@ -48,6 +49,7 @@ const (
 	TypeProfile        = "Profile"
 	TypeQuestionBank   = "QuestionBank"
 	TypeReportPolicy   = "ReportPolicy"
+	TypeReportSnapshot = "ReportSnapshot"
 	TypeSku            = "Sku"
 	TypeTest           = "Test"
 	TypeTestConfig     = "TestConfig"
@@ -8807,6 +8809,918 @@ func (m *ReportPolicyMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ReportPolicyMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown ReportPolicy edge %s", name)
+}
+
+// ReportSnapshotMutation represents an operation that mutates the ReportSnapshot nodes in the graph.
+type ReportSnapshotMutation struct {
+	config
+	op                      Op
+	typ                     string
+	id                      *string
+	created_at              *time.Time
+	updated_at              *time.Time
+	tenant_id               *string
+	deleted_at              *time.Time
+	record_id               *string
+	user_id                 *string
+	tier                    *reportsnapshot.Tier
+	composite_percentile    *float64
+	addcomposite_percentile *float64
+	abilities               *[]types.AbilitySnapshot
+	appendabilities         []types.AbilitySnapshot
+	cohort_basis            *string
+	clearedFields           map[string]struct{}
+	done                    bool
+	oldValue                func(context.Context) (*ReportSnapshot, error)
+	predicates              []predicate.ReportSnapshot
+}
+
+var _ ent.Mutation = (*ReportSnapshotMutation)(nil)
+
+// reportsnapshotOption allows management of the mutation configuration using functional options.
+type reportsnapshotOption func(*ReportSnapshotMutation)
+
+// newReportSnapshotMutation creates new mutation for the ReportSnapshot entity.
+func newReportSnapshotMutation(c config, op Op, opts ...reportsnapshotOption) *ReportSnapshotMutation {
+	m := &ReportSnapshotMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeReportSnapshot,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withReportSnapshotID sets the ID field of the mutation.
+func withReportSnapshotID(id string) reportsnapshotOption {
+	return func(m *ReportSnapshotMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ReportSnapshot
+		)
+		m.oldValue = func(ctx context.Context) (*ReportSnapshot, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ReportSnapshot.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withReportSnapshot sets the old ReportSnapshot of the mutation.
+func withReportSnapshot(node *ReportSnapshot) reportsnapshotOption {
+	return func(m *ReportSnapshotMutation) {
+		m.oldValue = func(context.Context) (*ReportSnapshot, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ReportSnapshotMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ReportSnapshotMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ReportSnapshot entities.
+func (m *ReportSnapshotMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ReportSnapshotMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ReportSnapshotMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ReportSnapshot.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ReportSnapshotMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ReportSnapshotMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ReportSnapshotMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ReportSnapshotMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ReportSnapshotMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ReportSnapshotMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *ReportSnapshotMutation) SetTenantID(s string) {
+	m.tenant_id = &s
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *ReportSnapshotMutation) TenantID() (r string, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldTenantID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *ReportSnapshotMutation) ResetTenantID() {
+	m.tenant_id = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *ReportSnapshotMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *ReportSnapshotMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *ReportSnapshotMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[reportsnapshot.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *ReportSnapshotMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[reportsnapshot.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *ReportSnapshotMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, reportsnapshot.FieldDeletedAt)
+}
+
+// SetRecordID sets the "record_id" field.
+func (m *ReportSnapshotMutation) SetRecordID(s string) {
+	m.record_id = &s
+}
+
+// RecordID returns the value of the "record_id" field in the mutation.
+func (m *ReportSnapshotMutation) RecordID() (r string, exists bool) {
+	v := m.record_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecordID returns the old "record_id" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldRecordID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecordID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecordID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecordID: %w", err)
+	}
+	return oldValue.RecordID, nil
+}
+
+// ResetRecordID resets all changes to the "record_id" field.
+func (m *ReportSnapshotMutation) ResetRecordID() {
+	m.record_id = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *ReportSnapshotMutation) SetUserID(s string) {
+	m.user_id = &s
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *ReportSnapshotMutation) UserID() (r string, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldUserID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *ReportSnapshotMutation) ResetUserID() {
+	m.user_id = nil
+}
+
+// SetTier sets the "tier" field.
+func (m *ReportSnapshotMutation) SetTier(r reportsnapshot.Tier) {
+	m.tier = &r
+}
+
+// Tier returns the value of the "tier" field in the mutation.
+func (m *ReportSnapshotMutation) Tier() (r reportsnapshot.Tier, exists bool) {
+	v := m.tier
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTier returns the old "tier" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldTier(ctx context.Context) (v reportsnapshot.Tier, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTier is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTier requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTier: %w", err)
+	}
+	return oldValue.Tier, nil
+}
+
+// ResetTier resets all changes to the "tier" field.
+func (m *ReportSnapshotMutation) ResetTier() {
+	m.tier = nil
+}
+
+// SetCompositePercentile sets the "composite_percentile" field.
+func (m *ReportSnapshotMutation) SetCompositePercentile(f float64) {
+	m.composite_percentile = &f
+	m.addcomposite_percentile = nil
+}
+
+// CompositePercentile returns the value of the "composite_percentile" field in the mutation.
+func (m *ReportSnapshotMutation) CompositePercentile() (r float64, exists bool) {
+	v := m.composite_percentile
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCompositePercentile returns the old "composite_percentile" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldCompositePercentile(ctx context.Context) (v *float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCompositePercentile is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCompositePercentile requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCompositePercentile: %w", err)
+	}
+	return oldValue.CompositePercentile, nil
+}
+
+// AddCompositePercentile adds f to the "composite_percentile" field.
+func (m *ReportSnapshotMutation) AddCompositePercentile(f float64) {
+	if m.addcomposite_percentile != nil {
+		*m.addcomposite_percentile += f
+	} else {
+		m.addcomposite_percentile = &f
+	}
+}
+
+// AddedCompositePercentile returns the value that was added to the "composite_percentile" field in this mutation.
+func (m *ReportSnapshotMutation) AddedCompositePercentile() (r float64, exists bool) {
+	v := m.addcomposite_percentile
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCompositePercentile clears the value of the "composite_percentile" field.
+func (m *ReportSnapshotMutation) ClearCompositePercentile() {
+	m.composite_percentile = nil
+	m.addcomposite_percentile = nil
+	m.clearedFields[reportsnapshot.FieldCompositePercentile] = struct{}{}
+}
+
+// CompositePercentileCleared returns if the "composite_percentile" field was cleared in this mutation.
+func (m *ReportSnapshotMutation) CompositePercentileCleared() bool {
+	_, ok := m.clearedFields[reportsnapshot.FieldCompositePercentile]
+	return ok
+}
+
+// ResetCompositePercentile resets all changes to the "composite_percentile" field.
+func (m *ReportSnapshotMutation) ResetCompositePercentile() {
+	m.composite_percentile = nil
+	m.addcomposite_percentile = nil
+	delete(m.clearedFields, reportsnapshot.FieldCompositePercentile)
+}
+
+// SetAbilities sets the "abilities" field.
+func (m *ReportSnapshotMutation) SetAbilities(ts []types.AbilitySnapshot) {
+	m.abilities = &ts
+	m.appendabilities = nil
+}
+
+// Abilities returns the value of the "abilities" field in the mutation.
+func (m *ReportSnapshotMutation) Abilities() (r []types.AbilitySnapshot, exists bool) {
+	v := m.abilities
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAbilities returns the old "abilities" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldAbilities(ctx context.Context) (v []types.AbilitySnapshot, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAbilities is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAbilities requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAbilities: %w", err)
+	}
+	return oldValue.Abilities, nil
+}
+
+// AppendAbilities adds ts to the "abilities" field.
+func (m *ReportSnapshotMutation) AppendAbilities(ts []types.AbilitySnapshot) {
+	m.appendabilities = append(m.appendabilities, ts...)
+}
+
+// AppendedAbilities returns the list of values that were appended to the "abilities" field in this mutation.
+func (m *ReportSnapshotMutation) AppendedAbilities() ([]types.AbilitySnapshot, bool) {
+	if len(m.appendabilities) == 0 {
+		return nil, false
+	}
+	return m.appendabilities, true
+}
+
+// ResetAbilities resets all changes to the "abilities" field.
+func (m *ReportSnapshotMutation) ResetAbilities() {
+	m.abilities = nil
+	m.appendabilities = nil
+}
+
+// SetCohortBasis sets the "cohort_basis" field.
+func (m *ReportSnapshotMutation) SetCohortBasis(s string) {
+	m.cohort_basis = &s
+}
+
+// CohortBasis returns the value of the "cohort_basis" field in the mutation.
+func (m *ReportSnapshotMutation) CohortBasis() (r string, exists bool) {
+	v := m.cohort_basis
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCohortBasis returns the old "cohort_basis" field's value of the ReportSnapshot entity.
+// If the ReportSnapshot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ReportSnapshotMutation) OldCohortBasis(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCohortBasis is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCohortBasis requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCohortBasis: %w", err)
+	}
+	return oldValue.CohortBasis, nil
+}
+
+// ResetCohortBasis resets all changes to the "cohort_basis" field.
+func (m *ReportSnapshotMutation) ResetCohortBasis() {
+	m.cohort_basis = nil
+}
+
+// Where appends a list predicates to the ReportSnapshotMutation builder.
+func (m *ReportSnapshotMutation) Where(ps ...predicate.ReportSnapshot) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ReportSnapshotMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ReportSnapshotMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ReportSnapshot, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ReportSnapshotMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ReportSnapshotMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ReportSnapshot).
+func (m *ReportSnapshotMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ReportSnapshotMutation) Fields() []string {
+	fields := make([]string, 0, 10)
+	if m.created_at != nil {
+		fields = append(fields, reportsnapshot.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, reportsnapshot.FieldUpdatedAt)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, reportsnapshot.FieldTenantID)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, reportsnapshot.FieldDeletedAt)
+	}
+	if m.record_id != nil {
+		fields = append(fields, reportsnapshot.FieldRecordID)
+	}
+	if m.user_id != nil {
+		fields = append(fields, reportsnapshot.FieldUserID)
+	}
+	if m.tier != nil {
+		fields = append(fields, reportsnapshot.FieldTier)
+	}
+	if m.composite_percentile != nil {
+		fields = append(fields, reportsnapshot.FieldCompositePercentile)
+	}
+	if m.abilities != nil {
+		fields = append(fields, reportsnapshot.FieldAbilities)
+	}
+	if m.cohort_basis != nil {
+		fields = append(fields, reportsnapshot.FieldCohortBasis)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ReportSnapshotMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case reportsnapshot.FieldCreatedAt:
+		return m.CreatedAt()
+	case reportsnapshot.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case reportsnapshot.FieldTenantID:
+		return m.TenantID()
+	case reportsnapshot.FieldDeletedAt:
+		return m.DeletedAt()
+	case reportsnapshot.FieldRecordID:
+		return m.RecordID()
+	case reportsnapshot.FieldUserID:
+		return m.UserID()
+	case reportsnapshot.FieldTier:
+		return m.Tier()
+	case reportsnapshot.FieldCompositePercentile:
+		return m.CompositePercentile()
+	case reportsnapshot.FieldAbilities:
+		return m.Abilities()
+	case reportsnapshot.FieldCohortBasis:
+		return m.CohortBasis()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ReportSnapshotMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case reportsnapshot.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case reportsnapshot.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case reportsnapshot.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case reportsnapshot.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case reportsnapshot.FieldRecordID:
+		return m.OldRecordID(ctx)
+	case reportsnapshot.FieldUserID:
+		return m.OldUserID(ctx)
+	case reportsnapshot.FieldTier:
+		return m.OldTier(ctx)
+	case reportsnapshot.FieldCompositePercentile:
+		return m.OldCompositePercentile(ctx)
+	case reportsnapshot.FieldAbilities:
+		return m.OldAbilities(ctx)
+	case reportsnapshot.FieldCohortBasis:
+		return m.OldCohortBasis(ctx)
+	}
+	return nil, fmt.Errorf("unknown ReportSnapshot field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReportSnapshotMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case reportsnapshot.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case reportsnapshot.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case reportsnapshot.FieldTenantID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case reportsnapshot.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case reportsnapshot.FieldRecordID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecordID(v)
+		return nil
+	case reportsnapshot.FieldUserID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case reportsnapshot.FieldTier:
+		v, ok := value.(reportsnapshot.Tier)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTier(v)
+		return nil
+	case reportsnapshot.FieldCompositePercentile:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCompositePercentile(v)
+		return nil
+	case reportsnapshot.FieldAbilities:
+		v, ok := value.([]types.AbilitySnapshot)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAbilities(v)
+		return nil
+	case reportsnapshot.FieldCohortBasis:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCohortBasis(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ReportSnapshot field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ReportSnapshotMutation) AddedFields() []string {
+	var fields []string
+	if m.addcomposite_percentile != nil {
+		fields = append(fields, reportsnapshot.FieldCompositePercentile)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ReportSnapshotMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case reportsnapshot.FieldCompositePercentile:
+		return m.AddedCompositePercentile()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ReportSnapshotMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case reportsnapshot.FieldCompositePercentile:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCompositePercentile(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ReportSnapshot numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ReportSnapshotMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(reportsnapshot.FieldDeletedAt) {
+		fields = append(fields, reportsnapshot.FieldDeletedAt)
+	}
+	if m.FieldCleared(reportsnapshot.FieldCompositePercentile) {
+		fields = append(fields, reportsnapshot.FieldCompositePercentile)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ReportSnapshotMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ReportSnapshotMutation) ClearField(name string) error {
+	switch name {
+	case reportsnapshot.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case reportsnapshot.FieldCompositePercentile:
+		m.ClearCompositePercentile()
+		return nil
+	}
+	return fmt.Errorf("unknown ReportSnapshot nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ReportSnapshotMutation) ResetField(name string) error {
+	switch name {
+	case reportsnapshot.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case reportsnapshot.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case reportsnapshot.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case reportsnapshot.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case reportsnapshot.FieldRecordID:
+		m.ResetRecordID()
+		return nil
+	case reportsnapshot.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case reportsnapshot.FieldTier:
+		m.ResetTier()
+		return nil
+	case reportsnapshot.FieldCompositePercentile:
+		m.ResetCompositePercentile()
+		return nil
+	case reportsnapshot.FieldAbilities:
+		m.ResetAbilities()
+		return nil
+	case reportsnapshot.FieldCohortBasis:
+		m.ResetCohortBasis()
+		return nil
+	}
+	return fmt.Errorf("unknown ReportSnapshot field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ReportSnapshotMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ReportSnapshotMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ReportSnapshotMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ReportSnapshotMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ReportSnapshotMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ReportSnapshotMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ReportSnapshotMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ReportSnapshot unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ReportSnapshotMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ReportSnapshot edge %s", name)
 }
 
 // SkuMutation represents an operation that mutates the Sku nodes in the graph.

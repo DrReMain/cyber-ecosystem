@@ -30,3 +30,17 @@ type MatchStep struct {
 	Ability  string `json:"ability"`
 	TestCode string `json:"test_code"`
 }
+
+// AbilitySnapshot is one radar axis as pinned inside a report snapshot:
+// the ability's own numbers plus the cohort answer at pin time. The
+// percentile is nullable by design — a cohort too thin to say anything
+// pins null rather than a made-up number, the report face's law.
+type AbilitySnapshot struct {
+	Ability     string   `json:"ability"`
+	GameCode    string   `json:"game_code"`
+	Score       float64  `json:"score"`
+	Percentile  *float64 `json:"percentile,omitempty"`
+	Confidence  string   `json:"confidence"`
+	SampleCount int      `json:"sample_count"`
+	PeerAverage *float64 `json:"peer_average,omitempty"`
+}

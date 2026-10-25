@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The member's report read face. The single-attempt ability report is one
+// record's board under the unlock state the entitlement ledger holds for
+// it — a trial-scope grant on this record (the pay domain's settle, the
+// pricing ruling's unlock unit), an active membership window, or a
+// redeemed family code; the same three facts the family access judgement
+// reads, never re-derived here. The free tier renders the tier badge, the
+// ability radar and the composite percentile; the unlocked tier adds the
+// per-ability peer detail, the last-attempt comparison and the improvement
+// board. Numbers travel, copy does not: the five-zone wording stays with
+// the client until its configuration face lands.
+service ReportService {
+  option (cyber.ext.v1.service_comment) = "报告";
+  rpc GetReport(GetReportRequest) returns (GetReportResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "获取单次能力报告"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/reports/get"
+      body: "*"
+    };
+  }
+}
+
+message GetReportRequest {
+  string record_id = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 20
+  }];
+}
+
+message GetReportResponse {
+  string record_id = 1;
+  // The unlock state at read time — the ledger's answer, never this face's.
+  bool unlocked = 2;
+  // The tier badge renders in the free tier, S/A/B/C by the composite
+  // percentile (top 5/15/40 percent); once the record is unlocked the
+  // snapshot pins the badge so later rubric changes never move it.
+  ReportTier tier = 3;
+  // The composite percentile: the equal-weight mean of the measured
+  // abilities' percentiles — a missing ability never counts as zero.
+  // Null when no measured ability carries a percentile at all.
+  optional double composite_percentile = 4;
+  // The measured primary abilities, one radar axis each; a missing
+  // ability is an absent entry, never a zero axis.
+  repeated ReportAbility abilities = 5;
+  // The genre's secondary contributions (fps: decisionEfficiency; moba:
+  // aimingAccuracy and trackingStability) — radar satellites, same shape.
+  repeated ReportAbility sub_abilities = 6;
+  // Unlocked-only: how each ability moved against the same ability on
+  // this member's previous attempt — the previous session's record, not
+  // the previous retry inside this one.
+  optional ReportComparison comparison = 7;
+  // Unlocked-only: the improvement board, weakest abilities first. The
+  // target is the tier ladder's excellence line (the A threshold),
+  // expressed in the same percentile currency as everything else.
+  repeated ReportImprovement improvements = 8;
+  // The completeness headline: how many of the record's genre-order
+  // abilities were measured, over how many the genre orders.
+  int32 tested_dimensions = 9;
+  int32 total_dimensions = 10;
+}
+
+// One radar axis: the ability's own numbers plus the cohort answer. The
+// percentile is the same-age same-sex cohort's; a cohort too thin to say
+// anything yields a null percentile and a LOW confidence — the axis then
+// renders score-only, never a made-up percentile.
+message ReportAbility {
+  // The six-word ability vocabulary.
+  string ability = 1;
+  // The game whose score fed this ability (the axis's provenance).
+  string game_code = 2;
+  double score = 3;
+  optional double percentile = 4;
+  PeerConfidence confidence = 5;
+  int32 sample_count = 6;
+  optional double peer_average = 7;
+}
+
+// The tier ladder, judged by percentile: S ≥95, A ≥85, B ≥60, else C.
+enum ReportTier {
+  REPORT_TIER_UNSPECIFIED = 0;
+  REPORT_TIER_S = 1;
+  REPORT_TIER_A = 2;
+  REPORT_TIER_B = 3;
+  REPORT_TIER_C = 4;
+}
+
+// Cohort trust: LOW sits below the confidence floor (percentile null),
+// MEDIUM spans the thin middle, HIGH is the settled band.
+enum PeerConfidence {
+  PEER_CONFIDENCE_UNSPECIFIED = 0;
+  PEER_CONFIDENCE_LOW = 1;
+  PEER_CONFIDENCE_MEDIUM = 2;
+  PEER_CONFIDENCE_HIGH = 3;
+}
+
+message ReportComparison {
+  message Delta {
+    string ability = 1;
+    // The previous attempt's percentile; null when that attempt carried
+    // none — the delta renders as "first measurement", not as zero.
+    optional double previous_percentile = 2;
+    optional double delta_percentile = 3;
+  }
+  repeated Delta deltas = 1;
+}
+
+message ReportImprovement {
+  string ability = 1;
+  double current_percentile = 2;
+  double target_percentile = 3;
+  // How far short of the target, in percent of it.
+  double gap_percent = 4;
+}

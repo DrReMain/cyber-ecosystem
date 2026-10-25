@@ -14,6 +14,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/reportpolicy"
+	"cyber-ecosystem/app/services/esports/internal/ent/reportsnapshot"
 	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
@@ -96,6 +97,7 @@ func checkColumn(t, c string) error {
 			profile.Table:        profile.ValidColumn,
 			questionbank.Table:   questionbank.ValidColumn,
 			reportpolicy.Table:   reportpolicy.ValidColumn,
+			reportsnapshot.Table: reportsnapshot.ValidColumn,
 			sku.Table:            sku.ValidColumn,
 			test.Table:           test.ValidColumn,
 			testconfig.Table:     testconfig.ValidColumn,

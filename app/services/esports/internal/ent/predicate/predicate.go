@@ -36,6 +36,9 @@ type QuestionBank func(*sql.Selector)
 // ReportPolicy is the predicate function for reportpolicy builders.
 type ReportPolicy func(*sql.Selector)
 
+// ReportSnapshot is the predicate function for reportsnapshot builders.
+type ReportSnapshot func(*sql.Selector)
+
 // Sku is the predicate function for sku builders.
 type Sku func(*sql.Selector)
 

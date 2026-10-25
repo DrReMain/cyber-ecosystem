@@ -18,6 +18,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/profile"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
 	"cyber-ecosystem/app/services/esports/internal/ent/reportpolicy"
+	"cyber-ecosystem/app/services/esports/internal/ent/reportsnapshot"
 	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
@@ -352,6 +353,33 @@ func (f TraverseReportPolicy) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.ReportPolicyQuery", q)
 }
 
+// The ReportSnapshotFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ReportSnapshotFunc func(context.Context, *ent.ReportSnapshotQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ReportSnapshotFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ReportSnapshotQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ReportSnapshotQuery", q)
+}
+
+// The TraverseReportSnapshot type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseReportSnapshot func(context.Context, *ent.ReportSnapshotQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseReportSnapshot) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseReportSnapshot) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ReportSnapshotQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ReportSnapshotQuery", q)
+}
+
 // The SkuFunc type is an adapter to allow the use of ordinary function as a Querier.
 type SkuFunc func(context.Context, *ent.SkuQuery) (ent.Value, error)
 
@@ -483,6 +511,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.QuestionBankQuery, predicate.QuestionBank, questionbank.OrderOption]{typ: ent.TypeQuestionBank, tq: q}, nil
 	case *ent.ReportPolicyQuery:
 		return &query[*ent.ReportPolicyQuery, predicate.ReportPolicy, reportpolicy.OrderOption]{typ: ent.TypeReportPolicy, tq: q}, nil
+	case *ent.ReportSnapshotQuery:
+		return &query[*ent.ReportSnapshotQuery, predicate.ReportSnapshot, reportsnapshot.OrderOption]{typ: ent.TypeReportSnapshot, tq: q}, nil
 	case *ent.SkuQuery:
 		return &query[*ent.SkuQuery, predicate.Sku, sku.OrderOption]{typ: ent.TypeSku, tq: q}, nil
 	case *ent.TestQuery:

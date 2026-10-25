@@ -747,6 +747,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetReportAccessResponse'
+    /api/v1/esports/reports/get:
+        post:
+            tags:
+                - ReportService
+            operationId: ReportService_GetReport
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GetReportRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetReportResponse'
     /api/v1/esports/skus:
         get:
             tags:
@@ -3109,6 +3127,77 @@ components:
                         - REPORT_ACCESS_REASON_NO_ENTITLEMENT
                     type: string
                     format: enum
+        cyber.esports.v1.GetReportRequest:
+            type: object
+            properties:
+                recordId:
+                    type: string
+        cyber.esports.v1.GetReportResponse:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                unlocked:
+                    type: boolean
+                    description: The unlock state at read time — the ledger's answer, never this face's.
+                tier:
+                    enum:
+                        - REPORT_TIER_UNSPECIFIED
+                        - REPORT_TIER_S
+                        - REPORT_TIER_A
+                        - REPORT_TIER_B
+                        - REPORT_TIER_C
+                    type: string
+                    description: |-
+                        The tier badge renders in the free tier, S/A/B/C by the composite
+                         percentile (top 5/15/40 percent); once the record is unlocked the
+                         snapshot pins the badge so later rubric changes never move it.
+                    format: enum
+                compositePercentile:
+                    type: number
+                    description: |-
+                        The composite percentile: the equal-weight mean of the measured
+                         abilities' percentiles — a missing ability never counts as zero.
+                         Null when no measured ability carries a percentile at all.
+                    format: double
+                abilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ReportAbility'
+                    description: |-
+                        The measured primary abilities, one radar axis each; a missing
+                         ability is an absent entry, never a zero axis.
+                subAbilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ReportAbility'
+                    description: |-
+                        The genre's secondary contributions (fps: decisionEfficiency; moba:
+                         aimingAccuracy and trackingStability) — radar satellites, same shape.
+                comparison:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.ReportComparison'
+                    description: |-
+                        Unlocked-only: how each ability moved against the same ability on
+                         this member's previous attempt — the previous session's record, not
+                         the previous retry inside this one.
+                improvements:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ReportImprovement'
+                    description: |-
+                        Unlocked-only: the improvement board, weakest abilities first. The
+                         target is the tier ladder's excellence line (the A threshold),
+                         expressed in the same percentile currency as everything else.
+                testedDimensions:
+                    type: integer
+                    description: |-
+                        The completeness headline: how many of the record's genre-order
+                         abilities were measured, over how many the genre orders.
+                    format: int32
+                totalDimensions:
+                    type: integer
+                    format: int32
         cyber.esports.v1.GetTestConfigResponse:
             type: object
             properties:
@@ -3582,6 +3671,76 @@ components:
                 grantedAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.ReportAbility:
+            type: object
+            properties:
+                ability:
+                    type: string
+                    description: The six-word ability vocabulary.
+                gameCode:
+                    type: string
+                    description: The game whose score fed this ability (the axis's provenance).
+                score:
+                    type: number
+                    format: double
+                percentile:
+                    type: number
+                    format: double
+                confidence:
+                    enum:
+                        - PEER_CONFIDENCE_UNSPECIFIED
+                        - PEER_CONFIDENCE_LOW
+                        - PEER_CONFIDENCE_MEDIUM
+                        - PEER_CONFIDENCE_HIGH
+                    type: string
+                    format: enum
+                sampleCount:
+                    type: integer
+                    format: int32
+                peerAverage:
+                    type: number
+                    format: double
+            description: |-
+                One radar axis: the ability's own numbers plus the cohort answer. The
+                 percentile is the same-age same-sex cohort's; a cohort too thin to say
+                 anything yields a null percentile and a LOW confidence — the axis then
+                 renders score-only, never a made-up percentile.
+        cyber.esports.v1.ReportComparison:
+            type: object
+            properties:
+                deltas:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ReportComparison_Delta'
+        cyber.esports.v1.ReportComparison_Delta:
+            type: object
+            properties:
+                ability:
+                    type: string
+                previousPercentile:
+                    type: number
+                    description: |-
+                        The previous attempt's percentile; null when that attempt carried
+                         none — the delta renders as "first measurement", not as zero.
+                    format: double
+                deltaPercentile:
+                    type: number
+                    format: double
+        cyber.esports.v1.ReportImprovement:
+            type: object
+            properties:
+                ability:
+                    type: string
+                currentPercentile:
+                    type: number
+                    format: double
+                targetPercentile:
+                    type: number
+                    format: double
+                gapPercent:
+                    type: number
+                    description: How far short of the target, in percent of it.
+                    format: double
         cyber.esports.v1.ResourceMatchCollect:
             type: object
             properties:
@@ -5421,6 +5580,18 @@ tags:
          preference. Identity stays in system — every face here is caller-scoped:
          the owning key resolves from the session seat (system introspection) and
          never appears in a request.
+    - name: ReportService
+      description: |-
+        The member's report read face. The single-attempt ability report is one
+         record's board under the unlock state the entitlement ledger holds for
+         it — a trial-scope grant on this record (the pay domain's settle, the
+         pricing ruling's unlock unit), an active membership window, or a
+         redeemed family code; the same three facts the family access judgement
+         reads, never re-derived here. The free tier renders the tier badge, the
+         ability radar and the composite percentile; the unlocked tier adds the
+         per-ability peer detail, the last-attempt comparison and the improvement
+         board. Numbers travel, copy does not: the five-zone wording stays with
+         the client until its configuration face lands.
     - name: ResourceService
     - name: RoleService
     - name: SkuService
