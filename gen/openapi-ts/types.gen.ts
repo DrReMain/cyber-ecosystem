@@ -2337,7 +2337,7 @@ export type ChatServiceListModelsResponses = {
 
 export type ChatServiceListModelsResponse = ChatServiceListModelsResponses[keyof ChatServiceListModelsResponses];
 
-export type ActivationCodeServiceListActivationCodesData = {
+export type EntitleAdminServiceListActivationCodesData = {
     body?: never;
     path?: never;
     query?: {
@@ -2374,30 +2374,30 @@ export type ActivationCodeServiceListActivationCodesData = {
     url: '/api/v1/esports/activation-codes';
 };
 
-export type ActivationCodeServiceListActivationCodesResponses = {
+export type EntitleAdminServiceListActivationCodesResponses = {
     /**
      * OK
      */
     200: CyberEsportsV1ListActivationCodesResponse;
 };
 
-export type ActivationCodeServiceListActivationCodesResponse = ActivationCodeServiceListActivationCodesResponses[keyof ActivationCodeServiceListActivationCodesResponses];
+export type EntitleAdminServiceListActivationCodesResponse = EntitleAdminServiceListActivationCodesResponses[keyof EntitleAdminServiceListActivationCodesResponses];
 
-export type ActivationCodeServiceGenerateActivationCodesData = {
+export type EntitleAdminServiceGenerateActivationCodesData = {
     body: CyberEsportsV1GenerateActivationCodesRequest;
     path?: never;
     query?: never;
     url: '/api/v1/esports/activation-codes/generate';
 };
 
-export type ActivationCodeServiceGenerateActivationCodesResponses = {
+export type EntitleAdminServiceGenerateActivationCodesResponses = {
     /**
      * OK
      */
     200: CyberEsportsV1GenerateActivationCodesResponse;
 };
 
-export type ActivationCodeServiceGenerateActivationCodesResponse = ActivationCodeServiceGenerateActivationCodesResponses[keyof ActivationCodeServiceGenerateActivationCodesResponses];
+export type EntitleAdminServiceGenerateActivationCodesResponse = EntitleAdminServiceGenerateActivationCodesResponses[keyof EntitleAdminServiceGenerateActivationCodesResponses];
 
 export type EntitlementServiceRedeemActivationCodeData = {
     body: CyberEsportsV1RedeemActivationCodeRequest;
@@ -2701,21 +2701,21 @@ export type ProfileServiceUpdateProfileResponses = {
 
 export type ProfileServiceUpdateProfileResponse = ProfileServiceUpdateProfileResponses[keyof ProfileServiceUpdateProfileResponses];
 
-export type EntitlementServiceSetReportAccessPolicyData = {
+export type EntitleAdminServiceSetReportAccessPolicyData = {
     body: CyberEsportsV1SetReportAccessPolicyRequest;
     path?: never;
     query?: never;
     url: '/api/v1/esports/report-access-policy';
 };
 
-export type EntitlementServiceSetReportAccessPolicyResponses = {
+export type EntitleAdminServiceSetReportAccessPolicyResponses = {
     /**
      * OK
      */
     200: CyberEsportsV1SetReportAccessPolicyResponse;
 };
 
-export type EntitlementServiceSetReportAccessPolicyResponse = EntitlementServiceSetReportAccessPolicyResponses[keyof EntitlementServiceSetReportAccessPolicyResponses];
+export type EntitleAdminServiceSetReportAccessPolicyResponse = EntitleAdminServiceSetReportAccessPolicyResponses[keyof EntitleAdminServiceSetReportAccessPolicyResponses];
 
 export type EntitlementServiceGetReportAccessData = {
     body?: never;

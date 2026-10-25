@@ -35,6 +35,10 @@ var bannedImports = map[string][]string{
 	"bootstrap": {"module/"},
 	// The kernel stays ent-free.
 	"shared": {"internal/ent"},
+	// The operator face is strippable: the business module never imports
+	// its admin twin, so deleting the admin module stays a closed
+	// operation on the dependency graph.
+	"module/entitle": {"module/entitleadmin"},
 }
 
 func TestModuleDependencyDAG(t *testing.T) {

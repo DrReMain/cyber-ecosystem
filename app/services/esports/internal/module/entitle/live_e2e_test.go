@@ -20,6 +20,7 @@ import (
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 
+	"cyber-ecosystem/app/services/esports/internal/bootstrap"
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
@@ -70,7 +71,8 @@ func TestEntitleLiveE2E(t *testing.T) {
 	codeRP := NewActivationCodeRP(logger, pf)
 	entRP := NewEntitlementRP(logger, pf)
 	policyRP := NewReportPolicyRP(logger, pf)
-	uc := NewEntitleUC(logger, pf, codeRP, entRP, policyRP)
+	bus := bootstrap.NewEventSubscriptions(logger)
+	uc := NewEntitleUC(logger, pf, codeRP, entRP, policyRP, bus)
 	adminCtx := entSubject(admin1)
 
 	// Generation: five single-use codes over the look-alike-free alphabet.
@@ -227,7 +229,7 @@ func TestEntitleLiveE2E(t *testing.T) {
 	// mints a permanent grant; the member-less racer stays grant-less, and
 	// a repeat call stays one row.
 	recA := "ente2erecord0000001"
-	uc.OnTrialCompleted(context.Background(), userB, recA)
+	bus.PublishTrialCompleted(context.Background(), shared.TrialCompleted{UserID: userB, RecordID: recA})
 	ref := recA
 	if row, err := pf.GetClient(context.Background()).Entitlement.Query().
 		Where(entitlement.UserIDEQ(userB), entitlement.ScopeRefEQ(ref)).Only(context.Background()); err != nil {
@@ -235,7 +237,7 @@ func TestEntitleLiveE2E(t *testing.T) {
 	} else if row.ScopeKind != shared.ScopeTrial || row.ExpiresAt != nil || row.Source != "membership" {
 		t.Fatalf("membership trial grant shape: %+v", row)
 	}
-	uc.OnTrialCompleted(context.Background(), winner, recA)
+	bus.PublishTrialCompleted(context.Background(), shared.TrialCompleted{UserID: winner, RecordID: recA})
 	n, err := pf.GetClient(context.Background()).Entitlement.Query().
 		Where(entitlement.ScopeRefEQ(ref)).Count(context.Background())
 	if err != nil {
@@ -244,7 +246,7 @@ func TestEntitleLiveE2E(t *testing.T) {
 	if n != 1 {
 		t.Fatalf("hook granted %d rows, want 1 (memberless must not grant)", n)
 	}
-	uc.OnTrialCompleted(context.Background(), userB, recA)
+	bus.PublishTrialCompleted(context.Background(), shared.TrialCompleted{UserID: userB, RecordID: recA})
 	if n, err := pf.GetClient(context.Background()).Entitlement.Query().
 		Where(entitlement.ScopeRefEQ(ref)).Count(context.Background()); err != nil || n != 1 {
 		t.Fatalf("hook repeat: n=%d err=%v, want 1", n, err)

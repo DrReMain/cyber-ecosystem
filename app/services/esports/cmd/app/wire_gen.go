@@ -12,6 +12,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
+	"cyber-ecosystem/app/services/esports/internal/module/entitleadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
@@ -67,11 +68,8 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	testRP := test.NewTestRP(logger, platformPlatform)
 	matchRP := match.NewMatchRP(logger, platformPlatform)
 	matchSessionLaw := match.NewSessionLaw(logger, matchRP)
-	activationCodeRP := entitle.NewActivationCodeRP(logger, platformPlatform)
-	entitlementRP := entitle.NewEntitlementRP(logger, platformPlatform)
-	reportPolicyRP := entitle.NewReportPolicyRP(logger, platformPlatform)
-	entitleUC := entitle.NewEntitleUC(logger, platformPlatform, activationCodeRP, entitlementRP, reportPolicyRP)
-	testUC := test.NewTestUC(logger, platformPlatform, testRP, matchSessionLaw, entitleUC)
+	eventSubscriptions := bootstrap.NewEventSubscriptions(logger)
+	testUC := test.NewTestUC(logger, platformPlatform, testRP, matchSessionLaw, eventSubscriptions)
 	testService := test.NewTestService(logger, testUC)
 	matchUC := match.NewMatchUC(logger, platformPlatform, matchRP, testRP, profileRP, gameRP)
 	matchService := match.NewMatchService(logger, matchUC)
@@ -80,13 +78,17 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	skuService := pay.NewSkuService(logger, skuUC)
 	lifecycle := bootstrap.NewLifecycle()
 	orderRP := pay.NewOrderRP(logger, platformPlatform)
+	entitlementRP := entitle.NewEntitlementRP(logger, platformPlatform)
 	payChannelRP := pay.NewPayChannelRP(logger, platformPlatform)
 	orderUC := pay.NewOrderUC(logger, platformPlatform, lifecycle, orderRP, skuRP, entitlementRP, testRP, payChannelRP)
 	orderService := pay.NewOrderService(logger, orderUC)
-	codeUC := entitle.NewCodeUC(logger, platformPlatform, activationCodeRP)
-	activationCodeService := entitle.NewActivationCodeService(logger, codeUC)
+	activationCodeRP := entitle.NewActivationCodeRP(logger, platformPlatform)
+	reportPolicyRP := entitle.NewReportPolicyRP(logger, platformPlatform)
+	entitleUC := entitle.NewEntitleUC(logger, platformPlatform, activationCodeRP, entitlementRP, reportPolicyRP, eventSubscriptions)
 	entitlementService := entitle.NewEntitlementService(logger, entitleUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, activationCodeService, entitlementService)
+	codeUC := entitle.NewCodeUC(logger, platformPlatform, activationCodeRP)
+	entitleAdminService := entitleadmin.NewEntitleAdminService(logger, codeUC, entitleUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

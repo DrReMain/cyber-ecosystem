@@ -23,7 +23,7 @@ type skuRP struct {
 }
 
 func NewSkuRP(logger *slog.Logger, p *platform.Platform) SkuRP {
-	return &skuRP{RP: shared.NewRP(logger.With("module", "module/pay_sku_rp"), p)}
+	return &skuRP{RP: shared.NewRP(logger.With("module", "module/pay_rp"), p)}
 }
 
 type orderRP struct {
@@ -31,7 +31,7 @@ type orderRP struct {
 }
 
 func NewOrderRP(logger *slog.Logger, p *platform.Platform) OrderRP {
-	return &orderRP{RP: shared.NewRP(logger.With("module", "module/pay_order_rp"), p)}
+	return &orderRP{RP: shared.NewRP(logger.With("module", "module/pay_rp"), p)}
 }
 
 type payChannelRP struct {
@@ -39,7 +39,7 @@ type payChannelRP struct {
 }
 
 func NewPayChannelRP(logger *slog.Logger, p *platform.Platform) PayChannelRP {
-	return &payChannelRP{RP: shared.NewRP(logger.With("module", "module/pay_channel_rp"), p)}
+	return &payChannelRP{RP: shared.NewRP(logger.With("module", "module/pay_rp"), p)}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------

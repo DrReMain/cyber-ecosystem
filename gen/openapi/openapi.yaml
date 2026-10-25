@@ -289,8 +289,8 @@ paths:
     /api/v1/esports/activation-codes:
         get:
             tags:
-                - ActivationCodeService
-            operationId: ActivationCodeService_ListActivationCodes
+                - EntitleAdminService
+            operationId: EntitleAdminService_ListActivationCodes
             parameters:
                 - name: page.pageNo
                   in: query
@@ -353,8 +353,8 @@ paths:
     /api/v1/esports/activation-codes/generate:
         post:
             tags:
-                - ActivationCodeService
-            operationId: ActivationCodeService_GenerateActivationCodes
+                - EntitleAdminService
+            operationId: EntitleAdminService_GenerateActivationCodes
             requestBody:
                 content:
                     application/json:
@@ -708,8 +708,8 @@ paths:
     /api/v1/esports/report-access-policy:
         post:
             tags:
-                - EntitlementService
-            operationId: EntitlementService_SetReportAccessPolicy
+                - EntitleAdminService
+            operationId: EntitleAdminService_SetReportAccessPolicy
             requestBody:
                 content:
                     application/json:
@@ -5320,20 +5320,22 @@ components:
                     type: string
                     description: OAuth authorization code from the wechat redirect.
 tags:
-    - name: ActivationCodeService
-      description: |-
-        The operator faces of the activation-code lifecycle. A code is a type
-         code — the pricing ruling retired single-record codes, so redeeming
-         opens one report family for the redeemer, never one trial's report.
-         Generation mints each code for a single redeem; an operator who needs N
-         hands-out mints N. Codes live in clear text because operators re-copy
-         them for support, which is why both faces stay on the admin ladder.
     - name: AgentConfigAdminService
     - name: AgentConfigService
     - name: AuditService
     - name: AuthService
     - name: ChatService
     - name: DeptService
+    - name: EntitleAdminService
+      description: |-
+        The operator face of the entitlement domain: minting and listing type
+         codes, and the access policy they judge by. A code is a type code — the
+         pricing ruling retired single-record codes, so redeeming opens one
+         report family, never one trial's report. Generation mints each code for
+         a single redeem; an operator who needs N hands-out mints N. Codes live
+         in clear text because operators re-copy them for support. This whole
+         service is a strippable module: deployments without the operator plane
+         drop it and the business faces never notice.
     - name: EntitlementService
       description: |-
         The member's entitlement faces. Redeem is idempotent per (member,

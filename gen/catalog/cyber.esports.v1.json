@@ -1,14 +1,14 @@
 [
   {
-    "name": "ActivationCodeService",
-    "full_name": "cyber.esports.v1.ActivationCodeService",
+    "name": "EntitleAdminService",
+    "full_name": "cyber.esports.v1.EntitleAdminService",
     "package": "cyber.esports.v1",
-    "source_file": "cyber/esports/v1/activation.proto",
-    "comment": "激活码",
+    "source_file": "cyber/esports/v1/activation_admin.proto",
+    "comment": "权益运营",
     "methods": [
       {
         "name": "GenerateActivationCodes",
-        "full_name": "cyber.esports.v1.ActivationCodeService.GenerateActivationCodes",
+        "full_name": "cyber.esports.v1.EntitleAdminService.GenerateActivationCodes",
         "request_name": "GenerateActivationCodesRequest",
         "request_full_name": "cyber.esports.v1.GenerateActivationCodesRequest",
         "response_name": "GenerateActivationCodesResponse",
@@ -21,7 +21,7 @@
       },
       {
         "name": "ListActivationCodes",
-        "full_name": "cyber.esports.v1.ActivationCodeService.ListActivationCodes",
+        "full_name": "cyber.esports.v1.EntitleAdminService.ListActivationCodes",
         "request_name": "ListActivationCodesRequest",
         "request_full_name": "cyber.esports.v1.ListActivationCodesRequest",
         "response_name": "ListActivationCodesResponse",
@@ -31,6 +31,19 @@
         "comment": "激活码列表",
         "access": "ADMIN",
         "datascope": false
+      },
+      {
+        "name": "SetReportAccessPolicy",
+        "full_name": "cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy",
+        "request_name": "SetReportAccessPolicyRequest",
+        "request_full_name": "cyber.esports.v1.SetReportAccessPolicyRequest",
+        "response_name": "SetReportAccessPolicyResponse",
+        "response_full_name": "cyber.esports.v1.SetReportAccessPolicyResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/report-access-policy",
+        "comment": "设置报告访问策略",
+        "access": "ADMIN",
+        "datascope": false
       }
     ]
   },
@@ -38,7 +51,7 @@
     "name": "EntitlementService",
     "full_name": "cyber.esports.v1.EntitlementService",
     "package": "cyber.esports.v1",
-    "source_file": "cyber/esports/v1/activation.proto",
+    "source_file": "cyber/esports/v1/entitlement.proto",
     "comment": "权益",
     "methods": [
       {
@@ -65,19 +78,6 @@
         "http_path": "/api/v1/esports/entitlements/redeem",
         "comment": "兑换激活码",
         "access": "BUILTIN",
-        "datascope": false
-      },
-      {
-        "name": "SetReportAccessPolicy",
-        "full_name": "cyber.esports.v1.EntitlementService.SetReportAccessPolicy",
-        "request_name": "SetReportAccessPolicyRequest",
-        "request_full_name": "cyber.esports.v1.SetReportAccessPolicyRequest",
-        "response_name": "SetReportAccessPolicyResponse",
-        "response_full_name": "cyber.esports.v1.SetReportAccessPolicyResponse",
-        "http_method": "POST",
-        "http_path": "/api/v1/esports/report-access-policy",
-        "comment": "设置报告访问策略",
-        "access": "ADMIN",
         "datascope": false
       }
     ]

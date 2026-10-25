@@ -24,7 +24,7 @@ type codeRP struct {
 }
 
 func NewActivationCodeRP(logger *slog.Logger, p *platform.Platform) ActivationCodeRP {
-	return &codeRP{RP: shared.NewRP(logger.With("module", "module/entitle_code_rp"), p)}
+	return &codeRP{RP: shared.NewRP(logger.With("module", "module/entitle_rp"), p)}
 }
 
 type entitlementRP struct {
@@ -32,7 +32,7 @@ type entitlementRP struct {
 }
 
 func NewEntitlementRP(logger *slog.Logger, p *platform.Platform) EntitlementRP {
-	return &entitlementRP{RP: shared.NewRP(logger.With("module", "module/entitle_ent_rp"), p)}
+	return &entitlementRP{RP: shared.NewRP(logger.With("module", "module/entitle_rp"), p)}
 }
 
 type policyRP struct {
@@ -40,7 +40,7 @@ type policyRP struct {
 }
 
 func NewReportPolicyRP(logger *slog.Logger, p *platform.Platform) ReportPolicyRP {
-	return &policyRP{RP: shared.NewRP(logger.With("module", "module/entitle_policy_rp"), p)}
+	return &policyRP{RP: shared.NewRP(logger.With("module", "module/entitle_rp"), p)}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------

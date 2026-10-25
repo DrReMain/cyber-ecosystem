@@ -25,7 +25,7 @@ type SkuService struct {
 
 func NewSkuService(logger *slog.Logger, skuUC *SkuUC) *SkuService {
 	return &SkuService{
-		log:   logger.With("module", "module/pay_sku_service"),
+		log:   logger.With("module", "module/pay_service"),
 		skuUC: skuUC,
 	}
 }
@@ -39,7 +39,7 @@ type OrderService struct {
 
 func NewOrderService(logger *slog.Logger, orderUC *OrderUC) *OrderService {
 	return &OrderService{
-		log:     logger.With("module", "module/pay_order_service"),
+		log:     logger.With("module", "module/pay_service"),
 		orderUC: orderUC,
 	}
 }

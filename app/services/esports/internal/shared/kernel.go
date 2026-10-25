@@ -27,6 +27,23 @@ type HookRegistry interface {
 	OnStop(fn func(context.Context) error)
 }
 
+// TrialCompleted is the fact the test domain publishes when a valid
+// attempt lands — a neutral cross-module protocol, so the entitle domain
+// subscribes without either module importing the other (the §1 answer to
+// cross-module writes: the writer publishes, the owner writes).
+type TrialCompleted struct {
+	UserID   string
+	RecordID string
+}
+
+// DomainEventBus carries in-process domain events: synchronous,
+// best-effort — a handler failure logs inside the bus and never
+// propagates to the publisher, whose own transaction is truth.
+type DomainEventBus interface {
+	PublishTrialCompleted(ctx context.Context, e TrialCompleted)
+	SubscribeTrialCompleted(handler func(context.Context, TrialCompleted))
+}
+
 // Base ----------------------------------------------------------------------------------------------------------------
 
 type UC struct {

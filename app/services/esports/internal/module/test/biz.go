@@ -17,7 +17,6 @@ import (
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
-	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
@@ -113,13 +112,13 @@ type MatchSessionLaw interface {
 
 type TestUC struct {
 	shared.UC
-	testRP    TestRP
-	matchLaw  MatchSessionLaw
-	grantHook entitle.TrialGrantHook
+	testRP   TestRP
+	matchLaw MatchSessionLaw
+	eventBus shared.DomainEventBus
 }
 
-func NewTestUC(logger *slog.Logger, tm shared.Transaction, testRP TestRP, matchLaw MatchSessionLaw, grantHook entitle.TrialGrantHook) *TestUC {
-	return &TestUC{UC: shared.NewUC(logger.With("module", "module/test"), tm), testRP: testRP, matchLaw: matchLaw, grantHook: grantHook}
+func NewTestUC(logger *slog.Logger, tm shared.Transaction, testRP TestRP, matchLaw MatchSessionLaw, eventBus shared.DomainEventBus) *TestUC {
+	return &TestUC{UC: shared.NewUC(logger.With("module", "module/test"), tm), testRP: testRP, matchLaw: matchLaw, eventBus: eventBus}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -253,10 +252,10 @@ func (uc *TestUC) Submit(ctx context.Context, in *esportspb.SubmitTestAttemptReq
 	if err != nil {
 		return nil, err
 	}
-	if rec.Valid && uc.grantHook != nil {
+	if rec.Valid && uc.eventBus != nil {
 		// The stored attempt is the truth; the derived grant rides beside
-		// it best-effort, never in front of it.
-		uc.grantHook.OnTrialCompleted(ctx, rec.UserID, rec.ID)
+		// it on the event bus, best-effort, never in front of it.
+		uc.eventBus.PublishTrialCompleted(ctx, shared.TrialCompleted{UserID: rec.UserID, RecordID: rec.ID})
 	}
 	if rec.SessionID != nil {
 		// The stored ordinal is the claim's truth — a concurrent submit may

@@ -17,6 +17,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
+	"cyber-ecosystem/app/services/esports/internal/module/entitleadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/pay"
@@ -32,6 +33,7 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Payment, *slog.Logger
 	panic(wire.Build(
 		wire.Bind(new(shared.Transaction), new(*platform.Platform)),
 		wire.Bind(new(shared.HookRegistry), new(*bootstrap.Lifecycle)),
+		wire.Bind(new(shared.DomainEventBus), new(*bootstrap.EventSubscriptions)),
 		server.ProviderSet,
 		platform.ProviderSet,
 		bootstrap.ProviderSet,
@@ -44,6 +46,7 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Payment, *slog.Logger
 		pay.ProviderSet,
 		test.ProviderSet,
 		entitle.ProviderSet,
+		entitleadmin.ProviderSet,
 		newApp,
 	))
 }

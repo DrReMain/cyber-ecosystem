@@ -122,10 +122,6 @@ type ReportPolicyRP interface {
 	SetPolicy(ctx context.Context, family, policy, updatedBy string) error
 }
 
-type TrialGrantHook interface { // the seam other modules complete through; best-effort — implementations absorb their own errors so a stored attempt is never lost
-	OnTrialCompleted(ctx context.Context, userID, recordID string)
-}
-
 // UC ------------------------------------------------------------------------------------------------------------
 
 type CodeUC struct {
@@ -134,7 +130,7 @@ type CodeUC struct {
 }
 
 func NewCodeUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationCodeRP) *CodeUC {
-	return &CodeUC{UC: shared.NewUC(logger.With("module", "module/entitle_code"), tm), codeRP: codeRP}
+	return &CodeUC{UC: shared.NewUC(logger.With("module", "module/entitle"), tm), codeRP: codeRP}
 }
 
 func (uc *CodeUC) Generate(ctx context.Context, in *GenerateIn) ([]string, error) {
@@ -176,13 +172,18 @@ type EntitleUC struct {
 	policyRP ReportPolicyRP
 }
 
-func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationCodeRP, entRP EntitlementRP, policyRP ReportPolicyRP) *EntitleUC {
-	return &EntitleUC{
+func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationCodeRP, entRP EntitlementRP, policyRP ReportPolicyRP, eventBus shared.DomainEventBus) *EntitleUC {
+	uc := &EntitleUC{
 		UC:       shared.NewUC(logger.With("module", "module/entitle"), tm),
 		codeRP:   codeRP,
 		entRP:    entRP,
 		policyRP: policyRP,
 	}
+	// The subscription is this module's whole coupling to the completion
+	// fact: the handler runs on the bus, the writer of the grant stays
+	// here, and no module imports another.
+	eventBus.SubscribeTrialCompleted(uc.onTrialCompleted)
+	return uc
 }
 
 func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error) {
@@ -308,13 +309,14 @@ func (uc *EntitleUC) SetReportAccessPolicy(ctx context.Context, family, policy s
 	return nil
 }
 
-func (uc *EntitleUC) OnTrialCompleted(ctx context.Context, userID, recordID string) {
+func (uc *EntitleUC) onTrialCompleted(ctx context.Context, e shared.TrialCompleted) {
 	// The member plane's derived grant: a valid trial finished while a
 	// membership is active unlocks that record permanently. The ruling
-	// names no retroactivity — the hook running at completion time is what
-	// enforces it. Best-effort by contract: the attempt is stored truth no
-	// grant failure may destroy, so errors land as logs, never on the
-	// submit's caller.
+	// names no retroactivity — the subscription firing at completion time
+	// is what enforces it. Best-effort by contract: the attempt is stored
+	// truth no grant failure may destroy, so errors land as logs, never on
+	// the publisher.
+	userID, recordID := e.UserID, e.RecordID
 	active, err := uc.entRP.HasActiveMembership(ctx, userID)
 	if err != nil {
 		uc.Log.Error("membership trial grant check failed", "user_id", userID, "record_id", recordID, "err", err)
