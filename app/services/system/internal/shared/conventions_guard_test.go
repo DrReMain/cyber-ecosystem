@@ -9,9 +9,9 @@ import (
 	"testing"
 )
 
-// Convention guards: the recurring violation classes (CONVENTIONS.md §4
-// declaration comments, §6 reason predicates, §1 serialization, §5a plane
-// gates) as machine gates — the §7 rows K-CMT-1, K-ERR-2, K-UTL-1, K-LAD-1
+// Convention guards: the recurring violation classes (declaration
+// comments, reason predicates, serialization, and plane gates) as machine
+// gates — rows K-CMT-1, K-ERR-2, K-UTL-1, K-LAD-1
 // run green here.
 
 var (
@@ -22,7 +22,7 @@ var (
 	guardJSON        = regexp.MustCompile(`json\.(Marshal|Unmarshal|NewEncoder|NewDecoder)\(`)
 )
 
-// guardDirs are the §4-enforced zones; ent/schema (own comment class) and
+// guardDirs are the comment-law zones; ent/schema (own comment class) and
 // this kernel package keep their own conventions.
 var guardDirs = []string{"module", "client", "server", "platform", "bootstrap"}
 
@@ -72,7 +72,7 @@ func TestNoDeclarationComments(t *testing.T) {
 				j++
 			}
 			if j < len(lines) && guardDeclRE.MatchString(strings.TrimSpace(lines[j])) {
-				t.Errorf("%s:%d declaration comment (CONVENTIONS.md §4): %q", f, i+1, s)
+				t.Errorf("%s:%d declaration comment: %q", f, i+1, s)
 			}
 		}
 	}
@@ -81,7 +81,7 @@ func TestNoDeclarationComments(t *testing.T) {
 func TestReasonPredicates(t *testing.T) {
 	for f, src := range guardGoFiles(t) {
 		if hit := guardKratosCode.FindString(src); hit != "" {
-			t.Errorf("%s kratos code check %q — use the generated reason predicate (CONVENTIONS.md §6)", f, hit)
+			t.Errorf("%s kratos code check %q — use the generated reason predicate", f, hit)
 		}
 	}
 }
@@ -89,12 +89,12 @@ func TestReasonPredicates(t *testing.T) {
 func TestSerializationViaUtils(t *testing.T) {
 	for f, src := range guardGoFiles(t) {
 		if guardJSON.MatchString(src) {
-			t.Errorf("%s direct encoding/json — serialize via shared-go/utils (CONVENTIONS.md §1)", f)
+			t.Errorf("%s direct encoding/json — serialize via shared-go/utils", f)
 		}
 	}
 }
 
-// TestAdminRungPlaneGate locks the §5a plane-gate law: the ADMIN rung seals
+// TestAdminRungPlaneGate locks the plane-gate law: the ADMIN rung seals
 // to the backend plane ahead of authz (K-LAD-1).
 func TestAdminRungPlaneGate(t *testing.T) {
 	src, ok := guardGoFiles(t)["server.go"]
@@ -102,10 +102,10 @@ func TestAdminRungPlaneGate(t *testing.T) {
 		t.Fatalf("server.go missing from the guard walk")
 	}
 	if !rungCarries(src, "ACCESS_ADMIN", "security.BackendPlaneGuard()") {
-		t.Errorf("server.go ADMIN rung lacks the backend plane gate (CONVENTIONS.md §5a)")
+		t.Errorf("server.go ADMIN rung lacks the backend plane gate")
 	}
 	if !rungCarries(src, "ACCESS_PLATFORM", "security.BackendPlaneGuard()") {
-		t.Errorf("server.go PLATFORM rung lacks the backend plane gate (CONVENTIONS.md §5a)")
+		t.Errorf("server.go PLATFORM rung lacks the backend plane gate")
 	}
 }
 

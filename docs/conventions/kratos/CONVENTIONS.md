@@ -50,7 +50,7 @@ conf             config (proto-defined, generated)
 
 - `MUST` keep business logic in `biz`; `service` is thin; `data`/`client` are adapters only.
 - `MUST NOT` let `biz` import `data`/`client`/`service`/`server`/`platform`. Direction is `data → biz` and `client → biz` (both import biz to satisfy ports), never reverse. biz depends on its ports + `gen/` + `shared-go/`, and MAY take `*conf.X` in its constructor (same pattern as `server`/`platform`).
-- **A UC depends on repo ports, never on another UC — injection is repo-port-only.** Cross-module *read* → the other module's repo port (read-only, no side-effect). Cross-module *write* is forbidden as a direct call → a **domain event** instead (the other module subscribes). A cross-module business-rule need (not a query) is a design smell — raise it, don't wire UC→UC.
+- **A UC depends on repo ports, never on another UC — injection is repo-port-only.** Cross-module *read* → the other module's repo port (read-only, no side-effect). Cross-module *write* has exactly two lawful shapes: **(1) a domain event** — the writer publishes the fact (the event type lives in the service's `internal/shared` as a neutral cross-module protocol; the in-process registry sits beside the lifecycle machinery, synchronous and best-effort — the publisher's own transaction is the truth), and the owning module subscribes and writes; **(2) an in-transaction ledger grant** — when a settled ruling demands same-database atomicity, the consumer may call the owning module's port *inside its own transaction*, provided the write is idempotent insert-only (conflict → no-op), because the transaction, not an event, is the consistency boundary — one sanctioned move on an existing row: a lapsed single-row grant may be re-granted forward-only (a conditional update that lengthens, never shortens), so an expired row cannot strand its owner. Everything else — a direct call outside a transaction, one UC invoking another — stays forbidden. A cross-module business-rule need (not a query) is a design smell — raise it, don't wire UC→UC.
 - The four files are a required-by-role set, not an exclusive list: `data.go` may be
   omitted (pure ACL facade), `service.go` may be omitted (module exposes no RPCs), and a
   module MAY add one extra file per cohesive non-layer concern when its content belongs
@@ -87,7 +87,7 @@ conf             config (proto-defined, generated)
 | data repo impl | `<do>RP` + `New<DO>RP` → `<DO>RP` | `userRP` |
 | ent↔biz mapping fn | `map<DO>` | `mapUser` |
 | service struct | `<Name>Service` | `UserService` |
-| log tag | UC = `module/<d>`; repo = `module/<d>_rp`; service = `module/<d>_service` | `module/role`, `module/role_rp`, `module/role_service` |
+| log tag | UC = `module/<d>`; repo = `module/<d>_rp`; service = `module/<d>_service` — the module is the unit, never the instance: a module holding several UCs or RPs still uses exactly these three forms, distinguishing instances with log fields, not tag suffixes | `module/role`, `module/role_rp`, `module/role_service` |
 
 - biz holds **one** port family — repo ports (`<X>RP`). A local repo (`UserRP`, backed by `data`) and a remote repo (`<Remote>RP`, backed by `client`) are the same shape: biz injects an RP and is indifferent to where the bytes come from. `data` and `client` are just two kinds of adapter.
 - A remote RP is named for the **provider** (the provider *is* the "table"); its payloads use a **neutral ACL value type**, not a consumer DO, so several consumers share one RP.

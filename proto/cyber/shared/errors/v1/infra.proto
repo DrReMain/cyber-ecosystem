@@ -47,4 +47,14 @@ enum InfraError {
   INFRA_ERROR_MQ_INVALID_ARGUMENT = 3400 [(.errors.code) = 400];
   INFRA_ERROR_MQ_UNAVAILABLE = 3401 [(.errors.code) = 503];
   INFRA_ERROR_MQ_TIMEOUT = 3402 [(.errors.code) = 504];
+
+  // 35xx: Payment
+  INFRA_ERROR_PAYMENT_INVALID_ARGUMENT = 3500 [(.errors.code) = 400];
+  INFRA_ERROR_PAYMENT_NOT_FOUND = 3501 [(.errors.code) = 404];
+  INFRA_ERROR_PAYMENT_DUPLICATE = 3502 [(.errors.code) = 409];
+  INFRA_ERROR_PAYMENT_CHANNEL_REJECTED = 3503 [(.errors.code) = 422];
+  INFRA_ERROR_PAYMENT_UNAVAILABLE = 3504 [(.errors.code) = 503];
+  INFRA_ERROR_PAYMENT_TIMEOUT = 3505 [(.errors.code) = 504];
+  INFRA_ERROR_PAYMENT_INVALID_SIGNATURE = 3506 [(.errors.code) = 400];
+  INFRA_ERROR_PAYMENT_DECRYPT_FAILED = 3507 [(.errors.code) = 400];
 }

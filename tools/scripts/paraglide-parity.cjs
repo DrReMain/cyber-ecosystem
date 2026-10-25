@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Paraglide message parity guard (tanstack CONVENTIONS.md §6).
+ * Paraglide message parity guard (the i18n directory-ownership law).
  *
  * Scope: clients that declare inlang/paraglide — the presence of a
  * project.inlang settings file is the opt-in; clients on other i18n stacks
@@ -40,7 +40,7 @@ if (!fs.existsSync(settingsPath) || !fs.existsSync(messagesDir)) {
   for (const d of onDisk) {
     if (!registered.includes(d)) {
       bad(
-        `messages/${d}/ is not registered in project.inlang settings (§6 three-point registration)`,
+        `messages/${d}/ is not registered in project.inlang settings (the three-point registration law)`,
       );
     }
   }
@@ -56,7 +56,7 @@ if (!fs.existsSync(settingsPath) || !fs.existsSync(messagesDir)) {
     for (const loc of locales) {
       const f = path.join(dir, `${loc}.json`);
       if (!fs.existsSync(f)) {
-        bad(`messages/${d}/${loc}.json missing (registered locale, §6)`);
+        bad(`messages/${d}/${loc}.json missing (a registered locale)`);
         continue;
       }
       try {
@@ -68,9 +68,7 @@ if (!fs.existsSync(settingsPath) || !fs.existsSync(messagesDir)) {
     const baseKeys = files[base] ? Object.keys(files[base]) : [];
     for (const k of baseKeys) {
       if (!k.startsWith(prefix)) {
-        bad(
-          `messages/${d}/${base}.json key \`${k}\` lacks the directory prefix \`${prefix}\` (§6)`,
-        );
+        bad(`messages/${d}/${base}.json key \`${k}\` lacks the directory prefix \`${prefix}\``);
       }
     }
     for (const [loc, data] of Object.entries(files)) {
@@ -82,7 +80,7 @@ if (!fs.existsSync(settingsPath) || !fs.existsSync(messagesDir)) {
       if (extra.length) bad(`messages/${d}/${loc}.json extra keys vs ${base}: ${extra.join(", ")}`);
       if (!miss.length && !extra.length && keys.join("\u0000") !== baseKeys.join("\u0000")) {
         bad(
-          `messages/${d}/${loc}.json key order differs from ${base} (§6 — deliberate order, never re-sorted)`,
+          `messages/${d}/${loc}.json key order differs from ${base} (deliberate order, never re-sorted)`,
         );
       }
       for (const k of baseKeys) {

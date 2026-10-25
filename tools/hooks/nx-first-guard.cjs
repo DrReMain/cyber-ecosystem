@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * PreToolUse guard (Bash): deny high-confidence Nx bypasses (root AGENTS.md §3/§4).
+ * PreToolUse guard (Bash): deny high-confidence Nx bypasses of declared targets.
  *
  * Fail-open by design — a broken guard must never brick the Bash tool: any
  * parse error or unexpected input exits 0 with no output. Denials carry the
@@ -40,7 +40,7 @@ for (const [re, reason] of BYPASSES) {
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           permissionDecision: "deny",
-          permissionDecisionReason: `${reason} (AGENTS.md §3: MUST use Nx for workflows with declared targets)`,
+          permissionDecisionReason: `${reason} (Nx targets are the only sanctioned workflow path: ./nx run <project>:<target>)`,
         },
       }),
     );
