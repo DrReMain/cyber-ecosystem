@@ -34,7 +34,7 @@ func (Entitlement) Fields() []ent.Field {
 		field.Time("expires_at").Optional().Nillable().Immutable().
 			Comment("membership window end (paid_at + period days); null on trial rows — permanence is the absence of a deadline"),
 		field.String("source").NotEmpty().MaxRuneLen(64).Immutable().
-			Comment("granting artifact id — the order number today; activation codes join this column when they land"),
+			Comment("granting artifact id — the order number on membership rows, the code on report-type rows"),
 	}
 }
 

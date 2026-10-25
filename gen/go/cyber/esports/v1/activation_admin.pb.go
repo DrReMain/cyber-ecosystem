@@ -172,9 +172,9 @@ func (x *ActivationCode) GetCreatedAt() *timestamppb.Timestamp {
 
 type GenerateActivationCodesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ReportType    ReportType             `protobuf:"varint,1,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType" json:"report_type,omitempty"`
-	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	ExpireDays    int32                  `protobuf:"varint,3,opt,name=expire_days,json=expireDays,proto3" json:"expire_days,omitempty"`
+	ReportType    *ReportType            `protobuf:"varint,1,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType,oneof" json:"report_type,omitempty"`
+	Count         *int32                 `protobuf:"varint,2,opt,name=count,proto3,oneof" json:"count,omitempty"`
+	ExpireDays    *int32                 `protobuf:"varint,3,opt,name=expire_days,json=expireDays,proto3,oneof" json:"expire_days,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -210,22 +210,22 @@ func (*GenerateActivationCodesRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *GenerateActivationCodesRequest) GetReportType() ReportType {
-	if x != nil {
-		return x.ReportType
+	if x != nil && x.ReportType != nil {
+		return *x.ReportType
 	}
 	return ReportType_REPORT_TYPE_UNSPECIFIED
 }
 
 func (x *GenerateActivationCodesRequest) GetCount() int32 {
-	if x != nil {
-		return x.Count
+	if x != nil && x.Count != nil {
+		return *x.Count
 	}
 	return 0
 }
 
 func (x *GenerateActivationCodesRequest) GetExpireDays() int32 {
-	if x != nil {
-		return x.ExpireDays
+	if x != nil && x.ExpireDays != nil {
+		return *x.ExpireDays
 	}
 	return 0
 }
@@ -382,8 +382,8 @@ func (x *ListActivationCodesResponse) GetCodes() []*ActivationCode {
 
 type SetReportAccessPolicyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ReportType    ReportType             `protobuf:"varint,1,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType" json:"report_type,omitempty"`
-	Policy        ReportAccessPolicy     `protobuf:"varint,2,opt,name=policy,proto3,enum=cyber.esports.v1.ReportAccessPolicy" json:"policy,omitempty"`
+	ReportType    *ReportType            `protobuf:"varint,1,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType,oneof" json:"report_type,omitempty"`
+	Policy        *ReportAccessPolicy    `protobuf:"varint,2,opt,name=policy,proto3,enum=cyber.esports.v1.ReportAccessPolicy,oneof" json:"policy,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -419,15 +419,15 @@ func (*SetReportAccessPolicyRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *SetReportAccessPolicyRequest) GetReportType() ReportType {
-	if x != nil {
-		return x.ReportType
+	if x != nil && x.ReportType != nil {
+		return *x.ReportType
 	}
 	return ReportType_REPORT_TYPE_UNSPECIFIED
 }
 
 func (x *SetReportAccessPolicyRequest) GetPolicy() ReportAccessPolicy {
-	if x != nil {
-		return x.Policy
+	if x != nil && x.Policy != nil {
+		return *x.Policy
 	}
 	return ReportAccessPolicy_REPORT_ACCESS_POLICY_UNSPECIFIED
 }
@@ -499,16 +499,19 @@ const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"\n" +
 	"expires_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x129\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xc3\x01\n" +
-	"\x1eGenerateActivationCodesRequest\x12L\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xfc\x01\n" +
+	"\x1eGenerateActivationCodesRequest\x12Q\n" +
 	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeB\r\xbaH\n" +
-	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00R\n" +
-	"reportType\x12#\n" +
+	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00H\x00R\n" +
+	"reportType\x88\x01\x01\x12(\n" +
 	"\x05count\x18\x02 \x01(\x05B\r\xbaH\n" +
-	"\xc8\x01\x01\x1a\x05\x18\xe8\a(\x01R\x05count\x12.\n" +
+	"\xc8\x01\x01\x1a\x05\x18\xe8\a(\x01H\x01R\x05count\x88\x01\x01\x123\n" +
 	"\vexpire_days\x18\x03 \x01(\x05B\r\xbaH\n" +
-	"\xc8\x01\x01\x1a\x05\x18\xc2\x1c(\x01R\n" +
-	"expireDays\"7\n" +
+	"\xc8\x01\x01\x1a\x05\x18\xc2\x1c(\x01H\x02R\n" +
+	"expireDays\x88\x01\x01B\x0e\n" +
+	"\f_report_typeB\b\n" +
+	"\x06_countB\x0e\n" +
+	"\f_expire_days\"7\n" +
 	"\x1fGenerateActivationCodesResponse\x12\x14\n" +
 	"\x05codes\x18\x01 \x03(\tR\x05codes\"\xa9\x01\n" +
 	"\x1aListActivationCodesRequest\x127\n" +
@@ -518,13 +521,15 @@ const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"\f_report_type\"\x8f\x01\n" +
 	"\x1bListActivationCodesResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x126\n" +
-	"\x05codes\x18\x02 \x03(\v2 .cyber.esports.v1.ActivationCodeR\x05codes\"\xb9\x01\n" +
-	"\x1cSetReportAccessPolicyRequest\x12L\n" +
+	"\x05codes\x18\x02 \x03(\v2 .cyber.esports.v1.ActivationCodeR\x05codes\"\xde\x01\n" +
+	"\x1cSetReportAccessPolicyRequest\x12Q\n" +
 	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeB\r\xbaH\n" +
-	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00R\n" +
-	"reportType\x12K\n" +
+	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00H\x00R\n" +
+	"reportType\x88\x01\x01\x12P\n" +
 	"\x06policy\x18\x02 \x01(\x0e2$.cyber.esports.v1.ReportAccessPolicyB\r\xbaH\n" +
-	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00R\x06policy\"\x9c\x01\n" +
+	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00H\x01R\x06policy\x88\x01\x01B\x0e\n" +
+	"\f_report_typeB\t\n" +
+	"\a_policy\"\x9c\x01\n" +
 	"\x1dSetReportAccessPolicyResponse\x12=\n" +
 	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeR\n" +
 	"reportType\x12<\n" +
@@ -608,7 +613,9 @@ func file_cyber_esports_v1_activation_admin_proto_init() {
 		return
 	}
 	file_cyber_esports_v1_entitlement_proto_init()
+	file_cyber_esports_v1_activation_admin_proto_msgTypes[1].OneofWrappers = []any{}
 	file_cyber_esports_v1_activation_admin_proto_msgTypes[3].OneofWrappers = []any{}
+	file_cyber_esports_v1_activation_admin_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

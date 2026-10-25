@@ -22,9 +22,9 @@ var (
 	guardJSON        = regexp.MustCompile(`[^a-zA-Z0-9_.]json\.(Marshal|Unmarshal|NewEncoder|NewDecoder)\(`)
 )
 
-// guardDirs are the comment-law zones; ent/schema (own comment class) and
-// this kernel package keep their own conventions.
-var guardDirs = []string{"module", "client", "server", "platform", "bootstrap"}
+// guardDirs are the comment-law zones; ent/schema keeps its own comment
+// class (schema docs are the ent ecosystem's idiom).
+var guardDirs = []string{"module", "client", "server", "platform", "bootstrap", "shared"}
 
 func guardGoFiles(t *testing.T) map[string]string {
 	t.Helper()
@@ -137,4 +137,53 @@ func rungCarries(src, tier, gate string) bool {
 		}
 	}
 	return false
+}
+
+// guardDividerOrder is the section law per layer file: the dividers a file
+// actually carries must appear in this order — the guard does not force a
+// thin file to grow sections it does not need, it only catches a divider
+// sitting above one the law puts before it (the regression the section
+// review caught: methods parked in the UC section).
+var guardDividerOrder = map[string][]string{
+	"biz.go":     {"DO", "Port", "UC", "Method", "Private"},
+	"data.go":    {"Repo", "Method", "Private"},
+	"service.go": {"Struct", "Handler", "Private"},
+}
+
+func TestSectionDividerOrder(t *testing.T) {
+	for f, src := range guardGoFiles(t) {
+		order, ok := guardDividerOrder[filepath.Base(f)]
+		if !ok {
+			continue // module.go and engine files carry no layer dividers
+		}
+		var seen []string
+		for _, line := range strings.Split(src, "\n") {
+			s := strings.TrimSpace(line)
+			if !strings.HasPrefix(s, "// ") {
+				continue
+			}
+			fields := strings.Fields(s)
+			if len(fields) < 2 {
+				continue
+			}
+			for _, d := range order {
+				if fields[1] == d {
+					seen = append(seen, d)
+				}
+			}
+		}
+		rank := func(name string) int {
+			for i, d := range order {
+				if d == name {
+					return i
+				}
+			}
+			return -1
+		}
+		for i := 1; i < len(seen); i++ {
+			if rank(seen[i]) <= rank(seen[i-1]) {
+				t.Errorf("%s divider %q above %q — lawful order %v", f, seen[i], seen[i-1], order)
+			}
+		}
+	}
 }

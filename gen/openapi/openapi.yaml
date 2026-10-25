@@ -3096,6 +3096,9 @@ components:
             properties:
                 allowed:
                     type: boolean
+                    description: |-
+                        Plain bool by design: two states are the whole vocabulary — there is
+                         no third "absent" reading a wrapper would preserve.
                 reason:
                     enum:
                         - REPORT_ACCESS_REASON_UNSPECIFIED

@@ -11,9 +11,11 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+
+	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
-// Struct ------------------------------------------------------------------------------------------------------
+// Struct --------------------------------------------------------------------------------------------------------------
 
 type EntitlementService struct {
 	esportspb.UnimplementedEntitlementServiceServer
@@ -68,11 +70,11 @@ func (s *EntitlementService) RegisterConnect(srv *connecttransport.Server) {
 
 func mapReportTypePB(family string) esportspb.ReportType {
 	switch family {
-	case reportCognitive:
+	case shared.ReportCognitive:
 		return esportspb.ReportType_REPORT_TYPE_COGNITIVE
-	case reportCareer:
+	case shared.ReportCareer:
 		return esportspb.ReportType_REPORT_TYPE_CAREER
-	case reportSchool:
+	case shared.ReportSchool:
 		return esportspb.ReportType_REPORT_TYPE_SCHOOL
 	}
 	return esportspb.ReportType_REPORT_TYPE_UNSPECIFIED
@@ -81,11 +83,11 @@ func mapReportTypePB(family string) esportspb.ReportType {
 func mapReportTypeFromPB(t esportspb.ReportType) string {
 	switch t {
 	case esportspb.ReportType_REPORT_TYPE_COGNITIVE:
-		return reportCognitive
+		return shared.ReportCognitive
 	case esportspb.ReportType_REPORT_TYPE_CAREER:
-		return reportCareer
+		return shared.ReportCareer
 	case esportspb.ReportType_REPORT_TYPE_SCHOOL:
-		return reportSchool
+		return shared.ReportSchool
 	}
 	return ""
 }

@@ -9,13 +9,21 @@ import (
 
 const ExtraAccount = "account"
 
-// The entitlement ledger's scope vocabulary — one home because two
-// modules write it (pay grants on settle, entitle grants on redeem) and a
-// drifted literal would silently split the ledger.
 const (
-	ScopeTrial      = "trial"
+	ScopeTrial      = "trial" // the ledger's scope vocabulary keeps one home: pay and entitle both write these rows, and a drifted literal would silently split the ledger
 	ScopeMembership = "membership"
 	ScopeReportType = "report_type"
+)
+
+const (
+	ReportCognitive = "cognitive" // the report-family and policy vocabulary: entitle judges by it, entitleadmin sets it — two modules, one home, or operator config drifts from judgement
+	ReportCareer    = "career"
+	ReportSchool    = "school"
+
+	PolicyOpen       = "open"
+	PolicyMembership = "membership"
+	PolicyTenant     = "tenant"
+	PolicyClosed     = "closed"
 )
 
 type Transaction interface {
@@ -27,20 +35,13 @@ type HookRegistry interface {
 	OnStop(fn func(context.Context) error)
 }
 
-// TrialCompleted is the fact the test domain publishes when a valid
-// attempt lands — a neutral cross-module protocol, so the entitle domain
-// subscribes without either module importing the other (the §1 answer to
-// cross-module writes: the writer publishes, the owner writes).
 type TrialCompleted struct {
 	UserID   string
 	RecordID string
 }
 
-// DomainEventBus carries in-process domain events: synchronous,
-// best-effort — a handler failure logs inside the bus and never
-// propagates to the publisher, whose own transaction is truth.
 type DomainEventBus interface {
-	PublishTrialCompleted(ctx context.Context, e TrialCompleted)
+	PublishTrialCompleted(ctx context.Context, e TrialCompleted) // in-process, synchronous, best-effort: the writer publishes a fact, the owner subscribes, a handler failure stays inside the bus — the publisher's transaction is truth
 	SubscribeTrialCompleted(handler func(context.Context, TrialCompleted))
 }
 

@@ -387,6 +387,10 @@ export type CyberEsportsV1GetProfileResponse = {
 };
 
 export type CyberEsportsV1GetReportAccessResponse = {
+    /**
+     * Plain bool by design: two states are the whole vocabulary — there is
+     * no third "absent" reading a wrapper would preserve.
+     */
     allowed?: boolean;
     reason?: 'REPORT_ACCESS_REASON_UNSPECIFIED' | 'REPORT_ACCESS_REASON_POLICY_OPEN' | 'REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE' | 'REPORT_ACCESS_REASON_CODE_REDEEMED' | 'REPORT_ACCESS_REASON_POLICY_CLOSED' | 'REPORT_ACCESS_REASON_NO_ENTITLEMENT';
 };

@@ -5,8 +5,8 @@ import "github.com/google/wire"
 var ProviderSet = wire.NewSet(
 	NewOrderUC,
 	NewSkuUC,
-	NewPayChannelRP,
 	NewOrderRP,
+	NewPayChannelRP,
 	NewSkuRP,
 	NewOrderService,
 	NewSkuService,

@@ -76,7 +76,7 @@ func TestEntitleLiveE2E(t *testing.T) {
 	adminCtx := entSubject(admin1)
 
 	// Generation: five single-use codes over the look-alike-free alphabet.
-	codes, err := NewCodeUC(logger, pf, codeRP).Generate(adminCtx, &GenerateIn{ReportType: reportSchool, Count: 5, ExpireDays: 30})
+	codes, err := NewCodeUC(logger, pf, codeRP).Generate(adminCtx, &GenerateIn{ReportType: shared.ReportSchool, Count: 5, ExpireDays: 30})
 	if err != nil {
 		t.Fatalf("generate: %v", err)
 	}
@@ -121,17 +121,19 @@ func TestEntitleLiveE2E(t *testing.T) {
 	if row, err := codeRP.ByCode(context.Background(), code0); err != nil || row.UsedCount != 1 {
 		t.Fatalf("used_count after race: row=%+v err=%v", row, err)
 	}
-	rows, err := pf.GetClient(context.Background()).Entitlement.Query().All(context.Background())
+	rows, err := pf.GetClient(context.Background()).Entitlement.Query().
+		Where(entitlement.ScopeKindEQ(shared.ScopeReportType), entitlement.SourceEQ(code0)).
+		All(context.Background())
 	if err != nil {
 		t.Fatalf("entitlement query: %v", err)
 	}
-	if len(rows) != 1 || rows[0].ScopeKind != shared.ScopeReportType || *rows[0].ScopeRef != reportSchool || rows[0].Source != code0 {
-		t.Fatalf("race granted %+v", rows[0])
+	if len(rows) != 1 || *rows[0].ScopeRef != shared.ReportSchool {
+		t.Fatalf("race granted %+v", rows)
 	}
 
 	// The winner re-redeems: idempotent, and the use is not re-taken.
 	winner := rows[0].UserID
-	if out, err := uc.Redeem(entSubject(winner), code0); err != nil || out.ReportType != reportSchool {
+	if out, err := uc.Redeem(entSubject(winner), code0); err != nil || out.ReportType != shared.ReportSchool {
 		t.Fatalf("winner re-redeem: out=%+v err=%v", out, err)
 	}
 	if row, _ := codeRP.ByCode(context.Background(), code0); row.UsedCount != 1 {
@@ -201,7 +203,7 @@ func TestEntitleLiveE2E(t *testing.T) {
 	if err != nil || out4.ExpiresAt == nil || !out4.ExpiresAt.Equal(codeRow4.ExpiresAt) {
 		t.Fatalf("post-lapse redeem: out=%+v err=%v want expiry %v", out4, err, codeRow4.ExpiresAt)
 	}
-	familySchool := reportSchool
+	familySchool := shared.ReportSchool
 	rowC, err := entRP.ByScope(entSubject(userC), userC, shared.ScopeReportType, &familySchool)
 	if err != nil || rowC == nil || rowC.Source != code4 || !rowC.ExpiresAt.Equal(codeRow4.ExpiresAt) {
 		t.Fatalf("ratcheted row: %+v err=%v", rowC, err)
@@ -211,7 +213,7 @@ func TestEntitleLiveE2E(t *testing.T) {
 			t.Fatalf("use count for %s: %+v", c, row)
 		}
 	}
-	short, err := NewCodeUC(logger, pf, codeRP).Generate(adminCtx, &GenerateIn{ReportType: reportSchool, Count: 1, ExpireDays: 1})
+	short, err := NewCodeUC(logger, pf, codeRP).Generate(adminCtx, &GenerateIn{ReportType: shared.ReportSchool, Count: 1, ExpireDays: 1})
 	if err != nil || len(short) != 1 {
 		t.Fatalf("short generate: %v err=%v", short, err)
 	}
@@ -233,13 +235,13 @@ func TestEntitleLiveE2E(t *testing.T) {
 		}
 		return out
 	}
-	if out := access(userB, reportCareer); !out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN {
+	if out := access(userB, shared.ReportCareer); !out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN {
 		t.Fatalf("career default: %+v", out)
 	}
-	if out := access(userB, reportCognitive); out.Allowed {
+	if out := access(userB, shared.ReportCognitive); out.Allowed {
 		t.Fatalf("cognitive default without membership: %+v", out)
 	}
-	if out := access(winner, reportSchool); !out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_CODE_REDEEMED {
+	if out := access(winner, shared.ReportSchool); !out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_CODE_REDEEMED {
 		t.Fatalf("school after redeem: %+v", out)
 	}
 
@@ -251,22 +253,22 @@ func TestEntitleLiveE2E(t *testing.T) {
 	}); err != nil {
 		t.Fatalf("membership grant: %v", err)
 	}
-	if out := access(userB, reportCognitive); !out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE {
+	if out := access(userB, shared.ReportCognitive); !out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE {
 		t.Fatalf("cognitive with membership: %+v", out)
 	}
-	if err := uc.SetReportAccessPolicy(adminCtx, reportCareer, policyClosed); err != nil {
+	if err := uc.SetReportAccessPolicy(adminCtx, shared.ReportCareer, shared.PolicyClosed); err != nil {
 		t.Fatalf("policy set: %v", err)
 	}
-	if out := access(userB, reportCareer); out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_CLOSED {
+	if out := access(userB, shared.ReportCareer); out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_CLOSED {
 		t.Fatalf("career after closed override: %+v", out)
 	}
-	if err := uc.SetReportAccessPolicy(adminCtx, reportSchool, policyMembership); err != nil {
+	if err := uc.SetReportAccessPolicy(adminCtx, shared.ReportSchool, shared.PolicyMembership); err != nil {
 		t.Fatalf("policy set school: %v", err)
 	}
-	if out := access(userB, reportSchool); !out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE {
+	if out := access(userB, shared.ReportSchool); !out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE {
 		t.Fatalf("school under membership policy: %+v", out)
 	}
-	if err := uc.SetReportAccessPolicy(adminCtx, reportCognitive, policyTenant); !esportspb.IsEsportsReportPolicyNotReady(err) {
+	if err := uc.SetReportAccessPolicy(adminCtx, shared.ReportCognitive, shared.PolicyTenant); !esportspb.IsEsportsReportPolicyNotReady(err) {
 		t.Fatalf("tenant policy refused: err=%v", err)
 	}
 
@@ -307,7 +309,7 @@ func cleanEntE2E(t *testing.T, db *ent.Client) {
 	}{
 		{`DELETE FROM entitlement WHERE user_id LIKE 'ente2e%' OR user_id LIKE 'entadm%'`, nil},
 		{`DELETE FROM activation_code WHERE created_by LIKE 'entadm%'`, nil},
-		{`DELETE FROM report_policy`, nil},
+		{`DELETE FROM report_policy WHERE report_type IN ('cognitive', 'career', 'school')`, nil},
 	} {
 		if _, err := db.ExecContext(ctx, stmt.q, stmt.args...); err != nil {
 			t.Fatalf("entitle e2e clean: %v", err)

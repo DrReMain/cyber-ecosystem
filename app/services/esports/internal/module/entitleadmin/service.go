@@ -13,6 +13,7 @@ import (
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
+	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
 // Struct --------------------------------------------------------------------------------------------------------------
@@ -27,7 +28,7 @@ type EntitleAdminService struct {
 
 func NewEntitleAdminService(logger *slog.Logger, codeUC *entitle.CodeUC, entitleUC *entitle.EntitleUC) *EntitleAdminService {
 	return &EntitleAdminService{
-		log:       logger.With("module", "module/entitle_admin_service"),
+		log:       logger.With("module", "module/entitleadmin_service"),
 		codeUC:    codeUC,
 		entitleUC: entitleUC,
 	}
@@ -90,11 +91,11 @@ func (s *EntitleAdminService) RegisterConnect(srv *connecttransport.Server) {
 func reportTypeFromPB(t esportspb.ReportType) string {
 	switch t {
 	case esportspb.ReportType_REPORT_TYPE_COGNITIVE:
-		return "cognitive"
+		return shared.ReportCognitive
 	case esportspb.ReportType_REPORT_TYPE_CAREER:
-		return "career"
+		return shared.ReportCareer
 	case esportspb.ReportType_REPORT_TYPE_SCHOOL:
-		return "school"
+		return shared.ReportSchool
 	}
 	return ""
 }
@@ -102,13 +103,13 @@ func reportTypeFromPB(t esportspb.ReportType) string {
 func policyFromPB(p esportspb.ReportAccessPolicy) string {
 	switch p {
 	case esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_OPEN:
-		return "open"
+		return shared.PolicyOpen
 	case esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_MEMBERSHIP:
-		return "membership"
+		return shared.PolicyMembership
 	case esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_TENANT:
-		return "tenant"
+		return shared.PolicyTenant
 	case esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_CLOSED:
-		return "closed"
+		return shared.PolicyClosed
 	}
 	return ""
 }

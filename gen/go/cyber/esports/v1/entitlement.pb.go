@@ -143,7 +143,7 @@ func (ReportAccessReason) EnumDescriptor() ([]byte, []int) {
 
 type RedeemActivationCodeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	Code          *string                `protobuf:"bytes,1,opt,name=code,proto3,oneof" json:"code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -179,8 +179,8 @@ func (*RedeemActivationCodeRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *RedeemActivationCodeRequest) GetCode() string {
-	if x != nil {
-		return x.Code
+	if x != nil && x.Code != nil {
+		return *x.Code
 	}
 	return ""
 }
@@ -292,9 +292,11 @@ func (x *GetReportAccessRequest) GetReportType() ReportType {
 }
 
 type GetReportAccessResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Allowed       bool                   `protobuf:"varint,1,opt,name=allowed,proto3" json:"allowed,omitempty"`
-	Reason        ReportAccessReason     `protobuf:"varint,2,opt,name=reason,proto3,enum=cyber.esports.v1.ReportAccessReason" json:"reason,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Plain bool by design: two states are the whole vocabulary — there is
+	// no third "absent" reading a wrapper would preserve.
+	Allowed       bool               `protobuf:"varint,1,opt,name=allowed,proto3" json:"allowed,omitempty"`
+	Reason        ReportAccessReason `protobuf:"varint,2,opt,name=reason,proto3,enum=cyber.esports.v1.ReportAccessReason" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -347,9 +349,10 @@ var File_cyber_esports_v1_entitlement_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_entitlement_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/esports/v1/entitlement.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"?\n" +
-	"\x1bRedeemActivationCodeRequest\x12 \n" +
-	"\x04code\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x02\x18@R\x04code\"\xd3\x01\n" +
+	"\"cyber/esports/v1/entitlement.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"M\n" +
+	"\x1bRedeemActivationCodeRequest\x12%\n" +
+	"\x04code\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x02\x18@H\x00R\x04code\x88\x01\x01B\a\n" +
+	"\x05_code\"\xd3\x01\n" +
 	"\x1cRedeemActivationCodeResponse\x12=\n" +
 	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeR\n" +
 	"reportType\x129\n" +
@@ -429,6 +432,7 @@ func file_cyber_esports_v1_entitlement_proto_init() {
 	if File_cyber_esports_v1_entitlement_proto != nil {
 		return
 	}
+	file_cyber_esports_v1_entitlement_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -77,21 +77,21 @@ message ActivationCode {
 }
 
 message GenerateActivationCodesRequest {
-  ReportType report_type = 1 [
+  optional ReportType report_type = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum = {
       defined_only: true
       not_in: [0]
     }
   ];
-  int32 count = 2 [
+  optional int32 count = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).int32 = {
       gte: 1
       lte: 1000
     }
   ];
-  int32 expire_days = 3 [
+  optional int32 expire_days = 3 [
     (buf.validate.field).required = true,
     (buf.validate.field).int32 = {
       gte: 1
@@ -117,14 +117,14 @@ message ListActivationCodesResponse {
 }
 
 message SetReportAccessPolicyRequest {
-  ReportType report_type = 1 [
+  optional ReportType report_type = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum = {
       defined_only: true
       not_in: [0]
     }
   ];
-  ReportAccessPolicy policy = 2 [
+  optional ReportAccessPolicy policy = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum = {
       defined_only: true

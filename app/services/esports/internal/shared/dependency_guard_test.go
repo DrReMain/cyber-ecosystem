@@ -35,10 +35,11 @@ var bannedImports = map[string][]string{
 	"bootstrap": {"module/"},
 	// The kernel stays ent-free.
 	"shared": {"internal/ent"},
-	// The operator face is strippable: the business module never imports
-	// its admin twin, so deleting the admin module stays a closed
-	// operation on the dependency graph.
-	"module/entitle": {"module/entitleadmin"},
+	// The operator face is strippable: no business module imports an admin
+	// twin (only server/registrar.go mounts it), so deleting the admin
+	// plane stays a closed operation on the dependency graph — the ban is
+	// generic, not per-module, so a second admin face inherits it.
+	"module": {"module/entitleadmin"},
 }
 
 func TestModuleDependencyDAG(t *testing.T) {

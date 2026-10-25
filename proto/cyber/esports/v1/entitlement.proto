@@ -62,7 +62,7 @@ enum ReportAccessReason {
 }
 
 message RedeemActivationCodeRequest {
-  string code = 1 [
+  optional string code = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string = {
       min_len: 2
@@ -90,6 +90,8 @@ message GetReportAccessRequest {
 }
 
 message GetReportAccessResponse {
+  // Plain bool by design: two states are the whole vocabulary — there is
+  // no third "absent" reading a wrapper would preserve.
   bool allowed = 1;
   ReportAccessReason reason = 2;
 }

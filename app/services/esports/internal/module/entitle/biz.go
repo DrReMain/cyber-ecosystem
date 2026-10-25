@@ -18,28 +18,15 @@ import (
 )
 
 const (
-	reportCognitive = "cognitive"
-	reportCareer    = "career"
-	reportSchool    = "school"
-
-	policyOpen       = "open"
-	policyMembership = "membership"
-	policyTenant     = "tenant"
-	policyClosed     = "closed"
-
-	// The code shape mirrors the legacy corpus: a two-letter prefix a
-	// support agent can recognize on the phone plus sixteen characters of
-	// secure random over an alphabet with the look-alikes (0/O, 1/I)
-	// removed, so a handed-out code survives being read aloud.
 	codePrefix   = "AC"
 	codeBodyLen  = 16
 	codeAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 )
 
 var defaultPolicy = map[string]string{ // shipped defaults; report_policy rows are the only override — career open, cognitive the member plane, school codes-only
-	reportCareer:    policyOpen,
-	reportCognitive: policyMembership,
-	reportSchool:    policyClosed,
+	shared.ReportCareer:    shared.PolicyOpen,
+	shared.ReportCognitive: shared.PolicyMembership,
+	shared.ReportSchool:    shared.PolicyClosed,
 }
 
 // DO ------------------------------------------------------------------------------------------------------------
@@ -101,24 +88,18 @@ type ActivationCodeRP interface {
 	CreateBatch(ctx context.Context, rows []*ActivationCode) error
 	List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, error)
 	ByCode(ctx context.Context, code string) (*ActivationCode, error) // nil = no such code
-	// TakeUse is the redeem's whole arbitration: a conditional UPDATE
-	// under used_count < quantity — one use taken per successful call,
-	// the same single-arbiter shape the settle path gives money.
-	TakeUse(ctx context.Context, code string) (bool, error)
+	TakeUse(ctx context.Context, code string) (bool, error)           // the redeem's whole arbitration: one conditional UPDATE under used_count < quantity — the settle path's single-arbiter shape
 }
 
 type EntitlementRP interface {
 	Grant(ctx context.Context, g *EntitlementGrant) error                                             // insert-only; a rival grant for the same scope lands as a no-op, never an error
 	ByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*EntitlementRow, error) // nil = no grant
-	// Exists is the narrow query pay's port asks of the same face.
-	Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error)
+	Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error)             // the narrow query pay's port asks of the same face
 	HasActiveMembership(ctx context.Context, userID string) (bool, error)
 }
 
 type ReportPolicyRP interface {
-	// Policy reads the operator's override for one family; ok=false means
-	// no row, and the shipped default answers.
-	Policy(ctx context.Context, family string) (policy string, ok bool, err error)
+	Policy(ctx context.Context, family string) (policy string, ok bool, err error) // ok=false means no row — the shipped default answers
 	SetPolicy(ctx context.Context, family, policy, updatedBy string) error
 }
 
@@ -131,38 +112,6 @@ type CodeUC struct {
 
 func NewCodeUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationCodeRP) *CodeUC {
 	return &CodeUC{UC: shared.NewUC(logger.With("module", "module/entitle"), tm), codeRP: codeRP}
-}
-
-func (uc *CodeUC) Generate(ctx context.Context, in *GenerateIn) ([]string, error) {
-	subject, ok := security.SubjectFromCtx(ctx)
-	if !ok || subject == nil {
-		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("code generation requires an admin session"))
-	}
-	expiresAt := time.Now().AddDate(0, 0, in.ExpireDays)
-	rows := make([]*ActivationCode, 0, in.Count)
-	codes := make([]string, 0, in.Count)
-	seen := make(map[string]struct{}, in.Count)
-	for len(rows) < in.Count {
-		code := codePrefix + mintCodeBody()
-		if _, dup := seen[code]; dup {
-			continue
-		}
-		seen[code] = struct{}{}
-		codes = append(codes, code)
-		rows = append(rows, &ActivationCode{
-			Code: code, ReportType: in.ReportType, Quantity: 1, UsedCount: 0,
-			ExpiresAt: expiresAt, CreatedBy: subject.UserID,
-		})
-	}
-	if err := uc.codeRP.CreateBatch(ctx, rows); err != nil {
-		return nil, err
-	}
-	uc.Log.Info("activation codes generated", "count", len(rows), "report_type", in.ReportType, "created_by", subject.UserID)
-	return codes, nil
-}
-
-func (uc *CodeUC) List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, error) {
-	return uc.codeRP.List(ctx, in)
 }
 
 type EntitleUC struct {
@@ -184,6 +133,85 @@ func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationC
 	// here, and no module imports another.
 	eventBus.SubscribeTrialCompleted(uc.onTrialCompleted)
 	return uc
+}
+
+// Method --------------------------------------------------------------------------------------------------------
+func (uc *CodeUC) List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, error) {
+	return uc.codeRP.List(ctx, in)
+}
+
+func (uc *CodeUC) Generate(ctx context.Context, in *GenerateIn) ([]string, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("code generation requires an admin session"))
+	}
+	expiresAt := time.Now().AddDate(0, 0, in.ExpireDays)
+	rows := make([]*ActivationCode, 0, in.Count)
+	codes := make([]string, 0, in.Count)
+	seen := make(map[string]struct{}, in.Count)
+	for len(rows) < in.Count {
+		// Two-letter prefix a support agent can recognize on the phone,
+		// then the random body — the code shape mirrors the legacy corpus.
+		body, err := mintCodeBody()
+		if err != nil {
+			return nil, err
+		}
+		code := codePrefix + body
+		if _, dup := seen[code]; dup {
+			continue
+		}
+		seen[code] = struct{}{}
+		codes = append(codes, code)
+		rows = append(rows, &ActivationCode{
+			Code: code, ReportType: in.ReportType, Quantity: 1, UsedCount: 0,
+			ExpiresAt: expiresAt, CreatedBy: subject.UserID,
+		})
+	}
+	if err := uc.codeRP.CreateBatch(ctx, rows); err != nil {
+		return nil, err
+	}
+	uc.Log.Info("activation codes generated", "count", len(rows), "report_type", in.ReportType, "created_by", subject.UserID)
+	return codes, nil
+}
+
+func (uc *EntitleUC) GetReportAccess(ctx context.Context, family string) (*AccessOut, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("report access requires a session"))
+	}
+	// A redeemed code outranks the policy — a type code is an explicit
+	// grant someone handed out; no config switch revokes it.
+	ref := family
+	grant, err := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &ref)
+	if err != nil {
+		return nil, err
+	}
+	if grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now())) {
+		return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_CODE_REDEEMED}, nil
+	}
+	policy, ok, err := uc.policyRP.Policy(ctx, family)
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		policy = defaultPolicy[family]
+	}
+	explicitClosed := ok && policy == shared.PolicyClosed
+	switch policy {
+	case shared.PolicyOpen:
+		return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN}, nil
+	case shared.PolicyMembership:
+		if ok, err := uc.entRP.HasActiveMembership(ctx, subject.UserID); err != nil {
+			return nil, err
+		} else if ok {
+			return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE}, nil
+		}
+	case shared.PolicyTenant, shared.PolicyClosed:
+	}
+	if explicitClosed {
+		return &AccessOut{Allowed: false, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_CLOSED}, nil
+	}
+	return &AccessOut{Allowed: false, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT}, nil
 }
 
 func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error) {
@@ -254,53 +282,12 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 	return out, nil
 }
 
-// Method --------------------------------------------------------------------------------------------------------
-func (uc *EntitleUC) GetReportAccess(ctx context.Context, family string) (*AccessOut, error) {
-	subject, ok := security.SubjectFromCtx(ctx)
-	if !ok || subject == nil {
-		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("report access requires a session"))
-	}
-	// A redeemed code outranks the policy — a type code is an explicit
-	// grant someone handed out; no config switch revokes it.
-	ref := family
-	grant, err := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &ref)
-	if err != nil {
-		return nil, err
-	}
-	if grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now())) {
-		return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_CODE_REDEEMED}, nil
-	}
-	policy, ok, err := uc.policyRP.Policy(ctx, family)
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		policy = defaultPolicy[family]
-	}
-	explicitClosed := ok && policy == policyClosed
-	switch policy {
-	case policyOpen:
-		return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN}, nil
-	case policyMembership:
-		if ok, err := uc.entRP.HasActiveMembership(ctx, subject.UserID); err != nil {
-			return nil, err
-		} else if ok {
-			return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE}, nil
-		}
-	case policyTenant, policyClosed:
-	}
-	if explicitClosed {
-		return &AccessOut{Allowed: false, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_CLOSED}, nil
-	}
-	return &AccessOut{Allowed: false, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT}, nil
-}
-
 func (uc *EntitleUC) SetReportAccessPolicy(ctx context.Context, family, policy string) error {
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {
 		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("policy write requires an admin session"))
 	}
-	if policy == policyTenant {
+	if policy == shared.PolicyTenant {
 		// The tenant plane is not here yet — refusing the value keeps the
 		// operator from setting a policy this build would silently answer
 		// as closed.
@@ -313,6 +300,7 @@ func (uc *EntitleUC) SetReportAccessPolicy(ctx context.Context, family, policy s
 	return nil
 }
 
+// Private -------------------------------------------------------------------------------------------------------
 func (uc *EntitleUC) onTrialCompleted(ctx context.Context, e shared.TrialCompleted) {
 	// The member plane's derived grant: a valid trial finished while a
 	// membership is active unlocks that record permanently. The ruling
@@ -336,16 +324,18 @@ func (uc *EntitleUC) onTrialCompleted(ctx context.Context, e shared.TrialComplet
 	}
 }
 
-// Private -------------------------------------------------------------------------------------------------------
-func mintCodeBody() string {
+func mintCodeBody() (string, error) {
+	// Sixteen chars of secure random over an alphabet with the
+	// look-alikes (0/O, 1/I) removed — a handed-out code survives being
+	// read aloud, the legacy corpus's own alphabet.
 	b := make([]byte, codeBodyLen)
 	alphabetMax := big.NewInt(int64(len(codeAlphabet)))
 	for i := range b {
 		n, err := rand.Int(rand.Reader, alphabetMax)
 		if err != nil {
-			panic("entitle: entropy failure: " + err.Error())
+			return "", fmt.Errorf("entitle: entropy failure: %w", err)
 		}
 		b[i] = codeAlphabet[n.Int64()]
 	}
-	return string(b)
+	return string(b), nil
 }
