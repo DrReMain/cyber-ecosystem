@@ -6,7 +6,7 @@ var ProviderSet = wire.NewSet(
 	NewOrderUC,
 	NewSkuUC,
 	NewPayChannelRP,
-	NewPayOrderRP,
+	NewOrderRP,
 	NewSkuRP,
 	NewOrderService,
 	NewSkuService,

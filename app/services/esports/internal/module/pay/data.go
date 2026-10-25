@@ -26,12 +26,12 @@ func NewSkuRP(logger *slog.Logger, p *platform.Platform) SkuRP {
 	return &skuRP{RP: shared.NewRP(logger.With("module", "module/pay_sku_rp"), p)}
 }
 
-type payOrderRP struct {
+type orderRP struct {
 	shared.RP
 }
 
-func NewPayOrderRP(logger *slog.Logger, p *platform.Platform) OrderRP {
-	return &payOrderRP{RP: shared.NewRP(logger.With("module", "module/pay_order_rp"), p)}
+func NewOrderRP(logger *slog.Logger, p *platform.Platform) OrderRP {
+	return &orderRP{RP: shared.NewRP(logger.With("module", "module/pay_order_rp"), p)}
 }
 
 type payChannelRP struct {
@@ -68,7 +68,7 @@ func (rp *skuRP) ByCode(ctx context.Context, code string) (*Sku, error) {
 	return mapSku(row), nil
 }
 
-func (rp *payOrderRP) Create(ctx context.Context, o *Order) (*Order, error) {
+func (rp *orderRP) Create(ctx context.Context, o *Order) (*Order, error) {
 	create := rp.Platform.GetClient(ctx).PayOrder.Create().
 		SetOrderNo(o.OrderNo).
 		SetUserID(o.UserID).
@@ -99,7 +99,7 @@ func (rp *payOrderRP) Create(ctx context.Context, o *Order) (*Order, error) {
 	return mapOrder(row), nil
 }
 
-func (rp *payOrderRP) ByNo(ctx context.Context, orderNo string) (*Order, error) {
+func (rp *orderRP) ByNo(ctx context.Context, orderNo string) (*Order, error) {
 	row, err := rp.Platform.GetClient(ctx).PayOrder.Query().
 		Where(payorder.OrderNoEQ(orderNo)).
 		Only(ctx)
@@ -112,7 +112,7 @@ func (rp *payOrderRP) ByNo(ctx context.Context, orderNo string) (*Order, error) 
 	return mapOrder(row), nil
 }
 
-func (rp *payOrderRP) ActiveByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*Order, error) {
+func (rp *orderRP) ActiveByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*Order, error) {
 	query := rp.Platform.GetClient(ctx).PayOrder.Query().
 		Where(
 			payorder.UserIDEQ(userID),
@@ -137,7 +137,7 @@ func (rp *payOrderRP) ActiveByScope(ctx context.Context, userID, scopeKind strin
 	return mapOrder(row), nil
 }
 
-func (rp *payOrderRP) ClosePending(ctx context.Context, orderNo string) (*Order, error) {
+func (rp *orderRP) ClosePending(ctx context.Context, orderNo string) (*Order, error) {
 	rows, err := rp.Platform.GetClient(ctx).PayOrder.Update().
 		Where(payorder.OrderNoEQ(orderNo), payorder.StateEQ(payorder.StatePending)).
 		SetState(payorder.StateClosed).
@@ -151,7 +151,7 @@ func (rp *payOrderRP) ClosePending(ctx context.Context, orderNo string) (*Order,
 	return rp.ByNo(ctx, orderNo)
 }
 
-func (rp *payOrderRP) Settle(ctx context.Context, in *SettleIn) (*Order, bool, error) {
+func (rp *orderRP) Settle(ctx context.Context, in *SettleIn) (*Order, bool, error) {
 	// The conditional update is the whole arbitration: state IN
 	// (pending, closed) → paid, where closed→paid is the channel-truth
 	// correction for a close that raced a payment. Zero rows means a rival
@@ -175,7 +175,7 @@ func (rp *payOrderRP) Settle(ctx context.Context, in *SettleIn) (*Order, bool, e
 	return order, rows > 0, nil
 }
 
-func (rp *payOrderRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
+func (rp *orderRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).PayOrder.Query().
 		Where(payorder.UserIDEQ(in.UserID)).
 		Order(ent.Desc(payorder.FieldCreatedAt))
@@ -193,7 +193,7 @@ func (rp *payOrderRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	}, nil
 }
 
-func (rp *payOrderRP) ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error) {
+func (rp *orderRP) ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error) {
 	rows, err := rp.Platform.GetClient(ctx).PayOrder.Query().
 		Where(
 			payorder.StateEQ(payorder.StatePending),
@@ -206,7 +206,7 @@ func (rp *payOrderRP) ListStalePending(ctx context.Context, olderThan time.Durat
 	return utils.SliceMap(rows, mapOrder), nil
 }
 
-func (rp *payOrderRP) ListPaid(ctx context.Context, from, to time.Time) ([]*Order, error) {
+func (rp *orderRP) ListPaid(ctx context.Context, from, to time.Time) ([]*Order, error) {
 	rows, err := rp.Platform.GetClient(ctx).PayOrder.Query().
 		Where(
 			payorder.StateEQ(payorder.StatePaid),

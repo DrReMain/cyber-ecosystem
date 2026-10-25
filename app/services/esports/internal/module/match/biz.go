@@ -66,7 +66,7 @@ type SessionView struct {
 	Created    bool
 }
 
-// RP port ------------------------------------------------------------------------------------------------------------
+// Port ------------------------------------------------------------------------------------------------------------
 
 type MatchRP interface {
 	Create(ctx context.Context, s *MatchSession) (*MatchSession, error)

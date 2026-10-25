@@ -67,9 +67,9 @@ func TestEntitleLiveE2E(t *testing.T) {
 	})
 	cleanEntE2E(t, db)
 
-	codeRP := NewCodeRP(logger, pf)
+	codeRP := NewActivationCodeRP(logger, pf)
 	entRP := NewEntitlementRP(logger, pf)
-	policyRP := NewPolicyRP(logger, pf)
+	policyRP := NewReportPolicyRP(logger, pf)
 	uc := NewEntitleUC(logger, pf, codeRP, entRP, policyRP)
 	adminCtx := entSubject(admin1)
 

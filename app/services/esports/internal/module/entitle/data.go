@@ -23,7 +23,7 @@ type codeRP struct {
 	shared.RP
 }
 
-func NewCodeRP(logger *slog.Logger, p *platform.Platform) CodeRP {
+func NewActivationCodeRP(logger *slog.Logger, p *platform.Platform) ActivationCodeRP {
 	return &codeRP{RP: shared.NewRP(logger.With("module", "module/entitle_code_rp"), p)}
 }
 
@@ -39,7 +39,7 @@ type policyRP struct {
 	shared.RP
 }
 
-func NewPolicyRP(logger *slog.Logger, p *platform.Platform) PolicyRP {
+func NewReportPolicyRP(logger *slog.Logger, p *platform.Platform) ReportPolicyRP {
 	return &policyRP{RP: shared.NewRP(logger.With("module", "module/entitle_policy_rp"), p)}
 }
 
@@ -78,7 +78,7 @@ func (rp *codeRP) List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, err
 	}
 	return &ListCodesOut{
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
-		Codes:        mapCodes(rows),
+		Codes:        mapActivationCodes(rows),
 	}, nil
 }
 
@@ -92,7 +92,7 @@ func (rp *codeRP) ByCode(ctx context.Context, code string) (*ActivationCode, err
 		}
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return mapCode(row), nil
+	return mapActivationCode(row), nil
 }
 
 func (rp *codeRP) TakeUse(ctx context.Context, code string) (bool, error) {
@@ -149,7 +149,7 @@ func (rp *entitlementRP) ByScope(ctx context.Context, userID, scopeKind string, 
 		}
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return mapEntRow(row), nil
+	return mapEntitlementRow(row), nil
 }
 
 func (rp *entitlementRP) HasActiveMembership(ctx context.Context, userID string) (bool, error) {
@@ -206,7 +206,7 @@ func (rp *policyRP) SetPolicy(ctx context.Context, family, policy, updatedBy str
 
 // Private -------------------------------------------------------------------------------------------------------------
 
-func mapCode(row *ent.ActivationCode) *ActivationCode {
+func mapActivationCode(row *ent.ActivationCode) *ActivationCode {
 	return &ActivationCode{
 		Code:       row.Code,
 		ReportType: string(row.ReportType),
@@ -218,15 +218,15 @@ func mapCode(row *ent.ActivationCode) *ActivationCode {
 	}
 }
 
-func mapCodes(rows []*ent.ActivationCode) []*ActivationCode {
+func mapActivationCodes(rows []*ent.ActivationCode) []*ActivationCode {
 	out := make([]*ActivationCode, 0, len(rows))
 	for _, r := range rows {
-		out = append(out, mapCode(r))
+		out = append(out, mapActivationCode(r))
 	}
 	return out
 }
 
-func mapEntRow(row *ent.Entitlement) *EntitlementRow {
+func mapEntitlementRow(row *ent.Entitlement) *EntitlementRow {
 	return &EntitlementRow{
 		ScopeKind: string(row.ScopeKind),
 		ScopeRef:  row.ScopeRef,

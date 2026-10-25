@@ -43,7 +43,7 @@ func NewEntitlementService(logger *slog.Logger, entitleUC *EntitleUC) *Entitleme
 	}
 }
 
-// Method --------------------------------------------------------------------------------------------------------------
+// Handler --------------------------------------------------------------------------------------------------------------
 
 func (s *ActivationCodeService) GenerateActivationCodes(ctx context.Context, req *esportspb.GenerateActivationCodesRequest) (*esportspb.GenerateActivationCodesResponse, error) {
 	codes, err := s.codeUC.Generate(ctx, &GenerateIn{

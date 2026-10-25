@@ -17,8 +17,32 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
-// DO ------------------------------------------------------------------------------------------------------------------
+const (
+	reportCognitive = "cognitive"
+	reportCareer    = "career"
+	reportSchool    = "school"
 
+	policyOpen       = "open"
+	policyMembership = "membership"
+	policyTenant     = "tenant"
+	policyClosed     = "closed"
+
+	// The code shape mirrors the legacy corpus: a two-letter prefix a
+	// support agent can recognize on the phone plus sixteen characters of
+	// secure random over an alphabet with the look-alikes (0/O, 1/I)
+	// removed, so a handed-out code survives being read aloud.
+	codePrefix   = "AC"
+	codeBodyLen  = 16
+	codeAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+)
+
+var defaultPolicy = map[string]string{ // shipped defaults; report_policy rows are the only override — career open, cognitive the member plane, school codes-only
+	reportCareer:    policyOpen,
+	reportCognitive: policyMembership,
+	reportSchool:    policyClosed,
+}
+
+// DO ------------------------------------------------------------------------------------------------------------
 type ActivationCode struct {
 	Code       string
 	ReportType string
@@ -44,33 +68,6 @@ type RedeemOut struct {
 type AccessOut struct {
 	Allowed bool
 	Reason  esportspb.ReportAccessReason
-}
-
-// Port ----------------------------------------------------------------------------------------------------------------
-
-type CodeRP interface {
-	CreateBatch(ctx context.Context, rows []*ActivationCode) error
-	List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, error)
-	ByCode(ctx context.Context, code string) (*ActivationCode, error) // nil = no such code
-	// TakeUse is the redeem's whole arbitration: a conditional UPDATE
-	// under used_count < quantity — one use taken per successful call,
-	// the same single-arbiter shape the settle path gives money.
-	TakeUse(ctx context.Context, code string) (bool, error)
-}
-
-type EntitlementRP interface {
-	Grant(ctx context.Context, g *EntitlementGrant) error                                             // insert-only; a rival grant for the same scope lands as a no-op, never an error
-	ByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*EntitlementRow, error) // nil = no grant
-	// Exists is the narrow query pay's port asks of the same face.
-	Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error)
-	HasActiveMembership(ctx context.Context, userID string) (bool, error)
-}
-
-type PolicyRP interface {
-	// Policy reads the operator's override for one family; ok=false means
-	// no row, and the shipped default answers.
-	Policy(ctx context.Context, family string) (policy string, ok bool, err error)
-	SetPolicy(ctx context.Context, family, policy, updatedBy string) error
 }
 
 type EntitlementGrant struct {
@@ -99,39 +96,44 @@ type ListCodesOut struct {
 	Codes []*ActivationCode
 }
 
-// UC ------------------------------------------------------------------------------------------------------------------
-
-const (
-	reportCognitive = "cognitive"
-	reportCareer    = "career"
-	reportSchool    = "school"
-
-	policyOpen       = "open"
-	policyMembership = "membership"
-	policyTenant     = "tenant"
-	policyClosed     = "closed"
-
-	// The code shape mirrors the legacy corpus: a two-letter prefix a
-	// support agent can recognize on the phone plus sixteen characters of
-	// secure random over an alphabet with the look-alikes (0/O, 1/I)
-	// removed, so a handed-out code survives being read aloud.
-	codePrefix   = "AC"
-	codeBodyLen  = 16
-	codeAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-)
-
-var defaultPolicy = map[string]string{ // shipped defaults; report_policy rows are the only override — career open, cognitive the member plane, school codes-only
-	reportCareer:    policyOpen,
-	reportCognitive: policyMembership,
-	reportSchool:    policyClosed,
+// Port ----------------------------------------------------------------------------------------------------------
+type ActivationCodeRP interface {
+	CreateBatch(ctx context.Context, rows []*ActivationCode) error
+	List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, error)
+	ByCode(ctx context.Context, code string) (*ActivationCode, error) // nil = no such code
+	// TakeUse is the redeem's whole arbitration: a conditional UPDATE
+	// under used_count < quantity — one use taken per successful call,
+	// the same single-arbiter shape the settle path gives money.
+	TakeUse(ctx context.Context, code string) (bool, error)
 }
+
+type EntitlementRP interface {
+	Grant(ctx context.Context, g *EntitlementGrant) error                                             // insert-only; a rival grant for the same scope lands as a no-op, never an error
+	ByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*EntitlementRow, error) // nil = no grant
+	// Exists is the narrow query pay's port asks of the same face.
+	Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error)
+	HasActiveMembership(ctx context.Context, userID string) (bool, error)
+}
+
+type ReportPolicyRP interface {
+	// Policy reads the operator's override for one family; ok=false means
+	// no row, and the shipped default answers.
+	Policy(ctx context.Context, family string) (policy string, ok bool, err error)
+	SetPolicy(ctx context.Context, family, policy, updatedBy string) error
+}
+
+type TrialGrantHook interface { // the seam other modules complete through; best-effort — implementations absorb their own errors so a stored attempt is never lost
+	OnTrialCompleted(ctx context.Context, userID, recordID string)
+}
+
+// UC ------------------------------------------------------------------------------------------------------------
 
 type CodeUC struct {
 	shared.UC
-	codeRP CodeRP
+	codeRP ActivationCodeRP
 }
 
-func NewCodeUC(logger *slog.Logger, tm shared.Transaction, codeRP CodeRP) *CodeUC {
+func NewCodeUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationCodeRP) *CodeUC {
 	return &CodeUC{UC: shared.NewUC(logger.With("module", "module/entitle_code"), tm), codeRP: codeRP}
 }
 
@@ -169,12 +171,12 @@ func (uc *CodeUC) List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, err
 
 type EntitleUC struct {
 	shared.UC
-	codeRP   CodeRP
+	codeRP   ActivationCodeRP
 	entRP    EntitlementRP
-	policyRP PolicyRP
+	policyRP ReportPolicyRP
 }
 
-func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP CodeRP, entRP EntitlementRP, policyRP PolicyRP) *EntitleUC {
+func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationCodeRP, entRP EntitlementRP, policyRP ReportPolicyRP) *EntitleUC {
 	return &EntitleUC{
 		UC:       shared.NewUC(logger.With("module", "module/entitle"), tm),
 		codeRP:   codeRP,
@@ -206,50 +208,48 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 	} else if grant != nil {
 		return &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}, nil
 	}
-	taken, err := uc.codeRP.TakeUse(ctx, code)
+	var out *RedeemOut
+	err = uc.Tm.InTx(ctx, func(txCtx context.Context) error {
+		// One transaction takes the use and lands the grant: a use taken
+		// without its grant is unrecoverable — the retry path would find
+		// the code exhausted and no grant to be idempotent against.
+		taken, err := uc.codeRP.TakeUse(txCtx, code)
+		if err != nil {
+			return err
+		}
+		if !taken {
+			// The conditional update lost: either a rival member took the
+			// use, or this member's own concurrent redeem won it — the
+			// re-read separates the two.
+			grant, err := uc.entRP.ByScope(txCtx, subject.UserID, shared.ScopeReportType, &family)
+			if err != nil {
+				return err
+			}
+			if grant != nil {
+				out = &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}
+				return nil
+			}
+			return esportspb.ErrorEsportsActivationCodeExhausted("")
+		}
+		ref := family
+		expiresAt := row.ExpiresAt
+		if err := uc.entRP.Grant(txCtx, &EntitlementGrant{
+			UserID: subject.UserID, ScopeKind: shared.ScopeReportType, ScopeRef: &ref,
+			ExpiresAt: &expiresAt, Source: code,
+		}); err != nil {
+			return err
+		}
+		out = &RedeemOut{ReportType: family, ExpiresAt: &expiresAt, GrantedAt: time.Now()}
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
-	if !taken {
-		// The conditional update lost: either a rival member took the use,
-		// or this member's own concurrent redeem won it — re-reading the
-		// grant separates the two.
-		grant, err := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &family)
-		if err != nil {
-			return nil, err
-		}
-		if grant != nil {
-			return &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}, nil
-		}
-		return nil, esportspb.ErrorEsportsActivationCodeExhausted("")
-	}
-	ref := family
-	expiresAt := row.ExpiresAt
-	if err := uc.entRP.Grant(ctx, &EntitlementGrant{
-		UserID: subject.UserID, ScopeKind: shared.ScopeReportType, ScopeRef: &ref,
-		ExpiresAt: &expiresAt, Source: code,
-	}); err != nil {
-		return nil, err
-	}
 	uc.Log.Info("activation code redeemed", "code", code, "report_type", family, "user_id", subject.UserID)
-	return &RedeemOut{ReportType: family, ExpiresAt: &expiresAt, GrantedAt: time.Now()}, nil
+	return out, nil
 }
 
-// Private -------------------------------------------------------------------------------------------------------------
-
-func mintCodeBody() string {
-	b := make([]byte, codeBodyLen)
-	alphabetMax := big.NewInt(int64(len(codeAlphabet)))
-	for i := range b {
-		n, err := rand.Int(rand.Reader, alphabetMax)
-		if err != nil {
-			panic("entitle: entropy failure: " + err.Error())
-		}
-		b[i] = codeAlphabet[n.Int64()]
-	}
-	return string(b)
-}
-
+// Method --------------------------------------------------------------------------------------------------------
 func (uc *EntitleUC) GetReportAccess(ctx context.Context, family string) (*AccessOut, error) {
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {
@@ -308,10 +308,6 @@ func (uc *EntitleUC) SetReportAccessPolicy(ctx context.Context, family, policy s
 	return nil
 }
 
-type TrialGrantHook interface { // the seam other modules complete through; best-effort — implementations absorb their own errors so a stored attempt is never lost
-	OnTrialCompleted(ctx context.Context, userID, recordID string)
-}
-
 func (uc *EntitleUC) OnTrialCompleted(ctx context.Context, userID, recordID string) {
 	// The member plane's derived grant: a valid trial finished while a
 	// membership is active unlocks that record permanently. The ruling
@@ -332,4 +328,18 @@ func (uc *EntitleUC) OnTrialCompleted(ctx context.Context, userID, recordID stri
 	}); err != nil {
 		uc.Log.Error("membership trial grant failed", "user_id", userID, "record_id", recordID, "err", err)
 	}
+}
+
+// Private -------------------------------------------------------------------------------------------------------
+func mintCodeBody() string {
+	b := make([]byte, codeBodyLen)
+	alphabetMax := big.NewInt(int64(len(codeAlphabet)))
+	for i := range b {
+		n, err := rand.Int(rand.Reader, alphabetMax)
+		if err != nil {
+			panic("entitle: entropy failure: " + err.Error())
+		}
+		b[i] = codeAlphabet[n.Int64()]
+	}
+	return string(b)
 }

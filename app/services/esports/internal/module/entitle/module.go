@@ -5,9 +5,9 @@ import "github.com/google/wire"
 var ProviderSet = wire.NewSet(
 	NewCodeUC,
 	NewEntitleUC,
-	NewCodeRP,
+	NewActivationCodeRP,
 	NewEntitlementRP,
-	NewPolicyRP,
+	NewReportPolicyRP,
 	NewActivationCodeService,
 	NewEntitlementService,
 	// The UC's completion seam, bound here at the producer: consumers see
