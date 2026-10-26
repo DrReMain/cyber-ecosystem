@@ -434,8 +434,13 @@ type BindCredentialRequest struct {
 	// Types that are valid to be assigned to Payload:
 	//
 	//	*BindCredentialRequest_Wechat
-	Payload       isBindCredentialRequest_Payload `protobuf_oneof:"payload"`
-	State         *string                         `protobuf:"bytes,3,opt,name=state,proto3,oneof" json:"state,omitempty"`
+	Payload isBindCredentialRequest_Payload `protobuf_oneof:"payload"`
+	// The state is one-shot (consumed on exchange) but binds only the
+	// provider key, not the initiating browser: this RPC trusts whoever
+	// presents the code. Dormant while no client offers a bind entry; the
+	// first GET-triggered bind flow must tie the state to the initiating
+	// session before shipping — do not copy this shape without that.
+	State         *string `protobuf:"bytes,3,opt,name=state,proto3,oneof" json:"state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
