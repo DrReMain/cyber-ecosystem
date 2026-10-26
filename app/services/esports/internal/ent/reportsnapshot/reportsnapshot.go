@@ -97,10 +97,11 @@ type Tier string
 
 // Tier values.
 const (
-	TierS Tier = "S"
-	TierA Tier = "A"
-	TierB Tier = "B"
-	TierC Tier = "C"
+	TierS        Tier = "S"
+	TierA        Tier = "A"
+	TierB        Tier = "B"
+	TierC        Tier = "C"
+	TierUnjudged Tier = "unjudged"
 )
 
 func (t Tier) String() string {
@@ -110,7 +111,7 @@ func (t Tier) String() string {
 // TierValidator is a validator for the "tier" field enum values. It is called by the builders before save.
 func TierValidator(t Tier) error {
 	switch t {
-	case TierS, TierA, TierB, TierC:
+	case TierS, TierA, TierB, TierC, TierUnjudged:
 		return nil
 	default:
 		return fmt.Errorf("reportsnapshot: invalid enum value for tier field: %q", t)

@@ -23,8 +23,8 @@ func (ReportSnapshot) Fields() []ent.Field {
 			Comment("owning attempt (join into test_record.id) — plain id, not an edge: the loose join keeps soft-delete cascade and future aggregation out of this table's way, the ability_score precedent"),
 		field.String("user_id").NotEmpty().MaxRuneLen(20).Immutable().
 			Comment("denormalized owner, the ability_score precedent — cohort reads never join through test_record"),
-		field.Enum("tier").Values("S", "A", "B", "C").
-			Comment("the pinned tier badge, judged once at unlock time — the ruling the roadmap froze: an unlocked report never moves with the rubric"),
+		field.Enum("tier").Values("S", "A", "B", "C", "unjudged").
+			Comment("the pinned tier badge, judged once at unlock time — the ruling the roadmap froze: an unlocked report never moves with the rubric; unjudged pins the honest no-verdict (every cohort too thin for a percentile), never a made-up letter"),
 		field.Float("composite_percentile").Optional().Nillable().
 			Comment("the pinned composite (equal-weight mean, missing abilities never zero) — null when no measured ability carried a percentile at pin time"),
 		field.JSON("abilities", []types.AbilitySnapshot{}).

@@ -119,6 +119,7 @@ type EntitleUC struct {
 	codeRP   ActivationCodeRP
 	entRP    EntitlementRP
 	policyRP ReportPolicyRP
+	eventBus shared.DomainEventBus
 }
 
 func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationCodeRP, entRP EntitlementRP, policyRP ReportPolicyRP, eventBus shared.DomainEventBus) *EntitleUC {
@@ -127,6 +128,7 @@ func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationC
 		codeRP:   codeRP,
 		entRP:    entRP,
 		policyRP: policyRP,
+		eventBus: eventBus,
 	}
 	// The subscription is this module's whole coupling to the completion
 	// fact: the handler runs on the bus, the writer of the grant stays
@@ -321,6 +323,12 @@ func (uc *EntitleUC) onTrialCompleted(ctx context.Context, e shared.TrialComplet
 		UserID: userID, ScopeKind: shared.ScopeTrial, ScopeRef: &recordID, Source: "membership",
 	}); err != nil {
 		uc.Log.Error("membership trial grant failed", "user_id", userID, "record_id", recordID, "err", err)
+		return
+	}
+	if uc.eventBus != nil {
+		// The grant named its record, so the freeze can happen now — the
+		// judgement pins at unlock time rather than at first read.
+		uc.eventBus.PublishReportUnlocked(ctx, shared.ReportUnlocked{UserID: userID, RecordID: recordID})
 	}
 }
 

@@ -98,7 +98,7 @@ func TestPayLiveE2E(t *testing.T) {
 	if !ok {
 		t.Fatalf("mock controller: not a mock backend")
 	}
-	uc := NewOrderUC(logger, pf, noopHooks{}, NewOrderRP(logger, pf), NewSkuRP(logger, pf),
+	uc := NewOrderUC(logger, pf, noopHooks{}, nil, NewOrderRP(logger, pf), NewSkuRP(logger, pf),
 		entitle.NewEntitlementRP(logger, pf), test.NewTestRP(logger, pf), chanRP)
 	svc := NewOrderService(logger, uc)
 

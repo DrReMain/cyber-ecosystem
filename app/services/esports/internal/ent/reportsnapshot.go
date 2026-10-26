@@ -31,7 +31,7 @@ type ReportSnapshot struct {
 	RecordID string `json:"record_id,omitempty"`
 	// denormalized owner, the ability_score precedent — cohort reads never join through test_record
 	UserID string `json:"user_id,omitempty"`
-	// the pinned tier badge, judged once at unlock time — the ruling the roadmap froze: an unlocked report never moves with the rubric
+	// the pinned tier badge, judged once at unlock time — the ruling the roadmap froze: an unlocked report never moves with the rubric; unjudged pins the honest no-verdict (every cohort too thin for a percentile), never a made-up letter
 	Tier reportsnapshot.Tier `json:"tier,omitempty"`
 	// the pinned composite (equal-weight mean, missing abilities never zero) — null when no measured ability carried a percentile at pin time
 	CompositePercentile *float64 `json:"composite_percentile,omitempty"`

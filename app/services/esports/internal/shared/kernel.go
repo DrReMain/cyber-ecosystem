@@ -33,6 +33,8 @@ const (
 	TierA = "A"
 	TierB = "B"
 	TierC = "C"
+
+	TierUnjudged = "unjudged" // the snapshot's honest no-verdict: every cohort too thin for a percentile at pin time — a letter would be a made-up number
 )
 
 type Transaction interface {
@@ -49,9 +51,16 @@ type TrialCompleted struct {
 	RecordID string
 }
 
+type ReportUnlocked struct {
+	UserID   string
+	RecordID string
+}
+
 type DomainEventBus interface {
 	PublishTrialCompleted(ctx context.Context, e TrialCompleted) // in-process, synchronous, best-effort: the writer publishes a fact, the owner subscribes, a handler failure stays inside the bus — the publisher's transaction is truth
 	SubscribeTrialCompleted(handler func(context.Context, TrialCompleted))
+	PublishReportUnlocked(ctx context.Context, e ReportUnlocked) // a trial grant names its record, so the report owner can freeze the judgement at unlock time; membership and family grants name no record — those freeze lazily on first read
+	SubscribeReportUnlocked(handler func(context.Context, ReportUnlocked))
 }
 
 // Base ----------------------------------------------------------------------------------------------------------------

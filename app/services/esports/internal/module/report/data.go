@@ -2,6 +2,8 @@ package report
 
 import (
 	"context"
+	dbsql "database/sql"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -11,6 +13,7 @@ import (
 	entmatchconfig "cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	entmatchsession "cyber-ecosystem/app/services/esports/internal/ent/matchsession"
 	entprofile "cyber-ecosystem/app/services/esports/internal/ent/profile"
+	entreportsnapshot "cyber-ecosystem/app/services/esports/internal/ent/reportsnapshot"
 	enttest "cyber-ecosystem/app/services/esports/internal/ent/test"
 	enttestrecord "cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -25,6 +28,14 @@ type boardRP struct {
 
 func NewRecordBoardRP(logger *slog.Logger, p *platform.Platform) RecordBoardRP {
 	return &boardRP{RP: shared.NewRP(logger.With("module", "module/report_rp"), p)}
+}
+
+type snapshotRP struct {
+	shared.RP
+}
+
+func NewSnapshotRP(logger *slog.Logger, p *platform.Platform) SnapshotRP {
+	return &snapshotRP{RP: shared.NewRP(logger.With("module", "module/report_rp"), p)}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -215,6 +226,45 @@ func (rp *boardRP) PreviousSessionRecord(ctx context.Context, userID, ability st
 		Score:    *row.AuthoritativeScore,
 		At:       row.CreatedAt,
 	}, nil
+}
+
+func (rp *snapshotRP) FindByRecord(ctx context.Context, recordID string) (*Snapshot, error) {
+	row, err := rp.Platform.GetClient(ctx).ReportSnapshot.Query().
+		Where(entreportsnapshot.RecordIDEQ(recordID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return &Snapshot{
+		RecordID:    row.RecordID,
+		UserID:      row.UserID,
+		Tier:        string(row.Tier),
+		Composite:   row.CompositePercentile,
+		Abilities:   row.Abilities,
+		CohortBasis: row.CohortBasis,
+	}, nil
+}
+
+func (rp *snapshotRP) Save(ctx context.Context, s *Snapshot) error {
+	// ON CONFLICT DO NOTHING keeps the freeze idempotent: a racing freeze
+	// (the event and a first read landing together) is a no-op statement,
+	// never an error — ent surfaces the swallowed insert as ErrNoRows, and
+	// that sentinel is the no-op answer itself, the Grant precedent.
+	err := rp.Platform.GetClient(ctx).ReportSnapshot.Create().
+		SetRecordID(s.RecordID).
+		SetUserID(s.UserID).
+		SetTier(entreportsnapshot.Tier(s.Tier)).
+		SetNillableCompositePercentile(s.Composite).
+		SetAbilities(s.Abilities).
+		SetCohortBasis(s.CohortBasis).
+		OnConflict().DoNothing().Exec(ctx)
+	if err != nil && !errors.Is(err, dbsql.ErrNoRows) {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

@@ -159,12 +159,13 @@ type OrderUC struct {
 	entRP         entitle.EntitlementRP
 	testRP        test.TestRP
 	channelRP     PayChannelRP
+	eventBus      shared.DomainEventBus
 	loopCancels   []context.CancelFunc
 	nextBillDay   time.Time // the day the next reconcile sweep must still see; owned by the reconcile loop's goroutine
 	nextBillRetry int
 }
 
-func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, orderRP OrderRP, skuRP SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
+func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, eventBus shared.DomainEventBus, orderRP OrderRP, skuRP SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
 	uc := &OrderUC{
 		UC:        shared.NewUC(logger.With("module", "module/pay"), tm),
 		orderRP:   orderRP,
@@ -172,6 +173,7 @@ func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookReg
 		entRP:     entRP,
 		testRP:    testRP,
 		channelRP: channelRP,
+		eventBus:  eventBus,
 	}
 	hooks.OnStart(uc.runLoop("converge", convergeInterval, uc.ConvergeOnce))
 	hooks.OnStart(uc.runLoop("reconcile", reconcileInterval, uc.reconcileSweep))
@@ -430,6 +432,13 @@ func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
 	}
 	if settled {
 		uc.Log.Info("order settled", "order_no", order.OrderNo, "transaction_id", in.TransactionID)
+	}
+	// The trial grant named its record and the transaction committed, so the
+	// freeze can pin the judgement at unlock time — best-effort, the report's
+	// lazy read path backstops a missed one. Membership orders unlock no
+	// record and publish nothing: their freezes happen on first read.
+	if settled && order.ScopeKind == ScopeTrial && order.ScopeRef != nil && uc.eventBus != nil {
+		uc.eventBus.PublishReportUnlocked(ctx, shared.ReportUnlocked{UserID: order.UserID, RecordID: *order.ScopeRef})
 	}
 	return true, nil
 }
