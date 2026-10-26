@@ -1,6 +1,12 @@
 {
   "profile_title": "个人中心",
   "profile_nickname_label": "昵称",
+  "profile_sex_label": "性别",
+  "profile_sex_hint": "必选；微信授权登录时会自动填入",
+  "profile_sex_male": "男",
+  "profile_sex_female": "女",
+  "profile_sex_undetermined": "待确定",
+  "profile_setup_sex_required": "请选择性别（必选）",
   "profile_birth_label": "出生年月",
   "profile_games_label": "游戏偏好",
   "profile_unset": "未设置",
