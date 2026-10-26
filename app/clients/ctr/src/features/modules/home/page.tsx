@@ -40,8 +40,8 @@ export function HomePage() {
   }
 
   return (
-    <AmbientLayout orbs={homeOrbs}>
-      <div className="flex w-full flex-col gap-3 pb-20">
+    <AmbientLayout chrome={<TabBar active="home" />} orbs={homeOrbs}>
+      <div className="flex w-full flex-col gap-3 pb-20 md:pb-0">
         <div className="flex items-start justify-between">
           <div>
             <div className="text-ink-tertiary text-[11px]">
@@ -82,7 +82,6 @@ export function HomePage() {
 
         <SoonCard description={m.home_soon_desc()} title={m.home_soon_title()} />
       </div>
-      <TabBar active="home" />
     </AmbientLayout>
   );
 }

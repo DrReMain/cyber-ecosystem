@@ -25,6 +25,11 @@ interface AmbientLayoutProps {
   dense?: boolean;
   /** Per-page orb art direction; absent = the shared login trio. */
   orbs?: readonly AmbientOrb[];
+  /** Frame-level chrome (the tab bar): the frame's own flow child, below
+   * the scrolling column — the desktop frame docks its bar to the frame
+   * bottom, never to the scroll extent (an in-scroller absolute would
+   * ride below the fold mid-scroll). */
+  chrome?: ReactNode;
 }
 
 export function AmbientLayout({
@@ -33,6 +38,7 @@ export function AmbientLayout({
   scroll = "page",
   dense = false,
   orbs,
+  chrome,
 }: Readonly<AmbientLayoutProps>) {
   const capped = scroll === "inside" || dense;
   return (
@@ -73,6 +79,7 @@ export function AmbientLayout({
           {children}
         </div>
       </div>
+      {chrome !== undefined && <div className="relative z-[1] shrink-0">{chrome}</div>}
     </div>
   );
 }
