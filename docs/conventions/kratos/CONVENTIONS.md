@@ -222,6 +222,7 @@ Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the D
 - `schema.Message` is dual-channel: `Content` and `ReasoningContent` both stream; a reasoning-only tick is an empty-content delta, not a skipped frame.
 - The decrypted api key exists only inside the eino config, never in a log line.
 - Model listing is outside eino: plain `GET <baseURL>/models` with an explicit timeout.
+- **Outbound dials toward user-configured endpoints carry the dial-time guard**: reserved address classes only — loopback, link-local, multicast, unspecified — checked on the address actually connected (DNS rebinding is structurally irrelevant, IP-literal targets need no DNS). Deployment topology never enters the code: which LAN, which IP, DNS or not is the deploy plane's knowledge, and private unicast is a first-class target (a fully-private deployment is a declared scenario). Redirects are refused and response bodies are capped; one guard instance injects everywhere the SDK dials (eino's `HTTPClient` seam included).
 
 **Transports**
 
@@ -252,12 +253,13 @@ The IAM engine is a **mechanism every service replicates**, not a system-service
   - `module/authz` reads ent tables directly, never imports `role`/`policy`.
   - `role → policy` is a read-only port; `auth → user` and `auth → authz` are one-way.
   - `role` never imports `user` (member faces show principal_id only).
-  - Cross-side protocols (policy version stamp, session epoch marker) live in `internal/shared` — writer and reader both reach the neutral layer without importing each other.
+  - Cross-side protocols (the policy-change wake channel, the session epoch marker) live in `internal/shared` — writer and reader both reach the neutral layer without importing each other. The version truth is not here: it is the `authz_stamps` row (below).
   - An interface injected to invert a semantically-cyclic dependency is the invisibility cloak of a cycle — banned even when the import graph stays acyclic.
 - **Version-stamp discipline.**
-  - Every write that can change a decision (role/policy/grant/user-status mutations) notifies `NotifyChanged` after commit.
-  - Replicas rebuild compiled snapshots on watch — and every subscription-establishment point (first subscribe, reconnect) re-checks the version once: pubsub has no backlog, so a change published before the subscription existed (the seed racing startup) is otherwise lost. Plus a low-frequency reconcile backstop.
-  - A single replica self-notifies on the same path — no code branch.
+  - The version truth is a single `authz_stamps` row, bumped inside the change transaction by `AuthzStampMixin` on the tables feeding the snapshot — a bump that is a property of the tables cannot be forgotten by a writer (seed, admin paths, future code all covered). User rows bump only when a mutation assigns `enabled` or sets the soft-delete marker; profile edits never move the stamp (a password change must not recompile every replica).
+  - Writers wake after commit (`NotifyChanged` → pubsub publish only): a failed publish costs timeliness, never correctness.
+  - Replicas rebuild compiled snapshots on watch — and every subscription-establishment point (first subscribe, reconnect) re-checks the stamp once: pubsub has no backlog, so a change published before the subscription existed is otherwise lost. Plus a low-frequency reconcile backstop.
+  - Reconcile compares `!=` and rebuilds on any divergence: the stamp is monotonic by construction, but a rewind or a restored backup must heal, never pin a stale replica; a forced rebuild every 24h bounds any unknown staleness class.
   - No app-layer decision cache: the compiled in-memory snapshot IS the cache; ABAC constraints evaluate live on every request.
 - **Seeds are service-level.**
   - The seed job lives in `internal/bootstrap`, mounts `kratos.BeforeStart` explicitly after `lc.Start` (its completion publishes a fire-and-forget change notification, so the subscriptions it notifies must already exist).
