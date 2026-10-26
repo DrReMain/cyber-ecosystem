@@ -36,7 +36,7 @@ export function ProfilePage() {
 
   if (profileQuery.isPending) {
     return (
-      <AmbientLayout orbs={overviewOrbs}>
+      <AmbientLayout chrome={<TabBar active="me" />} orbs={overviewOrbs}>
         <StateScreen variant="loading" />
       </AmbientLayout>
     );
@@ -60,8 +60,8 @@ export function ProfilePage() {
   }
 
   return (
-    <AmbientLayout orbs={overviewOrbs}>
-      <div className="flex w-full flex-col gap-3 pb-20">
+    <AmbientLayout chrome={<TabBar active="me" />} orbs={overviewOrbs}>
+      <div className="flex w-full flex-col gap-3 pb-20 md:pb-0">
         <div className="flex items-center justify-between">
           <h1 className="text-ink text-[19px] font-bold">{m.profile_title()}</h1>
           <button
@@ -121,7 +121,6 @@ export function ProfilePage() {
           {m.login_footer_email()}
         </div>
       </div>
-      <TabBar active="me" />
       <LogoutSheet
         onCancel={() => setSheetOpen(false)}
         onConfirm={() => void onLogout()}

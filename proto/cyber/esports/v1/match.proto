@@ -42,6 +42,19 @@ service MatchService {
       body: "*"
     };
   }
+  // The read-only sibling of GetMatchSession: reports the member's active
+  // in-window session, if any — never creates, never lazily expires, never
+  // votes a genre. (A minting surface here would hijack a later explicit
+  // genre choice: a resume ignores the genre param.) Over-window sessions
+  // read absent; the next GetMatchSession owns closing and redrawing them.
+  rpc PeekMatchSession(PeekMatchSessionRequest) returns (PeekMatchSessionResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "窥视进行中的匹配会话(只读,无则空)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/match/session/peek"};
+  }
 }
 
 message GetMatchSessionRequest {
@@ -103,5 +116,14 @@ message GetMatchSessionResponse {
 }
 
 message SwitchMatchGenreResponse {
+  MatchSession session = 1;
+}
+
+message PeekMatchSessionRequest {}
+
+message PeekMatchSessionResponse {
+  // Absent when no in-window session exists — message-field presence is
+  // the null/zero contract for entities (§3); a present session is the
+  // resume face's whole truth.
   MatchSession session = 1;
 }

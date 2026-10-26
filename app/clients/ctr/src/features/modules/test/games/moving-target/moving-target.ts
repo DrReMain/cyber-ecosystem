@@ -77,29 +77,58 @@ export const movingTargetModule: GameModule = {
     stage.appendChild(chip);
     // One anchored wrapper carries the disc and both honest rings: the
     // perfect and good radii mirror the thresholds the server classifies
-    // by, so the feedback geometry is never a second opinion.
+    // by, so the feedback geometry is never a second opinion. The rings
+    // paint above the disc (legacy's layering) — under it the perfect
+    // ring folds inside the disc and the good ring hides behind its own
+    // border, both bands invisible.
     const targetEl = document.createElement("div");
     targetEl.className = "pointer-events-none absolute select-none";
     targetEl.style.transform = "translate(-50%, -50%)";
     const perfectRing = document.createElement("div");
     perfectRing.className =
-      "absolute rounded-full border border-status-ok/40 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2";
+      "absolute rounded-full border-2 border-status-ok/40 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2";
     const goodRing = document.createElement("div");
     goodRing.className =
-      "absolute rounded-full border border-white/20 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2";
+      "absolute rounded-full border-2 border-status-pending/30 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2";
     const disc = document.createElement("div");
     disc.className =
       "absolute rounded-full border-2 border-white/40 bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-[0_0_24px_rgba(34,211,238,0.6)] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2";
     const size = `${params.targetSizePx}px`;
     disc.style.width = size;
     disc.style.height = size;
+    // The legacy disc's 🎯 center mark, drawn as canvas geometry (the
+    // games are framework-free — no emoji, no icon fonts): the icon
+    // family's concentric target, 10/6 stroke rings and a 2 dot.
+    const centerMark = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    centerMark.setAttribute("viewBox", "0 0 24 24");
+    centerMark.setAttribute(
+      "class",
+      "absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 text-white/80",
+    );
+    for (const radius of [10, 6]) {
+      const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      ring.setAttribute("cx", "12");
+      ring.setAttribute("cy", "12");
+      ring.setAttribute("r", String(radius));
+      ring.setAttribute("fill", "none");
+      ring.setAttribute("stroke", "currentColor");
+      ring.setAttribute("stroke-width", "2");
+      centerMark.appendChild(ring);
+    }
+    const centerDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    centerDot.setAttribute("cx", "12");
+    centerDot.setAttribute("cy", "12");
+    centerDot.setAttribute("r", "2");
+    centerDot.setAttribute("fill", "currentColor");
+    centerMark.appendChild(centerDot);
+    disc.appendChild(centerMark);
     const perfectSize = `${params.perfectDeviationPx * 2}px`;
     perfectRing.style.width = perfectSize;
     perfectRing.style.height = perfectSize;
     const goodSize = `${params.goodDeviationPx * 2}px`;
     goodRing.style.width = goodSize;
     goodRing.style.height = goodSize;
-    targetEl.append(perfectRing, goodRing, disc);
+    targetEl.append(disc, perfectRing, goodRing);
     stage.appendChild(targetEl);
     // The dashed tether shows the gap the score is about.
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -110,11 +139,18 @@ export const movingTargetModule: GameModule = {
     line.setAttribute("stroke", "rgba(255,255,255,0.5)");
     line.setAttribute("stroke-width", "2");
     line.setAttribute("stroke-dasharray", "5,5");
+    // The tether rides at half opacity (legacy's law) over whatever band
+    // color the run paints on it.
+    line.setAttribute("opacity", "0.5");
     svg.appendChild(line);
     svg.style.display = "none";
     stage.appendChild(svg);
     const crosshair = document.createElement("div");
-    crosshair.className = "pointer-events-none absolute h-10 w-10 text-white/90 left-0 top-0";
+    // The -translate pair centers the 40px box on the aim point — without
+    // it the drawn cross sits at the box's top-left, 20px down-right of
+    // the player's actual finger (a perfect-band-sized lie).
+    crosshair.className =
+      "pointer-events-none absolute top-0 left-0 h-10 w-10 -translate-x-1/2 -translate-y-1/2 text-white/90";
     crosshair.style.display = "none";
     const hBar = document.createElement("div");
     hBar.className = "absolute top-1/2 left-0 h-0.5 w-full -translate-y-1/2 bg-current";
@@ -202,6 +238,28 @@ export const movingTargetModule: GameModule = {
         line.setAttribute("y1", String(round1(target.y)));
         line.setAttribute("x2", String(round1(aim.x)));
         line.setAttribute("y2", String(round1(aim.y)));
+        // The disc's glow carries the band (legacy's three-state law):
+        // cyan while perfect, amber within good, red beyond — the same
+        // holdingBand the chip and the rings classify by, never a second
+        // opinion. The tether and the crosshair's center dot ride the
+        // same band through the chip's ok/pending/danger vocabulary
+        // (legacy's getDeviationColor consumers). Before the first touch
+        // the static cyan stays: no player state, no verdict color.
+        const band = holdingBand(deviation, params);
+        disc.style.boxShadow =
+          band === "perfect"
+            ? "0 0 30px rgba(34, 211, 238, 0.8)"
+            : band === "good"
+              ? "0 0 20px rgba(251, 191, 36, 0.6)"
+              : "0 0 10px rgba(239, 68, 68, 0.4)";
+        const bandColor =
+          band === "perfect"
+            ? "var(--color-status-ok)"
+            : band === "good"
+              ? "var(--color-status-pending)"
+              : "var(--color-danger)";
+        line.setAttribute("stroke", bandColor);
+        dot.style.backgroundColor = bandColor;
         // The sampling grid anchors at engagement: one sample per
         // interval of run time since the crosshair first touched the
         // stage (the clock freezes through pauses, so the grid does

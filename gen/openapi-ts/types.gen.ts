@@ -700,6 +700,15 @@ export type CyberEsportsV1PayCredential = {
     value?: string;
 };
 
+export type CyberEsportsV1PeekMatchSessionResponse = {
+    /**
+     * Absent when no in-window session exists — message-field presence is
+     * the null/zero contract for entities (§3); a present session is the
+     * resume face's whole truth.
+     */
+    session?: CyberEsportsV1MatchSession;
+};
+
 export type CyberEsportsV1Point = {
     x?: number;
     y?: number;
@@ -2575,6 +2584,22 @@ export type MatchServiceGetMatchSessionResponses = {
 };
 
 export type MatchServiceGetMatchSessionResponse = MatchServiceGetMatchSessionResponses[keyof MatchServiceGetMatchSessionResponses];
+
+export type MatchServicePeekMatchSessionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/match/session/peek';
+};
+
+export type MatchServicePeekMatchSessionResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1PeekMatchSessionResponse;
+};
+
+export type MatchServicePeekMatchSessionResponse = MatchServicePeekMatchSessionResponses[keyof MatchServicePeekMatchSessionResponses];
 
 export type MatchServiceSwitchMatchGenreData = {
     body: CyberEsportsV1SwitchMatchGenreRequest;

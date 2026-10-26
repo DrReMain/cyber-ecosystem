@@ -63,10 +63,10 @@ describe("moving-target logic", () => {
 
   it("walks one random step per jitter pair and clamps to the margin", () => {
     const stepped = randomWalkStep({ x: 150, y: 350 }, area, margin, () => 0.5);
-    expect(stepped).toEqual({ x: 160, y: 360 });
-    // A −20 jump from 595 stays in-bounds; the same jump from 95 clamps.
+    expect(stepped).toEqual({ x: 155, y: 355 });
+    // A −10 jump from 595 stays in-bounds; the same jump from 95 clamps.
     const inward = randomWalkStep({ x: 95, y: 595 }, area, margin, () => -1);
-    expect(inward).toEqual({ x: 100, y: 575 });
+    expect(inward).toEqual({ x: 100, y: 585 });
     const outward = randomWalkStep({ x: 380, y: 590 }, area, margin, () => 1);
     expect(outward).toEqual({ x: 290, y: 600 });
   });

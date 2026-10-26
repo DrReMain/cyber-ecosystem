@@ -125,6 +125,19 @@
         "datascope": false
       },
       {
+        "name": "PeekMatchSession",
+        "full_name": "cyber.esports.v1.MatchService.PeekMatchSession",
+        "request_name": "PeekMatchSessionRequest",
+        "request_full_name": "cyber.esports.v1.PeekMatchSessionRequest",
+        "response_name": "PeekMatchSessionResponse",
+        "response_full_name": "cyber.esports.v1.PeekMatchSessionResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/match/session/peek",
+        "comment": "窥视进行中的匹配会话(只读,无则空)",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "SwitchMatchGenre",
         "full_name": "cyber.esports.v1.MatchService.SwitchMatchGenre",
         "request_name": "SwitchMatchGenreRequest",

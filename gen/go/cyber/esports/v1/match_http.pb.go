@@ -18,10 +18,17 @@ var _ = new(context.Context)
 const _ = http.SupportPackageIsVersion3
 
 const OperationMatchServiceGetMatchSession = "/cyber.esports.v1.MatchService/GetMatchSession"
+const OperationMatchServicePeekMatchSession = "/cyber.esports.v1.MatchService/PeekMatchSession"
 const OperationMatchServiceSwitchMatchGenre = "/cyber.esports.v1.MatchService/SwitchMatchGenre"
 
 type MatchServiceHTTPServer interface {
 	GetMatchSession(context.Context, *GetMatchSessionRequest) (*GetMatchSessionResponse, error)
+	// PeekMatchSession The read-only sibling of GetMatchSession: reports the member's active
+	// in-window session, if any — never creates, never lazily expires, never
+	// votes a genre. (A minting surface here would hijack a later explicit
+	// genre choice: a resume ignores the genre param.) Over-window sessions
+	// read absent; the next GetMatchSession owns closing and redrawing them.
+	PeekMatchSession(context.Context, *PeekMatchSessionRequest) (*PeekMatchSessionResponse, error)
 	// SwitchMatchGenre The explicit re-draw: the target genre validates first, then the active
 	// session closes (even a fresh one) and a new one opens with a forced-new
 	// seed — the same test may be drawn again in the replacement.
@@ -32,6 +39,7 @@ func RegisterMatchServiceHTTPServer(s *http.Server, srv MatchServiceHTTPServer) 
 	r := s.Route("/")
 	r.Handle("GET", "/api/v1/esports/match/session", _MatchService_GetMatchSession0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/esports/match/session/switch", _MatchService_SwitchMatchGenre0_HTTP_Handler(srv))
+	r.Handle("GET", "/api/v1/esports/match/session/peek", _MatchService_PeekMatchSession0_HTTP_Handler(srv))
 }
 
 func _MatchService_GetMatchSession0_HTTP_Handler(srv MatchServiceHTTPServer) func(ctx http.Context) error {
@@ -72,8 +80,33 @@ func _MatchService_SwitchMatchGenre0_HTTP_Handler(srv MatchServiceHTTPServer) fu
 	}
 }
 
+func _MatchService_PeekMatchSession0_HTTP_Handler(srv MatchServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in PeekMatchSessionRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationMatchServicePeekMatchSession)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.PeekMatchSession(ctx, req.(*PeekMatchSessionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PeekMatchSessionResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type MatchServiceHTTPClient interface {
 	GetMatchSession(ctx context.Context, req *GetMatchSessionRequest, opts ...http.CallOption) (rsp *GetMatchSessionResponse, err error)
+	// PeekMatchSession The read-only sibling of GetMatchSession: reports the member's active
+	// in-window session, if any — never creates, never lazily expires, never
+	// votes a genre. (A minting surface here would hijack a later explicit
+	// genre choice: a resume ignores the genre param.) Over-window sessions
+	// read absent; the next GetMatchSession owns closing and redrawing them.
+	PeekMatchSession(ctx context.Context, req *PeekMatchSessionRequest, opts ...http.CallOption) (rsp *PeekMatchSessionResponse, err error)
 	// SwitchMatchGenre The explicit re-draw: the target genre validates first, then the active
 	// session closes (even a fresh one) and a new one opens with a forced-new
 	// seed — the same test may be drawn again in the replacement.
@@ -95,6 +128,27 @@ func (c *MatchServiceHTTPClientImpl) GetMatchSession(ctx context.Context, in *Ge
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationMatchServiceGetMatchSession),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// PeekMatchSession The read-only sibling of GetMatchSession: reports the member's active
+// in-window session, if any — never creates, never lazily expires, never
+// votes a genre. (A minting surface here would hijack a later explicit
+// genre choice: a resume ignores the genre param.) Over-window sessions
+// read absent; the next GetMatchSession owns closing and redrawing them.
+func (c *MatchServiceHTTPClientImpl) PeekMatchSession(ctx context.Context, in *PeekMatchSessionRequest, opts ...http.CallOption) (*PeekMatchSessionResponse, error) {
+	var out PeekMatchSessionResponse
+	pattern := "/api/v1/esports/match/session/peek"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationMatchServicePeekMatchSession),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)

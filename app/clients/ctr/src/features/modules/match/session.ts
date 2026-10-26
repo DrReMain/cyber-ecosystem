@@ -1,5 +1,8 @@
 import { createQueryOptions } from "@connectrpc/connect-query";
-import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
+import {
+  getMatchSession,
+  peekMatchSession,
+} from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import type { QueryClient } from "@tanstack/react-query";
 import { connectTransport } from "#/services/connect";
 
@@ -19,10 +22,23 @@ export function matchSessionKey(genre?: string) {
   return createQueryOptions(getMatchSession, input, { transport: connectTransport }).queryKey;
 }
 
+// The read-only peek (home's resume card): one input shape, and it must
+// ride the same invalidation so a switch/expiry the user just performed
+// never leaves a stale card on the next home visit.
+export function matchPeekKey() {
+  return createQueryOptions(peekMatchSession, {}, { transport: connectTransport }).queryKey;
+}
+
 // The pick page's manual choice is the only genre-seeded call and its
 // vocabulary is the two seeded genres — three keys cover every entry.
 export function invalidateMatchSession(queryClient: QueryClient): void {
-  for (const key of [matchSessionKey(), matchSessionKey("fps"), matchSessionKey("moba")]) {
+  const keys = [
+    matchSessionKey(),
+    matchSessionKey("fps"),
+    matchSessionKey("moba"),
+    matchPeekKey(),
+  ];
+  for (const key of keys) {
     void queryClient.invalidateQueries({ queryKey: key });
   }
 }

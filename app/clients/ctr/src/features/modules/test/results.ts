@@ -120,13 +120,31 @@ function deriveTargetRecognition(record: AttemptRecord): readonly ResultRow[] {
 function deriveMovingTarget(record: AttemptRecord): readonly ResultRow[] {
   const shots = record.events;
   const held = shots.filter((event) => event.hit === true).length;
+  const deviations = shots.map((event) => num(event.deviation));
+  const avg = mean(deviations);
+  // Population std dev — legacy's deviationStdDev, the stability input.
+  const stdDev = deviations.length
+    ? Math.sqrt(mean(deviations.map((d) => (d - avg) ** 2)))
+    : 0;
+  // Legacy's loss counter (its lastTrackingState law): the state starts
+  // "lost", and only a not-lost → lost transition counts — a run that
+  // begins off-target mints nothing, and staying lost mints once.
+  let losses = 0;
+  let lost = true;
+  for (const event of shots) {
+    if (event.hit === true) {
+      lost = false;
+    } else if (!lost) {
+      losses += 1;
+      lost = true;
+    }
+  }
   return [
     { key: "samples", value: String(shots.length) },
-    {
-      key: "avg_deviation",
-      value: `${mean(shots.map((event) => num(event.deviation))).toFixed(1)}px`,
-    },
+    { key: "avg_deviation", value: `${avg.toFixed(1)}px` },
+    { key: "std_dev", value: `${stdDev.toFixed(1)}px` },
     { key: "hold_rate", value: pct(held, shots.length) },
+    { key: "loss_count", value: String(losses) },
   ];
 }
 

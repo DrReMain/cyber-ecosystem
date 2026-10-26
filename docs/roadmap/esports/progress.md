@@ -7,7 +7,7 @@
 | 人 | 已交付(均已并 esports/main) | 当前 → 下一片 |
 |---|---|---|
 | lzx | E0-E2、E3 评分(13 款收满,71c33f4f;§指针清扫 43fd4b3d)、E4 匹配全量(704c3388/07b87349)、E6a/E6b、E7-a..e 13 款引擎收满(fa866414/dcce4fc6/1ce16289)、V1-V4+B 批(6b98c886/865511c1)、会员读面+admin 用户管理(88bcd9ba/3f272b28)、组合缝(a8b9f0a4)、校准战役 S1-S4+D-AL(9e0478e6/fe73a63a/1c1a8424)、支付 PAY1 订单域五片(20d61e2f→5b7e88a1,10-25)、流转批三件收口(ICP 备字+种子国服九款重播+偏好上限 config 化,10-26) | **▶ 待分配**(流转批已收;候选:E5 报告框架(P8 已裁=E5 分性别基准,D-AN)→ admin 对齐批(D-AK)→ PAY2 通道接入(H5 闸实测红:产品权限未开通,行政待商户管理者)) |
-| hzy | H1/H2/H-A/H-B、10-22 精修批、10-23 H-C 判定回路(真人链路验收;撞面合流正身=E4-c 版)、10-23/24 设计保真批(MR!6 于 10-25 并入 main,599dddce) | **下一片:待分配**(原登记 E7 追踪批已由 lzx 10-23 收;顺手项平均决策由 MR 内 12dc76a5 销) |
+| hzy | H1/H2/H-A/H-B、10-22 精修批、10-23 H-C 判定回路(真人链路验收;撞面合流正身=E4-c 版)、10-23/24 设计保真批(MR!6 于 10-25 并入 main,599dddce)、10-26 走查修批九条(93f67de3..179b1af2,见节奏记录;vitest 112→115) | **下一片:待分配**(原登记 E7 追踪批已由 lzx 10-23 收;顺手项平均决策由 MR 内 12dc76a5 销;✓ 字形残留已随设计保真批销) |
 | ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批 | 待裁:**P13 窗外豁免签认(CP2 前)、P15 报告簇窗口(E5b 前)**、P8 性别(E5 前,W4 末;含协议正文联动)、P11(B 批前)、P12(E4 前)、P16 待标定款回执等级面(E5 报告面前)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6 |
 
 **M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ✅(13 款收满,报告分 e2e 挂 E5);E4 ✅(a-d,e2e 三验收);E7 ✅(13 款引擎收满,判定回路已闭);E5/E8/E9/E10 未认领;M2 用户列表+档案首面已前拉;V1-V4+B 批落,admin 对齐批待排;支付 PAY-C0✅(契约/v3crypto/mock/35xx 四片)+PAY-C1✅代码面(传输核/五法/回调/账单/live 探针,10-26;**真握手待商户凭据 env 面配置**)+PAY1✅五片(10-25:契约+种子/订单域+platform 首装/回调+结算+收敛器/对账+账单解析/PAY_E2E 全链 e2e;PAY2-3 未启动)。**CP1(11-08)前瞻:原风险项 H-C 已闭;余风险=支付真握手待凭据(门=签名握手应答可验签即绿,10-26 二次校准)+E5/E8 无人认领。**
@@ -46,7 +46,11 @@
 | conventions guard 正则精度修正回流 dev 兄弟服务 | lzx | 下次定期镜像批 |
 | SMS 骨架片(system provider+capability) | lzx | E6c(2026-10-23 立片收口) |
 | 协议 consent 版本记录契约 | lzx | H2 versions.ts 真源 GET /agreements/current |
-| 自定义游戏偏好上限:产品口径 3,config 随 E9 下发 | ~~ljr~~→hzy/lzx | 已裁 D-AO,随 E9 落地 |
+| 自定义游戏偏好上限:产品口径 3,config 随 E9 下发 | ~~ljr~~→hzy/lzx | 已裁 D-AO,随 E9 落地(**10-26 改判写死:业务数值不进 config,常量已落 biz**) |
+| **mt-F1 重测耗尽死局**:match 阵容步「剩 0 次」进 intro,「继续 · 开始测试」被花费闸拦死——无提示、无出路(不能重测/跳过/换);活体证据在 10-26 走查会话档 | ljr | 裁出口三选一:提示文案/留观/恢复一次 |
+| skill_trajectory 30s 走查体感偏紧,操作时间不够 | lzx | 评估加时 |
+| mt-D5 intro 按款文案:getTest.introduction 字段在但种子未喂(seed.go 注「metric-sheet data」),locale 方案待定;客户端 per-game 键 B 方案被否(单一事实源) | lzx | 随种子/国际化面(用户 10-26 裁 A=后置转此) |
+| mt-D6 手机横屏真机未验(桌面 812×375 仿真预验绿,10-26:布局/控件锚位/目标合法) | hzy | 手机在手时顺手过一眼 |
 | D-W population 余件(provider 行 member_population/座位迁移/guard 注释清理) | lzx | E8 权益面触发 |
 | 走查墙 4:运营测试账号口径——pg2-probe 无 user 座位登不进 admin 端;种子超管=admin/admin123456 | 用户侧 | 即办(SQL 补座位或文档化) |
 | ~~P11 已裁(D-AN:维持单轨 birth)~~ | — | 2026-10-25 关闭 |
@@ -54,7 +58,6 @@
 | 微信登录回填昵称/头像(2.5b-⑫;需 system identity 持久化+向导去向联动) | lzx | E6b 余面小片(S1 登记) |
 | 版本检查页+app-version/内容块管理(coverage 缺口①;S4 终局对账低优) | 待排 | P13 签认后随 M2 余组/E9 增量 |
 | 走查注:admin 工作台 ERR·NETWORK(dev 栈缺数据源,非 esports 面) | lzx | pre 部署前查 |
-| ✓ 字形残留(match/page.tsx:57 done 步文本「✓」,图标法含字形族,应换 lucide Check) | hzy | 下批顺手 |
 | test 目录 List 单键 created_at 排序,同秒并列池序靠 PG 返回序(E4-d 观察) | lzx | 下次 schema 触碰带上 |
 | Nx 冒号目标名解析(ctr:dev:down 被 Nx 落到 dev target,曾以 devserver.cjs 直调兜底) | lzx | 下次 tools 触碰修 |
 
@@ -137,3 +140,4 @@
 - 10-25 E8-b 权益验收锚+策略面(lzx):ENT_E2E=1 全链 e2e 绿——**并发不超卖验收锚落定**(十 goroutine 竞兑一码:恰 1 成功/9 EXHAUSTED/used_count=1/entitlement 恰 1 行且 scope/source 字段级断言;同用户并发双兑=双双幂等返回且恰 1 次扣减——仲裁+败者重查分流路径全过;胜者重兑幂等不再耗次);过期码/无效码/tenant 策略三拒臂;判定面默认三族+运营覆盖(career closed 覆盖后 POLICY_CLOSED 可分于 NO_ENTITLEMENT;school 提 membership 后会员可开;码兑 grant 在 closed 覆盖下仍进=硬权益不被配置开关撤销);report_policy 表(每族一行 upsert 形,test_config 同族每域一表先例,无行=出厂默认)+SetReportAccessPolicy(ACCESS_ADMIN)+PolicyRP+6153 文案×7;fixture 坑=UID 21 rune 超 MaxRuneLen 20(ent validator 抓)。
 - 10-25 E8-c 会员衍生解锁+R7 修订(lzx,**E8 三片收满**):trial 自动解锁=事件钩子形状(test/biz.go TrialGrantHook port 声明+Submit 有效成绩 storeAttempt 后调用;entitle.OnTrialCompleted 实现:查会员活跃→grant trial 永久行 source=membership,ON CONFLICT no-op 幂等;**范式裁决依据**:动作时刻明确(完成)+事件源在手(本地 submit)=事件钩子,非扫描——扫描会有完成到 grant 窗口期;best-effort 契约=成绩已存真值不被 grant 失败毁,错误只落 ERROR log;「不追溯入会前」由钩子只在完成时刻跑天然成立,零额外代码);ENT_E2E 增三断言(会员活跃者 grant 形状字段级/无会员者零 grant/重复调用仍一行);**R7 修订建议对 D-AL**:每日扫描不落码——三范式分析(惰性判定/事件钩子/定时扫描;支付域三件套=结算惰性+收敛扫描(渠道事件源在外)+对账扫描(账本在外),会员过期事件源在本地 expires_at 且判定已惰性=扫描无消费者;旧仓扫描=status 状态搬运模型,新仓不可变账本=过期是事实不是状态),触发器=通知系统;守卫第六/七抓=方法与接口前 doc 折体内/行尾。
 - 10-25 整洁架构+DDD 全服务审查与收口(lzx,**三路对抗审查+用户两裁落地**):审查=三视角并行(模块边界/分层纯净/DDD 聚合)+聚合二轮坐实;**守面大面积满分**(biz import 纯净/ent edge 零/跨表写零/service 薄/data 原子/聚合切分全维持/组合分层守),缺陷集中=「entitlement 账本新域落地时范式两条腿缺位」(事件机制无实现+同库事务 port 写无合法位);**修复片一**(b258390b):Redeem 事务化(审查最硬发现:码扣后 Grant 失败=重试永远 EXHAUSTED 的零恢复死局;InTx 包裹+ENT_E2E 十路并发语义不变证明)+entitle 分节回正(Method 节缺失,守卫只验形状漏网)+命名批(CodeRP→ActivationCodeRP/payOrderRP→orderRP 等);**修复片二**:①**事件面落地**(用户裁 A=事件化):shared.TrialCompleted 中立协议+bootstrap.EventSubscriptions(同步 best-effort,publisher 事务是真值)+test 发布/entitle 构造器订阅→**test↔entitle 模块边消失**;②**法条修订**(用户裁 B):kratos §1 跨模块写=「领域事件」或「事务内幂等账本写(ON CONFLICT no-op)」两合法形,pay settle 的 Grant 获合法位;③**operator 面拆形**:activation.proto 拆双文件(entitlement.proto C 端/activation_admin.proto 运营),SetReportAccessPolicy 归 EntitleAdminService,entitleadmin 模块自立(纯 service 面,reads entitle UC),guard 增「entitle 禁 import entitleadmin」=删除闭操作;④log tag 收敛三形态+§2 扩条回灌;⑤wire 生成器恢复绿暴露并修复手编债(wire.go 缺 import+port 无 provider,bind 归生产方 ProviderSet);breaking 预期红一次(文件拆+RPC 迁移,骨架期未上线零消费点,HEAD 自愈)。
+- 10-26 走查修批日(hzy,用户现场走查逐项点单,九条全绿,93f67de3..179b1af2):晨批七条——mt 面色批(环上盘/中心标/系绳按档着色)+mt-F2 游走 ±10 保真(span≠amplitude 陷阱)+mt-D3 统计面补齐(丢失次数=not-lost→lost 迁移律+偏差σ)、ms 切换页(单紫球+规则先于警示+N1 诚实文案登记)、home 游客文案(未登录×2)、home-D5 续测卡**契约垂直片**(新只读 RPC PeekMatchSession:不铸造/不懒过期/不投流派,超窗读空——防 Get 铸场次劫持显式选型;进行到 X/Y·7 天可续卡,guest enabled 闸零请求)、流程钮跳过已完成项(用户活体撞上裁定:原型律「第一个未完成」胜旧律「剩次数>0」)。晚批两条 tm 三+二修——`9ad37da9`:十字星中心锚定(左上锚定曾推缘出屏+判定隐性偏 ~28px)/knob 单机制(v4 类 translate 与内联 transform 叠加不覆盖,松手偏 16px;全仓唯一混用点)/开局先挂载再量(脱文档 0×0 钉左上角);`179b1af2`:目标出生避摇杆·开火钮(实测 DOM 矩形+20px 缓冲,拒绝采样 20 次兜底,缩放重定位同律;登记与旧版均匀随机的有意分歧)+原型 z 序(准心 z-40/控件 z-30,dot 追加序曾盖准心)。验证:每条活体闭环(临时号 hzytm/hzytm2,含 812×375 横屏预验=mt-D6 桌面半场)+vitest 112→115。裁定点存档:mt-D5 裁 A 后置转 lzx;done=0 显卡跟原型;resume-remind 中介页不建(直达 /match);转达三件入遗留清单(mt-F1→ljr/skill_trajectory 30s+mt-D5→lzx/mt-D6)。

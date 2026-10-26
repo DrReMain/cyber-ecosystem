@@ -134,6 +134,25 @@ func (uc *MatchUC) Get(ctx context.Context, genre *string) (*SessionView, error)
 	return uc.view(ctx, session, true)
 }
 
+func (uc *MatchUC) Peek(ctx context.Context) (*SessionView, error) {
+	// The read-only sibling of Get: no create, no lazy expire, no genre
+	// vote — a minting read would hijack a later explicit genre choice,
+	// since a resume ignores the genre param. Over-window sessions read
+	// absent here; the next Get owns closing and redrawing them.
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("match peek requires a session"))
+	}
+	active, err := uc.matchRP.FindActive(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if active == nil || time.Since(active.CreatedAt) >= matchResumeWindow {
+		return nil, nil
+	}
+	return uc.view(ctx, active, false)
+}
+
 func (uc *MatchUC) Switch(ctx context.Context, genre string) (*SessionView, error) {
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {

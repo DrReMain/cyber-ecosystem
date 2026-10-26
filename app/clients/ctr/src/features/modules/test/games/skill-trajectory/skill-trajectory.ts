@@ -19,6 +19,7 @@ import {
   decimatePath,
   generateBoard,
   MISS_DEV_SENTINEL,
+  matchPairs,
   mulberry32,
   type Point,
   round1,
@@ -39,7 +40,9 @@ const COLOR_FILL: Record<StColor, string> = {
   purple: "fill-purple-500/90",
 };
 
-const FEEDBACK_MS = 1500;
+// The legacy feedback window (SkillTrajectoryTestPage: feedback 3s) — long
+// enough to read the pair verdicts the face draws.
+const FEEDBACK_MS = 3000;
 
 type Phase = "memorize" | "recall" | "feedback";
 
@@ -256,6 +259,76 @@ function buildFace(): FaceParts {
   return { stage, playLayer, chipRound, chipHint, palette, slots, confirm };
 }
 
+/* The feedback face's verdict drawing (the legacy overlay's law): the
+ * matched target rings green with a dashed tether to the placement and the
+ * deviation label at the pair's midpoint; unmatched pieces and targets
+ * wear the red dashed ring. Display only — the fact stays the single
+ * representative pair. */
+function feedbackRing(center: Point, sizePx: number, cls: string): HTMLElement {
+  const ring = document.createElement("div");
+  ring.className = `pointer-events-none absolute rounded-full border-2 ${cls}`;
+  ring.style.width = `${sizePx}px`;
+  ring.style.height = `${sizePx}px`;
+  ring.style.transform = "translate(-50%, -50%)";
+  place(ring, center);
+  return ring;
+}
+
+function pairVerdictEls(
+  svg: SVGSVGElement,
+  layer: HTMLElement,
+  pair: { target: LiveEntity; placement: LiveEntity; deviation: number },
+  ringSizePx: number,
+): Element[] {
+  const { target, placement, deviation } = pair;
+  // Legacy band verbatim: <50 green, <100 amber, else red (the match cap
+  // keeps every drawn pair green in practice).
+  const stroke =
+    deviation < 50
+      ? "var(--color-status-ok)"
+      : deviation < 100
+        ? "var(--color-status-pending)"
+        : "var(--color-danger)";
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", String(round1(target.center.x)));
+  line.setAttribute("y1", String(round1(target.center.y)));
+  line.setAttribute("x2", String(round1(placement.center.x)));
+  line.setAttribute("y2", String(round1(placement.center.y)));
+  line.setAttribute("stroke", stroke);
+  line.setAttribute("stroke-width", "2");
+  line.setAttribute("stroke-dasharray", "5,5");
+  svg.appendChild(line);
+  const label = document.createElement("div");
+  label.className =
+    "pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-lg border border-white/30 bg-black/90 px-2 py-0.5 text-[11px] font-bold text-white";
+  label.textContent = `${round1(deviation)}px`;
+  place(label, {
+    x: (target.center.x + placement.center.x) / 2,
+    y: (target.center.y + placement.center.y) / 2,
+  });
+  layer.appendChild(label);
+  const ring = feedbackRing(target.center, ringSizePx, "border-status-ok");
+  layer.appendChild(ring);
+  return [label, ring];
+}
+
+function missRingEls(
+  layer: HTMLElement,
+  entities: readonly LiveEntity[],
+  matched: ReadonlySet<LiveEntity>,
+  ringSizePx: number,
+): Element[] {
+  const els: Element[] = [];
+  for (const entity of entities) {
+    if (!matched.has(entity)) {
+      const ring = feedbackRing(entity.center, ringSizePx, "border-danger border-dashed");
+      layer.appendChild(ring);
+      els.push(ring);
+    }
+  }
+  return els;
+}
+
 export const skillTrajectoryModule: GameModule = {
   code: "skill_trajectory",
   create(ctx: GameModuleCtx): GameInstance {
@@ -332,8 +405,37 @@ export const skillTrajectoryModule: GameModule = {
       confirm.dataset.ready = pieces.every((piece) => piece.placed) ? "1" : "0";
     }
 
+    // The feedback overlay's tracked elements — drawn by the module-level
+    // verdict helpers, cleared when the next round reclaims the layer.
+    let feedbackEls: Element[] = [];
+
+    function clearFeedback(): void {
+      for (const el of feedbackEls) {
+        el.remove();
+      }
+      feedbackEls = [];
+    }
+
+    function buildFeedback(): void {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "pointer-events-none absolute inset-0 h-full w-full");
+      playLayer.appendChild(svg);
+      feedbackEls.push(svg);
+      const pairs = matchPairs(targets, pieces, params.matchDistancePx);
+      for (const pair of pairs) {
+        feedbackEls.push(...pairVerdictEls(svg, playLayer, pair, params.targetSizePx + 12));
+      }
+      const matchedTargets = new Set(pairs.map((pair) => pair.target));
+      const matchedPieces = new Set(pairs.map((pair) => pair.placement));
+      feedbackEls.push(
+        ...missRingEls(playLayer, targets, matchedTargets, params.targetSizePx + 12),
+      );
+      feedbackEls.push(...missRingEls(playLayer, pieces, matchedPieces, params.paletteSizePx + 12));
+    }
+
     function startRound(): void {
       round += 1;
+      clearFeedback();
       for (const item of [...targets, ...pieces]) {
         item.el.remove();
       }
@@ -384,8 +486,9 @@ export const skillTrajectoryModule: GameModule = {
       phaseStartMs = elapsed;
       palette.style.display = "none";
       // Feedback reveals the truth: the round's targets and the player's
-      // placements side by side.
+      // placements side by side, with each pair's verdict drawn over them.
       setVisible(targets, true);
+      buildFeedback();
       setChip();
     }
 
@@ -475,6 +578,7 @@ export const skillTrajectoryModule: GameModule = {
         loop.stop();
         observer?.disconnect();
         observer = null;
+        clearFeedback();
         for (const item of [...targets, ...pieces]) {
           item.el.remove();
         }

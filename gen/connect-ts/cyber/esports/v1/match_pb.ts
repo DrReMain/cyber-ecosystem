@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/esports/v1/match.proto.
  */
 export const file_cyber_esports_v1_match: GenFile = /*@__PURE__*/
-  fileDesc("ChxjeWJlci9lc3BvcnRzL3YxL21hdGNoLnByb3RvEhBjeWJlci5lc3BvcnRzLnYxIkEKFkdldE1hdGNoU2Vzc2lvblJlcXVlc3QSHQoFZ2VucmUYASABKAlCCbpIBnIEEAEYEEgAiAEBQggKBl9nZW5yZSJFChdTd2l0Y2hNYXRjaEdlbnJlUmVxdWVzdBIgCgVnZW5yZRgBIAEoCUIMukgJyAEBcgQQARgQSACIAQFCCAoGX2dlbnJlImsKCU1hdGNoU3RlcBItCgdhYmlsaXR5GAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi8KCXRlc3RfY29kZRgCIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZSKsAwoMTWF0Y2hTZXNzaW9uEigKAmlkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEisKBWdlbnJlGAIgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjAKCmRpZmZpY3VsdHkYAyABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSKgoFc3RlcHMYBCADKAsyGy5jeWJlci5lc3BvcnRzLnYxLk1hdGNoU3RlcBIMCgRkb25lGAUgAygJEkMKC3JldGVzdF9sZWZ0GAYgAygLMi4uY3liZXIuZXNwb3J0cy52MS5NYXRjaFNlc3Npb24uUmV0ZXN0TGVmdEVudHJ5Ei4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKDWZpcnN0X3Nlc3Npb24YCCABKAsyGi5nb29nbGUucHJvdG9idWYuQm9vbFZhbHVlGjEKD1JldGVzdExlZnRFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAU6AjgBIlsKF0dldE1hdGNoU2Vzc2lvblJlc3BvbnNlEi8KB3Nlc3Npb24YASABKAsyHi5jeWJlci5lc3BvcnRzLnYxLk1hdGNoU2Vzc2lvbhIPCgdjcmVhdGVkGAIgASgIIksKGFN3aXRjaE1hdGNoR2VucmVSZXNwb25zZRIvCgdzZXNzaW9uGAEgASgLMh4uY3liZXIuZXNwb3J0cy52MS5NYXRjaFNlc3Npb24ytQMKDE1hdGNoU2VydmljZRLLAQoPR2V0TWF0Y2hTZXNzaW9uEiguY3liZXIuZXNwb3J0cy52MS5HZXRNYXRjaFNlc3Npb25SZXF1ZXN0GikuY3liZXIuZXNwb3J0cy52MS5HZXRNYXRjaFNlc3Npb25SZXNwb25zZSJjiPEEBIrTDjYKMuiOt+WPluWMuemFjeS8muivnSjml6DliJnmjInlgY/lpb3lpJrmlbDnpajnvJbmjpIpEAGC0+STAh8SHS9hcGkvdjEvZXNwb3J0cy9tYXRjaC9zZXNzaW9uEsQBChBTd2l0Y2hNYXRjaEdlbnJlEikuY3liZXIuZXNwb3J0cy52MS5Td2l0Y2hNYXRjaEdlbnJlUmVxdWVzdBoqLmN5YmVyLmVzcG9ydHMudjEuU3dpdGNoTWF0Y2hHZW5yZVJlc3BvbnNlIlmI8QQEitMOIgoe5YiH5o2i57G75Z6L6YeN5o6S5Yy56YWN5Lya6K+dEAKC0+STAik6ASoiJC9hcGkvdjEvZXNwb3J0cy9tYXRjaC9zZXNzaW9uL3N3aXRjaBoQiuIJDOWMuemFjeS8muivnUIpWidjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL2VzcG9ydHMvdjFiBnByb3RvMw", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("ChxjeWJlci9lc3BvcnRzL3YxL21hdGNoLnByb3RvEhBjeWJlci5lc3BvcnRzLnYxIkEKFkdldE1hdGNoU2Vzc2lvblJlcXVlc3QSHQoFZ2VucmUYASABKAlCCbpIBnIEEAEYEEgAiAEBQggKBl9nZW5yZSJFChdTd2l0Y2hNYXRjaEdlbnJlUmVxdWVzdBIgCgVnZW5yZRgBIAEoCUIMukgJyAEBcgQQARgQSACIAQFCCAoGX2dlbnJlImsKCU1hdGNoU3RlcBItCgdhYmlsaXR5GAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi8KCXRlc3RfY29kZRgCIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZSKsAwoMTWF0Y2hTZXNzaW9uEigKAmlkGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEisKBWdlbnJlGAIgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjAKCmRpZmZpY3VsdHkYAyABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSKgoFc3RlcHMYBCADKAsyGy5jeWJlci5lc3BvcnRzLnYxLk1hdGNoU3RlcBIMCgRkb25lGAUgAygJEkMKC3JldGVzdF9sZWZ0GAYgAygLMi4uY3liZXIuZXNwb3J0cy52MS5NYXRjaFNlc3Npb24uUmV0ZXN0TGVmdEVudHJ5Ei4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKDWZpcnN0X3Nlc3Npb24YCCABKAsyGi5nb29nbGUucHJvdG9idWYuQm9vbFZhbHVlGjEKD1JldGVzdExlZnRFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAU6AjgBIlsKF0dldE1hdGNoU2Vzc2lvblJlc3BvbnNlEi8KB3Nlc3Npb24YASABKAsyHi5jeWJlci5lc3BvcnRzLnYxLk1hdGNoU2Vzc2lvbhIPCgdjcmVhdGVkGAIgASgIIksKGFN3aXRjaE1hdGNoR2VucmVSZXNwb25zZRIvCgdzZXNzaW9uGAEgASgLMh4uY3liZXIuZXNwb3J0cy52MS5NYXRjaFNlc3Npb24iGQoXUGVla01hdGNoU2Vzc2lvblJlcXVlc3QiSwoYUGVla01hdGNoU2Vzc2lvblJlc3BvbnNlEi8KB3Nlc3Npb24YASABKAsyHi5jeWJlci5lc3BvcnRzLnYxLk1hdGNoU2Vzc2lvbjKJBQoMTWF0Y2hTZXJ2aWNlEssBCg9HZXRNYXRjaFNlc3Npb24SKC5jeWJlci5lc3BvcnRzLnYxLkdldE1hdGNoU2Vzc2lvblJlcXVlc3QaKS5jeWJlci5lc3BvcnRzLnYxLkdldE1hdGNoU2Vzc2lvblJlc3BvbnNlImOI8QQEitMONgoy6I635Y+W5Yy56YWN5Lya6K+dKOaXoOWImeaMieWBj+WlveWkmuaVsOelqOe8luaOkikQAYLT5JMCHxIdL2FwaS92MS9lc3BvcnRzL21hdGNoL3Nlc3Npb24SxAEKEFN3aXRjaE1hdGNoR2VucmUSKS5jeWJlci5lc3BvcnRzLnYxLlN3aXRjaE1hdGNoR2VucmVSZXF1ZXN0GiouY3liZXIuZXNwb3J0cy52MS5Td2l0Y2hNYXRjaEdlbnJlUmVzcG9uc2UiWYjxBASK0w4iCh7liIfmjaLnsbvlnovph43mjpLljLnphY3kvJror50QAoLT5JMCKToBKiIkL2FwaS92MS9lc3BvcnRzL21hdGNoL3Nlc3Npb24vc3dpdGNoEtEBChBQZWVrTWF0Y2hTZXNzaW9uEikuY3liZXIuZXNwb3J0cy52MS5QZWVrTWF0Y2hTZXNzaW9uUmVxdWVzdBoqLmN5YmVyLmVzcG9ydHMudjEuUGVla01hdGNoU2Vzc2lvblJlc3BvbnNlImaI8QQEitMONAow56ql6KeG6L+b6KGM5Lit55qE5Yy56YWN5Lya6K+dKOWPquivuyzml6DliJnnqbopEAGC0+STAiQSIi9hcGkvdjEvZXNwb3J0cy9tYXRjaC9zZXNzaW9uL3BlZWsaEIriCQzljLnphY3kvJror51CKVonY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9lc3BvcnRzL3YxYgZwcm90bzM", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * @generated from message cyber.esports.v1.GetMatchSessionRequest
@@ -195,6 +195,40 @@ export const SwitchMatchGenreResponseSchema: GenMessage<SwitchMatchGenreResponse
   messageDesc(file_cyber_esports_v1_match, 5);
 
 /**
+ * @generated from message cyber.esports.v1.PeekMatchSessionRequest
+ */
+export type PeekMatchSessionRequest = Message<"cyber.esports.v1.PeekMatchSessionRequest"> & {
+};
+
+/**
+ * Describes the message cyber.esports.v1.PeekMatchSessionRequest.
+ * Use `create(PeekMatchSessionRequestSchema)` to create a new message.
+ */
+export const PeekMatchSessionRequestSchema: GenMessage<PeekMatchSessionRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_match, 6);
+
+/**
+ * @generated from message cyber.esports.v1.PeekMatchSessionResponse
+ */
+export type PeekMatchSessionResponse = Message<"cyber.esports.v1.PeekMatchSessionResponse"> & {
+  /**
+   * Absent when no in-window session exists — message-field presence is
+   * the null/zero contract for entities (§3); a present session is the
+   * resume face's whole truth.
+   *
+   * @generated from field: cyber.esports.v1.MatchSession session = 1;
+   */
+  session?: MatchSession | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.PeekMatchSessionResponse.
+ * Use `create(PeekMatchSessionResponseSchema)` to create a new message.
+ */
+export const PeekMatchSessionResponseSchema: GenMessage<PeekMatchSessionResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_match, 7);
+
+/**
  * The match session — the orchestration aggregate the C-end assessment
  * flow rides. One active session per member: steps are drawn once (seeded
  * jitter, so lineups cannot be memorized) and locked into the row, resume
@@ -225,6 +259,20 @@ export const MatchService: GenService<{
     methodKind: "unary";
     input: typeof SwitchMatchGenreRequestSchema;
     output: typeof SwitchMatchGenreResponseSchema;
+  },
+  /**
+   * The read-only sibling of GetMatchSession: reports the member's active
+   * in-window session, if any — never creates, never lazily expires, never
+   * votes a genre. (A minting surface here would hijack a later explicit
+   * genre choice: a resume ignores the genre param.) Over-window sessions
+   * read absent; the next GetMatchSession owns closing and redrawing them.
+   *
+   * @generated from rpc cyber.esports.v1.MatchService.PeekMatchSession
+   */
+  peekMatchSession: {
+    methodKind: "unary";
+    input: typeof PeekMatchSessionRequestSchema;
+    output: typeof PeekMatchSessionResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_cyber_esports_v1_match, 0);

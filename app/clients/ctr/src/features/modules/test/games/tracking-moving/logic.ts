@@ -95,6 +95,52 @@ export function stepCrosshair(
   return { x, y };
 }
 
+/** A stage-space box a control owns (the joystick, the fire button). */
+export interface Rect {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+/** True inside the rect grown by the margin — the zone the control
+ * claims for its glow and the player's thumb. */
+export function insideControlRect(p: Point, rect: Rect, marginPx: number): boolean {
+  return (
+    p.x > rect.x - marginPx &&
+    p.x < rect.x + rect.width + marginPx &&
+    p.y > rect.y - marginPx &&
+    p.y < rect.y + rect.height + marginPx
+  );
+}
+
+/**
+ * Uniform draw in the padded band that never lands on a control's
+ * rect — a dot under the joystick or the fire button is unaimable.
+ * Rejection sampling over the plain draw; when the stage is too small
+ * to satisfy both laws it gives up after 20 tries and takes the plain
+ * draw — a cramped stage prefers a playable dot over an impossible
+ * one. (Deliberate divergence from the legacy uniform-over-the-stage
+ * spawn, which had no control avoidance — walkthrough ruling
+ * 2026-10-26.)
+ */
+export function randomCenterAvoidingControls(
+  area: SpawnArea,
+  paddingPx: number,
+  controls: readonly Rect[],
+  marginPx: number,
+  rand: () => number,
+): Point {
+  const MAX_TRIES = 20;
+  for (let i = 0; i < MAX_TRIES; i++) {
+    const candidate = randomCenter(area, paddingPx, rand);
+    if (!controls.some((rect) => insideControlRect(candidate, rect, marginPx))) {
+      return candidate;
+    }
+  }
+  return randomCenter(area, paddingPx, rand);
+}
+
 export function round1(value: number): number {
   return Math.round(value * 10) / 10;
 }

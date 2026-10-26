@@ -2,7 +2,7 @@ import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import { listTests } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test-TestService_connectquery";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { Crosshair, Hexagon } from "lucide-react";
+import { Check, Crosshair, Hexagon } from "lucide-react";
 import { useEffect } from "react";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
@@ -54,7 +54,9 @@ function StepRow({ index, ability, name, left, ready, done, onEnter }: Readonly<
       <div className="min-w-0 flex-1">
         <div className="text-ink text-sm font-extrabold">
           {word.cn}
-          {done ? <span className="text-status-ok ml-1 text-xs">✓</span> : null}
+          {done ? (
+            <Check aria-hidden className="text-status-ok ml-1 inline h-3 w-3" strokeWidth={3} />
+          ) : null}
         </div>
         <div className="text-ink-tertiary mt-0.5 text-[9.5px] tracking-[0.9px]">{word.en}</div>
       </div>
@@ -164,11 +166,11 @@ export function MatchPage() {
   const nameOf = (code: string) => tests.find((t) => t.code === code)?.name ?? code;
   const engineReady = (code: string): boolean => getGameModule(code) !== null;
   const doneCount = (session?.done ?? []).length;
-  // An untested step is skippable by law, and a step whose engine has not
-  // shipped must be skipped — the start button walks the engine-backed
-  // steps only, never parking the flow on an unplayable one.
+  // The start button walks the linear path (prototype match-guide): the
+  // first step not yet done — a done step re-enters only by its own row
+  // tap, even with retakes left; the flow never re-parks on it.
   const next = steps.find(
-    (s) => s.testCode != null && leftOf(s.testCode) > 0 && engineReady(s.testCode),
+    (s) => s.testCode != null && !(session?.done ?? []).includes(s.testCode) && engineReady(s.testCode),
   );
   const undecided =
     (sessionQuery.error as { reason?: string } | null)?.reason === reasonGenreUndecided;

@@ -134,27 +134,83 @@ export function generateBoard(
 // triple is exact, so a board-reproducing server can verify it as-is.
 // Generic so callers keep their concrete entity types (the module's
 // pieces carry the drag path the fact's trajectory reads).
-export function bestPair<T extends StTarget, P extends StPlacement>(
+// One candidate pair's deviation, or null when the shape/color gate or the
+// distance cap refuses it.
+function openCandidate<T extends StTarget, P extends StPlacement>(
+  target: T,
+  placement: P,
+  maxDistancePx: number,
+): number | null {
+  if (placement.shape !== target.shape || placement.color !== target.color) {
+    return null;
+  }
+  const deviation = distance(target.center, placement.center);
+  return deviation > maxDistancePx ? null : deviation;
+}
+
+// The closest still-open same-shape same-color pair within the cap — the
+// shared search under both the fact's representative and the feedback
+// face's exhaustive pairing.
+function bestOpenPair<T extends StTarget, P extends StPlacement>(
   targets: readonly T[],
   placements: readonly P[],
+  takenTargets: ReadonlySet<T>,
+  takenPlacements: ReadonlySet<P>,
   maxDistancePx: number,
 ): { target: T; placement: P; deviation: number } | null {
   let best: { target: T; placement: P; deviation: number } | null = null;
   for (const target of targets) {
+    if (takenTargets.has(target)) {
+      continue;
+    }
     for (const placement of placements) {
-      if (placement.shape !== target.shape || placement.color !== target.color) {
+      if (takenPlacements.has(placement)) {
         continue;
       }
-      const deviation = distance(target.center, placement.center);
-      if (deviation > maxDistancePx) {
-        continue;
-      }
-      if (best === null || deviation < best.deviation) {
+      const deviation = openCandidate(target, placement, maxDistancePx);
+      if (deviation !== null && (best === null || deviation < best.deviation)) {
         best = { target, placement, deviation };
       }
     }
   }
   return best;
+}
+
+// The round's representative: the closest same-shape same-color pair
+// within the match distance. The reported original/placement/deviation
+// triple is exact, so a board-reproducing server can verify it as-is.
+// Generic so callers keep their concrete entity types (the module's
+// pieces carry the drag path the fact's trajectory reads).
+export function bestPair<T extends StTarget, P extends StPlacement>(
+  targets: readonly T[],
+  placements: readonly P[],
+  maxDistancePx: number,
+): { target: T; placement: P; deviation: number } | null {
+  return bestOpenPair(targets, placements, new Set(), new Set(), maxDistancePx);
+}
+
+// Every pair the feedback face shows: the same shape/color gate and
+// distance cap as the fact's representative, but the globally closest
+// remaining pair is taken repeatedly until nothing pairs (the legacy
+// feedback screen's greedy display law). Pairs are ordered nearest-first,
+// so the representative (bestPair) is always the head when both match.
+export function matchPairs<T extends StTarget, P extends StPlacement>(
+  targets: readonly T[],
+  placements: readonly P[],
+  maxDistancePx: number,
+): { target: T; placement: P; deviation: number }[] {
+  const pairs: { target: T; placement: P; deviation: number }[] = [];
+  const takenTargets = new Set<T>();
+  const takenPlacements = new Set<P>();
+  for (;;) {
+    const best = bestOpenPair(targets, placements, takenTargets, takenPlacements, maxDistancePx);
+    if (best === null) {
+      return pairs;
+    }
+    takenTargets.add(best.target);
+    takenPlacements.add(best.placement);
+    pairs.push(best);
+  }
 }
 
 // Polygon vertices for the non-circle shapes (circle renders as an SVG

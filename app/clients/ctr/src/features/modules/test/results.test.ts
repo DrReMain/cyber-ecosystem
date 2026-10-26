@@ -92,6 +92,44 @@ describe("local result derivation", () => {
     ]);
   });
 
+  it("moving_target: std dev, hold rate, and legacy's loss-counter law", () => {
+    // Two not-lost → lost transitions (40 and 35 after held samples); the
+    // consecutive miss (45) mints nothing.
+    const record = recordOf([
+      { deviation: 10, hit: true },
+      { deviation: 25, hit: true },
+      { deviation: 40, hit: false },
+      { deviation: 45, hit: false },
+      { deviation: 28, hit: true },
+      { deviation: 35, hit: false },
+      { deviation: 8, hit: true },
+    ]);
+    expect(deriveLocalResults("moving_target", record, new EngineParams({}))).toEqual([
+      { key: "samples", value: "7" },
+      { key: "avg_deviation", value: "27.3px" },
+      { key: "std_dev", value: "13.2px" },
+      { key: "hold_rate", value: "57.1%" },
+      { key: "loss_count", value: "2" },
+    ]);
+    // An empty stream (a never-touched run) stays zero across the board —
+    // no fake loss, no NaN deviation.
+    expect(deriveLocalResults("moving_target", recordOf([]), new EngineParams({}))).toEqual([
+      { key: "samples", value: "0" },
+      { key: "avg_deviation", value: "0.0px" },
+      { key: "std_dev", value: "0.0px" },
+      { key: "hold_rate", value: "0.0%" },
+      { key: "loss_count", value: "0" },
+    ]);
+    // A run that opens already lost mints nothing (legacy inits the
+    // tracking state to "lost").
+    const opensLost = recordOf([
+      { deviation: 40, hit: false },
+      { deviation: 12, hit: true },
+    ]);
+    const rows = deriveLocalResults("moving_target", opensLost, new EngineParams({}));
+    expect(rows[4]).toEqual({ key: "loss_count", value: "0" });
+  });
+
   it("unknown codes fall back to the generic tap/hit pair", () => {
     const record = recordOf([{ isHit: true }, { isHit: false }]);
     expect(deriveLocalResults("no_such_game", record, new EngineParams({}))).toEqual([

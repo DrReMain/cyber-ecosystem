@@ -1,6 +1,8 @@
 import { useQuery } from "@connectrpc/connect-query";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import { ProfileSex } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile_pb";
 import { useNavigate } from "@tanstack/react-router";
+import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import { ageOf, MONTHS, years } from "#/features/app/birth";
@@ -10,12 +12,21 @@ import { bandLabel, bandOfAge } from "../bands";
 import { useProfileUpdate } from "../use-profile-update";
 import { StepFrame } from "./step-frame";
 
+// The read-side wire names (proto-JSON) for the sex enum — the write side
+// takes the enum itself, so the mapping lives only where reads land.
+const SEX_FROM_WIRE: Record<string, ProfileSex> = {
+  PROFILE_SEX_MALE: ProfileSex.MALE,
+  PROFILE_SEX_FEMALE: ProfileSex.FEMALE,
+  PROFILE_SEX_UNDETERMINED: ProfileSex.UNDETERMINED,
+};
+
 export function SetupAgePage() {
   const navigate = useNavigate();
   const profileQuery = useQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
   const updateMutation = useProfileUpdate();
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
+  const [sex, setSex] = useState<ProfileSex | null>(null);
   const [guardian, setGuardian] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +40,27 @@ export function SetupAgePage() {
     }
   }, [profileQuery.data?.profile, ready]);
 
+  // The sex card (D-AN) prefills from the profile read — whenever the
+  // server starts deriving sex from wechat, this prefill lights up.
+  // Queries deliver proto-JSON shapes (CONVENTIONS §1): the enum arrives
+  // as its wire-name string, mapped back to the enum before state.
+  useEffect(() => {
+    if (sex !== null) {
+      return;
+    }
+    const wire = profileQuery.data?.profile?.sex as unknown as string | null | undefined;
+    const mapped = wire == null ? undefined : SEX_FROM_WIRE[wire];
+    if (mapped !== undefined) {
+      setSex(mapped);
+    }
+  }, [profileQuery.data?.profile?.sex, sex]);
+
+  const sexOptions = [
+    { value: ProfileSex.MALE, label: m.profile_sex_male() },
+    { value: ProfileSex.FEMALE, label: m.profile_sex_female() },
+    { value: ProfileSex.UNDETERMINED, label: m.profile_sex_undetermined() },
+  ];
+
   const complete = year !== "" && month !== "";
   const age = complete ? ageOf(Number(year), Number(month)) : null;
   const derivedBand = age !== null ? bandOfAge(age) : null;
@@ -36,6 +68,10 @@ export function SetupAgePage() {
   const minorNote = age !== null && age >= 13 && age < 18;
 
   async function onNext() {
+    if (sex === null) {
+      setError(m.profile_setup_sex_required());
+      return;
+    }
     if (!complete) {
       setError(m.profile_setup_birth_incomplete());
       return;
@@ -50,6 +86,7 @@ export function SetupAgePage() {
         ...(needGuardian ? { guardianAccepted: true } : {}),
         birthMonth: Number(month),
         birthYear: Number(year),
+        sex,
       });
     } catch {
       // The mutation cache already toasts the reason; swallowing the
@@ -64,6 +101,40 @@ export function SetupAgePage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/nickname" })} step={2}>
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
+        <div className="text-ink mb-1 text-sm font-extrabold">
+          {m.profile_sex_label()}
+          <span className="text-danger-text"> *</span>
+        </div>
+        <p className="text-ink-muted mb-2.5 text-[11.5px]">{m.profile_sex_hint()}</p>
+        <div
+          aria-label={m.profile_sex_label()}
+          className="bg-surface-input border-line-soft rounded-control flex gap-1 border p-1"
+          role="radiogroup"
+        >
+          {sexOptions.map((option) => (
+            <button
+              aria-checked={sex === option.value}
+              className={clsx(
+                "flex-1 cursor-pointer rounded-[9px] py-[11px] text-center text-[13.5px]",
+                sex === option.value
+                  ? "bg-focus shadow-[0_4px_12px_rgba(59,130,246,0.4)] font-bold text-white"
+                  : "text-ink-muted",
+              )}
+              key={option.value}
+              onClick={() => {
+                setSex(option.value);
+                setError(null);
+              }}
+              role="radio"
+              type="button"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
         <div className="text-ink mb-1 text-sm font-extrabold">{m.profile_birth_label()}</div>
         <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed whitespace-pre-line">

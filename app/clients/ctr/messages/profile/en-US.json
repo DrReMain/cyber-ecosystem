@@ -1,6 +1,12 @@
 {
   "profile_title": "Profile",
   "profile_nickname_label": "Nickname",
+  "profile_sex_label": "Sex",
+  "profile_sex_hint": "Required; auto-filled when signing in with WeChat",
+  "profile_sex_male": "Male",
+  "profile_sex_female": "Female",
+  "profile_sex_undetermined": "Undetermined",
+  "profile_setup_sex_required": "Please select a sex (required)",
   "profile_birth_label": "Birth date",
   "profile_games_label": "Game preference",
   "profile_unset": "Not set",

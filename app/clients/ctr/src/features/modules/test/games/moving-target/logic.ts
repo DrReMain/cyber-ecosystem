@@ -120,7 +120,9 @@ export function patternOffset(
 
 /**
  * One random-walk step: jitter in [−1, 1) per axis scaled to the legacy
- * 20 px jump, then clamped. Each call draws one axis.
+ * ±10 jump, then clamped. Each call draws one axis. (Legacy drew
+ * (rand − 0.5) · 20 — a 20 px span whose amplitude is 10; scaling the
+ * unit jitter by 20 doubled it.)
  */
 export function randomWalkStep(
   current: Point,
@@ -129,7 +131,7 @@ export function randomWalkStep(
   jitter: () => number,
 ): Point {
   return clampInside(
-    { x: current.x + jitter() * 20, y: current.y + jitter() * 20 },
+    { x: current.x + jitter() * 10, y: current.y + jitter() * 10 },
     area,
     marginPx,
   );
