@@ -1,18 +1,14 @@
 # security 开发计划 — 切片池
 
 > 归属：security 前沿开发档。总则/裁决台账见 README；状态记 progress.md。
-> 顺序律：简单 → 爆炸面小 → 风险低（S-1）；每片开工前须用户裁决。规模：XS（≤半天）/ S（≤1 天）/ M（2-4 天）/ L（>4 天）。
-> 证据均为 2026-10-26 于 esports/dev-lzx 树内核实所记（file:line）。
+> 顺序律：简单 → 爆炸面小 → 风险低（S-1）；方案先行律：每片落码前先与用户讨论方案（S-1）。规模：XS（≤半天）/ S（≤1 天）/ M（2-4 天）/ L（>4 天）。
+> 已裁不处理项已删（S-2：SH-1 刻意保留 / SH-3·4·5 不处理），ID 不复用。证据均为 2026-10-26 于 esports/dev-lzx 树内核实所记（file:line）。
 
 ---
 
 | 片 | 内容与验收要点 | 依赖 | 规模 | 爆炸面 | 建议 | 裁决 |
 |---|---|---|---|---|---|---|
-| SH-1 根 Cargo.toml 遗留删除 | `[workspace] members=[]` 空壳（无任何 Rust 代码引用）。验收：全仓 grep 零引用 + 门禁链不破 | — | XS | 零 | **处理** | 待裁 |
 | SH-2 README 双语补漏 | 能力族清单补 `payment` 行（cache/storage/mq/payment 四族，v0.8.0 已回收但漏列）；审计「队列满按设计丢弃、非保证落盘」一句入性能形态节。验收：docs:check 绿，双语同步 | — | XS | docs only | **处理** | 待裁 |
-| SH-3 wechat 配置默认值 | `system/configs/config.yaml:87-93`：`WECHAT_ENABLED:true` + `WECHAT_AUTO_REGISTER:true` + appid/secret 明文默认值。**建议形态 = 并入 SH-5 非 dev 拒绝清单**（dev 便利照旧，呼应 S-0 裁定）；备选 = 改默认（占位空值 + 默认关，dev e2e 需显式 env） | D-1 | XS-S | config | **处理**（并入形态） | 待裁 |
-| SH-4 reflection 非 dev 门 | connect server 反射注册常开（`server/connect.go:65`）。按形态判据关闭。验收：非 dev 探针=反射面不可达；dev 照旧 | D-1 | S | server 装配 | **处理** | 待裁 |
-| SH-5 非 dev 启动拒绝默认凭据 | 种子口令 `admin123456`（`config.yaml:97`）、agent master key `agent-dev-master-key`（20 字符恰过 ≥16 检查，`agent/configs/config.yaml:34`）、（SH-3 若并入）wechat 默认开+默认 secret——非 dev 形态启动即 fail。验收：非 dev 拒绝探针 ×3 + dev 默认行为不变 | D-1 | S | bootstrap 校验 | **处理** | 待裁 |
 | SH-6 租户跨租拒绝守卫 | executable 守卫：租户 A 不能读写租户 B 的角色/用户/文件/审计（读面=Traverse 拦截器含「无 ctx 即跳过」的有意豁免；写面=biz 先读后写约定）。test-only 零生产代码。验收：ENT_E2E 跨租四臂拒绝断言 | — | S | test only | **处理**（静默回归高危面，姿态表义务） | 待裁 |
 | SH-7 登录限流 | Login 现仅全局 CPU 自适应 `ratelimit.Server()`（四 server 同款），无按账号/IP 失败计数。cache 能力族 RateLimiter 接口在位零消费者。挂 Login：账号+IP 失败计数 → 锁定 TTL；阈值进 config（改不需重编译，合珍稀判据）。验收：锁定拒绝反例 + 误锁自动恢复 + 正常登录零回归 | — | M | system 登录面 | **处理** | 待裁 |
 | SH-8 agent 出网守卫（SSRF） | `chat/biz.go:253-271`：裸 `http.Client{Timeout:5s}` 默认跟重定向 + `io.ReadAll` 无上限；base_url 仅 `^https?://` 契约约束（`agent_config.proto:56`）；agent ladder 的 BUILTIN 档仅 SessionAuth（`server/server.go`）→ member 人群可探 compose 内网。修法：DialContext 解析后拒私网/回环/链路本地（拨号阶段防 DNS rebinding）+ 禁重定向或逐跳重验 + LimitReader 上限。先落 agent（重复驱动律，第二消费者再升 shared-go）。验收：internal 地址拒绝反例 ×N + 正常拨号零回归 + Stream 路径同守卫 | — | M | agent 服务出站 | **处理**（高危项里最便宜；参考服务应自带安全出网范式） | 待裁 |
