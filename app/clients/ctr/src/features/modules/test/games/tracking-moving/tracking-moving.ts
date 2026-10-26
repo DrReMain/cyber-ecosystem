@@ -24,8 +24,8 @@ import {
   joystickVector,
   outsidePaddedArea,
   type Point,
-  randomCenterAvoidingControls,
   type Rect,
+  randomCenterAvoidingControls,
   round1,
   type SpawnArea,
   stepCrosshair,
@@ -47,6 +47,42 @@ const CONTROL_SPAWN_MARGIN_PX = 20;
 function spawnAreaOf(el: HTMLElement): SpawnArea {
   const rect = el.getBoundingClientRect();
   return { width: rect.width, height: rect.height };
+}
+
+function place(el: HTMLElement, p: Point): void {
+  el.style.left = `${round1(p.x)}px`;
+  el.style.top = `${round1(p.y)}px`;
+}
+
+// The pointer's offset from the stick's center, in stage pixels.
+function knobOffset(event: PointerEvent, stick: HTMLElement): Point {
+  const rect = stick.getBoundingClientRect();
+  return {
+    x: event.clientX - (rect.left + rect.width / 2),
+    y: event.clientY - (rect.top + rect.height / 2),
+  };
+}
+
+// The run's thresholds, read once from the engine params with the
+// module defaults as the floor.
+function readParams(ctx: GameModuleCtx) {
+  return {
+    hitThresholdPx: ctx.params.num("hit_threshold_px", TRACKING_MOVING_DEFAULTS.hitThresholdPx),
+    dotSizePx: ctx.params.num("dot_size_px", TRACKING_MOVING_DEFAULTS.dotSizePx),
+    spawnPaddingPx: ctx.params.num("spawn_padding_px", TRACKING_MOVING_DEFAULTS.spawnPaddingPx),
+    crosshairSpeedPxS: ctx.params.num(
+      "crosshair_speed_px_s",
+      TRACKING_MOVING_DEFAULTS.crosshairSpeedPxS,
+    ),
+    movementSampleIntervalMs: ctx.params.num(
+      "movement_sample_interval_ms",
+      TRACKING_MOVING_DEFAULTS.movementSampleIntervalMs,
+    ),
+    respawnDelayMaxMs: ctx.params.num(
+      "respawn_delay_max_ms",
+      TRACKING_MOVING_DEFAULTS.respawnDelayMaxMs,
+    ),
+  };
 }
 
 interface DotState {
@@ -157,23 +193,7 @@ function buildFace(dotSizePx: number): FaceParts {
 export const trackingMovingModule: GameModule = {
   code: "tracking_moving",
   create(ctx: GameModuleCtx): GameInstance {
-    const params = {
-      hitThresholdPx: ctx.params.num("hit_threshold_px", TRACKING_MOVING_DEFAULTS.hitThresholdPx),
-      dotSizePx: ctx.params.num("dot_size_px", TRACKING_MOVING_DEFAULTS.dotSizePx),
-      spawnPaddingPx: ctx.params.num("spawn_padding_px", TRACKING_MOVING_DEFAULTS.spawnPaddingPx),
-      crosshairSpeedPxS: ctx.params.num(
-        "crosshair_speed_px_s",
-        TRACKING_MOVING_DEFAULTS.crosshairSpeedPxS,
-      ),
-      movementSampleIntervalMs: ctx.params.num(
-        "movement_sample_interval_ms",
-        TRACKING_MOVING_DEFAULTS.movementSampleIntervalMs,
-      ),
-      respawnDelayMaxMs: ctx.params.num(
-        "respawn_delay_max_ms",
-        TRACKING_MOVING_DEFAULTS.respawnDelayMaxMs,
-      ),
-    };
+    const params = readParams(ctx);
 
     const { stage, chipValue, dotEl, crosshair, stickBox, stick, knob, fireBox, fireBtn } =
       buildFace(params.dotSizePx);
@@ -194,11 +214,6 @@ export const trackingMovingModule: GameModule = {
     let respawnParkedMs: number | null = null;
     let respawnDeadline = 0;
     let observer: ResizeObserver | null = null;
-
-    function place(el: HTMLElement, p: Point): void {
-      el.style.left = `${round1(p.x)}px`;
-      el.style.top = `${round1(p.y)}px`;
-    }
 
     function setChip(): void {
       chipValue.textContent = `${hits}/${shots}`;
@@ -289,14 +304,6 @@ export const trackingMovingModule: GameModule = {
       setChip();
     }
 
-    function knobOffset(event: PointerEvent): Point {
-      const rect = stick.getBoundingClientRect();
-      return {
-        x: event.clientX - (rect.left + rect.width / 2),
-        y: event.clientY - (rect.top + rect.height / 2),
-      };
-    }
-
     function onStickStart(event: PointerEvent): void {
       if (destroyed || !started || paused) {
         return;
@@ -309,7 +316,7 @@ export const trackingMovingModule: GameModule = {
       if (destroyed || !started || paused) {
         return;
       }
-      const offset = knobOffset(event);
+      const offset = knobOffset(event, stick);
       vector = joystickVector(offset, BASE_RADIUS_PX);
       const len = Math.hypot(offset.x, offset.y);
       const scale = len > BASE_RADIUS_PX ? BASE_RADIUS_PX / len : 1;

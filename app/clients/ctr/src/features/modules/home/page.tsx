@@ -1,10 +1,10 @@
 import { type Timestamp, timestampDate } from "@bufbuild/protobuf/wkt";
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
+import { peekMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
 import { toast } from "sonner";
-import { peekMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import { SoonCard } from "#/components/soon-card";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
@@ -29,6 +29,65 @@ function resumeDescVars(createdAt: Timestamp | undefined, done: number, total: n
   const pad = (n: number) => String(n).padStart(2, "0");
   const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   return { done, total, date, days };
+}
+
+// The resume card: the peeked session's progress line and the jump
+// back into /match.
+function ResumeCard({
+  createdAt,
+  done,
+  total,
+}: Readonly<{ createdAt: Timestamp | undefined; done: number; total: number }>) {
+  const navigate = useNavigate();
+  return (
+    <div className="border-line bg-surface-card shadow-card rounded-card flex items-center gap-3 border p-3.5">
+      <div className="min-w-0 flex-1">
+        <div className="text-ink text-[13.5px] font-extrabold">{m.home_resume_title()}</div>
+        <div className="text-ink-tertiary mt-0.75 text-[11.5px] leading-[1.7]">
+          {m.home_resume_desc(resumeDescVars(createdAt, done, total))}
+        </div>
+      </div>
+      <button
+        className="bg-cta-practice shadow-cta-practice rounded-control shrink-0 px-3.5 py-2 text-[12.5px] font-bold text-white active:opacity-80"
+        onClick={() => void navigate({ to: "/match" })}
+        type="button"
+      >
+        {m.home_resume_cta()}
+      </button>
+    </div>
+  );
+}
+
+// The start CTA card: the desc, the primary button, and the hint line.
+function CtaCard({
+  authed,
+  hasGames,
+  onStart,
+}: Readonly<{ authed: boolean; hasGames: boolean; onStart: () => void }>) {
+  return (
+    <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-4.5">
+      <div className="text-ink text-base font-extrabold">{m.home_cta_title()}</div>
+      <p className="text-ink-tertiary mt-1.25 text-[11.5px] leading-[1.7]">
+        {/* The desc follows the games state alone (prototype law): a
+            guest has no preferences yet, so it reads the pick-games
+            line — the login-first ordering rides on the button and
+            hint, not the desc. */}
+        {!hasGames ? m.home_cta_desc_need_games() : m.home_cta_desc_ready()}
+      </p>
+      <button
+        className="bg-cta-primary shadow-cta-primary rounded-control mt-3.5 w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
+        onClick={onStart}
+        type="button"
+      >
+        {!authed ? m.home_cta_login() : !hasGames ? m.home_cta_pick() : m.home_cta_start()}
+      </button>
+      {!(authed && hasGames) && (
+        <p className="text-ink-tertiary mt-2.25 text-center text-[11px]">
+          {!authed ? m.home_hint_login() : m.home_hint_games()}
+        </p>
+      )}
+    </div>
+  );
 }
 
 export function HomePage() {
@@ -86,45 +145,10 @@ export function HomePage() {
         </div>
 
         {showResume && resume !== null && (
-          <div className="border-line bg-surface-card shadow-card rounded-card flex items-center gap-3 border p-3.5">
-            <div className="min-w-0 flex-1">
-              <div className="text-ink text-[13.5px] font-extrabold">{m.home_resume_title()}</div>
-              <div className="text-ink-tertiary mt-[3px] text-[11.5px] leading-[1.7]">
-                {m.home_resume_desc(resumeDescVars(resume.createdAt, resumeDone, resumeSteps))}
-              </div>
-            </div>
-            <button
-              className="bg-cta-practice shadow-cta-practice rounded-control shrink-0 px-3.5 py-2 text-[12.5px] font-bold text-white active:opacity-80"
-              onClick={() => void navigate({ to: "/match" })}
-              type="button"
-            >
-              {m.home_resume_cta()}
-            </button>
-          </div>
+          <ResumeCard createdAt={resume.createdAt} done={resumeDone} total={resumeSteps} />
         )}
 
-        <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-[18px]">
-          <div className="text-ink text-base font-extrabold">{m.home_cta_title()}</div>
-          <p className="text-ink-tertiary mt-[5px] text-[11.5px] leading-[1.7]">
-            {/* The desc follows the games state alone (prototype law): a
-                guest has no preferences yet, so it reads the pick-games
-                line — the login-first ordering rides on the button and
-                hint, not the desc. */}
-            {!hasGames ? m.home_cta_desc_need_games() : m.home_cta_desc_ready()}
-          </p>
-          <button
-            className="bg-cta-primary shadow-cta-primary rounded-control mt-3.5 w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
-            onClick={onStart}
-            type="button"
-          >
-            {!authed ? m.home_cta_login() : !hasGames ? m.home_cta_pick() : m.home_cta_start()}
-          </button>
-          {!(authed && hasGames) && (
-            <p className="text-ink-tertiary mt-[9px] text-center text-[11px]">
-              {!authed ? m.home_hint_login() : m.home_hint_games()}
-            </p>
-          )}
-        </div>
+        <CtaCard authed={authed} hasGames={hasGames} onStart={onStart} />
 
         <SoonCard description={m.home_soon_desc()} title={m.home_soon_title()} />
       </div>

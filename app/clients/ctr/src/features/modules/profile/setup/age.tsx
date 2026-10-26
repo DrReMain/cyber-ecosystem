@@ -1,8 +1,7 @@
 import { useQuery } from "@connectrpc/connect-query";
-import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import { ProfileSex } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile_pb";
+import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
-import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import { ageOf, MONTHS, years } from "#/features/app/birth";
@@ -107,30 +106,32 @@ export function SetupAgePage() {
           <span className="text-danger-text"> *</span>
         </div>
         <p className="text-ink-muted mb-2.5 text-[11.5px]">{m.profile_sex_hint()}</p>
+        {/* A native radio per option, visually hijacked by the segmented
+            skin: the sr-only input carries the semantics (checked,
+            arrow-key grouping), the sibling span carries the paint, and
+            peer-checked keeps the two in lockstep with no state mirror. */}
         <div
           aria-label={m.profile_sex_label()}
           className="bg-surface-input border-line-soft rounded-control flex gap-1 border p-1"
           role="radiogroup"
         >
           {sexOptions.map((option) => (
-            <button
-              aria-checked={sex === option.value}
-              className={clsx(
-                "flex-1 cursor-pointer rounded-[9px] py-[11px] text-center text-[13.5px]",
-                sex === option.value
-                  ? "bg-focus font-bold text-white shadow-[0_4px_12px_rgba(59,130,246,0.4)]"
-                  : "text-ink-muted",
-              )}
-              key={option.value}
-              onClick={() => {
-                setSex(option.value);
-                setError(null);
-              }}
-              role="radio"
-              type="button"
-            >
-              {option.label}
-            </button>
+            <label className="flex-1 cursor-pointer" key={option.value}>
+              <input
+                checked={sex === option.value}
+                className="peer sr-only"
+                name="profile-sex"
+                onChange={() => {
+                  setSex(option.value);
+                  setError(null);
+                }}
+                type="radio"
+                value={option.value}
+              />
+              <span className="text-ink-muted peer-checked:bg-focus peer-focus-visible:ring-focus block rounded-[9px] py-2.75 text-center text-[13.5px] peer-checked:font-bold peer-checked:text-white peer-checked:shadow-[0_4px_12px_rgba(59,130,246,0.4)] peer-focus-visible:ring-2">
+                {option.label}
+              </span>
+            </label>
           ))}
         </div>
       </div>
@@ -181,14 +182,14 @@ export function SetupAgePage() {
           </select>
         </div>
         {complete && derivedBand !== null && (
-          <p className="text-accent-info mt-[9px] text-[10.5px]">
+          <p className="text-accent-info mt-2.25 text-[10.5px]">
             {m.profile_setup_band_derived({ band: bandLabel(derivedBand) ?? "" })}
           </p>
         )}
       </div>
 
       {needGuardian || minorNote ? (
-        <div className="bg-surface-content text-status-pending rounded-control border border-[rgba(245,158,11,0.5)] px-[13px] py-[11px] text-[11.5px] leading-[1.7]">
+        <div className="bg-surface-content text-status-pending rounded-control border border-[rgba(245,158,11,0.5)] px-3.25 py-2.75 text-[11.5px] leading-[1.7]">
           {needGuardian ? (
             <>
               {m.profile_minor_u13_lead()}
@@ -207,7 +208,7 @@ export function SetupAgePage() {
 
       {needGuardian ? (
         <div>
-          <label className="text-ink-muted flex cursor-pointer items-start gap-[9px] text-[12px] leading-[1.6]">
+          <label className="text-ink-muted flex cursor-pointer items-start gap-2.25 text-[12px] leading-[1.6]">
             <input
               checked={guardian}
               className="mt-px h-4 w-4 shrink-0 accent-[#2563eb]"
@@ -223,7 +224,7 @@ export function SetupAgePage() {
               {m.profile_guardian_tail()}
             </span>
           </label>
-          <p className="text-ink-tertiary ml-[25px] text-[10.5px] leading-snug">
+          <p className="text-ink-tertiary ml-6.25 text-[10.5px] leading-snug">
             {m.profile_guardian_note()}
           </p>
         </div>
@@ -236,7 +237,7 @@ export function SetupAgePage() {
       )}
 
       <Button
-        className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50"
+        className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50"
         isDisabled={updateMutation.isPending}
         onPress={() => void onNext()}
       >

@@ -23,6 +23,8 @@ interface EndFaceProps {
   readonly onExit: () => void;
 }
 
+type DoneVerdict = Extract<SubmitVerdict, { phase: "done" }>;
+
 // Row key → label copy (every derivation key has its bilingual home here).
 const ROW_LABELS: Record<string, () => string> = {
   taps: m.test_result_taps,
@@ -138,6 +140,63 @@ function findNextStep(step: StepContext): StepRef | undefined {
   );
 }
 
+// The session's retake budget: the first run of the lineup carries
+// three chances, later sessions one.
+function retakeBudget(step: StepContext | null): number {
+  return step !== null ? (step.firstSession ? 3 : 1) : 0;
+}
+
+// The submit chain's done-and-valid face: the big score with its unit,
+// the grade chip, and the ungraded note that keeps the chip's shape
+// with the honest why.
+function ValidScore({ verdict }: Readonly<{ verdict: DoneVerdict }>) {
+  return (
+    <>
+      <div className="mt-1.5 flex items-baseline justify-center gap-1.5">
+        <span className="text-ink text-[58px] leading-none font-black tabular-nums">
+          {verdict.authoritativeScore ?? "—"}
+        </span>
+        <span className="text-ink-tertiary text-sm">{m.test_result_unit()}</span>
+      </div>
+      <div className="mt-2.5">
+        <TierChip grade={verdict.grade} />
+        {/* D-AO: the ungraded chip keeps its shape, with the honest
+            note on why — the game's norms are still accumulating. */}
+        {verdict.grade === undefined && (
+          <div className="text-ink-tertiary mt-1.5 text-[10.5px]">{m.test_grade_off_note()}</div>
+        )}
+      </div>
+    </>
+  );
+}
+
+// The invalid attempt's amber card: the verdict word plus the
+// ops-vocabulary reason resolved to user copy.
+function InvalidNotice({ reason }: Readonly<{ reason: string | undefined }>) {
+  return (
+    <div className="text-status-pending rounded-control mt-3 border border-[rgba(245,158,11,0.45)] bg-transparent px-3.25 py-3 text-left text-[12px] leading-[1.85]">
+      <span className="font-bold">{m.test_verdict_invalid()}</span>
+      <span className="opacity-80"> · {invalidCopy(reason)}</span>
+    </div>
+  );
+}
+
+// The submit failure's face: the error word with its inline retry.
+function SubmitError({ onResubmit }: Readonly<{ onResubmit: () => void }>) {
+  return (
+    <div className="mt-3">
+      <div className="text-status-pending text-sm font-bold">{m.test_submit_error()}</div>
+      <button
+        className="text-ink-tertiary cursor-pointer text-xs underline active:opacity-60"
+        onClick={onResubmit}
+        type="button"
+      >
+        {m.common_retry()}
+      </button>
+    </div>
+  );
+}
+
 // The score card: the ability line, then the submit chain's face — big
 // score with grade chip, the pending pulse, the invalid card, the error
 // card with its retry — and the retake receipt chip.
@@ -153,7 +212,7 @@ function VerdictCard({
   onResubmit: () => void;
 }>) {
   const word = step !== null ? abilityWord(step.ability) : null;
-  const maxRetakes = step !== null ? (step.firstSession ? 3 : 1) : 0;
+  const maxRetakes = retakeBudget(step);
   const retakeLeft = verdict.phase === "done" ? verdict.retestLeft : (step?.retestLeft ?? 0);
   return (
     <div className="border-line bg-surface-card rounded-card border px-4 py-4.5 text-center">
@@ -167,44 +226,11 @@ function VerdictCard({
           {m.test_verdict_pending()}
         </div>
       )}
-      {verdict.phase === "done" && verdict.valid && (
-        <>
-          <div className="mt-1.5 flex items-baseline justify-center gap-1.5">
-            <span className="text-ink text-[58px] leading-none font-black tabular-nums">
-              {verdict.authoritativeScore ?? "—"}
-            </span>
-            <span className="text-ink-tertiary text-sm">{m.test_result_unit()}</span>
-          </div>
-          <div className="mt-2.5">
-            <TierChip grade={verdict.grade} />
-            {/* D-AO: the ungraded chip keeps its shape, with the honest
-                note on why — the game's norms are still accumulating. */}
-            {verdict.grade === undefined && (
-              <div className="text-ink-tertiary mt-1.5 text-[10.5px]">
-                {m.test_grade_off_note()}
-              </div>
-            )}
-          </div>
-        </>
-      )}
-      {verdict.phase === "done" && !verdict.valid && (
-        <div className="text-status-pending rounded-control mt-3 border border-[rgba(245,158,11,0.45)] bg-transparent px-3.25 py-3 text-left text-[12px] leading-[1.85]">
-          <span className="font-bold">{m.test_verdict_invalid()}</span>
-          <span className="opacity-80"> · {invalidCopy(verdict.invalidReason)}</span>
-        </div>
-      )}
-      {verdict.phase === "error" && (
-        <div className="mt-3">
-          <div className="text-status-pending text-sm font-bold">{m.test_submit_error()}</div>
-          <button
-            className="text-ink-tertiary cursor-pointer text-xs underline active:opacity-60"
-            onClick={onResubmit}
-            type="button"
-          >
-            {m.common_retry()}
-          </button>
-        </div>
-      )}
+      {verdict.phase === "done" && verdict.valid ? <ValidScore verdict={verdict} /> : null}
+      {verdict.phase === "done" && !verdict.valid ? (
+        <InvalidNotice reason={verdict.invalidReason} />
+      ) : null}
+      {verdict.phase === "error" ? <SubmitError onResubmit={onResubmit} /> : null}
       {verdict.phase === "done" && verdict.inSession ? (
         <div className="mt-3 flex flex-wrap justify-center gap-2">
           <RetakeChip left={retakeLeft} max={maxRetakes} />
