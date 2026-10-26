@@ -114,7 +114,11 @@ export const movingTargetModule: GameModule = {
     svg.style.display = "none";
     stage.appendChild(svg);
     const crosshair = document.createElement("div");
-    crosshair.className = "pointer-events-none absolute h-10 w-10 text-white/90 left-0 top-0";
+    // The -translate pair centers the 40px box on the aim point — without
+    // it the drawn cross sits at the box's top-left, 20px down-right of
+    // the player's actual finger (a perfect-band-sized lie).
+    crosshair.className =
+      "pointer-events-none absolute top-0 left-0 h-10 w-10 -translate-x-1/2 -translate-y-1/2 text-white/90";
     crosshair.style.display = "none";
     const hBar = document.createElement("div");
     hBar.className = "absolute top-1/2 left-0 h-0.5 w-full -translate-y-1/2 bg-current";
