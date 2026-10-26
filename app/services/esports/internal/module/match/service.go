@@ -61,6 +61,19 @@ func (s *MatchService) SwitchMatchGenre(ctx context.Context, in *esportspb.Switc
 	return &esportspb.SwitchMatchGenreResponse{Session: mapSessionPB(v)}, nil
 }
 
+func (s *MatchService) PeekMatchSession(ctx context.Context, _ *esportspb.PeekMatchSessionRequest) (*esportspb.PeekMatchSessionResponse, error) {
+	v, err := s.matchUC.Peek(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if v == nil {
+		// Absent session = the response's whole truth (message-field
+		// presence is the null/zero contract); no error channel for it.
+		return &esportspb.PeekMatchSessionResponse{}, nil
+	}
+	return &esportspb.PeekMatchSessionResponse{Session: mapSessionPB(v)}, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func mapSessionPB(v *SessionView) *esportspb.MatchSession {

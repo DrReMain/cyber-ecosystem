@@ -427,6 +427,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetMatchSessionResponse'
+    /api/v1/esports/match/session/peek:
+        get:
+            tags:
+                - MatchService
+            description: |-
+                The read-only sibling of GetMatchSession: reports the member's active
+                 in-window session, if any — never creates, never lazily expires, never
+                 votes a genre. (A minting surface here would hijack a later explicit
+                 genre choice: a resume ignores the genre param.) Over-window sessions
+                 read absent; the next GetMatchSession owns closing and redrawing them.
+            operationId: MatchService_PeekMatchSession
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.PeekMatchSessionResponse'
     /api/v1/esports/match/session/switch:
         post:
             tags:
@@ -3556,6 +3574,16 @@ components:
                     description: |-
                         Success implies present — create answers with the payer's
                          continuation material or fails.
+        cyber.esports.v1.PeekMatchSessionResponse:
+            type: object
+            properties:
+                session:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.MatchSession'
+                    description: |-
+                        Absent when no in-window session exists — message-field presence is
+                         the null/zero contract for entities (§3); a present session is the
+                         resume face's whole truth.
         cyber.esports.v1.Point:
             type: object
             properties:

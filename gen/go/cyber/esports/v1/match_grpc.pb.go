@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	MatchService_GetMatchSession_FullMethodName  = "/cyber.esports.v1.MatchService/GetMatchSession"
 	MatchService_SwitchMatchGenre_FullMethodName = "/cyber.esports.v1.MatchService/SwitchMatchGenre"
+	MatchService_PeekMatchSession_FullMethodName = "/cyber.esports.v1.MatchService/PeekMatchSession"
 )
 
 // MatchServiceClient is the client API for MatchService service.
@@ -40,6 +41,12 @@ type MatchServiceClient interface {
 	// session closes (even a fresh one) and a new one opens with a forced-new
 	// seed — the same test may be drawn again in the replacement.
 	SwitchMatchGenre(ctx context.Context, in *SwitchMatchGenreRequest, opts ...grpc.CallOption) (*SwitchMatchGenreResponse, error)
+	// The read-only sibling of GetMatchSession: reports the member's active
+	// in-window session, if any — never creates, never lazily expires, never
+	// votes a genre. (A minting surface here would hijack a later explicit
+	// genre choice: a resume ignores the genre param.) Over-window sessions
+	// read absent; the next GetMatchSession owns closing and redrawing them.
+	PeekMatchSession(ctx context.Context, in *PeekMatchSessionRequest, opts ...grpc.CallOption) (*PeekMatchSessionResponse, error)
 }
 
 type matchServiceClient struct {
@@ -70,6 +77,16 @@ func (c *matchServiceClient) SwitchMatchGenre(ctx context.Context, in *SwitchMat
 	return out, nil
 }
 
+func (c *matchServiceClient) PeekMatchSession(ctx context.Context, in *PeekMatchSessionRequest, opts ...grpc.CallOption) (*PeekMatchSessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PeekMatchSessionResponse)
+	err := c.cc.Invoke(ctx, MatchService_PeekMatchSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MatchServiceServer is the server API for MatchService service.
 // All implementations must embed UnimplementedMatchServiceServer
 // for forward compatibility.
@@ -87,6 +104,12 @@ type MatchServiceServer interface {
 	// session closes (even a fresh one) and a new one opens with a forced-new
 	// seed — the same test may be drawn again in the replacement.
 	SwitchMatchGenre(context.Context, *SwitchMatchGenreRequest) (*SwitchMatchGenreResponse, error)
+	// The read-only sibling of GetMatchSession: reports the member's active
+	// in-window session, if any — never creates, never lazily expires, never
+	// votes a genre. (A minting surface here would hijack a later explicit
+	// genre choice: a resume ignores the genre param.) Over-window sessions
+	// read absent; the next GetMatchSession owns closing and redrawing them.
+	PeekMatchSession(context.Context, *PeekMatchSessionRequest) (*PeekMatchSessionResponse, error)
 	mustEmbedUnimplementedMatchServiceServer()
 }
 
@@ -102,6 +125,9 @@ func (UnimplementedMatchServiceServer) GetMatchSession(context.Context, *GetMatc
 }
 func (UnimplementedMatchServiceServer) SwitchMatchGenre(context.Context, *SwitchMatchGenreRequest) (*SwitchMatchGenreResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SwitchMatchGenre not implemented")
+}
+func (UnimplementedMatchServiceServer) PeekMatchSession(context.Context, *PeekMatchSessionRequest) (*PeekMatchSessionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PeekMatchSession not implemented")
 }
 func (UnimplementedMatchServiceServer) mustEmbedUnimplementedMatchServiceServer() {}
 func (UnimplementedMatchServiceServer) testEmbeddedByValue()                      {}
@@ -160,6 +186,24 @@ func _MatchService_SwitchMatchGenre_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MatchService_PeekMatchSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PeekMatchSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MatchServiceServer).PeekMatchSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MatchService_PeekMatchSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MatchServiceServer).PeekMatchSession(ctx, req.(*PeekMatchSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MatchService_ServiceDesc is the grpc.ServiceDesc for MatchService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -174,6 +218,10 @@ var MatchService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SwitchMatchGenre",
 			Handler:    _MatchService_SwitchMatchGenre_Handler,
+		},
+		{
+			MethodName: "PeekMatchSession",
+			Handler:    _MatchService_PeekMatchSession_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

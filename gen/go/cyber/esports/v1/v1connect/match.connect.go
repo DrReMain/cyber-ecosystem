@@ -39,6 +39,9 @@ const (
 	// MatchServiceSwitchMatchGenreProcedure is the fully-qualified name of the MatchService's
 	// SwitchMatchGenre RPC.
 	MatchServiceSwitchMatchGenreProcedure = "/cyber.esports.v1.MatchService/SwitchMatchGenre"
+	// MatchServicePeekMatchSessionProcedure is the fully-qualified name of the MatchService's
+	// PeekMatchSession RPC.
+	MatchServicePeekMatchSessionProcedure = "/cyber.esports.v1.MatchService/PeekMatchSession"
 )
 
 // MatchServiceClient is a client for the cyber.esports.v1.MatchService service.
@@ -48,6 +51,12 @@ type MatchServiceClient interface {
 	// session closes (even a fresh one) and a new one opens with a forced-new
 	// seed — the same test may be drawn again in the replacement.
 	SwitchMatchGenre(context.Context, *connect.Request[v1.SwitchMatchGenreRequest]) (*connect.Response[v1.SwitchMatchGenreResponse], error)
+	// The read-only sibling of GetMatchSession: reports the member's active
+	// in-window session, if any — never creates, never lazily expires, never
+	// votes a genre. (A minting surface here would hijack a later explicit
+	// genre choice: a resume ignores the genre param.) Over-window sessions
+	// read absent; the next GetMatchSession owns closing and redrawing them.
+	PeekMatchSession(context.Context, *connect.Request[v1.PeekMatchSessionRequest]) (*connect.Response[v1.PeekMatchSessionResponse], error)
 }
 
 // NewMatchServiceClient constructs a client for the cyber.esports.v1.MatchService service. By
@@ -73,6 +82,12 @@ func NewMatchServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(matchServiceMethods.ByName("SwitchMatchGenre")),
 			connect.WithClientOptions(opts...),
 		),
+		peekMatchSession: connect.NewClient[v1.PeekMatchSessionRequest, v1.PeekMatchSessionResponse](
+			httpClient,
+			baseURL+MatchServicePeekMatchSessionProcedure,
+			connect.WithSchema(matchServiceMethods.ByName("PeekMatchSession")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -80,6 +95,7 @@ func NewMatchServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 type matchServiceClient struct {
 	getMatchSession  *connect.Client[v1.GetMatchSessionRequest, v1.GetMatchSessionResponse]
 	switchMatchGenre *connect.Client[v1.SwitchMatchGenreRequest, v1.SwitchMatchGenreResponse]
+	peekMatchSession *connect.Client[v1.PeekMatchSessionRequest, v1.PeekMatchSessionResponse]
 }
 
 // GetMatchSession calls cyber.esports.v1.MatchService.GetMatchSession.
@@ -92,6 +108,11 @@ func (c *matchServiceClient) SwitchMatchGenre(ctx context.Context, req *connect.
 	return c.switchMatchGenre.CallUnary(ctx, req)
 }
 
+// PeekMatchSession calls cyber.esports.v1.MatchService.PeekMatchSession.
+func (c *matchServiceClient) PeekMatchSession(ctx context.Context, req *connect.Request[v1.PeekMatchSessionRequest]) (*connect.Response[v1.PeekMatchSessionResponse], error) {
+	return c.peekMatchSession.CallUnary(ctx, req)
+}
+
 // MatchServiceHandler is an implementation of the cyber.esports.v1.MatchService service.
 type MatchServiceHandler interface {
 	GetMatchSession(context.Context, *connect.Request[v1.GetMatchSessionRequest]) (*connect.Response[v1.GetMatchSessionResponse], error)
@@ -99,6 +120,12 @@ type MatchServiceHandler interface {
 	// session closes (even a fresh one) and a new one opens with a forced-new
 	// seed — the same test may be drawn again in the replacement.
 	SwitchMatchGenre(context.Context, *connect.Request[v1.SwitchMatchGenreRequest]) (*connect.Response[v1.SwitchMatchGenreResponse], error)
+	// The read-only sibling of GetMatchSession: reports the member's active
+	// in-window session, if any — never creates, never lazily expires, never
+	// votes a genre. (A minting surface here would hijack a later explicit
+	// genre choice: a resume ignores the genre param.) Over-window sessions
+	// read absent; the next GetMatchSession owns closing and redrawing them.
+	PeekMatchSession(context.Context, *connect.Request[v1.PeekMatchSessionRequest]) (*connect.Response[v1.PeekMatchSessionResponse], error)
 }
 
 // NewMatchServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -120,12 +147,20 @@ func NewMatchServiceHandler(svc MatchServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(matchServiceMethods.ByName("SwitchMatchGenre")),
 		connect.WithHandlerOptions(opts...),
 	)
+	matchServicePeekMatchSessionHandler := connect.NewUnaryHandler(
+		MatchServicePeekMatchSessionProcedure,
+		svc.PeekMatchSession,
+		connect.WithSchema(matchServiceMethods.ByName("PeekMatchSession")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.MatchService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MatchServiceGetMatchSessionProcedure:
 			matchServiceGetMatchSessionHandler.ServeHTTP(w, r)
 		case MatchServiceSwitchMatchGenreProcedure:
 			matchServiceSwitchMatchGenreHandler.ServeHTTP(w, r)
+		case MatchServicePeekMatchSessionProcedure:
+			matchServicePeekMatchSessionHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -141,4 +176,8 @@ func (UnimplementedMatchServiceHandler) GetMatchSession(context.Context, *connec
 
 func (UnimplementedMatchServiceHandler) SwitchMatchGenre(context.Context, *connect.Request[v1.SwitchMatchGenreRequest]) (*connect.Response[v1.SwitchMatchGenreResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.MatchService.SwitchMatchGenre is not implemented"))
+}
+
+func (UnimplementedMatchServiceHandler) PeekMatchSession(context.Context, *connect.Request[v1.PeekMatchSessionRequest]) (*connect.Response[v1.PeekMatchSessionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.MatchService.PeekMatchSession is not implemented"))
 }

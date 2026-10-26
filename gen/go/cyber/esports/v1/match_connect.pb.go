@@ -11,4 +11,5 @@ import (
 func RegisterMatchServiceConnectServer(srv *connect.Server, svc MatchServiceServer) {
 	connect.HandleUnary(srv, "/cyber.esports.v1.MatchService/GetMatchSession", svc.GetMatchSession)
 	connect.HandleUnary(srv, "/cyber.esports.v1.MatchService/SwitchMatchGenre", svc.SwitchMatchGenre)
+	connect.HandleUnary(srv, "/cyber.esports.v1.MatchService/PeekMatchSession", svc.PeekMatchSession)
 }

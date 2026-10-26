@@ -87,6 +87,49 @@ func TestGetCreateRaceReturnsSurvivor(t *testing.T) {
 	}
 }
 
+// The peek law under test: a pure read — an in-window session reports, an
+// over-window one reads absent (without Get's lazy expire write), and no
+// active row reads absent; none of the three paths creates or writes.
+func TestPeekIsReadOnly(t *testing.T) {
+	rp := &fakeMatchRP{active: &MatchSession{
+		ID: "s1", UserID: "u1", Genre: "fps", Status: statusActive, CreatedAt: time.Now(),
+		Steps:        []types.MatchStep{{Ability: "reactionSpeed", TestCode: "red_dot"}},
+		RetestBudget: 1,
+	}}
+	uc := NewMatchUC(slog.Default(), nil, rp, &fakeMatchTestRP{}, nil, nil)
+	view, err := uc.Peek(memberCtx())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if view == nil || view.Session.ID != "s1" {
+		t.Fatalf("view = %+v, want the in-window session s1", view)
+	}
+
+	// Over-window: absent, and the lazy expire stays Get's job.
+	rp.active.CreatedAt = time.Now().Add(-matchResumeWindow - time.Hour)
+	view, err = uc.Peek(memberCtx())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if view != nil {
+		t.Fatalf("over-window view = %+v, want absent", view)
+	}
+
+	// No active row: absent.
+	rp.active = nil
+	view, err = uc.Peek(memberCtx())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if view != nil {
+		t.Fatalf("no-active view = %+v, want absent", view)
+	}
+
+	if len(rp.statusCalls) != 0 || rp.created != nil {
+		t.Fatalf("statusCalls = %v, created = %+v — peek must not write", rp.statusCalls, rp.created)
+	}
+}
+
 func memberCtx() context.Context {
 	return security.WithSubject(context.Background(), &security.Subject{UserID: "u1"})
 }

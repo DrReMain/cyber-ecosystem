@@ -382,6 +382,89 @@ func (x *SwitchMatchGenreResponse) GetSession() *MatchSession {
 	return nil
 }
 
+type PeekMatchSessionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PeekMatchSessionRequest) Reset() {
+	*x = PeekMatchSessionRequest{}
+	mi := &file_cyber_esports_v1_match_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PeekMatchSessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PeekMatchSessionRequest) ProtoMessage() {}
+
+func (x *PeekMatchSessionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_match_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PeekMatchSessionRequest.ProtoReflect.Descriptor instead.
+func (*PeekMatchSessionRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_match_proto_rawDescGZIP(), []int{6}
+}
+
+type PeekMatchSessionResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Absent when no in-window session exists — message-field presence is
+	// the null/zero contract for entities (§3); a present session is the
+	// resume face's whole truth.
+	Session       *MatchSession `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PeekMatchSessionResponse) Reset() {
+	*x = PeekMatchSessionResponse{}
+	mi := &file_cyber_esports_v1_match_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PeekMatchSessionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PeekMatchSessionResponse) ProtoMessage() {}
+
+func (x *PeekMatchSessionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_match_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PeekMatchSessionResponse.ProtoReflect.Descriptor instead.
+func (*PeekMatchSessionResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_match_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *PeekMatchSessionResponse) GetSession() *MatchSession {
+	if x != nil {
+		return x.Session
+	}
+	return nil
+}
+
 var File_cyber_esports_v1_match_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_match_proto_rawDesc = "" +
@@ -416,12 +499,17 @@ const file_cyber_esports_v1_match_proto_rawDesc = "" +
 	"\asession\x18\x01 \x01(\v2\x1e.cyber.esports.v1.MatchSessionR\asession\x12\x18\n" +
 	"\acreated\x18\x02 \x01(\bR\acreated\"T\n" +
 	"\x18SwitchMatchGenreResponse\x128\n" +
-	"\asession\x18\x01 \x01(\v2\x1e.cyber.esports.v1.MatchSessionR\asession2\xb5\x03\n" +
+	"\asession\x18\x01 \x01(\v2\x1e.cyber.esports.v1.MatchSessionR\asession\"\x19\n" +
+	"\x17PeekMatchSessionRequest\"T\n" +
+	"\x18PeekMatchSessionResponse\x128\n" +
+	"\asession\x18\x01 \x01(\v2\x1e.cyber.esports.v1.MatchSessionR\asession2\x89\x05\n" +
 	"\fMatchService\x12\xcb\x01\n" +
 	"\x0fGetMatchSession\x12(.cyber.esports.v1.GetMatchSessionRequest\x1a).cyber.esports.v1.GetMatchSessionResponse\"c\x88\xf1\x04\x04\x8a\xd3\x0e6\n" +
 	"2获取匹配会话(无则按偏好多数票编排)\x10\x01\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/esports/match/session\x12\xc4\x01\n" +
 	"\x10SwitchMatchGenre\x12).cyber.esports.v1.SwitchMatchGenreRequest\x1a*.cyber.esports.v1.SwitchMatchGenreResponse\"Y\x88\xf1\x04\x04\x8a\xd3\x0e\"\n" +
-	"\x1e切换类型重排匹配会话\x10\x02\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/esports/match/session/switch\x1a\x10\x8a\xe2\t\f匹配会话B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	"\x1e切换类型重排匹配会话\x10\x02\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/esports/match/session/switch\x12\xd1\x01\n" +
+	"\x10PeekMatchSession\x12).cyber.esports.v1.PeekMatchSessionRequest\x1a*.cyber.esports.v1.PeekMatchSessionResponse\"f\x88\xf1\x04\x04\x8a\xd3\x0e4\n" +
+	"0窥视进行中的匹配会话(只读,无则空)\x10\x01\x82\xd3\xe4\x93\x02$\x12\"/api/v1/esports/match/session/peek\x1a\x10\x8a\xe2\t\f匹配会话B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_match_proto_rawDescOnce sync.Once
@@ -435,7 +523,7 @@ func file_cyber_esports_v1_match_proto_rawDescGZIP() []byte {
 	return file_cyber_esports_v1_match_proto_rawDescData
 }
 
-var file_cyber_esports_v1_match_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_cyber_esports_v1_match_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_cyber_esports_v1_match_proto_goTypes = []any{
 	(*GetMatchSessionRequest)(nil),   // 0: cyber.esports.v1.GetMatchSessionRequest
 	(*SwitchMatchGenreRequest)(nil),  // 1: cyber.esports.v1.SwitchMatchGenreRequest
@@ -443,32 +531,37 @@ var file_cyber_esports_v1_match_proto_goTypes = []any{
 	(*MatchSession)(nil),             // 3: cyber.esports.v1.MatchSession
 	(*GetMatchSessionResponse)(nil),  // 4: cyber.esports.v1.GetMatchSessionResponse
 	(*SwitchMatchGenreResponse)(nil), // 5: cyber.esports.v1.SwitchMatchGenreResponse
-	nil,                              // 6: cyber.esports.v1.MatchSession.RetestLeftEntry
-	(*wrapperspb.StringValue)(nil),   // 7: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),    // 8: google.protobuf.Timestamp
-	(*wrapperspb.BoolValue)(nil),     // 9: google.protobuf.BoolValue
+	(*PeekMatchSessionRequest)(nil),  // 6: cyber.esports.v1.PeekMatchSessionRequest
+	(*PeekMatchSessionResponse)(nil), // 7: cyber.esports.v1.PeekMatchSessionResponse
+	nil,                              // 8: cyber.esports.v1.MatchSession.RetestLeftEntry
+	(*wrapperspb.StringValue)(nil),   // 9: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),    // 10: google.protobuf.Timestamp
+	(*wrapperspb.BoolValue)(nil),     // 11: google.protobuf.BoolValue
 }
 var file_cyber_esports_v1_match_proto_depIdxs = []int32{
-	7,  // 0: cyber.esports.v1.MatchStep.ability:type_name -> google.protobuf.StringValue
-	7,  // 1: cyber.esports.v1.MatchStep.test_code:type_name -> google.protobuf.StringValue
-	7,  // 2: cyber.esports.v1.MatchSession.id:type_name -> google.protobuf.StringValue
-	7,  // 3: cyber.esports.v1.MatchSession.genre:type_name -> google.protobuf.StringValue
-	7,  // 4: cyber.esports.v1.MatchSession.difficulty:type_name -> google.protobuf.StringValue
+	9,  // 0: cyber.esports.v1.MatchStep.ability:type_name -> google.protobuf.StringValue
+	9,  // 1: cyber.esports.v1.MatchStep.test_code:type_name -> google.protobuf.StringValue
+	9,  // 2: cyber.esports.v1.MatchSession.id:type_name -> google.protobuf.StringValue
+	9,  // 3: cyber.esports.v1.MatchSession.genre:type_name -> google.protobuf.StringValue
+	9,  // 4: cyber.esports.v1.MatchSession.difficulty:type_name -> google.protobuf.StringValue
 	2,  // 5: cyber.esports.v1.MatchSession.steps:type_name -> cyber.esports.v1.MatchStep
-	6,  // 6: cyber.esports.v1.MatchSession.retest_left:type_name -> cyber.esports.v1.MatchSession.RetestLeftEntry
-	8,  // 7: cyber.esports.v1.MatchSession.created_at:type_name -> google.protobuf.Timestamp
-	9,  // 8: cyber.esports.v1.MatchSession.first_session:type_name -> google.protobuf.BoolValue
+	8,  // 6: cyber.esports.v1.MatchSession.retest_left:type_name -> cyber.esports.v1.MatchSession.RetestLeftEntry
+	10, // 7: cyber.esports.v1.MatchSession.created_at:type_name -> google.protobuf.Timestamp
+	11, // 8: cyber.esports.v1.MatchSession.first_session:type_name -> google.protobuf.BoolValue
 	3,  // 9: cyber.esports.v1.GetMatchSessionResponse.session:type_name -> cyber.esports.v1.MatchSession
 	3,  // 10: cyber.esports.v1.SwitchMatchGenreResponse.session:type_name -> cyber.esports.v1.MatchSession
-	0,  // 11: cyber.esports.v1.MatchService.GetMatchSession:input_type -> cyber.esports.v1.GetMatchSessionRequest
-	1,  // 12: cyber.esports.v1.MatchService.SwitchMatchGenre:input_type -> cyber.esports.v1.SwitchMatchGenreRequest
-	4,  // 13: cyber.esports.v1.MatchService.GetMatchSession:output_type -> cyber.esports.v1.GetMatchSessionResponse
-	5,  // 14: cyber.esports.v1.MatchService.SwitchMatchGenre:output_type -> cyber.esports.v1.SwitchMatchGenreResponse
-	13, // [13:15] is the sub-list for method output_type
-	11, // [11:13] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	3,  // 11: cyber.esports.v1.PeekMatchSessionResponse.session:type_name -> cyber.esports.v1.MatchSession
+	0,  // 12: cyber.esports.v1.MatchService.GetMatchSession:input_type -> cyber.esports.v1.GetMatchSessionRequest
+	1,  // 13: cyber.esports.v1.MatchService.SwitchMatchGenre:input_type -> cyber.esports.v1.SwitchMatchGenreRequest
+	6,  // 14: cyber.esports.v1.MatchService.PeekMatchSession:input_type -> cyber.esports.v1.PeekMatchSessionRequest
+	4,  // 15: cyber.esports.v1.MatchService.GetMatchSession:output_type -> cyber.esports.v1.GetMatchSessionResponse
+	5,  // 16: cyber.esports.v1.MatchService.SwitchMatchGenre:output_type -> cyber.esports.v1.SwitchMatchGenreResponse
+	7,  // 17: cyber.esports.v1.MatchService.PeekMatchSession:output_type -> cyber.esports.v1.PeekMatchSessionResponse
+	15, // [15:18] is the sub-list for method output_type
+	12, // [12:15] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_match_proto_init() }
@@ -484,7 +577,7 @@ func file_cyber_esports_v1_match_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_match_proto_rawDesc), len(file_cyber_esports_v1_match_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

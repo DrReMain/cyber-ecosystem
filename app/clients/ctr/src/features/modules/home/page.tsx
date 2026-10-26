@@ -1,7 +1,9 @@
+import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
 import { toast } from "sonner";
+import { peekMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import { SoonCard } from "#/components/soon-card";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
@@ -15,6 +17,18 @@ const homeOrbs: readonly AmbientOrb[] = [
   { className: "top-[280px] right-[-70px] size-[min(51vw,200px)]", tone: "purple" },
 ];
 
+/* The resume card's desc vars: the progress counts plus the age face —
+ * the prototype's inclusive day count (started today reads 已过 1 天) and
+ * a local-date stamp; createdAt is already the proto Timestamp string. */
+function resumeDescVars(createdAt: string | undefined, done: number, total: number) {
+  const created = createdAt !== undefined ? new Date(createdAt).getTime() : Date.now();
+  const days = Math.max(1, Math.floor((Date.now() - created) / 86_400_000) + 1);
+  const d = new Date(created);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return { done, total, date, days };
+}
+
 export function HomePage() {
   const navigate = useNavigate();
   const session = useQuery({ ...sessionQuery, throwOnError: false });
@@ -26,6 +40,14 @@ export function HomePage() {
   const authed = authedSession !== undefined;
   const profile = authedSession?.profile;
   const hasGames = (profile?.games ?? []).length > 0;
+  // The resume card's truth (prototype home): the read-only peek reports
+  // the active in-window session — never mints one, so a home visit can't
+  // hijack a later explicit genre choice. Guests skip the call entirely.
+  const peekQuery = useConnectQuery(peekMatchSession, {}, { enabled: authed });
+  const resume = peekQuery.data?.session ?? null;
+  const resumeSteps = (resume?.steps ?? []).length;
+  const resumeDone = (resume?.done ?? []).length;
+  const showResume = resume !== null && resumeSteps > 0 && resumeDone < resumeSteps;
 
   function onStart() {
     if (!authed) {
@@ -60,6 +82,26 @@ export function HomePage() {
             <Bell aria-hidden size={20} />
           </button>
         </div>
+
+        {showResume && resume !== null && (
+          <div className="border-line bg-surface-card shadow-card rounded-card flex items-center gap-3 border p-3.5">
+            <div className="min-w-0 flex-1">
+              <div className="text-ink text-[13.5px] font-extrabold">{m.home_resume_title()}</div>
+              <div className="text-ink-tertiary mt-[3px] text-[11.5px] leading-[1.7]">
+                {m.home_resume_desc(
+                  resumeDescVars(resume.createdAt, resumeDone, resumeSteps),
+                )}
+              </div>
+            </div>
+            <button
+              className="bg-cta-practice shadow-cta-practice rounded-control shrink-0 px-3.5 py-2 text-[12.5px] font-bold text-white active:opacity-80"
+              onClick={() => void navigate({ to: "/match" })}
+              type="button"
+            >
+              {m.home_resume_cta()}
+            </button>
+          </div>
+        )}
 
         <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-[18px]">
           <div className="text-ink text-base font-extrabold">{m.home_cta_title()}</div>
