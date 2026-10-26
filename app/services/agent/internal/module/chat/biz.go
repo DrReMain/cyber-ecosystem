@@ -257,7 +257,7 @@ func (uc *ChatUC) ListModels(ctx context.Context) ([]string, error) {
 	if apiKey != "" {
 		req.Header.Set("Authorization", "Bearer "+apiKey)
 	}
-	resp, err := (&http.Client{Timeout: 5 * time.Second}).Do(req)
+	resp, err := newGuardedHTTPClient(5*time.Second, modelsBodyCap).Do(req)
 	if err != nil {
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
@@ -312,11 +312,13 @@ func (uc *ChatUC) Stream(ctx context.Context, model string, turns []*Turn, emit 
 		return "", err
 	}
 	// Per-request construction: base_url is per-user, so there is no shared
-	// pool to reuse; stream lifetime is bounded by ctx, not by a client timeout.
+	// pool to reuse; the guarded client carries no timeout — stream lifetime
+	// stays bounded by ctx, and the outbound law matches ListModels.
 	cm, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
-		BaseURL: baseURL,
-		APIKey:  apiKey,
-		Model:   model,
+		BaseURL:    baseURL,
+		APIKey:     apiKey,
+		Model:      model,
+		HTTPClient: newGuardedHTTPClient(0, streamBodyCap),
 	})
 	if err != nil {
 		return "", mapUpstreamErr(err)
