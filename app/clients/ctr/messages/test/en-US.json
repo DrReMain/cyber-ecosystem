@@ -121,6 +121,7 @@
   "test_rm_legend_dragon": "Dragon",
   "test_rm_legend_enemy": "Enemy",
   "test_ns_round": "Round {n}",
+  "test_ns_next": "Next {n}",
   "test_ns_completed": "Cleared {n}",
   "test_cc_round": "Round {n}/{total}",
   "test_cc_enemy": "Enemy lineup",

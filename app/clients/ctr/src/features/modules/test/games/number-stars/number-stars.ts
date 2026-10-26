@@ -27,6 +27,7 @@ interface FaceParts {
   readonly field: HTMLElement;
   readonly chipRound: HTMLElement;
   readonly chipTime: HTMLElement;
+  readonly chipExpected: HTMLElement;
   readonly chipCompleted: HTMLElement;
 }
 
@@ -40,13 +41,17 @@ function buildFace(): FaceParts {
   chipRound.className = "text-[10px] font-semibold text-white/90";
   const chipTime = document.createElement("span");
   chipTime.className = "text-[10px] font-semibold text-white/90";
+  // The current target (the legacy header's 期望值) — the player never has
+  // to scan for the minimum themselves.
+  const chipExpected = document.createElement("span");
+  chipExpected.className = "text-[10px] font-semibold text-status-pending";
   const chipCompleted = document.createElement("span");
   chipCompleted.className = "text-[10px] font-semibold text-status-ok";
-  chip.append(chipRound, chipTime, chipCompleted);
+  chip.append(chipRound, chipTime, chipExpected, chipCompleted);
   const field = document.createElement("div");
   field.className = "relative flex-1 overflow-hidden";
   stage.append(chip, field);
-  return { stage, field, chipRound, chipTime, chipCompleted };
+  return { stage, field, chipRound, chipTime, chipExpected, chipCompleted };
 }
 
 export const numberStarsModule: GameModule = {
@@ -60,7 +65,7 @@ export const numberStarsModule: GameModule = {
       spawnMinGapPx: ctx.params.num("spawn_min_gap_px", NUMBER_STARS_DEFAULTS.spawnMinGapPx),
     };
 
-    const { stage, field, chipRound, chipTime, chipCompleted } = buildFace();
+    const { stage, field, chipRound, chipTime, chipExpected, chipCompleted } = buildFace();
 
     let started = false;
     let paused = false;
@@ -82,8 +87,12 @@ export const numberStarsModule: GameModule = {
       return { width: rect.width, height: rect.height };
     }
 
-    function fadeOut(el: HTMLElement, wrong: boolean): void {
-      if (wrong) {
+    // The legacy flash law, CSS-only: a correct tap flashes blue as it goes,
+    // a wrong tap red, a board redrawn under it fades neutrally.
+    function fadeOut(el: HTMLElement, tone: "neutral" | "correct" | "wrong"): void {
+      if (tone === "correct") {
+        el.classList.add("border-focus", "bg-focus", "text-white");
+      } else if (tone === "wrong") {
         el.classList.add("border-danger", "bg-danger", "text-white");
       }
       el.classList.add("opacity-0", "scale-50", "pointer-events-none");
@@ -94,6 +103,10 @@ export const numberStarsModule: GameModule = {
       const remaining = Math.max(0, ctx.durationMs - ctx.clock.elapsedMs());
       chipRound.textContent = m.test_ns_round({ n: roundSeq });
       chipTime.textContent = m.test_od_time_left({ s: (remaining / 1000).toFixed(1) });
+      const expected = sorted[progress];
+      if (expected !== undefined) {
+        chipExpected.textContent = m.test_ns_next({ n: expected });
+      }
       chipCompleted.textContent = m.test_ns_completed({ n: completed });
     }
 
@@ -113,7 +126,7 @@ export const numberStarsModule: GameModule = {
         Math.random,
       );
       for (const el of els) {
-        fadeOut(el, false);
+        fadeOut(el, "neutral");
       }
       els = [];
       sorted = ascending(numbers);
@@ -170,7 +183,7 @@ export const numberStarsModule: GameModule = {
       if (expected !== undefined && number === expected) {
         progress += 1;
         if (el !== undefined) {
-          fadeOut(el, false);
+          fadeOut(el, "correct");
           els = els.filter((candidate) => candidate !== el);
         }
         if (progress >= sorted.length) {
@@ -180,7 +193,7 @@ export const numberStarsModule: GameModule = {
       } else {
         // A wrong tap voids the round — red flash, redraw, next number.
         if (el !== undefined) {
-          fadeOut(el, true);
+          fadeOut(el, "wrong");
         }
         openRound();
       }

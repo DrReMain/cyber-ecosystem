@@ -121,6 +121,7 @@
   "test_rm_legend_dragon": "大龙",
   "test_rm_legend_enemy": "敌军",
   "test_ns_round": "回合 {n}",
+  "test_ns_next": "下一个 {n}",
   "test_ns_completed": "完成 {n} 轮",
   "test_cc_round": "回合 {n}/{total}",
   "test_cc_enemy": "敌方阵容",
