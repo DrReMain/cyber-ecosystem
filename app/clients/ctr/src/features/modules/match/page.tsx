@@ -166,11 +166,11 @@ export function MatchPage() {
   const nameOf = (code: string) => tests.find((t) => t.code === code)?.name ?? code;
   const engineReady = (code: string): boolean => getGameModule(code) !== null;
   const doneCount = (session?.done ?? []).length;
-  // An untested step is skippable by law, and a step whose engine has not
-  // shipped must be skipped — the start button walks the engine-backed
-  // steps only, never parking the flow on an unplayable one.
+  // The start button walks the linear path (prototype match-guide): the
+  // first step not yet done — a done step re-enters only by its own row
+  // tap, even with retakes left; the flow never re-parks on it.
   const next = steps.find(
-    (s) => s.testCode != null && leftOf(s.testCode) > 0 && engineReady(s.testCode),
+    (s) => s.testCode != null && !(session?.done ?? []).includes(s.testCode) && engineReady(s.testCode),
   );
   const undecided =
     (sessionQuery.error as { reason?: string } | null)?.reason === reasonGenreUndecided;
