@@ -1,6 +1,9 @@
-package shared_test
+package e2e
 
-// The tenant-isolation live guard. Tenancy on the read path is enforced by
+// The tenant-isolation live guard, in the cross-module live-e2e home: this
+// directory holds nothing but env-gated end-to-end tests (no non-test
+// files, so `go build` skips the package and it can never leak into a
+// production import). Tenancy on the read path is enforced by
 // four different mechanisms, and this guard pins each one where it lives:
 // role and file rows carry the tenant mixin (query interceptor filters,
 // insert hook back-fills); user rows carry no tenant column — visibility
