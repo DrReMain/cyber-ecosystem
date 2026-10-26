@@ -64,7 +64,11 @@ export function HomePage() {
         <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-[18px]">
           <div className="text-ink text-base font-extrabold">{m.home_cta_title()}</div>
           <p className="text-ink-tertiary mt-[5px] text-[11.5px] leading-[1.7]">
-            {authed && !hasGames ? m.home_cta_desc_need_games() : m.home_cta_desc_ready()}
+            {/* The desc follows the games state alone (prototype law): a
+                guest has no preferences yet, so it reads the pick-games
+                line — the login-first ordering rides on the button and
+                hint, not the desc. */}
+            {!hasGames ? m.home_cta_desc_need_games() : m.home_cta_desc_ready()}
           </p>
           <button
             className="bg-cta-primary shadow-cta-primary rounded-control mt-3.5 w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
