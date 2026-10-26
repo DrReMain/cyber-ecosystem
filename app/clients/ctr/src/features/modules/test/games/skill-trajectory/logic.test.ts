@@ -7,6 +7,7 @@ import {
   distance,
   generateBoard,
   MISS_DEV_SENTINEL,
+  matchPairs,
   mulberry32,
   SKILL_TRAJECTORY_DEFAULTS,
   shapeAt,
@@ -82,6 +83,30 @@ describe("skill-trajectory logic", () => {
     expect(best?.deviation).toBe(10);
     expect(bestPair([target], [beyond], 40)).toBeNull();
     expect(bestPair([target], [wrongColor], 40)).toBeNull();
+  });
+
+  it("pairs every match greedily nearest-first and leaves the rest unpaired", () => {
+    const t1 = { shape: "circle" as const, color: "blue" as const, center: { x: 100, y: 100 } };
+    const t2 = { shape: "circle" as const, color: "blue" as const, center: { x: 300, y: 100 } };
+    const t3 = { shape: "square" as const, color: "red" as const, center: { x: 200, y: 300 } };
+    // p1 sits between both circle targets but nearer t1; p2 claims t2;
+    // p3 is a square just past the cap; nothing claims t3.
+    const p1 = { shape: "circle" as const, color: "blue" as const, center: { x: 120, y: 100 } };
+    const p2 = { shape: "circle" as const, color: "blue" as const, center: { x: 310, y: 100 } };
+    const p3 = { shape: "square" as const, color: "red" as const, center: { x: 250, y: 300 } };
+    const pairs = matchPairs([t1, t2, t3], [p1, p2, p3], 40);
+    expect(pairs).toHaveLength(2);
+    // Nearest-first ordering: the representative head equals bestPair.
+    expect(pairs[0]?.target).toBe(t2);
+    expect(pairs[0]?.placement).toBe(p2);
+    expect(pairs[0]?.deviation).toBe(10);
+    expect(pairs[1]?.target).toBe(t1);
+    expect(pairs[1]?.placement).toBe(p1);
+    expect(pairs[1]?.deviation).toBe(20);
+    expect(bestPair([t1, t2, t3], [p1, p2, p3], 40)?.target).toBe(t2);
+    // The wrong-color and beyond-cap placements never pair.
+    expect(matchPairs([t3], [p3], 40)).toEqual([]);
+    expect(matchPairs([], [], 40)).toEqual([]);
   });
 
   it("renders each shape's polygon geometry", () => {
