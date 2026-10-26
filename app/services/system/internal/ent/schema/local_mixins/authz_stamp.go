@@ -88,6 +88,10 @@ func stampRelevant(m gen.Mutation) bool {
 	if _, ok := m.Field(userFieldEnabled); ok {
 		return true
 	}
-	_, deleted := m.Field(userFieldDeletedAt)
-	return deleted
+	if _, ok := m.Field(userFieldDeletedAt); ok {
+		return true
+	}
+	// A restore clears the marker — the SET-NULL path: the user re-enters
+	// the snapshot, so the un-delete moves the stamp too.
+	return m.FieldCleared(userFieldDeletedAt)
 }

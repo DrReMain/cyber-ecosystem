@@ -162,7 +162,7 @@ Two comment kinds are legal under `app/services/*`; a comment that is neither is
 | Divider | `// <Name>` + `-` run (~110 chars `biz`/`data`, ~120 `service`; equal ±5 to a same-file neighbor's run) | section boundaries only (§3 table) |
 | Inline | states non-obvious *why* only (trade-off, gotcha, concurrency); `MUST NOT` restate the code | inside a function, beside the line it explains |
 
-**Violation signature — declaration comment**: a `//` line whose next non-blank line opens a declaration (`type` / `func` / `const` / `var`) and whose text names or describes that symbol. Machine-enforced in `module/`, `client/`, `server/`, `platform/`, `bootstrap/` by `TestNoDeclarationComments` (conventions guard, `internal/shared`).
+**Violation signature — declaration comment**: a `//` line whose next non-blank line opens a declaration (`type` / `func` / `const` / `var`) and whose text names or describes that symbol. **Violation signature — file-header comment**: a `//` line after the package clause and before the first import or declaration — neither legal kind lives in that position, and the shape otherwise escapes the declaration signature (the next non-blank line opens `import`). Both machine-enforced in `module/`, `client/`, `server/`, `platform/`, `bootstrap/` by `TestNoDeclarationComments` (conventions guard, `internal/shared`).
 
 Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the DDL), never Go line comments (§3a); test files state the law under test, never process narration; `shared-go/` keeps godoc conventions — this section binds `app/services/*` only.
 
@@ -257,7 +257,7 @@ The IAM engine is a **mechanism every service replicates**, not a system-service
   - An interface injected to invert a semantically-cyclic dependency is the invisibility cloak of a cycle — banned even when the import graph stays acyclic.
 - **Version-stamp discipline.**
   - The version truth is a single `authz_stamps` row, bumped inside the change transaction by `AuthzStampMixin` on the tables feeding the snapshot — a bump that is a property of the tables cannot be forgotten by a writer (seed, admin paths, future code all covered). User rows bump only when a mutation assigns `enabled` or sets the soft-delete marker; profile edits never move the stamp (a password change must not recompile every replica).
-  - Writers wake after commit (`NotifyChanged` → pubsub publish only): a failed publish costs timeliness, never correctness.
+  - Writers wake after commit (`NotifyPolicyChanged` → pubsub publish only): a failed publish costs timeliness, never correctness.
   - Replicas rebuild compiled snapshots on watch — and every subscription-establishment point (first subscribe, reconnect) re-checks the stamp once: pubsub has no backlog, so a change published before the subscription existed is otherwise lost. Plus a low-frequency reconcile backstop.
   - Reconcile compares `!=` and rebuilds on any divergence: the stamp is monotonic by construction, but a rewind or a restored backup must heal, never pin a stale replica; a forced rebuild every 24h bounds any unknown staleness class.
   - No app-layer decision cache: the compiled in-memory snapshot IS the cache; ABAC constraints evaluate live on every request.

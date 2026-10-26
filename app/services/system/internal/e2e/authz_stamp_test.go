@@ -171,6 +171,27 @@ func TestAuthzStampLiveE2E(t *testing.T) {
 		t.Fatalf("user delete must bump: %d → %d", afterUser, s)
 	}
 
+	// Law one, the tombstone lift — a restore clears the marker through
+	// the SET-NULL path and the user re-enters the snapshot, so the
+	// un-delete moves the stamp exactly as the tombstone did.
+	u2, err := db.User.Create().SetAccount("e2e-authz-user2").SetPasswordHash("e2e-not-a-digest").Save(bare)
+	if err != nil {
+		t.Fatalf("user create two: %v", err)
+	}
+	afterCreate := stampRead(t, db)
+	if err = db.User.DeleteOneID(u2.ID).Exec(bare); err != nil {
+		t.Fatalf("user soft delete: %v", err)
+	}
+	if s := stampRead(t, db); s <= afterCreate {
+		t.Fatalf("soft delete must bump: %d → %d", afterCreate, s)
+	}
+	if _, err = db.User.UpdateOneID(u2.ID).ClearDeletedAt().Save(local_mixins.SkipSoftDelete(context.Background())); err != nil {
+		t.Fatalf("user restore: %v", err)
+	}
+	if s := stampRead(t, db); s <= afterCreate {
+		t.Fatalf("restore must bump: %d → %d", afterCreate, s)
+	}
+
 	// Law one, the vocabulary table — a population change moves the stamp
 	// because the snapshot compiles code → plane from it.
 	beforePop := stampRead(t, db)

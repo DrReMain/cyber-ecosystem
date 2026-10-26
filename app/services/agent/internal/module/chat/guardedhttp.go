@@ -1,18 +1,5 @@
 package chat
 
-// Outbound guard for member-configured providers: base_url is user input,
-// so every dial is attacker-influenced and must not reach address classes
-// the network stack itself reserves — loopback, link-local, unspecified,
-// multicast. Deployment topology (which LAN, which IP, DNS or not) is
-// never this code's business, so no other address is blocked: a private
-// unicast target is a first-class scenario. The check runs at dial time
-// on the address actually connected, which is what makes DNS rebinding
-// irrelevant, and it holds for IP literals identically — no DNS involved.
-// Redirects are refused outright: a provider endpoint is not a redirect
-// chain, and a hop would move the Authorization header to a host the user
-// never named. Response bodies are capped so a hostile provider cannot
-// exhaust memory through an unbounded read.
-
 import (
 	"errors"
 	"fmt"
@@ -67,6 +54,8 @@ type bodyCappingTransport struct {
 }
 
 func (t *bodyCappingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	// The cap rides the body, not the buffer: a hostile provider's
+	// unbounded read dies at this seam, never in the caller's heap.
 	resp, err := t.base.RoundTrip(req)
 	if err != nil {
 		return nil, err
@@ -94,6 +83,13 @@ func refuseReservedControl(_, address string, _ syscall.RawConn) error {
 }
 
 func newGuardedHTTPClient(timeout time.Duration, maxBody int64) *http.Client {
+	// base_url is member input, so every dial is attacker-influenced: the
+	// dialer refuses exactly the address classes the network stack itself
+	// reserves, checked on the address actually connected — which is what
+	// makes DNS rebinding irrelevant and IP-literal targets identical.
+	// Deployment topology (which LAN, which IP, DNS or not) is never this
+	// code's business, so nothing else is blocked: private unicast is a
+	// first-class scenario.
 	tr := &http.Transport{
 		DialContext: (&net.Dialer{
 			Timeout:   dialTimeout,
@@ -112,6 +108,8 @@ func newGuardedHTTPClient(timeout time.Duration, maxBody int64) *http.Client {
 			base:    tr,
 			maxBody: maxBody,
 		},
+		// A provider endpoint is not a redirect chain: a hop would carry
+		// the Authorization header to a host the user never named.
 		CheckRedirect: func(*http.Request, []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
