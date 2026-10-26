@@ -32,12 +32,7 @@ export function matchPeekKey() {
 // The pick page's manual choice is the only genre-seeded call and its
 // vocabulary is the two seeded genres — three keys cover every entry.
 export function invalidateMatchSession(queryClient: QueryClient): void {
-  const keys = [
-    matchSessionKey(),
-    matchSessionKey("fps"),
-    matchSessionKey("moba"),
-    matchPeekKey(),
-  ];
+  const keys = [matchSessionKey(), matchSessionKey("fps"), matchSessionKey("moba"), matchPeekKey()];
   for (const key of keys) {
     void queryClient.invalidateQueries({ queryKey: key });
   }

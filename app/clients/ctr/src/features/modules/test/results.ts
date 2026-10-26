@@ -123,9 +123,7 @@ function deriveMovingTarget(record: AttemptRecord): readonly ResultRow[] {
   const deviations = shots.map((event) => num(event.deviation));
   const avg = mean(deviations);
   // Population std dev — legacy's deviationStdDev, the stability input.
-  const stdDev = deviations.length
-    ? Math.sqrt(mean(deviations.map((d) => (d - avg) ** 2)))
-    : 0;
+  const stdDev = deviations.length ? Math.sqrt(mean(deviations.map((d) => (d - avg) ** 2))) : 0;
   // Legacy's loss counter (its lastTrackingState law): the state starts
   // "lost", and only a not-lost → lost transition counts — a run that
   // begins off-target mints nothing, and staying lost mints once.

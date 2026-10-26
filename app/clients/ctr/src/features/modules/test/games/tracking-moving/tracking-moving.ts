@@ -370,9 +370,10 @@ export const trackingMovingModule: GameModule = {
       // truthfully) to a fresh legal spot.
       const area = spawnAreaOf(stage);
       const controls = controlRects();
+      const center = dot.center; // a const snapshot — the closure below loses the guard's narrowing on the mutable let
       const illegal =
-        outsidePaddedArea(dot.center, area, params.spawnPaddingPx) ||
-        controls.some((rect) => insideControlRect(dot.center, rect, CONTROL_SPAWN_MARGIN_PX));
+        outsidePaddedArea(center, area, params.spawnPaddingPx) ||
+        controls.some((rect) => insideControlRect(center, rect, CONTROL_SPAWN_MARGIN_PX));
       if (illegal) {
         const pos = randomCenterAvoidingControls(
           area,

@@ -118,7 +118,7 @@ export function SetupAgePage() {
               className={clsx(
                 "flex-1 cursor-pointer rounded-[9px] py-[11px] text-center text-[13.5px]",
                 sex === option.value
-                  ? "bg-focus shadow-[0_4px_12px_rgba(59,130,246,0.4)] font-bold text-white"
+                  ? "bg-focus font-bold text-white shadow-[0_4px_12px_rgba(59,130,246,0.4)]"
                   : "text-ink-muted",
               )}
               key={option.value}

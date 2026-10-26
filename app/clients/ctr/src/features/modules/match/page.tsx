@@ -170,7 +170,8 @@ export function MatchPage() {
   // first step not yet done — a done step re-enters only by its own row
   // tap, even with retakes left; the flow never re-parks on it.
   const next = steps.find(
-    (s) => s.testCode != null && !(session?.done ?? []).includes(s.testCode) && engineReady(s.testCode),
+    (s) =>
+      s.testCode != null && !(session?.done ?? []).includes(s.testCode) && engineReady(s.testCode),
   );
   const undecided =
     (sessionQuery.error as { reason?: string } | null)?.reason === reasonGenreUndecided;
