@@ -7,11 +7,18 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
 import { invalidateMatchSession } from "./session";
 import { FlowHeader } from "./ui/flow-header";
 import { genreLabel, narrowGenre } from "./vocabulary";
+
+/* The confirm page's own single orb (prototype match-switch-confirm): one
+ * purple sphere bleeding off the top-right corner — not the login trio. */
+const switchOrbs: readonly AmbientOrb[] = [
+  { className: "top-[-60px] right-[-60px] size-[min(57vw,220px)]", tone: "purple" },
+];
 
 /**
  * The switch confirmation (prototype match-switch-confirm): current →
@@ -37,7 +44,7 @@ export function SwitchConfirmPage() {
   });
 
   return (
-    <AmbientLayout>
+    <AmbientLayout orbs={switchOrbs}>
       <div className="flex w-full flex-col gap-3 pb-6">
         <FlowHeader onBack={() => void navigate({ to: "/match" })} title={m.match_switch_title()} />
 
@@ -55,18 +62,24 @@ export function SwitchConfirmPage() {
           </div>
         </div>
 
+        <div className="border-line bg-surface-deep text-ink-tertiary rounded-control border p-3.5 text-[12px] leading-relaxed">
+          <div className="text-ink-secondary font-bold">{m.match_switch_rules()}</div>
+          {/* Walkthrough N1 (registered): rule 2 deliberately diverges from
+              the prototype — the prototype promises 「已测过的游戏不再重复编
+              排」, but the server's switch law closes the session and redraws
+              under a forced-new seed, so the same test CAN be drawn again.
+              The copy stays honest to the behavior; never "fix" it back to
+              the prototype's promise of an absent guarantee. */}
+          <div className="mt-1.5">· {m.match_switch_rule1()}</div>
+          <div>· {m.match_switch_rule2()}</div>
+          <div>· {m.match_switch_rule3()}</div>
+        </div>
+
         {doneCount > 0 && (
           <div className="border-status-pending/45 bg-surface-deep text-status-pending rounded-control border p-3.5 text-[12px] leading-relaxed">
             {m.match_switch_warn({ n: doneCount, type: genreLabel(tgt) })}
           </div>
         )}
-
-        <div className="border-line bg-surface-deep text-ink-tertiary rounded-control border p-3.5 text-[12px] leading-relaxed">
-          <div className="text-ink-secondary font-bold">{m.match_switch_rules()}</div>
-          <div className="mt-1.5">· {m.match_switch_rule1()}</div>
-          <div>· {m.match_switch_rule2()}</div>
-          <div>· {m.match_switch_rule3()}</div>
-        </div>
 
         <button
           className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-40"
