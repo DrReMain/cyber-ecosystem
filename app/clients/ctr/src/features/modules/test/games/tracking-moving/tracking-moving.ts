@@ -6,9 +6,12 @@
 // the player polyline — hit presence is the discriminator the frozen
 // contract judges shape by. A fire into the respawn gap is local
 // feedback only: the shot frame cannot name a missing dot, so no fact
-// is minted from air (the blank-tap family law). A shrunk stage
-// repositions a stranded dot in-bounds keeping its spawn stamp, so the
-// lifetime clock keeps running truthfully.
+// is minted from air (the blank-tap family law). Spawns never land on
+// the joystick or fire-button rects — a dot under a control is
+// unaimable (a deliberate divergence from the legacy uniform draw,
+// ruled in walkthrough 2026-10-27). A shrunk stage repositions a
+// stranded dot in-bounds keeping its spawn stamp, so the lifetime
+// clock keeps running truthfully.
 
 import { m } from "#/paraglide/messages";
 import type { GameInstance, GameModule, GameModuleCtx } from "../../contract";
@@ -16,11 +19,13 @@ import { createFrameLoop } from "../../frame-loop";
 import { createLucideIcon, type IconNode } from "../lucide-icon";
 import {
   distance,
+  insideControlRect,
   isHit,
   joystickVector,
   outsidePaddedArea,
   type Point,
-  randomCenter,
+  randomCenterAvoidingControls,
+  type Rect,
   round1,
   type SpawnArea,
   stepCrosshair,
@@ -35,6 +40,9 @@ const TARGET: IconNode = [
 ];
 
 const BASE_RADIUS_PX = 48;
+// How far a spawn keeps clear of a control's rect beyond its bounds —
+// the dot's blurred glow should never kiss a button.
+const CONTROL_SPAWN_MARGIN_PX = 20;
 
 function spawnAreaOf(el: HTMLElement): SpawnArea {
   const rect = el.getBoundingClientRect();
@@ -53,8 +61,10 @@ interface FaceParts {
   readonly chipValue: HTMLElement;
   readonly dotEl: HTMLElement;
   readonly crosshair: HTMLElement;
+  readonly stickBox: HTMLElement;
   readonly stick: HTMLElement;
   readonly knob: HTMLElement;
+  readonly fireBox: HTMLElement;
   readonly fireBtn: HTMLElement;
 }
 
@@ -67,7 +77,7 @@ function buildFace(dotSizePx: number): FaceParts {
   // The read-out strip: hits out of shots fired.
   const chip = document.createElement("div");
   chip.className =
-    "pointer-events-none absolute top-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/60 px-3.5 py-1.5 backdrop-blur-sm";
+    "pointer-events-none absolute top-3 left-1/2 z-40 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/60 px-3.5 py-1.5 backdrop-blur-sm";
   const chipLabel = document.createElement("span");
   chipLabel.className = "text-[10px] font-semibold text-white/90";
   chipLabel.textContent = m.test_tm_hits();
@@ -94,9 +104,11 @@ function buildFace(dotSizePx: number): FaceParts {
   // anchors at its center like the dot — the clamp law pins the aim
   // point inside the stage, and a top-left anchor would let the whole
   // cross walk off the edge at a boundary while silently biasing every
-  // recorded deviation by half its size.
+  // recorded deviation by half its size. It rides at the legacy z-40:
+  // above the dot (the aim mark must stay visible ON its target) and
+  // above the controls' z-30, while staying pointer-transparent.
   const crosshair = document.createElement("div");
-  crosshair.className = "pointer-events-none absolute h-10 w-10 text-status-ok left-0 top-0";
+  crosshair.className = "pointer-events-none absolute h-10 w-10 text-status-ok left-0 top-0 z-40";
   crosshair.style.transform = "translate(-50%, -50%)";
   const hBar = document.createElement("div");
   hBar.className = "absolute top-1/2 left-0 h-0.5 w-full -translate-y-1/2 bg-current";
@@ -109,7 +121,7 @@ function buildFace(dotSizePx: number): FaceParts {
   stage.appendChild(crosshair);
   // The joystick: bottom-left base with a knob that follows the finger.
   const stickBox = document.createElement("div");
-  stickBox.className = "absolute bottom-6 left-5 flex flex-col items-center gap-1";
+  stickBox.className = "absolute bottom-6 left-5 z-30 flex flex-col items-center gap-1";
   const stick = document.createElement("div");
   stick.className =
     "relative h-24 w-24 rounded-full border-2 border-white/40 bg-black/50 backdrop-blur-sm";
@@ -129,7 +141,7 @@ function buildFace(dotSizePx: number): FaceParts {
   stage.appendChild(stickBox);
   // The fire button: bottom-right, pressed not clicked (latency is aim).
   const fireBox = document.createElement("div");
-  fireBox.className = "absolute right-5 bottom-6 flex flex-col items-center gap-1";
+  fireBox.className = "absolute right-5 bottom-6 z-30 flex flex-col items-center gap-1";
   const fireBtn = document.createElement("div");
   fireBtn.className =
     "flex h-[88px] w-[88px] cursor-pointer items-center justify-center rounded-full border-4 border-white/50 bg-danger shadow-2xl active:scale-90";
@@ -139,7 +151,7 @@ function buildFace(dotSizePx: number): FaceParts {
   fireCaption.textContent = m.test_tm_fire();
   fireBox.append(fireBtn, fireCaption);
   stage.appendChild(fireBox);
-  return { stage, chipValue, dotEl, crosshair, stick, knob, fireBtn };
+  return { stage, chipValue, dotEl, crosshair, stickBox, stick, knob, fireBox, fireBtn };
 }
 
 export const trackingMovingModule: GameModule = {
@@ -163,9 +175,8 @@ export const trackingMovingModule: GameModule = {
       ),
     };
 
-    const { stage, chipValue, dotEl, crosshair, stick, knob, fireBtn } = buildFace(
-      params.dotSizePx,
-    );
+    const { stage, chipValue, dotEl, crosshair, stickBox, stick, knob, fireBox, fireBtn } =
+      buildFace(params.dotSizePx);
 
     let started = false;
     let paused = false;
@@ -204,11 +215,29 @@ export const trackingMovingModule: GameModule = {
       }, 200);
     }
 
+    function controlRects(): Rect[] {
+      const s = stage.getBoundingClientRect();
+      const box = (el: HTMLElement): Rect => {
+        const r = el.getBoundingClientRect();
+        return { x: r.left - s.left, y: r.top - s.top, width: r.width, height: r.height };
+      };
+      return [box(stickBox), box(fireBox)];
+    }
+
     function spawnDot(): void {
       respawnTimer = null;
       respawnParkedMs = null;
       const area = spawnAreaOf(stage);
-      const pos = randomCenter(area, params.spawnPaddingPx, Math.random);
+      // Never on a control: a dot under the joystick or the fire
+      // button is unaimable (deliberate divergence from the legacy
+      // uniform draw — walkthrough ruling 2026-10-27).
+      const pos = randomCenterAvoidingControls(
+        area,
+        params.spawnPaddingPx,
+        controlRects(),
+        CONTROL_SPAWN_MARGIN_PX,
+        Math.random,
+      );
       dot = {
         el: dotEl,
         center: pos,
@@ -336,10 +365,22 @@ export const trackingMovingModule: GameModule = {
         return;
       }
       // A shrunk stage strands the dot where no crosshair can legally
-      // reach it — move the same dot (same spawn stamp, so its lifetime
-      // keeps running truthfully) to a fresh in-bounds spot.
-      if (outsidePaddedArea(dot.center, spawnAreaOf(stage), params.spawnPaddingPx)) {
-        const pos = randomCenter(spawnAreaOf(stage), params.spawnPaddingPx, Math.random);
+      // reach it, or slides a control rect over where it sits — move
+      // the same dot (same spawn stamp, so its lifetime keeps running
+      // truthfully) to a fresh legal spot.
+      const area = spawnAreaOf(stage);
+      const controls = controlRects();
+      const illegal =
+        outsidePaddedArea(dot.center, area, params.spawnPaddingPx) ||
+        controls.some((rect) => insideControlRect(dot.center, rect, CONTROL_SPAWN_MARGIN_PX));
+      if (illegal) {
+        const pos = randomCenterAvoidingControls(
+          area,
+          params.spawnPaddingPx,
+          controls,
+          CONTROL_SPAWN_MARGIN_PX,
+          Math.random,
+        );
         dot.center = pos;
         place(dotEl, pos);
       }
