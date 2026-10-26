@@ -9,7 +9,7 @@
 // is minted from air (the blank-tap family law). Spawns never land on
 // the joystick or fire-button rects — a dot under a control is
 // unaimable (a deliberate divergence from the legacy uniform draw,
-// ruled in walkthrough 2026-10-27). A shrunk stage repositions a
+// ruled in walkthrough 2026-10-26). A shrunk stage repositions a
 // stranded dot in-bounds keeping its spawn stamp, so the lifetime
 // clock keeps running truthfully.
 
@@ -230,7 +230,7 @@ export const trackingMovingModule: GameModule = {
       const area = spawnAreaOf(stage);
       // Never on a control: a dot under the joystick or the fire
       // button is unaimable (deliberate divergence from the legacy
-      // uniform draw — walkthrough ruling 2026-10-27).
+      // uniform draw — walkthrough ruling 2026-10-26).
       const pos = randomCenterAvoidingControls(
         area,
         params.spawnPaddingPx,

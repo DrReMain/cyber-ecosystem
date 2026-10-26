@@ -122,7 +122,7 @@ export function insideControlRect(p: Point, rect: Rect, marginPx: number): boole
  * draw — a cramped stage prefers a playable dot over an impossible
  * one. (Deliberate divergence from the legacy uniform-over-the-stage
  * spawn, which had no control avoidance — walkthrough ruling
- * 2026-10-27.)
+ * 2026-10-26.)
  */
 export function randomCenterAvoidingControls(
   area: SpawnArea,
