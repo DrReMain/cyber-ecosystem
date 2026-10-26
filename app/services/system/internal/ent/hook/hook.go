@@ -44,6 +44,18 @@ func (f AuthzPolicyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AuthzPolicyMutation", m)
 }
 
+// The AuthzStampFunc type is an adapter to allow the use of ordinary
+// function as AuthzStamp mutator.
+type AuthzStampFunc func(context.Context, *ent.AuthzStampMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AuthzStampFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AuthzStampMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AuthzStampMutation", m)
+}
+
 // The CredentialFunc type is an adapter to allow the use of ordinary
 // function as Credential mutator.
 type CredentialFunc func(context.Context, *ent.CredentialMutation) (ent.Value, error)

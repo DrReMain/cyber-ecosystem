@@ -40,6 +40,7 @@ func (User) Mixin() []ent.Mixin {
 		mixins.CreatedUpdatedMixin{},
 		local_mixins.DatascopeMixin{UserField: "id", DeptField: "dept_id"},
 		local_mixins.SoftDeleteMixin{},
+		local_mixins.AuthzStampMixin{},
 	}
 }
 

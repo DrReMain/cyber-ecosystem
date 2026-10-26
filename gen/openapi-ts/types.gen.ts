@@ -299,6 +299,13 @@ export type CyberSystemV1BeginIdentityLoginResponse = {
 export type CyberSystemV1BindCredentialRequest = {
     provider?: string;
     wechat?: CyberSystemV1WeChatIdentityPayload;
+    /**
+     * The state is one-shot (consumed on exchange) but binds only the
+     * provider key, not the initiating browser: this RPC trusts whoever
+     * presents the code. Dormant while no client offers a bind entry; the
+     * first GET-triggered bind flow must tie the state to the initiating
+     * session before shipping — do not copy this shape without that.
+     */
     state?: string;
 };
 

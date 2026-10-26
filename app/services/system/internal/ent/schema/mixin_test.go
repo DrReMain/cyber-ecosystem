@@ -17,12 +17,14 @@ func TestMixinOrder(t *testing.T) {
 			return 2
 		case local_mixins.SoftDeleteMixin:
 			return 3
+		case local_mixins.AuthzStampMixin:
+			return 4
 		}
 		return 0
 	}
 	schemas := []interface{ Mixin() []ent.Mixin }{
 		User{}, Dept{}, Role{}, Permission{}, AuthzPolicy{},
-		PermissionPolicy{}, PrincipalRole{}, AuditLog{}, File{},
+		PermissionPolicy{}, PrincipalRole{}, Population{}, AuditLog{}, File{},
 	}
 	for _, s := range schemas {
 		last := 0

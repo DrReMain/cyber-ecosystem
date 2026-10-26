@@ -62,6 +62,9 @@ func guardGoFiles(t *testing.T) map[string]string {
 func TestNoDeclarationComments(t *testing.T) {
 	for f, src := range guardGoFiles(t) {
 		lines := strings.Split(src, "\n")
+		if i, ok := guardHeaderComment(lines); ok {
+			t.Errorf("%s:%d file-header comment — neither legal kind lives above the imports: %q", f, i+1, strings.TrimSpace(lines[i]))
+		}
 		for i, line := range lines {
 			s := strings.TrimSpace(line)
 			if !strings.HasPrefix(s, "//") || guardDividerRE.MatchString(s) || guardDirectiveRE.MatchString(s) {
@@ -76,6 +79,30 @@ func TestNoDeclarationComments(t *testing.T) {
 			}
 		}
 	}
+}
+
+// guardHeaderComment finds a comment line in the file-header position —
+// after the package clause, before the first import or declaration. The
+// comment law's two kinds are dividers and in-body why; a block floating
+// above the imports is the third shape, and it escapes the declaration
+// signature (the next non-blank line opens import, not a declaration).
+func guardHeaderComment(lines []string) (int, bool) {
+	seenPackage := false
+	for i, line := range lines {
+		s := strings.TrimSpace(line)
+		if !seenPackage {
+			seenPackage = strings.HasPrefix(s, "package ")
+			continue
+		}
+		if s == "" {
+			continue
+		}
+		if strings.HasPrefix(s, "//") && !guardDividerRE.MatchString(s) && !guardDirectiveRE.MatchString(s) {
+			return i, true
+		}
+		return -1, false // real code before any header comment
+	}
+	return -1, false
 }
 
 func TestReasonPredicates(t *testing.T) {

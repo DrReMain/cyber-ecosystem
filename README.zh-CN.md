@@ -105,6 +105,7 @@ AI-native 在骨架中分两层：
 - `cache`：KV、hash、list、set、sorted set、counter、lock、rate limiter、pub/sub、session 接口，Redis 后端。
 - `storage`：object、list、presign、multipart、bucket、per-bucket view 和操作限制，S3-compatible 后端。
 - `mq`：at-least-once producer / consumer、重试和 DLQ 语义，NATS 与 PostgreSQL 后端。
+- `payment`：prepay、支付与退款状态查询、退款、验签回调通知、账单对账接口，渠道可插拔，WeChat 后端。
 
 能力族只依赖标准库、第三方 provider 和自己的接口根，不 import 服务代码，因此可以作为单元复制或抽取。
 
@@ -153,7 +154,7 @@ libs → stores → domains → services → features → routes
 - **授权使用内存编译 snapshot**，正常决策不需要每次查询 role、permission、policy 和 binding 表。
 - **Ent 生成类型化 SQL**，连接池、显式索引和 Atlas 迁移让数据库访问路径可检查。
 - **Presign 上传 / 下载** 让大对象字节直接在浏览器和 S3-compatible 存储间传输；应用服务器协调元数据和确认，不代理每个字节。
-- **审计发布异步化**，请求路径与 MQ 持久化解耦。
+- **审计发布异步化**，请求路径与 MQ 持久化解耦；队列满时按设计直接丢弃而非阻塞请求——审计是尽力而为，非保证落盘。
 - **流式聊天** 在模型产出时持续发送 delta，而不是等待完整答案。
 
 可能的瓶颈主要来自外部条件与负载：模型 provider、数据库查询、对象存储、跨服务 introspection、策略和数据量。这些位置也都有明确的测量和优化缝。

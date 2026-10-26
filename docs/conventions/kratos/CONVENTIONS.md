@@ -89,7 +89,7 @@ conf             config (proto-defined, generated)
 | service struct | `<Name>Service` | `UserService` |
 | log tag | UC = `module/<d>`; repo = `module/<d>_rp`; service = `module/<d>_service` — the module is the unit, never the instance: a module holding several UCs or RPs still uses exactly these three forms, distinguishing instances with log fields, not tag suffixes | `module/role`, `module/role_rp`, `module/role_service` |
 
-- biz holds **one** port family — repo ports (`<X>RP`). A local repo (`UserRP`, backed by `data`) and a remote repo (`<Remote>RP`, backed by `client`) are the same shape: biz injects an RP and is indifferent to where the bytes come from. `data` and `client` are just two kinds of adapter.
+- biz holds **one** port family — repo ports (`<X>RP`). A local repo (`UserRP`, backed by `data`), a remote repo (`<Remote>RP`, backed by `client`), and a provider repo (backed by a `shared-go` capability — e.g. a payment-channel port) are the same shape: biz injects an RP and is indifferent to where the bytes come from. The adapter set is open — a port abstracts one external system; the list of adapter kinds is not itself law.
 - A remote RP is named for the **provider** (the provider *is* the "table"); its payloads use a **neutral ACL value type**, not a consumer DO, so several consumers share one RP.
 - Two views, two names for one object: the **port** is a repo (`<Remote>RP`, biz's view — "a store I call"); the **adapter** implementing it is a client (`<remote>Client`, the client layer's view — "a thing that dials a remote").
 - DO names carry no service prefix (`User`, not `SystemUser`) — the package gives context. Infra fields keep conventional short names (`log`); the lowercase-type rule is for domain deps only.
@@ -99,7 +99,7 @@ conf             config (proto-defined, generated)
 
 ## 3. File structure & ordering
 
-**One module per domain (aggregate root): `module/<d>/{biz,data,service,module}.go`.** Each file is one concern within the module: `biz.go` = DO + port + UC + aux (FSM, entity behavior); `data.go` = local repo; `service.go` = handlers; `module.go` = ProviderSet. `MUST NOT` split a concern across extra files (`<d>_uc.go` etc.). If `biz.go` becomes unwieldy, the **aggregate boundary** is wrong — split into two modules, don't fragment one. Cross-module infra (`UC`/`RP` base, `Transaction`) lives in `shared/kernel.go`, not in any module — the kernel is per-service (`RP` embeds the service-specific `*platform.Platform`), hence not in `shared-go`. Tenant resolution (`DefaultTenant`, `TenantFromCtx`) lives in `shared-go/kratos/security/tenant.go` (sibling of `SubjectFromCtx` — subject-derived policy, not mixin logic); the ent-dependent mixin shells stay in `local_mixins`. The ent tree (schema, local_mixins) MUST NOT import the service's `internal/shared` (shared → platform → ent/runtime → ent/schema closes a cycle); business code never assigns tenants (the TenantMixin hook back-fills on create).
+**One module per domain (aggregate root): `module/<d>/{biz,data,service,module}.go`.** Each file is one concern within the module: `biz.go` = DO + port + UC + aux (FSM, entity behavior); `data.go` = local repo; `service.go` = handlers; `module.go` = ProviderSet. `MUST NOT` split one concern across extra files (`<d>_uc.go` etc.) — the ban's unit is the concern, not the file: a distinct concern takes its own aux file (below), mechanical fragments of one concern stay banned. If `biz.go` becomes unwieldy with no distinct concern left to carve out, the **aggregate boundary** is wrong — split into two modules, don't fragment one. Cross-module infra (`UC`/`RP` base, `Transaction`) lives in `shared/kernel.go`, not in any module — the kernel is per-service (`RP` embeds the service-specific `*platform.Platform`), hence not in `shared-go`. Tenant resolution (`DefaultTenant`, `TenantFromCtx`) lives in `shared-go/kratos/security/tenant.go` (sibling of `SubjectFromCtx` — subject-derived policy, not mixin logic); the ent-dependent mixin shells stay in `local_mixins`. The ent tree (schema, local_mixins) MUST NOT import the service's `internal/shared` (shared → platform → ent/runtime → ent/schema closes a cycle); business code never assigns tenants (the TenantMixin hook back-fills on create).
 
 **Section order** (each preceded by a divider, §4; omit empty):
 
@@ -117,7 +117,9 @@ conf             config (proto-defined, generated)
 - **Value types live in `DO`; `Port` holds interfaces only.** A port's payload vocabulary (`GrantView`, `RoleMember`, `ListIn/Out`) is module data shape — declare it in `DO` even when only the port mentions it, so one section owns all types.
 - **Cross-section vocabulary (aux consts/types a layer file needs but no section owns)** — declared between the imports and the first divider; reads top-down. Declarations that ARE a section's content (DO types, the port interface, UC/repo/service structs) live inside their section. The `Private` section holds private methods then private functions only — never interleaved type/const declarations.
 - **Aux/engine files** — a module MAY hold extra lowercase files for a distinct non-layer concern (e.g. authz's `casbin.go` engine compile); no layer dividers inside. Internal order: constants → types → functions, each declared before its first use.
+- **Live-e2e placement** — an env-gated live test of one module's aggregate lives in the owning module (`module/<d>/live_e2e_test.go`); a cross-module live guard lives in `internal/e2e/` — a test-only package (nothing but `_test.go` files; `go build` skips it, so it can never enter a production import). `internal/shared` keeps the kernel plus the always-run law guards; env-gated domain e2e never mixes in.
 - **Transport-fixture modules** (e.g. `transfer`, the e2e regression base) are exempt from the four-file shape: `service.go` + `module.go` only, no aggregate, no biz/data. Recorded so nobody "completes" them later.
+- **Face modules** — when the contract splits a second service for a different access audience over one aggregate (a member face plus an operator face), the second module is a face: `service.go` + `module.go` only, injecting the sibling module's UCs — thin proto↔domain mapping, zero business rules (the called UC owns those). Unlike a transport fixture it is a real RPC face, but it owns no aggregate and never grows biz/data; nothing imports a face (the DAG guard bans it), so deleting the face plane stays a closed operation.
 
 **Client files** — `client.go` (shared `standardMiddleware` + `ProviderSet`) plus `<remote>.go` per remote. One remote = one repo port = one adapter = one file. Adding an RPC adds a method, **never a new file**; only a new remote opens one.
 
@@ -160,7 +162,7 @@ Two comment kinds are legal under `app/services/*`; a comment that is neither is
 | Divider | `// <Name>` + `-` run (~110 chars `biz`/`data`, ~120 `service`; equal ±5 to a same-file neighbor's run) | section boundaries only (§3 table) |
 | Inline | states non-obvious *why* only (trade-off, gotcha, concurrency); `MUST NOT` restate the code | inside a function, beside the line it explains |
 
-**Violation signature — declaration comment**: a `//` line whose next non-blank line opens a declaration (`type` / `func` / `const` / `var`) and whose text names or describes that symbol. Machine-enforced in `module/`, `client/`, `server/`, `platform/`, `bootstrap/` by `TestNoDeclarationComments` (conventions guard, `internal/shared`).
+**Violation signature — declaration comment**: a `//` line whose next non-blank line opens a declaration (`type` / `func` / `const` / `var`) and whose text names or describes that symbol. **Violation signature — file-header comment**: a `//` line after the package clause and before the first import or declaration — neither legal kind lives in that position, and the shape otherwise escapes the declaration signature (the next non-blank line opens `import`). Both machine-enforced in `module/`, `client/`, `server/`, `platform/`, `bootstrap/` by `TestNoDeclarationComments` (conventions guard, `internal/shared`).
 
 Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the DDL), never Go line comments (§3a); test files state the law under test, never process narration; `shared-go/` keeps godoc conventions — this section binds `app/services/*` only.
 
@@ -220,6 +222,7 @@ Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the D
 - `schema.Message` is dual-channel: `Content` and `ReasoningContent` both stream; a reasoning-only tick is an empty-content delta, not a skipped frame.
 - The decrypted api key exists only inside the eino config, never in a log line.
 - Model listing is outside eino: plain `GET <baseURL>/models` with an explicit timeout.
+- **Outbound dials toward user-configured endpoints carry the dial-time guard**: reserved address classes only — loopback, link-local, multicast, unspecified — checked on the address actually connected (DNS rebinding is structurally irrelevant, IP-literal targets need no DNS). Deployment topology never enters the code: which LAN, which IP, DNS or not is the deploy plane's knowledge, and private unicast is a first-class target (a fully-private deployment is a declared scenario). Redirects are refused and response bodies are capped; one guard instance injects everywhere the SDK dials (eino's `HTTPClient` seam included).
 
 **Transports**
 
@@ -250,12 +253,13 @@ The IAM engine is a **mechanism every service replicates**, not a system-service
   - `module/authz` reads ent tables directly, never imports `role`/`policy`.
   - `role → policy` is a read-only port; `auth → user` and `auth → authz` are one-way.
   - `role` never imports `user` (member faces show principal_id only).
-  - Cross-side protocols (policy version stamp, session epoch marker) live in `internal/shared` — writer and reader both reach the neutral layer without importing each other.
+  - Cross-side protocols (the policy-change wake channel, the session epoch marker) live in `internal/shared` — writer and reader both reach the neutral layer without importing each other. The version truth is not here: it is the `authz_stamps` row (below).
   - An interface injected to invert a semantically-cyclic dependency is the invisibility cloak of a cycle — banned even when the import graph stays acyclic.
 - **Version-stamp discipline.**
-  - Every write that can change a decision (role/policy/grant/user-status mutations) notifies `NotifyChanged` after commit.
-  - Replicas rebuild compiled snapshots on watch — and every subscription-establishment point (first subscribe, reconnect) re-checks the version once: pubsub has no backlog, so a change published before the subscription existed (the seed racing startup) is otherwise lost. Plus a low-frequency reconcile backstop.
-  - A single replica self-notifies on the same path — no code branch.
+  - The version truth is a single `authz_stamps` row, bumped inside the change transaction by `AuthzStampMixin` on the tables feeding the snapshot — a bump that is a property of the tables cannot be forgotten by a writer (seed, admin paths, future code all covered). User rows bump only when a mutation assigns `enabled` or sets the soft-delete marker; profile edits never move the stamp (a password change must not recompile every replica).
+  - Writers wake after commit (`NotifyPolicyChanged` → pubsub publish only): a failed publish costs timeliness, never correctness.
+  - Replicas rebuild compiled snapshots on watch — and every subscription-establishment point (first subscribe, reconnect) re-checks the stamp once: pubsub has no backlog, so a change published before the subscription existed is otherwise lost. Plus a low-frequency reconcile backstop.
+  - Reconcile compares `!=` and rebuilds on any divergence: the stamp is monotonic by construction, but a rewind or a restored backup must heal, never pin a stale replica; a forced rebuild every 24h bounds any unknown staleness class.
   - No app-layer decision cache: the compiled in-memory snapshot IS the cache; ABAC constraints evaluate live on every request.
 - **Seeds are service-level.**
   - The seed job lives in `internal/bootstrap`, mounts `kratos.BeforeStart` explicitly after `lc.Start` (its completion publishes a fire-and-forget change notification, so the subscriptions it notifies must already exist).
@@ -344,6 +348,7 @@ Posture (root `AGENTS.md` §6.1): declare the change-kind and close with the cou
 
 - **K-STR-1** — four-file shape intact (no `<d>_uc.go` fragments; extra files only per the aux-file rule); section order + dividers per the §3 table; `Private` = private methods then functions, no type/const inside. eye.
 - **K-STR-2** — imports in the five groups; proto import aliases `<scope>pb`, never bare `pb`; struct fields embedded base → `log` → dependencies. lint: `gofmt -l` empty + alias grep.
+- **K-STR-3** — one module one transport face: at most one `*Service` struct per module dir (a second audience opens a face module, not a second struct). lint: `TestModuleSingleService` green.
 
 ### Comments — law §4
 

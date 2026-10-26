@@ -156,6 +156,11 @@ message BindCredentialRequest {
     option (buf.validate.oneof).required = true;
     WeChatIdentityPayload wechat = 2;
   }
+  // The state is one-shot (consumed on exchange) but binds only the
+  // provider key, not the initiating browser: this RPC trusts whoever
+  // presents the code. Dormant while no client offers a bind entry; the
+  // first GET-triggered bind flow must tie the state to the initiating
+  // session before shipping — do not copy this shape without that.
   optional string state = 3 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 1,

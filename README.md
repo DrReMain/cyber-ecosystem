@@ -105,6 +105,7 @@ AI-native has two layers in this skeleton:
 - `cache`: KV, hash, list, set, sorted set, counter, lock, rate limiter, pub/sub, and session interfaces, with a Redis backend.
 - `storage`: object, list, presign, multipart, bucket, per-bucket views, and operational limits, with an S3-compatible backend.
 - `mq`: durable at-least-once producer/consumer semantics, retry and DLQ behavior, with NATS and PostgreSQL backends.
+- `payment`: prepay, payment and refund status queries, refund, signature-verified callback notifications, and bill-based reconciliation interfaces, over a pluggable channel seam with a WeChat backend.
 
 A capability family depends only on the standard library, its third-party providers, and its own interface root. It never imports service code, so a family can be copied or extracted as a unit.
 
@@ -153,7 +154,7 @@ This is an architectural profile, not a benchmark claim. Actual results depend o
 - **Authorization uses an in-memory compiled snapshot**, so normal decisions do not query the role, permission, policy, and binding tables on every request.
 - **Ent generates typed SQL**, while connection pooling, explicit indexes, and Atlas migrations keep the database access path inspectable.
 - **Presigned uploads and downloads** move large object bytes directly between the browser and S3-compatible storage; the app server coordinates metadata and confirmation instead of proxying every byte.
-- **Audit publishing is asynchronous**, decoupling the request path from MQ persistence.
+- **Audit publishing is asynchronous**, decoupling the request path from MQ persistence; when the queue is full, entries are dropped by design rather than blocking requests — auditing is best-effort, not a guaranteed-durable record.
 - **Streaming chat** emits deltas as the model produces them instead of waiting for the full answer.
 
 Likely bottlenecks are external and workload-specific: model providers, database queries, object storage, cross-service introspection, and policy/data volume. Those are also the surfaces with explicit seams for measurement and optimization.

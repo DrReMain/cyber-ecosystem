@@ -15,6 +15,9 @@ type AuditLog func(*sql.Selector)
 // AuthzPolicy is the predicate function for authzpolicy builders.
 type AuthzPolicy func(*sql.Selector)
 
+// AuthzStamp is the predicate function for authzstamp builders.
+type AuthzStamp func(*sql.Selector)
+
 // Credential is the predicate function for credential builders.
 type Credential func(*sql.Selector)
 
