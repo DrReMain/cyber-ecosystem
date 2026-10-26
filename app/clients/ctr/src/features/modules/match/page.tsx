@@ -2,7 +2,7 @@ import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import { listTests } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test-TestService_connectquery";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { Crosshair, Hexagon } from "lucide-react";
+import { Check, Crosshair, Hexagon } from "lucide-react";
 import { useEffect } from "react";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
@@ -54,7 +54,9 @@ function StepRow({ index, ability, name, left, ready, done, onEnter }: Readonly<
       <div className="min-w-0 flex-1">
         <div className="text-ink text-sm font-extrabold">
           {word.cn}
-          {done ? <span className="text-status-ok ml-1 text-xs">✓</span> : null}
+          {done ? (
+            <Check aria-hidden className="text-status-ok ml-1 inline h-3 w-3" strokeWidth={3} />
+          ) : null}
         </div>
         <div className="text-ink-tertiary mt-0.5 text-[9.5px] tracking-[0.9px]">{word.en}</div>
       </div>

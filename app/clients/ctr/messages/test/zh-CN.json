@@ -37,6 +37,7 @@
   "test_grade_b": "良好",
   "test_grade_c": "待提升",
   "test_grade_off": "未评级",
+  "test_grade_off_note": "该款常模积累中，暂无权威档位",
   "test_result_retake_chip": "重测机会 {left} / {max}",
   "test_result_retry_disabled": "重新测试（机会已用完）",
   "test_result_next": "继续 · {ability}",

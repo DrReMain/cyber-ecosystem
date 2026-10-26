@@ -175,6 +175,13 @@ function VerdictCard({
           </div>
           <div className="mt-2.5">
             <TierChip grade={verdict.grade} />
+            {/* D-AO: the ungraded chip keeps its shape, with the honest
+                note on why — the game's norms are still accumulating. */}
+            {verdict.grade === undefined && (
+              <div className="text-ink-tertiary mt-1.5 text-[10.5px]">
+                {m.test_grade_off_note()}
+              </div>
+            )}
           </div>
         </>
       )}

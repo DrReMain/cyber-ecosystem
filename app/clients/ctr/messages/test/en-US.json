@@ -37,6 +37,7 @@
   "test_grade_b": "Good",
   "test_grade_c": "Developing",
   "test_grade_off": "Unrated",
+  "test_grade_off_note": "This game's norms are still accumulating — no authoritative grade yet",
   "test_result_retake_chip": "Retakes {left} / {max}",
   "test_result_retry_disabled": "Retest (chances spent)",
   "test_result_next": "Continue · {ability}",
