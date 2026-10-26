@@ -9,6 +9,12 @@
   "targetDefaults": {
     "dev": {
       "cache": false
+    },
+    "dev-up": {
+      "cache": false
+    },
+    "dev-down": {
+      "cache": false
     }
   }
 }

@@ -50,7 +50,7 @@
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          "for d in app/clients/*/; do node tools/scripts/paraglide-parity.cjs \"$d\" || exit 1; done"
+          "node tools/scripts/paraglide-parity.cjs"
         ]
       }
     }

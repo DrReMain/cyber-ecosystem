@@ -181,7 +181,7 @@ app/
 shared-go/         Reusable Go packages: capability families, orm, kratos, codegen, utils, helpers
 shared-ts/         Shared TypeScript packages: error, antd, theme, store, cookie, router-progress, transport, storybook
 deploy/            Compose profiles, Traefik edge, and migration wiring
-tools/             Repository bootstrap and Go tooling targets
+tools/             Repository bootstrap, tooling targets, and dev-server lifecycle scripts
 docs/              Engineering conventions, the docs map and governance law, agent-environment recommendations, and screenshots
 ```
 
@@ -195,6 +195,8 @@ Everything with a declared workflow runs through Nx.
 - Node.js 24.15+
 - pnpm 11+
 - Docker with Compose v2
+
+The workflows run on macOS, Linux, and Windows — commands go through Nx targets, and per-OS shell handling is delegated to Nx and the tools themselves. macOS and Linux are exercised continuously; the Windows paths are written but not yet validated on Windows hardware.
 
 Optional agent tooling (recommended for coding agents): `docs/environment.md`.
 
@@ -231,13 +233,15 @@ The default profile raises PostgreSQL, Redis, SeaweedFS, and NATS. The Postgres 
 
 ### 5. Run the services
 
-Use one shell per process:
+Long-running dev servers have their own lifecycle targets — one command starts a server in the background, output streams to `.run/<project>/dev.log`, and a matching command stops it:
 
 ```bash
-./nx run system:dev
-./nx run agent:dev
-./nx run admin:dev
+./nx run system:dev-up
+./nx run agent:dev-up
+./nx run admin:dev-up
 ```
+
+While running, read or `tail -f` the server's log file; stop with `dev-down` (e.g. `./nx run system:dev-down`). The foreground `dev` targets (`./nx run system:dev`) remain available when a blocking process is preferred.
 
 The development proxy expects `system` on `localhost:13001` and `agent` on `localhost:13002`. Open `http://localhost:5173` and sign in with the seeded administrator — `admin`, default password `admin123456` (`SEED_INITIAL_PASSWORD` overrides it; see `app/services/system/configs/config.yaml`). A user can configure an OpenAI-compatible provider from the admin profile; the API key is encrypted server-side and never returned by an API.
 
@@ -248,7 +252,8 @@ The checked-in configuration contains development-only defaults — seeded admin
 - Proto lint / generation: `./nx run proto:lint` · `proto:generate`
 - Go lint / tests / format: `./nx run tools:go:lint` · `tools:go:test` · `tools:go:format`
 - Ent generation: `./nx run system:generate:ent` or `agent:generate:ent`
-- Migration diff: `NAME=add_x ./nx run system:migrate:diff` or `agent:migrate:diff`
+- Dev servers: `<project>:dev-up` to start, `<project>:dev-down` to stop
+- Migration diff: `./nx run system:migrate:diff --name add_x` or `agent:migrate:diff` (the name is required; it names the generated file)
 - Optional stacks: `deploy:realtime:start` · `deploy:media:start` · `deploy:observability:start`
 - Edge stack: `deploy:pre:start` or `deploy:pre:full:start`
 - Teardown: `deploy:stop` · `deploy:reset`
@@ -258,7 +263,7 @@ The checked-in configuration contains development-only defaults — seeded admin
 The intended workflow is:
 
 1. Start from a released skeleton snapshot or tag.
-2. Keep a private product repository or isolated product branch.
+2. Develop new applications in the same trunk (applications coexist as directories; deploy profiles select the service set) and isolate into a private product repository or branch only when delivery forces it.
 3. Add services under `app/services/<name>` and contracts under `proto/cyber/<name>/v1`.
 4. Keep business aggregates out of `system`.
 5. Consume identity and authorization through the `system` surface.

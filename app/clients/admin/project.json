@@ -11,14 +11,14 @@
         "command": "pnpm exec vite dev --host"
       }
     },
-    "dev:up": {
+    "dev-up": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "node tools/scripts/devserver.cjs up --project @cyber-ecosystem/admin"
       }
     },
-    "dev:down": {
+    "dev-down": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
@@ -86,7 +86,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "docker build -f app/clients/admin/Dockerfile --build-arg NPM_REGISTRY=\"$(pnpm config get registry)\" -t cyber-ecosystem/admin:local ."
+        "command": "docker build -f app/clients/admin/Dockerfile -t cyber-ecosystem/admin:local ."
       }
     }
   }

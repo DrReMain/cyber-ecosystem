@@ -43,14 +43,14 @@
         "command": "go tool kratos run"
       }
     },
-    "dev:up": {
+    "dev-up": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "node tools/scripts/devserver.cjs up --project agent"
       }
     },
-    "dev:down": {
+    "dev-down": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
@@ -69,28 +69,28 @@
       "outputs": ["{projectRoot}/bin"],
       "options": {
         "cwd": "{projectRoot}",
-        "command": "go build -ldflags \"-X main.Version=$(git describe --tags --always --match 'v*')\" -o ./bin/ ./..."
+        "command": "go build -o ./bin/ ./..."
       }
     },
     "image": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "docker build -f app/services/agent/Dockerfile --build-arg VERSION=$(git describe --tags --always --match 'v*') --build-arg GOPROXY=\"$(go env GOPROXY)\" -t cyber-ecosystem/agent:local ."
+        "command": "docker build -f app/services/agent/Dockerfile -t cyber-ecosystem/agent:local ."
       }
     },
     "migrate:diff": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "pnpm exec atlas migrate diff \"${NAME:-changes}\" --dir \"file://internal/ent/migrate/migrations\" --to \"ent://internal/ent/schema\" --dev-url \"${ATLAS_DEVDB:-postgres://postgres:postgres@localhost:5432/atlas_dev?sslmode=disable}\""
+        "command": "pnpm exec atlas migrate diff {args.name} --dir file://internal/ent/migrate/migrations --to ent://internal/ent/schema --dev-url postgres://postgres:postgres@localhost:5432/atlas_dev?sslmode=disable"
       }
     },
     "migrate:apply": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "pnpm exec atlas migrate apply --dir \"file://internal/ent/migrate/migrations\" --url \"${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/agent?sslmode=disable}\""
+        "command": "pnpm exec atlas migrate apply --dir file://internal/ent/migrate/migrations --url postgres://postgres:postgres@localhost:5432/agent?sslmode=disable"
       }
     },
     "migrate:validate": {

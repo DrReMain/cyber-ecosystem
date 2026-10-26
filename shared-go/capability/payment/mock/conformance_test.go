@@ -291,6 +291,18 @@ func TestParseFailureLadder(t *testing.T) {
 	if _, err := p.Notifier.Parse(context.Background(), signedGarbage); !errors.Is(err, payment.ErrDecryptFailed) {
 		t.Errorf("undecryptable payload: want ErrDecryptFailed, got %v", err)
 	}
+	// Correct signature, well-formed envelope, wrong-length nonce — the
+	// decrypt step refuses it the way the real channel does, never panics.
+	shortNonce, _ := json.Marshal(wireEnvelope{
+		V:       wireVersion,
+		Nonce:   base64.StdEncoding.EncodeToString(make([]byte, 11)),
+		Payload: base64.StdEncoding.EncodeToString([]byte("any ciphertext")),
+	})
+	signedShortNonce := &payment.NotificationInput{Headers: http.Header{}, Body: shortNonce}
+	signedShortNonce.Headers.Set(signatureHeader, ctrl.b.sign(shortNonce))
+	if _, err := p.Notifier.Parse(context.Background(), signedShortNonce); !errors.Is(err, payment.ErrDecryptFailed) {
+		t.Errorf("wrong-length nonce: want ErrDecryptFailed, got %v", err)
+	}
 }
 
 func TestCloseLifecycle(t *testing.T) {

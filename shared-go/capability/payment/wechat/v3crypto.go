@@ -75,6 +75,12 @@ func DecryptAES256GCM(key []byte, nonce, associatedData, b64Ciphertext string) (
 	if err != nil {
 		return nil, err
 	}
+	// gcm.Open panics on a wrong-length nonce instead of erroring; the
+	// channel's wire fixes the nonce at 12 bytes, so any other length must
+	// surface as the caller-mapped decrypt failure, never a crash.
+	if len(nonce) != gcm.NonceSize() {
+		return nil, fmt.Errorf("payment: nonce length %d, want %d", len(nonce), gcm.NonceSize())
+	}
 	ct, err := base64.StdEncoding.DecodeString(b64Ciphertext)
 	if err != nil {
 		return nil, fmt.Errorf("payment: bad ciphertext encoding: %w", err)

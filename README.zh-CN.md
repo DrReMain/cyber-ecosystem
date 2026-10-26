@@ -181,7 +181,7 @@ app/
 shared-go/         可复用 Go 包：能力族、orm、kratos、codegen、utils、helper
 shared-ts/         共享 TypeScript 包：error、antd、theme、store、cookie、router-progress、transport、storybook
 deploy/            Compose profile、Traefik edge 和迁移 wiring
-tools/             仓库初始化与 Go 工具目标
+tools/             仓库初始化、工具目标与 dev-server 生命周期脚本
 docs/              工程约定、文档地图与治理法、agent 环境建议与截图
 ```
 
@@ -195,6 +195,8 @@ docs/              工程约定、文档地图与治理法、agent 环境建议�
 - Node.js 24.15+
 - pnpm 11+
 - Docker Compose v2
+
+工作流可在 macOS、Linux 与 Windows 上运行——命令全部经由 Nx 目标，按操作系统的 shell 差异由 Nx 与各工具自行处理。macOS 与 Linux 持续验证；Windows 路径已实现但尚未在 Windows 真机上验证。
 
 可选的 agent 工具（推荐为 coding agent 配置）：`docs/environment.md`。
 
@@ -231,13 +233,15 @@ docs/              工程约定、文档地图与治理法、agent 环境建议�
 
 ### 5. 运行服务
 
-每个进程使用一个 shell：
+长跑 dev server 有自己的生命周期目标——一条命令后台启动，输出写入 `.run/<project>/dev.log`，配套命令负责停止：
 
 ```bash
-./nx run system:dev
-./nx run agent:dev
-./nx run admin:dev
+./nx run system:dev-up
+./nx run agent:dev-up
+./nx run admin:dev-up
 ```
+
+运行期间可读取或 `tail -f` 对应日志文件；用 `dev-down` 停止（如 `./nx run system:dev-down`）。需要占用式前台进程时，`dev` 目标（`./nx run system:dev`）仍然可用。
 
 开发代理默认连接 `localhost:13001` 的 system 和 `localhost:13002` 的 agent。打开 `http://localhost:5173`，使用种子管理员登录——`admin`，默认口令 `admin123456`（可用 `SEED_INITIAL_PASSWORD` 覆写，见 `app/services/system/configs/config.yaml`）。用户可以在 admin profile 中配置 OpenAI-compatible provider；API key 在服务端加密，API 永不回显。
 
@@ -248,7 +252,8 @@ docs/              工程约定、文档地图与治理法、agent 环境建议�
 - Proto lint / 生成：`./nx run proto:lint` · `proto:generate`
 - Go lint / 测试 / 格式化：`./nx run tools:go:lint` · `tools:go:test` · `tools:go:format`
 - Ent 生成：`./nx run system:generate:ent` 或 `agent:generate:ent`
-- 迁移 diff：`NAME=add_x ./nx run system:migrate:diff` 或 `agent:migrate:diff`
+- Dev server：`<project>:dev-up` 启动，`<project>:dev-down` 停止
+- 迁移 diff：`./nx run system:migrate:diff --name add_x` 或 `agent:migrate:diff`（name 必填，命名生成的迁移文件）
 - 可选栈：`deploy:realtime:start` · `deploy:media:start` · `deploy:observability:start`
 - Edge 栈：`deploy:pre:start` 或 `deploy:pre:full:start`
 - 关闭 / 清理：`deploy:stop` · `deploy:reset`
@@ -258,7 +263,7 @@ docs/              工程约定、文档地图与治理法、agent 环境建议�
 推荐流程：
 
 1. 从一个已发布的 skeleton snapshot 或 tag 开始。
-2. 使用私有产品仓库或隔离产品分支。
+2. 新应用先在同一主干内开发（应用以目录共存，deploy profile 选择服务集），仅当交付强制隔离时再落到私有产品仓库或隔离分支。
 3. 在 `app/services/<name>` 添加服务，在 `proto/cyber/<name>/v1` 添加契约。
 4. 不把业务聚合放进 `system`。
 5. 通过 `system` surface 消费身份与授权。
