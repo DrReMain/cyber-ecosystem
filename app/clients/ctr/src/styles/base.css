@@ -45,6 +45,15 @@
   min-height: 100svh;
 }
 
+/* The desktop presentation: the H5 app as a bounded, centered frame — the
+ * prototype body's 844px phone height with breathing room, capped by the
+ * viewport. Same cascade-fallback pattern as h-app above. */
+@utility h-frame {
+  height: min(844px, calc(100vh - 32px));
+  height: min(844px, calc(100dvh - 32px));
+  height: min(844px, calc(100svh - 32px));
+}
+
 /* Safe-area helpers: env() clamped by a legible padding floor. */
 @utility safe-px {
   padding-inline: max(env(safe-area-inset-left, 0px), 16px)

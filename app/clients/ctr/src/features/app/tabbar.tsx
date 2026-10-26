@@ -37,12 +37,14 @@ const TABS: readonly TabSpec[] = [
 /**
  * Bottom navigation chrome (prototype _shell TabBar): four slots, two live.
  * Mounted by the tab-owning pages (home, profile overview); fixed to the
- * viewport with the safe-area inset, blurred over ambient content.
+ * viewport with the safe-area inset, blurred over ambient content. On ≥md
+ * the app is a centered frame — the bar anchors to the frame's bottom
+ * instead of the viewport's.
  */
 export function TabBar({ active }: Readonly<{ active: TabKey }>) {
   const navigate = useNavigate();
   return (
-    <nav className="border-line-soft bg-surface-card/95 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur-md">
+    <nav className="border-line-soft bg-surface-card/95 fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur-md md:absolute">
       <div className="mx-auto flex h-14 max-w-md items-stretch">
         {TABS.map((tab) => {
           const Icon = tab.icon;
