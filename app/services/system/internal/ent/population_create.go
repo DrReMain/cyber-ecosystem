@@ -90,7 +90,9 @@ func (_c *PopulationCreate) Mutation() *PopulationMutation {
 
 // Save creates the Population in the database.
 func (_c *PopulationCreate) Save(ctx context.Context) (*Population, error) {
-	_c.defaults()
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -117,19 +119,29 @@ func (_c *PopulationCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *PopulationCreate) defaults() {
+func (_c *PopulationCreate) defaults() error {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if population.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized population.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := population.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if population.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized population.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := population.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := _c.mutation.ID(); !ok {
+		if population.DefaultID == nil {
+			return fmt.Errorf("ent: uninitialized population.DefaultID (forgotten import ent/runtime?)")
+		}
 		v := population.DefaultID()
 		_c.mutation.SetID(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

@@ -20,6 +20,8 @@ type Tx struct {
 	AuditLog *AuditLogClient
 	// AuthzPolicy is the client for interacting with the AuthzPolicy builders.
 	AuthzPolicy *AuthzPolicyClient
+	// AuthzStamp is the client for interacting with the AuthzStamp builders.
+	AuthzStamp *AuthzStampClient
 	// Credential is the client for interacting with the Credential builders.
 	Credential *CredentialClient
 	// Dept is the client for interacting with the Dept builders.
@@ -176,6 +178,7 @@ func (tx *Tx) init() {
 	tx.AuditExport = NewAuditExportClient(tx.config)
 	tx.AuditLog = NewAuditLogClient(tx.config)
 	tx.AuthzPolicy = NewAuthzPolicyClient(tx.config)
+	tx.AuthzStamp = NewAuthzStampClient(tx.config)
 	tx.Credential = NewCredentialClient(tx.config)
 	tx.Dept = NewDeptClient(tx.config)
 	tx.File = NewFileClient(tx.config)

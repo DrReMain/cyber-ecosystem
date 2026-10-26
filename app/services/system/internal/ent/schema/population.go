@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/schema/index"
 
 	"cyber-ecosystem/shared-go/orm/ent/mixins"
+
+	"cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
 )
 
 type Population struct {
@@ -36,6 +38,7 @@ func (Population) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
 		mixins.CreatedUpdatedMixin{},
+		local_mixins.AuthzStampMixin{},
 	}
 }
 

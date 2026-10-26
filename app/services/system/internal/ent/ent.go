@@ -7,6 +7,7 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
+	"cyber-ecosystem/app/services/system/internal/ent/authzstamp"
 	"cyber-ecosystem/app/services/system/internal/ent/credential"
 	"cyber-ecosystem/app/services/system/internal/ent/dept"
 	"cyber-ecosystem/app/services/system/internal/ent/file"
@@ -89,6 +90,7 @@ func checkColumn(t, c string) error {
 			auditexport.Table:      auditexport.ValidColumn,
 			auditlog.Table:         auditlog.ValidColumn,
 			authzpolicy.Table:      authzpolicy.ValidColumn,
+			authzstamp.Table:       authzstamp.ValidColumn,
 			credential.Table:       credential.ValidColumn,
 			dept.Table:             dept.ValidColumn,
 			file.Table:             file.ValidColumn,

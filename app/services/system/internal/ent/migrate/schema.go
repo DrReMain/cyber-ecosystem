@@ -126,6 +126,31 @@ var (
 			},
 		},
 	}
+	// AuthzStampsColumns holds the columns for the "authz_stamps" table.
+	AuthzStampsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 64},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "version", Type: field.TypeInt64, Default: 0},
+	}
+	// AuthzStampsTable holds the schema information for the "authz_stamps" table.
+	AuthzStampsTable = &schema.Table{
+		Name:       "authz_stamps",
+		Columns:    AuthzStampsColumns,
+		PrimaryKey: []*schema.Column{AuthzStampsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "authzstamp_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AuthzStampsColumns[1]},
+			},
+			{
+				Name:    "authzstamp_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{AuthzStampsColumns[2]},
+			},
+		},
+	}
 	// CredentialColumns holds the columns for the "credential" table.
 	CredentialColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -526,6 +551,7 @@ var (
 		AuditExportTable,
 		AuditLogTable,
 		PolicyTable,
+		AuthzStampsTable,
 		CredentialTable,
 		DeptTable,
 		FileTable,

@@ -41,6 +41,7 @@ func (Permission) Mixin() []ent.Mixin {
 		mixins.IDStringMixin{},
 		mixins.CreatedUpdatedMixin{},
 		local_mixins.TenantMixin{},
+		local_mixins.AuthzStampMixin{},
 	}
 }
 

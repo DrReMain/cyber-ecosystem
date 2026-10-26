@@ -2,7 +2,6 @@ package authz
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -14,22 +13,28 @@ import (
 
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
+	"cyber-ecosystem/app/services/system/internal/ent"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
 	"cyber-ecosystem/app/services/system/internal/ent/membership"
+	"cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
 	"cyber-ecosystem/app/services/system/internal/ent/user"
 	"cyber-ecosystem/app/services/system/internal/platform"
 	"cyber-ecosystem/app/services/system/internal/shared"
 )
 
-const reconcileEvery = 5 * time.Minute
+const (
+	reconcileEvery    = 5 * time.Minute
+	forceRebuildEvery = 24 * time.Hour
+)
 
 // Repo ----------------------------------------------------------------------------------------------------------------
 
 type authzRP struct {
 	shared.RP
-	snap      atomic.Pointer[snapshot]
-	watchDone chan struct{}
-	watchSub  cache.Subscription
+	snap       atomic.Pointer[snapshot]
+	lastForced atomic.Int64
+	watchDone  chan struct{}
+	watchSub   cache.Subscription
 }
 
 func NewAuthzRP(logger *slog.Logger, p *platform.Platform) (AuthzRP, error) {
@@ -37,11 +42,12 @@ func NewAuthzRP(logger *slog.Logger, p *platform.Platform) (AuthzRP, error) {
 	// Every request reads the snapshot, so compile failure must fail
 	// construction.
 	ctx := context.Background()
-	snap, err := r.compileFromDB(ctx, r.remoteVersionSafe(ctx))
+	snap, err := r.compileFromDB(ctx, r.stampVersionSafe(ctx))
 	if err != nil {
 		return nil, fmt.Errorf("authz rp: initial compile: %w", err)
 	}
 	r.snap.Store(snap)
+	r.lastForced.Store(time.Now().UnixNano())
 	return r, nil
 }
 
@@ -268,18 +274,24 @@ func (r *authzRP) StopWatch(context.Context) error {
 
 func (r *authzRP) reconcile() {
 	ctx := context.Background()
-	ver, err := r.remoteVersion(ctx)
+	ver, err := r.stampVersion(ctx)
 	if err != nil {
-		r.Log.Warn("authz: version read failed; keeping snapshot", "version", r.version(), "error", err)
+		r.Log.Warn("authz: stamp read failed; keeping snapshot", "version", r.version(), "error", err)
 		return
 	}
-	// >= so a stamp that ever moves backwards never pins an old snapshot.
-	if r.version() >= ver {
+	// != : any divergence from the stamp rebuilds. The stamp is the DB
+	// truth bumped inside the change transaction itself, so a replica that
+	// ever diverges — forwards, backwards, from a restored backup — heals
+	// on this pass; the old >= comparison pinned stale replicas forever
+	// whenever the stamp moved backwards (counter loss, a restore).
+	if r.version() == ver && !forcedDue(r.lastForced.Load(), time.Now()) {
 		return
 	}
 	if err := r.rebuild(ctx, ver); err != nil {
 		r.Log.Warn("authz: rebuild failed; keeping snapshot", "version", r.version(), "error", err)
+		return
 	}
+	r.lastForced.Store(time.Now().UnixNano())
 }
 
 func (r *authzRP) version() int64 {
@@ -289,23 +301,23 @@ func (r *authzRP) version() int64 {
 	return -1
 }
 
-func (r *authzRP) remoteVersion(ctx context.Context) (int64, error) {
-	ver, err := r.Platform.GetCache().Counter.Get(ctx, shared.PolicyVersionKey)
+func (r *authzRP) stampVersion(ctx context.Context) (int64, error) {
+	row, err := r.Platform.GetClient(ctx).AuthzStamp.Get(ctx, local_mixins.StampRowKey)
 	if err != nil {
-		if errors.Is(err, cache.ErrKeyNotFound) {
-			return 0, nil // never bumped yet: version zero
+		if ent.IsNotFound(err) {
+			return 0, nil // no bump yet: version zero
 		}
-		return 0, r.Platform.HandleCacheError(err)
+		return 0, r.Platform.HandleEntError(err)
 	}
-	return ver, nil
+	return row.Version, nil
 }
 
-func (r *authzRP) remoteVersionSafe(ctx context.Context) int64 {
-	ver, err := r.remoteVersion(ctx)
+func (r *authzRP) stampVersionSafe(ctx context.Context) int64 {
+	ver, err := r.stampVersion(ctx)
 	if err != nil {
-		// A Redis outage must not block startup; the first reconcile after
-		// recovery realigns the version.
-		r.Log.Warn("authz: initial version read failed; starting unversioned", "error", err)
+		// A stamp-read failure must not block startup; the first reconcile
+		// after recovery realigns the version.
+		r.Log.Warn("authz: initial stamp read failed; starting unversioned", "error", err)
 		return -1
 	}
 	return ver
@@ -459,4 +471,11 @@ func policyViews(polys []policyMeta) []PolicyView {
 		views = append(views, PolicyView{Kind: p.kind, Name: p.name, Params: p.params})
 	}
 	return views
+}
+
+func forcedDue(lastForcedNs int64, now time.Time) bool {
+	if lastForcedNs == 0 {
+		return true
+	}
+	return now.Sub(time.Unix(0, lastForcedNs)) >= forceRebuildEvery
 }

@@ -14,6 +14,7 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
+	"cyber-ecosystem/app/services/system/internal/ent/authzstamp"
 	"cyber-ecosystem/app/services/system/internal/ent/credential"
 	"cyber-ecosystem/app/services/system/internal/ent/dept"
 	"cyber-ecosystem/app/services/system/internal/ent/file"
@@ -44,6 +45,8 @@ type Client struct {
 	AuditLog *AuditLogClient
 	// AuthzPolicy is the client for interacting with the AuthzPolicy builders.
 	AuthzPolicy *AuthzPolicyClient
+	// AuthzStamp is the client for interacting with the AuthzStamp builders.
+	AuthzStamp *AuthzStampClient
 	// Credential is the client for interacting with the Credential builders.
 	Credential *CredentialClient
 	// Dept is the client for interacting with the Dept builders.
@@ -80,6 +83,7 @@ func (c *Client) init() {
 	c.AuditExport = NewAuditExportClient(c.config)
 	c.AuditLog = NewAuditLogClient(c.config)
 	c.AuthzPolicy = NewAuthzPolicyClient(c.config)
+	c.AuthzStamp = NewAuthzStampClient(c.config)
 	c.Credential = NewCredentialClient(c.config)
 	c.Dept = NewDeptClient(c.config)
 	c.File = NewFileClient(c.config)
@@ -186,6 +190,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AuditExport:      NewAuditExportClient(cfg),
 		AuditLog:         NewAuditLogClient(cfg),
 		AuthzPolicy:      NewAuthzPolicyClient(cfg),
+		AuthzStamp:       NewAuthzStampClient(cfg),
 		Credential:       NewCredentialClient(cfg),
 		Dept:             NewDeptClient(cfg),
 		File:             NewFileClient(cfg),
@@ -219,6 +224,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AuditExport:      NewAuditExportClient(cfg),
 		AuditLog:         NewAuditLogClient(cfg),
 		AuthzPolicy:      NewAuthzPolicyClient(cfg),
+		AuthzStamp:       NewAuthzStampClient(cfg),
 		Credential:       NewCredentialClient(cfg),
 		Dept:             NewDeptClient(cfg),
 		File:             NewFileClient(cfg),
@@ -259,9 +265,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AuditExport, c.AuditLog, c.AuthzPolicy, c.Credential, c.Dept, c.File,
-		c.Membership, c.Permission, c.PermissionPolicy, c.Population, c.PrincipalRole,
-		c.Role, c.Tenant, c.User,
+		c.AuditExport, c.AuditLog, c.AuthzPolicy, c.AuthzStamp, c.Credential, c.Dept,
+		c.File, c.Membership, c.Permission, c.PermissionPolicy, c.Population,
+		c.PrincipalRole, c.Role, c.Tenant, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -271,9 +277,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AuditExport, c.AuditLog, c.AuthzPolicy, c.Credential, c.Dept, c.File,
-		c.Membership, c.Permission, c.PermissionPolicy, c.Population, c.PrincipalRole,
-		c.Role, c.Tenant, c.User,
+		c.AuditExport, c.AuditLog, c.AuthzPolicy, c.AuthzStamp, c.Credential, c.Dept,
+		c.File, c.Membership, c.Permission, c.PermissionPolicy, c.Population,
+		c.PrincipalRole, c.Role, c.Tenant, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -288,6 +294,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AuditLog.mutate(ctx, m)
 	case *AuthzPolicyMutation:
 		return c.AuthzPolicy.mutate(ctx, m)
+	case *AuthzStampMutation:
+		return c.AuthzStamp.mutate(ctx, m)
 	case *CredentialMutation:
 		return c.Credential.mutate(ctx, m)
 	case *DeptMutation:
@@ -715,6 +723,139 @@ func (c *AuthzPolicyClient) mutate(ctx context.Context, m *AuthzPolicyMutation) 
 		return (&AuthzPolicyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AuthzPolicy mutation op: %q", m.Op())
+	}
+}
+
+// AuthzStampClient is a client for the AuthzStamp schema.
+type AuthzStampClient struct {
+	config
+}
+
+// NewAuthzStampClient returns a client for the AuthzStamp from the given config.
+func NewAuthzStampClient(c config) *AuthzStampClient {
+	return &AuthzStampClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `authzstamp.Hooks(f(g(h())))`.
+func (c *AuthzStampClient) Use(hooks ...Hook) {
+	c.hooks.AuthzStamp = append(c.hooks.AuthzStamp, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `authzstamp.Intercept(f(g(h())))`.
+func (c *AuthzStampClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AuthzStamp = append(c.inters.AuthzStamp, interceptors...)
+}
+
+// Create returns a builder for creating a AuthzStamp entity.
+func (c *AuthzStampClient) Create() *AuthzStampCreate {
+	mutation := newAuthzStampMutation(c.config, OpCreate)
+	return &AuthzStampCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AuthzStamp entities.
+func (c *AuthzStampClient) CreateBulk(builders ...*AuthzStampCreate) *AuthzStampCreateBulk {
+	return &AuthzStampCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AuthzStampClient) MapCreateBulk(slice any, setFunc func(*AuthzStampCreate, int)) *AuthzStampCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AuthzStampCreateBulk{err: fmt.Errorf("calling to AuthzStampClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AuthzStampCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AuthzStampCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AuthzStamp.
+func (c *AuthzStampClient) Update() *AuthzStampUpdate {
+	mutation := newAuthzStampMutation(c.config, OpUpdate)
+	return &AuthzStampUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AuthzStampClient) UpdateOne(_m *AuthzStamp) *AuthzStampUpdateOne {
+	mutation := newAuthzStampMutation(c.config, OpUpdateOne, withAuthzStamp(_m))
+	return &AuthzStampUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AuthzStampClient) UpdateOneID(id string) *AuthzStampUpdateOne {
+	mutation := newAuthzStampMutation(c.config, OpUpdateOne, withAuthzStampID(id))
+	return &AuthzStampUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AuthzStamp.
+func (c *AuthzStampClient) Delete() *AuthzStampDelete {
+	mutation := newAuthzStampMutation(c.config, OpDelete)
+	return &AuthzStampDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AuthzStampClient) DeleteOne(_m *AuthzStamp) *AuthzStampDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AuthzStampClient) DeleteOneID(id string) *AuthzStampDeleteOne {
+	builder := c.Delete().Where(authzstamp.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AuthzStampDeleteOne{builder}
+}
+
+// Query returns a query builder for AuthzStamp.
+func (c *AuthzStampClient) Query() *AuthzStampQuery {
+	return &AuthzStampQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAuthzStamp},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AuthzStamp entity by its id.
+func (c *AuthzStampClient) Get(ctx context.Context, id string) (*AuthzStamp, error) {
+	return c.Query().Where(authzstamp.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AuthzStampClient) GetX(ctx context.Context, id string) *AuthzStamp {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AuthzStampClient) Hooks() []Hook {
+	return c.hooks.AuthzStamp
+}
+
+// Interceptors returns the client interceptors.
+func (c *AuthzStampClient) Interceptors() []Interceptor {
+	return c.inters.AuthzStamp
+}
+
+func (c *AuthzStampClient) mutate(ctx context.Context, m *AuthzStampMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AuthzStampCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AuthzStampUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AuthzStampUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AuthzStampDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AuthzStamp mutation op: %q", m.Op())
 	}
 }
 
@@ -1634,7 +1775,8 @@ func (c *PopulationClient) GetX(ctx context.Context, id string) *Population {
 
 // Hooks returns the client hooks.
 func (c *PopulationClient) Hooks() []Hook {
-	return c.hooks.Population
+	hooks := c.hooks.Population
+	return append(hooks[:len(hooks):len(hooks)], population.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
@@ -2198,14 +2340,14 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AuditExport, AuditLog, AuthzPolicy, Credential, Dept, File, Membership,
-		Permission, PermissionPolicy, Population, PrincipalRole, Role, Tenant,
-		User []ent.Hook
+		AuditExport, AuditLog, AuthzPolicy, AuthzStamp, Credential, Dept, File,
+		Membership, Permission, PermissionPolicy, Population, PrincipalRole, Role,
+		Tenant, User []ent.Hook
 	}
 	inters struct {
-		AuditExport, AuditLog, AuthzPolicy, Credential, Dept, File, Membership,
-		Permission, PermissionPolicy, Population, PrincipalRole, Role, Tenant,
-		User []ent.Interceptor
+		AuditExport, AuditLog, AuthzPolicy, AuthzStamp, Credential, Dept, File,
+		Membership, Permission, PermissionPolicy, Population, PrincipalRole, Role,
+		Tenant, User []ent.Interceptor
 	}
 )
 

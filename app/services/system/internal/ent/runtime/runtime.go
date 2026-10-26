@@ -6,6 +6,7 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
+	"cyber-ecosystem/app/services/system/internal/ent/authzstamp"
 	"cyber-ecosystem/app/services/system/internal/ent/credential"
 	"cyber-ecosystem/app/services/system/internal/ent/dept"
 	"cyber-ecosystem/app/services/system/internal/ent/file"
@@ -203,7 +204,9 @@ func init() {
 	auditlog.IDValidator = auditlogDescID.Validators[0].(func(string) error)
 	authzpolicyMixin := schema.AuthzPolicy{}.Mixin()
 	authzpolicyMixinHooks2 := authzpolicyMixin[2].Hooks()
+	authzpolicyMixinHooks3 := authzpolicyMixin[3].Hooks()
 	authzpolicy.Hooks[0] = authzpolicyMixinHooks2[0]
+	authzpolicy.Hooks[1] = authzpolicyMixinHooks3[0]
 	authzpolicyMixinInters2 := authzpolicyMixin[2].Interceptors()
 	authzpolicy.Interceptors[0] = authzpolicyMixinInters2[0]
 	authzpolicyMixinFields0 := authzpolicyMixin[0].Fields()
@@ -274,6 +277,31 @@ func init() {
 	authzpolicy.DefaultID = authzpolicyDescID.Default.(func() string)
 	// authzpolicy.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	authzpolicy.IDValidator = authzpolicyDescID.Validators[0].(func(string) error)
+	authzstampMixin := schema.AuthzStamp{}.Mixin()
+	authzstampMixinFields0 := authzstampMixin[0].Fields()
+	_ = authzstampMixinFields0
+	authzstampFields := schema.AuthzStamp{}.Fields()
+	_ = authzstampFields
+	// authzstampDescCreatedAt is the schema descriptor for created_at field.
+	authzstampDescCreatedAt := authzstampMixinFields0[0].Descriptor()
+	// authzstamp.DefaultCreatedAt holds the default value on creation for the created_at field.
+	authzstamp.DefaultCreatedAt = authzstampDescCreatedAt.Default.(func() time.Time)
+	// authzstampDescUpdatedAt is the schema descriptor for updated_at field.
+	authzstampDescUpdatedAt := authzstampMixinFields0[1].Descriptor()
+	// authzstamp.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	authzstamp.DefaultUpdatedAt = authzstampDescUpdatedAt.Default.(func() time.Time)
+	// authzstamp.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	authzstamp.UpdateDefaultUpdatedAt = authzstampDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// authzstampDescVersion is the schema descriptor for version field.
+	authzstampDescVersion := authzstampFields[1].Descriptor()
+	// authzstamp.DefaultVersion holds the default value on creation for the version field.
+	authzstamp.DefaultVersion = authzstampDescVersion.Default.(int64)
+	// authzstampDescID is the schema descriptor for id field.
+	authzstampDescID := authzstampFields[0].Descriptor()
+	// authzstamp.DefaultID holds the default value on creation for the id field.
+	authzstamp.DefaultID = authzstampDescID.Default.(string)
+	// authzstamp.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	authzstamp.IDValidator = authzstampDescID.Validators[0].(func(string) error)
 	credentialMixin := schema.Credential{}.Mixin()
 	credentialMixinFields0 := credentialMixin[0].Fields()
 	_ = credentialMixinFields0
@@ -616,7 +644,9 @@ func init() {
 	membership.IDValidator = membershipDescID.Validators[0].(func(string) error)
 	permissionMixin := schema.Permission{}.Mixin()
 	permissionMixinHooks2 := permissionMixin[2].Hooks()
+	permissionMixinHooks3 := permissionMixin[3].Hooks()
 	permission.Hooks[0] = permissionMixinHooks2[0]
+	permission.Hooks[1] = permissionMixinHooks3[0]
 	permissionMixinInters2 := permissionMixin[2].Interceptors()
 	permission.Interceptors[0] = permissionMixinInters2[0]
 	permissionMixinFields0 := permissionMixin[0].Fields()
@@ -697,7 +727,9 @@ func init() {
 	permission.IDValidator = permissionDescID.Validators[0].(func(string) error)
 	permissionpolicyMixin := schema.PermissionPolicy{}.Mixin()
 	permissionpolicyMixinHooks2 := permissionpolicyMixin[2].Hooks()
+	permissionpolicyMixinHooks3 := permissionpolicyMixin[3].Hooks()
 	permissionpolicy.Hooks[0] = permissionpolicyMixinHooks2[0]
+	permissionpolicy.Hooks[1] = permissionpolicyMixinHooks3[0]
 	permissionpolicyMixinInters2 := permissionpolicyMixin[2].Interceptors()
 	permissionpolicy.Interceptors[0] = permissionpolicyMixinInters2[0]
 	permissionpolicyMixinFields0 := permissionpolicyMixin[0].Fields()
@@ -765,6 +797,8 @@ func init() {
 	// permissionpolicy.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	permissionpolicy.IDValidator = permissionpolicyDescID.Validators[0].(func(string) error)
 	populationMixin := schema.Population{}.Mixin()
+	populationMixinHooks2 := populationMixin[2].Hooks()
+	population.Hooks[0] = populationMixinHooks2[0]
 	populationMixinFields0 := populationMixin[0].Fields()
 	_ = populationMixinFields0
 	populationMixinFields1 := populationMixin[1].Fields()
@@ -844,7 +878,9 @@ func init() {
 	population.IDValidator = populationDescID.Validators[0].(func(string) error)
 	principalroleMixin := schema.PrincipalRole{}.Mixin()
 	principalroleMixinHooks2 := principalroleMixin[2].Hooks()
+	principalroleMixinHooks3 := principalroleMixin[3].Hooks()
 	principalrole.Hooks[0] = principalroleMixinHooks2[0]
+	principalrole.Hooks[1] = principalroleMixinHooks3[0]
 	principalroleMixinInters2 := principalroleMixin[2].Interceptors()
 	principalrole.Interceptors[0] = principalroleMixinInters2[0]
 	principalroleMixinFields0 := principalroleMixin[0].Fields()
@@ -931,7 +967,9 @@ func init() {
 	principalrole.IDValidator = principalroleDescID.Validators[0].(func(string) error)
 	roleMixin := schema.Role{}.Mixin()
 	roleMixinHooks2 := roleMixin[2].Hooks()
+	roleMixinHooks3 := roleMixin[3].Hooks()
 	role.Hooks[0] = roleMixinHooks2[0]
+	role.Hooks[1] = roleMixinHooks3[0]
 	roleMixinInters2 := roleMixin[2].Interceptors()
 	role.Interceptors[0] = roleMixinInters2[0]
 	roleMixinFields0 := roleMixin[0].Fields()
@@ -1075,8 +1113,10 @@ func init() {
 	userMixin := schema.User{}.Mixin()
 	userMixinHooks2 := userMixin[2].Hooks()
 	userMixinHooks3 := userMixin[3].Hooks()
+	userMixinHooks4 := userMixin[4].Hooks()
 	user.Hooks[0] = userMixinHooks2[0]
 	user.Hooks[1] = userMixinHooks3[0]
+	user.Hooks[2] = userMixinHooks4[0]
 	userMixinInters2 := userMixin[2].Interceptors()
 	userMixinInters3 := userMixin[3].Interceptors()
 	user.Interceptors[0] = userMixinInters2[0]

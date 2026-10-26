@@ -10,6 +10,7 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
+	"cyber-ecosystem/app/services/system/internal/ent/authzstamp"
 	"cyber-ecosystem/app/services/system/internal/ent/credential"
 	"cyber-ecosystem/app/services/system/internal/ent/dept"
 	"cyber-ecosystem/app/services/system/internal/ent/file"
@@ -161,6 +162,33 @@ func (f TraverseAuthzPolicy) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.AuthzPolicyQuery", q)
+}
+
+// The AuthzStampFunc type is an adapter to allow the use of ordinary function as a Querier.
+type AuthzStampFunc func(context.Context, *ent.AuthzStampQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f AuthzStampFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.AuthzStampQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.AuthzStampQuery", q)
+}
+
+// The TraverseAuthzStamp type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseAuthzStamp func(context.Context, *ent.AuthzStampQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseAuthzStamp) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseAuthzStamp) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.AuthzStampQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.AuthzStampQuery", q)
 }
 
 // The CredentialFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -469,6 +497,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.AuditLogQuery, predicate.AuditLog, auditlog.OrderOption]{typ: ent.TypeAuditLog, tq: q}, nil
 	case *ent.AuthzPolicyQuery:
 		return &query[*ent.AuthzPolicyQuery, predicate.AuthzPolicy, authzpolicy.OrderOption]{typ: ent.TypeAuthzPolicy, tq: q}, nil
+	case *ent.AuthzStampQuery:
+		return &query[*ent.AuthzStampQuery, predicate.AuthzStamp, authzstamp.OrderOption]{typ: ent.TypeAuthzStamp, tq: q}, nil
 	case *ent.CredentialQuery:
 		return &query[*ent.CredentialQuery, predicate.Credential, credential.OrderOption]{typ: ent.TypeCredential, tq: q}, nil
 	case *ent.DeptQuery:
