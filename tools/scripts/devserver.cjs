@@ -34,6 +34,18 @@ function parseArgs(argv) {
   return parsed;
 }
 
+// The session dir name is a project name's last segment, and it must be one
+// clean path segment: anything else ("..", ".", foreign bytes) would aim
+// rmSync outside the run dir — "foo/.." resolves to the workspace root
+// itself.
+function sessionName(project) {
+  const name = project.split("/").pop();
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(name)) {
+    die(`invalid project name: ${project}`);
+  }
+  return name;
+}
+
 // ps field for a pid, "" when the pid is gone (identity checks + reporting)
 function psField(field, pid) {
   try {
@@ -119,7 +131,7 @@ async function up(args) {
   if (!project) {
     die("usage: devserver.cjs up --project <nx-project> [--ready <regex>]");
   }
-  const name = project.split("/").pop();
+  const name = sessionName(project);
   const dir = path.join(RUN_DIR, name);
   const logFile = path.join(dir, "dev.log");
 
@@ -199,7 +211,7 @@ async function down(args) {
   if (!project) {
     die("usage: devserver.cjs down --project <nx-project>");
   }
-  const name = project.split("/").pop();
+  const name = sessionName(project);
   const dir = path.join(RUN_DIR, name);
   const state = readState(name);
   if (!state) {

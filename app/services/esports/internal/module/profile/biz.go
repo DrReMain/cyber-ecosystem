@@ -26,13 +26,13 @@ type Profile struct {
 	Nickname            *string
 	BirthYear           *int32
 	BirthMonth          *int32
-	Sex                 *string
 	AgeBand             *string
 	AvatarURL           *string
 	GuardianConsentedAt *time.Time
 	Games               []types.GameEntry
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
+	Sex                 *string
 }
 
 type GamePreference struct {
@@ -117,9 +117,6 @@ func (uc *ProfileUC) Update(ctx context.Context, in *UpdateIn) (*Profile, error)
 	if in.BirthMonth != nil {
 		p.BirthMonth = in.BirthMonth
 	}
-	if in.Sex != nil {
-		p.Sex = in.Sex
-	}
 	// The band follows the birth pair wherever it lands — derived, never
 	// client-supplied.
 	p.AgeBand = ageBandOf(p.BirthYear, p.BirthMonth, time.Now())
@@ -138,6 +135,9 @@ func (uc *ProfileUC) Update(ctx context.Context, in *UpdateIn) (*Profile, error)
 			return nil, err
 		}
 		p.Games = entries
+	}
+	if in.Sex != nil {
+		p.Sex = in.Sex
 	}
 	return uc.profileRP.Save(ctx, p)
 }

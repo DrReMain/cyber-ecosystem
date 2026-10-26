@@ -145,6 +145,13 @@ func TestGCMRoundTrip(t *testing.T) {
 	if _, err := DecryptAES256GCM(key, "nonce9999999", "transaction", ct); err == nil {
 		t.Error("wrong nonce must fail")
 	}
+	// Wrong lengths are a different class than a wrong value: the stdlib
+	// panics on them, so the wrapper must refuse before Open runs.
+	for _, bad := range []string{"", "n", "nonce12345", "nonce12345678"} {
+		if _, err := DecryptAES256GCM(key, bad, "transaction", ct); err == nil {
+			t.Errorf("nonce length %d must fail", len(bad))
+		}
+	}
 	if _, err := DecryptAES256GCM([]byte("another-32-byte-key-another-32-byt"), "nonce1234567", "transaction", ct); err == nil {
 		t.Error("wrong key must fail")
 	}

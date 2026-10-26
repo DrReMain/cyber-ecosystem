@@ -8,9 +8,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
+	entmatchconfig "cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
+	entmatchsession "cyber-ecosystem/app/services/esports/internal/ent/matchsession"
+	entprofile "cyber-ecosystem/app/services/esports/internal/ent/profile"
 	enttest "cyber-ecosystem/app/services/esports/internal/ent/test"
 	enttestrecord "cyber-ecosystem/app/services/esports/internal/ent/testrecord"
-	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
@@ -27,7 +29,7 @@ func NewRecordBoardRP(logger *slog.Logger, p *platform.Platform) RecordBoardRP {
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (rp *boardRP) Anchor(ctx context.Context, recordID string) (*test.AttemptRecord, error) {
+func (rp *boardRP) Anchor(ctx context.Context, recordID string) (*Attempt, error) {
 	row, err := rp.Platform.GetClient(ctx).TestRecord.Get(ctx, recordID)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -35,31 +37,81 @@ func (rp *boardRP) Anchor(ctx context.Context, recordID string) (*test.AttemptRe
 		}
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return attemptOf(row), nil
+	return &Attempt{
+		ID:        row.ID,
+		TestCode:  row.TestCode,
+		UserID:    row.UserID,
+		SessionID: row.SessionID,
+		Valid:     row.Valid,
+	}, nil
 }
 
-func (rp *boardRP) SessionBoard(ctx context.Context, sessionID string, anchor *test.AttemptRecord) ([]BoardEntry, error) {
-	client := rp.Platform.GetClient(ctx)
-	var (
-		rows []*ent.TestRecord
-		err  error
-	)
+func (rp *boardRP) SessionBoard(ctx context.Context, sessionID string, anchor *Attempt) ([]BoardEntry, error) {
 	// A session-less anchor is its own single-entry board; the join walks
 	// two queries rather than one — the tests table is a dozen rows and
 	// the ledger's read stays index-shaped.
+	client := rp.Platform.GetClient(ctx)
+	var rows []*ent.TestRecord
 	if sessionID == "" {
-		rows, err = client.TestRecord.Query().
-			Where(enttestrecord.IDEQ(anchor.ID)).All(ctx)
+		row, gerr := client.TestRecord.Get(ctx, anchor.ID)
+		if gerr != nil {
+			if ent.IsNotFound(gerr) {
+				return nil, nil
+			}
+			return nil, rp.Platform.HandleEntError(gerr)
+		}
+		rows = []*ent.TestRecord{row}
 	} else {
+		var err error
 		rows, err = client.TestRecord.Query().
 			Where(enttestrecord.SessionIDEQ(sessionID), enttestrecord.ValidEQ(true)).
 			Order(ent.Asc(enttestrecord.FieldCreatedAt)).
 			All(ctx)
-	}
-	if err != nil {
-		return nil, rp.Platform.HandleEntError(err)
+		if err != nil {
+			return nil, rp.Platform.HandleEntError(err)
+		}
 	}
 	return rp.boardOf(ctx, rows)
+}
+
+func (rp *boardRP) GenreOf(ctx context.Context, sessionID string, anchor *Attempt) (string, error) {
+	client := rp.Platform.GetClient(ctx)
+	if sessionID != "" {
+		row, err := client.MatchSession.Query().
+			Where(entmatchsession.IDEQ(sessionID)).Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return "", nil
+			}
+			return "", rp.Platform.HandleEntError(err)
+		}
+		return row.Genre, nil
+	}
+	// A session-less anchor's genre is its single test's category.
+	row, err := client.Test.Query().Where(enttest.CodeEQ(anchor.TestCode)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return "", nil
+		}
+		return "", rp.Platform.HandleEntError(err)
+	}
+	if row.Category == nil {
+		return "", nil
+	}
+	return *row.Category, nil
+}
+
+func (rp *boardRP) GenreDimensions(ctx context.Context, genre string) (int, error) {
+	// How many abilities the genre orders — read from match_config as the
+	// distinct ability set, the completeness headline's denominator.
+	dims, err := rp.Platform.GetClient(ctx).MatchConfig.Query().
+		Where(entmatchconfig.GenreEQ(genre)).
+		GroupBy(entmatchconfig.FieldAbility).
+		Strings(ctx)
+	if err != nil {
+		return 0, rp.Platform.HandleEntError(err)
+	}
+	return len(dims), nil
 }
 
 func (rp *boardRP) Cohort(ctx context.Context, ability string, birthYear *int32, sex *string, ageBand *string) (CohortStats, string, error) {
@@ -67,19 +119,22 @@ func (rp *boardRP) Cohort(ctx context.Context, ability string, birthYear *int32,
 	// undetermined or missing sex benches against the whole same-age pool),
 	// degrading to the age band when the birth year is unknown — the
 	// approximate rubric the basis flag names; the join rides ent's Modify.
+	tr := sql.Table(enttestrecord.Table)
+	t := sql.Table(enttest.Table)
+	p := sql.Table(entprofile.Table)
 	key := ""
 	conds := []func(*sql.Selector){
-		func(s *sql.Selector) { s.Where(sql.EQ(sql.Table("test").C("ability"), ability)) },
+		func(s *sql.Selector) { s.Where(sql.EQ(t.C(enttest.FieldAbility), ability)) },
 	}
 	if birthYear != nil {
-		conds = append(conds, func(s *sql.Selector) { s.Where(sql.EQ(sql.Table("profile").C("birth_year"), *birthYear)) })
+		conds = append(conds, func(s *sql.Selector) { s.Where(sql.EQ(p.C(entprofile.FieldBirthYear), *birthYear)) })
 		key = "same-age"
-		if sex != nil && *sex != "" && *sex != "undetermined" {
-			conds = append(conds, func(s *sql.Selector) { s.Where(sql.EQ(sql.Table("profile").C("sex"), *sex)) })
+		if sex != nil && *sex != "" && *sex != shared.SexUndetermined {
+			conds = append(conds, func(s *sql.Selector) { s.Where(sql.EQ(p.C(entprofile.FieldSex), *sex)) })
 			key = "same-age-same-sex"
 		}
 	} else if ageBand != nil && *ageBand != "" {
-		conds = append(conds, func(s *sql.Selector) { s.Where(sql.EQ(sql.Table("profile").C("age_band"), *ageBand)) })
+		conds = append(conds, func(s *sql.Selector) { s.Where(sql.EQ(p.C(entprofile.FieldAgeBand), *ageBand)) })
 		key = "band-approximate"
 	}
 	var stats CohortStats
@@ -88,32 +143,28 @@ func (rp *boardRP) Cohort(ctx context.Context, ability string, birthYear *int32,
 		// against, and the caller renders score-only.
 		return stats, "", nil
 	}
-	client := rp.Platform.GetClient(ctx)
 	var rows []*struct {
 		Avg   *float64 `json:"avg"`
 		Std   *float64 `json:"std"`
 		Count int      `json:"count"`
 	}
-	err := client.TestRecord.Query().
+	err := rp.Platform.GetClient(ctx).TestRecord.Query().
 		Modify(func(s *sql.Selector) {
-			tr := sql.Table("test_record")
-			t := sql.Table("test")
-			p := sql.Table("profile")
-			s.Join(t).On(t.C("code"), tr.C("test_code")).
-				Join(p).On(p.C("user_id"), tr.C("user_id")).
+			s.Join(t).On(t.C(enttest.FieldCode), tr.C(enttestrecord.FieldTestCode)).
+				Join(p).On(p.C(entprofile.FieldUserID), tr.C(enttestrecord.FieldUserID)).
 				Where(sql.And(
-					sql.EQ(tr.C("valid"), true),
-					sql.IsNull(tr.C("deleted_at")),
-					sql.IsNull(t.C("deleted_at")),
-					sql.IsNull(p.C("deleted_at")),
-					sql.NotNull(tr.C("authoritative_score")),
+					sql.EQ(tr.C(enttestrecord.FieldValid), true),
+					sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
+					sql.IsNull(t.C(enttest.FieldDeletedAt)),
+					sql.IsNull(p.C(entprofile.FieldDeletedAt)),
+					sql.NotNull(tr.C(enttestrecord.FieldAuthoritativeScore)),
 				))
 			for _, c := range conds {
 				c(s)
 			}
 			s.Select(
-				sql.As("avg("+tr.C("authoritative_score")+")", "avg"),
-				sql.As("stddev_samp("+tr.C("authoritative_score")+")", "std"),
+				sql.As("avg("+tr.C(enttestrecord.FieldAuthoritativeScore)+")", "avg"),
+				sql.As("stddev_samp("+tr.C(enttestrecord.FieldAuthoritativeScore)+")", "std"),
 				sql.As("count(*)", "count"),
 			)
 		}).
@@ -148,6 +199,7 @@ func (rp *boardRP) PreviousSessionRecord(ctx context.Context, userID, ability st
 			enttestrecord.TestCodeIn(codeList...),
 			enttestrecord.ValidEQ(true),
 			enttestrecord.CreatedAtLT(before),
+			enttestrecord.AuthoritativeScoreNotNil(),
 		).
 		Order(ent.Desc(enttestrecord.FieldCreatedAt)).
 		First(ctx)
@@ -207,28 +259,4 @@ func (rp *boardRP) boardOf(ctx context.Context, rows []*ent.TestRecord) ([]Board
 		})
 	}
 	return out, nil
-}
-
-func attemptOf(row *ent.TestRecord) *test.AttemptRecord {
-	grade := (*string)(nil)
-	if row.Grade != nil {
-		g := string(*row.Grade)
-		grade = &g
-	}
-	return &test.AttemptRecord{
-		ID:            row.ID,
-		TestCode:      row.TestCode,
-		UserID:        row.UserID,
-		AttemptNo:     row.AttemptNo,
-		SessionID:     row.SessionID,
-		StartedAt:     row.StartedAt,
-		EndedAt:       row.EndedAt,
-		Backgrounds:   row.Backgrounds,
-		RawDetail:     row.RawDetail,
-		RawScore:      row.RawScore,
-		Authoritative: row.AuthoritativeScore,
-		Grade:         grade,
-		Valid:         row.Valid,
-		InvalidReason: row.InvalidReason,
-	}
 }

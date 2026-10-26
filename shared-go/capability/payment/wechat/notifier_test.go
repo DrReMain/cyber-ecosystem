@@ -200,6 +200,17 @@ func TestNotifierFailureLadder(t *testing.T) {
 			body := []byte(mustMarshal(t, w))
 			ni.Body, ni.Headers = body, f.pushHeaders(body, time.Now().Unix())
 		}, payment.ErrDecryptFailed},
+		"bad_nonce_length": {func(t *testing.T, f *fakeChannel, ni *payment.NotificationInput) {
+			var w map[string]any
+			if err := json.Unmarshal(ni.Body, &w); err != nil {
+				t.Fatalf("unmarshal: %v", err)
+			}
+			// 11 chars: the sealed envelope carries a wrong-length nonce, and
+			// the decrypt step must refuse it rather than panic
+			w["resource"].(map[string]any)["nonce"] = "nonce123456"
+			body := []byte(mustMarshal(t, w))
+			ni.Body, ni.Headers = body, f.pushHeaders(body, time.Now().Unix())
+		}, payment.ErrDecryptFailed},
 		"unknown_algorithm": {func(_ *testing.T, f *fakeChannel, ni *payment.NotificationInput) {
 			body := []byte(`{"event_type":"TRANSACTION.SUCCESS","resource":{"original_type":"transaction","algorithm":"RSA-OAEP","nonce":"n","ciphertext":"c","associated_data":"a"}}`)
 			ni.Body, ni.Headers = body, f.pushHeaders(body, time.Now().Unix())

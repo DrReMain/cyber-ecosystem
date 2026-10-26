@@ -102,6 +102,11 @@ func (b *backend) Parse(_ context.Context, in *payment.NotificationInput) (*paym
 	if err != nil {
 		return nil, err
 	}
+	// A wrong-length nonce panics inside gcm.Open; the real channel's parse
+	// answers the same shape with ErrDecryptFailed, so the mock must match.
+	if len(nonce) != gcm.NonceSize() {
+		return nil, payment.ErrDecryptFailed
+	}
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
 		return nil, payment.ErrDecryptFailed

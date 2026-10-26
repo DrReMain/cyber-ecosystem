@@ -10,6 +10,8 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+
+	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
 // Struct --------------------------------------------------------------------------------------------------------------
@@ -49,7 +51,6 @@ func (s *ReportService) GetReport(ctx context.Context, req *esportspb.GetReportR
 		Tier:                tierPB(r.Tier),
 		CompositePercentile: r.Composite,
 		Abilities:           abilitiesPB(r.Abilities),
-		SubAbilities:        nil, // the sub-ability board waits for the engines' secondary-contribution outlet; absent, never zero-axed
 		Comparison:          comparisonPB(r.Comparison),
 		Improvements:        improvementsPB(r.Improvements),
 		TestedDimensions:    utils.ConvNum[int32](r.Tested),
@@ -90,7 +91,7 @@ func comparisonPB(deltas []AbilityDelta) *esportspb.ReportComparison {
 	return &esportspb.ReportComparison{Deltas: out}
 }
 
-func improvementsPB(items []Improvement) []*esportspb.ReportImprovement {
+func improvementsPB(items []ReportImprovement) []*esportspb.ReportImprovement {
 	out := make([]*esportspb.ReportImprovement, 0, len(items))
 	for _, it := range items {
 		out = append(out, &esportspb.ReportImprovement{
@@ -105,13 +106,13 @@ func improvementsPB(items []Improvement) []*esportspb.ReportImprovement {
 
 func tierPB(tier string) esportspb.ReportTier {
 	switch tier {
-	case "S":
+	case shared.TierS:
 		return esportspb.ReportTier_REPORT_TIER_S
-	case "A":
+	case shared.TierA:
 		return esportspb.ReportTier_REPORT_TIER_A
-	case "B":
+	case shared.TierB:
 		return esportspb.ReportTier_REPORT_TIER_B
-	case "C":
+	case shared.TierC:
 		return esportspb.ReportTier_REPORT_TIER_C
 	}
 	return esportspb.ReportTier_REPORT_TIER_UNSPECIFIED

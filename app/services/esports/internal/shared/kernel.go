@@ -24,6 +24,15 @@ const (
 	PolicyMembership = "membership"
 	PolicyTenant     = "tenant"
 	PolicyClosed     = "closed"
+
+	SexMale         = "male"
+	SexFemale       = "female"
+	SexUndetermined = "undetermined"
+
+	TierS = "S"
+	TierA = "A"
+	TierB = "B"
+	TierC = "C"
 )
 
 type Transaction interface {

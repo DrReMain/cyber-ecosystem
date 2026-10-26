@@ -11,6 +11,8 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+
+	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
 // Struct --------------------------------------------------------------------------------------------------------------
@@ -108,9 +110,9 @@ func sexPB(s *string) *esportspb.ProfileSex {
 	}
 	v := esportspb.ProfileSex_PROFILE_SEX_UNDETERMINED // the honest default — a bad row renders as not-said, never as a guess
 	switch *s {
-	case "male":
+	case shared.SexMale:
 		v = esportspb.ProfileSex_PROFILE_SEX_MALE
-	case "female":
+	case shared.SexFemale:
 		v = esportspb.ProfileSex_PROFILE_SEX_FEMALE
 	}
 	return &v
@@ -120,12 +122,12 @@ func sexFromPB(s *esportspb.ProfileSex) *string {
 	if s == nil {
 		return nil
 	}
-	v := "undetermined"
+	v := shared.SexUndetermined
 	switch *s {
 	case esportspb.ProfileSex_PROFILE_SEX_MALE:
-		v = "male"
+		v = shared.SexMale
 	case esportspb.ProfileSex_PROFILE_SEX_FEMALE:
-		v = "female"
+		v = shared.SexFemale
 	}
 	return &v
 }
