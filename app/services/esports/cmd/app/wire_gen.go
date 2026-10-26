@@ -91,7 +91,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	entitleAdminService := entitleadmin.NewEntitleAdminService(logger, codeUC, entitleUC)
 	recordBoardRP := report.NewRecordBoardRP(logger, platformPlatform)
 	reportUC := report.NewReportUC(logger, platformPlatform, recordBoardRP, entitlementRP, profileRP)
-	reportService := report.NewService(reportUC)
+	reportService := report.NewReportService(logger, reportUC)
 	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)

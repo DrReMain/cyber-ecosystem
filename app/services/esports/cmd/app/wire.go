@@ -41,7 +41,6 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Payment, *slog.Logger
 		client.ProviderSet,
 		authz.ProviderSet,
 		profile.ProviderSet,
-		report.ProviderSet,
 		game.ProviderSet,
 		match.ProviderSet,
 		member.ProviderSet,
@@ -49,6 +48,7 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Payment, *slog.Logger
 		test.ProviderSet,
 		entitle.ProviderSet,
 		entitleadmin.ProviderSet,
+		report.ProviderSet,
 		newApp,
 	))
 }

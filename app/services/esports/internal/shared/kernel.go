@@ -20,16 +20,16 @@ const (
 	ReportCareer    = "career"
 	ReportSchool    = "school"
 
-	PolicyOpen       = "open"
+	PolicyOpen       = "open" // report_policy's admission modes — entitle judges by them, entitleadmin sets them, same two-modules-one-home law as the family above
 	PolicyMembership = "membership"
 	PolicyTenant     = "tenant"
 	PolicyClosed     = "closed"
 
-	SexMale         = "male"
+	SexMale         = "male" // the trio profile collects and the report cohort keys on — undetermined is the honest not-said, never guessed from anything
 	SexFemale       = "female"
 	SexUndetermined = "undetermined"
 
-	TierS = "S"
+	TierS = "S" // the letters the judgement, the grade column, and the unlock-time snapshot all carry
 	TierA = "A"
 	TierB = "B"
 	TierC = "C"

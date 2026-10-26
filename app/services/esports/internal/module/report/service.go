@@ -2,6 +2,7 @@ package report
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 	"github.com/go-kratos/kratos/v3/transport/http"
@@ -19,11 +20,12 @@ import (
 type ReportService struct {
 	esportspb.UnimplementedReportServiceServer
 
-	uc *ReportUC
+	log *slog.Logger
+	uc  *ReportUC
 }
 
-func NewService(uc *ReportUC) *ReportService {
-	return &ReportService{uc: uc}
+func NewReportService(logger *slog.Logger, uc *ReportUC) *ReportService {
+	return &ReportService{log: logger.With("module", "module/report_service"), uc: uc}
 }
 
 func (s *ReportService) RegisterGRPC(srv *grpc.Server) {
