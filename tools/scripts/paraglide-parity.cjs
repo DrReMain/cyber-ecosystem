@@ -15,7 +15,25 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const clientRoot = path.resolve(process.argv[2] || ".");
+// No argument = every client under app/clients/*, each checked in a child
+// process so a failure names its client and the exit code aggregates. The
+// iteration lives here (not in a shell for-loop) so the Nx target is one
+// portable command on every platform.
+if (!process.argv[2]) {
+  const { spawnSync } = require("node:child_process");
+  const clientsRoot = path.join(__dirname, "..", "..", "app", "clients");
+  let failed = 0;
+  for (const entry of fs.readdirSync(clientsRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const r = spawnSync(process.execPath, [__filename, path.join(clientsRoot, entry.name)], {
+      stdio: "inherit",
+    });
+    if (r.status !== 0) failed++;
+  }
+  process.exit(failed ? 1 : 0);
+}
+
+const clientRoot = path.resolve(process.argv[2]);
 const fail = [];
 const bad = (msg) => fail.push(msg);
 

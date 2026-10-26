@@ -167,7 +167,7 @@
       ],
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "VERSION=$(git describe --tags --always --match 'v*') docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait"
+        "command": "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait"
       }
     },
     "app:stop": {
@@ -199,7 +199,7 @@
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          "VERSION=$(git describe --tags --always --match 'v*') docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait",
+          "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile app up -d --wait",
           "docker compose -f deploy/docker/compose.edge.yaml up -d --wait"
         ],
         "parallel": false
@@ -220,7 +220,7 @@
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          "VERSION=$(git describe --tags --always --match 'v*') docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile mq --profile realtime --profile media --profile observability --profile app up -d --wait",
+          "docker compose -f deploy/docker/compose.dev.yaml -f deploy/docker/compose.app.yaml --profile db --profile storage --profile mq --profile realtime --profile media --profile observability --profile app up -d --wait",
           "docker compose -f deploy/docker/compose.edge.yaml up -d --wait"
         ],
         "parallel": false

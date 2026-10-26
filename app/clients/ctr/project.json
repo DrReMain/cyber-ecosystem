@@ -86,7 +86,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "docker build -f app/clients/ctr/Dockerfile --build-arg NPM_REGISTRY=\"$(pnpm config get registry)\" -t cyber-ecosystem/ctr:local ."
+        "command": "docker build -f app/clients/ctr/Dockerfile -t cyber-ecosystem/ctr:local ."
       }
     }
   }
