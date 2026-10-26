@@ -131,11 +131,33 @@ func TestSharedContractSingleSource(t *testing.T) {
 	}
 }
 
+// TestModuleSingleService pins one module = one transport face: at most one
+// *Service struct per module dir. Two faces in one package mean two
+// aggregates sharing a module — the cure is the module split, never a
+// second service struct.
+func TestModuleSingleService(t *testing.T) {
+	counts := map[string][]string{}
+	for _, f := range goFiles(t, "..", "module", false) {
+		if len(f.serviceStructs) == 0 {
+			continue
+		}
+		mod, _, _ := strings.Cut(strings.TrimPrefix(f.rel, "module/"), "/")
+		counts[mod] = append(counts[mod], f.serviceStructs...)
+	}
+	for mod, names := range counts {
+		if len(names) > 1 {
+			t.Errorf("module/%s declares %d service structs (%s) — one module one face; split the module",
+				mod, len(names), strings.Join(names, ", "))
+		}
+	}
+}
+
 type goFile struct {
-	rel      string
-	imports  []string
-	literals []string
-	hookRefs int
+	rel            string
+	imports        []string
+	literals       []string
+	hookRefs       int
+	serviceStructs []string
 }
 
 // goFiles walks root collecting parsed files. When ruleDir is non-empty
@@ -198,6 +220,10 @@ func goFiles(t *testing.T, root, ruleDir string, importsOnly bool) []goFile {
 				case *ast.Ident:
 					if n.Name == "HookRegistry" {
 						gf.hookRefs++
+					}
+				case *ast.TypeSpec:
+					if _, isStruct := n.Type.(*ast.StructType); isStruct && strings.HasSuffix(n.Name.Name, "Service") {
+						gf.serviceStructs = append(gf.serviceStructs, n.Name.Name)
 					}
 				}
 				return true

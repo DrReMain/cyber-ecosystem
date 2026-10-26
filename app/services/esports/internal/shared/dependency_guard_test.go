@@ -91,10 +91,44 @@ func TestCompositionBoundaries(t *testing.T) {
 	}
 }
 
+// singleServiceExceptions names module dirs still allowed a second
+// *Service struct — each entry is a debt that dies with its module split,
+// and a stale entry fails the tail loop below.
+var singleServiceExceptions = map[string]bool{
+	"pay": true, // sku and order under one package, awaiting the split
+}
+
+// TestModuleSingleService pins one module = one transport face: at most one
+// *Service struct per module dir. Two faces in one package mean two
+// aggregates sharing a module — the cure is the module split, never a
+// second service struct.
+func TestModuleSingleService(t *testing.T) {
+	counts := map[string][]string{}
+	for _, f := range goFiles(t, "..", "module", false) {
+		if len(f.serviceStructs) == 0 {
+			continue
+		}
+		mod, _, _ := strings.Cut(strings.TrimPrefix(f.rel, "module/"), "/")
+		counts[mod] = append(counts[mod], f.serviceStructs...)
+	}
+	for mod, names := range counts {
+		if len(names) > 1 && !singleServiceExceptions[mod] {
+			t.Errorf("module/%s declares %d service structs (%s) — one module one face; split the module",
+				mod, len(names), strings.Join(names, ", "))
+		}
+	}
+	for mod := range singleServiceExceptions {
+		if _, ok := counts[mod]; !ok {
+			t.Errorf("single-service exception %q matched no module — stale entry?", mod)
+		}
+	}
+}
+
 type goFile struct {
-	rel      string
-	imports  []string
-	hookRefs int
+	rel            string
+	imports        []string
+	hookRefs       int
+	serviceStructs []string
 }
 
 // goFiles walks root collecting parsed files. When ruleDir is non-empty
@@ -147,6 +181,11 @@ func goFiles(t *testing.T, root, ruleDir string, importsOnly bool) []goFile {
 		}
 		if !importsOnly {
 			ast.Inspect(f, func(n ast.Node) bool {
+				if ts, ok := n.(*ast.TypeSpec); ok {
+					if _, isStruct := ts.Type.(*ast.StructType); isStruct && strings.HasSuffix(ts.Name.Name, "Service") {
+						gf.serviceStructs = append(gf.serviceStructs, ts.Name.Name)
+					}
+				}
 				if id, ok := n.(*ast.Ident); ok && id.Name == "HookRegistry" {
 					gf.hookRefs++
 				}
