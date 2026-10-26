@@ -1,7 +1,0 @@
-# ctr-shell 进度 — 节奏记录
-
-## 节奏记录
-
-- 2026-10-21 立项+当日落片(未提交,用户手动收口)。链路:用户报两首屏症状→机制诊断(脱水契约读穿+SSR HTML 实证)→深研(44 页全量声明+block3/block4 PRD 全文+LOGIC_AUDIT 全文+60 天计划)→设计提案两轮评审(用户质询"每点根据",逐点补证后认可)→实施。落刀面 9 文件:`routes/__root.tsx`(根级会话真值)/`home/page.tsx`(双态读会话内嵌画像,删独立画像查询)/`routes/profile.index.tsx`(loader 预取)/`features/modules/profile/use-profile-update.ts`(新,写失效缝)/`setup/{nickname,age,games}.tsx`×3 + `age-required/page.tsx`(第四写面,收口自检 walk 抓出的漏网调用方,一并入缝)/`login/after-login.ts`(`ensureQueryData`→`query()`,5.104 弃用词汇统一)。法条回灌 tanstack §3 First-paint data 小节+T-RTE-5+§0 派发行。
-- 2026-10-21 验证存档:ctr 四链绿(build/typecheck/check/test 全 exit 0 --skip-nx-cache);浏览器矩阵六案全绿——①已登录刷新首页:SSR HTML=「欢迎回来」+会话进脱水载荷,且加载后 fetch/xhr **零请求**(脱水新鲜期零重取,闪烁机制性不可能)②已登录刷新「我的」:内容直出零 LOADING;devtools 证实 loader 预取与页面 provider 同槽(缓存键 `transport:"connect"` 静态键)③匿名首页(隔离上下文):匿名脸+CTA 正确+SSR 无已登录串④向导失效链:存昵称「探针七号」→回首页 h1=新昵称(失效→重取→首屏直出),潜伏的 profileFlowGuard 陈旧回弹同步根除⑤死会话 SSR 回归:redis 落撤销标记→重载首页即自动踢 `/login?next=/`(expired 吐司一次性消费后参数剥离),零手动刷新——注水期守望者吃脱水 expired 判决直接点火⑥登录链回归(复登 pg7→完整性判定→落向导,`query()` 词汇变更无恙)。全程控制台零错误。
-- 2026-10-21 测试工具教训:①撤销标记真值=`utils.MustMarshal(time.Now())`=RFC3339 JSON 串;redis 手设裸秒串会让内省 `Unmarshal[time.Time]` 报错→**infra 错误≠auth 拒绝**,守卫/守望者都不认(顺带证实根级真值法对探针失败的静默降级正确:SSR 匿名渲染不炸壳)。②chrome-mcp 真实点击对 RAC Button 偶发不落(登录/下一步两例);兜底=elementFromPoint 命中验证+`btn.click()`/`form.requestSubmit()`。③登录页受控 checkbox 程序化 `.click()` 不进 React 态,须 pointer 事件序列 dispatch(本会话既有结论再证)。④死会话测试后标记已 DEL,pg7-probe 复登复原(昵称=探针七号,出生年月仍缺=向导素材态)。
