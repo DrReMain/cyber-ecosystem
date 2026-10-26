@@ -14,7 +14,7 @@ This file is the canonical root-rules source; `CLAUDE.md` is a Claude Code impor
 
 ## 2) Repository Overview
 
-Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**, not a vertical product: one shared base, business apps fork and grow on top. Protobuf contracts (`proto/`) are the source of truth; generated code (`gen/`) is derived output — never edit directly.
+Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**, not a vertical product: one shared base, business apps fork and grow on top. Protobuf contracts (`proto/`) are the source of truth; `gen/` is its derived output.
 
 | Path | Holds |
 |---|---|
@@ -40,9 +40,9 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 
 **Fresh clone:** bootstrap once with `./nx run tools:init` — pinned buf and grpcurl CLIs, Go and buf dependencies, and node_modules — before running anything else.
 
-**How to find targets:** Read the project's `project.json` — every valid target is declared there, for every project, JS/TS packages included. Do not assume a target exists. `package.json` carries package identity (name, dependencies) only — npm scripts are not used anywhere in this repo; a workflow with no target gets one added to `project.json`. In target commands, package-local binaries are invoked through `pnpm exec <bin>` — Nx injects only the workspace-root `.bin` into PATH, and pnpm's isolation keeps vite/vitest/storybook package-local, so a bare binary name fails loudly instead of resolving.
+**How to find targets:** Read the project's `project.json` — every valid target is declared there; do not assume one exists. `package.json` carries package identity only (npm scripts are not used; a workflow with no target gets one added). Package-local binaries in target commands go through `pnpm exec <bin>` — Nx injects only the workspace-root `.bin` and pnpm keeps vite/vitest/storybook package-local, so a bare binary name fails loudly instead of resolving.
 
-**Long-running dev servers:** start with the project's `dev:up` target, stop with `dev:down`. While up, all output streams to `.run/<project>/dev.log` (one directory per project, removed on stop — a log file exists only while its server runs); read or `tail -f` that file for logs. `dev:down` kills exactly the process group recorded at start — never by port — so raw `kill` is never needed.
+**Long-running dev servers:** start with the project's `dev-up` target, stop with `dev-down`. While up, all output streams to `.run/<project>/dev.log` (one directory per project, removed on stop — a log file exists only while its server runs); read or `tail -f` that file for logs. `dev-down` kills exactly the process group recorded at start — never by port — so raw `kill` is never needed. Target names never carry colons — under nx's configuration grammar, `X:dev:up` silently resolves to the raw `dev` target and boots a blocking foreground server outside the lifecycle.
 
 Recurring build, test, lint, generation, dev, and automation workflows `SHOULD` be exposed through Nx targets. If a needed workflow has no target yet, add one to `project.json` instead of running ad-hoc commands.
 
@@ -105,7 +105,7 @@ Default posture (the owning conventions instantiate each cell with concrete comm
 | refactor | chain, cache bypassed | counterexample replay — pin the baseline before the change | existing only | diff shape |
 | chore / docs | owning chain / docs gate | none | none | skim |
 
-Test posture is a function of the review regime, not a constant: under strict human review the human carries the verification (defaults above); when output is agent-heavy and review is light, the burden moves into executable form — test-first becomes the default for behavior-bearing kinds, and the reviewer reviews the spec rather than the implementation. The active regime is declared in the active working lane's collaboration section (lane law: docs/README.md §1), not here. Runtime verification escalates with blast radius: single-surface smoke → protocol matrix → full-flow e2e → cross-commit integration e2e.
+Test posture follows the review regime: strict human review — the human carries the verification (defaults above); agent-heavy output with light review — the burden moves into executable form, test-first by default for behavior-bearing kinds, the reviewer reading the spec rather than the implementation. The active regime is declared in the working lane's collaboration section (lane law: docs/README.md §1), not here. Runtime verification escalates with blast radius: single-surface smoke → protocol matrix → full-flow e2e → cross-commit integration e2e.
 
 Trigger tiers: **slice close** (the table above) · **absorb** (integrating a reviewed slice: the mechanical checklist runs — deleted exports grepped for remaining consumers, new magic values traced to their source — and the integration diff equals exactly the absorbed slice's files) · **freeze** (pre-milestone: multi-stage e2e campaign with counterexamples, fresh-cache gate matrix, live-stack health; campaign scripts are throwaway, never repo assets).
 
@@ -119,8 +119,8 @@ Knowledge lives in three lanes; each kind of knowledge has exactly one home — 
 
 Lane rules:
 
-- `MUST` read the relevant `CONVENTIONS.md` before writing code in an area, and follow it exactly (structure, naming, ordering, comments, dependency rules).
-- `MUST NOT` duplicate content across lanes or into skills — pointers only. Rule text and step text live in docs; a skill body holds a trigger, pointers, completion pointers, one-line trap annotations (a warning naming the trap and its home — never the rule or the steps), and its gates line — the owning chain's concrete commands, instantiated from the conventions, which stay the source.
+- `MUST` read the relevant `CONVENTIONS.md` before writing code in an area, and follow it exactly.
+- `MUST NOT` duplicate content across lanes or into skills — pointers only; rule and step text live in docs. A skill body holds a trigger, pointers, completion pointers, one-line trap annotations (warning + home, never the rule or the steps), and its gates line — the owning chain's commands, instantiated from the conventions, which stay the source.
 - `MUST NOT` reference roadmap content from here, `CLAUDE.md`, skills, or conventions — the working lane is temporary and fully isolated (law: `docs/README.md` §2.7); active fronts are introduced by the user, not by root docs.
 - Skills auto-trigger by description (Claude Code); any agent or human can read `.claude/skills/*/SKILL.md` as plain markdown.
 - Path-scoped rule shells (`.claude/rules/*.md`) inject their law card automatically when a matching file is read or edited (delivery law: `docs/README.md` §2.9).

@@ -43,14 +43,14 @@
         "command": "go tool kratos run"
       }
     },
-    "dev:up": {
+    "dev-up": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "node tools/scripts/devserver.cjs up --project agent"
       }
     },
-    "dev:down": {
+    "dev-down": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",

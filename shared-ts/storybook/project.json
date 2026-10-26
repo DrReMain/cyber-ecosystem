@@ -18,14 +18,14 @@
         "command": "pnpm exec storybook dev -p 6006"
       }
     },
-    "dev:up": {
+    "dev-up": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
         "command": "node tools/scripts/devserver.cjs up --project @cyber-ecosystem/shared-storybook"
       }
     },
-    "dev:down": {
+    "dev-down": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",

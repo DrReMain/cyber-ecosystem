@@ -188,7 +188,7 @@ async function up(args) {
       console.log(`  ${match[0].trim()}`);
       console.log(`  pid: ${child.pid} (own process group)`);
       console.log(`  log: ${rel(logFile)} — read or tail -f while running; removed on stop`);
-      console.log(`  stop: ./nx run ${project}:dev:down`);
+      console.log(`  stop: ./nx run ${project}:dev-down`);
       return;
     }
     if (!groupAlive(child.pid)) {

@@ -10,10 +10,10 @@
     "dev": {
       "cache": false
     },
-    "dev:up": {
+    "dev-up": {
       "cache": false
     },
-    "dev:down": {
+    "dev-down": {
       "cache": false
     }
   }
