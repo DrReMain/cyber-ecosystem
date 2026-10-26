@@ -7,7 +7,11 @@ import { type AttemptRecord, EngineParams, type StepContext, type StepRef } from
 import { getGameModule } from "../registry";
 import { deriveLocalResults } from "../results";
 import type { SubmitVerdict } from "../submit";
+import { InvalidNotice } from "./invalid-notice";
 import { ProgStrip } from "./prog-strip";
+import { RetakeChip } from "./retake-chip";
+import { SubmitError } from "./submit-error";
+import { ValidScore } from "./valid-score";
 
 interface EndFaceProps {
   readonly code: string;
@@ -22,8 +26,6 @@ interface EndFaceProps {
   readonly onRetry: () => void;
   readonly onExit: () => void;
 }
-
-type DoneVerdict = Extract<SubmitVerdict, { phase: "done" }>;
 
 // Row key → label copy (every derivation key has its bilingual home here).
 const ROW_LABELS: Record<string, () => string> = {
@@ -76,58 +78,10 @@ const ROW_LABELS: Record<string, () => string> = {
   final_health: m.test_result_final_health,
 };
 
-// Ops reason → user copy; the server's reason vocabulary is ops-facing, so
-// the resolution lives client-side with a generic fallback.
-const INVALID_REASON_COPY: Record<string, () => string> = {
-  BACKGROUND_OVER_BUDGET: m.test_invalid_background,
-  ABSURD_REACTION_TIME: m.test_invalid_absurd,
-  ABSURD_TIME_SPAN: m.test_invalid_absurd,
-  DETAIL_MISMATCH: m.test_invalid_detail,
-};
-
-function invalidCopy(reason: string | undefined): string {
-  const copy = reason !== undefined ? INVALID_REASON_COPY[reason] : undefined;
-  return copy?.() ?? m.test_verdict_invalid();
-}
-
-// The grade chip's four-color ladder (prototype .tier) and its grey off
-// state — the server's curve-pending verdicts render as 未评级.
-const TIERS: Record<string, { readonly cls: string; readonly cn: () => string }> = {
-  S: { cls: "text-grade-s bg-[rgba(253,224,71,0.15)]", cn: m.test_grade_s },
-  A: { cls: "text-grade-a bg-[rgba(34,197,94,0.15)]", cn: m.test_grade_a },
-  B: { cls: "text-grade-b bg-[rgba(59,130,246,0.15)]", cn: m.test_grade_b },
-  C: { cls: "text-grade-c bg-[rgba(249,115,22,0.15)]", cn: m.test_grade_c },
-};
-
-function TierChip({ grade }: Readonly<{ grade: string | undefined }>) {
-  const tier = grade !== undefined ? TIERS[grade] : undefined;
-  if (tier === undefined) {
-    return (
-      <span className="rounded-full bg-[rgba(107,114,128,0.15)] px-2.5 py-0.75 text-[11px] font-extrabold text-[#6b7280]">
-        {m.test_grade_off()}
-      </span>
-    );
-  }
-  return (
-    <span className={`rounded-full px-2.5 py-0.75 text-[11px] font-extrabold ${tier.cls}`}>
-      {grade} · {tier.cn()}
-    </span>
-  );
-}
-
-// The retake receipt chip (prototype .st): grey while chances remain,
-// amber when spent.
-function RetakeChip({ left, max }: Readonly<{ left: number; max: number }>) {
-  const spent = left <= 0;
-  return (
-    <span
-      className={`rounded-full px-2.5 py-0.75 text-[10.5px] font-semibold ${
-        spent ? "text-status-pending bg-status-pending-bg" : "text-ink-muted bg-status-lock-bg"
-      }`}
-    >
-      {m.test_result_retake_chip({ left, max })}
-    </span>
-  );
+// The session's retake budget: the first run of the lineup carries
+// three chances, later sessions one.
+function retakeBudget(step: StepContext | null): number {
+  return step !== null ? (step.firstSession ? 3 : 1) : 0;
 }
 
 // The continue CTA's target: the next undone engine-backed step. With
@@ -137,63 +91,6 @@ function RetakeChip({ left, max }: Readonly<{ left: number; max: number }>) {
 function findNextStep(step: StepContext): StepRef | undefined {
   return step.lineup.find(
     (s) => !step.doneCodes.includes(s.code) && getGameModule(s.code) !== null,
-  );
-}
-
-// The session's retake budget: the first run of the lineup carries
-// three chances, later sessions one.
-function retakeBudget(step: StepContext | null): number {
-  return step !== null ? (step.firstSession ? 3 : 1) : 0;
-}
-
-// The submit chain's done-and-valid face: the big score with its unit,
-// the grade chip, and the ungraded note that keeps the chip's shape
-// with the honest why.
-function ValidScore({ verdict }: Readonly<{ verdict: DoneVerdict }>) {
-  return (
-    <>
-      <div className="mt-1.5 flex items-baseline justify-center gap-1.5">
-        <span className="text-ink text-[58px] leading-none font-black tabular-nums">
-          {verdict.authoritativeScore ?? "—"}
-        </span>
-        <span className="text-ink-tertiary text-sm">{m.test_result_unit()}</span>
-      </div>
-      <div className="mt-2.5">
-        <TierChip grade={verdict.grade} />
-        {/* D-AO: the ungraded chip keeps its shape, with the honest
-            note on why — the game's norms are still accumulating. */}
-        {verdict.grade === undefined && (
-          <div className="text-ink-tertiary mt-1.5 text-[10.5px]">{m.test_grade_off_note()}</div>
-        )}
-      </div>
-    </>
-  );
-}
-
-// The invalid attempt's amber card: the verdict word plus the
-// ops-vocabulary reason resolved to user copy.
-function InvalidNotice({ reason }: Readonly<{ reason: string | undefined }>) {
-  return (
-    <div className="text-status-pending rounded-control mt-3 border border-[rgba(245,158,11,0.45)] bg-transparent px-3.25 py-3 text-left text-[12px] leading-[1.85]">
-      <span className="font-bold">{m.test_verdict_invalid()}</span>
-      <span className="opacity-80"> · {invalidCopy(reason)}</span>
-    </div>
-  );
-}
-
-// The submit failure's face: the error word with its inline retry.
-function SubmitError({ onResubmit }: Readonly<{ onResubmit: () => void }>) {
-  return (
-    <div className="mt-3">
-      <div className="text-status-pending text-sm font-bold">{m.test_submit_error()}</div>
-      <button
-        className="text-ink-tertiary cursor-pointer text-xs underline active:opacity-60"
-        onClick={onResubmit}
-        type="button"
-      >
-        {m.common_retry()}
-      </button>
-    </div>
   );
 }
 

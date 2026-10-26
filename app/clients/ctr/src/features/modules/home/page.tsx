@@ -1,4 +1,3 @@
-import { type Timestamp, timestampDate } from "@bufbuild/protobuf/wkt";
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { peekMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import { useQuery } from "@tanstack/react-query";
@@ -11,84 +10,14 @@ import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { TabBar } from "#/features/app/tabbar";
 import { sessionQuery } from "#/features/auth/session.fn";
 import { m } from "#/paraglide/messages";
+import { CtaCard } from "./ui/cta-card";
+import { ResumeCard } from "./ui/resume-card";
 
 /* The home page's orb pair (prototype home). */
 const homeOrbs: readonly AmbientOrb[] = [
   { className: "top-[-60px] left-[-70px] size-[min(62vw,240px)]", tone: "blue" },
   { className: "top-[280px] right-[-70px] size-[min(51vw,200px)]", tone: "purple" },
 ];
-
-/* The resume card's desc vars: the progress counts plus the age face —
- * the prototype's inclusive day count (started today reads 已过 1 天) and
- * a local-date stamp; createdAt is the proto Timestamp itself (the typed
- * connect surface hands the message object, not a flattened string). */
-function resumeDescVars(createdAt: Timestamp | undefined, done: number, total: number) {
-  const created = createdAt !== undefined ? timestampDate(createdAt).getTime() : Date.now();
-  const days = Math.max(1, Math.floor((Date.now() - created) / 86_400_000) + 1);
-  const d = new Date(created);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  return { done, total, date, days };
-}
-
-// The resume card: the peeked session's progress line and the jump
-// back into /match.
-function ResumeCard({
-  createdAt,
-  done,
-  total,
-}: Readonly<{ createdAt: Timestamp | undefined; done: number; total: number }>) {
-  const navigate = useNavigate();
-  return (
-    <div className="border-line bg-surface-card shadow-card rounded-card flex items-center gap-3 border p-3.5">
-      <div className="min-w-0 flex-1">
-        <div className="text-ink text-[13.5px] font-extrabold">{m.home_resume_title()}</div>
-        <div className="text-ink-tertiary mt-0.75 text-[11.5px] leading-[1.7]">
-          {m.home_resume_desc(resumeDescVars(createdAt, done, total))}
-        </div>
-      </div>
-      <button
-        className="bg-cta-practice shadow-cta-practice rounded-control shrink-0 px-3.5 py-2 text-[12.5px] font-bold text-white active:opacity-80"
-        onClick={() => void navigate({ to: "/match" })}
-        type="button"
-      >
-        {m.home_resume_cta()}
-      </button>
-    </div>
-  );
-}
-
-// The start CTA card: the desc, the primary button, and the hint line.
-function CtaCard({
-  authed,
-  hasGames,
-  onStart,
-}: Readonly<{ authed: boolean; hasGames: boolean; onStart: () => void }>) {
-  return (
-    <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-4.5">
-      <div className="text-ink text-base font-extrabold">{m.home_cta_title()}</div>
-      <p className="text-ink-tertiary mt-1.25 text-[11.5px] leading-[1.7]">
-        {/* The desc follows the games state alone (prototype law): a
-            guest has no preferences yet, so it reads the pick-games
-            line — the login-first ordering rides on the button and
-            hint, not the desc. */}
-        {!hasGames ? m.home_cta_desc_need_games() : m.home_cta_desc_ready()}
-      </p>
-      <button
-        className="bg-cta-primary shadow-cta-primary rounded-control mt-3.5 w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
-        onClick={onStart}
-        type="button"
-      >
-        {!authed ? m.home_cta_login() : !hasGames ? m.home_cta_pick() : m.home_cta_start()}
-      </button>
-      {!(authed && hasGames) && (
-        <p className="text-ink-tertiary mt-2.25 text-center text-[11px]">
-          {!authed ? m.home_hint_login() : m.home_hint_games()}
-        </p>
-      )}
-    </div>
-  );
-}
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -145,7 +74,12 @@ export function HomePage() {
         </div>
 
         {showResume && resume !== null && (
-          <ResumeCard createdAt={resume.createdAt} done={resumeDone} total={resumeSteps} />
+          <ResumeCard
+            createdAt={resume.createdAt}
+            done={resumeDone}
+            onOpen={() => void navigate({ to: "/match" })}
+            total={resumeSteps}
+          />
         )}
 
         <CtaCard authed={authed} hasGames={hasGames} onStart={onStart} />
