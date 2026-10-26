@@ -90,9 +90,14 @@ function buildFace(dotSizePx: number): FaceParts {
   disc.style.width = dotSize;
   disc.style.height = dotSize;
   dotEl.append(glow, disc);
-  // The crosshair: a currentColor cross that flashes red on a miss.
+  // The crosshair: a currentColor cross that flashes red on a miss. It
+  // anchors at its center like the dot — the clamp law pins the aim
+  // point inside the stage, and a top-left anchor would let the whole
+  // cross walk off the edge at a boundary while silently biasing every
+  // recorded deviation by half its size.
   const crosshair = document.createElement("div");
   crosshair.className = "pointer-events-none absolute h-10 w-10 text-status-ok left-0 top-0";
+  crosshair.style.transform = "translate(-50%, -50%)";
   const hBar = document.createElement("div");
   hBar.className = "absolute top-1/2 left-0 h-0.5 w-full -translate-y-1/2 bg-current";
   const vBar = document.createElement("div");
@@ -108,9 +113,14 @@ function buildFace(dotSizePx: number): FaceParts {
   const stick = document.createElement("div");
   stick.className =
     "relative h-24 w-24 rounded-full border-2 border-white/40 bg-black/50 backdrop-blur-sm";
+  // The knob: centered and steered by ONE mechanism — the inline
+  // transform, never a Tailwind translate class. Tailwind v4 compiles
+  // -translate-x/-y into the standalone `translate` property, which
+  // composes with (does not replace) `transform`; mixing the two
+  // doubles the centering and parks the released knob 16 px off-center.
   const knob = document.createElement("div");
-  knob.className =
-    "absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80";
+  knob.className = "absolute left-1/2 top-1/2 h-8 w-8 rounded-full bg-white/80";
+  knob.style.transform = "translate(-50%, -50%)";
   stick.appendChild(knob);
   const stickCaption = document.createElement("span");
   stickCaption.className = "text-ink-tertiary text-[10px]";
@@ -341,10 +351,13 @@ export const trackingMovingModule: GameModule = {
           return;
         }
         started = true;
+        // Mount before measuring: a detached stage reads as 0×0, so the
+        // opening aim would collapse to (0, 0) and pin the crosshair in
+        // the top-left corner until the player steers it back.
+        ctx.mount.appendChild(stage);
         const area = spawnAreaOf(stage);
         aim = { x: area.width / 2, y: area.height / 2 };
         place(crosshair, aim);
-        ctx.mount.appendChild(stage);
         stick.addEventListener("pointerdown", onStickStart);
         stick.addEventListener("pointermove", onStickMove);
         stick.addEventListener("pointerup", onStickEnd);
