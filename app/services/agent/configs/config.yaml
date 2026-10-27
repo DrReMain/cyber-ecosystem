@@ -31,4 +31,4 @@ remote:
   system_connect: ${SYSTEM_CONNECT:localhost:13001} # system connect
 
 crypto:
-  master_key: ${AGENT_MASTER_KEY} # required; no default lives here — the deploy plane owns the one dev value; a missing key fails service start at UC construction (min 16 bytes)
+  master_key: ${AGENT_MASTER_KEY:} # empty default mirrors container/config.yaml; required — the deploy plane owns the one dev value, and a missing key fails service start at UC construction (min 16 bytes)

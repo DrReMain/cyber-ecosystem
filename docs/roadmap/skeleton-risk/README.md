@@ -38,7 +38,7 @@ system 与 agent 的 `project.json` 各加 `test` target（`go test -race ./...`
 
 - **红**：单测 `chat.NewChatUC` 以 <16B key 构造应失败（当前仅非空→红）；`agentconfig.NewAgentConfigUC` 已 ≥16B（对照绿）。
 - **绿**：阈值统一为一处；`config.yaml` 去默认值改必填（`${AGENT_MASTER_KEY:?...}`）；compose 保留**单一** dev 默认值（归层惯例=默认值住部署面，沿 Windows POSIX 役先例）；dev-up 裸跑路径由 devserver 注入 dev 值（实施时核 devserver env 通道）。
-- **实施事实**：① kratos config 的 `${VAR:default}` 是 **config 树内解析非 shell 展开**——`APP_` 前缀 env source 把 `APP_AGENT_MASTER_KEY` 以 key `AGENT_MASTER_KEY` 进树、mapper 命中即覆写、未命中走 default、**无 default 返回空串**；kratos 不支持 `:?` 语法，必填语义=去默认后空串→UC 构造失败→启动 panic（fail-loud 链已活体实证）；② 阈值常量 `shared.MinMasterKeyBytes=16` 单源，chat/agentconfig 两构造统一引用；③ devserver 原只读 dev target 的 command 不读 env——**补齐 `options.env` 合入**（通用能力：target env 在 nx 直跑与 devserver 直启两路同语义）；④ dev 默认值单一落 `agent:dev` target env（devserver 经③消费），compose dev 栈保同值单条（弃 agent-insecure-dev-key）。
+- **实施事实**：① kratos config 的 `${VAR:default}` 是 **config 树内解析非 shell 展开**——`APP_` 前缀 env source 把 `APP_AGENT_MASTER_KEY` 以 key `AGENT_MASTER_KEY` 进树、mapper 命中即覆写、未命中走 default、**无 default 返回空串**；kratos 不支持 `:?` 语法，必填语义=去默认后空串→UC 构造失败→启动 panic（fail-loud 链已活体实证）；② 阈值常量 `shared.MinMasterKeyBytes=16` 单源，chat/agentconfig 两构造统一引用；③ devserver 原只读 dev target 的 command 不读 env——**补齐 `options.env` 合入**（通用能力：target env 在 nx 直跑与 devserver 直启两路同语义）；④ dev 默认值单一落 `agent:dev` target env（devserver 经③消费），compose dev 栈保同值单条（弃 agent-insecure-dev-key）；⑤ **双面镜像核查（deploy §6 律，事后补核）**：`container/config.yaml` 自始即 `${AGENT_MASTER_KEY:}` 空默认形状（无需改），`configs/config.yaml` 统一为同形 `${AGENT_MASTER_KEY:}`（空默认与无默认在 mapper 里等价=空串，字面同形便于 field-aligned 扫描）；dev-up 新形状复证 panic 0。教训：改 `configs/` 触发 deploy §6 镜像义务，读图当跨法域（当时只读 kratos 侧）。
 
 ### SR-3 审计 CSV 消毒（R3）
 
