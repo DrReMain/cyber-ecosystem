@@ -199,8 +199,6 @@ docs/              工程约定、文档地图与治理法、agent 环境建议�
 
 工作流可在 macOS、Linux 与 Windows 上运行——命令全部经由 Nx 目标，按操作系统的 shell 差异由 Nx 与各工具自行处理。macOS 与 Linux 持续验证；Windows 路径已实现但尚未在 Windows 真机上验证。
 
-可选的 agent 工具（推荐为 coding agent 配置）：`docs/environment.md`。
-
 ### 1. 初始化工具和依赖
 
 ```bash
@@ -291,7 +289,7 @@ docs/              工程约定、文档地图与治理法、agent 环境建议�
 
 ## 文档
 
-文档地图与治理法见 [`docs/README.md`](./docs/README.md)。领域约定见：
+领域约定见：
 
 - [`docs/conventions/proto/CONVENTIONS.md`](./docs/conventions/proto/CONVENTIONS.md)
 - [`docs/conventions/kratos/CONVENTIONS.md`](./docs/conventions/kratos/CONVENTIONS.md)

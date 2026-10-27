@@ -199,8 +199,6 @@ Everything with a declared workflow runs through Nx.
 
 The workflows run on macOS, Linux, and Windows — commands go through Nx targets, and per-OS shell handling is delegated to Nx and the tools themselves. macOS and Linux are exercised continuously; the Windows paths are written but not yet validated on Windows hardware.
 
-Optional agent tooling (recommended for coding agents): `docs/environment.md`.
-
 ### 1. Initialize tooling and dependencies
 
 ```bash
@@ -291,7 +289,7 @@ Future platform work includes runtime agent principals, API-key credentials, too
 
 ## Documentation
 
-The documentation map and governance law live in [`docs/README.md`](./docs/README.md). Area conventions live in:
+Area conventions live in:
 
 - [`docs/conventions/proto/CONVENTIONS.md`](./docs/conventions/proto/CONVENTIONS.md)
 - [`docs/conventions/kratos/CONVENTIONS.md`](./docs/conventions/kratos/CONVENTIONS.md)
