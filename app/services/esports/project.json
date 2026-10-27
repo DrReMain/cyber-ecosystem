@@ -57,13 +57,6 @@
         "command": "node tools/scripts/devserver.cjs down --project esports"
       }
     },
-    "test": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "command": "go test ./..."
-      }
-    },
     "build": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/bin"],

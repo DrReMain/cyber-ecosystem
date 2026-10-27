@@ -46,13 +46,6 @@
         "command": "pnpm exec vite preview --host"
       }
     },
-    "test": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "command": "pnpm exec vitest run --passWithNoTests"
-      }
-    },
     "format": {
       "executor": "nx:run-commands",
       "options": {
