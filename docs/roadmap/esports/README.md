@@ -135,15 +135,15 @@
 
 ## 5) 协作规约
 
-- **分支流**:认领切片(记入 progress.md)→ 各自 dev 分支(dev-lzx/dev-hzy/dev-ljr)→ MR 评审(契约面变更须另一人评审)→ esports/main;发布节奏由用户定。absorb/冻结档核查=`AGENTS.md` §6.1 trigger tiers(整合机械核查+整合差=被吸收片文件集;里程碑=e2e 大战役+fresh 门禁矩阵+活栈健康)。
+- **分支流**:认领切片(记入 progress.md)→ 各自 dev 分支(dev-lzx/dev-hzy/dev-ljr)→ MR 评审(契约面变更须另一人评审)→ esports/main;发布节奏由用户定。absorb/冻结档核查=整合机械核查+整合差=被吸收片文件集;里程碑=e2e 大战役+fresh 门禁矩阵+活栈健康。
 - **冲突面隔离**:认领时按切片文件面避让;E0 契约冻结前,E3/E5/E6 只做设计稿不动契约;proto+gen 为共享敏感面,变更走 proto-change skill 全链。
-- **完成门禁**:对应 skill(proto-change/kratos-new-module/kratos-selfcheck/tanstack-change)+ 声明的 Nx 目标 + docs:check;提交信息事实级;骨架期内容纪律适用(业务无关/过程无关/可复用)。**验证姿态律(性质×体制×proven-by 声明行)= `AGENTS.md` §6.1;当前体制 A(用户严人审),转体制 B 时改本行声明。**
+- **完成门禁**:对应 skill(proto-change/kratos-new-module/tanstack-change)+ 声明的 Nx 目标;提交信息事实级;骨架期内容纪律适用(业务无关/过程无关/可复用)。**验证收口=计数声明行(根壳工作契约第四条);链形以所属 CONVENTIONS 验证节为准。**
 - **AI 协作**:切片描述自包含可独立执行;裁决一律落 §2 台账再实施,不散落对话;旧仓文档只读,以本档 §0 对齐口径为冲突时的基准。
 - **双服务启动**:pgmq schema 竞态——先起 system 稳后再起 esports。
-- **包管理器纪律(2026-10-21 升根法条)**:工作区 pnpm 唯一,法条=`AGENTS.md` §4;`package-lock.json` 不应存在——出现即有人跑了 npm(删文件+修命令),禁以 ignore 规则掩盖(根 .gitignore 排除行已按此裁决移除)。
+- **包管理器纪律(2026-10-21 升根法条)**:工作区 pnpm 唯一,法条=根壳硬法2(pnpm 唯一);`package-lock.json` 不应存在——出现即有人跑了 npm(删文件+修命令),禁以 ignore 规则掩盖(根 .gitignore 排除行已按此裁决移除)。
 - **进度档剪枝律(2026-10-23 重申)**:progress.md 收口注一行制(状态+日期+hash+关键判定),节奏行一行一事,开放项入遗留清单表;验证证据一律归提交信息 proven-by 尾,档内不存叙述——roadmap 是 agent 的作业上下文,读档成本即团队成本。
 - **让步节制律+环境分裂律(2026-10-22)**:为环境让步只让无正确性价值的面向,承重检查不因环境噪音关闭;dev 必须充分暴露问题,迁就只发生在 prod;任何「为兼容环境而削弱检查」的修法须显式声明让掉的正确性价值与生效环境,未声明不予通过。
-- **目标单源律(2026-10-23 升根法条)**:npm scripts 全弃用——一切 target 只声明于 `project.json`,包内二进制调用一律 `pnpm exec <bin>`(法条=`AGENTS.md` §3 重写版);新工作流无 target 时加到 `project.json`,禁往 `package.json` scripts 回添;客户端 Dockerfile 构建行 `pnpm --filter <pkg> exec <bin>` 为法条形,勿改回 script 调用。
+- **目标单源律(2026-10-23 升根法条)**:npm scripts 全弃用——一切 target 只声明于 `project.json`,包内二进制调用一律 `pnpm exec <bin>`(法条=根壳硬法1,Nx target 单源);新工作流无 target 时加到 `project.json`,禁往 `package.json` scripts 回添;客户端 Dockerfile 构建行 `pnpm --filter <pkg> exec <bin>` 为法条形,勿改回 script 调用。
 
 ---
 
