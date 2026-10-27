@@ -5,10 +5,11 @@
 ## 法条与纪律
 
 - 法条=根壳硬法 1（一切工作流走 Nx target；**测试一律 `./nx run <svc>:test`**，裸 `go test` 在 settings deny 里，不松动）与硬法 2（pnpm）。
-- **测试纪律（本役自定）**：每片 TDD——先写红测（失败可观察），最小改绿，再重构；**测试随片留存为回归锚**，即「择机重建」的第一波，项域收口、不铺开全量测试面（家法「业务模块默认不写测试」不因此推翻）。
+- **测试纪律（2026-10-27 升格入 kratos CONVENTIONS §7，法源在那边）**：测试只有两个家——e2e 只在 `<svc>/internal/e2e/`（ENT_E2E 门）；unit 只针对 biz 层（`biz_test.go`）。每片 TDD——先写红测，最小改绿，再重构；测试随片留存为回归锚，项域收口、不铺开全量测试面（家法「业务模块默认不写测试」不因此推翻）。
 - DB 面红绿走 `ENT_E2E=1` 门（dev 栈 postgres+redis 在跑才执行，否则 skip）——沿 80ba9a59^ 旧例惯例。
 - 每片收口=计数声明行（根壳工作契约第四条）。
 - 完成门禁=所属链（build/lint/format）+ 本片新测试计数 + 适用 live 探针。
+- 2026-10-27 追记：同文件多 UC/RP 法条同步入 kratos CONVENTIONS §3（承重=esports entitle/pay/report 既有形状）。
 
 ## 复核修订（2026-10-27，对评审原稿）
 
@@ -33,10 +34,11 @@ system 与 agent 的 `project.json` 各加 `test` target（`go test -race ./...`
 - 开工前置：dev 栈 postgres+redis 在跑（否则红测 skip 不成红）。
 - **实施事实（落地时钉出）**：① 谓词须挂**四 op**（+OpDelete|OpDeleteOne）——Datascope 模板的两 op 靠软删重写兜 delete，而 Role/permission 等 TenantMixin 表硬删，原生 delete op 直挂；② mixin Hooks 变更**必须重跑 `generate:ent`**——钩子注册编在生成物 `ent/runtime/runtime.go`，不重生成则执法静默缺席（绿阶段曾假绿一次，即此因）；③ `UpdateOneID`/`DeleteOneID` 零行返回 `ent.IsNotFound` 可断言；④ ~~残留拷贝位~~ **已清（同日裁定：三服务底座对齐）**：agent 与 esports 的 `TenantMixin` 已逐字节对齐 system 形状（路径改写拷贝，diff 验证 TRIPLE-ALIGNED），各自拦截器补齐 registry-read skip 与 ExplicitTenant 分支（两侧服务内零消费方，无行为回退面），各自 e2e 锚落位（agent=AgentConfig 软删表钉重写链形、esports=ActivationCode 硬删表钉原生 delete 形——delete 双形各有专锚），esports project.json 补回 test target。
 
-### SR-2 master_key 收敛（R4）【裁定=默认值归层】
+### SR-2 master_key 收敛（R4）【裁定=默认值归层】✅
 
 - **红**：单测 `chat.NewChatUC` 以 <16B key 构造应失败（当前仅非空→红）；`agentconfig.NewAgentConfigUC` 已 ≥16B（对照绿）。
 - **绿**：阈值统一为一处；`config.yaml` 去默认值改必填（`${AGENT_MASTER_KEY:?...}`）；compose 保留**单一** dev 默认值（归层惯例=默认值住部署面，沿 Windows POSIX 役先例）；dev-up 裸跑路径由 devserver 注入 dev 值（实施时核 devserver env 通道）。
+- **实施事实**：① kratos config 的 `${VAR:default}` 是 **config 树内解析非 shell 展开**——`APP_` 前缀 env source 把 `APP_AGENT_MASTER_KEY` 以 key `AGENT_MASTER_KEY` 进树、mapper 命中即覆写、未命中走 default、**无 default 返回空串**；kratos 不支持 `:?` 语法，必填语义=去默认后空串→UC 构造失败→启动 panic（fail-loud 链已活体实证）；② 阈值常量 `shared.MinMasterKeyBytes=16` 单源，chat/agentconfig 两构造统一引用；③ devserver 原只读 dev target 的 command 不读 env——**补齐 `options.env` 合入**（通用能力：target env 在 nx 直跑与 devserver 直启两路同语义）；④ dev 默认值单一落 `agent:dev` target env（devserver 经③消费），compose dev 栈保同值单条（弃 agent-insecure-dev-key）。
 
 ### SR-3 审计 CSV 消毒（R3）
 
@@ -82,14 +84,14 @@ system 与 agent 的 `project.json` 各加 `test` target（`go test -race ./...`
 |---|---|---|---|---|
 | SR-0 | ✅ | 2026-10-27 | 未提交 | system:test/agent:test 双绿 exit 0（32.4s/7.2s），各 [no test files] |
 | SR-1 | ✅ | 2026-10-27 | 见变更录 | 红 1（跨租户 update 得 nil=写穿）→绿 4 臂（e2e ok，-race，exit 0）；system:generate:ent 重生成 10 文件；build/lint/format 全 0；测试留存为回归锚。**底座对齐同日落**：agent/esports tenant mixin 对齐+各自 e2e 锚（红→绿同形）+esports test target 补回，三服务 build/test/lint/format 全绿 |
-| SR-2 | 待开工（裁定已入） | | | |
-| SR-3 | 待开工 | | | |
-| SR-4 | 待开工 | | | |
-| SR-5 | 待开工 | | | |
-| SR-6 | 待开工 | | | |
+| SR-2 | ✅ | 2026-10-27 | 未提交 | 红 1（15B key 构造放行）→绿（module/chat ok）；yaml 去默认+compose 单值+dev target env+devserver env 通道四面落；活体探针=fail-loud panic 实录→env 通道修后 dev-up ready/三 listener/healthz 200/panic 0；build/lint/format 全 0 |
+| SR-3 | ✅ | 2026-10-27 | 未提交（随下一批） | 编译红→绿（module/audit ok，表驱动 9 例）；消毒挂 7 自由文本列（tenant/actor/operation/http_path/ip/user_agent/deny_reason），数值与词表列（status/latency/method/principal_type）刻意不过——负数是数据不是公式；build/format/lint 全 0 |
+| SR-4 | ✅ | 2026-10-27 | 未提交（随下一批） | 红（meta-less 行以 scopeKind="" 浮出=零值宽化实录）→绿；**测试锚后撤**（同日测试分层约定入法：unit 只钉 biz 层，data_test.go 违法被删；R8 防御+注释保留自证，私有图不对称态 e2e 包外不可模拟）；链复跑 test/lint/format 全 0 |
+| SR-5 | ✅ | 2026-10-27 | 未提交（随下一批） | 小改收口（mutex+why 注释，无测试——reconcile 在 RP 层，两家园法下无单测面；验证=build/test/lint/format 全 0+走查：锁内无递归无外呼长阻塞，构造期初始 compile 不经锁） |
+| SR-6 | ✅ | 2026-10-27 | 未提交（随下一批） | 四处 why 注释落（ChangePassword/admin Update 不撤会话、AuthenticateSession 新鲜度>缓存、autoRegister hash="" 密码面永久关）；自纠一处纪律违例（日期/裁定指认=过程性锚，删）；build/test/lint/format 全 0 |
 | SR-7 | 封存（触发条件在档） | | | |
 | SR-8 | 递延（触发条件在档） | | | |
-| SR-9 | 封存（注释封存） | | | |
+| SR-9 | ✅（注释封存落） | 2026-10-27 | 未提交（随下一批） | dept Update reparent 头注释记 TOCTOU 取舍（并发对调成环可接受=读安全自愈+修复代价不成比例）；无行为变化 |
 | SR-B | 待开工（transfer 删已裁；提档默认建议=是） | | | |
 
 ## 变更录
@@ -97,3 +99,5 @@ system 与 agent 的 `project.json` 各加 `test` target（`go test -race ./...`
 - 2026-10-27：评审复核完成（R5 撤销/R4 加重/新增 SR-TR），本档建立，切片池定序。
 - 2026-10-27（二）：用户四裁定入档——SR-1=A 方案；SR-2=默认值归层；SR-7=C+量化触发；SR-8=递延（生物验证时机）；SR-9=注释封存；SR-TR 升维 SR-B（BUILTIN 面审计，transfer 删除已裁）。SR-0 落地双绿。
 - 2026-10-27（三）：SR-1 落地（四臂红绿全过，实施事实四条入节；agent/esports 拷贝位待裁）。同日用户裁定底座对齐：agent/esports mixin+e2e 锚+esports test target 一并落地，SR-0/SR-1 与本档随批提交。
+- 2026-10-27（四）：SR-2 落地（构造阈值单源+部署四面+devserver env 通道补齐；kratos `${VAR:default}` 树内解析语义定案入实施事实——esports 新服务抄 yaml 形状时的语义底）。
+- 2026-10-27（五）：测试两家园+同文件多 UC/RP 两法条入 kratos CONVENTIONS（§7/§3）；SR-4 测试锚按法后撤（data_test.go 删）；SR-3/4/5/6/9 连落（CSV 消毒/grant meta 防御/reconcile 互斥/注释四+一处/TOCTOU 封存）。役内只剩 SR-B 与两个封存递延位。

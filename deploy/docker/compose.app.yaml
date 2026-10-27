@@ -109,7 +109,7 @@ services:
         VERSION: "${VERSION:-dev}"
     image: cyber-ecosystem/agent:local
     environment:
-      - APP_AGENT_MASTER_KEY=${AGENT_MASTER_KEY:-agent-insecure-dev-key}
+      - APP_AGENT_MASTER_KEY=${AGENT_MASTER_KEY:-agent-dev-master-key} # the single dev default, owned here on the deploy plane
       - APP_DB_HOST
       - APP_DB_PORT
       - APP_DB_USER

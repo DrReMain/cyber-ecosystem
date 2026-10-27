@@ -168,6 +168,9 @@ func (uc *AuthUC) BeginIdentityLogin(ctx context.Context, providerKey, redirectU
 
 func (uc *AuthUC) autoRegister(ctx context.Context, id *exchangedIdentity) (*user.User, error) {
 	account := xid.New().String()
+	// An empty hash permanently closes the password plane: Verify against
+	// "" can never succeed, so this identity logs in only through its
+	// provider credential — that is the auto-registration contract.
 	hash := ""
 	var u *user.User
 	err := uc.Tm.InTx(ctx, func(ctx context.Context) error {
@@ -242,6 +245,10 @@ func (uc *AuthUC) Logout(ctx context.Context) error {
 }
 
 func (uc *AuthUC) AuthenticateSession(ctx context.Context, token string) (*security.Subject, error) {
+	// Freshness over caching: each verification re-reads tenant liveness and
+	// user enabled straight from the DB, so a disable lands on the very next
+	// request at the cost of two queries per call — no snapshot to go stale.
+	// Revisit only with a load signal.
 	val, err := uc.tokenRP.Get(ctx, sessionPrefix+token)
 	if err != nil {
 		if errorspb.IsInfraErrorCacheMiss(err) {

@@ -201,6 +201,9 @@ func (uc *UserUC) Update(ctx context.Context, fieldsMask []string, u *User, pass
 		}
 	}
 	if password != nil {
+		// An admin reset also leaves sessions standing — same ruling as
+		// ChangePassword: revocation belongs to disable/delete, not to a
+		// credential rotation.
 		hash, e := utils.Hash(*password)
 		if e != nil {
 			return nil, errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", e))
@@ -275,6 +278,10 @@ func (uc *UserUC) ChangePassword(ctx context.Context, oldPassword, newPassword s
 	if _, err = uc.userRP.Update(ctx, []string{"password"}, &User{ID: subject.UserID, PasswordHash: &hash}); err != nil {
 		return err
 	}
+	// Existing sessions survive a self-service password change: the caller
+	// proved the old password, so this is the same person rotating a
+	// credential, not an account takeover — unlike disable/delete, which do
+	// revoke (their actor is someone else).
 	return nil
 }
 
