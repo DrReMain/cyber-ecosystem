@@ -319,6 +319,10 @@ func (r *authzRP) version() int64 {
 	return -1
 }
 
+func (r *authzRP) StampVersion(ctx context.Context) (int64, error) {
+	return r.stampVersion(ctx)
+}
+
 func (r *authzRP) stampVersion(ctx context.Context) (int64, error) {
 	row, err := r.Platform.GetClient(ctx).AuthzStamp.Get(ctx, local_mixins.StampRowKey)
 	if err != nil {

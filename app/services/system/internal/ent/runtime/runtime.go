@@ -1055,6 +1055,8 @@ func init() {
 	// role.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	role.IDValidator = roleDescID.Validators[0].(func(string) error)
 	tenantMixin := schema.Tenant{}.Mixin()
+	tenantMixinHooks2 := tenantMixin[2].Hooks()
+	tenant.Hooks[0] = tenantMixinHooks2[0]
 	tenantMixinFields0 := tenantMixin[0].Fields()
 	_ = tenantMixinFields0
 	tenantMixinFields1 := tenantMixin[1].Fields()

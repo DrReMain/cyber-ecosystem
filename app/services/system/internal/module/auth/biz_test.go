@@ -105,6 +105,7 @@ type fakeUserRP struct {
 	createdCreds   []*user.Credential
 	deletedCredFor []string
 	findIDErr      error
+	findByIDCalls  int
 
 	createdUsers []*user.User
 }
@@ -160,6 +161,7 @@ func (f *fakeUserRP) EnsureSeat(_ context.Context, s *user.Seat) error {
 }
 
 func (f *fakeUserRP) FindByID(_ context.Context, id string) (*user.User, error) {
+	f.findByIDCalls++
 	if f.findIDErr != nil {
 		return nil, f.findIDErr
 	}
@@ -183,9 +185,23 @@ func (f *fakeUserRP) Update(_ context.Context, fieldsMask []string, u *user.User
 // absent from the map read as backend.
 type fakeAuthzRP struct {
 	authz.AuthzRP
-	grants []authz.GrantView
-	err    error
-	planes map[string]string
+	grants    []authz.GrantView
+	err       error
+	planes    map[string]string
+	stamp     int64
+	stampErr  error
+	stampHits int
+}
+
+// StampVersion answers the liveness-stamp channel the verification path
+// compares the payload against; stampErr simulates the channel failing so
+// the deep-read fallback stays exercised.
+func (f *fakeAuthzRP) StampVersion(_ context.Context) (int64, error) {
+	f.stampHits++
+	if f.stampErr != nil {
+		return 0, f.stampErr
+	}
+	return f.stamp, nil
 }
 
 func (f *fakeAuthzRP) EffectiveGrants(_ context.Context, _ *security.Subject) ([]authz.GrantView, error) {
@@ -206,11 +222,13 @@ func (f *fakeAuthzRP) PlaneOf(population string) (string, error) {
 // (nil = the classified miss) and an injectable error.
 type fakeTenantRP struct {
 	tenant.TenantRP
-	row *tenant.Tenant
-	err error
+	row            *tenant.Tenant
+	err            error
+	findByCodeCall int
 }
 
 func (f *fakeTenantRP) FindByCode(_ context.Context, code string) (*tenant.Tenant, error) {
+	f.findByCodeCall++
 	if f.err != nil {
 		return nil, f.err
 	}
@@ -320,9 +338,15 @@ func seedRow(t *testing.T, account, password string) *user.User {
 }
 
 // mintSession writes a session key directly through the fake store — the
-// authenticate-family tests own their session shapes.
+// authenticate-family tests own their session shapes. A zero LivenessStamp
+// becomes -1, the shape a mint writes when the stamp channel failed: the
+// legacy specs then ride the deep reads, exactly as they did before the
+// stamp path existed.
 func mintSession(t *testing.T, rp *fakeTokenRP, sess *Session) string {
 	t.Helper()
+	if sess.LivenessStamp == 0 {
+		sess.LivenessStamp = -1
+	}
 	token, err := utils.RandomToken()
 	if err != nil {
 		t.Fatalf("token: %v", err)
@@ -616,7 +640,8 @@ func TestAuthenticateSessionTenantGate(t *testing.T) {
 	rp := newTokenStore()
 	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour)})
 	tn := &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: false}}
-	uc := newAuthUCTenant(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, &fakeAuthzRP{}, rp, tn)
+	az := &fakeAuthzRP{}
+	uc := newAuthUCTenant(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, az, rp, tn)
 
 	if _, err := uc.AuthenticateSession(context.Background(), token); !errorspb.IsGeneralErrorUnauthenticated(err) {
 		t.Fatalf("disabled tenant: want unauthenticated, got %v", err)
@@ -626,16 +651,19 @@ func TestAuthenticateSessionTenantGate(t *testing.T) {
 	}
 
 	tn.row.Enabled = true
+	az.stamp++ // every gate flip moves the version the payload compares against
 	if _, err := uc.AuthenticateSession(context.Background(), token); err != nil {
 		t.Fatalf("re-enabled tenant: session must resurrect, got %v", err)
 	}
 
 	tn.row = nil
+	az.stamp++ // a deleted row bumps on its way out
 	if _, err := uc.AuthenticateSession(context.Background(), token); !errorspb.IsGeneralErrorUnauthenticated(err) {
 		t.Fatalf("missing registry row: want unauthenticated same shape, got %v", err)
 	}
 
 	tn.err = errorspb.ErrorInfraErrorNetworkConnection("")
+	az.stamp++ // an unrelated bump forces the deep read the error rides in on
 	if _, err := uc.AuthenticateSession(context.Background(), token); !errorspb.IsInfraErrorNetworkConnection(err) {
 		t.Fatalf("generic registry error: want passthrough, got %v", err)
 	}
@@ -650,7 +678,8 @@ func TestAuthenticateSessionUserGate(t *testing.T) {
 	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour)})
 	row := seedRow(t, "a@x.co", "right")
 	uf := &fakeUserRP{row: row}
-	uc := newAuthUCTenant(uf, &fakeAuthzRP{}, rp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+	az := &fakeAuthzRP{}
+	uc := newAuthUCTenant(uf, az, rp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 
 	row.Enabled = false
 	if _, err := uc.AuthenticateSession(context.Background(), token); !errorspb.IsGeneralErrorUnauthenticated(err) {
@@ -661,16 +690,19 @@ func TestAuthenticateSessionUserGate(t *testing.T) {
 	}
 
 	row.Enabled = true
+	az.stamp++ // every gate flip moves the version the payload compares against
 	if _, err := uc.AuthenticateSession(context.Background(), token); err != nil {
 		t.Fatalf("re-enabled identity: session must resurrect, got %v", err)
 	}
 
 	uf.row = nil
+	az.stamp++ // a deleted row bumps on its way out
 	if _, err := uc.AuthenticateSession(context.Background(), token); !errorspb.IsGeneralErrorUnauthenticated(err) {
 		t.Fatalf("missing identity row: want unauthenticated same shape, got %v", err)
 	}
 
 	uf.findIDErr = errorspb.ErrorInfraErrorNetworkConnection("")
+	az.stamp++ // an unrelated bump forces the deep read the error rides in on
 	if _, err := uc.AuthenticateSession(context.Background(), token); !errorspb.IsInfraErrorNetworkConnection(err) {
 		t.Fatalf("generic identity error: want passthrough, got %v", err)
 	}
@@ -805,6 +837,100 @@ func TestAuthenticateSessionCarriesPopulation(t *testing.T) {
 	sub, err := uc.AuthenticateSession(context.Background(), token)
 	if err != nil || sub.Population != "user" {
 		t.Fatalf("verify: sub=%+v err=%v", sub, err)
+	}
+}
+
+// An unchanged liveness stamp means no tenant or user gate has moved since
+// the last deep read: the two row reads collapse into the single stamp
+// comparison, and the deep-read ports stay untouched.
+func TestAuthenticateSessionFastPathSkipsDeepReads(t *testing.T) {
+	rp := newTokenStore()
+	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour), LivenessStamp: 7})
+	uf := &fakeUserRP{row: seedRow(t, "a@x.co", "right")}
+	tn := &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}}
+	uc := newAuthUCTenant(uf, &fakeAuthzRP{stamp: 7}, rp, tn)
+
+	for range 2 {
+		if _, err := uc.AuthenticateSession(context.Background(), token); err != nil {
+			t.Fatalf("fast verify: %v", err)
+		}
+	}
+	if tn.findByCodeCall != 0 || uf.findByIDCalls != 0 {
+		t.Fatalf("stamp match must skip the deep reads: tenant=%d user=%d", tn.findByCodeCall, uf.findByIDCalls)
+	}
+}
+
+// A moved stamp forces the deep reads once; the survivor carries the current
+// version back into the payload, so the next request rides the fast path.
+func TestAuthenticateSessionStampMoveDeepReadsAndWritesBack(t *testing.T) {
+	rp := newTokenStore()
+	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour), LivenessStamp: 8})
+	uf := &fakeUserRP{row: seedRow(t, "a@x.co", "right")}
+	tn := &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}}
+	uc := newAuthUCTenant(uf, &fakeAuthzRP{stamp: 9}, rp, tn)
+
+	if _, err := uc.AuthenticateSession(context.Background(), token); err != nil {
+		t.Fatalf("deep verify: %v", err)
+	}
+	if tn.findByCodeCall != 1 || uf.findByIDCalls != 1 {
+		t.Fatalf("stamp mismatch must deep-read once: tenant=%d user=%d", tn.findByCodeCall, uf.findByIDCalls)
+	}
+	stored, err := utils.Unmarshal[Session](rp.vals[sessionPrefix+token])
+	if err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if stored.LivenessStamp != 9 {
+		t.Fatalf("payload must carry the current stamp after a deep read: got %d", stored.LivenessStamp)
+	}
+	if _, err := uc.AuthenticateSession(context.Background(), token); err != nil {
+		t.Fatalf("second verify: %v", err)
+	}
+	if tn.findByCodeCall != 1 || uf.findByIDCalls != 1 {
+		t.Fatalf("write-back must put the next request on the fast path: tenant=%d user=%d", tn.findByCodeCall, uf.findByIDCalls)
+	}
+}
+
+// A failed stamp read degrades the optimization, never the guarantee: the
+// deep reads answer as they did before the channel existed, and the payload
+// keeps its old stamp.
+func TestAuthenticateSessionStampFailureFallsBackToDeepReads(t *testing.T) {
+	rp := newTokenStore()
+	token := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: time.Now(), ExpiresAt: time.Now().Add(time.Hour), LivenessStamp: 5})
+	uf := &fakeUserRP{row: seedRow(t, "a@x.co", "right")}
+	tn := &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}}
+	uc := newAuthUCTenant(uf, &fakeAuthzRP{stampErr: errorspb.ErrorInfraErrorNetworkConnection("")}, rp, tn)
+
+	if _, err := uc.AuthenticateSession(context.Background(), token); err != nil {
+		t.Fatalf("fallback verify: %v", err)
+	}
+	if tn.findByCodeCall != 1 || uf.findByIDCalls != 1 {
+		t.Fatalf("channel failure must deep-read: tenant=%d user=%d", tn.findByCodeCall, uf.findByIDCalls)
+	}
+	stored, err := utils.Unmarshal[Session](rp.vals[sessionPrefix+token])
+	if err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if stored.LivenessStamp != 5 {
+		t.Fatalf("a failed channel must not rewrite the payload: got %d", stored.LivenessStamp)
+	}
+}
+
+// The mint writes the stamp it saw, so a fresh session rides the fast path
+// from its first verification.
+func TestLoginMintsCurrentLivenessStamp(t *testing.T) {
+	rp := newTokenStore()
+	uc := newAuthUC(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, &fakeAuthzRP{stamp: 3}, rp)
+
+	token, _, _, err := uc.Login(context.Background(), "a@x.co", "right", "")
+	if err != nil {
+		t.Fatalf("login: %v", err)
+	}
+	stored, err := utils.Unmarshal[Session](rp.vals[sessionPrefix+token])
+	if err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if stored.LivenessStamp != 3 {
+		t.Fatalf("minted payload must carry the current stamp: got %d", stored.LivenessStamp)
 	}
 }
 
