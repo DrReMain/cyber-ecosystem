@@ -78,7 +78,7 @@ export function ProfilePage() {
         <DataCard profile={profile} />
         <SecurityCard />
 
-        {/* ⑦ 训练趋势 — the prototype's own Phase-2 placeholder, dashed. */}
+        {/* Training trend — the prototype's own Phase-2 placeholder, dashed. */}
         <div className="rounded-card border border-dashed border-[rgba(107,114,128,0.6)] bg-[rgba(17,23,41,0.5)] px-4 py-[15px]">
           <div className="mb-[6px] flex items-center justify-between">
             <span className="text-[14.5px] font-extrabold text-[#9ca3af]">

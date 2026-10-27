@@ -87,7 +87,7 @@ func (p scoringParams) difficulty() float64 {
 }
 
 type scoreResult struct {
-	// raw: the uncapped linear track, 原始成绩 × 单位分 × 难度系数.
+	// raw: the uncapped linear track — raw score × unit score × difficulty factor.
 	raw float64
 	// authoritative: the 0-100 calibrated track grade derives from — nil
 	// while a game's calibration curve is pending.
