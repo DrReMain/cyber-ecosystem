@@ -197,7 +197,7 @@ Everything with a declared workflow runs through Nx.
 - pnpm 11+
 - Docker with Compose v2
 
-The workflows run on macOS, Linux, and Windows — commands go through Nx targets, and per-OS shell handling is delegated to Nx and the tools themselves. macOS and Linux are exercised continuously; the Windows paths are written but not yet validated on Windows hardware.
+The workflows run on macOS, Linux, and Windows — commands go through Nx targets, and per-OS shell handling is delegated to Nx and the tools themselves. Every workflow is declared as an Nx target in the owning project's `project.json` (build, lint, generation, dev lifecycle); pnpm is the only package manager — never npm or yarn. macOS and Linux are exercised continuously; the Windows paths are written but not yet validated on Windows hardware.
 
 ### 1. Initialize tooling and dependencies
 

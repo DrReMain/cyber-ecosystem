@@ -1,14 +1,12 @@
-# TanStack Client Runbooks
+# Skin Runbooks
 
-**Status:** ACTIVE
-
-Procedures for the tanstack lane. Law lives in the CONVENTIONS; each step cites the law it executes.
+Procedures for the skin lane. Law lives in the CONVENTIONS beside this file; each step cites the law it executes.
 
 ## 1. New skin
 
 1. Copy the closest existing preset (square → lyra, round/soft → luma).
 2. Replace the token palettes (light/dark objects), `bodyBg`, font stacks, shadow constants.
-3. Keep verbatim: the Layout/Menu chrome contract, the button dispatch, the flat-input patch, the steps/slider patch, the Select option tokens, the `useMemo` config with deps `[styles, base, isDark, compact]` — docs/conventions/tanstack/CONVENTIONS.md §5 "Skin presets".
+3. Keep verbatim: the Layout/Menu chrome contract, the button dispatch, the flat-input patch, the steps/slider patch, the Select option tokens, the `useMemo` config with deps `[styles, base, isDark, compact]` — docs/conventions/skin/CONVENTIONS.md.
 4. Register in `../skins/registry.tsx` — the only wiring step.
 5. Validate per the tuning loop below.
 
