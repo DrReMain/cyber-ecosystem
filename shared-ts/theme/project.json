@@ -31,6 +31,13 @@
         "cwd": "{projectRoot}",
         "command": "pnpm exec tsc --noEmit"
       }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm exec vitest run --passWithNoTests"
+      }
     }
   }
 }

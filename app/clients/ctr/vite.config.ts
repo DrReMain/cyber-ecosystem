@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
@@ -46,6 +48,10 @@ const config = defineConfig(({ mode }) => {
           brotliSize: true,
         }),
     ].filter(Boolean),
+    test: {
+      environment: "jsdom",
+      include: ["src/**/*.test.{ts,tsx}"],
+    },
   };
 });
 

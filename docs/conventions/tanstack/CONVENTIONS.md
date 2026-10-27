@@ -451,6 +451,22 @@ Per change, also run `./nx run tools:paraglide:check` — the build compiles a k
 missing from one locale from the base locale and exits 0, so locale parity has
 no other gate.
 
+**Tests have two homes** (the web face of kratos §7): unit tests run in
+vitest, colocated as `<file>.test.ts(x)` beside their source — jsdom carries
+the cookie jar and DOM seams, `@testing-library` drives rendered components,
+every package with a `test` target runs `vitest run`; end-to-end tests run in
+`@playwright/test`, ONLY in a client's `e2e/` directory with its own
+`playwright.config.ts` booting the dev server on a dedicated port via
+`webServer` — an explicit `<client>:e2e` target outside the regular chain
+(the web counterpart of ENT_E2E). A fresh environment installs browser
+binaries once (`pnpm exec playwright install`); artifacts (`test-results/`,
+`playwright-report/`) stay out of git and out of biome. The config and the
+spec files belong in the client's tsconfig include — a file outside the
+include is outside the type gate, and the editor's inferred-project fallback
+is the only thing that will ever tell you. The playwright suite is the
+automatable half of the reachable-surface rule below; the browser loop stays
+the finishing pass.
+
 **Behavioral review for library seams** (typecheck cannot see these — they
 are the recurring bug class): whenever code wires into, migrates between,
 or adapts a library-owned behavior (dnd, wheel/scroll physics, menus,

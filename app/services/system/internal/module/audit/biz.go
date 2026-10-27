@@ -152,15 +152,15 @@ func (uc *AuditUC) Emit(ctx context.Context, ev *kaudit.Event) {
 
 // Private -------------------------------------------------------------------------------------------------------------
 
-// sanitizeAuditCell defuses spreadsheet formula injection on the export's
-// free-text columns: a value starting with =, +, -, @, or tab would be
-// executed as a formula by Excel/Sheets when an admin opens the file, and
-// these columns carry request data (user agent, operation, path, deny
-// reason, actor, ip, tenant). A leading apostrophe renders the cell
-// literal; every other value passes through byte-identical. Numeric and
-// vocabulary columns (status, latency, method, principal type) never route
-// through here — a negative number is data, not a formula.
 func sanitizeAuditCell(s string) string {
+	// Defuses spreadsheet formula injection on the export's free-text
+	// columns: a value starting with =, +, -, @, or tab would be executed
+	// as a formula by Excel/Sheets when an admin opens the file, and these
+	// columns carry request data (user agent, operation, path, deny reason,
+	// actor, ip, tenant). A leading apostrophe renders the cell literal;
+	// every other value passes through byte-identical. Numeric and
+	// vocabulary columns (status, latency, method, principal type) never
+	// route through here — a negative number is data, not a formula.
 	if s == "" {
 		return s
 	}
