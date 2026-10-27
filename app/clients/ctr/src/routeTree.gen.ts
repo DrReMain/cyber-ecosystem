@@ -24,6 +24,7 @@ import { Route as MatchGuideRouteImport } from './routes/match.guide'
 import { Route as MatchPickRouteImport } from './routes/match.pick'
 import { Route as MatchSwitchRouteImport } from './routes/match.switch'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as ReportRecordIdRouteImport } from './routes/report.$recordId'
 import { Route as TestCodeRouteImport } from './routes/test.$code'
 import { Route as LoginWechatCallbackRouteImport } from './routes/login.wechat.callback'
 import { Route as ProfileSetupAgeRouteImport } from './routes/profile.setup.age'
@@ -106,6 +107,11 @@ const ProfileIndexRoute = ProfileIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProfileRoute,
 } as any)
+const ReportRecordIdRoute = ReportRecordIdRouteImport.update({
+  id: '/report/$recordId',
+  path: '/report/$recordId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TestCodeRoute = TestCodeRouteImport.update({
   id: '/test/$code',
   path: '/test/$code',
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/report/$recordId': typeof ReportRecordIdRoute
   '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/report/$recordId': typeof ReportRecordIdRoute
   '/test/$code': typeof TestCodeRoute
   '/login': typeof LoginIndexRoute
   '/match': typeof MatchIndexRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/report/$recordId': typeof ReportRecordIdRoute
   '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/report/$recordId'
     | '/test/$code'
     | '/login/'
     | '/match/'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/report/$recordId'
     | '/test/$code'
     | '/login'
     | '/match'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/report/$recordId'
     | '/test/$code'
     | '/login/'
     | '/match/'
@@ -283,6 +295,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AgreementPrivacyRoute: typeof AgreementPrivacyRoute
   AgreementUserRoute: typeof AgreementUserRoute
+  ReportRecordIdRoute: typeof ReportRecordIdRoute
   TestCodeRoute: typeof TestCodeRoute
   ApiPayProviderNotifyRoute: typeof ApiPayProviderNotifyRoute
 }
@@ -394,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof ProfileRoute
     }
+    '/report/$recordId': {
+      id: '/report/$recordId'
+      path: '/report/$recordId'
+      fullPath: '/report/$recordId'
+      preLoaderRoute: typeof ReportRecordIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/test/$code': {
       id: '/test/$code'
       path: '/test/$code'
@@ -494,6 +514,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AgreementPrivacyRoute: AgreementPrivacyRoute,
   AgreementUserRoute: AgreementUserRoute,
+  ReportRecordIdRoute: ReportRecordIdRoute,
   TestCodeRoute: TestCodeRoute,
   ApiPayProviderNotifyRoute: ApiPayProviderNotifyRoute,
 }

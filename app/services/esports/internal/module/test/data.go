@@ -123,6 +123,23 @@ func (rp *testRP) CountBySessionCodes(ctx context.Context, sessionID string) (ma
 	return counts, nil
 }
 
+func (rp *testRP) LatestScoredOfSession(ctx context.Context, sessionID string) (*string, error) {
+	// The report's anchor: the newest record carrying an authoritative
+	// score — an all-invalid session honestly has none, and the report
+	// face stays unreachable rather than anchored on a scoreless row.
+	row, err := rp.Platform.GetClient(ctx).TestRecord.Query().
+		Where(testrecord.SessionIDEQ(sessionID), testrecord.AuthoritativeScoreNotNil()).
+		Order(ent.Desc(testrecord.FieldCreatedAt)).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return &row.ID, nil
+}
+
 func (rp *testRP) GetAttempt(ctx context.Context, id string) (*AttemptRecord, error) {
 	row, err := rp.Platform.GetClient(ctx).TestRecord.Get(ctx, id)
 	if err != nil {

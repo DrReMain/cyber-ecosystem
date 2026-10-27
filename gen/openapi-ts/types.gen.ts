@@ -520,6 +520,13 @@ export type CyberEsportsV1MatchSession = {
      * budget face (the budget itself rides the session row).
      */
     firstSession?: boolean;
+    /**
+     * The session's latest scored record — the ability report's anchor.
+     * Derived from records like done (never client-asserted); absent while
+     * no record carries a score yet, so a finished-but-all-invalid session
+     * honestly has no report to enter.
+     */
+    anchorRecordId?: string;
 };
 
 export type CyberEsportsV1MatchStep = {

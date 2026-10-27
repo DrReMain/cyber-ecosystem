@@ -36,6 +36,7 @@ function buildStepContext(session: MatchSession, code: string): StepContext | nu
     doneCodes: session.done ?? [],
     retestLeft: session.retestLeft?.[code] ?? 0,
     firstSession: (session.firstSession as boolean | undefined) ?? true,
+    anchorRecordId: session.anchorRecordId as string | undefined,
   };
 }
 

@@ -237,20 +237,25 @@ export function MatchPage() {
 
             <button
               className="bg-cta-primary shadow-cta-primary rounded-control mt-3 w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-40"
-              disabled={next?.testCode == null}
+              disabled={next?.testCode == null && session?.anchorRecordId == null}
               onClick={() => {
                 if (next?.testCode != null) {
                   void navigate({ to: "/test/$code", params: { code: next.testCode } });
+                } else if (session?.anchorRecordId != null) {
+                  void navigate({
+                    to: "/report/$recordId",
+                    params: { recordId: session.anchorRecordId },
+                  });
                 }
               }}
               type="button"
             >
-              {m.match_go()}
+              {next?.testCode != null ? m.match_go() : m.match_go_result()}
             </button>
             {/* A dimmed start button with no explanation reads as a bug; the
                 note names the two reasons it can park (retakes spent, engines
                 unshipped) and the way out (switching starts a fresh session). */}
-            {next?.testCode == null && (
+            {next?.testCode == null && session?.anchorRecordId == null && (
               <div className="text-ink-tertiary mt-1.5 px-0.5 text-center text-[11px] leading-relaxed">
                 {m.match_go_blocked()}
               </div>

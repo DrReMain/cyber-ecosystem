@@ -193,9 +193,14 @@ type MatchSession struct {
 	CreatedAt  *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	// True when this session is the member's first ever — the 3-vs-1 retest
 	// budget face (the budget itself rides the session row).
-	FirstSession  *wrapperspb.BoolValue `protobuf:"bytes,8,opt,name=first_session,json=firstSession,proto3" json:"first_session,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	FirstSession *wrapperspb.BoolValue `protobuf:"bytes,8,opt,name=first_session,json=firstSession,proto3" json:"first_session,omitempty"`
+	// The session's latest scored record — the ability report's anchor.
+	// Derived from records like done (never client-asserted); absent while
+	// no record carries a score yet, so a finished-but-all-invalid session
+	// honestly has no report to enter.
+	AnchorRecordId *wrapperspb.StringValue `protobuf:"bytes,9,opt,name=anchor_record_id,json=anchorRecordId,proto3" json:"anchor_record_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *MatchSession) Reset() {
@@ -280,6 +285,13 @@ func (x *MatchSession) GetCreatedAt() *timestamppb.Timestamp {
 func (x *MatchSession) GetFirstSession() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.FirstSession
+	}
+	return nil
+}
+
+func (x *MatchSession) GetAnchorRecordId() *wrapperspb.StringValue {
+	if x != nil {
+		return x.AnchorRecordId
 	}
 	return nil
 }
@@ -478,7 +490,7 @@ const file_cyber_esports_v1_match_proto_rawDesc = "" +
 	"\x06_genre\"~\n" +
 	"\tMatchStep\x126\n" +
 	"\aability\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\aability\x129\n" +
-	"\ttest_code\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\btestCode\"\x81\x04\n" +
+	"\ttest_code\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\btestCode\"\xc9\x04\n" +
 	"\fMatchSession\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x122\n" +
 	"\x05genre\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\x05genre\x12<\n" +
@@ -491,7 +503,8 @@ const file_cyber_esports_v1_match_proto_rawDesc = "" +
 	"retestLeft\x129\n" +
 	"\n" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12?\n" +
-	"\rfirst_session\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\ffirstSession\x1a=\n" +
+	"\rfirst_session\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\ffirstSession\x12F\n" +
+	"\x10anchor_record_id\x18\t \x01(\v2\x1c.google.protobuf.StringValueR\x0eanchorRecordId\x1a=\n" +
 	"\x0fRetestLeftEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01\"m\n" +
@@ -548,20 +561,21 @@ var file_cyber_esports_v1_match_proto_depIdxs = []int32{
 	8,  // 6: cyber.esports.v1.MatchSession.retest_left:type_name -> cyber.esports.v1.MatchSession.RetestLeftEntry
 	10, // 7: cyber.esports.v1.MatchSession.created_at:type_name -> google.protobuf.Timestamp
 	11, // 8: cyber.esports.v1.MatchSession.first_session:type_name -> google.protobuf.BoolValue
-	3,  // 9: cyber.esports.v1.GetMatchSessionResponse.session:type_name -> cyber.esports.v1.MatchSession
-	3,  // 10: cyber.esports.v1.SwitchMatchGenreResponse.session:type_name -> cyber.esports.v1.MatchSession
-	3,  // 11: cyber.esports.v1.PeekMatchSessionResponse.session:type_name -> cyber.esports.v1.MatchSession
-	0,  // 12: cyber.esports.v1.MatchService.GetMatchSession:input_type -> cyber.esports.v1.GetMatchSessionRequest
-	1,  // 13: cyber.esports.v1.MatchService.SwitchMatchGenre:input_type -> cyber.esports.v1.SwitchMatchGenreRequest
-	6,  // 14: cyber.esports.v1.MatchService.PeekMatchSession:input_type -> cyber.esports.v1.PeekMatchSessionRequest
-	4,  // 15: cyber.esports.v1.MatchService.GetMatchSession:output_type -> cyber.esports.v1.GetMatchSessionResponse
-	5,  // 16: cyber.esports.v1.MatchService.SwitchMatchGenre:output_type -> cyber.esports.v1.SwitchMatchGenreResponse
-	7,  // 17: cyber.esports.v1.MatchService.PeekMatchSession:output_type -> cyber.esports.v1.PeekMatchSessionResponse
-	15, // [15:18] is the sub-list for method output_type
-	12, // [12:15] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	9,  // 9: cyber.esports.v1.MatchSession.anchor_record_id:type_name -> google.protobuf.StringValue
+	3,  // 10: cyber.esports.v1.GetMatchSessionResponse.session:type_name -> cyber.esports.v1.MatchSession
+	3,  // 11: cyber.esports.v1.SwitchMatchGenreResponse.session:type_name -> cyber.esports.v1.MatchSession
+	3,  // 12: cyber.esports.v1.PeekMatchSessionResponse.session:type_name -> cyber.esports.v1.MatchSession
+	0,  // 13: cyber.esports.v1.MatchService.GetMatchSession:input_type -> cyber.esports.v1.GetMatchSessionRequest
+	1,  // 14: cyber.esports.v1.MatchService.SwitchMatchGenre:input_type -> cyber.esports.v1.SwitchMatchGenreRequest
+	6,  // 15: cyber.esports.v1.MatchService.PeekMatchSession:input_type -> cyber.esports.v1.PeekMatchSessionRequest
+	4,  // 16: cyber.esports.v1.MatchService.GetMatchSession:output_type -> cyber.esports.v1.GetMatchSessionResponse
+	5,  // 17: cyber.esports.v1.MatchService.SwitchMatchGenre:output_type -> cyber.esports.v1.SwitchMatchGenreResponse
+	7,  // 18: cyber.esports.v1.MatchService.PeekMatchSession:output_type -> cyber.esports.v1.PeekMatchSessionResponse
+	16, // [16:19] is the sub-list for method output_type
+	13, // [13:16] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_match_proto_init() }

@@ -59,11 +59,12 @@ type MatchSession struct {
 }
 
 type SessionView struct {
-	Session    *MatchSession
-	Done       []string
-	RetestLeft map[string]int32
-	First      bool
-	Created    bool
+	Session        *MatchSession
+	Done           []string
+	RetestLeft     map[string]int32
+	First          bool
+	Created        bool
+	AnchorRecordID *string
 }
 
 // Port ------------------------------------------------------------------------------------------------------------
@@ -291,12 +292,17 @@ func (uc *MatchUC) view(ctx context.Context, s *MatchSession, created bool) (*Se
 		}
 		left[st.TestCode] = utils.ConvNum[int32](remain)
 	}
+	anchor, err := uc.testRP.LatestScoredOfSession(ctx, s.ID)
+	if err != nil {
+		return nil, err
+	}
 	return &SessionView{
-		Session:    s,
-		Done:       done,
-		RetestLeft: left,
-		First:      s.RetestBudget == firstSessionBudget,
-		Created:    created,
+		Session:        s,
+		Done:           done,
+		RetestLeft:     left,
+		First:          s.RetestBudget == firstSessionBudget,
+		Created:        created,
+		AnchorRecordID: anchor,
 	}, nil
 }
 

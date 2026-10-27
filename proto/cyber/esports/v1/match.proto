@@ -106,6 +106,11 @@ message MatchSession {
   // True when this session is the member's first ever — the 3-vs-1 retest
   // budget face (the budget itself rides the session row).
   google.protobuf.BoolValue first_session = 8;
+  // The session's latest scored record — the ability report's anchor.
+  // Derived from records like done (never client-asserted); absent while
+  // no record carries a score yet, so a finished-but-all-invalid session
+  // honestly has no report to enter.
+  google.protobuf.StringValue anchor_record_id = 9;
 }
 
 message GetMatchSessionResponse {

@@ -85,9 +85,9 @@ function retakeBudget(step: StepContext | null): number {
 }
 
 // The continue CTA's target: the next undone engine-backed step. With
-// the lineup finished it returns undefined and the CTA closes the
-// session flow (the report page the prototype routes to is a later
-// slice).
+// the lineup finished it returns undefined and the CTA turns into the
+// report entry — the session's anchor record, absent when nothing scored
+// (an all-invalid lineup keeps the finish button instead).
 function findNextStep(step: StepContext): StepRef | undefined {
   return step.lineup.find(
     (s) => !step.doneCodes.includes(s.code) && getGameModule(s.code) !== null,
@@ -235,6 +235,18 @@ export function EndFace({
                 onPress={() => void navigate({ to: "/test/$code", params: { code: next.code } })}
               >
                 {m.test_result_next({ ability: abilityWord(next.ability).cn })}
+              </Button>
+            ) : step !== null && step.anchorRecordId !== undefined ? (
+              <Button
+                className="bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
+                onPress={() =>
+                  void navigate({
+                    to: "/report/$recordId",
+                    params: { recordId: step.anchorRecordId ?? "" },
+                  })
+                }
+              >
+                {m.test_result_report()}
               </Button>
             ) : (
               <Button

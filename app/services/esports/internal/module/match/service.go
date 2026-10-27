@@ -91,7 +91,8 @@ func mapSessionPB(v *SessionView) *esportspb.MatchSession {
 		Steps:        steps,
 		Done:         v.Done,
 		RetestLeft:   v.RetestLeft,
-		CreatedAt:    utils.ToTimestamp(&v.Session.CreatedAt),
-		FirstSession: utils.BoolW(v.First),
+		CreatedAt:      utils.ToTimestamp(&v.Session.CreatedAt),
+		FirstSession:   utils.BoolW(v.First),
+		AnchorRecordId: utils.Wrap(v.AnchorRecordID, utils.StringW),
 	}
 }
