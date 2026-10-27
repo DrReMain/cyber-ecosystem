@@ -101,3 +101,4 @@ system 与 agent 的 `project.json` 各加 `test` target（`go test -race ./...`
 - 2026-10-27（四）：SR-2 落地（构造阈值单源+部署四面+devserver env 通道补齐；kratos `${VAR:default}` 树内解析语义定案入实施事实——esports 新服务抄 yaml 形状时的语义底）。
 - 2026-10-27（五）：测试两家园+同文件多 UC/RP 两法条入 kratos CONVENTIONS（§7/§3）；SR-4 测试锚按法后撤（data_test.go 删）；SR-3/4/5/6/9 连落（CSV 消毒/grant meta 防御/reconcile 互斥/注释四+一处/TOCTOU 封存）。役内只剩 SR-B 与两个封存递延位。
 - 2026-10-27（六，役闭）：SR-B 改形收口——提档件撤销（误报二例）、transfer 保留（用户改裁）、守则入 proto CONVENTIONS §5+偿豁免句漂移。**skeleton-risk 役全闭**：SR-0..SR-6/SR-9/SR-B ✅；SR-7/SR-8 封存递延（触发条件在档）。esports 写路径解锁（SR-1 结构执法三服务同型）。
+- 2026-10-27（七，影响面二轮）：①config 双面镜像补核（deploy §6 律）：container 面自始空默认、configs 面统一同形（e0acef02）；②**module 伴生文件规范蒸馏入法**（kratos §3 companion files 两类=domain files/layer companions，判据=零 ent+无 UC/RP receiver；§7 unit 位扩为 biz.go+domain companions 的 `<file>_test.go` 伴随名制）——证据=三服务 24 个伴生文件分簇全吻合 + strip 前十五个游戏伴生测试+engine_test 同名历史。E3 黄金向量冲突点就此消解。
