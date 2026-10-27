@@ -1,22 +1,5 @@
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { m } from "#/paraglide/messages";
-
-/* The resume card's desc vars: the progress counts plus the age face —
- * the prototype's inclusive day count (started today reads 已过 1 天) and
- * a local-date stamp. Queries deliver proto-JSON shapes (CONVENTIONS
- * §1): createdAt arrives as its RFC 3339 wire string, never the message
- * object the typed surface claims — routing it through timestampDate
- * reads .seconds off a string (undefined → NaN) and the stamp renders
- * NaN-NaN-NaN. The wire string is the one read mechanism. */
-function resumeDescVars(createdAt: Timestamp | undefined, done: number, total: number) {
-  const wire = createdAt as unknown as string | undefined;
-  const created = wire !== undefined ? Date.parse(wire) : Date.now();
-  const days = Math.max(1, Math.floor((Date.now() - created) / 86_400_000) + 1);
-  const d = new Date(created);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  return { done, total, date, days };
-}
+import { resumeDescVars, type WireStamp } from "../resume";
 
 /** The resume card: the peeked session's progress line and the jump
  * back into /match (the navigation itself stays with the page). */
@@ -26,7 +9,7 @@ export function ResumeCard({
   onOpen,
   total,
 }: Readonly<{
-  createdAt: Timestamp | undefined;
+  createdAt: WireStamp;
   done: number;
   onOpen: () => void;
   total: number;
