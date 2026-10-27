@@ -60,7 +60,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "cyber-ecosystem/app/services/system/internal/ent/runtime"
 var (
-	Hooks        [2]ent.Hook
+	Hooks        [3]ent.Hook
 	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time

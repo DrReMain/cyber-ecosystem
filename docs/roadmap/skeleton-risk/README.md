@@ -1,0 +1,99 @@
+# 骨架风险修复（skeleton-risk）
+
+2026-10-27 评审（system/agent/admin 资深架构师审查，守卫与测试清除后首轮）衍生的修复役。评审存档=会话记忆 `skeleton-arch-review-2026-10-27`；本档为唯一工作面，逐项处理。
+
+## 法条与纪律
+
+- 法条=根壳硬法 1（一切工作流走 Nx target；**测试一律 `./nx run <svc>:test`**，裸 `go test` 在 settings deny 里，不松动）与硬法 2（pnpm）。
+- **测试纪律（本役自定）**：每片 TDD——先写红测（失败可观察），最小改绿，再重构；**测试随片留存为回归锚**，即「择机重建」的第一波，项域收口、不铺开全量测试面（家法「业务模块默认不写测试」不因此推翻）。
+- DB 面红绿走 `ENT_E2E=1` 门（dev 栈 postgres+redis 在跑才执行，否则 skip）——沿 80ba9a59^ 旧例惯例。
+- 每片收口=计数声明行（根壳工作契约第四条）。
+- 完成门禁=所属链（build/lint/format）+ 本片新测试计数 + 适用 live 探针。
+
+## 复核修订（2026-10-27，对评审原稿）
+
+- **R5 撤销**：chat content 上限存在——proto 注释声明 + `chat/service.go:165-176` handler 显式校验（流式旁路 unary protovalidate 是刻意设计）。归入「已注释确认」清单。
+- **R4 加重**：双 dev 默认值并存且不一致——`agent/configs/config.yaml:34`（agent-dev-master-key）与 `deploy/docker/compose.app.yaml:112`（agent-insecure-dev-key）；prod 忘配环境变量即静默用公开钥。
+- **BUILTIN 面清点（TR 升维为 SR-B 的证据底）**：全仓 42 口 ACCESS_BUILTIN。system 侧 18 口中 14 口=me-face/own-keyed 正当（auth 3、filepresign 4、fileproxy 1、file 1、user ChangePassword、introspect 2）；**2 口信息泄露候选**：resource.ListResource（全生态操作目录对任何活会话开放=免费 API 地图）、role.PreviewGrants（租户内任意角色 grants 预览对 member 开放）；transfer 4 口=无用事例代码（用户裁定删除）。esports 17+4（test 模块）与 agent 9=member 面设计意图。
+
+## 切片池
+
+顺序即处理序。2026-10-27 二次裁定入位。
+
+### SR-0 测试目标回位（前置基建）✅
+
+system 与 agent 的 `project.json` 各加 `test` target（`go test -race ./...`，cwd=projectRoot；ENT_E2E 门由测试自身 env-gate）。验证=target 空跑绿。
+
+### SR-1 租户写保护 mixin 钩子（R1+D2）【裁定=A】✅
+
+- **红**：复活 `system/internal/e2e/`（夹具形状取自 `80ba9a59^`），写 `tenant_write_guard_test.go`（ENT_E2E 门）：双租户夹具下，subject-A 的 ctx 直接 `Role.UpdateOneID(B行).SetName(...)` 与 `DeleteOneID(B行)` 断言**零行生效**；当前写穿→红。同测锁两个豁免位不回归（ExplicitTenant 优先、无 subject 跳过）。
+- **绿**：`local_mixins/tenant.go` 增 `Hooks()`——OpUpdate|OpUpdateOne 挂 `tenant_id` 谓词，形状镜像同仓 `DatascopeMixin.Hooks()`（datascope.go:57-77 已证该形状在 SoftDelete 重写入链下成立）；优先级与查询拦截器一致（ExplicitTenant > subject > 无 subject 跳过）。
+- **重构**：各 UC 前读保留（NotFound 语义与模糊反枚举仍需）；D2 注释随片补进 TenantMixin 头注释。
+- **esports 解锁注**：SR-1 绿之前，esports 写路径暂守「前读收窄」现行约定。
+- 开工前置：dev 栈 postgres+redis 在跑（否则红测 skip 不成红）。
+- **实施事实（落地时钉出）**：① 谓词须挂**四 op**（+OpDelete|OpDeleteOne）——Datascope 模板的两 op 靠软删重写兜 delete，而 Role/permission 等 TenantMixin 表硬删，原生 delete op 直挂；② mixin Hooks 变更**必须重跑 `generate:ent`**——钩子注册编在生成物 `ent/runtime/runtime.go`，不重生成则执法静默缺席（绿阶段曾假绿一次，即此因）；③ `UpdateOneID`/`DeleteOneID` 零行返回 `ent.IsNotFound` 可断言；④ ~~残留拷贝位~~ **已清（同日裁定：三服务底座对齐）**：agent 与 esports 的 `TenantMixin` 已逐字节对齐 system 形状（路径改写拷贝，diff 验证 TRIPLE-ALIGNED），各自拦截器补齐 registry-read skip 与 ExplicitTenant 分支（两侧服务内零消费方，无行为回退面），各自 e2e 锚落位（agent=AgentConfig 软删表钉重写链形、esports=ActivationCode 硬删表钉原生 delete 形——delete 双形各有专锚），esports project.json 补回 test target。
+
+### SR-2 master_key 收敛（R4）【裁定=默认值归层】
+
+- **红**：单测 `chat.NewChatUC` 以 <16B key 构造应失败（当前仅非空→红）；`agentconfig.NewAgentConfigUC` 已 ≥16B（对照绿）。
+- **绿**：阈值统一为一处；`config.yaml` 去默认值改必填（`${AGENT_MASTER_KEY:?...}`）；compose 保留**单一** dev 默认值（归层惯例=默认值住部署面，沿 Windows POSIX 役先例）；dev-up 裸跑路径由 devserver 注入 dev 值（实施时核 devserver env 通道）。
+
+### SR-3 审计 CSV 消毒（R3）
+
+- **红**：表驱动单测 `sanitizeAuditCell`（`=`,`+`,`-`,`@`,`\t` 开头前置 `'`；正常字段原样；空串）——函数不存在，编译红即红。
+- **绿**：`audit/biz.go` emit 接线（UserAgent/Operation/HTTPPath/DenyReason/Actor/IP 全过）。纯函数片。
+
+### SR-4 grant meta 缺失防御（R8）
+
+- **红**：单测手工构造 snapshot（enf 含行、grants 图缺该键）→ `ImplicitGrants` 断言该 pattern 不出现；当前零值 ScopeKind="" 出现→红。
+- **绿**：`authz/data.go` ImplicitGrants/ExplainGrants 两处 `if _, ok := snap.grants[...]; !ok { continue }`。
+
+### SR-5 reconcile 互斥（R9）
+
+小改：reconcile 入口加 mutex，头注释一句；验证=`-race` 单测双 goroutine 触发。TDD 形状弱，按小改+竞态检测收口。
+
+### SR-6 注释补丁（D1/D3/D4）
+
+无红绿。三处：`user/biz.go` ChangePassword 补「不撤存量会话」why（10-17 裁定入载体；admin Update password 路径同句）；`auth/biz.go` AuthenticateSession 补「新鲜度>缓存」取舍；`auth/biz.go` autoRegister 补 `hash=""`=密码面永久关。
+
+### SR-7 会话验证热路径（R2）【裁定=C+量化触发】
+
+接受现状，D3 注释随 SR-6 落。重开触发条件（其一即启）：① esports H5 放量门禁前评审；② introspect/验证路径 P99 或 system DB QPS 出现放量信号；③ 出现 A 案依赖补齐契机（tenant.enabled 入 stamp relevant 集）。届时按 A（载荷内嵌快照+stamp 比对）先行评估。
+
+### SR-8 登录定向限速（R6）【裁定=递延】
+
+不急于处理：登录后续可能引入生物验证等多重防御，触发风险后再处理可接受。重开触发=登录滥用事件 / 生物验证方案启动时并入设计。
+
+### SR-9 dept reparent TOCTOU（R7）【裁定=注释封存】
+
+保留 check-then-act，头注释记：并发对调可成环、环自愈=一次 reparent、IsAncestor visited 终止保障读不死循环。不写码。
+
+### SR-B BUILTIN 面审计与处置（TR 升维）
+
+证据底见「复核修订」节。处置三件：
+1. **transfer 4 口删除**（用户裁定无用事例代码）：proto 契约删除+gen 重生成+registrar 摘除，走 proto-change 流程（清号纪律适用）。
+2. **ListResource / PreviewGrants 提档 ACCESS_ADMIN**（片内决策位，默认建议提档）：二者当前服务端内部调用（validateGrants 走 RP 不走 RPC）不受影响；admin 面提档后照常；唯一变化=member 会话失去 API 地图与租户 grants 预览。若裁「保留 BUILTIN」须补 why 注释入 proto。
+3. **类级结论入 CONVENTIONS**（proto 区）：BUILTIN 档语义=「任何活会话可调、无平面卫、无 op 鉴权、无 datascope（无 Decision）」；新 RPC 选档守则=me-face/own-keyed 方可 BUILTIN，资源型/信息型面须 ADMIN 起步。
+- 验证：proto 链三闸+注解面 grep 清单（42 口→38 口）+live 探针（member token 调 ListResource 应 403、transfer 四口 404）。
+
+## 台账
+
+| 片 | 状态 | 日期 | 提交 | 收口计数声明 |
+|---|---|---|---|---|
+| SR-0 | ✅ | 2026-10-27 | 未提交 | system:test/agent:test 双绿 exit 0（32.4s/7.2s），各 [no test files] |
+| SR-1 | ✅ | 2026-10-27 | 见变更录 | 红 1（跨租户 update 得 nil=写穿）→绿 4 臂（e2e ok，-race，exit 0）；system:generate:ent 重生成 10 文件；build/lint/format 全 0；测试留存为回归锚。**底座对齐同日落**：agent/esports tenant mixin 对齐+各自 e2e 锚（红→绿同形）+esports test target 补回，三服务 build/test/lint/format 全绿 |
+| SR-2 | 待开工（裁定已入） | | | |
+| SR-3 | 待开工 | | | |
+| SR-4 | 待开工 | | | |
+| SR-5 | 待开工 | | | |
+| SR-6 | 待开工 | | | |
+| SR-7 | 封存（触发条件在档） | | | |
+| SR-8 | 递延（触发条件在档） | | | |
+| SR-9 | 封存（注释封存） | | | |
+| SR-B | 待开工（transfer 删已裁；提档默认建议=是） | | | |
+
+## 变更录
+
+- 2026-10-27：评审复核完成（R5 撤销/R4 加重/新增 SR-TR），本档建立，切片池定序。
+- 2026-10-27（二）：用户四裁定入档——SR-1=A 方案；SR-2=默认值归层；SR-7=C+量化触发；SR-8=递延（生物验证时机）；SR-9=注释封存；SR-TR 升维 SR-B（BUILTIN 面审计，transfer 删除已裁）。SR-0 落地双绿。
+- 2026-10-27（三）：SR-1 落地（四臂红绿全过，实施事实四条入节；agent/esports 拷贝位待裁）。同日用户裁定底座对齐：agent/esports mixin+e2e 锚+esports test target 一并落地，SR-0/SR-1 与本档随批提交。

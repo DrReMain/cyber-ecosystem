@@ -65,6 +65,13 @@
         "command": "go build -o ./bin/ ./..."
       }
     },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go test -race ./..."
+      }
+    },
     "image": {
       "executor": "nx:run-commands",
       "options": {
