@@ -15,8 +15,8 @@ import { abilityWord, type Genre, genreLabel, genreMeta, narrowGenre } from "./v
 
 /* The guide page's own orb pair (prototype match-guide). */
 const guideOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-70px] left-[-50px] size-[min(62vw,240px)]", tone: "blue" },
-  { className: "bottom-[-60px] right-[-70px] size-[min(54vw,210px)]", tone: "cyan" },
+  { className: "top-[-70px] left-[-50px] size-[240px]", tone: "blue" },
+  { className: "bottom-[-60px] right-[-70px] size-[210px]", tone: "cyan" },
 ];
 
 interface StepRowProps {
@@ -41,13 +41,13 @@ function StepRow({ index, ability, name, left, ready, done, onEnter }: Readonly<
   const playable = ready && left > 0;
   return (
     <button
-      className={`${done ? "border-[rgba(34,197,94,0.55)]" : "border-line"} bg-surface-card shadow-card rounded-card flex w-full items-center gap-[11px] border px-[13px] py-[11px] text-start ${ready ? "" : "opacity-60"} ${playable ? "cursor-pointer active:opacity-80" : "cursor-default"}`}
+      className={`${done ? "border-[rgba(34,197,94,0.55)]" : "border-line"} bg-surface-card shadow-card rounded-card flex w-full items-center gap-[11px] border px-[13px] py-[11px] text-start backdrop-blur-md ${ready ? "" : "opacity-60"} ${playable ? "cursor-pointer active:opacity-80" : "cursor-default"}`}
       disabled={!playable}
       onClick={playable ? onEnter : undefined}
       type="button"
     >
       <div
-        className={`${word.gradient} flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[12px] text-[15px] font-bold text-white`}
+        className={`${word.gradient} shadow-inset-ring flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[12px] text-[15px] font-bold text-white`}
       >
         {index + 1}
       </div>
@@ -91,8 +91,10 @@ function GenreHeaderCard({ genre, switched }: Readonly<GenreHeaderCardProps>) {
   const meta = genreMeta(genre);
   const Icon = genre === "moba" ? Hexagon : Crosshair;
   return (
-    <div className={`${meta.gradient} rounded-card flex items-center gap-3.25 overflow-hidden p-4`}>
-      <div className="flex h-11.5 w-11.5 shrink-0 items-center justify-center rounded-xl bg-[rgba(0,0,0,0.22)] text-xl text-white">
+    <div
+      className={`${meta.gradient} shadow-card rounded-card flex items-center gap-3.25 overflow-hidden p-4 backdrop-blur-md`}
+    >
+      <div className="shadow-inset-ring flex h-11.5 w-11.5 shrink-0 items-center justify-center rounded-xl bg-[rgba(0,0,0,0.22)] text-xl text-white">
         <Icon aria-hidden size={20} />
       </div>
       <div className="min-w-0 flex-1">

@@ -100,7 +100,7 @@ export function SetupAgePage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/nickname" })} step={2}>
-      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
         <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_sex_label()}
           <span className="text-danger-text"> *</span>
@@ -136,7 +136,7 @@ export function SetupAgePage() {
         </div>
       </div>
 
-      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
         <div className="text-ink mb-1 text-sm font-extrabold">{m.profile_birth_label()}</div>
         <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed whitespace-pre-line">
           {m.profile_setup_birth_desc_lead()}

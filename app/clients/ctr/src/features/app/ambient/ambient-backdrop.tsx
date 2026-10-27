@@ -14,7 +14,7 @@ import clsx from "clsx";
 export type AmbientTone = "purple" | "blue" | "cyan" | "indigo" | "teal" | "orange" | "violet";
 
 export interface AmbientOrb {
-  /** Position + size utilities (e.g. "top-[-70px] left-[-60px] size-[min(67vw,260px)]"). */
+  /** Position + size utilities (e.g. "top-[-70px] left-[-60px] size-[260px]"). */
   className: string;
   tone: AmbientTone;
 }
@@ -39,9 +39,9 @@ const driftClass = [
 
 /** The login page's trio — also the default for pages not yet art-directed. */
 export const loginOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-70px] left-[-60px] size-[min(67vw,260px)]", tone: "purple" },
-  { className: "top-[320px] right-[-80px] size-[min(57vw,220px)]", tone: "blue" },
-  { className: "bottom-[-40px] left-[40px] size-[min(52vw,200px)]", tone: "cyan" },
+  { className: "top-[-70px] left-[-60px] size-[260px]", tone: "purple" },
+  { className: "top-[320px] right-[-80px] size-[220px]", tone: "blue" },
+  { className: "bottom-[-40px] left-[40px] size-[200px]", tone: "cyan" },
 ];
 
 export interface AmbientBackdropProps {

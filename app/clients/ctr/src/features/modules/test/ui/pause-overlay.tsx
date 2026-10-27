@@ -10,7 +10,7 @@ interface PauseOverlayProps {
 export function PauseOverlay({ onResume, onExit }: Readonly<PauseOverlayProps>) {
   return (
     <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm">
-      <div className="rounded-card border-line bg-surface-card w-full max-w-xs border p-6">
+      <div className="rounded-card border-line bg-surface-card shadow-card w-full max-w-xs border p-6 backdrop-blur-md">
         <h2 className="text-ink text-center text-lg font-bold">{m.test_pause_title()}</h2>
         <div className="mt-6 flex flex-col gap-3">
           <Button

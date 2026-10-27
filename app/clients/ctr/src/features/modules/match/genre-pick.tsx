@@ -13,8 +13,8 @@ import { abilityWord, defaultGenre, GENRE_ORDER, type Genre, genreLabel } from "
 
 /* The page's own orb pair (prototype match-genre-pick). */
 const pickOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-60px] left-[-50px] size-[min(59vw,220px)]", tone: "violet" },
-  { className: "bottom-[-50px] right-[-50px] size-[min(53vw,200px)]", tone: "purple" },
+  { className: "top-[-60px] left-[-50px] size-[220px]", tone: "violet" },
+  { className: "bottom-[-50px] right-[-50px] size-[200px]", tone: "purple" },
 ];
 
 /**
@@ -49,7 +49,7 @@ export function GenrePickPage() {
             onBack={() => void navigate({ to: "/" })}
             title={m.match_pick_empty_title()}
           />
-          <div className="border-line bg-surface-card rounded-card border px-4 py-[22px] text-center">
+          <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-[22px] text-center backdrop-blur-md">
             <FolderOpen
               aria-hidden
               className="text-ink-tertiary mx-auto"
@@ -101,7 +101,7 @@ export function GenrePickPage() {
         )}
         {(["fps", "moba"] as const).map((genre) => (
           <button
-            className="border-line bg-surface-card rounded-card relative border px-4 py-[15px] text-left active:opacity-60"
+            className="border-line bg-surface-card shadow-card rounded-card relative border px-4 py-[15px] text-left backdrop-blur-md active:opacity-60"
             key={genre}
             onClick={() => choose(genre)}
             type="button"

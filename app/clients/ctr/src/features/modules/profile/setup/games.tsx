@@ -137,7 +137,7 @@ export function SetupGamesPage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/age" })} step={3}>
-      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
         <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_games_title()} <span className="text-danger-text">*</span>
         </div>
@@ -179,7 +179,7 @@ export function SetupGamesPage() {
         ))}
       </div>
 
-      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
         <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_games_custom_title()}
         </div>

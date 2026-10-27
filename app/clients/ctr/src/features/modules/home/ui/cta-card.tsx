@@ -7,7 +7,7 @@ export function CtaCard({
   onStart,
 }: Readonly<{ authed: boolean; hasGames: boolean; onStart: () => void }>) {
   return (
-    <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-4.5">
+    <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-4.5 backdrop-blur-md">
       <div className="text-ink text-base font-extrabold">{m.home_cta_title()}</div>
       <p className="text-ink-tertiary mt-1.25 text-[11.5px] leading-[1.7]">
         {/* The desc follows the games state alone (prototype law): a

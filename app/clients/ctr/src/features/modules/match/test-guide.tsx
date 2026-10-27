@@ -10,7 +10,7 @@ import { FlowHeader } from "./ui/flow-header";
 
 /* The page's own orb (prototype test-guide): a single practice-orange blob. */
 const guideOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-60px] right-[-60px] size-[min(59vw,220px)]", tone: "orange" },
+  { className: "top-[-60px] right-[-60px] size-[220px]", tone: "orange" },
 ];
 
 /**
@@ -60,9 +60,9 @@ export function TestGuidePage() {
       <div className="flex w-full flex-col gap-3 pb-6">
         <FlowHeader onBack={() => void history.back()} title={m.match_guide_title()} />
 
-        <div className="border-line bg-surface-card rounded-card border p-4">
+        <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
           <div className="flex items-center gap-2.5">
-            <div className="bg-cta-practice rounded-control flex h-11 w-11 shrink-0 items-center justify-center">
+            <div className="bg-cta-practice shadow-inset-ring rounded-control flex h-11 w-11 shrink-0 items-center justify-center">
               <TriangleAlert aria-hidden className="text-white" size={20} />
             </div>
             <div>
