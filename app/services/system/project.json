@@ -57,19 +57,19 @@
         "command": "node tools/scripts/devserver.cjs down --project system"
       }
     },
-    "test": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "command": "go test ./..."
-      }
-    },
     "build": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/bin"],
       "options": {
         "cwd": "{projectRoot}",
         "command": "go build -o ./bin/ ./..."
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go test -race ./..."
       }
     },
     "image": {

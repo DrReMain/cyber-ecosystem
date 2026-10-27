@@ -1,4 +1,4 @@
-package shared
+package guards
 
 import (
 	"go/ast"
@@ -12,34 +12,50 @@ import (
 	"testing"
 )
 
-// Static guards for the dependency rules as code: the module DAG and the
-// composition layering (cmd/app wires through bootstrap; shared stays a
-// contracts-only kernel; injected app contracts land in module biz
-// constructors).
+// Static guards for the dependency rules as code: the module DAG, the
+// shared-contract seams, and the composition layering (cmd/app wires
+// through bootstrap; shared stays a contracts-only kernel; injected app
+// contracts land in module biz constructors). A pure-function property like
+// compile() is review-enforced — a file walk cannot see it; the rest is
+// checked here, plus single-sourcing of the ABAC vocabulary.
 
 // bannedImports maps a package directory (relative to internal/, prefix
 // match) to import markers it must not contain. Direct imports only: a
 // transitive leak requires importing the middleman, which these rules catch
 // at that hop.
 var bannedImports = map[string][]string{
-	// The engine floor is module-free infrastructure and never reads
-	// business aggregates.
-	"module/authz": {"module/agentconfig", "module/agentconfigadmin", "module/chat"},
-	// The operator face is a strippable unit; the business module must
-	// survive its deletion untouched.
-	"module/agentconfig": {"module/agentconfigadmin"},
-	// ACL adapters implement biz-declared ports (importing the declaring
-	// module for the interface is the designed direction; the reverse is the
-	// leak), and stay ent-free.
-	"client": {"internal/ent"},
+	// The engine reads ent tables directly and never sibling modules.
+	"module/authz": {
+		"module/role", "module/policy", "module/dept", "module/user",
+		"module/auth", "module/resource", "module/transfer",
+	},
+	// role may read the authz port (diagnostics trio); the others must not.
+	"module/policy": {"module/authz"},
+	"module/dept":   {"module/authz"},
+	"module/user":   {"module/authz", "module/auth"},
+	"module/role":   {"module/user"},
+	// Seam 1: the session-auth closure stays free of ent.
+	"module/auth": {"internal/ent"},
 	// The kernel-to-schema direction is one-way (shared → platform → ent);
 	// an import back closes the cycle.
 	"ent/schema": {"internal/shared"},
 	// Bootstrap sits below business modules.
 	"bootstrap": {"module/"},
-	// The kernel stays ent-free.
+	// The kernel stays ent-free (Paginate is generic by design).
 	"shared": {"internal/ent"},
 }
+
+// literalOwners pins contract strings to the single file allowed to declare
+// them; bannedLiterals must not appear in service code at all — the kauthz
+// constant is the only spelling.
+var (
+	literalOwners = map[string]string{
+		"authz:policy:ver":     "shared/policy_notify.go",
+		"authz:policy:changed": "shared/policy_notify.go",
+		"auth:web:revoked:":    "shared/session_revoke.go",
+	}
+	bannedLiterals = []string{"time_window", "calendar", "time.now"}
+)
 
 func TestModuleDependencyDAG(t *testing.T) {
 	for dir, bans := range bannedImports {
@@ -47,7 +63,8 @@ func TestModuleDependencyDAG(t *testing.T) {
 		if len(files) == 0 {
 			if _, statErr := os.Stat(filepath.Join("..", dir)); statErr == nil {
 				// The directory exists but matched nothing: renamed files or
-				// an empty package.
+				// an empty package. A not-yet-created module is expected to
+				// match nothing.
 				t.Errorf("rule %q matched no files — stale directory name?", dir)
 			}
 		}
@@ -90,6 +107,30 @@ func TestCompositionBoundaries(t *testing.T) {
 	}
 }
 
+func TestSharedContractSingleSource(t *testing.T) {
+	files := goFiles(t, "..", "", false)
+	if len(files) == 0 {
+		t.Fatal("walk matched no files — guard root is broken")
+	}
+	for _, f := range files {
+		for _, lit := range f.literals {
+			if owner, ok := literalOwners[lit]; ok {
+				if f.rel != owner {
+					t.Errorf("%s declares %q — owned by %s (seam 3: contract strings live once)",
+						f.rel, lit, owner)
+				}
+				continue
+			}
+			for _, ban := range bannedLiterals {
+				if lit == ban {
+					t.Errorf("%s spells %q as a raw literal — use the kauthz constant",
+						f.rel, lit)
+				}
+			}
+		}
+	}
+}
+
 // TestModuleSingleService pins one module = one transport face: at most one
 // *Service struct per module dir. Two faces in one package mean two
 // aggregates sharing a module — the cure is the module split, never a
@@ -114,6 +155,7 @@ func TestModuleSingleService(t *testing.T) {
 type goFile struct {
 	rel            string
 	imports        []string
+	literals       []string
 	hookRefs       int
 	serviceStructs []string
 }
@@ -121,7 +163,7 @@ type goFile struct {
 // goFiles walks root collecting parsed files. When ruleDir is non-empty
 // only that directory subtree is parsed, imports-only (the DAG check);
 // otherwise every handwritten file (ent generated code excluded, ent/schema
-// included) is parsed to surface contract refs.
+// included) is fully parsed to surface string literals and contract refs.
 func goFiles(t *testing.T, root, ruleDir string, importsOnly bool) []goFile {
 	t.Helper()
 	root = filepath.Clean(root)
@@ -147,7 +189,7 @@ func goFiles(t *testing.T, root, ruleDir string, importsOnly bool) []goFile {
 			return nil
 		}
 		if ruleDir == "" && strings.HasPrefix(rel, "ent/") && !strings.HasPrefix(rel, "ent/schema/") {
-			return nil // generated: imports never drift, refs never authored
+			return nil // generated: imports never drift, literals never authored
 		}
 		mode := parser.ImportsOnly
 		if !importsOnly {
@@ -168,13 +210,21 @@ func goFiles(t *testing.T, root, ruleDir string, importsOnly bool) []goFile {
 		}
 		if !importsOnly {
 			ast.Inspect(f, func(n ast.Node) bool {
-				if ts, ok := n.(*ast.TypeSpec); ok {
-					if _, isStruct := ts.Type.(*ast.StructType); isStruct && strings.HasSuffix(ts.Name.Name, "Service") {
-						gf.serviceStructs = append(gf.serviceStructs, ts.Name.Name)
+				switch n := n.(type) {
+				case *ast.BasicLit:
+					if n.Kind == token.STRING {
+						if v, err := strconv.Unquote(n.Value); err == nil {
+							gf.literals = append(gf.literals, v)
+						}
 					}
-				}
-				if id, ok := n.(*ast.Ident); ok && id.Name == "HookRegistry" {
-					gf.hookRefs++
+				case *ast.Ident:
+					if n.Name == "HookRegistry" {
+						gf.hookRefs++
+					}
+				case *ast.TypeSpec:
+					if _, isStruct := n.Type.(*ast.StructType); isStruct && strings.HasSuffix(n.Name.Name, "Service") {
+						gf.serviceStructs = append(gf.serviceStructs, n.Name.Name)
+					}
 				}
 				return true
 			})

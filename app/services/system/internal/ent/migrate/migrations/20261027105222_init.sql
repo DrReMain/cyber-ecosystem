@@ -63,6 +63,18 @@ COMMENT ON COLUMN "public"."audit_log"."status" IS 'HTTP status of the outcome';
 COMMENT ON COLUMN "public"."audit_log"."deny_reason" IS 'NO_GRANT | ABAC_CONSTRAINT; empty when allowed';
 -- Set comment to column: "event_id" on table: "audit_log"
 COMMENT ON COLUMN "public"."audit_log"."event_id" IS 'publisher-generated dedup key; unique index absorbs redelivery';
+-- Create "authz_stamps" table
+CREATE TABLE "public"."authz_stamps" (
+  "id" character varying NOT NULL,
+  "created_at" timestamptz NOT NULL,
+  "updated_at" timestamptz NOT NULL,
+  "version" bigint NOT NULL DEFAULT 0,
+  PRIMARY KEY ("id")
+);
+-- Create index "authzstamp_created_at" to table: "authz_stamps"
+CREATE INDEX "authzstamp_created_at" ON "public"."authz_stamps" ("created_at");
+-- Create index "authzstamp_updated_at" to table: "authz_stamps"
+CREATE INDEX "authzstamp_updated_at" ON "public"."authz_stamps" ("updated_at");
 -- Create "credential" table
 CREATE TABLE "public"."credential" (
   "id" character varying NOT NULL,

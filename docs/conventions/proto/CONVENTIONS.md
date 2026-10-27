@@ -1,10 +1,18 @@
 # Proto Conventions
 
-**Status:** ACTIVE
-
 **Scope:** Protobuf contracts under `proto/`. These are the **source of truth**; `gen/` is derived (never hand-edit). Prescriptive — `MUST` / `SHOULD` / `MAY`.
 
 For Go-side consumption (mapping, error handling, import aliases) see `docs/conventions/kratos/CONVENTIONS.md`.
+
+## Read map
+
+| About to touch | Read first |
+|---|---|
+| any `.proto` under `proto/cyber/**` | §1, §2, §3, §4 |
+| custom annotations (`proto/ext/v1/*.proto`) | §5 |
+| an error enum or its client copy | §4, §8 step 5 |
+| generation config, `proto/cmd/**` | §7 |
+| closing a contract change | §8, §9 |
 
 ---
 
@@ -85,7 +93,7 @@ The `(errors.code)` option comes from the vendored `proto/errors/errors.proto` (
 - **REST mapping:** every RPC has `option (google.api.http)` — `/api/v1/<service>/<resources>[/{id}]`, verb by CRUD (POST create / GET list-or-get / PUT update / DELETE delete).
 - **Repeated input ⇒ POST + body, not GET query:** the transport's GET-query binding does not reliably carry `repeated` fields (they arrive empty and fail `min_items`). Batch reads marshal ids in a POST body — minting-style batch reads are action-shaped anyway.
 - **Method desc (facts):** `option (cyber.ext.v1.method) = {comment, action}` — `comment` is the human-readable one-liner (Chinese OK), `action` (`ACTION_READ` / `ACTION_WRITE`) is the effect semantics the audit layer classifies on (allow side collects WRITE only). Facts only — policy knobs (audit toggles etc.) never live here. Mandatory on every business RPC, machine-enforced by `TestEveryBusinessRPCDeclaresAction` (`shared-go/kratos/security`, no exemptions). Consumed at runtime via proto reflection (`shared-go/helper/proto_reflect.go` reads the comment face; the Resource catalog transcribes it), not by codegen/docs. Custom option value types are compile-time contracts: reshaping one is a coordinated one-shot across all declarations and consumers, never a runtime-compat concern. See `proto/ext/v1/desc.proto`.
-- **Access policy:** `option (cyber.ext.v1.access)` — `ACCESS_PUBLIC` / `ACCESS_BUILTIN` / `ACCESS_PLATFORM` / `ACCESS_ADMIN`. **MUST be declared on every business RPC — there is no default level.** An unannotated RPC resolves to `ACCESS_UNSPECIFIED`, which servers wire to the deny-by-default guard: it fails loud at runtime (`MISSING_ANNOTATION`, 503) rather than silently falling back to ADMIN. Only framework built-ins outside `cyber.*` bypass the guard. Machine-enforced by `TestEveryBusinessRPCDeclaresAccess` (`shared-go/kratos/security`), whose exemption list holds one deliberate entry: `cyber.system.v1.ResourceService.ListResource` exercises the 503 path on purpose. See `proto/ext/v1/access.proto`.
+- **Access policy:** `option (cyber.ext.v1.access)` — `ACCESS_PUBLIC` / `ACCESS_BUILTIN` / `ACCESS_PLATFORM` / `ACCESS_ADMIN`. **MUST be declared on every business RPC — there is no default level.** An unannotated RPC resolves to `ACCESS_UNSPECIFIED`, which servers wire to the deny-by-default guard: it fails loud at runtime (`MISSING_ANNOTATION`, 503) rather than silently falling back to ADMIN. Only framework built-ins outside `cyber.*` bypass the guard. Machine-enforced by `TestEveryBusinessRPCDeclaresAccess` (`shared-go/kratos/security`), exemption list empty — the unannotated-rejection path lives in `TestDefaultGuard`. See `proto/ext/v1/access.proto`. **BUILTIN is a member-plane trust ring** — any live session (member H5 included) may call it, with no plane guard, no operation authz, and no datascope (no Decision in ctx): only me-face / own-keyed RPCs qualify (the caller reads or writes its own row by subject). Informational or resource-shaped surfaces — catalogs, previews, streaming fixtures — start at ACCESS_ADMIN; a datascope that a BUILTIN face would need silently does not exist there.
 
 ---
 
@@ -117,7 +125,7 @@ The `(errors.code)` option comes from the vendored `proto/errors/errors.proto` (
 6. `./nx run proto:breaking` before merging (FILE rules vs `HEAD`). Blind spot: it cannot see protovalidate rule removals/weakenings — review validation rules explicitly (§9).
 7. Build the affected service (`./nx run <service>:build`); if the client surface changed, run the client verification chain (`docs/conventions/tanstack/CONVENTIONS.md §11`).
 
-Done = every command's exit code checked; breaking green (or weakenings consciously reviewed); gen diff clean; error copy present in every registered locale. Contract posture (root `AGENTS.md` §6.1): close with the counted-evidence declaration line; gates = this checklist's chain plus `proto:check-drift` at close; runtime verification = counterexample e2e on the producer and one consumer.
+Done = every command's exit code checked; breaking green (or weakenings consciously reviewed); gen diff clean; error copy present in every registered locale. Close with the counted-evidence declaration line (what ran, what was observed); gates = this checklist's chain plus `proto:check-drift` at close; runtime verification = a counterexample live probe on the producer and one consumer.
 
 ---
 

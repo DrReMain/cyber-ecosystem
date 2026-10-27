@@ -56,6 +56,7 @@ type AuthzRP interface {
 	PlaneOf(population string) (string, error)
 	ExplainGrants(ctx context.Context, principalType, principalID, tenant, operation string) (*ExplainResult, error)
 	PreviewGrants(ctx context.Context, tenant string, roleCodes []string) ([]string, error)
+	StampVersion(ctx context.Context) (int64, error)
 	StartWatch(ctx context.Context) error
 	StopWatch(ctx context.Context) error
 }

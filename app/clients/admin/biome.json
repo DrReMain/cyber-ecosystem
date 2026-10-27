@@ -16,7 +16,9 @@
       "!**/dist",
       "!**/.output",
       "!**/coverage",
-      "!**/src/paraglide"
+      "!**/src/paraglide",
+      "!**/test-results",
+      "!**/playwright-report"
     ]
   },
   "linter": {

@@ -18,7 +18,8 @@ func init() {
 	agentconfigMixinHooks2 := agentconfigMixin[2].Hooks()
 	agentconfigMixinHooks3 := agentconfigMixin[3].Hooks()
 	agentconfig.Hooks[0] = agentconfigMixinHooks2[0]
-	agentconfig.Hooks[1] = agentconfigMixinHooks3[0]
+	agentconfig.Hooks[1] = agentconfigMixinHooks2[1]
+	agentconfig.Hooks[2] = agentconfigMixinHooks3[0]
 	agentconfigMixinInters2 := agentconfigMixin[2].Interceptors()
 	agentconfigMixinInters3 := agentconfigMixin[3].Interceptors()
 	agentconfig.Interceptors[0] = agentconfigMixinInters2[0]
@@ -97,7 +98,8 @@ func init() {
 	chatmessageMixinHooks2 := chatmessageMixin[2].Hooks()
 	chatmessageMixinHooks3 := chatmessageMixin[3].Hooks()
 	chatmessage.Hooks[0] = chatmessageMixinHooks2[0]
-	chatmessage.Hooks[1] = chatmessageMixinHooks3[0]
+	chatmessage.Hooks[1] = chatmessageMixinHooks2[1]
+	chatmessage.Hooks[2] = chatmessageMixinHooks3[0]
 	chatmessageMixinInters2 := chatmessageMixin[2].Interceptors()
 	chatmessageMixinInters3 := chatmessageMixin[3].Interceptors()
 	chatmessage.Interceptors[0] = chatmessageMixinInters2[0]
@@ -178,7 +180,8 @@ func init() {
 	chatsessionMixinHooks2 := chatsessionMixin[2].Hooks()
 	chatsessionMixinHooks3 := chatsessionMixin[3].Hooks()
 	chatsession.Hooks[0] = chatsessionMixinHooks2[0]
-	chatsession.Hooks[1] = chatsessionMixinHooks3[0]
+	chatsession.Hooks[1] = chatsessionMixinHooks2[1]
+	chatsession.Hooks[2] = chatsessionMixinHooks3[0]
 	chatsessionMixinInters2 := chatsessionMixin[2].Interceptors()
 	chatsessionMixinInters3 := chatsessionMixin[3].Interceptors()
 	chatsession.Interceptors[0] = chatsessionMixinInters2[0]

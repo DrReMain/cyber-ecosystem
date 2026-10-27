@@ -1,10 +1,11 @@
-package schema
+package guards
 
 import (
 	"testing"
 
 	"entgo.io/ent"
 
+	"cyber-ecosystem/app/services/agent/internal/ent/schema"
 	"cyber-ecosystem/app/services/agent/internal/ent/schema/local_mixins"
 )
 
@@ -19,9 +20,9 @@ func TestMixinOrder(t *testing.T) {
 		return 0
 	}
 	schemas := []interface{ Mixin() []ent.Mixin }{
-		AgentConfig{},
-		ChatSession{},
-		ChatMessage{},
+		schema.AgentConfig{},
+		schema.ChatSession{},
+		schema.ChatMessage{},
 	}
 	for _, s := range schemas {
 		last := 0

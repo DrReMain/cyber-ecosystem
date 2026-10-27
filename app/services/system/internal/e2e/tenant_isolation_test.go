@@ -3,17 +3,19 @@ package e2e
 // The tenant-isolation live guard, in the cross-module live-e2e home: this
 // directory holds nothing but env-gated end-to-end tests (no non-test
 // files, so `go build` skips the package and it can never leak into a
-// production import). Tenancy on the read path is enforced by
-// four different mechanisms, and this guard pins each one where it lives:
-// role and file rows carry the tenant mixin (query interceptor filters,
-// insert hook back-fills); user rows carry no tenant column — visibility
-// narrows to the caller's seats (membership join); audit rows carry a plain
-// tenant field — the read rule is stamped by the UC onto the list input.
-// The write path has no mixin hook: updates and deletes ride the biz
-// convention of a tenant-filtered pre-read, which is exactly why it needs
-// an executable guard — a convention without a test is a convention that
-// silently dies. The subject-less context is asserted too, as the intended
-// exemption (registry sweeps), so nobody tightens or "fixes" it by accident.
+// production import). Tenancy on the read path is enforced by three
+// mechanisms, and this guard pins each one where it lives: role and file
+// rows carry the tenant mixin (query interceptor filters, insert hook
+// back-fills); user rows carry no tenant column — visibility narrows to
+// the caller's seats (membership join); audit rows carry a plain tenant
+// field — the read rule is stamped by the UC onto the list input. The
+// write path is enforced in two layers: the UC's tenant-filtered pre-read
+// answers NotFound before any mutation (the refusal asserted below —
+// preserving not-found semantics and anti-enumeration), and the mixin's
+// update/delete predicate backstops it at the mutation layer (pinned by
+// the write-guard test in this home). The subject-less context is
+// asserted too, as the intended exemption (registry sweeps), so nobody
+// tightens or "fixes" it by accident.
 // Gated: ENT_E2E=1 with the dev database up runs it; anything else skips.
 
 import (

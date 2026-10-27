@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/schema/index"
 
 	"cyber-ecosystem/shared-go/orm/ent/mixins"
+
+	"cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
 )
 
 const codeJoinKeyPattern = `^[a-z][a-z0-9-]{0,18}[a-z0-9]$`
@@ -34,10 +36,13 @@ func (Tenant) Edges() []ent.Edge {
 }
 
 func (Tenant) Mixin() []ent.Mixin {
-	// No SoftDelete: a deleted row frees the code unique.
+	// No SoftDelete: a deleted row frees the code unique. The stamp mixin
+	// moves the liveness version on an enabled flip or delete — the signal
+	// session verification compares its payload against.
 	return []ent.Mixin{
 		mixins.IDStringMixin{},
 		mixins.CreatedUpdatedMixin{},
+		local_mixins.AuthzStampMixin{},
 	}
 }
 

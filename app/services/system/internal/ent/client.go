@@ -2179,7 +2179,8 @@ func (c *TenantClient) GetX(ctx context.Context, id string) *Tenant {
 
 // Hooks returns the client hooks.
 func (c *TenantClient) Hooks() []Hook {
-	return c.hooks.Tenant
+	hooks := c.hooks.Tenant
+	return append(hooks[:len(hooks):len(hooks)], tenant.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.

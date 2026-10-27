@@ -1,10 +1,11 @@
-package bootstrap
+package guards
 
 import (
 	"testing"
 
 	"cyber-ecosystem/shared-go/kratos/security"
 
+	"cyber-ecosystem/app/services/system/internal/bootstrap"
 	"cyber-ecosystem/app/services/system/internal/conf"
 )
 
@@ -29,7 +30,7 @@ func TestValidateDeclaredPopulations(t *testing.T) {
 		{"off-vocabulary plane", []*conf.Seed_Population{row("member", "sympath")}, false},
 		{"duplicate code", []*conf.Seed_Population{row("member", security.PlaneMember), row("member", security.PlaneBackend)}, false},
 	} {
-		err := validateDeclaredPopulations(tc.rows)
+		err := bootstrap.ValidateDeclaredPopulations(tc.rows)
 		if (err == nil) != tc.want {
 			t.Fatalf("%s: err = %v, want ok=%v", tc.name, err, tc.want)
 		}

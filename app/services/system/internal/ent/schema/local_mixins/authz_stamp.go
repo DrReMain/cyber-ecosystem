@@ -13,9 +13,11 @@ import (
 )
 
 const (
-	StampRowKey        = "policy" // the singleton row every bump upserts; readers use the same key
-	userFieldEnabled   = "enabled"
-	userFieldDeletedAt = "deleted_at"
+	StampRowKey = "policy" // the singleton row every bump upserts; readers use the same key
+	// enabledField is liveness-bearing on both Tenant and User — the one
+	// field whose flip every verified session must notice.
+	enabledField  = "enabled"
+	userDeletedAt = "deleted_at"
 )
 
 // The engine's version truth is a single row bumped inside the change
@@ -71,6 +73,15 @@ func (AuthzStampMixin) Hooks() []gen.Hook {
 }
 
 func stampRelevant(m gen.Mutation) bool {
+	if m.Type() == gen.TypeTenant {
+		// Only the enabled flip and a hard delete (the schema has no soft
+		// delete) move the version — a rename must not, or every verified
+		// session pays a deep read for a cosmetic change.
+		if _, ok := m.Field(enabledField); ok {
+			return true
+		}
+		return m.Op() == gen.OpDelete || m.Op() == gen.OpDeleteOne
+	}
 	if m.Type() != gen.TypeUser {
 		return true
 	}
@@ -85,13 +96,13 @@ func stampRelevant(m gen.Mutation) bool {
 	// Field (not FieldCleared — that is the SET-NULL path): a value
 	// assigned to enabled, or the soft-delete marker being set, moves the
 	// snapshot; every other user edit leaves the stamp alone.
-	if _, ok := m.Field(userFieldEnabled); ok {
+	if _, ok := m.Field(enabledField); ok {
 		return true
 	}
-	if _, ok := m.Field(userFieldDeletedAt); ok {
+	if _, ok := m.Field(userDeletedAt); ok {
 		return true
 	}
 	// A restore clears the marker — the SET-NULL path: the user re-enters
 	// the snapshot, so the un-delete moves the stamp too.
-	return m.FieldCleared(userFieldDeletedAt)
+	return m.FieldCleared(userDeletedAt)
 }

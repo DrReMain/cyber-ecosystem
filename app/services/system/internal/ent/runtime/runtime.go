@@ -30,7 +30,8 @@ func init() {
 	auditexportMixinHooks2 := auditexportMixin[2].Hooks()
 	auditexportMixinHooks3 := auditexportMixin[3].Hooks()
 	auditexport.Hooks[0] = auditexportMixinHooks2[0]
-	auditexport.Hooks[1] = auditexportMixinHooks3[0]
+	auditexport.Hooks[1] = auditexportMixinHooks2[1]
+	auditexport.Hooks[2] = auditexportMixinHooks3[0]
 	auditexportMixinInters2 := auditexportMixin[2].Interceptors()
 	auditexportMixinInters3 := auditexportMixin[3].Interceptors()
 	auditexport.Interceptors[0] = auditexportMixinInters2[0]
@@ -206,7 +207,8 @@ func init() {
 	authzpolicyMixinHooks2 := authzpolicyMixin[2].Hooks()
 	authzpolicyMixinHooks3 := authzpolicyMixin[3].Hooks()
 	authzpolicy.Hooks[0] = authzpolicyMixinHooks2[0]
-	authzpolicy.Hooks[1] = authzpolicyMixinHooks3[0]
+	authzpolicy.Hooks[1] = authzpolicyMixinHooks2[1]
+	authzpolicy.Hooks[2] = authzpolicyMixinHooks3[0]
 	authzpolicyMixinInters2 := authzpolicyMixin[2].Interceptors()
 	authzpolicy.Interceptors[0] = authzpolicyMixinInters2[0]
 	authzpolicyMixinFields0 := authzpolicyMixin[0].Fields()
@@ -384,8 +386,9 @@ func init() {
 	deptMixinHooks3 := deptMixin[3].Hooks()
 	deptMixinHooks4 := deptMixin[4].Hooks()
 	dept.Hooks[0] = deptMixinHooks2[0]
-	dept.Hooks[1] = deptMixinHooks3[0]
-	dept.Hooks[2] = deptMixinHooks4[0]
+	dept.Hooks[1] = deptMixinHooks2[1]
+	dept.Hooks[2] = deptMixinHooks3[0]
+	dept.Hooks[3] = deptMixinHooks4[0]
 	deptMixinInters2 := deptMixin[2].Interceptors()
 	deptMixinInters3 := deptMixin[3].Interceptors()
 	deptMixinInters4 := deptMixin[4].Interceptors()
@@ -453,8 +456,9 @@ func init() {
 	fileMixinHooks3 := fileMixin[3].Hooks()
 	fileMixinHooks4 := fileMixin[4].Hooks()
 	file.Hooks[0] = fileMixinHooks2[0]
-	file.Hooks[1] = fileMixinHooks3[0]
-	file.Hooks[2] = fileMixinHooks4[0]
+	file.Hooks[1] = fileMixinHooks2[1]
+	file.Hooks[2] = fileMixinHooks3[0]
+	file.Hooks[3] = fileMixinHooks4[0]
 	fileMixinInters2 := fileMixin[2].Interceptors()
 	fileMixinInters3 := fileMixin[3].Interceptors()
 	fileMixinInters4 := fileMixin[4].Interceptors()
@@ -646,7 +650,8 @@ func init() {
 	permissionMixinHooks2 := permissionMixin[2].Hooks()
 	permissionMixinHooks3 := permissionMixin[3].Hooks()
 	permission.Hooks[0] = permissionMixinHooks2[0]
-	permission.Hooks[1] = permissionMixinHooks3[0]
+	permission.Hooks[1] = permissionMixinHooks2[1]
+	permission.Hooks[2] = permissionMixinHooks3[0]
 	permissionMixinInters2 := permissionMixin[2].Interceptors()
 	permission.Interceptors[0] = permissionMixinInters2[0]
 	permissionMixinFields0 := permissionMixin[0].Fields()
@@ -729,7 +734,8 @@ func init() {
 	permissionpolicyMixinHooks2 := permissionpolicyMixin[2].Hooks()
 	permissionpolicyMixinHooks3 := permissionpolicyMixin[3].Hooks()
 	permissionpolicy.Hooks[0] = permissionpolicyMixinHooks2[0]
-	permissionpolicy.Hooks[1] = permissionpolicyMixinHooks3[0]
+	permissionpolicy.Hooks[1] = permissionpolicyMixinHooks2[1]
+	permissionpolicy.Hooks[2] = permissionpolicyMixinHooks3[0]
 	permissionpolicyMixinInters2 := permissionpolicyMixin[2].Interceptors()
 	permissionpolicy.Interceptors[0] = permissionpolicyMixinInters2[0]
 	permissionpolicyMixinFields0 := permissionpolicyMixin[0].Fields()
@@ -880,7 +886,8 @@ func init() {
 	principalroleMixinHooks2 := principalroleMixin[2].Hooks()
 	principalroleMixinHooks3 := principalroleMixin[3].Hooks()
 	principalrole.Hooks[0] = principalroleMixinHooks2[0]
-	principalrole.Hooks[1] = principalroleMixinHooks3[0]
+	principalrole.Hooks[1] = principalroleMixinHooks2[1]
+	principalrole.Hooks[2] = principalroleMixinHooks3[0]
 	principalroleMixinInters2 := principalroleMixin[2].Interceptors()
 	principalrole.Interceptors[0] = principalroleMixinInters2[0]
 	principalroleMixinFields0 := principalroleMixin[0].Fields()
@@ -969,7 +976,8 @@ func init() {
 	roleMixinHooks2 := roleMixin[2].Hooks()
 	roleMixinHooks3 := roleMixin[3].Hooks()
 	role.Hooks[0] = roleMixinHooks2[0]
-	role.Hooks[1] = roleMixinHooks3[0]
+	role.Hooks[1] = roleMixinHooks2[1]
+	role.Hooks[2] = roleMixinHooks3[0]
 	roleMixinInters2 := roleMixin[2].Interceptors()
 	role.Interceptors[0] = roleMixinInters2[0]
 	roleMixinFields0 := roleMixin[0].Fields()
@@ -1047,6 +1055,8 @@ func init() {
 	// role.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	role.IDValidator = roleDescID.Validators[0].(func(string) error)
 	tenantMixin := schema.Tenant{}.Mixin()
+	tenantMixinHooks2 := tenantMixin[2].Hooks()
+	tenant.Hooks[0] = tenantMixinHooks2[0]
 	tenantMixinFields0 := tenantMixin[0].Fields()
 	_ = tenantMixinFields0
 	tenantMixinFields1 := tenantMixin[1].Fields()

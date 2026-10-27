@@ -1,6 +1,6 @@
 # Kratos runbooks
 
-Procedures for rare, tool-heavy moments — the law lives in `CONVENTIONS.md` (§0 routes here). Every runbook closes with its gate rows (§7 item IDs); a runbook never restates law.
+Procedures for rare, tool-heavy moments — the law lives in `CONVENTIONS.md` (its read map routes here). A runbook never restates law; each closes with its verification per CONVENTIONS §7.
 
 ## 1. New domain module (aggregate root)
 
@@ -30,7 +30,7 @@ The module has **no `data.go`**; its UC depends on a `<Remote>RP` satisfied by t
 
 From `system`, the mandatory base and reference skeleton:
 
-1. **Copy-set**: `project.json` / `Dockerfile` / both `config.yamls` / `conf.proto`(+buf.gen.conf) / `cmd/app` / `bootstrap` (lifecycle only, no seed) / `shared` (kernel trimmed + `dependency_guard_test` + `conventions_guard_test` rewritten) / `platform` (trimmed to the module set — §5 platform law) / `server` (five files) / `client` (once the service calls out) / `ent` schema + `local_mixins`. Deliberately NOT copied: `seed.go`, system business modules, the authz engine internals (casbin/attrs/policies), audit.
+1. **Copy-set**: `project.json` / `Dockerfile` / both `config.yamls` / `conf.proto`(+buf.gen.conf) / `cmd/app` / `bootstrap` (lifecycle only, no seed) / `shared` (kernel trimmed) / `platform` (trimmed to the module set — §5 platform law) / `server` (five files) / `client` (once the service calls out) / `ent` schema + `local_mixins`. Deliberately NOT copied: `seed.go`, system business modules, the authz engine internals (casbin/attrs/policies), audit.
 2. **Dials**: the port triple advances **+1 per service** (system 11001/12001/13001 → agent 11002/…; the service configs are the truth). A service assembling redis isolates its db index from non-service consumers of the same redis (the current pairing lives in the compose files).
 3. **ent first generation is a two-pass stub dance**: `local_mixins` import the generated tree (chicken-and-egg), so stub the mixins (nil `Hooks`/`Interceptors` over entgo-level types) → generate → restore the real mixins → regenerate. entc also refuses an empty schema package ("no Go files"), so the derive slice must land its first aggregate's schema — deferring all schemas to the data slice is not an option. After removing an entity, nuke the whole generated tree first — the loader reads the stale tree.
 4. **wire cold start**: the `go:generate` directive lives in `wire_gen.go` itself — a fresh service runs `go run github.com/google/wire/cmd/wire` manually; wire rejects interface bindings with no consumer in the graph (comment the bind out until its consumer exists).

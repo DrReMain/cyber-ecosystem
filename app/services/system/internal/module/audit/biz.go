@@ -152,6 +152,25 @@ func (uc *AuditUC) Emit(ctx context.Context, ev *kaudit.Event) {
 
 // Private -------------------------------------------------------------------------------------------------------------
 
+func sanitizeAuditCell(s string) string {
+	// Defuses spreadsheet formula injection on the export's free-text
+	// columns: a value starting with =, +, -, @, or tab would be executed
+	// as a formula by Excel/Sheets when an admin opens the file, and these
+	// columns carry request data (user agent, operation, path, deny reason,
+	// actor, ip, tenant). A leading apostrophe renders the cell literal;
+	// every other value passes through byte-identical. Numeric and
+	// vocabulary columns (status, latency, method, principal type) never
+	// route through here — a negative number is data, not a formula.
+	if s == "" {
+		return s
+	}
+	switch s[0] {
+	case '=', '+', '-', '@', '\t':
+		return "'" + s
+	}
+	return s
+}
+
 func (uc *AuditUC) writeAuditCSV(ctx context.Context, w io.Writer, tenant string, ids []string) error {
 	// Batching keeps memory O(batch) whatever the row count; the tenant
 	// rule mirrors List — the caller's tenant plus the subject-less
@@ -163,10 +182,10 @@ func (uc *AuditUC) writeAuditCSV(ctx context.Context, w io.Writer, tenant string
 	emit := func(logs []*AuditLog) error {
 		for _, l := range logs {
 			rec := []string{
-				l.ID, l.CreatedAt.UTC().Format(time.RFC3339Nano), l.Tenant, l.Actor,
-				l.PrincipalType, l.Operation, l.HTTPMethod, l.HTTPPath,
+				l.ID, l.CreatedAt.UTC().Format(time.RFC3339Nano), sanitizeAuditCell(l.Tenant), sanitizeAuditCell(l.Actor),
+				l.PrincipalType, sanitizeAuditCell(l.Operation), l.HTTPMethod, sanitizeAuditCell(l.HTTPPath),
 				strconv.Itoa(l.Status), strconv.Itoa(l.LatencyMs),
-				l.IP, l.UserAgent, l.DenyReason,
+				sanitizeAuditCell(l.IP), sanitizeAuditCell(l.UserAgent), sanitizeAuditCell(l.DenyReason),
 			}
 			if err := cw.Write(rec); err != nil {
 				return err

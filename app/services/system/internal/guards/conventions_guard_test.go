@@ -1,4 +1,4 @@
-package shared
+package guards
 
 import (
 	"io/fs"
@@ -130,6 +130,9 @@ func TestAdminRungPlaneGate(t *testing.T) {
 	}
 	if !rungCarries(src, "ACCESS_ADMIN", "security.BackendPlaneGuard()") {
 		t.Errorf("server.go ADMIN rung lacks the backend plane gate")
+	}
+	if !rungCarries(src, "ACCESS_PLATFORM", "security.BackendPlaneGuard()") {
+		t.Errorf("server.go PLATFORM rung lacks the backend plane gate")
 	}
 }
 

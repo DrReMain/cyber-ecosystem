@@ -5,10 +5,8 @@ description: Domain module creation — use when creating a kratos module/<d>/ f
 
 # New domain module (aggregate root)
 
-Read first: `docs/conventions/kratos/CONVENTIONS.md` §0 (execution contract), §1 (layering & module-dependency law), §2 (naming table), §3 (file structure & ordering), §4 (comment law).
+Read first: the read map in `docs/conventions/kratos/CONVENTIONS.md` — the `module/<d>/**` and `ent/schema/**` rows.
 
-Procedure: `docs/conventions/kratos/RUNBOOKS.md` §1 "New domain module" — steps 1–6 exactly. Trap inside step 6: wire prunes unconsumed providers — anything startup-shaped must hang off a live dependency chain (a `newApp` param or HookRegistry self-registration).
+Procedure: `docs/conventions/kratos/RUNBOOKS.md` §1 "New domain module" — the steps exactly. Trap inside the wire step: wire prunes unconsumed providers — anything startup-shaped must hang off a live dependency chain (a `newApp` param or HookRegistry self-registration).
 
-Gates (all exit 0): `./nx run <service>:generate:ent` → `:migrate:diff` → `:migrate:apply` → `:generate:wire` → `:build`, plus `:test` (TestMixinOrder guards the mixin order; the conventions guard must stay green).
-
-Finish with the §7 gate table before reporting done; final line: the root `AGENTS.md` §6.1 declaration — change-kind + counted evidence.
+Verify per kratos CONVENTIONS §7: the generation chain green, the migration applied, one live RPC probe including the refused path; close with the counted declaration.

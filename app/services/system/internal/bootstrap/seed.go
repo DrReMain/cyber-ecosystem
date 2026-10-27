@@ -79,7 +79,7 @@ func (s *Seed) ensureDeclaredPopulations(ctx context.Context) error {
 		return nil
 	}
 	rows := s.cfg.GetPopulations()
-	if err := validateDeclaredPopulations(rows); err != nil {
+	if err := ValidateDeclaredPopulations(rows); err != nil {
 		return err
 	}
 	client := s.plat.GetClient(ctx)
@@ -114,7 +114,7 @@ func (s *Seed) ensureDeclaredPopulations(ctx context.Context) error {
 	return nil
 }
 
-func validateDeclaredPopulations(rows []*conf.Seed_Population) error {
+func ValidateDeclaredPopulations(rows []*conf.Seed_Population) error {
 	seen := make(map[string]bool, len(rows))
 	for _, row := range rows {
 		switch {

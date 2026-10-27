@@ -72,6 +72,10 @@ dist-ssr/
 build/
 *.local
 
+# Test artifacts
+test-results/
+playwright-report/
+
 # ==================== Environment & Secrets ====================
 # Environment variables
 .env

@@ -1,16 +1,24 @@
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node tools/hooks/nx-first-guard.cjs",
-            "timeout": 10
-          }
-        ]
-      }
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(curl *)",
+      "Bash(grpcurl *)",
+      "Bash(./nx *)",
+      "Bash(pnpm *)"
+    ],
+    "deny": [
+      "Bash(kill)",
+      "Bash(npm)",
+      "Bash(npm *)",
+      "Bash(npx)",
+      "Bash(npx *)",
+      "Bash(yarn)",
+      "Bash(yarn *)",
+      "Bash(go test)",
+      "Bash(go test *)",
+      "Bash(golangci-lint *)",
+      "Bash(vitest *)"
     ]
   }
 }

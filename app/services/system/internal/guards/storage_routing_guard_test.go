@@ -1,4 +1,4 @@
-package platform
+package guards
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 
 	"cyber-ecosystem/shared-go/capability/storage"
 	"cyber-ecosystem/shared-go/kratos/security"
+
+	"cyber-ecosystem/app/services/system/internal/platform"
 )
 
 // The routing fakes: the scope factory records every bucket asked for, the
@@ -29,13 +31,13 @@ func (b *routingBucket) List(context.Context) ([]storage.BucketInfo, error) {
 	return nil, nil
 }
 
-func routingStorage(b *routingBucket) (*TenantStorage, *[]string) {
+func routingStorage(b *routingBucket) (*platform.TenantStorage, *[]string) {
 	var scoped []string
 	s := storage.NewStorage(storage.View{}, b, func(name string) *storage.View {
 		scoped = append(scoped, name)
 		return &storage.View{}
 	}, storage.Limits{})
-	return &TenantStorage{Storage: s, defaultBucket: "core"}, &scoped
+	return platform.NewTenantStorage(s, "core"), &scoped
 }
 
 // The platform tenant rides the configured default bucket; every other

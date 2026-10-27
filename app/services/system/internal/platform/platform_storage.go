@@ -37,6 +37,10 @@ func (t *TenantStorage) ForTenant(ctx context.Context) *storage.View {
 	return t.For(bucket)
 }
 
+func NewTenantStorage(s *storage.Storage, defaultBucket string) *TenantStorage {
+	return &TenantStorage{Storage: s, defaultBucket: defaultBucket}
+}
+
 func NewStorage(c *conf.Data) (*TenantStorage, func(), error) {
 	sc := c.GetStorage()
 	if sc == nil {
@@ -47,7 +51,7 @@ func NewStorage(c *conf.Data) (*TenantStorage, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	return &TenantStorage{Storage: storageS3.New(client, publicPresigner, cfg), defaultBucket: cfg.Bucket}, closeFn, nil
+	return NewTenantStorage(storageS3.New(client, publicPresigner, cfg), cfg.Bucket), closeFn, nil
 }
 
 func toStorageConfig(sc *conf.Data_Storage) storageS3.Config {

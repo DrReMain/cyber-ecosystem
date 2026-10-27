@@ -41,7 +41,7 @@ func (DatascopeMixin) Indexes() []ent.Index { return nil }
 func (d DatascopeMixin) Interceptors() []gen.Interceptor {
 	return []gen.Interceptor{
 		intercept.TraverseFunc(func(ctx context.Context, q intercept.Query) error {
-			if p := d.scopePredicate(ctx); p != nil {
+			if p := d.ScopePredicate(ctx); p != nil {
 				applyScope(q, p)
 			}
 			return nil
@@ -59,7 +59,7 @@ func (d DatascopeMixin) Hooks() []gen.Hook {
 		hook.On(
 			func(next gen.Mutator) gen.Mutator {
 				return gen.MutateFunc(func(ctx context.Context, m gen.Mutation) (ent.Value, error) {
-					p := d.scopePredicate(ctx)
+					p := d.ScopePredicate(ctx)
 					if p == nil {
 						return next.Mutate(ctx, m)
 					}
@@ -76,9 +76,11 @@ func (d DatascopeMixin) Hooks() []gen.Hook {
 	}
 }
 
-// scopePredicate compiles the decision's scopes via the shared compiler, or
+// ScopePredicate compiles the decision's scopes via the shared compiler, or
 // returns nil when this read is unscoped (lifted, or no decision in ctx).
-func (d DatascopeMixin) scopePredicate(ctx context.Context) func(*sql.Selector) {
+// Exported for the guards package; internal/ visibility keeps the surface
+// service-local.
+func (d DatascopeMixin) ScopePredicate(ctx context.Context) func(*sql.Selector) {
 	if _, lifted := ctx.Value(unscopedKey{}).(bool); lifted {
 		return nil
 	}

@@ -1,4 +1,4 @@
-package local_mixins
+package guards
 
 import (
 	"context"
@@ -10,6 +10,8 @@ import (
 
 	"cyber-ecosystem/shared-go/kratos/security"
 	kauthz "cyber-ecosystem/shared-go/kratos/security/authz"
+
+	"cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
 )
 
 // opTransport embeds a nil Transporter and overrides exactly Operation, so
@@ -32,7 +34,7 @@ func (f fakeAuthorizer) Decide(context.Context, *security.Subject, string) (*kau
 // predicateViaMiddleware runs the real authz middleware so the Decision
 // reaches ctx the way production injects it, then compiles the mixin
 // predicate inside the handler.
-func predicateViaMiddleware(t *testing.T, m DatascopeMixin, d *kauthz.Decision) (func(*sql.Selector), bool) {
+func predicateViaMiddleware(t *testing.T, m local_mixins.DatascopeMixin, d *kauthz.Decision) (func(*sql.Selector), bool) {
 	t.Helper()
 	var (
 		pred func(*sql.Selector)
@@ -43,7 +45,7 @@ func predicateViaMiddleware(t *testing.T, m DatascopeMixin, d *kauthz.Decision) 
 		&security.Subject{UserID: "u1", TenantID: "default"},
 	)
 	handler := func(ctx context.Context, _ any) (any, error) {
-		pred, ok = m.scopePredicate(ctx), true
+		pred, ok = m.ScopePredicate(ctx), true
 		return nil, nil
 	}
 	if _, err := kauthz.OperationAuthz(fakeAuthorizer{decision: d})(handler)(ctx, nil); err != nil {
@@ -61,12 +63,12 @@ func renderPred(t *testing.T, pred func(*sql.Selector)) string {
 }
 
 func TestScopePredicatePlumbing(t *testing.T) {
-	m := DatascopeMixin{UserField: "id", DeptField: "dept_id"}
+	m := local_mixins.DatascopeMixin{UserField: "id", DeptField: "dept_id"}
 
-	if pred := m.scopePredicate(context.Background()); pred != nil {
+	if pred := m.ScopePredicate(context.Background()); pred != nil {
 		t.Fatalf("no decision in ctx pred = %v, want false (trusted paths skip filtering)", pred != nil)
 	}
-	if pred := m.scopePredicate(Unscoped(context.Background())); pred != nil {
+	if pred := m.ScopePredicate(local_mixins.Unscoped(context.Background())); pred != nil {
 		t.Fatalf("lifted read pred = %v, want false", pred != nil)
 	}
 
@@ -87,7 +89,7 @@ func TestScopePredicatePlumbing(t *testing.T) {
 func TestScopePredicateFailsClosed(t *testing.T) {
 	// A self-only narrowing on an entity without UserField has nothing
 	// honorable: the empty set, never unfiltered.
-	deptMixin := DatascopeMixin{DeptField: "id"}
+	deptMixin := local_mixins.DatascopeMixin{DeptField: "id"}
 	pred, ok := predicateViaMiddleware(t, deptMixin, &kauthz.Decision{
 		Allowed: true,
 		Scopes:  []kauthz.ScopeDescriptor{{Kind: kauthz.ScopeKindSelf}},

@@ -40,7 +40,10 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "go tool kratos run"
+        "command": "go tool kratos run",
+        "env": {
+          "APP_AGENT_MASTER_KEY": "agent-dev-master-key"
+        }
       }
     },
     "dev-up": {
@@ -57,19 +60,19 @@
         "command": "node tools/scripts/devserver.cjs down --project agent"
       }
     },
-    "test": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{projectRoot}",
-        "command": "go test ./..."
-      }
-    },
     "build": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/bin"],
       "options": {
         "cwd": "{projectRoot}",
         "command": "go build -o ./bin/ ./..."
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "go test -race ./..."
       }
     },
     "image": {

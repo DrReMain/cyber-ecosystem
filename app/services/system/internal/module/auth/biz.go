@@ -40,6 +40,9 @@ type Session struct {
 	ExpiresAt  time.Time
 	IssuedAt   time.Time
 	Account    string
+	// LivenessStamp is the engine version this payload last verified
+	// against; -1 means it was minted under a failed stamp read.
+	LivenessStamp int64
 }
 
 type CurrentUser struct {
@@ -168,6 +171,9 @@ func (uc *AuthUC) BeginIdentityLogin(ctx context.Context, providerKey, redirectU
 
 func (uc *AuthUC) autoRegister(ctx context.Context, id *exchangedIdentity) (*user.User, error) {
 	account := xid.New().String()
+	// An empty hash permanently closes the password plane: Verify against
+	// "" can never succeed, so this identity logs in only through its
+	// provider credential — that is the auto-registration contract.
 	hash := ""
 	var u *user.User
 	err := uc.Tm.InTx(ctx, func(ctx context.Context) error {
@@ -242,6 +248,10 @@ func (uc *AuthUC) Logout(ctx context.Context) error {
 }
 
 func (uc *AuthUC) AuthenticateSession(ctx context.Context, token string) (*security.Subject, error) {
+	// Freshness rides the liveness stamp: the payload carries the engine
+	// version it last verified against, and that version moves inside the
+	// very transaction that flips a gate, so a disable still lands on the
+	// very next request — the row reads are paid only when it moved.
 	val, err := uc.tokenRP.Get(ctx, sessionPrefix+token)
 	if err != nil {
 		if errorspb.IsInfraErrorCacheMiss(err) {
@@ -278,24 +288,39 @@ func (uc *AuthUC) AuthenticateSession(ctx context.Context, token string) (*secur
 			return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("session revoked by administration"))
 		}
 	}
-	// A disabled tenant kills its inhabitants' sessions at verification — a
-	// check, not a revocation: re-enabling resurrects stored sessions.
-	live, err := uc.tenantLive(ctx, sess.TenantID)
-	if err != nil {
-		return nil, err
+	ver, serr := uc.authzRP.StampVersion(ctx)
+	if serr != nil {
+		uc.Log.Warn("auth: liveness stamp read failed; verifying deep", "error", serr)
 	}
-	if !live {
-		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("tenant disabled: %s", sess.TenantID))
-	}
-	u, err := uc.userRP.FindByID(ctx, sess.UserID)
-	if err != nil {
-		if errorspb.IsInfraErrorDbNotFound(err) {
-			return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("identity missing: %s", sess.UserID))
+	if serr != nil || sess.LivenessStamp != ver {
+		// A disabled tenant kills its inhabitants' sessions at verification — a
+		// check, not a revocation: re-enabling resurrects stored sessions.
+		live, err := uc.tenantLive(ctx, sess.TenantID)
+		if err != nil {
+			return nil, err
 		}
-		return nil, err
-	}
-	if !u.Enabled {
-		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("identity disabled: %s", sess.UserID))
+		if !live {
+			return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("tenant disabled: %s", sess.TenantID))
+		}
+		u, err := uc.userRP.FindByID(ctx, sess.UserID)
+		if err != nil {
+			if errorspb.IsInfraErrorDbNotFound(err) {
+				return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("identity missing: %s", sess.UserID))
+			}
+			return nil, err
+		}
+		if !u.Enabled {
+			return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("identity disabled: %s", sess.UserID))
+		}
+		if serr == nil {
+			// The survivor carries the current version so its next request
+			// rides the comparison; a failed write-back only costs the next
+			// request its deep reads, never its correctness.
+			sess.LivenessStamp = ver
+			if werr := uc.tokenRP.Set(ctx, sessionPrefix+token, utils.MustMarshal(sess), sessionIdle); werr != nil {
+				uc.Log.Warn("auth: liveness stamp write-back failed; next request verifies deep", "error", werr)
+			}
+		}
 	}
 	slide := min(sessionIdle, time.Until(sess.ExpiresAt))
 	if err := uc.tokenRP.Expire(ctx, sessionPrefix+token, slide); err != nil {
@@ -496,7 +521,14 @@ func (uc *AuthUC) mintSession(ctx context.Context, u *user.User, seat *user.Seat
 	}
 	issuedAt = time.Now()
 	expiresAt = issuedAt.Add(shared.SessionMax)
-	sess := &Session{UserID: u.ID, TenantID: seat.TenantID, Population: seat.Population, ExpiresAt: expiresAt, IssuedAt: issuedAt, Account: utils.Deref(u.Account, "")}
+	// A failed stamp read mints -1 — a version no bump produces — so the
+	// session simply verifies deep until its first write-back.
+	ver, verr := uc.authzRP.StampVersion(ctx)
+	if verr != nil {
+		uc.Log.Warn("auth: liveness stamp read failed at mint; session verifies deep", "error", verr)
+		ver = -1
+	}
+	sess := &Session{UserID: u.ID, TenantID: seat.TenantID, Population: seat.Population, ExpiresAt: expiresAt, IssuedAt: issuedAt, Account: utils.Deref(u.Account, ""), LivenessStamp: ver}
 	if err = uc.tokenRP.Set(ctx, sessionPrefix+token, utils.MustMarshal(sess), sessionIdle); err != nil {
 		return "", time.Time{}, time.Time{}, err
 	}
