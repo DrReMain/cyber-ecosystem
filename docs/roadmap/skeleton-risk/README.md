@@ -15,7 +15,7 @@
 
 - **R5 撤销**：chat content 上限存在——proto 注释声明 + `chat/service.go:165-176` handler 显式校验（流式旁路 unary protovalidate 是刻意设计）。归入「已注释确认」清单。
 - **R4 加重**：双 dev 默认值并存且不一致——`agent/configs/config.yaml:34`（agent-dev-master-key）与 `deploy/docker/compose.app.yaml:112`（agent-insecure-dev-key）；prod 忘配环境变量即静默用公开钥。
-- **BUILTIN 面清点（TR 升维为 SR-B 的证据底）**：全仓 42 口 ACCESS_BUILTIN。system 侧 18 口中 14 口=me-face/own-keyed 正当（auth 3、filepresign 4、fileproxy 1、file 1、user ChangePassword、introspect 2）；**2 口信息泄露候选**：resource.ListResource（全生态操作目录对任何活会话开放=免费 API 地图）、role.PreviewGrants（租户内任意角色 grants 预览对 member 开放）；transfer 4 口=无用事例代码（用户裁定删除）。esports 17+4（test 模块）与 agent 9=member 面设计意图。
+- **BUILTIN 面清点（TR 升维为 SR-B 的证据底；2026-10-27 修正）**：初次清点 42 口、含「ListResource/PreviewGrants 两口提档候选」——**为注解 grep 假阳性**（reserved 注释文本误当注解；两口现状 ACCESS_ADMIN）。精确重清=全仓 43 口（system 16+agent 9+esports 18），全部=me-face/own-keyed 或 transfer 夹具。esports 18 与 agent 9=member 面设计意图。
 
 ## 切片池
 
@@ -70,13 +70,12 @@ system 与 agent 的 `project.json` 各加 `test` target（`go test -race ./...`
 
 保留 check-then-act，头注释记：并发对调可成环、环自愈=一次 reparent、IsAncestor visited 终止保障读不死循环。不写码。
 
-### SR-B BUILTIN 面审计与处置（TR 升维）
+### SR-B BUILTIN 面审计与处置（TR 升维）✅（改形两次收口）
 
-证据底见「复核修订」节。处置三件：
-1. **transfer 4 口删除**（用户裁定无用事例代码）：proto 契约删除+gen 重生成+registrar 摘除，走 proto-change 流程（清号纪律适用）。
-2. **ListResource / PreviewGrants 提档 ACCESS_ADMIN**（片内决策位，默认建议提档）：二者当前服务端内部调用（validateGrants 走 RP 不走 RPC）不受影响；admin 面提档后照常；唯一变化=member 会话失去 API 地图与租户 grants 预览。若裁「保留 BUILTIN」须补 why 注释入 proto。
-3. **类级结论入 CONVENTIONS**（proto 区）：BUILTIN 档语义=「任何活会话可调、无平面卫、无 op 鉴权、无 datascope（无 Decision）」；新 RPC 选档守则=me-face/own-keyed 方可 BUILTIN，资源型/信息型面须 ADMIN 起步。
-- 验证：proto 链三闸+注解面 grep 清单（42 口→38 口）+live 探针（member token 调 ListResource 应 403、transfer 四口 404）。
+- **原提档件撤销（误报二例，与 R5 同族）**：`ListResource`/`PreviewGrants` 的 proto 注解**现状已是 ACCESS_ADMIN**——评审清单把 reserved 注释行（`// builtin flag retired…ACCESS_BUILTIN…`）的文本误当注解（grep/awk 未锚定 `option (cyber.ext.v1.access)` 行形状）。教训入档：扫注解面必须精确匹配 option 行，proto 内注释文本可含同名词。
+- **transfer 保留（2026-10-27 用户改裁）**：不删。四论据=数据面零访问（Echo/Pipe/Subscribe/Raw 只回环或发硬编码假事件）；流均有界（Subscribe 5×500ms 自终）；内容注入窗口被 SameSite=Lax cookie 模型关死（跨站 POST 不带 cookie→401）；且它是 kratos CONVENTIONS §3「Transport-fixture modules」法条的活例子，删之失载体。
+- **守则件落位**：BUILTIN 档语义+选档守则入 proto CONVENTIONS §5 Access policy 段（member-plane trust ring：任何活会话可调/无平面卫/无 op 鉴权/无 datascope；只有 me-face/own-keyed 合格；信息型/资源型面 ADMIN 起步）。顺手偿还一处文档漂移：§5 豁免句仍写「ListResource 故意无注解练 503」——现状=proto 带 ADMIN、`accessExemptions` 空清单、503 覆盖移至 `TestDefaultGuard`，已按现状改写。
+- **验证**：无 proto 改动（纯文档片），proto:check-drift exit 0；精确清点全仓 BUILTIN=43 口（system 16+agent 9+esports 18），system 侧全部=me-face/own-keyed/transfer 夹具，零信息泄露候选残留。live 探针免跑理由=ADMIN 档语义由注解+TestDefaultGuard 既有覆盖承载，无新行为面。
 
 ## 台账
 
@@ -92,7 +91,7 @@ system 与 agent 的 `project.json` 各加 `test` target（`go test -race ./...`
 | SR-7 | 封存（触发条件在档） | | | |
 | SR-8 | 递延（触发条件在档） | | | |
 | SR-9 | ✅（注释封存落） | 2026-10-27 | 未提交（随下一批） | dept Update reparent 头注释记 TOCTOU 取舍（并发对调成环可接受=读安全自愈+修复代价不成比例）；无行为变化 |
-| SR-B | 待开工（transfer 删已裁；提档默认建议=是） | | | |
+| SR-B | ✅（改形收口） | 2026-10-27 | 随本批未提交 | 提档件撤销（误报二例：reserved 注释行假阳性，两口现状 ADMIN）；transfer 保留（用户改裁，无害+§3 活例子）；守则入 proto CONVENTIONS §5+偿豁免句漂移；精确清点 43 口零候选；check-drift 0 |
 
 ## 变更录
 
@@ -101,3 +100,4 @@ system 与 agent 的 `project.json` 各加 `test` target（`go test -race ./...`
 - 2026-10-27（三）：SR-1 落地（四臂红绿全过，实施事实四条入节；agent/esports 拷贝位待裁）。同日用户裁定底座对齐：agent/esports mixin+e2e 锚+esports test target 一并落地，SR-0/SR-1 与本档随批提交。
 - 2026-10-27（四）：SR-2 落地（构造阈值单源+部署四面+devserver env 通道补齐；kratos `${VAR:default}` 树内解析语义定案入实施事实——esports 新服务抄 yaml 形状时的语义底）。
 - 2026-10-27（五）：测试两家园+同文件多 UC/RP 两法条入 kratos CONVENTIONS（§7/§3）；SR-4 测试锚按法后撤（data_test.go 删）；SR-3/4/5/6/9 连落（CSV 消毒/grant meta 防御/reconcile 互斥/注释四+一处/TOCTOU 封存）。役内只剩 SR-B 与两个封存递延位。
+- 2026-10-27（六，役闭）：SR-B 改形收口——提档件撤销（误报二例）、transfer 保留（用户改裁）、守则入 proto CONVENTIONS §5+偿豁免句漂移。**skeleton-risk 役全闭**：SR-0..SR-6/SR-9/SR-B ✅；SR-7/SR-8 封存递延（触发条件在档）。esports 写路径解锁（SR-1 结构执法三服务同型）。
