@@ -51,7 +51,7 @@ export function ExitConfirmDialog({
       }}
     >
       <Dialog
-        className="rounded-card border-danger/40 bg-surface-card shadow-card motion-safe:data-[entering]:ease-out-expo w-full max-w-md border p-8 motion-safe:data-[entering]:scale-95 motion-safe:data-[entering]:opacity-0 motion-safe:data-[entering]:duration-200"
+        className="rounded-card border-danger/40 bg-surface-card shadow-card motion-safe:data-[entering]:ease-out-expo w-full max-w-md border p-8 backdrop-blur-md motion-safe:data-[entering]:scale-95 motion-safe:data-[entering]:opacity-0 motion-safe:data-[entering]:duration-200"
         role="alertdialog"
       >
         <h2 className="text-ink text-center text-xl font-bold tracking-[0.02em] rtl:tracking-normal">

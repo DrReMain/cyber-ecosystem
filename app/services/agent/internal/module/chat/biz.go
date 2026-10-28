@@ -121,8 +121,8 @@ type ChatUC struct {
 }
 
 func NewChatUC(logger *slog.Logger, tm shared.Transaction, c *conf.Crypto, agentConfigRP agentconfig.AgentConfigRP, chatRP ChatRP) (*ChatUC, error) {
-	if c == nil || c.GetMasterKey() == "" {
-		return nil, fmt.Errorf("crypto.master_key is required")
+	if c == nil || len(c.GetMasterKey()) < shared.MinMasterKeyBytes {
+		return nil, fmt.Errorf("crypto.master_key is required (min %d bytes)", shared.MinMasterKeyBytes)
 	}
 	return &ChatUC{
 		UC:        shared.NewUC(logger.With("module", "module/chat"), tm),

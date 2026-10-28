@@ -5,10 +5,8 @@ description: TanStack client change & verification — use when creating or edit
 
 # TanStack client change
 
-Read first: the §0 dispatch row for your artifact — `docs/conventions/tanstack/CONVENTIONS.md` §0 (by surface: §1 layering & transport shapes, §3 route tiers & read-set, §5 component grammar, §6 i18n ownership).
+Read first: the read map in `docs/conventions/tanstack/CONVENTIONS.md` — it routes skin-preset paths to `docs/conventions/skin/CONVENTIONS.md`.
 
-Gates (order is law, all exit 0, all `--skip-nx-cache`) — run for each client under `app/clients/*` affected by the change: `./nx run <client>:build` FIRST (regenerates routeTree + paraglide; `typecheck` also wires this edge mechanically via `nx.targets.dependsOn`) → `./nx run <client>:typecheck` → `./nx run <client>:check` (§11). For a `shared-ts` edit, the touched package's own chain runs too (`<pkg>:typecheck` → `<pkg>:check`, plus `<pkg>:test` where the package has it), and the consuming clients' chain still runs (§0 dispatch row, root AGENTS.md §6.2).
+Chain (order is law, all exit 0, `--skip-nx-cache`), per affected client: `<client>:build` FIRST (regenerates routeTree + paraglide) → `:typecheck` → `:check`; plus `tools:paraglide:check`. A `shared-ts` edit also runs the touched package's own chain (`:typecheck`, `:check`, `:test` where the package has it), and the consuming clients' chain still runs.
 
-Traps: §11 reachable-surface rule — changes on login pages, guard redirects, or the SSR entry need e2e verification before done. Library-seam changes (dnd, scroll physics, menus, toasts) get the §11 behavioral pairing review. No browser-automation MCP connected when live verification is due → recommend docs/environment.md (never auto-install); a manual developer walkthrough is the degraded form.
-
-Finish with the §12 pre-completion gate table (one row per item, emitted verbatim) before reporting done. Final line: the root `AGENTS.md` §6.1 declaration — change-kind + counted evidence.
+Traps: §11 reachable-surface rule — changes on login pages, guard redirects, or the SSR entry need live browser verification before done; library-seam changes get the §11 behavioral pairing review. No browser-automation tool connected when live verification is due → recommend `docs/environment/README.md` (never auto-install); a manual developer walkthrough is the degraded form. Close per §11 Close.

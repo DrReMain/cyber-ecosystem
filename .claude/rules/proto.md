@@ -1,9 +1,6 @@
----
-paths: ["proto/**/*.proto", "gen/**"]
----
-
 # Proto law card
 
-- `gen/` is derived output — never hand-edit it; fix the source and regenerate (`AGENTS.md` §4).
-- Read first by concern — docs/conventions/proto/CONVENTIONS.md §3 (optionality & the null/zero contract), §4 (error enums, reserved law, locale copy), §5 (access annotation is mandatory on every business RPC).
-- Changing a contract: follow the §8 checklist exactly — it carries the gates.
+- Before writing: read the read map at the top of `docs/conventions/proto/CONVENTIONS.md` — it names the sections that govern the artifact.
+- `gen/` is derived output — never hand-edit; fix the source and regenerate (§7).
+- A new error reason means client copy in every registered locale (§8 step 5).
+- Verify: the §8 chain + `proto:check-drift` at close.

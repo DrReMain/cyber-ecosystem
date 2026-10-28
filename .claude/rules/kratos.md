@@ -1,9 +1,7 @@
----
-paths: ["app/services/**/*.go", "shared-go/**/*.go"]
----
-
 # Kratos law card
 
-- Before writing: load the dispatch row for this artifact — docs/conventions/kratos/CONVENTIONS.md §0 "Execution contract"; those sections are the law for the edit.
-- Before reporting done: run docs/conventions/kratos/CONVENTIONS.md §7 "Pre-completion gate" over the combined diff and emit its report table.
-- Procedures (new module, new service, remote dependency, operating facts): docs/conventions/kratos/RUNBOOKS.md.
+- Before writing: read the read map at the top of `docs/conventions/kratos/CONVENTIONS.md` — it names the sections that govern the artifact.
+- Read-first by surface: §1 (layering & cross-module law), §3 (four-file shape & ordering), §4 (comments), §6 (errors).
+- Trap: serialization goes through `utils` only — never `encoding/json` directly (§1).
+- Trap: editor diagnostics lag codegen — trust `go build` and the Nx targets, never the LSP panel.
+- Verify: owning chain + live RPC probe incl. the refused path (§7).

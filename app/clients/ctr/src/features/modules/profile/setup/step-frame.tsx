@@ -13,11 +13,11 @@ const PROGRESS_SEGS = [1, 2, 3] as const;
  * pages: nickname carries two, age and games one each. */
 const STEP_ORBS = {
   1: [
-    { className: "top-[-60px] right-[-70px] size-[min(62vw,240px)]", tone: "blue" },
-    { className: "bottom-[-30px] left-[-50px] size-[min(52vw,200px)]", tone: "cyan" },
+    { className: "top-[-60px] right-[-70px] size-[240px]", tone: "blue" },
+    { className: "bottom-[-30px] left-[-50px] size-[200px]", tone: "cyan" },
   ],
-  2: [{ className: "top-[-60px] left-[-60px] size-[min(57vw,220px)]", tone: "purple" }],
-  3: [{ className: "top-[-60px] right-[-60px] size-[min(57vw,220px)]", tone: "cyan" }],
+  2: [{ className: "top-[-60px] left-[-60px] size-[220px]", tone: "purple" }],
+  3: [{ className: "top-[-60px] right-[-60px] size-[220px]", tone: "cyan" }],
 } as const satisfies Record<1 | 2 | 3, readonly AmbientOrb[]>;
 
 interface StepFrameProps {

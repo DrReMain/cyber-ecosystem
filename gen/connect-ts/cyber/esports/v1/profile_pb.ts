@@ -95,7 +95,7 @@ export type Profile = Message<"cyber.esports.v1.Profile"> & {
    * Three states by the sex ruling: male, female, undetermined — the last
    * is the honest "not said", never guessed from anything. The report
    * cohort's same-age-same-sex benchmark reads it; undetermined benches
-   * against the same-age pool不分性别.
+   * against the same-age pool regardless of sex.
    *
    * @generated from field: optional cyber.esports.v1.ProfileSex sex = 11;
    */

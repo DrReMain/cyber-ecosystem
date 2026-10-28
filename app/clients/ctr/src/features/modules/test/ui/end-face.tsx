@@ -112,7 +112,7 @@ function VerdictCard({
   const maxRetakes = retakeBudget(step);
   const retakeLeft = verdict.phase === "done" ? verdict.retestLeft : (step?.retestLeft ?? 0);
   return (
-    <div className="border-line bg-surface-card rounded-card border px-4 py-4.5 text-center">
+    <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-4.5 text-center backdrop-blur-md">
       {word !== null ? (
         <div className="text-ink-tertiary text-[11px]">
           {m.test_result_ability_line({ ability: word.cn, name: testName })}
@@ -161,15 +161,19 @@ export function EndFace({
   const spent = verdict.phase === "done" && verdict.inSession && verdict.retestLeft <= 0;
   const next = step !== null ? findNextStep(step) : undefined;
 
+  // overflow-x-hidden: both orbs bleed past the side edges by design, and
+  // a lone overflow-y-auto computes overflow-x to auto (the CSS
+  // visible-with-non-visible rule) — the bleed then buys the face a
+  // horizontal scrollbar. x stays clipped, y scrolls.
   return (
-    <div className="bg-canvas absolute inset-0 isolate z-40 overflow-y-auto">
+    <div className="bg-canvas absolute inset-0 isolate z-40 overflow-x-hidden overflow-y-auto">
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-20 -left-17.5 size-[min(69vw,260px)] rounded-full bg-[#2563eb] opacity-26 blur-[70px]"
+        className="pointer-events-none absolute -top-20 -left-17.5 size-[260px] rounded-full bg-[#2563eb] opacity-26 blur-[70px]"
       />
       <div
         aria-hidden
-        className="bg-ambient-cyan pointer-events-none absolute -right-17.5 -bottom-15 size-[min(59vw,220px)] rounded-full opacity-26 blur-[70px]"
+        className="bg-ambient-cyan pointer-events-none absolute -right-17.5 -bottom-15 size-[220px] rounded-full opacity-26 blur-[70px]"
       />
       <div className="relative mx-auto w-full max-w-md px-4 pb-6">
         <div className="flex items-center gap-3 pt-5 pb-2.5">
@@ -199,7 +203,7 @@ export function EndFace({
         <div className="flex flex-col gap-3">
           <VerdictCard onResubmit={onResubmit} step={step} testName={testName} verdict={verdict} />
 
-          <div className="border-line bg-surface-card rounded-card border p-4">
+          <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
             <div className="text-ink mb-2.5 text-sm font-extrabold">
               {m.test_result_detail_title()}
             </div>

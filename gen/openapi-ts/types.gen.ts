@@ -703,7 +703,7 @@ export type CyberEsportsV1PayCredential = {
 export type CyberEsportsV1PeekMatchSessionResponse = {
     /**
      * Absent when no in-window session exists — message-field presence is
-     * the null/zero contract for entities (§3); a present session is the
+     * the null/zero contract for entities; a present session is the
      * resume face's whole truth.
      */
     session?: CyberEsportsV1MatchSession;
@@ -754,7 +754,7 @@ export type CyberEsportsV1Profile = {
      * Three states by the sex ruling: male, female, undetermined — the last
      * is the honest "not said", never guessed from anything. The report
      * cohort's same-age-same-sex benchmark reads it; undetermined benches
-     * against the same-age pool不分性别.
+     * against the same-age pool regardless of sex.
      */
     sex?: 'PROFILE_SEX_UNSPECIFIED' | 'PROFILE_SEX_MALE' | 'PROFILE_SEX_FEMALE' | 'PROFILE_SEX_UNDETERMINED';
 };

@@ -19,8 +19,8 @@ import { SecurityCard } from "./ui/security-card";
 
 /* The overview page's orb pair (prototype profile-overview). */
 const overviewOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-70px] left-[-60px] size-[min(62vw,240px)]", tone: "purple" },
-  { className: "bottom-[-50px] right-[-60px] size-[min(51vw,200px)]", tone: "cyan" },
+  { className: "top-[-70px] left-[-60px] size-[240px]", tone: "purple" },
+  { className: "bottom-[-50px] right-[-60px] size-[200px]", tone: "cyan" },
 ];
 
 export function ProfilePage() {
@@ -78,7 +78,7 @@ export function ProfilePage() {
         <DataCard profile={profile} />
         <SecurityCard />
 
-        {/* ⑦ 训练趋势 — the prototype's own Phase-2 placeholder, dashed. */}
+        {/* Training trend — the prototype's own Phase-2 placeholder, dashed. */}
         <div className="rounded-card border border-dashed border-[rgba(107,114,128,0.6)] bg-[rgba(17,23,41,0.5)] px-4 py-[15px]">
           <div className="mb-[6px] flex items-center justify-between">
             <span className="text-[14.5px] font-extrabold text-[#9ca3af]">

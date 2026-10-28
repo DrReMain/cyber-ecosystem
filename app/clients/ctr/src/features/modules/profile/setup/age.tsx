@@ -41,14 +41,15 @@ export function SetupAgePage() {
 
   // The sex card (D-AN) prefills from the profile read — whenever the
   // server starts deriving sex from wechat, this prefill lights up.
-  // Queries deliver proto-JSON shapes (CONVENTIONS §1): the enum arrives
-  // as its wire-name string, mapped back to the enum before state.
+  // The JSON transport delivers the enum as its wire-name string while
+  // the generated type claims the enum: the union narrows by typeof,
+  // and an absent/null sex collapses to "" which no table row matches.
   useEffect(() => {
     if (sex !== null) {
       return;
     }
-    const wire = profileQuery.data?.profile?.sex as unknown as string | null | undefined;
-    const mapped = wire == null ? undefined : SEX_FROM_WIRE[wire];
+    const raw: ProfileSex | string = profileQuery.data?.profile?.sex ?? "";
+    const mapped = typeof raw === "string" ? SEX_FROM_WIRE[raw] : undefined;
     if (mapped !== undefined) {
       setSex(mapped);
     }
@@ -100,7 +101,7 @@ export function SetupAgePage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/nickname" })} step={2}>
-      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
         <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_sex_label()}
           <span className="text-danger-text"> *</span>
@@ -136,7 +137,7 @@ export function SetupAgePage() {
         </div>
       </div>
 
-      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
         <div className="text-ink mb-1 text-sm font-extrabold">{m.profile_birth_label()}</div>
         <p className="text-ink-tertiary mb-3 text-[11.5px] leading-relaxed whitespace-pre-line">
           {m.profile_setup_birth_desc_lead()}

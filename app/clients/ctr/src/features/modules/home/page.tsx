@@ -15,8 +15,8 @@ import { ResumeCard } from "./ui/resume-card";
 
 /* The home page's orb pair (prototype home). */
 const homeOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-60px] left-[-70px] size-[min(62vw,240px)]", tone: "blue" },
-  { className: "top-[280px] right-[-70px] size-[min(51vw,200px)]", tone: "purple" },
+  { className: "top-[-60px] left-[-70px] size-[240px]", tone: "blue" },
+  { className: "top-[280px] right-[-70px] size-[200px]", tone: "purple" },
 ];
 
 export function HomePage() {

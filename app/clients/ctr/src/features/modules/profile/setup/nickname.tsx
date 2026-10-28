@@ -78,7 +78,7 @@ export function SetupNicknamePage() {
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile" })} step={1}>
-      <div className="border-line bg-surface-card shadow-card rounded-card border p-4">
+      <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
         <div className="text-ink mb-1 text-sm font-extrabold">
           {m.profile_setup_nickname_title()}
         </div>

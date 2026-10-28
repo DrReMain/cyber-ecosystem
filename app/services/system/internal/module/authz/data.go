@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -35,6 +36,11 @@ type authzRP struct {
 	lastForced atomic.Int64
 	watchDone  chan struct{}
 	watchSub   cache.Subscription
+	// Serializes reconcile passes: concurrent triggers (a pubsub burst
+	// riding the 5-minute tick) would each pay the full-table rebuild for
+	// the same stamp version; under the lock the second pass re-reads the
+	// stamp and exits at the version gate.
+	mu sync.Mutex
 }
 
 func NewAuthzRP(logger *slog.Logger, p *platform.Platform) (AuthzRP, error) {
@@ -69,7 +75,12 @@ func (r *authzRP) ImplicitGrants(ctx context.Context, userID, tenant string) ([]
 		if len(row) < 3 {
 			continue
 		}
-		meta := snap.grants[grantKey{tenant, row[0], row[2]}]
+		// A row without its meta entry must vanish, never surface with the
+		// zero value: "" reads as tenant-wide, the opposite of narrowing.
+		meta, ok := snap.grants[grantKey{tenant, row[0], row[2]}]
+		if !ok {
+			continue
+		}
 		views = append(views, GrantView{
 			Pattern:     row[2],
 			ScopeKind:   meta.scopeKind,
@@ -163,7 +174,12 @@ func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID,
 		if len(row) < 3 || !matchOperation(operation, row[2]) {
 			continue
 		}
-		meta := snap.grants[grantKey{tenant, row[0], row[2]}]
+		// Same law as ImplicitGrants: a meta-less row vanishes rather than
+		// surface with a zero-value scope kind that reads as tenant-wide.
+		meta, ok := snap.grants[grantKey{tenant, row[0], row[2]}]
+		if !ok {
+			continue
+		}
 		views = append(views, GrantView{
 			Pattern:   row[2],
 			ScopeKind: meta.scopeKind,
@@ -273,6 +289,8 @@ func (r *authzRP) StopWatch(context.Context) error {
 // Private -------------------------------------------------------------------------------------------------------------
 
 func (r *authzRP) reconcile() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	ctx := context.Background()
 	ver, err := r.stampVersion(ctx)
 	if err != nil {
@@ -299,6 +317,10 @@ func (r *authzRP) version() int64 {
 		return s.version
 	}
 	return -1
+}
+
+func (r *authzRP) StampVersion(ctx context.Context) (int64, error) {
+	return r.stampVersion(ctx)
 }
 
 func (r *authzRP) stampVersion(ctx context.Context) (int64, error) {

@@ -107,7 +107,7 @@ type Profile struct {
 	// Three states by the sex ruling: male, female, undetermined — the last
 	// is the honest "not said", never guessed from anything. The report
 	// cohort's same-age-same-sex benchmark reads it; undetermined benches
-	// against the same-age pool不分性别.
+	// against the same-age pool regardless of sex.
 	Sex           *ProfileSex `protobuf:"varint,11,opt,name=sex,proto3,enum=cyber.esports.v1.ProfileSex,oneof" json:"sex,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

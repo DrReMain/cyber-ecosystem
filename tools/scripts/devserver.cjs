@@ -291,11 +291,15 @@ async function up(args) {
     die(`${project}: project.json declares no dev command`);
   }
   const [devBin, ...devArgs] = devCommand.trim().split(/\s+/);
+  // the target's env block rides along (dev-plane values like a dev-only
+  // master key), so the dev target is the single source for nx runs and
+  // direct devserver spawns alike
+  const targetEnv = projectJson.targets?.dev?.options?.env || {};
   const child = spawnDev(devBin, devArgs, {
     cwd: projectRoot,
     detached: true,
     stdio: ["ignore", logFd, logFd],
-    env: colorlessEnv(), // keep dev.log free of ANSI escapes for agents
+    env: { ...colorlessEnv(), ...targetEnv }, // keep dev.log free of ANSI escapes for agents
   });
   child.on("error", () => {}); // surfaced via the missing-lstart branch below
   child.unref(); // the script exits on ready; the detached server keeps running

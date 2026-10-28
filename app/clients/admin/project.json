@@ -53,6 +53,13 @@
         "command": "pnpm exec vitest run --passWithNoTests"
       }
     },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "pnpm exec playwright test"
+      }
+    },
     "format": {
       "executor": "nx:run-commands",
       "options": {

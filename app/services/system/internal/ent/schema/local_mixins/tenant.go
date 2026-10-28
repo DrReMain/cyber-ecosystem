@@ -54,10 +54,20 @@ func (TenantMixin) Interceptors() []gen.Interceptor {
 	}
 }
 
-// Hooks back-fills tenant_id on inserts: the write-side counterpart of the
-// interceptor above. An empty tenant (unset, or the zero value set by data
-// layers) means "unspecified" and resolves via security.TenantFromCtx.
-// Business code never assigns tenants.
+// Hooks back-fills tenant_id on inserts and narrows every update and delete
+// to the same tenant the interceptor above filters reads by. Writes used to
+// ride the biz-layer pre-read convention alone — correctly written modules
+// could not be confused, but nothing structural answered for a raw
+// cross-tenant mutation. An empty insert tenant (unset, or the zero value
+// set by data layers) resolves via security.TenantFromCtx; business code
+// never assigns tenants.
+//
+// The predicate guards all four write ops: soft-deleted tables rewrite
+// deletes into updates that re-enter this chain (re-applying the predicate
+// is idempotent), while hard-deleted tables keep native delete ops, which
+// the narrower update-only shape would miss. Its precedence mirrors the
+// interceptor — explicit domain switch > subject > no subject (framework
+// paths, registry sweeps) applies nothing.
 func (TenantMixin) Hooks() []gen.Hook {
 	return []gen.Hook{
 		hook.On(
@@ -75,6 +85,23 @@ func (TenantMixin) Hooks() []gen.Hook {
 				})
 			},
 			gen.OpCreate,
+		),
+		hook.On(
+			func(next gen.Mutator) gen.Mutator {
+				return gen.MutateFunc(func(ctx context.Context, m gen.Mutation) (ent.Value, error) {
+					mx, ok := m.(interface{ WhereP(...func(*sql.Selector)) })
+					if !ok {
+						return nil, fmt.Errorf("tenant mixin: unexpected mutation type %T", m)
+					}
+					if tenant, ok := security.ExplicitTenantFromCtx(ctx); ok {
+						applyTenant(mx, tenant)
+					} else if subject, ok := security.SubjectFromCtx(ctx); ok && subject.TenantID != "" {
+						applyTenant(mx, subject.TenantID)
+					}
+					return next.Mutate(ctx, m)
+				})
+			},
+			gen.OpUpdate|gen.OpUpdateOne|gen.OpDelete|gen.OpDeleteOne,
 		),
 	}
 }

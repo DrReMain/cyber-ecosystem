@@ -60,7 +60,7 @@ export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
 
         {chapters.map((chapter) => (
           <div
-            className="border-line bg-surface-card rounded-card border px-4 py-3.5"
+            className="border-line bg-surface-card shadow-card rounded-card border px-4 py-3.5 backdrop-blur-md"
             key={chapter.key}
           >
             <div className="text-ink mb-1.5 text-[13.5px] font-extrabold">{chapter.title}</div>

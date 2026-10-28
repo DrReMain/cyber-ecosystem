@@ -101,6 +101,12 @@ func (uc *DeptUC) Update(ctx context.Context, fieldsMask []string, d *Dept) (out
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
 		// reparenting: only when a new parent is set (d.ParentID != nil). Clearing to root
 		// (d.ParentID == nil) has no cycle risk; the repo clears it only when fieldsMask asks.
+		// The cycle check below is check-then-act: two concurrent reparents can
+		// each pass IsAncestor and swap into a cycle anyway. Accepted — the
+		// cycle is read-safe (IsAncestor and the subtree walk carry a visited
+		// set, so nothing loops forever) and self-heals with one more
+		// reparent; closing the race would take a tree-wide lock or
+		// serializable isolation, too dear for an admin-rare operation.
 		if d.ParentID != nil {
 			if *d.ParentID == d.ID {
 				return systempb.ErrorSystemDeptSelfParent("")

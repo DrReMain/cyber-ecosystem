@@ -65,15 +65,13 @@ export function AgeRequiredPage() {
   }
 
   return (
-    <AmbientLayout
-      orbs={[{ className: "top-[-60px] right-[-60px] size-[min(57vw,220px)]", tone: "orange" }]}
-    >
+    <AmbientLayout orbs={[{ className: "top-[-60px] right-[-60px] size-[220px]", tone: "orange" }]}>
       <div className="flex w-full flex-col gap-3 pb-6">
         <h1 className="text-ink text-center text-[19px] font-bold">{m.age_required_title()}</h1>
 
-        <div className="border-line bg-surface-card rounded-card border px-4 py-[18px]">
+        <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-[18px] backdrop-blur-md">
           <div className="mb-3 flex items-center gap-2.5">
-            <div className="bg-cta-practice flex size-11 shrink-0 items-center justify-center rounded-[12px]">
+            <div className="bg-cta-practice shadow-inset-ring flex size-11 shrink-0 items-center justify-center rounded-[12px]">
               <Cake aria-hidden className="text-white" size={20} />
             </div>
             <div>

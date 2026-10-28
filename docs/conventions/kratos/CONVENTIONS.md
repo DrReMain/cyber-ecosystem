@@ -1,31 +1,21 @@
 # Kratos Service Conventions
 
-**Status:** ACTIVE
-
 **Scope:** Rules for kratos-based Go services in this repo (`app/services/*`). Prescriptive — `MUST` / `SHOULD` / `MAY`.
 
-This document states **constraints, rationale, and anti-patterns** — the things code alone can't enforce or explain. It deliberately does not restate what the code already shows; look at any service under `app/services/*` for the shape. For proto contracts see `docs/conventions/proto/CONVENTIONS.md`.
+This document states **constraints, rationale, and anti-patterns** — the things code alone can't enforce or explain. It deliberately does not restate what the code already shows; look at any service under `app/services/*` for the shape. Rules here win over precedent in code. For proto contracts see `docs/conventions/proto/CONVENTIONS.md`; procedures (new module, remote dependency, service derivation, operating facts) live in `RUNBOOKS.md` beside this file. Every change closes with its chain green and its behavior probed live (§7); the human reviewer carries what no machine checks.
 
----
+## Read map
 
-## 0. Execution contract
-
-In force for every change under `app/services/*` and `shared-go/**`; rules here win over precedent in code.
-
-1. Before writing a file below, load the sections in its dispatch row — they are the law for that artifact.
-2. Before reporting done, run the §7 gate over the combined diff and emit its report table in the final message. No gate table = not done, whatever the build says.
-3. Gate = exit code 0 or the Nx "Successfully ran" banner — a log tail is not a gate.
-
-| About to write | Load first | Gate rows |
-|---|---|---|
-| `module/<d>/biz.go` | §1, §2, §3 biz row, §3a, §4 | K-NAM K-STR K-CMT K-ERR |
-| `module/<d>/data.go` | §2 repo rows, §3 data row, §5 data | K-NAM K-STR K-LAY K-UTL K-ERR |
-| `module/<d>/service.go` | §2, §3 service row, §5 service | K-NAM K-STR K-CMT K-UTL K-ERR |
-| `client/<remote>.go` | §2 client rows, §5 client, §5a | K-NAM K-LAY K-ERR |
-| `shared-go/**` capability code | root `AGENTS.md` §4, §6 errors | K-ERR, K-DEP-1 |
-| any other `.go` under `app/services/*` | §4, §6, the touched layer's §5 block | full §7 |
-
-Procedures (new module, remote dependency, service derivation, operating facts) live in `RUNBOOKS.md`.
+| About to touch | Read first |
+|---|---|
+| `module/<d>/biz.go` | §1, §2, §3 biz row, §3a, §4 |
+| `module/<d>/data.go` | §2 repo rows, §3 data row, §5 data |
+| `module/<d>/service.go` | §2, §3 service row, §5 service |
+| `client/<remote>.go` | §2 client rows, §5 client, §5a |
+| `internal/{bootstrap,shared,server}/**` | §1 composition bullets, §6 |
+| `ent/schema/**`, `local_mixins/**` | §3a, §5 schema block |
+| `shared-go/**` | §1 capability law, §6 |
+| any other `.go` under `app/services/*` | §4, §6, the touched layer's §5 block |
 
 ---
 
@@ -60,13 +50,14 @@ conf             config (proto-defined, generated)
 - **One table, two modules, split by lifecycle operation.** A channel module (e.g. `fileproxy`, the upload proxy) and a management module (e.g. `file`) may share one table when the channel is a different concern, not a different aggregate: every write has exactly one owner — create in the channel module's own data layer, update/delete in the management module's. The channel port is named for the channel (`FileProxyRP`, not `<DO>RP`); the channel module imports the owning module for DO/constants/mapper types only; binding a stored reference (e.g. a user's avatar file id) validates through the owning module's port.
 - **Entity relations follow aggregate boundaries.** *Intra-aggregate* composition (same root, same lifecycle, never a separate service — e.g. Order→OrderLine) uses an **ent edge**; *inter-aggregate* references (independent aggregates, any cross-service possibility — e.g. User→Dept) use a **plain `<x>_id` field** resolved via a repo port. Edges lock a relation to one DB (no cross-service or saga span) and clash with soft-delete cascade; plain IDs migrate to a remote RP with zero refactor. Default to a plain FK unless the relation is definitively intra-aggregate-and-intra-service-forever.
 - **Module dependency graph MUST be acyclic (DAG) and sparse.** Each module is its own package, so Go catches cycles at compile time — but Go blocks cycles, not meshes: every cross-module import is a review point. Default to no cross-module dependency; add one only for a real read need (consumer → provider via repo port). UC-level composition is legal only toward foundation modules (`user`, `authz`, `file` — base-service capabilities).
-- **Operator faces are strippable modules.** A service's operator face (list-everyone views that may not ship in every deployment) is its own module and own proto file, depending on the business module (reads its UC + ports); the business module MUST NOT import it back — deletion is then a closed operation on the graph: remove the proto file + module + one wire/registrar line. Enforced by the per-service DAG guard (e.g. `module/agentconfig` bans `module/agentconfigadmin`).
-- **Composition layering is fixed: `cmd/app → bootstrap → {platform, shared} ← module/*`, enforced by `TestCompositionBoundaries` in `internal/shared`.** Hand-written `cmd/app` assembly (`main.go`, `newApp`) imports `conf` + `bootstrap` + kernel/server types, never a business module — modules enter exclusively through wire provider sets (`wire.go`/`wire_gen.go`). `internal/bootstrap` is process-boot machinery below business — the `Lifecycle` registry and the idempotent seed job; it imports kernel/platform, never a module. `internal/shared` is a contracts-only kernel: module-facing bases (`UC`/`RP`, `Paginate`), cross-module neutral protocols, and bind-injected interfaces (`Transaction`, `HookRegistry` — both `wire.Bind`ed from their implementations); ent-free, no providers. Admission test for both packages: "do modules import this?" — no → bootstrap (or it does not exist).
+- **Operator faces are strippable modules.** A service's operator face (list-everyone views that may not ship in every deployment) is its own module and own proto file, depending on the business module (reads its UC + ports); the business module MUST NOT import it back (e.g. `module/agentconfig` never imports `module/agentconfigadmin`) — deletion is then a closed operation on the graph: remove the proto file + module + one wire/registrar line.
+- **Composition layering is fixed: `cmd/app → bootstrap → {platform, shared} ← module/*`.** Hand-written `cmd/app` assembly (`main.go`, `newApp`) imports `conf` + `bootstrap` + kernel/server types, never a business module — modules enter exclusively through wire provider sets (`wire.go`/`wire_gen.go`). `internal/bootstrap` is process-boot machinery below business — the `Lifecycle` registry and the idempotent seed job; it imports kernel/platform, never a module. `internal/shared` is a contracts-only kernel: module-facing bases (`UC`/`RP`, `Paginate`), cross-module neutral protocols, and bind-injected interfaces (`Transaction`, `HookRegistry` — both `wire.Bind`ed from their implementations); ent-free, no providers. Admission test for both packages: "do modules import this?" — no → bootstrap (or it does not exist).
 - **A module's outward surface is its biz layer.** Bind-injected shared contracts (`Transaction`, `HookRegistry`) land in UC constructors only; the UC implements the shared-go transport interfaces (`Authenticator`/`Authorizer`/`audit.Sink`); phase registration happens in the UC too — a repo's own loops are exposed as port methods on the RP and registered by its UC. `data`/`client` never receive app-level injected contracts.
 - **Lifecycle pattern: phase machinery registers; preconditions and degraded acquisition stay constructional.** Background loops and boot sweeps register on `shared.HookRegistry` in constructors and run in app phases; a dependency-graph precondition (authz's initial compile — every request reads the snapshot) stays in the constructor so failure fails construction; resource acquisition with designed degradation (audit's MQ subscribe — audit availability yields to service availability) stays constructional with a wire cleanup.
 - Events + outbox are `MAY` until a real cross-aggregate side-effect appears. Do not scaffold speculatively; `shared-go/capability/mq` is there when needed.
-- **Service code serializes through `utils`, never `encoding/json` directly** — `utils` is the single library-replacement seam (swap the JSON library in one place): `utils.Marshal` (error-returning) / `utils.MustMarshal` / `utils.Unmarshal[T]`; if the helper you need is missing, add it. Exemptions: `utils` itself, `jsoncodec`, generated code, `protojson`; capability packages are the other way round by the root self-containment rule (`AGENTS.md` §4). Numeric narrowing conversions go through `utils.ConvNum[R](x)` the same way — gosec G115-class findings are fixed at the seam, never silenced: a safety *rationale* comment may stay, `#nosec` directives may not.
+- **Service code serializes through `utils`, never `encoding/json` directly** — `utils` is the single library-replacement seam (swap the JSON library in one place): `utils.Marshal` (error-returning) / `utils.MustMarshal` / `utils.Unmarshal[T]`; if the helper you need is missing, add it. Exemptions: `utils` itself, `jsoncodec`, generated code, `protojson`; capability packages are the other way round by the self-containment law below. Numeric narrowing conversions go through `utils.ConvNum[R](x)` the same way — gosec G115-class findings are fixed at the seam, never silenced: a safety *rationale* comment may stay, `#nosec` directives may not.
 - **Secrets pick their algorithm by recovery semantics.** `utils.Hash` (argon2id, OWASP baseline, one-way; legacy bcrypt digests verify but never re-write — login rehashes them lazily) for credentials that only need verification; `utils.Seal` (AES-256-GCM over a SHA-256-derived master key, base64(nonce||ct)) for secrets the service must present again verbatim — provider API keys a harness will dial out with. Never hash a dialing secret (functional death: the plaintext is unreachable); never bother sealing a password (verification never needs it back). The master key comes from `conf.Crypto`, validated at construction — an empty key fails the boot, not the first write.
+- **Capability packages are self-contained units.** A package under `shared-go/capability` depends only on stdlib, its third-party providers, and its own capability family (the parent interface package — `mq/pg` → `mq`); never on `utils`, `kratos`, `orm`, or any other shared-go package — a family copies out as a unit. In-package substitutes: `encoding/json` directly; explicit bounds guards (clamp above `math.MaxInt32`, then convert) instead of `ConvNum`.
 
 ---
 
@@ -99,7 +90,7 @@ conf             config (proto-defined, generated)
 
 ## 3. File structure & ordering
 
-**One module per domain (aggregate root): `module/<d>/{biz,data,service,module}.go`.** Each file is one concern within the module: `biz.go` = DO + port + UC + aux (FSM, entity behavior); `data.go` = local repo; `service.go` = handlers; `module.go` = ProviderSet. `MUST NOT` split one concern across extra files (`<d>_uc.go` etc.) — the ban's unit is the concern, not the file: a distinct concern takes its own aux file (below), mechanical fragments of one concern stay banned. If `biz.go` becomes unwieldy with no distinct concern left to carve out, the **aggregate boundary** is wrong — split into two modules, don't fragment one. Cross-module infra (`UC`/`RP` base, `Transaction`) lives in `shared/kernel.go`, not in any module — the kernel is per-service (`RP` embeds the service-specific `*platform.Platform`), hence not in `shared-go`. Tenant resolution (`DefaultTenant`, `TenantFromCtx`) lives in `shared-go/kratos/security/tenant.go` (sibling of `SubjectFromCtx` — subject-derived policy, not mixin logic); the ent-dependent mixin shells stay in `local_mixins`. The ent tree (schema, local_mixins) MUST NOT import the service's `internal/shared` (shared → platform → ent/runtime → ent/schema closes a cycle); business code never assigns tenants (the TenantMixin hook back-fills on create).
+**One module per domain (aggregate root): `module/<d>/{biz,data,service,module}.go`.** Each file is one concern within the module: `biz.go` = DO + port + UC + aux (FSM, entity behavior); `data.go` = local repo; `service.go` = handlers; `module.go` = ProviderSet. `MUST NOT` split one concern across extra files (`<d>_uc.go` etc.) — the ban's unit is the concern, not the file: a distinct concern takes its own aux file (below), mechanical fragments of one concern stay banned. If `biz.go` becomes unwieldy with no distinct concern left to carve out, the **aggregate boundary** is wrong — split into two modules, don't fragment one. **Multiple UCs/RPs in one file** — `biz.go`/`data.go` are each layer's home, not one type's: a module MAY hold several UCs (several RPs) in its single biz/data file when they serve the same aggregate (a member-facing UC beside an operator UC, an export UC beside the list UC); UCs that share nothing are the wrong-aggregate signal above — split the module, not the file. Cross-module infra (`UC`/`RP` base, `Transaction`) lives in `shared/kernel.go`, not in any module — the kernel is per-service (`RP` embeds the service-specific `*platform.Platform`), hence not in `shared-go`. Tenant resolution (`DefaultTenant`, `TenantFromCtx`) lives in `shared-go/kratos/security/tenant.go` (sibling of `SubjectFromCtx` — subject-derived policy, not mixin logic); the ent-dependent mixin shells stay in `local_mixins`. The ent tree (schema, local_mixins) MUST NOT import the service's `internal/shared` (shared → platform → ent/runtime → ent/schema closes a cycle); business code never assigns tenants (the TenantMixin hook back-fills on create).
 
 **Section order** (each preceded by a divider, §4; omit empty):
 
@@ -116,10 +107,9 @@ conf             config (proto-defined, generated)
 - client: `Adapter` = `<remote>Client` + `New<Remote>Client` + port-method impls; `Private` = `map<ProviderDO>`. `client.go` is the layer's infra file (shared `standardMiddleware` + `ProviderSet`) — no dividers.
 - **Value types live in `DO`; `Port` holds interfaces only.** A port's payload vocabulary (`GrantView`, `RoleMember`, `ListIn/Out`) is module data shape — declare it in `DO` even when only the port mentions it, so one section owns all types.
 - **Cross-section vocabulary (aux consts/types a layer file needs but no section owns)** — declared between the imports and the first divider; reads top-down. Declarations that ARE a section's content (DO types, the port interface, UC/repo/service structs) live inside their section. The `Private` section holds private methods then private functions only — never interleaved type/const declarations.
-- **Aux/engine files** — a module MAY hold extra lowercase files for a distinct non-layer concern (e.g. authz's `casbin.go` engine compile); no layer dividers inside. Internal order: constants → types → functions, each declared before its first use.
-- **Live-e2e placement** — an env-gated live test of one module's aggregate lives in the owning module (`module/<d>/live_e2e_test.go`); a cross-module live guard lives in `internal/e2e/` — a test-only package (nothing but `_test.go` files; `go build` skips it, so it can never enter a production import). `internal/shared` keeps the kernel plus the always-run law guards; env-gated domain e2e never mixes in.
-- **Transport-fixture modules** (e.g. `transfer`, the e2e regression base) are exempt from the four-file shape: `service.go` + `module.go` only, no aggregate, no biz/data. Recorded so nobody "completes" them later.
-- **Face modules** — when the contract splits a second service for a different access audience over one aggregate (a member face plus an operator face), the second module is a face: `service.go` + `module.go` only, injecting the sibling module's UCs — thin proto↔domain mapping, zero business rules (the called UC owns those). Unlike a transport fixture it is a real RPC face, but it owns no aggregate and never grows biz/data; nothing imports a face (the DAG guard bans it), so deleting the face plane stays a closed operation.
+- **Companion files** — a module MAY hold extra lowercase files beside the four, in two kinds. **Domain files** carry self-sufficient pure domain logic: zero ent imports and no UC/RP receivers — own types with their own methods are the norm (game engines, ABAC plugins and their attribute sources, provider adapters, the casbin compile, guarded-HTTP transports); one file = one concept (one game, one plugin, one provider), the carve-out unit being the concept, not biz.go's size. **Layer companions** carry one theme of a layer's concern that outgrew the layer file (authz's `scopes.go` holds RP-side dept hydration): the layer's receiver and that layer's discipline apply. No layer dividers inside either; internal order constants → types → functions, each declared before its first use.
+- **Transport-fixture modules** (e.g. `transfer`) are exempt from the four-file shape: `service.go` + `module.go` only, no aggregate, no biz/data. Recorded so nobody "completes" them later.
+- **Face modules** — when the contract splits a second service for a different access audience over one aggregate (a member face plus an operator face), the second module is a face: `service.go` + `module.go` only, injecting the sibling module's UCs — thin proto↔domain mapping, zero business rules (the called UC owns those). Unlike a transport fixture it is a real RPC face, but it owns no aggregate and never grows biz/data; nothing imports a face (the module DAG forbids it), so deleting the face plane stays a closed operation.
 
 **Client files** — `client.go` (shared `standardMiddleware` + `ProviderSet`) plus `<remote>.go` per remote. One remote = one repo port = one adapter = one file. Adding an RPC adds a method, **never a new file**; only a new remote opens one.
 
@@ -162,9 +152,9 @@ Two comment kinds are legal under `app/services/*`; a comment that is neither is
 | Divider | `// <Name>` + `-` run (~110 chars `biz`/`data`, ~120 `service`; equal ±5 to a same-file neighbor's run) | section boundaries only (§3 table) |
 | Inline | states non-obvious *why* only (trade-off, gotcha, concurrency); `MUST NOT` restate the code | inside a function, beside the line it explains |
 
-**Violation signature — declaration comment**: a `//` line whose next non-blank line opens a declaration (`type` / `func` / `const` / `var`) and whose text names or describes that symbol. **Violation signature — file-header comment**: a `//` line after the package clause and before the first import or declaration — neither legal kind lives in that position, and the shape otherwise escapes the declaration signature (the next non-blank line opens `import`). Both machine-enforced in `module/`, `client/`, `server/`, `platform/`, `bootstrap/` by `TestNoDeclarationComments` (conventions guard, `internal/shared`).
+**Review signature — declaration comment**: a `//` line whose next non-blank line opens a declaration (`type` / `func` / `const` / `var`) and whose text names or describes that symbol. **Review signature — file-header comment**: a `//` line after the package clause and before the first import or declaration — neither legal kind lives in that position, and the shape otherwise escapes the declaration signature (the next non-blank line opens `import`). Both are what a reviewer greps added lines for; §7 carries them.
 
-Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the DDL), never Go line comments (§3a); test files state the law under test, never process narration; `shared-go/` keeps godoc conventions — this section binds `app/services/*` only.
+Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the DDL), never Go line comments (§3a); `shared-go/` keeps godoc conventions — this section binds `app/services/*` only.
 
 ---
 
@@ -196,7 +186,7 @@ Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the D
 
 **schema / local_mixins**
 
-- Behavioral mixin declaration order is load-bearing: `ID/CU → Tenant → Datascope → SoftDelete` (SoftDeleteMixin's delete→update rewrite relies on DatascopeMixin guarding `OpUpdate`). Guarded by `TestMixinOrder` (`./nx run <service>:test`).
+- Behavioral mixin declaration order is load-bearing: `ID/CU → Tenant → Datascope → SoftDelete` (SoftDeleteMixin's delete→update rewrite relies on DatascopeMixin guarding `OpUpdate`).
 - `DatascopeMixin` declares per-entity dimension fields (`UserField` for `self`, `DeptField` for `dept_tree`); an absent field = kind not expressible → compiles to the empty set. Narrowing never degrades to unfiltered.
 - Narrowing comes only from the ctx `Decision`; paths without one (seed, login, engine compilation) skip filtering, mirroring TenantMixin's no-subject skip.
 - `local_mixins.Unscoped(ctx)` lifts narrowing for one enclosed read — reference-plane shape only (authorization rides the referring row: a visible user's avatar → file id → key), review-guarded.
@@ -246,7 +236,7 @@ The IAM engine is a **mechanism every service replicates**, not a system-service
   - One file per kind (`policy_<kind>.go`) with `init()` self-registration; a duplicate kind panics at startup — the file list IS the registry; a new kind touches zero existing files.
   - A proto oneof member MUST have a registered plugin — an unregistered member would degrade "unknown kind" from a direct-DB-write-only state to reachable-by-normal-API.
   - The evaluation kernel (`survivingGrants` family) is frozen.
-  - `Evaluate` is a pure function (attrs in, verdict out; the engine feeds time, tests table-drive it).
+  - `Evaluate` is a pure function (attrs in, verdict out; the engine feeds time, the shared-go suite table-drives it).
   - Attribute sources are lazy: no linked policy → zero resolution; `Attrs()` union selects sources; at most one resolve per source per request.
   - Evaluation errors, unregistered kinds, and dirty params fail closed.
 - **Module dependency rulings (IAM DAG).**
@@ -274,7 +264,7 @@ Every non-system service consumes IAM remotely and grows no identity of its own:
 - **Member-plane identities are read through the population composition face.** The seat-oriented identity faces (`GetUser`/`ListUsers`) exclude member-plane seats by design — a member-view composition (roster, member list/detail) reads identities only via `ListUsersByPopulation` with the caller's forwarded credential, and derives its not-found errors from the local result.
 - **The client middleware order is load-bearing**: `tracing → circuitbreaker → metadata → sanitize.Client → logging.Client`. The chain wraps the raw transport call; `logging.Client` (innermost) sees the provider's original error first (kratos-rendered, so an upstream connect error logs with its message even when the code renders as a bare 500); `sanitize.Client` re-mints it into this service's catalog (provider reason dropped, detail only in cause); `circuitbreaker` (outermost of the three) judges the translated code — semantic 401/403 count as success, only 500/503/504 accumulate. `ConnectToError` sits at the chain exit: an already-translated kratos error passes through untouched, anything raw gets a final conversion. A call site therefore never predicates on a provider-specific upstream reason — the re-mint drops it before any predicate sees it (`ConnectToError` cannot recover it); shared-classification reasons (401/403/404…) re-mint to the same shared name and stay predicate-safe. Derive domain errors from local facts. Reorder any two and either the logs lose fidelity or the breaker arms on denied logins.
 - **Degraded hydration is grant-aware and graded.** An ungranted viewer is a normal audience state, so it must never be *reached* through the denial channel: the adapter decides eligibility once per request via `CheckOperation` (payload decision — an allow-side read that leaves no audit trail; the operation is named by the generated `<Service><Method>Procedure` constant, never a hand-written string — a drifted literal reads as permanently ungranted and silently blanks hydration) and skips the reads entirely; an ungranted viewer reaching the read face would land one audit denial — probe signal — per id per page view, polluting exactly the signal audit exists to collect. When granted, hydration reuses the normal user-facing RPC with the caller's own credential (never a privileged batch-lookup face — that would be a directory-enumeration surface); per-id failures then grade debug (denied — an ABAC flip between check and read) vs warn (any other failure); the row always renders with absent fields.
-- **Service credentials are a seam, not a feature.** Per-request identity rides the ctx-key → interceptor pattern (cookie header today; the same slot forwards Bearer when app clients land). A future service identity lands as a sibling interceptor on the same `WithInterceptors` list plus a credentials block in `conf.Remote` — do not pre-scaffold it; the two identities (on-behalf-of vs service-principal) never merge (see root §8 user-split law and the capability-token reservation in the platform vision).
+- **Service credentials are a seam, not a feature.** Per-request identity rides the ctx-key → interceptor pattern (cookie header today; the same slot forwards Bearer when app clients land). A future service identity lands as a sibling interceptor on the same `WithInterceptors` list plus a credentials block in `conf.Remote` — do not pre-scaffold it; the two identities (on-behalf-of vs service-principal) never merge.
 
 ---
 
@@ -290,7 +280,7 @@ Every non-system service consumes IAM remotely and grows no identity of its own:
   - **authored prose**: `fmt.Errorf("user not found: %s", account)` — always `fmt.Errorf` (no `errors.New`), lowercase start, no trailing punctuation, `%w` to chain an underlying error. `SCREAMING_SNAKE` is reserved for reason alone; splits finer than reason go to structured fields/metrics labels, never string prefixes.
 - Cause never crosses the wire (`ErrorToConnect`/`GRPCStatus` emit message/reason/metadata only) — the fuzzy-out/specific-collected split is safe by construction.
 - Infra is classified at choke points, not call sites: `HandleEntError` (ent; classified kratos errors pass through), `HandleCacheError`/`HandleStorageError`/`HandleMQError` (capabilities), `MapUpstreamErr` (remotes, behind `sanitize.Client`); each attaches the original as cause. A UC never returns a raw upstream error.
-- **Postgres transaction poisoning (25P02).** A failed statement poisons every later statement in its transaction (`current transaction is aborted`, SQLSTATE 25P02) — Postgres has no statement-level rollback. Ensure-semantics (an insert that may already exist) uses `ON CONFLICT DO NOTHING` (ent upsert, the `sql/upsert` feature) — no error fires, so nothing can poison; a tolerated failure is the fallback shape only where the statement is not a plain insert: hoist the existence guard before the transaction, or return from the body at the tolerance (the race loser skips the rest). Fake-RP unit tests cannot catch this class — a fake does not poison shared state; the law is live-e2e jurisdiction.
+- **Postgres transaction poisoning (25P02).** A failed statement poisons every later statement in its transaction (`current transaction is aborted`, SQLSTATE 25P02) — Postgres has no statement-level rollback. Ensure-semantics (an insert that may already exist) uses `ON CONFLICT DO NOTHING` (ent upsert, the `sql/upsert` feature) — no error fires, so nothing can poison; a tolerated failure is the fallback shape only where the statement is not a plain insert: hoist the existence guard before the transaction, or return from the body at the tolerance (the race loser skips the rest). An in-process fake repo cannot surface this class — a fake does not poison shared state; verification is live probing against a real database (§7).
 - Identity checks on errors that passed a choke point use the **generated reason predicates**, never kratos code checks: `errorspb.IsInfraErrorDbNotFound(err)` (reason identity), not `errors.IsNotFound(err)` — the latter matches on HTTP code and only works while the mapped code happens to be 404.
 - Intra-transaction control flow (retry vs abort on a classified failure) travels as a closure-scoped flag set at the failing statement — never as a circulating sentinel error; a reason predicate alone cannot say which statement in the transaction failed.
 - shared-go middleware sentinels declare internal-code reasons (`errors.Unauthorized("MISSING_SESSION", "")`) and are rebound onto catalog factories at service assembly (`server.go` init, original kept as cause): shared-go holds no generated-code knowledge, vocabulary drift = compile error at the rebind.
@@ -326,61 +316,22 @@ sanitize → tracing → metrics → logging(RenderErrors(logger)) → ErrorTele
 
 ---
 
-## 7. Pre-completion gate
+## 7. Verification
 
-Run over the combined diff (working tree plus the commits being amended into). One row per item, emitted verbatim in the final report:
+Every change under `app/services/*` or `shared-go/**` closes with its chain green and its behavior probed live; the report states what ran, with counted evidence.
 
-| item | verdict | evidence |
-|---|---|---|
-| K-CMT-1 | PASS | guard green; 3 added `//` lines in module files, all dividers (file:line each) |
+**Chain** — all exit 0, cache bypassed (`--skip-nx-cache`):
 
-PASS / FAIL / N/A are legal verdicts; an absent row is not. N/A names its glob and shows it empty. `shared-go` changes emit only K-ERR and K-DEP-1 (capability self-containment, root `AGENTS.md` §4). `lint:` rows scan the added lines of the combined diff; `eye:` rows cite file:line.
+- schema or wiring touched → `<service>:generate:ent` → `:migrate:diff` → `:migrate:apply` → `:generate:wire` → `:build`; otherwise → `<service>:build`
+- always → `tools:go:lint`, `tools:go:format`
+- a service whose `_test.go` files the change touches or adds → `<service>:test` (e2e tests skip themselves without `ENT_E2E=1`; unit tests and guards run bare)
+- `shared-go/**` touched → `shared-go:test` (the kept suites are the capability conformance face)
+- proto touched → the proto chain (proto CONVENTIONS §8)
 
-Posture (root `AGENTS.md` §6.1): declare the change-kind and close with the counted-evidence line. Kinds here — contract: proto §8 chain plus consumer regeneration; aggregate: this table plus migration applied plus refused-path probe; capability: this table plus declared conformance, probe/smoke; refactor: this table with cache bypass and counterexample replay; logic / chore: this table. Runtime verification = live RPC probe; probe scripts are throwaway, never repo assets.
+**Tests have three homes, all opt-in per slice** (business code is not test-first by default; a slice adds tests only as regression anchors it wants to keep): live end-to-end tests live ONLY in `<svc>/internal/e2e/` — a package of nothing but `_test.go` files so `go build` skips it and production can never import it — each env-gated on `ENT_E2E=1` and self-skipping when the dev stack is absent, fixtures self-contained and prefix-swept; unit tests target ONLY the biz layer — `biz.go` itself and its domain companion files (§3: zero ent imports, no UC/RP receivers) — each in `<file>_test.go` beside its code (pure logic — no DB, redis, or network; RP ports appear as interfaces only); invariant guards live ONLY in `<svc>/internal/guards/` — the same only-test-files package shape as e2e — each guarding one invariant, never rehearsing a business flow: a guard qualifies when its red means a law was broken, structural (module DAG, comment and serialization conventions, mixin ordering, seed vocabulary) or behavioral (fail-closed predicates, tenant-scoped storage routing), and stays DB-free (AST walks, file scans, in-memory fakes) so it runs under `<service>:test` with the rest. No `_test.go` files anywhere else under `app/services/*`: layer companions (ent-touching, layer-receiver files) and the data/service/platform layers carry no unit tests — their verification is the live probe above plus the e2e face.
 
-### Naming — law §2
+**Runtime verification = live RPC probe.** grpcurl against the dev stack (migrated, seeded, up): the happy path plus the **refused path** — every permission gate gets one denied call, every idempotent write gets one replay, every narrowing claim gets one cross-tenant read refused. Probe scripts are throwaway, never repo assets.
 
-- **K-NAM-1** — every new symbol matches its §2 table row (`DO` unprefixed, `<DO>RP`/`<Remote>RP` ports, `<Name>UC`, `<do>RP`, `map<DO>`; provider-named remote ports; `map<ProviderDO>` in client). eye: symbol → row.
-- **K-NAM-2** — CRUD UC/repo methods take bare verbs; aspect blocks ordered (core first, noun alphabet, infra hooks last). eye.
-- **K-NAM-3** — no package-level exported function in `module/` (types, `New*`, methods only). eye.
+**Review carries what no machine checks.** The reviewer walks the diff against this document's named signatures: declaration/file-header comments (§4), reversed layer direction and UC→UC wiring (§1), the four-file shape and section order (§3), mixin declaration order (§5), hand-rolled duplicates of utils helpers (§5), identity outside catalog factories and choke-point classification (§6), the middleware contracts (§5a). A difference between siblings of one family is either a bug or a distinction worth a comment.
 
-### Structure — law §3
-
-- **K-STR-1** — four-file shape intact (no `<d>_uc.go` fragments; extra files only per the aux-file rule); section order + dividers per the §3 table; `Private` = private methods then functions, no type/const inside. eye.
-- **K-STR-2** — imports in the five groups; proto import aliases `<scope>pb`, never bare `pb`; struct fields embedded base → `log` → dependencies. lint: `gofmt -l` empty + alias grep.
-- **K-STR-3** — one module one transport face: at most one `*Service` struct per module dir (a second audience opens a face module, not a second struct). lint: `TestModuleSingleService` green.
-
-### Comments — law §4
-
-- **K-CMT-1** — no added declaration comment (§4 violation signature). lint: `TestNoDeclarationComments` green; evidence = guard output or diff-grep pairing.
-- **K-CMT-2** — every added divider's dash run equals a same-file neighbor's (±5). eye: file:line per divider.
-- **K-CMT-3** — every other added `//` line states why, not mechanics. eye: quote the lines.
-
-### Layers — law §5, §5a
-
-- **K-LAY-1** — direction never reversed (biz imports neither `data`/`client` nor `service`/`server`/`platform`); cross-module access is a read via repo port. lint: `TestModuleDependencyDAG` green.
-- **K-LAY-2** — business logic in biz; no business rules in data; no repo access in service. eye.
-- **K-LAD-1** — the access ladder carries its plane gates: every ADMIN rung holds the backend gate ahead of authz, and a single-world BUILTIN rung holds its own. lint: `TestAdminRungPlaneGate` green (`TestBuiltinRungPlaneGate` where a member rung exists).
-
-### Reuse — law §1, §5
-
-- **K-UTL-1** — no `encoding/json` outside the §1 exemptions. lint: `TestSerializationViaUtils` green.
-- **K-UTL-2** — mapping and pagination helpers come from `shared-go/utils` and `shared-go/helper`; a hand-rolled nil-guard wrapper or private re-implementation is a duplicate. eye: added function signatures vs the utils/helper surface.
-- **K-UTL-3** — sibling predicates in one data-layer function share one shape (`helper.Where`/`helper.WherePtr` uniformly; no bare `if query.Where` next to kin). eye: compare side by side.
-
-### Errors — law §6
-
-- **K-ERR-1** — identity only from catalog factories, message `""`. lint: added-line grep for `Error[A-Za-z]+\("[^"]` (non-empty message = FAIL).
-- **K-ERR-2** — reason predicates, never kratos code checks (`errors.IsNotFound` & siblings banned). lint: `TestReasonPredicates` green.
-- **K-ERR-3** — infra classified at choke points; a UC never returns a raw upstream error; no circulating sentinels; biz logs errors nowhere outside the swallow-path exception. eye.
-
-### Shared-go — root §4
-
-- **K-DEP-1** — a changed capability package stays self-contained: its imports are stdlib, third-party providers, and its own capability family (the parent interface package — `mq/pg` → `mq`) only; never `utils`, `kratos`, `orm`, or any other shared-go package; in-package substitutes (`encoding/json` directly, explicit bounds guards) instead of cross-family helpers. eye: the import block of each changed package.
-
-### Review — pre-amend
-
-- **K-REV-1** — same-recipe consistency: sibling functions of one family (`ensure*`, classify wrappers, sweep stages) share the same race and error law; a difference is either a bug or a distinction worth a comment. eye: compare side by side, never in isolation.
-- **K-REV-2** — test comments state the law only; fixtures carry no unused fields; assertions use generated `Is<Reason>` predicates, never message text. eye.
-- **K-REV-3** — every hunk meaningful; formatter round-trips on untouched content get reverted, not committed as churn. eye.
-- **K-REV-4** — fixture defaults mirror the real degenerate world (a default fake answering differently from production data red-shifts unrelated tests). eye.
+**Declaration.** The change report closes with one line of counted evidence — what was run and what was observed ("proven by: 2/2 refused-path probes; chain green").

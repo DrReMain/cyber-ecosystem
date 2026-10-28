@@ -30,7 +30,8 @@ func init() {
 	abilityscoreMixinHooks2 := abilityscoreMixin[2].Hooks()
 	abilityscoreMixinHooks3 := abilityscoreMixin[3].Hooks()
 	abilityscore.Hooks[0] = abilityscoreMixinHooks2[0]
-	abilityscore.Hooks[1] = abilityscoreMixinHooks3[0]
+	abilityscore.Hooks[1] = abilityscoreMixinHooks2[1]
+	abilityscore.Hooks[2] = abilityscoreMixinHooks3[0]
 	abilityscoreMixinInters2 := abilityscoreMixin[2].Interceptors()
 	abilityscoreMixinInters3 := abilityscoreMixin[3].Interceptors()
 	abilityscore.Interceptors[0] = abilityscoreMixinInters2[0]
@@ -120,6 +121,7 @@ func init() {
 	activationcodeMixin := schema.ActivationCode{}.Mixin()
 	activationcodeMixinHooks2 := activationcodeMixin[2].Hooks()
 	activationcode.Hooks[0] = activationcodeMixinHooks2[0]
+	activationcode.Hooks[1] = activationcodeMixinHooks2[1]
 	activationcodeMixinInters2 := activationcodeMixin[2].Interceptors()
 	activationcode.Interceptors[0] = activationcodeMixinInters2[0]
 	activationcodeMixinFields0 := activationcodeMixin[0].Fields()
@@ -197,6 +199,7 @@ func init() {
 	entitlementMixin := schema.Entitlement{}.Mixin()
 	entitlementMixinHooks2 := entitlementMixin[2].Hooks()
 	entitlement.Hooks[0] = entitlementMixinHooks2[0]
+	entitlement.Hooks[1] = entitlementMixinHooks2[1]
 	entitlementMixinInters2 := entitlementMixin[2].Interceptors()
 	entitlement.Interceptors[0] = entitlementMixinInters2[0]
 	entitlementMixinFields0 := entitlementMixin[0].Fields()
@@ -271,7 +274,8 @@ func init() {
 	gameMixinHooks2 := gameMixin[2].Hooks()
 	gameMixinHooks3 := gameMixin[3].Hooks()
 	game.Hooks[0] = gameMixinHooks2[0]
-	game.Hooks[1] = gameMixinHooks3[0]
+	game.Hooks[1] = gameMixinHooks2[1]
+	game.Hooks[2] = gameMixinHooks3[0]
 	gameMixinInters2 := gameMixin[2].Interceptors()
 	gameMixinInters3 := gameMixin[3].Interceptors()
 	game.Interceptors[0] = gameMixinInters2[0]
@@ -356,7 +360,8 @@ func init() {
 	matchconfigMixinHooks2 := matchconfigMixin[2].Hooks()
 	matchconfigMixinHooks3 := matchconfigMixin[3].Hooks()
 	matchconfig.Hooks[0] = matchconfigMixinHooks2[0]
-	matchconfig.Hooks[1] = matchconfigMixinHooks3[0]
+	matchconfig.Hooks[1] = matchconfigMixinHooks2[1]
+	matchconfig.Hooks[2] = matchconfigMixinHooks3[0]
 	matchconfigMixinInters2 := matchconfigMixin[2].Interceptors()
 	matchconfigMixinInters3 := matchconfigMixin[3].Interceptors()
 	matchconfig.Interceptors[0] = matchconfigMixinInters2[0]
@@ -433,7 +438,8 @@ func init() {
 	matchsessionMixinHooks2 := matchsessionMixin[2].Hooks()
 	matchsessionMixinHooks3 := matchsessionMixin[3].Hooks()
 	matchsession.Hooks[0] = matchsessionMixinHooks2[0]
-	matchsession.Hooks[1] = matchsessionMixinHooks3[0]
+	matchsession.Hooks[1] = matchsessionMixinHooks2[1]
+	matchsession.Hooks[2] = matchsessionMixinHooks3[0]
 	matchsessionMixinInters2 := matchsessionMixin[2].Interceptors()
 	matchsessionMixinInters3 := matchsessionMixin[3].Interceptors()
 	matchsession.Interceptors[0] = matchsessionMixinInters2[0]
@@ -513,6 +519,7 @@ func init() {
 	payorderMixin := schema.PayOrder{}.Mixin()
 	payorderMixinHooks2 := payorderMixin[2].Hooks()
 	payorder.Hooks[0] = payorderMixinHooks2[0]
+	payorder.Hooks[1] = payorderMixinHooks2[1]
 	payorderMixinInters2 := payorderMixin[2].Interceptors()
 	payorder.Interceptors[0] = payorderMixinInters2[0]
 	payorderMixinFields0 := payorderMixin[0].Fields()
@@ -685,7 +692,8 @@ func init() {
 	profileMixinHooks2 := profileMixin[2].Hooks()
 	profileMixinHooks3 := profileMixin[3].Hooks()
 	profile.Hooks[0] = profileMixinHooks2[0]
-	profile.Hooks[1] = profileMixinHooks3[0]
+	profile.Hooks[1] = profileMixinHooks2[1]
+	profile.Hooks[2] = profileMixinHooks3[0]
 	profileMixinInters2 := profileMixin[2].Interceptors()
 	profileMixinInters3 := profileMixin[3].Interceptors()
 	profile.Interceptors[0] = profileMixinInters2[0]
@@ -770,7 +778,8 @@ func init() {
 	questionbankMixinHooks2 := questionbankMixin[2].Hooks()
 	questionbankMixinHooks3 := questionbankMixin[3].Hooks()
 	questionbank.Hooks[0] = questionbankMixinHooks2[0]
-	questionbank.Hooks[1] = questionbankMixinHooks3[0]
+	questionbank.Hooks[1] = questionbankMixinHooks2[1]
+	questionbank.Hooks[2] = questionbankMixinHooks3[0]
 	questionbankMixinInters2 := questionbankMixin[2].Interceptors()
 	questionbankMixinInters3 := questionbankMixin[3].Interceptors()
 	questionbank.Interceptors[0] = questionbankMixinInters2[0]
@@ -884,7 +893,8 @@ func init() {
 	reportsnapshotMixinHooks2 := reportsnapshotMixin[2].Hooks()
 	reportsnapshotMixinHooks3 := reportsnapshotMixin[3].Hooks()
 	reportsnapshot.Hooks[0] = reportsnapshotMixinHooks2[0]
-	reportsnapshot.Hooks[1] = reportsnapshotMixinHooks3[0]
+	reportsnapshot.Hooks[1] = reportsnapshotMixinHooks2[1]
+	reportsnapshot.Hooks[2] = reportsnapshotMixinHooks3[0]
 	reportsnapshotMixinInters2 := reportsnapshotMixin[2].Interceptors()
 	reportsnapshotMixinInters3 := reportsnapshotMixin[3].Interceptors()
 	reportsnapshot.Interceptors[0] = reportsnapshotMixinInters2[0]
@@ -975,7 +985,8 @@ func init() {
 	skuMixinHooks2 := skuMixin[2].Hooks()
 	skuMixinHooks3 := skuMixin[3].Hooks()
 	sku.Hooks[0] = skuMixinHooks2[0]
-	sku.Hooks[1] = skuMixinHooks3[0]
+	sku.Hooks[1] = skuMixinHooks2[1]
+	sku.Hooks[2] = skuMixinHooks3[0]
 	skuMixinInters2 := skuMixin[2].Interceptors()
 	skuMixinInters3 := skuMixin[3].Interceptors()
 	sku.Interceptors[0] = skuMixinInters2[0]
@@ -1068,7 +1079,8 @@ func init() {
 	testMixinHooks2 := testMixin[2].Hooks()
 	testMixinHooks3 := testMixin[3].Hooks()
 	test.Hooks[0] = testMixinHooks2[0]
-	test.Hooks[1] = testMixinHooks3[0]
+	test.Hooks[1] = testMixinHooks2[1]
+	test.Hooks[2] = testMixinHooks3[0]
 	testMixinInters2 := testMixin[2].Interceptors()
 	testMixinInters3 := testMixin[3].Interceptors()
 	test.Interceptors[0] = testMixinInters2[0]
@@ -1161,7 +1173,8 @@ func init() {
 	testconfigMixinHooks2 := testconfigMixin[2].Hooks()
 	testconfigMixinHooks3 := testconfigMixin[3].Hooks()
 	testconfig.Hooks[0] = testconfigMixinHooks2[0]
-	testconfig.Hooks[1] = testconfigMixinHooks3[0]
+	testconfig.Hooks[1] = testconfigMixinHooks2[1]
+	testconfig.Hooks[2] = testconfigMixinHooks3[0]
 	testconfigMixinInters2 := testconfigMixin[2].Interceptors()
 	testconfigMixinInters3 := testconfigMixin[3].Interceptors()
 	testconfig.Interceptors[0] = testconfigMixinInters2[0]
@@ -1224,7 +1237,8 @@ func init() {
 	testrecordMixinHooks2 := testrecordMixin[2].Hooks()
 	testrecordMixinHooks3 := testrecordMixin[3].Hooks()
 	testrecord.Hooks[0] = testrecordMixinHooks2[0]
-	testrecord.Hooks[1] = testrecordMixinHooks3[0]
+	testrecord.Hooks[1] = testrecordMixinHooks2[1]
+	testrecord.Hooks[2] = testrecordMixinHooks3[0]
 	testrecordMixinInters2 := testrecordMixin[2].Interceptors()
 	testrecordMixinInters3 := testrecordMixin[3].Interceptors()
 	testrecord.Interceptors[0] = testrecordMixinInters2[0]

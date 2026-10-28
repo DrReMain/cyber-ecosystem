@@ -213,7 +213,7 @@ export const PeekMatchSessionRequestSchema: GenMessage<PeekMatchSessionRequest> 
 export type PeekMatchSessionResponse = Message<"cyber.esports.v1.PeekMatchSessionResponse"> & {
   /**
    * Absent when no in-window session exists — message-field presence is
-   * the null/zero contract for entities (§3); a present session is the
+   * the null/zero contract for entities; a present session is the
    * resume face's whole truth.
    *
    * @generated from field: cyber.esports.v1.MatchSession session = 1;

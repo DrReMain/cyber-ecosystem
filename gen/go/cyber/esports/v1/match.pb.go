@@ -421,7 +421,7 @@ func (*PeekMatchSessionRequest) Descriptor() ([]byte, []int) {
 type PeekMatchSessionResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Absent when no in-window session exists — message-field presence is
-	// the null/zero contract for entities (§3); a present session is the
+	// the null/zero contract for entities; a present session is the
 	// resume face's whole truth.
 	Session       *MatchSession `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
 	unknownFields protoimpl.UnknownFields

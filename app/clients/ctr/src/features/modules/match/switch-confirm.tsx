@@ -17,7 +17,7 @@ import { genreLabel, narrowGenre } from "./vocabulary";
 /* The confirm page's own single orb (prototype match-switch-confirm): one
  * purple sphere bleeding off the top-right corner — not the login trio. */
 const switchOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-60px] right-[-60px] size-[min(57vw,220px)]", tone: "purple" },
+  { className: "top-[-60px] right-[-60px] size-[220px]", tone: "purple" },
 ];
 
 /**
@@ -48,7 +48,7 @@ export function SwitchConfirmPage() {
       <div className="flex w-full flex-col gap-3 pb-6">
         <FlowHeader onBack={() => void navigate({ to: "/match" })} title={m.match_switch_title()} />
 
-        <div className="border-line bg-surface-card rounded-card border p-4">
+        <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
           <div className="flex items-center gap-2.5">
             <div className="rounded-tile bg-surface-deep flex-1 p-3 text-center">
               <div className="text-ink-tertiary text-[10.5px]">{m.match_switch_cur()}</div>

@@ -15,7 +15,7 @@ type sessionLaw struct {
 }
 
 func NewSessionLaw(logger *slog.Logger, matchRP MatchRP) test.MatchSessionLaw {
-	return &sessionLaw{log: logger.With("module", "module/match_law"), matchRP: matchRP}
+	return &sessionLaw{log: logger.With("module", "module/match"), matchRP: matchRP}
 }
 
 func (l *sessionLaw) Resolve(ctx context.Context, userID, sessionID string) (*test.SessionBinding, error) {

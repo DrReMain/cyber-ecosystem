@@ -118,9 +118,9 @@
   --shadow-cta-member: 0 10px 24px rgba(126, 34, 206, 0.35);
   --shadow-inset-ring: inset 0 0 0 1px rgba(255, 255, 255, 0.1); /* .iconbox hairline */
   --shadow-seg-on: 0 4px 12px rgba(37, 99, 235, 0.4); /* selected segment */
-  --shadow-progress-cur: 0 0 10px rgba(245, 159, 11, 0.8); /* §4.7 current-step glow */
+  --shadow-progress-cur: 0 0 10px rgba(245, 159, 11, 0.8); /* current-step glow */
 
-  /* Onboarding progress rail, §4.7 tri-state: current = amber + glow,
+  /* Onboarding progress rail, tri-state: current = amber + glow,
    * done = cyan→blue, upcoming = surface */
   --color-progress-cur: #f59e0b;
 
@@ -227,7 +227,7 @@
   );
   /* The brand mark's own diagonal — distinct from the CTA's to-right flow */
   --grad-logo: linear-gradient(135deg, #2563eb, #06b6d4);
-  /* §4.7 done-step fill — the CTA gradient's reverse direction */
+  /* done-step fill — the CTA gradient's reverse direction */
   --grad-progress-done: linear-gradient(to right, #22d3ee, #2563eb);
 }
 

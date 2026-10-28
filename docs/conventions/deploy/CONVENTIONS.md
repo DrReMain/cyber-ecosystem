@@ -1,10 +1,19 @@
 # Deploy Conventions
 
-**Status:** ACTIVE
-
 **Scope:** containerization and deployment of everything in this repo — app images, `deploy/`, the compose stacks, the edge. Prescriptive — `MUST` / `SHOULD` / `MAY`.
 
 This repo is a **generic skeleton**: every rule below is a per-app pattern, not tied to any specific app. Instance state (service set, client set, URLs, ports) lives in the compose files and `deploy/docker/traefik/dynamic.yaml` themselves — read those for what exists, read this for how it fits together.
+
+## Read map
+
+| About to touch | Read first |
+|---|---|
+| compose files, profiles, start/stop targets | §1, §2 |
+| an app `Dockerfile` or image target | §3, §6 |
+| the edge (`deploy/docker/traefik/**`) | §5, §7 step 3 |
+| `deploy/images/**` | §3 |
+| migration wiring | §10 |
+| adding an application | §7, §11 |
 
 ---
 
@@ -46,7 +55,7 @@ Every `app:start` **rolls all app containers**: docker builds stamp a fresh time
 - `deploy/images/<name>/` = infra-derived custom images only (e.g. `pg-extended`), never app images. Each gets an `image:<name>` target in `deploy/project.json` with an existence guard (build-if-missing), depended on by every start target that activates the relevant profile — compose `up` then never faces a local-only tag (its pull-first fallback is registry-dependent and stalls on unreachable registries). Same-tag Dockerfile edits rebuild via `docker image rm` + rerun; a tag bump misses the guard naturally. Upstream tag styles vary — some publish without the `v` prefix (glitchtip) — so verify the exact tag exists before bumping any pin.
 - Both image kinds use the **workspace root as build context** (single Go module + pnpm workspace). The root `.dockerignore` is the **single trim surface** — `MUST NOT` scatter per-directory ignores.
 - pnpm-workspace installs inside image builds `MUST` run with the **full workspace source present** (`COPY` before `install`; a BuildKit store cache mount recovers the lost layer cache). A manifests-only install layer changes pnpm's node_modules shape, and vite's server environment then hashes `?url` css assets differently than the client emits — phantom css names that 404 at runtime (first-paint flash). The admin Dockerfile comment marks the spot.
-- Image build stages invoke package binaries via `pnpm --filter <pkg> exec <bin>` — npm scripts are not used in this repo (root AGENTS.md §3), so a `pnpm --filter <pkg> build` invocation does not resolve; keep the exec form when editing a client Dockerfile.
+- Image build stages invoke package binaries via `pnpm --filter <pkg> exec <bin>` — npm scripts are not used in this repo (workflows are declared as Nx targets in `project.json`; package-local binaries run through `pnpm exec`), so a `pnpm --filter <pkg> build` invocation does not resolve; keep the exec form when editing a client Dockerfile.
 
 ## 4. Discovery names
 
@@ -98,4 +107,14 @@ A service that hands **presigned URLs to browsers** (S3 today) must sign against
 - The job precedes its service via `depends_on: service_completed_successfully`, so `--wait` stacks wait for schema readiness too. On a retained volume the job is a no-op ("No migration files to execute").
 - A fresh postgres volume is bootstrapped by `deploy/docker/postgres/*.sql` (extensions + database shells); database names are shared facts with the consuming services' configs. Schemas are owned by their consumers: atlas migrations for kratos services, first-connect for the mq capability, setup jobs for the observability tools. Extension ownership follows the same consumer line: init SQL covers the default database and the diff scratch `atlas_dev` (fault-tolerant, skipped on a vanilla image); a service database's extensions land in its own first atlas migration.
 
-Posture (root `AGENTS.md` §6.1): deploy changes close as chore kind — owning chain = compose config validation plus this doc's section laws (§10 for migrations); close with the counted-evidence declaration line.
+## 11. Composition law
+
+One shared base, many applications on top:
+
+- **`system` is the mandatory base service** every application deploys: authentication, user identity, org, roles, the authz engine, the resource catalog. Each application adds services under `app/services/<name>` owning their aggregates end-to-end (schema, migrations, biz, RPC); business services grow no identity or auth of their own (kratos CONVENTIONS §5a).
+- **User split:** `system.User` is the authentication identity core only (credentials, org membership, role bindings). App-specific person data is the app's own domain aggregate keyed by `user_id`, named by its domain concept (`Delegate`, `Operator`) — never field bags on User. A field enters `system.User` only when the declared scenario set needs it in the shared core. Reads hydrate identity via system RPCs — a missing profile degrades rendering, never breaks the row.
+- **The service set is a deployment dial, cheapest tier first:** permission gating by default (hide-by-default — an ungranted operation never surfaces) → config-level module registry when the API itself must be absent (mounting a catalog subset is the knob, §6) → code fork only when isolation physically forces it, and then as a delivery action, not a development structure.
+- **Trunk composition:** applications coexist as directories in one trunk — deploy profiles select the service set (the `app` profile in `compose.app.yaml`), the client composes menu and skin per app. Per-app long-lived branches are banned (every base fix would need cherry-picking across them); fork per app only at isolation-forced delivery time, as late as possible.
+- `shared-go` / `shared-ts` carry capabilities, never business aggregates.
+
+Deploy changes close as chore kind — owning chain = compose config validation plus this doc's section laws (§10 for migrations); close with the counted-evidence declaration line (what ran, what was observed).
