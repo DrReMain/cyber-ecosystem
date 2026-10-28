@@ -11,20 +11,6 @@
         "command": "pnpm exec vite dev --host"
       }
     },
-    "dev-up": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "node tools/scripts/devserver.cjs up --project @cyber-ecosystem/ctr"
-      }
-    },
-    "dev-down": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "node tools/scripts/devserver.cjs down --project @cyber-ecosystem/ctr"
-      }
-    },
     "build": {
       "executor": "nx:run-commands",
       "options": {

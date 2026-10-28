@@ -46,20 +46,6 @@
         }
       }
     },
-    "dev-up": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "node tools/scripts/devserver.cjs up --project agent"
-      }
-    },
-    "dev-down": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "node tools/scripts/devserver.cjs down --project agent"
-      }
-    },
     "build": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/bin"],
