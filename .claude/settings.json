@@ -8,6 +8,7 @@
       "Bash(pnpm *)"
     ],
     "deny": [
+      "Bash(nohup)",
       "Bash(kill)",
       "Bash(node)",
       "Bash(node *)",
