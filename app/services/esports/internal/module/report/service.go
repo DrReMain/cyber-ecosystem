@@ -167,6 +167,40 @@ func (s *ReportService) GetTrendReport(ctx context.Context, _ *esportspb.GetTren
 	}, nil
 }
 
+func (s *ReportService) GetCareerReport(ctx context.Context, _ *esportspb.GetCareerReportRequest) (*esportspb.GetCareerReportResponse, error) {
+	r, err := s.uc.GetCareerReport(ctx)
+	if err != nil {
+		return nil, err
+	}
+	recs := make([]*esportspb.CareerRecommendation, 0, len(r.Recommendations))
+	for _, rec := range r.Recommendations {
+		recs = append(recs, &esportspb.CareerRecommendation{
+			CareerArea:       rec.Area,
+			Name:             rec.Name,
+			MatchedScore:     rec.Matched,
+			BasisDimensions:  rec.Basis,
+			EliminationRate:  rec.EliminationRate,
+			TrainingIntensity: rec.TrainingIntensity,
+			Suggestion:       rec.Suggestion,
+		})
+	}
+	improvements := make([]*esportspb.CareerImprovement, 0, len(r.Improvements))
+	for _, imp := range r.Improvements {
+		improvements = append(improvements, &esportspb.CareerImprovement{
+			Dimension:   imp.Dimension,
+			Current:     imp.Current,
+			Target:      imp.Target,
+			GapPercent:  imp.GapPercent,
+			Suggestions: imp.Suggestions,
+		})
+	}
+	return &esportspb.GetCareerReportResponse{
+		Access:          &esportspb.ReportAccessVerdict{Allowed: r.Allowed, Reason: r.Reason},
+		Recommendations: recs,
+		Improvements:    improvements,
+	}, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func sessionAbilitiesPB(rows []SessionAbilityRow) []*esportspb.SessionAbilityLine {

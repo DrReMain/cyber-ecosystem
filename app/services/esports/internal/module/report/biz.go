@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"cyber-ecosystem/shared-go/kratos/security"
+	"cyber-ecosystem/shared-go/utils"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 
@@ -75,6 +76,85 @@ var cognitiveModel = []cognitiveDimWeights{ // the frozen matrix's one transcrip
 type cognitiveDimWeights struct { // Weights' keys are ability keys while Dimension is a dimension key — the shared spelling of resourceAllocation is two names in two namespaces, kept apart by structure
 	Dimension string
 	Weights   map[string]float64
+}
+
+var careerAreas = []careerAreaDef{ // the seeded area library: the legacy gates and advice transcribed with dimension keys carried onto the frozen matrix's own spelling; the two library facts are the industry-level statistics the corpus carries (youth-academy washout, the pro training load) — per-area figures wait on product data, and the values are rows here, not config
+	{Area: "STEM", Name: "STEM领域",
+		Gates:             map[string]float64{"logicDecision": 75, "resourceAllocation": 75},
+		Score:             []string{"logicDecision", "resourceAllocation"},
+		EliminationRate:   95,
+		TrainingIntensity: "日均12-14小时",
+		Suggestion:        "逻辑推理和认知资源分配能力突出，适合复杂问题解决和技术创新"},
+	{Area: "CREATIVE_DESIGN", Name: "创意设计",
+		Gates:             map[string]float64{"motorCoordination": 75, "creativeThinking": 70},
+		Score:             []string{"motorCoordination"},
+		EliminationRate:   95,
+		TrainingIntensity: "日均12-14小时",
+		Suggestion:        "视觉运动协调与创新思维结合，适合需要精细操作与创意的设计工作"},
+	{Area: "MANAGEMENT", Name: "管理决策",
+		Gates:             map[string]float64{"stressResilience": 75, "resourceAllocation": 75},
+		Score:             []string{"stressResilience", "resourceAllocation"},
+		EliminationRate:   95,
+		TrainingIntensity: "日均12-14小时",
+		Suggestion:        "心理韧性和多任务管理能力强，适合高压环境下的决策与领导工作"},
+	{Area: "PRECISION_OPERATION", Name: "精密操作",
+		Gates:             map[string]float64{"neuralResponse": 75, "motorCoordination": 75},
+		Score:             []string{"neuralResponse", "motorCoordination"},
+		EliminationRate:   95,
+		TrainingIntensity: "日均12-14小时",
+		Suggestion:        "神经反应速度和手眼协调优秀，适合需要快速精准响应的职业"},
+}
+
+type careerAreaDef struct { // Gates opens the area (every basis dimension at or past its own threshold); Score names the dimensions whose floor is the match — two separate shapes because one legacy area rides a single lead dimension rather than the gate's floor
+	Area, Name        string
+	Gates             map[string]float64
+	Score             []string
+	EliminationRate   float64
+	TrainingIntensity string
+	Suggestion        string
+}
+
+var careerPrescriptions = map[string][]string{ // the legacy per-dimension prescription copy, verbatim; resourceAllocation and systemCognition share their rows because the source's two rows are themselves identical
+	"neuralResponse": {
+		"每天进行10分钟快速反应训练（如红点触碰游戏）",
+		"参加乒乓球、羽毛球等需要快速反应的体育运动",
+		"增加物理/化学实验课的动手操作机会",
+	},
+	"sustainedAttention": {
+		"使用番茄工作法逐步延长专注时间（25分钟专注+5分钟休息）",
+		"每天阅读30分钟长篇文学作品，培养深度阅读习惯",
+		"创造安静、无干扰的学习环境，减少电子设备干扰",
+	},
+	"motorCoordination": {
+		"练习工整书写，每天抄写一页优美文章",
+		"参加几何作图、美术绘画等需要精细操作的活动",
+		"增加实验课程中精密仪器操作的练习机会",
+	},
+	"stressResilience": {
+		"进行模拟考试训练，逐步适应考试压力环境",
+		"学习深呼吸、正念冥想等压力管理技巧",
+		"建立成长型思维，将错误视为学习机会而非失败",
+	},
+	"resourceAllocation": {
+		"使用思维导图整理学科知识体系",
+		"练习制定学习计划并合理分配时间和精力",
+		"阅读历史、地理类书籍，培养宏观视野和系统观",
+	},
+	"systemCognition": {
+		"使用思维导图整理学科知识体系",
+		"练习制定学习计划并合理分配时间和精力",
+		"阅读历史、地理类书籍，培养宏观视野和系统观",
+	},
+	"logicDecision": {
+		"每天完成5道数学逻辑推理题，强化演绎思维",
+		"尝试编程学习（如Python），培养算法思维",
+		"参加辩论社或模拟法庭，训练逻辑论证能力",
+	},
+	"creativeThinking": {
+		"每周写一篇创意作文，鼓励新颖独特的表达",
+		"参加美术、音乐、戏剧等艺术类课程和活动",
+		"鼓励'一题多解'，从多角度思考问题",
+	},
 }
 
 // DO ------------------------------------------------------------------------------------------------------------------
@@ -257,6 +337,33 @@ type judgement struct { // the live computation's whole answer — the freeze se
 	Composite *float64
 	Tier      string
 	Basis     string
+}
+
+type CareerReport struct {
+	Allowed bool
+	Reason  esportspb.ReportAccessReason
+	// Ordered by match, descending; areas whose basis dimensions went
+	// unrendered (an unfed source sank them) state nothing — no gate,
+	// no made-up number.
+	Recommendations []CareerRecommendationRow
+	Improvements    []CareerImprovementRow
+}
+
+type CareerRecommendationRow struct {
+	Area, Name       string
+	Matched          float64
+	Basis            []string
+	EliminationRate  float64
+	TrainingIntensity string
+	Suggestion       string
+}
+
+type CareerImprovementRow struct { // the weakest rendered dimensions first — the excellence line is the system's own tierA, the gap measured against it, never against a private constant
+	Dimension   string
+	Current     float64
+	Target      float64
+	GapPercent  int32
+	Suggestions []string
 }
 
 // Port ---------------------------------------------------------------------------------------------------------------
@@ -636,31 +743,11 @@ func (uc *ReportUC) GetCognitiveReport(ctx context.Context) (*CognitiveReport, e
 	// in first — cognitive ships membership-gated, so an unentitled
 	// member gets the covered count and the gate's own reason, and the
 	// numbers behind the gate never travel.
-	subject, ok := security.SubjectFromCtx(ctx)
-	if !ok || subject == nil {
-		return nil, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("cognitive report read requires a session"))
+	subject, allowed, reason, err := uc.reportAccessOf(ctx, shared.ReportCognitive)
+	if err != nil {
+		return nil, err
 	}
-	r := &CognitiveReport{Total: len(cognitiveModel)}
-	// The gate, folded from the three facts through the shared order —
-	// the same verdict the entitle face answers, so the two faces cannot
-	// drift apart. Cross-module reads ride the owning module's repo
-	// ports; the order itself lives in the kernel, not here.
-	ref := shared.ReportCognitive
-	grant, gerr := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &ref)
-	if gerr != nil {
-		return nil, gerr
-	}
-	codeActive := grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now()))
-	policy, rowPresent, perr := uc.policyRP.Policy(ctx, shared.ReportCognitive)
-	if perr != nil {
-		return nil, perr
-	}
-	memberActive, merr := uc.entRP.HasActiveMembership(ctx, subject.UserID)
-	if merr != nil {
-		return nil, merr
-	}
-	r.Allowed, r.Reason = shared.ReportAccessVerdict(shared.ReportCognitive, codeActive, rowPresent, policy, memberActive)
-
+	r := &CognitiveReport{Total: len(cognitiveModel), Allowed: allowed, Reason: reason}
 	bests, err := uc.boardRP.AbilityBests(ctx, subject.UserID)
 	if err != nil {
 		return nil, err
@@ -669,43 +756,11 @@ func (uc *ReportUC) GetCognitiveReport(ctx context.Context) (*CognitiveReport, e
 	if !r.Allowed {
 		return r, nil
 	}
-
-	pf, err := uc.profileRP.FindByUserID(ctx, subject.UserID)
+	dims, err := uc.renderedDims(ctx, subject, bests)
 	if err != nil {
 		return nil, err
 	}
-	var birthYear *int32
-	var sex *string
-	var ageBand *string
-	if pf != nil {
-		birthYear, sex, ageBand = pf.BirthYear, pf.Sex, pf.AgeBand
-	}
-	// The frozen matrix's input: each measured ability's best score
-	// benched read-time — the snapshot stays the only frozen source, and
-	// an unbenchable best (no cohort key, thin pool) feeds nothing.
-	pctByAbility := make(map[string]float64, len(bests))
-	for _, b := range bests {
-		pct, _, _, _, _ := uc.percentileFor(ctx, BoardEntry{Ability: b.Ability, Score: b.Best}, birthYear, sex, ageBand)
-		if pct != nil {
-			pctByAbility[b.Ability] = *pct
-		}
-	}
-	for _, dim := range cognitiveModel {
-		sum, fed := 0.0, true
-		for ability, w := range dim.Weights {
-			p, ok := pctByAbility[ability]
-			if !ok {
-				fed = false
-				break // one unfed source sinks the whole dimension, never a partial axis
-			}
-			sum += p * w
-		}
-		if !fed {
-			continue
-		}
-		v := math.Round(sum)
-		r.Dimensions = append(r.Dimensions, CognitiveDimensionRow{Dimension: dim.Dimension, Value: v, Tier: tierOf(v)})
-	}
+	r.Dimensions = dims
 	r.Tested = len(r.Dimensions)
 	if len(r.Dimensions) > 0 {
 		vals := make([]float64, 0, len(r.Dimensions))
@@ -775,6 +830,153 @@ func (uc *ReportUC) GetTrendReport(ctx context.Context) (*TrendReport, error) {
 		}
 	}
 	return r, nil
+}
+
+func (uc *ReportUC) GetCareerReport(ctx context.Context) (*CareerReport, error) {
+	// Career rides open by the standing default: the seeded area library
+	// judged against the same rendered dimensions the cognitive face
+	// shows, the weakest of those dimensions carried onto the
+	// prescription board against the system's own excellence line.
+	// Behind a closed gate neither the areas nor the prescriptions
+	// travel — the verdict alone.
+	subject, allowed, reason, err := uc.reportAccessOf(ctx, shared.ReportCareer)
+	if err != nil {
+		return nil, err
+	}
+	r := &CareerReport{Allowed: allowed, Reason: reason}
+	if !r.Allowed {
+		return r, nil
+	}
+	bests, err := uc.boardRP.AbilityBests(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	dims, err := uc.renderedDims(ctx, subject, bests)
+	if err != nil {
+		return nil, err
+	}
+	if len(dims) == 0 {
+		return r, nil // never-tested renders the honest empty page
+	}
+	byDim := make(map[string]float64, len(dims))
+	for _, d := range dims {
+		byDim[d.Dimension] = d.Value
+	}
+	for _, area := range careerAreas {
+		open := true
+		for dim, threshold := range area.Gates {
+			if v, ok := byDim[dim]; !ok || v < threshold {
+				open = false // an unrendered basis dimension is an unjudgeable area, never a zero axis
+				break
+			}
+		}
+		if !open {
+			continue
+		}
+		matched := math.Inf(1)
+		for _, dim := range area.Score {
+			matched = math.Min(matched, byDim[dim])
+		}
+		r.Recommendations = append(r.Recommendations, CareerRecommendationRow{
+			Area: area.Area, Name: area.Name, Matched: matched, Basis: area.Score,
+			EliminationRate: area.EliminationRate, TrainingIntensity: area.TrainingIntensity,
+			Suggestion: area.Suggestion,
+		})
+	}
+	sort.SliceStable(r.Recommendations, func(i, j int) bool { // the contract's own ordering: by match, descending
+		return r.Recommendations[i].Matched > r.Recommendations[j].Matched
+	})
+	weakest := append([]CognitiveDimensionRow(nil), dims...)
+	sort.SliceStable(weakest, func(i, j int) bool { return weakest[i].Value < weakest[j].Value })
+	if len(weakest) > 4 {
+		weakest = weakest[:4]
+	}
+	for _, d := range weakest {
+		short := d.Value < targetPercentile
+		gap := 0.0
+		if short { // an already-excellent row states a zero gap, never a negative one
+			gap = math.Round((targetPercentile - d.Value) / targetPercentile * 100)
+		}
+		suggestions := []string{"已达优秀水平"}
+		if short {
+			if rows, ok := careerPrescriptions[d.Dimension]; ok {
+				suggestions = rows
+			}
+		}
+		r.Improvements = append(r.Improvements, CareerImprovementRow{
+			Dimension: d.Dimension, Current: d.Value, Target: targetPercentile,
+			GapPercent: utils.ConvNum[int32](gap), Suggestions: suggestions,
+		})
+	}
+	return r, nil
+}
+
+func (uc *ReportUC) reportAccessOf(ctx context.Context, family string) (*security.Subject, bool, esportspb.ReportAccessReason, error) {
+	// The gate, folded from the three facts through the shared order —
+	// the same verdict the entitle face answers, so the faces cannot
+	// drift apart. Cross-module reads ride the owning module's repo
+	// ports; the order itself lives in the kernel, not here.
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, false, 0, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("report access requires a session"))
+	}
+	ref := family
+	grant, gerr := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &ref)
+	if gerr != nil {
+		return nil, false, 0, gerr
+	}
+	codeActive := grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now()))
+	policy, rowPresent, perr := uc.policyRP.Policy(ctx, family)
+	if perr != nil {
+		return nil, false, 0, perr
+	}
+	memberActive, merr := uc.entRP.HasActiveMembership(ctx, subject.UserID)
+	if merr != nil {
+		return nil, false, 0, merr
+	}
+	allowed, reason := shared.ReportAccessVerdict(family, codeActive, rowPresent, policy, memberActive)
+	return subject, allowed, reason, nil
+}
+
+func (uc *ReportUC) renderedDims(ctx context.Context, subject *security.Subject, bests []DigestAbilityRow) ([]CognitiveDimensionRow, error) {
+	// The frozen matrix's input: each measured ability's best score
+	// benched read-time — the snapshot stays the only frozen source, and
+	// an unbenchable best (no cohort key, thin pool) feeds nothing.
+	pf, err := uc.profileRP.FindByUserID(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	var birthYear *int32
+	var sex *string
+	var ageBand *string
+	if pf != nil {
+		birthYear, sex, ageBand = pf.BirthYear, pf.Sex, pf.AgeBand
+	}
+	pctByAbility := make(map[string]float64, len(bests))
+	for _, b := range bests {
+		pct, _, _, _, _ := uc.percentileFor(ctx, BoardEntry{Ability: b.Ability, Score: b.Best}, birthYear, sex, ageBand)
+		if pct != nil {
+			pctByAbility[b.Ability] = *pct
+		}
+	}
+	var dims []CognitiveDimensionRow
+	for _, dim := range cognitiveModel {
+		sum, fed := 0.0, true
+		for ability, w := range dim.Weights {
+			p, ok := pctByAbility[ability]
+			if !ok {
+				fed = false
+				break // one unfed source sinks the whole dimension, never a partial axis
+			}
+			sum += p * w
+		}
+		if !fed {
+			continue
+		}
+		v := math.Round(sum)
+		dims = append(dims, CognitiveDimensionRow{Dimension: dim.Dimension, Value: v, Tier: tierOf(v)})
+	}
+	return dims, nil
 }
 
 func (uc *ReportUC) anchorPercentilesOf(ctx context.Context, meta ScoredSessionRow, birthYear *int32, sex, ageBand *string) map[string]*float64 {

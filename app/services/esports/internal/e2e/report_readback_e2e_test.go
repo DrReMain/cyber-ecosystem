@@ -558,6 +558,60 @@ func TestReportClusterE2E(t *testing.T) {
 			t.Fatalf("digest %s percentile: %+v", a.Ability, a)
 		}
 	}
+
+	// Face 5 — the career aggregate: open by the standing default, the
+	// seeded gates shut on the degenerate 50 (every threshold sits above
+	// it), and the prescription board carries the four weakest rendered
+	// dimensions against the system's own excellence line — the same 50
+	// everywhere, so the weakest four are the model's own order.
+	cr, err := uc.GetCareerReport(fullCtx)
+	if err != nil {
+		t.Fatalf("career: %v", err)
+	}
+	if !cr.Allowed || cr.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN {
+		t.Fatalf("career open gate: allowed=%v reason=%v", cr.Allowed, cr.Reason)
+	}
+	if len(cr.Recommendations) != 0 {
+		t.Fatalf("career shut gates: %+v", cr.Recommendations)
+	}
+	if len(cr.Improvements) != 4 {
+		t.Fatalf("career improvements: %d", len(cr.Improvements))
+	}
+	for i, want := range []string{"neuralResponse", "sustainedAttention", "motorCoordination", "stressResilience"} {
+		imp := cr.Improvements[i]
+		if imp.Dimension != want || imp.Current != 50 || imp.Target != 85 || imp.GapPercent != 41 {
+			t.Fatalf("career improvement %s: %+v", want, imp)
+		}
+		if len(imp.Suggestions) != 3 || imp.Suggestions[0] == "已达优秀水平" {
+			t.Fatalf("career improvement %s suggestions: %+v", want, imp.Suggestions)
+		}
+	}
+
+	// The partial member's two rendered dimensions feed no area — a
+	// gate with a missing basis dimension is unjudgeable, and the board
+	// carries exactly the two rendered rows.
+	crp, err := uc.GetCareerReport(repSubject(rbqPart))
+	if err != nil {
+		t.Fatalf("career partial: %v", err)
+	}
+	if !crp.Allowed || len(crp.Recommendations) != 0 || len(crp.Improvements) != 2 {
+		t.Fatalf("career partial shape: %+v", crp)
+	}
+	if crp.Improvements[0].Dimension != "neuralResponse" || crp.Improvements[1].Dimension != "motorCoordination" {
+		t.Fatalf("career partial board: %+v", crp.Improvements)
+	}
+
+	// A never-tested member renders the honest empty page under the open
+	// gate — no bests feed any dimension, so neither the areas nor the
+	// board have anything to state. (The pool member is not that case:
+	// their own pool rows feed their dimensions all the same 50.)
+	crx, err := uc.GetCareerReport(repSubject("e2erbqnone00000000"))
+	if err != nil {
+		t.Fatalf("career empty: %v", err)
+	}
+	if !crx.Allowed || len(crx.Recommendations) != 0 || len(crx.Improvements) != 0 {
+		t.Fatalf("career empty shape: %+v", crx)
+	}
 }
 
 func rbqClean(t *testing.T, db *ent.Client) {
