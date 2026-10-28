@@ -9,6 +9,9 @@ import (
 var ProviderSet = wire.NewSet(
 	NewAuthUC,
 	NewTokenRP,
+	NewIdentityProviders,
+	NewSmsProvider,
+	NewWechatProvider,
 	NewAuthService,
 	wire.Bind(new(krauth.Authenticator), new(*AuthUC)),
 )

@@ -52,6 +52,14 @@ services:
       - APP_WECHAT_APPID
       - APP_WECHAT_AUTO_REGISTER
       - APP_WECHAT_SECRET
+      - APP_SMS_ENABLED
+      - APP_SMS_AUTO_REGISTER
+      - APP_SMS_BACKEND
+      - APP_SMS_ACCESS_KEY_ID
+      - APP_SMS_ACCESS_KEY_SECRET
+      - APP_SMS_SIGN_NAME
+      - APP_SMS_TEMPLATE_CODE
+      - APP_SMS_ENDPOINT
     networks:
       default:
         aliases: ["system.api"]

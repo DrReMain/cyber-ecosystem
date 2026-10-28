@@ -285,8 +285,10 @@ func (f fakeIdentityProvider) AuthorizeURL(row *conf.Auth_Provider, _, state str
 
 const fakeKind = "fakekind"
 
-func init() {
-	registerIdentityProvider(fakeKind, fakeIdentityProvider{id: &exchangedIdentity{Kind: fakeKind, Identifier: "oid-x"}})
+func testProviders() map[string]IdentityProvider {
+	return map[string]IdentityProvider{
+		fakeKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: fakeKind, Identifier: "oid-x"}},
+	}
 }
 
 func fakeProviderConf() *conf.Auth {
@@ -314,7 +316,7 @@ func newAuthUCConf(auth *conf.Auth, u *fakeUserRP, a *fakeAuthzRP, t *fakeTokenR
 	}
 	uc, err := NewAuthUC(
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
-		passthroughTx{}, auth, u, a, tn,
+		passthroughTx{}, auth, testProviders(), u, a, tn,
 		&fakePopulationRP{rows: map[string]*population.Population{
 			"member": {Code: "member", Name: "Member", Plane: security.PlaneMember},
 		}},
@@ -1381,7 +1383,7 @@ func TestLoginByIdentityStateCashInfraPassthrough(t *testing.T) {
 // fails the construction, not the first login.
 func TestNewAuthUCRejectsUnregisteredKind(t *testing.T) {
 	bad := &conf.Auth{Providers: []*conf.Auth_Provider{{Key: "x", Kind: "ghost"}}}
-	if _, err := NewAuthUC(slog.New(slog.NewTextHandler(io.Discard, nil)), nil, bad, nil, nil, nil, nil, nil); err == nil {
+	if _, err := NewAuthUC(slog.New(slog.NewTextHandler(io.Discard, nil)), nil, bad, nil, nil, nil, nil, nil, nil); err == nil {
 		t.Fatal("unregistered kind: want construction error")
 	}
 }

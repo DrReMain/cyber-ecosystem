@@ -23,6 +23,7 @@ const OperationAuthServiceGetCurrentUser = "/cyber.system.v1.AuthService/GetCurr
 const OperationAuthServiceLogin = "/cyber.system.v1.AuthService/Login"
 const OperationAuthServiceLoginByIdentity = "/cyber.system.v1.AuthService/LoginByIdentity"
 const OperationAuthServiceLogout = "/cyber.system.v1.AuthService/Logout"
+const OperationAuthServiceSendSmsCode = "/cyber.system.v1.AuthService/SendSmsCode"
 
 type AuthServiceHTTPServer interface {
 	BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error)
@@ -31,6 +32,7 @@ type AuthServiceHTTPServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginByIdentity(context.Context, *LoginByIdentityRequest) (*LoginByIdentityResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	SendSmsCode(context.Context, *SendSmsCodeRequest) (*SendSmsCodeResponse, error)
 }
 
 func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
@@ -38,6 +40,7 @@ func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
 	r.Handle("POST", "/api/v1/system/auth/login", _AuthService_Login0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/login-by-identity", _AuthService_LoginByIdentity0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/begin-identity-login", _AuthService_BeginIdentityLogin0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/send-sms-code", _AuthService_SendSmsCode0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/bind-credential", _AuthService_BindCredential0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/logout", _AuthService_Logout0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me", _AuthService_GetCurrentUser0_HTTP_Handler(srv))
@@ -96,6 +99,25 @@ func _AuthService_BeginIdentityLogin0_HTTP_Handler(srv AuthServiceHTTPServer) fu
 			return err
 		}
 		reply := out.(*BeginIdentityLoginResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthService_SendSmsCode0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SendSmsCodeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceSendSmsCode)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SendSmsCode(ctx, req.(*SendSmsCodeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SendSmsCodeResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -164,6 +186,7 @@ type AuthServiceHTTPClient interface {
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginResponse, err error)
 	LoginByIdentity(ctx context.Context, req *LoginByIdentityRequest, opts ...http.CallOption) (rsp *LoginByIdentityResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutResponse, err error)
+	SendSmsCode(ctx context.Context, req *SendSmsCodeRequest, opts ...http.CallOption) (rsp *SendSmsCodeResponse, err error)
 }
 
 type AuthServiceHTTPClientImpl struct {
@@ -266,6 +289,23 @@ func (c *AuthServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutReques
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationAuthServiceLogout),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) SendSmsCode(ctx context.Context, in *SendSmsCodeRequest, opts ...http.CallOption) (*SendSmsCodeResponse, error) {
+	var out SendSmsCodeResponse
+	pattern := "/api/v1/system/auth/send-sms-code"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceSendSmsCode),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

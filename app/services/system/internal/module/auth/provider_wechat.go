@@ -30,7 +30,7 @@ type wechatProvider struct {
 
 var wechatDefaultClient = &http.Client{Timeout: wechatTimeout}
 
-func init() { registerIdentityProvider(wechatKind, wechatProvider{}) }
+func NewWechatProvider() wechatProvider { return wechatProvider{} }
 
 func (p wechatProvider) clientOrDefault() *http.Client {
 	if p.client != nil {

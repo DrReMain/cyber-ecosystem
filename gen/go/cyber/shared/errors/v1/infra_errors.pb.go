@@ -454,3 +454,53 @@ func IsInfraErrorPaymentDecryptFailed(err error) bool {
 func ErrorInfraErrorPaymentDecryptFailed(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, InfraError_INFRA_ERROR_PAYMENT_DECRYPT_FAILED.String(), fmt.Sprintf(format, args...))
 }
+
+// 36xx: Sms
+func IsInfraErrorSmsInvalidArgument(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_SMS_INVALID_ARGUMENT.String() && e.Code == 400
+}
+
+// 36xx: Sms
+func ErrorInfraErrorSmsInvalidArgument(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, InfraError_INFRA_ERROR_SMS_INVALID_ARGUMENT.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorSmsChannelRejected(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_SMS_CHANNEL_REJECTED.String() && e.Code == 422
+}
+
+func ErrorInfraErrorSmsChannelRejected(format string, args ...interface{}) *errors.Error {
+	return errors.New(422, InfraError_INFRA_ERROR_SMS_CHANNEL_REJECTED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorSmsUnavailable(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_SMS_UNAVAILABLE.String() && e.Code == 503
+}
+
+func ErrorInfraErrorSmsUnavailable(format string, args ...interface{}) *errors.Error {
+	return errors.New(503, InfraError_INFRA_ERROR_SMS_UNAVAILABLE.String(), fmt.Sprintf(format, args...))
+}
+
+func IsInfraErrorSmsTimeout(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == InfraError_INFRA_ERROR_SMS_TIMEOUT.String() && e.Code == 504
+}
+
+func ErrorInfraErrorSmsTimeout(format string, args ...interface{}) *errors.Error {
+	return errors.New(504, InfraError_INFRA_ERROR_SMS_TIMEOUT.String(), fmt.Sprintf(format, args...))
+}
