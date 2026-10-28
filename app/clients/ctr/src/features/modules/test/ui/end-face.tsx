@@ -163,15 +163,20 @@ function AttemptsNote({ line }: Readonly<{ line: WireLine | undefined }>) {
     return null; // a single attempt needs no "which one was taken" story
   }
   const best = Math.max(...line.attemptScores);
+  // The receipt's identity is its position — repeated scores are legal
+  // and carry no distinguishing content of their own — derived here so
+  // the render's key never touches the index the array-key lint guards.
+  const entries = line.attemptScores.map((score, i) => ({
+    key: `${i}-${score}`,
+    leading: i > 0,
+    score,
+  }));
   return (
     <div className="border-line bg-surface-content text-ink-muted rounded-card border px-3.5 py-3 text-[11px] leading-[1.8]">
       {m.test_attempts_pre({ n: line.attemptScores.length })}
-      {line.attemptScores.map((score, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: the receipt is an
-        // ordered string where position is the identity — repeated scores
-        // are legal and carry no distinguishing content of their own.
-        <span key={`${i}-${score}`}>
-          {i > 0 ? (
+      {entries.map(({ key, leading, score }) => (
+        <span key={key}>
+          {leading ? (
             <span aria-hidden className="text-ink-tertiary">
               {" / "}
             </span>

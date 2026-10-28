@@ -4,11 +4,24 @@ import { toast } from "sonner";
 import { m } from "#/paraglide/messages";
 import { bandLabel } from "../bands";
 
+/** The four-stat strip's read-back values — each absent until its source
+ * face answers (unknown stays a dash, never a zero). The improvement
+ * count has no source face yet: it needs the per-session composite
+ * sequence, which the digest's no-verdict law keeps off the wire. */
+export interface IdentityStats {
+  total: number | null;
+  compTop: number | null;
+  best: number | null;
+}
+
 /**
  * The profile overview's header card: avatar chip, nickname, quick-action
- * pills, and the band / preference meta line.
+ * pills, the band / preference meta line, and the four-stat strip.
  */
-export function IdentityCard({ profile }: Readonly<{ profile: ProfilePB | undefined }>) {
+export function IdentityCard({
+  profile,
+  stats,
+}: Readonly<{ profile: ProfilePB | undefined; stats: IdentityStats }>) {
   const games = profile?.games ?? [];
   const meta = [
     bandLabel(profile?.ageBand),
@@ -41,17 +54,35 @@ export function IdentityCard({ profile }: Readonly<{ profile: ProfilePB | undefi
         </div>
       </div>
       {meta !== "" && <p className="text-ink-tertiary mt-[11px] text-[11px]">{meta}</p>}
-      {/* The prototype's four-stat strip. Values stay "—" until the records
-       * read API lands (P18) — unknown, honestly shown, never zero-asserted. */}
+      {/* The prototype's four-stat strip, riding the digest and the latest
+       * scored session's verdict read; the improvement count keeps its
+       * dash — no composite-sequence read face exists yet. */}
       <div className="mt-3 flex border-t border-[rgba(55,65,81,0.55)] pt-[11px]">
         {[
-          { color: "text-ink", label: m.profile_stat_total() },
-          { color: "text-status-ok", label: m.profile_stat_comp() },
-          { color: "text-[#fde047]", label: m.profile_stat_best() },
-          { color: "text-ink", label: m.profile_stat_prog() },
+          {
+            color: "text-ink",
+            label: m.profile_stat_total(),
+            value: stats.total === null ? "—" : String(stats.total),
+          },
+          {
+            color: "text-status-ok",
+            label: m.profile_stat_comp(),
+            value: stats.compTop === null ? "—" : m.profile_stat_top({ pct: stats.compTop }),
+          },
+          {
+            color: "text-[#fde047]",
+            label: m.profile_stat_best(),
+            value:
+              stats.best === null
+                ? "—"
+                : m.profile_stat_best_v({ score: Math.round(stats.best * 10) / 10 }),
+          },
+          { color: "text-ink", label: m.profile_stat_prog(), value: "—" },
         ].map((cell) => (
           <div className="flex-1 text-center" key={cell.label}>
-            <div className={`text-[19px] leading-[1.15] font-black ${cell.color}`}>—</div>
+            <div className={`text-[19px] leading-[1.15] font-black ${cell.color}`}>
+              {cell.value}
+            </div>
             <div className="text-ink-tertiary mt-[3px] text-[10.5px]">{cell.label}</div>
           </div>
         ))}

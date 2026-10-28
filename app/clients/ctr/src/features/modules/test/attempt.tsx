@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ExitConfirmDialog } from "#/features/app/dialog/exit-confirm-dialog";
 import { invalidateMatchSession } from "#/features/modules/match/session";
+import { invalidateAbilityDigest } from "#/features/modules/report/digest";
 import { invalidateSessionReport } from "#/features/modules/report/session";
 import { m } from "#/paraglide/messages";
 import { getLocale } from "#/paraglide/runtime";
@@ -143,10 +144,13 @@ export function TestAttempt({
     onSuccess: () => {
       invalidateMatchSession(queryClient);
       // The attempt just became the scoreboard's next line — the
-      // settlement tags and the attempts note read the refreshed truth.
+      // settlement tags and the attempts note read the refreshed truth,
+      // and every aggregate the digest carries (counts, bests, the
+      // latest lines) moved with it.
       if (bootSessionId !== undefined) {
         invalidateSessionReport(queryClient, bootSessionId);
       }
+      invalidateAbilityDigest(queryClient);
     },
   });
   const { mutate: submitAttempt } = submit;

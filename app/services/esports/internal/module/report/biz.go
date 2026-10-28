@@ -554,13 +554,16 @@ func (uc *ReportUC) sessionPercentiles(ctx context.Context, anchorID string) map
 }
 
 // sessionBoardOf flattens the attempt rows into the board shape the
-// live judgement consumes.
+// live judgement consumes — folded to one entry per ability by the
+// settlement's own law, so a retaken game's retries never each weigh on
+// the composite (0/0/100 would average as a 33rd percentile otherwise —
+// the same doubled-axis fault the record board's dedupe fixed).
 func sessionBoardOf(attempts []SessionAttemptRow) []BoardEntry {
 	out := make([]BoardEntry, 0, len(attempts))
 	for _, a := range attempts {
 		out = append(out, BoardEntry{TestCode: a.TestCode, Ability: a.Ability, Score: a.Score, At: a.CreatedAt})
 	}
-	return out
+	return dedupeBoard(out)
 }
 
 // dedupeBoard folds the session board to one entry per ability — the

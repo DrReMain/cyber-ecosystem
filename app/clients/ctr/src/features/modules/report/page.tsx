@@ -3,7 +3,10 @@ import type {
   GetReportResponse,
   ReportAbility,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report_pb";
-import { getReport } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
+import {
+  getAbilityDigest,
+  getReport,
+} from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import type { Sku } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku_pb";
 import { listSkus } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku-SkuService_connectquery";
 import { useNavigate, useParams } from "@tanstack/react-router";
@@ -12,6 +15,7 @@ import { StateScreen } from "#/features/app/states/state-screen";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { abilityWord } from "#/features/modules/match/vocabulary";
 import { m } from "#/paraglide/messages";
+import { bestMapOf, wireDigestOf } from "./digest";
 import { AbilityRadar } from "./ui/ability-radar";
 import { AbilityRow } from "./ui/ability-row";
 import { ComparisonCard, type ComparisonLine } from "./ui/comparison-card";
@@ -22,7 +26,7 @@ import { MemberCard } from "./ui/member-card";
 import { UnlockCard } from "./ui/unlock-card";
 import {
   deltaWord,
-  fenToYuan,
+  priceYuanOf,
   type RadarAxis,
   type TierWord,
   tierOfPercentile,
@@ -38,10 +42,12 @@ type AbilityWire = ReportAbility & {
   percentile?: number | null;
 };
 
-/** One ability's view row: identity, the cohort answer, and the unlocked
- * tier/decorations the row renders. */
+/** One ability's view row: identity, the cohort answer, the free-seat
+ * flag, and the decorations the row renders. */
 interface AbilityRowModel {
+  ability: string;
   abilityCn: string;
+  free: boolean;
   gradient: string;
   key: string;
   pct: number | null;
@@ -85,6 +91,7 @@ function rowOf(
   a: ReportAbility,
   deltas: Map<string, { previous: number | null; delta: number | undefined }>,
   unlocked: boolean,
+  free: boolean,
   keyPrefix: string,
 ): AbilityRowModel {
   const word = abilityWord(a.ability ?? "");
@@ -96,7 +103,9 @@ function rowOf(
       ? deltaWord(previous, typeof entry.delta === "number" ? entry.delta : null)
       : null;
   return {
+    ability: a.ability ?? "",
     abilityCn: word.cn,
+    free,
     gradient: word.gradient,
     key: `${keyPrefix}${a.ability ?? a.gameCode ?? ""}`,
     pct,
@@ -105,19 +114,6 @@ function rowOf(
     tier: pct !== null ? tierOfPercentile(pct) : tierWord(""),
     delta,
   };
-}
-
-// The two purchase faces price themselves off the catalog: the trial sku
-// unlocks this record once, the cheapest membership opens the window.
-// The kind rides the wire as a value-name string while the generated type
-// keeps a numeric enum — String() restates the runtime value the
-// transport actually delivers.
-function priceOf(skus: Sku[], kind: string, cheapest: boolean): string {
-  const picked = skus
-    .filter((s) => String(s.kind) === kind)
-    .sort((a, b) => Number(a.priceFen ?? 0) - Number(b.priceFen ?? 0));
-  const row = cheapest ? picked[0] : picked.at(-1);
-  return row?.priceFen !== undefined ? fenToYuan(row.priceFen) : "—";
 }
 
 function reportModel(report: GetReportResponse, skus: Sku[]): ReportModel {
@@ -130,8 +126,15 @@ function reportModel(report: GetReportResponse, skus: Sku[]): ReportModel {
       { previous: d.previousPercentile ?? null, delta: d.deltaPercentile },
     ]),
   );
-  const rows = [...abilities].sort(byPercentileDesc).map((a) => rowOf(a, deltas, unlocked, ""));
-  const subRows = subAbilities.map((a) => rowOf(a, deltas, unlocked, "sub-"));
+  const sorted = [...abilities].sort(byPercentileDesc);
+  // The free tier's own law (the E5-0 ruling the audit found dropped):
+  // the best measured main ability's trio — tier, analysis, advice — is
+  // free; every other row stays locked until the unlock. Satellites never
+  // compete for the free seat, and a score-only lineup (no cohort answer
+  // anywhere) keeps the seat vacant — the trio has no tier to show.
+  const freeSeat = sorted.findIndex((a) => pctOf(a) !== null);
+  const rows = sorted.map((a, i) => rowOf(a, deltas, unlocked, i === freeSeat, ""));
+  const subRows = subAbilities.map((a) => rowOf(a, deltas, unlocked, false, "sub-"));
   const comparison: ComparisonLine[] | null =
     unlocked && report.comparison !== undefined
       ? rows.map((r) => ({
@@ -164,8 +167,8 @@ function reportModel(report: GetReportResponse, skus: Sku[]): ReportModel {
         target: it.targetPercentile ?? 0,
         gap: it.gapPercent ?? 0,
       })),
-    trialYuan: priceOf(skus, "SKU_KIND_TRIAL", false),
-    memberYuan: priceOf(skus, "SKU_KIND_MEMBERSHIP", true),
+    trialYuan: priceYuanOf(skus, "SKU_KIND_TRIAL", false),
+    memberYuan: priceYuanOf(skus, "SKU_KIND_MEMBERSHIP", true),
   };
 }
 
@@ -175,13 +178,22 @@ function reportModel(report: GetReportResponse, skus: Sku[]): ReportModel {
  * over measured axes only — with the per-ability detail, the last-attempt
  * comparison and the improvement board behind the unlock state, and the
  * two purchase faces (one-shot unlock, membership) reading their prices
- * off the SKU catalog, never a hardcoded number.
+ * off the SKU catalog, never a hardcoded number. The free tier's own
+ * seat: the best measured main ability's trio (tier, analysis, advice)
+ * renders unlocked for everyone, its history-best bar beside it.
  */
 export function ReportPage() {
   const { recordId } = useParams({ from: "/report/$recordId" });
   const navigate = useNavigate();
   const reportQuery = useConnectQuery(getReport, { recordId });
   const skusQuery = useConnectQuery(listSkus, {});
+  // The history-best bars ride the cross-session digest; a failed read
+  // just leaves the bars absent — never blocks the report itself.
+  const digestQuery = useConnectQuery(getAbilityDigest, {}, { throwOnError: false });
+  const bestOf =
+    digestQuery.isSuccess && digestQuery.data !== undefined
+      ? bestMapOf(wireDigestOf(digestQuery.data))
+      : new Map<string, number>();
 
   if (reportQuery.isPending) {
     return (
@@ -216,7 +228,9 @@ export function ReportPage() {
     <AbilityRow
       abilityCn={row.abilityCn}
       delta={row.delta}
+      free={row.free}
       gradient={row.gradient}
+      historyBest={bestOf.get(row.ability)}
       isSub={isSub}
       key={row.key}
       pct={row.pct}

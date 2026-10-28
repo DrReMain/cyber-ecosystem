@@ -7,6 +7,6 @@ import { m } from "#/paraglide/messages";
 
 export const Route = createFileRoute("/report/session/$sessionId")({
   beforeLoad: profileFlowGuard,
-  head: () => ({ meta: [...noindexHead().meta, { title: pageTitle(m.session_done_title()) }] }),
+  head: () => ({ meta: [...noindexHead().meta, { title: pageTitle(m.report_session_title()) }] }),
   component: SessionDonePage,
 });

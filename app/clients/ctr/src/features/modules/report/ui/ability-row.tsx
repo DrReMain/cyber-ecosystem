@@ -2,16 +2,57 @@ import { TierChip } from "#/features/modules/test/ui/tier-chip";
 import { m } from "#/paraglide/messages";
 import { type DeltaWord, type TierWord, zoneCopyOf } from "../vocabulary";
 import { AdviceBox } from "./advice-box";
+import { CmpBar } from "./cmp-bar";
 import { LockLine } from "./lock-line";
 
+// The chip seat's law: a locked row carries no verdict letter (the tier
+// is part of the paid trio), the free seat wears the prototype's yellow
+// top-score tag until membership opens the letters.
+function SeatChip({
+  free,
+  isSub,
+  pct,
+  tier,
+  unlocked,
+}: Readonly<{
+  free: boolean;
+  isSub: boolean;
+  pct: number | null;
+  tier: TierWord;
+  unlocked: boolean;
+}>) {
+  const open = free || unlocked;
+  if (!open) {
+    return null;
+  }
+  if (isSub) {
+    return (
+      <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-[10px] font-semibold text-[#9CA3AF]">
+        {m.report_row_sub()}
+      </span>
+    );
+  }
+  if (free && !unlocked) {
+    return (
+      <span className="rounded-full bg-[rgba(234,179,8,0.18)] px-2 py-0.5 text-[10px] font-extrabold text-[#FDE047]">
+        {m.report_free_tag()}
+      </span>
+    );
+  }
+  return <TierChip grade={pct === null ? undefined : tier.letter} />;
+}
+
 /** The per-ability card (prototype ③): ability identity, the percentile
- * bar and score, then either the unlocked detail (three-zone analysis
- * copy + the last-attempt delta) or the locked teaser line. The analysis
- * copy is client-held five-zone wording — the contract carries numbers,
- * and the configuration face lands with E9. */
+ * bar and score, then the detail seat — open for the free seat (the
+ * best measured main ability's trio: tier, analysis, advice) or any
+ * unlocked row, locked teaser otherwise. The analysis copy is
+ * client-held five-zone wording — the contract carries numbers, and the
+ * configuration face lands with E9. */
 export function AbilityRow({
   abilityCn,
+  free,
   gradient,
+  historyBest,
   isSub,
   pct,
   score,
@@ -20,7 +61,9 @@ export function AbilityRow({
   unlocked,
 }: Readonly<{
   abilityCn: string;
+  free: boolean;
   gradient: string;
+  historyBest: number | undefined;
   isSub: boolean;
   pct: number | null;
   score: number;
@@ -28,18 +71,15 @@ export function AbilityRow({
   delta: DeltaWord | null;
   unlocked: boolean;
 }>) {
+  const open = free || unlocked;
   const zone = zoneCopyOf(abilityCn, pct, score);
   return (
-    <div className="border-line bg-surface-card shadow-card rounded-card border p-3.5 backdrop-blur-md">
+    <div
+      className={`border-line bg-surface-card shadow-card rounded-card border p-3.5 backdrop-blur-md ${free && !unlocked ? "border-[rgba(234,179,8,0.45)]" : ""}`}
+    >
       <div className="flex items-center justify-between gap-2">
         <span className="text-ink text-[13.5px] font-bold">{abilityCn}</span>
-        {isSub ? (
-          <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-[10px] font-semibold text-[#9CA3AF]">
-            {m.report_row_sub()}
-          </span>
-        ) : (
-          <TierChip grade={pct === null ? undefined : tier.letter} />
-        )}
+        <SeatChip free={free} isSub={isSub} pct={pct} tier={tier} unlocked={unlocked} />
       </div>
       <div className="mt-2 flex items-center gap-2.5">
         <div
@@ -59,10 +99,10 @@ export function AbilityRow({
           ) : (
             <div className="text-ink-tertiary text-[10.5px]">{m.report_axis_score_only()}</div>
           )}
-          {/* Unlocked with no cohort answer: the bar's score-only note
-              already says it — the detail seat renders nothing rather
-              than repeat the line. */}
-          {unlocked ? (
+          {/* An open seat with no cohort answer keeps the bar's score-only
+              note — the detail renders nothing rather than repeat the
+              line; the history-best bar still reads the digest. */}
+          {open ? (
             zone !== null ? (
               <>
                 <div className="text-ink-tertiary mt-2 text-[11px] leading-[1.6]">
@@ -74,6 +114,7 @@ export function AbilityRow({
           ) : (
             <LockLine />
           )}
+          {open ? <CmpBar best={historyBest} score={score} /> : null}
         </div>
         <div className="shrink-0 text-right">
           <div className="text-ink text-base font-extrabold tabular-nums">

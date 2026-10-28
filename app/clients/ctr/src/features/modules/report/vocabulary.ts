@@ -1,3 +1,4 @@
+import type { Sku } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku_pb";
 import { m } from "#/paraglide/messages";
 
 // The report's client vocabulary: tier words, radar geometry, money and
@@ -111,6 +112,19 @@ export function radarGeometry(axes: RadarAxis[]): RadarGeometry {
 export function fenToYuan(fen: bigint): string {
   const yuan = Number(fen) / 100;
   return Number.isInteger(yuan) ? String(yuan) : yuan.toFixed((yuan * 10) % 1 === 0 ? 1 : 2);
+}
+
+// The purchase faces price themselves off the catalog: the trial sku
+// unlocks one record, the cheapest membership opens the window. The kind
+// rides the wire as a value-name string while the generated type keeps a
+// numeric enum — String() restates the runtime value the transport
+// actually delivers. No picked row stays an invented number ("—").
+export function priceYuanOf(skus: Sku[], kind: string, cheapest: boolean): string {
+  const picked = skus
+    .filter((s) => String(s.kind) === kind)
+    .sort((a, b) => Number(a.priceFen ?? 0) - Number(b.priceFen ?? 0));
+  const row = cheapest ? picked[0] : picked.at(-1);
+  return row?.priceFen !== undefined ? fenToYuan(row.priceFen) : "—";
 }
 
 export interface DeltaWord {

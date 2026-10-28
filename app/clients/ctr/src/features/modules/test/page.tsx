@@ -48,5 +48,15 @@ export function TestPage() {
       />
     );
   }
-  return <TestBootstrap code={code} fallbackName={row.name ?? code} id={row.id} review={review} />;
+  // The search word is optional on the wire (navigators reach this route
+  // with an empty search) but never undefined at runtime after
+  // validation — narrowed once here for the bootstrap's required flag.
+  return (
+    <TestBootstrap
+      code={code}
+      fallbackName={row.name ?? code}
+      id={row.id}
+      review={review === true}
+    />
+  );
 }

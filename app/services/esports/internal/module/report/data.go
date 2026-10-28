@@ -10,12 +10,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
-	entabilityscore "cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	entmatchconfig "cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	entmatchsession "cyber-ecosystem/app/services/esports/internal/ent/matchsession"
 	entprofile "cyber-ecosystem/app/services/esports/internal/ent/profile"
 	entreportsnapshot "cyber-ecosystem/app/services/esports/internal/ent/reportsnapshot"
 	enttest "cyber-ecosystem/app/services/esports/internal/ent/test"
+	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 	enttestrecord "cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
@@ -314,35 +314,44 @@ func (rp *boardRP) AnchorOfSession(ctx context.Context, sessionID string) (*Atte
 }
 
 func (rp *boardRP) AbilityBests(ctx context.Context, userID string) ([]DigestAbilityRow, error) {
-	// Two rides over the ability ledger: the per-ability aggregates, then
-	// the best row's own facts (grade from the attempt, percentile from
-	// the ledger). M1 volumes make the second ride a handful of rows.
-	as2 := sql.Table(entabilityscore.Table)
+	// Two rides over the records themselves: the ability ledger stays the
+	// dormant E3 inheritance E5-b ruled (no business hand writes it), so
+	// the cross-session bests aggregate the record-level authoritative
+	// score the report board itself trusts — the ability rides the test
+	// join, the same ownership shape the board's other reads use. Only
+	// scored attempts carry a best (a played-but-unjudged round keeps its
+	// ability honestly absent, the line law the session report holds).
+	// First ride: per-ability best/sessions/last-at; second: the best's
+	// own grade (the newest record at the best score wins). The
+	// percentile stays honestly absent until the cohort face is a service
+	// — the ledger's percentile column was its promised seat, never
+	// written.
 	tr := sql.Table(enttestrecord.Table)
+	t := sql.Table(enttest.Table)
 	client := rp.Platform.GetClient(ctx)
 
 	var agg []*struct {
-		Ability string    `json:"ability"`
-		Best    float64   `json:"best"`
-		Sessions int      `json:"sessions"`
-		LastAt  time.Time `json:"last_at"`
+		Ability  string    `json:"ability"`
+		Best     float64   `json:"best"`
+		Sessions int       `json:"sessions"`
+		LastAt   time.Time `json:"last_at"`
 	}
-	err := client.AbilityScore.Query().
+	err := client.TestRecord.Query().
 		Modify(func(s *sql.Selector) {
-			s.Join(tr).On(tr.C(enttestrecord.FieldID), as2.C(entabilityscore.FieldRecordID)).
+			s.Join(t).On(t.C(enttest.FieldCode), tr.C(enttestrecord.FieldTestCode)).
 				Where(sql.And(
-					sql.EQ(as2.C(entabilityscore.FieldUserID), userID),
-					sql.IsNull(as2.C(entabilityscore.FieldDeletedAt)),
+					sql.EQ(tr.C(enttestrecord.FieldUserID), userID),
 					sql.EQ(tr.C(enttestrecord.FieldValid), true),
 					sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
+					sql.NotNull(tr.C(enttestrecord.FieldAuthoritativeScore)),
 				))
 			s.Select(
-				as2.C(entabilityscore.FieldAbility),
-				sql.As("max("+as2.C(entabilityscore.FieldScore)+")", "best"),
+				t.C(enttest.FieldAbility),
+				sql.As("max("+tr.C(enttestrecord.FieldAuthoritativeScore)+")", "best"),
 				sql.As("count(distinct "+tr.C(enttestrecord.FieldSessionID)+")", "sessions"),
-				sql.As("max("+as2.C(entabilityscore.FieldCreatedAt)+")", "last_at"),
+				sql.As("max("+tr.C(enttestrecord.FieldCreatedAt)+")", "last_at"),
 			).
-				GroupBy(as2.C(entabilityscore.FieldAbility))
+				GroupBy(t.C(enttest.FieldAbility))
 		}).
 		Scan(ctx, &agg)
 	if err != nil {
@@ -355,41 +364,30 @@ func (rp *boardRP) AbilityBests(ctx context.Context, userID string) ([]DigestAbi
 	out := make([]DigestAbilityRow, 0, len(agg))
 	for _, a := range agg {
 		row := DigestAbilityRow{Ability: a.Ability, Best: a.Best, Sessions: a.Sessions, LastAt: a.LastAt}
-		// The best's own facts: the latest row at the best score carries
-		// the percentile; its attempt carries the grade.
 		var top []*struct {
-			RecordID   string   `json:"record_id"`
-			Percentile *float64 `json:"percentile"`
+			Grade *testrecord.Grade `json:"grade"`
 		}
-		err = client.AbilityScore.Query().
+		err = client.TestRecord.Query().
 			Modify(func(s *sql.Selector) {
-				s.Join(tr).On(tr.C(enttestrecord.FieldID), as2.C(entabilityscore.FieldRecordID)).
+				s.Join(t).On(t.C(enttest.FieldCode), tr.C(enttestrecord.FieldTestCode)).
 					Where(sql.And(
-						sql.EQ(as2.C(entabilityscore.FieldUserID), userID),
-						sql.EQ(as2.C(entabilityscore.FieldAbility), a.Ability),
-						sql.EQ(as2.C(entabilityscore.FieldScore), a.Best),
-						sql.IsNull(as2.C(entabilityscore.FieldDeletedAt)),
+						sql.EQ(tr.C(enttestrecord.FieldUserID), userID),
 						sql.EQ(tr.C(enttestrecord.FieldValid), true),
 						sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
+						sql.NotNull(tr.C(enttestrecord.FieldAuthoritativeScore)),
+						sql.EQ(t.C(enttest.FieldAbility), a.Ability),
+						sql.EQ(tr.C(enttestrecord.FieldAuthoritativeScore), a.Best),
 					)).
-					Select(
-						as2.C(entabilityscore.FieldRecordID),
-						as2.C(entabilityscore.FieldPercentile),
-					).
-					OrderBy(sql.Desc(as2.C(entabilityscore.FieldCreatedAt)))
+					Select(tr.C(enttestrecord.FieldGrade)).
+					OrderBy(sql.Desc(tr.C(enttestrecord.FieldCreatedAt)))
 			}).
 			Scan(ctx, &top)
 		if err != nil {
 			return nil, rp.Platform.HandleEntError(err)
 		}
-		if len(top) > 0 {
-			row.Percentile = top[0].Percentile
-			if rec, gerr := client.TestRecord.Get(ctx, top[0].RecordID); gerr == nil {
-				if rec.Grade != nil {
-					g := string(*rec.Grade)
-					row.BestGrade = &g
-				}
-			}
+		if len(top) > 0 && top[0].Grade != nil {
+			g := string(*top[0].Grade)
+			row.BestGrade = &g
 		}
 		out = append(out, row)
 	}
@@ -501,31 +499,33 @@ func (rp *boardRP) LatestSessions(ctx context.Context, userID string) ([]Session
 }
 
 func (rp *boardRP) PreviousSessionScores(ctx context.Context, userID string, before time.Time) (map[string]float64, error) {
-	// Per ability, the latest ledger row older than the session's own
+	// Per ability, the latest valid record older than the session's own
 	// first attempt — everything this session wrote sits at or after it.
-	// The rows are a member's whole history (a handful), so the
-	// latest-per-ability cut runs in memory over one ordered read.
-	as2 := sql.Table(entabilityscore.Table)
+	// The records themselves carry the truth (the ability ledger stays the
+	// dormant inheritance E5-b ruled); the rows are a member's whole
+	// history (a handful), so the latest-per-ability cut runs in memory
+	// over one ordered read.
 	tr := sql.Table(enttestrecord.Table)
+	t := sql.Table(enttest.Table)
 	var rows []*struct {
 		Ability string  `json:"ability"`
 		Score   float64 `json:"score"`
 	}
-	err := rp.Platform.GetClient(ctx).AbilityScore.Query().
+	err := rp.Platform.GetClient(ctx).TestRecord.Query().
 		Modify(func(s *sql.Selector) {
-			s.Join(tr).On(tr.C(enttestrecord.FieldID), as2.C(entabilityscore.FieldRecordID)).
+			s.Join(t).On(t.C(enttest.FieldCode), tr.C(enttestrecord.FieldTestCode)).
 				Where(sql.And(
-					sql.EQ(as2.C(entabilityscore.FieldUserID), userID),
-					sql.IsNull(as2.C(entabilityscore.FieldDeletedAt)),
+					sql.EQ(tr.C(enttestrecord.FieldUserID), userID),
 					sql.EQ(tr.C(enttestrecord.FieldValid), true),
 					sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
-					sql.LT(as2.C(entabilityscore.FieldCreatedAt), before),
+					sql.NotNull(tr.C(enttestrecord.FieldAuthoritativeScore)),
+					sql.LT(tr.C(enttestrecord.FieldCreatedAt), before),
 				)).
 				Select(
-					as2.C(entabilityscore.FieldAbility),
-					as2.C(entabilityscore.FieldScore),
+					t.C(enttest.FieldAbility),
+					sql.As(tr.C(enttestrecord.FieldAuthoritativeScore), "score"),
 				).
-				OrderBy(sql.Desc(as2.C(entabilityscore.FieldCreatedAt)))
+				OrderBy(sql.Desc(tr.C(enttestrecord.FieldCreatedAt)))
 		}).
 		Scan(ctx, &rows)
 	if err != nil {

@@ -87,10 +87,10 @@ export function SessionDonePage() {
             <Check aria-hidden className="text-[#22D3EE]" size={40} strokeWidth={2.5} />
           </div>
           <div className="text-ink relative mt-2.5 text-2xl font-extrabold">
-            {m.session_done_hero()}
+            {m.report_session_hero()}
           </div>
           <div className="text-ink-tertiary relative mt-1 text-[12px]">
-            {m.session_done_line({ done: tested, total })}
+            {m.report_session_line({ done: tested, total })}
           </div>
         </div>
 
@@ -103,10 +103,10 @@ export function SessionDonePage() {
                 className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(234,179,8,0.16),transparent_70%)]"
               />
               <div className="text-ink-tertiary relative text-[12px]">
-                {m.session_done_top_label()}
+                {m.report_session_top_label()}
               </div>
               <div className="text-grade-s relative mt-2 text-3xl font-black tracking-tight">
-                {m.session_done_top_score({
+                {m.report_session_top_score({
                   ability: abilityWord(top.ability).cn,
                   score: Math.round(top.bestScore * 10) / 10,
                 })}
@@ -115,7 +115,7 @@ export function SessionDonePage() {
                 <TierChip grade={top.bestGrade} />
                 {top.percentile !== undefined ? (
                   <span className="rounded-full bg-[rgba(34,197,94,0.15)] px-2.5 py-0.75 text-[11px] font-semibold text-[#6EE7B7]">
-                    {m.session_done_top_beat({ pct: Math.round(top.percentile) })}
+                    {m.report_session_top_beat({ pct: Math.round(top.percentile) })}
                   </span>
                 ) : null}
               </div>
@@ -153,9 +153,9 @@ export function SessionDonePage() {
         ) : (
           /* The honest empty board: no scored ability, no invented winner. */
           <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-5 text-center backdrop-blur-md">
-            <div className="text-ink text-sm font-extrabold">{m.session_done_empty_title()}</div>
+            <div className="text-ink text-sm font-extrabold">{m.report_session_empty_title()}</div>
             <div className="text-ink-tertiary mt-1.5 text-[11.5px] leading-[1.7]">
-              {m.session_done_empty_desc()}
+              {m.report_session_empty_desc()}
             </div>
           </div>
         )}
@@ -178,7 +178,7 @@ export function SessionDonePage() {
             onPress={() => void navigate({ to: "/" })}
           >
             <House aria-hidden size={16} />
-            {m.session_done_cta_home()}
+            {m.report_session_cta_home()}
           </Button>
         </div>
       </div>
