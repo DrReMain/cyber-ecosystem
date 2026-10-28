@@ -46,6 +46,17 @@ service AuthService {
       body: "*"
     };
   }
+  rpc SendSmsCode(SendSmsCodeRequest) returns (SendSmsCodeResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "发送短信验证码：铸造一次性 state 供 LoginByIdentity 消费"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/send-sms-code"
+      body: "*"
+    };
+  }
   rpc BindCredential(BindCredentialRequest) returns (BindCredentialResponse) {
     option (cyber.ext.v1.method) = {
       comment: "绑定第三方身份凭证"
@@ -107,7 +118,11 @@ message LoginByIdentityRequest {
   oneof payload {
     option (buf.validate.oneof).required = true;
     WeChatIdentityPayload wechat = 2;
+    SmsIdentityPayload sms = 4;
   }
+  // The state is the one-shot proof a flow began: Begin mints it for
+  // redirect providers, SendSmsCode for direct-code ones; the exchange
+  // consumes it exactly once.
   optional string state = 3 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 1,
@@ -120,6 +135,20 @@ message WeChatIdentityPayload {
   optional string code = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 1
+  ];
+}
+
+// The direct-code payload: the phone the code was sent to plus the code
+// itself. The contract checks phone shape and code charset only; which
+// market the phone belongs to is the provider's channel knowledge.
+message SmsIdentityPayload {
+  optional string phone = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[0-9+]{5,20}$"
+  ];
+  optional string code = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[0-9]{6}$"
   ];
 }
 
@@ -144,6 +173,24 @@ message BeginIdentityLoginRequest {
 
 message BeginIdentityLoginResponse {
   string authorize_url = 1;
+}
+
+message SendSmsCodeRequest {
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  optional string phone = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[0-9+]{5,20}$"
+  ];
+}
+
+message SendSmsCodeResponse {
+  // The one-shot state the caller presents at LoginByIdentity — the same
+  // shape Begin mints for redirect flows.
+  string state = 1;
 }
 
 message BindCredentialRequest {

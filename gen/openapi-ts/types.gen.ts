@@ -754,6 +754,12 @@ export type CyberSystemV1ListUsersResponse = {
 export type CyberSystemV1LoginByIdentityRequest = {
     provider?: string;
     wechat?: CyberSystemV1WeChatIdentityPayload;
+    sms?: CyberSystemV1SmsIdentityPayload;
+    /**
+     * The state is the one-shot proof a flow began: Begin mints it for
+     * redirect providers, SendSmsCode for direct-code ones; the exchange
+     * consumes it exactly once.
+     */
     state?: string;
 };
 
@@ -973,6 +979,19 @@ export type CyberSystemV1RoleMember = {
     createdAt?: string;
 };
 
+export type CyberSystemV1SendSmsCodeRequest = {
+    provider?: string;
+    phone?: string;
+};
+
+export type CyberSystemV1SendSmsCodeResponse = {
+    /**
+     * The one-shot state the caller presents at LoginByIdentity — the same
+     * shape Begin mints for redirect flows.
+     */
+    state?: string;
+};
+
 /**
  * RPC service descriptor.
  */
@@ -1001,6 +1020,16 @@ export type CyberSystemV1Service = {
      * Service methods.
      */
     methods?: Array<CyberSystemV1Method>;
+};
+
+/**
+ * The direct-code payload: the phone the code was sent to plus the code
+ * itself. The contract checks phone shape and code charset only; which
+ * market the phone belongs to is the provider's channel knowledge.
+ */
+export type CyberSystemV1SmsIdentityPayload = {
+    phone?: string;
+    code?: string;
 };
 
 /**
@@ -1691,6 +1720,22 @@ export type AuthServiceLogoutResponses = {
 };
 
 export type AuthServiceLogoutResponse = AuthServiceLogoutResponses[keyof AuthServiceLogoutResponses];
+
+export type AuthServiceSendSmsCodeData = {
+    body: CyberSystemV1SendSmsCodeRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/send-sms-code';
+};
+
+export type AuthServiceSendSmsCodeResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1SendSmsCodeResponse;
+};
+
+export type AuthServiceSendSmsCodeResponse = AuthServiceSendSmsCodeResponses[keyof AuthServiceSendSmsCodeResponses];
 
 export type RoleServiceExplainOperationData = {
     body?: never;

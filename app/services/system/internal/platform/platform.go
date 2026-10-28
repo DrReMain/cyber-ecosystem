@@ -17,6 +17,7 @@ type EntErrorHandler func(error) error
 type CacheErrorHandler func(error) error
 type StorageErrorHandler func(error) error
 type MQErrorHandler func(error) error
+type SmsErrorHandler func(error) error
 
 type Platform struct {
 	cache              *cache.Cache
@@ -83,4 +84,6 @@ var ProviderSet = wire.NewSet(
 	NewStorageErrorHandler,
 	NewMQ,
 	NewMQErrorHandler,
+	NewSms,
+	NewSmsErrorHandler,
 )

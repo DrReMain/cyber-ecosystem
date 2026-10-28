@@ -60,6 +60,10 @@
   "error_INFRA_ERROR_PAYMENT_TIMEOUT": "支付请求超时，请稍后重试",
   "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "支付通知校验失败，请稍后重试",
   "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "支付通知解密失败，请稍后重试",
+  "error_INFRA_ERROR_SMS_INVALID_ARGUMENT": "短信请求无效，请稍后重试",
+  "error_INFRA_ERROR_SMS_CHANNEL_REJECTED": "短信通道拒绝了本次请求，请稍后重试",
+  "error_INFRA_ERROR_SMS_UNAVAILABLE": "短信通道暂时不可用，请稍后重试",
+  "error_INFRA_ERROR_SMS_TIMEOUT": "短信通道响应超时，请稍后重试",
   "error_FLOW_ERROR_UNSPECIFIED": "服务内部错误，请稍后重试",
   "error_FLOW_ERROR_RATE_LIMITED": "操作过于频繁，请稍后再试",
   "error_FLOW_ERROR_CIRCUIT_BREAKER": "服务暂不可用，请稍后重试",
@@ -96,5 +100,7 @@
   "error_SYSTEM_POPULATION_NOT_FOUND": "用户类型不存在",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "身份提供方未配置或已停用",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "第三方身份交换失败",
-  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "该第三方身份已绑定其他账号"
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "该第三方身份已绑定其他账号",
+  "error_SYSTEM_SMS_RATE_LIMITED": "验证码发送过于频繁，请稍后再试",
+  "error_SYSTEM_SMS_CODE_INVALID": "验证码错误或已过期，请重新获取"
 }

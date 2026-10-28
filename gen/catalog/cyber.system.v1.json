@@ -131,6 +131,19 @@
         "comment": "登出",
         "access": "BUILTIN",
         "datascope": false
+      },
+      {
+        "name": "SendSmsCode",
+        "full_name": "cyber.system.v1.AuthService.SendSmsCode",
+        "request_name": "SendSmsCodeRequest",
+        "request_full_name": "cyber.system.v1.SendSmsCodeRequest",
+        "response_name": "SendSmsCodeResponse",
+        "response_full_name": "cyber.system.v1.SendSmsCodeResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/send-sms-code",
+        "comment": "发送短信验证码：铸造一次性 state 供 LoginByIdentity 消费",
+        "access": "PUBLIC",
+        "datascope": false
       }
     ]
   },

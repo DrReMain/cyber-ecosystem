@@ -57,4 +57,10 @@ enum InfraError {
   INFRA_ERROR_PAYMENT_TIMEOUT = 3505 [(.errors.code) = 504];
   INFRA_ERROR_PAYMENT_INVALID_SIGNATURE = 3506 [(.errors.code) = 400];
   INFRA_ERROR_PAYMENT_DECRYPT_FAILED = 3507 [(.errors.code) = 400];
+
+  // 36xx: Sms
+  INFRA_ERROR_SMS_INVALID_ARGUMENT = 3600 [(.errors.code) = 400];
+  INFRA_ERROR_SMS_CHANNEL_REJECTED = 3601 [(.errors.code) = 422];
+  INFRA_ERROR_SMS_UNAVAILABLE = 3602 [(.errors.code) = 503];
+  INFRA_ERROR_SMS_TIMEOUT = 3603 [(.errors.code) = 504];
 }

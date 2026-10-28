@@ -97,6 +97,30 @@ func ErrorSystemIdentityAlreadyBound(format string, args ...interface{}) *errors
 	return errors.New(409, System_SYSTEM_IDENTITY_ALREADY_BOUND.String(), fmt.Sprintf(format, args...))
 }
 
+func IsSystemSmsRateLimited(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_SMS_RATE_LIMITED.String() && e.Code == 429
+}
+
+func ErrorSystemSmsRateLimited(format string, args ...interface{}) *errors.Error {
+	return errors.New(429, System_SYSTEM_SMS_RATE_LIMITED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemSmsCodeInvalid(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_SMS_CODE_INVALID.String() && e.Code == 401
+}
+
+func ErrorSystemSmsCodeInvalid(format string, args ...interface{}) *errors.Error {
+	return errors.New(401, System_SYSTEM_SMS_CODE_INVALID.String(), fmt.Sprintf(format, args...))
+}
+
 // 601x: dept
 func IsSystemDeptSelfParent(err error) bool {
 	if err == nil {

@@ -60,6 +60,10 @@
   "error_INFRA_ERROR_PAYMENT_TIMEOUT": "انتهت مهلة طلب الدفع، حاول مرة أخرى لاحقًا",
   "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "فشل التحقق من إشعار الدفع، حاول مرة أخرى لاحقًا",
   "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "فشل فك تشفير إشعار الدفع، حاول مرة أخرى لاحقًا",
+  "error_INFRA_ERROR_SMS_INVALID_ARGUMENT": "طلب الرسالة غير صالح — يرجى المحاولة بعد قليل",
+  "error_INFRA_ERROR_SMS_CHANNEL_REJECTED": "رفضت قناة الرسائل هذا الطلب — يرجى المحاولة بعد قليل",
+  "error_INFRA_ERROR_SMS_UNAVAILABLE": "قناة الرسائل غير متاحة مؤقتاً — يرجى المحاولة بعد قليل",
+  "error_INFRA_ERROR_SMS_TIMEOUT": "انتهت مهلة استجابة قناة الرسائل — يرجى المحاولة بعد قليل",
   "error_FLOW_ERROR_UNSPECIFIED": "حدث خطأ داخلي. حاول مجددًا بعد قليل.",
   "error_FLOW_ERROR_RATE_LIMITED": "طلبات كثيرة جدًا. حاول مجددًا لاحقًا.",
   "error_FLOW_ERROR_CIRCUIT_BREAKER": "الخدمة غير متاحة مؤقتًا. حاول مجددًا بعد قليل.",
@@ -96,5 +100,7 @@
   "error_SYSTEM_POPULATION_NOT_FOUND": "نوع المستخدم غير موجود",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "مزود الهوية غير مكون أو معطل",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "فشل تبادل الهوية من طرف ثالث",
-  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "هذه الهوية الخارجية مرتبطة بالفعل بحساب آخر"
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "هذه الهوية الخارجية مرتبطة بالفعل بحساب آخر",
+  "error_SYSTEM_SMS_RATE_LIMITED": "تم إرسال رموز التحقق بسرعة كبيرة — يرجى الانتظار قليلاً",
+  "error_SYSTEM_SMS_CODE_INVALID": "الرمز غير صحيح أو منتهي الصلاحية — اطلب رمزاً جديداً"
 }

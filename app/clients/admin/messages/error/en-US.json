@@ -60,6 +60,10 @@
   "error_INFRA_ERROR_PAYMENT_TIMEOUT": "The payment request timed out; try again later",
   "error_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": "Payment notification failed verification; try again later",
   "error_INFRA_ERROR_PAYMENT_DECRYPT_FAILED": "Payment notification could not be decrypted; try again later",
+  "error_INFRA_ERROR_SMS_INVALID_ARGUMENT": "The SMS request was invalid — please try again shortly",
+  "error_INFRA_ERROR_SMS_CHANNEL_REJECTED": "The SMS channel rejected this request — please try again shortly",
+  "error_INFRA_ERROR_SMS_UNAVAILABLE": "The SMS channel is temporarily unavailable — please try again shortly",
+  "error_INFRA_ERROR_SMS_TIMEOUT": "The SMS channel timed out — please try again shortly",
   "error_FLOW_ERROR_UNSPECIFIED": "An internal error occurred. Please try again shortly.",
   "error_FLOW_ERROR_RATE_LIMITED": "Too many requests. Please try again later.",
   "error_FLOW_ERROR_CIRCUIT_BREAKER": "The service is temporarily unavailable. Please try again shortly.",
@@ -96,5 +100,7 @@
   "error_SYSTEM_POPULATION_NOT_FOUND": "User type not found",
   "error_SYSTEM_IDENTITY_PROVIDER_UNKNOWN": "Identity provider is not configured or disabled",
   "error_SYSTEM_IDENTITY_EXCHANGE_FAILED": "Third-party identity exchange failed",
-  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "This third-party identity is already bound to another account"
+  "error_SYSTEM_IDENTITY_ALREADY_BOUND": "This third-party identity is already bound to another account",
+  "error_SYSTEM_SMS_RATE_LIMITED": "Verification codes sent too quickly — please wait a moment",
+  "error_SYSTEM_SMS_CODE_INVALID": "The code is wrong or expired — request a new one"
 }
