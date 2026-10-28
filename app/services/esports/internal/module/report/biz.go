@@ -292,11 +292,11 @@ type AbilityDigest struct {
 }
 
 type CognitiveReport struct {
-	Allowed bool
-	Reason  esportspb.ReportAccessReason
-	Covered int
-	Tested  int
-	Total   int
+	Allowed    bool
+	Reason     esportspb.ReportAccessReason
+	Covered    int
+	Tested     int
+	Total      int
 	Dimensions []CognitiveDimensionRow // only fully-fed dimensions; a missing dimension is an absent row, never a zero axis
 	Composite  *float64
 	Tier       string
@@ -309,9 +309,9 @@ type CognitiveDimensionRow struct {
 }
 
 type TrendReport struct {
-	Sessions int
-	Abilities []TrendSeriesRow
-	AdvancedAllowed bool                      // the advanced tier's gate — the base tier is free for anyone who has tested, the advanced content a later face
+	Sessions        int
+	Abilities       []TrendSeriesRow
+	AdvancedAllowed bool // the advanced tier's gate — the base tier is free for anyone who has tested, the advanced content a later face
 	AdvancedReason  esportspb.ReportAccessReason
 }
 
@@ -350,12 +350,12 @@ type CareerReport struct {
 }
 
 type CareerRecommendationRow struct {
-	Area, Name       string
-	Matched          float64
-	Basis            []string
-	EliminationRate  float64
+	Area, Name        string
+	Matched           float64
+	Basis             []string
+	EliminationRate   float64
 	TrainingIntensity string
-	Suggestion       string
+	Suggestion        string
 }
 
 type CareerImprovementRow struct { // the weakest rendered dimensions first — the excellence line is the system's own tierA, the gap measured against it, never against a private constant

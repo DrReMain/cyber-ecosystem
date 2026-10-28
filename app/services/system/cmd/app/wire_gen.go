@@ -104,6 +104,26 @@ func wireApp(confServer *conf.Server, data *conf.Data, catalog *conf.Catalog, co
 	userUC := user.NewUserUC(logger, platformPlatform, userRP, deptRP, fileRP, populationRP)
 	userService := user.NewUserService(logger, userUC)
 	transferService := transfer.NewTransferService(logger)
+	wechatProvider := auth.NewWechatProvider()
+	sender, err := platform.NewSms(confAuth, logger)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	smsErrorHandler, err := platform.NewSmsErrorHandler()
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	tokenRP := auth.NewTokenRP(logger, platformPlatform)
+	smsProvider := auth.NewSmsProvider(logger, sender, smsErrorHandler, cacheErrorHandler, cache, tokenRP)
+	v := auth.NewIdentityProviders(wechatProvider, smsProvider)
 	authzRP, err := authz.NewAuthzRP(logger, platformPlatform)
 	if err != nil {
 		cleanup4()
@@ -113,8 +133,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, catalog *conf.Catalog, co
 		return nil, nil, err
 	}
 	tenantRP := tenant.NewTenantRP(logger, platformPlatform)
-	tokenRP := auth.NewTokenRP(logger, platformPlatform)
-	authUC, err := auth.NewAuthUC(logger, platformPlatform, confAuth, userRP, authzRP, tenantRP, populationRP, tokenRP)
+	authUC, err := auth.NewAuthUC(logger, platformPlatform, confAuth, v, userRP, authzRP, tenantRP, populationRP, tokenRP)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -147,10 +166,10 @@ func wireApp(confServer *conf.Server, data *conf.Data, catalog *conf.Catalog, co
 	tenantService := tenant.NewTenantService(logger, tenantUC)
 	populationUC := population.NewPopulationUC(logger, platformPlatform, populationRP)
 	populationService := population.NewPopulationService(logger, populationUC)
-	v := server.NewRegistrarList(deptService, resourceService, userService, transferService, authService, roleService, policyService, auditService, fileService, fileProxyService, filePresignService, introspectService, tenantService, populationService)
-	grpcServer := server.NewGRPCServer(confServer, logger, v, authUC, authzUC, auditUC)
-	httpServer := server.NewHTTPServer(confServer, logger, v, authUC, authzUC, auditUC)
-	connectServer := server.NewConnectServer(confServer, logger, v, authUC, authzUC, auditUC)
+	v2 := server.NewRegistrarList(deptService, resourceService, userService, transferService, authService, roleService, policyService, auditService, fileService, fileProxyService, filePresignService, introspectService, tenantService, populationService)
+	grpcServer := server.NewGRPCServer(confServer, logger, v2, authUC, authzUC, auditUC)
+	httpServer := server.NewHTTPServer(confServer, logger, v2, authUC, authzUC, auditUC)
+	connectServer := server.NewConnectServer(confServer, logger, v2, authUC, authzUC, auditUC)
 	bootstrapSeed, err := bootstrap.NewSeed(seed, platformPlatform, logger)
 	if err != nil {
 		cleanup5()

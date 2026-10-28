@@ -67,6 +67,11 @@ const (
 	InfraError_INFRA_ERROR_PAYMENT_TIMEOUT           InfraError = 3505
 	InfraError_INFRA_ERROR_PAYMENT_INVALID_SIGNATURE InfraError = 3506
 	InfraError_INFRA_ERROR_PAYMENT_DECRYPT_FAILED    InfraError = 3507
+	// 36xx: Sms
+	InfraError_INFRA_ERROR_SMS_INVALID_ARGUMENT InfraError = 3600
+	InfraError_INFRA_ERROR_SMS_CHANNEL_REJECTED InfraError = 3601
+	InfraError_INFRA_ERROR_SMS_UNAVAILABLE      InfraError = 3602
+	InfraError_INFRA_ERROR_SMS_TIMEOUT          InfraError = 3603
 )
 
 // Enum value maps for InfraError.
@@ -108,6 +113,10 @@ var (
 		3505: "INFRA_ERROR_PAYMENT_TIMEOUT",
 		3506: "INFRA_ERROR_PAYMENT_INVALID_SIGNATURE",
 		3507: "INFRA_ERROR_PAYMENT_DECRYPT_FAILED",
+		3600: "INFRA_ERROR_SMS_INVALID_ARGUMENT",
+		3601: "INFRA_ERROR_SMS_CHANNEL_REJECTED",
+		3602: "INFRA_ERROR_SMS_UNAVAILABLE",
+		3603: "INFRA_ERROR_SMS_TIMEOUT",
 	}
 	InfraError_value = map[string]int32{
 		"INFRA_ERROR_UNSPECIFIED":               0,
@@ -146,6 +155,10 @@ var (
 		"INFRA_ERROR_PAYMENT_TIMEOUT":           3505,
 		"INFRA_ERROR_PAYMENT_INVALID_SIGNATURE": 3506,
 		"INFRA_ERROR_PAYMENT_DECRYPT_FAILED":    3507,
+		"INFRA_ERROR_SMS_INVALID_ARGUMENT":      3600,
+		"INFRA_ERROR_SMS_CHANNEL_REJECTED":      3601,
+		"INFRA_ERROR_SMS_UNAVAILABLE":           3602,
+		"INFRA_ERROR_SMS_TIMEOUT":               3603,
 	}
 )
 
@@ -180,7 +193,7 @@ var File_cyber_shared_errors_v1_infra_proto protoreflect.FileDescriptor
 
 const file_cyber_shared_errors_v1_infra_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/shared/errors/v1/infra.proto\x12\x16cyber.shared.errors.v1\x1a\x13errors/errors.proto*\xf0\v\n" +
+	"\"cyber/shared/errors/v1/infra.proto\x12\x16cyber.shared.errors.v1\x1a\x13errors/errors.proto*\x96\r\n" +
 	"\n" +
 	"InfraError\x12!\n" +
 	"\x17INFRA_ERROR_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12&\n" +
@@ -218,7 +231,11 @@ const file_cyber_shared_errors_v1_infra_proto_rawDesc = "" +
 	"\x1fINFRA_ERROR_PAYMENT_UNAVAILABLE\x10\xb0\x1b\x1a\x04\xa8E\xf7\x03\x12&\n" +
 	"\x1bINFRA_ERROR_PAYMENT_TIMEOUT\x10\xb1\x1b\x1a\x04\xa8E\xf8\x03\x120\n" +
 	"%INFRA_ERROR_PAYMENT_INVALID_SIGNATURE\x10\xb2\x1b\x1a\x04\xa8E\x90\x03\x12-\n" +
-	"\"INFRA_ERROR_PAYMENT_DECRYPT_FAILED\x10\xb3\x1b\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\xf4\x03B/Z-cyber-ecosystem/gen/go/cyber/shared/errors/v1b\x06proto3"
+	"\"INFRA_ERROR_PAYMENT_DECRYPT_FAILED\x10\xb3\x1b\x1a\x04\xa8E\x90\x03\x12+\n" +
+	" INFRA_ERROR_SMS_INVALID_ARGUMENT\x10\x90\x1c\x1a\x04\xa8E\x90\x03\x12+\n" +
+	" INFRA_ERROR_SMS_CHANNEL_REJECTED\x10\x91\x1c\x1a\x04\xa8E\xa6\x03\x12&\n" +
+	"\x1bINFRA_ERROR_SMS_UNAVAILABLE\x10\x92\x1c\x1a\x04\xa8E\xf7\x03\x12\"\n" +
+	"\x17INFRA_ERROR_SMS_TIMEOUT\x10\x93\x1c\x1a\x04\xa8E\xf8\x03\x1a\x04\xa0E\xf4\x03B/Z-cyber-ecosystem/gen/go/cyber/shared/errors/v1b\x06proto3"
 
 var (
 	file_cyber_shared_errors_v1_infra_proto_rawDescOnce sync.Once

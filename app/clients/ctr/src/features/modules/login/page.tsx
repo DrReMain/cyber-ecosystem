@@ -19,14 +19,18 @@ import { m } from "#/paraglide/messages";
 import { getLocale } from "#/paraglide/runtime";
 import { routeAfterLogin } from "./after-login";
 import { loginFn } from "./login.fn";
+import { smsFailureCopy, useSmsLogin } from "./sms";
 import { AgreeBox } from "./ui/agree-box";
+import { LoginFooter } from "./ui/login-footer";
+import { inputClass, SmsFields } from "./ui/sms-fields";
 import { beginWechatLoginFn } from "./wechat.fn";
 
 type FieldError = "short" | "generic" | null;
 
-// The login verdict branches per reason — wrong password, no seat at this
-// client's door, a disabled account, a disabled tenant are different stories
-// with different next actions; none of them collapses into "bad credentials".
+// The password leg's verdict branches per reason — wrong password, no seat
+// at this client's door, a disabled account, a disabled tenant are different
+// stories with different next actions; none of them collapses into "bad
+// credentials".
 function failureCopy(error: FieldError, reason: string | undefined): string | null {
   if (error === "short") return m.login_password_short();
   if (error === "generic") return m.login_error_generic();
@@ -46,9 +50,6 @@ function failureCopy(error: FieldError, reason: string | undefined): string | nu
   }
 }
 
-const inputClass =
-  "w-full rounded-control border border-line bg-surface-input px-3.5 py-[13px] text-[15px] text-ink outline-none placeholder:text-ink-tertiary focus:border-focus";
-
 export function LoginPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -62,6 +63,12 @@ export function LoginPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const [agree, setAgree] = useState({ privacy: false, user: false });
   const [missing, setMissing] = useState({ privacy: false, user: false });
+  const [mode, setMode] = useState<"code" | "password">("code");
+
+  const sms = useSmsLogin(async () => {
+    toast.success(m.login_success());
+    await routeAfterLogin({ navigate, queryClient, transport }, next);
+  });
 
   // WeChat-only login env: snsapi authorize needs the WeChat browser. The
   // check runs post-mount — SSR renders the same dimmed state, so hydration
@@ -109,9 +116,59 @@ export function LoginPage() {
     return `flex items-start gap-2.5 py-1.5 ${missing[field] ? "text-danger-text" : "text-ink-muted"}`;
   }
 
+  function switchMode(target: "code" | "password") {
+    setMode(target);
+    setError(null);
+    setServerReason(undefined);
+    sms.resetVerdicts();
+  }
+
+  // The send also walks the agree gate (the prototype's rule: 发送验证码也
+  // 校验); the hook owns the phone verdict and the server's 60s window.
+  function onSendCode() {
+    if (!agreeOK()) {
+      return;
+    }
+    void sms.send();
+  }
+
+  async function submitCode() {
+    if (sms.state === "") {
+      toast(m.login_code_send_first());
+      return;
+    }
+    await sms.submit();
+  }
+
+  async function onWechat() {
+    if (!wechatEnv) {
+      toast.error(m.login_error_wechat_env());
+      return;
+    }
+    if (!agreeOK()) {
+      return;
+    }
+    setWechatPending(true);
+    setError(null);
+    try {
+      // No query on the redirect_uri: WeChat's authorize validation rejects
+      // embedded queries, so the post-login hop is always derived afresh.
+      const redirectUri = `${window.location.origin}/login/wechat/callback`;
+      const res = await beginWechatLoginFn({ data: { redirectUri } });
+      window.location.href = res.authorizeUrl;
+    } catch {
+      setWechatPending(false);
+      setError("generic");
+    }
+  }
+
   async function onSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!agreeOK()) {
+      return;
+    }
+    if (mode === "code") {
+      await submitCode();
       return;
     }
     const form = new FormData(event.currentTarget);
@@ -143,29 +200,23 @@ export function LoginPage() {
     }
   }
 
-  async function onWechat() {
-    if (!wechatEnv) {
-      toast.error(m.login_error_wechat_env());
-      return;
+  // One error line for the whole form, as the prototype draws it: field
+  // verdicts first, then the server's reason story.
+  function codeModeCopy(): string | null {
+    if (sms.failed) {
+      return m.login_error_generic();
     }
-    if (!agreeOK()) {
-      return;
+    if (sms.phoneErr) {
+      return m.login_error_sms_phone();
     }
-    setWechatPending(true);
-    setError(null);
-    try {
-      // No query on the redirect_uri: WeChat's authorize validation rejects
-      // embedded queries, so the post-login hop is always derived afresh.
-      const redirectUri = `${window.location.origin}/login/wechat/callback`;
-      const res = await beginWechatLoginFn({ data: { redirectUri } });
-      window.location.href = res.authorizeUrl;
-    } catch {
-      setWechatPending(false);
-      setError("generic");
+    if (sms.codeErr) {
+      return m.login_error_sms_code_short();
     }
+    return smsFailureCopy(sms.reason);
   }
 
-  const errorCopy = failureCopy(error, serverReason);
+  const errorCopy = mode === "code" ? codeModeCopy() : failureCopy(error, serverReason);
+  const busy = pending || sms.pending || sms.sending;
 
   return (
     <AmbientLayout dense>
@@ -184,51 +235,68 @@ export function LoginPage() {
         <div aria-hidden className="h-2 shrink-0" />
 
         {/* Segment keeps the prototype's two-mode shape and DOM order — code
-            first — so flipping the default tab on when the system SMS
-            contract exists moves no nodes. The SMS tab stays a disabled
-            slot until then. */}
+            first and default now that the system SMS contract exists. */}
         <div className="border-line-soft bg-surface-input/90 rounded-control flex gap-1 border p-1">
           <button
-            className="text-ink-muted flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] active:opacity-60"
-            onClick={() => toast.info(m.common_soon())}
+            className={
+              mode === "code"
+                ? "bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] font-bold"
+                : "text-ink-muted flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] active:opacity-60"
+            }
+            onClick={() => switchMode("code")}
             type="button"
           >
             {m.login_tab_code()}
           </button>
-          <div className="bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] font-bold">
+          <button
+            className={
+              mode === "password"
+                ? "bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] font-bold"
+                : "text-ink-muted flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] active:opacity-60"
+            }
+            onClick={() => switchMode("password")}
+            type="button"
+          >
             {m.login_tab_password()}
-          </div>
+          </button>
         </div>
 
         <Form className="flex flex-col gap-4" onSubmit={onSubmit} ref={formRef}>
-          {/* aria-label, not a visually-hidden Label: sr-only text still leaks
-              into innerText, and the prototype's fields are label-less. */}
-          <TextField
-            aria-label={m.login_account_label()}
-            autoComplete="username"
-            isRequired
-            name="account"
-            type="text"
-          >
-            <Input className={inputClass} placeholder={m.login_account_placeholder()} />
-          </TextField>
-          <TextField
-            aria-label={m.login_password_label()}
-            autoComplete="current-password"
-            isRequired
-            name="password"
-            type="password"
-          >
-            <Input
-              className={inputClass}
-              maxLength={20}
-              placeholder={m.login_password_placeholder()}
-            />
-          </TextField>
+          {mode === "code" ? (
+            <SmsFields onSend={onSendCode} sms={sms} />
+          ) : (
+            <>
+              {/* aria-label, not a visually-hidden Label: sr-only text still
+                  leaks into innerText, and the prototype's fields are
+                  label-less. */}
+              <TextField
+                aria-label={m.login_account_label()}
+                autoComplete="username"
+                isRequired
+                name="account"
+                type="text"
+              >
+                <Input className={inputClass} placeholder={m.login_account_placeholder()} />
+              </TextField>
+              <TextField
+                aria-label={m.login_password_label()}
+                autoComplete="current-password"
+                isRequired
+                name="password"
+                type="password"
+              >
+                <Input
+                  className={inputClass}
+                  maxLength={20}
+                  placeholder={m.login_password_placeholder()}
+                />
+              </TextField>
+            </>
+          )}
           {errorCopy !== null && (
             <div className="flex items-start justify-between gap-2" role="alert">
               <p className="text-danger-text text-[11.5px] leading-snug">{errorCopy}</p>
-              {systemReason(serverReason) === System.LOGIN_SEAT_REQUIRED && (
+              {mode === "password" && systemReason(serverReason) === System.LOGIN_SEAT_REQUIRED && (
                 <button
                   className="tap-zone text-ink-secondary shrink-0 font-bold active:opacity-60"
                   onClick={() => {
@@ -248,8 +316,8 @@ export function LoginPage() {
 
           <div className="flex flex-col gap-1.5">
             {/* The prototype reads top-to-bottom as user row, select-all (on
-              the user row's line, right edge), privacy row, then the minor
-              note indented under the checkbox column. */}
+                the user row's line, right edge), privacy row, then the minor
+                note indented under the checkbox column. */}
             <div className="flex items-start justify-between gap-2.5">
               <CheckboxField
                 isSelected={agree.user}
@@ -325,10 +393,10 @@ export function LoginPage() {
 
           <Button
             className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50"
-            isDisabled={pending}
+            isDisabled={busy}
             type="submit"
           >
-            {pending ? m.login_pending() : m.login_submit()}
+            {busy ? m.login_pending() : m.login_submit()}
           </Button>
         </Form>
 
@@ -351,34 +419,7 @@ export function LoginPage() {
         )}
 
         {/* Forgot-password stays contract-gated (SMS provider). */}
-        <div className="text-ink-tertiary mt-2 text-center text-[10.5px] leading-[1.95]">
-          <button
-            className="tap-zone text-link py-1 active:opacity-60"
-            onClick={() => toast.info(m.common_soon())}
-            type="button"
-          >
-            {m.login_forgot()}
-          </button>
-          <span className="mx-1">{" · "}</span>
-          <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/user">
-            {m.login_footer_user()}
-          </Link>
-          <span className="mx-1">{" · "}</span>
-          <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/privacy">
-            {m.login_footer_privacy()}
-          </Link>
-          <span className="mx-1">{" · "}</span>
-          <Link className="tap-zone text-link py-1 active:opacity-60" to="/">
-            {m.login_footer_home()}
-          </Link>
-        </div>
-        <div className="text-ink-tertiary text-center text-[10.5px] leading-[1.95]">
-          {m.login_footer_company()}
-          {` · `}
-          {m.login_footer_icp()}
-          <br />
-          {m.login_footer_email()}
-        </div>
+        <LoginFooter />
       </div>
     </AmbientLayout>
   );

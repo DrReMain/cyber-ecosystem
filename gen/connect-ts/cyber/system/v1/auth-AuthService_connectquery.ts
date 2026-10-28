@@ -20,6 +20,11 @@ export const loginByIdentity = AuthService.method.loginByIdentity;
 export const beginIdentityLogin = AuthService.method.beginIdentityLogin;
 
 /**
+ * @generated from rpc cyber.system.v1.AuthService.SendSmsCode
+ */
+export const sendSmsCode = AuthService.method.sendSmsCode;
+
+/**
  * @generated from rpc cyber.system.v1.AuthService.BindCredential
  */
 export const bindCredential = AuthService.method.bindCredential;

@@ -150,6 +150,14 @@ message Auth {
       string appid = 1;
       string secret = 2;
     }
+    message Sms {
+      string access_key_id = 1;     // Aliyun RAM key; a credentialed row selects the dysmsapi backend, otherwise the mock backend
+      string access_key_secret = 2; // deploy-plane fact; empty with a non-empty id is a boot error
+      string sign_name = 3;         // channel-assigned signature
+      string template_code = 4;     // channel-assigned template; its own placeholder vocabulary names the params
+      string endpoint = 5;          // RPC endpoint; empty = the kind's default (tests override here)
+      string backend = 6;           // explicit channel choice: "dysmsapi" (credentials required, else boot fails) | "mock" (record, never dial); empty = pick by credentials
+    }
     string key = 1;      // instance registry key
     string kind = 2;     // code-registered kind; boot fails otherwise
     bool enabled = 3;
@@ -157,6 +165,7 @@ message Auth {
     bool auto_register = 6;
     WeChat wechat = 5;
     string population = 7; // landing population for this provider's logins (births and bound entries); empty = the default population
+    Sms sms = 8;
   }
   repeated Provider providers = 1;
 }

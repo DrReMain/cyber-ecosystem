@@ -41,6 +41,8 @@ const (
 	// AuthServiceBeginIdentityLoginProcedure is the fully-qualified name of the AuthService's
 	// BeginIdentityLogin RPC.
 	AuthServiceBeginIdentityLoginProcedure = "/cyber.system.v1.AuthService/BeginIdentityLogin"
+	// AuthServiceSendSmsCodeProcedure is the fully-qualified name of the AuthService's SendSmsCode RPC.
+	AuthServiceSendSmsCodeProcedure = "/cyber.system.v1.AuthService/SendSmsCode"
 	// AuthServiceBindCredentialProcedure is the fully-qualified name of the AuthService's
 	// BindCredential RPC.
 	AuthServiceBindCredentialProcedure = "/cyber.system.v1.AuthService/BindCredential"
@@ -56,6 +58,7 @@ type AuthServiceClient interface {
 	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
 	LoginByIdentity(context.Context, *connect.Request[v1.LoginByIdentityRequest]) (*connect.Response[v1.LoginByIdentityResponse], error)
 	BeginIdentityLogin(context.Context, *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error)
+	SendSmsCode(context.Context, *connect.Request[v1.SendSmsCodeRequest]) (*connect.Response[v1.SendSmsCodeResponse], error)
 	BindCredential(context.Context, *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
@@ -90,6 +93,12 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("BeginIdentityLogin")),
 			connect.WithClientOptions(opts...),
 		),
+		sendSmsCode: connect.NewClient[v1.SendSmsCodeRequest, v1.SendSmsCodeResponse](
+			httpClient,
+			baseURL+AuthServiceSendSmsCodeProcedure,
+			connect.WithSchema(authServiceMethods.ByName("SendSmsCode")),
+			connect.WithClientOptions(opts...),
+		),
 		bindCredential: connect.NewClient[v1.BindCredentialRequest, v1.BindCredentialResponse](
 			httpClient,
 			baseURL+AuthServiceBindCredentialProcedure,
@@ -116,6 +125,7 @@ type authServiceClient struct {
 	login              *connect.Client[v1.LoginRequest, v1.LoginResponse]
 	loginByIdentity    *connect.Client[v1.LoginByIdentityRequest, v1.LoginByIdentityResponse]
 	beginIdentityLogin *connect.Client[v1.BeginIdentityLoginRequest, v1.BeginIdentityLoginResponse]
+	sendSmsCode        *connect.Client[v1.SendSmsCodeRequest, v1.SendSmsCodeResponse]
 	bindCredential     *connect.Client[v1.BindCredentialRequest, v1.BindCredentialResponse]
 	logout             *connect.Client[v1.LogoutRequest, v1.LogoutResponse]
 	getCurrentUser     *connect.Client[v1.GetCurrentUserRequest, v1.GetCurrentUserResponse]
@@ -134,6 +144,11 @@ func (c *authServiceClient) LoginByIdentity(ctx context.Context, req *connect.Re
 // BeginIdentityLogin calls cyber.system.v1.AuthService.BeginIdentityLogin.
 func (c *authServiceClient) BeginIdentityLogin(ctx context.Context, req *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error) {
 	return c.beginIdentityLogin.CallUnary(ctx, req)
+}
+
+// SendSmsCode calls cyber.system.v1.AuthService.SendSmsCode.
+func (c *authServiceClient) SendSmsCode(ctx context.Context, req *connect.Request[v1.SendSmsCodeRequest]) (*connect.Response[v1.SendSmsCodeResponse], error) {
+	return c.sendSmsCode.CallUnary(ctx, req)
 }
 
 // BindCredential calls cyber.system.v1.AuthService.BindCredential.
@@ -156,6 +171,7 @@ type AuthServiceHandler interface {
 	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
 	LoginByIdentity(context.Context, *connect.Request[v1.LoginByIdentityRequest]) (*connect.Response[v1.LoginByIdentityResponse], error)
 	BeginIdentityLogin(context.Context, *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error)
+	SendSmsCode(context.Context, *connect.Request[v1.SendSmsCodeRequest]) (*connect.Response[v1.SendSmsCodeResponse], error)
 	BindCredential(context.Context, *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
@@ -186,6 +202,12 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("BeginIdentityLogin")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authServiceSendSmsCodeHandler := connect.NewUnaryHandler(
+		AuthServiceSendSmsCodeProcedure,
+		svc.SendSmsCode,
+		connect.WithSchema(authServiceMethods.ByName("SendSmsCode")),
+		connect.WithHandlerOptions(opts...),
+	)
 	authServiceBindCredentialHandler := connect.NewUnaryHandler(
 		AuthServiceBindCredentialProcedure,
 		svc.BindCredential,
@@ -212,6 +234,8 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 			authServiceLoginByIdentityHandler.ServeHTTP(w, r)
 		case AuthServiceBeginIdentityLoginProcedure:
 			authServiceBeginIdentityLoginHandler.ServeHTTP(w, r)
+		case AuthServiceSendSmsCodeProcedure:
+			authServiceSendSmsCodeHandler.ServeHTTP(w, r)
 		case AuthServiceBindCredentialProcedure:
 			authServiceBindCredentialHandler.ServeHTTP(w, r)
 		case AuthServiceLogoutProcedure:
@@ -237,6 +261,10 @@ func (UnimplementedAuthServiceHandler) LoginByIdentity(context.Context, *connect
 
 func (UnimplementedAuthServiceHandler) BeginIdentityLogin(context.Context, *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.BeginIdentityLogin is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) SendSmsCode(context.Context, *connect.Request[v1.SendSmsCodeRequest]) (*connect.Response[v1.SendSmsCodeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.SendSmsCode is not implemented"))
 }
 
 func (UnimplementedAuthServiceHandler) BindCredential(context.Context, *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error) {

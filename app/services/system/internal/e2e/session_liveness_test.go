@@ -129,7 +129,8 @@ func TestSessionLivenessLiveE2E(t *testing.T) {
 	tenantRP := tenantmod.NewTenantRP(logger, pf)
 	populationRP := populationmod.NewPopulationRP(logger, pf)
 	tokenRP := authmod.NewTokenRP(logger, pf)
-	uc, err := authmod.NewAuthUC(logger, pf, nil, userRP, authzRP, tenantRP, populationRP, tokenRP)
+	providers, _ := e2eProviders(t, logger, cacheClient, tokenRP)
+	uc, err := authmod.NewAuthUC(logger, pf, nil, providers, userRP, authzRP, tenantRP, populationRP, tokenRP)
 	if err != nil {
 		t.Fatalf("auth uc: %v", err)
 	}

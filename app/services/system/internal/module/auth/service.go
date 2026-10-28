@@ -77,6 +77,14 @@ func (s *AuthService) BeginIdentityLogin(ctx context.Context, in *systempb.Begin
 	return &systempb.BeginIdentityLoginResponse{AuthorizeUrl: redirect}, nil
 }
 
+func (s *AuthService) SendSmsCode(ctx context.Context, in *systempb.SendSmsCodeRequest) (*systempb.SendSmsCodeResponse, error) {
+	state, err := s.authUC.SendSmsCode(ctx, in.GetProvider(), in.GetPhone())
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.SendSmsCodeResponse{State: state}, nil
+}
+
 func (s *AuthService) BindCredential(ctx context.Context, in *systempb.BindCredentialRequest) (*systempb.BindCredentialResponse, error) {
 	if err := s.authUC.BindCredential(ctx, in.GetProvider(), in.GetState(), in); err != nil {
 		return nil, err

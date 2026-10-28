@@ -68,6 +68,7 @@ type TokenRP interface {
 type AuthUC struct {
 	shared.UC
 	auth         *conf.Auth
+	providers    map[string]IdentityProvider
 	userRP       user.UserRP
 	authzRP      authz.AuthzRP
 	tenantRP     tenant.TenantRP
@@ -75,10 +76,10 @@ type AuthUC struct {
 	tokenRP      TokenRP
 }
 
-func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, userRP user.UserRP, authzRP authz.AuthzRP, tenantRP tenant.TenantRP, populationRP population.PopulationRP, tokenRP TokenRP) (*AuthUC, error) {
+func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, providers map[string]IdentityProvider, userRP user.UserRP, authzRP authz.AuthzRP, tenantRP tenant.TenantRP, populationRP population.PopulationRP, tokenRP TokenRP) (*AuthUC, error) {
 	if auth != nil {
 		for _, row := range auth.GetProviders() {
-			if _, ok := identityProviders[row.GetKind()]; !ok {
+			if _, ok := providers[row.GetKind()]; !ok {
 				return nil, fmt.Errorf("auth: provider %q references unregistered kind %q", row.GetKey(), row.GetKind())
 			}
 		}
@@ -86,6 +87,7 @@ func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, user
 	return &AuthUC{
 		UC:           shared.NewUC(logger.With("module", "module/auth"), tm),
 		auth:         auth,
+		providers:    providers,
 		userRP:       userRP,
 		authzRP:      authzRP,
 		tenantRP:     tenantRP,
@@ -159,14 +161,31 @@ func (uc *AuthUC) BeginIdentityLogin(ctx context.Context, providerKey, redirectU
 	if err != nil {
 		return "", err
 	}
-	state, err := utils.RandomToken()
+	// Only jump-capable kinds have an authorize URL; a direct-code kind
+	// (no redirect) refuses the begin flow — its entry is SendSmsCode.
+	rp, ok := p.(redirectProvider)
+	if !ok {
+		return "", systempb.ErrorSystemIdentityProviderUnknown("").WithCause(
+			fmt.Errorf("provider %q has no redirect flow", providerKey))
+	}
+	state, err := mintIdentityState(ctx, uc.tokenRP, providerKey)
 	if err != nil {
 		return "", err
 	}
-	if err = uc.tokenRP.Set(ctx, identityStatePrefix+state, []byte(providerKey), identityStateTTL); err != nil {
+	return rp.AuthorizeURL(row, redirectURI, state), nil
+}
+
+func (uc *AuthUC) SendSmsCode(ctx context.Context, providerKey, phone string) (string, error) {
+	row, p, err := uc.providerRow(providerKey)
+	if err != nil {
 		return "", err
 	}
-	return p.AuthorizeURL(row, redirectURI, state), nil
+	ci, ok := p.(codeIssuer)
+	if !ok {
+		return "", systempb.ErrorSystemIdentityProviderUnknown("").WithCause(
+			fmt.Errorf("provider %q issues no codes", providerKey))
+	}
+	return ci.IssueCode(ctx, row, phone)
 }
 
 func (uc *AuthUC) autoRegister(ctx context.Context, id *exchangedIdentity) (*user.User, error) {
@@ -364,13 +383,13 @@ func (uc *AuthUC) GetCurrentUser(ctx context.Context) (*CurrentUser, error) {
 
 // Private -------------------------------------------------------------------------------------------------------------
 
-func (uc *AuthUC) providerRow(providerKey string) (*conf.Auth_Provider, identityProvider, error) {
+func (uc *AuthUC) providerRow(providerKey string) (*conf.Auth_Provider, IdentityProvider, error) {
 	for _, row := range uc.auth.GetProviders() {
 		if row.GetKey() == providerKey {
 			if !row.GetEnabled() {
 				break
 			}
-			return row, identityProviders[row.GetKind()], nil
+			return row, uc.providers[row.GetKind()], nil
 		}
 	}
 	return nil, nil, systempb.ErrorSystemIdentityProviderUnknown("").WithCause(fmt.Errorf("identity provider %q", providerKey))

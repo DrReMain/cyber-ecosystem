@@ -1600,6 +1600,7 @@ type Auth_Provider struct {
 	AutoRegister  bool                   `protobuf:"varint,6,opt,name=auto_register,json=autoRegister,proto3" json:"auto_register,omitempty"`
 	Wechat        *Auth_Provider_WeChat  `protobuf:"bytes,5,opt,name=wechat,proto3" json:"wechat,omitempty"`
 	Population    string                 `protobuf:"bytes,7,opt,name=population,proto3" json:"population,omitempty"` // landing population for this provider's logins (births and bound entries); empty = the default population
+	Sms           *Auth_Provider_Sms     `protobuf:"bytes,8,opt,name=sms,proto3" json:"sms,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1683,6 +1684,13 @@ func (x *Auth_Provider) GetPopulation() string {
 	return ""
 }
 
+func (x *Auth_Provider) GetSms() *Auth_Provider_Sms {
+	if x != nil {
+		return x.Sms
+	}
+	return nil
+}
+
 type Auth_Provider_WeChat struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Appid         string                 `protobuf:"bytes,1,opt,name=appid,proto3" json:"appid,omitempty"`
@@ -1735,6 +1743,90 @@ func (x *Auth_Provider_WeChat) GetSecret() string {
 	return ""
 }
 
+type Auth_Provider_Sms struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	AccessKeyId     string                 `protobuf:"bytes,1,opt,name=access_key_id,json=accessKeyId,proto3" json:"access_key_id,omitempty"`             // Aliyun RAM key; a credentialed row selects the dysmsapi backend, otherwise the mock backend
+	AccessKeySecret string                 `protobuf:"bytes,2,opt,name=access_key_secret,json=accessKeySecret,proto3" json:"access_key_secret,omitempty"` // deploy-plane fact; empty with a non-empty id is a boot error
+	SignName        string                 `protobuf:"bytes,3,opt,name=sign_name,json=signName,proto3" json:"sign_name,omitempty"`                        // channel-assigned signature
+	TemplateCode    string                 `protobuf:"bytes,4,opt,name=template_code,json=templateCode,proto3" json:"template_code,omitempty"`            // channel-assigned template; its own placeholder vocabulary names the params
+	Endpoint        string                 `protobuf:"bytes,5,opt,name=endpoint,proto3" json:"endpoint,omitempty"`                                        // RPC endpoint; empty = the kind's default (tests override here)
+	Backend         string                 `protobuf:"bytes,6,opt,name=backend,proto3" json:"backend,omitempty"`                                          // explicit channel choice: "dysmsapi" (credentials required, else boot fails) | "mock" (record, never dial); empty = pick by credentials
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *Auth_Provider_Sms) Reset() {
+	*x = Auth_Provider_Sms{}
+	mi := &file_internal_conf_conf_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Auth_Provider_Sms) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Auth_Provider_Sms) ProtoMessage() {}
+
+func (x *Auth_Provider_Sms) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Auth_Provider_Sms.ProtoReflect.Descriptor instead.
+func (*Auth_Provider_Sms) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{5, 0, 1}
+}
+
+func (x *Auth_Provider_Sms) GetAccessKeyId() string {
+	if x != nil {
+		return x.AccessKeyId
+	}
+	return ""
+}
+
+func (x *Auth_Provider_Sms) GetAccessKeySecret() string {
+	if x != nil {
+		return x.AccessKeySecret
+	}
+	return ""
+}
+
+func (x *Auth_Provider_Sms) GetSignName() string {
+	if x != nil {
+		return x.SignName
+	}
+	return ""
+}
+
+func (x *Auth_Provider_Sms) GetTemplateCode() string {
+	if x != nil {
+		return x.TemplateCode
+	}
+	return ""
+}
+
+func (x *Auth_Provider_Sms) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *Auth_Provider_Sms) GetBackend() string {
+	if x != nil {
+		return x.Backend
+	}
+	return ""
+}
+
 type Seed_Population struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"` // join key; declaring the default population is a config error
@@ -1746,7 +1838,7 @@ type Seed_Population struct {
 
 func (x *Seed_Population) Reset() {
 	*x = Seed_Population{}
-	mi := &file_internal_conf_conf_proto_msgTypes[24]
+	mi := &file_internal_conf_conf_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1758,7 +1850,7 @@ func (x *Seed_Population) String() string {
 func (*Seed_Population) ProtoMessage() {}
 
 func (x *Seed_Population) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[24]
+	mi := &file_internal_conf_conf_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1926,9 +2018,9 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\x02db\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x02db\x12/\n" +
 	"\x05cache\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x05cache\"\x1b\n" +
 	"\aCatalog\x12\x10\n" +
-	"\x03dir\x18\x01 \x01(\tR\x03dir\"\xdf\x02\n" +
+	"\x03dir\x18\x01 \x01(\tR\x03dir\"\xe0\x04\n" +
 	"\x04Auth\x127\n" +
-	"\tproviders\x18\x01 \x03(\v2\x19.cyber.conf.Auth.ProviderR\tproviders\x1a\x9d\x02\n" +
+	"\tproviders\x18\x01 \x03(\v2\x19.cyber.conf.Auth.ProviderR\tproviders\x1a\x9e\x04\n" +
 	"\bProvider\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x12\n" +
 	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x18\n" +
@@ -1938,10 +2030,18 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\x06wechat\x18\x05 \x01(\v2 .cyber.conf.Auth.Provider.WeChatR\x06wechat\x12\x1e\n" +
 	"\n" +
 	"population\x18\a \x01(\tR\n" +
-	"population\x1a6\n" +
+	"population\x12/\n" +
+	"\x03sms\x18\b \x01(\v2\x1d.cyber.conf.Auth.Provider.SmsR\x03sms\x1a6\n" +
 	"\x06WeChat\x12\x14\n" +
 	"\x05appid\x18\x01 \x01(\tR\x05appid\x12\x16\n" +
-	"\x06secret\x18\x02 \x01(\tR\x06secret\"\xdf\x01\n" +
+	"\x06secret\x18\x02 \x01(\tR\x06secret\x1a\xcd\x01\n" +
+	"\x03Sms\x12\"\n" +
+	"\raccess_key_id\x18\x01 \x01(\tR\vaccessKeyId\x12*\n" +
+	"\x11access_key_secret\x18\x02 \x01(\tR\x0faccessKeySecret\x12\x1b\n" +
+	"\tsign_name\x18\x03 \x01(\tR\bsignName\x12#\n" +
+	"\rtemplate_code\x18\x04 \x01(\tR\ftemplateCode\x12\x1a\n" +
+	"\bendpoint\x18\x05 \x01(\tR\bendpoint\x12\x18\n" +
+	"\abackend\x18\x06 \x01(\tR\abackend\"\xdf\x01\n" +
 	"\x04Seed\x12!\n" +
 	"\fsuper_admins\x18\x01 \x03(\tR\vsuperAdmins\x12)\n" +
 	"\x10initial_password\x18\x02 \x01(\tR\x0finitialPassword\x12=\n" +
@@ -1964,7 +2064,7 @@ func file_internal_conf_conf_proto_rawDescGZIP() []byte {
 	return file_internal_conf_conf_proto_rawDescData
 }
 
-var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_internal_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),                    // 0: cyber.conf.Bootstrap
 	(*Server)(nil),                       // 1: cyber.conf.Server
@@ -1990,8 +2090,9 @@ var file_internal_conf_conf_proto_goTypes = []any{
 	(*Observability_Log_FileOutput)(nil), // 21: cyber.conf.Observability.Log.FileOutput
 	(*Auth_Provider)(nil),                // 22: cyber.conf.Auth.Provider
 	(*Auth_Provider_WeChat)(nil),         // 23: cyber.conf.Auth.Provider.WeChat
-	(*Seed_Population)(nil),              // 24: cyber.conf.Seed.Population
-	(*durationpb.Duration)(nil),          // 25: google.protobuf.Duration
+	(*Auth_Provider_Sms)(nil),            // 24: cyber.conf.Auth.Provider.Sms
+	(*Seed_Population)(nil),              // 25: cyber.conf.Seed.Population
+	(*durationpb.Duration)(nil),          // 26: google.protobuf.Duration
 }
 var file_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber.conf.Bootstrap.server:type_name -> cyber.conf.Server
@@ -2012,36 +2113,37 @@ var file_internal_conf_conf_proto_depIdxs = []int32{
 	19, // 15: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
 	20, // 16: cyber.conf.Observability.slow_query:type_name -> cyber.conf.Observability.SlowQuery
 	22, // 17: cyber.conf.Auth.providers:type_name -> cyber.conf.Auth.Provider
-	24, // 18: cyber.conf.Seed.populations:type_name -> cyber.conf.Seed.Population
-	25, // 19: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	25, // 20: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	25, // 21: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	25, // 22: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	25, // 23: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
-	25, // 24: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	25, // 25: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	25, // 26: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
-	25, // 27: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
+	25, // 18: cyber.conf.Seed.populations:type_name -> cyber.conf.Seed.Population
+	26, // 19: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	26, // 20: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	26, // 21: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	26, // 22: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	26, // 23: cyber.conf.Data.Redis.conn_max_lifetime:type_name -> google.protobuf.Duration
+	26, // 24: cyber.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	26, // 25: cyber.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	26, // 26: cyber.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
+	26, // 27: cyber.conf.Data.Redis.pool_timeout:type_name -> google.protobuf.Duration
 	14, // 28: cyber.conf.Data.Storage.s3:type_name -> cyber.conf.Data.Storage.S3
 	15, // 29: cyber.conf.Data.MQ.nats:type_name -> cyber.conf.Data.MQ.NATS
 	16, // 30: cyber.conf.Data.MQ.pg:type_name -> cyber.conf.Data.MQ.PG
-	25, // 31: cyber.conf.Data.Storage.S3.presign_ttl:type_name -> google.protobuf.Duration
-	25, // 32: cyber.conf.Data.MQ.NATS.max_age:type_name -> google.protobuf.Duration
-	25, // 33: cyber.conf.Data.MQ.NATS.ack_wait:type_name -> google.protobuf.Duration
-	25, // 34: cyber.conf.Data.MQ.NATS.dlq_max_age:type_name -> google.protobuf.Duration
-	25, // 35: cyber.conf.Data.MQ.NATS.nak_backoff_step:type_name -> google.protobuf.Duration
-	25, // 36: cyber.conf.Data.MQ.PG.poll_interval:type_name -> google.protobuf.Duration
-	25, // 37: cyber.conf.Data.MQ.PG.visibility_timeout:type_name -> google.protobuf.Duration
-	25, // 38: cyber.conf.Data.MQ.PG.retention:type_name -> google.protobuf.Duration
+	26, // 31: cyber.conf.Data.Storage.S3.presign_ttl:type_name -> google.protobuf.Duration
+	26, // 32: cyber.conf.Data.MQ.NATS.max_age:type_name -> google.protobuf.Duration
+	26, // 33: cyber.conf.Data.MQ.NATS.ack_wait:type_name -> google.protobuf.Duration
+	26, // 34: cyber.conf.Data.MQ.NATS.dlq_max_age:type_name -> google.protobuf.Duration
+	26, // 35: cyber.conf.Data.MQ.NATS.nak_backoff_step:type_name -> google.protobuf.Duration
+	26, // 36: cyber.conf.Data.MQ.PG.poll_interval:type_name -> google.protobuf.Duration
+	26, // 37: cyber.conf.Data.MQ.PG.visibility_timeout:type_name -> google.protobuf.Duration
+	26, // 38: cyber.conf.Data.MQ.PG.retention:type_name -> google.protobuf.Duration
 	21, // 39: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
-	25, // 40: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
-	25, // 41: cyber.conf.Observability.SlowQuery.cache:type_name -> google.protobuf.Duration
+	26, // 40: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
+	26, // 41: cyber.conf.Observability.SlowQuery.cache:type_name -> google.protobuf.Duration
 	23, // 42: cyber.conf.Auth.Provider.wechat:type_name -> cyber.conf.Auth.Provider.WeChat
-	43, // [43:43] is the sub-list for method output_type
-	43, // [43:43] is the sub-list for method input_type
-	43, // [43:43] is the sub-list for extension type_name
-	43, // [43:43] is the sub-list for extension extendee
-	0,  // [0:43] is the sub-list for field type_name
+	24, // 43: cyber.conf.Auth.Provider.sms:type_name -> cyber.conf.Auth.Provider.Sms
+	44, // [44:44] is the sub-list for method output_type
+	44, // [44:44] is the sub-list for method input_type
+	44, // [44:44] is the sub-list for extension type_name
+	44, // [44:44] is the sub-list for extension extendee
+	0,  // [0:44] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }
@@ -2055,7 +2157,7 @@ func file_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_conf_conf_proto_rawDesc), len(file_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   25,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
