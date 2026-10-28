@@ -75,7 +75,8 @@ func TestReportReadBackE2E(t *testing.T) {
 	rbClean(t, db)
 
 	uc := report.NewReportUC(logger, pf, report.NewRecordBoardRP(logger, pf), report.NewSnapshotRP(logger, pf),
-		entitle.NewEntitlementRP(logger, pf), profile.NewProfileRP(logger, pf), bootstrap.NewEventSubscriptions(logger))
+		entitle.NewEntitlementRP(logger, pf), entitle.NewReportPolicyRP(logger, pf),
+		profile.NewProfileRP(logger, pf), bootstrap.NewEventSubscriptions(logger))
 	seedCtx := repSubject(rbOwner)
 	now := time.Now()
 
@@ -311,6 +312,274 @@ func rbClean(t *testing.T, db *ent.Client) {
 		t.Fatalf("clean profiles: %v", err)
 	}
 	for _, code := range []string{rbTestA, rbTestB, rbTestD, rbTestM} {
+		if _, err := db.Test.Delete().Where(enttest.Code(code)).Exec(dctx); err != nil {
+			t.Fatalf("clean test %s: %v", code, err)
+		}
+	}
+}
+
+const (
+	rbqFull = "e2erbqfull000000001"
+	rbqPart = "e2erbqpart000000001"
+	rbqPool = "e2erbqpool000000001"
+
+	rbqRS  = "e2erbqrs"
+	rbqAA  = "e2erbqaa"
+	rbqTS  = "e2erbqts"
+	rbqSRA = "e2erbqsra"
+	rbqRA  = "e2erbqra"
+	rbqDE  = "e2erbqde"
+)
+
+// The cluster faces' live probe over a degenerate cohort — every pool
+// row sits at the same score, so each ability's cohort answer is the
+// deterministic side-bench 50 and the golden expectations carry no
+// hand-computed z-scores: all eight dimensions at 50, the composite 50,
+// tier C. A partially-fed member pins the missing-dimension law (four
+// of six abilities feed exactly two of eight dimensions), the trend
+// chronology rides the per-point genre, and the digest's percentile
+// column gets its promised seat back. Gated like its sibling: ENT_E2E=1
+// with the dev database up.
+func TestReportClusterE2E(t *testing.T) {
+	if os.Getenv("ENT_E2E") != "1" {
+		t.Skip("set ENT_E2E=1 with the dev database up to run the cluster end-to-end")
+	}
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+
+	db, closeDB, err := platform.NewEntClient(&conf.Data{Database: &conf.Data_Database{
+		Driver: "postgres", Host: repEnvOr("DB_HOST", "localhost"), Port: 5432,
+		User: "postgres", Password: repEnvOr("DB_PASS", "postgres"), DbName: repEnvOr("DB_NAME", "esports"),
+		MaxOpenConns: 8,
+	}}, logger)
+	if err != nil {
+		t.Fatalf("ent client: %v", err)
+	}
+	pf, err := platform.NewPlatform(db, platform.NewEntErrorHandler(), nil, nil)
+	if err != nil {
+		t.Fatalf("platform: %v", err)
+	}
+	t.Cleanup(func() {
+		rbqClean(t, db)
+		closeDB()
+	})
+	rbqClean(t, db)
+
+	uc := report.NewReportUC(logger, pf, report.NewRecordBoardRP(logger, pf), report.NewSnapshotRP(logger, pf),
+		entitle.NewEntitlementRP(logger, pf), entitle.NewReportPolicyRP(logger, pf),
+		profile.NewProfileRP(logger, pf), bootstrap.NewEventSubscriptions(logger))
+	seedCtx := repSubject(rbqFull)
+	now := time.Now()
+
+	seedTest := func(code, ability string) {
+		t.Helper()
+		if _, err := db.Test.Create().SetCode(code).SetName("e2e cluster " + code).
+			SetCategory("fps").SetAbility(ability).Save(seedCtx); err != nil {
+			t.Fatalf("seed test %s: %v", code, err)
+		}
+	}
+	six := []struct{ code, ability string }{
+		{rbqRS, "reactionSpeed"}, {rbqAA, "aimingAccuracy"}, {rbqTS, "trackingStability"},
+		{rbqSRA, "skillReleaseAccuracy"}, {rbqRA, "resourceAllocation"}, {rbqDE, "decisionEfficiency"},
+	}
+	for _, s := range six {
+		seedTest(s.code, s.ability)
+	}
+	for _, u := range []string{rbqFull, rbqPart, rbqPool} {
+		if _, err := db.Profile.Create().SetUserID(u).
+			SetBirthYear(2010).SetSex(entprofile.Sex("male")).Save(seedCtx); err != nil {
+			t.Fatalf("profile %s: %v", u, err)
+		}
+	}
+	step := func(code, ability string) types.MatchStep {
+		return types.MatchStep{TestCode: code, Ability: ability}
+	}
+	newSession := func(user, genre, status string, steps ...types.MatchStep) *ent.MatchSession {
+		t.Helper()
+		s, serr := db.MatchSession.Create().SetUserID(user).SetGenre(genre).SetStatus(entmatchsession.Status(status)).
+			SetSteps(steps).Save(seedCtx)
+		if serr != nil {
+			t.Fatalf("session %s/%s: %v", user, genre, serr)
+		}
+		return s
+	}
+	record := func(user, code, session string, attempt int, score float64, minutesAgo int) {
+		t.Helper()
+		if _, rerr := db.TestRecord.Create().
+			SetTestCode(code).SetUserID(user).SetSessionID(session).SetAttemptNo(attempt).
+			SetStartedAt(now.Add(-time.Duration(minutesAgo) * time.Minute)).
+			SetEndedAt(now.Add(-time.Duration(minutesAgo-1) * time.Minute)).
+			SetRawDetail(map[string]any{"e2e": true}).
+			SetValid(true).SetAuthoritativeScore(score).
+			Save(seedCtx); rerr != nil {
+			t.Fatalf("record %s#%d: %v", code, attempt, rerr)
+		}
+	}
+
+	// The degenerate pool: ten rows per ability, all at 100 — past the
+	// confidence floor, std zero, so every bench lands on the side's 50.
+	for _, s := range six {
+		for i := 1; i <= 10; i++ {
+			record(rbqPool, s.code, "", i, 100, 600)
+		}
+	}
+	// The full member's two sessions, genres mixed so a series carries
+	// both genres and the per-point genre label has something to say.
+	s1 := newSession(rbqFull, "fps", "expired",
+		step(rbqRS, "reactionSpeed"), step(rbqAA, "aimingAccuracy"), step(rbqTS, "trackingStability"), step(rbqSRA, "skillReleaseAccuracy"))
+	record(rbqFull, rbqRS, s1.ID, 1, 100, 300)
+	record(rbqFull, rbqAA, s1.ID, 1, 100, 290)
+	record(rbqFull, rbqTS, s1.ID, 1, 100, 280)
+	record(rbqFull, rbqSRA, s1.ID, 1, 100, 270)
+	s2 := newSession(rbqFull, "moba", "active",
+		step(rbqRS, "reactionSpeed"), step(rbqSRA, "skillReleaseAccuracy"), step(rbqRA, "resourceAllocation"), step(rbqDE, "decisionEfficiency"))
+	record(rbqFull, rbqRS, s2.ID, 1, 100, 200)
+	record(rbqFull, rbqSRA, s2.ID, 1, 100, 190)
+	record(rbqFull, rbqRA, s2.ID, 1, 100, 180)
+	record(rbqFull, rbqDE, s2.ID, 1, 100, 170)
+	// The partial member: four of six abilities only.
+	sp := newSession(rbqPart, "fps", "expired",
+		step(rbqRS, "reactionSpeed"), step(rbqAA, "aimingAccuracy"), step(rbqTS, "trackingStability"), step(rbqSRA, "skillReleaseAccuracy"))
+	record(rbqPart, rbqRS, sp.ID, 1, 100, 250)
+	record(rbqPart, rbqAA, sp.ID, 1, 100, 240)
+	record(rbqPart, rbqTS, sp.ID, 1, 100, 230)
+	record(rbqPart, rbqSRA, sp.ID, 1, 100, 220)
+
+	memberGrant := func(user string) {
+		t.Helper()
+		if _, gerr := db.Entitlement.Create().SetUserID(user).
+			SetScopeKind(entitlement.ScopeKind(shared.ScopeMembership)).
+			SetSource("e2e").SetExpiresAt(now.Add(24 * time.Hour)).Save(seedCtx); gerr != nil {
+			t.Fatalf("membership grant %s: %v", user, gerr)
+		}
+	}
+
+	fullCtx := repSubject(rbqFull)
+
+	// Face 1 — the gate first: cognitive ships membership-gated, so with
+	// no grant the numbers never travel; the covered count stays public.
+	c1, err := uc.GetCognitiveReport(fullCtx)
+	if err != nil {
+		t.Fatalf("cognitive ungated: %v", err)
+	}
+	if c1.Allowed || c1.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT {
+		t.Fatalf("cognitive gate: allowed=%v reason=%v", c1.Allowed, c1.Reason)
+	}
+	if c1.Covered != 6 || c1.Tested != 0 || c1.Total != 8 || len(c1.Dimensions) != 0 || c1.Composite != nil {
+		t.Fatalf("cognitive gated shape: %+v", c1)
+	}
+
+	// The membership grant opens the gate; the degenerate pool feeds all
+	// eight dimensions the same 50.
+	memberGrant(rbqFull)
+	c2, err := uc.GetCognitiveReport(fullCtx)
+	if err != nil {
+		t.Fatalf("cognitive gated: %v", err)
+	}
+	if !c2.Allowed || c2.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE {
+		t.Fatalf("cognitive open gate: allowed=%v reason=%v", c2.Allowed, c2.Reason)
+	}
+	if c2.Tested != 8 || len(c2.Dimensions) != 8 {
+		t.Fatalf("cognitive fed dims: tested=%d rows=%d", c2.Tested, len(c2.Dimensions))
+	}
+	if c2.Dimensions[0].Dimension != "neuralResponse" || c2.Dimensions[7].Dimension != "creativeThinking" {
+		t.Fatalf("cognitive dim order: %s..%s", c2.Dimensions[0].Dimension, c2.Dimensions[7].Dimension)
+	}
+	for _, d := range c2.Dimensions {
+		if d.Value != 50 || d.Tier != shared.TierC {
+			t.Fatalf("cognitive dim %s: %+v", d.Dimension, d)
+		}
+	}
+	if c2.Composite == nil || *c2.Composite != 50 || c2.Tier != shared.TierC {
+		t.Fatalf("cognitive composite: %+v", c2)
+	}
+
+	// Face 2 — the missing-dimension law: four abilities feed exactly
+	// neuralResponse (RS+AA+TS) and motorCoordination (AA+TS+SRA); the
+	// other six stay absent rows, never zero axes.
+	memberGrant(rbqPart)
+	cp, err := uc.GetCognitiveReport(repSubject(rbqPart))
+	if err != nil {
+		t.Fatalf("cognitive partial: %v", err)
+	}
+	if !cp.Allowed || cp.Covered != 4 || cp.Tested != 2 || len(cp.Dimensions) != 2 {
+		t.Fatalf("cognitive partial shape: %+v", cp)
+	}
+	if cp.Dimensions[0].Dimension != "neuralResponse" || cp.Dimensions[1].Dimension != "motorCoordination" {
+		t.Fatalf("cognitive partial dims: %+v", cp.Dimensions)
+	}
+
+	// Face 3 — the trend chronology: two sessions, the RS series
+	// carrying one point per genre at the degenerate 50, the series
+	// order the vocabulary's own.
+	tr, err := uc.GetTrendReport(fullCtx)
+	if err != nil {
+		t.Fatalf("trend: %v", err)
+	}
+	if tr.Sessions != 2 || len(tr.Abilities) != 6 {
+		t.Fatalf("trend headline: sessions=%d series=%d", tr.Sessions, len(tr.Abilities))
+	}
+	if !tr.AdvancedAllowed || tr.AdvancedReason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE {
+		t.Fatalf("trend advanced gate: %+v", tr)
+	}
+	rs := tr.Abilities[0]
+	if rs.Ability != "reactionSpeed" || len(rs.Points) != 2 {
+		t.Fatalf("trend RS series: %+v", rs)
+	}
+	if rs.Points[0].Genre != shared.GenreFPS || rs.Points[0].Percentile != 50 ||
+		rs.Points[1].Genre != shared.GenreMOBA || rs.Points[1].Percentile != 50 {
+		t.Fatalf("trend RS points: %+v", rs.Points)
+	}
+	if tr.Abilities[5].Ability != "decisionEfficiency" || len(tr.Abilities[5].Points) != 1 {
+		t.Fatalf("trend DE series: %+v", tr.Abilities[5])
+	}
+
+	// The honest empty page still knows its gate: no sessions, no
+	// series, and the advanced verdict judged all the same.
+	tp, err := uc.GetTrendReport(repSubject(rbqPool))
+	if err != nil {
+		t.Fatalf("trend empty: %v", err)
+	}
+	if tp.Sessions != 0 || len(tp.Abilities) != 0 || tp.AdvancedAllowed ||
+		tp.AdvancedReason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT {
+		t.Fatalf("trend empty shape: %+v", tp)
+	}
+
+	// Face 4 — the digest's promised seat: every best now carries its
+	// cohort answer, the degenerate 50.
+	dg, err := uc.GetAbilityDigest(fullCtx)
+	if err != nil {
+		t.Fatalf("digest: %v", err)
+	}
+	if len(dg.Abilities) != 6 {
+		t.Fatalf("digest rows: %d", len(dg.Abilities))
+	}
+	for _, a := range dg.Abilities {
+		if a.Percentile == nil || *a.Percentile != 50 {
+			t.Fatalf("digest %s percentile: %+v", a.Ability, a)
+		}
+	}
+}
+
+func rbqClean(t *testing.T, db *ent.Client) {
+	t.Helper()
+	dctx := local_mixins.SkipSoftDelete(context.Background())
+	users := []string{rbqFull, rbqPart, rbqPool}
+	if _, err := db.ReportSnapshot.Delete().Where(entreportsnapshot.UserIDIn(users...)).Exec(dctx); err != nil {
+		t.Fatalf("clean snapshots: %v", err)
+	}
+	if _, err := db.Entitlement.Delete().Where(entitlement.UserIDIn(users...)).Exec(dctx); err != nil {
+		t.Fatalf("clean grants: %v", err)
+	}
+	if _, err := db.TestRecord.Delete().Where(enttestrecord.UserIDIn(users...)).Exec(dctx); err != nil {
+		t.Fatalf("clean records: %v", err)
+	}
+	if _, err := db.MatchSession.Delete().Where(entmatchsession.UserIDIn(users...)).Exec(dctx); err != nil {
+		t.Fatalf("clean sessions: %v", err)
+	}
+	if _, err := db.Profile.Delete().Where(entprofile.UserIDIn(users...)).Exec(dctx); err != nil {
+		t.Fatalf("clean profiles: %v", err)
+	}
+	for _, code := range []string{rbqRS, rbqAA, rbqTS, rbqSRA, rbqRA, rbqDE} {
 		if _, err := db.Test.Delete().Where(enttest.Code(code)).Exec(dctx); err != nil {
 			t.Fatalf("clean test %s: %v", code, err)
 		}

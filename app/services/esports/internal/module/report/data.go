@@ -125,6 +125,53 @@ func (rp *boardRP) GenreDimensions(ctx context.Context, genre string) (int, erro
 	return len(dims), nil
 }
 
+func (rp *boardRP) ScoredSessions(ctx context.Context, userID string) ([]ScoredSessionRow, error) {
+	// The join fans one session out per record, so the session's own
+	// columns group it back to one row; the ordering rides the immutable
+	// created_at the read-back faces already trust as the timeline.
+	ms := sql.Table(entmatchsession.Table)
+	tr := sql.Table(enttestrecord.Table)
+	var rows []*struct {
+		ID        string    `json:"id"`
+		Genre     string    `json:"genre"`
+		CreatedAt time.Time `json:"created_at"`
+	}
+	err := rp.Platform.GetClient(ctx).MatchSession.Query().
+		Modify(func(s *sql.Selector) {
+			s.Join(tr).On(tr.C(enttestrecord.FieldSessionID), ms.C(entmatchsession.FieldID)).
+				Where(sql.And(
+					sql.EQ(ms.C(entmatchsession.FieldUserID), userID),
+					sql.EQ(tr.C(enttestrecord.FieldUserID), userID),
+					sql.EQ(tr.C(enttestrecord.FieldValid), true),
+					sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
+					sql.NotNull(tr.C(enttestrecord.FieldAuthoritativeScore)),
+				)).
+				Select(
+					ms.C(entmatchsession.FieldID),
+					ms.C(entmatchsession.FieldGenre),
+					ms.C(entmatchsession.FieldCreatedAt),
+				).
+				GroupBy(
+					ms.C(entmatchsession.FieldID),
+					ms.C(entmatchsession.FieldGenre),
+					ms.C(entmatchsession.FieldCreatedAt),
+				).
+				OrderBy(sql.Asc(ms.C(entmatchsession.FieldCreatedAt)))
+		}).
+		Scan(ctx, &rows)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	if len(rows) == 0 {
+		return nil, nil
+	}
+	out := make([]ScoredSessionRow, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, ScoredSessionRow{ID: r.ID, Genre: r.Genre, CreatedAt: r.CreatedAt})
+	}
+	return out, nil
+}
+
 func (rp *boardRP) Cohort(ctx context.Context, ability string, birthYear *int32, sex *string, ageBand *string) (CohortStats, string, error) {
 	// The pool runs under the ruling's key: same birth year plus sex (an
 	// undetermined or missing sex benches against the whole same-age pool),

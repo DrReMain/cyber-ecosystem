@@ -92,7 +92,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	entitleAdminService := entitleadmin.NewEntitleAdminService(logger, codeUC, entitleUC)
 	recordBoardRP := report.NewRecordBoardRP(logger, platformPlatform)
 	snapshotRP := report.NewSnapshotRP(logger, platformPlatform)
-	reportUC := report.NewReportUC(logger, platformPlatform, recordBoardRP, snapshotRP, entitlementRP, profileRP, eventSubscriptions)
+	reportUC := report.NewReportUC(logger, platformPlatform, recordBoardRP, snapshotRP, entitlementRP, reportPolicyRP, profileRP, eventSubscriptions)
 	reportService := report.NewReportService(logger, reportUC)
 	testAdminService := testadmin.NewTestAdminService(logger, testUC)
 	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService)

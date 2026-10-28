@@ -115,6 +115,58 @@ func (s *ReportService) GetAbilityDigest(ctx context.Context, _ *esportspb.GetAb
 	}, nil
 }
 
+func (s *ReportService) GetCognitiveReport(ctx context.Context, _ *esportspb.GetCognitiveReportRequest) (*esportspb.GetCognitiveReportResponse, error) {
+	r, err := s.uc.GetCognitiveReport(ctx)
+	if err != nil {
+		return nil, err
+	}
+	dims := make([]*esportspb.CognitiveDimension, 0, len(r.Dimensions))
+	for _, d := range r.Dimensions {
+		dims = append(dims, &esportspb.CognitiveDimension{
+			Dimension: d.Dimension,
+			Value:     d.Value,
+			Tier:      tierPB(d.Tier),
+		})
+	}
+	return &esportspb.GetCognitiveReportResponse{
+		Access:           &esportspb.ReportAccessVerdict{Allowed: r.Allowed, Reason: r.Reason},
+		CoveredAbilities: utils.ConvNum[int32](r.Covered),
+		TestedDimensions: utils.ConvNum[int32](r.Tested),
+		TotalDimensions:  utils.ConvNum[int32](r.Total),
+		Dimensions:       dims,
+		Composite:        utils.Wrap(r.Composite, utils.DoubleW),
+		Tier:             tierPB(r.Tier),
+	}, nil
+}
+
+func (s *ReportService) GetTrendReport(ctx context.Context, _ *esportspb.GetTrendReportRequest) (*esportspb.GetTrendReportResponse, error) {
+	r, err := s.uc.GetTrendReport(ctx)
+	if err != nil {
+		return nil, err
+	}
+	series := make([]*esportspb.TrendAbilitySeries, 0, len(r.Abilities))
+	for _, s := range r.Abilities {
+		points := make([]*esportspb.TrendPoint, 0, len(s.Points))
+		for _, p := range s.Points {
+			at := p.At
+			points = append(points, &esportspb.TrendPoint{
+				At:         utils.ToTimestamp(&at),
+				Percentile: p.Percentile,
+				Genre:      p.Genre,
+			})
+		}
+		series = append(series, &esportspb.TrendAbilitySeries{Ability: s.Ability, Points: points})
+	}
+	return &esportspb.GetTrendReportResponse{
+		SessionsTotal: utils.ConvNum[int32](r.Sessions),
+		Abilities:     series,
+		AdvancedAccess: &esportspb.ReportAccessVerdict{
+			Allowed: r.AdvancedAllowed,
+			Reason:  r.AdvancedReason,
+		},
+	}, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func sessionAbilitiesPB(rows []SessionAbilityRow) []*esportspb.SessionAbilityLine {

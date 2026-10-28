@@ -40,6 +40,43 @@ const (
 
 const basisNone = "none" // cohort_basis is NotEmpty — a score-only freeze still stamps its rubric honestly: no cohort key existed at pin time
 
+var abilityOrder = []string{ // the six-word vocabulary's display order — the tests table's own keys, the order every board and series renders by
+	"reactionSpeed", "aimingAccuracy", "trackingStability",
+	"skillReleaseAccuracy", "resourceAllocation", "decisionEfficiency",
+}
+
+var cognitiveModel = []cognitiveDimWeights{ // the frozen matrix's one transcription into code, values unchanged; a source ability with no cohort answer sinks its whole dimension, never a partial axis
+	{Dimension: "neuralResponse", Weights: map[string]float64{
+		"reactionSpeed": 0.6, "aimingAccuracy": 0.3, "trackingStability": 0.1,
+	}},
+	{Dimension: "sustainedAttention", Weights: map[string]float64{
+		"trackingStability": 0.5, "resourceAllocation": 0.2, "decisionEfficiency": 0.3,
+	}},
+	{Dimension: "motorCoordination", Weights: map[string]float64{
+		"aimingAccuracy": 0.5, "trackingStability": 0.3, "skillReleaseAccuracy": 0.2,
+	}},
+	{Dimension: "stressResilience", Weights: map[string]float64{
+		"reactionSpeed": 0.2, "resourceAllocation": 0.3, "decisionEfficiency": 0.5,
+	}},
+	{Dimension: "resourceAllocation", Weights: map[string]float64{
+		"trackingStability": 0.2, "resourceAllocation": 0.5, "decisionEfficiency": 0.3,
+	}},
+	{Dimension: "systemCognition", Weights: map[string]float64{
+		"skillReleaseAccuracy": 0.2, "resourceAllocation": 0.4, "decisionEfficiency": 0.4,
+	}},
+	{Dimension: "logicDecision", Weights: map[string]float64{
+		"reactionSpeed": 0.1, "resourceAllocation": 0.3, "decisionEfficiency": 0.6,
+	}},
+	{Dimension: "creativeThinking", Weights: map[string]float64{
+		"skillReleaseAccuracy": 0.3, "resourceAllocation": 0.4, "decisionEfficiency": 0.3,
+	}},
+}
+
+type cognitiveDimWeights struct { // Weights' keys are ability keys while Dimension is a dimension key — the shared spelling of resourceAllocation is two names in two namespaces, kept apart by structure
+	Dimension string
+	Weights   map[string]float64
+}
+
 // DO ------------------------------------------------------------------------------------------------------------------
 
 type Attempt struct {
@@ -174,6 +211,47 @@ type AbilityDigest struct {
 	Sessions      []DigestSessionRow
 }
 
+type CognitiveReport struct {
+	Allowed bool
+	Reason  esportspb.ReportAccessReason
+	Covered int
+	Tested  int
+	Total   int
+	Dimensions []CognitiveDimensionRow // only fully-fed dimensions; a missing dimension is an absent row, never a zero axis
+	Composite  *float64
+	Tier       string
+}
+
+type CognitiveDimensionRow struct {
+	Dimension string
+	Value     float64
+	Tier      string
+}
+
+type TrendReport struct {
+	Sessions int
+	Abilities []TrendSeriesRow
+	AdvancedAllowed bool                      // the advanced tier's gate — the base tier is free for anyone who has tested, the advanced content a later face
+	AdvancedReason  esportspb.ReportAccessReason
+}
+
+type TrendSeriesRow struct {
+	Ability string
+	Points  []TrendPointRow
+}
+
+type TrendPointRow struct {
+	At         time.Time
+	Percentile float64
+	Genre      string
+}
+
+type ScoredSessionRow struct { // one trend chronology entry — a session carrying at least one valid scored record; practice runs never qualify
+	ID        string
+	Genre     string
+	CreatedAt time.Time
+}
+
 type judgement struct { // the live computation's whole answer — the freeze serializes it, the free tier renders it
 	Lines     []AbilityLine
 	Composite *float64
@@ -223,6 +301,10 @@ type RecordBoardRP interface {
 	// latest scored record older than the given time — the settlement
 	// face's "vs last session" word.
 	PreviousSessionScores(ctx context.Context, userID string, before time.Time) (map[string]float64, error)
+	// ScoredSessions is every session of the member's carrying at least
+	// one valid scored record, oldest first — trend's chronology; the
+	// scored-record join is the gate, practice runs never qualify.
+	ScoredSessions(ctx context.Context, userID string) ([]ScoredSessionRow, error)
 }
 
 type SnapshotRP interface {
@@ -237,16 +319,18 @@ type ReportUC struct {
 	boardRP    RecordBoardRP
 	snapshotRP SnapshotRP
 	entRP      entitle.EntitlementRP
+	policyRP   entitle.ReportPolicyRP
 	profileRP  profile.ProfileRP
 	eventBus   shared.DomainEventBus
 }
 
-func NewReportUC(logger *slog.Logger, tm shared.Transaction, boardRP RecordBoardRP, snapshotRP SnapshotRP, entRP entitle.EntitlementRP, profileRP profile.ProfileRP, eventBus shared.DomainEventBus) *ReportUC {
+func NewReportUC(logger *slog.Logger, tm shared.Transaction, boardRP RecordBoardRP, snapshotRP SnapshotRP, entRP entitle.EntitlementRP, policyRP entitle.ReportPolicyRP, profileRP profile.ProfileRP, eventBus shared.DomainEventBus) *ReportUC {
 	uc := &ReportUC{
 		UC:         shared.NewUC(logger.With("module", "module/report"), tm),
 		boardRP:    boardRP,
 		snapshotRP: snapshotRP,
 		entRP:      entRP,
+		policyRP:   policyRP,
 		profileRP:  profileRP,
 		eventBus:   eventBus,
 	}
@@ -505,6 +589,26 @@ func (uc *ReportUC) GetAbilityDigest(ctx context.Context) (*AbilityDigest, error
 	if d.Abilities, err = uc.boardRP.AbilityBests(ctx, subject.UserID); err != nil {
 		return nil, err
 	}
+	// The percentile column's promised seat, filled at last: the best
+	// score benched read-time under the same cohort keys the live
+	// judgement uses. The honest null stays whenever the cohort has
+	// nothing to say about the best — no made-up percentile.
+	if len(d.Abilities) > 0 {
+		pf, perr := uc.profileRP.FindByUserID(ctx, subject.UserID)
+		if perr != nil {
+			return nil, perr
+		}
+		var birthYear *int32
+		var sex *string
+		var ageBand *string
+		if pf != nil {
+			birthYear, sex, ageBand = pf.BirthYear, pf.Sex, pf.AgeBand
+		}
+		for i := range d.Abilities {
+			pct, _, _, _, _ := uc.percentileFor(ctx, BoardEntry{Ability: d.Abilities[i].Ability, Score: d.Abilities[i].Best}, birthYear, sex, ageBand)
+			d.Abilities[i].Percentile = pct
+		}
+	}
 	lines, err := uc.boardRP.LatestSessions(ctx, subject.UserID)
 	if err != nil {
 		return nil, err
@@ -524,6 +628,185 @@ func (uc *ReportUC) GetAbilityDigest(ctx context.Context) (*AbilityDigest, error
 		d.Sessions = append(d.Sessions, row)
 	}
 	return d, nil
+}
+
+func (uc *ReportUC) GetCognitiveReport(ctx context.Context) (*CognitiveReport, error) {
+	// The eight-dimension aggregate: each dimension the weighted sum of
+	// its source abilities' history-best percentiles. The verdict rides
+	// in first — cognitive ships membership-gated, so an unentitled
+	// member gets the covered count and the gate's own reason, and the
+	// numbers behind the gate never travel.
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("cognitive report read requires a session"))
+	}
+	r := &CognitiveReport{Total: len(cognitiveModel)}
+	// The gate, folded from the three facts through the shared order —
+	// the same verdict the entitle face answers, so the two faces cannot
+	// drift apart. Cross-module reads ride the owning module's repo
+	// ports; the order itself lives in the kernel, not here.
+	ref := shared.ReportCognitive
+	grant, gerr := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &ref)
+	if gerr != nil {
+		return nil, gerr
+	}
+	codeActive := grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now()))
+	policy, rowPresent, perr := uc.policyRP.Policy(ctx, shared.ReportCognitive)
+	if perr != nil {
+		return nil, perr
+	}
+	memberActive, merr := uc.entRP.HasActiveMembership(ctx, subject.UserID)
+	if merr != nil {
+		return nil, merr
+	}
+	r.Allowed, r.Reason = shared.ReportAccessVerdict(shared.ReportCognitive, codeActive, rowPresent, policy, memberActive)
+
+	bests, err := uc.boardRP.AbilityBests(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	r.Covered = len(bests) // the digest's own public fact, gate or no gate
+	if !r.Allowed {
+		return r, nil
+	}
+
+	pf, err := uc.profileRP.FindByUserID(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	var birthYear *int32
+	var sex *string
+	var ageBand *string
+	if pf != nil {
+		birthYear, sex, ageBand = pf.BirthYear, pf.Sex, pf.AgeBand
+	}
+	// The frozen matrix's input: each measured ability's best score
+	// benched read-time — the snapshot stays the only frozen source, and
+	// an unbenchable best (no cohort key, thin pool) feeds nothing.
+	pctByAbility := make(map[string]float64, len(bests))
+	for _, b := range bests {
+		pct, _, _, _, _ := uc.percentileFor(ctx, BoardEntry{Ability: b.Ability, Score: b.Best}, birthYear, sex, ageBand)
+		if pct != nil {
+			pctByAbility[b.Ability] = *pct
+		}
+	}
+	for _, dim := range cognitiveModel {
+		sum, fed := 0.0, true
+		for ability, w := range dim.Weights {
+			p, ok := pctByAbility[ability]
+			if !ok {
+				fed = false
+				break // one unfed source sinks the whole dimension, never a partial axis
+			}
+			sum += p * w
+		}
+		if !fed {
+			continue
+		}
+		v := math.Round(sum)
+		r.Dimensions = append(r.Dimensions, CognitiveDimensionRow{Dimension: dim.Dimension, Value: v, Tier: tierOf(v)})
+	}
+	r.Tested = len(r.Dimensions)
+	if len(r.Dimensions) > 0 {
+		vals := make([]float64, 0, len(r.Dimensions))
+		for _, d := range r.Dimensions {
+			vals = append(vals, d.Value)
+		}
+		if comp := compositeOf(vals); comp != nil {
+			c := math.Round(*comp)
+			r.Composite, r.Tier = &c, tierOf(c)
+		}
+	}
+	return r, nil
+}
+
+func (uc *ReportUC) GetTrendReport(ctx context.Context) (*TrendReport, error) {
+	// The base tier's chronology: one series per ability, each point the
+	// session-anchor's cohort answer at that time. The advanced gate is
+	// judged unconditionally — an empty history still renders its locked
+	// state from one call.
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("trend report read requires a session"))
+	}
+	r := &TrendReport{}
+	if active, aerr := uc.entRP.HasActiveMembership(ctx, subject.UserID); aerr != nil {
+		return nil, aerr
+	} else if active {
+		r.AdvancedAllowed, r.AdvancedReason = true, esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE
+	} else {
+		r.AdvancedReason = esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT
+	}
+	if total, _, _, serr := uc.boardRP.SessionCounts(ctx, subject.UserID); serr != nil {
+		return nil, serr
+	} else {
+		r.Sessions = total
+	}
+	if r.Sessions == 0 {
+		return r, nil // the honest empty page
+	}
+
+	metas, err := uc.boardRP.ScoredSessions(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	pf, err := uc.profileRP.FindByUserID(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	var birthYear *int32
+	var sex *string
+	var ageBand *string
+	if pf != nil {
+		birthYear, sex, ageBand = pf.BirthYear, pf.Sex, pf.AgeBand
+	}
+	byAbility := make(map[string][]TrendPointRow)
+	for _, meta := range metas {
+		for ability, p := range uc.anchorPercentilesOf(ctx, meta, birthYear, sex, ageBand) {
+			if p == nil {
+				continue // a point exists only where the cohort spoke
+			}
+			byAbility[ability] = append(byAbility[ability], TrendPointRow{At: meta.CreatedAt, Percentile: *p, Genre: meta.Genre})
+		}
+	}
+	for _, ability := range abilityOrder {
+		if pts, ok := byAbility[ability]; ok && len(pts) > 0 {
+			r.Abilities = append(r.Abilities, TrendSeriesRow{Ability: ability, Points: pts})
+		}
+	}
+	return r, nil
+}
+
+func (uc *ReportUC) anchorPercentilesOf(ctx context.Context, meta ScoredSessionRow, birthYear *int32, sex, ageBand *string) map[string]*float64 {
+	// One session's anchor verdict read the way the read-back faces do:
+	// the frozen snapshot when one exists — the numbers the unlock
+	// bought, pinned at unlock time — and the live judgement otherwise,
+	// the free tier's own law in aggregate form. Trend pins nothing; a
+	// snapshot that held nulls keeps its nulls, because a later fatter
+	// pool is today's answer, not the answer at that time.
+	anchor, err := uc.boardRP.AnchorOfSession(ctx, meta.ID)
+	if err != nil || anchor == nil {
+		return nil
+	}
+	if snap, serr := uc.snapshotRP.FindByRecord(ctx, anchor.ID); serr == nil && snap != nil {
+		out := make(map[string]*float64, len(snap.Abilities))
+		for _, a := range snap.Abilities {
+			if a.Percentile != nil {
+				out[a.Ability] = a.Percentile
+			}
+		}
+		return out
+	}
+	attempts, err := uc.boardRP.SessionAttempts(ctx, meta.ID)
+	if err != nil {
+		return nil
+	}
+	j := uc.computeFor(ctx, sessionBoardOf(attempts), birthYear, sex, ageBand)
+	out := make(map[string]*float64, len(j.Lines))
+	for _, l := range j.Lines {
+		out[l.Ability] = l.Percentile
+	}
+	return out
 }
 
 func (uc *ReportUC) sessionPercentiles(ctx context.Context, anchorID string) map[string]*float64 {
