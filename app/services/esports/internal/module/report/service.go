@@ -175,13 +175,13 @@ func (s *ReportService) GetCareerReport(ctx context.Context, _ *esportspb.GetCar
 	recs := make([]*esportspb.CareerRecommendation, 0, len(r.Recommendations))
 	for _, rec := range r.Recommendations {
 		recs = append(recs, &esportspb.CareerRecommendation{
-			CareerArea:       rec.Area,
-			Name:             rec.Name,
-			MatchedScore:     rec.Matched,
-			BasisDimensions:  rec.Basis,
-			EliminationRate:  rec.EliminationRate,
+			CareerArea:        rec.Area,
+			Name:              rec.Name,
+			MatchedScore:      rec.Matched,
+			BasisDimensions:   rec.Basis,
+			EliminationRate:   rec.EliminationRate,
 			TrainingIntensity: rec.TrainingIntensity,
-			Suggestion:       rec.Suggestion,
+			Suggestion:        rec.Suggestion,
 		})
 	}
 	improvements := make([]*esportspb.CareerImprovement, 0, len(r.Improvements))
