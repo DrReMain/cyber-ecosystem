@@ -24,6 +24,7 @@ import (
 	entitlement "cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	entmatchsession "cyber-ecosystem/app/services/esports/internal/ent/matchsession"
 	entprofile "cyber-ecosystem/app/services/esports/internal/ent/profile"
+	entreportpolicy "cyber-ecosystem/app/services/esports/internal/ent/reportpolicy"
 	entreportsnapshot "cyber-ecosystem/app/services/esports/internal/ent/reportsnapshot"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/local_mixins"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
@@ -319,9 +320,11 @@ func rbClean(t *testing.T, db *ent.Client) {
 }
 
 const (
-	rbqFull = "e2erbqfull000000001"
-	rbqPart = "e2erbqpart000000001"
-	rbqPool = "e2erbqpool000000001"
+	rbqFull    = "e2erbqfull000000001"
+	rbqPart    = "e2erbqpart000000001"
+	rbqPool    = "e2erbqpool000000001"
+	rbqTop     = "e2erbqtop0000000001"
+	rbqTopPool = "e2erbqtoppool0000001"
 
 	rbqRS  = "e2erbqrs"
 	rbqAA  = "e2erbqaa"
@@ -364,8 +367,9 @@ func TestReportClusterE2E(t *testing.T) {
 	})
 	rbqClean(t, db)
 
+	policyRP := entitle.NewReportPolicyRP(logger, pf)
 	uc := report.NewReportUC(logger, pf, report.NewRecordBoardRP(logger, pf), report.NewSnapshotRP(logger, pf),
-		entitle.NewEntitlementRP(logger, pf), entitle.NewReportPolicyRP(logger, pf),
+		entitle.NewEntitlementRP(logger, pf), policyRP,
 		profile.NewProfileRP(logger, pf), bootstrap.NewEventSubscriptions(logger))
 	seedCtx := repSubject(rbqFull)
 	now := time.Now()
@@ -443,6 +447,36 @@ func TestReportClusterE2E(t *testing.T) {
 	record(rbqPart, rbqAA, sp.ID, 1, 100, 240)
 	record(rbqPart, rbqTS, sp.ID, 1, 100, 230)
 	record(rbqPart, rbqSRA, sp.ID, 1, 100, 220)
+
+	// The top member rides its own cohort (birth 2009 — the key the
+	// degradation law benches by), its pool spread so the z-score speaks:
+	// the member's 100s sit far above a 15-ish average and land on a
+	// deterministic 100, the anchor an at-the-line row needs. Only
+	// neuralResponse's three sources are measured, so exactly one
+	// dimension renders.
+	for _, u := range []string{rbqTop, rbqTopPool} {
+		if _, err := db.Profile.Create().SetUserID(u).
+			SetBirthYear(2009).SetSex(entprofile.Sex("male")).Save(seedCtx); err != nil {
+			t.Fatalf("profile %s: %v", u, err)
+		}
+	}
+	// The pool rows hang on their own session: the record unique key is
+	// (session, code, attempt) with no user in it, so a bare "" session
+	// would collide with the degenerate pool's same-code rows.
+	spool := newSession(rbqTopPool, "fps", "expired",
+		step(rbqRS, "reactionSpeed"), step(rbqAA, "aimingAccuracy"), step(rbqTS, "trackingStability"))
+	for _, s := range []struct{ code, ability string }{
+		{rbqRS, "reactionSpeed"}, {rbqAA, "aimingAccuracy"}, {rbqTS, "trackingStability"},
+	} {
+		for i := 1; i <= 10; i++ {
+			record(rbqTopPool, s.code, spool.ID, i, 10+float64(i), 600)
+		}
+	}
+	st := newSession(rbqTop, "fps", "expired",
+		step(rbqRS, "reactionSpeed"), step(rbqAA, "aimingAccuracy"), step(rbqTS, "trackingStability"))
+	record(rbqTop, rbqRS, st.ID, 1, 100, 160)
+	record(rbqTop, rbqAA, st.ID, 1, 100, 150)
+	record(rbqTop, rbqTS, st.ID, 1, 100, 140)
 
 	memberGrant := func(user string) {
 		t.Helper()
@@ -544,6 +578,20 @@ func TestReportClusterE2E(t *testing.T) {
 		t.Fatalf("trend empty shape: %+v", tp)
 	}
 
+	// The partial member's chronology carries exactly the measured four —
+	// the missing-dimension law's trend face: an unmeasured ability has no
+	// series, never a flat line at zero.
+	trp, err := uc.GetTrendReport(repSubject(rbqPart))
+	if err != nil {
+		t.Fatalf("trend partial: %v", err)
+	}
+	if trp.Sessions != 1 || len(trp.Abilities) != 4 {
+		t.Fatalf("trend partial shape: %+v", trp)
+	}
+	if trp.Abilities[0].Ability != "reactionSpeed" || len(trp.Abilities[0].Points) != 1 {
+		t.Fatalf("trend partial RS: %+v", trp.Abilities[0])
+	}
+
 	// Face 4 — the digest's promised seat: every best now carries its
 	// cohort answer, the degenerate 50.
 	dg, err := uc.GetAbilityDigest(fullCtx)
@@ -612,12 +660,117 @@ func TestReportClusterE2E(t *testing.T) {
 	if !crx.Allowed || len(crx.Recommendations) != 0 || len(crx.Improvements) != 0 {
 		t.Fatalf("career empty shape: %+v", crx)
 	}
+
+	// Face 6 — the at-the-line row, the zero-gap regression line: an
+	// already-excellent dimension states a zero gap and the at-the-line
+	// copy. On the wire protojson drops a zero scalar's field entirely, so
+	// this row is the exact one whose gap must survive a client seam's
+	// row-level narrowing — a golden gap of 41 never exercises it.
+	memberGrant(rbqTop)
+	crt, err := uc.GetCareerReport(repSubject(rbqTop))
+	if err != nil {
+		t.Fatalf("career top: %v", err)
+	}
+	if !crt.Allowed || crt.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN {
+		t.Fatalf("career top gate: allowed=%v reason=%v", crt.Allowed, crt.Reason)
+	}
+	if len(crt.Recommendations) != 0 { // every area's gate set needs a dimension the three measured abilities never feed
+		t.Fatalf("career top gates: %+v", crt.Recommendations)
+	}
+	if len(crt.Improvements) != 1 {
+		t.Fatalf("career top board: %d rows", len(crt.Improvements))
+	}
+	top := crt.Improvements[0]
+	if top.Dimension != "neuralResponse" || top.Current != 100 || top.Target != 85 || top.GapPercent != 0 {
+		t.Fatalf("career at-the-line row: %+v", top)
+	}
+	if len(top.Suggestions) != 1 || top.Suggestions[0] != "已达优秀水平" {
+		t.Fatalf("career at-the-line copy: %+v", top.Suggestions)
+	}
+	// The same facts through the cognitive face: one dimension at 100,
+	// the composite its equal-weight mean.
+	ct, err := uc.GetCognitiveReport(repSubject(rbqTop))
+	if err != nil {
+		t.Fatalf("cognitive top: %v", err)
+	}
+	if !ct.Allowed || ct.Covered != 3 || ct.Tested != 1 || len(ct.Dimensions) != 1 {
+		t.Fatalf("cognitive top shape: %+v", ct)
+	}
+	if ct.Dimensions[0].Dimension != "neuralResponse" || ct.Dimensions[0].Value != 100 ||
+		ct.Composite == nil || *ct.Composite != 100 {
+		t.Fatalf("cognitive top values: %+v", ct)
+	}
+
+	// Face 7 — the policy flip: an explicit closed row is the operator's
+	// own word, and it outranks a membership; a redeemed family code is
+	// the order's first fact and outranks the row itself. Behind a closed
+	// gate the numbers never travel.
+	if err := policyRP.SetPolicy(seedCtx, shared.ReportCareer, shared.PolicyClosed, "e2e"); err != nil {
+		t.Fatalf("close career: %v", err)
+	}
+	crf, err := uc.GetCareerReport(fullCtx)
+	if err != nil {
+		t.Fatalf("career closed: %v", err)
+	}
+	if crf.Allowed || crf.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_CLOSED ||
+		len(crf.Recommendations) != 0 || len(crf.Improvements) != 0 {
+		t.Fatalf("career closed shape: %+v", crf)
+	}
+	// The redeemed code answers before the row is even read.
+	if _, gerr := db.Entitlement.Create().SetUserID(rbqTop).
+		SetScopeKind(entitlement.ScopeKind(shared.ScopeReportType)).
+		SetScopeRef(shared.ReportCareer).
+		SetSource("e2e").SetExpiresAt(now.Add(24 * time.Hour)).Save(seedCtx); gerr != nil {
+		t.Fatalf("career code grant: %v", gerr)
+	}
+	crc, err := uc.GetCareerReport(repSubject(rbqTop))
+	if err != nil {
+		t.Fatalf("career coded: %v", err)
+	}
+	if !crc.Allowed || crc.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_CODE_REDEEMED {
+		t.Fatalf("career coded gate: allowed=%v reason=%v", crc.Allowed, crc.Reason)
+	}
+	if len(crc.Improvements) != 1 || crc.Improvements[0].GapPercent != 0 {
+		t.Fatalf("career coded board: %+v", crc.Improvements)
+	}
+	// Cognitive flips the same way; the covered count stays public, the
+	// numbers behind the gate do not travel.
+	if err := policyRP.SetPolicy(seedCtx, shared.ReportCognitive, shared.PolicyClosed, "e2e"); err != nil {
+		t.Fatalf("close cognitive: %v", err)
+	}
+	cf, err := uc.GetCognitiveReport(fullCtx)
+	if err != nil {
+		t.Fatalf("cognitive closed: %v", err)
+	}
+	if cf.Allowed || cf.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_CLOSED ||
+		cf.Covered != 6 || cf.Tested != 0 || len(cf.Dimensions) != 0 || cf.Composite != nil {
+		t.Fatalf("cognitive closed shape: %+v", cf)
+	}
+	// The trend face's advanced verdict rides membership, never the
+	// policy families — a closed cognitive row must not lock the
+	// chronology or its advanced tier.
+	trf, err := uc.GetTrendReport(fullCtx)
+	if err != nil {
+		t.Fatalf("trend under closed: %v", err)
+	}
+	if !trf.AdvancedAllowed || trf.AdvancedReason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE ||
+		trf.Sessions != 2 || len(trf.Abilities) != 6 {
+		t.Fatalf("trend under closed shape: %+v", trf)
+	}
 }
 
 func rbqClean(t *testing.T, db *ent.Client) {
 	t.Helper()
 	dctx := local_mixins.SkipSoftDelete(context.Background())
-	users := []string{rbqFull, rbqPart, rbqPool}
+	users := []string{rbqFull, rbqPart, rbqPool, rbqTop, rbqTopPool}
+	// The flip rows this probe owns: updated_by is the probe's own marker,
+	// so an operator's row never sweeps.
+	if _, err := db.ReportPolicy.Delete().Where(
+		entreportpolicy.ReportTypeIn(entreportpolicy.ReportType(shared.ReportCareer), entreportpolicy.ReportType(shared.ReportCognitive)),
+		entreportpolicy.UpdatedByEQ("e2e"),
+	).Exec(dctx); err != nil {
+		t.Fatalf("clean policies: %v", err)
+	}
 	if _, err := db.ReportSnapshot.Delete().Where(entreportsnapshot.UserIDIn(users...)).Exec(dctx); err != nil {
 		t.Fatalf("clean snapshots: %v", err)
 	}
