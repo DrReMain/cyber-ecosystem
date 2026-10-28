@@ -412,7 +412,7 @@ API 定→hzy 一次补 ①④⑤⑥ 四卡(档位空值按 P16 已裁灰章形�
 
 ### H-B 走查转裁:target_recognition 视觉形态(**已定稿 2026-10-22**,README §2.1 登记 D-AG,转 hzy 落地)
 
-> 出处:progress.md 2026-10-21 H-B 走查日节奏行(hzy 转);未裁决按现状走查,不阻塞 H-B 收口。
+> 出处:progress-archive.md 2026-10-21 H-B 走查日行(hzy 转;原 progress.md 节奏行,2026-10-28 迁档);未裁决按现状走查,不阻塞 H-B 收口。
 
 **证据(旧仓 `TargetRecognitionTestPage.tsx` 逐行核对,2026-10-22)**:
 
