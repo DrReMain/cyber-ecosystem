@@ -247,6 +247,47 @@ export type CyberEsportsV1CreateOrderResponse = {
     credential?: CyberEsportsV1PayCredential;
 };
 
+export type CyberEsportsV1DigestAbilityLine = {
+    ability?: string;
+    /**
+     * The cross-session best score — the ability board's bar.
+     */
+    bestScore?: number;
+    /**
+     * The best attempt's grade; null when that attempt carried no cohort
+     * answer.
+     */
+    bestGrade?: string;
+    /**
+     * The best's percentile; null while the cohort says nothing.
+     */
+    bestPercentile?: number;
+    /**
+     * How many distinct sessions carried a valid attempt for the ability.
+     */
+    sessionsTested?: number;
+    lastAt?: string;
+};
+
+export type CyberEsportsV1DigestSessionLine = {
+    sessionId?: string;
+    genre?: string;
+    /**
+     * All steps done — the history card's finished state; false keeps the
+     * resume entry alive.
+     */
+    finished?: boolean;
+    doneCount?: number;
+    stepCount?: number;
+    createdAt?: string;
+    /**
+     * The session's anchor — the report entry; absent while nothing
+     * scored. The line carries no verdict of its own: the composite face
+     * reads GetSessionReport with this id.
+     */
+    anchorRecordId?: string;
+};
+
 export type CyberEsportsV1DualZoneBehavior = {
     elapsedMs?: number;
     /**
@@ -365,6 +406,31 @@ export type CyberEsportsV1GenerateActivationCodesResponse = {
     codes?: Array<string>;
 };
 
+export type CyberEsportsV1GetAbilityDigestRequest = {
+    [key: string]: unknown;
+};
+
+export type CyberEsportsV1GetAbilityDigestResponse = {
+    /**
+     * Sessions carrying at least one valid attempt — practice runs never
+     * count as sessions.
+     */
+    sessionsTotal?: number;
+    sessionsFps?: number;
+    sessionsMoba?: number;
+    /**
+     * One line per measured ability of the six-word vocabulary; an untested
+     * ability is an absent entry, never a zero row (the covered-count face
+     * reads the absence).
+     */
+    abilities?: Array<CyberEsportsV1DigestAbilityLine>;
+    /**
+     * The latest session line per genre — at most one row each, absent
+     * when the genre was never played.
+     */
+    sessions?: Array<CyberEsportsV1DigestSessionLine>;
+};
+
 export type CyberEsportsV1GetMatchSessionResponse = {
     session?: CyberEsportsV1MatchSession;
     /**
@@ -445,6 +511,39 @@ export type CyberEsportsV1GetReportResponse = {
      */
     testedDimensions?: number;
     totalDimensions?: number;
+};
+
+export type CyberEsportsV1GetSessionReportRequest = {
+    sessionId?: string;
+};
+
+export type CyberEsportsV1GetSessionReportResponse = {
+    sessionId?: string;
+    genre?: string;
+    /**
+     * The session's latest scored record — the composite verdict's owner;
+     * absent while nothing scored (the same derivation the match face
+     * carries, never this face's to claim).
+     */
+    anchorRecordId?: string;
+    /**
+     * The anchor's verdict: the frozen snapshot when one exists, the live
+     * judgement otherwise — the free tier's own law, same as the record
+     * board. UNSPECIFIED while no anchor exists.
+     */
+    tier?: 'REPORT_TIER_UNSPECIFIED' | 'REPORT_TIER_S' | 'REPORT_TIER_A' | 'REPORT_TIER_B' | 'REPORT_TIER_C';
+    compositePercentile?: number;
+    /**
+     * One line per ability the session measured, in the lineup's order —
+     * an unmeasured step never lands a line, never a zero line.
+     */
+    abilities?: Array<CyberEsportsV1SessionAbilityLine>;
+    /**
+     * The completeness headline over the genre's ordered abilities.
+     */
+    testedDimensions?: number;
+    totalDimensions?: number;
+    startedAt?: string;
 };
 
 export type CyberEsportsV1GetTestConfigResponse = {
@@ -875,6 +974,49 @@ export type CyberEsportsV1ResourceMatchDetail = {
 export type CyberEsportsV1ResourceMatchTrajectoryPoint = {
     position?: CyberEsportsV1Point;
     elapsedMs?: number;
+};
+
+/**
+ * One ability's session verdict — the three numbers the settlement face
+ * keeps distinct: this session's best, the previous session's word, and
+ * the cross-session best.
+ */
+export type CyberEsportsV1SessionAbilityLine = {
+    ability?: string;
+    /**
+     * The game whose best attempt fed the line.
+     */
+    gameCode?: string;
+    /**
+     * This session's best valid attempt — the settlement headline (a line
+     * exists only when a valid attempt landed, so this is never empty).
+     */
+    bestScore?: number;
+    /**
+     * Every valid attempt's authoritative score in ordinal order — the
+     * "N attempts, best taken" receipt.
+     */
+    attemptScores?: Array<number>;
+    /**
+     * The best attempt's grade; null when that attempt carried no cohort
+     * answer.
+     */
+    bestGrade?: string;
+    /**
+     * The ability's percentile from the anchor's frozen snapshot; null
+     * while the cohort says nothing.
+     */
+    percentile?: number;
+    /**
+     * The same ability's score on the member's previous session — null on
+     * the first session (the note renders "first", never zero).
+     */
+    prevSessionScore?: number;
+    /**
+     * The cross-session best including this session's attempts — the mark
+     * the comparison track and the "new personal best" note read.
+     */
+    historyBestScore?: number;
 };
 
 export type CyberEsportsV1SetReportAccessPolicyRequest = {
@@ -2884,6 +3026,22 @@ export type EntitlementServiceGetReportAccessResponses = {
 
 export type EntitlementServiceGetReportAccessResponse = EntitlementServiceGetReportAccessResponses[keyof EntitlementServiceGetReportAccessResponses];
 
+export type ReportServiceGetAbilityDigestData = {
+    body: CyberEsportsV1GetAbilityDigestRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/reports/digest';
+};
+
+export type ReportServiceGetAbilityDigestResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetAbilityDigestResponse;
+};
+
+export type ReportServiceGetAbilityDigestResponse = ReportServiceGetAbilityDigestResponses[keyof ReportServiceGetAbilityDigestResponses];
+
 export type ReportServiceGetReportData = {
     body: CyberEsportsV1GetReportRequest;
     path?: never;
@@ -2899,6 +3057,22 @@ export type ReportServiceGetReportResponses = {
 };
 
 export type ReportServiceGetReportResponse = ReportServiceGetReportResponses[keyof ReportServiceGetReportResponses];
+
+export type ReportServiceGetSessionReportData = {
+    body: CyberEsportsV1GetSessionReportRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/reports/session';
+};
+
+export type ReportServiceGetSessionReportResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetSessionReportResponse;
+};
+
+export type ReportServiceGetSessionReportResponse = ReportServiceGetSessionReportResponses[keyof ReportServiceGetSessionReportResponses];
 
 export type SkuServiceListSkusData = {
     body?: never;

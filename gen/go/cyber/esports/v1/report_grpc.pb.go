@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ReportService_GetReport_FullMethodName = "/cyber.esports.v1.ReportService/GetReport"
+	ReportService_GetReport_FullMethodName        = "/cyber.esports.v1.ReportService/GetReport"
+	ReportService_GetSessionReport_FullMethodName = "/cyber.esports.v1.ReportService/GetSessionReport"
+	ReportService_GetAbilityDigest_FullMethodName = "/cyber.esports.v1.ReportService/GetAbilityDigest"
 )
 
 // ReportServiceClient is the client API for ReportService service.
@@ -36,8 +38,16 @@ const (
 // per-ability peer detail, the last-attempt comparison and the improvement
 // board. Numbers travel, copy does not: the five-zone wording stays with
 // the client until its configuration face lands.
+//
+// Beside the record board sit the two read-back faces: the session
+// scoreboard (GetSessionReport) and the cross-session aggregate
+// (GetAbilityDigest) — what a member sees of scores they already earned.
+// Neither runs cohort math: the frozen snapshot is their only percentile
+// source, same as the record board itself.
 type ReportServiceClient interface {
 	GetReport(ctx context.Context, in *GetReportRequest, opts ...grpc.CallOption) (*GetReportResponse, error)
+	GetSessionReport(ctx context.Context, in *GetSessionReportRequest, opts ...grpc.CallOption) (*GetSessionReportResponse, error)
+	GetAbilityDigest(ctx context.Context, in *GetAbilityDigestRequest, opts ...grpc.CallOption) (*GetAbilityDigestResponse, error)
 }
 
 type reportServiceClient struct {
@@ -58,6 +68,26 @@ func (c *reportServiceClient) GetReport(ctx context.Context, in *GetReportReques
 	return out, nil
 }
 
+func (c *reportServiceClient) GetSessionReport(ctx context.Context, in *GetSessionReportRequest, opts ...grpc.CallOption) (*GetSessionReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSessionReportResponse)
+	err := c.cc.Invoke(ctx, ReportService_GetSessionReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reportServiceClient) GetAbilityDigest(ctx context.Context, in *GetAbilityDigestRequest, opts ...grpc.CallOption) (*GetAbilityDigestResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAbilityDigestResponse)
+	err := c.cc.Invoke(ctx, ReportService_GetAbilityDigest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReportServiceServer is the server API for ReportService service.
 // All implementations must embed UnimplementedReportServiceServer
 // for forward compatibility.
@@ -72,8 +102,16 @@ func (c *reportServiceClient) GetReport(ctx context.Context, in *GetReportReques
 // per-ability peer detail, the last-attempt comparison and the improvement
 // board. Numbers travel, copy does not: the five-zone wording stays with
 // the client until its configuration face lands.
+//
+// Beside the record board sit the two read-back faces: the session
+// scoreboard (GetSessionReport) and the cross-session aggregate
+// (GetAbilityDigest) — what a member sees of scores they already earned.
+// Neither runs cohort math: the frozen snapshot is their only percentile
+// source, same as the record board itself.
 type ReportServiceServer interface {
 	GetReport(context.Context, *GetReportRequest) (*GetReportResponse, error)
+	GetSessionReport(context.Context, *GetSessionReportRequest) (*GetSessionReportResponse, error)
+	GetAbilityDigest(context.Context, *GetAbilityDigestRequest) (*GetAbilityDigestResponse, error)
 	mustEmbedUnimplementedReportServiceServer()
 }
 
@@ -86,6 +124,12 @@ type UnimplementedReportServiceServer struct{}
 
 func (UnimplementedReportServiceServer) GetReport(context.Context, *GetReportRequest) (*GetReportResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetReport not implemented")
+}
+func (UnimplementedReportServiceServer) GetSessionReport(context.Context, *GetSessionReportRequest) (*GetSessionReportResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSessionReport not implemented")
+}
+func (UnimplementedReportServiceServer) GetAbilityDigest(context.Context, *GetAbilityDigestRequest) (*GetAbilityDigestResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAbilityDigest not implemented")
 }
 func (UnimplementedReportServiceServer) mustEmbedUnimplementedReportServiceServer() {}
 func (UnimplementedReportServiceServer) testEmbeddedByValue()                       {}
@@ -126,6 +170,42 @@ func _ReportService_GetReport_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReportService_GetSessionReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSessionReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportServiceServer).GetSessionReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportService_GetSessionReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportServiceServer).GetSessionReport(ctx, req.(*GetSessionReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReportService_GetAbilityDigest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAbilityDigestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportServiceServer).GetAbilityDigest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportService_GetAbilityDigest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportServiceServer).GetAbilityDigest(ctx, req.(*GetAbilityDigestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReportService_ServiceDesc is the grpc.ServiceDesc for ReportService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -136,6 +216,14 @@ var ReportService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetReport",
 			Handler:    _ReportService_GetReport_Handler,
+		},
+		{
+			MethodName: "GetSessionReport",
+			Handler:    _ReportService_GetSessionReport_Handler,
+		},
+		{
+			MethodName: "GetAbilityDigest",
+			Handler:    _ReportService_GetAbilityDigest_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -35,11 +35,19 @@ const (
 const (
 	// ReportServiceGetReportProcedure is the fully-qualified name of the ReportService's GetReport RPC.
 	ReportServiceGetReportProcedure = "/cyber.esports.v1.ReportService/GetReport"
+	// ReportServiceGetSessionReportProcedure is the fully-qualified name of the ReportService's
+	// GetSessionReport RPC.
+	ReportServiceGetSessionReportProcedure = "/cyber.esports.v1.ReportService/GetSessionReport"
+	// ReportServiceGetAbilityDigestProcedure is the fully-qualified name of the ReportService's
+	// GetAbilityDigest RPC.
+	ReportServiceGetAbilityDigestProcedure = "/cyber.esports.v1.ReportService/GetAbilityDigest"
 )
 
 // ReportServiceClient is a client for the cyber.esports.v1.ReportService service.
 type ReportServiceClient interface {
 	GetReport(context.Context, *connect.Request[v1.GetReportRequest]) (*connect.Response[v1.GetReportResponse], error)
+	GetSessionReport(context.Context, *connect.Request[v1.GetSessionReportRequest]) (*connect.Response[v1.GetSessionReportResponse], error)
+	GetAbilityDigest(context.Context, *connect.Request[v1.GetAbilityDigestRequest]) (*connect.Response[v1.GetAbilityDigestResponse], error)
 }
 
 // NewReportServiceClient constructs a client for the cyber.esports.v1.ReportService service. By
@@ -59,12 +67,26 @@ func NewReportServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(reportServiceMethods.ByName("GetReport")),
 			connect.WithClientOptions(opts...),
 		),
+		getSessionReport: connect.NewClient[v1.GetSessionReportRequest, v1.GetSessionReportResponse](
+			httpClient,
+			baseURL+ReportServiceGetSessionReportProcedure,
+			connect.WithSchema(reportServiceMethods.ByName("GetSessionReport")),
+			connect.WithClientOptions(opts...),
+		),
+		getAbilityDigest: connect.NewClient[v1.GetAbilityDigestRequest, v1.GetAbilityDigestResponse](
+			httpClient,
+			baseURL+ReportServiceGetAbilityDigestProcedure,
+			connect.WithSchema(reportServiceMethods.ByName("GetAbilityDigest")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // reportServiceClient implements ReportServiceClient.
 type reportServiceClient struct {
-	getReport *connect.Client[v1.GetReportRequest, v1.GetReportResponse]
+	getReport        *connect.Client[v1.GetReportRequest, v1.GetReportResponse]
+	getSessionReport *connect.Client[v1.GetSessionReportRequest, v1.GetSessionReportResponse]
+	getAbilityDigest *connect.Client[v1.GetAbilityDigestRequest, v1.GetAbilityDigestResponse]
 }
 
 // GetReport calls cyber.esports.v1.ReportService.GetReport.
@@ -72,9 +94,21 @@ func (c *reportServiceClient) GetReport(ctx context.Context, req *connect.Reques
 	return c.getReport.CallUnary(ctx, req)
 }
 
+// GetSessionReport calls cyber.esports.v1.ReportService.GetSessionReport.
+func (c *reportServiceClient) GetSessionReport(ctx context.Context, req *connect.Request[v1.GetSessionReportRequest]) (*connect.Response[v1.GetSessionReportResponse], error) {
+	return c.getSessionReport.CallUnary(ctx, req)
+}
+
+// GetAbilityDigest calls cyber.esports.v1.ReportService.GetAbilityDigest.
+func (c *reportServiceClient) GetAbilityDigest(ctx context.Context, req *connect.Request[v1.GetAbilityDigestRequest]) (*connect.Response[v1.GetAbilityDigestResponse], error) {
+	return c.getAbilityDigest.CallUnary(ctx, req)
+}
+
 // ReportServiceHandler is an implementation of the cyber.esports.v1.ReportService service.
 type ReportServiceHandler interface {
 	GetReport(context.Context, *connect.Request[v1.GetReportRequest]) (*connect.Response[v1.GetReportResponse], error)
+	GetSessionReport(context.Context, *connect.Request[v1.GetSessionReportRequest]) (*connect.Response[v1.GetSessionReportResponse], error)
+	GetAbilityDigest(context.Context, *connect.Request[v1.GetAbilityDigestRequest]) (*connect.Response[v1.GetAbilityDigestResponse], error)
 }
 
 // NewReportServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -90,10 +124,26 @@ func NewReportServiceHandler(svc ReportServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(reportServiceMethods.ByName("GetReport")),
 		connect.WithHandlerOptions(opts...),
 	)
+	reportServiceGetSessionReportHandler := connect.NewUnaryHandler(
+		ReportServiceGetSessionReportProcedure,
+		svc.GetSessionReport,
+		connect.WithSchema(reportServiceMethods.ByName("GetSessionReport")),
+		connect.WithHandlerOptions(opts...),
+	)
+	reportServiceGetAbilityDigestHandler := connect.NewUnaryHandler(
+		ReportServiceGetAbilityDigestProcedure,
+		svc.GetAbilityDigest,
+		connect.WithSchema(reportServiceMethods.ByName("GetAbilityDigest")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.ReportService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ReportServiceGetReportProcedure:
 			reportServiceGetReportHandler.ServeHTTP(w, r)
+		case ReportServiceGetSessionReportProcedure:
+			reportServiceGetSessionReportHandler.ServeHTTP(w, r)
+		case ReportServiceGetAbilityDigestProcedure:
+			reportServiceGetAbilityDigestHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -105,4 +155,12 @@ type UnimplementedReportServiceHandler struct{}
 
 func (UnimplementedReportServiceHandler) GetReport(context.Context, *connect.Request[v1.GetReportRequest]) (*connect.Response[v1.GetReportResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ReportService.GetReport is not implemented"))
+}
+
+func (UnimplementedReportServiceHandler) GetSessionReport(context.Context, *connect.Request[v1.GetSessionReportRequest]) (*connect.Response[v1.GetSessionReportResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ReportService.GetSessionReport is not implemented"))
+}
+
+func (UnimplementedReportServiceHandler) GetAbilityDigest(context.Context, *connect.Request[v1.GetAbilityDigestRequest]) (*connect.Response[v1.GetAbilityDigestResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ReportService.GetAbilityDigest is not implemented"))
 }

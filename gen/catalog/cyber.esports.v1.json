@@ -304,6 +304,19 @@
     "comment": "报告",
     "methods": [
       {
+        "name": "GetAbilityDigest",
+        "full_name": "cyber.esports.v1.ReportService.GetAbilityDigest",
+        "request_name": "GetAbilityDigestRequest",
+        "request_full_name": "cyber.esports.v1.GetAbilityDigestRequest",
+        "response_name": "GetAbilityDigestResponse",
+        "response_full_name": "cyber.esports.v1.GetAbilityDigestResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/reports/digest",
+        "comment": "获取能力成绩总览",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "GetReport",
         "full_name": "cyber.esports.v1.ReportService.GetReport",
         "request_name": "GetReportRequest",
@@ -313,6 +326,19 @@
         "http_method": "POST",
         "http_path": "/api/v1/esports/reports/get",
         "comment": "获取单次能力报告",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "GetSessionReport",
+        "full_name": "cyber.esports.v1.ReportService.GetSessionReport",
+        "request_name": "GetSessionReportRequest",
+        "request_full_name": "cyber.esports.v1.GetSessionReportRequest",
+        "response_name": "GetSessionReportResponse",
+        "response_full_name": "cyber.esports.v1.GetSessionReportResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/reports/session",
+        "comment": "获取场次成绩汇总",
         "access": "BUILTIN",
         "datascope": false
       }

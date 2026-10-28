@@ -10,4 +10,6 @@ import (
 // Kratos Connect transport server, bridging a gRPC-style implementation.
 func RegisterReportServiceConnectServer(srv *connect.Server, svc ReportServiceServer) {
 	connect.HandleUnary(srv, "/cyber.esports.v1.ReportService/GetReport", svc.GetReport)
+	connect.HandleUnary(srv, "/cyber.esports.v1.ReportService/GetSessionReport", svc.GetSessionReport)
+	connect.HandleUnary(srv, "/cyber.esports.v1.ReportService/GetAbilityDigest", svc.GetAbilityDigest)
 }

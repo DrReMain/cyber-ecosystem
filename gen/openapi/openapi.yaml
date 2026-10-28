@@ -765,6 +765,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetReportAccessResponse'
+    /api/v1/esports/reports/digest:
+        post:
+            tags:
+                - ReportService
+            operationId: ReportService_GetAbilityDigest
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GetAbilityDigestRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetAbilityDigestResponse'
     /api/v1/esports/reports/get:
         post:
             tags:
@@ -783,6 +801,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetReportResponse'
+    /api/v1/esports/reports/session:
+        post:
+            tags:
+                - ReportService
+            operationId: ReportService_GetSessionReport
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GetSessionReportRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetSessionReportResponse'
     /api/v1/esports/skus:
         get:
             tags:
@@ -2927,6 +2963,58 @@ components:
                     $ref: '#/components/schemas/cyber.esports.v1.Order'
                 credential:
                     $ref: '#/components/schemas/cyber.esports.v1.PayCredential'
+        cyber.esports.v1.DigestAbilityLine:
+            type: object
+            properties:
+                ability:
+                    type: string
+                bestScore:
+                    type: number
+                    description: The cross-session best score — the ability board's bar.
+                    format: double
+                bestGrade:
+                    type: string
+                    description: |-
+                        The best attempt's grade; null when that attempt carried no cohort
+                         answer.
+                bestPercentile:
+                    type: number
+                    description: The best's percentile; null while the cohort says nothing.
+                    format: double
+                sessionsTested:
+                    type: integer
+                    description: How many distinct sessions carried a valid attempt for the ability.
+                    format: int32
+                lastAt:
+                    type: string
+                    format: date-time
+        cyber.esports.v1.DigestSessionLine:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                genre:
+                    type: string
+                finished:
+                    type: boolean
+                    description: |-
+                        All steps done — the history card's finished state; false keeps the
+                         resume entry alive.
+                doneCount:
+                    type: integer
+                    format: int32
+                stepCount:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                    format: date-time
+                anchorRecordId:
+                    type: string
+                    description: |-
+                        The session's anchor — the report entry; absent while nothing
+                         scored. The line carries no verdict of its own: the composite face
+                         reads GetSessionReport with this id.
         cyber.esports.v1.DualZoneBehavior:
             type: object
             properties:
@@ -3102,6 +3190,39 @@ components:
                     description: |-
                         The codes in full, this once and on every later list — generation
                          answers what was minted so the operator hands them out.
+        cyber.esports.v1.GetAbilityDigestRequest:
+            type: object
+            properties: {}
+        cyber.esports.v1.GetAbilityDigestResponse:
+            type: object
+            properties:
+                sessionsTotal:
+                    type: integer
+                    description: |-
+                        Sessions carrying at least one valid attempt — practice runs never
+                         count as sessions.
+                    format: int32
+                sessionsFps:
+                    type: integer
+                    format: int32
+                sessionsMoba:
+                    type: integer
+                    format: int32
+                abilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.DigestAbilityLine'
+                    description: |-
+                        One line per measured ability of the six-word vocabulary; an untested
+                         ability is an absent entry, never a zero row (the covered-count face
+                         reads the absence).
+                sessions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.DigestSessionLine'
+                    description: |-
+                        The latest session line per genre — at most one row each, absent
+                         when the genre was never played.
         cyber.esports.v1.GetMatchSessionResponse:
             type: object
             properties:
@@ -3216,6 +3337,57 @@ components:
                 totalDimensions:
                     type: integer
                     format: int32
+        cyber.esports.v1.GetSessionReportRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+        cyber.esports.v1.GetSessionReportResponse:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                genre:
+                    type: string
+                anchorRecordId:
+                    type: string
+                    description: |-
+                        The session's latest scored record — the composite verdict's owner;
+                         absent while nothing scored (the same derivation the match face
+                         carries, never this face's to claim).
+                tier:
+                    enum:
+                        - REPORT_TIER_UNSPECIFIED
+                        - REPORT_TIER_S
+                        - REPORT_TIER_A
+                        - REPORT_TIER_B
+                        - REPORT_TIER_C
+                    type: string
+                    description: |-
+                        The anchor's verdict: the frozen snapshot when one exists, the live
+                         judgement otherwise — the free tier's own law, same as the record
+                         board. UNSPECIFIED while no anchor exists.
+                    format: enum
+                compositePercentile:
+                    type: number
+                    format: double
+                abilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.SessionAbilityLine'
+                    description: |-
+                        One line per ability the session measured, in the lineup's order —
+                         an unmeasured step never lands a line, never a zero line.
+                testedDimensions:
+                    type: integer
+                    description: The completeness headline over the genre's ordered abilities.
+                    format: int32
+                totalDimensions:
+                    type: integer
+                    format: int32
+                startedAt:
+                    type: string
+                    format: date-time
         cyber.esports.v1.GetTestConfigResponse:
             type: object
             properties:
@@ -3830,6 +4002,55 @@ components:
                 elapsedMs:
                     type: integer
                     format: int32
+        cyber.esports.v1.SessionAbilityLine:
+            type: object
+            properties:
+                ability:
+                    type: string
+                gameCode:
+                    type: string
+                    description: The game whose best attempt fed the line.
+                bestScore:
+                    type: number
+                    description: |-
+                        This session's best valid attempt — the settlement headline (a line
+                         exists only when a valid attempt landed, so this is never empty).
+                    format: double
+                attemptScores:
+                    type: array
+                    items:
+                        type: number
+                        format: double
+                    description: |-
+                        Every valid attempt's authoritative score in ordinal order — the
+                         "N attempts, best taken" receipt.
+                bestGrade:
+                    type: string
+                    description: |-
+                        The best attempt's grade; null when that attempt carried no cohort
+                         answer.
+                percentile:
+                    type: number
+                    description: |-
+                        The ability's percentile from the anchor's frozen snapshot; null
+                         while the cohort says nothing.
+                    format: double
+                prevSessionScore:
+                    type: number
+                    description: |-
+                        The same ability's score on the member's previous session — null on
+                         the first session (the note renders "first", never zero).
+                    format: double
+                historyBestScore:
+                    type: number
+                    description: |-
+                        The cross-session best including this session's attempts — the mark
+                         the comparison track and the "new personal best" note read.
+                    format: double
+            description: |-
+                One ability's session verdict — the three numbers the settlement face
+                 keeps distinct: this session's best, the previous session's word, and
+                 the cross-session best.
         cyber.esports.v1.SetReportAccessPolicyRequest:
             type: object
             properties:
@@ -5654,6 +5875,12 @@ tags:
          per-ability peer detail, the last-attempt comparison and the improvement
          board. Numbers travel, copy does not: the five-zone wording stays with
          the client until its configuration face lands.
+
+         Beside the record board sit the two read-back faces: the session
+         scoreboard (GetSessionReport) and the cross-session aggregate
+         (GetAbilityDigest) — what a member sees of scores they already earned.
+         Neither runs cohort math: the frozen snapshot is their only percentile
+         source, same as the record board itself.
     - name: ResourceService
     - name: RoleService
     - name: SkuService

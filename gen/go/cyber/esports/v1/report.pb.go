@@ -12,6 +12,8 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -313,6 +315,588 @@ func (x *GetReportResponse) GetTotalDimensions() int32 {
 	return 0
 }
 
+type GetSessionReportRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSessionReportRequest) Reset() {
+	*x = GetSessionReportRequest{}
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSessionReportRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionReportRequest) ProtoMessage() {}
+
+func (x *GetSessionReportRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionReportRequest.ProtoReflect.Descriptor instead.
+func (*GetSessionReportRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetSessionReportRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+type GetSessionReportResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	SessionId string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	Genre     string                 `protobuf:"bytes,2,opt,name=genre,proto3" json:"genre,omitempty"`
+	// The session's latest scored record — the composite verdict's owner;
+	// absent while nothing scored (the same derivation the match face
+	// carries, never this face's to claim).
+	AnchorRecordId *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=anchor_record_id,json=anchorRecordId,proto3" json:"anchor_record_id,omitempty"`
+	// The anchor's verdict: the frozen snapshot when one exists, the live
+	// judgement otherwise — the free tier's own law, same as the record
+	// board. UNSPECIFIED while no anchor exists.
+	Tier                ReportTier              `protobuf:"varint,4,opt,name=tier,proto3,enum=cyber.esports.v1.ReportTier" json:"tier,omitempty"`
+	CompositePercentile *wrapperspb.DoubleValue `protobuf:"bytes,5,opt,name=composite_percentile,json=compositePercentile,proto3" json:"composite_percentile,omitempty"`
+	// One line per ability the session measured, in the lineup's order —
+	// an unmeasured step never lands a line, never a zero line.
+	Abilities []*SessionAbilityLine `protobuf:"bytes,6,rep,name=abilities,proto3" json:"abilities,omitempty"`
+	// The completeness headline over the genre's ordered abilities.
+	TestedDimensions int32                  `protobuf:"varint,7,opt,name=tested_dimensions,json=testedDimensions,proto3" json:"tested_dimensions,omitempty"`
+	TotalDimensions  int32                  `protobuf:"varint,8,opt,name=total_dimensions,json=totalDimensions,proto3" json:"total_dimensions,omitempty"`
+	StartedAt        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *GetSessionReportResponse) Reset() {
+	*x = GetSessionReportResponse{}
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSessionReportResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionReportResponse) ProtoMessage() {}
+
+func (x *GetSessionReportResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionReportResponse.ProtoReflect.Descriptor instead.
+func (*GetSessionReportResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetSessionReportResponse) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *GetSessionReportResponse) GetGenre() string {
+	if x != nil {
+		return x.Genre
+	}
+	return ""
+}
+
+func (x *GetSessionReportResponse) GetAnchorRecordId() *wrapperspb.StringValue {
+	if x != nil {
+		return x.AnchorRecordId
+	}
+	return nil
+}
+
+func (x *GetSessionReportResponse) GetTier() ReportTier {
+	if x != nil {
+		return x.Tier
+	}
+	return ReportTier_REPORT_TIER_UNSPECIFIED
+}
+
+func (x *GetSessionReportResponse) GetCompositePercentile() *wrapperspb.DoubleValue {
+	if x != nil {
+		return x.CompositePercentile
+	}
+	return nil
+}
+
+func (x *GetSessionReportResponse) GetAbilities() []*SessionAbilityLine {
+	if x != nil {
+		return x.Abilities
+	}
+	return nil
+}
+
+func (x *GetSessionReportResponse) GetTestedDimensions() int32 {
+	if x != nil {
+		return x.TestedDimensions
+	}
+	return 0
+}
+
+func (x *GetSessionReportResponse) GetTotalDimensions() int32 {
+	if x != nil {
+		return x.TotalDimensions
+	}
+	return 0
+}
+
+func (x *GetSessionReportResponse) GetStartedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartedAt
+	}
+	return nil
+}
+
+// One ability's session verdict — the three numbers the settlement face
+// keeps distinct: this session's best, the previous session's word, and
+// the cross-session best.
+type SessionAbilityLine struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Ability string                 `protobuf:"bytes,1,opt,name=ability,proto3" json:"ability,omitempty"`
+	// The game whose best attempt fed the line.
+	GameCode string `protobuf:"bytes,2,opt,name=game_code,json=gameCode,proto3" json:"game_code,omitempty"`
+	// This session's best valid attempt — the settlement headline (a line
+	// exists only when a valid attempt landed, so this is never empty).
+	BestScore float64 `protobuf:"fixed64,3,opt,name=best_score,json=bestScore,proto3" json:"best_score,omitempty"`
+	// Every valid attempt's authoritative score in ordinal order — the
+	// "N attempts, best taken" receipt.
+	AttemptScores []float64 `protobuf:"fixed64,4,rep,packed,name=attempt_scores,json=attemptScores,proto3" json:"attempt_scores,omitempty"`
+	// The best attempt's grade; null when that attempt carried no cohort
+	// answer.
+	BestGrade *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=best_grade,json=bestGrade,proto3" json:"best_grade,omitempty"`
+	// The ability's percentile from the anchor's frozen snapshot; null
+	// while the cohort says nothing.
+	Percentile *wrapperspb.DoubleValue `protobuf:"bytes,6,opt,name=percentile,proto3" json:"percentile,omitempty"`
+	// The same ability's score on the member's previous session — null on
+	// the first session (the note renders "first", never zero).
+	PrevSessionScore *wrapperspb.DoubleValue `protobuf:"bytes,7,opt,name=prev_session_score,json=prevSessionScore,proto3" json:"prev_session_score,omitempty"`
+	// The cross-session best including this session's attempts — the mark
+	// the comparison track and the "new personal best" note read.
+	HistoryBestScore *wrapperspb.DoubleValue `protobuf:"bytes,8,opt,name=history_best_score,json=historyBestScore,proto3" json:"history_best_score,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *SessionAbilityLine) Reset() {
+	*x = SessionAbilityLine{}
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SessionAbilityLine) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SessionAbilityLine) ProtoMessage() {}
+
+func (x *SessionAbilityLine) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SessionAbilityLine.ProtoReflect.Descriptor instead.
+func (*SessionAbilityLine) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SessionAbilityLine) GetAbility() string {
+	if x != nil {
+		return x.Ability
+	}
+	return ""
+}
+
+func (x *SessionAbilityLine) GetGameCode() string {
+	if x != nil {
+		return x.GameCode
+	}
+	return ""
+}
+
+func (x *SessionAbilityLine) GetBestScore() float64 {
+	if x != nil {
+		return x.BestScore
+	}
+	return 0
+}
+
+func (x *SessionAbilityLine) GetAttemptScores() []float64 {
+	if x != nil {
+		return x.AttemptScores
+	}
+	return nil
+}
+
+func (x *SessionAbilityLine) GetBestGrade() *wrapperspb.StringValue {
+	if x != nil {
+		return x.BestGrade
+	}
+	return nil
+}
+
+func (x *SessionAbilityLine) GetPercentile() *wrapperspb.DoubleValue {
+	if x != nil {
+		return x.Percentile
+	}
+	return nil
+}
+
+func (x *SessionAbilityLine) GetPrevSessionScore() *wrapperspb.DoubleValue {
+	if x != nil {
+		return x.PrevSessionScore
+	}
+	return nil
+}
+
+func (x *SessionAbilityLine) GetHistoryBestScore() *wrapperspb.DoubleValue {
+	if x != nil {
+		return x.HistoryBestScore
+	}
+	return nil
+}
+
+type GetAbilityDigestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAbilityDigestRequest) Reset() {
+	*x = GetAbilityDigestRequest{}
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAbilityDigestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAbilityDigestRequest) ProtoMessage() {}
+
+func (x *GetAbilityDigestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAbilityDigestRequest.ProtoReflect.Descriptor instead.
+func (*GetAbilityDigestRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{5}
+}
+
+type GetAbilityDigestResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Sessions carrying at least one valid attempt — practice runs never
+	// count as sessions.
+	SessionsTotal int32 `protobuf:"varint,1,opt,name=sessions_total,json=sessionsTotal,proto3" json:"sessions_total,omitempty"`
+	SessionsFps   int32 `protobuf:"varint,2,opt,name=sessions_fps,json=sessionsFps,proto3" json:"sessions_fps,omitempty"`
+	SessionsMoba  int32 `protobuf:"varint,3,opt,name=sessions_moba,json=sessionsMoba,proto3" json:"sessions_moba,omitempty"`
+	// One line per measured ability of the six-word vocabulary; an untested
+	// ability is an absent entry, never a zero row (the covered-count face
+	// reads the absence).
+	Abilities []*DigestAbilityLine `protobuf:"bytes,4,rep,name=abilities,proto3" json:"abilities,omitempty"`
+	// The latest session line per genre — at most one row each, absent
+	// when the genre was never played.
+	Sessions      []*DigestSessionLine `protobuf:"bytes,5,rep,name=sessions,proto3" json:"sessions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAbilityDigestResponse) Reset() {
+	*x = GetAbilityDigestResponse{}
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAbilityDigestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAbilityDigestResponse) ProtoMessage() {}
+
+func (x *GetAbilityDigestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAbilityDigestResponse.ProtoReflect.Descriptor instead.
+func (*GetAbilityDigestResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetAbilityDigestResponse) GetSessionsTotal() int32 {
+	if x != nil {
+		return x.SessionsTotal
+	}
+	return 0
+}
+
+func (x *GetAbilityDigestResponse) GetSessionsFps() int32 {
+	if x != nil {
+		return x.SessionsFps
+	}
+	return 0
+}
+
+func (x *GetAbilityDigestResponse) GetSessionsMoba() int32 {
+	if x != nil {
+		return x.SessionsMoba
+	}
+	return 0
+}
+
+func (x *GetAbilityDigestResponse) GetAbilities() []*DigestAbilityLine {
+	if x != nil {
+		return x.Abilities
+	}
+	return nil
+}
+
+func (x *GetAbilityDigestResponse) GetSessions() []*DigestSessionLine {
+	if x != nil {
+		return x.Sessions
+	}
+	return nil
+}
+
+type DigestAbilityLine struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Ability string                 `protobuf:"bytes,1,opt,name=ability,proto3" json:"ability,omitempty"`
+	// The cross-session best score — the ability board's bar.
+	BestScore float64 `protobuf:"fixed64,2,opt,name=best_score,json=bestScore,proto3" json:"best_score,omitempty"`
+	// The best attempt's grade; null when that attempt carried no cohort
+	// answer.
+	BestGrade *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=best_grade,json=bestGrade,proto3" json:"best_grade,omitempty"`
+	// The best's percentile; null while the cohort says nothing.
+	BestPercentile *wrapperspb.DoubleValue `protobuf:"bytes,4,opt,name=best_percentile,json=bestPercentile,proto3" json:"best_percentile,omitempty"`
+	// How many distinct sessions carried a valid attempt for the ability.
+	SessionsTested int32                  `protobuf:"varint,5,opt,name=sessions_tested,json=sessionsTested,proto3" json:"sessions_tested,omitempty"`
+	LastAt         *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=last_at,json=lastAt,proto3" json:"last_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DigestAbilityLine) Reset() {
+	*x = DigestAbilityLine{}
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DigestAbilityLine) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DigestAbilityLine) ProtoMessage() {}
+
+func (x *DigestAbilityLine) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DigestAbilityLine.ProtoReflect.Descriptor instead.
+func (*DigestAbilityLine) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *DigestAbilityLine) GetAbility() string {
+	if x != nil {
+		return x.Ability
+	}
+	return ""
+}
+
+func (x *DigestAbilityLine) GetBestScore() float64 {
+	if x != nil {
+		return x.BestScore
+	}
+	return 0
+}
+
+func (x *DigestAbilityLine) GetBestGrade() *wrapperspb.StringValue {
+	if x != nil {
+		return x.BestGrade
+	}
+	return nil
+}
+
+func (x *DigestAbilityLine) GetBestPercentile() *wrapperspb.DoubleValue {
+	if x != nil {
+		return x.BestPercentile
+	}
+	return nil
+}
+
+func (x *DigestAbilityLine) GetSessionsTested() int32 {
+	if x != nil {
+		return x.SessionsTested
+	}
+	return 0
+}
+
+func (x *DigestAbilityLine) GetLastAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastAt
+	}
+	return nil
+}
+
+type DigestSessionLine struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	SessionId string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	Genre     string                 `protobuf:"bytes,2,opt,name=genre,proto3" json:"genre,omitempty"`
+	// All steps done — the history card's finished state; false keeps the
+	// resume entry alive.
+	Finished  bool                   `protobuf:"varint,3,opt,name=finished,proto3" json:"finished,omitempty"`
+	DoneCount int32                  `protobuf:"varint,4,opt,name=done_count,json=doneCount,proto3" json:"done_count,omitempty"`
+	StepCount int32                  `protobuf:"varint,5,opt,name=step_count,json=stepCount,proto3" json:"step_count,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// The session's anchor — the report entry; absent while nothing
+	// scored. The line carries no verdict of its own: the composite face
+	// reads GetSessionReport with this id.
+	AnchorRecordId *wrapperspb.StringValue `protobuf:"bytes,7,opt,name=anchor_record_id,json=anchorRecordId,proto3" json:"anchor_record_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *DigestSessionLine) Reset() {
+	*x = DigestSessionLine{}
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DigestSessionLine) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DigestSessionLine) ProtoMessage() {}
+
+func (x *DigestSessionLine) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DigestSessionLine.ProtoReflect.Descriptor instead.
+func (*DigestSessionLine) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *DigestSessionLine) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *DigestSessionLine) GetGenre() string {
+	if x != nil {
+		return x.Genre
+	}
+	return ""
+}
+
+func (x *DigestSessionLine) GetFinished() bool {
+	if x != nil {
+		return x.Finished
+	}
+	return false
+}
+
+func (x *DigestSessionLine) GetDoneCount() int32 {
+	if x != nil {
+		return x.DoneCount
+	}
+	return 0
+}
+
+func (x *DigestSessionLine) GetStepCount() int32 {
+	if x != nil {
+		return x.StepCount
+	}
+	return 0
+}
+
+func (x *DigestSessionLine) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *DigestSessionLine) GetAnchorRecordId() *wrapperspb.StringValue {
+	if x != nil {
+		return x.AnchorRecordId
+	}
+	return nil
+}
+
 // One radar axis: the ability's own numbers plus the cohort answer. The
 // percentile is the same-age same-sex cohort's; a cohort too thin to say
 // anything yields a null percentile and a LOW confidence — the axis then
@@ -334,7 +918,7 @@ type ReportAbility struct {
 
 func (x *ReportAbility) Reset() {
 	*x = ReportAbility{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -346,7 +930,7 @@ func (x *ReportAbility) String() string {
 func (*ReportAbility) ProtoMessage() {}
 
 func (x *ReportAbility) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -359,7 +943,7 @@ func (x *ReportAbility) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportAbility.ProtoReflect.Descriptor instead.
 func (*ReportAbility) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{2}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ReportAbility) GetAbility() string {
@@ -420,7 +1004,7 @@ type ReportComparison struct {
 
 func (x *ReportComparison) Reset() {
 	*x = ReportComparison{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[3]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -432,7 +1016,7 @@ func (x *ReportComparison) String() string {
 func (*ReportComparison) ProtoMessage() {}
 
 func (x *ReportComparison) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[3]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -445,7 +1029,7 @@ func (x *ReportComparison) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportComparison.ProtoReflect.Descriptor instead.
 func (*ReportComparison) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{3}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ReportComparison) GetDeltas() []*ReportComparison_Delta {
@@ -468,7 +1052,7 @@ type ReportImprovement struct {
 
 func (x *ReportImprovement) Reset() {
 	*x = ReportImprovement{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -480,7 +1064,7 @@ func (x *ReportImprovement) String() string {
 func (*ReportImprovement) ProtoMessage() {}
 
 func (x *ReportImprovement) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -493,7 +1077,7 @@ func (x *ReportImprovement) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportImprovement.ProtoReflect.Descriptor instead.
 func (*ReportImprovement) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{4}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ReportImprovement) GetAbility() string {
@@ -537,7 +1121,7 @@ type ReportComparison_Delta struct {
 
 func (x *ReportComparison_Delta) Reset() {
 	*x = ReportComparison_Delta{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -549,7 +1133,7 @@ func (x *ReportComparison_Delta) String() string {
 func (*ReportComparison_Delta) ProtoMessage() {}
 
 func (x *ReportComparison_Delta) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -562,7 +1146,7 @@ func (x *ReportComparison_Delta) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportComparison_Delta.ProtoReflect.Descriptor instead.
 func (*ReportComparison_Delta) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{3, 0}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{10, 0}
 }
 
 func (x *ReportComparison_Delta) GetAbility() string {
@@ -590,7 +1174,7 @@ var File_cyber_esports_v1_report_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_report_proto_rawDesc = "" +
 	"\n" +
-	"\x1dcyber/esports/v1/report.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\":\n" +
+	"\x1dcyber/esports/v1/report.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\":\n" +
 	"\x10GetReportRequest\x12&\n" +
 	"\trecord_id\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x14R\brecordId\"\xcd\x04\n" +
 	"\x11GetReportResponse\x12\x1b\n" +
@@ -608,7 +1192,63 @@ const file_cyber_esports_v1_report_proto_rawDesc = "" +
 	"\x10total_dimensions\x18\n" +
 	" \x01(\x05R\x0ftotalDimensionsB\x17\n" +
 	"\x15_composite_percentileB\r\n" +
-	"\v_comparison\"\xae\x02\n" +
+	"\v_comparison\"C\n" +
+	"\x17GetSessionReportRequest\x12(\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@R\tsessionId\"\xf1\x03\n" +
+	"\x18GetSessionReportResponse\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x14\n" +
+	"\x05genre\x18\x02 \x01(\tR\x05genre\x12F\n" +
+	"\x10anchor_record_id\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x0eanchorRecordId\x120\n" +
+	"\x04tier\x18\x04 \x01(\x0e2\x1c.cyber.esports.v1.ReportTierR\x04tier\x12O\n" +
+	"\x14composite_percentile\x18\x05 \x01(\v2\x1c.google.protobuf.DoubleValueR\x13compositePercentile\x12B\n" +
+	"\tabilities\x18\x06 \x03(\v2$.cyber.esports.v1.SessionAbilityLineR\tabilities\x12+\n" +
+	"\x11tested_dimensions\x18\a \x01(\x05R\x10testedDimensions\x12)\n" +
+	"\x10total_dimensions\x18\b \x01(\x05R\x0ftotalDimensions\x129\n" +
+	"\n" +
+	"started_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\"\xa4\x03\n" +
+	"\x12SessionAbilityLine\x12\x18\n" +
+	"\aability\x18\x01 \x01(\tR\aability\x12\x1b\n" +
+	"\tgame_code\x18\x02 \x01(\tR\bgameCode\x12\x1d\n" +
+	"\n" +
+	"best_score\x18\x03 \x01(\x01R\tbestScore\x12%\n" +
+	"\x0eattempt_scores\x18\x04 \x03(\x01R\rattemptScores\x12;\n" +
+	"\n" +
+	"best_grade\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\tbestGrade\x12<\n" +
+	"\n" +
+	"percentile\x18\x06 \x01(\v2\x1c.google.protobuf.DoubleValueR\n" +
+	"percentile\x12J\n" +
+	"\x12prev_session_score\x18\a \x01(\v2\x1c.google.protobuf.DoubleValueR\x10prevSessionScore\x12J\n" +
+	"\x12history_best_score\x18\b \x01(\v2\x1c.google.protobuf.DoubleValueR\x10historyBestScore\"\x19\n" +
+	"\x17GetAbilityDigestRequest\"\x8d\x02\n" +
+	"\x18GetAbilityDigestResponse\x12%\n" +
+	"\x0esessions_total\x18\x01 \x01(\x05R\rsessionsTotal\x12!\n" +
+	"\fsessions_fps\x18\x02 \x01(\x05R\vsessionsFps\x12#\n" +
+	"\rsessions_moba\x18\x03 \x01(\x05R\fsessionsMoba\x12A\n" +
+	"\tabilities\x18\x04 \x03(\v2#.cyber.esports.v1.DigestAbilityLineR\tabilities\x12?\n" +
+	"\bsessions\x18\x05 \x03(\v2#.cyber.esports.v1.DigestSessionLineR\bsessions\"\xae\x02\n" +
+	"\x11DigestAbilityLine\x12\x18\n" +
+	"\aability\x18\x01 \x01(\tR\aability\x12\x1d\n" +
+	"\n" +
+	"best_score\x18\x02 \x01(\x01R\tbestScore\x12;\n" +
+	"\n" +
+	"best_grade\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\tbestGrade\x12E\n" +
+	"\x0fbest_percentile\x18\x04 \x01(\v2\x1c.google.protobuf.DoubleValueR\x0ebestPercentile\x12'\n" +
+	"\x0fsessions_tested\x18\x05 \x01(\x05R\x0esessionsTested\x123\n" +
+	"\alast_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x06lastAt\"\xa5\x02\n" +
+	"\x11DigestSessionLine\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x14\n" +
+	"\x05genre\x18\x02 \x01(\tR\x05genre\x12\x1a\n" +
+	"\bfinished\x18\x03 \x01(\bR\bfinished\x12\x1d\n" +
+	"\n" +
+	"done_count\x18\x04 \x01(\x05R\tdoneCount\x12\x1d\n" +
+	"\n" +
+	"step_count\x18\x05 \x01(\x05R\tstepCount\x129\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12F\n" +
+	"\x10anchor_record_id\x18\a \x01(\v2\x1c.google.protobuf.StringValueR\x0eanchorRecordId\"\xae\x02\n" +
 	"\rReportAbility\x12\x18\n" +
 	"\aability\x18\x01 \x01(\tR\aability\x12\x1b\n" +
 	"\tgame_code\x18\x02 \x01(\tR\bgameCode\x12\x14\n" +
@@ -648,10 +1288,14 @@ const file_cyber_esports_v1_report_proto_rawDesc = "" +
 	"\x1bPEER_CONFIDENCE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13PEER_CONFIDENCE_LOW\x10\x01\x12\x1a\n" +
 	"\x16PEER_CONFIDENCE_MEDIUM\x10\x02\x12\x18\n" +
-	"\x14PEER_CONFIDENCE_HIGH\x10\x032\xbe\x01\n" +
+	"\x14PEER_CONFIDENCE_HIGH\x10\x032\xb5\x04\n" +
 	"\rReportService\x12\xa0\x01\n" +
 	"\tGetReport\x12\".cyber.esports.v1.GetReportRequest\x1a#.cyber.esports.v1.GetReportResponse\"J\x88\xf1\x04\x04\x8a\xd3\x0e\x1c\n" +
-	"\x18获取单次能力报告\x10\x01\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/esports/reports/get\x1a\n" +
+	"\x18获取单次能力报告\x10\x01\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/esports/reports/get\x12\xb9\x01\n" +
+	"\x10GetSessionReport\x12).cyber.esports.v1.GetSessionReportRequest\x1a*.cyber.esports.v1.GetSessionReportResponse\"N\x88\xf1\x04\x04\x8a\xd3\x0e\x1c\n" +
+	"\x18获取场次成绩汇总\x10\x01\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/api/v1/esports/reports/session\x12\xb8\x01\n" +
+	"\x10GetAbilityDigest\x12).cyber.esports.v1.GetAbilityDigestRequest\x1a*.cyber.esports.v1.GetAbilityDigestResponse\"M\x88\xf1\x04\x04\x8a\xd3\x0e\x1c\n" +
+	"\x18获取能力成绩总览\x10\x01\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/esports/reports/digest\x1a\n" +
 	"\x8a\xe2\t\x06报告B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
@@ -667,32 +1311,62 @@ func file_cyber_esports_v1_report_proto_rawDescGZIP() []byte {
 }
 
 var file_cyber_esports_v1_report_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_cyber_esports_v1_report_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_cyber_esports_v1_report_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_cyber_esports_v1_report_proto_goTypes = []any{
-	(ReportTier)(0),                // 0: cyber.esports.v1.ReportTier
-	(PeerConfidence)(0),            // 1: cyber.esports.v1.PeerConfidence
-	(*GetReportRequest)(nil),       // 2: cyber.esports.v1.GetReportRequest
-	(*GetReportResponse)(nil),      // 3: cyber.esports.v1.GetReportResponse
-	(*ReportAbility)(nil),          // 4: cyber.esports.v1.ReportAbility
-	(*ReportComparison)(nil),       // 5: cyber.esports.v1.ReportComparison
-	(*ReportImprovement)(nil),      // 6: cyber.esports.v1.ReportImprovement
-	(*ReportComparison_Delta)(nil), // 7: cyber.esports.v1.ReportComparison.Delta
+	(ReportTier)(0),                  // 0: cyber.esports.v1.ReportTier
+	(PeerConfidence)(0),              // 1: cyber.esports.v1.PeerConfidence
+	(*GetReportRequest)(nil),         // 2: cyber.esports.v1.GetReportRequest
+	(*GetReportResponse)(nil),        // 3: cyber.esports.v1.GetReportResponse
+	(*GetSessionReportRequest)(nil),  // 4: cyber.esports.v1.GetSessionReportRequest
+	(*GetSessionReportResponse)(nil), // 5: cyber.esports.v1.GetSessionReportResponse
+	(*SessionAbilityLine)(nil),       // 6: cyber.esports.v1.SessionAbilityLine
+	(*GetAbilityDigestRequest)(nil),  // 7: cyber.esports.v1.GetAbilityDigestRequest
+	(*GetAbilityDigestResponse)(nil), // 8: cyber.esports.v1.GetAbilityDigestResponse
+	(*DigestAbilityLine)(nil),        // 9: cyber.esports.v1.DigestAbilityLine
+	(*DigestSessionLine)(nil),        // 10: cyber.esports.v1.DigestSessionLine
+	(*ReportAbility)(nil),            // 11: cyber.esports.v1.ReportAbility
+	(*ReportComparison)(nil),         // 12: cyber.esports.v1.ReportComparison
+	(*ReportImprovement)(nil),        // 13: cyber.esports.v1.ReportImprovement
+	(*ReportComparison_Delta)(nil),   // 14: cyber.esports.v1.ReportComparison.Delta
+	(*wrapperspb.StringValue)(nil),   // 15: google.protobuf.StringValue
+	(*wrapperspb.DoubleValue)(nil),   // 16: google.protobuf.DoubleValue
+	(*timestamppb.Timestamp)(nil),    // 17: google.protobuf.Timestamp
 }
 var file_cyber_esports_v1_report_proto_depIdxs = []int32{
-	0, // 0: cyber.esports.v1.GetReportResponse.tier:type_name -> cyber.esports.v1.ReportTier
-	4, // 1: cyber.esports.v1.GetReportResponse.abilities:type_name -> cyber.esports.v1.ReportAbility
-	4, // 2: cyber.esports.v1.GetReportResponse.sub_abilities:type_name -> cyber.esports.v1.ReportAbility
-	5, // 3: cyber.esports.v1.GetReportResponse.comparison:type_name -> cyber.esports.v1.ReportComparison
-	6, // 4: cyber.esports.v1.GetReportResponse.improvements:type_name -> cyber.esports.v1.ReportImprovement
-	1, // 5: cyber.esports.v1.ReportAbility.confidence:type_name -> cyber.esports.v1.PeerConfidence
-	7, // 6: cyber.esports.v1.ReportComparison.deltas:type_name -> cyber.esports.v1.ReportComparison.Delta
-	2, // 7: cyber.esports.v1.ReportService.GetReport:input_type -> cyber.esports.v1.GetReportRequest
-	3, // 8: cyber.esports.v1.ReportService.GetReport:output_type -> cyber.esports.v1.GetReportResponse
-	8, // [8:9] is the sub-list for method output_type
-	7, // [7:8] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	0,  // 0: cyber.esports.v1.GetReportResponse.tier:type_name -> cyber.esports.v1.ReportTier
+	11, // 1: cyber.esports.v1.GetReportResponse.abilities:type_name -> cyber.esports.v1.ReportAbility
+	11, // 2: cyber.esports.v1.GetReportResponse.sub_abilities:type_name -> cyber.esports.v1.ReportAbility
+	12, // 3: cyber.esports.v1.GetReportResponse.comparison:type_name -> cyber.esports.v1.ReportComparison
+	13, // 4: cyber.esports.v1.GetReportResponse.improvements:type_name -> cyber.esports.v1.ReportImprovement
+	15, // 5: cyber.esports.v1.GetSessionReportResponse.anchor_record_id:type_name -> google.protobuf.StringValue
+	0,  // 6: cyber.esports.v1.GetSessionReportResponse.tier:type_name -> cyber.esports.v1.ReportTier
+	16, // 7: cyber.esports.v1.GetSessionReportResponse.composite_percentile:type_name -> google.protobuf.DoubleValue
+	6,  // 8: cyber.esports.v1.GetSessionReportResponse.abilities:type_name -> cyber.esports.v1.SessionAbilityLine
+	17, // 9: cyber.esports.v1.GetSessionReportResponse.started_at:type_name -> google.protobuf.Timestamp
+	15, // 10: cyber.esports.v1.SessionAbilityLine.best_grade:type_name -> google.protobuf.StringValue
+	16, // 11: cyber.esports.v1.SessionAbilityLine.percentile:type_name -> google.protobuf.DoubleValue
+	16, // 12: cyber.esports.v1.SessionAbilityLine.prev_session_score:type_name -> google.protobuf.DoubleValue
+	16, // 13: cyber.esports.v1.SessionAbilityLine.history_best_score:type_name -> google.protobuf.DoubleValue
+	9,  // 14: cyber.esports.v1.GetAbilityDigestResponse.abilities:type_name -> cyber.esports.v1.DigestAbilityLine
+	10, // 15: cyber.esports.v1.GetAbilityDigestResponse.sessions:type_name -> cyber.esports.v1.DigestSessionLine
+	15, // 16: cyber.esports.v1.DigestAbilityLine.best_grade:type_name -> google.protobuf.StringValue
+	16, // 17: cyber.esports.v1.DigestAbilityLine.best_percentile:type_name -> google.protobuf.DoubleValue
+	17, // 18: cyber.esports.v1.DigestAbilityLine.last_at:type_name -> google.protobuf.Timestamp
+	17, // 19: cyber.esports.v1.DigestSessionLine.created_at:type_name -> google.protobuf.Timestamp
+	15, // 20: cyber.esports.v1.DigestSessionLine.anchor_record_id:type_name -> google.protobuf.StringValue
+	1,  // 21: cyber.esports.v1.ReportAbility.confidence:type_name -> cyber.esports.v1.PeerConfidence
+	14, // 22: cyber.esports.v1.ReportComparison.deltas:type_name -> cyber.esports.v1.ReportComparison.Delta
+	2,  // 23: cyber.esports.v1.ReportService.GetReport:input_type -> cyber.esports.v1.GetReportRequest
+	4,  // 24: cyber.esports.v1.ReportService.GetSessionReport:input_type -> cyber.esports.v1.GetSessionReportRequest
+	7,  // 25: cyber.esports.v1.ReportService.GetAbilityDigest:input_type -> cyber.esports.v1.GetAbilityDigestRequest
+	3,  // 26: cyber.esports.v1.ReportService.GetReport:output_type -> cyber.esports.v1.GetReportResponse
+	5,  // 27: cyber.esports.v1.ReportService.GetSessionReport:output_type -> cyber.esports.v1.GetSessionReportResponse
+	8,  // 28: cyber.esports.v1.ReportService.GetAbilityDigest:output_type -> cyber.esports.v1.GetAbilityDigestResponse
+	26, // [26:29] is the sub-list for method output_type
+	23, // [23:26] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_report_proto_init() }
@@ -701,15 +1375,15 @@ func file_cyber_esports_v1_report_proto_init() {
 		return
 	}
 	file_cyber_esports_v1_report_proto_msgTypes[1].OneofWrappers = []any{}
-	file_cyber_esports_v1_report_proto_msgTypes[2].OneofWrappers = []any{}
-	file_cyber_esports_v1_report_proto_msgTypes[5].OneofWrappers = []any{}
+	file_cyber_esports_v1_report_proto_msgTypes[9].OneofWrappers = []any{}
+	file_cyber_esports_v1_report_proto_msgTypes[12].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_report_proto_rawDesc), len(file_cyber_esports_v1_report_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   6,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

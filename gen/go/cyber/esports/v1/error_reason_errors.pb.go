@@ -324,3 +324,15 @@ func IsEsportsReportRecordInvalid(err error) bool {
 func ErrorEsportsReportRecordInvalid(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, Esports_ESPORTS_REPORT_RECORD_INVALID.String(), fmt.Sprintf(format, args...))
 }
+
+func IsEsportsReportSessionNotOwned(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_REPORT_SESSION_NOT_OWNED.String() && e.Code == 403
+}
+
+func ErrorEsportsReportSessionNotOwned(format string, args ...interface{}) *errors.Error {
+	return errors.New(403, Esports_ESPORTS_REPORT_SESSION_NOT_OWNED.String(), fmt.Sprintf(format, args...))
+}
