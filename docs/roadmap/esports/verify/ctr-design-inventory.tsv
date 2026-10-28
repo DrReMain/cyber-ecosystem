@@ -1,0 +1,193 @@
+relpath	title	headings	visibletextchars
+outputs/NAVIGATION_MAP.html	图片关联关系 · block3 / block4 导览	图片关联关系导览 / ① 登录 → 信息填写 → 选类型 / ② 测试分支（各测 4 款，intro → result 循环）	3402
+outputs/block3/01-login-agree.html	01-login-agree		179
+outputs/block3/01-login-password.html	01-login-password		172
+outputs/block3/01-login-toast.html	01-login-toast		185
+outputs/block3/01-login.html	01-login		163
+outputs/block3/02-profile-nickname-wechat.html	02-profile-nickname-wechat		81
+outputs/block3/02-profile-nickname.html	02-profile-nickname		68
+outputs/block3/03-profile-age.html	03-profile-age		132
+outputs/block3/04-profile-setup-custom.html	04-profile-setup		226
+outputs/block3/04-profile-setup.html	04-profile-setup		195
+outputs/block3/05-match-guide-fps.html	05-match-guide-fps		235
+outputs/block3/06-fps-retest-guide.html	06-fps-retest-guide	测试说明	220
+outputs/block3/06-fps-test-guide.html	06-fps-test-guide	测试说明	218
+outputs/block3/07-fps-intro-1.html	07-fps-intro-1		94
+outputs/block3/08-fps-result-1.html	08-fps-result-1		161
+outputs/block3/09-fps-intro-2.html	09-fps-intro-2		95
+outputs/block3/10-fps-result-2.html	10-fps-result-2		162
+outputs/block3/11-fps-intro-3.html	11-fps-intro-3		97
+outputs/block3/12-fps-result-3.html	12-fps-result-3		163
+outputs/block3/13-fps-intro-4.html	13-fps-intro-4		95
+outputs/block3/14-fps-result-4.html	14-fps-result-4		150
+outputs/block3/15-match-switch-confirm.html	15-match-switch-confirm		79
+outputs/block3/16-match-empty.html	16-match-empty		52
+outputs/block3/16-match-genre-pick.html	16-match-genre-pick	选择测试类型	137
+outputs/block3/17-match-guide-moba.html	17-match-guide-moba		241
+outputs/block3/18-moba-retest-guide-20260811.html	18-moba-retest-guide-20260811	测试说明	238
+outputs/block3/18-moba-test-guide.html	18-moba-test-guide	测试说明	227
+outputs/block3/19-moba-intro-1.html	19-moba-intro-1		99
+outputs/block3/20-moba-result-1.html	20-moba-result-1		165
+outputs/block3/21-moba-intro-2.html	21-moba-intro-2		101
+outputs/block3/22-moba-result-2.html	22-moba-result-2		162
+outputs/block3/23-moba-intro-3.html	23-moba-intro-3		86
+outputs/block3/24-moba-result-3.html	24-moba-result-3		164
+outputs/block3/25-moba-intro-4.html	25-moba-intro-4		96
+outputs/block3/26-moba-result-4.html	26-moba-result-4		149
+outputs/block3/27a-20260810.html	27a-20260810	测评完成	239
+outputs/block3/27b-20260810.html	27b-20260810	测评完成	188
+outputs/block3/27c-20260810.html	27c-20260810	测评完成	192
+outputs/block3/27c-20260813.html	27c-20260813	测评完成	226
+outputs/block3/27c-moba.html	27c-moba	测评完成	219
+outputs/block3/28a-20260810.html	28a-20260810		144
+outputs/block3/28b-20260810.html	28b-20260810		175
+outputs/block3/28c-20260810.html	28c-20260810		174
+outputs/block3/29a-20260810.html	29a-20260810	能力报告	214
+outputs/block3/29b-20260810.html	29b-20260810	能力报告	195
+outputs/block3/29c-20260810.html	29c-20260810	能力报告	222
+outputs/block3/29c-20260813-complete.html	29c-20260813-complete	能力测评报告	618
+outputs/block3/29c-20260813-unlocked.html	29c-20260813-unlocked	能力测评报告	796
+outputs/block3/30-match-empty.html	30-match-empty		52
+outputs/block3/31-exit-confirm-20260811.html	31-exit-confirm-20260811		97
+outputs/block3/32-retest-guide-20260811.html	32-retest-guide-20260811	测试说明	233
+outputs/block3/33-resume-remind-20260811.html	33-resume-remind-20260811		126
+outputs/block3/34-test-records-20260811.html	34-test-records-20260811	我的测试记录	157
+outputs/block3/BLOCK3_REVIEW_V2_DECK.html	MVP2 匹配引擎 · 第二轮评审（变现三页方案）	MVP2 匹配引擎 · 变现三页方案评审 / 测试链路原型展示 / 测试链路（05-06）· 匹配引导 + 测试说明	3519
+outputs/block3/account-merge-confirm.html	account-merge-confirm		232
+outputs/block3/account-merge-success.html	account-merge-success		122
+outputs/block3/bind-phone-guide-error.html	bind-phone-guide-error		166
+outputs/block3/bind-phone-guide.html	bind-phone-guide		123
+outputs/block3/bind-wechat-guide-conflict.html	bind-wechat-guide-conflict		232
+outputs/block3/bind-wechat-guide.html	bind-wechat-guide		166
+outputs/block3/forgot-password.html	forgot-password	忘记密码	82
+outputs/block3/his/BLOCK3_REVIEW_DECK.html	MVP2 匹配引擎 · 设计评审	MVP2 匹配引擎 · 设计评审 / 背景与目标 / 现状 · 用户痛点	2621
+outputs/block3/his/MVP2_REVIEW_DECK.html	MVP2 匹配引擎 · 设计评审（极简科技风）	MVP2 匹配引擎 · 设计评审 / 背景与目标 / 现状 · 用户痛点	2626
+outputs/block3/moba-6dim-report.html	moba-6dim-report	能力测评报告	679
+outputs/block3/moba-6dim-unlocked.html	moba-6dim-report	能力测评报告	576
+outputs/block3/privacy-policy.html	隐私政策	隐私政策 / 一、我们收集的信息 / 二、我们如何使用信息	1257
+outputs/block3/rejected/03-profile-age-range.html	03-profile-age		160
+outputs/block3/rejected/27-match-complete.html	27-match-complete	测评完成	226
+outputs/block3/rejected/27a-20260810.html	27a-20260810	测评完成	239
+outputs/block3/rejected/27b-20260810.html	27b-20260810	测评完成	188
+outputs/block3/rejected/27c-20260810.html	27c-20260810	测评完成	192
+outputs/block3/rejected/28a-20260810.html	28a-20260810		144
+outputs/block3/rejected/28b-20260810.html	28b-20260810		175
+outputs/block3/rejected/28c-20260810.html	28c-20260810		174
+outputs/block3/rejected/28c-20260813.html	28c-20260813		184
+outputs/block3/rejected/29a-20260810.html	29a-20260810	能力报告	214
+outputs/block3/rejected/29b-20260810.html	29b-20260810	能力报告	195
+outputs/block3/rejected/29c-20260810.html	29c-20260810	能力报告	222
+outputs/block3/rejected/33-resume-remind-20260811.html	33-resume-remind-20260811		126
+outputs/block3/rejected/34-test-records-20260811.html	34-test-records-20260811	我的测试记录	157
+outputs/block3/user-agreement.html	用户服务协议	用户服务协议 / 一、定义 / 二、账号注册与管理	2285
+outputs/block4/01-report-center.html	01-report-center	报告中心	193
+outputs/block4/02-career-report.html	02-career-report	电竞职业指导	503
+outputs/block4/03-career-report-locked.html	03-career-report-locked	电竞职业指导	218
+outputs/block4/04-cognitive-report-full.html	04-cognitive-report-full	认知与潜力评估报告	720
+outputs/block4/05-cognitive-report-partial.html	05-cognitive-report-partial	认知与潜力评估报告	135
+outputs/block4/06-profile-overview-member.html	06-profile-overview-member	个人中心	607
+outputs/block4/06-profile-overview-phone-unbound.html	06-profile-overview-phone-unbound	个人中心	586
+outputs/block4/06-profile-overview.html	06-profile-overview	个人中心	578
+outputs/block4/09-test-records-unfinished.html	09-test-records-unfinished	我的测试记录	159
+outputs/block4/10-test-records-finished-locked.html	10-test-records-finished-locked	我的测试记录	202
+outputs/block4/10-test-records-finished.html	10-test-records-finished	我的测试记录	175
+outputs/block4/11-test-records-best.html	11-test-records-best	我的测试记录	269
+outputs/block4/12-resume-remind.html	12-resume-remind		117
+outputs/block4/13-message-center-feedback.html	13-message-center-feedback	消息中心	178
+outputs/block4/13-message-center.html	13-message-center	消息中心	179
+outputs/block4/14-feedback-detail.html	14-feedback-detail	反馈详情	213
+outputs/block4/15-feedback-submit.html	15-feedback-submit	意见反馈	111
+outputs/block4/16-scheme-b-match-guide.html	16-scheme-b-match-guide	为你编排的测试	326
+outputs/block4/17-scheme-b-test-intro.html	17-scheme-b-test-intro	测试介绍	136
+outputs/block4/18-scheme-b-test-result-noret.html	18-scheme-b-test-result-noret	测试结果	154
+outputs/block4/18-scheme-b-test-result.html	18-scheme-b-test-result	测试结果	148
+outputs/block4/19-scheme-b-tendency.html	19-scheme-b-tendency	测评完成	241
+outputs/block4/20-pay-confirm-member.html	20-pay-confirm	支付确认	166
+outputs/block4/20-pay-confirm.html	20-pay-confirm	支付确认	180
+outputs/block4/21-pay-success.html	21-pay-success		84
+outputs/block4/22-pay-fail.html	22-pay-fail		45
+outputs/block4/23-age-required.html	23-age-required		90
+outputs/block4/24-member-detail.html	24-member-detail	专属会员	358
+outputs/block4/25-share-invite-moba.html	25-share-invite-moba	分享测试结果	216
+outputs/block4/25-share-invite.html	25-share-invite	分享测试结果	211
+outputs/block4/26-pay-cancel.html	26-pay-cancel		40
+outputs/block4/27-pay-success-member.html	27-pay-success-member		88
+outputs/block4/28-loading.html	28-loading		16
+outputs/block4/29-empty.html	29-empty		35
+outputs/block4/30-error.html	30-error		33
+outputs/block4/31-ability-trend.html	31-ability-trend	能力测评报告	256
+outputs/block4/PRODUCT_STRATEGY_DECK-20260827.html	电竞天赋检测 · ToC / ToB 双线产品（2026-08-25 版）	电竞天赋检测客户端调整与管理后台最新进展 / 分数双轨：无上限分（爽感·线性·无天花板）/ 百分位 + 评级（统一尺度） / ① 天花板封顶	2915
+outputs/block4/account-change-password.html	account-change-password	修改登录密码	87
+outputs/block4/account-set-password.html	account-set-password	设置登录密码	115
+outputs/block4/notification-detail.html	notification-detail	通知详情	153
+outputs/block4/rejected/07-profile-history.html	07-profile-history	个人中心	205
+outputs/block4/rejected/08-profile-stats.html	08-profile-stats	个人中心	236
+outputs/block4/subscription-popup.html	subscription-popup		131
+outputs/block4/theme-hero.html	theme-hero		63
+outputs/block4/version-update.html	version-update		163
+outputs/future/01-login.html	01-login		116
+outputs/future/02-profile-setup.html	02-profile-setup		146
+outputs/future/03-home.html	03-home		216
+outputs/future/04-ability-games.html	04-ability-games	反应速度	206
+outputs/future/05-testpage-landscape.html	05-testpage-landscape		46
+outputs/future/06-gamerank-share.html	06-gamerank-share		166
+outputs/future/07-school-report-full.html	07-school-report-full	学校认知报告	504
+outputs/future/07-school-report-partial.html	07-school-report-partial	学校认知报告	129
+outputs/future/08-user-profile.html	08-user-profile	个人中心	178
+outputs/future/09-message-center.html	09-message-center	消息中心	231
+outputs/future/10-practice-startup.html	练习启动页 · 闪现瞄准	闪现瞄准	117
+outputs/future/11-practice-results.html	练习结果页 · 闪现瞄准	自由练习 · 结果	92
+outputs/future/12-practice-share.html	12-practice-share		91
+outputs/future/13-practice-hub.html	13-practice-hub	训练大厅	167
+outputs/future/14-pro-paywall.html	14-pro-paywall		212
+outputs/future/15-training-diagnosis.html	15-training-diagnosis	训练诊断	226
+outputs/future/16-cosmetic-shop.html	16-cosmetic-shop	装扮商店	144
+outputs/future/17-camp-signup.html	17-camp-signup	训练营报名	214
+outputs/future/17-scouting-pack.html	17-scouting-pack	青训自荐包	167
+outputs/future/18-skin-detail.html	18-skin-detail	皮肤详情	125
+outputs/future/19-share-skinned.html	19-share-skinned		102
+outputs/future/20-practice-skinned.html	20-practice-skinned		94
+prototype/account-merge-confirm.html	ctr · 账号合并	账号合并	27
+prototype/account-security.html	ctr · 账号与安全	账号与安全	17
+prototype/age-required.html	ctr · 补填出生年月	补填出生年月	145
+prototype/agreement.html	ctr · 用户协议与隐私政策	用户协议	20
+prototype/bind-phone.html	ctr · 绑定手机号	绑定手机号	65
+prototype/bind-wechat.html	ctr · 绑定微信	绑定微信	99
+prototype/empty.html	ctr · 空态	空态	24
+prototype/error.html	ctr · 网络异常	网络异常	145
+prototype/exit-confirm.html	ctr · 已退出测评	已退出测评	108
+prototype/feedback-detail.html	ctr · 详情	详情	11
+prototype/feedback-submit.html	ctr · 意见反馈	意见反馈	111
+prototype/home.html	ctr · 首页	—	81
+prototype/index.html	ctr 交互原型 · 入口	ctr 交互高保真原型 / ① 选版本 / ② 选状态（评审直达，省去一路点过去）	637
+prototype/loading.html	ctr · 加载中	加载中	45
+prototype/login.html	ctr · 登录		174
+prototype/match-genre-pick.html	ctr · 选择测评类型	选择测评类型	19
+prototype/match-guide.html	ctr · 匹配引导	为你编排的测试	46
+prototype/match-switch-confirm.html	ctr · 切换类型确认	切换测评类型	105
+prototype/member-detail.html	ctr · 会员权益	专属会员	15
+prototype/message-center.html	ctr · 消息中心	消息	19
+prototype/password.html	ctr · 密码管理	密码管理	15
+prototype/pay-confirm.html	ctr · 确认支付	确认支付	15
+prototype/pay-result.html	ctr · 支付结果		10
+prototype/profile-age.html	ctr · 完善资料 · 年龄	完善资料	151
+prototype/profile-nickname.html	ctr · 完善资料 · 昵称	完善资料	273
+prototype/profile-overview.html	ctr · 个人中心	个人中心	231
+prototype/profile-setup.html	ctr · 完善资料 · 游戏偏好	完善资料	159
+prototype/report-career.html	ctr · 电竞职业指导	电竞职业指导	212
+prototype/report-center.html	ctr · 报告中心	报告中心	15
+prototype/report-cognitive.html	ctr · 认知与潜力评估报告	认知与潜力评估报告	25
+prototype/report-single.html	ctr · 能力测评报告	能力测评报告	19
+prototype/report-trend.html	ctr · 能力成长趋势	能力成长趋势	19
+prototype/resume-remind.html	ctr · 继续上次进度	继续上次进度	19
+prototype/scheme-b-entry.html	渠道版 · 入口		8
+prototype/scheme-b-guide.html	渠道版 · 直测说明	6 项能力直测	17
+prototype/scheme-b-report.html	渠道版 · 报告	认知与潜力评估报告	17
+prototype/share-invite.html	ctr · 分享测试结果	分享测试结果	19
+prototype/test-done.html	ctr · 测评完成	测评完成	15
+prototype/test-guide.html	ctr · 测试说明	测评前须知	89
+prototype/test-intro.html	ctr · 单项测试介绍	测试介绍	41
+prototype/test-records.html	ctr · 测试记录	我的测试记录	26
+prototype/test-result.html	ctr · 单项测试结果	本次成绩	35
+prototype/test-running.html	ctr · 测试中		89
+prototype/version-update.html	ctr · 版本更新	检查更新	24

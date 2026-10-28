@@ -24,11 +24,13 @@ import { Route as MatchGuideRouteImport } from './routes/match.guide'
 import { Route as MatchPickRouteImport } from './routes/match.pick'
 import { Route as MatchSwitchRouteImport } from './routes/match.switch'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as ReportRecordIdRouteImport } from './routes/report.$recordId'
 import { Route as TestCodeRouteImport } from './routes/test.$code'
 import { Route as LoginWechatCallbackRouteImport } from './routes/login.wechat.callback'
 import { Route as ProfileSetupAgeRouteImport } from './routes/profile.setup.age'
 import { Route as ProfileSetupGamesRouteImport } from './routes/profile.setup.games'
 import { Route as ProfileSetupNicknameRouteImport } from './routes/profile.setup.nickname'
+import { Route as ReportSessionSessionIdRouteImport } from './routes/report.session.$sessionId'
 import { Route as ApiPayProviderNotifyRouteImport } from './routes/api/pay/$provider/notify'
 
 const IndexRoute = IndexRouteImport.update({
@@ -106,6 +108,11 @@ const ProfileIndexRoute = ProfileIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProfileRoute,
 } as any)
+const ReportRecordIdRoute = ReportRecordIdRouteImport.update({
+  id: '/report/$recordId',
+  path: '/report/$recordId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TestCodeRoute = TestCodeRouteImport.update({
   id: '/test/$code',
   path: '/test/$code',
@@ -131,6 +138,11 @@ const ProfileSetupNicknameRoute = ProfileSetupNicknameRouteImport.update({
   path: '/setup/nickname',
   getParentRoute: () => ProfileRoute,
 } as any)
+const ReportSessionSessionIdRoute = ReportSessionSessionIdRouteImport.update({
+  id: '/report/session/$sessionId',
+  path: '/report/session/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPayProviderNotifyRoute = ApiPayProviderNotifyRouteImport.update({
   id: '/api/pay/$provider/notify',
   path: '/api/pay/$provider/notify',
@@ -150,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/report/$recordId': typeof ReportRecordIdRoute
   '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
@@ -158,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
+  '/report/session/$sessionId': typeof ReportSessionSessionIdRoute
   '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
 }
 export interface FileRoutesByTo {
@@ -170,6 +184,7 @@ export interface FileRoutesByTo {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/report/$recordId': typeof ReportRecordIdRoute
   '/test/$code': typeof TestCodeRoute
   '/login': typeof LoginIndexRoute
   '/match': typeof MatchIndexRoute
@@ -178,6 +193,7 @@ export interface FileRoutesByTo {
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
+  '/report/session/$sessionId': typeof ReportSessionSessionIdRoute
   '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
 }
 export interface FileRoutesById {
@@ -194,6 +210,7 @@ export interface FileRoutesById {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/report/$recordId': typeof ReportRecordIdRoute
   '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
@@ -202,6 +219,7 @@ export interface FileRoutesById {
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
+  '/report/session/$sessionId': typeof ReportSessionSessionIdRoute
   '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
 }
 export interface FileRouteTypes {
@@ -219,6 +237,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/report/$recordId'
     | '/test/$code'
     | '/login/'
     | '/match/'
@@ -227,6 +246,7 @@ export interface FileRouteTypes {
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
+    | '/report/session/$sessionId'
     | '/api/pay/$provider/notify'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -239,6 +259,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/report/$recordId'
     | '/test/$code'
     | '/login'
     | '/match'
@@ -247,6 +268,7 @@ export interface FileRouteTypes {
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
+    | '/report/session/$sessionId'
     | '/api/pay/$provider/notify'
   id:
     | '__root__'
@@ -262,6 +284,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/report/$recordId'
     | '/test/$code'
     | '/login/'
     | '/match/'
@@ -270,6 +293,7 @@ export interface FileRouteTypes {
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
+    | '/report/session/$sessionId'
     | '/api/pay/$provider/notify'
   fileRoutesById: FileRoutesById
 }
@@ -283,7 +307,9 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AgreementPrivacyRoute: typeof AgreementPrivacyRoute
   AgreementUserRoute: typeof AgreementUserRoute
+  ReportRecordIdRoute: typeof ReportRecordIdRoute
   TestCodeRoute: typeof TestCodeRoute
+  ReportSessionSessionIdRoute: typeof ReportSessionSessionIdRoute
   ApiPayProviderNotifyRoute: typeof ApiPayProviderNotifyRoute
 }
 
@@ -394,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof ProfileRoute
     }
+    '/report/$recordId': {
+      id: '/report/$recordId'
+      path: '/report/$recordId'
+      fullPath: '/report/$recordId'
+      preLoaderRoute: typeof ReportRecordIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/test/$code': {
       id: '/test/$code'
       path: '/test/$code'
@@ -428,6 +461,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile/setup/nickname'
       preLoaderRoute: typeof ProfileSetupNicknameRouteImport
       parentRoute: typeof ProfileRoute
+    }
+    '/report/session/$sessionId': {
+      id: '/report/session/$sessionId'
+      path: '/report/session/$sessionId'
+      fullPath: '/report/session/$sessionId'
+      preLoaderRoute: typeof ReportSessionSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/pay/$provider/notify': {
       id: '/api/pay/$provider/notify'
@@ -494,7 +534,9 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AgreementPrivacyRoute: AgreementPrivacyRoute,
   AgreementUserRoute: AgreementUserRoute,
+  ReportRecordIdRoute: ReportRecordIdRoute,
   TestCodeRoute: TestCodeRoute,
+  ReportSessionSessionIdRoute: ReportSessionSessionIdRoute,
   ApiPayProviderNotifyRoute: ApiPayProviderNotifyRoute,
 }
 export const routeTree = rootRouteImport

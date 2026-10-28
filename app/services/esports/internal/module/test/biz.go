@@ -14,6 +14,7 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/types"
@@ -51,6 +52,36 @@ type TestConfig struct {
 	DurationSec          int
 	BackgroundInvalidSec int
 	EngineParams         map[string]string
+}
+
+type QuestionBankRow struct {
+	ScenarioCode string
+	Payload      map[string]any
+	Answer       map[string]any // the key rides in full — operator visibility into what correctness is judged against is the point of this row
+	CreatedAt    time.Time
+}
+
+type QuestionBankOut struct {
+	*commonv1.PageResponse
+	Rows []*QuestionBankRow
+}
+
+type UpdateConfigIn struct {
+	TestID               string
+	BackgroundInvalidSec *int              // absent = the dial stays as stored — one write touches only what the operator sent
+	EngineParams         map[string]string // present = full replacement — the page reads before it writes, so replace-what-you-saw loses nothing a merge would keep
+}
+
+type AttemptsQueryIn struct {
+	*commonv1.PageRequest
+	TestCode  *string
+	UserID    *string
+	SessionID *string
+}
+
+type AttemptsOut struct {
+	*commonv1.PageResponse
+	Rows []*AttemptRecord
 }
 
 type AttemptRecord struct {
@@ -97,8 +128,15 @@ type TestRP interface {
 	GetConfigByCode(ctx context.Context, code string) (*TestConfig, error)
 	ListAnswers(ctx context.Context, testCode string) (map[string]map[string]any, error)
 	CountBySessionCodes(ctx context.Context, sessionID string) (map[string]int, error)
-	GetAttempt(ctx context.Context, id string) (*AttemptRecord, error) // nil, nil = no such record
+	LatestScoredOfSession(ctx context.Context, sessionID string) (*string, error) // nil, nil = no scored record
+	GetAttempt(ctx context.Context, id string) (*AttemptRecord, error)            // nil, nil = no such record
 	CreateAttempt(ctx context.Context, rec *AttemptRecord) (*AttemptRecord, error)
+
+	// The operator face's needs beyond the member flow: paged bank reads,
+	// paged attempt browsing, and the one write this domain's operator owns.
+	ListQuestionBank(ctx context.Context, testCode string, page *commonv1.PageRequest) (*QuestionBankOut, error)
+	ListAttempts(ctx context.Context, in *AttemptsQueryIn) (*AttemptsOut, error)
+	UpdateConfig(ctx context.Context, in *UpdateConfigIn) (*TestConfig, error)
 }
 
 type MatchSessionLaw interface {
@@ -133,6 +171,22 @@ func (uc *TestUC) Get(ctx context.Context, id string) (*Test, error) {
 
 func (uc *TestUC) GetConfig(ctx context.Context, id string) (*TestConfig, error) {
 	return uc.testRP.GetConfigByID(ctx, id)
+}
+
+func (uc *TestUC) ListQuestionBank(ctx context.Context, testCode string, page *commonv1.PageRequest) (*QuestionBankOut, error) {
+	return uc.testRP.ListQuestionBank(ctx, testCode, page)
+}
+
+func (uc *TestUC) ListAttempts(ctx context.Context, in *AttemptsQueryIn) (*AttemptsOut, error) {
+	return uc.testRP.ListAttempts(ctx, in)
+}
+
+func (uc *TestUC) GetAttempt(ctx context.Context, id string) (*AttemptRecord, error) {
+	return uc.testRP.GetAttempt(ctx, id)
+}
+
+func (uc *TestUC) UpdateConfig(ctx context.Context, in *UpdateConfigIn) (*TestConfig, error) {
+	return uc.testRP.UpdateConfig(ctx, in)
 }
 
 func (uc *TestUC) Submit(ctx context.Context, in *esportspb.SubmitTestAttemptRequest) (*SubmitOut, error) {

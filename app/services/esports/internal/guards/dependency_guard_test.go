@@ -1,0 +1,202 @@
+package guards
+
+import (
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"testing"
+)
+
+// Static guards for the module DAG and the composition layering (cmd/app
+// wires through bootstrap; shared stays a contracts-only kernel; injected
+// app contracts land in module biz constructors).
+
+// bannedImports maps a package directory (relative to internal/, prefix
+// match) to import markers it must not contain. Direct imports only: a
+// transitive leak requires importing the middleman, which these rules catch
+// at that hop.
+var bannedImports = map[string][]string{
+	// The engine floor is module-free infrastructure and never reads
+	// business aggregates.
+	"module/authz": {"module/profile"},
+	// ACL adapters implement biz-declared ports (importing the declaring
+	// module for the interface is the designed direction; the reverse is the
+	// leak), and stay ent-free.
+	"client": {"internal/ent"},
+	// The kernel-to-schema direction is one-way (shared → platform →
+	// ent/schema); an import back closes the cycle.
+	"ent/schema": {"internal/shared"},
+	// Bootstrap sits below business modules.
+	"bootstrap": {"module/"},
+	// The kernel stays ent-free.
+	"shared": {"internal/ent"},
+	// The operator face is strippable: no business module imports an admin
+	// twin (only server/registrar.go mounts it), so deleting the admin
+	// plane stays a closed operation on the dependency graph — the ban is
+	// generic, not per-module, so a second admin face inherits it.
+	"module": {"module/entitleadmin"},
+}
+
+func TestModuleDependencyDAG(t *testing.T) {
+	for dir, bans := range bannedImports {
+		files := goFiles(t, "..", dir, true)
+		if len(files) == 0 {
+			if _, statErr := os.Stat(filepath.Join("..", dir)); statErr == nil {
+				// The directory exists but matched nothing: renamed files or
+				// an empty package.
+				t.Errorf("rule %q matched no files — stale directory name?", dir)
+			}
+		}
+		for _, f := range files {
+			for _, imp := range f.imports {
+				for _, ban := range bans {
+					if strings.Contains(imp, "/"+ban) {
+						t.Errorf("%s imports %q — %s must not depend on %s (module DAG)",
+							f.rel, imp, dir, ban)
+					}
+				}
+			}
+		}
+	}
+}
+
+// TestCompositionBoundaries pins the composition layering: hand-written
+// cmd/app assembly reaches business modules only through wire provider
+// sets, and injected app contracts (HookRegistry) land in module biz
+// constructors — a repo's phase machinery is exposed as port methods and
+// registered by its UC; data/client adapters never receive the registry.
+func TestCompositionBoundaries(t *testing.T) {
+	for _, f := range goFiles(t, filepath.Clean("../../cmd/app"), "", true) {
+		if f.rel == "wire.go" || f.rel == "wire_gen.go" {
+			continue
+		}
+		for _, imp := range f.imports {
+			if strings.Contains(imp, "/internal/module/") {
+				t.Errorf("%s imports %q — cmd/app hand-written assembly wires via bootstrap/server only; modules enter through wire provider sets", f.rel, imp)
+			}
+		}
+	}
+	for _, f := range goFiles(t, "..", "module", false) {
+		if f.hookRefs == 0 {
+			continue
+		}
+		if !strings.HasSuffix(f.rel, "/biz.go") {
+			t.Errorf("%s references HookRegistry — injected app contracts land in biz constructors only", f.rel)
+		}
+	}
+}
+
+// singleServiceExceptions names module dirs still allowed a second
+// *Service struct — each entry is a debt that dies with its module split,
+// and a stale entry fails the tail loop below.
+var singleServiceExceptions = map[string]bool{
+	"pay": true, // sku and order under one package, awaiting the split
+}
+
+// TestModuleSingleService pins one module = one transport face: at most one
+// *Service struct per module dir. Two faces in one package mean two
+// aggregates sharing a module — the cure is the module split, never a
+// second service struct.
+func TestModuleSingleService(t *testing.T) {
+	counts := map[string][]string{}
+	for _, f := range goFiles(t, "..", "module", false) {
+		if len(f.serviceStructs) == 0 {
+			continue
+		}
+		mod, _, _ := strings.Cut(strings.TrimPrefix(f.rel, "module/"), "/")
+		counts[mod] = append(counts[mod], f.serviceStructs...)
+	}
+	for mod, names := range counts {
+		if len(names) > 1 && !singleServiceExceptions[mod] {
+			t.Errorf("module/%s declares %d service structs (%s) — one module one face; split the module",
+				mod, len(names), strings.Join(names, ", "))
+		}
+	}
+	for mod := range singleServiceExceptions {
+		if _, ok := counts[mod]; !ok {
+			t.Errorf("single-service exception %q matched no module — stale entry?", mod)
+		}
+	}
+}
+
+type goFile struct {
+	rel            string
+	imports        []string
+	hookRefs       int
+	serviceStructs []string
+}
+
+// goFiles walks root collecting parsed files. When ruleDir is non-empty
+// only that directory subtree is parsed, imports-only (the DAG check);
+// otherwise every handwritten file (ent generated code excluded, ent/schema
+// included) is parsed to surface contract refs.
+func goFiles(t *testing.T, root, ruleDir string, importsOnly bool) []goFile {
+	t.Helper()
+	root = filepath.Clean(root)
+	var out []goFile
+	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if path == root {
+			return nil // the root's own entry is not a hidden dir to skip
+		}
+		rel := filepath.ToSlash(strings.TrimPrefix(filepath.ToSlash(path), filepath.ToSlash(root)+"/"))
+		if d.IsDir() {
+			if strings.HasPrefix(d.Name(), ".") {
+				return fs.SkipDir
+			}
+			return nil
+		}
+		if !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		if ruleDir != "" && (rel != ruleDir && !strings.HasPrefix(rel, ruleDir+"/")) {
+			return nil
+		}
+		if ruleDir == "" && strings.HasPrefix(rel, "ent/") && !strings.HasPrefix(rel, "ent/schema/") {
+			return nil // generated: imports never drift, refs never authored
+		}
+		mode := parser.ImportsOnly
+		if !importsOnly {
+			mode = parser.SkipObjectResolution
+		}
+		fset := token.NewFileSet()
+		f, err := parser.ParseFile(fset, path, nil, mode)
+		if err != nil {
+			t.Fatalf("parse %s: %v", rel, err)
+		}
+		gf := goFile{rel: rel}
+		for _, imp := range f.Imports {
+			v, err := strconv.Unquote(imp.Path.Value)
+			if err != nil {
+				continue
+			}
+			gf.imports = append(gf.imports, v)
+		}
+		if !importsOnly {
+			ast.Inspect(f, func(n ast.Node) bool {
+				if ts, ok := n.(*ast.TypeSpec); ok {
+					if _, isStruct := ts.Type.(*ast.StructType); isStruct && strings.HasSuffix(ts.Name.Name, "Service") {
+						gf.serviceStructs = append(gf.serviceStructs, ts.Name.Name)
+					}
+				}
+				if id, ok := n.(*ast.Ident); ok && id.Name == "HookRegistry" {
+					gf.hookRefs++
+				}
+				return true
+			})
+		}
+		out = append(out, gf)
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("walk %s: %v", root, err)
+	}
+	return out
+}

@@ -106,6 +106,74 @@ type Snapshot struct {
 	CohortBasis string
 }
 
+type SessionAttemptRow struct {
+	TestCode  string
+	Ability   string
+	AttemptNo int
+	Score     float64 // authoritative — only a scored attempt lands a row, the settlement receipt's raw truth
+	Grade     *string
+	CreatedAt time.Time
+}
+
+type SessionAbilityRow struct {
+	Ability     string
+	GameCode    string
+	Best        float64   // this session's best of the retries
+	Attempts    []float64 // every valid attempt, in order — the receipt beside the verdict
+	BestGrade   *string
+	Percentile  *float64
+	PrevSession *float64 // the same ability's last-session score, not this session's prior try
+	HistoryBest *float64 // the cross-session best, the third number the settlement face keeps distinct
+}
+
+type SessionReport struct {
+	SessionID string
+	Genre     string
+	StartedAt time.Time
+	Anchor    *string
+	Tier      string // "" while no anchor exists
+	Composite *float64
+	Abilities []SessionAbilityRow
+	Tested    int
+	Total     int
+}
+
+type SessionMetaRow struct {
+	ID        string
+	UserID    string
+	Genre     string
+	Steps     []types.MatchStep
+	DoneCount int
+	CreatedAt time.Time
+}
+
+type DigestAbilityRow struct {
+	Ability    string
+	Best       float64
+	BestGrade  *string
+	Percentile *float64
+	Sessions   int
+	LastAt     time.Time
+}
+
+type DigestSessionRow struct {
+	SessionID string
+	Genre     string
+	Finished  bool
+	DoneCount int
+	StepCount int
+	CreatedAt time.Time
+	Anchor    *string // carried for the composite consumer — a digest line renders no verdict of its own
+}
+
+type AbilityDigest struct {
+	SessionsTotal int
+	SessionsFPS   int
+	SessionsMOBA  int
+	Abilities     []DigestAbilityRow
+	Sessions      []DigestSessionRow
+}
+
 type judgement struct { // the live computation's whole answer — the freeze serializes it, the free tier renders it
 	Lines     []AbilityLine
 	Composite *float64
@@ -131,6 +199,30 @@ type RecordBoardRP interface {
 	// ability from a session older than the anchor's — the last attempt,
 	// never a retry inside this one.
 	PreviousSessionRecord(ctx context.Context, userID, ability string, before time.Time) (*BoardEntry, error) // nil, nil = none
+	// SessionMeta reads the session's own row — the read-back faces'
+	// ownership check, lineup order and liveness. nil, nil = no such session.
+	SessionMeta(ctx context.Context, sessionID string) (*SessionMetaRow, error)
+	// SessionAttempts is every valid scored attempt under the session in
+	// ordinal order, grade attached — the receipt's raw truth.
+	SessionAttempts(ctx context.Context, sessionID string) ([]SessionAttemptRow, error)
+	// AnchorOfSession is the session's latest scored record — the
+	// composite verdict's owner. nil, nil = nothing scored yet.
+	AnchorOfSession(ctx context.Context, sessionID string) (*Attempt, error)
+	// AbilityBests is the member's per-ability cross-session aggregate:
+	// the best score with its grade and percentile, how many sessions
+	// carried a valid attempt, and the last time. A never-measured
+	// ability is an absent row.
+	AbilityBests(ctx context.Context, userID string) ([]DigestAbilityRow, error)
+	// SessionCounts is how many distinct sessions carried a valid
+	// attempt, split per genre — practice runs never count.
+	SessionCounts(ctx context.Context, userID string) (total int, fps int, moba int, err error)
+	// LatestSessions is the latest session per genre that carried at
+	// least one valid attempt — at most two rows.
+	LatestSessions(ctx context.Context, userID string) ([]SessionMetaRow, error)
+	// PreviousSessionScores is, per ability, the score from the member's
+	// latest scored record older than the given time — the settlement
+	// face's "vs last session" word.
+	PreviousSessionScores(ctx context.Context, userID string, before time.Time) (map[string]float64, error)
 }
 
 type SnapshotRP interface {
@@ -192,6 +284,7 @@ func (uc *ReportUC) GetReport(ctx context.Context, recordID string) (*Report, er
 	if err != nil {
 		return nil, err
 	}
+	board = dedupeBoard(board)
 
 	pf, err := uc.profileRP.FindByUserID(ctx, subject.UserID)
 	if err != nil {
@@ -254,6 +347,237 @@ func (uc *ReportUC) GetReport(ctx context.Context, recordID string) (*Report, er
 		r.Total = total
 	}
 	return r, nil
+}
+
+func (uc *ReportUC) GetSessionReport(ctx context.Context, sessionID string) (*SessionReport, error) {
+	// The session read-back face: the lineup's own order, every ability's
+	// three-number verdict, and the anchor's composite under the same law
+	// the record board follows — frozen when a snapshot exists, live
+	// otherwise. A session with no scored attempt is an honest empty
+	// board, never an error.
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("session report read requires a session"))
+	}
+	meta, err := uc.boardRP.SessionMeta(ctx, sessionID)
+	if err != nil {
+		return nil, err
+	}
+	if meta == nil {
+		return nil, esportspb.ErrorEsportsMatchSessionNotFound("")
+	}
+	if meta.UserID != subject.UserID {
+		return nil, esportspb.ErrorEsportsReportSessionNotOwned("")
+	}
+
+	attempts, err := uc.boardRP.SessionAttempts(ctx, sessionID)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &SessionReport{SessionID: meta.ID, Genre: meta.Genre, StartedAt: meta.CreatedAt}
+
+	// Per ability in the lineup's order: the best score with its
+	// attempts receipt. An attempt outside the lineup's codes has no
+	// line to sit on — dropped, not invented a slot for.
+	bestOf := make(map[string]SessionAttemptRow, len(meta.Steps))
+	scoresOf := make(map[string][]float64, len(meta.Steps))
+	for _, a := range attempts {
+		scoresOf[a.TestCode] = append(scoresOf[a.TestCode], a.Score)
+		if b, ok := bestOf[a.TestCode]; !ok || a.Score > b.Score {
+			bestOf[a.TestCode] = a
+		}
+	}
+	for _, s := range meta.Steps {
+		scores, ok := scoresOf[s.TestCode]
+		if !ok {
+			continue // an unmeasured step never lands a line
+		}
+		r.Abilities = append(r.Abilities, SessionAbilityRow{
+			Ability:   s.Ability,
+			GameCode:  s.TestCode,
+			Best:      bestOf[s.TestCode].Score,
+			Attempts:  scores,
+			BestGrade: bestOf[s.TestCode].Grade,
+		})
+	}
+	r.Tested = len(r.Abilities)
+
+	// The anchor's verdict: the frozen snapshot when one exists, the
+	// live judgement otherwise — the free tier's own law.
+	var firstAt time.Time
+	if len(attempts) > 0 {
+		firstAt = attempts[0].CreatedAt
+	}
+	if anchor, aerr := uc.boardRP.AnchorOfSession(ctx, sessionID); aerr != nil {
+		return nil, aerr
+	} else if anchor != nil {
+		anchorID := anchor.ID
+		r.Anchor = &anchorID
+		pctByAbility := uc.sessionPercentiles(ctx, anchor.ID)
+		for i := range r.Abilities {
+			if pct, ok := pctByAbility[r.Abilities[i].Ability]; ok {
+				r.Abilities[i].Percentile = pct
+			}
+		}
+		if snap, ferr := uc.snapshotRP.FindByRecord(ctx, anchor.ID); ferr != nil {
+			return nil, ferr
+		} else if snap != nil {
+			r.Tier, r.Composite = snap.Tier, snap.Composite
+		} else {
+			pf, perr := uc.profileRP.FindByUserID(ctx, subject.UserID)
+			if perr != nil {
+				return nil, perr
+			}
+			var birthYear *int32
+			var sex *string
+			var ageBand *string
+			if pf != nil {
+				birthYear, sex, ageBand = pf.BirthYear, pf.Sex, pf.AgeBand
+			}
+			j := uc.computeFor(ctx, sessionBoardOf(attempts), birthYear, sex, ageBand)
+			r.Tier, r.Composite = j.Tier, j.Composite
+			// The live lines carry the per-ability percentiles the
+			// frozen branch already pinned above.
+			for _, l := range j.Lines {
+				for i := range r.Abilities {
+					if r.Abilities[i].Ability == l.Ability && r.Abilities[i].Percentile == nil {
+						r.Abilities[i].Percentile = l.Percentile
+					}
+				}
+			}
+		}
+	}
+
+	// The cross-session words: the previous session's score and the
+	// history best — both feed only lines that exist.
+	if len(attempts) > 0 {
+		prev, perr := uc.boardRP.PreviousSessionScores(ctx, subject.UserID, firstAt)
+		if perr != nil {
+			return nil, perr
+		}
+		for i := range r.Abilities {
+			if v, ok := prev[r.Abilities[i].Ability]; ok {
+				pv := v
+				r.Abilities[i].PrevSession = &pv
+			}
+		}
+	}
+	if bests, berr := uc.boardRP.AbilityBests(ctx, subject.UserID); berr != nil {
+		return nil, berr
+	} else {
+		byAbility := make(map[string]DigestAbilityRow, len(bests))
+		for _, b := range bests {
+			byAbility[b.Ability] = b
+		}
+		for i := range r.Abilities {
+			if b, ok := byAbility[r.Abilities[i].Ability]; ok {
+				v := math.Max(b.Best, r.Abilities[i].Best)
+				r.Abilities[i].HistoryBest = &v
+			} else {
+				v := r.Abilities[i].Best
+				r.Abilities[i].HistoryBest = &v
+			}
+		}
+	}
+
+	if total, terr := uc.boardRP.GenreDimensions(ctx, meta.Genre); terr != nil {
+		return nil, terr
+	} else {
+		r.Total = total
+	}
+	return r, nil
+}
+
+func (uc *ReportUC) GetAbilityDigest(ctx context.Context) (*AbilityDigest, error) {
+	// The cross-session aggregate: session counts by genre, the per-ability
+	// best lines, and the latest session line per genre. An empty history
+	// is an honest zero-and-nothing answer.
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("digest read requires a session"))
+	}
+	d := &AbilityDigest{}
+	var err error
+	if d.SessionsTotal, d.SessionsFPS, d.SessionsMOBA, err = uc.boardRP.SessionCounts(ctx, subject.UserID); err != nil {
+		return nil, err
+	}
+	if d.Abilities, err = uc.boardRP.AbilityBests(ctx, subject.UserID); err != nil {
+		return nil, err
+	}
+	lines, err := uc.boardRP.LatestSessions(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	for _, meta := range lines {
+		row := DigestSessionRow{
+			SessionID: meta.ID, Genre: meta.Genre,
+			DoneCount: meta.DoneCount, StepCount: len(meta.Steps),
+			Finished: meta.DoneCount >= len(meta.Steps), CreatedAt: meta.CreatedAt,
+		}
+		if anchor, aerr := uc.boardRP.AnchorOfSession(ctx, meta.ID); aerr != nil {
+			return nil, aerr
+		} else if anchor != nil {
+			id := anchor.ID
+			row.Anchor = &id
+		}
+		d.Sessions = append(d.Sessions, row)
+	}
+	return d, nil
+}
+
+func (uc *ReportUC) sessionPercentiles(ctx context.Context, anchorID string) map[string]*float64 {
+	// Reads the anchor's per-ability cohort answer from the frozen
+	// snapshot when one exists; the live branch of the caller fills the
+	// lines itself.
+	snap, err := uc.snapshotRP.FindByRecord(ctx, anchorID)
+	if err != nil || snap == nil {
+		return nil
+	}
+	out := make(map[string]*float64, len(snap.Abilities))
+	for _, a := range snap.Abilities {
+		if _, dup := out[a.Ability]; !dup && a.Percentile != nil {
+			p := *a.Percentile
+			out[a.Ability] = &p
+		}
+	}
+	return out
+}
+
+func sessionBoardOf(attempts []SessionAttemptRow) []BoardEntry {
+	// Flattens the attempt rows into the board shape the live judgement
+	// consumes — folded to one entry per ability by the settlement's own
+	// law, so a retaken game's retries never each weigh on the composite
+	// (0/0/100 would average as a 33rd percentile otherwise — the same
+	// doubled-axis fault the record board's dedupe fixed).
+	out := make([]BoardEntry, 0, len(attempts))
+	for _, a := range attempts {
+		out = append(out, BoardEntry{TestCode: a.TestCode, Ability: a.Ability, Score: a.Score, At: a.CreatedAt})
+	}
+	return dedupeBoard(out)
+}
+
+func dedupeBoard(board []BoardEntry) []BoardEntry {
+	// Folds the board to one entry per ability — the settlement's own law
+	// (the best attempt of the retries is the one that scores), so a
+	// retaken game never draws a doubled radar axis or a duplicated
+	// ability row on the record board either. Equal scores keep the newer
+	// attempt.
+	best := make(map[string]BoardEntry, len(board))
+	order := make([]string, 0, len(board))
+	for _, e := range board {
+		if cur, ok := best[e.Ability]; !ok || e.Score > cur.Score || (e.Score == cur.Score && e.At.After(cur.At)) {
+			if !ok {
+				order = append(order, e.Ability)
+			}
+			best[e.Ability] = e
+		}
+	}
+	out := make([]BoardEntry, 0, len(order))
+	for _, ability := range order {
+		out = append(out, best[ability])
+	}
+	return out
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
@@ -451,6 +775,7 @@ func (uc *ReportUC) freezeFor(ctx context.Context, userID, recordID string) (*Sn
 	if err != nil {
 		return nil, err
 	}
+	board = dedupeBoard(board)
 	pf, err := uc.profileRP.FindByUserID(ctx, userID)
 	if err != nil {
 		return nil, err

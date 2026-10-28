@@ -15,6 +15,15 @@
   "home_resume_title": "有一场未完成的测评",
   "home_resume_desc": "进行到 {done} / {total} · 开始于 {date}（已过 {days} 天，7 天内可续）",
   "home_resume_cta": "继续",
-  "home_soon_title": "测评与报告",
-  "home_soon_desc": "能力测评、报告中心与数据统计即将上线"
+  "home_recent_title": "最近一次测评",
+  "home_recent_go": "看报告",
+  "home_recent_comp": "综合分（百分位）",
+  "home_recent_items": "{n} 项",
+  "home_stat_title": "数据统计",
+  "home_stat_sessions": "已完成场次",
+  "home_stat_covered": "核心能力覆盖",
+  "home_stat_reaction": "反应速度最佳",
+  "home_stat_covered_note": "已覆盖 {covered} / 6 核心能力 —— 认知与潜力报告需测满 6 项才完整",
+  "home_center_title": "报告中心",
+  "home_center_desc": "认知与潜力 / 职业指导 / 能力成长趋势"
 }

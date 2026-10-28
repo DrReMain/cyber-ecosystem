@@ -1,0 +1,18 @@
+{
+  "esports_activation_codes_title": "アクティベーションコード",
+  "esports_activation_codes_total": "全 {n} 件",
+  "esports_activation_codes_filter_type": "レポート種別",
+  "esports_activation_codes_col_code": "コード",
+  "esports_activation_codes_col_type": "レポート種別",
+  "esports_activation_codes_col_expires": "有効期限",
+  "esports_activation_codes_col_created": "生成日時",
+  "esports_activation_codes_empty": "アクティベーションコードがありません",
+  "esports_activation_codes_generate": "バッチ生成",
+  "esports_activation_codes_generate_submit": "生成",
+  "esports_activation_codes_generate_type": "レポート種別",
+  "esports_activation_codes_generate_count": "数量(個)",
+  "esports_activation_codes_generate_days": "有効期間(日)",
+  "esports_activation_codes_generate_success": "{n} 件のコードを生成しました",
+  "esports_activation_codes_generate_hint": "コードは平文で保存され、いつでもコピーして配布できます。各コードは 1 回のみ引き換え可能です",
+  "esports_activation_codes_col_progress": "引き換え進捗"
+}

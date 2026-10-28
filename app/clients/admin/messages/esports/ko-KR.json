@@ -1,3 +1,6 @@
 {
-  "esports_title": "e스포츠"
+  "esports_title": "e스포츠",
+  "esports_report_type_cognitive": "인지 보고서",
+  "esports_report_type_career": "경력 보고서",
+  "esports_report_type_school": "학교 보고서"
 }

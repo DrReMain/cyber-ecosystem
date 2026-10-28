@@ -17,15 +17,21 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationReportServiceGetAbilityDigest = "/cyber.esports.v1.ReportService/GetAbilityDigest"
 const OperationReportServiceGetReport = "/cyber.esports.v1.ReportService/GetReport"
+const OperationReportServiceGetSessionReport = "/cyber.esports.v1.ReportService/GetSessionReport"
 
 type ReportServiceHTTPServer interface {
+	GetAbilityDigest(context.Context, *GetAbilityDigestRequest) (*GetAbilityDigestResponse, error)
 	GetReport(context.Context, *GetReportRequest) (*GetReportResponse, error)
+	GetSessionReport(context.Context, *GetSessionReportRequest) (*GetSessionReportResponse, error)
 }
 
 func RegisterReportServiceHTTPServer(s *http.Server, srv ReportServiceHTTPServer) {
 	r := s.Route("/")
 	r.Handle("POST", "/api/v1/esports/reports/get", _ReportService_GetReport0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/reports/session", _ReportService_GetSessionReport0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/reports/digest", _ReportService_GetAbilityDigest0_HTTP_Handler(srv))
 }
 
 func _ReportService_GetReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
@@ -47,8 +53,48 @@ func _ReportService_GetReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ct
 	}
 }
 
+func _ReportService_GetSessionReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetSessionReportRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReportServiceGetSessionReport)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetSessionReport(ctx, req.(*GetSessionReportRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetSessionReportResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ReportService_GetAbilityDigest0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetAbilityDigestRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReportServiceGetAbilityDigest)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetAbilityDigest(ctx, req.(*GetAbilityDigestRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetAbilityDigestResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ReportServiceHTTPClient interface {
+	GetAbilityDigest(ctx context.Context, req *GetAbilityDigestRequest, opts ...http.CallOption) (rsp *GetAbilityDigestResponse, err error)
 	GetReport(ctx context.Context, req *GetReportRequest, opts ...http.CallOption) (rsp *GetReportResponse, err error)
+	GetSessionReport(ctx context.Context, req *GetSessionReportRequest, opts ...http.CallOption) (rsp *GetSessionReportResponse, err error)
 }
 
 type ReportServiceHTTPClientImpl struct {
@@ -59,6 +105,23 @@ func NewReportServiceHTTPClient(client *http.Client) ReportServiceHTTPClient {
 	return &ReportServiceHTTPClientImpl{client}
 }
 
+func (c *ReportServiceHTTPClientImpl) GetAbilityDigest(ctx context.Context, in *GetAbilityDigestRequest, opts ...http.CallOption) (*GetAbilityDigestResponse, error) {
+	var out GetAbilityDigestResponse
+	pattern := "/api/v1/esports/reports/digest"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationReportServiceGetAbilityDigest),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ReportServiceHTTPClientImpl) GetReport(ctx context.Context, in *GetReportRequest, opts ...http.CallOption) (*GetReportResponse, error) {
 	var out GetReportResponse
 	pattern := "/api/v1/esports/reports/get"
@@ -67,6 +130,23 @@ func (c *ReportServiceHTTPClientImpl) GetReport(ctx context.Context, in *GetRepo
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationReportServiceGetReport),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ReportServiceHTTPClientImpl) GetSessionReport(ctx context.Context, in *GetSessionReportRequest, opts ...http.CallOption) (*GetSessionReportResponse, error) {
+	var out GetSessionReportResponse
+	pattern := "/api/v1/esports/reports/session"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationReportServiceGetSessionReport),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

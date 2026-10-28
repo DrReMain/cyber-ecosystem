@@ -8,7 +8,9 @@ export const HOME_PATH = "/" as const;
 // ─── COMMON helper ────────────────────────────────────────────────────────────────────
 // Router-level titles are plain strings; this keeps the "Page · App" convention in one place.
 export function pageTitle(page: string): string {
-  return `${page} · ${APP_NAME}`;
+  // Brand-first composition — every prototype page titles itself "ctr · <page>";
+  // the brand word itself rides APP_NAME and stays a PM-2 question.
+  return `${APP_NAME} · ${page}`;
 }
 
 // ─── SEO ────────────────────────────────────────────────────────────────────

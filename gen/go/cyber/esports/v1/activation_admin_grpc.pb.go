@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	EntitleAdminService_GenerateActivationCodes_FullMethodName = "/cyber.esports.v1.EntitleAdminService/GenerateActivationCodes"
-	EntitleAdminService_ListActivationCodes_FullMethodName     = "/cyber.esports.v1.EntitleAdminService/ListActivationCodes"
-	EntitleAdminService_SetReportAccessPolicy_FullMethodName   = "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy"
+	EntitleAdminService_GenerateActivationCodes_FullMethodName  = "/cyber.esports.v1.EntitleAdminService/GenerateActivationCodes"
+	EntitleAdminService_ListActivationCodes_FullMethodName      = "/cyber.esports.v1.EntitleAdminService/ListActivationCodes"
+	EntitleAdminService_SetReportAccessPolicy_FullMethodName    = "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy"
+	EntitleAdminService_ListReportAccessPolicies_FullMethodName = "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies"
 )
 
 // EntitleAdminServiceClient is the client API for EntitleAdminService service.
@@ -40,6 +41,7 @@ type EntitleAdminServiceClient interface {
 	GenerateActivationCodes(ctx context.Context, in *GenerateActivationCodesRequest, opts ...grpc.CallOption) (*GenerateActivationCodesResponse, error)
 	ListActivationCodes(ctx context.Context, in *ListActivationCodesRequest, opts ...grpc.CallOption) (*ListActivationCodesResponse, error)
 	SetReportAccessPolicy(ctx context.Context, in *SetReportAccessPolicyRequest, opts ...grpc.CallOption) (*SetReportAccessPolicyResponse, error)
+	ListReportAccessPolicies(ctx context.Context, in *ListReportAccessPoliciesRequest, opts ...grpc.CallOption) (*ListReportAccessPoliciesResponse, error)
 }
 
 type entitleAdminServiceClient struct {
@@ -80,6 +82,16 @@ func (c *entitleAdminServiceClient) SetReportAccessPolicy(ctx context.Context, i
 	return out, nil
 }
 
+func (c *entitleAdminServiceClient) ListReportAccessPolicies(ctx context.Context, in *ListReportAccessPoliciesRequest, opts ...grpc.CallOption) (*ListReportAccessPoliciesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListReportAccessPoliciesResponse)
+	err := c.cc.Invoke(ctx, EntitleAdminService_ListReportAccessPolicies_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EntitleAdminServiceServer is the server API for EntitleAdminService service.
 // All implementations must embed UnimplementedEntitleAdminServiceServer
 // for forward compatibility.
@@ -96,6 +108,7 @@ type EntitleAdminServiceServer interface {
 	GenerateActivationCodes(context.Context, *GenerateActivationCodesRequest) (*GenerateActivationCodesResponse, error)
 	ListActivationCodes(context.Context, *ListActivationCodesRequest) (*ListActivationCodesResponse, error)
 	SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error)
+	ListReportAccessPolicies(context.Context, *ListReportAccessPoliciesRequest) (*ListReportAccessPoliciesResponse, error)
 	mustEmbedUnimplementedEntitleAdminServiceServer()
 }
 
@@ -114,6 +127,9 @@ func (UnimplementedEntitleAdminServiceServer) ListActivationCodes(context.Contex
 }
 func (UnimplementedEntitleAdminServiceServer) SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetReportAccessPolicy not implemented")
+}
+func (UnimplementedEntitleAdminServiceServer) ListReportAccessPolicies(context.Context, *ListReportAccessPoliciesRequest) (*ListReportAccessPoliciesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListReportAccessPolicies not implemented")
 }
 func (UnimplementedEntitleAdminServiceServer) mustEmbedUnimplementedEntitleAdminServiceServer() {}
 func (UnimplementedEntitleAdminServiceServer) testEmbeddedByValue()                             {}
@@ -190,6 +206,24 @@ func _EntitleAdminService_SetReportAccessPolicy_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EntitleAdminService_ListReportAccessPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListReportAccessPoliciesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntitleAdminServiceServer).ListReportAccessPolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EntitleAdminService_ListReportAccessPolicies_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntitleAdminServiceServer).ListReportAccessPolicies(ctx, req.(*ListReportAccessPoliciesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EntitleAdminService_ServiceDesc is the grpc.ServiceDesc for EntitleAdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -208,6 +242,10 @@ var EntitleAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetReportAccessPolicy",
 			Handler:    _EntitleAdminService_SetReportAccessPolicy_Handler,
+		},
+		{
+			MethodName: "ListReportAccessPolicies",
+			Handler:    _EntitleAdminService_ListReportAccessPolicies_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

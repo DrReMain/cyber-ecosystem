@@ -8,3 +8,13 @@ import { ReportService } from "./report_pb";
  * @generated from rpc cyber.esports.v1.ReportService.GetReport
  */
 export const getReport = ReportService.method.getReport;
+
+/**
+ * @generated from rpc cyber.esports.v1.ReportService.GetSessionReport
+ */
+export const getSessionReport = ReportService.method.getSessionReport;
+
+/**
+ * @generated from rpc cyber.esports.v1.ReportService.GetAbilityDigest
+ */
+export const getAbilityDigest = ReportService.method.getAbilityDigest;

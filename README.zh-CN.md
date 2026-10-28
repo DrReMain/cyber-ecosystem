@@ -251,7 +251,7 @@ docs/              工程约定、文档地图与治理法、agent 环境建议�
 - Proto lint / 生成：`./nx run proto:lint` · `proto:generate`
 - Go lint / 测试 / 格式化：`./nx run tools:go:lint` · `tools:go:test` · `tools:go:format`
 - Ent 生成：`./nx run system:generate:ent` 或 `agent:generate:ent`
-- Dev server：`<project>:dev-up` 启动，`<project>:dev-down` 停止
+- Dev server：`<project>:dev`（长跑前台命令，Ctrl-C 停止）
 - 迁移 diff：`./nx run system:migrate:diff --name add_x` 或 `agent:migrate:diff`（name 必填，命名生成的迁移文件）
 - 可选栈：`deploy:realtime:start` · `deploy:media:start` · `deploy:observability:start`
 - Edge 栈：`deploy:pre:start` 或 `deploy:pre:full:start`

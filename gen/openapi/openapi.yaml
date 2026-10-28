@@ -368,6 +368,202 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GenerateActivationCodesResponse'
+    /api/v1/esports/admin/question-bank:
+        get:
+            tags:
+                - TestAdminService
+            operationId: TestAdminService_ListQuestionBank
+            parameters:
+                - name: testCode
+                  in: query
+                  schema:
+                    type: string
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListQuestionBankResponse'
+    /api/v1/esports/admin/test-attempts:
+        get:
+            tags:
+                - TestAdminService
+            operationId: TestAdminService_ListTestAttempts
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: testCode
+                  in: query
+                  schema:
+                    type: string
+                - name: userId
+                  in: query
+                  schema:
+                    type: string
+                - name: matchSessionId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListTestAttemptsResponse'
+    /api/v1/esports/admin/test-attempts/{recordId}:
+        get:
+            tags:
+                - TestAdminService
+            operationId: TestAdminService_GetTestAttempt
+            parameters:
+                - name: recordId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetTestAttemptResponse'
+    /api/v1/esports/admin/tests:
+        get:
+            tags:
+                - TestAdminService
+            operationId: TestAdminService_ListTests
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.TestAdminServiceListTestsResponse'
+    /api/v1/esports/admin/tests/{id}/config:
+        get:
+            tags:
+                - TestAdminService
+            operationId: TestAdminService_GetTestConfig
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.TestAdminServiceGetTestConfigResponse'
+    /api/v1/esports/admin/tests/{testId}/config:
+        post:
+            tags:
+                - TestAdminService
+            operationId: TestAdminService_UpdateTestConfig
+            parameters:
+                - name: testId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.UpdateTestConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.UpdateTestConfigResponse'
     /api/v1/esports/entitlements/redeem:
         post:
             tags:
@@ -723,6 +919,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.UpdateProfileResponse'
+    /api/v1/esports/report-access-policies:
+        get:
+            tags:
+                - EntitleAdminService
+            operationId: EntitleAdminService_ListReportAccessPolicies
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListReportAccessPoliciesResponse'
     /api/v1/esports/report-access-policy:
         post:
             tags:
@@ -765,6 +973,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetReportAccessResponse'
+    /api/v1/esports/reports/digest:
+        post:
+            tags:
+                - ReportService
+            operationId: ReportService_GetAbilityDigest
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GetAbilityDigestRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetAbilityDigestResponse'
     /api/v1/esports/reports/get:
         post:
             tags:
@@ -783,6 +1009,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetReportResponse'
+    /api/v1/esports/reports/session:
+        post:
+            tags:
+                - ReportService
+            operationId: ReportService_GetSessionReport
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GetSessionReportRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetSessionReportResponse'
     /api/v1/esports/skus:
         get:
             tags:
@@ -2927,6 +3171,58 @@ components:
                     $ref: '#/components/schemas/cyber.esports.v1.Order'
                 credential:
                     $ref: '#/components/schemas/cyber.esports.v1.PayCredential'
+        cyber.esports.v1.DigestAbilityLine:
+            type: object
+            properties:
+                ability:
+                    type: string
+                bestScore:
+                    type: number
+                    description: The cross-session best score — the ability board's bar.
+                    format: double
+                bestGrade:
+                    type: string
+                    description: |-
+                        The best attempt's grade; null when that attempt carried no cohort
+                         answer.
+                bestPercentile:
+                    type: number
+                    description: The best's percentile; null while the cohort says nothing.
+                    format: double
+                sessionsTested:
+                    type: integer
+                    description: How many distinct sessions carried a valid attempt for the ability.
+                    format: int32
+                lastAt:
+                    type: string
+                    format: date-time
+        cyber.esports.v1.DigestSessionLine:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                genre:
+                    type: string
+                finished:
+                    type: boolean
+                    description: |-
+                        All steps done — the history card's finished state; false keeps the
+                         resume entry alive.
+                doneCount:
+                    type: integer
+                    format: int32
+                stepCount:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                    format: date-time
+                anchorRecordId:
+                    type: string
+                    description: |-
+                        The session's anchor — the report entry; absent while nothing
+                         scored. The line carries no verdict of its own: the composite face
+                         reads GetSessionReport with this id.
         cyber.esports.v1.DualZoneBehavior:
             type: object
             properties:
@@ -3102,6 +3398,39 @@ components:
                     description: |-
                         The codes in full, this once and on every later list — generation
                          answers what was minted so the operator hands them out.
+        cyber.esports.v1.GetAbilityDigestRequest:
+            type: object
+            properties: {}
+        cyber.esports.v1.GetAbilityDigestResponse:
+            type: object
+            properties:
+                sessionsTotal:
+                    type: integer
+                    description: |-
+                        Sessions carrying at least one valid attempt — practice runs never
+                         count as sessions.
+                    format: int32
+                sessionsFps:
+                    type: integer
+                    format: int32
+                sessionsMoba:
+                    type: integer
+                    format: int32
+                abilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.DigestAbilityLine'
+                    description: |-
+                        One line per measured ability of the six-word vocabulary; an untested
+                         ability is an absent entry, never a zero row (the covered-count face
+                         reads the absence).
+                sessions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.DigestSessionLine'
+                    description: |-
+                        The latest session line per genre — at most one row each, absent
+                         when the genre was never played.
         cyber.esports.v1.GetMatchSessionResponse:
             type: object
             properties:
@@ -3216,6 +3545,67 @@ components:
                 totalDimensions:
                     type: integer
                     format: int32
+        cyber.esports.v1.GetSessionReportRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+        cyber.esports.v1.GetSessionReportResponse:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                genre:
+                    type: string
+                anchorRecordId:
+                    type: string
+                    description: |-
+                        The session's latest scored record — the composite verdict's owner;
+                         absent while nothing scored (the same derivation the match face
+                         carries, never this face's to claim).
+                tier:
+                    enum:
+                        - REPORT_TIER_UNSPECIFIED
+                        - REPORT_TIER_S
+                        - REPORT_TIER_A
+                        - REPORT_TIER_B
+                        - REPORT_TIER_C
+                    type: string
+                    description: |-
+                        The anchor's verdict: the frozen snapshot when one exists, the live
+                         judgement otherwise — the free tier's own law, same as the record
+                         board. UNSPECIFIED while no anchor exists.
+                    format: enum
+                compositePercentile:
+                    type: number
+                    format: double
+                abilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.SessionAbilityLine'
+                    description: |-
+                        One line per ability the session measured, in the lineup's order —
+                         an unmeasured step never lands a line, never a zero line.
+                testedDimensions:
+                    type: integer
+                    description: The completeness headline over the genre's ordered abilities.
+                    format: int32
+                totalDimensions:
+                    type: integer
+                    format: int32
+                startedAt:
+                    type: string
+                    format: date-time
+        cyber.esports.v1.GetTestAttemptResponse:
+            type: object
+            properties:
+                attempt:
+                    $ref: '#/components/schemas/cyber.esports.v1.TestAttemptRow'
+                rawDetail:
+                    type: object
+                    description: |-
+                        The raw fact stream as stored — the audit trail behind the verdict,
+                         presented verbatim rather than re-typed per engine.
         cyber.esports.v1.GetTestConfigResponse:
             type: object
             properties:
@@ -3265,6 +3655,22 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Order'
+        cyber.esports.v1.ListQuestionBankResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                questions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.QuestionBankRow'
+        cyber.esports.v1.ListReportAccessPoliciesResponse:
+            type: object
+            properties:
+                policies:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ReportPolicyRow'
         cyber.esports.v1.ListSkusResponse:
             type: object
             properties:
@@ -3272,6 +3678,15 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Sku'
+        cyber.esports.v1.ListTestAttemptsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                attempts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.TestAttemptRow'
         cyber.esports.v1.ListTestsResponse:
             type: object
             properties:
@@ -3320,6 +3735,13 @@ components:
                     description: |-
                         True when this session is the member's first ever — the 3-vs-1 retest
                          budget face (the budget itself rides the session row).
+                anchorRecordId:
+                    type: string
+                    description: |-
+                        The session's latest scored record — the ability report's anchor.
+                         Derived from records like done (never client-asserted); absent while
+                         no record carries a score yet, so a finished-but-all-invalid session
+                         honestly has no report to enter.
         cyber.esports.v1.MatchStep:
             type: object
             properties:
@@ -3664,6 +4086,21 @@ components:
             description: |-
                 One preference entry: exactly one of the pair is set — a catalog reference
                  or a user-typed name awaiting admin classification.
+        cyber.esports.v1.QuestionBankRow:
+            type: object
+            properties:
+                scenarioCode:
+                    type: string
+                payload:
+                    type: object
+                answer:
+                    type: object
+                createdAt:
+                    type: string
+                    format: date-time
+            description: |-
+                One banked scenario. The answer key rides in full — operator visibility
+                 into what correctness is judged against is the point of this face.
         cyber.esports.v1.RedDotDetail:
             type: object
             properties:
@@ -3782,6 +4219,40 @@ components:
                     type: number
                     description: How far short of the target, in percent of it.
                     format: double
+        cyber.esports.v1.ReportPolicyRow:
+            type: object
+            properties:
+                reportType:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+                policy:
+                    enum:
+                        - REPORT_ACCESS_POLICY_UNSPECIFIED
+                        - REPORT_ACCESS_POLICY_OPEN
+                        - REPORT_ACCESS_POLICY_MEMBERSHIP
+                        - REPORT_ACCESS_POLICY_TENANT
+                        - REPORT_ACCESS_POLICY_CLOSED
+                    type: string
+                    format: enum
+                overridden:
+                    type: boolean
+                    description: |-
+                        False = the shipped default answering, true = a report_policy row
+                         governs.
+                updatedBy:
+                    type: string
+                updatedAt:
+                    type: string
+                    format: date-time
+            description: |-
+                One family's current answer. Absent rows are the shipped defaults echoed
+                 back as-is — the override flag and the empty audit fields are the only
+                 way a reader can tell a default from a deliberate setting.
         cyber.esports.v1.ResourceMatchCollect:
             type: object
             properties:
@@ -3823,6 +4294,55 @@ components:
                 elapsedMs:
                     type: integer
                     format: int32
+        cyber.esports.v1.SessionAbilityLine:
+            type: object
+            properties:
+                ability:
+                    type: string
+                gameCode:
+                    type: string
+                    description: The game whose best attempt fed the line.
+                bestScore:
+                    type: number
+                    description: |-
+                        This session's best valid attempt — the settlement headline (a line
+                         exists only when a valid attempt landed, so this is never empty).
+                    format: double
+                attemptScores:
+                    type: array
+                    items:
+                        type: number
+                        format: double
+                    description: |-
+                        Every valid attempt's authoritative score in ordinal order — the
+                         "N attempts, best taken" receipt.
+                bestGrade:
+                    type: string
+                    description: |-
+                        The best attempt's grade; null when that attempt carried no cohort
+                         answer.
+                percentile:
+                    type: number
+                    description: |-
+                        The ability's percentile from the anchor's frozen snapshot; null
+                         while the cohort says nothing.
+                    format: double
+                prevSessionScore:
+                    type: number
+                    description: |-
+                        The same ability's score on the member's previous session — null on
+                         the first session (the note renders "first", never zero).
+                    format: double
+                historyBestScore:
+                    type: number
+                    description: |-
+                        The cross-session best including this session's attempts — the mark
+                         the comparison track and the "new personal best" note read.
+                    format: double
+            description: |-
+                One ability's session verdict — the three numbers the settlement face
+                 keeps distinct: this session's best, the previous session's word, and
+                 the cross-session best.
         cyber.esports.v1.SetReportAccessPolicyRequest:
             type: object
             properties:
@@ -4116,6 +4636,58 @@ components:
                 updatedAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.TestAdminServiceGetTestConfigResponse:
+            type: object
+            properties:
+                config:
+                    $ref: '#/components/schemas/cyber.esports.v1.TestConfig'
+        cyber.esports.v1.TestAdminServiceListTestsResponse:
+            type: object
+            properties:
+                tests:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Test'
+        cyber.esports.v1.TestAttemptRow:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                testCode:
+                    type: string
+                userId:
+                    type: string
+                matchSessionId:
+                    type: string
+                    description: Null for local practice — absence = no session, the submit law.
+                attemptNo:
+                    type: integer
+                    format: int32
+                startedAt:
+                    type: string
+                    format: date-time
+                endedAt:
+                    type: string
+                    format: date-time
+                rawScore:
+                    type: number
+                    description: |-
+                        The dual track — an invalid attempt carries no scores. Ability rides
+                         the catalog join client-side; the row carries only what it stored.
+                    format: double
+                authoritativeScore:
+                    type: number
+                    format: double
+                grade:
+                    type: string
+                valid:
+                    type: boolean
+                invalidReason:
+                    type: string
+            description: |-
+                The stored attempt as the operator reads it — the same row the member's
+                 report verdicts were cut from, so no verdict can be traced to a fact
+                 this face cannot show.
         cyber.esports.v1.TestConfig:
             type: object
             properties:
@@ -4215,6 +4787,32 @@ components:
             properties:
                 profile:
                     $ref: '#/components/schemas/cyber.esports.v1.Profile'
+        cyber.esports.v1.UpdateTestConfigRequest:
+            type: object
+            properties:
+                testId:
+                    type: string
+                backgroundInvalidSeconds:
+                    type: integer
+                    format: int32
+                engineParams:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: |-
+                        Full replacement when present, no patch semantics — the page always
+                         reads before it writes, so replace-what-you-saw is the simpler
+                         contract than a merge the operator could lose rows in.
+            description: |-
+                The one write this plane owns. Absent fields stay untouched — the
+                 operator tunes one dial at a time; duration_seconds is deliberately
+                 absent because it mirrors test.duration_seconds and answers to the
+                 catalog, not to this bag.
+        cyber.esports.v1.UpdateTestConfigResponse:
+            type: object
+            properties:
+                config:
+                    $ref: '#/components/schemas/cyber.esports.v1.TestConfig'
         cyber.shared.common.v1.PageRequest:
             type: object
             properties:
@@ -5647,6 +6245,12 @@ tags:
          per-ability peer detail, the last-attempt comparison and the improvement
          board. Numbers travel, copy does not: the five-zone wording stays with
          the client until its configuration face lands.
+
+         Beside the record board sit the two read-back faces: the session
+         scoreboard (GetSessionReport) and the cross-session aggregate
+         (GetAbilityDigest) — what a member sees of scores they already earned.
+         Neither runs cohort math: the frozen snapshot is their only percentile
+         source, same as the record board itself.
     - name: ResourceService
     - name: RoleService
     - name: SkuService
@@ -5658,6 +6262,17 @@ tags:
          value change, not a contract change — no discount is displayed either
          way in M1.
     - name: TenantService
+    - name: TestAdminService
+      description: |-
+        The operator face of the test domain: the catalog and its runtime tuning,
+         the question bank's seed rows, and the stored attempts behind every
+         verdict. The member face (TestService) answers hydration and submission;
+         this face answers the operator's "what is tuned, what is banked, what did
+         they score" — a read-mostly plane whose one write is the config dial.
+         Reuses TestService's own messages wherever the shapes coincide: the
+         catalog row and the boot bag are one truth, not two. This whole service
+         is a strippable module: deployments without the operator plane drop it
+         and the business faces never notice.
     - name: TestService
       description: |-
         Test catalog and per-test runtime delivery — test names the scored item,

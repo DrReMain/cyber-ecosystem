@@ -1,3 +1,6 @@
 {
-  "esports_title": "Esports"
+  "esports_title": "Esports",
+  "esports_report_type_cognitive": "Cognitive report",
+  "esports_report_type_career": "Career report",
+  "esports_report_type_school": "School report"
 }

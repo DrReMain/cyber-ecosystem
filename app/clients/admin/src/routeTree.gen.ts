@@ -35,6 +35,9 @@ import { Route as DashboardSystemDiagRouteImport } from './routes/dashboard/syst
 import { Route as DashboardSystemPoliciesRouteImport } from './routes/dashboard/system/policies'
 import { Route as DashboardSystemRolesRouteImport } from './routes/dashboard/system/roles'
 import { Route as DashboardSystemUsersRouteImport } from './routes/dashboard/system/users'
+import { Route as DashboardEsportsActivationCodesIndexRouteImport } from './routes/dashboard/esports/activation-codes/index'
+import { Route as DashboardEsportsReportPoliciesIndexRouteImport } from './routes/dashboard/esports/report-policies/index'
+import { Route as DashboardEsportsTestsIndexRouteImport } from './routes/dashboard/esports/tests/index'
 import { Route as DashboardEsportsUsersIndexRouteImport } from './routes/dashboard/esports/users/index'
 import { Route as DashboardEsportsUsersIdRouteImport } from './routes/dashboard/esports/users/$id'
 
@@ -173,6 +176,24 @@ const DashboardSystemUsersRoute = DashboardSystemUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => DashboardSystemRouteRoute,
 } as any)
+const DashboardEsportsActivationCodesIndexRoute =
+  DashboardEsportsActivationCodesIndexRouteImport.update({
+    id: '/activation-codes/',
+    path: '/activation-codes/',
+    getParentRoute: () => DashboardEsportsRouteRoute,
+  } as any)
+const DashboardEsportsReportPoliciesIndexRoute =
+  DashboardEsportsReportPoliciesIndexRouteImport.update({
+    id: '/report-policies/',
+    path: '/report-policies/',
+    getParentRoute: () => DashboardEsportsRouteRoute,
+  } as any)
+const DashboardEsportsTestsIndexRoute =
+  DashboardEsportsTestsIndexRouteImport.update({
+    id: '/tests/',
+    path: '/tests/',
+    getParentRoute: () => DashboardEsportsRouteRoute,
+  } as any)
 const DashboardEsportsUsersIndexRoute =
   DashboardEsportsUsersIndexRouteImport.update({
     id: '/',
@@ -213,6 +234,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
   '/dashboard/esports/users/$id': typeof DashboardEsportsUsersIdRoute
+  '/dashboard/esports/activation-codes/': typeof DashboardEsportsActivationCodesIndexRoute
+  '/dashboard/esports/report-policies/': typeof DashboardEsportsReportPoliciesIndexRoute
+  '/dashboard/esports/tests/': typeof DashboardEsportsTestsIndexRoute
   '/dashboard/esports/users/': typeof DashboardEsportsUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -240,6 +264,9 @@ export interface FileRoutesByTo {
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile': typeof DashboardProfileIndexRoute
   '/dashboard/esports/users/$id': typeof DashboardEsportsUsersIdRoute
+  '/dashboard/esports/activation-codes': typeof DashboardEsportsActivationCodesIndexRoute
+  '/dashboard/esports/report-policies': typeof DashboardEsportsReportPoliciesIndexRoute
+  '/dashboard/esports/tests': typeof DashboardEsportsTestsIndexRoute
   '/dashboard/esports/users': typeof DashboardEsportsUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -271,6 +298,9 @@ export interface FileRoutesById {
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
   '/dashboard/esports/users/$id': typeof DashboardEsportsUsersIdRoute
+  '/dashboard/esports/activation-codes/': typeof DashboardEsportsActivationCodesIndexRoute
+  '/dashboard/esports/report-policies/': typeof DashboardEsportsReportPoliciesIndexRoute
+  '/dashboard/esports/tests/': typeof DashboardEsportsTestsIndexRoute
   '/dashboard/esports/users/': typeof DashboardEsportsUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -303,6 +333,9 @@ export interface FileRouteTypes {
     | '/dashboard/system/users'
     | '/dashboard/profile/'
     | '/dashboard/esports/users/$id'
+    | '/dashboard/esports/activation-codes/'
+    | '/dashboard/esports/report-policies/'
+    | '/dashboard/esports/tests/'
     | '/dashboard/esports/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -330,6 +363,9 @@ export interface FileRouteTypes {
     | '/dashboard/system/users'
     | '/dashboard/profile'
     | '/dashboard/esports/users/$id'
+    | '/dashboard/esports/activation-codes'
+    | '/dashboard/esports/report-policies'
+    | '/dashboard/esports/tests'
     | '/dashboard/esports/users'
   id:
     | '__root__'
@@ -360,6 +396,9 @@ export interface FileRouteTypes {
     | '/dashboard/system/users'
     | '/dashboard/profile/'
     | '/dashboard/esports/users/$id'
+    | '/dashboard/esports/activation-codes/'
+    | '/dashboard/esports/report-policies/'
+    | '/dashboard/esports/tests/'
     | '/dashboard/esports/users/'
   fileRoutesById: FileRoutesById
 }
@@ -555,6 +594,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSystemUsersRouteImport
       parentRoute: typeof DashboardSystemRouteRoute
     }
+    '/dashboard/esports/activation-codes/': {
+      id: '/dashboard/esports/activation-codes/'
+      path: '/activation-codes'
+      fullPath: '/dashboard/esports/activation-codes/'
+      preLoaderRoute: typeof DashboardEsportsActivationCodesIndexRouteImport
+      parentRoute: typeof DashboardEsportsRouteRoute
+    }
+    '/dashboard/esports/report-policies/': {
+      id: '/dashboard/esports/report-policies/'
+      path: '/report-policies'
+      fullPath: '/dashboard/esports/report-policies/'
+      preLoaderRoute: typeof DashboardEsportsReportPoliciesIndexRouteImport
+      parentRoute: typeof DashboardEsportsRouteRoute
+    }
+    '/dashboard/esports/tests/': {
+      id: '/dashboard/esports/tests/'
+      path: '/tests'
+      fullPath: '/dashboard/esports/tests/'
+      preLoaderRoute: typeof DashboardEsportsTestsIndexRouteImport
+      parentRoute: typeof DashboardEsportsRouteRoute
+    }
     '/dashboard/esports/users/': {
       id: '/dashboard/esports/users/'
       path: '/'
@@ -601,10 +661,18 @@ const DashboardEsportsUsersRouteRouteWithChildren =
 
 interface DashboardEsportsRouteRouteChildren {
   DashboardEsportsUsersRouteRoute: typeof DashboardEsportsUsersRouteRouteWithChildren
+  DashboardEsportsActivationCodesIndexRoute: typeof DashboardEsportsActivationCodesIndexRoute
+  DashboardEsportsReportPoliciesIndexRoute: typeof DashboardEsportsReportPoliciesIndexRoute
+  DashboardEsportsTestsIndexRoute: typeof DashboardEsportsTestsIndexRoute
 }
 
 const DashboardEsportsRouteRouteChildren: DashboardEsportsRouteRouteChildren = {
   DashboardEsportsUsersRouteRoute: DashboardEsportsUsersRouteRouteWithChildren,
+  DashboardEsportsActivationCodesIndexRoute:
+    DashboardEsportsActivationCodesIndexRoute,
+  DashboardEsportsReportPoliciesIndexRoute:
+    DashboardEsportsReportPoliciesIndexRoute,
+  DashboardEsportsTestsIndexRoute: DashboardEsportsTestsIndexRoute,
 }
 
 const DashboardEsportsRouteRouteWithChildren =

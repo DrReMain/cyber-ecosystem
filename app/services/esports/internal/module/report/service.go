@@ -60,7 +60,79 @@ func (s *ReportService) GetReport(ctx context.Context, req *esportspb.GetReportR
 	}, nil
 }
 
+func (s *ReportService) GetSessionReport(ctx context.Context, req *esportspb.GetSessionReportRequest) (*esportspb.GetSessionReportResponse, error) {
+	r, err := s.uc.GetSessionReport(ctx, req.GetSessionId())
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.GetSessionReportResponse{
+		SessionId:           r.SessionID,
+		Genre:               r.Genre,
+		AnchorRecordId:      utils.Wrap(r.Anchor, utils.StringW),
+		Tier:                tierPB(r.Tier),
+		CompositePercentile: utils.Wrap(r.Composite, utils.DoubleW),
+		Abilities:           sessionAbilitiesPB(r.Abilities),
+		TestedDimensions:    utils.ConvNum[int32](r.Tested),
+		TotalDimensions:     utils.ConvNum[int32](r.Total),
+		StartedAt:           utils.ToTimestamp(&r.StartedAt),
+	}, nil
+}
+
+func (s *ReportService) GetAbilityDigest(ctx context.Context, _ *esportspb.GetAbilityDigestRequest) (*esportspb.GetAbilityDigestResponse, error) {
+	d, err := s.uc.GetAbilityDigest(ctx)
+	if err != nil {
+		return nil, err
+	}
+	abilities := make([]*esportspb.DigestAbilityLine, 0, len(d.Abilities))
+	for _, a := range d.Abilities {
+		abilities = append(abilities, &esportspb.DigestAbilityLine{
+			Ability:        a.Ability,
+			BestScore:      a.Best,
+			BestGrade:      utils.Wrap(a.BestGrade, utils.StringW),
+			BestPercentile: utils.Wrap(a.Percentile, utils.DoubleW),
+			SessionsTested: utils.ConvNum[int32](a.Sessions),
+			LastAt:         utils.ToTimestamp(&a.LastAt),
+		})
+	}
+	sessions := make([]*esportspb.DigestSessionLine, 0, len(d.Sessions))
+	for _, line := range d.Sessions {
+		sessions = append(sessions, &esportspb.DigestSessionLine{
+			SessionId:      line.SessionID,
+			Genre:          line.Genre,
+			Finished:       line.Finished,
+			DoneCount:      utils.ConvNum[int32](line.DoneCount),
+			StepCount:      utils.ConvNum[int32](line.StepCount),
+			CreatedAt:      utils.ToTimestamp(&line.CreatedAt),
+			AnchorRecordId: utils.Wrap(line.Anchor, utils.StringW),
+		})
+	}
+	return &esportspb.GetAbilityDigestResponse{
+		SessionsTotal: utils.ConvNum[int32](d.SessionsTotal),
+		SessionsFps:   utils.ConvNum[int32](d.SessionsFPS),
+		SessionsMoba:  utils.ConvNum[int32](d.SessionsMOBA),
+		Abilities:     abilities,
+		Sessions:      sessions,
+	}, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
+
+func sessionAbilitiesPB(rows []SessionAbilityRow) []*esportspb.SessionAbilityLine {
+	out := make([]*esportspb.SessionAbilityLine, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, &esportspb.SessionAbilityLine{
+			Ability:          r.Ability,
+			GameCode:         r.GameCode,
+			BestScore:        r.Best,
+			AttemptScores:    r.Attempts,
+			BestGrade:        utils.Wrap(r.BestGrade, utils.StringW),
+			Percentile:       utils.Wrap(r.Percentile, utils.DoubleW),
+			PrevSessionScore: utils.Wrap(r.PrevSession, utils.DoubleW),
+			HistoryBestScore: utils.Wrap(r.HistoryBest, utils.DoubleW),
+		})
+	}
+	return out
+}
 
 func abilitiesPB(lines []AbilityLine) []*esportspb.ReportAbility {
 	out := make([]*esportspb.ReportAbility, 0, len(lines))

@@ -33,6 +33,19 @@
         "datascope": false
       },
       {
+        "name": "ListReportAccessPolicies",
+        "full_name": "cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies",
+        "request_name": "ListReportAccessPoliciesRequest",
+        "request_full_name": "cyber.esports.v1.ListReportAccessPoliciesRequest",
+        "response_name": "ListReportAccessPoliciesResponse",
+        "response_full_name": "cyber.esports.v1.ListReportAccessPoliciesResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/report-access-policies",
+        "comment": "报告访问策略列表",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
         "name": "SetReportAccessPolicy",
         "full_name": "cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy",
         "request_name": "SetReportAccessPolicyRequest",
@@ -304,6 +317,19 @@
     "comment": "报告",
     "methods": [
       {
+        "name": "GetAbilityDigest",
+        "full_name": "cyber.esports.v1.ReportService.GetAbilityDigest",
+        "request_name": "GetAbilityDigestRequest",
+        "request_full_name": "cyber.esports.v1.GetAbilityDigestRequest",
+        "response_name": "GetAbilityDigestResponse",
+        "response_full_name": "cyber.esports.v1.GetAbilityDigestResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/reports/digest",
+        "comment": "获取能力成绩总览",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "GetReport",
         "full_name": "cyber.esports.v1.ReportService.GetReport",
         "request_name": "GetReportRequest",
@@ -313,6 +339,19 @@
         "http_method": "POST",
         "http_path": "/api/v1/esports/reports/get",
         "comment": "获取单次能力报告",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "GetSessionReport",
+        "full_name": "cyber.esports.v1.ReportService.GetSessionReport",
+        "request_name": "GetSessionReportRequest",
+        "request_full_name": "cyber.esports.v1.GetSessionReportRequest",
+        "response_name": "GetSessionReportResponse",
+        "response_full_name": "cyber.esports.v1.GetSessionReportResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/reports/session",
+        "comment": "获取场次成绩汇总",
         "access": "BUILTIN",
         "datascope": false
       }
@@ -336,6 +375,93 @@
         "http_path": "/api/v1/esports/skus",
         "comment": "在售SKU列表",
         "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "TestAdminService",
+    "full_name": "cyber.esports.v1.TestAdminService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/test_admin.proto",
+    "comment": "测试项运营",
+    "methods": [
+      {
+        "name": "GetTestAttempt",
+        "full_name": "cyber.esports.v1.TestAdminService.GetTestAttempt",
+        "request_name": "GetTestAttemptRequest",
+        "request_full_name": "cyber.esports.v1.GetTestAttemptRequest",
+        "response_name": "GetTestAttemptResponse",
+        "response_full_name": "cyber.esports.v1.GetTestAttemptResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/admin/test-attempts/{record_id}",
+        "comment": "测试记录详情(运营)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "GetTestConfig",
+        "full_name": "cyber.esports.v1.TestAdminService.GetTestConfig",
+        "request_name": "TestAdminServiceGetTestConfigRequest",
+        "request_full_name": "cyber.esports.v1.TestAdminServiceGetTestConfigRequest",
+        "response_name": "TestAdminServiceGetTestConfigResponse",
+        "response_full_name": "cyber.esports.v1.TestAdminServiceGetTestConfigResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/admin/tests/{id}/config",
+        "comment": "测试项运行配置(运营)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListQuestionBank",
+        "full_name": "cyber.esports.v1.TestAdminService.ListQuestionBank",
+        "request_name": "ListQuestionBankRequest",
+        "request_full_name": "cyber.esports.v1.ListQuestionBankRequest",
+        "response_name": "ListQuestionBankResponse",
+        "response_full_name": "cyber.esports.v1.ListQuestionBankResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/admin/question-bank",
+        "comment": "题库查看",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListTestAttempts",
+        "full_name": "cyber.esports.v1.TestAdminService.ListTestAttempts",
+        "request_name": "ListTestAttemptsRequest",
+        "request_full_name": "cyber.esports.v1.ListTestAttemptsRequest",
+        "response_name": "ListTestAttemptsResponse",
+        "response_full_name": "cyber.esports.v1.ListTestAttemptsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/admin/test-attempts",
+        "comment": "测试记录列表(运营)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListTests",
+        "full_name": "cyber.esports.v1.TestAdminService.ListTests",
+        "request_name": "TestAdminServiceListTestsRequest",
+        "request_full_name": "cyber.esports.v1.TestAdminServiceListTestsRequest",
+        "response_name": "TestAdminServiceListTestsResponse",
+        "response_full_name": "cyber.esports.v1.TestAdminServiceListTestsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/admin/tests",
+        "comment": "测试项列表(运营)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "UpdateTestConfig",
+        "full_name": "cyber.esports.v1.TestAdminService.UpdateTestConfig",
+        "request_name": "UpdateTestConfigRequest",
+        "request_full_name": "cyber.esports.v1.UpdateTestConfigRequest",
+        "response_name": "UpdateTestConfigResponse",
+        "response_full_name": "cyber.esports.v1.UpdateTestConfigResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/admin/tests/{test_id}/config",
+        "comment": "测试项运行配置调参",
+        "access": "ADMIN",
         "datascope": false
       }
     ]

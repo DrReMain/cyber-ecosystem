@@ -15,6 +15,15 @@
   "home_resume_title": "An unfinished assessment awaits",
   "home_resume_desc": "{done} / {total} done · started {date} (day {days} of 7 to resume)",
   "home_resume_cta": "Continue",
-  "home_soon_title": "Assessments & reports",
-  "home_soon_desc": "Ability assessments, the report center, and statistics are coming"
+  "home_recent_title": "Latest assessment",
+  "home_recent_go": "View report",
+  "home_recent_comp": "Composite (percentile)",
+  "home_recent_items": "{n} items",
+  "home_stat_title": "Statistics",
+  "home_stat_sessions": "Sessions done",
+  "home_stat_covered": "Core abilities",
+  "home_stat_reaction": "Reaction best",
+  "home_stat_covered_note": "Covered {covered} / 6 core abilities — the cognitive & potential report needs all 6",
+  "home_center_title": "Report Center",
+  "home_center_desc": "Cognitive & Potential / Career Guidance / Ability Growth"
 }

@@ -32,7 +32,10 @@
       "./messages/platform-populations/{locale}.json",
       "./messages/esports/{locale}.json",
       "./messages/esports-users/{locale}.json",
-      "./messages/esports-user-detail/{locale}.json"
+      "./messages/esports-user-detail/{locale}.json",
+      "./messages/esports-activation-codes/{locale}.json",
+      "./messages/esports-report-policies/{locale}.json",
+      "./messages/esports-tests/{locale}.json"
     ]
   }
 }

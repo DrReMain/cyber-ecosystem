@@ -1,0 +1,17 @@
+{
+  "esports_report_policies_title": "보고서 접근 정책",
+  "esports_report_policies_col_family": "보고서",
+  "esports_report_policies_col_policy": "정책",
+  "esports_report_policies_col_state": "상태",
+  "esports_report_policies_col_updated_by": "설정자",
+  "esports_report_policies_col_updated_at": "설정 시간",
+  "esports_report_policies_col_actions": "작업",
+  "esports_report_policies_policy_open": "개방",
+  "esports_report_policies_policy_membership": "멤버십",
+  "esports_report_policies_policy_closed": "폐쇄",
+  "esports_report_policies_state_default": "기본값",
+  "esports_report_policies_state_overridden": "재정의됨",
+  "esports_report_policies_act_set": "정책 설정",
+  "esports_report_policies_set_title": "접근 정책 설정",
+  "esports_report_policies_empty": "데이터 없음"
+}

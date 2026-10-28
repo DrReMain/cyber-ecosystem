@@ -53,6 +53,14 @@ service EntitleAdminService {
       body: "*"
     };
   }
+  rpc ListReportAccessPolicies(ListReportAccessPoliciesRequest) returns (ListReportAccessPoliciesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "报告访问策略列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/report-access-policies"};
+  }
 }
 
 // The operator's access policy for one report family. A redeemed code
@@ -136,4 +144,23 @@ message SetReportAccessPolicyRequest {
 message SetReportAccessPolicyResponse {
   ReportType report_type = 1;
   ReportAccessPolicy policy = 2;
+}
+
+message ListReportAccessPoliciesRequest {}
+
+message ListReportAccessPoliciesResponse {
+  repeated ReportPolicyRow policies = 1;
+}
+
+// One family's current answer. Absent rows are the shipped defaults echoed
+// back as-is — the override flag and the empty audit fields are the only
+// way a reader can tell a default from a deliberate setting.
+message ReportPolicyRow {
+  ReportType report_type = 1;
+  ReportAccessPolicy policy = 2;
+  // False = the shipped default answering, true = a report_policy row
+  // governs.
+  bool overridden = 3;
+  google.protobuf.StringValue updated_by = 4;
+  google.protobuf.Timestamp updated_at = 5;
 }

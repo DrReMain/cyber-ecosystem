@@ -247,6 +247,47 @@ export type CyberEsportsV1CreateOrderResponse = {
     credential?: CyberEsportsV1PayCredential;
 };
 
+export type CyberEsportsV1DigestAbilityLine = {
+    ability?: string;
+    /**
+     * The cross-session best score — the ability board's bar.
+     */
+    bestScore?: number;
+    /**
+     * The best attempt's grade; null when that attempt carried no cohort
+     * answer.
+     */
+    bestGrade?: string;
+    /**
+     * The best's percentile; null while the cohort says nothing.
+     */
+    bestPercentile?: number;
+    /**
+     * How many distinct sessions carried a valid attempt for the ability.
+     */
+    sessionsTested?: number;
+    lastAt?: string;
+};
+
+export type CyberEsportsV1DigestSessionLine = {
+    sessionId?: string;
+    genre?: string;
+    /**
+     * All steps done — the history card's finished state; false keeps the
+     * resume entry alive.
+     */
+    finished?: boolean;
+    doneCount?: number;
+    stepCount?: number;
+    createdAt?: string;
+    /**
+     * The session's anchor — the report entry; absent while nothing
+     * scored. The line carries no verdict of its own: the composite face
+     * reads GetSessionReport with this id.
+     */
+    anchorRecordId?: string;
+};
+
 export type CyberEsportsV1DualZoneBehavior = {
     elapsedMs?: number;
     /**
@@ -365,6 +406,31 @@ export type CyberEsportsV1GenerateActivationCodesResponse = {
     codes?: Array<string>;
 };
 
+export type CyberEsportsV1GetAbilityDigestRequest = {
+    [key: string]: unknown;
+};
+
+export type CyberEsportsV1GetAbilityDigestResponse = {
+    /**
+     * Sessions carrying at least one valid attempt — practice runs never
+     * count as sessions.
+     */
+    sessionsTotal?: number;
+    sessionsFps?: number;
+    sessionsMoba?: number;
+    /**
+     * One line per measured ability of the six-word vocabulary; an untested
+     * ability is an absent entry, never a zero row (the covered-count face
+     * reads the absence).
+     */
+    abilities?: Array<CyberEsportsV1DigestAbilityLine>;
+    /**
+     * The latest session line per genre — at most one row each, absent
+     * when the genre was never played.
+     */
+    sessions?: Array<CyberEsportsV1DigestSessionLine>;
+};
+
 export type CyberEsportsV1GetMatchSessionResponse = {
     session?: CyberEsportsV1MatchSession;
     /**
@@ -447,6 +513,50 @@ export type CyberEsportsV1GetReportResponse = {
     totalDimensions?: number;
 };
 
+export type CyberEsportsV1GetSessionReportRequest = {
+    sessionId?: string;
+};
+
+export type CyberEsportsV1GetSessionReportResponse = {
+    sessionId?: string;
+    genre?: string;
+    /**
+     * The session's latest scored record — the composite verdict's owner;
+     * absent while nothing scored (the same derivation the match face
+     * carries, never this face's to claim).
+     */
+    anchorRecordId?: string;
+    /**
+     * The anchor's verdict: the frozen snapshot when one exists, the live
+     * judgement otherwise — the free tier's own law, same as the record
+     * board. UNSPECIFIED while no anchor exists.
+     */
+    tier?: 'REPORT_TIER_UNSPECIFIED' | 'REPORT_TIER_S' | 'REPORT_TIER_A' | 'REPORT_TIER_B' | 'REPORT_TIER_C';
+    compositePercentile?: number;
+    /**
+     * One line per ability the session measured, in the lineup's order —
+     * an unmeasured step never lands a line, never a zero line.
+     */
+    abilities?: Array<CyberEsportsV1SessionAbilityLine>;
+    /**
+     * The completeness headline over the genre's ordered abilities.
+     */
+    testedDimensions?: number;
+    totalDimensions?: number;
+    startedAt?: string;
+};
+
+export type CyberEsportsV1GetTestAttemptResponse = {
+    attempt?: CyberEsportsV1TestAttemptRow;
+    /**
+     * The raw fact stream as stored — the audit trail behind the verdict,
+     * presented verbatim rather than re-typed per engine.
+     */
+    rawDetail?: {
+        [key: string]: unknown;
+    };
+};
+
 export type CyberEsportsV1GetTestConfigResponse = {
     config?: CyberEsportsV1TestConfig;
 };
@@ -479,8 +589,22 @@ export type CyberEsportsV1ListOrdersResponse = {
     orders?: Array<CyberEsportsV1Order>;
 };
 
+export type CyberEsportsV1ListQuestionBankResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    questions?: Array<CyberEsportsV1QuestionBankRow>;
+};
+
+export type CyberEsportsV1ListReportAccessPoliciesResponse = {
+    policies?: Array<CyberEsportsV1ReportPolicyRow>;
+};
+
 export type CyberEsportsV1ListSkusResponse = {
     skus?: Array<CyberEsportsV1Sku>;
+};
+
+export type CyberEsportsV1ListTestAttemptsResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    attempts?: Array<CyberEsportsV1TestAttemptRow>;
 };
 
 export type CyberEsportsV1ListTestsResponse = {
@@ -520,6 +644,13 @@ export type CyberEsportsV1MatchSession = {
      * budget face (the budget itself rides the session row).
      */
     firstSession?: boolean;
+    /**
+     * The session's latest scored record — the ability report's anchor.
+     * Derived from records like done (never client-asserted); absent while
+     * no record carries a score yet, so a finished-but-all-invalid session
+     * honestly has no report to enter.
+     */
+    anchorRecordId?: string;
 };
 
 export type CyberEsportsV1MatchStep = {
@@ -769,6 +900,21 @@ export type CyberEsportsV1ProfileGame = {
 };
 
 /**
+ * One banked scenario. The answer key rides in full — operator visibility
+ * into what correctness is judged against is the point of this face.
+ */
+export type CyberEsportsV1QuestionBankRow = {
+    scenarioCode?: string;
+    payload?: {
+        [key: string]: unknown;
+    };
+    answer?: {
+        [key: string]: unknown;
+    };
+    createdAt?: string;
+};
+
+/**
  * red_dot — reaction tap on a moving spot.
  */
 export type CyberEsportsV1RedDotDetail = {
@@ -843,6 +989,23 @@ export type CyberEsportsV1ReportImprovement = {
     gapPercent?: number;
 };
 
+/**
+ * One family's current answer. Absent rows are the shipped defaults echoed
+ * back as-is — the override flag and the empty audit fields are the only
+ * way a reader can tell a default from a deliberate setting.
+ */
+export type CyberEsportsV1ReportPolicyRow = {
+    reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+    policy?: 'REPORT_ACCESS_POLICY_UNSPECIFIED' | 'REPORT_ACCESS_POLICY_OPEN' | 'REPORT_ACCESS_POLICY_MEMBERSHIP' | 'REPORT_ACCESS_POLICY_TENANT' | 'REPORT_ACCESS_POLICY_CLOSED';
+    /**
+     * False = the shipped default answering, true = a report_policy row
+     * governs.
+     */
+    overridden?: boolean;
+    updatedBy?: string;
+    updatedAt?: string;
+};
+
 export type CyberEsportsV1ResourceMatchCollect = {
     /**
      * Open vocabulary {minion | monster | dragon} — the resource kinds.
@@ -868,6 +1031,49 @@ export type CyberEsportsV1ResourceMatchDetail = {
 export type CyberEsportsV1ResourceMatchTrajectoryPoint = {
     position?: CyberEsportsV1Point;
     elapsedMs?: number;
+};
+
+/**
+ * One ability's session verdict — the three numbers the settlement face
+ * keeps distinct: this session's best, the previous session's word, and
+ * the cross-session best.
+ */
+export type CyberEsportsV1SessionAbilityLine = {
+    ability?: string;
+    /**
+     * The game whose best attempt fed the line.
+     */
+    gameCode?: string;
+    /**
+     * This session's best valid attempt — the settlement headline (a line
+     * exists only when a valid attempt landed, so this is never empty).
+     */
+    bestScore?: number;
+    /**
+     * Every valid attempt's authoritative score in ordinal order — the
+     * "N attempts, best taken" receipt.
+     */
+    attemptScores?: Array<number>;
+    /**
+     * The best attempt's grade; null when that attempt carried no cohort
+     * answer.
+     */
+    bestGrade?: string;
+    /**
+     * The ability's percentile from the anchor's frozen snapshot; null
+     * while the cohort says nothing.
+     */
+    percentile?: number;
+    /**
+     * The same ability's score on the member's previous session — null on
+     * the first session (the note renders "first", never zero).
+     */
+    prevSessionScore?: number;
+    /**
+     * The cross-session best including this session's attempts — the mark
+     * the comparison track and the "new personal best" note read.
+     */
+    historyBestScore?: number;
 };
 
 export type CyberEsportsV1SetReportAccessPolicyRequest = {
@@ -1066,6 +1272,41 @@ export type CyberEsportsV1Test = {
     updatedAt?: string;
 };
 
+export type CyberEsportsV1TestAdminServiceGetTestConfigResponse = {
+    config?: CyberEsportsV1TestConfig;
+};
+
+export type CyberEsportsV1TestAdminServiceListTestsResponse = {
+    tests?: Array<CyberEsportsV1Test>;
+};
+
+/**
+ * The stored attempt as the operator reads it — the same row the member's
+ * report verdicts were cut from, so no verdict can be traced to a fact
+ * this face cannot show.
+ */
+export type CyberEsportsV1TestAttemptRow = {
+    recordId?: string;
+    testCode?: string;
+    userId?: string;
+    /**
+     * Null for local practice — absence = no session, the submit law.
+     */
+    matchSessionId?: string;
+    attemptNo?: number;
+    startedAt?: string;
+    endedAt?: string;
+    /**
+     * The dual track — an invalid attempt carries no scores. Ability rides
+     * the catalog join client-side; the row carries only what it stored.
+     */
+    rawScore?: number;
+    authoritativeScore?: number;
+    grade?: string;
+    valid?: boolean;
+    invalidReason?: string;
+};
+
 export type CyberEsportsV1TestConfig = {
     testId?: string;
     /**
@@ -1139,6 +1380,29 @@ export type CyberEsportsV1UpdateProfileRequest = {
 
 export type CyberEsportsV1UpdateProfileResponse = {
     profile?: CyberEsportsV1Profile;
+};
+
+/**
+ * The one write this plane owns. Absent fields stay untouched — the
+ * operator tunes one dial at a time; duration_seconds is deliberately
+ * absent because it mirrors test.duration_seconds and answers to the
+ * catalog, not to this bag.
+ */
+export type CyberEsportsV1UpdateTestConfigRequest = {
+    testId?: string;
+    backgroundInvalidSeconds?: number;
+    /**
+     * Full replacement when present, no patch semantics — the page always
+     * reads before it writes, so replace-what-you-saw is the simpler
+     * contract than a merge the operator could lose rows in.
+     */
+    engineParams?: {
+        [key: string]: string;
+    };
+};
+
+export type CyberEsportsV1UpdateTestConfigResponse = {
+    config?: CyberEsportsV1TestConfig;
 };
 
 /**
@@ -2525,6 +2789,170 @@ export type EntitleAdminServiceGenerateActivationCodesResponses = {
 
 export type EntitleAdminServiceGenerateActivationCodesResponse = EntitleAdminServiceGenerateActivationCodesResponses[keyof EntitleAdminServiceGenerateActivationCodesResponses];
 
+export type TestAdminServiceListQuestionBankData = {
+    body?: never;
+    path?: never;
+    query?: {
+        testCode?: string;
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/esports/admin/question-bank';
+};
+
+export type TestAdminServiceListQuestionBankResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListQuestionBankResponse;
+};
+
+export type TestAdminServiceListQuestionBankResponse = TestAdminServiceListQuestionBankResponses[keyof TestAdminServiceListQuestionBankResponses];
+
+export type TestAdminServiceListTestAttemptsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        testCode?: string;
+        userId?: string;
+        matchSessionId?: string;
+    };
+    url: '/api/v1/esports/admin/test-attempts';
+};
+
+export type TestAdminServiceListTestAttemptsResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListTestAttemptsResponse;
+};
+
+export type TestAdminServiceListTestAttemptsResponse = TestAdminServiceListTestAttemptsResponses[keyof TestAdminServiceListTestAttemptsResponses];
+
+export type TestAdminServiceGetTestAttemptData = {
+    body?: never;
+    path: {
+        recordId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/admin/test-attempts/{recordId}';
+};
+
+export type TestAdminServiceGetTestAttemptResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetTestAttemptResponse;
+};
+
+export type TestAdminServiceGetTestAttemptResponse = TestAdminServiceGetTestAttemptResponses[keyof TestAdminServiceGetTestAttemptResponses];
+
+export type TestAdminServiceListTestsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/admin/tests';
+};
+
+export type TestAdminServiceListTestsResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1TestAdminServiceListTestsResponse;
+};
+
+export type TestAdminServiceListTestsResponse = TestAdminServiceListTestsResponses[keyof TestAdminServiceListTestsResponses];
+
+export type TestAdminServiceGetTestConfigData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/admin/tests/{id}/config';
+};
+
+export type TestAdminServiceGetTestConfigResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1TestAdminServiceGetTestConfigResponse;
+};
+
+export type TestAdminServiceGetTestConfigResponse = TestAdminServiceGetTestConfigResponses[keyof TestAdminServiceGetTestConfigResponses];
+
+export type TestAdminServiceUpdateTestConfigData = {
+    body: CyberEsportsV1UpdateTestConfigRequest;
+    path: {
+        testId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/admin/tests/{testId}/config';
+};
+
+export type TestAdminServiceUpdateTestConfigResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1UpdateTestConfigResponse;
+};
+
+export type TestAdminServiceUpdateTestConfigResponse = TestAdminServiceUpdateTestConfigResponses[keyof TestAdminServiceUpdateTestConfigResponses];
+
 export type EntitlementServiceRedeemActivationCodeData = {
     body: CyberEsportsV1RedeemActivationCodeRequest;
     path?: never;
@@ -2843,6 +3271,22 @@ export type ProfileServiceUpdateProfileResponses = {
 
 export type ProfileServiceUpdateProfileResponse = ProfileServiceUpdateProfileResponses[keyof ProfileServiceUpdateProfileResponses];
 
+export type EntitleAdminServiceListReportAccessPoliciesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/report-access-policies';
+};
+
+export type EntitleAdminServiceListReportAccessPoliciesResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListReportAccessPoliciesResponse;
+};
+
+export type EntitleAdminServiceListReportAccessPoliciesResponse = EntitleAdminServiceListReportAccessPoliciesResponses[keyof EntitleAdminServiceListReportAccessPoliciesResponses];
+
 export type EntitleAdminServiceSetReportAccessPolicyData = {
     body: CyberEsportsV1SetReportAccessPolicyRequest;
     path?: never;
@@ -2877,6 +3321,22 @@ export type EntitlementServiceGetReportAccessResponses = {
 
 export type EntitlementServiceGetReportAccessResponse = EntitlementServiceGetReportAccessResponses[keyof EntitlementServiceGetReportAccessResponses];
 
+export type ReportServiceGetAbilityDigestData = {
+    body: CyberEsportsV1GetAbilityDigestRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/reports/digest';
+};
+
+export type ReportServiceGetAbilityDigestResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetAbilityDigestResponse;
+};
+
+export type ReportServiceGetAbilityDigestResponse = ReportServiceGetAbilityDigestResponses[keyof ReportServiceGetAbilityDigestResponses];
+
 export type ReportServiceGetReportData = {
     body: CyberEsportsV1GetReportRequest;
     path?: never;
@@ -2892,6 +3352,22 @@ export type ReportServiceGetReportResponses = {
 };
 
 export type ReportServiceGetReportResponse = ReportServiceGetReportResponses[keyof ReportServiceGetReportResponses];
+
+export type ReportServiceGetSessionReportData = {
+    body: CyberEsportsV1GetSessionReportRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/reports/session';
+};
+
+export type ReportServiceGetSessionReportResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetSessionReportResponse;
+};
+
+export type ReportServiceGetSessionReportResponse = ReportServiceGetSessionReportResponses[keyof ReportServiceGetSessionReportResponses];
 
 export type SkuServiceListSkusData = {
     body?: never;

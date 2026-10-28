@@ -1,0 +1,17 @@
+{
+  "esports_report_policies_title": "سياسات الوصول للتقارير",
+  "esports_report_policies_col_family": "التقرير",
+  "esports_report_policies_col_policy": "السياسة",
+  "esports_report_policies_col_state": "الحالة",
+  "esports_report_policies_col_updated_by": "بواسطة",
+  "esports_report_policies_col_updated_at": "وقت الضبط",
+  "esports_report_policies_col_actions": "إجراءات",
+  "esports_report_policies_policy_open": "مفتوح",
+  "esports_report_policies_policy_membership": "عضوية",
+  "esports_report_policies_policy_closed": "مغلق",
+  "esports_report_policies_state_default": "افتراضي",
+  "esports_report_policies_state_overridden": "تم التجاوز",
+  "esports_report_policies_act_set": "ضبط السياسة",
+  "esports_report_policies_set_title": "ضبط سياسة الوصول",
+  "esports_report_policies_empty": "لا توجد بيانات"
+}

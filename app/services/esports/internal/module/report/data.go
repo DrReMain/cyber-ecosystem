@@ -228,6 +228,357 @@ func (rp *boardRP) PreviousSessionRecord(ctx context.Context, userID, ability st
 	}, nil
 }
 
+func (rp *boardRP) SessionMeta(ctx context.Context, sessionID string) (*SessionMetaRow, error) {
+	row, err := rp.Platform.GetClient(ctx).MatchSession.Get(ctx, sessionID)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	// The done count rides the match face's own law: any stored record
+	// marks its step done — validity never refunds a chance, and the two
+	// faces must never disagree on a fraction.
+	done, err := rp.doneCountOf(ctx, sessionID)
+	if err != nil {
+		return nil, err
+	}
+	return &SessionMetaRow{
+		ID: row.ID, UserID: row.UserID, Genre: row.Genre,
+		Steps: row.Steps, DoneCount: done,
+		CreatedAt: row.CreatedAt,
+	}, nil
+}
+
+func (rp *boardRP) SessionAttempts(ctx context.Context, sessionID string) ([]SessionAttemptRow, error) {
+	// Every valid scored attempt under the session in submit order — the
+	// receipt's raw truth; the ability rides the tests join the board
+	// already uses.
+	client := rp.Platform.GetClient(ctx)
+	rows, err := client.TestRecord.Query().
+		Where(
+			enttestrecord.SessionIDEQ(sessionID),
+			enttestrecord.ValidEQ(true),
+			enttestrecord.AuthoritativeScoreNotNil(),
+		).
+		Order(ent.Asc(enttestrecord.FieldCreatedAt)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	if len(rows) == 0 {
+		return nil, nil
+	}
+	abilityOf, err := rp.abilityOfCodes(ctx, rows)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]SessionAttemptRow, 0, len(rows))
+	for _, r := range rows {
+		ability, ok := abilityOf[r.TestCode]
+		if !ok {
+			continue // a test outside the ability vocabulary feeds no line
+		}
+		var grade *string
+		if r.Grade != nil {
+			g := string(*r.Grade)
+			grade = &g
+		}
+		out = append(out, SessionAttemptRow{
+			TestCode: r.TestCode, Ability: ability, AttemptNo: r.AttemptNo,
+			Score: *r.AuthoritativeScore, Grade: grade, CreatedAt: r.CreatedAt,
+		})
+	}
+	return out, nil
+}
+
+func (rp *boardRP) AnchorOfSession(ctx context.Context, sessionID string) (*Attempt, error) {
+	row, err := rp.Platform.GetClient(ctx).TestRecord.Query().
+		Where(
+			enttestrecord.SessionIDEQ(sessionID),
+			enttestrecord.AuthoritativeScoreNotNil(),
+		).
+		Order(ent.Desc(enttestrecord.FieldCreatedAt)).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return &Attempt{
+		ID: row.ID, TestCode: row.TestCode, UserID: row.UserID,
+		SessionID: row.SessionID, Valid: row.Valid,
+	}, nil
+}
+
+func (rp *boardRP) AbilityBests(ctx context.Context, userID string) ([]DigestAbilityRow, error) {
+	// Two rides over the records themselves: the ability ledger stays the
+	// dormant E3 inheritance E5-b ruled (no business hand writes it), so
+	// the cross-session bests aggregate the record-level authoritative
+	// score the report board itself trusts — the ability rides the test
+	// join, the same ownership shape the board's other reads use. Only
+	// scored attempts carry a best (a played-but-unjudged round keeps its
+	// ability honestly absent, the line law the session report holds).
+	// First ride: per-ability best/sessions/last-at; second: the best's
+	// own grade (the newest record at the best score wins). The
+	// percentile stays honestly absent until the cohort face is a service
+	// — the ledger's percentile column was its promised seat, never
+	// written.
+	tr := sql.Table(enttestrecord.Table)
+	t := sql.Table(enttest.Table)
+	client := rp.Platform.GetClient(ctx)
+
+	var agg []*struct {
+		Ability  string    `json:"ability"`
+		Best     float64   `json:"best"`
+		Sessions int       `json:"sessions"`
+		LastAt   time.Time `json:"last_at"`
+	}
+	err := client.TestRecord.Query().
+		Modify(func(s *sql.Selector) {
+			s.Join(t).On(t.C(enttest.FieldCode), tr.C(enttestrecord.FieldTestCode)).
+				Where(sql.And(
+					sql.EQ(tr.C(enttestrecord.FieldUserID), userID),
+					sql.EQ(tr.C(enttestrecord.FieldValid), true),
+					sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
+					sql.NotNull(tr.C(enttestrecord.FieldAuthoritativeScore)),
+				))
+			s.Select(
+				t.C(enttest.FieldAbility),
+				sql.As("max("+tr.C(enttestrecord.FieldAuthoritativeScore)+")", "best"),
+				sql.As("count(distinct "+tr.C(enttestrecord.FieldSessionID)+")", "sessions"),
+				sql.As("max("+tr.C(enttestrecord.FieldCreatedAt)+")", "last_at"),
+			).
+				GroupBy(t.C(enttest.FieldAbility))
+		}).
+		Scan(ctx, &agg)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	if len(agg) == 0 {
+		return nil, nil
+	}
+
+	out := make([]DigestAbilityRow, 0, len(agg))
+	for _, a := range agg {
+		row := DigestAbilityRow{Ability: a.Ability, Best: a.Best, Sessions: a.Sessions, LastAt: a.LastAt}
+		var top []*struct {
+			Grade *enttestrecord.Grade `json:"grade"`
+		}
+		err = client.TestRecord.Query().
+			Modify(func(s *sql.Selector) {
+				s.Join(t).On(t.C(enttest.FieldCode), tr.C(enttestrecord.FieldTestCode)).
+					Where(sql.And(
+						sql.EQ(tr.C(enttestrecord.FieldUserID), userID),
+						sql.EQ(tr.C(enttestrecord.FieldValid), true),
+						sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
+						sql.NotNull(tr.C(enttestrecord.FieldAuthoritativeScore)),
+						sql.EQ(t.C(enttest.FieldAbility), a.Ability),
+						sql.EQ(tr.C(enttestrecord.FieldAuthoritativeScore), a.Best),
+					)).
+					Select(tr.C(enttestrecord.FieldGrade)).
+					OrderBy(sql.Desc(tr.C(enttestrecord.FieldCreatedAt)))
+			}).
+			Scan(ctx, &top)
+		if err != nil {
+			return nil, rp.Platform.HandleEntError(err)
+		}
+		if len(top) > 0 && top[0].Grade != nil {
+			g := string(*top[0].Grade)
+			row.BestGrade = &g
+		}
+		out = append(out, row)
+	}
+	return out, nil
+}
+
+func (rp *boardRP) SessionCounts(ctx context.Context, userID string) (int, int, int, error) {
+	// Distinct sessions carrying a valid attempt, split per genre — the
+	// join reads the session's own genre off the session row.
+	tr := sql.Table(enttestrecord.Table)
+	ms := sql.Table(entmatchsession.Table)
+	var rows []*struct {
+		Genre string `json:"genre"`
+		Count int    `json:"count"`
+	}
+	err := rp.Platform.GetClient(ctx).TestRecord.Query().
+		Modify(func(s *sql.Selector) {
+			s.Join(ms).On(ms.C(entmatchsession.FieldID), tr.C(enttestrecord.FieldSessionID)).
+				Where(sql.And(
+					sql.EQ(tr.C(enttestrecord.FieldUserID), userID),
+					sql.EQ(tr.C(enttestrecord.FieldValid), true),
+					sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
+					sql.IsNull(ms.C(entmatchsession.FieldDeletedAt)),
+				))
+			s.Select(
+				ms.C(entmatchsession.FieldGenre),
+				sql.As("count(distinct "+tr.C(enttestrecord.FieldSessionID)+")", "count"),
+			).
+				GroupBy(ms.C(entmatchsession.FieldGenre))
+		}).
+		Scan(ctx, &rows)
+	if err != nil {
+		return 0, 0, 0, rp.Platform.HandleEntError(err)
+	}
+	total, fps, moba := 0, 0, 0
+	for _, r := range rows {
+		total += r.Count
+		switch r.Genre {
+		case shared.GenreFPS:
+			fps = r.Count
+		case shared.GenreMOBA:
+			moba = r.Count
+		}
+	}
+	return total, fps, moba, nil
+}
+
+func (rp *boardRP) LatestSessions(ctx context.Context, userID string) ([]SessionMetaRow, error) {
+	// The newest session per genre that actually carried a valid attempt.
+	// No window magic: the joined rows repeat per record, but the read
+	// rides created_at descending, so the first row per genre already is
+	// the newest — the seen-map cut below absorbs the repeats.
+	tr := sql.Table(enttestrecord.Table)
+	ms := sql.Table(entmatchsession.Table)
+	var ids []*struct {
+		ID    string `json:"id"`
+		Genre string `json:"genre"`
+	}
+	err := rp.Platform.GetClient(ctx).MatchSession.Query().
+		Modify(func(s *sql.Selector) {
+			s.Join(tr).On(tr.C(enttestrecord.FieldSessionID), ms.C(entmatchsession.FieldID)).
+				Where(sql.And(
+					sql.EQ(ms.C(entmatchsession.FieldUserID), userID),
+					sql.EQ(tr.C(enttestrecord.FieldUserID), userID),
+					sql.EQ(tr.C(enttestrecord.FieldValid), true),
+					sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
+					sql.IsNull(ms.C(entmatchsession.FieldDeletedAt)),
+				)).
+				Select(
+					ms.C(entmatchsession.FieldID),
+					ms.C(entmatchsession.FieldGenre),
+				).
+				OrderBy(sql.Desc(ms.C(entmatchsession.FieldCreatedAt)))
+		}).
+		Scan(ctx, &ids)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	seen := make(map[string]struct{}, 2)
+	idList := make([]string, 0, 2)
+	for _, r := range ids {
+		if _, ok := seen[r.Genre]; ok {
+			continue
+		}
+		seen[r.Genre] = struct{}{}
+		idList = append(idList, r.ID)
+	}
+	if len(idList) == 0 {
+		return nil, nil
+	}
+	rows, err := rp.Platform.GetClient(ctx).MatchSession.Query().
+		Where(entmatchsession.IDIn(idList...)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := make([]SessionMetaRow, 0, len(rows))
+	for _, row := range rows {
+		done, derr := rp.doneCountOf(ctx, row.ID)
+		if derr != nil {
+			return nil, derr
+		}
+		out = append(out, SessionMetaRow{
+			ID: row.ID, UserID: row.UserID, Genre: row.Genre,
+			Steps: row.Steps, DoneCount: done, CreatedAt: row.CreatedAt,
+		})
+	}
+	return out, nil
+}
+
+func (rp *boardRP) PreviousSessionScores(ctx context.Context, userID string, before time.Time) (map[string]float64, error) {
+	// Per ability, the latest valid record older than the session's own
+	// first attempt — everything this session wrote sits at or after it.
+	// The records themselves carry the truth (the ability ledger stays the
+	// dormant inheritance E5-b ruled); the rows are a member's whole
+	// history (a handful), so the latest-per-ability cut runs in memory
+	// over one ordered read.
+	tr := sql.Table(enttestrecord.Table)
+	t := sql.Table(enttest.Table)
+	var rows []*struct {
+		Ability string  `json:"ability"`
+		Score   float64 `json:"score"`
+	}
+	err := rp.Platform.GetClient(ctx).TestRecord.Query().
+		Modify(func(s *sql.Selector) {
+			s.Join(t).On(t.C(enttest.FieldCode), tr.C(enttestrecord.FieldTestCode)).
+				Where(sql.And(
+					sql.EQ(tr.C(enttestrecord.FieldUserID), userID),
+					sql.EQ(tr.C(enttestrecord.FieldValid), true),
+					sql.IsNull(tr.C(enttestrecord.FieldDeletedAt)),
+					sql.NotNull(tr.C(enttestrecord.FieldAuthoritativeScore)),
+					sql.LT(tr.C(enttestrecord.FieldCreatedAt), before),
+				)).
+				Select(
+					t.C(enttest.FieldAbility),
+					sql.As(tr.C(enttestrecord.FieldAuthoritativeScore), "score"),
+				).
+				OrderBy(sql.Desc(tr.C(enttestrecord.FieldCreatedAt)))
+		}).
+		Scan(ctx, &rows)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := make(map[string]float64, len(rows))
+	for _, r := range rows {
+		if _, ok := out[r.Ability]; !ok {
+			out[r.Ability] = r.Score
+		}
+	}
+	return out, nil
+}
+
+func (rp *boardRP) doneCountOf(ctx context.Context, sessionID string) (int, error) {
+	// Counts the session's steps that carry any stored record — the match
+	// face's done law, so the two faces never disagree on a fraction.
+	codes, err := rp.Platform.GetClient(ctx).TestRecord.Query().
+		Where(
+			enttestrecord.SessionIDEQ(sessionID),
+		).
+		GroupBy(enttestrecord.FieldTestCode).
+		Strings(ctx)
+	if err != nil {
+		return 0, rp.Platform.HandleEntError(err)
+	}
+	return len(codes), nil
+}
+
+func (rp *boardRP) abilityOfCodes(ctx context.Context, rows []*ent.TestRecord) (map[string]string, error) {
+	// Maps test codes to their ability — the tests table is a dozen rows,
+	// the join rides two queries like the board's own.
+	codes := make([]string, 0, len(rows))
+	seen := make(map[string]struct{}, len(rows))
+	for _, r := range rows {
+		if _, ok := seen[r.TestCode]; !ok {
+			seen[r.TestCode] = struct{}{}
+			codes = append(codes, r.TestCode)
+		}
+	}
+	tests, err := rp.Platform.GetClient(ctx).Test.Query().
+		Where(enttest.CodeIn(codes...)).All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := make(map[string]string, len(tests))
+	for _, t := range tests {
+		if t.Ability != nil && *t.Ability != "" {
+			out[t.Code] = *t.Ability
+		}
+	}
+	return out, nil
+}
+
 func (rp *snapshotRP) FindByRecord(ctx context.Context, recordID string) (*Snapshot, error) {
 	row, err := rp.Platform.GetClient(ctx).ReportSnapshot.Query().
 		Where(entreportsnapshot.RecordIDEQ(recordID)).

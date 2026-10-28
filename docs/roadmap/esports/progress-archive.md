@@ -1,0 +1,78 @@
+# esports 节奏归档 — 历史节奏行索引(压实形)
+
+> 2026-10-28 剪枝律执法复位(M1 收口):progress.md 节奏记录 2026-10-18..10-28 共 75 条压实为索引行迁此,只增不改;下次压实=下个里程碑收口。
+> 检索法:切片收口注与 hash 在 progress.md 认领表;全文叙事=提交信息 proven-by 尾(`git log --grep <关键词>` / `git show <hash>`);裁决全文=README §2 台账;收口报告=会话记录。
+
+- 10-18 立项+目录化(D-J);五路旧仓分析+三路审计入档;grill 定稿(D-K..D-Q,12-17 承诺);D-R/S/T 落;E6a 壳开工同日收口;E0 种子片冻结;E1 八步落地;E2 首轮落地。
+- 10-19 E6b 接通片:微信真人链路全绿(D-V 兑现);E2 按 D-V 撤回;D-W/X/Y 裁;组合缝 a8b9f0a4;admin 只读面前拉提案否决(一面一消费等级)。
+- 10-20 E0 增量2;E2 增量a 重建;E3 增量a(metric.md 单源);E6b 完整形态+机制修复+R1R2+流程前段 UI;H1/H2 交付;MR!2 评审合并;会员读面+admin 用户管理落地;D-Z/D-AA/D-O2;批量追审+修复片;mock 插桩 TODO 法裁。
+- 10-21 E0 增量3/4;E3 增量b;H-A/H-B 交付+走查;P1(D-AB/AC)/P9(D-AD)定案;D-AE/D-AF;小程序栈初步讨论(plan.md M5)。
+- 10-22 E3 增量c/d(提交缝+MT/TR 定稿,双轴评审吸收两实错);hzy 精修批 MR!4 回流;D-AG/AH/AI 裁;让步节制+环境分裂律立;注释精简批;dev-hzy 全量并入 main。
+- 10-23 D-AJ 任务分配判据+hzy 线盘点(27f87fb8);本档整体剪枝重梳(状态对齐 git 事实/补登会员读面行/修表断裂/遗留清单建网)。
+- 10-23 E3-e:dual_zone/skill_trajectory scorer 定稿(净钟单向化+哨兵双射闸+ABSURD_TIME_SPAN;metric §6.7/6.8);自起栈三探针绿(dz 90/st 521.6/反例 DETAIL_MISMATCH)。
+- 10-23 E3-f:number_stars 定稿(进度指针+三闸+诚实零),Tier A 7/10;live 探针 raw 330 黄金逐位吻合。
+- 10-23 D-AL:ljr 材料全量吸收(DESIGN_DOC_MAP/DOC_INVENTORY 导览;LOGIC_AUDIT/GAME_LOGIC_SPEC/溯源 PRD/admin IA/BLOCK5/题库表/openspec 指针入档);E3 七款×单位分吻合零返工,metric.md 零改动;P11/备案串/迁移基线注登。
+- 10-23 校准战役 S1-S3:S1 ctr 语义 14 面全绿;S2 admin 面合规(6-Tab 对上);S3 契约种子全对唯 moving_target 主能力两源冲突→P12 提裁;满月粒度口径锚 PAY3;台账=coverage。
+- 10-23 S4 终局对账(四列融合:旧后端/旧前端/新原型/新 PRD):总判定=承诺窗基本可达,前提=支付即启+H-C 落地+未认领片有人接;全量原型需 P13 豁免签认;立片 MIG1/E5b/E6c+E9。
+- 10-23 E3-h:resource_match 定稿(碰撞事件流补位=契约增量5+经济三键配置化+死亡经济闸),Tier A 9/10;余 character_counter。
+- 10-23 E3-i:character_counter 定稿(96.3% 饱和治理/c_max 穷举分母/150 封顶;题库 12 关系行),Tier A 10/10;余 Tier B 三款。
+- 10-23 E3-j:moving_target 定稿(Tier B→A 升格:采样流全量重算,阈值 20/30/80,计数×间隔对偶+密度闸+空流诚实零),Tier A 十一款。
+- 10-23 E3-k:tracking_moving 定稿(Tier B→A:契约增量6 补 hit+dot_lifetime,hit 断言交叉验证+lifetime 反应闸),Tier A 十二款。
+- 10-23 E3-l:economic_sim 定稿(Tier B→A:窗口事实,判定/金额双交叉+时间线守恒+装备阶梯配置化),Tier B 消亡,13 款评分面收满;余面=报告分 e2e(随 E5)+guard 正则回流。
+- 10-23 新法(用户):代码内禁 § 文档指针与文档名引用(注释/schema Comment/proto 注释同禁),注释自含 why;存量清扫=独立机械片;同日 E4-a 按此清洗(含迁移 SQL 重放)。
+- 10-23 E4-a:match 聚合出生(match_config fps/moba 各 4 能力序+match_session 出生锁死/7 天 resume 窗/switched 计数盐换 seed/重测预算 3|1 出生冻结)+部分唯一索引执法。
+- 10-23 E4-b:提交缝接线(契约增量8 会话/练习局分流+序数真律+预算执法 6134+阵容闸 6133+会话失效 6132+难度轴消费)。
+- 10-23 E4-b 复审:两轴评审吸收十项(硬违规 engine.go 补 ConvNum;过期律收拢;难度词目具名 difficultyStandard;proto 注释英文化)。
+- 10-23 E4-c:ctr 切服务端编排收口(提交适配器落生+arranger.ts 退役迁 vocabulary;阵容/done/retest_left 全服务端派生;switch 真调)。
+- 10-23 E4-d:E4 e2e 三验收全绿(同日稳定=三变体逐字节同/6d23h 回拨原局复用/超窗重抽同 seed;跨日=8 天懒关;重排换 seed)。
+- 10-23 §指针存量清扫(独立机械片):全仓源面清零(esports 评分 22 文件/test.proto §0.5×2/ctr 四文件)。
+- 10-23 E7-a:反应瞄准批收口(种子真化 engine_params 四款物化+nil 让渡律+upsert 双臂;metric 四卡 boot 键行登记)。
+- 2026-10-23 D-AM(ljr):P12 定案 moving_target=trackingStability;零代码,B2 次 0.5 行判陈旧删(与 D-AD 同构)。
+- 10-23 H-C 判定回路闭环(hzy):与 E4-c 并行同日交付同一地皮(切片定义重叠的计划期裂缝)——H-C 版=薄适配器+verdict 回执卡+三入口直达。
+- 10-23 设计保真批开批(用户令一页一页来,D-AK 口径,锚=活原型+_base.css):①/agreement 四值档对齐(条款卡/正文色/尾注卡)。
+- 10-23 H-C×E4-c 合流:代码面取 E4-c/E7-a 版为正身(服务端真值),H-C 孤件净删(arranger/verdict-card 等),消息档死键剥离(14 键)。
+- 10-23 E7-b:追踪技能批首刀:moving_target+tracking_moving 落地(引擎/提交臂/结果行/消息 16 键×2);采样网格锚定律(网格锚定介入/首帧而非局始)。
+- 10-23 E7-c:追踪技能批二刀:skill_trajectory+dual_zone 落地(种子化棋盘;skillTrajectory randomSeed wire 字符串;消息 15 键×2=85 平价)。
+- 10-24 设计保真批第二日(hzy,用户逐页点单,D-AK):match 报告页/guide/pick 等七批成对 live 验收,尾用户令提交。
+- 10-25 MR!6 处理收口(lzx 代审):真树门禁 8 项=7 绿+ctr:check 红(三机械伤);机械修 99a1183e 先落 dev-hzy(模糊授权不推翻车道律)。
+- 10-25 E7-d:决策资源批首刀:offense_defense+resource_match 落地(OD=题库客户端镜像副本;消息 27 键×2;种子 boot 键物化)。
+- 10-25 E7-e:决策资源批收批(E7 13 款收满):number_stars+character_counter+economic_sim 落地(NS=回合事实即铸)。
+- 10-25 支付线两步走裁定+CP1 门校准(用户,官方查证):APIv3 无沙箱、测试号绑不了商户——CP1 门校准为验签握手通(GET /v3/certificates)。
+- 2026-10-25 D-AN/D-AO(ljr):P17 五问定案(性别进契约三态/年龄单轨/胶囊随账号批/种子国服 9 款重播/×1.5 弃句),P8/P11 关闭;ICP=浙ICP备2026028293号;偏好上限 3;P16-Q3 称号沿用。
+- 10-25 PAY-C0 架构推演定案(用户,三对账轮):场景矩阵(微信内 JSAPI/手机浏览器 H5/PC Native/无微信降级态)+支付凭据由登录供给。
+- 10-25 PAY1 订单域五片落地:a 契约+schema+种子(20d61e2f)+lint 收口(e6ef5b32)/b 渠道先行+platform map 容器(50427bde)/c 回调面+结算事务+边缘转发(1c88a4be)/d 对账+账单/e PAY_E2E 全链绿(5b7e88a1)。
+- 10-26 支付补两裁定(用户):①capability 只供语义,健壮性实现全归 PAY1 业务层;资金安全 M1 三件套(同库事务/未决单收敛/对账)。
+- 10-26 全量审查+C0-b/C0-c 连收:审查未提交面两伤即修;mock 镜像 wechat 渠道值集(兄弟包不 import);v3crypto 落 wechat 子包(分层修正)。
+- 10-26 C0-d infra 错误段(PAY-C0 全四片收):35xx Payment 八枚(1:1 折叠哨兵);proto:generate→breaking→build 全绿。
+- 10-26 PAY-C1 微信 provider 四片连收(代码面完工):传输核(双模式验签+防重放窗)/五法(三渠道)/回调解析/账单;公钥模式为主路径。
+- 10-26 流转批收口+H5 闸实测:ICP 备字双语言 live DOM 实测;种子国服九款重播;H5 闸实测红=产品权限未开通(行政件)。
+- 10-26 E5-c 解锁固化落地(双保险幂等快照=事件驱动+lazy 兜底):ReportUnlocked 中立协议+发布点两处覆盖全部 trial grant 语境。
+- 10-26 E5 二轮审查+修复批(用户点破裸 NewService;范围 6ecb89bb..HEAD 三笔全量):四修(NewService→NewReportService 接 logger 等)。
+- 10-26 偏好上限改判写死(用户,推翻 D-AO 半句):config 面珍稀原则——业务数值不进 config。
+- 10-26 E5-0 报告域设计定案(侦察+拆片):数据源就绪(ability_score percentile 空列=E3 预留挂点);8 维权重矩阵三源合一冻结。
+- 10-26 E5-a 报告契约+快照 schema 落地(第一手三源综合=旧仓 Java DTO+旧 API 文档+原型 _state.js):GetReport 单端点双态(免费层=tier 徽章)。
+- 10-26 E5-b1 性别三态前置落地(D-AN 兑现):profile.sex 三态枚举+proto Profile.sex=11(号段续排不重排)。
+- 10-26 E5-b 聚合引擎落地(module/report 四件套):侦察改判两处(ability_score=E3 遗留死表,真实数据源=record 级 join)。
+- 10-26 E5-b/b1 合并前审查修复批(用户 review 定罪 15 项全修):P1×2(total_dimensions 语义断路等)。
+- 10-25 CP1 门实质达成(提前里程碑 14 天):C1-d 真握手绿(凭据经授权从 GitLab wiki 取,/tmp 隔离不入库;公钥模式 404 应答体逐字印证)。
+- 10-25 合并前对抗审查收口(esports/main 合入前置闸,P0=0 放行):四视角并行 subagent+聚合二轮+IDOR 专项实测。
+- 10-25 E8-a 权益域结构片(entitle 模块自立+激活码全结构:activation.proto 双 service+activation_code 表+错误码 6150-52)。
+- 10-25 E8-b 权益验收锚+策略面:ENT_E2E 十人竞兑不超卖 e2e+report_policy 表+判定序重构(码兑>policy>默认)。
+- 10-25 E8-c 会员衍生解锁+R7 修订(E8 三片收满):trial 自动解锁=事件钩子(TrialGrantHook port)。
+- 10-25 整洁架构+DDD 全服务审查与收口(三路对抗+用户两裁):守面大面积满分;跨模块写两合法形法条回灌。
+- 10-26 走查修批日(hzy,用户现场走查九条全绿 93f67de3..179b1af2):mt 面色批/mt-F2 游走保真/mt-D3 统计面/ms 切换页等。
+- 10-27 验收收口+性别卡入账(hzy):用户亲验两件销账(tm 五修复复验+home-D5 续测卡);性别卡闭环 6beff1c1。
+- 10-27 MR!9 审查+吸收(lzx):三门代验绿后 12 笔 rebase 重放吸收(c78cd9e5,零 merge commit);wire-stamp 修复笔 e62ce8c6。
+- 10-27 全量审查+roadmap 纠正役(lzx,四片):R1 机械面修 8 处/R2 Go 面(13 跨模块边全 port 注入)/R3-R4 见 git。
+- 10-27 E5-d ctr report-single 页:七段面按原型语义级落地;契约增量=MatchSession.anchor_record_id(派生自最新 scored record)。
+- 10-28 原型还原度盘点+E5-f1 立片(44 页 vs 14 路由逐线对照):真欠账三族(读回面族/概览线/结算线)。
+- 10-28 E5-f2 结算线客户端落地:三标签+说明卡(EndFace 接 GetSessionReport;较上局 ± 着色;最高黄标)。
+- 10-28 E5-f3 概览线落地(f 族收官):home 最近成绩卡+数据统计卡+报告中心入口行。
+- 10-28 verify 工作台冻结入档(7ec87dea):44 页映射矩阵+gap 台账首批 9 条+PM 物料档+HARNESS-SOP(harness 全撤出 app 树)。
+- 2026-10-28 D-AP(ljr):P15 定案 ToC=窗内最小面(职业只读+趋势基础,认知零入口);三报告全做;ToB 交付物=认知报告页面;E5b 解锁。
+- 10-28 E-line-a 测试回位收口(含 E5-e 溶片):unit 17 原位直回/e2e 三件迁 internal/e2e(五幕+entitle+pay)/guards 3 件迁 internal/guards;ENT_E2E 活栈绿。
+- 10-28 E9-a 运营面服务端收口(c1ca75d3):TestAdminService 六 RPC 全 ACCESS_ADMIN+activation_admin 补读面。
+- 10-28 E9-b 运营面客户端挂载(5895f1a8):admin 三页(激活码/报告策略/测试项+题库抽屉);闭环 e2e 实走 CODE_REDEEMED;E8 存量 bug(codePB 域词)修复。
+- 10-28 devserver 机制退役(用户裁定):406 行+12 target 删除,agent=后台任务+TaskStop(kratos/vite 双树实证收净)。
+- 10-28 D-AQ 设计对齐前置法立档(design-alignment.md):客户端面切片开工查映射读原型源;ctr 活原型渲染态读;偏离三白名单。
+- 10-28 E10-b 全链 e2e 收口:ctr 首 Playwright spec(CTR_E2E=1)登录→向导→match→4 款→报告→开码兑换;两 fixture 法(反应池收窄+cohort 9 样本);五判例入 spec/config。

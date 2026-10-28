@@ -8,13 +8,15 @@ import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
 import { file_ext_v1_access } from "../../../ext/v1/access_pb";
 import { file_ext_v1_desc } from "../../../ext/v1/desc_pb";
 import { file_google_api_annotations } from "../../../google/api/annotations_pb";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp, file_google_protobuf_wrappers } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file cyber/esports/v1/report.proto.
  */
 export const file_cyber_esports_v1_report: GenFile = /*@__PURE__*/
-  fileDesc("Ch1jeWJlci9lc3BvcnRzL3YxL3JlcG9ydC5wcm90bxIQY3liZXIuZXNwb3J0cy52MSIwChBHZXRSZXBvcnRSZXF1ZXN0EhwKCXJlY29yZF9pZBgBIAEoCUIJukgGcgQQARgUIsgDChFHZXRSZXBvcnRSZXNwb25zZRIRCglyZWNvcmRfaWQYASABKAkSEAoIdW5sb2NrZWQYAiABKAgSKgoEdGllchgDIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VGllchIhChRjb21wb3NpdGVfcGVyY2VudGlsZRgEIAEoAUgAiAEBEjIKCWFiaWxpdGllcxgFIAMoCzIfLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0QWJpbGl0eRI2Cg1zdWJfYWJpbGl0aWVzGAYgAygLMh8uY3liZXIuZXNwb3J0cy52MS5SZXBvcnRBYmlsaXR5EjsKCmNvbXBhcmlzb24YByABKAsyIi5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydENvbXBhcmlzb25IAYgBARI5CgxpbXByb3ZlbWVudHMYCCADKAsyIy5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEltcHJvdmVtZW50EhkKEXRlc3RlZF9kaW1lbnNpb25zGAkgASgFEhgKEHRvdGFsX2RpbWVuc2lvbnMYCiABKAVCFwoVX2NvbXBvc2l0ZV9wZXJjZW50aWxlQg0KC19jb21wYXJpc29uIuIBCg1SZXBvcnRBYmlsaXR5Eg8KB2FiaWxpdHkYASABKAkSEQoJZ2FtZV9jb2RlGAIgASgJEg0KBXNjb3JlGAMgASgBEhcKCnBlcmNlbnRpbGUYBCABKAFIAIgBARI0Cgpjb25maWRlbmNlGAUgASgOMiAuY3liZXIuZXNwb3J0cy52MS5QZWVyQ29uZmlkZW5jZRIUCgxzYW1wbGVfY291bnQYBiABKAUSGQoMcGVlcl9hdmVyYWdlGAcgASgBSAGIAQFCDQoLX3BlcmNlbnRpbGVCDwoNX3BlZXJfYXZlcmFnZSLVAQoQUmVwb3J0Q29tcGFyaXNvbhI4CgZkZWx0YXMYASADKAsyKC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydENvbXBhcmlzb24uRGVsdGEahgEKBURlbHRhEg8KB2FiaWxpdHkYASABKAkSIAoTcHJldmlvdXNfcGVyY2VudGlsZRgCIAEoAUgAiAEBEh0KEGRlbHRhX3BlcmNlbnRpbGUYAyABKAFIAYgBAUIWChRfcHJldmlvdXNfcGVyY2VudGlsZUITChFfZGVsdGFfcGVyY2VudGlsZSJwChFSZXBvcnRJbXByb3ZlbWVudBIPCgdhYmlsaXR5GAEgASgJEhoKEmN1cnJlbnRfcGVyY2VudGlsZRgCIAEoARIZChF0YXJnZXRfcGVyY2VudGlsZRgDIAEoARITCgtnYXBfcGVyY2VudBgEIAEoASp1CgpSZXBvcnRUaWVyEhsKF1JFUE9SVF9USUVSX1VOU1BFQ0lGSUVEEAASEQoNUkVQT1JUX1RJRVJfUxABEhEKDVJFUE9SVF9USUVSX0EQAhIRCg1SRVBPUlRfVElFUl9CEAMSEQoNUkVQT1JUX1RJRVJfQxAEKoABCg5QZWVyQ29uZmlkZW5jZRIfChtQRUVSX0NPTkZJREVOQ0VfVU5TUEVDSUZJRUQQABIXChNQRUVSX0NPTkZJREVOQ0VfTE9XEAESGgoWUEVFUl9DT05GSURFTkNFX01FRElVTRACEhgKFFBFRVJfQ09ORklERU5DRV9ISUdIEAMyvgEKDVJlcG9ydFNlcnZpY2USoAEKCUdldFJlcG9ydBIiLmN5YmVyLmVzcG9ydHMudjEuR2V0UmVwb3J0UmVxdWVzdBojLmN5YmVyLmVzcG9ydHMudjEuR2V0UmVwb3J0UmVzcG9uc2UiSojxBASK0w4cChjojrflj5bljZXmrKHog73lipvmiqXlkYoQAYLT5JMCIDoBKiIbL2FwaS92MS9lc3BvcnRzL3JlcG9ydHMvZ2V0GgqK4gkG5oql5ZGKQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations]);
+  fileDesc("Ch1jeWJlci9lc3BvcnRzL3YxL3JlcG9ydC5wcm90bxIQY3liZXIuZXNwb3J0cy52MSIwChBHZXRSZXBvcnRSZXF1ZXN0EhwKCXJlY29yZF9pZBgBIAEoCUIJukgGcgQQARgUIsgDChFHZXRSZXBvcnRSZXNwb25zZRIRCglyZWNvcmRfaWQYASABKAkSEAoIdW5sb2NrZWQYAiABKAgSKgoEdGllchgDIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VGllchIhChRjb21wb3NpdGVfcGVyY2VudGlsZRgEIAEoAUgAiAEBEjIKCWFiaWxpdGllcxgFIAMoCzIfLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0QWJpbGl0eRI2Cg1zdWJfYWJpbGl0aWVzGAYgAygLMh8uY3liZXIuZXNwb3J0cy52MS5SZXBvcnRBYmlsaXR5EjsKCmNvbXBhcmlzb24YByABKAsyIi5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydENvbXBhcmlzb25IAYgBARI5CgxpbXByb3ZlbWVudHMYCCADKAsyIy5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEltcHJvdmVtZW50EhkKEXRlc3RlZF9kaW1lbnNpb25zGAkgASgFEhgKEHRvdGFsX2RpbWVuc2lvbnMYCiABKAVCFwoVX2NvbXBvc2l0ZV9wZXJjZW50aWxlQg0KC19jb21wYXJpc29uIjgKF0dldFNlc3Npb25SZXBvcnRSZXF1ZXN0Eh0KCnNlc3Npb25faWQYASABKAlCCbpIBnIEEAEYQCL7AgoYR2V0U2Vzc2lvblJlcG9ydFJlc3BvbnNlEhIKCnNlc3Npb25faWQYASABKAkSDQoFZ2VucmUYAiABKAkSNgoQYW5jaG9yX3JlY29yZF9pZBgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIqCgR0aWVyGAQgASgOMhwuY3liZXIuZXNwb3J0cy52MS5SZXBvcnRUaWVyEjoKFGNvbXBvc2l0ZV9wZXJjZW50aWxlGAUgASgLMhwuZ29vZ2xlLnByb3RvYnVmLkRvdWJsZVZhbHVlEjcKCWFiaWxpdGllcxgGIAMoCzIkLmN5YmVyLmVzcG9ydHMudjEuU2Vzc2lvbkFiaWxpdHlMaW5lEhkKEXRlc3RlZF9kaW1lbnNpb25zGAcgASgFEhgKEHRvdGFsX2RpbWVuc2lvbnMYCCABKAUSLgoKc3RhcnRlZF9hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAivAIKElNlc3Npb25BYmlsaXR5TGluZRIPCgdhYmlsaXR5GAEgASgJEhEKCWdhbWVfY29kZRgCIAEoCRISCgpiZXN0X3Njb3JlGAMgASgBEhYKDmF0dGVtcHRfc2NvcmVzGAQgAygBEjAKCmJlc3RfZ3JhZGUYBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMAoKcGVyY2VudGlsZRgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5Eb3VibGVWYWx1ZRI4ChJwcmV2X3Nlc3Npb25fc2NvcmUYByABKAsyHC5nb29nbGUucHJvdG9idWYuRG91YmxlVmFsdWUSOAoSaGlzdG9yeV9iZXN0X3Njb3JlGAggASgLMhwuZ29vZ2xlLnByb3RvYnVmLkRvdWJsZVZhbHVlIhkKF0dldEFiaWxpdHlEaWdlc3RSZXF1ZXN0Is4BChhHZXRBYmlsaXR5RGlnZXN0UmVzcG9uc2USFgoOc2Vzc2lvbnNfdG90YWwYASABKAUSFAoMc2Vzc2lvbnNfZnBzGAIgASgFEhUKDXNlc3Npb25zX21vYmEYAyABKAUSNgoJYWJpbGl0aWVzGAQgAygLMiMuY3liZXIuZXNwb3J0cy52MS5EaWdlc3RBYmlsaXR5TGluZRI1CghzZXNzaW9ucxgFIAMoCzIjLmN5YmVyLmVzcG9ydHMudjEuRGlnZXN0U2Vzc2lvbkxpbmUi5wEKEURpZ2VzdEFiaWxpdHlMaW5lEg8KB2FiaWxpdHkYASABKAkSEgoKYmVzdF9zY29yZRgCIAEoARIwCgpiZXN0X2dyYWRlGAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjUKD2Jlc3RfcGVyY2VudGlsZRgEIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5Eb3VibGVWYWx1ZRIXCg9zZXNzaW9uc190ZXN0ZWQYBSABKAUSKwoHbGFzdF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi2AEKEURpZ2VzdFNlc3Npb25MaW5lEhIKCnNlc3Npb25faWQYASABKAkSDQoFZ2VucmUYAiABKAkSEAoIZmluaXNoZWQYAyABKAgSEgoKZG9uZV9jb3VudBgEIAEoBRISCgpzdGVwX2NvdW50GAUgASgFEi4KCmNyZWF0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjYKEGFuY2hvcl9yZWNvcmRfaWQYByABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUi4gEKDVJlcG9ydEFiaWxpdHkSDwoHYWJpbGl0eRgBIAEoCRIRCglnYW1lX2NvZGUYAiABKAkSDQoFc2NvcmUYAyABKAESFwoKcGVyY2VudGlsZRgEIAEoAUgAiAEBEjQKCmNvbmZpZGVuY2UYBSABKA4yIC5jeWJlci5lc3BvcnRzLnYxLlBlZXJDb25maWRlbmNlEhQKDHNhbXBsZV9jb3VudBgGIAEoBRIZCgxwZWVyX2F2ZXJhZ2UYByABKAFIAYgBAUINCgtfcGVyY2VudGlsZUIPCg1fcGVlcl9hdmVyYWdlItUBChBSZXBvcnRDb21wYXJpc29uEjgKBmRlbHRhcxgBIAMoCzIoLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0Q29tcGFyaXNvbi5EZWx0YRqGAQoFRGVsdGESDwoHYWJpbGl0eRgBIAEoCRIgChNwcmV2aW91c19wZXJjZW50aWxlGAIgASgBSACIAQESHQoQZGVsdGFfcGVyY2VudGlsZRgDIAEoAUgBiAEBQhYKFF9wcmV2aW91c19wZXJjZW50aWxlQhMKEV9kZWx0YV9wZXJjZW50aWxlInAKEVJlcG9ydEltcHJvdmVtZW50Eg8KB2FiaWxpdHkYASABKAkSGgoSY3VycmVudF9wZXJjZW50aWxlGAIgASgBEhkKEXRhcmdldF9wZXJjZW50aWxlGAMgASgBEhMKC2dhcF9wZXJjZW50GAQgASgBKnUKClJlcG9ydFRpZXISGwoXUkVQT1JUX1RJRVJfVU5TUEVDSUZJRUQQABIRCg1SRVBPUlRfVElFUl9TEAESEQoNUkVQT1JUX1RJRVJfQRACEhEKDVJFUE9SVF9USUVSX0IQAxIRCg1SRVBPUlRfVElFUl9DEAQqgAEKDlBlZXJDb25maWRlbmNlEh8KG1BFRVJfQ09ORklERU5DRV9VTlNQRUNJRklFRBAAEhcKE1BFRVJfQ09ORklERU5DRV9MT1cQARIaChZQRUVSX0NPTkZJREVOQ0VfTUVESVVNEAISGAoUUEVFUl9DT05GSURFTkNFX0hJR0gQAzK1BAoNUmVwb3J0U2VydmljZRKgAQoJR2V0UmVwb3J0EiIuY3liZXIuZXNwb3J0cy52MS5HZXRSZXBvcnRSZXF1ZXN0GiMuY3liZXIuZXNwb3J0cy52MS5HZXRSZXBvcnRSZXNwb25zZSJKiPEEBIrTDhwKGOiOt+WPluWNleasoeiDveWKm+aKpeWRihABgtPkkwIgOgEqIhsvYXBpL3YxL2VzcG9ydHMvcmVwb3J0cy9nZXQSuQEKEEdldFNlc3Npb25SZXBvcnQSKS5jeWJlci5lc3BvcnRzLnYxLkdldFNlc3Npb25SZXBvcnRSZXF1ZXN0GiouY3liZXIuZXNwb3J0cy52MS5HZXRTZXNzaW9uUmVwb3J0UmVzcG9uc2UiTojxBASK0w4cChjojrflj5blnLrmrKHmiJDnu6nmsYfmgLsQAYLT5JMCJDoBKiIfL2FwaS92MS9lc3BvcnRzL3JlcG9ydHMvc2Vzc2lvbhK4AQoQR2V0QWJpbGl0eURpZ2VzdBIpLmN5YmVyLmVzcG9ydHMudjEuR2V0QWJpbGl0eURpZ2VzdFJlcXVlc3QaKi5jeWJlci5lc3BvcnRzLnYxLkdldEFiaWxpdHlEaWdlc3RSZXNwb25zZSJNiPEEBIrTDhwKGOiOt+WPluiDveWKm+aIkOe7qeaAu+iniBABgtPkkwIjOgEqIh4vYXBpL3YxL2VzcG9ydHMvcmVwb3J0cy9kaWdlc3QaCoriCQbmiqXlkYpCKVonY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9lc3BvcnRzL3YxYgZwcm90bzM", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * @generated from message cyber.esports.v1.GetReportRequest
@@ -123,6 +125,334 @@ export const GetReportResponseSchema: GenMessage<GetReportResponse> = /*@__PURE_
   messageDesc(file_cyber_esports_v1_report, 1);
 
 /**
+ * @generated from message cyber.esports.v1.GetSessionReportRequest
+ */
+export type GetSessionReportRequest = Message<"cyber.esports.v1.GetSessionReportRequest"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+};
+
+/**
+ * Describes the message cyber.esports.v1.GetSessionReportRequest.
+ * Use `create(GetSessionReportRequestSchema)` to create a new message.
+ */
+export const GetSessionReportRequestSchema: GenMessage<GetSessionReportRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_report, 2);
+
+/**
+ * @generated from message cyber.esports.v1.GetSessionReportResponse
+ */
+export type GetSessionReportResponse = Message<"cyber.esports.v1.GetSessionReportResponse"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string genre = 2;
+   */
+  genre: string;
+
+  /**
+   * The session's latest scored record — the composite verdict's owner;
+   * absent while nothing scored (the same derivation the match face
+   * carries, never this face's to claim).
+   *
+   * @generated from field: google.protobuf.StringValue anchor_record_id = 3;
+   */
+  anchorRecordId?: string | undefined;
+
+  /**
+   * The anchor's verdict: the frozen snapshot when one exists, the live
+   * judgement otherwise — the free tier's own law, same as the record
+   * board. UNSPECIFIED while no anchor exists.
+   *
+   * @generated from field: cyber.esports.v1.ReportTier tier = 4;
+   */
+  tier: ReportTier;
+
+  /**
+   * @generated from field: google.protobuf.DoubleValue composite_percentile = 5;
+   */
+  compositePercentile?: number | undefined;
+
+  /**
+   * One line per ability the session measured, in the lineup's order —
+   * an unmeasured step never lands a line, never a zero line.
+   *
+   * @generated from field: repeated cyber.esports.v1.SessionAbilityLine abilities = 6;
+   */
+  abilities: SessionAbilityLine[];
+
+  /**
+   * The completeness headline over the genre's ordered abilities.
+   *
+   * @generated from field: int32 tested_dimensions = 7;
+   */
+  testedDimensions: number;
+
+  /**
+   * @generated from field: int32 total_dimensions = 8;
+   */
+  totalDimensions: number;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp started_at = 9;
+   */
+  startedAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.GetSessionReportResponse.
+ * Use `create(GetSessionReportResponseSchema)` to create a new message.
+ */
+export const GetSessionReportResponseSchema: GenMessage<GetSessionReportResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_report, 3);
+
+/**
+ * One ability's session verdict — the three numbers the settlement face
+ * keeps distinct: this session's best, the previous session's word, and
+ * the cross-session best.
+ *
+ * @generated from message cyber.esports.v1.SessionAbilityLine
+ */
+export type SessionAbilityLine = Message<"cyber.esports.v1.SessionAbilityLine"> & {
+  /**
+   * @generated from field: string ability = 1;
+   */
+  ability: string;
+
+  /**
+   * The game whose best attempt fed the line.
+   *
+   * @generated from field: string game_code = 2;
+   */
+  gameCode: string;
+
+  /**
+   * This session's best valid attempt — the settlement headline (a line
+   * exists only when a valid attempt landed, so this is never empty).
+   *
+   * @generated from field: double best_score = 3;
+   */
+  bestScore: number;
+
+  /**
+   * Every valid attempt's authoritative score in ordinal order — the
+   * "N attempts, best taken" receipt.
+   *
+   * @generated from field: repeated double attempt_scores = 4;
+   */
+  attemptScores: number[];
+
+  /**
+   * The best attempt's grade; null when that attempt carried no cohort
+   * answer.
+   *
+   * @generated from field: google.protobuf.StringValue best_grade = 5;
+   */
+  bestGrade?: string | undefined;
+
+  /**
+   * The ability's percentile from the anchor's frozen snapshot; null
+   * while the cohort says nothing.
+   *
+   * @generated from field: google.protobuf.DoubleValue percentile = 6;
+   */
+  percentile?: number | undefined;
+
+  /**
+   * The same ability's score on the member's previous session — null on
+   * the first session (the note renders "first", never zero).
+   *
+   * @generated from field: google.protobuf.DoubleValue prev_session_score = 7;
+   */
+  prevSessionScore?: number | undefined;
+
+  /**
+   * The cross-session best including this session's attempts — the mark
+   * the comparison track and the "new personal best" note read.
+   *
+   * @generated from field: google.protobuf.DoubleValue history_best_score = 8;
+   */
+  historyBestScore?: number | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.SessionAbilityLine.
+ * Use `create(SessionAbilityLineSchema)` to create a new message.
+ */
+export const SessionAbilityLineSchema: GenMessage<SessionAbilityLine> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_report, 4);
+
+/**
+ * @generated from message cyber.esports.v1.GetAbilityDigestRequest
+ */
+export type GetAbilityDigestRequest = Message<"cyber.esports.v1.GetAbilityDigestRequest"> & {
+};
+
+/**
+ * Describes the message cyber.esports.v1.GetAbilityDigestRequest.
+ * Use `create(GetAbilityDigestRequestSchema)` to create a new message.
+ */
+export const GetAbilityDigestRequestSchema: GenMessage<GetAbilityDigestRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_report, 5);
+
+/**
+ * @generated from message cyber.esports.v1.GetAbilityDigestResponse
+ */
+export type GetAbilityDigestResponse = Message<"cyber.esports.v1.GetAbilityDigestResponse"> & {
+  /**
+   * Sessions carrying at least one valid attempt — practice runs never
+   * count as sessions.
+   *
+   * @generated from field: int32 sessions_total = 1;
+   */
+  sessionsTotal: number;
+
+  /**
+   * @generated from field: int32 sessions_fps = 2;
+   */
+  sessionsFps: number;
+
+  /**
+   * @generated from field: int32 sessions_moba = 3;
+   */
+  sessionsMoba: number;
+
+  /**
+   * One line per measured ability of the six-word vocabulary; an untested
+   * ability is an absent entry, never a zero row (the covered-count face
+   * reads the absence).
+   *
+   * @generated from field: repeated cyber.esports.v1.DigestAbilityLine abilities = 4;
+   */
+  abilities: DigestAbilityLine[];
+
+  /**
+   * The latest session line per genre — at most one row each, absent
+   * when the genre was never played.
+   *
+   * @generated from field: repeated cyber.esports.v1.DigestSessionLine sessions = 5;
+   */
+  sessions: DigestSessionLine[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.GetAbilityDigestResponse.
+ * Use `create(GetAbilityDigestResponseSchema)` to create a new message.
+ */
+export const GetAbilityDigestResponseSchema: GenMessage<GetAbilityDigestResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_report, 6);
+
+/**
+ * @generated from message cyber.esports.v1.DigestAbilityLine
+ */
+export type DigestAbilityLine = Message<"cyber.esports.v1.DigestAbilityLine"> & {
+  /**
+   * @generated from field: string ability = 1;
+   */
+  ability: string;
+
+  /**
+   * The cross-session best score — the ability board's bar.
+   *
+   * @generated from field: double best_score = 2;
+   */
+  bestScore: number;
+
+  /**
+   * The best attempt's grade; null when that attempt carried no cohort
+   * answer.
+   *
+   * @generated from field: google.protobuf.StringValue best_grade = 3;
+   */
+  bestGrade?: string | undefined;
+
+  /**
+   * The best's percentile; null while the cohort says nothing.
+   *
+   * @generated from field: google.protobuf.DoubleValue best_percentile = 4;
+   */
+  bestPercentile?: number | undefined;
+
+  /**
+   * How many distinct sessions carried a valid attempt for the ability.
+   *
+   * @generated from field: int32 sessions_tested = 5;
+   */
+  sessionsTested: number;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp last_at = 6;
+   */
+  lastAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.DigestAbilityLine.
+ * Use `create(DigestAbilityLineSchema)` to create a new message.
+ */
+export const DigestAbilityLineSchema: GenMessage<DigestAbilityLine> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_report, 7);
+
+/**
+ * @generated from message cyber.esports.v1.DigestSessionLine
+ */
+export type DigestSessionLine = Message<"cyber.esports.v1.DigestSessionLine"> & {
+  /**
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string genre = 2;
+   */
+  genre: string;
+
+  /**
+   * All steps done — the history card's finished state; false keeps the
+   * resume entry alive.
+   *
+   * @generated from field: bool finished = 3;
+   */
+  finished: boolean;
+
+  /**
+   * @generated from field: int32 done_count = 4;
+   */
+  doneCount: number;
+
+  /**
+   * @generated from field: int32 step_count = 5;
+   */
+  stepCount: number;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 6;
+   */
+  createdAt?: Timestamp | undefined;
+
+  /**
+   * The session's anchor — the report entry; absent while nothing
+   * scored. The line carries no verdict of its own: the composite face
+   * reads GetSessionReport with this id.
+   *
+   * @generated from field: google.protobuf.StringValue anchor_record_id = 7;
+   */
+  anchorRecordId?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.DigestSessionLine.
+ * Use `create(DigestSessionLineSchema)` to create a new message.
+ */
+export const DigestSessionLineSchema: GenMessage<DigestSessionLine> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_report, 8);
+
+/**
  * One radar axis: the ability's own numbers plus the cohort answer. The
  * percentile is the same-age same-sex cohort's; a cohort too thin to say
  * anything yields a null percentile and a LOW confidence — the axis then
@@ -176,7 +506,7 @@ export type ReportAbility = Message<"cyber.esports.v1.ReportAbility"> & {
  * Use `create(ReportAbilitySchema)` to create a new message.
  */
 export const ReportAbilitySchema: GenMessage<ReportAbility> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 2);
+  messageDesc(file_cyber_esports_v1_report, 9);
 
 /**
  * @generated from message cyber.esports.v1.ReportComparison
@@ -193,7 +523,7 @@ export type ReportComparison = Message<"cyber.esports.v1.ReportComparison"> & {
  * Use `create(ReportComparisonSchema)` to create a new message.
  */
 export const ReportComparisonSchema: GenMessage<ReportComparison> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 3);
+  messageDesc(file_cyber_esports_v1_report, 10);
 
 /**
  * @generated from message cyber.esports.v1.ReportComparison.Delta
@@ -223,7 +553,7 @@ export type ReportComparison_Delta = Message<"cyber.esports.v1.ReportComparison.
  * Use `create(ReportComparison_DeltaSchema)` to create a new message.
  */
 export const ReportComparison_DeltaSchema: GenMessage<ReportComparison_Delta> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 3, 0);
+  messageDesc(file_cyber_esports_v1_report, 10, 0);
 
 /**
  * @generated from message cyber.esports.v1.ReportImprovement
@@ -257,7 +587,7 @@ export type ReportImprovement = Message<"cyber.esports.v1.ReportImprovement"> & 
  * Use `create(ReportImprovementSchema)` to create a new message.
  */
 export const ReportImprovementSchema: GenMessage<ReportImprovement> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 4);
+  messageDesc(file_cyber_esports_v1_report, 11);
 
 /**
  * The tier ladder, judged by percentile: S ≥95, A ≥85, B ≥60, else C.
@@ -343,6 +673,12 @@ export const PeerConfidenceSchema: GenEnum<PeerConfidence> = /*@__PURE__*/
  * board. Numbers travel, copy does not: the five-zone wording stays with
  * the client until its configuration face lands.
  *
+ * Beside the record board sit the two read-back faces: the session
+ * scoreboard (GetSessionReport) and the cross-session aggregate
+ * (GetAbilityDigest) — what a member sees of scores they already earned.
+ * Neither runs cohort math: the frozen snapshot is their only percentile
+ * source, same as the record board itself.
+ *
  * @generated from service cyber.esports.v1.ReportService
  */
 export const ReportService: GenService<{
@@ -353,6 +689,22 @@ export const ReportService: GenService<{
     methodKind: "unary";
     input: typeof GetReportRequestSchema;
     output: typeof GetReportResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.esports.v1.ReportService.GetSessionReport
+   */
+  getSessionReport: {
+    methodKind: "unary";
+    input: typeof GetSessionReportRequestSchema;
+    output: typeof GetSessionReportResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.esports.v1.ReportService.GetAbilityDigest
+   */
+  getAbilityDigest: {
+    methodKind: "unary";
+    input: typeof GetAbilityDigestRequestSchema;
+    output: typeof GetAbilityDigestResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_cyber_esports_v1_report, 0);

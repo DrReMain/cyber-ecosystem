@@ -42,6 +42,9 @@ const (
 	// EntitleAdminServiceSetReportAccessPolicyProcedure is the fully-qualified name of the
 	// EntitleAdminService's SetReportAccessPolicy RPC.
 	EntitleAdminServiceSetReportAccessPolicyProcedure = "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy"
+	// EntitleAdminServiceListReportAccessPoliciesProcedure is the fully-qualified name of the
+	// EntitleAdminService's ListReportAccessPolicies RPC.
+	EntitleAdminServiceListReportAccessPoliciesProcedure = "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies"
 )
 
 // EntitleAdminServiceClient is a client for the cyber.esports.v1.EntitleAdminService service.
@@ -49,6 +52,7 @@ type EntitleAdminServiceClient interface {
 	GenerateActivationCodes(context.Context, *connect.Request[v1.GenerateActivationCodesRequest]) (*connect.Response[v1.GenerateActivationCodesResponse], error)
 	ListActivationCodes(context.Context, *connect.Request[v1.ListActivationCodesRequest]) (*connect.Response[v1.ListActivationCodesResponse], error)
 	SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error)
+	ListReportAccessPolicies(context.Context, *connect.Request[v1.ListReportAccessPoliciesRequest]) (*connect.Response[v1.ListReportAccessPoliciesResponse], error)
 }
 
 // NewEntitleAdminServiceClient constructs a client for the cyber.esports.v1.EntitleAdminService
@@ -80,14 +84,21 @@ func NewEntitleAdminServiceClient(httpClient connect.HTTPClient, baseURL string,
 			connect.WithSchema(entitleAdminServiceMethods.ByName("SetReportAccessPolicy")),
 			connect.WithClientOptions(opts...),
 		),
+		listReportAccessPolicies: connect.NewClient[v1.ListReportAccessPoliciesRequest, v1.ListReportAccessPoliciesResponse](
+			httpClient,
+			baseURL+EntitleAdminServiceListReportAccessPoliciesProcedure,
+			connect.WithSchema(entitleAdminServiceMethods.ByName("ListReportAccessPolicies")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // entitleAdminServiceClient implements EntitleAdminServiceClient.
 type entitleAdminServiceClient struct {
-	generateActivationCodes *connect.Client[v1.GenerateActivationCodesRequest, v1.GenerateActivationCodesResponse]
-	listActivationCodes     *connect.Client[v1.ListActivationCodesRequest, v1.ListActivationCodesResponse]
-	setReportAccessPolicy   *connect.Client[v1.SetReportAccessPolicyRequest, v1.SetReportAccessPolicyResponse]
+	generateActivationCodes  *connect.Client[v1.GenerateActivationCodesRequest, v1.GenerateActivationCodesResponse]
+	listActivationCodes      *connect.Client[v1.ListActivationCodesRequest, v1.ListActivationCodesResponse]
+	setReportAccessPolicy    *connect.Client[v1.SetReportAccessPolicyRequest, v1.SetReportAccessPolicyResponse]
+	listReportAccessPolicies *connect.Client[v1.ListReportAccessPoliciesRequest, v1.ListReportAccessPoliciesResponse]
 }
 
 // GenerateActivationCodes calls cyber.esports.v1.EntitleAdminService.GenerateActivationCodes.
@@ -105,12 +116,18 @@ func (c *entitleAdminServiceClient) SetReportAccessPolicy(ctx context.Context, r
 	return c.setReportAccessPolicy.CallUnary(ctx, req)
 }
 
+// ListReportAccessPolicies calls cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies.
+func (c *entitleAdminServiceClient) ListReportAccessPolicies(ctx context.Context, req *connect.Request[v1.ListReportAccessPoliciesRequest]) (*connect.Response[v1.ListReportAccessPoliciesResponse], error) {
+	return c.listReportAccessPolicies.CallUnary(ctx, req)
+}
+
 // EntitleAdminServiceHandler is an implementation of the cyber.esports.v1.EntitleAdminService
 // service.
 type EntitleAdminServiceHandler interface {
 	GenerateActivationCodes(context.Context, *connect.Request[v1.GenerateActivationCodesRequest]) (*connect.Response[v1.GenerateActivationCodesResponse], error)
 	ListActivationCodes(context.Context, *connect.Request[v1.ListActivationCodesRequest]) (*connect.Response[v1.ListActivationCodesResponse], error)
 	SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error)
+	ListReportAccessPolicies(context.Context, *connect.Request[v1.ListReportAccessPoliciesRequest]) (*connect.Response[v1.ListReportAccessPoliciesResponse], error)
 }
 
 // NewEntitleAdminServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -138,6 +155,12 @@ func NewEntitleAdminServiceHandler(svc EntitleAdminServiceHandler, opts ...conne
 		connect.WithSchema(entitleAdminServiceMethods.ByName("SetReportAccessPolicy")),
 		connect.WithHandlerOptions(opts...),
 	)
+	entitleAdminServiceListReportAccessPoliciesHandler := connect.NewUnaryHandler(
+		EntitleAdminServiceListReportAccessPoliciesProcedure,
+		svc.ListReportAccessPolicies,
+		connect.WithSchema(entitleAdminServiceMethods.ByName("ListReportAccessPolicies")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.EntitleAdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case EntitleAdminServiceGenerateActivationCodesProcedure:
@@ -146,6 +169,8 @@ func NewEntitleAdminServiceHandler(svc EntitleAdminServiceHandler, opts ...conne
 			entitleAdminServiceListActivationCodesHandler.ServeHTTP(w, r)
 		case EntitleAdminServiceSetReportAccessPolicyProcedure:
 			entitleAdminServiceSetReportAccessPolicyHandler.ServeHTTP(w, r)
+		case EntitleAdminServiceListReportAccessPoliciesProcedure:
+			entitleAdminServiceListReportAccessPoliciesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -165,4 +190,8 @@ func (UnimplementedEntitleAdminServiceHandler) ListActivationCodes(context.Conte
 
 func (UnimplementedEntitleAdminServiceHandler) SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy is not implemented"))
+}
+
+func (UnimplementedEntitleAdminServiceHandler) ListReportAccessPolicies(context.Context, *connect.Request[v1.ListReportAccessPoliciesRequest]) (*connect.Response[v1.ListReportAccessPoliciesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies is not implemented"))
 }

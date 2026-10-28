@@ -1,0 +1,18 @@
+{
+  "esports_activation_codes_title": "활성 코드",
+  "esports_activation_codes_total": "총 {n}건",
+  "esports_activation_codes_filter_type": "보고서 유형",
+  "esports_activation_codes_col_code": "코드",
+  "esports_activation_codes_col_type": "보고서 유형",
+  "esports_activation_codes_col_expires": "만료 시간",
+  "esports_activation_codes_col_created": "생성 시간",
+  "esports_activation_codes_empty": "활성 코드가 없습니다",
+  "esports_activation_codes_generate": "배치 생성",
+  "esports_activation_codes_generate_submit": "생성",
+  "esports_activation_codes_generate_type": "보고서 유형",
+  "esports_activation_codes_generate_count": "수량(개)",
+  "esports_activation_codes_generate_days": "유효 기간(일)",
+  "esports_activation_codes_generate_success": "{n}개의 코드를 생성했습니다",
+  "esports_activation_codes_generate_hint": "코드는 평문으로 저장되어 언제든 복사해 배포할 수 있습니다. 각 코드는 1회만 사용할 수 있습니다",
+  "esports_activation_codes_col_progress": "사용 진행"
+}

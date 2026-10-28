@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/esports/v1/test.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The operator face of the test domain: the catalog and its runtime tuning,
+// the question bank's seed rows, and the stored attempts behind every
+// verdict. The member face (TestService) answers hydration and submission;
+// this face answers the operator's "what is tuned, what is banked, what did
+// they score" — a read-mostly plane whose one write is the config dial.
+// Reuses TestService's own messages wherever the shapes coincide: the
+// catalog row and the boot bag are one truth, not two. This whole service
+// is a strippable module: deployments without the operator plane drop it
+// and the business faces never notice.
+service TestAdminService {
+  option (cyber.ext.v1.service_comment) = "测试项运营";
+  rpc ListTests(TestAdminServiceListTestsRequest) returns (TestAdminServiceListTestsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "测试项列表(运营)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/admin/tests"};
+  }
+  rpc GetTestConfig(TestAdminServiceGetTestConfigRequest) returns (TestAdminServiceGetTestConfigResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "测试项运行配置(运营)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/admin/tests/{id}/config"};
+  }
+  rpc UpdateTestConfig(UpdateTestConfigRequest) returns (UpdateTestConfigResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "测试项运行配置调参"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/admin/tests/{test_id}/config"
+      body: "*"
+    };
+  }
+  rpc ListQuestionBank(ListQuestionBankRequest) returns (ListQuestionBankResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "题库查看"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/admin/question-bank"};
+  }
+  rpc ListTestAttempts(ListTestAttemptsRequest) returns (ListTestAttemptsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "测试记录列表(运营)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/admin/test-attempts"};
+  }
+  rpc GetTestAttempt(GetTestAttemptRequest) returns (GetTestAttemptResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "测试记录详情(运营)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/admin/test-attempts/{record_id}"};
+  }
+}
+
+// The one write this plane owns. Absent fields stay untouched — the
+// operator tunes one dial at a time; duration_seconds is deliberately
+// absent because it mirrors test.duration_seconds and answers to the
+// catalog, not to this bag.
+message UpdateTestConfigRequest {
+  string test_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional int32 background_invalid_seconds = 2 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 3600
+  }];
+  // Full replacement when present, no patch semantics — the page always
+  // reads before it writes, so replace-what-you-saw is the simpler
+  // contract than a merge the operator could lose rows in.
+  map<string, string> engine_params = 3 [(buf.validate.field).map = {
+    min_pairs: 1
+    max_pairs: 64
+    keys: {
+      string: {
+        min_len: 1
+        max_len: 64
+      }
+    }
+    values: {
+      string: {
+        min_len: 1
+        max_len: 512
+      }
+    }
+  }];
+}
+
+message UpdateTestConfigResponse {
+  TestConfig config = 1;
+}
+
+// The admin catalog faces carry their own message names even where the
+// shape coincides with the member face — one message serving two RPCs
+// would weld their evolution together, and the lint holds that line.
+message TestAdminServiceListTestsRequest {}
+
+message TestAdminServiceListTestsResponse {
+  repeated Test tests = 1;
+}
+
+message TestAdminServiceGetTestConfigRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message TestAdminServiceGetTestConfigResponse {
+  TestConfig config = 1;
+}
+
+message ListQuestionBankRequest {
+  string test_code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 50
+    }
+  ];
+  cyber.shared.common.v1.PageRequest page = 2;
+}
+
+message ListQuestionBankResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated QuestionBankRow questions = 2;
+}
+
+// One banked scenario. The answer key rides in full — operator visibility
+// into what correctness is judged against is the point of this face.
+message QuestionBankRow {
+  string scenario_code = 1;
+  google.protobuf.Struct payload = 2;
+  google.protobuf.Struct answer = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message ListTestAttemptsRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional string test_code = 2 [(buf.validate.field).string.max_len = 50];
+  optional string user_id = 3 [(buf.validate.field).string.max_len = 20];
+  optional string match_session_id = 4 [(buf.validate.field).string.max_len = 64];
+}
+
+message ListTestAttemptsResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated TestAttemptRow attempts = 2;
+}
+
+// The stored attempt as the operator reads it — the same row the member's
+// report verdicts were cut from, so no verdict can be traced to a fact
+// this face cannot show.
+message TestAttemptRow {
+  string record_id = 1;
+  string test_code = 2;
+  string user_id = 3;
+  // Null for local practice — absence = no session, the submit law.
+  google.protobuf.StringValue match_session_id = 4;
+  int32 attempt_no = 5;
+  google.protobuf.Timestamp started_at = 6;
+  google.protobuf.Timestamp ended_at = 7;
+  // The dual track — an invalid attempt carries no scores. Ability rides
+  // the catalog join client-side; the row carries only what it stored.
+  google.protobuf.DoubleValue raw_score = 8;
+  google.protobuf.DoubleValue authoritative_score = 9;
+  google.protobuf.StringValue grade = 10;
+  bool valid = 11;
+  google.protobuf.StringValue invalid_reason = 12;
+}
+
+message GetTestAttemptRequest {
+  string record_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetTestAttemptResponse {
+  TestAttemptRow attempt = 1;
+  // The raw fact stream as stored — the audit trail behind the verdict,
+  // presented verbatim rather than re-typed per engine.
+  google.protobuf.Struct raw_detail = 2;
+}

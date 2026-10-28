@@ -85,13 +85,14 @@ func mapSessionPB(v *SessionView) *esportspb.MatchSession {
 		})
 	}
 	return &esportspb.MatchSession{
-		Id:           utils.StringW(v.Session.ID),
-		Genre:        utils.StringW(v.Session.Genre),
-		Difficulty:   utils.StringW(v.Session.Difficulty),
-		Steps:        steps,
-		Done:         v.Done,
-		RetestLeft:   v.RetestLeft,
-		CreatedAt:    utils.ToTimestamp(&v.Session.CreatedAt),
-		FirstSession: utils.BoolW(v.First),
+		Id:             utils.StringW(v.Session.ID),
+		Genre:          utils.StringW(v.Session.Genre),
+		Difficulty:     utils.StringW(v.Session.Difficulty),
+		Steps:          steps,
+		Done:           v.Done,
+		RetestLeft:     v.RetestLeft,
+		CreatedAt:      utils.ToTimestamp(&v.Session.CreatedAt),
+		FirstSession:   utils.BoolW(v.First),
+		AnchorRecordId: utils.Wrap(v.AnchorRecordID, utils.StringW),
 	}
 }

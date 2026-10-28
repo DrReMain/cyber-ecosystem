@@ -57,6 +57,10 @@ export interface StepContext {
   readonly retestLeft: number;
   /** 3 chances on the first session, 1 after (E4-b). */
   readonly firstSession: boolean;
+  /** The session's latest scored record — the ability report's anchor;
+   * undefined while nothing scored exists yet, so the report CTA stays
+   * honestly absent for an all-invalid session. */
+  readonly anchorRecordId: string | undefined;
 }
 
 // The one attempt-shaped record a run accumulates. Events are per-game
