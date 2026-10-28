@@ -49,7 +49,7 @@
 | SMS 骨架片(system provider+capability) | lzx | E6c(2026-10-23 立片收口) |
 | 协议 consent 版本记录契约 | lzx | H2 versions.ts 真源 GET /agreements/current |
 | 自定义游戏偏好上限:产品口径 3,config 随 E9 下发 | ~~ljr~~→hzy/lzx | 已裁 D-AO,随 E9 落地(**10-26 改判写死:业务数值不进 config,常量已落 biz**) |
-| **mt-F1 重测耗尽死局**:match 阵容步「剩 0 次」进 intro,「继续 · 开始测试」被花费闸拦死——无提示、无出路(不能重测/跳过/换);活体证据在 10-26 走查会话档 | ljr | 裁出口三选一:提示文案/留观/恢复一次 |
+| ~~mt-F1 重测耗尽死局~~ **已裁(D-AQ,2026-10-28)**:提示文案出口——双出口文案「本款机会已用完,成绩已取最高 —— 返回阵容继续下一款,或切换类型开新的一场」 | ~~ljr~~→hzy | 改 test_intro_blocked zh/en 两键,小片落地 |
 | skill_trajectory 30s 走查体感偏紧,操作时间不够 | lzx | 评估加时 |
 | mt-D5 intro 按款文案:getTest.introduction 字段在但种子未喂(seed.go 注「metric-sheet data」),locale 方案待定;客户端 per-game 键 B 方案被否(单一事实源) | lzx | 随种子/国际化面(用户 10-26 裁 A=后置转此) |
 | mt-D6 手机横屏真机未验(桌面 812×375 仿真预验绿,10-26:布局/控件锚位/目标合法) | hzy | 手机在手时顺手过一眼 |
@@ -148,3 +148,4 @@
 - 10-27 MR!9 审查+吸收(lzx):hzy 走查下午批(cf5fed92+台账 d3c8310f)增量为净——三门代验绿后 12 笔 rebase 重放吸收(c78cd9e5,四 ref 归一,GitLab 自动标 merged,零 merge commit);两必改发现自家修=wire-stamp 修复笔 e62ce8c6(as 断言→typeof 收窄法定形状/逻辑迁 flat resume.ts/§指针自含化/ctr 首 src spec 4 用例)。
 - 10-27 全量审查+roadmap 纠正役(lzx,四片):R1 机械面修 8 处(§指针 5 文件/as 收窄 1/中文注释 2;gen 注释面同步 5 生成物;11 门禁绿)+R2 Go 面(13 跨模块边全 port 注入零 UC 直调/SR-7 零继承实证/tag 三形式 1 修/BUILTIN 面引用 10-27 骨架收口)+R3 TS 面(ui 17 组件 props-only/tap-zone 热区机制/组件命名 8/8)+R4 本档漂移纠正(快照/燃尽/认领表刷至 10-27 终态,plan 实况注+E10 死引用,E-line 两片立片);骨架面登记=admin system-policies PolicyWire 断言(dev 车道)。
 - 2026-10-28 D-AP(ljr):P15 定案 ToC=窗内最小面(职业只读+趋势基础,认知零入口);三报告全做;ToB 交付物=认知报告页面(锚 P4);E5b 解锁可认领。
+- 2026-10-28 D-AQ(ljr):mt-F1=提示文案出口(spent 闸/如实计数/禁用保留,文案升级双出口,转 hzy 改双语键;D-E 重测经济不动)。
