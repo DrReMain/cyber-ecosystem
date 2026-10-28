@@ -40,7 +40,12 @@ export function wireTrendOf(data: unknown): WireTrend {
   const d = data as Partial<WireTrend> & { advancedAccess?: Partial<WireAccessVerdict> };
   return {
     sessionsTotal: d.sessionsTotal ?? 0,
-    abilities: d.abilities ?? [],
+    // Row fields narrow per field: protojson drops a zero scalar — a
+    // floor percentile of 0 still plots its point.
+    abilities: (d.abilities ?? []).map((s) => ({
+      ...s,
+      points: (s.points ?? []).map((p) => ({ ...p, percentile: p.percentile ?? 0 })),
+    })),
     advancedAccess: {
       allowed: d.advancedAccess?.allowed === true,
       reason: d.advancedAccess?.reason,

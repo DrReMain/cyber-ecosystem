@@ -45,12 +45,26 @@ export function wireCareerOf(data: unknown): WireCareer {
     };
   }
   const d = data as Partial<WireCareer> & { access?: Partial<WireAccessVerdict> };
+  // Row fields narrow per field: protojson drops a zero scalar entirely
+  // (an at-the-line gap of 0 arrives fieldless), so an absent number is
+  // the wire's own zero, never an undefined the template would print.
   return {
     access: {
       allowed: d.access?.allowed === true,
       reason: d.access?.reason,
     },
-    recommendations: d.recommendations ?? [],
-    improvements: d.improvements ?? [],
+    recommendations: (d.recommendations ?? []).map((rec) => ({
+      ...rec,
+      matchedScore: rec.matchedScore ?? 0,
+      eliminationRate: rec.eliminationRate ?? 0,
+      basisDimensions: rec.basisDimensions ?? [],
+    })),
+    improvements: (d.improvements ?? []).map((imp) => ({
+      ...imp,
+      current: imp.current ?? 0,
+      target: imp.target ?? 0,
+      gapPercent: imp.gapPercent ?? 0,
+      suggestions: imp.suggestions ?? [],
+    })),
   };
 }

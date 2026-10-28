@@ -56,7 +56,9 @@ export function wireCognitiveOf(data: unknown): WireCognitive {
     coveredAbilities: d.coveredAbilities ?? 0,
     testedDimensions: d.testedDimensions ?? 0,
     totalDimensions: d.totalDimensions ?? 8,
-    dimensions: d.dimensions ?? [],
+    // Row fields narrow per field: protojson drops a zero scalar, and a
+    // percentile floor of 0 is a number the radar must still plot.
+    dimensions: (d.dimensions ?? []).map((dim) => ({ ...dim, value: dim.value ?? 0 })),
     composite: d.composite,
     tier: d.tier,
   };
