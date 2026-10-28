@@ -37,7 +37,7 @@
 | H-C 判定回路闭环 | hzy | ✅ 10-23 | 判定回路=esports 首条人工可走通全链,已闭——**与 lzx E4-c 同日并行交付同一地皮(切片定义重叠的计划期裂缝),合流取 E4-c/E7-a 服务端真值版为正身**(提交适配器/判决卡/会话面/attempt_no 清号,详见 E4-c 节奏行);H-C 侧净贡献=**真人链路验收**(chrome-devtools 驱动+用户在场:阵容过滤/三入口直达/正例 raw 550+S+权威 96.5/无效反例 116ms 机器人反应判 ABSURD_REACTION_TIME 红章双语/待校准降级 ×2/257 事件逐字段过线/单发+锚点满程/6132 探针 404)+P16 登记(转 ljr)+D-AG/C3 走查销项;H-C 自有代码孤件随合流净删,撞面复盘见节奏行 |
 | PAY-C0/C1+PAY1-3 支付片 | PAY-C0✅+PAY-C1✅全收含真握手(lzx,10-25);PAY1✅五片(lzx,10-25);PAY2-3 未认领 | C0 契约/v3crypto/mock/35xx 四片落地;C1 传输核/五法/回调/账单/live 探针落地(公钥模式主路径);**CP1 门✅10-25 实测:真渠道握手 404+验签绿+absent-order 折叠 NotFound(凭据经授权从 GitLab wiki 取,/tmp 隔离不入库)**;P1 已定(D-AB/AC);商户资质就绪;**APIv3 密钥 wiki 记录 33 字符(应 32)待核对——握手/查单不受影响(不解密),回调解密与 CP3 前必须修正**;遗留=经营类目补设+H5 支付权限申请(建议即办);新依赖=JSAPI 需商户绑定 appid 域 openid,公众号测试号绑不了商户,上线前登录切真实公众号 appid |
 | MIG1 迁移工具片 | — | 未认领 | 2026-10-23 终局对账立片;W6-W7 建/W8 预演;school 步时序=P14;依赖 E8/PAY1/E5 |
-| E5b 报告簇扩片 | lzx | E5b-0 ✅ 10-28;余 a-e 未收 | E5b-0=设计定案+拆片+语料三裁(详见 plan 行):历史最佳百分位=read-time 复用 percentileFor(现无数据源);职业开放态=旧仓语义级(原型仅关闭态);旧 A/B/C/D 等级表废止;策略执法内嵌聚合响应 |
+| E5b 报告簇扩片 | lzx | E5b-0/a ✅ 10-28;余 b-e | E5b-0=设计定案+拆片+语料三裁(详见 plan 行):历史最佳百分位=read-time 复用 percentileFor(现无数据源);职业开放态=旧仓语义级(原型仅关闭态);旧 A/B/C/D 等级表废止;策略执法内嵌聚合响应。a=契约三读面(report.proto 增 GetCognitive/GetTrend/GetCareerReport,全 BUILTIN,ReportAccessVerdict 判定内嵌三响应,趋势点带 genre,职业=推荐行+差距处方单数组,零新错误码;gen 11 文件纯增量,breaking/build/test/ctr:build 真码全绿) |
 | E6c 账号域收口 | — | 未认领 | 2026-10-23 终局对账立片;SMS+密码+绑定合并;收编 SMS 散遗留行;**10-25 联动注:SMS=手机浏览器支付腿(H5)前置,openid 绑定流=微信内 JSAPI 凭据供给,E6c 优先级与 PAY 联动;微信 OAuth transport 注入缝随本片** |
 
 ## 开放遗留清单(防丢网;完成即删行)
@@ -91,4 +91,5 @@
 
 > 剪枝律执法复位(2026-10-28,M1 收口):历史节奏行(10-18..10-28,75 条)已压实为索引行迁 progress-archive.md;全文叙事=提交信息 proven-by 尾与收口报告。新条目按索引形写入本节(日期+切片+hash+一短语,≤150 字);里程碑收口时本节清空压实回归档,并做活档区漂移对账。
 - 10-28 D-AR(ljr):mt-F1 重测耗尽=提示文案出口,双出口文案转 hzy 改双语键;重测经济不动(3ee06f51)。
-- 10-28 E5b-0 报告簇设计定案+拆片:语料三裁(历史最佳百分位=read-time cohort/职业开放态=旧仓语义级/旧 A-B-C-D 档位废止);拆片 a 契约→b 认知趋势→c 职业→d ctr 四页→e 翻转 e2e 入 plan 行。)
+- 10-28 E5b-0 报告簇设计定案+拆片:语料三裁(历史最佳百分位=read-time cohort/职业开放态=旧仓语义级/旧 A-B-C-D 档位废止);拆片 a 契约→b 认知趋势→c 职业→d ctr 四页→e 翻转 e2e 入 plan 行。
+- 10-28 E5b-a 契约三读面落地:认知/趋势/职业聚合入 ReportService(判定内嵌响应,趋势点带 genre,零新错误码);proto 链+esports build/test+ctr:build 真码全绿。)

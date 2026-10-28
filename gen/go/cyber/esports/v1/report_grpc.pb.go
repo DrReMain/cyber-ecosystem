@@ -19,9 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ReportService_GetReport_FullMethodName        = "/cyber.esports.v1.ReportService/GetReport"
-	ReportService_GetSessionReport_FullMethodName = "/cyber.esports.v1.ReportService/GetSessionReport"
-	ReportService_GetAbilityDigest_FullMethodName = "/cyber.esports.v1.ReportService/GetAbilityDigest"
+	ReportService_GetReport_FullMethodName          = "/cyber.esports.v1.ReportService/GetReport"
+	ReportService_GetSessionReport_FullMethodName   = "/cyber.esports.v1.ReportService/GetSessionReport"
+	ReportService_GetAbilityDigest_FullMethodName   = "/cyber.esports.v1.ReportService/GetAbilityDigest"
+	ReportService_GetCognitiveReport_FullMethodName = "/cyber.esports.v1.ReportService/GetCognitiveReport"
+	ReportService_GetTrendReport_FullMethodName     = "/cyber.esports.v1.ReportService/GetTrendReport"
+	ReportService_GetCareerReport_FullMethodName    = "/cyber.esports.v1.ReportService/GetCareerReport"
 )
 
 // ReportServiceClient is the client API for ReportService service.
@@ -44,10 +47,20 @@ const (
 // (GetAbilityDigest) — what a member sees of scores they already earned.
 // Neither runs cohort math: the frozen snapshot is their only percentile
 // source, same as the record board itself.
+//
+// The cluster faces (GetCognitiveReport, GetTrendReport, GetCareerReport)
+// fold cross-session history into read-only pages beyond the single
+// attempt. Each response embeds its own access verdict — the same two
+// facts GetReportAccess answers — so a closed policy or an inactive
+// membership renders a locked face, never an error, and the numbers
+// behind a closed gate never travel.
 type ReportServiceClient interface {
 	GetReport(ctx context.Context, in *GetReportRequest, opts ...grpc.CallOption) (*GetReportResponse, error)
 	GetSessionReport(ctx context.Context, in *GetSessionReportRequest, opts ...grpc.CallOption) (*GetSessionReportResponse, error)
 	GetAbilityDigest(ctx context.Context, in *GetAbilityDigestRequest, opts ...grpc.CallOption) (*GetAbilityDigestResponse, error)
+	GetCognitiveReport(ctx context.Context, in *GetCognitiveReportRequest, opts ...grpc.CallOption) (*GetCognitiveReportResponse, error)
+	GetTrendReport(ctx context.Context, in *GetTrendReportRequest, opts ...grpc.CallOption) (*GetTrendReportResponse, error)
+	GetCareerReport(ctx context.Context, in *GetCareerReportRequest, opts ...grpc.CallOption) (*GetCareerReportResponse, error)
 }
 
 type reportServiceClient struct {
@@ -88,6 +101,36 @@ func (c *reportServiceClient) GetAbilityDigest(ctx context.Context, in *GetAbili
 	return out, nil
 }
 
+func (c *reportServiceClient) GetCognitiveReport(ctx context.Context, in *GetCognitiveReportRequest, opts ...grpc.CallOption) (*GetCognitiveReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCognitiveReportResponse)
+	err := c.cc.Invoke(ctx, ReportService_GetCognitiveReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reportServiceClient) GetTrendReport(ctx context.Context, in *GetTrendReportRequest, opts ...grpc.CallOption) (*GetTrendReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetTrendReportResponse)
+	err := c.cc.Invoke(ctx, ReportService_GetTrendReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reportServiceClient) GetCareerReport(ctx context.Context, in *GetCareerReportRequest, opts ...grpc.CallOption) (*GetCareerReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCareerReportResponse)
+	err := c.cc.Invoke(ctx, ReportService_GetCareerReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReportServiceServer is the server API for ReportService service.
 // All implementations must embed UnimplementedReportServiceServer
 // for forward compatibility.
@@ -108,10 +151,20 @@ func (c *reportServiceClient) GetAbilityDigest(ctx context.Context, in *GetAbili
 // (GetAbilityDigest) — what a member sees of scores they already earned.
 // Neither runs cohort math: the frozen snapshot is their only percentile
 // source, same as the record board itself.
+//
+// The cluster faces (GetCognitiveReport, GetTrendReport, GetCareerReport)
+// fold cross-session history into read-only pages beyond the single
+// attempt. Each response embeds its own access verdict — the same two
+// facts GetReportAccess answers — so a closed policy or an inactive
+// membership renders a locked face, never an error, and the numbers
+// behind a closed gate never travel.
 type ReportServiceServer interface {
 	GetReport(context.Context, *GetReportRequest) (*GetReportResponse, error)
 	GetSessionReport(context.Context, *GetSessionReportRequest) (*GetSessionReportResponse, error)
 	GetAbilityDigest(context.Context, *GetAbilityDigestRequest) (*GetAbilityDigestResponse, error)
+	GetCognitiveReport(context.Context, *GetCognitiveReportRequest) (*GetCognitiveReportResponse, error)
+	GetTrendReport(context.Context, *GetTrendReportRequest) (*GetTrendReportResponse, error)
+	GetCareerReport(context.Context, *GetCareerReportRequest) (*GetCareerReportResponse, error)
 	mustEmbedUnimplementedReportServiceServer()
 }
 
@@ -130,6 +183,15 @@ func (UnimplementedReportServiceServer) GetSessionReport(context.Context, *GetSe
 }
 func (UnimplementedReportServiceServer) GetAbilityDigest(context.Context, *GetAbilityDigestRequest) (*GetAbilityDigestResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAbilityDigest not implemented")
+}
+func (UnimplementedReportServiceServer) GetCognitiveReport(context.Context, *GetCognitiveReportRequest) (*GetCognitiveReportResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCognitiveReport not implemented")
+}
+func (UnimplementedReportServiceServer) GetTrendReport(context.Context, *GetTrendReportRequest) (*GetTrendReportResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTrendReport not implemented")
+}
+func (UnimplementedReportServiceServer) GetCareerReport(context.Context, *GetCareerReportRequest) (*GetCareerReportResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCareerReport not implemented")
 }
 func (UnimplementedReportServiceServer) mustEmbedUnimplementedReportServiceServer() {}
 func (UnimplementedReportServiceServer) testEmbeddedByValue()                       {}
@@ -206,6 +268,60 @@ func _ReportService_GetAbilityDigest_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReportService_GetCognitiveReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCognitiveReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportServiceServer).GetCognitiveReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportService_GetCognitiveReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportServiceServer).GetCognitiveReport(ctx, req.(*GetCognitiveReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReportService_GetTrendReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTrendReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportServiceServer).GetTrendReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportService_GetTrendReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportServiceServer).GetTrendReport(ctx, req.(*GetTrendReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReportService_GetCareerReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCareerReportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReportServiceServer).GetCareerReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReportService_GetCareerReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReportServiceServer).GetCareerReport(ctx, req.(*GetCareerReportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReportService_ServiceDesc is the grpc.ServiceDesc for ReportService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -224,6 +340,18 @@ var ReportService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAbilityDigest",
 			Handler:    _ReportService_GetAbilityDigest_Handler,
+		},
+		{
+			MethodName: "GetCognitiveReport",
+			Handler:    _ReportService_GetCognitiveReport_Handler,
+		},
+		{
+			MethodName: "GetTrendReport",
+			Handler:    _ReportService_GetTrendReport_Handler,
+		},
+		{
+			MethodName: "GetCareerReport",
+			Handler:    _ReportService_GetCareerReport_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -18,3 +18,18 @@ export const getSessionReport = ReportService.method.getSessionReport;
  * @generated from rpc cyber.esports.v1.ReportService.GetAbilityDigest
  */
 export const getAbilityDigest = ReportService.method.getAbilityDigest;
+
+/**
+ * @generated from rpc cyber.esports.v1.ReportService.GetCognitiveReport
+ */
+export const getCognitiveReport = ReportService.method.getCognitiveReport;
+
+/**
+ * @generated from rpc cyber.esports.v1.ReportService.GetTrendReport
+ */
+export const getTrendReport = ReportService.method.getTrendReport;
+
+/**
+ * @generated from rpc cyber.esports.v1.ReportService.GetCareerReport
+ */
+export const getCareerReport = ReportService.method.getCareerReport;

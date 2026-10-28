@@ -3,6 +3,7 @@ syntax = "proto3";
 package cyber.esports.v1;
 
 import "buf/validate/validate.proto";
+import "cyber/esports/v1/entitlement.proto";
 import "ext/v1/access.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
@@ -27,6 +28,13 @@ option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
 // (GetAbilityDigest) — what a member sees of scores they already earned.
 // Neither runs cohort math: the frozen snapshot is their only percentile
 // source, same as the record board itself.
+//
+// The cluster faces (GetCognitiveReport, GetTrendReport, GetCareerReport)
+// fold cross-session history into read-only pages beyond the single
+// attempt. Each response embeds its own access verdict — the same two
+// facts GetReportAccess answers — so a closed policy or an inactive
+// membership renders a locked face, never an error, and the numbers
+// behind a closed gate never travel.
 service ReportService {
   option (cyber.ext.v1.service_comment) = "报告";
   rpc GetReport(GetReportRequest) returns (GetReportResponse) {
@@ -59,6 +67,39 @@ service ReportService {
     option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {
       post: "/api/v1/esports/reports/digest"
+      body: "*"
+    };
+  }
+  rpc GetCognitiveReport(GetCognitiveReportRequest) returns (GetCognitiveReportResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "获取认知报告(8 维聚合)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/reports/cognitive"
+      body: "*"
+    };
+  }
+  rpc GetTrendReport(GetTrendReportRequest) returns (GetTrendReportResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "获取成长趋势(基础层)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/reports/trend"
+      body: "*"
+    };
+  }
+  rpc GetCareerReport(GetCareerReportRequest) returns (GetCareerReportResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "获取职业聚合报告"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/reports/career"
       body: "*"
     };
   }
@@ -255,4 +296,136 @@ message ReportImprovement {
   double target_percentile = 3;
   // How far short of the target, in percent of it.
   double gap_percent = 4;
+}
+
+// The same two-fact answer GetReportAccess returns, embedded in each
+// cluster face so a page carries its own gate: the judgement order
+// (code redemption outranks policy outranks the standing default) lives
+// in the entitlement module and is never re-derived here. A false
+// allowed means the face renders locked; the numbers behind a closed
+// gate never travel.
+message ReportAccessVerdict {
+  bool allowed = 1;
+  ReportAccessReason reason = 2;
+}
+
+message GetCognitiveReportRequest {}
+
+message GetCognitiveReportResponse {
+  // Cognitive is closed to the ToC member by default; the verdict's
+  // reason names which fact answered — policy, membership, or a
+  // redeemed code.
+  ReportAccessVerdict access = 1;
+  // How many of the six-word ability vocabulary the member has measured
+  // — the report header's covered count. Not gate-sensitive: the digest
+  // face answers the same number to anyone.
+  int32 covered_abilities = 2;
+  // How many dimension rows carry a value, over the eight the model
+  // defines — the completeness headline, same shape the record board
+  // carries.
+  int32 tested_dimensions = 3;
+  int32 total_dimensions = 4;
+  // Only dimensions whose every source ability has both a history-best
+  // score and a cohort answer; a partially-fed dimension is an absent
+  // row, never a zero axis — the same missing-never-zero law the record
+  // board holds. Values are the weighted sum of the source abilities'
+  // history-best percentiles, rounded to integers, weights server-side
+  // and single-sourced.
+  repeated CognitiveDimension dimensions = 5;
+  // Equal-weight mean over the rendered dimensions only — a missing
+  // dimension never counts as zero. Null when no dimension rendered.
+  google.protobuf.DoubleValue composite = 6;
+  // The composite's tier under the same ladder the record board judges
+  // by; UNSPECIFIED while the composite is null.
+  ReportTier tier = 7;
+}
+
+// One rendered dimension of the cognitive model. The dimension keys are
+// the legal eight-word vocabulary; the wording a client renders them
+// with stays with the client.
+message CognitiveDimension {
+  string dimension = 1;
+  // The weighted percentile sum, rounded to an integer (0-100 scale).
+  double value = 2;
+  ReportTier tier = 3;
+}
+
+message GetTrendReportRequest {}
+
+message GetTrendReportResponse {
+  // Sessions carrying at least one scored record — the same count the
+  // digest face answers; zero renders the honest empty page.
+  int32 sessions_total = 1;
+  // One series per ability that carries at least one cohort-answered
+  // point; an ability with no answer is an absent series, never a flat
+  // zero line.
+  repeated TrendAbilitySeries abilities = 2;
+  // The advanced tier's gate (cross-report comparison, prescriptions,
+  // percentile drift) rides the membership verdict — the base tier is
+  // free for anyone who has tested. The advanced content itself is a
+  // later face; the verdict travels now so the page renders its locked
+  // state from one call.
+  ReportAccessVerdict advanced_access = 3;
+}
+
+message TrendAbilitySeries {
+  string ability = 1;
+  // Ascending by time; first and last deltas are the client's own
+  // derivation off these points.
+  repeated TrendPoint points = 2;
+}
+
+// One session-anchor's cohort answer for one ability. The genre rides
+// the point because the two genres order different ability sets — a
+// mixed history must label itself, or a reader would take a curve's
+// rise and fall for skill change when it is vocabulary change.
+message TrendPoint {
+  google.protobuf.Timestamp at = 1;
+  double percentile = 2;
+  string genre = 3;
+}
+
+message GetCareerReportRequest {}
+
+message GetCareerReportResponse {
+  // Career is open by the standing default; the verdict carries the
+  // policy word if the operator closed or member-gated it.
+  ReportAccessVerdict access = 1;
+  // Career areas ordered by match, descending. The area vocabulary and
+  // its library facts (elimination rate, training intensity, advice)
+  // are seeded server-side and travel with the rows — library copy is
+  // data, not page wording.
+  repeated CareerRecommendation recommendations = 2;
+  // The gap board and the prescription cards render from one array:
+  // weakest dimensions first, the target line and suggestions carried
+  // per row so the client never hardcodes a rubric constant.
+  repeated CareerImprovement improvements = 3;
+}
+
+message CareerRecommendation {
+  // The seeded area code — the single source of the area's identity.
+  string career_area = 1;
+  string name = 2;
+  // The area's match against the member's rendered dimensions, 0-100.
+  double matched_score = 3;
+  // The dimensions the match weighed, legal keys.
+  repeated string basis_dimensions = 4;
+  // Library facts, seeded with the area — percent of entrants washed
+  // out and the training-load tier's own wording.
+  double elimination_rate = 5;
+  string training_intensity = 6;
+  string suggestion = 7;
+}
+
+message CareerImprovement {
+  // The legal dimension key; a row exists only for a rendered
+  // dimension — a missing dimension has no gap to state.
+  string dimension = 1;
+  double current = 2;
+  // The excellence line the rubric defines — server-owned, seed-fed.
+  double target = 3;
+  // How far short of the target, in percent of it.
+  int32 gap_percent = 4;
+  // Seeded prescription copy, the library's own words.
+  repeated string suggestions = 5;
 }

@@ -41,6 +41,15 @@ const (
 	// ReportServiceGetAbilityDigestProcedure is the fully-qualified name of the ReportService's
 	// GetAbilityDigest RPC.
 	ReportServiceGetAbilityDigestProcedure = "/cyber.esports.v1.ReportService/GetAbilityDigest"
+	// ReportServiceGetCognitiveReportProcedure is the fully-qualified name of the ReportService's
+	// GetCognitiveReport RPC.
+	ReportServiceGetCognitiveReportProcedure = "/cyber.esports.v1.ReportService/GetCognitiveReport"
+	// ReportServiceGetTrendReportProcedure is the fully-qualified name of the ReportService's
+	// GetTrendReport RPC.
+	ReportServiceGetTrendReportProcedure = "/cyber.esports.v1.ReportService/GetTrendReport"
+	// ReportServiceGetCareerReportProcedure is the fully-qualified name of the ReportService's
+	// GetCareerReport RPC.
+	ReportServiceGetCareerReportProcedure = "/cyber.esports.v1.ReportService/GetCareerReport"
 )
 
 // ReportServiceClient is a client for the cyber.esports.v1.ReportService service.
@@ -48,6 +57,9 @@ type ReportServiceClient interface {
 	GetReport(context.Context, *connect.Request[v1.GetReportRequest]) (*connect.Response[v1.GetReportResponse], error)
 	GetSessionReport(context.Context, *connect.Request[v1.GetSessionReportRequest]) (*connect.Response[v1.GetSessionReportResponse], error)
 	GetAbilityDigest(context.Context, *connect.Request[v1.GetAbilityDigestRequest]) (*connect.Response[v1.GetAbilityDigestResponse], error)
+	GetCognitiveReport(context.Context, *connect.Request[v1.GetCognitiveReportRequest]) (*connect.Response[v1.GetCognitiveReportResponse], error)
+	GetTrendReport(context.Context, *connect.Request[v1.GetTrendReportRequest]) (*connect.Response[v1.GetTrendReportResponse], error)
+	GetCareerReport(context.Context, *connect.Request[v1.GetCareerReportRequest]) (*connect.Response[v1.GetCareerReportResponse], error)
 }
 
 // NewReportServiceClient constructs a client for the cyber.esports.v1.ReportService service. By
@@ -79,14 +91,35 @@ func NewReportServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(reportServiceMethods.ByName("GetAbilityDigest")),
 			connect.WithClientOptions(opts...),
 		),
+		getCognitiveReport: connect.NewClient[v1.GetCognitiveReportRequest, v1.GetCognitiveReportResponse](
+			httpClient,
+			baseURL+ReportServiceGetCognitiveReportProcedure,
+			connect.WithSchema(reportServiceMethods.ByName("GetCognitiveReport")),
+			connect.WithClientOptions(opts...),
+		),
+		getTrendReport: connect.NewClient[v1.GetTrendReportRequest, v1.GetTrendReportResponse](
+			httpClient,
+			baseURL+ReportServiceGetTrendReportProcedure,
+			connect.WithSchema(reportServiceMethods.ByName("GetTrendReport")),
+			connect.WithClientOptions(opts...),
+		),
+		getCareerReport: connect.NewClient[v1.GetCareerReportRequest, v1.GetCareerReportResponse](
+			httpClient,
+			baseURL+ReportServiceGetCareerReportProcedure,
+			connect.WithSchema(reportServiceMethods.ByName("GetCareerReport")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // reportServiceClient implements ReportServiceClient.
 type reportServiceClient struct {
-	getReport        *connect.Client[v1.GetReportRequest, v1.GetReportResponse]
-	getSessionReport *connect.Client[v1.GetSessionReportRequest, v1.GetSessionReportResponse]
-	getAbilityDigest *connect.Client[v1.GetAbilityDigestRequest, v1.GetAbilityDigestResponse]
+	getReport          *connect.Client[v1.GetReportRequest, v1.GetReportResponse]
+	getSessionReport   *connect.Client[v1.GetSessionReportRequest, v1.GetSessionReportResponse]
+	getAbilityDigest   *connect.Client[v1.GetAbilityDigestRequest, v1.GetAbilityDigestResponse]
+	getCognitiveReport *connect.Client[v1.GetCognitiveReportRequest, v1.GetCognitiveReportResponse]
+	getTrendReport     *connect.Client[v1.GetTrendReportRequest, v1.GetTrendReportResponse]
+	getCareerReport    *connect.Client[v1.GetCareerReportRequest, v1.GetCareerReportResponse]
 }
 
 // GetReport calls cyber.esports.v1.ReportService.GetReport.
@@ -104,11 +137,29 @@ func (c *reportServiceClient) GetAbilityDigest(ctx context.Context, req *connect
 	return c.getAbilityDigest.CallUnary(ctx, req)
 }
 
+// GetCognitiveReport calls cyber.esports.v1.ReportService.GetCognitiveReport.
+func (c *reportServiceClient) GetCognitiveReport(ctx context.Context, req *connect.Request[v1.GetCognitiveReportRequest]) (*connect.Response[v1.GetCognitiveReportResponse], error) {
+	return c.getCognitiveReport.CallUnary(ctx, req)
+}
+
+// GetTrendReport calls cyber.esports.v1.ReportService.GetTrendReport.
+func (c *reportServiceClient) GetTrendReport(ctx context.Context, req *connect.Request[v1.GetTrendReportRequest]) (*connect.Response[v1.GetTrendReportResponse], error) {
+	return c.getTrendReport.CallUnary(ctx, req)
+}
+
+// GetCareerReport calls cyber.esports.v1.ReportService.GetCareerReport.
+func (c *reportServiceClient) GetCareerReport(ctx context.Context, req *connect.Request[v1.GetCareerReportRequest]) (*connect.Response[v1.GetCareerReportResponse], error) {
+	return c.getCareerReport.CallUnary(ctx, req)
+}
+
 // ReportServiceHandler is an implementation of the cyber.esports.v1.ReportService service.
 type ReportServiceHandler interface {
 	GetReport(context.Context, *connect.Request[v1.GetReportRequest]) (*connect.Response[v1.GetReportResponse], error)
 	GetSessionReport(context.Context, *connect.Request[v1.GetSessionReportRequest]) (*connect.Response[v1.GetSessionReportResponse], error)
 	GetAbilityDigest(context.Context, *connect.Request[v1.GetAbilityDigestRequest]) (*connect.Response[v1.GetAbilityDigestResponse], error)
+	GetCognitiveReport(context.Context, *connect.Request[v1.GetCognitiveReportRequest]) (*connect.Response[v1.GetCognitiveReportResponse], error)
+	GetTrendReport(context.Context, *connect.Request[v1.GetTrendReportRequest]) (*connect.Response[v1.GetTrendReportResponse], error)
+	GetCareerReport(context.Context, *connect.Request[v1.GetCareerReportRequest]) (*connect.Response[v1.GetCareerReportResponse], error)
 }
 
 // NewReportServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -136,6 +187,24 @@ func NewReportServiceHandler(svc ReportServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(reportServiceMethods.ByName("GetAbilityDigest")),
 		connect.WithHandlerOptions(opts...),
 	)
+	reportServiceGetCognitiveReportHandler := connect.NewUnaryHandler(
+		ReportServiceGetCognitiveReportProcedure,
+		svc.GetCognitiveReport,
+		connect.WithSchema(reportServiceMethods.ByName("GetCognitiveReport")),
+		connect.WithHandlerOptions(opts...),
+	)
+	reportServiceGetTrendReportHandler := connect.NewUnaryHandler(
+		ReportServiceGetTrendReportProcedure,
+		svc.GetTrendReport,
+		connect.WithSchema(reportServiceMethods.ByName("GetTrendReport")),
+		connect.WithHandlerOptions(opts...),
+	)
+	reportServiceGetCareerReportHandler := connect.NewUnaryHandler(
+		ReportServiceGetCareerReportProcedure,
+		svc.GetCareerReport,
+		connect.WithSchema(reportServiceMethods.ByName("GetCareerReport")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.ReportService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ReportServiceGetReportProcedure:
@@ -144,6 +213,12 @@ func NewReportServiceHandler(svc ReportServiceHandler, opts ...connect.HandlerOp
 			reportServiceGetSessionReportHandler.ServeHTTP(w, r)
 		case ReportServiceGetAbilityDigestProcedure:
 			reportServiceGetAbilityDigestHandler.ServeHTTP(w, r)
+		case ReportServiceGetCognitiveReportProcedure:
+			reportServiceGetCognitiveReportHandler.ServeHTTP(w, r)
+		case ReportServiceGetTrendReportProcedure:
+			reportServiceGetTrendReportHandler.ServeHTTP(w, r)
+		case ReportServiceGetCareerReportProcedure:
+			reportServiceGetCareerReportHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -163,4 +238,16 @@ func (UnimplementedReportServiceHandler) GetSessionReport(context.Context, *conn
 
 func (UnimplementedReportServiceHandler) GetAbilityDigest(context.Context, *connect.Request[v1.GetAbilityDigestRequest]) (*connect.Response[v1.GetAbilityDigestResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ReportService.GetAbilityDigest is not implemented"))
+}
+
+func (UnimplementedReportServiceHandler) GetCognitiveReport(context.Context, *connect.Request[v1.GetCognitiveReportRequest]) (*connect.Response[v1.GetCognitiveReportResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ReportService.GetCognitiveReport is not implemented"))
+}
+
+func (UnimplementedReportServiceHandler) GetTrendReport(context.Context, *connect.Request[v1.GetTrendReportRequest]) (*connect.Response[v1.GetTrendReportResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ReportService.GetTrendReport is not implemented"))
+}
+
+func (UnimplementedReportServiceHandler) GetCareerReport(context.Context, *connect.Request[v1.GetCareerReportRequest]) (*connect.Response[v1.GetCareerReportResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ReportService.GetCareerReport is not implemented"))
 }

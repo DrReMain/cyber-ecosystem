@@ -18,13 +18,19 @@ var _ = new(context.Context)
 const _ = http.SupportPackageIsVersion3
 
 const OperationReportServiceGetAbilityDigest = "/cyber.esports.v1.ReportService/GetAbilityDigest"
+const OperationReportServiceGetCareerReport = "/cyber.esports.v1.ReportService/GetCareerReport"
+const OperationReportServiceGetCognitiveReport = "/cyber.esports.v1.ReportService/GetCognitiveReport"
 const OperationReportServiceGetReport = "/cyber.esports.v1.ReportService/GetReport"
 const OperationReportServiceGetSessionReport = "/cyber.esports.v1.ReportService/GetSessionReport"
+const OperationReportServiceGetTrendReport = "/cyber.esports.v1.ReportService/GetTrendReport"
 
 type ReportServiceHTTPServer interface {
 	GetAbilityDigest(context.Context, *GetAbilityDigestRequest) (*GetAbilityDigestResponse, error)
+	GetCareerReport(context.Context, *GetCareerReportRequest) (*GetCareerReportResponse, error)
+	GetCognitiveReport(context.Context, *GetCognitiveReportRequest) (*GetCognitiveReportResponse, error)
 	GetReport(context.Context, *GetReportRequest) (*GetReportResponse, error)
 	GetSessionReport(context.Context, *GetSessionReportRequest) (*GetSessionReportResponse, error)
+	GetTrendReport(context.Context, *GetTrendReportRequest) (*GetTrendReportResponse, error)
 }
 
 func RegisterReportServiceHTTPServer(s *http.Server, srv ReportServiceHTTPServer) {
@@ -32,6 +38,9 @@ func RegisterReportServiceHTTPServer(s *http.Server, srv ReportServiceHTTPServer
 	r.Handle("POST", "/api/v1/esports/reports/get", _ReportService_GetReport0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/esports/reports/session", _ReportService_GetSessionReport0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/esports/reports/digest", _ReportService_GetAbilityDigest0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/reports/cognitive", _ReportService_GetCognitiveReport0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/reports/trend", _ReportService_GetTrendReport0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/reports/career", _ReportService_GetCareerReport0_HTTP_Handler(srv))
 }
 
 func _ReportService_GetReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
@@ -91,10 +100,70 @@ func _ReportService_GetAbilityDigest0_HTTP_Handler(srv ReportServiceHTTPServer) 
 	}
 }
 
+func _ReportService_GetCognitiveReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetCognitiveReportRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReportServiceGetCognitiveReport)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetCognitiveReport(ctx, req.(*GetCognitiveReportRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetCognitiveReportResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ReportService_GetTrendReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetTrendReportRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReportServiceGetTrendReport)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetTrendReport(ctx, req.(*GetTrendReportRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetTrendReportResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ReportService_GetCareerReport0_HTTP_Handler(srv ReportServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetCareerReportRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReportServiceGetCareerReport)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetCareerReport(ctx, req.(*GetCareerReportRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetCareerReportResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ReportServiceHTTPClient interface {
 	GetAbilityDigest(ctx context.Context, req *GetAbilityDigestRequest, opts ...http.CallOption) (rsp *GetAbilityDigestResponse, err error)
+	GetCareerReport(ctx context.Context, req *GetCareerReportRequest, opts ...http.CallOption) (rsp *GetCareerReportResponse, err error)
+	GetCognitiveReport(ctx context.Context, req *GetCognitiveReportRequest, opts ...http.CallOption) (rsp *GetCognitiveReportResponse, err error)
 	GetReport(ctx context.Context, req *GetReportRequest, opts ...http.CallOption) (rsp *GetReportResponse, err error)
 	GetSessionReport(ctx context.Context, req *GetSessionReportRequest, opts ...http.CallOption) (rsp *GetSessionReportResponse, err error)
+	GetTrendReport(ctx context.Context, req *GetTrendReportRequest, opts ...http.CallOption) (rsp *GetTrendReportResponse, err error)
 }
 
 type ReportServiceHTTPClientImpl struct {
@@ -113,6 +182,40 @@ func (c *ReportServiceHTTPClientImpl) GetAbilityDigest(ctx context.Context, in *
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationReportServiceGetAbilityDigest),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ReportServiceHTTPClientImpl) GetCareerReport(ctx context.Context, in *GetCareerReportRequest, opts ...http.CallOption) (*GetCareerReportResponse, error) {
+	var out GetCareerReportResponse
+	pattern := "/api/v1/esports/reports/career"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationReportServiceGetCareerReport),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ReportServiceHTTPClientImpl) GetCognitiveReport(ctx context.Context, in *GetCognitiveReportRequest, opts ...http.CallOption) (*GetCognitiveReportResponse, error) {
+	var out GetCognitiveReportResponse
+	pattern := "/api/v1/esports/reports/cognitive"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationReportServiceGetCognitiveReport),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
@@ -147,6 +250,23 @@ func (c *ReportServiceHTTPClientImpl) GetSessionReport(ctx context.Context, in *
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationReportServiceGetSessionReport),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ReportServiceHTTPClientImpl) GetTrendReport(ctx context.Context, in *GetTrendReportRequest, opts ...http.CallOption) (*GetTrendReportResponse, error) {
+	var out GetTrendReportResponse
+	pattern := "/api/v1/esports/reports/trend"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationReportServiceGetTrendReport),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

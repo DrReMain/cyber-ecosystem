@@ -330,6 +330,32 @@
         "datascope": false
       },
       {
+        "name": "GetCareerReport",
+        "full_name": "cyber.esports.v1.ReportService.GetCareerReport",
+        "request_name": "GetCareerReportRequest",
+        "request_full_name": "cyber.esports.v1.GetCareerReportRequest",
+        "response_name": "GetCareerReportResponse",
+        "response_full_name": "cyber.esports.v1.GetCareerReportResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/reports/career",
+        "comment": "获取职业聚合报告",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "GetCognitiveReport",
+        "full_name": "cyber.esports.v1.ReportService.GetCognitiveReport",
+        "request_name": "GetCognitiveReportRequest",
+        "request_full_name": "cyber.esports.v1.GetCognitiveReportRequest",
+        "response_name": "GetCognitiveReportResponse",
+        "response_full_name": "cyber.esports.v1.GetCognitiveReportResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/reports/cognitive",
+        "comment": "获取认知报告(8 维聚合)",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "GetReport",
         "full_name": "cyber.esports.v1.ReportService.GetReport",
         "request_name": "GetReportRequest",
@@ -352,6 +378,19 @@
         "http_method": "POST",
         "http_path": "/api/v1/esports/reports/session",
         "comment": "获取场次成绩汇总",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "GetTrendReport",
+        "full_name": "cyber.esports.v1.ReportService.GetTrendReport",
+        "request_name": "GetTrendReportRequest",
+        "request_full_name": "cyber.esports.v1.GetTrendReportRequest",
+        "response_name": "GetTrendReportResponse",
+        "response_full_name": "cyber.esports.v1.GetTrendReportResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/reports/trend",
+        "comment": "获取成长趋势(基础层)",
         "access": "BUILTIN",
         "datascope": false
       }

@@ -195,6 +195,50 @@ export type CyberEsportsV1BackgroundSpan = {
     durationMs?: number;
 };
 
+export type CyberEsportsV1CareerImprovement = {
+    /**
+     * The legal dimension key; a row exists only for a rendered
+     * dimension — a missing dimension has no gap to state.
+     */
+    dimension?: string;
+    current?: number;
+    /**
+     * The excellence line the rubric defines — server-owned, seed-fed.
+     */
+    target?: number;
+    /**
+     * How far short of the target, in percent of it.
+     */
+    gapPercent?: number;
+    /**
+     * Seeded prescription copy, the library's own words.
+     */
+    suggestions?: Array<string>;
+};
+
+export type CyberEsportsV1CareerRecommendation = {
+    /**
+     * The seeded area code — the single source of the area's identity.
+     */
+    careerArea?: string;
+    name?: string;
+    /**
+     * The area's match against the member's rendered dimensions, 0-100.
+     */
+    matchedScore?: number;
+    /**
+     * The dimensions the match weighed, legal keys.
+     */
+    basisDimensions?: Array<string>;
+    /**
+     * Library facts, seeded with the area — percent of entrants washed
+     * out and the training-load tier's own wording.
+     */
+    eliminationRate?: number;
+    trainingIntensity?: string;
+    suggestion?: string;
+};
+
 /**
  * character_counter — lineup counter-picking; the counter score is a
  * server-side judgment against the counter matrix.
@@ -216,6 +260,20 @@ export type CyberEsportsV1CloseOrderRequest = {
 
 export type CyberEsportsV1CloseOrderResponse = {
     order?: CyberEsportsV1Order;
+};
+
+/**
+ * One rendered dimension of the cognitive model. The dimension keys are
+ * the legal eight-word vocabulary; the wording a client renders them
+ * with stays with the client.
+ */
+export type CyberEsportsV1CognitiveDimension = {
+    dimension?: string;
+    /**
+     * The weighted percentile sum, rounded to an integer (0-100 scale).
+     */
+    value?: number;
+    tier?: 'REPORT_TIER_UNSPECIFIED' | 'REPORT_TIER_S' | 'REPORT_TIER_A' | 'REPORT_TIER_B' | 'REPORT_TIER_C';
 };
 
 export type CyberEsportsV1CreateOrderRequest = {
@@ -431,6 +489,76 @@ export type CyberEsportsV1GetAbilityDigestResponse = {
     sessions?: Array<CyberEsportsV1DigestSessionLine>;
 };
 
+export type CyberEsportsV1GetCareerReportRequest = {
+    [key: string]: unknown;
+};
+
+export type CyberEsportsV1GetCareerReportResponse = {
+    /**
+     * Career is open by the standing default; the verdict carries the
+     * policy word if the operator closed or member-gated it.
+     */
+    access?: CyberEsportsV1ReportAccessVerdict;
+    /**
+     * Career areas ordered by match, descending. The area vocabulary and
+     * its library facts (elimination rate, training intensity, advice)
+     * are seeded server-side and travel with the rows — library copy is
+     * data, not page wording.
+     */
+    recommendations?: Array<CyberEsportsV1CareerRecommendation>;
+    /**
+     * The gap board and the prescription cards render from one array:
+     * weakest dimensions first, the target line and suggestions carried
+     * per row so the client never hardcodes a rubric constant.
+     */
+    improvements?: Array<CyberEsportsV1CareerImprovement>;
+};
+
+export type CyberEsportsV1GetCognitiveReportRequest = {
+    [key: string]: unknown;
+};
+
+export type CyberEsportsV1GetCognitiveReportResponse = {
+    /**
+     * Cognitive is closed to the ToC member by default; the verdict's
+     * reason names which fact answered — policy, membership, or a
+     * redeemed code.
+     */
+    access?: CyberEsportsV1ReportAccessVerdict;
+    /**
+     * How many of the six-word ability vocabulary the member has measured
+     * — the report header's covered count. Not gate-sensitive: the digest
+     * face answers the same number to anyone.
+     */
+    coveredAbilities?: number;
+    /**
+     * How many dimension rows carry a value, over the eight the model
+     * defines — the completeness headline, same shape the record board
+     * carries.
+     */
+    testedDimensions?: number;
+    totalDimensions?: number;
+    /**
+     * Only dimensions whose every source ability has both a history-best
+     * score and a cohort answer; a partially-fed dimension is an absent
+     * row, never a zero axis — the same missing-never-zero law the record
+     * board holds. Values are the weighted sum of the source abilities'
+     * history-best percentiles, rounded to integers, weights server-side
+     * and single-sourced.
+     */
+    dimensions?: Array<CyberEsportsV1CognitiveDimension>;
+    /**
+     * Equal-weight mean over the rendered dimensions only — a missing
+     * dimension never counts as zero. Null when no dimension rendered.
+     */
+    composite?: number;
+    /**
+     * The composite's tier under the same ladder the record board judges
+     * by; UNSPECIFIED while the composite is null.
+     */
+    tier?: 'REPORT_TIER_UNSPECIFIED' | 'REPORT_TIER_S' | 'REPORT_TIER_A' | 'REPORT_TIER_B' | 'REPORT_TIER_C';
+};
+
 export type CyberEsportsV1GetMatchSessionResponse = {
     session?: CyberEsportsV1MatchSession;
     /**
@@ -568,6 +696,32 @@ export type CyberEsportsV1GetTestResponse = {
      * and free to diverge per test; copy changes are content, never contract.
      */
     introduction?: string;
+};
+
+export type CyberEsportsV1GetTrendReportRequest = {
+    [key: string]: unknown;
+};
+
+export type CyberEsportsV1GetTrendReportResponse = {
+    /**
+     * Sessions carrying at least one scored record — the same count the
+     * digest face answers; zero renders the honest empty page.
+     */
+    sessionsTotal?: number;
+    /**
+     * One series per ability that carries at least one cohort-answered
+     * point; an ability with no answer is an absent series, never a flat
+     * zero line.
+     */
+    abilities?: Array<CyberEsportsV1TrendAbilitySeries>;
+    /**
+     * The advanced tier's gate (cross-report comparison, prescriptions,
+     * percentile drift) rides the membership verdict — the base tier is
+     * free for anyone who has tested. The advanced content itself is a
+     * later face; the verdict travels now so the page renders its locked
+     * state from one call.
+     */
+    advancedAccess?: CyberEsportsV1ReportAccessVerdict;
 };
 
 export type CyberEsportsV1ListActivationCodesResponse = {
@@ -965,6 +1119,19 @@ export type CyberEsportsV1ReportAbility = {
     peerAverage?: number;
 };
 
+/**
+ * The same two-fact answer GetReportAccess returns, embedded in each
+ * cluster face so a page carries its own gate: the judgement order
+ * (code redemption outranks policy outranks the standing default) lives
+ * in the entitlement module and is never re-derived here. A false
+ * allowed means the face renders locked; the numbers behind a closed
+ * gate never travel.
+ */
+export type CyberEsportsV1ReportAccessVerdict = {
+    allowed?: boolean;
+    reason?: 'REPORT_ACCESS_REASON_UNSPECIFIED' | 'REPORT_ACCESS_REASON_POLICY_OPEN' | 'REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE' | 'REPORT_ACCESS_REASON_CODE_REDEEMED' | 'REPORT_ACCESS_REASON_POLICY_CLOSED' | 'REPORT_ACCESS_REASON_NO_ENTITLEMENT';
+};
+
 export type CyberEsportsV1ReportComparison = {
     deltas?: Array<CyberEsportsV1ReportComparisonDelta>;
 };
@@ -1352,6 +1519,27 @@ export type CyberEsportsV1TrackingMovingFrame = {
      * The dot's spawn-to-kill lifetime; rides only on shot frames.
      */
     dotLifetimeMs?: number;
+};
+
+export type CyberEsportsV1TrendAbilitySeries = {
+    ability?: string;
+    /**
+     * Ascending by time; first and last deltas are the client's own
+     * derivation off these points.
+     */
+    points?: Array<CyberEsportsV1TrendPoint>;
+};
+
+/**
+ * One session-anchor's cohort answer for one ability. The genre rides
+ * the point because the two genres order different ability sets — a
+ * mixed history must label itself, or a reader would take a curve's
+ * rise and fall for skill change when it is vocabulary change.
+ */
+export type CyberEsportsV1TrendPoint = {
+    at?: string;
+    percentile?: number;
+    genre?: string;
 };
 
 /**
@@ -3321,6 +3509,38 @@ export type EntitlementServiceGetReportAccessResponses = {
 
 export type EntitlementServiceGetReportAccessResponse = EntitlementServiceGetReportAccessResponses[keyof EntitlementServiceGetReportAccessResponses];
 
+export type ReportServiceGetCareerReportData = {
+    body: CyberEsportsV1GetCareerReportRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/reports/career';
+};
+
+export type ReportServiceGetCareerReportResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetCareerReportResponse;
+};
+
+export type ReportServiceGetCareerReportResponse = ReportServiceGetCareerReportResponses[keyof ReportServiceGetCareerReportResponses];
+
+export type ReportServiceGetCognitiveReportData = {
+    body: CyberEsportsV1GetCognitiveReportRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/reports/cognitive';
+};
+
+export type ReportServiceGetCognitiveReportResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetCognitiveReportResponse;
+};
+
+export type ReportServiceGetCognitiveReportResponse = ReportServiceGetCognitiveReportResponses[keyof ReportServiceGetCognitiveReportResponses];
+
 export type ReportServiceGetAbilityDigestData = {
     body: CyberEsportsV1GetAbilityDigestRequest;
     path?: never;
@@ -3368,6 +3588,22 @@ export type ReportServiceGetSessionReportResponses = {
 };
 
 export type ReportServiceGetSessionReportResponse = ReportServiceGetSessionReportResponses[keyof ReportServiceGetSessionReportResponses];
+
+export type ReportServiceGetTrendReportData = {
+    body: CyberEsportsV1GetTrendReportRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/reports/trend';
+};
+
+export type ReportServiceGetTrendReportResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetTrendReportResponse;
+};
+
+export type ReportServiceGetTrendReportResponse = ReportServiceGetTrendReportResponses[keyof ReportServiceGetTrendReportResponses];
 
 export type SkuServiceListSkusData = {
     body?: never;

@@ -12,4 +12,7 @@ func RegisterReportServiceConnectServer(srv *connect.Server, svc ReportServiceSe
 	connect.HandleUnary(srv, "/cyber.esports.v1.ReportService/GetReport", svc.GetReport)
 	connect.HandleUnary(srv, "/cyber.esports.v1.ReportService/GetSessionReport", svc.GetSessionReport)
 	connect.HandleUnary(srv, "/cyber.esports.v1.ReportService/GetAbilityDigest", svc.GetAbilityDigest)
+	connect.HandleUnary(srv, "/cyber.esports.v1.ReportService/GetCognitiveReport", svc.GetCognitiveReport)
+	connect.HandleUnary(srv, "/cyber.esports.v1.ReportService/GetTrendReport", svc.GetTrendReport)
+	connect.HandleUnary(srv, "/cyber.esports.v1.ReportService/GetCareerReport", svc.GetCareerReport)
 }

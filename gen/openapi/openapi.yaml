@@ -973,6 +973,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetReportAccessResponse'
+    /api/v1/esports/reports/career:
+        post:
+            tags:
+                - ReportService
+            operationId: ReportService_GetCareerReport
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GetCareerReportRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetCareerReportResponse'
+    /api/v1/esports/reports/cognitive:
+        post:
+            tags:
+                - ReportService
+            operationId: ReportService_GetCognitiveReport
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GetCognitiveReportRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetCognitiveReportResponse'
     /api/v1/esports/reports/digest:
         post:
             tags:
@@ -1027,6 +1063,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetSessionReportResponse'
+    /api/v1/esports/reports/trend:
+        post:
+            tags:
+                - ReportService
+            operationId: ReportService_GetTrendReport
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GetTrendReportRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetTrendReportResponse'
     /api/v1/esports/skus:
         get:
             tags:
@@ -3103,6 +3157,57 @@ components:
             description: |-
                 The engine marks backgrounding spans; validity is judged server-side at
                  submit against TestConfig.background_invalid_seconds.
+        cyber.esports.v1.CareerImprovement:
+            type: object
+            properties:
+                dimension:
+                    type: string
+                    description: |-
+                        The legal dimension key; a row exists only for a rendered
+                         dimension — a missing dimension has no gap to state.
+                current:
+                    type: number
+                    format: double
+                target:
+                    type: number
+                    description: The excellence line the rubric defines — server-owned, seed-fed.
+                    format: double
+                gapPercent:
+                    type: integer
+                    description: How far short of the target, in percent of it.
+                    format: int32
+                suggestions:
+                    type: array
+                    items:
+                        type: string
+                    description: Seeded prescription copy, the library's own words.
+        cyber.esports.v1.CareerRecommendation:
+            type: object
+            properties:
+                careerArea:
+                    type: string
+                    description: The seeded area code — the single source of the area's identity.
+                name:
+                    type: string
+                matchedScore:
+                    type: number
+                    description: The area's match against the member's rendered dimensions, 0-100.
+                    format: double
+                basisDimensions:
+                    type: array
+                    items:
+                        type: string
+                    description: The dimensions the match weighed, legal keys.
+                eliminationRate:
+                    type: number
+                    description: |-
+                        Library facts, seeded with the area — percent of entrants washed
+                         out and the training-load tier's own wording.
+                    format: double
+                trainingIntensity:
+                    type: string
+                suggestion:
+                    type: string
         cyber.esports.v1.CharacterCounterDetail:
             type: object
             properties:
@@ -3140,6 +3245,28 @@ components:
             properties:
                 order:
                     $ref: '#/components/schemas/cyber.esports.v1.Order'
+        cyber.esports.v1.CognitiveDimension:
+            type: object
+            properties:
+                dimension:
+                    type: string
+                value:
+                    type: number
+                    description: The weighted percentile sum, rounded to an integer (0-100 scale).
+                    format: double
+                tier:
+                    enum:
+                        - REPORT_TIER_UNSPECIFIED
+                        - REPORT_TIER_S
+                        - REPORT_TIER_A
+                        - REPORT_TIER_B
+                        - REPORT_TIER_C
+                    type: string
+                    format: enum
+            description: |-
+                One rendered dimension of the cognitive model. The dimension keys are
+                 the legal eight-word vocabulary; the wording a client renders them
+                 with stays with the client.
         cyber.esports.v1.CreateOrderRequest:
             type: object
             properties:
@@ -3431,6 +3558,94 @@ components:
                     description: |-
                         The latest session line per genre — at most one row each, absent
                          when the genre was never played.
+        cyber.esports.v1.GetCareerReportRequest:
+            type: object
+            properties: {}
+        cyber.esports.v1.GetCareerReportResponse:
+            type: object
+            properties:
+                access:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.ReportAccessVerdict'
+                    description: |-
+                        Career is open by the standing default; the verdict carries the
+                         policy word if the operator closed or member-gated it.
+                recommendations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.CareerRecommendation'
+                    description: |-
+                        Career areas ordered by match, descending. The area vocabulary and
+                         its library facts (elimination rate, training intensity, advice)
+                         are seeded server-side and travel with the rows — library copy is
+                         data, not page wording.
+                improvements:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.CareerImprovement'
+                    description: |-
+                        The gap board and the prescription cards render from one array:
+                         weakest dimensions first, the target line and suggestions carried
+                         per row so the client never hardcodes a rubric constant.
+        cyber.esports.v1.GetCognitiveReportRequest:
+            type: object
+            properties: {}
+        cyber.esports.v1.GetCognitiveReportResponse:
+            type: object
+            properties:
+                access:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.ReportAccessVerdict'
+                    description: |-
+                        Cognitive is closed to the ToC member by default; the verdict's
+                         reason names which fact answered — policy, membership, or a
+                         redeemed code.
+                coveredAbilities:
+                    type: integer
+                    description: |-
+                        How many of the six-word ability vocabulary the member has measured
+                         — the report header's covered count. Not gate-sensitive: the digest
+                         face answers the same number to anyone.
+                    format: int32
+                testedDimensions:
+                    type: integer
+                    description: |-
+                        How many dimension rows carry a value, over the eight the model
+                         defines — the completeness headline, same shape the record board
+                         carries.
+                    format: int32
+                totalDimensions:
+                    type: integer
+                    format: int32
+                dimensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.CognitiveDimension'
+                    description: |-
+                        Only dimensions whose every source ability has both a history-best
+                         score and a cohort answer; a partially-fed dimension is an absent
+                         row, never a zero axis — the same missing-never-zero law the record
+                         board holds. Values are the weighted sum of the source abilities'
+                         history-best percentiles, rounded to integers, weights server-side
+                         and single-sourced.
+                composite:
+                    type: number
+                    description: |-
+                        Equal-weight mean over the rendered dimensions only — a missing
+                         dimension never counts as zero. Null when no dimension rendered.
+                    format: double
+                tier:
+                    enum:
+                        - REPORT_TIER_UNSPECIFIED
+                        - REPORT_TIER_S
+                        - REPORT_TIER_A
+                        - REPORT_TIER_B
+                        - REPORT_TIER_C
+                    type: string
+                    description: |-
+                        The composite's tier under the same ladder the record board judges
+                         by; UNSPECIFIED while the composite is null.
+                    format: enum
         cyber.esports.v1.GetMatchSessionResponse:
             type: object
             properties:
@@ -3621,6 +3836,35 @@ components:
                     description: |-
                         Long-form how-to copy, per test — seeded from the six ability texts
                          and free to diverge per test; copy changes are content, never contract.
+        cyber.esports.v1.GetTrendReportRequest:
+            type: object
+            properties: {}
+        cyber.esports.v1.GetTrendReportResponse:
+            type: object
+            properties:
+                sessionsTotal:
+                    type: integer
+                    description: |-
+                        Sessions carrying at least one scored record — the same count the
+                         digest face answers; zero renders the honest empty page.
+                    format: int32
+                abilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.TrendAbilitySeries'
+                    description: |-
+                        One series per ability that carries at least one cohort-answered
+                         point; an ability with no answer is an absent series, never a flat
+                         zero line.
+                advancedAccess:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.ReportAccessVerdict'
+                    description: |-
+                        The advanced tier's gate (cross-report comparison, prescriptions,
+                         percentile drift) rides the membership verdict — the base tier is
+                         free for anyone who has tested. The advanced content itself is a
+                         later face; the verdict travels now so the page renders its locked
+                         state from one call.
         cyber.esports.v1.ListActivationCodesResponse:
             type: object
             properties:
@@ -4183,6 +4427,28 @@ components:
                  percentile is the same-age same-sex cohort's; a cohort too thin to say
                  anything yields a null percentile and a LOW confidence — the axis then
                  renders score-only, never a made-up percentile.
+        cyber.esports.v1.ReportAccessVerdict:
+            type: object
+            properties:
+                allowed:
+                    type: boolean
+                reason:
+                    enum:
+                        - REPORT_ACCESS_REASON_UNSPECIFIED
+                        - REPORT_ACCESS_REASON_POLICY_OPEN
+                        - REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE
+                        - REPORT_ACCESS_REASON_CODE_REDEEMED
+                        - REPORT_ACCESS_REASON_POLICY_CLOSED
+                        - REPORT_ACCESS_REASON_NO_ENTITLEMENT
+                    type: string
+                    format: enum
+            description: |-
+                The same two-fact answer GetReportAccess returns, embedded in each
+                 cluster face so a page carries its own gate: the judgement order
+                 (code redemption outranks policy outranks the standing default) lives
+                 in the entitlement module and is never re-derived here. A false
+                 allowed means the face renders locked; the numbers behind a closed
+                 gate never travel.
         cyber.esports.v1.ReportComparison:
             type: object
             properties:
@@ -4745,6 +5011,34 @@ components:
                     type: integer
                     description: The dot's spawn-to-kill lifetime; rides only on shot frames.
                     format: int32
+        cyber.esports.v1.TrendAbilitySeries:
+            type: object
+            properties:
+                ability:
+                    type: string
+                points:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.TrendPoint'
+                    description: |-
+                        Ascending by time; first and last deltas are the client's own
+                         derivation off these points.
+        cyber.esports.v1.TrendPoint:
+            type: object
+            properties:
+                at:
+                    type: string
+                    format: date-time
+                percentile:
+                    type: number
+                    format: double
+                genre:
+                    type: string
+            description: |-
+                One session-anchor's cohort answer for one ability. The genre rides
+                 the point because the two genres order different ability sets — a
+                 mixed history must label itself, or a reader would take a curve's
+                 rise and fall for skill change when it is vocabulary change.
         cyber.esports.v1.UpdateProfileRequest:
             type: object
             properties:
@@ -6251,6 +6545,13 @@ tags:
          (GetAbilityDigest) — what a member sees of scores they already earned.
          Neither runs cohort math: the frozen snapshot is their only percentile
          source, same as the record board itself.
+
+         The cluster faces (GetCognitiveReport, GetTrendReport, GetCareerReport)
+         fold cross-session history into read-only pages beyond the single
+         attempt. Each response embeds its own access verdict — the same two
+         facts GetReportAccess answers — so a closed policy or an inactive
+         membership renders a locked face, never an error, and the numbers
+         behind a closed gate never travel.
     - name: ResourceService
     - name: RoleService
     - name: SkuService
