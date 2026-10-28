@@ -23,6 +23,8 @@ const (
 	codeAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 )
 
+var reportFamilies = []string{shared.ReportCognitive, shared.ReportCareer, shared.ReportSchool}
+
 var defaultPolicy = map[string]string{ // shipped defaults; report_policy rows are the only override — career open, cognitive the member plane, school codes-only
 	shared.ReportCareer:    shared.PolicyOpen,
 	shared.ReportCognitive: shared.PolicyMembership,
@@ -38,6 +40,14 @@ type ActivationCode struct {
 	ExpiresAt  time.Time
 	CreatedBy  string
 	CreatedAt  time.Time
+}
+
+type PolicyRow struct {
+	Family     string
+	Policy     string
+	Overridden bool // false = the shipped default answering, true = a report_policy row governs
+	UpdatedBy  string
+	UpdatedAt  time.Time
 }
 
 type GenerateIn struct {
@@ -101,6 +111,7 @@ type EntitlementRP interface {
 type ReportPolicyRP interface {
 	Policy(ctx context.Context, family string) (policy string, ok bool, err error) // ok=false means no row — the shipped default answers
 	SetPolicy(ctx context.Context, family, policy, updatedBy string) error
+	List(ctx context.Context) ([]*PolicyRow, error) // override rows only — defaults fold in at the UC
 }
 
 // UC ------------------------------------------------------------------------------------------------------------
@@ -281,6 +292,28 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 		return nil, err
 	}
 	uc.Log.Info("activation code redeemed", "code", code, "report_type", family, "user_id", subject.UserID)
+	return out, nil
+}
+
+func (uc *EntitleUC) ListReportAccessPolicies(ctx context.Context) ([]*PolicyRow, error) {
+	rows, err := uc.policyRP.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	byFamily := make(map[string]*PolicyRow, len(rows))
+	for _, r := range rows {
+		byFamily[r.Family] = r
+	}
+	// The absent families answer with their shipped defaults — the operator
+	// sees one settled table, never "no row" as a third state.
+	out := make([]*PolicyRow, 0, len(reportFamilies))
+	for _, family := range reportFamilies {
+		if r, ok := byFamily[family]; ok {
+			out = append(out, r)
+			continue
+		}
+		out = append(out, &PolicyRow{Family: family, Policy: defaultPolicy[family]})
+	}
 	return out, nil
 }
 

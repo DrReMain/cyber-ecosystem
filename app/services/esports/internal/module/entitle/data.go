@@ -194,6 +194,24 @@ func (rp *policyRP) Policy(ctx context.Context, family string) (string, bool, er
 	return string(row.Policy), true, nil
 }
 
+func (rp *policyRP) List(ctx context.Context) ([]*PolicyRow, error) {
+	rows, err := rp.Platform.GetClient(ctx).ReportPolicy.Query().All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := make([]*PolicyRow, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, &PolicyRow{
+			Family:     string(row.ReportType),
+			Policy:     string(row.Policy),
+			Overridden: true,
+			UpdatedBy:  row.UpdatedBy,
+			UpdatedAt:  row.UpdatedAt,
+		})
+	}
+	return out, nil
+}
+
 func (rp *policyRP) SetPolicy(ctx context.Context, family, policy, updatedBy string) error {
 	// Upsert in place: the family row is the policy's whole state, so the
 	// conflict target is the unique family and the update rewrites it.

@@ -484,6 +484,167 @@ func (x *SetReportAccessPolicyResponse) GetPolicy() ReportAccessPolicy {
 	return ReportAccessPolicy_REPORT_ACCESS_POLICY_UNSPECIFIED
 }
 
+type ListReportAccessPoliciesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListReportAccessPoliciesRequest) Reset() {
+	*x = ListReportAccessPoliciesRequest{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListReportAccessPoliciesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListReportAccessPoliciesRequest) ProtoMessage() {}
+
+func (x *ListReportAccessPoliciesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListReportAccessPoliciesRequest.ProtoReflect.Descriptor instead.
+func (*ListReportAccessPoliciesRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{7}
+}
+
+type ListReportAccessPoliciesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Policies      []*ReportPolicyRow     `protobuf:"bytes,1,rep,name=policies,proto3" json:"policies,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListReportAccessPoliciesResponse) Reset() {
+	*x = ListReportAccessPoliciesResponse{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListReportAccessPoliciesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListReportAccessPoliciesResponse) ProtoMessage() {}
+
+func (x *ListReportAccessPoliciesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListReportAccessPoliciesResponse.ProtoReflect.Descriptor instead.
+func (*ListReportAccessPoliciesResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ListReportAccessPoliciesResponse) GetPolicies() []*ReportPolicyRow {
+	if x != nil {
+		return x.Policies
+	}
+	return nil
+}
+
+// One family's current answer. Absent rows are the shipped defaults echoed
+// back as-is — the override flag and the empty audit fields are the only
+// way a reader can tell a default from a deliberate setting.
+type ReportPolicyRow struct {
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	ReportType ReportType             `protobuf:"varint,1,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType" json:"report_type,omitempty"`
+	Policy     ReportAccessPolicy     `protobuf:"varint,2,opt,name=policy,proto3,enum=cyber.esports.v1.ReportAccessPolicy" json:"policy,omitempty"`
+	// False = the shipped default answering, true = a report_policy row
+	// governs.
+	Overridden    bool                    `protobuf:"varint,3,opt,name=overridden,proto3" json:"overridden,omitempty"`
+	UpdatedBy     *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=updated_by,json=updatedBy,proto3" json:"updated_by,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp  `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReportPolicyRow) Reset() {
+	*x = ReportPolicyRow{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReportPolicyRow) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReportPolicyRow) ProtoMessage() {}
+
+func (x *ReportPolicyRow) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReportPolicyRow.ProtoReflect.Descriptor instead.
+func (*ReportPolicyRow) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ReportPolicyRow) GetReportType() ReportType {
+	if x != nil {
+		return x.ReportType
+	}
+	return ReportType_REPORT_TYPE_UNSPECIFIED
+}
+
+func (x *ReportPolicyRow) GetPolicy() ReportAccessPolicy {
+	if x != nil {
+		return x.Policy
+	}
+	return ReportAccessPolicy_REPORT_ACCESS_POLICY_UNSPECIFIED
+}
+
+func (x *ReportPolicyRow) GetOverridden() bool {
+	if x != nil {
+		return x.Overridden
+	}
+	return false
+}
+
+func (x *ReportPolicyRow) GetUpdatedBy() *wrapperspb.StringValue {
+	if x != nil {
+		return x.UpdatedBy
+	}
+	return nil
+}
+
+func (x *ReportPolicyRow) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
 var File_cyber_esports_v1_activation_admin_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
@@ -533,20 +694,36 @@ const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"\x1dSetReportAccessPolicyResponse\x12=\n" +
 	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeR\n" +
 	"reportType\x12<\n" +
-	"\x06policy\x18\x02 \x01(\x0e2$.cyber.esports.v1.ReportAccessPolicyR\x06policy*\xc0\x01\n" +
+	"\x06policy\x18\x02 \x01(\x0e2$.cyber.esports.v1.ReportAccessPolicyR\x06policy\"!\n" +
+	"\x1fListReportAccessPoliciesRequest\"a\n" +
+	" ListReportAccessPoliciesResponse\x12=\n" +
+	"\bpolicies\x18\x01 \x03(\v2!.cyber.esports.v1.ReportPolicyRowR\bpolicies\"\xa6\x02\n" +
+	"\x0fReportPolicyRow\x12=\n" +
+	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeR\n" +
+	"reportType\x12<\n" +
+	"\x06policy\x18\x02 \x01(\x0e2$.cyber.esports.v1.ReportAccessPolicyR\x06policy\x12\x1e\n" +
+	"\n" +
+	"overridden\x18\x03 \x01(\bR\n" +
+	"overridden\x12;\n" +
+	"\n" +
+	"updated_by\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\tupdatedBy\x129\n" +
+	"\n" +
+	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt*\xc0\x01\n" +
 	"\x12ReportAccessPolicy\x12$\n" +
 	" REPORT_ACCESS_POLICY_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19REPORT_ACCESS_POLICY_OPEN\x10\x01\x12#\n" +
 	"\x1fREPORT_ACCESS_POLICY_MEMBERSHIP\x10\x02\x12\x1f\n" +
 	"\x1bREPORT_ACCESS_POLICY_TENANT\x10\x03\x12\x1f\n" +
-	"\x1bREPORT_ACCESS_POLICY_CLOSED\x10\x042\x89\x05\n" +
+	"\x1bREPORT_ACCESS_POLICY_CLOSED\x10\x042\xe1\x06\n" +
 	"\x13EntitleAdminService\x12\xd5\x01\n" +
 	"\x17GenerateActivationCodes\x120.cyber.esports.v1.GenerateActivationCodesRequest\x1a1.cyber.esports.v1.GenerateActivationCodesResponse\"U\x88\xf1\x04\x02\x8a\xd3\x0e\x19\n" +
 	"\x15批量生成激活码\x10\x02\x82\xd3\xe4\x93\x02.:\x01*\")/api/v1/esports/activation-codes/generate\x12\xb7\x01\n" +
 	"\x13ListActivationCodes\x12,.cyber.esports.v1.ListActivationCodesRequest\x1a-.cyber.esports.v1.ListActivationCodesResponse\"C\x88\xf1\x04\x02\x8a\xd3\x0e\x13\n" +
 	"\x0f激活码列表\x10\x01\x82\xd3\xe4\x93\x02\"\x12 /api/v1/esports/activation-codes\x12\xcd\x01\n" +
 	"\x15SetReportAccessPolicy\x12..cyber.esports.v1.SetReportAccessPolicyRequest\x1a/.cyber.esports.v1.SetReportAccessPolicyResponse\"S\x88\xf1\x04\x02\x8a\xd3\x0e\x1c\n" +
-	"\x18设置报告访问策略\x10\x02\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/esports/report-access-policy\x1a\x10\x8a\xe2\t\f权益运营B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	"\x18设置报告访问策略\x10\x02\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/esports/report-access-policy\x12\xd5\x01\n" +
+	"\x18ListReportAccessPolicies\x121.cyber.esports.v1.ListReportAccessPoliciesRequest\x1a2.cyber.esports.v1.ListReportAccessPoliciesResponse\"R\x88\xf1\x04\x02\x8a\xd3\x0e\x1c\n" +
+	"\x18报告访问策略列表\x10\x01\x82\xd3\xe4\x93\x02(\x12&/api/v1/esports/report-access-policies\x1a\x10\x8a\xe2\t\f权益运营B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_activation_admin_proto_rawDescOnce sync.Once
@@ -561,50 +738,60 @@ func file_cyber_esports_v1_activation_admin_proto_rawDescGZIP() []byte {
 }
 
 var file_cyber_esports_v1_activation_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_cyber_esports_v1_activation_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_cyber_esports_v1_activation_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_cyber_esports_v1_activation_admin_proto_goTypes = []any{
-	(ReportAccessPolicy)(0),                 // 0: cyber.esports.v1.ReportAccessPolicy
-	(*ActivationCode)(nil),                  // 1: cyber.esports.v1.ActivationCode
-	(*GenerateActivationCodesRequest)(nil),  // 2: cyber.esports.v1.GenerateActivationCodesRequest
-	(*GenerateActivationCodesResponse)(nil), // 3: cyber.esports.v1.GenerateActivationCodesResponse
-	(*ListActivationCodesRequest)(nil),      // 4: cyber.esports.v1.ListActivationCodesRequest
-	(*ListActivationCodesResponse)(nil),     // 5: cyber.esports.v1.ListActivationCodesResponse
-	(*SetReportAccessPolicyRequest)(nil),    // 6: cyber.esports.v1.SetReportAccessPolicyRequest
-	(*SetReportAccessPolicyResponse)(nil),   // 7: cyber.esports.v1.SetReportAccessPolicyResponse
-	(*wrapperspb.StringValue)(nil),          // 8: google.protobuf.StringValue
-	(ReportType)(0),                         // 9: cyber.esports.v1.ReportType
-	(*wrapperspb.Int32Value)(nil),           // 10: google.protobuf.Int32Value
-	(*timestamppb.Timestamp)(nil),           // 11: google.protobuf.Timestamp
-	(*v1.PageRequest)(nil),                  // 12: cyber.shared.common.v1.PageRequest
-	(*v1.PageResponse)(nil),                 // 13: cyber.shared.common.v1.PageResponse
+	(ReportAccessPolicy)(0),                  // 0: cyber.esports.v1.ReportAccessPolicy
+	(*ActivationCode)(nil),                   // 1: cyber.esports.v1.ActivationCode
+	(*GenerateActivationCodesRequest)(nil),   // 2: cyber.esports.v1.GenerateActivationCodesRequest
+	(*GenerateActivationCodesResponse)(nil),  // 3: cyber.esports.v1.GenerateActivationCodesResponse
+	(*ListActivationCodesRequest)(nil),       // 4: cyber.esports.v1.ListActivationCodesRequest
+	(*ListActivationCodesResponse)(nil),      // 5: cyber.esports.v1.ListActivationCodesResponse
+	(*SetReportAccessPolicyRequest)(nil),     // 6: cyber.esports.v1.SetReportAccessPolicyRequest
+	(*SetReportAccessPolicyResponse)(nil),    // 7: cyber.esports.v1.SetReportAccessPolicyResponse
+	(*ListReportAccessPoliciesRequest)(nil),  // 8: cyber.esports.v1.ListReportAccessPoliciesRequest
+	(*ListReportAccessPoliciesResponse)(nil), // 9: cyber.esports.v1.ListReportAccessPoliciesResponse
+	(*ReportPolicyRow)(nil),                  // 10: cyber.esports.v1.ReportPolicyRow
+	(*wrapperspb.StringValue)(nil),           // 11: google.protobuf.StringValue
+	(ReportType)(0),                          // 12: cyber.esports.v1.ReportType
+	(*wrapperspb.Int32Value)(nil),            // 13: google.protobuf.Int32Value
+	(*timestamppb.Timestamp)(nil),            // 14: google.protobuf.Timestamp
+	(*v1.PageRequest)(nil),                   // 15: cyber.shared.common.v1.PageRequest
+	(*v1.PageResponse)(nil),                  // 16: cyber.shared.common.v1.PageResponse
 }
 var file_cyber_esports_v1_activation_admin_proto_depIdxs = []int32{
-	8,  // 0: cyber.esports.v1.ActivationCode.code:type_name -> google.protobuf.StringValue
-	9,  // 1: cyber.esports.v1.ActivationCode.report_type:type_name -> cyber.esports.v1.ReportType
-	10, // 2: cyber.esports.v1.ActivationCode.quantity:type_name -> google.protobuf.Int32Value
-	10, // 3: cyber.esports.v1.ActivationCode.used_count:type_name -> google.protobuf.Int32Value
-	11, // 4: cyber.esports.v1.ActivationCode.expires_at:type_name -> google.protobuf.Timestamp
-	11, // 5: cyber.esports.v1.ActivationCode.created_at:type_name -> google.protobuf.Timestamp
-	9,  // 6: cyber.esports.v1.GenerateActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
-	12, // 7: cyber.esports.v1.ListActivationCodesRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	9,  // 8: cyber.esports.v1.ListActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
-	13, // 9: cyber.esports.v1.ListActivationCodesResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	11, // 0: cyber.esports.v1.ActivationCode.code:type_name -> google.protobuf.StringValue
+	12, // 1: cyber.esports.v1.ActivationCode.report_type:type_name -> cyber.esports.v1.ReportType
+	13, // 2: cyber.esports.v1.ActivationCode.quantity:type_name -> google.protobuf.Int32Value
+	13, // 3: cyber.esports.v1.ActivationCode.used_count:type_name -> google.protobuf.Int32Value
+	14, // 4: cyber.esports.v1.ActivationCode.expires_at:type_name -> google.protobuf.Timestamp
+	14, // 5: cyber.esports.v1.ActivationCode.created_at:type_name -> google.protobuf.Timestamp
+	12, // 6: cyber.esports.v1.GenerateActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
+	15, // 7: cyber.esports.v1.ListActivationCodesRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	12, // 8: cyber.esports.v1.ListActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
+	16, // 9: cyber.esports.v1.ListActivationCodesResponse.page:type_name -> cyber.shared.common.v1.PageResponse
 	1,  // 10: cyber.esports.v1.ListActivationCodesResponse.codes:type_name -> cyber.esports.v1.ActivationCode
-	9,  // 11: cyber.esports.v1.SetReportAccessPolicyRequest.report_type:type_name -> cyber.esports.v1.ReportType
+	12, // 11: cyber.esports.v1.SetReportAccessPolicyRequest.report_type:type_name -> cyber.esports.v1.ReportType
 	0,  // 12: cyber.esports.v1.SetReportAccessPolicyRequest.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
-	9,  // 13: cyber.esports.v1.SetReportAccessPolicyResponse.report_type:type_name -> cyber.esports.v1.ReportType
+	12, // 13: cyber.esports.v1.SetReportAccessPolicyResponse.report_type:type_name -> cyber.esports.v1.ReportType
 	0,  // 14: cyber.esports.v1.SetReportAccessPolicyResponse.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
-	2,  // 15: cyber.esports.v1.EntitleAdminService.GenerateActivationCodes:input_type -> cyber.esports.v1.GenerateActivationCodesRequest
-	4,  // 16: cyber.esports.v1.EntitleAdminService.ListActivationCodes:input_type -> cyber.esports.v1.ListActivationCodesRequest
-	6,  // 17: cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy:input_type -> cyber.esports.v1.SetReportAccessPolicyRequest
-	3,  // 18: cyber.esports.v1.EntitleAdminService.GenerateActivationCodes:output_type -> cyber.esports.v1.GenerateActivationCodesResponse
-	5,  // 19: cyber.esports.v1.EntitleAdminService.ListActivationCodes:output_type -> cyber.esports.v1.ListActivationCodesResponse
-	7,  // 20: cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy:output_type -> cyber.esports.v1.SetReportAccessPolicyResponse
-	18, // [18:21] is the sub-list for method output_type
-	15, // [15:18] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	10, // 15: cyber.esports.v1.ListReportAccessPoliciesResponse.policies:type_name -> cyber.esports.v1.ReportPolicyRow
+	12, // 16: cyber.esports.v1.ReportPolicyRow.report_type:type_name -> cyber.esports.v1.ReportType
+	0,  // 17: cyber.esports.v1.ReportPolicyRow.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
+	11, // 18: cyber.esports.v1.ReportPolicyRow.updated_by:type_name -> google.protobuf.StringValue
+	14, // 19: cyber.esports.v1.ReportPolicyRow.updated_at:type_name -> google.protobuf.Timestamp
+	2,  // 20: cyber.esports.v1.EntitleAdminService.GenerateActivationCodes:input_type -> cyber.esports.v1.GenerateActivationCodesRequest
+	4,  // 21: cyber.esports.v1.EntitleAdminService.ListActivationCodes:input_type -> cyber.esports.v1.ListActivationCodesRequest
+	6,  // 22: cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy:input_type -> cyber.esports.v1.SetReportAccessPolicyRequest
+	8,  // 23: cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies:input_type -> cyber.esports.v1.ListReportAccessPoliciesRequest
+	3,  // 24: cyber.esports.v1.EntitleAdminService.GenerateActivationCodes:output_type -> cyber.esports.v1.GenerateActivationCodesResponse
+	5,  // 25: cyber.esports.v1.EntitleAdminService.ListActivationCodes:output_type -> cyber.esports.v1.ListActivationCodesResponse
+	7,  // 26: cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy:output_type -> cyber.esports.v1.SetReportAccessPolicyResponse
+	9,  // 27: cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies:output_type -> cyber.esports.v1.ListReportAccessPoliciesResponse
+	24, // [24:28] is the sub-list for method output_type
+	20, // [20:24] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_activation_admin_proto_init() }
@@ -622,7 +809,7 @@ func file_cyber_esports_v1_activation_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_activation_admin_proto_rawDesc), len(file_cyber_esports_v1_activation_admin_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

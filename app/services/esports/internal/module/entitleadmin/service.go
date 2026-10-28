@@ -74,6 +74,27 @@ func (s *EntitleAdminService) SetReportAccessPolicy(ctx context.Context, req *es
 	}, nil
 }
 
+func (s *EntitleAdminService) ListReportAccessPolicies(ctx context.Context, _ *esportspb.ListReportAccessPoliciesRequest) (*esportspb.ListReportAccessPoliciesResponse, error) {
+	rows, err := s.entitleUC.ListReportAccessPolicies(ctx)
+	if err != nil {
+		return nil, err
+	}
+	policies := make([]*esportspb.ReportPolicyRow, 0, len(rows))
+	for _, r := range rows {
+		row := &esportspb.ReportPolicyRow{
+			ReportType: reportTypeToPB(r.Family),
+			Policy:     policyToPB(r.Policy),
+			Overridden: r.Overridden,
+			UpdatedAt:  utils.ToTimestamp(&r.UpdatedAt),
+		}
+		if r.Overridden {
+			row.UpdatedBy = utils.StringW(r.UpdatedBy)
+		}
+		policies = append(policies, row)
+	}
+	return &esportspb.ListReportAccessPoliciesResponse{Policies: policies}, nil
+}
+
 func (s *EntitleAdminService) RegisterGRPC(srv *grpc.Server) {
 	esportspb.RegisterEntitleAdminServiceServer(srv, s)
 }
@@ -112,6 +133,32 @@ func policyFromPB(p esportspb.ReportAccessPolicy) string {
 		return shared.PolicyClosed
 	}
 	return ""
+}
+
+func policyToPB(p string) esportspb.ReportAccessPolicy {
+	switch p {
+	case shared.PolicyOpen:
+		return esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_OPEN
+	case shared.PolicyMembership:
+		return esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_MEMBERSHIP
+	case shared.PolicyTenant:
+		return esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_TENANT
+	case shared.PolicyClosed:
+		return esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_CLOSED
+	}
+	return esportspb.ReportAccessPolicy_REPORT_ACCESS_POLICY_UNSPECIFIED
+}
+
+func reportTypeToPB(f string) esportspb.ReportType {
+	switch f {
+	case shared.ReportCognitive:
+		return esportspb.ReportType_REPORT_TYPE_COGNITIVE
+	case shared.ReportCareer:
+		return esportspb.ReportType_REPORT_TYPE_CAREER
+	case shared.ReportSchool:
+		return esportspb.ReportType_REPORT_TYPE_SCHOOL
+	}
+	return esportspb.ReportType_REPORT_TYPE_UNSPECIFIED
 }
 
 func codePB(r *entitle.ActivationCode) *esportspb.ActivationCode {

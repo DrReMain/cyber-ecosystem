@@ -12,4 +12,5 @@ func RegisterEntitleAdminServiceConnectServer(srv *connect.Server, svc EntitleAd
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/GenerateActivationCodes", svc.GenerateActivationCodes)
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/ListActivationCodes", svc.ListActivationCodes)
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy", svc.SetReportAccessPolicy)
+	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies", svc.ListReportAccessPolicies)
 }

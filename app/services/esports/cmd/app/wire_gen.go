@@ -20,6 +20,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/report"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
+	"cyber-ecosystem/app/services/esports/internal/module/testadmin"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/server"
 	"github.com/go-kratos/kratos/v3"
@@ -93,7 +94,8 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	snapshotRP := report.NewSnapshotRP(logger, platformPlatform)
 	reportUC := report.NewReportUC(logger, platformPlatform, recordBoardRP, snapshotRP, entitlementRP, profileRP, eventSubscriptions)
 	reportService := report.NewReportService(logger, reportUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService)
+	testAdminService := testadmin.NewTestAdminService(logger, testUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

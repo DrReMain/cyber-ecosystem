@@ -4,7 +4,10 @@ import (
 	"context"
 	"log/slog"
 
+	"cyber-ecosystem/shared-go/helper"
+
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/questionbank"
@@ -148,6 +151,105 @@ func (rp *testRP) GetAttempt(ctx context.Context, id string) (*AttemptRecord, er
 		}
 		return nil, rp.Platform.HandleEntError(err)
 	}
+	return mapAttemptRecord(row), nil
+}
+
+func (rp *testRP) ListQuestionBank(ctx context.Context, testCode string, page *commonv1.PageRequest) (*QuestionBankOut, error) {
+	query := rp.Platform.GetClient(ctx).QuestionBank.Query().
+		Where(questionbank.TestCodeEQ(testCode)).
+		Order(ent.Asc(questionbank.FieldCreatedAt))
+	total, offset, limit, err := helper.Paginate(ctx, query, helper.EnsurePageRequest(page), helper.DefaultPageSizeUnlimit)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	rows, err := query.All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := &QuestionBankOut{Rows: make([]*QuestionBankRow, 0, len(rows))}
+	for _, row := range rows {
+		out.Rows = append(out.Rows, &QuestionBankRow{
+			ScenarioCode: row.ScenarioCode,
+			Payload:      row.Payload,
+			Answer:       row.Answer,
+			CreatedAt:    row.CreatedAt,
+		})
+	}
+	out.PageResponse = helper.BuildPageResponse(total, offset, limit)
+	return out, nil
+}
+
+func (rp *testRP) ListAttempts(ctx context.Context, in *AttemptsQueryIn) (*AttemptsOut, error) {
+	query := rp.Platform.GetClient(ctx).TestRecord.Query()
+	helper.WherePtr(query, in.TestCode, testrecord.TestCodeEQ)
+	helper.WherePtr(query, in.UserID, testrecord.UserIDEQ)
+	helper.WherePtr(query, in.SessionID, testrecord.SessionIDEQ)
+	query.Order(ent.Desc(testrecord.FieldCreatedAt))
+	total, offset, limit, err := helper.Paginate(ctx, query, helper.EnsurePageRequest(in.PageRequest), helper.DefaultPageSizeUnlimit)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	rows, err := query.All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := &AttemptsOut{Rows: make([]*AttemptRecord, 0, len(rows))}
+	for _, row := range rows {
+		out.Rows = append(out.Rows, mapAttemptRecord(row))
+	}
+	out.PageResponse = helper.BuildPageResponse(total, offset, limit)
+	return out, nil
+}
+
+func (rp *testRP) UpdateConfig(ctx context.Context, in *UpdateConfigIn) (*TestConfig, error) {
+	owned, err := rp.Platform.GetClient(ctx).Test.Get(ctx, in.TestID)
+	if err != nil {
+		return nil, mapTestLoadError(rp, err)
+	}
+	client := rp.Platform.GetClient(ctx)
+	row, qerr := client.TestConfig.Query().
+		Where(testconfig.TestCodeEQ(owned.Code)).
+		Only(ctx)
+	switch {
+	case ent.IsNotFound(qerr):
+		// First touch of a test whose seed carried no config row — the
+		// schema defaults hold the absent dials, the present ones land, and
+		// a concurrent first-touch would lose to the unique index; operator
+		// cadence makes that retry, not architecture.
+		create := client.TestConfig.Create().
+			SetTestCode(owned.Code).
+			SetDurationSeconds(owned.DurationSeconds)
+		if in.BackgroundInvalidSec != nil {
+			create.SetBackgroundInvalidSeconds(*in.BackgroundInvalidSec)
+		}
+		if in.EngineParams != nil {
+			create.SetEngineParams(in.EngineParams)
+		}
+		if row, err = create.Save(ctx); err != nil {
+			return nil, rp.Platform.HandleEntError(err)
+		}
+	case qerr != nil:
+		return nil, rp.Platform.HandleEntError(qerr)
+	default:
+		// Absent dials stay as stored — one update touches only what the
+		// operator sent.
+		upd := client.TestConfig.UpdateOneID(row.ID)
+		if in.BackgroundInvalidSec != nil {
+			upd.SetBackgroundInvalidSeconds(*in.BackgroundInvalidSec)
+		}
+		if in.EngineParams != nil {
+			upd.SetEngineParams(in.EngineParams)
+		}
+		if row, err = upd.Save(ctx); err != nil {
+			return nil, rp.Platform.HandleEntError(err)
+		}
+	}
+	tc := mapTestConfig(row)
+	tc.TestID = owned.ID
+	return tc, nil
+}
+
+func mapAttemptRecord(row *ent.TestRecord) *AttemptRecord {
 	grade := (*string)(nil)
 	if row.Grade != nil {
 		g := string(*row.Grade)
@@ -168,7 +270,7 @@ func (rp *testRP) GetAttempt(ctx context.Context, id string) (*AttemptRecord, er
 		Grade:         grade,
 		Valid:         row.Valid,
 		InvalidReason: row.InvalidReason,
-	}, nil
+	}
 }
 
 func (rp *testRP) CreateAttempt(ctx context.Context, rec *AttemptRecord) (*AttemptRecord, error) {

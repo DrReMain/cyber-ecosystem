@@ -18,3 +18,8 @@ export const listActivationCodes = EntitleAdminService.method.listActivationCode
  * @generated from rpc cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy
  */
 export const setReportAccessPolicy = EntitleAdminService.method.setReportAccessPolicy;
+
+/**
+ * @generated from rpc cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies
+ */
+export const listReportAccessPolicies = EntitleAdminService.method.listReportAccessPolicies;

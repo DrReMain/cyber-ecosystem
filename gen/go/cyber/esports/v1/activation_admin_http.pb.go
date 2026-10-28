@@ -19,11 +19,13 @@ const _ = http.SupportPackageIsVersion3
 
 const OperationEntitleAdminServiceGenerateActivationCodes = "/cyber.esports.v1.EntitleAdminService/GenerateActivationCodes"
 const OperationEntitleAdminServiceListActivationCodes = "/cyber.esports.v1.EntitleAdminService/ListActivationCodes"
+const OperationEntitleAdminServiceListReportAccessPolicies = "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies"
 const OperationEntitleAdminServiceSetReportAccessPolicy = "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy"
 
 type EntitleAdminServiceHTTPServer interface {
 	GenerateActivationCodes(context.Context, *GenerateActivationCodesRequest) (*GenerateActivationCodesResponse, error)
 	ListActivationCodes(context.Context, *ListActivationCodesRequest) (*ListActivationCodesResponse, error)
+	ListReportAccessPolicies(context.Context, *ListReportAccessPoliciesRequest) (*ListReportAccessPoliciesResponse, error)
 	SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error)
 }
 
@@ -32,6 +34,7 @@ func RegisterEntitleAdminServiceHTTPServer(s *http.Server, srv EntitleAdminServi
 	r.Handle("POST", "/api/v1/esports/activation-codes/generate", _EntitleAdminService_GenerateActivationCodes0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/activation-codes", _EntitleAdminService_ListActivationCodes0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/esports/report-access-policy", _EntitleAdminService_SetReportAccessPolicy0_HTTP_Handler(srv))
+	r.Handle("GET", "/api/v1/esports/report-access-policies", _EntitleAdminService_ListReportAccessPolicies0_HTTP_Handler(srv))
 }
 
 func _EntitleAdminService_GenerateActivationCodes0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
@@ -91,9 +94,29 @@ func _EntitleAdminService_SetReportAccessPolicy0_HTTP_Handler(srv EntitleAdminSe
 	}
 }
 
+func _EntitleAdminService_ListReportAccessPolicies0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListReportAccessPoliciesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEntitleAdminServiceListReportAccessPolicies)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListReportAccessPolicies(ctx, req.(*ListReportAccessPoliciesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListReportAccessPoliciesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type EntitleAdminServiceHTTPClient interface {
 	GenerateActivationCodes(ctx context.Context, req *GenerateActivationCodesRequest, opts ...http.CallOption) (rsp *GenerateActivationCodesResponse, err error)
 	ListActivationCodes(ctx context.Context, req *ListActivationCodesRequest, opts ...http.CallOption) (rsp *ListActivationCodesResponse, err error)
+	ListReportAccessPolicies(ctx context.Context, req *ListReportAccessPoliciesRequest, opts ...http.CallOption) (rsp *ListReportAccessPoliciesResponse, err error)
 	SetReportAccessPolicy(ctx context.Context, req *SetReportAccessPolicyRequest, opts ...http.CallOption) (rsp *SetReportAccessPolicyResponse, err error)
 }
 
@@ -129,6 +152,22 @@ func (c *EntitleAdminServiceHTTPClientImpl) ListActivationCodes(ctx context.Cont
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationEntitleAdminServiceListActivationCodes),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *EntitleAdminServiceHTTPClientImpl) ListReportAccessPolicies(ctx context.Context, in *ListReportAccessPoliciesRequest, opts ...http.CallOption) (*ListReportAccessPoliciesResponse, error) {
+	var out ListReportAccessPoliciesResponse
+	pattern := "/api/v1/esports/report-access-policies"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationEntitleAdminServiceListReportAccessPolicies),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
