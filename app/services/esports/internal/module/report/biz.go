@@ -293,6 +293,7 @@ func (uc *ReportUC) GetReport(ctx context.Context, recordID string) (*Report, er
 	if err != nil {
 		return nil, err
 	}
+	board = dedupeBoard(board)
 
 	pf, err := uc.profileRP.FindByUserID(ctx, subject.UserID)
 	if err != nil {
@@ -562,6 +563,29 @@ func sessionBoardOf(attempts []SessionAttemptRow) []BoardEntry {
 	return out
 }
 
+// dedupeBoard folds the session board to one entry per ability — the
+// settlement's own law (the best attempt of the retries is the one that
+// scores), so a retaken game never draws a doubled radar axis or a
+// duplicated ability row on the record board either. Equal scores keep
+// the newer attempt.
+func dedupeBoard(board []BoardEntry) []BoardEntry {
+	best := make(map[string]BoardEntry, len(board))
+	order := make([]string, 0, len(board))
+	for _, e := range board {
+		if cur, ok := best[e.Ability]; !ok || e.Score > cur.Score || (e.Score == cur.Score && e.At.After(cur.At)) {
+			if !ok {
+				order = append(order, e.Ability)
+			}
+			best[e.Ability] = e
+		}
+	}
+	out := make([]BoardEntry, 0, len(order))
+	for _, ability := range order {
+		out = append(out, best[ability])
+	}
+	return out
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func sessionIDOf(rec *Attempt) string {
@@ -757,6 +781,7 @@ func (uc *ReportUC) freezeFor(ctx context.Context, userID, recordID string) (*Sn
 	if err != nil {
 		return nil, err
 	}
+	board = dedupeBoard(board)
 	pf, err := uc.profileRP.FindByUserID(ctx, userID)
 	if err != nil {
 		return nil, err

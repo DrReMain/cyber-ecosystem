@@ -9,6 +9,8 @@
     ],
     "deny": [
       "Bash(kill)",
+      "Bash(node)",
+      "Bash(node *)",
       "Bash(npm)",
       "Bash(npm *)",
       "Bash(npx)",

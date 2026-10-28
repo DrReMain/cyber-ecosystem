@@ -17,6 +17,8 @@ interface TestBootstrapProps {
   readonly id: string;
   readonly code: string;
   readonly fallbackName: string;
+  /** Land on the stored verdict, not the run (the done step's read-back). */
+  readonly review: boolean;
 }
 
 // The faces' session binding (null = practice): the lineup, this test's
@@ -47,7 +49,7 @@ function buildStepContext(session: MatchSession, code: string): StepContext | nu
 // undecided, or failed to load degrades the run to practice (unbound
 // submit) rather than blocking the game. The step context recomputes on
 // every session refetch, so the result face reads the post-submit truth.
-export function TestBootstrap({ id, code, fallbackName }: Readonly<TestBootstrapProps>) {
+export function TestBootstrap({ id, code, fallbackName, review }: Readonly<TestBootstrapProps>) {
   const navigate = useNavigate();
   const testQuery = useConnectQuery(getTest, { id });
   const configQuery = useConnectQuery(getTestConfig, { id });
@@ -111,6 +113,7 @@ export function TestBootstrap({ id, code, fallbackName }: Readonly<TestBootstrap
       gameModule={gameModule}
       introduction={testQuery.data?.introduction ?? m.test_start_rule_fallback()}
       matchSessionId={boundSessionId}
+      review={review}
       step={step}
       testName={test?.name ?? fallbackName}
       unitLabel={test?.unitScoreLabel ?? ""}

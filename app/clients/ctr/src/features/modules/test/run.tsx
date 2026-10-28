@@ -10,6 +10,8 @@ interface TestRunProps {
   readonly engineParams: Readonly<Record<string, string>>;
   /** The session step binding — undefined rides the run as practice. */
   readonly matchSessionId: string | undefined;
+  /** Land on the stored verdict, not the run (the done step's read-back). */
+  readonly review: boolean;
   /** The live session context the faces render (null = practice). */
   readonly step: StepContext | null;
   readonly category: string;

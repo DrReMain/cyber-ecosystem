@@ -1,6 +1,6 @@
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { listTests } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test-TestService_connectquery";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { m } from "#/paraglide/messages";
 import { TestBootstrap } from "./bootstrap";
@@ -8,10 +8,12 @@ import { TestBootstrap } from "./bootstrap";
 /**
  * The /test/$code host page. The route param is the test code; the row id
  * (what the read face keys on) is resolved through the same listTests
- * cache the match flow already hydrated.
+ * cache the match flow already hydrated. The review flag rides the search
+ * into the read-back face.
  */
 export function TestPage() {
   const { code } = useParams({ from: "/test/$code" });
+  const { review } = useSearch({ from: "/test/$code" });
   const navigate = useNavigate();
   const listQuery = useConnectQuery(listTests, {});
   const row = (listQuery.data?.tests ?? []).find((test) => test.code === code) ?? null;
@@ -46,5 +48,5 @@ export function TestPage() {
       />
     );
   }
-  return <TestBootstrap code={code} fallbackName={row.name ?? code} id={row.id} />;
+  return <TestBootstrap code={code} fallbackName={row.name ?? code} id={row.id} review={review} />;
 }

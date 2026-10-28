@@ -55,5 +55,14 @@
   "report_filing_icp": "浙ICP备2026028293号",
   "report_filing_email": "客服邮箱 xgwledu@126.com",
   "report_filing_user": "Terms",
-  "report_filing_privacy": "Privacy"
+  "report_filing_privacy": "Privacy",
+  "session_done_title": "Session complete",
+  "session_done_hero": "Session complete",
+  "session_done_line": "{done} / {total} abilities measured",
+  "session_done_top_label": "Your strongest · top-scoring ability",
+  "session_done_top_score": "{ability} · {score}",
+  "session_done_top_beat": "Beats {pct}% of peers",
+  "session_done_empty_title": "No scores yet",
+  "session_done_empty_desc": "This session carries no valid score yet; the report opens once scores land.",
+  "session_done_cta_home": "Back home"
 }

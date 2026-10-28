@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ExitConfirmDialog } from "#/features/app/dialog/exit-confirm-dialog";
 import { invalidateMatchSession } from "#/features/modules/match/session";
+import { invalidateSessionReport } from "#/features/modules/report/session";
 import { m } from "#/paraglide/messages";
 import { getLocale } from "#/paraglide/runtime";
 import { GameClock } from "./clock";
@@ -24,6 +25,8 @@ interface TestAttemptProps {
   readonly engineParams: Readonly<Record<string, string>>;
   /** The session binding frozen at boot — undefined rides as practice. */
   readonly matchSessionId: string | undefined;
+  /** Land on the stored verdict, not the run (the done step's read-back). */
+  readonly review: boolean;
   /** The live session context the faces render (null = practice). */
   readonly step: StepContext | null;
   readonly category: string;
@@ -115,6 +118,7 @@ export function TestAttempt({
   durationSeconds,
   engineParams,
   matchSessionId,
+  review,
   step,
   category,
   unitLabel,
@@ -128,13 +132,22 @@ export function TestAttempt({
   // The session binding freezes at boot, same law as the engine params: a
   // mid-run invalidation must not rewire the attempt already in flight.
   const [bootSessionId] = useState(matchSessionId);
-  const [phase, setPhase] = useState<Phase>("intro");
+  // The read-back mode starts and stays on the stored verdict — the
+  // intro/run never mount a host start.
+  const [phase, setPhase] = useState<Phase>(review ? "ended" : "intro");
   const [paused, setPaused] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
   const [remainingMs, setRemainingMs] = useState(durationSeconds * 1000);
   const [endRecord, setEndRecord] = useState<AttemptRecord | null>(null);
   const submit = useMutation(submitTestAttempt, {
-    onSuccess: () => invalidateMatchSession(queryClient),
+    onSuccess: () => {
+      invalidateMatchSession(queryClient);
+      // The attempt just became the scoreboard's next line — the
+      // settlement tags and the attempts note read the refreshed truth.
+      if (bootSessionId !== undefined) {
+        invalidateSessionReport(queryClient, bootSessionId);
+      }
+    },
   });
   const { mutate: submitAttempt } = submit;
   // One submit per attempt — the guard survives StrictMode's double effect
@@ -260,14 +273,16 @@ export function TestAttempt({
       {phase === "running" && paused && (
         <PauseOverlay onExit={() => setExitOpen(true)} onResume={resumeRun} />
       )}
-      {phase === "ended" && endRecord !== null && (
+      {phase === "ended" && (review || endRecord !== null) && (
         <EndFace
           code={gameModule.code}
           engineParams={bootParams}
           onExit={backToFlow}
           onResubmit={resubmit}
           onRetry={onRetry}
-          record={endRecord}
+          record={review ? null : endRecord}
+          review={review}
+          sessionId={bootSessionId}
           step={step}
           testName={testName}
           verdict={verdict}

@@ -1,5 +1,6 @@
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
+import { getSessionReport } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import { listTests } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test-TestService_connectquery";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Check, Crosshair, Hexagon } from "lucide-react";
@@ -26,24 +27,35 @@ interface StepRowProps {
   readonly left: number;
   readonly ready: boolean;
   readonly done: boolean;
+  /** The step's session-best score — the done row's own receipt. */
+  readonly best: number | undefined;
   readonly onEnter: () => void;
 }
 
-// One lineup row: the ability face, the drawn test's name, and the retake
-// receipt (the "N/3" face, zero reads as spent). A step whose engine has
-// not shipped yet renders dimmed with a coming-soon tag instead of the
-// retake receipt — the flow's start button skips it, so the tag is what
-// keeps the row honest. A done step wears the prototype's green border and
-// check; a playable one is tappable into its intro (the prototype's step
-// rows navigate; a done step's score read-face waits on the report slice).
-function StepRow({ index, ability, name, left, ready, done, onEnter }: Readonly<StepRowProps>) {
+// One lineup row: the ability face, the drawn test's name, and the row's
+// own receipt — a done step shows its session-best score (tappable into
+// the read-back verdict, the prototype's ro entry), an undone one the
+// retake count. A step whose engine has not shipped yet renders dimmed
+// with a coming-soon tag instead — the flow's start button skips it, so
+// the tag is what keeps the row honest. A done step wears the prototype's
+// green border and check.
+function StepRow({
+  index,
+  ability,
+  name,
+  left,
+  best,
+  ready,
+  done,
+  onEnter,
+}: Readonly<StepRowProps>) {
   const word = abilityWord(ability);
-  const playable = ready && left > 0;
+  const tappable = ready && (done || left > 0);
   return (
     <button
-      className={`${done ? "border-[rgba(34,197,94,0.55)]" : "border-line"} bg-surface-card shadow-card rounded-card flex w-full items-center gap-[11px] border px-[13px] py-[11px] text-start backdrop-blur-md ${ready ? "" : "opacity-60"} ${playable ? "cursor-pointer active:opacity-80" : "cursor-default"}`}
-      disabled={!playable}
-      onClick={playable ? onEnter : undefined}
+      className={`${done ? "border-[rgba(34,197,94,0.55)]" : "border-line"} bg-surface-card shadow-card rounded-card flex w-full items-center gap-[11px] border px-[13px] py-[11px] text-start backdrop-blur-md ${ready ? "" : "opacity-60"} ${tappable ? "cursor-pointer active:opacity-80" : "cursor-default"}`}
+      disabled={!tappable}
+      onClick={tappable ? onEnter : undefined}
       type="button"
     >
       <div
@@ -63,15 +75,21 @@ function StepRow({ index, ability, name, left, ready, done, onEnter }: Readonly<
       <div className="shrink-0 text-right">
         <div className="text-ink-secondary text-[12px]">{name}</div>
         {ready ? (
-          <div className="text-ink-tertiary mt-0.5 flex items-center justify-end gap-1 text-[10px]">
-            <span>{m.match_step_time()}</span>
-            <span aria-hidden>·</span>
-            {left > 0 ? (
-              <span className="text-status-ok font-bold">{m.match_step_left({ n: left })}</span>
-            ) : (
-              <span>{m.match_step_left_zero()}</span>
-            )}
-          </div>
+          done && best !== undefined ? (
+            <div className="text-ink-tertiary mt-0.5 text-[10px] font-semibold tabular-nums">
+              {m.match_step_best({ score: Math.round(best * 10) / 10 })}
+            </div>
+          ) : (
+            <div className="text-ink-tertiary mt-0.5 flex items-center justify-end gap-1 text-[10px]">
+              <span>{m.match_step_time()}</span>
+              <span aria-hidden>·</span>
+              {left > 0 ? (
+                <span className="text-status-ok font-bold">{m.match_step_left({ n: left })}</span>
+              ) : (
+                <span>{m.match_step_left_zero()}</span>
+              )}
+            </div>
+          )
         ) : (
           <div className="text-ink-tertiary mt-0.5 text-[10px]">{m.match_step_engine_soon()}</div>
         )}
@@ -145,6 +163,17 @@ function SessionGate({ pending, error, undecided, onRetry }: Readonly<SessionGat
   );
 }
 
+// The scoreboard's code→best map — the done rows' own receipts. The
+// transport flattens the WKT wrappers to plain scalars-or-undefined,
+// narrowed once here.
+function bestScoresOf(data: { abilities?: unknown[] } | undefined): Map<string, number> {
+  return new Map(
+    ((data?.abilities ?? []) as { gameCode?: string; bestScore?: number }[]).map(
+      (a) => [a.gameCode ?? "", a.bestScore ?? 0] as const,
+    ),
+  );
+}
+
 /**
  * The match guide (prototype match-guide): genre header card, the
  * server-drawn four-ability lineup, and the flow actions. The session is
@@ -164,6 +193,17 @@ export function MatchPage() {
   const tests = testsQuery.data?.tests ?? [];
   const session = sessionQuery.data?.session ?? null;
   const steps = session?.steps ?? [];
+  // The scoreboard read-back: the done rows' session-best receipts and the
+  // read-back entries ride the same face the settlement tags read —
+  // absent on a fresh session (nothing scored yet), never blocking.
+  const reportQuery = useConnectQuery(
+    getSessionReport,
+    { sessionId: session?.id ?? "" },
+    {
+      enabled: session?.id != null,
+    },
+  );
+  const bestOf = bestScoresOf(reportQuery.data);
   const leftOf = (code: string): number => session?.retestLeft?.[code] ?? 0;
   const nameOf = (code: string) => tests.find((t) => t.code === code)?.name ?? code;
   const engineReady = (code: string): boolean => getGameModule(code) !== null;
@@ -220,15 +260,25 @@ export function MatchPage() {
             <div className="flex flex-col gap-[9px]">
               {steps.map((step, i) => {
                 const code = step.testCode ?? "";
+                const done = (session?.done ?? []).includes(code);
                 return (
                   <StepRow
                     ability={step.ability ?? ""}
-                    done={(session?.done ?? []).includes(code)}
+                    best={bestOf.get(code)}
+                    done={done}
                     index={i}
                     key={code || i}
                     left={leftOf(code)}
                     name={nameOf(code)}
-                    onEnter={() => void navigate({ to: "/test/$code", params: { code } })}
+                    onEnter={() =>
+                      void navigate({
+                        to: "/test/$code",
+                        params: { code },
+                        // A done row's tap is the read-back entry (the
+                        // prototype's ro); an undone one enters the intro.
+                        search: done ? { review: true } : {},
+                      })
+                    }
                     ready={engineReady(code)}
                   />
                 );
@@ -241,10 +291,12 @@ export function MatchPage() {
               onClick={() => {
                 if (next?.testCode != null) {
                   void navigate({ to: "/test/$code", params: { code: next.testCode } });
-                } else if (session?.anchorRecordId != null) {
+                } else if (session?.id != null && session.anchorRecordId != null) {
+                  // The finished lineup's closing ceremony owns the report
+                  // entry (prototype test-done), not this button.
                   void navigate({
-                    to: "/report/$recordId",
-                    params: { recordId: session.anchorRecordId },
+                    to: "/report/session/$sessionId",
+                    params: { sessionId: session.id },
                   });
                 }
               }}
