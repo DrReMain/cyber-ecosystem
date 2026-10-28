@@ -157,12 +157,12 @@ export function HomePage() {
 
         <StatsSection digest={digest} />
 
-        {/* The report-center entry (prototype home's 报告中心): the three
-            report types it names are later slices' faces, so the row parks
-            on the honest soon toast rather than linking nowhere. */}
+        {/* The report-center entry (prototype home's 报告中心): the four
+            aggregate faces now live, so the row routes into the center
+            that composes them. */}
         <button
           className="border-line-accent-blue bg-identity tap-zone rounded-card flex w-full items-center gap-3 border px-4 py-3.5 text-start active:opacity-60"
-          onClick={() => toast.info(m.common_soon())}
+          onClick={() => void navigate({ to: "/report/center" })}
           type="button"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(37,99,235,0.16)]">

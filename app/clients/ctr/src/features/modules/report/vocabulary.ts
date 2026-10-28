@@ -30,6 +30,23 @@ export function tierWord(tier: string): TierWord {
   return { kind: "none", letter: "·", cn: m.report_tier_none() };
 }
 
+// The eight cognitive dimensions' words — the frozen matrix's keys in
+// the wording the prototype's DIM8 vocabulary froze; an unknown key
+// renders its raw spelling, never a blank or an invented name.
+export function dimensionWord(key: string): string {
+  const table: Record<string, string> = {
+    neuralResponse: m.report_dimension_neural_response(),
+    sustainedAttention: m.report_dimension_sustained_attention(),
+    motorCoordination: m.report_dimension_motor_coordination(),
+    stressResilience: m.report_dimension_stress_resilience(),
+    resourceAllocation: m.report_dimension_resource_allocation(),
+    systemCognition: m.report_dimension_system_cognition(),
+    logicDecision: m.report_dimension_logic_decision(),
+    creativeThinking: m.report_dimension_creative_thinking(),
+  };
+  return table[key] ?? key;
+}
+
 // The per-ability badge is decorative client vocabulary — the thresholds
 // restate the contract's tier ladder (S ≥95, A ≥85, B ≥60, else C), the
 // same words the server judges the composite by.
