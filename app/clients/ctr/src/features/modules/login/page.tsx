@@ -10,7 +10,6 @@ import {
   CheckboxField,
   Form,
   Input,
-  Label,
   TextField,
 } from "react-aria-components";
 import { toast } from "sonner";
@@ -184,12 +183,11 @@ export function LoginPage() {
         {/* The prototype's .gap8 breathing room between lockup and segment. */}
         <div aria-hidden className="h-2 shrink-0" />
 
-        {/* Segment keeps the prototype's two-mode shape; the SMS tab is a
-            disabled slot until the system SMS contract exists. */}
+        {/* Segment keeps the prototype's two-mode shape and DOM order — code
+            first — so flipping the default tab on when the system SMS
+            contract exists moves no nodes. The SMS tab stays a disabled
+            slot until then. */}
         <div className="border-line-soft bg-surface-input/90 rounded-control flex gap-1 border p-1">
-          <div className="bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] font-bold">
-            {m.login_tab_password()}
-          </div>
           <button
             className="text-ink-muted flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] active:opacity-60"
             onClick={() => toast.info(m.common_soon())}
@@ -197,15 +195,30 @@ export function LoginPage() {
           >
             {m.login_tab_code()}
           </button>
+          <div className="bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] font-bold">
+            {m.login_tab_password()}
+          </div>
         </div>
 
         <Form className="flex flex-col gap-4" onSubmit={onSubmit} ref={formRef}>
-          <TextField autoComplete="username" isRequired name="account" type="text">
-            <Label className="sr-only">{m.login_account_label()}</Label>
+          {/* aria-label, not a visually-hidden Label: sr-only text still leaks
+              into innerText, and the prototype's fields are label-less. */}
+          <TextField
+            aria-label={m.login_account_label()}
+            autoComplete="username"
+            isRequired
+            name="account"
+            type="text"
+          >
             <Input className={inputClass} placeholder={m.login_account_placeholder()} />
           </TextField>
-          <TextField autoComplete="current-password" isRequired name="password" type="password">
-            <Label className="sr-only">{m.login_password_label()}</Label>
+          <TextField
+            aria-label={m.login_password_label()}
+            autoComplete="current-password"
+            isRequired
+            name="password"
+            type="password"
+          >
             <Input
               className={inputClass}
               maxLength={20}
@@ -234,30 +247,53 @@ export function LoginPage() {
           )}
 
           <div className="flex flex-col gap-1.5">
-            <CheckboxField
-              isSelected={agree.user}
-              onChange={(selected) => {
-                setAgree((prev) => ({ ...prev, user: selected }));
-                setMissing((prev) => ({ ...prev, user: false }));
-              }}
-            >
-              <CheckboxButton>
-                <div className={agreeRowClass("user")}>
-                  <AgreeBox checked={agree.user} />
-                  <span className="text-xs leading-[1.6]">
-                    {m.login_agree_prefix()}
-                    {` `}
-                    <Link
-                      className="text-link active:opacity-60"
-                      onClick={(event) => event.stopPropagation()}
-                      to="/agreement/user"
-                    >
-                      {m.login_agree_user_name()}
-                    </Link>
-                  </span>
-                </div>
-              </CheckboxButton>
-            </CheckboxField>
+            {/* The prototype reads top-to-bottom as user row, select-all (on
+              the user row's line, right edge), privacy row, then the minor
+              note indented under the checkbox column. */}
+            <div className="flex items-start justify-between gap-2.5">
+              <CheckboxField
+                isSelected={agree.user}
+                onChange={(selected) => {
+                  setAgree((prev) => ({ ...prev, user: selected }));
+                  setMissing((prev) => ({ ...prev, user: false }));
+                }}
+              >
+                <CheckboxButton>
+                  <div className={agreeRowClass("user")}>
+                    <AgreeBox checked={agree.user} />
+                    <span className="text-xs leading-[1.6]">
+                      {m.login_agree_prefix()}
+                      {` `}
+                      <Link
+                        className="text-link active:opacity-60"
+                        onClick={(event) => event.stopPropagation()}
+                        to="/agreement/user"
+                      >
+                        {m.login_agree_user_name()}
+                      </Link>
+                    </span>
+                  </div>
+                </CheckboxButton>
+              </CheckboxField>
+              <CheckboxField
+                isIndeterminate={agree.user !== agree.privacy}
+                isSelected={agree.user && agree.privacy}
+                onChange={(selected) => {
+                  setAgree({ privacy: selected, user: selected });
+                  setMissing({ privacy: false, user: false });
+                }}
+              >
+                <CheckboxButton>
+                  <div className="text-ink-secondary flex items-center gap-2 font-bold whitespace-nowrap">
+                    <AgreeBox
+                      checked={agree.user && agree.privacy}
+                      indeterminate={agree.user !== agree.privacy}
+                    />
+                    <span className="text-sm">{m.login_agree_all()}</span>
+                  </div>
+                </CheckboxButton>
+              </CheckboxField>
+            </div>
             <CheckboxField
               isSelected={agree.privacy}
               onChange={(selected) => {
@@ -282,30 +318,9 @@ export function LoginPage() {
                 </div>
               </CheckboxButton>
             </CheckboxField>
-            {/* Select-all rides the user row's line: one tap covers both. */}
-            <div className="flex items-start justify-between gap-2.5">
-              <span className="text-ink-tertiary ml-6.25 text-[10.5px] leading-snug">
-                {m.login_agree_minor_note()}
-              </span>
-              <CheckboxField
-                isIndeterminate={agree.user !== agree.privacy}
-                isSelected={agree.user && agree.privacy}
-                onChange={(selected) => {
-                  setAgree({ privacy: selected, user: selected });
-                  setMissing({ privacy: false, user: false });
-                }}
-              >
-                <CheckboxButton>
-                  <div className="text-ink-secondary flex items-center gap-2 font-bold whitespace-nowrap">
-                    <AgreeBox
-                      checked={agree.user && agree.privacy}
-                      indeterminate={agree.user !== agree.privacy}
-                    />
-                    <span className="text-sm">{m.login_agree_all()}</span>
-                  </div>
-                </CheckboxButton>
-              </CheckboxField>
-            </div>
+            <span className="text-ink-tertiary ml-6.25 text-[10.5px] leading-snug">
+              {m.login_agree_minor_note()}
+            </span>
           </div>
 
           <Button
@@ -344,15 +359,15 @@ export function LoginPage() {
           >
             {m.login_forgot()}
           </button>
-          <span className="mx-1.5">·</span>
+          <span className="mx-1">{" · "}</span>
           <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/user">
-            {m.login_agree_user_name()}
+            {m.login_footer_user()}
           </Link>
-          <span className="mx-1.5">·</span>
+          <span className="mx-1">{" · "}</span>
           <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/privacy">
-            {m.login_agree_privacy_name()}
+            {m.login_footer_privacy()}
           </Link>
-          <span className="mx-1.5">·</span>
+          <span className="mx-1">{" · "}</span>
           <Link className="tap-zone text-link py-1 active:opacity-60" to="/">
             {m.login_footer_home()}
           </Link>
