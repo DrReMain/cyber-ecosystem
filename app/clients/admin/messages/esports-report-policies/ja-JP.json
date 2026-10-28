@@ -1,0 +1,17 @@
+{
+  "esports_report_policies_title": "レポートアクセス方針",
+  "esports_report_policies_col_family": "レポート",
+  "esports_report_policies_col_policy": "方針",
+  "esports_report_policies_col_state": "状態",
+  "esports_report_policies_col_updated_by": "設定者",
+  "esports_report_policies_col_updated_at": "設定日時",
+  "esports_report_policies_col_actions": "操作",
+  "esports_report_policies_policy_open": "オープン",
+  "esports_report_policies_policy_membership": "メンバー",
+  "esports_report_policies_policy_closed": "クローズ",
+  "esports_report_policies_state_default": "デフォルト",
+  "esports_report_policies_state_overridden": "上書き済み",
+  "esports_report_policies_act_set": "方針設定",
+  "esports_report_policies_set_title": "アクセス方針を設定",
+  "esports_report_policies_empty": "データがありません"
+}

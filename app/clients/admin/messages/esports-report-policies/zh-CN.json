@@ -1,0 +1,17 @@
+{
+  "esports_report_policies_title": "报告访问策略",
+  "esports_report_policies_col_family": "报告",
+  "esports_report_policies_col_policy": "策略",
+  "esports_report_policies_col_state": "状态",
+  "esports_report_policies_col_updated_by": "设置人",
+  "esports_report_policies_col_updated_at": "设置时间",
+  "esports_report_policies_col_actions": "操作",
+  "esports_report_policies_policy_open": "开放",
+  "esports_report_policies_policy_membership": "会员",
+  "esports_report_policies_policy_closed": "关闭",
+  "esports_report_policies_state_default": "默认",
+  "esports_report_policies_state_overridden": "已覆盖",
+  "esports_report_policies_act_set": "设置策略",
+  "esports_report_policies_set_title": "设置访问策略",
+  "esports_report_policies_empty": "暂无数据"
+}

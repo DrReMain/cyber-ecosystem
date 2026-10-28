@@ -1,0 +1,1 @@
+export { ReportPoliciesPage } from "./page";

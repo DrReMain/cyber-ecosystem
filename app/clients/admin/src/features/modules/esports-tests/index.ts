@@ -1,0 +1,1 @@
+export { EsportsTestsPage } from "./page";

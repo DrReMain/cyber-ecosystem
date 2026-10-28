@@ -1,0 +1,17 @@
+{
+  "esports_report_policies_title": "Report Access Policies",
+  "esports_report_policies_col_family": "Report",
+  "esports_report_policies_col_policy": "Policy",
+  "esports_report_policies_col_state": "State",
+  "esports_report_policies_col_updated_by": "Set by",
+  "esports_report_policies_col_updated_at": "Set at",
+  "esports_report_policies_col_actions": "Actions",
+  "esports_report_policies_policy_open": "Open",
+  "esports_report_policies_policy_membership": "Membership",
+  "esports_report_policies_policy_closed": "Closed",
+  "esports_report_policies_state_default": "Default",
+  "esports_report_policies_state_overridden": "Overridden",
+  "esports_report_policies_act_set": "Set policy",
+  "esports_report_policies_set_title": "Set access policy",
+  "esports_report_policies_empty": "No data"
+}

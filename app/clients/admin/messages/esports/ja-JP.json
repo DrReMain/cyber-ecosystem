@@ -1,3 +1,6 @@
 {
-  "esports_title": "eスポーツ"
+  "esports_title": "eスポーツ",
+  "esports_report_type_cognitive": "認知レポート",
+  "esports_report_type_career": "キャリアレポート",
+  "esports_report_type_school": "スクールレポート"
 }

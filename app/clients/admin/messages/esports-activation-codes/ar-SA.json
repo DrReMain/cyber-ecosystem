@@ -1,0 +1,18 @@
+{
+  "esports_activation_codes_title": "رموز التفعيل",
+  "esports_activation_codes_total": "{n} إجمالي",
+  "esports_activation_codes_filter_type": "نوع التقرير",
+  "esports_activation_codes_col_code": "الرمز",
+  "esports_activation_codes_col_type": "نوع التقرير",
+  "esports_activation_codes_col_expires": "تاريخ الانتهاء",
+  "esports_activation_codes_col_created": "تاريخ الإنشاء",
+  "esports_activation_codes_empty": "لا توجد رموز تفعيل",
+  "esports_activation_codes_generate": "إنشاء دفعة",
+  "esports_activation_codes_generate_submit": "إنشاء",
+  "esports_activation_codes_generate_type": "نوع التقرير",
+  "esports_activation_codes_generate_count": "العدد",
+  "esports_activation_codes_generate_days": "الصلاحية (أيام)",
+  "esports_activation_codes_generate_success": "تم إنشاء {n} رمزًا",
+  "esports_activation_codes_generate_hint": "تُحفظ الرموز كنص واضح لإعادة نسخها؛ كل رمز يُستبدل مرة واحدة",
+  "esports_activation_codes_col_progress": "التقدم"
+}

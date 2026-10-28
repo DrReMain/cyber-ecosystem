@@ -121,5 +121,6 @@
   "error_ESPORTS_REPORT_POLICY_NOT_READY": "That policy is not available yet; try again later",
   "error_ESPORTS_REPORT_RECORD_NOT_FOUND": "The test record was not found",
   "error_ESPORTS_REPORT_RECORD_NOT_OWNED": "You can only view your own reports",
-  "error_ESPORTS_REPORT_RECORD_INVALID": "That test record is invalid and has no report"
+  "error_ESPORTS_REPORT_RECORD_INVALID": "That test record is invalid and has no report",
+  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "You can only view your own results"
 }

@@ -121,5 +121,6 @@
   "error_ESPORTS_REPORT_POLICY_NOT_READY": "该策略暂未启用，请稍后再试",
   "error_ESPORTS_REPORT_RECORD_NOT_FOUND": "测评记录不存在",
   "error_ESPORTS_REPORT_RECORD_NOT_OWNED": "只能查看自己的测评报告",
-  "error_ESPORTS_REPORT_RECORD_INVALID": "该测评记录无效，无法生成报告"
+  "error_ESPORTS_REPORT_RECORD_INVALID": "该测评记录无效，无法生成报告",
+  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "只能查看自己的测评成绩"
 }

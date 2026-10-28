@@ -1,0 +1,18 @@
+{
+  "esports_activation_codes_title": "Activation Codes",
+  "esports_activation_codes_total": "{n} total",
+  "esports_activation_codes_filter_type": "Report type",
+  "esports_activation_codes_col_code": "Code",
+  "esports_activation_codes_col_type": "Report type",
+  "esports_activation_codes_col_expires": "Expires at",
+  "esports_activation_codes_col_created": "Created at",
+  "esports_activation_codes_empty": "No activation codes",
+  "esports_activation_codes_generate": "Generate batch",
+  "esports_activation_codes_generate_submit": "Generate",
+  "esports_activation_codes_generate_type": "Report type",
+  "esports_activation_codes_generate_count": "Count",
+  "esports_activation_codes_generate_days": "Validity (days)",
+  "esports_activation_codes_generate_success": "Generated {n} codes",
+  "esports_activation_codes_generate_hint": "Codes are stored in clear text for re-copying; each code redeems once",
+  "esports_activation_codes_col_progress": "Redeemed"
+}

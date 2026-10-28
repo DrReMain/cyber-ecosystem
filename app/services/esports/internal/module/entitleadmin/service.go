@@ -163,7 +163,10 @@ func reportTypeToPB(f string) esportspb.ReportType {
 
 func codePB(r *entitle.ActivationCode) *esportspb.ActivationCode {
 	row := &esportspb.ActivationCode{
-		ReportType: esportspb.ReportType(esportspb.ReportType_value[r.ReportType]),
+		// The DO carries the domain word ("career"), not the proto value
+		// name — the enum lookup table keyed on proto names answered
+		// UNSPECIFIED for every row; the inverse mapper is the right door.
+		ReportType: reportTypeToPB(r.ReportType),
 		Quantity:   utils.Int32W(utils.ConvNum[int32, int](r.Quantity)),
 		UsedCount:  utils.Int32W(utils.ConvNum[int32, int](r.UsedCount)),
 		ExpiresAt:  utils.ToTimestamp(&r.ExpiresAt),
