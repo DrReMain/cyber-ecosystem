@@ -9,7 +9,7 @@
 
 ## 时间轴总览(检查点与降级梯见文末)
 
-> **实况(2026-10-28,W2 尾,M1 全片收满)**:E0-E10+H 线全收(E5 全族 10-28;E-line-a 回位收口,E-line-b hzy 进行中);支付 PAY-C0/C1 代码面+PAY1 五片收,**CP1 支付门 10-25 提前 14 天实测达成**(行政件=类目补设+H5 权限+APIv3 密钥 32 位核对);hzy 线全并 main(MR!6/!9);verify 工作台冻结(7ec87dea,重激活=开发完成后);ljr 待裁件=P13/P4/P7/P10(P15 已裁 D-AP,E5b 解锁);E5b 全簇 10-28 收口;候选下一片=E6c/PAY2(行政件后)/MIG1。逐片状态见 progress.md 认领表。
+> **实况(2026-10-28,W2 尾,M1 全片收满)**:E0-E10+H 线全收(E5 全族 10-28;E-line-a 回位收口,E-line-b hzy 进行中);支付 PAY-C0/C1 代码面+PAY1 五片收,**CP1 支付门 10-25 提前 14 天实测达成**(行政件=类目补设+H5 权限+APIv3 密钥 32 位核对);hzy 线全并 main(MR!6/!9);verify 工作台冻结(7ec87dea,重激活=开发完成后);ljr 待裁件=P4/P7/P10(P13 已签 D-AS,P15 已裁 D-AP);E5b 全簇 10-28 收口;E6c 进行中(0+a 已收 bf0a99a0,余 b-d);D-AS 召回入窗:消息中心+反馈、分享裂变(+2 切片,建议 W7-W8);候选下一片=PAY2(行政件后)/MIG1。逐片状态见 progress.md 认领表。
 
 | 窗口 | 日期 | 服务线(建议用户) | 客户端线(建议 hzy) | 产品线(ljr) |
 |---|---|---|---|---|
@@ -37,13 +37,13 @@
 | ✅ E3 评分引擎(13 款收满) | 三层:指标单源(metric.md)/门槛百分位/评分双轨(线性+权威分位);Tier A 10/10 后 Tier B 三款升格消亡(71c33f4f);ScorerRegistry 插件+提交缝(4c5f0617);题库种子增量=旧库经验数据(D-AL);§指针存量清扫同日(43fd4b3d) | E0,E2 | XL |
 | ✅ E4 匹配引擎 | match_config+类型轴多数投票+两层编排+当日 seed+session 锁死落库+重测 3|1;细锚(D-AL:续测 7 天反推/超窗重排/切后台 is_valid 入库)全落;e2e 三验收全绿(704c3388/07b87349/43fd4b3d) | E2 | M |
 | ✅ E5 报告框架+能力报告(10-28 全族收满) | 板块插件化(supports)+缺维不渲染+同龄百分位+档位四色;细锚(D-AL:同龄同性别/档位快照固化/较上局=上一场/完整度 X/8)全落;报告文案五区后台可配;E5-e 溶片处置 10-28(服务端锚=E-line-a,客户端断言=E10) | E3 | L |
-| E5b 报告簇扩片(**E5b-0 定案 10-28,拆片 a-e**;认领 lzx) | 范围(D-AP)=报告中心四卡+认知 8 维策略渲染面(ToC 默认 closed 零入口)+成长趋势基础层(b4 免费;进阶=跨报告对比/训练处方/分位漂移随会员)+职业聚合只读页(D-AB 默认 open);称号映射随 P2。GL D1-D3 均有载体(D1=metric §七冻结/D2=综合分等权律/D3=cohort 键降级律)。**拆片**:a 契约三读面(S)→b 认知+趋势聚合(M)→c 职业聚合(M)→d ctr 四页(M-L,D-AQ 渲染态前置)→e 策略翻转 e2e(S)。**语料三裁**:①历史最佳百分位现无数据源(AbilityBests 诚实 null;ability_score 百分位列从未写)→read-time 复用 percentileFor(输入=best,同 cohort 键),快照仍唯一冻结源;digest best_percentile 随 b 回填销遗留。②职业页原型仅关闭态(「暂未开放·后台开关控制」),开放态=旧仓语义级(careerPotentials/RFS §5.4/OpenAPI 认知报告区)=D-AQ 白名单①。③旧 A/B/C/D 等级表废止,新档位 S/A/B/C 唯一;认知综合分=已渲染维度等权均值(缺维不计 0,与能力报告同律);趋势混类=FPS/MOBA 能力集不同综合分不可横比,序列按能力出+带 genre。策略执法=聚合响应内嵌判定(判定序复用);报告中心=组合既有面(digest+双 access)不立新 RPC。验收=缺维渲染收拢+策略翻转 e2e(片 e) | E5,P15(D-AP);称号随 P2 | L |
+| ✅ E5b 报告簇扩片(10-28 全簇收口 a-e;认领 lzx) | 范围(D-AP)=报告中心四卡+认知 8 维策略渲染面(ToC 默认 closed 零入口)+成长趋势基础层(b4 免费;进阶=跨报告对比/训练处方/分位漂移随会员)+职业聚合只读页(D-AB 默认 open);称号映射随 P2。GL D1-D3 均有载体(D1=metric §七冻结/D2=综合分等权律/D3=cohort 键降级律)。**拆片**:a 契约三读面(S)→b 认知+趋势聚合(M)→c 职业聚合(M)→d ctr 四页(M-L,D-AQ 渲染态前置)→e 策略翻转 e2e(S)。**语料三裁**:①历史最佳百分位现无数据源(AbilityBests 诚实 null;ability_score 百分位列从未写)→read-time 复用 percentileFor(输入=best,同 cohort 键),快照仍唯一冻结源;digest best_percentile 随 b 回填销遗留。②职业页原型仅关闭态(「暂未开放·后台开关控制」),开放态=旧仓语义级(careerPotentials/RFS §5.4/OpenAPI 认知报告区)=D-AQ 白名单①。③旧 A/B/C/D 等级表废止,新档位 S/A/B/C 唯一;认知综合分=已渲染维度等权均值(缺维不计 0,与能力报告同律);趋势混类=FPS/MOBA 能力集不同综合分不可横比,序列按能力出+带 genre。策略执法=聚合响应内嵌判定(判定序复用);报告中心=组合既有面(digest+双 access)不立新 RPC。验收=缺维渲染收拢+策略翻转 e2e(片 e) | E5,P15(D-AP);称号随 P2 | L |
 | ✅ E6a ctr 纯壳 | TanStack Start+react-aria/tailwind(D-R)+dark-only(D-S)+路由骨架(D-T)+微信 WebView 适配基线(safe-area/键盘 vh/无 hover);paraglide zh-CN/en-US;SEO 全量面(robots/sitemap/noindex/title);四包 UI-free 接线 | — | M |
 | ✅ E6b 登录+画像流 | 微信/手机登录(消费 system 既有契约,不等 E0)+画像流(昵称必填/出生年月 8 档/未满 13 监护人硬闸/游戏偏好);微信真人链路 e2e 绿;遗留随对应片(SMS=E6c/consent=H2 真源/上限口径已裁写死) | E6a,E0(画像流半片) | L |
-| E6c 账号域收口(2026-10-23 终局对账立片) | SMS 骨架落地(README §1 已裁分层:capability+system provider)+密码登录/密码管理页(b3 §01 三路收齐)+绑定/合并流(b3 §02b:PHONE_EXIST/WECHAT_OPENID_EXIST 冲突拦截/自绑幂等/重绑解绑走客服/富吞贫一次性+审计)+account-security 聚合页;收编遗留清单 SMS 散行。**E6c-0 定案(2026-10-28)**:拆片 a SMS 能力+发码契约+SMS 登录(S-M,**✅ 10-28**)→b 绑定+合并(M)→c ctr 客户端面(M-L,D-AQ 渲染态前置)→d 三路 e2e+微信 transport 注入缝+散行收编(M);语料裁定:①capability/sms 家族照 10-20 分层(payment 家族模板,dysmsapi+log 双实现+conformance),验证码存 cache 家族(TTL+counter 限速),provider 住 auth 模块与微信同层;②SMS 无跳转可铸——发码=新 PUBLIC RPC(限速),登录=LoginByIdentity oneof 加 sms{phone,code}(breaking 复核);③BindCredential 加 sms payload+契约自点名的 state→发起会话缺口必补;冲突拦截错误码族+自绑幂等;重绑解绑=客服语义无自助;④合并=富吞贫一次性+审计,双方有数据不自动并(e2e 反例锚);⑤密码三态:修改=既有 ChangePassword,设置(无密首登)+忘记(SMS 验证码)为契约增量;⑥account-security 独立页形态本片定。验收=三登录路 e2e+合并反例(双方有数据不自动并)+冲突拦截反例。**10-25 联动注**:SMS 登录=手机浏览器支付腿(H5)前置;openid 绑定流=微信内 JSAPI 支付凭据(openid)供给者——E6c 优先级与 PAY 联动;微信 OAuth transport 注入缝(授权登录 dev 全链自动化,补 E6b 真人依赖课)随本片 | E6b,system provider 片,E0 增量(绑定契约) | M-L |
+| E6c 账号域收口(2026-10-23 终局对账立片) | SMS 骨架落地(README §1 已裁分层:capability+system provider)+密码登录/密码管理页(b3 §01 三路收齐)+绑定/合并流(b3 §02b:PHONE_EXIST/WECHAT_OPENID_EXIST 冲突拦截/自绑幂等/重绑解绑走客服/富吞贫一次性+审计)+account-security 聚合页;收编遗留清单 SMS 散行。**E6c-0 定案(2026-10-28)**:拆片 a SMS 能力+发码契约+SMS 登录(S-M,**✅ 10-28**)→b 绑定+合并(M)→c ctr 客户端余面(M-L,D-AQ 渲染态前置;登录面已随 a 提前)→d 三路 e2e+微信 transport 注入缝+散行收编(M);语料裁定:①capability/sms 家族照 10-20 分层(payment 家族模板,dysmsapi+log 双实现+conformance),验证码存 cache 家族(TTL+counter 限速),provider 住 auth 模块与微信同层;②SMS 无跳转可铸——发码=新 PUBLIC RPC(限速),登录=LoginByIdentity oneof 加 sms{phone,code}(breaking 复核);③BindCredential 加 sms payload+契约自点名的 state→发起会话缺口必补;冲突拦截错误码族+自绑幂等;重绑解绑=客服语义无自助;④合并=富吞贫一次性+审计,双方有数据不自动并(e2e 反例锚);⑤密码三态:修改=既有 ChangePassword,设置(无密首登)+忘记(SMS 验证码)为契约增量;⑥account-security 独立页形态本片定。验收=三登录路 e2e+合并反例(双方有数据不自动并)+冲突拦截反例。**10-25 联动注**:SMS 登录=手机浏览器支付腿(H5)前置;openid 绑定流=微信内 JSAPI 支付凭据(openid)供给者——E6c 优先级与 PAY 联动;微信 OAuth transport 注入缝(授权登录 dev 全链自动化,补 E6b 真人依赖课)随本片 | E6b,E0 增量(绑定契约) | M-L |
 | ✅ E7 游戏框架+13 款(10-25 收满) | 统一引擎框架(rAF+墙钟计时+暂停顺延单实现)+遥测新契约+参数化单流程路由+配置驱动运行时+真响应式横竖屏;三批收满(反应瞄准/追踪技能/决策资源);定律族立档(采样网格锚/自然终局/出生间距/开场布局;nil 让渡律) | E6,E3 | XL |
 | ✅ E8 权益最小面(10-25 三片收满) | a 结构(entitle 模块自立+激活码全结构+兑换仲裁=条件 UPDATE+scope 词表单源)/b 验收锚(十人竞兑不超卖 e2e+report_policy 面+判定序:码兑>policy>默认)/c 会员衍生解锁(事件钩子 TrialGrantHook);架构审查收口两裁落地(进程内事件面+跨模块写两合法形法条回灌 kratos §1;operator 面拆形);**R7 修订:过期=事实(expires_at)非状态,每日扫描不落码(触发器=提醒/通知系统出现)** | E2 | M |
-| ✅ E9 最小 admin 面(10-28) | admin 挂 esports 模块:激活码+测试项/配置+报告策略+题库查看(c1ca75d3+5895f1a8);闭环 e2e(开码→兑换→CODE_REDEEMED);O-1/2/3 裁定照用;**S4 增量锚(题库 CRUD/Excel 导入/批量导入/compliance-config/协议版本管理/测试记录明细)剪裁随 P13 签认定** | E0 | M |
+| ✅ E9 最小 admin 面(10-28) | admin 挂 esports 模块:激活码+测试项/配置+报告策略+题库查看(c1ca75d3+5895f1a8);闭环 e2e(开码→兑换→CODE_REDEEMED);O-1/2/3 裁定照用;**S4 增量锚剪裁已定(D-AS⑥,10-28):协议版本管理+compliance-config 随 E9 增量入窗;题库 CRUD/Excel/批量导入/测试记录明细随 M2 余组;报告配置面梯①** | E0 | M |
 | ✅ E10 全链 e2e(10-28) | login 九红条消化(D-AQ 首片)+ctr 首 Playwright 全链 spec(CTR_E2E 门控;两 fixture 法=反应池收窄+cohort 样本,finally 全净清);原型断言语义级移植为验收基线(D-O)兑现 | 全部 | M |
 | ✅ E-line-a 测试回位·esports 23 件(10-28 收口) | 三家园回位:unit 17 原位直回/e2e 3 迁 internal/e2e(ENT_E2E 门)/guards 3 迁 internal/guards(法条=kratos §7);含 E5-e 溶片锚(五幕+读回+composite 一致性) | 骨架法条已立(§7) | M |
 | E-line-b 测试回位·ctr 18 件(2026-10-27 审查役立片) | 同役 ctr 面,法条=tanstack §11 两家园:colocated vitest 原位直回(domains/error 1+test 模块根 4 件+13 games logic);基建已就位(vitest 5/jsdom 30/test target 全回)。验收=ctr:test 全绿+用例数对账 vs 剥离前 | — | M |
@@ -81,8 +81,8 @@
 
 ## M2 运营与变现(核心组 W5-W7;余组 W8 可降级梯①)
 
-- **核心组(承诺窗口内)**:会员/权益终态(按 D-AB)+SKU 多档;激活码全面(批次/导出/核销视图);订单+解锁记录;用户列表+档案核心 Tab。
-- **余组(梯①候选,上线后首迭代)**:评级管理(P2)/增长裂变(分享卡+ref HMAC+归因)/消息中心/反馈客服/ToB 租户视图/仪表盘/报告配置面。
+- **核心组(承诺窗口内)**:会员/权益终态(按 D-AB)+SKU 多档;激活码全面(批次/导出/核销视图);订单+解锁记录;用户列表+档案核心 Tab(首面已前拉 10-20);**D-AS(10-28)召回入窗**:消息中心/反馈客服、增长裂变(分享卡+ref HMAC+归因)——+2 切片,建议 W7-W8,未完走梯③。
+- **余组(梯①候选,上线后首迭代)**:评级管理(P2)/ToB 租户视图/仪表盘/报告配置面。
 
 ## M3 专版(承诺日外 buffer:12 月底-1 月中)
 

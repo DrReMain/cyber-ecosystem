@@ -6,7 +6,7 @@
 
 | 人 | 已交付(均已并 esports/main) | 当前 → 下一片 |
 |---|---|---|
-| lzx | E0-E2、E3 评分(13 款收满,71c33f4f;§指针清扫 43fd4b3d)、E4 匹配全量(704c3388/07b87349)、E6a/E6b、E7-a..e 13 款引擎收满(fa866414/dcce4fc6/1ce16289)、V1-V4+B 批(6b98c886/865511c1)、会员读面+admin 用户管理(88bcd9ba/3f272b28)、组合缝(a8b9f0a4)、校准战役 S1-S4+D-AL(9e0478e6/fe73a63a/1c1a8424)、支付 PAY-C0 四片+PAY-C1 四片+PAY1 五片(CP1 支付门 10-25 提前达成;APIv3 密钥 33 字符待核=回调解密/CP3 前必须修)、流转批三件(ICP 备字+种子国服重播;偏好上限终态=常量写死,10-26 二裁推翻 config 化)、E8 权益三片(10-25 收满,含架构审查收口)、E5-0 定案+a/b1/b/c(10-26,二轮审查 15 项修复批同日)、MR!9 吸收+wire-stamp 修复笔(e62ce8c6,10-27)、E5-d+E5-f 读回面族(E5-d 69721f93/f 族 0ae81a28,10-28)、E9 最小 admin 面(c1ca75d3+5895f1a8,10-28)、D-AQ 设计对齐前置法立档(abacc542)、E10 全链 e2e(login 九红条消化+Playwright 全链,10-28) | **M1 全片收满**→**E5b 全簇收口**(10-28)→**▶ E6c 账号域收口**(10-28 认领;E6c-0+a 已收,余 b-d;PAY 联动片) |
+| lzx | E0-E2、E3 评分(13 款收满,71c33f4f;§指针清扫 43fd4b3d)、E4 匹配全量(704c3388/07b87349)、E6a/E6b、E7-a..e 13 款引擎收满(fa866414/dcce4fc6/1ce16289)、V1-V4+B 批(6b98c886/865511c1)、会员读面+admin 用户管理(88bcd9ba/3f272b28)、组合缝(a8b9f0a4)、校准战役 S1-S4+D-AL(9e0478e6/fe73a63a/1c1a8424)、支付 PAY-C0 四片+PAY-C1 四片+PAY1 五片(CP1 支付门 10-25 提前达成;APIv3 密钥 33 字符待核=回调解密/CP3 前必须修)、流转批三件(ICP 备字+种子国服重播;偏好上限终态=常量写死,10-26 二裁推翻 config 化)、E8 权益三片(10-25 收满,含架构审查收口)、E5-0 定案+a/b1/b/c(10-26,二轮审查 15 项修复批同日)、MR!9 吸收+wire-stamp 修复笔(e62ce8c6,10-27)、E5-d+E5-f 读回面族(E5-d 69721f93/f 族 0ae81a28,10-28)、E9 最小 admin 面(c1ca75d3+5895f1a8,10-28)、D-AQ 设计对齐前置法立档(abacc542)、E10 全链 e2e(login 九红条消化+Playwright 全链,10-28) | **M1 全片收满**→**E5b 全簇收口**(10-28)→**▶ E6c 账号域收口**(10-28 认领;E6c-0+a 已收 bf0a99a0,余 b-d;PAY 联动片) |
 | hzy | H1/H2/H-A/H-B、10-22 精修批、10-23 H-C 判定回路(真人链路验收;撞面合流正身=E4-c 版)、10-23/24 设计保真批(MR!6 于 10-25 并入 main,599dddce)、10-26 走查修批九条(93f67de3..179b1af2,见归档;vitest 112→115)、10-27 验收收口(tm/home-D5 亲验)+性别卡(6beff1c1,销 D-AN 流转半边)+走查下午批(MR!9 已并 main) | **下一片:E-line-b ctr 测试回位**(10-28 派定,18 件两家园直回,机械面;顺手项平均决策由 MR 内 12dc76a5 销) |
 | ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批、P15 报告簇(D-AP,10-28) | 待裁:P16 文案键半边(待标定款回执)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6;~~P13 已签毕(D-AS)~~;~~P15/P8/P11/P12 已裁(D-AN/D-AM/D-AP,10-28 刷新)~~ |
 
@@ -38,7 +38,7 @@
 | PAY-C0/C1+PAY1-3 支付片 | PAY-C0✅+PAY-C1✅全收含真握手(lzx,10-25);PAY1✅五片(lzx,10-25);PAY2-3 未认领 | C0 契约/v3crypto/mock/35xx 四片落地;C1 传输核/五法/回调/账单/live 探针落地(公钥模式主路径);**CP1 门✅10-25 实测:真渠道握手 404+验签绿+absent-order 折叠 NotFound(凭据经授权从 GitLab wiki 取,/tmp 隔离不入库)**;P1 已定(D-AB/AC);商户资质就绪;**APIv3 密钥 wiki 记录 33 字符(应 32)待核对——握手/查单不受影响(不解密),回调解密与 CP3 前必须修正**;遗留=经营类目补设+H5 支付权限申请(建议即办);新依赖=JSAPI 需商户绑定 appid 域 openid,公众号测试号绑不了商户,上线前登录切真实公众号 appid |
 | MIG1 迁移工具片 | — | 未认领 | 2026-10-23 终局对账立片;W6-W7 建/W8 预演;school 步时序=P14;依赖 E8/PAY1/E5 |
 | E5b 报告簇扩片 | lzx | E5b-0/a/b/c/d/e ✅ 10-28 全簇收口 | E5b-0=设计定案+拆片+语料三裁(详见 plan 行):历史最佳百分位=read-time 复用 percentileFor(现无数据源);职业开放态=旧仓语义级(原型仅关闭态);旧 A/B/C/D 等级表废止;策略执法内嵌聚合响应。a=契约三读面(report.proto 增 GetCognitive/GetTrend/GetCareerReport,全 BUILTIN,ReportAccessVerdict 判定内嵌三响应,趋势点带 genre,职业=推荐行+差距处方单数组,零新错误码;gen 11 文件纯增量,breaking/build/test/ctr:build 真码全绿)。b=认知+趋势聚合落地+digest 百分位回填(**B 裁定:判定序上移 shared.ReportAccessVerdict 单源双消费,entitle GetReportAccess 重构为消费方;AccessJudge UC→UC 注入形违 kratos §1 红线被用户叫停撤形**;退化池黄金锚=cohort 全员同分→侧席恒 50,八维全 50/tier C/缺维法 4 能力喂 2 维;趋势=ScoredSessions 时序+快照优先 live 兜底;ENT_E2E 活栈全绿含 guards)。c=职业聚合落地(careerAreas 四域种子库:旧仓门控 75/70+min 匹配 transcribe,维 key 经 metric.md 映射表译至冻结矩阵拼写;处方=已渲染维升序最低 4 行,target=系统 tierA 85 单源零私设线,gap 负值禁出;双 helper reportAccessOf/renderedDims 重构认知面同源零复制;库事实=行业级统计借挂(career_statistics 青训 95%/日均 12-14 小时),分域数据待 ljr;真空白用户空页断言;ENT_E2E 活栈全量绿)。e=翻转+零值锚 e2e(career/cognitive 置 closed:显式行压过 membership 而兑换码压过行,covered 仍公开,趋势 advanced 免疫一并钉界;独立 cohort 键 2009 造确定性 100→gap=0 已达线行=protojson 零值回归线;partial 趋势恰 4 序列收拢缺维;净清 8 探针 0) |
-| E6c 账号域收口 | lzx | E6c-0+a ✅ 10-28;余 b-d | 2026-10-23 终局对账立片;SMS+密码+绑定合并;收编 SMS 散遗留行;**10-25 联动注:SMS=手机浏览器支付腿(H5)前置,openid 绑定流=微信内 JSAPI 凭据供给,E6c 优先级与 PAY 联动;微信 OAuth transport 注入缝随本片**;E6c-0=拆片 a-d+语料六裁(详见 plan 行:capability/sms 家族照 payment 模板/发码新 PUBLIC RPC/BindCredential 补 state 系会话/合并=富吞贫+审计/密码三态增量/account-security 形态本片定);**a(10-28)**:capability/sms 家族落地(payment 模板:Message/Sender+哨兵 36xx 映射+dysmsapi 手写 RPC 签名客户端(协议强制 HMAC-SHA1,G505 行内 #nosec 特例——法条唯一例外类,优于 config 级豁免;openssl 金向量+httptest 协议真验签探针)+mock 后端 New/Open/ControllerOf+双 conformance);system 契约=SendSmsCode PUBLIC RPC(发码即铸同款 one-shot state,LoginByIdentity required state 零改动滑入既有 cashState)+payload oneof 加 sms{phone,code}(breaking 绿)+SYSTEM_SMS_RATE_LIMITED/CODE_INVALID 6006/6007;auth 模块=registry 重构(init 注册→wire 注入 map,redirectProvider/codeIssuer 接口隔离)+smsProvider(IssueCode 限速铸码发码+Exchange GetDel 烧码+大陆手机号 canonical);conf sms 行加显式 backend 选择(dysmsapi=强制真实缺凭据 boot 错/mock=固定不拨号/空=按凭据自动,与 payment 平台同款开关——真实通道验一次全链后开发固定 mock 省成本)+compose 镜像;双端 copy 7 locale;ENT_E2E=发码→窗口限速→错码烧码→state 重放拒→全链落会员净清;**审查修(10-28 三轴对审)**:NewSms 补 mock/dysmsapi 显式分支+unknown 值拒 boot(装配表测 100%)+container/config 镜像 sms 行+e2e 全腿穿 service 层+日上限恰 10/11 边界+失败发码覆盖旧码生命周期锚+非 issuer 拒镜像+dysmsapi 传输三形态(坏端点/短体/net.Error 超时)+Timestamp ISO 断言+兄弟熵失败统一返错(panic 消)+state 铸造去重;覆盖率实测 sms 家族 93%/platform_sms 100%;**ctr 接入+双轮拟真(10-28 晚,原 c 段登录面提前)**:登录页 SMS tab 转真(码 tab 默认/useSmsLogin hook+ui/sms-fields 拆分/手机号双闸实时校验/60s 倒计时换号清窗——服务端才是真限速器/发送也过协议门/infra 族 reason 兜底文案不再静默);mock 轮+真实通道轮(Aliyun dysmsapi,APP_SMS_ 前缀 env 注入)Chrome 拟人操作全链均绿:发码→真手机收码→登录→新用户向导→落 member 座→净清;live conformance 真通道 PASS(签名/凭据/模板被真 edge 接受);kratos env 注入唯一入口=APP_ 前缀(裸变量静默忽略) |
+| E6c 账号域收口 | lzx | E6c-0+a ✅ 10-28;余 b-d | 2026-10-23 终局对账立片;SMS+密码+绑定合并;收编 SMS 散遗留行;**10-25 联动注:SMS=手机浏览器支付腿(H5)前置,openid 绑定流=微信内 JSAPI 凭据供给,E6c 优先级与 PAY 联动;微信 OAuth transport 注入缝随本片**;E6c-0(10f67ab2)=拆片 a-d+语料六裁(详见 plan 行:capability/sms 家族照 payment 模板/发码新 PUBLIC RPC/BindCredential 补 state 系会话/合并=富吞贫+审计/密码三态增量/account-security 形态本片定);**a(10-28,bf0a99a0)**:capability/sms 家族落地(payment 模板:Message/Sender+哨兵 36xx 映射+dysmsapi 手写 RPC 签名客户端(协议强制 HMAC-SHA1,G505 行内 #nosec 特例——法条唯一例外类,优于 config 级豁免;openssl 金向量+httptest 协议真验签探针)+mock 后端 New/Open/ControllerOf+双 conformance);system 契约=SendSmsCode PUBLIC RPC(发码即铸同款 one-shot state,LoginByIdentity required state 零改动滑入既有 cashState)+payload oneof 加 sms{phone,code}(breaking 绿)+SYSTEM_SMS_RATE_LIMITED/CODE_INVALID 6006/6007;auth 模块=registry 重构(init 注册→wire 注入 map,redirectProvider/codeIssuer 接口隔离)+smsProvider(IssueCode 限速铸码发码+Exchange GetDel 烧码+大陆手机号 canonical);conf sms 行加显式 backend 选择(dysmsapi=强制真实缺凭据 boot 错/mock=固定不拨号/空=按凭据自动,与 payment 平台同款开关——真实通道验一次全链后开发固定 mock 省成本)+compose 镜像;双端 copy 7 locale;ENT_E2E=发码→窗口限速→错码烧码→state 重放拒→全链落会员净清;**审查修(10-28 三轴对审)**:NewSms 补 mock/dysmsapi 显式分支+unknown 值拒 boot(装配表测 100%)+container/config 镜像 sms 行+e2e 全腿穿 service 层+日上限恰 10/11 边界+失败发码覆盖旧码生命周期锚+非 issuer 拒镜像+dysmsapi 传输三形态(坏端点/短体/net.Error 超时)+Timestamp ISO 断言+兄弟熵失败统一返错(panic 消)+state 铸造去重;覆盖率实测 sms 家族 93%/platform_sms 100%;**ctr 接入+双轮拟真(10-28 晚,原 c 段登录面提前)**:登录页 SMS tab 转真(码 tab 默认/useSmsLogin hook+ui/sms-fields 拆分/手机号双闸实时校验/60s 倒计时换号清窗——服务端才是真限速器/发送也过协议门/infra 族 reason 兜底文案不再静默);mock 轮+真实通道轮(Aliyun dysmsapi,APP_SMS_ 前缀 env 注入)Chrome 拟人操作全链均绿:发码→真手机收码→登录→新用户向导→落 member 座→净清;live conformance 真通道 PASS(签名/凭据/模板被真 edge 接受);kratos env 注入唯一入口=APP_ 前缀(裸变量静默忽略) |
 
 ## 开放遗留清单(防丢网;完成即删行)
 
@@ -47,7 +47,6 @@
 | 微信回调 next 丢失(redirect_uri 不能带 query,保 next 须 state 中转) | 后续微信链路片 | 设计时定(review A6) |
 | conventions guard 正则精度修正回流 dev 兄弟服务(esports 侧已 AST 化:顶层声明 doc 判定,体内 var 上方叙事不再误报;组内 spec doc 存量登记下行) | lzx | dev 车道下次触碰同步 system 双子守卫 |
 | 组内 spec doc 存量约 40 处(test 模块 Frozen 出处系+E5-b const 组 doc;旧文本守卫对 const 组内注释天然漏检,AST 升法照见后刻意不扩执法面) | lzx | 独立机械片按家法行尾化(触碰 test 模块时顺路或立片) |
-| SMS 骨架片(system provider+capability) | lzx | E6c(2026-10-23 立片收口) |
 | 协议 consent 版本记录契约 | lzx | H2 versions.ts 真源 GET /agreements/current |
 | ~~mt-F1 重测耗尽死局~~ **已裁(D-AR,2026-10-28)**:提示文案出口——双出口文案「本款机会已用完,成绩已取最高 —— 返回阵容继续下一款,或切换类型开新的一场」 | ~~ljr~~→hzy | 改 test_intro_blocked zh/en 两键,小片落地 |
 | skill_trajectory 30s 走查体感偏紧,操作时间不够 | lzx | 评估加时 |
@@ -59,7 +58,7 @@
 | ~~P11 已裁(D-AN:维持单轨 birth)~~ | — | 2026-10-25 关闭 |
 | ICP 备案号权威串(LOGIC_AUDIT 2.5b「浙ICP2026028293号」vs MEMBERSHIP §九「浙ICP备2026028293号」) | ljr | 随 ljr 下轮文案定稿 |
 | 微信登录回填昵称/头像(2.5b-⑫;需 system identity 持久化+向导去向联动) | lzx | E6b 余面小片(S1 登记) |
-| 版本检查页+app-version/内容块管理(coverage 缺口①;S4 终局对账低优) | 待排 | P13 签认后随 M2 余组/E9 增量 |
+| 版本检查页+app-version/内容块管理(coverage 缺口①;S4 终局对账低优) | 待排 | P13 已签(D-AS⑥):协议版本管理+compliance-config 随 E9 增量入窗;版本检查页/内容块随 M2 余组 |
 | 走查注:admin 工作台 ERR·NETWORK(dev 栈缺数据源,非 esports 面) | lzx | pre 部署前查 |
 | test 目录 List 单键 created_at 排序,同秒并列池序靠 PG 返回序(E4-d 观察) | lzx | 下次 schema 触碰带上 |
 | ~~Nx 冒号目标名解析(ctr:dev:down 被 Nx 落到 dev target,曾以 devserver.cjs 直调兜底)~~ | — | 2026-10-28 关闭(devserver 退役,dev-up/down target 已删,手滑冒号形态从静默退化为显式报错) |
@@ -90,13 +89,13 @@
 
 > 剪枝律执法复位(2026-10-28,M1 收口):历史节奏行(10-18..10-28,75 条)已压实为索引行迁 progress-archive.md;全文叙事=提交信息 proven-by 尾与收口报告。新条目按索引形写入本节(日期+切片+hash+一短语,≤150 字);里程碑收口时本节清空压实回归档,并做活档区漂移对账。
 - 10-28 D-AR(ljr):mt-F1 重测耗尽=提示文案出口,双出口文案转 hzy 改双语键;重测经济不动(3ee06f51)。
-- 10-28 E5b-0 报告簇设计定案+拆片:语料三裁(历史最佳百分位=read-time cohort/职业开放态=旧仓语义级/旧 A-B-C-D 档位废止);拆片 a 契约→b 认知趋势→c 职业→d ctr 四页→e 翻转 e2e 入 plan 行。
-- 10-28 E5b-a 契约三读面落地:认知/趋势/职业聚合入 ReportService(判定内嵌响应,趋势点带 genre,零新错误码);proto 链+esports build/test+ctr:build 真码全绿。
-- 10-28 E5b-b 认知+趋势聚合落地:判定序上移 shared 单源双消费(B 裁定;AccessJudge UC→UC 违红线被叫停撤形);退化池黄金锚(八维全 50)+digest 百分位回填销遗留;ENT_E2E 活栈全绿。
-- 10-28 E5b-c 职业聚合落地:四域门控库(旧仓 75/70 阈值+min 匹配,key 译至冻结矩阵拼写)+处方=最低 4 维 vs tierA 85 单源;双 helper 重构认知面同源;库事实借行业统计待 ljr;ENT_E2E 全绿
-- 10-28 E5b-d ctr 四页:中心(组合 digest+双 access 四卡)/认知(双计数+雷达≥3 维+缺维不画)/趋势(genre 折线+进阶徽章)/职业(关闭态整版+库行);D-AQ 渲染态读原型,gap 二批 6 条,三链 0
-- 10-28 E5b-e 翻转+零值锚 e2e:closed 行压 membership/兑换码压行/covered 公开/趋势 advanced 免疫;独立 cohort 造 gap=0 已达线行=protojson 零值回归线;partial 趋势 4 序列;净清 8 探针 0
-- 10-28 E6c-0 账号域定案+拆片:SMS 按 10-20 分层(capability 家族+auth provider+cache 验证码);发码新 RPC+LoginByIdentity 加 sms;BindCredential 补 state 系会话;合并=富吞贫+审计;拆 a-d
-- 10-28 E6c-a SMS 能力+发码+登录:capability/sms 双后端(dysmsapi 手写签名+金向量/mock 可显式切)+conformance;发码 RPC 铸 state;LoginByIdentity 加 sms;烧码防爆破;ENT_E2E 全链绿
-- 10-28 E6c-a 续 ctr SMS 登录接入+双轮拟真验收:登录页 SMS tab 转真(hook/ui 拆分);mock 轮+Aliyun 真发码轮 Chrome 拟人全链均绿落 member 净清;热修=infra reason 静默/倒计时换号清窗/APP_ 前缀
-- 10-28 D-AS(ljr):P13 六项签毕——消息中心+反馈/分享裂变面召回入窗(W7-W8 落点,梯①减员),scheme-b 随 M3,旧 rank/pk·upload 废弃,学校报告随 P14(默认锁+后台手动解锁),admin 折中(协议版本管理+compliance 随 E9 增量,报告配置面梯①)。
+- 10-28 E5b-0 报告簇设计定案+拆片(1792dffe):语料三裁(历史最佳百分位=read-time cohort/职业开放态=旧仓语义级/旧 A-B-C-D 档位废止);拆片 a 契约→b 认知趋势→c 职业→d ctr 四页→e 翻转 e2e 入 plan 行。
+- 10-28 E5b-a 契约三读面落地(d619454e):认知/趋势/职业聚合入 ReportService(判定内嵌响应,趋势点带 genre,零新错误码);proto 链+esports build/test+ctr:build 真码全绿。
+- 10-28 E5b-b 认知+趋势聚合落地(5a760a60):判定序上移 shared 单源双消费(B 裁定;AccessJudge UC→UC 违红线被叫停撤形);退化池黄金锚(八维全 50)+digest 百分位回填销遗留;ENT_E2E 活栈全绿。
+- 10-28 E5b-c 职业聚合落地(e73f5553):四域门控库(旧仓 75/70 阈值+min 匹配,key 译至冻结矩阵拼写)+处方=最低 4 维 vs tierA 85 单源;双 helper 重构认知面同源;库事实借行业统计待 ljr;ENT_E2E 全绿
+- 10-28 E5b-d ctr 四页(56e7f0a6):中心(组合 digest+双 access 四卡)/认知(双计数+雷达≥3 维+缺维不画)/趋势(genre 折线+进阶徽章)/职业(关闭态整版+库行);D-AQ 渲染态读原型,gap 二批 6 条,三链 0
+- 10-28 E5b-e 翻转+零值锚 e2e(99b4032a):closed 行压 membership/兑换码压行/covered 公开/趋势 advanced 免疫;独立 cohort 造 gap=0 已达线行=protojson 零值回归线;partial 趋势 4 序列;净清 8 探针 0
+- 10-28 E6c-0 账号域定案+拆片(10f67ab2):SMS 按 10-20 分层(capability 家族+auth provider+cache 验证码);发码新 RPC+LoginByIdentity 加 sms;BindCredential 补 state 系会话;合并=富吞贫+审计;拆 a-d
+- 10-28 E6c-a SMS 能力+发码+登录(bf0a99a0):capability/sms 双后端(dysmsapi 手写签名+金向量/mock 可显式切)+conformance;发码 RPC 铸 state;LoginByIdentity 加 sms;烧码防爆破;ENT_E2E 全链绿
+- 10-28 E6c-a 续 ctr SMS 登录接入+双轮拟真验收(bf0a99a0):登录页 SMS tab 转真(hook/ui 拆分);mock 轮+Aliyun 真发码轮 Chrome 拟人全链均绿落 member 净清;热修=infra reason 静默/倒计时换号清窗/APP_ 前缀
+- 10-28 D-AS(ljr):P13 六项签毕——消息中心+反馈/分享裂变面召回入窗(W7-W8 落点,梯①减员),scheme-b 随 M3,旧 rank/pk·upload 废弃,学校报告随 P14(默认锁+后台手动解锁),admin 折中(协议版本管理+compliance 随 E9 增量,报告配置面梯①)。(d32ba170)
