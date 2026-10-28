@@ -251,7 +251,7 @@ The checked-in configuration contains development-only defaults — seeded admin
 - Proto lint / generation: `./nx run proto:lint` · `proto:generate`
 - Go lint / tests / format: `./nx run tools:go:lint` · `tools:go:test` · `tools:go:format`
 - Ent generation: `./nx run system:generate:ent` or `agent:generate:ent`
-- Dev servers: `<project>:dev-up` to start, `<project>:dev-down` to stop
+- Dev servers: `<project>:dev` (long-running foreground; Ctrl-C to stop)
 - Migration diff: `./nx run system:migrate:diff --name add_x` or `agent:migrate:diff` (the name is required; it names the generated file)
 - Optional stacks: `deploy:realtime:start` · `deploy:media:start` · `deploy:observability:start`
 - Edge stack: `deploy:pre:start` or `deploy:pre:full:start`

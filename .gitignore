@@ -132,8 +132,6 @@ tmp/
 temp/
 *.tmp
 *.temp
-# Dev-server session state + logs (devserver.cjs lifecycle)
-.run/
 
 # Cache directories
 .cache/

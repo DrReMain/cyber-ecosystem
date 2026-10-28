@@ -18,20 +18,6 @@
         "command": "pnpm exec storybook dev -p 6006"
       }
     },
-    "dev-up": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "node tools/scripts/devserver.cjs up --project @cyber-ecosystem/shared-storybook"
-      }
-    },
-    "dev-down": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "command": "node tools/scripts/devserver.cjs down --project @cyber-ecosystem/shared-storybook"
-      }
-    },
     "check": {
       "executor": "nx:run-commands",
       "options": {
