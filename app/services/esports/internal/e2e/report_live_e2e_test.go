@@ -75,7 +75,8 @@ func TestReportFreezeE2E(t *testing.T) {
 
 	bus := bootstrap.NewEventSubscriptions(logger)
 	uc := report.NewReportUC(logger, pf, report.NewRecordBoardRP(logger, pf), report.NewSnapshotRP(logger, pf),
-		entitle.NewEntitlementRP(logger, pf), profile.NewProfileRP(logger, pf), bus)
+		entitle.NewEntitlementRP(logger, pf), entitle.NewReportPolicyRP(logger, pf),
+		profile.NewProfileRP(logger, pf), bus)
 	entRP := entitle.NewEntitlementRP(logger, pf)
 	snapRP := report.NewSnapshotRP(logger, pf)
 

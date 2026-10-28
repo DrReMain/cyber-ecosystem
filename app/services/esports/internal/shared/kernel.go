@@ -4,6 +4,8 @@ import (
 	"context"
 	"log/slog"
 
+	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+
 	"cyber-ecosystem/app/services/esports/internal/platform"
 )
 
@@ -64,6 +66,41 @@ type DomainEventBus interface {
 	SubscribeTrialCompleted(handler func(context.Context, TrialCompleted))
 	PublishReportUnlocked(ctx context.Context, e ReportUnlocked) // a trial grant names its record, so the report owner can freeze the judgement at unlock time; membership and family grants name no record — those freeze lazily on first read
 	SubscribeReportUnlocked(handler func(context.Context, ReportUnlocked))
+}
+
+var DefaultReportPolicy = map[string]string{ // the shipped defaults; report_policy rows are the only override — career open, cognitive the member plane, school codes-only
+	ReportCareer:    PolicyOpen,
+	ReportCognitive: PolicyMembership,
+	ReportSchool:    PolicyClosed,
+}
+
+func ReportAccessVerdict(family string, codeGrantActive, policyRowPresent bool, policy string, memberActive bool) (bool, esportspb.ReportAccessReason) {
+	// The order's one home: a redeemed code outranks the policy, and the
+	// shipped default answers only when no row overrode it. The entitle
+	// face and the report cluster faces both quote this, so the facts may
+	// drift per caller but the order cannot; the order takes all three
+	// facts up front — the lazy membership read the entitle face once
+	// saved is a query, not semantics.
+	if codeGrantActive {
+		return true, esportspb.ReportAccessReason_REPORT_ACCESS_REASON_CODE_REDEEMED
+	}
+	if !policyRowPresent {
+		policy = DefaultReportPolicy[family]
+	}
+	explicitClosed := policyRowPresent && policy == PolicyClosed
+	switch policy {
+	case PolicyOpen:
+		return true, esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN
+	case PolicyMembership:
+		if memberActive {
+			return true, esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE
+		}
+	case PolicyTenant, PolicyClosed:
+	}
+	if explicitClosed {
+		return false, esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_CLOSED
+	}
+	return false, esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT
 }
 
 // Base ----------------------------------------------------------------------------------------------------------------

@@ -25,12 +25,6 @@ const (
 
 var reportFamilies = []string{shared.ReportCognitive, shared.ReportCareer, shared.ReportSchool}
 
-var defaultPolicy = map[string]string{ // shipped defaults; report_policy rows are the only override — career open, cognitive the member plane, school codes-only
-	shared.ReportCareer:    shared.PolicyOpen,
-	shared.ReportCognitive: shared.PolicyMembership,
-	shared.ReportSchool:    shared.PolicyClosed,
-}
-
 // DO ------------------------------------------------------------------------------------------------------------
 type ActivationCode struct {
 	Code       string
@@ -192,39 +186,25 @@ func (uc *EntitleUC) GetReportAccess(ctx context.Context, family string) (*Acces
 	if !ok || subject == nil {
 		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("report access requires a session"))
 	}
-	// A redeemed code outranks the policy — a type code is an explicit
-	// grant someone handed out; no config switch revokes it.
+	// The three facts, then the order's one home: the shared verdict
+	// this face and the report cluster faces both quote, so a drift
+	// between them is structurally impossible.
 	ref := family
 	grant, err := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &ref)
 	if err != nil {
 		return nil, err
 	}
-	if grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now())) {
-		return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_CODE_REDEEMED}, nil
-	}
-	policy, ok, err := uc.policyRP.Policy(ctx, family)
+	codeActive := grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now()))
+	policy, rowPresent, err := uc.policyRP.Policy(ctx, family)
 	if err != nil {
 		return nil, err
 	}
-	if !ok {
-		policy = defaultPolicy[family]
+	memberActive, err := uc.entRP.HasActiveMembership(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
 	}
-	explicitClosed := ok && policy == shared.PolicyClosed
-	switch policy {
-	case shared.PolicyOpen:
-		return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_OPEN}, nil
-	case shared.PolicyMembership:
-		if ok, err := uc.entRP.HasActiveMembership(ctx, subject.UserID); err != nil {
-			return nil, err
-		} else if ok {
-			return &AccessOut{Allowed: true, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE}, nil
-		}
-	case shared.PolicyTenant, shared.PolicyClosed:
-	}
-	if explicitClosed {
-		return &AccessOut{Allowed: false, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_POLICY_CLOSED}, nil
-	}
-	return &AccessOut{Allowed: false, Reason: esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT}, nil
+	allowed, reason := shared.ReportAccessVerdict(family, codeActive, rowPresent, policy, memberActive)
+	return &AccessOut{Allowed: allowed, Reason: reason}, nil
 }
 
 func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error) {
@@ -312,7 +292,7 @@ func (uc *EntitleUC) ListReportAccessPolicies(ctx context.Context) ([]*PolicyRow
 			out = append(out, r)
 			continue
 		}
-		out = append(out, &PolicyRow{Family: family, Policy: defaultPolicy[family]})
+		out = append(out, &PolicyRow{Family: family, Policy: shared.DefaultReportPolicy[family]})
 	}
 	return out, nil
 }

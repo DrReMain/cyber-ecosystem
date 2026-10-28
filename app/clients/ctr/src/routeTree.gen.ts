@@ -25,6 +25,10 @@ import { Route as MatchPickRouteImport } from './routes/match.pick'
 import { Route as MatchSwitchRouteImport } from './routes/match.switch'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
 import { Route as ReportRecordIdRouteImport } from './routes/report.$recordId'
+import { Route as ReportCareerRouteImport } from './routes/report.career'
+import { Route as ReportCenterRouteImport } from './routes/report.center'
+import { Route as ReportCognitiveRouteImport } from './routes/report.cognitive'
+import { Route as ReportTrendRouteImport } from './routes/report.trend'
 import { Route as TestCodeRouteImport } from './routes/test.$code'
 import { Route as LoginWechatCallbackRouteImport } from './routes/login.wechat.callback'
 import { Route as ProfileSetupAgeRouteImport } from './routes/profile.setup.age'
@@ -113,6 +117,26 @@ const ReportRecordIdRoute = ReportRecordIdRouteImport.update({
   path: '/report/$recordId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportCareerRoute = ReportCareerRouteImport.update({
+  id: '/report/career',
+  path: '/report/career',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportCenterRoute = ReportCenterRouteImport.update({
+  id: '/report/center',
+  path: '/report/center',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportCognitiveRoute = ReportCognitiveRouteImport.update({
+  id: '/report/cognitive',
+  path: '/report/cognitive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportTrendRoute = ReportTrendRouteImport.update({
+  id: '/report/trend',
+  path: '/report/trend',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TestCodeRoute = TestCodeRouteImport.update({
   id: '/test/$code',
   path: '/test/$code',
@@ -163,6 +187,10 @@ export interface FileRoutesByFullPath {
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
   '/report/$recordId': typeof ReportRecordIdRoute
+  '/report/career': typeof ReportCareerRoute
+  '/report/center': typeof ReportCenterRoute
+  '/report/cognitive': typeof ReportCognitiveRoute
+  '/report/trend': typeof ReportTrendRoute
   '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
@@ -185,6 +213,10 @@ export interface FileRoutesByTo {
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
   '/report/$recordId': typeof ReportRecordIdRoute
+  '/report/career': typeof ReportCareerRoute
+  '/report/center': typeof ReportCenterRoute
+  '/report/cognitive': typeof ReportCognitiveRoute
+  '/report/trend': typeof ReportTrendRoute
   '/test/$code': typeof TestCodeRoute
   '/login': typeof LoginIndexRoute
   '/match': typeof MatchIndexRoute
@@ -211,6 +243,10 @@ export interface FileRoutesById {
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
   '/report/$recordId': typeof ReportRecordIdRoute
+  '/report/career': typeof ReportCareerRoute
+  '/report/center': typeof ReportCenterRoute
+  '/report/cognitive': typeof ReportCognitiveRoute
+  '/report/trend': typeof ReportTrendRoute
   '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
@@ -238,6 +274,10 @@ export interface FileRouteTypes {
     | '/match/pick'
     | '/match/switch'
     | '/report/$recordId'
+    | '/report/career'
+    | '/report/center'
+    | '/report/cognitive'
+    | '/report/trend'
     | '/test/$code'
     | '/login/'
     | '/match/'
@@ -260,6 +300,10 @@ export interface FileRouteTypes {
     | '/match/pick'
     | '/match/switch'
     | '/report/$recordId'
+    | '/report/career'
+    | '/report/center'
+    | '/report/cognitive'
+    | '/report/trend'
     | '/test/$code'
     | '/login'
     | '/match'
@@ -285,6 +329,10 @@ export interface FileRouteTypes {
     | '/match/pick'
     | '/match/switch'
     | '/report/$recordId'
+    | '/report/career'
+    | '/report/center'
+    | '/report/cognitive'
+    | '/report/trend'
     | '/test/$code'
     | '/login/'
     | '/match/'
@@ -308,6 +356,10 @@ export interface RootRouteChildren {
   AgreementPrivacyRoute: typeof AgreementPrivacyRoute
   AgreementUserRoute: typeof AgreementUserRoute
   ReportRecordIdRoute: typeof ReportRecordIdRoute
+  ReportCareerRoute: typeof ReportCareerRoute
+  ReportCenterRoute: typeof ReportCenterRoute
+  ReportCognitiveRoute: typeof ReportCognitiveRoute
+  ReportTrendRoute: typeof ReportTrendRoute
   TestCodeRoute: typeof TestCodeRoute
   ReportSessionSessionIdRoute: typeof ReportSessionSessionIdRoute
   ApiPayProviderNotifyRoute: typeof ApiPayProviderNotifyRoute
@@ -427,6 +479,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportRecordIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/report/career': {
+      id: '/report/career'
+      path: '/report/career'
+      fullPath: '/report/career'
+      preLoaderRoute: typeof ReportCareerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report/center': {
+      id: '/report/center'
+      path: '/report/center'
+      fullPath: '/report/center'
+      preLoaderRoute: typeof ReportCenterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report/cognitive': {
+      id: '/report/cognitive'
+      path: '/report/cognitive'
+      fullPath: '/report/cognitive'
+      preLoaderRoute: typeof ReportCognitiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report/trend': {
+      id: '/report/trend'
+      path: '/report/trend'
+      fullPath: '/report/trend'
+      preLoaderRoute: typeof ReportTrendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/test/$code': {
       id: '/test/$code'
       path: '/test/$code'
@@ -535,6 +615,10 @@ const rootRouteChildren: RootRouteChildren = {
   AgreementPrivacyRoute: AgreementPrivacyRoute,
   AgreementUserRoute: AgreementUserRoute,
   ReportRecordIdRoute: ReportRecordIdRoute,
+  ReportCareerRoute: ReportCareerRoute,
+  ReportCenterRoute: ReportCenterRoute,
+  ReportCognitiveRoute: ReportCognitiveRoute,
+  ReportTrendRoute: ReportTrendRoute,
   TestCodeRoute: TestCodeRoute,
   ReportSessionSessionIdRoute: ReportSessionSessionIdRoute,
   ApiPayProviderNotifyRoute: ApiPayProviderNotifyRoute,
