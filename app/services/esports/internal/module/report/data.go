@@ -15,7 +15,6 @@ import (
 	entprofile "cyber-ecosystem/app/services/esports/internal/ent/profile"
 	entreportsnapshot "cyber-ecosystem/app/services/esports/internal/ent/reportsnapshot"
 	enttest "cyber-ecosystem/app/services/esports/internal/ent/test"
-	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 	enttestrecord "cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
@@ -365,7 +364,7 @@ func (rp *boardRP) AbilityBests(ctx context.Context, userID string) ([]DigestAbi
 	for _, a := range agg {
 		row := DigestAbilityRow{Ability: a.Ability, Best: a.Best, Sessions: a.Sessions, LastAt: a.LastAt}
 		var top []*struct {
-			Grade *testrecord.Grade `json:"grade"`
+			Grade *enttestrecord.Grade `json:"grade"`
 		}
 		err = client.TestRecord.Query().
 			Modify(func(s *sql.Selector) {
@@ -540,10 +539,9 @@ func (rp *boardRP) PreviousSessionScores(ctx context.Context, userID string, bef
 	return out, nil
 }
 
-// doneCountOf counts the session's steps that carry any stored record —
-// the match face's done law, so the two faces never disagree on a
-// fraction.
 func (rp *boardRP) doneCountOf(ctx context.Context, sessionID string) (int, error) {
+	// Counts the session's steps that carry any stored record — the match
+	// face's done law, so the two faces never disagree on a fraction.
 	codes, err := rp.Platform.GetClient(ctx).TestRecord.Query().
 		Where(
 			enttestrecord.SessionIDEQ(sessionID),
@@ -556,9 +554,9 @@ func (rp *boardRP) doneCountOf(ctx context.Context, sessionID string) (int, erro
 	return len(codes), nil
 }
 
-// abilityOfCodes maps test codes to their ability — the tests table is a
-// dozen rows, the join rides two queries like the board's own.
 func (rp *boardRP) abilityOfCodes(ctx context.Context, rows []*ent.TestRecord) (map[string]string, error) {
+	// Maps test codes to their ability — the tests table is a dozen rows,
+	// the join rides two queries like the board's own.
 	codes := make([]string, 0, len(rows))
 	seen := make(map[string]struct{}, len(rows))
 	for _, r := range rows {

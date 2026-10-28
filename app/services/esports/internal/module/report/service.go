@@ -121,14 +121,14 @@ func sessionAbilitiesPB(rows []SessionAbilityRow) []*esportspb.SessionAbilityLin
 	out := make([]*esportspb.SessionAbilityLine, 0, len(rows))
 	for _, r := range rows {
 		out = append(out, &esportspb.SessionAbilityLine{
-			Ability:           r.Ability,
-			GameCode:          r.GameCode,
-			BestScore:         r.Best,
-			AttemptScores:     r.Attempts,
-			BestGrade:         utils.Wrap(r.BestGrade, utils.StringW),
-			Percentile:        utils.Wrap(r.Percentile, utils.DoubleW),
-			PrevSessionScore:  utils.Wrap(r.PrevSession, utils.DoubleW),
-			HistoryBestScore:  utils.Wrap(r.HistoryBest, utils.DoubleW),
+			Ability:          r.Ability,
+			GameCode:         r.GameCode,
+			BestScore:        r.Best,
+			AttemptScores:    r.Attempts,
+			BestGrade:        utils.Wrap(r.BestGrade, utils.StringW),
+			Percentile:       utils.Wrap(r.Percentile, utils.DoubleW),
+			PrevSessionScore: utils.Wrap(r.PrevSession, utils.DoubleW),
+			HistoryBestScore: utils.Wrap(r.HistoryBest, utils.DoubleW),
 		})
 	}
 	return out

@@ -106,28 +106,24 @@ type Snapshot struct {
 	CohortBasis string
 }
 
-// SessionAttemptRow is one valid scored attempt under a session — the
-// settlement receipt's raw truth, grade attached.
 type SessionAttemptRow struct {
 	TestCode  string
 	Ability   string
 	AttemptNo int
-	Score     float64
+	Score     float64 // authoritative — only a scored attempt lands a row, the settlement receipt's raw truth
 	Grade     *string
 	CreatedAt time.Time
 }
 
-// SessionAbilityRow is one ability's session verdict — the three numbers
-// the settlement face keeps distinct.
 type SessionAbilityRow struct {
-	Ability      string
-	GameCode     string
-	Best         float64
-	Attempts     []float64
-	BestGrade    *string
-	Percentile   *float64
-	PrevSession  *float64
-	HistoryBest  *float64
+	Ability     string
+	GameCode    string
+	Best        float64   // this session's best of the retries
+	Attempts    []float64 // every valid attempt, in order — the receipt beside the verdict
+	BestGrade   *string
+	Percentile  *float64
+	PrevSession *float64 // the same ability's last-session score, not this session's prior try
+	HistoryBest *float64 // the cross-session best, the third number the settlement face keeps distinct
 }
 
 type SessionReport struct {
@@ -142,8 +138,6 @@ type SessionReport struct {
 	Total     int
 }
 
-// SessionMetaRow is the session's own row — the read-back faces'
-// ownership check, lineup order and liveness.
 type SessionMetaRow struct {
 	ID        string
 	UserID    string
@@ -153,7 +147,6 @@ type SessionMetaRow struct {
 	CreatedAt time.Time
 }
 
-// DigestAbilityRow is the member's per-ability cross-session aggregate.
 type DigestAbilityRow struct {
 	Ability    string
 	Best       float64
@@ -163,8 +156,6 @@ type DigestAbilityRow struct {
 	LastAt     time.Time
 }
 
-// DigestSessionRow is the latest session line of one genre — no verdict
-// of its own; the composite face reads GetSessionReport with the id.
 type DigestSessionRow struct {
 	SessionID string
 	Genre     string
@@ -172,7 +163,7 @@ type DigestSessionRow struct {
 	DoneCount int
 	StepCount int
 	CreatedAt time.Time
-	Anchor    *string
+	Anchor    *string // carried for the composite consumer — a digest line renders no verdict of its own
 }
 
 type AbilityDigest struct {
@@ -358,12 +349,12 @@ func (uc *ReportUC) GetReport(ctx context.Context, recordID string) (*Report, er
 	return r, nil
 }
 
-// GetSessionReport is the session read-back face: the lineup's own
-// order, every ability's three-number verdict, and the anchor's
-// composite under the same law the record board follows — frozen when a
-// snapshot exists, live otherwise. A session with no scored attempt is
-// an honest empty board, never an error.
 func (uc *ReportUC) GetSessionReport(ctx context.Context, sessionID string) (*SessionReport, error) {
+	// The session read-back face: the lineup's own order, every ability's
+	// three-number verdict, and the anchor's composite under the same law
+	// the record board follows — frozen when a snapshot exists, live
+	// otherwise. A session with no scored attempt is an honest empty
+	// board, never an error.
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {
 		return nil, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("session report read requires a session"))
@@ -498,10 +489,10 @@ func (uc *ReportUC) GetSessionReport(ctx context.Context, sessionID string) (*Se
 	return r, nil
 }
 
-// GetAbilityDigest is the cross-session aggregate: session counts by
-// genre, the per-ability best lines, and the latest session line per
-// genre. An empty history is an honest zero-and-nothing answer.
 func (uc *ReportUC) GetAbilityDigest(ctx context.Context) (*AbilityDigest, error) {
+	// The cross-session aggregate: session counts by genre, the per-ability
+	// best lines, and the latest session line per genre. An empty history
+	// is an honest zero-and-nothing answer.
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {
 		return nil, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("digest read requires a session"))
@@ -535,10 +526,10 @@ func (uc *ReportUC) GetAbilityDigest(ctx context.Context) (*AbilityDigest, error
 	return d, nil
 }
 
-// sessionPercentiles reads the anchor's per-ability cohort answer from
-// the frozen snapshot when one exists; the live branch of the caller
-// fills the lines itself.
 func (uc *ReportUC) sessionPercentiles(ctx context.Context, anchorID string) map[string]*float64 {
+	// Reads the anchor's per-ability cohort answer from the frozen
+	// snapshot when one exists; the live branch of the caller fills the
+	// lines itself.
 	snap, err := uc.snapshotRP.FindByRecord(ctx, anchorID)
 	if err != nil || snap == nil {
 		return nil
@@ -553,12 +544,12 @@ func (uc *ReportUC) sessionPercentiles(ctx context.Context, anchorID string) map
 	return out
 }
 
-// sessionBoardOf flattens the attempt rows into the board shape the
-// live judgement consumes — folded to one entry per ability by the
-// settlement's own law, so a retaken game's retries never each weigh on
-// the composite (0/0/100 would average as a 33rd percentile otherwise —
-// the same doubled-axis fault the record board's dedupe fixed).
 func sessionBoardOf(attempts []SessionAttemptRow) []BoardEntry {
+	// Flattens the attempt rows into the board shape the live judgement
+	// consumes — folded to one entry per ability by the settlement's own
+	// law, so a retaken game's retries never each weigh on the composite
+	// (0/0/100 would average as a 33rd percentile otherwise — the same
+	// doubled-axis fault the record board's dedupe fixed).
 	out := make([]BoardEntry, 0, len(attempts))
 	for _, a := range attempts {
 		out = append(out, BoardEntry{TestCode: a.TestCode, Ability: a.Ability, Score: a.Score, At: a.CreatedAt})
@@ -566,12 +557,12 @@ func sessionBoardOf(attempts []SessionAttemptRow) []BoardEntry {
 	return dedupeBoard(out)
 }
 
-// dedupeBoard folds the session board to one entry per ability — the
-// settlement's own law (the best attempt of the retries is the one that
-// scores), so a retaken game never draws a doubled radar axis or a
-// duplicated ability row on the record board either. Equal scores keep
-// the newer attempt.
 func dedupeBoard(board []BoardEntry) []BoardEntry {
+	// Folds the board to one entry per ability — the settlement's own law
+	// (the best attempt of the retries is the one that scores), so a
+	// retaken game never draws a doubled radar axis or a duplicated
+	// ability row on the record board either. Equal scores keep the newer
+	// attempt.
 	best := make(map[string]BoardEntry, len(board))
 	order := make([]string, 0, len(board))
 	for _, e := range board {

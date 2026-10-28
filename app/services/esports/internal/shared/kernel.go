@@ -36,7 +36,7 @@ const (
 
 	TierUnjudged = "unjudged" // the snapshot's honest no-verdict: every cohort too thin for a percentile at pin time — a letter would be a made-up number
 
-	GenreFPS  = "fps"  // the two genres the product ships — the match engine's draw, the digest's split
+	GenreFPS  = "fps" // the two genres the product ships — the match engine's draw, the digest's split
 	GenreMOBA = "moba"
 )
 
