@@ -117,7 +117,7 @@ func (p *smsProvider) IssueCode(ctx context.Context, row *conf.Auth_Provider, ph
 	return state, nil
 }
 
-func (p *smsProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, payload identityPayload) (*exchangedIdentity, error) {
+func (p *smsProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, payload any) (*exchangedIdentity, error) {
 	// A request narrows into the sms view by assertion — the identity
 	// requests carrying the sms member (LoginByIdentity, BindCredential,
 	// MergeAccounts) all satisfy it.

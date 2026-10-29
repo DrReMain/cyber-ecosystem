@@ -59,6 +59,51 @@ type ProfileRP interface {
 	Save(ctx context.Context, p *Profile) (*Profile, error)
 }
 
+type MergeCredential struct {
+	Phone      *string
+	WeChatCode *string
+	State      string
+}
+
+type CredentialFacts struct {
+	UserID    string
+	Enabled   bool
+	Mergeable bool
+	PhoneMask *string
+	Wechat    bool
+}
+
+type SecurityFacts struct {
+	HasPassword     bool
+	PhoneMask       *string
+	Wechat          bool
+	CredentialCount int
+}
+
+type MergeSummary struct {
+	UserID      string
+	PhoneMask   *string
+	Wechat      bool
+	Sessions    int
+	MemberUntil *time.Time
+	Unlocked    bool
+}
+
+type MergeOffer struct {
+	Status esportspb.MergePreviewStatus
+	Caller *MergeSummary
+	Other  *MergeSummary
+}
+
+type SystemRP interface {
+	ResolveCredential(ctx context.Context, cred *MergeCredential) (*CredentialFacts, error) // nil facts = free credential
+	SecurityStatus(ctx context.Context) (*SecurityFacts, error)                             // the caller's own binding surface
+}
+
+type MergePreviewer interface {
+	Preview(ctx context.Context, cred *MergeCredential) (*MergeOffer, error) // hosted in report, which owns the session facts the emptiness bar reads
+}
+
 // UC ------------------------------------------------------------------------------------------------------------------
 
 type ProfileUC struct {

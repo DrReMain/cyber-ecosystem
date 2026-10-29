@@ -101,6 +101,36 @@ service AuthService {
       body: "*"
     };
   }
+  rpc ResolveCredential(ResolveCredentialRequest) returns (ResolveCredentialResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "凭证属主解析：合并 offer 面的取数腿"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/resolve-credential"
+      body: "*"
+    };
+  }
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "重置登录密码：短信码证明手机号归属"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/reset-password"
+      body: "*"
+    };
+  }
+  rpc GetSecurityStatus(GetSecurityStatusRequest) returns (GetSecurityStatusResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "获取当前账号绑定面"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/system/me/security"};
+  }
   rpc Logout(LogoutRequest) returns (LogoutResponse) {
     option (cyber.ext.v1.method) = {
       comment: "登出"
@@ -315,6 +345,108 @@ message MergeAccountsRequest {
 }
 
 message MergeAccountsResponse {}
+
+// resolveCredential ------------------------------------------------------------------
+
+// The offer face's lookup leg. The sms branch is a bare owner lookup by
+// phone — no proof rides it because the merge itself re-proves with a
+// fresh code, and the consumer rate-guards the occupancy oracle. The wechat
+// branch carries the OAuth proof (the state BeginBindCredential minted plus
+// the redirect code): only the exchange learns the openid, and it burns
+// state and code exactly like a bind attempt would.
+message ResolveCredentialRequest {
+  option (buf.validate.message).cel = {
+    id: "ResolveCredentialRequest.state_pairing"
+    message: "state rides the wechat branch only"
+    expression: "has(this.wechat) == has(this.state)"
+  };
+
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  oneof credential {
+    option (buf.validate.oneof).required = true;
+    string phone = 2 [(buf.validate.field).string.pattern = "^[0-9+]{5,20}$"];
+    WeChatIdentityPayload wechat = 3;
+  }
+  // Wechat branch only: the bind-minted one-shot state.
+  optional string state = 4 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message ResolveCredentialResponse {
+  // Unset when the credential is free — no owner, the plain-bind path.
+  CredentialOwner owner = 1;
+}
+
+// The owner facts an offer needs. Masked identifiers only: the raw values
+// never leave the service. The mergeable verdict is the system-side hard
+// gate (no password, exactly the resolved credential, no operator seats);
+// the richer both-sides-have-data judgment over business records stays in
+// the consuming service.
+message CredentialOwner {
+  string user_id = 1;
+  bool enabled = 2;
+  bool mergeable = 3;
+  repeated SecurityCredential credentials = 4;
+}
+
+// resetPassword ----------------------------------------------------------------------
+
+// The proof-carrying password setter for accounts whose only reach is their
+// phone: the forgot-password leg on the login page and the first-password
+// leg in account security both land here. The sms code to the account's own
+// phone is the anti-takeover gate; the state is the one SendSmsCode minted.
+// The account owning the sms credential is the one rehashed; sessions stay
+// standing (a rotation is not a revocation).
+message ResetPasswordRequest {
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  oneof payload {
+    option (buf.validate.oneof).required = true;
+    SmsIdentityPayload sms = 2;
+  }
+  optional string state = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  optional string new_password = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 6
+      max_len: 128
+    }
+  ];
+}
+
+message ResetPasswordResponse {}
+
+// getSecurityStatus ------------------------------------------------------------------
+
+message GetSecurityStatusRequest {}
+
+// The caller's own binding surface: password set or not, and each
+// credential with a display-masked identifier. The mask is server policy
+// with one home; clients render what they receive and never re-derive it.
+message GetSecurityStatusResponse {
+  bool has_password = 1;
+  repeated SecurityCredential credentials = 2;
+}
+
+// One binding row of the security surface; kind is the credential family
+// (sms, wechat_mp).
+message SecurityCredential {
+  string kind = 1;
+  string masked_identifier = 2;
+}
 
 message LogoutRequest {}
 

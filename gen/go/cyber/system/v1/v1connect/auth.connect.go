@@ -55,6 +55,15 @@ const (
 	// AuthServiceMergeAccountsProcedure is the fully-qualified name of the AuthService's MergeAccounts
 	// RPC.
 	AuthServiceMergeAccountsProcedure = "/cyber.system.v1.AuthService/MergeAccounts"
+	// AuthServiceResolveCredentialProcedure is the fully-qualified name of the AuthService's
+	// ResolveCredential RPC.
+	AuthServiceResolveCredentialProcedure = "/cyber.system.v1.AuthService/ResolveCredential"
+	// AuthServiceResetPasswordProcedure is the fully-qualified name of the AuthService's ResetPassword
+	// RPC.
+	AuthServiceResetPasswordProcedure = "/cyber.system.v1.AuthService/ResetPassword"
+	// AuthServiceGetSecurityStatusProcedure is the fully-qualified name of the AuthService's
+	// GetSecurityStatus RPC.
+	AuthServiceGetSecurityStatusProcedure = "/cyber.system.v1.AuthService/GetSecurityStatus"
 	// AuthServiceLogoutProcedure is the fully-qualified name of the AuthService's Logout RPC.
 	AuthServiceLogoutProcedure = "/cyber.system.v1.AuthService/Logout"
 	// AuthServiceGetCurrentUserProcedure is the fully-qualified name of the AuthService's
@@ -72,6 +81,9 @@ type AuthServiceClient interface {
 	BeginBindCredential(context.Context, *connect.Request[v1.BeginBindCredentialRequest]) (*connect.Response[v1.BeginBindCredentialResponse], error)
 	SendBindSmsCode(context.Context, *connect.Request[v1.SendBindSmsCodeRequest]) (*connect.Response[v1.SendBindSmsCodeResponse], error)
 	MergeAccounts(context.Context, *connect.Request[v1.MergeAccountsRequest]) (*connect.Response[v1.MergeAccountsResponse], error)
+	ResolveCredential(context.Context, *connect.Request[v1.ResolveCredentialRequest]) (*connect.Response[v1.ResolveCredentialResponse], error)
+	ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error)
+	GetSecurityStatus(context.Context, *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
 }
@@ -135,6 +147,24 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("MergeAccounts")),
 			connect.WithClientOptions(opts...),
 		),
+		resolveCredential: connect.NewClient[v1.ResolveCredentialRequest, v1.ResolveCredentialResponse](
+			httpClient,
+			baseURL+AuthServiceResolveCredentialProcedure,
+			connect.WithSchema(authServiceMethods.ByName("ResolveCredential")),
+			connect.WithClientOptions(opts...),
+		),
+		resetPassword: connect.NewClient[v1.ResetPasswordRequest, v1.ResetPasswordResponse](
+			httpClient,
+			baseURL+AuthServiceResetPasswordProcedure,
+			connect.WithSchema(authServiceMethods.ByName("ResetPassword")),
+			connect.WithClientOptions(opts...),
+		),
+		getSecurityStatus: connect.NewClient[v1.GetSecurityStatusRequest, v1.GetSecurityStatusResponse](
+			httpClient,
+			baseURL+AuthServiceGetSecurityStatusProcedure,
+			connect.WithSchema(authServiceMethods.ByName("GetSecurityStatus")),
+			connect.WithClientOptions(opts...),
+		),
 		logout: connect.NewClient[v1.LogoutRequest, v1.LogoutResponse](
 			httpClient,
 			baseURL+AuthServiceLogoutProcedure,
@@ -160,6 +190,9 @@ type authServiceClient struct {
 	beginBindCredential *connect.Client[v1.BeginBindCredentialRequest, v1.BeginBindCredentialResponse]
 	sendBindSmsCode     *connect.Client[v1.SendBindSmsCodeRequest, v1.SendBindSmsCodeResponse]
 	mergeAccounts       *connect.Client[v1.MergeAccountsRequest, v1.MergeAccountsResponse]
+	resolveCredential   *connect.Client[v1.ResolveCredentialRequest, v1.ResolveCredentialResponse]
+	resetPassword       *connect.Client[v1.ResetPasswordRequest, v1.ResetPasswordResponse]
+	getSecurityStatus   *connect.Client[v1.GetSecurityStatusRequest, v1.GetSecurityStatusResponse]
 	logout              *connect.Client[v1.LogoutRequest, v1.LogoutResponse]
 	getCurrentUser      *connect.Client[v1.GetCurrentUserRequest, v1.GetCurrentUserResponse]
 }
@@ -204,6 +237,21 @@ func (c *authServiceClient) MergeAccounts(ctx context.Context, req *connect.Requ
 	return c.mergeAccounts.CallUnary(ctx, req)
 }
 
+// ResolveCredential calls cyber.system.v1.AuthService.ResolveCredential.
+func (c *authServiceClient) ResolveCredential(ctx context.Context, req *connect.Request[v1.ResolveCredentialRequest]) (*connect.Response[v1.ResolveCredentialResponse], error) {
+	return c.resolveCredential.CallUnary(ctx, req)
+}
+
+// ResetPassword calls cyber.system.v1.AuthService.ResetPassword.
+func (c *authServiceClient) ResetPassword(ctx context.Context, req *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error) {
+	return c.resetPassword.CallUnary(ctx, req)
+}
+
+// GetSecurityStatus calls cyber.system.v1.AuthService.GetSecurityStatus.
+func (c *authServiceClient) GetSecurityStatus(ctx context.Context, req *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error) {
+	return c.getSecurityStatus.CallUnary(ctx, req)
+}
+
 // Logout calls cyber.system.v1.AuthService.Logout.
 func (c *authServiceClient) Logout(ctx context.Context, req *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error) {
 	return c.logout.CallUnary(ctx, req)
@@ -224,6 +272,9 @@ type AuthServiceHandler interface {
 	BeginBindCredential(context.Context, *connect.Request[v1.BeginBindCredentialRequest]) (*connect.Response[v1.BeginBindCredentialResponse], error)
 	SendBindSmsCode(context.Context, *connect.Request[v1.SendBindSmsCodeRequest]) (*connect.Response[v1.SendBindSmsCodeResponse], error)
 	MergeAccounts(context.Context, *connect.Request[v1.MergeAccountsRequest]) (*connect.Response[v1.MergeAccountsResponse], error)
+	ResolveCredential(context.Context, *connect.Request[v1.ResolveCredentialRequest]) (*connect.Response[v1.ResolveCredentialResponse], error)
+	ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error)
+	GetSecurityStatus(context.Context, *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
 }
@@ -283,6 +334,24 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("MergeAccounts")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authServiceResolveCredentialHandler := connect.NewUnaryHandler(
+		AuthServiceResolveCredentialProcedure,
+		svc.ResolveCredential,
+		connect.WithSchema(authServiceMethods.ByName("ResolveCredential")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceResetPasswordHandler := connect.NewUnaryHandler(
+		AuthServiceResetPasswordProcedure,
+		svc.ResetPassword,
+		connect.WithSchema(authServiceMethods.ByName("ResetPassword")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceGetSecurityStatusHandler := connect.NewUnaryHandler(
+		AuthServiceGetSecurityStatusProcedure,
+		svc.GetSecurityStatus,
+		connect.WithSchema(authServiceMethods.ByName("GetSecurityStatus")),
+		connect.WithHandlerOptions(opts...),
+	)
 	authServiceLogoutHandler := connect.NewUnaryHandler(
 		AuthServiceLogoutProcedure,
 		svc.Logout,
@@ -313,6 +382,12 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 			authServiceSendBindSmsCodeHandler.ServeHTTP(w, r)
 		case AuthServiceMergeAccountsProcedure:
 			authServiceMergeAccountsHandler.ServeHTTP(w, r)
+		case AuthServiceResolveCredentialProcedure:
+			authServiceResolveCredentialHandler.ServeHTTP(w, r)
+		case AuthServiceResetPasswordProcedure:
+			authServiceResetPasswordHandler.ServeHTTP(w, r)
+		case AuthServiceGetSecurityStatusProcedure:
+			authServiceGetSecurityStatusHandler.ServeHTTP(w, r)
 		case AuthServiceLogoutProcedure:
 			authServiceLogoutHandler.ServeHTTP(w, r)
 		case AuthServiceGetCurrentUserProcedure:
@@ -356,6 +431,18 @@ func (UnimplementedAuthServiceHandler) SendBindSmsCode(context.Context, *connect
 
 func (UnimplementedAuthServiceHandler) MergeAccounts(context.Context, *connect.Request[v1.MergeAccountsRequest]) (*connect.Response[v1.MergeAccountsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.MergeAccounts is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) ResolveCredential(context.Context, *connect.Request[v1.ResolveCredentialRequest]) (*connect.Response[v1.ResolveCredentialResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.ResolveCredential is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.ResetPassword is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) GetSecurityStatus(context.Context, *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.GetSecurityStatus is not implemented"))
 }
 
 func (UnimplementedAuthServiceHandler) Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error) {

@@ -840,6 +840,34 @@ export type CyberEsportsV1Member = {
 };
 
 /**
+ * One side's confirm-page facts. Identifier-shaped values arrive masked by
+ * the system service; clients render, never re-derive.
+ */
+export type CyberEsportsV1MergeAccountSummary = {
+    userId?: string;
+    /**
+     * Masked phone when the side holds an sms credential, else null.
+     */
+    phoneMask?: string;
+    /**
+     * True when the side holds a wechat credential.
+     */
+    wechat?: boolean;
+    /**
+     * Distinct assessment sessions with a valid attempt.
+     */
+    sessions?: number;
+    /**
+     * The furthest live membership window; null = no live membership.
+     */
+    memberUntil?: string;
+    /**
+     * Any unlocked report family.
+     */
+    unlocked?: boolean;
+};
+
+/**
  * moving_target — tracking across movement patterns; the pattern phase is a
  * fact the server needs to reproduce per-pattern aggregates (legacy had it
  * only as a client-side summary).
@@ -997,6 +1025,28 @@ export type CyberEsportsV1PeekMatchSessionResponse = {
 export type CyberEsportsV1Point = {
     x?: number;
     y?: number;
+};
+
+/**
+ * The merge offer's decision input. The sms branch carries the bare phone —
+ * occupancy is not a secret the bind flow doesn't already reveal, and the
+ * merge itself re-proves with a fresh code. The wechat branch carries the
+ * OAuth proof: only the exchange learns the openid, so the preview burns
+ * state and code exactly like a bind attempt would.
+ */
+export type CyberEsportsV1PreviewMergeRequest = {
+    phone?: string;
+    wechat?: CyberEsportsV1WeChatMergeProof;
+    /**
+     * Wechat branch only: the bind-minted one-shot state.
+     */
+    state?: string;
+};
+
+export type CyberEsportsV1PreviewMergeResponse = {
+    status?: 'MERGE_PREVIEW_STATUS_UNSPECIFIED' | 'MERGE_PREVIEW_STATUS_FREE' | 'MERGE_PREVIEW_STATUS_SELF' | 'MERGE_PREVIEW_STATUS_KEEP_CALLER' | 'MERGE_PREVIEW_STATUS_KEEP_OTHER' | 'MERGE_PREVIEW_STATUS_BLOCKED';
+    caller?: CyberEsportsV1MergeAccountSummary;
+    other?: CyberEsportsV1MergeAccountSummary;
 };
 
 /**
@@ -1593,6 +1643,10 @@ export type CyberEsportsV1UpdateTestConfigResponse = {
     config?: CyberEsportsV1TestConfig;
 };
 
+export type CyberEsportsV1WeChatMergeProof = {
+    code?: string;
+};
+
 /**
  * Pagination request.
  */
@@ -1888,6 +1942,20 @@ export type CyberSystemV1CreateUserResponse = {
     id?: string;
 };
 
+/**
+ * The owner facts an offer needs. Masked identifiers only: the raw values
+ * never leave the service. The mergeable verdict is the system-side hard
+ * gate (no password, exactly the resolved credential, no operator seats);
+ * the richer both-sides-have-data judgment over business records stays in
+ * the consuming service.
+ */
+export type CyberSystemV1CredentialOwner = {
+    userId?: string;
+    enabled?: boolean;
+    mergeable?: boolean;
+    credentials?: Array<CyberSystemV1SecurityCredential>;
+};
+
 export type CyberSystemV1DeleteDeptResponse = {
     [key: string]: unknown;
 };
@@ -2065,6 +2133,16 @@ export type CyberSystemV1GetPolicyResponse = {
 export type CyberSystemV1GetRoleResponse = {
     role?: CyberSystemV1Role;
     grants?: Array<CyberSystemV1RoleGrant>;
+};
+
+/**
+ * The caller's own binding surface: password set or not, and each
+ * credential with a display-masked identifier. The mask is server policy
+ * with one home; clients render what they receive and never re-derive it.
+ */
+export type CyberSystemV1GetSecurityStatusResponse = {
+    hasPassword?: boolean;
+    credentials?: Array<CyberSystemV1SecurityCredential>;
 };
 
 export type CyberSystemV1GetTenantResponse = {
@@ -2395,6 +2473,50 @@ export type CyberSystemV1RenameFileResponse = {
     [key: string]: unknown;
 };
 
+/**
+ * The proof-carrying password setter for accounts whose only reach is their
+ * phone: the forgot-password leg on the login page and the first-password
+ * leg in account security both land here. The sms code to the account's own
+ * phone is the anti-takeover gate; the state is the one SendSmsCode minted.
+ * The account owning the sms credential is the one rehashed; sessions stay
+ * standing (a rotation is not a revocation).
+ */
+export type CyberSystemV1ResetPasswordRequest = {
+    provider?: string;
+    sms?: CyberSystemV1SmsIdentityPayload;
+    state?: string;
+    newPassword?: string;
+};
+
+export type CyberSystemV1ResetPasswordResponse = {
+    [key: string]: unknown;
+};
+
+/**
+ * The offer face's lookup leg. The sms branch is a bare owner lookup by
+ * phone — no proof rides it because the merge itself re-proves with a
+ * fresh code, and the consumer rate-guards the occupancy oracle. The wechat
+ * branch carries the OAuth proof (the state BeginBindCredential minted plus
+ * the redirect code): only the exchange learns the openid, and it burns
+ * state and code exactly like a bind attempt would.
+ */
+export type CyberSystemV1ResolveCredentialRequest = {
+    provider?: string;
+    phone?: string;
+    wechat?: CyberSystemV1WeChatIdentityPayload;
+    /**
+     * Wechat branch only: the bind-minted one-shot state.
+     */
+    state?: string;
+};
+
+export type CyberSystemV1ResolveCredentialResponse = {
+    /**
+     * Unset when the credential is free — no owner, the plain-bind path.
+     */
+    owner?: CyberSystemV1CredentialOwner;
+};
+
 export type CyberSystemV1Role = {
     id?: string;
     createdAt?: string;
@@ -2426,6 +2548,15 @@ export type CyberSystemV1RoleMember = {
     principalType?: string;
     principalId?: string;
     createdAt?: string;
+};
+
+/**
+ * One binding row of the security surface; kind is the credential family
+ * (sms, wechat_mp).
+ */
+export type CyberSystemV1SecurityCredential = {
+    kind?: string;
+    maskedIdentifier?: string;
 };
 
 export type CyberSystemV1SendBindSmsCodeRequest = {
@@ -3534,6 +3665,22 @@ export type ProfileServiceUpdateProfileResponses = {
 
 export type ProfileServiceUpdateProfileResponse = ProfileServiceUpdateProfileResponses[keyof ProfileServiceUpdateProfileResponses];
 
+export type ProfileServicePreviewMergeData = {
+    body: CyberEsportsV1PreviewMergeRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/profile/preview-merge';
+};
+
+export type ProfileServicePreviewMergeResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1PreviewMergeResponse;
+};
+
+export type ProfileServicePreviewMergeResponse = ProfileServicePreviewMergeResponses[keyof ProfileServicePreviewMergeResponses];
+
 export type EntitleAdminServiceListReportAccessPoliciesData = {
     body?: never;
     path?: never;
@@ -3988,6 +4135,38 @@ export type AuthServiceMergeAccountsResponses = {
 };
 
 export type AuthServiceMergeAccountsResponse = AuthServiceMergeAccountsResponses[keyof AuthServiceMergeAccountsResponses];
+
+export type AuthServiceResetPasswordData = {
+    body: CyberSystemV1ResetPasswordRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/reset-password';
+};
+
+export type AuthServiceResetPasswordResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ResetPasswordResponse;
+};
+
+export type AuthServiceResetPasswordResponse = AuthServiceResetPasswordResponses[keyof AuthServiceResetPasswordResponses];
+
+export type AuthServiceResolveCredentialData = {
+    body: CyberSystemV1ResolveCredentialRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/resolve-credential';
+};
+
+export type AuthServiceResolveCredentialResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1ResolveCredentialResponse;
+};
+
+export type AuthServiceResolveCredentialResponse = AuthServiceResolveCredentialResponses[keyof AuthServiceResolveCredentialResponses];
 
 export type AuthServiceSendBindSmsCodeData = {
     body: CyberSystemV1SendBindSmsCodeRequest;
@@ -4444,6 +4623,22 @@ export type UserServiceChangePasswordResponses = {
 };
 
 export type UserServiceChangePasswordResponse = UserServiceChangePasswordResponses[keyof UserServiceChangePasswordResponses];
+
+export type AuthServiceGetSecurityStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/me/security';
+};
+
+export type AuthServiceGetSecurityStatusResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1GetSecurityStatusResponse;
+};
+
+export type AuthServiceGetSecurityStatusResponse = AuthServiceGetSecurityStatusResponses[keyof AuthServiceGetSecurityStatusResponses];
 
 export type PolicyServiceListPoliciesData = {
     body?: never;

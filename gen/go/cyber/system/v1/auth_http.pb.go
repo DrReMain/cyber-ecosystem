@@ -21,10 +21,13 @@ const OperationAuthServiceBeginBindCredential = "/cyber.system.v1.AuthService/Be
 const OperationAuthServiceBeginIdentityLogin = "/cyber.system.v1.AuthService/BeginIdentityLogin"
 const OperationAuthServiceBindCredential = "/cyber.system.v1.AuthService/BindCredential"
 const OperationAuthServiceGetCurrentUser = "/cyber.system.v1.AuthService/GetCurrentUser"
+const OperationAuthServiceGetSecurityStatus = "/cyber.system.v1.AuthService/GetSecurityStatus"
 const OperationAuthServiceLogin = "/cyber.system.v1.AuthService/Login"
 const OperationAuthServiceLoginByIdentity = "/cyber.system.v1.AuthService/LoginByIdentity"
 const OperationAuthServiceLogout = "/cyber.system.v1.AuthService/Logout"
 const OperationAuthServiceMergeAccounts = "/cyber.system.v1.AuthService/MergeAccounts"
+const OperationAuthServiceResetPassword = "/cyber.system.v1.AuthService/ResetPassword"
+const OperationAuthServiceResolveCredential = "/cyber.system.v1.AuthService/ResolveCredential"
 const OperationAuthServiceSendBindSmsCode = "/cyber.system.v1.AuthService/SendBindSmsCode"
 const OperationAuthServiceSendSmsCode = "/cyber.system.v1.AuthService/SendSmsCode"
 
@@ -33,10 +36,13 @@ type AuthServiceHTTPServer interface {
 	BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error)
 	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
+	GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginByIdentity(context.Context, *LoginByIdentityRequest) (*LoginByIdentityResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	MergeAccounts(context.Context, *MergeAccountsRequest) (*MergeAccountsResponse, error)
+	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
+	ResolveCredential(context.Context, *ResolveCredentialRequest) (*ResolveCredentialResponse, error)
 	SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error)
 	SendSmsCode(context.Context, *SendSmsCodeRequest) (*SendSmsCodeResponse, error)
 }
@@ -51,6 +57,9 @@ func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
 	r.Handle("POST", "/api/v1/system/auth/begin-bind-credential", _AuthService_BeginBindCredential0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/send-bind-sms-code", _AuthService_SendBindSmsCode0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/merge-accounts", _AuthService_MergeAccounts0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/resolve-credential", _AuthService_ResolveCredential0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/reset-password", _AuthService_ResetPassword0_HTTP_Handler(srv))
+	r.Handle("GET", "/api/v1/system/me/security", _AuthService_GetSecurityStatus0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/logout", _AuthService_Logout0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me", _AuthService_GetCurrentUser0_HTTP_Handler(srv))
 }
@@ -207,6 +216,63 @@ func _AuthService_MergeAccounts0_HTTP_Handler(srv AuthServiceHTTPServer) func(ct
 	}
 }
 
+func _AuthService_ResolveCredential0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ResolveCredentialRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceResolveCredential)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ResolveCredential(ctx, req.(*ResolveCredentialRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ResolveCredentialResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthService_ResetPassword0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ResetPasswordRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceResetPassword)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ResetPassword(ctx, req.(*ResetPasswordRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ResetPasswordResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthService_GetSecurityStatus0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetSecurityStatusRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceGetSecurityStatus)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetSecurityStatus(ctx, req.(*GetSecurityStatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetSecurityStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _AuthService_Logout0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in LogoutRequest
@@ -250,10 +316,13 @@ type AuthServiceHTTPClient interface {
 	BeginIdentityLogin(ctx context.Context, req *BeginIdentityLoginRequest, opts ...http.CallOption) (rsp *BeginIdentityLoginResponse, err error)
 	BindCredential(ctx context.Context, req *BindCredentialRequest, opts ...http.CallOption) (rsp *BindCredentialResponse, err error)
 	GetCurrentUser(ctx context.Context, req *GetCurrentUserRequest, opts ...http.CallOption) (rsp *GetCurrentUserResponse, err error)
+	GetSecurityStatus(ctx context.Context, req *GetSecurityStatusRequest, opts ...http.CallOption) (rsp *GetSecurityStatusResponse, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginResponse, err error)
 	LoginByIdentity(ctx context.Context, req *LoginByIdentityRequest, opts ...http.CallOption) (rsp *LoginByIdentityResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutResponse, err error)
 	MergeAccounts(ctx context.Context, req *MergeAccountsRequest, opts ...http.CallOption) (rsp *MergeAccountsResponse, err error)
+	ResetPassword(ctx context.Context, req *ResetPasswordRequest, opts ...http.CallOption) (rsp *ResetPasswordResponse, err error)
+	ResolveCredential(ctx context.Context, req *ResolveCredentialRequest, opts ...http.CallOption) (rsp *ResolveCredentialResponse, err error)
 	SendBindSmsCode(ctx context.Context, req *SendBindSmsCodeRequest, opts ...http.CallOption) (rsp *SendBindSmsCodeResponse, err error)
 	SendSmsCode(ctx context.Context, req *SendSmsCodeRequest, opts ...http.CallOption) (rsp *SendSmsCodeResponse, err error)
 }
@@ -333,6 +402,22 @@ func (c *AuthServiceHTTPClientImpl) GetCurrentUser(ctx context.Context, in *GetC
 	return &out, nil
 }
 
+func (c *AuthServiceHTTPClientImpl) GetSecurityStatus(ctx context.Context, in *GetSecurityStatusRequest, opts ...http.CallOption) (*GetSecurityStatusResponse, error) {
+	var out GetSecurityStatusResponse
+	pattern := "/api/v1/system/me/security"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationAuthServiceGetSecurityStatus),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *AuthServiceHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginResponse, error) {
 	var out LoginResponse
 	pattern := "/api/v1/system/auth/login"
@@ -392,6 +477,40 @@ func (c *AuthServiceHTTPClientImpl) MergeAccounts(ctx context.Context, in *Merge
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationAuthServiceMergeAccounts),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...http.CallOption) (*ResetPasswordResponse, error) {
+	var out ResetPasswordResponse
+	pattern := "/api/v1/system/auth/reset-password"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceResetPassword),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) ResolveCredential(ctx context.Context, in *ResolveCredentialRequest, opts ...http.CallOption) (*ResolveCredentialResponse, error) {
+	var out ResolveCredentialResponse
+	pattern := "/api/v1/system/auth/resolve-credential"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceResolveCredential),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

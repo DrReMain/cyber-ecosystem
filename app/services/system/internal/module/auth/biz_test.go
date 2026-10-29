@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -159,6 +160,16 @@ func (f *fakeUserRP) CountCredentialsByUser(_ context.Context, userID string) (i
 		}
 	}
 	return n, nil
+}
+
+func (f *fakeUserRP) ListCredentialsByUser(_ context.Context, userID string) ([]*user.Credential, error) {
+	var out []*user.Credential
+	for _, c := range f.credentials {
+		if c.UserID == userID {
+			out = append(out, c)
+		}
+	}
+	return out, nil
 }
 
 func (f *fakeUserRP) MoveCredential(_ context.Context, kind, identifier, toUserID string) error {
@@ -338,7 +349,7 @@ type fakeIdentityProvider struct {
 
 var fakeExchanges int
 
-func (f fakeIdentityProvider) Exchange(_ context.Context, row *conf.Auth_Provider, _ identityPayload) (*exchangedIdentity, error) {
+func (f fakeIdentityProvider) Exchange(_ context.Context, row *conf.Auth_Provider, _ any) (*exchangedIdentity, error) {
 	fakeExchanges++
 	if row.GetKey() == "failing" {
 		return nil, systempb.ErrorSystemIdentityExchangeFailed("").WithCause(fmt.Errorf("provider rejected"))
@@ -355,6 +366,9 @@ const fakeKind = "fakekind"
 func testProviders() map[string]IdentityProvider {
 	return map[string]IdentityProvider{
 		fakeKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: fakeKind, Identifier: "oid-x"}},
+		// The resolve phone branch never exchanges; the row only has to
+		// carry the channel kind the branch guards on.
+		smsKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: smsKind, Identifier: "13900001111"}},
 	}
 }
 
@@ -363,6 +377,7 @@ func fakeProviderConf() *conf.Auth {
 		{Key: "fake", Kind: fakeKind, Enabled: true},
 		{Key: "failing", Kind: fakeKind, Enabled: true},
 		{Key: "off", Kind: fakeKind},
+		{Key: "sms", Kind: smsKind, Enabled: true},
 	}}
 }
 
@@ -1650,6 +1665,206 @@ func TestMergeAccountsLaws(t *testing.T) {
 		}
 	}
 	noUC()
+}
+
+func TestResolveCredentialLaws(t *testing.T) {
+	smsKey, fakeKey := "sms", "fake"
+	memberPlane := &fakeAuthzRP{planes: map[string]string{"member": security.PlaneMember}}
+	tn := &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}}
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+
+	phoneReq := func(phone string) *systempb.ResolveCredentialRequest {
+		return &systempb.ResolveCredentialRequest{Provider: &smsKey,
+			Credential: &systempb.ResolveCredentialRequest_Phone{Phone: phone}}
+	}
+	resolve := func(uf *fakeUserRP, providerKey, state string, in *systempb.ResolveCredentialRequest) (*CredentialOwner, error) {
+		uc := newAuthUCConf(fakeProviderConf(), uf, memberPlane, newTokenStore(), tn)
+		return uc.ResolveCredential(ctx, providerKey, state, in)
+	}
+
+	// Free phone: the plain-bind path, no owner facts at all.
+	if owner, err := resolve(&fakeUserRP{}, smsKey, "", phoneReq("13900001111")); err != nil || owner != nil {
+		t.Fatalf("free phone: want nil owner, got %v %v", owner, err)
+	}
+
+	// A weightless member owner answers with the mergeable verdict and a
+	// masked credential list; the +86 form canonicalizes to the same row.
+	empty := ""
+	owned := &fakeUserRP{
+		row:   &user.User{ID: "u9", Account: &empty, PasswordHash: &empty, Enabled: true},
+		seats: []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		credentials: map[string]*user.Credential{
+			smsKind + "|13900001111": {Kind: smsKind, Identifier: "13900001111", UserID: "u9"},
+		},
+	}
+	for _, form := range []string{"13900001111", "+8613900001111"} {
+		owner, err := resolve(owned, smsKey, "", phoneReq(form))
+		if err != nil {
+			t.Fatalf("owned phone %s: %v", form, err)
+		}
+		if owner == nil || owner.UserID != "u9" || !owner.Enabled || !owner.Mergeable {
+			t.Fatalf("owned phone %s: owner = %+v", form, owner)
+		}
+		if len(owner.Credentials) != 1 || owner.Credentials[0].Identifier != "139****1111" {
+			t.Fatalf("owned phone %s: credentials = %+v, want masked", form, owner.Credentials)
+		}
+	}
+
+	// Weight answers as a fact, not a refusal: the offer face renders the
+	// blocked pane from the same shape.
+	pw := "set"
+	heavy := &fakeUserRP{
+		row: &user.User{ID: "u9", Account: &empty, PasswordHash: &pw, Enabled: true},
+		credentials: map[string]*user.Credential{
+			smsKind + "|13900001111": {Kind: smsKind, Identifier: "13900001111", UserID: "u9"},
+		},
+	}
+	if owner, err := resolve(heavy, smsKey, "", phoneReq("13900001111")); err != nil || owner == nil || owner.Mergeable {
+		t.Fatalf("heavy owner: want mergeable=false, got %v %v", owner, err)
+	}
+
+	// A non-mainland phone and a phone branch on a redirect provider are
+	// both wiring refusals.
+	if _, err := resolve(&fakeUserRP{}, smsKey, "", phoneReq("12345")); !errorspb.IsGeneralErrorValidationFailed(err) {
+		t.Fatalf("non-mainland: want VALIDATION_FAILED, got %v", err)
+	}
+	if _, err := resolve(&fakeUserRP{}, fakeKey, "", &systempb.ResolveCredentialRequest{Provider: &fakeKey,
+		Credential: &systempb.ResolveCredentialRequest_Phone{Phone: "13900001111"}}); !systempb.IsSystemIdentityProviderUnknown(err) {
+		t.Fatalf("phone on redirect provider: want PROVIDER_UNKNOWN, got %v", err)
+	}
+
+	// The wechat branch is proof-carrying: a bind-minted state exchanges to
+	// the owner, an anonymous state refuses before any lookup.
+	code := "c"
+	wechatReq := func(state string) *systempb.ResolveCredentialRequest {
+		return &systempb.ResolveCredentialRequest{Provider: &fakeKey, State: &state,
+			Credential: &systempb.ResolveCredentialRequest_Wechat{Wechat: &systempb.WeChatIdentityPayload{Code: &code}}}
+	}
+	bound := &fakeUserRP{
+		row:   &user.User{ID: "u9", Account: &empty, PasswordHash: &empty, Enabled: true},
+		seats: []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	trp := newTokenStore()
+	state := issueBoundState(t, trp, "fake", "u1")
+	owner, err := newAuthUCConf(fakeProviderConf(), bound, memberPlane, trp, tn).
+		ResolveCredential(ctx, "fake", state, wechatReq(state))
+	if err != nil || owner == nil || owner.UserID != "u9" || !owner.Mergeable {
+		t.Fatalf("wechat branch: owner = %+v err = %v", owner, err)
+	}
+	anonState := issueState(t, trp, "fake")
+	if _, err := newAuthUCConf(fakeProviderConf(), bound, memberPlane, trp, tn).
+		ResolveCredential(ctx, "fake", anonState, wechatReq(anonState)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("anonymous state: want EXCHANGE_FAILED, got %v", err)
+	}
+
+	// A credential whose account vanished reads as free, with the dangling
+	// row left to the log.
+	dangling := &fakeUserRP{
+		row: &user.User{ID: "u1", Account: &empty, PasswordHash: &empty, Enabled: true},
+		credentials: map[string]*user.Credential{
+			smsKind + "|13900001111": {Kind: smsKind, Identifier: "13900001111", UserID: "u9"},
+		},
+	}
+	if owner, err := resolve(dangling, smsKey, "", phoneReq("13900001111")); err != nil || owner != nil {
+		t.Fatalf("dangling credential: want free, got %v %v", owner, err)
+	}
+
+	if _, err := newAuthUCConf(fakeProviderConf(), &fakeUserRP{}, memberPlane, newTokenStore(), tn).
+		ResolveCredential(context.Background(), "sms", "", phoneReq("13900001111")); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("no session: want 401, got %v", err)
+	}
+}
+
+func TestResetPasswordLaws(t *testing.T) {
+	key := "fake"
+	phone := "13900001111"
+	code := "123456"
+	newPw := "secret1"
+	req := func(state string) *systempb.ResetPasswordRequest {
+		return &systempb.ResetPasswordRequest{Provider: &key, State: &state, NewPassword: &newPw,
+			Payload: &systempb.ResetPasswordRequest_Sms{Sms: &systempb.SmsIdentityPayload{Phone: &phone, Code: &code}}}
+	}
+	reset := func(uf *fakeUserRP, trp *fakeTokenRP, state string) error {
+		uc := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, trp, &fakeTenantRP{})
+		return uc.ResetPassword(context.Background(), "fake", state, "secret1", req(state))
+	}
+
+	// The proof names the account: the sms credential's owner is rehashed,
+	// sessions stand (a rotation is not a revocation — no revoke call).
+	empty := ""
+	uf := &fakeUserRP{
+		row: &user.User{ID: "u9", Account: &empty, PasswordHash: &empty, Enabled: true},
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	trp := newTokenStore()
+	if err := reset(uf, trp, issueState(t, trp, "fake")); err != nil {
+		t.Fatalf("reset: %v", err)
+	}
+	if len(uf.updates) != 1 || uf.updates[0].u.ID != "u9" || uf.updates[0].u.PasswordHash == nil ||
+		!slices.Contains(uf.updates[0].fields, "password") {
+		t.Fatalf("reset: updates = %+v, want one password write on u9", uf.updates)
+	}
+	if len(uf.revoked) != 0 {
+		t.Fatalf("reset: revoked = %v, want sessions standing", uf.revoked)
+	}
+
+	// A phone no account holds and a state nobody minted both refuse.
+	free := &fakeUserRP{}
+	if err := reset(free, trp, issueState(t, trp, "fake")); !systempb.IsSystemUserNotFound(err) {
+		t.Fatalf("no owner: want USER_NOT_FOUND, got %v", err)
+	}
+	if err := reset(uf, newTokenStore(), "st-unknown"); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("unknown state: want EXCHANGE_FAILED, got %v", err)
+	}
+}
+
+func TestGetSecurityStatusLaws(t *testing.T) {
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	status := func(hash string) *SecurityStatus {
+		empty := ""
+		row := &user.User{ID: "u1", Account: &empty, Enabled: true}
+		if hash != "" {
+			row.PasswordHash = &hash
+		}
+		uf := &fakeUserRP{
+			row: row,
+			credentials: map[string]*user.Credential{
+				smsKind + "|13900001111":            {Kind: smsKind, Identifier: "13900001111", UserID: "u1"},
+				fakeKind + "|oABCDEFG1234567890xyz": {Kind: fakeKind, Identifier: "oABCDEFG1234567890xyz", UserID: "u1"},
+			},
+		}
+		s, err := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{}).
+			GetSecurityStatus(ctx)
+		if err != nil {
+			t.Fatalf("status: %v", err)
+		}
+		return s
+	}
+
+	withPw := status("hashed")
+	if !withPw.HasPassword || len(withPw.Credentials) != 2 {
+		t.Fatalf("with password: %+v", withPw)
+	}
+	masks := map[string]string{}
+	for _, c := range withPw.Credentials {
+		masks[c.Kind] = c.Identifier
+	}
+	if masks[smsKind] != "139****1111" || masks[fakeKind] != "oAB****0xyz" {
+		t.Fatalf("masks = %v, want phone 3-****-4 and openid head-tail", masks)
+	}
+	if status("").HasPassword {
+		t.Fatal("without password: want has_password=false")
+	}
+
+	if _, err := newAuthUCConf(fakeProviderConf(), &fakeUserRP{}, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{}).
+		GetSecurityStatus(context.Background()); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("no session: want 401, got %v", err)
+	}
 }
 
 // A store outage during the cash surfaces as infra — the state law must not

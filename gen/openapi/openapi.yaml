@@ -919,6 +919,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.UpdateProfileResponse'
+    /api/v1/esports/profile/preview-merge:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_PreviewMerge
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.PreviewMergeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.PreviewMergeResponse'
     /api/v1/esports/report-access-policies:
         get:
             tags:
@@ -1455,6 +1473,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.MergeAccountsResponse'
+    /api/v1/system/auth/reset-password:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_ResetPassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ResetPasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ResetPasswordResponse'
+    /api/v1/system/auth/resolve-credential:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_ResolveCredential
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ResolveCredentialRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ResolveCredentialResponse'
     /api/v1/system/auth/send-bind-sms-code:
         post:
             tags:
@@ -1999,6 +2053,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ChangePasswordResponse'
+    /api/v1/system/me/security:
+        get:
+            tags:
+                - AuthService
+            operationId: AuthService_GetSecurityStatus
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetSecurityStatusResponse'
     /api/v1/system/policies:
         get:
             tags:
@@ -4101,6 +4167,31 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.ProfileGame'
+        cyber.esports.v1.MergeAccountSummary:
+            type: object
+            properties:
+                userId:
+                    type: string
+                phoneMask:
+                    type: string
+                    description: Masked phone when the side holds an sms credential, else null.
+                wechat:
+                    type: boolean
+                    description: True when the side holds a wechat credential.
+                sessions:
+                    type: integer
+                    description: Distinct assessment sessions with a valid attempt.
+                    format: int32
+                memberUntil:
+                    type: string
+                    description: The furthest live membership window; null = no live membership.
+                    format: date-time
+                unlocked:
+                    type: boolean
+                    description: Any unlocked report family.
+            description: |-
+                One side's confirm-page facts. Identifier-shaped values arrive masked by
+                 the system service; clients render, never re-derive.
         cyber.esports.v1.MovingTargetDetail:
             type: object
             properties:
@@ -4331,6 +4422,39 @@ components:
                 y:
                     type: number
                     format: double
+        cyber.esports.v1.PreviewMergeRequest:
+            type: object
+            properties:
+                phone:
+                    type: string
+                wechat:
+                    $ref: '#/components/schemas/cyber.esports.v1.WeChatMergeProof'
+                state:
+                    type: string
+                    description: 'Wechat branch only: the bind-minted one-shot state.'
+            description: |-
+                The merge offer's decision input. The sms branch carries the bare phone —
+                 occupancy is not a secret the bind flow doesn't already reveal, and the
+                 merge itself re-proves with a fresh code. The wechat branch carries the
+                 OAuth proof: only the exchange learns the openid, so the preview burns
+                 state and code exactly like a bind attempt would.
+        cyber.esports.v1.PreviewMergeResponse:
+            type: object
+            properties:
+                status:
+                    enum:
+                        - MERGE_PREVIEW_STATUS_UNSPECIFIED
+                        - MERGE_PREVIEW_STATUS_FREE
+                        - MERGE_PREVIEW_STATUS_SELF
+                        - MERGE_PREVIEW_STATUS_KEEP_CALLER
+                        - MERGE_PREVIEW_STATUS_KEEP_OTHER
+                        - MERGE_PREVIEW_STATUS_BLOCKED
+                    type: string
+                    format: enum
+                caller:
+                    $ref: '#/components/schemas/cyber.esports.v1.MergeAccountSummary'
+                other:
+                    $ref: '#/components/schemas/cyber.esports.v1.MergeAccountSummary'
         cyber.esports.v1.Profile:
             type: object
             properties:
@@ -5179,6 +5303,11 @@ components:
             properties:
                 config:
                     $ref: '#/components/schemas/cyber.esports.v1.TestConfig'
+        cyber.esports.v1.WeChatMergeProof:
+            type: object
+            properties:
+                code:
+                    type: string
         cyber.shared.common.v1.PageRequest:
             type: object
             properties:
@@ -5513,6 +5642,25 @@ components:
             properties:
                 id:
                     type: string
+        cyber.system.v1.CredentialOwner:
+            type: object
+            properties:
+                userId:
+                    type: string
+                enabled:
+                    type: boolean
+                mergeable:
+                    type: boolean
+                credentials:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.SecurityCredential'
+            description: |-
+                The owner facts an offer needs. Masked identifiers only: the raw values
+                 never leave the service. The mergeable verdict is the system-side hard
+                 gate (no password, exactly the resolved credential, no operator seats);
+                 the richer both-sides-have-data judgment over business records stays in
+                 the consuming service.
         cyber.system.v1.DeleteDeptResponse:
             type: object
             properties: {}
@@ -5751,6 +5899,19 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.system.v1.RoleGrant'
+        cyber.system.v1.GetSecurityStatusResponse:
+            type: object
+            properties:
+                hasPassword:
+                    type: boolean
+                credentials:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.SecurityCredential'
+            description: |-
+                The caller's own binding surface: password set or not, and each
+                 credential with a display-masked identifier. The mask is server policy
+                 with one home; clients render what they receive and never re-derive it.
         cyber.system.v1.GetTenantResponse:
             type: object
             properties:
@@ -6165,6 +6326,53 @@ components:
         cyber.system.v1.RenameFileResponse:
             type: object
             properties: {}
+        cyber.system.v1.ResetPasswordRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                sms:
+                    $ref: '#/components/schemas/cyber.system.v1.SmsIdentityPayload'
+                state:
+                    type: string
+                newPassword:
+                    type: string
+            description: |-
+                The proof-carrying password setter for accounts whose only reach is their
+                 phone: the forgot-password leg on the login page and the first-password
+                 leg in account security both land here. The sms code to the account's own
+                 phone is the anti-takeover gate; the state is the one SendSmsCode minted.
+                 The account owning the sms credential is the one rehashed; sessions stay
+                 standing (a rotation is not a revocation).
+        cyber.system.v1.ResetPasswordResponse:
+            type: object
+            properties: {}
+        cyber.system.v1.ResolveCredentialRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                phone:
+                    type: string
+                wechat:
+                    $ref: '#/components/schemas/cyber.system.v1.WeChatIdentityPayload'
+                state:
+                    type: string
+                    description: 'Wechat branch only: the bind-minted one-shot state.'
+            description: |-
+                The offer face's lookup leg. The sms branch is a bare owner lookup by
+                 phone — no proof rides it because the merge itself re-proves with a
+                 fresh code, and the consumer rate-guards the occupancy oracle. The wechat
+                 branch carries the OAuth proof (the state BeginBindCredential minted plus
+                 the redirect code): only the exchange learns the openid, and it burns
+                 state and code exactly like a bind attempt would.
+        cyber.system.v1.ResolveCredentialResponse:
+            type: object
+            properties:
+                owner:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.system.v1.CredentialOwner'
+                    description: Unset when the credential is free — no owner, the plain-bind path.
         cyber.system.v1.Role:
             type: object
             properties:
@@ -6227,6 +6435,16 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+        cyber.system.v1.SecurityCredential:
+            type: object
+            properties:
+                kind:
+                    type: string
+                maskedIdentifier:
+                    type: string
+            description: |-
+                One binding row of the security surface; kind is the credential family
+                 (sms, wechat_mp).
         cyber.system.v1.SendBindSmsCodeRequest:
             type: object
             properties:

@@ -27,6 +27,9 @@ const (
 	AuthService_BeginBindCredential_FullMethodName = "/cyber.system.v1.AuthService/BeginBindCredential"
 	AuthService_SendBindSmsCode_FullMethodName     = "/cyber.system.v1.AuthService/SendBindSmsCode"
 	AuthService_MergeAccounts_FullMethodName       = "/cyber.system.v1.AuthService/MergeAccounts"
+	AuthService_ResolveCredential_FullMethodName   = "/cyber.system.v1.AuthService/ResolveCredential"
+	AuthService_ResetPassword_FullMethodName       = "/cyber.system.v1.AuthService/ResetPassword"
+	AuthService_GetSecurityStatus_FullMethodName   = "/cyber.system.v1.AuthService/GetSecurityStatus"
 	AuthService_Logout_FullMethodName              = "/cyber.system.v1.AuthService/Logout"
 	AuthService_GetCurrentUser_FullMethodName      = "/cyber.system.v1.AuthService/GetCurrentUser"
 )
@@ -43,6 +46,9 @@ type AuthServiceClient interface {
 	BeginBindCredential(ctx context.Context, in *BeginBindCredentialRequest, opts ...grpc.CallOption) (*BeginBindCredentialResponse, error)
 	SendBindSmsCode(ctx context.Context, in *SendBindSmsCodeRequest, opts ...grpc.CallOption) (*SendBindSmsCodeResponse, error)
 	MergeAccounts(ctx context.Context, in *MergeAccountsRequest, opts ...grpc.CallOption) (*MergeAccountsResponse, error)
+	ResolveCredential(ctx context.Context, in *ResolveCredentialRequest, opts ...grpc.CallOption) (*ResolveCredentialResponse, error)
+	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
+	GetSecurityStatus(ctx context.Context, in *GetSecurityStatusRequest, opts ...grpc.CallOption) (*GetSecurityStatusResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	GetCurrentUser(ctx context.Context, in *GetCurrentUserRequest, opts ...grpc.CallOption) (*GetCurrentUserResponse, error)
 }
@@ -135,6 +141,36 @@ func (c *authServiceClient) MergeAccounts(ctx context.Context, in *MergeAccounts
 	return out, nil
 }
 
+func (c *authServiceClient) ResolveCredential(ctx context.Context, in *ResolveCredentialRequest, opts ...grpc.CallOption) (*ResolveCredentialResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResolveCredentialResponse)
+	err := c.cc.Invoke(ctx, AuthService_ResolveCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResetPasswordResponse)
+	err := c.cc.Invoke(ctx, AuthService_ResetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) GetSecurityStatus(ctx context.Context, in *GetSecurityStatusRequest, opts ...grpc.CallOption) (*GetSecurityStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSecurityStatusResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetSecurityStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LogoutResponse)
@@ -167,6 +203,9 @@ type AuthServiceServer interface {
 	BeginBindCredential(context.Context, *BeginBindCredentialRequest) (*BeginBindCredentialResponse, error)
 	SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error)
 	MergeAccounts(context.Context, *MergeAccountsRequest) (*MergeAccountsResponse, error)
+	ResolveCredential(context.Context, *ResolveCredentialRequest) (*ResolveCredentialResponse, error)
+	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
+	GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
@@ -202,6 +241,15 @@ func (UnimplementedAuthServiceServer) SendBindSmsCode(context.Context, *SendBind
 }
 func (UnimplementedAuthServiceServer) MergeAccounts(context.Context, *MergeAccountsRequest) (*MergeAccountsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method MergeAccounts not implemented")
+}
+func (UnimplementedAuthServiceServer) ResolveCredential(context.Context, *ResolveCredentialRequest) (*ResolveCredentialResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResolveCredential not implemented")
+}
+func (UnimplementedAuthServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSecurityStatus not implemented")
 }
 func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
@@ -374,6 +422,60 @@ func _AuthService_MergeAccounts_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_ResolveCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveCredentialRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ResolveCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ResolveCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ResolveCredential(ctx, req.(*ResolveCredentialRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ResetPassword(ctx, req.(*ResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_GetSecurityStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSecurityStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetSecurityStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetSecurityStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetSecurityStatus(ctx, req.(*GetSecurityStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LogoutRequest)
 	if err := dec(in); err != nil {
@@ -448,6 +550,18 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "MergeAccounts",
 			Handler:    _AuthService_MergeAccounts_Handler,
+		},
+		{
+			MethodName: "ResolveCredential",
+			Handler:    _AuthService_ResolveCredential_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _AuthService_ResetPassword_Handler,
+		},
+		{
+			MethodName: "GetSecurityStatus",
+			Handler:    _AuthService_GetSecurityStatus_Handler,
 		},
 		{
 			MethodName: "Logout",

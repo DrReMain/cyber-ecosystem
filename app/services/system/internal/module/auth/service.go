@@ -118,6 +118,41 @@ func (s *AuthService) MergeAccounts(ctx context.Context, in *systempb.MergeAccou
 	return &systempb.MergeAccountsResponse{}, nil
 }
 
+func (s *AuthService) ResolveCredential(ctx context.Context, in *systempb.ResolveCredentialRequest) (*systempb.ResolveCredentialResponse, error) {
+	owner, err := s.authUC.ResolveCredential(ctx, in.GetProvider(), in.GetState(), in)
+	if err != nil {
+		return nil, err
+	}
+	resp := &systempb.ResolveCredentialResponse{}
+	if owner != nil {
+		resp.Owner = &systempb.CredentialOwner{
+			UserId:      owner.UserID,
+			Enabled:     owner.Enabled,
+			Mergeable:   owner.Mergeable,
+			Credentials: utils.SliceMap(owner.Credentials, mapSecurityCredential),
+		}
+	}
+	return resp, nil
+}
+
+func (s *AuthService) ResetPassword(ctx context.Context, in *systempb.ResetPasswordRequest) (*systempb.ResetPasswordResponse, error) {
+	if err := s.authUC.ResetPassword(ctx, in.GetProvider(), in.GetState(), in.GetNewPassword(), in); err != nil {
+		return nil, err
+	}
+	return &systempb.ResetPasswordResponse{}, nil
+}
+
+func (s *AuthService) GetSecurityStatus(ctx context.Context, in *systempb.GetSecurityStatusRequest) (*systempb.GetSecurityStatusResponse, error) {
+	status, err := s.authUC.GetSecurityStatus(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.GetSecurityStatusResponse{
+		HasPassword: status.HasPassword,
+		Credentials: utils.SliceMap(status.Credentials, mapSecurityCredential),
+	}, nil
+}
+
 func (s *AuthService) Logout(ctx context.Context, in *systempb.LogoutRequest) (*systempb.LogoutResponse, error) {
 	if err := s.authUC.Logout(ctx); err != nil {
 		return nil, err
@@ -141,4 +176,10 @@ func (s *AuthService) GetCurrentUser(ctx context.Context, in *systempb.GetCurren
 			return &systempb.Membership{Tenant: seat.TenantID, Population: seat.Population}
 		}),
 	}, nil
+}
+
+// Private -------------------------------------------------------------------------------------------------------------
+
+func mapSecurityCredential(c *SecurityCredential) *systempb.SecurityCredential {
+	return &systempb.SecurityCredential{Kind: c.Kind, MaskedIdentifier: c.Identifier}
 }

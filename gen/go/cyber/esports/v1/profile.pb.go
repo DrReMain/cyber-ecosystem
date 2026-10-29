@@ -26,6 +26,70 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// The offer verdict. KEEP_CALLER: the other side is the empty one and the
+// caller's session executes the merge as-is. KEEP_OTHER: the caller is the
+// empty one; the client decomposes — log in via the other side's wechat,
+// then merge with the caller's phone code. BLOCKED: both sides carry
+// business weight, no automatic merge. FREE and SELF answer the plain-bind
+// question so the bind pages can route without a second vocabulary.
+type MergePreviewStatus int32
+
+const (
+	MergePreviewStatus_MERGE_PREVIEW_STATUS_UNSPECIFIED MergePreviewStatus = 0
+	MergePreviewStatus_MERGE_PREVIEW_STATUS_FREE        MergePreviewStatus = 1
+	MergePreviewStatus_MERGE_PREVIEW_STATUS_SELF        MergePreviewStatus = 2
+	MergePreviewStatus_MERGE_PREVIEW_STATUS_KEEP_CALLER MergePreviewStatus = 3
+	MergePreviewStatus_MERGE_PREVIEW_STATUS_KEEP_OTHER  MergePreviewStatus = 4
+	MergePreviewStatus_MERGE_PREVIEW_STATUS_BLOCKED     MergePreviewStatus = 5
+)
+
+// Enum value maps for MergePreviewStatus.
+var (
+	MergePreviewStatus_name = map[int32]string{
+		0: "MERGE_PREVIEW_STATUS_UNSPECIFIED",
+		1: "MERGE_PREVIEW_STATUS_FREE",
+		2: "MERGE_PREVIEW_STATUS_SELF",
+		3: "MERGE_PREVIEW_STATUS_KEEP_CALLER",
+		4: "MERGE_PREVIEW_STATUS_KEEP_OTHER",
+		5: "MERGE_PREVIEW_STATUS_BLOCKED",
+	}
+	MergePreviewStatus_value = map[string]int32{
+		"MERGE_PREVIEW_STATUS_UNSPECIFIED": 0,
+		"MERGE_PREVIEW_STATUS_FREE":        1,
+		"MERGE_PREVIEW_STATUS_SELF":        2,
+		"MERGE_PREVIEW_STATUS_KEEP_CALLER": 3,
+		"MERGE_PREVIEW_STATUS_KEEP_OTHER":  4,
+		"MERGE_PREVIEW_STATUS_BLOCKED":     5,
+	}
+)
+
+func (x MergePreviewStatus) Enum() *MergePreviewStatus {
+	p := new(MergePreviewStatus)
+	*p = x
+	return p
+}
+
+func (x MergePreviewStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MergePreviewStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_cyber_esports_v1_profile_proto_enumTypes[0].Descriptor()
+}
+
+func (MergePreviewStatus) Type() protoreflect.EnumType {
+	return &file_cyber_esports_v1_profile_proto_enumTypes[0]
+}
+
+func (x MergePreviewStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use MergePreviewStatus.Descriptor instead.
+func (MergePreviewStatus) EnumDescriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{0}
+}
+
 // The profile's sex vocabulary, three states by ruling.
 type ProfileSex int32
 
@@ -63,11 +127,11 @@ func (x ProfileSex) String() string {
 }
 
 func (ProfileSex) Descriptor() protoreflect.EnumDescriptor {
-	return file_cyber_esports_v1_profile_proto_enumTypes[0].Descriptor()
+	return file_cyber_esports_v1_profile_proto_enumTypes[1].Descriptor()
 }
 
 func (ProfileSex) Type() protoreflect.EnumType {
-	return &file_cyber_esports_v1_profile_proto_enumTypes[0]
+	return &file_cyber_esports_v1_profile_proto_enumTypes[1]
 }
 
 func (x ProfileSex) Number() protoreflect.EnumNumber {
@@ -76,7 +140,298 @@ func (x ProfileSex) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ProfileSex.Descriptor instead.
 func (ProfileSex) EnumDescriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{1}
+}
+
+// The merge offer's decision input. The sms branch carries the bare phone —
+// occupancy is not a secret the bind flow doesn't already reveal, and the
+// merge itself re-proves with a fresh code. The wechat branch carries the
+// OAuth proof: only the exchange learns the openid, so the preview burns
+// state and code exactly like a bind attempt would.
+type PreviewMergeRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Credential:
+	//
+	//	*PreviewMergeRequest_Phone
+	//	*PreviewMergeRequest_Wechat
+	Credential isPreviewMergeRequest_Credential `protobuf_oneof:"credential"`
+	// Wechat branch only: the bind-minted one-shot state.
+	State         *string `protobuf:"bytes,3,opt,name=state,proto3,oneof" json:"state,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PreviewMergeRequest) Reset() {
+	*x = PreviewMergeRequest{}
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PreviewMergeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PreviewMergeRequest) ProtoMessage() {}
+
+func (x *PreviewMergeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PreviewMergeRequest.ProtoReflect.Descriptor instead.
+func (*PreviewMergeRequest) Descriptor() ([]byte, []int) {
 	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *PreviewMergeRequest) GetCredential() isPreviewMergeRequest_Credential {
+	if x != nil {
+		return x.Credential
+	}
+	return nil
+}
+
+func (x *PreviewMergeRequest) GetPhone() string {
+	if x != nil {
+		if x, ok := x.Credential.(*PreviewMergeRequest_Phone); ok {
+			return x.Phone
+		}
+	}
+	return ""
+}
+
+func (x *PreviewMergeRequest) GetWechat() *WeChatMergeProof {
+	if x != nil {
+		if x, ok := x.Credential.(*PreviewMergeRequest_Wechat); ok {
+			return x.Wechat
+		}
+	}
+	return nil
+}
+
+func (x *PreviewMergeRequest) GetState() string {
+	if x != nil && x.State != nil {
+		return *x.State
+	}
+	return ""
+}
+
+type isPreviewMergeRequest_Credential interface {
+	isPreviewMergeRequest_Credential()
+}
+
+type PreviewMergeRequest_Phone struct {
+	Phone string `protobuf:"bytes,1,opt,name=phone,proto3,oneof"`
+}
+
+type PreviewMergeRequest_Wechat struct {
+	Wechat *WeChatMergeProof `protobuf:"bytes,2,opt,name=wechat,proto3,oneof"`
+}
+
+func (*PreviewMergeRequest_Phone) isPreviewMergeRequest_Credential() {}
+
+func (*PreviewMergeRequest_Wechat) isPreviewMergeRequest_Credential() {}
+
+type WeChatMergeProof struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          *string                `protobuf:"bytes,1,opt,name=code,proto3,oneof" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WeChatMergeProof) Reset() {
+	*x = WeChatMergeProof{}
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WeChatMergeProof) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WeChatMergeProof) ProtoMessage() {}
+
+func (x *WeChatMergeProof) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WeChatMergeProof.ProtoReflect.Descriptor instead.
+func (*WeChatMergeProof) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *WeChatMergeProof) GetCode() string {
+	if x != nil && x.Code != nil {
+		return *x.Code
+	}
+	return ""
+}
+
+// One side's confirm-page facts. Identifier-shaped values arrive masked by
+// the system service; clients render, never re-derive.
+type MergeAccountSummary struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	UserId string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	// Masked phone when the side holds an sms credential, else null.
+	PhoneMask *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=phone_mask,json=phoneMask,proto3" json:"phone_mask,omitempty"`
+	// True when the side holds a wechat credential.
+	Wechat bool `protobuf:"varint,3,opt,name=wechat,proto3" json:"wechat,omitempty"`
+	// Distinct assessment sessions with a valid attempt.
+	Sessions int32 `protobuf:"varint,4,opt,name=sessions,proto3" json:"sessions,omitempty"`
+	// The furthest live membership window; null = no live membership.
+	MemberUntil *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=member_until,json=memberUntil,proto3" json:"member_until,omitempty"`
+	// Any unlocked report family.
+	Unlocked      bool `protobuf:"varint,6,opt,name=unlocked,proto3" json:"unlocked,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MergeAccountSummary) Reset() {
+	*x = MergeAccountSummary{}
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MergeAccountSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MergeAccountSummary) ProtoMessage() {}
+
+func (x *MergeAccountSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MergeAccountSummary.ProtoReflect.Descriptor instead.
+func (*MergeAccountSummary) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *MergeAccountSummary) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *MergeAccountSummary) GetPhoneMask() *wrapperspb.StringValue {
+	if x != nil {
+		return x.PhoneMask
+	}
+	return nil
+}
+
+func (x *MergeAccountSummary) GetWechat() bool {
+	if x != nil {
+		return x.Wechat
+	}
+	return false
+}
+
+func (x *MergeAccountSummary) GetSessions() int32 {
+	if x != nil {
+		return x.Sessions
+	}
+	return 0
+}
+
+func (x *MergeAccountSummary) GetMemberUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.MemberUntil
+	}
+	return nil
+}
+
+func (x *MergeAccountSummary) GetUnlocked() bool {
+	if x != nil {
+		return x.Unlocked
+	}
+	return false
+}
+
+type PreviewMergeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        MergePreviewStatus     `protobuf:"varint,1,opt,name=status,proto3,enum=cyber.esports.v1.MergePreviewStatus" json:"status,omitempty"`
+	Caller        *MergeAccountSummary   `protobuf:"bytes,2,opt,name=caller,proto3" json:"caller,omitempty"`
+	Other         *MergeAccountSummary   `protobuf:"bytes,3,opt,name=other,proto3" json:"other,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PreviewMergeResponse) Reset() {
+	*x = PreviewMergeResponse{}
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PreviewMergeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PreviewMergeResponse) ProtoMessage() {}
+
+func (x *PreviewMergeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PreviewMergeResponse.ProtoReflect.Descriptor instead.
+func (*PreviewMergeResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *PreviewMergeResponse) GetStatus() MergePreviewStatus {
+	if x != nil {
+		return x.Status
+	}
+	return MergePreviewStatus_MERGE_PREVIEW_STATUS_UNSPECIFIED
+}
+
+func (x *PreviewMergeResponse) GetCaller() *MergeAccountSummary {
+	if x != nil {
+		return x.Caller
+	}
+	return nil
+}
+
+func (x *PreviewMergeResponse) GetOther() *MergeAccountSummary {
+	if x != nil {
+		return x.Other
+	}
+	return nil
 }
 
 // The member's own profile. Entity fields are wrappers: null means "not set
@@ -115,7 +470,7 @@ type Profile struct {
 
 func (x *Profile) Reset() {
 	*x = Profile{}
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[0]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -127,7 +482,7 @@ func (x *Profile) String() string {
 func (*Profile) ProtoMessage() {}
 
 func (x *Profile) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[0]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -140,7 +495,7 @@ func (x *Profile) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Profile.ProtoReflect.Descriptor instead.
 func (*Profile) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{0}
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Profile) GetId() *wrapperspb.StringValue {
@@ -232,7 +587,7 @@ type ProfileGame struct {
 
 func (x *ProfileGame) Reset() {
 	*x = ProfileGame{}
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[1]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -244,7 +599,7 @@ func (x *ProfileGame) String() string {
 func (*ProfileGame) ProtoMessage() {}
 
 func (x *ProfileGame) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[1]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -257,7 +612,7 @@ func (x *ProfileGame) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileGame.ProtoReflect.Descriptor instead.
 func (*ProfileGame) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{1}
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ProfileGame) GetGameId() *wrapperspb.StringValue {
@@ -283,7 +638,7 @@ type GetProfileRequest struct {
 
 func (x *GetProfileRequest) Reset() {
 	*x = GetProfileRequest{}
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -295,7 +650,7 @@ func (x *GetProfileRequest) String() string {
 func (*GetProfileRequest) ProtoMessage() {}
 
 func (x *GetProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -308,7 +663,7 @@ func (x *GetProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileRequest.ProtoReflect.Descriptor instead.
 func (*GetProfileRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{2}
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{6}
 }
 
 type GetProfileResponse struct {
@@ -320,7 +675,7 @@ type GetProfileResponse struct {
 
 func (x *GetProfileResponse) Reset() {
 	*x = GetProfileResponse{}
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[3]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -332,7 +687,7 @@ func (x *GetProfileResponse) String() string {
 func (*GetProfileResponse) ProtoMessage() {}
 
 func (x *GetProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[3]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -345,7 +700,7 @@ func (x *GetProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileResponse.ProtoReflect.Descriptor instead.
 func (*GetProfileResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{3}
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetProfileResponse) GetProfile() *Profile {
@@ -378,7 +733,7 @@ type UpdateProfileRequest struct {
 
 func (x *UpdateProfileRequest) Reset() {
 	*x = UpdateProfileRequest{}
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -390,7 +745,7 @@ func (x *UpdateProfileRequest) String() string {
 func (*UpdateProfileRequest) ProtoMessage() {}
 
 func (x *UpdateProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -403,7 +758,7 @@ func (x *UpdateProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateProfileRequest.ProtoReflect.Descriptor instead.
 func (*UpdateProfileRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{4}
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UpdateProfileRequest) GetNickname() string {
@@ -465,7 +820,7 @@ type GamePreferenceInput struct {
 
 func (x *GamePreferenceInput) Reset() {
 	*x = GamePreferenceInput{}
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -477,7 +832,7 @@ func (x *GamePreferenceInput) String() string {
 func (*GamePreferenceInput) ProtoMessage() {}
 
 func (x *GamePreferenceInput) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -490,7 +845,7 @@ func (x *GamePreferenceInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GamePreferenceInput.ProtoReflect.Descriptor instead.
 func (*GamePreferenceInput) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{5}
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GamePreferenceInput) GetGameIds() []string {
@@ -516,7 +871,7 @@ type UpdateProfileResponse struct {
 
 func (x *UpdateProfileResponse) Reset() {
 	*x = UpdateProfileResponse{}
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[6]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -528,7 +883,7 @@ func (x *UpdateProfileResponse) String() string {
 func (*UpdateProfileResponse) ProtoMessage() {}
 
 func (x *UpdateProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_profile_proto_msgTypes[6]
+	mi := &file_cyber_esports_v1_profile_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -541,7 +896,7 @@ func (x *UpdateProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateProfileResponse.ProtoReflect.Descriptor instead.
 func (*UpdateProfileResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{6}
+	return file_cyber_esports_v1_profile_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UpdateProfileResponse) GetProfile() *Profile {
@@ -555,7 +910,32 @@ var File_cyber_esports_v1_profile_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_profile_proto_rawDesc = "" +
 	"\n" +
-	"\x1ecyber/esports/v1/profile.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x99\x05\n" +
+	"\x1ecyber/esports/v1/profile.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xbb\x02\n" +
+	"\x13PreviewMergeRequest\x12-\n" +
+	"\x05phone\x18\x01 \x01(\tB\x15\xbaH\x12r\x102\x0e^[0-9+]{5,20}$H\x00R\x05phone\x12<\n" +
+	"\x06wechat\x18\x02 \x01(\v2\".cyber.esports.v1.WeChatMergeProofH\x00R\x06wechat\x12%\n" +
+	"\x05state\x18\x03 \x01(\tB\n" +
+	"\xbaH\ar\x05\x10\x01\x18\x80\x01H\x01R\x05state\x88\x01\x01:q\xbaHn\x1al\n" +
+	"!PreviewMergeRequest.state_pairing\x12\"state rides the wechat branch only\x1a#has(this.wechat) == has(this.state)B\x13\n" +
+	"\n" +
+	"credential\x12\x05\xbaH\x02\b\x01B\b\n" +
+	"\x06_state\"@\n" +
+	"\x10WeChatMergeProof\x12#\n" +
+	"\x04code\x18\x01 \x01(\tB\n" +
+	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\x04code\x88\x01\x01B\a\n" +
+	"\x05_code\"\xfa\x01\n" +
+	"\x13MergeAccountSummary\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12;\n" +
+	"\n" +
+	"phone_mask\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\tphoneMask\x12\x16\n" +
+	"\x06wechat\x18\x03 \x01(\bR\x06wechat\x12\x1a\n" +
+	"\bsessions\x18\x04 \x01(\x05R\bsessions\x12=\n" +
+	"\fmember_until\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\vmemberUntil\x12\x1a\n" +
+	"\bunlocked\x18\x06 \x01(\bR\bunlocked\"\xd0\x01\n" +
+	"\x14PreviewMergeResponse\x12<\n" +
+	"\x06status\x18\x01 \x01(\x0e2$.cyber.esports.v1.MergePreviewStatusR\x06status\x12=\n" +
+	"\x06caller\x18\x02 \x01(\v2%.cyber.esports.v1.MergeAccountSummaryR\x06caller\x12;\n" +
+	"\x05other\x18\x03 \x01(\v2%.cyber.esports.v1.MergeAccountSummaryR\x05other\"\x99\x05\n" +
 	"\aProfile\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x128\n" +
 	"\bnickname\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\bnickname\x12:\n" +
@@ -608,19 +988,28 @@ const file_cyber_esports_v1_profile_proto_rawDesc = "" +
 	"\fcustom_names\x18\x02 \x03(\tB\x10\xbaH\r\x92\x01\n" +
 	"\x10\x14\"\x06r\x04\x10\x01\x18(R\vcustomNames\"L\n" +
 	"\x15UpdateProfileResponse\x123\n" +
-	"\aprofile\x18\x01 \x01(\v2\x19.cyber.esports.v1.ProfileR\aprofile*u\n" +
+	"\aprofile\x18\x01 \x01(\v2\x19.cyber.esports.v1.ProfileR\aprofile*\xe5\x01\n" +
+	"\x12MergePreviewStatus\x12$\n" +
+	" MERGE_PREVIEW_STATUS_UNSPECIFIED\x10\x00\x12\x1d\n" +
+	"\x19MERGE_PREVIEW_STATUS_FREE\x10\x01\x12\x1d\n" +
+	"\x19MERGE_PREVIEW_STATUS_SELF\x10\x02\x12$\n" +
+	" MERGE_PREVIEW_STATUS_KEEP_CALLER\x10\x03\x12#\n" +
+	"\x1fMERGE_PREVIEW_STATUS_KEEP_OTHER\x10\x04\x12 \n" +
+	"\x1cMERGE_PREVIEW_STATUS_BLOCKED\x10\x05*u\n" +
 	"\n" +
 	"ProfileSex\x12\x1b\n" +
 	"\x17PROFILE_SEX_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10PROFILE_SEX_MALE\x10\x01\x12\x16\n" +
 	"\x12PROFILE_SEX_FEMALE\x10\x02\x12\x1c\n" +
-	"\x18PROFILE_SEX_UNDETERMINED\x10\x032\xec\x02\n" +
+	"\x18PROFILE_SEX_UNDETERMINED\x10\x032\xbb\x04\n" +
 	"\x0eProfileService\x12\x9c\x01\n" +
 	"\n" +
 	"GetProfile\x12#.cyber.esports.v1.GetProfileRequest\x1a$.cyber.esports.v1.GetProfileResponse\"C\x88\xf1\x04\x04\x8a\xd3\x0e\x1c\n" +
 	"\x18获取当前玩家画像\x10\x01\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/esports/profile\x12\xa8\x01\n" +
 	"\rUpdateProfile\x12&.cyber.esports.v1.UpdateProfileRequest\x1a'.cyber.esports.v1.UpdateProfileResponse\"F\x88\xf1\x04\x04\x8a\xd3\x0e\x1c\n" +
-	"\x18保存当前玩家画像\x10\x02\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/v1/esports/profile\x1a\x10\x8a\xe2\t\f玩家画像B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	"\x18保存当前玩家画像\x10\x02\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/v1/esports/profile\x12\xcc\x01\n" +
+	"\fPreviewMerge\x12%.cyber.esports.v1.PreviewMergeRequest\x1a&.cyber.esports.v1.PreviewMergeResponse\"m\x88\xf1\x04\x04\x8a\xd3\x0e5\n" +
+	"1合并 offer 面：空号判据与两账号摘要\x10\x01\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/esports/profile/preview-merge\x1a\x10\x8a\xe2\t\f玩家画像B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_profile_proto_rawDescOnce sync.Once
@@ -634,48 +1023,61 @@ func file_cyber_esports_v1_profile_proto_rawDescGZIP() []byte {
 	return file_cyber_esports_v1_profile_proto_rawDescData
 }
 
-var file_cyber_esports_v1_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_cyber_esports_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_cyber_esports_v1_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_cyber_esports_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_cyber_esports_v1_profile_proto_goTypes = []any{
-	(ProfileSex)(0),                // 0: cyber.esports.v1.ProfileSex
-	(*Profile)(nil),                // 1: cyber.esports.v1.Profile
-	(*ProfileGame)(nil),            // 2: cyber.esports.v1.ProfileGame
-	(*GetProfileRequest)(nil),      // 3: cyber.esports.v1.GetProfileRequest
-	(*GetProfileResponse)(nil),     // 4: cyber.esports.v1.GetProfileResponse
-	(*UpdateProfileRequest)(nil),   // 5: cyber.esports.v1.UpdateProfileRequest
-	(*GamePreferenceInput)(nil),    // 6: cyber.esports.v1.GamePreferenceInput
-	(*UpdateProfileResponse)(nil),  // 7: cyber.esports.v1.UpdateProfileResponse
-	(*wrapperspb.StringValue)(nil), // 8: google.protobuf.StringValue
-	(*wrapperspb.Int32Value)(nil),  // 9: google.protobuf.Int32Value
-	(*timestamppb.Timestamp)(nil),  // 10: google.protobuf.Timestamp
+	(MergePreviewStatus)(0),        // 0: cyber.esports.v1.MergePreviewStatus
+	(ProfileSex)(0),                // 1: cyber.esports.v1.ProfileSex
+	(*PreviewMergeRequest)(nil),    // 2: cyber.esports.v1.PreviewMergeRequest
+	(*WeChatMergeProof)(nil),       // 3: cyber.esports.v1.WeChatMergeProof
+	(*MergeAccountSummary)(nil),    // 4: cyber.esports.v1.MergeAccountSummary
+	(*PreviewMergeResponse)(nil),   // 5: cyber.esports.v1.PreviewMergeResponse
+	(*Profile)(nil),                // 6: cyber.esports.v1.Profile
+	(*ProfileGame)(nil),            // 7: cyber.esports.v1.ProfileGame
+	(*GetProfileRequest)(nil),      // 8: cyber.esports.v1.GetProfileRequest
+	(*GetProfileResponse)(nil),     // 9: cyber.esports.v1.GetProfileResponse
+	(*UpdateProfileRequest)(nil),   // 10: cyber.esports.v1.UpdateProfileRequest
+	(*GamePreferenceInput)(nil),    // 11: cyber.esports.v1.GamePreferenceInput
+	(*UpdateProfileResponse)(nil),  // 12: cyber.esports.v1.UpdateProfileResponse
+	(*wrapperspb.StringValue)(nil), // 13: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),  // 14: google.protobuf.Timestamp
+	(*wrapperspb.Int32Value)(nil),  // 15: google.protobuf.Int32Value
 }
 var file_cyber_esports_v1_profile_proto_depIdxs = []int32{
-	8,  // 0: cyber.esports.v1.Profile.id:type_name -> google.protobuf.StringValue
-	8,  // 1: cyber.esports.v1.Profile.nickname:type_name -> google.protobuf.StringValue
-	9,  // 2: cyber.esports.v1.Profile.birth_year:type_name -> google.protobuf.Int32Value
-	9,  // 3: cyber.esports.v1.Profile.birth_month:type_name -> google.protobuf.Int32Value
-	8,  // 4: cyber.esports.v1.Profile.age_band:type_name -> google.protobuf.StringValue
-	8,  // 5: cyber.esports.v1.Profile.avatar_url:type_name -> google.protobuf.StringValue
-	10, // 6: cyber.esports.v1.Profile.guardian_consented_at:type_name -> google.protobuf.Timestamp
-	2,  // 7: cyber.esports.v1.Profile.games:type_name -> cyber.esports.v1.ProfileGame
-	10, // 8: cyber.esports.v1.Profile.created_at:type_name -> google.protobuf.Timestamp
-	10, // 9: cyber.esports.v1.Profile.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 10: cyber.esports.v1.Profile.sex:type_name -> cyber.esports.v1.ProfileSex
-	8,  // 11: cyber.esports.v1.ProfileGame.game_id:type_name -> google.protobuf.StringValue
-	8,  // 12: cyber.esports.v1.ProfileGame.custom_name:type_name -> google.protobuf.StringValue
-	1,  // 13: cyber.esports.v1.GetProfileResponse.profile:type_name -> cyber.esports.v1.Profile
-	6,  // 14: cyber.esports.v1.UpdateProfileRequest.game_preference:type_name -> cyber.esports.v1.GamePreferenceInput
-	0,  // 15: cyber.esports.v1.UpdateProfileRequest.sex:type_name -> cyber.esports.v1.ProfileSex
-	1,  // 16: cyber.esports.v1.UpdateProfileResponse.profile:type_name -> cyber.esports.v1.Profile
-	3,  // 17: cyber.esports.v1.ProfileService.GetProfile:input_type -> cyber.esports.v1.GetProfileRequest
-	5,  // 18: cyber.esports.v1.ProfileService.UpdateProfile:input_type -> cyber.esports.v1.UpdateProfileRequest
-	4,  // 19: cyber.esports.v1.ProfileService.GetProfile:output_type -> cyber.esports.v1.GetProfileResponse
-	7,  // 20: cyber.esports.v1.ProfileService.UpdateProfile:output_type -> cyber.esports.v1.UpdateProfileResponse
-	19, // [19:21] is the sub-list for method output_type
-	17, // [17:19] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	3,  // 0: cyber.esports.v1.PreviewMergeRequest.wechat:type_name -> cyber.esports.v1.WeChatMergeProof
+	13, // 1: cyber.esports.v1.MergeAccountSummary.phone_mask:type_name -> google.protobuf.StringValue
+	14, // 2: cyber.esports.v1.MergeAccountSummary.member_until:type_name -> google.protobuf.Timestamp
+	0,  // 3: cyber.esports.v1.PreviewMergeResponse.status:type_name -> cyber.esports.v1.MergePreviewStatus
+	4,  // 4: cyber.esports.v1.PreviewMergeResponse.caller:type_name -> cyber.esports.v1.MergeAccountSummary
+	4,  // 5: cyber.esports.v1.PreviewMergeResponse.other:type_name -> cyber.esports.v1.MergeAccountSummary
+	13, // 6: cyber.esports.v1.Profile.id:type_name -> google.protobuf.StringValue
+	13, // 7: cyber.esports.v1.Profile.nickname:type_name -> google.protobuf.StringValue
+	15, // 8: cyber.esports.v1.Profile.birth_year:type_name -> google.protobuf.Int32Value
+	15, // 9: cyber.esports.v1.Profile.birth_month:type_name -> google.protobuf.Int32Value
+	13, // 10: cyber.esports.v1.Profile.age_band:type_name -> google.protobuf.StringValue
+	13, // 11: cyber.esports.v1.Profile.avatar_url:type_name -> google.protobuf.StringValue
+	14, // 12: cyber.esports.v1.Profile.guardian_consented_at:type_name -> google.protobuf.Timestamp
+	7,  // 13: cyber.esports.v1.Profile.games:type_name -> cyber.esports.v1.ProfileGame
+	14, // 14: cyber.esports.v1.Profile.created_at:type_name -> google.protobuf.Timestamp
+	14, // 15: cyber.esports.v1.Profile.updated_at:type_name -> google.protobuf.Timestamp
+	1,  // 16: cyber.esports.v1.Profile.sex:type_name -> cyber.esports.v1.ProfileSex
+	13, // 17: cyber.esports.v1.ProfileGame.game_id:type_name -> google.protobuf.StringValue
+	13, // 18: cyber.esports.v1.ProfileGame.custom_name:type_name -> google.protobuf.StringValue
+	6,  // 19: cyber.esports.v1.GetProfileResponse.profile:type_name -> cyber.esports.v1.Profile
+	11, // 20: cyber.esports.v1.UpdateProfileRequest.game_preference:type_name -> cyber.esports.v1.GamePreferenceInput
+	1,  // 21: cyber.esports.v1.UpdateProfileRequest.sex:type_name -> cyber.esports.v1.ProfileSex
+	6,  // 22: cyber.esports.v1.UpdateProfileResponse.profile:type_name -> cyber.esports.v1.Profile
+	8,  // 23: cyber.esports.v1.ProfileService.GetProfile:input_type -> cyber.esports.v1.GetProfileRequest
+	10, // 24: cyber.esports.v1.ProfileService.UpdateProfile:input_type -> cyber.esports.v1.UpdateProfileRequest
+	2,  // 25: cyber.esports.v1.ProfileService.PreviewMerge:input_type -> cyber.esports.v1.PreviewMergeRequest
+	9,  // 26: cyber.esports.v1.ProfileService.GetProfile:output_type -> cyber.esports.v1.GetProfileResponse
+	12, // 27: cyber.esports.v1.ProfileService.UpdateProfile:output_type -> cyber.esports.v1.UpdateProfileResponse
+	5,  // 28: cyber.esports.v1.ProfileService.PreviewMerge:output_type -> cyber.esports.v1.PreviewMergeResponse
+	26, // [26:29] is the sub-list for method output_type
+	23, // [23:26] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_profile_proto_init() }
@@ -683,15 +1085,20 @@ func file_cyber_esports_v1_profile_proto_init() {
 	if File_cyber_esports_v1_profile_proto != nil {
 		return
 	}
-	file_cyber_esports_v1_profile_proto_msgTypes[0].OneofWrappers = []any{}
+	file_cyber_esports_v1_profile_proto_msgTypes[0].OneofWrappers = []any{
+		(*PreviewMergeRequest_Phone)(nil),
+		(*PreviewMergeRequest_Wechat)(nil),
+	}
+	file_cyber_esports_v1_profile_proto_msgTypes[1].OneofWrappers = []any{}
 	file_cyber_esports_v1_profile_proto_msgTypes[4].OneofWrappers = []any{}
+	file_cyber_esports_v1_profile_proto_msgTypes[8].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_profile_proto_rawDesc), len(file_cyber_esports_v1_profile_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   7,
+			NumEnums:      2,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

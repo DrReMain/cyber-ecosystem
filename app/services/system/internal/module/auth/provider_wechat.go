@@ -55,8 +55,12 @@ func (wechatProvider) AuthorizeURL(row *conf.Auth_Provider, redirectURI, state s
 	return wechatEntryURL + "?" + q.Encode() + "#wechat_redirect"
 }
 
-func (p wechatProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, payload identityPayload) (*exchangedIdentity, error) {
-	code := payload.GetWechat().GetCode()
+func (p wechatProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, payload any) (*exchangedIdentity, error) {
+	wp, ok := payload.(identityPayload)
+	if !ok || wp.GetWechat() == nil {
+		return nil, errorspb.ErrorGeneralErrorValidationFailed("").WithCause(fmt.Errorf("wechat payload required"))
+	}
+	code := wp.GetWechat().GetCode()
 	if code == "" {
 		return nil, errorspb.ErrorGeneralErrorValidationFailed("").WithCause(fmt.Errorf("wechat payload required"))
 	}

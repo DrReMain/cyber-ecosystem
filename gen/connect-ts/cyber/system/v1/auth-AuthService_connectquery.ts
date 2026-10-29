@@ -45,6 +45,21 @@ export const sendBindSmsCode = AuthService.method.sendBindSmsCode;
 export const mergeAccounts = AuthService.method.mergeAccounts;
 
 /**
+ * @generated from rpc cyber.system.v1.AuthService.ResolveCredential
+ */
+export const resolveCredential = AuthService.method.resolveCredential;
+
+/**
+ * @generated from rpc cyber.system.v1.AuthService.ResetPassword
+ */
+export const resetPassword = AuthService.method.resetPassword;
+
+/**
+ * @generated from rpc cyber.system.v1.AuthService.GetSecurityStatus
+ */
+export const getSecurityStatus = AuthService.method.getSecurityStatus;
+
+/**
  * @generated from rpc cyber.system.v1.AuthService.Logout
  */
 export const logout = AuthService.method.logout;

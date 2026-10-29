@@ -27,7 +27,7 @@ type exchangedIdentity struct {
 }
 
 type IdentityProvider interface {
-	Exchange(ctx context.Context, row *conf.Auth_Provider, payload identityPayload) (*exchangedIdentity, error)
+	Exchange(ctx context.Context, row *conf.Auth_Provider, payload any) (*exchangedIdentity, error)
 }
 
 type redirectProvider interface {

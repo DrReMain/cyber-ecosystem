@@ -100,6 +100,8 @@ type EntitlementRP interface {
 	ByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*EntitlementRow, error) // nil = no grant
 	Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error)             // the narrow query pay's port asks of the same face
 	HasActiveMembership(ctx context.Context, userID string) (bool, error)
+	MembershipWindow(ctx context.Context, userID string) (*EntitlementRow, error) // the live membership row with the furthest expiry; nil = none
+	HasAnyScope(ctx context.Context, userID, scopeKind string) (bool, error)      // any row of the kind, ref-agnostic
 }
 
 type ReportPolicyRP interface {

@@ -19,11 +19,13 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AgreementPrivacyRouteImport } from './routes/agreement.privacy'
 import { Route as AgreementUserRouteImport } from './routes/agreement.user'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
+import { Route as LoginForgotRouteImport } from './routes/login.forgot'
 import { Route as MatchIndexRouteImport } from './routes/match.index'
 import { Route as MatchGuideRouteImport } from './routes/match.guide'
 import { Route as MatchPickRouteImport } from './routes/match.pick'
 import { Route as MatchSwitchRouteImport } from './routes/match.switch'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as ProfileSecurityRouteImport } from './routes/profile.security'
 import { Route as ReportRecordIdRouteImport } from './routes/report.$recordId'
 import { Route as ReportCareerRouteImport } from './routes/report.career'
 import { Route as ReportCenterRouteImport } from './routes/report.center'
@@ -31,11 +33,23 @@ import { Route as ReportCognitiveRouteImport } from './routes/report.cognitive'
 import { Route as ReportTrendRouteImport } from './routes/report.trend'
 import { Route as TestCodeRouteImport } from './routes/test.$code'
 import { Route as LoginWechatCallbackRouteImport } from './routes/login.wechat.callback'
+import { Route as ProfileSecurityIndexRouteImport } from './routes/profile.security.index'
+import { Route as ProfileSecurityBindPhoneRouteImport } from './routes/profile.security.bind-phone'
+import { Route as ProfileSecurityBindWechatRouteImport } from './routes/profile.security.bind-wechat'
+import { Route as ProfileSecurityMergeRouteImport } from './routes/profile.security.merge'
+import { Route as ProfileSecurityPasswordRouteImport } from './routes/profile.security.password'
 import { Route as ProfileSetupAgeRouteImport } from './routes/profile.setup.age'
 import { Route as ProfileSetupGamesRouteImport } from './routes/profile.setup.games'
 import { Route as ProfileSetupNicknameRouteImport } from './routes/profile.setup.nickname'
 import { Route as ReportSessionSessionIdRouteImport } from './routes/report.session.$sessionId'
 import { Route as ApiPayProviderNotifyRouteImport } from './routes/api/pay/$provider/notify'
+import { Route as ProfileSecurityBindWechatIndexRouteImport } from './routes/profile.security.bind-wechat.index'
+import { Route as ProfileSecurityBindWechatCallbackRouteImport } from './routes/profile.security.bind-wechat.callback'
+import { Route as ProfileSecurityBindWechatPreviewCallbackRouteImport } from './routes/profile.security.bind-wechat.preview-callback'
+import { Route as ProfileSecurityMergeIndexRouteImport } from './routes/profile.security.merge.index'
+import { Route as ProfileSecurityMergeBindCallbackRouteImport } from './routes/profile.security.merge.bind-callback'
+import { Route as ProfileSecurityMergeSuccessRouteImport } from './routes/profile.security.merge.success'
+import { Route as ProfileSecurityMergeWechatCallbackRouteImport } from './routes/profile.security.merge.wechat-callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -87,6 +101,11 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LoginRoute,
 } as any)
+const LoginForgotRoute = LoginForgotRouteImport.update({
+  id: '/forgot',
+  path: '/forgot',
+  getParentRoute: () => LoginRoute,
+} as any)
 const MatchIndexRoute = MatchIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -110,6 +129,11 @@ const MatchSwitchRoute = MatchSwitchRouteImport.update({
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileSecurityRoute = ProfileSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
   getParentRoute: () => ProfileRoute,
 } as any)
 const ReportRecordIdRoute = ReportRecordIdRouteImport.update({
@@ -147,6 +171,33 @@ const LoginWechatCallbackRoute = LoginWechatCallbackRouteImport.update({
   path: '/wechat/callback',
   getParentRoute: () => LoginRoute,
 } as any)
+const ProfileSecurityIndexRoute = ProfileSecurityIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfileSecurityRoute,
+} as any)
+const ProfileSecurityBindPhoneRoute =
+  ProfileSecurityBindPhoneRouteImport.update({
+    id: '/bind-phone',
+    path: '/bind-phone',
+    getParentRoute: () => ProfileSecurityRoute,
+  } as any)
+const ProfileSecurityBindWechatRoute =
+  ProfileSecurityBindWechatRouteImport.update({
+    id: '/bind-wechat',
+    path: '/bind-wechat',
+    getParentRoute: () => ProfileSecurityRoute,
+  } as any)
+const ProfileSecurityMergeRoute = ProfileSecurityMergeRouteImport.update({
+  id: '/merge',
+  path: '/merge',
+  getParentRoute: () => ProfileSecurityRoute,
+} as any)
+const ProfileSecurityPasswordRoute = ProfileSecurityPasswordRouteImport.update({
+  id: '/password',
+  path: '/password',
+  getParentRoute: () => ProfileSecurityRoute,
+} as any)
 const ProfileSetupAgeRoute = ProfileSetupAgeRouteImport.update({
   id: '/setup/age',
   path: '/setup/age',
@@ -172,6 +223,48 @@ const ApiPayProviderNotifyRoute = ApiPayProviderNotifyRouteImport.update({
   path: '/api/pay/$provider/notify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileSecurityBindWechatIndexRoute =
+  ProfileSecurityBindWechatIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProfileSecurityBindWechatRoute,
+  } as any)
+const ProfileSecurityBindWechatCallbackRoute =
+  ProfileSecurityBindWechatCallbackRouteImport.update({
+    id: '/callback',
+    path: '/callback',
+    getParentRoute: () => ProfileSecurityBindWechatRoute,
+  } as any)
+const ProfileSecurityBindWechatPreviewCallbackRoute =
+  ProfileSecurityBindWechatPreviewCallbackRouteImport.update({
+    id: '/preview-callback',
+    path: '/preview-callback',
+    getParentRoute: () => ProfileSecurityBindWechatRoute,
+  } as any)
+const ProfileSecurityMergeIndexRoute =
+  ProfileSecurityMergeIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProfileSecurityMergeRoute,
+  } as any)
+const ProfileSecurityMergeBindCallbackRoute =
+  ProfileSecurityMergeBindCallbackRouteImport.update({
+    id: '/bind-callback',
+    path: '/bind-callback',
+    getParentRoute: () => ProfileSecurityMergeRoute,
+  } as any)
+const ProfileSecurityMergeSuccessRoute =
+  ProfileSecurityMergeSuccessRouteImport.update({
+    id: '/success',
+    path: '/success',
+    getParentRoute: () => ProfileSecurityMergeRoute,
+  } as any)
+const ProfileSecurityMergeWechatCallbackRoute =
+  ProfileSecurityMergeWechatCallbackRouteImport.update({
+    id: '/wechat-callback',
+    path: '/wechat-callback',
+    getParentRoute: () => ProfileSecurityMergeRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -183,9 +276,11 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/agreement/privacy': typeof AgreementPrivacyRoute
   '/agreement/user': typeof AgreementUserRoute
+  '/login/forgot': typeof LoginForgotRoute
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/profile/security': typeof ProfileSecurityRouteWithChildren
   '/report/$recordId': typeof ReportRecordIdRoute
   '/report/career': typeof ReportCareerRoute
   '/report/center': typeof ReportCenterRoute
@@ -196,11 +291,23 @@ export interface FileRoutesByFullPath {
   '/match/': typeof MatchIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
+  '/profile/security/bind-phone': typeof ProfileSecurityBindPhoneRoute
+  '/profile/security/bind-wechat': typeof ProfileSecurityBindWechatRouteWithChildren
+  '/profile/security/merge': typeof ProfileSecurityMergeRouteWithChildren
+  '/profile/security/password': typeof ProfileSecurityPasswordRoute
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
   '/report/session/$sessionId': typeof ReportSessionSessionIdRoute
+  '/profile/security/': typeof ProfileSecurityIndexRoute
   '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
+  '/profile/security/bind-wechat/callback': typeof ProfileSecurityBindWechatCallbackRoute
+  '/profile/security/bind-wechat/preview-callback': typeof ProfileSecurityBindWechatPreviewCallbackRoute
+  '/profile/security/merge/bind-callback': typeof ProfileSecurityMergeBindCallbackRoute
+  '/profile/security/merge/success': typeof ProfileSecurityMergeSuccessRoute
+  '/profile/security/merge/wechat-callback': typeof ProfileSecurityMergeWechatCallbackRoute
+  '/profile/security/bind-wechat/': typeof ProfileSecurityBindWechatIndexRoute
+  '/profile/security/merge/': typeof ProfileSecurityMergeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -209,6 +316,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/agreement/privacy': typeof AgreementPrivacyRoute
   '/agreement/user': typeof AgreementUserRoute
+  '/login/forgot': typeof LoginForgotRoute
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
@@ -222,11 +330,21 @@ export interface FileRoutesByTo {
   '/match': typeof MatchIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
+  '/profile/security/bind-phone': typeof ProfileSecurityBindPhoneRoute
+  '/profile/security/password': typeof ProfileSecurityPasswordRoute
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
   '/report/session/$sessionId': typeof ReportSessionSessionIdRoute
+  '/profile/security': typeof ProfileSecurityIndexRoute
   '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
+  '/profile/security/bind-wechat/callback': typeof ProfileSecurityBindWechatCallbackRoute
+  '/profile/security/bind-wechat/preview-callback': typeof ProfileSecurityBindWechatPreviewCallbackRoute
+  '/profile/security/merge/bind-callback': typeof ProfileSecurityMergeBindCallbackRoute
+  '/profile/security/merge/success': typeof ProfileSecurityMergeSuccessRoute
+  '/profile/security/merge/wechat-callback': typeof ProfileSecurityMergeWechatCallbackRoute
+  '/profile/security/bind-wechat': typeof ProfileSecurityBindWechatIndexRoute
+  '/profile/security/merge': typeof ProfileSecurityMergeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -239,9 +357,11 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/agreement/privacy': typeof AgreementPrivacyRoute
   '/agreement/user': typeof AgreementUserRoute
+  '/login/forgot': typeof LoginForgotRoute
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/profile/security': typeof ProfileSecurityRouteWithChildren
   '/report/$recordId': typeof ReportRecordIdRoute
   '/report/career': typeof ReportCareerRoute
   '/report/center': typeof ReportCenterRoute
@@ -252,11 +372,23 @@ export interface FileRoutesById {
   '/match/': typeof MatchIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
+  '/profile/security/bind-phone': typeof ProfileSecurityBindPhoneRoute
+  '/profile/security/bind-wechat': typeof ProfileSecurityBindWechatRouteWithChildren
+  '/profile/security/merge': typeof ProfileSecurityMergeRouteWithChildren
+  '/profile/security/password': typeof ProfileSecurityPasswordRoute
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
   '/report/session/$sessionId': typeof ReportSessionSessionIdRoute
+  '/profile/security/': typeof ProfileSecurityIndexRoute
   '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
+  '/profile/security/bind-wechat/callback': typeof ProfileSecurityBindWechatCallbackRoute
+  '/profile/security/bind-wechat/preview-callback': typeof ProfileSecurityBindWechatPreviewCallbackRoute
+  '/profile/security/merge/bind-callback': typeof ProfileSecurityMergeBindCallbackRoute
+  '/profile/security/merge/success': typeof ProfileSecurityMergeSuccessRoute
+  '/profile/security/merge/wechat-callback': typeof ProfileSecurityMergeWechatCallbackRoute
+  '/profile/security/bind-wechat/': typeof ProfileSecurityBindWechatIndexRoute
+  '/profile/security/merge/': typeof ProfileSecurityMergeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -270,9 +402,11 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/agreement/privacy'
     | '/agreement/user'
+    | '/login/forgot'
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/profile/security'
     | '/report/$recordId'
     | '/report/career'
     | '/report/center'
@@ -283,11 +417,23 @@ export interface FileRouteTypes {
     | '/match/'
     | '/profile/'
     | '/login/wechat/callback'
+    | '/profile/security/bind-phone'
+    | '/profile/security/bind-wechat'
+    | '/profile/security/merge'
+    | '/profile/security/password'
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
     | '/report/session/$sessionId'
+    | '/profile/security/'
     | '/api/pay/$provider/notify'
+    | '/profile/security/bind-wechat/callback'
+    | '/profile/security/bind-wechat/preview-callback'
+    | '/profile/security/merge/bind-callback'
+    | '/profile/security/merge/success'
+    | '/profile/security/merge/wechat-callback'
+    | '/profile/security/bind-wechat/'
+    | '/profile/security/merge/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -296,6 +442,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/agreement/privacy'
     | '/agreement/user'
+    | '/login/forgot'
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
@@ -309,11 +456,21 @@ export interface FileRouteTypes {
     | '/match'
     | '/profile'
     | '/login/wechat/callback'
+    | '/profile/security/bind-phone'
+    | '/profile/security/password'
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
     | '/report/session/$sessionId'
+    | '/profile/security'
     | '/api/pay/$provider/notify'
+    | '/profile/security/bind-wechat/callback'
+    | '/profile/security/bind-wechat/preview-callback'
+    | '/profile/security/merge/bind-callback'
+    | '/profile/security/merge/success'
+    | '/profile/security/merge/wechat-callback'
+    | '/profile/security/bind-wechat'
+    | '/profile/security/merge'
   id:
     | '__root__'
     | '/'
@@ -325,9 +482,11 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/agreement/privacy'
     | '/agreement/user'
+    | '/login/forgot'
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/profile/security'
     | '/report/$recordId'
     | '/report/career'
     | '/report/center'
@@ -338,11 +497,23 @@ export interface FileRouteTypes {
     | '/match/'
     | '/profile/'
     | '/login/wechat/callback'
+    | '/profile/security/bind-phone'
+    | '/profile/security/bind-wechat'
+    | '/profile/security/merge'
+    | '/profile/security/password'
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
     | '/report/session/$sessionId'
+    | '/profile/security/'
     | '/api/pay/$provider/notify'
+    | '/profile/security/bind-wechat/callback'
+    | '/profile/security/bind-wechat/preview-callback'
+    | '/profile/security/merge/bind-callback'
+    | '/profile/security/merge/success'
+    | '/profile/security/merge/wechat-callback'
+    | '/profile/security/bind-wechat/'
+    | '/profile/security/merge/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -437,6 +608,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof LoginRoute
     }
+    '/login/forgot': {
+      id: '/login/forgot'
+      path: '/forgot'
+      fullPath: '/login/forgot'
+      preLoaderRoute: typeof LoginForgotRouteImport
+      parentRoute: typeof LoginRoute
+    }
     '/match/': {
       id: '/match/'
       path: '/'
@@ -470,6 +648,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/profile/'
       preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/security': {
+      id: '/profile/security'
+      path: '/security'
+      fullPath: '/profile/security'
+      preLoaderRoute: typeof ProfileSecurityRouteImport
       parentRoute: typeof ProfileRoute
     }
     '/report/$recordId': {
@@ -521,6 +706,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginWechatCallbackRouteImport
       parentRoute: typeof LoginRoute
     }
+    '/profile/security/': {
+      id: '/profile/security/'
+      path: '/'
+      fullPath: '/profile/security/'
+      preLoaderRoute: typeof ProfileSecurityIndexRouteImport
+      parentRoute: typeof ProfileSecurityRoute
+    }
+    '/profile/security/bind-phone': {
+      id: '/profile/security/bind-phone'
+      path: '/bind-phone'
+      fullPath: '/profile/security/bind-phone'
+      preLoaderRoute: typeof ProfileSecurityBindPhoneRouteImport
+      parentRoute: typeof ProfileSecurityRoute
+    }
+    '/profile/security/bind-wechat': {
+      id: '/profile/security/bind-wechat'
+      path: '/bind-wechat'
+      fullPath: '/profile/security/bind-wechat'
+      preLoaderRoute: typeof ProfileSecurityBindWechatRouteImport
+      parentRoute: typeof ProfileSecurityRoute
+    }
+    '/profile/security/merge': {
+      id: '/profile/security/merge'
+      path: '/merge'
+      fullPath: '/profile/security/merge'
+      preLoaderRoute: typeof ProfileSecurityMergeRouteImport
+      parentRoute: typeof ProfileSecurityRoute
+    }
+    '/profile/security/password': {
+      id: '/profile/security/password'
+      path: '/password'
+      fullPath: '/profile/security/password'
+      preLoaderRoute: typeof ProfileSecurityPasswordRouteImport
+      parentRoute: typeof ProfileSecurityRoute
+    }
     '/profile/setup/age': {
       id: '/profile/setup/age'
       path: '/setup/age'
@@ -556,15 +776,66 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPayProviderNotifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile/security/bind-wechat/': {
+      id: '/profile/security/bind-wechat/'
+      path: '/'
+      fullPath: '/profile/security/bind-wechat/'
+      preLoaderRoute: typeof ProfileSecurityBindWechatIndexRouteImport
+      parentRoute: typeof ProfileSecurityBindWechatRoute
+    }
+    '/profile/security/bind-wechat/callback': {
+      id: '/profile/security/bind-wechat/callback'
+      path: '/callback'
+      fullPath: '/profile/security/bind-wechat/callback'
+      preLoaderRoute: typeof ProfileSecurityBindWechatCallbackRouteImport
+      parentRoute: typeof ProfileSecurityBindWechatRoute
+    }
+    '/profile/security/bind-wechat/preview-callback': {
+      id: '/profile/security/bind-wechat/preview-callback'
+      path: '/preview-callback'
+      fullPath: '/profile/security/bind-wechat/preview-callback'
+      preLoaderRoute: typeof ProfileSecurityBindWechatPreviewCallbackRouteImport
+      parentRoute: typeof ProfileSecurityBindWechatRoute
+    }
+    '/profile/security/merge/': {
+      id: '/profile/security/merge/'
+      path: '/'
+      fullPath: '/profile/security/merge/'
+      preLoaderRoute: typeof ProfileSecurityMergeIndexRouteImport
+      parentRoute: typeof ProfileSecurityMergeRoute
+    }
+    '/profile/security/merge/bind-callback': {
+      id: '/profile/security/merge/bind-callback'
+      path: '/bind-callback'
+      fullPath: '/profile/security/merge/bind-callback'
+      preLoaderRoute: typeof ProfileSecurityMergeBindCallbackRouteImport
+      parentRoute: typeof ProfileSecurityMergeRoute
+    }
+    '/profile/security/merge/success': {
+      id: '/profile/security/merge/success'
+      path: '/success'
+      fullPath: '/profile/security/merge/success'
+      preLoaderRoute: typeof ProfileSecurityMergeSuccessRouteImport
+      parentRoute: typeof ProfileSecurityMergeRoute
+    }
+    '/profile/security/merge/wechat-callback': {
+      id: '/profile/security/merge/wechat-callback'
+      path: '/wechat-callback'
+      fullPath: '/profile/security/merge/wechat-callback'
+      preLoaderRoute: typeof ProfileSecurityMergeWechatCallbackRouteImport
+      parentRoute: typeof ProfileSecurityMergeRoute
+    }
   }
 }
 
 interface LoginRouteChildren {
+  LoginForgotRoute: typeof LoginForgotRoute
   LoginIndexRoute: typeof LoginIndexRoute
   LoginWechatCallbackRoute: typeof LoginWechatCallbackRoute
 }
 
 const LoginRouteChildren: LoginRouteChildren = {
+  LoginForgotRoute: LoginForgotRoute,
   LoginIndexRoute: LoginIndexRoute,
   LoginWechatCallbackRoute: LoginWechatCallbackRoute,
 }
@@ -587,7 +858,66 @@ const MatchRouteChildren: MatchRouteChildren = {
 
 const MatchRouteWithChildren = MatchRoute._addFileChildren(MatchRouteChildren)
 
+interface ProfileSecurityBindWechatRouteChildren {
+  ProfileSecurityBindWechatCallbackRoute: typeof ProfileSecurityBindWechatCallbackRoute
+  ProfileSecurityBindWechatPreviewCallbackRoute: typeof ProfileSecurityBindWechatPreviewCallbackRoute
+  ProfileSecurityBindWechatIndexRoute: typeof ProfileSecurityBindWechatIndexRoute
+}
+
+const ProfileSecurityBindWechatRouteChildren: ProfileSecurityBindWechatRouteChildren =
+  {
+    ProfileSecurityBindWechatCallbackRoute:
+      ProfileSecurityBindWechatCallbackRoute,
+    ProfileSecurityBindWechatPreviewCallbackRoute:
+      ProfileSecurityBindWechatPreviewCallbackRoute,
+    ProfileSecurityBindWechatIndexRoute: ProfileSecurityBindWechatIndexRoute,
+  }
+
+const ProfileSecurityBindWechatRouteWithChildren =
+  ProfileSecurityBindWechatRoute._addFileChildren(
+    ProfileSecurityBindWechatRouteChildren,
+  )
+
+interface ProfileSecurityMergeRouteChildren {
+  ProfileSecurityMergeBindCallbackRoute: typeof ProfileSecurityMergeBindCallbackRoute
+  ProfileSecurityMergeSuccessRoute: typeof ProfileSecurityMergeSuccessRoute
+  ProfileSecurityMergeWechatCallbackRoute: typeof ProfileSecurityMergeWechatCallbackRoute
+  ProfileSecurityMergeIndexRoute: typeof ProfileSecurityMergeIndexRoute
+}
+
+const ProfileSecurityMergeRouteChildren: ProfileSecurityMergeRouteChildren = {
+  ProfileSecurityMergeBindCallbackRoute: ProfileSecurityMergeBindCallbackRoute,
+  ProfileSecurityMergeSuccessRoute: ProfileSecurityMergeSuccessRoute,
+  ProfileSecurityMergeWechatCallbackRoute:
+    ProfileSecurityMergeWechatCallbackRoute,
+  ProfileSecurityMergeIndexRoute: ProfileSecurityMergeIndexRoute,
+}
+
+const ProfileSecurityMergeRouteWithChildren =
+  ProfileSecurityMergeRoute._addFileChildren(ProfileSecurityMergeRouteChildren)
+
+interface ProfileSecurityRouteChildren {
+  ProfileSecurityBindPhoneRoute: typeof ProfileSecurityBindPhoneRoute
+  ProfileSecurityBindWechatRoute: typeof ProfileSecurityBindWechatRouteWithChildren
+  ProfileSecurityMergeRoute: typeof ProfileSecurityMergeRouteWithChildren
+  ProfileSecurityPasswordRoute: typeof ProfileSecurityPasswordRoute
+  ProfileSecurityIndexRoute: typeof ProfileSecurityIndexRoute
+}
+
+const ProfileSecurityRouteChildren: ProfileSecurityRouteChildren = {
+  ProfileSecurityBindPhoneRoute: ProfileSecurityBindPhoneRoute,
+  ProfileSecurityBindWechatRoute: ProfileSecurityBindWechatRouteWithChildren,
+  ProfileSecurityMergeRoute: ProfileSecurityMergeRouteWithChildren,
+  ProfileSecurityPasswordRoute: ProfileSecurityPasswordRoute,
+  ProfileSecurityIndexRoute: ProfileSecurityIndexRoute,
+}
+
+const ProfileSecurityRouteWithChildren = ProfileSecurityRoute._addFileChildren(
+  ProfileSecurityRouteChildren,
+)
+
 interface ProfileRouteChildren {
+  ProfileSecurityRoute: typeof ProfileSecurityRouteWithChildren
   ProfileIndexRoute: typeof ProfileIndexRoute
   ProfileSetupAgeRoute: typeof ProfileSetupAgeRoute
   ProfileSetupGamesRoute: typeof ProfileSetupGamesRoute
@@ -595,6 +925,7 @@ interface ProfileRouteChildren {
 }
 
 const ProfileRouteChildren: ProfileRouteChildren = {
+  ProfileSecurityRoute: ProfileSecurityRouteWithChildren,
   ProfileIndexRoute: ProfileIndexRoute,
   ProfileSetupAgeRoute: ProfileSetupAgeRoute,
   ProfileSetupGamesRoute: ProfileSetupGamesRoute,

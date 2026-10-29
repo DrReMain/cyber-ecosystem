@@ -37,3 +37,18 @@ E10-a 复对账(10-28,live dev 栈,同款 innerText oracle):14 行中 12 行逐�
 
 计数:6 条 = 白名单形② 4 + 形① 2 + 照录 1(重叠计:G-106 零偏离不计处置)。
 对齐判定:四页布局/文案/状态徽章/空态句=原型渲染态逐字誊录(覆盖条 N/6 动态、<3 维不画雷达句、缺维不画轴句、趋势 2 次门槛句、职业关闭态全版);live 验证=四路由注册+profileFlowGuard 链(curl 307→login?next 各自路径);登录态渲染递延片 e(策略翻转 e2e 带会话全链)。
+
+## 三批 · E6c-c 账号安全面(2026-10-30)
+
+出处:`prototype/{bind-phone,bind-wechat,account-merge-confirm}.html`+security/密码族 block3/4 文案块(渲染态读);实际=工作树 `/profile/security/*`+`/login/forgot` @ zh-CN(E6c-c 未提交态)。
+
+| # | 面 | 类型 | 期望(原型) | 实际(重建) | 处置 |
+|---|---|---|---|---|---|
+| G-201 | onboarding 昵称步「获取微信昵称」pill | 缺面 | 昵称输入侧「获取微信昵称」一键带入 | 无 | 红:需 snsapi_userinfo 授权域+userinfo 能力(provider 现仅 snsapi_base 换 openid),递延 E6c-d 微信 OAuth transport 缝 |
+| G-202 | BLOCKED pane「去意见反馈」CTA | 契约门控 | 跳 feedback-submit 页 | soon toast「即将开放」 | 红:feedback 契约未建(P13 消息中心+反馈召回在窗),门控占位;契约落地时接真跳 |
+| G-203 | 合并确认页保留卡掩码 | 策略 | 原型单手机号场景无此歧义 | 多凭证账号显示第二号(7777)非登录主号(6666) | 待面检:微信腿走查实证;掩码取 credential 列表序,主号语义待 PM 定(候选=最近登录凭证/首凭证) |
+| G-204 | 解绑/换绑 | 缺面 | 原型 security 页注记「解绑请联系客服」 | 同文案照录,无自助解绑 | 白名单形②:E6c-b 裁定重绑解绑零建设走客服;文案照原型 |
+| G-205 | 设置密码页手机号输入 | 状态 | 原型设置态仅掩码+验证码 | 增 typed phone input(placeholder 含掩码) | 白名单形②:服务端 ResetPassword 证明=码到绑定手机,客户端只持掩码无法发码——设计缺口以客户端补全闭合,契约零改动;原型无此场景交集 |
+
+计数:5 条 = 红 2(G-201/G-202 递延有主) + 待面检 1 + 白名单形② 2。
+对齐判定:原型 n31/32/33/34 全文案逐字誊录(冲突卡/凭证校验卡/琥珀警告/双闸 sheet 文案/blocked pane 全段——「如需合请走人工」原型笔误修正为「如需合并」);success 页文案=block3 微信语境照录,短信腿场景共用(原型无短信腿 success 变体);四场景全态 live 走查(短信腿/微信真人腿/KEEP_OTHER/BLOCKED)含 DB 断言与净清。

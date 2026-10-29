@@ -13,3 +13,8 @@ export const getProfile = ProfileService.method.getProfile;
  * @generated from rpc cyber.esports.v1.ProfileService.UpdateProfile
  */
 export const updateProfile = ProfileService.method.updateProfile;
+
+/**
+ * @generated from rpc cyber.esports.v1.ProfileService.PreviewMerge
+ */
+export const previewMerge = ProfileService.method.previewMerge;

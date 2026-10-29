@@ -19,6 +19,7 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
+	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
@@ -28,6 +29,7 @@ type systemClient struct {
 	log        *slog.Logger
 	introspect systemv1connect.IntrospectServiceClient
 	users      systemv1connect.UserServiceClient
+	auth       systemv1connect.AuthServiceClient
 }
 
 func NewSystemClient(c *conf.Remote, logger *slog.Logger) (*systemClient, func(), error) {
@@ -44,6 +46,7 @@ func NewSystemClient(c *conf.Remote, logger *slog.Logger) (*systemClient, func()
 		log:        logger.With("module", "client/system"),
 		introspect: systemv1connect.NewIntrospectServiceClient(conn.HTTPClient(), conn.BaseURL(), conn.ClientOptions()...),
 		users:      systemv1connect.NewUserServiceClient(conn.HTTPClient(), conn.BaseURL(), conn.ClientOptions()...),
+		auth:       systemv1connect.NewAuthServiceClient(conn.HTTPClient(), conn.BaseURL(), conn.ClientOptions()...),
 	}, cleanup, nil
 }
 
@@ -102,7 +105,84 @@ func (c *systemClient) ListRoster(ctx context.Context, q *member.RosterQuery) (*
 	}, nil
 }
 
+func (c *systemClient) ResolveCredential(ctx context.Context, cred *profile.MergeCredential) (*profile.CredentialFacts, error) {
+	ctx, err := withCallerSession(ctx)
+	if err != nil {
+		return nil, err
+	}
+	req := &systempb.ResolveCredentialRequest{}
+	if cred.Phone != nil {
+		key := smsProviderKey
+		req.Provider = &key
+		req.Credential = &systempb.ResolveCredentialRequest_Phone{Phone: *cred.Phone}
+	} else {
+		key := wechatProviderKey
+		req.Provider = &key
+		state := cred.State
+		req.State = &state
+		req.Credential = &systempb.ResolveCredentialRequest_Wechat{
+			Wechat: &systempb.WeChatIdentityPayload{Code: cred.WeChatCode},
+		}
+	}
+	resp, err := c.auth.ResolveCredential(ctx, connectrpc.NewRequest(req))
+	if err != nil {
+		return nil, err
+	}
+	owner := resp.Msg.GetOwner()
+	if owner == nil {
+		return nil, nil
+	}
+	return mapCredentialFacts(owner), nil
+}
+
+func (c *systemClient) SecurityStatus(ctx context.Context) (*profile.SecurityFacts, error) {
+	ctx, err := withCallerSession(ctx)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.auth.GetSecurityStatus(ctx, connectrpc.NewRequest(&systempb.GetSecurityStatusRequest{}))
+	if err != nil {
+		return nil, err
+	}
+	facts := &profile.SecurityFacts{HasPassword: resp.Msg.GetHasPassword(), CredentialCount: len(resp.Msg.GetCredentials())}
+	for _, cred := range resp.Msg.GetCredentials() {
+		switch cred.GetKind() {
+		case smsCredKind:
+			masked := cred.GetMaskedIdentifier()
+			facts.PhoneMask = &masked
+		case wechatCredKind:
+			facts.Wechat = true
+		}
+	}
+	return facts, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
+
+const (
+	smsProviderKey    = "sms"    // the system config's own instance key
+	wechatProviderKey = "wechat" // ditto, the MP web-authorization row
+	smsCredKind       = "sms"    // the exchange's registered credential families
+	wechatCredKind    = "wechat_mp"
+)
+
+func mapCredentialFacts(owner *systempb.CredentialOwner) *profile.CredentialFacts {
+	facts := &profile.CredentialFacts{
+		UserID:    owner.GetUserId(),
+		Enabled:   owner.GetEnabled(),
+		Mergeable: owner.GetMergeable(),
+	}
+	for _, cred := range owner.GetCredentials() {
+		switch cred.GetKind() {
+		case smsCredKind:
+			masked := cred.GetMaskedIdentifier()
+			facts.PhoneMask = &masked
+		case wechatCredKind:
+			facts.Wechat = true
+		}
+	}
+	return facts
+}
 
 func withCallerSession(ctx context.Context) (context.Context, error) {
 	subject, ok := security.SubjectFromCtx(ctx)

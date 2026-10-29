@@ -16,7 +16,148 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/esports/v1/profile.proto.
  */
 export const file_cyber_esports_v1_profile: GenFile = /*@__PURE__*/
-  fileDesc("Ch5jeWJlci9lc3BvcnRzL3YxL3Byb2ZpbGUucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEiqQQKB1Byb2ZpbGUSKAoCaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoIbmlja25hbWUYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLwoKYmlydGhfeWVhchgDIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlEjAKC2JpcnRoX21vbnRoGAQgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSLgoIYWdlX2JhbmQYBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMAoKYXZhdGFyX3VybBgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRI5ChVndWFyZGlhbl9jb25zZW50ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiwKBWdhbWVzGAggAygLMh0uY3liZXIuZXNwb3J0cy52MS5Qcm9maWxlR2FtZRIuCgpjcmVhdGVkX2F0GAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgp1cGRhdGVkX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgNzZXgYCyABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGVTZXhIAIgBAUIGCgRfc2V4Im8KC1Byb2ZpbGVHYW1lEi0KB2dhbWVfaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLY3VzdG9tX25hbWUYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUiEwoRR2V0UHJvZmlsZVJlcXVlc3QiQAoSR2V0UHJvZmlsZVJlc3BvbnNlEioKB3Byb2ZpbGUYASABKAsyGS5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGUitQQKFFVwZGF0ZVByb2ZpbGVSZXF1ZXN0EiAKCG5pY2tuYW1lGAEgASgJQgm6SAZyBBACGAxIAIgBARIjCgphdmF0YXJfdXJsGAIgASgJQgq6SAdyBRABGPQDSAGIAQESJAoKYmlydGhfeWVhchgDIAEoBUILukgIGgYYtBAo7A5IAogBARIjCgtiaXJ0aF9tb250aBgEIAEoBUIJukgGGgQYDCgBSAOIAQESHgoRZ3VhcmRpYW5fYWNjZXB0ZWQYBSABKAhIBIgBARJDCg9nYW1lX3ByZWZlcmVuY2UYBiABKAsyJS5jeWJlci5lc3BvcnRzLnYxLkdhbWVQcmVmZXJlbmNlSW5wdXRIBYgBARIuCgNzZXgYByABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGVTZXhIBogBATqIAbpIhAEagQEKH1VwZGF0ZVByb2ZpbGVSZXF1ZXN0LmJpcnRoX3BhaXISL2JpcnRoX3llYXIgYW5kIGJpcnRoX21vbnRoIG11c3QgYmUgc2V0IHRvZ2V0aGVyGi1oYXModGhpcy5iaXJ0aF95ZWFyKSA9PSBoYXModGhpcy5iaXJ0aF9tb250aClCCwoJX25pY2tuYW1lQg0KC19hdmF0YXJfdXJsQg0KC19iaXJ0aF95ZWFyQg4KDF9iaXJ0aF9tb250aEIUChJfZ3VhcmRpYW5fYWNjZXB0ZWRCEgoQX2dhbWVfcHJlZmVyZW5jZUIGCgRfc2V4ImEKE0dhbWVQcmVmZXJlbmNlSW5wdXQSIgoIZ2FtZV9pZHMYASADKAlCELpIDZIBChAyIgZyBBABGEASJgoMY3VzdG9tX25hbWVzGAIgAygJQhC6SA2SAQoQFCIGcgQQARgoIkMKFVVwZGF0ZVByb2ZpbGVSZXNwb25zZRIqCgdwcm9maWxlGAEgASgLMhkuY3liZXIuZXNwb3J0cy52MS5Qcm9maWxlKnUKClByb2ZpbGVTZXgSGwoXUFJPRklMRV9TRVhfVU5TUEVDSUZJRUQQABIUChBQUk9GSUxFX1NFWF9NQUxFEAESFgoSUFJPRklMRV9TRVhfRkVNQUxFEAISHAoYUFJPRklMRV9TRVhfVU5ERVRFUk1JTkVEEAMy7AIKDlByb2ZpbGVTZXJ2aWNlEpwBCgpHZXRQcm9maWxlEiMuY3liZXIuZXNwb3J0cy52MS5HZXRQcm9maWxlUmVxdWVzdBokLmN5YmVyLmVzcG9ydHMudjEuR2V0UHJvZmlsZVJlc3BvbnNlIkOI8QQEitMOHAoY6I635Y+W5b2T5YmN546p5a6255S75YOPEAGC0+STAhkSFy9hcGkvdjEvZXNwb3J0cy9wcm9maWxlEqgBCg1VcGRhdGVQcm9maWxlEiYuY3liZXIuZXNwb3J0cy52MS5VcGRhdGVQcm9maWxlUmVxdWVzdBonLmN5YmVyLmVzcG9ydHMudjEuVXBkYXRlUHJvZmlsZVJlc3BvbnNlIkaI8QQEitMOHAoY5L+d5a2Y5b2T5YmN546p5a6255S75YOPEAKC0+STAhw6ASoaFy9hcGkvdjEvZXNwb3J0cy9wcm9maWxlGhCK4gkM546p5a6255S75YOPQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("Ch5jeWJlci9lc3BvcnRzL3YxL3Byb2ZpbGUucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEipQIKE1ByZXZpZXdNZXJnZVJlcXVlc3QSJgoFcGhvbmUYASABKAlCFbpIEnIQMg5eWzAtOStdezUsMjB9JEgAEjQKBndlY2hhdBgCIAEoCzIiLmN5YmVyLmVzcG9ydHMudjEuV2VDaGF0TWVyZ2VQcm9vZkgAEh4KBXN0YXRlGAMgASgJQgq6SAdyBRABGIABSAGIAQE6cbpIbhpsCiFQcmV2aWV3TWVyZ2VSZXF1ZXN0LnN0YXRlX3BhaXJpbmcSInN0YXRlIHJpZGVzIHRoZSB3ZWNoYXQgYnJhbmNoIG9ubHkaI2hhcyh0aGlzLndlY2hhdCkgPT0gaGFzKHRoaXMuc3RhdGUpQhMKCmNyZWRlbnRpYWwSBbpIAggBQggKBl9zdGF0ZSI6ChBXZUNoYXRNZXJnZVByb29mEh0KBGNvZGUYASABKAlCCrpIB8gBAXICEAFIAIgBAUIHCgVfY29kZSK+AQoTTWVyZ2VBY2NvdW50U3VtbWFyeRIPCgd1c2VyX2lkGAEgASgJEjAKCnBob25lX21hc2sYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSDgoGd2VjaGF0GAMgASgIEhAKCHNlc3Npb25zGAQgASgFEjAKDG1lbWJlcl91bnRpbBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASEAoIdW5sb2NrZWQYBiABKAgiuQEKFFByZXZpZXdNZXJnZVJlc3BvbnNlEjQKBnN0YXR1cxgBIAEoDjIkLmN5YmVyLmVzcG9ydHMudjEuTWVyZ2VQcmV2aWV3U3RhdHVzEjUKBmNhbGxlchgCIAEoCzIlLmN5YmVyLmVzcG9ydHMudjEuTWVyZ2VBY2NvdW50U3VtbWFyeRI0CgVvdGhlchgDIAEoCzIlLmN5YmVyLmVzcG9ydHMudjEuTWVyZ2VBY2NvdW50U3VtbWFyeSKpBAoHUHJvZmlsZRIoCgJpZBgBIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIuCghuaWNrbmFtZRgCIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIvCgpiaXJ0aF95ZWFyGAMgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSMAoLYmlydGhfbW9udGgYBCABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZRIuCghhZ2VfYmFuZBgFIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIwCgphdmF0YXJfdXJsGAYgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjkKFWd1YXJkaWFuX2NvbnNlbnRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoFZ2FtZXMYCCADKAsyHS5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGVHYW1lEi4KCmNyZWF0ZWRfYXQYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYCiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KA3NleBgLIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUHJvZmlsZVNleEgAiAEBQgYKBF9zZXgibwoLUHJvZmlsZUdhbWUSLQoHZ2FtZV9pZBgBIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIxCgtjdXN0b21fbmFtZRgCIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZSITChFHZXRQcm9maWxlUmVxdWVzdCJAChJHZXRQcm9maWxlUmVzcG9uc2USKgoHcHJvZmlsZRgBIAEoCzIZLmN5YmVyLmVzcG9ydHMudjEuUHJvZmlsZSK1BAoUVXBkYXRlUHJvZmlsZVJlcXVlc3QSIAoIbmlja25hbWUYASABKAlCCbpIBnIEEAIYDEgAiAEBEiMKCmF2YXRhcl91cmwYAiABKAlCCrpIB3IFEAEY9ANIAYgBARIkCgpiaXJ0aF95ZWFyGAMgASgFQgu6SAgaBhi0ECjsDkgCiAEBEiMKC2JpcnRoX21vbnRoGAQgASgFQgm6SAYaBBgMKAFIA4gBARIeChFndWFyZGlhbl9hY2NlcHRlZBgFIAEoCEgEiAEBEkMKD2dhbWVfcHJlZmVyZW5jZRgGIAEoCzIlLmN5YmVyLmVzcG9ydHMudjEuR2FtZVByZWZlcmVuY2VJbnB1dEgFiAEBEi4KA3NleBgHIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUHJvZmlsZVNleEgGiAEBOogBukiEARqBAQofVXBkYXRlUHJvZmlsZVJlcXVlc3QuYmlydGhfcGFpchIvYmlydGhfeWVhciBhbmQgYmlydGhfbW9udGggbXVzdCBiZSBzZXQgdG9nZXRoZXIaLWhhcyh0aGlzLmJpcnRoX3llYXIpID09IGhhcyh0aGlzLmJpcnRoX21vbnRoKUILCglfbmlja25hbWVCDQoLX2F2YXRhcl91cmxCDQoLX2JpcnRoX3llYXJCDgoMX2JpcnRoX21vbnRoQhQKEl9ndWFyZGlhbl9hY2NlcHRlZEISChBfZ2FtZV9wcmVmZXJlbmNlQgYKBF9zZXgiYQoTR2FtZVByZWZlcmVuY2VJbnB1dBIiCghnYW1lX2lkcxgBIAMoCUIQukgNkgEKEDIiBnIEEAEYQBImCgxjdXN0b21fbmFtZXMYAiADKAlCELpIDZIBChAUIgZyBBABGCgiQwoVVXBkYXRlUHJvZmlsZVJlc3BvbnNlEioKB3Byb2ZpbGUYASABKAsyGS5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGUq5QEKEk1lcmdlUHJldmlld1N0YXR1cxIkCiBNRVJHRV9QUkVWSUVXX1NUQVRVU19VTlNQRUNJRklFRBAAEh0KGU1FUkdFX1BSRVZJRVdfU1RBVFVTX0ZSRUUQARIdChlNRVJHRV9QUkVWSUVXX1NUQVRVU19TRUxGEAISJAogTUVSR0VfUFJFVklFV19TVEFUVVNfS0VFUF9DQUxMRVIQAxIjCh9NRVJHRV9QUkVWSUVXX1NUQVRVU19LRUVQX09USEVSEAQSIAocTUVSR0VfUFJFVklFV19TVEFUVVNfQkxPQ0tFRBAFKnUKClByb2ZpbGVTZXgSGwoXUFJPRklMRV9TRVhfVU5TUEVDSUZJRUQQABIUChBQUk9GSUxFX1NFWF9NQUxFEAESFgoSUFJPRklMRV9TRVhfRkVNQUxFEAISHAoYUFJPRklMRV9TRVhfVU5ERVRFUk1JTkVEEAMyuwQKDlByb2ZpbGVTZXJ2aWNlEpwBCgpHZXRQcm9maWxlEiMuY3liZXIuZXNwb3J0cy52MS5HZXRQcm9maWxlUmVxdWVzdBokLmN5YmVyLmVzcG9ydHMudjEuR2V0UHJvZmlsZVJlc3BvbnNlIkOI8QQEitMOHAoY6I635Y+W5b2T5YmN546p5a6255S75YOPEAGC0+STAhkSFy9hcGkvdjEvZXNwb3J0cy9wcm9maWxlEqgBCg1VcGRhdGVQcm9maWxlEiYuY3liZXIuZXNwb3J0cy52MS5VcGRhdGVQcm9maWxlUmVxdWVzdBonLmN5YmVyLmVzcG9ydHMudjEuVXBkYXRlUHJvZmlsZVJlc3BvbnNlIkaI8QQEitMOHAoY5L+d5a2Y5b2T5YmN546p5a6255S75YOPEAKC0+STAhw6ASoaFy9hcGkvdjEvZXNwb3J0cy9wcm9maWxlEswBCgxQcmV2aWV3TWVyZ2USJS5jeWJlci5lc3BvcnRzLnYxLlByZXZpZXdNZXJnZVJlcXVlc3QaJi5jeWJlci5lc3BvcnRzLnYxLlByZXZpZXdNZXJnZVJlc3BvbnNlIm2I8QQEitMONQox5ZCI5bm2IG9mZmVyIOmdou+8muepuuWPt+WIpOaNruS4juS4pOi0puWPt+aRmOimgRABgtPkkwIqOgEqIiUvYXBpL3YxL2VzcG9ydHMvcHJvZmlsZS9wcmV2aWV3LW1lcmdlGhCK4gkM546p5a6255S75YOPQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+
+/**
+ * The merge offer's decision input. The sms branch carries the bare phone —
+ * occupancy is not a secret the bind flow doesn't already reveal, and the
+ * merge itself re-proves with a fresh code. The wechat branch carries the
+ * OAuth proof: only the exchange learns the openid, so the preview burns
+ * state and code exactly like a bind attempt would.
+ *
+ * @generated from message cyber.esports.v1.PreviewMergeRequest
+ */
+export type PreviewMergeRequest = Message<"cyber.esports.v1.PreviewMergeRequest"> & {
+  /**
+   * @generated from oneof cyber.esports.v1.PreviewMergeRequest.credential
+   */
+  credential: {
+    /**
+     * @generated from field: string phone = 1;
+     */
+    value: string;
+    case: "phone";
+  } | {
+    /**
+     * @generated from field: cyber.esports.v1.WeChatMergeProof wechat = 2;
+     */
+    value: WeChatMergeProof;
+    case: "wechat";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * Wechat branch only: the bind-minted one-shot state.
+   *
+   * @generated from field: optional string state = 3;
+   */
+  state?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.PreviewMergeRequest.
+ * Use `create(PreviewMergeRequestSchema)` to create a new message.
+ */
+export const PreviewMergeRequestSchema: GenMessage<PreviewMergeRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_profile, 0);
+
+/**
+ * @generated from message cyber.esports.v1.WeChatMergeProof
+ */
+export type WeChatMergeProof = Message<"cyber.esports.v1.WeChatMergeProof"> & {
+  /**
+   * @generated from field: optional string code = 1;
+   */
+  code?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.WeChatMergeProof.
+ * Use `create(WeChatMergeProofSchema)` to create a new message.
+ */
+export const WeChatMergeProofSchema: GenMessage<WeChatMergeProof> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_profile, 1);
+
+/**
+ * One side's confirm-page facts. Identifier-shaped values arrive masked by
+ * the system service; clients render, never re-derive.
+ *
+ * @generated from message cyber.esports.v1.MergeAccountSummary
+ */
+export type MergeAccountSummary = Message<"cyber.esports.v1.MergeAccountSummary"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * Masked phone when the side holds an sms credential, else null.
+   *
+   * @generated from field: google.protobuf.StringValue phone_mask = 2;
+   */
+  phoneMask?: string | undefined;
+
+  /**
+   * True when the side holds a wechat credential.
+   *
+   * @generated from field: bool wechat = 3;
+   */
+  wechat: boolean;
+
+  /**
+   * Distinct assessment sessions with a valid attempt.
+   *
+   * @generated from field: int32 sessions = 4;
+   */
+  sessions: number;
+
+  /**
+   * The furthest live membership window; null = no live membership.
+   *
+   * @generated from field: google.protobuf.Timestamp member_until = 5;
+   */
+  memberUntil?: Timestamp | undefined;
+
+  /**
+   * Any unlocked report family.
+   *
+   * @generated from field: bool unlocked = 6;
+   */
+  unlocked: boolean;
+};
+
+/**
+ * Describes the message cyber.esports.v1.MergeAccountSummary.
+ * Use `create(MergeAccountSummarySchema)` to create a new message.
+ */
+export const MergeAccountSummarySchema: GenMessage<MergeAccountSummary> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_profile, 2);
+
+/**
+ * @generated from message cyber.esports.v1.PreviewMergeResponse
+ */
+export type PreviewMergeResponse = Message<"cyber.esports.v1.PreviewMergeResponse"> & {
+  /**
+   * @generated from field: cyber.esports.v1.MergePreviewStatus status = 1;
+   */
+  status: MergePreviewStatus;
+
+  /**
+   * @generated from field: cyber.esports.v1.MergeAccountSummary caller = 2;
+   */
+  caller?: MergeAccountSummary | undefined;
+
+  /**
+   * @generated from field: cyber.esports.v1.MergeAccountSummary other = 3;
+   */
+  other?: MergeAccountSummary | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.PreviewMergeResponse.
+ * Use `create(PreviewMergeResponseSchema)` to create a new message.
+ */
+export const PreviewMergeResponseSchema: GenMessage<PreviewMergeResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_profile, 3);
 
 /**
  * The member's own profile. Entity fields are wrappers: null means "not set
@@ -107,7 +248,7 @@ export type Profile = Message<"cyber.esports.v1.Profile"> & {
  * Use `create(ProfileSchema)` to create a new message.
  */
 export const ProfileSchema: GenMessage<Profile> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_profile, 0);
+  messageDesc(file_cyber_esports_v1_profile, 4);
 
 /**
  * One preference entry: exactly one of the pair is set — a catalog reference
@@ -132,7 +273,7 @@ export type ProfileGame = Message<"cyber.esports.v1.ProfileGame"> & {
  * Use `create(ProfileGameSchema)` to create a new message.
  */
 export const ProfileGameSchema: GenMessage<ProfileGame> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_profile, 1);
+  messageDesc(file_cyber_esports_v1_profile, 5);
 
 /**
  * getProfile
@@ -147,7 +288,7 @@ export type GetProfileRequest = Message<"cyber.esports.v1.GetProfileRequest"> & 
  * Use `create(GetProfileRequestSchema)` to create a new message.
  */
 export const GetProfileRequestSchema: GenMessage<GetProfileRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_profile, 2);
+  messageDesc(file_cyber_esports_v1_profile, 6);
 
 /**
  * @generated from message cyber.esports.v1.GetProfileResponse
@@ -164,7 +305,7 @@ export type GetProfileResponse = Message<"cyber.esports.v1.GetProfileResponse"> 
  * Use `create(GetProfileResponseSchema)` to create a new message.
  */
 export const GetProfileResponseSchema: GenMessage<GetProfileResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_profile, 3);
+  messageDesc(file_cyber_esports_v1_profile, 7);
 
 /**
  * updateProfile — presence-based partial update: a field left out stays
@@ -222,7 +363,7 @@ export type UpdateProfileRequest = Message<"cyber.esports.v1.UpdateProfileReques
  * Use `create(UpdateProfileRequestSchema)` to create a new message.
  */
 export const UpdateProfileRequestSchema: GenMessage<UpdateProfileRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_profile, 4);
+  messageDesc(file_cyber_esports_v1_profile, 8);
 
 /**
  * @generated from message cyber.esports.v1.GamePreferenceInput
@@ -244,7 +385,7 @@ export type GamePreferenceInput = Message<"cyber.esports.v1.GamePreferenceInput"
  * Use `create(GamePreferenceInputSchema)` to create a new message.
  */
 export const GamePreferenceInputSchema: GenMessage<GamePreferenceInput> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_profile, 5);
+  messageDesc(file_cyber_esports_v1_profile, 9);
 
 /**
  * @generated from message cyber.esports.v1.UpdateProfileResponse
@@ -261,7 +402,55 @@ export type UpdateProfileResponse = Message<"cyber.esports.v1.UpdateProfileRespo
  * Use `create(UpdateProfileResponseSchema)` to create a new message.
  */
 export const UpdateProfileResponseSchema: GenMessage<UpdateProfileResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_profile, 6);
+  messageDesc(file_cyber_esports_v1_profile, 10);
+
+/**
+ * The offer verdict. KEEP_CALLER: the other side is the empty one and the
+ * caller's session executes the merge as-is. KEEP_OTHER: the caller is the
+ * empty one; the client decomposes — log in via the other side's wechat,
+ * then merge with the caller's phone code. BLOCKED: both sides carry
+ * business weight, no automatic merge. FREE and SELF answer the plain-bind
+ * question so the bind pages can route without a second vocabulary.
+ *
+ * @generated from enum cyber.esports.v1.MergePreviewStatus
+ */
+export enum MergePreviewStatus {
+  /**
+   * @generated from enum value: MERGE_PREVIEW_STATUS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: MERGE_PREVIEW_STATUS_FREE = 1;
+   */
+  FREE = 1,
+
+  /**
+   * @generated from enum value: MERGE_PREVIEW_STATUS_SELF = 2;
+   */
+  SELF = 2,
+
+  /**
+   * @generated from enum value: MERGE_PREVIEW_STATUS_KEEP_CALLER = 3;
+   */
+  KEEP_CALLER = 3,
+
+  /**
+   * @generated from enum value: MERGE_PREVIEW_STATUS_KEEP_OTHER = 4;
+   */
+  KEEP_OTHER = 4,
+
+  /**
+   * @generated from enum value: MERGE_PREVIEW_STATUS_BLOCKED = 5;
+   */
+  BLOCKED = 5,
+}
+
+/**
+ * Describes the enum cyber.esports.v1.MergePreviewStatus.
+ */
+export const MergePreviewStatusSchema: GenEnum<MergePreviewStatus> = /*@__PURE__*/
+  enumDesc(file_cyber_esports_v1_profile, 0);
 
 /**
  * The profile's sex vocabulary, three states by ruling.
@@ -294,7 +483,7 @@ export enum ProfileSex {
  * Describes the enum cyber.esports.v1.ProfileSex.
  */
 export const ProfileSexSchema: GenEnum<ProfileSex> = /*@__PURE__*/
-  enumDesc(file_cyber_esports_v1_profile, 0);
+  enumDesc(file_cyber_esports_v1_profile, 1);
 
 /**
  * Player profile, the C-end onboarding aggregate: nickname, birth year/month,
@@ -321,6 +510,14 @@ export const ProfileService: GenService<{
     methodKind: "unary";
     input: typeof UpdateProfileRequestSchema;
     output: typeof UpdateProfileResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.esports.v1.ProfileService.PreviewMerge
+   */
+  previewMerge: {
+    methodKind: "unary";
+    input: typeof PreviewMergeRequestSchema;
+    output: typeof PreviewMergeResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_cyber_esports_v1_profile, 0);

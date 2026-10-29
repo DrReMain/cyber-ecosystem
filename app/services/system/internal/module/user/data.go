@@ -250,6 +250,17 @@ func (rp *userRP) MoveCredential(ctx context.Context, kind, identifier, toUserID
 	return nil
 }
 
+func (rp *userRP) ListCredentialsByUser(ctx context.Context, userID string) ([]*Credential, error) {
+	rows, err := rp.Platform.GetClient(ctx).Credential.Query().
+		Where(credential.UserID(userID)).
+		Order(ent.Asc(credential.FieldKind), ent.Asc(credential.FieldIdentifier)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return utils.SliceMap(rows, mapCredential), nil
+}
+
 func (rp *userRP) CountCredentialsByUser(ctx context.Context, userID string) (int, error) {
 	n, err := rp.Platform.GetClient(ctx).Credential.Query().Where(credential.UserID(userID)).Count(ctx)
 	if err != nil {

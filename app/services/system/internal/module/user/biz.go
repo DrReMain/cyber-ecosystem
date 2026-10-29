@@ -84,6 +84,7 @@ type UserRP interface {
 	FindSeatedAnyPlane(ctx context.Context, id string) (*User, error)
 	FindByIDs(ctx context.Context, ids []string) (map[string]*User, error)
 	FindCredential(ctx context.Context, kind, identifier string) (*Credential, error)
+	ListCredentialsByUser(ctx context.Context, userID string) ([]*Credential, error)
 	CreateCredential(ctx context.Context, c *Credential) error
 	MoveCredential(ctx context.Context, kind, identifier, toUserID string) error
 	CountCredentialsByUser(ctx context.Context, userID string) (int, error)
