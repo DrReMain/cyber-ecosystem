@@ -12,6 +12,8 @@ import (
 	"cyber-ecosystem/shared-go/kratos/security"
 	"cyber-ecosystem/shared-go/utils"
 
+	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
+
 	"cyber-ecosystem/app/services/system/internal/ent"
 	"cyber-ecosystem/app/services/system/internal/ent/credential"
 	"cyber-ecosystem/app/services/system/internal/ent/membership"
@@ -232,8 +234,42 @@ func (rp *userRP) CreateCredential(ctx context.Context, c *Credential) error {
 	return nil
 }
 
+func (rp *userRP) MoveCredential(ctx context.Context, kind, identifier, toUserID string) error {
+	// Zero matched rows is a visible miss (the credential vanished between
+	// the caller's read and this write), never a silent no-op.
+	n, err := rp.Platform.GetClient(ctx).Credential.Update().
+		Where(credential.Kind(kind), credential.Identifier(identifier)).
+		SetUserID(toUserID).
+		Save(ctx)
+	if err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	if n == 0 {
+		return errorspb.ErrorInfraErrorDbNotFound("")
+	}
+	return nil
+}
+
+func (rp *userRP) CountCredentialsByUser(ctx context.Context, userID string) (int, error) {
+	n, err := rp.Platform.GetClient(ctx).Credential.Query().Where(credential.UserID(userID)).Count(ctx)
+	if err != nil {
+		return 0, rp.Platform.HandleEntError(err)
+	}
+	return n, nil
+}
+
 func (rp *userRP) DeleteCredentialsByUser(ctx context.Context, userID string) error {
 	if _, err := rp.Platform.GetClient(ctx).Credential.Delete().Where(credential.UserID(userID)).Exec(ctx); err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
+}
+
+func (rp *userRP) CreateAccountMerge(ctx context.Context, m *AccountMerge) error {
+	if _, err := rp.Platform.GetClient(ctx).AccountMerge.Create().
+		SetPoorID(m.PoorID).SetRichID(m.RichID).
+		SetProvider(m.Provider).SetKind(m.Kind).SetIdentifier(m.Identifier).
+		Save(ctx); err != nil {
 		return rp.Platform.HandleEntError(err)
 	}
 	return nil

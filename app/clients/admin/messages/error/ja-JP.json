@@ -91,6 +91,8 @@
   "error_SYSTEM_IDENTITY_ALREADY_BOUND": "このサードパーティIDは既に別のアカウントに紐づいています",
   "error_SYSTEM_SMS_RATE_LIMITED": "認証コードの送信間隔が短すぎます。しばらくお待ちください",
   "error_SYSTEM_SMS_CODE_INVALID": "認証コードが正しくないか期限切れです。再取得してください",
+  "error_SYSTEM_MERGE_NOT_MERGEABLE": "このアカウントは自動統合できません。カスタマーサポートまでご連絡ください",
+  "error_SYSTEM_MERGE_NOT_BOUND": "この認証情報はアカウントに紐付いていないため、統合の対象がありません",
   "error_ESPORTS_UNSPECIFIED": "eスポーツサービスエラー",
   "error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED": "13歳未満は続行に保護者の同意が必要です",
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "選択したゲームが見つかりません。一覧を更新して再試行してください",

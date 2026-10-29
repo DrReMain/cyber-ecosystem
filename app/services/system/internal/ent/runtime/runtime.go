@@ -3,6 +3,7 @@
 package runtime
 
 import (
+	"cyber-ecosystem/app/services/system/internal/ent/accountmerge"
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
@@ -26,6 +27,119 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	accountmergeMixin := schema.AccountMerge{}.Mixin()
+	accountmergeMixinFields0 := accountmergeMixin[0].Fields()
+	_ = accountmergeMixinFields0
+	accountmergeMixinFields1 := accountmergeMixin[1].Fields()
+	_ = accountmergeMixinFields1
+	accountmergeFields := schema.AccountMerge{}.Fields()
+	_ = accountmergeFields
+	// accountmergeDescCreatedAt is the schema descriptor for created_at field.
+	accountmergeDescCreatedAt := accountmergeMixinFields1[0].Descriptor()
+	// accountmerge.DefaultCreatedAt holds the default value on creation for the created_at field.
+	accountmerge.DefaultCreatedAt = accountmergeDescCreatedAt.Default.(func() time.Time)
+	// accountmergeDescUpdatedAt is the schema descriptor for updated_at field.
+	accountmergeDescUpdatedAt := accountmergeMixinFields1[1].Descriptor()
+	// accountmerge.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	accountmerge.DefaultUpdatedAt = accountmergeDescUpdatedAt.Default.(func() time.Time)
+	// accountmerge.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	accountmerge.UpdateDefaultUpdatedAt = accountmergeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// accountmergeDescPoorID is the schema descriptor for poor_id field.
+	accountmergeDescPoorID := accountmergeFields[0].Descriptor()
+	// accountmerge.PoorIDValidator is a validator for the "poor_id" field. It is called by the builders before save.
+	accountmerge.PoorIDValidator = func() func(string) error {
+		validators := accountmergeDescPoorID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(poor_id string) error {
+			for _, fn := range fns {
+				if err := fn(poor_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// accountmergeDescRichID is the schema descriptor for rich_id field.
+	accountmergeDescRichID := accountmergeFields[1].Descriptor()
+	// accountmerge.RichIDValidator is a validator for the "rich_id" field. It is called by the builders before save.
+	accountmerge.RichIDValidator = func() func(string) error {
+		validators := accountmergeDescRichID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(rich_id string) error {
+			for _, fn := range fns {
+				if err := fn(rich_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// accountmergeDescProvider is the schema descriptor for provider field.
+	accountmergeDescProvider := accountmergeFields[2].Descriptor()
+	// accountmerge.ProviderValidator is a validator for the "provider" field. It is called by the builders before save.
+	accountmerge.ProviderValidator = func() func(string) error {
+		validators := accountmergeDescProvider.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(provider string) error {
+			for _, fn := range fns {
+				if err := fn(provider); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// accountmergeDescKind is the schema descriptor for kind field.
+	accountmergeDescKind := accountmergeFields[3].Descriptor()
+	// accountmerge.KindValidator is a validator for the "kind" field. It is called by the builders before save.
+	accountmerge.KindValidator = func() func(string) error {
+		validators := accountmergeDescKind.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(kind string) error {
+			for _, fn := range fns {
+				if err := fn(kind); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// accountmergeDescIdentifier is the schema descriptor for identifier field.
+	accountmergeDescIdentifier := accountmergeFields[4].Descriptor()
+	// accountmerge.IdentifierValidator is a validator for the "identifier" field. It is called by the builders before save.
+	accountmerge.IdentifierValidator = func() func(string) error {
+		validators := accountmergeDescIdentifier.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(identifier string) error {
+			for _, fn := range fns {
+				if err := fn(identifier); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// accountmergeDescID is the schema descriptor for id field.
+	accountmergeDescID := accountmergeMixinFields0[0].Descriptor()
+	// accountmerge.DefaultID holds the default value on creation for the id field.
+	accountmerge.DefaultID = accountmergeDescID.Default.(func() string)
+	// accountmerge.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	accountmerge.IDValidator = accountmergeDescID.Validators[0].(func(string) error)
 	auditexportMixin := schema.AuditExport{}.Mixin()
 	auditexportMixinHooks2 := auditexportMixin[2].Hooks()
 	auditexportMixinHooks3 := auditexportMixin[3].Hooks()

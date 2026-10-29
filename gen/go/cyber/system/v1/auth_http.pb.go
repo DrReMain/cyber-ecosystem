@@ -17,21 +17,27 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationAuthServiceBeginBindCredential = "/cyber.system.v1.AuthService/BeginBindCredential"
 const OperationAuthServiceBeginIdentityLogin = "/cyber.system.v1.AuthService/BeginIdentityLogin"
 const OperationAuthServiceBindCredential = "/cyber.system.v1.AuthService/BindCredential"
 const OperationAuthServiceGetCurrentUser = "/cyber.system.v1.AuthService/GetCurrentUser"
 const OperationAuthServiceLogin = "/cyber.system.v1.AuthService/Login"
 const OperationAuthServiceLoginByIdentity = "/cyber.system.v1.AuthService/LoginByIdentity"
 const OperationAuthServiceLogout = "/cyber.system.v1.AuthService/Logout"
+const OperationAuthServiceMergeAccounts = "/cyber.system.v1.AuthService/MergeAccounts"
+const OperationAuthServiceSendBindSmsCode = "/cyber.system.v1.AuthService/SendBindSmsCode"
 const OperationAuthServiceSendSmsCode = "/cyber.system.v1.AuthService/SendSmsCode"
 
 type AuthServiceHTTPServer interface {
+	BeginBindCredential(context.Context, *BeginBindCredentialRequest) (*BeginBindCredentialResponse, error)
 	BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error)
 	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginByIdentity(context.Context, *LoginByIdentityRequest) (*LoginByIdentityResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	MergeAccounts(context.Context, *MergeAccountsRequest) (*MergeAccountsResponse, error)
+	SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error)
 	SendSmsCode(context.Context, *SendSmsCodeRequest) (*SendSmsCodeResponse, error)
 }
 
@@ -42,6 +48,9 @@ func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
 	r.Handle("POST", "/api/v1/system/auth/begin-identity-login", _AuthService_BeginIdentityLogin0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/send-sms-code", _AuthService_SendSmsCode0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/bind-credential", _AuthService_BindCredential0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/begin-bind-credential", _AuthService_BeginBindCredential0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/send-bind-sms-code", _AuthService_SendBindSmsCode0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/merge-accounts", _AuthService_MergeAccounts0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/logout", _AuthService_Logout0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me", _AuthService_GetCurrentUser0_HTTP_Handler(srv))
 }
@@ -141,6 +150,63 @@ func _AuthService_BindCredential0_HTTP_Handler(srv AuthServiceHTTPServer) func(c
 	}
 }
 
+func _AuthService_BeginBindCredential0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in BeginBindCredentialRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceBeginBindCredential)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.BeginBindCredential(ctx, req.(*BeginBindCredentialRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*BeginBindCredentialResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthService_SendBindSmsCode0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SendBindSmsCodeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceSendBindSmsCode)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SendBindSmsCode(ctx, req.(*SendBindSmsCodeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SendBindSmsCodeResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthService_MergeAccounts0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in MergeAccountsRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceMergeAccounts)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.MergeAccounts(ctx, req.(*MergeAccountsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*MergeAccountsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _AuthService_Logout0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in LogoutRequest
@@ -180,12 +246,15 @@ func _AuthService_GetCurrentUser0_HTTP_Handler(srv AuthServiceHTTPServer) func(c
 }
 
 type AuthServiceHTTPClient interface {
+	BeginBindCredential(ctx context.Context, req *BeginBindCredentialRequest, opts ...http.CallOption) (rsp *BeginBindCredentialResponse, err error)
 	BeginIdentityLogin(ctx context.Context, req *BeginIdentityLoginRequest, opts ...http.CallOption) (rsp *BeginIdentityLoginResponse, err error)
 	BindCredential(ctx context.Context, req *BindCredentialRequest, opts ...http.CallOption) (rsp *BindCredentialResponse, err error)
 	GetCurrentUser(ctx context.Context, req *GetCurrentUserRequest, opts ...http.CallOption) (rsp *GetCurrentUserResponse, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginResponse, err error)
 	LoginByIdentity(ctx context.Context, req *LoginByIdentityRequest, opts ...http.CallOption) (rsp *LoginByIdentityResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutResponse, err error)
+	MergeAccounts(ctx context.Context, req *MergeAccountsRequest, opts ...http.CallOption) (rsp *MergeAccountsResponse, err error)
+	SendBindSmsCode(ctx context.Context, req *SendBindSmsCodeRequest, opts ...http.CallOption) (rsp *SendBindSmsCodeResponse, err error)
 	SendSmsCode(ctx context.Context, req *SendSmsCodeRequest, opts ...http.CallOption) (rsp *SendSmsCodeResponse, err error)
 }
 
@@ -195,6 +264,23 @@ type AuthServiceHTTPClientImpl struct {
 
 func NewAuthServiceHTTPClient(client *http.Client) AuthServiceHTTPClient {
 	return &AuthServiceHTTPClientImpl{client}
+}
+
+func (c *AuthServiceHTTPClientImpl) BeginBindCredential(ctx context.Context, in *BeginBindCredentialRequest, opts ...http.CallOption) (*BeginBindCredentialResponse, error) {
+	var out BeginBindCredentialResponse
+	pattern := "/api/v1/system/auth/begin-bind-credential"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceBeginBindCredential),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *AuthServiceHTTPClientImpl) BeginIdentityLogin(ctx context.Context, in *BeginIdentityLoginRequest, opts ...http.CallOption) (*BeginIdentityLoginResponse, error) {
@@ -289,6 +375,40 @@ func (c *AuthServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutReques
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationAuthServiceLogout),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) MergeAccounts(ctx context.Context, in *MergeAccountsRequest, opts ...http.CallOption) (*MergeAccountsResponse, error) {
+	var out MergeAccountsResponse
+	pattern := "/api/v1/system/auth/merge-accounts"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceMergeAccounts),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) SendBindSmsCode(ctx context.Context, in *SendBindSmsCodeRequest, opts ...http.CallOption) (*SendBindSmsCodeResponse, error) {
+	var out SendBindSmsCodeResponse
+	pattern := "/api/v1/system/auth/send-bind-sms-code"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceSendBindSmsCode),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

@@ -92,6 +92,32 @@ func (s *AuthService) BindCredential(ctx context.Context, in *systempb.BindCrede
 	return &systempb.BindCredentialResponse{}, nil
 }
 
+func (s *AuthService) BeginBindCredential(ctx context.Context, in *systempb.BeginBindCredentialRequest) (*systempb.BeginBindCredentialResponse, error) {
+	redirect, err := s.authUC.BeginBindCredential(ctx, in.GetProvider(), in.GetRedirectUri())
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.BeginBindCredentialResponse{AuthorizeUrl: redirect}, nil
+}
+
+func (s *AuthService) SendBindSmsCode(ctx context.Context, in *systempb.SendBindSmsCodeRequest) (*systempb.SendBindSmsCodeResponse, error) {
+	// The bind twin shares SendSmsCode's body: the rung is the whole
+	// difference — the authenticated mint binds the returned state to
+	// this session, which the public face's anonymous mint never does.
+	state, err := s.authUC.SendSmsCode(ctx, in.GetProvider(), in.GetPhone())
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.SendBindSmsCodeResponse{State: state}, nil
+}
+
+func (s *AuthService) MergeAccounts(ctx context.Context, in *systempb.MergeAccountsRequest) (*systempb.MergeAccountsResponse, error) {
+	if err := s.authUC.MergeAccounts(ctx, in.GetProvider(), in.GetState(), in); err != nil {
+		return nil, err
+	}
+	return &systempb.MergeAccountsResponse{}, nil
+}
+
 func (s *AuthService) Logout(ctx context.Context, in *systempb.LogoutRequest) (*systempb.LogoutResponse, error) {
 	if err := s.authUC.Logout(ctx); err != nil {
 		return nil, err

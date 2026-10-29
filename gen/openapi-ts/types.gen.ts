@@ -1703,6 +1703,15 @@ export type CyberSystemV1BatchGetUsersResponse = {
     };
 };
 
+export type CyberSystemV1BeginBindCredentialRequest = {
+    provider?: string;
+    redirectUri?: string;
+};
+
+export type CyberSystemV1BeginBindCredentialResponse = {
+    authorizeUrl?: string;
+};
+
 export type CyberSystemV1BeginIdentityLoginRequest = {
     provider?: string;
     redirectUri?: string;
@@ -1715,12 +1724,13 @@ export type CyberSystemV1BeginIdentityLoginResponse = {
 export type CyberSystemV1BindCredentialRequest = {
     provider?: string;
     wechat?: CyberSystemV1WeChatIdentityPayload;
+    sms?: CyberSystemV1SmsIdentityPayload;
     /**
-     * The state is one-shot (consumed on exchange) but binds only the
-     * provider key, not the initiating browser: this RPC trusts whoever
-     * presents the code. Dormant while no client offers a bind entry; the
-     * first GET-triggered bind flow must tie the state to the initiating
-     * session before shipping — do not copy this shape without that.
+     * The state must be one minted on an authenticated rung (SendBindSmsCode
+     * or BeginBindCredential) and carries the minting session: the exchange
+     * refuses a state born in another session or anonymous, so a phished code
+     * cannot be injected into a foreign bind flow. Login faces accept any
+     * live state of their provider — the code itself is the login proof.
      */
     state?: string;
 };
@@ -2215,6 +2225,29 @@ export type CyberSystemV1Membership = {
 };
 
 /**
+ * Merge runs in one direction only: the calling session is the surviving
+ * account, and the proven credential's current owner is the account being
+ * absorbed. The caller proves control of that credential (SMS code or OAuth
+ * code, same exchange as bind), which is the anti-takeover gate. The
+ * absorbed account must be system-side weightless — no password, exactly
+ * the one proven credential, no operator seats — or the merge refuses; the
+ * richer both-sides-have-data judgment over business records lives in the
+ * consuming service's offer face and is not re-derived here. A flow whose
+ * session is the empty side decomposes client-side: log in via the rich
+ * side's credential, then merge from there.
+ */
+export type CyberSystemV1MergeAccountsRequest = {
+    provider?: string;
+    wechat?: CyberSystemV1WeChatIdentityPayload;
+    sms?: CyberSystemV1SmsIdentityPayload;
+    state?: string;
+};
+
+export type CyberSystemV1MergeAccountsResponse = {
+    [key: string]: unknown;
+};
+
+/**
  * RPC method descriptor.
  */
 export type CyberSystemV1Method = {
@@ -2393,6 +2426,19 @@ export type CyberSystemV1RoleMember = {
     principalType?: string;
     principalId?: string;
     createdAt?: string;
+};
+
+export type CyberSystemV1SendBindSmsCodeRequest = {
+    provider?: string;
+    phone?: string;
+};
+
+export type CyberSystemV1SendBindSmsCodeResponse = {
+    /**
+     * The one-shot state bound to the calling session; present it at
+     * BindCredential together with the code the phone received.
+     */
+    state?: string;
 };
 
 export type CyberSystemV1SendSmsCodeRequest = {
@@ -3831,6 +3877,22 @@ export type AuditServiceListAuditExportsResponses = {
 
 export type AuditServiceListAuditExportsResponse = AuditServiceListAuditExportsResponses[keyof AuditServiceListAuditExportsResponses];
 
+export type AuthServiceBeginBindCredentialData = {
+    body: CyberSystemV1BeginBindCredentialRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/begin-bind-credential';
+};
+
+export type AuthServiceBeginBindCredentialResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1BeginBindCredentialResponse;
+};
+
+export type AuthServiceBeginBindCredentialResponse = AuthServiceBeginBindCredentialResponses[keyof AuthServiceBeginBindCredentialResponses];
+
 export type AuthServiceBeginIdentityLoginData = {
     body: CyberSystemV1BeginIdentityLoginRequest;
     path?: never;
@@ -3910,6 +3972,38 @@ export type AuthServiceLogoutResponses = {
 };
 
 export type AuthServiceLogoutResponse = AuthServiceLogoutResponses[keyof AuthServiceLogoutResponses];
+
+export type AuthServiceMergeAccountsData = {
+    body: CyberSystemV1MergeAccountsRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/merge-accounts';
+};
+
+export type AuthServiceMergeAccountsResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1MergeAccountsResponse;
+};
+
+export type AuthServiceMergeAccountsResponse = AuthServiceMergeAccountsResponses[keyof AuthServiceMergeAccountsResponses];
+
+export type AuthServiceSendBindSmsCodeData = {
+    body: CyberSystemV1SendBindSmsCodeRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/send-bind-sms-code';
+};
+
+export type AuthServiceSendBindSmsCodeResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1SendBindSmsCodeResponse;
+};
+
+export type AuthServiceSendBindSmsCodeResponse = AuthServiceSendBindSmsCodeResponses[keyof AuthServiceSendBindSmsCodeResponses];
 
 export type AuthServiceSendSmsCodeData = {
     body: CyberSystemV1SendSmsCodeRequest;

@@ -8,6 +8,18 @@ import (
 	"fmt"
 )
 
+// The AccountMergeFunc type is an adapter to allow the use of ordinary
+// function as AccountMerge mutator.
+type AccountMergeFunc func(context.Context, *ent.AccountMergeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AccountMergeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AccountMergeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AccountMergeMutation", m)
+}
+
 // The AuditExportFunc type is an adapter to allow the use of ordinary
 // function as AuditExport mutator.
 type AuditExportFunc func(context.Context, *ent.AuditExportMutation) (ent.Value, error)

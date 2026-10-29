@@ -1329,6 +1329,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ListAuditExportsResponse'
+    /api/v1/system/auth/begin-bind-credential:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_BeginBindCredential
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.BeginBindCredentialRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.BeginBindCredentialResponse'
     /api/v1/system/auth/begin-identity-login:
         post:
             tags:
@@ -1419,6 +1437,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.LogoutResponse'
+    /api/v1/system/auth/merge-accounts:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_MergeAccounts
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.MergeAccountsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.MergeAccountsResponse'
+    /api/v1/system/auth/send-bind-sms-code:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_SendBindSmsCode
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.SendBindSmsCodeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.SendBindSmsCodeResponse'
     /api/v1/system/auth/send-sms-code:
         post:
             tags:
@@ -5246,6 +5300,18 @@ components:
                     description: |-
                         key = requested id; an absent key = no row or outside the viewer's data
                          scope — skip semantics, no per-item error channel.
+        cyber.system.v1.BeginBindCredentialRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                redirectUri:
+                    type: string
+        cyber.system.v1.BeginBindCredentialResponse:
+            type: object
+            properties:
+                authorizeUrl:
+                    type: string
         cyber.system.v1.BeginIdentityLoginRequest:
             type: object
             properties:
@@ -5265,14 +5331,16 @@ components:
                     type: string
                 wechat:
                     $ref: '#/components/schemas/cyber.system.v1.WeChatIdentityPayload'
+                sms:
+                    $ref: '#/components/schemas/cyber.system.v1.SmsIdentityPayload'
                 state:
                     type: string
                     description: |-
-                        The state is one-shot (consumed on exchange) but binds only the
-                         provider key, not the initiating browser: this RPC trusts whoever
-                         presents the code. Dormant while no client offers a bind entry; the
-                         first GET-triggered bind flow must tie the state to the initiating
-                         session before shipping — do not copy this shape without that.
+                        The state must be one minted on an authenticated rung (SendBindSmsCode
+                         or BeginBindCredential) and carries the minting session: the exchange
+                         refuses a state born in another session or anonymous, so a phished code
+                         cannot be injected into a foreign bind flow. Login faces accept any
+                         live state of their provider — the code itself is the login proof.
         cyber.system.v1.BindCredentialResponse:
             type: object
             properties: {}
@@ -5921,6 +5989,31 @@ components:
             description: |-
                 Plain scalars by the success-implies-present carve-out: a seat row always
                  carries its two join keys.
+        cyber.system.v1.MergeAccountsRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                wechat:
+                    $ref: '#/components/schemas/cyber.system.v1.WeChatIdentityPayload'
+                sms:
+                    $ref: '#/components/schemas/cyber.system.v1.SmsIdentityPayload'
+                state:
+                    type: string
+            description: |-
+                Merge runs in one direction only: the calling session is the surviving
+                 account, and the proven credential's current owner is the account being
+                 absorbed. The caller proves control of that credential (SMS code or OAuth
+                 code, same exchange as bind), which is the anti-takeover gate. The
+                 absorbed account must be system-side weightless — no password, exactly
+                 the one proven credential, no operator seats — or the merge refuses; the
+                 richer both-sides-have-data judgment over business records lives in the
+                 consuming service's offer face and is not re-derived here. A flow whose
+                 session is the empty side decomposes client-side: log in via the rich
+                 side's credential, then merge from there.
+        cyber.system.v1.MergeAccountsResponse:
+            type: object
+            properties: {}
         cyber.system.v1.Method:
             type: object
             properties:
@@ -6134,6 +6227,21 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+        cyber.system.v1.SendBindSmsCodeRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                phone:
+                    type: string
+        cyber.system.v1.SendBindSmsCodeResponse:
+            type: object
+            properties:
+                state:
+                    type: string
+                    description: |-
+                        The one-shot state bound to the calling session; present it at
+                         BindCredential together with the code the phone received.
         cyber.system.v1.SendSmsCodeRequest:
             type: object
             properties:

@@ -9,6 +9,45 @@ import (
 )
 
 var (
+	// AccountMergesColumns holds the columns for the "account_merges" table.
+	AccountMergesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "poor_id", Type: field.TypeString, Size: 20, Comment: "deactivated account id; unique — an account can be absorbed at most once"},
+		{Name: "rich_id", Type: field.TypeString, Size: 20, Comment: "surviving account id that took over the credential"},
+		{Name: "provider", Type: field.TypeString, Size: 64, Comment: "provider config key whose exchange proved control"},
+		{Name: "kind", Type: field.TypeString, Size: 16, Comment: "credential kind that moved (credential.kind)"},
+		{Name: "identifier", Type: field.TypeString, Size: 191, Comment: "credential identifier that moved (credential.identifier)"},
+	}
+	// AccountMergesTable holds the schema information for the "account_merges" table.
+	AccountMergesTable = &schema.Table{
+		Name:       "account_merges",
+		Columns:    AccountMergesColumns,
+		PrimaryKey: []*schema.Column{AccountMergesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "accountmerge_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AccountMergesColumns[1]},
+			},
+			{
+				Name:    "accountmerge_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{AccountMergesColumns[2]},
+			},
+			{
+				Name:    "accountmerge_poor_id",
+				Unique:  true,
+				Columns: []*schema.Column{AccountMergesColumns[3]},
+			},
+			{
+				Name:    "accountmerge_rich_id",
+				Unique:  false,
+				Columns: []*schema.Column{AccountMergesColumns[4]},
+			},
+		},
+	}
 	// AuditExportColumns holds the columns for the "audit_export" table.
 	AuditExportColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -548,6 +587,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AccountMergesTable,
 		AuditExportTable,
 		AuditLogTable,
 		PolicyTable,
@@ -567,6 +607,9 @@ var (
 )
 
 func init() {
+	AccountMergesTable.Annotation = &entsql.Annotation{
+		Table: "account_merges",
+	}
 	AuditExportTable.Annotation = &entsql.Annotation{
 		Table: "audit_export",
 	}

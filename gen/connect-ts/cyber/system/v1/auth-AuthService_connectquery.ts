@@ -30,6 +30,21 @@ export const sendSmsCode = AuthService.method.sendSmsCode;
 export const bindCredential = AuthService.method.bindCredential;
 
 /**
+ * @generated from rpc cyber.system.v1.AuthService.BeginBindCredential
+ */
+export const beginBindCredential = AuthService.method.beginBindCredential;
+
+/**
+ * @generated from rpc cyber.system.v1.AuthService.SendBindSmsCode
+ */
+export const sendBindSmsCode = AuthService.method.sendBindSmsCode;
+
+/**
+ * @generated from rpc cyber.system.v1.AuthService.MergeAccounts
+ */
+export const mergeAccounts = AuthService.method.mergeAccounts;
+
+/**
  * @generated from rpc cyber.system.v1.AuthService.Logout
  */
 export const logout = AuthService.method.logout;

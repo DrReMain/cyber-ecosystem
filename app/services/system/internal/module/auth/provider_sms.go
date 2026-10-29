@@ -118,9 +118,9 @@ func (p *smsProvider) IssueCode(ctx context.Context, row *conf.Auth_Provider, ph
 }
 
 func (p *smsProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, payload identityPayload) (*exchangedIdentity, error) {
-	// A request narrows into the sms view by assertion — its oneof grows
-	// into the GetSms method as it admits the sms member
-	// (LoginByIdentity carries it; BindCredential does not yet).
+	// A request narrows into the sms view by assertion — the identity
+	// requests carrying the sms member (LoginByIdentity, BindCredential,
+	// MergeAccounts) all satisfy it.
 	sp, ok := payload.(smsPayload)
 	if !ok {
 		return nil, errorspb.ErrorGeneralErrorValidationFailed("").WithCause(fmt.Errorf("sms payload required"))

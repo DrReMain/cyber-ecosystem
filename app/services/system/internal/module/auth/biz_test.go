@@ -107,6 +107,17 @@ type fakeUserRP struct {
 	findIDErr      error
 	findByIDCalls  int
 
+	// merge slice: the poor side's writes, the one-shot ledger, and the
+	// follow-ups the disable path owes.
+	credCounts map[string]int
+	moved      []string
+	moveErr    error
+	merges     []*user.AccountMerge
+	mergeErr   error
+	disabled   []string
+	revoked    []string
+	notified   int
+
 	createdUsers []*user.User
 }
 
@@ -135,6 +146,62 @@ func (f *fakeUserRP) CreateCredential(_ context.Context, c *user.Credential) err
 func (f *fakeUserRP) DeleteCredentialsByUser(_ context.Context, userID string) error {
 	f.deletedCredFor = append(f.deletedCredFor, userID)
 	return nil
+}
+
+func (f *fakeUserRP) CountCredentialsByUser(_ context.Context, userID string) (int, error) {
+	if f.credCounts != nil {
+		return f.credCounts[userID], nil
+	}
+	n := 0
+	for _, c := range f.credentials {
+		if c.UserID == userID {
+			n++
+		}
+	}
+	return n, nil
+}
+
+func (f *fakeUserRP) MoveCredential(_ context.Context, kind, identifier, toUserID string) error {
+	if f.moveErr != nil {
+		return f.moveErr
+	}
+	c, ok := f.credentials[kind+"|"+identifier]
+	if !ok {
+		return errorspb.ErrorInfraErrorDbNotFound("")
+	}
+	c.UserID = toUserID
+	f.moved = append(f.moved, kind+"|"+identifier+"->"+toUserID)
+	return nil
+}
+
+func (f *fakeUserRP) CreateAccountMerge(_ context.Context, m *user.AccountMerge) error {
+	if f.mergeErr != nil {
+		return f.mergeErr
+	}
+	f.merges = append(f.merges, m)
+	return nil
+}
+
+func (f *fakeUserRP) UpdateStatus(_ context.Context, id string, enabled bool) (*user.User, error) {
+	if !enabled {
+		f.disabled = append(f.disabled, id)
+	}
+	if f.row != nil && f.row.ID == id {
+		row := *f.row
+		row.Enabled = enabled
+		f.row = &row
+		return &row, nil
+	}
+	return &user.User{ID: id, Enabled: enabled}, nil
+}
+
+func (f *fakeUserRP) RevokeUserSessions(_ context.Context, userID string) error {
+	f.revoked = append(f.revoked, userID)
+	return nil
+}
+
+func (f *fakeUserRP) NotifyChanged(context.Context) {
+	f.notified++
 }
 
 func (f *fakeUserRP) FindByAccount(_ context.Context, account string) (*user.User, error) {
@@ -369,11 +436,22 @@ func identityReq(provider, state string) *systempb.LoginByIdentityRequest {
 }
 
 // issueState mints a begin-issued state directly into the fake store — the
-// law under test is the cash, not the mint (Begin covers that half).
+// law under test is the cash, not the mint (Begin covers that half). The
+// anonymous shape is what the public login rungs mint; boundState is the
+// bind-rung shape carrying the minting session.
 func issueState(t *testing.T, trp *fakeTokenRP, provider string) string {
 	t.Helper()
+	return issueBoundState(t, trp, provider, "")
+}
+
+func issueBoundState(t *testing.T, trp *fakeTokenRP, provider, bindUser string) string {
+	t.Helper()
 	state := "st-" + provider
-	if err := trp.Set(context.Background(), identityStatePrefix+state, []byte(provider), identityStateTTL); err != nil {
+	if bindUser != "" {
+		state += "-" + bindUser
+	}
+	val := utils.MustMarshal(identityStateValue{Provider: provider, BindUser: bindUser})
+	if err := trp.Set(context.Background(), identityStatePrefix+state, val, identityStateTTL); err != nil {
 		t.Fatalf("state: %v", err)
 	}
 	return state
@@ -1098,8 +1176,12 @@ func TestBeginIdentityLoginIssuesState(t *testing.T) {
 	if state == "" {
 		t.Fatal("begin: empty state")
 	}
-	if got, err := trp.Get(context.Background(), identityStatePrefix+state); err != nil || string(got) != "fake" {
-		t.Fatalf("begin: stored state = %q err=%v, want provider key", got, err)
+	got, err := trp.Get(context.Background(), identityStatePrefix+state)
+	if err != nil {
+		t.Fatalf("begin: stored state err=%v", err)
+	}
+	if val, uerr := utils.Unmarshal[identityStateValue](got); uerr != nil || val.Provider != "fake" || val.BindUser != "" {
+		t.Fatalf("begin: stored state = %q (%v), want an anonymous fake-provider mint", got, uerr)
 	}
 	if ttl := trp.ttls[identityStatePrefix+state]; ttl != 10*time.Minute {
 		t.Fatalf("begin: state ttl = %v, want 10m", ttl)
@@ -1324,7 +1406,27 @@ func TestBindCredentialLaws(t *testing.T) {
 		t.Fatal("stateless bind: the exchange ran or a credential landed")
 	}
 
-	state := issueState(t, trp, "fake")
+	// The session-tie law: an anonymous mint (the public login rung's
+	// shape) and a foreign session's mint both answer as a failed
+	// exchange, before any provider call.
+	anon := issueState(t, trp, "fake")
+	before = fakeExchanges
+	if err := uc.BindCredential(ctx, "fake", anon, newReq(anon)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("anonymous state: want EXCHANGE_FAILED, got %v", err)
+	}
+	if fakeExchanges != before || len(uf.createdCreds) != 0 {
+		t.Fatal("anonymous state: the exchange ran or a credential landed")
+	}
+	foreign := issueBoundState(t, trp, "fake", "u9")
+	before = fakeExchanges
+	if err := uc.BindCredential(ctx, "fake", foreign, newReq(foreign)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("foreign state: want EXCHANGE_FAILED, got %v", err)
+	}
+	if fakeExchanges != before || len(uf.createdCreds) != 0 {
+		t.Fatal("foreign state: the exchange ran or a credential landed")
+	}
+
+	state := issueBoundState(t, trp, "fake", "u1")
 	if err := uc.BindCredential(ctx, "fake", state, newReq(state)); err != nil {
 		t.Fatalf("bind: %v", err)
 	}
@@ -1334,7 +1436,7 @@ func TestBindCredentialLaws(t *testing.T) {
 
 	bind := func(uf *fakeUserRP) error {
 		uc, trp := identityUC(t, uf)
-		state := issueState(t, trp, "fake")
+		state := issueBoundState(t, trp, "fake", "u1")
 		return uc.BindCredential(ctx, "fake", state, newReq(state))
 	}
 	same := &fakeUserRP{credentials: map[string]*user.Credential{
@@ -1360,10 +1462,194 @@ func TestBindCredentialLaws(t *testing.T) {
 	}
 
 	noUC, noTrp := identityUC(t, &fakeUserRP{})
-	noState := issueState(t, noTrp, "fake")
+	noState := issueBoundState(t, noTrp, "fake", "u1")
 	if err := noUC.BindCredential(context.Background(), "fake", noState, newReq(noState)); !errorspb.IsGeneralErrorUnauthenticated(err) {
 		t.Fatalf("no session: want 401, got %v", err)
 	}
+}
+
+// The begin twin of the bind flow: an authenticated rung mints a state
+// carrying the session, and the mint is refused without one.
+func TestBeginBindCredentialBindsMint(t *testing.T) {
+	uc, trp := identityUC(t, &fakeUserRP{})
+
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	url, err := uc.BeginBindCredential(ctx, "fake", "https://app.example/cb")
+	if err != nil {
+		t.Fatalf("begin bind: %v", err)
+	}
+	state := strings.TrimPrefix(url, "https://idp.example/auth/fake?state=")
+	got, gerr := trp.Get(context.Background(), identityStatePrefix+state)
+	if gerr != nil {
+		t.Fatalf("begin bind: stored state err=%v", gerr)
+	}
+	if val, uerr := utils.Unmarshal[identityStateValue](got); uerr != nil || val.Provider != "fake" || val.BindUser != "u1" {
+		t.Fatalf("begin bind: stored state = %q (%v), want a u1-bound fake mint", got, uerr)
+	}
+
+	if _, err := uc.BeginBindCredential(context.Background(), "fake", "https://app.example/cb"); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("begin bind without session: want 401, got %v", err)
+	}
+}
+
+// Merge laws: proof + session-bound state, the poor side must be
+// system-side weightless, the absorption is one write set (move +
+// disable + ledger) with the disable's follow-ups, and every refusal
+// answers with its own reason before any write lands.
+func TestMergeAccountsLaws(t *testing.T) {
+	code, key := "c", "fake"
+	mergeReq := func(state string) *systempb.MergeAccountsRequest {
+		return &systempb.MergeAccountsRequest{Provider: &key, State: &state,
+			Payload: &systempb.MergeAccountsRequest_Wechat{Wechat: &systempb.WeChatIdentityPayload{Code: &code}}}
+	}
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	memberPlane := &fakeAuthzRP{planes: map[string]string{"member": security.PlaneMember}}
+
+	poorRow := func(mutate func(*user.User)) *user.User {
+		empty := ""
+		row := &user.User{ID: "u9", Account: &empty, PasswordHash: &empty, Enabled: true}
+		if mutate != nil {
+			mutate(row)
+		}
+		return row
+	}
+	merge := func(uf *fakeUserRP, trp *fakeTokenRP, state string) error {
+		uc := newAuthUCConf(fakeProviderConf(), uf, memberPlane, trp,
+			&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+		return uc.MergeAccounts(ctx, "fake", state, mergeReq(state))
+	}
+	mergeFresh := func(uf *fakeUserRP) error {
+		trp := newTokenStore()
+		return merge(uf, trp, issueBoundState(t, trp, "fake", "u1"))
+	}
+
+	// Happy path: one binding owned by a weightless u9, one member seat.
+	uf := &fakeUserRP{
+		row:   poorRow(nil),
+		seats: []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(uf); err != nil {
+		t.Fatalf("merge: %v", err)
+	}
+	if len(uf.moved) != 1 || uf.credentials[fakeKind+"|oid-x"].UserID != "u1" {
+		t.Fatalf("merge: moved = %v, credential owner = %+v", uf.moved, uf.credentials[fakeKind+"|oid-x"])
+	}
+	if len(uf.disabled) != 1 || uf.disabled[0] != "u9" {
+		t.Fatalf("merge: disabled = %v, want u9", uf.disabled)
+	}
+	if len(uf.merges) != 1 || uf.merges[0].PoorID != "u9" || uf.merges[0].RichID != "u1" ||
+		uf.merges[0].Kind != fakeKind || uf.merges[0].Identifier != "oid-x" {
+		t.Fatalf("merge: ledger = %+v, want one u9→u1 row for the proven credential", uf.merges)
+	}
+	if len(uf.revoked) != 1 || uf.revoked[0] != "u9" || uf.notified != 1 {
+		t.Fatalf("merge: revoked = %v notified = %d, want u9's sessions gone and one notify", uf.revoked, uf.notified)
+	}
+
+	// A free credential and the caller's own credential refuse before writes.
+	free := &fakeUserRP{}
+	if err := mergeFresh(free); !systempb.IsSystemMergeNotBound(err) {
+		t.Fatalf("unbound credential: want NOT_BOUND, got %v", err)
+	}
+	own := &fakeUserRP{credentials: map[string]*user.Credential{
+		fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u1"},
+	}}
+	if err := mergeFresh(own); !systempb.IsSystemIdentityAlreadyBound(err) {
+		t.Fatalf("own credential: want ALREADY_BOUND, got %v", err)
+	}
+
+	// Weight refuses: a password, a second credential, an operator seat,
+	// an already-dead account.
+	pw := "set"
+	withPw := &fakeUserRP{
+		row: poorRow(func(r *user.User) { r.PasswordHash = &pw }),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(withPw); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("password weight: want NOT_MERGEABLE, got %v", err)
+	}
+	multi := &fakeUserRP{
+		row: poorRow(nil),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+			fakeKind + "|oid-y": {Kind: fakeKind, Identifier: "oid-y", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(multi); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("multi credential: want NOT_MERGEABLE, got %v", err)
+	}
+	operator := &fakeUserRP{
+		row:   poorRow(nil),
+		seats: []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "ops"}},
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(operator); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("operator seat: want NOT_MERGEABLE, got %v", err)
+	}
+	dead := &fakeUserRP{
+		row: poorRow(func(r *user.User) { r.Enabled = false }),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(dead); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("dead account: want NOT_MERGEABLE, got %v", err)
+	}
+
+	// The one-shot ledger's race backstop and the vanished credential.
+	raced := &fakeUserRP{
+		row:      poorRow(nil),
+		seats:    []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		mergeErr: errorspb.ErrorInfraErrorDbConstraint(""),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(raced); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("ledger race: want NOT_MERGEABLE, got %v", err)
+	}
+	vanished := &fakeUserRP{
+		row:     poorRow(nil),
+		seats:   []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		moveErr: errorspb.ErrorInfraErrorDbNotFound(""),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(vanished); !systempb.IsSystemMergeNotBound(err) {
+		t.Fatalf("vanished credential: want NOT_BOUND, got %v", err)
+	}
+
+	// The session-tie law rides the merge too: an anonymous state never
+	// opens an absorption.
+	trp := newTokenStore()
+	anon := issueState(t, trp, "fake")
+	anonUf := &fakeUserRP{row: poorRow(nil), credentials: map[string]*user.Credential{
+		fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+	}}
+	if err := merge(anonUf, trp, anon); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("anonymous state: want EXCHANGE_FAILED, got %v", err)
+	}
+	if len(anonUf.moved) != 0 || len(anonUf.disabled) != 0 || len(anonUf.merges) != 0 {
+		t.Fatal("anonymous state: a write landed on a refused cash")
+	}
+
+	noUC := func() {
+		trp := newTokenStore()
+		uc := newAuthUCConf(fakeProviderConf(), &fakeUserRP{row: poorRow(nil)}, memberPlane, trp,
+			&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+		state := issueBoundState(t, trp, "fake", "u1")
+		if err := uc.MergeAccounts(context.Background(), "fake", state, mergeReq(state)); !errorspb.IsGeneralErrorUnauthenticated(err) {
+			t.Fatalf("no session: want 401, got %v", err)
+		}
+	}
+	noUC()
 }
 
 // A store outage during the cash surfaces as infra — the state law must not

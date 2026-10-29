@@ -19,13 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Login_FullMethodName              = "/cyber.system.v1.AuthService/Login"
-	AuthService_LoginByIdentity_FullMethodName    = "/cyber.system.v1.AuthService/LoginByIdentity"
-	AuthService_BeginIdentityLogin_FullMethodName = "/cyber.system.v1.AuthService/BeginIdentityLogin"
-	AuthService_SendSmsCode_FullMethodName        = "/cyber.system.v1.AuthService/SendSmsCode"
-	AuthService_BindCredential_FullMethodName     = "/cyber.system.v1.AuthService/BindCredential"
-	AuthService_Logout_FullMethodName             = "/cyber.system.v1.AuthService/Logout"
-	AuthService_GetCurrentUser_FullMethodName     = "/cyber.system.v1.AuthService/GetCurrentUser"
+	AuthService_Login_FullMethodName               = "/cyber.system.v1.AuthService/Login"
+	AuthService_LoginByIdentity_FullMethodName     = "/cyber.system.v1.AuthService/LoginByIdentity"
+	AuthService_BeginIdentityLogin_FullMethodName  = "/cyber.system.v1.AuthService/BeginIdentityLogin"
+	AuthService_SendSmsCode_FullMethodName         = "/cyber.system.v1.AuthService/SendSmsCode"
+	AuthService_BindCredential_FullMethodName      = "/cyber.system.v1.AuthService/BindCredential"
+	AuthService_BeginBindCredential_FullMethodName = "/cyber.system.v1.AuthService/BeginBindCredential"
+	AuthService_SendBindSmsCode_FullMethodName     = "/cyber.system.v1.AuthService/SendBindSmsCode"
+	AuthService_MergeAccounts_FullMethodName       = "/cyber.system.v1.AuthService/MergeAccounts"
+	AuthService_Logout_FullMethodName              = "/cyber.system.v1.AuthService/Logout"
+	AuthService_GetCurrentUser_FullMethodName      = "/cyber.system.v1.AuthService/GetCurrentUser"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -37,6 +40,9 @@ type AuthServiceClient interface {
 	BeginIdentityLogin(ctx context.Context, in *BeginIdentityLoginRequest, opts ...grpc.CallOption) (*BeginIdentityLoginResponse, error)
 	SendSmsCode(ctx context.Context, in *SendSmsCodeRequest, opts ...grpc.CallOption) (*SendSmsCodeResponse, error)
 	BindCredential(ctx context.Context, in *BindCredentialRequest, opts ...grpc.CallOption) (*BindCredentialResponse, error)
+	BeginBindCredential(ctx context.Context, in *BeginBindCredentialRequest, opts ...grpc.CallOption) (*BeginBindCredentialResponse, error)
+	SendBindSmsCode(ctx context.Context, in *SendBindSmsCodeRequest, opts ...grpc.CallOption) (*SendBindSmsCodeResponse, error)
+	MergeAccounts(ctx context.Context, in *MergeAccountsRequest, opts ...grpc.CallOption) (*MergeAccountsResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	GetCurrentUser(ctx context.Context, in *GetCurrentUserRequest, opts ...grpc.CallOption) (*GetCurrentUserResponse, error)
 }
@@ -99,6 +105,36 @@ func (c *authServiceClient) BindCredential(ctx context.Context, in *BindCredenti
 	return out, nil
 }
 
+func (c *authServiceClient) BeginBindCredential(ctx context.Context, in *BeginBindCredentialRequest, opts ...grpc.CallOption) (*BeginBindCredentialResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BeginBindCredentialResponse)
+	err := c.cc.Invoke(ctx, AuthService_BeginBindCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SendBindSmsCode(ctx context.Context, in *SendBindSmsCodeRequest, opts ...grpc.CallOption) (*SendBindSmsCodeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SendBindSmsCodeResponse)
+	err := c.cc.Invoke(ctx, AuthService_SendBindSmsCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) MergeAccounts(ctx context.Context, in *MergeAccountsRequest, opts ...grpc.CallOption) (*MergeAccountsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MergeAccountsResponse)
+	err := c.cc.Invoke(ctx, AuthService_MergeAccounts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LogoutResponse)
@@ -128,6 +164,9 @@ type AuthServiceServer interface {
 	BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error)
 	SendSmsCode(context.Context, *SendSmsCodeRequest) (*SendSmsCodeResponse, error)
 	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
+	BeginBindCredential(context.Context, *BeginBindCredentialRequest) (*BeginBindCredentialResponse, error)
+	SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error)
+	MergeAccounts(context.Context, *MergeAccountsRequest) (*MergeAccountsResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
@@ -154,6 +193,15 @@ func (UnimplementedAuthServiceServer) SendSmsCode(context.Context, *SendSmsCodeR
 }
 func (UnimplementedAuthServiceServer) BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method BindCredential not implemented")
+}
+func (UnimplementedAuthServiceServer) BeginBindCredential(context.Context, *BeginBindCredentialRequest) (*BeginBindCredentialResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BeginBindCredential not implemented")
+}
+func (UnimplementedAuthServiceServer) SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SendBindSmsCode not implemented")
+}
+func (UnimplementedAuthServiceServer) MergeAccounts(context.Context, *MergeAccountsRequest) (*MergeAccountsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method MergeAccounts not implemented")
 }
 func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
@@ -272,6 +320,60 @@ func _AuthService_BindCredential_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_BeginBindCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BeginBindCredentialRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).BeginBindCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_BeginBindCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).BeginBindCredential(ctx, req.(*BeginBindCredentialRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SendBindSmsCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendBindSmsCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SendBindSmsCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SendBindSmsCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SendBindSmsCode(ctx, req.(*SendBindSmsCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_MergeAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MergeAccountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).MergeAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_MergeAccounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).MergeAccounts(ctx, req.(*MergeAccountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LogoutRequest)
 	if err := dec(in); err != nil {
@@ -334,6 +436,18 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BindCredential",
 			Handler:    _AuthService_BindCredential_Handler,
+		},
+		{
+			MethodName: "BeginBindCredential",
+			Handler:    _AuthService_BeginBindCredential_Handler,
+		},
+		{
+			MethodName: "SendBindSmsCode",
+			Handler:    _AuthService_SendBindSmsCode_Handler,
+		},
+		{
+			MethodName: "MergeAccounts",
+			Handler:    _AuthService_MergeAccounts_Handler,
 		},
 		{
 			MethodName: "Logout",

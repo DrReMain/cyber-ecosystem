@@ -121,6 +121,30 @@ func ErrorSystemSmsCodeInvalid(format string, args ...interface{}) *errors.Error
 	return errors.New(401, System_SYSTEM_SMS_CODE_INVALID.String(), fmt.Sprintf(format, args...))
 }
 
+func IsSystemMergeNotMergeable(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_MERGE_NOT_MERGEABLE.String() && e.Code == 409
+}
+
+func ErrorSystemMergeNotMergeable(format string, args ...interface{}) *errors.Error {
+	return errors.New(409, System_SYSTEM_MERGE_NOT_MERGEABLE.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemMergeNotBound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_MERGE_NOT_BOUND.String() && e.Code == 404
+}
+
+func ErrorSystemMergeNotBound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, System_SYSTEM_MERGE_NOT_BOUND.String(), fmt.Sprintf(format, args...))
+}
+
 // 601x: dept
 func IsSystemDeptSelfParent(err error) bool {
 	if err == nil {

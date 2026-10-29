@@ -91,6 +91,8 @@
   "error_SYSTEM_IDENTITY_ALREADY_BOUND": "该第三方身份已绑定其他账号",
   "error_SYSTEM_SMS_RATE_LIMITED": "验证码发送过于频繁，请稍后再试",
   "error_SYSTEM_SMS_CODE_INVALID": "验证码错误或已过期，请重新获取",
+  "error_SYSTEM_MERGE_NOT_MERGEABLE": "该账号暂不满足自动合并条件，请联系客服处理",
+  "error_SYSTEM_MERGE_NOT_BOUND": "该凭证尚未绑定账号，无需合并",
   "error_ESPORTS_UNSPECIFIED": "请求未成功,请稍后重试",
   "error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED": "未满 13 岁需要监护人同意后才能继续",
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "所选游戏不存在，请刷新列表后重试",

@@ -17,6 +17,7 @@ import (
 
 	"cyber-ecosystem/shared-go/capability/cache"
 	"cyber-ecosystem/shared-go/capability/sms"
+	"cyber-ecosystem/shared-go/utils"
 
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
@@ -132,8 +133,9 @@ func TestIssueCodeHappyPath(t *testing.T) {
 	if m.To != "13800138000" || m.SignName != "曦光未来" || m.TemplateCode != "SMS_TEST" || m.Params["code"] != string(code) {
 		t.Fatalf("channel message = %+v", m)
 	}
-	if string(trp.vals[identityStatePrefix+state]) != "sms" {
-		t.Fatal("state not bound to the provider key")
+	val, uerr := utils.Unmarshal[identityStateValue](trp.vals[identityStatePrefix+state])
+	if uerr != nil || val.Provider != "sms" || val.BindUser != "" {
+		t.Fatalf("state = %q (%v), want an anonymous sms-provider mint", trp.vals[identityStatePrefix+state], uerr)
 	}
 }
 
