@@ -18,8 +18,8 @@
       "Bash(npx *)",
       "Bash(yarn)",
       "Bash(yarn *)",
-      "Bash(go test)",
-      "Bash(go test *)",
+      "Bash(go run)",
+      "Bash(go run *)",
       "Bash(golangci-lint *)",
       "Bash(vitest *)"
     ]
