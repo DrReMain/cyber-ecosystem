@@ -70,14 +70,19 @@ export function ForgotPasswordPage() {
 
   return (
     <AmbientLayout>
-      <FlowHeader onBack={() => void navigate({ to: "/login" })} title={m.security_forgot_title()} />
+      <FlowHeader
+        onBack={() => void navigate({ to: "/login" })}
+        title={m.security_forgot_title()}
+      />
       <div className="flex w-full flex-col gap-3.5 pt-3">
         <div className="text-ink-tertiary text-center text-xs leading-[1.6]">
           {m.security_forgot_pitch()}
         </div>
         <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-5">
           <div className="mb-3.5">
-            <div className="text-ink-secondary mb-1.5 text-xs">{m.security_forgot_phone_label()}</div>
+            <div className="text-ink-secondary mb-1.5 text-xs">
+              {m.security_forgot_phone_label()}
+            </div>
             <input
               aria-label={m.security_phone_label()}
               className={inputClass}
@@ -147,7 +152,9 @@ export function ForgotPasswordPage() {
           >
             {pending ? m.security_pending() : m.security_forgot_submit()}
           </button>
-          <div className="text-ink-tertiary mt-3 text-center text-[11px]">{m.security_forgot_note()}</div>
+          <div className="text-ink-tertiary mt-3 text-center text-[11px]">
+            {m.security_forgot_note()}
+          </div>
         </div>
         {error !== null && <p className="text-danger-text text-[11.5px]">{error}</p>}
         {reason !== undefined && <p className="text-danger-text text-[11.5px]">{failureCopy}</p>}

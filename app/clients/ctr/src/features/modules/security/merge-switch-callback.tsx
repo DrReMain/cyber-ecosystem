@@ -155,7 +155,9 @@ export function MergeSwitchCallbackPage() {
           onClick={() => void onSend()}
           type="button"
         >
-          {countdown > 0 ? m.security_code_resend_in({ seconds: countdown }) : m.security_code_send()}
+          {countdown > 0
+            ? m.security_code_resend_in({ seconds: countdown })
+            : m.security_code_send()}
         </button>
       </div>
       {mergeReason !== undefined && (

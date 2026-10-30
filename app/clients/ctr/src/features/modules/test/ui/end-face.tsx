@@ -433,7 +433,9 @@ export function EndFace({
               {spent ? m.test_result_retry_disabled() : m.test_end_retry()}
             </Button>
             {spent ? (
-              <p className="text-[#FCD34D] px-1 text-[11.5px] leading-[1.7]">{m.test_intro_blocked()}</p>
+              <p className="text-[#FCD34D] px-1 text-[11.5px] leading-[1.7]">
+                {m.test_intro_blocked()}
+              </p>
             ) : null}
             {next !== undefined ? (
               <Button

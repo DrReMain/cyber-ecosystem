@@ -36,7 +36,9 @@ function actionableOffer(preview: Preview): MergeOfferDTO | null {
 }
 
 function conflictCtaLabel(offer: MergeOfferDTO): string {
-  return offer.status === "BLOCKED" ? m.security_bind_phone_blocked_cta() : m.security_bind_phone_merge_cta();
+  return offer.status === "BLOCKED"
+    ? m.security_bind_phone_blocked_cta()
+    : m.security_bind_phone_merge_cta();
 }
 
 // Bind a phone to a wechat-born account. The preview runs

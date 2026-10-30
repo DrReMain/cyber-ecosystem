@@ -231,7 +231,11 @@ export function MergeConfirmPage() {
               kind: "hot",
               onPress: () => void executeSmsMerge(),
             },
-            { label: m.security_merge_sheet_cancel(), kind: "ghost", onPress: () => setSheetOpen(false) },
+            {
+              label: m.security_merge_sheet_cancel(),
+              kind: "ghost",
+              onPress: () => setSheetOpen(false),
+            },
           ]}
           body={m.security_merge_sheet_body()}
           onDismiss={() => setSheetOpen(false)}
@@ -253,7 +257,9 @@ function proofCopyOf(kind: Scenario["kind"]): string {
 function AccountPair({ poor, rich }: { poor: Side; rich: Side }) {
   return (
     <div className={`${CARD_CLASS} px-4 py-4`}>
-      <div className="text-ink mb-2.5 text-sm font-extrabold">{m.security_merge_confirm_head()}</div>
+      <div className="text-ink mb-2.5 text-sm font-extrabold">
+        {m.security_merge_confirm_head()}
+      </div>
       <div className="flex items-stretch gap-2.5">
         <div className="border-line bg-surface-input rounded-card flex-1 border border-dashed px-3 py-3 text-center">
           <div className="text-ink-tertiary text-[10.5px]">{m.security_merge_poor_tag()}</div>

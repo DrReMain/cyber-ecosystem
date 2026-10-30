@@ -14,7 +14,9 @@ export function MergeSuccessPage() {
           <Check aria-hidden className="text-white" size={34} strokeWidth={3} />
         </span>
         <div className="text-center">
-          <div className="text-ink text-[21px] font-extrabold">{m.security_merge_success_title()}</div>
+          <div className="text-ink text-[21px] font-extrabold">
+            {m.security_merge_success_title()}
+          </div>
           <p className="text-ink-secondary mt-1.5 text-center text-[12px] leading-[1.7]">
             {m.security_merge_success_body()}
           </p>
@@ -30,7 +32,9 @@ export function MergeSuccessPage() {
         >
           {m.security_merge_success_cta()}
         </button>
-        <div className="text-ink-tertiary text-center text-[11px]">{m.security_merge_success_note()}</div>
+        <div className="text-ink-tertiary text-center text-[11px]">
+          {m.security_merge_success_note()}
+        </div>
       </div>
     </AmbientLayout>
   );
