@@ -8,7 +8,7 @@
 |---|---|---|
 | lzx | E0-E2、E3 评分(13 款收满,71c33f4f;§指针清扫 43fd4b3d)、E4 匹配全量(704c3388/07b87349)、E6a/E6b、E7-a..e 13 款引擎收满(fa866414/dcce4fc6/1ce16289)、V1-V4+B 批(6b98c886/865511c1)、会员读面+admin 用户管理(88bcd9ba/3f272b28)、组合缝(a8b9f0a4)、校准战役 S1-S4+D-AL(9e0478e6/fe73a63a/1c1a8424)、支付 PAY-C0 四片+PAY-C1 四片+PAY1 五片(CP1 支付门 10-25 提前达成;APIv3 密钥 33 字符待核=回调解密/CP3 前必须修)、流转批三件(ICP 备字+种子国服重播;偏好上限终态=常量写死,10-26 二裁推翻 config 化)、E8 权益三片(10-25 收满,含架构审查收口)、E5-0 定案+a/b1/b/c(10-26,二轮审查 15 项修复批同日)、MR!9 吸收+wire-stamp 修复笔(e62ce8c6,10-27)、E5-d+E5-f 读回面族(E5-d 69721f93/f 族 0ae81a28,10-28)、E9 最小 admin 面(c1ca75d3+5895f1a8,10-28)、D-AQ 设计对齐前置法立档(abacc542)、E10 全链 e2e(login 九红条消化+Playwright 全链,10-28) | **M1 全片收满**→**E5b 全簇收口**(10-28)→**E6c 账号域全簇收口**(10-30;0+a bf0a99a0;b 2e0baf09;c dd83d3d6;d 10-30 注入缝+三路 e2e+D-W 台账收口;PAY 联动片) |
 | hzy | H1/H2/H-A/H-B、10-22 精修批、10-23 H-C 判定回路(真人链路验收;撞面合流正身=E4-c 版)、10-23/24 设计保真批(MR!6 于 10-25 并入 main,599dddce)、10-26 走查修批九条(93f67de3..179b1af2,见归档;vitest 112→115)、10-27 验收收口(tm/home-D5 亲验)+性别卡(6beff1c1,销 D-AN 流转半边)+走查下午批(MR!9 已并 main) | **下一片:E-line-b ctr 测试回位**(10-28 派定,18 件两家园直回,机械面;顺手项平均决策由 MR 内 12dc76a5 销) |
-| ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批、P15 报告簇(D-AP,10-28) | 待裁:P16 文案键半边(待标定款回执)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02)、P10(随 P4)、P2/P5/P6;~~P13 已签毕(D-AS)~~;~~P15/P8/P11/P12 已裁(D-AN/D-AM/D-AP,10-28 刷新)~~ |
+| ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批、P15 报告簇(D-AP,10-28) | 待裁:P16 文案键半边(待标定款回执)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02;四参数已定 D-AU)、P2/P5/P6;~~P10 已裁(D-AT)~~;~~P13 已签毕(D-AS)~~;~~P15/P8/P11/P12 已裁(D-AN/D-AM/D-AP,10-28 刷新)~~ |
 
 **M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ✅(13 款收满,报告分 e2e 挂 E5);E4 ✅(a-d,e2e 三验收);E7 ✅(13 款收满);E8 ✅(三片收满,10-25,含架构审查两裁落地);E5 ✅ 全族收满(E5-0..f3,10-26..28;E5-e 溶片=锚并 E-line-a/E10,10-28 拍板);E9 ✅(10-28)+E10 ✅(10-28);M2 用户列表+档案首面已前拉;V1-V4+B 批落,admin 对齐批待排;支付 PAY-C0✅+PAY-C1✅+PAY1✅五片(**CP1 门 10-25 提前 14 天实测达成**:真渠道验签握手绿);PAY2-3 未启动(H5 闸实测红=产品权限未开通,行政件)。**CP1(11-08)前瞻:门全项实质达成;余=E-line-b 回位(hzy 进行中)。**
 
@@ -58,7 +58,7 @@
 | 走查墙 4:运营测试账号口径——pg2-probe 无 user 座位登不进 admin 端;种子超管=admin/admin123456 | 用户侧 | 即办(SQL 补座位或文档化) |
 | age-required 逃生按钮(先看免费报告;原型有面,现仓无) | lzx | pay 客户端片(付费墙落地时) |
 | ~~P11 已裁(D-AN:维持单轨 birth)~~ | — | 2026-10-25 关闭 |
-| ICP 备案号权威串(LOGIC_AUDIT 2.5b「浙ICP2026028293号」vs MEMBERSHIP §九「浙ICP备2026028293号」) | ljr | 随 ljr 下轮文案定稿 |
+| ~~ICP 备案号权威串~~ **已定稿+已落地(D-AO)**:代码四键(login/report × zh/en)已全为「浙ICP备2026028293号」带「备」版,与 D-AO 一致,无改键动作;仅剩上线前 beian.miit.gov.cn 复核一次(随上线清单) | ~~ljr~~→已落 | 关闭 |
 | ~~微信登录回填昵称/头像(2.5b-⑫)~~ **已收(10-30 微信回填片)**:snsapi_userinfo 全链落,G-201 修复;余面=sex 自动填(G-206 待裁)+头像显示面(G-207 随 profile 页迭代) | lzx | 已关 |
 | 版本检查页+app-version/内容块管理(coverage 缺口①;S4 终局对账低优) | 待排 | P13 已签(D-AS⑥):协议版本管理+compliance-config 随 E9 增量入窗;版本检查页/内容块随 M2 余组 |
 | 走查注:admin 工作台 ERR·NETWORK(dev 栈缺数据源,非 esports 面) | lzx | pre 部署前查 |
@@ -104,6 +104,9 @@
 - 10-28 D-AS(ljr):P13 六项签毕——消息中心+反馈/分享裂变面召回入窗(W7-W8 落点,梯①减员),scheme-b 随 M3,旧 rank/pk·upload 废弃,学校报告随 P14(默认锁+后台手动解锁),admin 折中(协议版本管理+compliance 随 E9 增量,报告配置面梯①)。(d32ba170)
 - 10-30 E6c-c ctr 账号安全客户端面+合并 offer 面(dd83d3d6):system 三 RPC(ResolveCredential/ResetPassword/GetSecurityStatus)+esports PreviewMerge 五态 offer;方向感知重量闸(接口倒置住 report);ctr 11 路由+fn 层 DTO 防腐(枚举过界=字符串);四场景全态走查含微信真人三次 OAuth 合并全链;抓修 4 bug(路由吞子页/闪退竞态/BLOCKED 无入口/确认卡样式);门禁全绿+净清
 - 10-30 E6c-d 三路 e2e+微信 OAuth 注入缝+D-W 收口:E6c 全簇毕。AuthorizeURL 覆写(缝双半边齐)+微信路/合并反例 ENT_E2E+identity-routes Playwright 三锚(SMS/wechat/冲突卡 BLOCKED);fullchain tab 回归修复;GOFLAGS=-count=1 防 Go 测试缓存污染 env 门控;D-W 零代码收口(a0abb1a4 早已全落);门禁全绿+全套 e2e 5/5+净清
+- 10-30 D-AT(ljr):P10 定案 语言切换=个人中心设置行(现成 LocaleSelect 挂设置区,hzy 小片);P10 关闭。
+- 10-30 D-AU(ljr):P7 四参数定案(提醒可配置/到期回双选项/成功态复用 27 结构+标题双键/AI 出稿);视觉稿 12-02 前定稿交 PAY3。
+- 10-30 P7 视觉稿出稿+用户确认(ljr,AI 出稿三态 HTML 落库 p7-member-paywall.html;续费态=绿 CTA/单 CTA/状态头到期日/详情出口);待交 PAY3 实现。
 - 10-30 微信昵称/头像回填(G-201 修复,E6b 余面小片):scope 升 snsapi_userinfo+userinfo 腿(失败容忍);WeChatProfile 入两响应;ctr 预填+pill(绑定流复用,占用=6005 诚实拒绝)+头像同笔落库;identity-routes 扩锚+pill 新 test(4/4)+全套 6/6;chrome 三态走查含 DB 断言;G-206/G-207 登记
 - 10-30 微信全链真机回归(用户协作,7 用例全过):R1 登录预填真链路(thirdwx.qlogo.cn 头像落库铁证)/R2 二登进绑定页=设计内/R3 授权确认页正面+取消不回跳/R4 pill 6005 拒绝/R5-6 合并全链(双凭证归属+openid 转移 DB 铁证)/R7 pill 成功闭环。抓修 6 族:SMS 幽灵码+窗口死锁+模板空兜底(服务端先写后拨改「先轮换→拨→失败烧」+强断言)/park 残影跨账号身份泄漏(登出+消费+拒绑三点清)/双空合并误 BLOCKED+文案撒谎(放行 KEEP_CALLER)/「正在登录」文案错位三处+无 code 死页三处(同构修)/G-206 性别文案改「必选」(用户裁定 sex 不回填)/G-208 登出 sheet 六处差(浮层族批首条)。另立 config 显式化工单方向(用户裁定:空值禁静默兜底链);净清三库归零+三栈停
 - 10-30 浮层样式对齐+规范大审查(用户裁定「都按建议处理」):第一刀 BottomConfirmSheet 单源化(390px/上圆角 18px/三色族 primary·hot·ghost,红色只留真危险;登出=主 CTA/退出测评主按钮=继续测试),exit-confirm 重写+logout-sheet 薄壳+merge sheet 迁移,原型逐字文案+chrome 双侧 7 项几何实测全同,G-208 收口;第二刀双 agent 全读审查 20 条实证(工作树 8+E6c 三笔 12),三波全修:波 1 小项(config 镜像/bind_wechat_pending 键名/token×2/wechat-profile 迁 features/app)+波 2 proto WKT 全链(WeChatProfile→StringValue+wrapperspb+Private 节序+e2e 断言改形)+波 3 E6c 批(MergeUC 归位 UC/Method/Private 三节+log tag 去 report_merge/ProviderSet 分层序/profile 值类型归 DO/client const 上移跨节区/bind+merge 回调一文件多组件拆 5 文件+pending-landing 独立/注释清洗 11 处去切片号中文场景标/proto 响应标量 carve-out justification 6 处)+B 批 i18n 清算(security 域 105 键改 security_ 前缀×2 locale×136 引用点+footer 三键迁 common+SMS/错误族 security 域自持 12 键,跨域 login_* 引用归零,paraglide 强制重生成);门禁 proto 三链+esports/system build/test+ctr build/typecheck/check+admin typecheck 全绿;递延=MergePreviewer 接口倒置架构裁定(材料已备)+fetchProfile 遥测+beginBindWechatFn 跨引族
