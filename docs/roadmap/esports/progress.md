@@ -104,3 +104,4 @@
 - 10-30 E6c-d 三路 e2e+微信 OAuth 注入缝+D-W 收口:E6c 全簇毕。AuthorizeURL 覆写(缝双半边齐)+微信路/合并反例 ENT_E2E+identity-routes Playwright 三锚(SMS/wechat/冲突卡 BLOCKED);fullchain tab 回归修复;GOFLAGS=-count=1 防 Go 测试缓存污染 env 门控;D-W 零代码收口(a0abb1a4 早已全落);门禁全绿+全套 e2e 5/5+净清
 - 10-30 D-AT(ljr):P10 定案 语言切换=个人中心设置行(现成 LocaleSelect 挂设置区,hzy 小片);P10 关闭。
 - 10-30 D-AU(ljr):P7 四参数定案(提醒可配置/到期回双选项/成功态复用 27 结构+标题双键/AI 出稿);视觉稿 12-02 前定稿交 PAY3。
+- 10-30 P7 视觉稿出稿+用户确认(ljr,AI 出稿三态 HTML 落库 p7-member-paywall.html;续费态=绿 CTA/单 CTA/状态头到期日/详情出口);待交 PAY3 实现。
