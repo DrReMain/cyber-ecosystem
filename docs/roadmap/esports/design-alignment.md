@@ -15,7 +15,7 @@
 1. **查映射**(面→源,查表即得,禁漫游语料):
    - **归属与处置**(该页归哪个切片/建没建)→ `verify/demand-ledger.md`(2026-10-30 起唯一真值;未建页先看归属片是否已被 P 票阻塞)
    - ctr 面 → `verify/ctr-prototype-matrix.md`(44 页×重建路由主表;真源=`lab/esports/manage/design-systems/ctr/prototype/`,活原型交互基线)
-   - admin 面 → `verify/admin-gap-matrix.md`(27 行三路映射)+ `coverage.md` §五(41 页矩阵;真源=`design-systems/admin/outputs/prototype/`,2026-09-14 批)
+   - admin 面 → `verify/admin-gap-matrix.md`(27 行三路映射)+ `coverage.md` §五(41 页矩阵;真源=`design-systems/admin/outputs/prototype/`,2026-09-14 批);**菜单落位/命名 → `verify/admin-nav-anchor.md`**(_nav.js 九组真值;admin 原型两页验证为 JS 渲染活原型,同 ctr 须渲染态读——member 两页实证 10-30)
    - 旧码逻辑参考 → `coverage.md` §一..四语义锚 + 片行已锚单源(metric.md 等);数值/口径另引 `design-systems/admin/` 的 METRIC_SPEC_*/PRODUCT_STRATEGY_DECK(verify README 断言纪律同源)
 2. **读源**(只读映射命中件):ctr 原型是**活应用**(壳+`_state.js` 驱动 JS 渲染),文案与状态须渲染态读(chrome-mcp 开 file:// 取渲染后 DOM)或直读 `_state.js` 数据——静态剥标签只得壳文本;admin 原型静态页,可正则剥标签抽语义(E9-b 判例)。原型自带状态枚举(解锁/锁定/已测 N/6 等),每状态一条对齐用例。
 3. **偏离白名单**(仅三形,逐条登记,此外不偏离):

@@ -46,6 +46,8 @@
 | `admin-gap-matrix.md` | A-0:旧后台模块 × 新架构三路映射(状态列已退役,处置=demand-ledger) |
 | `demand-ledger.md` | **需求总账(2026-10-30 立)**:85 页×现行处置+旧码功能处置+对账计数——进度对账唯一真值,plan/progress 的需求分母 |
 | `gap-ledger.md` | gap 台账:红条(还原工单)/待面检,逐条含原型期望与出处 |
+| `admin-nav-anchor.md` | admin 菜单真值(_nav.js 九组×现行树差表 N-1..N-5;2026-10-30 立,菜单落位/命名以此为准) |
+| `admin-member-anchor.md` | M2-1 会员两页走查 oracle(渲染态机提+5 Modal+6 语义钉;admin 原型=JS 渲染活原型实证) |
 | `pm-review-items.md` | PM 核对物料:存疑累积档,调优阶段消费 |
 
 ## 执行 harness(已封存,2026-10-28)

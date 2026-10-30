@@ -60,7 +60,7 @@
 | 处置桶 | 页 | 计数 | 归属 |
 |---|---|---|---|
 | ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(4/6 Tab 占位)、activation-code ◐(码表/停用/导出缺)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺) | **4** | 余面→M2-3/M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
-| 📐 底座 IAM 承接 | audit-log、06-audit-detail、admin-user-manage、role-manage、permission-manage、menu-manage | 6 | system 既有面;操作级敏感清单对照(A8)留待 |
+| 📐 底座 IAM 承接(**D-AY**:直接用骨架,不为 esports 再造/不改名) | audit-log、06-audit-detail、admin-user-manage、role-manage、permission-manage、menu-manage | 6 | system 既有面;操作级敏感清单对照(A8)留待 |
 | 🌫 原型非本期 | attribution、channel-manage、landing-material、report-config | 4 | _nav.js 灰标(P5/梯①) |
 | 🎯 M2 核心组 | 01-member-list(到期提醒/批量续费/每日扫描语义随 M2-1 定)、02-member-detail、04-order-record、05-order-detail、sku-manage、activation-code-detail | **6** | M2-1..M2-4(10-30 用户裁首刀) |
 | 📋 E9 增量(D-AS⑥) | agreement-manage、agreement-consent、compliance-config | 3 | 已裁入窗,未认领 |

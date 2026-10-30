@@ -26,7 +26,7 @@
 
 | 片 | 内容与验收要点 | 依赖 | 规模 |
 |---|---|---|---|
-| M2-1 会员终态+运营三操作(首刀,10-30 用户裁) | Entitlement 加 status/terminated_at(**过期=时间推导,无状态列/无每日扫描,R7**);EntitleAdminService 增 Grant/Terminate/List/Get 四 RPC;system User 消息加手机号掩码投影;admin 会员列表(全部/有效/≤7 天到期/已过期 Tab+来源筛)/详情(有效期/来源/续订史 append-only)/开通-续费-终止 Modal+五语言。验收=ENT_E2E 扩展用例+chrome 走查+审计行核验;不做=到期提醒下发/批量续费/季卡年卡数据行 | E8,PAY1 | M |
+| M2-1 会员终态+运营三操作(首刀,10-30 用户裁) | Entitlement 加 status/terminated_at(**过期=时间推导,无状态列/无每日扫描,R7**);EntitleAdminService 增 Grant/Terminate/List/Get 四 RPC;system User 消息加手机号掩码投影;admin 会员列表(全部/有效/≤7 天到期/已过期 Tab+来源筛)/详情(有效期/来源/续订史 append-only,**续费=从到期顺延 31 天追加新行**)/开通-续费-终止 Modal+五语言;**admin 菜单重构+命名对齐(G-301/302,真值=verify/admin-nav-anchor.md:原型无「电竞」组,esports 自有组按原型落位,users 族正名用户列表/用户详情;系统与合规组=骨架直接承接 D-AY 不动)**。验收=ENT_E2E 扩展用例+chrome 走查(oracle=verify/admin-member-anchor.md)+审计行核验+菜单对齐;不做=到期提醒下发/批量续费/季卡年卡数据行 | E8,PAY1 | M-L |
 | M2-2 SKU 多档+订单面 | admin SKU 管理(改价敏感入审计/上下架即时同步 C 端)+订单列表/详情/关闭(消费既有 OrderService 零契约增量)+解锁记录视图(去向/来源)。验收=PAY_E2E 兼走 admin 读回+O-1/2/3 断言 | PAY1,M2-1 | M |
 | M2-3 激活码全面 | 契约增量:批次码表明细/停用(未核销即失效)/导出 CSV;admin 码表页(activation-code-detail:逐码核销人/时间+进度条≥95% 补码提示)。验收=ENT_E2E 扩展+导出走查 | E8 | M |
 | M2-4 用户详情余 Tab | assessments=ListTestAttempts 消费(契约已在,零增量);membership=随 M2-1;trace=**P22 裁后**定数据源;messages=随 MSG-1。验收=四 Tab 真数据+O-1 断言形状 | M2-1,P22,MSG-1 | S-M |
