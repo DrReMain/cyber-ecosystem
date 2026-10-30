@@ -33,6 +33,7 @@
   "test_result_title": "Result · {name}",
   "test_result_ability_line": "{ability} · {name}",
   "test_result_unit": "pts",
+  "test_result_raw_label": "Raw score",
   "test_result_detail_title": "This run's detail",
   "test_grade_s": "Pro",
   "test_grade_a": "Excellent",

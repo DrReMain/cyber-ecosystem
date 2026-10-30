@@ -188,9 +188,11 @@ export function buildSubmitRequest(input: SubmitInput): SubmitTestAttemptRequest
 }
 
 // The server verdict the end face renders: dual-track score and grade on a
-// valid attempt, the ops-vocabulary reason on an invalid one, and the
-// session's retake receipt — zero reads as "budget spent", and the whole
-// retest face hides on practice attempts (no session binding).
+// valid attempt (the raw points ride along for the norms-pending face,
+// where the authoritative track has no calibrated number yet), the
+// ops-vocabulary reason on an invalid one, and the session's retake
+// receipt — zero reads as "budget spent", and the whole retest face hides
+// on practice attempts (no session binding).
 export type SubmitVerdict =
   | { phase: "idle" }
   | { phase: "submitting" }
@@ -200,6 +202,7 @@ export type SubmitVerdict =
       valid: boolean;
       invalidReason: string | undefined;
       authoritativeScore: number | undefined;
+      rawScore: number | undefined;
       grade: string | undefined;
       retestLeft: number;
       inSession: boolean;

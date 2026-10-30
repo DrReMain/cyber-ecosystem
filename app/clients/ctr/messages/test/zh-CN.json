@@ -33,6 +33,7 @@
   "test_result_title": "本次成绩 · {name}",
   "test_result_ability_line": "{ability} · {name}",
   "test_result_unit": "分",
+  "test_result_raw_label": "原始分",
   "test_result_detail_title": "本次成绩明细",
   "test_grade_s": "专业",
   "test_grade_a": "优秀",

@@ -77,6 +77,7 @@ interface SubmitState {
     retestLeft?: number;
     invalidReason?: string;
     authoritativeScore?: number;
+    rawScore?: number;
     grade?: string;
   };
 }
@@ -107,6 +108,7 @@ function verdictOf(
     valid: data.valid ?? false,
     invalidReason: data.invalidReason as string | undefined,
     authoritativeScore: data.authoritativeScore as number | undefined,
+    rawScore: data.rawScore as number | undefined,
     grade: data.grade as string | undefined,
     retestLeft: data.retestLeft ?? 0,
     inSession,

@@ -6,15 +6,22 @@ export type DoneVerdict = Extract<SubmitVerdict, { phase: "done" }>;
 
 /** The submit chain's done-and-valid face: the big score with its unit,
  * the grade chip, and the ungraded note that keeps the chip's shape
- * with the honest why. */
+ * with the honest why. Norms pending, the authoritative track has no
+ * calibrated number — the raw points hold the big slot, labeled as raw
+ * so they never masquerade as the calibrated score. */
 export function ValidScore({ verdict }: Readonly<{ verdict: DoneVerdict }>) {
+  const uncalibrated = verdict.authoritativeScore === undefined;
+  const score = verdict.authoritativeScore ?? verdict.rawScore;
   return (
     <>
       <div className="mt-1.5 flex items-baseline justify-center gap-1.5">
         <span className="text-ink text-[58px] leading-none font-black tabular-nums">
-          {verdict.authoritativeScore ?? "—"}
+          {score ?? "—"}
         </span>
-        <span className="text-ink-tertiary text-sm">{m.test_result_unit()}</span>
+        <span className="text-ink-tertiary text-sm">
+          {m.test_result_unit()}
+          {uncalibrated && score !== undefined ? ` · ${m.test_result_raw_label()}` : ""}
+        </span>
       </div>
       <div className="mt-2.5">
         <TierChip grade={verdict.grade} />
