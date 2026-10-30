@@ -42,8 +42,9 @@
 | 文件 | 内容 |
 |---|---|
 | `ctr-design-inventory.tsv` | 192 行设计语料机器锚(路径/title/标题/壳文本量) |
-| `ctr-prototype-matrix.md` | V-0:原型 44 页 × 重建路由映射与实现状态 |
-| `admin-gap-matrix.md` | A-0:旧后台模块 × 新架构三路映射 |
+| `ctr-prototype-matrix.md` | V-0:原型 44 页 × 重建路由映射(状态列已退役,处置=demand-ledger) |
+| `admin-gap-matrix.md` | A-0:旧后台模块 × 新架构三路映射(状态列已退役,处置=demand-ledger) |
+| `demand-ledger.md` | **需求总账(2026-10-30 立)**:85 页×现行处置+旧码功能处置+对账计数——进度对账唯一真值,plan/progress 的需求分母 |
 | `gap-ledger.md` | gap 台账:红条(还原工单)/待面检,逐条含原型期望与出处 |
 | `pm-review-items.md` | PM 核对物料:存疑累积档,调优阶段消费 |
 

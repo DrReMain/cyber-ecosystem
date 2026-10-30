@@ -1,0 +1,101 @@
+# 需求总账 — 85 页原型 × 旧码功能 × 现行处置(单一真值)
+
+> 建立:2026-10-30 roadmap 重构役(用户令)。目的:进度对账不再依赖 progress 快照——**需求分母与每页处置只在本档维护**,plan.md 排片、progress.md 认领、coverage/两矩阵的状态列自本日起退役为快照。
+> 防失真:继承本目录 README 五条协议(清单计数/出处必填/计数收口)。本档出处=四路穷举(2026-10-30,agent 并行):①旧码双后端(esport-server 58 端点+esport-admin 133 端点/36 表);②旧码三前端(admin-game 23 视图/ctr-game 64 视图/manage 资产);③原型 85 页逐页(`ls *.html|wc -l` 实测 44+41,无缺页);④新实现盘点(esports 11 service/37 RPC/15 表+ctr 39 路由+admin 5 页)。
+> 处置词表:✅已建(面检另计)/◐部分/❌未建/⏸待裁(P 票)/🗑已裁废弃/📐底座承接/🌫原型非本期。
+
+## §一 ctr 原型 44 页(真源=`lab/esports/manage/design-systems/ctr/prototype/`)
+
+| # | 页 | 处置 | 归属/注 |
+|---|---|---|---|
+| 1 | index | 📄 | 评审工具页,非产品屏 |
+| 2 | home | ◐ | 已建;续测卡/最近成绩/统计卡已接(E5-f3);面检=V 线铺开 |
+| 3 | login | ✅ | E5+E10+E6c-a;G-001..009 已处置 |
+| 4 | profile-nickname | ✅ | G-201 微信回填已修 |
+| 5 | profile-age | ✅ | G-206 已裁修复 |
+| 6 | profile-setup(games) | ✅ | B 批④去向待 ljr 一句(→R4) |
+| 7 | profile-overview | ◐ | 九区在;会员卡随 PAY3/训练趋势 Phase2 占位(→R2 对核) |
+| 8 | password | ✅ | E6c-c 三路 |
+| 9 | match-genre-pick | ✅ | B 批①推荐角标缺(→R2) |
+| 10 | match-guide | ◐ | 名错位(重建 /match);面检待 |
+| 11 | match-switch-confirm | ✅ | |
+| 12 | test-guide | ✅ | |
+| 13 | test-intro | ✅ | mt-F1 文案键已裁(→R3) |
+| 14 | test-running | ✅ | E7/H-A;唯一横屏 |
+| 15 | test-result | ✅ | E5-f2 |
+| 16 | test-done | ✅ | D-AI 分享主 CTA |
+| 17 | test-records | ❌ | 三态页未建;归 M2 余组(记录读面) |
+| 18 | report-single | ◐ | 七区块在;unlock/member CTA parked→PAY3 |
+| 19 | report-center | ✅ | E5b-d;G-101..106 已处置 |
+| 20 | report-career | ✅ | E5b-c 开放态=旧仓语义级 |
+| 21 | report-cognitive | ✅ | 同上 |
+| 22 | report-trend | ✅ | 同上 |
+| 23 | member-detail | ❌ | →PAY3(随付费墙) |
+| 24 | pay-confirm | ❌ | →PAY3;P7 视觉稿已落库(p7-member-paywall.html) |
+| 25 | pay-result | ❌ | →PAY3(四态) |
+| 26 | message-center | ❌ | →MSG-1(D-AS①);P21 前置 |
+| 27 | feedback-submit | ❌ | →MSG-1;G-202 红条随接真跳 |
+| 28 | feedback-detail | ❌ | →MSG-1 |
+| 29 | agreement | ◐ | 双路由在;文案=ljr 法务定稿占位;版本真源化→E9 增量 |
+| 30 | age-required | ✅ | 付费闸挂接→PAY3;逃生按钮在遗留清单 |
+| 31 | bind-phone | ✅ | E6c-c |
+| 32 | bind-wechat | ✅ | E6c-c 三态 |
+| 33 | account-security | ✅ | E6c-c 三行真状态 |
+| 34 | account-merge-confirm | ✅ | E6c-b/c 四场景 |
+| 35 | resume-remind | ◐ | home 卡片形态;弹框形态面检(→R2) |
+| 36 | share-invite | ❌ | →MSG-2(D-AS②);P23 前置 |
+| 37 | scheme-b-entry | ❌ | D-AS③ 窗外随 M3/P4 |
+| 38 | scheme-b-guide | ❌ | 同上 |
+| 39 | scheme-b-report | ❌ | 同上;P14 报告快照归属 |
+| 40 | exit-confirm | ✅ | H-A kit 首用;G-208 首刀已收 |
+| 41 | version-update | ⏸ | **P19**(H5 形态是否保留强更族) |
+| 42 | loading | 📄 | kit 在,消费者随各片 |
+| 43 | empty | 📄 | 同上 |
+| 44 | error | 📄 | 同上 |
+
+**计数:44 = ✅22 + ◐6 + ❌11 + ⏸1 + 📄4。** blocks/future 补充面:forgot-password ✅(/login/forgot)、change-password ✅(E6c-c)、notification-detail→MSG-1、subscription-popup/theme-hero ⏸(P13 剪裁已定不入)、moba-6dim ⏸(P15 已裁口径)、future/22 页=远期参考不入账。
+
+## §二 admin 原型 41 页(真源=`manage/design-systems/admin/outputs/prototype/`;侧栏 9 组权威=_nav.js)
+
+| 处置桶 | 页 | 计数 | 归属 |
+|---|---|---|---|
+| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(4/6 Tab 占位)、activation-code ◐(码表/停用/导出缺)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺) | **4** | 余面→M2-3/M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
+| 📐 底座 IAM 承接 | audit-log、06-audit-detail、admin-user-manage、role-manage、permission-manage、menu-manage | 6 | system 既有面;操作级敏感清单对照(A8)留待 |
+| 🌫 原型非本期 | attribution、channel-manage、landing-material、report-config | 4 | _nav.js 灰标(P5/梯①) |
+| 🎯 M2 核心组 | 01-member-list(到期提醒/批量续费/每日扫描语义随 M2-1 定)、02-member-detail、04-order-record、05-order-detail、sku-manage、activation-code-detail | **6** | M2-1..M2-4(10-30 用户裁首刀) |
+| 📋 E9 增量(D-AS⑥) | agreement-manage、agreement-consent、compliance-config | 3 | 已裁入窗,未认领 |
+| 📋 D-AS 消息组 | feedback-manage、07-feedback-detail、announcement | 3 | →MSG-1(W7-W8);P21 前置 |
+| 📋 M2 余组(梯①) | dashboard、user-portrait、09-user-import、question-bank、question-detail、test-record、08-test-record-detail、test-type、game-category、payment-channel、rating-manage、system-config、app-version | 13 | 各项开工前先过对应 P 票:P20(dashboard/portrait 数据源)、P2(评级)、P24(归类)、P25(渠道面)、P19(版本)、system-config=裁不建候选(config 珍稀原则) |
+| 📋 M3/P4 | tob-tenant-list、tob-tenant-detail | 2 | 窗外 buffer;P14 前置 |
+
+**计数:41 = 已建 4 + 底座 6 + 非本期 4 + M2 核心 6 + E9 增量 3 + 消息组 3 + 余组 13 + M3 2。**(已建率 4/41≈10%;底座+已建+已裁入窗合计 16/41——承诺窗内可达成面 =16+6+3+3=28 页,余 13 页余组+M3。)
+
+## §三 旧码功能 × 处置(不在 85 页内者;出处=旧码穷举 2026-10-30)
+
+| 旧功能 | 处置 | 依据/归属 |
+|---|---|---|
+| 测试排名 GET /test/rank + PK /test/pk + upload 补传 | 🗑 废弃 | D-AS④ 签认 |
+| skill_prediction 款 | 🗑 裁出 | §0 对齐口径(multi_target 入) |
+| 三档会员 ¥99/¥299/¥499 定价 | 🗑 作废 | D-AB/D-AC 取代(¥19.9/¥29.9) |
+| sound-reaction 占位页 / BiometricMonitor / basic-results mock | 🗑 不迁 | demo/mock,原型未收 |
+| Sentry 全量埋点(六族百事件) | ⏸ 远期 | B2;与 dashboard 漏斗的循环依赖→**P20** 解销 |
+| 登录环境九件套(IP/省市/UA/设备解析+地域回填 Runner) | ⏸ | **P22**(隐私最小化 vs trace Tab 数据源) |
+| ?ref= 推荐码明文+注册地域记账 | ⏸ 重批中 | A12 旧裁待重批→**P23** |
+| 消息中心/反馈回复闭环/公告 | 📋 入窗 | D-AS①→MSG-1 |
+| 手动解锁三开关+解锁过期任务 | 📋 改形入窗 | R7(过期=事实推导);运营三操作=M2-1 |
+| 学校版报告(生成/7 天期/学科优势)+school 表 | 📋 随 P14 | D-AS⑤ 默认锁+手动解锁 |
+| App 版本管理+强更弹窗 | ⏸ | **P19** |
+| Excel 导入导出族(用户导入/题库导入/激活码导出) | 📋 余组 | 题库/激活码导出随 M2-3+余组;用户导入=余组 |
+| 题库三表 CRUD 23 端点(攻防/角色/克制) | 📋 余组 | E9 只读抽屉已建;CRUD/Excel 随余组(10-28 已注) |
+| 双 Java 服务共享库/Flyway/Snowflake/JWT 细节 | 🗑 不迁 | clean-room 律(README §0.1) |
+
+## §四 现状计数(2026-10-30 代码盘点;对账基准)
+
+- 新实现:esports=11 service/37 RPC(admin 面 12)/15 表/2 ticker(支付收敛 1min+对账 24h);ctr=39 路由+13 引擎(前后端一一对应)+0 业务 store;admin=esports 面 5 页(含 report-policies)+4 占位 Tab。
+- 对照:旧 191 端点(admin 133)/36 表/ctr 64 视图/admin 23 视图。新版**反超项**=支付后端(旧仅枚举)/匹配引擎(旧纯设计)/全量服务端判分(旧 4 款作弊面)/账号合并(旧无)/报告快照冻结(旧无)。
+- 投入分布(esports/main 10-09 以来提交数):ctr 98 : 后端 74 : **admin 27** : 文档 180 —— admin 投入为 ctr 的 1/4,系 CP 门原不含 admin 所致(10-30 修正:CP2/CP3 已增构成项)。
+
+## §五 对账环
+
+- 本档为唯一处置真值:切片收口时对应行 ◐/❌→✅ 并注 hash;P 票裁毕即改 ⏸→📋/🗑。
+- 与 gap-ledger 分工:本档=「建没建/归谁」;gap-ledger=「建得像不像」(逐字/态比对)。两档互不吸收。

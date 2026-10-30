@@ -13,6 +13,7 @@
 ## 前置动作(认领后、写第一行页面代码前)
 
 1. **查映射**(面→源,查表即得,禁漫游语料):
+   - **归属与处置**(该页归哪个切片/建没建)→ `verify/demand-ledger.md`(2026-10-30 起唯一真值;未建页先看归属片是否已被 P 票阻塞)
    - ctr 面 → `verify/ctr-prototype-matrix.md`(44 页×重建路由主表;真源=`lab/esports/manage/design-systems/ctr/prototype/`,活原型交互基线)
    - admin 面 → `verify/admin-gap-matrix.md`(27 行三路映射)+ `coverage.md` §五(41 页矩阵;真源=`design-systems/admin/outputs/prototype/`,2026-09-14 批)
    - 旧码逻辑参考 → `coverage.md` §一..四语义锚 + 片行已锚单源(metric.md 等);数值/口径另引 `design-systems/admin/` 的 METRIC_SPEC_*/PRODUCT_STRATEGY_DECK(verify README 断言纪律同源)

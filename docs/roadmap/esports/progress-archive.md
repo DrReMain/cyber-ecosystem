@@ -76,3 +76,27 @@
 - 10-28 devserver 机制退役(用户裁定):406 行+12 target 删除,agent=后台任务+TaskStop(kratos/vite 双树实证收净)。
 - 10-28 D-AQ 设计对齐前置法立档(design-alignment.md):客户端面切片开工查映射读原型源;ctr 活原型渲染态读;偏离三白名单。
 - 10-28 E10-b 全链 e2e 收口:ctr 首 Playwright spec(CTR_E2E=1)登录→向导→match→4 款→报告→开码兑换;两 fixture 法(反应池收窄+cohort 9 样本);五判例入 spec/config。
+
+## 2026-10-30 重构役 · M1+E 线+支付前段里程碑压实(已收池一行制;全文=git proven-by/会话记录)
+
+- E0 契约首刀 ✅(种子→读面→统一提交→三计数,193a9b7c);E1 骨架 ✅(八步+双面+探针);E2 schema+种子 ✅(D-V 后 clean-room 重建,D-Z 补行)。
+- E3 评分引擎 ✅ 13 款收满(Tier A 10/10 后 B 三款升格消亡 71c33f4f;Registry+提交缝 4c5f0617;§指针清扫 43fd4b3d;metric.md 单源)。
+- E4 匹配引擎 ✅(a 聚合出生+b 提交缝 704c3388+c 服务端编排+清号 07b87349+d e2e 三验收)。
+- E5 报告全族 ✅(E5-0..f3 10-26..28:E5-a 三源契约/E5-c 幂等快照/E5-d ctr 七段面/E5-f 读回族 0ae81a28;E5-e 溶片并入 E-line-a/E10)。
+- E5b 报告簇 ✅ 全簇 10-28(0 定案三裁/a 契约三读面/b 认知趋势聚合+百分位回填/c 职业聚合四域种子/e 翻转零值锚 e2e)。
+- E6a 纯壳 ✅;E6b 登录+画像流 ✅(微信真人链路绿;遗留随对应片全销)。
+- E6c 账号域全簇 ✅ 10-28..30(a SMS 能力+登录 bf0a99a0/b 绑定合并 2e0baf09/c ctr 11 路由+DTO 防腐 dd83d3d6/d OAuth 注入缝+e2e+D-W 收口 a0abb1a4)。
+- E7 游戏框架+13 款 ✅ 10-25 收满(E7-a..e 三批;定律族立档;engine_params 物化+nil 让渡律)。
+- E8 权益 ✅ 三片 10-25(a 结构+b 十人竞兑不超卖 e2e+判定序/c 事件钩子;R7 过期=事实)。
+- E9 最小 admin 面 ✅ 10-28(a 服务端六 RPC c1ca75d3/b admin 三页 5895f1a8;闭环 e2e CODE_REDEEMED;S4 增量锚剪裁=D-AS⑥)。
+- E10 全链 e2e ✅ 10-28(a login 九红条 D-AQ 首片/b Playwright 全链+两 fixture 法)。
+- E-line-a esports 测试回位 ✅ 10-28(三家园 23 件+guards;E5-e 服务端锚并入)。
+- H 线全收:H1/H2 ✅ 10-20(MR!2);H-A ✅ 10-20;H-B ✅ 10-21;H-C ✅ 10-23(真人链路验收;撞面合流取 E4-c/E7-a 正身)。
+- 会员读面+admin 用户管理 ✅ 10-20(MemberService 88bcd9ba+esports-users 3f272b28+组合缝 a8b9f0a4)。
+- 支付前段:PAY-C0 家族四片 ✅ 10-26(契约/mock 镜像/v3crypto 归 wechat 子包/35xx);PAY-C1 微信 provider ✅ 10-26(覆盖率 97.1/90.0/91.3);PAY1 订单域五片 ✅ 10-25(20d61e2f→5b7e88a1;资金安全三件套);**CP1 门 ✅ 10-25 提前 14 天**(真握手验签绿)。
+- 质量批三件 ✅ 10-30(99c5bb06:真机回归 7 用例 6 族修复+G-208 BottomConfirmSheet 首刀+规范大审查 20 条+i18n 前缀清算 105 键+config 显式化)。
+- 微信回填片(G-201)✅ 10-30(snsapi_userinfo 全链+昵称预填+头像落 profile.avatar_url)。
+- 校准战役 S1-S4 ✅ 10-23(S1 ctr 14 面/S2 admin/S3 契约种子唯 P12 提裁后 D-AM 关/S4 终局对账立 MIG1/E5b/E6c+E9)。
+- V1-V4+B 批 ✅(视觉四批+B 批修正;余项=R 带);MR!6(10-25)/MR!9(10-27,e62ce8c6 wire-stamp)吸收毕。
+- P7 视觉稿提前落库 ✅ 10-30(1c30b767 三态 HTML;D-AU 四参数;精修窗至 12-02)。
+- devserver 机制退役 ✅ 10-28(−498 净;agent=后台任务+TaskStop)。

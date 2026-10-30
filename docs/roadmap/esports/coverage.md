@@ -1,5 +1,6 @@
 # 原型×新版覆盖矩阵 — 精修基线盘点
 
+> **2026-10-30 起:本档状态列退役(快照冻结)——每页「建没建/归谁」的唯一真值=verify/demand-ledger.md;本档继续承重=语义锚(§一..四)+B 批清单(§七.5)+语料版本律(§六)+校准台账(§九)。**
 > 归属:esports 前沿档,2026-10-20 建立。三人+各自的 coding agent 共用同一基线:精修期每片开工前,对照本矩阵对应行的语义锚做逐条核对;谁落地谁把该行状态改为「已实现」并注差异。矩阵错漏当场修正,不另立流程。
 > 语料真相源(旧仓 manage,只读):页面映射=manage 仓 docs 下的 DESIGN_DOC_MAP §二(交互基线↔视觉基线);**每页语义规则=ctr 交互原型的 `_check.js`(逐条引 PRD 节号)**;裁决台账=同目录 LOGIC_AUDIT(L1/L2/L3);PRD=block3/block4 各自的 PRD。FEATURE_LIST 自标部分过时,仅作检索辅助。
 > 2026-10-23 ljr 材料全量吸收(D-AL):新增可用锚=GAME_LOGIC_SPEC_DRAFT(match_config 种子/副能力 4 行 0.5/聚合 D1-D3)、USER_TRACEABILITY_PRD(user:*:view 分区权限点+手动解锁语义)、ADMIN_NAVIGATION_IA(9 模块)+ADMIN_INTERACTION_GUIDE(O-1/2/3)、db/README(36 表全景,V17-19 未发布)、旧仓 esport-server|esport-admin `openspec/changes/`(agreement-consent/membership-pay 等代码变更规格,clean-room 高价值参考);METRIC_SPEC 族仍按 §六.3 单源化消费。
