@@ -56,7 +56,7 @@
 | 走查墙 4:运营测试账号口径——pg2-probe 无 user 座位登不进 admin 端;种子超管=admin/admin123456 | 用户侧 | 即办(SQL 补座位或文档化) |
 | age-required 逃生按钮(先看免费报告;原型有面,现仓无) | lzx | pay 客户端片(付费墙落地时) |
 | ~~P11 已裁(D-AN:维持单轨 birth)~~ | — | 2026-10-25 关闭 |
-| ICP 备案号权威串(LOGIC_AUDIT 2.5b「浙ICP2026028293号」vs MEMBERSHIP §九「浙ICP备2026028293号」) | ljr | 随 ljr 下轮文案定稿 |
+| ~~ICP 备案号权威串~~ **已定稿+已落地(D-AO)**:代码四键(login/report × zh/en)已全为「浙ICP备2026028293号」带「备」版,与 D-AO 一致,无改键动作;仅剩上线前 beian.miit.gov.cn 复核一次(随上线清单) | ~~ljr~~→已落 | 关闭 |
 | 微信登录回填昵称/头像(2.5b-⑫;需 system identity 持久化+向导去向联动) | lzx | E6b 余面小片(S1 登记) |
 | 版本检查页+app-version/内容块管理(coverage 缺口①;S4 终局对账低优) | 待排 | P13 已签(D-AS⑥):协议版本管理+compliance-config 随 E9 增量入窗;版本检查页/内容块随 M2 余组 |
 | 走查注:admin 工作台 ERR·NETWORK(dev 栈缺数据源,非 esports 面) | lzx | pre 部署前查 |
