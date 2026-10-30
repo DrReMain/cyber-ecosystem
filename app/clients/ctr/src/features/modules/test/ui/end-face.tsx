@@ -157,23 +157,27 @@ function BestTag({ line }: Readonly<{ line: WireLine | undefined }>) {
 
 /** The attempts receipt (prototype's note card): every valid attempt's
  * score in order with the taken one marked, then the rubric in one
- * honest line. */
+ * honest line — a single attempt reads too, as the prototype's note
+ * does. */
 function AttemptsNote({ line }: Readonly<{ line: WireLine | undefined }>) {
-  if (line === undefined || line.attemptScores.length < 2) {
-    return null; // a single attempt needs no "which one was taken" story
+  // toJson elides empty repeated fields, so a line without attempts may
+  // arrive without the key at all — normalize before reading.
+  const scores = line?.attemptScores ?? [];
+  if (scores.length === 0) {
+    return null; // an unscored line has no receipt to tell
   }
-  const best = Math.max(...line.attemptScores);
+  const best = Math.max(...scores);
   // The receipt's identity is its position — repeated scores are legal
   // and carry no distinguishing content of their own — derived here so
   // the render's key never touches the index the array-key lint guards.
-  const entries = line.attemptScores.map((score, i) => ({
+  const entries = scores.map((score, i) => ({
     key: `${i}-${score}`,
     leading: i > 0,
     score,
   }));
   return (
     <div className="border-line bg-surface-content text-ink-muted rounded-card border px-3.5 py-3 text-[11px] leading-[1.8]">
-      {m.test_attempts_pre({ n: line.attemptScores.length })}
+      {m.test_attempts_pre({ n: scores.length })}
       {entries.map(({ key, leading, score }) => (
         <span key={key}>
           {leading ? (
@@ -293,8 +297,10 @@ function shownVerdictOf(
  * The result face (prototype test-result): the big score with its grade
  * chip, the settlement's three receipt tags (vs-last-session, retake
  * budget, cross-session best), the attempts note, the fact rows as
- * label/value lines, and the two CTAs — the retake (absent in the
- * read-back mode) and the primary continue, which walks to the next
+ * label/value lines, and the two CTAs — the retake, greyed dead whenever
+ * the read-back mode or a spent budget holds it (the prototype's ro face
+ * keeps the button visible-but-dead rather than hiding it), with the
+ * ruled exit line under it — and the primary continue, which walks to the next
  * undone engine-backed step or closes the flow into the session-done
  * page. Markup-only; every number comes from results.ts, the submit
  * verdict, or the session's read-back face.
@@ -404,15 +410,19 @@ export function EndFace({
           ) : null}
 
           <div className="flex flex-col gap-3">
-            {!review ? (
-              <Button
-                className={`bg-cta-practice shadow-cta-practice rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80 ${
-                  spent ? "pointer-events-none opacity-45" : ""
-                }`}
-                onPress={onRetry}
-              >
-                {spent ? m.test_result_retry_disabled() : m.test_end_retry()}
-              </Button>
+            {/* The prototype's read-back keeps the retake visible but dead
+                (the ro face and a spent budget both grey it); the ruled
+                spent-exit line rides under the button. */}
+            <Button
+              className={`bg-cta-practice shadow-cta-practice rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80 ${
+                spent || review ? "pointer-events-none opacity-45" : ""
+              }`}
+              onPress={onRetry}
+            >
+              {spent ? m.test_result_retry_disabled() : m.test_end_retry()}
+            </Button>
+            {spent ? (
+              <p className="text-[#FCD34D] px-1 text-[11.5px] leading-[1.7]">{m.test_intro_blocked()}</p>
             ) : null}
             {next !== undefined ? (
               <Button
