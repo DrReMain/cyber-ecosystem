@@ -44,7 +44,7 @@ E10-a 复对账(10-28,live dev 栈,同款 innerText oracle):14 行中 12 行逐�
 
 | # | 面 | 类型 | 期望(原型) | 实际(重建) | 处置 |
 |---|---|---|---|---|---|
-| G-201 | onboarding 昵称步「获取微信昵称」pill | 缺面 | 昵称输入侧「获取微信昵称」一键带入 | 无 | 红:需 snsapi_userinfo 授权域+userinfo 能力(provider 现仅 snsapi_base 换 openid),递延 E6c-d 微信 OAuth transport 缝 |
+| G-201 | onboarding 昵称步「获取微信昵称」pill | 缺面 | 昵称输入侧「获取微信昵称」一键带入 | 无 | 红:前置 transport 缝已落(E6c-d AuthorizeURL 覆写);pill 本体归「微信登录回填昵称/头像」E6b 余面小片(S1 登记)——需 snsapi_userinfo 授权域+userinfo 能力(provider 现仅 snsapi_base 换 openid)+identity 持久化与向导联动 |
 | G-202 | BLOCKED pane「去意见反馈」CTA | 契约门控 | 跳 feedback-submit 页 | soon toast「即将开放」 | 红:feedback 契约未建(P13 消息中心+反馈召回在窗),门控占位;契约落地时接真跳 |
 | G-203 | 合并确认页保留卡掩码 | 策略 | 原型单手机号场景无此歧义 | 多凭证账号显示第二号(7777)非登录主号(6666) | 待面检:微信腿走查实证;掩码取 credential 列表序,主号语义待 PM 定(候选=最近登录凭证/首凭证) |
 | G-204 | 解绑/换绑 | 缺面 | 原型 security 页注记「解绑请联系客服」 | 同文案照录,无自助解绑 | 白名单形②:E6c-b 裁定重绑解绑零建设走客服;文案照原型 |

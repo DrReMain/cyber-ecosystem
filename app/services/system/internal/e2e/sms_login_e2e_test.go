@@ -47,22 +47,7 @@ func smsClean(t *testing.T, db *ent.Client, trp authmod.TokenRP) {
 	t.Helper()
 	ctx := context.Background()
 	for _, phone := range []string{e2eSmsPhoneA, e2eSmsPhoneB} {
-		cs, err := db.Credential.Query().Where(
-			entcredential.KindEQ("sms"), entcredential.IdentifierEQ(phone)).All(ctx)
-		if err != nil {
-			t.Fatalf("clean credential query: %v", err)
-		}
-		for _, c := range cs {
-			if _, err := db.Membership.Delete().Where(entmembership.UserIDEQ(c.UserID)).Exec(ctx); err != nil {
-				t.Fatalf("clean membership: %v", err)
-			}
-			if _, err := db.User.Delete().Where(entuser.IDEQ(c.UserID)).Exec(ctx); err != nil {
-				t.Fatalf("clean user: %v", err)
-			}
-			if _, err := db.Credential.Delete().Where(entcredential.IDEQ(c.ID)).Exec(ctx); err != nil {
-				t.Fatalf("clean credential: %v", err)
-			}
-		}
+		sweepBornUsers(t, db, "sms", phone)
 		// The code and throttle keys reset so the next run starts from
 		// zero; orphaned states die on their own TTL. The send-window key
 		// carries redis_rate's own "rate:" storage prefix — the one place
@@ -197,7 +182,7 @@ func TestSmsLoginLiveE2E(t *testing.T) {
 	if subject.Population != "member" {
 		t.Fatalf("session population = %q, want member", subject.Population)
 	}
-	smsAssertMemberChain(t, db)
+	assertBornMemberChain(t, db, "sms", e2eSmsPhoneB)
 }
 
 // lastSmsCode reads the newest recorded send's code — the harness's window
@@ -220,14 +205,14 @@ func lastSmsCode(t *testing.T, ctrl *smsmock.Controller, phone string) string {
 	return last.Params["code"]
 }
 
-// smsAssertMemberChain lands the auto-registration contract on real rows:
+// assertBornMemberChain lands the auto-registration contract on real rows:
 // the credential keys a born user (xid account, empty-hash password plane,
 // enabled) holding exactly the member seat.
-func smsAssertMemberChain(t *testing.T, db *ent.Client) {
+func assertBornMemberChain(t *testing.T, db *ent.Client, kind, identifier string) {
 	t.Helper()
 	ctx := context.Background()
 	c, err := db.Credential.Query().Where(
-		entcredential.KindEQ("sms"), entcredential.IdentifierEQ(e2eSmsPhoneB)).Only(ctx)
+		entcredential.KindEQ(kind), entcredential.IdentifierEQ(identifier)).Only(ctx)
 	if err != nil {
 		t.Fatalf("credential row: %v", err)
 	}
@@ -248,6 +233,29 @@ func smsAssertMemberChain(t *testing.T, db *ent.Client) {
 }
 
 func sp(s string) *string { return &s }
+
+// sweepBornUsers erases a born member's full row family — user, seats, and
+// the credential that keyed it — so a re-run starts from zero rows.
+func sweepBornUsers(t *testing.T, db *ent.Client, kind, identifier string) {
+	t.Helper()
+	ctx := context.Background()
+	cs, err := db.Credential.Query().Where(
+		entcredential.KindEQ(kind), entcredential.IdentifierEQ(identifier)).All(ctx)
+	if err != nil {
+		t.Fatalf("clean credential query: %v", err)
+	}
+	for _, c := range cs {
+		if _, err := db.Membership.Delete().Where(entmembership.UserIDEQ(c.UserID)).Exec(ctx); err != nil {
+			t.Fatalf("clean membership: %v", err)
+		}
+		if _, err := db.User.Delete().Where(entuser.IDEQ(c.UserID)).Exec(ctx); err != nil {
+			t.Fatalf("clean user: %v", err)
+		}
+		if _, err := db.Credential.Delete().Where(entcredential.IDEQ(c.ID)).Exec(ctx); err != nil {
+			t.Fatalf("clean credential: %v", err)
+		}
+	}
+}
 
 func smsIdentityReq(state, phone, code string) *systempb.LoginByIdentityRequest {
 	p, c, s, prov := phone, code, state, "sms"

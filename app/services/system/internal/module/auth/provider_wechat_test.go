@@ -114,3 +114,28 @@ func TestWeChatAuthorizeURL(t *testing.T) {
 		t.Fatal("authorize url: the secret must never appear")
 	}
 }
+
+// An endpoint override sends the browser's authorize hop to the same
+// stand-in the token exchange already honours — one base serves both OAuth
+// legs, which is what lets a mock carry the whole chain without WeChat or a
+// human in the loop.
+func TestWeChatAuthorizeURLOverridden(t *testing.T) {
+	p := wechatProvider{}
+	got := p.AuthorizeURL(wechatRow("http://127.0.0.1:18443"), "https://app.example/cb", "st-9")
+	for _, want := range []string{
+		"http://127.0.0.1:18443/connect/oauth2/authorize?",
+		"appid=wx-test",
+		"redirect_uri=" + "https%3A%2F%2Fapp.example%2Fcb",
+		"response_type=code",
+		"scope=snsapi_base",
+		"state=st-9",
+		"#wechat_redirect",
+	} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("authorize url %q missing %q", got, want)
+		}
+	}
+	if strings.Contains(got, "open.weixin.qq.com") {
+		t.Fatal("authorize url: an overridden row must not fall back to the official host")
+	}
+}

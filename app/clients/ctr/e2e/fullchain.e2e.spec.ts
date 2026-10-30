@@ -76,6 +76,9 @@ test("login → wizard → match → 4 games → done → report → code unlock
     // toggles without React knowing). Let the module graph settle first.
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1_000);
+    // The code tab is the default since the E6c-a login face; this chain
+    // rides the password pair, so flip to it before filling.
+    await page.getByRole("button", { name: "密码登录" }).click();
     await page.getByPlaceholder("手机号").fill(account);
     await page.getByPlaceholder("密码（≥6 位）").fill(password);
     // The RAC pair is visually hijacked: the real input hides behind the
