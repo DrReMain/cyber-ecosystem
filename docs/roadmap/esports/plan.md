@@ -46,7 +46,7 @@
 | ✅ E9 最小 admin 面(10-28) | admin 挂 esports 模块:激活码+测试项/配置+报告策略+题库查看(c1ca75d3+5895f1a8);闭环 e2e(开码→兑换→CODE_REDEEMED);O-1/2/3 裁定照用;**S4 增量锚剪裁已定(D-AS⑥,10-28):协议版本管理+compliance-config 随 E9 增量入窗;题库 CRUD/Excel/批量导入/测试记录明细随 M2 余组;报告配置面梯①** | E0 | M |
 | ✅ E10 全链 e2e(10-28) | login 九红条消化(D-AQ 首片)+ctr 首 Playwright 全链 spec(CTR_E2E 门控;两 fixture 法=反应池收窄+cohort 样本,finally 全净清);原型断言语义级移植为验收基线(D-O)兑现 | 全部 | M |
 | ✅ E-line-a 测试回位·esports 23 件(10-28 收口) | 三家园回位:unit 17 原位直回/e2e 3 迁 internal/e2e(ENT_E2E 门)/guards 3 迁 internal/guards(法条=kratos §7);含 E5-e 溶片锚(五幕+读回+composite 一致性) | 骨架法条已立(§7) | M |
-| E-line-b 测试回位·ctr 18 件(2026-10-27 审查役立片) | 同役 ctr 面,法条=tanstack §11 两家园:colocated vitest 原位直回(domains/error 1+test 模块根 4 件+13 games logic);基建已就位(vitest 5/jsdom 30/test target 全回)。验收=ctr:test 全绿+用例数对账 vs 剥离前 | — | M |
+| ✅ E-line-b 测试回位·ctr 18 件(10-30 收口) | 同役 ctr 面,法条=tanstack §11 两家园:colocated vitest 原位直回(domains/error 1+test 模块根 4 件+13 games logic);基建已就位(vitest 5/jsdom 30/test target 全回)。验收达成=ctr:test 20 件 127 绿,恢复 18 件=剥离前 106 例(blob 同一 18/18);mt-F1 D-AR 双键同车(2b0bd350) | hzy | M |
 
 ## hzy 外围启动线(2026-10-19 增补;W1-W2 桥接,定义归此、状态记 progress)
 

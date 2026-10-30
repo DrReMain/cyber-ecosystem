@@ -7,10 +7,10 @@
 | 人 | 已交付(均已并 esports/main) | 当前 → 下一片 |
 |---|---|---|
 | lzx | E0-E2、E3 评分(13 款收满,71c33f4f;§指针清扫 43fd4b3d)、E4 匹配全量(704c3388/07b87349)、E6a/E6b、E7-a..e 13 款引擎收满(fa866414/dcce4fc6/1ce16289)、V1-V4+B 批(6b98c886/865511c1)、会员读面+admin 用户管理(88bcd9ba/3f272b28)、组合缝(a8b9f0a4)、校准战役 S1-S4+D-AL(9e0478e6/fe73a63a/1c1a8424)、支付 PAY-C0 四片+PAY-C1 四片+PAY1 五片(CP1 支付门 10-25 提前达成;APIv3 密钥 33 字符待核=回调解密/CP3 前必须修)、流转批三件(ICP 备字+种子国服重播;偏好上限终态=常量写死,10-26 二裁推翻 config 化)、E8 权益三片(10-25 收满,含架构审查收口)、E5-0 定案+a/b1/b/c(10-26,二轮审查 15 项修复批同日)、MR!9 吸收+wire-stamp 修复笔(e62ce8c6,10-27)、E5-d+E5-f 读回面族(E5-d 69721f93/f 族 0ae81a28,10-28)、E9 最小 admin 面(c1ca75d3+5895f1a8,10-28)、D-AQ 设计对齐前置法立档(abacc542)、E10 全链 e2e(login 九红条消化+Playwright 全链,10-28) | **M1 全片收满**→**E5b 全簇收口**(10-28)→**E6c 账号域全簇收口**(10-30;0+a bf0a99a0;b 2e0baf09;c dd83d3d6;d 10-30 注入缝+三路 e2e+D-W 台账收口;PAY 联动片) |
-| hzy | H1/H2/H-A/H-B、10-22 精修批、10-23 H-C 判定回路(真人链路验收;撞面合流正身=E4-c 版)、10-23/24 设计保真批(MR!6 于 10-25 并入 main,599dddce)、10-26 走查修批九条(93f67de3..179b1af2,见归档;vitest 112→115)、10-27 验收收口(tm/home-D5 亲验)+性别卡(6beff1c1,销 D-AN 流转半边)+走查下午批(MR!9 已并 main) | **下一片:E-line-b ctr 测试回位**(10-28 派定,18 件两家园直回,机械面;顺手项平均决策由 MR 内 12dc76a5 销) |
+| hzy | H1/H2/H-A/H-B、10-22 精修批、10-23 H-C 判定回路(真人链路验收;撞面合流正身=E4-c 版)、10-23/24 设计保真批(MR!6 于 10-25 并入 main,599dddce)、10-26 走查修批九条(93f67de3..179b1af2,见归档;vitest 112→115)、10-27 验收收口(tm/home-D5 亲验)+性别卡(6beff1c1,销 D-AN 流转半边)+走查下午批(MR!9 已并 main)、10-30 收口批(E-line-b 18 件回位+mt-F1 双键 2b0bd350;E6c-c 空凭证崩溃热修 93bd46d9;intro 成绩回执卡补原型 #prev a5d9dafa) | **E-line-b ✅ 10-30 收口**(CP1 余项清);下一片待例会(MIG1/M2 后台页候选);挂裁:EndFace 耗尽出口文案落点 |
 | ljr | P1 计费(D-AB/AC)、P3 完成页(D-AI)、P9 能力归属(D-AD)、D-AG/AH 同批、P15 报告簇(D-AP,10-28) | 待裁:P16 文案键半边(待标定款回执)、P4(11 月底;HL 问卷回复红线 11-15)、P7(12-02;四参数已定 D-AU)、P2/P5/P6;~~P10 已裁(D-AT)~~;~~P13 已签毕(D-AS)~~;~~P15/P8/P11/P12 已裁(D-AN/D-AM/D-AP,10-28 刷新)~~ |
 
-**M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ✅(13 款收满,报告分 e2e 挂 E5);E4 ✅(a-d,e2e 三验收);E7 ✅(13 款收满);E8 ✅(三片收满,10-25,含架构审查两裁落地);E5 ✅ 全族收满(E5-0..f3,10-26..28;E5-e 溶片=锚并 E-line-a/E10,10-28 拍板);E9 ✅(10-28)+E10 ✅(10-28);M2 用户列表+档案首面已前拉;V1-V4+B 批落,admin 对齐批待排;支付 PAY-C0✅+PAY-C1✅+PAY1✅五片(**CP1 门 10-25 提前 14 天实测达成**:真渠道验签握手绿);PAY2-3 未启动(H5 闸实测红=产品权限未开通,行政件)。**CP1(11-08)前瞻:门全项实质达成;余=E-line-b 回位(hzy 进行中)。**
+**M1 燃尽**:E0✅ E1✅ E2✅ E6a/E6b✅;E3 ✅(13 款收满,报告分 e2e 挂 E5);E4 ✅(a-d,e2e 三验收);E7 ✅(13 款收满);E8 ✅(三片收满,10-25,含架构审查两裁落地);E5 ✅ 全族收满(E5-0..f3,10-26..28;E5-e 溶片=锚并 E-line-a/E10,10-28 拍板);E9 ✅(10-28)+E10 ✅(10-28);M2 用户列表+档案首面已前拉;V1-V4+B 批落,admin 对齐批待排;支付 PAY-C0✅+PAY-C1✅+PAY1✅五片(**CP1 门 10-25 提前 14 天实测达成**:真渠道验签握手绿);PAY2-3 未启动(H5 闸实测红=产品权限未开通,行政件)。**CP1(11-08)前瞻:门全项实质达成;E-line-b 10-30 收口,余项清零。**
 
 ## 切片认领表(窗口与定义见 plan.md)
 
@@ -29,7 +29,7 @@
 | E9 最小 admin 面 | lzx | ✅ 10-28 全收(a=c1ca75d3 服务端,b=5895f1a8 客户端) | a:TestAdminService 六 RPC+策略读面+admin_readback 五面 e2e;b:admin 三页(激活码批次/核销进度、报告策略 set+回显、测试项+调参+题库抽屉)原型逻辑/文案/基本视觉对齐(码表明细/停用/导出=契约无不造,gap 在档);闭环 e2e 实走:UI 开码→member 兑换→access=CODE_REDEEMED;走查抓 E8 存量 bug=codePB 域词查 proto 名表恒 UNSPECIFIED(修复验证);6163 admin 文案漏批补;S4 增量锚(题库 CRUD/Excel/compliance-config)随 P13 剪裁 |
 | E10 全链 e2e | lzx | ✅ 10-28 收口 | a=login 九红条消化(D-AQ 首片,渲染态读原型含密码 tab 态;修复 3/依赖 E6c 1/已裁压倒 1/随 PM 2/态比对 1/dev-only 1,gap-ledger 逐条处置);b=ctr 首 Playwright 全链 spec(CTR_E2E=1 门控):登录→向导→match→4 款→完成页→单次报告→激活码兑换 CODE_REDEEMED;两 fixture 法(反应池收窄+cohort 9 样本)finally 全净清;E5-e 客户端断言落位(免费座/缺维不渲染/付费墙) |
 | E-line-a 测试回位·esports 23 件(2026-10-27 审查役立片) | lzx | ✅ 10-28 收口 | 三家园回位:unit 17 原位直回(match biz/engine+test 模块 15 伴名)/e2e 3 迁 internal/e2e/(entitle/pay/report live_e2e+夹具前缀对齐)/guards 3 迁 internal/guards/(internal/shared 双守卫+ent mixin_test;sed 包名替换法,mixin_order 集合扩含 ActivationCode 硬删表;conventions guard 正则修正随本片)。验收=esports:test 裸跑绿+ENT_E2E=1 三 e2e 活栈绿;**E5-e 并入(10-28 拍板)**:report live_e2e 扩为 E5-c 五幕锚+f 族读回锚(GetSessionReport/GetAbilityDigest fixture 断言)+composite 一致性(重测 board 两面同数) |
-| E-line-b 测试回位·ctr 18 件(2026-10-27 审查役立片) | hzy | 10-28 派定 | 两家园回位:colocated vitest 原位直回(domains/error 1+test 模块根 4+13 games logic);基建已就位(vitest/jsdom/test target 全回)。验收=ctr:test 全绿+用例数对账 vs 剥离前 |
+| E-line-b 测试回位·ctr 18 件(2026-10-27 审查役立片) | hzy | ✅ 10-30 收口 | 两家园回位:colocated vitest 原位直回(domains/error 1+test 模块根 4+13 games logic);基建已就位(vitest/jsdom/test target 全回)。达成:ctr:test 20 件 127 绿,恢复 18 件 106 例=剥离前对账(blob 同一 18/18,零 .each 静态=跑器口径);mt-F1 D-AR 双键同车(2b0bd350)。发现:intro 耗尽面接线不可达(done 步阵容直送 ?review 回读面),出口文案落点转待裁(EndFace 补行候选) |
 | 会员读面+admin 用户管理 | lzx | ✅ 10-20 | MemberService 读面(88bcd9ba)+admin esports-users 列表/详情 Tab 骨架(3f272b28)+ListUsersByPopulation 组合缝(a8b9f0a4,D-X 落位);裁:一面一消费等级,BUILTIN 会员面不作运营消费面;详情余 Tab 随 E2/E5/E8 挂内容 |
 | H1-H2(系统态件/协议页) | hzy | ✅ 10-20 | MR!2 双轴评审合并;EN 协议译文 ljr 定稿后整目录换值 |
 | H-A 引擎框架片 | hzy | ✅ 10-20 | GameClock+GameModule 契约+TestRunHost+/test/$code+red_dot;biome 插件契约执法 |
@@ -48,9 +48,10 @@
 | conventions guard 正则精度修正回流 dev 兄弟服务(esports 侧已 AST 化:顶层声明 doc 判定,体内 var 上方叙事不再误报;组内 spec doc 存量登记下行) | lzx | dev 车道下次触碰同步 system 双子守卫 |
 | 组内 spec doc 存量约 40 处(test 模块 Frozen 出处系+E5-b const 组 doc;旧文本守卫对 const 组内注释天然漏检,AST 升法照见后刻意不扩执法面) | lzx | 独立机械片按家法行尾化(触碰 test 模块时顺路或立片) |
 | 协议 consent 版本记录契约 | lzx | H2 versions.ts 真源 GET /agreements/current |
-| ~~mt-F1 重测耗尽死局~~ **已裁(D-AR,2026-10-28)**:提示文案出口——双出口文案「本款机会已用完,成绩已取最高 —— 返回阵容继续下一款,或切换类型开新的一场」 | ~~ljr~~→hzy | 改 test_intro_blocked zh/en 两键,小片落地 |
+| ~~mt-F1 重测耗尽死局~~ **已裁(D-AR,2026-10-28)**:提示文案出口——双出口文案「本款机会已用完,成绩已取最高 —— 返回阵容继续下一款,或切换类型开新的一场」 | ~~ljr~~→hzy | ✅ 10-30 落地(2b0bd350 随 E-line-b 同车);注:intro 耗尽面现接线不可达(done 步阵容直送回读面),文案落点=EndFace 耗尽态补行,待裁 |
 | skill_trajectory 30s 走查体感偏紧,操作时间不够 | lzx | 评估加时 |
-| mt-D5 intro 按款文案:getTest.introduction 字段在但种子未喂(seed.go 注「metric-sheet data」),locale 方案待定;客户端 per-game 键 B 方案被否(单一事实源) | lzx | 随种子/国际化面(用户 10-26 裁 A=后置转此) |
+| mt-D5 intro 按款文案:getTest.introduction 字段在但种子未喂(seed.go 注「metric-sheet data」),locale 方案待定;客户端 per-game 键 B 方案被否(单一事实源);10-30 走查补:unitScoreLabel 同缺种子(裸英文 universal,原型=中文单位如「15 分/成功闪避」),同批喂 | lzx | 随种子/国际化面(用户 10-26 裁 A=后置转此) |
+| 双 N/4 撞义:match 头部=已完成数(done/总),测试面头部=位置号(第 N/总);原型两处均裸 N/4(match-guide doneCnt / test-result idx),实现逐字忠实但语义撞脸(10-30 走查发现) | 例会→ljr | 措辞微调候选:位置号改「第 N / 4 项」或 match 侧加「已完成」前缀;一句话可裁,裁后 5 分钟落 |
 | mt-D6 手机横屏真机未验(桌面 812×375 仿真预验绿,10-26:布局/控件锚位/目标合法) | hzy | 手机在手时顺手过一眼 |
 | ~~D-W population 余件(provider 行 member_population/座位迁移/guard 注释清理)~~ **已收(10-30 E6c-d 核验)**:a0abb1a4 population 机制片已全落(provider 行 landing population 语义+人群行 boot ensure 声明制+登录进场惰性落座=存量迁移答案+guard 测试自含)+组合缝 a8b9f0a4;挂账=台账滞后非真欠款 |
 | 走查墙 4:运营测试账号口径——pg2-probe 无 user 座位登不进 admin 端;种子超管=admin/admin123456 | 用户侧 | 即办(SQL 补座位或文档化) |
@@ -73,7 +74,7 @@
 
 | 检查点 | 日期 | 判定 | 拉闸动作 |
 |---|---|---|---|
-| CP1 | 11-08 | 待检(前瞻:全项实质达成——支付门 10-25 实测绿;余=E-line-b 回位) | — |
+| CP1 | 11-08 | 待检(前瞻:全项实质达成——支付门 10-25 实测绿;E-line-b 10-30 收口) | — |
 | CP2 | 11-22 | 待检 | — |
 | CP3 | 12-02 | 待检 | — |
 
