@@ -1,4 +1,5 @@
-import { useMutation } from "@connectrpc/connect-query";
+import { useMutation, useQuery } from "@connectrpc/connect-query";
+import { getSessionReport } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import { submitTestAttempt } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test-TestService_connectquery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -37,6 +38,33 @@ interface TestAttemptProps {
 
 type Phase = "intro" | "running" | "ended";
 
+// The intro's played receipt reads the session report's ability lines —
+// the transport's JSON shape (camelCase fields, empty repeated fields
+// elided), never the message surface.
+interface ReportLineLike {
+  readonly gameCode?: string;
+  readonly bestScore?: number;
+  readonly historyBestScore?: number;
+}
+
+// The prototype test-intro's #prev card: this game's session best and the
+// cross-session best, off the report's line for the code. Null while no
+// scored line exists — the receipt renders score-only, never a made-up 0.
+function prevBestOf(
+  data: { abilities?: readonly ReportLineLike[] } | undefined,
+  code: string,
+): { sessionBest: number; historyBest: number | null } | null {
+  const line = data?.abilities?.find((entry) => entry.gameCode === code);
+  if (line === undefined || line.bestScore === undefined) {
+    return null;
+  }
+  return {
+    sessionBest: Math.round(line.bestScore * 10) / 10,
+    historyBest:
+      line.historyBestScore === undefined ? null : Math.round(line.historyBestScore * 10) / 10,
+  };
+}
+
 // The mutation's face — the structural slice verdictOf reads. The plain
 // proto3 scalars (valid, retestLeft) are zero-omitted in the transport's
 // JSON, so they read as optional at runtime and the guard defaults
@@ -49,6 +77,7 @@ interface SubmitState {
     retestLeft?: number;
     invalidReason?: string;
     authoritativeScore?: number;
+    rawScore?: number;
     grade?: string;
   };
 }
@@ -79,6 +108,7 @@ function verdictOf(
     valid: data.valid ?? false,
     invalidReason: data.invalidReason as string | undefined,
     authoritativeScore: data.authoritativeScore as number | undefined,
+    rawScore: data.rawScore as number | undefined,
     grade: data.grade as string | undefined,
     retestLeft: data.retestLeft ?? 0,
     inSession,
@@ -140,6 +170,17 @@ export function TestAttempt({
   const [exitOpen, setExitOpen] = useState(false);
   const [remainingMs, setRemainingMs] = useState(durationSeconds * 1000);
   const [endRecord, setEndRecord] = useState<AttemptRecord | null>(null);
+  // The intro's played receipt rides the session report; practice runs
+  // (no session) never fetch it.
+  const reportQuery = useQuery(
+    getSessionReport,
+    { sessionId: bootSessionId ?? "" },
+    { enabled: bootSessionId !== undefined, throwOnError: false },
+  );
+  const prevBest = prevBestOf(
+    reportQuery.data as { abilities?: readonly ReportLineLike[] } | undefined,
+    gameModule.code,
+  );
   const submit = useMutation(submitTestAttempt, {
     onSuccess: () => {
       invalidateMatchSession(queryClient);
@@ -269,6 +310,7 @@ export function TestAttempt({
           introduction={introduction}
           onBack={backToFlow}
           onStart={startRun}
+          prevBest={prevBest}
           step={step}
           testName={testName}
           unitLabel={unitLabel}

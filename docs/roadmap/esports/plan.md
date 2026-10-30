@@ -10,7 +10,7 @@
 - M1 全片收满(E0-E10+E5b+E6c 全簇)+质量批三件收口(99c5bb06);CP1 提前 14 天实测达成,CP2 原前瞻项全实质达成。
 - 支付:后端+真握手绿;PAY2 卡行政件(**用户即办**:经营类目补设+H5 支付权限+APIv3 密钥 32 位核对);PAY3 未启动,P7 视觉稿已落库(1c30b767)。
 - 需求总账已建:**admin 原型 41 页仅 4 页建成**——M2 核心组入 CP2 门(本重构修正),防「门不含则永缓」。
-- hzy:E-line-b 进行中;P10/mt-F1 两枚已裁小片并入 R3。
+- hzy:E-line-b ✅ 10-30(2b0bd350);R3 mt-F1 已落(64ac733c),余 P10 语言行。
 
 ## 窗口(W1-W4 已过并压实 archive;W5 起现行;并行线为建议默认,D-AV① 允许 lzx 跨带)
 
@@ -57,7 +57,7 @@
 |---|---|---|
 | R1 V4 视觉值对齐批 | match 子页(pick/switch/guide)+agreement+age-required rounded 旧词汇→V4 词汇(B批⑥);admin 详情返回文案带目标名「返回 XXX 列表」(B批⑦,O-1 断言形状) | S |
 | R2 ctr ◐ 面精修+gap 核对 | genre-pick 推荐角标(B批①);nickname emoji 显式拦截(B批②);profile-overview 模块集对核(B批⑤:训练趋势空态/报告中心内嵌/安全三行);home 续测卡 vs resume-remind 形态面检;每项收口=gap-ledger 对应条转绿或登记 | M |
-| R3 已裁小片两枚(**已派**) | P10 语言设置行(D-AT:LocaleSelect 挂 profile 设置区)+mt-F1 重测耗尽双出口文案键(D-AR:test_intro_blocked zh/en) | S |
+| R3 已裁小片两枚(**已派**;mt-F1 ✅ 64ac733c) | 余 P10 语言设置行(D-AT:LocaleSelect 挂 profile 设置区);mt-F1 双出口文案键已落(D-AR:EndFace A 桩出口句+回读灰死钮,N=1 回执) | S |
 | R4 上收两枚 | age.tsx 改消费 age-required/birth.ts(B批③);向导 games 步完成去向改直连 /match(B批④,**需 ljr 一句确认** home 中枢是否有意) | S |
 | R5 admin 已建面交互文案精修 | O-1/2/3 断言形状复扫(admin 对齐批,progress 旧注「待排」)+五页空态/确认语对原型 | M |
 

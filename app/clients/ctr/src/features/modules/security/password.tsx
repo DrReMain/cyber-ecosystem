@@ -60,7 +60,8 @@ export function PasswordPage() {
   const queryClient = useQueryClient();
   const { mode } = useSearch({ from: "/profile/security/password" });
   const securityQuery = useQuery(getSecurityStatus, {}, { throwOnError: false });
-  const phone = securityQuery.data?.credentials.find((c) => c.kind === "sms");
+  // toJson elides empty repeated fields — credentials is absent when unbound.
+  const phone = (securityQuery.data?.credentials ?? []).find((c) => c.kind === "sms");
   const sms = useSmsCode();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
