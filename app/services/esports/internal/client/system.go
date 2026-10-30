@@ -23,6 +23,16 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
+const (
+	verifyTimeout = 300 * time.Millisecond // a hung engine fails fast here, not at the inbound server ceiling
+	checkTimeout  = 300 * time.Millisecond // fail-closed ceiling for a hung engine
+
+	smsProviderKey    = "sms"    // the system config's own instance key
+	wechatProviderKey = "wechat" // ditto, the MP web-authorization row
+	smsCredKind       = "sms"    // the exchange's registered credential families
+	wechatCredKind    = "wechat_mp"
+)
+
 // Adapter -------------------------------------------------------------------------------------------------------------
 
 type systemClient struct {
@@ -49,11 +59,6 @@ func NewSystemClient(c *conf.Remote, logger *slog.Logger) (*systemClient, func()
 		auth:       systemv1connect.NewAuthServiceClient(conn.HTTPClient(), conn.BaseURL(), conn.ClientOptions()...),
 	}, cleanup, nil
 }
-
-const (
-	verifyTimeout = 300 * time.Millisecond // a hung engine fails fast here, not at the inbound server ceiling
-	checkTimeout  = 300 * time.Millisecond // fail-closed ceiling for a hung engine
-)
 
 // Method --------------------------------------------------------------------------------------------------------------
 
@@ -158,13 +163,6 @@ func (c *systemClient) SecurityStatus(ctx context.Context) (*profile.SecurityFac
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
-
-const (
-	smsProviderKey    = "sms"    // the system config's own instance key
-	wechatProviderKey = "wechat" // ditto, the MP web-authorization row
-	smsCredKind       = "sms"    // the exchange's registered credential families
-	wechatCredKind    = "wechat_mp"
-)
 
 func mapCredentialFacts(owner *systempb.CredentialOwner) *profile.CredentialFacts {
 	facts := &profile.CredentialFacts{

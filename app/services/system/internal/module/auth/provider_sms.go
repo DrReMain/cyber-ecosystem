@@ -95,6 +95,8 @@ func (p *smsProvider) IssueCode(ctx context.Context, row *conf.Auth_Provider, ph
 	if err != nil {
 		return "", errorspb.ErrorGeneralErrorInternal("").WithCause(err)
 	}
+	// The rotation precedes the dial: the store holds one live code per
+	// phone, so merely attempting a resend kills the prior pair.
 	if err := p.tokenRP.Set(ctx, smsCodePrefix+canon, []byte(code), smsCodeTTL); err != nil {
 		return "", err
 	}
@@ -105,6 +107,12 @@ func (p *smsProvider) IssueCode(ctx context.Context, row *conf.Auth_Provider, ph
 		TemplateCode: sc.GetTemplateCode(),
 		Params:       map[string]string{"code": code},
 	}); err != nil {
+		// A refused channel also burns the fresh code — otherwise every
+		// failed send (config typo, carrier throttle) left a redeemable
+		// ghost behind while the send window kept burning: the caller
+		// was told "failed", yet the server held a live credential no
+		// phone ever saw.
+		_ = p.tokenRP.Del(ctx, smsCodePrefix+canon)
 		return "", p.handleSms(err)
 	}
 	// The state is minted only after a delivered send: a caller never

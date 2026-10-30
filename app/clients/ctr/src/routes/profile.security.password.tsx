@@ -9,7 +9,7 @@ export const Route = createFileRoute("/profile/security/password")({
     ...(search.mode === "change" ? { mode: "change" } : {}),
   }),
   head: () => ({
-    meta: [...noindexHead().meta, { title: pageTitle(m.pw_set_title()) }],
+    meta: [...noindexHead().meta, { title: pageTitle(m.security_pw_set_title()) }],
   }),
   component: PasswordPage,
 });

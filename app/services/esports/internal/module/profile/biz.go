@@ -50,15 +50,6 @@ type UpdateIn struct {
 	Games            *GamePreference // replace-set: presence rewrites the whole list
 }
 
-// Port ----------------------------------------------------------------------------------------------------------------
-
-type ProfileRP interface {
-	FindByUserID(ctx context.Context, userID string) (*Profile, error)
-	ListByUserIDs(ctx context.Context, userIDs []string) ([]*Profile, error)
-	ListUserIDs(ctx context.Context, keyword, ageBand *string) ([]string, error)
-	Save(ctx context.Context, p *Profile) (*Profile, error)
-}
-
 type MergeCredential struct {
 	Phone      *string
 	WeChatCode *string
@@ -93,6 +84,15 @@ type MergeOffer struct {
 	Status esportspb.MergePreviewStatus
 	Caller *MergeSummary
 	Other  *MergeSummary
+}
+
+// Port ----------------------------------------------------------------------------------------------------------------
+
+type ProfileRP interface {
+	FindByUserID(ctx context.Context, userID string) (*Profile, error)
+	ListByUserIDs(ctx context.Context, userIDs []string) ([]*Profile, error)
+	ListUserIDs(ctx context.Context, keyword, ageBand *string) ([]string, error)
+	Save(ctx context.Context, p *Profile) (*Profile, error)
 }
 
 type SystemRP interface {

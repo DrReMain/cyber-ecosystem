@@ -41,6 +41,7 @@ import { Route as ProfileSecurityPasswordRouteImport } from './routes/profile.se
 import { Route as ProfileSetupAgeRouteImport } from './routes/profile.setup.age'
 import { Route as ProfileSetupGamesRouteImport } from './routes/profile.setup.games'
 import { Route as ProfileSetupNicknameRouteImport } from './routes/profile.setup.nickname'
+import { Route as ProfileSetupWechatCallbackRouteImport } from './routes/profile.setup.wechat-callback'
 import { Route as ReportSessionSessionIdRouteImport } from './routes/report.session.$sessionId'
 import { Route as ApiPayProviderNotifyRouteImport } from './routes/api/pay/$provider/notify'
 import { Route as ProfileSecurityBindWechatIndexRouteImport } from './routes/profile.security.bind-wechat.index'
@@ -213,6 +214,12 @@ const ProfileSetupNicknameRoute = ProfileSetupNicknameRouteImport.update({
   path: '/setup/nickname',
   getParentRoute: () => ProfileRoute,
 } as any)
+const ProfileSetupWechatCallbackRoute =
+  ProfileSetupWechatCallbackRouteImport.update({
+    id: '/setup/wechat-callback',
+    path: '/setup/wechat-callback',
+    getParentRoute: () => ProfileRoute,
+  } as any)
 const ReportSessionSessionIdRoute = ReportSessionSessionIdRouteImport.update({
   id: '/report/session/$sessionId',
   path: '/report/session/$sessionId',
@@ -298,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
+  '/profile/setup/wechat-callback': typeof ProfileSetupWechatCallbackRoute
   '/report/session/$sessionId': typeof ReportSessionSessionIdRoute
   '/profile/security/': typeof ProfileSecurityIndexRoute
   '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
@@ -335,6 +343,7 @@ export interface FileRoutesByTo {
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
+  '/profile/setup/wechat-callback': typeof ProfileSetupWechatCallbackRoute
   '/report/session/$sessionId': typeof ReportSessionSessionIdRoute
   '/profile/security': typeof ProfileSecurityIndexRoute
   '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
@@ -379,6 +388,7 @@ export interface FileRoutesById {
   '/profile/setup/age': typeof ProfileSetupAgeRoute
   '/profile/setup/games': typeof ProfileSetupGamesRoute
   '/profile/setup/nickname': typeof ProfileSetupNicknameRoute
+  '/profile/setup/wechat-callback': typeof ProfileSetupWechatCallbackRoute
   '/report/session/$sessionId': typeof ReportSessionSessionIdRoute
   '/profile/security/': typeof ProfileSecurityIndexRoute
   '/api/pay/$provider/notify': typeof ApiPayProviderNotifyRoute
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
+    | '/profile/setup/wechat-callback'
     | '/report/session/$sessionId'
     | '/profile/security/'
     | '/api/pay/$provider/notify'
@@ -461,6 +472,7 @@ export interface FileRouteTypes {
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
+    | '/profile/setup/wechat-callback'
     | '/report/session/$sessionId'
     | '/profile/security'
     | '/api/pay/$provider/notify'
@@ -504,6 +516,7 @@ export interface FileRouteTypes {
     | '/profile/setup/age'
     | '/profile/setup/games'
     | '/profile/setup/nickname'
+    | '/profile/setup/wechat-callback'
     | '/report/session/$sessionId'
     | '/profile/security/'
     | '/api/pay/$provider/notify'
@@ -762,6 +775,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileSetupNicknameRouteImport
       parentRoute: typeof ProfileRoute
     }
+    '/profile/setup/wechat-callback': {
+      id: '/profile/setup/wechat-callback'
+      path: '/setup/wechat-callback'
+      fullPath: '/profile/setup/wechat-callback'
+      preLoaderRoute: typeof ProfileSetupWechatCallbackRouteImport
+      parentRoute: typeof ProfileRoute
+    }
     '/report/session/$sessionId': {
       id: '/report/session/$sessionId'
       path: '/report/session/$sessionId'
@@ -922,6 +942,7 @@ interface ProfileRouteChildren {
   ProfileSetupAgeRoute: typeof ProfileSetupAgeRoute
   ProfileSetupGamesRoute: typeof ProfileSetupGamesRoute
   ProfileSetupNicknameRoute: typeof ProfileSetupNicknameRoute
+  ProfileSetupWechatCallbackRoute: typeof ProfileSetupWechatCallbackRoute
 }
 
 const ProfileRouteChildren: ProfileRouteChildren = {
@@ -930,6 +951,7 @@ const ProfileRouteChildren: ProfileRouteChildren = {
   ProfileSetupAgeRoute: ProfileSetupAgeRoute,
   ProfileSetupGamesRoute: ProfileSetupGamesRoute,
   ProfileSetupNicknameRoute: ProfileSetupNicknameRoute,
+  ProfileSetupWechatCallbackRoute: ProfileSetupWechatCallbackRoute,
 }
 
 const ProfileRouteWithChildren =

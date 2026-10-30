@@ -152,7 +152,7 @@ export const bindWechatCredentialFn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { client, headers } = authedClient();
     try {
-      await client.bindCredential(
+      const res = await client.bindCredential(
         {
           payload: { case: "wechat", value: { code: data.code } },
           provider: "wechat",
@@ -160,7 +160,20 @@ export const bindWechatCredentialFn = createServerFn({ method: "POST" })
         },
         { headers },
       );
-      return { status: "ok" } as const;
+      // The person behind the openid arrives with the binding — the wizard
+      // pill's whole point is bind-and-prefill in one exchange. The
+      // already-bound-to-self branch answers it too, so a stale pill click
+      // still prefills instead of dead-ending.
+      return {
+        status: "ok" as const,
+        wechatProfile:
+          res.wechatProfile == null
+            ? undefined
+            : {
+                nickname: res.wechatProfile.nickname ?? "",
+                avatarUrl: res.wechatProfile.avatarUrl ?? "",
+              },
+      };
     } catch (error) {
       return { reason: normalize(error).reason, status: "rejected" } as const;
     }
@@ -251,7 +264,7 @@ export const mergeWechatFn = createServerFn({ method: "POST" })
     }
   });
 
-// 场景二's identity switch reuses the login family's own legs verbatim:
+// The switched-session merge reuses the login family's own legs verbatim:
 // beginWechatLoginFn (custom redirect) and wechatLoginFn (exchange +
 // cookie save) in features/modules/login/wechat.fn.ts.
 

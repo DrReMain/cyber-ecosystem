@@ -6,7 +6,7 @@ import { m } from "#/paraglide/messages";
 
 export const Route = createFileRoute("/login/forgot")({
   head: () => ({
-    meta: [...noindexHead().meta, { title: pageTitle(m.forgot_title()) }],
+    meta: [...noindexHead().meta, { title: pageTitle(m.security_forgot_title()) }],
   }),
   component: ForgotPasswordPage,
 });

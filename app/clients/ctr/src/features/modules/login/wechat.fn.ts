@@ -34,8 +34,19 @@ export const wechatLoginFn = createServerFn({ method: "POST" })
       });
       save(res.sessionToken);
       // Same verdict-as-data law as the password leg: the rejection reason
-      // survives the serialization boundary only as data.
-      return { status: "ok" } as const;
+      // survives the serialization boundary only as data. The person the
+      // userinfo leg learned rides along verbatim — the wizard prefill's
+      // only source; absent when that leg degraded.
+      return {
+        status: "ok" as const,
+        wechatProfile:
+          res.wechatProfile == null
+            ? undefined
+            : {
+                nickname: res.wechatProfile.nickname ?? "",
+                avatarUrl: res.wechatProfile.avatarUrl ?? "",
+              },
+      };
     } catch (error) {
       return { status: "rejected", reason: normalize(error).reason } as const;
     }

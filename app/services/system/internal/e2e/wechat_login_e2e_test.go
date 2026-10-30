@@ -37,8 +37,10 @@ import (
 )
 
 const (
-	e2eWechatOpenid = "e2e-openid-wxlogin"
-	e2eWechatCode   = "e2e-wx-code"
+	e2eWechatOpenid   = "e2e-openid-wxlogin"
+	e2eWechatCode     = "e2e-wx-code"
+	e2eWechatNickname = "链路微信昵称"
+	e2eWechatAvatar   = "https://qlogo.cn/e2e-avatar.png"
 )
 
 func TestWechatLoginLiveE2E(t *testing.T) {
@@ -84,7 +86,8 @@ func TestWechatLoginLiveE2E(t *testing.T) {
 	// The wechat stand-in mirrors the interface boundary: the authorize hop
 	// answers the redirect WeChat itself would issue (the code, and the
 	// state echoed verbatim onto the redirect target), the token endpoint
-	// answers the openid for the code it issued.
+	// answers the openid for the code it issued, and the userinfo endpoint
+	// answers the person the snsapi_userinfo scope unlocks.
 	wx := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/connect/oauth2/authorize":
@@ -105,6 +108,8 @@ func TestWechatLoginLiveE2E(t *testing.T) {
 				return
 			}
 			_, _ = fmt.Fprint(w, `{"access_token":"t","openid":"`+e2eWechatOpenid+`","errcode":0}`)
+		case "/sns/userinfo":
+			_, _ = fmt.Fprint(w, `{"nickname":"`+e2eWechatNickname+`","headimgurl":"`+e2eWechatAvatar+`","errcode":0}`)
 		default:
 			http.NotFound(w, r)
 		}
@@ -176,12 +181,16 @@ func TestWechatLoginLiveE2E(t *testing.T) {
 	}
 
 	// The callback leg exchanges the code for the openid and lands the
-	// auto-registered member.
+	// auto-registered member — carrying the person the userinfo leg learned,
+	// which is the wizard prefill's only source.
 	loggedIn, err := svc.LoginByIdentity(bare, &systempb.LoginByIdentityRequest{
 		Provider: sp("wechat"), State: &state,
 		Payload: &systempb.LoginByIdentityRequest_Wechat{Wechat: &systempb.WeChatIdentityPayload{Code: &code}}})
 	if err != nil {
 		t.Fatalf("login by identity: %v", err)
+	}
+	if got := loggedIn.GetWechatProfile(); got.GetNickname().GetValue() != e2eWechatNickname || got.GetAvatarUrl().GetValue() != e2eWechatAvatar {
+		t.Fatalf("wechat profile = %+v, want the stand-in's person verbatim", got)
 	}
 	subject, err := uc.AuthenticateSession(bare, loggedIn.SessionToken)
 	if err != nil {

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "#/config";
 import { noindexHead } from "#/domains/seo";
-import { BindWechatPreviewCallbackPage } from "#/features/modules/security/bind-wechat-callback";
+import { BindWechatPreviewCallbackPage } from "#/features/modules/security/bind-wechat-preview-callback";
 import { m } from "#/paraglide/messages";
 
 export const Route = createFileRoute("/profile/security/bind-wechat/preview-callback")({
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/profile/security/bind-wechat/preview-call
     ...(typeof search.state === "string" ? { state: search.state } : {}),
   }),
   head: () => ({
-    meta: [...noindexHead().meta, { title: pageTitle(m.login_callback_pending()) }],
+    meta: [...noindexHead().meta, { title: pageTitle(m.security_bind_wechat_pending()) }],
   }),
   component: BindWechatPreviewCallbackPage,
 });

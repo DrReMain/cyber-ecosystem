@@ -14,6 +14,7 @@ import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { TabBar } from "#/features/app/tabbar";
+import { clearWechatProfile } from "#/features/app/wechat-profile";
 import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { broadcastSessionKick } from "#/features/auth/session-kick";
 import { latestScoredOf, wireDigestOf } from "#/features/modules/report/digest";
@@ -81,6 +82,9 @@ export function ProfilePage() {
     try {
       await logoutFn();
       queryClient.clear();
+      // The parked wechat identity belonged to the seat that just left —
+      // a later sign-in in this tab must not inherit it as a prefill.
+      clearWechatProfile();
       // Boots the other tabs off the dead session (no expired notice — a
       // deliberate sign-out is expected, not a surprise).
       broadcastSessionKick();
@@ -202,9 +206,9 @@ export function ProfilePage() {
         </div>
 
         <div className="text-ink-tertiary mt-[14px] text-center text-[10.5px] leading-[1.7]">
-          {m.login_footer_company()} · {m.login_footer_icp()}
+          {m.common_footer_company()} · {m.common_footer_icp()}
           <br />
-          {m.login_footer_email()}
+          {m.common_footer_email()}
         </div>
       </div>
       <LogoutSheet

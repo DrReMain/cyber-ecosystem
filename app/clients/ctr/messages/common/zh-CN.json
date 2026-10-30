@@ -1,8 +1,12 @@
 {
   "common_locale_name": [
     {
-      "declarations": ["input locale"],
-      "selectors": ["locale"],
+      "declarations": [
+        "input locale"
+      ],
+      "selectors": [
+        "locale"
+      ],
       "match": {
         "locale=zh-CN": "简体中文",
         "locale=en-US": "English",
@@ -14,15 +18,18 @@
   "common_retry": "重试",
   "common_state_empty_title": "暂无数据",
   "common_state_empty_desc": "暂时没有可展示的内容",
-  "common_exit_title": "确认退出?",
-  "common_exit_desc": "当前进度将不会被保存",
-  "common_exit_cancel": "取消",
-  "common_exit_confirm": "确认退出",
+  "common_exit_title": "确定退出本次测评？",
+  "common_exit_desc": "未完成的这一场会被丢弃；已完成的成绩不受影响。",
+  "common_exit_resume": "继续测试",
+  "common_exit_leave": "退出并保留进度",
   "common_soon": "即将开放",
   "common_soon_badge": "敬请期待",
   "common_back": "返回",
   "common_tab_home": "首页",
   "common_tab_records": "记录",
   "common_tab_messages": "消息",
-  "common_tab_me": "我的"
+  "common_tab_me": "我的",
+  "common_footer_company": "星歌未来教育科技（杭州）有限公司",
+  "common_footer_icp": "浙ICP备2026028293号",
+  "common_footer_email": "客服邮箱 xgwledu@126.com"
 }

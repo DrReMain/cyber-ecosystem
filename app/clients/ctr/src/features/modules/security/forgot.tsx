@@ -10,7 +10,7 @@ import { m } from "#/paraglide/messages";
 import { resetPasswordFn } from "./security.fn";
 import { useSmsCode } from "./use-sms-code";
 
-// block3 forgot-password: the public reset leg. The SMS code to the
+// Forgot password: the public reset leg. The SMS code to the
 // account's own phone is the whole proof; success walks back to the login
 // page for the promised password login.
 export function ForgotPasswordPage() {
@@ -26,19 +26,19 @@ export function ForgotPasswordPage() {
     setError(null);
     setReason(undefined);
     if (!/^1[3-9]\d{9}$/.test(sms.phone)) {
-      setError(m.login_error_sms_phone());
+      setError(m.security_error_sms_phone());
       return;
     }
     if (!/^\d{6}$/.test(sms.code)) {
-      setError(m.login_error_sms_code_short());
+      setError(m.security_error_sms_code_short());
       return;
     }
     if (newPassword.length < 6) {
-      setError(m.login_password_short());
+      setError(m.security_password_short());
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError(m.pw_error_mismatch());
+      setError(m.security_pw_error_mismatch());
       return;
     }
     setPending(true);
@@ -50,10 +50,10 @@ export function ForgotPasswordPage() {
         setReason(res.reason);
         return;
       }
-      toast.success(m.forgot_done());
+      toast.success(m.security_forgot_done());
       await navigate({ to: "/login", viewTransition: false });
     } catch {
-      setError(m.login_error_generic());
+      setError(m.security_error_generic());
     } finally {
       setPending(false);
     }
@@ -66,38 +66,38 @@ export function ForgotPasswordPage() {
         ? m.error_SYSTEM_USER_NOT_FOUND()
         : systemReason(reason) === System.SMS_RATE_LIMITED
           ? m.error_SYSTEM_SMS_RATE_LIMITED()
-          : m.login_error_generic();
+          : m.security_error_generic();
 
   return (
     <AmbientLayout>
-      <FlowHeader onBack={() => void navigate({ to: "/login" })} title={m.forgot_title()} />
+      <FlowHeader onBack={() => void navigate({ to: "/login" })} title={m.security_forgot_title()} />
       <div className="flex w-full flex-col gap-3.5 pt-3">
         <div className="text-ink-tertiary text-center text-xs leading-[1.6]">
-          {m.forgot_pitch()}
+          {m.security_forgot_pitch()}
         </div>
         <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-5">
           <div className="mb-3.5">
-            <div className="text-ink-secondary mb-1.5 text-xs">{m.forgot_phone_label()}</div>
+            <div className="text-ink-secondary mb-1.5 text-xs">{m.security_forgot_phone_label()}</div>
             <input
-              aria-label={m.login_phone_label()}
+              aria-label={m.security_phone_label()}
               className={inputClass}
               inputMode="numeric"
               maxLength={11}
               onChange={(event) => sms.setPhone(event.target.value)}
-              placeholder={m.bind_phone_placeholder()}
+              placeholder={m.security_bind_phone_placeholder()}
               value={sms.phone}
             />
           </div>
           <div className="mb-3.5">
-            <div className="text-ink-secondary mb-1.5 text-xs">{m.pw_code_label()}</div>
+            <div className="text-ink-secondary mb-1.5 text-xs">{m.security_pw_code_label()}</div>
             <div className="flex items-stretch gap-3">
               <input
-                aria-label={m.login_code_label()}
+                aria-label={m.security_code_label()}
                 className={`${inputClass} flex-1 tracking-[4px]`}
                 inputMode="numeric"
                 maxLength={6}
                 onChange={(event) => sms.setCode(event.target.value)}
-                placeholder={m.pw_code_placeholder()}
+                placeholder={m.security_pw_code_placeholder()}
                 value={sms.code}
               />
               <button
@@ -107,34 +107,34 @@ export function ForgotPasswordPage() {
                 type="button"
               >
                 {sms.countdown > 0
-                  ? m.login_code_resend_in({ seconds: sms.countdown })
-                  : m.login_code_send()}
+                  ? m.security_code_resend_in({ seconds: sms.countdown })
+                  : m.security_code_send()}
               </button>
             </div>
             <div className="text-ink-tertiary mt-1.5 text-right text-[11px]">
-              {m.forgot_code_window()}
+              {m.security_forgot_code_window()}
             </div>
           </div>
           <div className="mb-3.5">
-            <div className="text-ink-secondary mb-1.5 text-xs">{m.pw_new_label()}</div>
+            <div className="text-ink-secondary mb-1.5 text-xs">{m.security_pw_new_label()}</div>
             <input
-              aria-label={m.pw_new_label()}
+              aria-label={m.security_pw_new_label()}
               autoComplete="new-password"
               className={inputClass}
               onChange={(event) => setNewPassword(event.target.value)}
-              placeholder={m.pw_new_placeholder()}
+              placeholder={m.security_pw_new_placeholder()}
               type="password"
               value={newPassword}
             />
           </div>
           <div>
-            <div className="text-ink-secondary mb-1.5 text-xs">{m.pw_confirm_label()}</div>
+            <div className="text-ink-secondary mb-1.5 text-xs">{m.security_pw_confirm_label()}</div>
             <input
-              aria-label={m.pw_confirm_label()}
+              aria-label={m.security_pw_confirm_label()}
               autoComplete="new-password"
               className={inputClass}
               onChange={(event) => setConfirmPassword(event.target.value)}
-              placeholder={m.pw_confirm_placeholder()}
+              placeholder={m.security_pw_confirm_placeholder()}
               type="password"
               value={confirmPassword}
             />
@@ -145,9 +145,9 @@ export function ForgotPasswordPage() {
             onClick={() => void onSubmit()}
             type="button"
           >
-            {pending ? m.login_pending() : m.forgot_submit()}
+            {pending ? m.security_pending() : m.security_forgot_submit()}
           </button>
-          <div className="text-ink-tertiary mt-3 text-center text-[11px]">{m.forgot_note()}</div>
+          <div className="text-ink-tertiary mt-3 text-center text-[11px]">{m.security_forgot_note()}</div>
         </div>
         {error !== null && <p className="text-danger-text text-[11.5px]">{error}</p>}
         {reason !== undefined && <p className="text-danger-text text-[11.5px]">{failureCopy}</p>}

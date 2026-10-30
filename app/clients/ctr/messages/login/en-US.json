@@ -43,9 +43,6 @@
   "login_forgot": "Forgot password?",
   "login_footer_user": "User Agreement",
   "login_footer_privacy": "Privacy Policy",
-  "login_footer_company": "星歌未来教育科技（杭州）有限公司",
-  "login_footer_icp": "浙ICP备2026028293号",
-  "login_footer_email": "客服邮箱 xgwledu@126.com",
   "login_wechat_env_note": "Not inside WeChat — tapping WeChat login will ask you to open in WeChat",
   "login_footer_home": "Back to start"
 }

@@ -10,7 +10,7 @@ export const Route = createFileRoute("/profile/security/bind-wechat/callback")({
     ...(typeof search.state === "string" ? { state: search.state } : {}),
   }),
   head: () => ({
-    meta: [...noindexHead().meta, { title: pageTitle(m.login_callback_pending()) }],
+    meta: [...noindexHead().meta, { title: pageTitle(m.security_bind_wechat_pending()) }],
   }),
   component: BindWechatCallbackPage,
 });

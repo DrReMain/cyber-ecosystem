@@ -70,7 +70,7 @@ export function useBindSms(seed = "") {
         return;
       }
       setState(res.state);
-      toast.success(m.login_code_sent());
+      toast.success(m.security_code_sent());
       setCountdown(60);
     } catch {
       setFailed(true);

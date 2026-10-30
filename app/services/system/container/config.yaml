@@ -100,9 +100,9 @@ auth:
       auto_register: ${SMS_AUTO_REGISTER:false}
       population: ${SMS_POPULATION:member} # landing population (member plane)
       sms:
-        backend: ${SMS_BACKEND:} # empty = auto by credentials; dysmsapi | mock
+        backend: ${SMS_BACKEND:mock} # dysmsapi (needs the credential pair) | mock (record-only)
         access_key_id: ${SMS_ACCESS_KEY_ID:}
         access_key_secret: ${SMS_ACCESS_KEY_SECRET:}
         sign_name: ${SMS_SIGN_NAME:}
-        template_code: ${SMS_TEMPLATE_CODE:}
+        template_code: ${SMS_TEMPLATE_CODE:SMS_460000000} # mock-family placeholder; real channel values are deploy-plane facts
         endpoint: ${SMS_ENDPOINT:} # empty = official default

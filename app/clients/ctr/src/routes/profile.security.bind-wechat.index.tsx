@@ -12,7 +12,7 @@ export const Route = createFileRoute("/profile/security/bind-wechat/")({
     ...(search.from === "login" || search.from === "guide" ? { from: search.from } : {}),
   }),
   head: () => ({
-    meta: [...noindexHead().meta, { title: pageTitle(m.bind_wechat_title()) }],
+    meta: [...noindexHead().meta, { title: pageTitle(m.security_bind_wechat_title()) }],
   }),
   component: BindWechatPage,
 });

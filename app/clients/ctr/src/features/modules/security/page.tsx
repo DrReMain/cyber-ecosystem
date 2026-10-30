@@ -14,7 +14,7 @@ const CARD_CLASS = "border-line-accent-blue bg-identity rounded-card border px-4
 const OK_CHIP =
   "bg-[rgba(34,197,94,0.15)] text-[#6EE7B7] rounded-full px-2.5 py-1 text-[10px] font-semibold";
 
-// Prototype 33: the binding surface as status rows — each row shows what is
+// The binding surface as status rows — each row shows what is
 // bound (masked server-side) and routes to the bind page only when it can
 // act. The unbind note is the corpus's service-desk ruling, not the
 // prototype's detail-page wording (those pages do not exist by ruling).

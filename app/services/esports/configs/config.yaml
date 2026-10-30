@@ -1,3 +1,8 @@
+# Bare-metal dev config (container/ holds the baked container shape; the two
+# mirror each other per the config-image law). Deployment-sensitive values are
+# ${VAR:default} placeholders overridden ONLY by APP_-prefixed env vars
+# (APP_DB_HOST=x reconfigures): the env source in main.go reads the APP_
+# prefix alone, so a bare DB_HOST=... is silently ignored.
 server:
   http: {addr: 0.0.0.0:11003, timeout: 1s}
   grpc: {addr: 0.0.0.0:12003, timeout: 1s}

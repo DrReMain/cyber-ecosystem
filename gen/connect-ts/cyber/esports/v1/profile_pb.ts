@@ -79,7 +79,10 @@ export const WeChatMergeProofSchema: GenMessage<WeChatMergeProof> = /*@__PURE__*
 
 /**
  * One side's confirm-page facts. Identifier-shaped values arrive masked by
- * the system service; clients render, never re-derive.
+ * the system service; clients render, never re-derive. The plain scalars
+ * (user_id, wechat, sessions, unlocked) ride the success-implies-present
+ * carve-out: every preview computes them, so zero means a real zero (no
+ * sessions, no wechat, nothing unlocked) — never "not computed".
  *
  * @generated from message cyber.esports.v1.MergeAccountSummary
  */

@@ -29,11 +29,17 @@ func wechatReq(code string) identityPayload {
 }
 
 // The exchange hits the configured endpoint with the OAuth contract and
-// returns the openid the provider answered.
+// returns the openid the provider answered. The userinfo leg finds no
+// endpoint here and degrades to a nil profile — the login it decorates
+// never fails for want of a nickname.
 func TestWeChatExchangeContract(t *testing.T) {
 	var gotQuery string
 	p := wechatProvider{}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != wechatExchangePath {
+			http.NotFound(w, r)
+			return
+		}
 		gotQuery = r.URL.RawQuery
 		_, _ = fmt.Fprint(w, `{"access_token":"t","openid":"oid-live","errcode":0}`)
 	}))
@@ -46,10 +52,72 @@ func TestWeChatExchangeContract(t *testing.T) {
 	if id.Kind != "wechat_mp" || id.Identifier != "oid-live" {
 		t.Fatalf("exchange: identity = %+v", id)
 	}
+	if id.Profile != nil {
+		t.Fatalf("exchange: degraded userinfo must leave the profile nil, got %+v", id.Profile)
+	}
 	for _, want := range []string{"appid=wx-test", "secret=s3cr3t", "code=the-code", "grant_type=authorization_code"} {
 		if !strings.Contains(gotQuery, want) {
 			t.Fatalf("exchange: query %q missing %q", gotQuery, want)
 		}
+	}
+}
+
+// The userinfo leg carries the person behind the openid: the exchange spends
+// the access token it just earned, and wechat's raw nickname/headimgurl land
+// on the identity verbatim — sanitising is the consumer's side of the wire.
+func TestWeChatExchangeFetchesUserinfo(t *testing.T) {
+	var gotQuery string
+	p := wechatProvider{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case wechatExchangePath:
+			_, _ = fmt.Fprint(w, `{"access_token":"t-ok","openid":"oid-live","errcode":0}`)
+		case wechatUserinfoPath:
+			gotQuery = r.URL.RawQuery
+			_, _ = fmt.Fprint(w, `{"nickname":"昵称","headimgurl":"https://qlogo.cn/a.png","errcode":0}`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer srv.Close()
+
+	id, err := p.Exchange(context.Background(), wechatRow(srv.URL), wechatReq("the-code"))
+	if err != nil {
+		t.Fatalf("exchange: %v", err)
+	}
+	if id.Profile == nil || id.Profile.Nickname != "昵称" || id.Profile.AvatarURL != "https://qlogo.cn/a.png" {
+		t.Fatalf("userinfo: profile = %+v, want wechat's raw person", id.Profile)
+	}
+	for _, want := range []string{"access_token=t-ok", "openid=oid-live", "lang=zh_CN"} {
+		if !strings.Contains(gotQuery, want) {
+			t.Fatalf("userinfo: query %q missing %q", gotQuery, want)
+		}
+	}
+}
+
+// An errcode from the userinfo endpoint is a degraded leg, not a failed
+// exchange: the openid already authenticated, the login stands, and the
+// profile reads as absent.
+func TestWeChatUserinfoErrCodeDegradesToNil(t *testing.T) {
+	p := wechatProvider{}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case wechatExchangePath:
+			_, _ = fmt.Fprint(w, `{"access_token":"t","openid":"oid-live","errcode":0}`)
+		case wechatUserinfoPath:
+			_, _ = fmt.Fprint(w, `{"errcode":48001,"errmsg":"api unauthorized"}`)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer srv.Close()
+
+	id, err := p.Exchange(context.Background(), wechatRow(srv.URL), wechatReq("the-code"))
+	if err != nil {
+		t.Fatalf("exchange must survive a degraded userinfo: %v", err)
+	}
+	if id.Identifier != "oid-live" || id.Profile != nil {
+		t.Fatalf("degraded userinfo: identity = %+v, want openid standing with a nil profile", id)
 	}
 }
 
@@ -92,8 +160,8 @@ func TestWeChatExchangeTransportFailureIsInfra(t *testing.T) {
 }
 
 // The authorize URL is minted server-side: appid, redirect, and the
-// one-time state ride the query, the wechat browser suffix closes it, and
-// no secret appears.
+// one-time state ride the query, the userinfo scope is what the nickname
+// prefill needs, the wechat browser suffix closes it, and no secret appears.
 func TestWeChatAuthorizeURL(t *testing.T) {
 	p := wechatProvider{}
 	got := p.AuthorizeURL(wechatRow(""), "https://app.example/cb?x=1", "st-1")
@@ -102,7 +170,7 @@ func TestWeChatAuthorizeURL(t *testing.T) {
 		"appid=wx-test",
 		"redirect_uri=" + "https%3A%2F%2Fapp.example%2Fcb%3Fx%3D1",
 		"response_type=code",
-		"scope=snsapi_base",
+		"scope=snsapi_userinfo",
 		"state=st-1",
 		"#wechat_redirect",
 	} {
@@ -127,7 +195,7 @@ func TestWeChatAuthorizeURLOverridden(t *testing.T) {
 		"appid=wx-test",
 		"redirect_uri=" + "https%3A%2F%2Fapp.example%2Fcb",
 		"response_type=code",
-		"scope=snsapi_base",
+		"scope=snsapi_userinfo",
 		"state=st-9",
 		"#wechat_redirect",
 	} {

@@ -13,6 +13,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -346,18 +347,82 @@ func (x *SmsIdentityPayload) GetCode() string {
 	return ""
 }
 
+// What the wechat oauth leg learned about the person behind the openid:
+// the raw nickname and avatar URL as wechat reports them, present only when
+// the authorize scope was snsapi_userinfo and the userinfo fetch survived
+// (a failed fetch degrades to absent, never to a failed login). Values are
+// wechat's own — sanitising to the nickname rules is the consumer's side of
+// the wire.
+type WeChatProfile struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Nickname      *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	AvatarUrl     *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WeChatProfile) Reset() {
+	*x = WeChatProfile{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WeChatProfile) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WeChatProfile) ProtoMessage() {}
+
+func (x *WeChatProfile) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WeChatProfile.ProtoReflect.Descriptor instead.
+func (*WeChatProfile) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *WeChatProfile) GetNickname() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Nickname
+	}
+	return nil
+}
+
+func (x *WeChatProfile) GetAvatarUrl() *wrapperspb.StringValue {
+	if x != nil {
+		return x.AvatarUrl
+	}
+	return nil
+}
+
 type LoginByIdentityResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionToken  string                 `protobuf:"bytes,1,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
-	IssuedAt      *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=issued_at,json=issuedAt,proto3" json:"issued_at,omitempty"`
-	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Plain, not a wrapper: the call succeeding is the token's presence —
+	// no "succeeded but empty session" shape exists.
+	SessionToken string                 `protobuf:"bytes,1,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
+	IssuedAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=issued_at,json=issuedAt,proto3" json:"issued_at,omitempty"`
+	ExpiresAt    *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	// The wechat profile when the logged-in identity is wechat and userinfo
+	// came back; the wizard prefills nickname/avatar from it. Absent for every
+	// other identity and for a degraded userinfo fetch alike.
+	WechatProfile *WeChatProfile `protobuf:"bytes,4,opt,name=wechat_profile,json=wechatProfile,proto3,oneof" json:"wechat_profile,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *LoginByIdentityResponse) Reset() {
 	*x = LoginByIdentityResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[5]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -369,7 +434,7 @@ func (x *LoginByIdentityResponse) String() string {
 func (*LoginByIdentityResponse) ProtoMessage() {}
 
 func (x *LoginByIdentityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[5]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -382,7 +447,7 @@ func (x *LoginByIdentityResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginByIdentityResponse.ProtoReflect.Descriptor instead.
 func (*LoginByIdentityResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{5}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *LoginByIdentityResponse) GetSessionToken() string {
@@ -406,6 +471,13 @@ func (x *LoginByIdentityResponse) GetExpiresAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *LoginByIdentityResponse) GetWechatProfile() *WeChatProfile {
+	if x != nil {
+		return x.WechatProfile
+	}
+	return nil
+}
+
 type BeginIdentityLoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Provider      *string                `protobuf:"bytes,1,opt,name=provider,proto3,oneof" json:"provider,omitempty"`
@@ -416,7 +488,7 @@ type BeginIdentityLoginRequest struct {
 
 func (x *BeginIdentityLoginRequest) Reset() {
 	*x = BeginIdentityLoginRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[6]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -428,7 +500,7 @@ func (x *BeginIdentityLoginRequest) String() string {
 func (*BeginIdentityLoginRequest) ProtoMessage() {}
 
 func (x *BeginIdentityLoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[6]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -441,7 +513,7 @@ func (x *BeginIdentityLoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeginIdentityLoginRequest.ProtoReflect.Descriptor instead.
 func (*BeginIdentityLoginRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{6}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *BeginIdentityLoginRequest) GetProvider() string {
@@ -459,15 +531,17 @@ func (x *BeginIdentityLoginRequest) GetRedirectUri() string {
 }
 
 type BeginIdentityLoginResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AuthorizeUrl  string                 `protobuf:"bytes,1,opt,name=authorize_url,json=authorizeUrl,proto3" json:"authorize_url,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Plain, not a wrapper: a successful begin always mints the redirect —
+	// success implies presence.
+	AuthorizeUrl  string `protobuf:"bytes,1,opt,name=authorize_url,json=authorizeUrl,proto3" json:"authorize_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *BeginIdentityLoginResponse) Reset() {
 	*x = BeginIdentityLoginResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[7]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -479,7 +553,7 @@ func (x *BeginIdentityLoginResponse) String() string {
 func (*BeginIdentityLoginResponse) ProtoMessage() {}
 
 func (x *BeginIdentityLoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[7]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -492,7 +566,7 @@ func (x *BeginIdentityLoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeginIdentityLoginResponse.ProtoReflect.Descriptor instead.
 func (*BeginIdentityLoginResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{7}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *BeginIdentityLoginResponse) GetAuthorizeUrl() string {
@@ -512,7 +586,7 @@ type SendSmsCodeRequest struct {
 
 func (x *SendSmsCodeRequest) Reset() {
 	*x = SendSmsCodeRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[8]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -524,7 +598,7 @@ func (x *SendSmsCodeRequest) String() string {
 func (*SendSmsCodeRequest) ProtoMessage() {}
 
 func (x *SendSmsCodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[8]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -537,7 +611,7 @@ func (x *SendSmsCodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendSmsCodeRequest.ProtoReflect.Descriptor instead.
 func (*SendSmsCodeRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{8}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SendSmsCodeRequest) GetProvider() string {
@@ -557,7 +631,8 @@ func (x *SendSmsCodeRequest) GetPhone() string {
 type SendSmsCodeResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The one-shot state the caller presents at LoginByIdentity — the same
-	// shape Begin mints for redirect flows.
+	// shape Begin mints for redirect flows. Plain, not a wrapper: a
+	// successful send always mints it — success implies presence.
 	State         string `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -565,7 +640,7 @@ type SendSmsCodeResponse struct {
 
 func (x *SendSmsCodeResponse) Reset() {
 	*x = SendSmsCodeResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[9]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -577,7 +652,7 @@ func (x *SendSmsCodeResponse) String() string {
 func (*SendSmsCodeResponse) ProtoMessage() {}
 
 func (x *SendSmsCodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[9]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -590,7 +665,7 @@ func (x *SendSmsCodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendSmsCodeResponse.ProtoReflect.Descriptor instead.
 func (*SendSmsCodeResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{9}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SendSmsCodeResponse) GetState() string {
@@ -620,7 +695,7 @@ type BindCredentialRequest struct {
 
 func (x *BindCredentialRequest) Reset() {
 	*x = BindCredentialRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[10]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -632,7 +707,7 @@ func (x *BindCredentialRequest) String() string {
 func (*BindCredentialRequest) ProtoMessage() {}
 
 func (x *BindCredentialRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[10]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -645,7 +720,7 @@ func (x *BindCredentialRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BindCredentialRequest.ProtoReflect.Descriptor instead.
 func (*BindCredentialRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{10}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *BindCredentialRequest) GetProvider() string {
@@ -704,14 +779,18 @@ func (*BindCredentialRequest_Wechat) isBindCredentialRequest_Payload() {}
 func (*BindCredentialRequest_Sms) isBindCredentialRequest_Payload() {}
 
 type BindCredentialResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Same shape as the login response's: binding a wechat identity is the
+	// wizard pill's moment — the openid binds and the nickname/avatar arrive
+	// in the same exchange, so the caller fills the form without a second hop.
+	WechatProfile *WeChatProfile `protobuf:"bytes,1,opt,name=wechat_profile,json=wechatProfile,proto3,oneof" json:"wechat_profile,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *BindCredentialResponse) Reset() {
 	*x = BindCredentialResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[11]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -723,7 +802,7 @@ func (x *BindCredentialResponse) String() string {
 func (*BindCredentialResponse) ProtoMessage() {}
 
 func (x *BindCredentialResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[11]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -736,7 +815,14 @@ func (x *BindCredentialResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BindCredentialResponse.ProtoReflect.Descriptor instead.
 func (*BindCredentialResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{11}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *BindCredentialResponse) GetWechatProfile() *WeChatProfile {
+	if x != nil {
+		return x.WechatProfile
+	}
+	return nil
 }
 
 type BeginBindCredentialRequest struct {
@@ -749,7 +835,7 @@ type BeginBindCredentialRequest struct {
 
 func (x *BeginBindCredentialRequest) Reset() {
 	*x = BeginBindCredentialRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[12]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -761,7 +847,7 @@ func (x *BeginBindCredentialRequest) String() string {
 func (*BeginBindCredentialRequest) ProtoMessage() {}
 
 func (x *BeginBindCredentialRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[12]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -774,7 +860,7 @@ func (x *BeginBindCredentialRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeginBindCredentialRequest.ProtoReflect.Descriptor instead.
 func (*BeginBindCredentialRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{12}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *BeginBindCredentialRequest) GetProvider() string {
@@ -792,15 +878,17 @@ func (x *BeginBindCredentialRequest) GetRedirectUri() string {
 }
 
 type BeginBindCredentialResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AuthorizeUrl  string                 `protobuf:"bytes,1,opt,name=authorize_url,json=authorizeUrl,proto3" json:"authorize_url,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Plain, not a wrapper: a successful begin always mints the redirect —
+	// success implies presence.
+	AuthorizeUrl  string `protobuf:"bytes,1,opt,name=authorize_url,json=authorizeUrl,proto3" json:"authorize_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *BeginBindCredentialResponse) Reset() {
 	*x = BeginBindCredentialResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[13]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -812,7 +900,7 @@ func (x *BeginBindCredentialResponse) String() string {
 func (*BeginBindCredentialResponse) ProtoMessage() {}
 
 func (x *BeginBindCredentialResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[13]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -825,7 +913,7 @@ func (x *BeginBindCredentialResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeginBindCredentialResponse.ProtoReflect.Descriptor instead.
 func (*BeginBindCredentialResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{13}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *BeginBindCredentialResponse) GetAuthorizeUrl() string {
@@ -845,7 +933,7 @@ type SendBindSmsCodeRequest struct {
 
 func (x *SendBindSmsCodeRequest) Reset() {
 	*x = SendBindSmsCodeRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[14]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -857,7 +945,7 @@ func (x *SendBindSmsCodeRequest) String() string {
 func (*SendBindSmsCodeRequest) ProtoMessage() {}
 
 func (x *SendBindSmsCodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[14]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -870,7 +958,7 @@ func (x *SendBindSmsCodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendBindSmsCodeRequest.ProtoReflect.Descriptor instead.
 func (*SendBindSmsCodeRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{14}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *SendBindSmsCodeRequest) GetProvider() string {
@@ -890,7 +978,8 @@ func (x *SendBindSmsCodeRequest) GetPhone() string {
 type SendBindSmsCodeResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The one-shot state bound to the calling session; present it at
-	// BindCredential together with the code the phone received.
+	// BindCredential together with the code the phone received. Plain, not a
+	// wrapper: a successful send always mints it — success implies presence.
 	State         string `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -898,7 +987,7 @@ type SendBindSmsCodeResponse struct {
 
 func (x *SendBindSmsCodeResponse) Reset() {
 	*x = SendBindSmsCodeResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[15]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -910,7 +999,7 @@ func (x *SendBindSmsCodeResponse) String() string {
 func (*SendBindSmsCodeResponse) ProtoMessage() {}
 
 func (x *SendBindSmsCodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[15]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -923,7 +1012,7 @@ func (x *SendBindSmsCodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendBindSmsCodeResponse.ProtoReflect.Descriptor instead.
 func (*SendBindSmsCodeResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{15}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *SendBindSmsCodeResponse) GetState() string {
@@ -958,7 +1047,7 @@ type MergeAccountsRequest struct {
 
 func (x *MergeAccountsRequest) Reset() {
 	*x = MergeAccountsRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[16]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -970,7 +1059,7 @@ func (x *MergeAccountsRequest) String() string {
 func (*MergeAccountsRequest) ProtoMessage() {}
 
 func (x *MergeAccountsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[16]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -983,7 +1072,7 @@ func (x *MergeAccountsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MergeAccountsRequest.ProtoReflect.Descriptor instead.
 func (*MergeAccountsRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{16}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *MergeAccountsRequest) GetProvider() string {
@@ -1049,7 +1138,7 @@ type MergeAccountsResponse struct {
 
 func (x *MergeAccountsResponse) Reset() {
 	*x = MergeAccountsResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[17]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1061,7 +1150,7 @@ func (x *MergeAccountsResponse) String() string {
 func (*MergeAccountsResponse) ProtoMessage() {}
 
 func (x *MergeAccountsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[17]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1074,7 +1163,7 @@ func (x *MergeAccountsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MergeAccountsResponse.ProtoReflect.Descriptor instead.
 func (*MergeAccountsResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{17}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{18}
 }
 
 // The offer face's lookup leg. The sms branch is a bare owner lookup by
@@ -1099,7 +1188,7 @@ type ResolveCredentialRequest struct {
 
 func (x *ResolveCredentialRequest) Reset() {
 	*x = ResolveCredentialRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[18]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1111,7 +1200,7 @@ func (x *ResolveCredentialRequest) String() string {
 func (*ResolveCredentialRequest) ProtoMessage() {}
 
 func (x *ResolveCredentialRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[18]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1124,7 +1213,7 @@ func (x *ResolveCredentialRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResolveCredentialRequest.ProtoReflect.Descriptor instead.
 func (*ResolveCredentialRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{18}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ResolveCredentialRequest) GetProvider() string {
@@ -1192,7 +1281,7 @@ type ResolveCredentialResponse struct {
 
 func (x *ResolveCredentialResponse) Reset() {
 	*x = ResolveCredentialResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[19]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1204,7 +1293,7 @@ func (x *ResolveCredentialResponse) String() string {
 func (*ResolveCredentialResponse) ProtoMessage() {}
 
 func (x *ResolveCredentialResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[19]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1217,7 +1306,7 @@ func (x *ResolveCredentialResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResolveCredentialResponse.ProtoReflect.Descriptor instead.
 func (*ResolveCredentialResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{19}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ResolveCredentialResponse) GetOwner() *CredentialOwner {
@@ -1244,7 +1333,7 @@ type CredentialOwner struct {
 
 func (x *CredentialOwner) Reset() {
 	*x = CredentialOwner{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[20]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1256,7 +1345,7 @@ func (x *CredentialOwner) String() string {
 func (*CredentialOwner) ProtoMessage() {}
 
 func (x *CredentialOwner) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[20]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1269,7 +1358,7 @@ func (x *CredentialOwner) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CredentialOwner.ProtoReflect.Descriptor instead.
 func (*CredentialOwner) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{20}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *CredentialOwner) GetUserId() string {
@@ -1321,7 +1410,7 @@ type ResetPasswordRequest struct {
 
 func (x *ResetPasswordRequest) Reset() {
 	*x = ResetPasswordRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[21]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1333,7 +1422,7 @@ func (x *ResetPasswordRequest) String() string {
 func (*ResetPasswordRequest) ProtoMessage() {}
 
 func (x *ResetPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[21]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1346,7 +1435,7 @@ func (x *ResetPasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetPasswordRequest.ProtoReflect.Descriptor instead.
 func (*ResetPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{21}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ResetPasswordRequest) GetProvider() string {
@@ -1404,7 +1493,7 @@ type ResetPasswordResponse struct {
 
 func (x *ResetPasswordResponse) Reset() {
 	*x = ResetPasswordResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[22]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1416,7 +1505,7 @@ func (x *ResetPasswordResponse) String() string {
 func (*ResetPasswordResponse) ProtoMessage() {}
 
 func (x *ResetPasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[22]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1429,7 +1518,7 @@ func (x *ResetPasswordResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetPasswordResponse.ProtoReflect.Descriptor instead.
 func (*ResetPasswordResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{22}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{23}
 }
 
 type GetSecurityStatusRequest struct {
@@ -1440,7 +1529,7 @@ type GetSecurityStatusRequest struct {
 
 func (x *GetSecurityStatusRequest) Reset() {
 	*x = GetSecurityStatusRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[23]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1452,7 +1541,7 @@ func (x *GetSecurityStatusRequest) String() string {
 func (*GetSecurityStatusRequest) ProtoMessage() {}
 
 func (x *GetSecurityStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[23]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1465,7 +1554,7 @@ func (x *GetSecurityStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSecurityStatusRequest.ProtoReflect.Descriptor instead.
 func (*GetSecurityStatusRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{23}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{24}
 }
 
 // The caller's own binding surface: password set or not, and each
@@ -1481,7 +1570,7 @@ type GetSecurityStatusResponse struct {
 
 func (x *GetSecurityStatusResponse) Reset() {
 	*x = GetSecurityStatusResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[24]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1493,7 +1582,7 @@ func (x *GetSecurityStatusResponse) String() string {
 func (*GetSecurityStatusResponse) ProtoMessage() {}
 
 func (x *GetSecurityStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[24]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1506,7 +1595,7 @@ func (x *GetSecurityStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSecurityStatusResponse.ProtoReflect.Descriptor instead.
 func (*GetSecurityStatusResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{24}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GetSecurityStatusResponse) GetHasPassword() bool {
@@ -1535,7 +1624,7 @@ type SecurityCredential struct {
 
 func (x *SecurityCredential) Reset() {
 	*x = SecurityCredential{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[25]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1547,7 +1636,7 @@ func (x *SecurityCredential) String() string {
 func (*SecurityCredential) ProtoMessage() {}
 
 func (x *SecurityCredential) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[25]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1560,7 +1649,7 @@ func (x *SecurityCredential) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SecurityCredential.ProtoReflect.Descriptor instead.
 func (*SecurityCredential) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{25}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *SecurityCredential) GetKind() string {
@@ -1585,7 +1674,7 @@ type LogoutRequest struct {
 
 func (x *LogoutRequest) Reset() {
 	*x = LogoutRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[26]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1597,7 +1686,7 @@ func (x *LogoutRequest) String() string {
 func (*LogoutRequest) ProtoMessage() {}
 
 func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[26]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1610,7 +1699,7 @@ func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
 func (*LogoutRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{26}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{27}
 }
 
 type LogoutResponse struct {
@@ -1621,7 +1710,7 @@ type LogoutResponse struct {
 
 func (x *LogoutResponse) Reset() {
 	*x = LogoutResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[27]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1633,7 +1722,7 @@ func (x *LogoutResponse) String() string {
 func (*LogoutResponse) ProtoMessage() {}
 
 func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[27]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1646,7 +1735,7 @@ func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutResponse.ProtoReflect.Descriptor instead.
 func (*LogoutResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{27}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{28}
 }
 
 // getCurrentUser
@@ -1658,7 +1747,7 @@ type GetCurrentUserRequest struct {
 
 func (x *GetCurrentUserRequest) Reset() {
 	*x = GetCurrentUserRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[28]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1670,7 +1759,7 @@ func (x *GetCurrentUserRequest) String() string {
 func (*GetCurrentUserRequest) ProtoMessage() {}
 
 func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[28]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1683,7 +1772,7 @@ func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCurrentUserRequest.ProtoReflect.Descriptor instead.
 func (*GetCurrentUserRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{28}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{29}
 }
 
 type GetCurrentUserResponse struct {
@@ -1697,7 +1786,7 @@ type GetCurrentUserResponse struct {
 
 func (x *GetCurrentUserResponse) Reset() {
 	*x = GetCurrentUserResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[29]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1709,7 +1798,7 @@ func (x *GetCurrentUserResponse) String() string {
 func (*GetCurrentUserResponse) ProtoMessage() {}
 
 func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[29]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1722,7 +1811,7 @@ func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCurrentUserResponse.ProtoReflect.Descriptor instead.
 func (*GetCurrentUserResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{29}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetCurrentUserResponse) GetUser() *User {
@@ -1758,7 +1847,7 @@ type Membership struct {
 
 func (x *Membership) Reset() {
 	*x = Membership{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[30]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1770,7 +1859,7 @@ func (x *Membership) String() string {
 func (*Membership) ProtoMessage() {}
 
 func (x *Membership) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[30]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1783,7 +1872,7 @@ func (x *Membership) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Membership.ProtoReflect.Descriptor instead.
 func (*Membership) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{30}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *Membership) GetTenant() string {
@@ -1804,7 +1893,7 @@ var File_cyber_system_v1_auth_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x1acyber/system/v1/auth.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/user.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb3\x01\n" +
+	"\x1acyber/system/v1/auth.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acyber/system/v1/user.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xb3\x01\n" +
 	"\fLoginRequest\x12)\n" +
 	"\aaccount\x18\x01 \x01(\tB\n" +
 	"\xbaH\a\xc8\x01\x01r\x02\x10\x01H\x00R\aaccount\x88\x01\x01\x12+\n" +
@@ -1840,12 +1929,18 @@ const file_cyber_system_v1_auth_proto_rawDesc = "" +
 	"\x04code\x18\x02 \x01(\tB\x14\xbaH\x11\xc8\x01\x01r\f2\n" +
 	"^[0-9]{6}$H\x01R\x04code\x88\x01\x01B\b\n" +
 	"\x06_phoneB\a\n" +
-	"\x05_code\"\xb2\x01\n" +
+	"\x05_code\"\x86\x01\n" +
+	"\rWeChatProfile\x128\n" +
+	"\bnickname\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\bnickname\x12;\n" +
+	"\n" +
+	"avatar_url\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\tavatarUrl\"\x91\x02\n" +
 	"\x17LoginByIdentityResponse\x12#\n" +
 	"\rsession_token\x18\x01 \x01(\tR\fsessionToken\x127\n" +
 	"\tissued_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bissuedAt\x129\n" +
 	"\n" +
-	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"\x9f\x01\n" +
+	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12J\n" +
+	"\x0ewechat_profile\x18\x04 \x01(\v2\x1e.cyber.system.v1.WeChatProfileH\x00R\rwechatProfile\x88\x01\x01B\x11\n" +
+	"\x0f_wechat_profile\"\x9f\x01\n" +
 	"\x19BeginIdentityLoginRequest\x12-\n" +
 	"\bprovider\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x00R\bprovider\x88\x01\x01\x125\n" +
 	"\fredirect_uri\x18\x02 \x01(\tB\r\xbaH\n" +
@@ -1869,8 +1964,10 @@ const file_cyber_system_v1_auth_proto_rawDesc = "" +
 	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x02R\x05state\x88\x01\x01B\x10\n" +
 	"\apayload\x12\x05\xbaH\x02\b\x01B\v\n" +
 	"\t_providerB\b\n" +
-	"\x06_state\"\x18\n" +
-	"\x16BindCredentialResponse\"\xa0\x01\n" +
+	"\x06_state\"w\n" +
+	"\x16BindCredentialResponse\x12J\n" +
+	"\x0ewechat_profile\x18\x01 \x01(\v2\x1e.cyber.system.v1.WeChatProfileH\x00R\rwechatProfile\x88\x01\x01B\x11\n" +
+	"\x0f_wechat_profile\"\xa0\x01\n" +
 	"\x1aBeginBindCredentialRequest\x12-\n" +
 	"\bprovider\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18@H\x00R\bprovider\x88\x01\x01\x125\n" +
 	"\fredirect_uri\x18\x02 \x01(\tB\r\xbaH\n" +
@@ -1988,91 +2085,97 @@ func file_cyber_system_v1_auth_proto_rawDescGZIP() []byte {
 	return file_cyber_system_v1_auth_proto_rawDescData
 }
 
-var file_cyber_system_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
+var file_cyber_system_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_cyber_system_v1_auth_proto_goTypes = []any{
 	(*LoginRequest)(nil),                // 0: cyber.system.v1.LoginRequest
 	(*LoginResponse)(nil),               // 1: cyber.system.v1.LoginResponse
 	(*LoginByIdentityRequest)(nil),      // 2: cyber.system.v1.LoginByIdentityRequest
 	(*WeChatIdentityPayload)(nil),       // 3: cyber.system.v1.WeChatIdentityPayload
 	(*SmsIdentityPayload)(nil),          // 4: cyber.system.v1.SmsIdentityPayload
-	(*LoginByIdentityResponse)(nil),     // 5: cyber.system.v1.LoginByIdentityResponse
-	(*BeginIdentityLoginRequest)(nil),   // 6: cyber.system.v1.BeginIdentityLoginRequest
-	(*BeginIdentityLoginResponse)(nil),  // 7: cyber.system.v1.BeginIdentityLoginResponse
-	(*SendSmsCodeRequest)(nil),          // 8: cyber.system.v1.SendSmsCodeRequest
-	(*SendSmsCodeResponse)(nil),         // 9: cyber.system.v1.SendSmsCodeResponse
-	(*BindCredentialRequest)(nil),       // 10: cyber.system.v1.BindCredentialRequest
-	(*BindCredentialResponse)(nil),      // 11: cyber.system.v1.BindCredentialResponse
-	(*BeginBindCredentialRequest)(nil),  // 12: cyber.system.v1.BeginBindCredentialRequest
-	(*BeginBindCredentialResponse)(nil), // 13: cyber.system.v1.BeginBindCredentialResponse
-	(*SendBindSmsCodeRequest)(nil),      // 14: cyber.system.v1.SendBindSmsCodeRequest
-	(*SendBindSmsCodeResponse)(nil),     // 15: cyber.system.v1.SendBindSmsCodeResponse
-	(*MergeAccountsRequest)(nil),        // 16: cyber.system.v1.MergeAccountsRequest
-	(*MergeAccountsResponse)(nil),       // 17: cyber.system.v1.MergeAccountsResponse
-	(*ResolveCredentialRequest)(nil),    // 18: cyber.system.v1.ResolveCredentialRequest
-	(*ResolveCredentialResponse)(nil),   // 19: cyber.system.v1.ResolveCredentialResponse
-	(*CredentialOwner)(nil),             // 20: cyber.system.v1.CredentialOwner
-	(*ResetPasswordRequest)(nil),        // 21: cyber.system.v1.ResetPasswordRequest
-	(*ResetPasswordResponse)(nil),       // 22: cyber.system.v1.ResetPasswordResponse
-	(*GetSecurityStatusRequest)(nil),    // 23: cyber.system.v1.GetSecurityStatusRequest
-	(*GetSecurityStatusResponse)(nil),   // 24: cyber.system.v1.GetSecurityStatusResponse
-	(*SecurityCredential)(nil),          // 25: cyber.system.v1.SecurityCredential
-	(*LogoutRequest)(nil),               // 26: cyber.system.v1.LogoutRequest
-	(*LogoutResponse)(nil),              // 27: cyber.system.v1.LogoutResponse
-	(*GetCurrentUserRequest)(nil),       // 28: cyber.system.v1.GetCurrentUserRequest
-	(*GetCurrentUserResponse)(nil),      // 29: cyber.system.v1.GetCurrentUserResponse
-	(*Membership)(nil),                  // 30: cyber.system.v1.Membership
-	(*timestamppb.Timestamp)(nil),       // 31: google.protobuf.Timestamp
-	(*User)(nil),                        // 32: cyber.system.v1.User
+	(*WeChatProfile)(nil),               // 5: cyber.system.v1.WeChatProfile
+	(*LoginByIdentityResponse)(nil),     // 6: cyber.system.v1.LoginByIdentityResponse
+	(*BeginIdentityLoginRequest)(nil),   // 7: cyber.system.v1.BeginIdentityLoginRequest
+	(*BeginIdentityLoginResponse)(nil),  // 8: cyber.system.v1.BeginIdentityLoginResponse
+	(*SendSmsCodeRequest)(nil),          // 9: cyber.system.v1.SendSmsCodeRequest
+	(*SendSmsCodeResponse)(nil),         // 10: cyber.system.v1.SendSmsCodeResponse
+	(*BindCredentialRequest)(nil),       // 11: cyber.system.v1.BindCredentialRequest
+	(*BindCredentialResponse)(nil),      // 12: cyber.system.v1.BindCredentialResponse
+	(*BeginBindCredentialRequest)(nil),  // 13: cyber.system.v1.BeginBindCredentialRequest
+	(*BeginBindCredentialResponse)(nil), // 14: cyber.system.v1.BeginBindCredentialResponse
+	(*SendBindSmsCodeRequest)(nil),      // 15: cyber.system.v1.SendBindSmsCodeRequest
+	(*SendBindSmsCodeResponse)(nil),     // 16: cyber.system.v1.SendBindSmsCodeResponse
+	(*MergeAccountsRequest)(nil),        // 17: cyber.system.v1.MergeAccountsRequest
+	(*MergeAccountsResponse)(nil),       // 18: cyber.system.v1.MergeAccountsResponse
+	(*ResolveCredentialRequest)(nil),    // 19: cyber.system.v1.ResolveCredentialRequest
+	(*ResolveCredentialResponse)(nil),   // 20: cyber.system.v1.ResolveCredentialResponse
+	(*CredentialOwner)(nil),             // 21: cyber.system.v1.CredentialOwner
+	(*ResetPasswordRequest)(nil),        // 22: cyber.system.v1.ResetPasswordRequest
+	(*ResetPasswordResponse)(nil),       // 23: cyber.system.v1.ResetPasswordResponse
+	(*GetSecurityStatusRequest)(nil),    // 24: cyber.system.v1.GetSecurityStatusRequest
+	(*GetSecurityStatusResponse)(nil),   // 25: cyber.system.v1.GetSecurityStatusResponse
+	(*SecurityCredential)(nil),          // 26: cyber.system.v1.SecurityCredential
+	(*LogoutRequest)(nil),               // 27: cyber.system.v1.LogoutRequest
+	(*LogoutResponse)(nil),              // 28: cyber.system.v1.LogoutResponse
+	(*GetCurrentUserRequest)(nil),       // 29: cyber.system.v1.GetCurrentUserRequest
+	(*GetCurrentUserResponse)(nil),      // 30: cyber.system.v1.GetCurrentUserResponse
+	(*Membership)(nil),                  // 31: cyber.system.v1.Membership
+	(*timestamppb.Timestamp)(nil),       // 32: google.protobuf.Timestamp
+	(*wrapperspb.StringValue)(nil),      // 33: google.protobuf.StringValue
+	(*User)(nil),                        // 34: cyber.system.v1.User
 }
 var file_cyber_system_v1_auth_proto_depIdxs = []int32{
-	31, // 0: cyber.system.v1.LoginResponse.issued_at:type_name -> google.protobuf.Timestamp
-	31, // 1: cyber.system.v1.LoginResponse.expires_at:type_name -> google.protobuf.Timestamp
+	32, // 0: cyber.system.v1.LoginResponse.issued_at:type_name -> google.protobuf.Timestamp
+	32, // 1: cyber.system.v1.LoginResponse.expires_at:type_name -> google.protobuf.Timestamp
 	3,  // 2: cyber.system.v1.LoginByIdentityRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
 	4,  // 3: cyber.system.v1.LoginByIdentityRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
-	31, // 4: cyber.system.v1.LoginByIdentityResponse.issued_at:type_name -> google.protobuf.Timestamp
-	31, // 5: cyber.system.v1.LoginByIdentityResponse.expires_at:type_name -> google.protobuf.Timestamp
-	3,  // 6: cyber.system.v1.BindCredentialRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
-	4,  // 7: cyber.system.v1.BindCredentialRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
-	3,  // 8: cyber.system.v1.MergeAccountsRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
-	4,  // 9: cyber.system.v1.MergeAccountsRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
-	3,  // 10: cyber.system.v1.ResolveCredentialRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
-	20, // 11: cyber.system.v1.ResolveCredentialResponse.owner:type_name -> cyber.system.v1.CredentialOwner
-	25, // 12: cyber.system.v1.CredentialOwner.credentials:type_name -> cyber.system.v1.SecurityCredential
-	4,  // 13: cyber.system.v1.ResetPasswordRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
-	25, // 14: cyber.system.v1.GetSecurityStatusResponse.credentials:type_name -> cyber.system.v1.SecurityCredential
-	32, // 15: cyber.system.v1.GetCurrentUserResponse.user:type_name -> cyber.system.v1.User
-	30, // 16: cyber.system.v1.GetCurrentUserResponse.memberships:type_name -> cyber.system.v1.Membership
-	0,  // 17: cyber.system.v1.AuthService.Login:input_type -> cyber.system.v1.LoginRequest
-	2,  // 18: cyber.system.v1.AuthService.LoginByIdentity:input_type -> cyber.system.v1.LoginByIdentityRequest
-	6,  // 19: cyber.system.v1.AuthService.BeginIdentityLogin:input_type -> cyber.system.v1.BeginIdentityLoginRequest
-	8,  // 20: cyber.system.v1.AuthService.SendSmsCode:input_type -> cyber.system.v1.SendSmsCodeRequest
-	10, // 21: cyber.system.v1.AuthService.BindCredential:input_type -> cyber.system.v1.BindCredentialRequest
-	12, // 22: cyber.system.v1.AuthService.BeginBindCredential:input_type -> cyber.system.v1.BeginBindCredentialRequest
-	14, // 23: cyber.system.v1.AuthService.SendBindSmsCode:input_type -> cyber.system.v1.SendBindSmsCodeRequest
-	16, // 24: cyber.system.v1.AuthService.MergeAccounts:input_type -> cyber.system.v1.MergeAccountsRequest
-	18, // 25: cyber.system.v1.AuthService.ResolveCredential:input_type -> cyber.system.v1.ResolveCredentialRequest
-	21, // 26: cyber.system.v1.AuthService.ResetPassword:input_type -> cyber.system.v1.ResetPasswordRequest
-	23, // 27: cyber.system.v1.AuthService.GetSecurityStatus:input_type -> cyber.system.v1.GetSecurityStatusRequest
-	26, // 28: cyber.system.v1.AuthService.Logout:input_type -> cyber.system.v1.LogoutRequest
-	28, // 29: cyber.system.v1.AuthService.GetCurrentUser:input_type -> cyber.system.v1.GetCurrentUserRequest
-	1,  // 30: cyber.system.v1.AuthService.Login:output_type -> cyber.system.v1.LoginResponse
-	5,  // 31: cyber.system.v1.AuthService.LoginByIdentity:output_type -> cyber.system.v1.LoginByIdentityResponse
-	7,  // 32: cyber.system.v1.AuthService.BeginIdentityLogin:output_type -> cyber.system.v1.BeginIdentityLoginResponse
-	9,  // 33: cyber.system.v1.AuthService.SendSmsCode:output_type -> cyber.system.v1.SendSmsCodeResponse
-	11, // 34: cyber.system.v1.AuthService.BindCredential:output_type -> cyber.system.v1.BindCredentialResponse
-	13, // 35: cyber.system.v1.AuthService.BeginBindCredential:output_type -> cyber.system.v1.BeginBindCredentialResponse
-	15, // 36: cyber.system.v1.AuthService.SendBindSmsCode:output_type -> cyber.system.v1.SendBindSmsCodeResponse
-	17, // 37: cyber.system.v1.AuthService.MergeAccounts:output_type -> cyber.system.v1.MergeAccountsResponse
-	19, // 38: cyber.system.v1.AuthService.ResolveCredential:output_type -> cyber.system.v1.ResolveCredentialResponse
-	22, // 39: cyber.system.v1.AuthService.ResetPassword:output_type -> cyber.system.v1.ResetPasswordResponse
-	24, // 40: cyber.system.v1.AuthService.GetSecurityStatus:output_type -> cyber.system.v1.GetSecurityStatusResponse
-	27, // 41: cyber.system.v1.AuthService.Logout:output_type -> cyber.system.v1.LogoutResponse
-	29, // 42: cyber.system.v1.AuthService.GetCurrentUser:output_type -> cyber.system.v1.GetCurrentUserResponse
-	30, // [30:43] is the sub-list for method output_type
-	17, // [17:30] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	33, // 4: cyber.system.v1.WeChatProfile.nickname:type_name -> google.protobuf.StringValue
+	33, // 5: cyber.system.v1.WeChatProfile.avatar_url:type_name -> google.protobuf.StringValue
+	32, // 6: cyber.system.v1.LoginByIdentityResponse.issued_at:type_name -> google.protobuf.Timestamp
+	32, // 7: cyber.system.v1.LoginByIdentityResponse.expires_at:type_name -> google.protobuf.Timestamp
+	5,  // 8: cyber.system.v1.LoginByIdentityResponse.wechat_profile:type_name -> cyber.system.v1.WeChatProfile
+	3,  // 9: cyber.system.v1.BindCredentialRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
+	4,  // 10: cyber.system.v1.BindCredentialRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
+	5,  // 11: cyber.system.v1.BindCredentialResponse.wechat_profile:type_name -> cyber.system.v1.WeChatProfile
+	3,  // 12: cyber.system.v1.MergeAccountsRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
+	4,  // 13: cyber.system.v1.MergeAccountsRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
+	3,  // 14: cyber.system.v1.ResolveCredentialRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
+	21, // 15: cyber.system.v1.ResolveCredentialResponse.owner:type_name -> cyber.system.v1.CredentialOwner
+	26, // 16: cyber.system.v1.CredentialOwner.credentials:type_name -> cyber.system.v1.SecurityCredential
+	4,  // 17: cyber.system.v1.ResetPasswordRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
+	26, // 18: cyber.system.v1.GetSecurityStatusResponse.credentials:type_name -> cyber.system.v1.SecurityCredential
+	34, // 19: cyber.system.v1.GetCurrentUserResponse.user:type_name -> cyber.system.v1.User
+	31, // 20: cyber.system.v1.GetCurrentUserResponse.memberships:type_name -> cyber.system.v1.Membership
+	0,  // 21: cyber.system.v1.AuthService.Login:input_type -> cyber.system.v1.LoginRequest
+	2,  // 22: cyber.system.v1.AuthService.LoginByIdentity:input_type -> cyber.system.v1.LoginByIdentityRequest
+	7,  // 23: cyber.system.v1.AuthService.BeginIdentityLogin:input_type -> cyber.system.v1.BeginIdentityLoginRequest
+	9,  // 24: cyber.system.v1.AuthService.SendSmsCode:input_type -> cyber.system.v1.SendSmsCodeRequest
+	11, // 25: cyber.system.v1.AuthService.BindCredential:input_type -> cyber.system.v1.BindCredentialRequest
+	13, // 26: cyber.system.v1.AuthService.BeginBindCredential:input_type -> cyber.system.v1.BeginBindCredentialRequest
+	15, // 27: cyber.system.v1.AuthService.SendBindSmsCode:input_type -> cyber.system.v1.SendBindSmsCodeRequest
+	17, // 28: cyber.system.v1.AuthService.MergeAccounts:input_type -> cyber.system.v1.MergeAccountsRequest
+	19, // 29: cyber.system.v1.AuthService.ResolveCredential:input_type -> cyber.system.v1.ResolveCredentialRequest
+	22, // 30: cyber.system.v1.AuthService.ResetPassword:input_type -> cyber.system.v1.ResetPasswordRequest
+	24, // 31: cyber.system.v1.AuthService.GetSecurityStatus:input_type -> cyber.system.v1.GetSecurityStatusRequest
+	27, // 32: cyber.system.v1.AuthService.Logout:input_type -> cyber.system.v1.LogoutRequest
+	29, // 33: cyber.system.v1.AuthService.GetCurrentUser:input_type -> cyber.system.v1.GetCurrentUserRequest
+	1,  // 34: cyber.system.v1.AuthService.Login:output_type -> cyber.system.v1.LoginResponse
+	6,  // 35: cyber.system.v1.AuthService.LoginByIdentity:output_type -> cyber.system.v1.LoginByIdentityResponse
+	8,  // 36: cyber.system.v1.AuthService.BeginIdentityLogin:output_type -> cyber.system.v1.BeginIdentityLoginResponse
+	10, // 37: cyber.system.v1.AuthService.SendSmsCode:output_type -> cyber.system.v1.SendSmsCodeResponse
+	12, // 38: cyber.system.v1.AuthService.BindCredential:output_type -> cyber.system.v1.BindCredentialResponse
+	14, // 39: cyber.system.v1.AuthService.BeginBindCredential:output_type -> cyber.system.v1.BeginBindCredentialResponse
+	16, // 40: cyber.system.v1.AuthService.SendBindSmsCode:output_type -> cyber.system.v1.SendBindSmsCodeResponse
+	18, // 41: cyber.system.v1.AuthService.MergeAccounts:output_type -> cyber.system.v1.MergeAccountsResponse
+	20, // 42: cyber.system.v1.AuthService.ResolveCredential:output_type -> cyber.system.v1.ResolveCredentialResponse
+	23, // 43: cyber.system.v1.AuthService.ResetPassword:output_type -> cyber.system.v1.ResetPasswordResponse
+	25, // 44: cyber.system.v1.AuthService.GetSecurityStatus:output_type -> cyber.system.v1.GetSecurityStatusResponse
+	28, // 45: cyber.system.v1.AuthService.Logout:output_type -> cyber.system.v1.LogoutResponse
+	30, // 46: cyber.system.v1.AuthService.GetCurrentUser:output_type -> cyber.system.v1.GetCurrentUserResponse
+	34, // [34:47] is the sub-list for method output_type
+	21, // [21:34] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_auth_proto_init() }
@@ -2089,22 +2192,24 @@ func file_cyber_system_v1_auth_proto_init() {
 	file_cyber_system_v1_auth_proto_msgTypes[3].OneofWrappers = []any{}
 	file_cyber_system_v1_auth_proto_msgTypes[4].OneofWrappers = []any{}
 	file_cyber_system_v1_auth_proto_msgTypes[6].OneofWrappers = []any{}
-	file_cyber_system_v1_auth_proto_msgTypes[8].OneofWrappers = []any{}
-	file_cyber_system_v1_auth_proto_msgTypes[10].OneofWrappers = []any{
+	file_cyber_system_v1_auth_proto_msgTypes[7].OneofWrappers = []any{}
+	file_cyber_system_v1_auth_proto_msgTypes[9].OneofWrappers = []any{}
+	file_cyber_system_v1_auth_proto_msgTypes[11].OneofWrappers = []any{
 		(*BindCredentialRequest_Wechat)(nil),
 		(*BindCredentialRequest_Sms)(nil),
 	}
 	file_cyber_system_v1_auth_proto_msgTypes[12].OneofWrappers = []any{}
-	file_cyber_system_v1_auth_proto_msgTypes[14].OneofWrappers = []any{}
-	file_cyber_system_v1_auth_proto_msgTypes[16].OneofWrappers = []any{
+	file_cyber_system_v1_auth_proto_msgTypes[13].OneofWrappers = []any{}
+	file_cyber_system_v1_auth_proto_msgTypes[15].OneofWrappers = []any{}
+	file_cyber_system_v1_auth_proto_msgTypes[17].OneofWrappers = []any{
 		(*MergeAccountsRequest_Wechat)(nil),
 		(*MergeAccountsRequest_Sms)(nil),
 	}
-	file_cyber_system_v1_auth_proto_msgTypes[18].OneofWrappers = []any{
+	file_cyber_system_v1_auth_proto_msgTypes[19].OneofWrappers = []any{
 		(*ResolveCredentialRequest_Phone)(nil),
 		(*ResolveCredentialRequest_Wechat)(nil),
 	}
-	file_cyber_system_v1_auth_proto_msgTypes[21].OneofWrappers = []any{
+	file_cyber_system_v1_auth_proto_msgTypes[22].OneofWrappers = []any{
 		(*ResetPasswordRequest_Sms)(nil),
 	}
 	type x struct{}
@@ -2113,7 +2218,7 @@ func file_cyber_system_v1_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_system_v1_auth_proto_rawDesc), len(file_cyber_system_v1_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   31,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -100,6 +100,17 @@ func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, prov
 			if _, ok := providers[row.GetKind()]; !ok {
 				return nil, fmt.Errorf("auth: provider %q references unregistered kind %q", row.GetKey(), row.GetKind())
 			}
+			// The boot-time resolution banner: one line per configured row
+			// naming the shape the service actually runs — the endpoint
+			// verdict is the wechat family's own (empty = the official
+			// bases, the e2e seam overrides), so an operator reading the
+			// boot log sees the channel topology without reading assembly
+			// code.
+			endpoint := "kind-default"
+			if row.GetEndpoint() != "" {
+				endpoint = "override:" + row.GetEndpoint()
+			}
+			logger.Info("auth provider resolved", "key", row.GetKey(), "kind", row.GetKind(), "enabled", row.GetEnabled(), "auto_register", row.GetAutoRegister(), "endpoint", endpoint)
 		}
 	}
 	return &AuthUC{
@@ -128,21 +139,21 @@ func (uc *AuthUC) Login(ctx context.Context, account, password, seatPopulation s
 	return uc.mintSession(ctx, u, seat)
 }
 
-func (uc *AuthUC) LoginByIdentity(ctx context.Context, providerKey, state string, payload identityPayload) (token string, issuedAt, expiresAt time.Time, err error) {
+func (uc *AuthUC) LoginByIdentity(ctx context.Context, providerKey, state string, payload identityPayload) (token string, issuedAt, expiresAt time.Time, profile *wechatProfile, err error) {
 	row, p, err := uc.providerRow(providerKey)
 	if err != nil {
-		return "", time.Time{}, time.Time{}, err
+		return "", time.Time{}, time.Time{}, nil, err
 	}
 	birthPopulation, err := uc.landingPopulation(ctx, row)
 	if err != nil {
-		return "", time.Time{}, time.Time{}, err
+		return "", time.Time{}, time.Time{}, nil, err
 	}
 	if err = uc.cashState(ctx, providerKey, state); err != nil {
-		return "", time.Time{}, time.Time{}, err
+		return "", time.Time{}, time.Time{}, nil, err
 	}
 	id, err := p.Exchange(ctx, row, payload)
 	if err != nil {
-		return "", time.Time{}, time.Time{}, err
+		return "", time.Time{}, time.Time{}, nil, err
 	}
 	c, err := uc.userRP.FindCredential(ctx, id.Kind, id.Identifier)
 	if err != nil {
@@ -150,28 +161,30 @@ func (uc *AuthUC) LoginByIdentity(ctx context.Context, providerKey, state string
 			if row.AutoRegister {
 				u, aerr := uc.autoRegister(ctx, id)
 				if aerr != nil {
-					return "", time.Time{}, time.Time{}, aerr
+					return "", time.Time{}, time.Time{}, nil, aerr
 				}
 				seat, serr := uc.resolveProviderSeat(ctx, u, birthPopulation)
 				if serr != nil {
-					return "", time.Time{}, time.Time{}, serr
+					return "", time.Time{}, time.Time{}, nil, serr
 				}
-				return uc.mintSession(ctx, u, seat)
+				token, issuedAt, expiresAt, err = uc.mintSession(ctx, u, seat)
+				return token, issuedAt, expiresAt, id.Profile, err
 			}
-			return "", time.Time{}, time.Time{}, systempb.ErrorSystemIdentityExchangeFailed("").WithCause(
+			return "", time.Time{}, time.Time{}, nil, systempb.ErrorSystemIdentityExchangeFailed("").WithCause(
 				fmt.Errorf("identity %s %s has no binding", id.Kind, id.Identifier))
 		}
-		return "", time.Time{}, time.Time{}, err
+		return "", time.Time{}, time.Time{}, nil, err
 	}
 	u, err := uc.userRP.FindByID(ctx, c.UserID)
 	if err != nil {
-		return "", time.Time{}, time.Time{}, err
+		return "", time.Time{}, time.Time{}, nil, err
 	}
 	seat, err := uc.resolveProviderSeat(ctx, u, birthPopulation)
 	if err != nil {
-		return "", time.Time{}, time.Time{}, err
+		return "", time.Time{}, time.Time{}, nil, err
 	}
-	return uc.mintSession(ctx, u, seat)
+	token, issuedAt, expiresAt, err = uc.mintSession(ctx, u, seat)
+	return token, issuedAt, expiresAt, id.Profile, err
 }
 
 func (uc *AuthUC) BeginIdentityLogin(ctx context.Context, providerKey, redirectURI string) (string, error) {
@@ -235,43 +248,43 @@ func (uc *AuthUC) autoRegister(ctx context.Context, id *exchangedIdentity) (*use
 	return u, nil
 }
 
-func (uc *AuthUC) BindCredential(ctx context.Context, providerKey, state string, payload identityPayload) error {
+func (uc *AuthUC) BindCredential(ctx context.Context, providerKey, state string, payload identityPayload) (*wechatProfile, error) {
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok {
-		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("binding requires an authenticated caller"))
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("binding requires an authenticated caller"))
 	}
 	row, p, err := uc.providerRow(providerKey)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if err = uc.cashBoundState(ctx, providerKey, state, subject.UserID); err != nil {
-		return err
+		return nil, err
 	}
 	id, err := p.Exchange(ctx, row, payload)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	c, err := uc.userRP.FindCredential(ctx, id.Kind, id.Identifier)
 	if err != nil && !errorspb.IsInfraErrorDbNotFound(err) {
-		return err
+		return nil, err
 	}
 	if err == nil {
 		// Already bound to this identity: cosmetic. Bound to another: the
 		// identifier belongs to someone else.
 		if c.UserID == subject.UserID {
-			return nil
+			return id.Profile, nil
 		}
-		return systempb.ErrorSystemIdentityAlreadyBound("").WithCause(
+		return nil, systempb.ErrorSystemIdentityAlreadyBound("").WithCause(
 			fmt.Errorf("identity %s %s already bound", id.Kind, id.Identifier))
 	}
 	if err = uc.userRP.CreateCredential(ctx, &user.Credential{Kind: id.Kind, Identifier: id.Identifier, UserID: subject.UserID}); err != nil {
 		// The unique is the race backstop — same shape as the pre-check.
 		if errorspb.IsInfraErrorDbConstraint(err) {
-			return systempb.ErrorSystemIdentityAlreadyBound("").WithCause(err)
+			return nil, systempb.ErrorSystemIdentityAlreadyBound("").WithCause(err)
 		}
-		return err
+		return nil, err
 	}
-	return nil
+	return id.Profile, nil
 }
 
 func (uc *AuthUC) BeginBindCredential(ctx context.Context, providerKey, redirectURI string) (string, error) {

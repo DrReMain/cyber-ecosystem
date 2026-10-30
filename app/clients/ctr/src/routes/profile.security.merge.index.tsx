@@ -6,7 +6,7 @@ import { m } from "#/paraglide/messages";
 
 export const Route = createFileRoute("/profile/security/merge/")({
   head: () => ({
-    meta: [...noindexHead().meta, { title: pageTitle(m.merge_title()) }],
+    meta: [...noindexHead().meta, { title: pageTitle(m.security_merge_title()) }],
   }),
   component: MergeConfirmPage,
 });

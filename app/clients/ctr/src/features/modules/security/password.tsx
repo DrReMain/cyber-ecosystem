@@ -23,16 +23,16 @@ function failureCopy(value: string | undefined): string {
     case System.SMS_RATE_LIMITED:
       return m.error_SYSTEM_SMS_RATE_LIMITED();
     default:
-      return m.pw_error_generic();
+      return m.security_pw_error_generic();
   }
 }
 
 // The two local password verdicts: the length floor and the echo match.
 function pwErrorOf(newPassword: string, confirmPassword: string): string | null {
   if (newPassword.length < 6) {
-    return m.login_password_short();
+    return m.security_password_short();
   }
-  return newPassword !== confirmPassword ? m.pw_error_mismatch() : null;
+  return newPassword !== confirmPassword ? m.security_pw_error_mismatch() : null;
 }
 
 // Branch-free view helpers: each boolean chain lives in its own function so
@@ -47,9 +47,9 @@ function submitDisabled(pending: boolean, isSet: boolean, phone: unknown): boole
 
 function submitLabel(pending: boolean, isSet: boolean): string {
   if (pending) {
-    return m.login_pending();
+    return m.security_pending();
   }
-  return isSet ? m.pw_set_submit() : m.pw_change_submit();
+  return isSet ? m.security_pw_set_submit() : m.security_pw_change_submit();
 }
 
 // block4's password pair on one route: mode=set (wechat-born, no password —
@@ -87,14 +87,14 @@ export function PasswordPage() {
       : await changePasswordFn({ data: { newPassword, oldPassword } }).catch(() => null);
     setPending(false);
     if (res === null) {
-      setError(m.pw_error_generic());
+      setError(m.security_pw_error_generic());
       return;
     }
     if (res.status === "rejected") {
       setReason(res.reason);
       return;
     }
-    toast.success(isSet ? m.pw_set_done() : m.pw_change_done());
+    toast.success(isSet ? m.security_pw_set_done() : m.security_pw_change_done());
     await queryClient.invalidateQueries();
     await navigate({ to: "/profile/security", viewTransition: false });
   }
@@ -103,11 +103,11 @@ export function PasswordPage() {
     <AmbientLayout>
       <FlowHeader
         onBack={() => void navigate({ to: "/profile/security" })}
-        title={isSet ? m.pw_set_title() : m.pw_change_title()}
+        title={isSet ? m.security_pw_set_title() : m.security_pw_change_title()}
       />
       <div className="flex w-full flex-col gap-3.5 pt-3">
         <div className="text-ink-tertiary text-center text-xs leading-[1.6]">
-          {isSet ? m.pw_set_pitch() : m.pw_change_pitch()}
+          {isSet ? m.security_pw_set_pitch() : m.security_pw_change_pitch()}
         </div>
 
         {noPhoneYet(isSet, phone, securityQuery.isSuccess) ? <NoPhoneCard /> : null}
@@ -116,38 +116,38 @@ export function PasswordPage() {
           {isSet ? <SetProofFields mask={phone?.maskedIdentifier ?? ""} sms={sms} /> : null}
           {!isSet && (
             <div className="mb-3.5">
-              <div className="text-ink-secondary mb-1.5 text-xs">{m.pw_old_label()}</div>
+              <div className="text-ink-secondary mb-1.5 text-xs">{m.security_pw_old_label()}</div>
               <input
-                aria-label={m.pw_old_label()}
+                aria-label={m.security_pw_old_label()}
                 autoComplete="current-password"
                 className={inputClass}
                 onChange={(event) => setOldPassword(event.target.value)}
-                placeholder={m.pw_old_placeholder()}
+                placeholder={m.security_pw_old_placeholder()}
                 type="password"
                 value={oldPassword}
               />
             </div>
           )}
           <div className="mb-3.5">
-            <div className="text-ink-secondary mb-1.5 text-xs">{m.pw_new_label()}</div>
+            <div className="text-ink-secondary mb-1.5 text-xs">{m.security_pw_new_label()}</div>
             <input
-              aria-label={m.pw_new_label()}
+              aria-label={m.security_pw_new_label()}
               autoComplete="new-password"
               className={inputClass}
               onChange={(event) => setNewPassword(event.target.value)}
-              placeholder={m.pw_new_placeholder()}
+              placeholder={m.security_pw_new_placeholder()}
               type="password"
               value={newPassword}
             />
           </div>
           <div>
-            <div className="text-ink-secondary mb-1.5 text-xs">{m.pw_confirm_label()}</div>
+            <div className="text-ink-secondary mb-1.5 text-xs">{m.security_pw_confirm_label()}</div>
             <input
-              aria-label={m.pw_confirm_label()}
+              aria-label={m.security_pw_confirm_label()}
               autoComplete="new-password"
               className={inputClass}
               onChange={(event) => setConfirmPassword(event.target.value)}
-              placeholder={m.pw_confirm_placeholder()}
+              placeholder={m.security_pw_confirm_placeholder()}
               type="password"
               value={confirmPassword}
             />
@@ -161,10 +161,10 @@ export function PasswordPage() {
             {submitLabel(pending, isSet)}
           </button>
           <div className="text-ink-tertiary mt-3 text-center text-[11px] leading-[1.7]">
-            {isSet ? m.pw_set_note() : m.pw_change_note()}{" "}
+            {isSet ? m.security_pw_set_note() : m.security_pw_change_note()}{" "}
             {!isSet ? (
               <Link className="text-link" to="/login/forgot">
-                {m.pw_change_forgot()}
+                {m.security_pw_change_forgot()}
               </Link>
             ) : null}
           </div>
@@ -185,30 +185,30 @@ function SetProofFields({ mask, sms }: { mask: string; sms: ReturnType<typeof us
   return (
     <>
       <div className="mb-3.5 w-fit rounded-full bg-[rgba(34,197,94,0.15)] px-2.5 py-1 text-[10.5px] font-semibold text-[#6EE7B7]">
-        {m.pw_set_send_to({ mask })}
+        {m.security_pw_set_send_to({ mask })}
       </div>
       <div className="mb-3.5">
-        <div className="text-ink-secondary mb-1.5 text-xs">{m.forgot_phone_label()}</div>
+        <div className="text-ink-secondary mb-1.5 text-xs">{m.security_forgot_phone_label()}</div>
         <input
-          aria-label={m.login_phone_label()}
+          aria-label={m.security_phone_label()}
           className={inputClass}
           inputMode="numeric"
           maxLength={11}
           onChange={(event) => sms.setPhone(event.target.value)}
-          placeholder={m.pw_set_phone_placeholder({ mask })}
+          placeholder={m.security_pw_set_phone_placeholder({ mask })}
           value={sms.phone}
         />
       </div>
       <div className="mb-3.5">
-        <div className="text-ink-secondary mb-1.5 text-xs">{m.pw_code_label()}</div>
+        <div className="text-ink-secondary mb-1.5 text-xs">{m.security_pw_code_label()}</div>
         <div className="flex items-stretch gap-3">
           <input
-            aria-label={m.login_code_label()}
+            aria-label={m.security_code_label()}
             className={`${inputClass} flex-1 tracking-[4px]`}
             inputMode="numeric"
             maxLength={6}
             onChange={(event) => sms.setCode(event.target.value)}
-            placeholder={m.pw_code_placeholder()}
+            placeholder={m.security_pw_code_placeholder()}
             value={sms.code}
           />
           <button
@@ -218,8 +218,8 @@ function SetProofFields({ mask, sms }: { mask: string; sms: ReturnType<typeof us
             type="button"
           >
             {sms.countdown > 0
-              ? m.login_code_resend_in({ seconds: sms.countdown })
-              : m.login_code_send()}
+              ? m.security_code_resend_in({ seconds: sms.countdown })
+              : m.security_code_send()}
           </button>
         </div>
       </div>
@@ -231,13 +231,13 @@ function SetProofFields({ mask, sms }: { mask: string; sms: ReturnType<typeof us
 function NoPhoneCard() {
   return (
     <div className="rounded-card border border-[rgba(220,38,38,0.55)] bg-[rgba(127,29,29,0.22)] px-3.5 py-3 text-[12px] leading-[1.8]">
-      <p className="text-danger-text">{m.pw_set_no_phone()}</p>
+      <p className="text-danger-text">{m.security_pw_set_no_phone()}</p>
       <Link
         className="tap-zone text-link font-bold"
         search={{ from: "me" }}
         to="/profile/security/bind-phone"
       >
-        {m.pw_set_go_bind()}
+        {m.security_pw_set_go_bind()}
       </Link>
     </div>
   );

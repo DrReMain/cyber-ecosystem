@@ -23,6 +23,8 @@ const (
 	wechatAuthorizePath = "/connect/oauth2/authorize"
 	wechatExchangeHost  = "https://api.weixin.qq.com"
 	wechatExchangePath  = "/sns/oauth2/access_token"
+	wechatUserinfoPath  = "/sns/userinfo"
+	wechatScope         = "snsapi_userinfo"
 	wechatTimeout       = 5 * time.Second
 )
 
@@ -42,9 +44,17 @@ func (p wechatProvider) clientOrDefault() *http.Client {
 }
 
 type wechatTokenResponse struct {
-	ErrCode int    `json:"errcode"`
-	ErrMsg  string `json:"errmsg"`
-	OpenID  string `json:"openid"`
+	ErrCode     int    `json:"errcode"`
+	ErrMsg      string `json:"errmsg"`
+	OpenID      string `json:"openid"`
+	AccessToken string `json:"access_token"`
+}
+
+type wechatUserinfoResponse struct {
+	ErrCode    int    `json:"errcode"`
+	ErrMsg     string `json:"errmsg"`
+	Nickname   string `json:"nickname"`
+	HeadImgURL string `json:"headimgurl"`
 }
 
 func (wechatProvider) AuthorizeURL(row *conf.Auth_Provider, redirectURI, state string) string {
@@ -52,7 +62,7 @@ func (wechatProvider) AuthorizeURL(row *conf.Auth_Provider, redirectURI, state s
 	q.Set("appid", row.GetWechat().GetAppid())
 	q.Set("redirect_uri", redirectURI)
 	q.Set("response_type", "code")
-	q.Set("scope", "snsapi_base")
+	q.Set("scope", wechatScope)
 	q.Set("state", state)
 	base := row.GetEndpoint()
 	if base == "" {
@@ -107,5 +117,36 @@ func (p wechatProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, p
 		return nil, systempb.ErrorSystemIdentityExchangeFailed("").WithCause(
 			fmt.Errorf("wechat exchange: errcode %d %s", out.ErrCode, out.ErrMsg))
 	}
-	return &exchangedIdentity{Kind: wechatKind, Identifier: out.OpenID}, nil
+	return &exchangedIdentity{Kind: wechatKind, Identifier: out.OpenID, Profile: p.fetchProfile(ctx, base, &out)}, nil
+}
+
+func (p wechatProvider) fetchProfile(ctx context.Context, base string, out *wechatTokenResponse) *wechatProfile {
+	// The userinfo leg is value-add, never load-bearing: the openid already
+	// authenticated the exchange, so a degraded fetch returns nil instead of
+	// failing the login it was decorating.
+	q := url.Values{}
+	q.Set("access_token", out.AccessToken)
+	q.Set("openid", out.OpenID)
+	q.Set("lang", "zh_CN")
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, base+wechatUserinfoPath+"?"+q.Encode(), nil)
+	if err != nil {
+		return nil
+	}
+	resp, err := p.clientOrDefault().Do(req)
+	if err != nil {
+		return nil
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode != http.StatusOK {
+		return nil
+	}
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 64<<10))
+	if err != nil {
+		return nil
+	}
+	info, err := utils.Unmarshal[wechatUserinfoResponse](body)
+	if err != nil || info.ErrCode != 0 || (info.Nickname == "" && info.HeadImgURL == "") {
+		return nil
+	}
+	return &wechatProfile{Nickname: info.Nickname, AvatarURL: info.HeadImgURL}
 }

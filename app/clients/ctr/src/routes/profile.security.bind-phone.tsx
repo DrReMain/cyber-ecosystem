@@ -9,7 +9,7 @@ export const Route = createFileRoute("/profile/security/bind-phone")({
     ...(search.from === "login" || search.from === "guide" ? { from: search.from } : {}),
   }),
   head: () => ({
-    meta: [...noindexHead().meta, { title: pageTitle(m.bind_phone_title()) }],
+    meta: [...noindexHead().meta, { title: pageTitle(m.security_bind_phone_title()) }],
   }),
   component: BindPhonePage,
 });

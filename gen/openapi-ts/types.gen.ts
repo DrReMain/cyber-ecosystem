@@ -841,7 +841,10 @@ export type CyberEsportsV1Member = {
 
 /**
  * One side's confirm-page facts. Identifier-shaped values arrive masked by
- * the system service; clients render, never re-derive.
+ * the system service; clients render, never re-derive. The plain scalars
+ * (user_id, wechat, sessions, unlocked) ride the success-implies-present
+ * carve-out: every preview computes them, so zero means a real zero (no
+ * sessions, no wechat, nothing unlocked) — never "not computed".
  */
 export type CyberEsportsV1MergeAccountSummary = {
     userId?: string;
@@ -1763,6 +1766,10 @@ export type CyberSystemV1BeginBindCredentialRequest = {
 };
 
 export type CyberSystemV1BeginBindCredentialResponse = {
+    /**
+     * Plain, not a wrapper: a successful begin always mints the redirect —
+     * success implies presence.
+     */
     authorizeUrl?: string;
 };
 
@@ -1772,6 +1779,10 @@ export type CyberSystemV1BeginIdentityLoginRequest = {
 };
 
 export type CyberSystemV1BeginIdentityLoginResponse = {
+    /**
+     * Plain, not a wrapper: a successful begin always mints the redirect —
+     * success implies presence.
+     */
     authorizeUrl?: string;
 };
 
@@ -1790,7 +1801,12 @@ export type CyberSystemV1BindCredentialRequest = {
 };
 
 export type CyberSystemV1BindCredentialResponse = {
-    [key: string]: unknown;
+    /**
+     * Same shape as the login response's: binding a wechat identity is the
+     * wizard pill's moment — the openid binds and the nickname/avatar arrive
+     * in the same exchange, so the caller fills the form without a second hop.
+     */
+    wechatProfile?: CyberSystemV1WeChatProfile;
 };
 
 /**
@@ -2268,9 +2284,19 @@ export type CyberSystemV1LoginByIdentityRequest = {
 };
 
 export type CyberSystemV1LoginByIdentityResponse = {
+    /**
+     * Plain, not a wrapper: the call succeeding is the token's presence —
+     * no "succeeded but empty session" shape exists.
+     */
     sessionToken?: string;
     issuedAt?: string;
     expiresAt?: string;
+    /**
+     * The wechat profile when the logged-in identity is wechat and userinfo
+     * came back; the wizard prefills nickname/avatar from it. Absent for every
+     * other identity and for a degraded userinfo fetch alike.
+     */
+    wechatProfile?: CyberSystemV1WeChatProfile;
 };
 
 export type CyberSystemV1LoginRequest = {
@@ -2567,7 +2593,8 @@ export type CyberSystemV1SendBindSmsCodeRequest = {
 export type CyberSystemV1SendBindSmsCodeResponse = {
     /**
      * The one-shot state bound to the calling session; present it at
-     * BindCredential together with the code the phone received.
+     * BindCredential together with the code the phone received. Plain, not a
+     * wrapper: a successful send always mints it — success implies presence.
      */
     state?: string;
 };
@@ -2580,7 +2607,8 @@ export type CyberSystemV1SendSmsCodeRequest = {
 export type CyberSystemV1SendSmsCodeResponse = {
     /**
      * The one-shot state the caller presents at LoginByIdentity — the same
-     * shape Begin mints for redirect flows.
+     * shape Begin mints for redirect flows. Plain, not a wrapper: a
+     * successful send always mints it — success implies presence.
      */
     state?: string;
 };
@@ -2860,6 +2888,19 @@ export type CyberSystemV1WeChatIdentityPayload = {
      * OAuth authorization code from the wechat redirect.
      */
     code?: string;
+};
+
+/**
+ * What the wechat oauth leg learned about the person behind the openid:
+ * the raw nickname and avatar URL as wechat reports them, present only when
+ * the authorize scope was snsapi_userinfo and the userinfo fetch survived
+ * (a failed fetch degrades to absent, never to a failed login). Values are
+ * wechat's own — sanitising to the nickname rules is the consumer's side of
+ * the wire.
+ */
+export type CyberSystemV1WeChatProfile = {
+    nickname?: string;
+    avatarUrl?: string;
 };
 
 export type AgentConfigAdminServiceListAgentConfigsData = {

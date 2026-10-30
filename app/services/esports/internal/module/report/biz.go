@@ -451,6 +451,22 @@ func NewReportUC(logger *slog.Logger, tm shared.Transaction, boardRP RecordBoard
 	return uc
 }
 
+type MergeUC struct {
+	shared.UC
+	systemRP profile.SystemRP // who holds the credential, and the hard-gate verdict
+	boardRP  RecordBoardRP    // the emptiness bar's session facts, this module's own
+	entRP    entitle.EntitlementRP
+}
+
+func NewMergeUC(logger *slog.Logger, tm shared.Transaction, systemRP profile.SystemRP, boardRP RecordBoardRP, entRP entitle.EntitlementRP) *MergeUC {
+	return &MergeUC{
+		UC:       shared.NewUC(logger.With("module", "module/report"), tm),
+		systemRP: systemRP,
+		boardRP:  boardRP,
+		entRP:    entRP,
+	}
+}
+
 // Method --------------------------------------------------------------------------------------------------------------
 
 func (uc *ReportUC) GetReport(ctx context.Context, recordID string) (*Report, error) {
@@ -1066,6 +1082,67 @@ func dedupeBoard(board []BoardEntry) []BoardEntry {
 	return out
 }
 
+func (uc *MergeUC) Preview(ctx context.Context, cred *profile.MergeCredential) (*profile.MergeOffer, error) {
+	// Hosted here, not in profile: the emptiness bar reads this module's
+	// session facts, and report already imports profile + entitle — the
+	// seam back is the profile.MergePreviewer interface. The verdict names
+	// the direction the client must execute.
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("merge preview requires a session"))
+	}
+	sec, err := uc.systemRP.SecurityStatus(ctx)
+	if err != nil {
+		return nil, err
+	}
+	caller, err := uc.summary(ctx, subject.UserID, sec.PhoneMask, sec.Wechat)
+	if err != nil {
+		return nil, err
+	}
+	other, err := uc.systemRP.ResolveCredential(ctx, cred)
+	if err != nil {
+		return nil, err
+	}
+	switch {
+	case other == nil:
+		return &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_FREE, Caller: caller}, nil
+	case other.UserID == subject.UserID:
+		return &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_SELF, Caller: caller, Other: caller}, nil
+	}
+	otherSummary, err := uc.summary(ctx, other.UserID, other.PhoneMask, other.Wechat)
+	if err != nil {
+		return nil, err
+	}
+	// The corpus bar is a data-safety bar: a side may only be absorbed
+	// when it carries no business weight. A doubly empty pair rides the
+	// absorb-other branch — two empty sides have no data to dispute, and
+	// the caller keeps (the seat the user is sitting in); the blocked
+	// shape is reserved for the genuinely both-weighted pair its copy
+	// describes. The system weight gate is direction-aware: it binds the
+	// side being absorbed, never the survivor — a password on the rich
+	// side is its normal attribute.
+	callerEmpty, otherEmpty := mergeEmpty(caller), mergeEmpty(otherSummary)
+	blocked := &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_BLOCKED, Caller: caller, Other: otherSummary}
+	switch {
+	case otherEmpty:
+		// The other side is absorbed: its system weight must pass.
+		if !other.Mergeable {
+			return blocked, nil
+		}
+		return &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_KEEP_CALLER, Caller: caller, Other: otherSummary}, nil
+	case callerEmpty:
+		// The caller is absorbed: a password or a second credential would
+		// fail the merge at the cash. Seat weight stays the executor's own
+		// check — this is UX honesty, not the law.
+		if sec.HasPassword || sec.CredentialCount > 1 {
+			return blocked, nil
+		}
+		return &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_KEEP_OTHER, Caller: caller, Other: otherSummary}, nil
+	default:
+		return blocked, nil
+	}
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func sessionIDOf(rec *Attempt) string {
@@ -1300,6 +1377,26 @@ func (uc *ReportUC) onReportUnlocked(ctx context.Context, e shared.ReportUnlocke
 	}
 }
 
+func (uc *MergeUC) summary(ctx context.Context, userID string, phoneMask *string, wechat bool) (*profile.MergeSummary, error) {
+	sessions, _, _, err := uc.boardRP.SessionCounts(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	window, err := uc.entRP.MembershipWindow(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	unlocked, err := uc.entRP.HasAnyScope(ctx, userID, shared.ScopeReportType)
+	if err != nil {
+		return nil, err
+	}
+	s := &profile.MergeSummary{UserID: userID, PhoneMask: phoneMask, Wechat: wechat, Sessions: sessions, Unlocked: unlocked}
+	if window != nil {
+		s.MemberUntil = window.ExpiresAt
+	}
+	return s, nil
+}
+
 func linesOfSnapshot(abilities []types.AbilitySnapshot) []AbilityLine {
 	out := make([]AbilityLine, 0, len(abilities))
 	for _, a := range abilities {
@@ -1322,102 +1419,6 @@ func snapshotsOf(lines []AbilityLine) []types.AbilitySnapshot {
 		})
 	}
 	return out
-}
-
-// MergeUC ------------------------------------------------------------------------------------------------------------
-
-type MergeUC struct {
-	shared.UC
-	systemRP profile.SystemRP // who holds the credential, and the hard-gate verdict
-	boardRP  RecordBoardRP    // the emptiness bar's session facts, this module's own
-	entRP    entitle.EntitlementRP
-}
-
-func NewMergeUC(logger *slog.Logger, tm shared.Transaction, systemRP profile.SystemRP, boardRP RecordBoardRP, entRP entitle.EntitlementRP) *MergeUC {
-	return &MergeUC{
-		UC:       shared.NewUC(logger.With("module", "module/report_merge"), tm),
-		systemRP: systemRP,
-		boardRP:  boardRP,
-		entRP:    entRP,
-	}
-}
-
-func (uc *MergeUC) Preview(ctx context.Context, cred *profile.MergeCredential) (*profile.MergeOffer, error) {
-	// Hosted here, not in profile: the emptiness bar reads this module's
-	// session facts, and report already imports profile + entitle — the
-	// seam back is the profile.MergePreviewer interface. The verdict names
-	// the direction the client must execute.
-	subject, ok := security.SubjectFromCtx(ctx)
-	if !ok {
-		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("merge preview requires a session"))
-	}
-	sec, err := uc.systemRP.SecurityStatus(ctx)
-	if err != nil {
-		return nil, err
-	}
-	caller, err := uc.summary(ctx, subject.UserID, sec.PhoneMask, sec.Wechat)
-	if err != nil {
-		return nil, err
-	}
-	other, err := uc.systemRP.ResolveCredential(ctx, cred)
-	if err != nil {
-		return nil, err
-	}
-	switch {
-	case other == nil:
-		return &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_FREE, Caller: caller}, nil
-	case other.UserID == subject.UserID:
-		return &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_SELF, Caller: caller, Other: caller}, nil
-	}
-	otherSummary, err := uc.summary(ctx, other.UserID, other.PhoneMask, other.Wechat)
-	if err != nil {
-		return nil, err
-	}
-	// The corpus bar: exactly one side may be empty. Both empty reads as
-	// blocked by the letter of the "exactly one side" rule, both weighted
-	// by the letter of "both sides carry data". The system weight gate is
-	// direction-aware: it binds the side being absorbed, never the
-	// survivor — a password on the rich side is its normal attribute.
-	callerEmpty, otherEmpty := mergeEmpty(caller), mergeEmpty(otherSummary)
-	blocked := &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_BLOCKED, Caller: caller, Other: otherSummary}
-	switch {
-	case otherEmpty && !callerEmpty:
-		// The other side is absorbed: its system weight must pass.
-		if !other.Mergeable {
-			return blocked, nil
-		}
-		return &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_KEEP_CALLER, Caller: caller, Other: otherSummary}, nil
-	case callerEmpty && !otherEmpty:
-		// The caller is absorbed: a password or a second credential would
-		// fail the merge at the cash. Seat weight stays the executor's own
-		// check — this is UX honesty, not the law.
-		if sec.HasPassword || sec.CredentialCount > 1 {
-			return blocked, nil
-		}
-		return &profile.MergeOffer{Status: esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_KEEP_OTHER, Caller: caller, Other: otherSummary}, nil
-	default:
-		return blocked, nil
-	}
-}
-
-func (uc *MergeUC) summary(ctx context.Context, userID string, phoneMask *string, wechat bool) (*profile.MergeSummary, error) {
-	sessions, _, _, err := uc.boardRP.SessionCounts(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	window, err := uc.entRP.MembershipWindow(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	unlocked, err := uc.entRP.HasAnyScope(ctx, userID, shared.ScopeReportType)
-	if err != nil {
-		return nil, err
-	}
-	s := &profile.MergeSummary{UserID: userID, PhoneMask: phoneMask, Wechat: wechat, Sessions: sessions, Unlocked: unlocked}
-	if window != nil {
-		s.MemberUntil = window.ExpiresAt
-	}
-	return s, nil
 }
 
 func mergeEmpty(s *profile.MergeSummary) bool {

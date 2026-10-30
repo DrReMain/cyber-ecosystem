@@ -39,8 +39,9 @@ export function SetupAgePage() {
     }
   }, [profileQuery.data?.profile, ready]);
 
-  // The sex card (D-AN) prefills from the profile read — whenever the
-  // server starts deriving sex from wechat, this prefill lights up.
+  // The sex card (D-AN) prefills from the profile read — the wechat
+  // auto-fill the prototype promised was ruled out (2026-10-30), so the
+  // read stays the only prefill source.
   // The JSON transport delivers the enum as its wire-name string while
   // the generated type claims the enum: the union narrows by typeof,
   // and an absent/null sex collapses to "" which no table row matches.

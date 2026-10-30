@@ -157,4 +157,22 @@ func TestMergePreviewLiveE2E(t *testing.T) {
 	if kept.Other.Sessions != 0 {
 		t.Fatalf("empty other sessions = %d, want 0", kept.Other.Sessions)
 	}
+
+	// The doubly empty pair rides the same absorb-other branch (the
+	// 2026-10-30 live-regression ruling): two empty sides have no data to
+	// dispute, so blocked stays reserved for the genuinely both-weighted
+	// pair its copy describes.
+	if _, err := db.MatchSession.Delete().Where(entmatchsession.UserIDEQ(mergeE2ECaller)).Exec(bare); err != nil {
+		t.Fatalf("clear caller weight: %v", err)
+	}
+	if _, err := db.TestRecord.Delete().Where(enttestrecord.UserIDEQ(mergeE2ECaller)).Exec(bare); err != nil {
+		t.Fatalf("clear caller records: %v", err)
+	}
+	doubly, err := mergeUC.Preview(callerCtx, &profile.MergeCredential{Phone: &maskC})
+	if err != nil {
+		t.Fatalf("preview doubly-empty: %v", err)
+	}
+	if doubly.Status != esportspb.MergePreviewStatus_MERGE_PREVIEW_STATUS_KEEP_CALLER {
+		t.Fatalf("doubly-empty preview = %v, want KEEP_CALLER", doubly.Status)
+	}
 }

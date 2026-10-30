@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { systemReason } from "#/domains/error";
+import { parkWechatProfile } from "#/features/app/wechat-profile";
 import { m } from "#/paraglide/messages";
 import { routeAfterLogin } from "./after-login";
 import { wechatLoginFn } from "./wechat.fn";
@@ -39,6 +40,9 @@ export function WechatCallbackPage() {
         if (res.status === "rejected") {
           setServerReason(res.reason);
           return;
+        }
+        if (res.wechatProfile != null) {
+          parkWechatProfile(res.wechatProfile);
         }
         return routeAfterLogin({ navigate, queryClient, transport }, search.next);
       })

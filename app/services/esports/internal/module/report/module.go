@@ -7,10 +7,10 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
+	NewMergeUC,
 	NewReportUC,
 	NewRecordBoardRP,
 	NewSnapshotRP,
 	NewReportService,
-	NewMergeUC,
 	wire.Bind(new(profile.MergePreviewer), new(*MergeUC)),
 )

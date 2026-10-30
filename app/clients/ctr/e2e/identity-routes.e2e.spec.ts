@@ -27,6 +27,12 @@ const REDIS = "docker exec cyber-ecosystem-redis-1 redis-cli --raw";
 const WX_PORT = 18443;
 const WX_OPENID = "e2epwwxopenid0001";
 const WX_CODE = "e2e-wx-code";
+// Emoji-decorated and one code point over the cap: the prefill must strip
+// and truncate it into a submittable nickname, exactly the ruling's
+// truncate-and-strip shape.
+const WX_NICKNAME_RAW = "🎮e2e微信少年郎12345";
+const WX_NICKNAME_CLEAN = "e2e微信少年郎1234";
+const WX_AVATAR = "https://qlogo.cn/e2e-pw-avatar.png";
 
 async function api(path: string, body: unknown, cookie?: string) {
   const res = await fetch(`${SYSTEM_HTTP}${path}`, {
@@ -70,9 +76,12 @@ function eraseMember(match: { byAccount?: string; byPhone?: string; byOpenid?: s
 }
 
 // The three onboarding steps every born member walks before any guarded
-// page lets them through.
-async function walkWizard(page: Page) {
-  await page.getByPlaceholder(/请输入昵称/).fill(`三路${Date.now() % 1000}`);
+// page lets them through. keepNickname skips the fill so a wechat prefill
+// under test rides through untouched.
+async function walkWizard(page: Page, opts?: { keepNickname?: boolean }) {
+  if (!opts?.keepNickname) {
+    await page.getByPlaceholder(/请输入昵称/).fill(`三路${Date.now() % 1000}`);
+  }
   await page.getByRole("button", { name: "下一步" }).click();
   await page.getByText("男", { exact: true }).click();
   const selects = page.getByRole("combobox");
@@ -114,6 +123,12 @@ const wxServer = createServer((req, res) => {
       return;
     }
     res.end(`{"access_token":"t","openid":"${WX_OPENID}","errcode":0}`);
+    return;
+  }
+  if (url.pathname === "/sns/userinfo") {
+    res.end(
+      `{"nickname":${JSON.stringify(WX_NICKNAME_RAW)},"headimgurl":"${WX_AVATAR}","errcode":0}`,
+    );
     return;
   }
   res.statusCode = 404;
@@ -198,7 +213,17 @@ test.describe("wechat leg", () => {
       await page.getByRole("button", { name: "微信授权登录" }).click();
       // The hop leaves for the stand-in, which bounces straight back to the
       // client callback; the login lands on the born member's wizard.
-      await page.waitForURL("**/profile/setup/**", { timeout: 15_000 });
+      await page.waitForURL("**/profile/setup/nickname", { timeout: 15_000 });
+      // The userinfo leg's person arrives with the login: the raw nickname
+      // is emoji-decorated and over cap, so the step prefill must show the
+      // stripped-and-truncated form plus the amber adjustment note, and no
+      // pill — this identity already carried its profile.
+      const prefilled = page.getByLabel("昵称");
+      await expect(prefilled).toHaveValue(WX_NICKNAME_CLEAN);
+      await expect(page.getByText("已从微信授权带出昵称与头像")).toBeVisible();
+      await expect(page.getByText(/已自动调整为/)).toBeVisible();
+      await expect(page.getByRole("button", { name: "获取微信昵称" })).toHaveCount(0);
+      await walkWizard(page, { keepNickname: true });
 
       const seat = sql(
         "system",
@@ -206,8 +231,69 @@ test.describe("wechat leg", () => {
           ` WHERE c.kind='wechat_mp' AND c.identifier='${WX_OPENID}'`,
       );
       expect(memberChainOk(seat), `wechat member chain: [${seat}]`).toBeTruthy();
+      // The avatar lands with the nickname in the same wizard write — the
+      // OAuth moment was the only chance to learn it.
+      const memberId = sql("system", `SELECT id FROM "user" WHERE account='${chainAccount(seat)}'`);
+      const stored = sql(
+        "esports",
+        `SELECT nickname || '|' || avatar_url FROM profile WHERE user_id='${memberId}'`,
+      );
+      expect(stored, "profile row carries the prefill verbatim").toBe(
+        `${WX_NICKNAME_CLEAN}|${WX_AVATAR}`,
+      );
     } finally {
       eraseMember({ byOpenid: WX_OPENID });
+    }
+  });
+
+  test("wizard pill: sms member binds wechat and the nickname arrives with it", async ({
+    page,
+  }) => {
+    test.skip(
+      !(await wechatSeamWired()),
+      `stack must boot with APP_WECHAT_ENDPOINT=http://127.0.0.1:${WX_PORT}`,
+    );
+    const phone = `139${((Date.now() + 7) % 1e8).toString().padStart(8, "0")}`;
+    try {
+      // An sms-born member stands on the nickname step; the pill shows
+      // because wechat's UA is present and nothing was carried in.
+      await page.goto("/login");
+      await page.waitForLoadState("networkidle");
+      await page.waitForTimeout(1_000);
+      await page.getByPlaceholder("手机号").fill(phone);
+      await agreeAll(page);
+      await page.getByRole("button", { name: "发送验证码" }).click();
+      const code = execSync(`${REDIS} GET auth:web:sms-code:${phone}`).toString().trim();
+      expect(code).toMatch(/^\d{6}$/);
+      await page.getByPlaceholder("6 位验证码").fill(code);
+      await page.getByRole("button", { name: "登录 / 注册" }).click();
+      await page.waitForURL("**/profile/setup/nickname", { timeout: 15_000 });
+      const pill = page.getByRole("button", { name: "获取微信昵称" });
+      await expect(pill).toBeVisible();
+
+      // The pill opens the bind leg: the same stand-in hop, but landing on
+      // the wizard's own callback — one exchange both binds the openid and
+      // carries the person back. The value assertion retries through the
+      // hop-and-return navigation.
+      await pill.click();
+      await expect(page.getByLabel("昵称")).toHaveValue(WX_NICKNAME_CLEAN, { timeout: 20_000 });
+      await expect(page.getByText("已从微信授权带出昵称与头像")).toBeVisible();
+      await walkWizard(page, { keepNickname: true });
+
+      const smsOwner = sql(
+        "system",
+        `SELECT user_id FROM credential WHERE kind='sms' AND identifier='${phone}'`,
+      );
+      const bound = sql(
+        "system",
+        `SELECT user_id FROM credential WHERE kind='wechat_mp' AND identifier='${WX_OPENID}'`,
+      );
+      expect(bound, "the pill bound the openid to the sms member").toBe(smsOwner);
+    } finally {
+      eraseMember({ byPhone: phone });
+      execSync(
+        `${REDIS} DEL auth:web:sms-code:${phone} auth:sms:send-daily:${phone} rate:auth:sms:send-window:${phone}`,
+      );
     }
   });
 });

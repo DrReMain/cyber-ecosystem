@@ -337,8 +337,10 @@ func TestFailedSendInvalidatesPriorCode(t *testing.T) {
 	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000"); !errors.Is(err, sms.ErrChannelRejected) {
 		t.Fatalf("failed resend: %v", err)
 	}
-	if cur := string(trp.vals[smsCodePrefix+"13800138000"]); cur == first {
-		t.Fatal("a failed send left the prior code armed")
+	// The burn is total: a refused send leaves neither the prior code
+	// nor the fresh ghost armed.
+	if cur, ok := trp.vals[smsCodePrefix+"13800138000"]; ok {
+		t.Fatalf("a refused send left a code armed: %q", cur)
 	}
 
 	// The overwritten code no longer exchanges — one live code per phone.

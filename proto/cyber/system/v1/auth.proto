@@ -8,6 +8,7 @@ import "ext/v1/access.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 
@@ -215,10 +216,27 @@ message SmsIdentityPayload {
   ];
 }
 
+// What the wechat oauth leg learned about the person behind the openid:
+// the raw nickname and avatar URL as wechat reports them, present only when
+// the authorize scope was snsapi_userinfo and the userinfo fetch survived
+// (a failed fetch degrades to absent, never to a failed login). Values are
+// wechat's own — sanitising to the nickname rules is the consumer's side of
+// the wire.
+message WeChatProfile {
+  google.protobuf.StringValue nickname = 1;
+  google.protobuf.StringValue avatar_url = 2;
+}
+
 message LoginByIdentityResponse {
+  // Plain, not a wrapper: the call succeeding is the token's presence —
+  // no "succeeded but empty session" shape exists.
   string session_token = 1;
   google.protobuf.Timestamp issued_at = 2;
   google.protobuf.Timestamp expires_at = 3;
+  // The wechat profile when the logged-in identity is wechat and userinfo
+  // came back; the wizard prefills nickname/avatar from it. Absent for every
+  // other identity and for a degraded userinfo fetch alike.
+  optional WeChatProfile wechat_profile = 4;
 }
 
 message BeginIdentityLoginRequest {
@@ -235,6 +253,8 @@ message BeginIdentityLoginRequest {
 }
 
 message BeginIdentityLoginResponse {
+  // Plain, not a wrapper: a successful begin always mints the redirect —
+  // success implies presence.
   string authorize_url = 1;
 }
 
@@ -252,7 +272,8 @@ message SendSmsCodeRequest {
 
 message SendSmsCodeResponse {
   // The one-shot state the caller presents at LoginByIdentity — the same
-  // shape Begin mints for redirect flows.
+  // shape Begin mints for redirect flows. Plain, not a wrapper: a
+  // successful send always mints it — success implies presence.
   string state = 1;
 }
 
@@ -279,7 +300,12 @@ message BindCredentialRequest {
   ];
 }
 
-message BindCredentialResponse {}
+message BindCredentialResponse {
+  // Same shape as the login response's: binding a wechat identity is the
+  // wizard pill's moment — the openid binds and the nickname/avatar arrive
+  // in the same exchange, so the caller fills the form without a second hop.
+  optional WeChatProfile wechat_profile = 1;
+}
 
 message BeginBindCredentialRequest {
   optional string provider = 1 [
@@ -295,6 +321,8 @@ message BeginBindCredentialRequest {
 }
 
 message BeginBindCredentialResponse {
+  // Plain, not a wrapper: a successful begin always mints the redirect —
+  // success implies presence.
   string authorize_url = 1;
 }
 
@@ -312,7 +340,8 @@ message SendBindSmsCodeRequest {
 
 message SendBindSmsCodeResponse {
   // The one-shot state bound to the calling session; present it at
-  // BindCredential together with the code the phone received.
+  // BindCredential together with the code the phone received. Plain, not a
+  // wrapper: a successful send always mints it — success implies presence.
   string state = 1;
 }
 

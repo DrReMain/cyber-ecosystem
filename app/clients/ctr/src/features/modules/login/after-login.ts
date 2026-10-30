@@ -30,7 +30,7 @@ function isSafeNext(value: string): boolean {
   return value.startsWith("/") && !value.startsWith("//");
 }
 
-// The corpus's post-login bind prompt (02b's "after login, first time,
+// The corpus's post-login bind prompt ("after login, first time,
 // skippable"): once per account, a wechat-born member without a phone is
 // walked to the bind-phone page; a phone-born member in the wechat browser
 // without a wechat, to bind-wechat. Skip marks itself — the flag is the

@@ -19,9 +19,9 @@ type Preview = { offer: MergeOfferDTO } | null;
 
 function entryLabelOf(from: string | undefined): string {
   if (from === "login") {
-    return m.bind_entry_login();
+    return m.security_bind_entry_login();
   }
-  return from === "guide" ? m.bind_entry_guide() : m.bind_entry_me();
+  return from === "guide" ? m.security_bind_entry_guide() : m.security_bind_entry_me();
 }
 
 // An offer that names a direction (either side empty) is the mergeable
@@ -36,10 +36,10 @@ function actionableOffer(preview: Preview): MergeOfferDTO | null {
 }
 
 function conflictCtaLabel(offer: MergeOfferDTO): string {
-  return offer.status === "BLOCKED" ? m.bind_phone_blocked_cta() : m.bind_phone_merge_cta();
+  return offer.status === "BLOCKED" ? m.security_bind_phone_blocked_cta() : m.security_bind_phone_merge_cta();
 }
 
-// Prototype 31: bind a phone to a wechat-born account. The preview runs
+// Bind a phone to a wechat-born account. The preview runs
 // before any SMS is spent — an occupied phone answers with the conflict
 // card (no send, per the prototype's "no code needed" law), and an
 // empty-owner conflict upgrades into the merge offer instead.
@@ -74,7 +74,7 @@ export function BindPhonePage() {
         return;
       }
       if (res.offer.status === "SELF") {
-        toast.info(m.bind_phone_self());
+        toast.info(m.security_bind_phone_self());
         setPreview(null);
         return;
       }
@@ -89,7 +89,7 @@ export function BindPhonePage() {
   async function onSubmit() {
     const verdict = await bind.submit();
     if (verdict === "ok") {
-      toast.success(m.bind_phone_done());
+      toast.success(m.security_bind_phone_done());
       await queryClient.invalidateQueries();
       await navigate({ to: doneTo, viewTransition: false });
     }
@@ -101,34 +101,34 @@ export function BindPhonePage() {
     <AmbientLayout>
       <FlowHeader
         onBack={() => void navigate({ to: "/profile/security" })}
-        title={m.bind_phone_title()}
+        title={m.security_bind_phone_title()}
       />
       <div className="flex w-full flex-col gap-3.5 pt-3">
         <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-5">
-          <div className="text-ink text-base font-extrabold">{m.bind_phone_title()}</div>
+          <div className="text-ink text-base font-extrabold">{m.security_bind_phone_title()}</div>
           <div className="text-ink-secondary mt-2 text-[12.5px] leading-[1.8]">
-            {m.bind_phone_pitch()}
+            {m.security_bind_phone_pitch()}
           </div>
         </div>
 
         <input
-          aria-label={m.login_phone_label()}
+          aria-label={m.security_phone_label()}
           className={bind.phoneErr ? badInputClass : inputClass}
           inputMode="numeric"
           maxLength={11}
           onBlur={bind.blurPhone}
           onChange={(event) => bind.setPhone(event.target.value)}
-          placeholder={m.bind_phone_placeholder()}
+          placeholder={m.security_bind_phone_placeholder()}
           value={bind.phone}
         />
         <div className="flex items-stretch gap-3">
           <input
-            aria-label={m.login_code_label()}
+            aria-label={m.security_code_label()}
             className={`${bind.codeErr ? badInputClass : inputClass} flex-1 tracking-[4px]`}
             inputMode="numeric"
             maxLength={6}
             onChange={(event) => bind.setCode(event.target.value)}
-            placeholder={m.bind_phone_code_placeholder()}
+            placeholder={m.security_bind_phone_code_placeholder()}
             value={bind.code}
           />
           <button
@@ -140,10 +140,10 @@ export function BindPhonePage() {
             type="button"
           >
             {bind.countdown > 0
-              ? m.login_code_resend_in({ seconds: bind.countdown })
+              ? m.security_code_resend_in({ seconds: bind.countdown })
               : checking
-                ? m.bind_phone_checking()
-                : m.login_code_send()}
+                ? m.security_bind_phone_checking()
+                : m.security_code_send()}
           </button>
         </div>
 
@@ -151,18 +151,18 @@ export function BindPhonePage() {
           <p className="text-danger-text text-[11.5px]">{m.error_SYSTEM_SMS_RATE_LIMITED()}</p>
         ) : null}
         {bind.codeErr ? (
-          <p className="text-danger-text text-[11.5px]">{m.bind_phone_code_err()}</p>
+          <p className="text-danger-text text-[11.5px]">{m.security_bind_phone_code_err()}</p>
         ) : null}
         {previewFailed ? (
-          <p className="text-danger-text text-[11.5px]">{m.bind_phone_preview_failed()}</p>
+          <p className="text-danger-text text-[11.5px]">{m.security_bind_phone_preview_failed()}</p>
         ) : null}
 
         {preview !== null ? (
           <div className="border-line-accent-blue bg-identity rounded-card border px-3.5 py-3">
             <p className="text-danger-text text-[12px] leading-[1.8]">
-              <b>{m.bind_phone_conflict_head()}</b>
+              <b>{m.security_bind_phone_conflict_head()}</b>
               <br />
-              {m.bind_phone_conflict_body()}
+              {m.security_bind_phone_conflict_body()}
             </p>
             {conflict !== null ? (
               <button
@@ -180,7 +180,7 @@ export function BindPhonePage() {
         ) : null}
 
         <div className="text-ink-tertiary text-[11.5px] leading-[1.8]">
-          {m.bind_phone_entry_line({ entry: entryLabelOf(from) })}
+          {m.security_bind_phone_entry_line({ entry: entryLabelOf(from) })}
         </div>
         <button
           className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50"
@@ -188,17 +188,17 @@ export function BindPhonePage() {
           onClick={() => void onSubmit()}
           type="button"
         >
-          {m.bind_phone_submit()}
+          {m.security_bind_phone_submit()}
         </button>
         <button
           className="border-line text-ink-secondary bg-surface-input rounded-control border-[1.5px] px-4 py-3.5 text-[15px] font-medium active:opacity-60"
           onClick={() => {
-            toast.info(m.bind_phone_skipped());
+            toast.info(m.security_bind_phone_skipped());
             void navigate({ to: doneTo, viewTransition: false });
           }}
           type="button"
         >
-          {m.bind_phone_skip()}
+          {m.security_bind_phone_skip()}
         </button>
       </div>
     </AmbientLayout>

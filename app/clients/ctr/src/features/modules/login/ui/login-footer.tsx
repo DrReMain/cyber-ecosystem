@@ -24,11 +24,11 @@ export function LoginFooter() {
         </Link>
       </div>
       <div className="text-ink-tertiary text-center text-[10.5px] leading-[1.95]">
-        {m.login_footer_company()}
+        {m.common_footer_company()}
         {` · `}
-        {m.login_footer_icp()}
+        {m.common_footer_icp()}
         <br />
-        {m.login_footer_email()}
+        {m.common_footer_email()}
       </div>
     </>
   );

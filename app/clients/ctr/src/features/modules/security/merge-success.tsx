@@ -3,8 +3,8 @@ import { Check } from "lucide-react";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
 
-// block3 account-merge-success: the closing screen says what moved and
-// where to check it — static copy, no state of its own.
+// The account-merge closing screen: it says what moved and where to check
+// it — static copy, no state of its own.
 export function MergeSuccessPage() {
   const navigate = useNavigate();
   return (
@@ -14,23 +14,23 @@ export function MergeSuccessPage() {
           <Check aria-hidden className="text-white" size={34} strokeWidth={3} />
         </span>
         <div className="text-center">
-          <div className="text-ink text-[21px] font-extrabold">{m.merge_success_title()}</div>
+          <div className="text-ink text-[21px] font-extrabold">{m.security_merge_success_title()}</div>
           <p className="text-ink-secondary mt-1.5 text-center text-[12px] leading-[1.7]">
-            {m.merge_success_body()}
+            {m.security_merge_success_body()}
           </p>
         </div>
         <div className="border-line-accent-blue bg-identity rounded-card w-full border px-4 py-2">
-          <CheckRow text={m.merge_success_line_credential()} />
-          <CheckRow text={m.merge_success_line_history()} />
+          <CheckRow text={m.security_merge_success_line_credential()} />
+          <CheckRow text={m.security_merge_success_line_history()} />
         </div>
         <button
           className="bg-cta-primary shadow-cta-primary rounded-control w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-60"
           onClick={() => void navigate({ to: "/profile", viewTransition: false })}
           type="button"
         >
-          {m.merge_success_cta()}
+          {m.security_merge_success_cta()}
         </button>
-        <div className="text-ink-tertiary text-center text-[11px]">{m.merge_success_note()}</div>
+        <div className="text-ink-tertiary text-center text-[11px]">{m.security_merge_success_note()}</div>
       </div>
     </AmbientLayout>
   );

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "#/config";
 import { noindexHead } from "#/domains/seo";
-import { MergeBindCallbackPage } from "#/features/modules/security/merge-callbacks";
+import { MergeBindCallbackPage } from "#/features/modules/security/merge-bind-callback";
 import { m } from "#/paraglide/messages";
 
 export const Route = createFileRoute("/profile/security/merge/bind-callback")({
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/profile/security/merge/bind-callback")({
     ...(typeof search.state === "string" ? { state: search.state } : {}),
   }),
   head: () => ({
-    meta: [...noindexHead().meta, { title: pageTitle(m.merge_pending()) }],
+    meta: [...noindexHead().meta, { title: pageTitle(m.security_merge_pending()) }],
   }),
   component: MergeBindCallbackPage,
 });

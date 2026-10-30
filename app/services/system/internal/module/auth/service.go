@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 	"github.com/go-kratos/kratos/v3/transport/http"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	connecttransport "cyber-ecosystem/shared-go/kratos/transport/connect"
 	"cyber-ecosystem/shared-go/utils"
@@ -58,14 +59,15 @@ func (s *AuthService) Login(ctx context.Context, in *systempb.LoginRequest) (*sy
 }
 
 func (s *AuthService) LoginByIdentity(ctx context.Context, in *systempb.LoginByIdentityRequest) (*systempb.LoginByIdentityResponse, error) {
-	token, issuedAt, expiresAt, err := s.authUC.LoginByIdentity(ctx, in.GetProvider(), in.GetState(), in)
+	token, issuedAt, expiresAt, profile, err := s.authUC.LoginByIdentity(ctx, in.GetProvider(), in.GetState(), in)
 	if err != nil {
 		return nil, err
 	}
 	return &systempb.LoginByIdentityResponse{
-		SessionToken: token,
-		IssuedAt:     utils.ToTimestamp(&issuedAt),
-		ExpiresAt:    utils.ToTimestamp(&expiresAt),
+		SessionToken:  token,
+		IssuedAt:      utils.ToTimestamp(&issuedAt),
+		ExpiresAt:     utils.ToTimestamp(&expiresAt),
+		WechatProfile: toWireWechatProfile(profile),
 	}, nil
 }
 
@@ -86,10 +88,11 @@ func (s *AuthService) SendSmsCode(ctx context.Context, in *systempb.SendSmsCodeR
 }
 
 func (s *AuthService) BindCredential(ctx context.Context, in *systempb.BindCredentialRequest) (*systempb.BindCredentialResponse, error) {
-	if err := s.authUC.BindCredential(ctx, in.GetProvider(), in.GetState(), in); err != nil {
+	profile, err := s.authUC.BindCredential(ctx, in.GetProvider(), in.GetState(), in)
+	if err != nil {
 		return nil, err
 	}
-	return &systempb.BindCredentialResponse{}, nil
+	return &systempb.BindCredentialResponse{WechatProfile: toWireWechatProfile(profile)}, nil
 }
 
 func (s *AuthService) BeginBindCredential(ctx context.Context, in *systempb.BeginBindCredentialRequest) (*systempb.BeginBindCredentialResponse, error) {
@@ -182,4 +185,14 @@ func (s *AuthService) GetCurrentUser(ctx context.Context, in *systempb.GetCurren
 
 func mapSecurityCredential(c *SecurityCredential) *systempb.SecurityCredential {
 	return &systempb.SecurityCredential{Kind: c.Kind, MaskedIdentifier: c.Identifier}
+}
+
+func toWireWechatProfile(p *wechatProfile) *systempb.WeChatProfile {
+	if p == nil {
+		return nil
+	}
+	return &systempb.WeChatProfile{
+		Nickname:  wrapperspb.String(p.Nickname),
+		AvatarUrl: wrapperspb.String(p.AvatarURL),
+	}
 }

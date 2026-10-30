@@ -365,7 +365,8 @@ const fakeKind = "fakekind"
 
 func testProviders() map[string]IdentityProvider {
 	return map[string]IdentityProvider{
-		fakeKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: fakeKind, Identifier: "oid-x"}},
+		fakeKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: fakeKind, Identifier: "oid-x",
+			Profile: &wechatProfile{Nickname: "昵称", AvatarURL: "https://qlogo.cn/a.png"}}},
 		// The resolve phone branch never exchanges; the row only has to
 		// carry the channel kind the branch guards on.
 		smsKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: smsKind, Identifier: "13900001111"}},
@@ -1127,7 +1128,7 @@ func TestLoginByIdentityMintsFromSeat(t *testing.T) {
 		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 	state := issueState(t, trp, "fake")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state))
 	if err != nil {
 		t.Fatalf("login-by-identity: %v", err)
 	}
@@ -1137,6 +1138,24 @@ func TestLoginByIdentityMintsFromSeat(t *testing.T) {
 	}
 	if sess.UserID != "u9" || sess.TenantID != "t1" || sess.Population != security.DefaultPopulation {
 		t.Fatalf("mint: session = %+v, want the seat's t1/%s for u9", sess, security.DefaultPopulation)
+	}
+}
+
+// The person behind the identity rides the login's return verbatim — the
+// wizard's nickname prefill source — without touching the session mint.
+func TestLoginByIdentityCarriesProfile(t *testing.T) {
+	trp := newTokenStore()
+	uf := boundUser(t, []*user.Seat{{UserID: "u9", TenantID: "t1", Population: security.DefaultPopulation}})
+	uc := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, trp,
+		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+	state := issueState(t, trp, "fake")
+
+	_, _, _, profile, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state))
+	if err != nil {
+		t.Fatalf("login-by-identity: %v", err)
+	}
+	if profile == nil || profile.Nickname != "昵称" || profile.AvatarURL != "https://qlogo.cn/a.png" {
+		t.Fatalf("profile = %+v, want the exchange's person verbatim", profile)
 	}
 }
 
@@ -1150,7 +1169,7 @@ func TestLoginByIdentityStateLaws(t *testing.T) {
 	uc, trp := identityUC(t, uf)
 
 	before := fakeExchanges
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", "st-missing", identityReq("fake", "st-missing")); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", "st-missing", identityReq("fake", "st-missing")); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("missing state: want EXCHANGE_FAILED, got %v", err)
 	}
 	if fakeExchanges != before {
@@ -1159,7 +1178,7 @@ func TestLoginByIdentityStateLaws(t *testing.T) {
 
 	other := issueState(t, trp, "failing")
 	before = fakeExchanges
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", other, identityReq("fake", other)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", other, identityReq("fake", other)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("foreign state: want EXCHANGE_FAILED, got %v", err)
 	}
 	if fakeExchanges != before {
@@ -1167,10 +1186,10 @@ func TestLoginByIdentityStateLaws(t *testing.T) {
 	}
 
 	state := issueState(t, trp, "fake")
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); err != nil {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); err != nil {
 		t.Fatalf("first cash: %v", err)
 	}
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("second cash: want EXCHANGE_FAILED (single use), got %v", err)
 	}
 }
@@ -1218,7 +1237,7 @@ func TestLoginByIdentityUnknownProvider(t *testing.T) {
 	uc, _ := identityUC(t, &fakeUserRP{})
 
 	for _, key := range []string{"ghost", "off"} {
-		if _, _, _, err := uc.LoginByIdentity(context.Background(), key, "st-x", identityReq(key, "st-x")); !systempb.IsSystemIdentityProviderUnknown(err) {
+		if _, _, _, _, err := uc.LoginByIdentity(context.Background(), key, "st-x", identityReq(key, "st-x")); !systempb.IsSystemIdentityProviderUnknown(err) {
 			t.Fatalf("provider %q: want PROVIDER_UNKNOWN, got %v", key, err)
 		}
 	}
@@ -1230,7 +1249,7 @@ func TestLoginByIdentityUnboundFailsAsExchange(t *testing.T) {
 	uc, trp := identityUC(t, &fakeUserRP{})
 	state := issueState(t, trp, "fake")
 
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("unbound: want EXCHANGE_FAILED, got %v", err)
 	}
 }
@@ -1245,7 +1264,7 @@ func TestLoginByIdentityAutoRegisterBirthsMember(t *testing.T) {
 	uc, trp := autoUC(t, uf)
 	state := issueState(t, trp, "auto")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
 	if err != nil {
 		t.Fatalf("auto-register: %v", err)
 	}
@@ -1289,7 +1308,7 @@ func TestLoginByIdentityUnboundBirthsFresh(t *testing.T) {
 	uc, trp := autoUC(t, uf)
 	state := issueState(t, trp, "auto")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
 	if err != nil {
 		t.Fatalf("unbound re-login: %v", err)
 	}
@@ -1317,7 +1336,7 @@ func TestLoginByIdentityExchangeFailureSurfaces(t *testing.T) {
 	uc, trp := identityUC(t, &fakeUserRP{})
 	state := issueState(t, trp, "failing")
 
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "failing", state, identityReq("failing", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "failing", state, identityReq("failing", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("exchange failure: want EXCHANGE_FAILED, got %v", err)
 	}
 }
@@ -1337,7 +1356,7 @@ func TestLoginByIdentityPicksProviderSeat(t *testing.T) {
 	}}, uf, &fakeAuthzRP{}, trp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 	state := issueState(t, trp, "auto")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
 	if err != nil {
 		t.Fatalf("directed seat: %v", err)
 	}
@@ -1361,7 +1380,7 @@ func TestLoginByIdentityEnsuresSeatForBoundIdentity(t *testing.T) {
 	}}, uf, &fakeAuthzRP{}, trp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 	state := issueState(t, trp, "auto")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
 	if err != nil {
 		t.Fatalf("bound entry: %v", err)
 	}
@@ -1389,7 +1408,7 @@ func TestLoginByIdentityUnknownPopulation(t *testing.T) {
 	state := issueState(t, trp, "auto")
 
 	before := fakeExchanges
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state)); !systempb.IsSystemPopulationNotFound(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state)); !systempb.IsSystemPopulationNotFound(err) {
 		t.Fatalf("unknown population: want POPULATION_NOT_FOUND, got %v", err)
 	}
 	if fakeExchanges != before || len(uf.createdCreds) != 0 {
@@ -1414,7 +1433,7 @@ func TestBindCredentialLaws(t *testing.T) {
 	uf := &fakeUserRP{}
 	uc, trp := identityUC(t, uf)
 	before := fakeExchanges
-	if err := uc.BindCredential(ctx, "fake", "st-missing", newReq("st-missing")); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, err := uc.BindCredential(ctx, "fake", "st-missing", newReq("st-missing")); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("stateless bind: want EXCHANGE_FAILED, got %v", err)
 	}
 	if fakeExchanges != before || len(uf.createdCreds) != 0 {
@@ -1426,7 +1445,7 @@ func TestBindCredentialLaws(t *testing.T) {
 	// exchange, before any provider call.
 	anon := issueState(t, trp, "fake")
 	before = fakeExchanges
-	if err := uc.BindCredential(ctx, "fake", anon, newReq(anon)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, err := uc.BindCredential(ctx, "fake", anon, newReq(anon)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("anonymous state: want EXCHANGE_FAILED, got %v", err)
 	}
 	if fakeExchanges != before || len(uf.createdCreds) != 0 {
@@ -1434,7 +1453,7 @@ func TestBindCredentialLaws(t *testing.T) {
 	}
 	foreign := issueBoundState(t, trp, "fake", "u9")
 	before = fakeExchanges
-	if err := uc.BindCredential(ctx, "fake", foreign, newReq(foreign)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, err := uc.BindCredential(ctx, "fake", foreign, newReq(foreign)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("foreign state: want EXCHANGE_FAILED, got %v", err)
 	}
 	if fakeExchanges != before || len(uf.createdCreds) != 0 {
@@ -1442,7 +1461,7 @@ func TestBindCredentialLaws(t *testing.T) {
 	}
 
 	state := issueBoundState(t, trp, "fake", "u1")
-	if err := uc.BindCredential(ctx, "fake", state, newReq(state)); err != nil {
+	if _, err := uc.BindCredential(ctx, "fake", state, newReq(state)); err != nil {
 		t.Fatalf("bind: %v", err)
 	}
 	if len(uf.createdCreds) != 1 || uf.createdCreds[0].UserID != "u1" {
@@ -1452,7 +1471,8 @@ func TestBindCredentialLaws(t *testing.T) {
 	bind := func(uf *fakeUserRP) error {
 		uc, trp := identityUC(t, uf)
 		state := issueBoundState(t, trp, "fake", "u1")
-		return uc.BindCredential(ctx, "fake", state, newReq(state))
+		_, err := uc.BindCredential(ctx, "fake", state, newReq(state))
+		return err
 	}
 	same := &fakeUserRP{credentials: map[string]*user.Credential{
 		fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u1"},
@@ -1478,7 +1498,7 @@ func TestBindCredentialLaws(t *testing.T) {
 
 	noUC, noTrp := identityUC(t, &fakeUserRP{})
 	noState := issueBoundState(t, noTrp, "fake", "u1")
-	if err := noUC.BindCredential(context.Background(), "fake", noState, newReq(noState)); !errorspb.IsGeneralErrorUnauthenticated(err) {
+	if _, err := noUC.BindCredential(context.Background(), "fake", noState, newReq(noState)); !errorspb.IsGeneralErrorUnauthenticated(err) {
 		t.Fatalf("no session: want 401, got %v", err)
 	}
 }
@@ -1875,7 +1895,7 @@ func TestLoginByIdentityStateCashInfraPassthrough(t *testing.T) {
 	state := issueState(t, trp, "fake")
 	trp.getErr = errorspb.ErrorInfraErrorNetworkConnection("")
 
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !errorspb.IsInfraErrorNetworkConnection(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !errorspb.IsInfraErrorNetworkConnection(err) {
 		t.Fatalf("cash outage: want infra passthrough, got %v", err)
 	}
 }

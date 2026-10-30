@@ -284,7 +284,10 @@ func (x *WeChatMergeProof) GetCode() string {
 }
 
 // One side's confirm-page facts. Identifier-shaped values arrive masked by
-// the system service; clients render, never re-derive.
+// the system service; clients render, never re-derive. The plain scalars
+// (user_id, wechat, sessions, unlocked) ride the success-implies-present
+// carve-out: every preview computes them, so zero means a real zero (no
+// sessions, no wechat, nothing unlocked) — never "not computed".
 type MergeAccountSummary struct {
 	state  protoimpl.MessageState `protogen:"open.v1"`
 	UserId string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`

@@ -38,12 +38,12 @@ export function useSmsCode(seedPhone = "") {
         toast.error(
           res.reason === "SYSTEM_SMS_RATE_LIMITED"
             ? m.error_SYSTEM_SMS_RATE_LIMITED()
-            : m.login_error_generic(),
+            : m.security_error_generic(),
         );
         return;
       }
       setState(res.state);
-      toast.success(m.login_code_sent());
+      toast.success(m.security_code_sent());
       setCountdown(60);
     } catch {
       setFailed(true);

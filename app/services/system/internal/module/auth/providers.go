@@ -24,6 +24,16 @@ type smsPayload interface {
 type exchangedIdentity struct {
 	Kind       string
 	Identifier string
+	Profile    *wechatProfile
+}
+
+type wechatProfile struct {
+	// The person behind the openid as the oauth leg learned them — wechat's
+	// raw values, pre-sanitisation. Nil means the userinfo leg degraded (or
+	// the kind reports no person at all); degraded never fails the exchange
+	// that owns it.
+	Nickname  string
+	AvatarURL string
 }
 
 type IdentityProvider interface {
