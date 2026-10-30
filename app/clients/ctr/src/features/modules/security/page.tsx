@@ -1,5 +1,6 @@
 import { useQuery } from "@connectrpc/connect-query";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import type { GetSecurityStatusResponse } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth_pb";
 import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, KeyRound, MessageCircle, Smartphone } from "lucide-react";
@@ -18,6 +19,12 @@ const OK_CHIP =
 // bound (masked server-side) and routes to the bind page only when it can
 // act. The unbind note is the corpus's service-desk ruling, not the
 // prototype's detail-page wording (those pages do not exist by ruling).
+// toJson elides empty repeated fields — a member with nothing bound has no
+// credentials key at all. Normalize before reading.
+function boundCredentials(status: GetSecurityStatusResponse | undefined) {
+  return status?.credentials ?? [];
+}
+
 export function SecurityPage() {
   const navigate = useNavigate();
   const securityQuery = useQuery(getSecurityStatus, {}, { throwOnError: false });
@@ -27,8 +34,9 @@ export function SecurityPage() {
     { staleTime: PROFILE_STALE_MS, throwOnError: false },
   );
   const status = securityQuery.data;
-  const phone = status?.credentials.find((c) => c.kind === "sms");
-  const wechat = status?.credentials.some((c) => c.kind === "wechat_mp");
+  const credentials = boundCredentials(status);
+  const phone = credentials.find((c) => c.kind === "sms");
+  const wechat = credentials.some((c) => c.kind === "wechat_mp");
   const profile = profileQuery.data?.profile;
 
   return (

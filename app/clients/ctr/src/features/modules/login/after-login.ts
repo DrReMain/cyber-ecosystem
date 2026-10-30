@@ -48,8 +48,10 @@ async function bindPromptTarget(
   } catch {
     return null;
   }
-  const phone = status.credentials.some((c) => c.kind === "sms");
-  const wechat = status.credentials.some((c) => c.kind === "wechat_mp");
+  // toJson elides empty repeated fields — a bare account has no credentials key.
+  const credentials = status.credentials ?? [];
+  const phone = credentials.some((c) => c.kind === "sms");
+  const wechat = credentials.some((c) => c.kind === "wechat_mp");
   const inWechat = /MicroMessenger/i.test(navigator.userAgent);
   localStorage.setItem(`ctr.bindprompt.${userID}`, "1");
   if (!phone) {

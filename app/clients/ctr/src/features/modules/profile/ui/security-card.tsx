@@ -1,4 +1,5 @@
 import { useQuery } from "@connectrpc/connect-query";
+import type { GetSecurityStatusResponse } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth_pb";
 import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, KeyRound, MessageCircle, Smartphone } from "lucide-react";
@@ -14,11 +15,18 @@ const LOCK_CHIP =
 // view, not an entry list — each row shows what is bound (masked
 // server-side) and acts only when it can: bind what is missing, manage the
 // rest on the security page.
+// The transport's toJson elides empty repeated fields: a member with nothing
+// bound gets no credentials key at all — normalize before reading.
+function boundCredentials(status: GetSecurityStatusResponse | undefined) {
+  return status?.credentials ?? [];
+}
+
 export function SecurityCard() {
   const securityQuery = useQuery(getSecurityStatus, {}, { throwOnError: false });
   const status = securityQuery.data;
-  const phone = status?.credentials.find((c) => c.kind === "sms");
-  const wechat = status?.credentials.some((c) => c.kind === "wechat_mp");
+  const credentials = boundCredentials(status);
+  const phone = credentials.find((c) => c.kind === "sms");
+  const wechat = credentials.some((c) => c.kind === "wechat_mp");
 
   return (
     <div className={CARD_CLASS}>
