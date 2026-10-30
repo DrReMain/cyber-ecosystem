@@ -55,7 +55,7 @@
 | **待校准成绩报告不可见(report 契约缺行)**:常模未积累的游戏,有效尝试(原始分在库)在 GetSessionReport 无处可见——abilities 只收权威分行,回读面只能显示「这一款还没有有效成绩」,成员测了有效分也看不见。根因=report/data.go SessionAttempts 过滤 AuthoritativeScoreNotNil(),curve-pending 行(raw 有/authoritative NULL)不进报告,契约亦无携带位。铁证(10-30 hzytm 会话 dbi4u5p0,DB 直读):number_stars valid=t raw=150、multi_target valid=t raw=360,abilities=[]。**建议**:GetSessionReportResponse 增 PendingAbilityLine(ability/game_code/raw_best/attempt_raw_scores),查询 valid+rawNotNil+authoritativeIsNil,按阵容序组装;ctr 回读面消费端 hzy 已备(结算面原始分+「原始分」标签已落),契约落地即接(用户 10-30 裁:服务端问题转 lzx,hzy 不直改) | lzx | 契约+聚合小片;配套=dev 常模种子(现全空,走查每款首测皆「未评级」),报告 e2e 补 pending 锚 |
 | 结算回读面明细卡缺:原型 test-result ro=1 携「本次成绩明细」行组,实现回读态不渲染(record=本地采样,GetSessionReport 契约无逐次明细;原型为 mock 数据) | 例会 | 要真做=契约带逐次明细行,非小片;登记豁免候选 |
 | 未校准态结算面措辞:「N 分 · 原始分」+未评级+常模积累中(原型无此态,新措辞;10-30 用户裁落) | 例会追认 | 措辞已是诚实态;例会改词则 5 分钟换键 |
-| mt-D6 手机横屏真机未验(桌面 812×375 仿真预验绿,10-26:布局/控件锚位/目标合法) | hzy | 手机在手时顺手过一眼 |
+| ~~mt-D6 手机横屏真机未验~~(桌面 812×375 仿真预验绿,10-26) | hzy | ✅ 10-30 真机过(用户亲测:三页面横竖屏切换,无横滚/不破版/后台恢复正常) |
 | ~~D-W population 余件(provider 行 member_population/座位迁移/guard 注释清理)~~ **已收(10-30 E6c-d 核验)**:a0abb1a4 population 机制片已全落(provider 行 landing population 语义+人群行 boot ensure 声明制+登录进场惰性落座=存量迁移答案+guard 测试自含)+组合缝 a8b9f0a4;挂账=台账滞后非真欠款 |
 | 走查墙 4:运营测试账号口径——pg2-probe 无 user 座位登不进 admin 端;种子超管=admin/admin123456 | 用户侧 | 即办(SQL 补座位或文档化) |
 | age-required 逃生按钮(先看免费报告;原型有面,现仓无) | lzx | pay 客户端片(付费墙落地时) |
