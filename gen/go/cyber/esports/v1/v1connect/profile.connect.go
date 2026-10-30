@@ -39,12 +39,16 @@ const (
 	// ProfileServiceUpdateProfileProcedure is the fully-qualified name of the ProfileService's
 	// UpdateProfile RPC.
 	ProfileServiceUpdateProfileProcedure = "/cyber.esports.v1.ProfileService/UpdateProfile"
+	// ProfileServicePreviewMergeProcedure is the fully-qualified name of the ProfileService's
+	// PreviewMerge RPC.
+	ProfileServicePreviewMergeProcedure = "/cyber.esports.v1.ProfileService/PreviewMerge"
 )
 
 // ProfileServiceClient is a client for the cyber.esports.v1.ProfileService service.
 type ProfileServiceClient interface {
 	GetProfile(context.Context, *connect.Request[v1.GetProfileRequest]) (*connect.Response[v1.GetProfileResponse], error)
 	UpdateProfile(context.Context, *connect.Request[v1.UpdateProfileRequest]) (*connect.Response[v1.UpdateProfileResponse], error)
+	PreviewMerge(context.Context, *connect.Request[v1.PreviewMergeRequest]) (*connect.Response[v1.PreviewMergeResponse], error)
 }
 
 // NewProfileServiceClient constructs a client for the cyber.esports.v1.ProfileService service. By
@@ -70,6 +74,12 @@ func NewProfileServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(profileServiceMethods.ByName("UpdateProfile")),
 			connect.WithClientOptions(opts...),
 		),
+		previewMerge: connect.NewClient[v1.PreviewMergeRequest, v1.PreviewMergeResponse](
+			httpClient,
+			baseURL+ProfileServicePreviewMergeProcedure,
+			connect.WithSchema(profileServiceMethods.ByName("PreviewMerge")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -77,6 +87,7 @@ func NewProfileServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 type profileServiceClient struct {
 	getProfile    *connect.Client[v1.GetProfileRequest, v1.GetProfileResponse]
 	updateProfile *connect.Client[v1.UpdateProfileRequest, v1.UpdateProfileResponse]
+	previewMerge  *connect.Client[v1.PreviewMergeRequest, v1.PreviewMergeResponse]
 }
 
 // GetProfile calls cyber.esports.v1.ProfileService.GetProfile.
@@ -89,10 +100,16 @@ func (c *profileServiceClient) UpdateProfile(ctx context.Context, req *connect.R
 	return c.updateProfile.CallUnary(ctx, req)
 }
 
+// PreviewMerge calls cyber.esports.v1.ProfileService.PreviewMerge.
+func (c *profileServiceClient) PreviewMerge(ctx context.Context, req *connect.Request[v1.PreviewMergeRequest]) (*connect.Response[v1.PreviewMergeResponse], error) {
+	return c.previewMerge.CallUnary(ctx, req)
+}
+
 // ProfileServiceHandler is an implementation of the cyber.esports.v1.ProfileService service.
 type ProfileServiceHandler interface {
 	GetProfile(context.Context, *connect.Request[v1.GetProfileRequest]) (*connect.Response[v1.GetProfileResponse], error)
 	UpdateProfile(context.Context, *connect.Request[v1.UpdateProfileRequest]) (*connect.Response[v1.UpdateProfileResponse], error)
+	PreviewMerge(context.Context, *connect.Request[v1.PreviewMergeRequest]) (*connect.Response[v1.PreviewMergeResponse], error)
 }
 
 // NewProfileServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -114,12 +131,20 @@ func NewProfileServiceHandler(svc ProfileServiceHandler, opts ...connect.Handler
 		connect.WithSchema(profileServiceMethods.ByName("UpdateProfile")),
 		connect.WithHandlerOptions(opts...),
 	)
+	profileServicePreviewMergeHandler := connect.NewUnaryHandler(
+		ProfileServicePreviewMergeProcedure,
+		svc.PreviewMerge,
+		connect.WithSchema(profileServiceMethods.ByName("PreviewMerge")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.ProfileService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ProfileServiceGetProfileProcedure:
 			profileServiceGetProfileHandler.ServeHTTP(w, r)
 		case ProfileServiceUpdateProfileProcedure:
 			profileServiceUpdateProfileHandler.ServeHTTP(w, r)
+		case ProfileServicePreviewMergeProcedure:
+			profileServicePreviewMergeHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -135,4 +160,8 @@ func (UnimplementedProfileServiceHandler) GetProfile(context.Context, *connect.R
 
 func (UnimplementedProfileServiceHandler) UpdateProfile(context.Context, *connect.Request[v1.UpdateProfileRequest]) (*connect.Response[v1.UpdateProfileResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ProfileService.UpdateProfile is not implemented"))
+}
+
+func (UnimplementedProfileServiceHandler) PreviewMerge(context.Context, *connect.Request[v1.PreviewMergeRequest]) (*connect.Response[v1.PreviewMergeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ProfileService.PreviewMerge is not implemented"))
 }

@@ -295,6 +295,19 @@
         "datascope": false
       },
       {
+        "name": "PreviewMerge",
+        "full_name": "cyber.esports.v1.ProfileService.PreviewMerge",
+        "request_name": "PreviewMergeRequest",
+        "request_full_name": "cyber.esports.v1.PreviewMergeRequest",
+        "response_name": "PreviewMergeResponse",
+        "response_full_name": "cyber.esports.v1.PreviewMergeResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/profile/preview-merge",
+        "comment": "合并 offer 面：空号判据与两账号摘要",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "UpdateProfile",
         "full_name": "cyber.esports.v1.ProfileService.UpdateProfile",
         "request_name": "UpdateProfileRequest",

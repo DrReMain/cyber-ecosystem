@@ -1,6 +1,11 @@
 import type { Transport } from "@connectrpc/connect";
+import { createClient } from "@connectrpc/connect";
 import { createQueryOptions } from "@connectrpc/connect-query";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import {
+  AuthService,
+  type GetSecurityStatusResponse,
+} from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth_pb";
 import type { QueryClient } from "@tanstack/react-query";
 import type { useNavigate } from "@tanstack/react-router";
 import { profileComplete } from "#/features/auth/guard";
@@ -25,9 +30,40 @@ function isSafeNext(value: string): boolean {
   return value.startsWith("/") && !value.startsWith("//");
 }
 
+// The corpus's post-login bind prompt (02b's "after login, first time,
+// skippable"): once per account, a wechat-born member without a phone is
+// walked to the bind-phone page; a phone-born member in the wechat browser
+// without a wechat, to bind-wechat. Skip marks itself — the flag is the
+// "don't nag" memory; the pages themselves offer the same exits.
+async function bindPromptTarget(
+  transport: Transport,
+  userID: string | undefined,
+): Promise<string | null> {
+  if (userID === undefined || localStorage.getItem(`ctr.bindprompt.${userID}`) === "1") {
+    return null;
+  }
+  let status: GetSecurityStatusResponse | undefined;
+  try {
+    status = await createClient(AuthService, transport).getSecurityStatus({});
+  } catch {
+    return null;
+  }
+  const phone = status.credentials.some((c) => c.kind === "sms");
+  const wechat = status.credentials.some((c) => c.kind === "wechat_mp");
+  const inWechat = /MicroMessenger/i.test(navigator.userAgent);
+  localStorage.setItem(`ctr.bindprompt.${userID}`, "1");
+  if (!phone) {
+    return "/profile/security/bind-phone?from=login";
+  }
+  if (!wechat && inWechat) {
+    return "/profile/security/bind-wechat?from=login";
+  }
+  return null;
+}
+
 // Shared post-login router: an explicit ?next= wins (guard bounce-back);
 // otherwise completeness decides — incomplete profiles land on the wizard's
-// nickname step, complete ones on home.
+// nickname step, complete ones get the one-time bind prompt before home.
 export async function routeAfterLogin(
   { queryClient, transport, navigate }: AfterLoginDeps,
   next: string | undefined,
@@ -44,6 +80,7 @@ export async function routeAfterLogin(
     return;
   }
   let complete = false;
+  let userID: string | undefined;
   try {
     const data = await queryClient.query({
       ...createQueryOptions(getProfile, {}, { transport }),
@@ -52,10 +89,20 @@ export async function routeAfterLogin(
       staleTime: 0,
     });
     complete = data.profile !== undefined && profileComplete(data.profile);
+    userID = data.profile?.id ?? undefined;
   } catch {
     // A profile fetch failure never blocks the login itself — the overview
     // page owns surfacing profile errors.
     complete = false;
   }
-  await navigate({ to: complete ? "/" : "/profile/setup/nickname" });
+  if (!complete) {
+    await navigate({ to: "/profile/setup/nickname" });
+    return;
+  }
+  const prompt = await bindPromptTarget(transport, userID);
+  if (prompt !== null) {
+    await navigate({ href: prompt });
+    return;
+  }
+  await navigate({ to: "/" });
 }

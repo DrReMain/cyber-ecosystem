@@ -15,6 +15,7 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
+	"cyber-ecosystem/app/services/esports/internal/module/profile"
 )
 
 func standardMiddleware(logger *slog.Logger) []middleware.Middleware {
@@ -32,4 +33,5 @@ var ProviderSet = wire.NewSet(
 	wire.Bind(new(krauth.Authenticator), new(*systemClient)),
 	wire.Bind(new(authz.AuthzRP), new(*systemClient)),
 	wire.Bind(new(member.SystemRP), new(*systemClient)),
+	wire.Bind(new(profile.SystemRP), new(*systemClient)),
 )

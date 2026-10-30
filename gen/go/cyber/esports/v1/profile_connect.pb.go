@@ -11,4 +11,5 @@ import (
 func RegisterProfileServiceConnectServer(srv *connect.Server, svc ProfileServiceServer) {
 	connect.HandleUnary(srv, "/cyber.esports.v1.ProfileService/GetProfile", svc.GetProfile)
 	connect.HandleUnary(srv, "/cyber.esports.v1.ProfileService/UpdateProfile", svc.UpdateProfile)
+	connect.HandleUnary(srv, "/cyber.esports.v1.ProfileService/PreviewMerge", svc.PreviewMerge)
 }

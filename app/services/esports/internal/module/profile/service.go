@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/go-kratos/kratos/v3/transport/grpc"
@@ -11,6 +12,7 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
@@ -22,12 +24,14 @@ type ProfileService struct {
 
 	log       *slog.Logger
 	profileUC *ProfileUC
+	mergeUC   MergePreviewer
 }
 
-func NewProfileService(logger *slog.Logger, profileUC *ProfileUC) *ProfileService {
+func NewProfileService(logger *slog.Logger, profileUC *ProfileUC, mergeUC MergePreviewer) *ProfileService {
 	return &ProfileService{
 		log:       logger.With("module", "module/profile_service"),
 		profileUC: profileUC,
+		mergeUC:   mergeUC,
 	}
 }
 
@@ -75,7 +79,44 @@ func (s *ProfileService) UpdateProfile(ctx context.Context, in *esportspb.Update
 	return &esportspb.UpdateProfileResponse{Profile: mapProfilePB(p)}, nil
 }
 
+func (s *ProfileService) PreviewMerge(ctx context.Context, in *esportspb.PreviewMergeRequest) (*esportspb.PreviewMergeResponse, error) {
+	cred := &MergeCredential{}
+	switch branch := in.GetCredential().(type) {
+	case *esportspb.PreviewMergeRequest_Phone:
+		cred.Phone = &branch.Phone
+	case *esportspb.PreviewMergeRequest_Wechat:
+		cred.WeChatCode = branch.Wechat.Code
+		cred.State = in.GetState()
+	default:
+		return nil, errorspb.ErrorGeneralErrorValidationFailed("").WithCause(fmt.Errorf("preview: no credential branch"))
+	}
+	offer, err := s.mergeUC.Preview(ctx, cred)
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.PreviewMergeResponse{
+		Status: offer.Status,
+		Caller: mapMergeSummaryPB(offer.Caller),
+		Other:  mapMergeSummaryPB(offer.Other),
+	}, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
+
+func mapMergeSummaryPB(s *MergeSummary) *esportspb.MergeAccountSummary {
+	if s == nil {
+		return nil
+	}
+	out := &esportspb.MergeAccountSummary{
+		UserId:      s.UserID,
+		PhoneMask:   utils.Wrap(s.PhoneMask, utils.StringW),
+		Wechat:      s.Wechat,
+		Sessions:    utils.ConvNum[int32](s.Sessions),
+		MemberUntil: utils.ToTimestamp(s.MemberUntil),
+		Unlocked:    s.Unlocked,
+	}
+	return out
+}
 
 func mapProfilePB(p *Profile) *esportspb.Profile {
 	games := make([]*esportspb.ProfileGame, 0, len(p.Games))

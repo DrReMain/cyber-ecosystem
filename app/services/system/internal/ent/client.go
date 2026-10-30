@@ -11,6 +11,7 @@ import (
 
 	"cyber-ecosystem/app/services/system/internal/ent/migrate"
 
+	"cyber-ecosystem/app/services/system/internal/ent/accountmerge"
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
@@ -39,6 +40,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AccountMerge is the client for interacting with the AccountMerge builders.
+	AccountMerge *AccountMergeClient
 	// AuditExport is the client for interacting with the AuditExport builders.
 	AuditExport *AuditExportClient
 	// AuditLog is the client for interacting with the AuditLog builders.
@@ -80,6 +83,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AccountMerge = NewAccountMergeClient(c.config)
 	c.AuditExport = NewAuditExportClient(c.config)
 	c.AuditLog = NewAuditLogClient(c.config)
 	c.AuthzPolicy = NewAuthzPolicyClient(c.config)
@@ -187,6 +191,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:              ctx,
 		config:           cfg,
+		AccountMerge:     NewAccountMergeClient(cfg),
 		AuditExport:      NewAuditExportClient(cfg),
 		AuditLog:         NewAuditLogClient(cfg),
 		AuthzPolicy:      NewAuthzPolicyClient(cfg),
@@ -221,6 +226,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:              ctx,
 		config:           cfg,
+		AccountMerge:     NewAccountMergeClient(cfg),
 		AuditExport:      NewAuditExportClient(cfg),
 		AuditLog:         NewAuditLogClient(cfg),
 		AuthzPolicy:      NewAuthzPolicyClient(cfg),
@@ -242,7 +248,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		AuditExport.
+//		AccountMerge.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -265,9 +271,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AuditExport, c.AuditLog, c.AuthzPolicy, c.AuthzStamp, c.Credential, c.Dept,
-		c.File, c.Membership, c.Permission, c.PermissionPolicy, c.Population,
-		c.PrincipalRole, c.Role, c.Tenant, c.User,
+		c.AccountMerge, c.AuditExport, c.AuditLog, c.AuthzPolicy, c.AuthzStamp,
+		c.Credential, c.Dept, c.File, c.Membership, c.Permission, c.PermissionPolicy,
+		c.Population, c.PrincipalRole, c.Role, c.Tenant, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -277,9 +283,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AuditExport, c.AuditLog, c.AuthzPolicy, c.AuthzStamp, c.Credential, c.Dept,
-		c.File, c.Membership, c.Permission, c.PermissionPolicy, c.Population,
-		c.PrincipalRole, c.Role, c.Tenant, c.User,
+		c.AccountMerge, c.AuditExport, c.AuditLog, c.AuthzPolicy, c.AuthzStamp,
+		c.Credential, c.Dept, c.File, c.Membership, c.Permission, c.PermissionPolicy,
+		c.Population, c.PrincipalRole, c.Role, c.Tenant, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -288,6 +294,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *AccountMergeMutation:
+		return c.AccountMerge.mutate(ctx, m)
 	case *AuditExportMutation:
 		return c.AuditExport.mutate(ctx, m)
 	case *AuditLogMutation:
@@ -320,6 +328,139 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// AccountMergeClient is a client for the AccountMerge schema.
+type AccountMergeClient struct {
+	config
+}
+
+// NewAccountMergeClient returns a client for the AccountMerge from the given config.
+func NewAccountMergeClient(c config) *AccountMergeClient {
+	return &AccountMergeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `accountmerge.Hooks(f(g(h())))`.
+func (c *AccountMergeClient) Use(hooks ...Hook) {
+	c.hooks.AccountMerge = append(c.hooks.AccountMerge, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `accountmerge.Intercept(f(g(h())))`.
+func (c *AccountMergeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AccountMerge = append(c.inters.AccountMerge, interceptors...)
+}
+
+// Create returns a builder for creating a AccountMerge entity.
+func (c *AccountMergeClient) Create() *AccountMergeCreate {
+	mutation := newAccountMergeMutation(c.config, OpCreate)
+	return &AccountMergeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AccountMerge entities.
+func (c *AccountMergeClient) CreateBulk(builders ...*AccountMergeCreate) *AccountMergeCreateBulk {
+	return &AccountMergeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AccountMergeClient) MapCreateBulk(slice any, setFunc func(*AccountMergeCreate, int)) *AccountMergeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AccountMergeCreateBulk{err: fmt.Errorf("calling to AccountMergeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AccountMergeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AccountMergeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AccountMerge.
+func (c *AccountMergeClient) Update() *AccountMergeUpdate {
+	mutation := newAccountMergeMutation(c.config, OpUpdate)
+	return &AccountMergeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AccountMergeClient) UpdateOne(_m *AccountMerge) *AccountMergeUpdateOne {
+	mutation := newAccountMergeMutation(c.config, OpUpdateOne, withAccountMerge(_m))
+	return &AccountMergeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AccountMergeClient) UpdateOneID(id string) *AccountMergeUpdateOne {
+	mutation := newAccountMergeMutation(c.config, OpUpdateOne, withAccountMergeID(id))
+	return &AccountMergeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AccountMerge.
+func (c *AccountMergeClient) Delete() *AccountMergeDelete {
+	mutation := newAccountMergeMutation(c.config, OpDelete)
+	return &AccountMergeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AccountMergeClient) DeleteOne(_m *AccountMerge) *AccountMergeDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AccountMergeClient) DeleteOneID(id string) *AccountMergeDeleteOne {
+	builder := c.Delete().Where(accountmerge.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AccountMergeDeleteOne{builder}
+}
+
+// Query returns a query builder for AccountMerge.
+func (c *AccountMergeClient) Query() *AccountMergeQuery {
+	return &AccountMergeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAccountMerge},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AccountMerge entity by its id.
+func (c *AccountMergeClient) Get(ctx context.Context, id string) (*AccountMerge, error) {
+	return c.Query().Where(accountmerge.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AccountMergeClient) GetX(ctx context.Context, id string) *AccountMerge {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AccountMergeClient) Hooks() []Hook {
+	return c.hooks.AccountMerge
+}
+
+// Interceptors returns the client interceptors.
+func (c *AccountMergeClient) Interceptors() []Interceptor {
+	return c.inters.AccountMerge
+}
+
+func (c *AccountMergeClient) mutate(ctx context.Context, m *AccountMergeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AccountMergeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AccountMergeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AccountMergeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AccountMergeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AccountMerge mutation op: %q", m.Op())
 	}
 }
 
@@ -2341,14 +2482,14 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AuditExport, AuditLog, AuthzPolicy, AuthzStamp, Credential, Dept, File,
-		Membership, Permission, PermissionPolicy, Population, PrincipalRole, Role,
-		Tenant, User []ent.Hook
+		AccountMerge, AuditExport, AuditLog, AuthzPolicy, AuthzStamp, Credential, Dept,
+		File, Membership, Permission, PermissionPolicy, Population, PrincipalRole,
+		Role, Tenant, User []ent.Hook
 	}
 	inters struct {
-		AuditExport, AuditLog, AuthzPolicy, AuthzStamp, Credential, Dept, File,
-		Membership, Permission, PermissionPolicy, Population, PrincipalRole, Role,
-		Tenant, User []ent.Interceptor
+		AccountMerge, AuditExport, AuditLog, AuthzPolicy, AuthzStamp, Credential, Dept,
+		File, Membership, Permission, PermissionPolicy, Population, PrincipalRole,
+		Role, Tenant, User []ent.Interceptor
 	}
 )
 

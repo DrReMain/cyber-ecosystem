@@ -92,6 +92,67 @@ func (s *AuthService) BindCredential(ctx context.Context, in *systempb.BindCrede
 	return &systempb.BindCredentialResponse{}, nil
 }
 
+func (s *AuthService) BeginBindCredential(ctx context.Context, in *systempb.BeginBindCredentialRequest) (*systempb.BeginBindCredentialResponse, error) {
+	redirect, err := s.authUC.BeginBindCredential(ctx, in.GetProvider(), in.GetRedirectUri())
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.BeginBindCredentialResponse{AuthorizeUrl: redirect}, nil
+}
+
+func (s *AuthService) SendBindSmsCode(ctx context.Context, in *systempb.SendBindSmsCodeRequest) (*systempb.SendBindSmsCodeResponse, error) {
+	// The bind twin shares SendSmsCode's body: the rung is the whole
+	// difference — the authenticated mint binds the returned state to
+	// this session, which the public face's anonymous mint never does.
+	state, err := s.authUC.SendSmsCode(ctx, in.GetProvider(), in.GetPhone())
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.SendBindSmsCodeResponse{State: state}, nil
+}
+
+func (s *AuthService) MergeAccounts(ctx context.Context, in *systempb.MergeAccountsRequest) (*systempb.MergeAccountsResponse, error) {
+	if err := s.authUC.MergeAccounts(ctx, in.GetProvider(), in.GetState(), in); err != nil {
+		return nil, err
+	}
+	return &systempb.MergeAccountsResponse{}, nil
+}
+
+func (s *AuthService) ResolveCredential(ctx context.Context, in *systempb.ResolveCredentialRequest) (*systempb.ResolveCredentialResponse, error) {
+	owner, err := s.authUC.ResolveCredential(ctx, in.GetProvider(), in.GetState(), in)
+	if err != nil {
+		return nil, err
+	}
+	resp := &systempb.ResolveCredentialResponse{}
+	if owner != nil {
+		resp.Owner = &systempb.CredentialOwner{
+			UserId:      owner.UserID,
+			Enabled:     owner.Enabled,
+			Mergeable:   owner.Mergeable,
+			Credentials: utils.SliceMap(owner.Credentials, mapSecurityCredential),
+		}
+	}
+	return resp, nil
+}
+
+func (s *AuthService) ResetPassword(ctx context.Context, in *systempb.ResetPasswordRequest) (*systempb.ResetPasswordResponse, error) {
+	if err := s.authUC.ResetPassword(ctx, in.GetProvider(), in.GetState(), in.GetNewPassword(), in); err != nil {
+		return nil, err
+	}
+	return &systempb.ResetPasswordResponse{}, nil
+}
+
+func (s *AuthService) GetSecurityStatus(ctx context.Context, in *systempb.GetSecurityStatusRequest) (*systempb.GetSecurityStatusResponse, error) {
+	status, err := s.authUC.GetSecurityStatus(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.GetSecurityStatusResponse{
+		HasPassword: status.HasPassword,
+		Credentials: utils.SliceMap(status.Credentials, mapSecurityCredential),
+	}, nil
+}
+
 func (s *AuthService) Logout(ctx context.Context, in *systempb.LogoutRequest) (*systempb.LogoutResponse, error) {
 	if err := s.authUC.Logout(ctx); err != nil {
 		return nil, err
@@ -115,4 +176,10 @@ func (s *AuthService) GetCurrentUser(ctx context.Context, in *systempb.GetCurren
 			return &systempb.Membership{Tenant: seat.TenantID, Population: seat.Population}
 		}),
 	}, nil
+}
+
+// Private -------------------------------------------------------------------------------------------------------------
+
+func mapSecurityCredential(c *SecurityCredential) *systempb.SecurityCredential {
+	return &systempb.SecurityCredential{Kind: c.Kind, MaskedIdentifier: c.Identifier}
 }

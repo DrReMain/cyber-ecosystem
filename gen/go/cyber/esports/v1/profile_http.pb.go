@@ -18,10 +18,12 @@ var _ = new(context.Context)
 const _ = http.SupportPackageIsVersion3
 
 const OperationProfileServiceGetProfile = "/cyber.esports.v1.ProfileService/GetProfile"
+const OperationProfileServicePreviewMerge = "/cyber.esports.v1.ProfileService/PreviewMerge"
 const OperationProfileServiceUpdateProfile = "/cyber.esports.v1.ProfileService/UpdateProfile"
 
 type ProfileServiceHTTPServer interface {
 	GetProfile(context.Context, *GetProfileRequest) (*GetProfileResponse, error)
+	PreviewMerge(context.Context, *PreviewMergeRequest) (*PreviewMergeResponse, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*UpdateProfileResponse, error)
 }
 
@@ -29,6 +31,7 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r := s.Route("/")
 	r.Handle("GET", "/api/v1/esports/profile", _ProfileService_GetProfile0_HTTP_Handler(srv))
 	r.Handle("PUT", "/api/v1/esports/profile", _ProfileService_UpdateProfile0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/profile/preview-merge", _ProfileService_PreviewMerge0_HTTP_Handler(srv))
 }
 
 func _ProfileService_GetProfile0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
@@ -69,8 +72,28 @@ func _ProfileService_UpdateProfile0_HTTP_Handler(srv ProfileServiceHTTPServer) f
 	}
 }
 
+func _ProfileService_PreviewMerge0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in PreviewMergeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServicePreviewMerge)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.PreviewMerge(ctx, req.(*PreviewMergeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PreviewMergeResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ProfileServiceHTTPClient interface {
 	GetProfile(ctx context.Context, req *GetProfileRequest, opts ...http.CallOption) (rsp *GetProfileResponse, err error)
+	PreviewMerge(ctx context.Context, req *PreviewMergeRequest, opts ...http.CallOption) (rsp *PreviewMergeResponse, err error)
 	UpdateProfile(ctx context.Context, req *UpdateProfileRequest, opts ...http.CallOption) (rsp *UpdateProfileResponse, err error)
 }
 
@@ -92,6 +115,23 @@ func (c *ProfileServiceHTTPClientImpl) GetProfile(ctx context.Context, in *GetPr
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) PreviewMerge(ctx context.Context, in *PreviewMergeRequest, opts ...http.CallOption) (*PreviewMergeResponse, error) {
+	var out PreviewMergeResponse
+	pattern := "/api/v1/esports/profile/preview-merge"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationProfileServicePreviewMerge),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

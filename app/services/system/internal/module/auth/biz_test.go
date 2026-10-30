@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -107,6 +108,17 @@ type fakeUserRP struct {
 	findIDErr      error
 	findByIDCalls  int
 
+	// merge slice: the poor side's writes, the one-shot ledger, and the
+	// follow-ups the disable path owes.
+	credCounts map[string]int
+	moved      []string
+	moveErr    error
+	merges     []*user.AccountMerge
+	mergeErr   error
+	disabled   []string
+	revoked    []string
+	notified   int
+
 	createdUsers []*user.User
 }
 
@@ -135,6 +147,72 @@ func (f *fakeUserRP) CreateCredential(_ context.Context, c *user.Credential) err
 func (f *fakeUserRP) DeleteCredentialsByUser(_ context.Context, userID string) error {
 	f.deletedCredFor = append(f.deletedCredFor, userID)
 	return nil
+}
+
+func (f *fakeUserRP) CountCredentialsByUser(_ context.Context, userID string) (int, error) {
+	if f.credCounts != nil {
+		return f.credCounts[userID], nil
+	}
+	n := 0
+	for _, c := range f.credentials {
+		if c.UserID == userID {
+			n++
+		}
+	}
+	return n, nil
+}
+
+func (f *fakeUserRP) ListCredentialsByUser(_ context.Context, userID string) ([]*user.Credential, error) {
+	var out []*user.Credential
+	for _, c := range f.credentials {
+		if c.UserID == userID {
+			out = append(out, c)
+		}
+	}
+	return out, nil
+}
+
+func (f *fakeUserRP) MoveCredential(_ context.Context, kind, identifier, toUserID string) error {
+	if f.moveErr != nil {
+		return f.moveErr
+	}
+	c, ok := f.credentials[kind+"|"+identifier]
+	if !ok {
+		return errorspb.ErrorInfraErrorDbNotFound("")
+	}
+	c.UserID = toUserID
+	f.moved = append(f.moved, kind+"|"+identifier+"->"+toUserID)
+	return nil
+}
+
+func (f *fakeUserRP) CreateAccountMerge(_ context.Context, m *user.AccountMerge) error {
+	if f.mergeErr != nil {
+		return f.mergeErr
+	}
+	f.merges = append(f.merges, m)
+	return nil
+}
+
+func (f *fakeUserRP) UpdateStatus(_ context.Context, id string, enabled bool) (*user.User, error) {
+	if !enabled {
+		f.disabled = append(f.disabled, id)
+	}
+	if f.row != nil && f.row.ID == id {
+		row := *f.row
+		row.Enabled = enabled
+		f.row = &row
+		return &row, nil
+	}
+	return &user.User{ID: id, Enabled: enabled}, nil
+}
+
+func (f *fakeUserRP) RevokeUserSessions(_ context.Context, userID string) error {
+	f.revoked = append(f.revoked, userID)
+	return nil
+}
+
+func (f *fakeUserRP) NotifyChanged(context.Context) {
+	f.notified++
 }
 
 func (f *fakeUserRP) FindByAccount(_ context.Context, account string) (*user.User, error) {
@@ -271,7 +349,7 @@ type fakeIdentityProvider struct {
 
 var fakeExchanges int
 
-func (f fakeIdentityProvider) Exchange(_ context.Context, row *conf.Auth_Provider, _ identityPayload) (*exchangedIdentity, error) {
+func (f fakeIdentityProvider) Exchange(_ context.Context, row *conf.Auth_Provider, _ any) (*exchangedIdentity, error) {
 	fakeExchanges++
 	if row.GetKey() == "failing" {
 		return nil, systempb.ErrorSystemIdentityExchangeFailed("").WithCause(fmt.Errorf("provider rejected"))
@@ -288,6 +366,9 @@ const fakeKind = "fakekind"
 func testProviders() map[string]IdentityProvider {
 	return map[string]IdentityProvider{
 		fakeKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: fakeKind, Identifier: "oid-x"}},
+		// The resolve phone branch never exchanges; the row only has to
+		// carry the channel kind the branch guards on.
+		smsKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: smsKind, Identifier: "13900001111"}},
 	}
 }
 
@@ -296,6 +377,7 @@ func fakeProviderConf() *conf.Auth {
 		{Key: "fake", Kind: fakeKind, Enabled: true},
 		{Key: "failing", Kind: fakeKind, Enabled: true},
 		{Key: "off", Kind: fakeKind},
+		{Key: "sms", Kind: smsKind, Enabled: true},
 	}}
 }
 
@@ -369,11 +451,22 @@ func identityReq(provider, state string) *systempb.LoginByIdentityRequest {
 }
 
 // issueState mints a begin-issued state directly into the fake store — the
-// law under test is the cash, not the mint (Begin covers that half).
+// law under test is the cash, not the mint (Begin covers that half). The
+// anonymous shape is what the public login rungs mint; boundState is the
+// bind-rung shape carrying the minting session.
 func issueState(t *testing.T, trp *fakeTokenRP, provider string) string {
 	t.Helper()
+	return issueBoundState(t, trp, provider, "")
+}
+
+func issueBoundState(t *testing.T, trp *fakeTokenRP, provider, bindUser string) string {
+	t.Helper()
 	state := "st-" + provider
-	if err := trp.Set(context.Background(), identityStatePrefix+state, []byte(provider), identityStateTTL); err != nil {
+	if bindUser != "" {
+		state += "-" + bindUser
+	}
+	val := utils.MustMarshal(identityStateValue{Provider: provider, BindUser: bindUser})
+	if err := trp.Set(context.Background(), identityStatePrefix+state, val, identityStateTTL); err != nil {
 		t.Fatalf("state: %v", err)
 	}
 	return state
@@ -1098,8 +1191,12 @@ func TestBeginIdentityLoginIssuesState(t *testing.T) {
 	if state == "" {
 		t.Fatal("begin: empty state")
 	}
-	if got, err := trp.Get(context.Background(), identityStatePrefix+state); err != nil || string(got) != "fake" {
-		t.Fatalf("begin: stored state = %q err=%v, want provider key", got, err)
+	got, err := trp.Get(context.Background(), identityStatePrefix+state)
+	if err != nil {
+		t.Fatalf("begin: stored state err=%v", err)
+	}
+	if val, uerr := utils.Unmarshal[identityStateValue](got); uerr != nil || val.Provider != "fake" || val.BindUser != "" {
+		t.Fatalf("begin: stored state = %q (%v), want an anonymous fake-provider mint", got, uerr)
 	}
 	if ttl := trp.ttls[identityStatePrefix+state]; ttl != 10*time.Minute {
 		t.Fatalf("begin: state ttl = %v, want 10m", ttl)
@@ -1324,7 +1421,27 @@ func TestBindCredentialLaws(t *testing.T) {
 		t.Fatal("stateless bind: the exchange ran or a credential landed")
 	}
 
-	state := issueState(t, trp, "fake")
+	// The session-tie law: an anonymous mint (the public login rung's
+	// shape) and a foreign session's mint both answer as a failed
+	// exchange, before any provider call.
+	anon := issueState(t, trp, "fake")
+	before = fakeExchanges
+	if err := uc.BindCredential(ctx, "fake", anon, newReq(anon)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("anonymous state: want EXCHANGE_FAILED, got %v", err)
+	}
+	if fakeExchanges != before || len(uf.createdCreds) != 0 {
+		t.Fatal("anonymous state: the exchange ran or a credential landed")
+	}
+	foreign := issueBoundState(t, trp, "fake", "u9")
+	before = fakeExchanges
+	if err := uc.BindCredential(ctx, "fake", foreign, newReq(foreign)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("foreign state: want EXCHANGE_FAILED, got %v", err)
+	}
+	if fakeExchanges != before || len(uf.createdCreds) != 0 {
+		t.Fatal("foreign state: the exchange ran or a credential landed")
+	}
+
+	state := issueBoundState(t, trp, "fake", "u1")
 	if err := uc.BindCredential(ctx, "fake", state, newReq(state)); err != nil {
 		t.Fatalf("bind: %v", err)
 	}
@@ -1334,7 +1451,7 @@ func TestBindCredentialLaws(t *testing.T) {
 
 	bind := func(uf *fakeUserRP) error {
 		uc, trp := identityUC(t, uf)
-		state := issueState(t, trp, "fake")
+		state := issueBoundState(t, trp, "fake", "u1")
 		return uc.BindCredential(ctx, "fake", state, newReq(state))
 	}
 	same := &fakeUserRP{credentials: map[string]*user.Credential{
@@ -1360,8 +1477,392 @@ func TestBindCredentialLaws(t *testing.T) {
 	}
 
 	noUC, noTrp := identityUC(t, &fakeUserRP{})
-	noState := issueState(t, noTrp, "fake")
+	noState := issueBoundState(t, noTrp, "fake", "u1")
 	if err := noUC.BindCredential(context.Background(), "fake", noState, newReq(noState)); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("no session: want 401, got %v", err)
+	}
+}
+
+// The begin twin of the bind flow: an authenticated rung mints a state
+// carrying the session, and the mint is refused without one.
+func TestBeginBindCredentialBindsMint(t *testing.T) {
+	uc, trp := identityUC(t, &fakeUserRP{})
+
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	url, err := uc.BeginBindCredential(ctx, "fake", "https://app.example/cb")
+	if err != nil {
+		t.Fatalf("begin bind: %v", err)
+	}
+	state := strings.TrimPrefix(url, "https://idp.example/auth/fake?state=")
+	got, gerr := trp.Get(context.Background(), identityStatePrefix+state)
+	if gerr != nil {
+		t.Fatalf("begin bind: stored state err=%v", gerr)
+	}
+	if val, uerr := utils.Unmarshal[identityStateValue](got); uerr != nil || val.Provider != "fake" || val.BindUser != "u1" {
+		t.Fatalf("begin bind: stored state = %q (%v), want a u1-bound fake mint", got, uerr)
+	}
+
+	if _, err := uc.BeginBindCredential(context.Background(), "fake", "https://app.example/cb"); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("begin bind without session: want 401, got %v", err)
+	}
+}
+
+// Merge laws: proof + session-bound state, the poor side must be
+// system-side weightless, the absorption is one write set (move +
+// disable + ledger) with the disable's follow-ups, and every refusal
+// answers with its own reason before any write lands.
+func TestMergeAccountsLaws(t *testing.T) {
+	code, key := "c", "fake"
+	mergeReq := func(state string) *systempb.MergeAccountsRequest {
+		return &systempb.MergeAccountsRequest{Provider: &key, State: &state,
+			Payload: &systempb.MergeAccountsRequest_Wechat{Wechat: &systempb.WeChatIdentityPayload{Code: &code}}}
+	}
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	memberPlane := &fakeAuthzRP{planes: map[string]string{"member": security.PlaneMember}}
+
+	poorRow := func(mutate func(*user.User)) *user.User {
+		empty := ""
+		row := &user.User{ID: "u9", Account: &empty, PasswordHash: &empty, Enabled: true}
+		if mutate != nil {
+			mutate(row)
+		}
+		return row
+	}
+	merge := func(uf *fakeUserRP, trp *fakeTokenRP, state string) error {
+		uc := newAuthUCConf(fakeProviderConf(), uf, memberPlane, trp,
+			&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+		return uc.MergeAccounts(ctx, "fake", state, mergeReq(state))
+	}
+	mergeFresh := func(uf *fakeUserRP) error {
+		trp := newTokenStore()
+		return merge(uf, trp, issueBoundState(t, trp, "fake", "u1"))
+	}
+
+	// Happy path: one binding owned by a weightless u9, one member seat.
+	uf := &fakeUserRP{
+		row:   poorRow(nil),
+		seats: []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(uf); err != nil {
+		t.Fatalf("merge: %v", err)
+	}
+	if len(uf.moved) != 1 || uf.credentials[fakeKind+"|oid-x"].UserID != "u1" {
+		t.Fatalf("merge: moved = %v, credential owner = %+v", uf.moved, uf.credentials[fakeKind+"|oid-x"])
+	}
+	if len(uf.disabled) != 1 || uf.disabled[0] != "u9" {
+		t.Fatalf("merge: disabled = %v, want u9", uf.disabled)
+	}
+	if len(uf.merges) != 1 || uf.merges[0].PoorID != "u9" || uf.merges[0].RichID != "u1" ||
+		uf.merges[0].Kind != fakeKind || uf.merges[0].Identifier != "oid-x" {
+		t.Fatalf("merge: ledger = %+v, want one u9→u1 row for the proven credential", uf.merges)
+	}
+	if len(uf.revoked) != 1 || uf.revoked[0] != "u9" || uf.notified != 1 {
+		t.Fatalf("merge: revoked = %v notified = %d, want u9's sessions gone and one notify", uf.revoked, uf.notified)
+	}
+
+	// A free credential and the caller's own credential refuse before writes.
+	free := &fakeUserRP{}
+	if err := mergeFresh(free); !systempb.IsSystemMergeNotBound(err) {
+		t.Fatalf("unbound credential: want NOT_BOUND, got %v", err)
+	}
+	own := &fakeUserRP{credentials: map[string]*user.Credential{
+		fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u1"},
+	}}
+	if err := mergeFresh(own); !systempb.IsSystemIdentityAlreadyBound(err) {
+		t.Fatalf("own credential: want ALREADY_BOUND, got %v", err)
+	}
+
+	// Weight refuses: a password, a second credential, an operator seat,
+	// an already-dead account.
+	pw := "set"
+	withPw := &fakeUserRP{
+		row: poorRow(func(r *user.User) { r.PasswordHash = &pw }),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(withPw); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("password weight: want NOT_MERGEABLE, got %v", err)
+	}
+	multi := &fakeUserRP{
+		row: poorRow(nil),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+			fakeKind + "|oid-y": {Kind: fakeKind, Identifier: "oid-y", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(multi); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("multi credential: want NOT_MERGEABLE, got %v", err)
+	}
+	operator := &fakeUserRP{
+		row:   poorRow(nil),
+		seats: []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "ops"}},
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(operator); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("operator seat: want NOT_MERGEABLE, got %v", err)
+	}
+	dead := &fakeUserRP{
+		row: poorRow(func(r *user.User) { r.Enabled = false }),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(dead); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("dead account: want NOT_MERGEABLE, got %v", err)
+	}
+
+	// The one-shot ledger's race backstop and the vanished credential.
+	raced := &fakeUserRP{
+		row:      poorRow(nil),
+		seats:    []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		mergeErr: errorspb.ErrorInfraErrorDbConstraint(""),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(raced); !systempb.IsSystemMergeNotMergeable(err) {
+		t.Fatalf("ledger race: want NOT_MERGEABLE, got %v", err)
+	}
+	vanished := &fakeUserRP{
+		row:     poorRow(nil),
+		seats:   []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		moveErr: errorspb.ErrorInfraErrorDbNotFound(""),
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	if err := mergeFresh(vanished); !systempb.IsSystemMergeNotBound(err) {
+		t.Fatalf("vanished credential: want NOT_BOUND, got %v", err)
+	}
+
+	// The session-tie law rides the merge too: an anonymous state never
+	// opens an absorption.
+	trp := newTokenStore()
+	anon := issueState(t, trp, "fake")
+	anonUf := &fakeUserRP{row: poorRow(nil), credentials: map[string]*user.Credential{
+		fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+	}}
+	if err := merge(anonUf, trp, anon); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("anonymous state: want EXCHANGE_FAILED, got %v", err)
+	}
+	if len(anonUf.moved) != 0 || len(anonUf.disabled) != 0 || len(anonUf.merges) != 0 {
+		t.Fatal("anonymous state: a write landed on a refused cash")
+	}
+
+	noUC := func() {
+		trp := newTokenStore()
+		uc := newAuthUCConf(fakeProviderConf(), &fakeUserRP{row: poorRow(nil)}, memberPlane, trp,
+			&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+		state := issueBoundState(t, trp, "fake", "u1")
+		if err := uc.MergeAccounts(context.Background(), "fake", state, mergeReq(state)); !errorspb.IsGeneralErrorUnauthenticated(err) {
+			t.Fatalf("no session: want 401, got %v", err)
+		}
+	}
+	noUC()
+}
+
+func TestResolveCredentialLaws(t *testing.T) {
+	smsKey, fakeKey := "sms", "fake"
+	memberPlane := &fakeAuthzRP{planes: map[string]string{"member": security.PlaneMember}}
+	tn := &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}}
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+
+	phoneReq := func(phone string) *systempb.ResolveCredentialRequest {
+		return &systempb.ResolveCredentialRequest{Provider: &smsKey,
+			Credential: &systempb.ResolveCredentialRequest_Phone{Phone: phone}}
+	}
+	resolve := func(uf *fakeUserRP, providerKey, state string, in *systempb.ResolveCredentialRequest) (*CredentialOwner, error) {
+		uc := newAuthUCConf(fakeProviderConf(), uf, memberPlane, newTokenStore(), tn)
+		return uc.ResolveCredential(ctx, providerKey, state, in)
+	}
+
+	// Free phone: the plain-bind path, no owner facts at all.
+	if owner, err := resolve(&fakeUserRP{}, smsKey, "", phoneReq("13900001111")); err != nil || owner != nil {
+		t.Fatalf("free phone: want nil owner, got %v %v", owner, err)
+	}
+
+	// A weightless member owner answers with the mergeable verdict and a
+	// masked credential list; the +86 form canonicalizes to the same row.
+	empty := ""
+	owned := &fakeUserRP{
+		row:   &user.User{ID: "u9", Account: &empty, PasswordHash: &empty, Enabled: true},
+		seats: []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		credentials: map[string]*user.Credential{
+			smsKind + "|13900001111": {Kind: smsKind, Identifier: "13900001111", UserID: "u9"},
+		},
+	}
+	for _, form := range []string{"13900001111", "+8613900001111"} {
+		owner, err := resolve(owned, smsKey, "", phoneReq(form))
+		if err != nil {
+			t.Fatalf("owned phone %s: %v", form, err)
+		}
+		if owner == nil || owner.UserID != "u9" || !owner.Enabled || !owner.Mergeable {
+			t.Fatalf("owned phone %s: owner = %+v", form, owner)
+		}
+		if len(owner.Credentials) != 1 || owner.Credentials[0].Identifier != "139****1111" {
+			t.Fatalf("owned phone %s: credentials = %+v, want masked", form, owner.Credentials)
+		}
+	}
+
+	// Weight answers as a fact, not a refusal: the offer face renders the
+	// blocked pane from the same shape.
+	pw := "set"
+	heavy := &fakeUserRP{
+		row: &user.User{ID: "u9", Account: &empty, PasswordHash: &pw, Enabled: true},
+		credentials: map[string]*user.Credential{
+			smsKind + "|13900001111": {Kind: smsKind, Identifier: "13900001111", UserID: "u9"},
+		},
+	}
+	if owner, err := resolve(heavy, smsKey, "", phoneReq("13900001111")); err != nil || owner == nil || owner.Mergeable {
+		t.Fatalf("heavy owner: want mergeable=false, got %v %v", owner, err)
+	}
+
+	// A non-mainland phone and a phone branch on a redirect provider are
+	// both wiring refusals.
+	if _, err := resolve(&fakeUserRP{}, smsKey, "", phoneReq("12345")); !errorspb.IsGeneralErrorValidationFailed(err) {
+		t.Fatalf("non-mainland: want VALIDATION_FAILED, got %v", err)
+	}
+	if _, err := resolve(&fakeUserRP{}, fakeKey, "", &systempb.ResolveCredentialRequest{Provider: &fakeKey,
+		Credential: &systempb.ResolveCredentialRequest_Phone{Phone: "13900001111"}}); !systempb.IsSystemIdentityProviderUnknown(err) {
+		t.Fatalf("phone on redirect provider: want PROVIDER_UNKNOWN, got %v", err)
+	}
+
+	// The wechat branch is proof-carrying: a bind-minted state exchanges to
+	// the owner, an anonymous state refuses before any lookup.
+	code := "c"
+	wechatReq := func(state string) *systempb.ResolveCredentialRequest {
+		return &systempb.ResolveCredentialRequest{Provider: &fakeKey, State: &state,
+			Credential: &systempb.ResolveCredentialRequest_Wechat{Wechat: &systempb.WeChatIdentityPayload{Code: &code}}}
+	}
+	bound := &fakeUserRP{
+		row:   &user.User{ID: "u9", Account: &empty, PasswordHash: &empty, Enabled: true},
+		seats: []*user.Seat{{UserID: "u9", TenantID: "t1", Population: "member"}},
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	trp := newTokenStore()
+	state := issueBoundState(t, trp, "fake", "u1")
+	owner, err := newAuthUCConf(fakeProviderConf(), bound, memberPlane, trp, tn).
+		ResolveCredential(ctx, "fake", state, wechatReq(state))
+	if err != nil || owner == nil || owner.UserID != "u9" || !owner.Mergeable {
+		t.Fatalf("wechat branch: owner = %+v err = %v", owner, err)
+	}
+	anonState := issueState(t, trp, "fake")
+	if _, err := newAuthUCConf(fakeProviderConf(), bound, memberPlane, trp, tn).
+		ResolveCredential(ctx, "fake", anonState, wechatReq(anonState)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("anonymous state: want EXCHANGE_FAILED, got %v", err)
+	}
+
+	// A credential whose account vanished reads as free, with the dangling
+	// row left to the log.
+	dangling := &fakeUserRP{
+		row: &user.User{ID: "u1", Account: &empty, PasswordHash: &empty, Enabled: true},
+		credentials: map[string]*user.Credential{
+			smsKind + "|13900001111": {Kind: smsKind, Identifier: "13900001111", UserID: "u9"},
+		},
+	}
+	if owner, err := resolve(dangling, smsKey, "", phoneReq("13900001111")); err != nil || owner != nil {
+		t.Fatalf("dangling credential: want free, got %v %v", owner, err)
+	}
+
+	if _, err := newAuthUCConf(fakeProviderConf(), &fakeUserRP{}, memberPlane, newTokenStore(), tn).
+		ResolveCredential(context.Background(), "sms", "", phoneReq("13900001111")); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("no session: want 401, got %v", err)
+	}
+}
+
+func TestResetPasswordLaws(t *testing.T) {
+	key := "fake"
+	phone := "13900001111"
+	code := "123456"
+	newPw := "secret1"
+	req := func(state string) *systempb.ResetPasswordRequest {
+		return &systempb.ResetPasswordRequest{Provider: &key, State: &state, NewPassword: &newPw,
+			Payload: &systempb.ResetPasswordRequest_Sms{Sms: &systempb.SmsIdentityPayload{Phone: &phone, Code: &code}}}
+	}
+	reset := func(uf *fakeUserRP, trp *fakeTokenRP, state string) error {
+		uc := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, trp, &fakeTenantRP{})
+		return uc.ResetPassword(context.Background(), "fake", state, "secret1", req(state))
+	}
+
+	// The proof names the account: the sms credential's owner is rehashed,
+	// sessions stand (a rotation is not a revocation — no revoke call).
+	empty := ""
+	uf := &fakeUserRP{
+		row: &user.User{ID: "u9", Account: &empty, PasswordHash: &empty, Enabled: true},
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	trp := newTokenStore()
+	if err := reset(uf, trp, issueState(t, trp, "fake")); err != nil {
+		t.Fatalf("reset: %v", err)
+	}
+	if len(uf.updates) != 1 || uf.updates[0].u.ID != "u9" || uf.updates[0].u.PasswordHash == nil ||
+		!slices.Contains(uf.updates[0].fields, "password") {
+		t.Fatalf("reset: updates = %+v, want one password write on u9", uf.updates)
+	}
+	if len(uf.revoked) != 0 {
+		t.Fatalf("reset: revoked = %v, want sessions standing", uf.revoked)
+	}
+
+	// A phone no account holds and a state nobody minted both refuse.
+	free := &fakeUserRP{}
+	if err := reset(free, trp, issueState(t, trp, "fake")); !systempb.IsSystemUserNotFound(err) {
+		t.Fatalf("no owner: want USER_NOT_FOUND, got %v", err)
+	}
+	if err := reset(uf, newTokenStore(), "st-unknown"); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("unknown state: want EXCHANGE_FAILED, got %v", err)
+	}
+}
+
+func TestGetSecurityStatusLaws(t *testing.T) {
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	status := func(hash string) *SecurityStatus {
+		empty := ""
+		row := &user.User{ID: "u1", Account: &empty, Enabled: true}
+		if hash != "" {
+			row.PasswordHash = &hash
+		}
+		uf := &fakeUserRP{
+			row: row,
+			credentials: map[string]*user.Credential{
+				smsKind + "|13900001111":            {Kind: smsKind, Identifier: "13900001111", UserID: "u1"},
+				fakeKind + "|oABCDEFG1234567890xyz": {Kind: fakeKind, Identifier: "oABCDEFG1234567890xyz", UserID: "u1"},
+			},
+		}
+		s, err := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{}).
+			GetSecurityStatus(ctx)
+		if err != nil {
+			t.Fatalf("status: %v", err)
+		}
+		return s
+	}
+
+	withPw := status("hashed")
+	if !withPw.HasPassword || len(withPw.Credentials) != 2 {
+		t.Fatalf("with password: %+v", withPw)
+	}
+	masks := map[string]string{}
+	for _, c := range withPw.Credentials {
+		masks[c.Kind] = c.Identifier
+	}
+	if masks[smsKind] != "139****1111" || masks[fakeKind] != "oAB****0xyz" {
+		t.Fatalf("masks = %v, want phone 3-****-4 and openid head-tail", masks)
+	}
+	if status("").HasPassword {
+		t.Fatal("without password: want has_password=false")
+	}
+
+	if _, err := newAuthUCConf(fakeProviderConf(), &fakeUserRP{}, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{}).
+		GetSecurityStatus(context.Background()); !errorspb.IsGeneralErrorUnauthenticated(err) {
 		t.Fatalf("no session: want 401, got %v", err)
 	}
 }

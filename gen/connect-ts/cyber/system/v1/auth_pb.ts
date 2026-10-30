@@ -18,7 +18,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/system/v1/auth.proto.
  */
 export const file_cyber_system_v1_auth: GenFile = /*@__PURE__*/
-  fileDesc("ChpjeWJlci9zeXN0ZW0vdjEvYXV0aC5wcm90bxIPY3liZXIuc3lzdGVtLnYxIpQBCgxMb2dpblJlcXVlc3QSIAoHYWNjb3VudBgBIAEoCUIKukgHyAEBcgIQAUgAiAEBEiEKCHBhc3N3b3JkGAIgASgJQgq6SAfIAQFyAhABSAGIAQESFwoKcG9wdWxhdGlvbhgDIAEoCUgCiAEBQgoKCF9hY2NvdW50QgsKCV9wYXNzd29yZEINCgtfcG9wdWxhdGlvbiKFAQoNTG9naW5SZXNwb25zZRIVCg1zZXNzaW9uX3Rva2VuGAEgASgJEi0KCWlzc3VlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi9wEKFkxvZ2luQnlJZGVudGl0eVJlcXVlc3QSIwoIcHJvdmlkZXIYASABKAlCDLpICcgBAXIEEAEYQEgBiAEBEjgKBndlY2hhdBgCIAEoCzImLmN5YmVyLnN5c3RlbS52MS5XZUNoYXRJZGVudGl0eVBheWxvYWRIABIyCgNzbXMYBCABKAsyIy5jeWJlci5zeXN0ZW0udjEuU21zSWRlbnRpdHlQYXlsb2FkSAASIQoFc3RhdGUYAyABKAlCDbpICsgBAXIFEAEYgAFIAogBAUIQCgdwYXlsb2FkEgW6SAIIAUILCglfcHJvdmlkZXJCCAoGX3N0YXRlIj8KFVdlQ2hhdElkZW50aXR5UGF5bG9hZBIdCgRjb2RlGAEgASgJQgq6SAfIAQFyAhABSACIAQFCBwoFX2NvZGUifgoSU21zSWRlbnRpdHlQYXlsb2FkEiwKBXBob25lGAEgASgJQhi6SBXIAQFyEDIOXlswLTkrXXs1LDIwfSRIAIgBARInCgRjb2RlGAIgASgJQhS6SBHIAQFyDDIKXlswLTldezZ9JEgBiAEBQggKBl9waG9uZUIHCgVfY29kZSKPAQoXTG9naW5CeUlkZW50aXR5UmVzcG9uc2USFQoNc2Vzc2lvbl90b2tlbhgBIAEoCRItCglpc3N1ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIogBChlCZWdpbklkZW50aXR5TG9naW5SZXF1ZXN0EiMKCHByb3ZpZGVyGAEgASgJQgy6SAnIAQFyBBABGEBIAIgBARIoCgxyZWRpcmVjdF91cmkYAiABKAlCDbpICsgBAXIFEAEYgARIAYgBAUILCglfcHJvdmlkZXJCDwoNX3JlZGlyZWN0X3VyaSIzChpCZWdpbklkZW50aXR5TG9naW5SZXNwb25zZRIVCg1hdXRob3JpemVfdXJsGAEgASgJIn4KElNlbmRTbXNDb2RlUmVxdWVzdBIjCghwcm92aWRlchgBIAEoCUIMukgJyAEBcgQQARhASACIAQESLAoFcGhvbmUYAiABKAlCGLpIFcgBAXIQMg5eWzAtOStdezUsMjB9JEgBiAEBQgsKCV9wcm92aWRlckIICgZfcGhvbmUiJAoTU2VuZFNtc0NvZGVSZXNwb25zZRINCgVzdGF0ZRgBIAEoCSLCAQoVQmluZENyZWRlbnRpYWxSZXF1ZXN0EiMKCHByb3ZpZGVyGAEgASgJQgy6SAnIAQFyBBABGEBIAYgBARI4CgZ3ZWNoYXQYAiABKAsyJi5jeWJlci5zeXN0ZW0udjEuV2VDaGF0SWRlbnRpdHlQYXlsb2FkSAASIQoFc3RhdGUYAyABKAlCDbpICsgBAXIFEAEYgAFIAogBAUIQCgdwYXlsb2FkEgW6SAIIAUILCglfcHJvdmlkZXJCCAoGX3N0YXRlIhgKFkJpbmRDcmVkZW50aWFsUmVzcG9uc2UiDwoNTG9nb3V0UmVxdWVzdCIQCg5Mb2dvdXRSZXNwb25zZSIXChVHZXRDdXJyZW50VXNlclJlcXVlc3QihAEKFkdldEN1cnJlbnRVc2VyUmVzcG9uc2USIwoEdXNlchgBIAEoCzIVLmN5YmVyLnN5c3RlbS52MS5Vc2VyEhMKC3Blcm1pc3Npb25zGAIgAygJEjAKC21lbWJlcnNoaXBzGAMgAygLMhsuY3liZXIuc3lzdGVtLnYxLk1lbWJlcnNoaXAiMAoKTWVtYmVyc2hpcBIOCgZ0ZW5hbnQYASABKAkSEgoKcG9wdWxhdGlvbhgCIAEoCTKNCgoLQXV0aFNlcnZpY2USfgoFTG9naW4SHS5jeWJlci5zeXN0ZW0udjEuTG9naW5SZXF1ZXN0Gh4uY3liZXIuc3lzdGVtLnYxLkxvZ2luUmVzcG9uc2UiNojxBAGK0w4KCgbnmbvlvZUQAoLT5JMCHjoBKiIZL2FwaS92MS9zeXN0ZW0vYXV0aC9sb2dpbhLPAQoPTG9naW5CeUlkZW50aXR5EicuY3liZXIuc3lzdGVtLnYxLkxvZ2luQnlJZGVudGl0eVJlcXVlc3QaKC5jeWJlci5zeXN0ZW0udjEuTG9naW5CeUlkZW50aXR5UmVzcG9uc2UiaYjxBAGK0w4xCi3ouqvku73kuqTmjaLnmbvlvZXvvJrnrKzkuInmlrnlh63or4HmjaLkvJror50QAoLT5JMCKjoBKiIlL2FwaS92MS9zeXN0ZW0vYXV0aC9sb2dpbi1ieS1pZGVudGl0eRLVAQoSQmVnaW5JZGVudGl0eUxvZ2luEiouY3liZXIuc3lzdGVtLnYxLkJlZ2luSWRlbnRpdHlMb2dpblJlcXVlc3QaKy5jeWJlci5zeXN0ZW0udjEuQmVnaW5JZGVudGl0eUxvZ2luUmVzcG9uc2UiZojxBAGK0w4rCiflj5Hotbfouqvku73nmbvlvZXvvJrpk7jpgKDmjojmnYPot7PovawQAYLT5JMCLToBKiIoL2FwaS92MS9zeXN0ZW0vYXV0aC9iZWdpbi1pZGVudGl0eS1sb2dpbhLbAQoLU2VuZFNtc0NvZGUSIy5jeWJlci5zeXN0ZW0udjEuU2VuZFNtc0NvZGVSZXF1ZXN0GiQuY3liZXIuc3lzdGVtLnYxLlNlbmRTbXNDb2RlUmVzcG9uc2UigAGI8QQBitMOTApI5Y+R6YCB55+t5L+h6aqM6K+B56CB77ya6ZO46YCg5LiA5qyh5oCnIHN0YXRlIOS+myBMb2dpbkJ5SWRlbnRpdHkg5raI6LS5EAKC0+STAiY6ASoiIS9hcGkvdjEvc3lzdGVtL2F1dGgvc2VuZC1zbXMtY29kZRK4AQoOQmluZENyZWRlbnRpYWwSJi5jeWJlci5zeXN0ZW0udjEuQmluZENyZWRlbnRpYWxSZXF1ZXN0GicuY3liZXIuc3lzdGVtLnYxLkJpbmRDcmVkZW50aWFsUmVzcG9uc2UiVYjxBASK0w4fChvnu5HlrprnrKzkuInmlrnouqvku73lh63or4EQAoLT5JMCKDoBKiIjL2FwaS92MS9zeXN0ZW0vYXV0aC9iaW5kLWNyZWRlbnRpYWwSggEKBkxvZ291dBIeLmN5YmVyLnN5c3RlbS52MS5Mb2dvdXRSZXF1ZXN0Gh8uY3liZXIuc3lzdGVtLnYxLkxvZ291dFJlc3BvbnNlIjeI8QQEitMOCgoG55m75Ye6EAKC0+STAh86ASoiGi9hcGkvdjEvc3lzdGVtL2F1dGgvbG9nb3V0EqABCg5HZXRDdXJyZW50VXNlchImLmN5YmVyLnN5c3RlbS52MS5HZXRDdXJyZW50VXNlclJlcXVlc3QaJy5jeWJlci5zeXN0ZW0udjEuR2V0Q3VycmVudFVzZXJSZXNwb25zZSI9iPEEBIrTDhwKGOiOt+WPluW9k+WJjeeZu+W9leeUqOaItxABgtPkkwITEhEvYXBpL3YxL3N5c3RlbS9tZRoTiuIJD+iupOivgeS4juS8muivnUIoWiZjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL3N5c3RlbS92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_system_v1_user, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp]);
+  fileDesc("ChpjeWJlci9zeXN0ZW0vdjEvYXV0aC5wcm90bxIPY3liZXIuc3lzdGVtLnYxIpQBCgxMb2dpblJlcXVlc3QSIAoHYWNjb3VudBgBIAEoCUIKukgHyAEBcgIQAUgAiAEBEiEKCHBhc3N3b3JkGAIgASgJQgq6SAfIAQFyAhABSAGIAQESFwoKcG9wdWxhdGlvbhgDIAEoCUgCiAEBQgoKCF9hY2NvdW50QgsKCV9wYXNzd29yZEINCgtfcG9wdWxhdGlvbiKFAQoNTG9naW5SZXNwb25zZRIVCg1zZXNzaW9uX3Rva2VuGAEgASgJEi0KCWlzc3VlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi9wEKFkxvZ2luQnlJZGVudGl0eVJlcXVlc3QSIwoIcHJvdmlkZXIYASABKAlCDLpICcgBAXIEEAEYQEgBiAEBEjgKBndlY2hhdBgCIAEoCzImLmN5YmVyLnN5c3RlbS52MS5XZUNoYXRJZGVudGl0eVBheWxvYWRIABIyCgNzbXMYBCABKAsyIy5jeWJlci5zeXN0ZW0udjEuU21zSWRlbnRpdHlQYXlsb2FkSAASIQoFc3RhdGUYAyABKAlCDbpICsgBAXIFEAEYgAFIAogBAUIQCgdwYXlsb2FkEgW6SAIIAUILCglfcHJvdmlkZXJCCAoGX3N0YXRlIj8KFVdlQ2hhdElkZW50aXR5UGF5bG9hZBIdCgRjb2RlGAEgASgJQgq6SAfIAQFyAhABSACIAQFCBwoFX2NvZGUifgoSU21zSWRlbnRpdHlQYXlsb2FkEiwKBXBob25lGAEgASgJQhi6SBXIAQFyEDIOXlswLTkrXXs1LDIwfSRIAIgBARInCgRjb2RlGAIgASgJQhS6SBHIAQFyDDIKXlswLTldezZ9JEgBiAEBQggKBl9waG9uZUIHCgVfY29kZSKPAQoXTG9naW5CeUlkZW50aXR5UmVzcG9uc2USFQoNc2Vzc2lvbl90b2tlbhgBIAEoCRItCglpc3N1ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIogBChlCZWdpbklkZW50aXR5TG9naW5SZXF1ZXN0EiMKCHByb3ZpZGVyGAEgASgJQgy6SAnIAQFyBBABGEBIAIgBARIoCgxyZWRpcmVjdF91cmkYAiABKAlCDbpICsgBAXIFEAEYgARIAYgBAUILCglfcHJvdmlkZXJCDwoNX3JlZGlyZWN0X3VyaSIzChpCZWdpbklkZW50aXR5TG9naW5SZXNwb25zZRIVCg1hdXRob3JpemVfdXJsGAEgASgJIn4KElNlbmRTbXNDb2RlUmVxdWVzdBIjCghwcm92aWRlchgBIAEoCUIMukgJyAEBcgQQARhASACIAQESLAoFcGhvbmUYAiABKAlCGLpIFcgBAXIQMg5eWzAtOStdezUsMjB9JEgBiAEBQgsKCV9wcm92aWRlckIICgZfcGhvbmUiJAoTU2VuZFNtc0NvZGVSZXNwb25zZRINCgVzdGF0ZRgBIAEoCSL2AQoVQmluZENyZWRlbnRpYWxSZXF1ZXN0EiMKCHByb3ZpZGVyGAEgASgJQgy6SAnIAQFyBBABGEBIAYgBARI4CgZ3ZWNoYXQYAiABKAsyJi5jeWJlci5zeXN0ZW0udjEuV2VDaGF0SWRlbnRpdHlQYXlsb2FkSAASMgoDc21zGAQgASgLMiMuY3liZXIuc3lzdGVtLnYxLlNtc0lkZW50aXR5UGF5bG9hZEgAEiEKBXN0YXRlGAMgASgJQg26SArIAQFyBRABGIABSAKIAQFCEAoHcGF5bG9hZBIFukgCCAFCCwoJX3Byb3ZpZGVyQggKBl9zdGF0ZSIYChZCaW5kQ3JlZGVudGlhbFJlc3BvbnNlIokBChpCZWdpbkJpbmRDcmVkZW50aWFsUmVxdWVzdBIjCghwcm92aWRlchgBIAEoCUIMukgJyAEBcgQQARhASACIAQESKAoMcmVkaXJlY3RfdXJpGAIgASgJQg26SArIAQFyBRABGIAESAGIAQFCCwoJX3Byb3ZpZGVyQg8KDV9yZWRpcmVjdF91cmkiNAobQmVnaW5CaW5kQ3JlZGVudGlhbFJlc3BvbnNlEhUKDWF1dGhvcml6ZV91cmwYASABKAkiggEKFlNlbmRCaW5kU21zQ29kZVJlcXVlc3QSIwoIcHJvdmlkZXIYASABKAlCDLpICcgBAXIEEAEYQEgAiAEBEiwKBXBob25lGAIgASgJQhi6SBXIAQFyEDIOXlswLTkrXXs1LDIwfSRIAYgBAUILCglfcHJvdmlkZXJCCAoGX3Bob25lIigKF1NlbmRCaW5kU21zQ29kZVJlc3BvbnNlEg0KBXN0YXRlGAEgASgJIvUBChRNZXJnZUFjY291bnRzUmVxdWVzdBIjCghwcm92aWRlchgBIAEoCUIMukgJyAEBcgQQARhASAGIAQESOAoGd2VjaGF0GAIgASgLMiYuY3liZXIuc3lzdGVtLnYxLldlQ2hhdElkZW50aXR5UGF5bG9hZEgAEjIKA3NtcxgEIAEoCzIjLmN5YmVyLnN5c3RlbS52MS5TbXNJZGVudGl0eVBheWxvYWRIABIhCgVzdGF0ZRgDIAEoCUINukgKyAEBcgUQARiAAUgCiAEBQhAKB3BheWxvYWQSBbpIAggBQgsKCV9wcm92aWRlckIICgZfc3RhdGUiFwoVTWVyZ2VBY2NvdW50c1Jlc3BvbnNlIuUCChhSZXNvbHZlQ3JlZGVudGlhbFJlcXVlc3QSIwoIcHJvdmlkZXIYASABKAlCDLpICcgBAXIEEAEYQEgBiAEBEiYKBXBob25lGAIgASgJQhW6SBJyEDIOXlswLTkrXXs1LDIwfSRIABI4CgZ3ZWNoYXQYAyABKAsyJi5jeWJlci5zeXN0ZW0udjEuV2VDaGF0SWRlbnRpdHlQYXlsb2FkSAASHgoFc3RhdGUYBCABKAlCCrpIB3IFEAEYgAFIAogBATp2ukhzGnEKJlJlc29sdmVDcmVkZW50aWFsUmVxdWVzdC5zdGF0ZV9wYWlyaW5nEiJzdGF0ZSByaWRlcyB0aGUgd2VjaGF0IGJyYW5jaCBvbmx5GiNoYXModGhpcy53ZWNoYXQpID09IGhhcyh0aGlzLnN0YXRlKUITCgpjcmVkZW50aWFsEgW6SAIIAUILCglfcHJvdmlkZXJCCAoGX3N0YXRlIkwKGVJlc29sdmVDcmVkZW50aWFsUmVzcG9uc2USLwoFb3duZXIYASABKAsyIC5jeWJlci5zeXN0ZW0udjEuQ3JlZGVudGlhbE93bmVyIoABCg9DcmVkZW50aWFsT3duZXISDwoHdXNlcl9pZBgBIAEoCRIPCgdlbmFibGVkGAIgASgIEhEKCW1lcmdlYWJsZRgDIAEoCBI4CgtjcmVkZW50aWFscxgEIAMoCzIjLmN5YmVyLnN5c3RlbS52MS5TZWN1cml0eUNyZWRlbnRpYWwi9gEKFFJlc2V0UGFzc3dvcmRSZXF1ZXN0EiMKCHByb3ZpZGVyGAEgASgJQgy6SAnIAQFyBBABGEBIAYgBARIyCgNzbXMYAiABKAsyIy5jeWJlci5zeXN0ZW0udjEuU21zSWRlbnRpdHlQYXlsb2FkSAASIQoFc3RhdGUYAyABKAlCDbpICsgBAXIFEAEYgAFIAogBARIoCgxuZXdfcGFzc3dvcmQYBCABKAlCDbpICsgBAXIFEAYYgAFIA4gBAUIQCgdwYXlsb2FkEgW6SAIIAUILCglfcHJvdmlkZXJCCAoGX3N0YXRlQg8KDV9uZXdfcGFzc3dvcmQiFwoVUmVzZXRQYXNzd29yZFJlc3BvbnNlIhoKGEdldFNlY3VyaXR5U3RhdHVzUmVxdWVzdCJrChlHZXRTZWN1cml0eVN0YXR1c1Jlc3BvbnNlEhQKDGhhc19wYXNzd29yZBgBIAEoCBI4CgtjcmVkZW50aWFscxgCIAMoCzIjLmN5YmVyLnN5c3RlbS52MS5TZWN1cml0eUNyZWRlbnRpYWwiPQoSU2VjdXJpdHlDcmVkZW50aWFsEgwKBGtpbmQYASABKAkSGQoRbWFza2VkX2lkZW50aWZpZXIYAiABKAkiDwoNTG9nb3V0UmVxdWVzdCIQCg5Mb2dvdXRSZXNwb25zZSIXChVHZXRDdXJyZW50VXNlclJlcXVlc3QihAEKFkdldEN1cnJlbnRVc2VyUmVzcG9uc2USIwoEdXNlchgBIAEoCzIVLmN5YmVyLnN5c3RlbS52MS5Vc2VyEhMKC3Blcm1pc3Npb25zGAIgAygJEjAKC21lbWJlcnNoaXBzGAMgAygLMhsuY3liZXIuc3lzdGVtLnYxLk1lbWJlcnNoaXAiMAoKTWVtYmVyc2hpcBIOCgZ0ZW5hbnQYASABKAkSEgoKcG9wdWxhdGlvbhgCIAEoCTK/FAoLQXV0aFNlcnZpY2USfgoFTG9naW4SHS5jeWJlci5zeXN0ZW0udjEuTG9naW5SZXF1ZXN0Gh4uY3liZXIuc3lzdGVtLnYxLkxvZ2luUmVzcG9uc2UiNojxBAGK0w4KCgbnmbvlvZUQAoLT5JMCHjoBKiIZL2FwaS92MS9zeXN0ZW0vYXV0aC9sb2dpbhLPAQoPTG9naW5CeUlkZW50aXR5EicuY3liZXIuc3lzdGVtLnYxLkxvZ2luQnlJZGVudGl0eVJlcXVlc3QaKC5jeWJlci5zeXN0ZW0udjEuTG9naW5CeUlkZW50aXR5UmVzcG9uc2UiaYjxBAGK0w4xCi3ouqvku73kuqTmjaLnmbvlvZXvvJrnrKzkuInmlrnlh63or4HmjaLkvJror50QAoLT5JMCKjoBKiIlL2FwaS92MS9zeXN0ZW0vYXV0aC9sb2dpbi1ieS1pZGVudGl0eRLVAQoSQmVnaW5JZGVudGl0eUxvZ2luEiouY3liZXIuc3lzdGVtLnYxLkJlZ2luSWRlbnRpdHlMb2dpblJlcXVlc3QaKy5jeWJlci5zeXN0ZW0udjEuQmVnaW5JZGVudGl0eUxvZ2luUmVzcG9uc2UiZojxBAGK0w4rCiflj5Hotbfouqvku73nmbvlvZXvvJrpk7jpgKDmjojmnYPot7PovawQAYLT5JMCLToBKiIoL2FwaS92MS9zeXN0ZW0vYXV0aC9iZWdpbi1pZGVudGl0eS1sb2dpbhLbAQoLU2VuZFNtc0NvZGUSIy5jeWJlci5zeXN0ZW0udjEuU2VuZFNtc0NvZGVSZXF1ZXN0GiQuY3liZXIuc3lzdGVtLnYxLlNlbmRTbXNDb2RlUmVzcG9uc2UigAGI8QQBitMOTApI5Y+R6YCB55+t5L+h6aqM6K+B56CB77ya6ZO46YCg5LiA5qyh5oCnIHN0YXRlIOS+myBMb2dpbkJ5SWRlbnRpdHkg5raI6LS5EAKC0+STAiY6ASoiIS9hcGkvdjEvc3lzdGVtL2F1dGgvc2VuZC1zbXMtY29kZRK4AQoOQmluZENyZWRlbnRpYWwSJi5jeWJlci5zeXN0ZW0udjEuQmluZENyZWRlbnRpYWxSZXF1ZXN0GicuY3liZXIuc3lzdGVtLnYxLkJpbmRDcmVkZW50aWFsUmVzcG9uc2UiVYjxBASK0w4fChvnu5HlrprnrKzkuInmlrnouqvku73lh63or4EQAoLT5JMCKDoBKiIjL2FwaS92MS9zeXN0ZW0vYXV0aC9iaW5kLWNyZWRlbnRpYWwS9QEKE0JlZ2luQmluZENyZWRlbnRpYWwSKy5jeWJlci5zeXN0ZW0udjEuQmVnaW5CaW5kQ3JlZGVudGlhbFJlcXVlc3QaLC5jeWJlci5zeXN0ZW0udjEuQmVnaW5CaW5kQ3JlZGVudGlhbFJlc3BvbnNlIoIBiPEEBIrTDkYKQuWPkei1t+WHreivgee7keWumu+8muS4uuW3sueZu+W9leS8muivnemTuOmAoOe7keWumuaAgeaOiOadg+i3s+i9rBABgtPkkwIuOgEqIikvYXBpL3YxL3N5c3RlbS9hdXRoL2JlZ2luLWJpbmQtY3JlZGVudGlhbBLvAQoPU2VuZEJpbmRTbXNDb2RlEicuY3liZXIuc3lzdGVtLnYxLlNlbmRCaW5kU21zQ29kZVJlcXVlc3QaKC5jeWJlci5zeXN0ZW0udjEuU2VuZEJpbmRTbXNDb2RlUmVzcG9uc2UiiAGI8QQEitMOTwpL5Y+R6YCB57uR5a6a55So55+t5L+h6aqM6K+B56CB77ya6ZO46YCg57uR5a6a5b2T5YmN5Lya6K+d55qE5LiA5qyh5oCnIHN0YXRlEAKC0+STAis6ASoiJi9hcGkvdjEvc3lzdGVtL2F1dGgvc2VuZC1iaW5kLXNtcy1jb2RlEuEBCg1NZXJnZUFjY291bnRzEiUuY3liZXIuc3lzdGVtLnYxLk1lcmdlQWNjb3VudHNSZXF1ZXN0GiYuY3liZXIuc3lzdGVtLnYxLk1lcmdlQWNjb3VudHNSZXNwb25zZSKAAYjxBASK0w5LCkfotKblj7flkIjlubbvvJrlr4zlj7flkJ7lubbnqbrlj7fvvIjlh63or4Hov4Hnp7sr56m65Y+35rOo6ZSAK+Wuoeiuoe+8iRACgtPkkwInOgEqIiIvYXBpL3YxL3N5c3RlbS9hdXRoL21lcmdlLWFjY291bnRzEtoBChFSZXNvbHZlQ3JlZGVudGlhbBIpLmN5YmVyLnN5c3RlbS52MS5SZXNvbHZlQ3JlZGVudGlhbFJlcXVlc3QaKi5jeWJlci5zeXN0ZW0udjEuUmVzb2x2ZUNyZWRlbnRpYWxSZXNwb25zZSJuiPEEBIrTDjUKMeWHreivgeWxnuS4u+ino+aekO+8muWQiOW5tiBvZmZlciDpnaLnmoTlj5bmlbDohb8QAYLT5JMCKzoBKiImL2FwaS92MS9zeXN0ZW0vYXV0aC9yZXNvbHZlLWNyZWRlbnRpYWwSzAEKDVJlc2V0UGFzc3dvcmQSJS5jeWJlci5zeXN0ZW0udjEuUmVzZXRQYXNzd29yZFJlcXVlc3QaJi5jeWJlci5zeXN0ZW0udjEuUmVzZXRQYXNzd29yZFJlc3BvbnNlImyI8QQBitMONwoz6YeN572u55m75b2V5a+G56CB77ya55+t5L+h56CB6K+B5piO5omL5py65Y+35b2S5bGeEAKC0+STAic6ASoiIi9hcGkvdjEvc3lzdGVtL2F1dGgvcmVzZXQtcGFzc3dvcmQStQEKEUdldFNlY3VyaXR5U3RhdHVzEikuY3liZXIuc3lzdGVtLnYxLkdldFNlY3VyaXR5U3RhdHVzUmVxdWVzdBoqLmN5YmVyLnN5c3RlbS52MS5HZXRTZWN1cml0eVN0YXR1c1Jlc3BvbnNlIkmI8QQEitMOHwob6I635Y+W5b2T5YmN6LSm5Y+357uR5a6a6Z2iEAGC0+STAhwSGi9hcGkvdjEvc3lzdGVtL21lL3NlY3VyaXR5EoIBCgZMb2dvdXQSHi5jeWJlci5zeXN0ZW0udjEuTG9nb3V0UmVxdWVzdBofLmN5YmVyLnN5c3RlbS52MS5Mb2dvdXRSZXNwb25zZSI3iPEEBIrTDgoKBueZu+WHuhACgtPkkwIfOgEqIhovYXBpL3YxL3N5c3RlbS9hdXRoL2xvZ291dBKgAQoOR2V0Q3VycmVudFVzZXISJi5jeWJlci5zeXN0ZW0udjEuR2V0Q3VycmVudFVzZXJSZXF1ZXN0GicuY3liZXIuc3lzdGVtLnYxLkdldEN1cnJlbnRVc2VyUmVzcG9uc2UiPYjxBASK0w4cChjojrflj5blvZPliY3nmbvlvZXnlKjmiLcQAYLT5JMCExIRL2FwaS92MS9zeXN0ZW0vbWUaE4riCQ/orqTor4HkuI7kvJror51CKFomY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9zeXN0ZW0vdjFiBnByb3RvMw", [file_buf_validate_validate, file_cyber_system_v1_user, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message cyber.system.v1.LoginRequest
@@ -288,14 +288,20 @@ export type BindCredentialRequest = Message<"cyber.system.v1.BindCredentialReque
      */
     value: WeChatIdentityPayload;
     case: "wechat";
+  } | {
+    /**
+     * @generated from field: cyber.system.v1.SmsIdentityPayload sms = 4;
+     */
+    value: SmsIdentityPayload;
+    case: "sms";
   } | { case: undefined; value?: undefined };
 
   /**
-   * The state is one-shot (consumed on exchange) but binds only the
-   * provider key, not the initiating browser: this RPC trusts whoever
-   * presents the code. Dormant while no client offers a bind entry; the
-   * first GET-triggered bind flow must tie the state to the initiating
-   * session before shipping — do not copy this shape without that.
+   * The state must be one minted on an authenticated rung (SendBindSmsCode
+   * or BeginBindCredential) and carries the minting session: the exchange
+   * refuses a state born in another session or anonymous, so a phished code
+   * cannot be injected into a foreign bind flow. Login faces accept any
+   * live state of their provider — the code itself is the login proof.
    *
    * @generated from field: optional string state = 3;
    */
@@ -323,6 +329,377 @@ export const BindCredentialResponseSchema: GenMessage<BindCredentialResponse> = 
   messageDesc(file_cyber_system_v1_auth, 11);
 
 /**
+ * @generated from message cyber.system.v1.BeginBindCredentialRequest
+ */
+export type BeginBindCredentialRequest = Message<"cyber.system.v1.BeginBindCredentialRequest"> & {
+  /**
+   * @generated from field: optional string provider = 1;
+   */
+  provider?: string | undefined;
+
+  /**
+   * @generated from field: optional string redirect_uri = 2;
+   */
+  redirectUri?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.BeginBindCredentialRequest.
+ * Use `create(BeginBindCredentialRequestSchema)` to create a new message.
+ */
+export const BeginBindCredentialRequestSchema: GenMessage<BeginBindCredentialRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 12);
+
+/**
+ * @generated from message cyber.system.v1.BeginBindCredentialResponse
+ */
+export type BeginBindCredentialResponse = Message<"cyber.system.v1.BeginBindCredentialResponse"> & {
+  /**
+   * @generated from field: string authorize_url = 1;
+   */
+  authorizeUrl: string;
+};
+
+/**
+ * Describes the message cyber.system.v1.BeginBindCredentialResponse.
+ * Use `create(BeginBindCredentialResponseSchema)` to create a new message.
+ */
+export const BeginBindCredentialResponseSchema: GenMessage<BeginBindCredentialResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 13);
+
+/**
+ * @generated from message cyber.system.v1.SendBindSmsCodeRequest
+ */
+export type SendBindSmsCodeRequest = Message<"cyber.system.v1.SendBindSmsCodeRequest"> & {
+  /**
+   * @generated from field: optional string provider = 1;
+   */
+  provider?: string | undefined;
+
+  /**
+   * @generated from field: optional string phone = 2;
+   */
+  phone?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.SendBindSmsCodeRequest.
+ * Use `create(SendBindSmsCodeRequestSchema)` to create a new message.
+ */
+export const SendBindSmsCodeRequestSchema: GenMessage<SendBindSmsCodeRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 14);
+
+/**
+ * @generated from message cyber.system.v1.SendBindSmsCodeResponse
+ */
+export type SendBindSmsCodeResponse = Message<"cyber.system.v1.SendBindSmsCodeResponse"> & {
+  /**
+   * The one-shot state bound to the calling session; present it at
+   * BindCredential together with the code the phone received.
+   *
+   * @generated from field: string state = 1;
+   */
+  state: string;
+};
+
+/**
+ * Describes the message cyber.system.v1.SendBindSmsCodeResponse.
+ * Use `create(SendBindSmsCodeResponseSchema)` to create a new message.
+ */
+export const SendBindSmsCodeResponseSchema: GenMessage<SendBindSmsCodeResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 15);
+
+/**
+ * Merge runs in one direction only: the calling session is the surviving
+ * account, and the proven credential's current owner is the account being
+ * absorbed. The caller proves control of that credential (SMS code or OAuth
+ * code, same exchange as bind), which is the anti-takeover gate. The
+ * absorbed account must be system-side weightless — no password, exactly
+ * the one proven credential, no operator seats — or the merge refuses; the
+ * richer both-sides-have-data judgment over business records lives in the
+ * consuming service's offer face and is not re-derived here. A flow whose
+ * session is the empty side decomposes client-side: log in via the rich
+ * side's credential, then merge from there.
+ *
+ * @generated from message cyber.system.v1.MergeAccountsRequest
+ */
+export type MergeAccountsRequest = Message<"cyber.system.v1.MergeAccountsRequest"> & {
+  /**
+   * @generated from field: optional string provider = 1;
+   */
+  provider?: string | undefined;
+
+  /**
+   * @generated from oneof cyber.system.v1.MergeAccountsRequest.payload
+   */
+  payload: {
+    /**
+     * @generated from field: cyber.system.v1.WeChatIdentityPayload wechat = 2;
+     */
+    value: WeChatIdentityPayload;
+    case: "wechat";
+  } | {
+    /**
+     * @generated from field: cyber.system.v1.SmsIdentityPayload sms = 4;
+     */
+    value: SmsIdentityPayload;
+    case: "sms";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * @generated from field: optional string state = 3;
+   */
+  state?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.MergeAccountsRequest.
+ * Use `create(MergeAccountsRequestSchema)` to create a new message.
+ */
+export const MergeAccountsRequestSchema: GenMessage<MergeAccountsRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 16);
+
+/**
+ * @generated from message cyber.system.v1.MergeAccountsResponse
+ */
+export type MergeAccountsResponse = Message<"cyber.system.v1.MergeAccountsResponse"> & {
+};
+
+/**
+ * Describes the message cyber.system.v1.MergeAccountsResponse.
+ * Use `create(MergeAccountsResponseSchema)` to create a new message.
+ */
+export const MergeAccountsResponseSchema: GenMessage<MergeAccountsResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 17);
+
+/**
+ * The offer face's lookup leg. The sms branch is a bare owner lookup by
+ * phone — no proof rides it because the merge itself re-proves with a
+ * fresh code, and the consumer rate-guards the occupancy oracle. The wechat
+ * branch carries the OAuth proof (the state BeginBindCredential minted plus
+ * the redirect code): only the exchange learns the openid, and it burns
+ * state and code exactly like a bind attempt would.
+ *
+ * @generated from message cyber.system.v1.ResolveCredentialRequest
+ */
+export type ResolveCredentialRequest = Message<"cyber.system.v1.ResolveCredentialRequest"> & {
+  /**
+   * @generated from field: optional string provider = 1;
+   */
+  provider?: string | undefined;
+
+  /**
+   * @generated from oneof cyber.system.v1.ResolveCredentialRequest.credential
+   */
+  credential: {
+    /**
+     * @generated from field: string phone = 2;
+     */
+    value: string;
+    case: "phone";
+  } | {
+    /**
+     * @generated from field: cyber.system.v1.WeChatIdentityPayload wechat = 3;
+     */
+    value: WeChatIdentityPayload;
+    case: "wechat";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * Wechat branch only: the bind-minted one-shot state.
+   *
+   * @generated from field: optional string state = 4;
+   */
+  state?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.ResolveCredentialRequest.
+ * Use `create(ResolveCredentialRequestSchema)` to create a new message.
+ */
+export const ResolveCredentialRequestSchema: GenMessage<ResolveCredentialRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 18);
+
+/**
+ * @generated from message cyber.system.v1.ResolveCredentialResponse
+ */
+export type ResolveCredentialResponse = Message<"cyber.system.v1.ResolveCredentialResponse"> & {
+  /**
+   * Unset when the credential is free — no owner, the plain-bind path.
+   *
+   * @generated from field: cyber.system.v1.CredentialOwner owner = 1;
+   */
+  owner?: CredentialOwner | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.ResolveCredentialResponse.
+ * Use `create(ResolveCredentialResponseSchema)` to create a new message.
+ */
+export const ResolveCredentialResponseSchema: GenMessage<ResolveCredentialResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 19);
+
+/**
+ * The owner facts an offer needs. Masked identifiers only: the raw values
+ * never leave the service. The mergeable verdict is the system-side hard
+ * gate (no password, exactly the resolved credential, no operator seats);
+ * the richer both-sides-have-data judgment over business records stays in
+ * the consuming service.
+ *
+ * @generated from message cyber.system.v1.CredentialOwner
+ */
+export type CredentialOwner = Message<"cyber.system.v1.CredentialOwner"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: bool enabled = 2;
+   */
+  enabled: boolean;
+
+  /**
+   * @generated from field: bool mergeable = 3;
+   */
+  mergeable: boolean;
+
+  /**
+   * @generated from field: repeated cyber.system.v1.SecurityCredential credentials = 4;
+   */
+  credentials: SecurityCredential[];
+};
+
+/**
+ * Describes the message cyber.system.v1.CredentialOwner.
+ * Use `create(CredentialOwnerSchema)` to create a new message.
+ */
+export const CredentialOwnerSchema: GenMessage<CredentialOwner> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 20);
+
+/**
+ * The proof-carrying password setter for accounts whose only reach is their
+ * phone: the forgot-password leg on the login page and the first-password
+ * leg in account security both land here. The sms code to the account's own
+ * phone is the anti-takeover gate; the state is the one SendSmsCode minted.
+ * The account owning the sms credential is the one rehashed; sessions stay
+ * standing (a rotation is not a revocation).
+ *
+ * @generated from message cyber.system.v1.ResetPasswordRequest
+ */
+export type ResetPasswordRequest = Message<"cyber.system.v1.ResetPasswordRequest"> & {
+  /**
+   * @generated from field: optional string provider = 1;
+   */
+  provider?: string | undefined;
+
+  /**
+   * @generated from oneof cyber.system.v1.ResetPasswordRequest.payload
+   */
+  payload: {
+    /**
+     * @generated from field: cyber.system.v1.SmsIdentityPayload sms = 2;
+     */
+    value: SmsIdentityPayload;
+    case: "sms";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * @generated from field: optional string state = 3;
+   */
+  state?: string | undefined;
+
+  /**
+   * @generated from field: optional string new_password = 4;
+   */
+  newPassword?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.system.v1.ResetPasswordRequest.
+ * Use `create(ResetPasswordRequestSchema)` to create a new message.
+ */
+export const ResetPasswordRequestSchema: GenMessage<ResetPasswordRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 21);
+
+/**
+ * @generated from message cyber.system.v1.ResetPasswordResponse
+ */
+export type ResetPasswordResponse = Message<"cyber.system.v1.ResetPasswordResponse"> & {
+};
+
+/**
+ * Describes the message cyber.system.v1.ResetPasswordResponse.
+ * Use `create(ResetPasswordResponseSchema)` to create a new message.
+ */
+export const ResetPasswordResponseSchema: GenMessage<ResetPasswordResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 22);
+
+/**
+ * @generated from message cyber.system.v1.GetSecurityStatusRequest
+ */
+export type GetSecurityStatusRequest = Message<"cyber.system.v1.GetSecurityStatusRequest"> & {
+};
+
+/**
+ * Describes the message cyber.system.v1.GetSecurityStatusRequest.
+ * Use `create(GetSecurityStatusRequestSchema)` to create a new message.
+ */
+export const GetSecurityStatusRequestSchema: GenMessage<GetSecurityStatusRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 23);
+
+/**
+ * The caller's own binding surface: password set or not, and each
+ * credential with a display-masked identifier. The mask is server policy
+ * with one home; clients render what they receive and never re-derive it.
+ *
+ * @generated from message cyber.system.v1.GetSecurityStatusResponse
+ */
+export type GetSecurityStatusResponse = Message<"cyber.system.v1.GetSecurityStatusResponse"> & {
+  /**
+   * @generated from field: bool has_password = 1;
+   */
+  hasPassword: boolean;
+
+  /**
+   * @generated from field: repeated cyber.system.v1.SecurityCredential credentials = 2;
+   */
+  credentials: SecurityCredential[];
+};
+
+/**
+ * Describes the message cyber.system.v1.GetSecurityStatusResponse.
+ * Use `create(GetSecurityStatusResponseSchema)` to create a new message.
+ */
+export const GetSecurityStatusResponseSchema: GenMessage<GetSecurityStatusResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 24);
+
+/**
+ * One binding row of the security surface; kind is the credential family
+ * (sms, wechat_mp).
+ *
+ * @generated from message cyber.system.v1.SecurityCredential
+ */
+export type SecurityCredential = Message<"cyber.system.v1.SecurityCredential"> & {
+  /**
+   * @generated from field: string kind = 1;
+   */
+  kind: string;
+
+  /**
+   * @generated from field: string masked_identifier = 2;
+   */
+  maskedIdentifier: string;
+};
+
+/**
+ * Describes the message cyber.system.v1.SecurityCredential.
+ * Use `create(SecurityCredentialSchema)` to create a new message.
+ */
+export const SecurityCredentialSchema: GenMessage<SecurityCredential> = /*@__PURE__*/
+  messageDesc(file_cyber_system_v1_auth, 25);
+
+/**
  * @generated from message cyber.system.v1.LogoutRequest
  */
 export type LogoutRequest = Message<"cyber.system.v1.LogoutRequest"> & {
@@ -333,7 +710,7 @@ export type LogoutRequest = Message<"cyber.system.v1.LogoutRequest"> & {
  * Use `create(LogoutRequestSchema)` to create a new message.
  */
 export const LogoutRequestSchema: GenMessage<LogoutRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_auth, 12);
+  messageDesc(file_cyber_system_v1_auth, 26);
 
 /**
  * @generated from message cyber.system.v1.LogoutResponse
@@ -346,7 +723,7 @@ export type LogoutResponse = Message<"cyber.system.v1.LogoutResponse"> & {
  * Use `create(LogoutResponseSchema)` to create a new message.
  */
 export const LogoutResponseSchema: GenMessage<LogoutResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_auth, 13);
+  messageDesc(file_cyber_system_v1_auth, 27);
 
 /**
  * getCurrentUser
@@ -361,7 +738,7 @@ export type GetCurrentUserRequest = Message<"cyber.system.v1.GetCurrentUserReque
  * Use `create(GetCurrentUserRequestSchema)` to create a new message.
  */
 export const GetCurrentUserRequestSchema: GenMessage<GetCurrentUserRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_auth, 14);
+  messageDesc(file_cyber_system_v1_auth, 28);
 
 /**
  * @generated from message cyber.system.v1.GetCurrentUserResponse
@@ -388,7 +765,7 @@ export type GetCurrentUserResponse = Message<"cyber.system.v1.GetCurrentUserResp
  * Use `create(GetCurrentUserResponseSchema)` to create a new message.
  */
 export const GetCurrentUserResponseSchema: GenMessage<GetCurrentUserResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_auth, 15);
+  messageDesc(file_cyber_system_v1_auth, 29);
 
 /**
  * Plain scalars by the success-implies-present carve-out: a seat row always
@@ -413,7 +790,7 @@ export type Membership = Message<"cyber.system.v1.Membership"> & {
  * Use `create(MembershipSchema)` to create a new message.
  */
 export const MembershipSchema: GenMessage<Membership> = /*@__PURE__*/
-  messageDesc(file_cyber_system_v1_auth, 16);
+  messageDesc(file_cyber_system_v1_auth, 30);
 
 /**
  * @generated from service cyber.system.v1.AuthService
@@ -458,6 +835,54 @@ export const AuthService: GenService<{
     methodKind: "unary";
     input: typeof BindCredentialRequestSchema;
     output: typeof BindCredentialResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.BeginBindCredential
+   */
+  beginBindCredential: {
+    methodKind: "unary";
+    input: typeof BeginBindCredentialRequestSchema;
+    output: typeof BeginBindCredentialResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.SendBindSmsCode
+   */
+  sendBindSmsCode: {
+    methodKind: "unary";
+    input: typeof SendBindSmsCodeRequestSchema;
+    output: typeof SendBindSmsCodeResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.MergeAccounts
+   */
+  mergeAccounts: {
+    methodKind: "unary";
+    input: typeof MergeAccountsRequestSchema;
+    output: typeof MergeAccountsResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.ResolveCredential
+   */
+  resolveCredential: {
+    methodKind: "unary";
+    input: typeof ResolveCredentialRequestSchema;
+    output: typeof ResolveCredentialResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.ResetPassword
+   */
+  resetPassword: {
+    methodKind: "unary";
+    input: typeof ResetPasswordRequestSchema;
+    output: typeof ResetPasswordResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.system.v1.AuthService.GetSecurityStatus
+   */
+  getSecurityStatus: {
+    methodKind: "unary";
+    input: typeof GetSecurityStatusRequestSchema;
+    output: typeof GetSecurityStatusResponseSchema;
   },
   /**
    * @generated from rpc cyber.system.v1.AuthService.Logout

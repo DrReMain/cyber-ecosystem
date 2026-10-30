@@ -91,6 +91,8 @@
   "error_SYSTEM_IDENTITY_ALREADY_BOUND": "This third-party identity is already bound to another account",
   "error_SYSTEM_SMS_RATE_LIMITED": "Verification codes sent too quickly — please wait a moment",
   "error_SYSTEM_SMS_CODE_INVALID": "The code is wrong or expired — request a new one",
+  "error_SYSTEM_MERGE_NOT_MERGEABLE": "That account cannot be merged automatically — contact customer service",
+  "error_SYSTEM_MERGE_NOT_BOUND": "This credential is not bound to an account; there is nothing to merge",
   "error_ESPORTS_UNSPECIFIED": "Esports service error",
   "error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED": "Users under 13 need guardian consent to continue",
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "Selected game not found; refresh the list and try again",

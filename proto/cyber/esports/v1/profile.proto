@@ -37,6 +37,87 @@ service ProfileService {
       body: "*"
     };
   }
+  rpc PreviewMerge(PreviewMergeRequest) returns (PreviewMergeResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "合并 offer 面：空号判据与两账号摘要"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/profile/preview-merge"
+      body: "*"
+    };
+  }
+}
+
+// previewMerge ------------------------------------------------------------------------
+
+// The merge offer's decision input. The sms branch carries the bare phone —
+// occupancy is not a secret the bind flow doesn't already reveal, and the
+// merge itself re-proves with a fresh code. The wechat branch carries the
+// OAuth proof: only the exchange learns the openid, so the preview burns
+// state and code exactly like a bind attempt would.
+message PreviewMergeRequest {
+  option (buf.validate.message).cel = {
+    id: "PreviewMergeRequest.state_pairing"
+    message: "state rides the wechat branch only"
+    expression: "has(this.wechat) == has(this.state)"
+  };
+
+  oneof credential {
+    option (buf.validate.oneof).required = true;
+    string phone = 1 [(buf.validate.field).string.pattern = "^[0-9+]{5,20}$"];
+    WeChatMergeProof wechat = 2;
+  }
+  // Wechat branch only: the bind-minted one-shot state.
+  optional string state = 3 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message WeChatMergeProof {
+  optional string code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+}
+
+// The offer verdict. KEEP_CALLER: the other side is the empty one and the
+// caller's session executes the merge as-is. KEEP_OTHER: the caller is the
+// empty one; the client decomposes — log in via the other side's wechat,
+// then merge with the caller's phone code. BLOCKED: both sides carry
+// business weight, no automatic merge. FREE and SELF answer the plain-bind
+// question so the bind pages can route without a second vocabulary.
+enum MergePreviewStatus {
+  MERGE_PREVIEW_STATUS_UNSPECIFIED = 0;
+  MERGE_PREVIEW_STATUS_FREE = 1;
+  MERGE_PREVIEW_STATUS_SELF = 2;
+  MERGE_PREVIEW_STATUS_KEEP_CALLER = 3;
+  MERGE_PREVIEW_STATUS_KEEP_OTHER = 4;
+  MERGE_PREVIEW_STATUS_BLOCKED = 5;
+}
+
+// One side's confirm-page facts. Identifier-shaped values arrive masked by
+// the system service; clients render, never re-derive.
+message MergeAccountSummary {
+  string user_id = 1;
+  // Masked phone when the side holds an sms credential, else null.
+  google.protobuf.StringValue phone_mask = 2;
+  // True when the side holds a wechat credential.
+  bool wechat = 3;
+  // Distinct assessment sessions with a valid attempt.
+  int32 sessions = 4;
+  // The furthest live membership window; null = no live membership.
+  google.protobuf.Timestamp member_until = 5;
+  // Any unlocked report family.
+  bool unlocked = 6;
+}
+
+message PreviewMergeResponse {
+  MergePreviewStatus status = 1;
+  MergeAccountSummary caller = 2;
+  MergeAccountSummary other = 3;
 }
 
 // The member's own profile. Entity fields are wrappers: null means "not set

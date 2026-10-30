@@ -161,7 +161,7 @@ message Auth {
     string key = 1;      // instance registry key
     string kind = 2;     // code-registered kind; boot fails otherwise
     bool enabled = 3;
-    string endpoint = 4; // exchange base URL; empty = the kind's default (tests override here)
+    string endpoint = 4; // OAuth base URL — the authorize redirect and the token exchange both; empty = the kind's defaults (tests override here)
     bool auto_register = 6;
     WeChat wechat = 5;
     string population = 7; // landing population for this provider's logins (births and bound entries); empty = the default population

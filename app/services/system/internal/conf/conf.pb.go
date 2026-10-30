@@ -1596,7 +1596,7 @@ type Auth_Provider struct {
 	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`   // instance registry key
 	Kind          string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"` // code-registered kind; boot fails otherwise
 	Enabled       bool                   `protobuf:"varint,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Endpoint      string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"` // exchange base URL; empty = the kind's default (tests override here)
+	Endpoint      string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"` // OAuth base URL — the authorize redirect and the token exchange both; empty = the kind's defaults (tests override here)
 	AutoRegister  bool                   `protobuf:"varint,6,opt,name=auto_register,json=autoRegister,proto3" json:"auto_register,omitempty"`
 	Wechat        *Auth_Provider_WeChat  `protobuf:"bytes,5,opt,name=wechat,proto3" json:"wechat,omitempty"`
 	Population    string                 `protobuf:"bytes,7,opt,name=population,proto3" json:"population,omitempty"` // landing population for this provider's logins (births and bound entries); empty = the default population

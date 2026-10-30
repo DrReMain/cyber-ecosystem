@@ -173,6 +173,42 @@ func (rp *entitlementRP) HasActiveMembership(ctx context.Context, userID string)
 	return ok, nil
 }
 
+func (rp *entitlementRP) MembershipWindow(ctx context.Context, userID string) (*EntitlementRow, error) {
+	// The display read for the merge offer: whichever live membership window
+	// runs furthest. Multiple tiers ratchet into separate rows; the confirm
+	// page promises the longest standing benefit, and a lapsed-only history
+	// reads as no membership at all.
+	rows, err := rp.Platform.GetClient(ctx).Entitlement.Query().
+		Where(
+			entitlement.UserIDEQ(userID),
+			entitlement.ScopeKindEQ(entitlement.ScopeKind(shared.ScopeMembership)),
+			entitlement.ExpiresAtGT(time.Now()),
+		).
+		Order(ent.Desc(entitlement.FieldExpiresAt)).
+		Limit(1).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	if len(rows) == 0 {
+		return nil, nil
+	}
+	return mapEntitlementRow(rows[0]), nil
+}
+
+func (rp *entitlementRP) HasAnyScope(ctx context.Context, userID, scopeKind string) (bool, error) {
+	ok, err := rp.Platform.GetClient(ctx).Entitlement.Query().
+		Where(
+			entitlement.UserIDEQ(userID),
+			entitlement.ScopeKindEQ(entitlement.ScopeKind(scopeKind)),
+		).
+		Exist(ctx)
+	if err != nil {
+		return false, rp.Platform.HandleEntError(err)
+	}
+	return ok, nil
+}
+
 func (rp *entitlementRP) Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error) {
 	row, err := rp.ByScope(ctx, userID, scopeKind, scopeRef)
 	if err != nil {

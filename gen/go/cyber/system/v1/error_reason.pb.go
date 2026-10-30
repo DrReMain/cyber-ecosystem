@@ -38,6 +38,8 @@ const (
 	System_SYSTEM_IDENTITY_ALREADY_BOUND    System = 6005
 	System_SYSTEM_SMS_RATE_LIMITED          System = 6006
 	System_SYSTEM_SMS_CODE_INVALID          System = 6007
+	System_SYSTEM_MERGE_NOT_MERGEABLE       System = 6008
+	System_SYSTEM_MERGE_NOT_BOUND           System = 6009
 	// 601x: dept
 	System_SYSTEM_DEPT_SELF_PARENT      System = 6010
 	System_SYSTEM_DEPT_CYCLE            System = 6011
@@ -86,6 +88,8 @@ var (
 		6005: "SYSTEM_IDENTITY_ALREADY_BOUND",
 		6006: "SYSTEM_SMS_RATE_LIMITED",
 		6007: "SYSTEM_SMS_CODE_INVALID",
+		6008: "SYSTEM_MERGE_NOT_MERGEABLE",
+		6009: "SYSTEM_MERGE_NOT_BOUND",
 		6010: "SYSTEM_DEPT_SELF_PARENT",
 		6011: "SYSTEM_DEPT_CYCLE",
 		6012: "SYSTEM_DEPT_HAS_CHILDREN",
@@ -122,6 +126,8 @@ var (
 		"SYSTEM_IDENTITY_ALREADY_BOUND":       6005,
 		"SYSTEM_SMS_RATE_LIMITED":             6006,
 		"SYSTEM_SMS_CODE_INVALID":             6007,
+		"SYSTEM_MERGE_NOT_MERGEABLE":          6008,
+		"SYSTEM_MERGE_NOT_BOUND":              6009,
 		"SYSTEM_DEPT_SELF_PARENT":             6010,
 		"SYSTEM_DEPT_CYCLE":                   6011,
 		"SYSTEM_DEPT_HAS_CHILDREN":            6012,
@@ -181,7 +187,8 @@ var File_cyber_system_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xf8\t\n" +
+	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xc2\n" +
+	"\n" +
 	"\x06System\x12\x1c\n" +
 	"\x12SYSTEM_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12\x1e\n" +
 	"\x13SYSTEM_LOGIN_FAILED\x10\xf0.\x1a\x04\xa8E\x90\x03\x12#\n" +
@@ -191,7 +198,9 @@ const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\x1fSYSTEM_IDENTITY_EXCHANGE_FAILED\x10\xf4.\x1a\x04\xa8E\x91\x03\x12(\n" +
 	"\x1dSYSTEM_IDENTITY_ALREADY_BOUND\x10\xf5.\x1a\x04\xa8E\x99\x03\x12\"\n" +
 	"\x17SYSTEM_SMS_RATE_LIMITED\x10\xf6.\x1a\x04\xa8E\xad\x03\x12\"\n" +
-	"\x17SYSTEM_SMS_CODE_INVALID\x10\xf7.\x1a\x04\xa8E\x91\x03\x12\"\n" +
+	"\x17SYSTEM_SMS_CODE_INVALID\x10\xf7.\x1a\x04\xa8E\x91\x03\x12%\n" +
+	"\x1aSYSTEM_MERGE_NOT_MERGEABLE\x10\xf8.\x1a\x04\xa8E\x99\x03\x12!\n" +
+	"\x16SYSTEM_MERGE_NOT_BOUND\x10\xf9.\x1a\x04\xa8E\x94\x03\x12\"\n" +
 	"\x17SYSTEM_DEPT_SELF_PARENT\x10\xfa.\x1a\x04\xa8E\x90\x03\x12\x1c\n" +
 	"\x11SYSTEM_DEPT_CYCLE\x10\xfb.\x1a\x04\xa8E\x90\x03\x12#\n" +
 	"\x18SYSTEM_DEPT_HAS_CHILDREN\x10\xfc.\x1a\x04\xa8E\x90\x03\x12 \n" +

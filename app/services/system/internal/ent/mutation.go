@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"cyber-ecosystem/app/services/system/internal/ent/accountmerge"
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
@@ -38,6 +39,7 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeAccountMerge     = "AccountMerge"
 	TypeAuditExport      = "AuditExport"
 	TypeAuditLog         = "AuditLog"
 	TypeAuthzPolicy      = "AuthzPolicy"
@@ -54,6 +56,662 @@ const (
 	TypeTenant           = "Tenant"
 	TypeUser             = "User"
 )
+
+// AccountMergeMutation represents an operation that mutates the AccountMerge nodes in the graph.
+type AccountMergeMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	poor_id       *string
+	rich_id       *string
+	provider      *string
+	kind          *string
+	identifier    *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*AccountMerge, error)
+	predicates    []predicate.AccountMerge
+}
+
+var _ ent.Mutation = (*AccountMergeMutation)(nil)
+
+// accountmergeOption allows management of the mutation configuration using functional options.
+type accountmergeOption func(*AccountMergeMutation)
+
+// newAccountMergeMutation creates new mutation for the AccountMerge entity.
+func newAccountMergeMutation(c config, op Op, opts ...accountmergeOption) *AccountMergeMutation {
+	m := &AccountMergeMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAccountMerge,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAccountMergeID sets the ID field of the mutation.
+func withAccountMergeID(id string) accountmergeOption {
+	return func(m *AccountMergeMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AccountMerge
+		)
+		m.oldValue = func(ctx context.Context) (*AccountMerge, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AccountMerge.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAccountMerge sets the old AccountMerge of the mutation.
+func withAccountMerge(node *AccountMerge) accountmergeOption {
+	return func(m *AccountMergeMutation) {
+		m.oldValue = func(context.Context) (*AccountMerge, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AccountMergeMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AccountMergeMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of AccountMerge entities.
+func (m *AccountMergeMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *AccountMergeMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *AccountMergeMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().AccountMerge.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AccountMergeMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AccountMergeMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AccountMerge entity.
+// If the AccountMerge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMergeMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AccountMergeMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *AccountMergeMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *AccountMergeMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the AccountMerge entity.
+// If the AccountMerge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMergeMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *AccountMergeMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetPoorID sets the "poor_id" field.
+func (m *AccountMergeMutation) SetPoorID(s string) {
+	m.poor_id = &s
+}
+
+// PoorID returns the value of the "poor_id" field in the mutation.
+func (m *AccountMergeMutation) PoorID() (r string, exists bool) {
+	v := m.poor_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPoorID returns the old "poor_id" field's value of the AccountMerge entity.
+// If the AccountMerge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMergeMutation) OldPoorID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPoorID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPoorID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPoorID: %w", err)
+	}
+	return oldValue.PoorID, nil
+}
+
+// ResetPoorID resets all changes to the "poor_id" field.
+func (m *AccountMergeMutation) ResetPoorID() {
+	m.poor_id = nil
+}
+
+// SetRichID sets the "rich_id" field.
+func (m *AccountMergeMutation) SetRichID(s string) {
+	m.rich_id = &s
+}
+
+// RichID returns the value of the "rich_id" field in the mutation.
+func (m *AccountMergeMutation) RichID() (r string, exists bool) {
+	v := m.rich_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRichID returns the old "rich_id" field's value of the AccountMerge entity.
+// If the AccountMerge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMergeMutation) OldRichID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRichID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRichID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRichID: %w", err)
+	}
+	return oldValue.RichID, nil
+}
+
+// ResetRichID resets all changes to the "rich_id" field.
+func (m *AccountMergeMutation) ResetRichID() {
+	m.rich_id = nil
+}
+
+// SetProvider sets the "provider" field.
+func (m *AccountMergeMutation) SetProvider(s string) {
+	m.provider = &s
+}
+
+// Provider returns the value of the "provider" field in the mutation.
+func (m *AccountMergeMutation) Provider() (r string, exists bool) {
+	v := m.provider
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProvider returns the old "provider" field's value of the AccountMerge entity.
+// If the AccountMerge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMergeMutation) OldProvider(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProvider is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProvider requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProvider: %w", err)
+	}
+	return oldValue.Provider, nil
+}
+
+// ResetProvider resets all changes to the "provider" field.
+func (m *AccountMergeMutation) ResetProvider() {
+	m.provider = nil
+}
+
+// SetKind sets the "kind" field.
+func (m *AccountMergeMutation) SetKind(s string) {
+	m.kind = &s
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *AccountMergeMutation) Kind() (r string, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the AccountMerge entity.
+// If the AccountMerge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMergeMutation) OldKind(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *AccountMergeMutation) ResetKind() {
+	m.kind = nil
+}
+
+// SetIdentifier sets the "identifier" field.
+func (m *AccountMergeMutation) SetIdentifier(s string) {
+	m.identifier = &s
+}
+
+// Identifier returns the value of the "identifier" field in the mutation.
+func (m *AccountMergeMutation) Identifier() (r string, exists bool) {
+	v := m.identifier
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIdentifier returns the old "identifier" field's value of the AccountMerge entity.
+// If the AccountMerge object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMergeMutation) OldIdentifier(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIdentifier is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIdentifier requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIdentifier: %w", err)
+	}
+	return oldValue.Identifier, nil
+}
+
+// ResetIdentifier resets all changes to the "identifier" field.
+func (m *AccountMergeMutation) ResetIdentifier() {
+	m.identifier = nil
+}
+
+// Where appends a list predicates to the AccountMergeMutation builder.
+func (m *AccountMergeMutation) Where(ps ...predicate.AccountMerge) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the AccountMergeMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AccountMergeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.AccountMerge, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *AccountMergeMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AccountMergeMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (AccountMerge).
+func (m *AccountMergeMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AccountMergeMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, accountmerge.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, accountmerge.FieldUpdatedAt)
+	}
+	if m.poor_id != nil {
+		fields = append(fields, accountmerge.FieldPoorID)
+	}
+	if m.rich_id != nil {
+		fields = append(fields, accountmerge.FieldRichID)
+	}
+	if m.provider != nil {
+		fields = append(fields, accountmerge.FieldProvider)
+	}
+	if m.kind != nil {
+		fields = append(fields, accountmerge.FieldKind)
+	}
+	if m.identifier != nil {
+		fields = append(fields, accountmerge.FieldIdentifier)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AccountMergeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case accountmerge.FieldCreatedAt:
+		return m.CreatedAt()
+	case accountmerge.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case accountmerge.FieldPoorID:
+		return m.PoorID()
+	case accountmerge.FieldRichID:
+		return m.RichID()
+	case accountmerge.FieldProvider:
+		return m.Provider()
+	case accountmerge.FieldKind:
+		return m.Kind()
+	case accountmerge.FieldIdentifier:
+		return m.Identifier()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AccountMergeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case accountmerge.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case accountmerge.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case accountmerge.FieldPoorID:
+		return m.OldPoorID(ctx)
+	case accountmerge.FieldRichID:
+		return m.OldRichID(ctx)
+	case accountmerge.FieldProvider:
+		return m.OldProvider(ctx)
+	case accountmerge.FieldKind:
+		return m.OldKind(ctx)
+	case accountmerge.FieldIdentifier:
+		return m.OldIdentifier(ctx)
+	}
+	return nil, fmt.Errorf("unknown AccountMerge field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AccountMergeMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case accountmerge.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case accountmerge.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case accountmerge.FieldPoorID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPoorID(v)
+		return nil
+	case accountmerge.FieldRichID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRichID(v)
+		return nil
+	case accountmerge.FieldProvider:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProvider(v)
+		return nil
+	case accountmerge.FieldKind:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
+		return nil
+	case accountmerge.FieldIdentifier:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIdentifier(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AccountMerge field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AccountMergeMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AccountMergeMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AccountMergeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AccountMerge numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AccountMergeMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AccountMergeMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AccountMergeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown AccountMerge nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AccountMergeMutation) ResetField(name string) error {
+	switch name {
+	case accountmerge.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case accountmerge.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case accountmerge.FieldPoorID:
+		m.ResetPoorID()
+		return nil
+	case accountmerge.FieldRichID:
+		m.ResetRichID()
+		return nil
+	case accountmerge.FieldProvider:
+		m.ResetProvider()
+		return nil
+	case accountmerge.FieldKind:
+		m.ResetKind()
+		return nil
+	case accountmerge.FieldIdentifier:
+		m.ResetIdentifier()
+		return nil
+	}
+	return fmt.Errorf("unknown AccountMerge field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AccountMergeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AccountMergeMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AccountMergeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AccountMergeMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AccountMergeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AccountMergeMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AccountMergeMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown AccountMerge unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AccountMergeMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown AccountMerge edge %s", name)
+}
 
 // AuditExportMutation represents an operation that mutates the AuditExport nodes in the graph.
 type AuditExportMutation struct {

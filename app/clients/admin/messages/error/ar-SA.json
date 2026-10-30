@@ -91,6 +91,8 @@
   "error_SYSTEM_IDENTITY_ALREADY_BOUND": "هذه الهوية الخارجية مرتبطة بالفعل بحساب آخر",
   "error_SYSTEM_SMS_RATE_LIMITED": "تم إرسال رموز التحقق بسرعة كبيرة — يرجى الانتظار قليلاً",
   "error_SYSTEM_SMS_CODE_INVALID": "الرمز غير صحيح أو منتهي الصلاحية — اطلب رمزاً جديداً",
+  "error_SYSTEM_MERGE_NOT_MERGEABLE": "لا يمكن دمج هذا الحساب تلقائيًا — يرجى التواصل مع خدمة العملاء",
+  "error_SYSTEM_MERGE_NOT_BOUND": "بيانات الاعتماد هذه غير مرتبطة بأي حساب، فلا يوجد ما يمكن دمجه",
   "error_ESPORTS_UNSPECIFIED": "خطأ في خدمة الرياضات الإلكترونية",
   "error_ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED": "يحتاج المستخدمون دون 13 عامًا إلى موافقة الوصي للمتابعة",
   "error_ESPORTS_PROFILE_GAME_UNKNOWN": "اللعبة المختارة غير موجودة؛ حدّث القائمة وحاول مجددًا",

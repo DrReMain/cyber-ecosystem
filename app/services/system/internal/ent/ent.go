@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"cyber-ecosystem/app/services/system/internal/ent/accountmerge"
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
@@ -87,6 +88,7 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			accountmerge.Table:     accountmerge.ValidColumn,
 			auditexport.Table:      auditexport.ValidColumn,
 			auditlog.Table:         auditlog.ValidColumn,
 			authzpolicy.Table:      authzpolicy.ValidColumn,

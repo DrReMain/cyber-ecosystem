@@ -55,6 +55,19 @@
     "comment": "认证与会话",
     "methods": [
       {
+        "name": "BeginBindCredential",
+        "full_name": "cyber.system.v1.AuthService.BeginBindCredential",
+        "request_name": "BeginBindCredentialRequest",
+        "request_full_name": "cyber.system.v1.BeginBindCredentialRequest",
+        "response_name": "BeginBindCredentialResponse",
+        "response_full_name": "cyber.system.v1.BeginBindCredentialResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/begin-bind-credential",
+        "comment": "发起凭证绑定：为已登录会话铸造绑定态授权跳转",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "BeginIdentityLogin",
         "full_name": "cyber.system.v1.AuthService.BeginIdentityLogin",
         "request_name": "BeginIdentityLoginRequest",
@@ -94,6 +107,19 @@
         "datascope": false
       },
       {
+        "name": "GetSecurityStatus",
+        "full_name": "cyber.system.v1.AuthService.GetSecurityStatus",
+        "request_name": "GetSecurityStatusRequest",
+        "request_full_name": "cyber.system.v1.GetSecurityStatusRequest",
+        "response_name": "GetSecurityStatusResponse",
+        "response_full_name": "cyber.system.v1.GetSecurityStatusResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/system/me/security",
+        "comment": "获取当前账号绑定面",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "Login",
         "full_name": "cyber.system.v1.AuthService.Login",
         "request_name": "LoginRequest",
@@ -129,6 +155,58 @@
         "http_method": "POST",
         "http_path": "/api/v1/system/auth/logout",
         "comment": "登出",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "MergeAccounts",
+        "full_name": "cyber.system.v1.AuthService.MergeAccounts",
+        "request_name": "MergeAccountsRequest",
+        "request_full_name": "cyber.system.v1.MergeAccountsRequest",
+        "response_name": "MergeAccountsResponse",
+        "response_full_name": "cyber.system.v1.MergeAccountsResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/merge-accounts",
+        "comment": "账号合并：富号吞并空号（凭证迁移+空号注销+审计）",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "ResetPassword",
+        "full_name": "cyber.system.v1.AuthService.ResetPassword",
+        "request_name": "ResetPasswordRequest",
+        "request_full_name": "cyber.system.v1.ResetPasswordRequest",
+        "response_name": "ResetPasswordResponse",
+        "response_full_name": "cyber.system.v1.ResetPasswordResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/reset-password",
+        "comment": "重置登录密码：短信码证明手机号归属",
+        "access": "PUBLIC",
+        "datascope": false
+      },
+      {
+        "name": "ResolveCredential",
+        "full_name": "cyber.system.v1.AuthService.ResolveCredential",
+        "request_name": "ResolveCredentialRequest",
+        "request_full_name": "cyber.system.v1.ResolveCredentialRequest",
+        "response_name": "ResolveCredentialResponse",
+        "response_full_name": "cyber.system.v1.ResolveCredentialResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/resolve-credential",
+        "comment": "凭证属主解析：合并 offer 面的取数腿",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "SendBindSmsCode",
+        "full_name": "cyber.system.v1.AuthService.SendBindSmsCode",
+        "request_name": "SendBindSmsCodeRequest",
+        "request_full_name": "cyber.system.v1.SendBindSmsCodeRequest",
+        "response_name": "SendBindSmsCodeResponse",
+        "response_full_name": "cyber.system.v1.SendBindSmsCodeResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/send-bind-sms-code",
+        "comment": "发送绑定用短信验证码：铸造绑定当前会话的一次性 state",
         "access": "BUILTIN",
         "datascope": false
       },

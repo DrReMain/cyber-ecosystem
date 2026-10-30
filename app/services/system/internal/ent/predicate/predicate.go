@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// AccountMerge is the predicate function for accountmerge builders.
+type AccountMerge func(*sql.Selector)
+
 // AuditExport is the predicate function for auditexport builders.
 type AuditExport func(*sql.Selector)
 

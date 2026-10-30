@@ -14,6 +14,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AccountMerge is the client for interacting with the AccountMerge builders.
+	AccountMerge *AccountMergeClient
 	// AuditExport is the client for interacting with the AuditExport builders.
 	AuditExport *AuditExportClient
 	// AuditLog is the client for interacting with the AuditLog builders.
@@ -175,6 +177,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AccountMerge = NewAccountMergeClient(tx.config)
 	tx.AuditExport = NewAuditExportClient(tx.config)
 	tx.AuditLog = NewAuditLogClient(tx.config)
 	tx.AuthzPolicy = NewAuthzPolicyClient(tx.config)
@@ -199,7 +202,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AuditExport.QueryXXX(), the query will be executed
+// applies a query, for example: AccountMerge.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

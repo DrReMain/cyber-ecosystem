@@ -1,20 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { toast } from "sonner";
 import { m } from "#/paraglide/messages";
 
-// The login card's static footer: forgot-password (still contract-gated),
-// the agreement links, and the company lines. Zero state of its own.
+// The login card's static footer: forgot-password (the SMS reset leg), the
+// agreement links, and the company lines. Zero state of its own.
 export function LoginFooter() {
   return (
     <>
       <div className="text-ink-tertiary mt-2 text-center text-[10.5px] leading-[1.95]">
-        <button
-          className="tap-zone text-link py-1 active:opacity-60"
-          onClick={() => toast.info(m.common_soon())}
-          type="button"
-        >
+        <Link className="tap-zone text-link py-1 active:opacity-60" to="/login/forgot">
           {m.login_forgot()}
-        </button>
+        </Link>
         <span className="mx-1">{" · "}</span>
         <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/user">
           {m.login_footer_user()}

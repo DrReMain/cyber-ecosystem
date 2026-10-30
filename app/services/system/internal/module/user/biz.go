@@ -40,6 +40,14 @@ type Credential struct {
 	UserID     string
 }
 
+type AccountMerge struct {
+	PoorID     string
+	RichID     string
+	Provider   string
+	Kind       string
+	Identifier string
+}
+
 type Seat struct {
 	UserID     string
 	TenantID   string
@@ -76,8 +84,12 @@ type UserRP interface {
 	FindSeatedAnyPlane(ctx context.Context, id string) (*User, error)
 	FindByIDs(ctx context.Context, ids []string) (map[string]*User, error)
 	FindCredential(ctx context.Context, kind, identifier string) (*Credential, error)
+	ListCredentialsByUser(ctx context.Context, userID string) ([]*Credential, error)
 	CreateCredential(ctx context.Context, c *Credential) error
+	MoveCredential(ctx context.Context, kind, identifier, toUserID string) error
+	CountCredentialsByUser(ctx context.Context, userID string) (int, error)
 	DeleteCredentialsByUser(ctx context.Context, userID string) error
+	CreateAccountMerge(ctx context.Context, m *AccountMerge) error
 	EnsureSeat(ctx context.Context, seat *Seat) error
 	DeleteSeatsByUser(ctx context.Context, userID string) error
 	ListSeatsByUser(ctx context.Context, userID string) ([]*Seat, error)

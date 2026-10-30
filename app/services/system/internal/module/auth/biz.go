@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/rs/xid"
@@ -51,6 +52,23 @@ type CurrentUser struct {
 	Avatar      *string
 	Permissions []string
 	Seats       []*user.Seat
+}
+
+type SecurityCredential struct {
+	Kind       string
+	Identifier string // display-masked; the raw value never crosses the boundary
+}
+
+type SecurityStatus struct {
+	HasPassword bool
+	Credentials []*SecurityCredential
+}
+
+type CredentialOwner struct {
+	UserID      string
+	Enabled     bool
+	Mergeable   bool
+	Credentials []*SecurityCredential
 }
 
 // Port ----------------------------------------------------------------------------------------------------------------
@@ -226,7 +244,7 @@ func (uc *AuthUC) BindCredential(ctx context.Context, providerKey, state string,
 	if err != nil {
 		return err
 	}
-	if err = uc.cashState(ctx, providerKey, state); err != nil {
+	if err = uc.cashBoundState(ctx, providerKey, state, subject.UserID); err != nil {
 		return err
 	}
 	id, err := p.Exchange(ctx, row, payload)
@@ -254,6 +272,209 @@ func (uc *AuthUC) BindCredential(ctx context.Context, providerKey, state string,
 		return err
 	}
 	return nil
+}
+
+func (uc *AuthUC) BeginBindCredential(ctx context.Context, providerKey, redirectURI string) (string, error) {
+	if _, ok := security.SubjectFromCtx(ctx); !ok {
+		return "", errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("binding requires an authenticated caller"))
+	}
+	row, p, err := uc.providerRow(providerKey)
+	if err != nil {
+		return "", err
+	}
+	// Only jump-capable kinds have an authorize URL; a direct-code kind
+	// (no redirect) refuses the begin flow — its entry is SendBindSmsCode.
+	rp, ok := p.(redirectProvider)
+	if !ok {
+		return "", systempb.ErrorSystemIdentityProviderUnknown("").WithCause(
+			fmt.Errorf("provider %q has no redirect flow", providerKey))
+	}
+	// The authenticated rung puts the caller in ctx, so this mint binds
+	// the state to the session — the cash at BindCredential enforces it.
+	state, err := mintIdentityState(ctx, uc.tokenRP, providerKey)
+	if err != nil {
+		return "", err
+	}
+	return rp.AuthorizeURL(row, redirectURI, state), nil
+}
+
+func (uc *AuthUC) MergeAccounts(ctx context.Context, providerKey, state string, payload identityPayload) error {
+	// Absorbs the proven credential's owner into the calling account: the
+	// credential moves, the absorbed account is disabled, and a ledger row
+	// makes the absorption one-shot and auditable.
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("merging requires an authenticated caller"))
+	}
+	row, p, err := uc.providerRow(providerKey)
+	if err != nil {
+		return err
+	}
+	if err = uc.cashBoundState(ctx, providerKey, state, subject.UserID); err != nil {
+		return err
+	}
+	id, err := p.Exchange(ctx, row, payload)
+	if err != nil {
+		return err
+	}
+	c, err := uc.userRP.FindCredential(ctx, id.Kind, id.Identifier)
+	if err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return systempb.ErrorSystemMergeNotBound("").WithCause(
+				fmt.Errorf("identity %s %s has no binding", id.Kind, id.Identifier))
+		}
+		return err
+	}
+	if c.UserID == subject.UserID {
+		return systempb.ErrorSystemIdentityAlreadyBound("").WithCause(
+			fmt.Errorf("identity %s %s already belongs to the caller", id.Kind, id.Identifier))
+	}
+	poor, err := uc.userRP.FindByID(ctx, c.UserID)
+	if err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return systempb.ErrorSystemMergeNotBound("").WithCause(
+				fmt.Errorf("identity %s %s points at a missing account", id.Kind, id.Identifier))
+		}
+		return err
+	}
+	if err = uc.mergeable(ctx, poor); err != nil {
+		return err
+	}
+	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
+		if merr := uc.userRP.MoveCredential(ctx, id.Kind, id.Identifier, subject.UserID); merr != nil {
+			if errorspb.IsInfraErrorDbNotFound(merr) {
+				return systempb.ErrorSystemMergeNotBound("").WithCause(merr)
+			}
+			return merr
+		}
+		if _, derr := uc.userRP.UpdateStatus(ctx, poor.ID, false); derr != nil {
+			return derr
+		}
+		if lerr := uc.userRP.CreateAccountMerge(ctx, &user.AccountMerge{
+			PoorID: poor.ID, RichID: subject.UserID,
+			Provider: providerKey, Kind: id.Kind, Identifier: id.Identifier,
+		}); lerr != nil {
+			// The poor_id unique is the one-shot law's race backstop.
+			if errorspb.IsInfraErrorDbConstraint(lerr) {
+				return systempb.ErrorSystemMergeNotMergeable("").WithCause(lerr)
+			}
+			return lerr
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	uc.userRP.NotifyChanged(ctx)
+	// Best-effort: the disable already fails the next deep verification, so
+	// a failed revoke only delays the cutoff.
+	if rerr := uc.userRP.RevokeUserSessions(ctx, poor.ID); rerr != nil {
+		uc.Log.Warn("merge: revoking absorbed sessions failed", "user_id", poor.ID, "error", rerr)
+	}
+	return nil
+}
+
+func (uc *AuthUC) ResolveCredential(ctx context.Context, providerKey, state string, in *systempb.ResolveCredentialRequest) (*CredentialOwner, error) {
+	// The offer face's data leg: name the account a credential belongs to
+	// and give the hard-gate verdict. Nothing moves here — the acting RPCs
+	// (bind, merge) each take their own fresh proof; this read only decides
+	// what the consuming service offers.
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("resolving requires an authenticated caller"))
+	}
+	row, p, err := uc.providerRow(providerKey)
+	if err != nil {
+		return nil, err
+	}
+	var id *exchangedIdentity
+	switch cred := in.GetCredential().(type) {
+	case *systempb.ResolveCredentialRequest_Phone:
+		// The bare lookup needs no proof: the phone branch never grants
+		// anything, and the merge re-proves with a fresh code. The channel
+		// row must agree — a phone branch on a redirect provider is wiring
+		// confusion, not a lookup.
+		if row.GetKind() != smsKind {
+			return nil, systempb.ErrorSystemIdentityProviderUnknown("").WithCause(
+				fmt.Errorf("phone branch on provider kind %q", row.GetKind()))
+		}
+		canon := normalizePhone(cred.Phone)
+		if canon == "" {
+			return nil, errorspb.ErrorGeneralErrorValidationFailed("").WithCause(
+				fmt.Errorf("resolve: not a mainland mobile: %s", maskPhone(cred.Phone)))
+		}
+		id = &exchangedIdentity{Kind: smsKind, Identifier: canon}
+	case *systempb.ResolveCredentialRequest_Wechat:
+		// Only the exchange learns the openid, so this branch carries the
+		// full proof and burns it — state and code, exactly like a bind
+		// attempt would.
+		if err = uc.cashBoundState(ctx, providerKey, state, subject.UserID); err != nil {
+			return nil, err
+		}
+		if id, err = p.Exchange(ctx, row, in); err != nil {
+			return nil, err
+		}
+	default:
+		return nil, errorspb.ErrorGeneralErrorValidationFailed("").WithCause(fmt.Errorf("resolve: no credential branch"))
+	}
+	return uc.ownerFacts(ctx, id.Kind, id.Identifier)
+}
+
+func (uc *AuthUC) ResetPassword(ctx context.Context, providerKey, state, newPassword string, payload smsPayload) error {
+	// One setter for both password-less legs: forgot (login page) and
+	// first-set (account security). The sms code to the account's own phone
+	// is the whole anti-takeover gate — the code just proved the phone, and
+	// the phone names its account.
+	if err := uc.cashState(ctx, providerKey, state); err != nil {
+		return err
+	}
+	row, p, err := uc.providerRow(providerKey)
+	if err != nil {
+		return err
+	}
+	id, err := p.Exchange(ctx, row, payload)
+	if err != nil {
+		return err
+	}
+	c, err := uc.userRP.FindCredential(ctx, id.Kind, id.Identifier)
+	if err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return systempb.ErrorSystemUserNotFound("").WithCause(
+				fmt.Errorf("no account holds %s %s", id.Kind, maskPhone(id.Identifier)))
+		}
+		return err
+	}
+	hash, herr := utils.Hash(newPassword)
+	if herr != nil {
+		return errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", herr))
+	}
+	// Sessions stay standing, same ruling as ChangePassword: revocation
+	// belongs to disable, not to a credential rotation.
+	if _, err = uc.userRP.Update(ctx, []string{"password"}, &user.User{ID: c.UserID, PasswordHash: &hash}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (uc *AuthUC) GetSecurityStatus(ctx context.Context) (*SecurityStatus, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("security status requires an authenticated caller"))
+	}
+	u, err := uc.userRP.FindByID(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	creds, err := uc.userRP.ListCredentialsByUser(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &SecurityStatus{
+		HasPassword: utils.Deref(u.PasswordHash, "") != "",
+		Credentials: utils.SliceMap(creds, func(c *user.Credential) *SecurityCredential {
+			return &SecurityCredential{Kind: c.Kind, Identifier: maskIdentifier(c.Kind, c.Identifier)}
+		}),
+	}, nil
 }
 
 func (uc *AuthUC) Logout(ctx context.Context) error {
@@ -383,6 +604,54 @@ func (uc *AuthUC) GetCurrentUser(ctx context.Context) (*CurrentUser, error) {
 
 // Private -------------------------------------------------------------------------------------------------------------
 
+func (uc *AuthUC) ownerFacts(ctx context.Context, kind, identifier string) (*CredentialOwner, error) {
+	// Free credential → nil owner (the plain-bind path). The hard-gate
+	// verdict is the same mergeable() the merge itself runs, read as a fact
+	// instead of a refusal.
+	c, err := uc.userRP.FindCredential(ctx, kind, identifier)
+	if err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	owner, err := uc.userRP.FindByID(ctx, c.UserID)
+	if err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			// A credential pointing at a missing account is integrity debt,
+			// not an offer — report free and leave a trace.
+			uc.Log.Warn("resolve: credential dangles", "kind", kind, "user_id", c.UserID)
+			return nil, nil
+		}
+		return nil, err
+	}
+	creds, err := uc.userRP.ListCredentialsByUser(ctx, owner.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &CredentialOwner{
+		UserID:    owner.ID,
+		Enabled:   owner.Enabled,
+		Mergeable: uc.mergeable(ctx, owner) == nil,
+		Credentials: utils.SliceMap(creds, func(c *user.Credential) *SecurityCredential {
+			return &SecurityCredential{Kind: c.Kind, Identifier: maskIdentifier(c.Kind, c.Identifier)}
+		}),
+	}, nil
+}
+
+func maskIdentifier(kind, identifier string) string {
+	// The one masking home: phones keep the 3-****-4 channel form, anything
+	// else (the openid family) keeps head and tail around a fixed star
+	// block.
+	if kind == smsKind {
+		return maskPhone(identifier)
+	}
+	if len(identifier) < 8 {
+		return strings.Repeat("*", len(identifier))
+	}
+	return identifier[:3] + "****" + identifier[len(identifier)-4:]
+}
+
 func (uc *AuthUC) providerRow(providerKey string) (*conf.Auth_Provider, IdentityProvider, error) {
 	for _, row := range uc.auth.GetProviders() {
 		if row.GetKey() == providerKey {
@@ -404,15 +673,54 @@ func (uc *AuthUC) tenantLive(ctx context.Context, code string) (bool, error) {
 }
 
 func (uc *AuthUC) cashState(ctx context.Context, providerKey, state string) error {
-	stored, err := uc.tokenRP.GetDel(ctx, identityStatePrefix+state)
+	// Login faces take any live state of their provider: the exchanged
+	// code is the proof, and a state minted on a bind rung still belongs
+	// to the same person's flow.
+	_, err := loadIdentityState(ctx, uc.tokenRP, providerKey, state)
+	return err
+}
+
+func (uc *AuthUC) cashBoundState(ctx context.Context, providerKey, state, userID string) error {
+	val, err := loadIdentityState(ctx, uc.tokenRP, providerKey, state)
 	if err != nil {
-		if errorspb.IsInfraErrorCacheMiss(err) {
-			return systempb.ErrorSystemIdentityExchangeFailed("").WithCause(fmt.Errorf("state not recognized"))
-		}
 		return err
 	}
-	if string(stored) != providerKey {
-		return systempb.ErrorSystemIdentityExchangeFailed("").WithCause(fmt.Errorf("state not recognized"))
+	if val.BindUser != userID {
+		return systempb.ErrorSystemIdentityExchangeFailed("").WithCause(fmt.Errorf("state not minted for this session"))
+	}
+	return nil
+}
+
+func (uc *AuthUC) mergeable(ctx context.Context, poor *user.User) error {
+	// The system-side half of the empty-account bar: a password, a second
+	// credential, or any non-member seat marks an account too heavy to
+	// absorb. The business-record half lives where those records live, in
+	// the consuming service's offer face.
+	if !poor.Enabled {
+		return systempb.ErrorSystemMergeNotMergeable("").WithCause(fmt.Errorf("account already deactivated: %s", poor.ID))
+	}
+	if utils.Deref(poor.PasswordHash, "") != "" {
+		return systempb.ErrorSystemMergeNotMergeable("").WithCause(fmt.Errorf("account holds a password: %s", poor.ID))
+	}
+	n, err := uc.userRP.CountCredentialsByUser(ctx, poor.ID)
+	if err != nil {
+		return err
+	}
+	if n != 1 {
+		return systempb.ErrorSystemMergeNotMergeable("").WithCause(fmt.Errorf("account holds %d credentials: %s", n, poor.ID))
+	}
+	seats, err := uc.userRP.ListSeatsByUser(ctx, poor.ID)
+	if err != nil {
+		return err
+	}
+	for _, seat := range seats {
+		plane, perr := uc.authzRP.PlaneOf(seat.Population)
+		if perr != nil {
+			return perr
+		}
+		if plane != security.PlaneMember {
+			return systempb.ErrorSystemMergeNotMergeable("").WithCause(fmt.Errorf("account holds a %s seat: %s", seat.Population, poor.ID))
+		}
 	}
 	return nil
 }

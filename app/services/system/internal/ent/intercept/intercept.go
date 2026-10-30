@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"cyber-ecosystem/app/services/system/internal/ent"
+	"cyber-ecosystem/app/services/system/internal/ent/accountmerge"
 	"cyber-ecosystem/app/services/system/internal/ent/auditexport"
 	"cyber-ecosystem/app/services/system/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/system/internal/ent/authzpolicy"
@@ -81,6 +82,33 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 		return err
 	}
 	return f(ctx, query)
+}
+
+// The AccountMergeFunc type is an adapter to allow the use of ordinary function as a Querier.
+type AccountMergeFunc func(context.Context, *ent.AccountMergeQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f AccountMergeFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.AccountMergeQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.AccountMergeQuery", q)
+}
+
+// The TraverseAccountMerge type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseAccountMerge func(context.Context, *ent.AccountMergeQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseAccountMerge) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseAccountMerge) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.AccountMergeQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.AccountMergeQuery", q)
 }
 
 // The AuditExportFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -491,6 +519,8 @@ func (f TraverseUser) Traverse(ctx context.Context, q ent.Query) error {
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
+	case *ent.AccountMergeQuery:
+		return &query[*ent.AccountMergeQuery, predicate.AccountMerge, accountmerge.OrderOption]{typ: ent.TypeAccountMerge, tq: q}, nil
 	case *ent.AuditExportQuery:
 		return &query[*ent.AuditExportQuery, predicate.AuditExport, auditexport.OrderOption]{typ: ent.TypeAuditExport, tq: q}, nil
 	case *ent.AuditLogQuery:

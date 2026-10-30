@@ -18,10 +18,12 @@ import (
 )
 
 const (
-	wechatKind         = "wechat_mp"
-	wechatEntryURL     = "https://open.weixin.qq.com/connect/oauth2/authorize"
-	wechatExchangePath = "/sns/oauth2/access_token"
-	wechatTimeout      = 5 * time.Second
+	wechatKind          = "wechat_mp"
+	wechatAuthorizeHost = "https://open.weixin.qq.com"
+	wechatAuthorizePath = "/connect/oauth2/authorize"
+	wechatExchangeHost  = "https://api.weixin.qq.com"
+	wechatExchangePath  = "/sns/oauth2/access_token"
+	wechatTimeout       = 5 * time.Second
 )
 
 type wechatProvider struct {
@@ -52,17 +54,25 @@ func (wechatProvider) AuthorizeURL(row *conf.Auth_Provider, redirectURI, state s
 	q.Set("response_type", "code")
 	q.Set("scope", "snsapi_base")
 	q.Set("state", state)
-	return wechatEntryURL + "?" + q.Encode() + "#wechat_redirect"
+	base := row.GetEndpoint()
+	if base == "" {
+		base = wechatAuthorizeHost
+	}
+	return base + wechatAuthorizePath + "?" + q.Encode() + "#wechat_redirect"
 }
 
-func (p wechatProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, payload identityPayload) (*exchangedIdentity, error) {
-	code := payload.GetWechat().GetCode()
+func (p wechatProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, payload any) (*exchangedIdentity, error) {
+	wp, ok := payload.(identityPayload)
+	if !ok || wp.GetWechat() == nil {
+		return nil, errorspb.ErrorGeneralErrorValidationFailed("").WithCause(fmt.Errorf("wechat payload required"))
+	}
+	code := wp.GetWechat().GetCode()
 	if code == "" {
 		return nil, errorspb.ErrorGeneralErrorValidationFailed("").WithCause(fmt.Errorf("wechat payload required"))
 	}
 	base := row.GetEndpoint()
 	if base == "" {
-		base = "https://api.weixin.qq.com"
+		base = wechatExchangeHost
 	}
 	q := url.Values{}
 	q.Set("appid", row.GetWechat().GetAppid())
