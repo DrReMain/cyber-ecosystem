@@ -162,4 +162,3 @@ out/
 # Nuxt.js
 .nuxt/
 dist/
-.run/

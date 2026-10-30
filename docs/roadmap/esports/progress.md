@@ -48,3 +48,4 @@
 | 回读面「本次成绩明细」行组缺(原型=mock,契约无逐次明细) | 例会 | 豁免候选或契约带明细行 |
 | 未校准结算措辞「N 分·原始分」(原型无此态,10-30 新措辞已裁落) | ljr(例会追认) | 改词则换键 5 分钟 |
 | home 续测卡 vs resume-remind 形态面检 | R2 | 精修带 |
+| dev 栈状态目录 .run/ 迁仓外(D-AX):各开发会话代理的后台栈状态文件(pid/ports json)改写到仓外——建议 `$TMPDIR/cyber-dev/<project>.json`,pid 失活即视为陈旧可覆盖;本机存在 .run/ 者整目录删除(hzy 机实存自 10-26,lzx/用户机自查),.gitignore 不再兜底 | 各机 coding agent 自处 | 下次开栈前 |
