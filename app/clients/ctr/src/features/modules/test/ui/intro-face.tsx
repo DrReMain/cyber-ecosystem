@@ -22,6 +22,9 @@ interface IntroFaceProps {
   readonly category: string;
   readonly unitLabel: string;
   readonly step: StepContext | null;
+  /** The played receipt (prototype #prev): this game's session best and
+   * cross-session best; null while no scored line exists. */
+  readonly prevBest: { sessionBest: number; historyBest: number | null } | null;
   readonly onBack: () => void;
   readonly onStart: () => void;
 }
@@ -39,6 +42,7 @@ export function IntroFace({
   category,
   unitLabel,
   step,
+  prevBest,
   onBack,
   onStart,
 }: Readonly<IntroFaceProps>) {
@@ -136,6 +140,14 @@ export function IntroFace({
                   {m.test_intro_retest_value({ n: step.retestLeft })}
                 </div>
               </div>
+            </div>
+          ) : null}
+
+          {prevBest !== null ? (
+            <div className="border-line bg-surface-content text-ink-muted rounded-control border px-[13px] py-[11px] text-[11.5px] leading-[1.7]">
+              {m.test_intro_prev_prefix()}{" "}
+              <b className="font-bold text-[#FDE047] tabular-nums">{prevBest.sessionBest}</b>
+              {m.test_intro_prev_history({ n: prevBest.historyBest ?? "—" })}
             </div>
           ) : null}
 
