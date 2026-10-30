@@ -235,7 +235,13 @@ function VerdictCard({
       )}
       {verdict.phase === "done" && verdict.valid ? <ValidScore verdict={verdict} /> : null}
       {verdict.phase === "done" && !verdict.valid ? (
-        <InvalidNotice reason={verdict.invalidReason} />
+        verdict.invalidReason !== undefined ? (
+          <InvalidNotice reason={verdict.invalidReason} />
+        ) : (
+          // The read-back with no stored line: not a void — the honest
+          // no-score word the prototype's own note carries.
+          <div className="text-ink-tertiary mt-3 text-sm">{m.test_review_no_score()}</div>
+        )
       ) : null}
       {verdict.phase === "error" ? <SubmitError onResubmit={onResubmit} /> : null}
       {verdict.phase === "done" && verdict.inSession ? (
@@ -251,13 +257,16 @@ function VerdictCard({
 
 // The read-back mode's verdict — the stored line is the whole truth: no
 // local run, no submit chain. A pending read keeps the pulse; a done
-// read with no line is the honest no-valid-score face.
+// read with no line renders the honest no-score face (the reason stays
+// undefined so it never wears the void card — an unplayed, a voided,
+// and a norms-pending game all read the same here until the report
+// carries more truth).
 function reviewVerdictOf(line: WireLine | undefined, step: StepContext | null): SubmitVerdict {
   if (line === undefined) {
     return {
       phase: "done",
       valid: false,
-      invalidReason: m.test_review_no_score(),
+      invalidReason: undefined,
       authoritativeScore: undefined,
       rawScore: undefined,
       grade: undefined,
