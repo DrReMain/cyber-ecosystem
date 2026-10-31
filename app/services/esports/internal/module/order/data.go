@@ -1,4 +1,4 @@
-package pay
+package order
 
 import (
 	"context"
@@ -11,27 +11,18 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/payorder"
-	"cyber-ecosystem/app/services/esports/internal/ent/sku"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
 // Repo ----------------------------------------------------------------------------------------------------------------
 
-type skuRP struct {
-	shared.RP
-}
-
-func NewSkuRP(logger *slog.Logger, p *platform.Platform) SkuRP {
-	return &skuRP{RP: shared.NewRP(logger.With("module", "module/pay_rp"), p)}
-}
-
 type orderRP struct {
 	shared.RP
 }
 
 func NewOrderRP(logger *slog.Logger, p *platform.Platform) OrderRP {
-	return &orderRP{RP: shared.NewRP(logger.With("module", "module/pay_rp"), p)}
+	return &orderRP{RP: shared.NewRP(logger.With("module", "module/order_rp"), p)}
 }
 
 type payChannelRP struct {
@@ -39,34 +30,10 @@ type payChannelRP struct {
 }
 
 func NewPayChannelRP(logger *slog.Logger, p *platform.Platform) PayChannelRP {
-	return &payChannelRP{RP: shared.NewRP(logger.With("module", "module/pay_rp"), p)}
+	return &payChannelRP{RP: shared.NewRP(logger.With("module", "module/order_rp"), p)}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
-
-func (rp *skuRP) List(ctx context.Context) ([]*Sku, error) {
-	rows, err := rp.Platform.GetClient(ctx).Sku.Query().
-		Where(sku.OnShelfEQ(true)).
-		Order(ent.Asc(sku.FieldCreatedAt)).
-		All(ctx)
-	if err != nil {
-		return nil, rp.Platform.HandleEntError(err)
-	}
-	return utils.SliceMap(rows, mapSku), nil
-}
-
-func (rp *skuRP) ByCode(ctx context.Context, code string) (*Sku, error) {
-	row, err := rp.Platform.GetClient(ctx).Sku.Query().
-		Where(sku.CodeEQ(code)).
-		Only(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, nil
-		}
-		return nil, rp.Platform.HandleEntError(err)
-	}
-	return mapSku(row), nil
-}
 
 func (rp *orderRP) Create(ctx context.Context, o *Order) (*Order, error) {
 	create := rp.Platform.GetClient(ctx).PayOrder.Create().
@@ -93,44 +60,6 @@ func (rp *orderRP) Create(ctx context.Context, o *Order) (*Order, error) {
 			if survivor, reErr := rp.ActiveByScope(ctx, o.UserID, o.ScopeKind, o.ScopeRef); reErr == nil && survivor != nil {
 				return survivor, nil
 			}
-		}
-		return nil, rp.Platform.HandleEntError(err)
-	}
-	return mapOrder(row), nil
-}
-
-func (rp *orderRP) ByNo(ctx context.Context, orderNo string) (*Order, error) {
-	row, err := rp.Platform.GetClient(ctx).PayOrder.Query().
-		Where(payorder.OrderNoEQ(orderNo)).
-		Only(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, nil
-		}
-		return nil, rp.Platform.HandleEntError(err)
-	}
-	return mapOrder(row), nil
-}
-
-func (rp *orderRP) ActiveByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*Order, error) {
-	query := rp.Platform.GetClient(ctx).PayOrder.Query().
-		Where(
-			payorder.UserIDEQ(userID),
-			payorder.ScopeKindEQ(payorder.ScopeKind(scopeKind)),
-			payorder.StateEQ(payorder.StatePending),
-		).
-		Order(ent.Desc(payorder.FieldCreatedAt))
-	if scopeRef != nil {
-		query = query.Where(payorder.ScopeRefEQ(*scopeRef))
-	} else {
-		// A period order's null ref: concurrent creations may leave more
-		// than one live (NULLS DISTINCT never clashes) — newest wins.
-		query = query.Where(payorder.ScopeRefIsNil())
-	}
-	row, err := query.First(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, nil
 		}
 		return nil, rp.Platform.HandleEntError(err)
 	}
@@ -220,6 +149,44 @@ func (rp *orderRP) ListPaid(ctx context.Context, from, to time.Time) ([]*Order, 
 	return utils.SliceMap(rows, mapOrder), nil
 }
 
+func (rp *orderRP) ByNo(ctx context.Context, orderNo string) (*Order, error) {
+	row, err := rp.Platform.GetClient(ctx).PayOrder.Query().
+		Where(payorder.OrderNoEQ(orderNo)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return mapOrder(row), nil
+}
+
+func (rp *orderRP) ActiveByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*Order, error) {
+	query := rp.Platform.GetClient(ctx).PayOrder.Query().
+		Where(
+			payorder.UserIDEQ(userID),
+			payorder.ScopeKindEQ(payorder.ScopeKind(scopeKind)),
+			payorder.StateEQ(payorder.StatePending),
+		).
+		Order(ent.Desc(payorder.FieldCreatedAt))
+	if scopeRef != nil {
+		query = query.Where(payorder.ScopeRefEQ(*scopeRef))
+	} else {
+		// A period order's null ref: concurrent creations may leave more
+		// than one live (NULLS DISTINCT never clashes) — newest wins.
+		query = query.Where(payorder.ScopeRefIsNil())
+	}
+	row, err := query.First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return mapOrder(row), nil
+}
+
 func (rp *payChannelRP) CreatePayment(ctx context.Context, provider string, in *payment.CreatePaymentInput) (*payment.PrepayResult, error) {
 	backend, err := rp.Platform.PaymentFor(provider)
 	if err != nil {
@@ -304,21 +271,6 @@ func (rp *payChannelRP) DefaultProvider() string { return rp.Platform.Payments()
 func (rp *payChannelRP) NotifyBaseURL() string { return rp.Platform.Payments().NotifyBaseURL() }
 
 // Private -------------------------------------------------------------------------------------------------------------
-
-func mapSku(row *ent.Sku) *Sku {
-	return &Sku{
-		Code:         row.Code,
-		Kind:         string(row.Kind),
-		Name:         row.Name,
-		Description:  row.Description,
-		PriceFen:     row.PriceFen,
-		ListPriceFen: row.ListPriceFen,
-		PeriodDays:   row.PeriodDays,
-		OnShelf:      row.OnShelf,
-		CreatedAt:    row.CreatedAt,
-		UpdatedAt:    row.UpdatedAt,
-	}
-}
 
 func mapOrder(row *ent.PayOrder) *Order {
 	return &Order{

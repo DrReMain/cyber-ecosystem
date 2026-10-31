@@ -20,9 +20,10 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
-	"cyber-ecosystem/app/services/esports/internal/module/pay"
+	"cyber-ecosystem/app/services/esports/internal/module/order"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/report"
+	"cyber-ecosystem/app/services/esports/internal/module/sku"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/module/testadmin"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -45,7 +46,8 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Payment, *slog.Logger
 		game.ProviderSet,
 		match.ProviderSet,
 		member.ProviderSet,
-		pay.ProviderSet,
+		order.ProviderSet,
+		sku.ProviderSet,
 		test.ProviderSet,
 		testadmin.ProviderSet,
 		entitle.ProviderSet,

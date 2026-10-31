@@ -16,9 +16,10 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
-	"cyber-ecosystem/app/services/esports/internal/module/pay"
+	"cyber-ecosystem/app/services/esports/internal/module/order"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/report"
+	"cyber-ecosystem/app/services/esports/internal/module/sku"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/module/testadmin"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -78,14 +79,14 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	testService := test.NewTestService(logger, testUC)
 	matchUC := match.NewMatchUC(logger, platformPlatform, matchRP, testRP, profileRP, gameRP)
 	matchService := match.NewMatchService(logger, matchUC)
-	skuRP := pay.NewSkuRP(logger, platformPlatform)
-	skuUC := pay.NewSkuUC(logger, platformPlatform, skuRP)
-	skuService := pay.NewSkuService(logger, skuUC)
+	skuRP := sku.NewSkuRP(logger, platformPlatform)
+	skuUC := sku.NewSkuUC(logger, platformPlatform, skuRP)
+	skuService := sku.NewSkuService(logger, skuUC)
 	lifecycle := bootstrap.NewLifecycle()
-	orderRP := pay.NewOrderRP(logger, platformPlatform)
-	payChannelRP := pay.NewPayChannelRP(logger, platformPlatform)
-	orderUC := pay.NewOrderUC(logger, platformPlatform, lifecycle, eventSubscriptions, orderRP, skuRP, entitlementRP, testRP, payChannelRP)
-	orderService := pay.NewOrderService(logger, orderUC)
+	orderRP := order.NewOrderRP(logger, platformPlatform)
+	payChannelRP := order.NewPayChannelRP(logger, platformPlatform)
+	orderUC := order.NewOrderUC(logger, platformPlatform, lifecycle, eventSubscriptions, orderRP, skuRP, entitlementRP, testRP, payChannelRP)
+	orderService := order.NewOrderService(logger, orderUC)
 	activationCodeRP := entitle.NewActivationCodeRP(logger, platformPlatform)
 	reportPolicyRP := entitle.NewReportPolicyRP(logger, platformPlatform)
 	entitleUC := entitle.NewEntitleUC(logger, platformPlatform, activationCodeRP, entitlementRP, reportPolicyRP, eventSubscriptions)

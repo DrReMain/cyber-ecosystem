@@ -26,7 +26,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
-	"cyber-ecosystem/app/services/esports/internal/module/pay"
+	"cyber-ecosystem/app/services/esports/internal/module/order"
+	"cyber-ecosystem/app/services/esports/internal/module/sku"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 )
@@ -94,14 +95,14 @@ func TestPayLiveE2E(t *testing.T) {
 	if err != nil {
 		t.Fatalf("backend: %v", err)
 	}
-	chanRP := pay.NewPayChannelRP(logger, pf)
+	chanRP := order.NewPayChannelRP(logger, pf)
 	ctrl, ok := mock.ControllerOf(backend)
 	if !ok {
 		t.Fatalf("mock controller: not a mock backend")
 	}
-	uc := pay.NewOrderUC(logger, pf, noopHooks{}, nil, pay.NewOrderRP(logger, pf), pay.NewSkuRP(logger, pf),
+	uc := order.NewOrderUC(logger, pf, noopHooks{}, nil, order.NewOrderRP(logger, pf), sku.NewSkuRP(logger, pf),
 		entitle.NewEntitlementRP(logger, pf), test.NewTestRP(logger, pf), chanRP)
-	svc := pay.NewOrderService(logger, uc)
+	svc := order.NewOrderService(logger, uc)
 
 	channels, err := chanRP.Channels("mock")
 	if err != nil {
@@ -160,11 +161,11 @@ func TestPayLiveE2E(t *testing.T) {
 	// The membership main line: create → channel pay → callback → settle →
 	// grant, with the callback delivered twice because at-least-once is the
 	// channel contract and idempotence is the settle's to carry.
-	mem1, err := uc.Create(ctx, &pay.CreateIn{SKUCode: "member_month", Channel: channel})
+	mem1, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: channel})
 	if err != nil {
 		t.Fatalf("membership create: %v", err)
 	}
-	if mem1.Order.State != pay.StatePending || mem1.Order.AmountFen != 2990 || mem1.Credential.Value == "" {
+	if mem1.Order.State != order.StatePending || mem1.Order.AmountFen != 2990 || mem1.Credential.Value == "" {
 		t.Fatalf("membership create shape: %+v", mem1.Order)
 	}
 	memN1, err := ctrl.MarkPaid(mem1.Order.OrderNo)
@@ -181,10 +182,10 @@ func TestPayLiveE2E(t *testing.T) {
 	if err != nil {
 		t.Fatalf("get settled: %v", err)
 	}
-	if got.State != pay.StatePaid || got.TransactionID == nil || got.PaidAt == nil {
+	if got.State != order.StatePaid || got.TransactionID == nil || got.PaidAt == nil {
 		t.Fatalf("settled shape: %+v", got)
 	}
-	rows, first := entCount(pay.EntMembership)
+	rows, first := entCount(order.EntMembership)
 	if rows != 1 {
 		t.Fatalf("double delivery granted %d membership rows, want 1", rows)
 	}
@@ -196,7 +197,7 @@ func TestPayLiveE2E(t *testing.T) {
 	}
 
 	// Renewal stacks: a second paid membership is a second row, never a dedup.
-	mem2, err := uc.Create(ctx, &pay.CreateIn{SKUCode: "member_month", Channel: channel})
+	mem2, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: channel})
 	if err != nil {
 		t.Fatalf("renewal create: %v", err)
 	}
@@ -207,7 +208,7 @@ func TestPayLiveE2E(t *testing.T) {
 	if resp, err := notify(memN2); err != nil || !resp.GetHandled() {
 		t.Fatalf("renewal callback: %v", err)
 	}
-	if rows, _ := entCount(pay.EntMembership); rows != 2 {
+	if rows, _ := entCount(order.EntMembership); rows != 2 {
 		t.Fatalf("renewal rows: %d, want 2 (stacking)", rows)
 	}
 
@@ -215,14 +216,14 @@ func TestPayLiveE2E(t *testing.T) {
 	// credential with zero channel round trips; after settle the record is
 	// granted permanently and a second trial order for it is refused.
 	refA := recA
-	trial1, err := uc.Create(ctx, &pay.CreateIn{SKUCode: "trial_report", Channel: channel, ScopeRef: &refA})
+	trial1, err := uc.Create(ctx, &order.CreateIn{SKUCode: "trial_report", Channel: channel, ScopeRef: &refA})
 	if err != nil {
 		t.Fatalf("trial create: %v", err)
 	}
-	if trial1.Order.AmountFen != 1990 || trial1.Order.ScopeKind != pay.ScopeTrial || *trial1.Order.ScopeRef != recA {
+	if trial1.Order.AmountFen != 1990 || trial1.Order.ScopeKind != order.ScopeTrial || *trial1.Order.ScopeRef != recA {
 		t.Fatalf("trial shape: %+v", trial1.Order)
 	}
-	reuse, err := uc.Create(ctx, &pay.CreateIn{SKUCode: "trial_report", Channel: channel, ScopeRef: &refA})
+	reuse, err := uc.Create(ctx, &order.CreateIn{SKUCode: "trial_report", Channel: channel, ScopeRef: &refA})
 	if err != nil {
 		t.Fatalf("trial reuse: %v", err)
 	}
@@ -236,18 +237,18 @@ func TestPayLiveE2E(t *testing.T) {
 	if resp, err := notify(trialN); err != nil || !resp.GetHandled() {
 		t.Fatalf("trial callback: %v", err)
 	}
-	rows, tfirst := entCount(pay.EntTrial)
+	rows, tfirst := entCount(order.EntTrial)
 	if rows != 1 || *tfirst.ScopeRef != recA || tfirst.ExpiresAt != nil {
 		t.Fatalf("trial grant shape: rows=%d row=%+v", rows, tfirst)
 	}
-	if _, err := uc.Create(ctx, &pay.CreateIn{SKUCode: "trial_report", Channel: channel, ScopeRef: &refA}); !esportspb.IsEsportsOrderScopeAlreadyGranted(err) {
+	if _, err := uc.Create(ctx, &order.CreateIn{SKUCode: "trial_report", Channel: channel, ScopeRef: &refA}); !esportspb.IsEsportsOrderScopeAlreadyGranted(err) {
 		t.Fatalf("re-granted trial: err=%v", err)
 	}
 	refB := recB
-	if _, err := uc.Create(ctx, &pay.CreateIn{SKUCode: "trial_report", Channel: channel, ScopeRef: &refB}); !esportspb.IsEsportsOrderScopeInvalid(err) {
+	if _, err := uc.Create(ctx, &order.CreateIn{SKUCode: "trial_report", Channel: channel, ScopeRef: &refB}); !esportspb.IsEsportsOrderScopeInvalid(err) {
 		t.Fatalf("foreign record accepted: err=%v", err)
 	}
-	if _, err := uc.Create(ctx, &pay.CreateIn{SKUCode: "no-such-sku", Channel: channel}); !esportspb.IsEsportsSkuNotFound(err) {
+	if _, err := uc.Create(ctx, &order.CreateIn{SKUCode: "no-such-sku", Channel: channel}); !esportspb.IsEsportsSkuNotFound(err) {
 		t.Fatalf("unknown sku: err=%v", err)
 	}
 	if _, err := uc.Close(ctx, mem1.Order.OrderNo); !esportspb.IsEsportsOrderStateConflict(err) {
@@ -264,7 +265,7 @@ func TestPayLiveE2E(t *testing.T) {
 	}
 
 	// The converger folds an aged pending order the payer abandoned.
-	aged, err := uc.Create(ctx, &pay.CreateIn{SKUCode: "member_month", Channel: channel})
+	aged, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: channel})
 	if err != nil {
 		t.Fatalf("aged create: %v", err)
 	}
@@ -276,7 +277,7 @@ func TestPayLiveE2E(t *testing.T) {
 	if err := uc.ConvergeOnce(context.Background()); err != nil {
 		t.Fatalf("converge: %v", err)
 	}
-	if got, err := uc.Get(ctx, aged.Order.OrderNo); err != nil || got.State != pay.StateClosed {
+	if got, err := uc.Get(ctx, aged.Order.OrderNo); err != nil || got.State != order.StateClosed {
 		t.Fatalf("aged fold: state=%v err=%v", got, err)
 	}
 

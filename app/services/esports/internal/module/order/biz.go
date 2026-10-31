@@ -1,4 +1,4 @@
-package pay
+package order
 
 import (
 	"context"
@@ -18,16 +18,15 @@ import (
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
+	"cyber-ecosystem/app/services/esports/internal/module/sku"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
 const (
-	SkuKindTrial      = "trial"
-	SkuKindMembership = "membership"
+	ScopeTrial  = "trial"  // order: unlocks one test record permanently
+	ScopePeriod = "period" // order: opens the membership window
 
-	ScopeTrial    = "trial"                // order: unlocks one test record permanently
-	ScopePeriod   = "period"               // order: opens the membership window
 	EntTrial      = shared.ScopeTrial      // the ledger's scope vocabulary lives in the cross-module kernel
 	EntMembership = shared.ScopeMembership // membership: a window with an expiry
 
@@ -48,19 +47,6 @@ const (
 var billZone = time.FixedZone("CST", 8*60*60) // bill days are wall-clock facts in the channel's timezone, not the host's — WeChat publishes in Beijing time; the mock's day-agnostic snapshot takes the same window so both providers reconcile under one rule
 
 // DO ------------------------------------------------------------------------------------------------------------------
-
-type Sku struct {
-	Code         string
-	Kind         string
-	Name         string
-	Description  *string
-	PriceFen     int64
-	ListPriceFen int64
-	PeriodDays   *int
-	OnShelf      bool
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-}
 
 type Order struct {
 	OrderNo         string
@@ -113,20 +99,15 @@ type SettleIn struct {
 
 // Port ----------------------------------------------------------------------------------------------------------------
 
-type SkuRP interface {
-	List(ctx context.Context) ([]*Sku, error)              // on-shelf face for the member plane
-	ByCode(ctx context.Context, code string) (*Sku, error) // shelf ignored — nil, nil = no such code
-}
-
 type OrderRP interface {
-	Create(ctx context.Context, o *Order) (*Order, error)                                          // a pending-unique conflict returns the surviving active order
+	Create(ctx context.Context, o *Order) (*Order, error)             // a pending-unique conflict returns the surviving active order
+	ClosePending(ctx context.Context, orderNo string) (*Order, error) // nil, nil = no longer pending
+	Settle(ctx context.Context, in *SettleIn) (*Order, bool, error)   // the single write-paid entry; false = a rival settle already won
+	List(ctx context.Context, in *ListIn) (*ListOut, error)
+	ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error)               // pending rows past the horizon; expiry is the converger's branch, not the query's
+	ListPaid(ctx context.Context, from, to time.Time) ([]*Order, error)                            // paid rows by paid_at window — the reconciliation's local side
 	ByNo(ctx context.Context, orderNo string) (*Order, error)                                      // nil, nil = no such order
 	ActiveByScope(ctx context.Context, userID, scopeKind string, scopeRef *string) (*Order, error) // nil, nil = none live
-	ClosePending(ctx context.Context, orderNo string) (*Order, error)                              // nil, nil = no longer pending
-	Settle(ctx context.Context, in *SettleIn) (*Order, bool, error)                                // the single write-paid entry; false = a rival settle already won
-	List(ctx context.Context, in *ListIn) (*ListOut, error)
-	ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error) // pending rows past the horizon; expiry is the converger's branch, not the query's
-	ListPaid(ctx context.Context, from, to time.Time) ([]*Order, error)              // paid rows by paid_at window — the reconciliation's local side
 }
 
 type PayChannelRP interface { // routes to the configured provider's backend; capability errors arrive classified
@@ -143,19 +124,10 @@ type PayChannelRP interface { // routes to the configured provider's backend; ca
 
 // UC ------------------------------------------------------------------------------------------------------------------
 
-type SkuUC struct {
-	shared.UC
-	skuRP SkuRP
-}
-
-func NewSkuUC(logger *slog.Logger, tm shared.Transaction, skuRP SkuRP) *SkuUC {
-	return &SkuUC{UC: shared.NewUC(logger.With("module", "module/pay"), tm), skuRP: skuRP}
-}
-
 type OrderUC struct {
 	shared.UC
 	orderRP       OrderRP
-	skuRP         SkuRP
+	skuRP         sku.SkuRP
 	entRP         entitle.EntitlementRP
 	testRP        test.TestRP
 	channelRP     PayChannelRP
@@ -165,9 +137,9 @@ type OrderUC struct {
 	nextBillRetry int
 }
 
-func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, eventBus shared.DomainEventBus, orderRP OrderRP, skuRP SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
+func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, eventBus shared.DomainEventBus, orderRP OrderRP, skuRP sku.SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
 	uc := &OrderUC{
-		UC:        shared.NewUC(logger.With("module", "module/pay"), tm),
+		UC:        shared.NewUC(logger.With("module", "module/order"), tm),
 		orderRP:   orderRP,
 		skuRP:     skuRP,
 		entRP:     entRP,
@@ -182,10 +154,6 @@ func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookReg
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
-
-func (uc *SkuUC) List(ctx context.Context) ([]*Sku, error) {
-	return uc.skuRP.List(ctx)
-}
 
 func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error) {
 	subject, ok := security.SubjectFromCtx(ctx)
@@ -306,61 +274,6 @@ func (uc *OrderUC) Close(ctx context.Context, orderNo string) (*Order, error) {
 	return closed, nil
 }
 
-func (uc *OrderUC) List(ctx context.Context, page *commonv1.PageRequest) (*ListOut, error) {
-	subject, ok := security.SubjectFromCtx(ctx)
-	if !ok || subject == nil {
-		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("order list requires a session"))
-	}
-	return uc.orderRP.List(ctx, &ListIn{PageRequest: page, UserID: subject.UserID})
-}
-
-func (uc *OrderUC) Get(ctx context.Context, orderNo string) (*Order, error) {
-	subject, ok := security.SubjectFromCtx(ctx)
-	if !ok || subject == nil {
-		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("order get requires a session"))
-	}
-	order, err := uc.orderRP.ByNo(ctx, orderNo)
-	if err != nil {
-		return nil, err
-	}
-	if order == nil || order.UserID != subject.UserID {
-		return nil, esportspb.ErrorEsportsOrderNotFound("")
-	}
-	return order, nil
-}
-
-func (uc *OrderUC) HandleNotification(ctx context.Context, provider string, headers map[string]string, body []byte) (bool, error) {
-	h := http.Header{}
-	for k, v := range headers {
-		h.Set(k, v)
-	}
-	event, err := uc.channelRP.ParseNotification(ctx, provider, &payment.NotificationInput{Headers: h, Body: body})
-	if err != nil {
-		return false, err
-	}
-	switch event.Type {
-	case payment.EventPaymentSucceeded:
-		return uc.SettlePaid(ctx, &SettleIn{
-			OrderNo:       event.OutTradeNo,
-			Provider:      provider,
-			TransactionID: event.TransactionID,
-			AmountFen:     int64(event.AmountFen),
-			PaidAt:        event.SuccessAt,
-		})
-	case payment.EventRefundSucceeded, payment.EventRefundAbnormal:
-		// M1 folds nothing on refunds — the event is the audit trail; the
-		// order stays paid and entitlements never roll back.
-		uc.Log.Info("payment refund event", "channel_type", event.ChannelType, "order_no", event.OutTradeNo, "refund_no", event.OutRefundNo, "refund_id", event.RefundID)
-		return true, nil
-	default:
-		// A channel event this build has never met: no fold, and no ack
-		// either — the channel's retry pressure keeps it visible instead of
-		// swallowing an unknown money movement.
-		uc.Log.Warn("payment event type unrecognized", "channel_type", event.ChannelType, "order_no", event.OutTradeNo)
-		return false, nil
-	}
-}
-
 func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
 	if in.PaidAt.IsZero() {
 		// A channel that stamps no success time still settles — the local
@@ -443,6 +356,61 @@ func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
 	return true, nil
 }
 
+func (uc *OrderUC) List(ctx context.Context, page *commonv1.PageRequest) (*ListOut, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("order list requires a session"))
+	}
+	return uc.orderRP.List(ctx, &ListIn{PageRequest: page, UserID: subject.UserID})
+}
+
+func (uc *OrderUC) Get(ctx context.Context, orderNo string) (*Order, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("order get requires a session"))
+	}
+	order, err := uc.orderRP.ByNo(ctx, orderNo)
+	if err != nil {
+		return nil, err
+	}
+	if order == nil || order.UserID != subject.UserID {
+		return nil, esportspb.ErrorEsportsOrderNotFound("")
+	}
+	return order, nil
+}
+
+func (uc *OrderUC) HandleNotification(ctx context.Context, provider string, headers map[string]string, body []byte) (bool, error) {
+	h := http.Header{}
+	for k, v := range headers {
+		h.Set(k, v)
+	}
+	event, err := uc.channelRP.ParseNotification(ctx, provider, &payment.NotificationInput{Headers: h, Body: body})
+	if err != nil {
+		return false, err
+	}
+	switch event.Type {
+	case payment.EventPaymentSucceeded:
+		return uc.SettlePaid(ctx, &SettleIn{
+			OrderNo:       event.OutTradeNo,
+			Provider:      provider,
+			TransactionID: event.TransactionID,
+			AmountFen:     int64(event.AmountFen),
+			PaidAt:        event.SuccessAt,
+		})
+	case payment.EventRefundSucceeded, payment.EventRefundAbnormal:
+		// M1 folds nothing on refunds — the event is the audit trail; the
+		// order stays paid and entitlements never roll back.
+		uc.Log.Info("payment refund event", "channel_type", event.ChannelType, "order_no", event.OutTradeNo, "refund_no", event.OutRefundNo, "refund_id", event.RefundID)
+		return true, nil
+	default:
+		// A channel event this build has never met: no fold, and no ack
+		// either — the channel's retry pressure keeps it visible instead of
+		// swallowing an unknown money movement.
+		uc.Log.Warn("payment event type unrecognized", "channel_type", event.ChannelType, "order_no", event.OutTradeNo)
+		return false, nil
+	}
+}
+
 func (uc *OrderUC) ConvergeOnce(ctx context.Context) error {
 	stale, err := uc.orderRP.ListStalePending(ctx, convergeStaleAfter)
 	if err != nil {
@@ -477,73 +445,14 @@ func (uc *OrderUC) ReconcileOnce(ctx context.Context, day time.Time) error {
 	return err
 }
 
-func (uc *OrderUC) reconcileDay(ctx context.Context, day time.Time) error {
-	provider := uc.channelRP.DefaultProvider()
-	bill, err := uc.channelRP.DownloadBill(ctx, provider, &payment.BillInput{Date: day, Kind: payment.BillKindTrade})
-	if err != nil {
-		return err
-	}
-	lines, err := uc.channelRP.ParseTradeBill(ctx, provider, bill.Raw)
-	if err != nil {
-		return err
-	}
-	start, end := billDayWindow(day)
-	orders, err := uc.orderRP.ListPaid(ctx, start, end)
-	if err != nil {
-		return err
-	}
-	local := make(map[string]*Order, len(orders))
-	for _, o := range orders {
-		local[o.OrderNo] = o
-	}
-	// The reconciliation compares day facts: channel rows the bill dates into
-	// this window against local rows paid in it — the mock's snapshot bill and
-	// WeChat's day bill meet under one rule.
-	billed := make(map[string]payment.BillLine, len(lines))
-	for _, l := range lines {
-		if (l.State == payment.BillLinePaid || l.State == payment.BillLineRefund) && !l.At.Before(start) && l.At.Before(end) {
-			billed[l.OutTradeNo] = l
-		}
-	}
-	mismatch := 0
-	for _, o := range orders {
-		l, ok := billed[o.OrderNo]
-		switch {
-		case !ok:
-			uc.Log.Error("paid order missing from bill", "order_no", o.OrderNo, "day", day.Format("2006-01-02"))
-			mismatch++
-		case int64(l.AmountFen) != o.AmountFen:
-			uc.Log.Error("bill amount mismatch", "order_no", o.OrderNo, "row_fen", o.AmountFen, "bill_fen", int64(l.AmountFen))
-			mismatch++
-		}
-	}
-	for no, l := range billed {
-		if _, ok := local[no]; ok {
-			continue
-		}
-		row, err := uc.orderRP.ByNo(ctx, no)
-		if err != nil {
-			return err
-		}
-		if row == nil {
-			uc.Log.Error("bill order unknown locally", "order_no", no, "bill_fen", int64(l.AmountFen))
-		} else {
-			uc.Log.Error("bill settled an unsettled order", "order_no", no, "local_state", row.State, "bill_fen", int64(l.AmountFen))
-		}
-		mismatch++
-	}
-	uc.Log.Info("payment bill reconciled", "day", day.Format("2006-01-02"), "local", len(orders), "billed", len(billed), "mismatch", mismatch)
-	return nil
-}
-
 // Private -------------------------------------------------------------------------------------------------------------
 
-func (uc *OrderUC) resolveScope(ctx context.Context, userID string, sku *Sku, ref *string) (string, *string, error) {
+func (uc *OrderUC) resolveScope(ctx context.Context, userID string, s *sku.Sku, ref *string) (string, *string, error) {
 	// Fixes what the order's grant points at, enforcing the sku-kind
 	// contract: a trial names the caller's own un-granted record, a
 	// membership takes no reference.
-	switch sku.Kind {
-	case SkuKindTrial:
+	switch s.Kind {
+	case sku.KindTrial:
 		if ref == nil {
 			return "", nil, esportspb.ErrorEsportsOrderScopeInvalid("").WithCause(
 				fmt.Errorf("a trial order requires the record it unlocks"))
@@ -564,7 +473,7 @@ func (uc *OrderUC) resolveScope(ctx context.Context, userID string, sku *Sku, re
 			return "", nil, esportspb.ErrorEsportsOrderScopeAlreadyGranted("")
 		}
 		return ScopeTrial, ref, nil
-	case SkuKindMembership:
+	case sku.KindMembership:
 		if ref != nil {
 			return "", nil, esportspb.ErrorEsportsOrderScopeInvalid("").WithCause(
 				fmt.Errorf("a membership order takes no record reference"))
@@ -572,7 +481,7 @@ func (uc *OrderUC) resolveScope(ctx context.Context, userID string, sku *Sku, re
 		return ScopePeriod, nil, nil
 	default:
 		return "", nil, esportspb.ErrorEsportsOrderScopeInvalid("").WithCause(
-			fmt.Errorf("sku kind %q buys nothing", sku.Kind))
+			fmt.Errorf("sku kind %q buys nothing", s.Kind))
 	}
 }
 
@@ -641,6 +550,65 @@ func (uc *OrderUC) reconcileSweep(ctx context.Context) error {
 		}
 		uc.nextBillDay = day.AddDate(0, 0, 1)
 	}
+	return nil
+}
+
+func (uc *OrderUC) reconcileDay(ctx context.Context, day time.Time) error {
+	provider := uc.channelRP.DefaultProvider()
+	bill, err := uc.channelRP.DownloadBill(ctx, provider, &payment.BillInput{Date: day, Kind: payment.BillKindTrade})
+	if err != nil {
+		return err
+	}
+	lines, err := uc.channelRP.ParseTradeBill(ctx, provider, bill.Raw)
+	if err != nil {
+		return err
+	}
+	start, end := billDayWindow(day)
+	orders, err := uc.orderRP.ListPaid(ctx, start, end)
+	if err != nil {
+		return err
+	}
+	local := make(map[string]*Order, len(orders))
+	for _, o := range orders {
+		local[o.OrderNo] = o
+	}
+	// The reconciliation compares day facts: channel rows the bill dates into
+	// this window against local rows paid in it — the mock's snapshot bill and
+	// WeChat's day bill meet under one rule.
+	billed := make(map[string]payment.BillLine, len(lines))
+	for _, l := range lines {
+		if (l.State == payment.BillLinePaid || l.State == payment.BillLineRefund) && !l.At.Before(start) && l.At.Before(end) {
+			billed[l.OutTradeNo] = l
+		}
+	}
+	mismatch := 0
+	for _, o := range orders {
+		l, ok := billed[o.OrderNo]
+		switch {
+		case !ok:
+			uc.Log.Error("paid order missing from bill", "order_no", o.OrderNo, "day", day.Format("2006-01-02"))
+			mismatch++
+		case int64(l.AmountFen) != o.AmountFen:
+			uc.Log.Error("bill amount mismatch", "order_no", o.OrderNo, "row_fen", o.AmountFen, "bill_fen", int64(l.AmountFen))
+			mismatch++
+		}
+	}
+	for no, l := range billed {
+		if _, ok := local[no]; ok {
+			continue
+		}
+		row, err := uc.orderRP.ByNo(ctx, no)
+		if err != nil {
+			return err
+		}
+		if row == nil {
+			uc.Log.Error("bill order unknown locally", "order_no", no, "bill_fen", int64(l.AmountFen))
+		} else {
+			uc.Log.Error("bill settled an unsettled order", "order_no", no, "local_state", row.State, "bill_fen", int64(l.AmountFen))
+		}
+		mismatch++
+	}
+	uc.Log.Info("payment bill reconciled", "day", day.Format("2006-01-02"), "local", len(orders), "billed", len(billed), "mismatch", mismatch)
 	return nil
 }
 

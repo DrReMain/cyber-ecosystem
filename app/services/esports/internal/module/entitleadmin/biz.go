@@ -108,10 +108,10 @@ type MembershipDetail struct {
 	Identity *IdentityFacts
 }
 
-// The sku facts a membership grant needs. A local face on purpose:
-// this consumer owns the shape it wants, and the pay side satisfies
-// it without either module importing the other's domain objects.
 type SkuFacts struct {
+	// The sku facts a membership grant needs. A local face on purpose:
+	// this consumer owns the shape it wants, and the sku side satisfies
+	// it without either module importing the other's domain objects.
 	Name       string
 	PeriodDays int
 }

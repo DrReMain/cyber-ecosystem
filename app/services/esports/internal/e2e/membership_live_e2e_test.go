@@ -23,8 +23,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/entitleadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
-	"cyber-ecosystem/app/services/esports/internal/module/pay"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
+	"cyber-ecosystem/app/services/esports/internal/module/sku"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
@@ -86,7 +86,7 @@ func TestMembershipLiveE2E(t *testing.T) {
 	cleanMembershipE2E(t, db)
 
 	entRP := entitle.NewEntitlementRP(logger, pf)
-	skuRP := entitleadmin.NewSkuFactsRP(pay.NewSkuRP(logger, pf))
+	skuRP := entitleadmin.NewSkuFactsRP(sku.NewSkuRP(logger, pf))
 	uc := entitleadmin.NewMembershipUC(logger, pf, entRP, skuRP, stubRoster{}, stubProfile{})
 	adminCtx := entSubject(admin1)
 	userCtx := entSubject(userA)

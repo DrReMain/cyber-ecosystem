@@ -55,7 +55,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "go test -race ./..."
+        "command": "go test -race -count=1 ./..."
       }
     },
     "image": {

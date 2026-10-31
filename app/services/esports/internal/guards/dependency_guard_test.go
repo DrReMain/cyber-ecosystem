@@ -94,9 +94,7 @@ func TestCompositionBoundaries(t *testing.T) {
 // singleServiceExceptions names module dirs still allowed a second
 // *Service struct — each entry is a debt that dies with its module split,
 // and a stale entry fails the tail loop below.
-var singleServiceExceptions = map[string]bool{
-	"pay": true, // sku and order under one package, awaiting the split
-}
+var singleServiceExceptions = map[string]bool{}
 
 // TestModuleSingleService pins one module = one transport face: at most one
 // *Service struct per module dir. Two faces in one package mean two

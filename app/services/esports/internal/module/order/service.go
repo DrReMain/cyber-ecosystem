@@ -1,4 +1,4 @@
-package pay
+package order
 
 import (
 	"context"
@@ -16,20 +16,6 @@ import (
 
 // Struct --------------------------------------------------------------------------------------------------------------
 
-type SkuService struct {
-	esportspb.UnimplementedSkuServiceServer
-
-	log   *slog.Logger
-	skuUC *SkuUC
-}
-
-func NewSkuService(logger *slog.Logger, skuUC *SkuUC) *SkuService {
-	return &SkuService{
-		log:   logger.With("module", "module/pay_service"),
-		skuUC: skuUC,
-	}
-}
-
 type OrderService struct {
 	esportspb.UnimplementedOrderServiceServer
 
@@ -39,21 +25,9 @@ type OrderService struct {
 
 func NewOrderService(logger *slog.Logger, orderUC *OrderUC) *OrderService {
 	return &OrderService{
-		log:     logger.With("module", "module/pay_service"),
+		log:     logger.With("module", "module/order_service"),
 		orderUC: orderUC,
 	}
-}
-
-func (s *SkuService) RegisterGRPC(srv *grpc.Server) {
-	esportspb.RegisterSkuServiceServer(srv, s)
-}
-
-func (s *SkuService) RegisterHTTP(srv *http.Server) {
-	esportspb.RegisterSkuServiceHTTPServer(srv, s)
-}
-
-func (s *SkuService) RegisterConnect(srv *connecttransport.Server) {
-	esportspb.RegisterSkuServiceConnectServer(srv, s)
 }
 
 func (s *OrderService) RegisterGRPC(srv *grpc.Server) {
@@ -69,14 +43,6 @@ func (s *OrderService) RegisterConnect(srv *connecttransport.Server) {
 }
 
 // Handler -------------------------------------------------------------------------------------------------------------
-
-func (s *SkuService) ListSkus(ctx context.Context, in *esportspb.ListSkusRequest) (*esportspb.ListSkusResponse, error) {
-	skus, err := s.skuUC.List(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &esportspb.ListSkusResponse{Skus: utils.SliceMap(skus, mapSkuPB)}, nil
-}
 
 func (s *OrderService) CreateOrder(ctx context.Context, in *esportspb.CreateOrderRequest) (*esportspb.CreateOrderResponse, error) {
 	out, err := s.orderUC.Create(ctx, &CreateIn{
@@ -95,12 +61,12 @@ func (s *OrderService) CreateOrder(ctx context.Context, in *esportspb.CreateOrde
 	}, nil
 }
 
-func (s *OrderService) GetOrder(ctx context.Context, in *esportspb.GetOrderRequest) (*esportspb.GetOrderResponse, error) {
-	order, err := s.orderUC.Get(ctx, in.GetOrderNo())
+func (s *OrderService) CloseOrder(ctx context.Context, in *esportspb.CloseOrderRequest) (*esportspb.CloseOrderResponse, error) {
+	order, err := s.orderUC.Close(ctx, in.GetOrderNo())
 	if err != nil {
 		return nil, err
 	}
-	return &esportspb.GetOrderResponse{Order: mapOrderPB(order)}, nil
+	return &esportspb.CloseOrderResponse{Order: mapOrderPB(order)}, nil
 }
 
 func (s *OrderService) ListOrders(ctx context.Context, in *esportspb.ListOrdersRequest) (*esportspb.ListOrdersResponse, error) {
@@ -114,12 +80,12 @@ func (s *OrderService) ListOrders(ctx context.Context, in *esportspb.ListOrdersR
 	}, nil
 }
 
-func (s *OrderService) CloseOrder(ctx context.Context, in *esportspb.CloseOrderRequest) (*esportspb.CloseOrderResponse, error) {
-	order, err := s.orderUC.Close(ctx, in.GetOrderNo())
+func (s *OrderService) GetOrder(ctx context.Context, in *esportspb.GetOrderRequest) (*esportspb.GetOrderResponse, error) {
+	order, err := s.orderUC.Get(ctx, in.GetOrderNo())
 	if err != nil {
 		return nil, err
 	}
-	return &esportspb.CloseOrderResponse{Order: mapOrderPB(order)}, nil
+	return &esportspb.GetOrderResponse{Order: mapOrderPB(order)}, nil
 }
 
 func (s *OrderService) NotifyPayment(ctx context.Context, in *esportspb.NotifyPaymentRequest) (*esportspb.NotifyPaymentResponse, error) {
@@ -131,20 +97,6 @@ func (s *OrderService) NotifyPayment(ctx context.Context, in *esportspb.NotifyPa
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
-
-func mapSkuPB(s *Sku) *esportspb.Sku {
-	return &esportspb.Sku{
-		SkuCode:      utils.StringW(s.Code),
-		Name:         utils.StringW(s.Name),
-		Description:  utils.Wrap(s.Description, utils.StringW),
-		Kind:         mapSkuKindPB(s.Kind),
-		PriceFen:     utils.Int64W(s.PriceFen),
-		ListPriceFen: utils.Int64W(s.ListPriceFen),
-		PeriodDays:   utils.Wrap(utils.ConvPtr[int32](s.PeriodDays), utils.Int32W),
-		CreatedAt:    utils.ToTimestamp(&s.CreatedAt),
-		UpdatedAt:    utils.ToTimestamp(&s.UpdatedAt),
-	}
-}
 
 func mapOrderPB(o *Order) *esportspb.Order {
 	return &esportspb.Order{
@@ -160,17 +112,6 @@ func mapOrderPB(o *Order) *esportspb.Order {
 		CreatedAt:     utils.ToTimestamp(&o.CreatedAt),
 		ExpiresAt:     utils.ToTimestamp(&o.ExpiresAt),
 		PaidAt:        utils.ToTimestamp(o.PaidAt),
-	}
-}
-
-func mapSkuKindPB(kind string) esportspb.SkuKind {
-	switch kind {
-	case SkuKindTrial:
-		return esportspb.SkuKind_SKU_KIND_TRIAL
-	case SkuKindMembership:
-		return esportspb.SkuKind_SKU_KIND_MEMBERSHIP
-	default:
-		return esportspb.SkuKind_SKU_KIND_UNSPECIFIED
 	}
 }
 
