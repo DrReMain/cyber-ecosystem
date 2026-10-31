@@ -14,9 +14,9 @@ import { ArrowLeft, Ban, ExternalLink, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { bandLabel } from "#/features/modules/esports-users/bands";
 import { m } from "#/paraglide/messages";
-import { isLive as isLiveRow, statusTags } from "./ui/members-table";
 import { fullDate } from "./ui/dates";
 import { GrantModal, MEMBER_MONTH_SKU } from "./ui/grant-modal";
+import { isLive as isLiveRow, statusTags } from "./ui/members-table";
 import { TerminateModal } from "./ui/terminate-modal";
 
 const LIST_SEARCH = { pageNo: 1, pageSize: 20 };
@@ -213,6 +213,7 @@ function HistoryCard({ periods }: { periods: MembershipPeriod[] }) {
             // The timeline is append-only and read-only; same-day grants
             // would collide on date+source, so the row's ledger position is
             // the stable identity.
+            // biome-ignore lint/suspicious/noArrayIndexKey: the ledger position is the stable identity here
             key={i}
           >
             <Typography.Text className="w-24 shrink-0">{fullDate(p.grantedAt)}</Typography.Text>

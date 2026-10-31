@@ -16,8 +16,8 @@ import { useState } from "react";
 import { useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
 import { membersSearchSchema, parseMembersSearch } from "./search";
-import { MembersTable } from "./ui/members-table";
 import { GrantModal, MEMBER_MONTH_SKU } from "./ui/grant-modal";
+import { MembersTable } from "./ui/members-table";
 import { TerminateModal } from "./ui/terminate-modal";
 
 const AREA = "/dashboard/people/members/";
