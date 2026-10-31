@@ -7,7 +7,7 @@
 
 | 人 | 一行定位(详单=archive 10-30 压实块) | 当前 → 下一片 |
 |---|---|---|
-| lzx | M1 全量收满+质量批三件收口(99c5bb06);CP1 提前 14 天;M2-1 四刀+走查毕(10-31) | **M2-2/PAY0**;W6 M2-3/M2-4/E9 增量;W7 PAY2/PAY3/MSG-1 |
+| lzx | M1 全量收满+质量批三件收口(99c5bb06);CP1 提前 14 天;M2-1 收口 347a9ce7+PAY0 收口 4a590622(10-31) | **M2-2**;W6 M2-3/M2-4/E9 增量;W7 PAY2/PAY3/MSG-1 |
 | hzy | E-line-b ✅ 10-30 收口+走查修批五件(=archive 10-30 块) | **R3 余 P10 语言行(mt-F1 已落)**→R1/R2(分配制 D-AV) |
 | ljr | P7 视觉稿已落库(1c30b767,精修窗至 12-02);P1/P3/P9/P15/P10/P7 四参数已裁 | **P19/P21/P22(W5)→P14/P23(W6)→P7 定稿/P6(W7-W8)**;P4 11 月底 |
 
@@ -20,7 +20,7 @@
 | M2-1 会员终态+运营三操作 | lzx | ✅ 收口 347a9ce7(10-31 走查+双轴审查毕) | 四刀+验收刀全毕:契约/schema(MIG1 口径冻结)/服务端(system 投影+roster 存在性守卫)/客户端(菜单九组 G-301/302 绿+两页+三 Modal 逐字)/e2e 顺延-翻转-解锁窗口-终止回落;走查修七处(isLive 枚举比较/跨小月天数/Modal 日期 NaN/详情变体文案/ageBand 本地化/旧链接残留/e2e 基线断言);G-303/304/305 登记;双轴审查(正确性+家法)修 13 处:unlockedFor 接 HasActiveMembership(终止仍解锁+续费多行 Only 炸两缝同修)/fold 当期=最长活窗(与访问判定同族)/sku_name 死契约删除/客户端复用四件/e2e 补 settle 形守卫+清理对称/规范四搬移(SkuFacts↔DO+adapter 归 data.go/WindowUnlockRow/hydrateIdentity/const/ProviderSet 序) |
 | M2-2 SKU/订单面 / M2-3 激活码全面 / M2-4 详情余 Tab / E9 增量 | — | 未认领 | CP2 构成(M2-4 争取制);M2-4 依赖 P22/MSG-1 |
 | MSG-1 消息反馈公告 / MSG-2 分享裂变 | — | 未认领(W7-W8) | P21/P23 前置;D-AS①② |
-| PAY0 模块拆分 | — | 触发器制 | 下一片触碰 module/pay 前 |
+| PAY0 模块拆分 | lzx | ✅ 收口 4a590622(10-31) | 双聚合根拆毕(module/sku+module/order,order 跨模块持 sku.SkuRP),guard 豁免清零;顺手捉 M2-1 声明注释残留(归位体内)+go test 缓存×文件树守卫假绿洞(esports test target 已 -count=1;system 六守卫同洞留骨架车道) |
 | PAY2 通道联调 | — | 等行政件 | 用户即办:类目+H5 权限+APIv3 密钥 32 位 |
 | PAY3 合规执法+付费墙 | — | 未认领 | P7 稿就绪;PAY2 后 |
 | MIG1 迁移工具 | — | W6-W7 建 | P14 开工前必裁;W8 预演(P6);**权益翻译口径已冻结(10-31,M2-1)**:Entitlement 终态=scope_membership 行 status(active/terminated)+expires_at+terminated_at,续期=append-only 新行,旧码 activation 翻译按此落 |
