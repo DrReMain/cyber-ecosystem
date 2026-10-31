@@ -9944,6 +9944,7 @@ type SkuMutation struct {
 	period_days       *int
 	addperiod_days    *int
 	on_shelf          *bool
+	updated_by        *string
 	clearedFields     map[string]struct{}
 	done              bool
 	oldValue          func(context.Context) (*Sku, error)
@@ -10586,6 +10587,55 @@ func (m *SkuMutation) ResetOnShelf() {
 	m.on_shelf = nil
 }
 
+// SetUpdatedBy sets the "updated_by" field.
+func (m *SkuMutation) SetUpdatedBy(s string) {
+	m.updated_by = &s
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *SkuMutation) UpdatedBy() (r string, exists bool) {
+	v := m.updated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the Sku entity.
+// If the Sku object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SkuMutation) OldUpdatedBy(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// ClearUpdatedBy clears the value of the "updated_by" field.
+func (m *SkuMutation) ClearUpdatedBy() {
+	m.updated_by = nil
+	m.clearedFields[sku.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdatedByCleared returns if the "updated_by" field was cleared in this mutation.
+func (m *SkuMutation) UpdatedByCleared() bool {
+	_, ok := m.clearedFields[sku.FieldUpdatedBy]
+	return ok
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *SkuMutation) ResetUpdatedBy() {
+	m.updated_by = nil
+	delete(m.clearedFields, sku.FieldUpdatedBy)
+}
+
 // Where appends a list predicates to the SkuMutation builder.
 func (m *SkuMutation) Where(ps ...predicate.Sku) {
 	m.predicates = append(m.predicates, ps...)
@@ -10620,7 +10670,7 @@ func (m *SkuMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SkuMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, sku.FieldCreatedAt)
 	}
@@ -10657,6 +10707,9 @@ func (m *SkuMutation) Fields() []string {
 	if m.on_shelf != nil {
 		fields = append(fields, sku.FieldOnShelf)
 	}
+	if m.updated_by != nil {
+		fields = append(fields, sku.FieldUpdatedBy)
+	}
 	return fields
 }
 
@@ -10689,6 +10742,8 @@ func (m *SkuMutation) Field(name string) (ent.Value, bool) {
 		return m.PeriodDays()
 	case sku.FieldOnShelf:
 		return m.OnShelf()
+	case sku.FieldUpdatedBy:
+		return m.UpdatedBy()
 	}
 	return nil, false
 }
@@ -10722,6 +10777,8 @@ func (m *SkuMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldPeriodDays(ctx)
 	case sku.FieldOnShelf:
 		return m.OldOnShelf(ctx)
+	case sku.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
 	}
 	return nil, fmt.Errorf("unknown Sku field %s", name)
 }
@@ -10815,6 +10872,13 @@ func (m *SkuMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetOnShelf(v)
 		return nil
+	case sku.FieldUpdatedBy:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Sku field %s", name)
 }
@@ -10893,6 +10957,9 @@ func (m *SkuMutation) ClearedFields() []string {
 	if m.FieldCleared(sku.FieldPeriodDays) {
 		fields = append(fields, sku.FieldPeriodDays)
 	}
+	if m.FieldCleared(sku.FieldUpdatedBy) {
+		fields = append(fields, sku.FieldUpdatedBy)
+	}
 	return fields
 }
 
@@ -10915,6 +10982,9 @@ func (m *SkuMutation) ClearField(name string) error {
 		return nil
 	case sku.FieldPeriodDays:
 		m.ClearPeriodDays()
+		return nil
+	case sku.FieldUpdatedBy:
+		m.ClearUpdatedBy()
 		return nil
 	}
 	return fmt.Errorf("unknown Sku nullable field %s", name)
@@ -10959,6 +11029,9 @@ func (m *SkuMutation) ResetField(name string) error {
 		return nil
 	case sku.FieldOnShelf:
 		m.ResetOnShelf()
+		return nil
+	case sku.FieldUpdatedBy:
+		m.ResetUpdatedBy()
 		return nil
 	}
 	return fmt.Errorf("unknown Sku field %s", name)

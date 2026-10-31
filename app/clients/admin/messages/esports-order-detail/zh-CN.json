@@ -1,0 +1,17 @@
+{
+  "esports_order_detail_title": "订单详情",
+  "esports_order_detail_back": "返回订单列表",
+  "esports_order_user": "用户",
+  "esports_order_amount": "金额",
+  "esports_order_sku": "商品",
+  "esports_order_channel": "渠道",
+  "esports_order_created": "下单时间",
+  "esports_order_paid": "支付时间",
+  "esports_order_txn": "渠道单号",
+  "esports_order_unlock": "解锁去向",
+  "esports_order_unlock_pending": "—（待支付）",
+  "esports_order_unlock_closed": "订单已关闭，未产生解锁",
+  "esports_order_unlock_trial": "报告 {id} · 永久解锁",
+  "esports_order_unlock_period": "{from} ~ {to} 窗口 · 期内解锁 {n} 份（永久保留）",
+  "esports_order_refund_note": "退款口径：不向客户开放线上/自助退款。数字内容一经解锁/生效即视为交付完成，默认不退；例外由客服线下人工处理（附原因与凭证），退款单回收对应解锁（单次）或剩余有效期（会员），全程入审计。"
+}

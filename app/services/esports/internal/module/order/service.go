@@ -56,7 +56,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, in *esportspb.CreateOrde
 		return nil, err
 	}
 	return &esportspb.CreateOrderResponse{
-		Order:      mapOrderPB(out.Order),
+		Order:      MapOrderPB(out.Order),
 		Credential: &esportspb.PayCredential{Kind: mapCredentialKindPB(out.Credential.Kind), Value: out.Credential.Value},
 	}, nil
 }
@@ -66,7 +66,7 @@ func (s *OrderService) CloseOrder(ctx context.Context, in *esportspb.CloseOrderR
 	if err != nil {
 		return nil, err
 	}
-	return &esportspb.CloseOrderResponse{Order: mapOrderPB(order)}, nil
+	return &esportspb.CloseOrderResponse{Order: MapOrderPB(order)}, nil
 }
 
 func (s *OrderService) ListOrders(ctx context.Context, in *esportspb.ListOrdersRequest) (*esportspb.ListOrdersResponse, error) {
@@ -76,7 +76,7 @@ func (s *OrderService) ListOrders(ctx context.Context, in *esportspb.ListOrdersR
 	}
 	return &esportspb.ListOrdersResponse{
 		Page:   out.PageResponse,
-		Orders: utils.SliceMap(out.Orders, mapOrderPB),
+		Orders: utils.SliceMap(out.Orders, MapOrderPB),
 	}, nil
 }
 
@@ -85,7 +85,7 @@ func (s *OrderService) GetOrder(ctx context.Context, in *esportspb.GetOrderReque
 	if err != nil {
 		return nil, err
 	}
-	return &esportspb.GetOrderResponse{Order: mapOrderPB(order)}, nil
+	return &esportspb.GetOrderResponse{Order: MapOrderPB(order)}, nil
 }
 
 func (s *OrderService) NotifyPayment(ctx context.Context, in *esportspb.NotifyPaymentRequest) (*esportspb.NotifyPaymentResponse, error) {
@@ -98,7 +98,7 @@ func (s *OrderService) NotifyPayment(ctx context.Context, in *esportspb.NotifyPa
 
 // Private -------------------------------------------------------------------------------------------------------------
 
-func mapOrderPB(o *Order) *esportspb.Order {
+func MapOrderPB(o *Order) *esportspb.Order {
 	return &esportspb.Order{
 		OrderNo:       utils.StringW(o.OrderNo),
 		SkuCode:       utils.StringW(o.SKUCode),
@@ -136,6 +136,32 @@ func mapStatePB(state string) esportspb.OrderState {
 		return esportspb.OrderState_ORDER_STATE_CLOSED
 	default:
 		return esportspb.OrderState_ORDER_STATE_UNSPECIFIED
+	}
+}
+
+func StateFromPB(state esportspb.OrderState) string {
+	// The admin list's filter direction; UNSPECIFIED folds to "no
+	// filter" — the caller omits rather than asks for it.
+	switch state {
+	case esportspb.OrderState_ORDER_STATE_PENDING:
+		return StatePending
+	case esportspb.OrderState_ORDER_STATE_PAID:
+		return StatePaid
+	case esportspb.OrderState_ORDER_STATE_CLOSED:
+		return StateClosed
+	default:
+		return ""
+	}
+}
+
+func ScopeFromPB(scope esportspb.OrderScope) string {
+	switch scope {
+	case esportspb.OrderScope_ORDER_SCOPE_TRIAL:
+		return ScopeTrial
+	case esportspb.OrderScope_ORDER_SCOPE_PERIOD:
+		return ScopePeriod
+	default:
+		return ""
 	}
 }
 

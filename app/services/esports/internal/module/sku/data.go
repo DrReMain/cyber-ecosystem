@@ -24,9 +24,72 @@ func NewSkuRP(logger *slog.Logger, p *platform.Platform) SkuRP {
 
 // Method --------------------------------------------------------------------------------------------------------------
 
+func (rp *skuRP) Save(ctx context.Context, s *Sku) (*Sku, error) {
+	create := rp.Platform.GetClient(ctx).Sku.Create().
+		SetCode(s.Code).
+		SetKind(sku.Kind(s.Kind)).
+		SetName(s.Name).
+		SetPriceFen(s.PriceFen).
+		SetListPriceFen(s.ListPriceFen).
+		SetOnShelf(s.OnShelf).
+		SetNillableUpdatedBy(s.UpdatedBy)
+	if s.Description != nil {
+		create = create.SetDescription(*s.Description)
+	}
+	if s.PeriodDays != nil {
+		create = create.SetPeriodDays(*s.PeriodDays)
+	}
+	row, err := create.Save(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return mapSku(row), nil
+}
+
+func (rp *skuRP) UpdatePrice(ctx context.Context, code string, priceFen, listPriceFen int64, by *string) (*Sku, error) {
+	affected, err := rp.Platform.GetClient(ctx).Sku.Update().
+		Where(sku.CodeEQ(code)).
+		SetPriceFen(priceFen).
+		SetListPriceFen(listPriceFen).
+		SetNillableUpdatedBy(by).
+		Save(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	if affected == 0 {
+		return nil, nil
+	}
+	return rp.ByCode(ctx, code)
+}
+
+func (rp *skuRP) SetShelf(ctx context.Context, code string, onShelf bool, by *string) (*Sku, error) {
+	affected, err := rp.Platform.GetClient(ctx).Sku.Update().
+		Where(sku.CodeEQ(code)).
+		SetOnShelf(onShelf).
+		SetNillableUpdatedBy(by).
+		Save(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	if affected == 0 {
+		return nil, nil
+	}
+	return rp.ByCode(ctx, code)
+}
+
 func (rp *skuRP) List(ctx context.Context) ([]*Sku, error) {
 	rows, err := rp.Platform.GetClient(ctx).Sku.Query().
 		Where(sku.OnShelfEQ(true)).
+		Order(ent.Asc(sku.FieldCreatedAt)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return utils.SliceMap(rows, mapSku), nil
+}
+
+func (rp *skuRP) ListAll(ctx context.Context) ([]*Sku, error) {
+	rows, err := rp.Platform.GetClient(ctx).Sku.Query().
 		Order(ent.Asc(sku.FieldCreatedAt)).
 		All(ctx)
 	if err != nil {
@@ -60,6 +123,7 @@ func mapSku(row *ent.Sku) *Sku {
 		ListPriceFen: row.ListPriceFen,
 		PeriodDays:   row.PeriodDays,
 		OnShelf:      row.OnShelf,
+		UpdatedBy:    row.UpdatedBy,
 		CreatedAt:    row.CreatedAt,
 		UpdatedAt:    row.UpdatedAt,
 	}

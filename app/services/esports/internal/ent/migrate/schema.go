@@ -523,6 +523,7 @@ var (
 		{Name: "list_price_fen", Type: field.TypeInt64, Comment: "list (pre-discount) price; equals price_fen while no discount is shown, carried so discounting stays a value change"},
 		{Name: "period_days", Type: field.TypeInt, Nullable: true, Comment: "membership window in days (31: the 32nd day expires); null on trial skus"},
 		{Name: "on_shelf", Type: field.TypeBool, Comment: "member-plane visibility switch; off-shelf rows stay for order-history joins", Default: true},
+		{Name: "updated_by", Type: field.TypeString, Nullable: true, Size: 20, Comment: "operator id of the last catalog write (audit join); null on seed rows"},
 	}
 	// SkuTable holds the schema information for the "sku" table.
 	SkuTable = &schema.Table{

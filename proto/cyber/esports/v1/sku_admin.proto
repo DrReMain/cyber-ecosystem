@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/esports/v1/sku.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The sku aggregate's operator face: the whole catalog, on-shelf or not,
+// plus the three write actions the catalog admin owns. Every write is
+// price-sensitive territory — the operator identity rides into the row's
+// audit-join column, and shelf flips reach the member plane on its next
+// read (the member face queries live, no cache to invalidate). A face
+// module over module/sku: zero aggregates of its own.
+service SkuAdminService {
+  option (cyber.ext.v1.service_comment) = "SKU管理";
+  rpc CreateSku(CreateSkuRequest) returns (CreateSkuResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "新建SKU"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/catalog/skus"
+      body: "*"
+    };
+  }
+  rpc UpdateSkuPrice(UpdateSkuPriceRequest) returns (UpdateSkuPriceResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "改价"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/catalog/skus/{sku_code}/price"
+      body: "*"
+    };
+  }
+  rpc SetSkuShelf(SetSkuShelfRequest) returns (SetSkuShelfResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "上下架"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/catalog/skus/{sku_code}/shelf"
+      body: "*"
+    };
+  }
+  rpc ListCatalogSkus(ListCatalogSkusRequest) returns (ListCatalogSkusResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "全量SKU列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/catalog/skus"};
+  }
+}
+
+// A catalog row as the operator sees it: the member-plane Sku plus the
+// facts that plane never carries — shelf state and the last writer.
+message AdminSku {
+  Sku sku = 1;
+  bool on_shelf = 2;
+  // Operator id of the last write (audit join); empty on seed rows no
+  // operator has touched.
+  google.protobuf.StringValue updated_by = 3;
+}
+
+message ListCatalogSkusRequest {}
+
+message ListCatalogSkusResponse {
+  repeated AdminSku skus = 1;
+}
+
+message CreateSkuRequest {
+  string name = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 100
+    }
+  ];
+  SkuKind kind = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      not_in: [0]
+    }
+  ];
+  int64 price_fen = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64 = {gt: 0}
+  ];
+  // List price; defaults to price_fen when absent.
+  optional int64 list_price_fen = 4 [(buf.validate.field).int64 = {gt: 0}];
+  // Membership window; required for membership skus, rejected for trial
+  // skus — the kind check answers with the sku-kind error.
+  optional int32 period_days = 5 [(buf.validate.field).int32 = {gt: 0}];
+  optional string description = 6 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message CreateSkuResponse {
+  AdminSku sku = 1;
+}
+
+message UpdateSkuPriceRequest {
+  string sku_code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 50
+    }
+  ];
+  int64 price_fen = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int64 = {gt: 0}
+  ];
+  optional int64 list_price_fen = 3 [(buf.validate.field).int64 = {gt: 0}];
+}
+
+message UpdateSkuPriceResponse {
+  AdminSku sku = 1;
+}
+
+message SetSkuShelfRequest {
+  string sku_code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 50
+    }
+  ];
+  optional bool on_shelf = 2 [(buf.validate.field).required = true];
+}
+
+message SetSkuShelfResponse {
+  AdminSku sku = 1;
+}

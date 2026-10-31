@@ -11,6 +11,7 @@ import (
 	"context"
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -20,13 +21,16 @@ import (
 	"cyber-ecosystem/shared-go/kratos/security"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
+	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/order"
+	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/sku"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -289,6 +293,103 @@ func TestPayLiveE2E(t *testing.T) {
 	if !strings.Contains(logBuf.String(), "mismatch=0") {
 		t.Fatalf("reconcile log:\n%s", logBuf.String())
 	}
+
+	// The operator plane reads the same settled facts back: the whole-flow
+	// list, the detail with its folded unlock outcome, and the catalog
+	// writes reaching the member plane on its very next read. The roster
+	// and profile planes are stubbed to answer empty — the lazy hydration
+	// shape is itself the assertion target for the identity columns.
+	adminSubject := &security.Subject{UserID: "e2eadmin000000000001", TenantID: "default", Plane: security.PlaneBackend}
+	actx := security.WithSubject(context.Background(), adminSubject)
+	adminUC := order.NewOrderAdminUC(logger, pf, order.NewOrderRP(logger, pf), chanRP,
+		sku.NewSkuRP(logger, pf), stubProfileRP{}, stubRosterRP{}, entitle.NewEntitlementRP(logger, pf))
+
+	listed, err := adminUC.List(actx, &order.AdminListIn{PageRequest: &commonv1.PageRequest{}})
+	if err != nil {
+		t.Fatalf("admin list: %v", err)
+	}
+	var listedMem *order.AdminOrderRow
+	for _, r := range listed.Rows {
+		if r.OrderNo == mem1.Order.OrderNo {
+			listedMem = r
+		}
+	}
+	if listedMem == nil {
+		t.Fatalf("admin list: settled order %s absent from %d rows", mem1.Order.OrderNo, len(listed.Rows))
+	}
+	if listedMem.SkuName == nil || *listedMem.SkuName == "" || listedMem.Nickname != nil || listedMem.PhoneMasked != nil {
+		t.Fatalf("admin hydration: sku=%v nickname=%v phone=%v (identity stays lazy on an empty roster)", listedMem.SkuName, listedMem.Nickname, listedMem.PhoneMasked)
+	}
+	byNo, err := adminUC.List(actx, &order.AdminListIn{PageRequest: &commonv1.PageRequest{}, Keyword: strp(mem1.Order.OrderNo)})
+	if err != nil || len(byNo.Rows) != 1 || byNo.Rows[0].OrderNo != mem1.Order.OrderNo {
+		t.Fatalf("admin keyword by order no: rows=%d err=%v", len(byNo.Rows), err)
+	}
+	byNick, err := adminUC.List(actx, &order.AdminListIn{PageRequest: &commonv1.PageRequest{}, Keyword: strp("no-such-nickname")})
+	if err != nil || len(byNick.Rows) != 0 || byNick.Total != 0 {
+		t.Fatalf("admin keyword by unknown nickname: rows=%d total=%d err=%v", len(byNick.Rows), byNick.Total, err)
+	}
+
+	detail, unlock, err := adminUC.Get(actx, mem1.Order.OrderNo)
+	if err != nil {
+		t.Fatalf("admin get membership: %v", err)
+	}
+	if detail.OrderNo != mem1.Order.OrderNo || unlock == nil || unlock.RecordID != "" || unlock.UnlockCount != 0 {
+		t.Fatalf("membership unlock fold: %+v", unlock)
+	}
+	if d := unlock.ExpiresAt.Sub(unlock.GrantedAt); d < 31*24*time.Hour-time.Minute || d > 31*24*time.Hour+time.Minute {
+		t.Fatalf("membership unlock window: %v off 31 days", d)
+	}
+	if _, _, err := adminUC.Get(actx, "Pno-such-order"); !esportspb.IsEsportsOrderNotFound(err) {
+		t.Fatalf("unknown order: err=%v", err)
+	}
+	_, trialUnlock, err := adminUC.Get(actx, trial1.Order.OrderNo)
+	if err != nil || trialUnlock == nil || trialUnlock.RecordID != recA {
+		t.Fatalf("trial unlock fold: %+v err=%v", trialUnlock, err)
+	}
+	if _, err := adminUC.Close(actx, mem1.Order.OrderNo); !esportspb.IsEsportsOrderStateConflict(err) {
+		t.Fatalf("operator close of a paid order: err=%v", err)
+	}
+
+	skuUC := sku.NewSkuUC(logger, pf, sku.NewSkuRP(logger, pf))
+	memberPlane := func() []string {
+		skus, err := skuUC.List(context.Background())
+		if err != nil {
+			t.Fatalf("member plane list: %v", err)
+		}
+		codes := make([]string, 0, len(skus))
+		for _, s := range skus {
+			codes = append(codes, s.Code)
+		}
+		return codes
+	}
+	created, err := skuUC.Save(actx, &sku.SaveIn{Name: "e2e operator sku", Kind: sku.KindTrial, PriceFen: 990})
+	if err != nil {
+		t.Fatalf("sku save: %v", err)
+	}
+	if !strings.HasPrefix(created.Code, "sku_") || !created.OnShelf || created.UpdatedBy == nil || *created.UpdatedBy != adminSubject.UserID {
+		t.Fatalf("saved sku shape: %+v", created)
+	}
+	if !slices.Contains(memberPlane(), created.Code) {
+		t.Fatalf("new sku not on the member plane")
+	}
+	if _, err := skuUC.UpdatePrice(actx, created.Code, 1990, nil); err != nil {
+		t.Fatalf("sku reprice: %v", err)
+	}
+	if s, _ := skuUC.ListAll(actx); !slices.ContainsFunc(s, func(x *sku.Sku) bool { return x.Code == created.Code && x.PriceFen == 1990 }) {
+		t.Fatalf("reprice not stored: %+v", created)
+	}
+	if _, err := skuUC.SetShelf(actx, created.Code, false); err != nil {
+		t.Fatalf("sku shelf off: %v", err)
+	}
+	if slices.Contains(memberPlane(), created.Code) {
+		t.Fatalf("off-shelf sku still on the member plane")
+	}
+	if _, err := skuUC.Save(actx, &sku.SaveIn{Name: "bad shape", Kind: sku.KindMembership, PriceFen: 990}); !esportspb.IsEsportsSkuKindInvalid(err) {
+		t.Fatalf("membership without window accepted: err=%v", err)
+	}
+	if _, err := skuUC.UpdatePrice(actx, "no-such-code", 990, nil); !esportspb.IsEsportsSkuNotFound(err) {
+		t.Fatalf("reprice unknown code: err=%v", err)
+	}
 }
 
 func cleanE2E(t *testing.T, db *ent.Client, uid string) {
@@ -301,9 +402,38 @@ func cleanE2E(t *testing.T, db *ent.Client, uid string) {
 		{`DELETE FROM pay_order WHERE user_id = $1`, []any{uid}},
 		{`DELETE FROM entitlement WHERE user_id = $1`, []any{uid}},
 		{`DELETE FROM test_record WHERE user_id LIKE 'e2epayuser%'`, nil},
+		// Operator-minted rows only — seed rows carry semantic codes and stay.
+		{`DELETE FROM sku WHERE code LIKE 'sku_%'`, nil},
 	} {
 		if _, err := db.ExecContext(ctx, stmt.q, stmt.args...); err != nil {
 			t.Fatalf("e2e clean: %v", err)
 		}
 	}
+}
+
+// The e2e runs without the system service: the roster answers an empty
+// page and the profile plane answers empty lists, so identity hydration
+// lands on its lazy shape — nil facts, never an error.
+type stubRosterRP struct{}
+
+func (stubRosterRP) ListRoster(ctx context.Context, q *member.RosterQuery) (*member.RosterPage, error) {
+	return &member.RosterPage{PageResponse: &commonv1.PageResponse{}}, nil
+}
+
+type stubProfileRP struct{}
+
+func (stubProfileRP) FindByUserID(ctx context.Context, userID string) (*profile.Profile, error) {
+	return nil, nil
+}
+
+func (stubProfileRP) ListByUserIDs(ctx context.Context, userIDs []string) ([]*profile.Profile, error) {
+	return nil, nil
+}
+
+func (stubProfileRP) ListUserIDs(ctx context.Context, keyword, ageBand *string) ([]string, error) {
+	return nil, nil
+}
+
+func (stubProfileRP) Save(ctx context.Context, p *profile.Profile) (*profile.Profile, error) {
+	return p, nil
 }

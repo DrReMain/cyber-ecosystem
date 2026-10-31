@@ -40,7 +40,9 @@ type Sku struct {
 	// membership window in days (31: the 32nd day expires); null on trial skus
 	PeriodDays *int `json:"period_days,omitempty"`
 	// member-plane visibility switch; off-shelf rows stay for order-history joins
-	OnShelf      bool `json:"on_shelf,omitempty"`
+	OnShelf bool `json:"on_shelf,omitempty"`
+	// operator id of the last catalog write (audit join); null on seed rows
+	UpdatedBy    *string `json:"updated_by,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -53,7 +55,7 @@ func (*Sku) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case sku.FieldPriceFen, sku.FieldListPriceFen, sku.FieldPeriodDays:
 			values[i] = new(sql.NullInt64)
-		case sku.FieldID, sku.FieldTenantID, sku.FieldCode, sku.FieldKind, sku.FieldName, sku.FieldDescription:
+		case sku.FieldID, sku.FieldTenantID, sku.FieldCode, sku.FieldKind, sku.FieldName, sku.FieldDescription, sku.FieldUpdatedBy:
 			values[i] = new(sql.NullString)
 		case sku.FieldCreatedAt, sku.FieldUpdatedAt, sku.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -153,6 +155,13 @@ func (_m *Sku) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.OnShelf = value.Bool
 			}
+		case sku.FieldUpdatedBy:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+			} else if value.Valid {
+				_m.UpdatedBy = new(string)
+				*_m.UpdatedBy = value.String
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -230,6 +239,11 @@ func (_m *Sku) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("on_shelf=")
 	builder.WriteString(fmt.Sprintf("%v", _m.OnShelf))
+	builder.WriteString(", ")
+	if v := _m.UpdatedBy; v != nil {
+		builder.WriteString("updated_by=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -1,0 +1,17 @@
+{
+  "esports_order_detail_title": "注文詳細",
+  "esports_order_detail_back": "注文一覧に戻る",
+  "esports_order_user": "ユーザー",
+  "esports_order_amount": "金額",
+  "esports_order_sku": "商品",
+  "esports_order_channel": "チャネル",
+  "esports_order_created": "注文日時",
+  "esports_order_paid": "支払日時",
+  "esports_order_txn": "チャネル取引番号",
+  "esports_order_unlock": "アンロック先",
+  "esports_order_unlock_pending": "—（未払い）",
+  "esports_order_unlock_closed": "注文はクローズ、アンロックなし",
+  "esports_order_unlock_trial": "レポート {id} · 永久解放",
+  "esports_order_unlock_period": "{from} ~ {to} の期間 · 期内 {n} 件解放（永久保持）",
+  "esports_order_refund_note": "返金方針：オンライン・セルフサービス返金は不可。デジタルコンテンツはアンロック・発効をもって引き渡し完了とみなし、原則返金不可；例外はカスタマーサポートがオフラインで処理（理由と証憑付き）、返金時にアンロック（単回）または残り期間（会員）を回収、すべて監査対象。"
+}

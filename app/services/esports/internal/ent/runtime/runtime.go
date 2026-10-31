@@ -1069,6 +1069,10 @@ func init() {
 	skuDescOnShelf := skuFields[7].Descriptor()
 	// sku.DefaultOnShelf holds the default value on creation for the on_shelf field.
 	sku.DefaultOnShelf = skuDescOnShelf.Default.(bool)
+	// skuDescUpdatedBy is the schema descriptor for updated_by field.
+	skuDescUpdatedBy := skuFields[8].Descriptor()
+	// sku.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	sku.UpdatedByValidator = skuDescUpdatedBy.Validators[0].(func(string) error)
 	// skuDescID is the schema descriptor for id field.
 	skuDescID := skuMixinFields0[0].Descriptor()
 	// sku.DefaultID holds the default value on creation for the id field.

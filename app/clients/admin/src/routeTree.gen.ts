@@ -20,6 +20,7 @@ import { Route as DashboardChannelsRouteRouteImport } from './routes/dashboard/c
 import { Route as DashboardFilesRouteRouteImport } from './routes/dashboard/files/route'
 import { Route as DashboardPeopleRouteRouteImport } from './routes/dashboard/people/route'
 import { Route as DashboardPlatformRouteRouteImport } from './routes/dashboard/platform/route'
+import { Route as DashboardPricingRouteRouteImport } from './routes/dashboard/pricing/route'
 import { Route as DashboardProfileRouteRouteImport } from './routes/dashboard/profile/route'
 import { Route as DashboardReportsRouteRouteImport } from './routes/dashboard/reports/route'
 import { Route as DashboardSystemRouteRouteImport } from './routes/dashboard/system/route'
@@ -30,6 +31,8 @@ import { Route as DashboardPeopleMembersRouteRouteImport } from './routes/dashbo
 import { Route as DashboardPeopleUsersRouteRouteImport } from './routes/dashboard/people/users/route'
 import { Route as DashboardPlatformPopulationsRouteImport } from './routes/dashboard/platform/populations'
 import { Route as DashboardPlatformTenantsRouteImport } from './routes/dashboard/platform/tenants'
+import { Route as DashboardPricingOrdersRouteRouteImport } from './routes/dashboard/pricing/orders/route'
+import { Route as DashboardPricingSkusRouteRouteImport } from './routes/dashboard/pricing/skus/route'
 import { Route as DashboardProfileIndexRouteImport } from './routes/dashboard/profile/index'
 import { Route as DashboardProfileAgentsRouteImport } from './routes/dashboard/profile/agents'
 import { Route as DashboardProfilePasswordRouteImport } from './routes/dashboard/profile/password'
@@ -45,6 +48,9 @@ import { Route as DashboardPeopleMembersIndexRouteImport } from './routes/dashbo
 import { Route as DashboardPeopleMembersIdRouteImport } from './routes/dashboard/people/members/$id'
 import { Route as DashboardPeopleUsersIndexRouteImport } from './routes/dashboard/people/users/index'
 import { Route as DashboardPeopleUsersIdRouteImport } from './routes/dashboard/people/users/$id'
+import { Route as DashboardPricingOrdersIndexRouteImport } from './routes/dashboard/pricing/orders/index'
+import { Route as DashboardPricingOrdersIdRouteImport } from './routes/dashboard/pricing/orders/$id'
+import { Route as DashboardPricingSkusIndexRouteImport } from './routes/dashboard/pricing/skus/index'
 import { Route as DashboardReportsReportPoliciesIndexRouteImport } from './routes/dashboard/reports/report-policies/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -103,6 +109,11 @@ const DashboardPlatformRouteRoute = DashboardPlatformRouteRouteImport.update({
   path: '/platform',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardPricingRouteRoute = DashboardPricingRouteRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardProfileRouteRoute = DashboardProfileRouteRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -157,6 +168,18 @@ const DashboardPlatformTenantsRoute =
     id: '/tenants',
     path: '/tenants',
     getParentRoute: () => DashboardPlatformRouteRoute,
+  } as any)
+const DashboardPricingOrdersRouteRoute =
+  DashboardPricingOrdersRouteRouteImport.update({
+    id: '/orders',
+    path: '/orders',
+    getParentRoute: () => DashboardPricingRouteRoute,
+  } as any)
+const DashboardPricingSkusRouteRoute =
+  DashboardPricingSkusRouteRouteImport.update({
+    id: '/skus',
+    path: '/skus',
+    getParentRoute: () => DashboardPricingRouteRoute,
   } as any)
 const DashboardProfileIndexRoute = DashboardProfileIndexRouteImport.update({
   id: '/',
@@ -239,6 +262,24 @@ const DashboardPeopleUsersIdRoute = DashboardPeopleUsersIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DashboardPeopleUsersRouteRoute,
 } as any)
+const DashboardPricingOrdersIndexRoute =
+  DashboardPricingOrdersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardPricingOrdersRouteRoute,
+  } as any)
+const DashboardPricingOrdersIdRoute =
+  DashboardPricingOrdersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => DashboardPricingOrdersRouteRoute,
+  } as any)
+const DashboardPricingSkusIndexRoute =
+  DashboardPricingSkusIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardPricingSkusRouteRoute,
+  } as any)
 const DashboardReportsReportPoliciesIndexRoute =
   DashboardReportsReportPoliciesIndexRouteImport.update({
     id: '/report-policies/',
@@ -257,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
+  '/dashboard/pricing': typeof DashboardPricingRouteRouteWithChildren
   '/dashboard/profile': typeof DashboardProfileRouteRouteWithChildren
   '/dashboard/reports': typeof DashboardReportsRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
@@ -264,6 +306,8 @@ export interface FileRoutesByFullPath {
   '/login/': typeof LoginIndexRoute
   '/dashboard/people/members': typeof DashboardPeopleMembersRouteRouteWithChildren
   '/dashboard/people/users': typeof DashboardPeopleUsersRouteRouteWithChildren
+  '/dashboard/pricing/orders': typeof DashboardPricingOrdersRouteRouteWithChildren
+  '/dashboard/pricing/skus': typeof DashboardPricingSkusRouteRouteWithChildren
   '/dashboard/agents/connections': typeof DashboardAgentsConnectionsRoute
   '/dashboard/files/list': typeof DashboardFilesListRoute
   '/dashboard/platform/populations': typeof DashboardPlatformPopulationsRoute
@@ -279,10 +323,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
   '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
   '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
+  '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
   '/dashboard/assessment/game-config/': typeof DashboardAssessmentGameConfigIndexRoute
   '/dashboard/channels/activation-codes/': typeof DashboardChannelsActivationCodesIndexRoute
   '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
+  '/dashboard/pricing/orders/': typeof DashboardPricingOrdersIndexRoute
+  '/dashboard/pricing/skus/': typeof DashboardPricingSkusIndexRoute
   '/dashboard/reports/report-policies/': typeof DashboardReportsReportPoliciesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -295,6 +342,7 @@ export interface FileRoutesByTo {
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
+  '/dashboard/pricing': typeof DashboardPricingRouteRouteWithChildren
   '/dashboard/reports': typeof DashboardReportsRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard': typeof DashboardIndexRoute
@@ -314,10 +362,13 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof DashboardProfileIndexRoute
   '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
   '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
+  '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
   '/dashboard/assessment/game-config': typeof DashboardAssessmentGameConfigIndexRoute
   '/dashboard/channels/activation-codes': typeof DashboardChannelsActivationCodesIndexRoute
   '/dashboard/people/members': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users': typeof DashboardPeopleUsersIndexRoute
+  '/dashboard/pricing/orders': typeof DashboardPricingOrdersIndexRoute
+  '/dashboard/pricing/skus': typeof DashboardPricingSkusIndexRoute
   '/dashboard/reports/report-policies': typeof DashboardReportsReportPoliciesIndexRoute
 }
 export interface FileRoutesById {
@@ -332,6 +383,7 @@ export interface FileRoutesById {
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
+  '/dashboard/pricing': typeof DashboardPricingRouteRouteWithChildren
   '/dashboard/profile': typeof DashboardProfileRouteRouteWithChildren
   '/dashboard/reports': typeof DashboardReportsRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
@@ -339,6 +391,8 @@ export interface FileRoutesById {
   '/login/': typeof LoginIndexRoute
   '/dashboard/people/members': typeof DashboardPeopleMembersRouteRouteWithChildren
   '/dashboard/people/users': typeof DashboardPeopleUsersRouteRouteWithChildren
+  '/dashboard/pricing/orders': typeof DashboardPricingOrdersRouteRouteWithChildren
+  '/dashboard/pricing/skus': typeof DashboardPricingSkusRouteRouteWithChildren
   '/dashboard/agents/connections': typeof DashboardAgentsConnectionsRoute
   '/dashboard/files/list': typeof DashboardFilesListRoute
   '/dashboard/platform/populations': typeof DashboardPlatformPopulationsRoute
@@ -354,10 +408,13 @@ export interface FileRoutesById {
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
   '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
   '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
+  '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
   '/dashboard/assessment/game-config/': typeof DashboardAssessmentGameConfigIndexRoute
   '/dashboard/channels/activation-codes/': typeof DashboardChannelsActivationCodesIndexRoute
   '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
+  '/dashboard/pricing/orders/': typeof DashboardPricingOrdersIndexRoute
+  '/dashboard/pricing/skus/': typeof DashboardPricingSkusIndexRoute
   '/dashboard/reports/report-policies/': typeof DashboardReportsReportPoliciesIndexRoute
 }
 export interface FileRouteTypes {
@@ -373,6 +430,7 @@ export interface FileRouteTypes {
     | '/dashboard/files'
     | '/dashboard/people'
     | '/dashboard/platform'
+    | '/dashboard/pricing'
     | '/dashboard/profile'
     | '/dashboard/reports'
     | '/dashboard/system'
@@ -380,6 +438,8 @@ export interface FileRouteTypes {
     | '/login/'
     | '/dashboard/people/members'
     | '/dashboard/people/users'
+    | '/dashboard/pricing/orders'
+    | '/dashboard/pricing/skus'
     | '/dashboard/agents/connections'
     | '/dashboard/files/list'
     | '/dashboard/platform/populations'
@@ -395,10 +455,13 @@ export interface FileRouteTypes {
     | '/dashboard/profile/'
     | '/dashboard/people/members/$id'
     | '/dashboard/people/users/$id'
+    | '/dashboard/pricing/orders/$id'
     | '/dashboard/assessment/game-config/'
     | '/dashboard/channels/activation-codes/'
     | '/dashboard/people/members/'
     | '/dashboard/people/users/'
+    | '/dashboard/pricing/orders/'
+    | '/dashboard/pricing/skus/'
     | '/dashboard/reports/report-policies/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -411,6 +474,7 @@ export interface FileRouteTypes {
     | '/dashboard/files'
     | '/dashboard/people'
     | '/dashboard/platform'
+    | '/dashboard/pricing'
     | '/dashboard/reports'
     | '/dashboard/system'
     | '/dashboard'
@@ -430,10 +494,13 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/people/members/$id'
     | '/dashboard/people/users/$id'
+    | '/dashboard/pricing/orders/$id'
     | '/dashboard/assessment/game-config'
     | '/dashboard/channels/activation-codes'
     | '/dashboard/people/members'
     | '/dashboard/people/users'
+    | '/dashboard/pricing/orders'
+    | '/dashboard/pricing/skus'
     | '/dashboard/reports/report-policies'
   id:
     | '__root__'
@@ -447,6 +514,7 @@ export interface FileRouteTypes {
     | '/dashboard/files'
     | '/dashboard/people'
     | '/dashboard/platform'
+    | '/dashboard/pricing'
     | '/dashboard/profile'
     | '/dashboard/reports'
     | '/dashboard/system'
@@ -454,6 +522,8 @@ export interface FileRouteTypes {
     | '/login/'
     | '/dashboard/people/members'
     | '/dashboard/people/users'
+    | '/dashboard/pricing/orders'
+    | '/dashboard/pricing/skus'
     | '/dashboard/agents/connections'
     | '/dashboard/files/list'
     | '/dashboard/platform/populations'
@@ -469,10 +539,13 @@ export interface FileRouteTypes {
     | '/dashboard/profile/'
     | '/dashboard/people/members/$id'
     | '/dashboard/people/users/$id'
+    | '/dashboard/pricing/orders/$id'
     | '/dashboard/assessment/game-config/'
     | '/dashboard/channels/activation-codes/'
     | '/dashboard/people/members/'
     | '/dashboard/people/users/'
+    | '/dashboard/pricing/orders/'
+    | '/dashboard/pricing/skus/'
     | '/dashboard/reports/report-policies/'
   fileRoutesById: FileRoutesById
 }
@@ -563,6 +636,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPlatformRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/pricing': {
+      id: '/dashboard/pricing'
+      path: '/pricing'
+      fullPath: '/dashboard/pricing'
+      preLoaderRoute: typeof DashboardPricingRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/profile': {
       id: '/dashboard/profile'
       path: '/profile'
@@ -632,6 +712,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/platform/tenants'
       preLoaderRoute: typeof DashboardPlatformTenantsRouteImport
       parentRoute: typeof DashboardPlatformRouteRoute
+    }
+    '/dashboard/pricing/orders': {
+      id: '/dashboard/pricing/orders'
+      path: '/orders'
+      fullPath: '/dashboard/pricing/orders'
+      preLoaderRoute: typeof DashboardPricingOrdersRouteRouteImport
+      parentRoute: typeof DashboardPricingRouteRoute
+    }
+    '/dashboard/pricing/skus': {
+      id: '/dashboard/pricing/skus'
+      path: '/skus'
+      fullPath: '/dashboard/pricing/skus'
+      preLoaderRoute: typeof DashboardPricingSkusRouteRouteImport
+      parentRoute: typeof DashboardPricingRouteRoute
     }
     '/dashboard/profile/': {
       id: '/dashboard/profile/'
@@ -737,6 +831,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/people/users/$id'
       preLoaderRoute: typeof DashboardPeopleUsersIdRouteImport
       parentRoute: typeof DashboardPeopleUsersRouteRoute
+    }
+    '/dashboard/pricing/orders/': {
+      id: '/dashboard/pricing/orders/'
+      path: '/'
+      fullPath: '/dashboard/pricing/orders/'
+      preLoaderRoute: typeof DashboardPricingOrdersIndexRouteImport
+      parentRoute: typeof DashboardPricingOrdersRouteRoute
+    }
+    '/dashboard/pricing/orders/$id': {
+      id: '/dashboard/pricing/orders/$id'
+      path: '/$id'
+      fullPath: '/dashboard/pricing/orders/$id'
+      preLoaderRoute: typeof DashboardPricingOrdersIdRouteImport
+      parentRoute: typeof DashboardPricingOrdersRouteRoute
+    }
+    '/dashboard/pricing/skus/': {
+      id: '/dashboard/pricing/skus/'
+      path: '/'
+      fullPath: '/dashboard/pricing/skus/'
+      preLoaderRoute: typeof DashboardPricingSkusIndexRouteImport
+      parentRoute: typeof DashboardPricingSkusRouteRoute
     }
     '/dashboard/reports/report-policies/': {
       id: '/dashboard/reports/report-policies/'
@@ -862,6 +977,52 @@ const DashboardPlatformRouteRouteWithChildren =
     DashboardPlatformRouteRouteChildren,
   )
 
+interface DashboardPricingOrdersRouteRouteChildren {
+  DashboardPricingOrdersIdRoute: typeof DashboardPricingOrdersIdRoute
+  DashboardPricingOrdersIndexRoute: typeof DashboardPricingOrdersIndexRoute
+}
+
+const DashboardPricingOrdersRouteRouteChildren: DashboardPricingOrdersRouteRouteChildren =
+  {
+    DashboardPricingOrdersIdRoute: DashboardPricingOrdersIdRoute,
+    DashboardPricingOrdersIndexRoute: DashboardPricingOrdersIndexRoute,
+  }
+
+const DashboardPricingOrdersRouteRouteWithChildren =
+  DashboardPricingOrdersRouteRoute._addFileChildren(
+    DashboardPricingOrdersRouteRouteChildren,
+  )
+
+interface DashboardPricingSkusRouteRouteChildren {
+  DashboardPricingSkusIndexRoute: typeof DashboardPricingSkusIndexRoute
+}
+
+const DashboardPricingSkusRouteRouteChildren: DashboardPricingSkusRouteRouteChildren =
+  {
+    DashboardPricingSkusIndexRoute: DashboardPricingSkusIndexRoute,
+  }
+
+const DashboardPricingSkusRouteRouteWithChildren =
+  DashboardPricingSkusRouteRoute._addFileChildren(
+    DashboardPricingSkusRouteRouteChildren,
+  )
+
+interface DashboardPricingRouteRouteChildren {
+  DashboardPricingOrdersRouteRoute: typeof DashboardPricingOrdersRouteRouteWithChildren
+  DashboardPricingSkusRouteRoute: typeof DashboardPricingSkusRouteRouteWithChildren
+}
+
+const DashboardPricingRouteRouteChildren: DashboardPricingRouteRouteChildren = {
+  DashboardPricingOrdersRouteRoute:
+    DashboardPricingOrdersRouteRouteWithChildren,
+  DashboardPricingSkusRouteRoute: DashboardPricingSkusRouteRouteWithChildren,
+}
+
+const DashboardPricingRouteRouteWithChildren =
+  DashboardPricingRouteRoute._addFileChildren(
+    DashboardPricingRouteRouteChildren,
+  )
+
 interface DashboardProfileRouteRouteChildren {
   DashboardProfileAgentsRoute: typeof DashboardProfileAgentsRoute
   DashboardProfilePasswordRoute: typeof DashboardProfilePasswordRoute
@@ -921,6 +1082,7 @@ interface DashboardRouteRouteChildren {
   DashboardFilesRouteRoute: typeof DashboardFilesRouteRouteWithChildren
   DashboardPeopleRouteRoute: typeof DashboardPeopleRouteRouteWithChildren
   DashboardPlatformRouteRoute: typeof DashboardPlatformRouteRouteWithChildren
+  DashboardPricingRouteRoute: typeof DashboardPricingRouteRouteWithChildren
   DashboardProfileRouteRoute: typeof DashboardProfileRouteRouteWithChildren
   DashboardReportsRouteRoute: typeof DashboardReportsRouteRouteWithChildren
   DashboardSystemRouteRoute: typeof DashboardSystemRouteRouteWithChildren
@@ -934,6 +1096,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardFilesRouteRoute: DashboardFilesRouteRouteWithChildren,
   DashboardPeopleRouteRoute: DashboardPeopleRouteRouteWithChildren,
   DashboardPlatformRouteRoute: DashboardPlatformRouteRouteWithChildren,
+  DashboardPricingRouteRoute: DashboardPricingRouteRouteWithChildren,
   DashboardProfileRouteRoute: DashboardProfileRouteRouteWithChildren,
   DashboardReportsRouteRoute: DashboardReportsRouteRouteWithChildren,
   DashboardSystemRouteRoute: DashboardSystemRouteRouteWithChildren,

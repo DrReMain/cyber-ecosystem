@@ -36,7 +36,10 @@
       "./messages/esports-members/{locale}.json",
       "./messages/esports-activation-codes/{locale}.json",
       "./messages/esports-report-policies/{locale}.json",
-      "./messages/esports-tests/{locale}.json"
+      "./messages/esports-tests/{locale}.json",
+      "./messages/esports-skus/{locale}.json",
+      "./messages/esports-orders/{locale}.json",
+      "./messages/esports-order-detail/{locale}.json"
     ]
   }
 }

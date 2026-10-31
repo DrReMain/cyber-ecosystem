@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/rs/xid"
 
 	"cyber-ecosystem/shared-go/capability/payment"
+	"cyber-ecosystem/shared-go/helper"
 	"cyber-ecosystem/shared-go/kratos/security"
 	"cyber-ecosystem/shared-go/utils"
 
@@ -18,6 +20,8 @@ import (
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
+	"cyber-ecosystem/app/services/esports/internal/module/member"
+	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/sku"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/shared"
@@ -34,7 +38,7 @@ const (
 	StatePaid    = "paid"
 	StateClosed  = "closed"
 
-	orderNoPrefix = "P"
+	OrderNoPrefix = "P"
 	// The channel's own default deadline, carried explicitly so the row and
 	// the channel order can never disagree about expiry.
 	payWindow = 2 * time.Hour
@@ -82,6 +86,12 @@ type CreateOut struct {
 type ListIn struct {
 	*commonv1.PageRequest
 	UserID string
+	// The operator face's filters — the member face leaves them unset.
+	// UserIDs, when the keyword named people, narrows instead of UserID.
+	UserIDs []string
+	State   string // "" = any
+	Scope   string // "" = any
+	Prefix  string // order-no prefix
 }
 
 type ListOut struct {
@@ -95,6 +105,40 @@ type SettleIn struct {
 	TransactionID string
 	AmountFen     int64
 	PaidAt        time.Time
+}
+
+type AdminOrderRow struct {
+	// The operator's read model of an order: the wire facts plus the
+	// hydrated identity and sku-name the list columns need. Nil hydration
+	// fields are the lazy shape (no profile row yet, roster gone) — never
+	// an error.
+	*Order
+	Nickname    *string
+	PhoneMasked *string
+	SkuName     *string
+}
+
+type AdminListIn struct {
+	*commonv1.PageRequest
+	State   *string
+	Scope   *string
+	Keyword *string
+}
+
+type AdminListOut struct {
+	*commonv1.PageResponse
+	Rows []*AdminOrderRow
+}
+
+type UnlockView struct {
+	// What a paid order actually unlocked, folded at read time — trial:
+	// the report record, permanently.
+	RecordID string
+	// Membership: the window this order opened (the grant row whose
+	// source is this order number) and the unlocks that landed inside it.
+	GrantedAt   time.Time
+	ExpiresAt   time.Time
+	UnlockCount int
 }
 
 // Port ----------------------------------------------------------------------------------------------------------------
@@ -153,6 +197,33 @@ func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookReg
 	return uc
 }
 
+type OrderAdminUC struct {
+	// The operator's UC over the same aggregate — a sibling of the member
+	// UC: the admin face's whole-order list, the detail with its folded
+	// unlock outcome, and the operator's close. Ports only; the owner
+	// check the member Close carries is deliberately absent — the admin
+	// face's access ladder already settled who may call here.
+	shared.UC
+	orderRP   OrderRP
+	channelRP PayChannelRP
+	skuRP     sku.SkuRP
+	profileRP profile.ProfileRP
+	systemRP  member.SystemRP
+	entRP     entitle.EntitlementRP
+}
+
+func NewOrderAdminUC(logger *slog.Logger, tm shared.Transaction, orderRP OrderRP, channelRP PayChannelRP, skuRP sku.SkuRP, profileRP profile.ProfileRP, systemRP member.SystemRP, entRP entitle.EntitlementRP) *OrderAdminUC {
+	return &OrderAdminUC{
+		UC:        shared.NewUC(logger.With("module", "module/order_admin"), tm),
+		orderRP:   orderRP,
+		channelRP: channelRP,
+		skuRP:     skuRP,
+		profileRP: profileRP,
+		systemRP:  systemRP,
+		entRP:     entRP,
+	}
+}
+
 // Method --------------------------------------------------------------------------------------------------------------
 
 func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error) {
@@ -192,11 +263,11 @@ func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error)
 			// create for the same grant target.
 			return &CreateOut{Order: active, Credential: credentialOf(active)}, nil
 		}
-		if _, err := uc.retire(ctx, active); err != nil {
+		if _, err := retirePending(ctx, uc.channelRP, uc.orderRP, active); err != nil {
 			return nil, err
 		}
 	}
-	orderNo := orderNoPrefix + xid.New().String()
+	orderNo := OrderNoPrefix + xid.New().String()
 	expireAt := time.Now().Add(payWindow)
 	var payer *payment.Payer
 	if in.PayerOpenID != nil || in.ReturnURL != nil {
@@ -264,7 +335,7 @@ func (uc *OrderUC) Close(ctx context.Context, orderNo string) (*Order, error) {
 	if order.State != StatePending {
 		return nil, esportspb.ErrorEsportsOrderStateConflict("")
 	}
-	closed, err := uc.retire(ctx, order)
+	closed, err := retirePending(ctx, uc.channelRP, uc.orderRP, order)
 	if err != nil {
 		return nil, err
 	}
@@ -421,7 +492,7 @@ func (uc *OrderUC) ConvergeOnce(ctx context.Context) error {
 			uc.convergeQuery(ctx, order)
 			continue
 		}
-		if _, err := uc.retire(ctx, order); err != nil {
+		if _, err := retirePending(ctx, uc.channelRP, uc.orderRP, order); err != nil {
 			if esportspb.IsEsportsOrderStateConflict(err) {
 				// The channel refused the close — paid in the expiry race.
 				// The query is the truth that settles it.
@@ -636,13 +707,13 @@ func (uc *OrderUC) convergeQuery(ctx context.Context, order *Order) {
 	}
 }
 
-func (uc *OrderUC) retire(ctx context.Context, order *Order) (*Order, error) {
+func retirePending(ctx context.Context, channelRP PayChannelRP, orderRP OrderRP, order *Order) (*Order, error) {
 	// Takes a pending order out of play: the channel twin closes first
 	// (the channel is the state machine; a channel refusal folds to the
 	// truth it reports), then the local conditional close frees the reuse
 	// slot. A nil return means the row left pending on its own — a settle
 	// or a rival close won the race.
-	if err := uc.channelRP.ClosePayment(ctx, order.Provider, order.OrderNo); err != nil {
+	if err := channelRP.ClosePayment(ctx, order.Provider, order.OrderNo); err != nil {
 		switch {
 		case errorspb.IsInfraErrorPaymentNotFound(err):
 			// The channel never knew this trade (a crash between the
@@ -657,7 +728,7 @@ func (uc *OrderUC) retire(ctx context.Context, order *Order) (*Order, error) {
 			return nil, err
 		}
 	}
-	return uc.orderRP.ClosePending(ctx, order.OrderNo)
+	return orderRP.ClosePending(ctx, order.OrderNo)
 }
 
 func credentialOf(o *Order) payment.Credential {
@@ -684,4 +755,187 @@ func billDayBefore(t time.Time) time.Time {
 	// for yesterday's bill.
 	d := t.In(billZone).AddDate(0, 0, -1)
 	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, billZone)
+}
+
+var rosterHydrate = utils.Ptr(int32(helper.DefaultPageSizeMax)) // one roster page covers the page's distinct ids
+
+func (uc *OrderAdminUC) List(ctx context.Context, in *AdminListIn) (*AdminListOut, error) {
+	listIn := &ListIn{PageRequest: in.PageRequest}
+	if in.State != nil {
+		listIn.State = *in.State
+	}
+	if in.Scope != nil {
+		listIn.Scope = *in.Scope
+	}
+	if in.Keyword != nil {
+		// One box, two readings: order-no shaped input queries orders
+		// directly, anything else resolves people first (nickname via the
+		// profile plane; phone search is a system-plane gap the ledger
+		// tracks). A P-prefixed nickname misroutes — one empty answer,
+		// the operator retypes.
+		kw := strings.TrimPrefix(strings.TrimSpace(*in.Keyword), "#")
+		if strings.HasPrefix(kw, OrderNoPrefix) {
+			listIn.Prefix = kw
+		} else {
+			userIDs, err := uc.profileRP.ListUserIDs(ctx, &kw, nil)
+			if err != nil {
+				return nil, err
+			}
+			if len(userIDs) == 0 {
+				return &AdminListOut{PageResponse: helper.BuildPageResponse(0, 0, 0)}, nil
+			}
+			listIn.UserIDs = userIDs
+		}
+	}
+	out, err := uc.orderRP.List(ctx, listIn)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := uc.hydrate(ctx, out.Orders)
+	if err != nil {
+		return nil, err
+	}
+	return &AdminListOut{PageResponse: out.PageResponse, Rows: rows}, nil
+}
+
+func (uc *OrderAdminUC) Get(ctx context.Context, orderNo string) (*AdminOrderRow, *UnlockView, error) {
+	o, err := uc.orderRP.ByNo(ctx, orderNo)
+	if err != nil {
+		return nil, nil, err
+	}
+	if o == nil {
+		return nil, nil, esportspb.ErrorEsportsOrderNotFound("")
+	}
+	rows, err := uc.hydrate(ctx, []*Order{o})
+	if err != nil {
+		return nil, nil, err
+	}
+	if o.State != StatePaid {
+		// A pending order has unlocked nothing; a closed one never will.
+		return rows[0], nil, nil
+	}
+	view, err := uc.foldUnlock(ctx, o)
+	if err != nil {
+		return nil, nil, err
+	}
+	return rows[0], view, nil
+}
+
+func (uc *OrderAdminUC) Close(ctx context.Context, orderNo string) (*AdminOrderRow, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("order close requires an admin session"))
+	}
+	o, err := uc.orderRP.ByNo(ctx, orderNo)
+	if err != nil {
+		return nil, err
+	}
+	if o == nil {
+		return nil, esportspb.ErrorEsportsOrderNotFound("")
+	}
+	if o.State != StatePending {
+		return nil, esportspb.ErrorEsportsOrderStateConflict("")
+	}
+	closed, err := retirePending(ctx, uc.channelRP, uc.orderRP, o)
+	if err != nil {
+		return nil, err
+	}
+	if closed == nil {
+		return nil, esportspb.ErrorEsportsOrderStateConflict("")
+	}
+	uc.Log.Info("order closed by operator", "order_no", orderNo, "user_id", o.UserID, "by", subject.UserID)
+	rows, err := uc.hydrate(ctx, []*Order{closed})
+	if err != nil {
+		return nil, err
+	}
+	return rows[0], nil
+}
+
+func (uc *OrderAdminUC) hydrate(ctx context.Context, orders []*Order) ([]*AdminOrderRow, error) {
+	rows := make([]*AdminOrderRow, len(orders))
+	ids := make([]string, 0, len(orders))
+	// One member may own several orders on the page; the roster's id list
+	// is unique-items on the wire, so dedupe before the call.
+	seen := make(map[string]struct{}, len(orders))
+	for i, o := range orders {
+		rows[i] = &AdminOrderRow{Order: o}
+		if _, dup := seen[o.UserID]; !dup {
+			seen[o.UserID] = struct{}{}
+			ids = append(ids, o.UserID)
+		}
+	}
+	skus, err := uc.skuRP.ListAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	names := make(map[string]string, len(skus))
+	for _, s := range skus {
+		names[s.Code] = s.Name
+	}
+	if len(ids) > 0 {
+		roster, err := uc.systemRP.ListRoster(ctx, &member.RosterQuery{
+			Population: member.DefaultPopulation,
+			UserIDs:    ids,
+			Page:       &commonv1.PageRequest{PageSize: rosterHydrate},
+		})
+		if err != nil {
+			return nil, err
+		}
+		profiles, err := uc.profileRP.ListByUserIDs(ctx, ids)
+		if err != nil {
+			return nil, err
+		}
+		byID := make(map[string]*profile.Profile, len(profiles))
+		for _, p := range profiles {
+			byID[p.UserID] = p
+		}
+		for _, u := range roster.Users {
+			for _, r := range rows {
+				if r.UserID == u.ID {
+					r.PhoneMasked = u.PhoneMasked
+				}
+			}
+		}
+		for _, r := range rows {
+			if p := byID[r.UserID]; p != nil {
+				r.Nickname = p.Nickname
+			}
+			if n, ok := names[r.SKUCode]; ok {
+				r.SkuName = &n
+			}
+		}
+	}
+	return rows, nil
+}
+
+func (uc *OrderAdminUC) foldUnlock(ctx context.Context, o *Order) (*UnlockView, error) {
+	if o.ScopeKind == ScopeTrial {
+		// The bought record is the order's own scope ref — the settle
+		// transaction granted it, so the id needs no second read.
+		view := &UnlockView{RecordID: utils.Deref(o.ScopeRef, "")}
+		return view, nil
+	}
+	rows, err := uc.entRP.ListMembershipRows(ctx, []string{o.UserID})
+	if err != nil {
+		return nil, err
+	}
+	for _, row := range rows {
+		if row.Source != o.OrderNo {
+			continue
+		}
+		view := &UnlockView{GrantedAt: row.CreatedAt, ExpiresAt: utils.Deref(row.ExpiresAt, time.Time{})}
+		unlocks, err := uc.entRP.ListMembershipUnlocks(ctx, []string{o.UserID})
+		if err != nil {
+			return nil, err
+		}
+		for _, u := range unlocks {
+			if !u.GrantedAt.Before(row.CreatedAt) && u.GrantedAt.Before(view.ExpiresAt) {
+				view.UnlockCount++
+			}
+		}
+		return view, nil
+	}
+	// A paid membership order without its grant row — a state no write
+	// path can produce; the honest answer is the empty view.
+	return &UnlockView{}, nil
 }

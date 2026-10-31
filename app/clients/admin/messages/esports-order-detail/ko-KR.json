@@ -1,0 +1,17 @@
+{
+  "esports_order_detail_title": "주문 상세",
+  "esports_order_detail_back": "주문 목록으로 돌아가기",
+  "esports_order_user": "사용자",
+  "esports_order_amount": "금액",
+  "esports_order_sku": "상품",
+  "esports_order_channel": "채널",
+  "esports_order_created": "주문 시간",
+  "esports_order_paid": "결제 시간",
+  "esports_order_txn": "채널 거래번호",
+  "esports_order_unlock": "잠금 해제 결과",
+  "esports_order_unlock_pending": "—(대기 중)",
+  "esports_order_unlock_closed": "주문 종료됨, 잠금 해제 없음",
+  "esports_order_unlock_trial": "보고서 {id} · 영구 잠금 해제",
+  "esports_order_unlock_period": "{from} ~ {to} 기간 · 기간 내 {n}건 해제(영구 유지)",
+  "esports_order_refund_note": "환불 방침: 온라인/셀프 서비스 환불 불가. 디지털 콘텐츠는 잠금 해제/발효 시점에 인도 완료로 간주되어 기본 환불 불가; 예외는 고객지원이 오프라인으로 처리(사유 및 증빙 첨부), 환불 시 잠금 해제(단일) 또는 잔여 기간(멤버십) 회수, 전 과정 감사 대상."
+}

@@ -172,6 +172,26 @@ func (_u *SkuUpdate) SetNillableOnShelf(v *bool) *SkuUpdate {
 	return _u
 }
 
+// SetUpdatedBy sets the "updated_by" field.
+func (_u *SkuUpdate) SetUpdatedBy(v string) *SkuUpdate {
+	_u.mutation.SetUpdatedBy(v)
+	return _u
+}
+
+// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
+func (_u *SkuUpdate) SetNillableUpdatedBy(v *string) *SkuUpdate {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
+	}
+	return _u
+}
+
+// ClearUpdatedBy clears the value of the "updated_by" field.
+func (_u *SkuUpdate) ClearUpdatedBy() *SkuUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
+}
+
 // Mutation returns the SkuMutation object of the builder.
 func (_u *SkuUpdate) Mutation() *SkuMutation {
 	return _u.mutation
@@ -246,6 +266,11 @@ func (_u *SkuUpdate) check() error {
 			return &ValidationError{Name: "period_days", err: fmt.Errorf(`ent: validator failed for field "Sku.period_days": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.UpdatedBy(); ok {
+		if err := sku.UpdatedByValidator(v); err != nil {
+			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`ent: validator failed for field "Sku.updated_by": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -308,6 +333,12 @@ func (_u *SkuUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.OnShelf(); ok {
 		_spec.SetField(sku.FieldOnShelf, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.UpdatedBy(); ok {
+		_spec.SetField(sku.FieldUpdatedBy, field.TypeString, value)
+	}
+	if _u.mutation.UpdatedByCleared() {
+		_spec.ClearField(sku.FieldUpdatedBy, field.TypeString)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -474,6 +505,26 @@ func (_u *SkuUpdateOne) SetNillableOnShelf(v *bool) *SkuUpdateOne {
 	return _u
 }
 
+// SetUpdatedBy sets the "updated_by" field.
+func (_u *SkuUpdateOne) SetUpdatedBy(v string) *SkuUpdateOne {
+	_u.mutation.SetUpdatedBy(v)
+	return _u
+}
+
+// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
+func (_u *SkuUpdateOne) SetNillableUpdatedBy(v *string) *SkuUpdateOne {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
+	}
+	return _u
+}
+
+// ClearUpdatedBy clears the value of the "updated_by" field.
+func (_u *SkuUpdateOne) ClearUpdatedBy() *SkuUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
+}
+
 // Mutation returns the SkuMutation object of the builder.
 func (_u *SkuUpdateOne) Mutation() *SkuMutation {
 	return _u.mutation
@@ -561,6 +612,11 @@ func (_u *SkuUpdateOne) check() error {
 			return &ValidationError{Name: "period_days", err: fmt.Errorf(`ent: validator failed for field "Sku.period_days": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.UpdatedBy(); ok {
+		if err := sku.UpdatedByValidator(v); err != nil {
+			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`ent: validator failed for field "Sku.updated_by": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -640,6 +696,12 @@ func (_u *SkuUpdateOne) sqlSave(ctx context.Context) (_node *Sku, err error) {
 	}
 	if value, ok := _u.mutation.OnShelf(); ok {
 		_spec.SetField(sku.FieldOnShelf, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.UpdatedBy(); ok {
+		_spec.SetField(sku.FieldUpdatedBy, field.TypeString, value)
+	}
+	if _u.mutation.UpdatedByCleared() {
+		_spec.ClearField(sku.FieldUpdatedBy, field.TypeString)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &Sku{config: _u.config}

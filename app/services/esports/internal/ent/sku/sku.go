@@ -39,6 +39,8 @@ const (
 	FieldPeriodDays = "period_days"
 	// FieldOnShelf holds the string denoting the on_shelf field in the database.
 	FieldOnShelf = "on_shelf"
+	// FieldUpdatedBy holds the string denoting the updated_by field in the database.
+	FieldUpdatedBy = "updated_by"
 	// Table holds the table name of the sku in the database.
 	Table = "sku"
 )
@@ -58,6 +60,7 @@ var Columns = []string{
 	FieldListPriceFen,
 	FieldPeriodDays,
 	FieldOnShelf,
+	FieldUpdatedBy,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -100,6 +103,8 @@ var (
 	PeriodDaysValidator func(int) error
 	// DefaultOnShelf holds the default value on creation for the "on_shelf" field.
 	DefaultOnShelf bool
+	// UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	UpdatedByValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -195,4 +200,9 @@ func ByPeriodDays(opts ...sql.OrderTermOption) OrderOption {
 // ByOnShelf orders the results by the on_shelf field.
 func ByOnShelf(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOnShelf, opts...).ToFunc()
+}
+
+// ByUpdatedBy orders the results by the updated_by field.
+func ByUpdatedBy(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedBy, opts...).ToFunc()
 }

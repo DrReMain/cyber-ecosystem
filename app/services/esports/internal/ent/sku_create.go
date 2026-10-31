@@ -143,6 +143,20 @@ func (_c *SkuCreate) SetNillableOnShelf(v *bool) *SkuCreate {
 	return _c
 }
 
+// SetUpdatedBy sets the "updated_by" field.
+func (_c *SkuCreate) SetUpdatedBy(v string) *SkuCreate {
+	_c.mutation.SetUpdatedBy(v)
+	return _c
+}
+
+// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
+func (_c *SkuCreate) SetNillableUpdatedBy(v *string) *SkuCreate {
+	if v != nil {
+		_c.SetUpdatedBy(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *SkuCreate) SetID(v string) *SkuCreate {
 	_c.mutation.SetID(v)
@@ -291,6 +305,11 @@ func (_c *SkuCreate) check() error {
 	if _, ok := _c.mutation.OnShelf(); !ok {
 		return &ValidationError{Name: "on_shelf", err: errors.New(`ent: missing required field "Sku.on_shelf"`)}
 	}
+	if v, ok := _c.mutation.UpdatedBy(); ok {
+		if err := sku.UpdatedByValidator(v); err != nil {
+			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`ent: validator failed for field "Sku.updated_by": %w`, err)}
+		}
+	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := sku.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Sku.id": %w`, err)}
@@ -379,6 +398,10 @@ func (_c *SkuCreate) createSpec() (*Sku, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.OnShelf(); ok {
 		_spec.SetField(sku.FieldOnShelf, field.TypeBool, value)
 		_node.OnShelf = value
+	}
+	if value, ok := _c.mutation.UpdatedBy(); ok {
+		_spec.SetField(sku.FieldUpdatedBy, field.TypeString, value)
+		_node.UpdatedBy = &value
 	}
 	return _node, _spec
 }
@@ -561,6 +584,24 @@ func (u *SkuUpsert) SetOnShelf(v bool) *SkuUpsert {
 // UpdateOnShelf sets the "on_shelf" field to the value that was provided on create.
 func (u *SkuUpsert) UpdateOnShelf() *SkuUpsert {
 	u.SetExcluded(sku.FieldOnShelf)
+	return u
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (u *SkuUpsert) SetUpdatedBy(v string) *SkuUpsert {
+	u.Set(sku.FieldUpdatedBy, v)
+	return u
+}
+
+// UpdateUpdatedBy sets the "updated_by" field to the value that was provided on create.
+func (u *SkuUpsert) UpdateUpdatedBy() *SkuUpsert {
+	u.SetExcluded(sku.FieldUpdatedBy)
+	return u
+}
+
+// ClearUpdatedBy clears the value of the "updated_by" field.
+func (u *SkuUpsert) ClearUpdatedBy() *SkuUpsert {
+	u.SetNull(sku.FieldUpdatedBy)
 	return u
 }
 
@@ -775,6 +816,27 @@ func (u *SkuUpsertOne) SetOnShelf(v bool) *SkuUpsertOne {
 func (u *SkuUpsertOne) UpdateOnShelf() *SkuUpsertOne {
 	return u.Update(func(s *SkuUpsert) {
 		s.UpdateOnShelf()
+	})
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (u *SkuUpsertOne) SetUpdatedBy(v string) *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetUpdatedBy(v)
+	})
+}
+
+// UpdateUpdatedBy sets the "updated_by" field to the value that was provided on create.
+func (u *SkuUpsertOne) UpdateUpdatedBy() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateUpdatedBy()
+	})
+}
+
+// ClearUpdatedBy clears the value of the "updated_by" field.
+func (u *SkuUpsertOne) ClearUpdatedBy() *SkuUpsertOne {
+	return u.Update(func(s *SkuUpsert) {
+		s.ClearUpdatedBy()
 	})
 }
 
@@ -1156,6 +1218,27 @@ func (u *SkuUpsertBulk) SetOnShelf(v bool) *SkuUpsertBulk {
 func (u *SkuUpsertBulk) UpdateOnShelf() *SkuUpsertBulk {
 	return u.Update(func(s *SkuUpsert) {
 		s.UpdateOnShelf()
+	})
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (u *SkuUpsertBulk) SetUpdatedBy(v string) *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.SetUpdatedBy(v)
+	})
+}
+
+// UpdateUpdatedBy sets the "updated_by" field to the value that was provided on create.
+func (u *SkuUpsertBulk) UpdateUpdatedBy() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.UpdateUpdatedBy()
+	})
+}
+
+// ClearUpdatedBy clears the value of the "updated_by" field.
+func (u *SkuUpsertBulk) ClearUpdatedBy() *SkuUpsertBulk {
+	return u.Update(func(s *SkuUpsert) {
+		s.ClearUpdatedBy()
 	})
 }
 

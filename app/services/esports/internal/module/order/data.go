@@ -11,6 +11,7 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/payorder"
+	"cyber-ecosystem/app/services/esports/internal/ent/predicate"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
@@ -105,8 +106,26 @@ func (rp *orderRP) Settle(ctx context.Context, in *SettleIn) (*Order, bool, erro
 }
 
 func (rp *orderRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
+	// The member face narrows by its caller; the operator face arrives
+	// with the filter set instead — unset fields simply add no predicate.
+	conds := make([]predicate.PayOrder, 0, 5)
+	if in.UserID != "" {
+		conds = append(conds, payorder.UserIDEQ(in.UserID))
+	}
+	if len(in.UserIDs) > 0 {
+		conds = append(conds, payorder.UserIDIn(in.UserIDs...))
+	}
+	if in.State != "" {
+		conds = append(conds, payorder.StateEQ(payorder.State(in.State)))
+	}
+	if in.Scope != "" {
+		conds = append(conds, payorder.ScopeKindEQ(payorder.ScopeKind(in.Scope)))
+	}
+	if in.Prefix != "" {
+		conds = append(conds, payorder.OrderNoHasPrefix(in.Prefix))
+	}
 	query := rp.Platform.GetClient(ctx).PayOrder.Query().
-		Where(payorder.UserIDEQ(in.UserID)).
+		Where(conds...).
 		Order(ent.Desc(payorder.FieldCreatedAt))
 	total, offset, limit, err := helper.Paginate(ctx, query, in.PageRequest, helper.DefaultPageSizeMax)
 	if err != nil {

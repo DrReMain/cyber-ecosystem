@@ -253,6 +253,54 @@
     ]
   },
   {
+    "name": "OrderAdminService",
+    "full_name": "cyber.esports.v1.OrderAdminService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/order_admin.proto",
+    "comment": "订单与解锁记录",
+    "methods": [
+      {
+        "name": "ClosePaymentOrder",
+        "full_name": "cyber.esports.v1.OrderAdminService.ClosePaymentOrder",
+        "request_name": "ClosePaymentOrderRequest",
+        "request_full_name": "cyber.esports.v1.ClosePaymentOrderRequest",
+        "response_name": "ClosePaymentOrderResponse",
+        "response_full_name": "cyber.esports.v1.ClosePaymentOrderResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/payment-orders/{order_no}/close",
+        "comment": "关闭订单",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "GetPaymentOrder",
+        "full_name": "cyber.esports.v1.OrderAdminService.GetPaymentOrder",
+        "request_name": "GetPaymentOrderRequest",
+        "request_full_name": "cyber.esports.v1.GetPaymentOrderRequest",
+        "response_name": "GetPaymentOrderResponse",
+        "response_full_name": "cyber.esports.v1.GetPaymentOrderResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/payment-orders/{order_no}",
+        "comment": "订单详情",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListPaymentOrders",
+        "full_name": "cyber.esports.v1.OrderAdminService.ListPaymentOrders",
+        "request_name": "ListPaymentOrdersRequest",
+        "request_full_name": "cyber.esports.v1.ListPaymentOrdersRequest",
+        "response_name": "ListPaymentOrdersResponse",
+        "response_full_name": "cyber.esports.v1.ListPaymentOrdersResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/payment-orders",
+        "comment": "全量订单列表",
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "OrderService",
     "full_name": "cyber.esports.v1.OrderService",
     "package": "cyber.esports.v1",
@@ -457,6 +505,67 @@
         "http_path": "/api/v1/esports/reports/trend",
         "comment": "获取成长趋势(基础层)",
         "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "SkuAdminService",
+    "full_name": "cyber.esports.v1.SkuAdminService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/sku_admin.proto",
+    "comment": "SKU管理",
+    "methods": [
+      {
+        "name": "CreateSku",
+        "full_name": "cyber.esports.v1.SkuAdminService.CreateSku",
+        "request_name": "CreateSkuRequest",
+        "request_full_name": "cyber.esports.v1.CreateSkuRequest",
+        "response_name": "CreateSkuResponse",
+        "response_full_name": "cyber.esports.v1.CreateSkuResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/catalog/skus",
+        "comment": "新建SKU",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListCatalogSkus",
+        "full_name": "cyber.esports.v1.SkuAdminService.ListCatalogSkus",
+        "request_name": "ListCatalogSkusRequest",
+        "request_full_name": "cyber.esports.v1.ListCatalogSkusRequest",
+        "response_name": "ListCatalogSkusResponse",
+        "response_full_name": "cyber.esports.v1.ListCatalogSkusResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/catalog/skus",
+        "comment": "全量SKU列表",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "SetSkuShelf",
+        "full_name": "cyber.esports.v1.SkuAdminService.SetSkuShelf",
+        "request_name": "SetSkuShelfRequest",
+        "request_full_name": "cyber.esports.v1.SetSkuShelfRequest",
+        "response_name": "SetSkuShelfResponse",
+        "response_full_name": "cyber.esports.v1.SetSkuShelfResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/catalog/skus/{sku_code}/shelf",
+        "comment": "上下架",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "UpdateSkuPrice",
+        "full_name": "cyber.esports.v1.SkuAdminService.UpdateSkuPrice",
+        "request_name": "UpdateSkuPriceRequest",
+        "request_full_name": "cyber.esports.v1.UpdateSkuPriceRequest",
+        "response_name": "UpdateSkuPriceResponse",
+        "response_full_name": "cyber.esports.v1.UpdateSkuPriceResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/catalog/skus/{sku_code}/price",
+        "comment": "改价",
+        "access": "ADMIN",
         "datascope": false
       }
     ]

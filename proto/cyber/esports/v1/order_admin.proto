@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/esports/v1/order.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The order aggregate's operator face: the whole payment flow, not the
+// caller's own. Reads hydrate the identity and sku names the operator
+// lists by; the detail folds the unlock outcome a paid order produced.
+// Close here is the operator's variant — the same pending-only
+// arbitration, minus the member plane's owner check, plus the operator
+// identity on the audit trail.
+service OrderAdminService {
+  option (cyber.ext.v1.service_comment) = "订单与解锁记录";
+  rpc ListPaymentOrders(ListPaymentOrdersRequest) returns (ListPaymentOrdersResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "全量订单列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/payment-orders"};
+  }
+  rpc GetPaymentOrder(GetPaymentOrderRequest) returns (GetPaymentOrderResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "订单详情"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/payment-orders/{order_no}"};
+  }
+  rpc ClosePaymentOrder(ClosePaymentOrderRequest) returns (ClosePaymentOrderResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "关闭订单"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/payment-orders/{order_no}/close"
+      body: "*"
+    };
+  }
+}
+
+// An order row as the operator reads it: the wire Order plus the
+// hydrated facts the list columns need. Absent hydration fields are the
+// lazy shape (no profile row yet, roster gone) — never an error.
+message AdminOrder {
+  Order order = 1;
+  // The member behind the order — the link target into the member
+  // module's detail page; always present, unlike the hydrated identity
+  // fields that may have nothing to show.
+  string user_id = 5;
+  google.protobuf.StringValue nickname = 2;
+  google.protobuf.StringValue phone_masked = 3;
+  // The sku's display title at read time; off-shelf and deleted rows
+  // still hydrate (order history outlives catalog changes).
+  google.protobuf.StringValue sku_name = 4;
+}
+
+// What a paid order actually unlocked, folded at read time.
+message OrderUnlockView {
+  // Trial: the report record permanently unlocked by this order.
+  google.protobuf.StringValue record_id = 1;
+  // Membership: the window this order opened and how many unlocks
+  // landed inside it (permanently kept).
+  google.protobuf.Timestamp granted_at = 2;
+  google.protobuf.Timestamp expires_at = 3;
+  // Wrapped: zero unlocks is a real paid state, not an absent one.
+  google.protobuf.Int32Value unlock_count = 4;
+}
+
+message ListPaymentOrdersRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  // State filter; absent = all (UNSPECIFIED carries no meaning here, so
+  // no enum rule — the handler reads only the two named values).
+  optional OrderState state = 2;
+  // Scope filter — the product column's two buckets (trial / period).
+  optional OrderScope scope = 3;
+  // Order-no prefix, or a nickname/phone substring resolved through the
+  // roster and profile planes.
+  optional string keyword = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 64
+  }];
+}
+
+message ListPaymentOrdersResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated AdminOrder orders = 2;
+}
+
+message GetPaymentOrderRequest {
+  string order_no = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 32
+    }
+  ];
+}
+
+message GetPaymentOrderResponse {
+  AdminOrder order = 1;
+  // Absent on a pending order — nothing has unlocked yet.
+  OrderUnlockView unlock = 2;
+}
+
+message ClosePaymentOrderRequest {
+  string order_no = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 32
+    }
+  ];
+}
+
+message ClosePaymentOrderResponse {
+  AdminOrder order = 1;
+}

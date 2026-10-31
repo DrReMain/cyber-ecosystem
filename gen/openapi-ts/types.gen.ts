@@ -187,6 +187,42 @@ export type CyberEsportsV1ActivationCode = {
 };
 
 /**
+ * An order row as the operator reads it: the wire Order plus the
+ * hydrated facts the list columns need. Absent hydration fields are the
+ * lazy shape (no profile row yet, roster gone) — never an error.
+ */
+export type CyberEsportsV1AdminOrder = {
+    order?: CyberEsportsV1Order;
+    /**
+     * The member behind the order — the link target into the member
+     * module's detail page; always present, unlike the hydrated identity
+     * fields that may have nothing to show.
+     */
+    userId?: string;
+    nickname?: string;
+    phoneMasked?: string;
+    /**
+     * The sku's display title at read time; off-shelf and deleted rows
+     * still hydrate (order history outlives catalog changes).
+     */
+    skuName?: string;
+};
+
+/**
+ * A catalog row as the operator sees it: the member-plane Sku plus the
+ * facts that plane never carries — shelf state and the last writer.
+ */
+export type CyberEsportsV1AdminSku = {
+    sku?: CyberEsportsV1Sku;
+    onShelf?: boolean;
+    /**
+     * Operator id of the last write (audit join); empty on seed rows no
+     * operator has touched.
+     */
+    updatedBy?: string;
+};
+
+/**
  * The engine marks backgrounding spans; validity is judged server-side at
  * submit against TestConfig.background_invalid_seconds.
  */
@@ -262,6 +298,14 @@ export type CyberEsportsV1CloseOrderResponse = {
     order?: CyberEsportsV1Order;
 };
 
+export type CyberEsportsV1ClosePaymentOrderRequest = {
+    orderNo?: string;
+};
+
+export type CyberEsportsV1ClosePaymentOrderResponse = {
+    order?: CyberEsportsV1AdminOrder;
+};
+
 /**
  * One rendered dimension of the cognitive model. The dimension keys are
  * the legal eight-word vocabulary; the wording a client renders them
@@ -303,6 +347,26 @@ export type CyberEsportsV1CreateOrderRequest = {
 export type CyberEsportsV1CreateOrderResponse = {
     order?: CyberEsportsV1Order;
     credential?: CyberEsportsV1PayCredential;
+};
+
+export type CyberEsportsV1CreateSkuRequest = {
+    name?: string;
+    kind?: 'SKU_KIND_UNSPECIFIED' | 'SKU_KIND_TRIAL' | 'SKU_KIND_MEMBERSHIP';
+    priceFen?: string;
+    /**
+     * List price; defaults to price_fen when absent.
+     */
+    listPriceFen?: string;
+    /**
+     * Membership window; required for membership skus, rejected for trial
+     * skus — the kind check answers with the sku-kind error.
+     */
+    periodDays?: number;
+    description?: string;
+};
+
+export type CyberEsportsV1CreateSkuResponse = {
+    sku?: CyberEsportsV1AdminSku;
 };
 
 export type CyberEsportsV1DigestAbilityLine = {
@@ -592,6 +656,14 @@ export type CyberEsportsV1GetOrderResponse = {
     order?: CyberEsportsV1Order;
 };
 
+export type CyberEsportsV1GetPaymentOrderResponse = {
+    order?: CyberEsportsV1AdminOrder;
+    /**
+     * Absent on a pending order — nothing has unlocked yet.
+     */
+    unlock?: CyberEsportsV1OrderUnlockView;
+};
+
 export type CyberEsportsV1GetProfileResponse = {
     profile?: CyberEsportsV1Profile;
 };
@@ -760,6 +832,10 @@ export type CyberEsportsV1ListActivationCodesResponse = {
     codes?: Array<CyberEsportsV1ActivationCode>;
 };
 
+export type CyberEsportsV1ListCatalogSkusResponse = {
+    skus?: Array<CyberEsportsV1AdminSku>;
+};
+
 export type CyberEsportsV1ListGamesResponse = {
     games?: Array<CyberEsportsV1Game>;
 };
@@ -786,6 +862,11 @@ export type CyberEsportsV1ListMembershipsResponse = {
 export type CyberEsportsV1ListOrdersResponse = {
     page?: CyberSharedCommonV1PageResponse;
     orders?: Array<CyberEsportsV1Order>;
+};
+
+export type CyberEsportsV1ListPaymentOrdersResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    orders?: Array<CyberEsportsV1AdminOrder>;
 };
 
 export type CyberEsportsV1ListQuestionBankResponse = {
@@ -1109,6 +1190,26 @@ export type CyberEsportsV1Order = {
     paidAt?: string;
 };
 
+/**
+ * What a paid order actually unlocked, folded at read time.
+ */
+export type CyberEsportsV1OrderUnlockView = {
+    /**
+     * Trial: the report record permanently unlocked by this order.
+     */
+    recordId?: string;
+    /**
+     * Membership: the window this order opened and how many unlocks
+     * landed inside it (permanently kept).
+     */
+    grantedAt?: string;
+    expiresAt?: string;
+    /**
+     * Wrapped: zero unlocks is a real paid state, not an absent one.
+     */
+    unlockCount?: number;
+};
+
 export type CyberEsportsV1PayCredential = {
     kind?: 'PAY_CREDENTIAL_KIND_UNSPECIFIED' | 'PAY_CREDENTIAL_KIND_INVOKE' | 'PAY_CREDENTIAL_KIND_JUMP_URL' | 'PAY_CREDENTIAL_KIND_QR_CODE';
     /**
@@ -1406,6 +1507,15 @@ export type CyberEsportsV1SetReportAccessPolicyRequest = {
 export type CyberEsportsV1SetReportAccessPolicyResponse = {
     reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
     policy?: 'REPORT_ACCESS_POLICY_UNSPECIFIED' | 'REPORT_ACCESS_POLICY_OPEN' | 'REPORT_ACCESS_POLICY_MEMBERSHIP' | 'REPORT_ACCESS_POLICY_TENANT' | 'REPORT_ACCESS_POLICY_CLOSED';
+};
+
+export type CyberEsportsV1SetSkuShelfRequest = {
+    skuCode?: string;
+    onShelf?: boolean;
+};
+
+export type CyberEsportsV1SetSkuShelfResponse = {
+    sku?: CyberEsportsV1AdminSku;
 };
 
 /**
@@ -1737,6 +1847,16 @@ export type CyberEsportsV1UpdateProfileRequest = {
 
 export type CyberEsportsV1UpdateProfileResponse = {
     profile?: CyberEsportsV1Profile;
+};
+
+export type CyberEsportsV1UpdateSkuPriceRequest = {
+    skuCode?: string;
+    priceFen?: string;
+    listPriceFen?: string;
+};
+
+export type CyberEsportsV1UpdateSkuPriceResponse = {
+    sku?: CyberEsportsV1AdminSku;
 };
 
 /**
@@ -3514,6 +3634,74 @@ export type TestAdminServiceUpdateTestConfigResponses = {
 
 export type TestAdminServiceUpdateTestConfigResponse = TestAdminServiceUpdateTestConfigResponses[keyof TestAdminServiceUpdateTestConfigResponses];
 
+export type SkuAdminServiceListCatalogSkusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/catalog/skus';
+};
+
+export type SkuAdminServiceListCatalogSkusResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListCatalogSkusResponse;
+};
+
+export type SkuAdminServiceListCatalogSkusResponse = SkuAdminServiceListCatalogSkusResponses[keyof SkuAdminServiceListCatalogSkusResponses];
+
+export type SkuAdminServiceCreateSkuData = {
+    body: CyberEsportsV1CreateSkuRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/catalog/skus';
+};
+
+export type SkuAdminServiceCreateSkuResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1CreateSkuResponse;
+};
+
+export type SkuAdminServiceCreateSkuResponse = SkuAdminServiceCreateSkuResponses[keyof SkuAdminServiceCreateSkuResponses];
+
+export type SkuAdminServiceUpdateSkuPriceData = {
+    body: CyberEsportsV1UpdateSkuPriceRequest;
+    path: {
+        skuCode: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/catalog/skus/{skuCode}/price';
+};
+
+export type SkuAdminServiceUpdateSkuPriceResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1UpdateSkuPriceResponse;
+};
+
+export type SkuAdminServiceUpdateSkuPriceResponse = SkuAdminServiceUpdateSkuPriceResponses[keyof SkuAdminServiceUpdateSkuPriceResponses];
+
+export type SkuAdminServiceSetSkuShelfData = {
+    body: CyberEsportsV1SetSkuShelfRequest;
+    path: {
+        skuCode: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/catalog/skus/{skuCode}/shelf';
+};
+
+export type SkuAdminServiceSetSkuShelfResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SetSkuShelfResponse;
+};
+
+export type SkuAdminServiceSetSkuShelfResponse = SkuAdminServiceSetSkuShelfResponses[keyof SkuAdminServiceSetSkuShelfResponses];
+
 export type EntitlementServiceRedeemActivationCodeData = {
     body: CyberEsportsV1RedeemActivationCodeRequest;
     path?: never;
@@ -3898,6 +4086,101 @@ export type OrderServiceNotifyPaymentResponses = {
 };
 
 export type OrderServiceNotifyPaymentResponse = OrderServiceNotifyPaymentResponses[keyof OrderServiceNotifyPaymentResponses];
+
+export type OrderAdminServiceListPaymentOrdersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        /**
+         * State filter; absent = all (UNSPECIFIED carries no meaning here, so
+         * no enum rule — the handler reads only the two named values).
+         */
+        state?: 'ORDER_STATE_UNSPECIFIED' | 'ORDER_STATE_PENDING' | 'ORDER_STATE_PAID' | 'ORDER_STATE_CLOSED';
+        /**
+         * Scope filter — the product column's two buckets (trial / period).
+         */
+        scope?: 'ORDER_SCOPE_UNSPECIFIED' | 'ORDER_SCOPE_TRIAL' | 'ORDER_SCOPE_PERIOD';
+        /**
+         * Order-no prefix, or a nickname/phone substring resolved through the
+         * roster and profile planes.
+         */
+        keyword?: string;
+    };
+    url: '/api/v1/esports/payment-orders';
+};
+
+export type OrderAdminServiceListPaymentOrdersResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListPaymentOrdersResponse;
+};
+
+export type OrderAdminServiceListPaymentOrdersResponse = OrderAdminServiceListPaymentOrdersResponses[keyof OrderAdminServiceListPaymentOrdersResponses];
+
+export type OrderAdminServiceGetPaymentOrderData = {
+    body?: never;
+    path: {
+        orderNo: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/payment-orders/{orderNo}';
+};
+
+export type OrderAdminServiceGetPaymentOrderResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetPaymentOrderResponse;
+};
+
+export type OrderAdminServiceGetPaymentOrderResponse = OrderAdminServiceGetPaymentOrderResponses[keyof OrderAdminServiceGetPaymentOrderResponses];
+
+export type OrderAdminServiceClosePaymentOrderData = {
+    body: CyberEsportsV1ClosePaymentOrderRequest;
+    path: {
+        orderNo: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/payment-orders/{orderNo}/close';
+};
+
+export type OrderAdminServiceClosePaymentOrderResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ClosePaymentOrderResponse;
+};
+
+export type OrderAdminServiceClosePaymentOrderResponse = OrderAdminServiceClosePaymentOrderResponses[keyof OrderAdminServiceClosePaymentOrderResponses];
 
 export type ProfileServiceGetProfileData = {
     body?: never;

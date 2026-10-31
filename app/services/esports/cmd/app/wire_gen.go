@@ -17,9 +17,11 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/order"
+	"cyber-ecosystem/app/services/esports/internal/module/orderadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/report"
 	"cyber-ecosystem/app/services/esports/internal/module/sku"
+	"cyber-ecosystem/app/services/esports/internal/module/skuadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/module/testadmin"
 	"cyber-ecosystem/app/services/esports/internal/platform"
@@ -99,7 +101,10 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	reportUC := report.NewReportUC(logger, platformPlatform, recordBoardRP, snapshotRP, entitlementRP, reportPolicyRP, profileRP, eventSubscriptions)
 	reportService := report.NewReportService(logger, reportUC)
 	testAdminService := testadmin.NewTestAdminService(logger, testUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService)
+	skuAdminService := skuadmin.NewSkuAdminService(logger, skuUC)
+	orderAdminUC := order.NewOrderAdminUC(logger, platformPlatform, orderRP, payChannelRP, skuRP, profileRP, systemClient, entitlementRP)
+	orderAdminService := orderadmin.NewOrderAdminService(logger, orderAdminUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

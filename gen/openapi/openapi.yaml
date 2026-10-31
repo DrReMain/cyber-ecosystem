@@ -564,6 +564,83 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.UpdateTestConfigResponse'
+    /api/v1/esports/catalog/skus:
+        get:
+            tags:
+                - SkuAdminService
+            operationId: SkuAdminService_ListCatalogSkus
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListCatalogSkusResponse'
+        post:
+            tags:
+                - SkuAdminService
+            operationId: SkuAdminService_CreateSku
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.CreateSkuRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.CreateSkuResponse'
+    /api/v1/esports/catalog/skus/{skuCode}/price:
+        put:
+            tags:
+                - SkuAdminService
+            operationId: SkuAdminService_UpdateSkuPrice
+            parameters:
+                - name: skuCode
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.UpdateSkuPriceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.UpdateSkuPriceResponse'
+    /api/v1/esports/catalog/skus/{skuCode}/shelf:
+        put:
+            tags:
+                - SkuAdminService
+            operationId: SkuAdminService_SetSkuShelf
+            parameters:
+                - name: skuCode
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SetSkuShelfRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SetSkuShelfResponse'
     /api/v1/esports/entitlements/redeem:
         post:
             tags:
@@ -1025,6 +1102,132 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.NotifyPaymentResponse'
+    /api/v1/esports/payment-orders:
+        get:
+            tags:
+                - OrderAdminService
+            operationId: OrderAdminService_ListPaymentOrders
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: state
+                  in: query
+                  description: |-
+                    State filter; absent = all (UNSPECIFIED carries no meaning here, so
+                     no enum rule — the handler reads only the two named values).
+                  schema:
+                    enum:
+                        - ORDER_STATE_UNSPECIFIED
+                        - ORDER_STATE_PENDING
+                        - ORDER_STATE_PAID
+                        - ORDER_STATE_CLOSED
+                    type: string
+                    format: enum
+                - name: scope
+                  in: query
+                  description: Scope filter — the product column's two buckets (trial / period).
+                  schema:
+                    enum:
+                        - ORDER_SCOPE_UNSPECIFIED
+                        - ORDER_SCOPE_TRIAL
+                        - ORDER_SCOPE_PERIOD
+                    type: string
+                    format: enum
+                - name: keyword
+                  in: query
+                  description: |-
+                    Order-no prefix, or a nickname/phone substring resolved through the
+                     roster and profile planes.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListPaymentOrdersResponse'
+    /api/v1/esports/payment-orders/{orderNo}:
+        get:
+            tags:
+                - OrderAdminService
+            operationId: OrderAdminService_GetPaymentOrder
+            parameters:
+                - name: orderNo
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetPaymentOrderResponse'
+    /api/v1/esports/payment-orders/{orderNo}/close:
+        post:
+            tags:
+                - OrderAdminService
+            operationId: OrderAdminService_ClosePaymentOrder
+            parameters:
+                - name: orderNo
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.ClosePaymentOrderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ClosePaymentOrderResponse'
     /api/v1/esports/profile:
         get:
             tags:
@@ -3418,6 +3621,45 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.AdminOrder:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/cyber.esports.v1.Order'
+                userId:
+                    type: string
+                    description: |-
+                        The member behind the order — the link target into the member
+                         module's detail page; always present, unlike the hydrated identity
+                         fields that may have nothing to show.
+                nickname:
+                    type: string
+                phoneMasked:
+                    type: string
+                skuName:
+                    type: string
+                    description: |-
+                        The sku's display title at read time; off-shelf and deleted rows
+                         still hydrate (order history outlives catalog changes).
+            description: |-
+                An order row as the operator reads it: the wire Order plus the
+                 hydrated facts the list columns need. Absent hydration fields are the
+                 lazy shape (no profile row yet, roster gone) — never an error.
+        cyber.esports.v1.AdminSku:
+            type: object
+            properties:
+                sku:
+                    $ref: '#/components/schemas/cyber.esports.v1.Sku'
+                onShelf:
+                    type: boolean
+                updatedBy:
+                    type: string
+                    description: |-
+                        Operator id of the last write (audit join); empty on seed rows no
+                         operator has touched.
+            description: |-
+                A catalog row as the operator sees it: the member-plane Sku plus the
+                 facts that plane never carries — shelf state and the last writer.
         cyber.esports.v1.BackgroundSpan:
             type: object
             properties:
@@ -3518,6 +3760,16 @@ components:
             properties:
                 order:
                     $ref: '#/components/schemas/cyber.esports.v1.Order'
+        cyber.esports.v1.ClosePaymentOrderRequest:
+            type: object
+            properties:
+                orderNo:
+                    type: string
+        cyber.esports.v1.ClosePaymentOrderResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/cyber.esports.v1.AdminOrder'
         cyber.esports.v1.CognitiveDimension:
             type: object
             properties:
@@ -3571,6 +3823,36 @@ components:
                     $ref: '#/components/schemas/cyber.esports.v1.Order'
                 credential:
                     $ref: '#/components/schemas/cyber.esports.v1.PayCredential'
+        cyber.esports.v1.CreateSkuRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                kind:
+                    enum:
+                        - SKU_KIND_UNSPECIFIED
+                        - SKU_KIND_TRIAL
+                        - SKU_KIND_MEMBERSHIP
+                    type: string
+                    format: enum
+                priceFen:
+                    type: string
+                listPriceFen:
+                    type: string
+                    description: List price; defaults to price_fen when absent.
+                periodDays:
+                    type: integer
+                    description: |-
+                        Membership window; required for membership skus, rejected for trial
+                         skus — the kind check answers with the sku-kind error.
+                    format: int32
+                description:
+                    type: string
+        cyber.esports.v1.CreateSkuResponse:
+            type: object
+            properties:
+                sku:
+                    $ref: '#/components/schemas/cyber.esports.v1.AdminSku'
         cyber.esports.v1.DigestAbilityLine:
             type: object
             properties:
@@ -3965,6 +4247,15 @@ components:
             properties:
                 order:
                     $ref: '#/components/schemas/cyber.esports.v1.Order'
+        cyber.esports.v1.GetPaymentOrderResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/cyber.esports.v1.AdminOrder'
+                unlock:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.OrderUnlockView'
+                    description: Absent on a pending order — nothing has unlocked yet.
         cyber.esports.v1.GetProfileResponse:
             type: object
             properties:
@@ -4190,6 +4481,13 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.ActivationCode'
+        cyber.esports.v1.ListCatalogSkusResponse:
+            type: object
+            properties:
+                skus:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.AdminSku'
         cyber.esports.v1.ListGamesResponse:
             type: object
             properties:
@@ -4240,6 +4538,15 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Order'
+        cyber.esports.v1.ListPaymentOrdersResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                orders:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.AdminOrder'
         cyber.esports.v1.ListQuestionBankResponse:
             type: object
             properties:
@@ -4687,6 +4994,26 @@ components:
                 paidAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.OrderUnlockView:
+            type: object
+            properties:
+                recordId:
+                    type: string
+                    description: 'Trial: the report record permanently unlocked by this order.'
+                grantedAt:
+                    type: string
+                    description: |-
+                        Membership: the window this order opened and how many unlocks
+                         landed inside it (permanently kept).
+                    format: date-time
+                expiresAt:
+                    type: string
+                    format: date-time
+                unlockCount:
+                    type: integer
+                    description: 'Wrapped: zero unlocks is a real paid state, not an absent one.'
+                    format: int32
+            description: What a paid order actually unlocked, folded at read time.
         cyber.esports.v1.PayCredential:
             type: object
             properties:
@@ -5145,6 +5472,18 @@ components:
                         - REPORT_ACCESS_POLICY_CLOSED
                     type: string
                     format: enum
+        cyber.esports.v1.SetSkuShelfRequest:
+            type: object
+            properties:
+                skuCode:
+                    type: string
+                onShelf:
+                    type: boolean
+        cyber.esports.v1.SetSkuShelfResponse:
+            type: object
+            properties:
+                sku:
+                    $ref: '#/components/schemas/cyber.esports.v1.AdminSku'
         cyber.esports.v1.SkillTrajectoryDetail:
             type: object
             properties:
@@ -5592,6 +5931,20 @@ components:
             properties:
                 profile:
                     $ref: '#/components/schemas/cyber.esports.v1.Profile'
+        cyber.esports.v1.UpdateSkuPriceRequest:
+            type: object
+            properties:
+                skuCode:
+                    type: string
+                priceFen:
+                    type: string
+                listPriceFen:
+                    type: string
+        cyber.esports.v1.UpdateSkuPriceResponse:
+            type: object
+            properties:
+                sku:
+                    $ref: '#/components/schemas/cyber.esports.v1.AdminSku'
         cyber.esports.v1.UpdateTestConfigRequest:
             type: object
             properties:
@@ -7247,6 +7600,14 @@ tags:
          absent profile row is the lazy onboarding shape, never an error. One
          face one consumer grade: this is the admin plane; the C-end member
          reads their own profile through ProfileService.
+    - name: OrderAdminService
+      description: |-
+        The order aggregate's operator face: the whole payment flow, not the
+         caller's own. Reads hydrate the identity and sku names the operator
+         lists by; the detail folds the unlock outcome a paid order produced.
+         Close here is the operator's variant — the same pending-only
+         arbitration, minus the member plane's owner check, plus the operator
+         identity on the audit trail.
     - name: OrderService
       description: |-
         The order aggregate's faces. The member plane creates and reads its own
@@ -7296,6 +7657,14 @@ tags:
          behind a closed gate never travel.
     - name: ResourceService
     - name: RoleService
+    - name: SkuAdminService
+      description: |-
+        The sku aggregate's operator face: the whole catalog, on-shelf or not,
+         plus the three write actions the catalog admin owns. Every write is
+         price-sensitive territory — the operator identity rides into the row's
+         audit-join column, and shelf flips reach the member plane on its next
+         read (the member face queries live, no cache to invalidate). A face
+         module over module/sku: zero aggregates of its own.
     - name: SkuService
       description: |-
         Purchasable catalog read face for the member plane. Values are product

@@ -34,6 +34,8 @@ func (Sku) Fields() []ent.Field {
 			Comment("membership window in days (31: the 32nd day expires); null on trial skus"),
 		field.Bool("on_shelf").Default(true).
 			Comment("member-plane visibility switch; off-shelf rows stay for order-history joins"),
+		field.String("updated_by").Optional().Nillable().MaxRuneLen(20).
+			Comment("operator id of the last catalog write (audit join); null on seed rows"),
 	}
 }
 

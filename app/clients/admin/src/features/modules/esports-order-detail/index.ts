@@ -1,0 +1,1 @@
+export { EsportsOrderDetailPage } from "./page";
