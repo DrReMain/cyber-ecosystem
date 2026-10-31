@@ -17,7 +17,7 @@
 
 | 片 | 认领 | 状态 | 一行注 |
 |---|---|---|---|
-| M2-1 会员终态+运营三操作 | lzx | ✅ 走查+提交前双轴审查毕(10-31,待提交注 hash) | 四刀+验收刀全毕:契约/schema(MIG1 口径冻结)/服务端(system 投影+roster 存在性守卫)/客户端(菜单九组 G-301/302 绿+两页+三 Modal 逐字)/e2e 顺延-翻转-解锁窗口-终止回落;走查修七处(isLive 枚举比较/跨小月天数/Modal 日期 NaN/详情变体文案/ageBand 本地化/旧链接残留/e2e 基线断言);G-303/304/305 登记;双轴审查(正确性+家法)修 13 处:unlockedFor 接 HasActiveMembership(终止仍解锁+续费多行 Only 炸两缝同修)/fold 当期=最长活窗(与访问判定同族)/sku_name 死契约删除/客户端复用四件/e2e 补 settle 形守卫+清理对称/规范四搬移(SkuFacts↔DO+adapter 归 data.go/WindowUnlockRow/hydrateIdentity/const/ProviderSet 序) |
+| M2-1 会员终态+运营三操作 | lzx | ✅ 收口 347a9ce7(10-31 走查+双轴审查毕) | 四刀+验收刀全毕:契约/schema(MIG1 口径冻结)/服务端(system 投影+roster 存在性守卫)/客户端(菜单九组 G-301/302 绿+两页+三 Modal 逐字)/e2e 顺延-翻转-解锁窗口-终止回落;走查修七处(isLive 枚举比较/跨小月天数/Modal 日期 NaN/详情变体文案/ageBand 本地化/旧链接残留/e2e 基线断言);G-303/304/305 登记;双轴审查(正确性+家法)修 13 处:unlockedFor 接 HasActiveMembership(终止仍解锁+续费多行 Only 炸两缝同修)/fold 当期=最长活窗(与访问判定同族)/sku_name 死契约删除/客户端复用四件/e2e 补 settle 形守卫+清理对称/规范四搬移(SkuFacts↔DO+adapter 归 data.go/WindowUnlockRow/hydrateIdentity/const/ProviderSet 序) |
 | M2-2 SKU/订单面 / M2-3 激活码全面 / M2-4 详情余 Tab / E9 增量 | — | 未认领 | CP2 构成(M2-4 争取制);M2-4 依赖 P22/MSG-1 |
 | MSG-1 消息反馈公告 / MSG-2 分享裂变 | — | 未认领(W7-W8) | P21/P23 前置;D-AS①② |
 | PAY0 模块拆分 | — | 触发器制 | 下一片触碰 module/pay 前 |
