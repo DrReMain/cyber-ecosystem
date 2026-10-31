@@ -43,6 +43,7 @@
 | 协议 consent 版本记录契约 | E9 增量 | 本片闭(H2 挂账销账) |
 | skill_trajectory 30s 走查体感偏紧 | lzx | 评估加时 |
 | mt-D5 intro 按款文案+unitScoreLabel 种子(10-30 走查补:后者现裸英文 universal,原型=中文单位如「15 分/成功闪避」) | lzx | 随种子/国际化面 |
+| dev 栈老库接 atlas 需基线(10-31 hzy 机实证:无 revisions 表的既有库直接 migrate:apply 必撞 already-exists,先 `atlas migrate set <init版>` 打基线再 apply;revisions 表落专用 schema `atlas_schema_revisions`,查 public 查不到) | lzx | migrate:baseline 补 nx target 或本行即文档 |
 | age-required 逃生按钮(先看免费报告;原型有面现仓无) | PAY3 | 付费墙落地时 |
 | 双 N/4 撞义:match 头=已完成数 vs 测试面头=位置号,原型两处均裸 N/4(10-30 走查) | ljr(例会) | 措辞一句话裁,裁后 5 分钟落 |
 | 待校准成绩报告不可见:report 契约缺行——SessionAttempts 滤 AuthoritativeScoreNotNil,curve-pending 行(有 raw 无权威)无处可见(10-30 DB 实证);建议 GetSessionReport 增 pending 行,ctr 消费端已备(6b2db084) | lzx | 契约+聚合小片+dev 常模种子+e2e pending 锚 |
