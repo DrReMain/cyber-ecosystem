@@ -18,15 +18,23 @@ var _ = new(context.Context)
 const _ = http.SupportPackageIsVersion3
 
 const OperationEntitleAdminServiceGenerateActivationCodes = "/cyber.esports.v1.EntitleAdminService/GenerateActivationCodes"
+const OperationEntitleAdminServiceGetMembership = "/cyber.esports.v1.EntitleAdminService/GetMembership"
+const OperationEntitleAdminServiceGrantMembership = "/cyber.esports.v1.EntitleAdminService/GrantMembership"
 const OperationEntitleAdminServiceListActivationCodes = "/cyber.esports.v1.EntitleAdminService/ListActivationCodes"
+const OperationEntitleAdminServiceListMemberships = "/cyber.esports.v1.EntitleAdminService/ListMemberships"
 const OperationEntitleAdminServiceListReportAccessPolicies = "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies"
 const OperationEntitleAdminServiceSetReportAccessPolicy = "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy"
+const OperationEntitleAdminServiceTerminateMembership = "/cyber.esports.v1.EntitleAdminService/TerminateMembership"
 
 type EntitleAdminServiceHTTPServer interface {
 	GenerateActivationCodes(context.Context, *GenerateActivationCodesRequest) (*GenerateActivationCodesResponse, error)
+	GetMembership(context.Context, *GetMembershipRequest) (*GetMembershipResponse, error)
+	GrantMembership(context.Context, *GrantMembershipRequest) (*GrantMembershipResponse, error)
 	ListActivationCodes(context.Context, *ListActivationCodesRequest) (*ListActivationCodesResponse, error)
+	ListMemberships(context.Context, *ListMembershipsRequest) (*ListMembershipsResponse, error)
 	ListReportAccessPolicies(context.Context, *ListReportAccessPoliciesRequest) (*ListReportAccessPoliciesResponse, error)
 	SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error)
+	TerminateMembership(context.Context, *TerminateMembershipRequest) (*TerminateMembershipResponse, error)
 }
 
 func RegisterEntitleAdminServiceHTTPServer(s *http.Server, srv EntitleAdminServiceHTTPServer) {
@@ -35,6 +43,10 @@ func RegisterEntitleAdminServiceHTTPServer(s *http.Server, srv EntitleAdminServi
 	r.Handle("GET", "/api/v1/esports/activation-codes", _EntitleAdminService_ListActivationCodes0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/esports/report-access-policy", _EntitleAdminService_SetReportAccessPolicy0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/report-access-policies", _EntitleAdminService_ListReportAccessPolicies0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/memberships/grant", _EntitleAdminService_GrantMembership0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/memberships/{user_id}/terminate", _EntitleAdminService_TerminateMembership0_HTTP_Handler(srv))
+	r.Handle("GET", "/api/v1/esports/memberships", _EntitleAdminService_ListMemberships0_HTTP_Handler(srv))
+	r.Handle("GET", "/api/v1/esports/memberships/{user_id}", _EntitleAdminService_GetMembership0_HTTP_Handler(srv))
 }
 
 func _EntitleAdminService_GenerateActivationCodes0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
@@ -113,11 +125,97 @@ func _EntitleAdminService_ListReportAccessPolicies0_HTTP_Handler(srv EntitleAdmi
 	}
 }
 
+func _EntitleAdminService_GrantMembership0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GrantMembershipRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEntitleAdminServiceGrantMembership)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GrantMembership(ctx, req.(*GrantMembershipRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GrantMembershipResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _EntitleAdminService_TerminateMembership0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in TerminateMembershipRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEntitleAdminServiceTerminateMembership)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.TerminateMembership(ctx, req.(*TerminateMembershipRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*TerminateMembershipResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _EntitleAdminService_ListMemberships0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListMembershipsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEntitleAdminServiceListMemberships)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListMemberships(ctx, req.(*ListMembershipsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListMembershipsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _EntitleAdminService_GetMembership0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetMembershipRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEntitleAdminServiceGetMembership)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetMembership(ctx, req.(*GetMembershipRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetMembershipResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type EntitleAdminServiceHTTPClient interface {
 	GenerateActivationCodes(ctx context.Context, req *GenerateActivationCodesRequest, opts ...http.CallOption) (rsp *GenerateActivationCodesResponse, err error)
+	GetMembership(ctx context.Context, req *GetMembershipRequest, opts ...http.CallOption) (rsp *GetMembershipResponse, err error)
+	GrantMembership(ctx context.Context, req *GrantMembershipRequest, opts ...http.CallOption) (rsp *GrantMembershipResponse, err error)
 	ListActivationCodes(ctx context.Context, req *ListActivationCodesRequest, opts ...http.CallOption) (rsp *ListActivationCodesResponse, err error)
+	ListMemberships(ctx context.Context, req *ListMembershipsRequest, opts ...http.CallOption) (rsp *ListMembershipsResponse, err error)
 	ListReportAccessPolicies(ctx context.Context, req *ListReportAccessPoliciesRequest, opts ...http.CallOption) (rsp *ListReportAccessPoliciesResponse, err error)
 	SetReportAccessPolicy(ctx context.Context, req *SetReportAccessPolicyRequest, opts ...http.CallOption) (rsp *SetReportAccessPolicyResponse, err error)
+	TerminateMembership(ctx context.Context, req *TerminateMembershipRequest, opts ...http.CallOption) (rsp *TerminateMembershipResponse, err error)
 }
 
 type EntitleAdminServiceHTTPClientImpl struct {
@@ -145,6 +243,39 @@ func (c *EntitleAdminServiceHTTPClientImpl) GenerateActivationCodes(ctx context.
 	return &out, nil
 }
 
+func (c *EntitleAdminServiceHTTPClientImpl) GetMembership(ctx context.Context, in *GetMembershipRequest, opts ...http.CallOption) (*GetMembershipResponse, error) {
+	var out GetMembershipResponse
+	pattern := "/api/v1/esports/memberships/{user_id}"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationEntitleAdminServiceGetMembership),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *EntitleAdminServiceHTTPClientImpl) GrantMembership(ctx context.Context, in *GrantMembershipRequest, opts ...http.CallOption) (*GrantMembershipResponse, error) {
+	var out GrantMembershipResponse
+	pattern := "/api/v1/esports/memberships/grant"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationEntitleAdminServiceGrantMembership),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *EntitleAdminServiceHTTPClientImpl) ListActivationCodes(ctx context.Context, in *ListActivationCodesRequest, opts ...http.CallOption) (*ListActivationCodesResponse, error) {
 	var out ListActivationCodesResponse
 	pattern := "/api/v1/esports/activation-codes"
@@ -152,6 +283,22 @@ func (c *EntitleAdminServiceHTTPClientImpl) ListActivationCodes(ctx context.Cont
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationEntitleAdminServiceListActivationCodes),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *EntitleAdminServiceHTTPClientImpl) ListMemberships(ctx context.Context, in *ListMembershipsRequest, opts ...http.CallOption) (*ListMembershipsResponse, error) {
+	var out ListMembershipsResponse
+	pattern := "/api/v1/esports/memberships"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationEntitleAdminServiceListMemberships),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
@@ -185,6 +332,23 @@ func (c *EntitleAdminServiceHTTPClientImpl) SetReportAccessPolicy(ctx context.Co
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationEntitleAdminServiceSetReportAccessPolicy),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *EntitleAdminServiceHTTPClientImpl) TerminateMembership(ctx context.Context, in *TerminateMembershipRequest, opts ...http.CallOption) (*TerminateMembershipResponse, error) {
+	var out TerminateMembershipResponse
+	pattern := "/api/v1/esports/memberships/{user_id}/terminate"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationEntitleAdminServiceTerminateMembership),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

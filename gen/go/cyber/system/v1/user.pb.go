@@ -28,15 +28,21 @@ const (
 )
 
 type User struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Id            *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	CreatedAt     *timestamppb.Timestamp  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Account       *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=account,proto3" json:"account,omitempty"`
-	DeptId        *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=dept_id,json=deptId,proto3" json:"dept_id,omitempty"`
-	Roles         []string                `protobuf:"bytes,6,rep,name=roles,proto3" json:"roles,omitempty"`
-	Enabled       *wrapperspb.BoolValue   `protobuf:"bytes,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Avatar        *wrapperspb.StringValue `protobuf:"bytes,8,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	state     protoimpl.MessageState  `protogen:"open.v1"`
+	Id        *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CreatedAt *timestamppb.Timestamp  `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt *timestamppb.Timestamp  `protobuf:"bytes,3,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Account   *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=account,proto3" json:"account,omitempty"`
+	DeptId    *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=dept_id,json=deptId,proto3" json:"dept_id,omitempty"`
+	Roles     []string                `protobuf:"bytes,6,rep,name=roles,proto3" json:"roles,omitempty"`
+	Enabled   *wrapperspb.BoolValue   `protobuf:"bytes,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Avatar    *wrapperspb.StringValue `protobuf:"bytes,8,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	// The seat's phone credential, middle-masked (153****0101) — the number
+	// operators recognize members by; the raw digit string never crosses
+	// this face. Null when no phone credential is bound.
+	PhoneMasked *wrapperspb.StringValue `protobuf:"bytes,9,opt,name=phone_masked,json=phoneMasked,proto3" json:"phone_masked,omitempty"`
+	// Whether a wechat credential is bound — the identity header's badge.
+	WechatBound   *wrapperspb.BoolValue `protobuf:"bytes,10,opt,name=wechat_bound,json=wechatBound,proto3" json:"wechat_bound,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -123,6 +129,20 @@ func (x *User) GetEnabled() *wrapperspb.BoolValue {
 func (x *User) GetAvatar() *wrapperspb.StringValue {
 	if x != nil {
 		return x.Avatar
+	}
+	return nil
+}
+
+func (x *User) GetPhoneMasked() *wrapperspb.StringValue {
+	if x != nil {
+		return x.PhoneMasked
+	}
+	return nil
+}
+
+func (x *User) GetWechatBound() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.WechatBound
 	}
 	return nil
 }
@@ -1147,7 +1167,7 @@ var File_cyber_system_v1_user_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x1acyber/system/v1/user.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x9b\x03\n" +
+	"\x1acyber/system/v1/user.proto\x12\x0fcyber.system.v1\x1a\x1bbuf/validate/validate.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x12ext/v1/authz.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x9b\x04\n" +
 	"\x04User\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x129\n" +
 	"\n" +
@@ -1158,7 +1178,10 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\adept_id\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\x06deptId\x12\x14\n" +
 	"\x05roles\x18\x06 \x03(\tR\x05roles\x124\n" +
 	"\aenabled\x18\a \x01(\v2\x1a.google.protobuf.BoolValueR\aenabled\x124\n" +
-	"\x06avatar\x18\b \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar\"\xd7\x02\n" +
+	"\x06avatar\x18\b \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar\x12?\n" +
+	"\fphone_masked\x18\t \x01(\v2\x1c.google.protobuf.StringValueR\vphoneMasked\x12=\n" +
+	"\fwechat_bound\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.BoolValueR\vwechatBound\"\xd7\x02\n" +
 	"\x11CreateUserRequest\x12,\n" +
 	"\aaccount\x18\x01 \x01(\tB\r\xbaH\n" +
 	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x00R\aaccount\x88\x01\x01\x12.\n" +
@@ -1330,42 +1353,44 @@ var file_cyber_system_v1_user_proto_depIdxs = []int32{
 	21, // 4: cyber.system.v1.User.dept_id:type_name -> google.protobuf.StringValue
 	23, // 5: cyber.system.v1.User.enabled:type_name -> google.protobuf.BoolValue
 	21, // 6: cyber.system.v1.User.avatar:type_name -> google.protobuf.StringValue
-	21, // 7: cyber.system.v1.CreateUserResponse.id:type_name -> google.protobuf.StringValue
-	24, // 8: cyber.system.v1.ListUsersRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	25, // 9: cyber.system.v1.ListUsersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	0,  // 10: cyber.system.v1.ListUsersResponse.list:type_name -> cyber.system.v1.User
-	24, // 11: cyber.system.v1.ListUsersByPopulationRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	25, // 12: cyber.system.v1.ListUsersByPopulationResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	0,  // 13: cyber.system.v1.ListUsersByPopulationResponse.list:type_name -> cyber.system.v1.User
-	0,  // 14: cyber.system.v1.GetUserResponse.user:type_name -> cyber.system.v1.User
-	20, // 15: cyber.system.v1.BatchGetUsersResponse.users:type_name -> cyber.system.v1.BatchGetUsersResponse.UsersEntry
-	21, // 16: cyber.system.v1.UserBrief.id:type_name -> google.protobuf.StringValue
-	21, // 17: cyber.system.v1.UserBrief.account:type_name -> google.protobuf.StringValue
-	21, // 18: cyber.system.v1.UserBrief.avatar:type_name -> google.protobuf.StringValue
-	19, // 19: cyber.system.v1.BatchGetUsersResponse.UsersEntry.value:type_name -> cyber.system.v1.UserBrief
-	1,  // 20: cyber.system.v1.UserService.CreateUser:input_type -> cyber.system.v1.CreateUserRequest
-	3,  // 21: cyber.system.v1.UserService.UpdateUser:input_type -> cyber.system.v1.UpdateUserRequest
-	5,  // 22: cyber.system.v1.UserService.UpdateUserStatus:input_type -> cyber.system.v1.UpdateUserStatusRequest
-	7,  // 23: cyber.system.v1.UserService.ChangePassword:input_type -> cyber.system.v1.ChangePasswordRequest
-	9,  // 24: cyber.system.v1.UserService.DeleteUser:input_type -> cyber.system.v1.DeleteUserRequest
-	11, // 25: cyber.system.v1.UserService.ListUsers:input_type -> cyber.system.v1.ListUsersRequest
-	15, // 26: cyber.system.v1.UserService.GetUser:input_type -> cyber.system.v1.GetUserRequest
-	17, // 27: cyber.system.v1.UserService.BatchGetUsers:input_type -> cyber.system.v1.BatchGetUsersRequest
-	13, // 28: cyber.system.v1.UserService.ListUsersByPopulation:input_type -> cyber.system.v1.ListUsersByPopulationRequest
-	2,  // 29: cyber.system.v1.UserService.CreateUser:output_type -> cyber.system.v1.CreateUserResponse
-	4,  // 30: cyber.system.v1.UserService.UpdateUser:output_type -> cyber.system.v1.UpdateUserResponse
-	6,  // 31: cyber.system.v1.UserService.UpdateUserStatus:output_type -> cyber.system.v1.UpdateUserStatusResponse
-	8,  // 32: cyber.system.v1.UserService.ChangePassword:output_type -> cyber.system.v1.ChangePasswordResponse
-	10, // 33: cyber.system.v1.UserService.DeleteUser:output_type -> cyber.system.v1.DeleteUserResponse
-	12, // 34: cyber.system.v1.UserService.ListUsers:output_type -> cyber.system.v1.ListUsersResponse
-	16, // 35: cyber.system.v1.UserService.GetUser:output_type -> cyber.system.v1.GetUserResponse
-	18, // 36: cyber.system.v1.UserService.BatchGetUsers:output_type -> cyber.system.v1.BatchGetUsersResponse
-	14, // 37: cyber.system.v1.UserService.ListUsersByPopulation:output_type -> cyber.system.v1.ListUsersByPopulationResponse
-	29, // [29:38] is the sub-list for method output_type
-	20, // [20:29] is the sub-list for method input_type
-	20, // [20:20] is the sub-list for extension type_name
-	20, // [20:20] is the sub-list for extension extendee
-	0,  // [0:20] is the sub-list for field type_name
+	21, // 7: cyber.system.v1.User.phone_masked:type_name -> google.protobuf.StringValue
+	23, // 8: cyber.system.v1.User.wechat_bound:type_name -> google.protobuf.BoolValue
+	21, // 9: cyber.system.v1.CreateUserResponse.id:type_name -> google.protobuf.StringValue
+	24, // 10: cyber.system.v1.ListUsersRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	25, // 11: cyber.system.v1.ListUsersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	0,  // 12: cyber.system.v1.ListUsersResponse.list:type_name -> cyber.system.v1.User
+	24, // 13: cyber.system.v1.ListUsersByPopulationRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	25, // 14: cyber.system.v1.ListUsersByPopulationResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	0,  // 15: cyber.system.v1.ListUsersByPopulationResponse.list:type_name -> cyber.system.v1.User
+	0,  // 16: cyber.system.v1.GetUserResponse.user:type_name -> cyber.system.v1.User
+	20, // 17: cyber.system.v1.BatchGetUsersResponse.users:type_name -> cyber.system.v1.BatchGetUsersResponse.UsersEntry
+	21, // 18: cyber.system.v1.UserBrief.id:type_name -> google.protobuf.StringValue
+	21, // 19: cyber.system.v1.UserBrief.account:type_name -> google.protobuf.StringValue
+	21, // 20: cyber.system.v1.UserBrief.avatar:type_name -> google.protobuf.StringValue
+	19, // 21: cyber.system.v1.BatchGetUsersResponse.UsersEntry.value:type_name -> cyber.system.v1.UserBrief
+	1,  // 22: cyber.system.v1.UserService.CreateUser:input_type -> cyber.system.v1.CreateUserRequest
+	3,  // 23: cyber.system.v1.UserService.UpdateUser:input_type -> cyber.system.v1.UpdateUserRequest
+	5,  // 24: cyber.system.v1.UserService.UpdateUserStatus:input_type -> cyber.system.v1.UpdateUserStatusRequest
+	7,  // 25: cyber.system.v1.UserService.ChangePassword:input_type -> cyber.system.v1.ChangePasswordRequest
+	9,  // 26: cyber.system.v1.UserService.DeleteUser:input_type -> cyber.system.v1.DeleteUserRequest
+	11, // 27: cyber.system.v1.UserService.ListUsers:input_type -> cyber.system.v1.ListUsersRequest
+	15, // 28: cyber.system.v1.UserService.GetUser:input_type -> cyber.system.v1.GetUserRequest
+	17, // 29: cyber.system.v1.UserService.BatchGetUsers:input_type -> cyber.system.v1.BatchGetUsersRequest
+	13, // 30: cyber.system.v1.UserService.ListUsersByPopulation:input_type -> cyber.system.v1.ListUsersByPopulationRequest
+	2,  // 31: cyber.system.v1.UserService.CreateUser:output_type -> cyber.system.v1.CreateUserResponse
+	4,  // 32: cyber.system.v1.UserService.UpdateUser:output_type -> cyber.system.v1.UpdateUserResponse
+	6,  // 33: cyber.system.v1.UserService.UpdateUserStatus:output_type -> cyber.system.v1.UpdateUserStatusResponse
+	8,  // 34: cyber.system.v1.UserService.ChangePassword:output_type -> cyber.system.v1.ChangePasswordResponse
+	10, // 35: cyber.system.v1.UserService.DeleteUser:output_type -> cyber.system.v1.DeleteUserResponse
+	12, // 36: cyber.system.v1.UserService.ListUsers:output_type -> cyber.system.v1.ListUsersResponse
+	16, // 37: cyber.system.v1.UserService.GetUser:output_type -> cyber.system.v1.GetUserResponse
+	18, // 38: cyber.system.v1.UserService.BatchGetUsers:output_type -> cyber.system.v1.BatchGetUsersResponse
+	14, // 39: cyber.system.v1.UserService.ListUsersByPopulation:output_type -> cyber.system.v1.ListUsersByPopulationResponse
+	31, // [31:40] is the sub-list for method output_type
+	22, // [22:31] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_user_proto_init() }

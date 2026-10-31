@@ -23,6 +23,10 @@ const (
 	EntitleAdminService_ListActivationCodes_FullMethodName      = "/cyber.esports.v1.EntitleAdminService/ListActivationCodes"
 	EntitleAdminService_SetReportAccessPolicy_FullMethodName    = "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy"
 	EntitleAdminService_ListReportAccessPolicies_FullMethodName = "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies"
+	EntitleAdminService_GrantMembership_FullMethodName          = "/cyber.esports.v1.EntitleAdminService/GrantMembership"
+	EntitleAdminService_TerminateMembership_FullMethodName      = "/cyber.esports.v1.EntitleAdminService/TerminateMembership"
+	EntitleAdminService_ListMemberships_FullMethodName          = "/cyber.esports.v1.EntitleAdminService/ListMemberships"
+	EntitleAdminService_GetMembership_FullMethodName            = "/cyber.esports.v1.EntitleAdminService/GetMembership"
 )
 
 // EntitleAdminServiceClient is the client API for EntitleAdminService service.
@@ -30,18 +34,25 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // The operator face of the entitlement domain: minting and listing type
-// codes, and the access policy they judge by. A code is a type code — the
-// pricing ruling retired single-record codes, so redeeming opens one
-// report family, never one trial's report. Generation mints each code for
-// a single redeem; an operator who needs N hands-out mints N. Codes live
-// in clear text because operators re-copy them for support. This whole
-// service is a strippable module: deployments without the operator plane
-// drop it and the business faces never notice.
+// codes, the access policy they judge by, and the membership lifecycle an
+// operator runs by hand. A code is a type code — the pricing ruling
+// retired single-record codes, so redeeming opens one report family,
+// never one trial's report. Generation mints each code for a single
+// redeem; an operator who needs N hands-out mints N. Codes live in clear
+// text because operators re-copy them for support. A membership grant is
+// the operator's twin of a settled order: it lands the same ledger row
+// without ever touching the payment pipeline. This whole service is a
+// strippable module: deployments without the operator plane drop it and
+// the business faces never notice.
 type EntitleAdminServiceClient interface {
 	GenerateActivationCodes(ctx context.Context, in *GenerateActivationCodesRequest, opts ...grpc.CallOption) (*GenerateActivationCodesResponse, error)
 	ListActivationCodes(ctx context.Context, in *ListActivationCodesRequest, opts ...grpc.CallOption) (*ListActivationCodesResponse, error)
 	SetReportAccessPolicy(ctx context.Context, in *SetReportAccessPolicyRequest, opts ...grpc.CallOption) (*SetReportAccessPolicyResponse, error)
 	ListReportAccessPolicies(ctx context.Context, in *ListReportAccessPoliciesRequest, opts ...grpc.CallOption) (*ListReportAccessPoliciesResponse, error)
+	GrantMembership(ctx context.Context, in *GrantMembershipRequest, opts ...grpc.CallOption) (*GrantMembershipResponse, error)
+	TerminateMembership(ctx context.Context, in *TerminateMembershipRequest, opts ...grpc.CallOption) (*TerminateMembershipResponse, error)
+	ListMemberships(ctx context.Context, in *ListMembershipsRequest, opts ...grpc.CallOption) (*ListMembershipsResponse, error)
+	GetMembership(ctx context.Context, in *GetMembershipRequest, opts ...grpc.CallOption) (*GetMembershipResponse, error)
 }
 
 type entitleAdminServiceClient struct {
@@ -92,23 +103,70 @@ func (c *entitleAdminServiceClient) ListReportAccessPolicies(ctx context.Context
 	return out, nil
 }
 
+func (c *entitleAdminServiceClient) GrantMembership(ctx context.Context, in *GrantMembershipRequest, opts ...grpc.CallOption) (*GrantMembershipResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GrantMembershipResponse)
+	err := c.cc.Invoke(ctx, EntitleAdminService_GrantMembership_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *entitleAdminServiceClient) TerminateMembership(ctx context.Context, in *TerminateMembershipRequest, opts ...grpc.CallOption) (*TerminateMembershipResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TerminateMembershipResponse)
+	err := c.cc.Invoke(ctx, EntitleAdminService_TerminateMembership_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *entitleAdminServiceClient) ListMemberships(ctx context.Context, in *ListMembershipsRequest, opts ...grpc.CallOption) (*ListMembershipsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListMembershipsResponse)
+	err := c.cc.Invoke(ctx, EntitleAdminService_ListMemberships_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *entitleAdminServiceClient) GetMembership(ctx context.Context, in *GetMembershipRequest, opts ...grpc.CallOption) (*GetMembershipResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMembershipResponse)
+	err := c.cc.Invoke(ctx, EntitleAdminService_GetMembership_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EntitleAdminServiceServer is the server API for EntitleAdminService service.
 // All implementations must embed UnimplementedEntitleAdminServiceServer
 // for forward compatibility.
 //
 // The operator face of the entitlement domain: minting and listing type
-// codes, and the access policy they judge by. A code is a type code — the
-// pricing ruling retired single-record codes, so redeeming opens one
-// report family, never one trial's report. Generation mints each code for
-// a single redeem; an operator who needs N hands-out mints N. Codes live
-// in clear text because operators re-copy them for support. This whole
-// service is a strippable module: deployments without the operator plane
-// drop it and the business faces never notice.
+// codes, the access policy they judge by, and the membership lifecycle an
+// operator runs by hand. A code is a type code — the pricing ruling
+// retired single-record codes, so redeeming opens one report family,
+// never one trial's report. Generation mints each code for a single
+// redeem; an operator who needs N hands-out mints N. Codes live in clear
+// text because operators re-copy them for support. A membership grant is
+// the operator's twin of a settled order: it lands the same ledger row
+// without ever touching the payment pipeline. This whole service is a
+// strippable module: deployments without the operator plane drop it and
+// the business faces never notice.
 type EntitleAdminServiceServer interface {
 	GenerateActivationCodes(context.Context, *GenerateActivationCodesRequest) (*GenerateActivationCodesResponse, error)
 	ListActivationCodes(context.Context, *ListActivationCodesRequest) (*ListActivationCodesResponse, error)
 	SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error)
 	ListReportAccessPolicies(context.Context, *ListReportAccessPoliciesRequest) (*ListReportAccessPoliciesResponse, error)
+	GrantMembership(context.Context, *GrantMembershipRequest) (*GrantMembershipResponse, error)
+	TerminateMembership(context.Context, *TerminateMembershipRequest) (*TerminateMembershipResponse, error)
+	ListMemberships(context.Context, *ListMembershipsRequest) (*ListMembershipsResponse, error)
+	GetMembership(context.Context, *GetMembershipRequest) (*GetMembershipResponse, error)
 	mustEmbedUnimplementedEntitleAdminServiceServer()
 }
 
@@ -130,6 +188,18 @@ func (UnimplementedEntitleAdminServiceServer) SetReportAccessPolicy(context.Cont
 }
 func (UnimplementedEntitleAdminServiceServer) ListReportAccessPolicies(context.Context, *ListReportAccessPoliciesRequest) (*ListReportAccessPoliciesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListReportAccessPolicies not implemented")
+}
+func (UnimplementedEntitleAdminServiceServer) GrantMembership(context.Context, *GrantMembershipRequest) (*GrantMembershipResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GrantMembership not implemented")
+}
+func (UnimplementedEntitleAdminServiceServer) TerminateMembership(context.Context, *TerminateMembershipRequest) (*TerminateMembershipResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TerminateMembership not implemented")
+}
+func (UnimplementedEntitleAdminServiceServer) ListMemberships(context.Context, *ListMembershipsRequest) (*ListMembershipsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMemberships not implemented")
+}
+func (UnimplementedEntitleAdminServiceServer) GetMembership(context.Context, *GetMembershipRequest) (*GetMembershipResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetMembership not implemented")
 }
 func (UnimplementedEntitleAdminServiceServer) mustEmbedUnimplementedEntitleAdminServiceServer() {}
 func (UnimplementedEntitleAdminServiceServer) testEmbeddedByValue()                             {}
@@ -224,6 +294,78 @@ func _EntitleAdminService_ListReportAccessPolicies_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EntitleAdminService_GrantMembership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GrantMembershipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntitleAdminServiceServer).GrantMembership(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EntitleAdminService_GrantMembership_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntitleAdminServiceServer).GrantMembership(ctx, req.(*GrantMembershipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EntitleAdminService_TerminateMembership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TerminateMembershipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntitleAdminServiceServer).TerminateMembership(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EntitleAdminService_TerminateMembership_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntitleAdminServiceServer).TerminateMembership(ctx, req.(*TerminateMembershipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EntitleAdminService_ListMemberships_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMembershipsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntitleAdminServiceServer).ListMemberships(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EntitleAdminService_ListMemberships_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntitleAdminServiceServer).ListMemberships(ctx, req.(*ListMembershipsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EntitleAdminService_GetMembership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMembershipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntitleAdminServiceServer).GetMembership(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EntitleAdminService_GetMembership_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntitleAdminServiceServer).GetMembership(ctx, req.(*GetMembershipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EntitleAdminService_ServiceDesc is the grpc.ServiceDesc for EntitleAdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -246,6 +388,22 @@ var EntitleAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListReportAccessPolicies",
 			Handler:    _EntitleAdminService_ListReportAccessPolicies_Handler,
+		},
+		{
+			MethodName: "GrantMembership",
+			Handler:    _EntitleAdminService_GrantMembership_Handler,
+		},
+		{
+			MethodName: "TerminateMembership",
+			Handler:    _EntitleAdminService_TerminateMembership_Handler,
+		},
+		{
+			MethodName: "ListMemberships",
+			Handler:    _EntitleAdminService_ListMemberships_Handler,
+		},
+		{
+			MethodName: "GetMembership",
+			Handler:    _EntitleAdminService_GetMembership_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

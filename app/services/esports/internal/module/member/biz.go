@@ -14,7 +14,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
-const defaultPopulation = "member"
+const DefaultPopulation = "member" // the member plane's roster population — the seat a C-end identity is born on; exported for the operator faces hydrating the same roster
 
 // DO ------------------------------------------------------------------------------------------------------------------
 
@@ -24,6 +24,11 @@ type RosterUser struct {
 	Avatar    *string
 	Enabled   bool
 	CreatedAt time.Time
+	// Identity projections the system roster carries alongside the seat:
+	// the phone operators recognize members by (masked), and the wechat
+	// binding fact. Null / false when the roster answers without them.
+	PhoneMasked *string
+	WechatBound bool
 }
 
 type RosterQuery struct {
@@ -122,7 +127,7 @@ func (uc *MemberUC) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 
 func (uc *MemberUC) Get(ctx context.Context, userID string) (*Member, error) {
 	roster, err := uc.systemRP.ListRoster(ctx, &RosterQuery{
-		Population: defaultPopulation,
+		Population: DefaultPopulation,
 		UserIDs:    []string{userID},
 		Page:       &commonv1.PageRequest{},
 	})
@@ -143,7 +148,7 @@ func (uc *MemberUC) Get(ctx context.Context, userID string) (*Member, error) {
 
 func defaultPop(population *string) string {
 	if population == nil || *population == "" {
-		return defaultPopulation
+		return DefaultPopulation
 	}
 	return *population
 }

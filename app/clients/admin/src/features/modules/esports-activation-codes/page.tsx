@@ -14,7 +14,7 @@ import { codesSearchSchema, parseCodesSearch, reportTypeFromWire } from "./searc
 import { CodesTable } from "./ui/codes-table";
 import { GenerateModal } from "./ui/generate-modal";
 
-const AREA = "/dashboard/esports/activation-codes/";
+const AREA = "/dashboard/channels/activation-codes/";
 
 const reportTypeOptions = [
   { label: () => m.esports_report_type_cognitive(), value: "REPORT_TYPE_COGNITIVE" },

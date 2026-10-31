@@ -4,6 +4,7 @@ package cyber.esports.v1;
 
 import "buf/validate/validate.proto";
 import "cyber/esports/v1/entitlement.proto";
+import "cyber/esports/v1/profile.proto";
 import "cyber/shared/common/v1/pagination.proto";
 import "ext/v1/access.proto";
 import "ext/v1/desc.proto";
@@ -14,13 +15,16 @@ import "google/protobuf/wrappers.proto";
 option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
 
 // The operator face of the entitlement domain: minting and listing type
-// codes, and the access policy they judge by. A code is a type code — the
-// pricing ruling retired single-record codes, so redeeming opens one
-// report family, never one trial's report. Generation mints each code for
-// a single redeem; an operator who needs N hands-out mints N. Codes live
-// in clear text because operators re-copy them for support. This whole
-// service is a strippable module: deployments without the operator plane
-// drop it and the business faces never notice.
+// codes, the access policy they judge by, and the membership lifecycle an
+// operator runs by hand. A code is a type code — the pricing ruling
+// retired single-record codes, so redeeming opens one report family,
+// never one trial's report. Generation mints each code for a single
+// redeem; an operator who needs N hands-out mints N. Codes live in clear
+// text because operators re-copy them for support. A membership grant is
+// the operator's twin of a settled order: it lands the same ledger row
+// without ever touching the payment pipeline. This whole service is a
+// strippable module: deployments without the operator plane drop it and
+// the business faces never notice.
 service EntitleAdminService {
   option (cyber.ext.v1.service_comment) = "权益运营";
   rpc GenerateActivationCodes(GenerateActivationCodesRequest) returns (GenerateActivationCodesResponse) {
@@ -60,6 +64,44 @@ service EntitleAdminService {
     };
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {get: "/api/v1/esports/report-access-policies"};
+  }
+  rpc GrantMembership(GrantMembershipRequest) returns (GrantMembershipResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "手动开通/续费会员"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/memberships/grant"
+      body: "*"
+    };
+  }
+  rpc TerminateMembership(TerminateMembershipRequest) returns (TerminateMembershipResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "终止会员"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/memberships/{user_id}/terminate"
+      body: "*"
+    };
+  }
+  rpc ListMemberships(ListMembershipsRequest) returns (ListMembershipsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "会员管理列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/memberships"};
+  }
+  rpc GetMembership(GetMembershipRequest) returns (GetMembershipResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "会员详情"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/memberships/{user_id}"};
   }
 }
 
@@ -163,4 +205,152 @@ message ReportPolicyRow {
   bool overridden = 3;
   google.protobuf.StringValue updated_by = 4;
   google.protobuf.Timestamp updated_at = 5;
+}
+
+// The four states an operator reads a membership period in. Only
+// TERMINATED is a stored fact — the terminate action flips the row's
+// status and nothing else; ACTIVE, EXPIRING_SOON and EXPIRED are derived
+// at read time from expires_at vs now, so an expired period never waits
+// for a sweeper to become true. EXPIRING_SOON means seven or fewer days
+// left — a product constant, not a config knob.
+enum MembershipStatus {
+  MEMBERSHIP_STATUS_UNSPECIFIED = 0;
+  MEMBERSHIP_STATUS_ACTIVE = 1;
+  MEMBERSHIP_STATUS_EXPIRING_SOON = 2;
+  MEMBERSHIP_STATUS_EXPIRED = 3;
+  MEMBERSHIP_STATUS_TERMINATED = 4;
+}
+
+// Where a period came from, folded from the ledger row's source artifact:
+// an order number means a settled payment, the literal "manual" means an
+// operator granted it, and the "legacy_code:" prefix is reserved for
+// migration rows carrying a legacy activation code's membership.
+enum MembershipSource {
+  MEMBERSHIP_SOURCE_UNSPECIFIED = 0;
+  MEMBERSHIP_SOURCE_ORDER = 1;
+  MEMBERSHIP_SOURCE_MANUAL = 2;
+  MEMBERSHIP_SOURCE_LEGACY_CODE = 3;
+}
+
+// A member's current (or most recent) membership period with the facts
+// the lifecycle page reads: one row per member, the newest period
+// answering.
+message MembershipSummary {
+  google.protobuf.StringValue user_id = 1;
+  // Local profile nickname; empty when the member is still lazy.
+  google.protobuf.StringValue nickname = 2;
+  // System identity projection — the number operators recognize members
+  // by, never the raw digits.
+  google.protobuf.StringValue phone_masked = 3;
+  // Period start. A first grant starts now; a renewal starts at the prior
+  // period's expiry, so consecutive periods tile without gaps or overlaps.
+  google.protobuf.Timestamp granted_at = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  // Whole days left until expiry; null once the period is over (expired
+  // or terminated) — the count line disappears with the period.
+  google.protobuf.Int32Value days_left = 6;
+  MembershipStatus status = 7;
+  MembershipSource source = 8;
+  // Periods so far, this one included — the renewal history's own count.
+  google.protobuf.Int32Value period_count = 9;
+  // Trials permanently unlocked inside this period — member-window grants
+  // the expiry never takes back.
+  google.protobuf.Int32Value unlock_count = 10;
+}
+
+// One append-only renewal row of the history timeline. Termination and
+// renewal both add facts here; no row is ever rewritten out of history —
+// a superseded period keeps its own window and source.
+message MembershipPeriod {
+  google.protobuf.Timestamp granted_at = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  MembershipSource source = 3;
+  // The raw source artifact — order number, "manual", or the legacy code
+  // id — for support traceability.
+  google.protobuf.StringValue source_ref = 4;
+  MembershipStatus status = 6;
+}
+
+// grantMembership — the operator's manual twin of a settled order: the
+// same ledger row the settle path writes, with "manual" as the granting
+// artifact, and the start picked by the ledger (now, or the live period's
+// expiry when one exists — renewal means seamless continuation).
+message GrantMembershipRequest {
+  optional string user_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  optional string sku_code = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 50
+    }
+  ];
+}
+
+message GrantMembershipResponse {
+  MembershipSummary membership = 1;
+}
+
+// terminateMembership — flips the live period to TERMINATED: access falls
+// back the same moment, while unlocks the window already made permanent
+// stay permanent. Requires a live (unexpired, unterminated) period; a
+// member without one answers not-found.
+message TerminateMembershipRequest {
+  string user_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message TerminateMembershipResponse {
+  MembershipSummary membership = 1;
+}
+
+// listMemberships — one row per member who ever held a membership,
+// newest period first; absent filters list everyone.
+message ListMembershipsRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional MembershipStatus status = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  optional MembershipSource source = 3 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+}
+
+message ListMembershipsResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  repeated MembershipSummary memberships = 2;
+  // Status fold over every member holding a membership row, independent
+  // of the applied filters — the tabs and the footer count line read one
+  // answer instead of one query each.
+  google.protobuf.Int32Value total_count = 3;
+  google.protobuf.Int32Value active_count = 4;
+  google.protobuf.Int32Value expiring_soon_count = 5;
+  google.protobuf.Int32Value expired_count = 6;
+}
+
+// getMembership — the detail page's whole payload: the summary, the
+// append-only period history, and the identity header facts.
+message GetMembershipRequest {
+  string user_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+}
+
+message GetMembershipResponse {
+  MembershipSummary membership = 1;
+  // Newest first.
+  repeated MembershipPeriod periods = 2;
+  // Identity header facts beside the membership: derived age band, the
+  // three-state sex the profile carries, and the wechat binding fact from
+  // the system identity.
+  google.protobuf.StringValue age_band = 3;
+  ProfileSex sex = 4;
+  google.protobuf.BoolValue wechat_bound = 5;
 }

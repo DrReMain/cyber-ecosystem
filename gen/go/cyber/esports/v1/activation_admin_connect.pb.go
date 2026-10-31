@@ -13,4 +13,8 @@ func RegisterEntitleAdminServiceConnectServer(srv *connect.Server, svc EntitleAd
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/ListActivationCodes", svc.ListActivationCodes)
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy", svc.SetReportAccessPolicy)
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies", svc.ListReportAccessPolicies)
+	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/GrantMembership", svc.GrantMembership)
+	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/TerminateMembership", svc.TerminateMembership)
+	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/ListMemberships", svc.ListMemberships)
+	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/GetMembership", svc.GetMembership)
 }

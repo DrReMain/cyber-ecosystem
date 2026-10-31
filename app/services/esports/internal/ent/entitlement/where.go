@@ -94,6 +94,11 @@ func ExpiresAt(v time.Time) predicate.Entitlement {
 	return predicate.Entitlement(sql.FieldEQ(FieldExpiresAt, v))
 }
 
+// TerminatedAt applies equality check predicate on the "terminated_at" field. It's identical to TerminatedAtEQ.
+func TerminatedAt(v time.Time) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldEQ(FieldTerminatedAt, v))
+}
+
 // Source applies equality check predicate on the "source" field. It's identical to SourceEQ.
 func Source(v string) predicate.Entitlement {
 	return predicate.Entitlement(sql.FieldEQ(FieldSource, v))
@@ -452,6 +457,76 @@ func ExpiresAtIsNil() predicate.Entitlement {
 // ExpiresAtNotNil applies the NotNil predicate on the "expires_at" field.
 func ExpiresAtNotNil() predicate.Entitlement {
 	return predicate.Entitlement(sql.FieldNotNull(FieldExpiresAt))
+}
+
+// StatusEQ applies the EQ predicate on the "status" field.
+func StatusEQ(v Status) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldEQ(FieldStatus, v))
+}
+
+// StatusNEQ applies the NEQ predicate on the "status" field.
+func StatusNEQ(v Status) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldNEQ(FieldStatus, v))
+}
+
+// StatusIn applies the In predicate on the "status" field.
+func StatusIn(vs ...Status) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldIn(FieldStatus, vs...))
+}
+
+// StatusNotIn applies the NotIn predicate on the "status" field.
+func StatusNotIn(vs ...Status) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldNotIn(FieldStatus, vs...))
+}
+
+// TerminatedAtEQ applies the EQ predicate on the "terminated_at" field.
+func TerminatedAtEQ(v time.Time) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldEQ(FieldTerminatedAt, v))
+}
+
+// TerminatedAtNEQ applies the NEQ predicate on the "terminated_at" field.
+func TerminatedAtNEQ(v time.Time) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldNEQ(FieldTerminatedAt, v))
+}
+
+// TerminatedAtIn applies the In predicate on the "terminated_at" field.
+func TerminatedAtIn(vs ...time.Time) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldIn(FieldTerminatedAt, vs...))
+}
+
+// TerminatedAtNotIn applies the NotIn predicate on the "terminated_at" field.
+func TerminatedAtNotIn(vs ...time.Time) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldNotIn(FieldTerminatedAt, vs...))
+}
+
+// TerminatedAtGT applies the GT predicate on the "terminated_at" field.
+func TerminatedAtGT(v time.Time) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldGT(FieldTerminatedAt, v))
+}
+
+// TerminatedAtGTE applies the GTE predicate on the "terminated_at" field.
+func TerminatedAtGTE(v time.Time) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldGTE(FieldTerminatedAt, v))
+}
+
+// TerminatedAtLT applies the LT predicate on the "terminated_at" field.
+func TerminatedAtLT(v time.Time) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldLT(FieldTerminatedAt, v))
+}
+
+// TerminatedAtLTE applies the LTE predicate on the "terminated_at" field.
+func TerminatedAtLTE(v time.Time) predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldLTE(FieldTerminatedAt, v))
+}
+
+// TerminatedAtIsNil applies the IsNil predicate on the "terminated_at" field.
+func TerminatedAtIsNil() predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldIsNull(FieldTerminatedAt))
+}
+
+// TerminatedAtNotNil applies the NotNil predicate on the "terminated_at" field.
+func TerminatedAtNotNil() predicate.Entitlement {
+	return predicate.Entitlement(sql.FieldNotNull(FieldTerminatedAt))
 }
 
 // SourceEQ applies the EQ predicate on the "source" field.

@@ -59,16 +59,16 @@
 
 | 处置桶 | 页 | 计数 | 归属 |
 |---|---|---|---|
-| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(4/6 Tab 占位)、activation-code ◐(码表/停用/导出缺)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺) | **4** | 余面→M2-3/M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
+| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(4/6 Tab 占位)、01-member-list ✅、02-member-detail ✅(两会员页随 M2-1 建成,10-31 走查毕)、activation-code ◐(码表/停用/导出缺)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺) | **6** | 余面→M2-3/M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
 | 📐 底座 IAM 承接(**D-AY**:直接用骨架,不为 esports 再造/不改名) | audit-log、06-audit-detail、admin-user-manage、role-manage、permission-manage、menu-manage | 6 | system 既有面;操作级敏感清单对照(A8)留待 |
 | 🌫 原型非本期 | attribution、channel-manage、landing-material、report-config | 4 | _nav.js 灰标(P5/梯①) |
-| 🎯 M2 核心组 | 01-member-list(到期提醒/批量续费/每日扫描语义随 M2-1 定)、02-member-detail、04-order-record、05-order-detail、sku-manage、activation-code-detail | **6** | M2-1..M2-4(10-30 用户裁首刀) |
+| 🎯 M2 核心组 | 04-order-record、05-order-detail、sku-manage、activation-code-detail | **4** | M2-2..M2-4;01-member-list/02-member-detail 已随 M2-1 建成(10-31,入已建桶;到期提醒/批量续费/每日扫描按 M2-1 裁面不含) |
 | 📋 E9 增量(D-AS⑥) | agreement-manage、agreement-consent、compliance-config | 3 | 已裁入窗,未认领 |
 | 📋 D-AS 消息组 | feedback-manage、07-feedback-detail、announcement | 3 | →MSG-1(W7-W8);P21 前置 |
 | 📋 M2 余组(梯①) | dashboard、user-portrait、09-user-import、question-bank、question-detail、test-record、08-test-record-detail、test-type、game-category、payment-channel、rating-manage、system-config、app-version | 13 | 各项开工前先过对应 P 票:P20(dashboard/portrait 数据源)、P2(评级)、P24(归类)、P25(渠道面)、P19(版本)、system-config=裁不建候选(config 珍稀原则) |
 | 📋 M3/P4 | tob-tenant-list、tob-tenant-detail | 2 | 窗外 buffer;P14 前置 |
 
-**计数:41 = 已建 4 + 底座 6 + 非本期 4 + M2 核心 6 + E9 增量 3 + 消息组 3 + 余组 13 + M3 2。**(已建率 4/41≈10%;底座+已建+已裁入窗合计 16/41——承诺窗内可达成面 =16+6+3+3=28 页,余 13 页余组+M3。)
+**计数:41 = 已建 6 + 底座 6 + 非本期 4 + M2 核心 4 + E9 增量 3 + 消息组 3 + 余组 13 + M3 2。**(已建率 6/41≈15%;底座+已建+已裁入窗合计 16/41——承诺窗内可达成面 =16+6+3+3=28 页,余 13 页余组+M3。)
 
 ## §三 旧码功能 × 处置(不在 85 页内者;出处=旧码穷举 2026-10-30)
 

@@ -29,6 +29,10 @@ const (
 	FieldScopeRef = "scope_ref"
 	// FieldExpiresAt holds the string denoting the expires_at field in the database.
 	FieldExpiresAt = "expires_at"
+	// FieldStatus holds the string denoting the status field in the database.
+	FieldStatus = "status"
+	// FieldTerminatedAt holds the string denoting the terminated_at field in the database.
+	FieldTerminatedAt = "terminated_at"
 	// FieldSource holds the string denoting the source field in the database.
 	FieldSource = "source"
 	// Table holds the table name of the entitlement in the database.
@@ -45,6 +49,8 @@ var Columns = []string{
 	FieldScopeKind,
 	FieldScopeRef,
 	FieldExpiresAt,
+	FieldStatus,
+	FieldTerminatedAt,
 	FieldSource,
 }
 
@@ -110,6 +116,32 @@ func ScopeKindValidator(sk ScopeKind) error {
 	}
 }
 
+// Status defines the type for the "status" enum field.
+type Status string
+
+// StatusActive is the default value of the Status enum.
+const DefaultStatus = StatusActive
+
+// Status values.
+const (
+	StatusActive     Status = "active"
+	StatusTerminated Status = "terminated"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
+func StatusValidator(s Status) error {
+	switch s {
+	case StatusActive, StatusTerminated:
+		return nil
+	default:
+		return fmt.Errorf("entitlement: invalid enum value for status field: %q", s)
+	}
+}
+
 // OrderOption defines the ordering options for the Entitlement queries.
 type OrderOption func(*sql.Selector)
 
@@ -151,6 +183,16 @@ func ByScopeRef(opts ...sql.OrderTermOption) OrderOption {
 // ByExpiresAt orders the results by the expires_at field.
 func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExpiresAt, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByTerminatedAt orders the results by the terminated_at field.
+func ByTerminatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTerminatedAt, opts...).ToFunc()
 }
 
 // BySource orders the results by the source field.

@@ -1,6 +1,9 @@
 {
-  "esports_title": "电竞",
   "esports_report_type_cognitive": "认知报告",
   "esports_report_type_career": "职业报告",
-  "esports_report_type_school": "校园报告"
+  "esports_report_type_school": "校园报告",
+  "esports_people_title": "用户与会员",
+  "esports_assessment_title": "题库与测试",
+  "esports_reports_title": "报告与内容",
+  "esports_channels_title": "渠道与推广"
 }

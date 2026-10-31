@@ -70,11 +70,14 @@ type EntitlementGrant struct {
 }
 
 type EntitlementRow struct {
-	ScopeKind string
-	ScopeRef  *string
-	ExpiresAt *time.Time
-	Source    string
-	CreatedAt time.Time
+	UserID       string
+	ScopeKind    string
+	ScopeRef     *string
+	ExpiresAt    *time.Time
+	Source       string
+	CreatedAt    time.Time
+	Status       string
+	TerminatedAt *time.Time
 }
 
 type ListCodesIn struct {
@@ -85,6 +88,13 @@ type ListCodesIn struct {
 type ListCodesOut struct {
 	*commonv1.PageResponse
 	Codes []*ActivationCode
+}
+
+type WindowUnlockRow struct {
+	// The grant time is the whole fact — which period it falls inside is
+	// the caller's window arithmetic.
+	UserID    string
+	GrantedAt time.Time
 }
 
 // Port ----------------------------------------------------------------------------------------------------------
@@ -102,6 +112,18 @@ type EntitlementRP interface {
 	HasActiveMembership(ctx context.Context, userID string) (bool, error)
 	MembershipWindow(ctx context.Context, userID string) (*EntitlementRow, error) // the live membership row with the furthest expiry; nil = none
 	HasAnyScope(ctx context.Context, userID, scopeKind string) (bool, error)      // any row of the kind, ref-agnostic
+	// Membership rows for the lifecycle faces: every member's whole history
+	// when ids is nil, the named members' rows otherwise — the operator
+	// plane folds statuses in the use case, so the read stays one shape.
+	ListMembershipRows(ctx context.Context, userIDs []string) ([]*EntitlementRow, error)
+	// The terminate action's whole arbitration: one conditional UPDATE —
+	// status still active, window still open — flipping exactly the live
+	// row. False = no live period to terminate (a settled fact, not a race
+	// to report: the caller answers not-found).
+	TerminateLiveMembership(ctx context.Context, userID string) (bool, error)
+	// Member-window trial grants for the named members — the count behind
+	// "unlocked inside this period, permanently".
+	ListMembershipUnlocks(ctx context.Context, userIDs []string) ([]*WindowUnlockRow, error)
 }
 
 type ReportPolicyRP interface {
@@ -335,7 +357,7 @@ func (uc *EntitleUC) onTrialCompleted(ctx context.Context, e shared.TrialComplet
 		return
 	}
 	if err := uc.entRP.Grant(ctx, &EntitlementGrant{
-		UserID: userID, ScopeKind: shared.ScopeTrial, ScopeRef: &recordID, Source: "membership",
+		UserID: userID, ScopeKind: shared.ScopeTrial, ScopeRef: &recordID, Source: shared.SourceMembership,
 	}); err != nil {
 		uc.Log.Error("membership trial grant failed", "user_id", userID, "record_id", recordID, "err", err)
 		return

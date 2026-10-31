@@ -190,9 +190,10 @@ transport the app actually uses.
 
 ## 5) Component file discipline
 
-- **One React component per `.tsx` file** (Fast Refresh boundaries are
-  files; co-located components widen every hot-reload blast radius). Helper
-  components get their own file and an `export`.
+- **One exported React component per `.tsx` file** (Fast Refresh boundaries
+  are files; co-located exports widen every hot-reload blast radius). A
+  page's private, non-exported sub-components may live in the page file;
+  any component another module imports gets its own file and an `export`.
 - **Exported component name = file name** in PascalCase
   (`tabbar.tsx` → `Tabbar`, no legacy area prefixes).
 - **UI/logic separation** — a formal-page module splits three ways:

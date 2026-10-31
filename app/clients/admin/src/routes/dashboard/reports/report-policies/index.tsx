@@ -10,8 +10,8 @@ const operations = [
   op(EntitleAdminService, "setReportAccessPolicy"),
 ];
 
-export const Route = createFileRoute("/dashboard/esports/report-policies/")({
-  staticData: { title: "esports_report_policies_title", menu: { order: 20 }, operations },
+export const Route = createFileRoute("/dashboard/reports/report-policies/")({
+  staticData: { title: "esports_report_policies_title", menu: { order: 10 }, operations },
   head: () => ({ meta: [{ title: pageTitle(m.esports_report_policies_title()) }] }),
   beforeLoad: ({ context }) => requireOperations(operations, context.permissions),
   component: ReportPoliciesPage,

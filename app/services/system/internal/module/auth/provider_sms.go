@@ -11,6 +11,7 @@ import (
 
 	"cyber-ecosystem/shared-go/capability/cache"
 	"cyber-ecosystem/shared-go/capability/sms"
+	"cyber-ecosystem/shared-go/utils"
 
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
@@ -167,10 +168,9 @@ func normalizePhone(phone string) string {
 }
 
 func maskPhone(phone string) string {
-	if len(phone) < 7 {
-		return strings.Repeat("*", len(phone))
-	}
-	return phone[:3] + "****" + phone[len(phone)-4:]
+	// Thin alias: the masking law lives in utils, this name keeps the
+	// package's own call sites reading naturally.
+	return utils.MaskPhone(phone)
 }
 
 func randomDigits(n int) (string, error) {

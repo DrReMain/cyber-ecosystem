@@ -572,6 +572,22 @@ export type CyberEsportsV1GetMemberResponse = {
     member?: CyberEsportsV1Member;
 };
 
+export type CyberEsportsV1GetMembershipResponse = {
+    membership?: CyberEsportsV1MembershipSummary;
+    /**
+     * Newest first.
+     */
+    periods?: Array<CyberEsportsV1MembershipPeriod>;
+    /**
+     * Identity header facts beside the membership: derived age band, the
+     * three-state sex the profile carries, and the wechat binding fact from
+     * the system identity.
+     */
+    ageBand?: string;
+    sex?: 'PROFILE_SEX_UNSPECIFIED' | 'PROFILE_SEX_MALE' | 'PROFILE_SEX_FEMALE' | 'PROFILE_SEX_UNDETERMINED';
+    wechatBound?: boolean;
+};
+
 export type CyberEsportsV1GetOrderResponse = {
     order?: CyberEsportsV1Order;
 };
@@ -724,6 +740,21 @@ export type CyberEsportsV1GetTrendReportResponse = {
     advancedAccess?: CyberEsportsV1ReportAccessVerdict;
 };
 
+/**
+ * grantMembership — the operator's manual twin of a settled order: the
+ * same ledger row the settle path writes, with "manual" as the granting
+ * artifact, and the start picked by the ledger (now, or the live period's
+ * expiry when one exists — renewal means seamless continuation).
+ */
+export type CyberEsportsV1GrantMembershipRequest = {
+    userId?: string;
+    skuCode?: string;
+};
+
+export type CyberEsportsV1GrantMembershipResponse = {
+    membership?: CyberEsportsV1MembershipSummary;
+};
+
 export type CyberEsportsV1ListActivationCodesResponse = {
     page?: CyberSharedCommonV1PageResponse;
     codes?: Array<CyberEsportsV1ActivationCode>;
@@ -736,6 +767,20 @@ export type CyberEsportsV1ListGamesResponse = {
 export type CyberEsportsV1ListMembersResponse = {
     page?: CyberSharedCommonV1PageResponse;
     members?: Array<CyberEsportsV1Member>;
+};
+
+export type CyberEsportsV1ListMembershipsResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    memberships?: Array<CyberEsportsV1MembershipSummary>;
+    /**
+     * Status fold over every member holding a membership row, independent
+     * of the applied filters — the tabs and the footer count line read one
+     * answer instead of one query each.
+     */
+    totalCount?: number;
+    activeCount?: number;
+    expiringSoonCount?: number;
+    expiredCount?: number;
 };
 
 export type CyberEsportsV1ListOrdersResponse = {
@@ -837,6 +882,63 @@ export type CyberEsportsV1Member = {
     birthMonth?: number;
     ageBand?: string;
     games?: Array<CyberEsportsV1ProfileGame>;
+};
+
+/**
+ * One append-only renewal row of the history timeline. Termination and
+ * renewal both add facts here; no row is ever rewritten out of history —
+ * a superseded period keeps its own window and source.
+ */
+export type CyberEsportsV1MembershipPeriod = {
+    grantedAt?: string;
+    expiresAt?: string;
+    source?: 'MEMBERSHIP_SOURCE_UNSPECIFIED' | 'MEMBERSHIP_SOURCE_ORDER' | 'MEMBERSHIP_SOURCE_MANUAL' | 'MEMBERSHIP_SOURCE_LEGACY_CODE';
+    /**
+     * The raw source artifact — order number, "manual", or the legacy code
+     * id — for support traceability.
+     */
+    sourceRef?: string;
+    status?: 'MEMBERSHIP_STATUS_UNSPECIFIED' | 'MEMBERSHIP_STATUS_ACTIVE' | 'MEMBERSHIP_STATUS_EXPIRING_SOON' | 'MEMBERSHIP_STATUS_EXPIRED' | 'MEMBERSHIP_STATUS_TERMINATED';
+};
+
+/**
+ * A member's current (or most recent) membership period with the facts
+ * the lifecycle page reads: one row per member, the newest period
+ * answering.
+ */
+export type CyberEsportsV1MembershipSummary = {
+    userId?: string;
+    /**
+     * Local profile nickname; empty when the member is still lazy.
+     */
+    nickname?: string;
+    /**
+     * System identity projection — the number operators recognize members
+     * by, never the raw digits.
+     */
+    phoneMasked?: string;
+    /**
+     * Period start. A first grant starts now; a renewal starts at the prior
+     * period's expiry, so consecutive periods tile without gaps or overlaps.
+     */
+    grantedAt?: string;
+    expiresAt?: string;
+    /**
+     * Whole days left until expiry; null once the period is over (expired
+     * or terminated) — the count line disappears with the period.
+     */
+    daysLeft?: number;
+    status?: 'MEMBERSHIP_STATUS_UNSPECIFIED' | 'MEMBERSHIP_STATUS_ACTIVE' | 'MEMBERSHIP_STATUS_EXPIRING_SOON' | 'MEMBERSHIP_STATUS_EXPIRED' | 'MEMBERSHIP_STATUS_TERMINATED';
+    source?: 'MEMBERSHIP_SOURCE_UNSPECIFIED' | 'MEMBERSHIP_SOURCE_ORDER' | 'MEMBERSHIP_SOURCE_MANUAL' | 'MEMBERSHIP_SOURCE_LEGACY_CODE';
+    /**
+     * Periods so far, this one included — the renewal history's own count.
+     */
+    periodCount?: number;
+    /**
+     * Trials permanently unlocked inside this period — member-window grants
+     * the expiry never takes back.
+     */
+    unlockCount?: number;
 };
 
 /**
@@ -1448,6 +1550,20 @@ export type CyberEsportsV1TargetRecognitionDetail = {
      * pre-cooked as enemyHitRate. Blank taps stay local: target_id cannot name air.
      */
     spawnedEnemy?: number;
+};
+
+/**
+ * terminateMembership — flips the live period to TERMINATED: access falls
+ * back the same moment, while unlocks the window already made permanent
+ * stay permanent. Requires a live (unexpired, unterminated) period; a
+ * member without one answers not-found.
+ */
+export type CyberEsportsV1TerminateMembershipRequest = {
+    userId?: string;
+};
+
+export type CyberEsportsV1TerminateMembershipResponse = {
+    membership?: CyberEsportsV1MembershipSummary;
 };
 
 export type CyberEsportsV1Test = {
@@ -2866,6 +2982,16 @@ export type CyberSystemV1User = {
     roles?: Array<string>;
     enabled?: boolean;
     avatar?: string;
+    /**
+     * The seat's phone credential, middle-masked (153****0101) — the number
+     * operators recognize members by; the raw digit string never crosses
+     * this face. Null when no phone credential is bound.
+     */
+    phoneMasked?: string;
+    /**
+     * Whether a wechat credential is bound — the identity header's badge.
+     */
+    wechatBound?: boolean;
 };
 
 export type CyberSystemV1UserBrief = {
@@ -3560,6 +3686,105 @@ export type MemberServiceGetMemberResponses = {
 };
 
 export type MemberServiceGetMemberResponse = MemberServiceGetMemberResponses[keyof MemberServiceGetMemberResponses];
+
+export type EntitleAdminServiceListMembershipsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        status?: 'MEMBERSHIP_STATUS_UNSPECIFIED' | 'MEMBERSHIP_STATUS_ACTIVE' | 'MEMBERSHIP_STATUS_EXPIRING_SOON' | 'MEMBERSHIP_STATUS_EXPIRED' | 'MEMBERSHIP_STATUS_TERMINATED';
+        source?: 'MEMBERSHIP_SOURCE_UNSPECIFIED' | 'MEMBERSHIP_SOURCE_ORDER' | 'MEMBERSHIP_SOURCE_MANUAL' | 'MEMBERSHIP_SOURCE_LEGACY_CODE';
+    };
+    url: '/api/v1/esports/memberships';
+};
+
+export type EntitleAdminServiceListMembershipsResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListMembershipsResponse;
+};
+
+export type EntitleAdminServiceListMembershipsResponse = EntitleAdminServiceListMembershipsResponses[keyof EntitleAdminServiceListMembershipsResponses];
+
+export type EntitleAdminServiceGrantMembershipData = {
+    body: CyberEsportsV1GrantMembershipRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/memberships/grant';
+};
+
+export type EntitleAdminServiceGrantMembershipResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GrantMembershipResponse;
+};
+
+export type EntitleAdminServiceGrantMembershipResponse = EntitleAdminServiceGrantMembershipResponses[keyof EntitleAdminServiceGrantMembershipResponses];
+
+export type EntitleAdminServiceGetMembershipData = {
+    body?: never;
+    path: {
+        userId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/memberships/{userId}';
+};
+
+export type EntitleAdminServiceGetMembershipResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetMembershipResponse;
+};
+
+export type EntitleAdminServiceGetMembershipResponse = EntitleAdminServiceGetMembershipResponses[keyof EntitleAdminServiceGetMembershipResponses];
+
+export type EntitleAdminServiceTerminateMembershipData = {
+    body: CyberEsportsV1TerminateMembershipRequest;
+    path: {
+        userId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/memberships/{userId}/terminate';
+};
+
+export type EntitleAdminServiceTerminateMembershipResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1TerminateMembershipResponse;
+};
+
+export type EntitleAdminServiceTerminateMembershipResponse = EntitleAdminServiceTerminateMembershipResponses[keyof EntitleAdminServiceTerminateMembershipResponses];
 
 export type OrderServiceListOrdersData = {
     body?: never;

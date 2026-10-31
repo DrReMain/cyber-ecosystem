@@ -45,6 +45,18 @@ const (
 	// EntitleAdminServiceListReportAccessPoliciesProcedure is the fully-qualified name of the
 	// EntitleAdminService's ListReportAccessPolicies RPC.
 	EntitleAdminServiceListReportAccessPoliciesProcedure = "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies"
+	// EntitleAdminServiceGrantMembershipProcedure is the fully-qualified name of the
+	// EntitleAdminService's GrantMembership RPC.
+	EntitleAdminServiceGrantMembershipProcedure = "/cyber.esports.v1.EntitleAdminService/GrantMembership"
+	// EntitleAdminServiceTerminateMembershipProcedure is the fully-qualified name of the
+	// EntitleAdminService's TerminateMembership RPC.
+	EntitleAdminServiceTerminateMembershipProcedure = "/cyber.esports.v1.EntitleAdminService/TerminateMembership"
+	// EntitleAdminServiceListMembershipsProcedure is the fully-qualified name of the
+	// EntitleAdminService's ListMemberships RPC.
+	EntitleAdminServiceListMembershipsProcedure = "/cyber.esports.v1.EntitleAdminService/ListMemberships"
+	// EntitleAdminServiceGetMembershipProcedure is the fully-qualified name of the
+	// EntitleAdminService's GetMembership RPC.
+	EntitleAdminServiceGetMembershipProcedure = "/cyber.esports.v1.EntitleAdminService/GetMembership"
 )
 
 // EntitleAdminServiceClient is a client for the cyber.esports.v1.EntitleAdminService service.
@@ -53,6 +65,10 @@ type EntitleAdminServiceClient interface {
 	ListActivationCodes(context.Context, *connect.Request[v1.ListActivationCodesRequest]) (*connect.Response[v1.ListActivationCodesResponse], error)
 	SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error)
 	ListReportAccessPolicies(context.Context, *connect.Request[v1.ListReportAccessPoliciesRequest]) (*connect.Response[v1.ListReportAccessPoliciesResponse], error)
+	GrantMembership(context.Context, *connect.Request[v1.GrantMembershipRequest]) (*connect.Response[v1.GrantMembershipResponse], error)
+	TerminateMembership(context.Context, *connect.Request[v1.TerminateMembershipRequest]) (*connect.Response[v1.TerminateMembershipResponse], error)
+	ListMemberships(context.Context, *connect.Request[v1.ListMembershipsRequest]) (*connect.Response[v1.ListMembershipsResponse], error)
+	GetMembership(context.Context, *connect.Request[v1.GetMembershipRequest]) (*connect.Response[v1.GetMembershipResponse], error)
 }
 
 // NewEntitleAdminServiceClient constructs a client for the cyber.esports.v1.EntitleAdminService
@@ -90,6 +106,30 @@ func NewEntitleAdminServiceClient(httpClient connect.HTTPClient, baseURL string,
 			connect.WithSchema(entitleAdminServiceMethods.ByName("ListReportAccessPolicies")),
 			connect.WithClientOptions(opts...),
 		),
+		grantMembership: connect.NewClient[v1.GrantMembershipRequest, v1.GrantMembershipResponse](
+			httpClient,
+			baseURL+EntitleAdminServiceGrantMembershipProcedure,
+			connect.WithSchema(entitleAdminServiceMethods.ByName("GrantMembership")),
+			connect.WithClientOptions(opts...),
+		),
+		terminateMembership: connect.NewClient[v1.TerminateMembershipRequest, v1.TerminateMembershipResponse](
+			httpClient,
+			baseURL+EntitleAdminServiceTerminateMembershipProcedure,
+			connect.WithSchema(entitleAdminServiceMethods.ByName("TerminateMembership")),
+			connect.WithClientOptions(opts...),
+		),
+		listMemberships: connect.NewClient[v1.ListMembershipsRequest, v1.ListMembershipsResponse](
+			httpClient,
+			baseURL+EntitleAdminServiceListMembershipsProcedure,
+			connect.WithSchema(entitleAdminServiceMethods.ByName("ListMemberships")),
+			connect.WithClientOptions(opts...),
+		),
+		getMembership: connect.NewClient[v1.GetMembershipRequest, v1.GetMembershipResponse](
+			httpClient,
+			baseURL+EntitleAdminServiceGetMembershipProcedure,
+			connect.WithSchema(entitleAdminServiceMethods.ByName("GetMembership")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -99,6 +139,10 @@ type entitleAdminServiceClient struct {
 	listActivationCodes      *connect.Client[v1.ListActivationCodesRequest, v1.ListActivationCodesResponse]
 	setReportAccessPolicy    *connect.Client[v1.SetReportAccessPolicyRequest, v1.SetReportAccessPolicyResponse]
 	listReportAccessPolicies *connect.Client[v1.ListReportAccessPoliciesRequest, v1.ListReportAccessPoliciesResponse]
+	grantMembership          *connect.Client[v1.GrantMembershipRequest, v1.GrantMembershipResponse]
+	terminateMembership      *connect.Client[v1.TerminateMembershipRequest, v1.TerminateMembershipResponse]
+	listMemberships          *connect.Client[v1.ListMembershipsRequest, v1.ListMembershipsResponse]
+	getMembership            *connect.Client[v1.GetMembershipRequest, v1.GetMembershipResponse]
 }
 
 // GenerateActivationCodes calls cyber.esports.v1.EntitleAdminService.GenerateActivationCodes.
@@ -121,6 +165,26 @@ func (c *entitleAdminServiceClient) ListReportAccessPolicies(ctx context.Context
 	return c.listReportAccessPolicies.CallUnary(ctx, req)
 }
 
+// GrantMembership calls cyber.esports.v1.EntitleAdminService.GrantMembership.
+func (c *entitleAdminServiceClient) GrantMembership(ctx context.Context, req *connect.Request[v1.GrantMembershipRequest]) (*connect.Response[v1.GrantMembershipResponse], error) {
+	return c.grantMembership.CallUnary(ctx, req)
+}
+
+// TerminateMembership calls cyber.esports.v1.EntitleAdminService.TerminateMembership.
+func (c *entitleAdminServiceClient) TerminateMembership(ctx context.Context, req *connect.Request[v1.TerminateMembershipRequest]) (*connect.Response[v1.TerminateMembershipResponse], error) {
+	return c.terminateMembership.CallUnary(ctx, req)
+}
+
+// ListMemberships calls cyber.esports.v1.EntitleAdminService.ListMemberships.
+func (c *entitleAdminServiceClient) ListMemberships(ctx context.Context, req *connect.Request[v1.ListMembershipsRequest]) (*connect.Response[v1.ListMembershipsResponse], error) {
+	return c.listMemberships.CallUnary(ctx, req)
+}
+
+// GetMembership calls cyber.esports.v1.EntitleAdminService.GetMembership.
+func (c *entitleAdminServiceClient) GetMembership(ctx context.Context, req *connect.Request[v1.GetMembershipRequest]) (*connect.Response[v1.GetMembershipResponse], error) {
+	return c.getMembership.CallUnary(ctx, req)
+}
+
 // EntitleAdminServiceHandler is an implementation of the cyber.esports.v1.EntitleAdminService
 // service.
 type EntitleAdminServiceHandler interface {
@@ -128,6 +192,10 @@ type EntitleAdminServiceHandler interface {
 	ListActivationCodes(context.Context, *connect.Request[v1.ListActivationCodesRequest]) (*connect.Response[v1.ListActivationCodesResponse], error)
 	SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error)
 	ListReportAccessPolicies(context.Context, *connect.Request[v1.ListReportAccessPoliciesRequest]) (*connect.Response[v1.ListReportAccessPoliciesResponse], error)
+	GrantMembership(context.Context, *connect.Request[v1.GrantMembershipRequest]) (*connect.Response[v1.GrantMembershipResponse], error)
+	TerminateMembership(context.Context, *connect.Request[v1.TerminateMembershipRequest]) (*connect.Response[v1.TerminateMembershipResponse], error)
+	ListMemberships(context.Context, *connect.Request[v1.ListMembershipsRequest]) (*connect.Response[v1.ListMembershipsResponse], error)
+	GetMembership(context.Context, *connect.Request[v1.GetMembershipRequest]) (*connect.Response[v1.GetMembershipResponse], error)
 }
 
 // NewEntitleAdminServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -161,6 +229,30 @@ func NewEntitleAdminServiceHandler(svc EntitleAdminServiceHandler, opts ...conne
 		connect.WithSchema(entitleAdminServiceMethods.ByName("ListReportAccessPolicies")),
 		connect.WithHandlerOptions(opts...),
 	)
+	entitleAdminServiceGrantMembershipHandler := connect.NewUnaryHandler(
+		EntitleAdminServiceGrantMembershipProcedure,
+		svc.GrantMembership,
+		connect.WithSchema(entitleAdminServiceMethods.ByName("GrantMembership")),
+		connect.WithHandlerOptions(opts...),
+	)
+	entitleAdminServiceTerminateMembershipHandler := connect.NewUnaryHandler(
+		EntitleAdminServiceTerminateMembershipProcedure,
+		svc.TerminateMembership,
+		connect.WithSchema(entitleAdminServiceMethods.ByName("TerminateMembership")),
+		connect.WithHandlerOptions(opts...),
+	)
+	entitleAdminServiceListMembershipsHandler := connect.NewUnaryHandler(
+		EntitleAdminServiceListMembershipsProcedure,
+		svc.ListMemberships,
+		connect.WithSchema(entitleAdminServiceMethods.ByName("ListMemberships")),
+		connect.WithHandlerOptions(opts...),
+	)
+	entitleAdminServiceGetMembershipHandler := connect.NewUnaryHandler(
+		EntitleAdminServiceGetMembershipProcedure,
+		svc.GetMembership,
+		connect.WithSchema(entitleAdminServiceMethods.ByName("GetMembership")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.EntitleAdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case EntitleAdminServiceGenerateActivationCodesProcedure:
@@ -171,6 +263,14 @@ func NewEntitleAdminServiceHandler(svc EntitleAdminServiceHandler, opts ...conne
 			entitleAdminServiceSetReportAccessPolicyHandler.ServeHTTP(w, r)
 		case EntitleAdminServiceListReportAccessPoliciesProcedure:
 			entitleAdminServiceListReportAccessPoliciesHandler.ServeHTTP(w, r)
+		case EntitleAdminServiceGrantMembershipProcedure:
+			entitleAdminServiceGrantMembershipHandler.ServeHTTP(w, r)
+		case EntitleAdminServiceTerminateMembershipProcedure:
+			entitleAdminServiceTerminateMembershipHandler.ServeHTTP(w, r)
+		case EntitleAdminServiceListMembershipsProcedure:
+			entitleAdminServiceListMembershipsHandler.ServeHTTP(w, r)
+		case EntitleAdminServiceGetMembershipProcedure:
+			entitleAdminServiceGetMembershipHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -194,4 +294,20 @@ func (UnimplementedEntitleAdminServiceHandler) SetReportAccessPolicy(context.Con
 
 func (UnimplementedEntitleAdminServiceHandler) ListReportAccessPolicies(context.Context, *connect.Request[v1.ListReportAccessPoliciesRequest]) (*connect.Response[v1.ListReportAccessPoliciesResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies is not implemented"))
+}
+
+func (UnimplementedEntitleAdminServiceHandler) GrantMembership(context.Context, *connect.Request[v1.GrantMembershipRequest]) (*connect.Response[v1.GrantMembershipResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.GrantMembership is not implemented"))
+}
+
+func (UnimplementedEntitleAdminServiceHandler) TerminateMembership(context.Context, *connect.Request[v1.TerminateMembershipRequest]) (*connect.Response[v1.TerminateMembershipResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.TerminateMembership is not implemented"))
+}
+
+func (UnimplementedEntitleAdminServiceHandler) ListMemberships(context.Context, *connect.Request[v1.ListMembershipsRequest]) (*connect.Response[v1.ListMembershipsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.ListMemberships is not implemented"))
+}
+
+func (UnimplementedEntitleAdminServiceHandler) GetMembership(context.Context, *connect.Request[v1.GetMembershipRequest]) (*connect.Response[v1.GetMembershipResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.GetMembership is not implemented"))
 }

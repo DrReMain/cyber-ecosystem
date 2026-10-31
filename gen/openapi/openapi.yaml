@@ -759,6 +759,141 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetMemberResponse'
+    /api/v1/esports/memberships:
+        get:
+            tags:
+                - EntitleAdminService
+            operationId: EntitleAdminService_ListMemberships
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: status
+                  in: query
+                  schema:
+                    enum:
+                        - MEMBERSHIP_STATUS_UNSPECIFIED
+                        - MEMBERSHIP_STATUS_ACTIVE
+                        - MEMBERSHIP_STATUS_EXPIRING_SOON
+                        - MEMBERSHIP_STATUS_EXPIRED
+                        - MEMBERSHIP_STATUS_TERMINATED
+                    type: string
+                    format: enum
+                - name: source
+                  in: query
+                  schema:
+                    enum:
+                        - MEMBERSHIP_SOURCE_UNSPECIFIED
+                        - MEMBERSHIP_SOURCE_ORDER
+                        - MEMBERSHIP_SOURCE_MANUAL
+                        - MEMBERSHIP_SOURCE_LEGACY_CODE
+                    type: string
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListMembershipsResponse'
+    /api/v1/esports/memberships/grant:
+        post:
+            tags:
+                - EntitleAdminService
+            operationId: EntitleAdminService_GrantMembership
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.GrantMembershipRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GrantMembershipResponse'
+    /api/v1/esports/memberships/{userId}:
+        get:
+            tags:
+                - EntitleAdminService
+            operationId: EntitleAdminService_GetMembership
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetMembershipResponse'
+    /api/v1/esports/memberships/{userId}/terminate:
+        post:
+            tags:
+                - EntitleAdminService
+            operationId: EntitleAdminService_TerminateMembership
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.TerminateMembershipRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.TerminateMembershipResponse'
     /api/v1/esports/orders:
         get:
             tags:
@@ -3799,6 +3934,32 @@ components:
             properties:
                 member:
                     $ref: '#/components/schemas/cyber.esports.v1.Member'
+        cyber.esports.v1.GetMembershipResponse:
+            type: object
+            properties:
+                membership:
+                    $ref: '#/components/schemas/cyber.esports.v1.MembershipSummary'
+                periods:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.MembershipPeriod'
+                    description: Newest first.
+                ageBand:
+                    type: string
+                    description: |-
+                        Identity header facts beside the membership: derived age band, the
+                         three-state sex the profile carries, and the wechat binding fact from
+                         the system identity.
+                sex:
+                    enum:
+                        - PROFILE_SEX_UNSPECIFIED
+                        - PROFILE_SEX_MALE
+                        - PROFILE_SEX_FEMALE
+                        - PROFILE_SEX_UNDETERMINED
+                    type: string
+                    format: enum
+                wechatBound:
+                    type: boolean
         cyber.esports.v1.GetOrderResponse:
             type: object
             properties:
@@ -4003,6 +4164,23 @@ components:
                          free for anyone who has tested. The advanced content itself is a
                          later face; the verdict travels now so the page renders its locked
                          state from one call.
+        cyber.esports.v1.GrantMembershipRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                skuCode:
+                    type: string
+            description: |-
+                grantMembership — the operator's manual twin of a settled order: the
+                 same ledger row the settle path writes, with "manual" as the granting
+                 artifact, and the start picked by the ledger (now, or the live period's
+                 expiry when one exists — renewal means seamless continuation).
+        cyber.esports.v1.GrantMembershipResponse:
+            type: object
+            properties:
+                membership:
+                    $ref: '#/components/schemas/cyber.esports.v1.MembershipSummary'
         cyber.esports.v1.ListActivationCodesResponse:
             type: object
             properties:
@@ -4028,6 +4206,31 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Member'
+        cyber.esports.v1.ListMembershipsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                memberships:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.MembershipSummary'
+                totalCount:
+                    type: integer
+                    description: |-
+                        Status fold over every member holding a membership row, independent
+                         of the applied filters — the tabs and the footer count line read one
+                         answer instead of one query each.
+                    format: int32
+                activeCount:
+                    type: integer
+                    format: int32
+                expiringSoonCount:
+                    type: integer
+                    format: int32
+                expiredCount:
+                    type: integer
+                    format: int32
         cyber.esports.v1.ListOrdersResponse:
             type: object
             properties:
@@ -4167,6 +4370,100 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.ProfileGame'
+        cyber.esports.v1.MembershipPeriod:
+            type: object
+            properties:
+                grantedAt:
+                    type: string
+                    format: date-time
+                expiresAt:
+                    type: string
+                    format: date-time
+                source:
+                    enum:
+                        - MEMBERSHIP_SOURCE_UNSPECIFIED
+                        - MEMBERSHIP_SOURCE_ORDER
+                        - MEMBERSHIP_SOURCE_MANUAL
+                        - MEMBERSHIP_SOURCE_LEGACY_CODE
+                    type: string
+                    format: enum
+                sourceRef:
+                    type: string
+                    description: |-
+                        The raw source artifact — order number, "manual", or the legacy code
+                         id — for support traceability.
+                status:
+                    enum:
+                        - MEMBERSHIP_STATUS_UNSPECIFIED
+                        - MEMBERSHIP_STATUS_ACTIVE
+                        - MEMBERSHIP_STATUS_EXPIRING_SOON
+                        - MEMBERSHIP_STATUS_EXPIRED
+                        - MEMBERSHIP_STATUS_TERMINATED
+                    type: string
+                    format: enum
+            description: |-
+                One append-only renewal row of the history timeline. Termination and
+                 renewal both add facts here; no row is ever rewritten out of history —
+                 a superseded period keeps its own window and source.
+        cyber.esports.v1.MembershipSummary:
+            type: object
+            properties:
+                userId:
+                    type: string
+                nickname:
+                    type: string
+                    description: Local profile nickname; empty when the member is still lazy.
+                phoneMasked:
+                    type: string
+                    description: |-
+                        System identity projection — the number operators recognize members
+                         by, never the raw digits.
+                grantedAt:
+                    type: string
+                    description: |-
+                        Period start. A first grant starts now; a renewal starts at the prior
+                         period's expiry, so consecutive periods tile without gaps or overlaps.
+                    format: date-time
+                expiresAt:
+                    type: string
+                    format: date-time
+                daysLeft:
+                    type: integer
+                    description: |-
+                        Whole days left until expiry; null once the period is over (expired
+                         or terminated) — the count line disappears with the period.
+                    format: int32
+                status:
+                    enum:
+                        - MEMBERSHIP_STATUS_UNSPECIFIED
+                        - MEMBERSHIP_STATUS_ACTIVE
+                        - MEMBERSHIP_STATUS_EXPIRING_SOON
+                        - MEMBERSHIP_STATUS_EXPIRED
+                        - MEMBERSHIP_STATUS_TERMINATED
+                    type: string
+                    format: enum
+                source:
+                    enum:
+                        - MEMBERSHIP_SOURCE_UNSPECIFIED
+                        - MEMBERSHIP_SOURCE_ORDER
+                        - MEMBERSHIP_SOURCE_MANUAL
+                        - MEMBERSHIP_SOURCE_LEGACY_CODE
+                    type: string
+                    format: enum
+                periodCount:
+                    type: integer
+                    description: Periods so far, this one included — the renewal history's own count.
+                    format: int32
+                unlockCount:
+                    type: integer
+                    description: |-
+                        Trials permanently unlocked inside this period — member-window grants
+                         the expiry never takes back.
+                    format: int32
+            description: |-
+                A member's current (or most recent) membership period with the facts
+                 the lifecycle page reads: one row per member, the newest period
+                 answering.
         cyber.esports.v1.MergeAccountSummary:
             type: object
             properties:
@@ -5053,6 +5350,21 @@ components:
             description: |-
                 target_recognition — friend/foe discrimination; correctness is judged
                  server-side against the target type, never asserted by the client.
+        cyber.esports.v1.TerminateMembershipRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+            description: |-
+                terminateMembership — flips the live period to TERMINATED: access falls
+                 back the same moment, while unlocks the window already made permanent
+                 stay permanent. Requires a live (unexpired, unterminated) period; a
+                 member without one answers not-found.
+        cyber.esports.v1.TerminateMembershipResponse:
+            type: object
+            properties:
+                membership:
+                    $ref: '#/components/schemas/cyber.esports.v1.MembershipSummary'
         cyber.esports.v1.Test:
             type: object
             properties:
@@ -6802,6 +7114,15 @@ components:
                     type: boolean
                 avatar:
                     type: string
+                phoneMasked:
+                    type: string
+                    description: |-
+                        The seat's phone credential, middle-masked (153****0101) — the number
+                         operators recognize members by; the raw digit string never crosses
+                         this face. Null when no phone credential is bound.
+                wechatBound:
+                    type: boolean
+                    description: Whether a wechat credential is bound — the identity header's badge.
         cyber.system.v1.UserBrief:
             type: object
             properties:
@@ -6856,13 +7177,16 @@ tags:
     - name: EntitleAdminService
       description: |-
         The operator face of the entitlement domain: minting and listing type
-         codes, and the access policy they judge by. A code is a type code — the
-         pricing ruling retired single-record codes, so redeeming opens one
-         report family, never one trial's report. Generation mints each code for
-         a single redeem; an operator who needs N hands-out mints N. Codes live
-         in clear text because operators re-copy them for support. This whole
-         service is a strippable module: deployments without the operator plane
-         drop it and the business faces never notice.
+         codes, the access policy they judge by, and the membership lifecycle an
+         operator runs by hand. A code is a type code — the pricing ruling
+         retired single-record codes, so redeeming opens one report family,
+         never one trial's report. Generation mints each code for a single
+         redeem; an operator who needs N hands-out mints N. Codes live in clear
+         text because operators re-copy them for support. A membership grant is
+         the operator's twin of a settled order: it lands the same ledger row
+         without ever touching the payment pipeline. This whole service is a
+         strippable module: deployments without the operator plane drop it and
+         the business faces never notice.
     - name: EntitlementService
       description: |-
         The member's entitlement faces. Redeem is idempotent per (member,

@@ -12,11 +12,14 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/local_mixins"
 )
 
-// Entitlement is the grant ledger, written only inside the settle
-// transaction: a paid order inserts exactly its one grant row. Trial rows
-// are permanent (an unlock never lapses); membership rows carry their
-// window and stack across renewals. The unique key lands the ledger law:
-// a trial unlocks once regardless of who or what paid for it, while
+// Entitlement is the grant ledger. Rows are born inside the settle
+// transaction (a paid order inserts exactly its one grant row) or by an
+// operator's manual grant — the same insert, "manual" as the artifact.
+// Trial rows are permanent (an unlock never lapses); membership rows
+// carry their window and stack across renewals. The single mutation the
+// ledger ever sees is termination: the live membership row flips to
+// terminated, history intact. The unique key lands the ledger law: a
+// trial unlocks once regardless of who or what paid for it, while
 // membership rows hold a null ref (NULLS DISTINCT) so each purchase is
 // its own row.
 type Entitlement struct {
@@ -33,6 +36,10 @@ func (Entitlement) Fields() []ent.Field {
 			Comment("trial: the unlocked test record id; report_type: the family name (dedup guard); membership: null — renewal rows stack instead of dedup"),
 		field.Time("expires_at").Optional().Nillable().Immutable().
 			Comment("membership window end (paid_at + period days); null on trial rows — permanence is the absence of a deadline"),
+		field.Enum("status").Values("active", "terminated").Default("active").
+			Comment("the only mutable fact on the ledger: the terminate action flips a live membership row to terminated; expiry itself never lands here — it stays a read-time fact of expires_at vs now, so no sweeper exists"),
+		field.Time("terminated_at").Optional().Nillable().
+			Comment("when the terminate action struck, set alongside status; null on rows still active"),
 		field.String("source").NotEmpty().MaxRuneLen(64).Immutable().
 			Comment("granting artifact id — the order number on membership rows, the code on report-type rows"),
 	}

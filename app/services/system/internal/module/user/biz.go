@@ -32,6 +32,11 @@ type User struct {
 	PasswordHash *string  // biz-only (never in proto); nil on Update = leave unchanged
 	Roles        []string // role codes; list enrichment, filled by List/Get
 	Enabled      bool
+	// Identity projections the roster faces hydrate beside the seat: the
+	// masked phone operators recognize members by, and the wechat binding
+	// fact. Faces that don't hydrate leave them zero — honest absence.
+	PhoneMasked *string
+	WechatBound bool
 }
 
 type Credential struct {
@@ -85,6 +90,7 @@ type UserRP interface {
 	FindByIDs(ctx context.Context, ids []string) (map[string]*User, error)
 	FindCredential(ctx context.Context, kind, identifier string) (*Credential, error)
 	ListCredentialsByUser(ctx context.Context, userID string) ([]*Credential, error)
+	ListCredentialsByUsers(ctx context.Context, userIDs []string) ([]*Credential, error) // the roster hydration's batch twin — one IN query for a whole page
 	CreateCredential(ctx context.Context, c *Credential) error
 	MoveCredential(ctx context.Context, kind, identifier, toUserID string) error
 	CountCredentialsByUser(ctx context.Context, userID string) (int, error)

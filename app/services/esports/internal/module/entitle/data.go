@@ -164,6 +164,7 @@ func (rp *entitlementRP) HasActiveMembership(ctx context.Context, userID string)
 		Where(
 			entitlement.UserIDEQ(userID),
 			entitlement.ScopeKindEQ(entitlement.ScopeKind(shared.ScopeMembership)),
+			entitlement.StatusEQ(entitlement.StatusActive),
 			entitlement.ExpiresAtGT(time.Now()),
 		).
 		Exist(ctx)
@@ -182,6 +183,7 @@ func (rp *entitlementRP) MembershipWindow(ctx context.Context, userID string) (*
 		Where(
 			entitlement.UserIDEQ(userID),
 			entitlement.ScopeKindEQ(entitlement.ScopeKind(shared.ScopeMembership)),
+			entitlement.StatusEQ(entitlement.StatusActive),
 			entitlement.ExpiresAtGT(time.Now()),
 		).
 		Order(ent.Desc(entitlement.FieldExpiresAt)).
@@ -207,6 +209,74 @@ func (rp *entitlementRP) HasAnyScope(ctx context.Context, userID, scopeKind stri
 		return false, rp.Platform.HandleEntError(err)
 	}
 	return ok, nil
+}
+
+func (rp *entitlementRP) ListMembershipRows(ctx context.Context, userIDs []string) ([]*EntitlementRow, error) {
+	query := rp.Platform.GetClient(ctx).Entitlement.Query().
+		Where(entitlement.ScopeKindEQ(entitlement.ScopeKind(shared.ScopeMembership)))
+	if userIDs != nil {
+		if len(userIDs) == 0 {
+			return nil, nil
+		}
+		query = query.Where(entitlement.UserIDIn(userIDs...))
+	}
+	// Oldest first: the fold walks a member's rows in grant order, so the
+	// last row is the live one and the count of rows is the period count.
+	rows, err := query.Order(ent.Asc(entitlement.FieldCreatedAt)).All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := make([]*EntitlementRow, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, mapEntitlementRow(row))
+	}
+	return out, nil
+}
+
+func (rp *entitlementRP) TerminateLiveMembership(ctx context.Context, userID string) (bool, error) {
+	// The TakeUse shape: one conditional UPDATE is the whole arbitration —
+	// every still-active, still-open row flips, and a replay matches
+	// nothing. All of them, not just the newest: renewal tiles windows, so
+	// a member mid-renewal holds several unexpired rows, and leaving the
+	// older ones active would keep access alive behind the terminate
+	// action's back. Save's row count carries the verdict; zero rows is the
+	// no-live-period answer the caller reports, not an error to surface.
+	rows, err := rp.Platform.GetClient(ctx).Entitlement.Update().
+		Where(
+			entitlement.UserIDEQ(userID),
+			entitlement.ScopeKindEQ(entitlement.ScopeKind(shared.ScopeMembership)),
+			entitlement.StatusEQ(entitlement.StatusActive),
+			entitlement.ExpiresAtGT(time.Now()),
+		).
+		SetStatus(entitlement.StatusTerminated).
+		SetTerminatedAt(time.Now()).
+		Save(ctx)
+	if err != nil {
+		return false, rp.Platform.HandleEntError(err)
+	}
+	return rows > 0, nil
+}
+
+func (rp *entitlementRP) ListMembershipUnlocks(ctx context.Context, userIDs []string) ([]*WindowUnlockRow, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
+	rows, err := rp.Platform.GetClient(ctx).Entitlement.Query().
+		Where(
+			entitlement.UserIDIn(userIDs...),
+			entitlement.ScopeKindEQ(entitlement.ScopeKind(shared.ScopeTrial)),
+			entitlement.SourceEQ(shared.SourceMembership),
+		).
+		Select(entitlement.FieldUserID, entitlement.FieldCreatedAt).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := make([]*WindowUnlockRow, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, &WindowUnlockRow{UserID: row.UserID, GrantedAt: row.CreatedAt})
+	}
+	return out, nil
 }
 
 func (rp *entitlementRP) Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error) {
@@ -289,11 +359,14 @@ func mapActivationCodes(rows []*ent.ActivationCode) []*ActivationCode {
 
 func mapEntitlementRow(row *ent.Entitlement) *EntitlementRow {
 	return &EntitlementRow{
-		ScopeKind: string(row.ScopeKind),
-		ScopeRef:  row.ScopeRef,
-		ExpiresAt: row.ExpiresAt,
-		Source:    row.Source,
-		CreatedAt: row.CreatedAt,
+		UserID:       row.UserID,
+		ScopeKind:    string(row.ScopeKind),
+		ScopeRef:     row.ScopeRef,
+		ExpiresAt:    row.ExpiresAt,
+		Source:       row.Source,
+		CreatedAt:    row.CreatedAt,
+		Status:       string(row.Status),
+		TerminatedAt: row.TerminatedAt,
 	}
 }
 

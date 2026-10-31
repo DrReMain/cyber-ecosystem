@@ -23,3 +23,23 @@ export const setReportAccessPolicy = EntitleAdminService.method.setReportAccessP
  * @generated from rpc cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies
  */
 export const listReportAccessPolicies = EntitleAdminService.method.listReportAccessPolicies;
+
+/**
+ * @generated from rpc cyber.esports.v1.EntitleAdminService.GrantMembership
+ */
+export const grantMembership = EntitleAdminService.method.grantMembership;
+
+/**
+ * @generated from rpc cyber.esports.v1.EntitleAdminService.TerminateMembership
+ */
+export const terminateMembership = EntitleAdminService.method.terminateMembership;
+
+/**
+ * @generated from rpc cyber.esports.v1.EntitleAdminService.ListMemberships
+ */
+export const listMemberships = EntitleAdminService.method.listMemberships;
+
+/**
+ * @generated from rpc cyber.esports.v1.EntitleAdminService.GetMembership
+ */
+export const getMembership = EntitleAdminService.method.getMembership;

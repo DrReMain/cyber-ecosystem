@@ -10,7 +10,7 @@ const operations = [
   op(EntitleAdminService, "generateActivationCodes"),
 ];
 
-export const Route = createFileRoute("/dashboard/esports/activation-codes/")({
+export const Route = createFileRoute("/dashboard/channels/activation-codes/")({
   staticData: { title: "esports_activation_codes_title", menu: { order: 10 }, operations },
   validateSearch: parseCodesSearch,
   head: () => ({ meta: [{ title: pageTitle(m.esports_activation_codes_title()) }] }),

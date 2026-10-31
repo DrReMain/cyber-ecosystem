@@ -192,10 +192,12 @@ func withCallerSession(ctx context.Context) (context.Context, error) {
 
 func mapUser(u *systempb.User) *member.RosterUser {
 	return &member.RosterUser{
-		ID:        utils.Deref(utils.Unwrap[string](u.GetId()), ""),
-		Account:   utils.Unwrap[string](u.GetAccount()),
-		Avatar:    utils.Unwrap[string](u.GetAvatar()),
-		Enabled:   utils.Deref(utils.Unwrap[bool](u.GetEnabled()), false),
-		CreatedAt: utils.Deref(utils.FromTimestamp(u.GetCreatedAt()), time.Time{}),
+		ID:          utils.Deref(utils.Unwrap[string](u.GetId()), ""),
+		Account:     utils.Unwrap[string](u.GetAccount()),
+		Avatar:      utils.Unwrap[string](u.GetAvatar()),
+		Enabled:     utils.Deref(utils.Unwrap[bool](u.GetEnabled()), false),
+		CreatedAt:   utils.Deref(utils.FromTimestamp(u.GetCreatedAt()), time.Time{}),
+		PhoneMasked: utils.Unwrap[string](u.GetPhoneMasked()),
+		WechatBound: utils.Deref(utils.Unwrap[bool](u.GetWechatBound()), false),
 	}
 }

@@ -237,6 +237,18 @@ func ErrorEsportsOrderStateConflict(format string, args ...interface{}) *errors.
 	return errors.New(400, Esports_ESPORTS_ORDER_STATE_CONFLICT.String(), fmt.Sprintf(format, args...))
 }
 
+func IsEsportsSkuKindInvalid(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_SKU_KIND_INVALID.String() && e.Code == 400
+}
+
+func ErrorEsportsSkuKindInvalid(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_SKU_KIND_INVALID.String(), fmt.Sprintf(format, args...))
+}
+
 // 615x: activation code & entitlement
 func IsEsportsActivationCodeInvalid(err error) bool {
 	if err == nil {
@@ -285,6 +297,18 @@ func IsEsportsReportPolicyNotReady(err error) bool {
 
 func ErrorEsportsReportPolicyNotReady(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, Esports_ESPORTS_REPORT_POLICY_NOT_READY.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsMembershipNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_MEMBERSHIP_NOT_FOUND.String() && e.Code == 404
+}
+
+func ErrorEsportsMembershipNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, Esports_ESPORTS_MEMBERSHIP_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
 
 // 616x: report

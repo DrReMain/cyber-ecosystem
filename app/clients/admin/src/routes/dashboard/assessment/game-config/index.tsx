@@ -12,8 +12,8 @@ const operations = [
   op(TestAdminService, "listQuestionBank"),
 ];
 
-export const Route = createFileRoute("/dashboard/esports/tests/")({
-  staticData: { title: "esports_tests_title", menu: { order: 30 }, operations },
+export const Route = createFileRoute("/dashboard/assessment/game-config/")({
+  staticData: { title: "esports_tests_title", menu: { order: 10 }, operations },
   head: () => ({ meta: [{ title: pageTitle(m.esports_tests_title()) }] }),
   beforeLoad: ({ context }) => requireOperations(operations, context.permissions),
   component: EsportsTestsPage,

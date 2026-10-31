@@ -5,7 +5,7 @@ import { op, requireOperations } from "#/features/layout-dashboard/auth/permissi
 
 const operations = [op(MemberService, "listMembers")];
 
-export const Route = createFileRoute("/dashboard/esports/users")({
+export const Route = createFileRoute("/dashboard/people/users")({
   staticData: {
     title: "esports_users_title",
     menu: { icon: Users, order: 10 },

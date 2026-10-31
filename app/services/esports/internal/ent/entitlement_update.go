@@ -35,6 +35,40 @@ func (_u *EntitlementUpdate) SetUpdatedAt(v time.Time) *EntitlementUpdate {
 	return _u
 }
 
+// SetStatus sets the "status" field.
+func (_u *EntitlementUpdate) SetStatus(v entitlement.Status) *EntitlementUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (_u *EntitlementUpdate) SetNillableStatus(v *entitlement.Status) *EntitlementUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
+	}
+	return _u
+}
+
+// SetTerminatedAt sets the "terminated_at" field.
+func (_u *EntitlementUpdate) SetTerminatedAt(v time.Time) *EntitlementUpdate {
+	_u.mutation.SetTerminatedAt(v)
+	return _u
+}
+
+// SetNillableTerminatedAt sets the "terminated_at" field if the given value is not nil.
+func (_u *EntitlementUpdate) SetNillableTerminatedAt(v *time.Time) *EntitlementUpdate {
+	if v != nil {
+		_u.SetTerminatedAt(*v)
+	}
+	return _u
+}
+
+// ClearTerminatedAt clears the value of the "terminated_at" field.
+func (_u *EntitlementUpdate) ClearTerminatedAt() *EntitlementUpdate {
+	_u.mutation.ClearTerminatedAt()
+	return _u
+}
+
 // Mutation returns the EntitlementMutation object of the builder.
 func (_u *EntitlementUpdate) Mutation() *EntitlementMutation {
 	return _u.mutation
@@ -82,6 +116,16 @@ func (_u *EntitlementUpdate) defaults() error {
 	return nil
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *EntitlementUpdate) check() error {
+	if v, ok := _u.mutation.Status(); ok {
+		if err := entitlement.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Entitlement.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *EntitlementUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EntitlementUpdate {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -89,6 +133,9 @@ func (_u *EntitlementUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *En
 }
 
 func (_u *EntitlementUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(entitlement.Table, entitlement.Columns, sqlgraph.NewFieldSpec(entitlement.FieldID, field.TypeString))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -105,6 +152,15 @@ func (_u *EntitlementUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	}
 	if _u.mutation.ExpiresAtCleared() {
 		_spec.ClearField(entitlement.FieldExpiresAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Status(); ok {
+		_spec.SetField(entitlement.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.TerminatedAt(); ok {
+		_spec.SetField(entitlement.FieldTerminatedAt, field.TypeTime, value)
+	}
+	if _u.mutation.TerminatedAtCleared() {
+		_spec.ClearField(entitlement.FieldTerminatedAt, field.TypeTime)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -131,6 +187,40 @@ type EntitlementUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *EntitlementUpdateOne) SetUpdatedAt(v time.Time) *EntitlementUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// SetStatus sets the "status" field.
+func (_u *EntitlementUpdateOne) SetStatus(v entitlement.Status) *EntitlementUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (_u *EntitlementUpdateOne) SetNillableStatus(v *entitlement.Status) *EntitlementUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
+	}
+	return _u
+}
+
+// SetTerminatedAt sets the "terminated_at" field.
+func (_u *EntitlementUpdateOne) SetTerminatedAt(v time.Time) *EntitlementUpdateOne {
+	_u.mutation.SetTerminatedAt(v)
+	return _u
+}
+
+// SetNillableTerminatedAt sets the "terminated_at" field if the given value is not nil.
+func (_u *EntitlementUpdateOne) SetNillableTerminatedAt(v *time.Time) *EntitlementUpdateOne {
+	if v != nil {
+		_u.SetTerminatedAt(*v)
+	}
+	return _u
+}
+
+// ClearTerminatedAt clears the value of the "terminated_at" field.
+func (_u *EntitlementUpdateOne) ClearTerminatedAt() *EntitlementUpdateOne {
+	_u.mutation.ClearTerminatedAt()
 	return _u
 }
 
@@ -194,6 +284,16 @@ func (_u *EntitlementUpdateOne) defaults() error {
 	return nil
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *EntitlementUpdateOne) check() error {
+	if v, ok := _u.mutation.Status(); ok {
+		if err := entitlement.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Entitlement.status": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *EntitlementUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EntitlementUpdateOne {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -201,6 +301,9 @@ func (_u *EntitlementUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) 
 }
 
 func (_u *EntitlementUpdateOne) sqlSave(ctx context.Context) (_node *Entitlement, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(entitlement.Table, entitlement.Columns, sqlgraph.NewFieldSpec(entitlement.FieldID, field.TypeString))
 	id, ok := _u.mutation.ID()
 	if !ok {
@@ -234,6 +337,15 @@ func (_u *EntitlementUpdateOne) sqlSave(ctx context.Context) (_node *Entitlement
 	}
 	if _u.mutation.ExpiresAtCleared() {
 		_spec.ClearField(entitlement.FieldExpiresAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Status(); ok {
+		_spec.SetField(entitlement.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.TerminatedAt(); ok {
+		_spec.SetField(entitlement.FieldTerminatedAt, field.TypeTime, value)
+	}
+	if _u.mutation.TerminatedAtCleared() {
+		_spec.ClearField(entitlement.FieldTerminatedAt, field.TypeTime)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &Entitlement{config: _u.config}

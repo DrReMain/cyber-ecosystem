@@ -247,7 +247,7 @@ func init() {
 	// entitlement.ScopeRefValidator is a validator for the "scope_ref" field. It is called by the builders before save.
 	entitlement.ScopeRefValidator = entitlementDescScopeRef.Validators[0].(func(string) error)
 	// entitlementDescSource is the schema descriptor for source field.
-	entitlementDescSource := entitlementFields[4].Descriptor()
+	entitlementDescSource := entitlementFields[6].Descriptor()
 	// entitlement.SourceValidator is a validator for the "source" field. It is called by the builders before save.
 	entitlement.SourceValidator = func() func(string) error {
 		validators := entitlementDescSource.Validators

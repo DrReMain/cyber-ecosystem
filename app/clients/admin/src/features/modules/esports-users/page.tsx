@@ -10,7 +10,7 @@ import { m } from "#/paraglide/messages";
 import { parseUsersSearch, usersSearchSchema } from "./search";
 import { UsersTable } from "./ui/users-table";
 
-const AREA = "/dashboard/esports/users/";
+const AREA = "/dashboard/people/users/";
 
 export function EsportsUsersPage() {
   const search = useSearch({ from: AREA });

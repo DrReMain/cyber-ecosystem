@@ -109,6 +109,8 @@ var (
 		{Name: "scope_kind", Type: field.TypeEnum, Comment: "grant shape: trial points at one record permanently, membership opens a window, report_type opens a report family via a type code", Enums: []string{"trial", "membership", "report_type"}},
 		{Name: "scope_ref", Type: field.TypeString, Nullable: true, Size: 32, Comment: "trial: the unlocked test record id; report_type: the family name (dedup guard); membership: null — renewal rows stack instead of dedup"},
 		{Name: "expires_at", Type: field.TypeTime, Nullable: true, Comment: "membership window end (paid_at + period days); null on trial rows — permanence is the absence of a deadline"},
+		{Name: "status", Type: field.TypeEnum, Comment: "the only mutable fact on the ledger: the terminate action flips a live membership row to terminated; expiry itself never lands here — it stays a read-time fact of expires_at vs now, so no sweeper exists", Enums: []string{"active", "terminated"}, Default: "active"},
+		{Name: "terminated_at", Type: field.TypeTime, Nullable: true, Comment: "when the terminate action struck, set alongside status; null on rows still active"},
 		{Name: "source", Type: field.TypeString, Size: 64, Comment: "granting artifact id — the order number on membership rows, the code on report-type rows"},
 	}
 	// EntitlementTable holds the schema information for the "entitlement" table.

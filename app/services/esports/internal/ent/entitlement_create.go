@@ -97,6 +97,34 @@ func (_c *EntitlementCreate) SetNillableExpiresAt(v *time.Time) *EntitlementCrea
 	return _c
 }
 
+// SetStatus sets the "status" field.
+func (_c *EntitlementCreate) SetStatus(v entitlement.Status) *EntitlementCreate {
+	_c.mutation.SetStatus(v)
+	return _c
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (_c *EntitlementCreate) SetNillableStatus(v *entitlement.Status) *EntitlementCreate {
+	if v != nil {
+		_c.SetStatus(*v)
+	}
+	return _c
+}
+
+// SetTerminatedAt sets the "terminated_at" field.
+func (_c *EntitlementCreate) SetTerminatedAt(v time.Time) *EntitlementCreate {
+	_c.mutation.SetTerminatedAt(v)
+	return _c
+}
+
+// SetNillableTerminatedAt sets the "terminated_at" field if the given value is not nil.
+func (_c *EntitlementCreate) SetNillableTerminatedAt(v *time.Time) *EntitlementCreate {
+	if v != nil {
+		_c.SetTerminatedAt(*v)
+	}
+	return _c
+}
+
 // SetSource sets the "source" field.
 func (_c *EntitlementCreate) SetSource(v string) *EntitlementCreate {
 	_c.mutation.SetSource(v)
@@ -168,6 +196,10 @@ func (_c *EntitlementCreate) defaults() error {
 		v := entitlement.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := _c.mutation.Status(); !ok {
+		v := entitlement.DefaultStatus
+		_c.mutation.SetStatus(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		if entitlement.DefaultID == nil {
 			return fmt.Errorf("ent: uninitialized entitlement.DefaultID (forgotten import ent/runtime?)")
@@ -213,6 +245,14 @@ func (_c *EntitlementCreate) check() error {
 	if v, ok := _c.mutation.ScopeRef(); ok {
 		if err := entitlement.ScopeRefValidator(v); err != nil {
 			return &ValidationError{Name: "scope_ref", err: fmt.Errorf(`ent: validator failed for field "Entitlement.scope_ref": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Entitlement.status"`)}
+	}
+	if v, ok := _c.mutation.Status(); ok {
+		if err := entitlement.StatusValidator(v); err != nil {
+			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Entitlement.status": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.Source(); !ok {
@@ -292,6 +332,14 @@ func (_c *EntitlementCreate) createSpec() (*Entitlement, *sqlgraph.CreateSpec) {
 		_spec.SetField(entitlement.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = &value
 	}
+	if value, ok := _c.mutation.Status(); ok {
+		_spec.SetField(entitlement.FieldStatus, field.TypeEnum, value)
+		_node.Status = value
+	}
+	if value, ok := _c.mutation.TerminatedAt(); ok {
+		_spec.SetField(entitlement.FieldTerminatedAt, field.TypeTime, value)
+		_node.TerminatedAt = &value
+	}
 	if value, ok := _c.mutation.Source(); ok {
 		_spec.SetField(entitlement.FieldSource, field.TypeString, value)
 		_node.Source = value
@@ -357,6 +405,36 @@ func (u *EntitlementUpsert) SetUpdatedAt(v time.Time) *EntitlementUpsert {
 // UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
 func (u *EntitlementUpsert) UpdateUpdatedAt() *EntitlementUpsert {
 	u.SetExcluded(entitlement.FieldUpdatedAt)
+	return u
+}
+
+// SetStatus sets the "status" field.
+func (u *EntitlementUpsert) SetStatus(v entitlement.Status) *EntitlementUpsert {
+	u.Set(entitlement.FieldStatus, v)
+	return u
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *EntitlementUpsert) UpdateStatus() *EntitlementUpsert {
+	u.SetExcluded(entitlement.FieldStatus)
+	return u
+}
+
+// SetTerminatedAt sets the "terminated_at" field.
+func (u *EntitlementUpsert) SetTerminatedAt(v time.Time) *EntitlementUpsert {
+	u.Set(entitlement.FieldTerminatedAt, v)
+	return u
+}
+
+// UpdateTerminatedAt sets the "terminated_at" field to the value that was provided on create.
+func (u *EntitlementUpsert) UpdateTerminatedAt() *EntitlementUpsert {
+	u.SetExcluded(entitlement.FieldTerminatedAt)
+	return u
+}
+
+// ClearTerminatedAt clears the value of the "terminated_at" field.
+func (u *EntitlementUpsert) ClearTerminatedAt() *EntitlementUpsert {
+	u.SetNull(entitlement.FieldTerminatedAt)
 	return u
 }
 
@@ -440,6 +518,41 @@ func (u *EntitlementUpsertOne) SetUpdatedAt(v time.Time) *EntitlementUpsertOne {
 func (u *EntitlementUpsertOne) UpdateUpdatedAt() *EntitlementUpsertOne {
 	return u.Update(func(s *EntitlementUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *EntitlementUpsertOne) SetStatus(v entitlement.Status) *EntitlementUpsertOne {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *EntitlementUpsertOne) UpdateStatus() *EntitlementUpsertOne {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetTerminatedAt sets the "terminated_at" field.
+func (u *EntitlementUpsertOne) SetTerminatedAt(v time.Time) *EntitlementUpsertOne {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.SetTerminatedAt(v)
+	})
+}
+
+// UpdateTerminatedAt sets the "terminated_at" field to the value that was provided on create.
+func (u *EntitlementUpsertOne) UpdateTerminatedAt() *EntitlementUpsertOne {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.UpdateTerminatedAt()
+	})
+}
+
+// ClearTerminatedAt clears the value of the "terminated_at" field.
+func (u *EntitlementUpsertOne) ClearTerminatedAt() *EntitlementUpsertOne {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.ClearTerminatedAt()
 	})
 }
 
@@ -690,6 +803,41 @@ func (u *EntitlementUpsertBulk) SetUpdatedAt(v time.Time) *EntitlementUpsertBulk
 func (u *EntitlementUpsertBulk) UpdateUpdatedAt() *EntitlementUpsertBulk {
 	return u.Update(func(s *EntitlementUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *EntitlementUpsertBulk) SetStatus(v entitlement.Status) *EntitlementUpsertBulk {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *EntitlementUpsertBulk) UpdateStatus() *EntitlementUpsertBulk {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetTerminatedAt sets the "terminated_at" field.
+func (u *EntitlementUpsertBulk) SetTerminatedAt(v time.Time) *EntitlementUpsertBulk {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.SetTerminatedAt(v)
+	})
+}
+
+// UpdateTerminatedAt sets the "terminated_at" field to the value that was provided on create.
+func (u *EntitlementUpsertBulk) UpdateTerminatedAt() *EntitlementUpsertBulk {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.UpdateTerminatedAt()
+	})
+}
+
+// ClearTerminatedAt clears the value of the "terminated_at" field.
+func (u *EntitlementUpsertBulk) ClearTerminatedAt() *EntitlementUpsertBulk {
+	return u.Update(func(s *EntitlementUpsert) {
+		s.ClearTerminatedAt()
 	})
 }
 

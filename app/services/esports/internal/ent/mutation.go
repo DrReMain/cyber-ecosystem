@@ -1777,6 +1777,8 @@ type EntitlementMutation struct {
 	scope_kind    *entitlement.ScopeKind
 	scope_ref     *string
 	expires_at    *time.Time
+	status        *entitlement.Status
+	terminated_at *time.Time
 	source        *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -2166,6 +2168,91 @@ func (m *EntitlementMutation) ResetExpiresAt() {
 	delete(m.clearedFields, entitlement.FieldExpiresAt)
 }
 
+// SetStatus sets the "status" field.
+func (m *EntitlementMutation) SetStatus(e entitlement.Status) {
+	m.status = &e
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *EntitlementMutation) Status() (r entitlement.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Entitlement entity.
+// If the Entitlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EntitlementMutation) OldStatus(ctx context.Context) (v entitlement.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *EntitlementMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetTerminatedAt sets the "terminated_at" field.
+func (m *EntitlementMutation) SetTerminatedAt(t time.Time) {
+	m.terminated_at = &t
+}
+
+// TerminatedAt returns the value of the "terminated_at" field in the mutation.
+func (m *EntitlementMutation) TerminatedAt() (r time.Time, exists bool) {
+	v := m.terminated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTerminatedAt returns the old "terminated_at" field's value of the Entitlement entity.
+// If the Entitlement object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EntitlementMutation) OldTerminatedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTerminatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTerminatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTerminatedAt: %w", err)
+	}
+	return oldValue.TerminatedAt, nil
+}
+
+// ClearTerminatedAt clears the value of the "terminated_at" field.
+func (m *EntitlementMutation) ClearTerminatedAt() {
+	m.terminated_at = nil
+	m.clearedFields[entitlement.FieldTerminatedAt] = struct{}{}
+}
+
+// TerminatedAtCleared returns if the "terminated_at" field was cleared in this mutation.
+func (m *EntitlementMutation) TerminatedAtCleared() bool {
+	_, ok := m.clearedFields[entitlement.FieldTerminatedAt]
+	return ok
+}
+
+// ResetTerminatedAt resets all changes to the "terminated_at" field.
+func (m *EntitlementMutation) ResetTerminatedAt() {
+	m.terminated_at = nil
+	delete(m.clearedFields, entitlement.FieldTerminatedAt)
+}
+
 // SetSource sets the "source" field.
 func (m *EntitlementMutation) SetSource(s string) {
 	m.source = &s
@@ -2236,7 +2323,7 @@ func (m *EntitlementMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EntitlementMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, entitlement.FieldCreatedAt)
 	}
@@ -2257,6 +2344,12 @@ func (m *EntitlementMutation) Fields() []string {
 	}
 	if m.expires_at != nil {
 		fields = append(fields, entitlement.FieldExpiresAt)
+	}
+	if m.status != nil {
+		fields = append(fields, entitlement.FieldStatus)
+	}
+	if m.terminated_at != nil {
+		fields = append(fields, entitlement.FieldTerminatedAt)
 	}
 	if m.source != nil {
 		fields = append(fields, entitlement.FieldSource)
@@ -2283,6 +2376,10 @@ func (m *EntitlementMutation) Field(name string) (ent.Value, bool) {
 		return m.ScopeRef()
 	case entitlement.FieldExpiresAt:
 		return m.ExpiresAt()
+	case entitlement.FieldStatus:
+		return m.Status()
+	case entitlement.FieldTerminatedAt:
+		return m.TerminatedAt()
 	case entitlement.FieldSource:
 		return m.Source()
 	}
@@ -2308,6 +2405,10 @@ func (m *EntitlementMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldScopeRef(ctx)
 	case entitlement.FieldExpiresAt:
 		return m.OldExpiresAt(ctx)
+	case entitlement.FieldStatus:
+		return m.OldStatus(ctx)
+	case entitlement.FieldTerminatedAt:
+		return m.OldTerminatedAt(ctx)
 	case entitlement.FieldSource:
 		return m.OldSource(ctx)
 	}
@@ -2368,6 +2469,20 @@ func (m *EntitlementMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetExpiresAt(v)
 		return nil
+	case entitlement.FieldStatus:
+		v, ok := value.(entitlement.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case entitlement.FieldTerminatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTerminatedAt(v)
+		return nil
 	case entitlement.FieldSource:
 		v, ok := value.(string)
 		if !ok {
@@ -2411,6 +2526,9 @@ func (m *EntitlementMutation) ClearedFields() []string {
 	if m.FieldCleared(entitlement.FieldExpiresAt) {
 		fields = append(fields, entitlement.FieldExpiresAt)
 	}
+	if m.FieldCleared(entitlement.FieldTerminatedAt) {
+		fields = append(fields, entitlement.FieldTerminatedAt)
+	}
 	return fields
 }
 
@@ -2430,6 +2548,9 @@ func (m *EntitlementMutation) ClearField(name string) error {
 		return nil
 	case entitlement.FieldExpiresAt:
 		m.ClearExpiresAt()
+		return nil
+	case entitlement.FieldTerminatedAt:
+		m.ClearTerminatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Entitlement nullable field %s", name)
@@ -2459,6 +2580,12 @@ func (m *EntitlementMutation) ResetField(name string) error {
 		return nil
 	case entitlement.FieldExpiresAt:
 		m.ResetExpiresAt()
+		return nil
+	case entitlement.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case entitlement.FieldTerminatedAt:
+		m.ResetTerminatedAt()
 		return nil
 	case entitlement.FieldSource:
 		m.ResetSource()

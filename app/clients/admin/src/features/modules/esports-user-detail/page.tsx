@@ -14,7 +14,7 @@ import { m } from "#/paraglide/messages";
 const LIST_SEARCH = parseUsersSearch({});
 
 export function EsportsUserDetailPage() {
-  const { id: userId } = useParams({ from: "/dashboard/esports/users/$id" });
+  const { id: userId } = useParams({ from: "/dashboard/people/users/$id" });
   const navigate = useNavigate();
   const memberQuery = useQuery(getMember, { userId });
   const toggleMut = useMutation(updateUserStatus, { onSuccess: () => memberQuery.refetch() });
@@ -33,7 +33,7 @@ export function EsportsUserDetailPage() {
       className="self-start"
       color="default"
       icon={<ArrowLeft size={14} />}
-      onClick={() => void navigate({ to: "/dashboard/esports/users", search: LIST_SEARCH })}
+      onClick={() => void navigate({ to: "/dashboard/people/users", search: LIST_SEARCH })}
       variant="text"
     >
       {m.esports_user_detail_back()}

@@ -1,6 +1,9 @@
 {
-  "esports_title": "eスポーツ",
   "esports_report_type_cognitive": "認知レポート",
   "esports_report_type_career": "キャリアレポート",
-  "esports_report_type_school": "スクールレポート"
+  "esports_report_type_school": "スクールレポート",
+  "esports_people_title": "ユーザーと会員",
+  "esports_assessment_title": "題庫とテスト",
+  "esports_reports_title": "レポートとコンテンツ",
+  "esports_channels_title": "チャネルとプロモーション"
 }

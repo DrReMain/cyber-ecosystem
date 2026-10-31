@@ -1,6 +1,9 @@
 {
-  "esports_title": "e스포츠",
   "esports_report_type_cognitive": "인지 보고서",
   "esports_report_type_career": "경력 보고서",
-  "esports_report_type_school": "학교 보고서"
+  "esports_report_type_school": "학교 보고서",
+  "esports_people_title": "사용자·멤버십",
+  "esports_assessment_title": "문제은행·테스트",
+  "esports_reports_title": "리포트·콘텐츠",
+  "esports_channels_title": "채널·프로모션"
 }

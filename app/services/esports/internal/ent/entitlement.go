@@ -31,6 +31,10 @@ type Entitlement struct {
 	ScopeRef *string `json:"scope_ref,omitempty"`
 	// membership window end (paid_at + period days); null on trial rows — permanence is the absence of a deadline
 	ExpiresAt *time.Time `json:"expires_at,omitempty"`
+	// the only mutable fact on the ledger: the terminate action flips a live membership row to terminated; expiry itself never lands here — it stays a read-time fact of expires_at vs now, so no sweeper exists
+	Status entitlement.Status `json:"status,omitempty"`
+	// when the terminate action struck, set alongside status; null on rows still active
+	TerminatedAt *time.Time `json:"terminated_at,omitempty"`
 	// granting artifact id — the order number on membership rows, the code on report-type rows
 	Source       string `json:"source,omitempty"`
 	selectValues sql.SelectValues
@@ -41,9 +45,9 @@ func (*Entitlement) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case entitlement.FieldID, entitlement.FieldTenantID, entitlement.FieldUserID, entitlement.FieldScopeKind, entitlement.FieldScopeRef, entitlement.FieldSource:
+		case entitlement.FieldID, entitlement.FieldTenantID, entitlement.FieldUserID, entitlement.FieldScopeKind, entitlement.FieldScopeRef, entitlement.FieldStatus, entitlement.FieldSource:
 			values[i] = new(sql.NullString)
-		case entitlement.FieldCreatedAt, entitlement.FieldUpdatedAt, entitlement.FieldExpiresAt:
+		case entitlement.FieldCreatedAt, entitlement.FieldUpdatedAt, entitlement.FieldExpiresAt, entitlement.FieldTerminatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -110,6 +114,19 @@ func (_m *Entitlement) assignValues(columns []string, values []any) error {
 				_m.ExpiresAt = new(time.Time)
 				*_m.ExpiresAt = value.Time
 			}
+		case entitlement.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				_m.Status = entitlement.Status(value.String)
+			}
+		case entitlement.FieldTerminatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field terminated_at", values[i])
+			} else if value.Valid {
+				_m.TerminatedAt = new(time.Time)
+				*_m.TerminatedAt = value.Time
+			}
 		case entitlement.FieldSource:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field source", values[i])
@@ -174,6 +191,14 @@ func (_m *Entitlement) String() string {
 	builder.WriteString(", ")
 	if v := _m.ExpiresAt; v != nil {
 		builder.WriteString("expires_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("status=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Status))
+	builder.WriteString(", ")
+	if v := _m.TerminatedAt; v != nil {
+		builder.WriteString("terminated_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")

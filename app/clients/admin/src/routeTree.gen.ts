@@ -15,15 +15,19 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAgentsRouteRouteImport } from './routes/dashboard/agents/route'
-import { Route as DashboardEsportsRouteRouteImport } from './routes/dashboard/esports/route'
+import { Route as DashboardAssessmentRouteRouteImport } from './routes/dashboard/assessment/route'
+import { Route as DashboardChannelsRouteRouteImport } from './routes/dashboard/channels/route'
 import { Route as DashboardFilesRouteRouteImport } from './routes/dashboard/files/route'
+import { Route as DashboardPeopleRouteRouteImport } from './routes/dashboard/people/route'
 import { Route as DashboardPlatformRouteRouteImport } from './routes/dashboard/platform/route'
 import { Route as DashboardProfileRouteRouteImport } from './routes/dashboard/profile/route'
+import { Route as DashboardReportsRouteRouteImport } from './routes/dashboard/reports/route'
 import { Route as DashboardSystemRouteRouteImport } from './routes/dashboard/system/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as DashboardAgentsConnectionsRouteImport } from './routes/dashboard/agents/connections'
-import { Route as DashboardEsportsUsersRouteRouteImport } from './routes/dashboard/esports/users/route'
 import { Route as DashboardFilesListRouteImport } from './routes/dashboard/files/list'
+import { Route as DashboardPeopleMembersRouteRouteImport } from './routes/dashboard/people/members/route'
+import { Route as DashboardPeopleUsersRouteRouteImport } from './routes/dashboard/people/users/route'
 import { Route as DashboardPlatformPopulationsRouteImport } from './routes/dashboard/platform/populations'
 import { Route as DashboardPlatformTenantsRouteImport } from './routes/dashboard/platform/tenants'
 import { Route as DashboardProfileIndexRouteImport } from './routes/dashboard/profile/index'
@@ -35,11 +39,13 @@ import { Route as DashboardSystemDiagRouteImport } from './routes/dashboard/syst
 import { Route as DashboardSystemPoliciesRouteImport } from './routes/dashboard/system/policies'
 import { Route as DashboardSystemRolesRouteImport } from './routes/dashboard/system/roles'
 import { Route as DashboardSystemUsersRouteImport } from './routes/dashboard/system/users'
-import { Route as DashboardEsportsActivationCodesIndexRouteImport } from './routes/dashboard/esports/activation-codes/index'
-import { Route as DashboardEsportsReportPoliciesIndexRouteImport } from './routes/dashboard/esports/report-policies/index'
-import { Route as DashboardEsportsTestsIndexRouteImport } from './routes/dashboard/esports/tests/index'
-import { Route as DashboardEsportsUsersIndexRouteImport } from './routes/dashboard/esports/users/index'
-import { Route as DashboardEsportsUsersIdRouteImport } from './routes/dashboard/esports/users/$id'
+import { Route as DashboardAssessmentGameConfigIndexRouteImport } from './routes/dashboard/assessment/game-config/index'
+import { Route as DashboardChannelsActivationCodesIndexRouteImport } from './routes/dashboard/channels/activation-codes/index'
+import { Route as DashboardPeopleMembersIndexRouteImport } from './routes/dashboard/people/members/index'
+import { Route as DashboardPeopleMembersIdRouteImport } from './routes/dashboard/people/members/$id'
+import { Route as DashboardPeopleUsersIndexRouteImport } from './routes/dashboard/people/users/index'
+import { Route as DashboardPeopleUsersIdRouteImport } from './routes/dashboard/people/users/$id'
+import { Route as DashboardReportsReportPoliciesIndexRouteImport } from './routes/dashboard/reports/report-policies/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,14 +77,25 @@ const DashboardAgentsRouteRoute = DashboardAgentsRouteRouteImport.update({
   path: '/agents',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardEsportsRouteRoute = DashboardEsportsRouteRouteImport.update({
-  id: '/esports',
-  path: '/esports',
+const DashboardAssessmentRouteRoute =
+  DashboardAssessmentRouteRouteImport.update({
+    id: '/assessment',
+    path: '/assessment',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardChannelsRouteRoute = DashboardChannelsRouteRouteImport.update({
+  id: '/channels',
+  path: '/channels',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardFilesRouteRoute = DashboardFilesRouteRouteImport.update({
   id: '/files',
   path: '/files',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardPeopleRouteRoute = DashboardPeopleRouteRouteImport.update({
+  id: '/people',
+  path: '/people',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardPlatformRouteRoute = DashboardPlatformRouteRouteImport.update({
@@ -89,6 +106,11 @@ const DashboardPlatformRouteRoute = DashboardPlatformRouteRouteImport.update({
 const DashboardProfileRouteRoute = DashboardProfileRouteRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardReportsRouteRoute = DashboardReportsRouteRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardSystemRouteRoute = DashboardSystemRouteRouteImport.update({
@@ -107,17 +129,23 @@ const DashboardAgentsConnectionsRoute =
     path: '/connections',
     getParentRoute: () => DashboardAgentsRouteRoute,
   } as any)
-const DashboardEsportsUsersRouteRoute =
-  DashboardEsportsUsersRouteRouteImport.update({
-    id: '/users',
-    path: '/users',
-    getParentRoute: () => DashboardEsportsRouteRoute,
-  } as any)
 const DashboardFilesListRoute = DashboardFilesListRouteImport.update({
   id: '/list',
   path: '/list',
   getParentRoute: () => DashboardFilesRouteRoute,
 } as any)
+const DashboardPeopleMembersRouteRoute =
+  DashboardPeopleMembersRouteRouteImport.update({
+    id: '/members',
+    path: '/members',
+    getParentRoute: () => DashboardPeopleRouteRoute,
+  } as any)
+const DashboardPeopleUsersRouteRoute =
+  DashboardPeopleUsersRouteRouteImport.update({
+    id: '/users',
+    path: '/users',
+    getParentRoute: () => DashboardPeopleRouteRoute,
+  } as any)
 const DashboardPlatformPopulationsRoute =
   DashboardPlatformPopulationsRouteImport.update({
     id: '/populations',
@@ -176,35 +204,47 @@ const DashboardSystemUsersRoute = DashboardSystemUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => DashboardSystemRouteRoute,
 } as any)
-const DashboardEsportsActivationCodesIndexRoute =
-  DashboardEsportsActivationCodesIndexRouteImport.update({
+const DashboardAssessmentGameConfigIndexRoute =
+  DashboardAssessmentGameConfigIndexRouteImport.update({
+    id: '/game-config/',
+    path: '/game-config/',
+    getParentRoute: () => DashboardAssessmentRouteRoute,
+  } as any)
+const DashboardChannelsActivationCodesIndexRoute =
+  DashboardChannelsActivationCodesIndexRouteImport.update({
     id: '/activation-codes/',
     path: '/activation-codes/',
-    getParentRoute: () => DashboardEsportsRouteRoute,
+    getParentRoute: () => DashboardChannelsRouteRoute,
   } as any)
-const DashboardEsportsReportPoliciesIndexRoute =
-  DashboardEsportsReportPoliciesIndexRouteImport.update({
-    id: '/report-policies/',
-    path: '/report-policies/',
-    getParentRoute: () => DashboardEsportsRouteRoute,
-  } as any)
-const DashboardEsportsTestsIndexRoute =
-  DashboardEsportsTestsIndexRouteImport.update({
-    id: '/tests/',
-    path: '/tests/',
-    getParentRoute: () => DashboardEsportsRouteRoute,
-  } as any)
-const DashboardEsportsUsersIndexRoute =
-  DashboardEsportsUsersIndexRouteImport.update({
+const DashboardPeopleMembersIndexRoute =
+  DashboardPeopleMembersIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => DashboardEsportsUsersRouteRoute,
+    getParentRoute: () => DashboardPeopleMembersRouteRoute,
   } as any)
-const DashboardEsportsUsersIdRoute = DashboardEsportsUsersIdRouteImport.update({
+const DashboardPeopleMembersIdRoute =
+  DashboardPeopleMembersIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => DashboardPeopleMembersRouteRoute,
+  } as any)
+const DashboardPeopleUsersIndexRoute =
+  DashboardPeopleUsersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardPeopleUsersRouteRoute,
+  } as any)
+const DashboardPeopleUsersIdRoute = DashboardPeopleUsersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => DashboardEsportsUsersRouteRoute,
+  getParentRoute: () => DashboardPeopleUsersRouteRoute,
 } as any)
+const DashboardReportsReportPoliciesIndexRoute =
+  DashboardReportsReportPoliciesIndexRouteImport.update({
+    id: '/report-policies/',
+    path: '/report-policies/',
+    getParentRoute: () => DashboardReportsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -212,14 +252,18 @@ export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
-  '/dashboard/esports': typeof DashboardEsportsRouteRouteWithChildren
+  '/dashboard/assessment': typeof DashboardAssessmentRouteRouteWithChildren
+  '/dashboard/channels': typeof DashboardChannelsRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
+  '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
   '/dashboard/profile': typeof DashboardProfileRouteRouteWithChildren
+  '/dashboard/reports': typeof DashboardReportsRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
-  '/dashboard/esports/users': typeof DashboardEsportsUsersRouteRouteWithChildren
+  '/dashboard/people/members': typeof DashboardPeopleMembersRouteRouteWithChildren
+  '/dashboard/people/users': typeof DashboardPeopleUsersRouteRouteWithChildren
   '/dashboard/agents/connections': typeof DashboardAgentsConnectionsRoute
   '/dashboard/files/list': typeof DashboardFilesListRoute
   '/dashboard/platform/populations': typeof DashboardPlatformPopulationsRoute
@@ -233,20 +277,25 @@ export interface FileRoutesByFullPath {
   '/dashboard/system/roles': typeof DashboardSystemRolesRoute
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
-  '/dashboard/esports/users/$id': typeof DashboardEsportsUsersIdRoute
-  '/dashboard/esports/activation-codes/': typeof DashboardEsportsActivationCodesIndexRoute
-  '/dashboard/esports/report-policies/': typeof DashboardEsportsReportPoliciesIndexRoute
-  '/dashboard/esports/tests/': typeof DashboardEsportsTestsIndexRoute
-  '/dashboard/esports/users/': typeof DashboardEsportsUsersIndexRoute
+  '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
+  '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
+  '/dashboard/assessment/game-config/': typeof DashboardAssessmentGameConfigIndexRoute
+  '/dashboard/channels/activation-codes/': typeof DashboardChannelsActivationCodesIndexRoute
+  '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
+  '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
+  '/dashboard/reports/report-policies/': typeof DashboardReportsReportPoliciesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
-  '/dashboard/esports': typeof DashboardEsportsRouteRouteWithChildren
+  '/dashboard/assessment': typeof DashboardAssessmentRouteRouteWithChildren
+  '/dashboard/channels': typeof DashboardChannelsRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
+  '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
+  '/dashboard/reports': typeof DashboardReportsRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard': typeof DashboardIndexRoute
   '/login': typeof LoginIndexRoute
@@ -263,11 +312,13 @@ export interface FileRoutesByTo {
   '/dashboard/system/roles': typeof DashboardSystemRolesRoute
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile': typeof DashboardProfileIndexRoute
-  '/dashboard/esports/users/$id': typeof DashboardEsportsUsersIdRoute
-  '/dashboard/esports/activation-codes': typeof DashboardEsportsActivationCodesIndexRoute
-  '/dashboard/esports/report-policies': typeof DashboardEsportsReportPoliciesIndexRoute
-  '/dashboard/esports/tests': typeof DashboardEsportsTestsIndexRoute
-  '/dashboard/esports/users': typeof DashboardEsportsUsersIndexRoute
+  '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
+  '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
+  '/dashboard/assessment/game-config': typeof DashboardAssessmentGameConfigIndexRoute
+  '/dashboard/channels/activation-codes': typeof DashboardChannelsActivationCodesIndexRoute
+  '/dashboard/people/members': typeof DashboardPeopleMembersIndexRoute
+  '/dashboard/people/users': typeof DashboardPeopleUsersIndexRoute
+  '/dashboard/reports/report-policies': typeof DashboardReportsReportPoliciesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -276,14 +327,18 @@ export interface FileRoutesById {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
-  '/dashboard/esports': typeof DashboardEsportsRouteRouteWithChildren
+  '/dashboard/assessment': typeof DashboardAssessmentRouteRouteWithChildren
+  '/dashboard/channels': typeof DashboardChannelsRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
+  '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
   '/dashboard/profile': typeof DashboardProfileRouteRouteWithChildren
+  '/dashboard/reports': typeof DashboardReportsRouteRouteWithChildren
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
-  '/dashboard/esports/users': typeof DashboardEsportsUsersRouteRouteWithChildren
+  '/dashboard/people/members': typeof DashboardPeopleMembersRouteRouteWithChildren
+  '/dashboard/people/users': typeof DashboardPeopleUsersRouteRouteWithChildren
   '/dashboard/agents/connections': typeof DashboardAgentsConnectionsRoute
   '/dashboard/files/list': typeof DashboardFilesListRoute
   '/dashboard/platform/populations': typeof DashboardPlatformPopulationsRoute
@@ -297,11 +352,13 @@ export interface FileRoutesById {
   '/dashboard/system/roles': typeof DashboardSystemRolesRoute
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
-  '/dashboard/esports/users/$id': typeof DashboardEsportsUsersIdRoute
-  '/dashboard/esports/activation-codes/': typeof DashboardEsportsActivationCodesIndexRoute
-  '/dashboard/esports/report-policies/': typeof DashboardEsportsReportPoliciesIndexRoute
-  '/dashboard/esports/tests/': typeof DashboardEsportsTestsIndexRoute
-  '/dashboard/esports/users/': typeof DashboardEsportsUsersIndexRoute
+  '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
+  '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
+  '/dashboard/assessment/game-config/': typeof DashboardAssessmentGameConfigIndexRoute
+  '/dashboard/channels/activation-codes/': typeof DashboardChannelsActivationCodesIndexRoute
+  '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
+  '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
+  '/dashboard/reports/report-policies/': typeof DashboardReportsReportPoliciesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -311,14 +368,18 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/dashboard/agents'
-    | '/dashboard/esports'
+    | '/dashboard/assessment'
+    | '/dashboard/channels'
     | '/dashboard/files'
+    | '/dashboard/people'
     | '/dashboard/platform'
     | '/dashboard/profile'
+    | '/dashboard/reports'
     | '/dashboard/system'
     | '/dashboard/'
     | '/login/'
-    | '/dashboard/esports/users'
+    | '/dashboard/people/members'
+    | '/dashboard/people/users'
     | '/dashboard/agents/connections'
     | '/dashboard/files/list'
     | '/dashboard/platform/populations'
@@ -332,20 +393,25 @@ export interface FileRouteTypes {
     | '/dashboard/system/roles'
     | '/dashboard/system/users'
     | '/dashboard/profile/'
-    | '/dashboard/esports/users/$id'
-    | '/dashboard/esports/activation-codes/'
-    | '/dashboard/esports/report-policies/'
-    | '/dashboard/esports/tests/'
-    | '/dashboard/esports/users/'
+    | '/dashboard/people/members/$id'
+    | '/dashboard/people/users/$id'
+    | '/dashboard/assessment/game-config/'
+    | '/dashboard/channels/activation-codes/'
+    | '/dashboard/people/members/'
+    | '/dashboard/people/users/'
+    | '/dashboard/reports/report-policies/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/dashboard/agents'
-    | '/dashboard/esports'
+    | '/dashboard/assessment'
+    | '/dashboard/channels'
     | '/dashboard/files'
+    | '/dashboard/people'
     | '/dashboard/platform'
+    | '/dashboard/reports'
     | '/dashboard/system'
     | '/dashboard'
     | '/login'
@@ -362,11 +428,13 @@ export interface FileRouteTypes {
     | '/dashboard/system/roles'
     | '/dashboard/system/users'
     | '/dashboard/profile'
-    | '/dashboard/esports/users/$id'
-    | '/dashboard/esports/activation-codes'
-    | '/dashboard/esports/report-policies'
-    | '/dashboard/esports/tests'
-    | '/dashboard/esports/users'
+    | '/dashboard/people/members/$id'
+    | '/dashboard/people/users/$id'
+    | '/dashboard/assessment/game-config'
+    | '/dashboard/channels/activation-codes'
+    | '/dashboard/people/members'
+    | '/dashboard/people/users'
+    | '/dashboard/reports/report-policies'
   id:
     | '__root__'
     | '/'
@@ -374,14 +442,18 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/dashboard/agents'
-    | '/dashboard/esports'
+    | '/dashboard/assessment'
+    | '/dashboard/channels'
     | '/dashboard/files'
+    | '/dashboard/people'
     | '/dashboard/platform'
     | '/dashboard/profile'
+    | '/dashboard/reports'
     | '/dashboard/system'
     | '/dashboard/'
     | '/login/'
-    | '/dashboard/esports/users'
+    | '/dashboard/people/members'
+    | '/dashboard/people/users'
     | '/dashboard/agents/connections'
     | '/dashboard/files/list'
     | '/dashboard/platform/populations'
@@ -395,11 +467,13 @@ export interface FileRouteTypes {
     | '/dashboard/system/roles'
     | '/dashboard/system/users'
     | '/dashboard/profile/'
-    | '/dashboard/esports/users/$id'
-    | '/dashboard/esports/activation-codes/'
-    | '/dashboard/esports/report-policies/'
-    | '/dashboard/esports/tests/'
-    | '/dashboard/esports/users/'
+    | '/dashboard/people/members/$id'
+    | '/dashboard/people/users/$id'
+    | '/dashboard/assessment/game-config/'
+    | '/dashboard/channels/activation-codes/'
+    | '/dashboard/people/members/'
+    | '/dashboard/people/users/'
+    | '/dashboard/reports/report-policies/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -454,11 +528,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAgentsRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/esports': {
-      id: '/dashboard/esports'
-      path: '/esports'
-      fullPath: '/dashboard/esports'
-      preLoaderRoute: typeof DashboardEsportsRouteRouteImport
+    '/dashboard/assessment': {
+      id: '/dashboard/assessment'
+      path: '/assessment'
+      fullPath: '/dashboard/assessment'
+      preLoaderRoute: typeof DashboardAssessmentRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/channels': {
+      id: '/dashboard/channels'
+      path: '/channels'
+      fullPath: '/dashboard/channels'
+      preLoaderRoute: typeof DashboardChannelsRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/files': {
@@ -466,6 +547,13 @@ declare module '@tanstack/react-router' {
       path: '/files'
       fullPath: '/dashboard/files'
       preLoaderRoute: typeof DashboardFilesRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/people': {
+      id: '/dashboard/people'
+      path: '/people'
+      fullPath: '/dashboard/people'
+      preLoaderRoute: typeof DashboardPeopleRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/platform': {
@@ -480,6 +568,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/dashboard/profile'
       preLoaderRoute: typeof DashboardProfileRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/reports': {
+      id: '/dashboard/reports'
+      path: '/reports'
+      fullPath: '/dashboard/reports'
+      preLoaderRoute: typeof DashboardReportsRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/system': {
@@ -503,19 +598,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAgentsConnectionsRouteImport
       parentRoute: typeof DashboardAgentsRouteRoute
     }
-    '/dashboard/esports/users': {
-      id: '/dashboard/esports/users'
-      path: '/users'
-      fullPath: '/dashboard/esports/users'
-      preLoaderRoute: typeof DashboardEsportsUsersRouteRouteImport
-      parentRoute: typeof DashboardEsportsRouteRoute
-    }
     '/dashboard/files/list': {
       id: '/dashboard/files/list'
       path: '/list'
       fullPath: '/dashboard/files/list'
       preLoaderRoute: typeof DashboardFilesListRouteImport
       parentRoute: typeof DashboardFilesRouteRoute
+    }
+    '/dashboard/people/members': {
+      id: '/dashboard/people/members'
+      path: '/members'
+      fullPath: '/dashboard/people/members'
+      preLoaderRoute: typeof DashboardPeopleMembersRouteRouteImport
+      parentRoute: typeof DashboardPeopleRouteRoute
+    }
+    '/dashboard/people/users': {
+      id: '/dashboard/people/users'
+      path: '/users'
+      fullPath: '/dashboard/people/users'
+      preLoaderRoute: typeof DashboardPeopleUsersRouteRouteImport
+      parentRoute: typeof DashboardPeopleRouteRoute
     }
     '/dashboard/platform/populations': {
       id: '/dashboard/platform/populations'
@@ -594,40 +696,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSystemUsersRouteImport
       parentRoute: typeof DashboardSystemRouteRoute
     }
-    '/dashboard/esports/activation-codes/': {
-      id: '/dashboard/esports/activation-codes/'
+    '/dashboard/assessment/game-config/': {
+      id: '/dashboard/assessment/game-config/'
+      path: '/game-config'
+      fullPath: '/dashboard/assessment/game-config/'
+      preLoaderRoute: typeof DashboardAssessmentGameConfigIndexRouteImport
+      parentRoute: typeof DashboardAssessmentRouteRoute
+    }
+    '/dashboard/channels/activation-codes/': {
+      id: '/dashboard/channels/activation-codes/'
       path: '/activation-codes'
-      fullPath: '/dashboard/esports/activation-codes/'
-      preLoaderRoute: typeof DashboardEsportsActivationCodesIndexRouteImport
-      parentRoute: typeof DashboardEsportsRouteRoute
+      fullPath: '/dashboard/channels/activation-codes/'
+      preLoaderRoute: typeof DashboardChannelsActivationCodesIndexRouteImport
+      parentRoute: typeof DashboardChannelsRouteRoute
     }
-    '/dashboard/esports/report-policies/': {
-      id: '/dashboard/esports/report-policies/'
-      path: '/report-policies'
-      fullPath: '/dashboard/esports/report-policies/'
-      preLoaderRoute: typeof DashboardEsportsReportPoliciesIndexRouteImport
-      parentRoute: typeof DashboardEsportsRouteRoute
-    }
-    '/dashboard/esports/tests/': {
-      id: '/dashboard/esports/tests/'
-      path: '/tests'
-      fullPath: '/dashboard/esports/tests/'
-      preLoaderRoute: typeof DashboardEsportsTestsIndexRouteImport
-      parentRoute: typeof DashboardEsportsRouteRoute
-    }
-    '/dashboard/esports/users/': {
-      id: '/dashboard/esports/users/'
+    '/dashboard/people/members/': {
+      id: '/dashboard/people/members/'
       path: '/'
-      fullPath: '/dashboard/esports/users/'
-      preLoaderRoute: typeof DashboardEsportsUsersIndexRouteImport
-      parentRoute: typeof DashboardEsportsUsersRouteRoute
+      fullPath: '/dashboard/people/members/'
+      preLoaderRoute: typeof DashboardPeopleMembersIndexRouteImport
+      parentRoute: typeof DashboardPeopleMembersRouteRoute
     }
-    '/dashboard/esports/users/$id': {
-      id: '/dashboard/esports/users/$id'
+    '/dashboard/people/members/$id': {
+      id: '/dashboard/people/members/$id'
       path: '/$id'
-      fullPath: '/dashboard/esports/users/$id'
-      preLoaderRoute: typeof DashboardEsportsUsersIdRouteImport
-      parentRoute: typeof DashboardEsportsUsersRouteRoute
+      fullPath: '/dashboard/people/members/$id'
+      preLoaderRoute: typeof DashboardPeopleMembersIdRouteImport
+      parentRoute: typeof DashboardPeopleMembersRouteRoute
+    }
+    '/dashboard/people/users/': {
+      id: '/dashboard/people/users/'
+      path: '/'
+      fullPath: '/dashboard/people/users/'
+      preLoaderRoute: typeof DashboardPeopleUsersIndexRouteImport
+      parentRoute: typeof DashboardPeopleUsersRouteRoute
+    }
+    '/dashboard/people/users/$id': {
+      id: '/dashboard/people/users/$id'
+      path: '/$id'
+      fullPath: '/dashboard/people/users/$id'
+      preLoaderRoute: typeof DashboardPeopleUsersIdRouteImport
+      parentRoute: typeof DashboardPeopleUsersRouteRoute
+    }
+    '/dashboard/reports/report-policies/': {
+      id: '/dashboard/reports/report-policies/'
+      path: '/report-policies'
+      fullPath: '/dashboard/reports/report-policies/'
+      preLoaderRoute: typeof DashboardReportsReportPoliciesIndexRouteImport
+      parentRoute: typeof DashboardReportsRouteRoute
     }
   }
 }
@@ -643,41 +759,34 @@ const DashboardAgentsRouteRouteChildren: DashboardAgentsRouteRouteChildren = {
 const DashboardAgentsRouteRouteWithChildren =
   DashboardAgentsRouteRoute._addFileChildren(DashboardAgentsRouteRouteChildren)
 
-interface DashboardEsportsUsersRouteRouteChildren {
-  DashboardEsportsUsersIdRoute: typeof DashboardEsportsUsersIdRoute
-  DashboardEsportsUsersIndexRoute: typeof DashboardEsportsUsersIndexRoute
+interface DashboardAssessmentRouteRouteChildren {
+  DashboardAssessmentGameConfigIndexRoute: typeof DashboardAssessmentGameConfigIndexRoute
 }
 
-const DashboardEsportsUsersRouteRouteChildren: DashboardEsportsUsersRouteRouteChildren =
+const DashboardAssessmentRouteRouteChildren: DashboardAssessmentRouteRouteChildren =
   {
-    DashboardEsportsUsersIdRoute: DashboardEsportsUsersIdRoute,
-    DashboardEsportsUsersIndexRoute: DashboardEsportsUsersIndexRoute,
+    DashboardAssessmentGameConfigIndexRoute:
+      DashboardAssessmentGameConfigIndexRoute,
   }
 
-const DashboardEsportsUsersRouteRouteWithChildren =
-  DashboardEsportsUsersRouteRoute._addFileChildren(
-    DashboardEsportsUsersRouteRouteChildren,
+const DashboardAssessmentRouteRouteWithChildren =
+  DashboardAssessmentRouteRoute._addFileChildren(
+    DashboardAssessmentRouteRouteChildren,
   )
 
-interface DashboardEsportsRouteRouteChildren {
-  DashboardEsportsUsersRouteRoute: typeof DashboardEsportsUsersRouteRouteWithChildren
-  DashboardEsportsActivationCodesIndexRoute: typeof DashboardEsportsActivationCodesIndexRoute
-  DashboardEsportsReportPoliciesIndexRoute: typeof DashboardEsportsReportPoliciesIndexRoute
-  DashboardEsportsTestsIndexRoute: typeof DashboardEsportsTestsIndexRoute
+interface DashboardChannelsRouteRouteChildren {
+  DashboardChannelsActivationCodesIndexRoute: typeof DashboardChannelsActivationCodesIndexRoute
 }
 
-const DashboardEsportsRouteRouteChildren: DashboardEsportsRouteRouteChildren = {
-  DashboardEsportsUsersRouteRoute: DashboardEsportsUsersRouteRouteWithChildren,
-  DashboardEsportsActivationCodesIndexRoute:
-    DashboardEsportsActivationCodesIndexRoute,
-  DashboardEsportsReportPoliciesIndexRoute:
-    DashboardEsportsReportPoliciesIndexRoute,
-  DashboardEsportsTestsIndexRoute: DashboardEsportsTestsIndexRoute,
-}
+const DashboardChannelsRouteRouteChildren: DashboardChannelsRouteRouteChildren =
+  {
+    DashboardChannelsActivationCodesIndexRoute:
+      DashboardChannelsActivationCodesIndexRoute,
+  }
 
-const DashboardEsportsRouteRouteWithChildren =
-  DashboardEsportsRouteRoute._addFileChildren(
-    DashboardEsportsRouteRouteChildren,
+const DashboardChannelsRouteRouteWithChildren =
+  DashboardChannelsRouteRoute._addFileChildren(
+    DashboardChannelsRouteRouteChildren,
   )
 
 interface DashboardFilesRouteRouteChildren {
@@ -690,6 +799,52 @@ const DashboardFilesRouteRouteChildren: DashboardFilesRouteRouteChildren = {
 
 const DashboardFilesRouteRouteWithChildren =
   DashboardFilesRouteRoute._addFileChildren(DashboardFilesRouteRouteChildren)
+
+interface DashboardPeopleMembersRouteRouteChildren {
+  DashboardPeopleMembersIdRoute: typeof DashboardPeopleMembersIdRoute
+  DashboardPeopleMembersIndexRoute: typeof DashboardPeopleMembersIndexRoute
+}
+
+const DashboardPeopleMembersRouteRouteChildren: DashboardPeopleMembersRouteRouteChildren =
+  {
+    DashboardPeopleMembersIdRoute: DashboardPeopleMembersIdRoute,
+    DashboardPeopleMembersIndexRoute: DashboardPeopleMembersIndexRoute,
+  }
+
+const DashboardPeopleMembersRouteRouteWithChildren =
+  DashboardPeopleMembersRouteRoute._addFileChildren(
+    DashboardPeopleMembersRouteRouteChildren,
+  )
+
+interface DashboardPeopleUsersRouteRouteChildren {
+  DashboardPeopleUsersIdRoute: typeof DashboardPeopleUsersIdRoute
+  DashboardPeopleUsersIndexRoute: typeof DashboardPeopleUsersIndexRoute
+}
+
+const DashboardPeopleUsersRouteRouteChildren: DashboardPeopleUsersRouteRouteChildren =
+  {
+    DashboardPeopleUsersIdRoute: DashboardPeopleUsersIdRoute,
+    DashboardPeopleUsersIndexRoute: DashboardPeopleUsersIndexRoute,
+  }
+
+const DashboardPeopleUsersRouteRouteWithChildren =
+  DashboardPeopleUsersRouteRoute._addFileChildren(
+    DashboardPeopleUsersRouteRouteChildren,
+  )
+
+interface DashboardPeopleRouteRouteChildren {
+  DashboardPeopleMembersRouteRoute: typeof DashboardPeopleMembersRouteRouteWithChildren
+  DashboardPeopleUsersRouteRoute: typeof DashboardPeopleUsersRouteRouteWithChildren
+}
+
+const DashboardPeopleRouteRouteChildren: DashboardPeopleRouteRouteChildren = {
+  DashboardPeopleMembersRouteRoute:
+    DashboardPeopleMembersRouteRouteWithChildren,
+  DashboardPeopleUsersRouteRoute: DashboardPeopleUsersRouteRouteWithChildren,
+}
+
+const DashboardPeopleRouteRouteWithChildren =
+  DashboardPeopleRouteRoute._addFileChildren(DashboardPeopleRouteRouteChildren)
 
 interface DashboardPlatformRouteRouteChildren {
   DashboardPlatformPopulationsRoute: typeof DashboardPlatformPopulationsRoute
@@ -724,6 +879,20 @@ const DashboardProfileRouteRouteWithChildren =
     DashboardProfileRouteRouteChildren,
   )
 
+interface DashboardReportsRouteRouteChildren {
+  DashboardReportsReportPoliciesIndexRoute: typeof DashboardReportsReportPoliciesIndexRoute
+}
+
+const DashboardReportsRouteRouteChildren: DashboardReportsRouteRouteChildren = {
+  DashboardReportsReportPoliciesIndexRoute:
+    DashboardReportsReportPoliciesIndexRoute,
+}
+
+const DashboardReportsRouteRouteWithChildren =
+  DashboardReportsRouteRoute._addFileChildren(
+    DashboardReportsRouteRouteChildren,
+  )
+
 interface DashboardSystemRouteRouteChildren {
   DashboardSystemAuditRoute: typeof DashboardSystemAuditRoute
   DashboardSystemDeptsRoute: typeof DashboardSystemDeptsRoute
@@ -747,20 +916,26 @@ const DashboardSystemRouteRouteWithChildren =
 
 interface DashboardRouteRouteChildren {
   DashboardAgentsRouteRoute: typeof DashboardAgentsRouteRouteWithChildren
-  DashboardEsportsRouteRoute: typeof DashboardEsportsRouteRouteWithChildren
+  DashboardAssessmentRouteRoute: typeof DashboardAssessmentRouteRouteWithChildren
+  DashboardChannelsRouteRoute: typeof DashboardChannelsRouteRouteWithChildren
   DashboardFilesRouteRoute: typeof DashboardFilesRouteRouteWithChildren
+  DashboardPeopleRouteRoute: typeof DashboardPeopleRouteRouteWithChildren
   DashboardPlatformRouteRoute: typeof DashboardPlatformRouteRouteWithChildren
   DashboardProfileRouteRoute: typeof DashboardProfileRouteRouteWithChildren
+  DashboardReportsRouteRoute: typeof DashboardReportsRouteRouteWithChildren
   DashboardSystemRouteRoute: typeof DashboardSystemRouteRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAgentsRouteRoute: DashboardAgentsRouteRouteWithChildren,
-  DashboardEsportsRouteRoute: DashboardEsportsRouteRouteWithChildren,
+  DashboardAssessmentRouteRoute: DashboardAssessmentRouteRouteWithChildren,
+  DashboardChannelsRouteRoute: DashboardChannelsRouteRouteWithChildren,
   DashboardFilesRouteRoute: DashboardFilesRouteRouteWithChildren,
+  DashboardPeopleRouteRoute: DashboardPeopleRouteRouteWithChildren,
   DashboardPlatformRouteRoute: DashboardPlatformRouteRouteWithChildren,
   DashboardProfileRouteRoute: DashboardProfileRouteRouteWithChildren,
+  DashboardReportsRouteRoute: DashboardReportsRouteRouteWithChildren,
   DashboardSystemRouteRoute: DashboardSystemRouteRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 }

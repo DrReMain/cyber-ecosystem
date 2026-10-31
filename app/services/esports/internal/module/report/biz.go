@@ -1251,9 +1251,11 @@ func (uc *ReportUC) unlockedFor(ctx context.Context, userID, recordID string) (b
 	} else if g != nil && (g.ExpiresAt == nil || g.ExpiresAt.After(now)) {
 		return true, nil
 	}
-	if g, err := uc.entRP.ByScope(ctx, userID, shared.ScopeMembership, nil); err != nil {
+	// Renewal stacks membership rows, so the window is a judgement
+	// (active status + live expiry over the set), not a single-row read.
+	if ok, err := uc.entRP.HasActiveMembership(ctx, userID); err != nil {
 		return false, err
-	} else if g != nil && g.ExpiresAt != nil && g.ExpiresAt.After(now) {
+	} else if ok {
 		return true, nil
 	}
 	if g, err := uc.entRP.ByScope(ctx, userID, shared.ScopeReportType, nil); err != nil {

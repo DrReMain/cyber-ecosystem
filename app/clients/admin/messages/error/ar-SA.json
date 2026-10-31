@@ -130,5 +130,7 @@
   "error_ESPORTS_REPORT_RECORD_NOT_FOUND": "لم يتم العثور على سجل الاختبار",
   "error_ESPORTS_REPORT_RECORD_NOT_OWNED": "يمكنك عرض تقاريرك فقط",
   "error_ESPORTS_REPORT_RECORD_INVALID": "سجل الاختبار غير صالح ولا يمكن إنشاء تقرير له",
-  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "يمكنك عرض نتائجك فقط"
+  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "يمكنك عرض نتائجك فقط",
+  "error_ESPORTS_SKU_KIND_INVALID": "هذا الـ SKU ليس خطة عضوية",
+  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "لا توجد عضوية سارية"
 }

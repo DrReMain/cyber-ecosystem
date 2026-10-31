@@ -21,16 +21,18 @@ import (
 type EntitleAdminService struct {
 	esportspb.UnimplementedEntitleAdminServiceServer
 
-	log       *slog.Logger
-	codeUC    *entitle.CodeUC
-	entitleUC *entitle.EntitleUC
+	log          *slog.Logger
+	codeUC       *entitle.CodeUC
+	entitleUC    *entitle.EntitleUC
+	membershipUC *MembershipUC
 }
 
-func NewEntitleAdminService(logger *slog.Logger, codeUC *entitle.CodeUC, entitleUC *entitle.EntitleUC) *EntitleAdminService {
+func NewEntitleAdminService(logger *slog.Logger, codeUC *entitle.CodeUC, entitleUC *entitle.EntitleUC, membershipUC *MembershipUC) *EntitleAdminService {
 	return &EntitleAdminService{
-		log:       logger.With("module", "module/entitleadmin_service"),
-		codeUC:    codeUC,
-		entitleUC: entitleUC,
+		log:          logger.With("module", "module/entitleadmin_service"),
+		codeUC:       codeUC,
+		entitleUC:    entitleUC,
+		membershipUC: membershipUC,
 	}
 }
 
@@ -93,6 +95,81 @@ func (s *EntitleAdminService) ListReportAccessPolicies(ctx context.Context, _ *e
 		policies = append(policies, row)
 	}
 	return &esportspb.ListReportAccessPoliciesResponse{Policies: policies}, nil
+}
+
+func (s *EntitleAdminService) GrantMembership(ctx context.Context, req *esportspb.GrantMembershipRequest) (*esportspb.GrantMembershipResponse, error) {
+	facts, err := s.membershipUC.Grant(ctx, req.GetUserId(), req.GetSkuCode())
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.GrantMembershipResponse{Membership: membershipSummaryPB(facts)}, nil
+}
+
+func (s *EntitleAdminService) TerminateMembership(ctx context.Context, req *esportspb.TerminateMembershipRequest) (*esportspb.TerminateMembershipResponse, error) {
+	facts, err := s.membershipUC.Terminate(ctx, req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.TerminateMembershipResponse{Membership: membershipSummaryPB(facts)}, nil
+}
+
+func (s *EntitleAdminService) ListMemberships(ctx context.Context, req *esportspb.ListMembershipsRequest) (*esportspb.ListMembershipsResponse, error) {
+	in := &ListMembershipsIn{PageRequest: req.GetPage()}
+	if req.GetStatus() != esportspb.MembershipStatus_MEMBERSHIP_STATUS_UNSPECIFIED {
+		v := statusFromPB(req.GetStatus())
+		in.Status = &v
+	}
+	if req.GetSource() != esportspb.MembershipSource_MEMBERSHIP_SOURCE_UNSPECIFIED {
+		v := sourceFromPB(req.GetSource())
+		in.Source = &v
+	}
+	out, err := s.membershipUC.List(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	resp := &esportspb.ListMembershipsResponse{
+		Page:              out.PageResponse,
+		Memberships:       make([]*esportspb.MembershipSummary, 0, len(out.Rows)),
+		TotalCount:        utils.Int32W(utils.ConvNum[int32, int](out.Counts.Total)),
+		ActiveCount:       utils.Int32W(utils.ConvNum[int32, int](out.Counts.Active)),
+		ExpiringSoonCount: utils.Int32W(utils.ConvNum[int32, int](out.Counts.ExpiringSoon)),
+		ExpiredCount:      utils.Int32W(utils.ConvNum[int32, int](out.Counts.Expired)),
+	}
+	for _, r := range out.Rows {
+		summary := membershipSummaryPB(&r.MembershipFacts)
+		summary.Nickname = utils.Wrap(r.Nickname, utils.StringW)
+		summary.PhoneMasked = utils.Wrap(r.PhoneMasked, utils.StringW)
+		resp.Memberships = append(resp.Memberships, summary)
+	}
+	return resp, nil
+}
+
+func (s *EntitleAdminService) GetMembership(ctx context.Context, req *esportspb.GetMembershipRequest) (*esportspb.GetMembershipResponse, error) {
+	detail, err := s.membershipUC.Get(ctx, req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+	resp := &esportspb.GetMembershipResponse{
+		Membership:  membershipSummaryPB(detail.Facts),
+		Periods:     make([]*esportspb.MembershipPeriod, 0, len(detail.History)),
+		AgeBand:     utils.Wrap(detail.Identity.AgeBand, utils.StringW),
+		Sex:         sexToPB(detail.Identity.Sex),
+		WechatBound: utils.BoolW(detail.Identity.WechatBound),
+	}
+	// The header's identity facts ride the summary too — the list and the
+	// detail read the same shape, one consumer each side.
+	resp.Membership.Nickname = utils.Wrap(detail.Identity.Nickname, utils.StringW)
+	resp.Membership.PhoneMasked = utils.Wrap(detail.Identity.PhoneMasked, utils.StringW)
+	for _, h := range detail.History {
+		resp.Periods = append(resp.Periods, &esportspb.MembershipPeriod{
+			GrantedAt: utils.ToTimestamp(&h.GrantedAt),
+			ExpiresAt: utils.ToTimestamp(&h.ExpiresAt),
+			Source:    sourceToPB(h.Source),
+			SourceRef: utils.StringW(h.SourceRef),
+			Status:    statusToPB(h.Status),
+		})
+	}
+	return resp, nil
 }
 
 func (s *EntitleAdminService) RegisterGRPC(srv *grpc.Server) {
@@ -174,4 +251,87 @@ func codePB(r *entitle.ActivationCode) *esportspb.ActivationCode {
 	}
 	row.Code = utils.StringW(r.Code)
 	return row
+}
+
+func membershipSummaryPB(f *MembershipFacts) *esportspb.MembershipSummary {
+	summary := &esportspb.MembershipSummary{
+		UserId:      utils.StringW(f.UserID),
+		GrantedAt:   utils.ToTimestamp(&f.GrantedAt),
+		ExpiresAt:   utils.ToTimestamp(&f.ExpiresAt),
+		Status:      statusToPB(f.Status),
+		Source:      sourceToPB(f.Source),
+		PeriodCount: utils.Int32W(utils.ConvNum[int32, int](f.PeriodCount)),
+		UnlockCount: utils.Int32W(utils.ConvNum[int32, int](f.UnlockCount)),
+	}
+	if f.DaysLeft != nil {
+		summary.DaysLeft = utils.Int32W(utils.ConvNum[int32, int](*f.DaysLeft))
+	}
+	return summary
+}
+
+func statusToPB(s string) esportspb.MembershipStatus {
+	switch s {
+	case displayActive:
+		return esportspb.MembershipStatus_MEMBERSHIP_STATUS_ACTIVE
+	case displayExpiringSoon:
+		return esportspb.MembershipStatus_MEMBERSHIP_STATUS_EXPIRING_SOON
+	case displayExpired:
+		return esportspb.MembershipStatus_MEMBERSHIP_STATUS_EXPIRED
+	case displayTerminated:
+		return esportspb.MembershipStatus_MEMBERSHIP_STATUS_TERMINATED
+	}
+	return esportspb.MembershipStatus_MEMBERSHIP_STATUS_UNSPECIFIED
+}
+
+func statusFromPB(s esportspb.MembershipStatus) string {
+	switch s {
+	case esportspb.MembershipStatus_MEMBERSHIP_STATUS_ACTIVE:
+		return displayActive
+	case esportspb.MembershipStatus_MEMBERSHIP_STATUS_EXPIRING_SOON:
+		return displayExpiringSoon
+	case esportspb.MembershipStatus_MEMBERSHIP_STATUS_EXPIRED:
+		return displayExpired
+	case esportspb.MembershipStatus_MEMBERSHIP_STATUS_TERMINATED:
+		return displayTerminated
+	}
+	return ""
+}
+
+func sourceToPB(s string) esportspb.MembershipSource {
+	switch s {
+	case sourceManual:
+		return esportspb.MembershipSource_MEMBERSHIP_SOURCE_MANUAL
+	case sourceLegacyCode:
+		return esportspb.MembershipSource_MEMBERSHIP_SOURCE_LEGACY_CODE
+	case sourceOrder:
+		return esportspb.MembershipSource_MEMBERSHIP_SOURCE_ORDER
+	}
+	return esportspb.MembershipSource_MEMBERSHIP_SOURCE_UNSPECIFIED
+}
+
+func sourceFromPB(s esportspb.MembershipSource) string {
+	switch s {
+	case esportspb.MembershipSource_MEMBERSHIP_SOURCE_MANUAL:
+		return sourceManual
+	case esportspb.MembershipSource_MEMBERSHIP_SOURCE_LEGACY_CODE:
+		return sourceLegacyCode
+	case esportspb.MembershipSource_MEMBERSHIP_SOURCE_ORDER:
+		return sourceOrder
+	}
+	return ""
+}
+
+func sexToPB(sex *string) esportspb.ProfileSex {
+	if sex == nil {
+		return esportspb.ProfileSex_PROFILE_SEX_UNSPECIFIED
+	}
+	switch *sex {
+	case shared.SexMale:
+		return esportspb.ProfileSex_PROFILE_SEX_MALE
+	case shared.SexFemale:
+		return esportspb.ProfileSex_PROFILE_SEX_FEMALE
+	case shared.SexUndetermined:
+		return esportspb.ProfileSex_PROFILE_SEX_UNDETERMINED
+	}
+	return esportspb.ProfileSex_PROFILE_SEX_UNSPECIFIED
 }

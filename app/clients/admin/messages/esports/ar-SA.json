@@ -1,6 +1,9 @@
 {
-  "esports_title": "الرياضات الإلكترونية",
   "esports_report_type_cognitive": "تقرير معرفي",
   "esports_report_type_career": "تقرير مهني",
-  "esports_report_type_school": "تقرير مدرسي"
+  "esports_report_type_school": "تقرير مدرسي",
+  "esports_people_title": "المستخدمون والعضويات",
+  "esports_assessment_title": "بنك الأسئلة والاختبارات",
+  "esports_reports_title": "التقارير والمحتوى",
+  "esports_channels_title": "القنوات والترويج"
 }

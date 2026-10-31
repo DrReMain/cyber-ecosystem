@@ -18,6 +18,17 @@ const (
 )
 
 const (
+	SourceManual     = "manual"       // the operator grant marker — a membership row born without an order, twin of the settle path's order number
+	SourceMembership = "membership"   // the member-window trial grant marker — the E8 hook writes it and the lifecycle count reads it back
+	SourceLegacyCode = "legacy_code:" // the migration prefix reserved for membership rows carried over from a legacy activation code
+
+	StatusActive     = "active"     // the ledger's single mutable fact: everything but terminated; expiry itself never becomes a status
+	StatusTerminated = "terminated" // the terminate action's word — access falls back, history and permanent unlocks stay
+)
+
+const ExpiringSoonDays = 7 // the product's "about to expire" window the list's third tab reads — a ruling with copy implications, not an operator dial
+
+const (
 	ReportCognitive = "cognitive" // the report-family and policy vocabulary: entitle judges by it, entitleadmin sets it — two modules, one home, or operator config drifts from judgement
 	ReportCareer    = "career"
 	ReportSchool    = "school"

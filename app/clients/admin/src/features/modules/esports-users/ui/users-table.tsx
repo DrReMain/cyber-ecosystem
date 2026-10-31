@@ -82,7 +82,7 @@ export function UsersTable({
         (_, row) => (
           <Space size={0}>
             <ActionIconButton
-              href={`/dashboard/esports/users/${row.userId}`}
+              href={`/dashboard/people/users/${row.userId}`}
               icon={Eye}
               label={m.esports_users_act_detail()}
             />

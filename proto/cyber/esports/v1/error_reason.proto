@@ -42,12 +42,14 @@ enum Esports {
   ESPORTS_ORDER_SCOPE_ALREADY_GRANTED = 6144 [(.errors.code) = 400];
   ESPORTS_ORDER_CHANNEL_INVALID = 6145 [(.errors.code) = 400];
   ESPORTS_ORDER_STATE_CONFLICT = 6146 [(.errors.code) = 400];
+  ESPORTS_SKU_KIND_INVALID = 6147 [(.errors.code) = 400];
 
   // 615x: activation code & entitlement
   ESPORTS_ACTIVATION_CODE_INVALID = 6150 [(.errors.code) = 400];
   ESPORTS_ACTIVATION_CODE_EXPIRED = 6151 [(.errors.code) = 400];
   ESPORTS_ACTIVATION_CODE_EXHAUSTED = 6152 [(.errors.code) = 400];
   ESPORTS_REPORT_POLICY_NOT_READY = 6153 [(.errors.code) = 400];
+  ESPORTS_MEMBERSHIP_NOT_FOUND = 6154 [(.errors.code) = 404];
 
   // 616x: report
   ESPORTS_REPORT_RECORD_NOT_FOUND = 6160 [(.errors.code) = 404];

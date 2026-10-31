@@ -26,6 +26,11 @@ import (
 	"cyber-ecosystem/app/services/system/internal/shared"
 )
 
+const (
+	rosterKindSMS      = "sms"       // the auth providers' registry values, kept local rather than importing that module's privates
+	rosterKindWechatMP = "wechat_mp" // ditto
+)
+
 // Repo ----------------------------------------------------------------------------------------------------------------
 
 type userRP struct {
@@ -151,10 +156,29 @@ func (rp *userRP) ListByPopulation(ctx context.Context, in *UserListIn) (*UserLi
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return &UserListOut{
+	out := &UserListOut{
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
 		List:         utils.SliceMap(us, mapUser),
-	}, nil
+	}
+	rp.hydrateIdentity(ctx, out.List)
+	return out, nil
+}
+
+func (rp *userRP) ListCredentialsByUsers(ctx context.Context, userIDs []string) ([]*Credential, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
+	rows, err := rp.Platform.GetClient(ctx).Credential.Query().
+		Where(credential.UserIDIn(userIDs...)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := make([]*Credential, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, &Credential{Kind: row.Kind, Identifier: row.Identifier, UserID: row.UserID})
+	}
+	return out, nil
 }
 
 func (rp *userRP) FindByAccount(ctx context.Context, account string) (*User, error) {
@@ -422,6 +446,43 @@ func (rp *userRP) RevokeUserSessions(ctx context.Context, userID string) error {
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
+
+func (rp *userRP) hydrateIdentity(ctx context.Context, users []*User) {
+	// Folds the credential registry's two operator-facing facts onto a
+	// roster page: the masked phone of the sms credential and whether a
+	// wechat_mp credential exists. Absent credentials stay absent — a
+	// member without a phone bound shows no number, never an error.
+	if len(users) == 0 {
+		return
+	}
+	ids := make([]string, 0, len(users))
+	for _, u := range users {
+		ids = append(ids, u.ID)
+	}
+	creds, err := rp.ListCredentialsByUsers(ctx, ids)
+	if err != nil {
+		// Best-effort by design: the roster row is the truth this face
+		// owes; identity projections failing to load is a degraded read,
+		// not a failed one.
+		rp.Log.Warn("roster identity hydration failed", "err", err)
+		return
+	}
+	byUser := make(map[string][]*Credential, len(users))
+	for _, c := range creds {
+		byUser[c.UserID] = append(byUser[c.UserID], c)
+	}
+	for _, u := range users {
+		for _, c := range byUser[u.ID] {
+			switch c.Kind {
+			case rosterKindSMS:
+				masked := utils.MaskPhone(c.Identifier)
+				u.PhoneMasked = &masked
+			case rosterKindWechatMP:
+				u.WechatBound = true
+			}
+		}
+	}
+}
 
 func seatNarrowing(tenantID string) predicate.User {
 	return predicate.User(func(s *entsql.Selector) {

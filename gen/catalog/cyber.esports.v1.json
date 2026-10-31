@@ -20,6 +20,32 @@
         "datascope": false
       },
       {
+        "name": "GetMembership",
+        "full_name": "cyber.esports.v1.EntitleAdminService.GetMembership",
+        "request_name": "GetMembershipRequest",
+        "request_full_name": "cyber.esports.v1.GetMembershipRequest",
+        "response_name": "GetMembershipResponse",
+        "response_full_name": "cyber.esports.v1.GetMembershipResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/memberships/{user_id}",
+        "comment": "会员详情",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "GrantMembership",
+        "full_name": "cyber.esports.v1.EntitleAdminService.GrantMembership",
+        "request_name": "GrantMembershipRequest",
+        "request_full_name": "cyber.esports.v1.GrantMembershipRequest",
+        "response_name": "GrantMembershipResponse",
+        "response_full_name": "cyber.esports.v1.GrantMembershipResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/memberships/grant",
+        "comment": "手动开通/续费会员",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
         "name": "ListActivationCodes",
         "full_name": "cyber.esports.v1.EntitleAdminService.ListActivationCodes",
         "request_name": "ListActivationCodesRequest",
@@ -29,6 +55,19 @@
         "http_method": "GET",
         "http_path": "/api/v1/esports/activation-codes",
         "comment": "激活码列表",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListMemberships",
+        "full_name": "cyber.esports.v1.EntitleAdminService.ListMemberships",
+        "request_name": "ListMembershipsRequest",
+        "request_full_name": "cyber.esports.v1.ListMembershipsRequest",
+        "response_name": "ListMembershipsResponse",
+        "response_full_name": "cyber.esports.v1.ListMembershipsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/memberships",
+        "comment": "会员管理列表",
         "access": "ADMIN",
         "datascope": false
       },
@@ -55,6 +94,19 @@
         "http_method": "POST",
         "http_path": "/api/v1/esports/report-access-policy",
         "comment": "设置报告访问策略",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "TerminateMembership",
+        "full_name": "cyber.esports.v1.EntitleAdminService.TerminateMembership",
+        "request_name": "TerminateMembershipRequest",
+        "request_full_name": "cyber.esports.v1.TerminateMembershipRequest",
+        "response_name": "TerminateMembershipResponse",
+        "response_full_name": "cyber.esports.v1.TerminateMembershipResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/memberships/{user_id}/terminate",
+        "comment": "终止会员",
         "access": "ADMIN",
         "datascope": false
       }

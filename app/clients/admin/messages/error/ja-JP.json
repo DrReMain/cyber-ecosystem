@@ -130,5 +130,7 @@
   "error_ESPORTS_REPORT_RECORD_NOT_FOUND": "テスト記録が見つかりません",
   "error_ESPORTS_REPORT_RECORD_NOT_OWNED": "自分のレポートのみ閲覧できます",
   "error_ESPORTS_REPORT_RECORD_INVALID": "このテスト記録は無効のため、レポートを生成できません",
-  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "自分の成績のみ閲覧できます"
+  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "自分の成績のみ閲覧できます",
+  "error_ESPORTS_SKU_KIND_INVALID": "このSKUは会員プランではありません",
+  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "有効な会員記録が見つかりません"
 }

@@ -123,6 +123,12 @@ message User {
   repeated string roles = 6;
   google.protobuf.BoolValue enabled = 7;
   google.protobuf.StringValue avatar = 8;
+  // The seat's phone credential, middle-masked (153****0101) — the number
+  // operators recognize members by; the raw digit string never crosses
+  // this face. Null when no phone credential is bound.
+  google.protobuf.StringValue phone_masked = 9;
+  // Whether a wechat credential is bound — the identity header's badge.
+  google.protobuf.BoolValue wechat_bound = 10;
 }
 
 // create

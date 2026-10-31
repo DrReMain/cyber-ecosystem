@@ -150,13 +150,15 @@ func (s *UserService) BatchGetUsers(ctx context.Context, in *systempb.BatchGetUs
 
 func toProtoUser(a *User) *systempb.User {
 	return &systempb.User{
-		Id:        utils.StringW(a.ID),
-		CreatedAt: utils.ToTimestamp(&a.CreatedAt),
-		UpdatedAt: utils.ToTimestamp(&a.UpdatedAt),
-		Account:   utils.Wrap(a.Account, utils.StringW),
-		DeptId:    utils.Wrap(a.DeptID, utils.StringW),
-		Avatar:    utils.Wrap(a.Avatar, utils.StringW),
-		Roles:     a.Roles,
-		Enabled:   utils.BoolW(a.Enabled),
+		Id:          utils.StringW(a.ID),
+		CreatedAt:   utils.ToTimestamp(&a.CreatedAt),
+		UpdatedAt:   utils.ToTimestamp(&a.UpdatedAt),
+		Account:     utils.Wrap(a.Account, utils.StringW),
+		DeptId:      utils.Wrap(a.DeptID, utils.StringW),
+		Avatar:      utils.Wrap(a.Avatar, utils.StringW),
+		Roles:       a.Roles,
+		Enabled:     utils.BoolW(a.Enabled),
+		PhoneMasked: utils.Wrap(a.PhoneMasked, utils.StringW),
+		WechatBound: utils.BoolW(a.WechatBound),
 	}
 }

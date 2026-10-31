@@ -1,6 +1,9 @@
 {
-  "esports_title": "Esports",
   "esports_report_type_cognitive": "Cognitive report",
   "esports_report_type_career": "Career report",
-  "esports_report_type_school": "School report"
+  "esports_report_type_school": "School report",
+  "esports_people_title": "Users & Memberships",
+  "esports_assessment_title": "Question Bank & Tests",
+  "esports_reports_title": "Reports & Content",
+  "esports_channels_title": "Channels & Promotion"
 }
