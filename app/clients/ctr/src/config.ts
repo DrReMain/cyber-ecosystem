@@ -2,14 +2,14 @@ import type { SitemapRoute } from "#/domains/seo";
 
 // ─── App constants ──────────────────────────────────────────────────────────
 
-export const APP_NAME = "CYBER ESPORTS" as const;
+// The prototype's own brand word (PM-2 ruled 11-01: restore "ctr" verbatim).
+export const APP_NAME = "ctr" as const;
 export const HOME_PATH = "/" as const;
 
 // ─── COMMON helper ────────────────────────────────────────────────────────────────────
 // Router-level titles are plain strings; this keeps the "Page · App" convention in one place.
 export function pageTitle(page: string): string {
-  // Brand-first composition — every prototype page titles itself "ctr · <page>";
-  // the brand word itself rides APP_NAME and stays a PM-2 question.
+  // Brand-first composition — every prototype page titles itself "ctr · <page>".
   return `${APP_NAME} · ${page}`;
 }
 
