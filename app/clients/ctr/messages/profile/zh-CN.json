@@ -56,6 +56,7 @@
   "profile_stat_top": "前 {pct}%",
   "profile_stat_best_v": "{score} 分",
   "profile_about": "关于我们",
+  "profile_settings_language": "语言",
   "profile_about_icp": "备案信息",
   "profile_setup_title": "完善资料",
   "profile_setup_step": "{n} / {total}",

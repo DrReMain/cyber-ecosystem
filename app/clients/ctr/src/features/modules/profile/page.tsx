@@ -12,6 +12,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { LocaleSelect } from "#/domains/i18n";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { TabBar } from "#/features/app/tabbar";
 import { clearWechatProfile } from "#/features/app/wechat-profile";
@@ -190,6 +191,16 @@ export function ProfilePage() {
             >
               {m.profile_center_view()}
             </button>
+          </div>
+        </div>
+
+        {/* The standing language row (D-AT): the profile's settings entry
+            is the ready LocaleSelect mounted as-is — the prototype carries
+            no settings block, the ruling defines this row. */}
+        <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]">
+          <div className="flex items-center justify-between">
+            <span className="text-ink text-[13px] font-bold">{m.profile_settings_language()}</span>
+            <LocaleSelect />
           </div>
         </div>
 

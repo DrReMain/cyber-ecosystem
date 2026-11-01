@@ -56,6 +56,7 @@
   "profile_stat_top": "Top {pct}%",
   "profile_stat_best_v": "{score} pts",
   "profile_about": "About us",
+  "profile_settings_language": "Language",
   "profile_about_icp": "ICP filing",
   "profile_setup_title": "Set up profile",
   "profile_setup_step": "{n} / {total}",
