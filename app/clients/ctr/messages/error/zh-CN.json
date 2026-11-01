@@ -131,5 +131,11 @@
   "error_ESPORTS_REPORT_RECORD_NOT_FOUND": "测评记录不存在",
   "error_ESPORTS_REPORT_RECORD_NOT_OWNED": "只能查看自己的测评报告",
   "error_ESPORTS_REPORT_RECORD_INVALID": "该测评记录无效，无法生成报告",
-  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "只能查看自己的测评成绩"
+  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "只能查看自己的测评成绩",
+  "error_ESPORTS_AGREEMENT_VERSION_NOT_FOUND": "协议版本不存在",
+  "error_ESPORTS_AGREEMENT_VERSION_IS_CURRENT": "当前生效版本不能删除，请先切换到其他版本",
+  "error_ESPORTS_AGREEMENT_VERSION_DUPLICATE": "该版本号已存在",
+  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "协议版本未配置，请联系运营",
+  "error_ESPORTS_SKU_KIND_INVALID": "该 SKU 不是会员档",
+  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "未找到有效会员记录"
 }

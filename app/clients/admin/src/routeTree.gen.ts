@@ -17,6 +17,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAgentsRouteRouteImport } from './routes/dashboard/agents/route'
 import { Route as DashboardAssessmentRouteRouteImport } from './routes/dashboard/assessment/route'
 import { Route as DashboardChannelsRouteRouteImport } from './routes/dashboard/channels/route'
+import { Route as DashboardComplianceRouteRouteImport } from './routes/dashboard/compliance/route'
 import { Route as DashboardFilesRouteRouteImport } from './routes/dashboard/files/route'
 import { Route as DashboardPeopleRouteRouteImport } from './routes/dashboard/people/route'
 import { Route as DashboardPlatformRouteRouteImport } from './routes/dashboard/platform/route'
@@ -45,6 +46,8 @@ import { Route as DashboardSystemUsersRouteImport } from './routes/dashboard/sys
 import { Route as DashboardAssessmentGameConfigIndexRouteImport } from './routes/dashboard/assessment/game-config/index'
 import { Route as DashboardChannelsActivationCodesIndexRouteImport } from './routes/dashboard/channels/activation-codes/index'
 import { Route as DashboardChannelsActivationCodesBatchNoRouteImport } from './routes/dashboard/channels/activation-codes/$batchNo'
+import { Route as DashboardComplianceAgreementConsentsIndexRouteImport } from './routes/dashboard/compliance/agreement-consents/index'
+import { Route as DashboardComplianceAgreementVersionsIndexRouteImport } from './routes/dashboard/compliance/agreement-versions/index'
 import { Route as DashboardPeopleMembersIndexRouteImport } from './routes/dashboard/people/members/index'
 import { Route as DashboardPeopleMembersIdRouteImport } from './routes/dashboard/people/members/$id'
 import { Route as DashboardPeopleUsersIndexRouteImport } from './routes/dashboard/people/users/index'
@@ -95,6 +98,12 @@ const DashboardChannelsRouteRoute = DashboardChannelsRouteRouteImport.update({
   path: '/channels',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardComplianceRouteRoute =
+  DashboardComplianceRouteRouteImport.update({
+    id: '/compliance',
+    path: '/compliance',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const DashboardFilesRouteRoute = DashboardFilesRouteRouteImport.update({
   id: '/files',
   path: '/files',
@@ -246,6 +255,18 @@ const DashboardChannelsActivationCodesBatchNoRoute =
     path: '/activation-codes/$batchNo',
     getParentRoute: () => DashboardChannelsRouteRoute,
   } as any)
+const DashboardComplianceAgreementConsentsIndexRoute =
+  DashboardComplianceAgreementConsentsIndexRouteImport.update({
+    id: '/agreement-consents/',
+    path: '/agreement-consents/',
+    getParentRoute: () => DashboardComplianceRouteRoute,
+  } as any)
+const DashboardComplianceAgreementVersionsIndexRoute =
+  DashboardComplianceAgreementVersionsIndexRouteImport.update({
+    id: '/agreement-versions/',
+    path: '/agreement-versions/',
+    getParentRoute: () => DashboardComplianceRouteRoute,
+  } as any)
 const DashboardPeopleMembersIndexRoute =
   DashboardPeopleMembersIndexRouteImport.update({
     id: '/',
@@ -302,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
   '/dashboard/assessment': typeof DashboardAssessmentRouteRouteWithChildren
   '/dashboard/channels': typeof DashboardChannelsRouteRouteWithChildren
+  '/dashboard/compliance': typeof DashboardComplianceRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
@@ -334,6 +356,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
   '/dashboard/assessment/game-config/': typeof DashboardAssessmentGameConfigIndexRoute
   '/dashboard/channels/activation-codes/': typeof DashboardChannelsActivationCodesIndexRoute
+  '/dashboard/compliance/agreement-consents/': typeof DashboardComplianceAgreementConsentsIndexRoute
+  '/dashboard/compliance/agreement-versions/': typeof DashboardComplianceAgreementVersionsIndexRoute
   '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
   '/dashboard/pricing/orders/': typeof DashboardPricingOrdersIndexRoute
@@ -347,6 +371,7 @@ export interface FileRoutesByTo {
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
   '/dashboard/assessment': typeof DashboardAssessmentRouteRouteWithChildren
   '/dashboard/channels': typeof DashboardChannelsRouteRouteWithChildren
+  '/dashboard/compliance': typeof DashboardComplianceRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
@@ -374,6 +399,8 @@ export interface FileRoutesByTo {
   '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
   '/dashboard/assessment/game-config': typeof DashboardAssessmentGameConfigIndexRoute
   '/dashboard/channels/activation-codes': typeof DashboardChannelsActivationCodesIndexRoute
+  '/dashboard/compliance/agreement-consents': typeof DashboardComplianceAgreementConsentsIndexRoute
+  '/dashboard/compliance/agreement-versions': typeof DashboardComplianceAgreementVersionsIndexRoute
   '/dashboard/people/members': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users': typeof DashboardPeopleUsersIndexRoute
   '/dashboard/pricing/orders': typeof DashboardPricingOrdersIndexRoute
@@ -389,6 +416,7 @@ export interface FileRoutesById {
   '/dashboard/agents': typeof DashboardAgentsRouteRouteWithChildren
   '/dashboard/assessment': typeof DashboardAssessmentRouteRouteWithChildren
   '/dashboard/channels': typeof DashboardChannelsRouteRouteWithChildren
+  '/dashboard/compliance': typeof DashboardComplianceRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
@@ -421,6 +449,8 @@ export interface FileRoutesById {
   '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
   '/dashboard/assessment/game-config/': typeof DashboardAssessmentGameConfigIndexRoute
   '/dashboard/channels/activation-codes/': typeof DashboardChannelsActivationCodesIndexRoute
+  '/dashboard/compliance/agreement-consents/': typeof DashboardComplianceAgreementConsentsIndexRoute
+  '/dashboard/compliance/agreement-versions/': typeof DashboardComplianceAgreementVersionsIndexRoute
   '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
   '/dashboard/pricing/orders/': typeof DashboardPricingOrdersIndexRoute
@@ -437,6 +467,7 @@ export interface FileRouteTypes {
     | '/dashboard/agents'
     | '/dashboard/assessment'
     | '/dashboard/channels'
+    | '/dashboard/compliance'
     | '/dashboard/files'
     | '/dashboard/people'
     | '/dashboard/platform'
@@ -469,6 +500,8 @@ export interface FileRouteTypes {
     | '/dashboard/pricing/orders/$id'
     | '/dashboard/assessment/game-config/'
     | '/dashboard/channels/activation-codes/'
+    | '/dashboard/compliance/agreement-consents/'
+    | '/dashboard/compliance/agreement-versions/'
     | '/dashboard/people/members/'
     | '/dashboard/people/users/'
     | '/dashboard/pricing/orders/'
@@ -482,6 +515,7 @@ export interface FileRouteTypes {
     | '/dashboard/agents'
     | '/dashboard/assessment'
     | '/dashboard/channels'
+    | '/dashboard/compliance'
     | '/dashboard/files'
     | '/dashboard/people'
     | '/dashboard/platform'
@@ -509,6 +543,8 @@ export interface FileRouteTypes {
     | '/dashboard/pricing/orders/$id'
     | '/dashboard/assessment/game-config'
     | '/dashboard/channels/activation-codes'
+    | '/dashboard/compliance/agreement-consents'
+    | '/dashboard/compliance/agreement-versions'
     | '/dashboard/people/members'
     | '/dashboard/people/users'
     | '/dashboard/pricing/orders'
@@ -523,6 +559,7 @@ export interface FileRouteTypes {
     | '/dashboard/agents'
     | '/dashboard/assessment'
     | '/dashboard/channels'
+    | '/dashboard/compliance'
     | '/dashboard/files'
     | '/dashboard/people'
     | '/dashboard/platform'
@@ -555,6 +592,8 @@ export interface FileRouteTypes {
     | '/dashboard/pricing/orders/$id'
     | '/dashboard/assessment/game-config/'
     | '/dashboard/channels/activation-codes/'
+    | '/dashboard/compliance/agreement-consents/'
+    | '/dashboard/compliance/agreement-versions/'
     | '/dashboard/people/members/'
     | '/dashboard/people/users/'
     | '/dashboard/pricing/orders/'
@@ -626,6 +665,13 @@ declare module '@tanstack/react-router' {
       path: '/channels'
       fullPath: '/dashboard/channels'
       preLoaderRoute: typeof DashboardChannelsRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/compliance': {
+      id: '/dashboard/compliance'
+      path: '/compliance'
+      fullPath: '/dashboard/compliance'
+      preLoaderRoute: typeof DashboardComplianceRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/files': {
@@ -824,6 +870,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardChannelsActivationCodesBatchNoRouteImport
       parentRoute: typeof DashboardChannelsRouteRoute
     }
+    '/dashboard/compliance/agreement-consents/': {
+      id: '/dashboard/compliance/agreement-consents/'
+      path: '/agreement-consents'
+      fullPath: '/dashboard/compliance/agreement-consents/'
+      preLoaderRoute: typeof DashboardComplianceAgreementConsentsIndexRouteImport
+      parentRoute: typeof DashboardComplianceRouteRoute
+    }
+    '/dashboard/compliance/agreement-versions/': {
+      id: '/dashboard/compliance/agreement-versions/'
+      path: '/agreement-versions'
+      fullPath: '/dashboard/compliance/agreement-versions/'
+      preLoaderRoute: typeof DashboardComplianceAgreementVersionsIndexRouteImport
+      parentRoute: typeof DashboardComplianceRouteRoute
+    }
     '/dashboard/people/members/': {
       id: '/dashboard/people/members/'
       path: '/'
@@ -925,6 +985,24 @@ const DashboardChannelsRouteRouteChildren: DashboardChannelsRouteRouteChildren =
 const DashboardChannelsRouteRouteWithChildren =
   DashboardChannelsRouteRoute._addFileChildren(
     DashboardChannelsRouteRouteChildren,
+  )
+
+interface DashboardComplianceRouteRouteChildren {
+  DashboardComplianceAgreementConsentsIndexRoute: typeof DashboardComplianceAgreementConsentsIndexRoute
+  DashboardComplianceAgreementVersionsIndexRoute: typeof DashboardComplianceAgreementVersionsIndexRoute
+}
+
+const DashboardComplianceRouteRouteChildren: DashboardComplianceRouteRouteChildren =
+  {
+    DashboardComplianceAgreementConsentsIndexRoute:
+      DashboardComplianceAgreementConsentsIndexRoute,
+    DashboardComplianceAgreementVersionsIndexRoute:
+      DashboardComplianceAgreementVersionsIndexRoute,
+  }
+
+const DashboardComplianceRouteRouteWithChildren =
+  DashboardComplianceRouteRoute._addFileChildren(
+    DashboardComplianceRouteRouteChildren,
   )
 
 interface DashboardFilesRouteRouteChildren {
@@ -1102,6 +1180,7 @@ interface DashboardRouteRouteChildren {
   DashboardAgentsRouteRoute: typeof DashboardAgentsRouteRouteWithChildren
   DashboardAssessmentRouteRoute: typeof DashboardAssessmentRouteRouteWithChildren
   DashboardChannelsRouteRoute: typeof DashboardChannelsRouteRouteWithChildren
+  DashboardComplianceRouteRoute: typeof DashboardComplianceRouteRouteWithChildren
   DashboardFilesRouteRoute: typeof DashboardFilesRouteRouteWithChildren
   DashboardPeopleRouteRoute: typeof DashboardPeopleRouteRouteWithChildren
   DashboardPlatformRouteRoute: typeof DashboardPlatformRouteRouteWithChildren
@@ -1116,6 +1195,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAgentsRouteRoute: DashboardAgentsRouteRouteWithChildren,
   DashboardAssessmentRouteRoute: DashboardAssessmentRouteRouteWithChildren,
   DashboardChannelsRouteRoute: DashboardChannelsRouteRouteWithChildren,
+  DashboardComplianceRouteRoute: DashboardComplianceRouteRouteWithChildren,
   DashboardFilesRouteRoute: DashboardFilesRouteRouteWithChildren,
   DashboardPeopleRouteRoute: DashboardPeopleRouteRouteWithChildren,
   DashboardPlatformRouteRoute: DashboardPlatformRouteRouteWithChildren,

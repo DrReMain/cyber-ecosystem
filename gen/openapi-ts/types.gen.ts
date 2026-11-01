@@ -268,6 +268,57 @@ export type CyberEsportsV1AdminSku = {
 };
 
 /**
+ * One consent row: the compliance-evidence unit. user_id with its two
+ * display folds — nickname from the local profile, masked phone from
+ * the system roster — because the operator answers disputes by reading
+ * this table, not by joining three systems by hand.
+ */
+export type CyberEsportsV1AgreementConsent = {
+    userId?: string;
+    nickname?: string;
+    phoneMasked?: string;
+    doc?: 'AGREEMENT_DOC_UNSPECIFIED' | 'AGREEMENT_DOC_USER' | 'AGREEMENT_DOC_PRIVACY';
+    /**
+     * Denormalized on purpose: the version row may be deleted after the
+     * fact, the evidence keeps the string it landed on.
+     */
+    versionNo?: string;
+    consentedAt?: string;
+    loginMethod?: 'AGREEMENT_LOGIN_METHOD_UNSPECIFIED' | 'AGREEMENT_LOGIN_METHOD_SMS_CODE' | 'AGREEMENT_LOGIN_METHOD_PASSWORD' | 'AGREEMENT_LOGIN_METHOD_WECHAT';
+};
+
+/**
+ * One document's current answer — the version line the legal page and
+ * the login gate render.
+ */
+export type CyberEsportsV1AgreementCurrent = {
+    doc?: 'AGREEMENT_DOC_UNSPECIFIED' | 'AGREEMENT_DOC_USER' | 'AGREEMENT_DOC_PRIVACY';
+    no?: string;
+    effectiveAt?: string;
+};
+
+/**
+ * One version row of one document. agreed_count is a fold over the
+ * consent rows (distinct users), carried per row so the table renders
+ * without a second query per version.
+ */
+export type CyberEsportsV1AgreementVersion = {
+    id?: string;
+    doc?: 'AGREEMENT_DOC_UNSPECIFIED' | 'AGREEMENT_DOC_USER' | 'AGREEMENT_DOC_PRIVACY';
+    no?: string;
+    /**
+     * The display title the create path derives from the document type
+     * (《用户服务协议》 / 《隐私政策》); stored per row so historical rows
+     * keep the title they were published under.
+     */
+    title?: string;
+    effectiveAt?: string;
+    agreedCount?: number;
+    isCurrent?: boolean;
+    body?: string;
+};
+
+/**
  * The engine marks backgrounding spans; validity is judged server-side at
  * submit against TestConfig.background_invalid_seconds.
  */
@@ -365,6 +416,21 @@ export type CyberEsportsV1CognitiveDimension = {
     tier?: 'REPORT_TIER_UNSPECIFIED' | 'REPORT_TIER_S' | 'REPORT_TIER_A' | 'REPORT_TIER_B' | 'REPORT_TIER_C';
 };
 
+export type CyberEsportsV1CreateAgreementVersionRequest = {
+    doc?: 'AGREEMENT_DOC_UNSPECIFIED' | 'AGREEMENT_DOC_USER' | 'AGREEMENT_DOC_PRIVACY';
+    /**
+     * Free-form version string the operator quotes (v1.0.0, v1.5-draft…);
+     * uniqueness per document is enforced by the store, format is not.
+     */
+    no?: string;
+    effectiveAt?: string;
+    body?: string;
+};
+
+export type CyberEsportsV1CreateAgreementVersionResponse = {
+    version?: CyberEsportsV1AgreementVersion;
+};
+
 export type CyberEsportsV1CreateOrderRequest = {
     skuCode?: string;
     /**
@@ -412,6 +478,14 @@ export type CyberEsportsV1CreateSkuRequest = {
 
 export type CyberEsportsV1CreateSkuResponse = {
     sku?: CyberEsportsV1AdminSku;
+};
+
+/**
+ * Deletion answers nothing: the row is gone and the list refetch
+ * renders the truth.
+ */
+export type CyberEsportsV1DeleteAgreementVersionResponse = {
+    [key: string]: unknown;
 };
 
 export type CyberEsportsV1DigestAbilityLine = {
@@ -543,6 +617,24 @@ export type CyberEsportsV1ExportActivationCodesResponse = {
     codes?: Array<CyberEsportsV1ActivationCode>;
 };
 
+export type CyberEsportsV1ExportAgreementConsentsRequest = {
+    /**
+     * Same filters as the list — an export answers the visible filter,
+     * never a wider set. The whole filtered set in one answer, no paging:
+     * an operator export is bounded by how narrow they filtered, and the
+     * day that stops being true is the day this grows a streaming shape.
+     */
+    doc?: 'AGREEMENT_DOC_UNSPECIFIED' | 'AGREEMENT_DOC_USER' | 'AGREEMENT_DOC_PRIVACY';
+    versionNo?: string;
+    keyword?: string;
+    createdAtA?: string;
+    createdAtZ?: string;
+};
+
+export type CyberEsportsV1ExportAgreementConsentsResponse = {
+    consents?: Array<CyberEsportsV1AgreementConsent>;
+};
+
 /**
  * flash_aiming — snap shots at flashing targets.
  */
@@ -631,6 +723,14 @@ export type CyberEsportsV1GetAbilityDigestResponse = {
      * when the genre was never played.
      */
     sessions?: Array<CyberEsportsV1DigestSessionLine>;
+};
+
+export type CyberEsportsV1GetAgreementCurrentResponse = {
+    /**
+     * One row per document that has a current version; a document without
+     * one is absent, and the legal page falls back to its placeholder.
+     */
+    docs?: Array<CyberEsportsV1AgreementCurrent>;
 };
 
 export type CyberEsportsV1GetCareerReportRequest = {
@@ -925,6 +1025,22 @@ export type CyberEsportsV1ListActivationBatchesResponse = {
 export type CyberEsportsV1ListActivationCodesResponse = {
     page?: CyberSharedCommonV1PageResponse;
     codes?: Array<CyberEsportsV1ActivationCode>;
+};
+
+export type CyberEsportsV1ListAgreementConsentsResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    /**
+     * Newest first.
+     */
+    consents?: Array<CyberEsportsV1AgreementConsent>;
+};
+
+export type CyberEsportsV1ListAgreementVersionsResponse = {
+    /**
+     * Current version first per document, then the rest newest-effective
+     * first; no paging — a document's version ledger is a handful of rows.
+     */
+    versions?: Array<CyberEsportsV1AgreementVersion>;
 };
 
 export type CyberEsportsV1ListCatalogSkusResponse = {
@@ -1419,6 +1535,19 @@ export type CyberEsportsV1QuestionBankRow = {
     createdAt?: string;
 };
 
+export type CyberEsportsV1RecordAgreementConsentRequest = {
+    loginMethod?: 'AGREEMENT_LOGIN_METHOD_UNSPECIFIED' | 'AGREEMENT_LOGIN_METHOD_SMS_CODE' | 'AGREEMENT_LOGIN_METHOD_PASSWORD' | 'AGREEMENT_LOGIN_METHOD_WECHAT';
+};
+
+/**
+ * Empty on purpose: the record is fire-and-forget evidence the member
+ * plane does not consume — the operator's consent query reads it, and
+ * the e2e chain asserts it there.
+ */
+export type CyberEsportsV1RecordAgreementConsentResponse = {
+    [key: string]: unknown;
+};
+
 /**
  * red_dot — reaction tap on a moving spot.
  */
@@ -1604,6 +1733,14 @@ export type CyberEsportsV1SetActivationBatchStatusRequest = {
 
 export type CyberEsportsV1SetActivationBatchStatusResponse = {
     batch?: CyberEsportsV1ActivationBatch;
+};
+
+export type CyberEsportsV1SetAgreementCurrentRequest = {
+    versionId?: string;
+};
+
+export type CyberEsportsV1SetAgreementCurrentResponse = {
+    version?: CyberEsportsV1AgreementVersion;
 };
 
 export type CyberEsportsV1SetReportAccessPolicyRequest = {
@@ -3845,6 +3982,185 @@ export type TestAdminServiceUpdateTestConfigResponses = {
 };
 
 export type TestAdminServiceUpdateTestConfigResponse = TestAdminServiceUpdateTestConfigResponses[keyof TestAdminServiceUpdateTestConfigResponses];
+
+export type AgreementAdminServiceListAgreementConsentsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        doc?: 'AGREEMENT_DOC_UNSPECIFIED' | 'AGREEMENT_DOC_USER' | 'AGREEMENT_DOC_PRIVACY';
+        /**
+         * Exact version string, prefilled by the version table's consent
+         * link; matches the denormalized column, so deleted versions stay
+         * queryable here.
+         */
+        versionNo?: string;
+        /**
+         * Nickname contains — resolved through the profile plane before the
+         * consent query runs. Phone search needs the system roster's reverse
+         * lookup and rides with that family's open gap instead of half-working.
+         */
+        keyword?: string;
+    };
+    url: '/api/v1/esports/agreement-consents';
+};
+
+export type AgreementAdminServiceListAgreementConsentsResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListAgreementConsentsResponse;
+};
+
+export type AgreementAdminServiceListAgreementConsentsResponse = AgreementAdminServiceListAgreementConsentsResponses[keyof AgreementAdminServiceListAgreementConsentsResponses];
+
+export type AgreementAdminServiceExportAgreementConsentsData = {
+    body: CyberEsportsV1ExportAgreementConsentsRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/agreement-consents/export';
+};
+
+export type AgreementAdminServiceExportAgreementConsentsResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ExportAgreementConsentsResponse;
+};
+
+export type AgreementAdminServiceExportAgreementConsentsResponse = AgreementAdminServiceExportAgreementConsentsResponses[keyof AgreementAdminServiceExportAgreementConsentsResponses];
+
+export type AgreementAdminServiceListAgreementVersionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Absent = both documents' versions in one table.
+         */
+        doc?: 'AGREEMENT_DOC_UNSPECIFIED' | 'AGREEMENT_DOC_USER' | 'AGREEMENT_DOC_PRIVACY';
+    };
+    url: '/api/v1/esports/agreement-versions';
+};
+
+export type AgreementAdminServiceListAgreementVersionsResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListAgreementVersionsResponse;
+};
+
+export type AgreementAdminServiceListAgreementVersionsResponse = AgreementAdminServiceListAgreementVersionsResponses[keyof AgreementAdminServiceListAgreementVersionsResponses];
+
+export type AgreementAdminServiceCreateAgreementVersionData = {
+    body: CyberEsportsV1CreateAgreementVersionRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/agreement-versions';
+};
+
+export type AgreementAdminServiceCreateAgreementVersionResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1CreateAgreementVersionResponse;
+};
+
+export type AgreementAdminServiceCreateAgreementVersionResponse = AgreementAdminServiceCreateAgreementVersionResponses[keyof AgreementAdminServiceCreateAgreementVersionResponses];
+
+export type AgreementAdminServiceDeleteAgreementVersionData = {
+    body?: never;
+    path: {
+        versionId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/agreement-versions/{versionId}';
+};
+
+export type AgreementAdminServiceDeleteAgreementVersionResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1DeleteAgreementVersionResponse;
+};
+
+export type AgreementAdminServiceDeleteAgreementVersionResponse = AgreementAdminServiceDeleteAgreementVersionResponses[keyof AgreementAdminServiceDeleteAgreementVersionResponses];
+
+export type AgreementAdminServiceSetAgreementCurrentData = {
+    body: CyberEsportsV1SetAgreementCurrentRequest;
+    path: {
+        versionId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/agreement-versions/{versionId}/current';
+};
+
+export type AgreementAdminServiceSetAgreementCurrentResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SetAgreementCurrentResponse;
+};
+
+export type AgreementAdminServiceSetAgreementCurrentResponse = AgreementAdminServiceSetAgreementCurrentResponses[keyof AgreementAdminServiceSetAgreementCurrentResponses];
+
+export type AgreementServiceRecordAgreementConsentData = {
+    body: CyberEsportsV1RecordAgreementConsentRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/agreements/consent';
+};
+
+export type AgreementServiceRecordAgreementConsentResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1RecordAgreementConsentResponse;
+};
+
+export type AgreementServiceRecordAgreementConsentResponse = AgreementServiceRecordAgreementConsentResponses[keyof AgreementServiceRecordAgreementConsentResponses];
+
+export type AgreementServiceGetAgreementCurrentData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/agreements/current';
+};
+
+export type AgreementServiceGetAgreementCurrentResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetAgreementCurrentResponse;
+};
+
+export type AgreementServiceGetAgreementCurrentResponse = AgreementServiceGetAgreementCurrentResponses[keyof AgreementServiceGetAgreementCurrentResponses];
 
 export type SkuAdminServiceListCatalogSkusData = {
     body?: never;

@@ -133,5 +133,9 @@
   "error_ESPORTS_REPORT_RECORD_INVALID": "سجل الاختبار غير صالح ولا يمكن إنشاء تقرير له",
   "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "يمكنك عرض نتائجك فقط",
   "error_ESPORTS_SKU_KIND_INVALID": "هذا الـ SKU ليس خطة عضوية",
-  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "لا توجد عضوية سارية"
+  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "لا توجد عضوية سارية",
+  "error_ESPORTS_AGREEMENT_VERSION_NOT_FOUND": "إصدار الاتفاقية غير موجود",
+  "error_ESPORTS_AGREEMENT_VERSION_IS_CURRENT": "لا يمكن حذف الإصدار الساري؛ بدّل إلى إصدار آخر أولاً",
+  "error_ESPORTS_AGREEMENT_VERSION_DUPLICATE": "رقم الإصدار موجود بالفعل",
+  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "لم يتم إعداد إصدارات الاتفاقية بعد؛ تواصل مع المشغل"
 }

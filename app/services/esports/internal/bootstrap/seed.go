@@ -804,6 +804,10 @@ func (s *Seed) Run(ctx context.Context) error {
 		}
 		s.log.Info("seeded sku", "code", sk.Code)
 	}
+
+	if err := s.seedAgreements(ctx, client); err != nil {
+		return err
+	}
 	return nil
 }
 

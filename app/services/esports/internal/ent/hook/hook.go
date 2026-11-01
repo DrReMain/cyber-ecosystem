@@ -44,6 +44,30 @@ func (f ActivationCodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ActivationCodeMutation", m)
 }
 
+// The AgreementConsentFunc type is an adapter to allow the use of ordinary
+// function as AgreementConsent mutator.
+type AgreementConsentFunc func(context.Context, *ent.AgreementConsentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AgreementConsentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AgreementConsentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AgreementConsentMutation", m)
+}
+
+// The AgreementVersionFunc type is an adapter to allow the use of ordinary
+// function as AgreementVersion mutator.
+type AgreementVersionFunc func(context.Context, *ent.AgreementVersionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AgreementVersionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AgreementVersionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AgreementVersionMutation", m)
+}
+
 // The EntitlementFunc type is an adapter to allow the use of ordinary
 // function as Entitlement mutator.
 type EntitlementFunc func(context.Context, *ent.EntitlementMutation) (ent.Value, error)

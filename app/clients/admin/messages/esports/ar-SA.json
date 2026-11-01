@@ -6,5 +6,11 @@
   "esports_assessment_title": "بنك الأسئلة والاختبارات",
   "esports_reports_title": "التقارير والمحتوى",
   "esports_channels_title": "القنوات والترويج",
-  "esports_pricing_title": "التسعير والطلبات"
+  "esports_pricing_title": "التسعير والطلبات",
+  "esports_compliance_title": "الاتفاقيات والامتثال",
+  "esports_agreement_doc_user": "اتفاقية المستخدم",
+  "esports_agreement_doc_privacy": "سياسة الخصوصية",
+  "esports_agreement_login_sms_code": "رمز التحقق",
+  "esports_agreement_login_password": "كلمة المرور",
+  "esports_agreement_login_wechat": "تسجيل دخول WeChat بنقرة واحدة"
 }

@@ -69,6 +69,17 @@ const (
 	Esports_ESPORTS_REPORT_RECORD_NOT_OWNED  Esports = 6161
 	Esports_ESPORTS_REPORT_RECORD_INVALID    Esports = 6162
 	Esports_ESPORTS_REPORT_SESSION_NOT_OWNED Esports = 6163
+	// 617x: agreement
+	Esports_ESPORTS_AGREEMENT_VERSION_NOT_FOUND Esports = 6170
+	// The current version anchors the login gate's consent; deleting it
+	// requires switching current to another version first, so no consent
+	// can ever land on a document with no current version.
+	Esports_ESPORTS_AGREEMENT_VERSION_IS_CURRENT Esports = 6171
+	Esports_ESPORTS_AGREEMENT_VERSION_DUPLICATE  Esports = 6172
+	// No current version exists for a document — only possible before the
+	// seed lands; recording consent against nothing is refused rather than
+	// silently backdated to whatever comes next.
+	Esports_ESPORTS_AGREEMENT_NOT_CONFIGURED Esports = 6173
 )
 
 // Enum value maps for Esports.
@@ -103,6 +114,10 @@ var (
 		6161: "ESPORTS_REPORT_RECORD_NOT_OWNED",
 		6162: "ESPORTS_REPORT_RECORD_INVALID",
 		6163: "ESPORTS_REPORT_SESSION_NOT_OWNED",
+		6170: "ESPORTS_AGREEMENT_VERSION_NOT_FOUND",
+		6171: "ESPORTS_AGREEMENT_VERSION_IS_CURRENT",
+		6172: "ESPORTS_AGREEMENT_VERSION_DUPLICATE",
+		6173: "ESPORTS_AGREEMENT_NOT_CONFIGURED",
 	}
 	Esports_value = map[string]int32{
 		"ESPORTS_UNSPECIFIED":                       0,
@@ -134,6 +149,10 @@ var (
 		"ESPORTS_REPORT_RECORD_NOT_OWNED":           6161,
 		"ESPORTS_REPORT_RECORD_INVALID":             6162,
 		"ESPORTS_REPORT_SESSION_NOT_OWNED":          6163,
+		"ESPORTS_AGREEMENT_VERSION_NOT_FOUND":       6170,
+		"ESPORTS_AGREEMENT_VERSION_IS_CURRENT":      6171,
+		"ESPORTS_AGREEMENT_VERSION_DUPLICATE":       6172,
+		"ESPORTS_AGREEMENT_NOT_CONFIGURED":          6173,
 	}
 )
 
@@ -168,7 +187,7 @@ var File_cyber_esports_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\xc7\t\n" +
+	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\x85\v\n" +
 	"\aEsports\x12\x1d\n" +
 	"\x13ESPORTS_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x124\n" +
 	")ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED\x10\xd4/\x1a\x04\xa8E\x90\x03\x12'\n" +
@@ -198,7 +217,11 @@ const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\x1fESPORTS_REPORT_RECORD_NOT_FOUND\x10\x900\x1a\x04\xa8E\x94\x03\x12*\n" +
 	"\x1fESPORTS_REPORT_RECORD_NOT_OWNED\x10\x910\x1a\x04\xa8E\x93\x03\x12(\n" +
 	"\x1dESPORTS_REPORT_RECORD_INVALID\x10\x920\x1a\x04\xa8E\x90\x03\x12+\n" +
-	" ESPORTS_REPORT_SESSION_NOT_OWNED\x10\x930\x1a\x04\xa8E\x93\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	" ESPORTS_REPORT_SESSION_NOT_OWNED\x10\x930\x1a\x04\xa8E\x93\x03\x12.\n" +
+	"#ESPORTS_AGREEMENT_VERSION_NOT_FOUND\x10\x9a0\x1a\x04\xa8E\x94\x03\x12/\n" +
+	"$ESPORTS_AGREEMENT_VERSION_IS_CURRENT\x10\x9b0\x1a\x04\xa8E\x90\x03\x12.\n" +
+	"#ESPORTS_AGREEMENT_VERSION_DUPLICATE\x10\x9c0\x1a\x04\xa8E\x90\x03\x12+\n" +
+	" ESPORTS_AGREEMENT_NOT_CONFIGURED\x10\x9d0\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_error_reason_proto_rawDescOnce sync.Once

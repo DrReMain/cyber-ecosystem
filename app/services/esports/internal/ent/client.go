@@ -14,6 +14,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationbatch"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
+	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
+	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -46,6 +48,10 @@ type Client struct {
 	ActivationBatch *ActivationBatchClient
 	// ActivationCode is the client for interacting with the ActivationCode builders.
 	ActivationCode *ActivationCodeClient
+	// AgreementConsent is the client for interacting with the AgreementConsent builders.
+	AgreementConsent *AgreementConsentClient
+	// AgreementVersion is the client for interacting with the AgreementVersion builders.
+	AgreementVersion *AgreementVersionClient
 	// Entitlement is the client for interacting with the Entitlement builders.
 	Entitlement *EntitlementClient
 	// Game is the client for interacting with the Game builders.
@@ -86,6 +92,8 @@ func (c *Client) init() {
 	c.AbilityScore = NewAbilityScoreClient(c.config)
 	c.ActivationBatch = NewActivationBatchClient(c.config)
 	c.ActivationCode = NewActivationCodeClient(c.config)
+	c.AgreementConsent = NewAgreementConsentClient(c.config)
+	c.AgreementVersion = NewAgreementVersionClient(c.config)
 	c.Entitlement = NewEntitlementClient(c.config)
 	c.Game = NewGameClient(c.config)
 	c.MatchConfig = NewMatchConfigClient(c.config)
@@ -189,24 +197,26 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		AbilityScore:    NewAbilityScoreClient(cfg),
-		ActivationBatch: NewActivationBatchClient(cfg),
-		ActivationCode:  NewActivationCodeClient(cfg),
-		Entitlement:     NewEntitlementClient(cfg),
-		Game:            NewGameClient(cfg),
-		MatchConfig:     NewMatchConfigClient(cfg),
-		MatchSession:    NewMatchSessionClient(cfg),
-		PayOrder:        NewPayOrderClient(cfg),
-		Profile:         NewProfileClient(cfg),
-		QuestionBank:    NewQuestionBankClient(cfg),
-		ReportPolicy:    NewReportPolicyClient(cfg),
-		ReportSnapshot:  NewReportSnapshotClient(cfg),
-		Sku:             NewSkuClient(cfg),
-		Test:            NewTestClient(cfg),
-		TestConfig:      NewTestConfigClient(cfg),
-		TestRecord:      NewTestRecordClient(cfg),
+		ctx:              ctx,
+		config:           cfg,
+		AbilityScore:     NewAbilityScoreClient(cfg),
+		ActivationBatch:  NewActivationBatchClient(cfg),
+		ActivationCode:   NewActivationCodeClient(cfg),
+		AgreementConsent: NewAgreementConsentClient(cfg),
+		AgreementVersion: NewAgreementVersionClient(cfg),
+		Entitlement:      NewEntitlementClient(cfg),
+		Game:             NewGameClient(cfg),
+		MatchConfig:      NewMatchConfigClient(cfg),
+		MatchSession:     NewMatchSessionClient(cfg),
+		PayOrder:         NewPayOrderClient(cfg),
+		Profile:          NewProfileClient(cfg),
+		QuestionBank:     NewQuestionBankClient(cfg),
+		ReportPolicy:     NewReportPolicyClient(cfg),
+		ReportSnapshot:   NewReportSnapshotClient(cfg),
+		Sku:              NewSkuClient(cfg),
+		Test:             NewTestClient(cfg),
+		TestConfig:       NewTestConfigClient(cfg),
+		TestRecord:       NewTestRecordClient(cfg),
 	}, nil
 }
 
@@ -224,24 +234,26 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		AbilityScore:    NewAbilityScoreClient(cfg),
-		ActivationBatch: NewActivationBatchClient(cfg),
-		ActivationCode:  NewActivationCodeClient(cfg),
-		Entitlement:     NewEntitlementClient(cfg),
-		Game:            NewGameClient(cfg),
-		MatchConfig:     NewMatchConfigClient(cfg),
-		MatchSession:    NewMatchSessionClient(cfg),
-		PayOrder:        NewPayOrderClient(cfg),
-		Profile:         NewProfileClient(cfg),
-		QuestionBank:    NewQuestionBankClient(cfg),
-		ReportPolicy:    NewReportPolicyClient(cfg),
-		ReportSnapshot:  NewReportSnapshotClient(cfg),
-		Sku:             NewSkuClient(cfg),
-		Test:            NewTestClient(cfg),
-		TestConfig:      NewTestConfigClient(cfg),
-		TestRecord:      NewTestRecordClient(cfg),
+		ctx:              ctx,
+		config:           cfg,
+		AbilityScore:     NewAbilityScoreClient(cfg),
+		ActivationBatch:  NewActivationBatchClient(cfg),
+		ActivationCode:   NewActivationCodeClient(cfg),
+		AgreementConsent: NewAgreementConsentClient(cfg),
+		AgreementVersion: NewAgreementVersionClient(cfg),
+		Entitlement:      NewEntitlementClient(cfg),
+		Game:             NewGameClient(cfg),
+		MatchConfig:      NewMatchConfigClient(cfg),
+		MatchSession:     NewMatchSessionClient(cfg),
+		PayOrder:         NewPayOrderClient(cfg),
+		Profile:          NewProfileClient(cfg),
+		QuestionBank:     NewQuestionBankClient(cfg),
+		ReportPolicy:     NewReportPolicyClient(cfg),
+		ReportSnapshot:   NewReportSnapshotClient(cfg),
+		Sku:              NewSkuClient(cfg),
+		Test:             NewTestClient(cfg),
+		TestConfig:       NewTestConfigClient(cfg),
+		TestRecord:       NewTestRecordClient(cfg),
 	}, nil
 }
 
@@ -271,9 +283,10 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityScore, c.ActivationBatch, c.ActivationCode, c.Entitlement, c.Game,
-		c.MatchConfig, c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank,
-		c.ReportPolicy, c.ReportSnapshot, c.Sku, c.Test, c.TestConfig, c.TestRecord,
+		c.AbilityScore, c.ActivationBatch, c.ActivationCode, c.AgreementConsent,
+		c.AgreementVersion, c.Entitlement, c.Game, c.MatchConfig, c.MatchSession,
+		c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy, c.ReportSnapshot, c.Sku,
+		c.Test, c.TestConfig, c.TestRecord,
 	} {
 		n.Use(hooks...)
 	}
@@ -283,9 +296,10 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityScore, c.ActivationBatch, c.ActivationCode, c.Entitlement, c.Game,
-		c.MatchConfig, c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank,
-		c.ReportPolicy, c.ReportSnapshot, c.Sku, c.Test, c.TestConfig, c.TestRecord,
+		c.AbilityScore, c.ActivationBatch, c.ActivationCode, c.AgreementConsent,
+		c.AgreementVersion, c.Entitlement, c.Game, c.MatchConfig, c.MatchSession,
+		c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy, c.ReportSnapshot, c.Sku,
+		c.Test, c.TestConfig, c.TestRecord,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -300,6 +314,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ActivationBatch.mutate(ctx, m)
 	case *ActivationCodeMutation:
 		return c.ActivationCode.mutate(ctx, m)
+	case *AgreementConsentMutation:
+		return c.AgreementConsent.mutate(ctx, m)
+	case *AgreementVersionMutation:
+		return c.AgreementVersion.mutate(ctx, m)
 	case *EntitlementMutation:
 		return c.Entitlement.mutate(ctx, m)
 	case *GameMutation:
@@ -733,6 +751,272 @@ func (c *ActivationCodeClient) mutate(ctx context.Context, m *ActivationCodeMuta
 		return (&ActivationCodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ActivationCode mutation op: %q", m.Op())
+	}
+}
+
+// AgreementConsentClient is a client for the AgreementConsent schema.
+type AgreementConsentClient struct {
+	config
+}
+
+// NewAgreementConsentClient returns a client for the AgreementConsent from the given config.
+func NewAgreementConsentClient(c config) *AgreementConsentClient {
+	return &AgreementConsentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `agreementconsent.Hooks(f(g(h())))`.
+func (c *AgreementConsentClient) Use(hooks ...Hook) {
+	c.hooks.AgreementConsent = append(c.hooks.AgreementConsent, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `agreementconsent.Intercept(f(g(h())))`.
+func (c *AgreementConsentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AgreementConsent = append(c.inters.AgreementConsent, interceptors...)
+}
+
+// Create returns a builder for creating a AgreementConsent entity.
+func (c *AgreementConsentClient) Create() *AgreementConsentCreate {
+	mutation := newAgreementConsentMutation(c.config, OpCreate)
+	return &AgreementConsentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AgreementConsent entities.
+func (c *AgreementConsentClient) CreateBulk(builders ...*AgreementConsentCreate) *AgreementConsentCreateBulk {
+	return &AgreementConsentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AgreementConsentClient) MapCreateBulk(slice any, setFunc func(*AgreementConsentCreate, int)) *AgreementConsentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AgreementConsentCreateBulk{err: fmt.Errorf("calling to AgreementConsentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AgreementConsentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AgreementConsentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AgreementConsent.
+func (c *AgreementConsentClient) Update() *AgreementConsentUpdate {
+	mutation := newAgreementConsentMutation(c.config, OpUpdate)
+	return &AgreementConsentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AgreementConsentClient) UpdateOne(_m *AgreementConsent) *AgreementConsentUpdateOne {
+	mutation := newAgreementConsentMutation(c.config, OpUpdateOne, withAgreementConsent(_m))
+	return &AgreementConsentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AgreementConsentClient) UpdateOneID(id string) *AgreementConsentUpdateOne {
+	mutation := newAgreementConsentMutation(c.config, OpUpdateOne, withAgreementConsentID(id))
+	return &AgreementConsentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AgreementConsent.
+func (c *AgreementConsentClient) Delete() *AgreementConsentDelete {
+	mutation := newAgreementConsentMutation(c.config, OpDelete)
+	return &AgreementConsentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AgreementConsentClient) DeleteOne(_m *AgreementConsent) *AgreementConsentDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AgreementConsentClient) DeleteOneID(id string) *AgreementConsentDeleteOne {
+	builder := c.Delete().Where(agreementconsent.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AgreementConsentDeleteOne{builder}
+}
+
+// Query returns a query builder for AgreementConsent.
+func (c *AgreementConsentClient) Query() *AgreementConsentQuery {
+	return &AgreementConsentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAgreementConsent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AgreementConsent entity by its id.
+func (c *AgreementConsentClient) Get(ctx context.Context, id string) (*AgreementConsent, error) {
+	return c.Query().Where(agreementconsent.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AgreementConsentClient) GetX(ctx context.Context, id string) *AgreementConsent {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AgreementConsentClient) Hooks() []Hook {
+	return c.hooks.AgreementConsent
+}
+
+// Interceptors returns the client interceptors.
+func (c *AgreementConsentClient) Interceptors() []Interceptor {
+	return c.inters.AgreementConsent
+}
+
+func (c *AgreementConsentClient) mutate(ctx context.Context, m *AgreementConsentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AgreementConsentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AgreementConsentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AgreementConsentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AgreementConsentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AgreementConsent mutation op: %q", m.Op())
+	}
+}
+
+// AgreementVersionClient is a client for the AgreementVersion schema.
+type AgreementVersionClient struct {
+	config
+}
+
+// NewAgreementVersionClient returns a client for the AgreementVersion from the given config.
+func NewAgreementVersionClient(c config) *AgreementVersionClient {
+	return &AgreementVersionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `agreementversion.Hooks(f(g(h())))`.
+func (c *AgreementVersionClient) Use(hooks ...Hook) {
+	c.hooks.AgreementVersion = append(c.hooks.AgreementVersion, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `agreementversion.Intercept(f(g(h())))`.
+func (c *AgreementVersionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AgreementVersion = append(c.inters.AgreementVersion, interceptors...)
+}
+
+// Create returns a builder for creating a AgreementVersion entity.
+func (c *AgreementVersionClient) Create() *AgreementVersionCreate {
+	mutation := newAgreementVersionMutation(c.config, OpCreate)
+	return &AgreementVersionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AgreementVersion entities.
+func (c *AgreementVersionClient) CreateBulk(builders ...*AgreementVersionCreate) *AgreementVersionCreateBulk {
+	return &AgreementVersionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AgreementVersionClient) MapCreateBulk(slice any, setFunc func(*AgreementVersionCreate, int)) *AgreementVersionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AgreementVersionCreateBulk{err: fmt.Errorf("calling to AgreementVersionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AgreementVersionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AgreementVersionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AgreementVersion.
+func (c *AgreementVersionClient) Update() *AgreementVersionUpdate {
+	mutation := newAgreementVersionMutation(c.config, OpUpdate)
+	return &AgreementVersionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AgreementVersionClient) UpdateOne(_m *AgreementVersion) *AgreementVersionUpdateOne {
+	mutation := newAgreementVersionMutation(c.config, OpUpdateOne, withAgreementVersion(_m))
+	return &AgreementVersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AgreementVersionClient) UpdateOneID(id string) *AgreementVersionUpdateOne {
+	mutation := newAgreementVersionMutation(c.config, OpUpdateOne, withAgreementVersionID(id))
+	return &AgreementVersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AgreementVersion.
+func (c *AgreementVersionClient) Delete() *AgreementVersionDelete {
+	mutation := newAgreementVersionMutation(c.config, OpDelete)
+	return &AgreementVersionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AgreementVersionClient) DeleteOne(_m *AgreementVersion) *AgreementVersionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AgreementVersionClient) DeleteOneID(id string) *AgreementVersionDeleteOne {
+	builder := c.Delete().Where(agreementversion.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AgreementVersionDeleteOne{builder}
+}
+
+// Query returns a query builder for AgreementVersion.
+func (c *AgreementVersionClient) Query() *AgreementVersionQuery {
+	return &AgreementVersionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAgreementVersion},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AgreementVersion entity by its id.
+func (c *AgreementVersionClient) Get(ctx context.Context, id string) (*AgreementVersion, error) {
+	return c.Query().Where(agreementversion.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AgreementVersionClient) GetX(ctx context.Context, id string) *AgreementVersion {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AgreementVersionClient) Hooks() []Hook {
+	return c.hooks.AgreementVersion
+}
+
+// Interceptors returns the client interceptors.
+func (c *AgreementVersionClient) Interceptors() []Interceptor {
+	return c.inters.AgreementVersion
+}
+
+func (c *AgreementVersionClient) mutate(ctx context.Context, m *AgreementVersionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AgreementVersionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AgreementVersionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AgreementVersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AgreementVersionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AgreementVersion mutation op: %q", m.Op())
 	}
 }
 
@@ -2492,14 +2776,16 @@ func (c *TestRecordClient) mutate(ctx context.Context, m *TestRecordMutation) (V
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, ActivationBatch, ActivationCode, Entitlement, Game, MatchConfig,
-		MatchSession, PayOrder, Profile, QuestionBank, ReportPolicy, ReportSnapshot,
-		Sku, Test, TestConfig, TestRecord []ent.Hook
+		AbilityScore, ActivationBatch, ActivationCode, AgreementConsent,
+		AgreementVersion, Entitlement, Game, MatchConfig, MatchSession, PayOrder,
+		Profile, QuestionBank, ReportPolicy, ReportSnapshot, Sku, Test, TestConfig,
+		TestRecord []ent.Hook
 	}
 	inters struct {
-		AbilityScore, ActivationBatch, ActivationCode, Entitlement, Game, MatchConfig,
-		MatchSession, PayOrder, Profile, QuestionBank, ReportPolicy, ReportSnapshot,
-		Sku, Test, TestConfig, TestRecord []ent.Interceptor
+		AbilityScore, ActivationBatch, ActivationCode, AgreementConsent,
+		AgreementVersion, Entitlement, Game, MatchConfig, MatchSession, PayOrder,
+		Profile, QuestionBank, ReportPolicy, ReportSnapshot, Sku, Test, TestConfig,
+		TestRecord []ent.Interceptor
 	}
 )
 

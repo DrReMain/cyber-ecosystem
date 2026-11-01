@@ -131,5 +131,11 @@
   "error_ESPORTS_REPORT_RECORD_NOT_FOUND": "The test record was not found",
   "error_ESPORTS_REPORT_RECORD_NOT_OWNED": "You can only view your own reports",
   "error_ESPORTS_REPORT_RECORD_INVALID": "That test record is invalid and has no report",
-  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "You can only view your own results"
+  "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "You can only view your own results",
+  "error_ESPORTS_AGREEMENT_VERSION_NOT_FOUND": "Agreement version not found",
+  "error_ESPORTS_AGREEMENT_VERSION_IS_CURRENT": "The current version cannot be deleted; switch to another version first",
+  "error_ESPORTS_AGREEMENT_VERSION_DUPLICATE": "This version number already exists",
+  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "Agreement versions are not configured yet; contact the operator",
+  "error_ESPORTS_SKU_KIND_INVALID": "This SKU is not a membership tier",
+  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "No live membership found"
 }

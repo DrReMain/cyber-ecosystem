@@ -10,6 +10,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationbatch"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
+	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
+	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -163,6 +165,60 @@ func (f TraverseActivationCode) Traverse(ctx context.Context, q ent.Query) error
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.ActivationCodeQuery", q)
+}
+
+// The AgreementConsentFunc type is an adapter to allow the use of ordinary function as a Querier.
+type AgreementConsentFunc func(context.Context, *ent.AgreementConsentQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f AgreementConsentFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.AgreementConsentQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.AgreementConsentQuery", q)
+}
+
+// The TraverseAgreementConsent type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseAgreementConsent func(context.Context, *ent.AgreementConsentQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseAgreementConsent) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseAgreementConsent) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.AgreementConsentQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.AgreementConsentQuery", q)
+}
+
+// The AgreementVersionFunc type is an adapter to allow the use of ordinary function as a Querier.
+type AgreementVersionFunc func(context.Context, *ent.AgreementVersionQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f AgreementVersionFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.AgreementVersionQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.AgreementVersionQuery", q)
+}
+
+// The TraverseAgreementVersion type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseAgreementVersion func(context.Context, *ent.AgreementVersionQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseAgreementVersion) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseAgreementVersion) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.AgreementVersionQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.AgreementVersionQuery", q)
 }
 
 // The EntitlementFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -525,6 +581,10 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.ActivationBatchQuery, predicate.ActivationBatch, activationbatch.OrderOption]{typ: ent.TypeActivationBatch, tq: q}, nil
 	case *ent.ActivationCodeQuery:
 		return &query[*ent.ActivationCodeQuery, predicate.ActivationCode, activationcode.OrderOption]{typ: ent.TypeActivationCode, tq: q}, nil
+	case *ent.AgreementConsentQuery:
+		return &query[*ent.AgreementConsentQuery, predicate.AgreementConsent, agreementconsent.OrderOption]{typ: ent.TypeAgreementConsent, tq: q}, nil
+	case *ent.AgreementVersionQuery:
+		return &query[*ent.AgreementVersionQuery, predicate.AgreementVersion, agreementversion.OrderOption]{typ: ent.TypeAgreementVersion, tq: q}, nil
 	case *ent.EntitlementQuery:
 		return &query[*ent.EntitlementQuery, predicate.Entitlement, entitlement.OrderOption]{typ: ent.TypeEntitlement, tq: q}, nil
 	case *ent.GameQuery:

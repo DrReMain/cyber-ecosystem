@@ -1,5 +1,127 @@
 [
   {
+    "name": "AgreementAdminService",
+    "full_name": "cyber.esports.v1.AgreementAdminService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/agreement_admin.proto",
+    "comment": "协议版本与同意记录",
+    "methods": [
+      {
+        "name": "CreateAgreementVersion",
+        "full_name": "cyber.esports.v1.AgreementAdminService.CreateAgreementVersion",
+        "request_name": "CreateAgreementVersionRequest",
+        "request_full_name": "cyber.esports.v1.CreateAgreementVersionRequest",
+        "response_name": "CreateAgreementVersionResponse",
+        "response_full_name": "cyber.esports.v1.CreateAgreementVersionResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/agreement-versions",
+        "comment": "新建协议版本并设为当前",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "DeleteAgreementVersion",
+        "full_name": "cyber.esports.v1.AgreementAdminService.DeleteAgreementVersion",
+        "request_name": "DeleteAgreementVersionRequest",
+        "request_full_name": "cyber.esports.v1.DeleteAgreementVersionRequest",
+        "response_name": "DeleteAgreementVersionResponse",
+        "response_full_name": "cyber.esports.v1.DeleteAgreementVersionResponse",
+        "http_method": "DELETE",
+        "http_path": "/api/v1/esports/agreement-versions/{version_id}",
+        "comment": "删除历史协议版本",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ExportAgreementConsents",
+        "full_name": "cyber.esports.v1.AgreementAdminService.ExportAgreementConsents",
+        "request_name": "ExportAgreementConsentsRequest",
+        "request_full_name": "cyber.esports.v1.ExportAgreementConsentsRequest",
+        "response_name": "ExportAgreementConsentsResponse",
+        "response_full_name": "cyber.esports.v1.ExportAgreementConsentsResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/agreement-consents/export",
+        "comment": "导出同意记录",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListAgreementConsents",
+        "full_name": "cyber.esports.v1.AgreementAdminService.ListAgreementConsents",
+        "request_name": "ListAgreementConsentsRequest",
+        "request_full_name": "cyber.esports.v1.ListAgreementConsentsRequest",
+        "response_name": "ListAgreementConsentsResponse",
+        "response_full_name": "cyber.esports.v1.ListAgreementConsentsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/agreement-consents",
+        "comment": "同意记录列表",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListAgreementVersions",
+        "full_name": "cyber.esports.v1.AgreementAdminService.ListAgreementVersions",
+        "request_name": "ListAgreementVersionsRequest",
+        "request_full_name": "cyber.esports.v1.ListAgreementVersionsRequest",
+        "response_name": "ListAgreementVersionsResponse",
+        "response_full_name": "cyber.esports.v1.ListAgreementVersionsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/agreement-versions",
+        "comment": "协议版本列表",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "SetAgreementCurrent",
+        "full_name": "cyber.esports.v1.AgreementAdminService.SetAgreementCurrent",
+        "request_name": "SetAgreementCurrentRequest",
+        "request_full_name": "cyber.esports.v1.SetAgreementCurrentRequest",
+        "response_name": "SetAgreementCurrentResponse",
+        "response_full_name": "cyber.esports.v1.SetAgreementCurrentResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/agreement-versions/{version_id}/current",
+        "comment": "切换当前生效版本",
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "AgreementService",
+    "full_name": "cyber.esports.v1.AgreementService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/agreement.proto",
+    "comment": "协议与同意",
+    "methods": [
+      {
+        "name": "GetAgreementCurrent",
+        "full_name": "cyber.esports.v1.AgreementService.GetAgreementCurrent",
+        "request_name": "GetAgreementCurrentRequest",
+        "request_full_name": "cyber.esports.v1.GetAgreementCurrentRequest",
+        "response_name": "GetAgreementCurrentResponse",
+        "response_full_name": "cyber.esports.v1.GetAgreementCurrentResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/agreements/current",
+        "comment": "当前生效协议版本",
+        "access": "PUBLIC",
+        "datascope": false
+      },
+      {
+        "name": "RecordAgreementConsent",
+        "full_name": "cyber.esports.v1.AgreementService.RecordAgreementConsent",
+        "request_name": "RecordAgreementConsentRequest",
+        "request_full_name": "cyber.esports.v1.RecordAgreementConsentRequest",
+        "response_name": "RecordAgreementConsentResponse",
+        "response_full_name": "cyber.esports.v1.RecordAgreementConsentResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/agreements/consent",
+        "comment": "登录同意落库",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "EntitleAdminService",
     "full_name": "cyber.esports.v1.EntitleAdminService",
     "package": "cyber.esports.v1",

@@ -6,5 +6,11 @@
   "esports_assessment_title": "题库与测试",
   "esports_reports_title": "报告与内容",
   "esports_channels_title": "渠道与推广",
-  "esports_pricing_title": "定价与订单"
+  "esports_pricing_title": "定价与订单",
+  "esports_compliance_title": "协议与合规",
+  "esports_agreement_doc_user": "用户协议",
+  "esports_agreement_doc_privacy": "隐私政策",
+  "esports_agreement_login_sms_code": "验证码",
+  "esports_agreement_login_password": "密码",
+  "esports_agreement_login_wechat": "微信一键登录"
 }

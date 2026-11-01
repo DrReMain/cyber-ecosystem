@@ -10,6 +10,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/bootstrap"
 	"cyber-ecosystem/app/services/esports/internal/client"
 	"cyber-ecosystem/app/services/esports/internal/conf"
+	"cyber-ecosystem/app/services/esports/internal/module/agreement"
+	"cyber-ecosystem/app/services/esports/internal/module/agreementadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/entitleadmin"
@@ -104,7 +106,12 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	skuAdminService := skuadmin.NewSkuAdminService(logger, skuUC)
 	orderAdminUC := order.NewOrderAdminUC(logger, platformPlatform, orderRP, payChannelRP, skuRP, profileRP, systemClient, entitlementRP)
 	orderAdminService := orderadmin.NewOrderAdminService(logger, orderAdminUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService)
+	agreementRP := agreement.NewAgreementRP(logger, platformPlatform)
+	agreementUC := agreement.NewAgreementUC(logger, platformPlatform, agreementRP)
+	agreementService := agreement.NewAgreementService(logger, agreementUC)
+	agreementAdminUC := agreement.NewAgreementAdminUC(logger, platformPlatform, agreementRP, profileRP, systemClient)
+	agreementAdminService := agreementadmin.NewAgreementAdminService(logger, agreementAdminUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService, agreementService, agreementAdminService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

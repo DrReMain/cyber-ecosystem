@@ -711,6 +711,215 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.UpdateTestConfigResponse'
+    /api/v1/esports/agreement-consents:
+        get:
+            tags:
+                - AgreementAdminService
+            operationId: AgreementAdminService_ListAgreementConsents
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: doc
+                  in: query
+                  schema:
+                    enum:
+                        - AGREEMENT_DOC_UNSPECIFIED
+                        - AGREEMENT_DOC_USER
+                        - AGREEMENT_DOC_PRIVACY
+                    type: string
+                    format: enum
+                - name: versionNo
+                  in: query
+                  description: |-
+                    Exact version string, prefilled by the version table's consent
+                     link; matches the denormalized column, so deleted versions stay
+                     queryable here.
+                  schema:
+                    type: string
+                - name: keyword
+                  in: query
+                  description: |-
+                    Nickname contains — resolved through the profile plane before the
+                     consent query runs. Phone search needs the system roster's reverse
+                     lookup and rides with that family's open gap instead of half-working.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListAgreementConsentsResponse'
+    /api/v1/esports/agreement-consents/export:
+        post:
+            tags:
+                - AgreementAdminService
+            operationId: AgreementAdminService_ExportAgreementConsents
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.ExportAgreementConsentsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ExportAgreementConsentsResponse'
+    /api/v1/esports/agreement-versions:
+        get:
+            tags:
+                - AgreementAdminService
+            operationId: AgreementAdminService_ListAgreementVersions
+            parameters:
+                - name: doc
+                  in: query
+                  description: Absent = both documents' versions in one table.
+                  schema:
+                    enum:
+                        - AGREEMENT_DOC_UNSPECIFIED
+                        - AGREEMENT_DOC_USER
+                        - AGREEMENT_DOC_PRIVACY
+                    type: string
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListAgreementVersionsResponse'
+        post:
+            tags:
+                - AgreementAdminService
+            operationId: AgreementAdminService_CreateAgreementVersion
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.CreateAgreementVersionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.CreateAgreementVersionResponse'
+    /api/v1/esports/agreement-versions/{versionId}:
+        delete:
+            tags:
+                - AgreementAdminService
+            operationId: AgreementAdminService_DeleteAgreementVersion
+            parameters:
+                - name: versionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.DeleteAgreementVersionResponse'
+    /api/v1/esports/agreement-versions/{versionId}/current:
+        put:
+            tags:
+                - AgreementAdminService
+            operationId: AgreementAdminService_SetAgreementCurrent
+            parameters:
+                - name: versionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SetAgreementCurrentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SetAgreementCurrentResponse'
+    /api/v1/esports/agreements/consent:
+        post:
+            tags:
+                - AgreementService
+            operationId: AgreementService_RecordAgreementConsent
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.RecordAgreementConsentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.RecordAgreementConsentResponse'
+    /api/v1/esports/agreements/current:
+        get:
+            tags:
+                - AgreementService
+            operationId: AgreementService_GetAgreementCurrent
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetAgreementCurrentResponse'
     /api/v1/esports/catalog/skus:
         get:
             tags:
@@ -3866,6 +4075,95 @@ components:
             description: |-
                 A catalog row as the operator sees it: the member-plane Sku plus the
                  facts that plane never carries — shelf state and the last writer.
+        cyber.esports.v1.AgreementConsent:
+            type: object
+            properties:
+                userId:
+                    type: string
+                nickname:
+                    type: string
+                phoneMasked:
+                    type: string
+                doc:
+                    enum:
+                        - AGREEMENT_DOC_UNSPECIFIED
+                        - AGREEMENT_DOC_USER
+                        - AGREEMENT_DOC_PRIVACY
+                    type: string
+                    format: enum
+                versionNo:
+                    type: string
+                    description: |-
+                        Denormalized on purpose: the version row may be deleted after the
+                         fact, the evidence keeps the string it landed on.
+                consentedAt:
+                    type: string
+                    format: date-time
+                loginMethod:
+                    enum:
+                        - AGREEMENT_LOGIN_METHOD_UNSPECIFIED
+                        - AGREEMENT_LOGIN_METHOD_SMS_CODE
+                        - AGREEMENT_LOGIN_METHOD_PASSWORD
+                        - AGREEMENT_LOGIN_METHOD_WECHAT
+                    type: string
+                    format: enum
+            description: |-
+                One consent row: the compliance-evidence unit. user_id with its two
+                 display folds — nickname from the local profile, masked phone from
+                 the system roster — because the operator answers disputes by reading
+                 this table, not by joining three systems by hand.
+        cyber.esports.v1.AgreementCurrent:
+            type: object
+            properties:
+                doc:
+                    enum:
+                        - AGREEMENT_DOC_UNSPECIFIED
+                        - AGREEMENT_DOC_USER
+                        - AGREEMENT_DOC_PRIVACY
+                    type: string
+                    format: enum
+                no:
+                    type: string
+                effectiveAt:
+                    type: string
+                    format: date-time
+            description: |-
+                One document's current answer — the version line the legal page and
+                 the login gate render.
+        cyber.esports.v1.AgreementVersion:
+            type: object
+            properties:
+                id:
+                    type: string
+                doc:
+                    enum:
+                        - AGREEMENT_DOC_UNSPECIFIED
+                        - AGREEMENT_DOC_USER
+                        - AGREEMENT_DOC_PRIVACY
+                    type: string
+                    format: enum
+                no:
+                    type: string
+                title:
+                    type: string
+                    description: |-
+                        The display title the create path derives from the document type
+                         (《用户服务协议》 / 《隐私政策》); stored per row so historical rows
+                         keep the title they were published under.
+                effectiveAt:
+                    type: string
+                    format: date-time
+                agreedCount:
+                    type: integer
+                    format: int32
+                isCurrent:
+                    type: boolean
+                body:
+                    type: string
+            description: |-
+                One version row of one document. agreed_count is a fold over the
+                 consent rows (distinct users), carried per row so the table renders
+                 without a second query per version.
         cyber.esports.v1.BackgroundSpan:
             type: object
             properties:
@@ -3998,6 +4296,31 @@ components:
                 One rendered dimension of the cognitive model. The dimension keys are
                  the legal eight-word vocabulary; the wording a client renders them
                  with stays with the client.
+        cyber.esports.v1.CreateAgreementVersionRequest:
+            type: object
+            properties:
+                doc:
+                    enum:
+                        - AGREEMENT_DOC_UNSPECIFIED
+                        - AGREEMENT_DOC_USER
+                        - AGREEMENT_DOC_PRIVACY
+                    type: string
+                    format: enum
+                no:
+                    type: string
+                    description: |-
+                        Free-form version string the operator quotes (v1.0.0, v1.5-draft…);
+                         uniqueness per document is enforced by the store, format is not.
+                effectiveAt:
+                    type: string
+                    format: date-time
+                body:
+                    type: string
+        cyber.esports.v1.CreateAgreementVersionResponse:
+            type: object
+            properties:
+                version:
+                    $ref: '#/components/schemas/cyber.esports.v1.AgreementVersion'
         cyber.esports.v1.CreateOrderRequest:
             type: object
             properties:
@@ -4059,6 +4382,12 @@ components:
             properties:
                 sku:
                     $ref: '#/components/schemas/cyber.esports.v1.AdminSku'
+        cyber.esports.v1.DeleteAgreementVersionResponse:
+            type: object
+            properties: {}
+            description: |-
+                Deletion answers nothing: the row is gone and the list refetch
+                 renders the truth.
         cyber.esports.v1.DigestAbilityLine:
             type: object
             properties:
@@ -4226,6 +4555,38 @@ components:
                     description: |-
                         The whole filtered set in one answer, no paging — a batch tops out
                          at a thousand codes, so the export stays one payload.
+        cyber.esports.v1.ExportAgreementConsentsRequest:
+            type: object
+            properties:
+                doc:
+                    enum:
+                        - AGREEMENT_DOC_UNSPECIFIED
+                        - AGREEMENT_DOC_USER
+                        - AGREEMENT_DOC_PRIVACY
+                    type: string
+                    description: |-
+                        Same filters as the list — an export answers the visible filter,
+                         never a wider set. The whole filtered set in one answer, no paging:
+                         an operator export is bounded by how narrow they filtered, and the
+                         day that stops being true is the day this grows a streaming shape.
+                    format: enum
+                versionNo:
+                    type: string
+                keyword:
+                    type: string
+                createdAtA:
+                    type: string
+                    format: date-time
+                createdAtZ:
+                    type: string
+                    format: date-time
+        cyber.esports.v1.ExportAgreementConsentsResponse:
+            type: object
+            properties:
+                consents:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.AgreementConsent'
         cyber.esports.v1.FlashAimingDetail:
             type: object
             properties:
@@ -4361,6 +4722,16 @@ components:
                     description: |-
                         The latest session line per genre — at most one row each, absent
                          when the genre was never played.
+        cyber.esports.v1.GetAgreementCurrentResponse:
+            type: object
+            properties:
+                docs:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.AgreementCurrent'
+                    description: |-
+                        One row per document that has a current version; a document without
+                         one is absent, and the legal page falls back to its placeholder.
         cyber.esports.v1.GetCareerReportRequest:
             type: object
             properties: {}
@@ -4751,6 +5122,26 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.ActivationCode'
+        cyber.esports.v1.ListAgreementConsentsResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                consents:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.AgreementConsent'
+                    description: Newest first.
+        cyber.esports.v1.ListAgreementVersionsResponse:
+            type: object
+            properties:
+                versions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.AgreementVersion'
+                    description: |-
+                        Current version first per document, then the rest newest-effective
+                         first; no paging — a document's version ledger is a handful of rows.
         cyber.esports.v1.ListCatalogSkusResponse:
             type: object
             properties:
@@ -5438,6 +5829,24 @@ components:
             description: |-
                 One banked scenario. The answer key rides in full — operator visibility
                  into what correctness is judged against is the point of this face.
+        cyber.esports.v1.RecordAgreementConsentRequest:
+            type: object
+            properties:
+                loginMethod:
+                    enum:
+                        - AGREEMENT_LOGIN_METHOD_UNSPECIFIED
+                        - AGREEMENT_LOGIN_METHOD_SMS_CODE
+                        - AGREEMENT_LOGIN_METHOD_PASSWORD
+                        - AGREEMENT_LOGIN_METHOD_WECHAT
+                    type: string
+                    format: enum
+        cyber.esports.v1.RecordAgreementConsentResponse:
+            type: object
+            properties: {}
+            description: |-
+                Empty on purpose: the record is fire-and-forget evidence the member
+                 plane does not consume — the operator's consent query reads it, and
+                 the e2e chain asserts it there.
         cyber.esports.v1.RedDotDetail:
             type: object
             properties:
@@ -5715,6 +6124,16 @@ components:
             properties:
                 batch:
                     $ref: '#/components/schemas/cyber.esports.v1.ActivationBatch'
+        cyber.esports.v1.SetAgreementCurrentRequest:
+            type: object
+            properties:
+                versionId:
+                    type: string
+        cyber.esports.v1.SetAgreementCurrentResponse:
+            type: object
+            properties:
+                version:
+                    $ref: '#/components/schemas/cyber.esports.v1.AgreementVersion'
         cyber.esports.v1.SetReportAccessPolicyRequest:
             type: object
             properties:
@@ -7806,6 +8225,30 @@ components:
 tags:
     - name: AgentConfigAdminService
     - name: AgentConfigService
+    - name: AgreementAdminService
+      description: |-
+        The operator face of the agreement domain: the version ledger each
+         document's consent evidence hangs on, and the consent query that
+         evidence answers. Creating a version makes it current on the spot —
+         an operator never publishes a draft, and the login gate starts
+         binding to the new version immediately; promoting an older version
+         back is the same one-action move. Consent rows are never touched:
+         deleting a version keeps every consent row it earned, because the
+         rows denormalize the version string they landed on. Like the other
+         operator planes, this service is a strippable module — deployments
+         without it lose the management face, never the member face's
+         recording or rendering.
+    - name: AgreementService
+      description: |-
+        The member face of the agreement domain: the two legal documents the
+         login checkbox gate binds to, and the consent record that checkbox
+         leaves behind. Compliance evidence is the whole point — when a minor's
+         recharge or a refund is disputed, the operator must show which version
+         the user agreed to and when, so consent rows are append-only and the
+         server alone decides which version a consent landed on: the client
+         reports that the boxes were checked and which login path carried them,
+         never a version number, because a stale client must not be able to
+         pin evidence to an outdated document.
     - name: AuditService
     - name: AuthService
     - name: ChatService

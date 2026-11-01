@@ -133,5 +133,9 @@
   "error_ESPORTS_REPORT_RECORD_INVALID": "이 테스트 기록은 유효하지 않아 리포트를 생성할 수 없습니다",
   "error_ESPORTS_REPORT_SESSION_NOT_OWNED": "자신의 결과만 볼 수 있습니다",
   "error_ESPORTS_SKU_KIND_INVALID": "该 SKU가 멤버십 플랜이 아닙니다",
-  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "유효한 멤버십 기록이 없습니다"
+  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "유효한 멤버십 기록이 없습니다",
+  "error_ESPORTS_AGREEMENT_VERSION_NOT_FOUND": "약관 버전을 찾을 수 없습니다",
+  "error_ESPORTS_AGREEMENT_VERSION_IS_CURRENT": "현재 적용 중인 버전은 삭제할 수 없습니다. 다른 버전으로 먼저 전환하세요",
+  "error_ESPORTS_AGREEMENT_VERSION_DUPLICATE": "이 버전 번호는 이미 존재합니다",
+  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "약관 버전이 아직 구성되지 않았습니다. 운영자에게 문의하세요"
 }

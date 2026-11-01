@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The member face of the agreement domain: the two legal documents the
+// login checkbox gate binds to, and the consent record that checkbox
+// leaves behind. Compliance evidence is the whole point — when a minor's
+// recharge or a refund is disputed, the operator must show which version
+// the user agreed to and when, so consent rows are append-only and the
+// server alone decides which version a consent landed on: the client
+// reports that the boxes were checked and which login path carried them,
+// never a version number, because a stale client must not be able to
+// pin evidence to an outdated document.
+service AgreementService {
+  option (cyber.ext.v1.service_comment) = "协议与同意";
+  rpc GetAgreementCurrent(GetAgreementCurrentRequest) returns (GetAgreementCurrentResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "当前生效协议版本"
+      action: ACTION_READ
+    };
+    // Public because the legal pages are linked from the login screen —
+    // the reader may hold no session yet. The answer is a document
+    // catalog with no user data in it.
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {get: "/api/v1/esports/agreements/current"};
+  }
+  rpc RecordAgreementConsent(RecordAgreementConsentRequest) returns (RecordAgreementConsentResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "登录同意落库"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/agreements/consent"
+      body: "*"
+    };
+  }
+}
+
+// The two documents the login gate binds to. A closed pair by product
+// definition — the login page draws one checkbox per document.
+enum AgreementDoc {
+  AGREEMENT_DOC_UNSPECIFIED = 0;
+  AGREEMENT_DOC_USER = 1;
+  AGREEMENT_DOC_PRIVACY = 2;
+}
+
+// The UI path the consent travelled on. The esports service never sees
+// the system's login handshake, so the client declares the mode it drew;
+// it is evidence of what the consent UI looked like, not of how the
+// system authenticated the user.
+enum AgreementLoginMethod {
+  AGREEMENT_LOGIN_METHOD_UNSPECIFIED = 0;
+  AGREEMENT_LOGIN_METHOD_SMS_CODE = 1;
+  AGREEMENT_LOGIN_METHOD_PASSWORD = 2;
+  AGREEMENT_LOGIN_METHOD_WECHAT = 3;
+}
+
+// One document's current answer — the version line the legal page and
+// the login gate render.
+message AgreementCurrent {
+  AgreementDoc doc = 1;
+  google.protobuf.StringValue no = 2;
+  google.protobuf.Timestamp effective_at = 3;
+}
+
+message GetAgreementCurrentRequest {}
+
+message GetAgreementCurrentResponse {
+  // One row per document that has a current version; a document without
+  // one is absent, and the legal page falls back to its placeholder.
+  repeated AgreementCurrent docs = 1;
+}
+
+message RecordAgreementConsentRequest {
+  optional AgreementLoginMethod login_method = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }
+  ];
+}
+
+// Empty on purpose: the record is fire-and-forget evidence the member
+// plane does not consume — the operator's consent query reads it, and
+// the e2e chain asserts it there.
+message RecordAgreementConsentResponse {}

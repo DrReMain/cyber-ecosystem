@@ -6,5 +6,11 @@
   "esports_assessment_title": "Question Bank & Tests",
   "esports_reports_title": "Reports & Content",
   "esports_channels_title": "Channels & Promotion",
-  "esports_pricing_title": "Pricing & Orders"
+  "esports_pricing_title": "Pricing & Orders",
+  "esports_compliance_title": "Agreements & Compliance",
+  "esports_agreement_doc_user": "User Agreement",
+  "esports_agreement_doc_privacy": "Privacy Policy",
+  "esports_agreement_login_sms_code": "SMS code",
+  "esports_agreement_login_password": "Password",
+  "esports_agreement_login_wechat": "WeChat one-tap login"
 }

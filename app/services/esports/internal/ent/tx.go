@@ -20,6 +20,10 @@ type Tx struct {
 	ActivationBatch *ActivationBatchClient
 	// ActivationCode is the client for interacting with the ActivationCode builders.
 	ActivationCode *ActivationCodeClient
+	// AgreementConsent is the client for interacting with the AgreementConsent builders.
+	AgreementConsent *AgreementConsentClient
+	// AgreementVersion is the client for interacting with the AgreementVersion builders.
+	AgreementVersion *AgreementVersionClient
 	// Entitlement is the client for interacting with the Entitlement builders.
 	Entitlement *EntitlementClient
 	// Game is the client for interacting with the Game builders.
@@ -180,6 +184,8 @@ func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.ActivationBatch = NewActivationBatchClient(tx.config)
 	tx.ActivationCode = NewActivationCodeClient(tx.config)
+	tx.AgreementConsent = NewAgreementConsentClient(tx.config)
+	tx.AgreementVersion = NewAgreementVersionClient(tx.config)
 	tx.Entitlement = NewEntitlementClient(tx.config)
 	tx.Game = NewGameClient(tx.config)
 	tx.MatchConfig = NewMatchConfigClient(tx.config)

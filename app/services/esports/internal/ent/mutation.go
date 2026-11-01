@@ -7,6 +7,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationbatch"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
+	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
+	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -40,22 +42,24 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAbilityScore    = "AbilityScore"
-	TypeActivationBatch = "ActivationBatch"
-	TypeActivationCode  = "ActivationCode"
-	TypeEntitlement     = "Entitlement"
-	TypeGame            = "Game"
-	TypeMatchConfig     = "MatchConfig"
-	TypeMatchSession    = "MatchSession"
-	TypePayOrder        = "PayOrder"
-	TypeProfile         = "Profile"
-	TypeQuestionBank    = "QuestionBank"
-	TypeReportPolicy    = "ReportPolicy"
-	TypeReportSnapshot  = "ReportSnapshot"
-	TypeSku             = "Sku"
-	TypeTest            = "Test"
-	TypeTestConfig      = "TestConfig"
-	TypeTestRecord      = "TestRecord"
+	TypeAbilityScore     = "AbilityScore"
+	TypeActivationBatch  = "ActivationBatch"
+	TypeActivationCode   = "ActivationCode"
+	TypeAgreementConsent = "AgreementConsent"
+	TypeAgreementVersion = "AgreementVersion"
+	TypeEntitlement      = "Entitlement"
+	TypeGame             = "Game"
+	TypeMatchConfig      = "MatchConfig"
+	TypeMatchSession     = "MatchSession"
+	TypePayOrder         = "PayOrder"
+	TypeProfile          = "Profile"
+	TypeQuestionBank     = "QuestionBank"
+	TypeReportPolicy     = "ReportPolicy"
+	TypeReportSnapshot   = "ReportSnapshot"
+	TypeSku              = "Sku"
+	TypeTest             = "Test"
+	TypeTestConfig       = "TestConfig"
+	TypeTestRecord       = "TestRecord"
 )
 
 // AbilityScoreMutation represents an operation that mutates the AbilityScore nodes in the graph.
@@ -2718,6 +2722,1318 @@ func (m *ActivationCodeMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ActivationCodeMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown ActivationCode edge %s", name)
+}
+
+// AgreementConsentMutation represents an operation that mutates the AgreementConsent nodes in the graph.
+type AgreementConsentMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	user_id       *string
+	doc           *agreementconsent.Doc
+	version_no    *string
+	login_method  *agreementconsent.LoginMethod
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*AgreementConsent, error)
+	predicates    []predicate.AgreementConsent
+}
+
+var _ ent.Mutation = (*AgreementConsentMutation)(nil)
+
+// agreementconsentOption allows management of the mutation configuration using functional options.
+type agreementconsentOption func(*AgreementConsentMutation)
+
+// newAgreementConsentMutation creates new mutation for the AgreementConsent entity.
+func newAgreementConsentMutation(c config, op Op, opts ...agreementconsentOption) *AgreementConsentMutation {
+	m := &AgreementConsentMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAgreementConsent,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAgreementConsentID sets the ID field of the mutation.
+func withAgreementConsentID(id string) agreementconsentOption {
+	return func(m *AgreementConsentMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AgreementConsent
+		)
+		m.oldValue = func(ctx context.Context) (*AgreementConsent, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AgreementConsent.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAgreementConsent sets the old AgreementConsent of the mutation.
+func withAgreementConsent(node *AgreementConsent) agreementconsentOption {
+	return func(m *AgreementConsentMutation) {
+		m.oldValue = func(context.Context) (*AgreementConsent, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AgreementConsentMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AgreementConsentMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of AgreementConsent entities.
+func (m *AgreementConsentMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *AgreementConsentMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *AgreementConsentMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().AgreementConsent.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AgreementConsentMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AgreementConsentMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AgreementConsent entity.
+// If the AgreementConsent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementConsentMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AgreementConsentMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *AgreementConsentMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *AgreementConsentMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the AgreementConsent entity.
+// If the AgreementConsent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementConsentMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *AgreementConsentMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *AgreementConsentMutation) SetUserID(s string) {
+	m.user_id = &s
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *AgreementConsentMutation) UserID() (r string, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the AgreementConsent entity.
+// If the AgreementConsent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementConsentMutation) OldUserID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *AgreementConsentMutation) ResetUserID() {
+	m.user_id = nil
+}
+
+// SetDoc sets the "doc" field.
+func (m *AgreementConsentMutation) SetDoc(a agreementconsent.Doc) {
+	m.doc = &a
+}
+
+// Doc returns the value of the "doc" field in the mutation.
+func (m *AgreementConsentMutation) Doc() (r agreementconsent.Doc, exists bool) {
+	v := m.doc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDoc returns the old "doc" field's value of the AgreementConsent entity.
+// If the AgreementConsent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementConsentMutation) OldDoc(ctx context.Context) (v agreementconsent.Doc, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDoc is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDoc requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDoc: %w", err)
+	}
+	return oldValue.Doc, nil
+}
+
+// ResetDoc resets all changes to the "doc" field.
+func (m *AgreementConsentMutation) ResetDoc() {
+	m.doc = nil
+}
+
+// SetVersionNo sets the "version_no" field.
+func (m *AgreementConsentMutation) SetVersionNo(s string) {
+	m.version_no = &s
+}
+
+// VersionNo returns the value of the "version_no" field in the mutation.
+func (m *AgreementConsentMutation) VersionNo() (r string, exists bool) {
+	v := m.version_no
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVersionNo returns the old "version_no" field's value of the AgreementConsent entity.
+// If the AgreementConsent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementConsentMutation) OldVersionNo(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVersionNo is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVersionNo requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVersionNo: %w", err)
+	}
+	return oldValue.VersionNo, nil
+}
+
+// ResetVersionNo resets all changes to the "version_no" field.
+func (m *AgreementConsentMutation) ResetVersionNo() {
+	m.version_no = nil
+}
+
+// SetLoginMethod sets the "login_method" field.
+func (m *AgreementConsentMutation) SetLoginMethod(am agreementconsent.LoginMethod) {
+	m.login_method = &am
+}
+
+// LoginMethod returns the value of the "login_method" field in the mutation.
+func (m *AgreementConsentMutation) LoginMethod() (r agreementconsent.LoginMethod, exists bool) {
+	v := m.login_method
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLoginMethod returns the old "login_method" field's value of the AgreementConsent entity.
+// If the AgreementConsent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementConsentMutation) OldLoginMethod(ctx context.Context) (v agreementconsent.LoginMethod, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLoginMethod is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLoginMethod requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLoginMethod: %w", err)
+	}
+	return oldValue.LoginMethod, nil
+}
+
+// ResetLoginMethod resets all changes to the "login_method" field.
+func (m *AgreementConsentMutation) ResetLoginMethod() {
+	m.login_method = nil
+}
+
+// Where appends a list predicates to the AgreementConsentMutation builder.
+func (m *AgreementConsentMutation) Where(ps ...predicate.AgreementConsent) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the AgreementConsentMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AgreementConsentMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.AgreementConsent, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *AgreementConsentMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AgreementConsentMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (AgreementConsent).
+func (m *AgreementConsentMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AgreementConsentMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.created_at != nil {
+		fields = append(fields, agreementconsent.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, agreementconsent.FieldUpdatedAt)
+	}
+	if m.user_id != nil {
+		fields = append(fields, agreementconsent.FieldUserID)
+	}
+	if m.doc != nil {
+		fields = append(fields, agreementconsent.FieldDoc)
+	}
+	if m.version_no != nil {
+		fields = append(fields, agreementconsent.FieldVersionNo)
+	}
+	if m.login_method != nil {
+		fields = append(fields, agreementconsent.FieldLoginMethod)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AgreementConsentMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case agreementconsent.FieldCreatedAt:
+		return m.CreatedAt()
+	case agreementconsent.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case agreementconsent.FieldUserID:
+		return m.UserID()
+	case agreementconsent.FieldDoc:
+		return m.Doc()
+	case agreementconsent.FieldVersionNo:
+		return m.VersionNo()
+	case agreementconsent.FieldLoginMethod:
+		return m.LoginMethod()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AgreementConsentMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case agreementconsent.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case agreementconsent.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case agreementconsent.FieldUserID:
+		return m.OldUserID(ctx)
+	case agreementconsent.FieldDoc:
+		return m.OldDoc(ctx)
+	case agreementconsent.FieldVersionNo:
+		return m.OldVersionNo(ctx)
+	case agreementconsent.FieldLoginMethod:
+		return m.OldLoginMethod(ctx)
+	}
+	return nil, fmt.Errorf("unknown AgreementConsent field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AgreementConsentMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case agreementconsent.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case agreementconsent.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case agreementconsent.FieldUserID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case agreementconsent.FieldDoc:
+		v, ok := value.(agreementconsent.Doc)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDoc(v)
+		return nil
+	case agreementconsent.FieldVersionNo:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVersionNo(v)
+		return nil
+	case agreementconsent.FieldLoginMethod:
+		v, ok := value.(agreementconsent.LoginMethod)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLoginMethod(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AgreementConsent field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AgreementConsentMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AgreementConsentMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AgreementConsentMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AgreementConsent numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AgreementConsentMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AgreementConsentMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AgreementConsentMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown AgreementConsent nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AgreementConsentMutation) ResetField(name string) error {
+	switch name {
+	case agreementconsent.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case agreementconsent.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case agreementconsent.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case agreementconsent.FieldDoc:
+		m.ResetDoc()
+		return nil
+	case agreementconsent.FieldVersionNo:
+		m.ResetVersionNo()
+		return nil
+	case agreementconsent.FieldLoginMethod:
+		m.ResetLoginMethod()
+		return nil
+	}
+	return fmt.Errorf("unknown AgreementConsent field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AgreementConsentMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AgreementConsentMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AgreementConsentMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AgreementConsentMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AgreementConsentMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AgreementConsentMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AgreementConsentMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown AgreementConsent unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AgreementConsentMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown AgreementConsent edge %s", name)
+}
+
+// AgreementVersionMutation represents an operation that mutates the AgreementVersion nodes in the graph.
+type AgreementVersionMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	doc           *agreementversion.Doc
+	no            *string
+	title         *string
+	body          *string
+	effective_at  *time.Time
+	is_current    *bool
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*AgreementVersion, error)
+	predicates    []predicate.AgreementVersion
+}
+
+var _ ent.Mutation = (*AgreementVersionMutation)(nil)
+
+// agreementversionOption allows management of the mutation configuration using functional options.
+type agreementversionOption func(*AgreementVersionMutation)
+
+// newAgreementVersionMutation creates new mutation for the AgreementVersion entity.
+func newAgreementVersionMutation(c config, op Op, opts ...agreementversionOption) *AgreementVersionMutation {
+	m := &AgreementVersionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAgreementVersion,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAgreementVersionID sets the ID field of the mutation.
+func withAgreementVersionID(id string) agreementversionOption {
+	return func(m *AgreementVersionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AgreementVersion
+		)
+		m.oldValue = func(ctx context.Context) (*AgreementVersion, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AgreementVersion.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAgreementVersion sets the old AgreementVersion of the mutation.
+func withAgreementVersion(node *AgreementVersion) agreementversionOption {
+	return func(m *AgreementVersionMutation) {
+		m.oldValue = func(context.Context) (*AgreementVersion, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AgreementVersionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AgreementVersionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of AgreementVersion entities.
+func (m *AgreementVersionMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *AgreementVersionMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *AgreementVersionMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().AgreementVersion.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AgreementVersionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AgreementVersionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AgreementVersion entity.
+// If the AgreementVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementVersionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AgreementVersionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *AgreementVersionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *AgreementVersionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the AgreementVersion entity.
+// If the AgreementVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementVersionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *AgreementVersionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDoc sets the "doc" field.
+func (m *AgreementVersionMutation) SetDoc(a agreementversion.Doc) {
+	m.doc = &a
+}
+
+// Doc returns the value of the "doc" field in the mutation.
+func (m *AgreementVersionMutation) Doc() (r agreementversion.Doc, exists bool) {
+	v := m.doc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDoc returns the old "doc" field's value of the AgreementVersion entity.
+// If the AgreementVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementVersionMutation) OldDoc(ctx context.Context) (v agreementversion.Doc, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDoc is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDoc requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDoc: %w", err)
+	}
+	return oldValue.Doc, nil
+}
+
+// ResetDoc resets all changes to the "doc" field.
+func (m *AgreementVersionMutation) ResetDoc() {
+	m.doc = nil
+}
+
+// SetNo sets the "no" field.
+func (m *AgreementVersionMutation) SetNo(s string) {
+	m.no = &s
+}
+
+// No returns the value of the "no" field in the mutation.
+func (m *AgreementVersionMutation) No() (r string, exists bool) {
+	v := m.no
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNo returns the old "no" field's value of the AgreementVersion entity.
+// If the AgreementVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementVersionMutation) OldNo(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNo is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNo requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNo: %w", err)
+	}
+	return oldValue.No, nil
+}
+
+// ResetNo resets all changes to the "no" field.
+func (m *AgreementVersionMutation) ResetNo() {
+	m.no = nil
+}
+
+// SetTitle sets the "title" field.
+func (m *AgreementVersionMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *AgreementVersionMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the AgreementVersion entity.
+// If the AgreementVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementVersionMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *AgreementVersionMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetBody sets the "body" field.
+func (m *AgreementVersionMutation) SetBody(s string) {
+	m.body = &s
+}
+
+// Body returns the value of the "body" field in the mutation.
+func (m *AgreementVersionMutation) Body() (r string, exists bool) {
+	v := m.body
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBody returns the old "body" field's value of the AgreementVersion entity.
+// If the AgreementVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementVersionMutation) OldBody(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBody is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBody requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBody: %w", err)
+	}
+	return oldValue.Body, nil
+}
+
+// ResetBody resets all changes to the "body" field.
+func (m *AgreementVersionMutation) ResetBody() {
+	m.body = nil
+}
+
+// SetEffectiveAt sets the "effective_at" field.
+func (m *AgreementVersionMutation) SetEffectiveAt(t time.Time) {
+	m.effective_at = &t
+}
+
+// EffectiveAt returns the value of the "effective_at" field in the mutation.
+func (m *AgreementVersionMutation) EffectiveAt() (r time.Time, exists bool) {
+	v := m.effective_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEffectiveAt returns the old "effective_at" field's value of the AgreementVersion entity.
+// If the AgreementVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementVersionMutation) OldEffectiveAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEffectiveAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEffectiveAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEffectiveAt: %w", err)
+	}
+	return oldValue.EffectiveAt, nil
+}
+
+// ResetEffectiveAt resets all changes to the "effective_at" field.
+func (m *AgreementVersionMutation) ResetEffectiveAt() {
+	m.effective_at = nil
+}
+
+// SetIsCurrent sets the "is_current" field.
+func (m *AgreementVersionMutation) SetIsCurrent(b bool) {
+	m.is_current = &b
+}
+
+// IsCurrent returns the value of the "is_current" field in the mutation.
+func (m *AgreementVersionMutation) IsCurrent() (r bool, exists bool) {
+	v := m.is_current
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsCurrent returns the old "is_current" field's value of the AgreementVersion entity.
+// If the AgreementVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AgreementVersionMutation) OldIsCurrent(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsCurrent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsCurrent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsCurrent: %w", err)
+	}
+	return oldValue.IsCurrent, nil
+}
+
+// ResetIsCurrent resets all changes to the "is_current" field.
+func (m *AgreementVersionMutation) ResetIsCurrent() {
+	m.is_current = nil
+}
+
+// Where appends a list predicates to the AgreementVersionMutation builder.
+func (m *AgreementVersionMutation) Where(ps ...predicate.AgreementVersion) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the AgreementVersionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AgreementVersionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.AgreementVersion, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *AgreementVersionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AgreementVersionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (AgreementVersion).
+func (m *AgreementVersionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AgreementVersionMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.created_at != nil {
+		fields = append(fields, agreementversion.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, agreementversion.FieldUpdatedAt)
+	}
+	if m.doc != nil {
+		fields = append(fields, agreementversion.FieldDoc)
+	}
+	if m.no != nil {
+		fields = append(fields, agreementversion.FieldNo)
+	}
+	if m.title != nil {
+		fields = append(fields, agreementversion.FieldTitle)
+	}
+	if m.body != nil {
+		fields = append(fields, agreementversion.FieldBody)
+	}
+	if m.effective_at != nil {
+		fields = append(fields, agreementversion.FieldEffectiveAt)
+	}
+	if m.is_current != nil {
+		fields = append(fields, agreementversion.FieldIsCurrent)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AgreementVersionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case agreementversion.FieldCreatedAt:
+		return m.CreatedAt()
+	case agreementversion.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case agreementversion.FieldDoc:
+		return m.Doc()
+	case agreementversion.FieldNo:
+		return m.No()
+	case agreementversion.FieldTitle:
+		return m.Title()
+	case agreementversion.FieldBody:
+		return m.Body()
+	case agreementversion.FieldEffectiveAt:
+		return m.EffectiveAt()
+	case agreementversion.FieldIsCurrent:
+		return m.IsCurrent()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AgreementVersionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case agreementversion.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case agreementversion.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case agreementversion.FieldDoc:
+		return m.OldDoc(ctx)
+	case agreementversion.FieldNo:
+		return m.OldNo(ctx)
+	case agreementversion.FieldTitle:
+		return m.OldTitle(ctx)
+	case agreementversion.FieldBody:
+		return m.OldBody(ctx)
+	case agreementversion.FieldEffectiveAt:
+		return m.OldEffectiveAt(ctx)
+	case agreementversion.FieldIsCurrent:
+		return m.OldIsCurrent(ctx)
+	}
+	return nil, fmt.Errorf("unknown AgreementVersion field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AgreementVersionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case agreementversion.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case agreementversion.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case agreementversion.FieldDoc:
+		v, ok := value.(agreementversion.Doc)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDoc(v)
+		return nil
+	case agreementversion.FieldNo:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNo(v)
+		return nil
+	case agreementversion.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case agreementversion.FieldBody:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBody(v)
+		return nil
+	case agreementversion.FieldEffectiveAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEffectiveAt(v)
+		return nil
+	case agreementversion.FieldIsCurrent:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsCurrent(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AgreementVersion field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AgreementVersionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AgreementVersionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AgreementVersionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AgreementVersion numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AgreementVersionMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AgreementVersionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AgreementVersionMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown AgreementVersion nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AgreementVersionMutation) ResetField(name string) error {
+	switch name {
+	case agreementversion.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case agreementversion.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case agreementversion.FieldDoc:
+		m.ResetDoc()
+		return nil
+	case agreementversion.FieldNo:
+		m.ResetNo()
+		return nil
+	case agreementversion.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case agreementversion.FieldBody:
+		m.ResetBody()
+		return nil
+	case agreementversion.FieldEffectiveAt:
+		m.ResetEffectiveAt()
+		return nil
+	case agreementversion.FieldIsCurrent:
+		m.ResetIsCurrent()
+		return nil
+	}
+	return fmt.Errorf("unknown AgreementVersion field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AgreementVersionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AgreementVersionMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AgreementVersionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AgreementVersionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AgreementVersionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AgreementVersionMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AgreementVersionMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown AgreementVersion unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AgreementVersionMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown AgreementVersion edge %s", name)
 }
 
 // EntitlementMutation represents an operation that mutates the Entitlement nodes in the graph.

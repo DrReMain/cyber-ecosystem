@@ -378,3 +378,65 @@ func IsEsportsReportSessionNotOwned(err error) bool {
 func ErrorEsportsReportSessionNotOwned(format string, args ...interface{}) *errors.Error {
 	return errors.New(403, Esports_ESPORTS_REPORT_SESSION_NOT_OWNED.String(), fmt.Sprintf(format, args...))
 }
+
+// 617x: agreement
+func IsEsportsAgreementVersionNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_AGREEMENT_VERSION_NOT_FOUND.String() && e.Code == 404
+}
+
+// 617x: agreement
+func ErrorEsportsAgreementVersionNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, Esports_ESPORTS_AGREEMENT_VERSION_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+// The current version anchors the login gate's consent; deleting it
+// requires switching current to another version first, so no consent
+// can ever land on a document with no current version.
+func IsEsportsAgreementVersionIsCurrent(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_AGREEMENT_VERSION_IS_CURRENT.String() && e.Code == 400
+}
+
+// The current version anchors the login gate's consent; deleting it
+// requires switching current to another version first, so no consent
+// can ever land on a document with no current version.
+func ErrorEsportsAgreementVersionIsCurrent(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_AGREEMENT_VERSION_IS_CURRENT.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsAgreementVersionDuplicate(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_AGREEMENT_VERSION_DUPLICATE.String() && e.Code == 400
+}
+
+func ErrorEsportsAgreementVersionDuplicate(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_AGREEMENT_VERSION_DUPLICATE.String(), fmt.Sprintf(format, args...))
+}
+
+// No current version exists for a document — only possible before the
+// seed lands; recording consent against nothing is refused rather than
+// silently backdated to whatever comes next.
+func IsEsportsAgreementNotConfigured(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_AGREEMENT_NOT_CONFIGURED.String() && e.Code == 400
+}
+
+// No current version exists for a document — only possible before the
+// seed lands; recording consent against nothing is refused rather than
+// silently backdated to whatever comes next.
+func ErrorEsportsAgreementNotConfigured(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_AGREEMENT_NOT_CONFIGURED.String(), fmt.Sprintf(format, args...))
+}

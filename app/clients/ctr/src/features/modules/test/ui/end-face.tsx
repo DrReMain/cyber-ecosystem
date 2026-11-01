@@ -134,7 +134,7 @@ function PrevTag({ line }: Readonly<{ line: WireLine | undefined }>) {
       className={`rounded-full px-2.5 py-0.75 text-[10.5px] font-semibold ${
         up
           ? "text-status-ok bg-[rgba(34,197,94,0.12)]"
-          : "bg-[rgba(248,113,113,0.12)] text-[#F87171]"
+          : "text-danger-text bg-[rgba(248,113,113,0.12)]"
       }`}
     >
       {m.test_result_prev({ delta: `${up ? "+" : ""}${Math.round(delta * 10) / 10}` })}
@@ -188,7 +188,7 @@ function AttemptsNote({ line }: Readonly<{ line: WireLine | undefined }>) {
           {score === best ? (
             <span className="text-grade-s font-bold tabular-nums">
               {Math.round(score * 10) / 10}
-              <span className="ml-0.5 rounded-[4px] bg-[rgba(253,224,71,0.14)] px-1 py-px text-[9px] font-semibold">
+              <span className="ml-0.5 rounded-sm bg-[rgba(253,224,71,0.14)] px-1 py-px text-[9px] font-semibold">
                 {m.test_attempts_taken()}
               </span>
             </span>
@@ -359,11 +359,11 @@ export function EndFace({
     <div className="bg-canvas absolute inset-0 isolate z-40 overflow-x-hidden overflow-y-auto">
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-20 -left-17.5 size-[260px] rounded-full bg-[#2563eb] opacity-26 blur-[70px]"
+        className="pointer-events-none absolute -top-20 -left-17.5 size-65 rounded-full bg-[#2563eb] opacity-26 blur-[70px]"
       />
       <div
         aria-hidden
-        className="bg-ambient-cyan pointer-events-none absolute -right-17.5 -bottom-15 size-[220px] rounded-full opacity-26 blur-[70px]"
+        className="bg-ambient-cyan pointer-events-none absolute -right-17.5 -bottom-15 size-55 rounded-full opacity-26 blur-[70px]"
       />
       <div className="relative mx-auto w-full max-w-md px-4 pb-6">
         <div className="flex items-center gap-3 pt-5 pb-2.5">
@@ -433,7 +433,7 @@ export function EndFace({
               {spent ? m.test_result_retry_disabled() : m.test_end_retry()}
             </Button>
             {spent ? (
-              <p className="text-[#FCD34D] px-1 text-[11.5px] leading-[1.7]">
+              <p className="text-status-pending px-1 text-[11.5px] leading-[1.7]">
                 {m.test_intro_blocked()}
               </p>
             ) : null}

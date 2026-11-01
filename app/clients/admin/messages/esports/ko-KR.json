@@ -6,5 +6,11 @@
   "esports_assessment_title": "문제은행·테스트",
   "esports_reports_title": "리포트·콘텐츠",
   "esports_channels_title": "채널·프로모션",
-  "esports_pricing_title": "가격 및 주문"
+  "esports_pricing_title": "가격 및 주문",
+  "esports_compliance_title": "약관 및 컴플라이언스",
+  "esports_agreement_doc_user": "이용약관",
+  "esports_agreement_doc_privacy": "개인정보 처리방침",
+  "esports_agreement_login_sms_code": "인증번호",
+  "esports_agreement_login_password": "비밀번호",
+  "esports_agreement_login_wechat": "WeChat 원탭 로그인"
 }

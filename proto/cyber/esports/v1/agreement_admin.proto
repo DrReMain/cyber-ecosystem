@@ -1,0 +1,245 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/esports/v1/agreement.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The operator face of the agreement domain: the version ledger each
+// document's consent evidence hangs on, and the consent query that
+// evidence answers. Creating a version makes it current on the spot —
+// an operator never publishes a draft, and the login gate starts
+// binding to the new version immediately; promoting an older version
+// back is the same one-action move. Consent rows are never touched:
+// deleting a version keeps every consent row it earned, because the
+// rows denormalize the version string they landed on. Like the other
+// operator planes, this service is a strippable module — deployments
+// without it lose the management face, never the member face's
+// recording or rendering.
+service AgreementAdminService {
+  option (cyber.ext.v1.service_comment) = "协议版本与同意记录";
+  rpc CreateAgreementVersion(CreateAgreementVersionRequest) returns (CreateAgreementVersionResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "新建协议版本并设为当前"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/agreement-versions"
+      body: "*"
+    };
+  }
+  rpc SetAgreementCurrent(SetAgreementCurrentRequest) returns (SetAgreementCurrentResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "切换当前生效版本"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/agreement-versions/{version_id}/current"
+      body: "*"
+    };
+  }
+  rpc DeleteAgreementVersion(DeleteAgreementVersionRequest) returns (DeleteAgreementVersionResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "删除历史协议版本"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {delete: "/api/v1/esports/agreement-versions/{version_id}"};
+  }
+  rpc ListAgreementVersions(ListAgreementVersionsRequest) returns (ListAgreementVersionsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "协议版本列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/agreement-versions"};
+  }
+  rpc ListAgreementConsents(ListAgreementConsentsRequest) returns (ListAgreementConsentsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "同意记录列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/agreement-consents"};
+  }
+  rpc ExportAgreementConsents(ExportAgreementConsentsRequest) returns (ExportAgreementConsentsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "导出同意记录"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/agreement-consents/export"
+      body: "*"
+    };
+  }
+}
+
+// One version row of one document. agreed_count is a fold over the
+// consent rows (distinct users), carried per row so the table renders
+// without a second query per version.
+message AgreementVersion {
+  google.protobuf.StringValue id = 1;
+  AgreementDoc doc = 2;
+  google.protobuf.StringValue no = 3;
+  // The display title the create path derives from the document type
+  // (《用户服务协议》 / 《隐私政策》); stored per row so historical rows
+  // keep the title they were published under.
+  google.protobuf.StringValue title = 4;
+  google.protobuf.Timestamp effective_at = 5;
+  google.protobuf.Int32Value agreed_count = 6;
+  google.protobuf.BoolValue is_current = 7;
+  google.protobuf.StringValue body = 8;
+}
+
+message CreateAgreementVersionRequest {
+  optional AgreementDoc doc = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }
+  ];
+  // Free-form version string the operator quotes (v1.0.0, v1.5-draft…);
+  // uniqueness per document is enforced by the store, format is not.
+  optional string no = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+  optional google.protobuf.Timestamp effective_at = 3 [(buf.validate.field).required = true];
+  optional string body = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 100000
+    }
+  ];
+}
+
+message CreateAgreementVersionResponse {
+  AgreementVersion version = 1;
+}
+
+message SetAgreementCurrentRequest {
+  string version_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+}
+
+message SetAgreementCurrentResponse {
+  AgreementVersion version = 1;
+}
+
+message DeleteAgreementVersionRequest {
+  string version_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+}
+
+// Deletion answers nothing: the row is gone and the list refetch
+// renders the truth.
+message DeleteAgreementVersionResponse {}
+
+message ListAgreementVersionsRequest {
+  // Absent = both documents' versions in one table.
+  optional AgreementDoc doc = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+}
+
+message ListAgreementVersionsResponse {
+  // Current version first per document, then the rest newest-effective
+  // first; no paging — a document's version ledger is a handful of rows.
+  repeated AgreementVersion versions = 1;
+}
+
+// One consent row: the compliance-evidence unit. user_id with its two
+// display folds — nickname from the local profile, masked phone from
+// the system roster — because the operator answers disputes by reading
+// this table, not by joining three systems by hand.
+message AgreementConsent {
+  google.protobuf.StringValue user_id = 1;
+  google.protobuf.StringValue nickname = 2;
+  google.protobuf.StringValue phone_masked = 3;
+  AgreementDoc doc = 4;
+  // Denormalized on purpose: the version row may be deleted after the
+  // fact, the evidence keeps the string it landed on.
+  google.protobuf.StringValue version_no = 5;
+  google.protobuf.Timestamp consented_at = 6;
+  AgreementLoginMethod login_method = 7;
+}
+
+message ListAgreementConsentsRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional AgreementDoc doc = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  // Exact version string, prefilled by the version table's consent
+  // link; matches the denormalized column, so deleted versions stay
+  // queryable here.
+  optional string version_no = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 20
+  }];
+  // Nickname contains — resolved through the profile plane before the
+  // consent query runs. Phone search needs the system roster's reverse
+  // lookup and rides with that family's open gap instead of half-working.
+  optional string keyword = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
+}
+
+message ListAgreementConsentsResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  // Newest first.
+  repeated AgreementConsent consents = 2;
+}
+
+message ExportAgreementConsentsRequest {
+  // Same filters as the list — an export answers the visible filter,
+  // never a wider set. The whole filtered set in one answer, no paging:
+  // an operator export is bounded by how narrow they filtered, and the
+  // day that stops being true is the day this grows a streaming shape.
+  optional AgreementDoc doc = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  optional string version_no = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 20
+  }];
+  optional string keyword = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
+  google.protobuf.Timestamp created_at_a = 4;
+  google.protobuf.Timestamp created_at_z = 5;
+}
+
+message ExportAgreementConsentsResponse {
+  repeated AgreementConsent consents = 1;
+}

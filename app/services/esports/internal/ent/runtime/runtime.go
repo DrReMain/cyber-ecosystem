@@ -6,6 +6,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationbatch"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
+	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
+	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -275,6 +277,132 @@ func init() {
 	activationcode.DefaultID = activationcodeDescID.Default.(func() string)
 	// activationcode.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	activationcode.IDValidator = activationcodeDescID.Validators[0].(func(string) error)
+	agreementconsentMixin := schema.AgreementConsent{}.Mixin()
+	agreementconsentMixinFields0 := agreementconsentMixin[0].Fields()
+	_ = agreementconsentMixinFields0
+	agreementconsentMixinFields1 := agreementconsentMixin[1].Fields()
+	_ = agreementconsentMixinFields1
+	agreementconsentFields := schema.AgreementConsent{}.Fields()
+	_ = agreementconsentFields
+	// agreementconsentDescCreatedAt is the schema descriptor for created_at field.
+	agreementconsentDescCreatedAt := agreementconsentMixinFields1[0].Descriptor()
+	// agreementconsent.DefaultCreatedAt holds the default value on creation for the created_at field.
+	agreementconsent.DefaultCreatedAt = agreementconsentDescCreatedAt.Default.(func() time.Time)
+	// agreementconsentDescUpdatedAt is the schema descriptor for updated_at field.
+	agreementconsentDescUpdatedAt := agreementconsentMixinFields1[1].Descriptor()
+	// agreementconsent.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	agreementconsent.DefaultUpdatedAt = agreementconsentDescUpdatedAt.Default.(func() time.Time)
+	// agreementconsent.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	agreementconsent.UpdateDefaultUpdatedAt = agreementconsentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// agreementconsentDescUserID is the schema descriptor for user_id field.
+	agreementconsentDescUserID := agreementconsentFields[0].Descriptor()
+	// agreementconsent.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	agreementconsent.UserIDValidator = func() func(string) error {
+		validators := agreementconsentDescUserID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(user_id string) error {
+			for _, fn := range fns {
+				if err := fn(user_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// agreementconsentDescVersionNo is the schema descriptor for version_no field.
+	agreementconsentDescVersionNo := agreementconsentFields[2].Descriptor()
+	// agreementconsent.VersionNoValidator is a validator for the "version_no" field. It is called by the builders before save.
+	agreementconsent.VersionNoValidator = func() func(string) error {
+		validators := agreementconsentDescVersionNo.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(version_no string) error {
+			for _, fn := range fns {
+				if err := fn(version_no); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// agreementconsentDescID is the schema descriptor for id field.
+	agreementconsentDescID := agreementconsentMixinFields0[0].Descriptor()
+	// agreementconsent.DefaultID holds the default value on creation for the id field.
+	agreementconsent.DefaultID = agreementconsentDescID.Default.(func() string)
+	// agreementconsent.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	agreementconsent.IDValidator = agreementconsentDescID.Validators[0].(func(string) error)
+	agreementversionMixin := schema.AgreementVersion{}.Mixin()
+	agreementversionMixinFields0 := agreementversionMixin[0].Fields()
+	_ = agreementversionMixinFields0
+	agreementversionMixinFields1 := agreementversionMixin[1].Fields()
+	_ = agreementversionMixinFields1
+	agreementversionFields := schema.AgreementVersion{}.Fields()
+	_ = agreementversionFields
+	// agreementversionDescCreatedAt is the schema descriptor for created_at field.
+	agreementversionDescCreatedAt := agreementversionMixinFields1[0].Descriptor()
+	// agreementversion.DefaultCreatedAt holds the default value on creation for the created_at field.
+	agreementversion.DefaultCreatedAt = agreementversionDescCreatedAt.Default.(func() time.Time)
+	// agreementversionDescUpdatedAt is the schema descriptor for updated_at field.
+	agreementversionDescUpdatedAt := agreementversionMixinFields1[1].Descriptor()
+	// agreementversion.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	agreementversion.DefaultUpdatedAt = agreementversionDescUpdatedAt.Default.(func() time.Time)
+	// agreementversion.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	agreementversion.UpdateDefaultUpdatedAt = agreementversionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// agreementversionDescNo is the schema descriptor for no field.
+	agreementversionDescNo := agreementversionFields[1].Descriptor()
+	// agreementversion.NoValidator is a validator for the "no" field. It is called by the builders before save.
+	agreementversion.NoValidator = func() func(string) error {
+		validators := agreementversionDescNo.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(no string) error {
+			for _, fn := range fns {
+				if err := fn(no); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// agreementversionDescTitle is the schema descriptor for title field.
+	agreementversionDescTitle := agreementversionFields[2].Descriptor()
+	// agreementversion.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	agreementversion.TitleValidator = func() func(string) error {
+		validators := agreementversionDescTitle.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(title string) error {
+			for _, fn := range fns {
+				if err := fn(title); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// agreementversionDescBody is the schema descriptor for body field.
+	agreementversionDescBody := agreementversionFields[3].Descriptor()
+	// agreementversion.BodyValidator is a validator for the "body" field. It is called by the builders before save.
+	agreementversion.BodyValidator = agreementversionDescBody.Validators[0].(func(string) error)
+	// agreementversionDescIsCurrent is the schema descriptor for is_current field.
+	agreementversionDescIsCurrent := agreementversionFields[5].Descriptor()
+	// agreementversion.DefaultIsCurrent holds the default value on creation for the is_current field.
+	agreementversion.DefaultIsCurrent = agreementversionDescIsCurrent.Default.(bool)
+	// agreementversionDescID is the schema descriptor for id field.
+	agreementversionDescID := agreementversionMixinFields0[0].Descriptor()
+	// agreementversion.DefaultID holds the default value on creation for the id field.
+	agreementversion.DefaultID = agreementversionDescID.Default.(func() string)
+	// agreementversion.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	agreementversion.IDValidator = agreementversionDescID.Validators[0].(func(string) error)
 	entitlementMixin := schema.Entitlement{}.Mixin()
 	entitlementMixinHooks2 := entitlementMixin[2].Hooks()
 	entitlement.Hooks[0] = entitlementMixinHooks2[0]

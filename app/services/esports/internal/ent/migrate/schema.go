@@ -147,6 +147,79 @@ var (
 			},
 		},
 	}
+	// AgreementConsentColumns holds the columns for the "agreement_consent" table.
+	AgreementConsentColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "the consenting member identity"},
+		{Name: "doc", Type: field.TypeEnum, Comment: "the document the checkbox bound to", Enums: []string{"user", "privacy"}},
+		{Name: "version_no", Type: field.TypeString, Size: 20, Comment: "the version string at consent time, denormalized so the evidence outlives the version row"},
+		{Name: "login_method", Type: field.TypeEnum, Comment: "the UI path the consent travelled on, declared by the client (the system owns the real auth facts)", Enums: []string{"sms_code", "password", "wechat"}},
+	}
+	// AgreementConsentTable holds the schema information for the "agreement_consent" table.
+	AgreementConsentTable = &schema.Table{
+		Name:       "agreement_consent",
+		Columns:    AgreementConsentColumns,
+		PrimaryKey: []*schema.Column{AgreementConsentColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "agreementconsent_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AgreementConsentColumns[1]},
+			},
+			{
+				Name:    "agreementconsent_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{AgreementConsentColumns[2]},
+			},
+			{
+				Name:    "agreementconsent_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{AgreementConsentColumns[3]},
+			},
+			{
+				Name:    "agreementconsent_doc_version_no",
+				Unique:  false,
+				Columns: []*schema.Column{AgreementConsentColumns[4], AgreementConsentColumns[5]},
+			},
+		},
+	}
+	// AgreementVersionColumns holds the columns for the "agreement_version" table.
+	AgreementVersionColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "doc", Type: field.TypeEnum, Comment: "the legal document this version publishes", Enums: []string{"user", "privacy"}},
+		{Name: "no", Type: field.TypeString, Size: 20, Comment: "operator-quoted version string (v1.0.0…); unique per document, format-free"},
+		{Name: "title", Type: field.TypeString, Size: 100, Comment: "display title derived from the document type at create; historical rows keep what they were published under"},
+		{Name: "body", Type: field.TypeString, Size: 2147483647, Comment: "the published legal text — the compliance archive an operator quotes in a dispute"},
+		{Name: "effective_at", Type: field.TypeTime, Comment: "the date this version started binding, shown on the legal page's version line"},
+		{Name: "is_current", Type: field.TypeBool, Comment: "true = the version every new consent lands on; exactly one per document, flipped in one transaction", Default: false},
+	}
+	// AgreementVersionTable holds the schema information for the "agreement_version" table.
+	AgreementVersionTable = &schema.Table{
+		Name:       "agreement_version",
+		Columns:    AgreementVersionColumns,
+		PrimaryKey: []*schema.Column{AgreementVersionColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "agreementversion_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AgreementVersionColumns[1]},
+			},
+			{
+				Name:    "agreementversion_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{AgreementVersionColumns[2]},
+			},
+			{
+				Name:    "agreementversion_doc_no",
+				Unique:  true,
+				Columns: []*schema.Column{AgreementVersionColumns[3], AgreementVersionColumns[4]},
+			},
+		},
+	}
 	// EntitlementColumns holds the columns for the "entitlement" table.
 	EntitlementColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -756,6 +829,8 @@ var (
 		AbilityScoreTable,
 		ActivationBatchTable,
 		ActivationCodeTable,
+		AgreementConsentTable,
+		AgreementVersionTable,
 		EntitlementTable,
 		GameTable,
 		MatchConfigTable,
@@ -781,6 +856,12 @@ func init() {
 	}
 	ActivationCodeTable.Annotation = &entsql.Annotation{
 		Table: "activation_code",
+	}
+	AgreementConsentTable.Annotation = &entsql.Annotation{
+		Table: "agreement_consent",
+	}
+	AgreementVersionTable.Annotation = &entsql.Annotation{
+		Table: "agreement_version",
 	}
 	EntitlementTable.Annotation = &entsql.Annotation{
 		Table: "entitlement",

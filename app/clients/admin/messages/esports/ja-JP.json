@@ -6,5 +6,11 @@
   "esports_assessment_title": "題庫とテスト",
   "esports_reports_title": "レポートとコンテンツ",
   "esports_channels_title": "チャネルとプロモーション",
-  "esports_pricing_title": "価格と注文"
+  "esports_pricing_title": "価格と注文",
+  "esports_compliance_title": "規約とコンプライアンス",
+  "esports_agreement_doc_user": "利用規約",
+  "esports_agreement_doc_privacy": "プライバシーポリシー",
+  "esports_agreement_login_sms_code": "認証コード",
+  "esports_agreement_login_password": "パスワード",
+  "esports_agreement_login_wechat": "WeChatワンタップログイン"
 }
