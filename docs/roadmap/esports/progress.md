@@ -45,8 +45,5 @@
 | mt-D5 intro 按款文案+unitScoreLabel 种子(10-30 走查补:后者现裸英文 universal,原型=中文单位如「15 分/成功闪避」) | lzx | 随种子/国际化面 |
 | dev 栈老库接 atlas 需基线(10-31 hzy 机实证:无 revisions 表的既有库直接 migrate:apply 必撞 already-exists,先 `atlas migrate set <init版>` 打基线再 apply;revisions 表落专用 schema `atlas_schema_revisions`,查 public 查不到) | lzx | migrate:baseline 补 nx target 或本行即文档 |
 | age-required 逃生按钮(先看免费报告;原型有面现仓无) | PAY3 | 付费墙落地时 |
-| 双 N/4 撞义:match 头=已完成数 vs 测试面头=位置号,原型两处均裸 N/4(10-30 走查) | ljr(例会) | 措辞一句话裁,裁后 5 分钟落 |
-| 待校准成绩报告不可见:report 契约缺行——SessionAttempts 滤 AuthoritativeScoreNotNil,curve-pending 行(有 raw 无权威)无处可见(10-30 DB 实证);建议 GetSessionReport 增 pending 行,ctr 消费端已备(6b2db084) | lzx | 契约+聚合小片+dev 常模种子+e2e pending 锚 |
-| 回读面「本次成绩明细」行组缺(原型=mock,契约无逐次明细) | 例会 | 豁免候选或契约带明细行 |
-| 未校准结算措辞「N 分·原始分」(原型无此态,10-30 新措辞已裁落) | ljr(例会追认) | 改词则换键 5 分钟 |
+| 待校准成绩报告不可见:report 契约缺行——SessionAttempts 滤 AuthoritativeScoreNotNil,curve-pending 行(有 raw 无权威)无处可见(10-30 DB 实证);建议 GetSessionReport 增 pending 行,ctr 消费端已备(6b2db084);11-01 用户裁(PM-10):回读面「成绩明细」逐次行组随本片并车(契约带明细行,C 端消费后置) | lzx | 契约+聚合小片+dev 常模种子+e2e pending 锚 |
 | dev 栈状态目录 .run/ 迁仓外(D-AX):各开发会话代理的后台栈状态文件(pid/ports json)改写到仓外——建议 `$TMPDIR/cyber-dev/<project>.json`,pid 失活即视为陈旧可覆盖;本机存在 .run/ 者整目录删除(hzy 机实存自 10-26,lzx/用户机自查),.gitignore 不再兜底 | 各机 coding agent 自处 | 下次开栈前 |
