@@ -71,7 +71,11 @@ export function EsportsOrderDetailPage() {
         <Descriptions bordered column={2} size="small">
           <Descriptions.Item label={m.esports_order_user()}>
             {o?.userId ? (
-              <Link className="text-primary" params={{ id: o.userId }} to="/dashboard/people/users/$id">
+              <Link
+                className="text-primary"
+                params={{ id: o.userId }}
+                to="/dashboard/people/users/$id"
+              >
                 {[o?.nickname, o?.phoneMasked].filter(Boolean).join(" · ") || "-"}
               </Link>
             ) : (

@@ -1,8 +1,8 @@
 import type { AdminOrder } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/order_admin_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
+import { Link } from "@tanstack/react-router";
 import type { TableProps } from "antd";
 import { Tag, Typography } from "antd";
-import { Link } from "@tanstack/react-router";
 import { Ban, FileSearch } from "lucide-react";
 import { ActionIconButton } from "#/components/action-icon-button";
 import { fullDate } from "#/features/modules/esports-members/ui/dates";
@@ -28,7 +28,13 @@ interface OrdersTableProps {
   onRefresh: () => void;
 }
 
-export function OrdersTable({ rows, loading, pagination, onClose, onRefresh }: Readonly<OrdersTableProps>) {
+export function OrdersTable({
+  rows,
+  loading,
+  pagination,
+  onClose,
+  onRefresh,
+}: Readonly<OrdersTableProps>) {
   const { fieldAction } = useColumns();
 
   const columns: TableProps<AdminOrder>["columns"] = [
