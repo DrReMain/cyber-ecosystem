@@ -59,7 +59,7 @@ function StepRow({
       type="button"
     >
       <div
-        className={`${word.gradient} shadow-inset-ring flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-control text-[15px] font-bold text-white`}
+        className={`${word.gradient} shadow-inset-ring rounded-control flex h-[38px] w-[38px] shrink-0 items-center justify-center text-[15px] font-bold text-white`}
       >
         {index + 1}
       </div>
@@ -112,7 +112,7 @@ function GenreHeaderCard({ genre, switched }: Readonly<GenreHeaderCardProps>) {
     <div
       className={`${meta.gradient} shadow-card rounded-card flex items-center gap-3.25 overflow-hidden p-4 backdrop-blur-md`}
     >
-      <div className="shadow-inset-ring flex h-11.5 w-11.5 shrink-0 items-center justify-center rounded-control bg-[rgba(0,0,0,0.22)] text-xl text-white">
+      <div className="shadow-inset-ring rounded-control flex h-11.5 w-11.5 shrink-0 items-center justify-center bg-[rgba(0,0,0,0.22)] text-xl text-white">
         <Icon aria-hidden size={20} />
       </div>
       <div className="min-w-0 flex-1">
