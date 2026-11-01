@@ -59,7 +59,7 @@
 
 | 处置桶 | 页 | 计数 | 归属 |
 |---|---|---|---|
-| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(assessments+membership 两 Tab 随 M2-4 首刀建成 11-01 走查毕;余 trace(P22)/messages(MSG-1) 占位)、01-member-list ✅、02-member-detail ✅(两会员页随 M2-1 建成,10-31 走查毕)、activation-code ✅(批次码表/停用/导出/码值搜索随 M2-3 建成,11-01 走查毕)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺) | **6** | 余面→M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
+| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(assessments+membership 两 Tab 随 M2-4 首刀建成 197fdbc6,11-01 走查+双轴审查毕;余 trace(P22)/messages(MSG-1) 占位)、01-member-list ✅、02-member-detail ✅(两会员页随 M2-1 建成,10-31 走查毕)、activation-code ✅(批次码表/停用/导出/码值搜索随 M2-3 建成,11-01 走查毕)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺) | **6** | 余面→M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
 | 📐 底座 IAM 承接(**D-AY**:直接用骨架,不为 esports 再造/不改名) | audit-log、06-audit-detail、admin-user-manage、role-manage、permission-manage、menu-manage | 6 | system 既有面;操作级敏感清单对照(A8)留待 |
 | 🌫 原型非本期 | attribution、channel-manage、landing-material、report-config | 4 | _nav.js 灰标(P5/梯①) |
 | 🎯 M2 核心组 | 04-order-record、05-order-detail、sku-manage、activation-code-detail | **4** | M2-2..M2-4;01-member-list/02-member-detail 已随 M2-1 建成(10-31,入已建桶;到期提醒/批量续费/每日扫描按 M2-1 裁面不含) |
