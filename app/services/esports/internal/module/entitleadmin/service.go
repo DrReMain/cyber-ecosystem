@@ -65,6 +65,7 @@ func (s *EntitleAdminService) ListActivationCodes(ctx context.Context, req *espo
 		BatchNo:     req.BatchNo,
 		Status:      codeStatusPtrFromPB(req.GetCodeStatus()),
 		Code:        req.Code,
+		User:        req.UserId,
 	})
 	if err != nil {
 		return nil, err

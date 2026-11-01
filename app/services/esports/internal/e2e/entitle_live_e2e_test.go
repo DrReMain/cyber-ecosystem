@@ -319,6 +319,18 @@ func TestEntitleLiveE2E(t *testing.T) {
 		t.Fatalf("code filter: n=%d err=%v", len(hitOut.Codes), err)
 	}
 
+	// The member's own view: userA redeemed exactly one code across every
+	// batch, so the filter answers that row and only that row — the user
+	// detail's report-unlock facts read from here.
+	userFilter := userA
+	userOut, err := codeUC.List(adminCtx, &entitle.ListCodesIn{PageRequest: &commonv1.PageRequest{}, User: &userFilter})
+	if err != nil || len(userOut.Codes) != 1 || userOut.Codes[0].Code != codes[1] {
+		t.Fatalf("user filter: n=%d err=%v", len(userOut.Codes), err)
+	}
+	if userOut.Codes[0].RedeemedBy == nil || *userOut.Codes[0].RedeemedBy != userA {
+		t.Fatalf("user filter returned a foreign row: %+v", userOut.Codes[0])
+	}
+
 	// The access judgement under shipped defaults: career open,
 	// cognitive member-gated (closed without one), school codes-only.
 	access := func(uid, family string) *entitle.AccessOut {

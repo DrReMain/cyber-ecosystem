@@ -3559,6 +3559,12 @@ export type EntitleAdminServiceListActivationCodesData = {
          * find-one search box; a no-match code answers the empty page.
          */
         code?: string;
+        /**
+         * Present = the member's own view — the codes this member redeemed.
+         * The user detail's report-unlock facts ride this filter; an absent
+         * value keeps the batch/flat views unchanged.
+         */
+        userId?: string;
     };
     url: '/api/v1/esports/activation-codes';
 };

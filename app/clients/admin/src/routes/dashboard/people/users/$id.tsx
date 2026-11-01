@@ -1,11 +1,20 @@
+import { EntitleAdminService } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/activation_admin_pb";
 import { MemberService } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/member_pb";
+import { TestAdminService } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_admin_pb";
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "#/config";
 import { op, requireOperations } from "#/features/layout-dashboard/auth/permissions";
 import { EsportsUserDetailPage } from "#/features/modules/esports-user-detail";
 import { m } from "#/paraglide/messages";
 
-const operations = [op(MemberService, "getMember")];
+const operations = [
+  op(MemberService, "getMember"),
+  op(EntitleAdminService, "getMembership"),
+  op(EntitleAdminService, "listActivationCodes"),
+  op(EntitleAdminService, "listReportAccessPolicies"),
+  op(TestAdminService, "listTests"),
+  op(TestAdminService, "listTestAttempts"),
+];
 
 export const Route = createFileRoute("/dashboard/people/users/$id")({
   staticData: {

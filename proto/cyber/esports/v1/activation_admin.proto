@@ -287,6 +287,13 @@ message ListActivationCodesRequest {
     min_len: 1
     max_len: 32
   }];
+  // Present = the member's own view — the codes this member redeemed.
+  // The user detail's report-unlock facts ride this filter; an absent
+  // value keeps the batch/flat views unchanged.
+  optional string user_id = 6 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 20
+  }];
 }
 
 message ListActivationCodesResponse {

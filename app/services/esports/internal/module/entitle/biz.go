@@ -131,6 +131,8 @@ type ListCodesIn struct {
 	Status  *string
 	// Present = the exact code the detail page's search box chases.
 	Code *string
+	// Present = the member's own view — the codes this member redeemed.
+	User *string
 }
 
 type ListCodesOut struct {

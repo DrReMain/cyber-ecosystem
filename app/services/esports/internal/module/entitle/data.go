@@ -562,6 +562,11 @@ func (rp *codeRP) applyCodeFilters(ctx context.Context, in *ListCodesIn) (*ent.A
 		// own lookup shape.
 		query = query.Where(activationcode.CodeEQ(*in.Code))
 	}
+	if in.User != nil {
+		// The member's redeemed view — the user detail reads its
+		// report-unlock facts from these rows.
+		query = query.Where(activationcode.RedeemedByEQ(*in.User))
+	}
 	return query, nil
 }
 

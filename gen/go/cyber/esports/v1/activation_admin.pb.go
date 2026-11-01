@@ -819,7 +819,11 @@ type ListActivationCodesRequest struct {
 	CodeStatus *ActivationCodeStatus `protobuf:"varint,4,opt,name=code_status,json=codeStatus,proto3,enum=cyber.esports.v1.ActivationCodeStatus,oneof" json:"code_status,omitempty"`
 	// Present = the exact code an operator is chasing — the detail page's
 	// find-one search box; a no-match code answers the empty page.
-	Code          *string `protobuf:"bytes,5,opt,name=code,proto3,oneof" json:"code,omitempty"`
+	Code *string `protobuf:"bytes,5,opt,name=code,proto3,oneof" json:"code,omitempty"`
+	// Present = the member's own view — the codes this member redeemed.
+	// The user detail's report-unlock facts ride this filter; an absent
+	// value keeps the batch/flat views unchanged.
+	UserId        *string `protobuf:"bytes,6,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -885,6 +889,13 @@ func (x *ListActivationCodesRequest) GetCodeStatus() ActivationCodeStatus {
 func (x *ListActivationCodesRequest) GetCode() string {
 	if x != nil && x.Code != nil {
 		return *x.Code
+	}
+	return ""
+}
+
+func (x *ListActivationCodesRequest) GetUserId() string {
+	if x != nil && x.UserId != nil {
+		return *x.UserId
 	}
 	return ""
 }
@@ -2098,7 +2109,7 @@ const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"\f_code_statusB\a\n" +
 	"\x05_code\"W\n" +
 	"\x1dExportActivationCodesResponse\x126\n" +
-	"\x05codes\x18\x01 \x03(\v2 .cyber.esports.v1.ActivationCodeR\x05codes\"\xf8\x02\n" +
+	"\x05codes\x18\x01 \x03(\v2 .cyber.esports.v1.ActivationCodeR\x05codes\"\xad\x03\n" +
 	"\x1aListActivationCodesRequest\x127\n" +
 	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12B\n" +
 	"\vreport_type\x18\x02 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeH\x00R\n" +
@@ -2107,11 +2118,14 @@ const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"\vcode_status\x18\x04 \x01(\x0e2&.cyber.esports.v1.ActivationCodeStatusB\n" +
 	"\xbaH\a\x82\x01\x04\x10\x01 \x00H\x02R\n" +
 	"codeStatus\x88\x01\x01\x12\"\n" +
-	"\x04code\x18\x05 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18 H\x03R\x04code\x88\x01\x01B\x0e\n" +
+	"\x04code\x18\x05 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18 H\x03R\x04code\x88\x01\x01\x12'\n" +
+	"\auser_id\x18\x06 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18\x14H\x04R\x06userId\x88\x01\x01B\x0e\n" +
 	"\f_report_typeB\v\n" +
 	"\t_batch_noB\x0e\n" +
 	"\f_code_statusB\a\n" +
-	"\x05_code\"\x8f\x01\n" +
+	"\x05_codeB\n" +
+	"\n" +
+	"\b_user_id\"\x8f\x01\n" +
 	"\x1bListActivationCodesResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x126\n" +
 	"\x05codes\x18\x02 \x03(\v2 .cyber.esports.v1.ActivationCodeR\x05codes\"\x9d\x02\n" +

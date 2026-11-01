@@ -26,6 +26,8 @@ const sourceLabels: Record<string, () => string> = {
   MEMBERSHIP_SOURCE_LEGACY_CODE: () => m.esports_members_source_legacy(),
 };
 
+export const sourceText = (source: string): string => sourceLabels[source]?.() ?? source;
+
 export const isLive = (row: MembershipSummary): boolean =>
   String(row.status) === "MEMBERSHIP_STATUS_ACTIVE" ||
   String(row.status) === "MEMBERSHIP_STATUS_EXPIRING_SOON";

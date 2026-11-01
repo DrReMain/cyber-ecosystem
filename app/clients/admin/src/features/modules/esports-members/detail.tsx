@@ -16,7 +16,7 @@ import { bandLabel } from "#/features/modules/esports-users/bands";
 import { m } from "#/paraglide/messages";
 import { fullDate } from "./ui/dates";
 import { GrantModal, MEMBER_MONTH_SKU } from "./ui/grant-modal";
-import { isLive as isLiveRow, statusTags } from "./ui/members-table";
+import { isLive as isLiveRow, sourceText, statusTags } from "./ui/members-table";
 import { TerminateModal } from "./ui/terminate-modal";
 
 const LIST_SEARCH = { pageNo: 1, pageSize: 20 };
@@ -251,10 +251,4 @@ function StatusTag({ status }: { status: string }) {
   ) : (
     <Tag className="m-0">{status}</Tag>
   );
-}
-
-function sourceText(source: string): string {
-  if (source === "MEMBERSHIP_SOURCE_MANUAL") return m.esports_members_source_manual();
-  if (source === "MEMBERSHIP_SOURCE_LEGACY_CODE") return m.esports_members_source_legacy();
-  return m.esports_members_source_order();
 }

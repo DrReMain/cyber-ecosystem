@@ -1,15 +1,34 @@
 import { useMutation, useQuery } from "@connectrpc/connect-query";
+import {
+  getMembership,
+  grantMembership,
+} from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/activation_admin-EntitleAdminService_connectquery";
 import type { Member } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/member_pb";
 import { getMember } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/member-MemberService_connectquery";
 import { updateUserStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/user-UserService_connectquery";
 import { useColumns } from "@cyber-ecosystem/shared-antd/table";
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { Button, Card, Descriptions, Popconfirm, Space, Spin, Tabs, Tag, Typography } from "antd";
-import { ArrowLeft, Power, PowerOff } from "lucide-react";
+import {
+  Button,
+  Card,
+  Descriptions,
+  Modal,
+  Popconfirm,
+  Space,
+  Spin,
+  Tabs,
+  Tag,
+  Typography,
+} from "antd";
+import { ArrowLeft, BadgeCheck, Power, PowerOff } from "lucide-react";
+import { useState } from "react";
+import { GrantModal, MEMBER_MONTH_SKU } from "#/features/modules/esports-members/ui/grant-modal";
 import { parseUsersSearch } from "#/features/modules/esports-users";
 import { bandLabel } from "#/features/modules/esports-users/bands";
 import { UserAvatar } from "#/features/modules/system-users/ui/user-avatar";
 import { m } from "#/paraglide/messages";
+import { AssessmentsTab } from "./ui/assessments-tab";
+import { MembershipTab } from "./ui/membership-tab";
 
 const LIST_SEARCH = parseUsersSearch({});
 
@@ -19,6 +38,19 @@ export function EsportsUserDetailPage() {
   const memberQuery = useQuery(getMember, { userId });
   const toggleMut = useMutation(updateUserStatus, { onSuccess: () => memberQuery.refetch() });
   const member = memberQuery.data?.member;
+  // Shared with the membership tab and the unlock card — one request, one
+  // cache entry; the grant entry in the header needs the live summary.
+  // Not-found is the ordinary never-held shape, not a page error — the
+  // session-watcher's own local opt-out.
+  const mshipQuery = useQuery(getMembership, { userId }, { throwOnError: false });
+  const [grantOpen, setGrantOpen] = useState(false);
+  const grantMut = useMutation(grantMembership, {
+    onSuccess: () => {
+      setGrantOpen(false);
+      void mshipQuery.refetch();
+    },
+  });
+  const summary = mshipQuery.data?.membership;
 
   if (memberQuery.isPending) {
     return (
@@ -66,6 +98,7 @@ export function EsportsUserDetailPage() {
       {back}
       <MemberHeader
         member={member}
+        onGrant={() => setGrantOpen(true)}
         onToggle={(next) => toggleMut.mutate({ id: member.userId ?? "", enabled: next })}
         pending={toggleMut.isPending}
       />
@@ -79,8 +112,16 @@ export function EsportsUserDetailPage() {
               children: <OverviewTab member={member} />,
             },
             notOpen("trace", m.esports_user_detail_tab_trace()),
-            notOpen("assessments", m.esports_user_detail_tab_assessments()),
-            notOpen("membership", m.esports_user_detail_tab_membership()),
+            {
+              key: "assessments",
+              label: m.esports_user_detail_tab_assessments(),
+              children: <AssessmentsTab userId={member.userId ?? ""} />,
+            },
+            {
+              key: "membership",
+              label: m.esports_user_detail_tab_membership(),
+              children: <MembershipTab userId={member.userId ?? ""} />,
+            },
             notOpen("messages", m.esports_user_detail_tab_messages()),
             {
               key: "account",
@@ -90,6 +131,36 @@ export function EsportsUserDetailPage() {
           ]}
         />
       </Card>
+      {/* The grant entry picks by what there is to show: no summary yet —
+          never-held, still loading, or a failed read — takes the plain
+          confirm (granting needs no read premise); a summary on hand takes
+          the renewal's double-confirm shape. */}
+      {summary == null ? (
+        <Modal
+          cancelText={m.common_cancel()}
+          okButtonProps={{ loading: grantMut.isPending }}
+          okText={m.esports_user_detail_grant_ok()}
+          onCancel={() => setGrantOpen(false)}
+          onOk={() => grantMut.mutate({ userId: member.userId ?? "", skuCode: MEMBER_MONTH_SKU })}
+          open={grantOpen}
+          title={m.esports_user_detail_act_grant()}
+        >
+          <p>
+            {m.esports_user_detail_grant_body({
+              name: member.nickname ?? member.account ?? member.userId ?? "",
+            })}
+          </p>
+        </Modal>
+      ) : (
+        <GrantModal
+          detail
+          onCancel={() => setGrantOpen(false)}
+          onSubmit={(uid) => grantMut.mutate({ userId: uid, skuCode: MEMBER_MONTH_SKU })}
+          open={grantOpen}
+          pending={grantMut.isPending}
+          row={summary}
+        />
+      )}
     </div>
   );
 }
@@ -109,8 +180,14 @@ function StatusTag({ enabled }: Readonly<{ enabled: boolean }>) {
 function MemberHeader({
   member,
   pending,
+  onGrant,
   onToggle,
-}: Readonly<{ member: Member; pending: boolean; onToggle: (next: boolean) => void }>) {
+}: Readonly<{
+  member: Member;
+  pending: boolean;
+  onGrant: () => void;
+  onToggle: (next: boolean) => void;
+}>) {
   return (
     <Card>
       <Space size="middle">
@@ -128,7 +205,10 @@ function MemberHeader({
           </Typography.Text>
         </div>
       </Space>
-      <div className="mt-4">
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button color="purple" icon={<BadgeCheck size={14} />} onClick={onGrant} variant="filled">
+          {m.esports_user_detail_act_grant()}
+        </Button>
         <Popconfirm
           cancelButtonProps={{ variant: "filled", color: "default" }}
           description={member.enabled ? m.esports_users_ban_confirm_description() : undefined}
