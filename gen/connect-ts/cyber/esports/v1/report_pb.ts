@@ -18,7 +18,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/esports/v1/report.proto.
  */
 export const file_cyber_esports_v1_report: GenFile = /*@__PURE__*/
-  fileDesc("Ch1jeWJlci9lc3BvcnRzL3YxL3JlcG9ydC5wcm90bxIQY3liZXIuZXNwb3J0cy52MSIwChBHZXRSZXBvcnRSZXF1ZXN0EhwKCXJlY29yZF9pZBgBIAEoCUIJukgGcgQQARgUIsgDChFHZXRSZXBvcnRSZXNwb25zZRIRCglyZWNvcmRfaWQYASABKAkSEAoIdW5sb2NrZWQYAiABKAgSKgoEdGllchgDIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VGllchIhChRjb21wb3NpdGVfcGVyY2VudGlsZRgEIAEoAUgAiAEBEjIKCWFiaWxpdGllcxgFIAMoCzIfLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0QWJpbGl0eRI2Cg1zdWJfYWJpbGl0aWVzGAYgAygLMh8uY3liZXIuZXNwb3J0cy52MS5SZXBvcnRBYmlsaXR5EjsKCmNvbXBhcmlzb24YByABKAsyIi5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydENvbXBhcmlzb25IAYgBARI5CgxpbXByb3ZlbWVudHMYCCADKAsyIy5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEltcHJvdmVtZW50EhkKEXRlc3RlZF9kaW1lbnNpb25zGAkgASgFEhgKEHRvdGFsX2RpbWVuc2lvbnMYCiABKAVCFwoVX2NvbXBvc2l0ZV9wZXJjZW50aWxlQg0KC19jb21wYXJpc29uIjgKF0dldFNlc3Npb25SZXBvcnRSZXF1ZXN0Eh0KCnNlc3Npb25faWQYASABKAlCCbpIBnIEEAEYQCL7AgoYR2V0U2Vzc2lvblJlcG9ydFJlc3BvbnNlEhIKCnNlc3Npb25faWQYASABKAkSDQoFZ2VucmUYAiABKAkSNgoQYW5jaG9yX3JlY29yZF9pZBgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIqCgR0aWVyGAQgASgOMhwuY3liZXIuZXNwb3J0cy52MS5SZXBvcnRUaWVyEjoKFGNvbXBvc2l0ZV9wZXJjZW50aWxlGAUgASgLMhwuZ29vZ2xlLnByb3RvYnVmLkRvdWJsZVZhbHVlEjcKCWFiaWxpdGllcxgGIAMoCzIkLmN5YmVyLmVzcG9ydHMudjEuU2Vzc2lvbkFiaWxpdHlMaW5lEhkKEXRlc3RlZF9kaW1lbnNpb25zGAcgASgFEhgKEHRvdGFsX2RpbWVuc2lvbnMYCCABKAUSLgoKc3RhcnRlZF9hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAivAIKElNlc3Npb25BYmlsaXR5TGluZRIPCgdhYmlsaXR5GAEgASgJEhEKCWdhbWVfY29kZRgCIAEoCRISCgpiZXN0X3Njb3JlGAMgASgBEhYKDmF0dGVtcHRfc2NvcmVzGAQgAygBEjAKCmJlc3RfZ3JhZGUYBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMAoKcGVyY2VudGlsZRgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5Eb3VibGVWYWx1ZRI4ChJwcmV2X3Nlc3Npb25fc2NvcmUYByABKAsyHC5nb29nbGUucHJvdG9idWYuRG91YmxlVmFsdWUSOAoSaGlzdG9yeV9iZXN0X3Njb3JlGAggASgLMhwuZ29vZ2xlLnByb3RvYnVmLkRvdWJsZVZhbHVlIhkKF0dldEFiaWxpdHlEaWdlc3RSZXF1ZXN0Is4BChhHZXRBYmlsaXR5RGlnZXN0UmVzcG9uc2USFgoOc2Vzc2lvbnNfdG90YWwYASABKAUSFAoMc2Vzc2lvbnNfZnBzGAIgASgFEhUKDXNlc3Npb25zX21vYmEYAyABKAUSNgoJYWJpbGl0aWVzGAQgAygLMiMuY3liZXIuZXNwb3J0cy52MS5EaWdlc3RBYmlsaXR5TGluZRI1CghzZXNzaW9ucxgFIAMoCzIjLmN5YmVyLmVzcG9ydHMudjEuRGlnZXN0U2Vzc2lvbkxpbmUi5wEKEURpZ2VzdEFiaWxpdHlMaW5lEg8KB2FiaWxpdHkYASABKAkSEgoKYmVzdF9zY29yZRgCIAEoARIwCgpiZXN0X2dyYWRlGAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjUKD2Jlc3RfcGVyY2VudGlsZRgEIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5Eb3VibGVWYWx1ZRIXCg9zZXNzaW9uc190ZXN0ZWQYBSABKAUSKwoHbGFzdF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi2AEKEURpZ2VzdFNlc3Npb25MaW5lEhIKCnNlc3Npb25faWQYASABKAkSDQoFZ2VucmUYAiABKAkSEAoIZmluaXNoZWQYAyABKAgSEgoKZG9uZV9jb3VudBgEIAEoBRISCgpzdGVwX2NvdW50GAUgASgFEi4KCmNyZWF0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjYKEGFuY2hvcl9yZWNvcmRfaWQYByABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUi4gEKDVJlcG9ydEFiaWxpdHkSDwoHYWJpbGl0eRgBIAEoCRIRCglnYW1lX2NvZGUYAiABKAkSDQoFc2NvcmUYAyABKAESFwoKcGVyY2VudGlsZRgEIAEoAUgAiAEBEjQKCmNvbmZpZGVuY2UYBSABKA4yIC5jeWJlci5lc3BvcnRzLnYxLlBlZXJDb25maWRlbmNlEhQKDHNhbXBsZV9jb3VudBgGIAEoBRIZCgxwZWVyX2F2ZXJhZ2UYByABKAFIAYgBAUINCgtfcGVyY2VudGlsZUIPCg1fcGVlcl9hdmVyYWdlItUBChBSZXBvcnRDb21wYXJpc29uEjgKBmRlbHRhcxgBIAMoCzIoLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0Q29tcGFyaXNvbi5EZWx0YRqGAQoFRGVsdGESDwoHYWJpbGl0eRgBIAEoCRIgChNwcmV2aW91c19wZXJjZW50aWxlGAIgASgBSACIAQESHQoQZGVsdGFfcGVyY2VudGlsZRgDIAEoAUgBiAEBQhYKFF9wcmV2aW91c19wZXJjZW50aWxlQhMKEV9kZWx0YV9wZXJjZW50aWxlInAKEVJlcG9ydEltcHJvdmVtZW50Eg8KB2FiaWxpdHkYASABKAkSGgoSY3VycmVudF9wZXJjZW50aWxlGAIgASgBEhkKEXRhcmdldF9wZXJjZW50aWxlGAMgASgBEhMKC2dhcF9wZXJjZW50GAQgASgBIlwKE1JlcG9ydEFjY2Vzc1ZlcmRpY3QSDwoHYWxsb3dlZBgBIAEoCBI0CgZyZWFzb24YAiABKA4yJC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1JlYXNvbiIbChlHZXRDb2duaXRpdmVSZXBvcnRSZXF1ZXN0IroCChpHZXRDb2duaXRpdmVSZXBvcnRSZXNwb25zZRI1CgZhY2Nlc3MYASABKAsyJS5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1ZlcmRpY3QSGQoRY292ZXJlZF9hYmlsaXRpZXMYAiABKAUSGQoRdGVzdGVkX2RpbWVuc2lvbnMYAyABKAUSGAoQdG90YWxfZGltZW5zaW9ucxgEIAEoBRI4CgpkaW1lbnNpb25zGAUgAygLMiQuY3liZXIuZXNwb3J0cy52MS5Db2duaXRpdmVEaW1lbnNpb24SLwoJY29tcG9zaXRlGAYgASgLMhwuZ29vZ2xlLnByb3RvYnVmLkRvdWJsZVZhbHVlEioKBHRpZXIYByABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydFRpZXIiYgoSQ29nbml0aXZlRGltZW5zaW9uEhEKCWRpbWVuc2lvbhgBIAEoCRINCgV2YWx1ZRgCIAEoARIqCgR0aWVyGAMgASgOMhwuY3liZXIuZXNwb3J0cy52MS5SZXBvcnRUaWVyIhcKFUdldFRyZW5kUmVwb3J0UmVxdWVzdCKpAQoWR2V0VHJlbmRSZXBvcnRSZXNwb25zZRIWCg5zZXNzaW9uc190b3RhbBgBIAEoBRI3CglhYmlsaXRpZXMYAiADKAsyJC5jeWJlci5lc3BvcnRzLnYxLlRyZW5kQWJpbGl0eVNlcmllcxI+Cg9hZHZhbmNlZF9hY2Nlc3MYAyABKAsyJS5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1ZlcmRpY3QiUwoSVHJlbmRBYmlsaXR5U2VyaWVzEg8KB2FiaWxpdHkYASABKAkSLAoGcG9pbnRzGAIgAygLMhwuY3liZXIuZXNwb3J0cy52MS5UcmVuZFBvaW50IlcKClRyZW5kUG9pbnQSJgoCYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKCnBlcmNlbnRpbGUYAiABKAESDQoFZ2VucmUYAyABKAkiGAoWR2V0Q2FyZWVyUmVwb3J0UmVxdWVzdCLMAQoXR2V0Q2FyZWVyUmVwb3J0UmVzcG9uc2USNQoGYWNjZXNzGAEgASgLMiUuY3liZXIuZXNwb3J0cy52MS5SZXBvcnRBY2Nlc3NWZXJkaWN0Ej8KD3JlY29tbWVuZGF0aW9ucxgCIAMoCzImLmN5YmVyLmVzcG9ydHMudjEuQ2FyZWVyUmVjb21tZW5kYXRpb24SOQoMaW1wcm92ZW1lbnRzGAMgAygLMiMuY3liZXIuZXNwb3J0cy52MS5DYXJlZXJJbXByb3ZlbWVudCK0AQoUQ2FyZWVyUmVjb21tZW5kYXRpb24SEwoLY2FyZWVyX2FyZWEYASABKAkSDAoEbmFtZRgCIAEoCRIVCg1tYXRjaGVkX3Njb3JlGAMgASgBEhgKEGJhc2lzX2RpbWVuc2lvbnMYBCADKAkSGAoQZWxpbWluYXRpb25fcmF0ZRgFIAEoARIaChJ0cmFpbmluZ19pbnRlbnNpdHkYBiABKAkSEgoKc3VnZ2VzdGlvbhgHIAEoCSJxChFDYXJlZXJJbXByb3ZlbWVudBIRCglkaW1lbnNpb24YASABKAkSDwoHY3VycmVudBgCIAEoARIOCgZ0YXJnZXQYAyABKAESEwoLZ2FwX3BlcmNlbnQYBCABKAUSEwoLc3VnZ2VzdGlvbnMYBSADKAkqdQoKUmVwb3J0VGllchIbChdSRVBPUlRfVElFUl9VTlNQRUNJRklFRBAAEhEKDVJFUE9SVF9USUVSX1MQARIRCg1SRVBPUlRfVElFUl9BEAISEQoNUkVQT1JUX1RJRVJfQhADEhEKDVJFUE9SVF9USUVSX0MQBCqAAQoOUGVlckNvbmZpZGVuY2USHwobUEVFUl9DT05GSURFTkNFX1VOU1BFQ0lGSUVEEAASFwoTUEVFUl9DT05GSURFTkNFX0xPVxABEhoKFlBFRVJfQ09ORklERU5DRV9NRURJVU0QAhIYChRQRUVSX0NPTkZJREVOQ0VfSElHSBADMvEICg1SZXBvcnRTZXJ2aWNlEqABCglHZXRSZXBvcnQSIi5jeWJlci5lc3BvcnRzLnYxLkdldFJlcG9ydFJlcXVlc3QaIy5jeWJlci5lc3BvcnRzLnYxLkdldFJlcG9ydFJlc3BvbnNlIkqI8QQEitMOHAoY6I635Y+W5Y2V5qyh6IO95Yqb5oql5ZGKEAGC0+STAiA6ASoiGy9hcGkvdjEvZXNwb3J0cy9yZXBvcnRzL2dldBK5AQoQR2V0U2Vzc2lvblJlcG9ydBIpLmN5YmVyLmVzcG9ydHMudjEuR2V0U2Vzc2lvblJlcG9ydFJlcXVlc3QaKi5jeWJlci5lc3BvcnRzLnYxLkdldFNlc3Npb25SZXBvcnRSZXNwb25zZSJOiPEEBIrTDhwKGOiOt+WPluWcuuasoeaIkOe7qeaxh+aAuxABgtPkkwIkOgEqIh8vYXBpL3YxL2VzcG9ydHMvcmVwb3J0cy9zZXNzaW9uErgBChBHZXRBYmlsaXR5RGlnZXN0EikuY3liZXIuZXNwb3J0cy52MS5HZXRBYmlsaXR5RGlnZXN0UmVxdWVzdBoqLmN5YmVyLmVzcG9ydHMudjEuR2V0QWJpbGl0eURpZ2VzdFJlc3BvbnNlIk2I8QQEitMOHAoY6I635Y+W6IO95Yqb5oiQ57up5oC76KeIEAGC0+STAiM6ASoiHi9hcGkvdjEvZXNwb3J0cy9yZXBvcnRzL2RpZ2VzdBLIAQoSR2V0Q29nbml0aXZlUmVwb3J0EisuY3liZXIuZXNwb3J0cy52MS5HZXRDb2duaXRpdmVSZXBvcnRSZXF1ZXN0GiwuY3liZXIuZXNwb3J0cy52MS5HZXRDb2duaXRpdmVSZXBvcnRSZXNwb25zZSJXiPEEBIrTDiMKH+iOt+WPluiupOefpeaKpeWRiig4IOe7tOiBmuWQiCkQAYLT5JMCJjoBKiIhL2FwaS92MS9lc3BvcnRzL3JlcG9ydHMvY29nbml0aXZlErYBCg5HZXRUcmVuZFJlcG9ydBInLmN5YmVyLmVzcG9ydHMudjEuR2V0VHJlbmRSZXBvcnRSZXF1ZXN0GiguY3liZXIuZXNwb3J0cy52MS5HZXRUcmVuZFJlcG9ydFJlc3BvbnNlIlGI8QQEitMOIQod6I635Y+W5oiQ6ZW/6LaL5Yq/KOWfuuehgOWxgikQAYLT5JMCIjoBKiIdL2FwaS92MS9lc3BvcnRzL3JlcG9ydHMvdHJlbmQStQEKD0dldENhcmVlclJlcG9ydBIoLmN5YmVyLmVzcG9ydHMudjEuR2V0Q2FyZWVyUmVwb3J0UmVxdWVzdBopLmN5YmVyLmVzcG9ydHMudjEuR2V0Q2FyZWVyUmVwb3J0UmVzcG9uc2UiTYjxBASK0w4cChjojrflj5bogYzkuJrogZrlkIjmiqXlkYoQAYLT5JMCIzoBKiIeL2FwaS92MS9lc3BvcnRzL3JlcG9ydHMvY2FyZWVyGgqK4gkG5oql5ZGKQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_esports_v1_entitlement, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("Ch1jeWJlci9lc3BvcnRzL3YxL3JlcG9ydC5wcm90bxIQY3liZXIuZXNwb3J0cy52MSIwChBHZXRSZXBvcnRSZXF1ZXN0EhwKCXJlY29yZF9pZBgBIAEoCUIJukgGcgQQARgUIsgDChFHZXRSZXBvcnRSZXNwb25zZRIRCglyZWNvcmRfaWQYASABKAkSEAoIdW5sb2NrZWQYAiABKAgSKgoEdGllchgDIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VGllchIhChRjb21wb3NpdGVfcGVyY2VudGlsZRgEIAEoAUgAiAEBEjIKCWFiaWxpdGllcxgFIAMoCzIfLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0QWJpbGl0eRI2Cg1zdWJfYWJpbGl0aWVzGAYgAygLMh8uY3liZXIuZXNwb3J0cy52MS5SZXBvcnRBYmlsaXR5EjsKCmNvbXBhcmlzb24YByABKAsyIi5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydENvbXBhcmlzb25IAYgBARI5CgxpbXByb3ZlbWVudHMYCCADKAsyIy5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEltcHJvdmVtZW50EhkKEXRlc3RlZF9kaW1lbnNpb25zGAkgASgFEhgKEHRvdGFsX2RpbWVuc2lvbnMYCiABKAVCFwoVX2NvbXBvc2l0ZV9wZXJjZW50aWxlQg0KC19jb21wYXJpc29uIjgKF0dldFNlc3Npb25SZXBvcnRSZXF1ZXN0Eh0KCnNlc3Npb25faWQYASABKAlCCbpIBnIEEAEYQCK8AwoYR2V0U2Vzc2lvblJlcG9ydFJlc3BvbnNlEhIKCnNlc3Npb25faWQYASABKAkSDQoFZ2VucmUYAiABKAkSNgoQYW5jaG9yX3JlY29yZF9pZBgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIqCgR0aWVyGAQgASgOMhwuY3liZXIuZXNwb3J0cy52MS5SZXBvcnRUaWVyEjoKFGNvbXBvc2l0ZV9wZXJjZW50aWxlGAUgASgLMhwuZ29vZ2xlLnByb3RvYnVmLkRvdWJsZVZhbHVlEjcKCWFiaWxpdGllcxgGIAMoCzIkLmN5YmVyLmVzcG9ydHMudjEuU2Vzc2lvbkFiaWxpdHlMaW5lEhkKEXRlc3RlZF9kaW1lbnNpb25zGAcgASgFEhgKEHRvdGFsX2RpbWVuc2lvbnMYCCABKAUSLgoKc3RhcnRlZF9hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASPwoPYXR0ZW1wdF9kZXRhaWxzGAogAygLMiYuY3liZXIuZXNwb3J0cy52MS5TZXNzaW9uQXR0ZW1wdERldGFpbCLxAQoUU2Vzc2lvbkF0dGVtcHREZXRhaWwSDwoHYWJpbGl0eRgBIAEoCRIRCglnYW1lX2NvZGUYAiABKAkSEgoKYXR0ZW1wdF9ubxgDIAEoBRIRCglyYXdfc2NvcmUYBCABKAESOQoTYXV0aG9yaXRhdGl2ZV9zY29yZRgFIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5Eb3VibGVWYWx1ZRIrCgVncmFkZRgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRImCgJhdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAivAIKElNlc3Npb25BYmlsaXR5TGluZRIPCgdhYmlsaXR5GAEgASgJEhEKCWdhbWVfY29kZRgCIAEoCRISCgpiZXN0X3Njb3JlGAMgASgBEhYKDmF0dGVtcHRfc2NvcmVzGAQgAygBEjAKCmJlc3RfZ3JhZGUYBSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMAoKcGVyY2VudGlsZRgGIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5Eb3VibGVWYWx1ZRI4ChJwcmV2X3Nlc3Npb25fc2NvcmUYByABKAsyHC5nb29nbGUucHJvdG9idWYuRG91YmxlVmFsdWUSOAoSaGlzdG9yeV9iZXN0X3Njb3JlGAggASgLMhwuZ29vZ2xlLnByb3RvYnVmLkRvdWJsZVZhbHVlIhkKF0dldEFiaWxpdHlEaWdlc3RSZXF1ZXN0Is4BChhHZXRBYmlsaXR5RGlnZXN0UmVzcG9uc2USFgoOc2Vzc2lvbnNfdG90YWwYASABKAUSFAoMc2Vzc2lvbnNfZnBzGAIgASgFEhUKDXNlc3Npb25zX21vYmEYAyABKAUSNgoJYWJpbGl0aWVzGAQgAygLMiMuY3liZXIuZXNwb3J0cy52MS5EaWdlc3RBYmlsaXR5TGluZRI1CghzZXNzaW9ucxgFIAMoCzIjLmN5YmVyLmVzcG9ydHMudjEuRGlnZXN0U2Vzc2lvbkxpbmUi5wEKEURpZ2VzdEFiaWxpdHlMaW5lEg8KB2FiaWxpdHkYASABKAkSEgoKYmVzdF9zY29yZRgCIAEoARIwCgpiZXN0X2dyYWRlGAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjUKD2Jlc3RfcGVyY2VudGlsZRgEIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5Eb3VibGVWYWx1ZRIXCg9zZXNzaW9uc190ZXN0ZWQYBSABKAUSKwoHbGFzdF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi2AEKEURpZ2VzdFNlc3Npb25MaW5lEhIKCnNlc3Npb25faWQYASABKAkSDQoFZ2VucmUYAiABKAkSEAoIZmluaXNoZWQYAyABKAgSEgoKZG9uZV9jb3VudBgEIAEoBRISCgpzdGVwX2NvdW50GAUgASgFEi4KCmNyZWF0ZWRfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjYKEGFuY2hvcl9yZWNvcmRfaWQYByABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUi4gEKDVJlcG9ydEFiaWxpdHkSDwoHYWJpbGl0eRgBIAEoCRIRCglnYW1lX2NvZGUYAiABKAkSDQoFc2NvcmUYAyABKAESFwoKcGVyY2VudGlsZRgEIAEoAUgAiAEBEjQKCmNvbmZpZGVuY2UYBSABKA4yIC5jeWJlci5lc3BvcnRzLnYxLlBlZXJDb25maWRlbmNlEhQKDHNhbXBsZV9jb3VudBgGIAEoBRIZCgxwZWVyX2F2ZXJhZ2UYByABKAFIAYgBAUINCgtfcGVyY2VudGlsZUIPCg1fcGVlcl9hdmVyYWdlItUBChBSZXBvcnRDb21wYXJpc29uEjgKBmRlbHRhcxgBIAMoCzIoLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0Q29tcGFyaXNvbi5EZWx0YRqGAQoFRGVsdGESDwoHYWJpbGl0eRgBIAEoCRIgChNwcmV2aW91c19wZXJjZW50aWxlGAIgASgBSACIAQESHQoQZGVsdGFfcGVyY2VudGlsZRgDIAEoAUgBiAEBQhYKFF9wcmV2aW91c19wZXJjZW50aWxlQhMKEV9kZWx0YV9wZXJjZW50aWxlInAKEVJlcG9ydEltcHJvdmVtZW50Eg8KB2FiaWxpdHkYASABKAkSGgoSY3VycmVudF9wZXJjZW50aWxlGAIgASgBEhkKEXRhcmdldF9wZXJjZW50aWxlGAMgASgBEhMKC2dhcF9wZXJjZW50GAQgASgBIlwKE1JlcG9ydEFjY2Vzc1ZlcmRpY3QSDwoHYWxsb3dlZBgBIAEoCBI0CgZyZWFzb24YAiABKA4yJC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1JlYXNvbiIbChlHZXRDb2duaXRpdmVSZXBvcnRSZXF1ZXN0IroCChpHZXRDb2duaXRpdmVSZXBvcnRSZXNwb25zZRI1CgZhY2Nlc3MYASABKAsyJS5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1ZlcmRpY3QSGQoRY292ZXJlZF9hYmlsaXRpZXMYAiABKAUSGQoRdGVzdGVkX2RpbWVuc2lvbnMYAyABKAUSGAoQdG90YWxfZGltZW5zaW9ucxgEIAEoBRI4CgpkaW1lbnNpb25zGAUgAygLMiQuY3liZXIuZXNwb3J0cy52MS5Db2duaXRpdmVEaW1lbnNpb24SLwoJY29tcG9zaXRlGAYgASgLMhwuZ29vZ2xlLnByb3RvYnVmLkRvdWJsZVZhbHVlEioKBHRpZXIYByABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydFRpZXIiYgoSQ29nbml0aXZlRGltZW5zaW9uEhEKCWRpbWVuc2lvbhgBIAEoCRINCgV2YWx1ZRgCIAEoARIqCgR0aWVyGAMgASgOMhwuY3liZXIuZXNwb3J0cy52MS5SZXBvcnRUaWVyIhcKFUdldFRyZW5kUmVwb3J0UmVxdWVzdCKpAQoWR2V0VHJlbmRSZXBvcnRSZXNwb25zZRIWCg5zZXNzaW9uc190b3RhbBgBIAEoBRI3CglhYmlsaXRpZXMYAiADKAsyJC5jeWJlci5lc3BvcnRzLnYxLlRyZW5kQWJpbGl0eVNlcmllcxI+Cg9hZHZhbmNlZF9hY2Nlc3MYAyABKAsyJS5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1ZlcmRpY3QiUwoSVHJlbmRBYmlsaXR5U2VyaWVzEg8KB2FiaWxpdHkYASABKAkSLAoGcG9pbnRzGAIgAygLMhwuY3liZXIuZXNwb3J0cy52MS5UcmVuZFBvaW50IlcKClRyZW5kUG9pbnQSJgoCYXQYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKCnBlcmNlbnRpbGUYAiABKAESDQoFZ2VucmUYAyABKAkiGAoWR2V0Q2FyZWVyUmVwb3J0UmVxdWVzdCLMAQoXR2V0Q2FyZWVyUmVwb3J0UmVzcG9uc2USNQoGYWNjZXNzGAEgASgLMiUuY3liZXIuZXNwb3J0cy52MS5SZXBvcnRBY2Nlc3NWZXJkaWN0Ej8KD3JlY29tbWVuZGF0aW9ucxgCIAMoCzImLmN5YmVyLmVzcG9ydHMudjEuQ2FyZWVyUmVjb21tZW5kYXRpb24SOQoMaW1wcm92ZW1lbnRzGAMgAygLMiMuY3liZXIuZXNwb3J0cy52MS5DYXJlZXJJbXByb3ZlbWVudCK0AQoUQ2FyZWVyUmVjb21tZW5kYXRpb24SEwoLY2FyZWVyX2FyZWEYASABKAkSDAoEbmFtZRgCIAEoCRIVCg1tYXRjaGVkX3Njb3JlGAMgASgBEhgKEGJhc2lzX2RpbWVuc2lvbnMYBCADKAkSGAoQZWxpbWluYXRpb25fcmF0ZRgFIAEoARIaChJ0cmFpbmluZ19pbnRlbnNpdHkYBiABKAkSEgoKc3VnZ2VzdGlvbhgHIAEoCSJxChFDYXJlZXJJbXByb3ZlbWVudBIRCglkaW1lbnNpb24YASABKAkSDwoHY3VycmVudBgCIAEoARIOCgZ0YXJnZXQYAyABKAESEwoLZ2FwX3BlcmNlbnQYBCABKAUSEwoLc3VnZ2VzdGlvbnMYBSADKAkqdQoKUmVwb3J0VGllchIbChdSRVBPUlRfVElFUl9VTlNQRUNJRklFRBAAEhEKDVJFUE9SVF9USUVSX1MQARIRCg1SRVBPUlRfVElFUl9BEAISEQoNUkVQT1JUX1RJRVJfQhADEhEKDVJFUE9SVF9USUVSX0MQBCqAAQoOUGVlckNvbmZpZGVuY2USHwobUEVFUl9DT05GSURFTkNFX1VOU1BFQ0lGSUVEEAASFwoTUEVFUl9DT05GSURFTkNFX0xPVxABEhoKFlBFRVJfQ09ORklERU5DRV9NRURJVU0QAhIYChRQRUVSX0NPTkZJREVOQ0VfSElHSBADMvEICg1SZXBvcnRTZXJ2aWNlEqABCglHZXRSZXBvcnQSIi5jeWJlci5lc3BvcnRzLnYxLkdldFJlcG9ydFJlcXVlc3QaIy5jeWJlci5lc3BvcnRzLnYxLkdldFJlcG9ydFJlc3BvbnNlIkqI8QQEitMOHAoY6I635Y+W5Y2V5qyh6IO95Yqb5oql5ZGKEAGC0+STAiA6ASoiGy9hcGkvdjEvZXNwb3J0cy9yZXBvcnRzL2dldBK5AQoQR2V0U2Vzc2lvblJlcG9ydBIpLmN5YmVyLmVzcG9ydHMudjEuR2V0U2Vzc2lvblJlcG9ydFJlcXVlc3QaKi5jeWJlci5lc3BvcnRzLnYxLkdldFNlc3Npb25SZXBvcnRSZXNwb25zZSJOiPEEBIrTDhwKGOiOt+WPluWcuuasoeaIkOe7qeaxh+aAuxABgtPkkwIkOgEqIh8vYXBpL3YxL2VzcG9ydHMvcmVwb3J0cy9zZXNzaW9uErgBChBHZXRBYmlsaXR5RGlnZXN0EikuY3liZXIuZXNwb3J0cy52MS5HZXRBYmlsaXR5RGlnZXN0UmVxdWVzdBoqLmN5YmVyLmVzcG9ydHMudjEuR2V0QWJpbGl0eURpZ2VzdFJlc3BvbnNlIk2I8QQEitMOHAoY6I635Y+W6IO95Yqb5oiQ57up5oC76KeIEAGC0+STAiM6ASoiHi9hcGkvdjEvZXNwb3J0cy9yZXBvcnRzL2RpZ2VzdBLIAQoSR2V0Q29nbml0aXZlUmVwb3J0EisuY3liZXIuZXNwb3J0cy52MS5HZXRDb2duaXRpdmVSZXBvcnRSZXF1ZXN0GiwuY3liZXIuZXNwb3J0cy52MS5HZXRDb2duaXRpdmVSZXBvcnRSZXNwb25zZSJXiPEEBIrTDiMKH+iOt+WPluiupOefpeaKpeWRiig4IOe7tOiBmuWQiCkQAYLT5JMCJjoBKiIhL2FwaS92MS9lc3BvcnRzL3JlcG9ydHMvY29nbml0aXZlErYBCg5HZXRUcmVuZFJlcG9ydBInLmN5YmVyLmVzcG9ydHMudjEuR2V0VHJlbmRSZXBvcnRSZXF1ZXN0GiguY3liZXIuZXNwb3J0cy52MS5HZXRUcmVuZFJlcG9ydFJlc3BvbnNlIlGI8QQEitMOIQod6I635Y+W5oiQ6ZW/6LaL5Yq/KOWfuuehgOWxgikQAYLT5JMCIjoBKiIdL2FwaS92MS9lc3BvcnRzL3JlcG9ydHMvdHJlbmQStQEKD0dldENhcmVlclJlcG9ydBIoLmN5YmVyLmVzcG9ydHMudjEuR2V0Q2FyZWVyUmVwb3J0UmVxdWVzdBopLmN5YmVyLmVzcG9ydHMudjEuR2V0Q2FyZWVyUmVwb3J0UmVzcG9uc2UiTYjxBASK0w4cChjojrflj5bogYzkuJrogZrlkIjmiqXlkYoQAYLT5JMCIzoBKiIeL2FwaS92MS9lc3BvcnRzL3JlcG9ydHMvY2FyZWVyGgqK4gkG5oql5ZGKQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_esports_v1_entitlement, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * @generated from message cyber.esports.v1.GetReportRequest
@@ -204,6 +204,19 @@ export type GetSessionReportResponse = Message<"cyber.esports.v1.GetSessionRepor
    * @generated from field: google.protobuf.Timestamp started_at = 9;
    */
   startedAt?: Timestamp | undefined;
+
+  /**
+   * Every valid attempt the session's lineup admitted, in submit order —
+   * the read-back detail rows, the detail-row group's single source. A
+   * curve-pending attempt rides the same list with a null authoritative
+   * score: the score the member earned is visible the moment it exists,
+   * never held hostage to the game's calibration curve (curves freeze
+   * one game at a time). The per-line attempt_scores stay the calibrated
+   * receipt; this list is the full truth, pending rows included.
+   *
+   * @generated from field: repeated cyber.esports.v1.SessionAttemptDetail attempt_details = 10;
+   */
+  attemptDetails: SessionAttemptDetail[];
 };
 
 /**
@@ -212,6 +225,70 @@ export type GetSessionReportResponse = Message<"cyber.esports.v1.GetSessionRepor
  */
 export const GetSessionReportResponseSchema: GenMessage<GetSessionReportResponse> = /*@__PURE__*/
   messageDesc(file_cyber_esports_v1_report, 3);
+
+/**
+ * One attempt's read-back row — the raw track always present, the
+ * authoritative answer only once the game's curve has spoken. A pending
+ * row (raw set, authoritative null) renders under the same raw-score
+ * label law the settlement face holds.
+ *
+ * @generated from message cyber.esports.v1.SessionAttemptDetail
+ */
+export type SessionAttemptDetail = Message<"cyber.esports.v1.SessionAttemptDetail"> & {
+  /**
+   * The six-word vocabulary; the face filters its own ability's rows.
+   *
+   * @generated from field: string ability = 1;
+   */
+  ability: string;
+
+  /**
+   * @generated from field: string game_code = 2;
+   */
+  gameCode: string;
+
+  /**
+   * The attempt's ordinal within the game — the retest counter.
+   *
+   * @generated from field: int32 attempt_no = 3;
+   */
+  attemptNo: number;
+
+  /**
+   * The uncapped linear track — the only number a curve-pending attempt
+   * has.
+   *
+   * @generated from field: double raw_score = 4;
+   */
+  rawScore: number;
+
+  /**
+   * Null while the game's calibration curve is pending; the row still
+   * travels.
+   *
+   * @generated from field: google.protobuf.DoubleValue authoritative_score = 5;
+   */
+  authoritativeScore?: number | undefined;
+
+  /**
+   * The authoritative answer's band; null with the score.
+   *
+   * @generated from field: google.protobuf.StringValue grade = 6;
+   */
+  grade?: string | undefined;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp at = 7;
+   */
+  at?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.SessionAttemptDetail.
+ * Use `create(SessionAttemptDetailSchema)` to create a new message.
+ */
+export const SessionAttemptDetailSchema: GenMessage<SessionAttemptDetail> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_report, 4);
 
 /**
  * One ability's session verdict — the three numbers the settlement face
@@ -287,7 +364,7 @@ export type SessionAbilityLine = Message<"cyber.esports.v1.SessionAbilityLine"> 
  * Use `create(SessionAbilityLineSchema)` to create a new message.
  */
 export const SessionAbilityLineSchema: GenMessage<SessionAbilityLine> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 4);
+  messageDesc(file_cyber_esports_v1_report, 5);
 
 /**
  * @generated from message cyber.esports.v1.GetAbilityDigestRequest
@@ -300,7 +377,7 @@ export type GetAbilityDigestRequest = Message<"cyber.esports.v1.GetAbilityDigest
  * Use `create(GetAbilityDigestRequestSchema)` to create a new message.
  */
 export const GetAbilityDigestRequestSchema: GenMessage<GetAbilityDigestRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 5);
+  messageDesc(file_cyber_esports_v1_report, 6);
 
 /**
  * @generated from message cyber.esports.v1.GetAbilityDigestResponse
@@ -347,7 +424,7 @@ export type GetAbilityDigestResponse = Message<"cyber.esports.v1.GetAbilityDiges
  * Use `create(GetAbilityDigestResponseSchema)` to create a new message.
  */
 export const GetAbilityDigestResponseSchema: GenMessage<GetAbilityDigestResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 6);
+  messageDesc(file_cyber_esports_v1_report, 7);
 
 /**
  * @generated from message cyber.esports.v1.DigestAbilityLine
@@ -398,7 +475,7 @@ export type DigestAbilityLine = Message<"cyber.esports.v1.DigestAbilityLine"> & 
  * Use `create(DigestAbilityLineSchema)` to create a new message.
  */
 export const DigestAbilityLineSchema: GenMessage<DigestAbilityLine> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 7);
+  messageDesc(file_cyber_esports_v1_report, 8);
 
 /**
  * @generated from message cyber.esports.v1.DigestSessionLine
@@ -452,7 +529,7 @@ export type DigestSessionLine = Message<"cyber.esports.v1.DigestSessionLine"> & 
  * Use `create(DigestSessionLineSchema)` to create a new message.
  */
 export const DigestSessionLineSchema: GenMessage<DigestSessionLine> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 8);
+  messageDesc(file_cyber_esports_v1_report, 9);
 
 /**
  * One radar axis: the ability's own numbers plus the cohort answer. The
@@ -508,7 +585,7 @@ export type ReportAbility = Message<"cyber.esports.v1.ReportAbility"> & {
  * Use `create(ReportAbilitySchema)` to create a new message.
  */
 export const ReportAbilitySchema: GenMessage<ReportAbility> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 9);
+  messageDesc(file_cyber_esports_v1_report, 10);
 
 /**
  * @generated from message cyber.esports.v1.ReportComparison
@@ -525,7 +602,7 @@ export type ReportComparison = Message<"cyber.esports.v1.ReportComparison"> & {
  * Use `create(ReportComparisonSchema)` to create a new message.
  */
 export const ReportComparisonSchema: GenMessage<ReportComparison> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 10);
+  messageDesc(file_cyber_esports_v1_report, 11);
 
 /**
  * @generated from message cyber.esports.v1.ReportComparison.Delta
@@ -555,7 +632,7 @@ export type ReportComparison_Delta = Message<"cyber.esports.v1.ReportComparison.
  * Use `create(ReportComparison_DeltaSchema)` to create a new message.
  */
 export const ReportComparison_DeltaSchema: GenMessage<ReportComparison_Delta> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 10, 0);
+  messageDesc(file_cyber_esports_v1_report, 11, 0);
 
 /**
  * @generated from message cyber.esports.v1.ReportImprovement
@@ -589,7 +666,7 @@ export type ReportImprovement = Message<"cyber.esports.v1.ReportImprovement"> & 
  * Use `create(ReportImprovementSchema)` to create a new message.
  */
 export const ReportImprovementSchema: GenMessage<ReportImprovement> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 11);
+  messageDesc(file_cyber_esports_v1_report, 12);
 
 /**
  * The same two-fact answer GetReportAccess returns, embedded in each
@@ -618,7 +695,7 @@ export type ReportAccessVerdict = Message<"cyber.esports.v1.ReportAccessVerdict"
  * Use `create(ReportAccessVerdictSchema)` to create a new message.
  */
 export const ReportAccessVerdictSchema: GenMessage<ReportAccessVerdict> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 12);
+  messageDesc(file_cyber_esports_v1_report, 13);
 
 /**
  * @generated from message cyber.esports.v1.GetCognitiveReportRequest
@@ -631,7 +708,7 @@ export type GetCognitiveReportRequest = Message<"cyber.esports.v1.GetCognitiveRe
  * Use `create(GetCognitiveReportRequestSchema)` to create a new message.
  */
 export const GetCognitiveReportRequestSchema: GenMessage<GetCognitiveReportRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 13);
+  messageDesc(file_cyber_esports_v1_report, 14);
 
 /**
  * @generated from message cyber.esports.v1.GetCognitiveReportResponse
@@ -703,7 +780,7 @@ export type GetCognitiveReportResponse = Message<"cyber.esports.v1.GetCognitiveR
  * Use `create(GetCognitiveReportResponseSchema)` to create a new message.
  */
 export const GetCognitiveReportResponseSchema: GenMessage<GetCognitiveReportResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 14);
+  messageDesc(file_cyber_esports_v1_report, 15);
 
 /**
  * One rendered dimension of the cognitive model. The dimension keys are
@@ -736,7 +813,7 @@ export type CognitiveDimension = Message<"cyber.esports.v1.CognitiveDimension"> 
  * Use `create(CognitiveDimensionSchema)` to create a new message.
  */
 export const CognitiveDimensionSchema: GenMessage<CognitiveDimension> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 15);
+  messageDesc(file_cyber_esports_v1_report, 16);
 
 /**
  * @generated from message cyber.esports.v1.GetTrendReportRequest
@@ -749,7 +826,7 @@ export type GetTrendReportRequest = Message<"cyber.esports.v1.GetTrendReportRequ
  * Use `create(GetTrendReportRequestSchema)` to create a new message.
  */
 export const GetTrendReportRequestSchema: GenMessage<GetTrendReportRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 16);
+  messageDesc(file_cyber_esports_v1_report, 17);
 
 /**
  * @generated from message cyber.esports.v1.GetTrendReportResponse
@@ -789,7 +866,7 @@ export type GetTrendReportResponse = Message<"cyber.esports.v1.GetTrendReportRes
  * Use `create(GetTrendReportResponseSchema)` to create a new message.
  */
 export const GetTrendReportResponseSchema: GenMessage<GetTrendReportResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 17);
+  messageDesc(file_cyber_esports_v1_report, 18);
 
 /**
  * @generated from message cyber.esports.v1.TrendAbilitySeries
@@ -814,7 +891,7 @@ export type TrendAbilitySeries = Message<"cyber.esports.v1.TrendAbilitySeries"> 
  * Use `create(TrendAbilitySeriesSchema)` to create a new message.
  */
 export const TrendAbilitySeriesSchema: GenMessage<TrendAbilitySeries> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 18);
+  messageDesc(file_cyber_esports_v1_report, 19);
 
 /**
  * One session-anchor's cohort answer for one ability. The genre rides
@@ -846,7 +923,7 @@ export type TrendPoint = Message<"cyber.esports.v1.TrendPoint"> & {
  * Use `create(TrendPointSchema)` to create a new message.
  */
 export const TrendPointSchema: GenMessage<TrendPoint> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 19);
+  messageDesc(file_cyber_esports_v1_report, 20);
 
 /**
  * @generated from message cyber.esports.v1.GetCareerReportRequest
@@ -859,7 +936,7 @@ export type GetCareerReportRequest = Message<"cyber.esports.v1.GetCareerReportRe
  * Use `create(GetCareerReportRequestSchema)` to create a new message.
  */
 export const GetCareerReportRequestSchema: GenMessage<GetCareerReportRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 20);
+  messageDesc(file_cyber_esports_v1_report, 21);
 
 /**
  * @generated from message cyber.esports.v1.GetCareerReportResponse
@@ -898,7 +975,7 @@ export type GetCareerReportResponse = Message<"cyber.esports.v1.GetCareerReportR
  * Use `create(GetCareerReportResponseSchema)` to create a new message.
  */
 export const GetCareerReportResponseSchema: GenMessage<GetCareerReportResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 21);
+  messageDesc(file_cyber_esports_v1_report, 22);
 
 /**
  * @generated from message cyber.esports.v1.CareerRecommendation
@@ -954,7 +1031,7 @@ export type CareerRecommendation = Message<"cyber.esports.v1.CareerRecommendatio
  * Use `create(CareerRecommendationSchema)` to create a new message.
  */
 export const CareerRecommendationSchema: GenMessage<CareerRecommendation> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 22);
+  messageDesc(file_cyber_esports_v1_report, 23);
 
 /**
  * @generated from message cyber.esports.v1.CareerImprovement
@@ -1000,7 +1077,7 @@ export type CareerImprovement = Message<"cyber.esports.v1.CareerImprovement"> & 
  * Use `create(CareerImprovementSchema)` to create a new message.
  */
 export const CareerImprovementSchema: GenMessage<CareerImprovement> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_report, 23);
+  messageDesc(file_cyber_esports_v1_report, 24);
 
 /**
  * The tier ladder, judged by percentile: S ≥95, A ≥85, B ≥60, else C.

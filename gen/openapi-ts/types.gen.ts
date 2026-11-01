@@ -960,6 +960,16 @@ export type CyberEsportsV1GetSessionReportResponse = {
     testedDimensions?: number;
     totalDimensions?: number;
     startedAt?: string;
+    /**
+     * Every valid attempt the session's lineup admitted, in submit order —
+     * the read-back detail rows, the detail-row group's single source. A
+     * curve-pending attempt rides the same list with a null authoritative
+     * score: the score the member earned is visible the moment it exists,
+     * never held hostage to the game's calibration curve (curves freeze
+     * one game at a time). The per-line attempt_scores stay the calibrated
+     * receipt; this list is the full truth, pending rows included.
+     */
+    attemptDetails?: Array<CyberEsportsV1SessionAttemptDetail>;
 };
 
 export type CyberEsportsV1GetTestAttemptResponse = {
@@ -1741,6 +1751,39 @@ export type CyberEsportsV1SessionAbilityLine = {
      * the comparison track and the "new personal best" note read.
      */
     historyBestScore?: number;
+};
+
+/**
+ * One attempt's read-back row — the raw track always present, the
+ * authoritative answer only once the game's curve has spoken. A pending
+ * row (raw set, authoritative null) renders under the same raw-score
+ * label law the settlement face holds.
+ */
+export type CyberEsportsV1SessionAttemptDetail = {
+    /**
+     * The six-word vocabulary; the face filters its own ability's rows.
+     */
+    ability?: string;
+    gameCode?: string;
+    /**
+     * The attempt's ordinal within the game — the retest counter.
+     */
+    attemptNo?: number;
+    /**
+     * The uncapped linear track — the only number a curve-pending attempt
+     * has.
+     */
+    rawScore?: number;
+    /**
+     * Null while the game's calibration curve is pending; the row still
+     * travels.
+     */
+    authoritativeScore?: number;
+    /**
+     * The authoritative answer's band; null with the score.
+     */
+    grade?: string;
+    at?: string;
 };
 
 export type CyberEsportsV1SetActivationBatchStatusRequest = {

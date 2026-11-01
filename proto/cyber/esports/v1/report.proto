@@ -170,6 +170,35 @@ message GetSessionReportResponse {
   int32 tested_dimensions = 7;
   int32 total_dimensions = 8;
   google.protobuf.Timestamp started_at = 9;
+  // Every valid attempt the session's lineup admitted, in submit order —
+  // the read-back detail rows, the detail-row group's single source. A
+  // curve-pending attempt rides the same list with a null authoritative
+  // score: the score the member earned is visible the moment it exists,
+  // never held hostage to the game's calibration curve (curves freeze
+  // one game at a time). The per-line attempt_scores stay the calibrated
+  // receipt; this list is the full truth, pending rows included.
+  repeated SessionAttemptDetail attempt_details = 10;
+}
+
+// One attempt's read-back row — the raw track always present, the
+// authoritative answer only once the game's curve has spoken. A pending
+// row (raw set, authoritative null) renders under the same raw-score
+// label law the settlement face holds.
+message SessionAttemptDetail {
+  // The six-word vocabulary; the face filters its own ability's rows.
+  string ability = 1;
+  string game_code = 2;
+  // The attempt's ordinal within the game — the retest counter.
+  int32 attempt_no = 3;
+  // The uncapped linear track — the only number a curve-pending attempt
+  // has.
+  double raw_score = 4;
+  // Null while the game's calibration curve is pending; the row still
+  // travels.
+  google.protobuf.DoubleValue authoritative_score = 5;
+  // The authoritative answer's band; null with the score.
+  google.protobuf.StringValue grade = 6;
+  google.protobuf.Timestamp at = 7;
 }
 
 // One ability's session verdict — the three numbers the settlement face

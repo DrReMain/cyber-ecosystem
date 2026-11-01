@@ -379,8 +379,16 @@ type GetSessionReportResponse struct {
 	TestedDimensions int32                  `protobuf:"varint,7,opt,name=tested_dimensions,json=testedDimensions,proto3" json:"tested_dimensions,omitempty"`
 	TotalDimensions  int32                  `protobuf:"varint,8,opt,name=total_dimensions,json=totalDimensions,proto3" json:"total_dimensions,omitempty"`
 	StartedAt        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Every valid attempt the session's lineup admitted, in submit order —
+	// the read-back detail rows, the detail-row group's single source. A
+	// curve-pending attempt rides the same list with a null authoritative
+	// score: the score the member earned is visible the moment it exists,
+	// never held hostage to the game's calibration curve (curves freeze
+	// one game at a time). The per-line attempt_scores stay the calibrated
+	// receipt; this list is the full truth, pending rows included.
+	AttemptDetails []*SessionAttemptDetail `protobuf:"bytes,10,rep,name=attempt_details,json=attemptDetails,proto3" json:"attempt_details,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *GetSessionReportResponse) Reset() {
@@ -476,6 +484,116 @@ func (x *GetSessionReportResponse) GetStartedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *GetSessionReportResponse) GetAttemptDetails() []*SessionAttemptDetail {
+	if x != nil {
+		return x.AttemptDetails
+	}
+	return nil
+}
+
+// One attempt's read-back row — the raw track always present, the
+// authoritative answer only once the game's curve has spoken. A pending
+// row (raw set, authoritative null) renders under the same raw-score
+// label law the settlement face holds.
+type SessionAttemptDetail struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The six-word vocabulary; the face filters its own ability's rows.
+	Ability  string `protobuf:"bytes,1,opt,name=ability,proto3" json:"ability,omitempty"`
+	GameCode string `protobuf:"bytes,2,opt,name=game_code,json=gameCode,proto3" json:"game_code,omitempty"`
+	// The attempt's ordinal within the game — the retest counter.
+	AttemptNo int32 `protobuf:"varint,3,opt,name=attempt_no,json=attemptNo,proto3" json:"attempt_no,omitempty"`
+	// The uncapped linear track — the only number a curve-pending attempt
+	// has.
+	RawScore float64 `protobuf:"fixed64,4,opt,name=raw_score,json=rawScore,proto3" json:"raw_score,omitempty"`
+	// Null while the game's calibration curve is pending; the row still
+	// travels.
+	AuthoritativeScore *wrapperspb.DoubleValue `protobuf:"bytes,5,opt,name=authoritative_score,json=authoritativeScore,proto3" json:"authoritative_score,omitempty"`
+	// The authoritative answer's band; null with the score.
+	Grade         *wrapperspb.StringValue `protobuf:"bytes,6,opt,name=grade,proto3" json:"grade,omitempty"`
+	At            *timestamppb.Timestamp  `protobuf:"bytes,7,opt,name=at,proto3" json:"at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SessionAttemptDetail) Reset() {
+	*x = SessionAttemptDetail{}
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SessionAttemptDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SessionAttemptDetail) ProtoMessage() {}
+
+func (x *SessionAttemptDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SessionAttemptDetail.ProtoReflect.Descriptor instead.
+func (*SessionAttemptDetail) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SessionAttemptDetail) GetAbility() string {
+	if x != nil {
+		return x.Ability
+	}
+	return ""
+}
+
+func (x *SessionAttemptDetail) GetGameCode() string {
+	if x != nil {
+		return x.GameCode
+	}
+	return ""
+}
+
+func (x *SessionAttemptDetail) GetAttemptNo() int32 {
+	if x != nil {
+		return x.AttemptNo
+	}
+	return 0
+}
+
+func (x *SessionAttemptDetail) GetRawScore() float64 {
+	if x != nil {
+		return x.RawScore
+	}
+	return 0
+}
+
+func (x *SessionAttemptDetail) GetAuthoritativeScore() *wrapperspb.DoubleValue {
+	if x != nil {
+		return x.AuthoritativeScore
+	}
+	return nil
+}
+
+func (x *SessionAttemptDetail) GetGrade() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Grade
+	}
+	return nil
+}
+
+func (x *SessionAttemptDetail) GetAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.At
+	}
+	return nil
+}
+
 // One ability's session verdict — the three numbers the settlement face
 // keeps distinct: this session's best, the previous session's word, and
 // the cross-session best.
@@ -508,7 +626,7 @@ type SessionAbilityLine struct {
 
 func (x *SessionAbilityLine) Reset() {
 	*x = SessionAbilityLine{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -520,7 +638,7 @@ func (x *SessionAbilityLine) String() string {
 func (*SessionAbilityLine) ProtoMessage() {}
 
 func (x *SessionAbilityLine) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -533,7 +651,7 @@ func (x *SessionAbilityLine) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionAbilityLine.ProtoReflect.Descriptor instead.
 func (*SessionAbilityLine) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{4}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SessionAbilityLine) GetAbility() string {
@@ -600,7 +718,7 @@ type GetAbilityDigestRequest struct {
 
 func (x *GetAbilityDigestRequest) Reset() {
 	*x = GetAbilityDigestRequest{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -612,7 +730,7 @@ func (x *GetAbilityDigestRequest) String() string {
 func (*GetAbilityDigestRequest) ProtoMessage() {}
 
 func (x *GetAbilityDigestRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -625,7 +743,7 @@ func (x *GetAbilityDigestRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAbilityDigestRequest.ProtoReflect.Descriptor instead.
 func (*GetAbilityDigestRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{5}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{6}
 }
 
 type GetAbilityDigestResponse struct {
@@ -648,7 +766,7 @@ type GetAbilityDigestResponse struct {
 
 func (x *GetAbilityDigestResponse) Reset() {
 	*x = GetAbilityDigestResponse{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[6]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -660,7 +778,7 @@ func (x *GetAbilityDigestResponse) String() string {
 func (*GetAbilityDigestResponse) ProtoMessage() {}
 
 func (x *GetAbilityDigestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[6]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -673,7 +791,7 @@ func (x *GetAbilityDigestResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAbilityDigestResponse.ProtoReflect.Descriptor instead.
 func (*GetAbilityDigestResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{6}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetAbilityDigestResponse) GetSessionsTotal() int32 {
@@ -730,7 +848,7 @@ type DigestAbilityLine struct {
 
 func (x *DigestAbilityLine) Reset() {
 	*x = DigestAbilityLine{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[7]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -742,7 +860,7 @@ func (x *DigestAbilityLine) String() string {
 func (*DigestAbilityLine) ProtoMessage() {}
 
 func (x *DigestAbilityLine) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[7]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -755,7 +873,7 @@ func (x *DigestAbilityLine) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DigestAbilityLine.ProtoReflect.Descriptor instead.
 func (*DigestAbilityLine) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{7}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DigestAbilityLine) GetAbility() string {
@@ -820,7 +938,7 @@ type DigestSessionLine struct {
 
 func (x *DigestSessionLine) Reset() {
 	*x = DigestSessionLine{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[8]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -832,7 +950,7 @@ func (x *DigestSessionLine) String() string {
 func (*DigestSessionLine) ProtoMessage() {}
 
 func (x *DigestSessionLine) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[8]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -845,7 +963,7 @@ func (x *DigestSessionLine) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DigestSessionLine.ProtoReflect.Descriptor instead.
 func (*DigestSessionLine) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{8}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *DigestSessionLine) GetSessionId() string {
@@ -918,7 +1036,7 @@ type ReportAbility struct {
 
 func (x *ReportAbility) Reset() {
 	*x = ReportAbility{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[9]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -930,7 +1048,7 @@ func (x *ReportAbility) String() string {
 func (*ReportAbility) ProtoMessage() {}
 
 func (x *ReportAbility) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[9]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -943,7 +1061,7 @@ func (x *ReportAbility) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportAbility.ProtoReflect.Descriptor instead.
 func (*ReportAbility) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{9}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ReportAbility) GetAbility() string {
@@ -1004,7 +1122,7 @@ type ReportComparison struct {
 
 func (x *ReportComparison) Reset() {
 	*x = ReportComparison{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[10]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1016,7 +1134,7 @@ func (x *ReportComparison) String() string {
 func (*ReportComparison) ProtoMessage() {}
 
 func (x *ReportComparison) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[10]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1029,7 +1147,7 @@ func (x *ReportComparison) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportComparison.ProtoReflect.Descriptor instead.
 func (*ReportComparison) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{10}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ReportComparison) GetDeltas() []*ReportComparison_Delta {
@@ -1052,7 +1170,7 @@ type ReportImprovement struct {
 
 func (x *ReportImprovement) Reset() {
 	*x = ReportImprovement{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[11]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1064,7 +1182,7 @@ func (x *ReportImprovement) String() string {
 func (*ReportImprovement) ProtoMessage() {}
 
 func (x *ReportImprovement) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[11]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1077,7 +1195,7 @@ func (x *ReportImprovement) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportImprovement.ProtoReflect.Descriptor instead.
 func (*ReportImprovement) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{11}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ReportImprovement) GetAbility() string {
@@ -1124,7 +1242,7 @@ type ReportAccessVerdict struct {
 
 func (x *ReportAccessVerdict) Reset() {
 	*x = ReportAccessVerdict{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[12]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1136,7 +1254,7 @@ func (x *ReportAccessVerdict) String() string {
 func (*ReportAccessVerdict) ProtoMessage() {}
 
 func (x *ReportAccessVerdict) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[12]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1149,7 +1267,7 @@ func (x *ReportAccessVerdict) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportAccessVerdict.ProtoReflect.Descriptor instead.
 func (*ReportAccessVerdict) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{12}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ReportAccessVerdict) GetAllowed() bool {
@@ -1174,7 +1292,7 @@ type GetCognitiveReportRequest struct {
 
 func (x *GetCognitiveReportRequest) Reset() {
 	*x = GetCognitiveReportRequest{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[13]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1186,7 +1304,7 @@ func (x *GetCognitiveReportRequest) String() string {
 func (*GetCognitiveReportRequest) ProtoMessage() {}
 
 func (x *GetCognitiveReportRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[13]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1199,7 +1317,7 @@ func (x *GetCognitiveReportRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCognitiveReportRequest.ProtoReflect.Descriptor instead.
 func (*GetCognitiveReportRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{13}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{14}
 }
 
 type GetCognitiveReportResponse struct {
@@ -1236,7 +1354,7 @@ type GetCognitiveReportResponse struct {
 
 func (x *GetCognitiveReportResponse) Reset() {
 	*x = GetCognitiveReportResponse{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[14]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1248,7 +1366,7 @@ func (x *GetCognitiveReportResponse) String() string {
 func (*GetCognitiveReportResponse) ProtoMessage() {}
 
 func (x *GetCognitiveReportResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[14]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1261,7 +1379,7 @@ func (x *GetCognitiveReportResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCognitiveReportResponse.ProtoReflect.Descriptor instead.
 func (*GetCognitiveReportResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{14}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GetCognitiveReportResponse) GetAccess() *ReportAccessVerdict {
@@ -1328,7 +1446,7 @@ type CognitiveDimension struct {
 
 func (x *CognitiveDimension) Reset() {
 	*x = CognitiveDimension{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[15]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1340,7 +1458,7 @@ func (x *CognitiveDimension) String() string {
 func (*CognitiveDimension) ProtoMessage() {}
 
 func (x *CognitiveDimension) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[15]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1353,7 +1471,7 @@ func (x *CognitiveDimension) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CognitiveDimension.ProtoReflect.Descriptor instead.
 func (*CognitiveDimension) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{15}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CognitiveDimension) GetDimension() string {
@@ -1385,7 +1503,7 @@ type GetTrendReportRequest struct {
 
 func (x *GetTrendReportRequest) Reset() {
 	*x = GetTrendReportRequest{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[16]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1397,7 +1515,7 @@ func (x *GetTrendReportRequest) String() string {
 func (*GetTrendReportRequest) ProtoMessage() {}
 
 func (x *GetTrendReportRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[16]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1410,7 +1528,7 @@ func (x *GetTrendReportRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTrendReportRequest.ProtoReflect.Descriptor instead.
 func (*GetTrendReportRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{16}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{17}
 }
 
 type GetTrendReportResponse struct {
@@ -1434,7 +1552,7 @@ type GetTrendReportResponse struct {
 
 func (x *GetTrendReportResponse) Reset() {
 	*x = GetTrendReportResponse{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[17]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1446,7 +1564,7 @@ func (x *GetTrendReportResponse) String() string {
 func (*GetTrendReportResponse) ProtoMessage() {}
 
 func (x *GetTrendReportResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[17]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1459,7 +1577,7 @@ func (x *GetTrendReportResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTrendReportResponse.ProtoReflect.Descriptor instead.
 func (*GetTrendReportResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{17}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *GetTrendReportResponse) GetSessionsTotal() int32 {
@@ -1495,7 +1613,7 @@ type TrendAbilitySeries struct {
 
 func (x *TrendAbilitySeries) Reset() {
 	*x = TrendAbilitySeries{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[18]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1507,7 +1625,7 @@ func (x *TrendAbilitySeries) String() string {
 func (*TrendAbilitySeries) ProtoMessage() {}
 
 func (x *TrendAbilitySeries) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[18]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1520,7 +1638,7 @@ func (x *TrendAbilitySeries) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrendAbilitySeries.ProtoReflect.Descriptor instead.
 func (*TrendAbilitySeries) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{18}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *TrendAbilitySeries) GetAbility() string {
@@ -1552,7 +1670,7 @@ type TrendPoint struct {
 
 func (x *TrendPoint) Reset() {
 	*x = TrendPoint{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[19]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1564,7 +1682,7 @@ func (x *TrendPoint) String() string {
 func (*TrendPoint) ProtoMessage() {}
 
 func (x *TrendPoint) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[19]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1577,7 +1695,7 @@ func (x *TrendPoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrendPoint.ProtoReflect.Descriptor instead.
 func (*TrendPoint) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{19}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *TrendPoint) GetAt() *timestamppb.Timestamp {
@@ -1609,7 +1727,7 @@ type GetCareerReportRequest struct {
 
 func (x *GetCareerReportRequest) Reset() {
 	*x = GetCareerReportRequest{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[20]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1621,7 +1739,7 @@ func (x *GetCareerReportRequest) String() string {
 func (*GetCareerReportRequest) ProtoMessage() {}
 
 func (x *GetCareerReportRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[20]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1634,7 +1752,7 @@ func (x *GetCareerReportRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCareerReportRequest.ProtoReflect.Descriptor instead.
 func (*GetCareerReportRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{20}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{21}
 }
 
 type GetCareerReportResponse struct {
@@ -1657,7 +1775,7 @@ type GetCareerReportResponse struct {
 
 func (x *GetCareerReportResponse) Reset() {
 	*x = GetCareerReportResponse{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[21]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1669,7 +1787,7 @@ func (x *GetCareerReportResponse) String() string {
 func (*GetCareerReportResponse) ProtoMessage() {}
 
 func (x *GetCareerReportResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[21]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1682,7 +1800,7 @@ func (x *GetCareerReportResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCareerReportResponse.ProtoReflect.Descriptor instead.
 func (*GetCareerReportResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{21}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GetCareerReportResponse) GetAccess() *ReportAccessVerdict {
@@ -1726,7 +1844,7 @@ type CareerRecommendation struct {
 
 func (x *CareerRecommendation) Reset() {
 	*x = CareerRecommendation{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[22]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1738,7 +1856,7 @@ func (x *CareerRecommendation) String() string {
 func (*CareerRecommendation) ProtoMessage() {}
 
 func (x *CareerRecommendation) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[22]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1751,7 +1869,7 @@ func (x *CareerRecommendation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CareerRecommendation.ProtoReflect.Descriptor instead.
 func (*CareerRecommendation) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{22}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CareerRecommendation) GetCareerArea() string {
@@ -1821,7 +1939,7 @@ type CareerImprovement struct {
 
 func (x *CareerImprovement) Reset() {
 	*x = CareerImprovement{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[23]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1833,7 +1951,7 @@ func (x *CareerImprovement) String() string {
 func (*CareerImprovement) ProtoMessage() {}
 
 func (x *CareerImprovement) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[23]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1846,7 +1964,7 @@ func (x *CareerImprovement) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CareerImprovement.ProtoReflect.Descriptor instead.
 func (*CareerImprovement) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{23}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *CareerImprovement) GetDimension() string {
@@ -1897,7 +2015,7 @@ type ReportComparison_Delta struct {
 
 func (x *ReportComparison_Delta) Reset() {
 	*x = ReportComparison_Delta{}
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[24]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1909,7 +2027,7 @@ func (x *ReportComparison_Delta) String() string {
 func (*ReportComparison_Delta) ProtoMessage() {}
 
 func (x *ReportComparison_Delta) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_report_proto_msgTypes[24]
+	mi := &file_cyber_esports_v1_report_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1922,7 +2040,7 @@ func (x *ReportComparison_Delta) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportComparison_Delta.ProtoReflect.Descriptor instead.
 func (*ReportComparison_Delta) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{10, 0}
+	return file_cyber_esports_v1_report_proto_rawDescGZIP(), []int{11, 0}
 }
 
 func (x *ReportComparison_Delta) GetAbility() string {
@@ -1971,7 +2089,7 @@ const file_cyber_esports_v1_report_proto_rawDesc = "" +
 	"\v_comparison\"C\n" +
 	"\x17GetSessionReportRequest\x12(\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@R\tsessionId\"\xf1\x03\n" +
+	"session_id\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18@R\tsessionId\"\xc2\x04\n" +
 	"\x18GetSessionReportResponse\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x14\n" +
@@ -1983,7 +2101,18 @@ const file_cyber_esports_v1_report_proto_rawDesc = "" +
 	"\x11tested_dimensions\x18\a \x01(\x05R\x10testedDimensions\x12)\n" +
 	"\x10total_dimensions\x18\b \x01(\x05R\x0ftotalDimensions\x129\n" +
 	"\n" +
-	"started_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\"\xa4\x03\n" +
+	"started_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x12O\n" +
+	"\x0fattempt_details\x18\n" +
+	" \x03(\v2&.cyber.esports.v1.SessionAttemptDetailR\x0eattemptDetails\"\xb8\x02\n" +
+	"\x14SessionAttemptDetail\x12\x18\n" +
+	"\aability\x18\x01 \x01(\tR\aability\x12\x1b\n" +
+	"\tgame_code\x18\x02 \x01(\tR\bgameCode\x12\x1d\n" +
+	"\n" +
+	"attempt_no\x18\x03 \x01(\x05R\tattemptNo\x12\x1b\n" +
+	"\traw_score\x18\x04 \x01(\x01R\brawScore\x12M\n" +
+	"\x13authoritative_score\x18\x05 \x01(\v2\x1c.google.protobuf.DoubleValueR\x12authoritativeScore\x122\n" +
+	"\x05grade\x18\x06 \x01(\v2\x1c.google.protobuf.StringValueR\x05grade\x12*\n" +
+	"\x02at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\x02at\"\xa4\x03\n" +
 	"\x12SessionAbilityLine\x12\x18\n" +
 	"\aability\x18\x01 \x01(\tR\aability\x12\x1b\n" +
 	"\tgame_code\x18\x02 \x01(\tR\bgameCode\x12\x1d\n" +
@@ -2149,7 +2278,7 @@ func file_cyber_esports_v1_report_proto_rawDescGZIP() []byte {
 }
 
 var file_cyber_esports_v1_report_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_cyber_esports_v1_report_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_cyber_esports_v1_report_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_cyber_esports_v1_report_proto_goTypes = []any{
 	(ReportTier)(0),                    // 0: cyber.esports.v1.ReportTier
 	(PeerConfidence)(0),                // 1: cyber.esports.v1.PeerConfidence
@@ -2157,86 +2286,91 @@ var file_cyber_esports_v1_report_proto_goTypes = []any{
 	(*GetReportResponse)(nil),          // 3: cyber.esports.v1.GetReportResponse
 	(*GetSessionReportRequest)(nil),    // 4: cyber.esports.v1.GetSessionReportRequest
 	(*GetSessionReportResponse)(nil),   // 5: cyber.esports.v1.GetSessionReportResponse
-	(*SessionAbilityLine)(nil),         // 6: cyber.esports.v1.SessionAbilityLine
-	(*GetAbilityDigestRequest)(nil),    // 7: cyber.esports.v1.GetAbilityDigestRequest
-	(*GetAbilityDigestResponse)(nil),   // 8: cyber.esports.v1.GetAbilityDigestResponse
-	(*DigestAbilityLine)(nil),          // 9: cyber.esports.v1.DigestAbilityLine
-	(*DigestSessionLine)(nil),          // 10: cyber.esports.v1.DigestSessionLine
-	(*ReportAbility)(nil),              // 11: cyber.esports.v1.ReportAbility
-	(*ReportComparison)(nil),           // 12: cyber.esports.v1.ReportComparison
-	(*ReportImprovement)(nil),          // 13: cyber.esports.v1.ReportImprovement
-	(*ReportAccessVerdict)(nil),        // 14: cyber.esports.v1.ReportAccessVerdict
-	(*GetCognitiveReportRequest)(nil),  // 15: cyber.esports.v1.GetCognitiveReportRequest
-	(*GetCognitiveReportResponse)(nil), // 16: cyber.esports.v1.GetCognitiveReportResponse
-	(*CognitiveDimension)(nil),         // 17: cyber.esports.v1.CognitiveDimension
-	(*GetTrendReportRequest)(nil),      // 18: cyber.esports.v1.GetTrendReportRequest
-	(*GetTrendReportResponse)(nil),     // 19: cyber.esports.v1.GetTrendReportResponse
-	(*TrendAbilitySeries)(nil),         // 20: cyber.esports.v1.TrendAbilitySeries
-	(*TrendPoint)(nil),                 // 21: cyber.esports.v1.TrendPoint
-	(*GetCareerReportRequest)(nil),     // 22: cyber.esports.v1.GetCareerReportRequest
-	(*GetCareerReportResponse)(nil),    // 23: cyber.esports.v1.GetCareerReportResponse
-	(*CareerRecommendation)(nil),       // 24: cyber.esports.v1.CareerRecommendation
-	(*CareerImprovement)(nil),          // 25: cyber.esports.v1.CareerImprovement
-	(*ReportComparison_Delta)(nil),     // 26: cyber.esports.v1.ReportComparison.Delta
-	(*wrapperspb.StringValue)(nil),     // 27: google.protobuf.StringValue
-	(*wrapperspb.DoubleValue)(nil),     // 28: google.protobuf.DoubleValue
-	(*timestamppb.Timestamp)(nil),      // 29: google.protobuf.Timestamp
-	(ReportAccessReason)(0),            // 30: cyber.esports.v1.ReportAccessReason
+	(*SessionAttemptDetail)(nil),       // 6: cyber.esports.v1.SessionAttemptDetail
+	(*SessionAbilityLine)(nil),         // 7: cyber.esports.v1.SessionAbilityLine
+	(*GetAbilityDigestRequest)(nil),    // 8: cyber.esports.v1.GetAbilityDigestRequest
+	(*GetAbilityDigestResponse)(nil),   // 9: cyber.esports.v1.GetAbilityDigestResponse
+	(*DigestAbilityLine)(nil),          // 10: cyber.esports.v1.DigestAbilityLine
+	(*DigestSessionLine)(nil),          // 11: cyber.esports.v1.DigestSessionLine
+	(*ReportAbility)(nil),              // 12: cyber.esports.v1.ReportAbility
+	(*ReportComparison)(nil),           // 13: cyber.esports.v1.ReportComparison
+	(*ReportImprovement)(nil),          // 14: cyber.esports.v1.ReportImprovement
+	(*ReportAccessVerdict)(nil),        // 15: cyber.esports.v1.ReportAccessVerdict
+	(*GetCognitiveReportRequest)(nil),  // 16: cyber.esports.v1.GetCognitiveReportRequest
+	(*GetCognitiveReportResponse)(nil), // 17: cyber.esports.v1.GetCognitiveReportResponse
+	(*CognitiveDimension)(nil),         // 18: cyber.esports.v1.CognitiveDimension
+	(*GetTrendReportRequest)(nil),      // 19: cyber.esports.v1.GetTrendReportRequest
+	(*GetTrendReportResponse)(nil),     // 20: cyber.esports.v1.GetTrendReportResponse
+	(*TrendAbilitySeries)(nil),         // 21: cyber.esports.v1.TrendAbilitySeries
+	(*TrendPoint)(nil),                 // 22: cyber.esports.v1.TrendPoint
+	(*GetCareerReportRequest)(nil),     // 23: cyber.esports.v1.GetCareerReportRequest
+	(*GetCareerReportResponse)(nil),    // 24: cyber.esports.v1.GetCareerReportResponse
+	(*CareerRecommendation)(nil),       // 25: cyber.esports.v1.CareerRecommendation
+	(*CareerImprovement)(nil),          // 26: cyber.esports.v1.CareerImprovement
+	(*ReportComparison_Delta)(nil),     // 27: cyber.esports.v1.ReportComparison.Delta
+	(*wrapperspb.StringValue)(nil),     // 28: google.protobuf.StringValue
+	(*wrapperspb.DoubleValue)(nil),     // 29: google.protobuf.DoubleValue
+	(*timestamppb.Timestamp)(nil),      // 30: google.protobuf.Timestamp
+	(ReportAccessReason)(0),            // 31: cyber.esports.v1.ReportAccessReason
 }
 var file_cyber_esports_v1_report_proto_depIdxs = []int32{
 	0,  // 0: cyber.esports.v1.GetReportResponse.tier:type_name -> cyber.esports.v1.ReportTier
-	11, // 1: cyber.esports.v1.GetReportResponse.abilities:type_name -> cyber.esports.v1.ReportAbility
-	11, // 2: cyber.esports.v1.GetReportResponse.sub_abilities:type_name -> cyber.esports.v1.ReportAbility
-	12, // 3: cyber.esports.v1.GetReportResponse.comparison:type_name -> cyber.esports.v1.ReportComparison
-	13, // 4: cyber.esports.v1.GetReportResponse.improvements:type_name -> cyber.esports.v1.ReportImprovement
-	27, // 5: cyber.esports.v1.GetSessionReportResponse.anchor_record_id:type_name -> google.protobuf.StringValue
+	12, // 1: cyber.esports.v1.GetReportResponse.abilities:type_name -> cyber.esports.v1.ReportAbility
+	12, // 2: cyber.esports.v1.GetReportResponse.sub_abilities:type_name -> cyber.esports.v1.ReportAbility
+	13, // 3: cyber.esports.v1.GetReportResponse.comparison:type_name -> cyber.esports.v1.ReportComparison
+	14, // 4: cyber.esports.v1.GetReportResponse.improvements:type_name -> cyber.esports.v1.ReportImprovement
+	28, // 5: cyber.esports.v1.GetSessionReportResponse.anchor_record_id:type_name -> google.protobuf.StringValue
 	0,  // 6: cyber.esports.v1.GetSessionReportResponse.tier:type_name -> cyber.esports.v1.ReportTier
-	28, // 7: cyber.esports.v1.GetSessionReportResponse.composite_percentile:type_name -> google.protobuf.DoubleValue
-	6,  // 8: cyber.esports.v1.GetSessionReportResponse.abilities:type_name -> cyber.esports.v1.SessionAbilityLine
-	29, // 9: cyber.esports.v1.GetSessionReportResponse.started_at:type_name -> google.protobuf.Timestamp
-	27, // 10: cyber.esports.v1.SessionAbilityLine.best_grade:type_name -> google.protobuf.StringValue
-	28, // 11: cyber.esports.v1.SessionAbilityLine.percentile:type_name -> google.protobuf.DoubleValue
-	28, // 12: cyber.esports.v1.SessionAbilityLine.prev_session_score:type_name -> google.protobuf.DoubleValue
-	28, // 13: cyber.esports.v1.SessionAbilityLine.history_best_score:type_name -> google.protobuf.DoubleValue
-	9,  // 14: cyber.esports.v1.GetAbilityDigestResponse.abilities:type_name -> cyber.esports.v1.DigestAbilityLine
-	10, // 15: cyber.esports.v1.GetAbilityDigestResponse.sessions:type_name -> cyber.esports.v1.DigestSessionLine
-	27, // 16: cyber.esports.v1.DigestAbilityLine.best_grade:type_name -> google.protobuf.StringValue
-	28, // 17: cyber.esports.v1.DigestAbilityLine.best_percentile:type_name -> google.protobuf.DoubleValue
-	29, // 18: cyber.esports.v1.DigestAbilityLine.last_at:type_name -> google.protobuf.Timestamp
-	29, // 19: cyber.esports.v1.DigestSessionLine.created_at:type_name -> google.protobuf.Timestamp
-	27, // 20: cyber.esports.v1.DigestSessionLine.anchor_record_id:type_name -> google.protobuf.StringValue
-	1,  // 21: cyber.esports.v1.ReportAbility.confidence:type_name -> cyber.esports.v1.PeerConfidence
-	26, // 22: cyber.esports.v1.ReportComparison.deltas:type_name -> cyber.esports.v1.ReportComparison.Delta
-	30, // 23: cyber.esports.v1.ReportAccessVerdict.reason:type_name -> cyber.esports.v1.ReportAccessReason
-	14, // 24: cyber.esports.v1.GetCognitiveReportResponse.access:type_name -> cyber.esports.v1.ReportAccessVerdict
-	17, // 25: cyber.esports.v1.GetCognitiveReportResponse.dimensions:type_name -> cyber.esports.v1.CognitiveDimension
-	28, // 26: cyber.esports.v1.GetCognitiveReportResponse.composite:type_name -> google.protobuf.DoubleValue
-	0,  // 27: cyber.esports.v1.GetCognitiveReportResponse.tier:type_name -> cyber.esports.v1.ReportTier
-	0,  // 28: cyber.esports.v1.CognitiveDimension.tier:type_name -> cyber.esports.v1.ReportTier
-	20, // 29: cyber.esports.v1.GetTrendReportResponse.abilities:type_name -> cyber.esports.v1.TrendAbilitySeries
-	14, // 30: cyber.esports.v1.GetTrendReportResponse.advanced_access:type_name -> cyber.esports.v1.ReportAccessVerdict
-	21, // 31: cyber.esports.v1.TrendAbilitySeries.points:type_name -> cyber.esports.v1.TrendPoint
-	29, // 32: cyber.esports.v1.TrendPoint.at:type_name -> google.protobuf.Timestamp
-	14, // 33: cyber.esports.v1.GetCareerReportResponse.access:type_name -> cyber.esports.v1.ReportAccessVerdict
-	24, // 34: cyber.esports.v1.GetCareerReportResponse.recommendations:type_name -> cyber.esports.v1.CareerRecommendation
-	25, // 35: cyber.esports.v1.GetCareerReportResponse.improvements:type_name -> cyber.esports.v1.CareerImprovement
-	2,  // 36: cyber.esports.v1.ReportService.GetReport:input_type -> cyber.esports.v1.GetReportRequest
-	4,  // 37: cyber.esports.v1.ReportService.GetSessionReport:input_type -> cyber.esports.v1.GetSessionReportRequest
-	7,  // 38: cyber.esports.v1.ReportService.GetAbilityDigest:input_type -> cyber.esports.v1.GetAbilityDigestRequest
-	15, // 39: cyber.esports.v1.ReportService.GetCognitiveReport:input_type -> cyber.esports.v1.GetCognitiveReportRequest
-	18, // 40: cyber.esports.v1.ReportService.GetTrendReport:input_type -> cyber.esports.v1.GetTrendReportRequest
-	22, // 41: cyber.esports.v1.ReportService.GetCareerReport:input_type -> cyber.esports.v1.GetCareerReportRequest
-	3,  // 42: cyber.esports.v1.ReportService.GetReport:output_type -> cyber.esports.v1.GetReportResponse
-	5,  // 43: cyber.esports.v1.ReportService.GetSessionReport:output_type -> cyber.esports.v1.GetSessionReportResponse
-	8,  // 44: cyber.esports.v1.ReportService.GetAbilityDigest:output_type -> cyber.esports.v1.GetAbilityDigestResponse
-	16, // 45: cyber.esports.v1.ReportService.GetCognitiveReport:output_type -> cyber.esports.v1.GetCognitiveReportResponse
-	19, // 46: cyber.esports.v1.ReportService.GetTrendReport:output_type -> cyber.esports.v1.GetTrendReportResponse
-	23, // 47: cyber.esports.v1.ReportService.GetCareerReport:output_type -> cyber.esports.v1.GetCareerReportResponse
-	42, // [42:48] is the sub-list for method output_type
-	36, // [36:42] is the sub-list for method input_type
-	36, // [36:36] is the sub-list for extension type_name
-	36, // [36:36] is the sub-list for extension extendee
-	0,  // [0:36] is the sub-list for field type_name
+	29, // 7: cyber.esports.v1.GetSessionReportResponse.composite_percentile:type_name -> google.protobuf.DoubleValue
+	7,  // 8: cyber.esports.v1.GetSessionReportResponse.abilities:type_name -> cyber.esports.v1.SessionAbilityLine
+	30, // 9: cyber.esports.v1.GetSessionReportResponse.started_at:type_name -> google.protobuf.Timestamp
+	6,  // 10: cyber.esports.v1.GetSessionReportResponse.attempt_details:type_name -> cyber.esports.v1.SessionAttemptDetail
+	29, // 11: cyber.esports.v1.SessionAttemptDetail.authoritative_score:type_name -> google.protobuf.DoubleValue
+	28, // 12: cyber.esports.v1.SessionAttemptDetail.grade:type_name -> google.protobuf.StringValue
+	30, // 13: cyber.esports.v1.SessionAttemptDetail.at:type_name -> google.protobuf.Timestamp
+	28, // 14: cyber.esports.v1.SessionAbilityLine.best_grade:type_name -> google.protobuf.StringValue
+	29, // 15: cyber.esports.v1.SessionAbilityLine.percentile:type_name -> google.protobuf.DoubleValue
+	29, // 16: cyber.esports.v1.SessionAbilityLine.prev_session_score:type_name -> google.protobuf.DoubleValue
+	29, // 17: cyber.esports.v1.SessionAbilityLine.history_best_score:type_name -> google.protobuf.DoubleValue
+	10, // 18: cyber.esports.v1.GetAbilityDigestResponse.abilities:type_name -> cyber.esports.v1.DigestAbilityLine
+	11, // 19: cyber.esports.v1.GetAbilityDigestResponse.sessions:type_name -> cyber.esports.v1.DigestSessionLine
+	28, // 20: cyber.esports.v1.DigestAbilityLine.best_grade:type_name -> google.protobuf.StringValue
+	29, // 21: cyber.esports.v1.DigestAbilityLine.best_percentile:type_name -> google.protobuf.DoubleValue
+	30, // 22: cyber.esports.v1.DigestAbilityLine.last_at:type_name -> google.protobuf.Timestamp
+	30, // 23: cyber.esports.v1.DigestSessionLine.created_at:type_name -> google.protobuf.Timestamp
+	28, // 24: cyber.esports.v1.DigestSessionLine.anchor_record_id:type_name -> google.protobuf.StringValue
+	1,  // 25: cyber.esports.v1.ReportAbility.confidence:type_name -> cyber.esports.v1.PeerConfidence
+	27, // 26: cyber.esports.v1.ReportComparison.deltas:type_name -> cyber.esports.v1.ReportComparison.Delta
+	31, // 27: cyber.esports.v1.ReportAccessVerdict.reason:type_name -> cyber.esports.v1.ReportAccessReason
+	15, // 28: cyber.esports.v1.GetCognitiveReportResponse.access:type_name -> cyber.esports.v1.ReportAccessVerdict
+	18, // 29: cyber.esports.v1.GetCognitiveReportResponse.dimensions:type_name -> cyber.esports.v1.CognitiveDimension
+	29, // 30: cyber.esports.v1.GetCognitiveReportResponse.composite:type_name -> google.protobuf.DoubleValue
+	0,  // 31: cyber.esports.v1.GetCognitiveReportResponse.tier:type_name -> cyber.esports.v1.ReportTier
+	0,  // 32: cyber.esports.v1.CognitiveDimension.tier:type_name -> cyber.esports.v1.ReportTier
+	21, // 33: cyber.esports.v1.GetTrendReportResponse.abilities:type_name -> cyber.esports.v1.TrendAbilitySeries
+	15, // 34: cyber.esports.v1.GetTrendReportResponse.advanced_access:type_name -> cyber.esports.v1.ReportAccessVerdict
+	22, // 35: cyber.esports.v1.TrendAbilitySeries.points:type_name -> cyber.esports.v1.TrendPoint
+	30, // 36: cyber.esports.v1.TrendPoint.at:type_name -> google.protobuf.Timestamp
+	15, // 37: cyber.esports.v1.GetCareerReportResponse.access:type_name -> cyber.esports.v1.ReportAccessVerdict
+	25, // 38: cyber.esports.v1.GetCareerReportResponse.recommendations:type_name -> cyber.esports.v1.CareerRecommendation
+	26, // 39: cyber.esports.v1.GetCareerReportResponse.improvements:type_name -> cyber.esports.v1.CareerImprovement
+	2,  // 40: cyber.esports.v1.ReportService.GetReport:input_type -> cyber.esports.v1.GetReportRequest
+	4,  // 41: cyber.esports.v1.ReportService.GetSessionReport:input_type -> cyber.esports.v1.GetSessionReportRequest
+	8,  // 42: cyber.esports.v1.ReportService.GetAbilityDigest:input_type -> cyber.esports.v1.GetAbilityDigestRequest
+	16, // 43: cyber.esports.v1.ReportService.GetCognitiveReport:input_type -> cyber.esports.v1.GetCognitiveReportRequest
+	19, // 44: cyber.esports.v1.ReportService.GetTrendReport:input_type -> cyber.esports.v1.GetTrendReportRequest
+	23, // 45: cyber.esports.v1.ReportService.GetCareerReport:input_type -> cyber.esports.v1.GetCareerReportRequest
+	3,  // 46: cyber.esports.v1.ReportService.GetReport:output_type -> cyber.esports.v1.GetReportResponse
+	5,  // 47: cyber.esports.v1.ReportService.GetSessionReport:output_type -> cyber.esports.v1.GetSessionReportResponse
+	9,  // 48: cyber.esports.v1.ReportService.GetAbilityDigest:output_type -> cyber.esports.v1.GetAbilityDigestResponse
+	17, // 49: cyber.esports.v1.ReportService.GetCognitiveReport:output_type -> cyber.esports.v1.GetCognitiveReportResponse
+	20, // 50: cyber.esports.v1.ReportService.GetTrendReport:output_type -> cyber.esports.v1.GetTrendReportResponse
+	24, // 51: cyber.esports.v1.ReportService.GetCareerReport:output_type -> cyber.esports.v1.GetCareerReportResponse
+	46, // [46:52] is the sub-list for method output_type
+	40, // [40:46] is the sub-list for method input_type
+	40, // [40:40] is the sub-list for extension type_name
+	40, // [40:40] is the sub-list for extension extendee
+	0,  // [0:40] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_report_proto_init() }
@@ -2246,15 +2380,15 @@ func file_cyber_esports_v1_report_proto_init() {
 	}
 	file_cyber_esports_v1_entitlement_proto_init()
 	file_cyber_esports_v1_report_proto_msgTypes[1].OneofWrappers = []any{}
-	file_cyber_esports_v1_report_proto_msgTypes[9].OneofWrappers = []any{}
-	file_cyber_esports_v1_report_proto_msgTypes[24].OneofWrappers = []any{}
+	file_cyber_esports_v1_report_proto_msgTypes[10].OneofWrappers = []any{}
+	file_cyber_esports_v1_report_proto_msgTypes[25].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_report_proto_rawDesc), len(file_cyber_esports_v1_report_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   25,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

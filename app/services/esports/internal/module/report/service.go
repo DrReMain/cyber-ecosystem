@@ -72,6 +72,7 @@ func (s *ReportService) GetSessionReport(ctx context.Context, req *esportspb.Get
 		Tier:                tierPB(r.Tier),
 		CompositePercentile: utils.Wrap(r.Composite, utils.DoubleW),
 		Abilities:           sessionAbilitiesPB(r.Abilities),
+		AttemptDetails:      sessionAttemptDetailsPB(r.AttemptDetails),
 		TestedDimensions:    utils.ConvNum[int32](r.Tested),
 		TotalDimensions:     utils.ConvNum[int32](r.Total),
 		StartedAt:           utils.ToTimestamp(&r.StartedAt),
@@ -215,6 +216,23 @@ func sessionAbilitiesPB(rows []SessionAbilityRow) []*esportspb.SessionAbilityLin
 			Percentile:       utils.Wrap(r.Percentile, utils.DoubleW),
 			PrevSessionScore: utils.Wrap(r.PrevSession, utils.DoubleW),
 			HistoryBestScore: utils.Wrap(r.HistoryBest, utils.DoubleW),
+		})
+	}
+	return out
+}
+
+func sessionAttemptDetailsPB(rows []SessionAttemptRow) []*esportspb.SessionAttemptDetail {
+	out := make([]*esportspb.SessionAttemptDetail, 0, len(rows))
+	for _, r := range rows {
+		at := r.CreatedAt
+		out = append(out, &esportspb.SessionAttemptDetail{
+			Ability:            r.Ability,
+			GameCode:           r.TestCode,
+			AttemptNo:          utils.ConvNum[int32](r.AttemptNo),
+			RawScore:           r.Raw,
+			AuthoritativeScore: utils.Wrap(r.Authoritative, utils.DoubleW),
+			Grade:              utils.Wrap(r.Grade, utils.StringW),
+			At:                 utils.ToTimestamp(&at),
 		})
 	}
 	return out

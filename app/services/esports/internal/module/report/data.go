@@ -298,15 +298,14 @@ func (rp *boardRP) SessionMeta(ctx context.Context, sessionID string) (*SessionM
 }
 
 func (rp *boardRP) SessionAttempts(ctx context.Context, sessionID string) ([]SessionAttemptRow, error) {
-	// Every valid scored attempt under the session in submit order — the
-	// receipt's raw truth; the ability rides the tests join the board
-	// already uses.
+	// Every valid attempt under the session in submit order, curve-pending
+	// rows included — the receipt's raw truth; the ability rides the tests
+	// join the board already uses.
 	client := rp.Platform.GetClient(ctx)
 	rows, err := client.TestRecord.Query().
 		Where(
 			enttestrecord.SessionIDEQ(sessionID),
 			enttestrecord.ValidEQ(true),
-			enttestrecord.AuthoritativeScoreNotNil(),
 		).
 		Order(ent.Asc(enttestrecord.FieldCreatedAt)).
 		All(ctx)
@@ -326,6 +325,14 @@ func (rp *boardRP) SessionAttempts(ctx context.Context, sessionID string) ([]Ses
 		if !ok {
 			continue // a test outside the ability vocabulary feeds no line
 		}
+		// The engine always writes raw; the column's leniency only serves
+		// legacy rows, where the authoritative answer speaks anyway — a
+		// zero raw on those never masquerades as a score (the pending path,
+		// the one raw headlines, always carries the real number).
+		raw := 0.0
+		if r.RawScore != nil {
+			raw = *r.RawScore
+		}
 		var grade *string
 		if r.Grade != nil {
 			g := string(*r.Grade)
@@ -333,7 +340,7 @@ func (rp *boardRP) SessionAttempts(ctx context.Context, sessionID string) ([]Ses
 		}
 		out = append(out, SessionAttemptRow{
 			TestCode: r.TestCode, Ability: ability, AttemptNo: r.AttemptNo,
-			Score: *r.AuthoritativeScore, Grade: grade, CreatedAt: r.CreatedAt,
+			Raw: raw, Authoritative: r.AuthoritativeScore, Grade: grade, CreatedAt: r.CreatedAt,
 		})
 	}
 	return out, nil

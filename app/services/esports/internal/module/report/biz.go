@@ -225,12 +225,13 @@ type Snapshot struct {
 }
 
 type SessionAttemptRow struct {
-	TestCode  string
-	Ability   string
-	AttemptNo int
-	Score     float64 // authoritative — only a scored attempt lands a row, the settlement receipt's raw truth
-	Grade     *string
-	CreatedAt time.Time
+	TestCode      string
+	Ability       string
+	AttemptNo     int
+	Raw           float64  // the uncapped linear track — always present, the curve-pending row's headline
+	Authoritative *float64 // nil while the game's calibration curve is pending; the line math's only currency
+	Grade         *string
+	CreatedAt     time.Time
 }
 
 type SessionAbilityRow struct {
@@ -252,8 +253,12 @@ type SessionReport struct {
 	Tier      string // "" while no anchor exists
 	Composite *float64
 	Abilities []SessionAbilityRow
-	Tested    int
-	Total     int
+	// Every valid attempt in submit order, curve-pending rows included —
+	// the read-back detail list; the ability lines above narrow to the
+	// calibrated currency.
+	AttemptDetails []SessionAttemptRow
+	Tested         int
+	Total          int
 }
 
 type SessionMetaRow struct {
@@ -587,12 +592,26 @@ func (uc *ReportUC) GetSessionReport(ctx context.Context, sessionID string) (*Se
 
 	// Per ability in the lineup's order: the best score with its
 	// attempts receipt. An attempt outside the lineup's codes has no
-	// line to sit on — dropped, not invented a slot for.
+	// line to sit on — dropped, not invented a slot for. A curve-pending
+	// attempt joins no line math either — the receipt's currency is the
+	// calibrated score — but its row travels in the detail list, the
+	// score never held hostage to the curve.
+	lineup := make(map[string]bool, len(meta.Steps))
+	for _, s := range meta.Steps {
+		lineup[s.TestCode] = true
+	}
 	bestOf := make(map[string]SessionAttemptRow, len(meta.Steps))
 	scoresOf := make(map[string][]float64, len(meta.Steps))
+	r.AttemptDetails = make([]SessionAttemptRow, 0, len(attempts))
 	for _, a := range attempts {
-		scoresOf[a.TestCode] = append(scoresOf[a.TestCode], a.Score)
-		if b, ok := bestOf[a.TestCode]; !ok || a.Score > b.Score {
+		if lineup[a.TestCode] {
+			r.AttemptDetails = append(r.AttemptDetails, a)
+		}
+		if a.Authoritative == nil {
+			continue
+		}
+		scoresOf[a.TestCode] = append(scoresOf[a.TestCode], *a.Authoritative)
+		if b, ok := bestOf[a.TestCode]; !ok || *a.Authoritative > *b.Authoritative {
 			bestOf[a.TestCode] = a
 		}
 	}
@@ -604,7 +623,7 @@ func (uc *ReportUC) GetSessionReport(ctx context.Context, sessionID string) (*Se
 		r.Abilities = append(r.Abilities, SessionAbilityRow{
 			Ability:   s.Ability,
 			GameCode:  s.TestCode,
-			Best:      bestOf[s.TestCode].Score,
+			Best:      *bestOf[s.TestCode].Authoritative,
 			Attempts:  scores,
 			BestGrade: bestOf[s.TestCode].Grade,
 		})
@@ -1054,7 +1073,13 @@ func sessionBoardOf(attempts []SessionAttemptRow) []BoardEntry {
 	// doubled-axis fault the record board's dedupe fixed).
 	out := make([]BoardEntry, 0, len(attempts))
 	for _, a := range attempts {
-		out = append(out, BoardEntry{TestCode: a.TestCode, Ability: a.Ability, Score: a.Score, At: a.CreatedAt})
+		if a.Authoritative == nil {
+			// Curve-pending attempts never weigh on the composite — the
+			// judgement's currency is the calibrated score, the same law
+			// the receipt fold holds.
+			continue
+		}
+		out = append(out, BoardEntry{TestCode: a.TestCode, Ability: a.Ability, Score: *a.Authoritative, At: a.CreatedAt})
 	}
 	return dedupeBoard(out)
 }

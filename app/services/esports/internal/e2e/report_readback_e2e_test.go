@@ -129,6 +129,22 @@ func TestReportReadBackE2E(t *testing.T) {
 		}
 		return r
 	}
+	// A curve-pending attempt: the engine wrote raw, the game's
+	// calibration curve has not frozen, authoritative stays null.
+	pendingRecord := func(user, code, session string, attempt int, raw float64, minutesAgo int) *ent.TestRecord {
+		t.Helper()
+		r, rerr := db.TestRecord.Create().
+			SetTestCode(code).SetUserID(user).SetSessionID(session).SetAttemptNo(attempt).
+			SetStartedAt(now.Add(-time.Duration(minutesAgo) * time.Minute)).
+			SetEndedAt(now.Add(-time.Duration(minutesAgo-1) * time.Minute)).
+			SetRawDetail(map[string]any{"e2e": true}).
+			SetValid(true).SetRawScore(raw).
+			Save(seedCtx)
+		if rerr != nil {
+			t.Fatalf("pending record %s#%d: %v", code, attempt, rerr)
+		}
+		return r
+	}
 
 	// The cohort pool rides the same ability the owner excels at, same
 	// age and sex, well past the floor, mediocre scores — enough to judge
@@ -241,22 +257,72 @@ func TestReportReadBackE2E(t *testing.T) {
 		t.Fatalf("s3 must answer unjudged over a thin pool: tier=%q composite=%v", r3.Tier, r3.Composite)
 	}
 
-	// Face 4 — the digest: three valid sessions split by genre, the
-	// cross-session bests (the retake's 100 owns reactionSpeed, the
-	// first session's 70 owns aimingAccuracy), and the latest line per
-	// genre carrying the anchor.
+	// Face 4 — the curve-pending session: a game whose calibration curve
+	// has not frozen (raw landed, authoritative null) keeps every attempt
+	// in the detail rows while feeding no line math — the score a member
+	// earned never waits on the curve. The calibrated sibling rides the
+	// same response: both states, one face.
+	s5 := newSession(rbOwner, "fps", "expired", step(rbTestD, rbAbilityD), step(rbTestA, rbAbilityA))
+	pendingRecord(rbOwner, rbTestD, s5.ID, 1, 420, 62)
+	pendingRecord(rbOwner, rbTestD, s5.ID, 2, 400, 61)
+	a88 := record(rbOwner, rbTestA, s5.ID, 1, 88, 60)
+	r4, err := uc.GetSessionReport(ownerCtx, s5.ID)
+	if err != nil {
+		t.Fatalf("session report s5: %v", err)
+	}
+	if r4.Tested != 1 || len(r4.Abilities) != 1 || r4.Abilities[0].Ability != rbAbilityA || r4.Abilities[0].Best != 88 {
+		t.Fatalf("s5 lines: tested=%d %+v", r4.Tested, r4.Abilities)
+	}
+	if len(r4.AttemptDetails) != 3 {
+		t.Fatalf("s5 details: %+v", r4.AttemptDetails)
+	}
+	if d0 := r4.AttemptDetails[0]; d0.TestCode != rbTestD || d0.AttemptNo != 1 || d0.Raw != 420 || d0.Authoritative != nil || d0.Grade != nil {
+		t.Fatalf("s5 pending row 1: %+v", d0)
+	}
+	if d1 := r4.AttemptDetails[1]; d1.TestCode != rbTestD || d1.AttemptNo != 2 || d1.Raw != 400 || d1.Authoritative != nil {
+		t.Fatalf("s5 pending row 2: %+v", d1)
+	}
+	if d2 := r4.AttemptDetails[2]; d2.TestCode != rbTestA || d2.Authoritative == nil || *d2.Authoritative != 88 {
+		t.Fatalf("s5 calibrated row: %+v", d2)
+	}
+	if r4.Anchor == nil || *r4.Anchor != a88.ID {
+		t.Fatalf("s5 anchor: %v want %s", r4.Anchor, a88.ID)
+	}
+
+	// The all-pending session is the finding's own shape: nothing to
+	// judge, everything still visible — the report answers the rows, not
+	// an empty board.
+	s6 := newSession(rbOwner, "fps", "expired", step(rbTestD, rbAbilityD))
+	pendingRecord(rbOwner, rbTestD, s6.ID, 1, 410, 59)
+	r4b, err := uc.GetSessionReport(ownerCtx, s6.ID)
+	if err != nil {
+		t.Fatalf("session report s6: %v", err)
+	}
+	if len(r4b.Abilities) != 0 || r4b.Tested != 0 || r4b.Anchor != nil || r4b.Tier != "" || r4b.Composite != nil {
+		t.Fatalf("s6 must answer no verdict: %+v", r4b)
+	}
+	if len(r4b.AttemptDetails) != 1 || r4b.AttemptDetails[0].Raw != 410 {
+		t.Fatalf("s6 details: %+v", r4b.AttemptDetails)
+	}
+
+	// Face 5 — the digest: five valid-attempt sessions split by genre
+	// (the curve-pending-only s6 counts in the headline and owns the
+	// latest fps line — both laws say "carried a valid attempt", the
+	// anchor field itself carrying the honest absent), the cross-session
+	// bests (the retake's 100 owns reactionSpeed, the first session's 70
+	// owns aimingAccuracy), and the moba latest line carrying its anchor.
 	d, err := uc.GetAbilityDigest(ownerCtx)
 	if err != nil {
 		t.Fatalf("digest: %v", err)
 	}
-	if d.SessionsTotal != 3 || d.SessionsFPS != 2 || d.SessionsMOBA != 1 {
+	if d.SessionsTotal != 5 || d.SessionsFPS != 4 || d.SessionsMOBA != 1 {
 		t.Fatalf("digest counts: total=%d fps=%d moba=%d", d.SessionsTotal, d.SessionsFPS, d.SessionsMOBA)
 	}
 	best := make(map[string]report.DigestAbilityRow, len(d.Abilities))
 	for _, a := range d.Abilities {
 		best[a.Ability] = a
 	}
-	if a := best[rbAbilityA]; a.Best != 100 || a.Sessions != 2 {
+	if a := best[rbAbilityA]; a.Best != 100 || a.Sessions != 3 {
 		t.Fatalf("digest A: %+v", a)
 	}
 	if b := best[rbAbilityB]; b.Best != 70 || b.Sessions != 2 {
@@ -272,16 +338,26 @@ func TestReportReadBackE2E(t *testing.T) {
 		var want string
 		switch l.Genre {
 		case shared.GenreFPS:
-			want = s2.ID
+			want = s6.ID
 		case shared.GenreMOBA:
 			want = s3.ID
 		}
-		if l.SessionID != want || l.Anchor == nil {
+		if l.SessionID != want {
 			t.Fatalf("digest latest %s: %+v", l.Genre, l)
 		}
 	}
+	// The pending-only latest line carries its anchor honestly absent;
+	// the calibrated one carries a real anchor.
+	for _, l := range d.Sessions {
+		if l.Genre == shared.GenreFPS && l.Anchor != nil {
+			t.Fatalf("digest latest fps anchor must stay absent: %+v", l)
+		}
+		if l.Genre == shared.GenreMOBA && l.Anchor == nil {
+			t.Fatalf("digest latest moba anchor: %+v", l)
+		}
+	}
 
-	// Face 5 — the refusals: a missing session and a foreign one.
+	// Face 6 — the refusals: a missing session and a foreign one.
 	if _, err := uc.GetSessionReport(ownerCtx, "e2e-no-such-session"); !esportspb.IsEsportsMatchSessionNotFound(err) {
 		t.Fatalf("missing session: %v", err)
 	}
