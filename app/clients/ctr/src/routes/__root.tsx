@@ -87,7 +87,11 @@ function RootDocument({ children }: Readonly<PropsWithChildren>) {
           <RouterProgress color="linear-gradient(90deg, #2563eb, #06b6d4, #34d399, #2563eb)" />
           <FeedbackSonner />
           <TransportProvider>
-            <div className="flex min-h-svh flex-col">{children}</div>
+            {/* Desktop centers the app column vertically — a short face
+                (login, error, not-found) floats mid-viewport instead of
+                hugging the top edge; pages that fill min-h-svh are
+                unaffected (centering only acts on the leftover space). */}
+            <div className="flex min-h-svh flex-col md:justify-center">{children}</div>
           </TransportProvider>
         </JotaiProvider>
         <TanStackDevtools

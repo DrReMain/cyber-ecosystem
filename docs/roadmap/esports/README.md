@@ -117,6 +117,7 @@
 | D-AW | **专版不分叉铁律(2026-10-25 裁定;2026-10-30 自 plan M3 节入台账)**:专版不得与公版代码分叉——分叉即维护双路;登录/支付等对接差异一律落 capability provider 层或配置/模块注册表层(可插拔面最便宜层级优先);物理隔离需求递延 delivery-time fork 最晚点;首租户(HL)预判=租户 app 内完成对接、不穿透公版 H5 |
 | D-AX | **gitignore 卫生律(2026-10-30 用户裁定)**:.gitignore 不登记「本不该存在」的路径——ignore 行只留给合法产物(构建/生成物类);他人设备上出现的非预期产物不做 ignore 兜底,而由 roadmap 遗留清单登记→交该机 coding agent 根治处理。首例=.run/ dev 栈状态目录:e034375b 的 ignore 行撤销,状态文件约定迁仓外(见 progress 遗留清单对应行) |
 | D-AY | **IAM 面直接用骨架能力(2026-10-30 用户裁定)**:admin 原型「系统与合规」组与骨架 system 重复的 IAM 五面(操作审计/角色管理/权限管理/管理员账号/菜单管理)——**直接使用骨架既有实现,不为 esports 再造一套**(不改名不改结构,该组归骨架车道自治;esports 菜单重构范围=自有组)。组内非 IAM 项(合规配置/协议版本/同意记录/评级管理/系统配置/App 版本)仍归 esports 各片(E9 增量/P2/P19/裁不建候选)。影响面:admin-nav-anchor §三、G-301/302、demand-ledger §二底座行 |
+| D-AZ | **走查账号口径(2026-11-01 用户裁定)**:运营/admin 面走查一律用**种子超管 admin/admin123456**,不另建运营测试号——pg2-probe 方案作废(DB 核实该号从未存在,走查墙 4 闭);e2e 同凭证(identity/admin specs 实用即它)。影响面:progress 遗留清单走查墙 4 行删;后续走查/e2e 沿用 |
 
 ### 2.2 待裁(Owner + 时点;背景与候选案在 prd.md 对应条目展开)
 
@@ -184,3 +185,4 @@
 - 2026-10-30 roadmap 重构役(用户令,进度评估驱动):四路穷举(旧码 191 端点/36 表+85 页原型逐页+新实现盘点)落 **verify/demand-ledger.md** 为处置唯一真值(coverage/两矩阵状态列退役为快照锚);plan.md 已完池压实迁 archive、窗口表 W5 起现行、**CP2/CP3 增 admin 构成项**(依据=admin 原型 41 页仅 4 页建成+投入比 27:98);progress.md 重写为活片档;D-AV 分工法/D-AW 不分叉铁律入账;P19-P25 立票(prd.md P18 号已被「个人中心数据面」占用,新票顺延;prd.md 同日补七票背景/候选条目)。重构前全文=git 历史。
 - 2026-10-30 D-AX gitignore 卫生律(用户裁定)+MR!10 消化:.run/ 的 ignore 行撤销(e034375b 的兜底改为根治——dev 栈状态目录迁仓外,各机 coding agent 按遗留清单行处理);hzy 十批经 dev-lzx 车道合并(c0cdead7)+格式修复(9ce4ea95),详见 MR!10 回执。
 - 2026-10-30 admin 菜单锚立档+G-301/302 立红(用户发现菜单规划/命名与原型差远):verify/admin-nav-anchor.md(九组真值×现行树差表)+admin-member-anchor.md(M2-1 走查 oracle,渲染态机提;member 两页实证=JS 渲染活原型,design-alignment 已回灌「admin 原型须逐页验证渲染态」);M2-1 行扩菜单重构(M→M-L)。**D-AY IAM 面直接用骨架**(用户裁定):系统与合规组 IAM 五面不为 esports 再造不改名,G-301/302 执法范围同日收窄。
+- 2026-11-01 PM 票批直裁(用户,register 9 行闭):PM-9 双 N/4 拆义落 ed4f0f21(match 头「已测 N/4」+测试面头「第 N 题/共 N 题」双语);PM-10 并车 lzx 待校准行(契约带明细行);PM-11 追认;PM-2 品牌词回原型「ctr」(ab7ec52f,全站标题「ctr · 页名」+404/错误面);**PM-1 首裁去「备」后查出 D-AO① 系 ljr 10-25 正式裁定,知情复裁维持带「备」并回滚(928077f3)**;PM-4/5 现状核验已消解(lucide 胜出/微信 UA 门已落);PM-12(match_sub 分钟数=步数复用,原型自身同式)立票留例会。gap-ledger 首批(V-1 login)9 行全收口(G-005 微信 UA 态比对隔离页 live 补证)。**D-AZ 走查账号口径**(用户裁定):走查用种子超管,pg2-probe 作废,走查墙 4 闭。

@@ -5,7 +5,7 @@
   "match_tag_default": "Recommended",
   "match_tag_switched": "Switched",
   "match_sub": "{n} abilities · about {n} min",
-  "match_done": "{done} / {total}",
+  "match_done": "Tested {done} / {total}",
   "match_step_time": "About 30s",
   "match_step_left": "Retakes left: {n}",
   "match_step_left_zero": "Spent",

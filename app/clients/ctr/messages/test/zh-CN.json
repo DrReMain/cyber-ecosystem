@@ -19,7 +19,7 @@
   "test_intro_blocked": "本款机会已用完，成绩已取最高 —— 返回阵容继续下一款，或切换类型开新的一场",
   "test_run_title": "测试中 · {name}",
   "test_run_hint": "保持屏幕常亮 · 不要切后台或锁屏（切走会中断采样，该次记为无效）",
-  "test_run_idx": "{ability} · {i} / {total}",
+  "test_run_idx": "{ability} · 第 {i} 题 / 共 {total} 题",
   "test_exit_desc_session": "已完成 {done} / {total} 项。进度会保留，7 天内可续测；本次未完成的这一款不计成绩。",
   "test_pause_action": "暂停",
   "test_pause_title": "游戏暂停",
