@@ -59,16 +59,16 @@
 
 | 处置桶 | 页 | 计数 | 归属 |
 |---|---|---|---|
-| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(assessments+membership 两 Tab 随 M2-4 首刀建成 197fdbc6,11-01 走查+双轴审查毕;余 trace(P22)/messages(MSG-1) 占位)、01-member-list ✅、02-member-detail ✅(两会员页随 M2-1 建成,10-31 走查毕)、activation-code ✅(批次码表/停用/导出/码值搜索随 M2-3 建成,11-01 走查毕)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺)、agreement-manage ✅、agreement-consent ✅(两协议页随 E9 首刀建成 067a89ce,11-01 走查毕;版本表/查看全文真法务文/建即当前/切换/删除拒当前版/同意记录预填+昵称搜索+CSV 导出;渠道列递延 P23,手机号搜索递延 G-306 族)、compliance-config ✅(随 E9 余刀建成 32f5cf0a,11-01 走查毕;出生采集开关/付费年龄线敏感二次确认/两条付费文案覆盖+默认折面) | **9** | 余面→M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
+| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(assessments+membership 两 Tab 随 M2-4 首刀建成 197fdbc6,11-01 走查+双轴审查毕;余 trace(P22)/messages(MSG-1) 占位)、01-member-list ✅、02-member-detail ✅(两会员页随 M2-1 建成,10-31 走查毕)、activation-code ✅(批次码表/停用/导出/码值搜索随 M2-3 建成,11-01 走查毕)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺)、agreement-manage ✅、agreement-consent ✅(两协议页随 E9 首刀建成 067a89ce,11-01 走查毕;版本表/查看全文真法务文/建即当前/切换/删除拒当前版/同意记录预填+昵称搜索+CSV 导出;渠道列递延 P23,手机号搜索递延 G-306 族)、compliance-config ✅(随 E9 余刀建成 32f5cf0a,11-01 走查毕;出生采集开关/付费年龄线敏感二次确认/两条付费文案覆盖+默认折面)、sku-manage ✅、04-order-record ✅、05-order-detail ✅(三面随 M2-2 建成 9860eb34,10-31 走查+双轴审查毕;pricing 区 skus+orders 两族)、activation-code-detail ✅(批次页 $batchNo 逐码明细随 M2-3 建成 45c276d4,11-01 走查毕) | **13** | 余面→M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
 | 📐 底座 IAM 承接(**D-AY**:直接用骨架,不为 esports 再造/不改名) | audit-log、06-audit-detail、admin-user-manage、role-manage、permission-manage、menu-manage | 6 | system 既有面;操作级敏感清单对照(A8)留待 |
 | 🌫 原型非本期 | attribution、channel-manage、landing-material、report-config | 4 | _nav.js 灰标(P5/梯①) |
-| 🎯 M2 核心组 | 04-order-record、05-order-detail、sku-manage、activation-code-detail | **4** | M2-2..M2-4;01-member-list/02-member-detail 已随 M2-1 建成(10-31,入已建桶;到期提醒/批量续费/每日扫描按 M2-1 裁面不含) |
+| 🎯 M2 核心组 | — | **0** | 全员升已建桶(11-02 对账):member 两页随 M2-1(347a9ce7)、sku-manage/04-order-record/05-order-detail 随 M2-2(9860eb34)、activation-code+activation-code-detail 随 M2-3(45c276d4);到期提醒/批量续费/每日扫描按 M2-1 裁面不含 |
 | 📋 E9 增量(D-AS⑥) | — | 0 | compliance-config 已随 E9 余刀建成升已建桶(11-01);执法消费面(注册年龄带/付费墙)随 PAY3/注册面 |
 | 📋 D-AS 消息组 | feedback-manage、07-feedback-detail、announcement | 3 | →MSG-1(W7-W8);P21 前置 |
 | 📋 M2 余组(梯①) | dashboard、user-portrait、09-user-import、question-bank、question-detail、test-record、08-test-record-detail、test-type、game-category、payment-channel、rating-manage、system-config、app-version | 13 | 各项开工前先过对应 P 票:P20(dashboard/portrait 数据源)、P2(评级)、P24(归类)、P25(渠道面)、P19(版本)、system-config=裁不建候选(config 珍稀原则) |
 | 📋 M3/P4 | tob-tenant-list、tob-tenant-detail | 2 | 窗外 buffer;P14 前置 |
 
-**计数:41 = 已建 9 + 底座 6 + 非本期 4 + M2 核心 4 + E9 增量 0 + 消息组 3 + 余组 13 + M3 2。**(已建率 9/41≈22%;窗内可达成面 =已建 9+底座 6+M2 核心 4+消息组 3=22 页,余组 13+M3 2=15 页窗外,非本期 4 不计。)
+**计数:41 = 已建 13 + 底座 6 + 非本期 4 + M2 核心 0 + E9 增量 0 + 消息组 3 + 余组 13 + M3 2。**(11-02 对账吸收 M2-2/M2-3 四面;已建率 13/41≈32%;窗内可达成面 =已建 13+底座 6+消息组 3=22 页,余组 13+M3 2=15 页窗外,非本期 4 不计。)
 
 ## §三 旧码功能 × 处置(不在 85 页内者;出处=旧码穷举 2026-10-30)
 
