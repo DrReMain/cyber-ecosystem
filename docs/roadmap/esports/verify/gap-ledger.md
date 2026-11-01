@@ -49,7 +49,7 @@ E10-a 复对账(10-28,live dev 栈,同款 innerText oracle):14 行中 12 行逐�
 | G-207 | 微信昵称清洗规则基数 | 策略 | 加权计(CJK 2/上限 24=12 中文字或 24 字母),规则卡含 pill 行 | 码点计(上限 12,中英同权——E6b 冻结契约) | 白名单②:现仓契约(UpdateProfileRequest.nickname 2..12 码点)为正身,清洗按契约截断;原型加权制与规则卡 pill 行=文案差,随文案定稿批次(PM);另:头像显示面递延(现仓 profile 页无头像位,原型 profile-overview 有——存储+供给已闭,显示随 profile 页迭代;10-30 真机回归用户佐证「找不到填头像的地方」) |
 | G-208 | 登出确认 sheet 形状 | 浮层 | 竖排按钮(取消上/退出下,btn-pri 蓝青渐变)+上圆角 18px+15px 标题+全角问号 | 横排按钮+退出=红 danger+四角圆角+14px+半角问号 | **首刀已收(10-30)**:BottomConfirmSheet 单源组件(CTS.sheet 正身:390px/上圆角 18px/竖排全宽 gap 9px/三色族 primary·hot·ghost——红只留真危险),exit-confirm 重写+logout-sheet 薄壳+merge sheet 三迁,原型逐字文案+chrome 双侧 7 项几何实测全同;**余族待扫**(pay-confirm/match-switch-confirm/resume-remind/share-invite)=各对应页面片落地时逐一对齐;取消 autoFocus 无障碍增强保留 |
 | G-202 | BLOCKED pane「去意见反馈」CTA | 契约门控 | 跳 feedback-submit 页 | soon toast「即将开放」 | 红:feedback 契约未建(P13 消息中心+反馈召回在窗),门控占位;契约落地时接真跳 |
-| G-203 | 合并确认页保留卡掩码 | 策略 | 原型单手机号场景无此歧义 | 多凭证账号显示第二号(7777)非登录主号(6666) | 待面检:微信腿走查实证;掩码取 credential 列表序,主号语义待 PM 定(候选=最近登录凭证/首凭证) |
+| G-203 | 合并确认页保留卡掩码 | 策略 | 原型单手机号场景无此歧义 | 多凭证账号显示第二号(7777)非登录主号(6666) | 面检毕(11-01 代码级全链追查):**现行法=最近绑定 sms 胜出**——esports 适配器覆写循环(client/system.go:153-161)×system 凭证列表序,DB 序=绑定序;与走查所见(7777)互证;主号语义候选修正为「保持现状(最新绑定)/改登录主号/改首凭证」——P21 ljr 裁;改动面=适配器一处(+roster 投影 data.go 同构处若求一致) |
 | G-204 | 解绑/换绑 | 缺面 | 原型 security 页注记「解绑请联系客服」 | 同文案照录,无自助解绑 | 白名单形②:E6c-b 裁定重绑解绑零建设走客服;文案照原型 |
 | G-205 | 设置密码页手机号输入 | 状态 | 原型设置态仅掩码+验证码 | 增 typed phone input(placeholder 含掩码) | 白名单形②:服务端 ResetPassword 证明=码到绑定手机,客户端只持掩码无法发码——设计缺口以客户端补全闭合,契约零改动;原型无此场景交集 |
 
