@@ -36,9 +36,18 @@ const (
 	// EntitleAdminServiceGenerateActivationCodesProcedure is the fully-qualified name of the
 	// EntitleAdminService's GenerateActivationCodes RPC.
 	EntitleAdminServiceGenerateActivationCodesProcedure = "/cyber.esports.v1.EntitleAdminService/GenerateActivationCodes"
+	// EntitleAdminServiceSetActivationBatchStatusProcedure is the fully-qualified name of the
+	// EntitleAdminService's SetActivationBatchStatus RPC.
+	EntitleAdminServiceSetActivationBatchStatusProcedure = "/cyber.esports.v1.EntitleAdminService/SetActivationBatchStatus"
 	// EntitleAdminServiceListActivationCodesProcedure is the fully-qualified name of the
 	// EntitleAdminService's ListActivationCodes RPC.
 	EntitleAdminServiceListActivationCodesProcedure = "/cyber.esports.v1.EntitleAdminService/ListActivationCodes"
+	// EntitleAdminServiceListActivationBatchesProcedure is the fully-qualified name of the
+	// EntitleAdminService's ListActivationBatches RPC.
+	EntitleAdminServiceListActivationBatchesProcedure = "/cyber.esports.v1.EntitleAdminService/ListActivationBatches"
+	// EntitleAdminServiceExportActivationCodesProcedure is the fully-qualified name of the
+	// EntitleAdminService's ExportActivationCodes RPC.
+	EntitleAdminServiceExportActivationCodesProcedure = "/cyber.esports.v1.EntitleAdminService/ExportActivationCodes"
 	// EntitleAdminServiceSetReportAccessPolicyProcedure is the fully-qualified name of the
 	// EntitleAdminService's SetReportAccessPolicy RPC.
 	EntitleAdminServiceSetReportAccessPolicyProcedure = "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy"
@@ -62,7 +71,10 @@ const (
 // EntitleAdminServiceClient is a client for the cyber.esports.v1.EntitleAdminService service.
 type EntitleAdminServiceClient interface {
 	GenerateActivationCodes(context.Context, *connect.Request[v1.GenerateActivationCodesRequest]) (*connect.Response[v1.GenerateActivationCodesResponse], error)
+	SetActivationBatchStatus(context.Context, *connect.Request[v1.SetActivationBatchStatusRequest]) (*connect.Response[v1.SetActivationBatchStatusResponse], error)
 	ListActivationCodes(context.Context, *connect.Request[v1.ListActivationCodesRequest]) (*connect.Response[v1.ListActivationCodesResponse], error)
+	ListActivationBatches(context.Context, *connect.Request[v1.ListActivationBatchesRequest]) (*connect.Response[v1.ListActivationBatchesResponse], error)
+	ExportActivationCodes(context.Context, *connect.Request[v1.ExportActivationCodesRequest]) (*connect.Response[v1.ExportActivationCodesResponse], error)
 	SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error)
 	ListReportAccessPolicies(context.Context, *connect.Request[v1.ListReportAccessPoliciesRequest]) (*connect.Response[v1.ListReportAccessPoliciesResponse], error)
 	GrantMembership(context.Context, *connect.Request[v1.GrantMembershipRequest]) (*connect.Response[v1.GrantMembershipResponse], error)
@@ -88,10 +100,28 @@ func NewEntitleAdminServiceClient(httpClient connect.HTTPClient, baseURL string,
 			connect.WithSchema(entitleAdminServiceMethods.ByName("GenerateActivationCodes")),
 			connect.WithClientOptions(opts...),
 		),
+		setActivationBatchStatus: connect.NewClient[v1.SetActivationBatchStatusRequest, v1.SetActivationBatchStatusResponse](
+			httpClient,
+			baseURL+EntitleAdminServiceSetActivationBatchStatusProcedure,
+			connect.WithSchema(entitleAdminServiceMethods.ByName("SetActivationBatchStatus")),
+			connect.WithClientOptions(opts...),
+		),
 		listActivationCodes: connect.NewClient[v1.ListActivationCodesRequest, v1.ListActivationCodesResponse](
 			httpClient,
 			baseURL+EntitleAdminServiceListActivationCodesProcedure,
 			connect.WithSchema(entitleAdminServiceMethods.ByName("ListActivationCodes")),
+			connect.WithClientOptions(opts...),
+		),
+		listActivationBatches: connect.NewClient[v1.ListActivationBatchesRequest, v1.ListActivationBatchesResponse](
+			httpClient,
+			baseURL+EntitleAdminServiceListActivationBatchesProcedure,
+			connect.WithSchema(entitleAdminServiceMethods.ByName("ListActivationBatches")),
+			connect.WithClientOptions(opts...),
+		),
+		exportActivationCodes: connect.NewClient[v1.ExportActivationCodesRequest, v1.ExportActivationCodesResponse](
+			httpClient,
+			baseURL+EntitleAdminServiceExportActivationCodesProcedure,
+			connect.WithSchema(entitleAdminServiceMethods.ByName("ExportActivationCodes")),
 			connect.WithClientOptions(opts...),
 		),
 		setReportAccessPolicy: connect.NewClient[v1.SetReportAccessPolicyRequest, v1.SetReportAccessPolicyResponse](
@@ -136,7 +166,10 @@ func NewEntitleAdminServiceClient(httpClient connect.HTTPClient, baseURL string,
 // entitleAdminServiceClient implements EntitleAdminServiceClient.
 type entitleAdminServiceClient struct {
 	generateActivationCodes  *connect.Client[v1.GenerateActivationCodesRequest, v1.GenerateActivationCodesResponse]
+	setActivationBatchStatus *connect.Client[v1.SetActivationBatchStatusRequest, v1.SetActivationBatchStatusResponse]
 	listActivationCodes      *connect.Client[v1.ListActivationCodesRequest, v1.ListActivationCodesResponse]
+	listActivationBatches    *connect.Client[v1.ListActivationBatchesRequest, v1.ListActivationBatchesResponse]
+	exportActivationCodes    *connect.Client[v1.ExportActivationCodesRequest, v1.ExportActivationCodesResponse]
 	setReportAccessPolicy    *connect.Client[v1.SetReportAccessPolicyRequest, v1.SetReportAccessPolicyResponse]
 	listReportAccessPolicies *connect.Client[v1.ListReportAccessPoliciesRequest, v1.ListReportAccessPoliciesResponse]
 	grantMembership          *connect.Client[v1.GrantMembershipRequest, v1.GrantMembershipResponse]
@@ -150,9 +183,24 @@ func (c *entitleAdminServiceClient) GenerateActivationCodes(ctx context.Context,
 	return c.generateActivationCodes.CallUnary(ctx, req)
 }
 
+// SetActivationBatchStatus calls cyber.esports.v1.EntitleAdminService.SetActivationBatchStatus.
+func (c *entitleAdminServiceClient) SetActivationBatchStatus(ctx context.Context, req *connect.Request[v1.SetActivationBatchStatusRequest]) (*connect.Response[v1.SetActivationBatchStatusResponse], error) {
+	return c.setActivationBatchStatus.CallUnary(ctx, req)
+}
+
 // ListActivationCodes calls cyber.esports.v1.EntitleAdminService.ListActivationCodes.
 func (c *entitleAdminServiceClient) ListActivationCodes(ctx context.Context, req *connect.Request[v1.ListActivationCodesRequest]) (*connect.Response[v1.ListActivationCodesResponse], error) {
 	return c.listActivationCodes.CallUnary(ctx, req)
+}
+
+// ListActivationBatches calls cyber.esports.v1.EntitleAdminService.ListActivationBatches.
+func (c *entitleAdminServiceClient) ListActivationBatches(ctx context.Context, req *connect.Request[v1.ListActivationBatchesRequest]) (*connect.Response[v1.ListActivationBatchesResponse], error) {
+	return c.listActivationBatches.CallUnary(ctx, req)
+}
+
+// ExportActivationCodes calls cyber.esports.v1.EntitleAdminService.ExportActivationCodes.
+func (c *entitleAdminServiceClient) ExportActivationCodes(ctx context.Context, req *connect.Request[v1.ExportActivationCodesRequest]) (*connect.Response[v1.ExportActivationCodesResponse], error) {
+	return c.exportActivationCodes.CallUnary(ctx, req)
 }
 
 // SetReportAccessPolicy calls cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy.
@@ -189,7 +237,10 @@ func (c *entitleAdminServiceClient) GetMembership(ctx context.Context, req *conn
 // service.
 type EntitleAdminServiceHandler interface {
 	GenerateActivationCodes(context.Context, *connect.Request[v1.GenerateActivationCodesRequest]) (*connect.Response[v1.GenerateActivationCodesResponse], error)
+	SetActivationBatchStatus(context.Context, *connect.Request[v1.SetActivationBatchStatusRequest]) (*connect.Response[v1.SetActivationBatchStatusResponse], error)
 	ListActivationCodes(context.Context, *connect.Request[v1.ListActivationCodesRequest]) (*connect.Response[v1.ListActivationCodesResponse], error)
+	ListActivationBatches(context.Context, *connect.Request[v1.ListActivationBatchesRequest]) (*connect.Response[v1.ListActivationBatchesResponse], error)
+	ExportActivationCodes(context.Context, *connect.Request[v1.ExportActivationCodesRequest]) (*connect.Response[v1.ExportActivationCodesResponse], error)
 	SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error)
 	ListReportAccessPolicies(context.Context, *connect.Request[v1.ListReportAccessPoliciesRequest]) (*connect.Response[v1.ListReportAccessPoliciesResponse], error)
 	GrantMembership(context.Context, *connect.Request[v1.GrantMembershipRequest]) (*connect.Response[v1.GrantMembershipResponse], error)
@@ -211,10 +262,28 @@ func NewEntitleAdminServiceHandler(svc EntitleAdminServiceHandler, opts ...conne
 		connect.WithSchema(entitleAdminServiceMethods.ByName("GenerateActivationCodes")),
 		connect.WithHandlerOptions(opts...),
 	)
+	entitleAdminServiceSetActivationBatchStatusHandler := connect.NewUnaryHandler(
+		EntitleAdminServiceSetActivationBatchStatusProcedure,
+		svc.SetActivationBatchStatus,
+		connect.WithSchema(entitleAdminServiceMethods.ByName("SetActivationBatchStatus")),
+		connect.WithHandlerOptions(opts...),
+	)
 	entitleAdminServiceListActivationCodesHandler := connect.NewUnaryHandler(
 		EntitleAdminServiceListActivationCodesProcedure,
 		svc.ListActivationCodes,
 		connect.WithSchema(entitleAdminServiceMethods.ByName("ListActivationCodes")),
+		connect.WithHandlerOptions(opts...),
+	)
+	entitleAdminServiceListActivationBatchesHandler := connect.NewUnaryHandler(
+		EntitleAdminServiceListActivationBatchesProcedure,
+		svc.ListActivationBatches,
+		connect.WithSchema(entitleAdminServiceMethods.ByName("ListActivationBatches")),
+		connect.WithHandlerOptions(opts...),
+	)
+	entitleAdminServiceExportActivationCodesHandler := connect.NewUnaryHandler(
+		EntitleAdminServiceExportActivationCodesProcedure,
+		svc.ExportActivationCodes,
+		connect.WithSchema(entitleAdminServiceMethods.ByName("ExportActivationCodes")),
 		connect.WithHandlerOptions(opts...),
 	)
 	entitleAdminServiceSetReportAccessPolicyHandler := connect.NewUnaryHandler(
@@ -257,8 +326,14 @@ func NewEntitleAdminServiceHandler(svc EntitleAdminServiceHandler, opts ...conne
 		switch r.URL.Path {
 		case EntitleAdminServiceGenerateActivationCodesProcedure:
 			entitleAdminServiceGenerateActivationCodesHandler.ServeHTTP(w, r)
+		case EntitleAdminServiceSetActivationBatchStatusProcedure:
+			entitleAdminServiceSetActivationBatchStatusHandler.ServeHTTP(w, r)
 		case EntitleAdminServiceListActivationCodesProcedure:
 			entitleAdminServiceListActivationCodesHandler.ServeHTTP(w, r)
+		case EntitleAdminServiceListActivationBatchesProcedure:
+			entitleAdminServiceListActivationBatchesHandler.ServeHTTP(w, r)
+		case EntitleAdminServiceExportActivationCodesProcedure:
+			entitleAdminServiceExportActivationCodesHandler.ServeHTTP(w, r)
 		case EntitleAdminServiceSetReportAccessPolicyProcedure:
 			entitleAdminServiceSetReportAccessPolicyHandler.ServeHTTP(w, r)
 		case EntitleAdminServiceListReportAccessPoliciesProcedure:
@@ -284,8 +359,20 @@ func (UnimplementedEntitleAdminServiceHandler) GenerateActivationCodes(context.C
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.GenerateActivationCodes is not implemented"))
 }
 
+func (UnimplementedEntitleAdminServiceHandler) SetActivationBatchStatus(context.Context, *connect.Request[v1.SetActivationBatchStatusRequest]) (*connect.Response[v1.SetActivationBatchStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.SetActivationBatchStatus is not implemented"))
+}
+
 func (UnimplementedEntitleAdminServiceHandler) ListActivationCodes(context.Context, *connect.Request[v1.ListActivationCodesRequest]) (*connect.Response[v1.ListActivationCodesResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.ListActivationCodes is not implemented"))
+}
+
+func (UnimplementedEntitleAdminServiceHandler) ListActivationBatches(context.Context, *connect.Request[v1.ListActivationBatchesRequest]) (*connect.Response[v1.ListActivationBatchesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.ListActivationBatches is not implemented"))
+}
+
+func (UnimplementedEntitleAdminServiceHandler) ExportActivationCodes(context.Context, *connect.Request[v1.ExportActivationCodesRequest]) (*connect.Response[v1.ExportActivationCodesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.EntitleAdminService.ExportActivationCodes is not implemented"))
 }
 
 func (UnimplementedEntitleAdminServiceHandler) SetReportAccessPolicy(context.Context, *connect.Request[v1.SetReportAccessPolicyRequest]) (*connect.Response[v1.SetReportAccessPolicyResponse], error) {

@@ -19,12 +19,14 @@ import (
 	"cyber-ecosystem/shared-go/kratos/security"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 
 	"cyber-ecosystem/app/services/esports/internal/bootstrap"
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
+	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
@@ -72,17 +74,24 @@ func TestEntitleLiveE2E(t *testing.T) {
 	codeRP := entitle.NewActivationCodeRP(logger, pf)
 	entRP := entitle.NewEntitlementRP(logger, pf)
 	policyRP := entitle.NewReportPolicyRP(logger, pf)
+	profileRP := profile.NewProfileRP(logger, pf)
 	bus := bootstrap.NewEventSubscriptions(logger)
 	uc := entitle.NewEntitleUC(logger, pf, codeRP, entRP, policyRP, bus)
+	codeUC := entitle.NewCodeUC(logger, pf, codeRP, profileRP)
 	adminCtx := entSubject(admin1)
 
-	// Generation: five single-use codes over the look-alike-free alphabet.
-	codes, err := entitle.NewCodeUC(logger, pf, codeRP).Generate(adminCtx, &entitle.GenerateIn{ReportType: shared.ReportSchool, Count: 5, ExpireDays: 30})
+	// Generation: five single-use codes over the look-alike-free alphabet,
+	// one batch holding them.
+	gen, err := codeUC.Generate(adminCtx, &entitle.GenerateIn{ReportType: shared.ReportSchool, Count: 5, ExpireDays: 30})
 	if err != nil {
 		t.Fatalf("generate: %v", err)
 	}
+	codes := gen.Codes
 	if len(codes) != 5 || len(codes[0]) != 2+16 || codes[0][:2] != "AC" {
 		t.Fatalf("code shape: %v", codes)
+	}
+	if len(gen.BatchNo) == 0 || gen.BatchNo[0] != 'B' {
+		t.Fatalf("batch number shape: %q", gen.BatchNo)
 	}
 
 	// The acceptance anchor: ten members race one code — exactly one
@@ -214,16 +223,100 @@ func TestEntitleLiveE2E(t *testing.T) {
 			t.Fatalf("use count for %s: %+v", c, row)
 		}
 	}
-	short, err := entitle.NewCodeUC(logger, pf, codeRP).Generate(adminCtx, &entitle.GenerateIn{ReportType: shared.ReportSchool, Count: 1, ExpireDays: 1})
-	if err != nil || len(short) != 1 {
-		t.Fatalf("short generate: %v err=%v", short, err)
+	shortGen, err := codeUC.Generate(adminCtx, &entitle.GenerateIn{ReportType: shared.ReportSchool, Count: 1, ExpireDays: 1})
+	if err != nil || len(shortGen.Codes) != 1 {
+		t.Fatalf("short generate: %+v err=%v", shortGen, err)
 	}
+	short := shortGen.Codes
 	outS, err := uc.Redeem(entSubject(userC), short[0])
 	if err != nil || outS.ExpiresAt == nil || !outS.ExpiresAt.Equal(codeRow4.ExpiresAt) {
 		t.Fatalf("short redeem must stay idempotent on the longer row: out=%+v err=%v", outS, err)
 	}
 	if row, _ := codeRP.ByCode(context.Background(), short[0]); row.UsedCount != 0 {
 		t.Fatalf("short code burned a use: %+v", row)
+	}
+
+	// The batch plane reads as one story: the list folds counts over the
+	// code rows, the code table carries each redeem's trail, a disable
+	// voids only the unredeemed remainder, and the export answers the
+	// whole filter in one payload.
+	batchesOut, err := codeUC.ListBatches(adminCtx, &entitle.ListBatchesIn{PageRequest: &commonv1.PageRequest{}})
+	if err != nil {
+		t.Fatalf("list batches: %v", err)
+	}
+	var firstBatch *entitle.ActivationBatch
+	for _, b := range batchesOut.Batches {
+		if b.BatchNo == gen.BatchNo {
+			firstBatch = b
+		}
+	}
+	if firstBatch == nil || firstBatch.Count != 5 || firstBatch.UsedCount != 4 || firstBatch.DisabledAt != nil {
+		t.Fatalf("batch fold: %+v", firstBatch)
+	}
+	if batchesOut.TotalBatches < 2 || batchesOut.TotalCodes < 6 || batchesOut.UsedCodes < 4 {
+		t.Fatalf("footer fold: %+v", batchesOut)
+	}
+	redeemedOnly := entitle.CodeStatusRedeemed
+	trailOut, err := codeUC.List(adminCtx, &entitle.ListCodesIn{PageRequest: &commonv1.PageRequest{}, BatchNo: &gen.BatchNo, Status: &redeemedOnly})
+	if err != nil {
+		t.Fatalf("redeemed trail: %v", err)
+	}
+	if len(trailOut.Codes) != 4 {
+		t.Fatalf("redeemed trail: n=%d, want 4", len(trailOut.Codes))
+	}
+	// Each trail row names its own taker — the map is this run's redeem
+	// ledger, so a swapped or stranger identity fails here.
+	redeemers := map[string]string{code0: winner, code1: userA, code3: userC, code4: userC}
+	for _, row := range trailOut.Codes {
+		want, known := redeemers[row.Code]
+		if !known || row.RedeemedBy == nil || row.RedeemedAt == nil || *row.RedeemedBy != want {
+			t.Fatalf("redeem trail wrong: row=%+v want=%s", row, want)
+		}
+	}
+
+	userD := "ente2euser0000000004"
+	// The short batch still holds one unspent, unexpired code — the right
+	// target for the disable flip. Disabling the first batch instead
+	// would prove nothing: codes[2] is aged past its deadline, and the
+	// other four are spent.
+	if _, err := codeUC.SetBatchStatus(adminCtx, shortGen.BatchNo, true); err != nil {
+		t.Fatalf("disable batch: %v", err)
+	}
+	if _, err := uc.Redeem(entSubject(userD), short[0]); !esportspb.IsEsportsActivationCodeDisabled(err) {
+		t.Fatalf("disabled batch redeem: err=%v", err)
+	}
+	// code0's own batch is still live — plain idempotency: the answer
+	// must be the standing grant, expiry and all.
+	if out, err := uc.Redeem(entSubject(winner), code0); err != nil || out.ExpiresAt == nil || !out.ExpiresAt.Equal(*rows[0].ExpiresAt) {
+		t.Fatalf("idempotent re-redeem must re-answer the standing grant: out=%+v err=%v", out, err)
+	}
+	// The true disable-vs-idempotent case: userC already holds short[0]'s
+	// grant and a disabled batch cannot void a landed use — the answer is
+	// the standing (longer) grant, not a fresh mint from short[0].
+	if out, err := uc.Redeem(entSubject(userC), short[0]); err != nil || out.ExpiresAt == nil || !out.ExpiresAt.Equal(codeRow4.ExpiresAt) {
+		t.Fatalf("idempotent under disabled must re-answer the standing grant: out=%+v err=%v", out, err)
+	}
+	if _, err := codeUC.SetBatchStatus(adminCtx, shortGen.BatchNo, false); err != nil {
+		t.Fatalf("re-enable batch: %v", err)
+	}
+	if _, err := uc.Redeem(entSubject(userD), short[0]); err != nil {
+		t.Fatalf("redeem after re-enable: %v", err)
+	}
+	unusedOnly := entitle.CodeStatusUnused
+	exported, err := codeUC.Export(adminCtx, &entitle.ListCodesIn{BatchNo: &gen.BatchNo, Status: &unusedOnly})
+	if err != nil || len(exported) != 1 || exported[0].Code != codes[2] {
+		t.Fatalf("export unused of first batch: n=%d err=%v", len(exported), err)
+	}
+	if exported[0].RedeemedBy != nil || exported[0].RedeemedAt != nil {
+		t.Fatalf("unused row carries a redeem trail: %+v", exported[0])
+	}
+
+	// The detail page's find-one search: the exact code narrows the
+	// batch's table to its own row.
+	codeHit := codes[2]
+	hitOut, err := codeUC.List(adminCtx, &entitle.ListCodesIn{PageRequest: &commonv1.PageRequest{}, BatchNo: &gen.BatchNo, Code: &codeHit})
+	if err != nil || len(hitOut.Codes) != 1 || hitOut.Codes[0].Code != codeHit {
+		t.Fatalf("code filter: n=%d err=%v", len(hitOut.Codes), err)
 	}
 
 	// The access judgement under shipped defaults: career open,
@@ -310,6 +403,7 @@ func cleanEntE2E(t *testing.T, db *ent.Client) {
 	}{
 		{`DELETE FROM entitlement WHERE user_id LIKE 'ente2e%' OR user_id LIKE 'entadm%'`, nil},
 		{`DELETE FROM activation_code WHERE created_by LIKE 'entadm%'`, nil},
+		{`DELETE FROM activation_batch WHERE created_by LIKE 'entadm%'`, nil},
 		{`DELETE FROM report_policy WHERE report_type IN ('cognitive', 'career', 'school')`, nil},
 	} {
 		if _, err := db.ExecContext(ctx, stmt.q, stmt.args...); err != nil {

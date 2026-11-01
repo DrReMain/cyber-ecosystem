@@ -17,22 +17,28 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationEntitleAdminServiceExportActivationCodes = "/cyber.esports.v1.EntitleAdminService/ExportActivationCodes"
 const OperationEntitleAdminServiceGenerateActivationCodes = "/cyber.esports.v1.EntitleAdminService/GenerateActivationCodes"
 const OperationEntitleAdminServiceGetMembership = "/cyber.esports.v1.EntitleAdminService/GetMembership"
 const OperationEntitleAdminServiceGrantMembership = "/cyber.esports.v1.EntitleAdminService/GrantMembership"
+const OperationEntitleAdminServiceListActivationBatches = "/cyber.esports.v1.EntitleAdminService/ListActivationBatches"
 const OperationEntitleAdminServiceListActivationCodes = "/cyber.esports.v1.EntitleAdminService/ListActivationCodes"
 const OperationEntitleAdminServiceListMemberships = "/cyber.esports.v1.EntitleAdminService/ListMemberships"
 const OperationEntitleAdminServiceListReportAccessPolicies = "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies"
+const OperationEntitleAdminServiceSetActivationBatchStatus = "/cyber.esports.v1.EntitleAdminService/SetActivationBatchStatus"
 const OperationEntitleAdminServiceSetReportAccessPolicy = "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy"
 const OperationEntitleAdminServiceTerminateMembership = "/cyber.esports.v1.EntitleAdminService/TerminateMembership"
 
 type EntitleAdminServiceHTTPServer interface {
+	ExportActivationCodes(context.Context, *ExportActivationCodesRequest) (*ExportActivationCodesResponse, error)
 	GenerateActivationCodes(context.Context, *GenerateActivationCodesRequest) (*GenerateActivationCodesResponse, error)
 	GetMembership(context.Context, *GetMembershipRequest) (*GetMembershipResponse, error)
 	GrantMembership(context.Context, *GrantMembershipRequest) (*GrantMembershipResponse, error)
+	ListActivationBatches(context.Context, *ListActivationBatchesRequest) (*ListActivationBatchesResponse, error)
 	ListActivationCodes(context.Context, *ListActivationCodesRequest) (*ListActivationCodesResponse, error)
 	ListMemberships(context.Context, *ListMembershipsRequest) (*ListMembershipsResponse, error)
 	ListReportAccessPolicies(context.Context, *ListReportAccessPoliciesRequest) (*ListReportAccessPoliciesResponse, error)
+	SetActivationBatchStatus(context.Context, *SetActivationBatchStatusRequest) (*SetActivationBatchStatusResponse, error)
 	SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error)
 	TerminateMembership(context.Context, *TerminateMembershipRequest) (*TerminateMembershipResponse, error)
 }
@@ -40,7 +46,10 @@ type EntitleAdminServiceHTTPServer interface {
 func RegisterEntitleAdminServiceHTTPServer(s *http.Server, srv EntitleAdminServiceHTTPServer) {
 	r := s.Route("/")
 	r.Handle("POST", "/api/v1/esports/activation-codes/generate", _EntitleAdminService_GenerateActivationCodes0_HTTP_Handler(srv))
+	r.Handle("PUT", "/api/v1/esports/activation-codes/batches/{batch_no}/status", _EntitleAdminService_SetActivationBatchStatus0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/activation-codes", _EntitleAdminService_ListActivationCodes0_HTTP_Handler(srv))
+	r.Handle("GET", "/api/v1/esports/activation-codes/batches", _EntitleAdminService_ListActivationBatches0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/activation-codes/export", _EntitleAdminService_ExportActivationCodes0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/esports/report-access-policy", _EntitleAdminService_SetReportAccessPolicy0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/report-access-policies", _EntitleAdminService_ListReportAccessPolicies0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/esports/memberships/grant", _EntitleAdminService_GrantMembership0_HTTP_Handler(srv))
@@ -68,6 +77,28 @@ func _EntitleAdminService_GenerateActivationCodes0_HTTP_Handler(srv EntitleAdmin
 	}
 }
 
+func _EntitleAdminService_SetActivationBatchStatus0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SetActivationBatchStatusRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEntitleAdminServiceSetActivationBatchStatus)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SetActivationBatchStatus(ctx, req.(*SetActivationBatchStatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SetActivationBatchStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _EntitleAdminService_ListActivationCodes0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ListActivationCodesRequest
@@ -83,6 +114,44 @@ func _EntitleAdminService_ListActivationCodes0_HTTP_Handler(srv EntitleAdminServ
 			return err
 		}
 		reply := out.(*ListActivationCodesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _EntitleAdminService_ListActivationBatches0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListActivationBatchesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEntitleAdminServiceListActivationBatches)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListActivationBatches(ctx, req.(*ListActivationBatchesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListActivationBatchesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _EntitleAdminService_ExportActivationCodes0_HTTP_Handler(srv EntitleAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ExportActivationCodesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEntitleAdminServiceExportActivationCodes)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ExportActivationCodes(ctx, req.(*ExportActivationCodesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ExportActivationCodesResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -208,12 +277,15 @@ func _EntitleAdminService_GetMembership0_HTTP_Handler(srv EntitleAdminServiceHTT
 }
 
 type EntitleAdminServiceHTTPClient interface {
+	ExportActivationCodes(ctx context.Context, req *ExportActivationCodesRequest, opts ...http.CallOption) (rsp *ExportActivationCodesResponse, err error)
 	GenerateActivationCodes(ctx context.Context, req *GenerateActivationCodesRequest, opts ...http.CallOption) (rsp *GenerateActivationCodesResponse, err error)
 	GetMembership(ctx context.Context, req *GetMembershipRequest, opts ...http.CallOption) (rsp *GetMembershipResponse, err error)
 	GrantMembership(ctx context.Context, req *GrantMembershipRequest, opts ...http.CallOption) (rsp *GrantMembershipResponse, err error)
+	ListActivationBatches(ctx context.Context, req *ListActivationBatchesRequest, opts ...http.CallOption) (rsp *ListActivationBatchesResponse, err error)
 	ListActivationCodes(ctx context.Context, req *ListActivationCodesRequest, opts ...http.CallOption) (rsp *ListActivationCodesResponse, err error)
 	ListMemberships(ctx context.Context, req *ListMembershipsRequest, opts ...http.CallOption) (rsp *ListMembershipsResponse, err error)
 	ListReportAccessPolicies(ctx context.Context, req *ListReportAccessPoliciesRequest, opts ...http.CallOption) (rsp *ListReportAccessPoliciesResponse, err error)
+	SetActivationBatchStatus(ctx context.Context, req *SetActivationBatchStatusRequest, opts ...http.CallOption) (rsp *SetActivationBatchStatusResponse, err error)
 	SetReportAccessPolicy(ctx context.Context, req *SetReportAccessPolicyRequest, opts ...http.CallOption) (rsp *SetReportAccessPolicyResponse, err error)
 	TerminateMembership(ctx context.Context, req *TerminateMembershipRequest, opts ...http.CallOption) (rsp *TerminateMembershipResponse, err error)
 }
@@ -224,6 +296,23 @@ type EntitleAdminServiceHTTPClientImpl struct {
 
 func NewEntitleAdminServiceHTTPClient(client *http.Client) EntitleAdminServiceHTTPClient {
 	return &EntitleAdminServiceHTTPClientImpl{client}
+}
+
+func (c *EntitleAdminServiceHTTPClientImpl) ExportActivationCodes(ctx context.Context, in *ExportActivationCodesRequest, opts ...http.CallOption) (*ExportActivationCodesResponse, error) {
+	var out ExportActivationCodesResponse
+	pattern := "/api/v1/esports/activation-codes/export"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationEntitleAdminServiceExportActivationCodes),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *EntitleAdminServiceHTTPClientImpl) GenerateActivationCodes(ctx context.Context, in *GenerateActivationCodesRequest, opts ...http.CallOption) (*GenerateActivationCodesResponse, error) {
@@ -276,6 +365,22 @@ func (c *EntitleAdminServiceHTTPClientImpl) GrantMembership(ctx context.Context,
 	return &out, nil
 }
 
+func (c *EntitleAdminServiceHTTPClientImpl) ListActivationBatches(ctx context.Context, in *ListActivationBatchesRequest, opts ...http.CallOption) (*ListActivationBatchesResponse, error) {
+	var out ListActivationBatchesResponse
+	pattern := "/api/v1/esports/activation-codes/batches"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationEntitleAdminServiceListActivationBatches),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *EntitleAdminServiceHTTPClientImpl) ListActivationCodes(ctx context.Context, in *ListActivationCodesRequest, opts ...http.CallOption) (*ListActivationCodesResponse, error) {
 	var out ListActivationCodesResponse
 	pattern := "/api/v1/esports/activation-codes"
@@ -318,6 +423,23 @@ func (c *EntitleAdminServiceHTTPClientImpl) ListReportAccessPolicies(ctx context
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *EntitleAdminServiceHTTPClientImpl) SetActivationBatchStatus(ctx context.Context, in *SetActivationBatchStatusRequest, opts ...http.CallOption) (*SetActivationBatchStatusResponse, error) {
+	var out SetActivationBatchStatusResponse
+	pattern := "/api/v1/esports/activation-codes/batches/{batch_no}/status"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationEntitleAdminServiceSetActivationBatchStatus),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

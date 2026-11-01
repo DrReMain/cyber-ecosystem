@@ -9,11 +9,13 @@ import (
 	"time"
 
 	"cyber-ecosystem/shared-go/kratos/security"
+	"cyber-ecosystem/shared-go/utils"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
+	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
@@ -34,6 +36,37 @@ type ActivationCode struct {
 	ExpiresAt  time.Time
 	CreatedBy  string
 	CreatedAt  time.Time
+	// The minting batch; nil only on rows predating the batch model.
+	BatchID *string
+	// BatchNo/BatchDisabled hydrate from the batch row the code points at —
+	// the redeem's disable check reads the latter.
+	BatchNo       *string
+	BatchDisabled bool
+	// The redeem's trail, written by the take-use arbitration itself: nil
+	// on an unredeemed code. The grant the redeem produced is not this
+	// trail's source — a family ratchet rewrites it.
+	RedeemedBy *string
+	RedeemedAt *time.Time
+	// Profile fold the operator reads beside the redeem; hydrated in the UC.
+	Nickname *string
+}
+
+type ActivationBatch struct {
+	// Human-shape batch number (B-YYMM-XXXX) — the string support quotes.
+	BatchNo string
+	// The report family every code in the batch opens.
+	ReportType string
+	// The shared validity deadline.
+	ExpiresAt time.Time
+	// Nil = live batch; the flip is the whole mutable truth on this row.
+	DisabledAt *time.Time
+	CreatedAt  time.Time
+	// The admin identity that minted the batch (audit join).
+	CreatedBy string
+	// Aggregates over the code rows, computed at read time so the batch
+	// row and the codes can never drift.
+	Count     int
+	UsedCount int
 }
 
 type PolicyRow struct {
@@ -48,6 +81,11 @@ type GenerateIn struct {
 	ReportType string
 	Count      int
 	ExpireDays int
+}
+
+type GenerateOut struct {
+	Codes   []string
+	BatchNo string
 }
 
 type RedeemOut struct {
@@ -80,14 +118,42 @@ type EntitlementRow struct {
 	TerminatedAt *time.Time
 }
 
+const (
+	CodeStatusUnused   = "unused" // batch-level facts (disabled, expired) never enter the row state — they stay on the batch
+	CodeStatusRedeemed = "redeemed"
+)
+
 type ListCodesIn struct {
 	*commonv1.PageRequest
 	ReportType *string
+	// Present = one batch's code table; absent = the flat all-codes view.
+	BatchNo *string
+	Status  *string
+	// Present = the exact code the detail page's search box chases.
+	Code *string
 }
 
 type ListCodesOut struct {
 	*commonv1.PageResponse
 	Codes []*ActivationCode
+}
+
+type ListBatchesIn struct {
+	*commonv1.PageRequest
+	ReportType *string
+	// Nil = every batch; true/false = disabled/live only.
+	Disabled *bool
+	// Exact-match lookup — the detail page's header facts in one answer.
+	BatchNo *string
+}
+
+type ListBatchesOut struct {
+	*commonv1.PageResponse
+	Batches []*ActivationBatch
+	// Fold over every batch, filters ignored — the footer's one line.
+	TotalBatches int
+	TotalCodes   int
+	UsedCodes    int
 }
 
 type WindowUnlockRow struct {
@@ -99,10 +165,19 @@ type WindowUnlockRow struct {
 
 // Port ----------------------------------------------------------------------------------------------------------
 type ActivationCodeRP interface {
-	CreateBatch(ctx context.Context, rows []*ActivationCode) error
 	List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, error)
-	ByCode(ctx context.Context, code string) (*ActivationCode, error) // nil = no such code
-	TakeUse(ctx context.Context, code string) (bool, error)           // the redeem's whole arbitration: one conditional UPDATE under used_count < quantity — the settle path's single-arbiter shape
+	// The export's whole-filter shape: every matching row, no paging.
+	ListAll(ctx context.Context, in *ListCodesIn) ([]*ActivationCode, error)
+	ByCode(ctx context.Context, code string) (*ActivationCode, error)   // nil = no such code
+	TakeUse(ctx context.Context, code, redeemedBy string) (bool, error) // the redeem's whole arbitration: one conditional UPDATE under used_count < quantity and a live batch, landing the use and its trail together — the settle path's single-arbiter shape
+	// One transaction lands the batch row and its codes — a batch whose
+	// codes never landed must not exist.
+	MintBatch(ctx context.Context, batch *ActivationBatch, rows []*ActivationCode) error
+	// The status flip's whole arbitration: one conditional UPDATE on the
+	// batch row — disabling only a live batch, re-enabling only a disabled
+	// one. Zero rows = idempotent repeat; the batch re-reads either way.
+	SetBatchDisabled(ctx context.Context, batchNo string, disabled bool) (*ActivationBatch, error)
+	ListBatches(ctx context.Context, in *ListBatchesIn) (*ListBatchesOut, error)
 }
 
 type EntitlementRP interface {
@@ -136,11 +211,16 @@ type ReportPolicyRP interface {
 
 type CodeUC struct {
 	shared.UC
-	codeRP ActivationCodeRP
+	codeRP    ActivationCodeRP
+	profileRP profile.ProfileRP
 }
 
-func NewCodeUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationCodeRP) *CodeUC {
-	return &CodeUC{UC: shared.NewUC(logger.With("module", "module/entitle"), tm), codeRP: codeRP}
+func NewCodeUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationCodeRP, profileRP profile.ProfileRP) *CodeUC {
+	return &CodeUC{
+		UC:        shared.NewUC(logger.With("module", "module/entitle"), tm),
+		codeRP:    codeRP,
+		profileRP: profileRP,
+	}
 }
 
 type EntitleUC struct {
@@ -167,11 +247,7 @@ func NewEntitleUC(logger *slog.Logger, tm shared.Transaction, codeRP ActivationC
 }
 
 // Method --------------------------------------------------------------------------------------------------------
-func (uc *CodeUC) List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, error) {
-	return uc.codeRP.List(ctx, in)
-}
-
-func (uc *CodeUC) Generate(ctx context.Context, in *GenerateIn) ([]string, error) {
+func (uc *CodeUC) Generate(ctx context.Context, in *GenerateIn) (*GenerateOut, error) {
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {
 		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("code generation requires an admin session"))
@@ -198,11 +274,81 @@ func (uc *CodeUC) Generate(ctx context.Context, in *GenerateIn) ([]string, error
 			ExpiresAt: expiresAt, CreatedBy: subject.UserID,
 		})
 	}
-	if err := uc.codeRP.CreateBatch(ctx, rows); err != nil {
+	// The batch number rides a collision-retry loop: the unique index is
+	// the only arbiter of "this number is taken".
+	var minted *ActivationBatch
+	var lastErr error
+	for range 3 {
+		no, err := mintBatchNo()
+		if err != nil {
+			return nil, err
+		}
+		batch := &ActivationBatch{BatchNo: no, ReportType: in.ReportType, ExpiresAt: expiresAt, CreatedBy: subject.UserID}
+		err = uc.Tm.InTx(ctx, func(txCtx context.Context) error {
+			return uc.codeRP.MintBatch(txCtx, batch, rows)
+		})
+		if err == nil {
+			minted = batch
+			break
+		}
+		// Identity on the choke point's classification, via the generated
+		// reason predicate — never a fresh ent-class at the call site.
+		if !errorspb.IsInfraErrorDbConstraint(err) {
+			return nil, err
+		}
+		lastErr = err
+	}
+	if minted == nil {
+		return nil, fmt.Errorf("minting the batch hit a constraint three times in a row: %w", lastErr)
+	}
+	uc.Log.Info("activation codes generated", "count", len(rows), "report_type", in.ReportType, "created_by", subject.UserID, "batch_no", minted.BatchNo)
+	return &GenerateOut{Codes: codes, BatchNo: minted.BatchNo}, nil
+}
+
+func (uc *CodeUC) List(ctx context.Context, in *ListCodesIn) (*ListCodesOut, error) {
+	out, err := uc.codeRP.List(ctx, in)
+	if err != nil {
 		return nil, err
 	}
-	uc.Log.Info("activation codes generated", "count", len(rows), "report_type", in.ReportType, "created_by", subject.UserID)
+	if err := uc.hydrateRedeems(ctx, out.Codes); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (uc *CodeUC) Export(ctx context.Context, in *ListCodesIn) ([]*ActivationCode, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("code export requires an admin session"))
+	}
+	codes, err := uc.codeRP.ListAll(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	if err := uc.hydrateRedeems(ctx, codes); err != nil {
+		return nil, err
+	}
+	// The export hands out usable code values — its own trace line even
+	// before the audit middleware joins this service's ladder.
+	uc.Log.Info("activation codes exported", "count", len(codes), "batch_no", utils.Deref(in.BatchNo, ""), "by", subject.UserID)
 	return codes, nil
+}
+
+func (uc *CodeUC) SetBatchStatus(ctx context.Context, batchNo string, disabled bool) (*ActivationBatch, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("batch status flip requires an admin session"))
+	}
+	batch, err := uc.codeRP.SetBatchDisabled(ctx, batchNo, disabled)
+	if err != nil {
+		return nil, err
+	}
+	uc.Log.Info("activation batch status flipped", "batch_no", batchNo, "disabled", disabled, "by", subject.UserID)
+	return batch, nil
+}
+
+func (uc *CodeUC) ListBatches(ctx context.Context, in *ListBatchesIn) (*ListBatchesOut, error) {
+	return uc.codeRP.ListBatches(ctx, in)
 }
 
 func (uc *EntitleUC) GetReportAccess(ctx context.Context, family string) (*AccessOut, error) {
@@ -248,8 +394,10 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 	}
 	family := row.ReportType
 	// The same member redeeming their own code again is idempotent — the
-	// grant already exists and the code's single use is already theirs.
-	// A lapsed grant is not that idempotent hit: an expired family row
+	// grant already exists and the code's single use is already theirs,
+	// and that answer outranks the batch's state below: a disabled batch
+	// voids unredeemed codes, it never reopens a grant already landed. A
+	// lapsed grant is not that idempotent hit: an expired family row
 	// must not strand the member out of every later code for the family,
 	// so the redeem falls through and the grant ratchets forward — the
 	// access judgement reads the same liveness rule.
@@ -258,12 +406,17 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 	} else if grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now())) {
 		return &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}, nil
 	}
+	if row.BatchDisabled {
+		// The operator pulled the batch — distinct from expired and from
+		// invalid, so support can say exactly which of the three it was.
+		return nil, esportspb.ErrorEsportsActivationCodeDisabled("")
+	}
 	var out *RedeemOut
 	err = uc.Tm.InTx(ctx, func(txCtx context.Context) error {
 		// One transaction takes the use and lands the grant: a use taken
 		// without its grant is unrecoverable — the retry path would find
 		// the code exhausted and no grant to be idempotent against.
-		taken, err := uc.codeRP.TakeUse(txCtx, code)
+		taken, err := uc.codeRP.TakeUse(txCtx, code, subject.UserID)
 		if err != nil {
 			return err
 		}
@@ -369,18 +522,71 @@ func (uc *EntitleUC) onTrialCompleted(ctx context.Context, e shared.TrialComplet
 	}
 }
 
+func (uc *CodeUC) hydrateRedeems(ctx context.Context, codes []*ActivationCode) error {
+	// Folds the local profile nickname onto each redeemed code's member —
+	// the who is the code row's own fact; only the readable name comes
+	// from outside it.
+	ids := make([]string, 0, len(codes))
+	seen := make(map[string]struct{}, len(codes))
+	for _, c := range codes {
+		if c.RedeemedBy != nil {
+			if _, dup := seen[*c.RedeemedBy]; !dup {
+				seen[*c.RedeemedBy] = struct{}{}
+				ids = append(ids, *c.RedeemedBy)
+			}
+		}
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	profiles, err := uc.profileRP.ListByUserIDs(ctx, ids)
+	if err != nil {
+		return err
+	}
+	nicknames := make(map[string]*string, len(profiles))
+	for _, p := range profiles {
+		if p.Nickname != nil && *p.Nickname != "" {
+			nicknames[p.UserID] = p.Nickname
+		}
+	}
+	for _, c := range codes {
+		if c.RedeemedBy != nil {
+			c.Nickname = nicknames[*c.RedeemedBy]
+		}
+	}
+	return nil
+}
+
 func mintCodeBody() (string, error) {
 	// Sixteen chars of secure random over an alphabet with the
 	// look-alikes (0/O, 1/I) removed — a handed-out code survives being
 	// read aloud, the legacy corpus's own alphabet.
 	b := make([]byte, codeBodyLen)
+	if err := fillRandom(b); err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func mintBatchNo() (string, error) {
+	// B-YYMM-XXXX: the prefix and month a support agent can parse on the
+	// phone, four random chars over the code alphabet — a batch number
+	// is spoken far more often than it is typed.
+	b := make([]byte, 4)
+	if err := fillRandom(b); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("B-%s-%s", time.Now().Format("0601"), string(b)), nil
+}
+
+func fillRandom(b []byte) error {
 	alphabetMax := big.NewInt(int64(len(codeAlphabet)))
 	for i := range b {
 		n, err := rand.Int(rand.Reader, alphabetMax)
 		if err != nil {
-			return "", fmt.Errorf("entitle: entropy failure: %w", err)
+			return fmt.Errorf("entitle: entropy failure: %w", err)
 		}
 		b[i] = codeAlphabet[n.Int64()]
 	}
-	return string(b), nil
+	return nil
 }

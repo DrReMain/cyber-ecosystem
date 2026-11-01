@@ -177,6 +177,38 @@ export type CyberAgentV1UpdateSessionResponse = {
     [key: string]: unknown;
 };
 
+/**
+ * One generation call's mint: the unit an operator disables, exports,
+ * and reads burn-down by. Count facts are aggregates over the code rows
+ * — the batch row carries only batch-level truth (family, deadline, the
+ * disable flip), so the two can never drift.
+ */
+export type CyberEsportsV1ActivationBatch = {
+    /**
+     * Human-shape batch number (B-YYMM-XXXX) — the string support quotes
+     * on the phone.
+     */
+    batchNo?: string;
+    reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+    /**
+     * Codes minted in this batch.
+     */
+    count?: number;
+    /**
+     * Codes already redeemed.
+     */
+    usedCount?: number;
+    expiresAt?: string;
+    createdAt?: string;
+    /**
+     * Absent = live batch; present = the moment the operator disabled it.
+     * Disabling voids every unredeemed code in the batch on the spot —
+     * grants already landed stay landed, the same permanence a settled
+     * order gets.
+     */
+    disabledAt?: string;
+};
+
 export type CyberEsportsV1ActivationCode = {
     code?: string;
     reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
@@ -184,6 +216,19 @@ export type CyberEsportsV1ActivationCode = {
     usedCount?: number;
     expiresAt?: string;
     createdAt?: string;
+    /**
+     * The minting batch this code belongs to; absent only on rows older
+     * than the batch model itself.
+     */
+    batchNo?: string;
+    /**
+     * The redeem's trail, hydrated from the grant the redeem landed:
+     * absent on an unredeemed code. user_id is the member link target;
+     * nickname is the local profile fold operators read.
+     */
+    redeemedAt?: string;
+    userId?: string;
+    nickname?: string;
 };
 
 /**
@@ -470,6 +515,34 @@ export type CyberEsportsV1EconomicSimPurchase = {
     cost?: number;
 };
 
+export type CyberEsportsV1ExportActivationCodesRequest = {
+    /**
+     * An export hands out usable code values — that hand-out is the
+     * sensitive act, so the RPC carries ACTION_WRITE and lands one audit
+     * line per export even though it changes nothing.
+     * Absent = every batch; present = the named batch's codes.
+     */
+    batchNo?: string;
+    /**
+     * Absent = every code; the natural ask is the unredeemed remainder an
+     * operator is about to hand out.
+     */
+    codeStatus?: 'ACTIVATION_CODE_STATUS_UNSPECIFIED' | 'ACTIVATION_CODE_STATUS_UNUSED' | 'ACTIVATION_CODE_STATUS_REDEEMED';
+    /**
+     * Same find-one filter as the list — an export answers the visible
+     * filter, never a wider set.
+     */
+    code?: string;
+};
+
+export type CyberEsportsV1ExportActivationCodesResponse = {
+    /**
+     * The whole filtered set in one answer, no paging — a batch tops out
+     * at a thousand codes, so the export stays one payload.
+     */
+    codes?: Array<CyberEsportsV1ActivationCode>;
+};
+
 /**
  * flash_aiming — snap shots at flashing targets.
  */
@@ -526,6 +599,13 @@ export type CyberEsportsV1GenerateActivationCodesResponse = {
      * answers what was minted so the operator hands them out.
      */
     codes?: Array<string>;
+    /**
+     * The batch these codes share — the handle for the detail page and
+     * every later status flip. Plain string, not a wrapper: generation
+     * succeeded means the batch exists, absence is not a state this field
+     * can carry.
+     */
+    batchNo?: string;
 };
 
 export type CyberEsportsV1GetAbilityDigestRequest = {
@@ -825,6 +905,21 @@ export type CyberEsportsV1GrantMembershipRequest = {
 
 export type CyberEsportsV1GrantMembershipResponse = {
     membership?: CyberEsportsV1MembershipSummary;
+};
+
+export type CyberEsportsV1ListActivationBatchesResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    /**
+     * Newest batch first.
+     */
+    batches?: Array<CyberEsportsV1ActivationBatch>;
+    /**
+     * Fold over every batch, independent of the applied filters — the
+     * footer's one count line instead of one query per number.
+     */
+    totalBatches?: number;
+    totalCodes?: number;
+    usedCodes?: number;
 };
 
 export type CyberEsportsV1ListActivationCodesResponse = {
@@ -1497,6 +1592,18 @@ export type CyberEsportsV1SessionAbilityLine = {
      * the comparison track and the "new personal best" note read.
      */
     historyBestScore?: number;
+};
+
+export type CyberEsportsV1SetActivationBatchStatusRequest = {
+    batchNo?: string;
+    /**
+     * True = disable (unredeemed codes void immediately), false = re-enable.
+     */
+    disabled?: boolean;
+};
+
+export type CyberEsportsV1SetActivationBatchStatusResponse = {
+    batch?: CyberEsportsV1ActivationBatch;
 };
 
 export type CyberEsportsV1SetReportAccessPolicyRequest = {
@@ -3441,6 +3548,17 @@ export type EntitleAdminServiceListActivationCodesData = {
          */
         'page.updatedAtZ'?: string;
         reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+        /**
+         * Present = one batch's code table (the detail page); absent = the
+         * flat all-codes view.
+         */
+        batchNo?: string;
+        codeStatus?: 'ACTIVATION_CODE_STATUS_UNSPECIFIED' | 'ACTIVATION_CODE_STATUS_UNUSED' | 'ACTIVATION_CODE_STATUS_REDEEMED';
+        /**
+         * Present = the exact code an operator is chasing — the detail page's
+         * find-one search box; a no-match code answers the empty page.
+         */
+        code?: string;
     };
     url: '/api/v1/esports/activation-codes';
 };
@@ -3453,6 +3571,94 @@ export type EntitleAdminServiceListActivationCodesResponses = {
 };
 
 export type EntitleAdminServiceListActivationCodesResponse = EntitleAdminServiceListActivationCodesResponses[keyof EntitleAdminServiceListActivationCodesResponses];
+
+export type EntitleAdminServiceListActivationBatchesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        reportType?: 'REPORT_TYPE_UNSPECIFIED' | 'REPORT_TYPE_COGNITIVE' | 'REPORT_TYPE_CAREER' | 'REPORT_TYPE_SCHOOL';
+        /**
+         * Absent = every batch; true = disabled only, false = live only.
+         */
+        disabled?: boolean;
+        /**
+         * Exact-match lookup — the detail page's header facts in one answer.
+         */
+        batchNo?: string;
+    };
+    url: '/api/v1/esports/activation-codes/batches';
+};
+
+export type EntitleAdminServiceListActivationBatchesResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListActivationBatchesResponse;
+};
+
+export type EntitleAdminServiceListActivationBatchesResponse = EntitleAdminServiceListActivationBatchesResponses[keyof EntitleAdminServiceListActivationBatchesResponses];
+
+export type EntitleAdminServiceSetActivationBatchStatusData = {
+    body: CyberEsportsV1SetActivationBatchStatusRequest;
+    path: {
+        batchNo: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/activation-codes/batches/{batchNo}/status';
+};
+
+export type EntitleAdminServiceSetActivationBatchStatusResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SetActivationBatchStatusResponse;
+};
+
+export type EntitleAdminServiceSetActivationBatchStatusResponse = EntitleAdminServiceSetActivationBatchStatusResponses[keyof EntitleAdminServiceSetActivationBatchStatusResponses];
+
+export type EntitleAdminServiceExportActivationCodesData = {
+    body: CyberEsportsV1ExportActivationCodesRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/activation-codes/export';
+};
+
+export type EntitleAdminServiceExportActivationCodesResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ExportActivationCodesResponse;
+};
+
+export type EntitleAdminServiceExportActivationCodesResponse = EntitleAdminServiceExportActivationCodesResponses[keyof EntitleAdminServiceExportActivationCodesResponses];
 
 export type EntitleAdminServiceGenerateActivationCodesData = {
     body: CyberEsportsV1GenerateActivationCodesRequest;

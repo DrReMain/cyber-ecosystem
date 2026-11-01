@@ -2,9 +2,11 @@ import { create } from "@bufbuild/protobuf";
 import type { GenerateActivationCodesResponse } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/activation_admin_pb";
 import { GenerateActivationCodesRequestSchema } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/activation_admin_pb";
 import type { ReportType } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/entitlement_pb";
+import { Link } from "@tanstack/react-router";
 import { Alert, Form, InputNumber, Modal, Select, Typography } from "antd";
 import { m } from "#/paraglide/messages";
 import { reportTypeFromWire } from "../search";
+import { reportTypeOptions } from "../vocab";
 
 interface GenerateModalProps {
   open: boolean;
@@ -56,6 +58,14 @@ export function GenerateModal({
             message={m.esports_activation_codes_generate_success({ n: result.codes.length })}
             type="success"
           />
+          <Link
+            className="text-primary font-mono font-semibold"
+            params={{ batchNo: result.batchNo }}
+            search={{ pageNo: 1, pageSize: 50 }}
+            to="/dashboard/channels/activation-codes/$batchNo"
+          >
+            {m.esports_activation_codes_generate_batch({ no: result.batchNo })}
+          </Link>
           <div className="flex max-h-72 flex-col gap-1 overflow-auto">
             {result.codes.map((code) => (
               <Typography.Text className="font-mono" copyable key={code}>
@@ -75,11 +85,7 @@ export function GenerateModal({
             rules={[{ required: true }]}
           >
             <Select
-              options={[
-                { label: m.esports_report_type_cognitive(), value: "REPORT_TYPE_COGNITIVE" },
-                { label: m.esports_report_type_career(), value: "REPORT_TYPE_CAREER" },
-                { label: m.esports_report_type_school(), value: "REPORT_TYPE_SCHOOL" },
-              ]}
+              options={reportTypeOptions.map((o) => ({ label: o.label(), value: o.value }))}
             />
           </Form.Item>
           <Form.Item

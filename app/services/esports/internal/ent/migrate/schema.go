@@ -58,6 +58,46 @@ var (
 			},
 		},
 	}
+	// ActivationBatchColumns holds the columns for the "activation_batch" table.
+	ActivationBatchColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant_id", Type: field.TypeString, Size: 20, Comment: "tenant scope; back-filled on insert and filtered from the request subject"},
+		{Name: "no", Type: field.TypeString, Size: 32, Comment: "human-shape batch number (B-YYMM-XXXX) — the string support quotes"},
+		{Name: "report_type", Type: field.TypeEnum, Comment: "the report family every code in the batch opens", Enums: []string{"cognitive", "career", "school"}},
+		{Name: "expires_at", Type: field.TypeTime, Comment: "code validity deadline shared by the whole batch"},
+		{Name: "created_by", Type: field.TypeString, Size: 20, Comment: "admin identity that minted the batch (audit join)"},
+		{Name: "disabled_at", Type: field.TypeTime, Nullable: true, Comment: "null = live batch; set = the moment the operator disabled it — unredeemed codes void on the spot, landed grants stay landed"},
+	}
+	// ActivationBatchTable holds the schema information for the "activation_batch" table.
+	ActivationBatchTable = &schema.Table{
+		Name:       "activation_batch",
+		Columns:    ActivationBatchColumns,
+		PrimaryKey: []*schema.Column{ActivationBatchColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "activationbatch_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ActivationBatchColumns[1]},
+			},
+			{
+				Name:    "activationbatch_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{ActivationBatchColumns[2]},
+			},
+			{
+				Name:    "activationbatch_no",
+				Unique:  true,
+				Columns: []*schema.Column{ActivationBatchColumns[4]},
+			},
+			{
+				Name:    "activationbatch_report_type_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ActivationBatchColumns[5], ActivationBatchColumns[1]},
+			},
+		},
+	}
 	// ActivationCodeColumns holds the columns for the "activation_code" table.
 	ActivationCodeColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -68,8 +108,11 @@ var (
 		{Name: "report_type", Type: field.TypeEnum, Comment: "the report family this code opens — the pricing ruling retired single-record codes", Enums: []string{"cognitive", "career", "school"}},
 		{Name: "quantity", Type: field.TypeInt, Comment: "redeems allowed; generation mints single-use codes, the field keeps the redeem guard general", Default: 1},
 		{Name: "used_count", Type: field.TypeInt, Comment: "redeems taken; the conditional UPDATE increments under the quantity guard", Default: 0},
+		{Name: "redeemed_by", Type: field.TypeString, Nullable: true, Size: 20, Comment: "the member the single use went to, set by the same conditional UPDATE that takes it — the code row is the redeem's own record, the family grant it produced may later be ratcheted by a newer code and lose this trail"},
+		{Name: "redeemed_at", Type: field.TypeTime, Nullable: true, Comment: "when the use was taken; written with redeemed_by in the one arbitration"},
 		{Name: "expires_at", Type: field.TypeTime, Comment: "code validity deadline; a redeem after it refuses even with uses left"},
 		{Name: "created_by", Type: field.TypeString, Size: 20, Comment: "admin identity that minted the batch (audit join)"},
+		{Name: "batch_id", Type: field.TypeString, Nullable: true, Size: 32, Comment: "the minting batch; null only on rows predating the batch model"},
 	}
 	// ActivationCodeTable holds the schema information for the "activation_code" table.
 	ActivationCodeTable = &schema.Table{
@@ -96,6 +139,11 @@ var (
 				Name:    "activationcode_report_type_created_at",
 				Unique:  false,
 				Columns: []*schema.Column{ActivationCodeColumns[5], ActivationCodeColumns[1]},
+			},
+			{
+				Name:    "activationcode_batch_id",
+				Unique:  false,
+				Columns: []*schema.Column{ActivationCodeColumns[12]},
 			},
 		},
 	}
@@ -706,6 +754,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoreTable,
+		ActivationBatchTable,
 		ActivationCodeTable,
 		EntitlementTable,
 		GameTable,
@@ -726,6 +775,9 @@ var (
 func init() {
 	AbilityScoreTable.Annotation = &entsql.Annotation{
 		Table: "ability_score",
+	}
+	ActivationBatchTable.Annotation = &entsql.Annotation{
+		Table: "activation_batch",
 	}
 	ActivationCodeTable.Annotation = &entsql.Annotation{
 		Table: "activation_code",

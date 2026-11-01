@@ -31,10 +31,16 @@ type ActivationCode struct {
 	Quantity int `json:"quantity,omitempty"`
 	// redeems taken; the conditional UPDATE increments under the quantity guard
 	UsedCount int `json:"used_count,omitempty"`
+	// the member the single use went to, set by the same conditional UPDATE that takes it — the code row is the redeem's own record, the family grant it produced may later be ratcheted by a newer code and lose this trail
+	RedeemedBy *string `json:"redeemed_by,omitempty"`
+	// when the use was taken; written with redeemed_by in the one arbitration
+	RedeemedAt *time.Time `json:"redeemed_at,omitempty"`
 	// code validity deadline; a redeem after it refuses even with uses left
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// admin identity that minted the batch (audit join)
-	CreatedBy    string `json:"created_by,omitempty"`
+	CreatedBy string `json:"created_by,omitempty"`
+	// the minting batch; null only on rows predating the batch model
+	BatchID      *string `json:"batch_id,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -45,9 +51,9 @@ func (*ActivationCode) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case activationcode.FieldQuantity, activationcode.FieldUsedCount:
 			values[i] = new(sql.NullInt64)
-		case activationcode.FieldID, activationcode.FieldTenantID, activationcode.FieldCode, activationcode.FieldReportType, activationcode.FieldCreatedBy:
+		case activationcode.FieldID, activationcode.FieldTenantID, activationcode.FieldCode, activationcode.FieldReportType, activationcode.FieldRedeemedBy, activationcode.FieldCreatedBy, activationcode.FieldBatchID:
 			values[i] = new(sql.NullString)
-		case activationcode.FieldCreatedAt, activationcode.FieldUpdatedAt, activationcode.FieldExpiresAt:
+		case activationcode.FieldCreatedAt, activationcode.FieldUpdatedAt, activationcode.FieldRedeemedAt, activationcode.FieldExpiresAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -112,6 +118,20 @@ func (_m *ActivationCode) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.UsedCount = int(value.Int64)
 			}
+		case activationcode.FieldRedeemedBy:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field redeemed_by", values[i])
+			} else if value.Valid {
+				_m.RedeemedBy = new(string)
+				*_m.RedeemedBy = value.String
+			}
+		case activationcode.FieldRedeemedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field redeemed_at", values[i])
+			} else if value.Valid {
+				_m.RedeemedAt = new(time.Time)
+				*_m.RedeemedAt = value.Time
+			}
 		case activationcode.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field expires_at", values[i])
@@ -123,6 +143,13 @@ func (_m *ActivationCode) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
 			} else if value.Valid {
 				_m.CreatedBy = value.String
+			}
+		case activationcode.FieldBatchID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field batch_id", values[i])
+			} else if value.Valid {
+				_m.BatchID = new(string)
+				*_m.BatchID = value.String
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -181,11 +208,26 @@ func (_m *ActivationCode) String() string {
 	builder.WriteString("used_count=")
 	builder.WriteString(fmt.Sprintf("%v", _m.UsedCount))
 	builder.WriteString(", ")
+	if v := _m.RedeemedBy; v != nil {
+		builder.WriteString("redeemed_by=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.RedeemedAt; v != nil {
+		builder.WriteString("redeemed_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
 	builder.WriteString("expires_at=")
 	builder.WriteString(_m.ExpiresAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("created_by=")
 	builder.WriteString(_m.CreatedBy)
+	builder.WriteString(", ")
+	if v := _m.BatchID; v != nil {
+		builder.WriteString("batch_id=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

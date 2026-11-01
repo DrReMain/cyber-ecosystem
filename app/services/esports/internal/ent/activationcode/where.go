@@ -94,6 +94,16 @@ func UsedCount(v int) predicate.ActivationCode {
 	return predicate.ActivationCode(sql.FieldEQ(FieldUsedCount, v))
 }
 
+// RedeemedBy applies equality check predicate on the "redeemed_by" field. It's identical to RedeemedByEQ.
+func RedeemedBy(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldEQ(FieldRedeemedBy, v))
+}
+
+// RedeemedAt applies equality check predicate on the "redeemed_at" field. It's identical to RedeemedAtEQ.
+func RedeemedAt(v time.Time) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldEQ(FieldRedeemedAt, v))
+}
+
 // ExpiresAt applies equality check predicate on the "expires_at" field. It's identical to ExpiresAtEQ.
 func ExpiresAt(v time.Time) predicate.ActivationCode {
 	return predicate.ActivationCode(sql.FieldEQ(FieldExpiresAt, v))
@@ -102,6 +112,11 @@ func ExpiresAt(v time.Time) predicate.ActivationCode {
 // CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
 func CreatedBy(v string) predicate.ActivationCode {
 	return predicate.ActivationCode(sql.FieldEQ(FieldCreatedBy, v))
+}
+
+// BatchID applies equality check predicate on the "batch_id" field. It's identical to BatchIDEQ.
+func BatchID(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldEQ(FieldBatchID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -414,6 +429,131 @@ func UsedCountLTE(v int) predicate.ActivationCode {
 	return predicate.ActivationCode(sql.FieldLTE(FieldUsedCount, v))
 }
 
+// RedeemedByEQ applies the EQ predicate on the "redeemed_by" field.
+func RedeemedByEQ(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldEQ(FieldRedeemedBy, v))
+}
+
+// RedeemedByNEQ applies the NEQ predicate on the "redeemed_by" field.
+func RedeemedByNEQ(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldNEQ(FieldRedeemedBy, v))
+}
+
+// RedeemedByIn applies the In predicate on the "redeemed_by" field.
+func RedeemedByIn(vs ...string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldIn(FieldRedeemedBy, vs...))
+}
+
+// RedeemedByNotIn applies the NotIn predicate on the "redeemed_by" field.
+func RedeemedByNotIn(vs ...string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldNotIn(FieldRedeemedBy, vs...))
+}
+
+// RedeemedByGT applies the GT predicate on the "redeemed_by" field.
+func RedeemedByGT(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldGT(FieldRedeemedBy, v))
+}
+
+// RedeemedByGTE applies the GTE predicate on the "redeemed_by" field.
+func RedeemedByGTE(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldGTE(FieldRedeemedBy, v))
+}
+
+// RedeemedByLT applies the LT predicate on the "redeemed_by" field.
+func RedeemedByLT(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldLT(FieldRedeemedBy, v))
+}
+
+// RedeemedByLTE applies the LTE predicate on the "redeemed_by" field.
+func RedeemedByLTE(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldLTE(FieldRedeemedBy, v))
+}
+
+// RedeemedByContains applies the Contains predicate on the "redeemed_by" field.
+func RedeemedByContains(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldContains(FieldRedeemedBy, v))
+}
+
+// RedeemedByHasPrefix applies the HasPrefix predicate on the "redeemed_by" field.
+func RedeemedByHasPrefix(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldHasPrefix(FieldRedeemedBy, v))
+}
+
+// RedeemedByHasSuffix applies the HasSuffix predicate on the "redeemed_by" field.
+func RedeemedByHasSuffix(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldHasSuffix(FieldRedeemedBy, v))
+}
+
+// RedeemedByIsNil applies the IsNil predicate on the "redeemed_by" field.
+func RedeemedByIsNil() predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldIsNull(FieldRedeemedBy))
+}
+
+// RedeemedByNotNil applies the NotNil predicate on the "redeemed_by" field.
+func RedeemedByNotNil() predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldNotNull(FieldRedeemedBy))
+}
+
+// RedeemedByEqualFold applies the EqualFold predicate on the "redeemed_by" field.
+func RedeemedByEqualFold(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldEqualFold(FieldRedeemedBy, v))
+}
+
+// RedeemedByContainsFold applies the ContainsFold predicate on the "redeemed_by" field.
+func RedeemedByContainsFold(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldContainsFold(FieldRedeemedBy, v))
+}
+
+// RedeemedAtEQ applies the EQ predicate on the "redeemed_at" field.
+func RedeemedAtEQ(v time.Time) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldEQ(FieldRedeemedAt, v))
+}
+
+// RedeemedAtNEQ applies the NEQ predicate on the "redeemed_at" field.
+func RedeemedAtNEQ(v time.Time) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldNEQ(FieldRedeemedAt, v))
+}
+
+// RedeemedAtIn applies the In predicate on the "redeemed_at" field.
+func RedeemedAtIn(vs ...time.Time) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldIn(FieldRedeemedAt, vs...))
+}
+
+// RedeemedAtNotIn applies the NotIn predicate on the "redeemed_at" field.
+func RedeemedAtNotIn(vs ...time.Time) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldNotIn(FieldRedeemedAt, vs...))
+}
+
+// RedeemedAtGT applies the GT predicate on the "redeemed_at" field.
+func RedeemedAtGT(v time.Time) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldGT(FieldRedeemedAt, v))
+}
+
+// RedeemedAtGTE applies the GTE predicate on the "redeemed_at" field.
+func RedeemedAtGTE(v time.Time) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldGTE(FieldRedeemedAt, v))
+}
+
+// RedeemedAtLT applies the LT predicate on the "redeemed_at" field.
+func RedeemedAtLT(v time.Time) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldLT(FieldRedeemedAt, v))
+}
+
+// RedeemedAtLTE applies the LTE predicate on the "redeemed_at" field.
+func RedeemedAtLTE(v time.Time) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldLTE(FieldRedeemedAt, v))
+}
+
+// RedeemedAtIsNil applies the IsNil predicate on the "redeemed_at" field.
+func RedeemedAtIsNil() predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldIsNull(FieldRedeemedAt))
+}
+
+// RedeemedAtNotNil applies the NotNil predicate on the "redeemed_at" field.
+func RedeemedAtNotNil() predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldNotNull(FieldRedeemedAt))
+}
+
 // ExpiresAtEQ applies the EQ predicate on the "expires_at" field.
 func ExpiresAtEQ(v time.Time) predicate.ActivationCode {
 	return predicate.ActivationCode(sql.FieldEQ(FieldExpiresAt, v))
@@ -517,6 +657,81 @@ func CreatedByEqualFold(v string) predicate.ActivationCode {
 // CreatedByContainsFold applies the ContainsFold predicate on the "created_by" field.
 func CreatedByContainsFold(v string) predicate.ActivationCode {
 	return predicate.ActivationCode(sql.FieldContainsFold(FieldCreatedBy, v))
+}
+
+// BatchIDEQ applies the EQ predicate on the "batch_id" field.
+func BatchIDEQ(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldEQ(FieldBatchID, v))
+}
+
+// BatchIDNEQ applies the NEQ predicate on the "batch_id" field.
+func BatchIDNEQ(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldNEQ(FieldBatchID, v))
+}
+
+// BatchIDIn applies the In predicate on the "batch_id" field.
+func BatchIDIn(vs ...string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldIn(FieldBatchID, vs...))
+}
+
+// BatchIDNotIn applies the NotIn predicate on the "batch_id" field.
+func BatchIDNotIn(vs ...string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldNotIn(FieldBatchID, vs...))
+}
+
+// BatchIDGT applies the GT predicate on the "batch_id" field.
+func BatchIDGT(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldGT(FieldBatchID, v))
+}
+
+// BatchIDGTE applies the GTE predicate on the "batch_id" field.
+func BatchIDGTE(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldGTE(FieldBatchID, v))
+}
+
+// BatchIDLT applies the LT predicate on the "batch_id" field.
+func BatchIDLT(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldLT(FieldBatchID, v))
+}
+
+// BatchIDLTE applies the LTE predicate on the "batch_id" field.
+func BatchIDLTE(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldLTE(FieldBatchID, v))
+}
+
+// BatchIDContains applies the Contains predicate on the "batch_id" field.
+func BatchIDContains(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldContains(FieldBatchID, v))
+}
+
+// BatchIDHasPrefix applies the HasPrefix predicate on the "batch_id" field.
+func BatchIDHasPrefix(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldHasPrefix(FieldBatchID, v))
+}
+
+// BatchIDHasSuffix applies the HasSuffix predicate on the "batch_id" field.
+func BatchIDHasSuffix(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldHasSuffix(FieldBatchID, v))
+}
+
+// BatchIDIsNil applies the IsNil predicate on the "batch_id" field.
+func BatchIDIsNil() predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldIsNull(FieldBatchID))
+}
+
+// BatchIDNotNil applies the NotNil predicate on the "batch_id" field.
+func BatchIDNotNil() predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldNotNull(FieldBatchID))
+}
+
+// BatchIDEqualFold applies the EqualFold predicate on the "batch_id" field.
+func BatchIDEqualFold(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldEqualFold(FieldBatchID, v))
+}
+
+// BatchIDContainsFold applies the ContainsFold predicate on the "batch_id" field.
+func BatchIDContainsFold(v string) predicate.ActivationCode {
+	return predicate.ActivationCode(sql.FieldContainsFold(FieldBatchID, v))
 }
 
 // And groups predicates with the AND operator between them.

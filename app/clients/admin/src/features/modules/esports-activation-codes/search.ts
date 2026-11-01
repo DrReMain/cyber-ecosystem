@@ -10,6 +10,9 @@ export const codesSearchSchema = z.looseObject({
   reportType: z
     .enum(["REPORT_TYPE_COGNITIVE", "REPORT_TYPE_CAREER", "REPORT_TYPE_SCHOOL"])
     .optional(),
+  // The URL carries the three-way pick; the request folds it to a boolean
+  // only when a side is chosen.
+  state: z.enum(["live", "disabled"]).optional(),
   pageNo: pageNoField(),
   pageSize: pageSizeField(20),
 });

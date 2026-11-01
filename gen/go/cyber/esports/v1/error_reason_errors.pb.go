@@ -311,6 +311,24 @@ func ErrorEsportsMembershipNotFound(format string, args ...interface{}) *errors.
 	return errors.New(404, Esports_ESPORTS_MEMBERSHIP_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
 
+// A batch the operator disabled: distinct from expired (time ran out)
+// and invalid (never a code) — the operator pulled it, so support can
+// say exactly that.
+func IsEsportsActivationCodeDisabled(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ACTIVATION_CODE_DISABLED.String() && e.Code == 400
+}
+
+// A batch the operator disabled: distinct from expired (time ran out)
+// and invalid (never a code) — the operator pulled it, so support can
+// say exactly that.
+func ErrorEsportsActivationCodeDisabled(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ACTIVATION_CODE_DISABLED.String(), fmt.Sprintf(format, args...))
+}
+
 // 616x: report
 func IsEsportsReportRecordNotFound(err error) bool {
 	if err == nil {

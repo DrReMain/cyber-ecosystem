@@ -5,10 +5,9 @@ import { op, requireOperations } from "#/features/layout-dashboard/auth/permissi
 import { ActivationCodesPage, parseCodesSearch } from "#/features/modules/esports-activation-codes";
 import { m } from "#/paraglide/messages";
 
-const operations = [
-  op(EntitleAdminService, "listActivationCodes"),
-  op(EntitleAdminService, "generateActivationCodes"),
-];
+// The read set is the page's queries only — the mint/flip/export buttons
+// surface denials through the error domain, not the page gate.
+const operations = [op(EntitleAdminService, "listActivationBatches")];
 
 export const Route = createFileRoute("/dashboard/channels/activation-codes/")({
   staticData: { title: "esports_activation_codes_title", menu: { order: 10 }, operations },

@@ -60,6 +60,10 @@ const (
 	Esports_ESPORTS_ACTIVATION_CODE_EXHAUSTED Esports = 6152
 	Esports_ESPORTS_REPORT_POLICY_NOT_READY   Esports = 6153
 	Esports_ESPORTS_MEMBERSHIP_NOT_FOUND      Esports = 6154
+	// A batch the operator disabled: distinct from expired (time ran out)
+	// and invalid (never a code) — the operator pulled it, so support can
+	// say exactly that.
+	Esports_ESPORTS_ACTIVATION_CODE_DISABLED Esports = 6155
 	// 616x: report
 	Esports_ESPORTS_REPORT_RECORD_NOT_FOUND  Esports = 6160
 	Esports_ESPORTS_REPORT_RECORD_NOT_OWNED  Esports = 6161
@@ -94,6 +98,7 @@ var (
 		6152: "ESPORTS_ACTIVATION_CODE_EXHAUSTED",
 		6153: "ESPORTS_REPORT_POLICY_NOT_READY",
 		6154: "ESPORTS_MEMBERSHIP_NOT_FOUND",
+		6155: "ESPORTS_ACTIVATION_CODE_DISABLED",
 		6160: "ESPORTS_REPORT_RECORD_NOT_FOUND",
 		6161: "ESPORTS_REPORT_RECORD_NOT_OWNED",
 		6162: "ESPORTS_REPORT_RECORD_INVALID",
@@ -124,6 +129,7 @@ var (
 		"ESPORTS_ACTIVATION_CODE_EXHAUSTED":         6152,
 		"ESPORTS_REPORT_POLICY_NOT_READY":           6153,
 		"ESPORTS_MEMBERSHIP_NOT_FOUND":              6154,
+		"ESPORTS_ACTIVATION_CODE_DISABLED":          6155,
 		"ESPORTS_REPORT_RECORD_NOT_FOUND":           6160,
 		"ESPORTS_REPORT_RECORD_NOT_OWNED":           6161,
 		"ESPORTS_REPORT_RECORD_INVALID":             6162,
@@ -162,7 +168,7 @@ var File_cyber_esports_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\x9a\t\n" +
+	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\xc7\t\n" +
 	"\aEsports\x12\x1d\n" +
 	"\x13ESPORTS_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x124\n" +
 	")ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED\x10\xd4/\x1a\x04\xa8E\x90\x03\x12'\n" +
@@ -187,7 +193,8 @@ const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\x1fESPORTS_ACTIVATION_CODE_EXPIRED\x10\x870\x1a\x04\xa8E\x90\x03\x12,\n" +
 	"!ESPORTS_ACTIVATION_CODE_EXHAUSTED\x10\x880\x1a\x04\xa8E\x90\x03\x12*\n" +
 	"\x1fESPORTS_REPORT_POLICY_NOT_READY\x10\x890\x1a\x04\xa8E\x90\x03\x12'\n" +
-	"\x1cESPORTS_MEMBERSHIP_NOT_FOUND\x10\x8a0\x1a\x04\xa8E\x94\x03\x12*\n" +
+	"\x1cESPORTS_MEMBERSHIP_NOT_FOUND\x10\x8a0\x1a\x04\xa8E\x94\x03\x12+\n" +
+	" ESPORTS_ACTIVATION_CODE_DISABLED\x10\x8b0\x1a\x04\xa8E\x90\x03\x12*\n" +
 	"\x1fESPORTS_REPORT_RECORD_NOT_FOUND\x10\x900\x1a\x04\xa8E\x94\x03\x12*\n" +
 	"\x1fESPORTS_REPORT_RECORD_NOT_OWNED\x10\x910\x1a\x04\xa8E\x93\x03\x12(\n" +
 	"\x1dESPORTS_REPORT_RECORD_INVALID\x10\x920\x1a\x04\xa8E\x90\x03\x12+\n" +

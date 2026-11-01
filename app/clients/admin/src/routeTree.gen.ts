@@ -44,6 +44,7 @@ import { Route as DashboardSystemRolesRouteImport } from './routes/dashboard/sys
 import { Route as DashboardSystemUsersRouteImport } from './routes/dashboard/system/users'
 import { Route as DashboardAssessmentGameConfigIndexRouteImport } from './routes/dashboard/assessment/game-config/index'
 import { Route as DashboardChannelsActivationCodesIndexRouteImport } from './routes/dashboard/channels/activation-codes/index'
+import { Route as DashboardChannelsActivationCodesBatchNoRouteImport } from './routes/dashboard/channels/activation-codes/$batchNo'
 import { Route as DashboardPeopleMembersIndexRouteImport } from './routes/dashboard/people/members/index'
 import { Route as DashboardPeopleMembersIdRouteImport } from './routes/dashboard/people/members/$id'
 import { Route as DashboardPeopleUsersIndexRouteImport } from './routes/dashboard/people/users/index'
@@ -239,6 +240,12 @@ const DashboardChannelsActivationCodesIndexRoute =
     path: '/activation-codes/',
     getParentRoute: () => DashboardChannelsRouteRoute,
   } as any)
+const DashboardChannelsActivationCodesBatchNoRoute =
+  DashboardChannelsActivationCodesBatchNoRouteImport.update({
+    id: '/activation-codes/$batchNo',
+    path: '/activation-codes/$batchNo',
+    getParentRoute: () => DashboardChannelsRouteRoute,
+  } as any)
 const DashboardPeopleMembersIndexRoute =
   DashboardPeopleMembersIndexRouteImport.update({
     id: '/',
@@ -321,6 +328,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/system/roles': typeof DashboardSystemRolesRoute
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
+  '/dashboard/channels/activation-codes/$batchNo': typeof DashboardChannelsActivationCodesBatchNoRoute
   '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
   '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
   '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
@@ -360,6 +368,7 @@ export interface FileRoutesByTo {
   '/dashboard/system/roles': typeof DashboardSystemRolesRoute
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile': typeof DashboardProfileIndexRoute
+  '/dashboard/channels/activation-codes/$batchNo': typeof DashboardChannelsActivationCodesBatchNoRoute
   '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
   '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
   '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
@@ -406,6 +415,7 @@ export interface FileRoutesById {
   '/dashboard/system/roles': typeof DashboardSystemRolesRoute
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
+  '/dashboard/channels/activation-codes/$batchNo': typeof DashboardChannelsActivationCodesBatchNoRoute
   '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
   '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
   '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
@@ -453,6 +463,7 @@ export interface FileRouteTypes {
     | '/dashboard/system/roles'
     | '/dashboard/system/users'
     | '/dashboard/profile/'
+    | '/dashboard/channels/activation-codes/$batchNo'
     | '/dashboard/people/members/$id'
     | '/dashboard/people/users/$id'
     | '/dashboard/pricing/orders/$id'
@@ -492,6 +503,7 @@ export interface FileRouteTypes {
     | '/dashboard/system/roles'
     | '/dashboard/system/users'
     | '/dashboard/profile'
+    | '/dashboard/channels/activation-codes/$batchNo'
     | '/dashboard/people/members/$id'
     | '/dashboard/people/users/$id'
     | '/dashboard/pricing/orders/$id'
@@ -537,6 +549,7 @@ export interface FileRouteTypes {
     | '/dashboard/system/roles'
     | '/dashboard/system/users'
     | '/dashboard/profile/'
+    | '/dashboard/channels/activation-codes/$batchNo'
     | '/dashboard/people/members/$id'
     | '/dashboard/people/users/$id'
     | '/dashboard/pricing/orders/$id'
@@ -804,6 +817,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardChannelsActivationCodesIndexRouteImport
       parentRoute: typeof DashboardChannelsRouteRoute
     }
+    '/dashboard/channels/activation-codes/$batchNo': {
+      id: '/dashboard/channels/activation-codes/$batchNo'
+      path: '/activation-codes/$batchNo'
+      fullPath: '/dashboard/channels/activation-codes/$batchNo'
+      preLoaderRoute: typeof DashboardChannelsActivationCodesBatchNoRouteImport
+      parentRoute: typeof DashboardChannelsRouteRoute
+    }
     '/dashboard/people/members/': {
       id: '/dashboard/people/members/'
       path: '/'
@@ -890,11 +910,14 @@ const DashboardAssessmentRouteRouteWithChildren =
   )
 
 interface DashboardChannelsRouteRouteChildren {
+  DashboardChannelsActivationCodesBatchNoRoute: typeof DashboardChannelsActivationCodesBatchNoRoute
   DashboardChannelsActivationCodesIndexRoute: typeof DashboardChannelsActivationCodesIndexRoute
 }
 
 const DashboardChannelsRouteRouteChildren: DashboardChannelsRouteRouteChildren =
   {
+    DashboardChannelsActivationCodesBatchNoRoute:
+      DashboardChannelsActivationCodesBatchNoRoute,
     DashboardChannelsActivationCodesIndexRoute:
       DashboardChannelsActivationCodesIndexRoute,
   }

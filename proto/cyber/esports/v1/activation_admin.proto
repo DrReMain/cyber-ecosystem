@@ -19,12 +19,13 @@ option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
 // operator runs by hand. A code is a type code — the pricing ruling
 // retired single-record codes, so redeeming opens one report family,
 // never one trial's report. Generation mints each code for a single
-// redeem; an operator who needs N hands-out mints N. Codes live in clear
-// text because operators re-copy them for support. A membership grant is
-// the operator's twin of a settled order: it lands the same ledger row
-// without ever touching the payment pipeline. This whole service is a
-// strippable module: deployments without the operator plane drop it and
-// the business faces never notice.
+// redeem; an operator who needs N hands-out mints N, and one generation
+// call is one batch — the unit the operator disables, exports, and reads
+// progress by. Codes live in clear text because operators re-copy them
+// for support. A membership grant is the operator's twin of a settled
+// order: it lands the same ledger row without ever touching the payment
+// pipeline. This whole service is a strippable module: deployments
+// without the operator plane drop it and the business faces never notice.
 service EntitleAdminService {
   option (cyber.ext.v1.service_comment) = "权益运营";
   rpc GenerateActivationCodes(GenerateActivationCodesRequest) returns (GenerateActivationCodesResponse) {
@@ -38,6 +39,17 @@ service EntitleAdminService {
       body: "*"
     };
   }
+  rpc SetActivationBatchStatus(SetActivationBatchStatusRequest) returns (SetActivationBatchStatusResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "停用/启用激活码批次"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/activation-codes/batches/{batch_no}/status"
+      body: "*"
+    };
+  }
   rpc ListActivationCodes(ListActivationCodesRequest) returns (ListActivationCodesResponse) {
     option (cyber.ext.v1.method) = {
       comment: "激活码列表"
@@ -45,6 +57,25 @@ service EntitleAdminService {
     };
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {get: "/api/v1/esports/activation-codes"};
+  }
+  rpc ListActivationBatches(ListActivationBatchesRequest) returns (ListActivationBatchesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "激活码批次列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/activation-codes/batches"};
+  }
+  rpc ExportActivationCodes(ExportActivationCodesRequest) returns (ExportActivationCodesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "导出激活码"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/activation-codes/export"
+      body: "*"
+    };
   }
   rpc SetReportAccessPolicy(SetReportAccessPolicyRequest) returns (SetReportAccessPolicyResponse) {
     option (cyber.ext.v1.method) = {
@@ -117,6 +148,28 @@ enum ReportAccessPolicy {
   REPORT_ACCESS_POLICY_CLOSED = 4;
 }
 
+// One generation call's mint: the unit an operator disables, exports,
+// and reads burn-down by. Count facts are aggregates over the code rows
+// — the batch row carries only batch-level truth (family, deadline, the
+// disable flip), so the two can never drift.
+message ActivationBatch {
+  // Human-shape batch number (B-YYMM-XXXX) — the string support quotes
+  // on the phone.
+  google.protobuf.StringValue batch_no = 1;
+  ReportType report_type = 2;
+  // Codes minted in this batch.
+  google.protobuf.Int32Value count = 3;
+  // Codes already redeemed.
+  google.protobuf.Int32Value used_count = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  google.protobuf.Timestamp created_at = 6;
+  // Absent = live batch; present = the moment the operator disabled it.
+  // Disabling voids every unredeemed code in the batch on the spot —
+  // grants already landed stay landed, the same permanence a settled
+  // order gets.
+  google.protobuf.Timestamp disabled_at = 7;
+}
+
 message ActivationCode {
   google.protobuf.StringValue code = 1;
   ReportType report_type = 2;
@@ -124,6 +177,15 @@ message ActivationCode {
   google.protobuf.Int32Value used_count = 4;
   google.protobuf.Timestamp expires_at = 5;
   google.protobuf.Timestamp created_at = 6;
+  // The minting batch this code belongs to; absent only on rows older
+  // than the batch model itself.
+  google.protobuf.StringValue batch_no = 7;
+  // The redeem's trail, hydrated from the grant the redeem landed:
+  // absent on an unredeemed code. user_id is the member link target;
+  // nickname is the local profile fold operators read.
+  google.protobuf.Timestamp redeemed_at = 8;
+  google.protobuf.StringValue user_id = 9;
+  google.protobuf.StringValue nickname = 10;
 }
 
 message GenerateActivationCodesRequest {
@@ -154,16 +216,117 @@ message GenerateActivationCodesResponse {
   // The codes in full, this once and on every later list — generation
   // answers what was minted so the operator hands them out.
   repeated string codes = 1;
+  // The batch these codes share — the handle for the detail page and
+  // every later status flip. Plain string, not a wrapper: generation
+  // succeeded means the batch exists, absence is not a state this field
+  // can carry.
+  string batch_no = 2;
+}
+
+message SetActivationBatchStatusRequest {
+  string batch_no = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 32
+    }
+  ];
+  // True = disable (unredeemed codes void immediately), false = re-enable.
+  optional bool disabled = 2 [(buf.validate.field).required = true];
+}
+
+message SetActivationBatchStatusResponse {
+  ActivationBatch batch = 1;
+}
+
+message ExportActivationCodesRequest {
+  // An export hands out usable code values — that hand-out is the
+  // sensitive act, so the RPC carries ACTION_WRITE and lands one audit
+  // line per export even though it changes nothing.
+  // Absent = every batch; present = the named batch's codes.
+  optional string batch_no = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
+  // Absent = every code; the natural ask is the unredeemed remainder an
+  // operator is about to hand out.
+  optional ActivationCodeStatus code_status = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  // Same find-one filter as the list — an export answers the visible
+  // filter, never a wider set.
+  optional string code = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
+}
+
+message ExportActivationCodesResponse {
+  // The whole filtered set in one answer, no paging — a batch tops out
+  // at a thousand codes, so the export stays one payload.
+  repeated ActivationCode codes = 1;
 }
 
 message ListActivationCodesRequest {
   cyber.shared.common.v1.PageRequest page = 1;
   optional ReportType report_type = 2;
+  // Present = one batch's code table (the detail page); absent = the
+  // flat all-codes view.
+  optional string batch_no = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
+  optional ActivationCodeStatus code_status = 4 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  // Present = the exact code an operator is chasing — the detail page's
+  // find-one search box; a no-match code answers the empty page.
+  optional string code = 5 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
 }
 
 message ListActivationCodesResponse {
   cyber.shared.common.v1.PageResponse page = 1;
   repeated ActivationCode codes = 2;
+}
+
+// The two states a code row reads in — redeemed means its single use is
+// taken, unused means still spendable (unless the batch is disabled or
+// the deadline passed; both are batch-level facts, not row states).
+enum ActivationCodeStatus {
+  ACTIVATION_CODE_STATUS_UNSPECIFIED = 0;
+  ACTIVATION_CODE_STATUS_UNUSED = 1;
+  ACTIVATION_CODE_STATUS_REDEEMED = 2;
+}
+
+message ListActivationBatchesRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional ReportType report_type = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  // Absent = every batch; true = disabled only, false = live only.
+  optional bool disabled = 3;
+  // Exact-match lookup — the detail page's header facts in one answer.
+  optional string batch_no = 4 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 32
+  }];
+}
+
+message ListActivationBatchesResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  // Newest batch first.
+  repeated ActivationBatch batches = 2;
+  // Fold over every batch, independent of the applied filters — the
+  // footer's one count line instead of one query per number.
+  google.protobuf.Int32Value total_batches = 3;
+  google.protobuf.Int32Value total_codes = 4;
+  google.protobuf.Int32Value used_codes = 5;
 }
 
 message SetReportAccessPolicyRequest {

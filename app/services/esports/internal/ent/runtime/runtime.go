@@ -4,6 +4,7 @@ package runtime
 
 import (
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/activationbatch"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
@@ -118,6 +119,76 @@ func init() {
 	abilityscore.DefaultID = abilityscoreDescID.Default.(func() string)
 	// abilityscore.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	abilityscore.IDValidator = abilityscoreDescID.Validators[0].(func(string) error)
+	activationbatchMixin := schema.ActivationBatch{}.Mixin()
+	activationbatchMixinHooks2 := activationbatchMixin[2].Hooks()
+	activationbatch.Hooks[0] = activationbatchMixinHooks2[0]
+	activationbatch.Hooks[1] = activationbatchMixinHooks2[1]
+	activationbatchMixinInters2 := activationbatchMixin[2].Interceptors()
+	activationbatch.Interceptors[0] = activationbatchMixinInters2[0]
+	activationbatchMixinFields0 := activationbatchMixin[0].Fields()
+	_ = activationbatchMixinFields0
+	activationbatchMixinFields1 := activationbatchMixin[1].Fields()
+	_ = activationbatchMixinFields1
+	activationbatchMixinFields2 := activationbatchMixin[2].Fields()
+	_ = activationbatchMixinFields2
+	activationbatchFields := schema.ActivationBatch{}.Fields()
+	_ = activationbatchFields
+	// activationbatchDescCreatedAt is the schema descriptor for created_at field.
+	activationbatchDescCreatedAt := activationbatchMixinFields1[0].Descriptor()
+	// activationbatch.DefaultCreatedAt holds the default value on creation for the created_at field.
+	activationbatch.DefaultCreatedAt = activationbatchDescCreatedAt.Default.(func() time.Time)
+	// activationbatchDescUpdatedAt is the schema descriptor for updated_at field.
+	activationbatchDescUpdatedAt := activationbatchMixinFields1[1].Descriptor()
+	// activationbatch.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	activationbatch.DefaultUpdatedAt = activationbatchDescUpdatedAt.Default.(func() time.Time)
+	// activationbatch.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	activationbatch.UpdateDefaultUpdatedAt = activationbatchDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// activationbatchDescTenantID is the schema descriptor for tenant_id field.
+	activationbatchDescTenantID := activationbatchMixinFields2[0].Descriptor()
+	// activationbatch.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	activationbatch.TenantIDValidator = activationbatchDescTenantID.Validators[0].(func(string) error)
+	// activationbatchDescNo is the schema descriptor for no field.
+	activationbatchDescNo := activationbatchFields[0].Descriptor()
+	// activationbatch.NoValidator is a validator for the "no" field. It is called by the builders before save.
+	activationbatch.NoValidator = func() func(string) error {
+		validators := activationbatchDescNo.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(no string) error {
+			for _, fn := range fns {
+				if err := fn(no); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// activationbatchDescCreatedBy is the schema descriptor for created_by field.
+	activationbatchDescCreatedBy := activationbatchFields[3].Descriptor()
+	// activationbatch.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
+	activationbatch.CreatedByValidator = func() func(string) error {
+		validators := activationbatchDescCreatedBy.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(created_by string) error {
+			for _, fn := range fns {
+				if err := fn(created_by); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// activationbatchDescID is the schema descriptor for id field.
+	activationbatchDescID := activationbatchMixinFields0[0].Descriptor()
+	// activationbatch.DefaultID holds the default value on creation for the id field.
+	activationbatch.DefaultID = activationbatchDescID.Default.(func() string)
+	// activationbatch.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	activationbatch.IDValidator = activationbatchDescID.Validators[0].(func(string) error)
 	activationcodeMixin := schema.ActivationCode{}.Mixin()
 	activationcodeMixinHooks2 := activationcodeMixin[2].Hooks()
 	activationcode.Hooks[0] = activationcodeMixinHooks2[0]
@@ -172,8 +243,12 @@ func init() {
 	activationcodeDescUsedCount := activationcodeFields[3].Descriptor()
 	// activationcode.DefaultUsedCount holds the default value on creation for the used_count field.
 	activationcode.DefaultUsedCount = activationcodeDescUsedCount.Default.(int)
+	// activationcodeDescRedeemedBy is the schema descriptor for redeemed_by field.
+	activationcodeDescRedeemedBy := activationcodeFields[4].Descriptor()
+	// activationcode.RedeemedByValidator is a validator for the "redeemed_by" field. It is called by the builders before save.
+	activationcode.RedeemedByValidator = activationcodeDescRedeemedBy.Validators[0].(func(string) error)
 	// activationcodeDescCreatedBy is the schema descriptor for created_by field.
-	activationcodeDescCreatedBy := activationcodeFields[5].Descriptor()
+	activationcodeDescCreatedBy := activationcodeFields[7].Descriptor()
 	// activationcode.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
 	activationcode.CreatedByValidator = func() func(string) error {
 		validators := activationcodeDescCreatedBy.Validators
@@ -190,6 +265,10 @@ func init() {
 			return nil
 		}
 	}()
+	// activationcodeDescBatchID is the schema descriptor for batch_id field.
+	activationcodeDescBatchID := activationcodeFields[8].Descriptor()
+	// activationcode.BatchIDValidator is a validator for the "batch_id" field. It is called by the builders before save.
+	activationcode.BatchIDValidator = activationcodeDescBatchID.Validators[0].(func(string) error)
 	// activationcodeDescID is the schema descriptor for id field.
 	activationcodeDescID := activationcodeMixinFields0[0].Descriptor()
 	// activationcode.DefaultID holds the default value on creation for the id field.

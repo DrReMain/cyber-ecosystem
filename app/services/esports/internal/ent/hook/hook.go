@@ -20,6 +20,18 @@ func (f AbilityScoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityScoreMutation", m)
 }
 
+// The ActivationBatchFunc type is an adapter to allow the use of ordinary
+// function as ActivationBatch mutator.
+type ActivationBatchFunc func(context.Context, *ent.ActivationBatchMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ActivationBatchFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ActivationBatchMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ActivationBatchMutation", m)
+}
+
 // The ActivationCodeFunc type is an adapter to allow the use of ordinary
 // function as ActivationCode mutator.
 type ActivationCodeFunc func(context.Context, *ent.ActivationCodeMutation) (ent.Value, error)

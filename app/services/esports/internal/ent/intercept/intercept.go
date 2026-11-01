@@ -8,6 +8,7 @@ import (
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/activationbatch"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
@@ -108,6 +109,33 @@ func (f TraverseAbilityScore) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.AbilityScoreQuery", q)
+}
+
+// The ActivationBatchFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ActivationBatchFunc func(context.Context, *ent.ActivationBatchQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ActivationBatchFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ActivationBatchQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ActivationBatchQuery", q)
+}
+
+// The TraverseActivationBatch type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseActivationBatch func(context.Context, *ent.ActivationBatchQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseActivationBatch) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseActivationBatch) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ActivationBatchQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ActivationBatchQuery", q)
 }
 
 // The ActivationCodeFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -493,6 +521,8 @@ func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
 	case *ent.AbilityScoreQuery:
 		return &query[*ent.AbilityScoreQuery, predicate.AbilityScore, abilityscore.OrderOption]{typ: ent.TypeAbilityScore, tq: q}, nil
+	case *ent.ActivationBatchQuery:
+		return &query[*ent.ActivationBatchQuery, predicate.ActivationBatch, activationbatch.OrderOption]{typ: ent.TypeActivationBatch, tq: q}, nil
 	case *ent.ActivationCodeQuery:
 		return &query[*ent.ActivationCodeQuery, predicate.ActivationCode, activationcode.OrderOption]{typ: ent.TypeActivationCode, tq: q}, nil
 	case *ent.EntitlementQuery:

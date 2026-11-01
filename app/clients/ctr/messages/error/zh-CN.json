@@ -126,6 +126,7 @@
   "error_ESPORTS_ACTIVATION_CODE_INVALID": "激活码无效",
   "error_ESPORTS_ACTIVATION_CODE_EXPIRED": "激活码已过期",
   "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "激活码已被使用",
+  "error_ESPORTS_ACTIVATION_CODE_DISABLED": "该批次已停用，激活码无法使用",
   "error_ESPORTS_REPORT_POLICY_NOT_READY": "该策略暂未启用，请稍后再试",
   "error_ESPORTS_REPORT_RECORD_NOT_FOUND": "测评记录不存在",
   "error_ESPORTS_REPORT_RECORD_NOT_OWNED": "只能查看自己的测评报告",

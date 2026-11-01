@@ -126,6 +126,7 @@
   "error_ESPORTS_ACTIVATION_CODE_INVALID": "رمز التنشيط غير صالح",
   "error_ESPORTS_ACTIVATION_CODE_EXPIRED": "انتهت صلاحية رمز التنشيط",
   "error_ESPORTS_ACTIVATION_CODE_EXHAUSTED": "تم استخدام رمز التنشيط بالفعل",
+  "error_ESPORTS_ACTIVATION_CODE_DISABLED": "تم تعطيل هذه الدفعة؛ لا يمكن استخدام الرمز",
   "error_ESPORTS_REPORT_POLICY_NOT_READY": "هذه السياسة غير متاحة بعد؛ حاول مرة أخرى لاحقًا",
   "error_ESPORTS_REPORT_RECORD_NOT_FOUND": "لم يتم العثور على سجل الاختبار",
   "error_ESPORTS_REPORT_RECORD_NOT_OWNED": "يمكنك عرض تقاريرك فقط",

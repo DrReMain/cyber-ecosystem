@@ -31,10 +31,16 @@ func (ActivationCode) Fields() []ent.Field {
 			Comment("redeems allowed; generation mints single-use codes, the field keeps the redeem guard general"),
 		field.Int("used_count").Default(0).
 			Comment("redeems taken; the conditional UPDATE increments under the quantity guard"),
+		field.String("redeemed_by").MaxRuneLen(20).Optional().Nillable().
+			Comment("the member the single use went to, set by the same conditional UPDATE that takes it — the code row is the redeem's own record, the family grant it produced may later be ratcheted by a newer code and lose this trail"),
+		field.Time("redeemed_at").Optional().Nillable().
+			Comment("when the use was taken; written with redeemed_by in the one arbitration"),
 		field.Time("expires_at").
 			Comment("code validity deadline; a redeem after it refuses even with uses left"),
 		field.String("created_by").NotEmpty().MaxRuneLen(20).Immutable().
 			Comment("admin identity that minted the batch (audit join)"),
+		field.String("batch_id").MaxLen(32).Optional().Nillable().Immutable().
+			Comment("the minting batch; null only on rows predating the batch model"),
 	}
 }
 
@@ -54,6 +60,7 @@ func (ActivationCode) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("code").Unique(),
 		index.Fields("report_type", "created_at"),
+		index.Fields("batch_id"),
 	}
 }
 

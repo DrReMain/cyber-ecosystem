@@ -35,6 +35,7 @@
       "./messages/esports-user-detail/{locale}.json",
       "./messages/esports-members/{locale}.json",
       "./messages/esports-activation-codes/{locale}.json",
+      "./messages/esports-activation-batch/{locale}.json",
       "./messages/esports-report-policies/{locale}.json",
       "./messages/esports-tests/{locale}.json",
       "./messages/esports-skus/{locale}.json",

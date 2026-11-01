@@ -343,6 +343,29 @@ paths:
                         - REPORT_TYPE_SCHOOL
                     type: string
                     format: enum
+                - name: batchNo
+                  in: query
+                  description: |-
+                    Present = one batch's code table (the detail page); absent = the
+                     flat all-codes view.
+                  schema:
+                    type: string
+                - name: codeStatus
+                  in: query
+                  schema:
+                    enum:
+                        - ACTIVATION_CODE_STATUS_UNSPECIFIED
+                        - ACTIVATION_CODE_STATUS_UNUSED
+                        - ACTIVATION_CODE_STATUS_REDEEMED
+                    type: string
+                    format: enum
+                - name: code
+                  in: query
+                  description: |-
+                    Present = the exact code an operator is chasing — the detail page's
+                     find-one search box; a no-match code answers the empty page.
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -350,6 +373,122 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.ListActivationCodesResponse'
+    /api/v1/esports/activation-codes/batches:
+        get:
+            tags:
+                - EntitleAdminService
+            operationId: EntitleAdminService_ListActivationBatches
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: reportType
+                  in: query
+                  schema:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+                - name: disabled
+                  in: query
+                  description: Absent = every batch; true = disabled only, false = live only.
+                  schema:
+                    type: boolean
+                - name: batchNo
+                  in: query
+                  description: Exact-match lookup — the detail page's header facts in one answer.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListActivationBatchesResponse'
+    /api/v1/esports/activation-codes/batches/{batchNo}/status:
+        put:
+            tags:
+                - EntitleAdminService
+            operationId: EntitleAdminService_SetActivationBatchStatus
+            parameters:
+                - name: batchNo
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SetActivationBatchStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SetActivationBatchStatusResponse'
+    /api/v1/esports/activation-codes/export:
+        post:
+            tags:
+                - EntitleAdminService
+            operationId: EntitleAdminService_ExportActivationCodes
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.ExportActivationCodesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ExportActivationCodesResponse'
     /api/v1/esports/activation-codes/generate:
         post:
             tags:
@@ -3596,6 +3735,49 @@ components:
         cyber.agent.v1.UpdateSessionResponse:
             type: object
             properties: {}
+        cyber.esports.v1.ActivationBatch:
+            type: object
+            properties:
+                batchNo:
+                    type: string
+                    description: |-
+                        Human-shape batch number (B-YYMM-XXXX) — the string support quotes
+                         on the phone.
+                reportType:
+                    enum:
+                        - REPORT_TYPE_UNSPECIFIED
+                        - REPORT_TYPE_COGNITIVE
+                        - REPORT_TYPE_CAREER
+                        - REPORT_TYPE_SCHOOL
+                    type: string
+                    format: enum
+                count:
+                    type: integer
+                    description: Codes minted in this batch.
+                    format: int32
+                usedCount:
+                    type: integer
+                    description: Codes already redeemed.
+                    format: int32
+                expiresAt:
+                    type: string
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
+                disabledAt:
+                    type: string
+                    description: |-
+                        Absent = live batch; present = the moment the operator disabled it.
+                         Disabling voids every unredeemed code in the batch on the spot —
+                         grants already landed stay landed, the same permanence a settled
+                         order gets.
+                    format: date-time
+            description: |-
+                One generation call's mint: the unit an operator disables, exports,
+                 and reads burn-down by. Count facts are aggregates over the code rows
+                 — the batch row carries only batch-level truth (family, deadline, the
+                 disable flip), so the two can never drift.
         cyber.esports.v1.ActivationCode:
             type: object
             properties:
@@ -3621,6 +3803,22 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+                batchNo:
+                    type: string
+                    description: |-
+                        The minting batch this code belongs to; absent only on rows older
+                         than the batch model itself.
+                redeemedAt:
+                    type: string
+                    description: |-
+                        The redeem's trail, hydrated from the grant the redeem landed:
+                         absent on an unredeemed code. user_id is the member link target;
+                         nickname is the local profile fold operators read.
+                    format: date-time
+                userId:
+                    type: string
+                nickname:
+                    type: string
         cyber.esports.v1.AdminOrder:
             type: object
             properties:
@@ -3985,6 +4183,41 @@ components:
                 cost:
                     type: integer
                     format: int32
+        cyber.esports.v1.ExportActivationCodesRequest:
+            type: object
+            properties:
+                batchNo:
+                    type: string
+                    description: |-
+                        An export hands out usable code values — that hand-out is the
+                         sensitive act, so the RPC carries ACTION_WRITE and lands one audit
+                         line per export even though it changes nothing.
+                         Absent = every batch; present = the named batch's codes.
+                codeStatus:
+                    enum:
+                        - ACTIVATION_CODE_STATUS_UNSPECIFIED
+                        - ACTIVATION_CODE_STATUS_UNUSED
+                        - ACTIVATION_CODE_STATUS_REDEEMED
+                    type: string
+                    description: |-
+                        Absent = every code; the natural ask is the unredeemed remainder an
+                         operator is about to hand out.
+                    format: enum
+                code:
+                    type: string
+                    description: |-
+                        Same find-one filter as the list — an export answers the visible
+                         filter, never a wider set.
+        cyber.esports.v1.ExportActivationCodesResponse:
+            type: object
+            properties:
+                codes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ActivationCode'
+                    description: |-
+                        The whole filtered set in one answer, no paging — a batch tops out
+                         at a thousand codes, so the export stays one payload.
         cyber.esports.v1.FlashAimingDetail:
             type: object
             properties:
@@ -4080,6 +4313,13 @@ components:
                     description: |-
                         The codes in full, this once and on every later list — generation
                          answers what was minted so the operator hands them out.
+                batchNo:
+                    type: string
+                    description: |-
+                        The batch these codes share — the handle for the detail page and
+                         every later status flip. Plain string, not a wrapper: generation
+                         succeeded means the batch exists, absence is not a state this field
+                         can carry.
         cyber.esports.v1.GetAbilityDigestRequest:
             type: object
             properties: {}
@@ -4472,6 +4712,28 @@ components:
             properties:
                 membership:
                     $ref: '#/components/schemas/cyber.esports.v1.MembershipSummary'
+        cyber.esports.v1.ListActivationBatchesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                batches:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.ActivationBatch'
+                    description: Newest batch first.
+                totalBatches:
+                    type: integer
+                    description: |-
+                        Fold over every batch, independent of the applied filters — the
+                         footer's one count line instead of one query per number.
+                    format: int32
+                totalCodes:
+                    type: integer
+                    format: int32
+                usedCodes:
+                    type: integer
+                    format: int32
         cyber.esports.v1.ListActivationCodesResponse:
             type: object
             properties:
@@ -5432,6 +5694,19 @@ components:
                 One ability's session verdict — the three numbers the settlement face
                  keeps distinct: this session's best, the previous session's word, and
                  the cross-session best.
+        cyber.esports.v1.SetActivationBatchStatusRequest:
+            type: object
+            properties:
+                batchNo:
+                    type: string
+                disabled:
+                    type: boolean
+                    description: True = disable (unredeemed codes void immediately), false = re-enable.
+        cyber.esports.v1.SetActivationBatchStatusResponse:
+            type: object
+            properties:
+                batch:
+                    $ref: '#/components/schemas/cyber.esports.v1.ActivationBatch'
         cyber.esports.v1.SetReportAccessPolicyRequest:
             type: object
             properties:
@@ -7534,12 +7809,13 @@ tags:
          operator runs by hand. A code is a type code — the pricing ruling
          retired single-record codes, so redeeming opens one report family,
          never one trial's report. Generation mints each code for a single
-         redeem; an operator who needs N hands-out mints N. Codes live in clear
-         text because operators re-copy them for support. A membership grant is
-         the operator's twin of a settled order: it lands the same ledger row
-         without ever touching the payment pipeline. This whole service is a
-         strippable module: deployments without the operator plane drop it and
-         the business faces never notice.
+         redeem; an operator who needs N hands-out mints N, and one generation
+         call is one batch — the unit the operator disables, exports, and reads
+         progress by. Codes live in clear text because operators re-copy them
+         for support. A membership grant is the operator's twin of a settled
+         order: it lands the same ledger row without ever touching the payment
+         pipeline. This whole service is a strippable module: deployments
+         without the operator plane drop it and the business faces never notice.
     - name: EntitlementService
       description: |-
         The member's entitlement faces. Redeem is idempotent per (member,

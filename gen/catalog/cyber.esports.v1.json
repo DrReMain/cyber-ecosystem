@@ -7,6 +7,19 @@
     "comment": "权益运营",
     "methods": [
       {
+        "name": "ExportActivationCodes",
+        "full_name": "cyber.esports.v1.EntitleAdminService.ExportActivationCodes",
+        "request_name": "ExportActivationCodesRequest",
+        "request_full_name": "cyber.esports.v1.ExportActivationCodesRequest",
+        "response_name": "ExportActivationCodesResponse",
+        "response_full_name": "cyber.esports.v1.ExportActivationCodesResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/activation-codes/export",
+        "comment": "导出激活码",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
         "name": "GenerateActivationCodes",
         "full_name": "cyber.esports.v1.EntitleAdminService.GenerateActivationCodes",
         "request_name": "GenerateActivationCodesRequest",
@@ -46,6 +59,19 @@
         "datascope": false
       },
       {
+        "name": "ListActivationBatches",
+        "full_name": "cyber.esports.v1.EntitleAdminService.ListActivationBatches",
+        "request_name": "ListActivationBatchesRequest",
+        "request_full_name": "cyber.esports.v1.ListActivationBatchesRequest",
+        "response_name": "ListActivationBatchesResponse",
+        "response_full_name": "cyber.esports.v1.ListActivationBatchesResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/activation-codes/batches",
+        "comment": "激活码批次列表",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
         "name": "ListActivationCodes",
         "full_name": "cyber.esports.v1.EntitleAdminService.ListActivationCodes",
         "request_name": "ListActivationCodesRequest",
@@ -81,6 +107,19 @@
         "http_method": "GET",
         "http_path": "/api/v1/esports/report-access-policies",
         "comment": "报告访问策略列表",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "SetActivationBatchStatus",
+        "full_name": "cyber.esports.v1.EntitleAdminService.SetActivationBatchStatus",
+        "request_name": "SetActivationBatchStatusRequest",
+        "request_full_name": "cyber.esports.v1.SetActivationBatchStatusRequest",
+        "response_name": "SetActivationBatchStatusResponse",
+        "response_full_name": "cyber.esports.v1.SetActivationBatchStatusResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/activation-codes/batches/{batch_no}/status",
+        "comment": "停用/启用激活码批次",
         "access": "ADMIN",
         "datascope": false
       },

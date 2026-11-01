@@ -56,6 +56,46 @@ func (_u *ActivationCodeUpdate) AddUsedCount(v int) *ActivationCodeUpdate {
 	return _u
 }
 
+// SetRedeemedBy sets the "redeemed_by" field.
+func (_u *ActivationCodeUpdate) SetRedeemedBy(v string) *ActivationCodeUpdate {
+	_u.mutation.SetRedeemedBy(v)
+	return _u
+}
+
+// SetNillableRedeemedBy sets the "redeemed_by" field if the given value is not nil.
+func (_u *ActivationCodeUpdate) SetNillableRedeemedBy(v *string) *ActivationCodeUpdate {
+	if v != nil {
+		_u.SetRedeemedBy(*v)
+	}
+	return _u
+}
+
+// ClearRedeemedBy clears the value of the "redeemed_by" field.
+func (_u *ActivationCodeUpdate) ClearRedeemedBy() *ActivationCodeUpdate {
+	_u.mutation.ClearRedeemedBy()
+	return _u
+}
+
+// SetRedeemedAt sets the "redeemed_at" field.
+func (_u *ActivationCodeUpdate) SetRedeemedAt(v time.Time) *ActivationCodeUpdate {
+	_u.mutation.SetRedeemedAt(v)
+	return _u
+}
+
+// SetNillableRedeemedAt sets the "redeemed_at" field if the given value is not nil.
+func (_u *ActivationCodeUpdate) SetNillableRedeemedAt(v *time.Time) *ActivationCodeUpdate {
+	if v != nil {
+		_u.SetRedeemedAt(*v)
+	}
+	return _u
+}
+
+// ClearRedeemedAt clears the value of the "redeemed_at" field.
+func (_u *ActivationCodeUpdate) ClearRedeemedAt() *ActivationCodeUpdate {
+	_u.mutation.ClearRedeemedAt()
+	return _u
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (_u *ActivationCodeUpdate) SetExpiresAt(v time.Time) *ActivationCodeUpdate {
 	_u.mutation.SetExpiresAt(v)
@@ -117,6 +157,16 @@ func (_u *ActivationCodeUpdate) defaults() error {
 	return nil
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *ActivationCodeUpdate) check() error {
+	if v, ok := _u.mutation.RedeemedBy(); ok {
+		if err := activationcode.RedeemedByValidator(v); err != nil {
+			return &ValidationError{Name: "redeemed_by", err: fmt.Errorf(`ent: validator failed for field "ActivationCode.redeemed_by": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *ActivationCodeUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ActivationCodeUpdate {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -124,6 +174,9 @@ func (_u *ActivationCodeUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) 
 }
 
 func (_u *ActivationCodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(activationcode.Table, activationcode.Columns, sqlgraph.NewFieldSpec(activationcode.FieldID, field.TypeString))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -141,8 +194,23 @@ func (_u *ActivationCodeUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if value, ok := _u.mutation.AddedUsedCount(); ok {
 		_spec.AddField(activationcode.FieldUsedCount, field.TypeInt, value)
 	}
+	if value, ok := _u.mutation.RedeemedBy(); ok {
+		_spec.SetField(activationcode.FieldRedeemedBy, field.TypeString, value)
+	}
+	if _u.mutation.RedeemedByCleared() {
+		_spec.ClearField(activationcode.FieldRedeemedBy, field.TypeString)
+	}
+	if value, ok := _u.mutation.RedeemedAt(); ok {
+		_spec.SetField(activationcode.FieldRedeemedAt, field.TypeTime, value)
+	}
+	if _u.mutation.RedeemedAtCleared() {
+		_spec.ClearField(activationcode.FieldRedeemedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(activationcode.FieldExpiresAt, field.TypeTime, value)
+	}
+	if _u.mutation.BatchIDCleared() {
+		_spec.ClearField(activationcode.FieldBatchID, field.TypeString)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -190,6 +258,46 @@ func (_u *ActivationCodeUpdateOne) SetNillableUsedCount(v *int) *ActivationCodeU
 // AddUsedCount adds value to the "used_count" field.
 func (_u *ActivationCodeUpdateOne) AddUsedCount(v int) *ActivationCodeUpdateOne {
 	_u.mutation.AddUsedCount(v)
+	return _u
+}
+
+// SetRedeemedBy sets the "redeemed_by" field.
+func (_u *ActivationCodeUpdateOne) SetRedeemedBy(v string) *ActivationCodeUpdateOne {
+	_u.mutation.SetRedeemedBy(v)
+	return _u
+}
+
+// SetNillableRedeemedBy sets the "redeemed_by" field if the given value is not nil.
+func (_u *ActivationCodeUpdateOne) SetNillableRedeemedBy(v *string) *ActivationCodeUpdateOne {
+	if v != nil {
+		_u.SetRedeemedBy(*v)
+	}
+	return _u
+}
+
+// ClearRedeemedBy clears the value of the "redeemed_by" field.
+func (_u *ActivationCodeUpdateOne) ClearRedeemedBy() *ActivationCodeUpdateOne {
+	_u.mutation.ClearRedeemedBy()
+	return _u
+}
+
+// SetRedeemedAt sets the "redeemed_at" field.
+func (_u *ActivationCodeUpdateOne) SetRedeemedAt(v time.Time) *ActivationCodeUpdateOne {
+	_u.mutation.SetRedeemedAt(v)
+	return _u
+}
+
+// SetNillableRedeemedAt sets the "redeemed_at" field if the given value is not nil.
+func (_u *ActivationCodeUpdateOne) SetNillableRedeemedAt(v *time.Time) *ActivationCodeUpdateOne {
+	if v != nil {
+		_u.SetRedeemedAt(*v)
+	}
+	return _u
+}
+
+// ClearRedeemedAt clears the value of the "redeemed_at" field.
+func (_u *ActivationCodeUpdateOne) ClearRedeemedAt() *ActivationCodeUpdateOne {
+	_u.mutation.ClearRedeemedAt()
 	return _u
 }
 
@@ -267,6 +375,16 @@ func (_u *ActivationCodeUpdateOne) defaults() error {
 	return nil
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *ActivationCodeUpdateOne) check() error {
+	if v, ok := _u.mutation.RedeemedBy(); ok {
+		if err := activationcode.RedeemedByValidator(v); err != nil {
+			return &ValidationError{Name: "redeemed_by", err: fmt.Errorf(`ent: validator failed for field "ActivationCode.redeemed_by": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *ActivationCodeUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ActivationCodeUpdateOne {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -274,6 +392,9 @@ func (_u *ActivationCodeUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder
 }
 
 func (_u *ActivationCodeUpdateOne) sqlSave(ctx context.Context) (_node *ActivationCode, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(activationcode.Table, activationcode.Columns, sqlgraph.NewFieldSpec(activationcode.FieldID, field.TypeString))
 	id, ok := _u.mutation.ID()
 	if !ok {
@@ -308,8 +429,23 @@ func (_u *ActivationCodeUpdateOne) sqlSave(ctx context.Context) (_node *Activati
 	if value, ok := _u.mutation.AddedUsedCount(); ok {
 		_spec.AddField(activationcode.FieldUsedCount, field.TypeInt, value)
 	}
+	if value, ok := _u.mutation.RedeemedBy(); ok {
+		_spec.SetField(activationcode.FieldRedeemedBy, field.TypeString, value)
+	}
+	if _u.mutation.RedeemedByCleared() {
+		_spec.ClearField(activationcode.FieldRedeemedBy, field.TypeString)
+	}
+	if value, ok := _u.mutation.RedeemedAt(); ok {
+		_spec.SetField(activationcode.FieldRedeemedAt, field.TypeTime, value)
+	}
+	if _u.mutation.RedeemedAtCleared() {
+		_spec.ClearField(activationcode.FieldRedeemedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(activationcode.FieldExpiresAt, field.TypeTime, value)
+	}
+	if _u.mutation.BatchIDCleared() {
+		_spec.ClearField(activationcode.FieldBatchID, field.TypeString)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &ActivationCode{config: _u.config}

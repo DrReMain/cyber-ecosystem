@@ -23,11 +23,13 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/bootstrap"
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/ent"
+	entactivationbatch "cyber-ecosystem/app/services/esports/internal/ent/activationbatch"
 	entactivation "cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	entreportpolicy "cyber-ecosystem/app/services/esports/internal/ent/reportpolicy"
 	"cyber-ecosystem/app/services/esports/internal/ent/schema/local_mixins"
 	enttestrecord "cyber-ecosystem/app/services/esports/internal/ent/testrecord"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
+	"cyber-ecosystem/app/services/esports/internal/module/profile"
 	"cyber-ecosystem/app/services/esports/internal/module/test"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
@@ -65,7 +67,7 @@ func TestAdminReadBackE2E(t *testing.T) {
 	adminCtx := repSubject(abAdmin)
 	entUC := entitle.NewEntitleUC(logger, nil, nil, nil,
 		entitle.NewReportPolicyRP(logger, pf), bootstrap.NewEventSubscriptions(logger))
-	codeUC := entitle.NewCodeUC(logger, nil, entitle.NewActivationCodeRP(logger, pf))
+	codeUC := entitle.NewCodeUC(logger, pf, entitle.NewActivationCodeRP(logger, pf), profile.NewProfileRP(logger, pf))
 	testUC := test.NewTestUC(logger, nil, test.NewTestRP(logger, pf), nil, nil)
 
 	// Face 1 — the policy table: the three families answer as one settled
@@ -108,10 +110,11 @@ func TestAdminReadBackE2E(t *testing.T) {
 
 	// Face 2 — mint and list: generation answers what was minted, the list
 	// keeps showing it, and the code shape is the operator's AC prefix.
-	codes, err := codeUC.Generate(adminCtx, &entitle.GenerateIn{ReportType: shared.ReportCognitive, Count: 2, ExpireDays: 7})
+	gen, err := codeUC.Generate(adminCtx, &entitle.GenerateIn{ReportType: shared.ReportCognitive, Count: 2, ExpireDays: 7})
 	if err != nil {
 		t.Fatalf("mint: %v", err)
 	}
+	codes := gen.Codes
 	if len(codes) != 2 {
 		t.Fatalf("minted %d codes, want 2", len(codes))
 	}
@@ -231,6 +234,9 @@ func abClean(t *testing.T, db *ent.Client) {
 	}
 	if _, err := db.ActivationCode.Delete().Where(entactivation.CreatedBy(abAdmin)).Exec(dctx); err != nil {
 		t.Fatalf("clean codes: %v", err)
+	}
+	if _, err := db.ActivationBatch.Delete().Where(entactivationbatch.CreatedBy(abAdmin)).Exec(dctx); err != nil {
+		t.Fatalf("clean batches: %v", err)
 	}
 	if _, err := db.TestRecord.Delete().Where(enttestrecord.UserID(abUser)).Exec(dctx); err != nil {
 		t.Fatalf("clean records: %v", err)

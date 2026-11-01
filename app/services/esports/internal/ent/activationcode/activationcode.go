@@ -29,10 +29,16 @@ const (
 	FieldQuantity = "quantity"
 	// FieldUsedCount holds the string denoting the used_count field in the database.
 	FieldUsedCount = "used_count"
+	// FieldRedeemedBy holds the string denoting the redeemed_by field in the database.
+	FieldRedeemedBy = "redeemed_by"
+	// FieldRedeemedAt holds the string denoting the redeemed_at field in the database.
+	FieldRedeemedAt = "redeemed_at"
 	// FieldExpiresAt holds the string denoting the expires_at field in the database.
 	FieldExpiresAt = "expires_at"
 	// FieldCreatedBy holds the string denoting the created_by field in the database.
 	FieldCreatedBy = "created_by"
+	// FieldBatchID holds the string denoting the batch_id field in the database.
+	FieldBatchID = "batch_id"
 	// Table holds the table name of the activationcode in the database.
 	Table = "activation_code"
 )
@@ -47,8 +53,11 @@ var Columns = []string{
 	FieldReportType,
 	FieldQuantity,
 	FieldUsedCount,
+	FieldRedeemedBy,
+	FieldRedeemedAt,
 	FieldExpiresAt,
 	FieldCreatedBy,
+	FieldBatchID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -83,8 +92,12 @@ var (
 	DefaultQuantity int
 	// DefaultUsedCount holds the default value on creation for the "used_count" field.
 	DefaultUsedCount int
+	// RedeemedByValidator is a validator for the "redeemed_by" field. It is called by the builders before save.
+	RedeemedByValidator func(string) error
 	// CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
 	CreatedByValidator func(string) error
+	// BatchIDValidator is a validator for the "batch_id" field. It is called by the builders before save.
+	BatchIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -158,6 +171,16 @@ func ByUsedCount(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUsedCount, opts...).ToFunc()
 }
 
+// ByRedeemedBy orders the results by the redeemed_by field.
+func ByRedeemedBy(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRedeemedBy, opts...).ToFunc()
+}
+
+// ByRedeemedAt orders the results by the redeemed_at field.
+func ByRedeemedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRedeemedAt, opts...).ToFunc()
+}
+
 // ByExpiresAt orders the results by the expires_at field.
 func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExpiresAt, opts...).ToFunc()
@@ -166,4 +189,9 @@ func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedBy orders the results by the created_by field.
 func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
+}
+
+// ByBatchID orders the results by the batch_id field.
+func ByBatchID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBatchID, opts...).ToFunc()
 }

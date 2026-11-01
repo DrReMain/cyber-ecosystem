@@ -93,7 +93,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	reportPolicyRP := entitle.NewReportPolicyRP(logger, platformPlatform)
 	entitleUC := entitle.NewEntitleUC(logger, platformPlatform, activationCodeRP, entitlementRP, reportPolicyRP, eventSubscriptions)
 	entitlementService := entitle.NewEntitlementService(logger, entitleUC)
-	codeUC := entitle.NewCodeUC(logger, platformPlatform, activationCodeRP)
+	codeUC := entitle.NewCodeUC(logger, platformPlatform, activationCodeRP, profileRP)
 	skuFactsRP := entitleadmin.NewSkuFactsRP(skuRP)
 	membershipUC := entitleadmin.NewMembershipUC(logger, platformPlatform, entitlementRP, skuFactsRP, systemClient, profileRP)
 	entitleAdminService := entitleadmin.NewEntitleAdminService(logger, codeUC, entitleUC, membershipUC)

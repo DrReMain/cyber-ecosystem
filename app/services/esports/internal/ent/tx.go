@@ -16,6 +16,8 @@ type Tx struct {
 	config
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// ActivationBatch is the client for interacting with the ActivationBatch builders.
+	ActivationBatch *ActivationBatchClient
 	// ActivationCode is the client for interacting with the ActivationCode builders.
 	ActivationCode *ActivationCodeClient
 	// Entitlement is the client for interacting with the Entitlement builders.
@@ -176,6 +178,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
+	tx.ActivationBatch = NewActivationBatchClient(tx.config)
 	tx.ActivationCode = NewActivationCodeClient(tx.config)
 	tx.Entitlement = NewEntitlementClient(tx.config)
 	tx.Game = NewGameClient(tx.config)

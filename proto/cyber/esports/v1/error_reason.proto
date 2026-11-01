@@ -50,6 +50,10 @@ enum Esports {
   ESPORTS_ACTIVATION_CODE_EXHAUSTED = 6152 [(.errors.code) = 400];
   ESPORTS_REPORT_POLICY_NOT_READY = 6153 [(.errors.code) = 400];
   ESPORTS_MEMBERSHIP_NOT_FOUND = 6154 [(.errors.code) = 404];
+  // A batch the operator disabled: distinct from expired (time ran out)
+  // and invalid (never a code) — the operator pulled it, so support can
+  // say exactly that.
+  ESPORTS_ACTIVATION_CODE_DISABLED = 6155 [(.errors.code) = 400];
 
   // 616x: report
   ESPORTS_REPORT_RECORD_NOT_FOUND = 6160 [(.errors.code) = 404];

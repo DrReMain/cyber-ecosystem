@@ -10,7 +10,10 @@ import (
 // Kratos Connect transport server, bridging a gRPC-style implementation.
 func RegisterEntitleAdminServiceConnectServer(srv *connect.Server, svc EntitleAdminServiceServer) {
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/GenerateActivationCodes", svc.GenerateActivationCodes)
+	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/SetActivationBatchStatus", svc.SetActivationBatchStatus)
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/ListActivationCodes", svc.ListActivationCodes)
+	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/ListActivationBatches", svc.ListActivationBatches)
+	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/ExportActivationCodes", svc.ExportActivationCodes)
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy", svc.SetReportAccessPolicy)
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies", svc.ListReportAccessPolicies)
 	connect.HandleUnary(srv, "/cyber.esports.v1.EntitleAdminService/GrantMembership", svc.GrantMembership)

@@ -97,6 +97,34 @@ func (_c *ActivationCodeCreate) SetNillableUsedCount(v *int) *ActivationCodeCrea
 	return _c
 }
 
+// SetRedeemedBy sets the "redeemed_by" field.
+func (_c *ActivationCodeCreate) SetRedeemedBy(v string) *ActivationCodeCreate {
+	_c.mutation.SetRedeemedBy(v)
+	return _c
+}
+
+// SetNillableRedeemedBy sets the "redeemed_by" field if the given value is not nil.
+func (_c *ActivationCodeCreate) SetNillableRedeemedBy(v *string) *ActivationCodeCreate {
+	if v != nil {
+		_c.SetRedeemedBy(*v)
+	}
+	return _c
+}
+
+// SetRedeemedAt sets the "redeemed_at" field.
+func (_c *ActivationCodeCreate) SetRedeemedAt(v time.Time) *ActivationCodeCreate {
+	_c.mutation.SetRedeemedAt(v)
+	return _c
+}
+
+// SetNillableRedeemedAt sets the "redeemed_at" field if the given value is not nil.
+func (_c *ActivationCodeCreate) SetNillableRedeemedAt(v *time.Time) *ActivationCodeCreate {
+	if v != nil {
+		_c.SetRedeemedAt(*v)
+	}
+	return _c
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (_c *ActivationCodeCreate) SetExpiresAt(v time.Time) *ActivationCodeCreate {
 	_c.mutation.SetExpiresAt(v)
@@ -106,6 +134,20 @@ func (_c *ActivationCodeCreate) SetExpiresAt(v time.Time) *ActivationCodeCreate 
 // SetCreatedBy sets the "created_by" field.
 func (_c *ActivationCodeCreate) SetCreatedBy(v string) *ActivationCodeCreate {
 	_c.mutation.SetCreatedBy(v)
+	return _c
+}
+
+// SetBatchID sets the "batch_id" field.
+func (_c *ActivationCodeCreate) SetBatchID(v string) *ActivationCodeCreate {
+	_c.mutation.SetBatchID(v)
+	return _c
+}
+
+// SetNillableBatchID sets the "batch_id" field if the given value is not nil.
+func (_c *ActivationCodeCreate) SetNillableBatchID(v *string) *ActivationCodeCreate {
+	if v != nil {
+		_c.SetBatchID(*v)
+	}
 	return _c
 }
 
@@ -230,6 +272,11 @@ func (_c *ActivationCodeCreate) check() error {
 	if _, ok := _c.mutation.UsedCount(); !ok {
 		return &ValidationError{Name: "used_count", err: errors.New(`ent: missing required field "ActivationCode.used_count"`)}
 	}
+	if v, ok := _c.mutation.RedeemedBy(); ok {
+		if err := activationcode.RedeemedByValidator(v); err != nil {
+			return &ValidationError{Name: "redeemed_by", err: fmt.Errorf(`ent: validator failed for field "ActivationCode.redeemed_by": %w`, err)}
+		}
+	}
 	if _, ok := _c.mutation.ExpiresAt(); !ok {
 		return &ValidationError{Name: "expires_at", err: errors.New(`ent: missing required field "ActivationCode.expires_at"`)}
 	}
@@ -239,6 +286,11 @@ func (_c *ActivationCodeCreate) check() error {
 	if v, ok := _c.mutation.CreatedBy(); ok {
 		if err := activationcode.CreatedByValidator(v); err != nil {
 			return &ValidationError{Name: "created_by", err: fmt.Errorf(`ent: validator failed for field "ActivationCode.created_by": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.BatchID(); ok {
+		if err := activationcode.BatchIDValidator(v); err != nil {
+			return &ValidationError{Name: "batch_id", err: fmt.Errorf(`ent: validator failed for field "ActivationCode.batch_id": %w`, err)}
 		}
 	}
 	if v, ok := _c.mutation.ID(); ok {
@@ -310,6 +362,14 @@ func (_c *ActivationCodeCreate) createSpec() (*ActivationCode, *sqlgraph.CreateS
 		_spec.SetField(activationcode.FieldUsedCount, field.TypeInt, value)
 		_node.UsedCount = value
 	}
+	if value, ok := _c.mutation.RedeemedBy(); ok {
+		_spec.SetField(activationcode.FieldRedeemedBy, field.TypeString, value)
+		_node.RedeemedBy = &value
+	}
+	if value, ok := _c.mutation.RedeemedAt(); ok {
+		_spec.SetField(activationcode.FieldRedeemedAt, field.TypeTime, value)
+		_node.RedeemedAt = &value
+	}
 	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(activationcode.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = value
@@ -317,6 +377,10 @@ func (_c *ActivationCodeCreate) createSpec() (*ActivationCode, *sqlgraph.CreateS
 	if value, ok := _c.mutation.CreatedBy(); ok {
 		_spec.SetField(activationcode.FieldCreatedBy, field.TypeString, value)
 		_node.CreatedBy = value
+	}
+	if value, ok := _c.mutation.BatchID(); ok {
+		_spec.SetField(activationcode.FieldBatchID, field.TypeString, value)
+		_node.BatchID = &value
 	}
 	return _node, _spec
 }
@@ -400,6 +464,42 @@ func (u *ActivationCodeUpsert) AddUsedCount(v int) *ActivationCodeUpsert {
 	return u
 }
 
+// SetRedeemedBy sets the "redeemed_by" field.
+func (u *ActivationCodeUpsert) SetRedeemedBy(v string) *ActivationCodeUpsert {
+	u.Set(activationcode.FieldRedeemedBy, v)
+	return u
+}
+
+// UpdateRedeemedBy sets the "redeemed_by" field to the value that was provided on create.
+func (u *ActivationCodeUpsert) UpdateRedeemedBy() *ActivationCodeUpsert {
+	u.SetExcluded(activationcode.FieldRedeemedBy)
+	return u
+}
+
+// ClearRedeemedBy clears the value of the "redeemed_by" field.
+func (u *ActivationCodeUpsert) ClearRedeemedBy() *ActivationCodeUpsert {
+	u.SetNull(activationcode.FieldRedeemedBy)
+	return u
+}
+
+// SetRedeemedAt sets the "redeemed_at" field.
+func (u *ActivationCodeUpsert) SetRedeemedAt(v time.Time) *ActivationCodeUpsert {
+	u.Set(activationcode.FieldRedeemedAt, v)
+	return u
+}
+
+// UpdateRedeemedAt sets the "redeemed_at" field to the value that was provided on create.
+func (u *ActivationCodeUpsert) UpdateRedeemedAt() *ActivationCodeUpsert {
+	u.SetExcluded(activationcode.FieldRedeemedAt)
+	return u
+}
+
+// ClearRedeemedAt clears the value of the "redeemed_at" field.
+func (u *ActivationCodeUpsert) ClearRedeemedAt() *ActivationCodeUpsert {
+	u.SetNull(activationcode.FieldRedeemedAt)
+	return u
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (u *ActivationCodeUpsert) SetExpiresAt(v time.Time) *ActivationCodeUpsert {
 	u.Set(activationcode.FieldExpiresAt, v)
@@ -446,6 +546,9 @@ func (u *ActivationCodeUpsertOne) UpdateNewValues() *ActivationCodeUpsertOne {
 		}
 		if _, exists := u.create.mutation.CreatedBy(); exists {
 			s.SetIgnore(activationcode.FieldCreatedBy)
+		}
+		if _, exists := u.create.mutation.BatchID(); exists {
+			s.SetIgnore(activationcode.FieldBatchID)
 		}
 	}))
 	return u
@@ -510,6 +613,48 @@ func (u *ActivationCodeUpsertOne) AddUsedCount(v int) *ActivationCodeUpsertOne {
 func (u *ActivationCodeUpsertOne) UpdateUsedCount() *ActivationCodeUpsertOne {
 	return u.Update(func(s *ActivationCodeUpsert) {
 		s.UpdateUsedCount()
+	})
+}
+
+// SetRedeemedBy sets the "redeemed_by" field.
+func (u *ActivationCodeUpsertOne) SetRedeemedBy(v string) *ActivationCodeUpsertOne {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.SetRedeemedBy(v)
+	})
+}
+
+// UpdateRedeemedBy sets the "redeemed_by" field to the value that was provided on create.
+func (u *ActivationCodeUpsertOne) UpdateRedeemedBy() *ActivationCodeUpsertOne {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.UpdateRedeemedBy()
+	})
+}
+
+// ClearRedeemedBy clears the value of the "redeemed_by" field.
+func (u *ActivationCodeUpsertOne) ClearRedeemedBy() *ActivationCodeUpsertOne {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.ClearRedeemedBy()
+	})
+}
+
+// SetRedeemedAt sets the "redeemed_at" field.
+func (u *ActivationCodeUpsertOne) SetRedeemedAt(v time.Time) *ActivationCodeUpsertOne {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.SetRedeemedAt(v)
+	})
+}
+
+// UpdateRedeemedAt sets the "redeemed_at" field to the value that was provided on create.
+func (u *ActivationCodeUpsertOne) UpdateRedeemedAt() *ActivationCodeUpsertOne {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.UpdateRedeemedAt()
+	})
+}
+
+// ClearRedeemedAt clears the value of the "redeemed_at" field.
+func (u *ActivationCodeUpsertOne) ClearRedeemedAt() *ActivationCodeUpsertOne {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.ClearRedeemedAt()
 	})
 }
 
@@ -728,6 +873,9 @@ func (u *ActivationCodeUpsertBulk) UpdateNewValues() *ActivationCodeUpsertBulk {
 			if _, exists := b.mutation.CreatedBy(); exists {
 				s.SetIgnore(activationcode.FieldCreatedBy)
 			}
+			if _, exists := b.mutation.BatchID(); exists {
+				s.SetIgnore(activationcode.FieldBatchID)
+			}
 		}
 	}))
 	return u
@@ -792,6 +940,48 @@ func (u *ActivationCodeUpsertBulk) AddUsedCount(v int) *ActivationCodeUpsertBulk
 func (u *ActivationCodeUpsertBulk) UpdateUsedCount() *ActivationCodeUpsertBulk {
 	return u.Update(func(s *ActivationCodeUpsert) {
 		s.UpdateUsedCount()
+	})
+}
+
+// SetRedeemedBy sets the "redeemed_by" field.
+func (u *ActivationCodeUpsertBulk) SetRedeemedBy(v string) *ActivationCodeUpsertBulk {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.SetRedeemedBy(v)
+	})
+}
+
+// UpdateRedeemedBy sets the "redeemed_by" field to the value that was provided on create.
+func (u *ActivationCodeUpsertBulk) UpdateRedeemedBy() *ActivationCodeUpsertBulk {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.UpdateRedeemedBy()
+	})
+}
+
+// ClearRedeemedBy clears the value of the "redeemed_by" field.
+func (u *ActivationCodeUpsertBulk) ClearRedeemedBy() *ActivationCodeUpsertBulk {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.ClearRedeemedBy()
+	})
+}
+
+// SetRedeemedAt sets the "redeemed_at" field.
+func (u *ActivationCodeUpsertBulk) SetRedeemedAt(v time.Time) *ActivationCodeUpsertBulk {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.SetRedeemedAt(v)
+	})
+}
+
+// UpdateRedeemedAt sets the "redeemed_at" field to the value that was provided on create.
+func (u *ActivationCodeUpsertBulk) UpdateRedeemedAt() *ActivationCodeUpsertBulk {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.UpdateRedeemedAt()
+	})
+}
+
+// ClearRedeemedAt clears the value of the "redeemed_at" field.
+func (u *ActivationCodeUpsertBulk) ClearRedeemedAt() *ActivationCodeUpsertBulk {
+	return u.Update(func(s *ActivationCodeUpsert) {
+		s.ClearRedeemedAt()
 	})
 }
 

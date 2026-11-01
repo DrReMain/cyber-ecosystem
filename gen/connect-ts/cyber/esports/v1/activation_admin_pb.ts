@@ -22,7 +22,71 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/esports/v1/activation_admin.proto.
  */
 export const file_cyber_esports_v1_activation_admin: GenFile = /*@__PURE__*/
-  fileDesc("CidjeWJlci9lc3BvcnRzL3YxL2FjdGl2YXRpb25fYWRtaW4ucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEirwIKDkFjdGl2YXRpb25Db2RlEioKBGNvZGUYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLcmVwb3J0X3R5cGUYAiABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydFR5cGUSLQoIcXVhbnRpdHkYAyABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZRIvCgp1c2VkX2NvdW50GAQgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSLgoKZXhwaXJlc19hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKY3JlYXRlZF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi3QEKHkdlbmVyYXRlQWN0aXZhdGlvbkNvZGVzUmVxdWVzdBJFCgtyZXBvcnRfdHlwZRgBIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VHlwZUINukgKyAEBggEEEAEgAEgAiAEBEiEKBWNvdW50GAIgASgFQg26SArIAQEaBRjoBygBSAGIAQESJwoLZXhwaXJlX2RheXMYAyABKAVCDbpICsgBARoFGMIcKAFIAogBAUIOCgxfcmVwb3J0X3R5cGVCCAoGX2NvdW50Qg4KDF9leHBpcmVfZGF5cyIwCh9HZW5lcmF0ZUFjdGl2YXRpb25Db2Rlc1Jlc3BvbnNlEg0KBWNvZGVzGAEgAygJIpcBChpMaXN0QWN0aXZhdGlvbkNvZGVzUmVxdWVzdBIxCgRwYWdlGAEgASgLMiMuY3liZXIuc2hhcmVkLmNvbW1vbi52MS5QYWdlUmVxdWVzdBI2CgtyZXBvcnRfdHlwZRgCIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VHlwZUgAiAEBQg4KDF9yZXBvcnRfdHlwZSKCAQobTGlzdEFjdGl2YXRpb25Db2Rlc1Jlc3BvbnNlEjIKBHBhZ2UYASABKAsyJC5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXNwb25zZRIvCgVjb2RlcxgCIAMoCzIgLmN5YmVyLmVzcG9ydHMudjEuQWN0aXZhdGlvbkNvZGUiygEKHFNldFJlcG9ydEFjY2Vzc1BvbGljeVJlcXVlc3QSRQoLcmVwb3J0X3R5cGUYASABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydFR5cGVCDbpICsgBAYIBBBABIABIAIgBARJICgZwb2xpY3kYAiABKA4yJC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1BvbGljeUINukgKyAEBggEEEAEgAEgBiAEBQg4KDF9yZXBvcnRfdHlwZUIJCgdfcG9saWN5IogBCh1TZXRSZXBvcnRBY2Nlc3NQb2xpY3lSZXNwb25zZRIxCgtyZXBvcnRfdHlwZRgBIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VHlwZRI0CgZwb2xpY3kYAiABKA4yJC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1BvbGljeSIhCh9MaXN0UmVwb3J0QWNjZXNzUG9saWNpZXNSZXF1ZXN0IlcKIExpc3RSZXBvcnRBY2Nlc3NQb2xpY2llc1Jlc3BvbnNlEjMKCHBvbGljaWVzGAEgAygLMiEuY3liZXIuZXNwb3J0cy52MS5SZXBvcnRQb2xpY3lSb3ci8AEKD1JlcG9ydFBvbGljeVJvdxIxCgtyZXBvcnRfdHlwZRgBIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VHlwZRI0CgZwb2xpY3kYAiABKA4yJC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1BvbGljeRISCgpvdmVycmlkZGVuGAMgASgIEjAKCnVwZGF0ZWRfYnkYBCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoKdXBkYXRlZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAihAQKEU1lbWJlcnNoaXBTdW1tYXJ5Ei0KB3VzZXJfaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoIbmlja25hbWUYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMgoMcGhvbmVfbWFza2VkGAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCmdyYW50ZWRfYXQYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCWRheXNfbGVmdBgGIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlEjIKBnN0YXR1cxgHIAEoDjIiLmN5YmVyLmVzcG9ydHMudjEuTWVtYmVyc2hpcFN0YXR1cxIyCgZzb3VyY2UYCCABKA4yIi5jeWJlci5lc3BvcnRzLnYxLk1lbWJlcnNoaXBTb3VyY2USMQoMcGVyaW9kX2NvdW50GAkgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSMQoMdW5sb2NrX2NvdW50GAogASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUijAIKEE1lbWJlcnNoaXBQZXJpb2QSLgoKZ3JhbnRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMgoGc291cmNlGAMgASgOMiIuY3liZXIuZXNwb3J0cy52MS5NZW1iZXJzaGlwU291cmNlEjAKCnNvdXJjZV9yZWYYBCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMgoGc3RhdHVzGAYgASgOMiIuY3liZXIuZXNwb3J0cy52MS5NZW1iZXJzaGlwU3RhdHVzInkKFkdyYW50TWVtYmVyc2hpcFJlcXVlc3QSIQoHdXNlcl9pZBgBIAEoCUILukgIyAEBcgOYARRIAIgBARIjCghza3VfY29kZRgCIAEoCUIMukgJyAEBcgQQARgySAGIAQFCCgoIX3VzZXJfaWRCCwoJX3NrdV9jb2RlIlIKF0dyYW50TWVtYmVyc2hpcFJlc3BvbnNlEjcKCm1lbWJlcnNoaXAYASABKAsyIy5jeWJlci5lc3BvcnRzLnYxLk1lbWJlcnNoaXBTdW1tYXJ5IjoKGlRlcm1pbmF0ZU1lbWJlcnNoaXBSZXF1ZXN0EhwKB3VzZXJfaWQYASABKAlCC7pICMgBAXIDmAEUIlYKG1Rlcm1pbmF0ZU1lbWJlcnNoaXBSZXNwb25zZRI3CgptZW1iZXJzaGlwGAEgASgLMiMuY3liZXIuZXNwb3J0cy52MS5NZW1iZXJzaGlwU3VtbWFyeSLrAQoWTGlzdE1lbWJlcnNoaXBzUmVxdWVzdBIxCgRwYWdlGAEgASgLMiMuY3liZXIuc2hhcmVkLmNvbW1vbi52MS5QYWdlUmVxdWVzdBJDCgZzdGF0dXMYAiABKA4yIi5jeWJlci5lc3BvcnRzLnYxLk1lbWJlcnNoaXBTdGF0dXNCCrpIB4IBBBABIABIAIgBARJDCgZzb3VyY2UYAyABKA4yIi5jeWJlci5lc3BvcnRzLnYxLk1lbWJlcnNoaXBTb3VyY2VCCrpIB4IBBBABIABIAYgBAUIJCgdfc3RhdHVzQgkKB19zb3VyY2Ui2gIKF0xpc3RNZW1iZXJzaGlwc1Jlc3BvbnNlEjIKBHBhZ2UYASABKAsyJC5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXNwb25zZRI4CgttZW1iZXJzaGlwcxgCIAMoCzIjLmN5YmVyLmVzcG9ydHMudjEuTWVtYmVyc2hpcFN1bW1hcnkSMAoLdG90YWxfY291bnQYAyABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZRIxCgxhY3RpdmVfY291bnQYBCABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZRI4ChNleHBpcmluZ19zb29uX2NvdW50GAUgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSMgoNZXhwaXJlZF9jb3VudBgGIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlIjQKFEdldE1lbWJlcnNoaXBSZXF1ZXN0EhwKB3VzZXJfaWQYASABKAlCC7pICMgBAXIDmAEUIpICChVHZXRNZW1iZXJzaGlwUmVzcG9uc2USNwoKbWVtYmVyc2hpcBgBIAEoCzIjLmN5YmVyLmVzcG9ydHMudjEuTWVtYmVyc2hpcFN1bW1hcnkSMwoHcGVyaW9kcxgCIAMoCzIiLmN5YmVyLmVzcG9ydHMudjEuTWVtYmVyc2hpcFBlcmlvZBIuCghhZ2VfYmFuZBgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIpCgNzZXgYBCABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGVTZXgSMAoMd2VjaGF0X2JvdW5kGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZSrAAQoSUmVwb3J0QWNjZXNzUG9saWN5EiQKIFJFUE9SVF9BQ0NFU1NfUE9MSUNZX1VOU1BFQ0lGSUVEEAASHQoZUkVQT1JUX0FDQ0VTU19QT0xJQ1lfT1BFThABEiMKH1JFUE9SVF9BQ0NFU1NfUE9MSUNZX01FTUJFUlNISVAQAhIfChtSRVBPUlRfQUNDRVNTX1BPTElDWV9URU5BTlQQAxIfChtSRVBPUlRfQUNDRVNTX1BPTElDWV9DTE9TRUQQBCq5AQoQTWVtYmVyc2hpcFN0YXR1cxIhCh1NRU1CRVJTSElQX1NUQVRVU19VTlNQRUNJRklFRBAAEhwKGE1FTUJFUlNISVBfU1RBVFVTX0FDVElWRRABEiMKH01FTUJFUlNISVBfU1RBVFVTX0VYUElSSU5HX1NPT04QAhIdChlNRU1CRVJTSElQX1NUQVRVU19FWFBJUkVEEAMSIAocTUVNQkVSU0hJUF9TVEFUVVNfVEVSTUlOQVRFRBAEKpMBChBNZW1iZXJzaGlwU291cmNlEiEKHU1FTUJFUlNISVBfU09VUkNFX1VOU1BFQ0lGSUVEEAASGwoXTUVNQkVSU0hJUF9TT1VSQ0VfT1JERVIQARIcChhNRU1CRVJTSElQX1NPVVJDRV9NQU5VQUwQAhIhCh1NRU1CRVJTSElQX1NPVVJDRV9MRUdBQ1lfQ09ERRADMrwMChNFbnRpdGxlQWRtaW5TZXJ2aWNlEtUBChdHZW5lcmF0ZUFjdGl2YXRpb25Db2RlcxIwLmN5YmVyLmVzcG9ydHMudjEuR2VuZXJhdGVBY3RpdmF0aW9uQ29kZXNSZXF1ZXN0GjEuY3liZXIuZXNwb3J0cy52MS5HZW5lcmF0ZUFjdGl2YXRpb25Db2Rlc1Jlc3BvbnNlIlWI8QQCitMOGQoV5om56YeP55Sf5oiQ5r+A5rS756CBEAKC0+STAi46ASoiKS9hcGkvdjEvZXNwb3J0cy9hY3RpdmF0aW9uLWNvZGVzL2dlbmVyYXRlErcBChNMaXN0QWN0aXZhdGlvbkNvZGVzEiwuY3liZXIuZXNwb3J0cy52MS5MaXN0QWN0aXZhdGlvbkNvZGVzUmVxdWVzdBotLmN5YmVyLmVzcG9ydHMudjEuTGlzdEFjdGl2YXRpb25Db2Rlc1Jlc3BvbnNlIkOI8QQCitMOEwoP5r+A5rS756CB5YiX6KGoEAGC0+STAiISIC9hcGkvdjEvZXNwb3J0cy9hY3RpdmF0aW9uLWNvZGVzEs0BChVTZXRSZXBvcnRBY2Nlc3NQb2xpY3kSLi5jeWJlci5lc3BvcnRzLnYxLlNldFJlcG9ydEFjY2Vzc1BvbGljeVJlcXVlc3QaLy5jeWJlci5lc3BvcnRzLnYxLlNldFJlcG9ydEFjY2Vzc1BvbGljeVJlc3BvbnNlIlOI8QQCitMOHAoY6K6+572u5oql5ZGK6K6/6Zeu562W55WlEAKC0+STAik6ASoiJC9hcGkvdjEvZXNwb3J0cy9yZXBvcnQtYWNjZXNzLXBvbGljeRLVAQoYTGlzdFJlcG9ydEFjY2Vzc1BvbGljaWVzEjEuY3liZXIuZXNwb3J0cy52MS5MaXN0UmVwb3J0QWNjZXNzUG9saWNpZXNSZXF1ZXN0GjIuY3liZXIuZXNwb3J0cy52MS5MaXN0UmVwb3J0QWNjZXNzUG9saWNpZXNSZXNwb25zZSJSiPEEAorTDhwKGOaKpeWRiuiuv+mXruetlueVpeWIl+ihqBABgtPkkwIoEiYvYXBpL3YxL2VzcG9ydHMvcmVwb3J0LWFjY2Vzcy1wb2xpY2llcxK5AQoPR3JhbnRNZW1iZXJzaGlwEiguY3liZXIuZXNwb3J0cy52MS5HcmFudE1lbWJlcnNoaXBSZXF1ZXN0GikuY3liZXIuZXNwb3J0cy52MS5HcmFudE1lbWJlcnNoaXBSZXNwb25zZSJRiPEEAorTDh0KGeaJi+WKqOW8gOmAmi/nu63otLnkvJrlkZgQAoLT5JMCJjoBKiIhL2FwaS92MS9lc3BvcnRzL21lbWJlcnNoaXBzL2dyYW50EsYBChNUZXJtaW5hdGVNZW1iZXJzaGlwEiwuY3liZXIuZXNwb3J0cy52MS5UZXJtaW5hdGVNZW1iZXJzaGlwUmVxdWVzdBotLmN5YmVyLmVzcG9ydHMudjEuVGVybWluYXRlTWVtYmVyc2hpcFJlc3BvbnNlIlKI8QQCitMOEAoM57uI5q2i5Lya5ZGYEAKC0+STAjQ6ASoiLy9hcGkvdjEvZXNwb3J0cy9tZW1iZXJzaGlwcy97dXNlcl9pZH0vdGVybWluYXRlEqkBCg9MaXN0TWVtYmVyc2hpcHMSKC5jeWJlci5lc3BvcnRzLnYxLkxpc3RNZW1iZXJzaGlwc1JlcXVlc3QaKS5jeWJlci5lc3BvcnRzLnYxLkxpc3RNZW1iZXJzaGlwc1Jlc3BvbnNlIkGI8QQCitMOFgoS5Lya5ZGY566h55CG5YiX6KGoEAGC0+STAh0SGy9hcGkvdjEvZXNwb3J0cy9tZW1iZXJzaGlwcxKnAQoNR2V0TWVtYmVyc2hpcBImLmN5YmVyLmVzcG9ydHMudjEuR2V0TWVtYmVyc2hpcFJlcXVlc3QaJy5jeWJlci5lc3BvcnRzLnYxLkdldE1lbWJlcnNoaXBSZXNwb25zZSJFiPEEAorTDhAKDOS8muWRmOivpuaDhRABgtPkkwInEiUvYXBpL3YxL2VzcG9ydHMvbWVtYmVyc2hpcHMve3VzZXJfaWR9GhCK4gkM5p2D55uK6L+Q6JClQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_esports_v1_entitlement, file_cyber_esports_v1_profile, file_cyber_shared_common_v1_pagination, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("CidjeWJlci9lc3BvcnRzL3YxL2FjdGl2YXRpb25fYWRtaW4ucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEi4gIKD0FjdGl2YXRpb25CYXRjaBIuCghiYXRjaF9ubxgBIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIxCgtyZXBvcnRfdHlwZRgCIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VHlwZRIqCgVjb3VudBgDIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlEi8KCnVzZWRfY291bnQYBCABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZRIuCgpleHBpcmVzX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpjcmVhdGVkX2F0GAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIvCgtkaXNhYmxlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi7wMKDkFjdGl2YXRpb25Db2RlEioKBGNvZGUYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLcmVwb3J0X3R5cGUYAiABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydFR5cGUSLQoIcXVhbnRpdHkYAyABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZRIvCgp1c2VkX2NvdW50GAQgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSLgoKZXhwaXJlc19hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKY3JlYXRlZF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoIYmF0Y2hfbm8YByABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLwoLcmVkZWVtZWRfYXQYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi0KB3VzZXJfaWQYCSABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoIbmlja25hbWUYCiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUi3QEKHkdlbmVyYXRlQWN0aXZhdGlvbkNvZGVzUmVxdWVzdBJFCgtyZXBvcnRfdHlwZRgBIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VHlwZUINukgKyAEBggEEEAEgAEgAiAEBEiEKBWNvdW50GAIgASgFQg26SArIAQEaBRjoBygBSAGIAQESJwoLZXhwaXJlX2RheXMYAyABKAVCDbpICsgBARoFGMIcKAFIAogBAUIOCgxfcmVwb3J0X3R5cGVCCAoGX2NvdW50Qg4KDF9leHBpcmVfZGF5cyJCCh9HZW5lcmF0ZUFjdGl2YXRpb25Db2Rlc1Jlc3BvbnNlEg0KBWNvZGVzGAEgAygJEhAKCGJhdGNoX25vGAIgASgJIm0KH1NldEFjdGl2YXRpb25CYXRjaFN0YXR1c1JlcXVlc3QSHgoIYmF0Y2hfbm8YASABKAlCDLpICcgBAXIEEAEYIBIdCghkaXNhYmxlZBgCIAEoCEIGukgDyAEBSACIAQFCCwoJX2Rpc2FibGVkIlQKIFNldEFjdGl2YXRpb25CYXRjaFN0YXR1c1Jlc3BvbnNlEjAKBWJhdGNoGAEgASgLMiEuY3liZXIuZXNwb3J0cy52MS5BY3RpdmF0aW9uQmF0Y2gi0gEKHEV4cG9ydEFjdGl2YXRpb25Db2Rlc1JlcXVlc3QSIAoIYmF0Y2hfbm8YASABKAlCCbpIBnIEEAEYIEgAiAEBEkwKC2NvZGVfc3RhdHVzGAIgASgOMiYuY3liZXIuZXNwb3J0cy52MS5BY3RpdmF0aW9uQ29kZVN0YXR1c0IKukgHggEEEAEgAEgBiAEBEhwKBGNvZGUYAyABKAlCCbpIBnIEEAEYIEgCiAEBQgsKCV9iYXRjaF9ub0IOCgxfY29kZV9zdGF0dXNCBwoFX2NvZGUiUAodRXhwb3J0QWN0aXZhdGlvbkNvZGVzUmVzcG9uc2USLwoFY29kZXMYASADKAsyIC5jeWJlci5lc3BvcnRzLnYxLkFjdGl2YXRpb25Db2RlIssCChpMaXN0QWN0aXZhdGlvbkNvZGVzUmVxdWVzdBIxCgRwYWdlGAEgASgLMiMuY3liZXIuc2hhcmVkLmNvbW1vbi52MS5QYWdlUmVxdWVzdBI2CgtyZXBvcnRfdHlwZRgCIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VHlwZUgAiAEBEiAKCGJhdGNoX25vGAMgASgJQgm6SAZyBBABGCBIAYgBARJMCgtjb2RlX3N0YXR1cxgEIAEoDjImLmN5YmVyLmVzcG9ydHMudjEuQWN0aXZhdGlvbkNvZGVTdGF0dXNCCrpIB4IBBBABIABIAogBARIcCgRjb2RlGAUgASgJQgm6SAZyBBABGCBIA4gBAUIOCgxfcmVwb3J0X3R5cGVCCwoJX2JhdGNoX25vQg4KDF9jb2RlX3N0YXR1c0IHCgVfY29kZSKCAQobTGlzdEFjdGl2YXRpb25Db2Rlc1Jlc3BvbnNlEjIKBHBhZ2UYASABKAsyJC5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXNwb25zZRIvCgVjb2RlcxgCIAMoCzIgLmN5YmVyLmVzcG9ydHMudjEuQWN0aXZhdGlvbkNvZGUi+AEKHExpc3RBY3RpdmF0aW9uQmF0Y2hlc1JlcXVlc3QSMQoEcGFnZRgBIAEoCzIjLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlcXVlc3QSQgoLcmVwb3J0X3R5cGUYAiABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydFR5cGVCCrpIB4IBBBABIABIAIgBARIVCghkaXNhYmxlZBgDIAEoCEgBiAEBEiAKCGJhdGNoX25vGAQgASgJQgm6SAZyBBABGCBIAogBAUIOCgxfcmVwb3J0X3R5cGVCCwoJX2Rpc2FibGVkQgsKCV9iYXRjaF9ubyKeAgodTGlzdEFjdGl2YXRpb25CYXRjaGVzUmVzcG9uc2USMgoEcGFnZRgBIAEoCzIkLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlc3BvbnNlEjIKB2JhdGNoZXMYAiADKAsyIS5jeWJlci5lc3BvcnRzLnYxLkFjdGl2YXRpb25CYXRjaBIyCg10b3RhbF9iYXRjaGVzGAMgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSMAoLdG90YWxfY29kZXMYBCABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZRIvCgp1c2VkX2NvZGVzGAUgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUiygEKHFNldFJlcG9ydEFjY2Vzc1BvbGljeVJlcXVlc3QSRQoLcmVwb3J0X3R5cGUYASABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydFR5cGVCDbpICsgBAYIBBBABIABIAIgBARJICgZwb2xpY3kYAiABKA4yJC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1BvbGljeUINukgKyAEBggEEEAEgAEgBiAEBQg4KDF9yZXBvcnRfdHlwZUIJCgdfcG9saWN5IogBCh1TZXRSZXBvcnRBY2Nlc3NQb2xpY3lSZXNwb25zZRIxCgtyZXBvcnRfdHlwZRgBIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VHlwZRI0CgZwb2xpY3kYAiABKA4yJC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1BvbGljeSIhCh9MaXN0UmVwb3J0QWNjZXNzUG9saWNpZXNSZXF1ZXN0IlcKIExpc3RSZXBvcnRBY2Nlc3NQb2xpY2llc1Jlc3BvbnNlEjMKCHBvbGljaWVzGAEgAygLMiEuY3liZXIuZXNwb3J0cy52MS5SZXBvcnRQb2xpY3lSb3ci8AEKD1JlcG9ydFBvbGljeVJvdxIxCgtyZXBvcnRfdHlwZRgBIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuUmVwb3J0VHlwZRI0CgZwb2xpY3kYAiABKA4yJC5jeWJlci5lc3BvcnRzLnYxLlJlcG9ydEFjY2Vzc1BvbGljeRISCgpvdmVycmlkZGVuGAMgASgIEjAKCnVwZGF0ZWRfYnkYBCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoKdXBkYXRlZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAihAQKEU1lbWJlcnNoaXBTdW1tYXJ5Ei0KB3VzZXJfaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoIbmlja25hbWUYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMgoMcGhvbmVfbWFza2VkGAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEi4KCmdyYW50ZWRfYXQYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCWRheXNfbGVmdBgGIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlEjIKBnN0YXR1cxgHIAEoDjIiLmN5YmVyLmVzcG9ydHMudjEuTWVtYmVyc2hpcFN0YXR1cxIyCgZzb3VyY2UYCCABKA4yIi5jeWJlci5lc3BvcnRzLnYxLk1lbWJlcnNoaXBTb3VyY2USMQoMcGVyaW9kX2NvdW50GAkgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSMQoMdW5sb2NrX2NvdW50GAogASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUijAIKEE1lbWJlcnNoaXBQZXJpb2QSLgoKZ3JhbnRlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMgoGc291cmNlGAMgASgOMiIuY3liZXIuZXNwb3J0cy52MS5NZW1iZXJzaGlwU291cmNlEjAKCnNvdXJjZV9yZWYYBCABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMgoGc3RhdHVzGAYgASgOMiIuY3liZXIuZXNwb3J0cy52MS5NZW1iZXJzaGlwU3RhdHVzInkKFkdyYW50TWVtYmVyc2hpcFJlcXVlc3QSIQoHdXNlcl9pZBgBIAEoCUILukgIyAEBcgOYARRIAIgBARIjCghza3VfY29kZRgCIAEoCUIMukgJyAEBcgQQARgySAGIAQFCCgoIX3VzZXJfaWRCCwoJX3NrdV9jb2RlIlIKF0dyYW50TWVtYmVyc2hpcFJlc3BvbnNlEjcKCm1lbWJlcnNoaXAYASABKAsyIy5jeWJlci5lc3BvcnRzLnYxLk1lbWJlcnNoaXBTdW1tYXJ5IjoKGlRlcm1pbmF0ZU1lbWJlcnNoaXBSZXF1ZXN0EhwKB3VzZXJfaWQYASABKAlCC7pICMgBAXIDmAEUIlYKG1Rlcm1pbmF0ZU1lbWJlcnNoaXBSZXNwb25zZRI3CgptZW1iZXJzaGlwGAEgASgLMiMuY3liZXIuZXNwb3J0cy52MS5NZW1iZXJzaGlwU3VtbWFyeSLrAQoWTGlzdE1lbWJlcnNoaXBzUmVxdWVzdBIxCgRwYWdlGAEgASgLMiMuY3liZXIuc2hhcmVkLmNvbW1vbi52MS5QYWdlUmVxdWVzdBJDCgZzdGF0dXMYAiABKA4yIi5jeWJlci5lc3BvcnRzLnYxLk1lbWJlcnNoaXBTdGF0dXNCCrpIB4IBBBABIABIAIgBARJDCgZzb3VyY2UYAyABKA4yIi5jeWJlci5lc3BvcnRzLnYxLk1lbWJlcnNoaXBTb3VyY2VCCrpIB4IBBBABIABIAYgBAUIJCgdfc3RhdHVzQgkKB19zb3VyY2Ui2gIKF0xpc3RNZW1iZXJzaGlwc1Jlc3BvbnNlEjIKBHBhZ2UYASABKAsyJC5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXNwb25zZRI4CgttZW1iZXJzaGlwcxgCIAMoCzIjLmN5YmVyLmVzcG9ydHMudjEuTWVtYmVyc2hpcFN1bW1hcnkSMAoLdG90YWxfY291bnQYAyABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZRIxCgxhY3RpdmVfY291bnQYBCABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZRI4ChNleHBpcmluZ19zb29uX2NvdW50GAUgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSMgoNZXhwaXJlZF9jb3VudBgGIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQzMlZhbHVlIjQKFEdldE1lbWJlcnNoaXBSZXF1ZXN0EhwKB3VzZXJfaWQYASABKAlCC7pICMgBAXIDmAEUIpICChVHZXRNZW1iZXJzaGlwUmVzcG9uc2USNwoKbWVtYmVyc2hpcBgBIAEoCzIjLmN5YmVyLmVzcG9ydHMudjEuTWVtYmVyc2hpcFN1bW1hcnkSMwoHcGVyaW9kcxgCIAMoCzIiLmN5YmVyLmVzcG9ydHMudjEuTWVtYmVyc2hpcFBlcmlvZBIuCghhZ2VfYmFuZBgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIpCgNzZXgYBCABKA4yHC5jeWJlci5lc3BvcnRzLnYxLlByb2ZpbGVTZXgSMAoMd2VjaGF0X2JvdW5kGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLkJvb2xWYWx1ZSrAAQoSUmVwb3J0QWNjZXNzUG9saWN5EiQKIFJFUE9SVF9BQ0NFU1NfUE9MSUNZX1VOU1BFQ0lGSUVEEAASHQoZUkVQT1JUX0FDQ0VTU19QT0xJQ1lfT1BFThABEiMKH1JFUE9SVF9BQ0NFU1NfUE9MSUNZX01FTUJFUlNISVAQAhIfChtSRVBPUlRfQUNDRVNTX1BPTElDWV9URU5BTlQQAxIfChtSRVBPUlRfQUNDRVNTX1BPTElDWV9DTE9TRUQQBCqGAQoUQWN0aXZhdGlvbkNvZGVTdGF0dXMSJgoiQUNUSVZBVElPTl9DT0RFX1NUQVRVU19VTlNQRUNJRklFRBAAEiEKHUFDVElWQVRJT05fQ09ERV9TVEFUVVNfVU5VU0VEEAESIwofQUNUSVZBVElPTl9DT0RFX1NUQVRVU19SRURFRU1FRBACKrkBChBNZW1iZXJzaGlwU3RhdHVzEiEKHU1FTUJFUlNISVBfU1RBVFVTX1VOU1BFQ0lGSUVEEAASHAoYTUVNQkVSU0hJUF9TVEFUVVNfQUNUSVZFEAESIwofTUVNQkVSU0hJUF9TVEFUVVNfRVhQSVJJTkdfU09PThACEh0KGU1FTUJFUlNISVBfU1RBVFVTX0VYUElSRUQQAxIgChxNRU1CRVJTSElQX1NUQVRVU19URVJNSU5BVEVEEAQqkwEKEE1lbWJlcnNoaXBTb3VyY2USIQodTUVNQkVSU0hJUF9TT1VSQ0VfVU5TUEVDSUZJRUQQABIbChdNRU1CRVJTSElQX1NPVVJDRV9PUkRFUhABEhwKGE1FTUJFUlNISVBfU09VUkNFX01BTlVBTBACEiEKHU1FTUJFUlNISVBfU09VUkNFX0xFR0FDWV9DT0RFEAMyxxEKE0VudGl0bGVBZG1pblNlcnZpY2US1QEKF0dlbmVyYXRlQWN0aXZhdGlvbkNvZGVzEjAuY3liZXIuZXNwb3J0cy52MS5HZW5lcmF0ZUFjdGl2YXRpb25Db2Rlc1JlcXVlc3QaMS5jeWJlci5lc3BvcnRzLnYxLkdlbmVyYXRlQWN0aXZhdGlvbkNvZGVzUmVzcG9uc2UiVYjxBAKK0w4ZChXmibnph4/nlJ/miJDmv4DmtLvnoIEQAoLT5JMCLjoBKiIpL2FwaS92MS9lc3BvcnRzL2FjdGl2YXRpb24tY29kZXMvZ2VuZXJhdGUS8AEKGFNldEFjdGl2YXRpb25CYXRjaFN0YXR1cxIxLmN5YmVyLmVzcG9ydHMudjEuU2V0QWN0aXZhdGlvbkJhdGNoU3RhdHVzUmVxdWVzdBoyLmN5YmVyLmVzcG9ydHMudjEuU2V0QWN0aXZhdGlvbkJhdGNoU3RhdHVzUmVzcG9uc2UibYjxBAKK0w4gChzlgZznlKgv5ZCv55So5r+A5rS756CB5om55qyhEAKC0+STAj86ASoaOi9hcGkvdjEvZXNwb3J0cy9hY3RpdmF0aW9uLWNvZGVzL2JhdGNoZXMve2JhdGNoX25vfS9zdGF0dXMStwEKE0xpc3RBY3RpdmF0aW9uQ29kZXMSLC5jeWJlci5lc3BvcnRzLnYxLkxpc3RBY3RpdmF0aW9uQ29kZXNSZXF1ZXN0Gi0uY3liZXIuZXNwb3J0cy52MS5MaXN0QWN0aXZhdGlvbkNvZGVzUmVzcG9uc2UiQ4jxBAKK0w4TCg/mv4DmtLvnoIHliJfooagQAYLT5JMCIhIgL2FwaS92MS9lc3BvcnRzL2FjdGl2YXRpb24tY29kZXMSywEKFUxpc3RBY3RpdmF0aW9uQmF0Y2hlcxIuLmN5YmVyLmVzcG9ydHMudjEuTGlzdEFjdGl2YXRpb25CYXRjaGVzUmVxdWVzdBovLmN5YmVyLmVzcG9ydHMudjEuTGlzdEFjdGl2YXRpb25CYXRjaGVzUmVzcG9uc2UiUYjxBAKK0w4ZChXmv4DmtLvnoIHmibnmrKHliJfooagQAYLT5JMCKhIoL2FwaS92MS9lc3BvcnRzL2FjdGl2YXRpb24tY29kZXMvYmF0Y2hlcxLHAQoVRXhwb3J0QWN0aXZhdGlvbkNvZGVzEi4uY3liZXIuZXNwb3J0cy52MS5FeHBvcnRBY3RpdmF0aW9uQ29kZXNSZXF1ZXN0Gi8uY3liZXIuZXNwb3J0cy52MS5FeHBvcnRBY3RpdmF0aW9uQ29kZXNSZXNwb25zZSJNiPEEAorTDhMKD+WvvOWHuua/gOa0u+eggRACgtPkkwIsOgEqIicvYXBpL3YxL2VzcG9ydHMvYWN0aXZhdGlvbi1jb2Rlcy9leHBvcnQSzQEKFVNldFJlcG9ydEFjY2Vzc1BvbGljeRIuLmN5YmVyLmVzcG9ydHMudjEuU2V0UmVwb3J0QWNjZXNzUG9saWN5UmVxdWVzdBovLmN5YmVyLmVzcG9ydHMudjEuU2V0UmVwb3J0QWNjZXNzUG9saWN5UmVzcG9uc2UiU4jxBAKK0w4cChjorr7nva7miqXlkYrorr/pl67nrZbnlaUQAoLT5JMCKToBKiIkL2FwaS92MS9lc3BvcnRzL3JlcG9ydC1hY2Nlc3MtcG9saWN5EtUBChhMaXN0UmVwb3J0QWNjZXNzUG9saWNpZXMSMS5jeWJlci5lc3BvcnRzLnYxLkxpc3RSZXBvcnRBY2Nlc3NQb2xpY2llc1JlcXVlc3QaMi5jeWJlci5lc3BvcnRzLnYxLkxpc3RSZXBvcnRBY2Nlc3NQb2xpY2llc1Jlc3BvbnNlIlKI8QQCitMOHAoY5oql5ZGK6K6/6Zeu562W55Wl5YiX6KGoEAGC0+STAigSJi9hcGkvdjEvZXNwb3J0cy9yZXBvcnQtYWNjZXNzLXBvbGljaWVzErkBCg9HcmFudE1lbWJlcnNoaXASKC5jeWJlci5lc3BvcnRzLnYxLkdyYW50TWVtYmVyc2hpcFJlcXVlc3QaKS5jeWJlci5lc3BvcnRzLnYxLkdyYW50TWVtYmVyc2hpcFJlc3BvbnNlIlGI8QQCitMOHQoZ5omL5Yqo5byA6YCaL+e7rei0ueS8muWRmBACgtPkkwImOgEqIiEvYXBpL3YxL2VzcG9ydHMvbWVtYmVyc2hpcHMvZ3JhbnQSxgEKE1Rlcm1pbmF0ZU1lbWJlcnNoaXASLC5jeWJlci5lc3BvcnRzLnYxLlRlcm1pbmF0ZU1lbWJlcnNoaXBSZXF1ZXN0Gi0uY3liZXIuZXNwb3J0cy52MS5UZXJtaW5hdGVNZW1iZXJzaGlwUmVzcG9uc2UiUojxBAKK0w4QCgznu4jmraLkvJrlkZgQAoLT5JMCNDoBKiIvL2FwaS92MS9lc3BvcnRzL21lbWJlcnNoaXBzL3t1c2VyX2lkfS90ZXJtaW5hdGUSqQEKD0xpc3RNZW1iZXJzaGlwcxIoLmN5YmVyLmVzcG9ydHMudjEuTGlzdE1lbWJlcnNoaXBzUmVxdWVzdBopLmN5YmVyLmVzcG9ydHMudjEuTGlzdE1lbWJlcnNoaXBzUmVzcG9uc2UiQYjxBAKK0w4WChLkvJrlkZjnrqHnkIbliJfooagQAYLT5JMCHRIbL2FwaS92MS9lc3BvcnRzL21lbWJlcnNoaXBzEqcBCg1HZXRNZW1iZXJzaGlwEiYuY3liZXIuZXNwb3J0cy52MS5HZXRNZW1iZXJzaGlwUmVxdWVzdBonLmN5YmVyLmVzcG9ydHMudjEuR2V0TWVtYmVyc2hpcFJlc3BvbnNlIkWI8QQCitMOEAoM5Lya5ZGY6K+m5oOFEAGC0+STAicSJS9hcGkvdjEvZXNwb3J0cy9tZW1iZXJzaGlwcy97dXNlcl9pZH0aEIriCQzmnYPnm4rov5DokKVCKVonY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9lc3BvcnRzL3YxYgZwcm90bzM", [file_buf_validate_validate, file_cyber_esports_v1_entitlement, file_cyber_esports_v1_profile, file_cyber_shared_common_v1_pagination, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+
+/**
+ * One generation call's mint: the unit an operator disables, exports,
+ * and reads burn-down by. Count facts are aggregates over the code rows
+ * — the batch row carries only batch-level truth (family, deadline, the
+ * disable flip), so the two can never drift.
+ *
+ * @generated from message cyber.esports.v1.ActivationBatch
+ */
+export type ActivationBatch = Message<"cyber.esports.v1.ActivationBatch"> & {
+  /**
+   * Human-shape batch number (B-YYMM-XXXX) — the string support quotes
+   * on the phone.
+   *
+   * @generated from field: google.protobuf.StringValue batch_no = 1;
+   */
+  batchNo?: string | undefined;
+
+  /**
+   * @generated from field: cyber.esports.v1.ReportType report_type = 2;
+   */
+  reportType: ReportType;
+
+  /**
+   * Codes minted in this batch.
+   *
+   * @generated from field: google.protobuf.Int32Value count = 3;
+   */
+  count?: number | undefined;
+
+  /**
+   * Codes already redeemed.
+   *
+   * @generated from field: google.protobuf.Int32Value used_count = 4;
+   */
+  usedCount?: number | undefined;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp expires_at = 5;
+   */
+  expiresAt?: Timestamp | undefined;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 6;
+   */
+  createdAt?: Timestamp | undefined;
+
+  /**
+   * Absent = live batch; present = the moment the operator disabled it.
+   * Disabling voids every unredeemed code in the batch on the spot —
+   * grants already landed stay landed, the same permanence a settled
+   * order gets.
+   *
+   * @generated from field: google.protobuf.Timestamp disabled_at = 7;
+   */
+  disabledAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.ActivationBatch.
+ * Use `create(ActivationBatchSchema)` to create a new message.
+ */
+export const ActivationBatchSchema: GenMessage<ActivationBatch> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_activation_admin, 0);
 
 /**
  * @generated from message cyber.esports.v1.ActivationCode
@@ -57,6 +121,33 @@ export type ActivationCode = Message<"cyber.esports.v1.ActivationCode"> & {
    * @generated from field: google.protobuf.Timestamp created_at = 6;
    */
   createdAt?: Timestamp | undefined;
+
+  /**
+   * The minting batch this code belongs to; absent only on rows older
+   * than the batch model itself.
+   *
+   * @generated from field: google.protobuf.StringValue batch_no = 7;
+   */
+  batchNo?: string | undefined;
+
+  /**
+   * The redeem's trail, hydrated from the grant the redeem landed:
+   * absent on an unredeemed code. user_id is the member link target;
+   * nickname is the local profile fold operators read.
+   *
+   * @generated from field: google.protobuf.Timestamp redeemed_at = 8;
+   */
+  redeemedAt?: Timestamp | undefined;
+
+  /**
+   * @generated from field: google.protobuf.StringValue user_id = 9;
+   */
+  userId?: string | undefined;
+
+  /**
+   * @generated from field: google.protobuf.StringValue nickname = 10;
+   */
+  nickname?: string | undefined;
 };
 
 /**
@@ -64,7 +155,7 @@ export type ActivationCode = Message<"cyber.esports.v1.ActivationCode"> & {
  * Use `create(ActivationCodeSchema)` to create a new message.
  */
 export const ActivationCodeSchema: GenMessage<ActivationCode> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 0);
+  messageDesc(file_cyber_esports_v1_activation_admin, 1);
 
 /**
  * @generated from message cyber.esports.v1.GenerateActivationCodesRequest
@@ -91,7 +182,7 @@ export type GenerateActivationCodesRequest = Message<"cyber.esports.v1.GenerateA
  * Use `create(GenerateActivationCodesRequestSchema)` to create a new message.
  */
 export const GenerateActivationCodesRequestSchema: GenMessage<GenerateActivationCodesRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 1);
+  messageDesc(file_cyber_esports_v1_activation_admin, 2);
 
 /**
  * @generated from message cyber.esports.v1.GenerateActivationCodesResponse
@@ -104,6 +195,16 @@ export type GenerateActivationCodesResponse = Message<"cyber.esports.v1.Generate
    * @generated from field: repeated string codes = 1;
    */
   codes: string[];
+
+  /**
+   * The batch these codes share — the handle for the detail page and
+   * every later status flip. Plain string, not a wrapper: generation
+   * succeeded means the batch exists, absence is not a state this field
+   * can carry.
+   *
+   * @generated from field: string batch_no = 2;
+   */
+  batchNo: string;
 };
 
 /**
@@ -111,7 +212,106 @@ export type GenerateActivationCodesResponse = Message<"cyber.esports.v1.Generate
  * Use `create(GenerateActivationCodesResponseSchema)` to create a new message.
  */
 export const GenerateActivationCodesResponseSchema: GenMessage<GenerateActivationCodesResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 2);
+  messageDesc(file_cyber_esports_v1_activation_admin, 3);
+
+/**
+ * @generated from message cyber.esports.v1.SetActivationBatchStatusRequest
+ */
+export type SetActivationBatchStatusRequest = Message<"cyber.esports.v1.SetActivationBatchStatusRequest"> & {
+  /**
+   * @generated from field: string batch_no = 1;
+   */
+  batchNo: string;
+
+  /**
+   * True = disable (unredeemed codes void immediately), false = re-enable.
+   *
+   * @generated from field: optional bool disabled = 2;
+   */
+  disabled?: boolean | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.SetActivationBatchStatusRequest.
+ * Use `create(SetActivationBatchStatusRequestSchema)` to create a new message.
+ */
+export const SetActivationBatchStatusRequestSchema: GenMessage<SetActivationBatchStatusRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_activation_admin, 4);
+
+/**
+ * @generated from message cyber.esports.v1.SetActivationBatchStatusResponse
+ */
+export type SetActivationBatchStatusResponse = Message<"cyber.esports.v1.SetActivationBatchStatusResponse"> & {
+  /**
+   * @generated from field: cyber.esports.v1.ActivationBatch batch = 1;
+   */
+  batch?: ActivationBatch | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.SetActivationBatchStatusResponse.
+ * Use `create(SetActivationBatchStatusResponseSchema)` to create a new message.
+ */
+export const SetActivationBatchStatusResponseSchema: GenMessage<SetActivationBatchStatusResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_activation_admin, 5);
+
+/**
+ * @generated from message cyber.esports.v1.ExportActivationCodesRequest
+ */
+export type ExportActivationCodesRequest = Message<"cyber.esports.v1.ExportActivationCodesRequest"> & {
+  /**
+   * An export hands out usable code values — that hand-out is the
+   * sensitive act, so the RPC carries ACTION_WRITE and lands one audit
+   * line per export even though it changes nothing.
+   * Absent = every batch; present = the named batch's codes.
+   *
+   * @generated from field: optional string batch_no = 1;
+   */
+  batchNo?: string | undefined;
+
+  /**
+   * Absent = every code; the natural ask is the unredeemed remainder an
+   * operator is about to hand out.
+   *
+   * @generated from field: optional cyber.esports.v1.ActivationCodeStatus code_status = 2;
+   */
+  codeStatus?: ActivationCodeStatus | undefined;
+
+  /**
+   * Same find-one filter as the list — an export answers the visible
+   * filter, never a wider set.
+   *
+   * @generated from field: optional string code = 3;
+   */
+  code?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.ExportActivationCodesRequest.
+ * Use `create(ExportActivationCodesRequestSchema)` to create a new message.
+ */
+export const ExportActivationCodesRequestSchema: GenMessage<ExportActivationCodesRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_activation_admin, 6);
+
+/**
+ * @generated from message cyber.esports.v1.ExportActivationCodesResponse
+ */
+export type ExportActivationCodesResponse = Message<"cyber.esports.v1.ExportActivationCodesResponse"> & {
+  /**
+   * The whole filtered set in one answer, no paging — a batch tops out
+   * at a thousand codes, so the export stays one payload.
+   *
+   * @generated from field: repeated cyber.esports.v1.ActivationCode codes = 1;
+   */
+  codes: ActivationCode[];
+};
+
+/**
+ * Describes the message cyber.esports.v1.ExportActivationCodesResponse.
+ * Use `create(ExportActivationCodesResponseSchema)` to create a new message.
+ */
+export const ExportActivationCodesResponseSchema: GenMessage<ExportActivationCodesResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_activation_admin, 7);
 
 /**
  * @generated from message cyber.esports.v1.ListActivationCodesRequest
@@ -126,6 +326,27 @@ export type ListActivationCodesRequest = Message<"cyber.esports.v1.ListActivatio
    * @generated from field: optional cyber.esports.v1.ReportType report_type = 2;
    */
   reportType?: ReportType | undefined;
+
+  /**
+   * Present = one batch's code table (the detail page); absent = the
+   * flat all-codes view.
+   *
+   * @generated from field: optional string batch_no = 3;
+   */
+  batchNo?: string | undefined;
+
+  /**
+   * @generated from field: optional cyber.esports.v1.ActivationCodeStatus code_status = 4;
+   */
+  codeStatus?: ActivationCodeStatus | undefined;
+
+  /**
+   * Present = the exact code an operator is chasing — the detail page's
+   * find-one search box; a no-match code answers the empty page.
+   *
+   * @generated from field: optional string code = 5;
+   */
+  code?: string | undefined;
 };
 
 /**
@@ -133,7 +354,7 @@ export type ListActivationCodesRequest = Message<"cyber.esports.v1.ListActivatio
  * Use `create(ListActivationCodesRequestSchema)` to create a new message.
  */
 export const ListActivationCodesRequestSchema: GenMessage<ListActivationCodesRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 3);
+  messageDesc(file_cyber_esports_v1_activation_admin, 8);
 
 /**
  * @generated from message cyber.esports.v1.ListActivationCodesResponse
@@ -155,7 +376,85 @@ export type ListActivationCodesResponse = Message<"cyber.esports.v1.ListActivati
  * Use `create(ListActivationCodesResponseSchema)` to create a new message.
  */
 export const ListActivationCodesResponseSchema: GenMessage<ListActivationCodesResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 4);
+  messageDesc(file_cyber_esports_v1_activation_admin, 9);
+
+/**
+ * @generated from message cyber.esports.v1.ListActivationBatchesRequest
+ */
+export type ListActivationBatchesRequest = Message<"cyber.esports.v1.ListActivationBatchesRequest"> & {
+  /**
+   * @generated from field: cyber.shared.common.v1.PageRequest page = 1;
+   */
+  page?: PageRequest | undefined;
+
+  /**
+   * @generated from field: optional cyber.esports.v1.ReportType report_type = 2;
+   */
+  reportType?: ReportType | undefined;
+
+  /**
+   * Absent = every batch; true = disabled only, false = live only.
+   *
+   * @generated from field: optional bool disabled = 3;
+   */
+  disabled?: boolean | undefined;
+
+  /**
+   * Exact-match lookup — the detail page's header facts in one answer.
+   *
+   * @generated from field: optional string batch_no = 4;
+   */
+  batchNo?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.ListActivationBatchesRequest.
+ * Use `create(ListActivationBatchesRequestSchema)` to create a new message.
+ */
+export const ListActivationBatchesRequestSchema: GenMessage<ListActivationBatchesRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_activation_admin, 10);
+
+/**
+ * @generated from message cyber.esports.v1.ListActivationBatchesResponse
+ */
+export type ListActivationBatchesResponse = Message<"cyber.esports.v1.ListActivationBatchesResponse"> & {
+  /**
+   * @generated from field: cyber.shared.common.v1.PageResponse page = 1;
+   */
+  page?: PageResponse | undefined;
+
+  /**
+   * Newest batch first.
+   *
+   * @generated from field: repeated cyber.esports.v1.ActivationBatch batches = 2;
+   */
+  batches: ActivationBatch[];
+
+  /**
+   * Fold over every batch, independent of the applied filters — the
+   * footer's one count line instead of one query per number.
+   *
+   * @generated from field: google.protobuf.Int32Value total_batches = 3;
+   */
+  totalBatches?: number | undefined;
+
+  /**
+   * @generated from field: google.protobuf.Int32Value total_codes = 4;
+   */
+  totalCodes?: number | undefined;
+
+  /**
+   * @generated from field: google.protobuf.Int32Value used_codes = 5;
+   */
+  usedCodes?: number | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.ListActivationBatchesResponse.
+ * Use `create(ListActivationBatchesResponseSchema)` to create a new message.
+ */
+export const ListActivationBatchesResponseSchema: GenMessage<ListActivationBatchesResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_activation_admin, 11);
 
 /**
  * @generated from message cyber.esports.v1.SetReportAccessPolicyRequest
@@ -177,7 +476,7 @@ export type SetReportAccessPolicyRequest = Message<"cyber.esports.v1.SetReportAc
  * Use `create(SetReportAccessPolicyRequestSchema)` to create a new message.
  */
 export const SetReportAccessPolicyRequestSchema: GenMessage<SetReportAccessPolicyRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 5);
+  messageDesc(file_cyber_esports_v1_activation_admin, 12);
 
 /**
  * @generated from message cyber.esports.v1.SetReportAccessPolicyResponse
@@ -199,7 +498,7 @@ export type SetReportAccessPolicyResponse = Message<"cyber.esports.v1.SetReportA
  * Use `create(SetReportAccessPolicyResponseSchema)` to create a new message.
  */
 export const SetReportAccessPolicyResponseSchema: GenMessage<SetReportAccessPolicyResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 6);
+  messageDesc(file_cyber_esports_v1_activation_admin, 13);
 
 /**
  * @generated from message cyber.esports.v1.ListReportAccessPoliciesRequest
@@ -212,7 +511,7 @@ export type ListReportAccessPoliciesRequest = Message<"cyber.esports.v1.ListRepo
  * Use `create(ListReportAccessPoliciesRequestSchema)` to create a new message.
  */
 export const ListReportAccessPoliciesRequestSchema: GenMessage<ListReportAccessPoliciesRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 7);
+  messageDesc(file_cyber_esports_v1_activation_admin, 14);
 
 /**
  * @generated from message cyber.esports.v1.ListReportAccessPoliciesResponse
@@ -229,7 +528,7 @@ export type ListReportAccessPoliciesResponse = Message<"cyber.esports.v1.ListRep
  * Use `create(ListReportAccessPoliciesResponseSchema)` to create a new message.
  */
 export const ListReportAccessPoliciesResponseSchema: GenMessage<ListReportAccessPoliciesResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 8);
+  messageDesc(file_cyber_esports_v1_activation_admin, 15);
 
 /**
  * One family's current answer. Absent rows are the shipped defaults echoed
@@ -273,7 +572,7 @@ export type ReportPolicyRow = Message<"cyber.esports.v1.ReportPolicyRow"> & {
  * Use `create(ReportPolicyRowSchema)` to create a new message.
  */
 export const ReportPolicyRowSchema: GenMessage<ReportPolicyRow> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 9);
+  messageDesc(file_cyber_esports_v1_activation_admin, 16);
 
 /**
  * A member's current (or most recent) membership period with the facts
@@ -355,7 +654,7 @@ export type MembershipSummary = Message<"cyber.esports.v1.MembershipSummary"> & 
  * Use `create(MembershipSummarySchema)` to create a new message.
  */
 export const MembershipSummarySchema: GenMessage<MembershipSummary> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 10);
+  messageDesc(file_cyber_esports_v1_activation_admin, 17);
 
 /**
  * One append-only renewal row of the history timeline. Termination and
@@ -399,7 +698,7 @@ export type MembershipPeriod = Message<"cyber.esports.v1.MembershipPeriod"> & {
  * Use `create(MembershipPeriodSchema)` to create a new message.
  */
 export const MembershipPeriodSchema: GenMessage<MembershipPeriod> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 11);
+  messageDesc(file_cyber_esports_v1_activation_admin, 18);
 
 /**
  * grantMembership — the operator's manual twin of a settled order: the
@@ -426,7 +725,7 @@ export type GrantMembershipRequest = Message<"cyber.esports.v1.GrantMembershipRe
  * Use `create(GrantMembershipRequestSchema)` to create a new message.
  */
 export const GrantMembershipRequestSchema: GenMessage<GrantMembershipRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 12);
+  messageDesc(file_cyber_esports_v1_activation_admin, 19);
 
 /**
  * @generated from message cyber.esports.v1.GrantMembershipResponse
@@ -443,7 +742,7 @@ export type GrantMembershipResponse = Message<"cyber.esports.v1.GrantMembershipR
  * Use `create(GrantMembershipResponseSchema)` to create a new message.
  */
 export const GrantMembershipResponseSchema: GenMessage<GrantMembershipResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 13);
+  messageDesc(file_cyber_esports_v1_activation_admin, 20);
 
 /**
  * terminateMembership — flips the live period to TERMINATED: access falls
@@ -465,7 +764,7 @@ export type TerminateMembershipRequest = Message<"cyber.esports.v1.TerminateMemb
  * Use `create(TerminateMembershipRequestSchema)` to create a new message.
  */
 export const TerminateMembershipRequestSchema: GenMessage<TerminateMembershipRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 14);
+  messageDesc(file_cyber_esports_v1_activation_admin, 21);
 
 /**
  * @generated from message cyber.esports.v1.TerminateMembershipResponse
@@ -482,7 +781,7 @@ export type TerminateMembershipResponse = Message<"cyber.esports.v1.TerminateMem
  * Use `create(TerminateMembershipResponseSchema)` to create a new message.
  */
 export const TerminateMembershipResponseSchema: GenMessage<TerminateMembershipResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 15);
+  messageDesc(file_cyber_esports_v1_activation_admin, 22);
 
 /**
  * listMemberships — one row per member who ever held a membership,
@@ -512,7 +811,7 @@ export type ListMembershipsRequest = Message<"cyber.esports.v1.ListMembershipsRe
  * Use `create(ListMembershipsRequestSchema)` to create a new message.
  */
 export const ListMembershipsRequestSchema: GenMessage<ListMembershipsRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 16);
+  messageDesc(file_cyber_esports_v1_activation_admin, 23);
 
 /**
  * @generated from message cyber.esports.v1.ListMembershipsResponse
@@ -558,7 +857,7 @@ export type ListMembershipsResponse = Message<"cyber.esports.v1.ListMembershipsR
  * Use `create(ListMembershipsResponseSchema)` to create a new message.
  */
 export const ListMembershipsResponseSchema: GenMessage<ListMembershipsResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 17);
+  messageDesc(file_cyber_esports_v1_activation_admin, 24);
 
 /**
  * getMembership — the detail page's whole payload: the summary, the
@@ -578,7 +877,7 @@ export type GetMembershipRequest = Message<"cyber.esports.v1.GetMembershipReques
  * Use `create(GetMembershipRequestSchema)` to create a new message.
  */
 export const GetMembershipRequestSchema: GenMessage<GetMembershipRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 18);
+  messageDesc(file_cyber_esports_v1_activation_admin, 25);
 
 /**
  * @generated from message cyber.esports.v1.GetMembershipResponse
@@ -621,7 +920,7 @@ export type GetMembershipResponse = Message<"cyber.esports.v1.GetMembershipRespo
  * Use `create(GetMembershipResponseSchema)` to create a new message.
  */
 export const GetMembershipResponseSchema: GenMessage<GetMembershipResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_activation_admin, 19);
+  messageDesc(file_cyber_esports_v1_activation_admin, 26);
 
 /**
  * The operator's access policy for one report family. A redeemed code
@@ -665,6 +964,36 @@ export const ReportAccessPolicySchema: GenEnum<ReportAccessPolicy> = /*@__PURE__
   enumDesc(file_cyber_esports_v1_activation_admin, 0);
 
 /**
+ * The two states a code row reads in — redeemed means its single use is
+ * taken, unused means still spendable (unless the batch is disabled or
+ * the deadline passed; both are batch-level facts, not row states).
+ *
+ * @generated from enum cyber.esports.v1.ActivationCodeStatus
+ */
+export enum ActivationCodeStatus {
+  /**
+   * @generated from enum value: ACTIVATION_CODE_STATUS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: ACTIVATION_CODE_STATUS_UNUSED = 1;
+   */
+  UNUSED = 1,
+
+  /**
+   * @generated from enum value: ACTIVATION_CODE_STATUS_REDEEMED = 2;
+   */
+  REDEEMED = 2,
+}
+
+/**
+ * Describes the enum cyber.esports.v1.ActivationCodeStatus.
+ */
+export const ActivationCodeStatusSchema: GenEnum<ActivationCodeStatus> = /*@__PURE__*/
+  enumDesc(file_cyber_esports_v1_activation_admin, 1);
+
+/**
  * The four states an operator reads a membership period in. Only
  * TERMINATED is a stored fact — the terminate action flips the row's
  * status and nothing else; ACTIVE, EXPIRING_SOON and EXPIRED are derived
@@ -705,7 +1034,7 @@ export enum MembershipStatus {
  * Describes the enum cyber.esports.v1.MembershipStatus.
  */
 export const MembershipStatusSchema: GenEnum<MembershipStatus> = /*@__PURE__*/
-  enumDesc(file_cyber_esports_v1_activation_admin, 1);
+  enumDesc(file_cyber_esports_v1_activation_admin, 2);
 
 /**
  * Where a period came from, folded from the ledger row's source artifact:
@@ -741,7 +1070,7 @@ export enum MembershipSource {
  * Describes the enum cyber.esports.v1.MembershipSource.
  */
 export const MembershipSourceSchema: GenEnum<MembershipSource> = /*@__PURE__*/
-  enumDesc(file_cyber_esports_v1_activation_admin, 2);
+  enumDesc(file_cyber_esports_v1_activation_admin, 3);
 
 /**
  * The operator face of the entitlement domain: minting and listing type
@@ -749,12 +1078,13 @@ export const MembershipSourceSchema: GenEnum<MembershipSource> = /*@__PURE__*/
  * operator runs by hand. A code is a type code — the pricing ruling
  * retired single-record codes, so redeeming opens one report family,
  * never one trial's report. Generation mints each code for a single
- * redeem; an operator who needs N hands-out mints N. Codes live in clear
- * text because operators re-copy them for support. A membership grant is
- * the operator's twin of a settled order: it lands the same ledger row
- * without ever touching the payment pipeline. This whole service is a
- * strippable module: deployments without the operator plane drop it and
- * the business faces never notice.
+ * redeem; an operator who needs N hands-out mints N, and one generation
+ * call is one batch — the unit the operator disables, exports, and reads
+ * progress by. Codes live in clear text because operators re-copy them
+ * for support. A membership grant is the operator's twin of a settled
+ * order: it lands the same ledger row without ever touching the payment
+ * pipeline. This whole service is a strippable module: deployments
+ * without the operator plane drop it and the business faces never notice.
  *
  * @generated from service cyber.esports.v1.EntitleAdminService
  */
@@ -768,12 +1098,36 @@ export const EntitleAdminService: GenService<{
     output: typeof GenerateActivationCodesResponseSchema;
   },
   /**
+   * @generated from rpc cyber.esports.v1.EntitleAdminService.SetActivationBatchStatus
+   */
+  setActivationBatchStatus: {
+    methodKind: "unary";
+    input: typeof SetActivationBatchStatusRequestSchema;
+    output: typeof SetActivationBatchStatusResponseSchema;
+  },
+  /**
    * @generated from rpc cyber.esports.v1.EntitleAdminService.ListActivationCodes
    */
   listActivationCodes: {
     methodKind: "unary";
     input: typeof ListActivationCodesRequestSchema;
     output: typeof ListActivationCodesResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.esports.v1.EntitleAdminService.ListActivationBatches
+   */
+  listActivationBatches: {
+    methodKind: "unary";
+    input: typeof ListActivationBatchesRequestSchema;
+    output: typeof ListActivationBatchesResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.esports.v1.EntitleAdminService.ExportActivationCodes
+   */
+  exportActivationCodes: {
+    methodKind: "unary";
+    input: typeof ExportActivationCodesRequestSchema;
+    output: typeof ExportActivationCodesResponseSchema;
   },
   /**
    * @generated from rpc cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy

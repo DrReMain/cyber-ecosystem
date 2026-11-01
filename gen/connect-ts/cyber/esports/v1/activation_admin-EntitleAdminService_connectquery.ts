@@ -10,9 +10,24 @@ import { EntitleAdminService } from "./activation_admin_pb";
 export const generateActivationCodes = EntitleAdminService.method.generateActivationCodes;
 
 /**
+ * @generated from rpc cyber.esports.v1.EntitleAdminService.SetActivationBatchStatus
+ */
+export const setActivationBatchStatus = EntitleAdminService.method.setActivationBatchStatus;
+
+/**
  * @generated from rpc cyber.esports.v1.EntitleAdminService.ListActivationCodes
  */
 export const listActivationCodes = EntitleAdminService.method.listActivationCodes;
+
+/**
+ * @generated from rpc cyber.esports.v1.EntitleAdminService.ListActivationBatches
+ */
+export const listActivationBatches = EntitleAdminService.method.listActivationBatches;
+
+/**
+ * @generated from rpc cyber.esports.v1.EntitleAdminService.ExportActivationCodes
+ */
+export const exportActivationCodes = EntitleAdminService.method.exportActivationCodes;
 
 /**
  * @generated from rpc cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy

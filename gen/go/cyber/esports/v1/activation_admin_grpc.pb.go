@@ -20,7 +20,10 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	EntitleAdminService_GenerateActivationCodes_FullMethodName  = "/cyber.esports.v1.EntitleAdminService/GenerateActivationCodes"
+	EntitleAdminService_SetActivationBatchStatus_FullMethodName = "/cyber.esports.v1.EntitleAdminService/SetActivationBatchStatus"
 	EntitleAdminService_ListActivationCodes_FullMethodName      = "/cyber.esports.v1.EntitleAdminService/ListActivationCodes"
+	EntitleAdminService_ListActivationBatches_FullMethodName    = "/cyber.esports.v1.EntitleAdminService/ListActivationBatches"
+	EntitleAdminService_ExportActivationCodes_FullMethodName    = "/cyber.esports.v1.EntitleAdminService/ExportActivationCodes"
 	EntitleAdminService_SetReportAccessPolicy_FullMethodName    = "/cyber.esports.v1.EntitleAdminService/SetReportAccessPolicy"
 	EntitleAdminService_ListReportAccessPolicies_FullMethodName = "/cyber.esports.v1.EntitleAdminService/ListReportAccessPolicies"
 	EntitleAdminService_GrantMembership_FullMethodName          = "/cyber.esports.v1.EntitleAdminService/GrantMembership"
@@ -38,15 +41,19 @@ const (
 // operator runs by hand. A code is a type code — the pricing ruling
 // retired single-record codes, so redeeming opens one report family,
 // never one trial's report. Generation mints each code for a single
-// redeem; an operator who needs N hands-out mints N. Codes live in clear
-// text because operators re-copy them for support. A membership grant is
-// the operator's twin of a settled order: it lands the same ledger row
-// without ever touching the payment pipeline. This whole service is a
-// strippable module: deployments without the operator plane drop it and
-// the business faces never notice.
+// redeem; an operator who needs N hands-out mints N, and one generation
+// call is one batch — the unit the operator disables, exports, and reads
+// progress by. Codes live in clear text because operators re-copy them
+// for support. A membership grant is the operator's twin of a settled
+// order: it lands the same ledger row without ever touching the payment
+// pipeline. This whole service is a strippable module: deployments
+// without the operator plane drop it and the business faces never notice.
 type EntitleAdminServiceClient interface {
 	GenerateActivationCodes(ctx context.Context, in *GenerateActivationCodesRequest, opts ...grpc.CallOption) (*GenerateActivationCodesResponse, error)
+	SetActivationBatchStatus(ctx context.Context, in *SetActivationBatchStatusRequest, opts ...grpc.CallOption) (*SetActivationBatchStatusResponse, error)
 	ListActivationCodes(ctx context.Context, in *ListActivationCodesRequest, opts ...grpc.CallOption) (*ListActivationCodesResponse, error)
+	ListActivationBatches(ctx context.Context, in *ListActivationBatchesRequest, opts ...grpc.CallOption) (*ListActivationBatchesResponse, error)
+	ExportActivationCodes(ctx context.Context, in *ExportActivationCodesRequest, opts ...grpc.CallOption) (*ExportActivationCodesResponse, error)
 	SetReportAccessPolicy(ctx context.Context, in *SetReportAccessPolicyRequest, opts ...grpc.CallOption) (*SetReportAccessPolicyResponse, error)
 	ListReportAccessPolicies(ctx context.Context, in *ListReportAccessPoliciesRequest, opts ...grpc.CallOption) (*ListReportAccessPoliciesResponse, error)
 	GrantMembership(ctx context.Context, in *GrantMembershipRequest, opts ...grpc.CallOption) (*GrantMembershipResponse, error)
@@ -73,10 +80,40 @@ func (c *entitleAdminServiceClient) GenerateActivationCodes(ctx context.Context,
 	return out, nil
 }
 
+func (c *entitleAdminServiceClient) SetActivationBatchStatus(ctx context.Context, in *SetActivationBatchStatusRequest, opts ...grpc.CallOption) (*SetActivationBatchStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetActivationBatchStatusResponse)
+	err := c.cc.Invoke(ctx, EntitleAdminService_SetActivationBatchStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *entitleAdminServiceClient) ListActivationCodes(ctx context.Context, in *ListActivationCodesRequest, opts ...grpc.CallOption) (*ListActivationCodesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListActivationCodesResponse)
 	err := c.cc.Invoke(ctx, EntitleAdminService_ListActivationCodes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *entitleAdminServiceClient) ListActivationBatches(ctx context.Context, in *ListActivationBatchesRequest, opts ...grpc.CallOption) (*ListActivationBatchesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListActivationBatchesResponse)
+	err := c.cc.Invoke(ctx, EntitleAdminService_ListActivationBatches_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *entitleAdminServiceClient) ExportActivationCodes(ctx context.Context, in *ExportActivationCodesRequest, opts ...grpc.CallOption) (*ExportActivationCodesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExportActivationCodesResponse)
+	err := c.cc.Invoke(ctx, EntitleAdminService_ExportActivationCodes_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -152,15 +189,19 @@ func (c *entitleAdminServiceClient) GetMembership(ctx context.Context, in *GetMe
 // operator runs by hand. A code is a type code — the pricing ruling
 // retired single-record codes, so redeeming opens one report family,
 // never one trial's report. Generation mints each code for a single
-// redeem; an operator who needs N hands-out mints N. Codes live in clear
-// text because operators re-copy them for support. A membership grant is
-// the operator's twin of a settled order: it lands the same ledger row
-// without ever touching the payment pipeline. This whole service is a
-// strippable module: deployments without the operator plane drop it and
-// the business faces never notice.
+// redeem; an operator who needs N hands-out mints N, and one generation
+// call is one batch — the unit the operator disables, exports, and reads
+// progress by. Codes live in clear text because operators re-copy them
+// for support. A membership grant is the operator's twin of a settled
+// order: it lands the same ledger row without ever touching the payment
+// pipeline. This whole service is a strippable module: deployments
+// without the operator plane drop it and the business faces never notice.
 type EntitleAdminServiceServer interface {
 	GenerateActivationCodes(context.Context, *GenerateActivationCodesRequest) (*GenerateActivationCodesResponse, error)
+	SetActivationBatchStatus(context.Context, *SetActivationBatchStatusRequest) (*SetActivationBatchStatusResponse, error)
 	ListActivationCodes(context.Context, *ListActivationCodesRequest) (*ListActivationCodesResponse, error)
+	ListActivationBatches(context.Context, *ListActivationBatchesRequest) (*ListActivationBatchesResponse, error)
+	ExportActivationCodes(context.Context, *ExportActivationCodesRequest) (*ExportActivationCodesResponse, error)
 	SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error)
 	ListReportAccessPolicies(context.Context, *ListReportAccessPoliciesRequest) (*ListReportAccessPoliciesResponse, error)
 	GrantMembership(context.Context, *GrantMembershipRequest) (*GrantMembershipResponse, error)
@@ -180,8 +221,17 @@ type UnimplementedEntitleAdminServiceServer struct{}
 func (UnimplementedEntitleAdminServiceServer) GenerateActivationCodes(context.Context, *GenerateActivationCodesRequest) (*GenerateActivationCodesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GenerateActivationCodes not implemented")
 }
+func (UnimplementedEntitleAdminServiceServer) SetActivationBatchStatus(context.Context, *SetActivationBatchStatusRequest) (*SetActivationBatchStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetActivationBatchStatus not implemented")
+}
 func (UnimplementedEntitleAdminServiceServer) ListActivationCodes(context.Context, *ListActivationCodesRequest) (*ListActivationCodesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListActivationCodes not implemented")
+}
+func (UnimplementedEntitleAdminServiceServer) ListActivationBatches(context.Context, *ListActivationBatchesRequest) (*ListActivationBatchesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListActivationBatches not implemented")
+}
+func (UnimplementedEntitleAdminServiceServer) ExportActivationCodes(context.Context, *ExportActivationCodesRequest) (*ExportActivationCodesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ExportActivationCodes not implemented")
 }
 func (UnimplementedEntitleAdminServiceServer) SetReportAccessPolicy(context.Context, *SetReportAccessPolicyRequest) (*SetReportAccessPolicyResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetReportAccessPolicy not implemented")
@@ -240,6 +290,24 @@ func _EntitleAdminService_GenerateActivationCodes_Handler(srv interface{}, ctx c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EntitleAdminService_SetActivationBatchStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetActivationBatchStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntitleAdminServiceServer).SetActivationBatchStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EntitleAdminService_SetActivationBatchStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntitleAdminServiceServer).SetActivationBatchStatus(ctx, req.(*SetActivationBatchStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _EntitleAdminService_ListActivationCodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListActivationCodesRequest)
 	if err := dec(in); err != nil {
@@ -254,6 +322,42 @@ func _EntitleAdminService_ListActivationCodes_Handler(srv interface{}, ctx conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EntitleAdminServiceServer).ListActivationCodes(ctx, req.(*ListActivationCodesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EntitleAdminService_ListActivationBatches_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListActivationBatchesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntitleAdminServiceServer).ListActivationBatches(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EntitleAdminService_ListActivationBatches_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntitleAdminServiceServer).ListActivationBatches(ctx, req.(*ListActivationBatchesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EntitleAdminService_ExportActivationCodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExportActivationCodesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EntitleAdminServiceServer).ExportActivationCodes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EntitleAdminService_ExportActivationCodes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EntitleAdminServiceServer).ExportActivationCodes(ctx, req.(*ExportActivationCodesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -378,8 +482,20 @@ var EntitleAdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EntitleAdminService_GenerateActivationCodes_Handler,
 		},
 		{
+			MethodName: "SetActivationBatchStatus",
+			Handler:    _EntitleAdminService_SetActivationBatchStatus_Handler,
+		},
+		{
 			MethodName: "ListActivationCodes",
 			Handler:    _EntitleAdminService_ListActivationCodes_Handler,
+		},
+		{
+			MethodName: "ListActivationBatches",
+			Handler:    _EntitleAdminService_ListActivationBatches_Handler,
+		},
+		{
+			MethodName: "ExportActivationCodes",
+			Handler:    _EntitleAdminService_ExportActivationCodes_Handler,
 		},
 		{
 			MethodName: "SetReportAccessPolicy",

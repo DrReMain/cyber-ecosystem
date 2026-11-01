@@ -39,7 +39,7 @@ func NewEntitleAdminService(logger *slog.Logger, codeUC *entitle.CodeUC, entitle
 // Handler ------------------------------------------------------------------------------------------------------------
 
 func (s *EntitleAdminService) GenerateActivationCodes(ctx context.Context, req *esportspb.GenerateActivationCodesRequest) (*esportspb.GenerateActivationCodesResponse, error) {
-	codes, err := s.codeUC.Generate(ctx, &entitle.GenerateIn{
+	out, err := s.codeUC.Generate(ctx, &entitle.GenerateIn{
 		ReportType: reportTypeFromPB(req.GetReportType()),
 		Count:      int(req.GetCount()),
 		ExpireDays: int(req.GetExpireDays()),
@@ -47,16 +47,25 @@ func (s *EntitleAdminService) GenerateActivationCodes(ctx context.Context, req *
 	if err != nil {
 		return nil, err
 	}
-	return &esportspb.GenerateActivationCodesResponse{Codes: codes}, nil
+	return &esportspb.GenerateActivationCodesResponse{Codes: out.Codes, BatchNo: out.BatchNo}, nil
+}
+
+func (s *EntitleAdminService) SetActivationBatchStatus(ctx context.Context, req *esportspb.SetActivationBatchStatusRequest) (*esportspb.SetActivationBatchStatusResponse, error) {
+	batch, err := s.codeUC.SetBatchStatus(ctx, req.GetBatchNo(), req.GetDisabled())
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.SetActivationBatchStatusResponse{Batch: batchPB(batch)}, nil
 }
 
 func (s *EntitleAdminService) ListActivationCodes(ctx context.Context, req *esportspb.ListActivationCodesRequest) (*esportspb.ListActivationCodesResponse, error) {
-	var reportType *string
-	if req.GetReportType() != esportspb.ReportType_REPORT_TYPE_UNSPECIFIED {
-		v := reportTypeFromPB(req.GetReportType())
-		reportType = &v
-	}
-	out, err := s.codeUC.List(ctx, &entitle.ListCodesIn{PageRequest: req.GetPage(), ReportType: reportType})
+	out, err := s.codeUC.List(ctx, &entitle.ListCodesIn{
+		PageRequest: req.GetPage(),
+		ReportType:  reportTypePtrFromPB(req.GetReportType()),
+		BatchNo:     req.BatchNo,
+		Status:      codeStatusPtrFromPB(req.GetCodeStatus()),
+		Code:        req.Code,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +73,37 @@ func (s *EntitleAdminService) ListActivationCodes(ctx context.Context, req *espo
 		Page:  out.PageResponse,
 		Codes: utils.SliceMap(out.Codes, codePB),
 	}, nil
+}
+
+func (s *EntitleAdminService) ListActivationBatches(ctx context.Context, req *esportspb.ListActivationBatchesRequest) (*esportspb.ListActivationBatchesResponse, error) {
+	out, err := s.codeUC.ListBatches(ctx, &entitle.ListBatchesIn{
+		PageRequest: req.GetPage(),
+		ReportType:  reportTypePtrFromPB(req.GetReportType()),
+		Disabled:    req.Disabled,
+		BatchNo:     req.BatchNo,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.ListActivationBatchesResponse{
+		Page:         out.PageResponse,
+		Batches:      utils.SliceMap(out.Batches, batchPB),
+		TotalBatches: utils.Int32W(utils.ConvNum[int32, int](out.TotalBatches)),
+		TotalCodes:   utils.Int32W(utils.ConvNum[int32, int](out.TotalCodes)),
+		UsedCodes:    utils.Int32W(utils.ConvNum[int32, int](out.UsedCodes)),
+	}, nil
+}
+
+func (s *EntitleAdminService) ExportActivationCodes(ctx context.Context, req *esportspb.ExportActivationCodesRequest) (*esportspb.ExportActivationCodesResponse, error) {
+	codes, err := s.codeUC.Export(ctx, &entitle.ListCodesIn{
+		BatchNo: req.BatchNo,
+		Status:  codeStatusPtrFromPB(req.GetCodeStatus()),
+		Code:    req.Code,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.ExportActivationCodesResponse{Codes: utils.SliceMap(codes, codePB)}, nil
 }
 
 func (s *EntitleAdminService) SetReportAccessPolicy(ctx context.Context, req *esportspb.SetReportAccessPolicyRequest) (*esportspb.SetReportAccessPolicyResponse, error) {
@@ -248,9 +288,47 @@ func codePB(r *entitle.ActivationCode) *esportspb.ActivationCode {
 		UsedCount:  utils.Int32W(utils.ConvNum[int32, int](r.UsedCount)),
 		ExpiresAt:  utils.ToTimestamp(&r.ExpiresAt),
 		CreatedAt:  utils.ToTimestamp(&r.CreatedAt),
+		BatchNo:    utils.Wrap(r.BatchNo, utils.StringW),
+		RedeemedAt: utils.ToTimestamp(r.RedeemedAt),
+		UserId:     utils.Wrap(r.RedeemedBy, utils.StringW),
+		Nickname:   utils.Wrap(r.Nickname, utils.StringW),
 	}
 	row.Code = utils.StringW(r.Code)
 	return row
+}
+
+func batchPB(b *entitle.ActivationBatch) *esportspb.ActivationBatch {
+	return &esportspb.ActivationBatch{
+		BatchNo:    utils.StringW(b.BatchNo),
+		ReportType: reportTypeToPB(b.ReportType),
+		Count:      utils.Int32W(utils.ConvNum[int32, int](b.Count)),
+		UsedCount:  utils.Int32W(utils.ConvNum[int32, int](b.UsedCount)),
+		ExpiresAt:  utils.ToTimestamp(&b.ExpiresAt),
+		CreatedAt:  utils.ToTimestamp(&b.CreatedAt),
+		DisabledAt: utils.ToTimestamp(b.DisabledAt),
+	}
+}
+
+func reportTypePtrFromPB(t esportspb.ReportType) *string {
+	// The filters' direction: UNSPECIFIED folds to "no filter" — the
+	// caller omits rather than asks for it.
+	if t == esportspb.ReportType_REPORT_TYPE_UNSPECIFIED {
+		return nil
+	}
+	v := reportTypeFromPB(t)
+	return &v
+}
+
+func codeStatusPtrFromPB(t esportspb.ActivationCodeStatus) *string {
+	switch t {
+	case esportspb.ActivationCodeStatus_ACTIVATION_CODE_STATUS_UNUSED:
+		v := entitle.CodeStatusUnused
+		return &v
+	case esportspb.ActivationCodeStatus_ACTIVATION_CODE_STATUS_REDEEMED:
+		v := entitle.CodeStatusRedeemed
+		return &v
+	}
+	return nil
 }
 
 func membershipSummaryPB(f *MembershipFacts) *esportspb.MembershipSummary {

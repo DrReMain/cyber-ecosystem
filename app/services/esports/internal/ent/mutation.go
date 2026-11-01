@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"cyber-ecosystem/app/services/esports/internal/ent/abilityscore"
+	"cyber-ecosystem/app/services/esports/internal/ent/activationbatch"
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
@@ -39,21 +40,22 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAbilityScore   = "AbilityScore"
-	TypeActivationCode = "ActivationCode"
-	TypeEntitlement    = "Entitlement"
-	TypeGame           = "Game"
-	TypeMatchConfig    = "MatchConfig"
-	TypeMatchSession   = "MatchSession"
-	TypePayOrder       = "PayOrder"
-	TypeProfile        = "Profile"
-	TypeQuestionBank   = "QuestionBank"
-	TypeReportPolicy   = "ReportPolicy"
-	TypeReportSnapshot = "ReportSnapshot"
-	TypeSku            = "Sku"
-	TypeTest           = "Test"
-	TypeTestConfig     = "TestConfig"
-	TypeTestRecord     = "TestRecord"
+	TypeAbilityScore    = "AbilityScore"
+	TypeActivationBatch = "ActivationBatch"
+	TypeActivationCode  = "ActivationCode"
+	TypeEntitlement     = "Entitlement"
+	TypeGame            = "Game"
+	TypeMatchConfig     = "MatchConfig"
+	TypeMatchSession    = "MatchSession"
+	TypePayOrder        = "PayOrder"
+	TypeProfile         = "Profile"
+	TypeQuestionBank    = "QuestionBank"
+	TypeReportPolicy    = "ReportPolicy"
+	TypeReportSnapshot  = "ReportSnapshot"
+	TypeSku             = "Sku"
+	TypeTest            = "Test"
+	TypeTestConfig      = "TestConfig"
+	TypeTestRecord      = "TestRecord"
 )
 
 // AbilityScoreMutation represents an operation that mutates the AbilityScore nodes in the graph.
@@ -931,6 +933,738 @@ func (m *AbilityScoreMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown AbilityScore edge %s", name)
 }
 
+// ActivationBatchMutation represents an operation that mutates the ActivationBatch nodes in the graph.
+type ActivationBatchMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	created_at    *time.Time
+	updated_at    *time.Time
+	tenant_id     *string
+	no            *string
+	report_type   *activationbatch.ReportType
+	expires_at    *time.Time
+	created_by    *string
+	disabled_at   *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*ActivationBatch, error)
+	predicates    []predicate.ActivationBatch
+}
+
+var _ ent.Mutation = (*ActivationBatchMutation)(nil)
+
+// activationbatchOption allows management of the mutation configuration using functional options.
+type activationbatchOption func(*ActivationBatchMutation)
+
+// newActivationBatchMutation creates new mutation for the ActivationBatch entity.
+func newActivationBatchMutation(c config, op Op, opts ...activationbatchOption) *ActivationBatchMutation {
+	m := &ActivationBatchMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeActivationBatch,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withActivationBatchID sets the ID field of the mutation.
+func withActivationBatchID(id string) activationbatchOption {
+	return func(m *ActivationBatchMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ActivationBatch
+		)
+		m.oldValue = func(ctx context.Context) (*ActivationBatch, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ActivationBatch.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withActivationBatch sets the old ActivationBatch of the mutation.
+func withActivationBatch(node *ActivationBatch) activationbatchOption {
+	return func(m *ActivationBatchMutation) {
+		m.oldValue = func(context.Context) (*ActivationBatch, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ActivationBatchMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ActivationBatchMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ActivationBatch entities.
+func (m *ActivationBatchMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ActivationBatchMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ActivationBatchMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ActivationBatch.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ActivationBatchMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ActivationBatchMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ActivationBatch entity.
+// If the ActivationBatch object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationBatchMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ActivationBatchMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ActivationBatchMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ActivationBatchMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ActivationBatch entity.
+// If the ActivationBatch object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationBatchMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ActivationBatchMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *ActivationBatchMutation) SetTenantID(s string) {
+	m.tenant_id = &s
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *ActivationBatchMutation) TenantID() (r string, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the ActivationBatch entity.
+// If the ActivationBatch object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationBatchMutation) OldTenantID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *ActivationBatchMutation) ResetTenantID() {
+	m.tenant_id = nil
+}
+
+// SetNo sets the "no" field.
+func (m *ActivationBatchMutation) SetNo(s string) {
+	m.no = &s
+}
+
+// No returns the value of the "no" field in the mutation.
+func (m *ActivationBatchMutation) No() (r string, exists bool) {
+	v := m.no
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNo returns the old "no" field's value of the ActivationBatch entity.
+// If the ActivationBatch object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationBatchMutation) OldNo(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNo is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNo requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNo: %w", err)
+	}
+	return oldValue.No, nil
+}
+
+// ResetNo resets all changes to the "no" field.
+func (m *ActivationBatchMutation) ResetNo() {
+	m.no = nil
+}
+
+// SetReportType sets the "report_type" field.
+func (m *ActivationBatchMutation) SetReportType(at activationbatch.ReportType) {
+	m.report_type = &at
+}
+
+// ReportType returns the value of the "report_type" field in the mutation.
+func (m *ActivationBatchMutation) ReportType() (r activationbatch.ReportType, exists bool) {
+	v := m.report_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReportType returns the old "report_type" field's value of the ActivationBatch entity.
+// If the ActivationBatch object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationBatchMutation) OldReportType(ctx context.Context) (v activationbatch.ReportType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReportType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReportType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReportType: %w", err)
+	}
+	return oldValue.ReportType, nil
+}
+
+// ResetReportType resets all changes to the "report_type" field.
+func (m *ActivationBatchMutation) ResetReportType() {
+	m.report_type = nil
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (m *ActivationBatchMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
+}
+
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *ActivationBatchMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpiresAt returns the old "expires_at" field's value of the ActivationBatch entity.
+// If the ActivationBatch object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationBatchMutation) OldExpiresAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
+	}
+	return oldValue.ExpiresAt, nil
+}
+
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *ActivationBatchMutation) ResetExpiresAt() {
+	m.expires_at = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *ActivationBatchMutation) SetCreatedBy(s string) {
+	m.created_by = &s
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *ActivationBatchMutation) CreatedBy() (r string, exists bool) {
+	v := m.created_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the ActivationBatch entity.
+// If the ActivationBatch object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationBatchMutation) OldCreatedBy(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *ActivationBatchMutation) ResetCreatedBy() {
+	m.created_by = nil
+}
+
+// SetDisabledAt sets the "disabled_at" field.
+func (m *ActivationBatchMutation) SetDisabledAt(t time.Time) {
+	m.disabled_at = &t
+}
+
+// DisabledAt returns the value of the "disabled_at" field in the mutation.
+func (m *ActivationBatchMutation) DisabledAt() (r time.Time, exists bool) {
+	v := m.disabled_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDisabledAt returns the old "disabled_at" field's value of the ActivationBatch entity.
+// If the ActivationBatch object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationBatchMutation) OldDisabledAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDisabledAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDisabledAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDisabledAt: %w", err)
+	}
+	return oldValue.DisabledAt, nil
+}
+
+// ClearDisabledAt clears the value of the "disabled_at" field.
+func (m *ActivationBatchMutation) ClearDisabledAt() {
+	m.disabled_at = nil
+	m.clearedFields[activationbatch.FieldDisabledAt] = struct{}{}
+}
+
+// DisabledAtCleared returns if the "disabled_at" field was cleared in this mutation.
+func (m *ActivationBatchMutation) DisabledAtCleared() bool {
+	_, ok := m.clearedFields[activationbatch.FieldDisabledAt]
+	return ok
+}
+
+// ResetDisabledAt resets all changes to the "disabled_at" field.
+func (m *ActivationBatchMutation) ResetDisabledAt() {
+	m.disabled_at = nil
+	delete(m.clearedFields, activationbatch.FieldDisabledAt)
+}
+
+// Where appends a list predicates to the ActivationBatchMutation builder.
+func (m *ActivationBatchMutation) Where(ps ...predicate.ActivationBatch) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ActivationBatchMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ActivationBatchMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ActivationBatch, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ActivationBatchMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ActivationBatchMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ActivationBatch).
+func (m *ActivationBatchMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ActivationBatchMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.created_at != nil {
+		fields = append(fields, activationbatch.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, activationbatch.FieldUpdatedAt)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, activationbatch.FieldTenantID)
+	}
+	if m.no != nil {
+		fields = append(fields, activationbatch.FieldNo)
+	}
+	if m.report_type != nil {
+		fields = append(fields, activationbatch.FieldReportType)
+	}
+	if m.expires_at != nil {
+		fields = append(fields, activationbatch.FieldExpiresAt)
+	}
+	if m.created_by != nil {
+		fields = append(fields, activationbatch.FieldCreatedBy)
+	}
+	if m.disabled_at != nil {
+		fields = append(fields, activationbatch.FieldDisabledAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ActivationBatchMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case activationbatch.FieldCreatedAt:
+		return m.CreatedAt()
+	case activationbatch.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case activationbatch.FieldTenantID:
+		return m.TenantID()
+	case activationbatch.FieldNo:
+		return m.No()
+	case activationbatch.FieldReportType:
+		return m.ReportType()
+	case activationbatch.FieldExpiresAt:
+		return m.ExpiresAt()
+	case activationbatch.FieldCreatedBy:
+		return m.CreatedBy()
+	case activationbatch.FieldDisabledAt:
+		return m.DisabledAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ActivationBatchMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case activationbatch.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case activationbatch.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case activationbatch.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case activationbatch.FieldNo:
+		return m.OldNo(ctx)
+	case activationbatch.FieldReportType:
+		return m.OldReportType(ctx)
+	case activationbatch.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
+	case activationbatch.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case activationbatch.FieldDisabledAt:
+		return m.OldDisabledAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown ActivationBatch field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ActivationBatchMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case activationbatch.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case activationbatch.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case activationbatch.FieldTenantID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case activationbatch.FieldNo:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNo(v)
+		return nil
+	case activationbatch.FieldReportType:
+		v, ok := value.(activationbatch.ReportType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReportType(v)
+		return nil
+	case activationbatch.FieldExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiresAt(v)
+		return nil
+	case activationbatch.FieldCreatedBy:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case activationbatch.FieldDisabledAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDisabledAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ActivationBatch field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ActivationBatchMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ActivationBatchMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ActivationBatchMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ActivationBatch numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ActivationBatchMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(activationbatch.FieldDisabledAt) {
+		fields = append(fields, activationbatch.FieldDisabledAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ActivationBatchMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ActivationBatchMutation) ClearField(name string) error {
+	switch name {
+	case activationbatch.FieldDisabledAt:
+		m.ClearDisabledAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ActivationBatch nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ActivationBatchMutation) ResetField(name string) error {
+	switch name {
+	case activationbatch.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case activationbatch.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case activationbatch.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case activationbatch.FieldNo:
+		m.ResetNo()
+		return nil
+	case activationbatch.FieldReportType:
+		m.ResetReportType()
+		return nil
+	case activationbatch.FieldExpiresAt:
+		m.ResetExpiresAt()
+		return nil
+	case activationbatch.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case activationbatch.FieldDisabledAt:
+		m.ResetDisabledAt()
+		return nil
+	}
+	return fmt.Errorf("unknown ActivationBatch field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ActivationBatchMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ActivationBatchMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ActivationBatchMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ActivationBatchMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ActivationBatchMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ActivationBatchMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ActivationBatchMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ActivationBatch unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ActivationBatchMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ActivationBatch edge %s", name)
+}
+
 // ActivationCodeMutation represents an operation that mutates the ActivationCode nodes in the graph.
 type ActivationCodeMutation struct {
 	config
@@ -946,8 +1680,11 @@ type ActivationCodeMutation struct {
 	addquantity   *int
 	used_count    *int
 	addused_count *int
+	redeemed_by   *string
+	redeemed_at   *time.Time
 	expires_at    *time.Time
 	created_by    *string
+	batch_id      *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*ActivationCode, error)
@@ -1350,6 +2087,104 @@ func (m *ActivationCodeMutation) ResetUsedCount() {
 	m.addused_count = nil
 }
 
+// SetRedeemedBy sets the "redeemed_by" field.
+func (m *ActivationCodeMutation) SetRedeemedBy(s string) {
+	m.redeemed_by = &s
+}
+
+// RedeemedBy returns the value of the "redeemed_by" field in the mutation.
+func (m *ActivationCodeMutation) RedeemedBy() (r string, exists bool) {
+	v := m.redeemed_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRedeemedBy returns the old "redeemed_by" field's value of the ActivationCode entity.
+// If the ActivationCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationCodeMutation) OldRedeemedBy(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRedeemedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRedeemedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRedeemedBy: %w", err)
+	}
+	return oldValue.RedeemedBy, nil
+}
+
+// ClearRedeemedBy clears the value of the "redeemed_by" field.
+func (m *ActivationCodeMutation) ClearRedeemedBy() {
+	m.redeemed_by = nil
+	m.clearedFields[activationcode.FieldRedeemedBy] = struct{}{}
+}
+
+// RedeemedByCleared returns if the "redeemed_by" field was cleared in this mutation.
+func (m *ActivationCodeMutation) RedeemedByCleared() bool {
+	_, ok := m.clearedFields[activationcode.FieldRedeemedBy]
+	return ok
+}
+
+// ResetRedeemedBy resets all changes to the "redeemed_by" field.
+func (m *ActivationCodeMutation) ResetRedeemedBy() {
+	m.redeemed_by = nil
+	delete(m.clearedFields, activationcode.FieldRedeemedBy)
+}
+
+// SetRedeemedAt sets the "redeemed_at" field.
+func (m *ActivationCodeMutation) SetRedeemedAt(t time.Time) {
+	m.redeemed_at = &t
+}
+
+// RedeemedAt returns the value of the "redeemed_at" field in the mutation.
+func (m *ActivationCodeMutation) RedeemedAt() (r time.Time, exists bool) {
+	v := m.redeemed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRedeemedAt returns the old "redeemed_at" field's value of the ActivationCode entity.
+// If the ActivationCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationCodeMutation) OldRedeemedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRedeemedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRedeemedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRedeemedAt: %w", err)
+	}
+	return oldValue.RedeemedAt, nil
+}
+
+// ClearRedeemedAt clears the value of the "redeemed_at" field.
+func (m *ActivationCodeMutation) ClearRedeemedAt() {
+	m.redeemed_at = nil
+	m.clearedFields[activationcode.FieldRedeemedAt] = struct{}{}
+}
+
+// RedeemedAtCleared returns if the "redeemed_at" field was cleared in this mutation.
+func (m *ActivationCodeMutation) RedeemedAtCleared() bool {
+	_, ok := m.clearedFields[activationcode.FieldRedeemedAt]
+	return ok
+}
+
+// ResetRedeemedAt resets all changes to the "redeemed_at" field.
+func (m *ActivationCodeMutation) ResetRedeemedAt() {
+	m.redeemed_at = nil
+	delete(m.clearedFields, activationcode.FieldRedeemedAt)
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (m *ActivationCodeMutation) SetExpiresAt(t time.Time) {
 	m.expires_at = &t
@@ -1422,6 +2257,55 @@ func (m *ActivationCodeMutation) ResetCreatedBy() {
 	m.created_by = nil
 }
 
+// SetBatchID sets the "batch_id" field.
+func (m *ActivationCodeMutation) SetBatchID(s string) {
+	m.batch_id = &s
+}
+
+// BatchID returns the value of the "batch_id" field in the mutation.
+func (m *ActivationCodeMutation) BatchID() (r string, exists bool) {
+	v := m.batch_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBatchID returns the old "batch_id" field's value of the ActivationCode entity.
+// If the ActivationCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActivationCodeMutation) OldBatchID(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBatchID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBatchID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBatchID: %w", err)
+	}
+	return oldValue.BatchID, nil
+}
+
+// ClearBatchID clears the value of the "batch_id" field.
+func (m *ActivationCodeMutation) ClearBatchID() {
+	m.batch_id = nil
+	m.clearedFields[activationcode.FieldBatchID] = struct{}{}
+}
+
+// BatchIDCleared returns if the "batch_id" field was cleared in this mutation.
+func (m *ActivationCodeMutation) BatchIDCleared() bool {
+	_, ok := m.clearedFields[activationcode.FieldBatchID]
+	return ok
+}
+
+// ResetBatchID resets all changes to the "batch_id" field.
+func (m *ActivationCodeMutation) ResetBatchID() {
+	m.batch_id = nil
+	delete(m.clearedFields, activationcode.FieldBatchID)
+}
+
 // Where appends a list predicates to the ActivationCodeMutation builder.
 func (m *ActivationCodeMutation) Where(ps ...predicate.ActivationCode) {
 	m.predicates = append(m.predicates, ps...)
@@ -1456,7 +2340,7 @@ func (m *ActivationCodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ActivationCodeMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 12)
 	if m.created_at != nil {
 		fields = append(fields, activationcode.FieldCreatedAt)
 	}
@@ -1478,11 +2362,20 @@ func (m *ActivationCodeMutation) Fields() []string {
 	if m.used_count != nil {
 		fields = append(fields, activationcode.FieldUsedCount)
 	}
+	if m.redeemed_by != nil {
+		fields = append(fields, activationcode.FieldRedeemedBy)
+	}
+	if m.redeemed_at != nil {
+		fields = append(fields, activationcode.FieldRedeemedAt)
+	}
 	if m.expires_at != nil {
 		fields = append(fields, activationcode.FieldExpiresAt)
 	}
 	if m.created_by != nil {
 		fields = append(fields, activationcode.FieldCreatedBy)
+	}
+	if m.batch_id != nil {
+		fields = append(fields, activationcode.FieldBatchID)
 	}
 	return fields
 }
@@ -1506,10 +2399,16 @@ func (m *ActivationCodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Quantity()
 	case activationcode.FieldUsedCount:
 		return m.UsedCount()
+	case activationcode.FieldRedeemedBy:
+		return m.RedeemedBy()
+	case activationcode.FieldRedeemedAt:
+		return m.RedeemedAt()
 	case activationcode.FieldExpiresAt:
 		return m.ExpiresAt()
 	case activationcode.FieldCreatedBy:
 		return m.CreatedBy()
+	case activationcode.FieldBatchID:
+		return m.BatchID()
 	}
 	return nil, false
 }
@@ -1533,10 +2432,16 @@ func (m *ActivationCodeMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldQuantity(ctx)
 	case activationcode.FieldUsedCount:
 		return m.OldUsedCount(ctx)
+	case activationcode.FieldRedeemedBy:
+		return m.OldRedeemedBy(ctx)
+	case activationcode.FieldRedeemedAt:
+		return m.OldRedeemedAt(ctx)
 	case activationcode.FieldExpiresAt:
 		return m.OldExpiresAt(ctx)
 	case activationcode.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
+	case activationcode.FieldBatchID:
+		return m.OldBatchID(ctx)
 	}
 	return nil, fmt.Errorf("unknown ActivationCode field %s", name)
 }
@@ -1595,6 +2500,20 @@ func (m *ActivationCodeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUsedCount(v)
 		return nil
+	case activationcode.FieldRedeemedBy:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRedeemedBy(v)
+		return nil
+	case activationcode.FieldRedeemedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRedeemedAt(v)
+		return nil
 	case activationcode.FieldExpiresAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -1608,6 +2527,13 @@ func (m *ActivationCodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedBy(v)
+		return nil
+	case activationcode.FieldBatchID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBatchID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ActivationCode field %s", name)
@@ -1665,7 +2591,17 @@ func (m *ActivationCodeMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ActivationCodeMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(activationcode.FieldRedeemedBy) {
+		fields = append(fields, activationcode.FieldRedeemedBy)
+	}
+	if m.FieldCleared(activationcode.FieldRedeemedAt) {
+		fields = append(fields, activationcode.FieldRedeemedAt)
+	}
+	if m.FieldCleared(activationcode.FieldBatchID) {
+		fields = append(fields, activationcode.FieldBatchID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1678,6 +2614,17 @@ func (m *ActivationCodeMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ActivationCodeMutation) ClearField(name string) error {
+	switch name {
+	case activationcode.FieldRedeemedBy:
+		m.ClearRedeemedBy()
+		return nil
+	case activationcode.FieldRedeemedAt:
+		m.ClearRedeemedAt()
+		return nil
+	case activationcode.FieldBatchID:
+		m.ClearBatchID()
+		return nil
+	}
 	return fmt.Errorf("unknown ActivationCode nullable field %s", name)
 }
 
@@ -1706,11 +2653,20 @@ func (m *ActivationCodeMutation) ResetField(name string) error {
 	case activationcode.FieldUsedCount:
 		m.ResetUsedCount()
 		return nil
+	case activationcode.FieldRedeemedBy:
+		m.ResetRedeemedBy()
+		return nil
+	case activationcode.FieldRedeemedAt:
+		m.ResetRedeemedAt()
+		return nil
 	case activationcode.FieldExpiresAt:
 		m.ResetExpiresAt()
 		return nil
 	case activationcode.FieldCreatedBy:
 		m.ResetCreatedBy()
+		return nil
+	case activationcode.FieldBatchID:
+		m.ResetBatchID()
 		return nil
 	}
 	return fmt.Errorf("unknown ActivationCode field %s", name)

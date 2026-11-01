@@ -86,6 +86,58 @@ func (ReportAccessPolicy) EnumDescriptor() ([]byte, []int) {
 	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{0}
 }
 
+// The two states a code row reads in — redeemed means its single use is
+// taken, unused means still spendable (unless the batch is disabled or
+// the deadline passed; both are batch-level facts, not row states).
+type ActivationCodeStatus int32
+
+const (
+	ActivationCodeStatus_ACTIVATION_CODE_STATUS_UNSPECIFIED ActivationCodeStatus = 0
+	ActivationCodeStatus_ACTIVATION_CODE_STATUS_UNUSED      ActivationCodeStatus = 1
+	ActivationCodeStatus_ACTIVATION_CODE_STATUS_REDEEMED    ActivationCodeStatus = 2
+)
+
+// Enum value maps for ActivationCodeStatus.
+var (
+	ActivationCodeStatus_name = map[int32]string{
+		0: "ACTIVATION_CODE_STATUS_UNSPECIFIED",
+		1: "ACTIVATION_CODE_STATUS_UNUSED",
+		2: "ACTIVATION_CODE_STATUS_REDEEMED",
+	}
+	ActivationCodeStatus_value = map[string]int32{
+		"ACTIVATION_CODE_STATUS_UNSPECIFIED": 0,
+		"ACTIVATION_CODE_STATUS_UNUSED":      1,
+		"ACTIVATION_CODE_STATUS_REDEEMED":    2,
+	}
+)
+
+func (x ActivationCodeStatus) Enum() *ActivationCodeStatus {
+	p := new(ActivationCodeStatus)
+	*p = x
+	return p
+}
+
+func (x ActivationCodeStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ActivationCodeStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_cyber_esports_v1_activation_admin_proto_enumTypes[1].Descriptor()
+}
+
+func (ActivationCodeStatus) Type() protoreflect.EnumType {
+	return &file_cyber_esports_v1_activation_admin_proto_enumTypes[1]
+}
+
+func (x ActivationCodeStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ActivationCodeStatus.Descriptor instead.
+func (ActivationCodeStatus) EnumDescriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{1}
+}
+
 // The four states an operator reads a membership period in. Only
 // TERMINATED is a stored fact — the terminate action flips the row's
 // status and nothing else; ACTIVE, EXPIRING_SOON and EXPIRED are derived
@@ -131,11 +183,11 @@ func (x MembershipStatus) String() string {
 }
 
 func (MembershipStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_cyber_esports_v1_activation_admin_proto_enumTypes[1].Descriptor()
+	return file_cyber_esports_v1_activation_admin_proto_enumTypes[2].Descriptor()
 }
 
 func (MembershipStatus) Type() protoreflect.EnumType {
-	return &file_cyber_esports_v1_activation_admin_proto_enumTypes[1]
+	return &file_cyber_esports_v1_activation_admin_proto_enumTypes[2]
 }
 
 func (x MembershipStatus) Number() protoreflect.EnumNumber {
@@ -144,7 +196,7 @@ func (x MembershipStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MembershipStatus.Descriptor instead.
 func (MembershipStatus) EnumDescriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{1}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{2}
 }
 
 // Where a period came from, folded from the ledger row's source artifact:
@@ -187,11 +239,11 @@ func (x MembershipSource) String() string {
 }
 
 func (MembershipSource) Descriptor() protoreflect.EnumDescriptor {
-	return file_cyber_esports_v1_activation_admin_proto_enumTypes[2].Descriptor()
+	return file_cyber_esports_v1_activation_admin_proto_enumTypes[3].Descriptor()
 }
 
 func (MembershipSource) Type() protoreflect.EnumType {
-	return &file_cyber_esports_v1_activation_admin_proto_enumTypes[2]
+	return &file_cyber_esports_v1_activation_admin_proto_enumTypes[3]
 }
 
 func (x MembershipSource) Number() protoreflect.EnumNumber {
@@ -200,24 +252,137 @@ func (x MembershipSource) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MembershipSource.Descriptor instead.
 func (MembershipSource) EnumDescriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{2}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{3}
+}
+
+// One generation call's mint: the unit an operator disables, exports,
+// and reads burn-down by. Count facts are aggregates over the code rows
+// — the batch row carries only batch-level truth (family, deadline, the
+// disable flip), so the two can never drift.
+type ActivationBatch struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Human-shape batch number (B-YYMM-XXXX) — the string support quotes
+	// on the phone.
+	BatchNo    *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=batch_no,json=batchNo,proto3" json:"batch_no,omitempty"`
+	ReportType ReportType              `protobuf:"varint,2,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType" json:"report_type,omitempty"`
+	// Codes minted in this batch.
+	Count *wrapperspb.Int32Value `protobuf:"bytes,3,opt,name=count,proto3" json:"count,omitempty"`
+	// Codes already redeemed.
+	UsedCount *wrapperspb.Int32Value `protobuf:"bytes,4,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`
+	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// Absent = live batch; present = the moment the operator disabled it.
+	// Disabling voids every unredeemed code in the batch on the spot —
+	// grants already landed stay landed, the same permanence a settled
+	// order gets.
+	DisabledAt    *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=disabled_at,json=disabledAt,proto3" json:"disabled_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ActivationBatch) Reset() {
+	*x = ActivationBatch{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ActivationBatch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ActivationBatch) ProtoMessage() {}
+
+func (x *ActivationBatch) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ActivationBatch.ProtoReflect.Descriptor instead.
+func (*ActivationBatch) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *ActivationBatch) GetBatchNo() *wrapperspb.StringValue {
+	if x != nil {
+		return x.BatchNo
+	}
+	return nil
+}
+
+func (x *ActivationBatch) GetReportType() ReportType {
+	if x != nil {
+		return x.ReportType
+	}
+	return ReportType_REPORT_TYPE_UNSPECIFIED
+}
+
+func (x *ActivationBatch) GetCount() *wrapperspb.Int32Value {
+	if x != nil {
+		return x.Count
+	}
+	return nil
+}
+
+func (x *ActivationBatch) GetUsedCount() *wrapperspb.Int32Value {
+	if x != nil {
+		return x.UsedCount
+	}
+	return nil
+}
+
+func (x *ActivationBatch) GetExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return nil
+}
+
+func (x *ActivationBatch) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *ActivationBatch) GetDisabledAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DisabledAt
+	}
+	return nil
 }
 
 type ActivationCode struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Code          *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	ReportType    ReportType              `protobuf:"varint,2,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType" json:"report_type,omitempty"`
-	Quantity      *wrapperspb.Int32Value  `protobuf:"bytes,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	UsedCount     *wrapperspb.Int32Value  `protobuf:"bytes,4,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`
-	ExpiresAt     *timestamppb.Timestamp  `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	CreatedAt     *timestamppb.Timestamp  `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	state      protoimpl.MessageState  `protogen:"open.v1"`
+	Code       *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	ReportType ReportType              `protobuf:"varint,2,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType" json:"report_type,omitempty"`
+	Quantity   *wrapperspb.Int32Value  `protobuf:"bytes,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	UsedCount  *wrapperspb.Int32Value  `protobuf:"bytes,4,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`
+	ExpiresAt  *timestamppb.Timestamp  `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	CreatedAt  *timestamppb.Timestamp  `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// The minting batch this code belongs to; absent only on rows older
+	// than the batch model itself.
+	BatchNo *wrapperspb.StringValue `protobuf:"bytes,7,opt,name=batch_no,json=batchNo,proto3" json:"batch_no,omitempty"`
+	// The redeem's trail, hydrated from the grant the redeem landed:
+	// absent on an unredeemed code. user_id is the member link target;
+	// nickname is the local profile fold operators read.
+	RedeemedAt    *timestamppb.Timestamp  `protobuf:"bytes,8,opt,name=redeemed_at,json=redeemedAt,proto3" json:"redeemed_at,omitempty"`
+	UserId        *wrapperspb.StringValue `protobuf:"bytes,9,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Nickname      *wrapperspb.StringValue `protobuf:"bytes,10,opt,name=nickname,proto3" json:"nickname,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ActivationCode) Reset() {
 	*x = ActivationCode{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[0]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -229,7 +394,7 @@ func (x *ActivationCode) String() string {
 func (*ActivationCode) ProtoMessage() {}
 
 func (x *ActivationCode) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[0]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -242,7 +407,7 @@ func (x *ActivationCode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActivationCode.ProtoReflect.Descriptor instead.
 func (*ActivationCode) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{0}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ActivationCode) GetCode() *wrapperspb.StringValue {
@@ -287,6 +452,34 @@ func (x *ActivationCode) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *ActivationCode) GetBatchNo() *wrapperspb.StringValue {
+	if x != nil {
+		return x.BatchNo
+	}
+	return nil
+}
+
+func (x *ActivationCode) GetRedeemedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RedeemedAt
+	}
+	return nil
+}
+
+func (x *ActivationCode) GetUserId() *wrapperspb.StringValue {
+	if x != nil {
+		return x.UserId
+	}
+	return nil
+}
+
+func (x *ActivationCode) GetNickname() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Nickname
+	}
+	return nil
+}
+
 type GenerateActivationCodesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ReportType    *ReportType            `protobuf:"varint,1,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType,oneof" json:"report_type,omitempty"`
@@ -298,7 +491,7 @@ type GenerateActivationCodesRequest struct {
 
 func (x *GenerateActivationCodesRequest) Reset() {
 	*x = GenerateActivationCodesRequest{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[1]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -310,7 +503,7 @@ func (x *GenerateActivationCodesRequest) String() string {
 func (*GenerateActivationCodesRequest) ProtoMessage() {}
 
 func (x *GenerateActivationCodesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[1]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -323,7 +516,7 @@ func (x *GenerateActivationCodesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateActivationCodesRequest.ProtoReflect.Descriptor instead.
 func (*GenerateActivationCodesRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{1}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GenerateActivationCodesRequest) GetReportType() ReportType {
@@ -351,14 +544,19 @@ type GenerateActivationCodesResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The codes in full, this once and on every later list — generation
 	// answers what was minted so the operator hands them out.
-	Codes         []string `protobuf:"bytes,1,rep,name=codes,proto3" json:"codes,omitempty"`
+	Codes []string `protobuf:"bytes,1,rep,name=codes,proto3" json:"codes,omitempty"`
+	// The batch these codes share — the handle for the detail page and
+	// every later status flip. Plain string, not a wrapper: generation
+	// succeeded means the batch exists, absence is not a state this field
+	// can carry.
+	BatchNo       string `protobuf:"bytes,2,opt,name=batch_no,json=batchNo,proto3" json:"batch_no,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GenerateActivationCodesResponse) Reset() {
 	*x = GenerateActivationCodesResponse{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -370,7 +568,7 @@ func (x *GenerateActivationCodesResponse) String() string {
 func (*GenerateActivationCodesResponse) ProtoMessage() {}
 
 func (x *GenerateActivationCodesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -383,7 +581,7 @@ func (x *GenerateActivationCodesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateActivationCodesResponse.ProtoReflect.Descriptor instead.
 func (*GenerateActivationCodesResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{2}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GenerateActivationCodesResponse) GetCodes() []string {
@@ -393,17 +591,242 @@ func (x *GenerateActivationCodesResponse) GetCodes() []string {
 	return nil
 }
 
-type ListActivationCodesRequest struct {
+func (x *GenerateActivationCodesResponse) GetBatchNo() string {
+	if x != nil {
+		return x.BatchNo
+	}
+	return ""
+}
+
+type SetActivationBatchStatusRequest struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	BatchNo string                 `protobuf:"bytes,1,opt,name=batch_no,json=batchNo,proto3" json:"batch_no,omitempty"`
+	// True = disable (unredeemed codes void immediately), false = re-enable.
+	Disabled      *bool `protobuf:"varint,2,opt,name=disabled,proto3,oneof" json:"disabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetActivationBatchStatusRequest) Reset() {
+	*x = SetActivationBatchStatusRequest{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetActivationBatchStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetActivationBatchStatusRequest) ProtoMessage() {}
+
+func (x *SetActivationBatchStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetActivationBatchStatusRequest.ProtoReflect.Descriptor instead.
+func (*SetActivationBatchStatusRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SetActivationBatchStatusRequest) GetBatchNo() string {
+	if x != nil {
+		return x.BatchNo
+	}
+	return ""
+}
+
+func (x *SetActivationBatchStatusRequest) GetDisabled() bool {
+	if x != nil && x.Disabled != nil {
+		return *x.Disabled
+	}
+	return false
+}
+
+type SetActivationBatchStatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          *v1.PageRequest        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
-	ReportType    *ReportType            `protobuf:"varint,2,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType,oneof" json:"report_type,omitempty"`
+	Batch         *ActivationBatch       `protobuf:"bytes,1,opt,name=batch,proto3" json:"batch,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetActivationBatchStatusResponse) Reset() {
+	*x = SetActivationBatchStatusResponse{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetActivationBatchStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetActivationBatchStatusResponse) ProtoMessage() {}
+
+func (x *SetActivationBatchStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetActivationBatchStatusResponse.ProtoReflect.Descriptor instead.
+func (*SetActivationBatchStatusResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *SetActivationBatchStatusResponse) GetBatch() *ActivationBatch {
+	if x != nil {
+		return x.Batch
+	}
+	return nil
+}
+
+type ExportActivationCodesRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// An export hands out usable code values — that hand-out is the
+	// sensitive act, so the RPC carries ACTION_WRITE and lands one audit
+	// line per export even though it changes nothing.
+	// Absent = every batch; present = the named batch's codes.
+	BatchNo *string `protobuf:"bytes,1,opt,name=batch_no,json=batchNo,proto3,oneof" json:"batch_no,omitempty"`
+	// Absent = every code; the natural ask is the unredeemed remainder an
+	// operator is about to hand out.
+	CodeStatus *ActivationCodeStatus `protobuf:"varint,2,opt,name=code_status,json=codeStatus,proto3,enum=cyber.esports.v1.ActivationCodeStatus,oneof" json:"code_status,omitempty"`
+	// Same find-one filter as the list — an export answers the visible
+	// filter, never a wider set.
+	Code          *string `protobuf:"bytes,3,opt,name=code,proto3,oneof" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExportActivationCodesRequest) Reset() {
+	*x = ExportActivationCodesRequest{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExportActivationCodesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExportActivationCodesRequest) ProtoMessage() {}
+
+func (x *ExportActivationCodesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExportActivationCodesRequest.ProtoReflect.Descriptor instead.
+func (*ExportActivationCodesRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ExportActivationCodesRequest) GetBatchNo() string {
+	if x != nil && x.BatchNo != nil {
+		return *x.BatchNo
+	}
+	return ""
+}
+
+func (x *ExportActivationCodesRequest) GetCodeStatus() ActivationCodeStatus {
+	if x != nil && x.CodeStatus != nil {
+		return *x.CodeStatus
+	}
+	return ActivationCodeStatus_ACTIVATION_CODE_STATUS_UNSPECIFIED
+}
+
+func (x *ExportActivationCodesRequest) GetCode() string {
+	if x != nil && x.Code != nil {
+		return *x.Code
+	}
+	return ""
+}
+
+type ExportActivationCodesResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The whole filtered set in one answer, no paging — a batch tops out
+	// at a thousand codes, so the export stays one payload.
+	Codes         []*ActivationCode `protobuf:"bytes,1,rep,name=codes,proto3" json:"codes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExportActivationCodesResponse) Reset() {
+	*x = ExportActivationCodesResponse{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExportActivationCodesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExportActivationCodesResponse) ProtoMessage() {}
+
+func (x *ExportActivationCodesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExportActivationCodesResponse.ProtoReflect.Descriptor instead.
+func (*ExportActivationCodesResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ExportActivationCodesResponse) GetCodes() []*ActivationCode {
+	if x != nil {
+		return x.Codes
+	}
+	return nil
+}
+
+type ListActivationCodesRequest struct {
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Page       *v1.PageRequest        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	ReportType *ReportType            `protobuf:"varint,2,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType,oneof" json:"report_type,omitempty"`
+	// Present = one batch's code table (the detail page); absent = the
+	// flat all-codes view.
+	BatchNo    *string               `protobuf:"bytes,3,opt,name=batch_no,json=batchNo,proto3,oneof" json:"batch_no,omitempty"`
+	CodeStatus *ActivationCodeStatus `protobuf:"varint,4,opt,name=code_status,json=codeStatus,proto3,enum=cyber.esports.v1.ActivationCodeStatus,oneof" json:"code_status,omitempty"`
+	// Present = the exact code an operator is chasing — the detail page's
+	// find-one search box; a no-match code answers the empty page.
+	Code          *string `protobuf:"bytes,5,opt,name=code,proto3,oneof" json:"code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListActivationCodesRequest) Reset() {
 	*x = ListActivationCodesRequest{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[3]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -415,7 +838,7 @@ func (x *ListActivationCodesRequest) String() string {
 func (*ListActivationCodesRequest) ProtoMessage() {}
 
 func (x *ListActivationCodesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[3]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -428,7 +851,7 @@ func (x *ListActivationCodesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListActivationCodesRequest.ProtoReflect.Descriptor instead.
 func (*ListActivationCodesRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{3}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListActivationCodesRequest) GetPage() *v1.PageRequest {
@@ -445,6 +868,27 @@ func (x *ListActivationCodesRequest) GetReportType() ReportType {
 	return ReportType_REPORT_TYPE_UNSPECIFIED
 }
 
+func (x *ListActivationCodesRequest) GetBatchNo() string {
+	if x != nil && x.BatchNo != nil {
+		return *x.BatchNo
+	}
+	return ""
+}
+
+func (x *ListActivationCodesRequest) GetCodeStatus() ActivationCodeStatus {
+	if x != nil && x.CodeStatus != nil {
+		return *x.CodeStatus
+	}
+	return ActivationCodeStatus_ACTIVATION_CODE_STATUS_UNSPECIFIED
+}
+
+func (x *ListActivationCodesRequest) GetCode() string {
+	if x != nil && x.Code != nil {
+		return *x.Code
+	}
+	return ""
+}
+
 type ListActivationCodesResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          *v1.PageResponse       `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
@@ -455,7 +899,7 @@ type ListActivationCodesResponse struct {
 
 func (x *ListActivationCodesResponse) Reset() {
 	*x = ListActivationCodesResponse{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -467,7 +911,7 @@ func (x *ListActivationCodesResponse) String() string {
 func (*ListActivationCodesResponse) ProtoMessage() {}
 
 func (x *ListActivationCodesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -480,7 +924,7 @@ func (x *ListActivationCodesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListActivationCodesResponse.ProtoReflect.Descriptor instead.
 func (*ListActivationCodesResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{4}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListActivationCodesResponse) GetPage() *v1.PageResponse {
@@ -497,6 +941,155 @@ func (x *ListActivationCodesResponse) GetCodes() []*ActivationCode {
 	return nil
 }
 
+type ListActivationBatchesRequest struct {
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Page       *v1.PageRequest        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	ReportType *ReportType            `protobuf:"varint,2,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType,oneof" json:"report_type,omitempty"`
+	// Absent = every batch; true = disabled only, false = live only.
+	Disabled *bool `protobuf:"varint,3,opt,name=disabled,proto3,oneof" json:"disabled,omitempty"`
+	// Exact-match lookup — the detail page's header facts in one answer.
+	BatchNo       *string `protobuf:"bytes,4,opt,name=batch_no,json=batchNo,proto3,oneof" json:"batch_no,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListActivationBatchesRequest) Reset() {
+	*x = ListActivationBatchesRequest{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListActivationBatchesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListActivationBatchesRequest) ProtoMessage() {}
+
+func (x *ListActivationBatchesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListActivationBatchesRequest.ProtoReflect.Descriptor instead.
+func (*ListActivationBatchesRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListActivationBatchesRequest) GetPage() *v1.PageRequest {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *ListActivationBatchesRequest) GetReportType() ReportType {
+	if x != nil && x.ReportType != nil {
+		return *x.ReportType
+	}
+	return ReportType_REPORT_TYPE_UNSPECIFIED
+}
+
+func (x *ListActivationBatchesRequest) GetDisabled() bool {
+	if x != nil && x.Disabled != nil {
+		return *x.Disabled
+	}
+	return false
+}
+
+func (x *ListActivationBatchesRequest) GetBatchNo() string {
+	if x != nil && x.BatchNo != nil {
+		return *x.BatchNo
+	}
+	return ""
+}
+
+type ListActivationBatchesResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Page  *v1.PageResponse       `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	// Newest batch first.
+	Batches []*ActivationBatch `protobuf:"bytes,2,rep,name=batches,proto3" json:"batches,omitempty"`
+	// Fold over every batch, independent of the applied filters — the
+	// footer's one count line instead of one query per number.
+	TotalBatches  *wrapperspb.Int32Value `protobuf:"bytes,3,opt,name=total_batches,json=totalBatches,proto3" json:"total_batches,omitempty"`
+	TotalCodes    *wrapperspb.Int32Value `protobuf:"bytes,4,opt,name=total_codes,json=totalCodes,proto3" json:"total_codes,omitempty"`
+	UsedCodes     *wrapperspb.Int32Value `protobuf:"bytes,5,opt,name=used_codes,json=usedCodes,proto3" json:"used_codes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListActivationBatchesResponse) Reset() {
+	*x = ListActivationBatchesResponse{}
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListActivationBatchesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListActivationBatchesResponse) ProtoMessage() {}
+
+func (x *ListActivationBatchesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListActivationBatchesResponse.ProtoReflect.Descriptor instead.
+func (*ListActivationBatchesResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ListActivationBatchesResponse) GetPage() *v1.PageResponse {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *ListActivationBatchesResponse) GetBatches() []*ActivationBatch {
+	if x != nil {
+		return x.Batches
+	}
+	return nil
+}
+
+func (x *ListActivationBatchesResponse) GetTotalBatches() *wrapperspb.Int32Value {
+	if x != nil {
+		return x.TotalBatches
+	}
+	return nil
+}
+
+func (x *ListActivationBatchesResponse) GetTotalCodes() *wrapperspb.Int32Value {
+	if x != nil {
+		return x.TotalCodes
+	}
+	return nil
+}
+
+func (x *ListActivationBatchesResponse) GetUsedCodes() *wrapperspb.Int32Value {
+	if x != nil {
+		return x.UsedCodes
+	}
+	return nil
+}
+
 type SetReportAccessPolicyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ReportType    *ReportType            `protobuf:"varint,1,opt,name=report_type,json=reportType,proto3,enum=cyber.esports.v1.ReportType,oneof" json:"report_type,omitempty"`
@@ -507,7 +1100,7 @@ type SetReportAccessPolicyRequest struct {
 
 func (x *SetReportAccessPolicyRequest) Reset() {
 	*x = SetReportAccessPolicyRequest{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -519,7 +1112,7 @@ func (x *SetReportAccessPolicyRequest) String() string {
 func (*SetReportAccessPolicyRequest) ProtoMessage() {}
 
 func (x *SetReportAccessPolicyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -532,7 +1125,7 @@ func (x *SetReportAccessPolicyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetReportAccessPolicyRequest.ProtoReflect.Descriptor instead.
 func (*SetReportAccessPolicyRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{5}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SetReportAccessPolicyRequest) GetReportType() ReportType {
@@ -559,7 +1152,7 @@ type SetReportAccessPolicyResponse struct {
 
 func (x *SetReportAccessPolicyResponse) Reset() {
 	*x = SetReportAccessPolicyResponse{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[6]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -571,7 +1164,7 @@ func (x *SetReportAccessPolicyResponse) String() string {
 func (*SetReportAccessPolicyResponse) ProtoMessage() {}
 
 func (x *SetReportAccessPolicyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[6]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -584,7 +1177,7 @@ func (x *SetReportAccessPolicyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetReportAccessPolicyResponse.ProtoReflect.Descriptor instead.
 func (*SetReportAccessPolicyResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{6}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *SetReportAccessPolicyResponse) GetReportType() ReportType {
@@ -609,7 +1202,7 @@ type ListReportAccessPoliciesRequest struct {
 
 func (x *ListReportAccessPoliciesRequest) Reset() {
 	*x = ListReportAccessPoliciesRequest{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[7]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -621,7 +1214,7 @@ func (x *ListReportAccessPoliciesRequest) String() string {
 func (*ListReportAccessPoliciesRequest) ProtoMessage() {}
 
 func (x *ListReportAccessPoliciesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[7]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -634,7 +1227,7 @@ func (x *ListReportAccessPoliciesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListReportAccessPoliciesRequest.ProtoReflect.Descriptor instead.
 func (*ListReportAccessPoliciesRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{7}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{14}
 }
 
 type ListReportAccessPoliciesResponse struct {
@@ -646,7 +1239,7 @@ type ListReportAccessPoliciesResponse struct {
 
 func (x *ListReportAccessPoliciesResponse) Reset() {
 	*x = ListReportAccessPoliciesResponse{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[8]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -658,7 +1251,7 @@ func (x *ListReportAccessPoliciesResponse) String() string {
 func (*ListReportAccessPoliciesResponse) ProtoMessage() {}
 
 func (x *ListReportAccessPoliciesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[8]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -671,7 +1264,7 @@ func (x *ListReportAccessPoliciesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListReportAccessPoliciesResponse.ProtoReflect.Descriptor instead.
 func (*ListReportAccessPoliciesResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{8}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ListReportAccessPoliciesResponse) GetPolicies() []*ReportPolicyRow {
@@ -699,7 +1292,7 @@ type ReportPolicyRow struct {
 
 func (x *ReportPolicyRow) Reset() {
 	*x = ReportPolicyRow{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[9]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -711,7 +1304,7 @@ func (x *ReportPolicyRow) String() string {
 func (*ReportPolicyRow) ProtoMessage() {}
 
 func (x *ReportPolicyRow) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[9]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -724,7 +1317,7 @@ func (x *ReportPolicyRow) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportPolicyRow.ProtoReflect.Descriptor instead.
 func (*ReportPolicyRow) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{9}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ReportPolicyRow) GetReportType() ReportType {
@@ -793,7 +1386,7 @@ type MembershipSummary struct {
 
 func (x *MembershipSummary) Reset() {
 	*x = MembershipSummary{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[10]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -805,7 +1398,7 @@ func (x *MembershipSummary) String() string {
 func (*MembershipSummary) ProtoMessage() {}
 
 func (x *MembershipSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[10]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -818,7 +1411,7 @@ func (x *MembershipSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MembershipSummary.ProtoReflect.Descriptor instead.
 func (*MembershipSummary) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{10}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *MembershipSummary) GetUserId() *wrapperspb.StringValue {
@@ -909,7 +1502,7 @@ type MembershipPeriod struct {
 
 func (x *MembershipPeriod) Reset() {
 	*x = MembershipPeriod{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[11]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -921,7 +1514,7 @@ func (x *MembershipPeriod) String() string {
 func (*MembershipPeriod) ProtoMessage() {}
 
 func (x *MembershipPeriod) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[11]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -934,7 +1527,7 @@ func (x *MembershipPeriod) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MembershipPeriod.ProtoReflect.Descriptor instead.
 func (*MembershipPeriod) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{11}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *MembershipPeriod) GetGrantedAt() *timestamppb.Timestamp {
@@ -986,7 +1579,7 @@ type GrantMembershipRequest struct {
 
 func (x *GrantMembershipRequest) Reset() {
 	*x = GrantMembershipRequest{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[12]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -998,7 +1591,7 @@ func (x *GrantMembershipRequest) String() string {
 func (*GrantMembershipRequest) ProtoMessage() {}
 
 func (x *GrantMembershipRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[12]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1011,7 +1604,7 @@ func (x *GrantMembershipRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GrantMembershipRequest.ProtoReflect.Descriptor instead.
 func (*GrantMembershipRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{12}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GrantMembershipRequest) GetUserId() string {
@@ -1037,7 +1630,7 @@ type GrantMembershipResponse struct {
 
 func (x *GrantMembershipResponse) Reset() {
 	*x = GrantMembershipResponse{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[13]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1049,7 +1642,7 @@ func (x *GrantMembershipResponse) String() string {
 func (*GrantMembershipResponse) ProtoMessage() {}
 
 func (x *GrantMembershipResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[13]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1062,7 +1655,7 @@ func (x *GrantMembershipResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GrantMembershipResponse.ProtoReflect.Descriptor instead.
 func (*GrantMembershipResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{13}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *GrantMembershipResponse) GetMembership() *MembershipSummary {
@@ -1085,7 +1678,7 @@ type TerminateMembershipRequest struct {
 
 func (x *TerminateMembershipRequest) Reset() {
 	*x = TerminateMembershipRequest{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[14]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1097,7 +1690,7 @@ func (x *TerminateMembershipRequest) String() string {
 func (*TerminateMembershipRequest) ProtoMessage() {}
 
 func (x *TerminateMembershipRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[14]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1110,7 +1703,7 @@ func (x *TerminateMembershipRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TerminateMembershipRequest.ProtoReflect.Descriptor instead.
 func (*TerminateMembershipRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{14}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *TerminateMembershipRequest) GetUserId() string {
@@ -1129,7 +1722,7 @@ type TerminateMembershipResponse struct {
 
 func (x *TerminateMembershipResponse) Reset() {
 	*x = TerminateMembershipResponse{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[15]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1141,7 +1734,7 @@ func (x *TerminateMembershipResponse) String() string {
 func (*TerminateMembershipResponse) ProtoMessage() {}
 
 func (x *TerminateMembershipResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[15]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1154,7 +1747,7 @@ func (x *TerminateMembershipResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TerminateMembershipResponse.ProtoReflect.Descriptor instead.
 func (*TerminateMembershipResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{15}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *TerminateMembershipResponse) GetMembership() *MembershipSummary {
@@ -1177,7 +1770,7 @@ type ListMembershipsRequest struct {
 
 func (x *ListMembershipsRequest) Reset() {
 	*x = ListMembershipsRequest{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[16]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1189,7 +1782,7 @@ func (x *ListMembershipsRequest) String() string {
 func (*ListMembershipsRequest) ProtoMessage() {}
 
 func (x *ListMembershipsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[16]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1202,7 +1795,7 @@ func (x *ListMembershipsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMembershipsRequest.ProtoReflect.Descriptor instead.
 func (*ListMembershipsRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{16}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ListMembershipsRequest) GetPage() *v1.PageRequest {
@@ -1243,7 +1836,7 @@ type ListMembershipsResponse struct {
 
 func (x *ListMembershipsResponse) Reset() {
 	*x = ListMembershipsResponse{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[17]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1255,7 +1848,7 @@ func (x *ListMembershipsResponse) String() string {
 func (*ListMembershipsResponse) ProtoMessage() {}
 
 func (x *ListMembershipsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[17]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1268,7 +1861,7 @@ func (x *ListMembershipsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMembershipsResponse.ProtoReflect.Descriptor instead.
 func (*ListMembershipsResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{17}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ListMembershipsResponse) GetPage() *v1.PageResponse {
@@ -1324,7 +1917,7 @@ type GetMembershipRequest struct {
 
 func (x *GetMembershipRequest) Reset() {
 	*x = GetMembershipRequest{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[18]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1336,7 +1929,7 @@ func (x *GetMembershipRequest) String() string {
 func (*GetMembershipRequest) ProtoMessage() {}
 
 func (x *GetMembershipRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[18]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1349,7 +1942,7 @@ func (x *GetMembershipRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMembershipRequest.ProtoReflect.Descriptor instead.
 func (*GetMembershipRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{18}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GetMembershipRequest) GetUserId() string {
@@ -1376,7 +1969,7 @@ type GetMembershipResponse struct {
 
 func (x *GetMembershipResponse) Reset() {
 	*x = GetMembershipResponse{}
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[19]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1388,7 +1981,7 @@ func (x *GetMembershipResponse) String() string {
 func (*GetMembershipResponse) ProtoMessage() {}
 
 func (x *GetMembershipResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[19]
+	mi := &file_cyber_esports_v1_activation_admin_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1401,7 +1994,7 @@ func (x *GetMembershipResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMembershipResponse.ProtoReflect.Descriptor instead.
 func (*GetMembershipResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{19}
+	return file_cyber_esports_v1_activation_admin_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *GetMembershipResponse) GetMembership() *MembershipSummary {
@@ -1443,7 +2036,20 @@ var File_cyber_esports_v1_activation_admin_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"\n" +
-	"'cyber/esports/v1/activation_admin.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\"cyber/esports/v1/entitlement.proto\x1a\x1ecyber/esports/v1/profile.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xec\x02\n" +
+	"'cyber/esports/v1/activation_admin.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\"cyber/esports/v1/entitlement.proto\x1a\x1ecyber/esports/v1/profile.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xab\x03\n" +
+	"\x0fActivationBatch\x127\n" +
+	"\bbatch_no\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\abatchNo\x12=\n" +
+	"\vreport_type\x18\x02 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeR\n" +
+	"reportType\x121\n" +
+	"\x05count\x18\x03 \x01(\v2\x1b.google.protobuf.Int32ValueR\x05count\x12:\n" +
+	"\n" +
+	"used_count\x18\x04 \x01(\v2\x1b.google.protobuf.Int32ValueR\tusedCount\x129\n" +
+	"\n" +
+	"expires_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x129\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12;\n" +
+	"\vdisabled_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"disabledAt\"\xd3\x04\n" +
 	"\x0eActivationCode\x120\n" +
 	"\x04code\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x04code\x12=\n" +
 	"\vreport_type\x18\x02 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeR\n" +
@@ -1454,7 +2060,13 @@ const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"\n" +
 	"expires_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x129\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xfc\x01\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x127\n" +
+	"\bbatch_no\x18\a \x01(\v2\x1c.google.protobuf.StringValueR\abatchNo\x12;\n" +
+	"\vredeemed_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"redeemedAt\x125\n" +
+	"\auser_id\x18\t \x01(\v2\x1c.google.protobuf.StringValueR\x06userId\x128\n" +
+	"\bnickname\x18\n" +
+	" \x01(\v2\x1c.google.protobuf.StringValueR\bnickname\"\xfc\x01\n" +
 	"\x1eGenerateActivationCodesRequest\x12Q\n" +
 	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeB\r\xbaH\n" +
 	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00H\x00R\n" +
@@ -1466,17 +2078,61 @@ const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"expireDays\x88\x01\x01B\x0e\n" +
 	"\f_report_typeB\b\n" +
 	"\x06_countB\x0e\n" +
-	"\f_expire_days\"7\n" +
+	"\f_expire_days\"R\n" +
 	"\x1fGenerateActivationCodesResponse\x12\x14\n" +
-	"\x05codes\x18\x01 \x03(\tR\x05codes\"\xa9\x01\n" +
+	"\x05codes\x18\x01 \x03(\tR\x05codes\x12\x19\n" +
+	"\bbatch_no\x18\x02 \x01(\tR\abatchNo\"\x80\x01\n" +
+	"\x1fSetActivationBatchStatusRequest\x12'\n" +
+	"\bbatch_no\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18 R\abatchNo\x12'\n" +
+	"\bdisabled\x18\x02 \x01(\bB\x06\xbaH\x03\xc8\x01\x01H\x00R\bdisabled\x88\x01\x01B\v\n" +
+	"\t_disabled\"[\n" +
+	" SetActivationBatchStatusResponse\x127\n" +
+	"\x05batch\x18\x01 \x01(\v2!.cyber.esports.v1.ActivationBatchR\x05batch\"\xed\x01\n" +
+	"\x1cExportActivationCodesRequest\x12)\n" +
+	"\bbatch_no\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18 H\x00R\abatchNo\x88\x01\x01\x12X\n" +
+	"\vcode_status\x18\x02 \x01(\x0e2&.cyber.esports.v1.ActivationCodeStatusB\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00H\x01R\n" +
+	"codeStatus\x88\x01\x01\x12\"\n" +
+	"\x04code\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18 H\x02R\x04code\x88\x01\x01B\v\n" +
+	"\t_batch_noB\x0e\n" +
+	"\f_code_statusB\a\n" +
+	"\x05_code\"W\n" +
+	"\x1dExportActivationCodesResponse\x126\n" +
+	"\x05codes\x18\x01 \x03(\v2 .cyber.esports.v1.ActivationCodeR\x05codes\"\xf8\x02\n" +
 	"\x1aListActivationCodesRequest\x127\n" +
 	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12B\n" +
 	"\vreport_type\x18\x02 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeH\x00R\n" +
-	"reportType\x88\x01\x01B\x0e\n" +
-	"\f_report_type\"\x8f\x01\n" +
+	"reportType\x88\x01\x01\x12)\n" +
+	"\bbatch_no\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18 H\x01R\abatchNo\x88\x01\x01\x12X\n" +
+	"\vcode_status\x18\x04 \x01(\x0e2&.cyber.esports.v1.ActivationCodeStatusB\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00H\x02R\n" +
+	"codeStatus\x88\x01\x01\x12\"\n" +
+	"\x04code\x18\x05 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18 H\x03R\x04code\x88\x01\x01B\x0e\n" +
+	"\f_report_typeB\v\n" +
+	"\t_batch_noB\x0e\n" +
+	"\f_code_statusB\a\n" +
+	"\x05_code\"\x8f\x01\n" +
 	"\x1bListActivationCodesResponse\x128\n" +
 	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x126\n" +
-	"\x05codes\x18\x02 \x03(\v2 .cyber.esports.v1.ActivationCodeR\x05codes\"\xde\x01\n" +
+	"\x05codes\x18\x02 \x03(\v2 .cyber.esports.v1.ActivationCodeR\x05codes\"\x9d\x02\n" +
+	"\x1cListActivationBatchesRequest\x127\n" +
+	"\x04page\x18\x01 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\x12N\n" +
+	"\vreport_type\x18\x02 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeB\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00H\x00R\n" +
+	"reportType\x88\x01\x01\x12\x1f\n" +
+	"\bdisabled\x18\x03 \x01(\bH\x01R\bdisabled\x88\x01\x01\x12)\n" +
+	"\bbatch_no\x18\x04 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18 H\x02R\abatchNo\x88\x01\x01B\x0e\n" +
+	"\f_report_typeB\v\n" +
+	"\t_disabledB\v\n" +
+	"\t_batch_no\"\xd2\x02\n" +
+	"\x1dListActivationBatchesResponse\x128\n" +
+	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x12;\n" +
+	"\abatches\x18\x02 \x03(\v2!.cyber.esports.v1.ActivationBatchR\abatches\x12@\n" +
+	"\rtotal_batches\x18\x03 \x01(\v2\x1b.google.protobuf.Int32ValueR\ftotalBatches\x12<\n" +
+	"\vtotal_codes\x18\x04 \x01(\v2\x1b.google.protobuf.Int32ValueR\n" +
+	"totalCodes\x12:\n" +
+	"\n" +
+	"used_codes\x18\x05 \x01(\v2\x1b.google.protobuf.Int32ValueR\tusedCodes\"\xde\x01\n" +
 	"\x1cSetReportAccessPolicyRequest\x12Q\n" +
 	"\vreport_type\x18\x01 \x01(\x0e2\x1c.cyber.esports.v1.ReportTypeB\r\xbaH\n" +
 	"\xc8\x01\x01\x82\x01\x04\x10\x01 \x00H\x00R\n" +
@@ -1573,7 +2229,11 @@ const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"\x19REPORT_ACCESS_POLICY_OPEN\x10\x01\x12#\n" +
 	"\x1fREPORT_ACCESS_POLICY_MEMBERSHIP\x10\x02\x12\x1f\n" +
 	"\x1bREPORT_ACCESS_POLICY_TENANT\x10\x03\x12\x1f\n" +
-	"\x1bREPORT_ACCESS_POLICY_CLOSED\x10\x04*\xb9\x01\n" +
+	"\x1bREPORT_ACCESS_POLICY_CLOSED\x10\x04*\x86\x01\n" +
+	"\x14ActivationCodeStatus\x12&\n" +
+	"\"ACTIVATION_CODE_STATUS_UNSPECIFIED\x10\x00\x12!\n" +
+	"\x1dACTIVATION_CODE_STATUS_UNUSED\x10\x01\x12#\n" +
+	"\x1fACTIVATION_CODE_STATUS_REDEEMED\x10\x02*\xb9\x01\n" +
 	"\x10MembershipStatus\x12!\n" +
 	"\x1dMEMBERSHIP_STATUS_UNSPECIFIED\x10\x00\x12\x1c\n" +
 	"\x18MEMBERSHIP_STATUS_ACTIVE\x10\x01\x12#\n" +
@@ -1584,12 +2244,18 @@ const file_cyber_esports_v1_activation_admin_proto_rawDesc = "" +
 	"\x1dMEMBERSHIP_SOURCE_UNSPECIFIED\x10\x00\x12\x1b\n" +
 	"\x17MEMBERSHIP_SOURCE_ORDER\x10\x01\x12\x1c\n" +
 	"\x18MEMBERSHIP_SOURCE_MANUAL\x10\x02\x12!\n" +
-	"\x1dMEMBERSHIP_SOURCE_LEGACY_CODE\x10\x032\xbc\f\n" +
+	"\x1dMEMBERSHIP_SOURCE_LEGACY_CODE\x10\x032\xc7\x11\n" +
 	"\x13EntitleAdminService\x12\xd5\x01\n" +
 	"\x17GenerateActivationCodes\x120.cyber.esports.v1.GenerateActivationCodesRequest\x1a1.cyber.esports.v1.GenerateActivationCodesResponse\"U\x88\xf1\x04\x02\x8a\xd3\x0e\x19\n" +
-	"\x15批量生成激活码\x10\x02\x82\xd3\xe4\x93\x02.:\x01*\")/api/v1/esports/activation-codes/generate\x12\xb7\x01\n" +
+	"\x15批量生成激活码\x10\x02\x82\xd3\xe4\x93\x02.:\x01*\")/api/v1/esports/activation-codes/generate\x12\xf0\x01\n" +
+	"\x18SetActivationBatchStatus\x121.cyber.esports.v1.SetActivationBatchStatusRequest\x1a2.cyber.esports.v1.SetActivationBatchStatusResponse\"m\x88\xf1\x04\x02\x8a\xd3\x0e \n" +
+	"\x1c停用/启用激活码批次\x10\x02\x82\xd3\xe4\x93\x02?:\x01*\x1a:/api/v1/esports/activation-codes/batches/{batch_no}/status\x12\xb7\x01\n" +
 	"\x13ListActivationCodes\x12,.cyber.esports.v1.ListActivationCodesRequest\x1a-.cyber.esports.v1.ListActivationCodesResponse\"C\x88\xf1\x04\x02\x8a\xd3\x0e\x13\n" +
-	"\x0f激活码列表\x10\x01\x82\xd3\xe4\x93\x02\"\x12 /api/v1/esports/activation-codes\x12\xcd\x01\n" +
+	"\x0f激活码列表\x10\x01\x82\xd3\xe4\x93\x02\"\x12 /api/v1/esports/activation-codes\x12\xcb\x01\n" +
+	"\x15ListActivationBatches\x12..cyber.esports.v1.ListActivationBatchesRequest\x1a/.cyber.esports.v1.ListActivationBatchesResponse\"Q\x88\xf1\x04\x02\x8a\xd3\x0e\x19\n" +
+	"\x15激活码批次列表\x10\x01\x82\xd3\xe4\x93\x02*\x12(/api/v1/esports/activation-codes/batches\x12\xc7\x01\n" +
+	"\x15ExportActivationCodes\x12..cyber.esports.v1.ExportActivationCodesRequest\x1a/.cyber.esports.v1.ExportActivationCodesResponse\"M\x88\xf1\x04\x02\x8a\xd3\x0e\x13\n" +
+	"\x0f导出激活码\x10\x02\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/esports/activation-codes/export\x12\xcd\x01\n" +
 	"\x15SetReportAccessPolicy\x12..cyber.esports.v1.SetReportAccessPolicyRequest\x1a/.cyber.esports.v1.SetReportAccessPolicyResponse\"S\x88\xf1\x04\x02\x8a\xd3\x0e\x1c\n" +
 	"\x18设置报告访问策略\x10\x02\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/esports/report-access-policy\x12\xd5\x01\n" +
 	"\x18ListReportAccessPolicies\x121.cyber.esports.v1.ListReportAccessPoliciesRequest\x1a2.cyber.esports.v1.ListReportAccessPoliciesResponse\"R\x88\xf1\x04\x02\x8a\xd3\x0e\x1c\n" +
@@ -1615,114 +2281,150 @@ func file_cyber_esports_v1_activation_admin_proto_rawDescGZIP() []byte {
 	return file_cyber_esports_v1_activation_admin_proto_rawDescData
 }
 
-var file_cyber_esports_v1_activation_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_cyber_esports_v1_activation_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_cyber_esports_v1_activation_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_cyber_esports_v1_activation_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_cyber_esports_v1_activation_admin_proto_goTypes = []any{
 	(ReportAccessPolicy)(0),                  // 0: cyber.esports.v1.ReportAccessPolicy
-	(MembershipStatus)(0),                    // 1: cyber.esports.v1.MembershipStatus
-	(MembershipSource)(0),                    // 2: cyber.esports.v1.MembershipSource
-	(*ActivationCode)(nil),                   // 3: cyber.esports.v1.ActivationCode
-	(*GenerateActivationCodesRequest)(nil),   // 4: cyber.esports.v1.GenerateActivationCodesRequest
-	(*GenerateActivationCodesResponse)(nil),  // 5: cyber.esports.v1.GenerateActivationCodesResponse
-	(*ListActivationCodesRequest)(nil),       // 6: cyber.esports.v1.ListActivationCodesRequest
-	(*ListActivationCodesResponse)(nil),      // 7: cyber.esports.v1.ListActivationCodesResponse
-	(*SetReportAccessPolicyRequest)(nil),     // 8: cyber.esports.v1.SetReportAccessPolicyRequest
-	(*SetReportAccessPolicyResponse)(nil),    // 9: cyber.esports.v1.SetReportAccessPolicyResponse
-	(*ListReportAccessPoliciesRequest)(nil),  // 10: cyber.esports.v1.ListReportAccessPoliciesRequest
-	(*ListReportAccessPoliciesResponse)(nil), // 11: cyber.esports.v1.ListReportAccessPoliciesResponse
-	(*ReportPolicyRow)(nil),                  // 12: cyber.esports.v1.ReportPolicyRow
-	(*MembershipSummary)(nil),                // 13: cyber.esports.v1.MembershipSummary
-	(*MembershipPeriod)(nil),                 // 14: cyber.esports.v1.MembershipPeriod
-	(*GrantMembershipRequest)(nil),           // 15: cyber.esports.v1.GrantMembershipRequest
-	(*GrantMembershipResponse)(nil),          // 16: cyber.esports.v1.GrantMembershipResponse
-	(*TerminateMembershipRequest)(nil),       // 17: cyber.esports.v1.TerminateMembershipRequest
-	(*TerminateMembershipResponse)(nil),      // 18: cyber.esports.v1.TerminateMembershipResponse
-	(*ListMembershipsRequest)(nil),           // 19: cyber.esports.v1.ListMembershipsRequest
-	(*ListMembershipsResponse)(nil),          // 20: cyber.esports.v1.ListMembershipsResponse
-	(*GetMembershipRequest)(nil),             // 21: cyber.esports.v1.GetMembershipRequest
-	(*GetMembershipResponse)(nil),            // 22: cyber.esports.v1.GetMembershipResponse
-	(*wrapperspb.StringValue)(nil),           // 23: google.protobuf.StringValue
-	(ReportType)(0),                          // 24: cyber.esports.v1.ReportType
-	(*wrapperspb.Int32Value)(nil),            // 25: google.protobuf.Int32Value
-	(*timestamppb.Timestamp)(nil),            // 26: google.protobuf.Timestamp
-	(*v1.PageRequest)(nil),                   // 27: cyber.shared.common.v1.PageRequest
-	(*v1.PageResponse)(nil),                  // 28: cyber.shared.common.v1.PageResponse
-	(ProfileSex)(0),                          // 29: cyber.esports.v1.ProfileSex
-	(*wrapperspb.BoolValue)(nil),             // 30: google.protobuf.BoolValue
+	(ActivationCodeStatus)(0),                // 1: cyber.esports.v1.ActivationCodeStatus
+	(MembershipStatus)(0),                    // 2: cyber.esports.v1.MembershipStatus
+	(MembershipSource)(0),                    // 3: cyber.esports.v1.MembershipSource
+	(*ActivationBatch)(nil),                  // 4: cyber.esports.v1.ActivationBatch
+	(*ActivationCode)(nil),                   // 5: cyber.esports.v1.ActivationCode
+	(*GenerateActivationCodesRequest)(nil),   // 6: cyber.esports.v1.GenerateActivationCodesRequest
+	(*GenerateActivationCodesResponse)(nil),  // 7: cyber.esports.v1.GenerateActivationCodesResponse
+	(*SetActivationBatchStatusRequest)(nil),  // 8: cyber.esports.v1.SetActivationBatchStatusRequest
+	(*SetActivationBatchStatusResponse)(nil), // 9: cyber.esports.v1.SetActivationBatchStatusResponse
+	(*ExportActivationCodesRequest)(nil),     // 10: cyber.esports.v1.ExportActivationCodesRequest
+	(*ExportActivationCodesResponse)(nil),    // 11: cyber.esports.v1.ExportActivationCodesResponse
+	(*ListActivationCodesRequest)(nil),       // 12: cyber.esports.v1.ListActivationCodesRequest
+	(*ListActivationCodesResponse)(nil),      // 13: cyber.esports.v1.ListActivationCodesResponse
+	(*ListActivationBatchesRequest)(nil),     // 14: cyber.esports.v1.ListActivationBatchesRequest
+	(*ListActivationBatchesResponse)(nil),    // 15: cyber.esports.v1.ListActivationBatchesResponse
+	(*SetReportAccessPolicyRequest)(nil),     // 16: cyber.esports.v1.SetReportAccessPolicyRequest
+	(*SetReportAccessPolicyResponse)(nil),    // 17: cyber.esports.v1.SetReportAccessPolicyResponse
+	(*ListReportAccessPoliciesRequest)(nil),  // 18: cyber.esports.v1.ListReportAccessPoliciesRequest
+	(*ListReportAccessPoliciesResponse)(nil), // 19: cyber.esports.v1.ListReportAccessPoliciesResponse
+	(*ReportPolicyRow)(nil),                  // 20: cyber.esports.v1.ReportPolicyRow
+	(*MembershipSummary)(nil),                // 21: cyber.esports.v1.MembershipSummary
+	(*MembershipPeriod)(nil),                 // 22: cyber.esports.v1.MembershipPeriod
+	(*GrantMembershipRequest)(nil),           // 23: cyber.esports.v1.GrantMembershipRequest
+	(*GrantMembershipResponse)(nil),          // 24: cyber.esports.v1.GrantMembershipResponse
+	(*TerminateMembershipRequest)(nil),       // 25: cyber.esports.v1.TerminateMembershipRequest
+	(*TerminateMembershipResponse)(nil),      // 26: cyber.esports.v1.TerminateMembershipResponse
+	(*ListMembershipsRequest)(nil),           // 27: cyber.esports.v1.ListMembershipsRequest
+	(*ListMembershipsResponse)(nil),          // 28: cyber.esports.v1.ListMembershipsResponse
+	(*GetMembershipRequest)(nil),             // 29: cyber.esports.v1.GetMembershipRequest
+	(*GetMembershipResponse)(nil),            // 30: cyber.esports.v1.GetMembershipResponse
+	(*wrapperspb.StringValue)(nil),           // 31: google.protobuf.StringValue
+	(ReportType)(0),                          // 32: cyber.esports.v1.ReportType
+	(*wrapperspb.Int32Value)(nil),            // 33: google.protobuf.Int32Value
+	(*timestamppb.Timestamp)(nil),            // 34: google.protobuf.Timestamp
+	(*v1.PageRequest)(nil),                   // 35: cyber.shared.common.v1.PageRequest
+	(*v1.PageResponse)(nil),                  // 36: cyber.shared.common.v1.PageResponse
+	(ProfileSex)(0),                          // 37: cyber.esports.v1.ProfileSex
+	(*wrapperspb.BoolValue)(nil),             // 38: google.protobuf.BoolValue
 }
 var file_cyber_esports_v1_activation_admin_proto_depIdxs = []int32{
-	23, // 0: cyber.esports.v1.ActivationCode.code:type_name -> google.protobuf.StringValue
-	24, // 1: cyber.esports.v1.ActivationCode.report_type:type_name -> cyber.esports.v1.ReportType
-	25, // 2: cyber.esports.v1.ActivationCode.quantity:type_name -> google.protobuf.Int32Value
-	25, // 3: cyber.esports.v1.ActivationCode.used_count:type_name -> google.protobuf.Int32Value
-	26, // 4: cyber.esports.v1.ActivationCode.expires_at:type_name -> google.protobuf.Timestamp
-	26, // 5: cyber.esports.v1.ActivationCode.created_at:type_name -> google.protobuf.Timestamp
-	24, // 6: cyber.esports.v1.GenerateActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
-	27, // 7: cyber.esports.v1.ListActivationCodesRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	24, // 8: cyber.esports.v1.ListActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
-	28, // 9: cyber.esports.v1.ListActivationCodesResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	3,  // 10: cyber.esports.v1.ListActivationCodesResponse.codes:type_name -> cyber.esports.v1.ActivationCode
-	24, // 11: cyber.esports.v1.SetReportAccessPolicyRequest.report_type:type_name -> cyber.esports.v1.ReportType
-	0,  // 12: cyber.esports.v1.SetReportAccessPolicyRequest.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
-	24, // 13: cyber.esports.v1.SetReportAccessPolicyResponse.report_type:type_name -> cyber.esports.v1.ReportType
-	0,  // 14: cyber.esports.v1.SetReportAccessPolicyResponse.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
-	12, // 15: cyber.esports.v1.ListReportAccessPoliciesResponse.policies:type_name -> cyber.esports.v1.ReportPolicyRow
-	24, // 16: cyber.esports.v1.ReportPolicyRow.report_type:type_name -> cyber.esports.v1.ReportType
-	0,  // 17: cyber.esports.v1.ReportPolicyRow.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
-	23, // 18: cyber.esports.v1.ReportPolicyRow.updated_by:type_name -> google.protobuf.StringValue
-	26, // 19: cyber.esports.v1.ReportPolicyRow.updated_at:type_name -> google.protobuf.Timestamp
-	23, // 20: cyber.esports.v1.MembershipSummary.user_id:type_name -> google.protobuf.StringValue
-	23, // 21: cyber.esports.v1.MembershipSummary.nickname:type_name -> google.protobuf.StringValue
-	23, // 22: cyber.esports.v1.MembershipSummary.phone_masked:type_name -> google.protobuf.StringValue
-	26, // 23: cyber.esports.v1.MembershipSummary.granted_at:type_name -> google.protobuf.Timestamp
-	26, // 24: cyber.esports.v1.MembershipSummary.expires_at:type_name -> google.protobuf.Timestamp
-	25, // 25: cyber.esports.v1.MembershipSummary.days_left:type_name -> google.protobuf.Int32Value
-	1,  // 26: cyber.esports.v1.MembershipSummary.status:type_name -> cyber.esports.v1.MembershipStatus
-	2,  // 27: cyber.esports.v1.MembershipSummary.source:type_name -> cyber.esports.v1.MembershipSource
-	25, // 28: cyber.esports.v1.MembershipSummary.period_count:type_name -> google.protobuf.Int32Value
-	25, // 29: cyber.esports.v1.MembershipSummary.unlock_count:type_name -> google.protobuf.Int32Value
-	26, // 30: cyber.esports.v1.MembershipPeriod.granted_at:type_name -> google.protobuf.Timestamp
-	26, // 31: cyber.esports.v1.MembershipPeriod.expires_at:type_name -> google.protobuf.Timestamp
-	2,  // 32: cyber.esports.v1.MembershipPeriod.source:type_name -> cyber.esports.v1.MembershipSource
-	23, // 33: cyber.esports.v1.MembershipPeriod.source_ref:type_name -> google.protobuf.StringValue
-	1,  // 34: cyber.esports.v1.MembershipPeriod.status:type_name -> cyber.esports.v1.MembershipStatus
-	13, // 35: cyber.esports.v1.GrantMembershipResponse.membership:type_name -> cyber.esports.v1.MembershipSummary
-	13, // 36: cyber.esports.v1.TerminateMembershipResponse.membership:type_name -> cyber.esports.v1.MembershipSummary
-	27, // 37: cyber.esports.v1.ListMembershipsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	1,  // 38: cyber.esports.v1.ListMembershipsRequest.status:type_name -> cyber.esports.v1.MembershipStatus
-	2,  // 39: cyber.esports.v1.ListMembershipsRequest.source:type_name -> cyber.esports.v1.MembershipSource
-	28, // 40: cyber.esports.v1.ListMembershipsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	13, // 41: cyber.esports.v1.ListMembershipsResponse.memberships:type_name -> cyber.esports.v1.MembershipSummary
-	25, // 42: cyber.esports.v1.ListMembershipsResponse.total_count:type_name -> google.protobuf.Int32Value
-	25, // 43: cyber.esports.v1.ListMembershipsResponse.active_count:type_name -> google.protobuf.Int32Value
-	25, // 44: cyber.esports.v1.ListMembershipsResponse.expiring_soon_count:type_name -> google.protobuf.Int32Value
-	25, // 45: cyber.esports.v1.ListMembershipsResponse.expired_count:type_name -> google.protobuf.Int32Value
-	13, // 46: cyber.esports.v1.GetMembershipResponse.membership:type_name -> cyber.esports.v1.MembershipSummary
-	14, // 47: cyber.esports.v1.GetMembershipResponse.periods:type_name -> cyber.esports.v1.MembershipPeriod
-	23, // 48: cyber.esports.v1.GetMembershipResponse.age_band:type_name -> google.protobuf.StringValue
-	29, // 49: cyber.esports.v1.GetMembershipResponse.sex:type_name -> cyber.esports.v1.ProfileSex
-	30, // 50: cyber.esports.v1.GetMembershipResponse.wechat_bound:type_name -> google.protobuf.BoolValue
-	4,  // 51: cyber.esports.v1.EntitleAdminService.GenerateActivationCodes:input_type -> cyber.esports.v1.GenerateActivationCodesRequest
-	6,  // 52: cyber.esports.v1.EntitleAdminService.ListActivationCodes:input_type -> cyber.esports.v1.ListActivationCodesRequest
-	8,  // 53: cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy:input_type -> cyber.esports.v1.SetReportAccessPolicyRequest
-	10, // 54: cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies:input_type -> cyber.esports.v1.ListReportAccessPoliciesRequest
-	15, // 55: cyber.esports.v1.EntitleAdminService.GrantMembership:input_type -> cyber.esports.v1.GrantMembershipRequest
-	17, // 56: cyber.esports.v1.EntitleAdminService.TerminateMembership:input_type -> cyber.esports.v1.TerminateMembershipRequest
-	19, // 57: cyber.esports.v1.EntitleAdminService.ListMemberships:input_type -> cyber.esports.v1.ListMembershipsRequest
-	21, // 58: cyber.esports.v1.EntitleAdminService.GetMembership:input_type -> cyber.esports.v1.GetMembershipRequest
-	5,  // 59: cyber.esports.v1.EntitleAdminService.GenerateActivationCodes:output_type -> cyber.esports.v1.GenerateActivationCodesResponse
-	7,  // 60: cyber.esports.v1.EntitleAdminService.ListActivationCodes:output_type -> cyber.esports.v1.ListActivationCodesResponse
-	9,  // 61: cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy:output_type -> cyber.esports.v1.SetReportAccessPolicyResponse
-	11, // 62: cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies:output_type -> cyber.esports.v1.ListReportAccessPoliciesResponse
-	16, // 63: cyber.esports.v1.EntitleAdminService.GrantMembership:output_type -> cyber.esports.v1.GrantMembershipResponse
-	18, // 64: cyber.esports.v1.EntitleAdminService.TerminateMembership:output_type -> cyber.esports.v1.TerminateMembershipResponse
-	20, // 65: cyber.esports.v1.EntitleAdminService.ListMemberships:output_type -> cyber.esports.v1.ListMembershipsResponse
-	22, // 66: cyber.esports.v1.EntitleAdminService.GetMembership:output_type -> cyber.esports.v1.GetMembershipResponse
-	59, // [59:67] is the sub-list for method output_type
-	51, // [51:59] is the sub-list for method input_type
-	51, // [51:51] is the sub-list for extension type_name
-	51, // [51:51] is the sub-list for extension extendee
-	0,  // [0:51] is the sub-list for field type_name
+	31, // 0: cyber.esports.v1.ActivationBatch.batch_no:type_name -> google.protobuf.StringValue
+	32, // 1: cyber.esports.v1.ActivationBatch.report_type:type_name -> cyber.esports.v1.ReportType
+	33, // 2: cyber.esports.v1.ActivationBatch.count:type_name -> google.protobuf.Int32Value
+	33, // 3: cyber.esports.v1.ActivationBatch.used_count:type_name -> google.protobuf.Int32Value
+	34, // 4: cyber.esports.v1.ActivationBatch.expires_at:type_name -> google.protobuf.Timestamp
+	34, // 5: cyber.esports.v1.ActivationBatch.created_at:type_name -> google.protobuf.Timestamp
+	34, // 6: cyber.esports.v1.ActivationBatch.disabled_at:type_name -> google.protobuf.Timestamp
+	31, // 7: cyber.esports.v1.ActivationCode.code:type_name -> google.protobuf.StringValue
+	32, // 8: cyber.esports.v1.ActivationCode.report_type:type_name -> cyber.esports.v1.ReportType
+	33, // 9: cyber.esports.v1.ActivationCode.quantity:type_name -> google.protobuf.Int32Value
+	33, // 10: cyber.esports.v1.ActivationCode.used_count:type_name -> google.protobuf.Int32Value
+	34, // 11: cyber.esports.v1.ActivationCode.expires_at:type_name -> google.protobuf.Timestamp
+	34, // 12: cyber.esports.v1.ActivationCode.created_at:type_name -> google.protobuf.Timestamp
+	31, // 13: cyber.esports.v1.ActivationCode.batch_no:type_name -> google.protobuf.StringValue
+	34, // 14: cyber.esports.v1.ActivationCode.redeemed_at:type_name -> google.protobuf.Timestamp
+	31, // 15: cyber.esports.v1.ActivationCode.user_id:type_name -> google.protobuf.StringValue
+	31, // 16: cyber.esports.v1.ActivationCode.nickname:type_name -> google.protobuf.StringValue
+	32, // 17: cyber.esports.v1.GenerateActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
+	4,  // 18: cyber.esports.v1.SetActivationBatchStatusResponse.batch:type_name -> cyber.esports.v1.ActivationBatch
+	1,  // 19: cyber.esports.v1.ExportActivationCodesRequest.code_status:type_name -> cyber.esports.v1.ActivationCodeStatus
+	5,  // 20: cyber.esports.v1.ExportActivationCodesResponse.codes:type_name -> cyber.esports.v1.ActivationCode
+	35, // 21: cyber.esports.v1.ListActivationCodesRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	32, // 22: cyber.esports.v1.ListActivationCodesRequest.report_type:type_name -> cyber.esports.v1.ReportType
+	1,  // 23: cyber.esports.v1.ListActivationCodesRequest.code_status:type_name -> cyber.esports.v1.ActivationCodeStatus
+	36, // 24: cyber.esports.v1.ListActivationCodesResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	5,  // 25: cyber.esports.v1.ListActivationCodesResponse.codes:type_name -> cyber.esports.v1.ActivationCode
+	35, // 26: cyber.esports.v1.ListActivationBatchesRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	32, // 27: cyber.esports.v1.ListActivationBatchesRequest.report_type:type_name -> cyber.esports.v1.ReportType
+	36, // 28: cyber.esports.v1.ListActivationBatchesResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	4,  // 29: cyber.esports.v1.ListActivationBatchesResponse.batches:type_name -> cyber.esports.v1.ActivationBatch
+	33, // 30: cyber.esports.v1.ListActivationBatchesResponse.total_batches:type_name -> google.protobuf.Int32Value
+	33, // 31: cyber.esports.v1.ListActivationBatchesResponse.total_codes:type_name -> google.protobuf.Int32Value
+	33, // 32: cyber.esports.v1.ListActivationBatchesResponse.used_codes:type_name -> google.protobuf.Int32Value
+	32, // 33: cyber.esports.v1.SetReportAccessPolicyRequest.report_type:type_name -> cyber.esports.v1.ReportType
+	0,  // 34: cyber.esports.v1.SetReportAccessPolicyRequest.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
+	32, // 35: cyber.esports.v1.SetReportAccessPolicyResponse.report_type:type_name -> cyber.esports.v1.ReportType
+	0,  // 36: cyber.esports.v1.SetReportAccessPolicyResponse.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
+	20, // 37: cyber.esports.v1.ListReportAccessPoliciesResponse.policies:type_name -> cyber.esports.v1.ReportPolicyRow
+	32, // 38: cyber.esports.v1.ReportPolicyRow.report_type:type_name -> cyber.esports.v1.ReportType
+	0,  // 39: cyber.esports.v1.ReportPolicyRow.policy:type_name -> cyber.esports.v1.ReportAccessPolicy
+	31, // 40: cyber.esports.v1.ReportPolicyRow.updated_by:type_name -> google.protobuf.StringValue
+	34, // 41: cyber.esports.v1.ReportPolicyRow.updated_at:type_name -> google.protobuf.Timestamp
+	31, // 42: cyber.esports.v1.MembershipSummary.user_id:type_name -> google.protobuf.StringValue
+	31, // 43: cyber.esports.v1.MembershipSummary.nickname:type_name -> google.protobuf.StringValue
+	31, // 44: cyber.esports.v1.MembershipSummary.phone_masked:type_name -> google.protobuf.StringValue
+	34, // 45: cyber.esports.v1.MembershipSummary.granted_at:type_name -> google.protobuf.Timestamp
+	34, // 46: cyber.esports.v1.MembershipSummary.expires_at:type_name -> google.protobuf.Timestamp
+	33, // 47: cyber.esports.v1.MembershipSummary.days_left:type_name -> google.protobuf.Int32Value
+	2,  // 48: cyber.esports.v1.MembershipSummary.status:type_name -> cyber.esports.v1.MembershipStatus
+	3,  // 49: cyber.esports.v1.MembershipSummary.source:type_name -> cyber.esports.v1.MembershipSource
+	33, // 50: cyber.esports.v1.MembershipSummary.period_count:type_name -> google.protobuf.Int32Value
+	33, // 51: cyber.esports.v1.MembershipSummary.unlock_count:type_name -> google.protobuf.Int32Value
+	34, // 52: cyber.esports.v1.MembershipPeriod.granted_at:type_name -> google.protobuf.Timestamp
+	34, // 53: cyber.esports.v1.MembershipPeriod.expires_at:type_name -> google.protobuf.Timestamp
+	3,  // 54: cyber.esports.v1.MembershipPeriod.source:type_name -> cyber.esports.v1.MembershipSource
+	31, // 55: cyber.esports.v1.MembershipPeriod.source_ref:type_name -> google.protobuf.StringValue
+	2,  // 56: cyber.esports.v1.MembershipPeriod.status:type_name -> cyber.esports.v1.MembershipStatus
+	21, // 57: cyber.esports.v1.GrantMembershipResponse.membership:type_name -> cyber.esports.v1.MembershipSummary
+	21, // 58: cyber.esports.v1.TerminateMembershipResponse.membership:type_name -> cyber.esports.v1.MembershipSummary
+	35, // 59: cyber.esports.v1.ListMembershipsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	2,  // 60: cyber.esports.v1.ListMembershipsRequest.status:type_name -> cyber.esports.v1.MembershipStatus
+	3,  // 61: cyber.esports.v1.ListMembershipsRequest.source:type_name -> cyber.esports.v1.MembershipSource
+	36, // 62: cyber.esports.v1.ListMembershipsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	21, // 63: cyber.esports.v1.ListMembershipsResponse.memberships:type_name -> cyber.esports.v1.MembershipSummary
+	33, // 64: cyber.esports.v1.ListMembershipsResponse.total_count:type_name -> google.protobuf.Int32Value
+	33, // 65: cyber.esports.v1.ListMembershipsResponse.active_count:type_name -> google.protobuf.Int32Value
+	33, // 66: cyber.esports.v1.ListMembershipsResponse.expiring_soon_count:type_name -> google.protobuf.Int32Value
+	33, // 67: cyber.esports.v1.ListMembershipsResponse.expired_count:type_name -> google.protobuf.Int32Value
+	21, // 68: cyber.esports.v1.GetMembershipResponse.membership:type_name -> cyber.esports.v1.MembershipSummary
+	22, // 69: cyber.esports.v1.GetMembershipResponse.periods:type_name -> cyber.esports.v1.MembershipPeriod
+	31, // 70: cyber.esports.v1.GetMembershipResponse.age_band:type_name -> google.protobuf.StringValue
+	37, // 71: cyber.esports.v1.GetMembershipResponse.sex:type_name -> cyber.esports.v1.ProfileSex
+	38, // 72: cyber.esports.v1.GetMembershipResponse.wechat_bound:type_name -> google.protobuf.BoolValue
+	6,  // 73: cyber.esports.v1.EntitleAdminService.GenerateActivationCodes:input_type -> cyber.esports.v1.GenerateActivationCodesRequest
+	8,  // 74: cyber.esports.v1.EntitleAdminService.SetActivationBatchStatus:input_type -> cyber.esports.v1.SetActivationBatchStatusRequest
+	12, // 75: cyber.esports.v1.EntitleAdminService.ListActivationCodes:input_type -> cyber.esports.v1.ListActivationCodesRequest
+	14, // 76: cyber.esports.v1.EntitleAdminService.ListActivationBatches:input_type -> cyber.esports.v1.ListActivationBatchesRequest
+	10, // 77: cyber.esports.v1.EntitleAdminService.ExportActivationCodes:input_type -> cyber.esports.v1.ExportActivationCodesRequest
+	16, // 78: cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy:input_type -> cyber.esports.v1.SetReportAccessPolicyRequest
+	18, // 79: cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies:input_type -> cyber.esports.v1.ListReportAccessPoliciesRequest
+	23, // 80: cyber.esports.v1.EntitleAdminService.GrantMembership:input_type -> cyber.esports.v1.GrantMembershipRequest
+	25, // 81: cyber.esports.v1.EntitleAdminService.TerminateMembership:input_type -> cyber.esports.v1.TerminateMembershipRequest
+	27, // 82: cyber.esports.v1.EntitleAdminService.ListMemberships:input_type -> cyber.esports.v1.ListMembershipsRequest
+	29, // 83: cyber.esports.v1.EntitleAdminService.GetMembership:input_type -> cyber.esports.v1.GetMembershipRequest
+	7,  // 84: cyber.esports.v1.EntitleAdminService.GenerateActivationCodes:output_type -> cyber.esports.v1.GenerateActivationCodesResponse
+	9,  // 85: cyber.esports.v1.EntitleAdminService.SetActivationBatchStatus:output_type -> cyber.esports.v1.SetActivationBatchStatusResponse
+	13, // 86: cyber.esports.v1.EntitleAdminService.ListActivationCodes:output_type -> cyber.esports.v1.ListActivationCodesResponse
+	15, // 87: cyber.esports.v1.EntitleAdminService.ListActivationBatches:output_type -> cyber.esports.v1.ListActivationBatchesResponse
+	11, // 88: cyber.esports.v1.EntitleAdminService.ExportActivationCodes:output_type -> cyber.esports.v1.ExportActivationCodesResponse
+	17, // 89: cyber.esports.v1.EntitleAdminService.SetReportAccessPolicy:output_type -> cyber.esports.v1.SetReportAccessPolicyResponse
+	19, // 90: cyber.esports.v1.EntitleAdminService.ListReportAccessPolicies:output_type -> cyber.esports.v1.ListReportAccessPoliciesResponse
+	24, // 91: cyber.esports.v1.EntitleAdminService.GrantMembership:output_type -> cyber.esports.v1.GrantMembershipResponse
+	26, // 92: cyber.esports.v1.EntitleAdminService.TerminateMembership:output_type -> cyber.esports.v1.TerminateMembershipResponse
+	28, // 93: cyber.esports.v1.EntitleAdminService.ListMemberships:output_type -> cyber.esports.v1.ListMembershipsResponse
+	30, // 94: cyber.esports.v1.EntitleAdminService.GetMembership:output_type -> cyber.esports.v1.GetMembershipResponse
+	84, // [84:95] is the sub-list for method output_type
+	73, // [73:84] is the sub-list for method input_type
+	73, // [73:73] is the sub-list for extension type_name
+	73, // [73:73] is the sub-list for extension extendee
+	0,  // [0:73] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_activation_admin_proto_init() }
@@ -1732,18 +2434,21 @@ func file_cyber_esports_v1_activation_admin_proto_init() {
 	}
 	file_cyber_esports_v1_entitlement_proto_init()
 	file_cyber_esports_v1_profile_proto_init()
-	file_cyber_esports_v1_activation_admin_proto_msgTypes[1].OneofWrappers = []any{}
-	file_cyber_esports_v1_activation_admin_proto_msgTypes[3].OneofWrappers = []any{}
-	file_cyber_esports_v1_activation_admin_proto_msgTypes[5].OneofWrappers = []any{}
+	file_cyber_esports_v1_activation_admin_proto_msgTypes[2].OneofWrappers = []any{}
+	file_cyber_esports_v1_activation_admin_proto_msgTypes[4].OneofWrappers = []any{}
+	file_cyber_esports_v1_activation_admin_proto_msgTypes[6].OneofWrappers = []any{}
+	file_cyber_esports_v1_activation_admin_proto_msgTypes[8].OneofWrappers = []any{}
+	file_cyber_esports_v1_activation_admin_proto_msgTypes[10].OneofWrappers = []any{}
 	file_cyber_esports_v1_activation_admin_proto_msgTypes[12].OneofWrappers = []any{}
-	file_cyber_esports_v1_activation_admin_proto_msgTypes[16].OneofWrappers = []any{}
+	file_cyber_esports_v1_activation_admin_proto_msgTypes[19].OneofWrappers = []any{}
+	file_cyber_esports_v1_activation_admin_proto_msgTypes[23].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_activation_admin_proto_rawDesc), len(file_cyber_esports_v1_activation_admin_proto_rawDesc)),
-			NumEnums:      3,
-			NumMessages:   20,
+			NumEnums:      4,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
