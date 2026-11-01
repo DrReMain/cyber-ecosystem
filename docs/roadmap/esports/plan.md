@@ -56,7 +56,7 @@
 | 片 | 内容与验收 | 规模 |
 |---|---|---|
 | R1 V4 视觉值对齐批(**✅ 11-01 落 5c2f272a**:实况远小于 10-23 快照——五面仅剩 3 处旧词汇,均已像素等值换 rounded-control;agreement/switch/guide/pick 早已 V4;B批⑦ 真问题=user-detail 返回文案 M2-1 抄串「会员列表」,五语已正名「用户列表」,O-1 形状三详情页齐) | match 子页(pick/switch/guide)+agreement+age-required rounded 旧词汇→V4 词汇(B批⑥);admin 详情返回文案带目标名「返回 XXX 列表」(B批⑦,O-1 断言形状) | S |
-| R2 ctr ◐ 面精修+gap 核对 | genre-pick 推荐角标(B批①);nickname emoji 显式拦截(B批②);profile-overview 模块集对核(B批⑤:训练趋势空态/报告中心内嵌/安全三行);home 续测卡 vs resume-remind 形态面检;每项收口=gap-ledger 对应条转绿或登记 | M |
+| R2 ctr ◐ 面精修+gap 核对(**✅ 11-01 落 86e834ba**:①②前批已落仅核验补注;⑤=唯一代码缺口报告中心「查看全部 ›」已补;面检=续测卡逐字对齐,去向差登记随 G-208) | genre-pick 推荐角标(B批①);nickname emoji 显式拦截(B批②);profile-overview 模块集对核(B批⑤:训练趋势空态/报告中心内嵌/安全三行);home 续测卡 vs resume-remind 形态面检;每项收口=gap-ledger 对应条转绿或登记 | M |
 | R3 已裁小片两枚(**已派**;mt-F1 ✅ 64ac733c) | 余 P10 语言设置行(D-AT:LocaleSelect 挂 profile 设置区);mt-F1 双出口文案键已落(D-AR:EndFace A 桩出口句+回读灰死钮,N=1 回执) | S |
 | R4 上收两枚 | age.tsx 改消费 age-required/birth.ts(B批③);向导 games 步完成去向改直连 /match(B批④,**需 ljr 一句确认** home 中枢是否有意) | S |
 | R5 admin 已建面交互文案精修 | O-1/2/3 断言形状复扫(admin 对齐批,progress 旧注「待排」)+五页空态/确认语对原型 | M |

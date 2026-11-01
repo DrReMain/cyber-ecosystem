@@ -8,7 +8,7 @@
 | 人 | 一行定位(详单=archive 10-30 压实块) | 当前 → 下一片 |
 |---|---|---|
 | lzx | M1 全量收满+质量批三件收口(99c5bb06);CP1 提前 14 天;M2-1 收口 347a9ce7+PAY0 收口 4a590622+M2-2 收口 9860eb34(10-31) | **M2-3**;W6 M2-4/E9 增量;W7 PAY2/PAY3/MSG-1 |
-| hzy | E-line-b ✅ 10-30 收口+走查修批五件(=archive 10-30 块);R1 ✅ 11-01(5c2f272a) | **R3 余 P10 语言行(mt-F1 已落)**→R2(分配制 D-AV) |
+| hzy | E-line-b ✅ 10-30 收口+走查修批五件(=archive 10-30 块);R1 ✅(5c2f272a);R2 ✅ 11-01(86e834ba) | **R3 余 P10 语言行(mt-F1 已落)**(分配制 D-AV) |
 | ljr | P7 视觉稿已落库(1c30b767,精修窗至 12-02);P1/P3/P9/P15/P10/P7 四参数已裁 | **P19/P21/P22(W5)→P14/P23(W6)→P7 定稿/P6(W7-W8)**;P4 11 月底 |
 
 **M1 燃尽**:E0-E10+E5b+E6c 全簇+H 线+质量批 全✅;PAY-C0/C1+PAY1 ✅;PAY2-3 未启动(行政件=用户即办);CP1 ✅ 提前 14 天;CP2 原项全实质达成,**新增门构成(M2 核心组)自 10-30 重构起算**。
@@ -25,7 +25,7 @@
 | PAY2 通道联调 | — | 等行政件 | 用户即办:类目+H5 权限+APIv3 密钥 32 位 |
 | PAY3 合规执法+付费墙 | — | 未认领 | P7 稿就绪;PAY2 后 |
 | MIG1 迁移工具 | — | W6-W7 建 | P14 开工前必裁;W8 预演(P6);**权益翻译口径已冻结(10-31,M2-1)**:Entitlement 终态=scope_membership 行 status(active/terminated)+expires_at+terminated_at,续期=append-only 新行,旧码 activation 翻译按此落 |
-| R1..R5 精修带 | hzy(分配制,lzx 可代领) | R1 ✅ 11-01(5c2f272a,像素等值 V4 三处+user-detail 返回五语正名);R3 半收(mt-F1 ✅ 64ac733c),余 P10;R2 次之 | 定义=plan hzy 精修带;R4 内含 ljr 确认点 |
+| R1..R5 精修带 | hzy(分配制,lzx 可代领) | R1 ✅ 11-01(5c2f272a);R2 ✅ 11-01(86e834ba,①②⑤前批已落仅补注+核验,唯一代码缺口=报告中心查看全部;面检:续测卡逐字对齐,去向差随 G-208);R3 半收(mt-F1 ✅ 64ac733c),余 P10 | 定义=plan hzy 精修带;R4 内含 ljr 确认点 |
 
 ## 开放遗留清单(完成即删行)
 
@@ -49,5 +49,4 @@
 | 待校准成绩报告不可见:report 契约缺行——SessionAttempts 滤 AuthoritativeScoreNotNil,curve-pending 行(有 raw 无权威)无处可见(10-30 DB 实证);建议 GetSessionReport 增 pending 行,ctr 消费端已备(6b2db084) | lzx | 契约+聚合小片+dev 常模种子+e2e pending 锚 |
 | 回读面「本次成绩明细」行组缺(原型=mock,契约无逐次明细) | 例会 | 豁免候选或契约带明细行 |
 | 未校准结算措辞「N 分·原始分」(原型无此态,10-30 新措辞已裁落) | ljr(例会追认) | 改词则换键 5 分钟 |
-| home 续测卡 vs resume-remind 形态面检 | R2 | 精修带 |
 | dev 栈状态目录 .run/ 迁仓外(D-AX):各开发会话代理的后台栈状态文件(pid/ports json)改写到仓外——建议 `$TMPDIR/cyber-dev/<project>.json`,pid 失活即视为陈旧可覆盖;本机存在 .run/ 者整目录删除(hzy 机实存自 10-26,lzx/用户机自查),.gitignore 不再兜底 | 各机 coding agent 自处 | 下次开栈前 |

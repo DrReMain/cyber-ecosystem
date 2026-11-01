@@ -15,7 +15,7 @@
 | 4 | profile-nickname.html | 完善资料·昵称 | `/profile/setup/nickname` | ✅ | 三步向导之一 |
 | 5 | profile-age.html | 完善资料·年龄 | `/profile/setup/age` | ✅ | 三步向导之二 |
 | 6 | profile-setup.html | 完善资料·游戏偏好 | `/profile/setup/games` | ✅ | 三步向导之三(名称差异:setup→games) |
-| 7 | profile-overview.html | 个人中心 | `/profile` | ◐ | 页面在;内容面(会员卡/消息入口/设置项)待面检 |
+| 7 | profile-overview.html | 个人中心 | `/profile` | ◐ | 页面在;B批⑤三模块已核 ✅(11-01 R2:训练趋势空态/报告中心内嵌+查看全部/安全两行绑定);余 ◐=消息入口(随 MSG-1)+设置项(随 P10) |
 | 8 | password.html | 密码管理 | — | ❌ | 无独立页;block4 另有 set/change-password 设计 |
 | 9 | match-genre-pick.html | 选择测评类型 | `/match/pick` | ✅ | |
 | 10 | match-guide.html | 匹配引导·编排列表 | `/match` | ◐ | 名字错位:重建把编排列表独立成 `/match`;形态待面检 |
@@ -43,7 +43,7 @@
 | 32 | bind-wechat.html | 绑定微信 | — | ❌ | `/login/wechat/callback` 仅回调,非绑定管理 |
 | 33 | account-security.html | 账号与安全 | — | ❌ | |
 | 34 | account-merge-confirm.html | 账号合并 | — | ❌ | |
-| 35 | resume-remind.html | 继续上次进度 | `/`(home 续测卡) | ◐ | 卡片 vs 原型提醒形态待面检 |
+| 35 | resume-remind.html | 继续上次进度 | `/`(home 续测卡) | ✅ | 面检毕(11-01 R2):卡片逐字对齐(标题/进度行/继续橙钮);去向差登记=原型经 resume-remind 面中转,重建直跳 /match(剩余项可视+切换重开已由 match 面承接),整面随 G-208 页面片 |
 | 36 | share-invite.html | 分享测试结果 | — | ❌ | |
 | 37 | scheme-b-entry.html | 渠道版入口 | — | ❌ | 渠道 B 方案三件套 |
 | 38 | scheme-b-guide.html | 渠道版直测说明 | — | ❌ | |
