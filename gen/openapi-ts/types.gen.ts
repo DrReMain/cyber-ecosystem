@@ -416,6 +416,22 @@ export type CyberEsportsV1CognitiveDimension = {
     tier?: 'REPORT_TIER_UNSPECIFIED' | 'REPORT_TIER_S' | 'REPORT_TIER_A' | 'REPORT_TIER_B' | 'REPORT_TIER_C';
 };
 
+/**
+ * The settled config every face of these knobs reads. birth_collect and
+ * pay_age_line are the effective values (an absent row answers the
+ * shipped defaults); the two prompts carry the operator's override only —
+ * absent means each face renders its own localized default, because the
+ * shipped copy is locale-dependent text the server cannot fold into one
+ * string, while an override is operator-authored literal copy shown as-is
+ * in every locale (the sku-name precedent for operator text).
+ */
+export type CyberEsportsV1ComplianceConfig = {
+    birthCollect?: boolean;
+    payAgeLine?: number;
+    minorPrompt?: string;
+    missingBirthPrompt?: string;
+};
+
 export type CyberEsportsV1CreateAgreementVersionRequest = {
     doc?: 'AGREEMENT_DOC_UNSPECIFIED' | 'AGREEMENT_DOC_USER' | 'AGREEMENT_DOC_PRIVACY';
     /**
@@ -801,6 +817,10 @@ export type CyberEsportsV1GetCognitiveReportResponse = {
      * by; UNSPECIFIED while the composite is null.
      */
     tier?: 'REPORT_TIER_UNSPECIFIED' | 'REPORT_TIER_S' | 'REPORT_TIER_A' | 'REPORT_TIER_B' | 'REPORT_TIER_C';
+};
+
+export type CyberEsportsV1GetComplianceConfigResponse = {
+    config?: CyberEsportsV1ComplianceConfig;
 };
 
 export type CyberEsportsV1GetMatchSessionResponse = {
@@ -1741,6 +1761,31 @@ export type CyberEsportsV1SetAgreementCurrentRequest = {
 
 export type CyberEsportsV1SetAgreementCurrentResponse = {
     version?: CyberEsportsV1AgreementVersion;
+};
+
+export type CyberEsportsV1SetBirthCollectionRequest = {
+    collect?: boolean;
+};
+
+export type CyberEsportsV1SetBirthCollectionResponse = {
+    config?: CyberEsportsV1ComplianceConfig;
+};
+
+export type CyberEsportsV1SetCompliancePromptsRequest = {
+    minorPrompt?: string;
+    missingBirthPrompt?: string;
+};
+
+export type CyberEsportsV1SetCompliancePromptsResponse = {
+    config?: CyberEsportsV1ComplianceConfig;
+};
+
+export type CyberEsportsV1SetPayAgeLineRequest = {
+    age?: number;
+};
+
+export type CyberEsportsV1SetPayAgeLineResponse = {
+    config?: CyberEsportsV1ComplianceConfig;
 };
 
 export type CyberEsportsV1SetReportAccessPolicyRequest = {
@@ -4229,6 +4274,70 @@ export type SkuAdminServiceSetSkuShelfResponses = {
 };
 
 export type SkuAdminServiceSetSkuShelfResponse = SkuAdminServiceSetSkuShelfResponses[keyof SkuAdminServiceSetSkuShelfResponses];
+
+export type ComplianceAdminServiceGetComplianceConfigData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/compliance-config';
+};
+
+export type ComplianceAdminServiceGetComplianceConfigResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetComplianceConfigResponse;
+};
+
+export type ComplianceAdminServiceGetComplianceConfigResponse = ComplianceAdminServiceGetComplianceConfigResponses[keyof ComplianceAdminServiceGetComplianceConfigResponses];
+
+export type ComplianceAdminServiceSetBirthCollectionData = {
+    body: CyberEsportsV1SetBirthCollectionRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/compliance-config/birth-collection';
+};
+
+export type ComplianceAdminServiceSetBirthCollectionResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SetBirthCollectionResponse;
+};
+
+export type ComplianceAdminServiceSetBirthCollectionResponse = ComplianceAdminServiceSetBirthCollectionResponses[keyof ComplianceAdminServiceSetBirthCollectionResponses];
+
+export type ComplianceAdminServiceSetPayAgeLineData = {
+    body: CyberEsportsV1SetPayAgeLineRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/compliance-config/pay-age-line';
+};
+
+export type ComplianceAdminServiceSetPayAgeLineResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SetPayAgeLineResponse;
+};
+
+export type ComplianceAdminServiceSetPayAgeLineResponse = ComplianceAdminServiceSetPayAgeLineResponses[keyof ComplianceAdminServiceSetPayAgeLineResponses];
+
+export type ComplianceAdminServiceSetCompliancePromptsData = {
+    body: CyberEsportsV1SetCompliancePromptsRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/compliance-config/prompts';
+};
+
+export type ComplianceAdminServiceSetCompliancePromptsResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SetCompliancePromptsResponse;
+};
+
+export type ComplianceAdminServiceSetCompliancePromptsResponse = ComplianceAdminServiceSetCompliancePromptsResponses[keyof ComplianceAdminServiceSetCompliancePromptsResponses];
 
 export type EntitlementServiceRedeemActivationCodeData = {
     body: CyberEsportsV1RedeemActivationCodeRequest;

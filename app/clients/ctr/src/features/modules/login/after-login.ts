@@ -1,6 +1,10 @@
 import type { Transport } from "@connectrpc/connect";
 import { createClient } from "@connectrpc/connect";
 import { createQueryOptions } from "@connectrpc/connect-query";
+import {
+  type AgreementLoginMethod,
+  AgreementService,
+} from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/agreement_pb";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import {
   AuthService,
@@ -66,10 +70,22 @@ async function bindPromptTarget(
 // Shared post-login router: an explicit ?next= wins (guard bounce-back);
 // otherwise completeness decides — incomplete profiles land on the wizard's
 // nickname step, complete ones get the one-time bind prompt before home.
+// It files the login's consent evidence in the background — one call
+// records every current document on the versions the server resolves; the
+// checked boxes at the gate are the claim, this is the receipt. Never
+// awaited: the receipt must not add its round-trip to the login's own
+// navigation (SPA routing keeps the in-flight write alive), and a failed
+// write never blocks a login that already succeeded.
 export async function routeAfterLogin(
   { queryClient, transport, navigate }: AfterLoginDeps,
   next: string | undefined,
+  loginMethod: AgreementLoginMethod,
 ): Promise<void> {
+  void createClient(AgreementService, transport)
+    .recordAgreementConsent({ loginMethod })
+    .catch(() => {
+      // The next login re-records.
+    });
   // The login just minted the session cookie: re-verify the session query
   // before any navigation — a guarded landing target reads the same cache
   // (60s staleTime) and would bounce straight back to login. Invalidate,

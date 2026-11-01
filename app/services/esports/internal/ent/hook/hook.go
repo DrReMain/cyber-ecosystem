@@ -68,6 +68,18 @@ func (f AgreementVersionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.V
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AgreementVersionMutation", m)
 }
 
+// The ComplianceConfigFunc type is an adapter to allow the use of ordinary
+// function as ComplianceConfig mutator.
+type ComplianceConfigFunc func(context.Context, *ent.ComplianceConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ComplianceConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ComplianceConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ComplianceConfigMutation", m)
+}
+
 // The EntitlementFunc type is an adapter to allow the use of ordinary
 // function as Entitlement mutator.
 type EntitlementFunc func(context.Context, *ent.EntitlementMutation) (ent.Value, error)

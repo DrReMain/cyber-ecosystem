@@ -8,6 +8,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
+	"cyber-ecosystem/app/services/esports/internal/ent/complianceconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -403,6 +404,63 @@ func init() {
 	agreementversion.DefaultID = agreementversionDescID.Default.(func() string)
 	// agreementversion.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	agreementversion.IDValidator = agreementversionDescID.Validators[0].(func(string) error)
+	complianceconfigMixin := schema.ComplianceConfig{}.Mixin()
+	complianceconfigMixinFields0 := complianceconfigMixin[0].Fields()
+	_ = complianceconfigMixinFields0
+	complianceconfigMixinFields1 := complianceconfigMixin[1].Fields()
+	_ = complianceconfigMixinFields1
+	complianceconfigFields := schema.ComplianceConfig{}.Fields()
+	_ = complianceconfigFields
+	// complianceconfigDescCreatedAt is the schema descriptor for created_at field.
+	complianceconfigDescCreatedAt := complianceconfigMixinFields1[0].Descriptor()
+	// complianceconfig.DefaultCreatedAt holds the default value on creation for the created_at field.
+	complianceconfig.DefaultCreatedAt = complianceconfigDescCreatedAt.Default.(func() time.Time)
+	// complianceconfigDescUpdatedAt is the schema descriptor for updated_at field.
+	complianceconfigDescUpdatedAt := complianceconfigMixinFields1[1].Descriptor()
+	// complianceconfig.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	complianceconfig.DefaultUpdatedAt = complianceconfigDescUpdatedAt.Default.(func() time.Time)
+	// complianceconfig.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	complianceconfig.UpdateDefaultUpdatedAt = complianceconfigDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// complianceconfigDescBirthCollect is the schema descriptor for birth_collect field.
+	complianceconfigDescBirthCollect := complianceconfigFields[1].Descriptor()
+	// complianceconfig.DefaultBirthCollect holds the default value on creation for the birth_collect field.
+	complianceconfig.DefaultBirthCollect = complianceconfigDescBirthCollect.Default.(bool)
+	// complianceconfigDescPayAgeLine is the schema descriptor for pay_age_line field.
+	complianceconfigDescPayAgeLine := complianceconfigFields[2].Descriptor()
+	// complianceconfig.DefaultPayAgeLine holds the default value on creation for the pay_age_line field.
+	complianceconfig.DefaultPayAgeLine = complianceconfigDescPayAgeLine.Default.(int)
+	// complianceconfigDescMinorPrompt is the schema descriptor for minor_prompt field.
+	complianceconfigDescMinorPrompt := complianceconfigFields[3].Descriptor()
+	// complianceconfig.DefaultMinorPrompt holds the default value on creation for the minor_prompt field.
+	complianceconfig.DefaultMinorPrompt = complianceconfigDescMinorPrompt.Default.(string)
+	// complianceconfigDescMissingBirthPrompt is the schema descriptor for missing_birth_prompt field.
+	complianceconfigDescMissingBirthPrompt := complianceconfigFields[4].Descriptor()
+	// complianceconfig.DefaultMissingBirthPrompt holds the default value on creation for the missing_birth_prompt field.
+	complianceconfig.DefaultMissingBirthPrompt = complianceconfigDescMissingBirthPrompt.Default.(string)
+	// complianceconfigDescUpdatedBy is the schema descriptor for updated_by field.
+	complianceconfigDescUpdatedBy := complianceconfigFields[5].Descriptor()
+	// complianceconfig.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	complianceconfig.UpdatedByValidator = func() func(string) error {
+		validators := complianceconfigDescUpdatedBy.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(updated_by string) error {
+			for _, fn := range fns {
+				if err := fn(updated_by); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// complianceconfigDescID is the schema descriptor for id field.
+	complianceconfigDescID := complianceconfigMixinFields0[0].Descriptor()
+	// complianceconfig.DefaultID holds the default value on creation for the id field.
+	complianceconfig.DefaultID = complianceconfigDescID.Default.(func() string)
+	// complianceconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	complianceconfig.IDValidator = complianceconfigDescID.Validators[0].(func(string) error)
 	entitlementMixin := schema.Entitlement{}.Mixin()
 	entitlementMixinHooks2 := entitlementMixin[2].Hooks()
 	entitlement.Hooks[0] = entitlementMixinHooks2[0]

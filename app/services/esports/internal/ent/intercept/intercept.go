@@ -12,6 +12,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
+	"cyber-ecosystem/app/services/esports/internal/ent/complianceconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -219,6 +220,33 @@ func (f TraverseAgreementVersion) Traverse(ctx context.Context, q ent.Query) err
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.AgreementVersionQuery", q)
+}
+
+// The ComplianceConfigFunc type is an adapter to allow the use of ordinary function as a Querier.
+type ComplianceConfigFunc func(context.Context, *ent.ComplianceConfigQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f ComplianceConfigFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.ComplianceConfigQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ComplianceConfigQuery", q)
+}
+
+// The TraverseComplianceConfig type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseComplianceConfig func(context.Context, *ent.ComplianceConfigQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseComplianceConfig) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseComplianceConfig) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ComplianceConfigQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.ComplianceConfigQuery", q)
 }
 
 // The EntitlementFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -585,6 +613,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.AgreementConsentQuery, predicate.AgreementConsent, agreementconsent.OrderOption]{typ: ent.TypeAgreementConsent, tq: q}, nil
 	case *ent.AgreementVersionQuery:
 		return &query[*ent.AgreementVersionQuery, predicate.AgreementVersion, agreementversion.OrderOption]{typ: ent.TypeAgreementVersion, tq: q}, nil
+	case *ent.ComplianceConfigQuery:
+		return &query[*ent.ComplianceConfigQuery, predicate.ComplianceConfig, complianceconfig.OrderOption]{typ: ent.TypeComplianceConfig, tq: q}, nil
 	case *ent.EntitlementQuery:
 		return &query[*ent.EntitlementQuery, predicate.Entitlement, entitlement.OrderOption]{typ: ent.TypeEntitlement, tq: q}, nil
 	case *ent.GameQuery:

@@ -16,6 +16,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
+	"cyber-ecosystem/app/services/esports/internal/ent/complianceconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -52,6 +53,8 @@ type Client struct {
 	AgreementConsent *AgreementConsentClient
 	// AgreementVersion is the client for interacting with the AgreementVersion builders.
 	AgreementVersion *AgreementVersionClient
+	// ComplianceConfig is the client for interacting with the ComplianceConfig builders.
+	ComplianceConfig *ComplianceConfigClient
 	// Entitlement is the client for interacting with the Entitlement builders.
 	Entitlement *EntitlementClient
 	// Game is the client for interacting with the Game builders.
@@ -94,6 +97,7 @@ func (c *Client) init() {
 	c.ActivationCode = NewActivationCodeClient(c.config)
 	c.AgreementConsent = NewAgreementConsentClient(c.config)
 	c.AgreementVersion = NewAgreementVersionClient(c.config)
+	c.ComplianceConfig = NewComplianceConfigClient(c.config)
 	c.Entitlement = NewEntitlementClient(c.config)
 	c.Game = NewGameClient(c.config)
 	c.MatchConfig = NewMatchConfigClient(c.config)
@@ -204,6 +208,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ActivationCode:   NewActivationCodeClient(cfg),
 		AgreementConsent: NewAgreementConsentClient(cfg),
 		AgreementVersion: NewAgreementVersionClient(cfg),
+		ComplianceConfig: NewComplianceConfigClient(cfg),
 		Entitlement:      NewEntitlementClient(cfg),
 		Game:             NewGameClient(cfg),
 		MatchConfig:      NewMatchConfigClient(cfg),
@@ -241,6 +246,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ActivationCode:   NewActivationCodeClient(cfg),
 		AgreementConsent: NewAgreementConsentClient(cfg),
 		AgreementVersion: NewAgreementVersionClient(cfg),
+		ComplianceConfig: NewComplianceConfigClient(cfg),
 		Entitlement:      NewEntitlementClient(cfg),
 		Game:             NewGameClient(cfg),
 		MatchConfig:      NewMatchConfigClient(cfg),
@@ -284,9 +290,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.ActivationBatch, c.ActivationCode, c.AgreementConsent,
-		c.AgreementVersion, c.Entitlement, c.Game, c.MatchConfig, c.MatchSession,
-		c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy, c.ReportSnapshot, c.Sku,
-		c.Test, c.TestConfig, c.TestRecord,
+		c.AgreementVersion, c.ComplianceConfig, c.Entitlement, c.Game, c.MatchConfig,
+		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy,
+		c.ReportSnapshot, c.Sku, c.Test, c.TestConfig, c.TestRecord,
 	} {
 		n.Use(hooks...)
 	}
@@ -297,9 +303,9 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.ActivationBatch, c.ActivationCode, c.AgreementConsent,
-		c.AgreementVersion, c.Entitlement, c.Game, c.MatchConfig, c.MatchSession,
-		c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy, c.ReportSnapshot, c.Sku,
-		c.Test, c.TestConfig, c.TestRecord,
+		c.AgreementVersion, c.ComplianceConfig, c.Entitlement, c.Game, c.MatchConfig,
+		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy,
+		c.ReportSnapshot, c.Sku, c.Test, c.TestConfig, c.TestRecord,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -318,6 +324,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AgreementConsent.mutate(ctx, m)
 	case *AgreementVersionMutation:
 		return c.AgreementVersion.mutate(ctx, m)
+	case *ComplianceConfigMutation:
+		return c.ComplianceConfig.mutate(ctx, m)
 	case *EntitlementMutation:
 		return c.Entitlement.mutate(ctx, m)
 	case *GameMutation:
@@ -1017,6 +1025,139 @@ func (c *AgreementVersionClient) mutate(ctx context.Context, m *AgreementVersion
 		return (&AgreementVersionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AgreementVersion mutation op: %q", m.Op())
+	}
+}
+
+// ComplianceConfigClient is a client for the ComplianceConfig schema.
+type ComplianceConfigClient struct {
+	config
+}
+
+// NewComplianceConfigClient returns a client for the ComplianceConfig from the given config.
+func NewComplianceConfigClient(c config) *ComplianceConfigClient {
+	return &ComplianceConfigClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `complianceconfig.Hooks(f(g(h())))`.
+func (c *ComplianceConfigClient) Use(hooks ...Hook) {
+	c.hooks.ComplianceConfig = append(c.hooks.ComplianceConfig, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `complianceconfig.Intercept(f(g(h())))`.
+func (c *ComplianceConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ComplianceConfig = append(c.inters.ComplianceConfig, interceptors...)
+}
+
+// Create returns a builder for creating a ComplianceConfig entity.
+func (c *ComplianceConfigClient) Create() *ComplianceConfigCreate {
+	mutation := newComplianceConfigMutation(c.config, OpCreate)
+	return &ComplianceConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ComplianceConfig entities.
+func (c *ComplianceConfigClient) CreateBulk(builders ...*ComplianceConfigCreate) *ComplianceConfigCreateBulk {
+	return &ComplianceConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ComplianceConfigClient) MapCreateBulk(slice any, setFunc func(*ComplianceConfigCreate, int)) *ComplianceConfigCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ComplianceConfigCreateBulk{err: fmt.Errorf("calling to ComplianceConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ComplianceConfigCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ComplianceConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ComplianceConfig.
+func (c *ComplianceConfigClient) Update() *ComplianceConfigUpdate {
+	mutation := newComplianceConfigMutation(c.config, OpUpdate)
+	return &ComplianceConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ComplianceConfigClient) UpdateOne(_m *ComplianceConfig) *ComplianceConfigUpdateOne {
+	mutation := newComplianceConfigMutation(c.config, OpUpdateOne, withComplianceConfig(_m))
+	return &ComplianceConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ComplianceConfigClient) UpdateOneID(id string) *ComplianceConfigUpdateOne {
+	mutation := newComplianceConfigMutation(c.config, OpUpdateOne, withComplianceConfigID(id))
+	return &ComplianceConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ComplianceConfig.
+func (c *ComplianceConfigClient) Delete() *ComplianceConfigDelete {
+	mutation := newComplianceConfigMutation(c.config, OpDelete)
+	return &ComplianceConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ComplianceConfigClient) DeleteOne(_m *ComplianceConfig) *ComplianceConfigDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ComplianceConfigClient) DeleteOneID(id string) *ComplianceConfigDeleteOne {
+	builder := c.Delete().Where(complianceconfig.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ComplianceConfigDeleteOne{builder}
+}
+
+// Query returns a query builder for ComplianceConfig.
+func (c *ComplianceConfigClient) Query() *ComplianceConfigQuery {
+	return &ComplianceConfigQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeComplianceConfig},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ComplianceConfig entity by its id.
+func (c *ComplianceConfigClient) Get(ctx context.Context, id string) (*ComplianceConfig, error) {
+	return c.Query().Where(complianceconfig.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ComplianceConfigClient) GetX(ctx context.Context, id string) *ComplianceConfig {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ComplianceConfigClient) Hooks() []Hook {
+	return c.hooks.ComplianceConfig
+}
+
+// Interceptors returns the client interceptors.
+func (c *ComplianceConfigClient) Interceptors() []Interceptor {
+	return c.inters.ComplianceConfig
+}
+
+func (c *ComplianceConfigClient) mutate(ctx context.Context, m *ComplianceConfigMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ComplianceConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ComplianceConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ComplianceConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ComplianceConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ComplianceConfig mutation op: %q", m.Op())
 	}
 }
 
@@ -2777,15 +2918,15 @@ func (c *TestRecordClient) mutate(ctx context.Context, m *TestRecordMutation) (V
 type (
 	hooks struct {
 		AbilityScore, ActivationBatch, ActivationCode, AgreementConsent,
-		AgreementVersion, Entitlement, Game, MatchConfig, MatchSession, PayOrder,
-		Profile, QuestionBank, ReportPolicy, ReportSnapshot, Sku, Test, TestConfig,
-		TestRecord []ent.Hook
+		AgreementVersion, ComplianceConfig, Entitlement, Game, MatchConfig,
+		MatchSession, PayOrder, Profile, QuestionBank, ReportPolicy, ReportSnapshot,
+		Sku, Test, TestConfig, TestRecord []ent.Hook
 	}
 	inters struct {
 		AbilityScore, ActivationBatch, ActivationCode, AgreementConsent,
-		AgreementVersion, Entitlement, Game, MatchConfig, MatchSession, PayOrder,
-		Profile, QuestionBank, ReportPolicy, ReportSnapshot, Sku, Test, TestConfig,
-		TestRecord []ent.Interceptor
+		AgreementVersion, ComplianceConfig, Entitlement, Game, MatchConfig,
+		MatchSession, PayOrder, Profile, QuestionBank, ReportPolicy, ReportSnapshot,
+		Sku, Test, TestConfig, TestRecord []ent.Interceptor
 	}
 )
 

@@ -1,20 +1,49 @@
+import { useQuery } from "@connectrpc/connect-query";
+import { getAgreementCurrent } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/agreement-AgreementService_connectquery";
 import { ChevronLeft } from "lucide-react";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { m } from "#/paraglide/messages";
-import { AGREEMENT_DOC_META, type AgreementDoc } from "./versions";
+
+export type AgreementDoc = "user" | "privacy";
 
 interface AgreementPageProps {
   doc: AgreementDoc;
 }
 
+// The wire carries full value names while the generated type says enum —
+// String() bridges the two (the transport JSON family's standing shape).
+const wireDoc = (doc: AgreementDoc): string =>
+  doc === "privacy" ? "AGREEMENT_DOC_PRIVACY" : "AGREEMENT_DOC_USER";
+
+// Timestamps arrive JSON-shaped and the transport family renders them
+// differently ({seconds} objects or RFC3339 strings — the accepted WKT
+// variance); normalize every shape, the line shows the date only.
+const wireDate = (at: unknown): string => {
+  const ms = dateLikeMs(at);
+  return ms === null ? "" : new Date(ms).toISOString().slice(0, 10);
+};
+
+const dateLikeMs = (v: unknown): number | null => {
+  if (typeof v === "string") {
+    const parsed = new Date(v).getTime();
+    // NaN check, not falsiness: the epoch itself parses to 0.
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  if (v != null && typeof v === "object") {
+    const seconds = Number((v as { seconds?: unknown }).seconds ?? Number.NaN);
+    return Number.isNaN(seconds) ? null : seconds * 1000;
+  }
+  return null;
+};
+
 /**
  * The legal face (prototype agreement.html): one page component, two static
  * routes — /agreement/user and /agreement/privacy each pass their document.
  * Chapter copy is the prototype's demo placeholder until ljr's final legal
- * text lands; the version line reads versions.ts.
+ * text lands; the version line reads the server's current version — the
+ * operator's publish is the only truth, a local versions file is not.
  */
 export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
-  const meta = AGREEMENT_DOC_META[doc];
   const title = doc === "privacy" ? m.agreement_privacy_title() : m.agreement_user_title();
   const chapters =
     doc === "privacy"
@@ -35,6 +64,11 @@ export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
           { body: m.agreement_user_c6_d(), key: "u6", title: m.agreement_user_c6_t() },
         ];
 
+  // The route loader prefetched this; no current version, no version line —
+  // a legal page never guesses its own version.
+  const current = useQuery(getAgreementCurrent, {});
+  const meta = (current.data?.docs ?? []).find((d) => String(d.doc) === wireDoc(doc));
+
   return (
     <AmbientLayout>
       <div className="flex w-full flex-col gap-3 pb-6">
@@ -53,8 +87,15 @@ export function AgreementPage({ doc }: Readonly<AgreementPageProps>) {
         </div>
 
         <div className="text-ink-tertiary text-[11.5px]">
-          {m.agreement_version_line({ date: meta.effectiveDate, no: meta.no })}
-          {" · "}
+          {meta !== undefined && (
+            <>
+              {m.agreement_version_line({
+                date: wireDate(meta.effectiveAt),
+                no: meta.no ?? "",
+              })}
+              {" · "}
+            </>
+          )}
           {m.agreement_demo_note()}
         </div>
 

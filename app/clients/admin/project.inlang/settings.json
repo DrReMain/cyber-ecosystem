@@ -38,6 +38,7 @@
       "./messages/esports-activation-batch/{locale}.json",
       "./messages/esports-agreement-versions/{locale}.json",
       "./messages/esports-agreement-consents/{locale}.json",
+      "./messages/esports-compliance-config/{locale}.json",
       "./messages/esports-report-policies/{locale}.json",
       "./messages/esports-tests/{locale}.json",
       "./messages/esports-skus/{locale}.json",

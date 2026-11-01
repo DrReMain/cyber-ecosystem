@@ -9,6 +9,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
+	"cyber-ecosystem/app/services/esports/internal/ent/complianceconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -47,6 +48,7 @@ const (
 	TypeActivationCode   = "ActivationCode"
 	TypeAgreementConsent = "AgreementConsent"
 	TypeAgreementVersion = "AgreementVersion"
+	TypeComplianceConfig = "ComplianceConfig"
 	TypeEntitlement      = "Entitlement"
 	TypeGame             = "Game"
 	TypeMatchConfig      = "MatchConfig"
@@ -4034,6 +4036,752 @@ func (m *AgreementVersionMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *AgreementVersionMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown AgreementVersion edge %s", name)
+}
+
+// ComplianceConfigMutation represents an operation that mutates the ComplianceConfig nodes in the graph.
+type ComplianceConfigMutation struct {
+	config
+	op                   Op
+	typ                  string
+	id                   *string
+	created_at           *time.Time
+	updated_at           *time.Time
+	slot                 *complianceconfig.Slot
+	birth_collect        *bool
+	pay_age_line         *int
+	addpay_age_line      *int
+	minor_prompt         *string
+	missing_birth_prompt *string
+	updated_by           *string
+	clearedFields        map[string]struct{}
+	done                 bool
+	oldValue             func(context.Context) (*ComplianceConfig, error)
+	predicates           []predicate.ComplianceConfig
+}
+
+var _ ent.Mutation = (*ComplianceConfigMutation)(nil)
+
+// complianceconfigOption allows management of the mutation configuration using functional options.
+type complianceconfigOption func(*ComplianceConfigMutation)
+
+// newComplianceConfigMutation creates new mutation for the ComplianceConfig entity.
+func newComplianceConfigMutation(c config, op Op, opts ...complianceconfigOption) *ComplianceConfigMutation {
+	m := &ComplianceConfigMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeComplianceConfig,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withComplianceConfigID sets the ID field of the mutation.
+func withComplianceConfigID(id string) complianceconfigOption {
+	return func(m *ComplianceConfigMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ComplianceConfig
+		)
+		m.oldValue = func(ctx context.Context) (*ComplianceConfig, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ComplianceConfig.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withComplianceConfig sets the old ComplianceConfig of the mutation.
+func withComplianceConfig(node *ComplianceConfig) complianceconfigOption {
+	return func(m *ComplianceConfigMutation) {
+		m.oldValue = func(context.Context) (*ComplianceConfig, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ComplianceConfigMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ComplianceConfigMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ComplianceConfig entities.
+func (m *ComplianceConfigMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ComplianceConfigMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ComplianceConfigMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ComplianceConfig.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ComplianceConfigMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ComplianceConfigMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ComplianceConfig entity.
+// If the ComplianceConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ComplianceConfigMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ComplianceConfigMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ComplianceConfigMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ComplianceConfigMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ComplianceConfig entity.
+// If the ComplianceConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ComplianceConfigMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ComplianceConfigMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetSlot sets the "slot" field.
+func (m *ComplianceConfigMutation) SetSlot(c complianceconfig.Slot) {
+	m.slot = &c
+}
+
+// Slot returns the value of the "slot" field in the mutation.
+func (m *ComplianceConfigMutation) Slot() (r complianceconfig.Slot, exists bool) {
+	v := m.slot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlot returns the old "slot" field's value of the ComplianceConfig entity.
+// If the ComplianceConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ComplianceConfigMutation) OldSlot(ctx context.Context) (v complianceconfig.Slot, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlot is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlot requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlot: %w", err)
+	}
+	return oldValue.Slot, nil
+}
+
+// ResetSlot resets all changes to the "slot" field.
+func (m *ComplianceConfigMutation) ResetSlot() {
+	m.slot = nil
+}
+
+// SetBirthCollect sets the "birth_collect" field.
+func (m *ComplianceConfigMutation) SetBirthCollect(b bool) {
+	m.birth_collect = &b
+}
+
+// BirthCollect returns the value of the "birth_collect" field in the mutation.
+func (m *ComplianceConfigMutation) BirthCollect() (r bool, exists bool) {
+	v := m.birth_collect
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBirthCollect returns the old "birth_collect" field's value of the ComplianceConfig entity.
+// If the ComplianceConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ComplianceConfigMutation) OldBirthCollect(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBirthCollect is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBirthCollect requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBirthCollect: %w", err)
+	}
+	return oldValue.BirthCollect, nil
+}
+
+// ResetBirthCollect resets all changes to the "birth_collect" field.
+func (m *ComplianceConfigMutation) ResetBirthCollect() {
+	m.birth_collect = nil
+}
+
+// SetPayAgeLine sets the "pay_age_line" field.
+func (m *ComplianceConfigMutation) SetPayAgeLine(i int) {
+	m.pay_age_line = &i
+	m.addpay_age_line = nil
+}
+
+// PayAgeLine returns the value of the "pay_age_line" field in the mutation.
+func (m *ComplianceConfigMutation) PayAgeLine() (r int, exists bool) {
+	v := m.pay_age_line
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPayAgeLine returns the old "pay_age_line" field's value of the ComplianceConfig entity.
+// If the ComplianceConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ComplianceConfigMutation) OldPayAgeLine(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPayAgeLine is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPayAgeLine requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPayAgeLine: %w", err)
+	}
+	return oldValue.PayAgeLine, nil
+}
+
+// AddPayAgeLine adds i to the "pay_age_line" field.
+func (m *ComplianceConfigMutation) AddPayAgeLine(i int) {
+	if m.addpay_age_line != nil {
+		*m.addpay_age_line += i
+	} else {
+		m.addpay_age_line = &i
+	}
+}
+
+// AddedPayAgeLine returns the value that was added to the "pay_age_line" field in this mutation.
+func (m *ComplianceConfigMutation) AddedPayAgeLine() (r int, exists bool) {
+	v := m.addpay_age_line
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPayAgeLine resets all changes to the "pay_age_line" field.
+func (m *ComplianceConfigMutation) ResetPayAgeLine() {
+	m.pay_age_line = nil
+	m.addpay_age_line = nil
+}
+
+// SetMinorPrompt sets the "minor_prompt" field.
+func (m *ComplianceConfigMutation) SetMinorPrompt(s string) {
+	m.minor_prompt = &s
+}
+
+// MinorPrompt returns the value of the "minor_prompt" field in the mutation.
+func (m *ComplianceConfigMutation) MinorPrompt() (r string, exists bool) {
+	v := m.minor_prompt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMinorPrompt returns the old "minor_prompt" field's value of the ComplianceConfig entity.
+// If the ComplianceConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ComplianceConfigMutation) OldMinorPrompt(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMinorPrompt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMinorPrompt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMinorPrompt: %w", err)
+	}
+	return oldValue.MinorPrompt, nil
+}
+
+// ResetMinorPrompt resets all changes to the "minor_prompt" field.
+func (m *ComplianceConfigMutation) ResetMinorPrompt() {
+	m.minor_prompt = nil
+}
+
+// SetMissingBirthPrompt sets the "missing_birth_prompt" field.
+func (m *ComplianceConfigMutation) SetMissingBirthPrompt(s string) {
+	m.missing_birth_prompt = &s
+}
+
+// MissingBirthPrompt returns the value of the "missing_birth_prompt" field in the mutation.
+func (m *ComplianceConfigMutation) MissingBirthPrompt() (r string, exists bool) {
+	v := m.missing_birth_prompt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMissingBirthPrompt returns the old "missing_birth_prompt" field's value of the ComplianceConfig entity.
+// If the ComplianceConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ComplianceConfigMutation) OldMissingBirthPrompt(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMissingBirthPrompt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMissingBirthPrompt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMissingBirthPrompt: %w", err)
+	}
+	return oldValue.MissingBirthPrompt, nil
+}
+
+// ResetMissingBirthPrompt resets all changes to the "missing_birth_prompt" field.
+func (m *ComplianceConfigMutation) ResetMissingBirthPrompt() {
+	m.missing_birth_prompt = nil
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *ComplianceConfigMutation) SetUpdatedBy(s string) {
+	m.updated_by = &s
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *ComplianceConfigMutation) UpdatedBy() (r string, exists bool) {
+	v := m.updated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the ComplianceConfig entity.
+// If the ComplianceConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ComplianceConfigMutation) OldUpdatedBy(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *ComplianceConfigMutation) ResetUpdatedBy() {
+	m.updated_by = nil
+}
+
+// Where appends a list predicates to the ComplianceConfigMutation builder.
+func (m *ComplianceConfigMutation) Where(ps ...predicate.ComplianceConfig) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ComplianceConfigMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ComplianceConfigMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ComplianceConfig, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ComplianceConfigMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ComplianceConfigMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ComplianceConfig).
+func (m *ComplianceConfigMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ComplianceConfigMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.created_at != nil {
+		fields = append(fields, complianceconfig.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, complianceconfig.FieldUpdatedAt)
+	}
+	if m.slot != nil {
+		fields = append(fields, complianceconfig.FieldSlot)
+	}
+	if m.birth_collect != nil {
+		fields = append(fields, complianceconfig.FieldBirthCollect)
+	}
+	if m.pay_age_line != nil {
+		fields = append(fields, complianceconfig.FieldPayAgeLine)
+	}
+	if m.minor_prompt != nil {
+		fields = append(fields, complianceconfig.FieldMinorPrompt)
+	}
+	if m.missing_birth_prompt != nil {
+		fields = append(fields, complianceconfig.FieldMissingBirthPrompt)
+	}
+	if m.updated_by != nil {
+		fields = append(fields, complianceconfig.FieldUpdatedBy)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ComplianceConfigMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case complianceconfig.FieldCreatedAt:
+		return m.CreatedAt()
+	case complianceconfig.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case complianceconfig.FieldSlot:
+		return m.Slot()
+	case complianceconfig.FieldBirthCollect:
+		return m.BirthCollect()
+	case complianceconfig.FieldPayAgeLine:
+		return m.PayAgeLine()
+	case complianceconfig.FieldMinorPrompt:
+		return m.MinorPrompt()
+	case complianceconfig.FieldMissingBirthPrompt:
+		return m.MissingBirthPrompt()
+	case complianceconfig.FieldUpdatedBy:
+		return m.UpdatedBy()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ComplianceConfigMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case complianceconfig.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case complianceconfig.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case complianceconfig.FieldSlot:
+		return m.OldSlot(ctx)
+	case complianceconfig.FieldBirthCollect:
+		return m.OldBirthCollect(ctx)
+	case complianceconfig.FieldPayAgeLine:
+		return m.OldPayAgeLine(ctx)
+	case complianceconfig.FieldMinorPrompt:
+		return m.OldMinorPrompt(ctx)
+	case complianceconfig.FieldMissingBirthPrompt:
+		return m.OldMissingBirthPrompt(ctx)
+	case complianceconfig.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	}
+	return nil, fmt.Errorf("unknown ComplianceConfig field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ComplianceConfigMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case complianceconfig.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case complianceconfig.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case complianceconfig.FieldSlot:
+		v, ok := value.(complianceconfig.Slot)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlot(v)
+		return nil
+	case complianceconfig.FieldBirthCollect:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBirthCollect(v)
+		return nil
+	case complianceconfig.FieldPayAgeLine:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPayAgeLine(v)
+		return nil
+	case complianceconfig.FieldMinorPrompt:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMinorPrompt(v)
+		return nil
+	case complianceconfig.FieldMissingBirthPrompt:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMissingBirthPrompt(v)
+		return nil
+	case complianceconfig.FieldUpdatedBy:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ComplianceConfig field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ComplianceConfigMutation) AddedFields() []string {
+	var fields []string
+	if m.addpay_age_line != nil {
+		fields = append(fields, complianceconfig.FieldPayAgeLine)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ComplianceConfigMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case complianceconfig.FieldPayAgeLine:
+		return m.AddedPayAgeLine()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ComplianceConfigMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case complianceconfig.FieldPayAgeLine:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPayAgeLine(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ComplianceConfig numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ComplianceConfigMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ComplianceConfigMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ComplianceConfigMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ComplianceConfig nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ComplianceConfigMutation) ResetField(name string) error {
+	switch name {
+	case complianceconfig.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case complianceconfig.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case complianceconfig.FieldSlot:
+		m.ResetSlot()
+		return nil
+	case complianceconfig.FieldBirthCollect:
+		m.ResetBirthCollect()
+		return nil
+	case complianceconfig.FieldPayAgeLine:
+		m.ResetPayAgeLine()
+		return nil
+	case complianceconfig.FieldMinorPrompt:
+		m.ResetMinorPrompt()
+		return nil
+	case complianceconfig.FieldMissingBirthPrompt:
+		m.ResetMissingBirthPrompt()
+		return nil
+	case complianceconfig.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	}
+	return fmt.Errorf("unknown ComplianceConfig field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ComplianceConfigMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ComplianceConfigMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ComplianceConfigMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ComplianceConfigMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ComplianceConfigMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ComplianceConfigMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ComplianceConfigMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ComplianceConfig unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ComplianceConfigMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ComplianceConfig edge %s", name)
 }
 
 // EntitlementMutation represents an operation that mutates the Entitlement nodes in the graph.

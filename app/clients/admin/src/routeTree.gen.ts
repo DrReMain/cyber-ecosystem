@@ -48,6 +48,7 @@ import { Route as DashboardChannelsActivationCodesIndexRouteImport } from './rou
 import { Route as DashboardChannelsActivationCodesBatchNoRouteImport } from './routes/dashboard/channels/activation-codes/$batchNo'
 import { Route as DashboardComplianceAgreementConsentsIndexRouteImport } from './routes/dashboard/compliance/agreement-consents/index'
 import { Route as DashboardComplianceAgreementVersionsIndexRouteImport } from './routes/dashboard/compliance/agreement-versions/index'
+import { Route as DashboardComplianceComplianceConfigIndexRouteImport } from './routes/dashboard/compliance/compliance-config/index'
 import { Route as DashboardPeopleMembersIndexRouteImport } from './routes/dashboard/people/members/index'
 import { Route as DashboardPeopleMembersIdRouteImport } from './routes/dashboard/people/members/$id'
 import { Route as DashboardPeopleUsersIndexRouteImport } from './routes/dashboard/people/users/index'
@@ -267,6 +268,12 @@ const DashboardComplianceAgreementVersionsIndexRoute =
     path: '/agreement-versions/',
     getParentRoute: () => DashboardComplianceRouteRoute,
   } as any)
+const DashboardComplianceComplianceConfigIndexRoute =
+  DashboardComplianceComplianceConfigIndexRouteImport.update({
+    id: '/compliance-config/',
+    path: '/compliance-config/',
+    getParentRoute: () => DashboardComplianceRouteRoute,
+  } as any)
 const DashboardPeopleMembersIndexRoute =
   DashboardPeopleMembersIndexRouteImport.update({
     id: '/',
@@ -358,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/channels/activation-codes/': typeof DashboardChannelsActivationCodesIndexRoute
   '/dashboard/compliance/agreement-consents/': typeof DashboardComplianceAgreementConsentsIndexRoute
   '/dashboard/compliance/agreement-versions/': typeof DashboardComplianceAgreementVersionsIndexRoute
+  '/dashboard/compliance/compliance-config/': typeof DashboardComplianceComplianceConfigIndexRoute
   '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
   '/dashboard/pricing/orders/': typeof DashboardPricingOrdersIndexRoute
@@ -401,6 +409,7 @@ export interface FileRoutesByTo {
   '/dashboard/channels/activation-codes': typeof DashboardChannelsActivationCodesIndexRoute
   '/dashboard/compliance/agreement-consents': typeof DashboardComplianceAgreementConsentsIndexRoute
   '/dashboard/compliance/agreement-versions': typeof DashboardComplianceAgreementVersionsIndexRoute
+  '/dashboard/compliance/compliance-config': typeof DashboardComplianceComplianceConfigIndexRoute
   '/dashboard/people/members': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users': typeof DashboardPeopleUsersIndexRoute
   '/dashboard/pricing/orders': typeof DashboardPricingOrdersIndexRoute
@@ -451,6 +460,7 @@ export interface FileRoutesById {
   '/dashboard/channels/activation-codes/': typeof DashboardChannelsActivationCodesIndexRoute
   '/dashboard/compliance/agreement-consents/': typeof DashboardComplianceAgreementConsentsIndexRoute
   '/dashboard/compliance/agreement-versions/': typeof DashboardComplianceAgreementVersionsIndexRoute
+  '/dashboard/compliance/compliance-config/': typeof DashboardComplianceComplianceConfigIndexRoute
   '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
   '/dashboard/pricing/orders/': typeof DashboardPricingOrdersIndexRoute
@@ -502,6 +512,7 @@ export interface FileRouteTypes {
     | '/dashboard/channels/activation-codes/'
     | '/dashboard/compliance/agreement-consents/'
     | '/dashboard/compliance/agreement-versions/'
+    | '/dashboard/compliance/compliance-config/'
     | '/dashboard/people/members/'
     | '/dashboard/people/users/'
     | '/dashboard/pricing/orders/'
@@ -545,6 +556,7 @@ export interface FileRouteTypes {
     | '/dashboard/channels/activation-codes'
     | '/dashboard/compliance/agreement-consents'
     | '/dashboard/compliance/agreement-versions'
+    | '/dashboard/compliance/compliance-config'
     | '/dashboard/people/members'
     | '/dashboard/people/users'
     | '/dashboard/pricing/orders'
@@ -594,6 +606,7 @@ export interface FileRouteTypes {
     | '/dashboard/channels/activation-codes/'
     | '/dashboard/compliance/agreement-consents/'
     | '/dashboard/compliance/agreement-versions/'
+    | '/dashboard/compliance/compliance-config/'
     | '/dashboard/people/members/'
     | '/dashboard/people/users/'
     | '/dashboard/pricing/orders/'
@@ -884,6 +897,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardComplianceAgreementVersionsIndexRouteImport
       parentRoute: typeof DashboardComplianceRouteRoute
     }
+    '/dashboard/compliance/compliance-config/': {
+      id: '/dashboard/compliance/compliance-config/'
+      path: '/compliance-config'
+      fullPath: '/dashboard/compliance/compliance-config/'
+      preLoaderRoute: typeof DashboardComplianceComplianceConfigIndexRouteImport
+      parentRoute: typeof DashboardComplianceRouteRoute
+    }
     '/dashboard/people/members/': {
       id: '/dashboard/people/members/'
       path: '/'
@@ -990,6 +1010,7 @@ const DashboardChannelsRouteRouteWithChildren =
 interface DashboardComplianceRouteRouteChildren {
   DashboardComplianceAgreementConsentsIndexRoute: typeof DashboardComplianceAgreementConsentsIndexRoute
   DashboardComplianceAgreementVersionsIndexRoute: typeof DashboardComplianceAgreementVersionsIndexRoute
+  DashboardComplianceComplianceConfigIndexRoute: typeof DashboardComplianceComplianceConfigIndexRoute
 }
 
 const DashboardComplianceRouteRouteChildren: DashboardComplianceRouteRouteChildren =
@@ -998,6 +1019,8 @@ const DashboardComplianceRouteRouteChildren: DashboardComplianceRouteRouteChildr
       DashboardComplianceAgreementConsentsIndexRoute,
     DashboardComplianceAgreementVersionsIndexRoute:
       DashboardComplianceAgreementVersionsIndexRoute,
+    DashboardComplianceComplianceConfigIndexRoute:
+      DashboardComplianceComplianceConfigIndexRoute,
   }
 
 const DashboardComplianceRouteRouteWithChildren =

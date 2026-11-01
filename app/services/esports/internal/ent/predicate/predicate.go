@@ -21,6 +21,9 @@ type AgreementConsent func(*sql.Selector)
 // AgreementVersion is the predicate function for agreementversion builders.
 type AgreementVersion func(*sql.Selector)
 
+// ComplianceConfig is the predicate function for complianceconfig builders.
+type ComplianceConfig func(*sql.Selector)
+
 // Entitlement is the predicate function for entitlement builders.
 type Entitlement func(*sql.Selector)
 

@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The operator face of the compliance knobs: the birth-date collection
+// switch, the pay age line, and the two pay-wall prompt overrides — one
+// singleton row behind them all, so every setter answers with the whole
+// settled config and concurrent setters on different knobs never clobber
+// each other (each setter updates only its own column). The age line is
+// the sensitive knob: the operator face draws a double confirm around it
+// and every write lands in the audit log like any other admin action.
+// Like the other operator planes, this service is a strippable module —
+// deployments without it lose the management face, never the knobs'
+// answers (an absent row keeps answering the shipped defaults).
+service ComplianceAdminService {
+  option (cyber.ext.v1.service_comment) = "合规配置";
+  rpc SetBirthCollection(SetBirthCollectionRequest) returns (SetBirthCollectionResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "出生年月采集开关"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/compliance-config/birth-collection"
+      body: "*"
+    };
+  }
+  rpc SetCompliancePrompts(SetCompliancePromptsRequest) returns (SetCompliancePromptsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "付费提示文案"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/compliance-config/prompts"
+      body: "*"
+    };
+  }
+  rpc SetPayAgeLine(SetPayAgeLineRequest) returns (SetPayAgeLineResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "调整付费年龄线"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/compliance-config/pay-age-line"
+      body: "*"
+    };
+  }
+  rpc GetComplianceConfig(GetComplianceConfigRequest) returns (GetComplianceConfigResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "合规配置读取"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/compliance-config"};
+  }
+}
+
+// The settled config every face of these knobs reads. birth_collect and
+// pay_age_line are the effective values (an absent row answers the
+// shipped defaults); the two prompts carry the operator's override only —
+// absent means each face renders its own localized default, because the
+// shipped copy is locale-dependent text the server cannot fold into one
+// string, while an override is operator-authored literal copy shown as-is
+// in every locale (the sku-name precedent for operator text).
+message ComplianceConfig {
+  google.protobuf.BoolValue birth_collect = 1;
+  google.protobuf.Int32Value pay_age_line = 2;
+  google.protobuf.StringValue minor_prompt = 3;
+  google.protobuf.StringValue missing_birth_prompt = 4;
+}
+
+message SetBirthCollectionRequest {
+  optional bool collect = 1 [(buf.validate.field).required = true];
+}
+
+message SetBirthCollectionResponse {
+  ComplianceConfig config = 1;
+}
+
+message SetCompliancePromptsRequest {
+  optional string minor_prompt = 1 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  optional string missing_birth_prompt = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Each call edits at least one of the two — presence carries the edit,
+  // absence leaves that prompt's stored value untouched.
+  option (buf.validate.message).cel = {
+    id: "compliance_prompts_at_least_one"
+    expression: "has(this.minor_prompt) || has(this.missing_birth_prompt)"
+  };
+}
+
+message SetCompliancePromptsResponse {
+  ComplianceConfig config = 1;
+}
+
+message SetPayAgeLineRequest {
+  optional int32 age = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32 = {
+      gte: 1
+      lte: 120
+    }
+  ];
+}
+
+message SetPayAgeLineResponse {
+  ComplianceConfig config = 1;
+}
+
+message GetComplianceConfigRequest {}
+
+message GetComplianceConfigResponse {
+  ComplianceConfig config = 1;
+}

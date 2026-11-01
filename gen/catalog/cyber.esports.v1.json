@@ -122,6 +122,67 @@
     ]
   },
   {
+    "name": "ComplianceAdminService",
+    "full_name": "cyber.esports.v1.ComplianceAdminService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/compliance_admin.proto",
+    "comment": "合规配置",
+    "methods": [
+      {
+        "name": "GetComplianceConfig",
+        "full_name": "cyber.esports.v1.ComplianceAdminService.GetComplianceConfig",
+        "request_name": "GetComplianceConfigRequest",
+        "request_full_name": "cyber.esports.v1.GetComplianceConfigRequest",
+        "response_name": "GetComplianceConfigResponse",
+        "response_full_name": "cyber.esports.v1.GetComplianceConfigResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/compliance-config",
+        "comment": "合规配置读取",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "SetBirthCollection",
+        "full_name": "cyber.esports.v1.ComplianceAdminService.SetBirthCollection",
+        "request_name": "SetBirthCollectionRequest",
+        "request_full_name": "cyber.esports.v1.SetBirthCollectionRequest",
+        "response_name": "SetBirthCollectionResponse",
+        "response_full_name": "cyber.esports.v1.SetBirthCollectionResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/compliance-config/birth-collection",
+        "comment": "出生年月采集开关",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "SetCompliancePrompts",
+        "full_name": "cyber.esports.v1.ComplianceAdminService.SetCompliancePrompts",
+        "request_name": "SetCompliancePromptsRequest",
+        "request_full_name": "cyber.esports.v1.SetCompliancePromptsRequest",
+        "response_name": "SetCompliancePromptsResponse",
+        "response_full_name": "cyber.esports.v1.SetCompliancePromptsResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/compliance-config/prompts",
+        "comment": "付费提示文案",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "SetPayAgeLine",
+        "full_name": "cyber.esports.v1.ComplianceAdminService.SetPayAgeLine",
+        "request_name": "SetPayAgeLineRequest",
+        "request_full_name": "cyber.esports.v1.SetPayAgeLineRequest",
+        "response_name": "SetPayAgeLineResponse",
+        "response_full_name": "cyber.esports.v1.SetPayAgeLineResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/compliance-config/pay-age-line",
+        "comment": "调整付费年龄线",
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "EntitleAdminService",
     "full_name": "cyber.esports.v1.EntitleAdminService",
     "package": "cyber.esports.v1",

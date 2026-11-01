@@ -1,4 +1,5 @@
 import { useTransport } from "@connectrpc/connect-query";
+import { AgreementLoginMethod } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/agreement_pb";
 import { System } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/error_reason_pb";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
@@ -44,7 +45,11 @@ export function WechatCallbackPage() {
         if (res.wechatProfile != null) {
           parkWechatProfile(res.wechatProfile);
         }
-        return routeAfterLogin({ navigate, queryClient, transport }, search.next);
+        return routeAfterLogin(
+          { navigate, queryClient, transport },
+          search.next,
+          AgreementLoginMethod.WECHAT,
+        );
       })
       .catch(() => {
         setFailed(true);

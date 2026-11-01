@@ -13,6 +13,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/agreement"
 	"cyber-ecosystem/app/services/esports/internal/module/agreementadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
+	"cyber-ecosystem/app/services/esports/internal/module/compliance"
+	"cyber-ecosystem/app/services/esports/internal/module/complianceadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/entitleadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
@@ -111,7 +113,10 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	agreementService := agreement.NewAgreementService(logger, agreementUC)
 	agreementAdminUC := agreement.NewAgreementAdminUC(logger, platformPlatform, agreementRP, profileRP, systemClient)
 	agreementAdminService := agreementadmin.NewAgreementAdminService(logger, agreementAdminUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService, agreementService, agreementAdminService)
+	complianceRP := compliance.NewComplianceRP(logger, platformPlatform)
+	complianceUC := compliance.NewComplianceUC(logger, platformPlatform, complianceRP)
+	complianceAdminService := complianceadmin.NewComplianceAdminService(logger, complianceUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService, agreementService, agreementAdminService, complianceAdminService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

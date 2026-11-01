@@ -997,6 +997,72 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.SetSkuShelfResponse'
+    /api/v1/esports/compliance-config:
+        get:
+            tags:
+                - ComplianceAdminService
+            operationId: ComplianceAdminService_GetComplianceConfig
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetComplianceConfigResponse'
+    /api/v1/esports/compliance-config/birth-collection:
+        put:
+            tags:
+                - ComplianceAdminService
+            operationId: ComplianceAdminService_SetBirthCollection
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SetBirthCollectionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SetBirthCollectionResponse'
+    /api/v1/esports/compliance-config/pay-age-line:
+        put:
+            tags:
+                - ComplianceAdminService
+            operationId: ComplianceAdminService_SetPayAgeLine
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SetPayAgeLineRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SetPayAgeLineResponse'
+    /api/v1/esports/compliance-config/prompts:
+        put:
+            tags:
+                - ComplianceAdminService
+            operationId: ComplianceAdminService_SetCompliancePrompts
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SetCompliancePromptsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SetCompliancePromptsResponse'
     /api/v1/esports/entitlements/redeem:
         post:
             tags:
@@ -4296,6 +4362,26 @@ components:
                 One rendered dimension of the cognitive model. The dimension keys are
                  the legal eight-word vocabulary; the wording a client renders them
                  with stays with the client.
+        cyber.esports.v1.ComplianceConfig:
+            type: object
+            properties:
+                birthCollect:
+                    type: boolean
+                payAgeLine:
+                    type: integer
+                    format: int32
+                minorPrompt:
+                    type: string
+                missingBirthPrompt:
+                    type: string
+            description: |-
+                The settled config every face of these knobs reads. birth_collect and
+                 pay_age_line are the effective values (an absent row answers the
+                 shipped defaults); the two prompts carry the operator's override only —
+                 absent means each face renders its own localized default, because the
+                 shipped copy is locale-dependent text the server cannot fold into one
+                 string, while an override is operator-authored literal copy shown as-is
+                 in every locale (the sku-name precedent for operator text).
         cyber.esports.v1.CreateAgreementVersionRequest:
             type: object
             properties:
@@ -4820,6 +4906,11 @@ components:
                         The composite's tier under the same ladder the record board judges
                          by; UNSPECIFIED while the composite is null.
                     format: enum
+        cyber.esports.v1.GetComplianceConfigResponse:
+            type: object
+            properties:
+                config:
+                    $ref: '#/components/schemas/cyber.esports.v1.ComplianceConfig'
         cyber.esports.v1.GetMatchSessionResponse:
             type: object
             properties:
@@ -6134,6 +6225,39 @@ components:
             properties:
                 version:
                     $ref: '#/components/schemas/cyber.esports.v1.AgreementVersion'
+        cyber.esports.v1.SetBirthCollectionRequest:
+            type: object
+            properties:
+                collect:
+                    type: boolean
+        cyber.esports.v1.SetBirthCollectionResponse:
+            type: object
+            properties:
+                config:
+                    $ref: '#/components/schemas/cyber.esports.v1.ComplianceConfig'
+        cyber.esports.v1.SetCompliancePromptsRequest:
+            type: object
+            properties:
+                minorPrompt:
+                    type: string
+                missingBirthPrompt:
+                    type: string
+        cyber.esports.v1.SetCompliancePromptsResponse:
+            type: object
+            properties:
+                config:
+                    $ref: '#/components/schemas/cyber.esports.v1.ComplianceConfig'
+        cyber.esports.v1.SetPayAgeLineRequest:
+            type: object
+            properties:
+                age:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.SetPayAgeLineResponse:
+            type: object
+            properties:
+                config:
+                    $ref: '#/components/schemas/cyber.esports.v1.ComplianceConfig'
         cyber.esports.v1.SetReportAccessPolicyRequest:
             type: object
             properties:
@@ -8252,6 +8376,18 @@ tags:
     - name: AuditService
     - name: AuthService
     - name: ChatService
+    - name: ComplianceAdminService
+      description: |-
+        The operator face of the compliance knobs: the birth-date collection
+         switch, the pay age line, and the two pay-wall prompt overrides — one
+         singleton row behind them all, so every setter answers with the whole
+         settled config and concurrent setters on different knobs never clobber
+         each other (each setter updates only its own column). The age line is
+         the sensitive knob: the operator face draws a double confirm around it
+         and every write lands in the audit log like any other admin action.
+         Like the other operator planes, this service is a strippable module —
+         deployments without it lose the management face, never the knobs'
+         answers (an absent row keeps answering the shipped defaults).
     - name: DeptService
     - name: EntitleAdminService
       description: |-

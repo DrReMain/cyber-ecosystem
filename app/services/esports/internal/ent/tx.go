@@ -24,6 +24,8 @@ type Tx struct {
 	AgreementConsent *AgreementConsentClient
 	// AgreementVersion is the client for interacting with the AgreementVersion builders.
 	AgreementVersion *AgreementVersionClient
+	// ComplianceConfig is the client for interacting with the ComplianceConfig builders.
+	ComplianceConfig *ComplianceConfigClient
 	// Entitlement is the client for interacting with the Entitlement builders.
 	Entitlement *EntitlementClient
 	// Game is the client for interacting with the Game builders.
@@ -186,6 +188,7 @@ func (tx *Tx) init() {
 	tx.ActivationCode = NewActivationCodeClient(tx.config)
 	tx.AgreementConsent = NewAgreementConsentClient(tx.config)
 	tx.AgreementVersion = NewAgreementVersionClient(tx.config)
+	tx.ComplianceConfig = NewComplianceConfigClient(tx.config)
 	tx.Entitlement = NewEntitlementClient(tx.config)
 	tx.Game = NewGameClient(tx.config)
 	tx.MatchConfig = NewMatchConfigClient(tx.config)

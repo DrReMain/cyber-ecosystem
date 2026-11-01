@@ -15,11 +15,11 @@ import (
 	"testing"
 	"time"
 
+	"cyber-ecosystem/shared-go/utils"
+
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
-
-	"cyber-ecosystem/shared-go/utils"
 
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/ent"

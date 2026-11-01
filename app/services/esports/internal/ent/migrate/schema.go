@@ -220,6 +220,41 @@ var (
 			},
 		},
 	}
+	// ComplianceConfigColumns holds the columns for the "compliance_config" table.
+	ComplianceConfigColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "slot", Type: field.TypeEnum, Comment: "the upsert pin — this table's one and only row", Enums: []string{"singleton"}},
+		{Name: "birth_collect", Type: field.TypeBool, Comment: "collect the member's birth date at registration; off = age band only (the pay wall then guides the backfill)", Default: true},
+		{Name: "pay_age_line", Type: field.TypeInt, Comment: "members younger than this cannot pay; age reckons on the maximum boundary — born Jan 1 means one year older only on Jan 2", Default: 18},
+		{Name: "minor_prompt", Type: field.TypeString, Comment: "pay-wall copy for an under-age member; empty = each face renders its own localized default", Default: ""},
+		{Name: "missing_birth_prompt", Type: field.TypeString, Comment: "pay-wall copy when the birth date is missing; empty = localized default", Default: ""},
+		{Name: "updated_by", Type: field.TypeString, Size: 20, Comment: "admin identity that last set any knob (audit join)"},
+	}
+	// ComplianceConfigTable holds the schema information for the "compliance_config" table.
+	ComplianceConfigTable = &schema.Table{
+		Name:       "compliance_config",
+		Columns:    ComplianceConfigColumns,
+		PrimaryKey: []*schema.Column{ComplianceConfigColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "complianceconfig_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ComplianceConfigColumns[1]},
+			},
+			{
+				Name:    "complianceconfig_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{ComplianceConfigColumns[2]},
+			},
+			{
+				Name:    "complianceconfig_slot",
+				Unique:  true,
+				Columns: []*schema.Column{ComplianceConfigColumns[3]},
+			},
+		},
+	}
 	// EntitlementColumns holds the columns for the "entitlement" table.
 	EntitlementColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -831,6 +866,7 @@ var (
 		ActivationCodeTable,
 		AgreementConsentTable,
 		AgreementVersionTable,
+		ComplianceConfigTable,
 		EntitlementTable,
 		GameTable,
 		MatchConfigTable,
@@ -862,6 +898,9 @@ func init() {
 	}
 	AgreementVersionTable.Annotation = &entsql.Annotation{
 		Table: "agreement_version",
+	}
+	ComplianceConfigTable.Annotation = &entsql.Annotation{
+		Table: "compliance_config",
 	}
 	EntitlementTable.Annotation = &entsql.Annotation{
 		Table: "entitlement",

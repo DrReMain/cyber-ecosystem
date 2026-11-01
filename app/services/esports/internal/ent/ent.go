@@ -9,6 +9,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
+	"cyber-ecosystem/app/services/esports/internal/ent/complianceconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
@@ -95,6 +96,7 @@ func checkColumn(t, c string) error {
 			activationcode.Table:   activationcode.ValidColumn,
 			agreementconsent.Table: agreementconsent.ValidColumn,
 			agreementversion.Table: agreementversion.ValidColumn,
+			complianceconfig.Table: complianceconfig.ValidColumn,
 			entitlement.Table:      entitlement.ValidColumn,
 			game.Table:             game.ValidColumn,
 			matchconfig.Table:      matchconfig.ValidColumn,

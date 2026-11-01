@@ -1,17 +1,10 @@
 import { useTransport } from "@connectrpc/connect-query";
+import { AgreementLoginMethod } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/agreement_pb";
 import { System } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/error_reason_pb";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { Zap } from "lucide-react";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { type SyntheticEvent, useEffect, useRef, useState } from "react";
-import {
-  Button,
-  CheckboxButton,
-  CheckboxField,
-  Form,
-  Input,
-  TextField,
-} from "react-aria-components";
+import { Button, Form } from "react-aria-components";
 import { toast } from "sonner";
 import { systemReason } from "#/domains/error";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
@@ -20,10 +13,14 @@ import { getLocale } from "#/paraglide/runtime";
 import { routeAfterLogin } from "./after-login";
 import { loginFn } from "./login.fn";
 import { smsFailureCopy, useSmsLogin } from "./sms";
-import { AgreeBox } from "./ui/agree-box";
+import { AgreeGate } from "./ui/agree-gate";
+import { BrandLockup } from "./ui/brand-lockup";
+import { FormErrorLine } from "./ui/form-error-line";
 import { LoginFooter } from "./ui/login-footer";
-import { inputClass, SmsFields } from "./ui/sms-fields";
-import { beginWechatLoginFn } from "./wechat.fn";
+import { ModeSegment } from "./ui/mode-segment";
+import { PasswordFields } from "./ui/password-fields";
+import { SmsFields } from "./ui/sms-fields";
+import { WechatButton } from "./ui/wechat-button";
 
 type FieldError = "short" | "generic" | null;
 
@@ -56,7 +53,6 @@ export function LoginPage() {
   const transport = useTransport();
   const { expired, next } = useSearch({ from: "/login/" });
   const [pending, setPending] = useState(false);
-  const [wechatPending, setWechatPending] = useState(false);
   const [wechatEnv, setWechatEnv] = useState(false);
   const [error, setError] = useState<FieldError>(null);
   const [serverReason, setServerReason] = useState<string | undefined>(undefined);
@@ -67,7 +63,11 @@ export function LoginPage() {
 
   const sms = useSmsLogin(async () => {
     toast.success(m.login_success());
-    await routeAfterLogin({ navigate, queryClient, transport }, next);
+    await routeAfterLogin(
+      { navigate, queryClient, transport },
+      next,
+      AgreementLoginMethod.SMS_CODE,
+    );
   });
 
   // WeChat-only login env: snsapi authorize needs the WeChat browser. The
@@ -92,6 +92,8 @@ export function LoginPage() {
     });
   }, [expired, navigate]);
 
+  // The consent gate's verdict — every leg (submit, code send, wechat)
+  // refuses to fire while a box is still empty.
   function agreeOK(): boolean {
     const miss = {
       privacy: !agree.privacy,
@@ -110,10 +112,6 @@ export function LoginPage() {
       return false;
     }
     return true;
-  }
-
-  function agreeRowClass(field: "user" | "privacy"): string {
-    return `flex items-start gap-2.5 py-1.5 ${missing[field] ? "text-danger-text" : "text-ink-muted"}`;
   }
 
   function switchMode(target: "code" | "password") {
@@ -138,28 +136,6 @@ export function LoginPage() {
       return;
     }
     await sms.submit();
-  }
-
-  async function onWechat() {
-    if (!wechatEnv) {
-      toast.error(m.login_error_wechat_env());
-      return;
-    }
-    if (!agreeOK()) {
-      return;
-    }
-    setWechatPending(true);
-    setError(null);
-    try {
-      // No query on the redirect_uri: WeChat's authorize validation rejects
-      // embedded queries, so the post-login hop is always derived afresh.
-      const redirectUri = `${window.location.origin}/login/wechat/callback`;
-      const res = await beginWechatLoginFn({ data: { redirectUri } });
-      window.location.href = res.authorizeUrl;
-    } catch {
-      setWechatPending(false);
-      setError("generic");
-    }
   }
 
   async function onSubmit(event: SyntheticEvent<HTMLFormElement>) {
@@ -192,7 +168,11 @@ export function LoginPage() {
         return;
       }
       toast.success(m.login_success());
-      await routeAfterLogin({ navigate, queryClient, transport }, next);
+      await routeAfterLogin(
+        { navigate, queryClient, transport },
+        next,
+        AgreementLoginMethod.PASSWORD,
+      );
     } catch {
       setError("generic");
     } finally {
@@ -200,8 +180,6 @@ export function LoginPage() {
     }
   }
 
-  // One error line for the whole form, as the prototype draws it: field
-  // verdicts first, then the server's reason story.
   function codeModeCopy(): string | null {
     if (sms.failed) {
       return m.login_error_generic();
@@ -221,175 +199,39 @@ export function LoginPage() {
   return (
     <AmbientLayout dense>
       <div className="flex w-full flex-col gap-3.5 pt-7">
-        <div className="flex items-center gap-3">
-          <div className="bg-logo shadow-inset-ring flex h-11 w-11 items-center justify-center rounded-xl">
-            <Zap aria-hidden className="text-white" size={22} />
-          </div>
-          <div>
-            <div className="text-ink text-xl font-extrabold">{m.login_brand_name()}</div>
-            <div className="text-ink-tertiary mt-0.5 text-[11.5px]">{m.login_brand_tagline()}</div>
-          </div>
-        </div>
+        <BrandLockup />
 
-        {/* The prototype's .gap8 breathing room between lockup and segment. */}
-        <div aria-hidden className="h-2 shrink-0" />
-
-        {/* Segment keeps the prototype's two-mode shape and DOM order — code
-            first and default now that the system SMS contract exists. */}
-        <div className="border-line-soft bg-surface-input/90 rounded-control flex gap-1 border p-1">
-          <button
-            className={
-              mode === "code"
-                ? "bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] font-bold"
-                : "text-ink-muted flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] active:opacity-60"
-            }
-            onClick={() => switchMode("code")}
-            type="button"
-          >
-            {m.login_tab_code()}
-          </button>
-          <button
-            className={
-              mode === "password"
-                ? "bg-ambient-blue shadow-seg-on text-ink flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] font-bold"
-                : "text-ink-muted flex-1 rounded-[9px] py-2.75 text-center text-[13.5px] active:opacity-60"
-            }
-            onClick={() => switchMode("password")}
-            type="button"
-          >
-            {m.login_tab_password()}
-          </button>
-        </div>
+        <ModeSegment mode={mode} onSwitch={switchMode} />
 
         <Form className="flex flex-col gap-4" onSubmit={onSubmit} ref={formRef}>
-          {mode === "code" ? (
-            <SmsFields onSend={onSendCode} sms={sms} />
-          ) : (
-            <>
-              {/* aria-label, not a visually-hidden Label: sr-only text still
-                  leaks into innerText, and the prototype's fields are
-                  label-less. */}
-              <TextField
-                aria-label={m.login_account_label()}
-                autoComplete="username"
-                isRequired
-                name="account"
-                type="text"
-              >
-                <Input className={inputClass} placeholder={m.login_account_placeholder()} />
-              </TextField>
-              <TextField
-                aria-label={m.login_password_label()}
-                autoComplete="current-password"
-                isRequired
-                name="password"
-                type="password"
-              >
-                <Input
-                  className={inputClass}
-                  maxLength={20}
-                  placeholder={m.login_password_placeholder()}
-                />
-              </TextField>
-            </>
-          )}
-          {errorCopy !== null && (
-            <div className="flex items-start justify-between gap-2" role="alert">
-              <p className="text-danger-text text-[11.5px] leading-snug">{errorCopy}</p>
-              {mode === "password" && systemReason(serverReason) === System.LOGIN_SEAT_REQUIRED && (
-                <button
-                  className="tap-zone text-ink-secondary shrink-0 font-bold active:opacity-60"
-                  onClick={() => {
-                    formRef.current?.reset();
-                    setServerReason(undefined);
-                    formRef.current
-                      ?.querySelector<HTMLInputElement>("input[name='account']")
-                      ?.focus();
-                  }}
-                  type="button"
-                >
-                  {m.login_error_switch_account()}
-                </button>
-              )}
-            </div>
-          )}
+          {mode === "code" ? <SmsFields onSend={onSendCode} sms={sms} /> : <PasswordFields />}
+          <FormErrorLine
+            copy={errorCopy}
+            mode={mode}
+            onSwitchAccount={() => {
+              formRef.current?.reset();
+              setServerReason(undefined);
+              formRef.current?.querySelector<HTMLInputElement>("input[name='account']")?.focus();
+            }}
+            serverReason={serverReason}
+          />
 
-          <div className="flex flex-col gap-1.5">
-            {/* The prototype reads top-to-bottom as user row, select-all (on
-                the user row's line, right edge), privacy row, then the minor
-                note indented under the checkbox column. */}
-            <div className="flex items-start justify-between gap-2.5">
-              <CheckboxField
-                isSelected={agree.user}
-                onChange={(selected) => {
-                  setAgree((prev) => ({ ...prev, user: selected }));
-                  setMissing((prev) => ({ ...prev, user: false }));
-                }}
-              >
-                <CheckboxButton>
-                  <div className={agreeRowClass("user")}>
-                    <AgreeBox checked={agree.user} />
-                    <span className="text-xs leading-[1.6]">
-                      {m.login_agree_prefix()}
-                      {` `}
-                      <Link
-                        className="text-link active:opacity-60"
-                        onClick={(event) => event.stopPropagation()}
-                        to="/agreement/user"
-                      >
-                        {m.login_agree_user_name()}
-                      </Link>
-                    </span>
-                  </div>
-                </CheckboxButton>
-              </CheckboxField>
-              <CheckboxField
-                isIndeterminate={agree.user !== agree.privacy}
-                isSelected={agree.user && agree.privacy}
-                onChange={(selected) => {
-                  setAgree({ privacy: selected, user: selected });
-                  setMissing({ privacy: false, user: false });
-                }}
-              >
-                <CheckboxButton>
-                  <div className="text-ink-secondary flex items-center gap-2 font-bold whitespace-nowrap">
-                    <AgreeBox
-                      checked={agree.user && agree.privacy}
-                      indeterminate={agree.user !== agree.privacy}
-                    />
-                    <span className="text-sm">{m.login_agree_all()}</span>
-                  </div>
-                </CheckboxButton>
-              </CheckboxField>
-            </div>
-            <CheckboxField
-              isSelected={agree.privacy}
-              onChange={(selected) => {
-                setAgree((prev) => ({ ...prev, privacy: selected }));
-                setMissing((prev) => ({ ...prev, privacy: false }));
-              }}
-            >
-              <CheckboxButton>
-                <div className={agreeRowClass("privacy")}>
-                  <AgreeBox checked={agree.privacy} />
-                  <span className="text-xs leading-[1.6]">
-                    {m.login_agree_prefix()}
-                    {` `}
-                    <Link
-                      className="text-link active:opacity-60"
-                      onClick={(event) => event.stopPropagation()}
-                      to="/agreement/privacy"
-                    >
-                      {m.login_agree_privacy_name()}
-                    </Link>
-                  </span>
-                </div>
-              </CheckboxButton>
-            </CheckboxField>
-            <span className="text-ink-tertiary ml-6.25 text-[10.5px] leading-snug">
-              {m.login_agree_minor_note()}
-            </span>
-          </div>
+          <AgreeGate
+            agree={agree}
+            missing={missing}
+            onAll={(selected) => {
+              setAgree({ privacy: selected, user: selected });
+              setMissing({ privacy: false, user: false });
+            }}
+            onPrivacy={(selected) => {
+              setAgree((prev) => ({ ...prev, privacy: selected }));
+              setMissing((prev) => ({ ...prev, privacy: false }));
+            }}
+            onUser={(selected) => {
+              setAgree((prev) => ({ ...prev, user: selected }));
+              setMissing((prev) => ({ ...prev, user: false }));
+            }}
+          />
 
           <Button
             className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50"
@@ -400,23 +242,7 @@ export function LoginPage() {
           </Button>
         </Form>
 
-        <Button
-          className={`bg-cta-success shadow-cta-success rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50 ${
-            wechatEnv ? "" : "opacity-55"
-          }`}
-          isDisabled={wechatPending}
-          onPress={onWechat}
-        >
-          {wechatPending ? m.login_pending() : m.login_wechat_button()}
-        </Button>
-
-        {/* Outside WeChat the green button is dimmed; the note says what
-            tapping it does (prototype envNote). */}
-        {!wechatEnv && (
-          <div className="text-ink-tertiary text-center text-[11px] leading-[1.6]">
-            {m.login_wechat_env_note()}
-          </div>
-        )}
+        <WechatButton agreeOK={agreeOK} onError={() => setError("generic")} wechatEnv={wechatEnv} />
 
         {/* Forgot-password stays contract-gated (SMS provider). */}
         <LoginFooter />

@@ -17,6 +17,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/agreement"
 	"cyber-ecosystem/app/services/esports/internal/module/agreementadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
+	"cyber-ecosystem/app/services/esports/internal/module/compliance"
+	"cyber-ecosystem/app/services/esports/internal/module/complianceadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/entitleadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
@@ -60,6 +62,8 @@ func wireApp(*conf.Server, *conf.Data, *conf.Remote, *conf.Payment, *slog.Logger
 		entitleadmin.ProviderSet,
 		agreement.ProviderSet,
 		agreementadmin.ProviderSet,
+		compliance.ProviderSet,
+		complianceadmin.ProviderSet,
 		report.ProviderSet,
 		newApp,
 	))
