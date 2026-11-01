@@ -36,7 +36,7 @@
 | 26 | message-center | ❌ | →MSG-1(D-AS①);P21 前置 |
 | 27 | feedback-submit | ❌ | →MSG-1;G-202 红条随接真跳 |
 | 28 | feedback-detail | ❌ | →MSG-1 |
-| 29 | agreement | ◐ | 双路由在;文案=ljr 法务定稿占位;版本真源化→E9 增量 |
+| 29 | agreement | ◐ | 双路由在;文案=ljr 法务定稿占位;版本真源契约已就(GetAgreementCurrent PUBLIC,种子=真法务文 v1.0.0),versions.ts 真源化+登录 consent 上行→E9 余刀 |
 | 30 | age-required | ✅ | 付费闸挂接→PAY3;逃生按钮在遗留清单 |
 | 31 | bind-phone | ✅ | E6c-c |
 | 32 | bind-wechat | ✅ | E6c-c 三态 |
@@ -59,16 +59,16 @@
 
 | 处置桶 | 页 | 计数 | 归属 |
 |---|---|---|---|
-| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(assessments+membership 两 Tab 随 M2-4 首刀建成 197fdbc6,11-01 走查+双轴审查毕;余 trace(P22)/messages(MSG-1) 占位)、01-member-list ✅、02-member-detail ✅(两会员页随 M2-1 建成,10-31 走查毕)、activation-code ✅(批次码表/停用/导出/码值搜索随 M2-3 建成,11-01 走查毕)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺) | **6** | 余面→M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
+| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(assessments+membership 两 Tab 随 M2-4 首刀建成 197fdbc6,11-01 走查+双轴审查毕;余 trace(P22)/messages(MSG-1) 占位)、01-member-list ✅、02-member-detail ✅(两会员页随 M2-1 建成,10-31 走查毕)、activation-code ✅(批次码表/停用/导出/码值搜索随 M2-3 建成,11-01 走查毕)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺)、agreement-manage ✅、agreement-consent ✅(两协议页随 E9 首刀建成 067a89ce,11-01 走查毕;版本表/查看全文真法务文/建即当前/切换/删除拒当前版/同意记录预填+昵称搜索+CSV 导出;渠道列递延 P23,手机号搜索递延 G-306 族) | **8** | 余面→M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
 | 📐 底座 IAM 承接(**D-AY**:直接用骨架,不为 esports 再造/不改名) | audit-log、06-audit-detail、admin-user-manage、role-manage、permission-manage、menu-manage | 6 | system 既有面;操作级敏感清单对照(A8)留待 |
 | 🌫 原型非本期 | attribution、channel-manage、landing-material、report-config | 4 | _nav.js 灰标(P5/梯①) |
 | 🎯 M2 核心组 | 04-order-record、05-order-detail、sku-manage、activation-code-detail | **4** | M2-2..M2-4;01-member-list/02-member-detail 已随 M2-1 建成(10-31,入已建桶;到期提醒/批量续费/每日扫描按 M2-1 裁面不含) |
-| 📋 E9 增量(D-AS⑥) | agreement-manage、agreement-consent、compliance-config | 3 | 已裁入窗,未认领 |
+| 📋 E9 增量(D-AS⑥) | compliance-config | 1 | 余刀(出生采集开关/付费年龄线/提示文案,敏感二次确认+审计;契约存储随余刀);agreement 两页已升已建桶 |
 | 📋 D-AS 消息组 | feedback-manage、07-feedback-detail、announcement | 3 | →MSG-1(W7-W8);P21 前置 |
 | 📋 M2 余组(梯①) | dashboard、user-portrait、09-user-import、question-bank、question-detail、test-record、08-test-record-detail、test-type、game-category、payment-channel、rating-manage、system-config、app-version | 13 | 各项开工前先过对应 P 票:P20(dashboard/portrait 数据源)、P2(评级)、P24(归类)、P25(渠道面)、P19(版本)、system-config=裁不建候选(config 珍稀原则) |
 | 📋 M3/P4 | tob-tenant-list、tob-tenant-detail | 2 | 窗外 buffer;P14 前置 |
 
-**计数:41 = 已建 6 + 底座 6 + 非本期 4 + M2 核心 4 + E9 增量 3 + 消息组 3 + 余组 13 + M3 2。**(已建率 6/41≈15%;底座+已建+已裁入窗合计 16/41——承诺窗内可达成面 =16+6+3+3=28 页,余 13 页余组+M3。)
+**计数:41 = 已建 8 + 底座 6 + 非本期 4 + M2 核心 4 + E9 增量 1 + 消息组 3 + 余组 13 + M3 2。**(已建率 8/41≈20%;窗内可达成面 =已建 8+底座 6+M2 核心 4+E9 余 1+消息组 3=22 页,余组 13+M3 2=15 页窗外,非本期 4 不计。)
 
 ## §三 旧码功能 × 处置(不在 85 页内者;出处=旧码穷举 2026-10-30)
 
