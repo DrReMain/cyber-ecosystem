@@ -155,6 +155,16 @@ export function ProfilePage() {
             <span className="text-ink text-[14.5px] font-extrabold">
               {m.profile_center_title()}
             </span>
+            {/* The prototype's header link (查看全部 ›) — the center's own
+                page is a later face, so it parks on the same honest soon
+                toast the embedded row's button holds. */}
+            <button
+              className="tap-zone text-ink-tertiary text-[10.5px] active:opacity-60"
+              onClick={() => toast.info(m.common_soon())}
+              type="button"
+            >
+              {m.profile_center_all()}
+            </button>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex min-w-0 items-center gap-2.5">
