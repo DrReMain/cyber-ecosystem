@@ -3,11 +3,11 @@
 > 归属:esports 前沿进度档,三人共写。**剪枝律**(2026-10-23 立,10-28 补细则,约束三个 agent;全文见 README §5):片收口即剪枝为一行收口注(状态+日期+hash+关键判定);节奏行=索引形 ≤150 字;活档区(快照/认领表/遗留清单)=唯一可变区;历史随里程碑压实迁 progress-archive.md;里程碑收口做活档漂移对账。
 > **2026-10-30 重构役**:已收池(M1 全量+H 线+PAY-C0/C1/PAY1+质量批)压实迁 archive;认领表只载活片;需求分母与页面处置=verify/demand-ledger.md(coverage/矩阵状态列退役)。
 
-## 现状快照(2026-10-30,W2 尾)
+## 现状快照(2026-11-01,W2 尾)
 
 | 人 | 一行定位(详单=archive 10-30 压实块) | 当前 → 下一片 |
 |---|---|---|
-| lzx | M1 全量收满+质量批三件收口(99c5bb06);CP1 提前 14 天;M2-1 收口 347a9ce7+PAY0 收口 4a590622+M2-2 收口 9860eb34+M2-3 收口 45c276d4+M2-4 首刀收口 197fdbc6+E9 首刀收口 067a89ce(11-01,agreement 两页)+E9 余刀收口 32f5cf0a(11-01,compliance-config+真源化/登录上行) | **M2-4 余半边**(trace 待 P22/messages 待 MSG-1,盯例会);W7 PAY2/PAY3/MSG-1 |
+| lzx | M1 全量收满+质量批三件收口(99c5bb06);CP1 提前 14 天;M2-1 收口 347a9ce7+PAY0 收口 4a590622+M2-2 收口 9860eb34+M2-3 收口 45c276d4+M2-4 首刀收口 197fdbc6+E9 首刀收口 067a89ce(11-01,agreement 两页)+E9 余刀收口 32f5cf0a(11-01,compliance-config+真源化/登录上行)+待校准成绩小片收口 ecbe8ab6(11-01,pending 明细行+PM-10 并车,e2e 全套) | **M2-4 余半边**(trace 待 P22/messages 待 MSG-1,盯例会);W7 PAY2/PAY3/MSG-1 |
 | hzy | E-line-b ✅ 10-30;R1 ✅(5c2f272a);R2 ✅(86e834ba);R3 ✅(a44045a8);R5 ✅ 复扫全绿;PC 垂直居中 ✅(82bb2ad9,根列 md:justify-center,现状面全自填满=今日零视觉差,规则为短面备) | **R4② 待 ljr 确认**(分配制 D-AV) |
 | ljr | P7 视觉稿已落库(1c30b767,精修窗至 12-02);P1/P3/P9/P15/P10/P7 四参数已裁 | **P19/P21/P22(W5)→P14/P23(W6)→P7 定稿/P6(W7-W8)**;P4 11 月底 |
 
@@ -22,6 +22,7 @@
 | M2-3 激活码全面 | lzx | ✅ 收口 45c276d4(11-01 回退重审+走查毕) | 批次模型(activation_batch 行+码行挂 batch_id,计数聚合免漂移)/码表页(逐码核销人/时间+进度≥95% 补码+码值精确搜索补原型搜索框缺失半边)/停用-复启(未核销即失效,幂等答案压过停用不压过期,新错误码 6155)/导出 CSV(ACTION_WRITE 审计法条,客户端拼 BOM CSV)/e2e 捉模型洞(家族 grant 单行 ratchet 丢核销去向→trail 落码行 TakeUse 同语句)+trail 逐码对核销人+幂等答案相等性断言;擅自提交三笔回退重审(授权逐片裁定入档)修 12:分区两处(hydrateRedeems 入 Private/batchAgg 归 imports 后)+方法序三层(proto Export 序纠上轮误驳,§2 Other 垫底)+迁移去切片标(DB 版本列时间戳无感)+vocab 三份合一+CodesTable 命名+明细 tab 并入列表+Generate 死赋值+copyUnused 守卫+Disabled 直传;type 双用途+school_id=原型旧库形态不采,核销人搜索递延会员面,RESTOCK_AT 升 libs 触发=第三模块消费者 |
 | M2-4 详情余 Tab / E9 增量 | lzx | ✅ 首刀两 Tab 收口 197fdbc6(11-01 走查+双轴审查毕);✅ E9 首刀两页收口 067a89ce(11-01 走查毕);✅ E9 余刀收口 32f5cf0a(11-01 走查毕) | assessments(场次=attempts 按 session 分组派生,原型 done/total 无 admin 数据源砍为项数·试次;解锁区=码/会员/策略三事实并陈不重 fold)+membership(GetMembership 整份载荷,6154 空态+头部开通 GrantMembership 真链);契约增量一处=ListActivationCodes+user_id(承接 M2-3 核销人搜索递延+解锁事实源);顺手修 O-1 五语言「返回用户列表」;双轴审查修 7:明细 lift 方向反转(降序 fold 把前次算成未来次,走查数据未覆盖同测两次故漏网)+route read-set 补全 6 op(§3 whole-set 法条,M2-1 摘要「Tab 级靠兜底」认知作废)+文件名对齐导出名(attempts→assessments)+ja 三键简体残留+错误行 i18n 键+开通按钮静默死区(summary==null 一律轻确认形)+act_renew 跨面键回收;trace 待 P22/messages 待 MSG-1 ‖ E9 首刀=agreement 域全量:契约 8 RPC(agreement.proto ctr 面 GetAgreementCurrent PUBLIC/RecordAgreementConsent BUILTIN 服务端定版+agreement_admin.proto 版本 CRUD/同意查询导出)+617x 四枚(拒删当前版/重复/未配置)+两表(agreement_version 唯一(doc,no) 事务切 current 无租户列随 report_policy 先例;agreement_consent append-only 证据行 denormalize 版本串,版本删而证据存)+种子=法务 md 真文两行只建不刷+module/agreement(双 UC 归属本体,M2-2 OrderAdminUC 先例)+agreementadmin 纯面+admin 两页(查看全文真文/建即当前/切换删除双确认/同意记录预填+昵称搜索+CSV;11-01 用户裁定后改=两页自 dashboard/system 迁出,客户端基础设施区=IAM 底座专属,业务页入新 compliance 区「协议与合规」order 50,E9 余刀 compliance-config 同区归位)+e2e 全链含四拒路;走查三写+双语言零控制台错;顺手愈 ctr 错误词表三键陈欠(DISABLED/SKU_KIND/MEMBERSHIP 落 admin 未落 ctr)+end-face 类序一行;E9 余刀=compliance-config+ctr versions.ts 真源化+登录 consent 上行;双轴审查(11-01 提交前)修 12:roster unique 去重(一次登录双文档行,首发真实 consent 即炸同意表,e2e stub 不可见)/nil-page 守卫+面层 EnsurePageRequest/导出水合 roster 翻页至 Total(>100 用户不再丢掩码手机)/CSV 时间升秒粒 fullTime/版本链接 ver 编码/删版查删同事务(补提升竞态窗)/rowKey 补 method/utils.Ptr 代私 ptr/折叠对 DocPB 家族归词汇主(面删本地复制)/consent 滤子提取 applyConsentFilters/§3 方法序五层重排;词表空态键归尾五语言 ‖ E9 余刀=compliance_config 单例表(slot 唯一钉,列定向 upsert=并发改不同钮互不踩,缺行=出厂默认;两条提示文案 empty=各端本地化默认,覆盖=运营字面量 sku-name 先例,无租户列随 report_policy)+compliance_admin.proto 4 RPC(三 Set 定向+Get,法序 Set 三兄弟名词字母+Get 殿后;年龄线 1..120 界 wire+UC 双卡;无新错误枚举)+module/compliance(UC+RP,面=complianceadmin 纯面注入)+admin 合规配置页(compliance 区 order 30:出生开关即时翻/年龄线红线二次确认/文案编辑模态/最大边界 callout,覆盖行去默认标;32 键×5 语言)+ctr versions.ts 删-协议页版本行真源化(loader 预取 GetAgreementCurrent,无答案则不显行)+登录 consent 上行(routeAfterLogin 第三参=登录法,sms/password/wechat 三腿,吞错不阻登录)+e2e 全语义(缺行默认/列定向不互踩/nil 保持/界限拒/审计列);走查=真登录(13800001234 mock 码落日志)→双行落证 user+privacy v1.0.0 sms_code→同意记录页行态闭债(昵称+掩码手机号折面)+合规页 zh/en 三写(en 面覆盖文案保持运营原文)+协议页版本行=服务端真值;走查捉 antd6 Alert message 弃用(改 title) ‖ E9 余刀提交前双轴审查(11-01)修 9:裸窄化归 utils.ConvNum/e2e import 组序两文件(余刀+首刀同病带上,包级归零)/登录 consent 上行改 fire-and-forget(原 await 给登录导航加一跳,真登录复验 11:57 双行落库导航零延迟)/文案编辑模态回填现行覆盖(原空框,运营看不到将替换什么,真验 17/200 回填)/登录页巨石按原型块拆六 ui 件(biome 行数法条 359 非空行超 200,拆为段控件/密码字段/同意门槛/错误行/微信腿/品牌头,纯移动;收口轮 check「绿」系 nx 缓存假绿,--skip-nx-cache 复跑翻出,登录页复走查形态/切换/门槛/全选全过)/Tailwind 类序/biome 格式与 import 序;登遗留:consent 同版重复登录追加行(ljr 裁每次记 vs 首同意记);报备不修:biz 界 1..120 双卡(域不变量非 wire 重复,e2e 锁 UC 拒)/ctr 两路由 loader 8 行同形(第三处出现时提取) |
 | MSG-1 消息反馈公告 / MSG-2 分享裂变 | — | 未认领(W7-W8) | P21/P23 前置;D-AS①② |
+| 待校准成绩小片(pending 行+PM-10 明细行) | lzx | ✅ 收口 ecbe8ab6(11-01,e2e 全套+三链绿,C 端走查随消费片) | report.proto 增 SessionAttemptDetail 逐次行组(response 第 10 域,明细=全真含 curve-pending:raw 恒在+权威/档位可空);RP 滤 AuthoritativeScoreNotNil 撤(行注本就写「receipt's raw truth」,代码曾违背自家注);行折面窄化收口=线法不变(缺席永不零值),pending 行只进明细不进线算;sessionBoardOf 复合判定同滤(pending 不压 composite);digest 族查证=两法皆 valid-any 本无病(头条计数/最新行列表),仅锚字段可选缺席=契约原设计;e2e Face 4 双态一面(双 pending 行 raw 420/400+权威同窗 88,锚=权威行)+全 pending 场次=10-30 发现原形(零线零锚零判,明细 1 行可见)+Face 5 计数随真(5/4/1,最新 fps=pending 场次锚诚实空);「dev 常模种子」裁定=e2e 平面(幻影池 boot 种子=生产污染硬否,fixture 机制待消费端落地片再议,遗留清单登记) |
 | PAY0 模块拆分 | lzx | ✅ 收口 4a590622(10-31) | 双聚合根拆毕(module/sku+module/order,order 跨模块持 sku.SkuRP),guard 豁免清零;顺手捉 M2-1 声明注释残留(归位体内)+go test 缓存×文件树守卫假绿洞(esports test target 已 -count=1;system 六守卫同洞留骨架车道) |
 | PAY2 通道联调 | — | 等行政件 | 用户即办:类目+H5 权限+APIv3 密钥 32 位 |
 | PAY3 合规执法+付费墙 | — | 未认领 | P7 稿就绪;PAY2 后 |
@@ -37,16 +38,15 @@
 | 上线前登录切真实公众号 appid(JSAPI 绑域约束;测试号绑不了商户) | PAY2 | 上线清单 |
 | ICP 串上线前 beian.miit.gov.cn 复核一次(D-AO① 原案;11-01 PM-1 复裁维持带「备」,当日去备翻案经知情复裁回滚 928077f3) | 上线清单 | W9 前核对 |
 | G-202 反馈 CTA 门控占位(soon toast) | MSG-1 | 契约落地接真跳 |
-| G-208 浮层余族(pay-confirm/match-switch/resume-remind/share-invite) | 各对应页面片 | 落地时逐一对齐 |
+| G-208 浮层余族 gated 两腿(pay-confirm/share-invite;match-switch/resume-remind 11-01 审计=原型 oracle 整页非浮层,误挂已销零欠账) | 各对应页面片 | 落地时先验各自 oracle 形状 |
 | G-203 多凭证保留卡掩码取序(主号语义) | ljr | 并入 P21 |
 | conventions guard 正则精度修正回流 dev 兄弟服务(esports 已 AST 化) | lzx | dev 车道下次触碰同步 |
 | 组内 spec doc 存量约 40 处行尾化 | lzx | 触碰 test 模块顺路或独立机械片 |
-| 协议 consent 版本记录契约 | E9 增量 | 本片闭(H2 挂账销账) |
 | skill_trajectory 30s 走查体感偏紧 | lzx | 评估加时 |
 | mt-D5 intro 按款文案+unitScoreLabel 种子(10-30 走查补:后者现裸英文 universal,原型=中文单位如「15 分/成功闪避」) | lzx | 随种子/国际化面 |
 | dev 栈老库接 atlas 需基线(10-31 hzy 机实证:无 revisions 表的既有库直接 migrate:apply 必撞 already-exists,先 `atlas migrate set <init版>` 打基线再 apply;revisions 表落专用 schema `atlas_schema_revisions`,查 public 查不到) | lzx | migrate:baseline 补 nx target 或本行即文档 |
 | age-required 逃生按钮(先看免费报告;原型有面现仓无) | PAY3 | 付费墙落地时 |
-| 待校准成绩报告不可见:report 契约缺行——SessionAttempts 滤 AuthoritativeScoreNotNil,curve-pending 行(有 raw 无权威)无处可见(10-30 DB 实证);建议 GetSessionReport 增 pending 行,ctr 消费端已备(6b2db084);11-01 用户裁(PM-10):回读面「成绩明细」逐次行组随本片并车(契约带明细行,C 端消费后置) | lzx | 契约+聚合小片+dev 常模种子+e2e pending 锚 |
+| dev 常模池 fixture 机制未立(待校准小片裁定:幻影池 boot 种子=生产污染硬否;曲线常模=代码常量随 E3-b/c 逐款定稿不可种;e2e 已种双态池承担验证面;dev 走查 percentile 列渲染的消费端落地片再议机制) | lzx | 明细行 C 端消费片开工时 |
 | tools:paraglide:check admin 存量红 13 条(esports-order-detail 目录键族缺 `esports_order_detail_` 前缀,M2-2 遗留;E9 首刀 11-01 起挡 admin 绿) | lzx | 机械片:13 键改名+调用点随迁,随下次触碰 admin i18n 顺路 |
 | 同意记录页渠道列缺(原型列=小红书/抖音/归因,数据源=?ref 推荐码记账) | P23 裁后 | 归因记账落时契约补 channel 字段+页面补列 |
 | 同意记录页手机号搜索缺(system roster 无反查) | G-306 家族 | roster 反查 RPC 落时一并补(membership 手机搜索同欠) |

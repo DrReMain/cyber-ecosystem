@@ -14,9 +14,9 @@
 | 4 | profile-nickname | ✅ | G-201 微信回填已修 |
 | 5 | profile-age | ✅ | G-206 已裁修复 |
 | 6 | profile-setup(games) | ✅ | B 批④去向待 ljr 一句(→R4) |
-| 7 | profile-overview | ◐ | 九区在;会员卡随 PAY3/训练趋势 Phase2 占位(→R2 对核) |
+| 7 | profile-overview | ◐ | 九区在;模块集对核毕(R2 11-01,B批⑤);会员卡随 PAY3/训练趋势 Phase2 占位 |
 | 8 | password | ✅ | E6c-c 三路 |
-| 9 | match-genre-pick | ✅ | B 批①推荐角标缺(→R2) |
+| 9 | match-genre-pick | ✅ | B 批①推荐角标已落(R2 11-01 核验补注,前批所落) |
 | 10 | match-guide | ◐ | 名错位(重建 /match);面检待 |
 | 11 | match-switch-confirm | ✅ | |
 | 12 | test-guide | ✅ | |
@@ -42,7 +42,7 @@
 | 32 | bind-wechat | ✅ | E6c-c 三态 |
 | 33 | account-security | ✅ | E6c-c 三行真状态 |
 | 34 | account-merge-confirm | ✅ | E6c-b/c 四场景 |
-| 35 | resume-remind | ◐ | home 卡片形态;弹框形态面检(→R2) |
+| 35 | resume-remind | ◐ | 续测卡逐字对齐毕(R2 11-01);形态差(卡片 vs 整页,原型 oracle=整页非浮层)挂 P 票(G-208 余族审计) |
 | 36 | share-invite | ❌ | →MSG-2(D-AS②);P23 前置 |
 | 37 | scheme-b-entry | ❌ | D-AS③ 窗外随 M3/P4 |
 | 38 | scheme-b-guide | ❌ | 同上 |
