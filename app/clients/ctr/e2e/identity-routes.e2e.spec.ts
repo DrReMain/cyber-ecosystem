@@ -373,11 +373,12 @@ test("bind-phone on an occupied number stops at the conflict card, no code sent"
       );
     }
     await expect(page.getByText("本次绑定已拦截、未做任何改动")).toBeVisible();
-    // This scenario's pair is empty on both sides (neither carries a test
-    // record, membership, or unlock), and the corpus bar reads both-empty
-    // as BLOCKED — so the card's CTA is the guidance one, not the merge
-    // direction a weighted caller would see.
-    await expect(page.getByRole("button", { name: /为什么不能自动合并/ })).toBeVisible();
+    // The corpus bar's current law (report/biz.go, the 10-31 batch): a
+    // doubly empty pair rides the absorb-other branch — the empty occupier
+    // is absorbed and the caller keeps, so the card's CTA is the merge
+    // one; the blocked guidance CTA is reserved for the genuinely
+    // both-weighted pair.
+    await expect(page.getByRole("button", { name: /去合并/ })).toBeVisible();
     const leaked = execSync(`${REDIS} EXISTS auth:web:sms-code:${heldPhone}`).toString().trim();
     expect(leaked, "no code may be sent for a number the preview already holds").toBe("0");
   } finally {
