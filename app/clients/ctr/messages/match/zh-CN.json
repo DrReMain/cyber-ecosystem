@@ -5,7 +5,7 @@
   "match_tag_default": "默认推荐",
   "match_tag_switched": "已切换",
   "match_sub": "共 {n} 项能力 · 约 {n} 分钟",
-  "match_done": "{done} / {total}",
+  "match_done": "已测 {done} / {total}",
   "match_step_time": "约 30 秒",
   "match_step_left": "剩 {n} 次",
   "match_step_left_zero": "已用完",
