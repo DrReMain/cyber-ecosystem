@@ -53,7 +53,7 @@
 |---|---|---|---|
 | PAY0 pay 模块拆分(**✅ 收口 4a590622,10-31,guard 豁免清零**) | module/pay 双聚合根拆分(module/sku+module/order,跨模块读走 sku repo port;guard 豁免清空)。**触发器=下一片触碰 module/pay 的切片开工前**。验收=guard 零豁免+PAY_E2E 全链绿 | kratos §3 | S-M |
 | PAY2 通道接入与联调 | deploy 环境面切 wechat;0.01 真实闭环+全额退款(CP3 门);生产联调+对账;H5 权限就绪后开 H5 scene;上线前登录切真实公众号 appid(JSAPI 绑域 openid 约束,登记上线清单);行政件就绪前代码面全 mock 不阻塞开发序 | 行政件(ljr 即办:类目+H5 权限,**就绪目标 11-10,D-BA 拉前**;APIv3 密钥 32 位已核对转 lzx) | M |
-| PAY3 合规执法+付费墙全链 | 合规:未成年拦截执法点(付费补填+18 岁禁付,满岁月粒度保守口径=次月起算)/仅人工退款入口/备案四落点。ctr 付费墙:**pay-confirm(三 SKU/会员期内隐单次只留续费/模拟收银台三态)+pay-result(四态)+age-required 闸挂接(逃生按钮)+member-detail 页**——P7 视觉稿(p7-member-paywall.html)=实现源,D-AU 四参数生效。验收=微信内/外双路真金或 mock 全链 e2e+未成年拦截反例 | PAY2,P7 | M-L |
+| PAY3 合规执法+付费墙全链 | 合规:未成年拦截执法点(付费补填+18 岁禁付,满岁月粒度保守口径=次月起算)/仅人工退款入口/备案四落点。ctr 付费墙:**pay-confirm(三 SKU/会员期内隐单次只留续费/模拟收银台三态)+pay-result(四态)+age-required 闸挂接(逃生按钮)+member-detail 页**——P7 视觉稿(p7-member-paywall.html)=实现源,**已定稿 11-02**,D-AU 四参数生效(到期提醒默认 7 天)。验收=微信内/外双路真金或 mock 全链 e2e+未成年拦截反例 | PAY2,P7 | M-L |
 
 ## MIG1 迁移工具片(**W3 建,W4 预演**——11-02 D-BA:P14 解散门开+拉前重排;10-30 校准条件已满足:M1/M2 核心冻结,MSG-1 新表不在迁移射面)
 
