@@ -57,7 +57,7 @@
 
 ## MIG1 迁移工具片(**W3 建,W4 预演**——11-02 D-BA:P14 解散门开+拉前重排;10-30 校准条件已满足:M1/M2 核心冻结,MSG-1 新表不在迁移射面)
 
-导入器落地 migration.md 全部口径:旧↔新 ID 映射持久化(覆盖软删行)、四档重算重放(A 明细/B 聚合/C 平移+legacy 标/D 作废)、身份翻译(密码 verify-then-rehash)、权益翻译(旧库无支付网关)、画像不完整态、报告快照保真搬运、种子重放、对账 SQL 族(行数+抽样逐字段+分布)。验收=migration.md 血泪清单逐条过+生产副本脱敏预演对账全绿(副本 11-14 就绪即演)。**P14 已解散(11-02 D-BA:生产全公版无学校数据)——迁移射面删「组织」层与 school_report 承载,导入器遇 school/school_report 非空行=停机报错待议**;**lzx 专职,hzy 不参与(D-BB)**;详见 migration.md;旧栈切换后停机封存 2 周(D-P)。
+导入器落地 migration.md 全部口径:旧↔新 ID 映射持久化(覆盖软删行)、四档重算重放(A 明细/B 聚合/C 平移+legacy 标/D 作废)、身份翻译(密码 verify-then-rehash)、权益翻译(旧库无支付网关)、画像不完整态、报告快照保真搬运、种子重放、对账 SQL 族(行数+抽样逐字段+分布)。验收=migration.md 血泪清单逐条过+生产备份本地预演对账全绿(不脱敏,11-02 裁定;副本 11-14 就绪即演)。**首刀已落 f9d1d3dc(11-02,guard+identity;仓库根独立 go module 不入 nx)**;余阶段 entitlement/behavior/snapshot/recompute/reconcile 按刀续。**P14 已解散(11-02 D-BA:生产全公版无学校数据)——迁移射面删「组织」层与 school_report 承载,导入器遇 school/school_report 非空行=停机报错待议**;**lzx 专职,hzy 不参与(D-BB)**;详见 migration.md;旧栈切换后停机封存 2 周(D-P)。
 
 ## hzy 精修带(分配制 D-AV;来源=gap-ledger 红条+coverage §七.5 B 批;lzx 可代领)
 

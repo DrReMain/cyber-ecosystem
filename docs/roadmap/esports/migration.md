@@ -15,7 +15,7 @@
 
 ## 逐表口径
 
-- **身份列 → system**:username/phone/open_id/微信身份迁为会员身份+identity;credential 密码 verify-then-rehash(MD5 无法验证者强制重置);微信资料 4 列合并为一条画像 JSON。
+- **身份列 → system**:username/phone/open_id/微信身份迁为会员身份+identity;credential 密码 verify-then-rehash(MD5 无法验证者强制重置);微信 4 列口径修订(11-02 随首刀定):wechat_sex→sex 枚举已迁,地区 3 列新模型无消费面不迁、预演计数报备。
 - **画像/偏好/溯源 → esports**:出生年月/年龄段/头像/游戏偏好(含待归类项保持待归类)/邀请关系/登录溯源九件套(随 login_record 语义迁或冷存)。存量「仅年龄段无出生年月」用户(旧 API 允许)6→8 档不可精确映射:迁为画像不完整态(档位置空),首个画像触点补填出生年月后服务端重派生。
 - **权益翻译**:解锁三旗标与 activation_records → entitlement 解锁记录;未核销激活码 → 新兑换码批次(保留 report_type 语义);已核销/过期码丢弃靠流水保历史。
 - **不迁重算**:user 统计四列/ability_score/platform_analytics/game_analytics(由 test_record 重算)。
@@ -33,7 +33,7 @@
 
 ## cutover 验收清单(血泪教训条款)
 
-1. 生产副本脱敏预演(UK 脱敏后仍唯一);空 staging 验证无效,禁止作为通过依据。
+1. 生产备份直载本地预演(**不脱敏——2026-11-02 用户裁定**,毕了销毁细则待定);空 staging 验证无效,禁止作为通过依据。
 2. 预演环境补 nginx 仿真 + 生产形态造数(鸿蒙 UA/IPv6/CGNAT/软删旧行/无注册 IP 老用户)。
 3. 旧→新 ID 映射持久化落盘,且覆盖软删行(上次事故根因:软删行被跳过→子表幽灵 FK)。
 4. FK 解析禁止按命名约定猜表名(上次静默 skip 事故)。
