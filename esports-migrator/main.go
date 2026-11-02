@@ -119,7 +119,7 @@ var phases = map[string]func(context.Context, *environment) error{
 	"guard":       runGuard,
 	"identity":    runIdentity,
 	"entitlement": runEntitlement,
-	"behavior":    stubPhase("behavior"),
+	"behavior":    runBehavior,
 	"snapshot":    stubPhase("snapshot"),
 	"recompute":   stubPhase("recompute"),
 	"reconcile":   stubPhase("reconcile"),
@@ -138,7 +138,7 @@ func stubPhase(name string) func(context.Context, *environment) error {
 
 func expandPhases(flagValue string) ([]string, error) {
 	if flagValue == "all" {
-		return order[:3], nil // the phases this cut implements
+		return order[:4], nil // the phases this cut implements
 	}
 	var out []string
 	for _, raw := range strings.Split(flagValue, ",") {

@@ -24,14 +24,18 @@ export APP_MIG_SYSTEM_DSN='postgres://user:pass@host:5432/system?sslmode=disable
 export APP_MIG_ESPORTS_DSN='postgres://user:pass@host:5432/esports?sslmode=disable'
 
 go run . --phase all --dry-run   # census only, no target credentials needed
-go run . --phase all             # guard + identity + entitlement (later cuts add phases)
+go run . --phase all             # guard + identity + entitlement + behavior (later cuts add phases)
 ```
 
 Phases: `guard` (halt on any school-domain rows), `identity`, `entitlement`
 (legacy unlock flags, activation records, and unredeemed codes → grant
-ledger + bare code rows), then `behavior`/`snapshot`/`recompute`/`reconcile`
-as later cuts land. Every phase is idempotent — re-running after a failure
-resumes where the durable markers left off.
+ledger + bare code rows), `behavior` (game preferences → profile.games,
+test attempts → the fact stream with detail-else-summary payloads; the
+retired `skill_prediction` rows drop, login_record stays cold — no
+new-schema home — and user_referral waits on the pending referral ruling),
+then `snapshot`/`recompute`/`reconcile` as later cuts land. Every phase is
+idempotent — re-running after a failure resumes where the durable markers
+left off.
 
 ## Checks
 
