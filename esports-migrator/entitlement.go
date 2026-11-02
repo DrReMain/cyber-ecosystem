@@ -41,8 +41,8 @@ const (
 	// Era-2 rows: the code string never reached the record, so no artifact
 	// id exists to name. A fixed sentinel keeps source non-empty without
 	// inventing an attribution.
-	sourceLegacy        = "legacy"
-	sourceLegacyPayment = "legacy-payment"
+	sourceLegacy        = "legacy_flag"
+	sourceLegacyPayment = "legacy_payment"
 )
 
 // farFuture is the expiry sentinel for legacy codes that never expire: the
