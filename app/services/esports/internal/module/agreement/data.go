@@ -4,9 +4,10 @@ import (
 	"context"
 	"log/slog"
 
+	"entgo.io/ent/dialect/sql"
+
 	"cyber-ecosystem/shared-go/helper"
 	"cyber-ecosystem/shared-go/utils"
-	"entgo.io/ent/dialect/sql"
 
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
