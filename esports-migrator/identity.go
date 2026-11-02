@@ -303,7 +303,7 @@ func ensureMapTable(ctx context.Context, db *sql.DB) error {
 			id varchar(32) NOT NULL PRIMARY KEY,
 			created_at timestamptz NOT NULL,
 			updated_at timestamptz NOT NULL,
-			old_pk varchar(32) NOT NULL,
+			old_pk varchar(64) NOT NULL,
 			entity varchar(16) NOT NULL,
 			new_id varchar(20) NOT NULL,
 			CONSTRAINT migration_map_entity_old_pk_key UNIQUE (entity, old_pk)

@@ -40,7 +40,14 @@ type environment struct {
 // ensureTargets opens the write targets on first use: read-only phases
 // (guard, dry-runs) must run without target credentials.
 func (e *environment) ensureTargets() error {
-	if e.sys != nil && e.esp != nil {
+	if err := e.ensureSystem(); err != nil {
+		return err
+	}
+	return e.ensureEsports()
+}
+
+func (e *environment) ensureSystem() error {
+	if e.sys != nil {
 		return nil
 	}
 	sysDSN, err := requiredEnv("APP_MIG_SYSTEM_DSN")
@@ -48,8 +55,14 @@ func (e *environment) ensureTargets() error {
 		return err
 	}
 	e.sys, err = openPostgres("system", sysDSN)
-	if err != nil {
-		return err
+	return err
+}
+
+// ensureEsports opens only the esports target: the entitlement phase writes
+// grants and codes but never touches the identity core.
+func (e *environment) ensureEsports() error {
+	if e.esp != nil {
+		return nil
 	}
 	espDSN, err := requiredEnv("APP_MIG_ESPORTS_DSN")
 	if err != nil {
@@ -105,7 +118,7 @@ func main() {
 var phases = map[string]func(context.Context, *environment) error{
 	"guard":       runGuard,
 	"identity":    runIdentity,
-	"entitlement": stubPhase("entitlement"),
+	"entitlement": runEntitlement,
 	"behavior":    stubPhase("behavior"),
 	"snapshot":    stubPhase("snapshot"),
 	"recompute":   stubPhase("recompute"),
@@ -125,7 +138,7 @@ func stubPhase(name string) func(context.Context, *environment) error {
 
 func expandPhases(flagValue string) ([]string, error) {
 	if flagValue == "all" {
-		return order[:2], nil // the phases this cut implements
+		return order[:3], nil // the phases this cut implements
 	}
 	var out []string
 	for _, raw := range strings.Split(flagValue, ",") {
