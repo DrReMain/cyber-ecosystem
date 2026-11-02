@@ -472,11 +472,17 @@ API 定→hzy 一次补 ①④⑤⑥ 四卡(档位空值按 P16 已裁灰章形�
 **候选**:A 不建(配置归 deploy 珍稀原则,排障走日志/对账);B 建只读页(成功率+开关状态,只读不配置)。
 **推荐**:B 只读面(运营排障真实需要,不碰配置)。
 
-### P26 旧职业档案承载表+读面接线【ljr;理想 W4 预演范围冻结前(11-12),硬限 W6 cutover 准备(11-24);MIG1 snapshot 阶段冻结待此票(2026-11-02 用户裁定:留 ljr 决策)】
+### P26 旧职业档案承载表+读面接线【ljr;理想 W4 预演范围冻结前(11-12),硬限 W6 cutover 准备(11-24);MIG1 snapshot 阶段冻结待此票(2026-11-02 用户裁定:留 ljr 决策);11-02 recompute 审计增题 P26.1=迁移行口径标+重放窗口】
 **背景**:D-C2 冻结口径「user_career_profile 原样只读迁入+R3 永久可查看」,但现 schema 无落点——新 report_snapshot=单次 attempt 钉板(record_id NOT NULL+tier 枚举+雷达板),旧表=用户级字段行(comprehensive/pro_average/gap_percent+三段结论文本+ability_scores TEXT JSON+expires_at),粒度与形状双不匹配;P14 票卡「冷存保真入新库(只读)」曾有推荐形状,随 D-BA 解散;读面归属(E5b 已建 report-career 面 vs M3)同步未决。
 **候选**:A 新建只读承载表 legacy_career_report(ent schema+Atlas 迁移,列=旧行逐字段+ability_scores jsonb 化;migrator snapshot 即写,读面接线另裁);B 承载表随读面归属一起定(E5b 加 legacy 读通道或 M3 二次迁移),migrator snapshot 冻结至定案。
 **推荐**:A——内容=旧行原样,形状无需消费端推导;12-01 cutover 时间线安全;B 有裁定落 W6 挤 cutover 准备期的风险。
 **旧仓实锤(2026-11-02 复核)**:user_career_profile 15 列字段级产物(非 JSON 列),ability_scores 为终态文本,旧算法输出无重推导源。
+
+**P26.1 增题(2026-11-02 recompute 审计立):迁移行分数口径标+重放窗口【ljr;时限同主问(理想 11-12,硬限 11-24);MIG1 recompute 机械片冻结待此票】**
+**背景**:behavior 刀已把旧 score(0-100,旧仓 V5 标定)平移进 authoritative_score+grade=band(score)——D-C 四档「C 档平移」事实上已对全部迁移行落地;但新引擎 authoritative 仅 red_dot 有冻结曲线(P16:余 12 款 curve-pending 回执 null),A/B 档重放被标定曲线逐款闸死(curvePendingResult 结构性不出权威分——曲线前重放=把旧标定分行降级成无权威分/无档位)。两问随之开:(1)口径标=test_record 无来源列,旧口径平移分与新曲线重放分同列不可分,报告/读面无从表达「该分是当时口径」;(2)重放窗口=曲线逐款定稿(E3-b/c),cutover(12-01~03)时未必 13 款全齐,而迁移器 cutover 后整目录删除,之后无人能重放。
+**候选**:(1)口径标载体:A test_record 加 nullable 来源列(迁移器写哨兵=legacy 平移/重放款名,读面按需消费);B 独立标记表;C 不标(新旧口径同列混存)。(2)重放窗口:A 钉死 cutover 一刻——迁移器内逐字复制当日已定曲线款的 scorer+曲线(bandFor 先例形状+金向量),其余行平移+标;cutover 后不重放,历史分=当时口径永久 legacy(与 R3「永久可查看=当时判定」同语义);B 服务端立回填面,曲线陆续定稿时逐款重放(迁移器「一次性工具 cutover 后删」形态法突破,需用户另裁)。
+**推荐**:两问均 A——形态法零突破、12-01 时间线安全;回填面引入常驻一次性代码+形态法突破,且「历史分追新」与 R3 冻结语义相逆。
+**旧仓实锤(2026-11-02 审计)**:旧服务端本就重算入库(「忽略客户端 totalScore」注记,score=0-100 能力分/raw=无上限原始分双轨与新同构);旧 detail=事件流(red_dot ClickDetail 逐点击 isHit+reactionTime,粒度与新引擎输入同族)、旧 summary=聚合 map(number_stars 带 roundsCompleted/avgDecisionInterval/incorrectClicks 等,对得上新 composite 输入,maxSeqLen 缺席→复杂度项降级重放);新 scorer=旧公式 clean-room 移植+修坑(number_stars「legacy parity」注)。A 档重放机械可行性成立,闸门纯在曲线。
 
 
 

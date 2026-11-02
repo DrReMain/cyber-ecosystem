@@ -13,12 +13,14 @@
 | C 只能平移 | tracking_moving/economic_sim | 旧分平移+legacy 口径标 |
 | D 作废 | skill_prediction | 死端点,无有效存量 |
 
+> **2026-11-02 recompute 审计注**:①「平移」已由 behavior 刀对全部迁移行落地(score→authoritative_score,rawScore→raw_score,grade=band(score)),四档现况=C 档处置泛化为默认,重放是「升级」而非「必经」。②A/B 重放闸门=该款标定曲线(P16:现仅 red_dot 分位冻结;curvePendingResult 结构性不出权威分,曲线前重放=把旧标定分行降级成无权威分/无档位)。③重放窗口与口径标载体=P26.1(ljr):推荐 cutover 一刻迁移器内重放当日已定曲线款(逐字复制 scorer+曲线,bandFor 先例形状),余款平移+legacy 标,cutover 后不重放。④B 档 summary 聚合重放可行性:旧 summary 聚合面对得上新 composite 输入(number_stars 例:maxSeqLen 缺席→复杂度项降级重放);逐款咬合核对归 recompute 机械片夹具。
+
 ## 逐表口径
 
 - **身份列 → system**:username/phone/open_id/微信身份迁为会员身份+identity;credential 密码 verify-then-rehash(MD5 无法验证者强制重置);微信 4 列口径修订(11-02 随首刀定):wechat_sex→sex 枚举已迁,地区 3 列新模型无消费面不迁、预演计数报备。
 - **画像/偏好/溯源 → esports**:出生年月/年龄段/头像/游戏偏好(含待归类项保持待归类)/邀请关系/登录溯源九件套(随 login_record 语义迁或冷存)。存量「仅年龄段无出生年月」用户(旧 API 允许)6→8 档不可精确映射:迁为画像不完整态(档位置空),首个画像触点补填出生年月后服务端重派生。
 - **权益翻译**:解锁三旗标与 activation_records → entitlement 解锁记录;未核销激活码 → 新兑换码批次(保留 report_type 语义);已核销/过期码丢弃靠流水保历史。
-- **不迁重算**:user 统计四列/ability_score/platform_analytics/game_analytics(由 test_record 重算)。
+- **不迁重算**:user 统计四列/ability_score/platform_analytics/game_analytics(由 test_record 重算)。**2026-11-02 recompute 审计**:四目标全数零迁移器写入——platform/game analytics 新 schema 未建(归 P20 特性从 test_record 现算),user 统计四列=读时推导(新 profile 无统计列,原型统计条走 API 现算),ability_score=report 冻结流懒写(读面幂等生成,迁移器抢写反而破坏懒冻结语义);「由 test_record 重算」的正确读法=新系统读时自行重算,迁移器不碰。
 - **保真搬运(D-C2)**:报告 JSON 快照(user_career_profile/school_report)= 旧算法产物+R3 永久可查看语义,原样只读迁入;consent/审计从零。(生产实况 11-02 核实:school_report 无存量,组织层随之删除,见迁移顺序注)
 - **不迁**:RBAC 六件套(`admin_user`/`admin_user_role`/`role`/`role_permission`/`permission`/`menu`)/`*_bak_*` 快照表/flyway 历史/`sku_pricing`(旧报告三档定价表,D-AB 新计费取代且旧库无网关无存量交易)/`content_management`(banner/notice/guide kv 内容表,旧码零消费端=死表;notice 面由 MSG-1 公告承接)/`system_config`(逐键核对新栈配置面,默认不迁)。
 - **表名对照(2026-11-02 全 36 表逐名过账,处置组↔表名,零命中补齐)**:身份=`user`;画像行为=`user_game_preference`/`login_record`(溯源,P22)/`user_referral`(归因,P23);权益=`activation_code`/`activation_records`+`user` 解锁三旗标列;报告快照=`user_career_profile`/`school_report`(无存量,D-BA 停机守卫);种子=`game`/`test_type`/`test_config`/`game_ability_contribution`/题库四表(`moba_character`/`offense_scenario`/`character_counter_relation`/`offense_choice_explanation`)/`career_recommendation_template`/`career_statistics`/`test_type_introduction`(档案面随余组);重算=`ability_score`/`platform_analytics`/`game_analytics`+`user` 统计四列;MSG 域=`user_message`/`user_feedback`(随 MSG-1;未读语义旧仓实锤=A1,见 prd.md P21);待裁=`app_version`(P19,证据倾向 B:旧 H5 版本弹窗实存)。
