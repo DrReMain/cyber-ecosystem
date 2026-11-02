@@ -91,11 +91,11 @@
 
 ## 七、盘点发现的缺口(切片池漏网/待归属)
 
-1. **version-update 无承接片**:原型有页、admin 侧有 app-version 页面(`app-version.html`,系统与合规组),但 E0-E10/H-*/PAY/M2 均未排。前置=system/esports 是否有版本契约;归属建议下次例会定(admin 面随 E9?ctr 面随 M2?)。
+1. **version-update 无承接片**:原型有页、admin 侧有 app-version 页面(`app-version.html`,系统与合规组),但 E0-E10/H-*/PAY/M2 均未排。前置=system/esports 是否有版本契约;归属已裁(**P19=B,D-BC 11-02**):admin 版本公告页随 M2 余组、ctr 轻量「新版本提示,刷新生效」随消费面;强更语义不采(H5 无物理基础)。
 2. **每页语义锚的消费纪律**:ctr 交互原型的 `_check.js` rules 面板(逐条引 PRD 节号)是防偷懒的现成抓手——承接片开工时把对应页的 rules 逐条搬进该片评审锚,逐条对上才算语义级完成(E0 测试读面片已示范此法);admin 原型无同款面板,以对应 PRD 节+BLOCK5_ADMIN_REFORM_PRD 为锚。
 3. **迁移口径同步律**:本矩阵行所属聚合落地时,当日回 migration.md 对应表补行(不积压到 cutover)。
 4. **权威地图滞后**(2026-10-20 核查):DESIGN_DOC_MAP 快照(09-18)之后 manage/docs 与 ctr 原型仍有演进——处理见 §六语料版本律,不视为 ljr 侧缺陷,以流程消化。
-5. **B 批修正清单(已建面×PRD 细则;2026-10-23 S1 校准后修订版,一片收)**:①genre-pick 补「推荐」角标(原型 §16 命中偏好类型带角标,现缺)。**✅ 已在前批落**(11-01 R2 核验:match_pick_recommended 条件渲染在位,矩阵 9 行 ✅)。②profile-nickname 禁 emoji 显式拦截(现仅 trim+服务端兜底)。**✅ 已在微信回填批落**(11-01 R2 核验:EMOJI_RE 显式拒+微信预填剥离)。③age.tsx 改消费 age-required/birth.ts(现自带本地 years/ageOf 副本=遗留清单「上收」反例)。**✅ 已闭**(11-01 R4① 核验:单源落 `features/app/birth`,age-required 与 setup/age 同源消费,零代码)。④向导 games 步完成去向改直连 /match(原型/PRD=04→05;现去首页——若 home 中枢是有意设计需 ljr 一句确认)。⑤profile-overview 模块集对核(PRD:训练趋势本期空态/报告中心内嵌 1 条+查看全部/账号安全=微信手机两行绑定)。**✅ 11-01 R2 落(86e834ba)**:前两块本已对齐(查看全部头链补上),安全两行绑定在位;矩阵 7 行注记。⑥V4 视觉值对齐批:match 子页(pick/switch/guide)+agreement+age-required 仍用 rounded-lg/sm 旧词汇(V1-V3 未覆盖)。**✅ 11-01 R1 落(5c2f272a)**:10-23 快照后 V1-V3 已清至仅剩 3 处(全 12px 图标盒),像素等值换 rounded-control,浏览器算样式实证。⑦admin 详情返回文案带目标名(O-1 断言形状「返回 XXX 列表」)。**✅ 11-01 R1 落(5c2f272a)**:member/order 两页本已合规;真问题=user-detail 抄串「会员列表」(M2-1),五语正名「用户列表」,zh-CN+en-US 双语实测。**S1 撤案两枚**:login「toast 指名缺哪项」(已在:agreeOK 拼名 toast)、setup「列表后端取」(已在:listGames 零硬编码)。横屏律=仅 test-running ✓ 已核无残留。归属=lzx。
+5. **B 批修正清单(已建面×PRD 细则;2026-10-23 S1 校准后修订版,一片收)**:①genre-pick 补「推荐」角标(原型 §16 命中偏好类型带角标,现缺)。**✅ 已在前批落**(11-01 R2 核验:match_pick_recommended 条件渲染在位,矩阵 9 行 ✅)。②profile-nickname 禁 emoji 显式拦截(现仅 trim+服务端兜底)。**✅ 已在微信回填批落**(11-01 R2 核验:EMOJI_RE 显式拒+微信预填剥离)。③age.tsx 改消费 age-required/birth.ts(现自带本地 years/ageOf 副本=遗留清单「上收」反例)。**✅ 已闭**(11-01 R4① 核验:单源落 `features/app/birth`,age-required 与 setup/age 同源消费,零代码)。④向导 games 步完成去向改直连 /match(原型/PRD=04→05;现去首页——若 home 中枢是有意设计需 ljr 一句确认)。**✅ 11-02 D-BD 裁 A**(维持直连 /match;home 中枢=老用户回归落地页,与向导收尾职责不同;代码已就位 games.tsx navigate /match,零改动)。⑤profile-overview 模块集对核(PRD:训练趋势本期空态/报告中心内嵌 1 条+查看全部/账号安全=微信手机两行绑定)。**✅ 11-01 R2 落(86e834ba)**:前两块本已对齐(查看全部头链补上),安全两行绑定在位;矩阵 7 行注记。⑥V4 视觉值对齐批:match 子页(pick/switch/guide)+agreement+age-required 仍用 rounded-lg/sm 旧词汇(V1-V3 未覆盖)。**✅ 11-01 R1 落(5c2f272a)**:10-23 快照后 V1-V3 已清至仅剩 3 处(全 12px 图标盒),像素等值换 rounded-control,浏览器算样式实证。⑦admin 详情返回文案带目标名(O-1 断言形状「返回 XXX 列表」)。**✅ 11-01 R1 落(5c2f272a)**:member/order 两页本已合规;真问题=user-detail 抄串「会员列表」(M2-1),五语正名「用户列表」,zh-CN+en-US 双语实测。**S1 撤案两枚**:login「toast 指名缺哪项」(已在:agreeOK 拼名 toast)、setup「列表后端取」(已在:listGames 零硬编码)。横屏律=仅 test-running ✓ 已核无残留。归属=lzx。
 
 ## 八、变更记录
 
@@ -113,7 +113,7 @@
 | login+回调+守卫 | ✅ | 双勾三态+指名 toast(page.tsx agreeOK)/微信双环境置灰+提示/协议校验盖微信腿/?next= 回跳+开重定向卫生(after-login)/去向=资料完整性(guard.profileComplete 同口径)/备案四要素齐(messages login_footer_*) |
 | profile-nickname | ✅(⚠emoji) | 2-12 码点+计数条+trim 拦+仅真实值预填;emoji 显式拦截缺=B批② |
 | profile-age | ✅ | 6-60 年范围/双下拉+8 档派生提示/未满13 硬闸+guardianAccepted 独立落库/u18 提示;bands 码值=V18 词形;⚠age.tsx 未消费 birth.ts=B批③ |
-| profile-setup(games) | ✅ | listGames 后端取零硬编码/未归类不计投票/平票注/cap 提示+删除×+换行;⚠完成去向=首页非 /match=B批④ |
+| profile-setup(games) | ✅ | listGames 后端取零硬编码/未归类不计投票/平票注/cap 提示+删除×+换行;完成去向=直连 /match(D-BD 裁 A) |
 | home | ✅ | 游客可浏览/点测评拦+next 回跳/hasGames 门控(profileFlowGuard 承真闸);续测卡/最近成绩=E4/E5 锚 |
 | match 主页 | ✅ | 竖屏/tie+empty 路由/编排序=D-Z/?genre= 覆盖+switched 标/done=0 恒(已登记 E4) |
 | match 子页×3 | ✅(⚠视觉) | switch=整页形态+会话生效;guide=五规则+成绩口径+首测面恒定;pick=tie/empty/normal 三面+整卡可点——缺推荐角标=B批①;rounded 旧词汇=V4 |

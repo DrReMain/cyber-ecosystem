@@ -46,9 +46,9 @@
 | 36 | share-invite | ❌ | →MSG-2(D-AS②);P23 前置 |
 | 37 | scheme-b-entry | ❌ | D-AS③ 窗外随 M3/P4 |
 | 38 | scheme-b-guide | ❌ | 同上 |
-| 39 | scheme-b-report | ❌ | 同上;P14 报告快照归属 |
+| 39 | scheme-b-report | ❌ | 同上;P14 已解散(11-02 D-BA,生产无学校数据)→窗外随 M3 |
 | 40 | exit-confirm | ✅ | H-A kit 首用;G-208 首刀已收 |
-| 41 | version-update | ⏸ | **P19**(H5 形态是否保留强更族) |
+| 41 | version-update | 📋 | 已裁 B(D-BC 11-02):ctr 轻量提示+admin 版本公告页,随 M2 余组排程 |
 | 42 | loading | 📄 | kit 在,消费者随各片 |
 | 43 | empty | 📄 | 同上 |
 | 44 | error | 📄 | 同上 |
@@ -64,9 +64,9 @@
 | 🌫 原型非本期 | attribution、channel-manage、landing-material、report-config | 4 | _nav.js 灰标(P5/梯①) |
 | 🎯 M2 核心组 | — | **0** | 全员升已建桶(11-02 对账):member 两页随 M2-1(347a9ce7)、sku-manage/04-order-record/05-order-detail 随 M2-2(9860eb34)、activation-code+activation-code-detail 随 M2-3(45c276d4);到期提醒/批量续费/每日扫描按 M2-1 裁面不含 |
 | 📋 E9 增量(D-AS⑥) | — | 0 | compliance-config 已随 E9 余刀建成升已建桶(11-01);执法消费面(注册年龄带/付费墙)随 PAY3/注册面 |
-| 📋 D-AS 消息组 | feedback-manage、07-feedback-detail、announcement | 3 | →MSG-1(W7-W8);P21 前置 |
-| 📋 M2 余组(梯①) | dashboard、user-portrait、09-user-import、question-bank、question-detail、test-record、08-test-record-detail、test-type、game-category、payment-channel、rating-manage、system-config、app-version | 13 | 各项开工前先过对应 P 票:P20(dashboard/portrait 数据源)、P2(评级)、P24(归类)、P25(渠道面)、P19(版本)、system-config=裁不建候选(config 珍稀原则) |
-| 📋 M3/P4 | tob-tenant-list、tob-tenant-detail | 2 | 窗外 buffer;P14 前置 |
+| 📋 D-AS 消息组 | feedback-manage、07-feedback-detail、announcement | 3 | →MSG-1(W5 契约+面,D-BA 拉前);P21 前置(11-05) |
+| 📋 M2 余组(梯①) | dashboard、user-portrait、09-user-import、question-bank、question-detail、test-record、08-test-record-detail、test-type、game-category、payment-channel、rating-manage、system-config、app-version | 13 | 各项开工前先过对应 P 票:P20(dashboard/portrait 数据源)、P2(评级)、P24(归类)、P25(渠道面);app-version 已裁 B 建(D-BC 11-02),system-config=裁不建候选(config 珍稀原则) |
+| 📋 M3/P4 | tob-tenant-list、tob-tenant-detail | 2 | 窗外 buffer;P14 已解散(11-02 D-BA),随 M3/P4 |
 
 **计数:41 = 已建 13 + 底座 6 + 非本期 4 + M2 核心 0 + E9 增量 0 + 消息组 3 + 余组 13 + M3 2。**(11-02 对账吸收 M2-2/M2-3 四面;已建率 13/41≈32%;窗内可达成面 =已建 13+底座 6+消息组 3=22 页,余组 13+M3 2=15 页窗外,非本期 4 不计。)
 
@@ -83,7 +83,7 @@
 | ?ref= 推荐码明文+注册地域记账 | ⏸ 重批中 | A12 旧裁待重批→**P23** |
 | 消息中心/反馈回复闭环/公告 | 📋 入窗 | D-AS①→MSG-1 |
 | 手动解锁三开关+解锁过期任务 | 📋 改形入窗 | R7(过期=事实推导);运营三操作=M2-1 |
-| 学校版报告(生成/7 天期/学科优势)+school 表 | 📋 随 P14 | D-AS⑤ 默认锁+手动解锁 |
+| 学校版报告(生成/7 天期/学科优势)+school 表 | 📋 读面=E5b 已建位 | P14 已解散(11-02 D-BA,生产无学校数据);D-AS⑤ 默认锁+手动解锁语义不变,M3 真租户再议 |
 | App 版本管理+强更弹窗 | ⏸ | **P19** |
 | Excel 导入导出族(用户导入/题库导入/激活码导出) | 📋 余组 | 题库/激活码导出随 M2-3+余组;用户导入=余组 |
 | 题库三表 CRUD 23 端点(攻防/角色/克制) | 📋 余组 | E9 只读抽屉已建;CRUD/Excel 随余组(10-28 已注) |
