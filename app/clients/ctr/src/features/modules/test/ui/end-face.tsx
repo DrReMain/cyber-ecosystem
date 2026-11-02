@@ -116,6 +116,32 @@ interface WireLine {
   attemptScores: number[];
 }
 
+// One read-back row off the report's attempt_details (field 10): the raw
+// track always travels, the authoritative answer only once the game's
+// curve has spoken — a pending row renders under the same raw-score
+// label law the settlement face holds (the contract's own comment).
+export interface WireDetail {
+  gameCode: string;
+  attemptNo: number;
+  // Proto3 implicit presence: a raw score of 0 — the zero-interaction
+  // honest run's own number — is the default, so the parsed message
+  // OMITS the field entirely (the wire JSON carries it, the runtime
+  // object does not). Readers coerce with ?? 0; undefined is a zero,
+  // never a NaN.
+  rawScore: number | undefined;
+  authoritativeScore: number | undefined;
+  grade: string | undefined;
+}
+
+/** A curve-pending game's read-back rows: every attempt raw, none
+ * authoritative — the game earned a face, just not a calibrated one. */
+export function pendingDetailsOf(
+  details: readonly WireDetail[] | undefined,
+  code: string,
+): readonly WireDetail[] {
+  return (details ?? []).filter((d) => d.gameCode === code);
+}
+
 /** The "vs last session" tag: the previous session's same-ability score
  * with its signed delta, or the honest first-attempt word — never zero
  * masquerading as a delta. */
@@ -158,11 +184,17 @@ function BestTag({ line }: Readonly<{ line: WireLine | undefined }>) {
 /** The attempts receipt (prototype's note card): every valid attempt's
  * score in order with the taken one marked, then the rubric in one
  * honest line — a single attempt reads too, as the prototype's note
- * does. */
-function AttemptsNote({ line }: Readonly<{ line: WireLine | undefined }>) {
+ * does. A curve-pending game has no calibrated line, so its receipt
+ * rides the raw rows instead — the same numbers, one calibration
+ * earlier. */
+function AttemptsNote({
+  line,
+  pending,
+}: Readonly<{ line: WireLine | undefined; pending: readonly WireDetail[] }>) {
   // toJson elides empty repeated fields, so a line without attempts may
   // arrive without the key at all — normalize before reading.
-  const scores = line?.attemptScores ?? [];
+  const lineScores = line?.attemptScores ?? [];
+  const scores = lineScores.length > 0 ? lineScores : pending.map((d) => d.rawScore ?? 0);
   if (scores.length === 0) {
     return null; // an unscored line has no receipt to tell
   }
@@ -256,12 +288,30 @@ function VerdictCard({
 }
 
 // The read-back mode's verdict — the stored line is the whole truth: no
-// local run, no submit chain. A pending read keeps the pulse; a done
-// read with no line renders the honest no-score face (the reason stays
-// undefined so it never wears the void card — an unplayed, a voided,
-// and a norms-pending game all read the same here until the report
-// carries more truth).
-function reviewVerdictOf(line: WireLine | undefined, step: StepContext | null): SubmitVerdict {
+// local run, no submit chain. A pending read keeps the pulse. A done
+// read with no line falls to the report's attempt_details: rows present
+// means a curve-pending game whose earned raw score finally reads back
+// (the raw-slot face, 原始分 label — the same law the live settlement
+// holds); no rows at all stays the honest no-score face (the reason
+// undefined so it never wears the void card — an unplayed and a voided
+// game still read the same, and only those two).
+function reviewVerdictOf(
+  line: WireLine | undefined,
+  step: StepContext | null,
+  pending: readonly WireDetail[],
+): SubmitVerdict {
+  if (line === undefined && pending.length > 0) {
+    return {
+      phase: "done",
+      valid: true,
+      invalidReason: undefined,
+      authoritativeScore: undefined,
+      rawScore: Math.max(...pending.map((d) => d.rawScore ?? 0)),
+      grade: undefined,
+      retestLeft: step?.retestLeft ?? 0,
+      inSession: true,
+    };
+  }
   if (line === undefined) {
     return {
       phase: "done",
@@ -294,6 +344,7 @@ function shownVerdictOf(
   line: WireLine | undefined,
   step: StepContext | null,
   verdict: SubmitVerdict,
+  details: readonly WireDetail[],
 ): SubmitVerdict {
   if (!review) {
     return verdict;
@@ -301,7 +352,7 @@ function shownVerdictOf(
   if (pending) {
     return { phase: "idle" };
   }
-  return reviewVerdictOf(line, step);
+  return reviewVerdictOf(line, step, details);
 }
 
 /**
@@ -340,7 +391,13 @@ export function EndFace({
   const line = (reportQuery.data?.abilities ?? []).find((a) => a.gameCode === code) as
     | WireLine
     | undefined;
-  const shown = shownVerdictOf(review, reportQuery.isPending, line, step, verdict);
+  // The full truth off field 10: rows the calibrated lines can't carry —
+  // curve-pending attempts with raw scores and no authoritative answer.
+  const pending = pendingDetailsOf(
+    reportQuery.data?.attemptDetails as readonly WireDetail[] | undefined,
+    code,
+  );
+  const shown = shownVerdictOf(review, reportQuery.isPending, line, step, verdict, pending);
 
   const rows =
     record !== null ? deriveLocalResults(code, record, new EngineParams(engineParams)) : null;
@@ -399,7 +456,7 @@ export function EndFace({
             verdict={shown}
           />
 
-          <AttemptsNote line={line} />
+          <AttemptsNote line={line} pending={pending} />
 
           {rows !== null ? (
             <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">

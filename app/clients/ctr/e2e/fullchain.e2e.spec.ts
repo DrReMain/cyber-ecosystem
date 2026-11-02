@@ -129,6 +129,7 @@ test("login → wizard → match → 4 games → done → report → code unlock
     await page.waitForURL("**/match", { timeout: 15_000 });
 
     // --- four games ---------------------------------------------------------
+    let pendingReadBackChecked = false;
     for (let step = 0; step < 4; step++) {
       await page.goto("/match");
       await page.getByRole("button", { name: "开始测试" }).click();
@@ -149,6 +150,22 @@ test("login → wizard → match → 4 games → done → report → code unlock
       }
       await expect(page.getByText("重新测试")).toBeVisible({ timeout: 60_000 });
       await page.waitForTimeout(800);
+
+      // The curve-pending read-back (the attempt_details consumer): a
+      // zero-interaction game leaves raw rows with no authoritative
+      // answer, and revisiting its result face mid-session — the session
+      // is still the current one here — must show the earned raw under
+      // the 原始分 label with the receipt, not the no-score face the
+      // pre-contract era rendered for unplayed and pending alike.
+      if (!pendingReadBackChecked && !page.url().includes("red_dot")) {
+        pendingReadBackChecked = true;
+        const pendingCode = page.url().split("/test/")[1]?.split("?")[0] ?? "";
+        await page.goto(`/test/${pendingCode}?review=true`);
+        await expect(page.getByText("原始分", { exact: false })).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText("该款常模积累中，暂无权威档位")).toBeVisible();
+        await expect(page.getByText(/本次共测 1 次/)).toBeVisible();
+        await expect(page.getByText("本次取值")).toBeVisible();
+      }
     }
 
     // --- cohort fixture: the A-② free seat is percentile-gated, and the
