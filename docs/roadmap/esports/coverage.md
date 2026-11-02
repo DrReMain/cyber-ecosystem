@@ -91,7 +91,7 @@
 
 ## 七、盘点发现的缺口(切片池漏网/待归属)
 
-1. **version-update 无承接片**:原型有页、admin 侧有 app-version 页面(`app-version.html`,系统与合规组),但 E0-E10/H-*/PAY/M2 均未排。前置=system/esports 是否有版本契约;归属建议下次例会定(admin 面随 E9?ctr 面随 M2?)。
+1. **version-update 无承接片**:原型有页、admin 侧有 app-version 页面(`app-version.html`,系统与合规组),但 E0-E10/H-*/PAY/M2 均未排。前置=system/esports 是否有版本契约;归属已裁(**P19=B,D-BC 11-02**):admin 版本公告页随 M2 余组、ctr 轻量「新版本提示,刷新生效」随消费面;强更语义不采(H5 无物理基础)。
 2. **每页语义锚的消费纪律**:ctr 交互原型的 `_check.js` rules 面板(逐条引 PRD 节号)是防偷懒的现成抓手——承接片开工时把对应页的 rules 逐条搬进该片评审锚,逐条对上才算语义级完成(E0 测试读面片已示范此法);admin 原型无同款面板,以对应 PRD 节+BLOCK5_ADMIN_REFORM_PRD 为锚。
 3. **迁移口径同步律**:本矩阵行所属聚合落地时,当日回 migration.md 对应表补行(不积压到 cutover)。
 4. **权威地图滞后**(2026-10-20 核查):DESIGN_DOC_MAP 快照(09-18)之后 manage/docs 与 ctr 原型仍有演进——处理见 §六语料版本律,不视为 ljr 侧缺陷,以流程消化。
