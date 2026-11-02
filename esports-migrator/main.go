@@ -35,6 +35,7 @@ type environment struct {
 	sys    *sql.DB
 	esp    *sql.DB
 	dryRun bool
+	sample int
 }
 
 // ensureTargets opens the write targets on first use: read-only phases
@@ -75,9 +76,10 @@ func (e *environment) ensureEsports() error {
 func main() {
 	phaseFlag := flag.String("phase", "all", "comma-separated phases to run (guard,identity,... or all)")
 	dryRun := flag.Bool("dry-run", false, "read the source and print the plan census without writing anything")
+	sample := flag.Int("sample", 200, "per-field sampling size for the reconcile phase")
 	flag.Parse()
 
-	env := &environment{dryRun: *dryRun}
+	env := &environment{dryRun: *dryRun, sample: *sample}
 
 	srcDSN, err := requiredEnv("APP_MIG_SOURCE_DSN")
 	if err != nil {
@@ -122,7 +124,7 @@ var phases = map[string]func(context.Context, *environment) error{
 	"behavior":    runBehavior,
 	"snapshot":    stubPhase("snapshot"),
 	"recompute":   stubPhase("recompute"),
-	"reconcile":   stubPhase("reconcile"),
+	"reconcile":   runReconcile,
 }
 
 // order mirrors the frozen migration order: identity first (it produces the

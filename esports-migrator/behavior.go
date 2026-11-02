@@ -391,8 +391,11 @@ func applyProfileGames(ctx context.Context, db *sql.DB, g *gamesPlan) (bool, err
 	}
 
 	err = withTx(ctx, db, func(tx *sql.Tx) error {
+		// updated_at deliberately stays what identity carried: timestamps
+		// travel verbatim as historical truth, and the fold's own moment
+		// is recorded in migration_map.created_at, not on the row.
 		res, err := tx.ExecContext(ctx, `
-			UPDATE profile SET games = $1, updated_at = now()
+			UPDATE profile SET games = $1
 			WHERE user_id = $2 AND games IS NULL`,
 			payload, userID)
 		if err != nil {

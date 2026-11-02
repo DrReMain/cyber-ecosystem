@@ -33,7 +33,12 @@ ledger + bare code rows), `behavior` (game preferences → profile.games,
 test attempts → the fact stream with detail-else-summary payloads; the
 retired `skill_prediction` rows drop, login_record stays cold — no
 new-schema home — and user_referral waits on the pending referral ruling),
-then `snapshot`/`recompute`/`reconcile` as later cuts land. Every phase is
+and `reconcile` — the read-only closing assertion pass (count identities
+scoped through `migration_map`, full-column invariants such as
+grade=band(score) and re-derived attempt ordinals and age bands, per-field
+sampling with canonical JSON comparison; `--sample N` sizes it). `snapshot`
+waits on the legacy-report carrier ruling and `recompute` on the
+calibration-curve window (both filed as P26/P26.1). Every phase is
 idempotent — re-running after a failure resumes where the durable markers
 left off.
 
