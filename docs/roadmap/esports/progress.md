@@ -11,7 +11,7 @@
 | hzy | E-line-b ✅ 10-30;R1 ✅(5c2f272a);R2 ✅(86e834ba);R3 ✅(a44045a8);R5 ✅ 复扫全绿;PC 垂直居中 ✅(82bb2ad9,根列 md:justify-center,现状面全自填满=今日零视觉差,规则为短面备) | **R4② 待 ljr 确认**(分配制 D-AV) |
 | ljr | P7 视觉稿已落库(1c30b767,精修窗至 12-02);P1/P3/P9/P15/P10/P7 四参数已裁 | **P19/P21/P22(W5)→P14/P23(W6)→P7 定稿/P6(W7-W8)**;P4 11 月底 |
 
-**M1 燃尽**:E0-E10+E5b+E6c 全簇+H 线+质量批 全✅;PAY-C0/C1+PAY1 ✅;PAY2-3 未启动(行政件=用户即办);CP1 ✅ 提前 14 天;CP2 原项全实质达成,**新增门构成(M2 核心组)自 10-30 重构起算**。
+**M1 燃尽**:E0-E10+E5b+E6c 全簇+H 线+质量批 全✅;PAY-C0/C1+PAY1 ✅;PAY2-3 未启动(行政件=ljr 即办:类目+H5 权限;APIv3 密钥 32 位已核对);CP1 ✅ 提前 14 天;CP2 原项全实质达成,**新增门构成(M2 核心组)自 10-30 重构起算**。
 
 ## 活片认领表(定义=plan.md;已收片迁 archive)
 
@@ -24,7 +24,7 @@
 | MSG-1 消息反馈公告 / MSG-2 分享裂变 | — | 未认领(W7-W8) | P21/P23 前置;D-AS①② |
 | 待校准成绩小片(pending 行+PM-10 明细行) | lzx | ✅ 收口 ecbe8ab6(11-01,e2e 全套+三链绿,C 端走查随消费片) | report.proto 增 SessionAttemptDetail 逐次行组(response 第 10 域,明细=全真含 curve-pending:raw 恒在+权威/档位可空);RP 滤 AuthoritativeScoreNotNil 撤(行注本就写「receipt's raw truth」,代码曾违背自家注);行折面窄化收口=线法不变(缺席永不零值),pending 行只进明细不进线算;sessionBoardOf 复合判定同滤(pending 不压 composite);digest 族查证=两法皆 valid-any 本无病(头条计数/最新行列表),仅锚字段可选缺席=契约原设计;e2e Face 4 双态一面(双 pending 行 raw 420/400+权威同窗 88,锚=权威行)+全 pending 场次=10-30 发现原形(零线零锚零判,明细 1 行可见)+Face 5 计数随真(5/4/1,最新 fps=pending 场次锚诚实空);「dev 常模种子」裁定=e2e 平面(幻影池 boot 种子=生产污染硬否,fixture 机制待消费端落地片再议,遗留清单登记) |
 | PAY0 模块拆分 | lzx | ✅ 收口 4a590622(10-31) | 双聚合根拆毕(module/sku+module/order,order 跨模块持 sku.SkuRP),guard 豁免清零;顺手捉 M2-1 声明注释残留(归位体内)+go test 缓存×文件树守卫假绿洞(esports test target 已 -count=1;system 六守卫同洞留骨架车道) |
-| PAY2 通道联调 | — | 等行政件 | 用户即办:类目+H5 权限+APIv3 密钥 32 位 |
+| PAY2 通道联调 | — | 等行政件 | ljr 即办:类目+H5 权限;APIv3 密钥 32 位已核对(wiki 已更)转 lzx |
 | PAY3 合规执法+付费墙 | — | 未认领 | P7 稿就绪;PAY2 后 |
 | MIG1 迁移工具 | — | W6-W7 建 | P14 开工前必裁;W8 预演(P6);**权益翻译口径已冻结(10-31,M2-1)**:Entitlement 终态=scope_membership 行 status(active/terminated)+expires_at+terminated_at,续期=append-only 新行,旧码 activation 翻译按此落 |
 | R1..R5 精修带 | hzy(分配制,lzx 可代领) | R1 ✅ 11-01(5c2f272a);R2 ✅ 11-01(86e834ba,①②⑤前批已落仅补注+核验,唯一代码缺口=报告中心查看全部;面检:续测卡逐字对齐,去向差随 G-208);R3 ✅ 全收(mt-F1+P10=a44045a8);R4 ①闭②卡 ljr;R5 ✅ 复扫全绿(11-01) | 定义=plan hzy 精修带;R4②=lrj 例会确认点 |
@@ -33,7 +33,6 @@
 
 | 项 | 归属 | 触发/时点 |
 |---|---|---|
-| APIv3 密钥 wiki 记录 33 字符(应 32)——回调解密与 CP3 前必须核对 | 用户侧 | 即办 |
 | 微信回调 next 丢失(redirect_uri 不能带 query,须 state 中转) | 后续微信链路片 | 设计时定 |
 | 上线前登录切真实公众号 appid(JSAPI 绑域约束;测试号绑不了商户) | PAY2 | 上线清单 |
 | ICP 串上线前 beian.miit.gov.cn 复核一次(D-AO① 原案;11-01 PM-1 复裁维持带「备」,当日去备翻案经知情复裁回滚 928077f3) | 上线清单 | W9 前核对 |
