@@ -9,7 +9,7 @@
 |---|---|---|
 | lzx | M1 全量收满+质量批三件收口(99c5bb06);CP1 提前 14 天;M2-1 收口 347a9ce7+PAY0 收口 4a590622+M2-2 收口 9860eb34+M2-3 收口 45c276d4+M2-4 首刀收口 197fdbc6+E9 首刀收口 067a89ce(11-01,agreement 两页)+E9 余刀收口 32f5cf0a(11-01,compliance-config+真源化/登录上行)+待校准成绩小片收口 ecbe8ab6(11-01,pending 明细行+PM-10 并车,e2e 全套)+机械债两件收口 84fe10ee(11-02,paraglide 13 键+orderadmin §3 重排)+MIG1 首刀收口 f9d1d3dc(11-02,guard+identity,仓库根独立 module 不入 nx)+MIG1 二刀 entitlement 收口 3bdec4ad(11-02,两代解锁翻译+未兑换码裸行,school 旗标不迁报备,冒烟矩阵全绿)+MIG1 三刀 behavior 收口 54654a62(11-02,偏好折叠+事实流保真,grade=band 派生金向量,login_record 冷存/user_referral 等 P23 报备)+agreement 域三处 lint 收口 d502d60b(11-02,E9 漏网,gci+G115×2 走 ConvNum seam,全仓门 0 issues) | **MIG1 建进行中**(三刀毕,下一刀=snapshot);后继 W4-W6=PAY2/M2-4 trace/PAY3/MSG-1(拉前重排,见 plan 窗口表) |
 | hzy | E-line-b ✅ 10-30;R1 ✅(5c2f272a);R2 ✅(86e834ba);R3 ✅(a44045a8);R4 ✅(D-BD 11-02);R5 ✅ 复扫全绿;PC 垂直居中 ✅(82bb2ad9,根列 md:justify-center,现状面全自填满=今日零视觉差,规则为短面备) | **Q 线役首分配 Q1**(D-BB 用户裁定:业务码逐部分独立校对+精修,hzy 参与;射面/验收=plan Q 线节) |
-| ljr | P7 三态稿**已定稿 11-02**(1c30b767,到期提醒默认 7 天);P1/P3/P9/P15/P10/P7 四参数已裁;行政件(类目+H5)归属 ljr(11-02 fe04b7b2);**P21/P19/PM-12/同意口径已由 lzx 证据了结(D-BC 11-02),P22 默认 A 已生效待否决窗** | **书面待办(D-BA/D-BC)**:行政件就绪 11-10(类目+H5 即办启动)→P6 11-12(用户)→P22 否决窗截止 11-14(默认 A)→P23/P20 11-28;P4 11 月底(R4② 已裁 D-BD;P7 定稿 11-02 提前 5 天) |
+| ljr | P7 三态稿**已定稿 11-02**(1c30b767,到期提醒默认 7 天);P1/P3/P9/P15/P10/P7 四参数已裁;行政件(类目+H5)归属 ljr(11-02 fe04b7b2);**P21/P19/PM-12/同意口径已由 lzx 证据了结(D-BC 11-02),P22 默认 A 已生效待否决窗** | **书面待办(D-BA/D-BC)**:行政件就绪 11-10(类目+H5 即办启动)→P6 11-12(用户)→**P26 旧职业档案承载(理想 11-12,硬限 11-24;MIG1 snapshot 冻结中)**→P22 否决窗截止 11-14(默认 A)→P23/P20 11-28;P4 11 月底(R4② 已裁 D-BD;P7 定稿 11-02 提前 5 天) |
 
 **M1 燃尽**:E0-E10+E5b+E6c 全簇+H 线+质量批 全✅;PAY-C0/C1+PAY1 ✅;PAY2-3 未启动(行政件=ljr 即办:类目+H5 权限;APIv3 密钥 32 位已核对);CP1 ✅ 提前 14 天;CP2 原项全实质达成,**新增门构成(M2 核心组)自 10-30 重构起算**。
 
@@ -26,7 +26,7 @@
 | PAY0 模块拆分 | lzx | ✅ 收口 4a590622(10-31) | 双聚合根拆毕(module/sku+module/order,order 跨模块持 sku.SkuRP),guard 豁免清零;顺手捉 M2-1 声明注释残留(归位体内)+go test 缓存×文件树守卫假绿洞(esports test target 已 -count=1;system 六守卫同洞留骨架车道) |
 | PAY2 通道联调 | — | W4(行政件就绪目标 11-10,D-BA 拉前) | ljr 即办:类目+H5 权限;APIv3 密钥 32 位已核对(wiki 已更)转 lzx |
 | PAY3 合规执法+付费墙 | — | W5-W6(P7 已定稿 11-02;余依赖=PAY2) | P7 三态稿已定稿(1c30b767);PAY2 后 |
-| MIG1 迁移工具 | lzx(**专职,D-BB**:hzy 不碰迁移) | **首刀毕 f9d1d3dc+二刀 entitlement 毕 3bdec4ad+三刀 behavior 毕 54654a62(11-02:guard+identity+权益两代翻译+行为面事实流;形态=仓库根独立 go module 不入 nx+双库裸 SQL+migration_map 工具自管+档位/grade 双金向量;三链绿+冒烟矩阵全绿;溯源=login_record 冷存无落点、user_referral 等 P23);后续 snapshot/recompute/reconcile 占位中** | W4 预演(P6=11-12 用户确认,副本 11-14 就绪即演,生产备份直载本地不脱敏 11-02 裁定);**权益翻译口径已冻结(10-31,M2-1)**:Entitlement 终态=scope_membership 行 status(active/terminated)+expires_at+terminated_at,续期=append-only 新行,旧码 activation 翻译按此落;迁移射面删「组织」层(11-02 D-BA) |
+| MIG1 迁移工具 | lzx(**专职,D-BB**:hzy 不碰迁移) | **首刀毕 f9d1d3dc+二刀 entitlement 毕 3bdec4ad+三刀 behavior 毕 54654a62(11-02:guard+identity+权益两代翻译+行为面事实流;形态=仓库根独立 go module 不入 nx+双库裸 SQL+migration_map 工具自管+档位/grade 双金向量;三链绿+冒烟矩阵全绿;溯源=login_record 冷存无落点、user_referral 等 P23);**snapshot 冻结待 P26(承载表无落点,留 ljr 裁)**;后续 recompute/reconcile 占位中** | W4 预演(P6=11-12 用户确认,副本 11-14 就绪即演,生产备份直载本地不脱敏 11-02 裁定);**权益翻译口径已冻结(10-31,M2-1)**:Entitlement 终态=scope_membership 行 status(active/terminated)+expires_at+terminated_at,续期=append-only 新行,旧码 activation 翻译按此落;迁移射面删「组织」层(11-02 D-BA) |
 | R1..R5 精修带 | hzy(分配制,lzx 可代领) | R1 ✅ 11-01(5c2f272a);R2 ✅ 11-01(86e834ba,①②⑤前批已落仅补注+核验,唯一代码缺口=报告中心查看全部;面检:续测卡逐字对齐,去向差随 G-208);R3 ✅ 全收(mt-F1+P10=a44045a8);R4 ✅ 全收(①单源+②D-BD 裁 A);R5 ✅ 复扫全绿(11-01) | 定义=plan hzy 精修带;R 线全收 |
 
 ## 开放遗留清单(完成即删行)

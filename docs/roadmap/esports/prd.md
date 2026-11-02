@@ -472,6 +472,12 @@ API 定→hzy 一次补 ①④⑤⑥ 四卡(档位空值按 P16 已裁灰章形�
 **候选**:A 不建(配置归 deploy 珍稀原则,排障走日志/对账);B 建只读页(成功率+开关状态,只读不配置)。
 **推荐**:B 只读面(运营排障真实需要,不碰配置)。
 
+### P26 旧职业档案承载表+读面接线【ljr;理想 W4 预演范围冻结前(11-12),硬限 W6 cutover 准备(11-24);MIG1 snapshot 阶段冻结待此票(2026-11-02 用户裁定:留 ljr 决策)】
+**背景**:D-C2 冻结口径「user_career_profile 原样只读迁入+R3 永久可查看」,但现 schema 无落点——新 report_snapshot=单次 attempt 钉板(record_id NOT NULL+tier 枚举+雷达板),旧表=用户级字段行(comprehensive/pro_average/gap_percent+三段结论文本+ability_scores TEXT JSON+expires_at),粒度与形状双不匹配;P14 票卡「冷存保真入新库(只读)」曾有推荐形状,随 D-BA 解散;读面归属(E5b 已建 report-career 面 vs M3)同步未决。
+**候选**:A 新建只读承载表 legacy_career_report(ent schema+Atlas 迁移,列=旧行逐字段+ability_scores jsonb 化;migrator snapshot 即写,读面接线另裁);B 承载表随读面归属一起定(E5b 加 legacy 读通道或 M3 二次迁移),migrator snapshot 冻结至定案。
+**推荐**:A——内容=旧行原样,形状无需消费端推导;12-01 cutover 时间线安全;B 有裁定落 W6 挤 cutover 准备期的风险。
+**旧仓实锤(2026-11-02 复核)**:user_career_profile 15 列字段级产物(非 JSON 列),ability_scores 为终态文本,旧算法输出无重推导源。
+
 
 
 ---
