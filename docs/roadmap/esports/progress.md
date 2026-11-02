@@ -46,11 +46,9 @@
 | dev 栈老库接 atlas 需基线(10-31 hzy 机实证:无 revisions 表的既有库直接 migrate:apply 必撞 already-exists,先 `atlas migrate set <init版>` 打基线再 apply;revisions 表落专用 schema `atlas_schema_revisions`,查 public 查不到) | lzx | migrate:baseline 补 nx target 或本行即文档 |
 | age-required 逃生按钮(先看免费报告;原型有面现仓无) | PAY3 | 付费墙落地时 |
 | dev 常模池 fixture 机制未立(待校准小片裁定:幻影池 boot 种子=生产污染硬否;曲线常模=代码常量随 E3-b/c 逐款定稿不可种;e2e 已种双态池承担验证面;dev 走查 percentile 列渲染的消费端落地片再议机制) | lzx | 明细行 C 端消费片开工时 |
-| tools:paraglide:check admin 存量红 13 条(esports-order-detail 目录键族缺 `esports_order_detail_` 前缀,M2-2 遗留;E9 首刀 11-01 起挡 admin 绿) | lzx | 机械片:13 键改名+调用点随迁,随下次触碰 admin i18n 顺路 |
 | 同意记录页渠道列缺(原型列=小红书/抖音/归因,数据源=?ref 推荐码记账) | P23 裁后 | 归因记账落时契约补 channel 字段+页面补列 |
 | 同意记录页手机号搜索缺(system roster 无反查) | G-306 家族 | roster 反查 RPC 落时一并补(membership 手机搜索同欠) |
 | 合规配置提示文案无「恢复默认」手势(契约 min_len1 挡空串,覆盖一旦落只能再覆盖;需重置时契约加 clear 语义) | lzx | ljr 提出时契约小补 |
 | 出生采集开关消费面未接(ctr 注册仍问出生年月;付费年龄线/两条文案执法随 PAY3) | 注册面/PAY3 落地时 | 消费端接 GetComplianceConfig ctr 面 RPC(届时立契约) |
 | 同意记录重复登录同版追加行(RecordAgreementConsent 无 user+doc 幂等键,登录 consent 上行落地后每次登录×2 行 append;强合规口径=每次记 vs 轻口径=首同意记,agreed_count 折 distinct 不受影响但同意记录页会现重复行) | ljr(例会) | 裁后 agreement 域小补:服务端幂等或维持每次记 |
-| orderadmin(M2-2 已提交)Port/UC/handlers 方法序与 proto Create-first 法序漂移(E9 双轴审查同病发现,agreement 已按 §3 重排) | lzx | 下次触碰 order 域顺路重排 |
 | dev 栈状态目录 .run/ 迁仓外(D-AX):各开发会话代理的后台栈状态文件(pid/ports json)改写到仓外——建议 `$TMPDIR/cyber-dev/<project>.json`,pid 失活即视为陈旧可覆盖;本机存在 .run/ 者整目录删除(hzy 机实存自 10-26,lzx/用户机自查),.gitignore 不再兜底 | 各机 coding agent 自处 | 下次开栈前 |

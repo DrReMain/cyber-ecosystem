@@ -218,6 +218,17 @@ func (rp *payChannelRP) CreatePayment(ctx context.Context, provider string, in *
 	return out, nil
 }
 
+func (rp *payChannelRP) ClosePayment(ctx context.Context, provider, outTradeNo string) error {
+	backend, err := rp.Platform.PaymentFor(provider)
+	if err != nil {
+		return rp.Platform.HandlePaymentError(err)
+	}
+	if err := backend.Gateway.ClosePayment(ctx, outTradeNo); err != nil {
+		return rp.Platform.HandlePaymentError(err)
+	}
+	return nil
+}
+
 func (rp *payChannelRP) QueryPayment(ctx context.Context, provider, outTradeNo string) (*payment.PaymentStatusResult, error) {
 	backend, err := rp.Platform.PaymentFor(provider)
 	if err != nil {
@@ -228,17 +239,6 @@ func (rp *payChannelRP) QueryPayment(ctx context.Context, provider, outTradeNo s
 		return nil, rp.Platform.HandlePaymentError(err)
 	}
 	return out, nil
-}
-
-func (rp *payChannelRP) ClosePayment(ctx context.Context, provider, outTradeNo string) error {
-	backend, err := rp.Platform.PaymentFor(provider)
-	if err != nil {
-		return rp.Platform.HandlePaymentError(err)
-	}
-	if err := backend.Gateway.ClosePayment(ctx, outTradeNo); err != nil {
-		return rp.Platform.HandlePaymentError(err)
-	}
-	return nil
 }
 
 func (rp *payChannelRP) ParseNotification(ctx context.Context, provider string, in *payment.NotificationInput) (*payment.NotificationEvent, error) {

@@ -46,6 +46,14 @@ func (s *OrderAdminService) RegisterConnect(srv *connecttransport.Server) {
 
 // Handler -------------------------------------------------------------------------------------------------------------
 
+func (s *OrderAdminService) ClosePaymentOrder(ctx context.Context, req *esportspb.ClosePaymentOrderRequest) (*esportspb.ClosePaymentOrderResponse, error) {
+	row, err := s.adminUC.Close(ctx, req.GetOrderNo())
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.ClosePaymentOrderResponse{Order: adminOrderPB(row)}, nil
+}
+
 func (s *OrderAdminService) ListPaymentOrders(ctx context.Context, req *esportspb.ListPaymentOrdersRequest) (*esportspb.ListPaymentOrdersResponse, error) {
 	in := &order.AdminListIn{PageRequest: req.GetPage()}
 	if req.GetState() != esportspb.OrderState_ORDER_STATE_UNSPECIFIED {
@@ -73,14 +81,6 @@ func (s *OrderAdminService) GetPaymentOrder(ctx context.Context, req *esportspb.
 		return nil, err
 	}
 	return &esportspb.GetPaymentOrderResponse{Order: adminOrderPB(row), Unlock: unlockPB(unlock)}, nil
-}
-
-func (s *OrderAdminService) ClosePaymentOrder(ctx context.Context, req *esportspb.ClosePaymentOrderRequest) (*esportspb.ClosePaymentOrderResponse, error) {
-	row, err := s.adminUC.Close(ctx, req.GetOrderNo())
-	if err != nil {
-		return nil, err
-	}
-	return &esportspb.ClosePaymentOrderResponse{Order: adminOrderPB(row)}, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------

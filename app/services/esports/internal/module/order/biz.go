@@ -50,6 +50,8 @@ const (
 
 var billZone = time.FixedZone("CST", 8*60*60) // bill days are wall-clock facts in the channel's timezone, not the host's — WeChat publishes in Beijing time; the mock's day-agnostic snapshot takes the same window so both providers reconcile under one rule
 
+var rosterHydrate = utils.Ptr(int32(helper.DefaultPageSizeMax)) // one roster page covers the page's distinct ids
+
 // DO ------------------------------------------------------------------------------------------------------------------
 
 type Order struct {
@@ -156,8 +158,8 @@ type OrderRP interface {
 
 type PayChannelRP interface { // routes to the configured provider's backend; capability errors arrive classified
 	CreatePayment(ctx context.Context, provider string, in *payment.CreatePaymentInput) (*payment.PrepayResult, error)
-	QueryPayment(ctx context.Context, provider, outTradeNo string) (*payment.PaymentStatusResult, error)
 	ClosePayment(ctx context.Context, provider, outTradeNo string) error
+	QueryPayment(ctx context.Context, provider, outTradeNo string) (*payment.PaymentStatusResult, error)
 	ParseNotification(ctx context.Context, provider string, in *payment.NotificationInput) (*payment.NotificationEvent, error)
 	DownloadBill(ctx context.Context, provider string, in *payment.BillInput) (*payment.BillResult, error) // the day's raw statement; NotFound = the channel has not published it yet
 	ParseTradeBill(ctx context.Context, provider string, raw []byte) ([]payment.BillLine, error)           // neutralized statement rows in the contract's vocabulary
@@ -516,6 +518,98 @@ func (uc *OrderUC) ReconcileOnce(ctx context.Context, day time.Time) error {
 	return err
 }
 
+func (uc *OrderAdminUC) Close(ctx context.Context, orderNo string) (*AdminOrderRow, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("order close requires an admin session"))
+	}
+	o, err := uc.orderRP.ByNo(ctx, orderNo)
+	if err != nil {
+		return nil, err
+	}
+	if o == nil {
+		return nil, esportspb.ErrorEsportsOrderNotFound("")
+	}
+	if o.State != StatePending {
+		return nil, esportspb.ErrorEsportsOrderStateConflict("")
+	}
+	closed, err := retirePending(ctx, uc.channelRP, uc.orderRP, o)
+	if err != nil {
+		return nil, err
+	}
+	if closed == nil {
+		return nil, esportspb.ErrorEsportsOrderStateConflict("")
+	}
+	uc.Log.Info("order closed by operator", "order_no", orderNo, "user_id", o.UserID, "by", subject.UserID)
+	rows, err := uc.hydrate(ctx, []*Order{closed})
+	if err != nil {
+		return nil, err
+	}
+	return rows[0], nil
+}
+
+func (uc *OrderAdminUC) List(ctx context.Context, in *AdminListIn) (*AdminListOut, error) {
+	listIn := &ListIn{PageRequest: in.PageRequest}
+	if in.State != nil {
+		listIn.State = *in.State
+	}
+	if in.Scope != nil {
+		listIn.Scope = *in.Scope
+	}
+	if in.Keyword != nil {
+		// One box, two readings: order-no shaped input queries orders
+		// directly, anything else resolves people first (nickname via the
+		// profile plane; phone search is a system-plane gap the ledger
+		// tracks). A P-prefixed nickname misroutes — one empty answer,
+		// the operator retypes.
+		kw := strings.TrimPrefix(strings.TrimSpace(*in.Keyword), "#")
+		if strings.HasPrefix(kw, OrderNoPrefix) {
+			listIn.Prefix = kw
+		} else {
+			userIDs, err := uc.profileRP.ListUserIDs(ctx, &kw, nil)
+			if err != nil {
+				return nil, err
+			}
+			if len(userIDs) == 0 {
+				return &AdminListOut{PageResponse: helper.BuildPageResponse(0, 0, 0)}, nil
+			}
+			listIn.UserIDs = userIDs
+		}
+	}
+	out, err := uc.orderRP.List(ctx, listIn)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := uc.hydrate(ctx, out.Orders)
+	if err != nil {
+		return nil, err
+	}
+	return &AdminListOut{PageResponse: out.PageResponse, Rows: rows}, nil
+}
+
+func (uc *OrderAdminUC) Get(ctx context.Context, orderNo string) (*AdminOrderRow, *UnlockView, error) {
+	o, err := uc.orderRP.ByNo(ctx, orderNo)
+	if err != nil {
+		return nil, nil, err
+	}
+	if o == nil {
+		return nil, nil, esportspb.ErrorEsportsOrderNotFound("")
+	}
+	rows, err := uc.hydrate(ctx, []*Order{o})
+	if err != nil {
+		return nil, nil, err
+	}
+	if o.State != StatePaid {
+		// A pending order has unlocked nothing; a closed one never will.
+		return rows[0], nil, nil
+	}
+	view, err := uc.foldUnlock(ctx, o)
+	if err != nil {
+		return nil, nil, err
+	}
+	return rows[0], view, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func (uc *OrderUC) resolveScope(ctx context.Context, userID string, s *sku.Sku, ref *string) (string, *string, error) {
@@ -707,150 +801,6 @@ func (uc *OrderUC) convergeQuery(ctx context.Context, order *Order) {
 	}
 }
 
-func retirePending(ctx context.Context, channelRP PayChannelRP, orderRP OrderRP, order *Order) (*Order, error) {
-	// Takes a pending order out of play: the channel twin closes first
-	// (the channel is the state machine; a channel refusal folds to the
-	// truth it reports), then the local conditional close frees the reuse
-	// slot. A nil return means the row left pending on its own — a settle
-	// or a rival close won the race.
-	if err := channelRP.ClosePayment(ctx, order.Provider, order.OrderNo); err != nil {
-		switch {
-		case errorspb.IsInfraErrorPaymentNotFound(err):
-			// The channel never knew this trade (a crash between the
-			// channel create and the local insert) — the local close is
-			// the whole close.
-		case errorspb.IsInfraErrorPaymentChannelRejected(err):
-			// The channel refuses the close — paid in the expiry race. The
-			// converger settles it; a fresh pending order must wait for
-			// this row to leave pending first.
-			return nil, esportspb.ErrorEsportsOrderStateConflict("").WithCause(err)
-		default:
-			return nil, err
-		}
-	}
-	return orderRP.ClosePending(ctx, order.OrderNo)
-}
-
-func credentialOf(o *Order) payment.Credential {
-	return payment.Credential{Kind: payment.CredentialKind(o.CredentialKind), Value: o.CredentialValue}
-}
-
-func channelIn(channels []payment.Channel, want payment.Channel) bool {
-	for _, c := range channels {
-		if c == want {
-			return true
-		}
-	}
-	return false
-}
-
-func billDayWindow(day time.Time) (time.Time, time.Time) {
-	d := day.In(billZone)
-	start := time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, billZone)
-	return start, start.Add(24 * time.Hour)
-}
-
-func billDayBefore(t time.Time) time.Time {
-	// A day's statement publishes the following day — the sweep always asks
-	// for yesterday's bill.
-	d := t.In(billZone).AddDate(0, 0, -1)
-	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, billZone)
-}
-
-var rosterHydrate = utils.Ptr(int32(helper.DefaultPageSizeMax)) // one roster page covers the page's distinct ids
-
-func (uc *OrderAdminUC) List(ctx context.Context, in *AdminListIn) (*AdminListOut, error) {
-	listIn := &ListIn{PageRequest: in.PageRequest}
-	if in.State != nil {
-		listIn.State = *in.State
-	}
-	if in.Scope != nil {
-		listIn.Scope = *in.Scope
-	}
-	if in.Keyword != nil {
-		// One box, two readings: order-no shaped input queries orders
-		// directly, anything else resolves people first (nickname via the
-		// profile plane; phone search is a system-plane gap the ledger
-		// tracks). A P-prefixed nickname misroutes — one empty answer,
-		// the operator retypes.
-		kw := strings.TrimPrefix(strings.TrimSpace(*in.Keyword), "#")
-		if strings.HasPrefix(kw, OrderNoPrefix) {
-			listIn.Prefix = kw
-		} else {
-			userIDs, err := uc.profileRP.ListUserIDs(ctx, &kw, nil)
-			if err != nil {
-				return nil, err
-			}
-			if len(userIDs) == 0 {
-				return &AdminListOut{PageResponse: helper.BuildPageResponse(0, 0, 0)}, nil
-			}
-			listIn.UserIDs = userIDs
-		}
-	}
-	out, err := uc.orderRP.List(ctx, listIn)
-	if err != nil {
-		return nil, err
-	}
-	rows, err := uc.hydrate(ctx, out.Orders)
-	if err != nil {
-		return nil, err
-	}
-	return &AdminListOut{PageResponse: out.PageResponse, Rows: rows}, nil
-}
-
-func (uc *OrderAdminUC) Get(ctx context.Context, orderNo string) (*AdminOrderRow, *UnlockView, error) {
-	o, err := uc.orderRP.ByNo(ctx, orderNo)
-	if err != nil {
-		return nil, nil, err
-	}
-	if o == nil {
-		return nil, nil, esportspb.ErrorEsportsOrderNotFound("")
-	}
-	rows, err := uc.hydrate(ctx, []*Order{o})
-	if err != nil {
-		return nil, nil, err
-	}
-	if o.State != StatePaid {
-		// A pending order has unlocked nothing; a closed one never will.
-		return rows[0], nil, nil
-	}
-	view, err := uc.foldUnlock(ctx, o)
-	if err != nil {
-		return nil, nil, err
-	}
-	return rows[0], view, nil
-}
-
-func (uc *OrderAdminUC) Close(ctx context.Context, orderNo string) (*AdminOrderRow, error) {
-	subject, ok := security.SubjectFromCtx(ctx)
-	if !ok || subject == nil {
-		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("order close requires an admin session"))
-	}
-	o, err := uc.orderRP.ByNo(ctx, orderNo)
-	if err != nil {
-		return nil, err
-	}
-	if o == nil {
-		return nil, esportspb.ErrorEsportsOrderNotFound("")
-	}
-	if o.State != StatePending {
-		return nil, esportspb.ErrorEsportsOrderStateConflict("")
-	}
-	closed, err := retirePending(ctx, uc.channelRP, uc.orderRP, o)
-	if err != nil {
-		return nil, err
-	}
-	if closed == nil {
-		return nil, esportspb.ErrorEsportsOrderStateConflict("")
-	}
-	uc.Log.Info("order closed by operator", "order_no", orderNo, "user_id", o.UserID, "by", subject.UserID)
-	rows, err := uc.hydrate(ctx, []*Order{closed})
-	if err != nil {
-		return nil, err
-	}
-	return rows[0], nil
-}
-
 func (uc *OrderAdminUC) hydrate(ctx context.Context, orders []*Order) ([]*AdminOrderRow, error) {
 	rows := make([]*AdminOrderRow, len(orders))
 	ids := make([]string, 0, len(orders))
@@ -938,4 +888,54 @@ func (uc *OrderAdminUC) foldUnlock(ctx context.Context, o *Order) (*UnlockView, 
 	// A paid membership order without its grant row — a state no write
 	// path can produce; the honest answer is the empty view.
 	return &UnlockView{}, nil
+}
+
+func retirePending(ctx context.Context, channelRP PayChannelRP, orderRP OrderRP, order *Order) (*Order, error) {
+	// Takes a pending order out of play: the channel twin closes first
+	// (the channel is the state machine; a channel refusal folds to the
+	// truth it reports), then the local conditional close frees the reuse
+	// slot. A nil return means the row left pending on its own — a settle
+	// or a rival close won the race.
+	if err := channelRP.ClosePayment(ctx, order.Provider, order.OrderNo); err != nil {
+		switch {
+		case errorspb.IsInfraErrorPaymentNotFound(err):
+			// The channel never knew this trade (a crash between the
+			// channel create and the local insert) — the local close is
+			// the whole close.
+		case errorspb.IsInfraErrorPaymentChannelRejected(err):
+			// The channel refuses the close — paid in the expiry race. The
+			// converger settles it; a fresh pending order must wait for
+			// this row to leave pending first.
+			return nil, esportspb.ErrorEsportsOrderStateConflict("").WithCause(err)
+		default:
+			return nil, err
+		}
+	}
+	return orderRP.ClosePending(ctx, order.OrderNo)
+}
+
+func credentialOf(o *Order) payment.Credential {
+	return payment.Credential{Kind: payment.CredentialKind(o.CredentialKind), Value: o.CredentialValue}
+}
+
+func channelIn(channels []payment.Channel, want payment.Channel) bool {
+	for _, c := range channels {
+		if c == want {
+			return true
+		}
+	}
+	return false
+}
+
+func billDayWindow(day time.Time) (time.Time, time.Time) {
+	d := day.In(billZone)
+	start := time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, billZone)
+	return start, start.Add(24 * time.Hour)
+}
+
+func billDayBefore(t time.Time) time.Time {
+	// A day's statement publishes the following day — the sweep always asks
+	// for yesterday's bill.
+	d := t.In(billZone).AddDate(0, 0, -1)
+	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, billZone)
 }

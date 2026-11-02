@@ -21,10 +21,11 @@ export function EsportsOrderDetailPage() {
 
   const unlockLine = () => {
     if (!o) return "";
-    if (String(o.order?.state) === "ORDER_STATE_CLOSED") return m.esports_order_unlock_closed();
-    if (!unlock) return m.esports_order_unlock_pending();
-    if (unlock.recordId) return m.esports_order_unlock_trial({ id: unlock.recordId });
-    return m.esports_order_unlock_period({
+    if (String(o.order?.state) === "ORDER_STATE_CLOSED")
+      return m.esports_order_detail_unlock_closed();
+    if (!unlock) return m.esports_order_detail_unlock_pending();
+    if (unlock.recordId) return m.esports_order_detail_unlock_trial({ id: unlock.recordId });
+    return m.esports_order_detail_unlock_period({
       from: shortOf(dateOf(unlock.grantedAt)),
       to: shortOf(dateOf(unlock.expiresAt)),
       // protojson drops zero scalars; zero unlocks is a real state.
@@ -69,7 +70,7 @@ export function EsportsOrderDetailPage() {
           ) : null}
         </div>
         <Descriptions bordered column={2} size="small">
-          <Descriptions.Item label={m.esports_order_user()}>
+          <Descriptions.Item label={m.esports_order_detail_user()}>
             {o?.userId ? (
               <Link
                 className="text-primary"
@@ -82,29 +83,31 @@ export function EsportsOrderDetailPage() {
               [o?.nickname, o?.phoneMasked].filter(Boolean).join(" · ") || "-"
             )}
           </Descriptions.Item>
-          <Descriptions.Item label={m.esports_order_amount()}>
+          <Descriptions.Item label={m.esports_order_detail_amount()}>
             <span className="font-semibold">{fenToYuan(o?.order?.amountFen)}</span>
           </Descriptions.Item>
-          <Descriptions.Item label={m.esports_order_sku()}>
+          <Descriptions.Item label={m.esports_order_detail_sku()}>
             {o?.skuName || o?.order?.skuCode || "-"}
           </Descriptions.Item>
-          <Descriptions.Item label={m.esports_order_channel()}>
+          <Descriptions.Item label={m.esports_order_detail_channel()}>
             {o?.order?.channel || "-"}
           </Descriptions.Item>
-          <Descriptions.Item label={m.esports_order_created()}>
+          <Descriptions.Item label={m.esports_order_detail_created()}>
             {fullDate(o?.order?.createdAt)}
           </Descriptions.Item>
-          <Descriptions.Item label={m.esports_order_paid()}>
+          <Descriptions.Item label={m.esports_order_detail_paid()}>
             {o?.order?.paidAt ? fullDate(o.order.paidAt) : "-"}
           </Descriptions.Item>
-          <Descriptions.Item label={m.esports_order_txn()}>
+          <Descriptions.Item label={m.esports_order_detail_txn()}>
             {o?.order?.transactionId || "-"}
           </Descriptions.Item>
-          <Descriptions.Item label={m.esports_order_unlock()}>{unlockLine()}</Descriptions.Item>
+          <Descriptions.Item label={m.esports_order_detail_unlock()}>
+            {unlockLine()}
+          </Descriptions.Item>
         </Descriptions>
       </Card>
 
-      <Alert message={m.esports_order_refund_note()} showIcon type="info" />
+      <Alert message={m.esports_order_detail_refund_note()} showIcon type="info" />
     </div>
   );
 }
