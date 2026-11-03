@@ -17,7 +17,11 @@ export const sessionFn = createServerFn({ method: "GET" }).handler(async () => {
   }
   try {
     const res = await createClient(ProfileService, createCtrTransport()).getProfile({});
-    return { status: "authed", profile: res.profile } as const;
+    return {
+      status: "authed",
+      profile: res.profile,
+      memberUntil: res.memberUntil ?? null,
+    } as const;
   } catch (error) {
     const { kind, reason } = normalize(error);
     if (reason === TERMINAL_AUTH_REASON) {

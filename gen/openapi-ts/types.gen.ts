@@ -866,6 +866,13 @@ export type CyberEsportsV1GetPaymentOrderResponse = {
 
 export type CyberEsportsV1GetProfileResponse = {
     profile?: CyberEsportsV1Profile;
+    /**
+     * The furthest live membership window's end; null = no live membership —
+     * the same liveness read the merge preview promises, riding the probe the
+     * home greet already reads so membership adds no extra call. Clients
+     * render presence, never re-derive expiry.
+     */
+    memberUntil?: string;
 };
 
 export type CyberEsportsV1GetReportAccessResponse = {

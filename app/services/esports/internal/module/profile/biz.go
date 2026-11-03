@@ -35,6 +35,11 @@ type Profile struct {
 	Sex                 *string
 }
 
+type GetOut struct {
+	Profile     *Profile
+	MemberUntil *time.Time // liveness rides the read, not the row
+}
+
 type GamePreference struct {
 	GameIDs     []string
 	CustomNames []string
@@ -104,28 +109,34 @@ type MergePreviewer interface {
 	Preview(ctx context.Context, cred *MergeCredential) (*MergeOffer, error) // hosted in report, which owns the session facts the emptiness bar reads
 }
 
+type MembershipRP interface {
+	MemberUntil(ctx context.Context, userID string) (*time.Time, error) // furthest live membership window end; nil = none standing — entitle's UC hosts the adapter (verdict-port direction: entitle already reads profile, the import arrow stays one-way)
+}
+
 // UC ------------------------------------------------------------------------------------------------------------------
 
 type ProfileUC struct {
 	shared.UC
-	profileRP ProfileRP
-	gameRP    game.GameRP
+	profileRP    ProfileRP
+	gameRP       game.GameRP
+	membershipRP MembershipRP
 }
 
-func NewProfileUC(logger *slog.Logger, tm shared.Transaction, profileRP ProfileRP, gameRP game.GameRP) *ProfileUC {
+func NewProfileUC(logger *slog.Logger, tm shared.Transaction, profileRP ProfileRP, gameRP game.GameRP, membershipRP MembershipRP) *ProfileUC {
 	return &ProfileUC{
-		UC:        shared.NewUC(logger.With("module", "module/profile"), tm),
-		profileRP: profileRP,
-		gameRP:    gameRP,
+		UC:           shared.NewUC(logger.With("module", "module/profile"), tm),
+		profileRP:    profileRP,
+		gameRP:       gameRP,
+		membershipRP: membershipRP,
 	}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *ProfileUC) Get(ctx context.Context) (*Profile, error) {
+func (uc *ProfileUC) Get(ctx context.Context) (*GetOut, error) {
 	subject, _ := security.SubjectFromCtx(ctx)
 	if subject == nil {
-		return &Profile{}, nil
+		return &GetOut{Profile: &Profile{}}, nil
 	}
 	p, err := uc.profileRP.FindByUserID(ctx, subject.UserID)
 	if err != nil {
@@ -133,9 +144,14 @@ func (uc *ProfileUC) Get(ctx context.Context) (*Profile, error) {
 	}
 	if p == nil {
 		// Lazy row: born on first save, absent until then.
-		return &Profile{UserID: subject.UserID}, nil
+		p = &Profile{UserID: subject.UserID}
 	}
-	return p, nil
+	// Liveness is a read-time entitlement fact, never a profile column.
+	until, err := uc.membershipRP.MemberUntil(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &GetOut{Profile: p, MemberUntil: until}, nil
 }
 
 func (uc *ProfileUC) Update(ctx context.Context, in *UpdateIn) (*Profile, error) {

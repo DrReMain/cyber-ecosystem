@@ -50,11 +50,11 @@ func (s *ProfileService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *ProfileService) GetProfile(ctx context.Context, in *esportspb.GetProfileRequest) (*esportspb.GetProfileResponse, error) {
-	p, err := s.profileUC.Get(ctx)
+	out, err := s.profileUC.Get(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &esportspb.GetProfileResponse{Profile: mapProfilePB(p)}, nil
+	return &esportspb.GetProfileResponse{Profile: mapProfilePB(out.Profile), MemberUntil: utils.ToTimestamp(out.MemberUntil)}, nil
 }
 
 func (s *ProfileService) UpdateProfile(ctx context.Context, in *esportspb.UpdateProfileRequest) (*esportspb.UpdateProfileResponse, error) {

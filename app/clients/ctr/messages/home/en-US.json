@@ -3,6 +3,7 @@
   "home_description": "Esports talent assessment platform",
   "home_greet_logged": "Welcome back",
   "home_greet_guest": "Not signed in",
+  "home_greet_member": "Exclusive member · Membership active",
   "home_guest_name": "Not signed in",
   "home_cta_title": "Your assessment lineup",
   "home_cta_desc_ready": "Arranged by your game preferences · ~30s each · ability report on completion",

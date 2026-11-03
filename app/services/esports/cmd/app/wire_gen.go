@@ -62,7 +62,12 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	}
 	profileRP := profile.NewProfileRP(logger, platformPlatform)
 	gameRP := game.NewGameRP(logger, platformPlatform)
-	profileUC := profile.NewProfileUC(logger, platformPlatform, profileRP, gameRP)
+	activationCodeRP := entitle.NewActivationCodeRP(logger, platformPlatform)
+	entitlementRP := entitle.NewEntitlementRP(logger, platformPlatform)
+	reportPolicyRP := entitle.NewReportPolicyRP(logger, platformPlatform)
+	eventSubscriptions := bootstrap.NewEventSubscriptions(logger)
+	entitleUC := entitle.NewEntitleUC(logger, platformPlatform, activationCodeRP, entitlementRP, reportPolicyRP, eventSubscriptions)
+	profileUC := profile.NewProfileUC(logger, platformPlatform, profileRP, gameRP, entitleUC)
 	systemClient, cleanup3, err := client.NewSystemClient(remote, logger)
 	if err != nil {
 		cleanup2()
@@ -70,7 +75,6 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 		return nil, nil, err
 	}
 	recordBoardRP := report.NewRecordBoardRP(logger, platformPlatform)
-	entitlementRP := entitle.NewEntitlementRP(logger, platformPlatform)
 	mergeUC := report.NewMergeUC(logger, platformPlatform, systemClient, recordBoardRP, entitlementRP)
 	profileService := profile.NewProfileService(logger, profileUC, mergeUC)
 	gameUC := game.NewGameUC(logger, platformPlatform, gameRP)
@@ -80,7 +84,6 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	testRP := test.NewTestRP(logger, platformPlatform)
 	matchRP := match.NewMatchRP(logger, platformPlatform)
 	matchSessionLaw := match.NewSessionLaw(logger, matchRP)
-	eventSubscriptions := bootstrap.NewEventSubscriptions(logger)
 	testUC := test.NewTestUC(logger, platformPlatform, testRP, matchSessionLaw, eventSubscriptions)
 	testService := test.NewTestService(logger, testUC)
 	matchUC := match.NewMatchUC(logger, platformPlatform, matchRP, testRP, profileRP, gameRP)
@@ -93,9 +96,6 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	payChannelRP := order.NewPayChannelRP(logger, platformPlatform)
 	orderUC := order.NewOrderUC(logger, platformPlatform, lifecycle, eventSubscriptions, orderRP, skuRP, entitlementRP, testRP, payChannelRP)
 	orderService := order.NewOrderService(logger, orderUC)
-	activationCodeRP := entitle.NewActivationCodeRP(logger, platformPlatform)
-	reportPolicyRP := entitle.NewReportPolicyRP(logger, platformPlatform)
-	entitleUC := entitle.NewEntitleUC(logger, platformPlatform, activationCodeRP, entitlementRP, reportPolicyRP, eventSubscriptions)
 	entitlementService := entitle.NewEntitlementService(logger, entitleUC)
 	codeUC := entitle.NewCodeUC(logger, platformPlatform, activationCodeRP, profileRP)
 	skuFactsRP := entitleadmin.NewSkuFactsRP(skuRP)

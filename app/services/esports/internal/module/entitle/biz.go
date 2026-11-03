@@ -379,6 +379,23 @@ func (uc *EntitleUC) GetReportAccess(ctx context.Context, family string) (*Acces
 	return &AccessOut{Allowed: allowed, Reason: reason}, nil
 }
 
+func (uc *EntitleUC) MemberUntil(ctx context.Context, userID string) (*time.Time, error) {
+	// The profile face's greet port (verdict-port shape): profile owns the
+	// RPC face but already sits under this module's imports, so this module
+	// implements the port profile declares. Membership rows are born
+	// bounded — trial nulls never reach this read, the window query's GT
+	// filter drops them — so the guard below keeps the port's nil contract
+	// honest, it is not a fourth liveness state.
+	window, err := uc.entRP.MembershipWindow(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if window == nil || window.ExpiresAt == nil {
+		return nil, nil
+	}
+	return window.ExpiresAt, nil
+}
+
 func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error) {
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {

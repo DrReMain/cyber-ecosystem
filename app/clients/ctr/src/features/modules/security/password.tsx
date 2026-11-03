@@ -222,7 +222,7 @@ export function PasswordPage() {
 function SetProofFields({ mask, sms }: { mask: string; sms: ReturnType<typeof useSmsCode> }) {
   return (
     <>
-      <div className="mb-3.5 w-fit rounded-full bg-[rgba(34,197,94,0.15)] px-2.5 py-1 text-[10.5px] font-semibold text-[#6EE7B7]">
+      <div className="bg-status-ok-bg mb-3.5 w-fit rounded-full px-2.5 py-1 text-[10.5px] font-semibold text-[#6EE7B7]">
         {m.security_pw_set_send_to({ mask })}
       </div>
       <div className="mb-3.5">
@@ -250,7 +250,7 @@ function SetProofFields({ mask, sms }: { mask: string; sms: ReturnType<typeof us
             value={sms.code}
           />
           <button
-            className="border-line text-ink-secondary bg-surface-input rounded-control w-[112px] shrink-0 border-[1.5px] py-[13px] text-[13px] font-medium active:opacity-60 disabled:opacity-60"
+            className="border-line text-ink-secondary bg-surface-input rounded-control w-28 shrink-0 border-[1.5px] py-3.25 text-[13px] font-medium active:opacity-60 disabled:opacity-60"
             disabled={sms.countdown > 0 || sms.sending}
             onClick={() => void sms.send()}
             type="button"

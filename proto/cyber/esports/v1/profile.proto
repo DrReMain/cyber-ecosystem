@@ -174,6 +174,11 @@ message GetProfileRequest {}
 
 message GetProfileResponse {
   Profile profile = 1;
+  // The furthest live membership window's end; null = no live membership —
+  // the same liveness read the merge preview promises, riding the probe the
+  // home greet already reads so membership adds no extra call. Clients
+  // render presence, never re-derive expiry.
+  google.protobuf.Timestamp member_until = 2;
 }
 
 // updateProfile — presence-based partial update: a field left out stays

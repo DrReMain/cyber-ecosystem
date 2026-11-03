@@ -69,13 +69,18 @@ function StatsSection({ digest }: Readonly<{ digest: WireDigest | null }>) {
 export function HomePage() {
   const navigate = useNavigate();
   const session = useQuery({ ...sessionQuery, throwOnError: false });
-  // One session truth: the probe carries the profile (it proves the
-  // credential with getProfile), so the greet, the nickname, and the games
-  // gate all read it — profile writes invalidate it, and the dehydrated
-  // SSR verdict delivers the final state on first paint.
+  // One session truth: the probe carries the profile and the membership
+  // liveness (it proves the credential with getProfile), so the greet, the
+  // nickname, and the games gate all read it — profile writes invalidate
+  // it, and the dehydrated SSR verdict delivers the final state on first
+  // paint.
   const authedSession = session.data?.status === "authed" ? session.data : undefined;
   const authed = authedSession !== undefined;
   const profile = authedSession?.profile;
+  // The server already collapsed liveness to presence (nil = none standing
+  // or lapsed-only), so the greet renders presence and never re-derives
+  // expiry.
+  const memberUntil = authedSession?.memberUntil ?? null;
   const hasGames = (profile?.games ?? []).length > 0;
   // The resume card's truth (prototype home): the read-only peek reports
   // the active in-window session — never mints one, so a home visit can't
@@ -126,7 +131,11 @@ export function HomePage() {
         <div className="flex items-start justify-between">
           <div>
             <div className="text-ink-tertiary text-[11px]">
-              {authed ? m.home_greet_logged() : m.home_greet_guest()}
+              {authed
+                ? memberUntil != null
+                  ? m.home_greet_member()
+                  : m.home_greet_logged()
+                : m.home_greet_guest()}
             </div>
             <h1 className="text-ink mt-0.5 text-xl font-black">
               {authed && profile?.nickname != null ? profile.nickname : m.home_guest_name()}
@@ -166,7 +175,7 @@ export function HomePage() {
           type="button"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(37,99,235,0.16)]">
-            <FileText aria-hidden className="text-[#93C5FD]" size={16} />
+            <FileText aria-hidden className="text-accent-info" size={16} />
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-ink text-[13.5px] font-bold">{m.home_center_title()}</div>
