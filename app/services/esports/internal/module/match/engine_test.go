@@ -99,6 +99,38 @@ func TestArrangeDeterminismAndJitter(t *testing.T) {
 	}
 }
 
+func TestArrangePreferenceWeighting(t *testing.T) {
+	// A deliberately mixed pool for one ability — one genre hit against
+	// one universal plain, the only pool shape where ×1.5 can bend a pick.
+	catalog := []*test.Test{
+		{Code: "hit", Category: utils.Ptr("fps"), Ability: utils.Ptr("reactionSpeed")},
+		{Code: "plain", Category: utils.Ptr("universal"), Ability: utils.Ptr("reactionSpeed")},
+	}
+	picks := map[string]int{}
+	for seed := int64(0); seed < 1000; seed++ {
+		steps := arrange([]string{"reactionSpeed"}, catalog, "fps", seed)
+		if len(steps) != 1 || (steps[0].TestCode != "hit" && steps[0].TestCode != "plain") {
+			t.Fatalf("seed %d: weighted draw left the pool: %v", seed, steps)
+		}
+		picks[steps[0].TestCode]++
+	}
+	// The seed span is literal and the mixer's constants are fixed, so
+	// the count is a frozen number, not a sample: 609/1000 — the 3:2
+	// halves law (60%) with the mixer's own wobble. The plain leg never
+	// starves — a weight bends a pick, it never excludes one.
+	if picks["hit"] < 599 || picks["hit"] > 619 {
+		t.Errorf("preference hit drew %d/1000, want the frozen ×1.5 count 609", picks["hit"])
+	}
+	if picks["plain"] == 0 {
+		t.Errorf("plain leg starved under weighting: %v", picks)
+	}
+	// Weights aboard, determinism intact: the same seed redraws the same
+	// lineup, the law every locked session resumes by.
+	if a, b := arrange([]string{"reactionSpeed"}, catalog, "fps", 7), arrange([]string{"reactionSpeed"}, catalog, "fps", 7); !reflect.DeepEqual(a, b) {
+		t.Errorf("same seed redrew differently under weighting: %v vs %v", a, b)
+	}
+}
+
 func TestMajorityGenre(t *testing.T) {
 	games := []*game.Game{
 		{Code: "lol", Category: utils.Ptr("moba")},

@@ -101,7 +101,7 @@
   "profile_minor_guard_required": "Under-13s need guardian consent first",
   "profile_setup_games_head": "Set up profile · Games",
   "profile_setup_games_title": "Which games do you play?",
-  "profile_setup_games_desc": "Pick at least 1. The majority vote sets the default assessment type (FPS / MOBA).",
+  "profile_setup_games_desc": "Pick at least 1. The majority vote sets the default assessment type (FPS / MOBA); a pool test matching your preference draws at ×1.5 weight.",
   "profile_setup_games_custom_title": "Other games (uncategorized)",
   "profile_setup_games_custom_desc_lead": "Custom games need no category; ",
   "profile_setup_games_custom_desc_un": "unclassified games don't join the vote",

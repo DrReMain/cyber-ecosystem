@@ -101,7 +101,7 @@
   "profile_minor_guard_required": "未满 13 周岁须先取得监护人同意",
   "profile_setup_games_head": "完善资料 · 游戏偏好",
   "profile_setup_games_title": "你常玩哪些游戏？",
-  "profile_setup_games_desc": "至少选 1 款。多数票决定默认测评类型（FPS / MOBA）。",
+  "profile_setup_games_desc": "至少选 1 款。多数票决定默认测评类型（FPS / MOBA）；命中偏好的能力池内权重 ×1.5。",
   "profile_setup_games_custom_title": "其他游戏（可暂不归类）",
   "profile_setup_games_custom_desc_lead": "自定义的游戏可不选类型；",
   "profile_setup_games_custom_desc_un": "未归类的游戏不计入类型投票",
