@@ -36,7 +36,7 @@ export function SecurityPage() {
   const status = securityQuery.data;
   const credentials = boundCredentials(status);
   const phone = credentials.find((c) => c.kind === "sms");
-  const wechat = credentials.some((c) => c.kind === "wechat_mp");
+  const wechat = credentials.find((c) => c.kind === "wechat_mp");
   const profile = profileQuery.data?.profile;
 
   return (
@@ -55,10 +55,12 @@ export function SecurityPage() {
             <div className="min-w-0 flex-1">
               <div className="text-ink text-[13px] font-bold">{m.security_row_wechat()}</div>
               <div className="text-ink-tertiary mt-[3px] text-[10.5px] leading-[1.6]">
-                {wechat ? m.security_wechat_bound_desc() : m.security_wechat_unbound_desc()}
+                {wechat !== undefined
+                  ? m.security_wechat_bound_desc({ mask: wechat.maskedIdentifier ?? "" })
+                  : m.security_wechat_unbound_desc()}
               </div>
             </div>
-            {wechat ? (
+            {wechat !== undefined ? (
               <span className={OK_CHIP}>{m.security_status_bound()}</span>
             ) : (
               <Link
@@ -152,7 +154,9 @@ export function SecurityPage() {
             value={
               profile?.birthYear != null && profile?.birthMonth != null
                 ? `${profile.birthYear}-${String(profile.birthMonth).padStart(2, "0")}`
-                : m.security_info_unfilled()
+                : profile?.ageBand != null && profile.ageBand !== ""
+                  ? m.security_info_birth_band_note({ band: profile.ageBand })
+                  : m.security_info_unfilled()
             }
           />
           <InfoRow

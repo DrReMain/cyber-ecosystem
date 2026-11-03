@@ -1,8 +1,12 @@
+import { useQuery } from "@connectrpc/connect-query";
+import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { mainlandMobile } from "#/features/modules/login/sms";
 import { badInputClass, inputClass } from "#/features/modules/login/ui/sms-fields";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
@@ -49,6 +53,21 @@ export function BindPhonePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { from } = useSearch({ from: "/profile/security/bind-phone" });
+  // The entry line's second half names the account being bound into — the
+  // prototype's own safety line, read off the cached profile and the
+  // credential list (the caller here is by definition phone-less).
+  const securityQuery = useQuery(getSecurityStatus, {}, { throwOnError: false });
+  const profileQuery = useQuery(
+    getProfile,
+    {},
+    { staleTime: PROFILE_STALE_MS, throwOnError: false },
+  );
+  const hasSms =
+    (securityQuery.data?.credentials ?? []).some((c) => c.kind === "sms");
+  const method = hasSms
+    ? m.security_login_method_sms()
+    : `${m.security_login_method_wechat()}，${m.security_bind_phone_no_phone()}`;
+  const nickname = profileQuery.data?.profile?.nickname ?? m.security_nickname_unset();
   const bind = useBindSms();
   const [preview, setPreview] = useState<Preview>(null);
   const [checking, setChecking] = useState(false);
@@ -182,7 +201,11 @@ export function BindPhonePage() {
         ) : null}
 
         <div className="text-ink-tertiary text-[11.5px] leading-[1.8]">
-          {m.security_bind_phone_entry_line({ entry: entryLabelOf(from) })}
+          {m.security_bind_phone_entry_line({
+            entry: entryLabelOf(from),
+            method,
+            nickname,
+          })}
         </div>
         <button
           className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50"

@@ -1,8 +1,12 @@
+import { useQuery } from "@connectrpc/connect-query";
+import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { beginWechatLoginFn } from "#/features/modules/login/wechat.fn";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { m } from "#/paraglide/messages";
@@ -16,6 +20,19 @@ export function BindWechatPage() {
   const { failed, from } = useSearch({ from: "/profile/security/bind-wechat/" });
   const [pending, setPending] = useState(false);
   const [wechatEnv, setWechatEnv] = useState(false);
+  // The entry line's second half: the account being bound into, with the
+  // other credential naming it (the prototype shows the bound phone's
+  // mask here, or the wechat leg when nothing else is bound).
+  const securityQuery = useQuery(getSecurityStatus, {}, { throwOnError: false });
+  const profileQuery = useQuery(
+    getProfile,
+    {},
+    { staleTime: PROFILE_STALE_MS, throwOnError: false },
+  );
+  const phoneMask = (securityQuery.data?.credentials ?? []).find((c) => c.kind === "sms")
+    ?.maskedIdentifier;
+  const method = phoneMask ?? m.security_login_method_wechat();
+  const nickname = profileQuery.data?.profile?.nickname ?? m.security_nickname_unset();
 
   useEffect(() => {
     setWechatEnv(/MicroMessenger/i.test(navigator.userAgent));
@@ -64,7 +81,7 @@ export function BindWechatPage() {
           <span className="bg-cta-success mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl">
             <MessageCircle aria-hidden className="text-white" size={26} />
           </span>
-          <div className="text-ink text-base font-extrabold">{m.security_bind_wechat_title()}</div>
+          <div className="text-ink text-base font-extrabold">{m.security_bind_wechat_head()}</div>
           <div className="text-ink-secondary mx-auto mt-2 max-w-[300px] text-[12.5px] leading-[1.8]">
             {m.security_bind_wechat_pitch()}
           </div>
@@ -87,6 +104,8 @@ export function BindWechatPage() {
                 : from === "guide"
                   ? m.security_bind_entry_guide()
                   : m.security_bind_entry_me(),
+            method,
+            nickname,
           })}
         </div>
         <button

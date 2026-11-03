@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { systemReason } from "#/domains/error";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { mainlandMobile } from "#/features/modules/login/sms";
 import { inputClass } from "#/features/modules/login/ui/sms-fields";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { m } from "#/paraglide/messages";
@@ -27,10 +28,35 @@ function failureCopy(value: string | undefined): string {
   }
 }
 
-// The two local password verdicts: the length floor and the echo match.
-function pwErrorOf(newPassword: string, confirmPassword: string): string | null {
+// The prototype's own validation ladder, in its order: the proof fields
+// first (old password, or phone + code on the set leg), then the new
+// password's length floor, its letters-and-digits composition, and the
+// echo match. The server-side composition enforcement rides the lzx queue
+// (Q3-①); this pre-check is the member-facing half of the rule.
+function pwErrorOf(
+  isSet: boolean,
+  oldPassword: string,
+  phone: string,
+  code: string,
+  newPassword: string,
+  confirmPassword: string,
+): string | null {
+  if (!isSet && oldPassword === "") {
+    return m.security_pw_error_old();
+  }
+  if (isSet) {
+    if (!mainlandMobile.test(phone)) {
+      return m.security_pw_error_phone();
+    }
+    if (!/^\d{6}$/.test(code)) {
+      return m.security_pw_error_code();
+    }
+  }
   if (newPassword.length < 6) {
     return m.security_password_short();
+  }
+  if (!/[a-zA-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
+    return m.security_pw_error_composition();
   }
   return newPassword !== confirmPassword ? m.security_pw_error_mismatch() : null;
 }
@@ -75,7 +101,14 @@ export function PasswordPage() {
   async function onSubmit() {
     setError(null);
     setReason(undefined);
-    const invalid = pwErrorOf(newPassword, confirmPassword);
+    const invalid = pwErrorOf(
+      isSet,
+      oldPassword,
+      sms.phone,
+      sms.code,
+      newPassword,
+      confirmPassword,
+    );
     if (invalid !== null) {
       setError(invalid);
       return;
