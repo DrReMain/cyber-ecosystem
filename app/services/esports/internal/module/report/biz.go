@@ -295,6 +295,13 @@ type AbilityDigest struct {
 	SessionsMOBA  int
 	Abilities     []DigestAbilityRow
 	Sessions      []DigestSessionRow
+	// The entry cards' gates so the center page renders its unlock tags
+	// from this one call: the cognitive family's verdict and the trend
+	// page's advanced gate, the same answers the gated faces embed.
+	ReportAllowed        bool
+	ReportReason         esportspb.ReportAccessReason
+	TrendAdvancedAllowed bool
+	TrendAdvancedReason  esportspb.ReportAccessReason
 }
 
 type CognitiveReport struct {
@@ -306,6 +313,10 @@ type CognitiveReport struct {
 	Dimensions []CognitiveDimensionRow // only fully-fed dimensions; a missing dimension is an absent row, never a zero axis
 	Composite  *float64
 	Tier       string
+	// The to-trend CTA's gate — the upsell hides once the advanced tier
+	// is open; the same verdict the trend face itself embeds.
+	TrendAdvancedAllowed bool
+	TrendAdvancedReason  esportspb.ReportAccessReason
 }
 
 type CognitiveDimensionRow struct {
@@ -725,6 +736,19 @@ func (uc *ReportUC) GetAbilityDigest(ctx context.Context) (*AbilityDigest, error
 		return nil, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("digest read requires a session"))
 	}
 	d := &AbilityDigest{}
+	// The two gates fold in first — the center page's unlock tags read
+	// them here, the same verdicts the gated faces embed, never
+	// re-derived.
+	if _, allowed, reason, aerr := uc.reportAccessOf(ctx, shared.ReportCognitive); aerr != nil {
+		return nil, aerr
+	} else {
+		d.ReportAllowed, d.ReportReason = allowed, reason
+	}
+	if allowed, reason, aerr := uc.trendAdvancedOf(ctx, subject.UserID); aerr != nil {
+		return nil, aerr
+	} else {
+		d.TrendAdvancedAllowed, d.TrendAdvancedReason = allowed, reason
+	}
 	var err error
 	if d.SessionsTotal, d.SessionsFPS, d.SessionsMOBA, err = uc.boardRP.SessionCounts(ctx, subject.UserID); err != nil {
 		return nil, err
@@ -784,6 +808,9 @@ func (uc *ReportUC) GetCognitiveReport(ctx context.Context) (*CognitiveReport, e
 		return nil, err
 	}
 	r := &CognitiveReport{Total: len(cognitiveModel), Allowed: allowed, Reason: reason}
+	if r.TrendAdvancedAllowed, r.TrendAdvancedReason, err = uc.trendAdvancedOf(ctx, subject.UserID); err != nil {
+		return nil, err
+	}
 	bests, err := uc.boardRP.AbilityBests(ctx, subject.UserID)
 	if err != nil {
 		return nil, err
@@ -821,12 +848,10 @@ func (uc *ReportUC) GetTrendReport(ctx context.Context) (*TrendReport, error) {
 		return nil, esportspb.ErrorEsportsReportRecordNotOwned("").WithCause(fmt.Errorf("trend report read requires a session"))
 	}
 	r := &TrendReport{}
-	if active, aerr := uc.entRP.HasActiveMembership(ctx, subject.UserID); aerr != nil {
+	if allowed, reason, aerr := uc.trendAdvancedOf(ctx, subject.UserID); aerr != nil {
 		return nil, aerr
-	} else if active {
-		r.AdvancedAllowed, r.AdvancedReason = true, esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE
 	} else {
-		r.AdvancedReason = esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT
+		r.AdvancedAllowed, r.AdvancedReason = allowed, reason
 	}
 	if total, _, _, serr := uc.boardRP.SessionCounts(ctx, subject.UserID); serr != nil {
 		return nil, serr
@@ -945,6 +970,21 @@ func (uc *ReportUC) GetCareerReport(ctx context.Context) (*CareerReport, error) 
 		})
 	}
 	return r, nil
+}
+
+func (uc *ReportUC) trendAdvancedOf(ctx context.Context, userID string) (bool, esportspb.ReportAccessReason, error) {
+	// The trend page's advanced-tier gate — membership is the only fact,
+	// the base tier free for anyone who has tested. Three faces quote it
+	// (the trend page's own modules, the digest's entry card, the
+	// cognitive page's to-trend CTA), so it lives once and cannot drift.
+	active, err := uc.entRP.HasActiveMembership(ctx, userID)
+	if err != nil {
+		return false, 0, err
+	}
+	if active {
+		return true, esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE, nil
+	}
+	return false, esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT, nil
 }
 
 func (uc *ReportUC) reportAccessOf(ctx context.Context, family string) (*security.Subject, bool, esportspb.ReportAccessReason, error) {

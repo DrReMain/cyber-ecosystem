@@ -739,6 +739,18 @@ export type CyberEsportsV1GetAbilityDigestResponse = {
      * when the genre was never played.
      */
     sessions?: Array<CyberEsportsV1DigestSessionLine>;
+    /**
+     * The cognitive family's gate, folded from the same three facts the
+     * gated faces read — the entry page's two report cards key their
+     * unlock tags on this one verdict, so the center needs no second call.
+     */
+    reportAccess?: CyberEsportsV1ReportAccessVerdict;
+    /**
+     * The trend page's advanced-tier gate — the trend entry card's
+     * advanced/base tag reads this, the same verdict the trend face itself
+     * embeds; the base tier stays free for anyone who has tested.
+     */
+    trendAdvancedAccess?: CyberEsportsV1ReportAccessVerdict;
 };
 
 export type CyberEsportsV1GetAgreementCurrentResponse = {
@@ -817,6 +829,13 @@ export type CyberEsportsV1GetCognitiveReportResponse = {
      * by; UNSPECIFIED while the composite is null.
      */
     tier?: 'REPORT_TIER_UNSPECIFIED' | 'REPORT_TIER_S' | 'REPORT_TIER_A' | 'REPORT_TIER_B' | 'REPORT_TIER_C';
+    /**
+     * The trend page's advanced gate — the to-trend CTA is an upsell that
+     * renders only while the advanced tier is closed, so the verdict
+     * travels with this face too; a member never meets the upsell aimed
+     * at themselves.
+     */
+    trendAdvancedAccess?: CyberEsportsV1ReportAccessVerdict;
 };
 
 export type CyberEsportsV1GetComplianceConfigResponse = {

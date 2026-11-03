@@ -33,6 +33,9 @@ export interface WireCognitive {
   dimensions: WireCognitiveDimension[];
   composite: number | undefined;
   tier: string | undefined;
+  // The to-trend CTA's gate — the upsell renders only while the trend
+  // page's advanced tier is closed (a member never meets it).
+  trendAdvancedAccess: WireAccessVerdict;
 }
 
 export function wireCognitiveOf(data: unknown): WireCognitive {
@@ -45,9 +48,13 @@ export function wireCognitiveOf(data: unknown): WireCognitive {
       dimensions: [],
       composite: undefined,
       tier: undefined,
+      trendAdvancedAccess: { allowed: false, reason: undefined },
     };
   }
-  const d = data as Partial<WireCognitive> & { access?: Partial<WireAccessVerdict> };
+  const d = data as Partial<WireCognitive> & {
+    access?: Partial<WireAccessVerdict>;
+    trendAdvancedAccess?: Partial<WireAccessVerdict>;
+  };
   return {
     access: {
       allowed: d.access?.allowed === true,
@@ -61,5 +68,9 @@ export function wireCognitiveOf(data: unknown): WireCognitive {
     dimensions: (d.dimensions ?? []).map((dim) => ({ ...dim, value: dim.value ?? 0 })),
     composite: d.composite,
     tier: d.tier,
+    trendAdvancedAccess: {
+      allowed: d.trendAdvancedAccess?.allowed === true,
+      reason: d.trendAdvancedAccess?.reason,
+    },
   };
 }

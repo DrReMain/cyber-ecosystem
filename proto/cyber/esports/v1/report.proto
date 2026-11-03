@@ -243,6 +243,14 @@ message GetAbilityDigestResponse {
   // The latest session line per genre — at most one row each, absent
   // when the genre was never played.
   repeated DigestSessionLine sessions = 5;
+  // The cognitive family's gate, folded from the same three facts the
+  // gated faces read — the entry page's two report cards key their
+  // unlock tags on this one verdict, so the center needs no second call.
+  ReportAccessVerdict report_access = 6;
+  // The trend page's advanced-tier gate — the trend entry card's
+  // advanced/base tag reads this, the same verdict the trend face itself
+  // embeds; the base tier stays free for anyone who has tested.
+  ReportAccessVerdict trend_advanced_access = 7;
 }
 
 message DigestAbilityLine {
@@ -367,6 +375,11 @@ message GetCognitiveReportResponse {
   // The composite's tier under the same ladder the record board judges
   // by; UNSPECIFIED while the composite is null.
   ReportTier tier = 7;
+  // The trend page's advanced gate — the to-trend CTA is an upsell that
+  // renders only while the advanced tier is closed, so the verdict
+  // travels with this face too; a member never meets the upsell aimed
+  // at themselves.
+  ReportAccessVerdict trend_advanced_access = 8;
 }
 
 // One rendered dimension of the cognitive model. The dimension keys are

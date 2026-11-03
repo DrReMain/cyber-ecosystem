@@ -113,6 +113,12 @@ func (s *ReportService) GetAbilityDigest(ctx context.Context, _ *esportspb.GetAb
 		SessionsMoba:  utils.ConvNum[int32](d.SessionsMOBA),
 		Abilities:     abilities,
 		Sessions:      sessions,
+		ReportAccess: &esportspb.ReportAccessVerdict{
+			Allowed: d.ReportAllowed, Reason: d.ReportReason,
+		},
+		TrendAdvancedAccess: &esportspb.ReportAccessVerdict{
+			Allowed: d.TrendAdvancedAllowed, Reason: d.TrendAdvancedReason,
+		},
 	}, nil
 }
 
@@ -137,6 +143,9 @@ func (s *ReportService) GetCognitiveReport(ctx context.Context, _ *esportspb.Get
 		Dimensions:       dims,
 		Composite:        utils.Wrap(r.Composite, utils.DoubleW),
 		Tier:             tierPB(r.Tier),
+		TrendAdvancedAccess: &esportspb.ReportAccessVerdict{
+			Allowed: r.TrendAdvancedAllowed, Reason: r.TrendAdvancedReason,
+		},
 	}, nil
 }
 

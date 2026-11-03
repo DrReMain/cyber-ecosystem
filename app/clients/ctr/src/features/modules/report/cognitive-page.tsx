@@ -183,14 +183,19 @@ export function CognitivePage() {
           </div>
         </div>
 
-        <button
-          className="border-line-accent-blue border-accent-blue/10 bg-accent-blue/10 rounded-card flex w-full items-center justify-between border px-4 py-3 active:opacity-60"
-          onClick={() => void navigate({ to: "/report/trend" })}
-          type="button"
-        >
-          <span className="text-ink text-[12.5px] font-bold">{m.report_cognitive_to_trend()}</span>
-          <span className="text-ink-tertiary text-[11px]">›</span>
-        </button>
+        {/* The to-trend upsell (prototype report-cognitive): the orange
+            CTA rides the trend page's advanced gate — it renders only
+            while the advanced tier is closed, so a member never meets
+            the upsell aimed at themselves. */}
+        {!r.trendAdvancedAccess.allowed ? (
+          <button
+            className="rounded-control w-full cursor-pointer bg-[#F97316] px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+            onClick={() => void navigate({ to: "/report/trend" })}
+            type="button"
+          >
+            {m.report_cognitive_to_trend()}
+          </button>
+        ) : null}
       </div>
     </AmbientLayout>
   );

@@ -2,6 +2,7 @@ import { createQueryOptions } from "@connectrpc/connect-query";
 import { getAbilityDigest } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import type { QueryClient } from "@tanstack/react-query";
 import { connectTransport } from "#/services/connect";
+import type { WireAccessVerdict } from "./cognitive";
 
 // The cross-session digest's client seam. The key built here plus this
 // module's invalidation reaches every cache entry the UI can create; the
@@ -47,6 +48,12 @@ export interface WireDigest {
   sessionsMoba: number;
   abilities: WireDigestAbility[];
   sessions: WireDigestSession[];
+  // The entry cards' gates: the cognitive family's verdict (both report
+  // cards key their unlock tags on it) and the trend page's advanced
+  // gate — the same answers the gated faces embed, so the center page
+  // renders from this one call.
+  reportAccess: WireAccessVerdict;
+  trendAdvancedAccess: WireAccessVerdict;
 }
 
 // The single narrowing point. The generated type claims the WKT message
@@ -62,15 +69,28 @@ export function wireDigestOf(data: unknown): WireDigest {
       sessionsMoba: 0,
       abilities: [],
       sessions: [],
+      reportAccess: { allowed: false, reason: undefined },
+      trendAdvancedAccess: { allowed: false, reason: undefined },
     };
   }
-  const d = data as Partial<WireDigest>;
+  const d = data as Partial<WireDigest> & {
+    reportAccess?: Partial<WireAccessVerdict>;
+    trendAdvancedAccess?: Partial<WireAccessVerdict>;
+  };
   return {
     sessionsTotal: d.sessionsTotal ?? 0,
     sessionsFps: d.sessionsFps ?? 0,
     sessionsMoba: d.sessionsMoba ?? 0,
     abilities: d.abilities ?? [],
     sessions: d.sessions ?? [],
+    reportAccess: {
+      allowed: d.reportAccess?.allowed === true,
+      reason: d.reportAccess?.reason,
+    },
+    trendAdvancedAccess: {
+      allowed: d.trendAdvancedAccess?.allowed === true,
+      reason: d.trendAdvancedAccess?.reason,
+    },
   };
 }
 

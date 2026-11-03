@@ -318,6 +318,15 @@ func TestReportReadBackE2E(t *testing.T) {
 	if d.SessionsTotal != 5 || d.SessionsFPS != 4 || d.SessionsMOBA != 1 {
 		t.Fatalf("digest counts: total=%d fps=%d moba=%d", d.SessionsTotal, d.SessionsFPS, d.SessionsMOBA)
 	}
+	// The entry cards' gates ride the digest (the owner carries no grant):
+	// both verdicts answer the honest closed state, so the center page's
+	// unlock tags render from this one call.
+	if d.ReportAllowed || d.ReportReason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT {
+		t.Fatalf("digest report gate: allowed=%v reason=%v", d.ReportAllowed, d.ReportReason)
+	}
+	if d.TrendAdvancedAllowed || d.TrendAdvancedReason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT {
+		t.Fatalf("digest trend gate: allowed=%v reason=%v", d.TrendAdvancedAllowed, d.TrendAdvancedReason)
+	}
 	best := make(map[string]report.DigestAbilityRow, len(d.Abilities))
 	for _, a := range d.Abilities {
 		best[a.Ability] = a
@@ -574,6 +583,11 @@ func TestReportClusterE2E(t *testing.T) {
 	if c1.Allowed || c1.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT {
 		t.Fatalf("cognitive gate: allowed=%v reason=%v", c1.Allowed, c1.Reason)
 	}
+	// The to-trend CTA's gate rides the same face: closed before the
+	// grant, so the upsell renders; open after, so a member never meets it.
+	if c1.TrendAdvancedAllowed {
+		t.Fatalf("cognitive trend gate pre-grant: %+v", c1.TrendAdvancedAllowed)
+	}
 	if c1.Covered != 6 || c1.Tested != 0 || c1.Total != 8 || len(c1.Dimensions) != 0 || c1.Composite != nil {
 		t.Fatalf("cognitive gated shape: %+v", c1)
 	}
@@ -587,6 +601,9 @@ func TestReportClusterE2E(t *testing.T) {
 	}
 	if !c2.Allowed || c2.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE {
 		t.Fatalf("cognitive open gate: allowed=%v reason=%v", c2.Allowed, c2.Reason)
+	}
+	if !c2.TrendAdvancedAllowed || c2.TrendAdvancedReason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE {
+		t.Fatalf("cognitive trend gate post-grant: allowed=%v reason=%v", c2.TrendAdvancedAllowed, c2.TrendAdvancedReason)
 	}
 	if c2.Tested != 8 || len(c2.Dimensions) != 8 {
 		t.Fatalf("cognitive fed dims: tested=%d rows=%d", c2.Tested, len(c2.Dimensions))

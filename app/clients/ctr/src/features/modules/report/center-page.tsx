@@ -2,7 +2,6 @@ import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import {
   getAbilityDigest,
   getCareerReport,
-  getCognitiveReport,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -11,27 +10,27 @@ import { StateScreen } from "#/features/app/states/state-screen";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { m } from "#/paraglide/messages";
 import { wireCareerOf } from "./career";
-import { wireCognitiveOf } from "./cognitive";
 import { wireDigestOf } from "./digest";
 
-// The aggregate reports' front door — a composition face, no RPC of its
-// own: the digest answers coverage, the two access verdicts answer the
-// cards' own gates, and every card routes into its page where the gate
-// itself renders (a badge states the state; the page carries the door).
+// The aggregate reports' front door — a composition face: the digest
+// answers coverage and both report gates (the two verdicts the cards'
+// unlock tags key on, the prototype's own shared key), career's own
+// verdict answers its card, and every card routes into its page where
+// the gate itself renders (a badge states the state; the page carries
+// the door).
 export function CenterPage() {
   const navigate = useNavigate();
   const digestQuery = useConnectQuery(getAbilityDigest, {}, { throwOnError: false });
-  const cogQuery = useConnectQuery(getCognitiveReport, {}, { throwOnError: false });
   const careerQuery = useConnectQuery(getCareerReport, {}, { throwOnError: false });
 
-  if (digestQuery.isPending || cogQuery.isPending || careerQuery.isPending) {
+  if (digestQuery.isPending || careerQuery.isPending) {
     return (
       <AmbientLayout>
         <StateScreen variant="loading" />
       </AmbientLayout>
     );
   }
-  if (digestQuery.isError || cogQuery.isError || careerQuery.isError) {
+  if (digestQuery.isError || careerQuery.isError) {
     return (
       <AmbientLayout>
         <StateScreen
@@ -40,7 +39,6 @@ export function CenterPage() {
               className="bg-cta-primary rounded-control cursor-pointer px-5 py-2.5 text-sm font-semibold text-white active:opacity-80"
               onClick={() => {
                 void digestQuery.refetch();
-                void cogQuery.refetch();
                 void careerQuery.refetch();
               }}
               type="button"
@@ -57,7 +55,6 @@ export function CenterPage() {
   }
 
   const digest = wireDigestOf(digestQuery.data);
-  const cog = wireCognitiveOf(cogQuery.data);
   const career = wireCareerOf(careerQuery.data);
   const covered = digest.abilities.length;
   const latestAnchor = digest.sessions.find((s) => s.anchorRecordId !== undefined)?.anchorRecordId;
@@ -72,9 +69,13 @@ export function CenterPage() {
 
   const cards = [
     {
+      // The prototype keys this card on the cognitive family's verdict —
+      // the same key the next card reads — not on the tested state.
       desc: m.report_center_card_digest_desc(),
       icon: "📊",
-      state: covered > 0 ? m.report_center_status_view() : m.report_center_status_locked(),
+      state: digest.reportAccess.allowed
+        ? m.report_center_status_unlocked()
+        : m.report_center_status_locked(),
       title: m.report_center_card_digest_title(),
       onOpen: goDigest,
     },
@@ -87,7 +88,9 @@ export function CenterPage() {
           ? m.report_center_cognitive_full({ covered })
           : m.report_center_card_cognitive_desc({ covered }),
       icon: "🧠",
-      state: cog.access.allowed ? m.report_center_status_view() : m.report_center_status_locked(),
+      state: digest.reportAccess.allowed
+        ? m.report_center_status_unlocked()
+        : m.report_center_status_locked(),
       title: m.report_center_card_cognitive_title(),
       onOpen: () => void navigate({ to: "/report/cognitive" }),
     },
@@ -101,11 +104,16 @@ export function CenterPage() {
       onOpen: () => void navigate({ to: "/report/career" }),
     },
     {
+      // The three-state receipt (prototype report-center): no sessions
+      // yet, the free base tier, or the membership-gated advanced tier —
+      // the advanced verdict is the digest's own carried gate.
       desc: m.report_center_card_trend_desc(),
       icon: "📈",
       state:
         digest.sessionsTotal > 0
-          ? m.report_center_status_view()
+          ? digest.trendAdvancedAccess.allowed
+            ? m.report_center_status_trend_advanced()
+            : m.report_center_status_trend_base()
           : m.report_center_status_untested(),
       title: m.report_center_card_trend_title(),
       onOpen: () => void navigate({ to: "/report/trend" }),

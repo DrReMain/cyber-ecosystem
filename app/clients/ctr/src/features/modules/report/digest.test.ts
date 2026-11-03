@@ -45,6 +45,24 @@ describe("wireDigestOf", () => {
     expect(fresh.sessions).toEqual([]);
     expect(latestScoredOf(fresh)).toBeUndefined();
   });
+
+  it("narrows absent or partial verdict objects to the closed state", () => {
+    // protojson drops an empty message field's key entirely, so a digest
+    // whose verdict objects traveled keyless must read as closed — the
+    // entry cards' tags never render off an undefined access.
+    const dropped = wireDigestOf({ sessionsTotal: 2 });
+    expect(dropped.reportAccess).toEqual({ allowed: false, reason: undefined });
+    expect(dropped.trendAdvancedAccess).toEqual({ allowed: false, reason: undefined });
+    const carried = wireDigestOf({
+      reportAccess: { allowed: true, reason: "REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE" },
+      trendAdvancedAccess: { allowed: false, reason: "REPORT_ACCESS_REASON_NO_ENTITLEMENT" },
+    });
+    expect(carried.reportAccess.allowed).toBe(true);
+    expect(carried.trendAdvancedAccess).toEqual({
+      allowed: false,
+      reason: "REPORT_ACCESS_REASON_NO_ENTITLEMENT",
+    });
+  });
 });
 
 describe("latestScoredOf", () => {
