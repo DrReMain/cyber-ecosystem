@@ -382,7 +382,7 @@ func (uc *AgreementAdminUC) identityFolds(ctx context.Context, userIDs []string)
 		for _, u := range roster.Users {
 			phone[u.ID] = u.PhoneMasked
 		}
-		if len(roster.Users) == 0 || int32(len(phone)) >= roster.GetTotal() {
+		if len(roster.Users) == 0 || utils.ConvNum[int32](len(phone)) >= roster.GetTotal() {
 			break
 		}
 	}

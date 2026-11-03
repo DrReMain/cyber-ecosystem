@@ -137,7 +137,7 @@ func versionPB(v *agreement.AgreementVersion) *esportspb.AgreementVersion {
 		No:          utils.StringW(v.No),
 		Title:       utils.StringW(v.Title),
 		EffectiveAt: utils.ToTimestamp(&v.EffectiveAt),
-		AgreedCount: utils.Int32W(int32(v.AgreedCount)),
+		AgreedCount: utils.Int32W(utils.ConvNum[int32](v.AgreedCount)),
 		IsCurrent:   utils.BoolW(v.IsCurrent),
 		Body:        utils.StringW(v.Body),
 	}
