@@ -19,6 +19,10 @@ function failureCopy(value: string | undefined): string {
   switch (systemReason(value)) {
     case System.PASSWORD_MISMATCH:
       return m.error_SYSTEM_PASSWORD_MISMATCH();
+    case System.PASSWORD_POLICY:
+      // The server's composition law; its copy states the whole rule —
+      // the bare reason carries no facet detail to branch on.
+      return m.error_SYSTEM_PASSWORD_POLICY();
     case System.SMS_CODE_INVALID:
       return m.error_SYSTEM_SMS_CODE_INVALID();
     case System.SMS_RATE_LIMITED:

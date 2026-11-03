@@ -43,6 +43,8 @@ enum System {
   SYSTEM_POLICY_UNKNOWN_KIND = 6040 [(.errors.code) = 400];
   SYSTEM_POLICY_INVALID_PARAMS = 6041 [(.errors.code) = 400];
   SYSTEM_POLICY_NOT_FOUND = 6042 [(.errors.code) = 404];
+  // 605x: password
+  SYSTEM_PASSWORD_POLICY = 6050 [(.errors.code) = 400];
   // 606x: authz runtime
   SYSTEM_AUTHZ_POLICY_DENIED = 6060 [(.errors.code) = 403];
   // 607x: user

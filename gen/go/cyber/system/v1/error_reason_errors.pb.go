@@ -297,6 +297,20 @@ func ErrorSystemPolicyNotFound(format string, args ...interface{}) *errors.Error
 	return errors.New(404, System_SYSTEM_POLICY_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
 
+// 605x: password
+func IsSystemPasswordPolicy(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_PASSWORD_POLICY.String() && e.Code == 400
+}
+
+// 605x: password
+func ErrorSystemPasswordPolicy(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_PASSWORD_POLICY.String(), fmt.Sprintf(format, args...))
+}
+
 // 606x: authz runtime
 func IsSystemAuthzPolicyDenied(err error) bool {
 	if err == nil {

@@ -72,6 +72,7 @@
   "error_SYSTEM_POLICY_UNKNOWN_KIND": "نوع سياسة غير معروف.",
   "error_SYSTEM_POLICY_INVALID_PARAMS": "معلمات سياسة غير صالحة.",
   "error_SYSTEM_POLICY_NOT_FOUND": "السياسة غير موجودة.",
+  "error_SYSTEM_PASSWORD_POLICY": "كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل وتتضمن حروفًا وأرقامًا.",
   "error_SYSTEM_AUTHZ_POLICY_DENIED": "رفضت سياسة الوصول (نافذة زمنية / قيد شبكة).",
   "error_SYSTEM_USER_SELF_DELETE": "لا يمكن حذف الحساب المسجّل به حاليًا.",
   "error_SYSTEM_USER_SELF_DISABLE": "لا يمكن إيقاف الحساب الذي سجّلت الدخول به.",

@@ -72,6 +72,7 @@
   "error_SYSTEM_POLICY_UNKNOWN_KIND": "未注册的策略类型",
   "error_SYSTEM_POLICY_INVALID_PARAMS": "策略参数不合法",
   "error_SYSTEM_POLICY_NOT_FOUND": "策略不存在",
+  "error_SYSTEM_PASSWORD_POLICY": "新密码需至少 6 位，且同时包含字母与数字",
   "error_SYSTEM_AUTHZ_POLICY_DENIED": "当前条件不满足访问策略（时间/网段限制）",
   "error_SYSTEM_USER_SELF_DELETE": "不能删除当前登录的账号",
   "error_SYSTEM_USER_SELF_DISABLE": "不能停用当前登录的账号",

@@ -72,6 +72,7 @@
   "error_SYSTEM_POLICY_UNKNOWN_KIND": "未登録のポリシー種別です。",
   "error_SYSTEM_POLICY_INVALID_PARAMS": "ポリシーパラメータが不正です。",
   "error_SYSTEM_POLICY_NOT_FOUND": "ポリシーが見つかりません。",
+  "error_SYSTEM_PASSWORD_POLICY": "新しいパスワードは6文字以上で、英字と数字を両方含める必要があります。",
   "error_SYSTEM_AUTHZ_POLICY_DENIED": "現在の条件がアクセスポリシーを満たしていません（時間帯・ネットワーク制限）。",
   "error_SYSTEM_USER_SELF_DELETE": "現在ログイン中のアカウントは削除できません。",
   "error_SYSTEM_USER_SELF_DISABLE": "現在ログイン中のアカウントは無効化できません。",

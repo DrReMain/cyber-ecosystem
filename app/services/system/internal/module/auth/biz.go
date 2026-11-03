@@ -457,6 +457,9 @@ func (uc *AuthUC) ResetPassword(ctx context.Context, providerKey, state, newPass
 		}
 		return err
 	}
+	if err := shared.PasswordPolicyError(newPassword); err != nil {
+		return err
+	}
 	hash, herr := utils.Hash(newPassword)
 	if herr != nil {
 		return errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", herr))

@@ -56,6 +56,8 @@ const (
 	System_SYSTEM_POLICY_UNKNOWN_KIND   System = 6040
 	System_SYSTEM_POLICY_INVALID_PARAMS System = 6041
 	System_SYSTEM_POLICY_NOT_FOUND      System = 6042
+	// 605x: password
+	System_SYSTEM_PASSWORD_POLICY System = 6050
 	// 606x: authz runtime
 	System_SYSTEM_AUTHZ_POLICY_DENIED System = 6060
 	// 607x: user
@@ -102,6 +104,7 @@ var (
 		6040: "SYSTEM_POLICY_UNKNOWN_KIND",
 		6041: "SYSTEM_POLICY_INVALID_PARAMS",
 		6042: "SYSTEM_POLICY_NOT_FOUND",
+		6050: "SYSTEM_PASSWORD_POLICY",
 		6060: "SYSTEM_AUTHZ_POLICY_DENIED",
 		6070: "SYSTEM_USER_SELF_DELETE",
 		6071: "SYSTEM_USER_SELF_DISABLE",
@@ -140,6 +143,7 @@ var (
 		"SYSTEM_POLICY_UNKNOWN_KIND":          6040,
 		"SYSTEM_POLICY_INVALID_PARAMS":        6041,
 		"SYSTEM_POLICY_NOT_FOUND":             6042,
+		"SYSTEM_PASSWORD_POLICY":              6050,
 		"SYSTEM_AUTHZ_POLICY_DENIED":          6060,
 		"SYSTEM_USER_SELF_DELETE":             6070,
 		"SYSTEM_USER_SELF_DISABLE":            6071,
@@ -187,7 +191,7 @@ var File_cyber_system_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xc2\n" +
+	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xe5\n" +
 	"\n" +
 	"\x06System\x12\x1c\n" +
 	"\x12SYSTEM_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12\x1e\n" +
@@ -212,7 +216,8 @@ const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"#SYSTEM_PERMISSION_INVALID_OPERATION\x10\x8e/\x1a\x04\xa8E\x90\x03\x12%\n" +
 	"\x1aSYSTEM_POLICY_UNKNOWN_KIND\x10\x98/\x1a\x04\xa8E\x90\x03\x12'\n" +
 	"\x1cSYSTEM_POLICY_INVALID_PARAMS\x10\x99/\x1a\x04\xa8E\x90\x03\x12\"\n" +
-	"\x17SYSTEM_POLICY_NOT_FOUND\x10\x9a/\x1a\x04\xa8E\x94\x03\x12%\n" +
+	"\x17SYSTEM_POLICY_NOT_FOUND\x10\x9a/\x1a\x04\xa8E\x94\x03\x12!\n" +
+	"\x16SYSTEM_PASSWORD_POLICY\x10\xa2/\x1a\x04\xa8E\x90\x03\x12%\n" +
 	"\x1aSYSTEM_AUTHZ_POLICY_DENIED\x10\xac/\x1a\x04\xa8E\x93\x03\x12\"\n" +
 	"\x17SYSTEM_USER_SELF_DELETE\x10\xb6/\x1a\x04\xa8E\x90\x03\x12#\n" +
 	"\x18SYSTEM_USER_SELF_DISABLE\x10\xb7/\x1a\x04\xa8E\x90\x03\x12\x1f\n" +

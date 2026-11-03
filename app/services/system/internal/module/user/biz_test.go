@@ -15,6 +15,7 @@ import (
 	"cyber-ecosystem/app/services/system/internal/module/dept"
 	"cyber-ecosystem/app/services/system/internal/module/file"
 	"cyber-ecosystem/app/services/system/internal/module/population"
+	"cyber-ecosystem/app/services/system/internal/shared"
 )
 
 // passthroughTm runs the unit inline — these laws are about the UC's write
@@ -400,6 +401,52 @@ func TestChangePasswordOldMismatch(t *testing.T) {
 	}
 }
 
+// The composition law under test (Q3-①): at least six runes carrying both
+// an ASCII letter and an ASCII digit — the prototype's own rule, one law
+// for every seam that accepts a freshly chosen password.
+func TestPasswordPolicyLaw(t *testing.T) {
+	cases := []struct {
+		pw string
+		ok bool
+	}{
+		{"abc123", true},
+		{"NewPass123", true},
+		{"abcdef", false}, // no digit
+		{"123456", false}, // no letter
+		{"ab1", false},    // under six runes
+		{"中中中中中1", false}, // no ASCII letter
+		{"", false},
+	}
+	for _, c := range cases {
+		err := shared.PasswordPolicyError(c.pw)
+		if c.ok != (err == nil) {
+			t.Fatalf("policy(%q): ok=%v err=%v", c.pw, c.ok, err)
+		}
+		if err != nil && !systempb.IsSystemPasswordPolicy(err) {
+			t.Fatalf("policy(%q): want SYSTEM_PASSWORD_POLICY, got %v", c.pw, err)
+		}
+	}
+}
+
+// The ladder's order holds server-side too: the old-password proof first,
+// the composition law second — a weak candidate never reaches the digest.
+func TestChangePasswordRejectsWeakPassword(t *testing.T) {
+	account := "a@x.co"
+	oldHash, err := utils.Hash("right-old")
+	if err != nil {
+		t.Fatalf("seed hash: %v", err)
+	}
+	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Account: &account, PasswordHash: &oldHash}}}
+	uc := newUserUC(rp)
+
+	if err := uc.ChangePassword(selfCtx("u1"), "right-old", "abcdef"); !systempb.IsSystemPasswordPolicy(err) {
+		t.Fatalf("weak new password: want PASSWORD_POLICY, got %v", err)
+	}
+	if rp.updates != 0 {
+		t.Fatal("weak new password: no digest write may happen")
+	}
+}
+
 // Create --------------------------------------------------------------------------------------------------------------
 
 func TestCreateResolvesRefsAndRoles(t *testing.T) {
@@ -438,6 +485,20 @@ func TestCreateRejectsUnknownDept(t *testing.T) {
 	}
 	if rp.creates != 0 {
 		t.Fatal("unknown dept: no row may be created")
+	}
+}
+
+// A birth answers the same law at the identity's first digest.
+func TestCreateRejectsWeakPassword(t *testing.T) {
+	rp := &fakeUserRP{}
+	uc := newUserUCWith(rp, &fakeDeptRP{}, nil)
+
+	account, password := "a@x.co", "abcdef"
+	if _, err := uc.Create(context.Background(), &account, &password, nil, nil, "", nil); !systempb.IsSystemPasswordPolicy(err) {
+		t.Fatalf("weak birth password: want PASSWORD_POLICY, got %v", err)
+	}
+	if rp.creates != 0 {
+		t.Fatal("weak birth password: no row may be created")
 	}
 }
 
@@ -526,6 +587,21 @@ func TestUpdatePasswordOnly(t *testing.T) {
 	}
 	if rp.updates != 1 || len(rp.setRolesCalls) != 0 || rp.notifyCalls != 0 {
 		t.Fatalf("password-only: updates=%d setRoles=%v notify=%d", rp.updates, rp.setRolesCalls, rp.notifyCalls)
+	}
+}
+
+// An operator-set password answers the same law — the rule holds no matter
+// which side typed the candidate.
+func TestUpdateRejectsWeakPassword(t *testing.T) {
+	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1"}}}
+	uc := newUserUC(rp)
+
+	weak := "123456"
+	if _, err := uc.Update(context.Background(), []string{"password"}, &User{ID: "u1"}, &weak, nil); !systempb.IsSystemPasswordPolicy(err) {
+		t.Fatalf("weak reset: want PASSWORD_POLICY, got %v", err)
+	}
+	if rp.updates != 0 {
+		t.Fatal("weak reset: no digest write may happen")
 	}
 }
 

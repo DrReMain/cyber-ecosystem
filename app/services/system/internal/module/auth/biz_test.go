@@ -1841,6 +1841,20 @@ func TestResetPasswordLaws(t *testing.T) {
 	if err := reset(uf, newTokenStore(), "st-unknown"); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("unknown state: want EXCHANGE_FAILED, got %v", err)
 	}
+
+	// The composition law (Q3-①): a proof-backed but weak candidate is
+	// refused after the exchange, before any digest write.
+	weak := "secret"
+	wstate := issueState(t, trp, "fake")
+	wreq := &systempb.ResetPasswordRequest{Provider: &key, State: &wstate, NewPassword: &weak,
+		Payload: &systempb.ResetPasswordRequest_Sms{Sms: &systempb.SmsIdentityPayload{Phone: &phone, Code: &code}}}
+	if err := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, trp, &fakeTenantRP{}).
+		ResetPassword(context.Background(), "fake", wstate, weak, wreq); !systempb.IsSystemPasswordPolicy(err) {
+		t.Fatalf("weak new password: want PASSWORD_POLICY, got %v", err)
+	}
+	if len(uf.updates) != 1 {
+		t.Fatalf("weak new password: updates = %d, want still one (the earlier strong reset only)", len(uf.updates))
+	}
 }
 
 func TestGetSecurityStatusLaws(t *testing.T) {

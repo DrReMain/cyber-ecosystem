@@ -25,7 +25,6 @@ import (
 const (
 	statusActive   = "active"
 	statusSwitched = "switched"
-	statusExpired  = "expired"
 
 	difficultyExperience = "experience"
 

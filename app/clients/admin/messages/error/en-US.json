@@ -72,6 +72,7 @@
   "error_SYSTEM_POLICY_UNKNOWN_KIND": "Unknown policy kind.",
   "error_SYSTEM_POLICY_INVALID_PARAMS": "Invalid policy params.",
   "error_SYSTEM_POLICY_NOT_FOUND": "Policy not found.",
+  "error_SYSTEM_PASSWORD_POLICY": "The new password needs at least 6 characters and both letters and digits",
   "error_SYSTEM_AUTHZ_POLICY_DENIED": "Access policy denied (time window / network restriction).",
   "error_SYSTEM_USER_SELF_DELETE": "You cannot delete the account you are signed in with.",
   "error_SYSTEM_USER_SELF_DISABLE": "Cannot disable the account you are signed in with.",

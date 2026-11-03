@@ -157,6 +157,9 @@ func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar 
 		if err = uc.ensureAvatar(ctx, avatar); err != nil {
 			return nil, err
 		}
+		if err := shared.PasswordPolicyError(*password); err != nil {
+			return nil, err
+		}
 		hash, herr := utils.Hash(*password)
 		if herr != nil {
 			return nil, errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", herr))
@@ -222,6 +225,9 @@ func (uc *UserUC) Update(ctx context.Context, fieldsMask []string, u *User, pass
 		// An admin reset also leaves sessions standing — same ruling as
 		// ChangePassword: revocation belongs to disable/delete, not to a
 		// credential rotation.
+		if err := shared.PasswordPolicyError(*password); err != nil {
+			return nil, err
+		}
 		hash, e := utils.Hash(*password)
 		if e != nil {
 			return nil, errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", e))
@@ -288,6 +294,9 @@ func (uc *UserUC) ChangePassword(ctx context.Context, oldPassword, newPassword s
 	}
 	if !utils.Verify(oldPassword, *u.PasswordHash) {
 		return systempb.ErrorSystemPasswordMismatch("").WithCause(fmt.Errorf("old password mismatch: user %s", subject.UserID))
+	}
+	if err := shared.PasswordPolicyError(newPassword); err != nil {
+		return err
 	}
 	hash, err := utils.Hash(newPassword)
 	if err != nil {
