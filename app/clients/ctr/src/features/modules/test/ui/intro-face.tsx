@@ -1,5 +1,5 @@
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import { abilityWord } from "#/features/modules/match/vocabulary";
 import { m } from "#/paraglide/messages";
@@ -16,9 +16,45 @@ const abilityBlob: Record<string, string> = {
   decisionEfficiency: "bg-[#1d4ed8]",
 };
 
-/** The how-to card rides the server's introduction; an absent text
- * leaves the identity card clean instead of an empty bordered box
- * (the seed has not authored one yet — Q1-⑥). */
+/* The seeded how-to copy carries the prototype's own <b> emphasis
+ * markers. Exactly those tokens render as bold spans; every other
+ * character — stray tags included — stays a literal text node, so no
+ * markup is ever parsed or injected. */
+export function howToNodes(text: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  let bold = false;
+  let buffer = "";
+  const flush = () => {
+    if (buffer === "") {
+      return;
+    }
+    nodes.push(
+      bold ? (
+        <b className="font-bold" key={nodes.length}>
+          {buffer}
+        </b>
+      ) : (
+        buffer
+      ),
+    );
+    buffer = "";
+  };
+  for (const part of text.split(/(<b>|<\/b>)/)) {
+    if (part === "<b>" || part === "</b>") {
+      flush();
+      bold = part === "<b>";
+      continue;
+    }
+    buffer += part;
+  }
+  flush();
+  return nodes;
+}
+
+/** The how-to card rides the server's introduction — seeded per ability
+ * from the prototype's six texts. An absent text leaves the identity
+ * card clean instead of an empty bordered box: the honest face for a
+ * row nobody authored. */
 function HowToCard({ introduction }: Readonly<{ introduction: string }>) {
   if (introduction === "") {
     return null;
@@ -27,7 +63,7 @@ function HowToCard({ introduction }: Readonly<{ introduction: string }>) {
     <>
       <div aria-hidden className="h-[14px]" />
       <div className="border-line bg-surface-content text-ink-muted rounded-control border px-[13px] py-3 text-[12px] leading-[1.85]">
-        {introduction}
+        {howToNodes(introduction)}
       </div>
     </>
   );

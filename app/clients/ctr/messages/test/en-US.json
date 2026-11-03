@@ -6,7 +6,6 @@
   "test_unknown_desc": "This test does not exist or is offline",
   "test_no_engine_title": "Engine not yet available",
   "test_no_engine_desc": "The engine for this test is coming soon",
-  "test_start_rule_fallback": "Complete each action as fast and as accurately as you can within the time limit.",
   "test_countdown_ready": "Get ready",
   "test_countdown_cancel": "Cancel start",
   "test_intro_step_title": "Step {n}",

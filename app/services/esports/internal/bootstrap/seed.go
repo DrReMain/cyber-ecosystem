@@ -174,6 +174,22 @@ var seedTests = []struct {
 	}},
 }
 
+var seedAbilityIntroductions = map[string]string{
+	// The how-to copy adopted verbatim from the prototype's per-ability
+	// HOW map (test-intro's only authored copy, one paragraph per
+	// ability — every test of an ability shares it until content
+	// diverges per test, which the contract's introduction field already
+	// promises). The <b> markers ride along in the prototype's own
+	// authoring format; the intro face renders exactly those tokens as
+	// bold spans, never as parsed markup.
+	"reactionSpeed":        "屏幕会出现目标，出现后<b>尽快点击</b>。计时从目标出现到点击为止，越快越好；误点会扣精度。",
+	"aimingAccuracy":       "目标会闪现并停留极短时间，<b>点得又快又准</b>。命中率与精度同时计入。",
+	"trackingStability":    "持续<b>把准心压在移动目标上</b>，越贴合越好。中断追踪会记为丢失。",
+	"skillReleaseAccuracy": "按提示的<b>轨迹与时机</b>施放技能，考察贴合度与提前/滞后量。",
+	"resourceAllocation":   "在有限资源下做<b>分配决策</b>，考察转化效率与正确率。",
+	"decisionEfficiency":   "场景出现后<b>尽快选攻/防/撤</b>，同时保证正确率。",
+}
+
 var seedSkus = []struct {
 	Code         string
 	Kind         sku.Kind
@@ -615,8 +631,9 @@ func (s *Seed) Run(ctx context.Context) error {
 		// (genre-order rule): lineups draw per-ability pools the genre
 		// order runs, so families both orders draw (reactionSpeed,
 		// skillReleaseAccuracy) are universal while single-genre families
-		// keep their native mark. Durations, unit labels, and introductions
-		// remain metric-sheet data; engine params materialize for the
+		// keep their native mark. Durations and unit labels remain
+		// metric-sheet data; introductions seed from the ability how-to
+		// map above; engine params materialize for the
 		// engine-backed games as the same KV the client boot pack and the
 		// server scorers read, values equal to the compiled metric-sheet
 		// constants so the config path goes live without moving a needle.
@@ -630,6 +647,7 @@ func (s *Seed) Run(ctx context.Context) error {
 				SetName(t.Name).
 				SetNillableCategory(strPtr(t.Category)).
 				SetNillableAbility(strPtr(t.Ability)).
+				SetNillableIntroduction(strPtr(seedAbilityIntroductions[t.Ability])).
 				Save(ctx)
 			if err != nil {
 				// Multi-replica boot race: see the game loop's arm — the
@@ -660,6 +678,7 @@ func (s *Seed) Run(ctx context.Context) error {
 			SetName(t.Name).
 			SetNillableCategory(strPtr(t.Category)).
 			SetNillableAbility(strPtr(t.Ability)).
+			SetNillableIntroduction(strPtr(seedAbilityIntroductions[t.Ability])).
 			Save(ctx); err != nil {
 			return s.plat.HandleEntError(fmt.Errorf("seed: update test %q: %w", t.Code, err))
 		}

@@ -110,7 +110,7 @@ export function TestBootstrap({ id, code, fallbackName, review }: Readonly<TestB
       durationSeconds={durationSeconds}
       engineParams={config?.engineParams ?? {}}
       gameModule={gameModule}
-      introduction={testQuery.data?.introduction ?? m.test_start_rule_fallback()}
+      introduction={testQuery.data?.introduction ?? ""}
       matchSessionId={boundSessionId}
       review={review}
       step={step}

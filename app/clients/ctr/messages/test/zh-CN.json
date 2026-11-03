@@ -6,7 +6,6 @@
   "test_unknown_desc": "该测试项不存在或已下线",
   "test_no_engine_title": "引擎暂未收录",
   "test_no_engine_desc": "该测试项的引擎即将开放，敬请期待",
-  "test_start_rule_fallback": "在限定时间内，尽可能快且准确地完成每一项操作。",
   "test_countdown_ready": "准备开始",
   "test_countdown_cancel": "取消开始",
   "test_intro_step_title": "第 {n} 项",
