@@ -24,15 +24,9 @@ func (l *sessionLaw) Resolve(ctx context.Context, userID, sessionID string) (*te
 		return nil, err
 	}
 	// Ownership folds into the miss: a foreign or absent session reads the
-	// same not-found, so the miss leaks nothing.
+	// same not-found, so the miss leaks nothing. An active session binds
+	// at any age — the lineup is locked in the row and resumes forever.
 	if s == nil || s.UserID != userID || s.Status != statusActive {
-		return nil, esportspb.ErrorEsportsMatchSessionNotFound("")
-	}
-	stale, err := expireIfStale(ctx, l.matchRP, s)
-	if err != nil {
-		return nil, err
-	}
-	if stale {
 		return nil, esportspb.ErrorEsportsMatchSessionNotFound("")
 	}
 	return &test.SessionBinding{

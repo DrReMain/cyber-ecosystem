@@ -87,9 +87,9 @@ func TestGetCreateRaceReturnsSurvivor(t *testing.T) {
 	}
 }
 
-// The peek law under test: a pure read — an in-window session reports, an
-// over-window one reads absent (without Get's lazy expire write), and no
-// active row reads absent; none of the three paths creates or writes.
+// The peek law under test: a pure read — a fresh session reports, an
+// ancient one reports too (resume has no window), and no active row reads
+// absent; none of the three paths creates or writes.
 func TestPeekIsReadOnly(t *testing.T) {
 	rp := &fakeMatchRP{active: &MatchSession{
 		ID: "s1", UserID: "u1", Genre: "fps", Status: statusActive, CreatedAt: time.Now(),
@@ -102,17 +102,18 @@ func TestPeekIsReadOnly(t *testing.T) {
 		t.Fatal(err)
 	}
 	if view == nil || view.Session.ID != "s1" {
-		t.Fatalf("view = %+v, want the in-window session s1", view)
+		t.Fatalf("view = %+v, want the fresh session s1", view)
 	}
 
-	// Over-window: absent, and the lazy expire stays Get's job.
-	rp.active.CreatedAt = time.Now().Add(-matchResumeWindow - time.Hour)
+	// Ancient session: still reports — the lineup is locked in-row and
+	// resumes at any age; nothing expires on read anymore.
+	rp.active.CreatedAt = time.Now().Add(-8 * 24 * time.Hour)
 	view, err = uc.Peek(memberCtx())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if view != nil {
-		t.Fatalf("over-window view = %+v, want absent", view)
+	if view == nil || view.Session.ID != "s1" {
+		t.Fatalf("ancient view = %+v, want the same session s1 (resume, no window)", view)
 	}
 
 	// No active row: absent.
@@ -130,6 +131,33 @@ func TestPeekIsReadOnly(t *testing.T) {
 	}
 }
 
+// The resume law under test (Q1-②): an over-window active session is
+// never closed or redrawn — Get returns the same lineup untouched, with
+// zero status writes and zero creates. The old repo inferred remaining
+// steps from done results after its client cache died; here the lineup
+// lives in the row, so the same member promise (continue, never reshuffle)
+// holds by construction at any age.
+func TestGetResumesOverWindowSession(t *testing.T) {
+	ancient := &MatchSession{
+		ID: "s1", UserID: "u1", Genre: "fps", Difficulty: "experience", Seed: 7,
+		Steps:        []types.MatchStep{{Ability: "reactionSpeed", TestCode: "red_dot"}},
+		RetestBudget: 3, Status: statusActive,
+		CreatedAt: time.Now().Add(-30 * 24 * time.Hour),
+	}
+	rp := &fakeMatchRP{active: ancient}
+	uc := NewMatchUC(slog.Default(), nil, rp, &fakeMatchTestRP{}, nil, nil)
+	view, err := uc.Get(memberCtx(), utils.Ptr("fps"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if view.Session.ID != "s1" || view.Created {
+		t.Fatalf("view = %+v, want the ancient session s1 resumed, not a birth", view)
+	}
+	if len(rp.statusCalls) != 0 || rp.created != nil {
+		t.Fatalf("statusCalls = %v, created = %+v — a resume must not close or redraw", rp.statusCalls, rp.created)
+	}
+}
+
 func memberCtx() context.Context {
 	return security.WithSubject(context.Background(), &security.Subject{UserID: "u1"})
 }
@@ -138,6 +166,7 @@ type fakeMatchRP struct {
 	MatchRP
 	configs     []MatchConfig
 	active      *MatchSession
+	byID        map[string]*MatchSession
 	createErr   error
 	statusCalls []string
 	created     *MatchSession
@@ -153,6 +182,16 @@ func (rp *fakeMatchRP) FindActive(_ context.Context, _ string) (*MatchSession, e
 		return rp.findActive()
 	}
 	return rp.active, nil
+}
+
+func (rp *fakeMatchRP) FindByID(_ context.Context, id string) (*MatchSession, error) {
+	if rp.byID != nil {
+		return rp.byID[id], nil
+	}
+	if rp.active != nil && rp.active.ID == id {
+		return rp.active, nil
+	}
+	return nil, nil
 }
 
 func (rp *fakeMatchRP) UpdateStatus(_ context.Context, id, status string) error {

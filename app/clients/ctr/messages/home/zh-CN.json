@@ -13,7 +13,7 @@
   "home_hint_login": "未登录 —— 点击后先去登录",
   "home_hint_games": "还没选游戏偏好 —— 点击后先去选",
   "home_resume_title": "有一场未完成的测评",
-  "home_resume_desc": "进行到 {done} / {total} · 开始于 {date}（已过 {days} 天，7 天内可续）",
+  "home_resume_desc": "进行到 {done} / {total} · 开始于 {date}（已过 {days} 天）",
   "home_resume_cta": "继续",
   "home_recent_title": "最近一次测评",
   "home_recent_go": "看报告",

@@ -24,10 +24,10 @@ const OperationMatchServiceSwitchMatchGenre = "/cyber.esports.v1.MatchService/Sw
 type MatchServiceHTTPServer interface {
 	GetMatchSession(context.Context, *GetMatchSessionRequest) (*GetMatchSessionResponse, error)
 	// PeekMatchSession The read-only sibling of GetMatchSession: reports the member's active
-	// in-window session, if any — never creates, never lazily expires, never
-	// votes a genre. (A minting surface here would hijack a later explicit
-	// genre choice: a resume ignores the genre param.) Over-window sessions
-	// read absent; the next GetMatchSession owns closing and redrawing them.
+	// session, if any — never creates, never votes a genre. (A minting
+	// surface here would hijack a later explicit genre choice: a resume
+	// ignores the genre param.) A session at any age reads here, exactly as
+	// GetMatchSession would resume it.
 	PeekMatchSession(context.Context, *PeekMatchSessionRequest) (*PeekMatchSessionResponse, error)
 	// SwitchMatchGenre The explicit re-draw: the target genre validates first, then the active
 	// session closes (even a fresh one) and a new one opens with a forced-new
@@ -102,10 +102,10 @@ func _MatchService_PeekMatchSession0_HTTP_Handler(srv MatchServiceHTTPServer) fu
 type MatchServiceHTTPClient interface {
 	GetMatchSession(ctx context.Context, req *GetMatchSessionRequest, opts ...http.CallOption) (rsp *GetMatchSessionResponse, err error)
 	// PeekMatchSession The read-only sibling of GetMatchSession: reports the member's active
-	// in-window session, if any — never creates, never lazily expires, never
-	// votes a genre. (A minting surface here would hijack a later explicit
-	// genre choice: a resume ignores the genre param.) Over-window sessions
-	// read absent; the next GetMatchSession owns closing and redrawing them.
+	// session, if any — never creates, never votes a genre. (A minting
+	// surface here would hijack a later explicit genre choice: a resume
+	// ignores the genre param.) A session at any age reads here, exactly as
+	// GetMatchSession would resume it.
 	PeekMatchSession(ctx context.Context, req *PeekMatchSessionRequest, opts ...http.CallOption) (rsp *PeekMatchSessionResponse, err error)
 	// SwitchMatchGenre The explicit re-draw: the target genre validates first, then the active
 	// session closes (even a fresh one) and a new one opens with a forced-new
@@ -138,10 +138,10 @@ func (c *MatchServiceHTTPClientImpl) GetMatchSession(ctx context.Context, in *Ge
 }
 
 // PeekMatchSession The read-only sibling of GetMatchSession: reports the member's active
-// in-window session, if any — never creates, never lazily expires, never
-// votes a genre. (A minting surface here would hijack a later explicit
-// genre choice: a resume ignores the genre param.) Over-window sessions
-// read absent; the next GetMatchSession owns closing and redrawing them.
+// session, if any — never creates, never votes a genre. (A minting
+// surface here would hijack a later explicit genre choice: a resume
+// ignores the genre param.) A session at any age reads here, exactly as
+// GetMatchSession would resume it.
 func (c *MatchServiceHTTPClientImpl) PeekMatchSession(ctx context.Context, in *PeekMatchSessionRequest, opts ...http.CallOption) (*PeekMatchSessionResponse, error) {
 	var out PeekMatchSessionResponse
 	pattern := "/api/v1/esports/match/session/peek"

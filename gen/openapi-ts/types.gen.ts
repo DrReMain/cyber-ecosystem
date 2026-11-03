@@ -826,8 +826,8 @@ export type CyberEsportsV1GetComplianceConfigResponse = {
 export type CyberEsportsV1GetMatchSessionResponse = {
     session?: CyberEsportsV1MatchSession;
     /**
-     * True when this call created the session (intro face); false when an
-     * in-window session resumed (continue face). Success implies present.
+     * True when this call created the session (intro face); false when a
+     * session resumed (continue face). Success implies present.
      */
     created?: boolean;
 };
@@ -1462,7 +1462,7 @@ export type CyberEsportsV1PayCredential = {
 
 export type CyberEsportsV1PeekMatchSessionResponse = {
     /**
-     * Absent when no in-window session exists — message-field presence is
+     * Absent when no active session exists — message-field presence is
      * the null/zero contract for entities; a present session is the
      * resume face's whole truth.
      */
@@ -4421,7 +4421,7 @@ export type MatchServiceGetMatchSessionData = {
     path?: never;
     query?: {
         /**
-         * Seeds session creation only — an active in-window session resumes
+         * Seeds session creation only — an active session resumes
          * regardless of this value (switching is the explicit SwitchMatchGenre
          * action; Get never closes a session implicitly). Absent → the server
          * votes the member's preferred-game majority through the catalog

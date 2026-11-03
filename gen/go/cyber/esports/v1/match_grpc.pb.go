@@ -30,11 +30,11 @@ const (
 //
 // The match session — the orchestration aggregate the C-end assessment
 // flow rides. One active session per member: steps are drawn once (seeded
-// jitter, so lineups cannot be memorized) and locked into the row, resume
-// inside the seven-day window never redraws, and a fresh draw starts only
-// on window expiry or an explicit genre switch (forced new seed). The
-// difficulty mode axis lives on the session: every attempt inside scores
-// on the session's mode, consumed at the submit seam.
+// jitter, so lineups cannot be memorized) and locked into the row, a
+// resume at any age never redraws, and a fresh draw starts only on an
+// explicit genre switch (forced new seed). The difficulty mode axis lives
+// on the session: every attempt inside scores on the session's mode,
+// consumed at the submit seam.
 type MatchServiceClient interface {
 	GetMatchSession(ctx context.Context, in *GetMatchSessionRequest, opts ...grpc.CallOption) (*GetMatchSessionResponse, error)
 	// The explicit re-draw: the target genre validates first, then the active
@@ -42,10 +42,10 @@ type MatchServiceClient interface {
 	// seed — the same test may be drawn again in the replacement.
 	SwitchMatchGenre(ctx context.Context, in *SwitchMatchGenreRequest, opts ...grpc.CallOption) (*SwitchMatchGenreResponse, error)
 	// The read-only sibling of GetMatchSession: reports the member's active
-	// in-window session, if any — never creates, never lazily expires, never
-	// votes a genre. (A minting surface here would hijack a later explicit
-	// genre choice: a resume ignores the genre param.) Over-window sessions
-	// read absent; the next GetMatchSession owns closing and redrawing them.
+	// session, if any — never creates, never votes a genre. (A minting
+	// surface here would hijack a later explicit genre choice: a resume
+	// ignores the genre param.) A session at any age reads here, exactly as
+	// GetMatchSession would resume it.
 	PeekMatchSession(ctx context.Context, in *PeekMatchSessionRequest, opts ...grpc.CallOption) (*PeekMatchSessionResponse, error)
 }
 
@@ -93,11 +93,11 @@ func (c *matchServiceClient) PeekMatchSession(ctx context.Context, in *PeekMatch
 //
 // The match session — the orchestration aggregate the C-end assessment
 // flow rides. One active session per member: steps are drawn once (seeded
-// jitter, so lineups cannot be memorized) and locked into the row, resume
-// inside the seven-day window never redraws, and a fresh draw starts only
-// on window expiry or an explicit genre switch (forced new seed). The
-// difficulty mode axis lives on the session: every attempt inside scores
-// on the session's mode, consumed at the submit seam.
+// jitter, so lineups cannot be memorized) and locked into the row, a
+// resume at any age never redraws, and a fresh draw starts only on an
+// explicit genre switch (forced new seed). The difficulty mode axis lives
+// on the session: every attempt inside scores on the session's mode,
+// consumed at the submit seam.
 type MatchServiceServer interface {
 	GetMatchSession(context.Context, *GetMatchSessionRequest) (*GetMatchSessionResponse, error)
 	// The explicit re-draw: the target genre validates first, then the active
@@ -105,10 +105,10 @@ type MatchServiceServer interface {
 	// seed — the same test may be drawn again in the replacement.
 	SwitchMatchGenre(context.Context, *SwitchMatchGenreRequest) (*SwitchMatchGenreResponse, error)
 	// The read-only sibling of GetMatchSession: reports the member's active
-	// in-window session, if any — never creates, never lazily expires, never
-	// votes a genre. (A minting surface here would hijack a later explicit
-	// genre choice: a resume ignores the genre param.) Over-window sessions
-	// read absent; the next GetMatchSession owns closing and redrawing them.
+	// session, if any — never creates, never votes a genre. (A minting
+	// surface here would hijack a later explicit genre choice: a resume
+	// ignores the genre param.) A session at any age reads here, exactly as
+	// GetMatchSession would resume it.
 	PeekMatchSession(context.Context, *PeekMatchSessionRequest) (*PeekMatchSessionResponse, error)
 	mustEmbedUnimplementedMatchServiceServer()
 }

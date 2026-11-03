@@ -28,7 +28,7 @@ const (
 
 type GetMatchSessionRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Seeds session creation only — an active in-window session resumes
+	// Seeds session creation only — an active session resumes
 	// regardless of this value (switching is the explicit SwitchMatchGenre
 	// action; Get never closes a session implicitly). Absent → the server
 	// votes the member's preferred-game majority through the catalog
@@ -299,8 +299,8 @@ func (x *MatchSession) GetAnchorRecordId() *wrapperspb.StringValue {
 type GetMatchSessionResponse struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Session *MatchSession          `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
-	// True when this call created the session (intro face); false when an
-	// in-window session resumed (continue face). Success implies present.
+	// True when this call created the session (intro face); false when a
+	// session resumed (continue face). Success implies present.
 	Created       bool `protobuf:"varint,2,opt,name=created,proto3" json:"created,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -432,7 +432,7 @@ func (*PeekMatchSessionRequest) Descriptor() ([]byte, []int) {
 
 type PeekMatchSessionResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Absent when no in-window session exists — message-field presence is
+	// Absent when no active session exists — message-field presence is
 	// the null/zero contract for entities; a present session is the
 	// resume face's whole truth.
 	Session       *MatchSession `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`

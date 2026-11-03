@@ -20,10 +20,10 @@ export const switchMatchGenre = MatchService.method.switchMatchGenre;
 
 /**
  * The read-only sibling of GetMatchSession: reports the member's active
- * in-window session, if any — never creates, never lazily expires, never
- * votes a genre. (A minting surface here would hijack a later explicit
- * genre choice: a resume ignores the genre param.) Over-window sessions
- * read absent; the next GetMatchSession owns closing and redrawing them.
+ * session, if any — never creates, never votes a genre. (A minting
+ * surface here would hijack a later explicit genre choice: a resume
+ * ignores the genre param.) A session at any age reads here, exactly as
+ * GetMatchSession would resume it.
  *
  * @generated from rpc cyber.esports.v1.MatchService.PeekMatchSession
  */

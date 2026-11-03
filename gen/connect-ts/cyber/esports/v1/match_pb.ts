@@ -23,7 +23,7 @@ export const file_cyber_esports_v1_match: GenFile = /*@__PURE__*/
  */
 export type GetMatchSessionRequest = Message<"cyber.esports.v1.GetMatchSessionRequest"> & {
   /**
-   * Seeds session creation only — an active in-window session resumes
+   * Seeds session creation only — an active session resumes
    * regardless of this value (switching is the explicit SwitchMatchGenre
    * action; Get never closes a session implicitly). Absent → the server
    * votes the member's preferred-game majority through the catalog
@@ -172,8 +172,8 @@ export type GetMatchSessionResponse = Message<"cyber.esports.v1.GetMatchSessionR
   session?: MatchSession | undefined;
 
   /**
-   * True when this call created the session (intro face); false when an
-   * in-window session resumed (continue face). Success implies present.
+   * True when this call created the session (intro face); false when a
+   * session resumed (continue face). Success implies present.
    *
    * @generated from field: bool created = 2;
    */
@@ -222,7 +222,7 @@ export const PeekMatchSessionRequestSchema: GenMessage<PeekMatchSessionRequest> 
  */
 export type PeekMatchSessionResponse = Message<"cyber.esports.v1.PeekMatchSessionResponse"> & {
   /**
-   * Absent when no in-window session exists — message-field presence is
+   * Absent when no active session exists — message-field presence is
    * the null/zero contract for entities; a present session is the
    * resume face's whole truth.
    *
@@ -241,11 +241,11 @@ export const PeekMatchSessionResponseSchema: GenMessage<PeekMatchSessionResponse
 /**
  * The match session — the orchestration aggregate the C-end assessment
  * flow rides. One active session per member: steps are drawn once (seeded
- * jitter, so lineups cannot be memorized) and locked into the row, resume
- * inside the seven-day window never redraws, and a fresh draw starts only
- * on window expiry or an explicit genre switch (forced new seed). The
- * difficulty mode axis lives on the session: every attempt inside scores
- * on the session's mode, consumed at the submit seam.
+ * jitter, so lineups cannot be memorized) and locked into the row, a
+ * resume at any age never redraws, and a fresh draw starts only on an
+ * explicit genre switch (forced new seed). The difficulty mode axis lives
+ * on the session: every attempt inside scores on the session's mode,
+ * consumed at the submit seam.
  *
  * @generated from service cyber.esports.v1.MatchService
  */
@@ -272,10 +272,10 @@ export const MatchService: GenService<{
   },
   /**
    * The read-only sibling of GetMatchSession: reports the member's active
-   * in-window session, if any — never creates, never lazily expires, never
-   * votes a genre. (A minting surface here would hijack a later explicit
-   * genre choice: a resume ignores the genre param.) Over-window sessions
-   * read absent; the next GetMatchSession owns closing and redrawing them.
+   * session, if any — never creates, never votes a genre. (A minting
+   * surface here would hijack a later explicit genre choice: a resume
+   * ignores the genre param.) A session at any age reads here, exactly as
+   * GetMatchSession would resume it.
    *
    * @generated from rpc cyber.esports.v1.MatchService.PeekMatchSession
    */

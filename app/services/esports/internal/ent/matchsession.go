@@ -39,7 +39,7 @@ type MatchSession struct {
 	Steps []types.MatchStep `json:"steps,omitempty"`
 	// attempts allowed per step inside this session — first-ever session 3, later sessions 1; frozen at birth, each stored attempt spends one valid or not
 	RetestBudget int `json:"retest_budget,omitempty"`
-	// active resumes inside the seven-day window; switched = explicit re-draw closed it, expired = window passed (closed lazily on read)
+	// active resumes at any age — the lineup is locked in the row; switched = an explicit re-draw closed it; expired = the retired seven-day window close (legacy rows only, no longer produced)
 	Status       matchsession.Status `json:"status,omitempty"`
 	selectValues sql.SelectValues
 }

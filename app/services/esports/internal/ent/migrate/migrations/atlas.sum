@@ -1,4 +1,4 @@
-h1:nljAVvKdgWw3r7L4iiKuFGTpj+dvq1WW+10garr+AxE=
+h1:y7VjMc8jr/SH3VkHwLsMS5okeB/pxmvwu2S5VdjAveg=
 20261027105256_init.sql h1:FcjRpjnfnbO62yY7dkLh7pMC4wwNgZ71sJb9gGciP18=
 20261030125202.sql h1:s02JYSvbCU5aKxlosdenUaHYEFBBTrC2FRUoQV3r2ac=
 20261031045417_sku_updated_by.sql h1:LhYVeiOG3l0EKMKIZixyU3HBIAuCK5/OUc7ZQXK/s7Q=
@@ -7,3 +7,4 @@ h1:nljAVvKdgWw3r7L4iiKuFGTpj+dvq1WW+10garr+AxE=
 20261031140305_code_redeem_trail.sql h1:7aVmAlROg/gWlort/Dvy4faleicyvuFjHyFRXWrPosw=
 20261101063106.sql h1:Y5iU23/H4hK+KV7nxmxFJQ3dQK4u0HiwL4Lj6ao5FCs=
 20261101105744.sql h1:kwIZ6G0XmmuERKeXzLe+JGO6dAiCVx+PcxE3hINTRp0=
+20261103123125_match_session_status_comment.sql h1:iaOePjOyvSBHQTaNW62zA1JUefJ1fuK0tmoH/FIEO58=

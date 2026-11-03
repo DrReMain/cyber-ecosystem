@@ -32,7 +32,7 @@ func (MatchSession) Fields() []ent.Field {
 		field.Int("retest_budget").Default(3).
 			Comment("attempts allowed per step inside this session — first-ever session 3, later sessions 1; frozen at birth, each stored attempt spends one valid or not"),
 		field.Enum("status").Values("active", "switched", "expired").Default("active").
-			Comment("active resumes inside the seven-day window; switched = explicit re-draw closed it, expired = window passed (closed lazily on read)"),
+			Comment("active resumes at any age — the lineup is locked in the row; switched = an explicit re-draw closed it; expired = the retired seven-day window close (legacy rows only, no longer produced)"),
 	}
 }
 

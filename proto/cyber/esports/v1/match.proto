@@ -13,11 +13,11 @@ option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
 
 // The match session — the orchestration aggregate the C-end assessment
 // flow rides. One active session per member: steps are drawn once (seeded
-// jitter, so lineups cannot be memorized) and locked into the row, resume
-// inside the seven-day window never redraws, and a fresh draw starts only
-// on window expiry or an explicit genre switch (forced new seed). The
-// difficulty mode axis lives on the session: every attempt inside scores
-// on the session's mode, consumed at the submit seam.
+// jitter, so lineups cannot be memorized) and locked into the row, a
+// resume at any age never redraws, and a fresh draw starts only on an
+// explicit genre switch (forced new seed). The difficulty mode axis lives
+// on the session: every attempt inside scores on the session's mode,
+// consumed at the submit seam.
 service MatchService {
   option (cyber.ext.v1.service_comment) = "匹配会话";
   rpc GetMatchSession(GetMatchSessionRequest) returns (GetMatchSessionResponse) {
@@ -43,10 +43,10 @@ service MatchService {
     };
   }
   // The read-only sibling of GetMatchSession: reports the member's active
-  // in-window session, if any — never creates, never lazily expires, never
-  // votes a genre. (A minting surface here would hijack a later explicit
-  // genre choice: a resume ignores the genre param.) Over-window sessions
-  // read absent; the next GetMatchSession owns closing and redrawing them.
+  // session, if any — never creates, never votes a genre. (A minting
+  // surface here would hijack a later explicit genre choice: a resume
+  // ignores the genre param.) A session at any age reads here, exactly as
+  // GetMatchSession would resume it.
   rpc PeekMatchSession(PeekMatchSessionRequest) returns (PeekMatchSessionResponse) {
     option (cyber.ext.v1.method) = {
       comment: "窥视进行中的匹配会话(只读,无则空)"
@@ -58,7 +58,7 @@ service MatchService {
 }
 
 message GetMatchSessionRequest {
-  // Seeds session creation only — an active in-window session resumes
+  // Seeds session creation only — an active session resumes
   // regardless of this value (switching is the explicit SwitchMatchGenre
   // action; Get never closes a session implicitly). Absent → the server
   // votes the member's preferred-game majority through the catalog
@@ -115,8 +115,8 @@ message MatchSession {
 
 message GetMatchSessionResponse {
   MatchSession session = 1;
-  // True when this call created the session (intro face); false when an
-  // in-window session resumed (continue face). Success implies present.
+  // True when this call created the session (intro face); false when a
+  // session resumed (continue face). Success implies present.
   bool created = 2;
 }
 
@@ -127,7 +127,7 @@ message SwitchMatchGenreResponse {
 message PeekMatchSessionRequest {}
 
 message PeekMatchSessionResponse {
-  // Absent when no in-window session exists — message-field presence is
+  // Absent when no active session exists — message-field presence is
   // the null/zero contract for entities; a present session is the
   // resume face's whole truth.
   MatchSession session = 1;

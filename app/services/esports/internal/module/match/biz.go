@@ -29,7 +29,6 @@ const (
 
 	difficultyExperience = "experience"
 
-	matchResumeWindow  = 7 * 24 * time.Hour
 	firstSessionBudget = 3
 	laterSessionBudget = 1
 )
@@ -110,14 +109,11 @@ func (uc *MatchUC) Get(ctx context.Context, genre *string) (*SessionView, error)
 	if err != nil {
 		return nil, err
 	}
+	// An active session resumes at any age — the lineup is locked in the
+	// row, so "cache loss" cannot exist and no redraw is ever owed. The
+	// only exits are finishing the lineup or an explicit Switch.
 	if active != nil {
-		stale, err := expireIfStale(ctx, uc.matchRP, active)
-		if err != nil {
-			return nil, err
-		}
-		if !stale {
-			return uc.view(ctx, active, false)
-		}
+		return uc.view(ctx, active, false)
 	}
 	session, err := uc.create(ctx, subject.UserID, genre, 0)
 	if err != nil {
@@ -136,10 +132,10 @@ func (uc *MatchUC) Get(ctx context.Context, genre *string) (*SessionView, error)
 }
 
 func (uc *MatchUC) Peek(ctx context.Context) (*SessionView, error) {
-	// The read-only sibling of Get: no create, no lazy expire, no genre
-	// vote — a minting read would hijack a later explicit genre choice,
-	// since a resume ignores the genre param. Over-window sessions read
-	// absent here; the next Get owns closing and redrawing them.
+	// The read-only sibling of Get: no create, no genre vote — a minting
+	// read would hijack a later explicit genre choice, since a resume
+	// ignores the genre param. A session at any age reads here, exactly
+	// as Get would resume it.
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {
 		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("match peek requires a session"))
@@ -148,7 +144,7 @@ func (uc *MatchUC) Peek(ctx context.Context) (*SessionView, error) {
 	if err != nil {
 		return nil, err
 	}
-	if active == nil || time.Since(active.CreatedAt) >= matchResumeWindow {
+	if active == nil {
 		return nil, nil
 	}
 	return uc.view(ctx, active, false)
@@ -191,18 +187,6 @@ func (uc *MatchUC) Switch(ctx context.Context, genre string) (*SessionView, erro
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
-
-func expireIfStale(ctx context.Context, rp MatchRP, s *MatchSession) (bool, error) {
-	// An over-window session closes lazily so the next draw is fresh —
-	// used retest counts never come back with a new one.
-	if time.Since(s.CreatedAt) < matchResumeWindow {
-		return false, nil
-	}
-	if err := rp.UpdateStatus(ctx, s.ID, statusExpired); err != nil {
-		return false, err
-	}
-	return true, nil
-}
 
 func isClaimLost(err error) bool {
 	var ke *kerrors.Error

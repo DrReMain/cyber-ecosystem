@@ -396,7 +396,7 @@ var (
 		{Name: "seed", Type: field.TypeInt64, Comment: "the draw's input entropy (FNV over user|day|genre|salt), stored for audit reproduction only — behavior always replays the locked steps", Default: 0},
 		{Name: "steps", Type: field.TypeJSON, Comment: "the locked arrangement in match_config render_order; frozen at creation, resumes replay it verbatim"},
 		{Name: "retest_budget", Type: field.TypeInt, Comment: "attempts allowed per step inside this session — first-ever session 3, later sessions 1; frozen at birth, each stored attempt spends one valid or not", Default: 3},
-		{Name: "status", Type: field.TypeEnum, Comment: "active resumes inside the seven-day window; switched = explicit re-draw closed it, expired = window passed (closed lazily on read)", Enums: []string{"active", "switched", "expired"}, Default: "active"},
+		{Name: "status", Type: field.TypeEnum, Comment: "active resumes at any age — the lineup is locked in the row; switched = an explicit re-draw closed it; expired = the retired seven-day window close (legacy rows only, no longer produced)", Enums: []string{"active", "switched", "expired"}, Default: "active"},
 	}
 	// MatchSessionTable holds the schema information for the "match_session" table.
 	MatchSessionTable = &schema.Table{

@@ -52,10 +52,10 @@ type MatchServiceClient interface {
 	// seed — the same test may be drawn again in the replacement.
 	SwitchMatchGenre(context.Context, *connect.Request[v1.SwitchMatchGenreRequest]) (*connect.Response[v1.SwitchMatchGenreResponse], error)
 	// The read-only sibling of GetMatchSession: reports the member's active
-	// in-window session, if any — never creates, never lazily expires, never
-	// votes a genre. (A minting surface here would hijack a later explicit
-	// genre choice: a resume ignores the genre param.) Over-window sessions
-	// read absent; the next GetMatchSession owns closing and redrawing them.
+	// session, if any — never creates, never votes a genre. (A minting
+	// surface here would hijack a later explicit genre choice: a resume
+	// ignores the genre param.) A session at any age reads here, exactly as
+	// GetMatchSession would resume it.
 	PeekMatchSession(context.Context, *connect.Request[v1.PeekMatchSessionRequest]) (*connect.Response[v1.PeekMatchSessionResponse], error)
 }
 
@@ -121,10 +121,10 @@ type MatchServiceHandler interface {
 	// seed — the same test may be drawn again in the replacement.
 	SwitchMatchGenre(context.Context, *connect.Request[v1.SwitchMatchGenreRequest]) (*connect.Response[v1.SwitchMatchGenreResponse], error)
 	// The read-only sibling of GetMatchSession: reports the member's active
-	// in-window session, if any — never creates, never lazily expires, never
-	// votes a genre. (A minting surface here would hijack a later explicit
-	// genre choice: a resume ignores the genre param.) Over-window sessions
-	// read absent; the next GetMatchSession owns closing and redrawing them.
+	// session, if any — never creates, never votes a genre. (A minting
+	// surface here would hijack a later explicit genre choice: a resume
+	// ignores the genre param.) A session at any age reads here, exactly as
+	// GetMatchSession would resume it.
 	PeekMatchSession(context.Context, *connect.Request[v1.PeekMatchSessionRequest]) (*connect.Response[v1.PeekMatchSessionResponse], error)
 }
 

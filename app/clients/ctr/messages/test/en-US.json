@@ -20,7 +20,7 @@
   "test_run_title": "Testing · {name}",
   "test_run_hint": "Keep the screen on — no backgrounding or locking (it voids this run)",
   "test_run_idx": "{ability} · Question {i} of {total}",
-  "test_exit_desc_session": "{done} / {total} done. Progress keeps for 7 days; the unfinished test is not scored.",
+  "test_exit_desc_session": "{done} / {total} done. Progress keeps — resume anytime; the unfinished test is not scored.",
   "test_pause_action": "Pause",
   "test_pause_title": "Paused",
   "test_pause_resume": "Resume",

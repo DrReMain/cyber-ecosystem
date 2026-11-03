@@ -13,7 +13,7 @@
   "home_hint_login": "Not signed in — tapping goes to sign-in first",
   "home_hint_games": "No game preferences yet — tapping goes to the picker",
   "home_resume_title": "An unfinished assessment awaits",
-  "home_resume_desc": "{done} / {total} done · started {date} (day {days} of 7 to resume)",
+  "home_resume_desc": "{done} / {total} done · started {date} ({days} days ago)",
   "home_resume_cta": "Continue",
   "home_recent_title": "Latest assessment",
   "home_recent_go": "View report",
