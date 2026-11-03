@@ -38,8 +38,8 @@
 | # | 面 | 断言与证据 | 级 | 处置 |
 |---|---|---|---|---|
 | Q1-① | B1 home greet 会员态 | 原型 home.html:52-54 会员活性时 greet=「专属会员 · 有效期内」;重建仅 欢迎/未登录 两态。C 端无会员活性读:ProfileService 仅 Get/Update/PreviewMerge(profile.proto 三 RPC),唯一 member_until 在合并预览事实(profile.proto:114);MemberService=admin 面(member.proto:20「this is the admin plane」);GetAbilityDigest 无会员字段(report.proto:231) | **契约级** | 入 lzx 队列。建议形状:GetProfileResponse 增会员活性(如 member_until)——home 会话探针本就调 GetProfile,零加跳;客户端三态 greet 随契约落 |
-| Q1-② | B5 须知 rule5 过期语义 | 原型/LOGIC_AUDIT(D-AL 吸收锚「续测 7 天反推」):「超 24h 缓存失效时会按已测结果反推剩余项,不重排」;重建文案「过期后下次进入会重新编排」=**服务端真行为**(match/biz.go:195-203 expireIfStale 过窗懒闭+下场新抽)。文案从行为、分歧未在册 | 口径 | 一句裁:裁 A=重抽法定案(在册登记分歧,文案不动) / 裁 B=服务端改反推续测(lzx)。同族参照:switch rule2 同型分歧已由 G-208 N1 注册裁从行为 |
-| Q1-③ | C4 通用态族 idiom | error:原型暖卡(📡+「网络连接失败」+「本次进度已保留」安抚行+重试/返回上一页/返回首页三钮,error.html:9-18)vs 重建 ERR 终端美学(ERR chip+巨型 HTTP 码+重试/返回首页,error-page.tsx);loading:原型骨架屏 vs 重建 mono 扫描条(StateScreen 注=自觉系统选择);empty:原型三域变体 vs 重建通用+域内空态 | 作者级 | 整族裁决(P 票):裁 A=网络错面还原原型暖卡(仅 network kind 有 oracle,余 kind 无原型面维持现状=两 idiom 并存) / 裁 B=骨架美学仓法定案(登记分歧,零代码) / 裁 C=全族还原。**进度保留安抚行**不论裁向都值得单独落(测评场景关键 UX,行为真:attempts 逐款提交) |
+| Q1-② | B5 须知 rule5 过期语义 | 原型/LOGIC_AUDIT(D-AL 吸收锚「续测 7 天反推」):「超 24h 缓存失效时会按已测结果反推剩余项,不重排」;重建文案「过期后下次进入会重新编排」=现行服务端行为(match/biz.go:195-203 expireIfStale 过窗懒闭+下场新抽) | 口径 | **已裁(用户 11-03)=服务端改反推续测**:入 lzx 队列(match 域改过期续用=按已测结果反推剩余项不重排,对齐 D-AL 锚);rule5 文案随服务端落地回反推语义(「24h 缓存失效」系旧仓 localStorage 细节,届时按服务端真行为表述) |
+| Q1-③ | C4 通用态族 idiom | error:原型暖卡(📡+「网络连接失败」+「本次进度已保留」安抚行+重试/返回上一页/返回首页三钮,error.html:9-18)vs 重建 ERR 终端美学;loading:原型骨架屏 vs 重建 mono 扫描条;empty:原型三域变体 vs 重建通用+域内空态 | 作者级 | **已裁(用户 11-03)=网络错面还原暖卡,已落**:network kind 双宿主渲染暖卡 network-face.tsx(root ErrorPage=loader 级+ErrorFallback=组件级,📡→RadioTower 按 PM-4 lucide 仓法/进度保留安抚行/502·NETWORK 诊断行/三钮);其余 kind 维持 ERR idiom(无原型面);loading/empty 维持骨架 idiom,分歧在册 |
 
 Q1 余量:A 段(login 11-01 E9 复走查毕/向导三步/age-required/agreement 壳)+C1/C2/D1/D2(近走查面,低优先独立复扫)——第二腿。
 

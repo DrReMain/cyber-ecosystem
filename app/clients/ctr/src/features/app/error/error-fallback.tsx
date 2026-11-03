@@ -1,5 +1,7 @@
 import { view } from "#/domains/error";
+import { HOME_PATH } from "#/config";
 import { m } from "#/paraglide/messages";
+import { NetworkErrorFace } from "./network-face";
 
 export function ErrorFallback({
   error,
@@ -23,6 +25,23 @@ export function ErrorFallback({
           {resolved.title}
         </span>
         {retry}
+      </div>
+    );
+  }
+
+  // A network failure a member can actually hit mid-app renders the
+  // prototype's warm card (Q1-③ ruling) — when the content died of the
+  // network, this fallback IS the page. The other kinds keep the inline
+  // chip: they surface as slot-scale notes beside living content.
+  if (resolved.kind === "network") {
+    return (
+      <div className="safe-px flex w-full grow flex-col items-center py-12">
+        <NetworkErrorFace
+          homePath={HOME_PATH}
+          http={resolved.http}
+          kind={resolved.kind}
+          onRetry={onRetry}
+        />
       </div>
     );
   }

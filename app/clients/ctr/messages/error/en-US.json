@@ -137,5 +137,11 @@
   "error_ESPORTS_AGREEMENT_VERSION_DUPLICATE": "This version number already exists",
   "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "Agreement versions are not configured yet; contact the operator",
   "error_ESPORTS_SKU_KIND_INVALID": "This SKU is not a membership tier",
-  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "No live membership found"
+  "error_ESPORTS_MEMBERSHIP_NOT_FOUND": "No live membership found",
+  "error_network_card_title": "Network connection failed",
+  "error_network_sub_lead": "Please check your network and try again. If you were in the middle of a test, ",
+  "error_network_sub_keep": "your progress is preserved",
+  "error_network_sub_tail": " and will not be lost to a network problem.",
+  "error_back": "Go back",
+  "error_code": "Error code: "
 }
