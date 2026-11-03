@@ -14,7 +14,6 @@ interface TestRunProps {
   readonly review: boolean;
   /** The live session context the faces render (null = practice). */
   readonly step: StepContext | null;
-  readonly category: string;
   readonly unitLabel: string;
 }
 

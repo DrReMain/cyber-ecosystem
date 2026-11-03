@@ -31,7 +31,6 @@ interface TestAttemptProps {
   readonly review: boolean;
   /** The live session context the faces render (null = practice). */
   readonly step: StepContext | null;
-  readonly category: string;
   readonly unitLabel: string;
   readonly onRetry: () => void;
 }
@@ -151,7 +150,6 @@ export function TestAttempt({
   matchSessionId,
   review,
   step,
-  category,
   unitLabel,
   onRetry,
 }: Readonly<TestAttemptProps>) {
@@ -306,7 +304,6 @@ export function TestAttempt({
 
       {phase === "intro" && (
         <IntroFace
-          category={category}
           introduction={introduction}
           onBack={backToFlow}
           onStart={startRun}

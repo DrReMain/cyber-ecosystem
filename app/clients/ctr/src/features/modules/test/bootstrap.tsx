@@ -107,7 +107,6 @@ export function TestBootstrap({ id, code, fallbackName, review }: Readonly<TestB
   const durationSeconds = config?.durationSeconds || test?.durationSeconds || 30;
   return (
     <TestRun
-      category={test?.category ?? ""}
       durationSeconds={durationSeconds}
       engineParams={config?.engineParams ?? {}}
       gameModule={gameModule}

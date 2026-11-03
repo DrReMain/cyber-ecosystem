@@ -11,24 +11,24 @@
 
 | 段 | 面 | 原型→重建 | 校对点(三源断言) | 态 |
 |---|---|---|---|---|
-| A1 | 登录 | login.html→/login | tab 序/默认验证码;微信腿 UA 态(✅G-005 已证);协议勾选门槛+全选;错误行;忘记密码腿 | 待 |
-| A2 | 昵称步 | profile-nickname→/profile/setup/nickname | 文案逐字;校验口径;跳过态 | 待 |
-| A3 | 年龄步 | profile-age→/profile/setup/age | 文案逐字;年龄线(合规配置真源);补填闭环 | 待 |
-| A4 | 偏好步 | profile-setup→/profile/setup/games | 文案逐字;三步编排序;完成去向(D-BD=/match) | 待 |
-| A5 | 年龄门槛 | age-required→/age-required | 触发条件;文案;去向 | 待 |
-| A6 | 协议壳 | agreement→/agreement/{user,privacy} | 版本行真源(E9 已落);面布局 vs 原型壳 | 待 |
+| A1 | 登录 | login.html→/login | 全字面逐字过(含页脚公司/ICP 带「备」/客服邮箱);UA 态=G-005;门槛/全选=E9 复走查毕 | 毕 |
+| A2 | 昵称步 | profile-nickname→/profile/setup/nickname | 逐字过;观察=规则块蒸馏(原型含设计注记文字非用户文案,重建两行用户面)+max 措辞同口径简化 | 毕 |
+| A3 | 年龄步 | profile-age→/profile/setup/age | 逐字过;性别 hint 后半句缺=10-30 裁剔除(代码注在案);**年龄段双轨缺块=P11 在册票**(契约单轨 vs 原型双轨,ljr 待裁)交叉引用不另立 | 毕(挂 P11) |
+| A4 | 偏好步 | profile-setup→/profile/setup/games | 逐字过;④半角问号(已修);⑤权重×1.5 子句缺=服务端无实现 | 毕(④⑤) |
+| A5 | 年龄门槛 | age-required→/age-required | 全落含退出说明逐字 | 毕 |
+| A6 | 协议壳 | agreement→/agreement/{user,privacy} | E9 走查毕+版本行真源+演示文本注携带;一壳 vs 两路由=矩阵在册 | 毕 |
 | B1 | 首页 | home.html→/ | 续测卡(✅R2);最近成绩/数据统计/报告中心入口逐字全过;会员 greet=Q1-① | 毕(①) |
 | B2 | 编排列表 | match-guide→/match | 形态+字面全过(PM-9/12 裁已吸收;剩N次收据=E7 增强) | 毕 |
 | B3 | 类型选择 | match-genre-pick→/match/pick | tie/normal/empty 三态+toast 逐字全过;推荐角标=登记增强 | 毕 |
 | B4 | 切换确认 | match-switch-confirm→/match/switch | 逐字全过(rule2 分歧=G-208 N1 已注册) | 毕 |
 | B5 | 前须知 | test-guide→/match/guide | 16/17 逐字全过;rule5 过期语义=Q1-② | 毕(②) |
-| C1 | 单项介绍 | test-intro→/test/$code intro | 能力名/介绍文/开始钮;开始前守卫 | 待 |
-| C2 | 测试中 | test-running→running 态 | 题头(✅PM-9);中断/退出(**exit-confirm 形态待面检**);计时 | 待 |
+| C1 | 单项介绍 | test-intro→/test/$code intro | 面结构+收据逐字过;**⑥introduction 种子 12/12 NULL→how-to 空盒**(客户端半边已修,种子半边入 lzx 队列) | 毕(⑥) |
+| C2 | 测试中 | test-running→running 态 | 题头=PM-9 裁毕;退出=G-208 毕;e2e 全链日跑 | 毕 |
 | C3 | 退出确认 | exit-confirm→BottomConfirmSheet | G-208 首刀闭(逐字+几何实测) | 毕 |
 | C4 | 通用态 | loading/empty/error→全局 | idiom 族分歧=Q1-③(P 票) | 裁决中 |
 | C5 | 记录页 | test-records | 矩阵行 17+block4 三态在册 | 核登记毕 |
-| D1 | 成绩面 | test-result→end/review | 活跑+回读双态(E5-f2+6b2db084+ca729f5f 刚毕=低优先复扫) | 待(低) |
-| D2 | 完成页 | test-done→/report/session/$id | 逐字;四款清单态;去向(报告/首页) | 待 |
+| D1 | 成绩面 | test-result→end/review | 低优先复扫过(E5-f2+双轨律+ca729f5f 三重验证在案) | 毕 |
+| D2 | 完成页 | test-done→/report/session/$id | E5-f2 按原型落地+走查在案 | 毕 |
 | D3 | 续测提醒 | resume-remind→/ 续测卡 | ✅R2 毕(去向差=G-208 页面片);Q1 只核在册 | 核在册 |
 
 ### 发现与处置(面级即时修;契约级入 lzx 队列)
@@ -43,3 +43,14 @@
 
 Q1 余量:A 段(login 11-01 E9 复走查毕/向导三步/age-required/agreement 壳)+C1/C2/D1/D2(近走查面,低优先独立复扫)——第二腿。
 
+
+**第二腿 11-03(A 段全+C1/C2/D1/D2)+ 用户复测轮**:Q1 清单 21 面全毕。A1/A2/A5/A6/C2/D1/D2 零新发现(E9/G-005/G-208/PM-9/E5-f2/ca729f5f 在案判定吸收);A3 双轨缺块挂 P11 在册票;④⑤⑥ 三发现+复测轮活探翻案⑥/新增⑦:
+
+| # | 面 | 断言与证据 | 级 | 处置 |
+|---|---|---|---|---|
+| Q1-④ | A4 偏好步标题 | 原型「你常玩哪些游戏？」全角;重建半角 ? | 字面 | **已修**(本轮,zh 键改全角) |
+| Q1-⑤ | A4 偏好步权重子句 | 原型 desc 含「命中偏好的能力池内权重 ×1.5」;重建缺;match 域 grep 无权重实现(抽签=类型票定池后随机) | 行为级 | 入 lzx 队列待一句裁:服务端落偏好加权(抽签权重) or 子句弃(登记分歧) |
+| Q1-⑥ | C1 介绍文种子 | test.introduction 12/12 NULL(活库实证);**首判「空盒」系误判——活探翻案:bootstrap.tsx:114 本有通用兜底句(在限定时间内,尽可能快且准确地完成每一项操作),盒从未空过**;真差=通用兜底 vs 原型 6 段能力 how-to 逐字文 | 跨端 | 客户端防御守卫已加(空文隐盒,兜底在时永不触发);**服务端半边入 lzx 队列:seed 增 introduction(文=原型 6 段逐字),兜底随之退役** |
+| Q1-⑦ | C1 身份卡类词裸出 | 活探捉获:类目词(universal/fps/moba=内部池词)直出中文面身份卡(原型身份卡无此行);unit_score_label 同未种(仅空显) | 呈现级 | **已修**(category 全链拔除:bootstrap→run→attempt→intro-face 四文件死链清;unitLabel 在场才显,原型态) |
+
+Q1 收口:审计毕,余项全在队列(①⑤⑥=lzx;②=lzx 已裁待落;P11=ljr)。回归门=ctr 门禁链+单测 129+门控 e2e 4/4(三轮全绿);**复测轮=hzypw 真登录活探**(④全角？实读/⑦universal 消失/⑥兜底句在场),教训=**判空盒前先追消费链兜底**。

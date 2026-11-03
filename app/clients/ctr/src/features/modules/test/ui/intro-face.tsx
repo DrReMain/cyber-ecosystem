@@ -19,7 +19,6 @@ const abilityBlob: Record<string, string> = {
 interface IntroFaceProps {
   readonly testName: string;
   readonly introduction: string;
-  readonly category: string;
   readonly unitLabel: string;
   readonly step: StepContext | null;
   /** The played receipt (prototype #prev): this game's session best and
@@ -39,7 +38,6 @@ interface IntroFaceProps {
 export function IntroFace({
   testName,
   introduction,
-  category,
   unitLabel,
   step,
   prevBest,
@@ -62,7 +60,10 @@ export function IntroFace({
 
   const word = step !== null ? abilityWord(step.ability) : null;
   const blob = (step !== null ? abilityBlob[step.ability] : undefined) ?? "bg-[#2563eb]";
-  const catUnit = [category, unitLabel].filter(Boolean).join(" · ");
+  // The category was a pool word (universal/fps/moba) — internal
+  // vocabulary the prototype's identity card never shows (Q1-⑦); the
+  // unit label renders only when the test row authored one.
+  const catUnit = unitLabel;
   const title = step !== null ? m.test_intro_step_title({ n: step.index + 1 }) : testName;
   // A bound step with its retake budget spent must not start a run — the
   // 30 seconds would only die at submit (ESPORTS_MATCH_RETEST_EXHAUSTED).
@@ -118,10 +119,17 @@ export function IntroFace({
                 ) : null}
               </div>
             </div>
-            <div aria-hidden className="h-[14px]" />
-            <div className="border-line bg-surface-content text-ink-muted rounded-control border px-[13px] py-3 text-[12px] leading-[1.85]">
-              {introduction}
-            </div>
+            {/* The how-to card rides the server's introduction (the seed
+                has not authored it yet — Q1-⑥); an absent text leaves the
+                identity card clean instead of an empty bordered box. */}
+            {introduction !== "" ? (
+              <>
+                <div aria-hidden className="h-[14px]" />
+                <div className="border-line bg-surface-content text-ink-muted rounded-control border px-[13px] py-3 text-[12px] leading-[1.85]">
+                  {introduction}
+                </div>
+              </>
+            ) : null}
           </div>
 
           {step !== null ? (
