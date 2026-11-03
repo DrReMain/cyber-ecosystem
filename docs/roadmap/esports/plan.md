@@ -24,7 +24,7 @@
 | 窗 | 日期 | 服务/管理线(lzx) | 精修带(hzy,分配制) | 产品线(ljr) |
 |---|---|---|---|---|
 | W3 | 11.03-11.09 | **MIG1 建**(P14 解散门开;10-30 校准「功能面定型」条件已满足:M1/M2 核心冻结,MSG-1 新表不在迁移射面) | **Q 线役启动**(D-BB;首分配 Q1=ctr 测评主链) | 行政件即办启动(就绪目标 11-10;P21/P19/PM-12/同意口径已裁 D-BC,P22 默认 A;R4② 已裁 D-BD;P7 已定稿 11-02) |
-| W4 | 11.10-11.16 | MIG1 建·续(→~11.11)→PAY2 联调+0.01 真钱闭环+全额退款(deploy 切 wechat);M2-4 trace(按已定 A 口径,S 片);**MIG1 预演**(副本 11-14 就绪即演,对账全绿门;lzx 专职 D-BB) | Q 线续(Q4;Q1-Q3 已毕 11-03 提前本窗,MR FF 合入+台账=verify/q-line.md) | P6 11-12(用户);P22 否决窗截止 11-14 |
+| W4 | 11.10-11.16 | MIG1 建·续(→~11.11)→PAY2 联调+0.01 真钱闭环+全额退款(deploy 切 wechat);**MIG1 预演**(副本 11-14 就绪即演,对账全绿门;lzx 专职 D-BB) | Q 线续(Q4;Q1-Q3 已毕 11-03 提前本窗,MR FF 合入+台账=verify/q-line.md) | P6 11-12(用户);P22 否决窗截止 11-14 |
 | W5 | 11.17-11.23 | MSG-1 契约+domain 首刀(2 天)→PAY3 合规执法+付费墙全链(P7 已定稿) | Q 线续(Q4 续/Q5 admin 面) | — |
 | W6 | 11.24-11.30 | PAY3 收尾→MSG-1 ctr+admin 面(lzx 全片 D-BB);**CP3 三腿内部核验 11-28**;cutover 准备(真实 appid 切换+上线清单) | Q 线续+上线走查配合 | P23/P20 11-28;appid+绑域信息 11-26(上线清单件) |
 | **cutover** | **12.01-12.03(力争)/12.08(保底)** | 停机切换+L4 验证+上线;旧栈停机封存 2 周(D-P);承诺保险丝 12-17 不动 | 上线值守 | 上线内容核对 |
@@ -37,7 +37,7 @@
 | M2-1 会员终态+运营三操作(首刀,10-30 用户裁;**✅ 收口 347a9ce7,10-31 走查+双轴审查毕**) | Entitlement 加 status/terminated_at(**过期=时间推导,无状态列/无每日扫描,R7**);EntitleAdminService 增 Grant/Terminate/List/Get 四 RPC;system User 消息加手机号掩码投影;admin 会员列表(全部/有效/≤7 天到期/已过期 Tab+来源筛)/详情(有效期/来源/续订史 append-only,**续费=从到期顺延 31 天追加新行**)/开通-续费-终止 Modal+五语言;**admin 菜单重构+命名对齐(G-301/302,真值=verify/admin-nav-anchor.md:原型无「电竞」组,esports 自有组按原型落位,users 族正名用户列表/用户详情;系统与合规组=骨架直接承接 D-AY 不动)**。验收=ENT_E2E 扩展用例+chrome 走查(oracle=verify/admin-member-anchor.md)+审计行核验+菜单对齐;不做=到期提醒下发/批量续费/季卡年卡数据行 | E8,PAY1 | M-L |
 | M2-2 SKU 多档+订单面(**✅ 收口 9860eb34,10-31 双轴审查+走查毕**) | admin SKU 管理(改价敏感入审计/上下架即时同步 C 端)+订单列表/详情/关闭(消费既有 OrderService 零契约增量)+解锁记录视图(去向/来源)。验收=PAY_E2E 兼走 admin 读回+O-1/2/3 断言 | PAY1,M2-1 | M |
 | M2-3 激活码全面(**✅ 收口 45c276d4,11-01 回退重审+走查毕**) | 契约增量:批次码表明细/停用(未核销即失效)/导出 CSV;admin 码表页(activation-code-detail:逐码核销人/时间+进度条≥95% 补码提示)。验收=ENT_E2E 扩展+导出走查 | E8 | M |
-| M2-4 用户详情余 Tab(**首刀两 Tab 收口 197fdbc6,11-01;余半边 trace 待 P22/messages 待 MSG-1**) | assessments=ListTestAttempts 消费(契约已在,零增量);membership=随 M2-1;trace=**P22 裁后**定数据源;messages=随 MSG-1。验收=四 Tab 真数据+O-1 断言形状 | M2-1,P22,MSG-1 | S-M |
+| M2-4 用户详情余 Tab(**首刀两 Tab 收口 197fdbc6,11-01;余半边 trace 待 P22/messages 待 MSG-1**) | assessments=ListTestAttempts 消费(契约已在,零增量);membership=随 M2-1;trace=**P22 裁后**定数据源,**11-03 用户裁:暂缓后置**(需引入新第三方依赖且相对独立,W4 不排,归 M2 余组梯次处理);messages=随 MSG-1。验收=四 Tab 真数据+O-1 断言形状 | M2-1,P22,MSG-1 | S-M |
 | E9 增量(D-AS⑥;**✅ 全收:首刀 067a89ce+余刀 32f5cf0a,11-01 走查毕**) | 协议版本管理+同意记录查询(consent 契约缺口自 H2 挂账,本片闭:versions.ts 真源化 GET /agreements/current)+compliance-config(出生采集开关/付费年龄线/提示文案,敏感二次确认+入审计)。验收=admin 三页+ctr 协议版本行真值 | H2 | M |
 
 ## D-AS 召回组(W7-W8;未完走梯③)
@@ -82,7 +82,7 @@
 | Q5 admin 已建 13 面 | 逐面对照 _nav/原型+操作审计语义+空态(O-1/2/3 断言形状) | M |
 | Q6 服务端仲裁逻辑 | order/sku/entitlement/activation 仲裁与审计行(lzx 陪跑,承重面) | M |
 
-**11-03 校准(lzx)**:Q1-Q3 毕(hzy,11-03 MR FF 合入 esports/main=aa448be1;逐项处置台账=verify/q-line.md,21 面清单+七发现/四发现逐条);lzx 复核合入时实锤 check 门红 15 条(作者链声明未过 --skip-nx-cache 复现)→已修 08721c1f(12 机械+3 复杂度纯提取,链五连绿亲见)。**lzx 队列(契约/schema 级,上线前修完,D-BB 同窗)**:①Q1-① GetProfileResponse 增会员活性(如 member_until;home greet 三态,零加跳);②Q1-② match 反推续测(用户已裁 11-03=服务端按已测结果反推剩余项不重排,rule5 文案随服务端真行为回写);③Q1-⑤ 偏好权重 ×1.5 子句(一句裁:服务端落抽签加权 or 弃子句登记分歧);④Q1-⑥ seed 增六段能力介绍文(introduction 12/12 NULL,客户端兜底随之退役);⑤Q3-① 密码组成规则服务端执法(ResetPassword 现仅 bcrypt 无组成校验;客户端半边已落);⑥Q2 两条契约微欠(E4 去趋势 CTA 无进阶判定+E1 digest 卡态键=解锁态需 digest 携解锁判定)。**ljr/P4**:E4 三配置模块(学科优势匹配/职业发展潜能/提升计划,契约无字段)。
+**11-03 校准(lzx)**:Q1-Q3 毕(hzy,11-03 MR FF 合入 esports/main=aa448be1;逐项处置台账=verify/q-line.md,21 面清单+七发现/四发现逐条);lzx 复核合入时实锤 check 门红 15 条(作者链声明未过 --skip-nx-cache 复现)→已修 08721c1f(12 机械+3 复杂度纯提取,链五连绿亲见)。**lzx 队列(契约/schema 级,上线前修完,D-BB 同窗)**:①Q1-① GetProfileResponse 增会员活性(如 member_until;home greet 三态,零加跳);②Q1-② match 反推续测 ✅ 已落 2e4d98c2(11-03,裁决的忠实翻译:编排本锁 match_session.steps,七日窗整体退役——Get/Peek/Resolve 摘窗,active 场次任意龄续用,唯一出场=走完编排或显式切换;expired 枚举留历史行不再生产;schema status 注释改义迁移 20261103123125 纯 COMMENT 已 apply;proto 五处注释随义零字段变更;ctr 七天族六键双语回写;活探=40 天老化场次同 id 续用实证);③Q1-⑤ 偏好权重 ×1.5 子句(**已裁 11-03 用户=落服务端加权**:类型票定池后命中用户偏好的能力抽取权重×1.5,原型语义忠实);④Q1-⑥ seed 增六段能力介绍文(introduction 12/12 NULL,客户端兜底随之退役);⑤Q3-① 密码组成规则服务端执法(ResetPassword 现仅 bcrypt 无组成校验;客户端半边已落);⑥Q2 两条契约微欠(E4 去趋势 CTA 无进阶判定+E1 digest 卡态键=解锁态需 digest 携解锁判定);⑦e2e fullchain finally 清理漏 match_session(已删用户的 active 孤儿场次实证,11-03)——补删一表,小件。**ljr/P4**:E4 三配置模块(学科优势匹配/职业发展潜能/提升计划,契约无字段);**ljr/法务**:隐私真文 agreement_privacy_c6_d「未完成的测评进度保留 7 天」与 Q1-② 任意龄续用相悖(11-03 lzx 报备,真文归法务车道,开发者不擅改)。
 
 ## M2 余组(梯①=上线后首迭代;**每项开工前先过对应 P 票**)
 
