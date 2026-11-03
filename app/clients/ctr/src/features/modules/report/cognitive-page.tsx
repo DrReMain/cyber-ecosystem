@@ -13,7 +13,7 @@ import { m } from "#/paraglide/messages";
 import { wireCognitiveOf } from "./cognitive";
 import { wireDigestOf } from "./digest";
 import { AbilityRadar } from "./ui/ability-radar";
-import { CompositeCard } from "./ui/composite-card";
+import { CognitiveHead } from "./ui/cognitive-head";
 import { dimensionWord, tierWord } from "./vocabulary";
 
 // The six-word core vocabulary in display order — the counters' and the
@@ -99,24 +99,13 @@ export function CognitivePage() {
           </div>
         ) : (
           <>
-            <div className="border-line bg-surface-card rounded-card border px-4 py-3 backdrop-blur-md">
-              <div className="flex items-baseline justify-between">
-                <span className="text-ink text-[12.5px] font-bold">
-                  {m.report_cognitive_dims_tested({
-                    tested: r.testedDimensions,
-                    total: r.totalDimensions,
-                  })}
-                </span>
-                {r.testedDimensions < r.totalDimensions ? (
-                  <span className="text-ink-tertiary text-[10.5px]">
-                    {m.report_cognitive_full_note()}
-                  </span>
-                ) : null}
-              </div>
-              <div className="text-ink-tertiary mt-1 text-[11px]">
-                {m.report_cognitive_abilities_covered({ covered: digest.abilities.length })}
-              </div>
-            </div>
+            <CognitiveHead
+              composite={r.composite}
+              covered={digest.abilities.length}
+              tested={r.testedDimensions}
+              tier={tier}
+              total={r.totalDimensions}
+            />
 
             {radarReady ? (
               <AbilityRadar axes={axes} mainCount={axes.length} subCount={0} />
@@ -133,8 +122,6 @@ export function CognitivePage() {
                 </div>
               </div>
             )}
-
-            <CompositeCard composite={r.composite} tier={tier} />
 
             <div className="border-line bg-surface-card rounded-card border px-4 py-3.5 backdrop-blur-md">
               <div className="text-ink text-[13px] font-bold">

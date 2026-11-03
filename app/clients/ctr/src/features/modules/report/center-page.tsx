@@ -79,7 +79,13 @@ export function CenterPage() {
       onOpen: goDigest,
     },
     {
-      desc: m.report_center_card_cognitive_desc({ covered }),
+      // The covered banner's own law: at full coverage the copy switches
+      // to the complete-report sentence instead of the fill-it nudge
+      // (prototype report-center, both the banner and this card's line).
+      desc:
+        covered >= 6
+          ? m.report_center_cognitive_full({ covered })
+          : m.report_center_card_cognitive_desc({ covered }),
       icon: "🧠",
       state: cog.access.allowed ? m.report_center_status_view() : m.report_center_status_locked(),
       title: m.report_center_card_cognitive_title(),
@@ -113,7 +119,9 @@ export function CenterPage() {
 
         <div className="border-line bg-surface-card rounded-card border px-4 py-3 backdrop-blur-md">
           <div className="text-ink-secondary text-[11.5px] leading-relaxed">
-            {m.report_center_covered({ covered, total: 6 })}
+            {covered >= 6
+              ? m.report_center_covered_full({ covered, total: 6 })
+              : m.report_center_covered({ covered, total: 6 })}
           </div>
           <div className="bg-line mt-2 h-1.5 w-full overflow-hidden rounded-full">
             <div

@@ -9,7 +9,7 @@ import {
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import type { Sku } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku_pb";
 import { listSkus } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku-SkuService_connectquery";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, useRouter } from "@tanstack/react-router";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
@@ -185,6 +185,7 @@ function reportModel(report: GetReportResponse, skus: Sku[]): ReportModel {
 export function ReportPage() {
   const { recordId } = useParams({ from: "/report/$recordId" });
   const navigate = useNavigate();
+  const router = useRouter();
   const reportQuery = useConnectQuery(getReport, { recordId });
   const skusQuery = useConnectQuery(listSkus, {});
   // The history-best bars ride the cross-session digest; a failed read
@@ -243,7 +244,19 @@ export function ReportPage() {
   return (
     <AmbientLayout>
       <div className="flex w-full flex-col gap-3 pb-6">
-        <FlowHeader onBack={() => void navigate({ to: "/match" })} title={m.report_title()} />
+        {/* The header's back follows the road the member arrived by
+            (prototype: back to the page that linked here); a direct
+            entry with no history falls to the lineup. */}
+        <FlowHeader
+          onBack={() => {
+            if (router.history.canGoBack()) {
+              router.history.back();
+            } else {
+              void navigate({ to: "/match" });
+            }
+          }}
+          title={m.report_title()}
+        />
         <CompositeCard composite={model.composite} tier={model.tier} />
         <AbilityRadar axes={model.axes} mainCount={model.mainCount} subCount={model.subCount} />
         <div className="text-ink-tertiary px-0.5 text-[11px] leading-relaxed">
@@ -263,10 +276,10 @@ export function ReportPage() {
         </div>
         <button
           className="bg-cta-practice shadow-cta-practice rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
-          onClick={() => void navigate({ to: "/match" })}
+          onClick={() => void navigate({ to: "/profile" })}
           type="button"
         >
-          {m.report_back_match()}
+          {m.report_back_profile()}
         </button>
         <FilingFooter />
       </div>

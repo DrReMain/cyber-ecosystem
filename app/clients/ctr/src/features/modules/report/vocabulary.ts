@@ -176,7 +176,10 @@ export function zoneCopyOf(abilityCn: string, pct: number | null, score: number)
   const vars = {
     ability: abilityCn,
     score: String(Math.round(score * 10) / 10),
-    pct: Math.round(pct),
+    // The wire's percentile is the beaten share; the "top X%" phrasing
+    // speaks its complement — the same inversion the composite card makes
+    // (prototype report-single analysis: 100 − pct).
+    pct: Math.round(100 - pct),
   };
   if (pct >= 85) {
     return { analysis: m.report_analysis_high(vars), advice: m.report_advice_high() };

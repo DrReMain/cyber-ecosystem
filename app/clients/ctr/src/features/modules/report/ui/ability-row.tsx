@@ -112,7 +112,7 @@ export function AbilityRow({
               </>
             ) : null
           ) : (
-            <LockLine />
+            <LockLine abilityCn={abilityCn} />
           )}
           {open ? <CmpBar best={historyBest} score={score} /> : null}
         </div>

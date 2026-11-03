@@ -3,6 +3,7 @@ import { getTrendReport } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1
 import { useNavigate } from "@tanstack/react-router";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
+import { narrowGenre } from "#/features/modules/match/vocabulary";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { m } from "#/paraglide/messages";
 import { wireTrendOf } from "./trend";
@@ -46,6 +47,8 @@ export function TrendPage() {
   }
 
   const r = wireTrendOf(trendQuery.data);
+  const genres = new Set(r.abilities.flatMap((s) => s.points.map((p) => narrowGenre(p.genre))));
+  const mixedGenres = genres.has("fps") && genres.has("moba");
 
   return (
     <AmbientLayout>
@@ -72,10 +75,7 @@ export function TrendPage() {
           />
         ) : (
           <>
-            <div className="flex items-center justify-between px-0.5">
-              <span className="text-ink-tertiary text-[11px]">
-                {m.report_trend_sessions({ n: r.sessionsTotal })}
-              </span>
+            <div className="flex items-center justify-end px-0.5">
               <span
                 className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${
                   r.advancedAccess.allowed
@@ -88,12 +88,33 @@ export function TrendPage() {
                   : m.report_trend_advanced_off()}
               </span>
             </div>
-            <div className="text-ink-tertiary px-0.5 text-[10.5px] leading-relaxed">
-              {m.report_trend_genre_legend()}
+            {/* The summary banner rides the prototype's own law: the count
+                line states itself, and a history mixing the two genres
+                earns the not-directly-comparable warning (decision ②) —
+                a single-genre history carries no banner. */}
+            <div className="border-line bg-surface-card rounded-card border px-3.5 py-3 backdrop-blur-md">
+              <div className="text-ink-secondary text-[11.5px] leading-[1.85]">
+                {m.report_trend_sessions({ n: r.sessionsTotal, k: r.abilities.length })}
+              </div>
+              {mixedGenres ? (
+                <div className="mt-1 text-[11.5px] leading-[1.85] text-[#FCD34D]">
+                  {m.report_trend_mixed()}
+                </div>
+              ) : null}
             </div>
-            {r.abilities.map((s) => (
-              <TrendChart key={s.ability} series={s} />
-            ))}
+            <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-3.5 backdrop-blur-md">
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-ink text-[13px] font-bold">
+                  {m.report_trend_base_title()}
+                </span>
+                <span className="rounded-full bg-[rgba(34,197,94,0.15)] px-2 py-0.5 text-[10px] font-bold text-status-ok">
+                  {m.report_trend_base_tag()}
+                </span>
+              </div>
+              {r.abilities.map((s) => (
+                <TrendChart key={s.ability} series={s} />
+              ))}
+            </div>
           </>
         )}
       </div>
