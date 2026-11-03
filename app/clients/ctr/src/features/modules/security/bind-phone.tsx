@@ -1,5 +1,7 @@
 import { useQuery } from "@connectrpc/connect-query";
+import type { GetProfileResponse } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile_pb";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import type { GetSecurityStatusResponse } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth_pb";
 import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
@@ -45,6 +47,23 @@ function conflictCtaLabel(offer: MergeOfferDTO): string {
     : m.security_bind_phone_merge_cta();
 }
 
+// The entry line's account half — the prototype's safety line naming the
+// account being bound into. The bind-phone caller is by definition
+// phone-less: the method reads as the wechat leg plus the no-phone note
+// unless an SMS credential already exists.
+function bindPhoneAccountLine(
+  security: GetSecurityStatusResponse | undefined,
+  profile: GetProfileResponse | undefined,
+): { method: string; nickname: string } {
+  const hasSms = (security?.credentials ?? []).some((c) => c.kind === "sms");
+  return {
+    method: hasSms
+      ? m.security_login_method_sms()
+      : `${m.security_login_method_wechat()}，${m.security_bind_phone_no_phone()}`,
+    nickname: profile?.profile?.nickname ?? m.security_nickname_unset(),
+  };
+}
+
 // Bind a phone to a wechat-born account. The preview runs
 // before any SMS is spent — an occupied phone answers with the conflict
 // card (no send, per the prototype's "no code needed" law), and an
@@ -62,12 +81,7 @@ export function BindPhonePage() {
     {},
     { staleTime: PROFILE_STALE_MS, throwOnError: false },
   );
-  const hasSms =
-    (securityQuery.data?.credentials ?? []).some((c) => c.kind === "sms");
-  const method = hasSms
-    ? m.security_login_method_sms()
-    : `${m.security_login_method_wechat()}，${m.security_bind_phone_no_phone()}`;
-  const nickname = profileQuery.data?.profile?.nickname ?? m.security_nickname_unset();
+  const { method, nickname } = bindPhoneAccountLine(securityQuery.data, profileQuery.data);
   const bind = useBindSms();
   const [preview, setPreview] = useState<Preview>(null);
   const [checking, setChecking] = useState(false);

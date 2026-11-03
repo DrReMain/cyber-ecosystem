@@ -16,6 +16,23 @@ const abilityBlob: Record<string, string> = {
   decisionEfficiency: "bg-[#1d4ed8]",
 };
 
+/** The how-to card rides the server's introduction; an absent text
+ * leaves the identity card clean instead of an empty bordered box
+ * (the seed has not authored one yet — Q1-⑥). */
+function HowToCard({ introduction }: Readonly<{ introduction: string }>) {
+  if (introduction === "") {
+    return null;
+  }
+  return (
+    <>
+      <div aria-hidden className="h-[14px]" />
+      <div className="border-line bg-surface-content text-ink-muted rounded-control border px-[13px] py-3 text-[12px] leading-[1.85]">
+        {introduction}
+      </div>
+    </>
+  );
+}
+
 interface IntroFaceProps {
   readonly testName: string;
   readonly introduction: string;
@@ -119,17 +136,7 @@ export function IntroFace({
                 ) : null}
               </div>
             </div>
-            {/* The how-to card rides the server's introduction (the seed
-                has not authored it yet — Q1-⑥); an absent text leaves the
-                identity card clean instead of an empty bordered box. */}
-            {introduction !== "" ? (
-              <>
-                <div aria-hidden className="h-[14px]" />
-                <div className="border-line bg-surface-content text-ink-muted rounded-control border px-[13px] py-3 text-[12px] leading-[1.85]">
-                  {introduction}
-                </div>
-              </>
-            ) : null}
+            <HowToCard introduction={introduction} />
           </div>
 
           {step !== null ? (

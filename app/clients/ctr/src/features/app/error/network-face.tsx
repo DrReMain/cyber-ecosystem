@@ -26,12 +26,7 @@ export function NetworkErrorFace({ homePath, http, kind, onRetry }: Readonly<Net
   return (
     <div className="w-full max-w-md">
       <div className="border-line bg-surface-card shadow-card rounded-card border px-5 py-[30px] text-center backdrop-blur-md">
-        <RadioTower
-          aria-hidden
-          className="text-ink-tertiary mx-auto"
-          size={34}
-          strokeWidth={1.5}
-        />
+        <RadioTower aria-hidden className="text-ink-tertiary mx-auto" size={34} strokeWidth={1.5} />
         <div className="text-ink mt-3 text-[14.5px] font-extrabold">
           {m.error_network_card_title()}
         </div>
@@ -40,7 +35,7 @@ export function NetworkErrorFace({ homePath, http, kind, onRetry }: Readonly<Net
           <span className="font-bold">{m.error_network_sub_keep()}</span>
           {m.error_network_sub_tail()}
         </p>
-        <div className="border-line text-ink-tertiary mt-3.5 rounded-control border px-2.75 py-2.25 text-start font-mono text-[10.5px] leading-[1.7]">
+        <div className="border-line text-ink-tertiary rounded-control mt-3.5 border px-2.75 py-2.25 text-start font-mono text-[10.5px] leading-[1.7]">
           {m.error_code()} <span dir="ltr">{`${http} · ${kind.toUpperCase()}`}</span>
         </div>
       </div>

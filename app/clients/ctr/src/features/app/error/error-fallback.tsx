@@ -1,5 +1,5 @@
-import { view } from "#/domains/error";
 import { HOME_PATH } from "#/config";
+import { view } from "#/domains/error";
 import { m } from "#/paraglide/messages";
 import { NetworkErrorFace } from "./network-face";
 

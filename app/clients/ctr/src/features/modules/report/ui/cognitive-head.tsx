@@ -27,7 +27,14 @@ export function CognitiveHead({
       <div className="flex items-center gap-4">
         <div className="relative size-28 shrink-0">
           <svg aria-hidden className="-rotate-90" viewBox="0 0 112 112">
-            <circle cx={56} cy={56} fill="none" r={46} stroke="rgba(55,65,81,.75)" strokeWidth={8} />
+            <circle
+              cx={56}
+              cy={56}
+              fill="none"
+              r={46}
+              stroke="rgba(55,65,81,.75)"
+              strokeWidth={8}
+            />
             {has ? (
               <circle
                 cx={56}

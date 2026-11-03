@@ -29,8 +29,9 @@ export function BindWechatPage() {
     {},
     { staleTime: PROFILE_STALE_MS, throwOnError: false },
   );
-  const phoneMask = (securityQuery.data?.credentials ?? []).find((c) => c.kind === "sms")
-    ?.maskedIdentifier;
+  const phoneMask = (securityQuery.data?.credentials ?? []).find(
+    (c) => c.kind === "sms",
+  )?.maskedIdentifier;
   const method = phoneMask ?? m.security_login_method_wechat();
   const nickname = profileQuery.data?.profile?.nickname ?? m.security_nickname_unset();
 

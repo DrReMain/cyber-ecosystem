@@ -157,7 +157,7 @@ test("login → wizard → match → 4 games → done → report → code unlock
       // is still the current one here — must show the earned raw under
       // the 原始分 label with the receipt, not the no-score face the
       // pre-contract era rendered for unplayed and pending alike.
-      if (!pendingReadBackChecked && !page.url().includes("red_dot")) {
+      if (!(pendingReadBackChecked || page.url().includes("red_dot"))) {
         pendingReadBackChecked = true;
         const pendingCode = page.url().split("/test/")[1]?.split("?")[0] ?? "";
         await page.goto(`/test/${pendingCode}?review=true`);

@@ -87,7 +87,11 @@ export function TrendChart({ series }: Readonly<{ series: WireTrendSeries }>) {
         })}
       </svg>
       <div className="text-ink-tertiary mt-1.5 text-[10px] tabular-nums">
-        {m.report_trend_footnote({ n: points.length, first: Math.round(first), last: Math.round(last) })}
+        {m.report_trend_footnote({
+          n: points.length,
+          first: Math.round(first),
+          last: Math.round(last),
+        })}
       </div>
     </div>
   );

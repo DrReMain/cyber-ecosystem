@@ -3,8 +3,8 @@ import { getTrendReport } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1
 import { useNavigate } from "@tanstack/react-router";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
-import { narrowGenre } from "#/features/modules/match/vocabulary";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
+import { narrowGenre } from "#/features/modules/match/vocabulary";
 import { m } from "#/paraglide/messages";
 import { wireTrendOf } from "./trend";
 import { TrendChart } from "./ui/trend-chart";
@@ -107,7 +107,7 @@ export function TrendPage() {
                 <span className="text-ink text-[13px] font-bold">
                   {m.report_trend_base_title()}
                 </span>
-                <span className="rounded-full bg-[rgba(34,197,94,0.15)] px-2 py-0.5 text-[10px] font-bold text-status-ok">
+                <span className="text-status-ok rounded-full bg-[rgba(34,197,94,0.15)] px-2 py-0.5 text-[10px] font-bold">
                   {m.report_trend_base_tag()}
                 </span>
               </div>

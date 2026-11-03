@@ -34,7 +34,9 @@ describe("the curve-pending read-back data shape", () => {
   it("the filter narrows to the visited game and the max rides the raw track", () => {
     const all = [RUNTIME_ZERO_RAW, RUNTIME_SCORED];
     expect(pendingDetailsOf(all, "flash_aiming")).toHaveLength(1);
-    expect(Math.max(...pendingDetailsOf(all, "flash_aiming").map((d) => d.rawScore ?? 0))).toBe(220);
+    expect(Math.max(...pendingDetailsOf(all, "flash_aiming").map((d) => d.rawScore ?? 0))).toBe(
+      220,
+    );
     expect(pendingDetailsOf(all, "other_game")).toHaveLength(0);
   });
 });

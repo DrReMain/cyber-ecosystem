@@ -55,7 +55,7 @@ function pwErrorOf(
   if (newPassword.length < 6) {
     return m.security_password_short();
   }
-  if (!/[a-zA-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
+  if (!(/[a-zA-Z]/.test(newPassword) && /\d/.test(newPassword))) {
     return m.security_pw_error_composition();
   }
   return newPassword !== confirmPassword ? m.security_pw_error_mismatch() : null;

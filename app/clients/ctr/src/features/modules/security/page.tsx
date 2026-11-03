@@ -1,4 +1,5 @@
 import { useQuery } from "@connectrpc/connect-query";
+import type { GetProfileResponse } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile_pb";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import type { GetSecurityStatusResponse } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth_pb";
 import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
@@ -23,6 +24,19 @@ const OK_CHIP =
 // credentials key at all. Normalize before reading.
 function boundCredentials(status: GetSecurityStatusResponse | undefined) {
   return status?.credentials ?? [];
+}
+
+// The birth row's value: the authored date, else the age-band note when
+// only the band exists (age_band rides GetProfile), else the honest
+// unfilled word.
+function birthValueOf(profile: GetProfileResponse | undefined): string {
+  const p = profile?.profile;
+  if (p?.birthYear != null && p?.birthMonth != null) {
+    return `${p.birthYear}-${String(p.birthMonth).padStart(2, "0")}`;
+  }
+  return p?.ageBand != null && p.ageBand !== ""
+    ? m.security_info_birth_band_note({ band: p.ageBand })
+    : m.security_info_unfilled();
 }
 
 export function SecurityPage() {
@@ -149,16 +163,7 @@ export function SecurityPage() {
                   : m.security_info_unfilled()
             }
           />
-          <InfoRow
-            label={m.security_info_birth()}
-            value={
-              profile?.birthYear != null && profile?.birthMonth != null
-                ? `${profile.birthYear}-${String(profile.birthMonth).padStart(2, "0")}`
-                : profile?.ageBand != null && profile.ageBand !== ""
-                  ? m.security_info_birth_band_note({ band: profile.ageBand })
-                  : m.security_info_unfilled()
-            }
-          />
+          <InfoRow label={m.security_info_birth()} value={birthValueOf(profileQuery.data)} />
           <InfoRow
             label={m.security_info_games()}
             value={
