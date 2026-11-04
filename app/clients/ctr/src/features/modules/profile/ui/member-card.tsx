@@ -1,5 +1,5 @@
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { Crown } from "lucide-react";
+import { ChevronRight, Crown } from "lucide-react";
 import { localDateOf } from "#/features/app/date";
 import { m } from "#/paraglide/messages";
 
@@ -26,17 +26,22 @@ function dayOf(value: Timestamp): string {
  * the report page's ④: the member state states the standing window off
  * member_until (GetProfile carries it — the page's own query, zero extra
  * hop), the pitch state sells the window at the catalog's price. Both
- * CTAs enter the wall; the active state's left slot stays empty until
- * the unlocked-count line lands with the member-detail slice (the digest
- * count field it reads is that slice's contract question). */
+ * CTAs enter the wall; the title row's right slot links to the benefits
+ * page, and the active state's left slot quotes the digest's all-time
+ * unlock count (null while the digest read is absent — no invented
+ * number). */
 export function ProfileMemberCard({
   memberUntil,
+  onDetail,
   onPay,
   priceYuan,
+  unlockedCount,
 }: Readonly<{
   memberUntil: Timestamp | null;
+  onDetail: () => void;
   onPay: () => void;
   priceYuan: string;
+  unlockedCount: number | null;
 }>) {
   const active = memberUntil != null;
   const until = active ? dayOf(memberUntil) : null;
@@ -52,17 +57,29 @@ export function ProfileMemberCard({
         ) : (
           <span className={MONTH_TAG}>{m.profile_member_tag_month()}</span>
         )}
-        {active ? (
-          <span className="ml-auto text-[10.5px] text-[#D8B4FE]">
-            {m.profile_member_until({ date: until ?? "" })}
-          </span>
-        ) : null}
+        <button
+          className="tap-zone ml-auto flex items-center gap-0.5 text-[10.5px] text-[#D8B4FE] active:opacity-60"
+          onClick={onDetail}
+          type="button"
+        >
+          {active ? m.profile_member_until({ date: until ?? "" }) : m.profile_member_detail()}
+          <ChevronRight aria-hidden size={11} />
+        </button>
       </div>
       <div className="text-ink-tertiary mt-2 text-[11.5px] leading-[1.75]">
         {active ? m.profile_member_desc_active() : m.profile_member_desc_pitch()}
       </div>
       <div className="mt-[11px] flex items-center justify-between">
-        {active ? null : (
+        {active ? (
+          unlockedCount !== null ? (
+            <span className="flex items-center gap-1.5 text-[11.5px] text-[#6EE7B7]">
+              <span>{m.profile_member_unlocked({ count: String(unlockedCount) })}</span>
+              <span className="rounded-full bg-[rgba(34,197,94,0.15)] px-2 py-0.5 text-[9.5px] font-semibold">
+                {m.profile_member_kept()}
+              </span>
+            </span>
+          ) : null
+        ) : (
           <span>
             <span className="text-[19px] leading-none font-black text-[#FDE047]">¥{priceYuan}</span>
             <span className="text-ink-tertiary text-[11px]">{m.profile_member_per_month()}</span>

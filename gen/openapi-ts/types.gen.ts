@@ -869,6 +869,25 @@ export type CyberEsportsV1GetAbilityDigestResponse = {
      * embeds; the base tier stays free for anyone who has tested.
      */
     trendAdvancedAccess?: CyberEsportsV1ReportAccessVerdict;
+    /**
+     * How many reports this account unlocked inside member windows — each
+     * such row is permanent, so the count is all-time, never per-period
+     * (the admin plane's per-window attribution is a different fold). The
+     * profile member card's "kept forever" count line reads it off this
+     * same call. Plain scalar: the count exists whenever the call
+     * succeeds, and the card renders a true zero as zero (a member who has
+     * tested nothing), never as unknown.
+     */
+    membershipUnlockedReports?: number;
+    /**
+     * The furthest window end among standing-status rows, live or lapsed —
+     * null only when the account never held one (an admin-terminated window
+     * folds away with its revoked status). The member page's three-state
+     * fold reads this one fact: member_until answers liveness only, and a
+     * naturally-lapsed window drops to null there while its end date lives
+     * on here.
+     */
+    lastMembershipUntil?: string;
 };
 
 export type CyberEsportsV1GetAgreementCurrentResponse = {

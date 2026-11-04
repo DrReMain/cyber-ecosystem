@@ -148,6 +148,9 @@
   "profile_member_desc_active": "Full reports auto-unlock on every test while the membership runs · past reports kept forever · growth trends / career-gap comparison and other member pages",
   "profile_member_desc_pitch": "Full reports auto-unlock with tests · past reports kept forever · growth trends / career-gap comparison and other member pages",
   "profile_member_per_month": "/mo",
+  "profile_member_detail": "Details",
+  "profile_member_unlocked": "{count} reports unlocked",
+  "profile_member_kept": "kept forever",
   "profile_member_cta_renew": "Renew membership",
   "profile_member_cta_open": "Get membership"
 }

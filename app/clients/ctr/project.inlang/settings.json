@@ -20,7 +20,8 @@
       "./messages/test/{locale}.json",
       "./messages/report/{locale}.json",
       "./messages/security/{locale}.json",
-      "./messages/pay/{locale}.json"
+      "./messages/pay/{locale}.json",
+      "./messages/member/{locale}.json"
     ]
   }
 }

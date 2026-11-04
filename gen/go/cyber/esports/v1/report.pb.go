@@ -768,6 +768,21 @@ type GetAbilityDigestResponse struct {
 	// advanced/base tag reads this, the same verdict the trend face itself
 	// embeds; the base tier stays free for anyone who has tested.
 	TrendAdvancedAccess *ReportAccessVerdict `protobuf:"bytes,7,opt,name=trend_advanced_access,json=trendAdvancedAccess,proto3" json:"trend_advanced_access,omitempty"`
+	// How many reports this account unlocked inside member windows — each
+	// such row is permanent, so the count is all-time, never per-period
+	// (the admin plane's per-window attribution is a different fold). The
+	// profile member card's "kept forever" count line reads it off this
+	// same call. Plain scalar: the count exists whenever the call
+	// succeeds, and the card renders a true zero as zero (a member who has
+	// tested nothing), never as unknown.
+	MembershipUnlockedReports int32 `protobuf:"varint,8,opt,name=membership_unlocked_reports,json=membershipUnlockedReports,proto3" json:"membership_unlocked_reports,omitempty"`
+	// The furthest window end among standing-status rows, live or lapsed —
+	// null only when the account never held one (an admin-terminated window
+	// folds away with its revoked status). The member page's three-state
+	// fold reads this one fact: member_until answers liveness only, and a
+	// naturally-lapsed window drops to null there while its end date lives
+	// on here.
+	LastMembershipUntil *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=last_membership_until,json=lastMembershipUntil,proto3" json:"last_membership_until,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -847,6 +862,20 @@ func (x *GetAbilityDigestResponse) GetReportAccess() *ReportAccessVerdict {
 func (x *GetAbilityDigestResponse) GetTrendAdvancedAccess() *ReportAccessVerdict {
 	if x != nil {
 		return x.TrendAdvancedAccess
+	}
+	return nil
+}
+
+func (x *GetAbilityDigestResponse) GetMembershipUnlockedReports() int32 {
+	if x != nil {
+		return x.MembershipUnlockedReports
+	}
+	return 0
+}
+
+func (x *GetAbilityDigestResponse) GetLastMembershipUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastMembershipUntil
 	}
 	return nil
 }
@@ -2160,7 +2189,7 @@ const file_cyber_esports_v1_report_proto_rawDesc = "" +
 	"percentile\x12J\n" +
 	"\x12prev_session_score\x18\a \x01(\v2\x1c.google.protobuf.DoubleValueR\x10prevSessionScore\x12J\n" +
 	"\x12history_best_score\x18\b \x01(\v2\x1c.google.protobuf.DoubleValueR\x10historyBestScore\"\x19\n" +
-	"\x17GetAbilityDigestRequest\"\xb4\x03\n" +
+	"\x17GetAbilityDigestRequest\"\xc4\x04\n" +
 	"\x18GetAbilityDigestResponse\x12%\n" +
 	"\x0esessions_total\x18\x01 \x01(\x05R\rsessionsTotal\x12!\n" +
 	"\fsessions_fps\x18\x02 \x01(\x05R\vsessionsFps\x12#\n" +
@@ -2168,7 +2197,9 @@ const file_cyber_esports_v1_report_proto_rawDesc = "" +
 	"\tabilities\x18\x04 \x03(\v2#.cyber.esports.v1.DigestAbilityLineR\tabilities\x12?\n" +
 	"\bsessions\x18\x05 \x03(\v2#.cyber.esports.v1.DigestSessionLineR\bsessions\x12J\n" +
 	"\rreport_access\x18\x06 \x01(\v2%.cyber.esports.v1.ReportAccessVerdictR\freportAccess\x12Y\n" +
-	"\x15trend_advanced_access\x18\a \x01(\v2%.cyber.esports.v1.ReportAccessVerdictR\x13trendAdvancedAccess\"\xae\x02\n" +
+	"\x15trend_advanced_access\x18\a \x01(\v2%.cyber.esports.v1.ReportAccessVerdictR\x13trendAdvancedAccess\x12>\n" +
+	"\x1bmembership_unlocked_reports\x18\b \x01(\x05R\x19membershipUnlockedReports\x12N\n" +
+	"\x15last_membership_until\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\x13lastMembershipUntil\"\xae\x02\n" +
 	"\x11DigestAbilityLine\x12\x18\n" +
 	"\aability\x18\x01 \x01(\tR\aability\x12\x1d\n" +
 	"\n" +
@@ -2373,44 +2404,45 @@ var file_cyber_esports_v1_report_proto_depIdxs = []int32{
 	11, // 19: cyber.esports.v1.GetAbilityDigestResponse.sessions:type_name -> cyber.esports.v1.DigestSessionLine
 	15, // 20: cyber.esports.v1.GetAbilityDigestResponse.report_access:type_name -> cyber.esports.v1.ReportAccessVerdict
 	15, // 21: cyber.esports.v1.GetAbilityDigestResponse.trend_advanced_access:type_name -> cyber.esports.v1.ReportAccessVerdict
-	28, // 22: cyber.esports.v1.DigestAbilityLine.best_grade:type_name -> google.protobuf.StringValue
-	29, // 23: cyber.esports.v1.DigestAbilityLine.best_percentile:type_name -> google.protobuf.DoubleValue
-	30, // 24: cyber.esports.v1.DigestAbilityLine.last_at:type_name -> google.protobuf.Timestamp
-	30, // 25: cyber.esports.v1.DigestSessionLine.created_at:type_name -> google.protobuf.Timestamp
-	28, // 26: cyber.esports.v1.DigestSessionLine.anchor_record_id:type_name -> google.protobuf.StringValue
-	1,  // 27: cyber.esports.v1.ReportAbility.confidence:type_name -> cyber.esports.v1.PeerConfidence
-	27, // 28: cyber.esports.v1.ReportComparison.deltas:type_name -> cyber.esports.v1.ReportComparison.Delta
-	31, // 29: cyber.esports.v1.ReportAccessVerdict.reason:type_name -> cyber.esports.v1.ReportAccessReason
-	15, // 30: cyber.esports.v1.GetCognitiveReportResponse.access:type_name -> cyber.esports.v1.ReportAccessVerdict
-	18, // 31: cyber.esports.v1.GetCognitiveReportResponse.dimensions:type_name -> cyber.esports.v1.CognitiveDimension
-	29, // 32: cyber.esports.v1.GetCognitiveReportResponse.composite:type_name -> google.protobuf.DoubleValue
-	0,  // 33: cyber.esports.v1.GetCognitiveReportResponse.tier:type_name -> cyber.esports.v1.ReportTier
-	15, // 34: cyber.esports.v1.GetCognitiveReportResponse.trend_advanced_access:type_name -> cyber.esports.v1.ReportAccessVerdict
-	0,  // 35: cyber.esports.v1.CognitiveDimension.tier:type_name -> cyber.esports.v1.ReportTier
-	21, // 36: cyber.esports.v1.GetTrendReportResponse.abilities:type_name -> cyber.esports.v1.TrendAbilitySeries
-	15, // 37: cyber.esports.v1.GetTrendReportResponse.advanced_access:type_name -> cyber.esports.v1.ReportAccessVerdict
-	22, // 38: cyber.esports.v1.TrendAbilitySeries.points:type_name -> cyber.esports.v1.TrendPoint
-	30, // 39: cyber.esports.v1.TrendPoint.at:type_name -> google.protobuf.Timestamp
-	15, // 40: cyber.esports.v1.GetCareerReportResponse.access:type_name -> cyber.esports.v1.ReportAccessVerdict
-	25, // 41: cyber.esports.v1.GetCareerReportResponse.recommendations:type_name -> cyber.esports.v1.CareerRecommendation
-	26, // 42: cyber.esports.v1.GetCareerReportResponse.improvements:type_name -> cyber.esports.v1.CareerImprovement
-	2,  // 43: cyber.esports.v1.ReportService.GetReport:input_type -> cyber.esports.v1.GetReportRequest
-	4,  // 44: cyber.esports.v1.ReportService.GetSessionReport:input_type -> cyber.esports.v1.GetSessionReportRequest
-	8,  // 45: cyber.esports.v1.ReportService.GetAbilityDigest:input_type -> cyber.esports.v1.GetAbilityDigestRequest
-	16, // 46: cyber.esports.v1.ReportService.GetCognitiveReport:input_type -> cyber.esports.v1.GetCognitiveReportRequest
-	19, // 47: cyber.esports.v1.ReportService.GetTrendReport:input_type -> cyber.esports.v1.GetTrendReportRequest
-	23, // 48: cyber.esports.v1.ReportService.GetCareerReport:input_type -> cyber.esports.v1.GetCareerReportRequest
-	3,  // 49: cyber.esports.v1.ReportService.GetReport:output_type -> cyber.esports.v1.GetReportResponse
-	5,  // 50: cyber.esports.v1.ReportService.GetSessionReport:output_type -> cyber.esports.v1.GetSessionReportResponse
-	9,  // 51: cyber.esports.v1.ReportService.GetAbilityDigest:output_type -> cyber.esports.v1.GetAbilityDigestResponse
-	17, // 52: cyber.esports.v1.ReportService.GetCognitiveReport:output_type -> cyber.esports.v1.GetCognitiveReportResponse
-	20, // 53: cyber.esports.v1.ReportService.GetTrendReport:output_type -> cyber.esports.v1.GetTrendReportResponse
-	24, // 54: cyber.esports.v1.ReportService.GetCareerReport:output_type -> cyber.esports.v1.GetCareerReportResponse
-	49, // [49:55] is the sub-list for method output_type
-	43, // [43:49] is the sub-list for method input_type
-	43, // [43:43] is the sub-list for extension type_name
-	43, // [43:43] is the sub-list for extension extendee
-	0,  // [0:43] is the sub-list for field type_name
+	30, // 22: cyber.esports.v1.GetAbilityDigestResponse.last_membership_until:type_name -> google.protobuf.Timestamp
+	28, // 23: cyber.esports.v1.DigestAbilityLine.best_grade:type_name -> google.protobuf.StringValue
+	29, // 24: cyber.esports.v1.DigestAbilityLine.best_percentile:type_name -> google.protobuf.DoubleValue
+	30, // 25: cyber.esports.v1.DigestAbilityLine.last_at:type_name -> google.protobuf.Timestamp
+	30, // 26: cyber.esports.v1.DigestSessionLine.created_at:type_name -> google.protobuf.Timestamp
+	28, // 27: cyber.esports.v1.DigestSessionLine.anchor_record_id:type_name -> google.protobuf.StringValue
+	1,  // 28: cyber.esports.v1.ReportAbility.confidence:type_name -> cyber.esports.v1.PeerConfidence
+	27, // 29: cyber.esports.v1.ReportComparison.deltas:type_name -> cyber.esports.v1.ReportComparison.Delta
+	31, // 30: cyber.esports.v1.ReportAccessVerdict.reason:type_name -> cyber.esports.v1.ReportAccessReason
+	15, // 31: cyber.esports.v1.GetCognitiveReportResponse.access:type_name -> cyber.esports.v1.ReportAccessVerdict
+	18, // 32: cyber.esports.v1.GetCognitiveReportResponse.dimensions:type_name -> cyber.esports.v1.CognitiveDimension
+	29, // 33: cyber.esports.v1.GetCognitiveReportResponse.composite:type_name -> google.protobuf.DoubleValue
+	0,  // 34: cyber.esports.v1.GetCognitiveReportResponse.tier:type_name -> cyber.esports.v1.ReportTier
+	15, // 35: cyber.esports.v1.GetCognitiveReportResponse.trend_advanced_access:type_name -> cyber.esports.v1.ReportAccessVerdict
+	0,  // 36: cyber.esports.v1.CognitiveDimension.tier:type_name -> cyber.esports.v1.ReportTier
+	21, // 37: cyber.esports.v1.GetTrendReportResponse.abilities:type_name -> cyber.esports.v1.TrendAbilitySeries
+	15, // 38: cyber.esports.v1.GetTrendReportResponse.advanced_access:type_name -> cyber.esports.v1.ReportAccessVerdict
+	22, // 39: cyber.esports.v1.TrendAbilitySeries.points:type_name -> cyber.esports.v1.TrendPoint
+	30, // 40: cyber.esports.v1.TrendPoint.at:type_name -> google.protobuf.Timestamp
+	15, // 41: cyber.esports.v1.GetCareerReportResponse.access:type_name -> cyber.esports.v1.ReportAccessVerdict
+	25, // 42: cyber.esports.v1.GetCareerReportResponse.recommendations:type_name -> cyber.esports.v1.CareerRecommendation
+	26, // 43: cyber.esports.v1.GetCareerReportResponse.improvements:type_name -> cyber.esports.v1.CareerImprovement
+	2,  // 44: cyber.esports.v1.ReportService.GetReport:input_type -> cyber.esports.v1.GetReportRequest
+	4,  // 45: cyber.esports.v1.ReportService.GetSessionReport:input_type -> cyber.esports.v1.GetSessionReportRequest
+	8,  // 46: cyber.esports.v1.ReportService.GetAbilityDigest:input_type -> cyber.esports.v1.GetAbilityDigestRequest
+	16, // 47: cyber.esports.v1.ReportService.GetCognitiveReport:input_type -> cyber.esports.v1.GetCognitiveReportRequest
+	19, // 48: cyber.esports.v1.ReportService.GetTrendReport:input_type -> cyber.esports.v1.GetTrendReportRequest
+	23, // 49: cyber.esports.v1.ReportService.GetCareerReport:input_type -> cyber.esports.v1.GetCareerReportRequest
+	3,  // 50: cyber.esports.v1.ReportService.GetReport:output_type -> cyber.esports.v1.GetReportResponse
+	5,  // 51: cyber.esports.v1.ReportService.GetSessionReport:output_type -> cyber.esports.v1.GetSessionReportResponse
+	9,  // 52: cyber.esports.v1.ReportService.GetAbilityDigest:output_type -> cyber.esports.v1.GetAbilityDigestResponse
+	17, // 53: cyber.esports.v1.ReportService.GetCognitiveReport:output_type -> cyber.esports.v1.GetCognitiveReportResponse
+	20, // 54: cyber.esports.v1.ReportService.GetTrendReport:output_type -> cyber.esports.v1.GetTrendReportResponse
+	24, // 55: cyber.esports.v1.ReportService.GetCareerReport:output_type -> cyber.esports.v1.GetCareerReportResponse
+	50, // [50:56] is the sub-list for method output_type
+	44, // [44:50] is the sub-list for method input_type
+	44, // [44:44] is the sub-list for extension type_name
+	44, // [44:44] is the sub-list for extension extendee
+	0,  // [0:44] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_report_proto_init() }

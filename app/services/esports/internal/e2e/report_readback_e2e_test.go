@@ -327,6 +327,11 @@ func TestReportReadBackE2E(t *testing.T) {
 	if d.TrendAdvancedAllowed || d.TrendAdvancedReason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_NO_ENTITLEMENT {
 		t.Fatalf("digest trend gate: allowed=%v reason=%v", d.TrendAdvancedAllowed, d.TrendAdvancedReason)
 	}
+	// The member plane's two facts on a never-member: zero unlocks, no
+	// window end to quote.
+	if d.MembershipUnlockedReports != 0 || d.LastMembershipUntil != nil {
+		t.Fatalf("digest member facts on never-member: count=%d until=%v", d.MembershipUnlockedReports, d.LastMembershipUntil)
+	}
 	best := make(map[string]report.DigestAbilityRow, len(d.Abilities))
 	for _, a := range d.Abilities {
 		best[a.Ability] = a

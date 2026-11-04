@@ -192,6 +192,7 @@ function retrySearchOf(
 // the parent only decides which face exists.
 function ResultFace({
   onHome,
+  onMember,
   onRetry,
   onView,
   order,
@@ -200,6 +201,7 @@ function ResultFace({
   verdict,
 }: Readonly<{
   onHome: () => void;
+  onMember: () => void;
   onRetry: () => void;
   onView: () => void;
   order: WireResultOrder;
@@ -263,6 +265,14 @@ function ResultFace({
         >
           {m.pay_result_btn_home()}
         </Button>
+        {verdict.kind === "member" ? (
+          <Button
+            className="bg-surface-input text-ink-secondary w-full rounded-[12px] border-[1.5px] border-[#4B5563] py-[14px] text-[15px] font-medium active:opacity-80"
+            onPress={onMember}
+          >
+            {m.pay_result_btn_member()}
+          </Button>
+        ) : null}
 
         <div className="text-ink-tertiary text-center text-[10.5px] leading-[1.7]">
           {m.pay_result_note()}
@@ -350,6 +360,7 @@ export function PayResultPage() {
   return (
     <ResultFace
       onHome={goHome}
+      onMember={() => void navigate({ to: "/member" })}
       onRetry={() =>
         void navigate({
           to: "/pay",

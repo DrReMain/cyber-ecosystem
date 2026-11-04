@@ -18,7 +18,7 @@ import { TabBar } from "#/features/app/tabbar";
 import { clearWechatProfile } from "#/features/app/wechat-profile";
 import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { broadcastSessionKick } from "#/features/auth/session-kick";
-import { latestScoredOf, wireDigestOf } from "#/features/modules/report/digest";
+import { latestScoredOf, type WireDigest, wireDigestOf } from "#/features/modules/report/digest";
 import { priceYuanOf } from "#/features/modules/report/vocabulary";
 import { m } from "#/paraglide/messages";
 import { logoutFn } from "./logout.fn";
@@ -37,6 +37,13 @@ const overviewOrbs: readonly AmbientOrb[] = [
   { className: "top-[-70px] left-[-60px] size-[240px]", tone: "purple" },
   { className: "bottom-[-50px] right-[-60px] size-[200px]", tone: "cyan" },
 ];
+
+// The digest's all-time unlock count — null while the digest read is
+// absent, so the member card hides its count line rather than inventing
+// a number.
+function unlockedCountOf(digest: WireDigest | null): number | null {
+  return digest !== null ? digest.membershipUnlockedReports : null;
+}
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -126,11 +133,15 @@ export function ProfilePage() {
             the member_until the page's own profile query carries: the
             member state states the standing window, the pitch state sells
             it at the catalog price — both CTAs enter the wall, which picks
-            the renewal or dual face off the same window fact. */}
+            the renewal or dual face off the same window fact; the digest
+            the page already reads carries the active state's unlock
+            count. */}
         <ProfileMemberCard
           memberUntil={profileQuery.data?.memberUntil ?? null}
+          onDetail={() => void navigate({ to: "/member" })}
           onPay={() => void navigate({ to: "/pay", search: { from: "/profile" } })}
           priceYuan={memberYuan}
+          unlockedCount={unlockedCountOf(digest)}
         />
 
         {digest !== null ? <AbilityOverviewCard rows={overviewRowsOf(digest)} /> : null}

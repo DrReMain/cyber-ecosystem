@@ -54,6 +54,13 @@ export interface WireDigest {
   // renders from this one call.
   reportAccess: WireAccessVerdict;
   trendAdvancedAccess: WireAccessVerdict;
+  // The member plane's two facts: the all-time count of reports unlocked
+  // inside member windows (each permanent) and the furthest window end
+  // among standing rows — live or lapsed, undefined only when never a
+  // member. The profile card's count line and the member page's
+  // three-state fold read them off this one call.
+  membershipUnlockedReports: number;
+  lastMembershipUntil: string | undefined;
 }
 
 // The single narrowing point. The generated type claims the WKT message
@@ -71,6 +78,8 @@ export function wireDigestOf(data: unknown): WireDigest {
       sessions: [],
       reportAccess: { allowed: false, reason: undefined },
       trendAdvancedAccess: { allowed: false, reason: undefined },
+      membershipUnlockedReports: 0,
+      lastMembershipUntil: undefined,
     };
   }
   const d = data as Partial<WireDigest> & {
@@ -91,6 +100,9 @@ export function wireDigestOf(data: unknown): WireDigest {
       allowed: d.trendAdvancedAccess?.allowed === true,
       reason: d.trendAdvancedAccess?.reason,
     },
+    membershipUnlockedReports: d.membershipUnlockedReports ?? 0,
+    lastMembershipUntil:
+      typeof d.lastMembershipUntil === "string" ? d.lastMembershipUntil : undefined,
   };
 }
 

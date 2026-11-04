@@ -8,7 +8,7 @@ import {
 import { listSkus } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku-SkuService_connectquery";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
@@ -243,15 +243,21 @@ function qrActionsOf(onCheck: () => void, onCancel: () => void): SheetAction[] {
 }
 
 /** 态②, the slice's own subject: renewal only — an active window hides
- * the single unlock entirely. The 会员权益与规则 link lands with the
- * member-detail page (its owning slice); a dead link is the one thing
- * this wall never shows. */
+ * the single unlock entirely. Below the green button the P7 draft's text
+ * link hands off to the benefits page. */
 function RenewalFace({
   disabled,
+  onDetail,
   onPay,
   price,
   untilDate,
-}: Readonly<{ disabled: boolean; onPay: () => void; price: string; untilDate: string }>) {
+}: Readonly<{
+  disabled: boolean;
+  onDetail: () => void;
+  onPay: () => void;
+  price: string;
+  untilDate: string;
+}>) {
   return (
     <>
       <StateBanner tag={m.pay_member_tag()} text={m.pay_member_until({ date: untilDate })} />
@@ -270,6 +276,14 @@ function RenewalFace({
       >
         {m.pay_act_renew({ price })}
       </Button>
+      <button
+        className="tap-zone flex w-full items-center justify-center gap-0.5 text-[11px] text-[#93C5FD] active:opacity-60"
+        onClick={onDetail}
+        type="button"
+      >
+        {m.pay_benefit_link()}
+        <ChevronRight aria-hidden size={11} />
+      </button>
     </>
   );
 }
@@ -507,6 +521,7 @@ function WallBody({
   faces,
   onBackfill,
   onBackOrHome,
+  onDetail,
   onHome,
   onPay,
   pending,
@@ -516,6 +531,7 @@ function WallBody({
   faces: ReturnType<typeof purchaseFaces>;
   onBackfill: () => void;
   onBackOrHome: () => void;
+  onDetail: () => void;
   onHome: () => void;
   onPay: (kind: PurchaseKind) => void;
   pending: boolean;
@@ -549,6 +565,7 @@ function WallBody({
     return (
       <RenewalFace
         disabled={faces.member.row === undefined || pending}
+        onDetail={onDetail}
         onPay={() => onPay("member")}
         price={faces.member.yuan}
         untilDate={wall.untilDate}
@@ -624,6 +641,7 @@ export function PayConfirmPage() {
           faces={faces}
           onBackfill={() => void navigate({ to: "/age-required" })}
           onBackOrHome={backOrHome}
+          onDetail={() => void navigate({ to: "/member" })}
           onHome={() => void navigate({ to: "/" })}
           onPay={payWith}
           pending={flow.createOrderMut.isPending}

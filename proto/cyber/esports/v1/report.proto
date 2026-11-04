@@ -251,6 +251,21 @@ message GetAbilityDigestResponse {
   // advanced/base tag reads this, the same verdict the trend face itself
   // embeds; the base tier stays free for anyone who has tested.
   ReportAccessVerdict trend_advanced_access = 7;
+  // How many reports this account unlocked inside member windows — each
+  // such row is permanent, so the count is all-time, never per-period
+  // (the admin plane's per-window attribution is a different fold). The
+  // profile member card's "kept forever" count line reads it off this
+  // same call. Plain scalar: the count exists whenever the call
+  // succeeds, and the card renders a true zero as zero (a member who has
+  // tested nothing), never as unknown.
+  int32 membership_unlocked_reports = 8;
+  // The furthest window end among standing-status rows, live or lapsed —
+  // null only when the account never held one (an admin-terminated window
+  // folds away with its revoked status). The member page's three-state
+  // fold reads this one fact: member_until answers liveness only, and a
+  // naturally-lapsed window drops to null there while its end date lives
+  // on here.
+  google.protobuf.Timestamp last_membership_until = 9;
 }
 
 message DigestAbilityLine {

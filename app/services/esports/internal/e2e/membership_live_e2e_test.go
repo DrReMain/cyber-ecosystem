@@ -24,6 +24,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/entitleadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
+	"cyber-ecosystem/app/services/esports/internal/module/report"
 	"cyber-ecosystem/app/services/esports/internal/module/sku"
 	"cyber-ecosystem/app/services/esports/internal/platform"
 	"cyber-ecosystem/app/services/esports/internal/shared"
@@ -223,6 +224,50 @@ func TestMembershipLiveE2E(t *testing.T) {
 	}
 	if settled.Facts.PeriodCount != 2 || !settled.Facts.ExpiresAt.After(shortExpiry) {
 		t.Fatalf("fold must answer with the furthest live window, not the newest row: %+v", settled.Facts)
+	}
+
+	// The digest's member facts: the count is all-time (userA's unlock
+	// survives its window's termination), the window end keeps naturally
+	// lapsed rows while terminated ones fold away with the revocation.
+	// userC's lapsed window is planted direct — the hand grant path cannot
+	// produce a past expiry — and it carries one permanent unlock, so the
+	// pair the contract promises (a lapsed window that keeps its end date
+	// beside an all-time count) is pinned on one member, not composed
+	// from the terminated arm.
+	const userC = "meme2euser0000000003"
+	if err := db.Entitlement.Create().
+		SetUserID(userC).
+		SetScopeKind(shared.ScopeMembership).
+		SetExpiresAt(time.Now().Add(-48 * time.Hour)).
+		SetSource("E2E-LAPSED").
+		Exec(userCtx); err != nil {
+		t.Fatalf("lapsed row: %v", err)
+	}
+	recordC := "meme2erecord0000003"
+	if err := entRP.Grant(entSubject(userC), &entitle.EntitlementGrant{
+		UserID: userC, ScopeKind: shared.ScopeTrial, ScopeRef: &recordC, Source: shared.SourceMembership,
+	}); err != nil {
+		t.Fatalf("lapsed member unlock grant: %v", err)
+	}
+	reportUC := report.NewReportUC(logger, pf, report.NewRecordBoardRP(logger, pf), report.NewSnapshotRP(logger, pf),
+		entRP, entitle.NewReportPolicyRP(logger, pf), profile.NewProfileRP(logger, pf), bootstrap.NewEventSubscriptions(logger))
+	digestOf := func(userID string) *report.AbilityDigest {
+		t.Helper()
+		d, derr := reportUC.GetAbilityDigest(entSubject(userID))
+		if derr != nil {
+			t.Fatalf("digest %s: %v", userID, derr)
+		}
+		return d
+	}
+	if d := digestOf(userB); d.MembershipUnlockedReports != 1 || d.LastMembershipUntil == nil || !d.LastMembershipUntil.After(time.Now()) {
+		t.Fatalf("digest live member: count=%d until=%v", d.MembershipUnlockedReports, d.LastMembershipUntil)
+	}
+	da := digestOf(userA)
+	if da.MembershipUnlockedReports != 1 || da.LastMembershipUntil != nil {
+		t.Fatalf("digest terminated member: count=%d until=%v (unlocks are all-time, the window folds away)", da.MembershipUnlockedReports, da.LastMembershipUntil)
+	}
+	if d := digestOf(userC); d.MembershipUnlockedReports != 1 || d.LastMembershipUntil == nil || !d.LastMembershipUntil.Before(time.Now()) {
+		t.Fatalf("digest lapsed member: count=%d until=%v (a lapsed window keeps its end date, the unlock survives it)", d.MembershipUnlockedReports, d.LastMembershipUntil)
 	}
 }
 

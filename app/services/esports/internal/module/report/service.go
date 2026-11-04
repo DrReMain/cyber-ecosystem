@@ -119,6 +119,8 @@ func (s *ReportService) GetAbilityDigest(ctx context.Context, _ *esportspb.GetAb
 		TrendAdvancedAccess: &esportspb.ReportAccessVerdict{
 			Allowed: d.TrendAdvancedAllowed, Reason: d.TrendAdvancedReason,
 		},
+		MembershipUnlockedReports: utils.ConvNum[int32](d.MembershipUnlockedReports),
+		LastMembershipUntil:       utils.ToTimestamp(d.LastMembershipUntil),
 	}, nil
 }
 

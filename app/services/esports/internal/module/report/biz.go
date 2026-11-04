@@ -302,6 +302,12 @@ type AbilityDigest struct {
 	ReportReason         esportspb.ReportAccessReason
 	TrendAdvancedAllowed bool
 	TrendAdvancedReason  esportspb.ReportAccessReason
+	// The member plane's two facts, same call: the all-time count of
+	// reports unlocked inside member windows (each row permanent) and the
+	// furthest window end among standing rows, live or lapsed — the
+	// profile card's count line and the member page's three-state fold.
+	MembershipUnlockedReports int
+	LastMembershipUntil       *time.Time
 }
 
 type CognitiveReport struct {
@@ -793,6 +799,30 @@ func (uc *ReportUC) GetAbilityDigest(ctx context.Context) (*AbilityDigest, error
 			row.Anchor = &id
 		}
 		d.Sessions = append(d.Sessions, row)
+	}
+	// The member plane's two facts. The unlock count is all-time — each
+	// membership-sourced row is permanent, window liveness never rides it.
+	// The window fold keeps naturally-lapsed rows (member_until would drop
+	// a lapsed window to nil, and the member page's expired face still
+	// needs the date it ended) while terminated rows fold away with the
+	// revocation that ended them early.
+	if unlocks, uerr := uc.entRP.ListMembershipUnlocks(ctx, []string{subject.UserID}); uerr != nil {
+		return nil, uerr
+	} else {
+		d.MembershipUnlockedReports = len(unlocks)
+	}
+	if memberRows, merr := uc.entRP.ListMembershipRows(ctx, []string{subject.UserID}); merr != nil {
+		return nil, merr
+	} else {
+		for _, row := range memberRows {
+			if row.Status != shared.StatusActive || row.ExpiresAt == nil {
+				continue
+			}
+			if d.LastMembershipUntil == nil || row.ExpiresAt.After(*d.LastMembershipUntil) {
+				end := *row.ExpiresAt
+				d.LastMembershipUntil = &end
+			}
+		}
 	}
 	return d, nil
 }
