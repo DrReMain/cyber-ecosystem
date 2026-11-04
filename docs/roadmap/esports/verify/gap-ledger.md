@@ -78,8 +78,23 @@ E10-a 复对账(10-28,live dev 栈,同款 innerText oracle):14 行中 12 行逐�
 | # | 面 | 类型 | 期望(原型) | 实际(重建) | 处置 |
 |---|---|---|---|---|---|
 | G-401 | H5 通道 client_ip | 服务端缝 | 微信外 H5 可下单(pay-confirm 文案面) | **✅ 绿 11-05(片3)**:order/service.go clientIPOf 双形状(transport.Header 读 XFF/X-Real-IP,connect 包装器 *connect.Transport.RemoteAddr 与 kratos *http.Transport.Request 两型落 peer 地址)→CreateIn.ClientIP→Payer 组装第三肢;PayOrder 落库 channel=wechat_h5 credential=jump_url,手机仿真 mock 全链 live 走通,PAY_E2E 增 h5 无 IP 拒/有 IP 过双臂 | 绿:微信侧真通道联调随 PAY2/cutover 承接 |
-| G-402 | JSAPI 通道 payer_openid | 契约缺口 | 微信内 JSAPI 可支付 | 会员面契约无处可读自身 openid(仅 OAuth 交换知悉);客户端报 wechat_jsapi 必被渠道拒(require openid) | 红:二选一待裁——①契约暴露绑定 openid ②服务端按绑定富集(乙方裁决);客户端 invoke 分派代码已在案 |
+| G-402 | JSAPI 通道 payer_openid | 契约缺口 | 微信内 JSAPI 可支付 | 会员面契约无处可读自身 openid(仅 OAuth 交换知悉);客户端报 wechat_jsapi 必被渠道拒(require openid) | 红:**lzx 建议裁②服务端按绑定富集**(D-BC 报备形,2026-11-05;证据=JSAPI v3 openid 仅服务端统一下单入参,前端 invoke 只消费 prepay 参数,客户端零消费方——契约暴露=凭据无收益扩散面);真通道刀执行时落,客户端 invoke 分派代码已在案 |
 | G-403 | QR 腿渲染 | 依赖缺口 | 桌面 QR 扫码支付 | QR 凭据以值文本+「我已完成支付」轮询 sheet 呈现(无码图) | 红:qrcode 依赖引入+码图渲染随真通道联调刀;mock+native 走查不受影响(provider=mock 恒走收银台 sheet) |
 | G-404 | H5 真通道跳转回程 | 服务端缝×客户端 | 渠道收银台跳回后落支付结果页 | 11-05 两轴审查发现:jump 通道 returnUrl=墙自身 URL,微信回跳后墙重挂载无 orderNo 上下文→轮询不续、「三钮全落收据」仅 mock/QR 出口成立 | 红:修形随真通道刀=returnUrl 改指 /pay/result?order=…&face=…(或墙持单入 search);另 clientIPOf 信任拨盘(XFF 优先 vs peer 地址优先)同刀裁——现注释口径=现行 edge 拓扑保证,直暴拓扑归部署面剥头 |
 
 计数:1 绿 3 红(G-401 服务端缝已闭;余 G-402 契约裁决、G-403 依赖件、G-404 回程+信任拨盘=真通道联调刀);mock 全链零红条。
+
+## 六批 · 已登记偏离登记簿(2026-11-05 校准役立)
+
+> 与红条分工:红条=「按原型严格还原」的工单;本批=**契约/产品口径级已裁定或已登记的偏离**(白名单形②仓法/③真实生命周期),非工单——集中登记防散失,各随对应裁决窗复核。出处=切片收口登记(原散于 plan/progress 巨格,2026-11-05 瘦身时收拢)。
+
+| # | 面 | 原型/旧码 | 现行实现 | 依据/复核窗 |
+|---|---|---|---|---|
+| R-01 | MSG-1 消息类型与范围 | 三型四范围(含触达已读统计) | 两型两范围,无触达已读统计 | 白名单①(契约窄化显式登记);W6 ljr |
+| R-02 | MSG-1 contact 上限 | 输入 40 字 | 128 | 同上;W6 ljr |
+| R-03 | pay-result cancel 文案 | 「未产生订单」 | 「未产生扣款」(真实订单生命周期 CLOSED 形,订单存在无扣款) | 白名单③(真实生命周期);真通道刀随检 |
+| R-04 | terminated 会员 /member 呈现 | (原型无此态) | 折 never 形(解锁内容仍可读,灰条/计数行不显);e2e 钉死 | 白名单②(无 oracle 面);运营/真通道刀复核 |
+| R-05 | member FAQ 硬价 | ¥19.9/五折逐字 | 文案硬编码键(messages/member),调价需改文案 | 白名单②;运营调价时 |
+| R-06 | game-config 呈现 | 难度三档权重/上下架四列+因子抽屉 | 运行配置平键值表(更贴 test_config schema 真相) | 白名单②(schema 更真);M2 余组 test-type 档案面 |
+| R-07 | consent 渠道列 | 列=小红书/抖音/归因 | 契约无 channel 字段,列未建 | 白名单①;P23 归因记账(遗留清单并) |
+

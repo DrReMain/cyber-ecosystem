@@ -25,14 +25,14 @@
 | 15 | test-result | ✅ | E5-f2 |
 | 16 | test-done | ✅ | D-AI 分享主 CTA |
 | 17 | test-records | ❌ | 三态页未建;归 M2 余组(记录读面) |
-| 18 | report-single | ◐ | 七区块在;unlock/member CTA parked→PAY3 |
+| 18 | report-single | ◐ | 七区块在;unlock/member CTA 已 live(片3 带参入口,ref-less 墙 member-only);点击 live 走查待解锁态记录,随真通道刀/激活码走查复核 |
 | 19 | report-center | ✅ | E5b-d;G-101..106 已处置 |
 | 20 | report-career | ✅ | E5b-c 开放态=旧仓语义级 |
 | 21 | report-cognitive | ✅ | 同上 |
 | 22 | report-trend | ✅ | 同上 |
-| 23 | member-detail | ❌ | →PAY3(随付费墙) |
-| 24 | pay-confirm | ❌ | →PAY3;P7 视觉稿已落库(p7-member-paywall.html) |
-| 25 | pay-result | ❌ | →PAY3(四态) |
+| 23 | member-detail | ✅ | PAY3 片4 建成(2c3ecb7c,11-05):三态折(活窗紫条/过期灰条含日期/never 无条)+权益 4+FAQ5+紫 CTA;走查三态+计数 0→1 活证 |
+| 24 | pay-confirm | ✅ | PAY3 片2 建成(e3159a9e,11-05):P7 三态/未成年红卡+逃生双钮/缺出生回跳/模拟收银台(MockCashierService.MarkPaid);mock 全链走查毕;真通道三红条=gap-ledger 五批 |
+| 25 | pay-result | ✅ | PAY3 片3 建成(d9ddd12e,11-05):四态 GetOrder 真值驱动+D-AU③ 双文案键+收据四行;五腿 live 走查毕(含 h5 手机仿真);cancel 文案偏离登记=gap-ledger 六批 |
 | 26 | message-center | ❌ | →MSG-1(D-AS①);P21 前置 |
 | 27 | feedback-submit | ❌ | →MSG-1;G-202 红条随接真跳 |
 | 28 | feedback-detail | ❌ | →MSG-1 |
@@ -53,7 +53,7 @@
 | 43 | empty | 📄 | 同上 |
 | 44 | error | 📄 | 同上 |
 
-**计数:44 = ✅23 + ◐5 + ❌11 + ⏸1 + 📄4。** blocks/future 补充面:forgot-password ✅(/login/forgot)、change-password ✅(E6c-c)、notification-detail→MSG-1、subscription-popup/theme-hero ⏸(P13 剪裁已定不入)、moba-6dim ⏸(P15 已裁口径)、future/22 页=远期参考不入账。
+**计数:44 = ✅26 + ◐5 + ❌8 + ⏸1 + 📄4(2026-11-05 对账:pay-confirm/pay-result/member-detail 三页随 PAY3 翻 ✅;❌ 余=message 族 3+test-records+share-invite+scheme-b 3+version-update)。** blocks/future 补充面:forgot-password ✅(/login/forgot)、change-password ✅(E6c-c)、notification-detail→MSG-1、subscription-popup/theme-hero ⏸(P13 剪裁已定不入)、moba-6dim ⏸(P15 已裁口径)、future/22 页=远期参考不入账。
 
 ## §二 admin 原型 41 页(真源=`manage/design-systems/admin/outputs/prototype/`;侧栏 9 组权威=_nav.js)
 
@@ -89,13 +89,14 @@
 | 题库三表 CRUD 23 端点(攻防/角色/克制) | 📋 余组 | E9 只读抽屉已建;CRUD/Excel 随余组(10-28 已注) |
 | 双 Java 服务共享库/Flyway/Snowflake/JWT 细节 | 🗑 不迁 | clean-room 律(README §0.1) |
 
-## §四 现状计数(2026-10-30 代码盘点;对账基准)
+## §四 现状计数(2026-11-05 代码盘点;对账基准)
 
-- 新实现:esports=11 service/37 RPC(admin 面 12)/15 表/2 ticker(支付收敛 1min+对账 24h);ctr=39 路由+13 引擎(前后端一一对应)+0 业务 store;admin=esports 面 5 页(含 report-policies)+4 占位 Tab。
-- 对照:旧 191 端点(admin 133)/36 表/ctr 64 视图/admin 23 视图。新版**反超项**=支付后端(旧仅枚举)/匹配引擎(旧纯设计)/全量服务端判分(旧 4 款作弊面)/账号合并(旧无)/报告快照冻结(旧无)。
-- 投入分布(esports/main 10-09 以来提交数):ctr 98 : 后端 74 : **admin 27** : 文档 180 —— admin 投入为 ctr 的 1/4,系 CP 门原不含 admin 所致(10-30 修正:CP2/CP3 已增构成项)。
+- 新实现:esports=21 service/83 RPC/23 表/2 ticker(支付收敛 1min+对账 24h;MSG 四表+mockcashier 面已入);ctr=43 路由+13 引擎(前后端一一对应)+0 业务 store;admin=esports 面 14 页(13 计账+report-policies 账外)。
+- 对照:旧 191 端点(admin 133)/36 表/ctr 64 视图/admin 23 视图。新版**反超项**=支付后端(旧仅枚举)/匹配引擎(旧纯设计)/全量服务端判分(旧 4 款作弊面)/账号合并(旧无)/报告快照冻结(旧无)/消息反馈线程域(旧单发回复)。
+- 投入分布(esports/main 提交数):10-09 起全窗 ctr 140 : 后端 99 : admin 41;**10-30 校正后(至 11-05)ctr 42 : 后端 25 : admin 14**——admin 占比升至约 ctr 的 1/3,CP2/CP3 增 admin 构成项已见效。
 
 ## §五 对账环
 
 - 本档为唯一处置真值:切片收口时对应行 ◐/❌→✅ 并注 hash;P 票裁毕即改 ⏸→📋/🗑。
-- 与 gap-ledger 分工:本档=「建没建/归谁」;gap-ledger=「建得像不像」(逐字/态比对)。两档互不吸收。
+- 与 gap-ledger 分工:本档=「建没建/归谁」;gap-ledger=「建得像不像」(逐字/态比对,六批=产品口径级偏离登记)。两档互不吸收。
+- 对账节拍:2026-11-05 全档校准(PAY3 四片+Q 线收口吸收;§四 盘点刷新;原型仓 manage/design-systems git 零演进实证=10-30 四路穷举基线仍有效)。

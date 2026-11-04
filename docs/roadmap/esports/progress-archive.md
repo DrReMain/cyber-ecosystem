@@ -102,3 +102,19 @@
 - devserver 机制退役 ✅ 10-28(−498 净;agent=后台任务+TaskStop)。
 - E-line-b ctr 测试回位 ✅ 10-30(hzy,2b0bd350:18 件回位 blob 恒等 18/18,ctr:test 20 件 127 绿=恢复 106 例剥离前对账;mt-F1 D-AR 双键同车)。
 - 10-30 hzy 走查收口批:E6c-c 空凭证崩溃热修 93bd46d9;intro #prev 成绩回执卡 a5d9dafa;EndFace A 桩对齐 64ac733c(出口句+回读灰死钮+N=1 回执);未校准结算露原始分 6b2db084;回读面诚实无成绩文案 95081a4d(原始分 0/420 双例活验+DB 证有效);mt-F1 全落 4f582e32;mt-D6 真机横屏过 ff7c4e07(用户亲测);.run/ 误提自清 e034375b。
+
+## 2026-11-05 瘦身役 · CP2 后段压实(10-31..11-05 已收池一行制;全文=提交 proven-by 尾/会话记录)
+
+- M2-1 会员终态+运营三操作 ✅ 10-31 347a9ce7:Entitlement status/terminated_at(R7 时间推导零扫描);Grant/Terminate/List/Get 四 RPC;admin 会员两页+三 Modal 五语言;菜单九组重构(G-301/302,真值=admin-nav-anchor);双轴审查修 13 处+走查修 7 处。
+- M2-2 SKU/订单面 ✅ 10-31 9860eb34:skuadmin 纯 face+OrderAdminUC 归 module/order;下架即时同步 C 端;走查捉四 bug 族;G-306 手机搜索登记。
+- M2-3 激活码全面 ✅ 11-01 45c276d4:批次模型+码表页+停用复启(6155)+导出 CSV+trail 落码行 TakeUse;e2e 捉单行 ratchet 丢去向洞;回退重审(授权法)修 12。
+- M2-4 首刀两 Tab ✅ 11-01 197fdbc6:assessments(场次分组派生+解锁三事实并陈)+membership Tab;契约增量 ListActivationCodes+user_id;双轴审查修 7。
+- E9 增量全收 ✅ 11-01 首刀 067a89ce+余刀 32f5cf0a:agreement 域 8 RPC+617x 四枚+两表+admin 两页;compliance_config 单例表+4 RPC+页;versions.ts 真源化+登录 consent 上行三腿;三轮双轴审查修 12+9。
+- R 线五片+PC/PM 批 ✅ 11-01/02(hzy):R1 5c2f272a/R2 86e834ba/R3 a44045a8/R4 全收(D-BD)/R5 复扫全绿;PC 桌面居中 82bb2ad9;PM 票批(双 N/4 ed4f4f21+品牌词 ab7ec52f)。
+- 待校准成绩小片+消费片 ✅ 11-01/02:ecbe8ab6(SessionAttemptDetail 明细行组,pending 行全真)+ca729f5f(回读原始分面+逐次收据,hzy)。
+- 机械债两件 ✅ 11-02 84fe10ee(paraglide 13 键改名+orderadmin §3 重排);agreement lint 三处 d502d60b。
+- MIG1 五阶段 ✅ 11-02(三刀)+审计毕:首刀 f9d1d3dc(guard+identity,仓库根独立 module 不入 nx)+entitlement 3bdec4ad(两代解锁翻译)+behavior 54654a62(偏好折叠+事实流保真,grade=band 金向量);recompute 审计=注册重算四目标全消解(读时重算,迁移器零写入);reconcile=43 断言全绿+负探针三破坏七路齐咬;snapshot/recompute 机械片冻结待 P26/P26.1(ljr 硬限 11-24)。
+- Q 线役全毕 11-03..04(D-BB;台账=verify/q-line.md):Q1-Q3 hzy 独立校对(MR FF 合入 aa448be1;check 门红 15 条实锤→lint 修复 08721c1f);Q4-Q6 MR 复核合入 8055495f(Q4 会员订单面/Q5 admin 14 面/Q6 服务端仲裁读腿);lzx 队列①-⑩全清:①member_until 入契 f0e928da/②反推续测七日窗退役 2e4d98c2/⑤偏好 ×1.5 抽款层加权 cf48aa46/⑥介绍文六段种子 0e6b9d6a/③密码组成服务端执法 88ada92a(6050)/⑥' 判决微欠 498512a8(digest/cognitive 携解锁判决)/⑦e2e 残件查证结案(净清法补 match_session)/⑨续费窗缝 settle 砌瓦片+⑩Redeem 幂等支上移(11-04 同日)。
+- MSG-1 契约+domain 首刀 ✅ 11-04 a564bf77(W5 件拉前):四契约+618x 五枚+ent 四表+message/feedback 双面四模块+文案 7 文件;MSG_E2E 门控全环绿(五拒绝臂全枚举);条件仲裁形五写点+名册定序;HandleEntError(nil) 幻影 500 雷 9 处修守卫形;对原型显式窄化两处登记 W6 ljr;余面=ctr 三页+admin 三页。
+- PAY3 四片全收 11-04..05(门禁全绿+双推,check-drift 提交后自愈 0):片1 服务端执法 82a53f46(CreateOrder 年龄闸 6148/6149+ListSkus 折叠 pay_gate+compliance 第 5 旋钮 renewal_remind_days+mock 收银台桥);片2 ctr 三态墙 e3159a9e(P7 三态/未成年红卡逃生双钮/缺出生回跳/收银台 connect 统一形 MockCashierService.MarkPaid 6156=用户当面临裁;两轴审查加固=plain 律+one-module-one-face 拆 mockcashier+localDateOf 家族四点);片3 购买环 d9ddd12e(pay-result 四态 GetOrder 真值+墙出口原型导航契约三钮全跳 result+CTA 挂接 live+G-401 clientIPOf 双形状闭;两轴审查加固=§3 节序/ref-less 藏单次选项/face click 捕获贯穿/收据 isFetching 闸;G-404 新红);片4 member-detail+Q4 尾 2c3ecb7c(digest 两 field=all-time 解锁计数+含过期最远窗尾/member 三态页/三挂点=profile 链+计数行+墙 P7 链+result ghost 钮/member 域 33 键×2;两轴审查修=plain 理由句+e2e lapsed 组合臂直钉)。
+- 11-04 W6 备料 cutover-watch.md(hzy 值守清单草案,T-1 五检/六节点/冒烟八环含激活码兜底腿)+D-BE P6 代裁(预演定 11-15,回滚腿入绿门)。
