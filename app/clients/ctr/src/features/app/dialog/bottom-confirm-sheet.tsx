@@ -57,6 +57,7 @@ export function BottomConfirmSheet({
       }}
     >
       <Dialog
+        aria-label={title}
         className="border-line-soft bg-surface-card w-full max-w-[390px] rounded-t-[18px] border px-4 pt-[18px] pb-[calc(18px+env(safe-area-inset-bottom))] outline-none"
         role="alertdialog"
       >

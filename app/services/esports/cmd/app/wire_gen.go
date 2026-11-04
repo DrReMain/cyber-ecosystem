@@ -24,6 +24,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/message"
 	"cyber-ecosystem/app/services/esports/internal/module/messageadmin"
+	"cyber-ecosystem/app/services/esports/internal/module/mockcashier"
 	"cyber-ecosystem/app/services/esports/internal/module/order"
 	"cyber-ecosystem/app/services/esports/internal/module/orderadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
@@ -130,8 +131,8 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	feedbackService := feedback.NewFeedbackService(logger, feedbackUC)
 	feedbackAdminUC := feedback.NewFeedbackAdminUC(logger, platformPlatform, feedbackRP, profileRP, messageRP)
 	feedbackAdminService := feedbackadmin.NewFeedbackAdminService(logger, feedbackAdminUC)
-	mockCashier := order.NewMockCashier(logger, payment, platformPlatform, orderUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService, agreementService, agreementAdminService, complianceAdminService, messageService, messageAdminService, feedbackService, feedbackAdminService, mockCashier)
+	mockCashierService := mockcashier.NewMockCashierService(logger, payment, platformPlatform, orderUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService, agreementService, agreementAdminService, complianceAdminService, messageService, messageAdminService, feedbackService, feedbackAdminService, mockCashierService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

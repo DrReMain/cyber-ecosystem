@@ -59,6 +59,10 @@ const (
 	// is final until the member's next birthday month passes.
 	Esports_ESPORTS_PAY_AGE_BLOCKED   Esports = 6148
 	Esports_ESPORTS_PAY_BIRTH_MISSING Esports = 6149
+	// The simulated cashier's answer-time gate: the mock provider's dev
+	// face exists in the contract but a topology whose default provider is
+	// not mock refuses every call — production never serves a cashier.
+	Esports_ESPORTS_PAY_CASHIER_DISABLED Esports = 6156
 	// 615x: activation code & entitlement
 	Esports_ESPORTS_ACTIVATION_CODE_INVALID   Esports = 6150
 	Esports_ESPORTS_ACTIVATION_CODE_EXPIRED   Esports = 6151
@@ -125,6 +129,7 @@ var (
 		6147: "ESPORTS_SKU_KIND_INVALID",
 		6148: "ESPORTS_PAY_AGE_BLOCKED",
 		6149: "ESPORTS_PAY_BIRTH_MISSING",
+		6156: "ESPORTS_PAY_CASHIER_DISABLED",
 		6150: "ESPORTS_ACTIVATION_CODE_INVALID",
 		6151: "ESPORTS_ACTIVATION_CODE_EXPIRED",
 		6152: "ESPORTS_ACTIVATION_CODE_EXHAUSTED",
@@ -167,6 +172,7 @@ var (
 		"ESPORTS_SKU_KIND_INVALID":                  6147,
 		"ESPORTS_PAY_AGE_BLOCKED":                   6148,
 		"ESPORTS_PAY_BIRTH_MISSING":                 6149,
+		"ESPORTS_PAY_CASHIER_DISABLED":              6156,
 		"ESPORTS_ACTIVATION_CODE_INVALID":           6150,
 		"ESPORTS_ACTIVATION_CODE_EXPIRED":           6151,
 		"ESPORTS_ACTIVATION_CODE_EXHAUSTED":         6152,
@@ -220,7 +226,7 @@ var File_cyber_esports_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\x9c\r\n" +
+	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\xc5\r\n" +
 	"\aEsports\x12\x1d\n" +
 	"\x13ESPORTS_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x124\n" +
 	")ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED\x10\xd4/\x1a\x04\xa8E\x90\x03\x12'\n" +
@@ -242,7 +248,8 @@ const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\x1cESPORTS_ORDER_STATE_CONFLICT\x10\x820\x1a\x04\xa8E\x90\x03\x12#\n" +
 	"\x18ESPORTS_SKU_KIND_INVALID\x10\x830\x1a\x04\xa8E\x90\x03\x12\"\n" +
 	"\x17ESPORTS_PAY_AGE_BLOCKED\x10\x840\x1a\x04\xa8E\x90\x03\x12$\n" +
-	"\x19ESPORTS_PAY_BIRTH_MISSING\x10\x850\x1a\x04\xa8E\x90\x03\x12*\n" +
+	"\x19ESPORTS_PAY_BIRTH_MISSING\x10\x850\x1a\x04\xa8E\x90\x03\x12'\n" +
+	"\x1cESPORTS_PAY_CASHIER_DISABLED\x10\x8c0\x1a\x04\xa8E\x90\x03\x12*\n" +
 	"\x1fESPORTS_ACTIVATION_CODE_INVALID\x10\x860\x1a\x04\xa8E\x90\x03\x12*\n" +
 	"\x1fESPORTS_ACTIVATION_CODE_EXPIRED\x10\x870\x1a\x04\xa8E\x90\x03\x12,\n" +
 	"!ESPORTS_ACTIVATION_CODE_EXHAUSTED\x10\x880\x1a\x04\xa8E\x90\x03\x12*\n" +

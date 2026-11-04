@@ -758,6 +758,28 @@
     ]
   },
   {
+    "name": "MockCashierService",
+    "full_name": "cyber.esports.v1.MockCashierService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/mock_cashier.proto",
+    "comment": "模拟收银台",
+    "methods": [
+      {
+        "name": "MarkPaid",
+        "full_name": "cyber.esports.v1.MockCashierService.MarkPaid",
+        "request_name": "MarkPaidRequest",
+        "request_full_name": "cyber.esports.v1.MarkPaidRequest",
+        "response_name": "MarkPaidResponse",
+        "response_full_name": "cyber.esports.v1.MarkPaidResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/dev/cashier/{order_no}/mark-paid",
+        "comment": "标记已支付",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "OrderAdminService",
     "full_name": "cyber.esports.v1.OrderAdminService",
     "package": "cyber.esports.v1",

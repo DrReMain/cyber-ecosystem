@@ -114,6 +114,7 @@
   "error_ESPORTS_ORDER_STATE_CONFLICT": "تغيّرت حالة الطلب، يرجى التحديث والمحاولة مرة أخرى",
   "error_ESPORTS_PAY_AGE_BLOCKED": "أقل من خط سن الدفع، لا يمكن الشراء حاليًا",
   "error_ESPORTS_PAY_BIRTH_MISSING": "يرجى إضافة سنة وشهر الميلاد قبل الشراء",
+  "error_ESPORTS_PAY_CASHIER_DISABLED": "كاشير المحاكاة غير متاح: قناة الدفع الفعّالة ليست مزوّد المحاكاة",
   "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "طلب الدفع غير صالح، حاول مرة أخرى لاحقًا",
   "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "لم يعثر قناة الدفع على هذه المعاملة، حاول مرة أخرى لاحقًا",
   "error_INFRA_ERROR_PAYMENT_DUPLICATE": "طلب دفع مكرر، حاول مرة أخرى لاحقًا",

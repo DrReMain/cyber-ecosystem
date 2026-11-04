@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { systemReason } from "#/domains/error";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { localDateOf } from "#/features/app/date";
 import { BottomConfirmSheet } from "#/features/app/dialog/bottom-confirm-sheet";
 import { inputClass } from "#/features/modules/login/ui/sms-fields";
 import { beginWechatLoginFn } from "#/features/modules/login/wechat.fn";
@@ -68,7 +69,7 @@ function summaryLine(s: Side | null | undefined): string {
   }
   const parts: string[] = [m.security_merge_summary_sessions({ count: s.sessions })];
   if (s.memberUntil !== undefined) {
-    const until = new Date(s.memberUntil).toISOString().slice(0, 10);
+    const until = localDateOf(Date.parse(s.memberUntil));
     parts.push(m.security_merge_summary_member({ until }));
   } else if (s.unlocked) {
     parts.push(m.security_merge_summary_unlocked());

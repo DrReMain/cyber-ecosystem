@@ -7,8 +7,7 @@ export function years(): number[] {
   return Array.from({ length: 55 }, (_, i) => now - 60 + i);
 }
 
-// Month-granularity age (the contract stores no day); the pay gate's
-// month-level approximation of the birthday-next-day rule lands with PAY3.
+// Month-granularity age (the contract stores no day).
 export function ageOf(year: number, month: number): number {
   const now = new Date();
   let age = now.getFullYear() - year;
@@ -16,4 +15,18 @@ export function ageOf(year: number, month: number): number {
     age--;
   }
   return age;
+}
+
+// The pay gate's reckoning, the mirror of the server's conservative rule:
+// the line clears only from the month AFTER the birthday month (次月起算),
+// so it is stricter than ageOf >= line — the birthday month itself still
+// blocks. The server's CreateOrder refusal stays the authority; this mirror
+// only keeps the wall's pre-check from pitching a purchase the gate refuses.
+export function ageLineReached(year: number, month: number, line: number): boolean {
+  const now = new Date();
+  const elapsed = now.getFullYear() - year;
+  if (elapsed !== line) {
+    return elapsed > line;
+  }
+  return now.getMonth() + 1 > month;
 }

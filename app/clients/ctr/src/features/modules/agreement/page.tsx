@@ -2,6 +2,7 @@ import { useQuery } from "@connectrpc/connect-query";
 import { getAgreementCurrent } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/agreement-AgreementService_connectquery";
 import { ChevronLeft } from "lucide-react";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { localDateOf } from "#/features/app/date";
 import { m } from "#/paraglide/messages";
 
 export type AgreementDoc = "user" | "privacy";
@@ -20,7 +21,7 @@ const wireDoc = (doc: AgreementDoc): string =>
 // variance); normalize every shape, the line shows the date only.
 const wireDate = (at: unknown): string => {
   const ms = dateLikeMs(at);
-  return ms === null ? "" : new Date(ms).toISOString().slice(0, 10);
+  return ms === null ? "" : localDateOf(ms);
 };
 
 const dateLikeMs = (v: unknown): number | null => {

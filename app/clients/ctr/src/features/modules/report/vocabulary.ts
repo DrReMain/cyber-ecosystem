@@ -1,4 +1,5 @@
 import type { Sku } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku_pb";
+import { fenToYuan } from "#/features/app/fen";
 import { m } from "#/paraglide/messages";
 
 // The report's client vocabulary: tier words, radar geometry, money and
@@ -122,13 +123,6 @@ export function radarGeometry(axes: RadarAxis[]): RadarGeometry {
     return { point: p, anchor };
   });
   return { grid, spokes, shape, dots, labels };
-}
-
-// Fen amounts ride the wire as bigint (Int64Value flattened); yuan is a
-// display concern, never a stored one.
-export function fenToYuan(fen: bigint): string {
-  const yuan = Number(fen) / 100;
-  return Number.isInteger(yuan) ? String(yuan) : yuan.toFixed((yuan * 10) % 1 === 0 ? 1 : 2);
 }
 
 // The purchase faces price themselves off the catalog: the trial sku

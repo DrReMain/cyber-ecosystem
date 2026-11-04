@@ -114,6 +114,7 @@
   "error_ESPORTS_ORDER_STATE_CONFLICT": "注文の状態が変わりました。更新して再試行してください",
   "error_ESPORTS_PAY_AGE_BLOCKED": "支払い可能な年齢に達していないため、現在購入できません",
   "error_ESPORTS_PAY_BIRTH_MISSING": "購入前に生年月（年・月）を登録してください",
+  "error_ESPORTS_PAY_CASHIER_DISABLED": "デモ用キャッシャーは利用できません：現在の決済環境では mock チャネルが有効ではありません",
   "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "支払いリクエストが無効です。しばらくしてからお試しください",
   "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "決済チャネルで該当の取引が見つかりません。しばらくしてからお試しください",
   "error_INFRA_ERROR_PAYMENT_DUPLICATE": "重複した支払いリクエストです。しばらくしてからお試しください",

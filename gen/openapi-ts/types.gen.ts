@@ -1365,6 +1365,18 @@ export type CyberEsportsV1MarkMessageReadResponse = {
     [key: string]: unknown;
 };
 
+export type CyberEsportsV1MarkPaidRequest = {
+    orderNo?: string;
+};
+
+export type CyberEsportsV1MarkPaidResponse = {
+    /**
+     * True when the minted push settled the order — success implies the
+     * value; the query surface converges the rest.
+     */
+    handled?: boolean;
+};
+
 export type CyberEsportsV1MatchSession = {
     id?: string;
     /**
@@ -4831,6 +4843,24 @@ export type ComplianceAdminServiceSetRenewalReminderResponses = {
 };
 
 export type ComplianceAdminServiceSetRenewalReminderResponse = ComplianceAdminServiceSetRenewalReminderResponses[keyof ComplianceAdminServiceSetRenewalReminderResponses];
+
+export type MockCashierServiceMarkPaidData = {
+    body: CyberEsportsV1MarkPaidRequest;
+    path: {
+        orderNo: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/dev/cashier/{orderNo}/mark-paid';
+};
+
+export type MockCashierServiceMarkPaidResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1MarkPaidResponse;
+};
+
+export type MockCashierServiceMarkPaidResponse = MockCashierServiceMarkPaidResponses[keyof MockCashierServiceMarkPaidResponses];
 
 export type EntitlementServiceRedeemActivationCodeData = {
     body: CyberEsportsV1RedeemActivationCodeRequest;

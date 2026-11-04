@@ -1,12 +1,13 @@
 import { useQuery } from "@connectrpc/connect-query";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
+import { listSkus } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku-SkuService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
 import { Cake } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
-import { ageOf, MONTHS, years } from "#/features/app/birth";
+import { ageLineReached, MONTHS, years } from "#/features/app/birth";
 import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { useProfileUpdate } from "#/features/modules/profile/use-profile-update";
 import { m } from "#/paraglide/messages";
@@ -21,6 +22,10 @@ const selectClass =
 export function AgeRequiredPage() {
   const navigate = useNavigate();
   const profileQuery = useQuery(getProfile, {}, { staleTime: PROFILE_STALE_MS });
+  // The gate's own facts ride the catalog read (the pay_gate fold) — the
+  // line this page enforces is the operator's configured value, not a
+  // hardcoded age.
+  const skusQuery = useQuery(listSkus, {});
   const updateMutation = useProfileUpdate();
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
@@ -43,8 +48,11 @@ export function AgeRequiredPage() {
       setError(m.age_required_err_incomplete());
       return;
     }
-    // The pay hard gate (< 18 cannot buy) blocks here.
-    if (ageOf(Number(year), Number(month)) < 18) {
+    // The pay hard gate blocks here — the compliance-configured line under
+    // the same conservative month-granularity reckoning the server's
+    // CreateOrder refusal enforces (次月起算).
+    const ageLine = skusQuery.data?.payGate?.payAgeLine ?? 18;
+    if (!ageLineReached(Number(year), Number(month), ageLine)) {
       setError(null);
       toast.error(m.age_required_minor_toast());
       return;

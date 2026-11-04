@@ -19,7 +19,8 @@
       "./messages/age-required/{locale}.json",
       "./messages/test/{locale}.json",
       "./messages/report/{locale}.json",
-      "./messages/security/{locale}.json"
+      "./messages/security/{locale}.json",
+      "./messages/pay/{locale}.json"
     ]
   }
 }

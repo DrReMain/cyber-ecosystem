@@ -279,6 +279,24 @@ func ErrorEsportsPayBirthMissing(format string, args ...interface{}) *errors.Err
 	return errors.New(400, Esports_ESPORTS_PAY_BIRTH_MISSING.String(), fmt.Sprintf(format, args...))
 }
 
+// The simulated cashier's answer-time gate: the mock provider's dev
+// face exists in the contract but a topology whose default provider is
+// not mock refuses every call — production never serves a cashier.
+func IsEsportsPayCashierDisabled(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_PAY_CASHIER_DISABLED.String() && e.Code == 400
+}
+
+// The simulated cashier's answer-time gate: the mock provider's dev
+// face exists in the contract but a topology whose default provider is
+// not mock refuses every call — production never serves a cashier.
+func ErrorEsportsPayCashierDisabled(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_PAY_CASHIER_DISABLED.String(), fmt.Sprintf(format, args...))
+}
+
 // 615x: activation code & entitlement
 func IsEsportsActivationCodeInvalid(err error) bool {
 	if err == nil {

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AgeRequiredRouteImport } from './routes/age-required'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MatchRouteImport } from './routes/match'
+import { Route as PayRouteImport } from './routes/pay'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -70,6 +71,11 @@ const LoginRoute = LoginRouteImport.update({
 const MatchRoute = MatchRouteImport.update({
   id: '/match',
   path: '/match',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayRoute = PayRouteImport.update({
+  id: '/pay',
+  path: '/pay',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -278,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/age-required': typeof AgeRequiredRoute
   '/login': typeof LoginRouteWithChildren
   '/match': typeof MatchRouteWithChildren
+  '/pay': typeof PayRoute
   '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/age-required': typeof AgeRequiredRoute
+  '/pay': typeof PayRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/agreement/privacy': typeof AgreementPrivacyRoute
@@ -361,6 +369,7 @@ export interface FileRoutesById {
   '/age-required': typeof AgeRequiredRoute
   '/login': typeof LoginRouteWithChildren
   '/match': typeof MatchRouteWithChildren
+  '/pay': typeof PayRoute
   '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -407,6 +416,7 @@ export interface FileRouteTypes {
     | '/age-required'
     | '/login'
     | '/match'
+    | '/pay'
     | '/profile'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -449,6 +459,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/age-required'
+    | '/pay'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/agreement/privacy'
@@ -489,6 +500,7 @@ export interface FileRouteTypes {
     | '/age-required'
     | '/login'
     | '/match'
+    | '/pay'
     | '/profile'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -534,6 +546,7 @@ export interface RootRouteChildren {
   AgeRequiredRoute: typeof AgeRequiredRoute
   LoginRoute: typeof LoginRouteWithChildren
   MatchRoute: typeof MatchRouteWithChildren
+  PayRoute: typeof PayRoute
   ProfileRoute: typeof ProfileRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -577,6 +590,13 @@ declare module '@tanstack/react-router' {
       path: '/match'
       fullPath: '/match'
       preLoaderRoute: typeof MatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pay': {
+      id: '/pay'
+      path: '/pay'
+      fullPath: '/pay'
+      preLoaderRoute: typeof PayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -962,6 +982,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgeRequiredRoute: AgeRequiredRoute,
   LoginRoute: LoginRouteWithChildren,
   MatchRoute: MatchRouteWithChildren,
+  PayRoute: PayRoute,
   ProfileRoute: ProfileRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

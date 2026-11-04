@@ -114,6 +114,7 @@
   "error_ESPORTS_ORDER_STATE_CONFLICT": "Order state changed; refresh and try again",
   "error_ESPORTS_PAY_AGE_BLOCKED": "Under the pay age line — purchasing is unavailable for now",
   "error_ESPORTS_PAY_BIRTH_MISSING": "Add your birth year and month before purchasing",
+  "error_ESPORTS_PAY_CASHIER_DISABLED": "The simulated cashier is unavailable: the active payment channel is not the mock provider",
   "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "Invalid payment request; try again later",
   "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "The payment channel has no such transaction; try again later",
   "error_INFRA_ERROR_PAYMENT_DUPLICATE": "Duplicate payment request; try again later",

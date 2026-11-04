@@ -8,5 +8,4 @@ var ProviderSet = wire.NewSet(
 	NewOrderRP,
 	NewPayChannelRP,
 	NewOrderService,
-	NewMockCashier,
 )

@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The simulated cashier (the mock provider's dev face): the browser sheet
+// a mock environment renders instead of the channel's own cashier.
+// MarkPaid mints the channel-signed push the real channel would deliver
+// and hands it to the same notify pipeline NotifyPayment serves, so a dev
+// walkthrough exercises the true settle path, never a shortcut. The gate
+// answers at call time, not mount time: a topology whose default provider
+// is not mock refuses every order with CASHIER_DISABLED — the simulated
+// cashier never exists in production, the contract states that honestly.
+// The caller must own the order; another member's order answers
+// NOT_FOUND, never material.
+service MockCashierService {
+  option (cyber.ext.v1.service_comment) = "模拟收银台";
+  rpc MarkPaid(MarkPaidRequest) returns (MarkPaidResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "标记已支付"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/dev/cashier/{order_no}/mark-paid"
+      body: "*"
+    };
+  }
+}
+
+message MarkPaidRequest {
+  string order_no = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 32
+    }
+  ];
+}
+
+message MarkPaidResponse {
+  // True when the minted push settled the order — success implies the
+  // value; the query surface converges the rest.
+  bool handled = 1;
+}

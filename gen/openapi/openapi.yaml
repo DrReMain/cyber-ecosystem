@@ -1214,6 +1214,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.SetRenewalReminderResponse'
+    /api/v1/esports/dev/cashier/{orderNo}/mark-paid:
+        post:
+            tags:
+                - MockCashierService
+            operationId: MockCashierService_MarkPaid
+            parameters:
+                - name: orderNo
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.MarkPaidRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.MarkPaidResponse'
     /api/v1/esports/entitlements/redeem:
         post:
             tags:
@@ -6210,6 +6234,19 @@ components:
             description: |-
                 Empty on purpose: marking read is fire-and-forget — a message another
                  device already read (or a racing id) is the same outcome as success.
+        cyber.esports.v1.MarkPaidRequest:
+            type: object
+            properties:
+                orderNo:
+                    type: string
+        cyber.esports.v1.MarkPaidResponse:
+            type: object
+            properties:
+                handled:
+                    type: boolean
+                    description: |-
+                        True when the minted push settled the order — success implies the
+                         value; the query surface converges the rest.
         cyber.esports.v1.MatchSession:
             type: object
             properties:
@@ -9552,6 +9589,18 @@ tags:
          unsent by a later offline), feedback replies land as rows in the same
          transaction the operator's answer commits, and report and membership
          notes land when their writer domains wire in.
+    - name: MockCashierService
+      description: |-
+        The simulated cashier (the mock provider's dev face): the browser sheet
+         a mock environment renders instead of the channel's own cashier.
+         MarkPaid mints the channel-signed push the real channel would deliver
+         and hands it to the same notify pipeline NotifyPayment serves, so a dev
+         walkthrough exercises the true settle path, never a shortcut. The gate
+         answers at call time, not mount time: a topology whose default provider
+         is not mock refuses every order with CASHIER_DISABLED — the simulated
+         cashier never exists in production, the contract states that honestly.
+         The caller must own the order; another member's order answers
+         NOT_FOUND, never material.
     - name: OrderAdminService
       description: |-
         The order aggregate's operator face: the whole payment flow, not the

@@ -1,5 +1,6 @@
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { Crown } from "lucide-react";
+import { localDateOf } from "#/features/app/date";
 import { m } from "#/paraglide/messages";
 
 // The profile's own member-face colors: the purple identity the prototype
@@ -20,7 +21,7 @@ const CTA_CLASS =
 function dayOf(value: Timestamp): string {
   const v = value as unknown as string | { seconds?: unknown };
   const ms = typeof v === "string" ? new Date(v).getTime() : Number(v.seconds ?? Number.NaN) * 1000;
-  return Number.isNaN(ms) ? "—" : new Date(ms).toISOString().slice(0, 10);
+  return Number.isNaN(ms) ? "—" : localDateOf(ms);
 }
 
 /** The profile's membership face (prototype ③), its own card apart from
