@@ -144,5 +144,6 @@
   "report_trend_base_tag": "Free · yours once measured",
   "report_trend_footnote": "{n} points · first {first} → last {last}",
   "report_trend_mixed": "Both FPS and MOBA in this history: the two measure different ability sets, so composite scores are not directly comparable across them; each ability below stands on its own.",
-  "report_back_profile": "Back to profile"
+  "report_back_profile": "Back to profile",
+  "report_member_unlocked_single": "Single unlock · valid forever"
 }

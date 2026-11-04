@@ -140,5 +140,14 @@
   "profile_stat_best": "Best",
   "profile_stat_prog": "Improvements",
   "profile_about_user": "User Agreement",
-  "profile_about_privacy": "Privacy Policy"
+  "profile_about_privacy": "Privacy Policy",
+  "profile_member_title": "Membership",
+  "profile_member_tag_active": "Active",
+  "profile_member_tag_month": "Monthly",
+  "profile_member_until": "Valid until {date}",
+  "profile_member_desc_active": "Full reports auto-unlock on every test while the membership runs · past reports kept forever · growth trends / career-gap comparison and other member pages",
+  "profile_member_desc_pitch": "Full reports auto-unlock with tests · past reports kept forever · growth trends / career-gap comparison and other member pages",
+  "profile_member_per_month": "/mo",
+  "profile_member_cta_renew": "Renew membership",
+  "profile_member_cta_open": "Get membership"
 }

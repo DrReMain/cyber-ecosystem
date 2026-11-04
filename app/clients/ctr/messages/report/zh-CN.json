@@ -144,5 +144,6 @@
   "report_trend_base_tag": "免费 · 已测即可用",
   "report_trend_footnote": "{n} 次 · 首 {first} → 末 {last}",
   "report_trend_mixed": "含 FPS 与 MOBA 两类：两者测的能力集不同，综合分不可直接横向比较；下方按能力分开展示，只有同一能力才可比。",
-  "report_back_profile": "返回个人中心"
+  "report_back_profile": "返回个人中心",
+  "report_member_unlocked_single": "单次解锁 · 永久有效"
 }

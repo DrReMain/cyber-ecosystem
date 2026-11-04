@@ -9,9 +9,11 @@ import {
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import type { Sku } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku_pb";
 import { listSkus } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku-SkuService_connectquery";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouter } from "@tanstack/react-router";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
+import { sessionQuery } from "#/features/auth/session.fn";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { abilityWord } from "#/features/modules/match/vocabulary";
 import { m } from "#/paraglide/messages";
@@ -188,6 +190,10 @@ export function ReportPage() {
   const router = useRouter();
   const reportQuery = useConnectQuery(getReport, { recordId });
   const skusQuery = useConnectQuery(listSkus, {});
+  // The membership note vs the single-purchase note on the member card
+  // keys off the standing window — the cached session probe carries it.
+  const session = useQuery({ ...sessionQuery, throwOnError: false });
+  const memberActive = session.data?.status === "authed" ? session.data.memberUntil != null : false;
   // The history-best bars ride the cross-session digest; a failed read
   // just leaves the bars absent — never blocks the report itself.
   const digestQuery = useConnectQuery(getAbilityDigest, {}, { throwOnError: false });
@@ -267,7 +273,11 @@ export function ReportPage() {
         {model.subRows.map((row) => renderRow(row, true))}
         {model.comparison !== null ? <ComparisonCard lines={model.comparison} /> : null}
         {model.improvements.length > 0 ? <ImprovementBoard lines={model.improvements} /> : null}
-        <MemberCard priceYuan={model.memberYuan} unlocked={model.unlocked} />
+        <MemberCard
+          memberActive={memberActive}
+          priceYuan={model.memberYuan}
+          unlocked={model.unlocked}
+        />
         {!model.unlocked ? (
           <UnlockCard count={model.mainCount} priceYuan={model.trialYuan} />
         ) : null}

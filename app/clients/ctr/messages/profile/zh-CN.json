@@ -140,5 +140,14 @@
   "profile_stat_best": "最高分",
   "profile_stat_prog": "进步次数",
   "profile_about_user": "用户协议",
-  "profile_about_privacy": "隐私政策"
+  "profile_about_privacy": "隐私政策",
+  "profile_member_title": "专属会员",
+  "profile_member_tag_active": "已开通",
+  "profile_member_tag_month": "月卡",
+  "profile_member_until": "有效期至 {date}",
+  "profile_member_desc_active": "会员期内测试自动解锁完整报告 · 历史报告永久保留 · 训练趋势 / 职业差距对比等增值页",
+  "profile_member_desc_pitch": "测评自动解锁完整报告 · 历史报告永久保留 · 训练趋势 / 职业差距对比等增值页",
+  "profile_member_per_month": "/月",
+  "profile_member_cta_renew": "续费会员",
+  "profile_member_cta_open": "开通会员"
 }

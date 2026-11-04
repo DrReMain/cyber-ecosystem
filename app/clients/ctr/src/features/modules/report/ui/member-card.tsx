@@ -2,14 +2,18 @@ import { Crown } from "lucide-react";
 import { m } from "#/paraglide/messages";
 
 /** The membership card (prototype ④): the unlocked state states the
- * standing benefit; the locked state pitches the window (price off the
- * SKU read face) with the same parked CTA as the unlock card. */
+ * standing benefit — the prototype splits it by how the unlock happened
+ * (a member window speaks the membership note, a single purchase says
+ * so); the locked state pitches the window (price off the SKU read face)
+ * with the same parked CTA as the unlock card. */
 export function MemberCard({
-  unlocked,
+  memberActive,
   priceYuan,
+  unlocked,
 }: Readonly<{
-  unlocked: boolean;
+  memberActive: boolean;
   priceYuan: string;
+  unlocked: boolean;
 }>) {
   if (unlocked) {
     return (
@@ -24,7 +28,7 @@ export function MemberCard({
           </span>
         </div>
         <div className="mt-2 text-[11px] leading-[1.7] text-[#C4B5FD]">
-          {m.report_member_note()}
+          {memberActive ? m.report_member_note() : m.report_member_unlocked_single()}
         </div>
       </div>
     );

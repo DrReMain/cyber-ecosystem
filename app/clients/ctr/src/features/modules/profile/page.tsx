@@ -19,7 +19,6 @@ import { clearWechatProfile } from "#/features/app/wechat-profile";
 import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { broadcastSessionKick } from "#/features/auth/session-kick";
 import { latestScoredOf, wireDigestOf } from "#/features/modules/report/digest";
-import { MemberCard } from "#/features/modules/report/ui/member-card";
 import { priceYuanOf } from "#/features/modules/report/vocabulary";
 import { m } from "#/paraglide/messages";
 import { logoutFn } from "./logout.fn";
@@ -30,6 +29,7 @@ import { DataCard } from "./ui/data-card";
 import { GenreStatsCard } from "./ui/genre-stats-card";
 import { HistoryCard } from "./ui/history-card";
 import { IdentityCard } from "./ui/identity-card";
+import { ProfileMemberCard } from "./ui/member-card";
 import { SecurityCard } from "./ui/security-card";
 
 /* The overview page's orb pair (prototype profile-overview). */
@@ -122,10 +122,15 @@ export function ProfilePage() {
         <DataCard profile={profile} />
         <SecurityCard />
 
-        {/* The membership face (prototype ③): price off the catalog, CTA
-            parked until the pay client lands — the same stance the report
-            page's purchase faces hold. */}
-        <MemberCard priceYuan={memberYuan} unlocked={false} />
+        {/* The membership face (prototype ③), its own two states keyed on
+            the member_until the page's own profile query carries: the
+            member state states the standing window, the pitch state sells
+            it at the catalog price — CTA parked until the pay client
+            lands, the same stance the report page's purchase faces hold. */}
+        <ProfileMemberCard
+          memberUntil={profileQuery.data?.memberUntil ?? null}
+          priceYuan={memberYuan}
+        />
 
         {digest !== null ? <AbilityOverviewCard rows={overviewRowsOf(digest)} /> : null}
         {digest !== null ? <HistoryCard slots={historySlotsOf(digest)} /> : null}

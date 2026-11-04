@@ -109,3 +109,34 @@ Q1 收口:审计毕,余项全在队列(①⑤⑥=lzx;②=lzx 已裁待落;P11=lj
 **Q3 收口(11-03)**:五面审毕,四发现全处置(①②③④ 客户端半边即修;①服务端执法缺=lzx 队列,同 Q1-⑤ 家族)。回归门=ctr 门禁链+paraglide+单测 21 文件/129+门控 e2e 4 过 2 跳 0 败(修后);活探=hzypw 真登录五读:安全页三行 desc 逐字+解绑卡服务台口径在场;bind-phone 入口行全句(入口：登录后 · 当前账号：哈哈哈（微信登录，未绑手机）);密码页 change 模式头注/栏/钮逐字+校验梯五连拒实测(空旧密码→请输入当前密码;纯字母/纯数字→需同时包含字母与数字;5 位→至少 6 位;不一致→两次输入不一致,原型顺序原句);bind-wechat 头卡 授权并绑定微信+入口行(哈哈哈（微信登录）)。已绑微信掩码分支+出生年月年龄段注记分支=走查号态不达(无微信凭证/已填出生),桌面+类型承载。
 
 登记不修:E4 三配置模块(学科优势匹配/职业发展潜能/提升计划)+免责声明后台可配置——契约无字段,D-AP 剪裁+P4 报告形态锚(ToB 交付物),**入 ljr/P4 登记**;E4 to-trend CTA 无条件(认知响应无进阶判定,会员见自家 upsell)+E1 digest 卡态语义(原型键=解锁态,重建键=已测态,真还原需 digest 携解锁判定)——契约级微欠,**lzx 队列注**;增强在案:进度条/较上局对比卡/提升建议板/SKU 真价口径/五区文案(E5 设计注)/较上局 delta(AnalysisCard contract)。
+
+## Q4 ctr 会员订单面(11-04 开工;射面=会员态呈现/SKU 价格呈现/订单契约面;PAY1 已建面)
+
+清单基线=原型三页(member-detail/pay-confirm/pay-result 渲染态)+prd P1 计费矩阵(已定稿 10-21)+P1.5 订单行形状+sku 种子(19.9/29.9 P1 冻结价)。**边界先立**:member-detail/pay-confirm/pay-result 三页本体=PAY3(W5 付费墙全链)未建面,Q4 不建只登记;Q4 射面=已建的会员态/SKU/判决消费面+支付族契约就绪度。已毕面不重复:home greet(Q1-①毕)/digest·cognitive 判决(Q2-⑥毕)/合并事实行 memberUntil(Q3 G5 毕)。
+
+### 逐项清单
+
+| 段 | 面 | 原型→重建 | 校对点(三源断言) | 态 |
+|---|---|---|---|---|
+| H1 | profile ③ 会员卡两态 | profile-overview.html ③→/profile MemberCard | 原型两态:已开通(green tag+有效期至 X ›去 member-detail+已解锁 N 份报告永久保留+续费会员)/未开通(月卡 tag+查看详情 ›+¥29.9/月+开通会员);desc 双态逐字(会员期内测试自动解锁完整报告 · 历史报告永久保留 · 训练趋势 / 职业差距对比等增值页 vs 测评自动解锁完整报告 · …);重建=借用报告 ④ 卡(MemberCard)且 **unlocked 硬编码 false**(profile/page.tsx:128),memberUntil 契约已在(f0e928da)未消费 | 审毕(①) |
+| H2 | 报告 ④ 会员卡 | report-single.html ④→report/page.tsx MemberCard | 原型两态:会员态(会员期内测试自动全解锁 · 历史报告永久保留)/未开通(¥29.9/月 · 会员期内测试自动全解锁 · 历史报告永久保留+开通专属会员 ¥29.9/月);重建 unlocked=report.unlocked 契约真值;词面+parked CTA 口径核 | 审毕(②) |
+| H3 | 单次解锁卡 ⑤ | report-single.html ⑤→UnlockCard | 价格=SKU 读面真价(priceYuanOf trial kind);P1 词=¥19.9 买该次完整报告永久有效;report_unlock_title/desc/forever 逐字(Q2 已审 desc 族,本段复认价格链与 once/forever 词) | 审毕(过) |
+| H4 | SKU 种子与呈现链 | seed.go seedSkus→ListSkus→两卡 | 种子价 1990/2990=P1 冻结价;名称(单次能力报告/专属会员·月卡)vs 原型标题(认知综合报告·单次解锁/专属会员·月卡)——P1 粒度=trial 非报告类型,种子名合规性核;listPrice=price 无折扣;kind 枚举串消费(String(s.kind))口径 | 审毕(过) |
+| H5 | 订单状态面 | pay-result.html 订单卡→**C 端零订单面** | 原型订单面=结果页订单卡(订单号/金额/支付渠道 wx_h5|wx_jsapi/时间)+fail 卡引「我的 → 订单」(原型自身未画列表页);契约 OrderService GetOrder/ListOrders 在(C 端可读性核:鉴权/owning);重建零面=PAY3 范围,登记不修 | 审毕(登记) |
+| H6 | 支付族契约就绪度(PAY3 输入) | pay-confirm.html 决策④+guard adult+under18 拦截+四态结果 | 决策④ 会员期隐单次;guard=adult;under18 内联拦截(FCA5A5 红卡+两出口);四态(ok/member/fail/cancel)文案族;merchant_not_configured 演示注——逐条对契约/合规配置(compliance-config 出生采集开关/付费年龄线)就绪度,缺口入 lzx 队列供 PAY3 | 审毕(过) |
+| H7 | memberUntil 消费一致性 | 契约 member_until(最远活性窗尾,null=无) | 三消费面口径一致:home greet(在场性)/merge 事实行(有效期至)/profile H1(待接);失效/terminated 态呈现词(已过期(X)· 期内解锁的报告仍可看=原型 member-detail expired 态,PAY3 前无面,登记) | 审毕(过) |
+
+### 发现与处置(11-04,桌面三源对照+admin 授会员活探)
+
+| # | 面 | 断言与证据 | 级 | 处置 |
+|---|---|---|---|---|
+| Q4-① | H1 profile ③ 会员卡 | 原型两态(已开通=green tag+有效期至 X+已解锁 N 份报告 永久保留+续费会员/未开通=月卡 tag+查看详情+¥29.9/月+开通会员,desc 双态各有本句);重建借报告 ④ 卡且 **unlocked 硬编码 false**(profile/page.tsx:128)——memberUntil 契约在(f0e928da)页内 getProfile 本就携带,零加跳可接 | 字面+状态 | **已修**:新建 profile/ui/member-card.tsx ③ 本卡两态(键=memberUntil),desc/tag/CTA 全 ③ 本句双 locale;已开通态有效期至 X+parked 续费,pitch 态 ¥{price}/月+parked 开通 |
+| Q4-② | H2 报告 ④ 卡 unlocked 分叉 | 原型 unlocked 态 desc 二分:memberActive?会员期内测试自动全解锁 · 历史报告永久保留:单次解锁 · 永久有效;重建恒显会员句——单次购买解锁的报告会自标会员权益 | 字面 | **已修**:MemberCard 增 memberActive(session 探针缓存零加跳),非会员解锁落新键 report_member_unlocked_single(单次解锁 · 永久有效/Single unlock · valid forever)双 locale |
+
+过面孔:H3 ⑤ 解锁卡逐字(价格=SKU 读面真价,Q2 desc 族复认);H4 SKU 种子=P1 冻结价 1990/2990+名称合 P1 trial 粒度+listPrice=price 无折扣;H7 memberUntil 三消费面(home 在场性/merge 事实行/profile ③ 卡)口径一致。
+
+登记不修(PAY3 输入固化):member-detail/pay-confirm/pay-result 三页本体未建=W5 PAY3 范围; parked CTA 三处(单次解锁/开通/续费)+③ 查看详情 ›+member-detail expired 态词(已过期(X)· 期内解锁的报告仍可看)随 pay client/页面落地;决策④(会员期隐单次)+guard adult+under18 拦截+四态结果文案族已固化在案;契约就绪**零缺口**(OrderService 四面+PayCredential 三通道+compliance pay_age_line 配置在,under18/merchant 执法=PAY3 合规执法计划内);原型「我的 → 订单」列表页原型自身未画——PAY3 需裁入口形态。
+
+**lzx 队列注(微)**:profile ③ 已开通态「已解锁 N 份报告 永久保留」行无 wire 计数(digest 无 trial 解锁计数;admin MembershipSummary.unlockCount 有先例)——PAY3 前随 digest 或订单面携带,本片以 parked 注让位不硬编码。
+
+**Q4 收口(11-04)**:七面审毕,两发现全落(①profile ③ 两态本卡回位 ②④ 卡解锁分叉);其余五面过/登记。**活探抓真雷一枚:运行时 memberUntil=JSON 平铺 ISO 标量非水合 Timestamp,seconds 读法 NaN→toISOString 抛→整面 ERR——修为 agreement 面双形状读法(string|{seconds}),不可读落「—」不抛面**。活探=hzypw 真登录双向:非会员态 ③ 卡逐字→admin GrantMembership 授 31 天(至 12-05)→首页 greet=专属会员·有效期内(**Q1-① 三态会员支首度活证**)+profile 已开通/有效期至 2026-12-05/③ 会员句逐字+中心四卡判决全翻(单报告/认知=已解锁,趋势=**进阶已解锁三态键首度活证**)→Terminate 回 pitch 态(键控双向);④ 卡 unlocked 支=走查号无锚记录不可达(Q2 同款),桌面+e2e 承载。回归门=ctr 链 --skip-nx-cache+paraglide+单测 22 文件/134+门控 e2e 4 过 2 跳 0 败。Q 线 Q1-Q4 毕,Q5 admin 面(W5)待派。
