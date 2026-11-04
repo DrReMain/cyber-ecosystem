@@ -21,7 +21,9 @@
       "./messages/report/{locale}.json",
       "./messages/security/{locale}.json",
       "./messages/pay/{locale}.json",
-      "./messages/member/{locale}.json"
+      "./messages/member/{locale}.json",
+      "./messages/messages/{locale}.json",
+      "./messages/feedback/{locale}.json"
     ]
   }
 }

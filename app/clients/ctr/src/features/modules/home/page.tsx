@@ -7,10 +7,10 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Bell, ChevronRight, FileText } from "lucide-react";
-import { toast } from "sonner";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { TabBar } from "#/features/app/tabbar";
+import { useUnreadCount } from "#/features/app/unread";
 import { sessionQuery } from "#/features/auth/session.fn";
 import { latestScoredOf, type WireDigest, wireDateOf } from "#/features/modules/report/digest";
 import { m } from "#/paraglide/messages";
@@ -63,6 +63,36 @@ function StatsSection({ digest }: Readonly<{ digest: WireDigest | null }>) {
       reactionBest={digest.abilities.find((a) => a.ability === "reactionSpeed")?.bestScore}
       total={digest.sessionsTotal}
     />
+  );
+}
+
+// The bell entry (prototype home's toMsg fab): the letterbox's unread
+// count is server-owned row state, so guests skip the ask and a member's
+// mark-read invalidations walk the dot back to zero; the accessible name
+// carries the count so the dot is not a sight-only signal.
+function BellEntry() {
+  const navigate = useNavigate();
+  const unread = useUnreadCount();
+  const dot = unread !== undefined && unread > 0;
+  return (
+    <button
+      aria-label={
+        dot ? `${m.profile_msg()} ${unread} ${m.messages_unread_unit()}` : m.profile_msg()
+      }
+      className="bg-surface-input text-ink-secondary flex h-10 w-10 items-center justify-center rounded-full active:opacity-60"
+      onClick={() => void navigate({ to: "/messages", search: { t: "msg" } })}
+      type="button"
+    >
+      <span className="relative">
+        <Bell aria-hidden size={20} />
+        {dot ? (
+          <span
+            aria-hidden
+            className="absolute top-[-2px] right-[-4px] size-[7px] rounded-full bg-[#EF4444]"
+          />
+        ) : null}
+      </span>
+    </button>
   );
 }
 
@@ -141,14 +171,7 @@ export function HomePage() {
               {authed && profile?.nickname != null ? profile.nickname : m.home_guest_name()}
             </h1>
           </div>
-          <button
-            aria-label={m.profile_msg()}
-            className="bg-surface-input text-ink-secondary flex h-10 w-10 items-center justify-center rounded-full active:opacity-60"
-            onClick={() => toast.info(m.common_soon())}
-            type="button"
-          >
-            <Bell aria-hidden size={20} />
-          </button>
+          <BellEntry />
         </div>
 
         {showResume && resume !== null && (

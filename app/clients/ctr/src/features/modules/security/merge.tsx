@@ -363,6 +363,7 @@ function ScenarioAction(props: {
 // The blocked pane: both sides carry weight, the merge stays
 // closed, and the manual path is the only offer.
 function BlockedPane({ onBack }: { onBack: () => void }) {
+  const navigate = useNavigate();
   return (
     <AmbientLayout>
       <FlowHeader onBack={onBack} title={m.security_merge_title()} />
@@ -385,7 +386,7 @@ function BlockedPane({ onBack }: { onBack: () => void }) {
         </div>
         <button
           className="border-line text-ink-secondary bg-surface-input rounded-control border-[1.5px] px-4 py-3.5 text-[15px] font-medium active:opacity-60"
-          onClick={() => toast.info(m.common_soon())}
+          onClick={() => void navigate({ to: "/feedback" })}
           type="button"
         >
           {m.security_merge_blocked_feedback_cta()}

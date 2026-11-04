@@ -11,21 +11,27 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AgeRequiredRouteImport } from './routes/age-required'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MatchRouteImport } from './routes/match'
 import { Route as MemberRouteImport } from './routes/member'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as PayRouteImport } from './routes/pay'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AgreementPrivacyRouteImport } from './routes/agreement.privacy'
 import { Route as AgreementUserRouteImport } from './routes/agreement.user'
+import { Route as FeedbackIndexRouteImport } from './routes/feedback.index'
+import { Route as FeedbackFeedbackIdRouteImport } from './routes/feedback.$feedbackId'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as LoginForgotRouteImport } from './routes/login.forgot'
 import { Route as MatchIndexRouteImport } from './routes/match.index'
 import { Route as MatchGuideRouteImport } from './routes/match.guide'
 import { Route as MatchPickRouteImport } from './routes/match.pick'
 import { Route as MatchSwitchRouteImport } from './routes/match.switch'
+import { Route as MessagesIndexRouteImport } from './routes/messages.index'
+import { Route as MessagesMessageIdRouteImport } from './routes/messages.$messageId'
 import { Route as PayIndexRouteImport } from './routes/pay.index'
 import { Route as PayResultRouteImport } from './routes/pay.result'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
@@ -66,6 +72,11 @@ const AgeRequiredRoute = AgeRequiredRouteImport.update({
   path: '/age-required',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -79,6 +90,11 @@ const MatchRoute = MatchRouteImport.update({
 const MemberRoute = MemberRouteImport.update({
   id: '/member',
   path: '/member',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayRoute = PayRouteImport.update({
@@ -111,6 +127,16 @@ const AgreementUserRoute = AgreementUserRouteImport.update({
   path: '/agreement/user',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedbackIndexRoute = FeedbackIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => FeedbackRoute,
+} as any)
+const FeedbackFeedbackIdRoute = FeedbackFeedbackIdRouteImport.update({
+  id: '/$feedbackId',
+  path: '/$feedbackId',
+  getParentRoute: () => FeedbackRoute,
+} as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -140,6 +166,16 @@ const MatchSwitchRoute = MatchSwitchRouteImport.update({
   id: '/switch',
   path: '/switch',
   getParentRoute: () => MatchRoute,
+} as any)
+const MessagesIndexRoute = MessagesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MessagesRoute,
+} as any)
+const MessagesMessageIdRoute = MessagesMessageIdRouteImport.update({
+  id: '/$messageId',
+  path: '/$messageId',
+  getParentRoute: () => MessagesRoute,
 } as any)
 const PayIndexRoute = PayIndexRouteImport.update({
   id: '/',
@@ -300,19 +336,23 @@ const ProfileSecurityMergeWechatCallbackRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/age-required': typeof AgeRequiredRoute
+  '/feedback': typeof FeedbackRouteWithChildren
   '/login': typeof LoginRouteWithChildren
   '/match': typeof MatchRouteWithChildren
   '/member': typeof MemberRoute
+  '/messages': typeof MessagesRouteWithChildren
   '/pay': typeof PayRouteWithChildren
   '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/agreement/privacy': typeof AgreementPrivacyRoute
   '/agreement/user': typeof AgreementUserRoute
+  '/feedback/$feedbackId': typeof FeedbackFeedbackIdRoute
   '/login/forgot': typeof LoginForgotRoute
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/messages/$messageId': typeof MessagesMessageIdRoute
   '/pay/result': typeof PayResultRoute
   '/profile/security': typeof ProfileSecurityRouteWithChildren
   '/report/$recordId': typeof ReportRecordIdRoute
@@ -321,8 +361,10 @@ export interface FileRoutesByFullPath {
   '/report/cognitive': typeof ReportCognitiveRoute
   '/report/trend': typeof ReportTrendRoute
   '/test/$code': typeof TestCodeRoute
+  '/feedback/': typeof FeedbackIndexRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
+  '/messages/': typeof MessagesIndexRoute
   '/pay/': typeof PayIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
@@ -353,10 +395,12 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/agreement/privacy': typeof AgreementPrivacyRoute
   '/agreement/user': typeof AgreementUserRoute
+  '/feedback/$feedbackId': typeof FeedbackFeedbackIdRoute
   '/login/forgot': typeof LoginForgotRoute
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/messages/$messageId': typeof MessagesMessageIdRoute
   '/pay/result': typeof PayResultRoute
   '/report/$recordId': typeof ReportRecordIdRoute
   '/report/career': typeof ReportCareerRoute
@@ -364,8 +408,10 @@ export interface FileRoutesByTo {
   '/report/cognitive': typeof ReportCognitiveRoute
   '/report/trend': typeof ReportTrendRoute
   '/test/$code': typeof TestCodeRoute
+  '/feedback': typeof FeedbackIndexRoute
   '/login': typeof LoginIndexRoute
   '/match': typeof MatchIndexRoute
+  '/messages': typeof MessagesIndexRoute
   '/pay': typeof PayIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
@@ -390,19 +436,23 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/age-required': typeof AgeRequiredRoute
+  '/feedback': typeof FeedbackRouteWithChildren
   '/login': typeof LoginRouteWithChildren
   '/match': typeof MatchRouteWithChildren
   '/member': typeof MemberRoute
+  '/messages': typeof MessagesRouteWithChildren
   '/pay': typeof PayRouteWithChildren
   '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/agreement/privacy': typeof AgreementPrivacyRoute
   '/agreement/user': typeof AgreementUserRoute
+  '/feedback/$feedbackId': typeof FeedbackFeedbackIdRoute
   '/login/forgot': typeof LoginForgotRoute
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/messages/$messageId': typeof MessagesMessageIdRoute
   '/pay/result': typeof PayResultRoute
   '/profile/security': typeof ProfileSecurityRouteWithChildren
   '/report/$recordId': typeof ReportRecordIdRoute
@@ -411,8 +461,10 @@ export interface FileRoutesById {
   '/report/cognitive': typeof ReportCognitiveRoute
   '/report/trend': typeof ReportTrendRoute
   '/test/$code': typeof TestCodeRoute
+  '/feedback/': typeof FeedbackIndexRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
+  '/messages/': typeof MessagesIndexRoute
   '/pay/': typeof PayIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
@@ -440,19 +492,23 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/age-required'
+    | '/feedback'
     | '/login'
     | '/match'
     | '/member'
+    | '/messages'
     | '/pay'
     | '/profile'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/agreement/privacy'
     | '/agreement/user'
+    | '/feedback/$feedbackId'
     | '/login/forgot'
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/messages/$messageId'
     | '/pay/result'
     | '/profile/security'
     | '/report/$recordId'
@@ -461,8 +517,10 @@ export interface FileRouteTypes {
     | '/report/cognitive'
     | '/report/trend'
     | '/test/$code'
+    | '/feedback/'
     | '/login/'
     | '/match/'
+    | '/messages/'
     | '/pay/'
     | '/profile/'
     | '/login/wechat/callback'
@@ -493,10 +551,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/agreement/privacy'
     | '/agreement/user'
+    | '/feedback/$feedbackId'
     | '/login/forgot'
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/messages/$messageId'
     | '/pay/result'
     | '/report/$recordId'
     | '/report/career'
@@ -504,8 +564,10 @@ export interface FileRouteTypes {
     | '/report/cognitive'
     | '/report/trend'
     | '/test/$code'
+    | '/feedback'
     | '/login'
     | '/match'
+    | '/messages'
     | '/pay'
     | '/profile'
     | '/login/wechat/callback'
@@ -529,19 +591,23 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/age-required'
+    | '/feedback'
     | '/login'
     | '/match'
     | '/member'
+    | '/messages'
     | '/pay'
     | '/profile'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/agreement/privacy'
     | '/agreement/user'
+    | '/feedback/$feedbackId'
     | '/login/forgot'
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/messages/$messageId'
     | '/pay/result'
     | '/profile/security'
     | '/report/$recordId'
@@ -550,8 +616,10 @@ export interface FileRouteTypes {
     | '/report/cognitive'
     | '/report/trend'
     | '/test/$code'
+    | '/feedback/'
     | '/login/'
     | '/match/'
+    | '/messages/'
     | '/pay/'
     | '/profile/'
     | '/login/wechat/callback'
@@ -578,9 +646,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AgeRequiredRoute: typeof AgeRequiredRoute
+  FeedbackRoute: typeof FeedbackRouteWithChildren
   LoginRoute: typeof LoginRouteWithChildren
   MatchRoute: typeof MatchRouteWithChildren
   MemberRoute: typeof MemberRoute
+  MessagesRoute: typeof MessagesRouteWithChildren
   PayRoute: typeof PayRouteWithChildren
   ProfileRoute: typeof ProfileRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
@@ -613,6 +683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgeRequiredRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -632,6 +709,13 @@ declare module '@tanstack/react-router' {
       path: '/member'
       fullPath: '/member'
       preLoaderRoute: typeof MemberRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pay': {
@@ -676,6 +760,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgreementUserRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feedback/': {
+      id: '/feedback/'
+      path: '/'
+      fullPath: '/feedback/'
+      preLoaderRoute: typeof FeedbackIndexRouteImport
+      parentRoute: typeof FeedbackRoute
+    }
+    '/feedback/$feedbackId': {
+      id: '/feedback/$feedbackId'
+      path: '/$feedbackId'
+      fullPath: '/feedback/$feedbackId'
+      preLoaderRoute: typeof FeedbackFeedbackIdRouteImport
+      parentRoute: typeof FeedbackRoute
+    }
     '/login/': {
       id: '/login/'
       path: '/'
@@ -717,6 +815,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/match/switch'
       preLoaderRoute: typeof MatchSwitchRouteImport
       parentRoute: typeof MatchRoute
+    }
+    '/messages/': {
+      id: '/messages/'
+      path: '/'
+      fullPath: '/messages/'
+      preLoaderRoute: typeof MessagesIndexRouteImport
+      parentRoute: typeof MessagesRoute
+    }
+    '/messages/$messageId': {
+      id: '/messages/$messageId'
+      path: '/$messageId'
+      fullPath: '/messages/$messageId'
+      preLoaderRoute: typeof MessagesMessageIdRouteImport
+      parentRoute: typeof MessagesRoute
     }
     '/pay/': {
       id: '/pay/'
@@ -924,6 +1036,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface FeedbackRouteChildren {
+  FeedbackFeedbackIdRoute: typeof FeedbackFeedbackIdRoute
+  FeedbackIndexRoute: typeof FeedbackIndexRoute
+}
+
+const FeedbackRouteChildren: FeedbackRouteChildren = {
+  FeedbackFeedbackIdRoute: FeedbackFeedbackIdRoute,
+  FeedbackIndexRoute: FeedbackIndexRoute,
+}
+
+const FeedbackRouteWithChildren = FeedbackRoute._addFileChildren(
+  FeedbackRouteChildren,
+)
+
 interface LoginRouteChildren {
   LoginForgotRoute: typeof LoginForgotRoute
   LoginIndexRoute: typeof LoginIndexRoute
@@ -953,6 +1079,20 @@ const MatchRouteChildren: MatchRouteChildren = {
 }
 
 const MatchRouteWithChildren = MatchRoute._addFileChildren(MatchRouteChildren)
+
+interface MessagesRouteChildren {
+  MessagesMessageIdRoute: typeof MessagesMessageIdRoute
+  MessagesIndexRoute: typeof MessagesIndexRoute
+}
+
+const MessagesRouteChildren: MessagesRouteChildren = {
+  MessagesMessageIdRoute: MessagesMessageIdRoute,
+  MessagesIndexRoute: MessagesIndexRoute,
+}
+
+const MessagesRouteWithChildren = MessagesRoute._addFileChildren(
+  MessagesRouteChildren,
+)
 
 interface PayRouteChildren {
   PayResultRoute: typeof PayResultRoute
@@ -1048,9 +1188,11 @@ const ProfileRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgeRequiredRoute: AgeRequiredRoute,
+  FeedbackRoute: FeedbackRouteWithChildren,
   LoginRoute: LoginRouteWithChildren,
   MatchRoute: MatchRouteWithChildren,
   MemberRoute: MemberRoute,
+  MessagesRoute: MessagesRouteWithChildren,
   PayRoute: PayRouteWithChildren,
   ProfileRoute: ProfileRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,

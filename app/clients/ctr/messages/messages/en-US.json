@@ -1,0 +1,20 @@
+{
+  "messages_head": "Messages",
+  "messages_title": "Messages",
+  "messages_tab_msg": "Messages",
+  "messages_tab_feedback": "My Feedback",
+  "messages_unread_unit": "unread",
+  "messages_empty": "No messages yet",
+  "messages_feedback_empty": "No feedback submitted yet",
+  "messages_feedback_new": "Send Feedback",
+  "messages_type_announcement": "System notice",
+  "messages_type_report": "Assessment report",
+  "messages_type_membership": "Membership notice",
+  "messages_type_feedback_reply": "Feedback reply",
+  "messages_notice_head": "System notice",
+  "messages_detail_head": "Details",
+  "messages_cta_report": "View my report",
+  "messages_cta_feedback": "View conversation",
+  "messages_not_found": "Message not found",
+  "messages_error_title": "Couldn't load messages"
+}

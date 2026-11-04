@@ -19,7 +19,7 @@ UI 对照四要素=**布局一样、细节接近、文案一样、视觉接近**
 | 锚 | 内容 | 归属 |
 |---|---|---|
 | test-records 三态 | block4 未完成/完成锁定/历史最佳三态设计(?t=) | M2 余组记录读面 |
-| message 族 | message-center 双 Tab/feedback 六类枚举/对话式详情;notification-detail 补充面 | MSG-1 余面 |
+| message 族 | message-center 双 Tab/feedback 六类枚举/对话式详情;notification-detail 补充面 | ctr 腿 ✅(2026-11-05,MSG-1);admin 三页=W4 |
 | share-invite 两态 | 免费层 5 维卡+动态三档文案+未成年代称+保存图片 | MSG-2(P23) |
 | E4 三配置模块 | 学科优势匹配/职业发展潜能/提升计划(契约无字段,后台可配置+空态不造假) | P4(ljr)/M3 |
 | scheme-b 三页 | 渠道版 6 能力直测+渠道报告 | M3/P4 窗外 |

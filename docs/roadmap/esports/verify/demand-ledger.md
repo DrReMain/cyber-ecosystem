@@ -33,9 +33,9 @@
 | 23 | member-detail | ✅ | PAY3 片4 建成(2c3ecb7c,11-05):三态折(活窗紫条/过期灰条含日期/never 无条)+权益 4+FAQ5+紫 CTA;走查三态+计数 0→1 活证 |
 | 24 | pay-confirm | ✅ | PAY3 片2 建成(e3159a9e,11-05):P7 三态/未成年红卡+逃生双钮/缺出生回跳/模拟收银台(MockCashierService.MarkPaid);mock 全链走查毕;真通道三红条=gap-ledger 五批 |
 | 25 | pay-result | ✅ | PAY3 片3 建成(d9ddd12e,11-05):四态 GetOrder 真值驱动+D-AU③ 双文案键+收据四行;五腿 live 走查毕(含 h5 手机仿真);cancel 文案偏离登记=gap-ledger 六批 |
-| 26 | message-center | ❌ | →MSG-1(D-AS①);P21 前置 |
-| 27 | feedback-submit | ❌ | →MSG-1;G-202 红条随接真跳 |
-| 28 | feedback-detail | ❌ | →MSG-1 |
+| 26 | message-center | ✅ | /messages 双 Tab(消息/我的反馈,?t=);未读横幅+行红点+tabbar/home 双红点(2026-11-05 MSG-1 ctr 腿,live 走查毕) |
+| 27 | feedback-submit | ✅ | /feedback 六类/10-500 校验逐字(2026-11-05,提交→toast→fb 队列 live 毕;G-202 接真跳随落) |
+| 28 | feedback-detail | ✅ | /feedback/$feedbackId 对话式+追问翻态+关单态;notice 形=/messages/$messageId(开信即读+类型 CTA 深链)(2026-11-05 live 毕) |
 | 29 | agreement | ✅ | 版本行真源化(loader 预取 GetAgreementCurrent)+登录 consent 上行(三腿登录法)随 E9 余刀落(11-01 走查毕);章节文案仍 ljr 法务定稿占位 |
 | 30 | age-required | ✅ | 付费闸挂接→PAY3;逃生按钮在遗留清单 |
 | 31 | bind-phone | ✅ | E6c-c |
@@ -53,7 +53,7 @@
 | 43 | empty | 📄 | 同上 |
 | 44 | error | 📄 | 同上 |
 
-**计数:44 = ✅26 + ◐5 + ❌8 + ⏸1 + 📄4(2026-11-05 对账:pay-confirm/pay-result/member-detail 三页随 PAY3 翻 ✅;❌ 余=message 族 3+test-records+share-invite+scheme-b 3+version-update)。** blocks/future 补充面:forgot-password ✅(/login/forgot)、change-password ✅(E6c-c)、notification-detail→MSG-1、subscription-popup/theme-hero ⏸(P13 剪裁已定不入)、moba-6dim ⏸(P15 已裁口径)、future/22 页=远期参考不入账。
+**计数:44 = ✅29 + ◐5 + ❌5 + ⏸1 + 📄4(2026-11-05 二对账:message 族三页随 MSG-1 ctr 腿翻 ✅;❌ 余=test-records+share-invite+scheme-b 3+version-update)。** blocks/future 补充面:forgot-password ✅(/login/forgot)、change-password ✅(E6c-c)、notification-detail ✅(=feedback-detail?kind=notice 形,落 /messages/$messageId)、subscription-popup/theme-hero ⏸(P13 剪裁已定不入)、moba-6dim ⏸(P15 已裁口径)、future/22 页=远期参考不入账。
 
 ## §二 admin 原型 41 页(真源=`manage/design-systems/admin/outputs/prototype/`;侧栏 9 组权威=_nav.js)
 
@@ -89,9 +89,9 @@
 | 题库三表 CRUD 23 端点(攻防/角色/克制) | 📋 余组 | E9 只读抽屉已建;CRUD/Excel 随余组(10-28 已注) |
 | 双 Java 服务共享库/Flyway/Snowflake/JWT 细节 | 🗑 不迁 | clean-room 律(README §0.1) |
 
-## §四 现状计数(2026-11-05 代码盘点;对账基准)
+## §四 现状计数(2026-11-05 二盘点;对账基准)
 
-- 新实现:esports=21 service/83 RPC/23 表/2 ticker(支付收敛 1min+对账 24h;MSG 四表+mockcashier 面已入);ctr=43 路由+13 引擎(前后端一一对应)+0 业务 store;admin=esports 面 14 页(13 计账+report-policies 账外)。
+- 新实现:esports=21 service/83 RPC/23 表/2 ticker(支付收敛 1min+对账 24h;MSG 四表+mockcashier 面已入);ctr=47 路由(+4=messages 树 2+feedback 树 2,MSG-1 ctr 腿)+13 引擎(前后端一一对应)+0 业务 store;admin=esports 面 14 页(13 计账+report-policies 账外)。
 - 对照:旧 191 端点(admin 133)/36 表/ctr 64 视图/admin 23 视图。新版**反超项**=支付后端(旧仅枚举)/匹配引擎(旧纯设计)/全量服务端判分(旧 4 款作弊面)/账号合并(旧无)/报告快照冻结(旧无)/消息反馈线程域(旧单发回复)。
 - 投入分布(esports/main 提交数):10-09 起全窗 ctr 140 : 后端 99 : admin 41;**10-30 校正后(至 11-05)ctr 42 : 后端 25 : admin 14**——admin 占比升至约 ctr 的 1/3,CP2/CP3 增 admin 构成项已见效。
 

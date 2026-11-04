@@ -15,3 +15,18 @@ export function localDateTimeOf(ms: number): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${localDateOf(ms)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
+
+// The letterbox and feedback threads quote the prototype's compact stamps:
+// MM-DD on list rows, MM-DD HH:mm on ticket turns — a year prefix would
+// crowd rows that already carry a dot and a badge.
+export function localShortDateOf(ms: number): string {
+  const d = new Date(ms);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+export function localShortDateTimeOf(ms: number): string {
+  const d = new Date(ms);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${localShortDateOf(ms)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}

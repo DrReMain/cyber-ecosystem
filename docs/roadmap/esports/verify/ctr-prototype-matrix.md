@@ -32,9 +32,9 @@
 | 23 | member-detail.html | 会员权益 | `/member`(PAY3 片4) |
 | 24 | pay-confirm.html | 确认支付 | `/pay`(PAY3 片2;oracle=P7 稿 p7-member-paywall.html) |
 | 25 | pay-result.html | 支付结果 | `/pay/result`(PAY3 片3,四态) |
-| 26 | message-center.html | 消息中心 | 未建(→MSG-1 余面) |
-| 27 | feedback-submit.html | 意见反馈 | 未建(→MSG-1 余面) |
-| 28 | feedback-detail.html | 反馈详情 | 未建(→MSG-1 余面) |
+| 26 | message-center.html | 消息中心 | `/messages`(MSG-1 ctr 腿,双 Tab ?t=) |
+| 27 | feedback-submit.html | 意见反馈 | `/feedback`(MSG-1 ctr 腿) |
+| 28 | feedback-detail.html | 反馈详情 | `/feedback/$feedbackId`(fb 形)+`/messages/$messageId`(notice 形,MSG-1 ctr 腿) |
 | 29 | agreement.html | 用户协议与隐私政策 | `/agreement/user`+`/agreement/privacy`(一壳两协议 vs 两路由,在册分歧) |
 | 30 | age-required.html | 补填出生年月 | `/age-required`(逃生口=遗留清单) |
 | 31 | bind-phone.html | 绑定手机号 | `/profile/security/bind-phone` |
@@ -52,13 +52,13 @@
 | 43 | empty.html | 空态 | 全局 StateScreen(域内变体随消费面) |
 | 44 | error.html | 网络异常 | 全局 ErrorPage/ErrorFallback(network kind=暖卡,Q1-③) |
 
-**计数:44 = 已映射 31 + 未建 9 + 壳/通用 4**(与 demand-ledger §一 计数互通:未建 9=❌8+⏸1)。
+**计数:44 = 已映射 34 + 未建 6 + 壳/通用 4**(2026-11-05 MSG-1 ctr 腿:message 族三页入映射;与 demand-ledger §一 计数互通:未建 6=❌5+⏸1)。
 
 ## blocks/future 补充面(44 页之外)
 
 | 出处 | 内容 | 处置 |
 |---|---|---|
-| block4/notification-detail.html | 通知详情 | 随 message-center 族(MSG-1 余面定形态) |
+| block4/notification-detail.html | 通知详情 | ✅ 已落=prototype feedback-detail?kind=notice 形(权威层级 prototype>block4),路由 /messages/$messageId(MSG-1 ctr 腿) |
 | block4/account-set/change-password.html | 设置/修改登录密码 | ✅ 已随 password 族 |
 | block4/subscription-popup.html · theme-hero.html | 订阅弹窗 · 主题英雄位 | ⏸ 不入(P13 已裁) |
 | block3/moba-6dim-report.html | moba 6 维报告形态 | ⏸ 不入(P15/D-AP 已裁:窗内 4×genre 形态) |
