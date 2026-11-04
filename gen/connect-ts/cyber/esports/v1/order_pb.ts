@@ -460,11 +460,16 @@ export const PayCredentialKindSchema: GenEnum<PayCredentialKind> = /*@__PURE__*/
 /**
  * The order aggregate's faces. The member plane creates and reads its own
  * orders; creating again for the same grant target while a pending order
- * lives returns that order. NotifyPayment is the service's only public
- * face: its callers are payment channels pushing their envelopes, and
- * they authenticate by the channel signature inside the payload, never by
- * a session — the notification accelerates settlement, the query surface
- * converges it.
+ * lives returns that order. Create is also the pay gate's authority, and
+ * the gate outranks reuse: a member without a recorded birth is refused
+ * BIRTH_MISSING (the client routes to the backfill), a member under the
+ * compliance age line is refused AGE_BLOCKED — live order or not, a
+ * member the gate refuses never receives payment material. The wall's
+ * catalog-side pre-check is experience, this refusal is the rule.
+ * NotifyPayment is the service's only public face: its callers are
+ * payment channels pushing their envelopes, and they authenticate by the
+ * channel signature inside the payload, never by a session — the
+ * notification accelerates settlement, the query surface converges it.
  *
  * @generated from service cyber.esports.v1.OrderService
  */

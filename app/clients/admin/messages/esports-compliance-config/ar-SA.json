@@ -1,6 +1,6 @@
 {
   "esports_compliance_config_title": "إعدادات الامتثال",
-  "esports_compliance_config_desc": "جمع تاريخ الميلاد · خط العمر للدفع (حساسة، تأكيد مزدوج) · نصوص إرشاد الدفع",
+  "esports_compliance_config_desc": "جمع تاريخ الميلاد · خط سن الدفع (حساس، تأكيد مزدوج) · تذكير التجديد · نصوص إرشاد الدفع",
   "esports_compliance_config_refresh": "تحديث",
   "esports_compliance_config_birth_title": "جمع تاريخ الميلاد",
   "esports_compliance_config_birth_label": "جمع تاريخ الميلاد عند التسجيل",
@@ -19,6 +19,15 @@
   "esports_compliance_config_age_modal_ok": "تأكيد التعديل",
   "esports_compliance_config_age_modal_warn": "عملية حساسة: تتطلب صلاحية + تأكيدًا مزدوجًا + قيدًا في سجل التدقيق",
   "esports_compliance_config_age_ok": "تم تعديل خط العمر للدفع إلى {age}",
+  "esports_compliance_config_remind_title": "توقيت تذكير التجديد",
+  "esports_compliance_config_remind_label": "التذكير قبل انتهاء العضوية",
+  "esports_compliance_config_remind_unit": "يومًا",
+  "esports_compliance_config_remind_hint": "خلال N يومًا من الانتهاء تعرض صفحة التجديد وبطاقة العضوية التذكير",
+  "esports_compliance_config_remind_edit": "تعديل التوقيت",
+  "esports_compliance_config_remind_modal_title": "تعديل تذكير التجديد",
+  "esports_compliance_config_remind_modal_label": "بدء التذكير (أيام) قبل الانتهاء",
+  "esports_compliance_config_remind_modal_ok": "تأكيد",
+  "esports_compliance_config_remind_ok": "تم ضبط تذكير التجديد على {days} يومًا قبل الانتهاء",
   "esports_compliance_config_prompts_title": "نصوص إرشاد الدفع",
   "esports_compliance_config_prompts_minor_label": "تنبيه القاصرين",
   "esports_compliance_config_prompts_minor_default": "لا يمكن الدفع لمن هم دون 18 عامًا",
@@ -30,5 +39,5 @@
   "esports_compliance_config_prompts_placeholder": "أدخل النص الإرشادي الجديد",
   "esports_compliance_config_prompts_save": "حفظ",
   "esports_compliance_config_prompts_ok": "تم تحديث النص",
-  "esports_compliance_config_callout": "يُحسب العمر بأقصى حدّه: من وُلد في 1 يناير لا يُعد أكمل سنة إلا في 2 يناير من العام التالي؛ تعديل خط العمر عملية حساسة تتطلب تأكيدًا مزدوجًا ويُدوَّن في سجل التدقيق."
+  "esports_compliance_config_callout": "يُحتسب العمر بتحفّظ على أشهر كاملة من سنة وشهر الميلاد المسجّلين: من وُلد في يونيو لا يجتاز خط الـ18 عامًا إلا بدءًا من يوليو في السنة التي يُتمّ فيها الثامنة عشرة. تعديل خط السن عملية حساسة — تأكيد مزدوج ويُسجّل في التدقيق."
 }

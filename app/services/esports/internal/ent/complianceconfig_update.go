@@ -70,6 +70,27 @@ func (_u *ComplianceConfigUpdate) AddPayAgeLine(v int) *ComplianceConfigUpdate {
 	return _u
 }
 
+// SetRenewalRemindDays sets the "renewal_remind_days" field.
+func (_u *ComplianceConfigUpdate) SetRenewalRemindDays(v int) *ComplianceConfigUpdate {
+	_u.mutation.ResetRenewalRemindDays()
+	_u.mutation.SetRenewalRemindDays(v)
+	return _u
+}
+
+// SetNillableRenewalRemindDays sets the "renewal_remind_days" field if the given value is not nil.
+func (_u *ComplianceConfigUpdate) SetNillableRenewalRemindDays(v *int) *ComplianceConfigUpdate {
+	if v != nil {
+		_u.SetRenewalRemindDays(*v)
+	}
+	return _u
+}
+
+// AddRenewalRemindDays adds value to the "renewal_remind_days" field.
+func (_u *ComplianceConfigUpdate) AddRenewalRemindDays(v int) *ComplianceConfigUpdate {
+	_u.mutation.AddRenewalRemindDays(v)
+	return _u
+}
+
 // SetMinorPrompt sets the "minor_prompt" field.
 func (_u *ComplianceConfigUpdate) SetMinorPrompt(v string) *ComplianceConfigUpdate {
 	_u.mutation.SetMinorPrompt(v)
@@ -193,6 +214,12 @@ func (_u *ComplianceConfigUpdate) sqlSave(ctx context.Context) (_node int, err e
 	if value, ok := _u.mutation.AddedPayAgeLine(); ok {
 		_spec.AddField(complianceconfig.FieldPayAgeLine, field.TypeInt, value)
 	}
+	if value, ok := _u.mutation.RenewalRemindDays(); ok {
+		_spec.SetField(complianceconfig.FieldRenewalRemindDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedRenewalRemindDays(); ok {
+		_spec.AddField(complianceconfig.FieldRenewalRemindDays, field.TypeInt, value)
+	}
 	if value, ok := _u.mutation.MinorPrompt(); ok {
 		_spec.SetField(complianceconfig.FieldMinorPrompt, field.TypeString, value)
 	}
@@ -262,6 +289,27 @@ func (_u *ComplianceConfigUpdateOne) SetNillablePayAgeLine(v *int) *ComplianceCo
 // AddPayAgeLine adds value to the "pay_age_line" field.
 func (_u *ComplianceConfigUpdateOne) AddPayAgeLine(v int) *ComplianceConfigUpdateOne {
 	_u.mutation.AddPayAgeLine(v)
+	return _u
+}
+
+// SetRenewalRemindDays sets the "renewal_remind_days" field.
+func (_u *ComplianceConfigUpdateOne) SetRenewalRemindDays(v int) *ComplianceConfigUpdateOne {
+	_u.mutation.ResetRenewalRemindDays()
+	_u.mutation.SetRenewalRemindDays(v)
+	return _u
+}
+
+// SetNillableRenewalRemindDays sets the "renewal_remind_days" field if the given value is not nil.
+func (_u *ComplianceConfigUpdateOne) SetNillableRenewalRemindDays(v *int) *ComplianceConfigUpdateOne {
+	if v != nil {
+		_u.SetRenewalRemindDays(*v)
+	}
+	return _u
+}
+
+// AddRenewalRemindDays adds value to the "renewal_remind_days" field.
+func (_u *ComplianceConfigUpdateOne) AddRenewalRemindDays(v int) *ComplianceConfigUpdateOne {
+	_u.mutation.AddRenewalRemindDays(v)
 	return _u
 }
 
@@ -417,6 +465,12 @@ func (_u *ComplianceConfigUpdateOne) sqlSave(ctx context.Context) (_node *Compli
 	}
 	if value, ok := _u.mutation.AddedPayAgeLine(); ok {
 		_spec.AddField(complianceconfig.FieldPayAgeLine, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.RenewalRemindDays(); ok {
+		_spec.SetField(complianceconfig.FieldRenewalRemindDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedRenewalRemindDays(); ok {
+		_spec.AddField(complianceconfig.FieldRenewalRemindDays, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.MinorPrompt(); ok {
 		_spec.SetField(complianceconfig.FieldMinorPrompt, field.TypeString, value)

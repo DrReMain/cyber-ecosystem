@@ -25,8 +25,10 @@ type ComplianceConfig struct {
 	Slot complianceconfig.Slot `json:"slot,omitempty"`
 	// collect the member's birth date at registration; off = age band only (the pay wall then guides the backfill)
 	BirthCollect bool `json:"birth_collect,omitempty"`
-	// members younger than this cannot pay; age reckons on the maximum boundary — born Jan 1 means one year older only on Jan 2
+	// members younger than this cannot pay; birth is year+month granularity, so the line clears only from the month after the birthday month — the conservative reading
 	PayAgeLine int `json:"pay_age_line,omitempty"`
+	// days before membership expiry the renewal reminder shows; the shipped default answers when unset
+	RenewalRemindDays int `json:"renewal_remind_days,omitempty"`
 	// pay-wall copy for an under-age member; empty = each face renders its own localized default
 	MinorPrompt string `json:"minor_prompt,omitempty"`
 	// pay-wall copy when the birth date is missing; empty = localized default
@@ -43,7 +45,7 @@ func (*ComplianceConfig) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case complianceconfig.FieldBirthCollect:
 			values[i] = new(sql.NullBool)
-		case complianceconfig.FieldPayAgeLine:
+		case complianceconfig.FieldPayAgeLine, complianceconfig.FieldRenewalRemindDays:
 			values[i] = new(sql.NullInt64)
 		case complianceconfig.FieldID, complianceconfig.FieldSlot, complianceconfig.FieldMinorPrompt, complianceconfig.FieldMissingBirthPrompt, complianceconfig.FieldUpdatedBy:
 			values[i] = new(sql.NullString)
@@ -99,6 +101,12 @@ func (_m *ComplianceConfig) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field pay_age_line", values[i])
 			} else if value.Valid {
 				_m.PayAgeLine = int(value.Int64)
+			}
+		case complianceconfig.FieldRenewalRemindDays:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field renewal_remind_days", values[i])
+			} else if value.Valid {
+				_m.RenewalRemindDays = int(value.Int64)
 			}
 		case complianceconfig.FieldMinorPrompt:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -168,6 +176,9 @@ func (_m *ComplianceConfig) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("pay_age_line=")
 	builder.WriteString(fmt.Sprintf("%v", _m.PayAgeLine))
+	builder.WriteString(", ")
+	builder.WriteString("renewal_remind_days=")
+	builder.WriteString(fmt.Sprintf("%v", _m.RenewalRemindDays))
 	builder.WriteString(", ")
 	builder.WriteString("minor_prompt=")
 	builder.WriteString(_m.MinorPrompt)

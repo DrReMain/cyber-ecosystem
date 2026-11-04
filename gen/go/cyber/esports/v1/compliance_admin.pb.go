@@ -38,8 +38,11 @@ type ComplianceConfig struct {
 	PayAgeLine         *wrapperspb.Int32Value  `protobuf:"bytes,2,opt,name=pay_age_line,json=payAgeLine,proto3" json:"pay_age_line,omitempty"`
 	MinorPrompt        *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=minor_prompt,json=minorPrompt,proto3" json:"minor_prompt,omitempty"`
 	MissingBirthPrompt *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=missing_birth_prompt,json=missingBirthPrompt,proto3" json:"missing_birth_prompt,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Days before membership expiry the renewal reminder shows; the
+	// shipped default 7 answers when no row sets it.
+	RenewalRemindDays *wrapperspb.Int32Value `protobuf:"bytes,5,opt,name=renewal_remind_days,json=renewalRemindDays,proto3" json:"renewal_remind_days,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *ComplianceConfig) Reset() {
@@ -96,6 +99,13 @@ func (x *ComplianceConfig) GetMinorPrompt() *wrapperspb.StringValue {
 func (x *ComplianceConfig) GetMissingBirthPrompt() *wrapperspb.StringValue {
 	if x != nil {
 		return x.MissingBirthPrompt
+	}
+	return nil
+}
+
+func (x *ComplianceConfig) GetRenewalRemindDays() *wrapperspb.Int32Value {
+	if x != nil {
+		return x.RenewalRemindDays
 	}
 	return nil
 }
@@ -372,6 +382,94 @@ func (x *SetPayAgeLineResponse) GetConfig() *ComplianceConfig {
 	return nil
 }
 
+type SetRenewalReminderRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Days          *int32                 `protobuf:"varint,1,opt,name=days,proto3,oneof" json:"days,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetRenewalReminderRequest) Reset() {
+	*x = SetRenewalReminderRequest{}
+	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetRenewalReminderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetRenewalReminderRequest) ProtoMessage() {}
+
+func (x *SetRenewalReminderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetRenewalReminderRequest.ProtoReflect.Descriptor instead.
+func (*SetRenewalReminderRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_compliance_admin_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SetRenewalReminderRequest) GetDays() int32 {
+	if x != nil && x.Days != nil {
+		return *x.Days
+	}
+	return 0
+}
+
+type SetRenewalReminderResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Config        *ComplianceConfig      `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetRenewalReminderResponse) Reset() {
+	*x = SetRenewalReminderResponse{}
+	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetRenewalReminderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetRenewalReminderResponse) ProtoMessage() {}
+
+func (x *SetRenewalReminderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetRenewalReminderResponse.ProtoReflect.Descriptor instead.
+func (*SetRenewalReminderResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_compliance_admin_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SetRenewalReminderResponse) GetConfig() *ComplianceConfig {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
 type GetComplianceConfigRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -380,7 +478,7 @@ type GetComplianceConfigRequest struct {
 
 func (x *GetComplianceConfigRequest) Reset() {
 	*x = GetComplianceConfigRequest{}
-	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[7]
+	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -392,7 +490,7 @@ func (x *GetComplianceConfigRequest) String() string {
 func (*GetComplianceConfigRequest) ProtoMessage() {}
 
 func (x *GetComplianceConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[7]
+	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -405,7 +503,7 @@ func (x *GetComplianceConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetComplianceConfigRequest.ProtoReflect.Descriptor instead.
 func (*GetComplianceConfigRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_compliance_admin_proto_rawDescGZIP(), []int{7}
+	return file_cyber_esports_v1_compliance_admin_proto_rawDescGZIP(), []int{9}
 }
 
 type GetComplianceConfigResponse struct {
@@ -417,7 +515,7 @@ type GetComplianceConfigResponse struct {
 
 func (x *GetComplianceConfigResponse) Reset() {
 	*x = GetComplianceConfigResponse{}
-	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[8]
+	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -429,7 +527,7 @@ func (x *GetComplianceConfigResponse) String() string {
 func (*GetComplianceConfigResponse) ProtoMessage() {}
 
 func (x *GetComplianceConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[8]
+	mi := &file_cyber_esports_v1_compliance_admin_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -442,7 +540,7 @@ func (x *GetComplianceConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetComplianceConfigResponse.ProtoReflect.Descriptor instead.
 func (*GetComplianceConfigResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_compliance_admin_proto_rawDescGZIP(), []int{8}
+	return file_cyber_esports_v1_compliance_admin_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetComplianceConfigResponse) GetConfig() *ComplianceConfig {
@@ -456,13 +554,14 @@ var File_cyber_esports_v1_compliance_admin_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_compliance_admin_proto_rawDesc = "" +
 	"\n" +
-	"'cyber/esports/v1/compliance_admin.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xa3\x02\n" +
+	"'cyber/esports/v1/compliance_admin.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xf0\x02\n" +
 	"\x10ComplianceConfig\x12?\n" +
 	"\rbirth_collect\x18\x01 \x01(\v2\x1a.google.protobuf.BoolValueR\fbirthCollect\x12=\n" +
 	"\fpay_age_line\x18\x02 \x01(\v2\x1b.google.protobuf.Int32ValueR\n" +
 	"payAgeLine\x12?\n" +
 	"\fminor_prompt\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\vminorPrompt\x12N\n" +
-	"\x14missing_birth_prompt\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x12missingBirthPrompt\"N\n" +
+	"\x14missing_birth_prompt\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x12missingBirthPrompt\x12K\n" +
+	"\x13renewal_remind_days\x18\x05 \x01(\v2\x1b.google.protobuf.Int32ValueR\x11renewalRemindDays\"N\n" +
 	"\x19SetBirthCollectionRequest\x12%\n" +
 	"\acollect\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01H\x00R\acollect\x88\x01\x01B\n" +
 	"\n" +
@@ -483,17 +582,24 @@ const file_cyber_esports_v1_compliance_admin_proto_rawDesc = "" +
 	"\x03age\x18\x01 \x01(\x05B\f\xbaH\t\xc8\x01\x01\x1a\x04\x18x(\x01H\x00R\x03age\x88\x01\x01B\x06\n" +
 	"\x04_age\"S\n" +
 	"\x15SetPayAgeLineResponse\x12:\n" +
+	"\x06config\x18\x01 \x01(\v2\".cyber.esports.v1.ComplianceConfigR\x06config\"K\n" +
+	"\x19SetRenewalReminderRequest\x12%\n" +
+	"\x04days\x18\x01 \x01(\x05B\f\xbaH\t\xc8\x01\x01\x1a\x04\x18Z(\x01H\x00R\x04days\x88\x01\x01B\a\n" +
+	"\x05_days\"X\n" +
+	"\x1aSetRenewalReminderResponse\x12:\n" +
 	"\x06config\x18\x01 \x01(\v2\".cyber.esports.v1.ComplianceConfigR\x06config\"\x1c\n" +
 	"\x1aGetComplianceConfigRequest\"Y\n" +
 	"\x1bGetComplianceConfigResponse\x12:\n" +
-	"\x06config\x18\x01 \x01(\v2\".cyber.esports.v1.ComplianceConfigR\x06config2\xc8\x06\n" +
+	"\x06config\x18\x01 \x01(\v2\".cyber.esports.v1.ComplianceConfigR\x06config2\x97\b\n" +
 	"\x16ComplianceAdminService\x12\xd2\x01\n" +
 	"\x12SetBirthCollection\x12+.cyber.esports.v1.SetBirthCollectionRequest\x1a,.cyber.esports.v1.SetBirthCollectionResponse\"a\x88\xf1\x04\x02\x8a\xd3\x0e\x1c\n" +
 	"\x18出生年月采集开关\x10\x02\x82\xd3\xe4\x93\x027:\x01*\x1a2/api/v1/esports/compliance-config/birth-collection\x12\xc9\x01\n" +
 	"\x14SetCompliancePrompts\x12-.cyber.esports.v1.SetCompliancePromptsRequest\x1a..cyber.esports.v1.SetCompliancePromptsResponse\"R\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
 	"\x12付费提示文案\x10\x02\x82\xd3\xe4\x93\x02.:\x01*\x1a)/api/v1/esports/compliance-config/prompts\x12\xbc\x01\n" +
 	"\rSetPayAgeLine\x12&.cyber.esports.v1.SetPayAgeLineRequest\x1a'.cyber.esports.v1.SetPayAgeLineResponse\"Z\x88\xf1\x04\x02\x8a\xd3\x0e\x19\n" +
-	"\x15调整付费年龄线\x10\x02\x82\xd3\xe4\x93\x023:\x01*\x1a./api/v1/esports/compliance-config/pay-age-line\x12\xbb\x01\n" +
+	"\x15调整付费年龄线\x10\x02\x82\xd3\xe4\x93\x023:\x01*\x1a./api/v1/esports/compliance-config/pay-age-line\x12\xcc\x01\n" +
+	"\x12SetRenewalReminder\x12+.cyber.esports.v1.SetRenewalReminderRequest\x1a,.cyber.esports.v1.SetRenewalReminderResponse\"[\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
+	"\x12到期提醒时机\x10\x02\x82\xd3\xe4\x93\x027:\x01*\x1a2/api/v1/esports/compliance-config/renewal-reminder\x12\xbb\x01\n" +
 	"\x13GetComplianceConfig\x12,.cyber.esports.v1.GetComplianceConfigRequest\x1a-.cyber.esports.v1.GetComplianceConfigResponse\"G\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
 	"\x12合规配置读取\x10\x01\x82\xd3\xe4\x93\x02#\x12!/api/v1/esports/compliance-config\x1a\x10\x8a\xe2\t\f合规配置B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
@@ -509,7 +615,7 @@ func file_cyber_esports_v1_compliance_admin_proto_rawDescGZIP() []byte {
 	return file_cyber_esports_v1_compliance_admin_proto_rawDescData
 }
 
-var file_cyber_esports_v1_compliance_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_cyber_esports_v1_compliance_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_cyber_esports_v1_compliance_admin_proto_goTypes = []any{
 	(*ComplianceConfig)(nil),             // 0: cyber.esports.v1.ComplianceConfig
 	(*SetBirthCollectionRequest)(nil),    // 1: cyber.esports.v1.SetBirthCollectionRequest
@@ -518,34 +624,40 @@ var file_cyber_esports_v1_compliance_admin_proto_goTypes = []any{
 	(*SetCompliancePromptsResponse)(nil), // 4: cyber.esports.v1.SetCompliancePromptsResponse
 	(*SetPayAgeLineRequest)(nil),         // 5: cyber.esports.v1.SetPayAgeLineRequest
 	(*SetPayAgeLineResponse)(nil),        // 6: cyber.esports.v1.SetPayAgeLineResponse
-	(*GetComplianceConfigRequest)(nil),   // 7: cyber.esports.v1.GetComplianceConfigRequest
-	(*GetComplianceConfigResponse)(nil),  // 8: cyber.esports.v1.GetComplianceConfigResponse
-	(*wrapperspb.BoolValue)(nil),         // 9: google.protobuf.BoolValue
-	(*wrapperspb.Int32Value)(nil),        // 10: google.protobuf.Int32Value
-	(*wrapperspb.StringValue)(nil),       // 11: google.protobuf.StringValue
+	(*SetRenewalReminderRequest)(nil),    // 7: cyber.esports.v1.SetRenewalReminderRequest
+	(*SetRenewalReminderResponse)(nil),   // 8: cyber.esports.v1.SetRenewalReminderResponse
+	(*GetComplianceConfigRequest)(nil),   // 9: cyber.esports.v1.GetComplianceConfigRequest
+	(*GetComplianceConfigResponse)(nil),  // 10: cyber.esports.v1.GetComplianceConfigResponse
+	(*wrapperspb.BoolValue)(nil),         // 11: google.protobuf.BoolValue
+	(*wrapperspb.Int32Value)(nil),        // 12: google.protobuf.Int32Value
+	(*wrapperspb.StringValue)(nil),       // 13: google.protobuf.StringValue
 }
 var file_cyber_esports_v1_compliance_admin_proto_depIdxs = []int32{
-	9,  // 0: cyber.esports.v1.ComplianceConfig.birth_collect:type_name -> google.protobuf.BoolValue
-	10, // 1: cyber.esports.v1.ComplianceConfig.pay_age_line:type_name -> google.protobuf.Int32Value
-	11, // 2: cyber.esports.v1.ComplianceConfig.minor_prompt:type_name -> google.protobuf.StringValue
-	11, // 3: cyber.esports.v1.ComplianceConfig.missing_birth_prompt:type_name -> google.protobuf.StringValue
-	0,  // 4: cyber.esports.v1.SetBirthCollectionResponse.config:type_name -> cyber.esports.v1.ComplianceConfig
-	0,  // 5: cyber.esports.v1.SetCompliancePromptsResponse.config:type_name -> cyber.esports.v1.ComplianceConfig
-	0,  // 6: cyber.esports.v1.SetPayAgeLineResponse.config:type_name -> cyber.esports.v1.ComplianceConfig
-	0,  // 7: cyber.esports.v1.GetComplianceConfigResponse.config:type_name -> cyber.esports.v1.ComplianceConfig
-	1,  // 8: cyber.esports.v1.ComplianceAdminService.SetBirthCollection:input_type -> cyber.esports.v1.SetBirthCollectionRequest
-	3,  // 9: cyber.esports.v1.ComplianceAdminService.SetCompliancePrompts:input_type -> cyber.esports.v1.SetCompliancePromptsRequest
-	5,  // 10: cyber.esports.v1.ComplianceAdminService.SetPayAgeLine:input_type -> cyber.esports.v1.SetPayAgeLineRequest
-	7,  // 11: cyber.esports.v1.ComplianceAdminService.GetComplianceConfig:input_type -> cyber.esports.v1.GetComplianceConfigRequest
-	2,  // 12: cyber.esports.v1.ComplianceAdminService.SetBirthCollection:output_type -> cyber.esports.v1.SetBirthCollectionResponse
-	4,  // 13: cyber.esports.v1.ComplianceAdminService.SetCompliancePrompts:output_type -> cyber.esports.v1.SetCompliancePromptsResponse
-	6,  // 14: cyber.esports.v1.ComplianceAdminService.SetPayAgeLine:output_type -> cyber.esports.v1.SetPayAgeLineResponse
-	8,  // 15: cyber.esports.v1.ComplianceAdminService.GetComplianceConfig:output_type -> cyber.esports.v1.GetComplianceConfigResponse
-	12, // [12:16] is the sub-list for method output_type
-	8,  // [8:12] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	11, // 0: cyber.esports.v1.ComplianceConfig.birth_collect:type_name -> google.protobuf.BoolValue
+	12, // 1: cyber.esports.v1.ComplianceConfig.pay_age_line:type_name -> google.protobuf.Int32Value
+	13, // 2: cyber.esports.v1.ComplianceConfig.minor_prompt:type_name -> google.protobuf.StringValue
+	13, // 3: cyber.esports.v1.ComplianceConfig.missing_birth_prompt:type_name -> google.protobuf.StringValue
+	12, // 4: cyber.esports.v1.ComplianceConfig.renewal_remind_days:type_name -> google.protobuf.Int32Value
+	0,  // 5: cyber.esports.v1.SetBirthCollectionResponse.config:type_name -> cyber.esports.v1.ComplianceConfig
+	0,  // 6: cyber.esports.v1.SetCompliancePromptsResponse.config:type_name -> cyber.esports.v1.ComplianceConfig
+	0,  // 7: cyber.esports.v1.SetPayAgeLineResponse.config:type_name -> cyber.esports.v1.ComplianceConfig
+	0,  // 8: cyber.esports.v1.SetRenewalReminderResponse.config:type_name -> cyber.esports.v1.ComplianceConfig
+	0,  // 9: cyber.esports.v1.GetComplianceConfigResponse.config:type_name -> cyber.esports.v1.ComplianceConfig
+	1,  // 10: cyber.esports.v1.ComplianceAdminService.SetBirthCollection:input_type -> cyber.esports.v1.SetBirthCollectionRequest
+	3,  // 11: cyber.esports.v1.ComplianceAdminService.SetCompliancePrompts:input_type -> cyber.esports.v1.SetCompliancePromptsRequest
+	5,  // 12: cyber.esports.v1.ComplianceAdminService.SetPayAgeLine:input_type -> cyber.esports.v1.SetPayAgeLineRequest
+	7,  // 13: cyber.esports.v1.ComplianceAdminService.SetRenewalReminder:input_type -> cyber.esports.v1.SetRenewalReminderRequest
+	9,  // 14: cyber.esports.v1.ComplianceAdminService.GetComplianceConfig:input_type -> cyber.esports.v1.GetComplianceConfigRequest
+	2,  // 15: cyber.esports.v1.ComplianceAdminService.SetBirthCollection:output_type -> cyber.esports.v1.SetBirthCollectionResponse
+	4,  // 16: cyber.esports.v1.ComplianceAdminService.SetCompliancePrompts:output_type -> cyber.esports.v1.SetCompliancePromptsResponse
+	6,  // 17: cyber.esports.v1.ComplianceAdminService.SetPayAgeLine:output_type -> cyber.esports.v1.SetPayAgeLineResponse
+	8,  // 18: cyber.esports.v1.ComplianceAdminService.SetRenewalReminder:output_type -> cyber.esports.v1.SetRenewalReminderResponse
+	10, // 19: cyber.esports.v1.ComplianceAdminService.GetComplianceConfig:output_type -> cyber.esports.v1.GetComplianceConfigResponse
+	15, // [15:20] is the sub-list for method output_type
+	10, // [10:15] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_compliance_admin_proto_init() }
@@ -556,13 +668,14 @@ func file_cyber_esports_v1_compliance_admin_proto_init() {
 	file_cyber_esports_v1_compliance_admin_proto_msgTypes[1].OneofWrappers = []any{}
 	file_cyber_esports_v1_compliance_admin_proto_msgTypes[3].OneofWrappers = []any{}
 	file_cyber_esports_v1_compliance_admin_proto_msgTypes[5].OneofWrappers = []any{}
+	file_cyber_esports_v1_compliance_admin_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_compliance_admin_proto_rawDesc), len(file_cyber_esports_v1_compliance_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

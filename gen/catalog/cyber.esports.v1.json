@@ -179,6 +179,19 @@
         "comment": "调整付费年龄线",
         "access": "ADMIN",
         "datascope": false
+      },
+      {
+        "name": "SetRenewalReminder",
+        "full_name": "cyber.esports.v1.ComplianceAdminService.SetRenewalReminder",
+        "request_name": "SetRenewalReminderRequest",
+        "request_full_name": "cyber.esports.v1.SetRenewalReminderRequest",
+        "response_name": "SetRenewalReminderResponse",
+        "response_full_name": "cyber.esports.v1.SetRenewalReminderResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/compliance-config/renewal-reminder",
+        "comment": "到期提醒时机",
+        "access": "ADMIN",
+        "datascope": false
       }
     ]
   },

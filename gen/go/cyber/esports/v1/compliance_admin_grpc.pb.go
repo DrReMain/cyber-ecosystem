@@ -22,6 +22,7 @@ const (
 	ComplianceAdminService_SetBirthCollection_FullMethodName   = "/cyber.esports.v1.ComplianceAdminService/SetBirthCollection"
 	ComplianceAdminService_SetCompliancePrompts_FullMethodName = "/cyber.esports.v1.ComplianceAdminService/SetCompliancePrompts"
 	ComplianceAdminService_SetPayAgeLine_FullMethodName        = "/cyber.esports.v1.ComplianceAdminService/SetPayAgeLine"
+	ComplianceAdminService_SetRenewalReminder_FullMethodName   = "/cyber.esports.v1.ComplianceAdminService/SetRenewalReminder"
 	ComplianceAdminService_GetComplianceConfig_FullMethodName  = "/cyber.esports.v1.ComplianceAdminService/GetComplianceConfig"
 )
 
@@ -30,12 +31,13 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // The operator face of the compliance knobs: the birth-date collection
-// switch, the pay age line, and the two pay-wall prompt overrides — one
-// singleton row behind them all, so every setter answers with the whole
-// settled config and concurrent setters on different knobs never clobber
-// each other (each setter updates only its own column). The age line is
-// the sensitive knob: the operator face draws a double confirm around it
-// and every write lands in the audit log like any other admin action.
+// switch, the pay age line, the renewal reminder timing, and the two
+// pay-wall prompt overrides — one singleton row behind them all, so every
+// setter answers with the whole settled config and concurrent setters on
+// different knobs never clobber each other (each setter updates only its
+// own column). The age line is the sensitive knob: the operator face
+// draws a double confirm around it and every write lands in the audit log
+// like any other admin action.
 // Like the other operator planes, this service is a strippable module —
 // deployments without it lose the management face, never the knobs'
 // answers (an absent row keeps answering the shipped defaults).
@@ -43,6 +45,7 @@ type ComplianceAdminServiceClient interface {
 	SetBirthCollection(ctx context.Context, in *SetBirthCollectionRequest, opts ...grpc.CallOption) (*SetBirthCollectionResponse, error)
 	SetCompliancePrompts(ctx context.Context, in *SetCompliancePromptsRequest, opts ...grpc.CallOption) (*SetCompliancePromptsResponse, error)
 	SetPayAgeLine(ctx context.Context, in *SetPayAgeLineRequest, opts ...grpc.CallOption) (*SetPayAgeLineResponse, error)
+	SetRenewalReminder(ctx context.Context, in *SetRenewalReminderRequest, opts ...grpc.CallOption) (*SetRenewalReminderResponse, error)
 	GetComplianceConfig(ctx context.Context, in *GetComplianceConfigRequest, opts ...grpc.CallOption) (*GetComplianceConfigResponse, error)
 }
 
@@ -84,6 +87,16 @@ func (c *complianceAdminServiceClient) SetPayAgeLine(ctx context.Context, in *Se
 	return out, nil
 }
 
+func (c *complianceAdminServiceClient) SetRenewalReminder(ctx context.Context, in *SetRenewalReminderRequest, opts ...grpc.CallOption) (*SetRenewalReminderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetRenewalReminderResponse)
+	err := c.cc.Invoke(ctx, ComplianceAdminService_SetRenewalReminder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *complianceAdminServiceClient) GetComplianceConfig(ctx context.Context, in *GetComplianceConfigRequest, opts ...grpc.CallOption) (*GetComplianceConfigResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetComplianceConfigResponse)
@@ -99,12 +112,13 @@ func (c *complianceAdminServiceClient) GetComplianceConfig(ctx context.Context, 
 // for forward compatibility.
 //
 // The operator face of the compliance knobs: the birth-date collection
-// switch, the pay age line, and the two pay-wall prompt overrides — one
-// singleton row behind them all, so every setter answers with the whole
-// settled config and concurrent setters on different knobs never clobber
-// each other (each setter updates only its own column). The age line is
-// the sensitive knob: the operator face draws a double confirm around it
-// and every write lands in the audit log like any other admin action.
+// switch, the pay age line, the renewal reminder timing, and the two
+// pay-wall prompt overrides — one singleton row behind them all, so every
+// setter answers with the whole settled config and concurrent setters on
+// different knobs never clobber each other (each setter updates only its
+// own column). The age line is the sensitive knob: the operator face
+// draws a double confirm around it and every write lands in the audit log
+// like any other admin action.
 // Like the other operator planes, this service is a strippable module —
 // deployments without it lose the management face, never the knobs'
 // answers (an absent row keeps answering the shipped defaults).
@@ -112,6 +126,7 @@ type ComplianceAdminServiceServer interface {
 	SetBirthCollection(context.Context, *SetBirthCollectionRequest) (*SetBirthCollectionResponse, error)
 	SetCompliancePrompts(context.Context, *SetCompliancePromptsRequest) (*SetCompliancePromptsResponse, error)
 	SetPayAgeLine(context.Context, *SetPayAgeLineRequest) (*SetPayAgeLineResponse, error)
+	SetRenewalReminder(context.Context, *SetRenewalReminderRequest) (*SetRenewalReminderResponse, error)
 	GetComplianceConfig(context.Context, *GetComplianceConfigRequest) (*GetComplianceConfigResponse, error)
 	mustEmbedUnimplementedComplianceAdminServiceServer()
 }
@@ -131,6 +146,9 @@ func (UnimplementedComplianceAdminServiceServer) SetCompliancePrompts(context.Co
 }
 func (UnimplementedComplianceAdminServiceServer) SetPayAgeLine(context.Context, *SetPayAgeLineRequest) (*SetPayAgeLineResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetPayAgeLine not implemented")
+}
+func (UnimplementedComplianceAdminServiceServer) SetRenewalReminder(context.Context, *SetRenewalReminderRequest) (*SetRenewalReminderResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetRenewalReminder not implemented")
 }
 func (UnimplementedComplianceAdminServiceServer) GetComplianceConfig(context.Context, *GetComplianceConfigRequest) (*GetComplianceConfigResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetComplianceConfig not implemented")
@@ -211,6 +229,24 @@ func _ComplianceAdminService_SetPayAgeLine_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ComplianceAdminService_SetRenewalReminder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetRenewalReminderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ComplianceAdminServiceServer).SetRenewalReminder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ComplianceAdminService_SetRenewalReminder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ComplianceAdminServiceServer).SetRenewalReminder(ctx, req.(*SetRenewalReminderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ComplianceAdminService_GetComplianceConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetComplianceConfigRequest)
 	if err := dec(in); err != nil {
@@ -247,6 +283,10 @@ var ComplianceAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetPayAgeLine",
 			Handler:    _ComplianceAdminService_SetPayAgeLine_Handler,
+		},
+		{
+			MethodName: "SetRenewalReminder",
+			Handler:    _ComplianceAdminService_SetRenewalReminder_Handler,
 		},
 		{
 			MethodName: "GetComplianceConfig",

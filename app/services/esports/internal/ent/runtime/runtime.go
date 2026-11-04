@@ -496,16 +496,20 @@ func init() {
 	complianceconfigDescPayAgeLine := complianceconfigFields[2].Descriptor()
 	// complianceconfig.DefaultPayAgeLine holds the default value on creation for the pay_age_line field.
 	complianceconfig.DefaultPayAgeLine = complianceconfigDescPayAgeLine.Default.(int)
+	// complianceconfigDescRenewalRemindDays is the schema descriptor for renewal_remind_days field.
+	complianceconfigDescRenewalRemindDays := complianceconfigFields[3].Descriptor()
+	// complianceconfig.DefaultRenewalRemindDays holds the default value on creation for the renewal_remind_days field.
+	complianceconfig.DefaultRenewalRemindDays = complianceconfigDescRenewalRemindDays.Default.(int)
 	// complianceconfigDescMinorPrompt is the schema descriptor for minor_prompt field.
-	complianceconfigDescMinorPrompt := complianceconfigFields[3].Descriptor()
+	complianceconfigDescMinorPrompt := complianceconfigFields[4].Descriptor()
 	// complianceconfig.DefaultMinorPrompt holds the default value on creation for the minor_prompt field.
 	complianceconfig.DefaultMinorPrompt = complianceconfigDescMinorPrompt.Default.(string)
 	// complianceconfigDescMissingBirthPrompt is the schema descriptor for missing_birth_prompt field.
-	complianceconfigDescMissingBirthPrompt := complianceconfigFields[4].Descriptor()
+	complianceconfigDescMissingBirthPrompt := complianceconfigFields[5].Descriptor()
 	// complianceconfig.DefaultMissingBirthPrompt holds the default value on creation for the missing_birth_prompt field.
 	complianceconfig.DefaultMissingBirthPrompt = complianceconfigDescMissingBirthPrompt.Default.(string)
 	// complianceconfigDescUpdatedBy is the schema descriptor for updated_by field.
-	complianceconfigDescUpdatedBy := complianceconfigFields[5].Descriptor()
+	complianceconfigDescUpdatedBy := complianceconfigFields[6].Descriptor()
 	// complianceconfig.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
 	complianceconfig.UpdatedByValidator = func() func(string) error {
 		validators := complianceconfigDescUpdatedBy.Validators

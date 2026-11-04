@@ -84,6 +84,11 @@ func PayAgeLine(v int) predicate.ComplianceConfig {
 	return predicate.ComplianceConfig(sql.FieldEQ(FieldPayAgeLine, v))
 }
 
+// RenewalRemindDays applies equality check predicate on the "renewal_remind_days" field. It's identical to RenewalRemindDaysEQ.
+func RenewalRemindDays(v int) predicate.ComplianceConfig {
+	return predicate.ComplianceConfig(sql.FieldEQ(FieldRenewalRemindDays, v))
+}
+
 // MinorPrompt applies equality check predicate on the "minor_prompt" field. It's identical to MinorPromptEQ.
 func MinorPrompt(v string) predicate.ComplianceConfig {
 	return predicate.ComplianceConfig(sql.FieldEQ(FieldMinorPrompt, v))
@@ -247,6 +252,46 @@ func PayAgeLineLT(v int) predicate.ComplianceConfig {
 // PayAgeLineLTE applies the LTE predicate on the "pay_age_line" field.
 func PayAgeLineLTE(v int) predicate.ComplianceConfig {
 	return predicate.ComplianceConfig(sql.FieldLTE(FieldPayAgeLine, v))
+}
+
+// RenewalRemindDaysEQ applies the EQ predicate on the "renewal_remind_days" field.
+func RenewalRemindDaysEQ(v int) predicate.ComplianceConfig {
+	return predicate.ComplianceConfig(sql.FieldEQ(FieldRenewalRemindDays, v))
+}
+
+// RenewalRemindDaysNEQ applies the NEQ predicate on the "renewal_remind_days" field.
+func RenewalRemindDaysNEQ(v int) predicate.ComplianceConfig {
+	return predicate.ComplianceConfig(sql.FieldNEQ(FieldRenewalRemindDays, v))
+}
+
+// RenewalRemindDaysIn applies the In predicate on the "renewal_remind_days" field.
+func RenewalRemindDaysIn(vs ...int) predicate.ComplianceConfig {
+	return predicate.ComplianceConfig(sql.FieldIn(FieldRenewalRemindDays, vs...))
+}
+
+// RenewalRemindDaysNotIn applies the NotIn predicate on the "renewal_remind_days" field.
+func RenewalRemindDaysNotIn(vs ...int) predicate.ComplianceConfig {
+	return predicate.ComplianceConfig(sql.FieldNotIn(FieldRenewalRemindDays, vs...))
+}
+
+// RenewalRemindDaysGT applies the GT predicate on the "renewal_remind_days" field.
+func RenewalRemindDaysGT(v int) predicate.ComplianceConfig {
+	return predicate.ComplianceConfig(sql.FieldGT(FieldRenewalRemindDays, v))
+}
+
+// RenewalRemindDaysGTE applies the GTE predicate on the "renewal_remind_days" field.
+func RenewalRemindDaysGTE(v int) predicate.ComplianceConfig {
+	return predicate.ComplianceConfig(sql.FieldGTE(FieldRenewalRemindDays, v))
+}
+
+// RenewalRemindDaysLT applies the LT predicate on the "renewal_remind_days" field.
+func RenewalRemindDaysLT(v int) predicate.ComplianceConfig {
+	return predicate.ComplianceConfig(sql.FieldLT(FieldRenewalRemindDays, v))
+}
+
+// RenewalRemindDaysLTE applies the LTE predicate on the "renewal_remind_days" field.
+func RenewalRemindDaysLTE(v int) predicate.ComplianceConfig {
+	return predicate.ComplianceConfig(sql.FieldLTE(FieldRenewalRemindDays, v))
 }
 
 // MinorPromptEQ applies the EQ predicate on the "minor_prompt" field.

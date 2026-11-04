@@ -227,16 +227,96 @@ func (*ListSkusRequest) Descriptor() ([]byte, []int) {
 	return file_cyber_esports_v1_sku_proto_rawDescGZIP(), []int{1}
 }
 
+// The compliance facts the pay wall gates on, folded into the catalog
+// read (the same fold GetProfileResponse.member_until rides on: the wall
+// reads the gate with a call it already makes, zero extra hop).
+type PayGate struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Plain scalars by the success-implies-present carve-out: an absent
+	// config row still answers the shipped defaults (18 and 7), so the
+	// gate always speaks.
+	PayAgeLine int32 `protobuf:"varint,1,opt,name=pay_age_line,json=payAgeLine,proto3" json:"pay_age_line,omitempty"`
+	// Days before membership expiry the renewal reminder shows — the same
+	// name the compliance knob answers, one vocabulary end to end.
+	RenewalRemindDays int32 `protobuf:"varint,2,opt,name=renewal_remind_days,json=renewalRemindDays,proto3" json:"renewal_remind_days,omitempty"`
+	// Operator overrides shown as-is in every locale (the sku-name
+	// precedent for operator text); null = the face renders its own
+	// localized default.
+	MinorPrompt        *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=minor_prompt,json=minorPrompt,proto3" json:"minor_prompt,omitempty"`
+	MissingBirthPrompt *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=missing_birth_prompt,json=missingBirthPrompt,proto3" json:"missing_birth_prompt,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *PayGate) Reset() {
+	*x = PayGate{}
+	mi := &file_cyber_esports_v1_sku_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PayGate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PayGate) ProtoMessage() {}
+
+func (x *PayGate) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_sku_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PayGate.ProtoReflect.Descriptor instead.
+func (*PayGate) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_sku_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *PayGate) GetPayAgeLine() int32 {
+	if x != nil {
+		return x.PayAgeLine
+	}
+	return 0
+}
+
+func (x *PayGate) GetRenewalRemindDays() int32 {
+	if x != nil {
+		return x.RenewalRemindDays
+	}
+	return 0
+}
+
+func (x *PayGate) GetMinorPrompt() *wrapperspb.StringValue {
+	if x != nil {
+		return x.MinorPrompt
+	}
+	return nil
+}
+
+func (x *PayGate) GetMissingBirthPrompt() *wrapperspb.StringValue {
+	if x != nil {
+		return x.MissingBirthPrompt
+	}
+	return nil
+}
+
 type ListSkusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Skus          []*Sku                 `protobuf:"bytes,1,rep,name=skus,proto3" json:"skus,omitempty"`
+	PayGate       *PayGate               `protobuf:"bytes,2,opt,name=pay_gate,json=payGate,proto3" json:"pay_gate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListSkusResponse) Reset() {
 	*x = ListSkusResponse{}
-	mi := &file_cyber_esports_v1_sku_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_sku_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -248,7 +328,7 @@ func (x *ListSkusResponse) String() string {
 func (*ListSkusResponse) ProtoMessage() {}
 
 func (x *ListSkusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_sku_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_sku_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -261,12 +341,19 @@ func (x *ListSkusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSkusResponse.ProtoReflect.Descriptor instead.
 func (*ListSkusResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_sku_proto_rawDescGZIP(), []int{2}
+	return file_cyber_esports_v1_sku_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListSkusResponse) GetSkus() []*Sku {
 	if x != nil {
 		return x.Skus
+	}
+	return nil
+}
+
+func (x *ListSkusResponse) GetPayGate() *PayGate {
+	if x != nil {
+		return x.PayGate
 	}
 	return nil
 }
@@ -289,9 +376,16 @@ const file_cyber_esports_v1_sku_proto_rawDesc = "" +
 	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x11\n" +
-	"\x0fListSkusRequest\"=\n" +
+	"\x0fListSkusRequest\"\xec\x01\n" +
+	"\aPayGate\x12 \n" +
+	"\fpay_age_line\x18\x01 \x01(\x05R\n" +
+	"payAgeLine\x12.\n" +
+	"\x13renewal_remind_days\x18\x02 \x01(\x05R\x11renewalRemindDays\x12?\n" +
+	"\fminor_prompt\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\vminorPrompt\x12N\n" +
+	"\x14missing_birth_prompt\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x12missingBirthPrompt\"s\n" +
 	"\x10ListSkusResponse\x12)\n" +
-	"\x04skus\x18\x01 \x03(\v2\x15.cyber.esports.v1.SkuR\x04skus*P\n" +
+	"\x04skus\x18\x01 \x03(\v2\x15.cyber.esports.v1.SkuR\x04skus\x124\n" +
+	"\bpay_gate\x18\x02 \x01(\v2\x19.cyber.esports.v1.PayGateR\apayGate*P\n" +
 	"\aSkuKind\x12\x18\n" +
 	"\x14SKU_KIND_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSKU_KIND_TRIAL\x10\x01\x12\x17\n" +
@@ -314,35 +408,39 @@ func file_cyber_esports_v1_sku_proto_rawDescGZIP() []byte {
 }
 
 var file_cyber_esports_v1_sku_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_cyber_esports_v1_sku_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_cyber_esports_v1_sku_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_cyber_esports_v1_sku_proto_goTypes = []any{
 	(SkuKind)(0),                   // 0: cyber.esports.v1.SkuKind
 	(*Sku)(nil),                    // 1: cyber.esports.v1.Sku
 	(*ListSkusRequest)(nil),        // 2: cyber.esports.v1.ListSkusRequest
-	(*ListSkusResponse)(nil),       // 3: cyber.esports.v1.ListSkusResponse
-	(*wrapperspb.StringValue)(nil), // 4: google.protobuf.StringValue
-	(*wrapperspb.Int64Value)(nil),  // 5: google.protobuf.Int64Value
-	(*wrapperspb.Int32Value)(nil),  // 6: google.protobuf.Int32Value
-	(*timestamppb.Timestamp)(nil),  // 7: google.protobuf.Timestamp
+	(*PayGate)(nil),                // 3: cyber.esports.v1.PayGate
+	(*ListSkusResponse)(nil),       // 4: cyber.esports.v1.ListSkusResponse
+	(*wrapperspb.StringValue)(nil), // 5: google.protobuf.StringValue
+	(*wrapperspb.Int64Value)(nil),  // 6: google.protobuf.Int64Value
+	(*wrapperspb.Int32Value)(nil),  // 7: google.protobuf.Int32Value
+	(*timestamppb.Timestamp)(nil),  // 8: google.protobuf.Timestamp
 }
 var file_cyber_esports_v1_sku_proto_depIdxs = []int32{
-	4,  // 0: cyber.esports.v1.Sku.sku_code:type_name -> google.protobuf.StringValue
-	4,  // 1: cyber.esports.v1.Sku.name:type_name -> google.protobuf.StringValue
-	4,  // 2: cyber.esports.v1.Sku.description:type_name -> google.protobuf.StringValue
+	5,  // 0: cyber.esports.v1.Sku.sku_code:type_name -> google.protobuf.StringValue
+	5,  // 1: cyber.esports.v1.Sku.name:type_name -> google.protobuf.StringValue
+	5,  // 2: cyber.esports.v1.Sku.description:type_name -> google.protobuf.StringValue
 	0,  // 3: cyber.esports.v1.Sku.kind:type_name -> cyber.esports.v1.SkuKind
-	5,  // 4: cyber.esports.v1.Sku.price_fen:type_name -> google.protobuf.Int64Value
-	5,  // 5: cyber.esports.v1.Sku.list_price_fen:type_name -> google.protobuf.Int64Value
-	6,  // 6: cyber.esports.v1.Sku.period_days:type_name -> google.protobuf.Int32Value
-	7,  // 7: cyber.esports.v1.Sku.created_at:type_name -> google.protobuf.Timestamp
-	7,  // 8: cyber.esports.v1.Sku.updated_at:type_name -> google.protobuf.Timestamp
-	1,  // 9: cyber.esports.v1.ListSkusResponse.skus:type_name -> cyber.esports.v1.Sku
-	2,  // 10: cyber.esports.v1.SkuService.ListSkus:input_type -> cyber.esports.v1.ListSkusRequest
-	3,  // 11: cyber.esports.v1.SkuService.ListSkus:output_type -> cyber.esports.v1.ListSkusResponse
-	11, // [11:12] is the sub-list for method output_type
-	10, // [10:11] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	6,  // 4: cyber.esports.v1.Sku.price_fen:type_name -> google.protobuf.Int64Value
+	6,  // 5: cyber.esports.v1.Sku.list_price_fen:type_name -> google.protobuf.Int64Value
+	7,  // 6: cyber.esports.v1.Sku.period_days:type_name -> google.protobuf.Int32Value
+	8,  // 7: cyber.esports.v1.Sku.created_at:type_name -> google.protobuf.Timestamp
+	8,  // 8: cyber.esports.v1.Sku.updated_at:type_name -> google.protobuf.Timestamp
+	5,  // 9: cyber.esports.v1.PayGate.minor_prompt:type_name -> google.protobuf.StringValue
+	5,  // 10: cyber.esports.v1.PayGate.missing_birth_prompt:type_name -> google.protobuf.StringValue
+	1,  // 11: cyber.esports.v1.ListSkusResponse.skus:type_name -> cyber.esports.v1.Sku
+	3,  // 12: cyber.esports.v1.ListSkusResponse.pay_gate:type_name -> cyber.esports.v1.PayGate
+	2,  // 13: cyber.esports.v1.SkuService.ListSkus:input_type -> cyber.esports.v1.ListSkusRequest
+	4,  // 14: cyber.esports.v1.SkuService.ListSkus:output_type -> cyber.esports.v1.ListSkusResponse
+	14, // [14:15] is the sub-list for method output_type
+	13, // [13:14] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_sku_proto_init() }
@@ -356,7 +454,7 @@ func file_cyber_esports_v1_sku_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_sku_proto_rawDesc), len(file_cyber_esports_v1_sku_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -1,6 +1,6 @@
 {
   "esports_compliance_config_title": "Compliance Config",
-  "esports_compliance_config_desc": "Birth-date collection · pay age line (sensitive, double confirm) · pay prompt copy",
+  "esports_compliance_config_desc": "Birth-date collection · pay age line (sensitive, double confirm) · renewal reminder · pay-wall prompts",
   "esports_compliance_config_refresh": "Refresh",
   "esports_compliance_config_birth_title": "Birth-Date Collection",
   "esports_compliance_config_birth_label": "Collect birth date at registration",
@@ -19,6 +19,15 @@
   "esports_compliance_config_age_modal_ok": "Confirm adjustment",
   "esports_compliance_config_age_modal_warn": "Sensitive operation: permission + double confirmation + audit log",
   "esports_compliance_config_age_ok": "Pay age line adjusted to {age}",
+  "esports_compliance_config_remind_title": "Renewal reminder timing",
+  "esports_compliance_config_remind_label": "Remind before membership expiry",
+  "esports_compliance_config_remind_unit": "days",
+  "esports_compliance_config_remind_hint": "Within N days of expiry, the renewal page and member card show the reminder",
+  "esports_compliance_config_remind_edit": "Adjust timing",
+  "esports_compliance_config_remind_modal_title": "Adjust renewal reminder",
+  "esports_compliance_config_remind_modal_label": "Start reminding (days) before expiry",
+  "esports_compliance_config_remind_modal_ok": "Confirm",
+  "esports_compliance_config_remind_ok": "Renewal reminder set to {days} days before expiry",
   "esports_compliance_config_prompts_title": "Pay Guidance Prompts",
   "esports_compliance_config_prompts_minor_label": "Under-age prompt",
   "esports_compliance_config_prompts_minor_default": "Members under 18 cannot pay",
@@ -30,5 +39,5 @@
   "esports_compliance_config_prompts_placeholder": "Enter the new prompt copy",
   "esports_compliance_config_prompts_save": "Save",
   "esports_compliance_config_prompts_ok": "Copy updated",
-  "esports_compliance_config_callout": "Age reckons on the maximum boundary — born on Jan 1 counts one year older only on Jan 2 of the next year. Adjusting the age line is a sensitive operation: it needs the double confirmation and lands in the audit log."
+  "esports_compliance_config_callout": "Age reckons conservatively on whole months of the recorded year+month: a June birth only clears an 18-year line in July of the year it turns 18. Moving the age line is sensitive — double confirm plus audit."
 }

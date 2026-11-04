@@ -21,12 +21,14 @@ const OperationComplianceAdminServiceGetComplianceConfig = "/cyber.esports.v1.Co
 const OperationComplianceAdminServiceSetBirthCollection = "/cyber.esports.v1.ComplianceAdminService/SetBirthCollection"
 const OperationComplianceAdminServiceSetCompliancePrompts = "/cyber.esports.v1.ComplianceAdminService/SetCompliancePrompts"
 const OperationComplianceAdminServiceSetPayAgeLine = "/cyber.esports.v1.ComplianceAdminService/SetPayAgeLine"
+const OperationComplianceAdminServiceSetRenewalReminder = "/cyber.esports.v1.ComplianceAdminService/SetRenewalReminder"
 
 type ComplianceAdminServiceHTTPServer interface {
 	GetComplianceConfig(context.Context, *GetComplianceConfigRequest) (*GetComplianceConfigResponse, error)
 	SetBirthCollection(context.Context, *SetBirthCollectionRequest) (*SetBirthCollectionResponse, error)
 	SetCompliancePrompts(context.Context, *SetCompliancePromptsRequest) (*SetCompliancePromptsResponse, error)
 	SetPayAgeLine(context.Context, *SetPayAgeLineRequest) (*SetPayAgeLineResponse, error)
+	SetRenewalReminder(context.Context, *SetRenewalReminderRequest) (*SetRenewalReminderResponse, error)
 }
 
 func RegisterComplianceAdminServiceHTTPServer(s *http.Server, srv ComplianceAdminServiceHTTPServer) {
@@ -34,6 +36,7 @@ func RegisterComplianceAdminServiceHTTPServer(s *http.Server, srv ComplianceAdmi
 	r.Handle("PUT", "/api/v1/esports/compliance-config/birth-collection", _ComplianceAdminService_SetBirthCollection0_HTTP_Handler(srv))
 	r.Handle("PUT", "/api/v1/esports/compliance-config/prompts", _ComplianceAdminService_SetCompliancePrompts0_HTTP_Handler(srv))
 	r.Handle("PUT", "/api/v1/esports/compliance-config/pay-age-line", _ComplianceAdminService_SetPayAgeLine0_HTTP_Handler(srv))
+	r.Handle("PUT", "/api/v1/esports/compliance-config/renewal-reminder", _ComplianceAdminService_SetRenewalReminder0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/compliance-config", _ComplianceAdminService_GetComplianceConfig0_HTTP_Handler(srv))
 }
 
@@ -94,6 +97,25 @@ func _ComplianceAdminService_SetPayAgeLine0_HTTP_Handler(srv ComplianceAdminServ
 	}
 }
 
+func _ComplianceAdminService_SetRenewalReminder0_HTTP_Handler(srv ComplianceAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SetRenewalReminderRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationComplianceAdminServiceSetRenewalReminder)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SetRenewalReminder(ctx, req.(*SetRenewalReminderRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SetRenewalReminderResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _ComplianceAdminService_GetComplianceConfig0_HTTP_Handler(srv ComplianceAdminServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetComplianceConfigRequest
@@ -118,6 +140,7 @@ type ComplianceAdminServiceHTTPClient interface {
 	SetBirthCollection(ctx context.Context, req *SetBirthCollectionRequest, opts ...http.CallOption) (rsp *SetBirthCollectionResponse, err error)
 	SetCompliancePrompts(ctx context.Context, req *SetCompliancePromptsRequest, opts ...http.CallOption) (rsp *SetCompliancePromptsResponse, err error)
 	SetPayAgeLine(ctx context.Context, req *SetPayAgeLineRequest, opts ...http.CallOption) (rsp *SetPayAgeLineResponse, err error)
+	SetRenewalReminder(ctx context.Context, req *SetRenewalReminderRequest, opts ...http.CallOption) (rsp *SetRenewalReminderResponse, err error)
 }
 
 type ComplianceAdminServiceHTTPClientImpl struct {
@@ -186,6 +209,23 @@ func (c *ComplianceAdminServiceHTTPClientImpl) SetPayAgeLine(ctx context.Context
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationComplianceAdminServiceSetPayAgeLine),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ComplianceAdminServiceHTTPClientImpl) SetRenewalReminder(ctx context.Context, in *SetRenewalReminderRequest, opts ...http.CallOption) (*SetRenewalReminderResponse, error) {
+	var out SetRenewalReminderResponse
+	pattern := "/api/v1/esports/compliance-config/renewal-reminder"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationComplianceAdminServiceSetRenewalReminder),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)

@@ -1,6 +1,6 @@
 {
   "esports_compliance_config_title": "コンプライアンス設定",
-  "esports_compliance_config_desc": "生年月日収集 · 有料年齢ライン（敏感操作・二重確認）· 決済ガイド文面",
+  "esports_compliance_config_desc": "生年月の収集 · 支払い可能年齢線（敏感・二重確認）· 更新リマインド · 支払いガイド文案",
   "esports_compliance_config_refresh": "更新",
   "esports_compliance_config_birth_title": "生年月日収集",
   "esports_compliance_config_birth_label": "登録時に生年月日を収集",
@@ -19,6 +19,15 @@
   "esports_compliance_config_age_modal_ok": "調整を確認",
   "esports_compliance_config_age_modal_warn": "敏感操作：権限 + 二重確認 + 監査ログが必要です",
   "esports_compliance_config_age_ok": "有料年齢ラインを {age} 歳に調整しました",
+  "esports_compliance_config_remind_title": "更新リマインド時期",
+  "esports_compliance_config_remind_label": "メンバーシップ失効前のリマインド",
+  "esports_compliance_config_remind_unit": "日",
+  "esports_compliance_config_remind_hint": "失効 N 日前から、更新ページと会員カードにリマインドを表示",
+  "esports_compliance_config_remind_edit": "時期を調整",
+  "esports_compliance_config_remind_modal_title": "更新リマインドの調整",
+  "esports_compliance_config_remind_modal_label": "失効何日前から通知するか（日）",
+  "esports_compliance_config_remind_modal_ok": "確認",
+  "esports_compliance_config_remind_ok": "更新リマインドを失効 {days} 日前に設定しました",
   "esports_compliance_config_prompts_title": "決済ガイド文面",
   "esports_compliance_config_prompts_minor_label": "未成年向け文言",
   "esports_compliance_config_prompts_minor_default": "18 歳未満は支払えません",
@@ -30,5 +39,5 @@
   "esports_compliance_config_prompts_placeholder": "新しい文言を入力",
   "esports_compliance_config_prompts_save": "保存",
   "esports_compliance_config_prompts_ok": "文言を更新しました",
-  "esports_compliance_config_callout": "年齢は最大境界で計算します：1 月 1 日生まれは翌年 1 月 2 日に 1 歳となります。年齢ラインの調整は敏感操作であり、二重確認と監査ログの対象です。"
+  "esports_compliance_config_callout": "年齢は登録された生年月（年・月）を丸月単位で保守的に計算します：6月生まれは18歳になる年の7月から18歳の年齢線を通過とみなします。年齢線の変更は敏感操作で、二重確認と監査記録が必要です。"
 }

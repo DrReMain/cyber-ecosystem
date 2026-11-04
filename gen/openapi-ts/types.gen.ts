@@ -471,6 +471,11 @@ export type CyberEsportsV1ComplianceConfig = {
     payAgeLine?: number;
     minorPrompt?: string;
     missingBirthPrompt?: string;
+    /**
+     * Days before membership expiry the renewal reminder shows; the
+     * shipped default 7 answers when no row sets it.
+     */
+    renewalRemindDays?: number;
 };
 
 export type CyberEsportsV1CreateAgreementVersionRequest = {
@@ -1328,6 +1333,7 @@ export type CyberEsportsV1ListReportAccessPoliciesResponse = {
 
 export type CyberEsportsV1ListSkusResponse = {
     skus?: Array<CyberEsportsV1Sku>;
+    payGate?: CyberEsportsV1PayGate;
 };
 
 export type CyberEsportsV1ListTestAttemptsResponse = {
@@ -1710,6 +1716,32 @@ export type CyberEsportsV1PayCredential = {
      * continuation material or fails.
      */
     value?: string;
+};
+
+/**
+ * The compliance facts the pay wall gates on, folded into the catalog
+ * read (the same fold GetProfileResponse.member_until rides on: the wall
+ * reads the gate with a call it already makes, zero extra hop).
+ */
+export type CyberEsportsV1PayGate = {
+    /**
+     * Plain scalars by the success-implies-present carve-out: an absent
+     * config row still answers the shipped defaults (18 and 7), so the
+     * gate always speaks.
+     */
+    payAgeLine?: number;
+    /**
+     * Days before membership expiry the renewal reminder shows — the same
+     * name the compliance knob answers, one vocabulary end to end.
+     */
+    renewalRemindDays?: number;
+    /**
+     * Operator overrides shown as-is in every locale (the sku-name
+     * precedent for operator text); null = the face renders its own
+     * localized default.
+     */
+    minorPrompt?: string;
+    missingBirthPrompt?: string;
 };
 
 export type CyberEsportsV1PeekMatchSessionResponse = {
@@ -2097,6 +2129,14 @@ export type CyberEsportsV1SetPayAgeLineRequest = {
 };
 
 export type CyberEsportsV1SetPayAgeLineResponse = {
+    config?: CyberEsportsV1ComplianceConfig;
+};
+
+export type CyberEsportsV1SetRenewalReminderRequest = {
+    days?: number;
+};
+
+export type CyberEsportsV1SetRenewalReminderResponse = {
     config?: CyberEsportsV1ComplianceConfig;
 };
 
@@ -4775,6 +4815,22 @@ export type ComplianceAdminServiceSetCompliancePromptsResponses = {
 };
 
 export type ComplianceAdminServiceSetCompliancePromptsResponse = ComplianceAdminServiceSetCompliancePromptsResponses[keyof ComplianceAdminServiceSetCompliancePromptsResponses];
+
+export type ComplianceAdminServiceSetRenewalReminderData = {
+    body: CyberEsportsV1SetRenewalReminderRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/compliance-config/renewal-reminder';
+};
+
+export type ComplianceAdminServiceSetRenewalReminderResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SetRenewalReminderResponse;
+};
+
+export type ComplianceAdminServiceSetRenewalReminderResponse = ComplianceAdminServiceSetRenewalReminderResponses[keyof ComplianceAdminServiceSetRenewalReminderResponses];
 
 export type EntitlementServiceRedeemActivationCodeData = {
     body: CyberEsportsV1RedeemActivationCodeRequest;

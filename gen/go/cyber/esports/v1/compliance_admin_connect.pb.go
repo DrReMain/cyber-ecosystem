@@ -12,5 +12,6 @@ func RegisterComplianceAdminServiceConnectServer(srv *connect.Server, svc Compli
 	connect.HandleUnary(srv, "/cyber.esports.v1.ComplianceAdminService/SetBirthCollection", svc.SetBirthCollection)
 	connect.HandleUnary(srv, "/cyber.esports.v1.ComplianceAdminService/SetCompliancePrompts", svc.SetCompliancePrompts)
 	connect.HandleUnary(srv, "/cyber.esports.v1.ComplianceAdminService/SetPayAgeLine", svc.SetPayAgeLine)
+	connect.HandleUnary(srv, "/cyber.esports.v1.ComplianceAdminService/SetRenewalReminder", svc.SetRenewalReminder)
 	connect.HandleUnary(srv, "/cyber.esports.v1.ComplianceAdminService/GetComplianceConfig", svc.GetComplianceConfig)
 }

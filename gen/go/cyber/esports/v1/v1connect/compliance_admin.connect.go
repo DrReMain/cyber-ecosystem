@@ -42,6 +42,9 @@ const (
 	// ComplianceAdminServiceSetPayAgeLineProcedure is the fully-qualified name of the
 	// ComplianceAdminService's SetPayAgeLine RPC.
 	ComplianceAdminServiceSetPayAgeLineProcedure = "/cyber.esports.v1.ComplianceAdminService/SetPayAgeLine"
+	// ComplianceAdminServiceSetRenewalReminderProcedure is the fully-qualified name of the
+	// ComplianceAdminService's SetRenewalReminder RPC.
+	ComplianceAdminServiceSetRenewalReminderProcedure = "/cyber.esports.v1.ComplianceAdminService/SetRenewalReminder"
 	// ComplianceAdminServiceGetComplianceConfigProcedure is the fully-qualified name of the
 	// ComplianceAdminService's GetComplianceConfig RPC.
 	ComplianceAdminServiceGetComplianceConfigProcedure = "/cyber.esports.v1.ComplianceAdminService/GetComplianceConfig"
@@ -52,6 +55,7 @@ type ComplianceAdminServiceClient interface {
 	SetBirthCollection(context.Context, *connect.Request[v1.SetBirthCollectionRequest]) (*connect.Response[v1.SetBirthCollectionResponse], error)
 	SetCompliancePrompts(context.Context, *connect.Request[v1.SetCompliancePromptsRequest]) (*connect.Response[v1.SetCompliancePromptsResponse], error)
 	SetPayAgeLine(context.Context, *connect.Request[v1.SetPayAgeLineRequest]) (*connect.Response[v1.SetPayAgeLineResponse], error)
+	SetRenewalReminder(context.Context, *connect.Request[v1.SetRenewalReminderRequest]) (*connect.Response[v1.SetRenewalReminderResponse], error)
 	GetComplianceConfig(context.Context, *connect.Request[v1.GetComplianceConfigRequest]) (*connect.Response[v1.GetComplianceConfigResponse], error)
 }
 
@@ -84,6 +88,12 @@ func NewComplianceAdminServiceClient(httpClient connect.HTTPClient, baseURL stri
 			connect.WithSchema(complianceAdminServiceMethods.ByName("SetPayAgeLine")),
 			connect.WithClientOptions(opts...),
 		),
+		setRenewalReminder: connect.NewClient[v1.SetRenewalReminderRequest, v1.SetRenewalReminderResponse](
+			httpClient,
+			baseURL+ComplianceAdminServiceSetRenewalReminderProcedure,
+			connect.WithSchema(complianceAdminServiceMethods.ByName("SetRenewalReminder")),
+			connect.WithClientOptions(opts...),
+		),
 		getComplianceConfig: connect.NewClient[v1.GetComplianceConfigRequest, v1.GetComplianceConfigResponse](
 			httpClient,
 			baseURL+ComplianceAdminServiceGetComplianceConfigProcedure,
@@ -98,6 +108,7 @@ type complianceAdminServiceClient struct {
 	setBirthCollection   *connect.Client[v1.SetBirthCollectionRequest, v1.SetBirthCollectionResponse]
 	setCompliancePrompts *connect.Client[v1.SetCompliancePromptsRequest, v1.SetCompliancePromptsResponse]
 	setPayAgeLine        *connect.Client[v1.SetPayAgeLineRequest, v1.SetPayAgeLineResponse]
+	setRenewalReminder   *connect.Client[v1.SetRenewalReminderRequest, v1.SetRenewalReminderResponse]
 	getComplianceConfig  *connect.Client[v1.GetComplianceConfigRequest, v1.GetComplianceConfigResponse]
 }
 
@@ -116,6 +127,11 @@ func (c *complianceAdminServiceClient) SetPayAgeLine(ctx context.Context, req *c
 	return c.setPayAgeLine.CallUnary(ctx, req)
 }
 
+// SetRenewalReminder calls cyber.esports.v1.ComplianceAdminService.SetRenewalReminder.
+func (c *complianceAdminServiceClient) SetRenewalReminder(ctx context.Context, req *connect.Request[v1.SetRenewalReminderRequest]) (*connect.Response[v1.SetRenewalReminderResponse], error) {
+	return c.setRenewalReminder.CallUnary(ctx, req)
+}
+
 // GetComplianceConfig calls cyber.esports.v1.ComplianceAdminService.GetComplianceConfig.
 func (c *complianceAdminServiceClient) GetComplianceConfig(ctx context.Context, req *connect.Request[v1.GetComplianceConfigRequest]) (*connect.Response[v1.GetComplianceConfigResponse], error) {
 	return c.getComplianceConfig.CallUnary(ctx, req)
@@ -127,6 +143,7 @@ type ComplianceAdminServiceHandler interface {
 	SetBirthCollection(context.Context, *connect.Request[v1.SetBirthCollectionRequest]) (*connect.Response[v1.SetBirthCollectionResponse], error)
 	SetCompliancePrompts(context.Context, *connect.Request[v1.SetCompliancePromptsRequest]) (*connect.Response[v1.SetCompliancePromptsResponse], error)
 	SetPayAgeLine(context.Context, *connect.Request[v1.SetPayAgeLineRequest]) (*connect.Response[v1.SetPayAgeLineResponse], error)
+	SetRenewalReminder(context.Context, *connect.Request[v1.SetRenewalReminderRequest]) (*connect.Response[v1.SetRenewalReminderResponse], error)
 	GetComplianceConfig(context.Context, *connect.Request[v1.GetComplianceConfigRequest]) (*connect.Response[v1.GetComplianceConfigResponse], error)
 }
 
@@ -155,6 +172,12 @@ func NewComplianceAdminServiceHandler(svc ComplianceAdminServiceHandler, opts ..
 		connect.WithSchema(complianceAdminServiceMethods.ByName("SetPayAgeLine")),
 		connect.WithHandlerOptions(opts...),
 	)
+	complianceAdminServiceSetRenewalReminderHandler := connect.NewUnaryHandler(
+		ComplianceAdminServiceSetRenewalReminderProcedure,
+		svc.SetRenewalReminder,
+		connect.WithSchema(complianceAdminServiceMethods.ByName("SetRenewalReminder")),
+		connect.WithHandlerOptions(opts...),
+	)
 	complianceAdminServiceGetComplianceConfigHandler := connect.NewUnaryHandler(
 		ComplianceAdminServiceGetComplianceConfigProcedure,
 		svc.GetComplianceConfig,
@@ -169,6 +192,8 @@ func NewComplianceAdminServiceHandler(svc ComplianceAdminServiceHandler, opts ..
 			complianceAdminServiceSetCompliancePromptsHandler.ServeHTTP(w, r)
 		case ComplianceAdminServiceSetPayAgeLineProcedure:
 			complianceAdminServiceSetPayAgeLineHandler.ServeHTTP(w, r)
+		case ComplianceAdminServiceSetRenewalReminderProcedure:
+			complianceAdminServiceSetRenewalReminderHandler.ServeHTTP(w, r)
 		case ComplianceAdminServiceGetComplianceConfigProcedure:
 			complianceAdminServiceGetComplianceConfigHandler.ServeHTTP(w, r)
 		default:
@@ -190,6 +215,10 @@ func (UnimplementedComplianceAdminServiceHandler) SetCompliancePrompts(context.C
 
 func (UnimplementedComplianceAdminServiceHandler) SetPayAgeLine(context.Context, *connect.Request[v1.SetPayAgeLineRequest]) (*connect.Response[v1.SetPayAgeLineResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ComplianceAdminService.SetPayAgeLine is not implemented"))
+}
+
+func (UnimplementedComplianceAdminServiceHandler) SetRenewalReminder(context.Context, *connect.Request[v1.SetRenewalReminderRequest]) (*connect.Response[v1.SetRenewalReminderResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.ComplianceAdminService.SetRenewalReminder is not implemented"))
 }
 
 func (UnimplementedComplianceAdminServiceHandler) GetComplianceConfig(context.Context, *connect.Request[v1.GetComplianceConfigRequest]) (*connect.Response[v1.GetComplianceConfigResponse], error) {

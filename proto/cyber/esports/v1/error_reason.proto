@@ -43,6 +43,11 @@ enum Esports {
   ESPORTS_ORDER_CHANNEL_INVALID = 6145 [(.errors.code) = 400];
   ESPORTS_ORDER_STATE_CONFLICT = 6146 [(.errors.code) = 400];
   ESPORTS_SKU_KIND_INVALID = 6147 [(.errors.code) = 400];
+  // The pay gate on order create: the two refusals route differently —
+  // BIRTH_MISSING sends the wall to the birth backfill page, AGE_BLOCKED
+  // is final until the member's next birthday month passes.
+  ESPORTS_PAY_AGE_BLOCKED = 6148 [(.errors.code) = 400];
+  ESPORTS_PAY_BIRTH_MISSING = 6149 [(.errors.code) = 400];
 
   // 615x: activation code & entitlement
   ESPORTS_ACTIVATION_CODE_INVALID = 6150 [(.errors.code) = 400];

@@ -85,6 +85,20 @@ func (_c *ComplianceConfigCreate) SetNillablePayAgeLine(v *int) *ComplianceConfi
 	return _c
 }
 
+// SetRenewalRemindDays sets the "renewal_remind_days" field.
+func (_c *ComplianceConfigCreate) SetRenewalRemindDays(v int) *ComplianceConfigCreate {
+	_c.mutation.SetRenewalRemindDays(v)
+	return _c
+}
+
+// SetNillableRenewalRemindDays sets the "renewal_remind_days" field if the given value is not nil.
+func (_c *ComplianceConfigCreate) SetNillableRenewalRemindDays(v *int) *ComplianceConfigCreate {
+	if v != nil {
+		_c.SetRenewalRemindDays(*v)
+	}
+	return _c
+}
+
 // SetMinorPrompt sets the "minor_prompt" field.
 func (_c *ComplianceConfigCreate) SetMinorPrompt(v string) *ComplianceConfigCreate {
 	_c.mutation.SetMinorPrompt(v)
@@ -184,6 +198,10 @@ func (_c *ComplianceConfigCreate) defaults() {
 		v := complianceconfig.DefaultPayAgeLine
 		_c.mutation.SetPayAgeLine(v)
 	}
+	if _, ok := _c.mutation.RenewalRemindDays(); !ok {
+		v := complianceconfig.DefaultRenewalRemindDays
+		_c.mutation.SetRenewalRemindDays(v)
+	}
 	if _, ok := _c.mutation.MinorPrompt(); !ok {
 		v := complianceconfig.DefaultMinorPrompt
 		_c.mutation.SetMinorPrompt(v)
@@ -219,6 +237,9 @@ func (_c *ComplianceConfigCreate) check() error {
 	}
 	if _, ok := _c.mutation.PayAgeLine(); !ok {
 		return &ValidationError{Name: "pay_age_line", err: errors.New(`ent: missing required field "ComplianceConfig.pay_age_line"`)}
+	}
+	if _, ok := _c.mutation.RenewalRemindDays(); !ok {
+		return &ValidationError{Name: "renewal_remind_days", err: errors.New(`ent: missing required field "ComplianceConfig.renewal_remind_days"`)}
 	}
 	if _, ok := _c.mutation.MinorPrompt(); !ok {
 		return &ValidationError{Name: "minor_prompt", err: errors.New(`ent: missing required field "ComplianceConfig.minor_prompt"`)}
@@ -294,6 +315,10 @@ func (_c *ComplianceConfigCreate) createSpec() (*ComplianceConfig, *sqlgraph.Cre
 	if value, ok := _c.mutation.PayAgeLine(); ok {
 		_spec.SetField(complianceconfig.FieldPayAgeLine, field.TypeInt, value)
 		_node.PayAgeLine = value
+	}
+	if value, ok := _c.mutation.RenewalRemindDays(); ok {
+		_spec.SetField(complianceconfig.FieldRenewalRemindDays, field.TypeInt, value)
+		_node.RenewalRemindDays = value
 	}
 	if value, ok := _c.mutation.MinorPrompt(); ok {
 		_spec.SetField(complianceconfig.FieldMinorPrompt, field.TypeString, value)
@@ -398,6 +423,24 @@ func (u *ComplianceConfigUpsert) UpdatePayAgeLine() *ComplianceConfigUpsert {
 // AddPayAgeLine adds v to the "pay_age_line" field.
 func (u *ComplianceConfigUpsert) AddPayAgeLine(v int) *ComplianceConfigUpsert {
 	u.Add(complianceconfig.FieldPayAgeLine, v)
+	return u
+}
+
+// SetRenewalRemindDays sets the "renewal_remind_days" field.
+func (u *ComplianceConfigUpsert) SetRenewalRemindDays(v int) *ComplianceConfigUpsert {
+	u.Set(complianceconfig.FieldRenewalRemindDays, v)
+	return u
+}
+
+// UpdateRenewalRemindDays sets the "renewal_remind_days" field to the value that was provided on create.
+func (u *ComplianceConfigUpsert) UpdateRenewalRemindDays() *ComplianceConfigUpsert {
+	u.SetExcluded(complianceconfig.FieldRenewalRemindDays)
+	return u
+}
+
+// AddRenewalRemindDays adds v to the "renewal_remind_days" field.
+func (u *ComplianceConfigUpsert) AddRenewalRemindDays(v int) *ComplianceConfigUpsert {
+	u.Add(complianceconfig.FieldRenewalRemindDays, v)
 	return u
 }
 
@@ -537,6 +580,27 @@ func (u *ComplianceConfigUpsertOne) AddPayAgeLine(v int) *ComplianceConfigUpsert
 func (u *ComplianceConfigUpsertOne) UpdatePayAgeLine() *ComplianceConfigUpsertOne {
 	return u.Update(func(s *ComplianceConfigUpsert) {
 		s.UpdatePayAgeLine()
+	})
+}
+
+// SetRenewalRemindDays sets the "renewal_remind_days" field.
+func (u *ComplianceConfigUpsertOne) SetRenewalRemindDays(v int) *ComplianceConfigUpsertOne {
+	return u.Update(func(s *ComplianceConfigUpsert) {
+		s.SetRenewalRemindDays(v)
+	})
+}
+
+// AddRenewalRemindDays adds v to the "renewal_remind_days" field.
+func (u *ComplianceConfigUpsertOne) AddRenewalRemindDays(v int) *ComplianceConfigUpsertOne {
+	return u.Update(func(s *ComplianceConfigUpsert) {
+		s.AddRenewalRemindDays(v)
+	})
+}
+
+// UpdateRenewalRemindDays sets the "renewal_remind_days" field to the value that was provided on create.
+func (u *ComplianceConfigUpsertOne) UpdateRenewalRemindDays() *ComplianceConfigUpsertOne {
+	return u.Update(func(s *ComplianceConfigUpsert) {
+		s.UpdateRenewalRemindDays()
 	})
 }
 
@@ -849,6 +913,27 @@ func (u *ComplianceConfigUpsertBulk) AddPayAgeLine(v int) *ComplianceConfigUpser
 func (u *ComplianceConfigUpsertBulk) UpdatePayAgeLine() *ComplianceConfigUpsertBulk {
 	return u.Update(func(s *ComplianceConfigUpsert) {
 		s.UpdatePayAgeLine()
+	})
+}
+
+// SetRenewalRemindDays sets the "renewal_remind_days" field.
+func (u *ComplianceConfigUpsertBulk) SetRenewalRemindDays(v int) *ComplianceConfigUpsertBulk {
+	return u.Update(func(s *ComplianceConfigUpsert) {
+		s.SetRenewalRemindDays(v)
+	})
+}
+
+// AddRenewalRemindDays adds v to the "renewal_remind_days" field.
+func (u *ComplianceConfigUpsertBulk) AddRenewalRemindDays(v int) *ComplianceConfigUpsertBulk {
+	return u.Update(func(s *ComplianceConfigUpsert) {
+		s.AddRenewalRemindDays(v)
+	})
+}
+
+// UpdateRenewalRemindDays sets the "renewal_remind_days" field to the value that was provided on create.
+func (u *ComplianceConfigUpsertBulk) UpdateRenewalRemindDays() *ComplianceConfigUpsertBulk {
+	return u.Update(func(s *ComplianceConfigUpsert) {
+		s.UpdateRenewalRemindDays()
 	})
 }
 

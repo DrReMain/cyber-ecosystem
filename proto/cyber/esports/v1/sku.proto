@@ -15,7 +15,9 @@ option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
 // report; membership is a 31-day window); the structure carries both the
 // selling price and the list price so a future discount display is a
 // value change, not a contract change — no discount is displayed either
-// way in M1.
+// way in M1. The list also answers the pay gate's facts, folded into the
+// read the wall already makes — the member plane has no compliance read
+// of its own, and the gate is sale-shaped, so the selling face carries it.
 service SkuService {
   option (cyber.ext.v1.service_comment) = "SKU";
   rpc ListSkus(ListSkusRequest) returns (ListSkusResponse) {
@@ -57,6 +59,25 @@ message Sku {
 
 message ListSkusRequest {}
 
+// The compliance facts the pay wall gates on, folded into the catalog
+// read (the same fold GetProfileResponse.member_until rides on: the wall
+// reads the gate with a call it already makes, zero extra hop).
+message PayGate {
+  // Plain scalars by the success-implies-present carve-out: an absent
+  // config row still answers the shipped defaults (18 and 7), so the
+  // gate always speaks.
+  int32 pay_age_line = 1;
+  // Days before membership expiry the renewal reminder shows — the same
+  // name the compliance knob answers, one vocabulary end to end.
+  int32 renewal_remind_days = 2;
+  // Operator overrides shown as-is in every locale (the sku-name
+  // precedent for operator text); null = the face renders its own
+  // localized default.
+  google.protobuf.StringValue minor_prompt = 3;
+  google.protobuf.StringValue missing_birth_prompt = 4;
+}
+
 message ListSkusResponse {
   repeated Sku skus = 1;
+  PayGate pay_gate = 2;
 }

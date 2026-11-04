@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/esports/v1/sku.proto.
  */
 export const file_cyber_esports_v1_sku: GenFile = /*@__PURE__*/
-  fileDesc("ChpjeWJlci9lc3BvcnRzL3YxL3NrdS5wcm90bxIQY3liZXIuZXNwb3J0cy52MSK0AwoDU2t1Ei4KCHNrdV9jb2RlGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEioKBG5hbWUYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLZGVzY3JpcHRpb24YAyABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSJwoEa2luZBgEIAEoDjIZLmN5YmVyLmVzcG9ydHMudjEuU2t1S2luZBIuCglwcmljZV9mZW4YBSABKAsyGy5nb29nbGUucHJvdG9idWYuSW50NjRWYWx1ZRIzCg5saXN0X3ByaWNlX2ZlbhgGIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQ2NFZhbHVlEjAKC3BlcmlvZF9kYXlzGAcgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSLgoKY3JlYXRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKdXBkYXRlZF9hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiEQoPTGlzdFNrdXNSZXF1ZXN0IjcKEExpc3RTa3VzUmVzcG9uc2USIwoEc2t1cxgBIAMoCzIVLmN5YmVyLmVzcG9ydHMudjEuU2t1KlAKB1NrdUtpbmQSGAoUU0tVX0tJTkRfVU5TUEVDSUZJRUQQABISCg5TS1VfS0lORF9UUklBTBABEhcKE1NLVV9LSU5EX01FTUJFUlNISVAQAjKiAQoKU2t1U2VydmljZRKKAQoITGlzdFNrdXMSIS5jeWJlci5lc3BvcnRzLnYxLkxpc3RTa3VzUmVxdWVzdBoiLmN5YmVyLmVzcG9ydHMudjEuTGlzdFNrdXNSZXNwb25zZSI3iPEEBIrTDhMKD+WcqOWUrlNLVeWIl+ihqBABgtPkkwIWEhQvYXBpL3YxL2VzcG9ydHMvc2t1cxoHiuIJA1NLVUIpWidjeWJlci1lY29zeXN0ZW0vZ2VuL2dvL2N5YmVyL2VzcG9ydHMvdjFiBnByb3RvMw", [file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("ChpjeWJlci9lc3BvcnRzL3YxL3NrdS5wcm90bxIQY3liZXIuZXNwb3J0cy52MSK0AwoDU2t1Ei4KCHNrdV9jb2RlGAEgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEioKBG5hbWUYAiABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSMQoLZGVzY3JpcHRpb24YAyABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSJwoEa2luZBgEIAEoDjIZLmN5YmVyLmVzcG9ydHMudjEuU2t1S2luZBIuCglwcmljZV9mZW4YBSABKAsyGy5nb29nbGUucHJvdG9idWYuSW50NjRWYWx1ZRIzCg5saXN0X3ByaWNlX2ZlbhgGIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQ2NFZhbHVlEjAKC3BlcmlvZF9kYXlzGAcgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSLgoKY3JlYXRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKdXBkYXRlZF9hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiEQoPTGlzdFNrdXNSZXF1ZXN0IqwBCgdQYXlHYXRlEhQKDHBheV9hZ2VfbGluZRgBIAEoBRIbChNyZW5ld2FsX3JlbWluZF9kYXlzGAIgASgFEjIKDG1pbm9yX3Byb21wdBgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRI6ChRtaXNzaW5nX2JpcnRoX3Byb21wdBgEIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZSJkChBMaXN0U2t1c1Jlc3BvbnNlEiMKBHNrdXMYASADKAsyFS5jeWJlci5lc3BvcnRzLnYxLlNrdRIrCghwYXlfZ2F0ZRgCIAEoCzIZLmN5YmVyLmVzcG9ydHMudjEuUGF5R2F0ZSpQCgdTa3VLaW5kEhgKFFNLVV9LSU5EX1VOU1BFQ0lGSUVEEAASEgoOU0tVX0tJTkRfVFJJQUwQARIXChNTS1VfS0lORF9NRU1CRVJTSElQEAIyogEKClNrdVNlcnZpY2USigEKCExpc3RTa3VzEiEuY3liZXIuZXNwb3J0cy52MS5MaXN0U2t1c1JlcXVlc3QaIi5jeWJlci5lc3BvcnRzLnYxLkxpc3RTa3VzUmVzcG9uc2UiN4jxBASK0w4TCg/lnKjllK5TS1XliJfooagQAYLT5JMCFhIUL2FwaS92MS9lc3BvcnRzL3NrdXMaB4riCQNTS1VCKVonY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9lc3BvcnRzL3YxYgZwcm90bzM", [file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * @generated from message cyber.esports.v1.Sku
@@ -98,6 +98,53 @@ export const ListSkusRequestSchema: GenMessage<ListSkusRequest> = /*@__PURE__*/
   messageDesc(file_cyber_esports_v1_sku, 1);
 
 /**
+ * The compliance facts the pay wall gates on, folded into the catalog
+ * read (the same fold GetProfileResponse.member_until rides on: the wall
+ * reads the gate with a call it already makes, zero extra hop).
+ *
+ * @generated from message cyber.esports.v1.PayGate
+ */
+export type PayGate = Message<"cyber.esports.v1.PayGate"> & {
+  /**
+   * Plain scalars by the success-implies-present carve-out: an absent
+   * config row still answers the shipped defaults (18 and 7), so the
+   * gate always speaks.
+   *
+   * @generated from field: int32 pay_age_line = 1;
+   */
+  payAgeLine: number;
+
+  /**
+   * Days before membership expiry the renewal reminder shows — the same
+   * name the compliance knob answers, one vocabulary end to end.
+   *
+   * @generated from field: int32 renewal_remind_days = 2;
+   */
+  renewalRemindDays: number;
+
+  /**
+   * Operator overrides shown as-is in every locale (the sku-name
+   * precedent for operator text); null = the face renders its own
+   * localized default.
+   *
+   * @generated from field: google.protobuf.StringValue minor_prompt = 3;
+   */
+  minorPrompt?: string | undefined;
+
+  /**
+   * @generated from field: google.protobuf.StringValue missing_birth_prompt = 4;
+   */
+  missingBirthPrompt?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.PayGate.
+ * Use `create(PayGateSchema)` to create a new message.
+ */
+export const PayGateSchema: GenMessage<PayGate> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_sku, 2);
+
+/**
  * @generated from message cyber.esports.v1.ListSkusResponse
  */
 export type ListSkusResponse = Message<"cyber.esports.v1.ListSkusResponse"> & {
@@ -105,6 +152,11 @@ export type ListSkusResponse = Message<"cyber.esports.v1.ListSkusResponse"> & {
    * @generated from field: repeated cyber.esports.v1.Sku skus = 1;
    */
   skus: Sku[];
+
+  /**
+   * @generated from field: cyber.esports.v1.PayGate pay_gate = 2;
+   */
+  payGate?: PayGate | undefined;
 };
 
 /**
@@ -112,7 +164,7 @@ export type ListSkusResponse = Message<"cyber.esports.v1.ListSkusResponse"> & {
  * Use `create(ListSkusResponseSchema)` to create a new message.
  */
 export const ListSkusResponseSchema: GenMessage<ListSkusResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_sku, 2);
+  messageDesc(file_cyber_esports_v1_sku, 3);
 
 /**
  * What a sku sells: a trial unlocks one test record's report
@@ -150,7 +202,9 @@ export const SkuKindSchema: GenEnum<SkuKind> = /*@__PURE__*/
  * report; membership is a 31-day window); the structure carries both the
  * selling price and the list price so a future discount display is a
  * value change, not a contract change — no discount is displayed either
- * way in M1.
+ * way in M1. The list also answers the pay gate's facts, folded into the
+ * read the wall already makes — the member plane has no compliance read
+ * of its own, and the gate is sale-shaped, so the selling face carries it.
  *
  * @generated from service cyber.esports.v1.SkuService
  */

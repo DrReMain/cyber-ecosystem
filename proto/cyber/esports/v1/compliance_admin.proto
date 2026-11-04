@@ -11,12 +11,13 @@ import "google/protobuf/wrappers.proto";
 option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
 
 // The operator face of the compliance knobs: the birth-date collection
-// switch, the pay age line, and the two pay-wall prompt overrides — one
-// singleton row behind them all, so every setter answers with the whole
-// settled config and concurrent setters on different knobs never clobber
-// each other (each setter updates only its own column). The age line is
-// the sensitive knob: the operator face draws a double confirm around it
-// and every write lands in the audit log like any other admin action.
+// switch, the pay age line, the renewal reminder timing, and the two
+// pay-wall prompt overrides — one singleton row behind them all, so every
+// setter answers with the whole settled config and concurrent setters on
+// different knobs never clobber each other (each setter updates only its
+// own column). The age line is the sensitive knob: the operator face
+// draws a double confirm around it and every write lands in the audit log
+// like any other admin action.
 // Like the other operator planes, this service is a strippable module —
 // deployments without it lose the management face, never the knobs'
 // answers (an absent row keeps answering the shipped defaults).
@@ -55,6 +56,17 @@ service ComplianceAdminService {
       body: "*"
     };
   }
+  rpc SetRenewalReminder(SetRenewalReminderRequest) returns (SetRenewalReminderResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "到期提醒时机"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/compliance-config/renewal-reminder"
+      body: "*"
+    };
+  }
   rpc GetComplianceConfig(GetComplianceConfigRequest) returns (GetComplianceConfigResponse) {
     option (cyber.ext.v1.method) = {
       comment: "合规配置读取"
@@ -77,6 +89,9 @@ message ComplianceConfig {
   google.protobuf.Int32Value pay_age_line = 2;
   google.protobuf.StringValue minor_prompt = 3;
   google.protobuf.StringValue missing_birth_prompt = 4;
+  // Days before membership expiry the renewal reminder shows; the
+  // shipped default 7 answers when no row sets it.
+  google.protobuf.Int32Value renewal_remind_days = 5;
 }
 
 message SetBirthCollectionRequest {
@@ -119,6 +134,20 @@ message SetPayAgeLineRequest {
 }
 
 message SetPayAgeLineResponse {
+  ComplianceConfig config = 1;
+}
+
+message SetRenewalReminderRequest {
+  optional int32 days = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).int32 = {
+      gte: 1
+      lte: 90
+    }
+  ];
+}
+
+message SetRenewalReminderResponse {
   ComplianceConfig config = 1;
 }
 

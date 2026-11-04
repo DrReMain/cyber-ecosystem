@@ -13,6 +13,7 @@ import (
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
+	"cyber-ecosystem/app/services/esports/internal/module/compliance"
 	"cyber-ecosystem/app/services/esports/internal/shared"
 )
 
@@ -67,11 +68,12 @@ type SkuRP interface {
 
 type SkuUC struct {
 	shared.UC
-	skuRP SkuRP
+	skuRP        SkuRP
+	complianceRP compliance.ComplianceRP
 }
 
-func NewSkuUC(logger *slog.Logger, tm shared.Transaction, skuRP SkuRP) *SkuUC {
-	return &SkuUC{UC: shared.NewUC(logger.With("module", "module/sku"), tm), skuRP: skuRP}
+func NewSkuUC(logger *slog.Logger, tm shared.Transaction, skuRP SkuRP, complianceRP compliance.ComplianceRP) *SkuUC {
+	return &SkuUC{UC: shared.NewUC(logger.With("module", "module/sku"), tm), skuRP: skuRP, complianceRP: complianceRP}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -141,6 +143,13 @@ func (uc *SkuUC) SetShelf(ctx context.Context, code string, onShelf bool) (*Sku,
 
 func (uc *SkuUC) List(ctx context.Context) ([]*Sku, error) {
 	return uc.skuRP.List(ctx)
+}
+
+func (uc *SkuUC) PayGate(ctx context.Context) (*compliance.ComplianceConfig, error) {
+	// The selling face answers the gate with a read it already owes the
+	// wall — the member plane has no compliance read of its own, so the
+	// catalog folds it (the member_until precedent: zero extra hop).
+	return uc.complianceRP.Get(ctx)
 }
 
 func (uc *SkuUC) ListAll(ctx context.Context) ([]*Sku, error) {

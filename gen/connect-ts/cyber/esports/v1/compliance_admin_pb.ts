@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/esports/v1/compliance_admin.proto.
  */
 export const file_cyber_esports_v1_compliance_admin: GenFile = /*@__PURE__*/
-  fileDesc("CidjeWJlci9lc3BvcnRzL3YxL2NvbXBsaWFuY2VfYWRtaW4ucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEi6AEKEENvbXBsaWFuY2VDb25maWcSMQoNYmlydGhfY29sbGVjdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5Cb29sVmFsdWUSMQoMcGF5X2FnZV9saW5lGAIgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSMgoMbWlub3JfcHJvbXB0GAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjoKFG1pc3NpbmdfYmlydGhfcHJvbXB0GAQgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlIkUKGVNldEJpcnRoQ29sbGVjdGlvblJlcXVlc3QSHAoHY29sbGVjdBgBIAEoCEIGukgDyAEBSACIAQFCCgoIX2NvbGxlY3QiUAoaU2V0QmlydGhDb2xsZWN0aW9uUmVzcG9uc2USMgoGY29uZmlnGAEgASgLMiIuY3liZXIuZXNwb3J0cy52MS5Db21wbGlhbmNlQ29uZmlnIv8BChtTZXRDb21wbGlhbmNlUHJvbXB0c1JlcXVlc3QSJQoMbWlub3JfcHJvbXB0GAEgASgJQgq6SAdyBRABGMgBSACIAQESLQoUbWlzc2luZ19iaXJ0aF9wcm9tcHQYAiABKAlCCrpIB3IFEAEYyAFIAYgBATpgukhdGlsKH2NvbXBsaWFuY2VfcHJvbXB0c19hdF9sZWFzdF9vbmUaOGhhcyh0aGlzLm1pbm9yX3Byb21wdCkgfHwgaGFzKHRoaXMubWlzc2luZ19iaXJ0aF9wcm9tcHQpQg8KDV9taW5vcl9wcm9tcHRCFwoVX21pc3NpbmdfYmlydGhfcHJvbXB0IlIKHFNldENvbXBsaWFuY2VQcm9tcHRzUmVzcG9uc2USMgoGY29uZmlnGAEgASgLMiIuY3liZXIuZXNwb3J0cy52MS5Db21wbGlhbmNlQ29uZmlnIj4KFFNldFBheUFnZUxpbmVSZXF1ZXN0Eh4KA2FnZRgBIAEoBUIMukgJyAEBGgQYeCgBSACIAQFCBgoEX2FnZSJLChVTZXRQYXlBZ2VMaW5lUmVzcG9uc2USMgoGY29uZmlnGAEgASgLMiIuY3liZXIuZXNwb3J0cy52MS5Db21wbGlhbmNlQ29uZmlnIhwKGkdldENvbXBsaWFuY2VDb25maWdSZXF1ZXN0IlEKG0dldENvbXBsaWFuY2VDb25maWdSZXNwb25zZRIyCgZjb25maWcYASABKAsyIi5jeWJlci5lc3BvcnRzLnYxLkNvbXBsaWFuY2VDb25maWcyyAYKFkNvbXBsaWFuY2VBZG1pblNlcnZpY2US0gEKElNldEJpcnRoQ29sbGVjdGlvbhIrLmN5YmVyLmVzcG9ydHMudjEuU2V0QmlydGhDb2xsZWN0aW9uUmVxdWVzdBosLmN5YmVyLmVzcG9ydHMudjEuU2V0QmlydGhDb2xsZWN0aW9uUmVzcG9uc2UiYYjxBAKK0w4cChjlh7rnlJ/lubTmnIjph4fpm4blvIDlhbMQAoLT5JMCNzoBKhoyL2FwaS92MS9lc3BvcnRzL2NvbXBsaWFuY2UtY29uZmlnL2JpcnRoLWNvbGxlY3Rpb24SyQEKFFNldENvbXBsaWFuY2VQcm9tcHRzEi0uY3liZXIuZXNwb3J0cy52MS5TZXRDb21wbGlhbmNlUHJvbXB0c1JlcXVlc3QaLi5jeWJlci5lc3BvcnRzLnYxLlNldENvbXBsaWFuY2VQcm9tcHRzUmVzcG9uc2UiUojxBAKK0w4WChLku5jotLnmj5DnpLrmlofmoYgQAoLT5JMCLjoBKhopL2FwaS92MS9lc3BvcnRzL2NvbXBsaWFuY2UtY29uZmlnL3Byb21wdHMSvAEKDVNldFBheUFnZUxpbmUSJi5jeWJlci5lc3BvcnRzLnYxLlNldFBheUFnZUxpbmVSZXF1ZXN0GicuY3liZXIuZXNwb3J0cy52MS5TZXRQYXlBZ2VMaW5lUmVzcG9uc2UiWojxBAKK0w4ZChXosIPmlbTku5jotLnlubTpvoTnur8QAoLT5JMCMzoBKhouL2FwaS92MS9lc3BvcnRzL2NvbXBsaWFuY2UtY29uZmlnL3BheS1hZ2UtbGluZRK7AQoTR2V0Q29tcGxpYW5jZUNvbmZpZxIsLmN5YmVyLmVzcG9ydHMudjEuR2V0Q29tcGxpYW5jZUNvbmZpZ1JlcXVlc3QaLS5jeWJlci5lc3BvcnRzLnYxLkdldENvbXBsaWFuY2VDb25maWdSZXNwb25zZSJHiPEEAorTDhYKEuWQiOinhOmFjee9ruivu+WPlhABgtPkkwIjEiEvYXBpL3YxL2VzcG9ydHMvY29tcGxpYW5jZS1jb25maWcaEIriCQzlkIjop4TphY3nva5CKVonY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9lc3BvcnRzL3YxYgZwcm90bzM", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_wrappers]);
+  fileDesc("CidjeWJlci9lc3BvcnRzL3YxL2NvbXBsaWFuY2VfYWRtaW4ucHJvdG8SEGN5YmVyLmVzcG9ydHMudjEiogIKEENvbXBsaWFuY2VDb25maWcSMQoNYmlydGhfY29sbGVjdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5Cb29sVmFsdWUSMQoMcGF5X2FnZV9saW5lGAIgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUSMgoMbWlub3JfcHJvbXB0GAMgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjoKFG1pc3NpbmdfYmlydGhfcHJvbXB0GAQgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjgKE3JlbmV3YWxfcmVtaW5kX2RheXMYBSABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZSJFChlTZXRCaXJ0aENvbGxlY3Rpb25SZXF1ZXN0EhwKB2NvbGxlY3QYASABKAhCBrpIA8gBAUgAiAEBQgoKCF9jb2xsZWN0IlAKGlNldEJpcnRoQ29sbGVjdGlvblJlc3BvbnNlEjIKBmNvbmZpZxgBIAEoCzIiLmN5YmVyLmVzcG9ydHMudjEuQ29tcGxpYW5jZUNvbmZpZyL/AQobU2V0Q29tcGxpYW5jZVByb21wdHNSZXF1ZXN0EiUKDG1pbm9yX3Byb21wdBgBIAEoCUIKukgHcgUQARjIAUgAiAEBEi0KFG1pc3NpbmdfYmlydGhfcHJvbXB0GAIgASgJQgq6SAdyBRABGMgBSAGIAQE6YLpIXRpbCh9jb21wbGlhbmNlX3Byb21wdHNfYXRfbGVhc3Rfb25lGjhoYXModGhpcy5taW5vcl9wcm9tcHQpIHx8IGhhcyh0aGlzLm1pc3NpbmdfYmlydGhfcHJvbXB0KUIPCg1fbWlub3JfcHJvbXB0QhcKFV9taXNzaW5nX2JpcnRoX3Byb21wdCJSChxTZXRDb21wbGlhbmNlUHJvbXB0c1Jlc3BvbnNlEjIKBmNvbmZpZxgBIAEoCzIiLmN5YmVyLmVzcG9ydHMudjEuQ29tcGxpYW5jZUNvbmZpZyI+ChRTZXRQYXlBZ2VMaW5lUmVxdWVzdBIeCgNhZ2UYASABKAVCDLpICcgBARoEGHgoAUgAiAEBQgYKBF9hZ2UiSwoVU2V0UGF5QWdlTGluZVJlc3BvbnNlEjIKBmNvbmZpZxgBIAEoCzIiLmN5YmVyLmVzcG9ydHMudjEuQ29tcGxpYW5jZUNvbmZpZyJFChlTZXRSZW5ld2FsUmVtaW5kZXJSZXF1ZXN0Eh8KBGRheXMYASABKAVCDLpICcgBARoEGFooAUgAiAEBQgcKBV9kYXlzIlAKGlNldFJlbmV3YWxSZW1pbmRlclJlc3BvbnNlEjIKBmNvbmZpZxgBIAEoCzIiLmN5YmVyLmVzcG9ydHMudjEuQ29tcGxpYW5jZUNvbmZpZyIcChpHZXRDb21wbGlhbmNlQ29uZmlnUmVxdWVzdCJRChtHZXRDb21wbGlhbmNlQ29uZmlnUmVzcG9uc2USMgoGY29uZmlnGAEgASgLMiIuY3liZXIuZXNwb3J0cy52MS5Db21wbGlhbmNlQ29uZmlnMpcIChZDb21wbGlhbmNlQWRtaW5TZXJ2aWNlEtIBChJTZXRCaXJ0aENvbGxlY3Rpb24SKy5jeWJlci5lc3BvcnRzLnYxLlNldEJpcnRoQ29sbGVjdGlvblJlcXVlc3QaLC5jeWJlci5lc3BvcnRzLnYxLlNldEJpcnRoQ29sbGVjdGlvblJlc3BvbnNlImGI8QQCitMOHAoY5Ye655Sf5bm05pyI6YeH6ZuG5byA5YWzEAKC0+STAjc6ASoaMi9hcGkvdjEvZXNwb3J0cy9jb21wbGlhbmNlLWNvbmZpZy9iaXJ0aC1jb2xsZWN0aW9uEskBChRTZXRDb21wbGlhbmNlUHJvbXB0cxItLmN5YmVyLmVzcG9ydHMudjEuU2V0Q29tcGxpYW5jZVByb21wdHNSZXF1ZXN0Gi4uY3liZXIuZXNwb3J0cy52MS5TZXRDb21wbGlhbmNlUHJvbXB0c1Jlc3BvbnNlIlKI8QQCitMOFgoS5LuY6LS55o+Q56S65paH5qGIEAKC0+STAi46ASoaKS9hcGkvdjEvZXNwb3J0cy9jb21wbGlhbmNlLWNvbmZpZy9wcm9tcHRzErwBCg1TZXRQYXlBZ2VMaW5lEiYuY3liZXIuZXNwb3J0cy52MS5TZXRQYXlBZ2VMaW5lUmVxdWVzdBonLmN5YmVyLmVzcG9ydHMudjEuU2V0UGF5QWdlTGluZVJlc3BvbnNlIlqI8QQCitMOGQoV6LCD5pW05LuY6LS55bm06b6E57q/EAKC0+STAjM6ASoaLi9hcGkvdjEvZXNwb3J0cy9jb21wbGlhbmNlLWNvbmZpZy9wYXktYWdlLWxpbmUSzAEKElNldFJlbmV3YWxSZW1pbmRlchIrLmN5YmVyLmVzcG9ydHMudjEuU2V0UmVuZXdhbFJlbWluZGVyUmVxdWVzdBosLmN5YmVyLmVzcG9ydHMudjEuU2V0UmVuZXdhbFJlbWluZGVyUmVzcG9uc2UiW4jxBAKK0w4WChLliLDmnJ/mj5DphpLml7bmnLoQAoLT5JMCNzoBKhoyL2FwaS92MS9lc3BvcnRzL2NvbXBsaWFuY2UtY29uZmlnL3JlbmV3YWwtcmVtaW5kZXISuwEKE0dldENvbXBsaWFuY2VDb25maWcSLC5jeWJlci5lc3BvcnRzLnYxLkdldENvbXBsaWFuY2VDb25maWdSZXF1ZXN0Gi0uY3liZXIuZXNwb3J0cy52MS5HZXRDb21wbGlhbmNlQ29uZmlnUmVzcG9uc2UiR4jxBAKK0w4WChLlkIjop4TphY3nva7or7vlj5YQAYLT5JMCIxIhL2FwaS92MS9lc3BvcnRzL2NvbXBsaWFuY2UtY29uZmlnGhCK4gkM5ZCI6KeE6YWN572uQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_wrappers]);
 
 /**
  * The settled config every face of these knobs reads. birth_collect and
@@ -48,6 +48,14 @@ export type ComplianceConfig = Message<"cyber.esports.v1.ComplianceConfig"> & {
    * @generated from field: google.protobuf.StringValue missing_birth_prompt = 4;
    */
   missingBirthPrompt?: string | undefined;
+
+  /**
+   * Days before membership expiry the renewal reminder shows; the
+   * shipped default 7 answers when no row sets it.
+   *
+   * @generated from field: google.protobuf.Int32Value renewal_remind_days = 5;
+   */
+  renewalRemindDays?: number | undefined;
 };
 
 /**
@@ -165,6 +173,40 @@ export const SetPayAgeLineResponseSchema: GenMessage<SetPayAgeLineResponse> = /*
   messageDesc(file_cyber_esports_v1_compliance_admin, 6);
 
 /**
+ * @generated from message cyber.esports.v1.SetRenewalReminderRequest
+ */
+export type SetRenewalReminderRequest = Message<"cyber.esports.v1.SetRenewalReminderRequest"> & {
+  /**
+   * @generated from field: optional int32 days = 1;
+   */
+  days?: number | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.SetRenewalReminderRequest.
+ * Use `create(SetRenewalReminderRequestSchema)` to create a new message.
+ */
+export const SetRenewalReminderRequestSchema: GenMessage<SetRenewalReminderRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_compliance_admin, 7);
+
+/**
+ * @generated from message cyber.esports.v1.SetRenewalReminderResponse
+ */
+export type SetRenewalReminderResponse = Message<"cyber.esports.v1.SetRenewalReminderResponse"> & {
+  /**
+   * @generated from field: cyber.esports.v1.ComplianceConfig config = 1;
+   */
+  config?: ComplianceConfig | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.SetRenewalReminderResponse.
+ * Use `create(SetRenewalReminderResponseSchema)` to create a new message.
+ */
+export const SetRenewalReminderResponseSchema: GenMessage<SetRenewalReminderResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_compliance_admin, 8);
+
+/**
  * @generated from message cyber.esports.v1.GetComplianceConfigRequest
  */
 export type GetComplianceConfigRequest = Message<"cyber.esports.v1.GetComplianceConfigRequest"> & {
@@ -175,7 +217,7 @@ export type GetComplianceConfigRequest = Message<"cyber.esports.v1.GetCompliance
  * Use `create(GetComplianceConfigRequestSchema)` to create a new message.
  */
 export const GetComplianceConfigRequestSchema: GenMessage<GetComplianceConfigRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_compliance_admin, 7);
+  messageDesc(file_cyber_esports_v1_compliance_admin, 9);
 
 /**
  * @generated from message cyber.esports.v1.GetComplianceConfigResponse
@@ -192,16 +234,17 @@ export type GetComplianceConfigResponse = Message<"cyber.esports.v1.GetComplianc
  * Use `create(GetComplianceConfigResponseSchema)` to create a new message.
  */
 export const GetComplianceConfigResponseSchema: GenMessage<GetComplianceConfigResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_compliance_admin, 8);
+  messageDesc(file_cyber_esports_v1_compliance_admin, 10);
 
 /**
  * The operator face of the compliance knobs: the birth-date collection
- * switch, the pay age line, and the two pay-wall prompt overrides — one
- * singleton row behind them all, so every setter answers with the whole
- * settled config and concurrent setters on different knobs never clobber
- * each other (each setter updates only its own column). The age line is
- * the sensitive knob: the operator face draws a double confirm around it
- * and every write lands in the audit log like any other admin action.
+ * switch, the pay age line, the renewal reminder timing, and the two
+ * pay-wall prompt overrides — one singleton row behind them all, so every
+ * setter answers with the whole settled config and concurrent setters on
+ * different knobs never clobber each other (each setter updates only its
+ * own column). The age line is the sensitive knob: the operator face
+ * draws a double confirm around it and every write lands in the audit log
+ * like any other admin action.
  * Like the other operator planes, this service is a strippable module —
  * deployments without it lose the management face, never the knobs'
  * answers (an absent row keeps answering the shipped defaults).
@@ -232,6 +275,14 @@ export const ComplianceAdminService: GenService<{
     methodKind: "unary";
     input: typeof SetPayAgeLineRequestSchema;
     output: typeof SetPayAgeLineResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.esports.v1.ComplianceAdminService.SetRenewalReminder
+   */
+  setRenewalReminder: {
+    methodKind: "unary";
+    input: typeof SetRenewalReminderRequestSchema;
+    output: typeof SetRenewalReminderResponseSchema;
   },
   /**
    * @generated from rpc cyber.esports.v1.ComplianceAdminService.GetComplianceConfig

@@ -1196,6 +1196,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.SetCompliancePromptsResponse'
+    /api/v1/esports/compliance-config/renewal-reminder:
+        put:
+            tags:
+                - ComplianceAdminService
+            operationId: ComplianceAdminService_SetRenewalReminder
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SetRenewalReminderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SetRenewalReminderResponse'
     /api/v1/esports/entitlements/redeem:
         post:
             tags:
@@ -4929,6 +4947,12 @@ components:
                     type: string
                 missingBirthPrompt:
                     type: string
+                renewalRemindDays:
+                    type: integer
+                    description: |-
+                        Days before membership expiry the renewal reminder shows; the
+                         shipped default 7 answers when no row sets it.
+                    format: int32
             description: |-
                 The settled config every face of these knobs reads. birth_collect and
                  pay_age_line are the effective values (an absent row answers the
@@ -6151,6 +6175,8 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Sku'
+                payGate:
+                    $ref: '#/components/schemas/cyber.esports.v1.PayGate'
         cyber.esports.v1.ListTestAttemptsResponse:
             type: object
             properties:
@@ -6667,6 +6693,34 @@ components:
                     description: |-
                         Success implies present — create answers with the payer's
                          continuation material or fails.
+        cyber.esports.v1.PayGate:
+            type: object
+            properties:
+                payAgeLine:
+                    type: integer
+                    description: |-
+                        Plain scalars by the success-implies-present carve-out: an absent
+                         config row still answers the shipped defaults (18 and 7), so the
+                         gate always speaks.
+                    format: int32
+                renewalRemindDays:
+                    type: integer
+                    description: |-
+                        Days before membership expiry the renewal reminder shows — the same
+                         name the compliance knob answers, one vocabulary end to end.
+                    format: int32
+                minorPrompt:
+                    type: string
+                    description: |-
+                        Operator overrides shown as-is in every locale (the sku-name
+                         precedent for operator text); null = the face renders its own
+                         localized default.
+                missingBirthPrompt:
+                    type: string
+            description: |-
+                The compliance facts the pay wall gates on, folded into the catalog
+                 read (the same fold GetProfileResponse.member_until rides on: the wall
+                 reads the gate with a call it already makes, zero extra hop).
         cyber.esports.v1.PeekMatchSessionResponse:
             type: object
             properties:
@@ -7196,6 +7250,17 @@ components:
                     type: integer
                     format: int32
         cyber.esports.v1.SetPayAgeLineResponse:
+            type: object
+            properties:
+                config:
+                    $ref: '#/components/schemas/cyber.esports.v1.ComplianceConfig'
+        cyber.esports.v1.SetRenewalReminderRequest:
+            type: object
+            properties:
+                days:
+                    type: integer
+                    format: int32
+        cyber.esports.v1.SetRenewalReminderResponse:
             type: object
             properties:
                 config:
@@ -9358,12 +9423,13 @@ tags:
     - name: ComplianceAdminService
       description: |-
         The operator face of the compliance knobs: the birth-date collection
-         switch, the pay age line, and the two pay-wall prompt overrides — one
-         singleton row behind them all, so every setter answers with the whole
-         settled config and concurrent setters on different knobs never clobber
-         each other (each setter updates only its own column). The age line is
-         the sensitive knob: the operator face draws a double confirm around it
-         and every write lands in the audit log like any other admin action.
+         switch, the pay age line, the renewal reminder timing, and the two
+         pay-wall prompt overrides — one singleton row behind them all, so every
+         setter answers with the whole settled config and concurrent setters on
+         different knobs never clobber each other (each setter updates only its
+         own column). The age line is the sensitive knob: the operator face
+         draws a double confirm around it and every write lands in the audit log
+         like any other admin action.
          Like the other operator planes, this service is a strippable module —
          deployments without it lose the management face, never the knobs'
          answers (an absent row keeps answering the shipped defaults).
@@ -9498,11 +9564,16 @@ tags:
       description: |-
         The order aggregate's faces. The member plane creates and reads its own
          orders; creating again for the same grant target while a pending order
-         lives returns that order. NotifyPayment is the service's only public
-         face: its callers are payment channels pushing their envelopes, and
-         they authenticate by the channel signature inside the payload, never by
-         a session — the notification accelerates settlement, the query surface
-         converges it.
+         lives returns that order. Create is also the pay gate's authority, and
+         the gate outranks reuse: a member without a recorded birth is refused
+         BIRTH_MISSING (the client routes to the backfill), a member under the
+         compliance age line is refused AGE_BLOCKED — live order or not, a
+         member the gate refuses never receives payment material. The wall's
+         catalog-side pre-check is experience, this refusal is the rule.
+         NotifyPayment is the service's only public face: its callers are
+         payment channels pushing their envelopes, and they authenticate by the
+         channel signature inside the payload, never by a session — the
+         notification accelerates settlement, the query surface converges it.
     - name: PolicyService
     - name: PopulationService
       description: |-
@@ -9558,7 +9629,9 @@ tags:
          report; membership is a 31-day window); the structure carries both the
          selling price and the list price so a future discount display is a
          value change, not a contract change — no discount is displayed either
-         way in M1.
+         way in M1. The list also answers the pay gate's facts, folded into the
+         read the wall already makes — the member plane has no compliance read
+         of its own, and the gate is sale-shaped, so the selling face carries it.
     - name: TenantService
     - name: TestAdminService
       description: |-

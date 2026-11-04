@@ -1,6 +1,6 @@
 {
   "esports_compliance_config_title": "合规配置",
-  "esports_compliance_config_desc": "出生年月采集 · 付费年龄线（敏感操作二次确认）· 付费提示文案",
+  "esports_compliance_config_desc": "出生年月采集 · 付费年龄线（敏感操作二次确认）· 到期提醒 · 付费提示文案",
   "esports_compliance_config_refresh": "刷新",
   "esports_compliance_config_birth_title": "出生年月采集",
   "esports_compliance_config_birth_label": "启用出生年月采集",
@@ -19,6 +19,15 @@
   "esports_compliance_config_age_modal_ok": "确认调整",
   "esports_compliance_config_age_modal_warn": "敏感操作：需权限 + 二次确认 + 审计",
   "esports_compliance_config_age_ok": "付费年龄线已调整至 {age} 岁",
+  "esports_compliance_config_remind_title": "到期提醒时机",
+  "esports_compliance_config_remind_label": "会员到期前提醒",
+  "esports_compliance_config_remind_unit": "天",
+  "esports_compliance_config_remind_hint": "到期前 N 天起，续费页与会员卡显示到期提醒",
+  "esports_compliance_config_remind_edit": "调整提醒时机",
+  "esports_compliance_config_remind_modal_title": "调整到期提醒",
+  "esports_compliance_config_remind_modal_label": "到期前（天）开始提醒",
+  "esports_compliance_config_remind_modal_ok": "确认调整",
+  "esports_compliance_config_remind_ok": "到期提醒已调整为到期前 {days} 天",
   "esports_compliance_config_prompts_title": "付费引导/提示文案",
   "esports_compliance_config_prompts_minor_label": "未成年提示",
   "esports_compliance_config_prompts_minor_default": "未满 18 岁将无法支付",
@@ -30,5 +39,5 @@
   "esports_compliance_config_prompts_placeholder": "输入新的提示文案",
   "esports_compliance_config_prompts_save": "保存",
   "esports_compliance_config_prompts_ok": "文案已更新",
-  "esports_compliance_config_callout": "年龄边界按最大边界计算：1 月 1 日出生，次年 1 月 2 日才算满 1 岁；调整年龄线为敏感操作，需二次确认并计入审计。"
+  "esports_compliance_config_callout": "年龄按出生年月整月保守计算：6 月出生的孩子，要到满 18 岁那年的 7 月才算通过年龄线；调整年龄线为敏感操作，需二次确认并计入审计。"
 }

@@ -14,18 +14,21 @@ import (
 
 const (
 	// The shipped defaults an absent row answers. The schema's column
-	// defaults materialize the same pair the moment the singleton row is
-	// first written — two homes, one frozen pair: 18 is the product's
-	// line, and changing it is this knob's runtime job, never a code edit.
-	DefaultBirthCollect = true
-	DefaultPayAgeLine   = 18
+	// defaults materialize the same set the moment the singleton row is
+	// first written — two homes, one frozen set: 18 is the product's
+	// line, and changing any of them is a knob's runtime job, never a
+	// code edit.
+	DefaultBirthCollect      = true
+	DefaultPayAgeLine        = 18
+	DefaultRenewalRemindDays = 7
 )
 
 // DO ------------------------------------------------------------------------------------------------------------------
 
 type ComplianceConfig struct {
-	BirthCollect bool
-	PayAgeLine   int32
+	BirthCollect      bool
+	PayAgeLine        int32
+	RenewalRemindDays int32
 	// nil = no override: each face renders its own localized default copy,
 	// because the shipped copy is locale-dependent text.
 	MinorPrompt        *string
@@ -40,6 +43,7 @@ type ComplianceRP interface {
 	SetBirthCollection(ctx context.Context, collect bool, updatedBy string) (*ComplianceConfig, error)
 	SetCompliancePrompts(ctx context.Context, minor, missing *string, updatedBy string) (*ComplianceConfig, error)
 	SetPayAgeLine(ctx context.Context, age int32, updatedBy string) (*ComplianceConfig, error)
+	SetRenewalReminder(ctx context.Context, days int32, updatedBy string) (*ComplianceConfig, error)
 	Get(ctx context.Context) (*ComplianceConfig, error)
 }
 
@@ -88,6 +92,19 @@ func (uc *ComplianceUC) SetPayAgeLine(ctx context.Context, age int32) (*Complian
 		return nil, err
 	}
 	return uc.complianceRP.SetPayAgeLine(ctx, age, updatedBy)
+}
+
+func (uc *ComplianceUC) SetRenewalReminder(ctx context.Context, days int32) (*ComplianceConfig, error) {
+	// Same shape as the age line: wire bounds mirrored for direct UC
+	// callers, so every home answers one vocabulary.
+	if days < 1 || days > 90 {
+		return nil, errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("renewal reminder days %d outside 1..90", days))
+	}
+	updatedBy, err := actorID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return uc.complianceRP.SetRenewalReminder(ctx, days, updatedBy)
 }
 
 func (uc *ComplianceUC) Get(ctx context.Context) (*ComplianceConfig, error) {

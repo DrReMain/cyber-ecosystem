@@ -4927,22 +4927,24 @@ func (m *AnnouncementMutation) ResetEdge(name string) error {
 // ComplianceConfigMutation represents an operation that mutates the ComplianceConfig nodes in the graph.
 type ComplianceConfigMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *string
-	created_at           *time.Time
-	updated_at           *time.Time
-	slot                 *complianceconfig.Slot
-	birth_collect        *bool
-	pay_age_line         *int
-	addpay_age_line      *int
-	minor_prompt         *string
-	missing_birth_prompt *string
-	updated_by           *string
-	clearedFields        map[string]struct{}
-	done                 bool
-	oldValue             func(context.Context) (*ComplianceConfig, error)
-	predicates           []predicate.ComplianceConfig
+	op                     Op
+	typ                    string
+	id                     *string
+	created_at             *time.Time
+	updated_at             *time.Time
+	slot                   *complianceconfig.Slot
+	birth_collect          *bool
+	pay_age_line           *int
+	addpay_age_line        *int
+	renewal_remind_days    *int
+	addrenewal_remind_days *int
+	minor_prompt           *string
+	missing_birth_prompt   *string
+	updated_by             *string
+	clearedFields          map[string]struct{}
+	done                   bool
+	oldValue               func(context.Context) (*ComplianceConfig, error)
+	predicates             []predicate.ComplianceConfig
 }
 
 var _ ent.Mutation = (*ComplianceConfigMutation)(nil)
@@ -5249,6 +5251,62 @@ func (m *ComplianceConfigMutation) ResetPayAgeLine() {
 	m.addpay_age_line = nil
 }
 
+// SetRenewalRemindDays sets the "renewal_remind_days" field.
+func (m *ComplianceConfigMutation) SetRenewalRemindDays(i int) {
+	m.renewal_remind_days = &i
+	m.addrenewal_remind_days = nil
+}
+
+// RenewalRemindDays returns the value of the "renewal_remind_days" field in the mutation.
+func (m *ComplianceConfigMutation) RenewalRemindDays() (r int, exists bool) {
+	v := m.renewal_remind_days
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRenewalRemindDays returns the old "renewal_remind_days" field's value of the ComplianceConfig entity.
+// If the ComplianceConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ComplianceConfigMutation) OldRenewalRemindDays(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRenewalRemindDays is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRenewalRemindDays requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRenewalRemindDays: %w", err)
+	}
+	return oldValue.RenewalRemindDays, nil
+}
+
+// AddRenewalRemindDays adds i to the "renewal_remind_days" field.
+func (m *ComplianceConfigMutation) AddRenewalRemindDays(i int) {
+	if m.addrenewal_remind_days != nil {
+		*m.addrenewal_remind_days += i
+	} else {
+		m.addrenewal_remind_days = &i
+	}
+}
+
+// AddedRenewalRemindDays returns the value that was added to the "renewal_remind_days" field in this mutation.
+func (m *ComplianceConfigMutation) AddedRenewalRemindDays() (r int, exists bool) {
+	v := m.addrenewal_remind_days
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRenewalRemindDays resets all changes to the "renewal_remind_days" field.
+func (m *ComplianceConfigMutation) ResetRenewalRemindDays() {
+	m.renewal_remind_days = nil
+	m.addrenewal_remind_days = nil
+}
+
 // SetMinorPrompt sets the "minor_prompt" field.
 func (m *ComplianceConfigMutation) SetMinorPrompt(s string) {
 	m.minor_prompt = &s
@@ -5391,7 +5449,7 @@ func (m *ComplianceConfigMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ComplianceConfigMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, complianceconfig.FieldCreatedAt)
 	}
@@ -5406,6 +5464,9 @@ func (m *ComplianceConfigMutation) Fields() []string {
 	}
 	if m.pay_age_line != nil {
 		fields = append(fields, complianceconfig.FieldPayAgeLine)
+	}
+	if m.renewal_remind_days != nil {
+		fields = append(fields, complianceconfig.FieldRenewalRemindDays)
 	}
 	if m.minor_prompt != nil {
 		fields = append(fields, complianceconfig.FieldMinorPrompt)
@@ -5434,6 +5495,8 @@ func (m *ComplianceConfigMutation) Field(name string) (ent.Value, bool) {
 		return m.BirthCollect()
 	case complianceconfig.FieldPayAgeLine:
 		return m.PayAgeLine()
+	case complianceconfig.FieldRenewalRemindDays:
+		return m.RenewalRemindDays()
 	case complianceconfig.FieldMinorPrompt:
 		return m.MinorPrompt()
 	case complianceconfig.FieldMissingBirthPrompt:
@@ -5459,6 +5522,8 @@ func (m *ComplianceConfigMutation) OldField(ctx context.Context, name string) (e
 		return m.OldBirthCollect(ctx)
 	case complianceconfig.FieldPayAgeLine:
 		return m.OldPayAgeLine(ctx)
+	case complianceconfig.FieldRenewalRemindDays:
+		return m.OldRenewalRemindDays(ctx)
 	case complianceconfig.FieldMinorPrompt:
 		return m.OldMinorPrompt(ctx)
 	case complianceconfig.FieldMissingBirthPrompt:
@@ -5509,6 +5574,13 @@ func (m *ComplianceConfigMutation) SetField(name string, value ent.Value) error 
 		}
 		m.SetPayAgeLine(v)
 		return nil
+	case complianceconfig.FieldRenewalRemindDays:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRenewalRemindDays(v)
+		return nil
 	case complianceconfig.FieldMinorPrompt:
 		v, ok := value.(string)
 		if !ok {
@@ -5541,6 +5613,9 @@ func (m *ComplianceConfigMutation) AddedFields() []string {
 	if m.addpay_age_line != nil {
 		fields = append(fields, complianceconfig.FieldPayAgeLine)
 	}
+	if m.addrenewal_remind_days != nil {
+		fields = append(fields, complianceconfig.FieldRenewalRemindDays)
+	}
 	return fields
 }
 
@@ -5551,6 +5626,8 @@ func (m *ComplianceConfigMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case complianceconfig.FieldPayAgeLine:
 		return m.AddedPayAgeLine()
+	case complianceconfig.FieldRenewalRemindDays:
+		return m.AddedRenewalRemindDays()
 	}
 	return nil, false
 }
@@ -5566,6 +5643,13 @@ func (m *ComplianceConfigMutation) AddField(name string, value ent.Value) error 
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddPayAgeLine(v)
+		return nil
+	case complianceconfig.FieldRenewalRemindDays:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRenewalRemindDays(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ComplianceConfig numeric field %s", name)
@@ -5608,6 +5692,9 @@ func (m *ComplianceConfigMutation) ResetField(name string) error {
 		return nil
 	case complianceconfig.FieldPayAgeLine:
 		m.ResetPayAgeLine()
+		return nil
+	case complianceconfig.FieldRenewalRemindDays:
+		m.ResetRenewalRemindDays()
 		return nil
 	case complianceconfig.FieldMinorPrompt:
 		m.ResetMinorPrompt()

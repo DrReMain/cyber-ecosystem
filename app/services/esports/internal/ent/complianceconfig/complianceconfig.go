@@ -24,6 +24,8 @@ const (
 	FieldBirthCollect = "birth_collect"
 	// FieldPayAgeLine holds the string denoting the pay_age_line field in the database.
 	FieldPayAgeLine = "pay_age_line"
+	// FieldRenewalRemindDays holds the string denoting the renewal_remind_days field in the database.
+	FieldRenewalRemindDays = "renewal_remind_days"
 	// FieldMinorPrompt holds the string denoting the minor_prompt field in the database.
 	FieldMinorPrompt = "minor_prompt"
 	// FieldMissingBirthPrompt holds the string denoting the missing_birth_prompt field in the database.
@@ -42,6 +44,7 @@ var Columns = []string{
 	FieldSlot,
 	FieldBirthCollect,
 	FieldPayAgeLine,
+	FieldRenewalRemindDays,
 	FieldMinorPrompt,
 	FieldMissingBirthPrompt,
 	FieldUpdatedBy,
@@ -68,6 +71,8 @@ var (
 	DefaultBirthCollect bool
 	// DefaultPayAgeLine holds the default value on creation for the "pay_age_line" field.
 	DefaultPayAgeLine int
+	// DefaultRenewalRemindDays holds the default value on creation for the "renewal_remind_days" field.
+	DefaultRenewalRemindDays int
 	// DefaultMinorPrompt holds the default value on creation for the "minor_prompt" field.
 	DefaultMinorPrompt string
 	// DefaultMissingBirthPrompt holds the default value on creation for the "missing_birth_prompt" field.
@@ -133,6 +138,11 @@ func ByBirthCollect(opts ...sql.OrderTermOption) OrderOption {
 // ByPayAgeLine orders the results by the pay_age_line field.
 func ByPayAgeLine(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPayAgeLine, opts...).ToFunc()
+}
+
+// ByRenewalRemindDays orders the results by the renewal_remind_days field.
+func ByRenewalRemindDays(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRenewalRemindDays, opts...).ToFunc()
 }
 
 // ByMinorPrompt orders the results by the minor_prompt field.

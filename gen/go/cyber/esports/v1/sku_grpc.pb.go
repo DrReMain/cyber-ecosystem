@@ -31,7 +31,9 @@ const (
 // report; membership is a 31-day window); the structure carries both the
 // selling price and the list price so a future discount display is a
 // value change, not a contract change — no discount is displayed either
-// way in M1.
+// way in M1. The list also answers the pay gate's facts, folded into the
+// read the wall already makes — the member plane has no compliance read
+// of its own, and the gate is sale-shaped, so the selling face carries it.
 type SkuServiceClient interface {
 	ListSkus(ctx context.Context, in *ListSkusRequest, opts ...grpc.CallOption) (*ListSkusResponse, error)
 }
@@ -63,7 +65,9 @@ func (c *skuServiceClient) ListSkus(ctx context.Context, in *ListSkusRequest, op
 // report; membership is a 31-day window); the structure carries both the
 // selling price and the list price so a future discount display is a
 // value change, not a contract change — no discount is displayed either
-// way in M1.
+// way in M1. The list also answers the pay gate's facts, folded into the
+// read the wall already makes — the member plane has no compliance read
+// of its own, and the gate is sale-shaped, so the selling face carries it.
 type SkuServiceServer interface {
 	ListSkus(context.Context, *ListSkusRequest) (*ListSkusResponse, error)
 	mustEmbedUnimplementedSkuServiceServer()

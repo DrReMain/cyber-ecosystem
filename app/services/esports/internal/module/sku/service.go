@@ -11,6 +11,8 @@ import (
 	"cyber-ecosystem/shared-go/utils"
 
 	esportspb "cyber-ecosystem/gen/go/cyber/esports/v1"
+
+	"cyber-ecosystem/app/services/esports/internal/module/compliance"
 )
 
 // Struct --------------------------------------------------------------------------------------------------------------
@@ -48,10 +50,23 @@ func (s *SkuService) ListSkus(ctx context.Context, in *esportspb.ListSkusRequest
 	if err != nil {
 		return nil, err
 	}
-	return &esportspb.ListSkusResponse{Skus: utils.SliceMap(skus, mapSkuPB)}, nil
+	gate, err := s.skuUC.PayGate(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.ListSkusResponse{Skus: utils.SliceMap(skus, mapSkuPB), PayGate: payGatePB(gate)}, nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
+
+func payGatePB(g *compliance.ComplianceConfig) *esportspb.PayGate {
+	return &esportspb.PayGate{
+		PayAgeLine:         g.PayAgeLine,
+		RenewalRemindDays:  g.RenewalRemindDays,
+		MinorPrompt:        utils.Wrap(g.MinorPrompt, utils.StringW),
+		MissingBirthPrompt: utils.Wrap(g.MissingBirthPrompt, utils.StringW),
+	}
+}
 
 func mapSkuPB(s *Sku) *esportspb.Sku {
 	return &esportspb.Sku{

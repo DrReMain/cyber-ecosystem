@@ -20,6 +20,11 @@ export const setCompliancePrompts = ComplianceAdminService.method.setComplianceP
 export const setPayAgeLine = ComplianceAdminService.method.setPayAgeLine;
 
 /**
+ * @generated from rpc cyber.esports.v1.ComplianceAdminService.SetRenewalReminder
+ */
+export const setRenewalReminder = ComplianceAdminService.method.setRenewalReminder;
+
+/**
  * @generated from rpc cyber.esports.v1.ComplianceAdminService.GetComplianceConfig
  */
 export const getComplianceConfig = ComplianceAdminService.method.getComplianceConfig;

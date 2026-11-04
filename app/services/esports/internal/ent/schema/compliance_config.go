@@ -29,7 +29,9 @@ func (ComplianceConfig) Fields() []ent.Field {
 		field.Bool("birth_collect").Default(true).
 			Comment("collect the member's birth date at registration; off = age band only (the pay wall then guides the backfill)"),
 		field.Int("pay_age_line").Default(18).
-			Comment("members younger than this cannot pay; age reckons on the maximum boundary — born Jan 1 means one year older only on Jan 2"),
+			Comment("members younger than this cannot pay; birth is year+month granularity, so the line clears only from the month after the birthday month — the conservative reading"),
+		field.Int("renewal_remind_days").Default(7).
+			Comment("days before membership expiry the renewal reminder shows; the shipped default answers when unset"),
 		field.String("minor_prompt").Default("").
 			Comment("pay-wall copy for an under-age member; empty = each face renders its own localized default"),
 		field.String("missing_birth_prompt").Default("").

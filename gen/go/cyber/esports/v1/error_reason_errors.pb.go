@@ -249,6 +249,36 @@ func ErrorEsportsSkuKindInvalid(format string, args ...interface{}) *errors.Erro
 	return errors.New(400, Esports_ESPORTS_SKU_KIND_INVALID.String(), fmt.Sprintf(format, args...))
 }
 
+// The pay gate on order create: the two refusals route differently —
+// BIRTH_MISSING sends the wall to the birth backfill page, AGE_BLOCKED
+// is final until the member's next birthday month passes.
+func IsEsportsPayAgeBlocked(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_PAY_AGE_BLOCKED.String() && e.Code == 400
+}
+
+// The pay gate on order create: the two refusals route differently —
+// BIRTH_MISSING sends the wall to the birth backfill page, AGE_BLOCKED
+// is final until the member's next birthday month passes.
+func ErrorEsportsPayAgeBlocked(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_PAY_AGE_BLOCKED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsPayBirthMissing(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_PAY_BIRTH_MISSING.String() && e.Code == 400
+}
+
+func ErrorEsportsPayBirthMissing(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_PAY_BIRTH_MISSING.String(), fmt.Sprintf(format, args...))
+}
+
 // 615x: activation code & entitlement
 func IsEsportsActivationCodeInvalid(err error) bool {
 	if err == nil {

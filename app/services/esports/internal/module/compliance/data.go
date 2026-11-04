@@ -91,6 +91,23 @@ func (rp *complianceRP) SetPayAgeLine(ctx context.Context, age int32, updatedBy 
 	return rp.Get(ctx)
 }
 
+func (rp *complianceRP) SetRenewalReminder(ctx context.Context, days int32, updatedBy string) (*ComplianceConfig, error) {
+	if err := rp.Platform.GetClient(ctx).ComplianceConfig.Create().
+		SetSlot(complianceconfig.SlotSingleton).
+		SetRenewalRemindDays(int(days)).
+		SetUpdatedBy(updatedBy).
+		OnConflictColumns(complianceconfig.FieldSlot).
+		Update(func(u *ent.ComplianceConfigUpsert) {
+			u.SetUpdatedAt(time.Now())
+			u.SetRenewalRemindDays(int(days))
+			u.SetUpdatedBy(updatedBy)
+		}).
+		Exec(ctx); err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return rp.Get(ctx)
+}
+
 func (rp *complianceRP) Get(ctx context.Context) (*ComplianceConfig, error) {
 	row, err := rp.Platform.GetClient(ctx).ComplianceConfig.Query().
 		Where(complianceconfig.SlotEQ(complianceconfig.SlotSingleton)).
@@ -98,7 +115,7 @@ func (rp *complianceRP) Get(ctx context.Context) (*ComplianceConfig, error) {
 	if ent.IsNotFound(err) {
 		// Absent row = the shipped defaults answering; the table only
 		// ever carries what an operator actually set.
-		return &ComplianceConfig{BirthCollect: DefaultBirthCollect, PayAgeLine: DefaultPayAgeLine}, nil
+		return &ComplianceConfig{BirthCollect: DefaultBirthCollect, PayAgeLine: DefaultPayAgeLine, RenewalRemindDays: DefaultRenewalRemindDays}, nil
 	}
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
@@ -112,6 +129,7 @@ func mapConfig(row *ent.ComplianceConfig) *ComplianceConfig {
 	return &ComplianceConfig{
 		BirthCollect:       row.BirthCollect,
 		PayAgeLine:         utils.ConvNum[int32](row.PayAgeLine),
+		RenewalRemindDays:  utils.ConvNum[int32](row.RenewalRemindDays),
 		MinorPrompt:        promptPtr(row.MinorPrompt),
 		MissingBirthPrompt: promptPtr(row.MissingBirthPrompt),
 	}

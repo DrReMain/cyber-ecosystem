@@ -69,6 +69,14 @@ func (s *ComplianceAdminService) SetPayAgeLine(ctx context.Context, in *esportsp
 	return &esportspb.SetPayAgeLineResponse{Config: configPB(config)}, nil
 }
 
+func (s *ComplianceAdminService) SetRenewalReminder(ctx context.Context, in *esportspb.SetRenewalReminderRequest) (*esportspb.SetRenewalReminderResponse, error) {
+	config, err := s.complianceUC.SetRenewalReminder(ctx, in.GetDays())
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.SetRenewalReminderResponse{Config: configPB(config)}, nil
+}
+
 func (s *ComplianceAdminService) GetComplianceConfig(ctx context.Context, _ *esportspb.GetComplianceConfigRequest) (*esportspb.GetComplianceConfigResponse, error) {
 	config, err := s.complianceUC.Get(ctx)
 	if err != nil {
@@ -85,5 +93,6 @@ func configPB(config *compliance.ComplianceConfig) *esportspb.ComplianceConfig {
 		PayAgeLine:         utils.Int32W(config.PayAgeLine),
 		MinorPrompt:        utils.Wrap(config.MinorPrompt, utils.StringW),
 		MissingBirthPrompt: utils.Wrap(config.MissingBirthPrompt, utils.StringW),
+		RenewalRemindDays:  utils.Int32W(config.RenewalRemindDays),
 	}
 }

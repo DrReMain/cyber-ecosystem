@@ -4,6 +4,7 @@ import {
   setBirthCollection,
   setCompliancePrompts,
   setPayAgeLine,
+  setRenewalReminder,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/compliance_admin-ComplianceAdminService_connectquery";
 import { Alert, Button, Card, Switch, Tag, Typography } from "antd";
 import { Pencil, RefreshCw } from "lucide-react";
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 import { m } from "#/paraglide/messages";
 import { AgeLineModal } from "./ui/age-line-modal";
 import { PromptModal } from "./ui/prompt-modal";
+import { RemindModal } from "./ui/remind-modal";
 
 // Which of the two prompt rows an edit opened — the modal writes exactly
 // that one, nil on the wire for the other.
@@ -24,6 +26,7 @@ type PromptKey = "minor" | "missing";
 // operator overrides them.
 export function ComplianceConfigPage() {
   const [ageOpen, setAgeOpen] = useState(false);
+  const [remindOpen, setRemindOpen] = useState(false);
   const [promptKey, setPromptKey] = useState<PromptKey | null>(null);
   const configQuery = useQuery(getComplianceConfig, {});
 
@@ -44,6 +47,15 @@ export function ComplianceConfigPage() {
       void configQuery.refetch();
     },
   });
+  const remindMut = useMutation(setRenewalReminder, {
+    onSuccess: (resp) => {
+      toast.success(
+        m.esports_compliance_config_remind_ok({ days: resp.config?.renewalRemindDays ?? 0 }),
+      );
+      setRemindOpen(false);
+      void configQuery.refetch();
+    },
+  });
   const promptMut = useMutation(setCompliancePrompts, {
     onSuccess: () => {
       toast.success(m.esports_compliance_config_prompts_ok());
@@ -55,6 +67,7 @@ export function ComplianceConfigPage() {
   const config = configQuery.data?.config;
   const birthOn = config?.birthCollect ?? true;
   const ageLine = config?.payAgeLine ?? 18;
+  const remindDays = config?.renewalRemindDays ?? 7;
   const prompts: Record<PromptKey, string | null> = {
     minor: config?.minorPrompt ?? null,
     missing: config?.missingBirthPrompt ?? null,
@@ -93,7 +106,7 @@ export function ComplianceConfigPage() {
     <div className="flex flex-col gap-4 p-4">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <Typography.Title className="!mb-0" level={4}>
+          <Typography.Title className="mb-0!" level={4}>
             {m.esports_compliance_config_title()}
           </Typography.Title>
           <Typography.Text className="text-xs" type="secondary">
@@ -145,6 +158,22 @@ export function ComplianceConfigPage() {
         </div>
       </Card>
 
+      <Card loading={configQuery.isLoading} title={m.esports_compliance_config_remind_title()}>
+        <div className="flex items-center gap-3 py-1">
+          <span className="text-sm">{m.esports_compliance_config_remind_label()}</span>
+          <span className="text-primary text-3xl font-black">{remindDays}</span>
+          <span className="text-text-secondary text-sm">
+            {m.esports_compliance_config_remind_unit()}
+          </span>
+          <span className="text-text-secondary ml-auto text-xs">
+            {m.esports_compliance_config_remind_hint()}
+          </span>
+          <Button className="ml-2" onClick={() => setRemindOpen(true)} type="link">
+            {m.esports_compliance_config_remind_edit()}
+          </Button>
+        </div>
+      </Card>
+
       <Card loading={configQuery.isLoading} title={m.esports_compliance_config_prompts_title()}>
         {promptRow("minor")}
         {promptRow("missing")}
@@ -158,6 +187,13 @@ export function ComplianceConfigPage() {
         onConfirm={(age) => ageMut.mutate({ age })}
         open={ageOpen}
         submitting={ageMut.isPending}
+      />
+      <RemindModal
+        initial={remindDays}
+        onClose={() => setRemindOpen(false)}
+        onConfirm={(days) => remindMut.mutate({ days })}
+        open={remindOpen}
+        submitting={remindMut.isPending}
       />
       <PromptModal
         initial={promptKey !== null ? prompts[promptKey] : null}

@@ -1,6 +1,6 @@
 {
   "esports_compliance_config_title": "컴플라이언스 설정",
-  "esports_compliance_config_desc": "생년월일 수집 · 유료 연령 기준선(민감 작업 이중 확인) · 결제 안내 문구",
+  "esports_compliance_config_desc": "출생 연월 수집 · 결제 가능 연령선(민감·이중 확인) · 갱신 리마인더 · 결제 안내 문구",
   "esports_compliance_config_refresh": "새로고침",
   "esports_compliance_config_birth_title": "생년월일 수집",
   "esports_compliance_config_birth_label": "가입 시 생년월일 수집",
@@ -19,6 +19,15 @@
   "esports_compliance_config_age_modal_ok": "조정 확인",
   "esports_compliance_config_age_modal_warn": "민감 작업: 권한 + 이중 확인 + 감사 로그가 필요합니다",
   "esports_compliance_config_age_ok": "유료 연령 기준선을 {age}세로 조정했습니다",
+  "esports_compliance_config_remind_title": "갱신 리마인더 시점",
+  "esports_compliance_config_remind_label": "멤버십 만료 전 알림",
+  "esports_compliance_config_remind_unit": "일",
+  "esports_compliance_config_remind_hint": "만료 N일 전부터 갱신 페이지와 멤버십 카드에 알림 표시",
+  "esports_compliance_config_remind_edit": "시점 조정",
+  "esports_compliance_config_remind_modal_title": "갱신 리마인더 조정",
+  "esports_compliance_config_remind_modal_label": "만료 몇 일 전(일)부터 알림",
+  "esports_compliance_config_remind_modal_ok": "확인",
+  "esports_compliance_config_remind_ok": "갱신 리마인더가 만료 {days}일 전으로 설정되었습니다",
   "esports_compliance_config_prompts_title": "결제 안내 문구",
   "esports_compliance_config_prompts_minor_label": "미성년자 안내 문구",
   "esports_compliance_config_prompts_minor_default": "만 18세 미만은 결제할 수 없습니다",
@@ -30,5 +39,5 @@
   "esports_compliance_config_prompts_placeholder": "새 안내 문구를 입력하세요",
   "esports_compliance_config_prompts_save": "저장",
   "esports_compliance_config_prompts_ok": "문구를 업데이트했습니다",
-  "esports_compliance_config_callout": "연령은 최대 경계로 계산합니다: 1월 1일생은 다음 해 1월 2일이 되어야 1살로 칩니다. 연령 기준선 조정은 민감 작업으로 이중 확인과 감사 로그 대상입니다."
+  "esports_compliance_config_callout": "연령은 등록된 출생 연월을 온전한 개월 단위로 보수적으로 계산합니다: 6월생은 18세 연령선을 그해 7월부터 통과한 것으로 봅니다. 연령선 조정은 민감 작업으로 이중 확인과 감사 기록이 필요합니다."
 }

@@ -27,6 +27,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/ent"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
+	"cyber-ecosystem/app/services/esports/internal/module/compliance"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/order"
@@ -57,6 +58,8 @@ func TestPayLiveE2E(t *testing.T) {
 	const (
 		uid  = "e2epayuser0000000001" // MaxRuneLen 20
 		uid2 = "e2epayuser0000000002"
+		uid3 = "e2epayuser0000000003" // the minor — under the pay age line
+		uid4 = "e2epayuser0000000004" // no profile row at all — birth unreadable
 		recA = "e2erecord00000000001"
 		recB = "e2erecord00000000002"
 	)
@@ -105,7 +108,8 @@ func TestPayLiveE2E(t *testing.T) {
 		t.Fatalf("mock controller: not a mock backend")
 	}
 	uc := order.NewOrderUC(logger, pf, noopHooks{}, nil, order.NewOrderRP(logger, pf), sku.NewSkuRP(logger, pf),
-		entitle.NewEntitlementRP(logger, pf), test.NewTestRP(logger, pf), chanRP)
+		entitle.NewEntitlementRP(logger, pf), test.NewTestRP(logger, pf), chanRP,
+		profile.NewProfileRP(logger, pf), compliance.NewComplianceRP(logger, pf))
 	svc := order.NewOrderService(logger, uc)
 
 	channels, err := chanRP.Channels("mock")
@@ -160,6 +164,47 @@ func TestPayLiveE2E(t *testing.T) {
 		SetStartedAt(now).SetEndedAt(now).SetRawDetail(map[string]any{"e2e": true}).
 		Save(context.Background()); err != nil {
 		t.Fatalf("attempt fixture B: %v", err)
+	}
+
+	// The pay gate's subjects: two adults on the main line, one minor, one
+	// member with no profile row (birth unreadable — the backfill refusal).
+	for _, p := range []struct {
+		uid   string
+		year  int
+		month int
+	}{
+		{uid, 1990, 6},  // 36 — clears any sane line
+		{uid2, 1990, 6}, //
+		{uid3, 2015, 6}, // 11 — under the shipped line of 18
+	} {
+		if _, err := pf.GetClient(context.Background()).Profile.Create().
+			SetUserID(p.uid).SetBirthYear(p.year).SetBirthMonth(p.month).
+			Save(context.Background()); err != nil {
+			t.Fatalf("profile fixture %s: %v", p.uid, err)
+		}
+	}
+
+	// The gate arms: the minor is refused AGE_BLOCKED, the profile-less
+	// member BIRTH_MISSING — both before any catalog work matters.
+	subjectOf := func(id string) context.Context {
+		return security.WithSubject(context.Background(), &security.Subject{UserID: id, TenantID: "default", Population: "user"})
+	}
+	if _, err := uc.Create(subjectOf(uid3), &order.CreateIn{SKUCode: "member_month", Channel: channel}); !esportspb.IsEsportsPayAgeBlocked(err) {
+		t.Fatalf("minor create: err=%v", err)
+	}
+	if _, err := uc.Create(subjectOf(uid4), &order.CreateIn{SKUCode: "member_month", Channel: channel}); !esportspb.IsEsportsPayBirthMissing(err) {
+		t.Fatalf("birthless create: err=%v", err)
+	}
+
+	// The catalog read answers the gate's facts alongside the skus — the
+	// absent config row speaks the shipped defaults.
+	skuSvc := sku.NewSkuService(logger, sku.NewSkuUC(logger, pf, sku.NewSkuRP(logger, pf), compliance.NewComplianceRP(logger, pf)))
+	catalog, err := skuSvc.ListSkus(context.Background(), &esportspb.ListSkusRequest{})
+	if err != nil {
+		t.Fatalf("list skus: %v", err)
+	}
+	if g := catalog.GetPayGate(); g == nil || g.GetPayAgeLine() != 18 || g.GetRenewalRemindDays() != 7 || g.GetMinorPrompt() != nil || g.GetMissingBirthPrompt() != nil {
+		t.Fatalf("pay gate defaults: %+v", g)
 	}
 
 	// The membership main line: create → channel pay → callback → settle →
@@ -367,7 +412,7 @@ func TestPayLiveE2E(t *testing.T) {
 		t.Fatalf("operator close of a paid order: err=%v", err)
 	}
 
-	skuUC := sku.NewSkuUC(logger, pf, sku.NewSkuRP(logger, pf))
+	skuUC := sku.NewSkuUC(logger, pf, sku.NewSkuRP(logger, pf), compliance.NewComplianceRP(logger, pf))
 	memberPlane := func() []string {
 		skus, err := skuUC.List(context.Background())
 		if err != nil {
@@ -419,6 +464,7 @@ func cleanE2E(t *testing.T, db *ent.Client, uid string) {
 		{`DELETE FROM pay_order WHERE user_id = $1`, []any{uid}},
 		{`DELETE FROM entitlement WHERE user_id = $1`, []any{uid}},
 		{`DELETE FROM test_record WHERE user_id LIKE 'e2epayuser%'`, nil},
+		{`DELETE FROM profile WHERE user_id LIKE 'e2epayuser%'`, nil},
 		// Operator-minted rows only — seed rows carry semantic codes and stay.
 		{`DELETE FROM sku WHERE code LIKE 'sku_%'`, nil},
 	} {

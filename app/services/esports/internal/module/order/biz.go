@@ -19,6 +19,7 @@ import (
 	commonv1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
+	"cyber-ecosystem/app/services/esports/internal/module/compliance"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
@@ -177,21 +178,25 @@ type OrderUC struct {
 	entRP         entitle.EntitlementRP
 	testRP        test.TestRP
 	channelRP     PayChannelRP
+	profileRP     profile.ProfileRP
+	complianceRP  compliance.ComplianceRP
 	eventBus      shared.DomainEventBus
 	loopCancels   []context.CancelFunc
 	nextBillDay   time.Time // the day the next reconcile sweep must still see; owned by the reconcile loop's goroutine
 	nextBillRetry int
 }
 
-func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, eventBus shared.DomainEventBus, orderRP OrderRP, skuRP sku.SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP) *OrderUC {
+func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, eventBus shared.DomainEventBus, orderRP OrderRP, skuRP sku.SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP, profileRP profile.ProfileRP, complianceRP compliance.ComplianceRP) *OrderUC {
 	uc := &OrderUC{
-		UC:        shared.NewUC(logger.With("module", "module/order"), tm),
-		orderRP:   orderRP,
-		skuRP:     skuRP,
-		entRP:     entRP,
-		testRP:    testRP,
-		channelRP: channelRP,
-		eventBus:  eventBus,
+		UC:           shared.NewUC(logger.With("module", "module/order"), tm),
+		orderRP:      orderRP,
+		skuRP:        skuRP,
+		entRP:        entRP,
+		testRP:       testRP,
+		channelRP:    channelRP,
+		profileRP:    profileRP,
+		complianceRP: complianceRP,
+		eventBus:     eventBus,
 	}
 	hooks.OnStart(uc.runLoop("converge", convergeInterval, uc.ConvergeOnce))
 	hooks.OnStart(uc.runLoop("reconcile", reconcileInterval, uc.reconcileSweep))
@@ -232,6 +237,24 @@ func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error)
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {
 		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("order create requires a session"))
+	}
+	// The pay gate's authority — the wall's catalog-side pre-check is
+	// experience, this refusal is the rule. A member whose birth cannot
+	// be read is refused the same way as a reading under the line: the
+	// two reasons route differently on the client (backfill vs final).
+	gate, err := uc.complianceRP.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	p, err := uc.profileRP.FindByUserID(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if p == nil || p.BirthYear == nil || p.BirthMonth == nil {
+		return nil, esportspb.ErrorEsportsPayBirthMissing("")
+	}
+	if !lineReached(int(*p.BirthYear), int(*p.BirthMonth), int(gate.PayAgeLine), time.Now()) {
+		return nil, esportspb.ErrorEsportsPayAgeBlocked("")
 	}
 	sku, err := uc.skuRP.ByCode(ctx, in.SKUCode)
 	if err != nil {
@@ -945,6 +968,17 @@ func channelIn(channels []payment.Channel, want payment.Channel) bool {
 		}
 	}
 	return false
+}
+
+func lineReached(birthYear, birthMonth, line int, now time.Time) bool {
+	// Birth is year+month granularity, so the line clears conservatively
+	// only from the month after the birthday month (次月起算): a June
+	// birth clears an 18-year line in July, never inside June itself.
+	years := now.Year() - birthYear
+	if years != line {
+		return years > line
+	}
+	return int(now.Month()) > birthMonth
 }
 
 func billDayWindow(day time.Time) (time.Time, time.Time) {
