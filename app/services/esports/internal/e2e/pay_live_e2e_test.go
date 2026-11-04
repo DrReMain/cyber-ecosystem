@@ -215,6 +215,23 @@ func TestPayLiveE2E(t *testing.T) {
 	if rows, _ := entCount(order.EntMembership); rows != 2 {
 		t.Fatalf("renewal rows: %d, want 2 (stacking)", rows)
 	}
+	// The renewal tiles: the second row's expiry is the standing window's
+	// plus the period — the seam the settle transaction read — not its own
+	// paid moment plus it, which would overlap and forfeit the remainder.
+	tileRows, err := pf.GetClient(context.Background()).Entitlement.Query().
+		Where(
+			entitlement.UserIDEQ(uid),
+			entitlement.ScopeKindEQ(entitlement.ScopeKind(order.EntMembership)),
+		).
+		Order(ent.Asc(entitlement.FieldCreatedAt)).
+		All(context.Background())
+	if err != nil || len(tileRows) != 2 {
+		t.Fatalf("renewal tile query: n=%d err=%v", len(tileRows), err)
+	}
+	if tileRows[0].ExpiresAt == nil || tileRows[1].ExpiresAt == nil ||
+		!tileRows[1].ExpiresAt.Equal(tileRows[0].ExpiresAt.AddDate(0, 0, 31)) {
+		t.Fatalf("renewal tiling: first=%v second=%v", tileRows[0].ExpiresAt, tileRows[1].ExpiresAt)
+	}
 
 	// The trial line: same-order reuse before payment replays the stored
 	// credential with zero channel round trips; after settle the record is

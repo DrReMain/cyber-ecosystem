@@ -177,14 +177,28 @@ func TestEntitleLiveE2E(t *testing.T) {
 		t.Fatalf("same-member race took two uses: %+v", row)
 	}
 
-	// Expired code refuses even with its use untaken.
+	// Expired code refuses a member with no standing grant, use untaken.
 	code2 := codes[2]
 	if _, err := db.ExecContext(context.Background(),
 		`UPDATE activation_code SET expires_at = now() - interval '1 second' WHERE code = $1`, code2); err != nil {
 		t.Fatalf("age the code: %v", err)
 	}
-	if _, err := uc.Redeem(entSubject(userA), code2); !esportspb.IsEsportsActivationCodeExpired(err) {
+	if _, err := uc.Redeem(entSubject("ente2egrantless00001"), code2); !esportspb.IsEsportsActivationCodeExpired(err) {
 		t.Fatalf("expired code: err=%v", err)
+	}
+	// The precedence the service contract promises: a member whose family
+	// grant stands re-presenting their own now-expired code gets the
+	// idempotent answer — the grant outranks the code's expiry exactly as
+	// it outranks a disabled batch, and the aged code keeps its one use.
+	if _, err := db.ExecContext(context.Background(),
+		`UPDATE activation_code SET expires_at = now() - interval '1 second' WHERE code = $1`, code1); err != nil {
+		t.Fatalf("age the used code: %v", err)
+	}
+	if out, err := uc.Redeem(entSubject(userA), code1); err != nil || out.ExpiresAt == nil || !out.ExpiresAt.After(time.Now()) {
+		t.Fatalf("expired-code re-present must answer the standing grant: out=%+v err=%v", out, err)
+	}
+	if row, _ := codeRP.ByCode(context.Background(), code1); row.UsedCount != 1 {
+		t.Fatalf("expired-code re-present took a use: %+v", row)
 	}
 	if _, err := uc.Redeem(entSubject(userA), "ACNOPE"); !esportspb.IsEsportsActivationCodeInvalid(err) {
 		t.Fatalf("unknown code: err=%v", err)

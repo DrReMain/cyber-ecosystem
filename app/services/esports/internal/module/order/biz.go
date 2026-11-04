@@ -377,6 +377,7 @@ func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
 		return true, nil
 	}
 	var grant *entitle.EntitlementGrant
+	var periodDays int
 	switch order.ScopeKind {
 	case ScopeTrial:
 		if order.ScopeRef == nil {
@@ -396,8 +397,10 @@ func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
 			uc.Log.Error("membership settle without period", "order_no", order.OrderNo, "sku_code", order.SKUCode)
 			break
 		}
-		expiry := in.PaidAt.AddDate(0, 0, *sku.PeriodDays)
-		grant = &entitle.EntitlementGrant{UserID: order.UserID, ScopeKind: EntMembership, ExpiresAt: &expiry, Source: order.OrderNo}
+		periodDays = *sku.PeriodDays
+		// The expiry is the settle transaction's to set — the renewal seam
+		// there tiles a live window's renewal past its standing remainder.
+		grant = &entitle.EntitlementGrant{UserID: order.UserID, ScopeKind: EntMembership, Source: order.OrderNo}
 	default:
 		uc.Log.Error("order scope unknown at settle", "order_no", order.OrderNo, "scope_kind", order.ScopeKind)
 	}
@@ -410,6 +413,23 @@ func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
 		settled = updated
 		if !updated || grant == nil {
 			return nil
+		}
+		if grant.ScopeKind == EntMembership {
+			// The renewal seam, the same in-transaction read the operator
+			// grant makes: a live window sets the start, so a renewal paid
+			// mid-window tiles after the standing remainder rather than
+			// overlapping and forfeiting it; a first purchase starts at the
+			// paid moment. Concurrent renewal settles may still read the
+			// same seam and overlap — the replay shape the operator plane
+			// accepts; the fold reads the furthest window either way.
+			start := in.PaidAt
+			if window, werr := uc.entRP.MembershipWindow(txCtx, order.UserID); werr != nil {
+				return werr
+			} else if window != nil {
+				start = *window.ExpiresAt
+			}
+			expiry := start.AddDate(0, 0, periodDays)
+			grant.ExpiresAt = &expiry
 		}
 		return uc.entRP.Grant(txCtx, grant)
 	})

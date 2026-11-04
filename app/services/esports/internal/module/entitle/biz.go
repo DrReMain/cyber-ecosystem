@@ -408,22 +408,23 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 	if row == nil {
 		return nil, esportspb.ErrorEsportsActivationCodeInvalid("")
 	}
-	if row.ExpiresAt.Before(time.Now()) {
-		return nil, esportspb.ErrorEsportsActivationCodeExpired("")
-	}
 	family := row.ReportType
 	// The same member redeeming their own code again is idempotent — the
 	// grant already exists and the code's single use is already theirs,
-	// and that answer outranks the batch's state below: a disabled batch
-	// voids unredeemed codes, it never reopens a grant already landed. A
-	// lapsed grant is not that idempotent hit: an expired family row
-	// must not strand the member out of every later code for the family,
-	// so the redeem falls through and the grant ratchets forward — the
-	// access judgement reads the same liveness rule.
+	// and that answer outranks both refusals below: an expired code or a
+	// disabled batch voids unredeemed uses, neither reopens a grant
+	// already landed. A lapsed grant is not that idempotent hit: an
+	// expired family row must not strand the member out of every later
+	// code for the family, so the redeem falls through and the grant
+	// ratchets forward — the access judgement reads the same liveness
+	// rule.
 	if grant, err := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &family); err != nil {
 		return nil, err
 	} else if grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now())) {
 		return &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}, nil
+	}
+	if row.ExpiresAt.Before(time.Now()) {
+		return nil, esportspb.ErrorEsportsActivationCodeExpired("")
 	}
 	if row.BatchDisabled {
 		// The operator pulled the batch — distinct from expired and from
