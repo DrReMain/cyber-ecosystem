@@ -275,11 +275,21 @@ export function ReportPage() {
         {model.improvements.length > 0 ? <ImprovementBoard lines={model.improvements} /> : null}
         <MemberCard
           memberActive={memberActive}
+          onPay={() => void navigate({ to: "/pay", search: { from: `/report/${recordId}` } })}
           priceYuan={model.memberYuan}
           unlocked={model.unlocked}
         />
         {!model.unlocked ? (
-          <UnlockCard count={model.mainCount} priceYuan={model.trialYuan} />
+          <UnlockCard
+            count={model.mainCount}
+            onPay={() =>
+              void navigate({
+                to: "/pay",
+                search: { ref: recordId, from: `/report/${recordId}` },
+              })
+            }
+            priceYuan={model.trialYuan}
+          />
         ) : null}
         <div className="px-2 text-center text-[10px] leading-[1.6] text-[#F87171]">
           {m.report_minor_note()}

@@ -1,6 +1,7 @@
 import { useQuery as useConnectQuery, useMutation } from "@connectrpc/connect-query";
 import { markPaid } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/mock_cashier-MockCashierService_connectquery";
 import {
+  closeOrder,
   createOrder,
   getOrder,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/order-OrderService_connectquery";
@@ -10,7 +11,6 @@ import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "react-aria-components";
-import { toast } from "sonner";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { ageLineReached, ageOf } from "#/features/app/birth";
@@ -46,13 +46,20 @@ const RENEW_ORBS: readonly AmbientOrb[] = [
 
 type PurchaseKind = "member" | "trial";
 
+// The receipt's member copy fork (opened vs renewed). Captured at click
+// time — the standing window the purchase started under is the fact; a
+// session refetch mid-poll must not rewrite the verdict the receipt quotes.
+type MemberFace = "open" | "renew";
+
 interface SheetState {
+  face: MemberFace;
   orderNo: string;
   price: string;
   kind: PurchaseKind;
 }
 
 interface QrState {
+  face: MemberFace;
   kind: PurchaseKind;
   orderNo: string;
   value: string;
@@ -148,6 +155,7 @@ function wallStateOf(sdata: SessionView | undefined, payGate: PayGateView | unde
 function continueWithCredential(
   res: CreateResult,
   kind: PurchaseKind,
+  face: MemberFace,
   price: string,
   onMockSheet: (state: SheetState) => void,
   onInvokePaid: (orderNo: string) => void,
@@ -155,7 +163,7 @@ function continueWithCredential(
 ): void {
   const orderNo = res.order?.orderNo ?? "";
   if ((res.order?.provider ?? "") === "mock") {
-    onMockSheet({ kind, orderNo, price });
+    onMockSheet({ face, kind, orderNo, price });
     return;
   }
   const credentialKind = String(res.credential?.kind ?? "");
@@ -173,7 +181,7 @@ function continueWithCredential(
     return;
   }
   if (credentialKind === CREDENTIAL_QR_CODE && value !== "") {
-    onQr({ kind, orderNo, value });
+    onQr({ face, kind, orderNo, value });
   }
 }
 
@@ -191,6 +199,7 @@ interface CreateInput {
 async function createAndContinue(
   kind: PurchaseKind,
   face: PurchaseFace,
+  memberFace: MemberFace,
   ref: string | undefined,
   mutate: (input: CreateInput) => Promise<CreateResult>,
   onMockSheet: (state: SheetState) => void,
@@ -208,7 +217,7 @@ async function createAndContinue(
       ...(kind === "trial" && ref !== undefined ? { scopeRef: ref } : {}),
       ...(channel === "wechat_h5" ? { returnUrl: window.location.href } : {}),
     });
-    continueWithCredential(res, kind, face.yuan, onMockSheet, onInvokePaid, onQr);
+    continueWithCredential(res, kind, memberFace, face.yuan, onMockSheet, onInvokePaid, onQr);
   } catch {
     // The mutation cache already toasts the reason copy.
   }
@@ -266,12 +275,17 @@ function RenewalFace({
 }
 
 /** 态①/③: the dual options, member first — an expired window says
- * so on the neutral banner before the pitch. */
+ * so on the neutral banner before the pitch. The single unlock targets
+ * one test record, so it renders only when a record is in scope (the
+ * report context entries); a ref-less arrival (the profile card, the
+ * member retry) pitches member only — the same member-only face the
+ * prototype's profile entry carries. */
 function DualFace({
   expiredText,
   memberDisabled,
   memberPrice,
   onPay,
+  showTrial,
   trialDisabled,
   trialPrice,
 }: Readonly<{
@@ -279,6 +293,7 @@ function DualFace({
   memberDisabled: boolean;
   memberPrice: string;
   onPay: (kind: PurchaseKind) => void;
+  showTrial: boolean;
   trialDisabled: boolean;
   trialPrice: string;
 }>) {
@@ -288,11 +303,13 @@ function DualFace({
       <div className="border-line bg-surface-card shadow-card rounded-card border p-4 backdrop-blur-md">
         <div className="text-ink mb-3 text-[13px] font-bold">{m.pay_choose_way()}</div>
         <div className="flex flex-col gap-2.5">
-          <OptionCard
-            desc={m.pay_opt_trial_desc()}
-            name={m.pay_opt_trial_name()}
-            price={`¥${trialPrice}`}
-          />
+          {showTrial ? (
+            <OptionCard
+              desc={m.pay_opt_trial_desc()}
+              name={m.pay_opt_trial_name()}
+              price={`¥${trialPrice}`}
+            />
+          ) : null}
           <OptionCard
             bestBadge={m.pay_opt_member_best()}
             desc={m.pay_opt_member_desc()}
@@ -309,31 +326,39 @@ function DualFace({
       >
         {m.pay_act_member({ price: memberPrice })}
       </Button>
-      <Button
-        className="bg-surface-input text-ink-secondary w-full rounded-[12px] border-[1.5px] border-[#4B5563] py-[14px] text-[15px] font-medium active:opacity-80 disabled:opacity-50"
-        isDisabled={trialDisabled}
-        onPress={() => onPay("trial")}
-      >
-        {m.pay_act_trial({ price: trialPrice })}
-      </Button>
+      {showTrial ? (
+        <Button
+          className="bg-surface-input text-ink-secondary w-full rounded-[12px] border-[1.5px] border-[#4B5563] py-[14px] text-[15px] font-medium active:opacity-80 disabled:opacity-50"
+          isDisabled={trialDisabled}
+          onPress={() => onPay("trial")}
+        >
+          {m.pay_act_trial({ price: trialPrice })}
+        </Button>
+      ) : null}
     </>
   );
 }
 
 // The wall's interaction flow, one hook: create-and-continue, the mock
 // cashier sheet over the dev bridge, the QR sheet, and the settle poll
-// that flips the session (and with it the wall's own face).
+// that hands the outcome to the receipt page — the prototype routes every
+// cashier exit there, the wall never renders the verdict itself.
 function usePayFlow(faces: ReturnType<typeof purchaseFaces>, search: PaySearch) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [qr, setQr] = useState<QrState | null>(null);
-  const [polling, setPolling] = useState<{ kind: PurchaseKind; orderNo: string } | null>(null);
+  const [polling, setPolling] = useState<{
+    kind: PurchaseKind;
+    orderNo: string;
+    face: MemberFace;
+  } | null>(null);
   const createOrderMut = useMutation(createOrder);
   // The simulated cashier's own face — a mock provider's dev RPC, one the
   // service refuses (CASHIER_DISABLED) wherever the default provider is
   // not mock, so the sheet's success leg exists only in dev.
   const markPaidMut = useMutation(markPaid);
+  const closeOrderMut = useMutation(closeOrder);
   // Convergence read: the bridge settles synchronously server-side, so the
   // first poll usually answers PAID; the interval only covers the race.
   const orderQuery = useConnectQuery(
@@ -343,43 +368,69 @@ function usePayFlow(faces: ReturnType<typeof purchaseFaces>, search: PaySearch) 
   );
 
   // The settle finisher: PAID observed → the session's embedded window
-  // refreshes (the wall flips to the renewal face on its own for a member
-  // purchase), a single unlock returns to its origin. The state rides the
-  // wire as a value-name string — String() restates what the transport
-  // actually delivers.
+  // refreshes, then the receipt page owns the outcome (a CLOSED row —
+  // closed by this page's cancel or expired server-side — renders the
+  // cancel face from its own truth). The face each state carries is the
+  // one captured at click time — the receipt quotes the window the
+  // purchase started under, never a mid-poll refetch's rewrite. The state
+  // rides the wire as a value-name string — String() restates what the
+  // transport delivers.
   useEffect(() => {
     if (polling === null) {
       return;
     }
     const state = String(orderQuery.data?.order?.state ?? "");
-    if (state === ORDER_STATE_CLOSED) {
-      // A retired order never answers PAID — stop asking; the sheet is
-      // gone and a fresh create is the recovery.
-      setPolling(null);
-      return;
-    }
-    if (state !== ORDER_STATE_PAID) {
+    if (state !== ORDER_STATE_PAID && state !== ORDER_STATE_CLOSED) {
       return;
     }
     setPolling(null);
-    void queryClient.invalidateQueries({ queryKey: sessionQuery.queryKey });
-    toast.success(m.pay_toast_paid());
-    if (polling.kind === "trial") {
-      void navigate({ href: search.from ?? "/" });
+    if (state === ORDER_STATE_PAID) {
+      void queryClient.invalidateQueries({ queryKey: sessionQuery.queryKey });
     }
+    void navigate({
+      to: "/pay/result",
+      search: {
+        order: polling.orderNo,
+        face: polling.face,
+        ...(search.from !== undefined ? { from: search.from } : {}),
+      },
+    });
   }, [orderQuery.data, polling, queryClient, navigate, search.from]);
 
-  async function pay(kind: PurchaseKind) {
+  function toResult(orderNo: string, face: MemberFace) {
+    void navigate({
+      to: "/pay/result",
+      search: { order: orderNo, face, ...(search.from !== undefined ? { from: search.from } : {}) },
+    });
+  }
+
+  // The cancel leg: close the order first so the channel order cannot be
+  // paid into behind the receipt, then land on it — the row answers the
+  // face. A close refusal toasts through the mutation cache and the order
+  // still expires on its own.
+  function abandonTo(orderNo: string, face: MemberFace) {
+    void (async () => {
+      try {
+        await closeOrderMut.mutateAsync({ orderNo });
+      } catch {
+        // The receipt page reads the row's own truth either way.
+      }
+      toResult(orderNo, face);
+    })();
+  }
+
+  async function pay(kind: PurchaseKind, face: MemberFace) {
     if (createOrderMut.isPending) {
       return;
     }
     await createAndContinue(
       kind,
       kind === "member" ? faces.member : faces.trial,
+      face,
       search.ref,
       createOrderMut.mutateAsync,
       setSheet,
-      (orderNo) => setPolling({ kind, orderNo }),
+      (orderNo) => setPolling({ kind, orderNo, face }),
       setQr,
     );
   }
@@ -393,7 +444,7 @@ function usePayFlow(faces: ReturnType<typeof purchaseFaces>, search: PaySearch) 
     void (async () => {
       try {
         await markPaidMut.mutateAsync({ orderNo: target.orderNo });
-        setPolling({ kind: target.kind, orderNo: target.orderNo });
+        setPolling({ kind: target.kind, orderNo: target.orderNo, face: target.face });
       } catch {
         // The mutation cache already toasts the reason copy; the sheet
         // returns so its button can replay the idempotent call.
@@ -410,20 +461,32 @@ function usePayFlow(faces: ReturnType<typeof purchaseFaces>, search: PaySearch) 
       ? sheetActionsOf(
           settleViaBridge,
           () => {
+            const target = sheet;
             setSheet(null);
-            toast.error(m.pay_toast_unpaid());
+            toResult(target.orderNo, target.face);
           },
-          closeSheet,
+          () => {
+            const target = sheet;
+            setSheet(null);
+            abandonTo(target.orderNo, target.face);
+          },
         )
       : [];
 
   const qrActions =
     qr !== null
-      ? qrActionsOf(() => {
-          const target = qr;
-          setQr(null);
-          setPolling({ kind: target.kind, orderNo: target.orderNo });
-        }, closeQr)
+      ? qrActionsOf(
+          () => {
+            const target = qr;
+            setQr(null);
+            setPolling({ kind: target.kind, orderNo: target.orderNo, face: target.face });
+          },
+          () => {
+            const target = qr;
+            setQr(null);
+            abandonTo(target.orderNo, target.face);
+          },
+        )
       : [];
 
   return {
@@ -447,6 +510,7 @@ function WallBody({
   onHome,
   onPay,
   pending,
+  showTrial,
   wall,
 }: Readonly<{
   faces: ReturnType<typeof purchaseFaces>;
@@ -455,6 +519,7 @@ function WallBody({
   onHome: () => void;
   onPay: (kind: PurchaseKind) => void;
   pending: boolean;
+  showTrial: boolean;
   wall: WallState;
 }>) {
   if (wall.birthMissing) {
@@ -496,6 +561,7 @@ function WallBody({
       memberDisabled={faces.member.row === undefined || pending}
       memberPrice={faces.member.yuan}
       onPay={onPay}
+      showTrial={showTrial}
       trialDisabled={faces.trial.row === undefined || pending}
       trialPrice={faces.trial.yuan}
     />
@@ -512,7 +578,7 @@ function WallBody({
  * card with its two exits, and no pay button renders under either.
  */
 export function PayConfirmPage() {
-  const search = useSearch({ from: "/pay" });
+  const search = useSearch({ from: "/pay/" });
   const navigate = useNavigate();
   const router = useRouter();
   const session = useQuery({ ...sessionQuery, throwOnError: false });
@@ -521,6 +587,10 @@ export function PayConfirmPage() {
   const wall = wallStateOf(session.data, skusQuery.data?.payGate);
   const faces = purchaseFaces(skusQuery.data?.skus ?? []);
   const flow = usePayFlow(faces, search);
+  // The receipt's member copy fork (opened vs renewed) keys off the
+  // standing window at click time — captured in the click handler, so a
+  // session refetch mid-poll can never rewrite the verdict.
+  const payWith = (kind: PurchaseKind) => void flow.pay(kind, wall.memberActive ? "renew" : "open");
 
   function backOrHome() {
     if (router.history.canGoBack()) {
@@ -555,8 +625,9 @@ export function PayConfirmPage() {
           onBackfill={() => void navigate({ to: "/age-required" })}
           onBackOrHome={backOrHome}
           onHome={() => void navigate({ to: "/" })}
-          onPay={(kind) => void flow.pay(kind)}
+          onPay={payWith}
           pending={flow.createOrderMut.isPending}
+          showTrial={search.ref !== undefined}
           wall={wall}
         />
 

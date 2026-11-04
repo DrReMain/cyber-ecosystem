@@ -77,8 +77,9 @@ E10-a 复对账(10-28,live dev 栈,同款 innerText oracle):14 行中 12 行逐�
 
 | # | 面 | 类型 | 期望(原型) | 实际(重建) | 处置 |
 |---|---|---|---|---|---|
-| G-401 | H5 通道 client_ip | 服务端缝 | 微信外 H5 可下单(pay-confirm 文案面) | order/biz.go Payer 只组装 OpenID+ReturnURL,never ClientIP;mock 与微信 enforceChannel 均 require payer.client_ip → H5 下单必被渠道拒 | 红:服务端从 kratos transport ctx 取 client_ip 补 Payer 组装(PAY3 余刀);客户端 H5 分派代码已在案(location.href=value) |
+| G-401 | H5 通道 client_ip | 服务端缝 | 微信外 H5 可下单(pay-confirm 文案面) | **✅ 绿 11-05(片3)**:order/service.go clientIPOf 双形状(transport.Header 读 XFF/X-Real-IP,connect 包装器 *connect.Transport.RemoteAddr 与 kratos *http.Transport.Request 两型落 peer 地址)→CreateIn.ClientIP→Payer 组装第三肢;PayOrder 落库 channel=wechat_h5 credential=jump_url,手机仿真 mock 全链 live 走通,PAY_E2E 增 h5 无 IP 拒/有 IP 过双臂 | 绿:微信侧真通道联调随 PAY2/cutover 承接 |
 | G-402 | JSAPI 通道 payer_openid | 契约缺口 | 微信内 JSAPI 可支付 | 会员面契约无处可读自身 openid(仅 OAuth 交换知悉);客户端报 wechat_jsapi 必被渠道拒(require openid) | 红:二选一待裁——①契约暴露绑定 openid ②服务端按绑定富集(乙方裁决);客户端 invoke 分派代码已在案 |
 | G-403 | QR 腿渲染 | 依赖缺口 | 桌面 QR 扫码支付 | QR 凭据以值文本+「我已完成支付」轮询 sheet 呈现(无码图) | 红:qrcode 依赖引入+码图渲染随真通道联调刀;mock+native 走查不受影响(provider=mock 恒走收银台 sheet) |
+| G-404 | H5 真通道跳转回程 | 服务端缝×客户端 | 渠道收银台跳回后落支付结果页 | 11-05 两轴审查发现:jump 通道 returnUrl=墙自身 URL,微信回跳后墙重挂载无 orderNo 上下文→轮询不续、「三钮全落收据」仅 mock/QR 出口成立 | 红:修形随真通道刀=returnUrl 改指 /pay/result?order=…&face=…(或墙持单入 search);另 clientIPOf 信任拨盘(XFF 优先 vs peer 地址优先)同刀裁——现注释口径=现行 edge 拓扑保证,直暴拓扑归部署面剥头 |
 
-计数:3 条全红(真通道联调刀承接:G-401 服务端片、G-402 契约裁决、G-403 依赖件);mock 全链零红条。
+计数:1 绿 3 红(G-401 服务端缝已闭;余 G-402 契约裁决、G-403 依赖件、G-404 回程+信任拨盘=真通道联调刀);mock 全链零红条。

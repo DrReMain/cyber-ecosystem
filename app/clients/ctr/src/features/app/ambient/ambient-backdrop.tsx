@@ -3,15 +3,26 @@ import clsx from "clsx";
 /*
  * Ambient backdrop — blurred solid-tone orbs bleeding off the page edges.
  * Decorative only (aria-hidden). The prototype art-directs orbs per page (two
- * or three, from a seven-tone palette); the shared default is the login trio.
- * Rest state (opacity .26, blur 70px, solid color) is the prototype's .blob
- * form; motion-safe drift keeps that rest as its 0%/100% keyframe so any
- * still frame stays pixel-honest. Position/size classes are dot-free —
+ * or three, from a seven-tone palette; the pay result adds the three verdict
+ * tones that color its single state blob); the shared default is the login
+ * trio. Rest state (opacity .26, blur 70px, solid color) is the prototype's
+ * .blob form; motion-safe drift keeps that rest as its 0%/100% keyframe so
+ * any still frame stays pixel-honest. Position/size classes are dot-free —
  * Tailwind v4's extractor splits arbitrary values containing decimal points
  * into dead classes.
  */
 
-export type AmbientTone = "purple" | "blue" | "cyan" | "indigo" | "teal" | "orange" | "violet";
+export type AmbientTone =
+  | "purple"
+  | "blue"
+  | "cyan"
+  | "indigo"
+  | "teal"
+  | "orange"
+  | "violet"
+  | "green"
+  | "red"
+  | "slate";
 
 export interface AmbientOrb {
   /** Position + size utilities (e.g. "top-[-70px] left-[-60px] size-[260px]"). */
@@ -29,6 +40,9 @@ const toneClass: Record<AmbientTone, string> = {
   teal: "bg-ambient-teal",
   orange: "bg-ambient-orange",
   violet: "bg-ambient-violet",
+  green: "bg-ambient-green",
+  red: "bg-ambient-red",
+  slate: "bg-ambient-slate",
 };
 
 const driftClass = [

@@ -1,14 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { pageTitle } from "#/config";
-import { noindexHead } from "#/domains/seo";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { sessionGuard } from "#/features/auth/guard";
-import { PayConfirmPage } from "#/features/modules/pay/page";
-import { paySearchOf } from "#/features/modules/pay/search";
-import { m } from "#/paraglide/messages";
 
+// Layout parent for the /pay tree: both the wall and the result page sit
+// behind the session guard once, here; each child owns its head and URL
+// shape.
 export const Route = createFileRoute("/pay")({
   beforeLoad: sessionGuard,
-  head: () => ({ meta: [...noindexHead().meta, { title: pageTitle(m.pay_title()) }] }),
-  validateSearch: (search: Record<string, unknown>) => paySearchOf(search),
-  component: PayConfirmPage,
+  component: () => <Outlet />,
 });

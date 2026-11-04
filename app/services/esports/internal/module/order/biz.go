@@ -79,6 +79,10 @@ type CreateIn struct {
 	ScopeRef    *string
 	PayerOpenID *string
 	ReturnURL   *string
+	// The payer's wire address as the transport saw it — a server-derived
+	// fact the client never declares; the H5 channel requires it for risk
+	// control, so the service face extracts it and the channel validates.
+	ClientIP string
 }
 
 type CreateOut struct {
@@ -295,9 +299,10 @@ func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error)
 	orderNo := OrderNoPrefix + xid.New().String()
 	expireAt := time.Now().Add(payWindow)
 	var payer *payment.Payer
-	if in.PayerOpenID != nil || in.ReturnURL != nil {
+	if in.PayerOpenID != nil || in.ReturnURL != nil || in.ClientIP != "" {
 		payer = &payment.Payer{
 			OpenID:    utils.Deref(in.PayerOpenID, ""),
+			ClientIP:  in.ClientIP,
 			ReturnURL: utils.Deref(in.ReturnURL, ""),
 		}
 	}

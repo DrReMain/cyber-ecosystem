@@ -3,13 +3,15 @@ import { m } from "#/paraglide/messages";
 
 /** The one-shot unlock card (prototype ⑤, paystripe): what the unlock
  * buys, the price straight off the SKU read face (never a hardcoded
- * number), and the permanence note. The CTA stays parked until the pay
- * client lands — an honest "coming" note, never a dead button. */
+ * number), and the permanence note. The CTA enters the wall with this
+ * record as the trial's scope target. */
 export function UnlockCard({
   count,
+  onPay,
   priceYuan,
 }: Readonly<{
   count: number;
+  onPay: () => void;
   priceYuan: string;
 }>) {
   return (
@@ -35,13 +37,12 @@ export function UnlockCard({
       </div>
       <div className="mt-3 flex flex-col items-center gap-1.5">
         <button
-          className="w-full cursor-pointer rounded-[10px] bg-[#F97316] px-4 py-3 text-[15px] font-bold text-white opacity-70 active:opacity-60"
-          disabled
+          className="w-full cursor-pointer rounded-[10px] bg-[#F97316] px-4 py-3 text-[15px] font-bold text-white active:opacity-60"
+          onClick={onPay}
           type="button"
         >
           {m.report_unlock_cta({ price: priceYuan })}
         </button>
-        <div className="text-ink-tertiary text-[10px]">{m.report_pay_soon()}</div>
       </div>
       <div className="text-ink-tertiary mt-2 text-center text-[10px]">
         {m.report_unlock_forever()}

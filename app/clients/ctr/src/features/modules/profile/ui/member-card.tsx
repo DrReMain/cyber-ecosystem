@@ -11,8 +11,6 @@ const ACTIVE_TAG =
   "rounded-full bg-[rgba(34,197,94,0.18)] px-2 py-0.5 text-[10px] font-extrabold text-[#6EE7B7]";
 const MONTH_TAG =
   "rounded-full bg-[rgba(124,58,237,0.22)] px-2 py-0.5 text-[10px] font-extrabold text-[#D8B4FE]";
-const CTA_CLASS =
-  "shrink-0 cursor-pointer rounded-[10px] bg-[#7C3AED] px-[14px] py-[7px] text-[12px] font-bold text-white opacity-70 active:opacity-60";
 
 // The wire stamps a Timestamp two ways: the JSON transport flattens it to
 // an ISO scalar, a hydrated message carries epoch seconds — read both,
@@ -28,13 +26,16 @@ function dayOf(value: Timestamp): string {
  * the report page's ④: the member state states the standing window off
  * member_until (GetProfile carries it — the page's own query, zero extra
  * hop), the pitch state sells the window at the catalog's price. Both
- * CTAs stay parked until the pay client lands — the same stance the
- * purchase faces hold; the 详情 link rides with the member-detail page. */
+ * CTAs enter the wall; the active state's left slot stays empty until
+ * the unlocked-count line lands with the member-detail slice (the digest
+ * count field it reads is that slice's contract question). */
 export function ProfileMemberCard({
   memberUntil,
+  onPay,
   priceYuan,
 }: Readonly<{
   memberUntil: Timestamp | null;
+  onPay: () => void;
   priceYuan: string;
 }>) {
   const active = memberUntil != null;
@@ -61,15 +62,17 @@ export function ProfileMemberCard({
         {active ? m.profile_member_desc_active() : m.profile_member_desc_pitch()}
       </div>
       <div className="mt-[11px] flex items-center justify-between">
-        {active ? (
-          <span className="text-ink-tertiary text-[10px]">{m.report_pay_soon()}</span>
-        ) : (
+        {active ? null : (
           <span>
             <span className="text-[19px] leading-none font-black text-[#FDE047]">¥{priceYuan}</span>
             <span className="text-ink-tertiary text-[11px]">{m.profile_member_per_month()}</span>
           </span>
         )}
-        <button className={CTA_CLASS} disabled type="button">
+        <button
+          className="shrink-0 cursor-pointer rounded-[10px] bg-[#7C3AED] px-[14px] py-[7px] text-[12px] font-bold text-white active:opacity-60"
+          onClick={onPay}
+          type="button"
+        >
           {active ? m.profile_member_cta_renew() : m.profile_member_cta_open()}
         </button>
       </div>

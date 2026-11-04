@@ -125,10 +125,11 @@ export function ProfilePage() {
         {/* The membership face (prototype ③), its own two states keyed on
             the member_until the page's own profile query carries: the
             member state states the standing window, the pitch state sells
-            it at the catalog price — CTA parked until the pay client
-            lands, the same stance the report page's purchase faces hold. */}
+            it at the catalog price — both CTAs enter the wall, which picks
+            the renewal or dual face off the same window fact. */}
         <ProfileMemberCard
           memberUntil={profileQuery.data?.memberUntil ?? null}
+          onPay={() => void navigate({ to: "/pay", search: { from: "/profile" } })}
           priceYuan={memberYuan}
         />
 

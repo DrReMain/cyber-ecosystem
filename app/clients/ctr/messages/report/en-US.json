@@ -42,7 +42,6 @@
   "report_unlock_once": "one-time unlock",
   "report_unlock_cta": "Unlock all · ¥{price}",
   "report_unlock_forever": "Stays unlocked forever once purchased",
-  "report_pay_soon": "Payment channel opening soon",
   "report_member_title": "Membership",
   "report_member_unlocked": "Unlocked",
   "report_member_note": "Tests auto-unlock while the membership runs · past reports kept forever",

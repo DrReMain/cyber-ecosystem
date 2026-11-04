@@ -5,13 +5,15 @@ import { m } from "#/paraglide/messages";
  * standing benefit — the prototype splits it by how the unlock happened
  * (a member window speaks the membership note, a single purchase says
  * so); the locked state pitches the window (price off the SKU read face)
- * with the same parked CTA as the unlock card. */
+ * with a CTA into the wall's member purchase. */
 export function MemberCard({
   memberActive,
+  onPay,
   priceYuan,
   unlocked,
 }: Readonly<{
   memberActive: boolean;
+  onPay: () => void;
   priceYuan: string;
   unlocked: boolean;
 }>) {
@@ -54,8 +56,8 @@ export function MemberCard({
         </div>
         <div className="mt-2.5 flex flex-col items-center gap-1">
           <button
-            className="w-full cursor-pointer rounded-[10px] bg-[#7C3AED] px-4 py-2.5 text-[13px] font-bold text-white opacity-70 active:opacity-60"
-            disabled
+            className="w-full cursor-pointer rounded-[10px] bg-[#7C3AED] px-4 py-2.5 text-[13px] font-bold text-white active:opacity-60"
+            onClick={onPay}
             type="button"
           >
             {m.report_member_cta({ price: priceYuan })}

@@ -25,6 +25,8 @@ import { Route as MatchIndexRouteImport } from './routes/match.index'
 import { Route as MatchGuideRouteImport } from './routes/match.guide'
 import { Route as MatchPickRouteImport } from './routes/match.pick'
 import { Route as MatchSwitchRouteImport } from './routes/match.switch'
+import { Route as PayIndexRouteImport } from './routes/pay.index'
+import { Route as PayResultRouteImport } from './routes/pay.result'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
 import { Route as ProfileSecurityRouteImport } from './routes/profile.security'
 import { Route as ReportRecordIdRouteImport } from './routes/report.$recordId'
@@ -132,6 +134,16 @@ const MatchSwitchRoute = MatchSwitchRouteImport.update({
   id: '/switch',
   path: '/switch',
   getParentRoute: () => MatchRoute,
+} as any)
+const PayIndexRoute = PayIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PayRoute,
+} as any)
+const PayResultRoute = PayResultRouteImport.update({
+  id: '/result',
+  path: '/result',
+  getParentRoute: () => PayRoute,
 } as any)
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
   id: '/',
@@ -284,7 +296,7 @@ export interface FileRoutesByFullPath {
   '/age-required': typeof AgeRequiredRoute
   '/login': typeof LoginRouteWithChildren
   '/match': typeof MatchRouteWithChildren
-  '/pay': typeof PayRoute
+  '/pay': typeof PayRouteWithChildren
   '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -294,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/pay/result': typeof PayResultRoute
   '/profile/security': typeof ProfileSecurityRouteWithChildren
   '/report/$recordId': typeof ReportRecordIdRoute
   '/report/career': typeof ReportCareerRoute
@@ -303,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
+  '/pay/': typeof PayIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
   '/profile/security/bind-phone': typeof ProfileSecurityBindPhoneRoute
@@ -327,7 +341,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/age-required': typeof AgeRequiredRoute
-  '/pay': typeof PayRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/agreement/privacy': typeof AgreementPrivacyRoute
@@ -336,6 +349,7 @@ export interface FileRoutesByTo {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/pay/result': typeof PayResultRoute
   '/report/$recordId': typeof ReportRecordIdRoute
   '/report/career': typeof ReportCareerRoute
   '/report/center': typeof ReportCenterRoute
@@ -344,6 +358,7 @@ export interface FileRoutesByTo {
   '/test/$code': typeof TestCodeRoute
   '/login': typeof LoginIndexRoute
   '/match': typeof MatchIndexRoute
+  '/pay': typeof PayIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
   '/profile/security/bind-phone': typeof ProfileSecurityBindPhoneRoute
@@ -369,7 +384,7 @@ export interface FileRoutesById {
   '/age-required': typeof AgeRequiredRoute
   '/login': typeof LoginRouteWithChildren
   '/match': typeof MatchRouteWithChildren
-  '/pay': typeof PayRoute
+  '/pay': typeof PayRouteWithChildren
   '/profile': typeof ProfileRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -379,6 +394,7 @@ export interface FileRoutesById {
   '/match/guide': typeof MatchGuideRoute
   '/match/pick': typeof MatchPickRoute
   '/match/switch': typeof MatchSwitchRoute
+  '/pay/result': typeof PayResultRoute
   '/profile/security': typeof ProfileSecurityRouteWithChildren
   '/report/$recordId': typeof ReportRecordIdRoute
   '/report/career': typeof ReportCareerRoute
@@ -388,6 +404,7 @@ export interface FileRoutesById {
   '/test/$code': typeof TestCodeRoute
   '/login/': typeof LoginIndexRoute
   '/match/': typeof MatchIndexRoute
+  '/pay/': typeof PayIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/login/wechat/callback': typeof LoginWechatCallbackRoute
   '/profile/security/bind-phone': typeof ProfileSecurityBindPhoneRoute
@@ -426,6 +443,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/pay/result'
     | '/profile/security'
     | '/report/$recordId'
     | '/report/career'
@@ -435,6 +453,7 @@ export interface FileRouteTypes {
     | '/test/$code'
     | '/login/'
     | '/match/'
+    | '/pay/'
     | '/profile/'
     | '/login/wechat/callback'
     | '/profile/security/bind-phone'
@@ -459,7 +478,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/age-required'
-    | '/pay'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/agreement/privacy'
@@ -468,6 +486,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/pay/result'
     | '/report/$recordId'
     | '/report/career'
     | '/report/center'
@@ -476,6 +495,7 @@ export interface FileRouteTypes {
     | '/test/$code'
     | '/login'
     | '/match'
+    | '/pay'
     | '/profile'
     | '/login/wechat/callback'
     | '/profile/security/bind-phone'
@@ -510,6 +530,7 @@ export interface FileRouteTypes {
     | '/match/guide'
     | '/match/pick'
     | '/match/switch'
+    | '/pay/result'
     | '/profile/security'
     | '/report/$recordId'
     | '/report/career'
@@ -519,6 +540,7 @@ export interface FileRouteTypes {
     | '/test/$code'
     | '/login/'
     | '/match/'
+    | '/pay/'
     | '/profile/'
     | '/login/wechat/callback'
     | '/profile/security/bind-phone'
@@ -546,7 +568,7 @@ export interface RootRouteChildren {
   AgeRequiredRoute: typeof AgeRequiredRoute
   LoginRoute: typeof LoginRouteWithChildren
   MatchRoute: typeof MatchRouteWithChildren
-  PayRoute: typeof PayRoute
+  PayRoute: typeof PayRouteWithChildren
   ProfileRoute: typeof ProfileRouteWithChildren
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -675,6 +697,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/match/switch'
       preLoaderRoute: typeof MatchSwitchRouteImport
       parentRoute: typeof MatchRoute
+    }
+    '/pay/': {
+      id: '/pay/'
+      path: '/'
+      fullPath: '/pay/'
+      preLoaderRoute: typeof PayIndexRouteImport
+      parentRoute: typeof PayRoute
+    }
+    '/pay/result': {
+      id: '/pay/result'
+      path: '/result'
+      fullPath: '/pay/result'
+      preLoaderRoute: typeof PayResultRouteImport
+      parentRoute: typeof PayRoute
     }
     '/profile/': {
       id: '/profile/'
@@ -898,6 +934,18 @@ const MatchRouteChildren: MatchRouteChildren = {
 
 const MatchRouteWithChildren = MatchRoute._addFileChildren(MatchRouteChildren)
 
+interface PayRouteChildren {
+  PayResultRoute: typeof PayResultRoute
+  PayIndexRoute: typeof PayIndexRoute
+}
+
+const PayRouteChildren: PayRouteChildren = {
+  PayResultRoute: PayResultRoute,
+  PayIndexRoute: PayIndexRoute,
+}
+
+const PayRouteWithChildren = PayRoute._addFileChildren(PayRouteChildren)
+
 interface ProfileSecurityBindWechatRouteChildren {
   ProfileSecurityBindWechatCallbackRoute: typeof ProfileSecurityBindWechatCallbackRoute
   ProfileSecurityBindWechatPreviewCallbackRoute: typeof ProfileSecurityBindWechatPreviewCallbackRoute
@@ -982,7 +1030,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgeRequiredRoute: AgeRequiredRoute,
   LoginRoute: LoginRouteWithChildren,
   MatchRoute: MatchRouteWithChildren,
-  PayRoute: PayRoute,
+  PayRoute: PayRouteWithChildren,
   ProfileRoute: ProfileRouteWithChildren,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

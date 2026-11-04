@@ -90,10 +90,12 @@
   /* Lock veil (paywall visuals) */
   --color-veil: rgba(11, 18, 32, 0.72);
 
-  /* Ambient orbs — page backdrop atmosphere. The palette is the prototype's
-   * seven-tone set; placement is per-page art direction carried by the
-   * AmbientBackdrop props (the login trio is the shared default). Solid
-   * circles at blur 70px / rest opacity .26 = the prototype's .blob form. */
+  /* Ambient orbs — page backdrop atmosphere. The prototype's seven-tone
+   * set plus the pay result's three verdict colors (green/red/slate state
+   * the outcome before any copy is read); placement is per-page art
+   * direction carried by the AmbientBackdrop props (the login trio is the
+   * shared default). Solid circles at blur 70px / rest opacity .26 = the
+   * prototype's .blob form. */
   --color-ambient-purple: #7c3aed;
   --color-ambient-blue: #2563eb;
   --color-ambient-cyan: #06b6d4;
@@ -101,6 +103,9 @@
   --color-ambient-teal: #0e7490;
   --color-ambient-orange: #ea580c;
   --color-ambient-violet: #4f46e5;
+  --color-ambient-green: #16a34a;
+  --color-ambient-red: #dc2626;
+  --color-ambient-slate: #4b5563;
 
   /* Links — the prototype's one .link voice, cyan on every surface */
   --color-link: #22d3ee;

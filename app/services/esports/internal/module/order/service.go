@@ -3,7 +3,10 @@ package order
 import (
 	"context"
 	"log/slog"
+	"net"
+	"strings"
 
+	"github.com/go-kratos/kratos/v3/transport"
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 	"github.com/go-kratos/kratos/v3/transport/http"
 
@@ -51,6 +54,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, in *esportspb.CreateOrde
 		ScopeRef:    in.ScopeRef,
 		PayerOpenID: in.PayerOpenid,
 		ReturnURL:   in.ReturnUrl,
+		ClientIP:    clientIPOf(ctx),
 	})
 	if err != nil {
 		return nil, err
@@ -176,4 +180,54 @@ func mapCredentialKindPB(kind payment.CredentialKind) esportspb.PayCredentialKin
 	default:
 		return esportspb.PayCredentialKind_PAY_CREDENTIAL_KIND_UNSPECIFIED
 	}
+}
+
+func clientIPOf(ctx context.Context) string {
+	tr, ok := transport.FromServerContext(ctx)
+	if !ok {
+		// A caller with no transport face (the e2e harness drives the UC
+		// directly) carries no wire address — the empty value keeps the
+		// channel's own validation the single refuser.
+		return ""
+	}
+	// Both server faces (the connect wrapper and the kratos http server)
+	// expose the request headers through the same transport.Header face.
+	// The standing deploy plane fronts the services with the edge, which
+	// appends hops and (unconfigured forwarding) discards an inbound
+	// X-Forwarded-For — so the first entry is the client the edge saw,
+	// the risk-control fact the H5 channel wants. A topology that exposes
+	// a service directly owns stripping these headers at its own edge;
+	// that trust dial is a deploy-plane question, not code.
+	hdr := tr.RequestHeader()
+	if xff := hdr.Get("X-Forwarded-For"); xff != "" {
+		if i := strings.IndexByte(xff, ','); i >= 0 {
+			xff = xff[:i]
+		}
+		return hostOf(strings.TrimSpace(xff))
+	}
+	if realIP := hdr.Get("X-Real-IP"); realIP != "" {
+		return hostOf(strings.TrimSpace(realIP))
+	}
+	// No edge headers: read the peer address off whichever transport shape
+	// carried the call — the raw socket address is the last honest fact.
+	switch t := tr.(type) {
+	case *http.Transport:
+		if req := t.Request(); req != nil {
+			return hostOf(req.RemoteAddr)
+		}
+	case *connecttransport.Transport:
+		return hostOf(t.RemoteAddr())
+	}
+	return ""
+}
+
+func hostOf(addr string) string {
+	// The port an address may carry (forwarded header values included — a
+	// "ip:port" entry is a malformed risk-control fact) leaves here; a
+	// port-less host stays verbatim.
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return addr
+	}
+	return host
 }

@@ -125,6 +125,15 @@ func TestPayLiveE2E(t *testing.T) {
 	if channel == "" {
 		t.Fatalf("no native channel in %v", channels)
 	}
+	var h5 payment.Channel
+	for _, c := range channels {
+		if strings.HasSuffix(string(c), "_h5") { // the jump face: the payer's wire address is its required hint
+			h5 = c
+		}
+	}
+	if h5 == "" {
+		t.Fatalf("no h5 channel in %v", channels)
+	}
 	subject := &security.Subject{UserID: uid, TenantID: "default", Population: "user"}
 	ctx := security.WithSubject(context.Background(), subject)
 	notify := func(ni *payment.NotificationInput) (*esportspb.NotifyPaymentResponse, error) {
@@ -316,6 +325,23 @@ func TestPayLiveE2E(t *testing.T) {
 	}
 	if _, err := uc.Create(ctx, &order.CreateIn{SKUCode: "no-such-sku", Channel: channel}); !esportspb.IsEsportsSkuNotFound(err) {
 		t.Fatalf("unknown sku: err=%v", err)
+	}
+	// The H5 channel's payer hint is a server-derived wire fact, never a
+	// client declaration: the channel refuses a create carrying no client
+	// address and mints the jump credential once the service face supplies
+	// one.
+	if _, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: h5}); err == nil {
+		t.Fatalf("h5 create without a client address passed")
+	}
+	h5o, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: h5, ClientIP: "203.0.113.9"})
+	if err != nil {
+		t.Fatalf("h5 create: %v", err)
+	}
+	if h5o.Credential.Kind != payment.CredentialJumpURL {
+		t.Fatalf("h5 credential kind: %+v", h5o.Credential)
+	}
+	if _, err := uc.Close(ctx, h5o.Order.OrderNo); err != nil {
+		t.Fatalf("h5 close: %v", err)
 	}
 	if _, err := uc.Close(ctx, mem1.Order.OrderNo); !esportspb.IsEsportsOrderStateConflict(err) {
 		t.Fatalf("close paid: err=%v", err)

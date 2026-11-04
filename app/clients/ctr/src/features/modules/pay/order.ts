@@ -6,6 +6,7 @@ import { fenToYuan } from "#/features/app/fen";
 // restate what actually arrives.
 export const SKU_KIND_TRIAL = "SKU_KIND_TRIAL";
 export const SKU_KIND_MEMBERSHIP = "SKU_KIND_MEMBERSHIP";
+export const ORDER_SCOPE_TRIAL = "ORDER_SCOPE_TRIAL";
 export const ORDER_STATE_PAID = "ORDER_STATE_PAID";
 export const ORDER_STATE_CLOSED = "ORDER_STATE_CLOSED";
 export const CREDENTIAL_INVOKE = "PAY_CREDENTIAL_KIND_INVOKE";
