@@ -440,3 +440,81 @@ func IsEsportsAgreementNotConfigured(err error) bool {
 func ErrorEsportsAgreementNotConfigured(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, Esports_ESPORTS_AGREEMENT_NOT_CONFIGURED.String(), fmt.Sprintf(format, args...))
 }
+
+// 618x: message & feedback
+func IsEsportsFeedbackNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_FEEDBACK_NOT_FOUND.String() && e.Code == 404
+}
+
+// 618x: message & feedback
+func ErrorEsportsFeedbackNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, Esports_ESPORTS_FEEDBACK_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+// The ticket exists but belongs to another member — the member plane's
+// own-key check, kept distinct from absent so support can tell a lost
+// id from a borrowed one.
+func IsEsportsFeedbackNotOwned(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_FEEDBACK_NOT_OWNED.String() && e.Code == 403
+}
+
+// The ticket exists but belongs to another member — the member plane's
+// own-key check, kept distinct from absent so support can tell a lost
+// id from a borrowed one.
+func ErrorEsportsFeedbackNotOwned(format string, args ...interface{}) *errors.Error {
+	return errors.New(403, Esports_ESPORTS_FEEDBACK_NOT_OWNED.String(), fmt.Sprintf(format, args...))
+}
+
+// Closed is terminal: no member follow-up and no operator answer
+// reopens it — the asker opens a new ticket instead.
+func IsEsportsFeedbackClosed(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_FEEDBACK_CLOSED.String() && e.Code == 400
+}
+
+// Closed is terminal: no member follow-up and no operator answer
+// reopens it — the asker opens a new ticket instead.
+func ErrorEsportsFeedbackClosed(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_FEEDBACK_CLOSED.String(), fmt.Sprintf(format, args...))
+}
+
+func IsEsportsAnnouncementNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ANNOUNCEMENT_NOT_FOUND.String() && e.Code == 404
+}
+
+func ErrorEsportsAnnouncementNotFound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, Esports_ESPORTS_ANNOUNCEMENT_NOT_FOUND.String(), fmt.Sprintf(format, args...))
+}
+
+// The row's state refuses the move — publishing a non-draft, editing a
+// published row, offlining a draft. The operator switches the row's
+// state deliberately, never by accident.
+func IsEsportsAnnouncementStateConflict(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT.String() && e.Code == 400
+}
+
+// The row's state refuses the move — publishing a non-draft, editing a
+// published row, offlining a draft. The operator switches the row's
+// state deliberately, never by accident.
+func ErrorEsportsAnnouncementStateConflict(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT.String(), fmt.Sprintf(format, args...))
+}

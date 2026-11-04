@@ -1,0 +1,154 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The member face of the message domain: the message center's letterbox
+// and the home banner. Unread is server-side row state — is_read lives
+// on the row, the badge asks the server, and mark-read mutates the row —
+// so the count stays true across devices instead of being a client-local
+// memory. Every message a member sees is one row of their own letterbox:
+// announcements land as rows at publish time (a delivered letter is not
+// unsent by a later offline), feedback replies land as rows in the same
+// transaction the operator's answer commits, and report and membership
+// notes land when their writer domains wire in.
+service MessageService {
+  option (cyber.ext.v1.service_comment) = "消息中心与首页横幅";
+  rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "我的消息列表(含未读数)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/messages"};
+  }
+  rpc GetUnreadCount(GetUnreadCountRequest) returns (GetUnreadCountResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "未读消息数(红点)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/messages/unread-count"};
+  }
+  rpc MarkMessageRead(MarkMessageReadRequest) returns (MarkMessageReadResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "单条消息已读"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/messages/{message_id}/read"
+      body: "*"
+    };
+  }
+  rpc MarkAllMessagesRead(MarkAllMessagesReadRequest) returns (MarkAllMessagesReadResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "全部消息已读"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/messages/read-all"
+      body: "*"
+    };
+  }
+  rpc ListBanners(ListBannersRequest) returns (ListBannersResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "首页横幅(在发布横幅,新→旧)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/banners"};
+  }
+}
+
+// What kind of letter this is. The type decides the ref's domain:
+// report carries a test-record id, feedback_reply a feedback id.
+enum MessageType {
+  MESSAGE_TYPE_UNSPECIFIED = 0;
+  // The letterbox copy of a published announcement.
+  MESSAGE_TYPE_ANNOUNCEMENT = 1;
+  // A finished attempt's report became available.
+  MESSAGE_TYPE_REPORT = 2;
+  // Membership terms the operator updated.
+  MESSAGE_TYPE_MEMBERSHIP = 3;
+  // An operator answered this member's feedback.
+  MESSAGE_TYPE_FEEDBACK_REPLY = 4;
+}
+
+// One row of the member's letterbox.
+message Message {
+  google.protobuf.StringValue id = 1;
+  MessageType type = 2;
+  google.protobuf.StringValue title = 3;
+  google.protobuf.StringValue content = 4;
+  // Present when the type carries a deep link — report holds the
+  // attempt's id, feedback_reply the feedback id; absent otherwise.
+  google.protobuf.StringValue ref_id = 5;
+  google.protobuf.BoolValue is_read = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+message ListMessagesRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+}
+
+message ListMessagesResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  // Newest first.
+  repeated Message messages = 2;
+  // Plain scalar: the count exists whenever the call succeeds, and the
+  // badge renders a true zero as zero, never as unknown.
+  int32 unread_count = 3;
+}
+
+message GetUnreadCountRequest {}
+
+message GetUnreadCountResponse {
+  // Plain scalar: the count exists whenever the call succeeds, and the
+  // badge renders a true zero as zero, never as unknown.
+  int32 count = 1;
+}
+
+message MarkMessageReadRequest {
+  string message_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+}
+
+// Empty on purpose: marking read is fire-and-forget — a message another
+// device already read (or a racing id) is the same outcome as success.
+message MarkMessageReadResponse {}
+
+message MarkAllMessagesReadRequest {}
+
+message MarkAllMessagesReadResponse {}
+
+message ListBannersRequest {}
+
+// The banner face is a read of the published banner announcements; it
+// carries no operator lifecycle fields.
+message Banner {
+  google.protobuf.StringValue title = 1;
+  google.protobuf.StringValue content = 2;
+  google.protobuf.Timestamp published_at = 3;
+}
+
+message ListBannersResponse {
+  // A banner set is a handful of rows by nature — newest published
+  // first, no paging.
+  repeated Banner banners = 1;
+}

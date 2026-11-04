@@ -72,4 +72,19 @@ enum Esports {
   // seed lands; recording consent against nothing is refused rather than
   // silently backdated to whatever comes next.
   ESPORTS_AGREEMENT_NOT_CONFIGURED = 6173 [(.errors.code) = 400];
+
+  // 618x: message & feedback
+  ESPORTS_FEEDBACK_NOT_FOUND = 6180 [(.errors.code) = 404];
+  // The ticket exists but belongs to another member — the member plane's
+  // own-key check, kept distinct from absent so support can tell a lost
+  // id from a borrowed one.
+  ESPORTS_FEEDBACK_NOT_OWNED = 6181 [(.errors.code) = 403];
+  // Closed is terminal: no member follow-up and no operator answer
+  // reopens it — the asker opens a new ticket instead.
+  ESPORTS_FEEDBACK_CLOSED = 6182 [(.errors.code) = 400];
+  ESPORTS_ANNOUNCEMENT_NOT_FOUND = 6183 [(.errors.code) = 404];
+  // The row's state refuses the move — publishing a non-draft, editing a
+  // published row, offlining a draft. The operator switches the row's
+  // state deliberately, never by accident.
+  ESPORTS_ANNOUNCEMENT_STATE_CONFLICT = 6184 [(.errors.code) = 400];
 }

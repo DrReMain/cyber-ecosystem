@@ -44,7 +44,7 @@
 
 | 片 | 内容与验收要点 | 依赖 | 规模 |
 |---|---|---|---|
-| MSG-1 消息中心+反馈+公告 | 契约=message/feedback 域新建(消息类型:系统公告/报告生成/会员说明;**未读契约先过 P21**);ctr 三页(message-center 双 Tab/feedback-submit 六类枚举/feedback-detail 对话式+追问回 pending);admin feedback-manage+07-detail+announcement(回复→C 端站内信闭环=旧语义 V10);未读红点。验收=双端走查+G-202 红条转绿(反馈 CTA 接真跳) | P21 | L |
+| MSG-1 消息中心+反馈+公告 | 契约=message/feedback 域新建(消息类型:系统公告/报告生成/会员说明;**未读契约先过 P21**);ctr 三页(message-center 双 Tab/feedback-submit 六类枚举/feedback-detail 对话式+追问回 pending);admin feedback-manage+07-detail+announcement(回复→C 端站内信闭环=旧语义 V10);未读红点。验收=双端走查+G-202 红条转绿(反馈 CTA 接真跳)。**✅ 契约+domain 首刀(11-04 W3 车道拉前完成):四契约(message/feedback/message_admin/feedback_admin)+618x 错误块五枚+ent 四表(user_message/announcement/user_feedback/feedback_message,迁移映射三则入 migration.md)+module/message·feedback 双面四模块+error 文案 7 文件;MSG_E2E 门控 e2e 全环绿(公告发布投递双范围/未读已读/横幅面/V10 回复闭环信带 ref/追问回 pending/三拒绝臂 6180-6182-6184(11-04 提交前两轴审查后补缺席臂 6180/6183,现为五拒绝臂全枚举));活探针=真栈双服务全链(种子超管登录+mock 短信真登录),抓出并修一雷=HandleEntError(nil) 幸存路径裸返回致幻影 500(9 处改守卫形);定时发布=非特性显式延后随 W6 admin 面裁;契约对原型显式窄化=两型两范围无触达已读统计(原型三型四范围)+contact 上限 128 vs 原型输入 40,同随 W6 ljr 裁;11-04 提交前两轴审查修=名册定序(createdAt:asc 防无序分页漏/重)/publish·offline·draft-edit·followUp·reply 改条件仲裁形(Settle 先例,守 TOCTOU)/死导出清理(MessageTypeFromPB)/五拒绝臂;余面=ctr 三页+admin 三页随 W6** | P21 | L |
 | MSG-2 分享裂变 | ctr share-invite 页(免费层 5 维卡+动态三档文案+未成年代称+保存图片;D-AI② 分享动作即解锁预设);ref 验签与归因记账(**P23 裁后落**);邀请关系表。验收=分享链路走查+归因记账断言 | P23,D-AI | M |
 
 ## 支付线(未完片;家族定案四则与已收片 PAY-C0/C1/PAY1 压实 archive,法条仍在 README §2 与 kratos/第三方边界律)

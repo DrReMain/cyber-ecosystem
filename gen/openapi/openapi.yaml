@@ -920,6 +920,139 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetAgreementCurrentResponse'
+    /api/v1/esports/announcements:
+        get:
+            tags:
+                - MessageAdminService
+            operationId: MessageAdminService_ListAnnouncements
+            parameters:
+                - name: kind
+                  in: query
+                  schema:
+                    enum:
+                        - ANNOUNCEMENT_KIND_UNSPECIFIED
+                        - ANNOUNCEMENT_KIND_BANNER
+                        - ANNOUNCEMENT_KIND_MESSAGE
+                    type: string
+                    format: enum
+                - name: status
+                  in: query
+                  schema:
+                    enum:
+                        - ANNOUNCEMENT_STATUS_UNSPECIFIED
+                        - ANNOUNCEMENT_STATUS_DRAFT
+                        - ANNOUNCEMENT_STATUS_PUBLISHED
+                        - ANNOUNCEMENT_STATUS_OFFLINE
+                    type: string
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListAnnouncementsResponse'
+        post:
+            tags:
+                - MessageAdminService
+            operationId: MessageAdminService_CreateAnnouncement
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.CreateAnnouncementRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.CreateAnnouncementResponse'
+    /api/v1/esports/announcements/{announcementId}:
+        put:
+            tags:
+                - MessageAdminService
+            operationId: MessageAdminService_UpdateAnnouncement
+            parameters:
+                - name: announcementId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.UpdateAnnouncementRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.UpdateAnnouncementResponse'
+    /api/v1/esports/announcements/{announcementId}/offline:
+        post:
+            tags:
+                - MessageAdminService
+            operationId: MessageAdminService_OfflineAnnouncement
+            parameters:
+                - name: announcementId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.OfflineAnnouncementRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.OfflineAnnouncementResponse'
+    /api/v1/esports/announcements/{announcementId}/publish:
+        post:
+            tags:
+                - MessageAdminService
+            operationId: MessageAdminService_PublishAnnouncement
+            parameters:
+                - name: announcementId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.PublishAnnouncementRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.PublishAnnouncementResponse'
+    /api/v1/esports/banners:
+        get:
+            tags:
+                - MessageService
+            operationId: MessageService_ListBanners
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListBannersResponse'
     /api/v1/esports/catalog/skus:
         get:
             tags:
@@ -1081,6 +1214,119 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.RedeemActivationCodeResponse'
+    /api/v1/esports/feedbacks:
+        get:
+            tags:
+                - FeedbackService
+            operationId: FeedbackService_ListMyFeedbacks
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListMyFeedbacksResponse'
+        post:
+            tags:
+                - FeedbackService
+            operationId: FeedbackService_SubmitFeedback
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.SubmitFeedbackRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.SubmitFeedbackResponse'
+    /api/v1/esports/feedbacks/{feedbackId}:
+        get:
+            tags:
+                - FeedbackService
+            operationId: FeedbackService_GetMyFeedback
+            parameters:
+                - name: feedbackId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetMyFeedbackResponse'
+    /api/v1/esports/feedbacks/{feedbackId}/follow-ups:
+        post:
+            tags:
+                - FeedbackService
+            operationId: FeedbackService_FollowUpFeedback
+            parameters:
+                - name: feedbackId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.FollowUpFeedbackRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.FollowUpFeedbackResponse'
     /api/v1/esports/games:
         get:
             tags:
@@ -1393,6 +1639,114 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.TerminateMembershipResponse'
+    /api/v1/esports/messages:
+        get:
+            tags:
+                - MessageService
+            operationId: MessageService_ListMessages
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListMessagesResponse'
+    /api/v1/esports/messages/read-all:
+        post:
+            tags:
+                - MessageService
+            operationId: MessageService_MarkAllMessagesRead
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.MarkAllMessagesReadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.MarkAllMessagesReadResponse'
+    /api/v1/esports/messages/unread-count:
+        get:
+            tags:
+                - MessageService
+            operationId: MessageService_GetUnreadCount
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetUnreadCountResponse'
+    /api/v1/esports/messages/{messageId}/read:
+        post:
+            tags:
+                - MessageService
+            operationId: MessageService_MarkMessageRead
+            parameters:
+                - name: messageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.MarkMessageReadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.MarkMessageReadResponse'
     /api/v1/esports/orders:
         get:
             tags:
@@ -1945,6 +2299,136 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.GetTestConfigResponse'
+    /api/v1/esports/user-feedbacks:
+        get:
+            tags:
+                - FeedbackAdminService
+            operationId: FeedbackAdminService_ListFeedbacks
+            parameters:
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: status
+                  in: query
+                  schema:
+                    enum:
+                        - FEEDBACK_STATUS_UNSPECIFIED
+                        - FEEDBACK_STATUS_PENDING
+                        - FEEDBACK_STATUS_REPLIED
+                        - FEEDBACK_STATUS_CLOSED
+                    type: string
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListFeedbacksResponse'
+    /api/v1/esports/user-feedbacks/{feedbackId}:
+        get:
+            tags:
+                - FeedbackAdminService
+            operationId: FeedbackAdminService_GetFeedback
+            parameters:
+                - name: feedbackId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.GetFeedbackResponse'
+    /api/v1/esports/user-feedbacks/{feedbackId}/close:
+        post:
+            tags:
+                - FeedbackAdminService
+            operationId: FeedbackAdminService_CloseFeedback
+            parameters:
+                - name: feedbackId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.CloseFeedbackRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.CloseFeedbackResponse'
+    /api/v1/esports/user-feedbacks/{feedbackId}/reply:
+        post:
+            tags:
+                - FeedbackAdminService
+            operationId: FeedbackAdminService_ReplyFeedback
+            parameters:
+                - name: feedbackId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.ReplyFeedbackRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ReplyFeedbackResponse'
     /api/v1/system/audit-logs:
         get:
             tags:
@@ -4230,6 +4714,54 @@ components:
                 One version row of one document. agreed_count is a fold over the
                  consent rows (distinct users), carried per row so the table renders
                  without a second query per version.
+        cyber.esports.v1.Announcement:
+            type: object
+            properties:
+                id:
+                    type: string
+                kind:
+                    enum:
+                        - ANNOUNCEMENT_KIND_UNSPECIFIED
+                        - ANNOUNCEMENT_KIND_BANNER
+                        - ANNOUNCEMENT_KIND_MESSAGE
+                    type: string
+                    format: enum
+                scope:
+                    enum:
+                        - ANNOUNCEMENT_SCOPE_UNSPECIFIED
+                        - ANNOUNCEMENT_SCOPE_ALL
+                        - ANNOUNCEMENT_SCOPE_MEMBERSHIP
+                    type: string
+                    format: enum
+                title:
+                    type: string
+                content:
+                    type: string
+                status:
+                    enum:
+                        - ANNOUNCEMENT_STATUS_UNSPECIFIED
+                        - ANNOUNCEMENT_STATUS_DRAFT
+                        - ANNOUNCEMENT_STATUS_PUBLISHED
+                        - ANNOUNCEMENT_STATUS_OFFLINE
+                    type: string
+                    format: enum
+                publishedAt:
+                    type: string
+                    description: Absent until published — the delivery moment.
+                    format: date-time
+                offlineAt:
+                    type: string
+                    description: Absent until offlined.
+                    format: date-time
+                publishedBy:
+                    type: string
+                    description: The operator who published; drafts carry none.
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
         cyber.esports.v1.BackgroundSpan:
             type: object
             properties:
@@ -4242,6 +4774,19 @@ components:
             description: |-
                 The engine marks backgrounding spans; validity is judged server-side at
                  submit against TestConfig.background_invalid_seconds.
+        cyber.esports.v1.Banner:
+            type: object
+            properties:
+                title:
+                    type: string
+                content:
+                    type: string
+                publishedAt:
+                    type: string
+                    format: date-time
+            description: |-
+                The banner face is a read of the published banner announcements; it
+                 carries no operator lifecycle fields.
         cyber.esports.v1.CareerImprovement:
             type: object
             properties:
@@ -4320,6 +4865,16 @@ components:
                 timeSpentMs:
                     type: integer
                     format: int32
+        cyber.esports.v1.CloseFeedbackRequest:
+            type: object
+            properties:
+                feedbackId:
+                    type: string
+        cyber.esports.v1.CloseFeedbackResponse:
+            type: object
+            properties:
+                ticket:
+                    $ref: '#/components/schemas/cyber.esports.v1.FeedbackTicket'
         cyber.esports.v1.CloseOrderRequest:
             type: object
             properties:
@@ -4407,6 +4962,32 @@ components:
             properties:
                 version:
                     $ref: '#/components/schemas/cyber.esports.v1.AgreementVersion'
+        cyber.esports.v1.CreateAnnouncementRequest:
+            type: object
+            properties:
+                kind:
+                    enum:
+                        - ANNOUNCEMENT_KIND_UNSPECIFIED
+                        - ANNOUNCEMENT_KIND_BANNER
+                        - ANNOUNCEMENT_KIND_MESSAGE
+                    type: string
+                    format: enum
+                scope:
+                    enum:
+                        - ANNOUNCEMENT_SCOPE_UNSPECIFIED
+                        - ANNOUNCEMENT_SCOPE_ALL
+                        - ANNOUNCEMENT_SCOPE_MEMBERSHIP
+                    type: string
+                    format: enum
+                title:
+                    type: string
+                content:
+                    type: string
+        cyber.esports.v1.CreateAnnouncementResponse:
+            type: object
+            properties:
+                announcement:
+                    $ref: '#/components/schemas/cyber.esports.v1.Announcement'
         cyber.esports.v1.CreateOrderRequest:
             type: object
             properties:
@@ -4673,6 +5254,110 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.AgreementConsent'
+        cyber.esports.v1.Feedback:
+            type: object
+            properties:
+                id:
+                    type: string
+                category:
+                    enum:
+                        - FEEDBACK_CATEGORY_UNSPECIFIED
+                        - FEEDBACK_CATEGORY_FEATURE_BUG
+                        - FEEDBACK_CATEGORY_ASSESSMENT
+                        - FEEDBACK_CATEGORY_REPORT
+                        - FEEDBACK_CATEGORY_PAYMENT
+                        - FEEDBACK_CATEGORY_ACCOUNT
+                        - FEEDBACK_CATEGORY_OTHER
+                    type: string
+                    format: enum
+                content:
+                    type: string
+                contact:
+                    type: string
+                    description: |-
+                        Where the operator may reach the member, offered optionally at
+                         submit; absent is the member choosing in-app contact only.
+                status:
+                    enum:
+                        - FEEDBACK_STATUS_UNSPECIFIED
+                        - FEEDBACK_STATUS_PENDING
+                        - FEEDBACK_STATUS_REPLIED
+                        - FEEDBACK_STATUS_CLOSED
+                    type: string
+                    format: enum
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+            description: |-
+                The ticket root: what the list row renders. Content is denormalized
+                 as the conversation's first message so the list needs no join.
+        cyber.esports.v1.FeedbackMessage:
+            type: object
+            properties:
+                id:
+                    type: string
+                sender:
+                    enum:
+                        - FEEDBACK_MESSAGE_SENDER_UNSPECIFIED
+                        - FEEDBACK_MESSAGE_SENDER_USER
+                        - FEEDBACK_MESSAGE_SENDER_ADMIN
+                    type: string
+                    format: enum
+                content:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+            description: |-
+                One turn of the conversation, oldest first — the initial submission
+                 included, so the detail is one ordered list.
+        cyber.esports.v1.FeedbackTicket:
+            type: object
+            properties:
+                id:
+                    type: string
+                userId:
+                    type: string
+                nickname:
+                    type: string
+                    description: |-
+                        The local profile's nickname; a member without one keeps null —
+                         the honest shape, never an error.
+                category:
+                    enum:
+                        - FEEDBACK_CATEGORY_UNSPECIFIED
+                        - FEEDBACK_CATEGORY_FEATURE_BUG
+                        - FEEDBACK_CATEGORY_ASSESSMENT
+                        - FEEDBACK_CATEGORY_REPORT
+                        - FEEDBACK_CATEGORY_PAYMENT
+                        - FEEDBACK_CATEGORY_ACCOUNT
+                        - FEEDBACK_CATEGORY_OTHER
+                    type: string
+                    format: enum
+                content:
+                    type: string
+                contact:
+                    type: string
+                status:
+                    enum:
+                        - FEEDBACK_STATUS_UNSPECIFIED
+                        - FEEDBACK_STATUS_PENDING
+                        - FEEDBACK_STATUS_REPLIED
+                        - FEEDBACK_STATUS_CLOSED
+                    type: string
+                    format: enum
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+            description: |-
+                The operator's ticket row: the member ticket with the nickname fold,
+                 so the queue reads one table instead of joining the profile plane.
         cyber.esports.v1.FlashAimingDetail:
             type: object
             properties:
@@ -4705,6 +5390,20 @@ components:
                 aimTimeMs:
                     type: integer
                     format: int32
+        cyber.esports.v1.FollowUpFeedbackRequest:
+            type: object
+            properties:
+                feedbackId:
+                    type: string
+                content:
+                    type: string
+        cyber.esports.v1.FollowUpFeedbackResponse:
+            type: object
+            properties:
+                feedback:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.Feedback'
+                    description: 'The ticket as it stands after the follow-up: pending again.'
         cyber.esports.v1.Game:
             type: object
             properties:
@@ -4933,6 +5632,16 @@ components:
             properties:
                 config:
                     $ref: '#/components/schemas/cyber.esports.v1.ComplianceConfig'
+        cyber.esports.v1.GetFeedbackResponse:
+            type: object
+            properties:
+                ticket:
+                    $ref: '#/components/schemas/cyber.esports.v1.FeedbackTicket'
+                messages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.FeedbackMessage'
+                    description: The conversation, oldest first, initial submission included.
         cyber.esports.v1.GetMatchSessionResponse:
             type: object
             properties:
@@ -4974,6 +5683,15 @@ components:
                     format: enum
                 wechatBound:
                     type: boolean
+        cyber.esports.v1.GetMyFeedbackResponse:
+            type: object
+            properties:
+                feedback:
+                    $ref: '#/components/schemas/cyber.esports.v1.Feedback'
+                messages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.FeedbackMessage'
         cyber.esports.v1.GetOrderResponse:
             type: object
             properties:
@@ -5207,6 +5925,15 @@ components:
                          free for anyone who has tested. The advanced content itself is a
                          later face; the verdict travels now so the page renders its locked
                          state from one call.
+        cyber.esports.v1.GetUnreadCountResponse:
+            type: object
+            properties:
+                count:
+                    type: integer
+                    description: |-
+                        Plain scalar: the count exists whenever the call succeeds, and the
+                         badge renders a true zero as zero, never as unknown.
+                    format: int32
         cyber.esports.v1.GrantMembershipRequest:
             type: object
             properties:
@@ -5275,6 +6002,26 @@ components:
                     description: |-
                         Current version first per document, then the rest newest-effective
                          first; no paging — a document's version ledger is a handful of rows.
+        cyber.esports.v1.ListAnnouncementsResponse:
+            type: object
+            properties:
+                announcements:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Announcement'
+                    description: |-
+                        Newest created first — an announcement ledger is a handful of rows
+                         per season, no paging.
+        cyber.esports.v1.ListBannersResponse:
+            type: object
+            properties:
+                banners:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Banner'
+                    description: |-
+                        A banner set is a handful of rows by nature — newest published
+                         first, no paging.
         cyber.esports.v1.ListCatalogSkusResponse:
             type: object
             properties:
@@ -5282,6 +6029,18 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.AdminSku'
+        cyber.esports.v1.ListFeedbacksResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                tickets:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.FeedbackTicket'
+                    description: |-
+                        Newest first — the table's reading order; the seat's working
+                         filter (the state segments) narrows it to the queue.
         cyber.esports.v1.ListGamesResponse:
             type: object
             properties:
@@ -5323,6 +6082,34 @@ components:
                 expiredCount:
                     type: integer
                     format: int32
+        cyber.esports.v1.ListMessagesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                messages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Message'
+                    description: Newest first.
+                unreadCount:
+                    type: integer
+                    description: |-
+                        Plain scalar: the count exists whenever the call succeeds, and the
+                         badge renders a true zero as zero, never as unknown.
+                    format: int32
+        cyber.esports.v1.ListMyFeedbacksResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                feedbacks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Feedback'
+                    description: |-
+                        Most recently active first — a ticket with a fresh answer or
+                         follow-up jumps the queue.
         cyber.esports.v1.ListOrdersResponse:
             type: object
             properties:
@@ -5380,6 +6167,23 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Test'
+        cyber.esports.v1.MarkAllMessagesReadRequest:
+            type: object
+            properties: {}
+        cyber.esports.v1.MarkAllMessagesReadResponse:
+            type: object
+            properties: {}
+        cyber.esports.v1.MarkMessageReadRequest:
+            type: object
+            properties:
+                messageId:
+                    type: string
+        cyber.esports.v1.MarkMessageReadResponse:
+            type: object
+            properties: {}
+            description: |-
+                Empty on purpose: marking read is fire-and-forget — a message another
+                 device already read (or a racing id) is the same outcome as success.
         cyber.esports.v1.MatchSession:
             type: object
             properties:
@@ -5593,6 +6397,35 @@ components:
                  (user_id, wechat, sessions, unlocked) ride the success-implies-present
                  carve-out: every preview computes them, so zero means a real zero (no
                  sessions, no wechat, nothing unlocked) — never "not computed".
+        cyber.esports.v1.Message:
+            type: object
+            properties:
+                id:
+                    type: string
+                type:
+                    enum:
+                        - MESSAGE_TYPE_UNSPECIFIED
+                        - MESSAGE_TYPE_ANNOUNCEMENT
+                        - MESSAGE_TYPE_REPORT
+                        - MESSAGE_TYPE_MEMBERSHIP
+                        - MESSAGE_TYPE_FEEDBACK_REPLY
+                    type: string
+                    format: enum
+                title:
+                    type: string
+                content:
+                    type: string
+                refId:
+                    type: string
+                    description: |-
+                        Present when the type carries a deep link — report holds the
+                         attempt's id, feedback_reply the feedback id; absent otherwise.
+                isRead:
+                    type: boolean
+                createdAt:
+                    type: string
+                    format: date-time
+            description: One row of the member's letterbox.
         cyber.esports.v1.MovingTargetDetail:
             type: object
             properties:
@@ -5742,6 +6575,16 @@ components:
             description: |-
                 offense_defense — scenario decisions; correctness is judged server-side
                  against the scenario answer key (legacy isCorrect dropped).
+        cyber.esports.v1.OfflineAnnouncementRequest:
+            type: object
+            properties:
+                announcementId:
+                    type: string
+        cyber.esports.v1.OfflineAnnouncementResponse:
+            type: object
+            properties:
+                announcement:
+                    $ref: '#/components/schemas/cyber.esports.v1.Announcement'
         cyber.esports.v1.Order:
             type: object
             properties:
@@ -5947,6 +6790,16 @@ components:
             description: |-
                 One preference entry: exactly one of the pair is set — a catalog reference
                  or a user-typed name awaiting admin classification.
+        cyber.esports.v1.PublishAnnouncementRequest:
+            type: object
+            properties:
+                announcementId:
+                    type: string
+        cyber.esports.v1.PublishAnnouncementResponse:
+            type: object
+            properties:
+                announcement:
+                    $ref: '#/components/schemas/cyber.esports.v1.Announcement'
         cyber.esports.v1.QuestionBankRow:
             type: object
             properties:
@@ -6028,6 +6881,18 @@ components:
                 grantedAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.ReplyFeedbackRequest:
+            type: object
+            properties:
+                feedbackId:
+                    type: string
+                content:
+                    type: string
+        cyber.esports.v1.ReplyFeedbackResponse:
+            type: object
+            properties:
+                ticket:
+                    $ref: '#/components/schemas/cyber.esports.v1.FeedbackTicket'
         cyber.esports.v1.ReportAbility:
             type: object
             properties:
@@ -6470,6 +7335,29 @@ components:
                 updatedAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.SubmitFeedbackRequest:
+            type: object
+            properties:
+                category:
+                    enum:
+                        - FEEDBACK_CATEGORY_UNSPECIFIED
+                        - FEEDBACK_CATEGORY_FEATURE_BUG
+                        - FEEDBACK_CATEGORY_ASSESSMENT
+                        - FEEDBACK_CATEGORY_REPORT
+                        - FEEDBACK_CATEGORY_PAYMENT
+                        - FEEDBACK_CATEGORY_ACCOUNT
+                        - FEEDBACK_CATEGORY_OTHER
+                    type: string
+                    format: enum
+                content:
+                    type: string
+                contact:
+                    type: string
+        cyber.esports.v1.SubmitFeedbackResponse:
+            type: object
+            properties:
+                feedback:
+                    $ref: '#/components/schemas/cyber.esports.v1.Feedback'
         cyber.esports.v1.SubmitTestAttemptRequest:
             type: object
             properties:
@@ -6792,6 +7680,20 @@ components:
                  the point because the two genres order different ability sets — a
                  mixed history must label itself, or a reader would take a curve's
                  rise and fall for skill change when it is vocabulary change.
+        cyber.esports.v1.UpdateAnnouncementRequest:
+            type: object
+            properties:
+                announcementId:
+                    type: string
+                title:
+                    type: string
+                content:
+                    type: string
+        cyber.esports.v1.UpdateAnnouncementResponse:
+            type: object
+            properties:
+                announcement:
+                    $ref: '#/components/schemas/cyber.esports.v1.Announcement'
         cyber.esports.v1.UpdateProfileRequest:
             type: object
             properties:
@@ -8488,6 +9390,26 @@ tags:
          Access folds every openable fact — policy config, an active membership,
          a redeemed code — into one answer with one reason, so the client never
          re-derives entitlement rules.
+    - name: FeedbackAdminService
+      description: |-
+        The operator face of the feedback domain: the queue the support seat
+         works — list by state, read the conversation, answer, close. An
+         answer is one move with two effects: the ticket flips to replied AND
+         the member's letterbox gains the reply's letter in the same
+         transaction, so the message center's feedback notice can never point
+         at an answer that did not land. A member's follow-up walks the ticket
+         back to pending on their side; the operator sees it re-enter the
+         queue. Closing is terminal for the conversation, not a deletion —
+         the ticket and its thread stay as the record of what was asked and
+         answered.
+    - name: FeedbackService
+      description: |-
+        The member face of the feedback domain: the six-category submit form,
+         the my-feedback list, and the conversation-shaped detail where a
+         follow-up question walks the ticket back to pending so the operator
+         sees it again. The ticket is a loop, not a form: submit → answer →
+         ask again → answer again, until the member is satisfied or the
+         operator closes it.
     - name: FilePresignService
       description: |-
         File presign channel: the client-direct upload path. The
@@ -8540,6 +9462,30 @@ tags:
          absent profile row is the lazy onboarding shape, never an error. One
          face one consumer grade: this is the admin plane; the C-end member
          reads their own profile through ProfileService.
+    - name: MessageAdminService
+      description: |-
+        The operator face of the message domain: announcement management.
+         An announcement is a draft the operator composes, then publishes
+         once — the moment of publishing is the moment of delivery. A
+         banner-kind row goes live on the home surface; a message-kind row is
+         copied into every targeted member's letterbox as their own row, so
+         the delivered letters survive a later offline untouched (offline
+         retires the banner and stops nothing already sent). The member set
+         is resolved at publish time — members arriving later never see the
+         letter, exactly like a letter mailed on paper. Scheduling a publish
+         for a future moment is a deliberate non-feature here; the face that
+         wants it grows the field then, not before.
+    - name: MessageService
+      description: |-
+        The member face of the message domain: the message center's letterbox
+         and the home banner. Unread is server-side row state — is_read lives
+         on the row, the badge asks the server, and mark-read mutates the row —
+         so the count stays true across devices instead of being a client-local
+         memory. Every message a member sees is one row of their own letterbox:
+         announcements land as rows at publish time (a delivered letter is not
+         unsent by a later offline), feedback replies land as rows in the same
+         transaction the operator's answer commits, and report and membership
+         notes land when their writer domains wire in.
     - name: OrderAdminService
       description: |-
         The order aggregate's operator face: the whole payment flow, not the

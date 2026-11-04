@@ -1,0 +1,223 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The operator face of the message domain: announcement management.
+// An announcement is a draft the operator composes, then publishes
+// once — the moment of publishing is the moment of delivery. A
+// banner-kind row goes live on the home surface; a message-kind row is
+// copied into every targeted member's letterbox as their own row, so
+// the delivered letters survive a later offline untouched (offline
+// retires the banner and stops nothing already sent). The member set
+// is resolved at publish time — members arriving later never see the
+// letter, exactly like a letter mailed on paper. Scheduling a publish
+// for a future moment is a deliberate non-feature here; the face that
+// wants it grows the field then, not before.
+service MessageAdminService {
+  option (cyber.ext.v1.service_comment) = "公告管理";
+  rpc CreateAnnouncement(CreateAnnouncementRequest) returns (CreateAnnouncementResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "新建公告(草稿)"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/announcements"
+      body: "*"
+    };
+  }
+  rpc UpdateAnnouncement(UpdateAnnouncementRequest) returns (UpdateAnnouncementResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "改草稿公告"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      put: "/api/v1/esports/announcements/{announcement_id}"
+      body: "*"
+    };
+  }
+  rpc PublishAnnouncement(PublishAnnouncementRequest) returns (PublishAnnouncementResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "发布公告(站内信型=按范围投递)"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/announcements/{announcement_id}/publish"
+      body: "*"
+    };
+  }
+  rpc OfflineAnnouncement(OfflineAnnouncementRequest) returns (OfflineAnnouncementResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "下线公告"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/announcements/{announcement_id}/offline"
+      body: "*"
+    };
+  }
+  rpc ListAnnouncements(ListAnnouncementsRequest) returns (ListAnnouncementsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "公告列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/announcements"};
+  }
+}
+
+// Where the announcement surfaces.
+enum AnnouncementKind {
+  ANNOUNCEMENT_KIND_UNSPECIFIED = 0;
+  // 首页横幅 — live on the home surface, no per-member row.
+  ANNOUNCEMENT_KIND_BANNER = 1;
+  // 站内信 — copied into each targeted member's letterbox at publish.
+  ANNOUNCEMENT_KIND_MESSAGE = 2;
+}
+
+// Who receives a message-kind announcement at publish time.
+enum AnnouncementScope {
+  ANNOUNCEMENT_SCOPE_UNSPECIFIED = 0;
+  // 全部用户
+  ANNOUNCEMENT_SCOPE_ALL = 1;
+  // 专属会员 — members holding a live membership window.
+  ANNOUNCEMENT_SCOPE_MEMBERSHIP = 2;
+}
+
+enum AnnouncementStatus {
+  ANNOUNCEMENT_STATUS_UNSPECIFIED = 0;
+  ANNOUNCEMENT_STATUS_DRAFT = 1;
+  ANNOUNCEMENT_STATUS_PUBLISHED = 2;
+  ANNOUNCEMENT_STATUS_OFFLINE = 3;
+}
+
+message Announcement {
+  google.protobuf.StringValue id = 1;
+  AnnouncementKind kind = 2;
+  AnnouncementScope scope = 3;
+  google.protobuf.StringValue title = 4;
+  google.protobuf.StringValue content = 5;
+  AnnouncementStatus status = 6;
+  // Absent until published — the delivery moment.
+  google.protobuf.Timestamp published_at = 7;
+  // Absent until offlined.
+  google.protobuf.Timestamp offline_at = 8;
+  // The operator who published; drafts carry none.
+  google.protobuf.StringValue published_by = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+message CreateAnnouncementRequest {
+  optional AnnouncementKind kind = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }
+  ];
+  optional AnnouncementScope scope = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }
+  ];
+  optional string title = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 64
+    }
+  ];
+  optional string content = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 5000
+    }
+  ];
+}
+
+message CreateAnnouncementResponse {
+  Announcement announcement = 1;
+}
+
+message UpdateAnnouncementRequest {
+  string announcement_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+  optional string title = 2 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 64
+  }];
+  optional string content = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 5000
+  }];
+}
+
+message UpdateAnnouncementResponse {
+  Announcement announcement = 1;
+}
+
+message PublishAnnouncementRequest {
+  string announcement_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+}
+
+message PublishAnnouncementResponse {
+  Announcement announcement = 1;
+}
+
+message OfflineAnnouncementRequest {
+  string announcement_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+}
+
+message OfflineAnnouncementResponse {
+  Announcement announcement = 1;
+}
+
+message ListAnnouncementsRequest {
+  optional AnnouncementKind kind = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  optional AnnouncementStatus status = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+}
+
+message ListAnnouncementsResponse {
+  // Newest created first — an announcement ledger is a handful of rows
+  // per season, no paging.
+  repeated Announcement announcements = 1;
+}

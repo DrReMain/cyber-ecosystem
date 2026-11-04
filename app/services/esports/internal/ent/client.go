@@ -16,8 +16,10 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
+	"cyber-ecosystem/app/services/esports/internal/ent/announcement"
 	"cyber-ecosystem/app/services/esports/internal/ent/complianceconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
+	"cyber-ecosystem/app/services/esports/internal/ent/feedbackmessage"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
@@ -30,6 +32,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
+	"cyber-ecosystem/app/services/esports/internal/ent/userfeedback"
+	"cyber-ecosystem/app/services/esports/internal/ent/usermessage"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -53,10 +57,14 @@ type Client struct {
 	AgreementConsent *AgreementConsentClient
 	// AgreementVersion is the client for interacting with the AgreementVersion builders.
 	AgreementVersion *AgreementVersionClient
+	// Announcement is the client for interacting with the Announcement builders.
+	Announcement *AnnouncementClient
 	// ComplianceConfig is the client for interacting with the ComplianceConfig builders.
 	ComplianceConfig *ComplianceConfigClient
 	// Entitlement is the client for interacting with the Entitlement builders.
 	Entitlement *EntitlementClient
+	// FeedbackMessage is the client for interacting with the FeedbackMessage builders.
+	FeedbackMessage *FeedbackMessageClient
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
 	// MatchConfig is the client for interacting with the MatchConfig builders.
@@ -81,6 +89,10 @@ type Client struct {
 	TestConfig *TestConfigClient
 	// TestRecord is the client for interacting with the TestRecord builders.
 	TestRecord *TestRecordClient
+	// UserFeedback is the client for interacting with the UserFeedback builders.
+	UserFeedback *UserFeedbackClient
+	// UserMessage is the client for interacting with the UserMessage builders.
+	UserMessage *UserMessageClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -97,8 +109,10 @@ func (c *Client) init() {
 	c.ActivationCode = NewActivationCodeClient(c.config)
 	c.AgreementConsent = NewAgreementConsentClient(c.config)
 	c.AgreementVersion = NewAgreementVersionClient(c.config)
+	c.Announcement = NewAnnouncementClient(c.config)
 	c.ComplianceConfig = NewComplianceConfigClient(c.config)
 	c.Entitlement = NewEntitlementClient(c.config)
+	c.FeedbackMessage = NewFeedbackMessageClient(c.config)
 	c.Game = NewGameClient(c.config)
 	c.MatchConfig = NewMatchConfigClient(c.config)
 	c.MatchSession = NewMatchSessionClient(c.config)
@@ -111,6 +125,8 @@ func (c *Client) init() {
 	c.Test = NewTestClient(c.config)
 	c.TestConfig = NewTestConfigClient(c.config)
 	c.TestRecord = NewTestRecordClient(c.config)
+	c.UserFeedback = NewUserFeedbackClient(c.config)
+	c.UserMessage = NewUserMessageClient(c.config)
 }
 
 type (
@@ -208,8 +224,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ActivationCode:   NewActivationCodeClient(cfg),
 		AgreementConsent: NewAgreementConsentClient(cfg),
 		AgreementVersion: NewAgreementVersionClient(cfg),
+		Announcement:     NewAnnouncementClient(cfg),
 		ComplianceConfig: NewComplianceConfigClient(cfg),
 		Entitlement:      NewEntitlementClient(cfg),
+		FeedbackMessage:  NewFeedbackMessageClient(cfg),
 		Game:             NewGameClient(cfg),
 		MatchConfig:      NewMatchConfigClient(cfg),
 		MatchSession:     NewMatchSessionClient(cfg),
@@ -222,6 +240,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Test:             NewTestClient(cfg),
 		TestConfig:       NewTestConfigClient(cfg),
 		TestRecord:       NewTestRecordClient(cfg),
+		UserFeedback:     NewUserFeedbackClient(cfg),
+		UserMessage:      NewUserMessageClient(cfg),
 	}, nil
 }
 
@@ -246,8 +266,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ActivationCode:   NewActivationCodeClient(cfg),
 		AgreementConsent: NewAgreementConsentClient(cfg),
 		AgreementVersion: NewAgreementVersionClient(cfg),
+		Announcement:     NewAnnouncementClient(cfg),
 		ComplianceConfig: NewComplianceConfigClient(cfg),
 		Entitlement:      NewEntitlementClient(cfg),
+		FeedbackMessage:  NewFeedbackMessageClient(cfg),
 		Game:             NewGameClient(cfg),
 		MatchConfig:      NewMatchConfigClient(cfg),
 		MatchSession:     NewMatchSessionClient(cfg),
@@ -260,6 +282,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Test:             NewTestClient(cfg),
 		TestConfig:       NewTestConfigClient(cfg),
 		TestRecord:       NewTestRecordClient(cfg),
+		UserFeedback:     NewUserFeedbackClient(cfg),
+		UserMessage:      NewUserMessageClient(cfg),
 	}, nil
 }
 
@@ -290,9 +314,10 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.ActivationBatch, c.ActivationCode, c.AgreementConsent,
-		c.AgreementVersion, c.ComplianceConfig, c.Entitlement, c.Game, c.MatchConfig,
-		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy,
-		c.ReportSnapshot, c.Sku, c.Test, c.TestConfig, c.TestRecord,
+		c.AgreementVersion, c.Announcement, c.ComplianceConfig, c.Entitlement,
+		c.FeedbackMessage, c.Game, c.MatchConfig, c.MatchSession, c.PayOrder,
+		c.Profile, c.QuestionBank, c.ReportPolicy, c.ReportSnapshot, c.Sku, c.Test,
+		c.TestConfig, c.TestRecord, c.UserFeedback, c.UserMessage,
 	} {
 		n.Use(hooks...)
 	}
@@ -303,9 +328,10 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.ActivationBatch, c.ActivationCode, c.AgreementConsent,
-		c.AgreementVersion, c.ComplianceConfig, c.Entitlement, c.Game, c.MatchConfig,
-		c.MatchSession, c.PayOrder, c.Profile, c.QuestionBank, c.ReportPolicy,
-		c.ReportSnapshot, c.Sku, c.Test, c.TestConfig, c.TestRecord,
+		c.AgreementVersion, c.Announcement, c.ComplianceConfig, c.Entitlement,
+		c.FeedbackMessage, c.Game, c.MatchConfig, c.MatchSession, c.PayOrder,
+		c.Profile, c.QuestionBank, c.ReportPolicy, c.ReportSnapshot, c.Sku, c.Test,
+		c.TestConfig, c.TestRecord, c.UserFeedback, c.UserMessage,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -324,10 +350,14 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AgreementConsent.mutate(ctx, m)
 	case *AgreementVersionMutation:
 		return c.AgreementVersion.mutate(ctx, m)
+	case *AnnouncementMutation:
+		return c.Announcement.mutate(ctx, m)
 	case *ComplianceConfigMutation:
 		return c.ComplianceConfig.mutate(ctx, m)
 	case *EntitlementMutation:
 		return c.Entitlement.mutate(ctx, m)
+	case *FeedbackMessageMutation:
+		return c.FeedbackMessage.mutate(ctx, m)
 	case *GameMutation:
 		return c.Game.mutate(ctx, m)
 	case *MatchConfigMutation:
@@ -352,6 +382,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.TestConfig.mutate(ctx, m)
 	case *TestRecordMutation:
 		return c.TestRecord.mutate(ctx, m)
+	case *UserFeedbackMutation:
+		return c.UserFeedback.mutate(ctx, m)
+	case *UserMessageMutation:
+		return c.UserMessage.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -1028,6 +1062,139 @@ func (c *AgreementVersionClient) mutate(ctx context.Context, m *AgreementVersion
 	}
 }
 
+// AnnouncementClient is a client for the Announcement schema.
+type AnnouncementClient struct {
+	config
+}
+
+// NewAnnouncementClient returns a client for the Announcement from the given config.
+func NewAnnouncementClient(c config) *AnnouncementClient {
+	return &AnnouncementClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `announcement.Hooks(f(g(h())))`.
+func (c *AnnouncementClient) Use(hooks ...Hook) {
+	c.hooks.Announcement = append(c.hooks.Announcement, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `announcement.Intercept(f(g(h())))`.
+func (c *AnnouncementClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Announcement = append(c.inters.Announcement, interceptors...)
+}
+
+// Create returns a builder for creating a Announcement entity.
+func (c *AnnouncementClient) Create() *AnnouncementCreate {
+	mutation := newAnnouncementMutation(c.config, OpCreate)
+	return &AnnouncementCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Announcement entities.
+func (c *AnnouncementClient) CreateBulk(builders ...*AnnouncementCreate) *AnnouncementCreateBulk {
+	return &AnnouncementCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AnnouncementClient) MapCreateBulk(slice any, setFunc func(*AnnouncementCreate, int)) *AnnouncementCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AnnouncementCreateBulk{err: fmt.Errorf("calling to AnnouncementClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AnnouncementCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AnnouncementCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Announcement.
+func (c *AnnouncementClient) Update() *AnnouncementUpdate {
+	mutation := newAnnouncementMutation(c.config, OpUpdate)
+	return &AnnouncementUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AnnouncementClient) UpdateOne(_m *Announcement) *AnnouncementUpdateOne {
+	mutation := newAnnouncementMutation(c.config, OpUpdateOne, withAnnouncement(_m))
+	return &AnnouncementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AnnouncementClient) UpdateOneID(id string) *AnnouncementUpdateOne {
+	mutation := newAnnouncementMutation(c.config, OpUpdateOne, withAnnouncementID(id))
+	return &AnnouncementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Announcement.
+func (c *AnnouncementClient) Delete() *AnnouncementDelete {
+	mutation := newAnnouncementMutation(c.config, OpDelete)
+	return &AnnouncementDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AnnouncementClient) DeleteOne(_m *Announcement) *AnnouncementDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AnnouncementClient) DeleteOneID(id string) *AnnouncementDeleteOne {
+	builder := c.Delete().Where(announcement.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AnnouncementDeleteOne{builder}
+}
+
+// Query returns a query builder for Announcement.
+func (c *AnnouncementClient) Query() *AnnouncementQuery {
+	return &AnnouncementQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAnnouncement},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Announcement entity by its id.
+func (c *AnnouncementClient) Get(ctx context.Context, id string) (*Announcement, error) {
+	return c.Query().Where(announcement.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AnnouncementClient) GetX(ctx context.Context, id string) *Announcement {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AnnouncementClient) Hooks() []Hook {
+	return c.hooks.Announcement
+}
+
+// Interceptors returns the client interceptors.
+func (c *AnnouncementClient) Interceptors() []Interceptor {
+	return c.inters.Announcement
+}
+
+func (c *AnnouncementClient) mutate(ctx context.Context, m *AnnouncementMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AnnouncementCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AnnouncementUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AnnouncementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AnnouncementDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Announcement mutation op: %q", m.Op())
+	}
+}
+
 // ComplianceConfigClient is a client for the ComplianceConfig schema.
 type ComplianceConfigClient struct {
 	config
@@ -1293,6 +1460,139 @@ func (c *EntitlementClient) mutate(ctx context.Context, m *EntitlementMutation) 
 		return (&EntitlementDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Entitlement mutation op: %q", m.Op())
+	}
+}
+
+// FeedbackMessageClient is a client for the FeedbackMessage schema.
+type FeedbackMessageClient struct {
+	config
+}
+
+// NewFeedbackMessageClient returns a client for the FeedbackMessage from the given config.
+func NewFeedbackMessageClient(c config) *FeedbackMessageClient {
+	return &FeedbackMessageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `feedbackmessage.Hooks(f(g(h())))`.
+func (c *FeedbackMessageClient) Use(hooks ...Hook) {
+	c.hooks.FeedbackMessage = append(c.hooks.FeedbackMessage, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `feedbackmessage.Intercept(f(g(h())))`.
+func (c *FeedbackMessageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.FeedbackMessage = append(c.inters.FeedbackMessage, interceptors...)
+}
+
+// Create returns a builder for creating a FeedbackMessage entity.
+func (c *FeedbackMessageClient) Create() *FeedbackMessageCreate {
+	mutation := newFeedbackMessageMutation(c.config, OpCreate)
+	return &FeedbackMessageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of FeedbackMessage entities.
+func (c *FeedbackMessageClient) CreateBulk(builders ...*FeedbackMessageCreate) *FeedbackMessageCreateBulk {
+	return &FeedbackMessageCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FeedbackMessageClient) MapCreateBulk(slice any, setFunc func(*FeedbackMessageCreate, int)) *FeedbackMessageCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FeedbackMessageCreateBulk{err: fmt.Errorf("calling to FeedbackMessageClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FeedbackMessageCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FeedbackMessageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for FeedbackMessage.
+func (c *FeedbackMessageClient) Update() *FeedbackMessageUpdate {
+	mutation := newFeedbackMessageMutation(c.config, OpUpdate)
+	return &FeedbackMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FeedbackMessageClient) UpdateOne(_m *FeedbackMessage) *FeedbackMessageUpdateOne {
+	mutation := newFeedbackMessageMutation(c.config, OpUpdateOne, withFeedbackMessage(_m))
+	return &FeedbackMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FeedbackMessageClient) UpdateOneID(id string) *FeedbackMessageUpdateOne {
+	mutation := newFeedbackMessageMutation(c.config, OpUpdateOne, withFeedbackMessageID(id))
+	return &FeedbackMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for FeedbackMessage.
+func (c *FeedbackMessageClient) Delete() *FeedbackMessageDelete {
+	mutation := newFeedbackMessageMutation(c.config, OpDelete)
+	return &FeedbackMessageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FeedbackMessageClient) DeleteOne(_m *FeedbackMessage) *FeedbackMessageDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FeedbackMessageClient) DeleteOneID(id string) *FeedbackMessageDeleteOne {
+	builder := c.Delete().Where(feedbackmessage.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FeedbackMessageDeleteOne{builder}
+}
+
+// Query returns a query builder for FeedbackMessage.
+func (c *FeedbackMessageClient) Query() *FeedbackMessageQuery {
+	return &FeedbackMessageQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFeedbackMessage},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a FeedbackMessage entity by its id.
+func (c *FeedbackMessageClient) Get(ctx context.Context, id string) (*FeedbackMessage, error) {
+	return c.Query().Where(feedbackmessage.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FeedbackMessageClient) GetX(ctx context.Context, id string) *FeedbackMessage {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *FeedbackMessageClient) Hooks() []Hook {
+	return c.hooks.FeedbackMessage
+}
+
+// Interceptors returns the client interceptors.
+func (c *FeedbackMessageClient) Interceptors() []Interceptor {
+	return c.inters.FeedbackMessage
+}
+
+func (c *FeedbackMessageClient) mutate(ctx context.Context, m *FeedbackMessageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FeedbackMessageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FeedbackMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FeedbackMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FeedbackMessageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown FeedbackMessage mutation op: %q", m.Op())
 	}
 }
 
@@ -2914,19 +3214,287 @@ func (c *TestRecordClient) mutate(ctx context.Context, m *TestRecordMutation) (V
 	}
 }
 
+// UserFeedbackClient is a client for the UserFeedback schema.
+type UserFeedbackClient struct {
+	config
+}
+
+// NewUserFeedbackClient returns a client for the UserFeedback from the given config.
+func NewUserFeedbackClient(c config) *UserFeedbackClient {
+	return &UserFeedbackClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `userfeedback.Hooks(f(g(h())))`.
+func (c *UserFeedbackClient) Use(hooks ...Hook) {
+	c.hooks.UserFeedback = append(c.hooks.UserFeedback, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `userfeedback.Intercept(f(g(h())))`.
+func (c *UserFeedbackClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserFeedback = append(c.inters.UserFeedback, interceptors...)
+}
+
+// Create returns a builder for creating a UserFeedback entity.
+func (c *UserFeedbackClient) Create() *UserFeedbackCreate {
+	mutation := newUserFeedbackMutation(c.config, OpCreate)
+	return &UserFeedbackCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserFeedback entities.
+func (c *UserFeedbackClient) CreateBulk(builders ...*UserFeedbackCreate) *UserFeedbackCreateBulk {
+	return &UserFeedbackCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserFeedbackClient) MapCreateBulk(slice any, setFunc func(*UserFeedbackCreate, int)) *UserFeedbackCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserFeedbackCreateBulk{err: fmt.Errorf("calling to UserFeedbackClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserFeedbackCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserFeedbackCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserFeedback.
+func (c *UserFeedbackClient) Update() *UserFeedbackUpdate {
+	mutation := newUserFeedbackMutation(c.config, OpUpdate)
+	return &UserFeedbackUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserFeedbackClient) UpdateOne(_m *UserFeedback) *UserFeedbackUpdateOne {
+	mutation := newUserFeedbackMutation(c.config, OpUpdateOne, withUserFeedback(_m))
+	return &UserFeedbackUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserFeedbackClient) UpdateOneID(id string) *UserFeedbackUpdateOne {
+	mutation := newUserFeedbackMutation(c.config, OpUpdateOne, withUserFeedbackID(id))
+	return &UserFeedbackUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserFeedback.
+func (c *UserFeedbackClient) Delete() *UserFeedbackDelete {
+	mutation := newUserFeedbackMutation(c.config, OpDelete)
+	return &UserFeedbackDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserFeedbackClient) DeleteOne(_m *UserFeedback) *UserFeedbackDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserFeedbackClient) DeleteOneID(id string) *UserFeedbackDeleteOne {
+	builder := c.Delete().Where(userfeedback.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserFeedbackDeleteOne{builder}
+}
+
+// Query returns a query builder for UserFeedback.
+func (c *UserFeedbackClient) Query() *UserFeedbackQuery {
+	return &UserFeedbackQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserFeedback},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserFeedback entity by its id.
+func (c *UserFeedbackClient) Get(ctx context.Context, id string) (*UserFeedback, error) {
+	return c.Query().Where(userfeedback.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserFeedbackClient) GetX(ctx context.Context, id string) *UserFeedback {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UserFeedbackClient) Hooks() []Hook {
+	return c.hooks.UserFeedback
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserFeedbackClient) Interceptors() []Interceptor {
+	return c.inters.UserFeedback
+}
+
+func (c *UserFeedbackClient) mutate(ctx context.Context, m *UserFeedbackMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserFeedbackCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserFeedbackUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserFeedbackUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserFeedbackDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserFeedback mutation op: %q", m.Op())
+	}
+}
+
+// UserMessageClient is a client for the UserMessage schema.
+type UserMessageClient struct {
+	config
+}
+
+// NewUserMessageClient returns a client for the UserMessage from the given config.
+func NewUserMessageClient(c config) *UserMessageClient {
+	return &UserMessageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `usermessage.Hooks(f(g(h())))`.
+func (c *UserMessageClient) Use(hooks ...Hook) {
+	c.hooks.UserMessage = append(c.hooks.UserMessage, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `usermessage.Intercept(f(g(h())))`.
+func (c *UserMessageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserMessage = append(c.inters.UserMessage, interceptors...)
+}
+
+// Create returns a builder for creating a UserMessage entity.
+func (c *UserMessageClient) Create() *UserMessageCreate {
+	mutation := newUserMessageMutation(c.config, OpCreate)
+	return &UserMessageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserMessage entities.
+func (c *UserMessageClient) CreateBulk(builders ...*UserMessageCreate) *UserMessageCreateBulk {
+	return &UserMessageCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserMessageClient) MapCreateBulk(slice any, setFunc func(*UserMessageCreate, int)) *UserMessageCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserMessageCreateBulk{err: fmt.Errorf("calling to UserMessageClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserMessageCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserMessageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserMessage.
+func (c *UserMessageClient) Update() *UserMessageUpdate {
+	mutation := newUserMessageMutation(c.config, OpUpdate)
+	return &UserMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserMessageClient) UpdateOne(_m *UserMessage) *UserMessageUpdateOne {
+	mutation := newUserMessageMutation(c.config, OpUpdateOne, withUserMessage(_m))
+	return &UserMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserMessageClient) UpdateOneID(id string) *UserMessageUpdateOne {
+	mutation := newUserMessageMutation(c.config, OpUpdateOne, withUserMessageID(id))
+	return &UserMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserMessage.
+func (c *UserMessageClient) Delete() *UserMessageDelete {
+	mutation := newUserMessageMutation(c.config, OpDelete)
+	return &UserMessageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserMessageClient) DeleteOne(_m *UserMessage) *UserMessageDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserMessageClient) DeleteOneID(id string) *UserMessageDeleteOne {
+	builder := c.Delete().Where(usermessage.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserMessageDeleteOne{builder}
+}
+
+// Query returns a query builder for UserMessage.
+func (c *UserMessageClient) Query() *UserMessageQuery {
+	return &UserMessageQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserMessage},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserMessage entity by its id.
+func (c *UserMessageClient) Get(ctx context.Context, id string) (*UserMessage, error) {
+	return c.Query().Where(usermessage.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserMessageClient) GetX(ctx context.Context, id string) *UserMessage {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UserMessageClient) Hooks() []Hook {
+	return c.hooks.UserMessage
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserMessageClient) Interceptors() []Interceptor {
+	return c.inters.UserMessage
+}
+
+func (c *UserMessageClient) mutate(ctx context.Context, m *UserMessageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserMessageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserMessageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserMessage mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
 		AbilityScore, ActivationBatch, ActivationCode, AgreementConsent,
-		AgreementVersion, ComplianceConfig, Entitlement, Game, MatchConfig,
-		MatchSession, PayOrder, Profile, QuestionBank, ReportPolicy, ReportSnapshot,
-		Sku, Test, TestConfig, TestRecord []ent.Hook
+		AgreementVersion, Announcement, ComplianceConfig, Entitlement, FeedbackMessage,
+		Game, MatchConfig, MatchSession, PayOrder, Profile, QuestionBank, ReportPolicy,
+		ReportSnapshot, Sku, Test, TestConfig, TestRecord, UserFeedback,
+		UserMessage []ent.Hook
 	}
 	inters struct {
 		AbilityScore, ActivationBatch, ActivationCode, AgreementConsent,
-		AgreementVersion, ComplianceConfig, Entitlement, Game, MatchConfig,
-		MatchSession, PayOrder, Profile, QuestionBank, ReportPolicy, ReportSnapshot,
-		Sku, Test, TestConfig, TestRecord []ent.Interceptor
+		AgreementVersion, Announcement, ComplianceConfig, Entitlement, FeedbackMessage,
+		Game, MatchConfig, MatchSession, PayOrder, Profile, QuestionBank, ReportPolicy,
+		ReportSnapshot, Sku, Test, TestConfig, TestRecord, UserFeedback,
+		UserMessage []ent.Interceptor
 	}
 )
 

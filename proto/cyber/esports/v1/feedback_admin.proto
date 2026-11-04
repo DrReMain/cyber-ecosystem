@@ -1,0 +1,148 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/esports/v1/feedback.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The operator face of the feedback domain: the queue the support seat
+// works — list by state, read the conversation, answer, close. An
+// answer is one move with two effects: the ticket flips to replied AND
+// the member's letterbox gains the reply's letter in the same
+// transaction, so the message center's feedback notice can never point
+// at an answer that did not land. A member's follow-up walks the ticket
+// back to pending on their side; the operator sees it re-enter the
+// queue. Closing is terminal for the conversation, not a deletion —
+// the ticket and its thread stay as the record of what was asked and
+// answered.
+service FeedbackAdminService {
+  option (cyber.ext.v1.service_comment) = "反馈处理";
+  rpc ListFeedbacks(ListFeedbacksRequest) returns (ListFeedbacksResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "反馈列表(按状态筛)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/user-feedbacks"};
+  }
+  rpc GetFeedback(GetFeedbackRequest) returns (GetFeedbackResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "反馈详情(对话)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/user-feedbacks/{feedback_id}"};
+  }
+  rpc ReplyFeedback(ReplyFeedbackRequest) returns (ReplyFeedbackResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "回复反馈(同步投递站内信)"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/user-feedbacks/{feedback_id}/reply"
+      body: "*"
+    };
+  }
+  rpc CloseFeedback(CloseFeedbackRequest) returns (CloseFeedbackResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "关闭反馈"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/user-feedbacks/{feedback_id}/close"
+      body: "*"
+    };
+  }
+}
+
+// The operator's ticket row: the member ticket with the nickname fold,
+// so the queue reads one table instead of joining the profile plane.
+message FeedbackTicket {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.StringValue user_id = 2;
+  // The local profile's nickname; a member without one keeps null —
+  // the honest shape, never an error.
+  google.protobuf.StringValue nickname = 3;
+  FeedbackCategory category = 4;
+  google.protobuf.StringValue content = 5;
+  google.protobuf.StringValue contact = 6;
+  FeedbackStatus status = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message ListFeedbacksRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+  optional FeedbackStatus status = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+}
+
+message ListFeedbacksResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  // Newest first — the table's reading order; the seat's working
+  // filter (the state segments) narrows it to the queue.
+  repeated FeedbackTicket tickets = 2;
+}
+
+message GetFeedbackRequest {
+  string feedback_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+}
+
+message GetFeedbackResponse {
+  FeedbackTicket ticket = 1;
+  // The conversation, oldest first, initial submission included.
+  repeated FeedbackMessage messages = 2;
+}
+
+message ReplyFeedbackRequest {
+  string feedback_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+  optional string content = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 2000
+    }
+  ];
+}
+
+message ReplyFeedbackResponse {
+  FeedbackTicket ticket = 1;
+}
+
+message CloseFeedbackRequest {
+  string feedback_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+}
+
+message CloseFeedbackResponse {
+  FeedbackTicket ticket = 1;
+}

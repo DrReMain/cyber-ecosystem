@@ -68,6 +68,18 @@ func (f AgreementVersionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.V
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AgreementVersionMutation", m)
 }
 
+// The AnnouncementFunc type is an adapter to allow the use of ordinary
+// function as Announcement mutator.
+type AnnouncementFunc func(context.Context, *ent.AnnouncementMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AnnouncementFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AnnouncementMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AnnouncementMutation", m)
+}
+
 // The ComplianceConfigFunc type is an adapter to allow the use of ordinary
 // function as ComplianceConfig mutator.
 type ComplianceConfigFunc func(context.Context, *ent.ComplianceConfigMutation) (ent.Value, error)
@@ -90,6 +102,18 @@ func (f EntitlementFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EntitlementMutation", m)
+}
+
+// The FeedbackMessageFunc type is an adapter to allow the use of ordinary
+// function as FeedbackMessage mutator.
+type FeedbackMessageFunc func(context.Context, *ent.FeedbackMessageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FeedbackMessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.FeedbackMessageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FeedbackMessageMutation", m)
 }
 
 // The GameFunc type is an adapter to allow the use of ordinary
@@ -234,6 +258,30 @@ func (f TestRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TestRecordMutation", m)
+}
+
+// The UserFeedbackFunc type is an adapter to allow the use of ordinary
+// function as UserFeedback mutator.
+type UserFeedbackFunc func(context.Context, *ent.UserFeedbackMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserFeedbackFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserFeedbackMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserFeedbackMutation", m)
+}
+
+// The UserMessageFunc type is an adapter to allow the use of ordinary
+// function as UserMessage mutator.
+type UserMessageFunc func(context.Context, *ent.UserMessageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserMessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserMessageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMessageMutation", m)
 }
 
 // Condition is a hook condition function.

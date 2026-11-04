@@ -24,10 +24,14 @@ type Tx struct {
 	AgreementConsent *AgreementConsentClient
 	// AgreementVersion is the client for interacting with the AgreementVersion builders.
 	AgreementVersion *AgreementVersionClient
+	// Announcement is the client for interacting with the Announcement builders.
+	Announcement *AnnouncementClient
 	// ComplianceConfig is the client for interacting with the ComplianceConfig builders.
 	ComplianceConfig *ComplianceConfigClient
 	// Entitlement is the client for interacting with the Entitlement builders.
 	Entitlement *EntitlementClient
+	// FeedbackMessage is the client for interacting with the FeedbackMessage builders.
+	FeedbackMessage *FeedbackMessageClient
 	// Game is the client for interacting with the Game builders.
 	Game *GameClient
 	// MatchConfig is the client for interacting with the MatchConfig builders.
@@ -52,6 +56,10 @@ type Tx struct {
 	TestConfig *TestConfigClient
 	// TestRecord is the client for interacting with the TestRecord builders.
 	TestRecord *TestRecordClient
+	// UserFeedback is the client for interacting with the UserFeedback builders.
+	UserFeedback *UserFeedbackClient
+	// UserMessage is the client for interacting with the UserMessage builders.
+	UserMessage *UserMessageClient
 
 	// lazily loaded.
 	client     *Client
@@ -188,8 +196,10 @@ func (tx *Tx) init() {
 	tx.ActivationCode = NewActivationCodeClient(tx.config)
 	tx.AgreementConsent = NewAgreementConsentClient(tx.config)
 	tx.AgreementVersion = NewAgreementVersionClient(tx.config)
+	tx.Announcement = NewAnnouncementClient(tx.config)
 	tx.ComplianceConfig = NewComplianceConfigClient(tx.config)
 	tx.Entitlement = NewEntitlementClient(tx.config)
+	tx.FeedbackMessage = NewFeedbackMessageClient(tx.config)
 	tx.Game = NewGameClient(tx.config)
 	tx.MatchConfig = NewMatchConfigClient(tx.config)
 	tx.MatchSession = NewMatchSessionClient(tx.config)
@@ -202,6 +212,8 @@ func (tx *Tx) init() {
 	tx.Test = NewTestClient(tx.config)
 	tx.TestConfig = NewTestConfigClient(tx.config)
 	tx.TestRecord = NewTestRecordClient(tx.config)
+	tx.UserFeedback = NewUserFeedbackClient(tx.config)
+	tx.UserMessage = NewUserMessageClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

@@ -138,5 +138,10 @@
   "error_ESPORTS_AGREEMENT_VERSION_NOT_FOUND": "إصدار الاتفاقية غير موجود",
   "error_ESPORTS_AGREEMENT_VERSION_IS_CURRENT": "لا يمكن حذف الإصدار الساري؛ بدّل إلى إصدار آخر أولاً",
   "error_ESPORTS_AGREEMENT_VERSION_DUPLICATE": "رقم الإصدار موجود بالفعل",
-  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "لم يتم إعداد إصدارات الاتفاقية بعد؛ تواصل مع المشغل"
+  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "لم يتم إعداد إصدارات الاتفاقية بعد؛ تواصل مع المشغل",
+  "error_ESPORTS_FEEDBACK_NOT_FOUND": "لم يتم العثور على الملاحظات",
+  "error_ESPORTS_FEEDBACK_NOT_OWNED": "يمكنك عرض ملاحظاتك فقط",
+  "error_ESPORTS_FEEDBACK_CLOSED": "تم إغلاق هذه الملاحظات؛ أرسل ملاحظات جديدة لأي أسئلة أخرى",
+  "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "لم يتم العثور على الإعلان",
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "الحالة الحالية للإعلان لا تسمح بهذا الإجراء"
 }

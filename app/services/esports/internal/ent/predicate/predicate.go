@@ -21,11 +21,17 @@ type AgreementConsent func(*sql.Selector)
 // AgreementVersion is the predicate function for agreementversion builders.
 type AgreementVersion func(*sql.Selector)
 
+// Announcement is the predicate function for announcement builders.
+type Announcement func(*sql.Selector)
+
 // ComplianceConfig is the predicate function for complianceconfig builders.
 type ComplianceConfig func(*sql.Selector)
 
 // Entitlement is the predicate function for entitlement builders.
 type Entitlement func(*sql.Selector)
+
+// FeedbackMessage is the predicate function for feedbackmessage builders.
+type FeedbackMessage func(*sql.Selector)
 
 // Game is the predicate function for game builders.
 type Game func(*sql.Selector)
@@ -62,3 +68,9 @@ type TestConfig func(*sql.Selector)
 
 // TestRecord is the predicate function for testrecord builders.
 type TestRecord func(*sql.Selector)
+
+// UserFeedback is the predicate function for userfeedback builders.
+type UserFeedback func(*sql.Selector)
+
+// UserMessage is the predicate function for usermessage builders.
+type UserMessage func(*sql.Selector)

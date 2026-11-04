@@ -220,6 +220,43 @@ var (
 			},
 		},
 	}
+	// AnnouncementColumns holds the columns for the "announcement" table.
+	AnnouncementColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "kind", Type: field.TypeEnum, Comment: "banner = live on the home surface; message = delivered into letterboxes at publish", Enums: []string{"banner", "message"}},
+		{Name: "scope", Type: field.TypeEnum, Comment: "who receives a message-kind row at publish: every roster member, or live membership holders", Enums: []string{"all", "membership"}},
+		{Name: "title", Type: field.TypeString, Size: 64, Comment: "the headline both surfaces render"},
+		{Name: "content", Type: field.TypeString, Size: 5000, Comment: "the body; editable while draft, frozen in every delivered copy at publish"},
+		{Name: "status", Type: field.TypeEnum, Comment: "the one-way lifecycle: draft→published→offline, no revival", Enums: []string{"draft", "published", "offline"}, Default: "draft"},
+		{Name: "published_at", Type: field.TypeTime, Nullable: true, Comment: "absent until published — the delivery moment"},
+		{Name: "offline_at", Type: field.TypeTime, Nullable: true, Comment: "absent until offlined"},
+		{Name: "published_by", Type: field.TypeString, Nullable: true, Size: 20, Comment: "the operator who published; drafts carry none"},
+	}
+	// AnnouncementTable holds the schema information for the "announcement" table.
+	AnnouncementTable = &schema.Table{
+		Name:       "announcement",
+		Columns:    AnnouncementColumns,
+		PrimaryKey: []*schema.Column{AnnouncementColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "announcement_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AnnouncementColumns[1]},
+			},
+			{
+				Name:    "announcement_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{AnnouncementColumns[2]},
+			},
+			{
+				Name:    "announcement_kind_status_published_at",
+				Unique:  false,
+				Columns: []*schema.Column{AnnouncementColumns[3], AnnouncementColumns[7], AnnouncementColumns[8]},
+			},
+		},
+	}
 	// ComplianceConfigColumns holds the columns for the "compliance_config" table.
 	ComplianceConfigColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -289,6 +326,39 @@ var (
 				Name:    "entitlement_tenant_id_user_id_scope_kind_scope_ref",
 				Unique:  true,
 				Columns: []*schema.Column{EntitlementColumns[3], EntitlementColumns[4], EntitlementColumns[5], EntitlementColumns[6]},
+			},
+		},
+	}
+	// FeedbackMessageColumns holds the columns for the "feedback_message" table.
+	FeedbackMessageColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "feedback_id", Type: field.TypeString, Size: 20, Comment: "the conversation root this turn belongs to"},
+		{Name: "sender", Type: field.TypeEnum, Comment: "who spoke this turn", Enums: []string{"user", "admin"}},
+		{Name: "content", Type: field.TypeString, Size: 2000, Comment: "the turn's text"},
+		{Name: "admin_id", Type: field.TypeString, Nullable: true, Size: 20, Comment: "the operator behind an admin turn; absent on member turns"},
+	}
+	// FeedbackMessageTable holds the schema information for the "feedback_message" table.
+	FeedbackMessageTable = &schema.Table{
+		Name:       "feedback_message",
+		Columns:    FeedbackMessageColumns,
+		PrimaryKey: []*schema.Column{FeedbackMessageColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "feedbackmessage_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{FeedbackMessageColumns[1]},
+			},
+			{
+				Name:    "feedbackmessage_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{FeedbackMessageColumns[2]},
+			},
+			{
+				Name:    "feedbackmessage_feedback_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{FeedbackMessageColumns[3], FeedbackMessageColumns[1]},
 			},
 		},
 	}
@@ -859,6 +929,85 @@ var (
 			},
 		},
 	}
+	// UserFeedbackColumns holds the columns for the "user_feedback" table.
+	UserFeedbackColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "the asking member identity"},
+		{Name: "category", Type: field.TypeEnum, Comment: "the submit form's six problem types", Enums: []string{"feature_bug", "assessment", "report", "payment", "account", "other"}},
+		{Name: "content", Type: field.TypeString, Size: 500, Comment: "the first message of the conversation, denormalized for the list rows"},
+		{Name: "contact", Type: field.TypeString, Nullable: true, Size: 128, Comment: "where the operator may reach the member; absent = in-app contact only"},
+		{Name: "status", Type: field.TypeEnum, Comment: "the conversation's state: follow-up walks replied back to pending; closed is terminal", Enums: []string{"pending", "replied", "closed"}, Default: "pending"},
+	}
+	// UserFeedbackTable holds the schema information for the "user_feedback" table.
+	UserFeedbackTable = &schema.Table{
+		Name:       "user_feedback",
+		Columns:    UserFeedbackColumns,
+		PrimaryKey: []*schema.Column{UserFeedbackColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "userfeedback_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{UserFeedbackColumns[1]},
+			},
+			{
+				Name:    "userfeedback_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{UserFeedbackColumns[2]},
+			},
+			{
+				Name:    "userfeedback_user_id_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{UserFeedbackColumns[3], UserFeedbackColumns[2]},
+			},
+			{
+				Name:    "userfeedback_status_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{UserFeedbackColumns[7], UserFeedbackColumns[1]},
+			},
+		},
+	}
+	// UserMessageColumns holds the columns for the "user_message" table.
+	UserMessageColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeString, Size: 20, Comment: "the receiving member identity"},
+		{Name: "type", Type: field.TypeEnum, Comment: "what kind of letter this is; decides the ref's domain (report→test record, feedback_reply→feedback)", Enums: []string{"announcement", "report", "membership", "feedback_reply"}},
+		{Name: "title", Type: field.TypeString, Size: 128, Comment: "the headline the sender composed; every writer sets one, no fallback shape exists"},
+		{Name: "content", Type: field.TypeString, Size: 5000, Comment: "the letter body, denormalized at delivery so later source changes never rewrite a sent letter"},
+		{Name: "ref_id", Type: field.TypeString, Nullable: true, Size: 20, Comment: "deep-link target whose domain the type names; absent when the letter carries no link"},
+		{Name: "is_read", Type: field.TypeBool, Comment: "the row's own unread state — the only mutable column, flipped by mark-read", Default: false},
+	}
+	// UserMessageTable holds the schema information for the "user_message" table.
+	UserMessageTable = &schema.Table{
+		Name:       "user_message",
+		Columns:    UserMessageColumns,
+		PrimaryKey: []*schema.Column{UserMessageColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "usermessage_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{UserMessageColumns[1]},
+			},
+			{
+				Name:    "usermessage_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{UserMessageColumns[2]},
+			},
+			{
+				Name:    "usermessage_user_id_is_read",
+				Unique:  false,
+				Columns: []*schema.Column{UserMessageColumns[3], UserMessageColumns[8]},
+			},
+			{
+				Name:    "usermessage_user_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{UserMessageColumns[3], UserMessageColumns[1]},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoreTable,
@@ -866,8 +1015,10 @@ var (
 		ActivationCodeTable,
 		AgreementConsentTable,
 		AgreementVersionTable,
+		AnnouncementTable,
 		ComplianceConfigTable,
 		EntitlementTable,
+		FeedbackMessageTable,
 		GameTable,
 		MatchConfigTable,
 		MatchSessionTable,
@@ -880,6 +1031,8 @@ var (
 		TestTable,
 		TestConfigTable,
 		TestRecordTable,
+		UserFeedbackTable,
+		UserMessageTable,
 	}
 )
 
@@ -899,11 +1052,17 @@ func init() {
 	AgreementVersionTable.Annotation = &entsql.Annotation{
 		Table: "agreement_version",
 	}
+	AnnouncementTable.Annotation = &entsql.Annotation{
+		Table: "announcement",
+	}
 	ComplianceConfigTable.Annotation = &entsql.Annotation{
 		Table: "compliance_config",
 	}
 	EntitlementTable.Annotation = &entsql.Annotation{
 		Table: "entitlement",
+	}
+	FeedbackMessageTable.Annotation = &entsql.Annotation{
+		Table: "feedback_message",
 	}
 	GameTable.Annotation = &entsql.Annotation{
 		Table: "game",
@@ -940,5 +1099,11 @@ func init() {
 	}
 	TestRecordTable.Annotation = &entsql.Annotation{
 		Table: "test_record",
+	}
+	UserFeedbackTable.Annotation = &entsql.Annotation{
+		Table: "user_feedback",
+	}
+	UserMessageTable.Annotation = &entsql.Annotation{
+		Table: "user_message",
 	}
 }

@@ -138,5 +138,10 @@
   "error_ESPORTS_AGREEMENT_VERSION_NOT_FOUND": "协议版本不存在",
   "error_ESPORTS_AGREEMENT_VERSION_IS_CURRENT": "当前生效版本不能删除，请先切换到其他版本",
   "error_ESPORTS_AGREEMENT_VERSION_DUPLICATE": "该版本号已存在",
-  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "协议版本未配置，请联系运营"
+  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "协议版本未配置，请联系运营",
+  "error_ESPORTS_FEEDBACK_NOT_FOUND": "反馈不存在",
+  "error_ESPORTS_FEEDBACK_NOT_OWNED": "只能查看自己的反馈",
+  "error_ESPORTS_FEEDBACK_CLOSED": "该反馈已关闭，如有新问题请重新提交",
+  "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "公告不存在",
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "公告当前状态不支持该操作"
 }

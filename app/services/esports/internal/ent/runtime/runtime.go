@@ -8,8 +8,10 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
+	"cyber-ecosystem/app/services/esports/internal/ent/announcement"
 	"cyber-ecosystem/app/services/esports/internal/ent/complianceconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
+	"cyber-ecosystem/app/services/esports/internal/ent/feedbackmessage"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
@@ -23,6 +25,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
+	"cyber-ecosystem/app/services/esports/internal/ent/userfeedback"
+	"cyber-ecosystem/app/services/esports/internal/ent/usermessage"
 	"time"
 )
 
@@ -404,6 +408,69 @@ func init() {
 	agreementversion.DefaultID = agreementversionDescID.Default.(func() string)
 	// agreementversion.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	agreementversion.IDValidator = agreementversionDescID.Validators[0].(func(string) error)
+	announcementMixin := schema.Announcement{}.Mixin()
+	announcementMixinFields0 := announcementMixin[0].Fields()
+	_ = announcementMixinFields0
+	announcementMixinFields1 := announcementMixin[1].Fields()
+	_ = announcementMixinFields1
+	announcementFields := schema.Announcement{}.Fields()
+	_ = announcementFields
+	// announcementDescCreatedAt is the schema descriptor for created_at field.
+	announcementDescCreatedAt := announcementMixinFields1[0].Descriptor()
+	// announcement.DefaultCreatedAt holds the default value on creation for the created_at field.
+	announcement.DefaultCreatedAt = announcementDescCreatedAt.Default.(func() time.Time)
+	// announcementDescUpdatedAt is the schema descriptor for updated_at field.
+	announcementDescUpdatedAt := announcementMixinFields1[1].Descriptor()
+	// announcement.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	announcement.DefaultUpdatedAt = announcementDescUpdatedAt.Default.(func() time.Time)
+	// announcement.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	announcement.UpdateDefaultUpdatedAt = announcementDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// announcementDescTitle is the schema descriptor for title field.
+	announcementDescTitle := announcementFields[2].Descriptor()
+	// announcement.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	announcement.TitleValidator = func() func(string) error {
+		validators := announcementDescTitle.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(title string) error {
+			for _, fn := range fns {
+				if err := fn(title); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// announcementDescContent is the schema descriptor for content field.
+	announcementDescContent := announcementFields[3].Descriptor()
+	// announcement.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	announcement.ContentValidator = func() func(string) error {
+		validators := announcementDescContent.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(content string) error {
+			for _, fn := range fns {
+				if err := fn(content); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// announcementDescPublishedBy is the schema descriptor for published_by field.
+	announcementDescPublishedBy := announcementFields[7].Descriptor()
+	// announcement.PublishedByValidator is a validator for the "published_by" field. It is called by the builders before save.
+	announcement.PublishedByValidator = announcementDescPublishedBy.Validators[0].(func(string) error)
+	// announcementDescID is the schema descriptor for id field.
+	announcementDescID := announcementMixinFields0[0].Descriptor()
+	// announcement.DefaultID holds the default value on creation for the id field.
+	announcement.DefaultID = announcementDescID.Default.(func() string)
+	// announcement.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	announcement.IDValidator = announcementDescID.Validators[0].(func(string) error)
 	complianceconfigMixin := schema.ComplianceConfig{}.Mixin()
 	complianceconfigMixinFields0 := complianceconfigMixin[0].Fields()
 	_ = complianceconfigMixinFields0
@@ -535,6 +602,69 @@ func init() {
 	entitlement.DefaultID = entitlementDescID.Default.(func() string)
 	// entitlement.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	entitlement.IDValidator = entitlementDescID.Validators[0].(func(string) error)
+	feedbackmessageMixin := schema.FeedbackMessage{}.Mixin()
+	feedbackmessageMixinFields0 := feedbackmessageMixin[0].Fields()
+	_ = feedbackmessageMixinFields0
+	feedbackmessageMixinFields1 := feedbackmessageMixin[1].Fields()
+	_ = feedbackmessageMixinFields1
+	feedbackmessageFields := schema.FeedbackMessage{}.Fields()
+	_ = feedbackmessageFields
+	// feedbackmessageDescCreatedAt is the schema descriptor for created_at field.
+	feedbackmessageDescCreatedAt := feedbackmessageMixinFields1[0].Descriptor()
+	// feedbackmessage.DefaultCreatedAt holds the default value on creation for the created_at field.
+	feedbackmessage.DefaultCreatedAt = feedbackmessageDescCreatedAt.Default.(func() time.Time)
+	// feedbackmessageDescUpdatedAt is the schema descriptor for updated_at field.
+	feedbackmessageDescUpdatedAt := feedbackmessageMixinFields1[1].Descriptor()
+	// feedbackmessage.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	feedbackmessage.DefaultUpdatedAt = feedbackmessageDescUpdatedAt.Default.(func() time.Time)
+	// feedbackmessage.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	feedbackmessage.UpdateDefaultUpdatedAt = feedbackmessageDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// feedbackmessageDescFeedbackID is the schema descriptor for feedback_id field.
+	feedbackmessageDescFeedbackID := feedbackmessageFields[0].Descriptor()
+	// feedbackmessage.FeedbackIDValidator is a validator for the "feedback_id" field. It is called by the builders before save.
+	feedbackmessage.FeedbackIDValidator = func() func(string) error {
+		validators := feedbackmessageDescFeedbackID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(feedback_id string) error {
+			for _, fn := range fns {
+				if err := fn(feedback_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// feedbackmessageDescContent is the schema descriptor for content field.
+	feedbackmessageDescContent := feedbackmessageFields[2].Descriptor()
+	// feedbackmessage.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	feedbackmessage.ContentValidator = func() func(string) error {
+		validators := feedbackmessageDescContent.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(content string) error {
+			for _, fn := range fns {
+				if err := fn(content); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// feedbackmessageDescAdminID is the schema descriptor for admin_id field.
+	feedbackmessageDescAdminID := feedbackmessageFields[3].Descriptor()
+	// feedbackmessage.AdminIDValidator is a validator for the "admin_id" field. It is called by the builders before save.
+	feedbackmessage.AdminIDValidator = feedbackmessageDescAdminID.Validators[0].(func(string) error)
+	// feedbackmessageDescID is the schema descriptor for id field.
+	feedbackmessageDescID := feedbackmessageMixinFields0[0].Descriptor()
+	// feedbackmessage.DefaultID holds the default value on creation for the id field.
+	feedbackmessage.DefaultID = feedbackmessageDescID.Default.(func() string)
+	// feedbackmessage.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	feedbackmessage.IDValidator = feedbackmessageDescID.Validators[0].(func(string) error)
 	gameMixin := schema.Game{}.Mixin()
 	gameMixinHooks2 := gameMixin[2].Hooks()
 	gameMixinHooks3 := gameMixin[3].Hooks()
@@ -1592,6 +1722,154 @@ func init() {
 	testrecord.DefaultID = testrecordDescID.Default.(func() string)
 	// testrecord.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	testrecord.IDValidator = testrecordDescID.Validators[0].(func(string) error)
+	userfeedbackMixin := schema.UserFeedback{}.Mixin()
+	userfeedbackMixinFields0 := userfeedbackMixin[0].Fields()
+	_ = userfeedbackMixinFields0
+	userfeedbackMixinFields1 := userfeedbackMixin[1].Fields()
+	_ = userfeedbackMixinFields1
+	userfeedbackFields := schema.UserFeedback{}.Fields()
+	_ = userfeedbackFields
+	// userfeedbackDescCreatedAt is the schema descriptor for created_at field.
+	userfeedbackDescCreatedAt := userfeedbackMixinFields1[0].Descriptor()
+	// userfeedback.DefaultCreatedAt holds the default value on creation for the created_at field.
+	userfeedback.DefaultCreatedAt = userfeedbackDescCreatedAt.Default.(func() time.Time)
+	// userfeedbackDescUpdatedAt is the schema descriptor for updated_at field.
+	userfeedbackDescUpdatedAt := userfeedbackMixinFields1[1].Descriptor()
+	// userfeedback.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	userfeedback.DefaultUpdatedAt = userfeedbackDescUpdatedAt.Default.(func() time.Time)
+	// userfeedback.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	userfeedback.UpdateDefaultUpdatedAt = userfeedbackDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// userfeedbackDescUserID is the schema descriptor for user_id field.
+	userfeedbackDescUserID := userfeedbackFields[0].Descriptor()
+	// userfeedback.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	userfeedback.UserIDValidator = func() func(string) error {
+		validators := userfeedbackDescUserID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(user_id string) error {
+			for _, fn := range fns {
+				if err := fn(user_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// userfeedbackDescContent is the schema descriptor for content field.
+	userfeedbackDescContent := userfeedbackFields[2].Descriptor()
+	// userfeedback.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	userfeedback.ContentValidator = func() func(string) error {
+		validators := userfeedbackDescContent.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(content string) error {
+			for _, fn := range fns {
+				if err := fn(content); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// userfeedbackDescContact is the schema descriptor for contact field.
+	userfeedbackDescContact := userfeedbackFields[3].Descriptor()
+	// userfeedback.ContactValidator is a validator for the "contact" field. It is called by the builders before save.
+	userfeedback.ContactValidator = userfeedbackDescContact.Validators[0].(func(string) error)
+	// userfeedbackDescID is the schema descriptor for id field.
+	userfeedbackDescID := userfeedbackMixinFields0[0].Descriptor()
+	// userfeedback.DefaultID holds the default value on creation for the id field.
+	userfeedback.DefaultID = userfeedbackDescID.Default.(func() string)
+	// userfeedback.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	userfeedback.IDValidator = userfeedbackDescID.Validators[0].(func(string) error)
+	usermessageMixin := schema.UserMessage{}.Mixin()
+	usermessageMixinFields0 := usermessageMixin[0].Fields()
+	_ = usermessageMixinFields0
+	usermessageMixinFields1 := usermessageMixin[1].Fields()
+	_ = usermessageMixinFields1
+	usermessageFields := schema.UserMessage{}.Fields()
+	_ = usermessageFields
+	// usermessageDescCreatedAt is the schema descriptor for created_at field.
+	usermessageDescCreatedAt := usermessageMixinFields1[0].Descriptor()
+	// usermessage.DefaultCreatedAt holds the default value on creation for the created_at field.
+	usermessage.DefaultCreatedAt = usermessageDescCreatedAt.Default.(func() time.Time)
+	// usermessageDescUpdatedAt is the schema descriptor for updated_at field.
+	usermessageDescUpdatedAt := usermessageMixinFields1[1].Descriptor()
+	// usermessage.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	usermessage.DefaultUpdatedAt = usermessageDescUpdatedAt.Default.(func() time.Time)
+	// usermessage.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	usermessage.UpdateDefaultUpdatedAt = usermessageDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// usermessageDescUserID is the schema descriptor for user_id field.
+	usermessageDescUserID := usermessageFields[0].Descriptor()
+	// usermessage.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
+	usermessage.UserIDValidator = func() func(string) error {
+		validators := usermessageDescUserID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(user_id string) error {
+			for _, fn := range fns {
+				if err := fn(user_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// usermessageDescTitle is the schema descriptor for title field.
+	usermessageDescTitle := usermessageFields[2].Descriptor()
+	// usermessage.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	usermessage.TitleValidator = func() func(string) error {
+		validators := usermessageDescTitle.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(title string) error {
+			for _, fn := range fns {
+				if err := fn(title); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// usermessageDescContent is the schema descriptor for content field.
+	usermessageDescContent := usermessageFields[3].Descriptor()
+	// usermessage.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	usermessage.ContentValidator = func() func(string) error {
+		validators := usermessageDescContent.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(content string) error {
+			for _, fn := range fns {
+				if err := fn(content); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// usermessageDescRefID is the schema descriptor for ref_id field.
+	usermessageDescRefID := usermessageFields[4].Descriptor()
+	// usermessage.RefIDValidator is a validator for the "ref_id" field. It is called by the builders before save.
+	usermessage.RefIDValidator = usermessageDescRefID.Validators[0].(func(string) error)
+	// usermessageDescIsRead is the schema descriptor for is_read field.
+	usermessageDescIsRead := usermessageFields[5].Descriptor()
+	// usermessage.DefaultIsRead holds the default value on creation for the is_read field.
+	usermessage.DefaultIsRead = usermessageDescIsRead.Default.(bool)
+	// usermessageDescID is the schema descriptor for id field.
+	usermessageDescID := usermessageMixinFields0[0].Descriptor()
+	// usermessage.DefaultID holds the default value on creation for the id field.
+	usermessage.DefaultID = usermessageDescID.Default.(func() string)
+	// usermessage.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	usermessage.IDValidator = usermessageDescID.Validators[0].(func(string) error)
 }
 
 const (

@@ -144,5 +144,10 @@
   "error_network_sub_keep": "your progress is preserved",
   "error_network_sub_tail": " and will not be lost to a network problem.",
   "error_back": "Go back",
-  "error_code": "Error code: "
+  "error_code": "Error code: ",
+  "error_ESPORTS_FEEDBACK_NOT_FOUND": "Feedback not found",
+  "error_ESPORTS_FEEDBACK_NOT_OWNED": "You can only view your own feedback",
+  "error_ESPORTS_FEEDBACK_CLOSED": "This feedback is closed; submit a new one for further questions",
+  "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "Announcement not found",
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "The announcement's current state refuses this action"
 }

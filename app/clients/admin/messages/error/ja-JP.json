@@ -138,5 +138,10 @@
   "error_ESPORTS_AGREEMENT_VERSION_NOT_FOUND": "契約バージョンが見つかりません",
   "error_ESPORTS_AGREEMENT_VERSION_IS_CURRENT": "現行バージョンは削除できません。先に別のバージョンへ切り替えてください",
   "error_ESPORTS_AGREEMENT_VERSION_DUPLICATE": "このバージョン番号は既に存在します",
-  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "契約バージョンが未設定です。運営にご連絡ください"
+  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "契約バージョンが未設定です。運営にご連絡ください",
+  "error_ESPORTS_FEEDBACK_NOT_FOUND": "フィードバックが見つかりません",
+  "error_ESPORTS_FEEDBACK_NOT_OWNED": "自分のフィードバックのみ閲覧できます",
+  "error_ESPORTS_FEEDBACK_CLOSED": "このフィードバックは終了しました。新しい質問は再送信してください",
+  "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "お知らせが見つかりません",
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "現在の状態ではこの操作はできません"
 }

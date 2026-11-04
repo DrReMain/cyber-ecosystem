@@ -370,6 +370,128 @@
     ]
   },
   {
+    "name": "FeedbackAdminService",
+    "full_name": "cyber.esports.v1.FeedbackAdminService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/feedback_admin.proto",
+    "comment": "反馈处理",
+    "methods": [
+      {
+        "name": "CloseFeedback",
+        "full_name": "cyber.esports.v1.FeedbackAdminService.CloseFeedback",
+        "request_name": "CloseFeedbackRequest",
+        "request_full_name": "cyber.esports.v1.CloseFeedbackRequest",
+        "response_name": "CloseFeedbackResponse",
+        "response_full_name": "cyber.esports.v1.CloseFeedbackResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/user-feedbacks/{feedback_id}/close",
+        "comment": "关闭反馈",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "GetFeedback",
+        "full_name": "cyber.esports.v1.FeedbackAdminService.GetFeedback",
+        "request_name": "GetFeedbackRequest",
+        "request_full_name": "cyber.esports.v1.GetFeedbackRequest",
+        "response_name": "GetFeedbackResponse",
+        "response_full_name": "cyber.esports.v1.GetFeedbackResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/user-feedbacks/{feedback_id}",
+        "comment": "反馈详情(对话)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListFeedbacks",
+        "full_name": "cyber.esports.v1.FeedbackAdminService.ListFeedbacks",
+        "request_name": "ListFeedbacksRequest",
+        "request_full_name": "cyber.esports.v1.ListFeedbacksRequest",
+        "response_name": "ListFeedbacksResponse",
+        "response_full_name": "cyber.esports.v1.ListFeedbacksResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/user-feedbacks",
+        "comment": "反馈列表(按状态筛)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ReplyFeedback",
+        "full_name": "cyber.esports.v1.FeedbackAdminService.ReplyFeedback",
+        "request_name": "ReplyFeedbackRequest",
+        "request_full_name": "cyber.esports.v1.ReplyFeedbackRequest",
+        "response_name": "ReplyFeedbackResponse",
+        "response_full_name": "cyber.esports.v1.ReplyFeedbackResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/user-feedbacks/{feedback_id}/reply",
+        "comment": "回复反馈(同步投递站内信)",
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "FeedbackService",
+    "full_name": "cyber.esports.v1.FeedbackService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/feedback.proto",
+    "comment": "意见反馈",
+    "methods": [
+      {
+        "name": "FollowUpFeedback",
+        "full_name": "cyber.esports.v1.FeedbackService.FollowUpFeedback",
+        "request_name": "FollowUpFeedbackRequest",
+        "request_full_name": "cyber.esports.v1.FollowUpFeedbackRequest",
+        "response_name": "FollowUpFeedbackResponse",
+        "response_full_name": "cyber.esports.v1.FollowUpFeedbackResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/feedbacks/{feedback_id}/follow-ups",
+        "comment": "追问(回到待处理)",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "GetMyFeedback",
+        "full_name": "cyber.esports.v1.FeedbackService.GetMyFeedback",
+        "request_name": "GetMyFeedbackRequest",
+        "request_full_name": "cyber.esports.v1.GetMyFeedbackRequest",
+        "response_name": "GetMyFeedbackResponse",
+        "response_full_name": "cyber.esports.v1.GetMyFeedbackResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/feedbacks/{feedback_id}",
+        "comment": "我的反馈详情(对话)",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "ListMyFeedbacks",
+        "full_name": "cyber.esports.v1.FeedbackService.ListMyFeedbacks",
+        "request_name": "ListMyFeedbacksRequest",
+        "request_full_name": "cyber.esports.v1.ListMyFeedbacksRequest",
+        "response_name": "ListMyFeedbacksResponse",
+        "response_full_name": "cyber.esports.v1.ListMyFeedbacksResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/feedbacks",
+        "comment": "我的反馈列表",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "SubmitFeedback",
+        "full_name": "cyber.esports.v1.FeedbackService.SubmitFeedback",
+        "request_name": "SubmitFeedbackRequest",
+        "request_full_name": "cyber.esports.v1.SubmitFeedbackRequest",
+        "response_name": "SubmitFeedbackResponse",
+        "response_full_name": "cyber.esports.v1.SubmitFeedbackResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/feedbacks",
+        "comment": "提交反馈",
+        "access": "BUILTIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
     "name": "GameService",
     "full_name": "cyber.esports.v1.GameService",
     "package": "cyber.esports.v1",
@@ -470,6 +592,154 @@
         "http_path": "/api/v1/esports/members",
         "comment": "会员列表",
         "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "MessageAdminService",
+    "full_name": "cyber.esports.v1.MessageAdminService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/message_admin.proto",
+    "comment": "公告管理",
+    "methods": [
+      {
+        "name": "CreateAnnouncement",
+        "full_name": "cyber.esports.v1.MessageAdminService.CreateAnnouncement",
+        "request_name": "CreateAnnouncementRequest",
+        "request_full_name": "cyber.esports.v1.CreateAnnouncementRequest",
+        "response_name": "CreateAnnouncementResponse",
+        "response_full_name": "cyber.esports.v1.CreateAnnouncementResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/announcements",
+        "comment": "新建公告(草稿)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "ListAnnouncements",
+        "full_name": "cyber.esports.v1.MessageAdminService.ListAnnouncements",
+        "request_name": "ListAnnouncementsRequest",
+        "request_full_name": "cyber.esports.v1.ListAnnouncementsRequest",
+        "response_name": "ListAnnouncementsResponse",
+        "response_full_name": "cyber.esports.v1.ListAnnouncementsResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/announcements",
+        "comment": "公告列表",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "OfflineAnnouncement",
+        "full_name": "cyber.esports.v1.MessageAdminService.OfflineAnnouncement",
+        "request_name": "OfflineAnnouncementRequest",
+        "request_full_name": "cyber.esports.v1.OfflineAnnouncementRequest",
+        "response_name": "OfflineAnnouncementResponse",
+        "response_full_name": "cyber.esports.v1.OfflineAnnouncementResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/announcements/{announcement_id}/offline",
+        "comment": "下线公告",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "PublishAnnouncement",
+        "full_name": "cyber.esports.v1.MessageAdminService.PublishAnnouncement",
+        "request_name": "PublishAnnouncementRequest",
+        "request_full_name": "cyber.esports.v1.PublishAnnouncementRequest",
+        "response_name": "PublishAnnouncementResponse",
+        "response_full_name": "cyber.esports.v1.PublishAnnouncementResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/announcements/{announcement_id}/publish",
+        "comment": "发布公告(站内信型=按范围投递)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "UpdateAnnouncement",
+        "full_name": "cyber.esports.v1.MessageAdminService.UpdateAnnouncement",
+        "request_name": "UpdateAnnouncementRequest",
+        "request_full_name": "cyber.esports.v1.UpdateAnnouncementRequest",
+        "response_name": "UpdateAnnouncementResponse",
+        "response_full_name": "cyber.esports.v1.UpdateAnnouncementResponse",
+        "http_method": "PUT",
+        "http_path": "/api/v1/esports/announcements/{announcement_id}",
+        "comment": "改草稿公告",
+        "access": "ADMIN",
+        "datascope": false
+      }
+    ]
+  },
+  {
+    "name": "MessageService",
+    "full_name": "cyber.esports.v1.MessageService",
+    "package": "cyber.esports.v1",
+    "source_file": "cyber/esports/v1/message.proto",
+    "comment": "消息中心与首页横幅",
+    "methods": [
+      {
+        "name": "GetUnreadCount",
+        "full_name": "cyber.esports.v1.MessageService.GetUnreadCount",
+        "request_name": "GetUnreadCountRequest",
+        "request_full_name": "cyber.esports.v1.GetUnreadCountRequest",
+        "response_name": "GetUnreadCountResponse",
+        "response_full_name": "cyber.esports.v1.GetUnreadCountResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/messages/unread-count",
+        "comment": "未读消息数(红点)",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "ListBanners",
+        "full_name": "cyber.esports.v1.MessageService.ListBanners",
+        "request_name": "ListBannersRequest",
+        "request_full_name": "cyber.esports.v1.ListBannersRequest",
+        "response_name": "ListBannersResponse",
+        "response_full_name": "cyber.esports.v1.ListBannersResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/banners",
+        "comment": "首页横幅(在发布横幅,新→旧)",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "ListMessages",
+        "full_name": "cyber.esports.v1.MessageService.ListMessages",
+        "request_name": "ListMessagesRequest",
+        "request_full_name": "cyber.esports.v1.ListMessagesRequest",
+        "response_name": "ListMessagesResponse",
+        "response_full_name": "cyber.esports.v1.ListMessagesResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/messages",
+        "comment": "我的消息列表(含未读数)",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "MarkAllMessagesRead",
+        "full_name": "cyber.esports.v1.MessageService.MarkAllMessagesRead",
+        "request_name": "MarkAllMessagesReadRequest",
+        "request_full_name": "cyber.esports.v1.MarkAllMessagesReadRequest",
+        "response_name": "MarkAllMessagesReadResponse",
+        "response_full_name": "cyber.esports.v1.MarkAllMessagesReadResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/messages/read-all",
+        "comment": "全部消息已读",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "MarkMessageRead",
+        "full_name": "cyber.esports.v1.MessageService.MarkMessageRead",
+        "request_name": "MarkMessageReadRequest",
+        "request_full_name": "cyber.esports.v1.MarkMessageReadRequest",
+        "response_name": "MarkMessageReadResponse",
+        "response_full_name": "cyber.esports.v1.MarkMessageReadResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/messages/{message_id}/read",
+        "comment": "单条消息已读",
+        "access": "BUILTIN",
         "datascope": false
       }
     ]

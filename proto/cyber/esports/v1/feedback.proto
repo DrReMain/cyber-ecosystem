@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+package cyber.esports.v1;
+
+import "buf/validate/validate.proto";
+import "cyber/shared/common/v1/pagination.proto";
+import "ext/v1/access.proto";
+import "ext/v1/desc.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
+
+// The member face of the feedback domain: the six-category submit form,
+// the my-feedback list, and the conversation-shaped detail where a
+// follow-up question walks the ticket back to pending so the operator
+// sees it again. The ticket is a loop, not a form: submit → answer →
+// ask again → answer again, until the member is satisfied or the
+// operator closes it.
+service FeedbackService {
+  option (cyber.ext.v1.service_comment) = "意见反馈";
+  rpc SubmitFeedback(SubmitFeedbackRequest) returns (SubmitFeedbackResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "提交反馈"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/feedbacks"
+      body: "*"
+    };
+  }
+  rpc ListMyFeedbacks(ListMyFeedbacksRequest) returns (ListMyFeedbacksResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "我的反馈列表"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/feedbacks"};
+  }
+  rpc GetMyFeedback(GetMyFeedbackRequest) returns (GetMyFeedbackResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "我的反馈详情(对话)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/esports/feedbacks/{feedback_id}"};
+  }
+  rpc FollowUpFeedback(FollowUpFeedbackRequest) returns (FollowUpFeedbackResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "追问(回到待处理)"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/feedbacks/{feedback_id}/follow-ups"
+      body: "*"
+    };
+  }
+}
+
+// The submit form's six problem types, in the form's order.
+enum FeedbackCategory {
+  FEEDBACK_CATEGORY_UNSPECIFIED = 0;
+  // 功能异常
+  FEEDBACK_CATEGORY_FEATURE_BUG = 1;
+  // 测评体验
+  FEEDBACK_CATEGORY_ASSESSMENT = 2;
+  // 报告内容
+  FEEDBACK_CATEGORY_REPORT = 3;
+  // 付费与会员
+  FEEDBACK_CATEGORY_PAYMENT = 4;
+  // 账号问题
+  FEEDBACK_CATEGORY_ACCOUNT = 5;
+  // 其他建议
+  FEEDBACK_CATEGORY_OTHER = 6;
+}
+
+// Where the ticket stands. A follow-up walks replied back to pending;
+// closed is terminal — the member asks a new question on a new ticket.
+enum FeedbackStatus {
+  FEEDBACK_STATUS_UNSPECIFIED = 0;
+  FEEDBACK_STATUS_PENDING = 1;
+  FEEDBACK_STATUS_REPLIED = 2;
+  FEEDBACK_STATUS_CLOSED = 3;
+}
+
+// Who spoke this turn.
+enum FeedbackMessageSender {
+  FEEDBACK_MESSAGE_SENDER_UNSPECIFIED = 0;
+  FEEDBACK_MESSAGE_SENDER_USER = 1;
+  FEEDBACK_MESSAGE_SENDER_ADMIN = 2;
+}
+
+// The ticket root: what the list row renders. Content is denormalized
+// as the conversation's first message so the list needs no join.
+message Feedback {
+  google.protobuf.StringValue id = 1;
+  FeedbackCategory category = 2;
+  google.protobuf.StringValue content = 3;
+  // Where the operator may reach the member, offered optionally at
+  // submit; absent is the member choosing in-app contact only.
+  google.protobuf.StringValue contact = 4;
+  FeedbackStatus status = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// One turn of the conversation, oldest first — the initial submission
+// included, so the detail is one ordered list.
+message FeedbackMessage {
+  google.protobuf.StringValue id = 1;
+  FeedbackMessageSender sender = 2;
+  google.protobuf.StringValue content = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message SubmitFeedbackRequest {
+  optional FeedbackCategory category = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }
+  ];
+  optional string content = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 10
+      max_len: 500
+    }
+  ];
+  optional string contact = 3 [(buf.validate.field).string = {
+    min_len: 1
+    max_len: 128
+  }];
+}
+
+message SubmitFeedbackResponse {
+  Feedback feedback = 1;
+}
+
+message ListMyFeedbacksRequest {
+  cyber.shared.common.v1.PageRequest page = 1;
+}
+
+message ListMyFeedbacksResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  // Most recently active first — a ticket with a fresh answer or
+  // follow-up jumps the queue.
+  repeated Feedback feedbacks = 2;
+}
+
+message GetMyFeedbackRequest {
+  string feedback_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+}
+
+message GetMyFeedbackResponse {
+  Feedback feedback = 1;
+  repeated FeedbackMessage messages = 2;
+}
+
+message FollowUpFeedbackRequest {
+  string feedback_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 20
+    }
+  ];
+  optional string content = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 500
+    }
+  ];
+}
+
+message FollowUpFeedbackResponse {
+  // The ticket as it stands after the follow-up: pending again.
+  Feedback feedback = 1;
+}

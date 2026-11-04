@@ -9,8 +9,10 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/activationcode"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementconsent"
 	"cyber-ecosystem/app/services/esports/internal/ent/agreementversion"
+	"cyber-ecosystem/app/services/esports/internal/ent/announcement"
 	"cyber-ecosystem/app/services/esports/internal/ent/complianceconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/entitlement"
+	"cyber-ecosystem/app/services/esports/internal/ent/feedbackmessage"
 	"cyber-ecosystem/app/services/esports/internal/ent/game"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/matchsession"
@@ -23,6 +25,8 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/ent/test"
 	"cyber-ecosystem/app/services/esports/internal/ent/testconfig"
 	"cyber-ecosystem/app/services/esports/internal/ent/testrecord"
+	"cyber-ecosystem/app/services/esports/internal/ent/userfeedback"
+	"cyber-ecosystem/app/services/esports/internal/ent/usermessage"
 	"errors"
 	"fmt"
 	"reflect"
@@ -96,8 +100,10 @@ func checkColumn(t, c string) error {
 			activationcode.Table:   activationcode.ValidColumn,
 			agreementconsent.Table: agreementconsent.ValidColumn,
 			agreementversion.Table: agreementversion.ValidColumn,
+			announcement.Table:     announcement.ValidColumn,
 			complianceconfig.Table: complianceconfig.ValidColumn,
 			entitlement.Table:      entitlement.ValidColumn,
+			feedbackmessage.Table:  feedbackmessage.ValidColumn,
 			game.Table:             game.ValidColumn,
 			matchconfig.Table:      matchconfig.ValidColumn,
 			matchsession.Table:     matchsession.ValidColumn,
@@ -110,6 +116,8 @@ func checkColumn(t, c string) error {
 			test.Table:             test.ValidColumn,
 			testconfig.Table:       testconfig.ValidColumn,
 			testrecord.Table:       testrecord.ValidColumn,
+			userfeedback.Table:     userfeedback.ValidColumn,
+			usermessage.Table:      usermessage.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

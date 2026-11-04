@@ -138,5 +138,10 @@
   "error_ESPORTS_AGREEMENT_VERSION_NOT_FOUND": "Agreement version not found",
   "error_ESPORTS_AGREEMENT_VERSION_IS_CURRENT": "The current version cannot be deleted; switch to another version first",
   "error_ESPORTS_AGREEMENT_VERSION_DUPLICATE": "This version number already exists",
-  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "Agreement versions are not configured yet; contact the operator"
+  "error_ESPORTS_AGREEMENT_NOT_CONFIGURED": "Agreement versions are not configured yet; contact the operator",
+  "error_ESPORTS_FEEDBACK_NOT_FOUND": "Feedback not found",
+  "error_ESPORTS_FEEDBACK_NOT_OWNED": "You can only view your own feedback",
+  "error_ESPORTS_FEEDBACK_CLOSED": "This feedback is closed; submit a new one for further questions",
+  "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "Announcement not found",
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "The announcement's current state refuses this action"
 }

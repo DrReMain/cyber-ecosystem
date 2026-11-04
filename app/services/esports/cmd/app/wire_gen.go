@@ -17,9 +17,13 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/module/complianceadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/entitle"
 	"cyber-ecosystem/app/services/esports/internal/module/entitleadmin"
+	"cyber-ecosystem/app/services/esports/internal/module/feedback"
+	"cyber-ecosystem/app/services/esports/internal/module/feedbackadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/game"
 	"cyber-ecosystem/app/services/esports/internal/module/match"
 	"cyber-ecosystem/app/services/esports/internal/module/member"
+	"cyber-ecosystem/app/services/esports/internal/module/message"
+	"cyber-ecosystem/app/services/esports/internal/module/messageadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/order"
 	"cyber-ecosystem/app/services/esports/internal/module/orderadmin"
 	"cyber-ecosystem/app/services/esports/internal/module/profile"
@@ -116,7 +120,17 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	complianceRP := compliance.NewComplianceRP(logger, platformPlatform)
 	complianceUC := compliance.NewComplianceUC(logger, platformPlatform, complianceRP)
 	complianceAdminService := complianceadmin.NewComplianceAdminService(logger, complianceUC)
-	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService, agreementService, agreementAdminService, complianceAdminService)
+	messageRP := message.NewMessageRP(logger, platformPlatform)
+	messageUC := message.NewMessageUC(logger, platformPlatform, messageRP)
+	messageService := message.NewMessageService(logger, messageUC)
+	messageAdminUC := message.NewMessageAdminUC(logger, platformPlatform, messageRP, systemClient, entitlementRP)
+	messageAdminService := messageadmin.NewMessageAdminService(logger, messageAdminUC)
+	feedbackRP := feedback.NewFeedbackRP(logger, platformPlatform)
+	feedbackUC := feedback.NewFeedbackUC(logger, platformPlatform, feedbackRP)
+	feedbackService := feedback.NewFeedbackService(logger, feedbackUC)
+	feedbackAdminUC := feedback.NewFeedbackAdminUC(logger, platformPlatform, feedbackRP, profileRP, messageRP)
+	feedbackAdminService := feedbackadmin.NewFeedbackAdminService(logger, feedbackAdminUC)
+	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService, agreementService, agreementAdminService, complianceAdminService, messageService, messageAdminService, feedbackService, feedbackAdminService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
 	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
 	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)

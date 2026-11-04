@@ -318,6 +318,29 @@ export type CyberEsportsV1AgreementVersion = {
     body?: string;
 };
 
+export type CyberEsportsV1Announcement = {
+    id?: string;
+    kind?: 'ANNOUNCEMENT_KIND_UNSPECIFIED' | 'ANNOUNCEMENT_KIND_BANNER' | 'ANNOUNCEMENT_KIND_MESSAGE';
+    scope?: 'ANNOUNCEMENT_SCOPE_UNSPECIFIED' | 'ANNOUNCEMENT_SCOPE_ALL' | 'ANNOUNCEMENT_SCOPE_MEMBERSHIP';
+    title?: string;
+    content?: string;
+    status?: 'ANNOUNCEMENT_STATUS_UNSPECIFIED' | 'ANNOUNCEMENT_STATUS_DRAFT' | 'ANNOUNCEMENT_STATUS_PUBLISHED' | 'ANNOUNCEMENT_STATUS_OFFLINE';
+    /**
+     * Absent until published — the delivery moment.
+     */
+    publishedAt?: string;
+    /**
+     * Absent until offlined.
+     */
+    offlineAt?: string;
+    /**
+     * The operator who published; drafts carry none.
+     */
+    publishedBy?: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
 /**
  * The engine marks backgrounding spans; validity is judged server-side at
  * submit against TestConfig.background_invalid_seconds.
@@ -325,6 +348,16 @@ export type CyberEsportsV1AgreementVersion = {
 export type CyberEsportsV1BackgroundSpan = {
     elapsedMs?: number;
     durationMs?: number;
+};
+
+/**
+ * The banner face is a read of the published banner announcements; it
+ * carries no operator lifecycle fields.
+ */
+export type CyberEsportsV1Banner = {
+    title?: string;
+    content?: string;
+    publishedAt?: string;
 };
 
 export type CyberEsportsV1CareerImprovement = {
@@ -386,6 +419,14 @@ export type CyberEsportsV1CharacterCounterRound = {
     timeSpentMs?: number;
 };
 
+export type CyberEsportsV1CloseFeedbackRequest = {
+    feedbackId?: string;
+};
+
+export type CyberEsportsV1CloseFeedbackResponse = {
+    ticket?: CyberEsportsV1FeedbackTicket;
+};
+
 export type CyberEsportsV1CloseOrderRequest = {
     orderNo?: string;
 };
@@ -445,6 +486,17 @@ export type CyberEsportsV1CreateAgreementVersionRequest = {
 
 export type CyberEsportsV1CreateAgreementVersionResponse = {
     version?: CyberEsportsV1AgreementVersion;
+};
+
+export type CyberEsportsV1CreateAnnouncementRequest = {
+    kind?: 'ANNOUNCEMENT_KIND_UNSPECIFIED' | 'ANNOUNCEMENT_KIND_BANNER' | 'ANNOUNCEMENT_KIND_MESSAGE';
+    scope?: 'ANNOUNCEMENT_SCOPE_UNSPECIFIED' | 'ANNOUNCEMENT_SCOPE_ALL' | 'ANNOUNCEMENT_SCOPE_MEMBERSHIP';
+    title?: string;
+    content?: string;
+};
+
+export type CyberEsportsV1CreateAnnouncementResponse = {
+    announcement?: CyberEsportsV1Announcement;
 };
 
 export type CyberEsportsV1CreateOrderRequest = {
@@ -652,6 +704,55 @@ export type CyberEsportsV1ExportAgreementConsentsResponse = {
 };
 
 /**
+ * The ticket root: what the list row renders. Content is denormalized
+ * as the conversation's first message so the list needs no join.
+ */
+export type CyberEsportsV1Feedback = {
+    id?: string;
+    category?: 'FEEDBACK_CATEGORY_UNSPECIFIED' | 'FEEDBACK_CATEGORY_FEATURE_BUG' | 'FEEDBACK_CATEGORY_ASSESSMENT' | 'FEEDBACK_CATEGORY_REPORT' | 'FEEDBACK_CATEGORY_PAYMENT' | 'FEEDBACK_CATEGORY_ACCOUNT' | 'FEEDBACK_CATEGORY_OTHER';
+    content?: string;
+    /**
+     * Where the operator may reach the member, offered optionally at
+     * submit; absent is the member choosing in-app contact only.
+     */
+    contact?: string;
+    status?: 'FEEDBACK_STATUS_UNSPECIFIED' | 'FEEDBACK_STATUS_PENDING' | 'FEEDBACK_STATUS_REPLIED' | 'FEEDBACK_STATUS_CLOSED';
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+/**
+ * One turn of the conversation, oldest first — the initial submission
+ * included, so the detail is one ordered list.
+ */
+export type CyberEsportsV1FeedbackMessage = {
+    id?: string;
+    sender?: 'FEEDBACK_MESSAGE_SENDER_UNSPECIFIED' | 'FEEDBACK_MESSAGE_SENDER_USER' | 'FEEDBACK_MESSAGE_SENDER_ADMIN';
+    content?: string;
+    createdAt?: string;
+};
+
+/**
+ * The operator's ticket row: the member ticket with the nickname fold,
+ * so the queue reads one table instead of joining the profile plane.
+ */
+export type CyberEsportsV1FeedbackTicket = {
+    id?: string;
+    userId?: string;
+    /**
+     * The local profile's nickname; a member without one keeps null —
+     * the honest shape, never an error.
+     */
+    nickname?: string;
+    category?: 'FEEDBACK_CATEGORY_UNSPECIFIED' | 'FEEDBACK_CATEGORY_FEATURE_BUG' | 'FEEDBACK_CATEGORY_ASSESSMENT' | 'FEEDBACK_CATEGORY_REPORT' | 'FEEDBACK_CATEGORY_PAYMENT' | 'FEEDBACK_CATEGORY_ACCOUNT' | 'FEEDBACK_CATEGORY_OTHER';
+    content?: string;
+    contact?: string;
+    status?: 'FEEDBACK_STATUS_UNSPECIFIED' | 'FEEDBACK_STATUS_PENDING' | 'FEEDBACK_STATUS_REPLIED' | 'FEEDBACK_STATUS_CLOSED';
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+/**
  * flash_aiming — snap shots at flashing targets.
  */
 export type CyberEsportsV1FlashAimingDetail = {
@@ -670,6 +771,18 @@ export type CyberEsportsV1FlashAimingShot = {
     click?: CyberEsportsV1Point;
     deviation?: number;
     aimTimeMs?: number;
+};
+
+export type CyberEsportsV1FollowUpFeedbackRequest = {
+    feedbackId?: string;
+    content?: string;
+};
+
+export type CyberEsportsV1FollowUpFeedbackResponse = {
+    /**
+     * The ticket as it stands after the follow-up: pending again.
+     */
+    feedback?: CyberEsportsV1Feedback;
 };
 
 export type CyberEsportsV1Game = {
@@ -842,6 +955,14 @@ export type CyberEsportsV1GetComplianceConfigResponse = {
     config?: CyberEsportsV1ComplianceConfig;
 };
 
+export type CyberEsportsV1GetFeedbackResponse = {
+    ticket?: CyberEsportsV1FeedbackTicket;
+    /**
+     * The conversation, oldest first, initial submission included.
+     */
+    messages?: Array<CyberEsportsV1FeedbackMessage>;
+};
+
 export type CyberEsportsV1GetMatchSessionResponse = {
     session?: CyberEsportsV1MatchSession;
     /**
@@ -869,6 +990,11 @@ export type CyberEsportsV1GetMembershipResponse = {
     ageBand?: string;
     sex?: 'PROFILE_SEX_UNSPECIFIED' | 'PROFILE_SEX_MALE' | 'PROFILE_SEX_FEMALE' | 'PROFILE_SEX_UNDETERMINED';
     wechatBound?: boolean;
+};
+
+export type CyberEsportsV1GetMyFeedbackResponse = {
+    feedback?: CyberEsportsV1Feedback;
+    messages?: Array<CyberEsportsV1FeedbackMessage>;
 };
 
 export type CyberEsportsV1GetOrderResponse = {
@@ -1048,6 +1174,14 @@ export type CyberEsportsV1GetTrendReportResponse = {
     advancedAccess?: CyberEsportsV1ReportAccessVerdict;
 };
 
+export type CyberEsportsV1GetUnreadCountResponse = {
+    /**
+     * Plain scalar: the count exists whenever the call succeeds, and the
+     * badge renders a true zero as zero, never as unknown.
+     */
+    count?: number;
+};
+
 /**
  * grantMembership — the operator's manual twin of a settled order: the
  * same ledger row the settle path writes, with "manual" as the granting
@@ -1099,8 +1233,33 @@ export type CyberEsportsV1ListAgreementVersionsResponse = {
     versions?: Array<CyberEsportsV1AgreementVersion>;
 };
 
+export type CyberEsportsV1ListAnnouncementsResponse = {
+    /**
+     * Newest created first — an announcement ledger is a handful of rows
+     * per season, no paging.
+     */
+    announcements?: Array<CyberEsportsV1Announcement>;
+};
+
+export type CyberEsportsV1ListBannersResponse = {
+    /**
+     * A banner set is a handful of rows by nature — newest published
+     * first, no paging.
+     */
+    banners?: Array<CyberEsportsV1Banner>;
+};
+
 export type CyberEsportsV1ListCatalogSkusResponse = {
     skus?: Array<CyberEsportsV1AdminSku>;
+};
+
+export type CyberEsportsV1ListFeedbacksResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    /**
+     * Newest first — the table's reading order; the seat's working
+     * filter (the state segments) narrows it to the queue.
+     */
+    tickets?: Array<CyberEsportsV1FeedbackTicket>;
 };
 
 export type CyberEsportsV1ListGamesResponse = {
@@ -1124,6 +1283,28 @@ export type CyberEsportsV1ListMembershipsResponse = {
     activeCount?: number;
     expiringSoonCount?: number;
     expiredCount?: number;
+};
+
+export type CyberEsportsV1ListMessagesResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    /**
+     * Newest first.
+     */
+    messages?: Array<CyberEsportsV1Message>;
+    /**
+     * Plain scalar: the count exists whenever the call succeeds, and the
+     * badge renders a true zero as zero, never as unknown.
+     */
+    unreadCount?: number;
+};
+
+export type CyberEsportsV1ListMyFeedbacksResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    /**
+     * Most recently active first — a ticket with a fresh answer or
+     * follow-up jumps the queue.
+     */
+    feedbacks?: Array<CyberEsportsV1Feedback>;
 };
 
 export type CyberEsportsV1ListOrdersResponse = {
@@ -1156,6 +1337,26 @@ export type CyberEsportsV1ListTestAttemptsResponse = {
 
 export type CyberEsportsV1ListTestsResponse = {
     tests?: Array<CyberEsportsV1Test>;
+};
+
+export type CyberEsportsV1MarkAllMessagesReadRequest = {
+    [key: string]: unknown;
+};
+
+export type CyberEsportsV1MarkAllMessagesReadResponse = {
+    [key: string]: unknown;
+};
+
+export type CyberEsportsV1MarkMessageReadRequest = {
+    messageId?: string;
+};
+
+/**
+ * Empty on purpose: marking read is fire-and-forget — a message another
+ * device already read (or a racing id) is the same outcome as success.
+ */
+export type CyberEsportsV1MarkMessageReadResponse = {
+    [key: string]: unknown;
 };
 
 export type CyberEsportsV1MatchSession = {
@@ -1321,6 +1522,23 @@ export type CyberEsportsV1MergeAccountSummary = {
 };
 
 /**
+ * One row of the member's letterbox.
+ */
+export type CyberEsportsV1Message = {
+    id?: string;
+    type?: 'MESSAGE_TYPE_UNSPECIFIED' | 'MESSAGE_TYPE_ANNOUNCEMENT' | 'MESSAGE_TYPE_REPORT' | 'MESSAGE_TYPE_MEMBERSHIP' | 'MESSAGE_TYPE_FEEDBACK_REPLY';
+    title?: string;
+    content?: string;
+    /**
+     * Present when the type carries a deep link — report holds the
+     * attempt's id, feedback_reply the feedback id; absent otherwise.
+     */
+    refId?: string;
+    isRead?: boolean;
+    createdAt?: string;
+};
+
+/**
  * moving_target — tracking across movement patterns; the pattern phase is a
  * fact the server needs to reproduce per-pattern aggregates (legacy had it
  * only as a client-side summary).
@@ -1430,6 +1648,14 @@ export type CyberEsportsV1OffenseDefenseDecision = {
  */
 export type CyberEsportsV1OffenseDefenseDetail = {
     decisions?: Array<CyberEsportsV1OffenseDefenseDecision>;
+};
+
+export type CyberEsportsV1OfflineAnnouncementRequest = {
+    announcementId?: string;
+};
+
+export type CyberEsportsV1OfflineAnnouncementResponse = {
+    announcement?: CyberEsportsV1Announcement;
 };
 
 export type CyberEsportsV1Order = {
@@ -1576,6 +1802,14 @@ export type CyberEsportsV1ProfileGame = {
     customName?: string;
 };
 
+export type CyberEsportsV1PublishAnnouncementRequest = {
+    announcementId?: string;
+};
+
+export type CyberEsportsV1PublishAnnouncementResponse = {
+    announcement?: CyberEsportsV1Announcement;
+};
+
 /**
  * One banked scenario. The answer key rides in full — operator visibility
  * into what correctness is judged against is the point of this face.
@@ -1631,6 +1865,15 @@ export type CyberEsportsV1RedeemActivationCodeResponse = {
      */
     expiresAt?: string;
     grantedAt?: string;
+};
+
+export type CyberEsportsV1ReplyFeedbackRequest = {
+    feedbackId?: string;
+    content?: string;
+};
+
+export type CyberEsportsV1ReplyFeedbackResponse = {
+    ticket?: CyberEsportsV1FeedbackTicket;
 };
 
 /**
@@ -1929,6 +2172,16 @@ export type CyberEsportsV1Sku = {
     updatedAt?: string;
 };
 
+export type CyberEsportsV1SubmitFeedbackRequest = {
+    category?: 'FEEDBACK_CATEGORY_UNSPECIFIED' | 'FEEDBACK_CATEGORY_FEATURE_BUG' | 'FEEDBACK_CATEGORY_ASSESSMENT' | 'FEEDBACK_CATEGORY_REPORT' | 'FEEDBACK_CATEGORY_PAYMENT' | 'FEEDBACK_CATEGORY_ACCOUNT' | 'FEEDBACK_CATEGORY_OTHER';
+    content?: string;
+    contact?: string;
+};
+
+export type CyberEsportsV1SubmitFeedbackResponse = {
+    feedback?: CyberEsportsV1Feedback;
+};
+
 export type CyberEsportsV1SubmitTestAttemptRequest = {
     /**
      * Code join key (e.g. "red_dot") — same law as Test.code.
@@ -2177,6 +2430,16 @@ export type CyberEsportsV1TrendPoint = {
     at?: string;
     percentile?: number;
     genre?: string;
+};
+
+export type CyberEsportsV1UpdateAnnouncementRequest = {
+    announcementId?: string;
+    title?: string;
+    content?: string;
+};
+
+export type CyberEsportsV1UpdateAnnouncementResponse = {
+    announcement?: CyberEsportsV1Announcement;
 };
 
 /**
@@ -4276,6 +4539,111 @@ export type AgreementServiceGetAgreementCurrentResponses = {
 
 export type AgreementServiceGetAgreementCurrentResponse = AgreementServiceGetAgreementCurrentResponses[keyof AgreementServiceGetAgreementCurrentResponses];
 
+export type MessageAdminServiceListAnnouncementsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        kind?: 'ANNOUNCEMENT_KIND_UNSPECIFIED' | 'ANNOUNCEMENT_KIND_BANNER' | 'ANNOUNCEMENT_KIND_MESSAGE';
+        status?: 'ANNOUNCEMENT_STATUS_UNSPECIFIED' | 'ANNOUNCEMENT_STATUS_DRAFT' | 'ANNOUNCEMENT_STATUS_PUBLISHED' | 'ANNOUNCEMENT_STATUS_OFFLINE';
+    };
+    url: '/api/v1/esports/announcements';
+};
+
+export type MessageAdminServiceListAnnouncementsResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListAnnouncementsResponse;
+};
+
+export type MessageAdminServiceListAnnouncementsResponse = MessageAdminServiceListAnnouncementsResponses[keyof MessageAdminServiceListAnnouncementsResponses];
+
+export type MessageAdminServiceCreateAnnouncementData = {
+    body: CyberEsportsV1CreateAnnouncementRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/announcements';
+};
+
+export type MessageAdminServiceCreateAnnouncementResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1CreateAnnouncementResponse;
+};
+
+export type MessageAdminServiceCreateAnnouncementResponse = MessageAdminServiceCreateAnnouncementResponses[keyof MessageAdminServiceCreateAnnouncementResponses];
+
+export type MessageAdminServiceUpdateAnnouncementData = {
+    body: CyberEsportsV1UpdateAnnouncementRequest;
+    path: {
+        announcementId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/announcements/{announcementId}';
+};
+
+export type MessageAdminServiceUpdateAnnouncementResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1UpdateAnnouncementResponse;
+};
+
+export type MessageAdminServiceUpdateAnnouncementResponse = MessageAdminServiceUpdateAnnouncementResponses[keyof MessageAdminServiceUpdateAnnouncementResponses];
+
+export type MessageAdminServiceOfflineAnnouncementData = {
+    body: CyberEsportsV1OfflineAnnouncementRequest;
+    path: {
+        announcementId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/announcements/{announcementId}/offline';
+};
+
+export type MessageAdminServiceOfflineAnnouncementResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1OfflineAnnouncementResponse;
+};
+
+export type MessageAdminServiceOfflineAnnouncementResponse = MessageAdminServiceOfflineAnnouncementResponses[keyof MessageAdminServiceOfflineAnnouncementResponses];
+
+export type MessageAdminServicePublishAnnouncementData = {
+    body: CyberEsportsV1PublishAnnouncementRequest;
+    path: {
+        announcementId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/announcements/{announcementId}/publish';
+};
+
+export type MessageAdminServicePublishAnnouncementResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1PublishAnnouncementResponse;
+};
+
+export type MessageAdminServicePublishAnnouncementResponse = MessageAdminServicePublishAnnouncementResponses[keyof MessageAdminServicePublishAnnouncementResponses];
+
+export type MessageServiceListBannersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/banners';
+};
+
+export type MessageServiceListBannersResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListBannersResponse;
+};
+
+export type MessageServiceListBannersResponse = MessageServiceListBannersResponses[keyof MessageServiceListBannersResponses];
+
 export type SkuAdminServiceListCatalogSkusData = {
     body?: never;
     path?: never;
@@ -4423,6 +4791,103 @@ export type EntitlementServiceRedeemActivationCodeResponses = {
 };
 
 export type EntitlementServiceRedeemActivationCodeResponse = EntitlementServiceRedeemActivationCodeResponses[keyof EntitlementServiceRedeemActivationCodeResponses];
+
+export type FeedbackServiceListMyFeedbacksData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/esports/feedbacks';
+};
+
+export type FeedbackServiceListMyFeedbacksResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListMyFeedbacksResponse;
+};
+
+export type FeedbackServiceListMyFeedbacksResponse = FeedbackServiceListMyFeedbacksResponses[keyof FeedbackServiceListMyFeedbacksResponses];
+
+export type FeedbackServiceSubmitFeedbackData = {
+    body: CyberEsportsV1SubmitFeedbackRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/feedbacks';
+};
+
+export type FeedbackServiceSubmitFeedbackResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1SubmitFeedbackResponse;
+};
+
+export type FeedbackServiceSubmitFeedbackResponse = FeedbackServiceSubmitFeedbackResponses[keyof FeedbackServiceSubmitFeedbackResponses];
+
+export type FeedbackServiceGetMyFeedbackData = {
+    body?: never;
+    path: {
+        feedbackId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/feedbacks/{feedbackId}';
+};
+
+export type FeedbackServiceGetMyFeedbackResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetMyFeedbackResponse;
+};
+
+export type FeedbackServiceGetMyFeedbackResponse = FeedbackServiceGetMyFeedbackResponses[keyof FeedbackServiceGetMyFeedbackResponses];
+
+export type FeedbackServiceFollowUpFeedbackData = {
+    body: CyberEsportsV1FollowUpFeedbackRequest;
+    path: {
+        feedbackId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/feedbacks/{feedbackId}/follow-ups';
+};
+
+export type FeedbackServiceFollowUpFeedbackResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1FollowUpFeedbackResponse;
+};
+
+export type FeedbackServiceFollowUpFeedbackResponse = FeedbackServiceFollowUpFeedbackResponses[keyof FeedbackServiceFollowUpFeedbackResponses];
 
 export type GameServiceListGamesData = {
     body?: never;
@@ -4679,6 +5144,101 @@ export type EntitleAdminServiceTerminateMembershipResponses = {
 };
 
 export type EntitleAdminServiceTerminateMembershipResponse = EntitleAdminServiceTerminateMembershipResponses[keyof EntitleAdminServiceTerminateMembershipResponses];
+
+export type MessageServiceListMessagesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/esports/messages';
+};
+
+export type MessageServiceListMessagesResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListMessagesResponse;
+};
+
+export type MessageServiceListMessagesResponse = MessageServiceListMessagesResponses[keyof MessageServiceListMessagesResponses];
+
+export type MessageServiceMarkAllMessagesReadData = {
+    body: CyberEsportsV1MarkAllMessagesReadRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/messages/read-all';
+};
+
+export type MessageServiceMarkAllMessagesReadResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1MarkAllMessagesReadResponse;
+};
+
+export type MessageServiceMarkAllMessagesReadResponse = MessageServiceMarkAllMessagesReadResponses[keyof MessageServiceMarkAllMessagesReadResponses];
+
+export type MessageServiceGetUnreadCountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/esports/messages/unread-count';
+};
+
+export type MessageServiceGetUnreadCountResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetUnreadCountResponse;
+};
+
+export type MessageServiceGetUnreadCountResponse = MessageServiceGetUnreadCountResponses[keyof MessageServiceGetUnreadCountResponses];
+
+export type MessageServiceMarkMessageReadData = {
+    body: CyberEsportsV1MarkMessageReadRequest;
+    path: {
+        messageId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/messages/{messageId}/read';
+};
+
+export type MessageServiceMarkMessageReadResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1MarkMessageReadResponse;
+};
+
+export type MessageServiceMarkMessageReadResponse = MessageServiceMarkMessageReadResponses[keyof MessageServiceMarkMessageReadResponses];
 
 export type OrderServiceListOrdersData = {
     body?: never;
@@ -5165,6 +5725,106 @@ export type TestServiceGetTestConfigResponses = {
 };
 
 export type TestServiceGetTestConfigResponse = TestServiceGetTestConfigResponses[keyof TestServiceGetTestConfigResponses];
+
+export type FeedbackAdminServiceListFeedbacksData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+        status?: 'FEEDBACK_STATUS_UNSPECIFIED' | 'FEEDBACK_STATUS_PENDING' | 'FEEDBACK_STATUS_REPLIED' | 'FEEDBACK_STATUS_CLOSED';
+    };
+    url: '/api/v1/esports/user-feedbacks';
+};
+
+export type FeedbackAdminServiceListFeedbacksResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListFeedbacksResponse;
+};
+
+export type FeedbackAdminServiceListFeedbacksResponse = FeedbackAdminServiceListFeedbacksResponses[keyof FeedbackAdminServiceListFeedbacksResponses];
+
+export type FeedbackAdminServiceGetFeedbackData = {
+    body?: never;
+    path: {
+        feedbackId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/user-feedbacks/{feedbackId}';
+};
+
+export type FeedbackAdminServiceGetFeedbackResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1GetFeedbackResponse;
+};
+
+export type FeedbackAdminServiceGetFeedbackResponse = FeedbackAdminServiceGetFeedbackResponses[keyof FeedbackAdminServiceGetFeedbackResponses];
+
+export type FeedbackAdminServiceCloseFeedbackData = {
+    body: CyberEsportsV1CloseFeedbackRequest;
+    path: {
+        feedbackId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/user-feedbacks/{feedbackId}/close';
+};
+
+export type FeedbackAdminServiceCloseFeedbackResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1CloseFeedbackResponse;
+};
+
+export type FeedbackAdminServiceCloseFeedbackResponse = FeedbackAdminServiceCloseFeedbackResponses[keyof FeedbackAdminServiceCloseFeedbackResponses];
+
+export type FeedbackAdminServiceReplyFeedbackData = {
+    body: CyberEsportsV1ReplyFeedbackRequest;
+    path: {
+        feedbackId: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/user-feedbacks/{feedbackId}/reply';
+};
+
+export type FeedbackAdminServiceReplyFeedbackResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ReplyFeedbackResponse;
+};
+
+export type FeedbackAdminServiceReplyFeedbackResponse = FeedbackAdminServiceReplyFeedbackResponses[keyof FeedbackAdminServiceReplyFeedbackResponses];
 
 export type AuditServiceListAuditLogsData = {
     body?: never;

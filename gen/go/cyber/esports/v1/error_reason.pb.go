@@ -80,6 +80,20 @@ const (
 	// seed lands; recording consent against nothing is refused rather than
 	// silently backdated to whatever comes next.
 	Esports_ESPORTS_AGREEMENT_NOT_CONFIGURED Esports = 6173
+	// 618x: message & feedback
+	Esports_ESPORTS_FEEDBACK_NOT_FOUND Esports = 6180
+	// The ticket exists but belongs to another member — the member plane's
+	// own-key check, kept distinct from absent so support can tell a lost
+	// id from a borrowed one.
+	Esports_ESPORTS_FEEDBACK_NOT_OWNED Esports = 6181
+	// Closed is terminal: no member follow-up and no operator answer
+	// reopens it — the asker opens a new ticket instead.
+	Esports_ESPORTS_FEEDBACK_CLOSED        Esports = 6182
+	Esports_ESPORTS_ANNOUNCEMENT_NOT_FOUND Esports = 6183
+	// The row's state refuses the move — publishing a non-draft, editing a
+	// published row, offlining a draft. The operator switches the row's
+	// state deliberately, never by accident.
+	Esports_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT Esports = 6184
 )
 
 // Enum value maps for Esports.
@@ -118,6 +132,11 @@ var (
 		6171: "ESPORTS_AGREEMENT_VERSION_IS_CURRENT",
 		6172: "ESPORTS_AGREEMENT_VERSION_DUPLICATE",
 		6173: "ESPORTS_AGREEMENT_NOT_CONFIGURED",
+		6180: "ESPORTS_FEEDBACK_NOT_FOUND",
+		6181: "ESPORTS_FEEDBACK_NOT_OWNED",
+		6182: "ESPORTS_FEEDBACK_CLOSED",
+		6183: "ESPORTS_ANNOUNCEMENT_NOT_FOUND",
+		6184: "ESPORTS_ANNOUNCEMENT_STATE_CONFLICT",
 	}
 	Esports_value = map[string]int32{
 		"ESPORTS_UNSPECIFIED":                       0,
@@ -153,6 +172,11 @@ var (
 		"ESPORTS_AGREEMENT_VERSION_IS_CURRENT":      6171,
 		"ESPORTS_AGREEMENT_VERSION_DUPLICATE":       6172,
 		"ESPORTS_AGREEMENT_NOT_CONFIGURED":          6173,
+		"ESPORTS_FEEDBACK_NOT_FOUND":                6180,
+		"ESPORTS_FEEDBACK_NOT_OWNED":                6181,
+		"ESPORTS_FEEDBACK_CLOSED":                   6182,
+		"ESPORTS_ANNOUNCEMENT_NOT_FOUND":            6183,
+		"ESPORTS_ANNOUNCEMENT_STATE_CONFLICT":       6184,
 	}
 )
 
@@ -187,7 +211,7 @@ var File_cyber_esports_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\x85\v\n" +
+	"#cyber/esports/v1/error_reason.proto\x12\x10cyber.esports.v1\x1a\x13errors/errors.proto*\xd2\f\n" +
 	"\aEsports\x12\x1d\n" +
 	"\x13ESPORTS_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x124\n" +
 	")ESPORTS_PROFILE_GUARDIAN_CONSENT_REQUIRED\x10\xd4/\x1a\x04\xa8E\x90\x03\x12'\n" +
@@ -221,7 +245,12 @@ const file_cyber_esports_v1_error_reason_proto_rawDesc = "" +
 	"#ESPORTS_AGREEMENT_VERSION_NOT_FOUND\x10\x9a0\x1a\x04\xa8E\x94\x03\x12/\n" +
 	"$ESPORTS_AGREEMENT_VERSION_IS_CURRENT\x10\x9b0\x1a\x04\xa8E\x90\x03\x12.\n" +
 	"#ESPORTS_AGREEMENT_VERSION_DUPLICATE\x10\x9c0\x1a\x04\xa8E\x90\x03\x12+\n" +
-	" ESPORTS_AGREEMENT_NOT_CONFIGURED\x10\x9d0\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	" ESPORTS_AGREEMENT_NOT_CONFIGURED\x10\x9d0\x1a\x04\xa8E\x90\x03\x12%\n" +
+	"\x1aESPORTS_FEEDBACK_NOT_FOUND\x10\xa40\x1a\x04\xa8E\x94\x03\x12%\n" +
+	"\x1aESPORTS_FEEDBACK_NOT_OWNED\x10\xa50\x1a\x04\xa8E\x93\x03\x12\"\n" +
+	"\x17ESPORTS_FEEDBACK_CLOSED\x10\xa60\x1a\x04\xa8E\x90\x03\x12)\n" +
+	"\x1eESPORTS_ANNOUNCEMENT_NOT_FOUND\x10\xa70\x1a\x04\xa8E\x94\x03\x12.\n" +
+	"#ESPORTS_ANNOUNCEMENT_STATE_CONFLICT\x10\xa80\x1a\x04\xa8E\x90\x03\x1a\x04\xa0E\x90\x03B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_error_reason_proto_rawDescOnce sync.Once

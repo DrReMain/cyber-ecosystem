@@ -144,5 +144,10 @@
   "error_network_sub_keep": "本次进度已保留",
   "error_network_sub_tail": "，不会因网络问题丢失。",
   "error_back": "返回上一页",
-  "error_code": "错误码："
+  "error_code": "错误码：",
+  "error_ESPORTS_FEEDBACK_NOT_FOUND": "反馈不存在",
+  "error_ESPORTS_FEEDBACK_NOT_OWNED": "只能查看自己的反馈",
+  "error_ESPORTS_FEEDBACK_CLOSED": "该反馈已关闭，如有新问题请重新提交",
+  "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "公告不存在",
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "公告当前状态不支持该操作"
 }
