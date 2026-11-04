@@ -140,3 +140,39 @@ Q1 收口:审计毕,余项全在队列(①⑤⑥=lzx;②=lzx 已裁待落;P11=lj
 **lzx 队列注(微)**:profile ③ 已开通态「已解锁 N 份报告 永久保留」行无 wire 计数(digest 无 trial 解锁计数;admin MembershipSummary.unlockCount 有先例)——PAY3 前随 digest 或订单面携带,本片以 parked 注让位不硬编码。
 
 **Q4 收口(11-04)**:七面审毕,两发现全落(①profile ③ 两态本卡回位 ②④ 卡解锁分叉);其余五面过/登记。**活探抓真雷一枚:运行时 memberUntil=JSON 平铺 ISO 标量非水合 Timestamp,seconds 读法 NaN→toISOString 抛→整面 ERR——修为 agreement 面双形状读法(string|{seconds}),不可读落「—」不抛面**。活探=hzypw 真登录双向:非会员态 ③ 卡逐字→admin GrantMembership 授 31 天(至 12-05)→首页 greet=专属会员·有效期内(**Q1-① 三态会员支首度活证**)+profile 已开通/有效期至 2026-12-05/③ 会员句逐字+中心四卡判决全翻(单报告/认知=已解锁,趋势=**进阶已解锁三态键首度活证**)→Terminate 回 pitch 态(键控双向);④ 卡 unlocked 支=走查号无锚记录不可达(Q2 同款),桌面+e2e 承载。回归门=ctr 链 --skip-nx-cache+paraglide+单测 22 文件/134+门控 e2e 4 过 2 跳 0 败。Q 线 Q1-Q4 毕,Q5 admin 面(W5)待派。
+
+## Q5 admin 已建面(11-04 开工;射面=esports 自有 14 面;骨架面不在射面)
+
+清单基线=原型 admin outputs/prototype 14 页(D-AQ:功能规划+文案维度逐字,antd 视觉自由)+admin-nav-anchor.md(组/名真值)+proto 契约+demand-ledger;O-1(返回带目标名)/O-2(操作列详情打头+终态降级文本)/O-3(敏感操作「敏感·二次确认·入审计」+执法语义)三断言形状+空态逐面核。已毕走查(会员 M2-1/SKU·订单 M2-2/激活码 M2-3/用户详情首刀 M2-4/E9 合规族/R5 复扫)不重复存量判定,只记独立复核新发现;G-301/302 菜单裁定在案吸收。
+
+### 逐项清单
+
+| 段 | 面 | 原型→重建 | 校对点(三源断言) | 态 |
+|---|---|---|---|---|
+| I1 | 用户列表 | 01-user-list→people/users | 组名「用户与会员」+页名+列集+筛集+行去向;空态;O-1/2 | 审毕(①) |
+| I2 | 用户详情 | 02-user-detail→people/users/$id | Tab 集(资料/测评记录/会员/trace 暂缓/messages 随 MSG-1);返回「返回用户列表」;O-1 | 审毕(过) |
+| I3 | 会员管理 | 01-member-list→people/members | 四 Tab(全部/有效/≤7 天到期/已过期)+来源筛;列+状态词;oracle=admin-member-anchor.md | 审毕(过) |
+| I4 | 会员详情 | 02-member-detail→people/members/$id | 有效期/来源/续订史 append-only 展示;开通-续费-终止 Modal+五语言;O-3 执法语义 | 审毕(过) |
+| I5 | SKU 管理 | sku-manage→pricing/skus | 列集+改价敏感入审计+上下架即时同步;O-2/O-3 | 审毕(过) |
+| I6 | 订单与解锁记录 | 04-order-record→pricing/orders | 列集+状态词+筛;解锁记录视图(去向/来源)在场 | 审毕(②) |
+| I7 | 订单详情 | 05-order-detail→pricing/orders/$id | 事实行集(订单号/金额/渠道/状态/时间线);关闭操作+O-3;O-1 返回 | 审毕(过) |
+| I8 | 激活码管理 | activation-code→channels/activation-codes | 批次列表+创建流+停用(未核销即失效)+导出 CSV;O-3 | 审毕(过) |
+| I9 | 码表明细 | activation-code-detail→channels/activation-codes/$batchNo | 逐码核销人/时间+进度条+≥95% 补码提示 | 审毕(过) |
+| I10 | 协议版本 | agreement-manage→compliance/agreement-versions | 版本列表+发布/下架流+真源 versions.ts 口径 | 审毕(过) |
+| I11 | 同意记录 | agreement-consent→compliance/agreement-consents | 记录列集+筛(版本/用户/时间) | 审毕(登记) |
+| I12 | 合规配置 | compliance-config→compliance/compliance-config | 出生采集开关+付费年龄线+提示文案;敏感二次确认+入审计 | 审毕(过) |
+| I13 | 报告访问策略 | report-config→reports/report-policies | 策略面(open/membership/tenant/closed 四值×报告族);D-AB 计费口径 | 审毕(过) |
+| I14 | 游戏与因子配置 | game-config→assessment/game-config | 阵容/能力/渲染序呈现+编辑执法 | 审毕(登记) |
+
+### 发现与处置(11-04,桌面三源对照+admin 活探)
+
+| # | 面 | 断言与证据 | 级 | 处置 |
+|---|---|---|---|---|
+| Q5-① | I1/I2 users 两页「会员」词面残留族 | G-302 正名只改了页名(用户列表/用户详情),体内词族仍说会员:列头 col_user=会员/空态 暂无会员/计数 共 N 名会员/封禁确认 确认封禁该会员？+该会员的存量会话…/详情错误态 会员不存在或无法访问——N-3 概念错位的残留半边;另 副标题缺(原型 通用档案入口：点「详情」进用户档案…本页零 desc,orders/skus/members/compliance 均有)+出生行缺(原型 用户与画像 cell 出生 2008-06✓/出生未采集⚠,Member wire 有 birth_year/month,纯呈现) | 字面+呈现 | **已修**(五语言):词族 会员→用户(列头/空态/计数/封禁·解禁确认/详情错误态);补 desc=通用档案入口句(去「本原型仅开放」原型自注);年龄段列下补出生行(yyyy-mm/出生未采集) |
+| Q5-② | I6 orders 列头/筛选项词漂 | 原型列=订单号/用户/商品/金额/**解锁方式**/渠道/状态/时间/操作+筛 商品：全部/单次 · 报告解锁/**会员 · 月卡**;重建列头=类型(scope 列)、筛选项=会员 | 字面 | **已修**(五语言):col_scope 类型→解锁方式;scope_period 会员→会员 · 月卡 |
+
+过面孔(11/14):I2 用户详情六 Tab 齐+O-1 返回用户列表;I3/I4 会员两页=admin-member-anchor §三白名单(扫描/提醒/批量续费/导出/订单记录按钮)+§四六钉(续费顺延 append-only/终止只改状态/状态四值/来源三值/统计三卡/掩码形)全过;I5 SKU 七列逐字+改价/上下架 O-3;I7 订单详情八事实行+#单号题头+退款口径+解锁三态;I8/I9 激活码两页(停用=未核销即失效+已核销不变/码表逐码+导出+补码);I10 协议版本七列逐字+设为当前/删除审计注;I12 合规配置三卡逐字(出生采集/年龄线敏感 Modal/提示文案默认句)+callout 逐字;I13 报告访问策略 tenant 刻意不提供(服务端拒绝在先,注释在案)。
+
+登记不修:I11 同意记录 渠道 列+desc 半句——契约 AgreementConsent 无 channel 字段(仅 login_method),**lzx 队列注**(渠道轴语义 vs 并入登录方式,一句裁);I14 game-config 呈现塌缩——原型 难度预设/三档权重/简·标·难/单位分 四列+因子配置抽屉(config_type 五组+单调性校验) vs 重建 运行配置调参 平表(键值+整体替换),原型页自注=真实 schema=test_config 平键值,重建更贴 schema 真相;**登记分歧不建列**(具名列=特定 config 键的派生呈现,抽屉已可编辑同物),状态/上下架=M2 余组 test-type 档案面在案;users 批量导入/导出 CSV=P24 族、最近登录/测评/报告解锁/会员列+来源/年龄段/设备筛=契约无字段(P23 login_record 冷存/trace 暂缓在案)。
+
+**Q5 收口(11-04)**:14 面审毕,两发现全落(①users 词族+副标题+出生行 ②orders 列头/筛词,皆五语言);11 面过,2 面登记,1 微注入 lzx 队列(consent 渠道)。活探=admin 真登录读 users 页(题头+desc 逐字/列头 用户/出生 2000-06 行在/残留「会员」仅余菜单组合法名)+orders 页(解锁方式列头/desc 逐字/诚实空态)。回归门=admin 链 --skip-nx-cache+单测 3 文件/12+paraglide 五语言平价。admin:dev 临时起毕即停。**Q 线 Q1-Q5 毕;余 Q6 服务端仲裁(lzx 陪跑,未排窗)**。

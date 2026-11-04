@@ -6,7 +6,7 @@
   "esports_users_filter_any": "すべて",
   "esports_users_status_on": "有効",
   "esports_users_status_off": "禁止",
-  "esports_users_col_user": "メンバー",
+  "esports_users_col_user": "ユーザー",
   "esports_users_col_age_band": "年齢層",
   "esports_users_col_registered_at": "登録日時",
   "esports_users_col_status": "状態",
@@ -20,12 +20,15 @@
   "esports_users_band_26_29": "26-29歳",
   "esports_users_band_30_40": "30-40歳",
   "esports_users_band_over40": "40歳以上",
-  "esports_users_total": "メンバー {n} 名",
-  "esports_users_empty": "メンバーがいません",
+  "esports_users_total": "ユーザー {n} 名",
+  "esports_users_empty": "ユーザーがいません",
   "esports_users_act_detail": "詳細",
   "esports_users_act_ban": "禁止",
   "esports_users_act_unban": "禁止解除",
-  "esports_users_ban_confirm_title": "このメンバーを禁止しますか？",
+  "esports_users_ban_confirm_title": "このユーザーを禁止しますか？",
   "esports_users_ban_confirm_description": "既存セッションは次のリクエストで失効します。操作は監査に記録されます。",
-  "esports_users_unban_confirm_title": "このメンバーの禁止を解除しますか？"
+  "esports_users_unban_confirm_title": "このユーザーの禁止を解除しますか？",
+  "esports_users_desc": "汎用プロフィール入口：「詳細」からユーザーファイルを開く（概要・履歴・測評とレポートは詳細ページ内で切り替わります）",
+  "esports_users_birth": "生年月日 {date}",
+  "esports_users_birth_uncollected": "生年月日 未収集"
 }

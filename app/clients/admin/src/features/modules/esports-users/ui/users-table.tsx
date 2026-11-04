@@ -50,7 +50,22 @@ export function UsersTable({
       width: 110,
       render: (_, row) =>
         row.ageBand ? (
-          <Tag className="m-0">{bandLabel(row.ageBand)}</Tag>
+          <div className="flex flex-col">
+            <Tag className="m-0">{bandLabel(row.ageBand)}</Tag>
+            {/* The prototype's 用户与画像 cell carries the birth datum
+                beside the band; an absent birth speaks its own word. */}
+            {row.birthYear != null && row.birthMonth != null ? (
+              <Typography.Text className="mt-0.5 text-[11px]" type="secondary">
+                {m.esports_users_birth({
+                  date: `${row.birthYear}-${String(row.birthMonth).padStart(2, "0")}`,
+                })}
+              </Typography.Text>
+            ) : (
+              <Typography.Text className="mt-0.5 text-[11px]" type="secondary">
+                {m.esports_users_birth_uncollected()}
+              </Typography.Text>
+            )}
+          </div>
         ) : (
           <Typography.Text type="secondary">-</Typography.Text>
         ),

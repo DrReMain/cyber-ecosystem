@@ -1,7 +1,7 @@
 {
   "esports_user_detail_title": "用户详情",
   "esports_user_detail_back": "返回用户列表",
-  "esports_user_detail_error": "会员不存在或无法访问",
+  "esports_user_detail_error": "用户不存在或无法访问",
   "esports_user_detail_not_open": "暂未开放",
   "esports_user_detail_tab_overview": "总览",
   "esports_user_detail_tab_trace": "溯源",

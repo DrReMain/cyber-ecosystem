@@ -4,7 +4,7 @@ import { updateUserStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v
 import { Filter } from "@cyber-ecosystem/shared-antd/filter";
 import { useFilter, useServerPagination } from "@cyber-ecosystem/shared-antd/use-search";
 import { useSearch } from "@tanstack/react-router";
-import { Card } from "antd";
+import { Card, Typography } from "antd";
 import { useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
 import { parseUsersSearch, usersSearchSchema } from "./search";
@@ -29,6 +29,14 @@ export function EsportsUsersPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
+      <div>
+        <Typography.Title className="!mb-0" level={4}>
+          {m.esports_users_title()}
+        </Typography.Title>
+        <Typography.Text className="text-xs" type="secondary">
+          {m.esports_users_desc()}
+        </Typography.Text>
+      </div>
       <Card>
         <Filter
           columns={4}

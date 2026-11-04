@@ -1,7 +1,7 @@
 {
   "esports_user_detail_title": "ユーザー詳細",
   "esports_user_detail_back": "ユーザー一覧に戻る",
-  "esports_user_detail_error": "メンバーが見つからないかアクセスできません",
+  "esports_user_detail_error": "ユーザーが見つからないかアクセスできません",
   "esports_user_detail_not_open": "現在未提供",
   "esports_user_detail_tab_overview": "概要",
   "esports_user_detail_tab_trace": "追跡",

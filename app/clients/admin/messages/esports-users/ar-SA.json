@@ -6,7 +6,7 @@
   "esports_users_filter_any": "الكل",
   "esports_users_status_on": "نشط",
   "esports_users_status_off": "محظور",
-  "esports_users_col_user": "العضو",
+  "esports_users_col_user": "المستخدم",
   "esports_users_col_age_band": "الفئة العمرية",
   "esports_users_col_registered_at": "تاريخ التسجيل",
   "esports_users_col_status": "الحالة",
@@ -20,12 +20,15 @@
   "esports_users_band_26_29": "26-29",
   "esports_users_band_30_40": "30-40",
   "esports_users_band_over40": "أكثر من 40",
-  "esports_users_total": "{n} عضوًا",
-  "esports_users_empty": "لا يوجد أعضاء",
+  "esports_users_total": "{n} مستخدمًا",
+  "esports_users_empty": "لا يوجد مستخدمون",
   "esports_users_act_detail": "التفاصيل",
   "esports_users_act_ban": "حظر",
   "esports_users_act_unban": "إلغاء الحظر",
-  "esports_users_ban_confirm_title": "حظر هذا العضو؟",
+  "esports_users_ban_confirm_title": "حظر هذا المستخدم؟",
   "esports_users_ban_confirm_description": "تتوقف جلساته القائمة عند الطلب التالي؛ ويُسجَّل الإجراء في التدقيق.",
-  "esports_users_unban_confirm_title": "إلغاء حظر هذا العضو؟"
+  "esports_users_unban_confirm_title": "إلغاء حظر هذا المستخدم؟",
+  "esports_users_desc": "مدخل الملف العام: افتح ملف المستخدم عبر «التفاصيل» (النظرة العامة والتتبع والتقييمات والتقارير تتبدل داخل صفحة التفاصيل)",
+  "esports_users_birth": "الميلاد {date}",
+  "esports_users_birth_uncollected": "تاريخ الميلاد غير مُجمع"
 }

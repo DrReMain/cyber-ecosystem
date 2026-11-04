@@ -6,7 +6,7 @@
   "esports_users_filter_any": "전체",
   "esports_users_status_on": "정상",
   "esports_users_status_off": "차단",
-  "esports_users_col_user": "회원",
+  "esports_users_col_user": "사용자",
   "esports_users_col_age_band": "연령대",
   "esports_users_col_registered_at": "등록 시간",
   "esports_users_col_status": "상태",
@@ -20,12 +20,15 @@
   "esports_users_band_26_29": "26-29세",
   "esports_users_band_30_40": "30-40세",
   "esports_users_band_over40": "40세 이상",
-  "esports_users_total": "회원 {n}명",
-  "esports_users_empty": "회원이 없습니다",
+  "esports_users_total": "사용자 {n}명",
+  "esports_users_empty": "사용자가 없습니다",
   "esports_users_act_detail": "상세",
   "esports_users_act_ban": "차단",
   "esports_users_act_unban": "차단 해제",
-  "esports_users_ban_confirm_title": "이 회원을 차단할까요?",
+  "esports_users_ban_confirm_title": "이 사용자를 차단할까요?",
   "esports_users_ban_confirm_description": "기존 세션은 다음 요청에서 즉시 만료됩니다. 조작은 감사에 기록됩니다.",
-  "esports_users_unban_confirm_title": "이 회원의 차단을 해제할까요?"
+  "esports_users_unban_confirm_title": "이 사용자의 차단을 해제할까요?",
+  "esports_users_desc": "공용 프로필 입구: 「자세히」로 사용자 파일을 엽니다(개요·추적·평가와 보고서는 상세 페이지 안에서 전환됩니다)",
+  "esports_users_birth": "출생 {date}",
+  "esports_users_birth_uncollected": "출생일 미수집"
 }

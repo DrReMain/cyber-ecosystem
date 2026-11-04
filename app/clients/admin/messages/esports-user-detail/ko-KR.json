@@ -1,7 +1,7 @@
 {
   "esports_user_detail_title": "사용자 상세",
   "esports_user_detail_back": "사용자 목록으로 돌아가기",
-  "esports_user_detail_error": "회원이 없거나 접근할 수 없습니다",
+  "esports_user_detail_error": "사용자가 없거나 접근할 수 없습니다",
   "esports_user_detail_not_open": "아직 제공되지 않음",
   "esports_user_detail_tab_overview": "개요",
   "esports_user_detail_tab_trace": "추적",

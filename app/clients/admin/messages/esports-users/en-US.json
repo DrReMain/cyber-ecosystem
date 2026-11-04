@@ -6,7 +6,7 @@
   "esports_users_filter_any": "Any",
   "esports_users_status_on": "Active",
   "esports_users_status_off": "Banned",
-  "esports_users_col_user": "Member",
+  "esports_users_col_user": "User",
   "esports_users_col_age_band": "Age band",
   "esports_users_col_registered_at": "Registered",
   "esports_users_col_status": "Status",
@@ -20,12 +20,15 @@
   "esports_users_band_26_29": "26–29",
   "esports_users_band_30_40": "30–40",
   "esports_users_band_over40": "Over 40",
-  "esports_users_total": "{n} members",
-  "esports_users_empty": "No members",
+  "esports_users_total": "{n} users",
+  "esports_users_empty": "No users",
   "esports_users_act_detail": "Detail",
   "esports_users_act_ban": "Ban",
   "esports_users_act_unban": "Unban",
-  "esports_users_ban_confirm_title": "Ban this member?",
+  "esports_users_ban_confirm_title": "Ban this user?",
   "esports_users_ban_confirm_description": "Existing sessions stop at the next request; the action is audited.",
-  "esports_users_unban_confirm_title": "Unban this member?"
+  "esports_users_unban_confirm_title": "Unban this user?",
+  "esports_users_desc": "The general profile entry: open a user's file via Detail (overview, trace, assessments and reports switch inside the detail page)",
+  "esports_users_birth": "Born {date}",
+  "esports_users_birth_uncollected": "Birth not collected"
 }

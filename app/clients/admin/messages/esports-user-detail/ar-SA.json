@@ -1,7 +1,7 @@
 {
   "esports_user_detail_title": "تفاصيل المستخدم",
   "esports_user_detail_back": "العودة إلى قائمة المستخدمين",
-  "esports_user_detail_error": "العضو غير موجود أو يتعذر الوصول إليه",
+  "esports_user_detail_error": "المستخدم غير موجود أو يتعذر الوصول إليه",
   "esports_user_detail_not_open": "غير متاح بعد",
   "esports_user_detail_tab_overview": "نظرة عامة",
   "esports_user_detail_tab_trace": "التتبع",
