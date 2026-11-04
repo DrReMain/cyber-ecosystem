@@ -13,7 +13,7 @@
 | C 只能平移 | tracking_moving/economic_sim | 旧分平移+legacy 口径标 |
 | D 作废 | skill_prediction | 死端点,无有效存量 |
 
-> **2026-11-02 recompute 审计注**:①「平移」已由 behavior 刀对全部迁移行落地(score→authoritative_score,rawScore→raw_score,grade=band(score)),四档现况=C 档处置泛化为默认,重放是「升级」而非「必经」。②A/B 重放闸门=该款标定曲线(P16:现仅 red_dot 分位冻结;curvePendingResult 结构性不出权威分,曲线前重放=把旧标定分行降级成无权威分/无档位)。③重放窗口与口径标载体=P26.1(ljr):推荐 cutover 一刻迁移器内重放当日已定曲线款(逐字复制 scorer+曲线,bandFor 先例形状),余款平移+legacy 标,cutover 后不重放。④B 档 summary 聚合重放可行性:旧 summary 聚合面对得上新 composite 输入(number_stars 例:maxSeqLen 缺席→复杂度项降级重放);逐款咬合核对归 recompute 机械片夹具。
+> **2026-11-02 recompute 审计注**:①「平移」已由 behavior 刀对全部迁移行落地(score→authoritative_score,rawScore→raw_score,grade=band(score)),四档现况=C 档处置泛化为默认,重放是「升级」而非「必经」。②A/B 重放闸门=该款标定曲线(P16:现仅 red_dot 分位冻结;curvePendingResult 结构性不出权威分,曲线前重放=把旧标定分行降级成无权威分/无档位)。③重放窗口与口径标载体=P26.1(ljr):推荐 cutover 一刻迁移器内重放当日已定曲线款(逐字复制 scorer+曲线,bandFor 先例形状),余款平移+legacy 标,cutover 后不重放。**(11-04 补注,用户问「游戏测试完分数/评级」带出)新测侧同缝:14 款 scorer 仅 red_dot 冻结曲线在码(提交即出权威分+档位),余 13 款 curvePendingResult/raw-only 结构性不出权威分——历史行评级随本票重放口径落,新测 13 款出评级的时点=曲线从重放器进 live scorer 的入码片,未排票;建议本票裁决一并钉(搬运方=lzx,口径/窗口=ljr),在此之前新测=诚实「未评级」态(设计内非 bug,D-AO③ 文案在)**。④B 档 summary 聚合重放可行性:旧 summary 聚合面对得上新 composite 输入(number_stars 例:maxSeqLen 缺席→复杂度项降级重放);逐款咬合核对归 recompute 机械片夹具。
 
 ## 逐表口径
 
