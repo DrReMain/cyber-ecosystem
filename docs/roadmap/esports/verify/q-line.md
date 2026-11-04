@@ -176,3 +176,33 @@ Q1 收口:审计毕,余项全在队列(①⑤⑥=lzx;②=lzx 已裁待落;P11=lj
 登记不修:I11 同意记录 渠道 列+desc 半句——契约 AgreementConsent 无 channel 字段(仅 login_method),**lzx 队列注**(渠道轴语义 vs 并入登录方式,一句裁);I14 game-config 呈现塌缩——原型 难度预设/三档权重/简·标·难/单位分 四列+因子配置抽屉(config_type 五组+单调性校验) vs 重建 运行配置调参 平表(键值+整体替换),原型页自注=真实 schema=test_config 平键值,重建更贴 schema 真相;**登记分歧不建列**(具名列=特定 config 键的派生呈现,抽屉已可编辑同物),状态/上下架=M2 余组 test-type 档案面在案;users 批量导入/导出 CSV=P24 族、最近登录/测评/报告解锁/会员列+来源/年龄段/设备筛=契约无字段(P23 login_record 冷存/trace 暂缓在案)。
 
 **Q5 收口(11-04)**:14 面审毕,两发现全落(①users 词族+副标题+出生行 ②orders 列头/筛词,皆五语言);11 面过,2 面登记,1 微注入 lzx 队列(consent 渠道)。活探=admin 真登录读 users 页(题头+desc 逐字/列头 用户/出生 2000-06 行在/残留「会员」仅余菜单组合法名)+orders 页(解锁方式列头/desc 逐字/诚实空态)。回归门=admin 链 --skip-nx-cache+单测 3 文件/12+paraglide 五语言平价。admin:dev 临时起毕即停。**Q 线 Q1-Q5 毕;余 Q6 服务端仲裁(lzx 陪跑,未排窗)**。
+
+## Q6 服务端仲裁(11-04 读腿开工;射面=order/sku/entitlement/activation 四域仲裁与审计行;修腿=lzx 同窗)
+
+法条=D-BB 承重面 lzx 陪跑——**陪跑绑修不绑读**(用户 11-04「继续」令):本片=作者盲独立读第一腿,服务端业务码只读不碰(lzx 车道),发现项全数入 lzx 队列、PAY3(W5)开工前同窗修完——发现赶在 PAY3 建购买面前=本片排窗意图兑现。三源=proto 契约(entitlement/order/sku/activation_admin)+裁定族(D-AB 计费矩阵/MEMBERSHIP_DESIGN R1-R7/原型评审④)+种子(seedSkus)+已建三套门控 e2e 断言(ENT_E2E/PAY_E2E)。读面=entitle/entitleadmin/order/orderadmin/sku 模块 biz+data+schema+shared/kernel(判决单序)。
+
+### 逐项清单
+
+| 段 | 域 | 校对点(三源断言) | 态 |
+|---|---|---|---|
+| J1 | order 创建仲裁 | pending-unique 局部索引=trial 绑定/membership NULLS DISTINCT 故意不绑(schema 注在案:并发会员单可双活双付各叠各行);同单凭证重放零渠道往返;创建竞标输家孤儿渠道单 best-effort 关+自过期兜底;渠道集校验;scope 执法=trial 须携本人未授记录/period 拒 ref | 审毕(过) |
+| J2 | order 结算仲裁 | 单条件 UPDATE 单仲裁者(pending\|closed→paid;closed→paid=渠道真相纠正,钱已收必授予=schema 法条兑现);at-least-once 双回调幂等(settle+grant 同事务,e2e 断言);金额/提供方错配=ack 止重试+Error 告警+对账承接(注释自述人工路径,不静默);trial 结算 Source=单号/period=PaidAt+PeriodDays | 审毕(过) |
+| J3 | order 生命周期外沿 | converger(boot sweep 先折停机间隙+到期 fold+渠道拒关→查询定真相);日对账(billZone=北京时间墙钟/未发布日单重试/单日弃守护栏不楔死);admin close 无属主检查=访问梯在前(注释法条);foldUnlock=trial 单号自带 ref/period 按 Source 对账+期内解锁计数(计数骑手见①) | 审毕(过) |
+| J4 | trial 购买防线 | resolveScope=记录属主(GetAttempt)+未授(Exists)+pending-unique 兜底→AlreadyGranted;e2e 断言外记录拒/重复授拒/金额 1990;账本唯一键=一记录一授(谁付都一样) | 审毕(过) |
+| J5 | entitlement 账本 | trial 无到期=R3 永久;membership 续费叠行;terminate=单条件 UPDATE 翻**全部**活窗(续费叠行全翻,注释自述);家族 ratchet 只向前(等值不动作,不可变列走特许 raw SQL);Grant OnConflict no-op 不毒化事务(ErrNoRows=吞并答) | 审毕(过) |
+| J6 | **会员续费窗缝** | settle expiry=PaidAt+31d **不读窗缝** vs Grant 砌缝(活窗尾起算,注释自述「tile without gaps」);会员活窗内续买=新窗重叠站窗,余期被吞 | 审毕(**①**) |
+| J7 | activation 兑换仲裁 | TakeUse 单条件 UPDATE(used<quantity+活批次子查询,使用与痕同语句);同员幂等**胜过**批次停用(停用只 void 未核销,e2e 双向断言);过期家族授予不困死(fall-through+ratchet 前推);短码在长行上不烧用(e2e);过期码查先于幂等支=②微注 | 审毕(过,②) |
+| J8 | activation 铸码 | 三族枚举双端执法(proto defined_only+ent enum cognitive/career/school);quantity 恒 1(无单次能力码=D-AB);批次+码单事务;批次号唯一索引碰撞重试×3(身份走生成 reason 谓词);导出=自身 trace 行 | 审毕(过) |
+| J9 | policy 判定序 | ReportAccessVerdict 单序=码>政策行>默认折叠;membership 门;explicitClosed 区分 POLICY_CLOSED/NO_ENTITLEMENT;tenant 写面拒 NotReady/读面答闭;entitle 面与 digest 三键共引=漂移结构不可能;默认三分 career open/cognitive membership/school closed=D-AB 逐字 | 审毕(过) |
+| J10 | 审计行 | pay_order 不可变钱行+transaction_id 回填=对账 join 键;entitlement append-only+terminate 痕;report_policy/sku updated_by;code redeemed_by/at 在码行自持(授予可被 ratchet 改写而痕不丢——注释自述);操作面 Log 带 by 九处(Grant/Terminate/SetPolicy/会员·订单·SKU Close/Generate/Export/SetBatchStatus) | 审毕(过) |
+| J11 | e2e 断言承载 | 三套门控(ENT_E2E/PAY_E2E):十人竞一码=1 胜 9 exhausted 锚;同员并发双兑仍单用;ratchet/短码/停用-幂等三矩阵;pay 全链双回调+converger 到期 fold+对账 mismatch=0+admin fold 懒水合;membership 砌缝/终止后准入回落/期内解锁计数/settle 短行取最远活窗 | 审毕(过) |
+| J12 | P1 矩阵对表 | seed trial_report 1990/member_month 2990+31d 逐字;付费只发 trial+窗口(无付费 report_type 授予);R2 完成即授=事件在 storeAttempt 后 best-effort(存储真相不受授予失败损);R4 到期新报告恢复部分可见;R5 聚合随会员(digest 三键复用判决);R6 退款只记不回滚(M1 注释);R7 月卡 31 天第 32 天过期 | 审毕(过) |
+
+### 发现与处置(11-04,桌面三源对照;服务端码=只读,全数入 lzx 队列)
+
+| # | 域 | 断言与证据 | 级 | 处置 |
+|---|---|---|---|---|
+| Q6-① | J6 会员续费窗缝:同一 SKU 两写入方两缝法 | entitleadmin.Grant 砌缝(活窗尾起算,entitleadmin/biz.go 注释自述 renewal law「consecutive periods tile without gaps」);order.SettlePaid **不读缝**——expiry=PaidAt+PeriodDays(order/biz.go:399),会员活窗内续买→新窗与站窗重叠,余期被吞(例:剩 25 天时付 ¥29.9,实得 +6 天非 +31)。resolveScope 对 membership 无活窗检查=期内续买可下单可支付。产品暴露面=原型评审④「会员期内隐藏单次,只留续费」+member-detail 活窗 CTA「续费会员 ¥29.9」——PAY3(W5)恰要建此购买。MEMBERSHIP_DESIGN R7 只钉 31 天/第 32 天过期未钉中窗缝,Grant 路径注释钉了。**随附骑手**:foldAll 期内解锁计数按砌缝行假设(periodStart=前行窗尾),重叠行下重叠区内 trial 解锁漏出当期计数(授予本体无损永久,仅运营计数视图漏)——缝修好计数自愈。修形已在:Grant 的缝读(MembershipWindow in-tx)搬进 settle 事务即成 | **契约级** | **入 lzx 队列(PAY3 开工前同窗修)** |
+| Q6-② | J7 Redeem 幂等注 vs 过期码重呈 | entitlement.proto:13-15「idempotent per (member, code): handing the same code to the same member again **returns the same entitlement**」无限定;实现先查码过期(entitle/biz.go:411)再查幂等支(:423)——已用码过期后重呈答 ActivationCodeExpired 非站窗授予(e2e 只断言未过期路径)。两侧皆可辩(过期=对码的诚实答),一句裁:注释加过期限定或幂等支上移 | 契约注释 | **入 lzx 队列(微注,随①同窗)** |
+
+**Q6 读腿收口(11-04)**:十二项清单审毕——10 项过,发现 ①(契约级续费窗缝)+②(微注),全数入 lzx 队列 PAY3 前同窗;验证=纯台账零码改(服务端=lzx 车道只读),三套门控 e2e 在案=修腿验收基线。**修腿待 lzx 同窗**;Q 线 Q1-Q6 读腿全毕。
