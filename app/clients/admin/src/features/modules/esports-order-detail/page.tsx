@@ -54,7 +54,7 @@ export function EsportsOrderDetailPage() {
 
       <Card loading={detailQuery.isLoading}>
         <div className="mb-4 flex items-center gap-3">
-          <Typography.Title className="!mb-0" level={4}>
+          <Typography.Title className="mb-0!" level={4}>
             {m.esports_order_detail_title()}
           </Typography.Title>
           <span className="font-mono text-sm">{id}</span>
