@@ -11,14 +11,14 @@
 - MIG1 五阶段毕(guard/identity/entitlement/behavior/reconcile);snapshot+recompute 机械片冻结待 **P26/P26.1(ljr,硬限 11-24)**;预演 11-15(D-BE)。
 - 需求总账(11-05 对账):ctr 44 页=✅26+◐5+❌8+⏸1+📄4(message 族三页+test-records+share-invite+scheme-b×3+version-update 未建);admin 41 页已建 13(+report-policies 账外);唯一真值=demand-ledger。
 - **等待面**:PAY2 行政件(ljr,就绪目标 11-10)=真通道联调门;P26/P26.1=MIG1 冻结件门;G-402 openid 契约(lzx 建议裁②服务端富集,报备中,见 gap-ledger 五批);MSG-1 窄化两裁决=W6 ljr。
-- hzy 车道清仓(Q 线全毕);下一分配=W4-W5 上线走查执行稿修订(cutover-watch 按实况)+值守。
+- hzy 车道清仓(Q 线全毕);cutover-watch 执行稿修订 ✅ 11-05 提前(九环实况版,PAY3/MSG-1/Q6-①② 入稿);余=随实况随修+11-24 起复核终版+W5 值守演练配合。
 
 ## 窗口(11-05 校准重排;锚点裁决不动:cutover 12-01~03/12-08、CP3 核验 11-28、例会取消 D-BA)
 
 | 窗 | 日期 | 服务/管理线(lzx) | 精修带(hzy,分配制) | 产品线(ljr) |
 |---|---|---|---|---|
 | W3 余 | 11.06-09 | MSG-1 ctr 腿已收(11-05,未提交);余=真通道刀先行件 G-403 QR 码图/G-404 returnUrl 修形 | — | 行政件即办(就绪目标 11-10) |
-| W4 | 11.10-16 | MSG-1 admin 三页(feedback-manage/07-detail/announcement+V10 闭环走查)+窄化两裁决接洽;PAY2 联调启动(行政件就绪后);**MIG1 预演 11-15**(D-BE:副本 11-14 就绪即演,绿门含回滚腿) | 上线走查执行稿修订(cutover-watch) | P22 否决窗 11-14;P26 理想 11-12 |
+| W4 | 11.10-16 | MSG-1 admin 三页(feedback-manage/07-detail/announcement+V10 闭环走查)+窄化两裁决接洽;PAY2 联调启动(行政件就绪后);**MIG1 预演 11-15**(D-BE:副本 11-14 就绪即演,绿门含回滚腿) | 执行稿修订 ✅ 提前 11-05(九环实况版);W4 余=随实况随修 | P22 否决窗 11-14;P26 理想 11-12 |
 | W5 | 11.17-23 | 真通道联调收口(0.01 真钱闭环+全额退款;G-402/403/404 三红收);MIG1 snapshot+recompute(P26/P26.1 裁后)含曲线入码片 sizing ⑧ | 值守演练配合 | P23/P20 推进 |
 | W6 | 11.24-30 | **CP3 三腿内部核验 11-28**(M1 e2e/PAY2 0.01 真钱/PAY3 全链+MSG-1 可走);cutover 准备(真实 appid 切换+上线清单) | 上线值守(执行稿=cutover-watch) | P23/P20 11-28;appid+绑域 11-26 |
 | cutover | 12.01-03/12.08 | 停机切换+L4 验证+上线;旧栈停机封存 2 周(D-P);迁移执行=lzx 专职(D-BB) | 值守 | 上线内容核对 |
