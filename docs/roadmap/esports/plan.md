@@ -29,7 +29,7 @@
 | 片 | 内容与验收要点 | 依赖 | 规模 |
 |---|---|---|---|
 | MSG-1 余面(lzx 全片 D-BB) | **ctr 腿已收(2026-11-05,提交 5d3bded5):四路由+未读双红点+G-202 真跳+全态 live 走查毕**;余=admin 三页(feedback-manage/07-detail/announcement+V10 闭环走查)+窄化两裁决接洽;MSG_E2E 服务端已绿。**窄化两裁决=W6 ljr**(消息两型两范围 vs 原型三型四范围;contact 128 vs 40;另 R-08 关单态文案,登记=gap-ledger 六批),裁决若翻契约面小改随改;定时发布=已裁非特性延后 | — | M |
-| PAY2 通道联调 | deploy 环境面切 wechat;0.01 真实闭环+全额退款(CP3 门);生产联调+对账;H5 权限就绪后开 H5 scene;上线前登录切真实公众号 appid(JSAPI 绑域,登记上线清单) | 行政件(ljr 11-10);**APIv3 材料全齐并验真(11-05:公钥模式三件套+证书序列号/密钥对 openssl 互证,PAY_PROVIDER=wechat boot 冒烟绿;凭据=本机 ~/.xgwl-secrets/wechat-pay/ + wiki,不进仓)** | M |
+| PAY2 通道联调 | deploy 环境面切 wechat;0.01 真实闭环+全额退款(CP3 门);生产联调+对账;H5 权限就绪后开 H5 scene;上线前登录切真实公众号 appid(JSAPI 绑域,登记上线清单) | 行政件(ljr 11-10);**APIv3 材料全齐并活证(11-05:openssl 三重互证+APP_ 前缀引号形 boot 绿,boot 对账 sweep 签名请求获微信真实应答 NO_STATEMENT_EXIST=昨日账单未出;env 两律实锤=裸名静默忽略假绿/数字形 string 须引号形;凭据=本机 ~/.xgwl-secrets/wechat-pay/ + wiki,不进仓)** | M |
 | 真通道刀(G-402/403/404) | **G-403/404 先行件已收 11-05**(qrcode@1.5.4+码图 tile+sheet visual 槽;returnUrl 三层修形=客户端绝对收据 URL→biz.go 缝 order→wechat/mock 网关 redirect_url 镜像;e2e+浏览器网络面实捕;唯微信侧活证随真通道);**G-402 JSAPI openid:lzx 建议裁②服务端按绑定富集**(证据:JSAPI v3 openid 仅服务端统一下单入参,前端 invoke 只消费 prepay 参数,客户端零消费方;契约暴露=凭据无收益扩散),D-BC 报备形,真通道刀执行时落;另 clientIPOf 信任拨盘(XFF 优先 vs peer 优先)同刀裁=部署面口径 | G-402 裁决;G-403/404 无依赖 | S-M |
 | MIG1 冻结件+预演 | 五阶段毕;snapshot 承载表待 **P26**、recompute 口径标+重放窗口待 **P26.1**(含曲线入码片 sizing ⑧:14 款仅 red_dot 冻结曲线出权威分,余 13 款 curvePending 诚实「未评级」=设计内非 bug,入码时点随本票一并钉);**预演 11-15**;cutover 迁移执行=lzx 专职;口径全档=migration.md | P26/P26.1(ljr 硬限 11-24) | M |
 | M2-4 余 Tab | trace=**暂缓后置**(11-03 用户裁,归梯次,P22 否决窗 11-14 后复评);messages Tab=随 MSG-1 admin 面 | P22/MSG-1 | S |

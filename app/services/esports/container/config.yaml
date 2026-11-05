@@ -50,8 +50,11 @@ payment:
   providers:
     - name: ${PAY_PROVIDER:mock}
       kind: ${PAY_PROVIDER:mock}
-      # Inert under the mock default; PAY_PROVIDER=wechat with empty env fails
-      # the boot validate — credentials are deploy-plane facts, never literals.
+      # Inert under the mock default; selecting wechat via APP_PAY_PROVIDER
+      # with empty env fails the boot validate — credentials are deploy-plane
+      # facts, never literals. Env overrides need the APP_ prefix (bare names
+      # never land), and a numeric-looking string value (mch_id) must ride
+      # quoted or the proto scan rejects it.
       wechat:
         mch_id: ${WECHAT_MCH_ID:}
         mch_serial: ${WECHAT_MCH_SERIAL:}
