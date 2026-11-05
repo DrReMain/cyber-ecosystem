@@ -21,7 +21,7 @@
 - **画像/偏好/溯源 → esports**:出生年月/年龄段/头像/游戏偏好(含待归类项保持待归类)/邀请关系/登录溯源九件套(随 login_record 语义迁或冷存)。存量「仅年龄段无出生年月」用户(旧 API 允许)6→8 档不可精确映射:迁为画像不完整态(档位置空),首个画像触点补填出生年月后服务端重派生。
 - **权益翻译**:解锁三旗标与 activation_records → entitlement 解锁记录;未核销激活码 → 新兑换码批次(保留 report_type 语义);已核销/过期码丢弃靠流水保历史。
 - **不迁重算**:user 统计四列/ability_score/platform_analytics/game_analytics(由 test_record 重算)。**2026-11-02 recompute 审计**:四目标全数零迁移器写入——platform/game analytics 新 schema 未建(归 P20 特性从 test_record 现算),user 统计四列=读时推导(新 profile 无统计列,原型统计条走 API 现算),ability_score=report 冻结流懒写(读面幂等生成,迁移器抢写反而破坏懒冻结语义);「由 test_record 重算」的正确读法=新系统读时自行重算,迁移器不碰。
-- **保真搬运(D-C2)**:报告 JSON 快照(user_career_profile/school_report)= 旧算法产物+R3 永久可查看语义,原样只读迁入;consent/审计从零。(生产实况 11-02 核实:school_report 无存量,组织层随之删除,见迁移顺序注)
+- **保真搬运(D-C2)**:报告 JSON 快照(user_career_profile/school_report)= 旧算法产物+R3 永久可查看语义,原样只读迁入;consent/审计从零。(生产实况 11-02 核实:school_report 无存量,组织层随之删除,见迁移顺序注;**11-06 真转储证伪——463 行实存,处置=D-MIG-1,见预演备料节**)
 - **不迁**:RBAC 六件套(`admin_user`/`admin_user_role`/`role`/`role_permission`/`permission`/`menu`)/`*_bak_*` 快照表/flyway 历史/`sku_pricing`(旧报告三档定价表,D-AB 新计费取代且旧库无网关无存量交易)/`content_management`(banner/notice/guide kv 内容表,旧码零消费端=死表;notice 面由 MSG-1 公告承接)/`system_config`(逐键核对新栈配置面,默认不迁)。
 - **表名对照(2026-11-02 全 36 表逐名过账,处置组↔表名,零命中补齐)**:身份=`user`;画像行为=`user_game_preference`/`login_record`(溯源,P22)/`user_referral`(归因,P23);权益=`activation_code`/`activation_records`+`user` 解锁三旗标列;报告快照=`user_career_profile`/`school_report`(无存量,D-BA 停机守卫);种子=`game`/`test_type`/`test_config`/`game_ability_contribution`/题库四表(`moba_character`/`offense_scenario`/`character_counter_relation`/`offense_choice_explanation`)/`career_recommendation_template`/`career_statistics`/`test_type_introduction`(档案面随余组);重算=`ability_score`/`platform_analytics`/`game_analytics`+`user` 统计四列;MSG 域=`user_message`/`user_feedback`(随 MSG-1;未读语义旧仓实锤=A1,见 prd.md P21;**11-04 域落齐=新四表 user_message/announcement/user_feedback/feedback_message,迁移映射三则=旧 type system→announcement、旧六类前自由串 category(suggestion/bug/other)→新枚举 other/feature_bug/other 兜 other、旧 ref_type+ref_id 收窄为 ref_id(类型即定域);旧单发 admin_reply/replied_at 拆入 feedback_message 线程(admin 行带 admin_id);announcement/feedback_message 无旧表=纯新增;旧 is_read 行级未读同形直迁**);待裁=`app_version`(P19,证据倾向 B:旧 H5 版本弹窗实存)。
 - **种子重放**:game/test_type/test_config/contribution/题库四表/职业模板与统计 —— 以旧仓 init.sql 种子为内容基线重放进版本化迁移(修已知坑,见 plan.md E2)。
@@ -32,6 +32,19 @@
 身份(产出并持久化 旧↔新 ID 映射)→ 权益 → 主数据种子(先于行为数据)→ 行为数据(偏好→test_record→溯源)→ 报告快照 → 收尾(同意/审计/分析重算)。
 
 **「组织(school→租户)」层删除(11-02 D-BA:生产数据全公版,旧版无专版,无学校数据可迁;ljr 补证 school 域存量管理员/组织/学员/report 均测试数据不迁)**——导入器遇 school/school_report 非空行=停机报错待议,不静默跳过(血泪条款 4 同族防线);真租户随 M3 出现再立二次迁移。
+
+## 预演备料实录(2026-11-06,副本较 11-14 就绪门提前 8 天)
+
+- **物料落地(血泪条款 1 首次实做)**:生产备份直载本地——lab compose `mysql8`(宿主 13306,utf8mb4/+8:00 与源对齐)建 `esport` schema 后导入 106MB Navicat 转储(11-05 22:27 生产导出),一次绿。
+- **谱系三源互证(裁「生产是否跑过 main 外的表结构更新」)**:①生产 flyway 台账=BASELINE(07-21)+V1..V15(末笔 09-04「user device type brand」),V16+ 零痕;②lab 五目录=旧仓全量 git 克隆,master HEAD(911e125)=09-04 与 V15 同日同代、其后零提交,`feature/block34-groundwork`(09-27)=V17 协议两表(规格入库、**代码未实现**)/V18 年龄段字典/V19 自定义归类;③转储 37 表无任何 V17+ 产物。结论:**master 即生产世代代码,block34 未发布;转储=唯一 schema 真相源**——init.sql 仅 19 表,是 CI 建库残缺基线(master db0f654 自认「建库基线缺失」),其 `user.nickname NOT NULL` 等声明以转储为准(nickname 实可空,9/285 NULL);V1-V15 实体 SQL 散在 esport-admin/sql/ 具名脚本与 manage/sql/(雪flake FK 修复族)。
+- **census 真数据首跑三绿(identity 除冲突停机)**:user 285(260 活/25 软删;openid NULL 255、birth NULL 157、username NULL 30);entitlement 绿(era-2 school 旗标 257 行弃=默认 1 不可归因;**334 码全为全局型→0 迁**;孤儿 activation_records 2);behavior 绿(2698→2685 迁,skill_prediction 弃 13,自报旗标 2125,login_record 217 冷存,user_referral 6 待 P23)。
+- **guard 必停=预演第一脚**:school=4(测试学校×3 软删+**存活零成员「萧山中学」**);school_report=463=342 行挂 10 用户(**全部未绑校**:320 行=Aqiu 重注册族软删行,**22 行=7 真实存活用户**:鲁智深 12/kk 3/玩家0866 2/黄皓予 2/陵川 1/黑豆 1/Amy 1)+121 行 user_id 孤儿;另有悬空 school_id=162(无 school 行)。
+- **随片两修+执行面**:srcUser.Nickname→NullString;test_record 读取改 PK 序+Go 侧四键排序(MySQL 1038 宽行 filesort 爆 buffer——cutover 宿主 buffer 不可假设)。migrator build+race test+lint 绿。直执 go 已禁(11-06 用户指示)→临时 nx target `esports-migrator:run/check`(project.json+README 带 TODO 拆除清单;DSN=~/.xgwl-secrets/esports-mig/source.env 引号形)。
+
+### 预演前决策(拦 11-14/15 绿门)
+
+1. **D-MIG-1 school 域处置**(guard 停机即此):证据如上。选项 (a) 裁「测试/残留不迁」+guard 显式旁路旗标(默认仍停、运行日志留证、cutover 夜同旗标)——ljr 需对「7 真实用户 22 行」复核签字;(b) 22 行保真迁(需新 schema 落点,预演前代价大);(c) 封存旧栈只读承接(受 D-P 两周封存窗约束,非永久)。推荐 (a)。
+2. **D-MIG-2 账号冲突消解**(identity 停机即此):6 组 23 行=131****8167×7、Aqiu openid×2、test×2、test2×2、todeleteuser×5(全软删)、newtestuser×5(全存活同手机号 13900000000);混合组活行全为雪flake 行。推荐机械规则(零产品判断/零丢行/可审计):组内存活行得原账号,多存活取 updated_at 最新;其余账号改 `<account>#<legacy_id>`(软删身份登录面已死,migration_map 全量留痕,census 打印改写计数)。替代=测试族整批排除(丢数据,须产品裁)。
 
 ## cutover 验收清单(血泪教训条款)
 

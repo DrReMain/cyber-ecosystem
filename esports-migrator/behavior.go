@@ -117,9 +117,13 @@ func fetchPreferences(ctx context.Context, db *sql.DB) ([]*srcPreference, error)
 }
 
 func fetchTestRecords(ctx context.Context, db *sql.DB) ([]*srcTestRecord, error) {
+	// PK order only: a server-side sort over these wide detail rows blew the
+	// sort buffer on the production-shaped copy (MySQL 1038), and the cutover
+	// host's buffer size is not ours to assume. The four-key order is rebuilt
+	// below.
 	rows, err := db.QueryContext(ctx, `SELECT id, user_id, test_code, score, raw_score,
 		summary_data, detail_data, start_time, end_time, completed_at, user_uploaded,
-		created_at, updated_at, is_deleted FROM test_record ORDER BY user_id, test_code, completed_at, id`)
+		created_at, updated_at, is_deleted FROM test_record ORDER BY id`)
 	if err != nil {
 		return nil, fmt.Errorf("query legacy test_record: %w", err)
 	}
@@ -139,7 +143,27 @@ func fetchTestRecords(ctx context.Context, db *sql.DB) ([]*srcTestRecord, error)
 		r.IsDeleted = isDeleted != 0
 		out = append(out, r)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	// Same order the SQL used to carry: user, test, completion time (NULLs
+	// first, MySQL ascending), id last so the order is total.
+	sort.Slice(out, func(i, j int) bool {
+		a, b := out[i], out[j]
+		switch {
+		case a.UserID != b.UserID:
+			return a.UserID < b.UserID
+		case a.TestCode != b.TestCode:
+			return a.TestCode < b.TestCode
+		case a.CompletedAt.Valid != b.CompletedAt.Valid:
+			return !a.CompletedAt.Valid
+		case !a.CompletedAt.Time.Equal(b.CompletedAt.Time):
+			return a.CompletedAt.Time.Before(b.CompletedAt.Time)
+		default:
+			return a.ID < b.ID
+		}
+	})
+	return out, nil
 }
 
 func countRows(ctx context.Context, db *sql.DB, table string) (int64, error) {

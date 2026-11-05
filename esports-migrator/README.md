@@ -18,14 +18,22 @@ for that seam.
 
 ## Run
 
-```sh
-export APP_MIG_SOURCE_DSN='user:pass@tcp(host:3306)/legacy?charset=utf8mb4'   # old MySQL, read-only
-export APP_MIG_SYSTEM_DSN='postgres://user:pass@host:5432/system?sslmode=disable'
-export APP_MIG_ESPORTS_DSN='postgres://user:pass@host:5432/esports?sslmode=disable'
+DSNs live in env files under `~/.xgwl-secrets/esports-mig/` (deploy-plane
+facts — never inline in commands, never in the repo): `source.env` holds
+`APP_MIG_SOURCE_DSN` (old MySQL); the write phases additionally read
+`APP_MIG_SYSTEM_DSN` / `APP_MIG_ESPORTS_DSN` from the same file. The `run`
+nx target is the execution plane — direct `go` shell calls are forbidden in
+this repo — and it sources the env file itself:
 
-go run . --phase all --dry-run   # census only, no target credentials needed
-go run . --phase all             # guard + identity + entitlement + behavior (later cuts add phases)
+```sh
+./nx run esports-migrator:run -- --phase all --dry-run   # census only, no target credentials needed
+./nx run esports-migrator:run -- --phase all             # guard + identity + entitlement + behavior (later cuts add phases)
 ```
+
+> TODO(mig1 temporary instrumentation, teardown listed): `project.json` is a
+> rehearsal-run-up wrapper only — the module stays deliberately outside the
+> build graph (user ruling 2026-11-02). Tear it down with the directory's
+> post-cutover single-commit removal; it must not outlive the tool.
 
 Phases: `guard` (halt on any school-domain rows), `identity`, `entitlement`
 (legacy unlock flags, activation records, and unredeemed codes → grant
@@ -45,5 +53,5 @@ left off.
 ## Checks
 
 ```sh
-go build ./... && go test -race -count=1 ./... && go tool golangci-lint run ./...
+./nx run esports-migrator:check
 ```

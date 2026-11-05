@@ -1,0 +1,26 @@
+{
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "esports-migrator",
+  "root": "esports-migrator",
+  "targets": {
+    "run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "set -a && source ~/.xgwl-secrets/esports-mig/source.env && set +a && go run ."
+      }
+    },
+    "check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "commands": [
+          "go build ./...",
+          "go test -race -count=1 ./...",
+          "go tool golangci-lint run ./..."
+        ],
+        "parallel": false
+      }
+    }
+  }
+}

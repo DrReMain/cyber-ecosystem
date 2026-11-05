@@ -75,7 +75,7 @@ type srcUser struct {
 	WechatCountry     sql.NullString
 	WechatProvince    sql.NullString
 	WechatCity        sql.NullString
-	Nickname          string
+	Nickname          sql.NullString // prod copy: NULL despite init.sql's NOT NULL claim (9/285 rows)
 	AgeRange          sql.NullString
 	BirthDate         sql.NullTime
 	AvatarURL         sql.NullString
