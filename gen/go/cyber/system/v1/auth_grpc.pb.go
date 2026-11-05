@@ -30,6 +30,7 @@ const (
 	AuthService_ResolveCredential_FullMethodName   = "/cyber.system.v1.AuthService/ResolveCredential"
 	AuthService_ResetPassword_FullMethodName       = "/cyber.system.v1.AuthService/ResetPassword"
 	AuthService_GetSecurityStatus_FullMethodName   = "/cyber.system.v1.AuthService/GetSecurityStatus"
+	AuthService_GetWechatOpenId_FullMethodName     = "/cyber.system.v1.AuthService/GetWechatOpenId"
 	AuthService_Logout_FullMethodName              = "/cyber.system.v1.AuthService/Logout"
 	AuthService_GetCurrentUser_FullMethodName      = "/cyber.system.v1.AuthService/GetCurrentUser"
 )
@@ -49,6 +50,7 @@ type AuthServiceClient interface {
 	ResolveCredential(ctx context.Context, in *ResolveCredentialRequest, opts ...grpc.CallOption) (*ResolveCredentialResponse, error)
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
 	GetSecurityStatus(ctx context.Context, in *GetSecurityStatusRequest, opts ...grpc.CallOption) (*GetSecurityStatusResponse, error)
+	GetWechatOpenId(ctx context.Context, in *GetWechatOpenIdRequest, opts ...grpc.CallOption) (*GetWechatOpenIdResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	GetCurrentUser(ctx context.Context, in *GetCurrentUserRequest, opts ...grpc.CallOption) (*GetCurrentUserResponse, error)
 }
@@ -171,6 +173,16 @@ func (c *authServiceClient) GetSecurityStatus(ctx context.Context, in *GetSecuri
 	return out, nil
 }
 
+func (c *authServiceClient) GetWechatOpenId(ctx context.Context, in *GetWechatOpenIdRequest, opts ...grpc.CallOption) (*GetWechatOpenIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWechatOpenIdResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetWechatOpenId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LogoutResponse)
@@ -206,6 +218,7 @@ type AuthServiceServer interface {
 	ResolveCredential(context.Context, *ResolveCredentialRequest) (*ResolveCredentialResponse, error)
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
 	GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error)
+	GetWechatOpenId(context.Context, *GetWechatOpenIdRequest) (*GetWechatOpenIdResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
@@ -250,6 +263,9 @@ func (UnimplementedAuthServiceServer) ResetPassword(context.Context, *ResetPassw
 }
 func (UnimplementedAuthServiceServer) GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSecurityStatus not implemented")
+}
+func (UnimplementedAuthServiceServer) GetWechatOpenId(context.Context, *GetWechatOpenIdRequest) (*GetWechatOpenIdResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWechatOpenId not implemented")
 }
 func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
@@ -476,6 +492,24 @@ func _AuthService_GetSecurityStatus_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetWechatOpenId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWechatOpenIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetWechatOpenId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetWechatOpenId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetWechatOpenId(ctx, req.(*GetWechatOpenIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LogoutRequest)
 	if err := dec(in); err != nil {
@@ -562,6 +596,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSecurityStatus",
 			Handler:    _AuthService_GetSecurityStatus_Handler,
+		},
+		{
+			MethodName: "GetWechatOpenId",
+			Handler:    _AuthService_GetWechatOpenId_Handler,
 		},
 		{
 			MethodName: "Logout",

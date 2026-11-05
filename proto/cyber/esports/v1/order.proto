@@ -152,12 +152,6 @@ message CreateOrderRequest {
     min_len: 1
     max_len: 32
   }];
-  // OpenID for in-WeChat payment, supplied by the wechat binding;
-  // required when the channel pays by invoke.
-  optional string payer_openid = 4 [(buf.validate.field).string = {
-    min_len: 1
-    max_len: 128
-  }];
   // Post-payment landing page for jump channels.
   optional string return_url = 5 [(buf.validate.field).string = {
     min_len: 1

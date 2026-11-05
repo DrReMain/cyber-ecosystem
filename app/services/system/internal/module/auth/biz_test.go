@@ -1857,6 +1857,31 @@ func TestResetPasswordLaws(t *testing.T) {
 	}
 }
 
+// The pay-enrichment read's two laws: the answer is raw, not the masked
+// display form (the unified order consumes the identifier itself), and a
+// caller with no wechat binding answers nil — the consumer's refusal to
+// act on it lives in the order service.
+func TestWechatOpenIDRawAndUnbound(t *testing.T) {
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	uc := newAuthUC(&fakeUserRP{credentials: map[string]*user.Credential{
+		smsKind + "|13900001111":   {Kind: smsKind, Identifier: "13900001111", UserID: "u1"},
+		wechatKind + "|oid-real-1": {Kind: wechatKind, Identifier: "oid-real-1", UserID: "u1"},
+	}}, &fakeAuthzRP{}, newTokenStore())
+
+	openid, err := uc.WechatOpenID(ctx)
+	if err != nil {
+		t.Fatalf("wechat openid: %v", err)
+	}
+	if openid == nil || *openid != "oid-real-1" {
+		t.Fatalf("openid: want oid-real-1 raw, got %v", openid)
+	}
+
+	unbound := newAuthUC(&fakeUserRP{}, &fakeAuthzRP{}, newTokenStore())
+	if openid, err := unbound.WechatOpenID(ctx); err != nil || openid != nil {
+		t.Fatalf("unbound: want nil,nil got %v,%v", openid, err)
+	}
+}
+
 func TestGetSecurityStatusLaws(t *testing.T) {
 	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
 	status := func(hash string) *SecurityStatus {

@@ -90,11 +90,10 @@ type Order struct {
 }
 
 type CreateIn struct {
-	SKUCode     string
-	Channel     payment.Channel
-	ScopeRef    *string
-	PayerOpenID *string
-	ReturnURL   *string
+	SKUCode   string
+	Channel   payment.Channel
+	ScopeRef  *string
+	ReturnURL *string
 	// The payer's wire address as the transport saw it — a server-derived
 	// fact the client never declares; the H5 channel requires it for risk
 	// control, so the service face extracts it and the channel validates.
@@ -179,10 +178,10 @@ type UnlockView struct {
 // Port ----------------------------------------------------------------------------------------------------------------
 
 type OrderRP interface {
-	Create(ctx context.Context, o *Order) (*Order, error)             // a pending-unique conflict returns the surviving active order
-	ClosePending(ctx context.Context, orderNo string) (*Order, error) // nil, nil = no longer pending
-	Settle(ctx context.Context, in *SettleIn) (*Order, bool, error)   // the single write-paid entry; false = a rival settle already won
-	RefundPaid(ctx context.Context, in *RefundIn) (*Order, bool, error) // the single write-refund entry; false = a rival refund already won
+	Create(ctx context.Context, o *Order) (*Order, error)                 // a pending-unique conflict returns the surviving active order
+	ClosePending(ctx context.Context, orderNo string) (*Order, error)     // nil, nil = no longer pending
+	Settle(ctx context.Context, in *SettleIn) (*Order, bool, error)       // the single write-paid entry; false = a rival settle already won
+	RefundPaid(ctx context.Context, in *RefundIn) (*Order, bool, error)   // the single write-refund entry; false = a rival refund already won
 	SettleRefund(ctx context.Context, in *RefundIn) (*Order, bool, error) // processing → terminal refund convergence; false = already terminal
 	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error)               // pending rows past the horizon; expiry is the converger's branch, not the query's
@@ -205,6 +204,12 @@ type PayChannelRP interface { // routes to the configured provider's backend; ca
 	NotifyBaseURL() string
 }
 
+type SystemRP interface {
+	// The caller's own wechat openid via the forwarded session — nil = the
+	// payer never bound wechat, which the invoke channel refuses at create.
+	WechatOpenID(ctx context.Context) (*string, error)
+}
+
 // UC ------------------------------------------------------------------------------------------------------------------
 
 type OrderUC struct {
@@ -216,13 +221,14 @@ type OrderUC struct {
 	channelRP     PayChannelRP
 	profileRP     profile.ProfileRP
 	complianceRP  compliance.ComplianceRP
+	systemRP      SystemRP
 	eventBus      shared.DomainEventBus
 	loopCancels   []context.CancelFunc
 	nextBillDay   time.Time // the day the next reconcile sweep must still see; owned by the reconcile loop's goroutine
 	nextBillRetry int
 }
 
-func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, eventBus shared.DomainEventBus, orderRP OrderRP, skuRP sku.SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP, profileRP profile.ProfileRP, complianceRP compliance.ComplianceRP) *OrderUC {
+func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, eventBus shared.DomainEventBus, orderRP OrderRP, skuRP sku.SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP, profileRP profile.ProfileRP, complianceRP compliance.ComplianceRP, systemRP SystemRP) *OrderUC {
 	uc := &OrderUC{
 		UC:           shared.NewUC(logger.With("module", "module/order"), tm),
 		orderRP:      orderRP,
@@ -232,6 +238,7 @@ func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookReg
 		channelRP:    channelRP,
 		profileRP:    profileRP,
 		complianceRP: complianceRP,
+		systemRP:     systemRP,
 		eventBus:     eventBus,
 	}
 	hooks.OnStart(uc.runLoop("converge", convergeInterval, uc.ConvergeOnce))
@@ -331,7 +338,21 @@ func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error)
 	orderNo := OrderNoPrefix + xid.New().String()
 	expireAt := time.Now().Add(payWindow)
 	var payer *payment.Payer
-	if in.PayerOpenID != nil || in.ReturnURL != nil || in.ClientIP != "" {
+	if strings.HasSuffix(string(in.Channel), "_jsapi") {
+		// The invoke channel's payer openid is the caller's wechat binding,
+		// never a request field — the client has no way to know one, so the
+		// order server resolves it from identity at the only hop that needs
+		// it. An account that never bound wechat has nothing to pay with.
+		openid, err := uc.systemRP.WechatOpenID(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if openid == nil {
+			return nil, esportspb.ErrorEsportsPayWechatUnbound("")
+		}
+		payer = &payment.Payer{OpenID: *openid}
+	}
+	if in.ReturnURL != nil || in.ClientIP != "" {
 		// The caller's landing URL cannot name the order — the number is
 		// minted right here — so the caller sends the receipt URL with its
 		// own params and this side appends the one fact only it owns; the
@@ -345,11 +366,11 @@ func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error)
 			}
 			returnURL += sep + "order=" + orderNo
 		}
-		payer = &payment.Payer{
-			OpenID:    utils.Deref(in.PayerOpenID, ""),
-			ClientIP:  in.ClientIP,
-			ReturnURL: returnURL,
+		if payer == nil {
+			payer = &payment.Payer{}
 		}
+		payer.ClientIP = in.ClientIP
+		payer.ReturnURL = returnURL
 	}
 	prepay, err := uc.channelRP.CreatePayment(ctx, provider, &payment.CreatePaymentInput{
 		Channel:     in.Channel,

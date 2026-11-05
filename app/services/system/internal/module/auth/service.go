@@ -156,6 +156,18 @@ func (s *AuthService) GetSecurityStatus(ctx context.Context, in *systempb.GetSec
 	}, nil
 }
 
+func (s *AuthService) GetWechatOpenId(ctx context.Context, in *systempb.GetWechatOpenIdRequest) (*systempb.GetWechatOpenIdResponse, error) {
+	openid, err := s.authUC.WechatOpenID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	resp := &systempb.GetWechatOpenIdResponse{}
+	if openid != nil {
+		resp.Openid = wrapperspb.String(*openid)
+	}
+	return resp, nil
+}
+
 func (s *AuthService) Logout(ctx context.Context, in *systempb.LogoutRequest) (*systempb.LogoutResponse, error) {
 	if err := s.authUC.Logout(ctx); err != nil {
 		return nil, err

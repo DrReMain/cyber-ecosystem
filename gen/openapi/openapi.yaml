@@ -3375,6 +3375,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.GetSecurityStatusResponse'
+    /api/v1/system/me/wechat-openid:
+        get:
+            tags:
+                - AuthService
+            operationId: AuthService_GetWechatOpenId
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetWechatOpenIdResponse'
     /api/v1/system/policies:
         get:
             tags:
@@ -5083,11 +5095,6 @@ components:
                     description: |-
                         The test record a trial sku unlocks — required for trial, must be
                          absent for membership; the caller must own the record.
-                payerOpenid:
-                    type: string
-                    description: |-
-                        OpenID for in-WeChat payment, supplied by the wechat binding;
-                         required when the channel pays by invoke.
                 returnUrl:
                     type: string
                     description: Post-payment landing page for jump channels.
@@ -8604,6 +8611,16 @@ components:
             properties:
                 user:
                     $ref: '#/components/schemas/cyber.system.v1.User'
+        cyber.system.v1.GetWechatOpenIdResponse:
+            type: object
+            properties:
+                openid:
+                    type: string
+            description: |-
+                The caller's wechat openid, raw — the one credential value that crosses
+                 unmasked: the JSAPI unified order takes it as a payer fact, and only the
+                 consuming service's server-side enrichment reads this face (display
+                 surfaces keep the masked form). Null = the caller never bound wechat.
         cyber.system.v1.ListAuditExportsResponse:
             type: object
             properties:

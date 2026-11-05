@@ -22,6 +22,7 @@ const OperationAuthServiceBeginIdentityLogin = "/cyber.system.v1.AuthService/Beg
 const OperationAuthServiceBindCredential = "/cyber.system.v1.AuthService/BindCredential"
 const OperationAuthServiceGetCurrentUser = "/cyber.system.v1.AuthService/GetCurrentUser"
 const OperationAuthServiceGetSecurityStatus = "/cyber.system.v1.AuthService/GetSecurityStatus"
+const OperationAuthServiceGetWechatOpenId = "/cyber.system.v1.AuthService/GetWechatOpenId"
 const OperationAuthServiceLogin = "/cyber.system.v1.AuthService/Login"
 const OperationAuthServiceLoginByIdentity = "/cyber.system.v1.AuthService/LoginByIdentity"
 const OperationAuthServiceLogout = "/cyber.system.v1.AuthService/Logout"
@@ -37,6 +38,7 @@ type AuthServiceHTTPServer interface {
 	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
 	GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error)
+	GetWechatOpenId(context.Context, *GetWechatOpenIdRequest) (*GetWechatOpenIdResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginByIdentity(context.Context, *LoginByIdentityRequest) (*LoginByIdentityResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
@@ -60,6 +62,7 @@ func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
 	r.Handle("POST", "/api/v1/system/auth/resolve-credential", _AuthService_ResolveCredential0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/reset-password", _AuthService_ResetPassword0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me/security", _AuthService_GetSecurityStatus0_HTTP_Handler(srv))
+	r.Handle("GET", "/api/v1/system/me/wechat-openid", _AuthService_GetWechatOpenId0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/logout", _AuthService_Logout0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me", _AuthService_GetCurrentUser0_HTTP_Handler(srv))
 }
@@ -273,6 +276,25 @@ func _AuthService_GetSecurityStatus0_HTTP_Handler(srv AuthServiceHTTPServer) fun
 	}
 }
 
+func _AuthService_GetWechatOpenId0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetWechatOpenIdRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceGetWechatOpenId)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetWechatOpenId(ctx, req.(*GetWechatOpenIdRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetWechatOpenIdResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _AuthService_Logout0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in LogoutRequest
@@ -317,6 +339,7 @@ type AuthServiceHTTPClient interface {
 	BindCredential(ctx context.Context, req *BindCredentialRequest, opts ...http.CallOption) (rsp *BindCredentialResponse, err error)
 	GetCurrentUser(ctx context.Context, req *GetCurrentUserRequest, opts ...http.CallOption) (rsp *GetCurrentUserResponse, err error)
 	GetSecurityStatus(ctx context.Context, req *GetSecurityStatusRequest, opts ...http.CallOption) (rsp *GetSecurityStatusResponse, err error)
+	GetWechatOpenId(ctx context.Context, req *GetWechatOpenIdRequest, opts ...http.CallOption) (rsp *GetWechatOpenIdResponse, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginResponse, err error)
 	LoginByIdentity(ctx context.Context, req *LoginByIdentityRequest, opts ...http.CallOption) (rsp *LoginByIdentityResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutResponse, err error)
@@ -409,6 +432,22 @@ func (c *AuthServiceHTTPClientImpl) GetSecurityStatus(ctx context.Context, in *G
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationAuthServiceGetSecurityStatus),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) GetWechatOpenId(ctx context.Context, in *GetWechatOpenIdRequest, opts ...http.CallOption) (*GetWechatOpenIdResponse, error) {
+	var out GetWechatOpenIdResponse
+	pattern := "/api/v1/system/me/wechat-openid"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationAuthServiceGetWechatOpenId),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)

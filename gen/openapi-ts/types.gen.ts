@@ -524,11 +524,6 @@ export type CyberEsportsV1CreateOrderRequest = {
      */
     scopeRef?: string;
     /**
-     * OpenID for in-WeChat payment, supplied by the wechat binding;
-     * required when the channel pays by invoke.
-     */
-    payerOpenid?: string;
-    /**
      * Post-payment landing page for jump channels.
      */
     returnUrl?: string;
@@ -3138,6 +3133,16 @@ export type CyberSystemV1GetTenantResponse = {
 
 export type CyberSystemV1GetUserResponse = {
     user?: CyberSystemV1User;
+};
+
+/**
+ * The caller's wechat openid, raw — the one credential value that crosses
+ * unmasked: the JSAPI unified order takes it as a payer fact, and only the
+ * consuming service's server-side enrichment reads this face (display
+ * surfaces keep the masked form). Null = the caller never bound wechat.
+ */
+export type CyberSystemV1GetWechatOpenIdResponse = {
+    openid?: string;
 };
 
 export type CyberSystemV1ListAuditExportsResponse = {
@@ -6720,6 +6725,22 @@ export type AuthServiceGetSecurityStatusResponses = {
 };
 
 export type AuthServiceGetSecurityStatusResponse = AuthServiceGetSecurityStatusResponses[keyof AuthServiceGetSecurityStatusResponses];
+
+export type AuthServiceGetWechatOpenIdData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/me/wechat-openid';
+};
+
+export type AuthServiceGetWechatOpenIdResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1GetWechatOpenIdResponse;
+};
+
+export type AuthServiceGetWechatOpenIdResponse = AuthServiceGetWechatOpenIdResponses[keyof AuthServiceGetWechatOpenIdResponses];
 
 export type PolicyServiceListPoliciesData = {
     body?: never;

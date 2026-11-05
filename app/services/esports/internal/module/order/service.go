@@ -49,12 +49,11 @@ func (s *OrderService) RegisterConnect(srv *connecttransport.Server) {
 
 func (s *OrderService) CreateOrder(ctx context.Context, in *esportspb.CreateOrderRequest) (*esportspb.CreateOrderResponse, error) {
 	out, err := s.orderUC.Create(ctx, &CreateIn{
-		SKUCode:     in.GetSkuCode(),
-		Channel:     payment.Channel(in.GetChannel()),
-		ScopeRef:    in.ScopeRef,
-		PayerOpenID: in.PayerOpenid,
-		ReturnURL:   in.ReturnUrl,
-		ClientIP:    clientIPOf(ctx),
+		SKUCode:   in.GetSkuCode(),
+		Channel:   payment.Channel(in.GetChannel()),
+		ScopeRef:  in.ScopeRef,
+		ReturnURL: in.ReturnUrl,
+		ClientIP:  clientIPOf(ctx),
 	})
 	if err != nil {
 		return nil, err

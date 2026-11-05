@@ -60,6 +60,11 @@ export const resetPassword = AuthService.method.resetPassword;
 export const getSecurityStatus = AuthService.method.getSecurityStatus;
 
 /**
+ * @generated from rpc cyber.system.v1.AuthService.GetWechatOpenId
+ */
+export const getWechatOpenId = AuthService.method.getWechatOpenId;
+
+/**
  * @generated from rpc cyber.system.v1.AuthService.Logout
  */
 export const logout = AuthService.method.logout;

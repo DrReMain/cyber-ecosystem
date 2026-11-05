@@ -45,6 +45,10 @@ func (noopHooks) OnStop(func(context.Context) error)  {}
 
 func strp(v string) *string { return &v }
 
+type fakeWechatID struct{ openid *string }
+
+func (f *fakeWechatID) WechatOpenID(context.Context) (*string, error) { return f.openid, nil }
+
 func envOr(key, def string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
@@ -108,9 +112,10 @@ func TestPayLiveE2E(t *testing.T) {
 	if !ok {
 		t.Fatalf("mock controller: not a mock backend")
 	}
+	payerID := &fakeWechatID{openid: strp("oid-e2e-payer")}
 	uc := order.NewOrderUC(logger, pf, noopHooks{}, nil, order.NewOrderRP(logger, pf), sku.NewSkuRP(logger, pf),
 		entitle.NewEntitlementRP(logger, pf), test.NewTestRP(logger, pf), chanRP,
-		profile.NewProfileRP(logger, pf), compliance.NewComplianceRP(logger, pf))
+		profile.NewProfileRP(logger, pf), compliance.NewComplianceRP(logger, pf), payerID)
 	svc := order.NewOrderService(logger, uc)
 
 	channels, err := chanRP.Channels("mock")
@@ -356,6 +361,34 @@ func TestPayLiveE2E(t *testing.T) {
 	}
 	if _, err := uc.Close(ctx, h5o.Order.OrderNo); err != nil {
 		t.Fatalf("h5 close: %v", err)
+	}
+	// The invoke channel's payer is the caller's wechat binding, never a
+	// request fact: an unbound account is refused before the channel ever
+	// sees an order; a bound one's openid rides the payer silently and the
+	// mock answers with the invoke credential.
+	var jsapi payment.Channel
+	for _, c := range channels {
+		if strings.HasSuffix(string(c), "_jsapi") {
+			jsapi = c
+		}
+	}
+	if jsapi == "" {
+		t.Fatalf("no jsapi channel in %v", channels)
+	}
+	payerID.openid = nil
+	if _, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: jsapi}); !esportspb.IsEsportsPayWechatUnbound(err) {
+		t.Fatalf("jsapi unbound: want ESPORTS_PAY_WECHAT_UNBOUND, got %v", err)
+	}
+	payerID.openid = strp("oid-e2e-payer")
+	jsapio, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: jsapi})
+	if err != nil {
+		t.Fatalf("jsapi create: %v", err)
+	}
+	if jsapio.Credential.Kind != payment.CredentialInvoke {
+		t.Fatalf("jsapi credential kind: %+v", jsapio.Credential)
+	}
+	if _, err := uc.Close(ctx, jsapio.Order.OrderNo); err != nil {
+		t.Fatalf("jsapi close: %v", err)
 	}
 	if _, err := uc.Close(ctx, mem1.Order.OrderNo); !esportspb.IsEsportsOrderStateConflict(err) {
 		t.Fatalf("close paid: err=%v", err)

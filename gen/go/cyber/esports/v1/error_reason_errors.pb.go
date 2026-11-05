@@ -313,6 +313,24 @@ func ErrorEsportsOrderAlreadyRefunded(format string, args ...interface{}) *error
 	return errors.New(400, Esports_ESPORTS_ORDER_ALREADY_REFUNDED.String(), fmt.Sprintf(format, args...))
 }
 
+// The invoke channel's payer is the caller's wechat binding, never a
+// request field — an in-WeChat order from an account that never bound
+// wechat has no openid to pay with; the wall routes to bind first.
+func IsEsportsPayWechatUnbound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_PAY_WECHAT_UNBOUND.String() && e.Code == 400
+}
+
+// The invoke channel's payer is the caller's wechat binding, never a
+// request field — an in-WeChat order from an account that never bound
+// wechat has no openid to pay with; the wall routes to bind first.
+func ErrorEsportsPayWechatUnbound(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_PAY_WECHAT_UNBOUND.String(), fmt.Sprintf(format, args...))
+}
+
 // 615x: activation code & entitlement
 func IsEsportsActivationCodeInvalid(err error) bool {
 	if err == nil {

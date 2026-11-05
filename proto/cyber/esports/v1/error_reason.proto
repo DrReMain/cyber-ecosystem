@@ -55,6 +55,10 @@ enum Esports {
   // The order's one full refund already exists — the tool refunds whole
   // orders once, so support says "already refunded", not "state conflict".
   ESPORTS_ORDER_ALREADY_REFUNDED = 6157 [(.errors.code) = 400];
+  // The invoke channel's payer is the caller's wechat binding, never a
+  // request field — an in-WeChat order from an account that never bound
+  // wechat has no openid to pay with; the wall routes to bind first.
+  ESPORTS_PAY_WECHAT_UNBOUND = 6158 [(.errors.code) = 400];
 
   // 615x: activation code & entitlement
   ESPORTS_ACTIVATION_CODE_INVALID = 6150 [(.errors.code) = 400];

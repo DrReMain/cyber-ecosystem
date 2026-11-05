@@ -162,6 +162,26 @@ func (c *systemClient) SecurityStatus(ctx context.Context) (*profile.SecurityFac
 	return facts, nil
 }
 
+func (c *systemClient) WechatOpenID(ctx context.Context) (*string, error) {
+	// Me-face by construction: the forwarded session is the order creator's
+	// own, so the read can only ever name the payer's binding.
+	ctx, err := withCallerSession(ctx)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.auth.GetWechatOpenId(ctx, connectrpc.NewRequest(&systempb.GetWechatOpenIdRequest{}))
+	if err != nil {
+		return nil, err
+	}
+	// Unwrap boxes the typed-nil wrapper into a non-nil interface and would
+	// surface &"" — here nil-vs-empty is semantic: nil is the unbound payer.
+	if v := resp.Msg.GetOpenid(); v != nil {
+		id := v.GetValue()
+		return &id, nil
+	}
+	return nil, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func mapCredentialFacts(owner *systempb.CredentialOwner) *profile.CredentialFacts {
