@@ -402,12 +402,12 @@
 
 族小计:15 门=路由门 1/状态门 11/交互门 3;已活证 1、部分活证 3、待造态 10(易造 9)、占位过时嫌疑 1。
 
-## 3) 文件级 · admin esports(未开)
+## 3) 文件级 · admin esports(已迁独立档 `render-coverage-admin.md`;2026-11-06 admin 起栈日:U1-admin 首轮 25 面=22 live+1 观测受限(agent 依赖)+2 parked)
 
 ## 4) 计数收口与对账环
 
 - **U1-ctr 分支级提取全量毕(2026-11-06)**:11 批=壳 15+守卫补遗 4+login 22+向导 25+home 13+match 22+test 32+report 29+member/pay 28+messages/feedback 20+security 29+末批 15=**254 门**(交互门 43/状态门 174/路由门 37)。
 - 判定分布:已活证 13(X1-1/e2e 红利)、部分活证 11、e2e 在案 3、待造态 189(易造约 80)、观测受限 28(真微信腿+瞬态各半)、数据门 14、法条在案 4。
 - **悬置三件已判(11-06,「先由你来判断」授权)**:①Skeleton=删(孤儿资产,Q1-③ 残骸无预留登记,现行 loading idiom=LoadingStrip 已竞争上岗);②pick·empty=接线(错接非预留,立 **G-406**);③profile 报告中心=接线(原型 289-291 三钮真跳转实锤,立 **G-407**)。①为代码删除、②③为红条工单,执行均归开发会话。红条 G-405 已立(emoji 字形)。
-- 下一步:起栈 U1-ctr 活证走查(chrome mcp 人在环;优先序=test verdict 六面→messages/feedback 全族→security merge 离线缝→易造 80 门铺开),后 U1-admin。**进度(11-06 全天):前四项毕+易造大丰收**——verdict 5/6 面/messages 八面/security 大批(merge 全族/双闸/bind-phone 真链/password/forgot/bind-wechat)/test 单场×4 全脸/向导族直访群/登出态批(Logout 链+双守卫匿名支+login 族 toast 群)/profile 总览连walk;**新伤五枚(G-408..412)**。ctr 侧小残=FormErrorLine 三支/AgreeBox indeterminate/home guest 面/logout sheet 面文(皆需再登出循环,边际低)+InvalidNotice 余三词+SubmitError;**下一大块=admin 起栈(X2-1 admin 腿+U1-admin 文件级)**。
+- 下一步:起栈 U1-ctr 活证走查(chrome mcp 人在环;优先序=test verdict 六面→messages/feedback 全族→security merge 离线缝→易造 80 门铺开),后 U1-admin。**进度(11-06 全天):前四项毕+易造大丰收**——verdict 5/6 面/messages 八面/security 大批(merge 全族/双闸/bind-phone 真链/password/forgot/bind-wechat)/test 单场×4 全脸/向导族直访群/登出态批(Logout 链+双守卫匿名支+login 族 toast 群)/profile 总览连walk;**新伤五枚(G-408..412)**。ctr 侧小残=FormErrorLine 三支/AgreeBox indeterminate/home guest 面/logout sheet 面文(皆需再登出循环,边际低)+InvalidNotice 余三词+SubmitError;**下一大块=admin 起栈(X2-1 admin 腿+U1-admin 文件级)**——**起栈日毕(11-06 晚)**:X2-1 六腿全闭环/X2-2 全毕/X2-3 半毕(G-413 立)+U1-admin 首轮 25 面(22 live+1 观测受限+2 parked)+U3 三裁定入 calibration-log(tab 筛选族→Filter/Segmented、布局留白、drawer 重型 table);下一=X1-2 mock 购会员→X3 铸码导出→A-套余面→U2 harness 重激活;伤单累计 G-405..413(2 绿 11 红)。
 - 死码嫌疑处置:修条件 bug 或删(逐条用户过目);预留门登记编号引 gap-ledger/pm-review。

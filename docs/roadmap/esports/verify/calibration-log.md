@@ -8,3 +8,6 @@
 
 | 日期 | 套/例-面 | 偏好 | 处置 | 泛化候选 |
 |---|---|---|---|---|
+| 2026-11-06 | X2-1·admin esports 列表页(反馈队列现场起,泛全族) | tab 筛选族没必要——骨架侧(IAM/文件)列表页已有统一 Filter 筛选组件;esports 页大量 tab 是为还原原型而存在;就算要用这种交互也应该是 Segment 组件更美观 | 入队 U3 基座范式:4 列表页(feedback-tickets/members/orders/skus)迁移基座 Filter(状态=Select);单一运营主维度确需常驻→Segmented 例外形,禁 line Tabs;现状 Tab 与 Filter 均写 URL search 态(实测 status=closed 入 URL),迁移不丢可分享性 | 中:列表页筛选范式=基座 Filter 默认+Segmented 例外(骨架侧候选,须过回灌门槛) |
+| 2026-11-06 | X2-1·admin esports 页布局 | 布局有问题,特别是内外边距、不必要的外层容器(为还原原型而存在) | 入队 U3:esports admin 页容器层级与留白对齐骨架页基线(逐页审计) | 低 |
+| 2026-11-06 | X2-1·admin drawer 场景 | 封装的重型 table 组件不适用于 drawer 中的简单场景,属于过度使用组件 | 入队 U3:drawer 内简单列表降级朴素 Table/List;重型 DataTable(columnSettings/toolbar/density)保留给主列表页 | 中:组件选型粒度律(场景重量匹配) |
