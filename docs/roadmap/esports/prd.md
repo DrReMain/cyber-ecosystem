@@ -296,6 +296,8 @@
 | ⑦ | 新仓 metric.md(E3 增量a) | 「反应/追踪(P9)」标注,归反应类 | 已预登记待裁 |
 | ⑧ | 新仓 seed.go(E2 增量a) | ability=**reactionSpeed** | 暂按设计侧 |
 
+> **2026-11-06 生产实况注(转储直查)**:生产 test_type.ability 已自行改为 **reactionSpeed**(2026-08 按 GAME_LOGIC_SPEC「数据层 4 处修正」批执行)——①的陈旧值在生产已被修正,与②③⑧收敛,P9 定稿获生产侧迟到背书。附带两笔:moving_target 同批改 trackingStability(新仓 seed.go 同值),与 gac 主行 aimingAccuracy 相左=归因悬点随校准片(P16/P26.1)裁;副能力终态 4 行(生产 3 行+flash_aiming→DE)详见 migration.md 种子重放注。
+
 **语义判据**:追踪类(moving_target/tracking_moving)的定义是「10 分/秒**完美追踪**」= 对移动目标的持续跟随;target_recognition 是「干扰物中出现目标→识别点击」= 离散的选择性注意/反应任务。二者范式不同,玩法本体不含追踪成分。
 
 ### P9.2 候选与推荐

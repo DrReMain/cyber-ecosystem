@@ -8,12 +8,14 @@
 
 | 档 | 测试 | 处置 |
 |---|---|---|
-| A 明细自足 | red_dot/offense_defense/character_counter/skill_trajectory/flash_aiming/dual_zone | 原始明细全量重放重算 |
+| A 明细自足 | red_dot/offense_defense/character_counter/skill_trajectory/flash_aiming/dual_zone/resource_match | 原始明细全量重放重算 |
 | B 聚合可重放 | number_stars/moving_target/target_recognition/multi_target | summary 聚合重放 |
 | C 只能平移 | tracking_moving/economic_sim | 旧分平移+legacy 口径标 |
 | D 作废 | skill_prediction | 死端点,无有效存量 |
 
 > **2026-11-02 recompute 审计注**:①「平移」已由 behavior 刀对全部迁移行落地(score→authoritative_score,rawScore→raw_score,grade=band(score)),四档现况=C 档处置泛化为默认,重放是「升级」而非「必经」。②A/B 重放闸门=该款标定曲线(P16:现仅 red_dot 分位冻结;curvePendingResult 结构性不出权威分,曲线前重放=把旧标定分行降级成无权威分/无档位)。③重放窗口与口径标载体=P26.1(ljr):推荐 cutover 一刻迁移器内重放当日已定曲线款(逐字复制 scorer+曲线,bandFor 先例形状),余款平移+legacy 标,cutover 后不重放。**(11-04 补注,用户问「游戏测试完分数/评级」带出)新测侧同缝:14 款 scorer 仅 red_dot 冻结曲线在码(提交即出权威分+档位),余 13 款 curvePendingResult/raw-only 结构性不出权威分——历史行评级随本票重放口径落,新测 13 款出评级的时点=曲线从重放器进 live scorer 的入码片,未排票;建议本票裁决一并钉(搬运方=lzx,口径/窗口=ljr),在此之前新测=诚实「未评级」态(设计内非 bug,D-AO③ 文案在)**。④B 档 summary 聚合重放可行性:旧 summary 聚合面对得上新 composite 输入(number_stars 例:maxSeqLen 缺席→复杂度项降级重放);逐款咬合核对归 recompute 机械片夹具。
+
+> **2026-11-06 补行注**:A 档补 resource_match——生产存量 101 行(在 2698 总量/2685 迁移量对账内),原表 13 款漏列;归属依据=metric.md §6.11 E3-h 定稿卡(Tier A,事实流全量重算),重算闸门同 P16 曲线律(曲线前平移)。档位依 metric 定稿证据落(D-BC 报备)。
 
 ## 逐表口径
 
@@ -23,15 +25,15 @@
 - **不迁重算**:user 统计四列/ability_score/platform_analytics/game_analytics(由 test_record 重算)。**2026-11-02 recompute 审计**:四目标全数零迁移器写入——platform/game analytics 新 schema 未建(归 P20 特性从 test_record 现算),user 统计四列=读时推导(新 profile 无统计列,原型统计条走 API 现算),ability_score=report 冻结流懒写(读面幂等生成,迁移器抢写反而破坏懒冻结语义);「由 test_record 重算」的正确读法=新系统读时自行重算,迁移器不碰。
 - **保真搬运(D-C2)**:报告 JSON 快照(user_career_profile/school_report)= 旧算法产物+R3 永久可查看语义,原样只读迁入;consent/审计从零。(生产实况 11-02 核实:school_report 无存量,组织层随之删除,见迁移顺序注;**11-06 真转储证伪——463 行实存,处置=D-MIG-1,见预演备料节**)
 - **不迁**:RBAC 六件套(`admin_user`/`admin_user_role`/`role`/`role_permission`/`permission`/`menu`)/`*_bak_*` 快照表/flyway 历史/`sku_pricing`(旧报告三档定价表,D-AB 新计费取代且旧库无网关无存量交易)/`content_management`(banner/notice/guide kv 内容表,旧码零消费端=死表;notice 面由 MSG-1 公告承接)/`system_config`(逐键核对新栈配置面,默认不迁)。
-- **表名对照(2026-11-02 全 36 表逐名过账,处置组↔表名,零命中补齐)**:身份=`user`;画像行为=`user_game_preference`/`login_record`(溯源,P22)/`user_referral`(归因,P23);权益=`activation_code`/`activation_records`+`user` 解锁三旗标列;报告快照=`user_career_profile`/`school_report`(无存量,D-BA 停机守卫);种子=`game`/`test_type`/`test_config`/`game_ability_contribution`/题库四表(`moba_character`/`offense_scenario`/`character_counter_relation`/`offense_choice_explanation`)/`career_recommendation_template`/`career_statistics`/`test_type_introduction`(档案面随余组);重算=`ability_score`/`platform_analytics`/`game_analytics`+`user` 统计四列;MSG 域=`user_message`/`user_feedback`(随 MSG-1;未读语义旧仓实锤=A1,见 prd.md P21;**11-04 域落齐=新四表 user_message/announcement/user_feedback/feedback_message,迁移映射三则=旧 type system→announcement、旧六类前自由串 category(suggestion/bug/other)→新枚举 other/feature_bug/other 兜 other、旧 ref_type+ref_id 收窄为 ref_id(类型即定域);旧单发 admin_reply/replied_at 拆入 feedback_message 线程(admin 行带 admin_id);announcement/feedback_message 无旧表=纯新增;旧 is_read 行级未读同形直迁**);待裁=`app_version`(P19,证据倾向 B:旧 H5 版本弹窗实存)。
-- **种子重放**:game/test_type/test_config/contribution/题库四表/职业模板与统计 —— 以旧仓 init.sql 种子为内容基线重放进版本化迁移(修已知坑,见 plan.md E2)。
+- **表名对照(2026-11-02 全 36 表逐名过账,处置组↔表名,零命中补齐)**:身份=`user`;画像行为=`user_game_preference`/`login_record`(溯源,P22)/`user_referral`(归因,P23);权益=`activation_code`/`activation_records`+`user` 解锁三旗标列;报告快照=`user_career_profile`/`school_report`(**463 行实存**(11-06 转储),处置=D-MIG-1,guard 遇非空仍停);种子=`game`/`test_type`/`test_config`/`game_ability_contribution`/题库四表(`moba_character`/`offense_scenario`/`character_counter_relation`/`offense_choice_explanation`)/`career_recommendation_template`/`career_statistics`/`test_type_introduction`(档案面随余组);重算=`ability_score`/`platform_analytics`/`game_analytics`+`user` 统计四列;MSG 域=`user_message`/`user_feedback`(随 MSG-1;未读语义旧仓实锤=A1,见 prd.md P21;**11-04 域落齐=新四表 user_message/announcement/user_feedback/feedback_message,迁移映射三则=旧 type system→announcement、旧六类前自由串 category(suggestion/bug/other)→新枚举 other/feature_bug/other 兜 other、旧 ref_type+ref_id 收窄为 ref_id(类型即定域);旧单发 admin_reply/replied_at 拆入 feedback_message 线程(admin 行带 admin_id);announcement/feedback_message 无旧表=纯新增;旧 is_read 行级未读同形直迁**);待裁=`app_version`(P19,证据倾向 B:旧 H5 版本弹窗实存)。
+- **种子重放**:game/test_type/test_config/contribution/题库四表/职业模板与统计 —— **内容真相源=生产转储(2026-11-06 重锚,证据见预演备料节)**,init.sql 降辅助参考:实锤=生产 test_type.ability 已按 09-26 GAME_LOGIC_SPEC「数据层 4 处修正」批执行(target_recognition→reactionSpeed/moving_target→trackingStability/dual_zone 蛇形修),init.sql 仍是修正前世代;gac 16 行与题库正典(20 场景×60 解析)两源逐行一致。新仓载体=bootstrap/seed.go(E2;init 迁移零 SQL 种子);**归因悬点(校准片 P16/P26.1 第一裁决项):moving_target 主归因 seed.go=trackingStability(随生产)vs gac 主行=aimingAccuracy(规格 B2 将其 TS 列 0.5 次行)**。副能力终态=4 行 0.5(09-26 拍板=生产现存 3 行+flash_aiming→DE 新增,生产未及上线)——校准勿按生产 gac 回「修」成 3 行。题库垃圾:生产另有 2 条手工场景(「222」/「测试场景xx」)被 2 行 offense_defense 明细引用,重放按 DETAIL_MISMATCH 拒后落平移(设计内),预演对账预期之。修已知坑清单随 E 线入 progress-archive。
 - **ID 与时间**:存量 Snowflake ID 沿用(不改写主键);时间戳按 Asia/Shanghai 墙钟解释转 UTC;游戏时钟毫秒保留为原始 long;duration 由 ms 差重算。
 
 ## 迁移顺序
 
 身份(产出并持久化 旧↔新 ID 映射)→ 权益 → 主数据种子(先于行为数据)→ 行为数据(偏好→test_record→溯源)→ 报告快照 → 收尾(同意/审计/分析重算)。
 
-**「组织(school→租户)」层删除(11-02 D-BA:生产数据全公版,旧版无专版,无学校数据可迁;ljr 补证 school 域存量管理员/组织/学员/report 均测试数据不迁)**——导入器遇 school/school_report 非空行=停机报错待议,不静默跳过(血泪条款 4 同族防线);真租户随 M3 出现再立二次迁移。
+**「组织(school→租户)」层删除(11-02 D-BA:生产数据全公版,旧版无专版,无学校数据可迁;ljr 补证 school 域存量管理员/组织/学员/report 均测试数据不迁)**——导入器遇 school/school_report 非空行=停机报错待议,不静默跳过(血泪条款 4 同族防线);真租户随 M3 出现再立二次迁移。(**11-06 census 证伪「均为测试数据」:463 行中 22 行属 7 真实存活用户、121 行 user_id 孤儿——事实前提推翻,行级处置挂 D-MIG-1;层删除裁定本体待裁决后复核**)
 
 ## 预演备料实录(2026-11-06,副本较 11-14 就绪门提前 8 天)
 
