@@ -90,7 +90,7 @@ E10-a 复对账(10-28,live dev 栈,同款 innerText oracle):14 行中 12 行逐�
 
 | # | 面 | 原型/旧码 | 现行实现 | 依据/复核窗 |
 |---|---|---|---|---|
-| R-01 | MSG-1 消息类型与范围 | 三型四范围(含触达已读统计) | 两型两范围,无触达已读统计 | 白名单①(契约窄化显式登记);W6 ljr |
+| R-01 | MSG-1 消息类型与范围 | 三型四范围(含触达已读统计) | 两型两范围,无触达已读统计(ctr+admin 公告面同窄,11-05 对齐) | 白名单①(契约窄化显式登记);W6 ljr |
 | R-02 | MSG-1 contact 上限 | 输入 40 字 | 128 | 同上;W6 ljr |
 | R-03 | pay-result cancel 文案 | 「未产生订单」 | 「未产生扣款」(真实订单生命周期 CLOSED 形,订单存在无扣款) | 白名单③(真实生命周期);真通道刀随检 |
 | R-04 | terminated 会员 /member 呈现 | (原型无此态) | 折 never 形(解锁内容仍可读,灰条/计数行不显);e2e 钉死 | 白名单②(无 oracle 面);运营/真通道刀复核 |
@@ -98,4 +98,9 @@ E10-a 复对账(10-28,live dev 栈,同款 innerText oracle):14 行中 12 行逐�
 | R-06 | game-config 呈现 | 难度三档权重/上下架四列+因子抽屉 | 运行配置平键值表(更贴 test_config schema 真相) | 白名单②(schema 更真);M2 余组 test-type 档案面 |
 | R-07 | consent 渠道列 | 列=小红书/抖音/归因 | 契约无 channel 字段,列未建 | 白名单①;P23 归因记账(遗留清单并) |
 | R-08 | MSG-1 ctr 呈现两处 | fb 关单态无 UI(原型仅 pending/replied);fb 列表行=短标题 | 关单态=灰徽+「该反馈已关闭;如有新问题,请提交新反馈」新文案;列表行以内容首行为题(契约无 title 字段) | 白名单①延伸(契约态原型无 UI);W6 ljr |
+| R-09 | MSG-1 admin 反馈列表关键字搜索 | 「搜索 用户 / 内容」输入框 | 未建(契约 ListFeedbacks 无 search 参数) | 白名单①;契约增量时随建(手机号投影=G-306 族) |
+| R-10 | MSG-1 admin 反馈列表行内回复预览 | 行内 replybox 展「管理员回复：…」 | 未建(契约 FeedbackTicket 无 last-reply 字段),回复内容详情页承载 | 白名单①;契约增量时随建 |
+| R-11 | MSG-1 admin 反馈详情掩码手机号 | KV 行=昵称 · 150\*\*\*\*4410 | 未建(契约 ticket 无 phone 字段);用户自留 contact(回访方式)已显 | 白名单①;G-306 投影族共议 |
+| R-12 | MSG-1 admin 公告发布动作 | 新建 modal 主按钮=发布(一步直达) | 两步=存草稿→行内发布(契约 Create=draft 正身,无 create+publish 原子面) | 白名单①;W6 ljr |
+| R-13 | MSG-1 admin 公告草稿编辑 | 无编辑动作 | 契约 UpdateAnnouncement 落编辑动作(改题/改正文,kind·scope 创建后冻结) | 契约正身(超原型面);W6 ljr 复核 |
 

@@ -1,0 +1,14 @@
+{
+  "esports_feedback_detail_title": "フィードバック詳細",
+  "esports_feedback_detail_back": "フィードバック管理に戻る",
+  "esports_feedback_detail_user": "ユーザー",
+  "esports_feedback_detail_category": "分類",
+  "esports_feedback_detail_time": "送信時刻",
+  "esports_feedback_detail_contact": "連絡先",
+  "esports_feedback_detail_content": "内容",
+  "esports_feedback_detail_thread": "会話履歴",
+  "esports_feedback_detail_sender_admin": "管理者返信",
+  "esports_feedback_detail_reply_placeholder": "管理者の返信を入力…",
+  "esports_feedback_detail_reply_send": "返信",
+  "esports_feedback_detail_reply_ok": "返信し、アプリ版メッセージセンターに同期しました"
+}

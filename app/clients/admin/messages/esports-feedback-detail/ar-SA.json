@@ -1,0 +1,14 @@
+{
+  "esports_feedback_detail_title": "تفاصيل الملاحظة",
+  "esports_feedback_detail_back": "العودة إلى إدارة الملاحظات",
+  "esports_feedback_detail_user": "المستخدم",
+  "esports_feedback_detail_category": "التصنيف",
+  "esports_feedback_detail_time": "وقت الإرسال",
+  "esports_feedback_detail_contact": "وسيلة التواصل",
+  "esports_feedback_detail_content": "المحتوى",
+  "esports_feedback_detail_thread": "سجل المحادثة",
+  "esports_feedback_detail_sender_admin": "رد المشغل",
+  "esports_feedback_detail_reply_placeholder": "اكتب رد المشغل…",
+  "esports_feedback_detail_reply_send": "رد",
+  "esports_feedback_detail_reply_ok": "تم الرد والمزامنة مع مركز الرسائل"
+}
