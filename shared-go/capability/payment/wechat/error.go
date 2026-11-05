@@ -31,9 +31,12 @@ func (e *APIError) Error() string {
 // ErrChannelRejected.
 func classifyAPIError(a *APIError) error {
 	switch {
-	case a.Code == "NO_BILL_EXIST":
+	case a.Code == "NO_BILL_EXIST", a.Code == "NO_STATEMENT_EXIST":
 		// A statement day with no bill is a query miss, not a bad request —
-		// the channel reports it as 400 regardless.
+		// the channel reports it as 400 regardless. Two spellings answer
+		// "no bill for that day": the documented NO_BILL_EXIST and the
+		// NO_STATEMENT_EXIST the live channel returns for an unpublished
+		// trade bill.
 		return fmt.Errorf("%w: %s", payment.ErrNotFound, a.Code)
 	case a.Status == http.StatusBadRequest, a.Status == http.StatusUnauthorized:
 		// 401 is the channel refusing our signature — a credential or

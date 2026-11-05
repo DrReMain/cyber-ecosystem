@@ -103,16 +103,19 @@ func TestReportsHashMismatch(t *testing.T) {
 	}
 }
 
-// A statement day with no bill is a query miss.
+// A statement day with no bill is a query miss — under either spelling the
+// channel answers "no bill for that day" with.
 func TestReportsNoBill(t *testing.T) {
-	f, r := newTestReports(t)
-	f.route(http.MethodGet, "/v3/bill/tradebill", http.StatusBadRequest,
-		`{"code":"NO_BILL_EXIST","message":"no bill for the day"}`)
-	_, err := r.DownloadBill(context.Background(), &payment.BillInput{
-		Date: time.Date(2026, 10, 24, 0, 0, 0, 0, time.UTC), Kind: payment.BillKindTrade,
-	})
-	if !errors.Is(err, payment.ErrNotFound) {
-		t.Fatalf("want ErrNotFound, got %v", err)
+	for _, code := range []string{"NO_BILL_EXIST", "NO_STATEMENT_EXIST"} {
+		f, r := newTestReports(t)
+		f.route(http.MethodGet, "/v3/bill/tradebill", http.StatusBadRequest,
+			`{"code":"`+code+`","message":"no bill for the day"}`)
+		_, err := r.DownloadBill(context.Background(), &payment.BillInput{
+			Date: time.Date(2026, 10, 24, 0, 0, 0, 0, time.UTC), Kind: payment.BillKindTrade,
+		})
+		if !errors.Is(err, payment.ErrNotFound) {
+			t.Fatalf("%s: want ErrNotFound, got %v", code, err)
+		}
 	}
 }
 
