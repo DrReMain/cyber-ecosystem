@@ -35,6 +35,7 @@
   "pay_sheet_success": "模拟支付成功",
   "pay_sheet_fail": "模拟支付失败",
   "pay_sheet_cancel": "取消支付",
+  "pay_qr_alt": "付款二维码",
   "pay_qr_title": "扫码支付",
   "pay_qr_body": "请使用微信扫码完成支付",
   "pay_qr_check": "我已完成支付",

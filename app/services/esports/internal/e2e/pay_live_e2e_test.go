@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"context"
 	"log/slog"
+	"net/url"
 	"os"
 	"slices"
 	"strings"
@@ -329,16 +330,29 @@ func TestPayLiveE2E(t *testing.T) {
 	// The H5 channel's payer hint is a server-derived wire fact, never a
 	// client declaration: the channel refuses a create carrying no client
 	// address and mints the jump credential once the service face supplies
-	// one.
+	// one. The caller's landing names its own params (the receipt face)
+	// but cannot name the order — the service mints it — so the credential
+	// must come back with the landing riding the jump url as redirect_url
+	// and the order stitched in beside the caller's params.
 	if _, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: h5}); err == nil {
 		t.Fatalf("h5 create without a client address passed")
 	}
-	h5o, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: h5, ClientIP: "203.0.113.9"})
+	landing := "https://app.example.com/pay/result?face=open"
+	h5o, err := uc.Create(ctx, &order.CreateIn{
+		SKUCode:   "member_month",
+		Channel:   h5,
+		ClientIP:  "203.0.113.9",
+		ReturnURL: strp(landing),
+	})
 	if err != nil {
 		t.Fatalf("h5 create: %v", err)
 	}
 	if h5o.Credential.Kind != payment.CredentialJumpURL {
 		t.Fatalf("h5 credential kind: %+v", h5o.Credential)
+	}
+	wantRedirect := url.QueryEscape(landing + "&order=" + h5o.Order.OrderNo)
+	if !strings.Contains(h5o.Credential.Value, "redirect_url="+wantRedirect) {
+		t.Fatalf("h5 credential must carry the stitched landing as redirect_url:\n%s", h5o.Credential.Value)
 	}
 	if _, err := uc.Close(ctx, h5o.Order.OrderNo); err != nil {
 		t.Fatalf("h5 close: %v", err)

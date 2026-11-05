@@ -300,10 +300,23 @@ func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error)
 	expireAt := time.Now().Add(payWindow)
 	var payer *payment.Payer
 	if in.PayerOpenID != nil || in.ReturnURL != nil || in.ClientIP != "" {
+		// The caller's landing URL cannot name the order — the number is
+		// minted right here — so the caller sends the receipt URL with its
+		// own params and this side appends the one fact only it owns; the
+		// channel's post-payment redirect then lands on a receipt that
+		// reads its own row.
+		returnURL := utils.Deref(in.ReturnURL, "")
+		if returnURL != "" {
+			sep := "?"
+			if strings.Contains(returnURL, "?") {
+				sep = "&"
+			}
+			returnURL += sep + "order=" + orderNo
+		}
 		payer = &payment.Payer{
 			OpenID:    utils.Deref(in.PayerOpenID, ""),
 			ClientIP:  in.ClientIP,
-			ReturnURL: utils.Deref(in.ReturnURL, ""),
+			ReturnURL: returnURL,
 		}
 	}
 	prepay, err := uc.channelRP.CreatePayment(ctx, provider, &payment.CreatePaymentInput{

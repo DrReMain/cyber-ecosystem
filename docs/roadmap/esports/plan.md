@@ -17,7 +17,7 @@
 
 | 窗 | 日期 | 服务/管理线(lzx) | 精修带(hzy,分配制) | 产品线(ljr) |
 |---|---|---|---|---|
-| W3 余 | 11.06-09 | MSG-1 ctr 腿已收(11-05,未提交);余=真通道刀先行件 G-403 QR 码图/G-404 returnUrl 修形 | — | 行政件即办(就绪目标 11-10) |
+| W3 余 | 11.06-09 | MSG-1 ctr 腿已收(11-05,提交 5d3bded5);G-403/404 先行件亦收(11-05 修形三层落,活证随真通道);可提前进 W4 MSG-1 admin 三页 | — | 行政件即办(就绪目标 11-10) |
 | W4 | 11.10-16 | MSG-1 admin 三页(feedback-manage/07-detail/announcement+V10 闭环走查)+窄化两裁决接洽;PAY2 联调启动(行政件就绪后);**MIG1 预演 11-15**(D-BE:副本 11-14 就绪即演,绿门含回滚腿) | 上线走查执行稿修订(cutover-watch) | P22 否决窗 11-14;P26 理想 11-12 |
 | W5 | 11.17-23 | 真通道联调收口(0.01 真钱闭环+全额退款;G-402/403/404 三红收);MIG1 snapshot+recompute(P26/P26.1 裁后)含曲线入码片 sizing ⑧ | 值守演练配合 | P23/P20 推进 |
 | W6 | 11.24-30 | **CP3 三腿内部核验 11-28**(M1 e2e/PAY2 0.01 真钱/PAY3 全链+MSG-1 可走);cutover 准备(真实 appid 切换+上线清单) | 上线值守(执行稿=cutover-watch) | P23/P20 11-28;appid+绑域 11-26 |
@@ -28,9 +28,9 @@
 
 | 片 | 内容与验收要点 | 依赖 | 规模 |
 |---|---|---|---|
-| MSG-1 余面(lzx 全片 D-BB) | **ctr 腿已收(2026-11-05,未提交):四路由+未读双红点+G-202 真跳+全态 live 走查毕**;余=admin 三页(feedback-manage/07-detail/announcement+V10 闭环走查)+窄化两裁决接洽;MSG_E2E 服务端已绿。**窄化两裁决=W6 ljr**(消息两型两范围 vs 原型三型四范围;contact 128 vs 40;另 R-08 关单态文案,登记=gap-ledger 六批),裁决若翻契约面小改随改;定时发布=已裁非特性延后 | — | M |
-| PAY2 通道联调 | deploy 环境面切 wechat;0.01 真实闭环+全额退款(CP3 门);生产联调+对账;H5 权限就绪后开 H5 scene;上线前登录切真实公众号 appid(JSAPI 绑域,登记上线清单) | 行政件(ljr 11-10);APIv3 密钥已核对转 lzx | M |
-| 真通道刀(G-402/403/404) | **G-402 JSAPI openid:lzx 建议裁②服务端按绑定富集**(证据:JSAPI v3 openid 仅服务端统一下单入参,前端 invoke 只消费 prepay 参数,客户端零消费方;契约暴露=凭据无收益扩散),D-BC 报备形,真通道刀执行时落;**G-403** QR 码图(qrcode 依赖+码图渲染,可先行);**G-404** H5 jump returnUrl 改指 /pay/result?order=…&face=…(修形可先行,活证随真通道——mock 通道不行走 jump);另 clientIPOf 信任拨盘(XFF 优先 vs peer 优先)同刀裁=部署面口径 | G-402 裁决;G-403/404 无依赖 | S-M |
+| MSG-1 余面(lzx 全片 D-BB) | **ctr 腿已收(2026-11-05,提交 5d3bded5):四路由+未读双红点+G-202 真跳+全态 live 走查毕**;余=admin 三页(feedback-manage/07-detail/announcement+V10 闭环走查)+窄化两裁决接洽;MSG_E2E 服务端已绿。**窄化两裁决=W6 ljr**(消息两型两范围 vs 原型三型四范围;contact 128 vs 40;另 R-08 关单态文案,登记=gap-ledger 六批),裁决若翻契约面小改随改;定时发布=已裁非特性延后 | — | M |
+| PAY2 通道联调 | deploy 环境面切 wechat;0.01 真实闭环+全额退款(CP3 门);生产联调+对账;H5 权限就绪后开 H5 scene;上线前登录切真实公众号 appid(JSAPI 绑域,登记上线清单) | 行政件(ljr 11-10);**APIv3 材料全齐并验真(11-05:公钥模式三件套+证书序列号/密钥对 openssl 互证,PAY_PROVIDER=wechat boot 冒烟绿;凭据=本机 ~/.xgwl-secrets/wechat-pay/ + wiki,不进仓)** | M |
+| 真通道刀(G-402/403/404) | **G-403/404 先行件已收 11-05**(qrcode@1.5.4+码图 tile+sheet visual 槽;returnUrl 三层修形=客户端绝对收据 URL→biz.go 缝 order→wechat/mock 网关 redirect_url 镜像;e2e+浏览器网络面实捕;唯微信侧活证随真通道);**G-402 JSAPI openid:lzx 建议裁②服务端按绑定富集**(证据:JSAPI v3 openid 仅服务端统一下单入参,前端 invoke 只消费 prepay 参数,客户端零消费方;契约暴露=凭据无收益扩散),D-BC 报备形,真通道刀执行时落;另 clientIPOf 信任拨盘(XFF 优先 vs peer 优先)同刀裁=部署面口径 | G-402 裁决;G-403/404 无依赖 | S-M |
 | MIG1 冻结件+预演 | 五阶段毕;snapshot 承载表待 **P26**、recompute 口径标+重放窗口待 **P26.1**(含曲线入码片 sizing ⑧:14 款仅 red_dot 冻结曲线出权威分,余 13 款 curvePending 诚实「未评级」=设计内非 bug,入码时点随本票一并钉);**预演 11-15**;cutover 迁移执行=lzx 专职;口径全档=migration.md | P26/P26.1(ljr 硬限 11-24) | M |
 | M2-4 余 Tab | trace=**暂缓后置**(11-03 用户裁,归梯次,P22 否决窗 11-14 后复评);messages Tab=随 MSG-1 admin 面 | P22/MSG-1 | S |
 | Q 线尾(役毕残件) | ⑧曲线入码 sizing(随 P26.1);consent 渠道列契约微欠(一句裁,P23 归因记账可并);E4 三配置模块=P4(ljr);隐私真文「7 天保留」句 vs 反推续用任意龄=ljr/法务车道 | P26.1/P4/P23 | S |

@@ -79,10 +79,10 @@ E10-a 复对账(10-28,live dev 栈,同款 innerText oracle):14 行中 12 行逐�
 |---|---|---|---|---|---|
 | G-401 | H5 通道 client_ip | 服务端缝 | 微信外 H5 可下单(pay-confirm 文案面) | **✅ 绿 11-05(片3)**:order/service.go clientIPOf 双形状(transport.Header 读 XFF/X-Real-IP,connect 包装器 *connect.Transport.RemoteAddr 与 kratos *http.Transport.Request 两型落 peer 地址)→CreateIn.ClientIP→Payer 组装第三肢;PayOrder 落库 channel=wechat_h5 credential=jump_url,手机仿真 mock 全链 live 走通,PAY_E2E 增 h5 无 IP 拒/有 IP 过双臂 | 绿:微信侧真通道联调随 PAY2/cutover 承接 |
 | G-402 | JSAPI 通道 payer_openid | 契约缺口 | 微信内 JSAPI 可支付 | 会员面契约无处可读自身 openid(仅 OAuth 交换知悉);客户端报 wechat_jsapi 必被渠道拒(require openid) | 红:**lzx 建议裁②服务端按绑定富集**(D-BC 报备形,2026-11-05;证据=JSAPI v3 openid 仅服务端统一下单入参,前端 invoke 只消费 prepay 参数,客户端零消费方——契约暴露=凭据无收益扩散面);真通道刀执行时落,客户端 invoke 分派代码已在案 |
-| G-403 | QR 腿渲染 | 依赖缺口 | 桌面 QR 扫码支付 | QR 凭据以值文本+「我已完成支付」轮询 sheet 呈现(无码图) | 红:qrcode 依赖引入+码图渲染随真通道联调刀;mock+native 走查不受影响(provider=mock 恒走收银台 sheet) |
-| G-404 | H5 真通道跳转回程 | 服务端缝×客户端 | 渠道收银台跳回后落支付结果页 | 11-05 两轴审查发现:jump 通道 returnUrl=墙自身 URL,微信回跳后墙重挂载无 orderNo 上下文→轮询不续、「三钮全落收据」仅 mock/QR 出口成立 | 红:修形随真通道刀=returnUrl 改指 /pay/result?order=…&face=…(或墙持单入 search);另 clientIPOf 信任拨盘(XFF 优先 vs peer 地址优先)同刀裁——现注释口径=现行 edge 拓扑保证,直暴拓扑归部署面剥头 |
+| G-403 | QR 腿渲染 | 依赖缺口 | 桌面 QR 扫码支付 | **修形已落 11-05**:qrcode@1.5.4 引入+`pay/ui/qr-code.tsx` 码图 tile(白垫静区/编码拒→回退值文本)+sheet 通用 visual 槽;浏览器活证=真 PNG 渲染(360×360,alt=扫码支付)经模块图 named import 亲走 | 半绿:UI 面 provider=mock 恒走收银台 sheet 不可达(PAY3 片2 裁),码图 UI 活证随真通道联调刀 |
+| G-404 | H5 真通道跳转回程 | 服务端缝×客户端 | 渠道收银台跳回后落支付结果页 | **修形已落 11-05 三层**:客户端 returnUrl=绝对 `/pay/result?face=…&from=…`(h5ReturnUrl)→order/biz.go 缝 `order=<orderNo>`(号唯服务端先铸)→wechat+mock 网关 H5 腿把 landing 拼 `redirect_url` 于 h5_url;mock 镜像使 e2e+浏览器网络面全链可观测(实捕 redirect_url 解码=face=open&order=… ) | 半绿:微信真回跳活证随真通道联调刀(需商户凭据);另 clientIPOf 信任拨盘(XFF 优先 vs peer 地址优先)同刀裁——现注释口径=现行 edge 拓扑保证,直暴拓扑归部署面剥头 |
 
-计数:1 绿 3 红(G-401 服务端缝已闭;余 G-402 契约裁决、G-403 依赖件、G-404 回程+信任拨盘=真通道联调刀);mock 全链零红条。
+计数:1 绿 3 红(G-401 服务端缝已闭;G-403/G-404 修形已落 11-05 半绿——UI/微信侧活证随真通道联调刀;余 G-402 契约裁决同刀);mock 全链零红条。
 
 ## 六批 · 已登记偏离登记簿(2026-11-05 校准役立)
 

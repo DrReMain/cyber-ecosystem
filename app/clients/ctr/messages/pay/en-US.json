@@ -35,6 +35,7 @@
   "pay_sheet_success": "Simulate success",
   "pay_sheet_fail": "Simulate failure",
   "pay_sheet_cancel": "Cancel payment",
+  "pay_qr_alt": "Payment QR code",
   "pay_qr_title": "Scan to pay",
   "pay_qr_body": "Scan with WeChat to complete the payment",
   "pay_qr_check": "I have paid",

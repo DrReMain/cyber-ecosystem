@@ -3,6 +3,7 @@ package mock
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"time"
 
 	"cyber-ecosystem/shared-go/capability/payment"
@@ -33,7 +34,14 @@ func credentialFor(in *payment.CreatePaymentInput) payment.Credential {
 	case ChannelJSAPI:
 		return payment.Credential{Kind: payment.CredentialInvoke, Value: "mock-prepay-" + in.OutTradeNo}
 	case ChannelH5:
-		return payment.Credential{Kind: payment.CredentialJumpURL, Value: "https://mock.pay/jump?out_trade_no=" + in.OutTradeNo}
+		// The wechat h5 contract mirrored string for string: the payer's
+		// post-payment landing rides the jump url as redirect_url, so a
+		// consumer's redirect handling survives the dev-to-production swap.
+		v := "https://mock.pay/jump?out_trade_no=" + in.OutTradeNo
+		if in.Payer != nil && in.Payer.ReturnURL != "" {
+			v += "&redirect_url=" + url.QueryEscape(in.Payer.ReturnURL)
+		}
+		return payment.Credential{Kind: payment.CredentialJumpURL, Value: v}
 	default:
 		return payment.Credential{Kind: payment.CredentialQRCode, Value: "mockqr://" + in.OutTradeNo}
 	}

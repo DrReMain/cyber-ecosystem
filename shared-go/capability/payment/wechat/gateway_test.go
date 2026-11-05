@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -148,6 +149,28 @@ func TestGatewayCreatePayment(t *testing.T) {
 		}
 		if _, has := m["time_expire"]; !has {
 			t.Error("a set ExpireAt must ride the wire as time_expire")
+		}
+	})
+
+	t.Run("h5_redirect", func(t *testing.T) {
+		f, g := newTestGateway(t)
+		// An h5_url already carrying a query proves the param lands as &
+		// never as a second ?.
+		f.route(http.MethodPost, "/v3/pay/transactions/h5", http.StatusOK, `{"h5_url":"https://wx.tenpay.com/v1/jump?p=1"}`)
+		in := base()
+		in.Channel = ChannelH5
+		in.Payer = &payment.Payer{
+			ClientIP:  "203.0.113.7",
+			ReturnURL: "https://app.example.com/pay/result?face=open&order=ES-1",
+		}
+		res, err := g.CreatePayment(context.Background(), in)
+		if err != nil {
+			t.Fatalf("create: %v", err)
+		}
+		want := "https://wx.tenpay.com/v1/jump?p=1&redirect_url=" +
+			url.QueryEscape("https://app.example.com/pay/result?face=open&order=ES-1")
+		if res.Credential.Value != want {
+			t.Errorf("credential value:\n got %s\nwant %s", res.Credential.Value, want)
 		}
 	})
 }
