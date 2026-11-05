@@ -154,7 +154,7 @@ ctr:test-records(路由 404 形)/share-invite(parked toast)/scheme-b×3(无路�
 
 ## 9) 对账环
 
-- 轮次:每轮开工先对账 demand-ledger(处置桶变动)+本档态列;例毕记「毕@R<n>」形,跨轮复走按面变更重置相关例。当前=**R1**(2026-11-05 立)。
+- 轮次:每轮开工先对账 demand-ledger(处置桶变动)+本档态列;例毕记「毕@R<n>」形,跨轮复走按面变更重置相关例。当前=**R1**(2026-11-05 立)。2026-11-06 用户裁:**UI 校准役插队**(U1 渲染可达→U2 ctr 原型对齐→U3 admin 对齐基座范式,仪器=render-coverage.md+harness 重激活),X 线暂停于 X1-1,UI 役毕后续走。
 - 每例毕:态列 未走→毕/发现;发现按 §1 四路处置;用户偏好即时落 calibration-log.md。
 - 每套毕:净清声明(计数);本档+gap/calibration 三档同步;套间停等用户确认。
 - 役毕:progress.md 认领表一行收口;可泛化偏好条目按回灌门槛评估入 CONVENTIONS。
