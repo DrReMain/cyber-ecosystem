@@ -1,6 +1,6 @@
 # Browser Walkthrough Conventions
 
-**Scope:** human-like walkthrough of web clients (the repo's `app/clients/*` and future forks) driven through **chrome-devtools-mcp** — the repo's recommended browser-automation tool (installation guidance lives in the `tool-recommendations` skill). Everything here is tool-bound: the traps are chrome-devtools-mcp shapes and MUST NOT be extrapolated to playwright or any other driver; a different driver earns its own page. This file is a skeleton-side reusable asset: business-neutral by law — cases keep their date and generic shape; business detail lives in the owning campaign's ledger. Prescriptive — MUST / SHOULD / MAY.
+**Scope:** human-like walkthrough of the repo's `app/clients/*` via **chrome-devtools-mcp** (install guidance: the `tool-recommendations` skill). Tool-bound: these are chrome-devtools-mcp shapes — never extrapolate to another driver; a different driver earns its own page. Skeleton-side asset, business-neutral by law: cases keep their date and generic stack shape; business detail lives in the owning campaign's ledger. Prescriptive — MUST / SHOULD / MAY.
 
 **Maintenance law:** a trap diagnosed mid-walkthrough gets written back here the moment it is understood, verdict-style (symptom / mechanism / prescription / case date). Same law as conventions-drift: the file is the memory, the session is not.
 
@@ -29,7 +29,7 @@ input.blur();
 ```
 
 - Checkboxes/toggles: programmatic `.click()` on the input switches them correctly (the React onChange listens to click at the input level).
-- **Trap — checkbox choreography:** picking the input by index or clicking the row's visible label text proved unreliable — indexes drift with noise checkboxes and stale state, and labels without a `for`/wrap association toggle nothing. Locate the checkbox through its enclosing row's text (find the row whose `textContent` includes a known phrase, `querySelector` the `input` inside it), then `.click()` the input body. (Case 2026-11-06: three label-click misses before the input-body click landed.)
+- **Trap — checkbox choreography:** index picks and label-text clicks are unreliable (indexes drift with noise checkboxes and stale state; labels without `for`/wrap association toggle nothing). Find the row whose `textContent` includes a known phrase, `querySelector` its `input`, `.click()` the input body. (Case 2026-11-06: three label-click misses before the input-body click landed.)
 
 ### 1.2 Click order — real events first, programmatic fallback
 
@@ -40,7 +40,7 @@ input.blur();
 [...document.querySelectorAll("button")].find(b => b.textContent?.includes("<the button's label>"))?.click();
 ```
 
-- **Trap:** icon-only buttons carry an `aria-label` and no text — a text-based finder never matches them (and reports "not found", not "wrong finder"). When a text regex finds nothing, enumerate buttons with their `aria-label`s before concluding the control is absent. (Case 2026-11-06: an overlay HUD's pause control.)
+- **Trap:** icon-only buttons carry an `aria-label` and no text — a text finder never matches them. When a text regex finds nothing, enumerate buttons with their `aria-label`s before concluding the control is absent. (Case 2026-11-06: an overlay HUD's pause control.)
 
 ### 1.3 Visibility changes — tab switching is a dead end; patch `document.hidden`
 
@@ -59,7 +59,7 @@ Reflect.deleteProperty(document, "hidden"); // restore
 
 ### 2.1 One script: trigger → wait → observe (toast law)
 
-- **Symptom:** toasts (sonner, ~3s auto-dismiss), countdown labels, and pulse states observed across separate tool calls come back empty — and a self-invented copy wordlist guesses at wording the actual copy never uses (a consent reminder, not an error word), producing a false "silent hang" verdict. (Case 2026-11-06: six wasted reasoning rounds before the toast was found.)
+- **Symptom:** toasts (sonner, ~3s auto-dismiss), countdowns, and pulse states observed across separate tool calls come back empty — and an invented copy wordlist guesses wording the real copy never uses, producing a false "silent hang" verdict. (Case 2026-11-06: six wasted rounds before the toast was found.)
 - **Prescription — MUST** complete trigger, wait, and observation inside a single `evaluate_script`:
 
 ```js
@@ -136,7 +136,7 @@ window.fetch = async (...a) => {
 
 ### 6.2 In-memory handoffs — same-mount continuity and the dev-import seam
 
-- **Symptom (shape A — per-mount state):** an sms flow (send code → submit) driven across two tool calls with a navigation in between shows the page's GENERIC failure word instead of the specific reason word — the send minted a per-mount `state` that the remount destroyed, the submit's validator threw, and the catch branch rendered the fallback. A "no specific copy" verdict here is a walkthrough artifact, not a product fact. (Case 2026-11-06: a password-reset leg misread as missing its not-found copy.)
+- **Symptom (shape A — per-mount state):** an sms flow (send → submit) driven with a navigation in between shows the page's GENERIC failure word instead of the specific reason — the remount destroyed the per-mount `state` minted by send, the submit's validator threw, and the catch rendered the fallback. A "no specific copy" verdict here is a walkthrough artifact, not a product fact. (Case 2026-11-06: a password-reset leg misread as missing its not-found copy.)
 - **Prescription (A) — MUST** keep send and submit inside the same mounted page: navigate once, then run send and submit as separate `evaluate_script` calls **without navigation** between them (the component stays mounted across tool calls; only navigating remounts it).
 - **Symptom (shape B — module-singleton handoff):** a one-shot handoff held in module scope (not sessionStorage, not URL — e.g. a payload that cannot be re-derived) is unreachable by URL gardening or storage injection.
 - **Prescription (B):** in dev, `await import("/src/path/to/module.ts")` from the page returns the **live module instance** — call its setter, then navigate SPA-side (the router global or an in-app link); a hard reload resets module state (which itself proves the honest-bounce path). (Case 2026-11-06: a module-singleton handoff's faces, cross-validated against its real producer.)
