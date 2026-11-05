@@ -36,3 +36,4 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 | tanstack (web clients) | `docs/conventions/tanstack/CONVENTIONS.md` | writing under `app/clients/*` or `shared-ts/` |
 | deploy (containers) | `docs/conventions/deploy/CONVENTIONS.md` | touching `deploy/`, Dockerfiles, compose, edge, migrations |
 | skin (antd presets) | `docs/conventions/skin/CONVENTIONS.md` | touching `shared-ts/antd/src/skin-presets/**` or authoring a skin |
+| browser walkthrough (chrome mcp) | `docs/conventions/browser-walkthrough/CONVENTIONS.md` | any simulated walkthrough / live-proof pass / browser verification of a web client |
