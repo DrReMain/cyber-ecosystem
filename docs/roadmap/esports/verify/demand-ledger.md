@@ -64,7 +64,7 @@
 | 🌫 原型非本期 | attribution、channel-manage、landing-material、report-config | 4 | _nav.js 灰标(P5/梯①) |
 | 🎯 M2 核心组 | — | **0** | 全员升已建桶(11-02 对账):member 两页随 M2-1(347a9ce7)、sku-manage/04-order-record/05-order-detail 随 M2-2(9860eb34)、activation-code+activation-code-detail 随 M2-3(45c276d4);到期提醒/批量续费/每日扫描按 M2-1 裁面不含 |
 | 📋 E9 增量(D-AS⑥) | — | 0 | compliance-config 已随 E9 余刀建成升已建桶(11-01);执法消费面(注册年龄带/付费墙)随 PAY3/注册面 |
-| 📋 D-AS 消息组 | — | 0 | 三页随 MSG-1 建成升已建桶(11-05,V10 闭环毕);窄化两裁决+R-08..R-13 随 W6 ljr;P21 已裁(D-BC 11-02:A1 服务端行级) |
+| 📋 D-AS 消息组 | — | 0 | 三页随 MSG-1 建成升已建桶(11-05,V10 闭环毕);窄化两裁决+R-08..R-13 随 W6 ljr(接洽单已立 11-06=pm-review-items PM-13..20);P21 已裁(D-BC 11-02:A1 服务端行级) |
 | 📋 M2 余组(梯①) | dashboard、user-portrait、09-user-import、question-bank、question-detail、test-record、08-test-record-detail、test-type、game-category、payment-channel、rating-manage、system-config、app-version | 13 | 各项开工前先过对应 P 票:P20(dashboard/portrait 数据源)、P2(评级)、P24(归类)、P25(渠道面);app-version 已裁 B 建(D-BC 11-02),system-config=裁不建候选(config 珍稀原则) |
 | 📋 M3/P4 | tob-tenant-list、tob-tenant-detail | 2 | 窗外 buffer;P14 已解散(11-02 D-BA),随 M3/P4 |
 
