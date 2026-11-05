@@ -49,6 +49,8 @@
 | `admin-nav-anchor.md` | admin 菜单真值(_nav.js 九组×现行树差表 N-1..N-5;2026-10-30 立,菜单落位/命名以此为准) |
 | `admin-member-anchor.md` | M2-1 会员两页走查 oracle(渲染态机提+5 Modal+6 语义钉;admin 原型=JS 渲染活原型实证) |
 | `pm-review-items.md` | PM 核对物料:存疑累积档,调优阶段消费 |
+| `integration-matrix.md` | **集成走查矩阵(2026-11-05 立)**:旅程级拟真测试用例与操作脚本(X/C/A 三群 56 例;chrome mcp 人在环,执行真值) |
+| `calibration-log.md` | 校准日志:用户交互/逻辑偏好活档(走查发现即记,后续开发照此执行) |
 
 ## 执行 harness(已封存,2026-10-28)
 

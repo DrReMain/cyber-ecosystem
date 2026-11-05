@@ -16,7 +16,7 @@
 | 片 | 认领 | 状态 | 一行注 |
 |---|---|---|---|
 | MSG-1 余面 | lzx(D-BB 全片) | **admin 三页+V10 闭环毕(11-05)**:反馈管理(状态段+快捷回复+关闭)+反馈详情(KV/对话气泡/contact)+公告管理(两步发布/编辑草稿/下线);V10 全环 live 走查毕(ctr 提交→admin 双路回复→追问回待处理→关闭终态;全员信 11 封/会员型空投/banner 零投递 DB 侧证);走查捕五伤全修(Form.Item 双子断绑定/form store 残值/枚举名比对/两处分型 confirm 文案);窄化 R-09..R-13 已登记 | 余=窄化两裁决接洽(两裁决+R-08..R-13,W6 ljr);banner ctr 消费面见遗留清单 |
-| PAY2 通道联调 | lzx | W4(**行政件门已清空 11-05**);材料全齐活证(11-05:wechat 配置块+环境占位落,APP_ 前缀引号形 boot 绿+对账 sweep 获微信真应答;裸名 env 假绿陷阱在案) | deploy 切 wechat+0.01 真钱闭环+全额退款(CP3 门);微信外降级「引导微信内打开」(H5 递延 D-BF;Native 已开通);首探=真通道 create/query 活证 |
+| PAY2 通道联调 | lzx | W4(**行政件门已清空 11-05**);材料全齐活证(11-05:wechat 配置块+环境占位落,APP_ 前缀引号形 boot 绿+对账 sweep 获微信真应答;裸名 env 假绿陷阱在案);通道审核 11-05(D-BF):JSAPI/Native 过审,H5 驳回递延 | deploy 切 wechat+0.01 真钱闭环+全额退款(CP3 门;锚 JSAPI/Native,Native=QR 无目录/payer 依赖先行);微信外降级「引导微信内打开」(D-BF);首探=真通道 create/query 活证(Native 腿) |
 | 真通道刀(G-402/403/404) | lzx | G-403/404 先行件收(11-05):qrcode 码图 tile+sheet visual 槽;returnUrl 三层修形(客户端收据 URL/biz 缝 order/网关 redirect_url 镜像);G-402 建议裁②报备中 | 唯微信侧活证+G-402+信任拨盘=真通道联调刀(W5);详单=gap-ledger 五批 |
 | MIG1 迁移工具 | lzx(专职 D-BB) | 五阶段毕;**预演 11-15**(D-BE,绿门含回滚腿) | snapshot/recompute 冻结待 P26/P26.1;口径=migration.md;cutover 执行同专职 |
 | M2-4 trace/messages Tab | 递延 | trace=暂缓后置(11-03 用户裁,P22 否决窗 11-14 后复评);messages=随 MSG-1 admin 面 | — |
@@ -27,6 +27,7 @@
 |---|---|---|
 | 微信回调 next 丢失(redirect_uri 不能带 query,须 state 中转) | 真通道刀 | 设计时定 |
 | 上线前登录切真实公众号 appid(JSAPI 绑域;测试号绑不了商户) | PAY2 | 上线清单 |
+| H5 支付重审(D-BF 递延:新版部署上线、有真实付费界面后再提;过审前微信外=降级「引导微信内打开完成支付」prd P7.2) | PAY2 | 新版部署上线后即提 |
 | ICP 串上线前 beian.miit.gov.cn 复核一次(D-AO① 维持带「备」) | 上线清单 | cutover 前 |
 | G-208 余族 share-invite 腿(pay-confirm 腿已随 PAY3 片2 落,oracle=P7 稿) | MSG-2 | 落地时先验 oracle 形状 |
 | 报告页 ④⑤ CTA live 走查(裸记录过不了 getReport 判分面;导航形与 profile 卡同构已活证) | lzx | 随真通道刀/激活码走查复核 |
