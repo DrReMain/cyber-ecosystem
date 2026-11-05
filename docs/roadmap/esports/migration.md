@@ -19,7 +19,7 @@
 
 ## 逐表口径
 
-- **身份列 → system**:username/phone/open_id/微信身份迁为会员身份+identity;credential 密码 verify-then-rehash(MD5 无法验证者强制重置);微信 4 列口径修订(11-02 随首刀定):wechat_sex→sex 枚举已迁,地区 3 列新模型无消费面不迁、预演计数报备。
+- **身份列 → system**:username/phone/open_id/微信身份迁为会员身份+identity;**密码口径(11-06 实数定谳)**:纯 BCRYPT digest 直迁(生产 0 行),MD5 274 行(250 空=微信自注族;余 24=真 hex 8+todeleteuser 软删族字面明文 16)+BCRYPT_OVER_MD5 11 行一律关闭密码面——不可离线验证,兼容零入产品(形态与新栈 provider-born 无密码账号同构),登录走手机/微信凭据(照迁);设过真密码者仅 19 人;活行无凭据者 lockedOut(实数 6)预演对账;微信 4 列口径修订(11-02 随首刀定):wechat_sex→sex 枚举已迁,地区 3 列新模型无消费面不迁、预演计数报备。
 - **画像/偏好/溯源 → esports**:出生年月/年龄段/头像/游戏偏好(含待归类项保持待归类)/邀请关系/登录溯源九件套(随 login_record 语义迁或冷存)。存量「仅年龄段无出生年月」用户(旧 API 允许)6→8 档不可精确映射:迁为画像不完整态(档位置空),首个画像触点补填出生年月后服务端重派生。
 - **权益翻译**:解锁三旗标与 activation_records → entitlement 解锁记录;未核销激活码 → 新兑换码批次(保留 report_type 语义);已核销/过期码丢弃靠流水保历史。
 - **不迁重算**:user 统计四列/ability_score/platform_analytics/game_analytics(由 test_record 重算)。**2026-11-02 recompute 审计**:四目标全数零迁移器写入——platform/game analytics 新 schema 未建(归 P20 特性从 test_record 现算),user 统计四列=读时推导(新 profile 无统计列,原型统计条走 API 现算),ability_score=report 冻结流懒写(读面幂等生成,迁移器抢写反而破坏懒冻结语义);「由 test_record 重算」的正确读法=新系统读时自行重算,迁移器不碰。
@@ -42,11 +42,29 @@
 - **census 真数据首跑三绿(identity 除冲突停机)**:user 285(260 活/25 软删;openid NULL 255、birth NULL 157、username NULL 30);entitlement 绿(era-2 school 旗标 257 行弃=默认 1 不可归因;**334 码全为全局型→0 迁**;孤儿 activation_records 2);behavior 绿(2698→2685 迁,skill_prediction 弃 13,自报旗标 2125,login_record 217 冷存,user_referral 6 待 P23)。
 - **guard 必停=预演第一脚**:school=4(测试学校×3 软删+**存活零成员「萧山中学」**);school_report=463=342 行挂 10 用户(**全部未绑校**:320 行=Aqiu 重注册族软删行,**22 行=7 真实存活用户**:鲁智深 12/kk 3/玩家0866 2/黄皓予 2/陵川 1/黑豆 1/Amy 1)+121 行 user_id 孤儿;另有悬空 school_id=162(无 school 行)。
 - **随片两修+执行面**:srcUser.Nickname→NullString;test_record 读取改 PK 序+Go 侧四键排序(MySQL 1038 宽行 filesort 爆 buffer——cutover 宿主 buffer 不可假设)。migrator build+race test+lint 绿。直执 go 已禁(11-06 用户指示)→临时 nx target `esports-migrator:run/check`(project.json+README 带 TODO 拆除清单;DSN=~/.xgwl-secrets/esports-mig/source.env 引号形)。
+- **回滚腿+造数件毕并彩排(11-06,清单 2/7 两项)**:`esports-migrator/rehearsal/` 四件=snapshot/restore 脚本对(dump 出仓至 lab mig-snapshots/,restore 后全表精确 counts 对 sidecar,不一致即.abort)+synthetic/revert 造数对。彩排链全绿:快照(37 表 sidecar)→造数(migsyn 4 用户+2 登录行;behavior census login_record 217→219 增量精确对上)→restore(exit 0,37 表 counts 全对,造数抹净回基线)→双应用幂等(仍 4 行)+revert 净。造数口径:鸿蒙 NEXT/IPv6/CGNAT/组合四形态为真缺面(生产存量 OpenHarmony 6.1 仅 2 行、IPv6=0);软删 25 行/无注册 IP 117 行**真实存量已足不造**;造数行 id 段 990000xxx/994000xxx(低于雪花段,预查零撞),demo 密码 MD5(migsyn-demo)走 verify-then-rehash 走查。identity census 打印被 D-MIG-2 冲突组拦在 buildPlans(11-06 实测)→造数对账探针=SQL 直查,预演日同理。
 
 ### 预演前决策(拦 11-14/15 绿门)
 
 1. **D-MIG-1 school 域处置**(guard 停机即此):证据如上。选项 (a) 裁「测试/残留不迁」+guard 显式旁路旗标(默认仍停、运行日志留证、cutover 夜同旗标)——ljr 需对「7 真实用户 22 行」复核签字;(b) 22 行保真迁(需新 schema 落点,预演前代价大);(c) 封存旧栈只读承接(受 D-P 两周封存窗约束,非永久)。推荐 (a)。
 2. **D-MIG-2 账号冲突消解**(identity 停机即此):6 组 23 行=131****8167×7、Aqiu openid×2、test×2、test2×2、todeleteuser×5(全软删)、newtestuser×5(全存活同手机号 13900000000);混合组活行全为雪flake 行。推荐机械规则(零产品判断/零丢行/可审计):组内存活行得原账号,多存活取 updated_at 最新;其余账号改 `<account>#<legacy_id>`(软删身份登录面已死,migration_map 全量留痕,census 打印改写计数)。替代=测试族整批排除(丢数据,须产品裁)。
+
+## 预演执行稿(2026-11-06 预制;回滚腿与造数件已彩排,见备料节)
+
+前置门:D-MIG-1/2 裁决形(拦 S3);snapshot/recompute 是否入演随 P26/P26.1(理想 11-12)。演练日程 P6 已代裁定 11-15;副本 11-06 已就绪,裁回皆可提前(报备制)。
+
+| 步 | 动作 | 判据 |
+|---|---|---|
+| S0 | `rehearsal/snapshot-source.sh` 打预演态快照 | 37 表 counts sidecar 落(lab mig-snapshots/) |
+| S1 | `rehearsal/synthetic.sql` 造数(四形态 4 用户+2 登录行) | migsyn 4 行 SQL 证;login_record 217→219 |
+| S2 | 目标库重建:drop/recreate → atlas migrate → bootstrap seed | 种子重放绿(2 垃圾场景 DETAIL_MISMATCH 拒后平移=设计内预期;副能力终态 4 行勿回修 3) |
+| S3 | `--phase all` 五阶段(guard 按 D-MIG-1 裁决形:(a)=显式旁路旗标+运行日志留证) | 各阶段 census+写入计数入录 |
+| S4 | `--phase reconcile --sample N` | 全绿零 fail |
+| S5 | 新栈走查:造数账号密码登录(MD5 verify-then-rehash 亲证)/鸿蒙 UA 访问/IPv6·CGNAT 审计形态 | 走查录;nginx 仿真=本机反代近似(真形状 W8 前定,条目挂账) |
+| S6 | **绿门**=对账全绿+走查过+migration_map 落盘(含软删行) | 任一不过 → S7 |
+| S7 | 回滚腿:目标侧=重走 S2-S3(可重建);源侧只读无需回滚,误写则 `restore-source.sh <快照>` | 11-06 彩排证:restore 后全表 counts 对 sidecar |
+
+对账预期锚(基线 11-06 census,造数增量随 S1):user 285(260 活/25 删)+4 活;phone 凭据 distinct+4;login_record 冷存 217+2;entitlement/behavior 面不变(造数不触解锁/偏好/成绩);school 停项 4/463 按 D-MIG-1 裁决形消解;账号冲突 6 组 23 行按 D-MIG-2 规则改写计数入 census 打印。
 
 ## cutover 验收清单(血泪教训条款)
 

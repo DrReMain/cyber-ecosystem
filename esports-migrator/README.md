@@ -50,6 +50,28 @@ calibration-curve window (both filed as P26/P26.1). Every phase is
 idempotent — re-running after a failure resumes where the durable markers
 left off.
 
+## Rehearsal scripts
+
+`rehearsal/` holds the rehearsal environment pieces (cutover checklist
+items 2 and 7; the rollback leg was proven in a dry rehearsal on
+2026-11-06 — snapshot, synthetic, restore, counts diff all green):
+
+- `snapshot-source.sh` / `restore-source.sh` — dump and replay the lab
+  MySQL copy. The dump is self-contained (`--add-drop-database`), and the
+  restore re-counts every table and diffs against the snapshot's counts
+  sidecar, aborting on any mismatch — a partial restore is never mistaken
+  for a rollback point. Snapshots live in
+  `~/Desktop/lab/esports/mig-snapshots/` (production data, unsanitized,
+  never inside the repo).
+- `synthetic.sql` / `revert-synthetic.sql` — production-shaped rows the
+  copy has zero or thin real coverage of (HarmonyOS NEXT device, IPv6
+  registrant, CGNAT registrant, combined), with a demo MD5 password so the
+  walkthrough exercises verify-then-rehash on a migrated account. Shapes
+  the copy already has for real (soft-deleted users, register_ip-less old
+  users) are not manufactured. Idempotent (delete-then-insert over fixed
+  id bands below the snowflake segment, double-keyed so a revert can never
+  touch a real row).
+
 ## Checks
 
 ```sh

@@ -99,6 +99,8 @@ logs/
 !**/ent/migrate/migrations/*.sql
 # postgres bootstrap SQL (deploy initdb) is source — must be tracked, not ignored
 !deploy/docker/postgres/*.sql
+# migrator rehearsal synthetic-row scripts are source — must be tracked, not ignored
+!esports-migrator/rehearsal/*.sql
 *.sqlite
 *.db
 
