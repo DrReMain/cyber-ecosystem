@@ -13,5 +13,15 @@
   "esports_order_detail_unlock_closed": "주문 종료됨, 잠금 해제 없음",
   "esports_order_detail_unlock_trial": "보고서 {id} · 영구 잠금 해제",
   "esports_order_detail_unlock_period": "{from} ~ {to} 기간 · 기간 내 {n}건 해제(영구 유지)",
-  "esports_order_detail_refund_note": "환불 방침: 온라인/셀프 서비스 환불 불가. 디지털 콘텐츠는 잠금 해제/발효 시점에 인도 완료로 간주되어 기본 환불 불가; 예외는 고객지원이 오프라인으로 처리(사유 및 증빙 첨부), 환불 시 잠금 해제(단일) 또는 잔여 기간(멤버십) 회수, 전 과정 감사 대상."
+  "esports_order_detail_refund_note": "환불 방침: 온라인/셀프 서비스 환불 불가. 디지털 콘텐츠는 잠금 해제/발효 시점에 인도 완료로 간주되어 기본 환불 불가; 예외는 고객지원이 오프라인으로 처리(사유 및 증빙 첨부), 환불 시 잠금 해제(단일) 또는 잔여 기간(멤버십) 회수, 전 과정 감사 대상.",
+  "esports_order_detail_refund": "환불",
+  "esports_order_detail_refund_reason": "환불 사유",
+  "esports_order_detail_refund_act": "전액 환불",
+  "esports_order_detail_refund_title": "전액 환불",
+  "esports_order_detail_refund_desc": "{amount}을(를) 원래 결제 수단으로 전액 환불합니다. 취소할 수 없습니다. 잠금 해제와 멤버십 잔여 기간은 이 작업으로 자동 회수되지 않으니 필요 시 회원 측에서 별도 회수하세요. 전 과정 감사에 기록됩니다.",
+  "esports_order_detail_refund_label": "환불 사유(필수, 감사 기록)",
+  "esports_order_detail_refund_ph": "오프라인 협의 결과를 기록(예: 문의 #123)",
+  "esports_order_detail_refund_ok": "환불 확정",
+  "esports_order_detail_refund_cancel": "취소",
+  "esports_order_detail_refund_done": "환불 접수됨: {no}"
 }

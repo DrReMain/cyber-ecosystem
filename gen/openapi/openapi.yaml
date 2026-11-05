@@ -2046,6 +2046,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.ClosePaymentOrderResponse'
+    /api/v1/esports/payment-orders/{orderNo}/refund:
+        post:
+            tags:
+                - OrderAdminService
+            operationId: OrderAdminService_RefundPaymentOrder
+            parameters:
+                - name: orderNo
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.RefundPaymentOrderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.RefundPaymentOrderResponse'
     /api/v1/esports/profile:
         get:
             tags:
@@ -4648,6 +4672,13 @@ components:
                     description: |-
                         The sku's display title at read time; off-shelf and deleted rows
                          still hydrate (order history outlives catalog changes).
+                refund:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.OrderRefundView'
+                    description: |-
+                        The derived refund fact on a paid order; absent = never refunded.
+                         One full refund per order — the operator face mints it, the channel
+                         idempotency key (out_refund_no) is derived from the order no.
             description: |-
                 An order row as the operator reads it: the wire Order plus the
                  hydrated facts the list columns need. Absent hydration fields are the
@@ -6715,6 +6746,33 @@ components:
                 paidAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.OrderRefundView:
+            type: object
+            properties:
+                refundNo:
+                    type: string
+                    description: The caller-minted channel idempotency key ('R'+order_no).
+                channelRefundId:
+                    type: string
+                    description: The channel's own refund id — the support/portal join key.
+                state:
+                    enum:
+                        - REFUND_STATE_UNSPECIFIED
+                        - REFUND_STATE_PROCESSING
+                        - REFUND_STATE_SUCCEEDED
+                        - REFUND_STATE_ABNORMAL
+                    type: string
+                    format: enum
+                amountFen:
+                    type: string
+                reason:
+                    type: string
+                    description: The operator's paper trail for the offline exception.
+                refundedAt:
+                    type: string
+                    description: The channel-side success moment; null until the refund succeeds.
+                    format: date-time
+            description: What a paid order's one full refund looks like to the operator.
         cyber.esports.v1.OrderUnlockView:
             type: object
             properties:
@@ -6993,6 +7051,21 @@ components:
                 grantedAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.RefundPaymentOrderRequest:
+            type: object
+            properties:
+                orderNo:
+                    type: string
+                reason:
+                    type: string
+                    description: |-
+                        Why the exception was granted — required: an operator refund with no
+                         recorded reason is an audit hole, not a shortcut.
+        cyber.esports.v1.RefundPaymentOrderResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/cyber.esports.v1.AdminOrder'
         cyber.esports.v1.ReplyFeedbackRequest:
             type: object
             properties:
@@ -9629,7 +9702,9 @@ tags:
          lists by; the detail folds the unlock outcome a paid order produced.
          Close here is the operator's variant — the same pending-only
          arbitration, minus the member plane's owner check, plus the operator
-         identity on the audit trail.
+         identity on the audit trail. Refund is the offline-exception executor
+         the member FAQ points at: the product sells no self-service refunds,
+         so this face mints the one full refund an operator grants by hand.
     - name: OrderService
       description: |-
         The order aggregate's faces. The member plane creates and reads its own

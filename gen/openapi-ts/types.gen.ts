@@ -251,6 +251,12 @@ export type CyberEsportsV1AdminOrder = {
      * still hydrate (order history outlives catalog changes).
      */
     skuName?: string;
+    /**
+     * The derived refund fact on a paid order; absent = never refunded.
+     * One full refund per order — the operator face mints it, the channel
+     * idempotency key (out_refund_no) is derived from the order no.
+     */
+    refund?: CyberEsportsV1OrderRefundView;
 };
 
 /**
@@ -1721,6 +1727,30 @@ export type CyberEsportsV1Order = {
 };
 
 /**
+ * What a paid order's one full refund looks like to the operator.
+ */
+export type CyberEsportsV1OrderRefundView = {
+    /**
+     * The caller-minted channel idempotency key ('R'+order_no).
+     */
+    refundNo?: string;
+    /**
+     * The channel's own refund id — the support/portal join key.
+     */
+    channelRefundId?: string;
+    state?: 'REFUND_STATE_UNSPECIFIED' | 'REFUND_STATE_PROCESSING' | 'REFUND_STATE_SUCCEEDED' | 'REFUND_STATE_ABNORMAL';
+    amountFen?: string;
+    /**
+     * The operator's paper trail for the offline exception.
+     */
+    reason?: string;
+    /**
+     * The channel-side success moment; null until the refund succeeds.
+     */
+    refundedAt?: string;
+};
+
+/**
  * What a paid order actually unlocked, folded at read time.
  */
 export type CyberEsportsV1OrderUnlockView = {
@@ -1928,6 +1958,19 @@ export type CyberEsportsV1RedeemActivationCodeResponse = {
      */
     expiresAt?: string;
     grantedAt?: string;
+};
+
+export type CyberEsportsV1RefundPaymentOrderRequest = {
+    orderNo?: string;
+    /**
+     * Why the exception was granted — required: an operator refund with no
+     * recorded reason is an audit hole, not a shortcut.
+     */
+    reason?: string;
+};
+
+export type CyberEsportsV1RefundPaymentOrderResponse = {
+    order?: CyberEsportsV1AdminOrder;
 };
 
 export type CyberEsportsV1ReplyFeedbackRequest = {
@@ -5552,6 +5595,24 @@ export type OrderAdminServiceClosePaymentOrderResponses = {
 };
 
 export type OrderAdminServiceClosePaymentOrderResponse = OrderAdminServiceClosePaymentOrderResponses[keyof OrderAdminServiceClosePaymentOrderResponses];
+
+export type OrderAdminServiceRefundPaymentOrderData = {
+    body: CyberEsportsV1RefundPaymentOrderRequest;
+    path: {
+        orderNo: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/payment-orders/{orderNo}/refund';
+};
+
+export type OrderAdminServiceRefundPaymentOrderResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1RefundPaymentOrderResponse;
+};
+
+export type OrderAdminServiceRefundPaymentOrderResponse = OrderAdminServiceRefundPaymentOrderResponses[keyof OrderAdminServiceRefundPaymentOrderResponses];
 
 export type ProfileServiceGetProfileData = {
     body?: never;

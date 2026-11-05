@@ -297,6 +297,22 @@ func ErrorEsportsPayCashierDisabled(format string, args ...interface{}) *errors.
 	return errors.New(400, Esports_ESPORTS_PAY_CASHIER_DISABLED.String(), fmt.Sprintf(format, args...))
 }
 
+// The order's one full refund already exists — the tool refunds whole
+// orders once, so support says "already refunded", not "state conflict".
+func IsEsportsOrderAlreadyRefunded(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == Esports_ESPORTS_ORDER_ALREADY_REFUNDED.String() && e.Code == 400
+}
+
+// The order's one full refund already exists — the tool refunds whole
+// orders once, so support says "already refunded", not "state conflict".
+func ErrorEsportsOrderAlreadyRefunded(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, Esports_ESPORTS_ORDER_ALREADY_REFUNDED.String(), fmt.Sprintf(format, args...))
+}
+
 // 615x: activation code & entitlement
 func IsEsportsActivationCodeInvalid(err error) bool {
 	if err == nil {

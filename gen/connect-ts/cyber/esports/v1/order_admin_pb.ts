@@ -2,8 +2,8 @@
 // @generated from file cyber/esports/v1/order_admin.proto (package cyber.esports.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_buf_validate_validate } from "../../../buf/validate/validate_pb";
 import type { Order, OrderScope, OrderState } from "./order_pb";
 import { file_cyber_esports_v1_order } from "./order_pb";
@@ -20,7 +20,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file cyber/esports/v1/order_admin.proto.
  */
 export const file_cyber_esports_v1_order_admin: GenFile = /*@__PURE__*/
-  fileDesc("CiJjeWJlci9lc3BvcnRzL3YxL29yZGVyX2FkbWluLnByb3RvEhBjeWJlci5lc3BvcnRzLnYxItkBCgpBZG1pbk9yZGVyEiYKBW9yZGVyGAEgASgLMhcuY3liZXIuZXNwb3J0cy52MS5PcmRlchIPCgd1c2VyX2lkGAUgASgJEi4KCG5pY2tuYW1lGAIgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjIKDHBob25lX21hc2tlZBgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIuCghza3VfbmFtZRgEIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZSLVAQoPT3JkZXJVbmxvY2tWaWV3Ei8KCXJlY29yZF9pZBgBIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIuCgpncmFudGVkX2F0GAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCgx1bmxvY2tfY291bnQYBCABKAsyGy5nb29nbGUucHJvdG9idWYuSW50MzJWYWx1ZSLyAQoYTGlzdFBheW1lbnRPcmRlcnNSZXF1ZXN0EjEKBHBhZ2UYASABKAsyIy5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXF1ZXN0EjAKBXN0YXRlGAIgASgOMhwuY3liZXIuZXNwb3J0cy52MS5PcmRlclN0YXRlSACIAQESMAoFc2NvcGUYAyABKA4yHC5jeWJlci5lc3BvcnRzLnYxLk9yZGVyU2NvcGVIAYgBARIfCgdrZXl3b3JkGAQgASgJQgm6SAZyBBABGEBIAogBAUIICgZfc3RhdGVCCAoGX3Njb3BlQgoKCF9rZXl3b3JkIn0KGUxpc3RQYXltZW50T3JkZXJzUmVzcG9uc2USMgoEcGFnZRgBIAEoCzIkLmN5YmVyLnNoYXJlZC5jb21tb24udjEuUGFnZVJlc3BvbnNlEiwKBm9yZGVycxgCIAMoCzIcLmN5YmVyLmVzcG9ydHMudjEuQWRtaW5PcmRlciI4ChZHZXRQYXltZW50T3JkZXJSZXF1ZXN0Eh4KCG9yZGVyX25vGAEgASgJQgy6SAnIAQFyBBABGCAieQoXR2V0UGF5bWVudE9yZGVyUmVzcG9uc2USKwoFb3JkZXIYASABKAsyHC5jeWJlci5lc3BvcnRzLnYxLkFkbWluT3JkZXISMQoGdW5sb2NrGAIgASgLMiEuY3liZXIuZXNwb3J0cy52MS5PcmRlclVubG9ja1ZpZXciOgoYQ2xvc2VQYXltZW50T3JkZXJSZXF1ZXN0Eh4KCG9yZGVyX25vGAEgASgJQgy6SAnIAQFyBBABGCAiSAoZQ2xvc2VQYXltZW50T3JkZXJSZXNwb25zZRIrCgVvcmRlchgBIAEoCzIcLmN5YmVyLmVzcG9ydHMudjEuQWRtaW5PcmRlcjLaBAoRT3JkZXJBZG1pblNlcnZpY2USsgEKEUxpc3RQYXltZW50T3JkZXJzEiouY3liZXIuZXNwb3J0cy52MS5MaXN0UGF5bWVudE9yZGVyc1JlcXVlc3QaKy5jeWJlci5lc3BvcnRzLnYxLkxpc3RQYXltZW50T3JkZXJzUmVzcG9uc2UiRIjxBAKK0w4WChLlhajph4/orqLljZXliJfooagQAYLT5JMCIBIeL2FwaS92MS9lc3BvcnRzL3BheW1lbnQtb3JkZXJzErEBCg9HZXRQYXltZW50T3JkZXISKC5jeWJlci5lc3BvcnRzLnYxLkdldFBheW1lbnRPcmRlclJlcXVlc3QaKS5jeWJlci5lc3BvcnRzLnYxLkdldFBheW1lbnRPcmRlclJlc3BvbnNlIkmI8QQCitMOEAoM6K6i5Y2V6K+m5oOFEAGC0+STAisSKS9hcGkvdjEvZXNwb3J0cy9wYXltZW50LW9yZGVycy97b3JkZXJfbm99EsABChFDbG9zZVBheW1lbnRPcmRlchIqLmN5YmVyLmVzcG9ydHMudjEuQ2xvc2VQYXltZW50T3JkZXJSZXF1ZXN0GisuY3liZXIuZXNwb3J0cy52MS5DbG9zZVBheW1lbnRPcmRlclJlc3BvbnNlIlKI8QQCitMOEAoM5YWz6Zet6K6i5Y2VEAKC0+STAjQ6ASoiLy9hcGkvdjEvZXNwb3J0cy9wYXltZW50LW9yZGVycy97b3JkZXJfbm99L2Nsb3NlGhmK4gkV6K6i5Y2V5LiO6Kej6ZSB6K6w5b2VQilaJ2N5YmVyLWVjb3N5c3RlbS9nZW4vZ28vY3liZXIvZXNwb3J0cy92MWIGcHJvdG8z", [file_buf_validate_validate, file_cyber_esports_v1_order, file_cyber_shared_common_v1_pagination, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
+  fileDesc("CiJjeWJlci9lc3BvcnRzL3YxL29yZGVyX2FkbWluLnByb3RvEhBjeWJlci5lc3BvcnRzLnYxIowCCgpBZG1pbk9yZGVyEiYKBW9yZGVyGAEgASgLMhcuY3liZXIuZXNwb3J0cy52MS5PcmRlchIPCgd1c2VyX2lkGAUgASgJEi4KCG5pY2tuYW1lGAIgASgLMhwuZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEjIKDHBob25lX21hc2tlZBgDIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIuCghza3VfbmFtZRgEIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIxCgZyZWZ1bmQYBiABKAsyIS5jeWJlci5lc3BvcnRzLnYxLk9yZGVyUmVmdW5kVmlldyK5AgoPT3JkZXJSZWZ1bmRWaWV3Ei8KCXJlZnVuZF9ubxgBIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRI3ChFjaGFubmVsX3JlZnVuZF9pZBgCIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIsCgVzdGF0ZRgDIAEoDjIdLmN5YmVyLmVzcG9ydHMudjEuUmVmdW5kU3RhdGUSLwoKYW1vdW50X2ZlbhgEIAEoCzIbLmdvb2dsZS5wcm90b2J1Zi5JbnQ2NFZhbHVlEiwKBnJlYXNvbhgFIAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRIvCgtyZWZ1bmRlZF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi1QEKD09yZGVyVW5sb2NrVmlldxIvCglyZWNvcmRfaWQYASABKAsyHC5nb29nbGUucHJvdG9idWYuU3RyaW5nVmFsdWUSLgoKZ3JhbnRlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASMQoMdW5sb2NrX2NvdW50GAQgASgLMhsuZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUi8gEKGExpc3RQYXltZW50T3JkZXJzUmVxdWVzdBIxCgRwYWdlGAEgASgLMiMuY3liZXIuc2hhcmVkLmNvbW1vbi52MS5QYWdlUmVxdWVzdBIwCgVzdGF0ZRgCIAEoDjIcLmN5YmVyLmVzcG9ydHMudjEuT3JkZXJTdGF0ZUgAiAEBEjAKBXNjb3BlGAMgASgOMhwuY3liZXIuZXNwb3J0cy52MS5PcmRlclNjb3BlSAGIAQESHwoHa2V5d29yZBgEIAEoCUIJukgGcgQQARhASAKIAQFCCAoGX3N0YXRlQggKBl9zY29wZUIKCghfa2V5d29yZCJ9ChlMaXN0UGF5bWVudE9yZGVyc1Jlc3BvbnNlEjIKBHBhZ2UYASABKAsyJC5jeWJlci5zaGFyZWQuY29tbW9uLnYxLlBhZ2VSZXNwb25zZRIsCgZvcmRlcnMYAiADKAsyHC5jeWJlci5lc3BvcnRzLnYxLkFkbWluT3JkZXIiOAoWR2V0UGF5bWVudE9yZGVyUmVxdWVzdBIeCghvcmRlcl9ubxgBIAEoCUIMukgJyAEBcgQQARggInkKF0dldFBheW1lbnRPcmRlclJlc3BvbnNlEisKBW9yZGVyGAEgASgLMhwuY3liZXIuZXNwb3J0cy52MS5BZG1pbk9yZGVyEjEKBnVubG9jaxgCIAEoCzIhLmN5YmVyLmVzcG9ydHMudjEuT3JkZXJVbmxvY2tWaWV3IjoKGENsb3NlUGF5bWVudE9yZGVyUmVxdWVzdBIeCghvcmRlcl9ubxgBIAEoCUIMukgJyAEBcgQQARggIkgKGUNsb3NlUGF5bWVudE9yZGVyUmVzcG9uc2USKwoFb3JkZXIYASABKAsyHC5jeWJlci5lc3BvcnRzLnYxLkFkbWluT3JkZXIiagoZUmVmdW5kUGF5bWVudE9yZGVyUmVxdWVzdBIeCghvcmRlcl9ubxgBIAEoCUIMukgJyAEBcgQQARggEiIKBnJlYXNvbhgCIAEoCUINukgKyAEBcgUQARj/AUgAiAEBQgkKB19yZWFzb24iSQoaUmVmdW5kUGF5bWVudE9yZGVyUmVzcG9uc2USKwoFb3JkZXIYASABKAsyHC5jeWJlci5lc3BvcnRzLnYxLkFkbWluT3JkZXIqfwoLUmVmdW5kU3RhdGUSHAoYUkVGVU5EX1NUQVRFX1VOU1BFQ0lGSUVEEAASGwoXUkVGVU5EX1NUQVRFX1BST0NFU1NJTkcQARIaChZSRUZVTkRfU1RBVEVfU1VDQ0VFREVEEAISGQoVUkVGVU5EX1NUQVRFX0FCTk9STUFMEAMyoQYKEU9yZGVyQWRtaW5TZXJ2aWNlErIBChFMaXN0UGF5bWVudE9yZGVycxIqLmN5YmVyLmVzcG9ydHMudjEuTGlzdFBheW1lbnRPcmRlcnNSZXF1ZXN0GisuY3liZXIuZXNwb3J0cy52MS5MaXN0UGF5bWVudE9yZGVyc1Jlc3BvbnNlIkSI8QQCitMOFgoS5YWo6YeP6K6i5Y2V5YiX6KGoEAGC0+STAiASHi9hcGkvdjEvZXNwb3J0cy9wYXltZW50LW9yZGVycxKxAQoPR2V0UGF5bWVudE9yZGVyEiguY3liZXIuZXNwb3J0cy52MS5HZXRQYXltZW50T3JkZXJSZXF1ZXN0GikuY3liZXIuZXNwb3J0cy52MS5HZXRQYXltZW50T3JkZXJSZXNwb25zZSJJiPEEAorTDhAKDOiuouWNleivpuaDhRABgtPkkwIrEikvYXBpL3YxL2VzcG9ydHMvcGF5bWVudC1vcmRlcnMve29yZGVyX25vfRLAAQoRQ2xvc2VQYXltZW50T3JkZXISKi5jeWJlci5lc3BvcnRzLnYxLkNsb3NlUGF5bWVudE9yZGVyUmVxdWVzdBorLmN5YmVyLmVzcG9ydHMudjEuQ2xvc2VQYXltZW50T3JkZXJSZXNwb25zZSJSiPEEAorTDhAKDOWFs+mXreiuouWNlRACgtPkkwI0OgEqIi8vYXBpL3YxL2VzcG9ydHMvcGF5bWVudC1vcmRlcnMve29yZGVyX25vfS9jbG9zZRLEAQoSUmVmdW5kUGF5bWVudE9yZGVyEisuY3liZXIuZXNwb3J0cy52MS5SZWZ1bmRQYXltZW50T3JkZXJSZXF1ZXN0GiwuY3liZXIuZXNwb3J0cy52MS5SZWZ1bmRQYXltZW50T3JkZXJSZXNwb25zZSJTiPEEAorTDhAKDOWFqOminemAgOasvhACgtPkkwI1OgEqIjAvYXBpL3YxL2VzcG9ydHMvcGF5bWVudC1vcmRlcnMve29yZGVyX25vfS9yZWZ1bmQaGYriCRXorqLljZXkuI7op6PplIHorrDlvZVCKVonY3liZXItZWNvc3lzdGVtL2dlbi9nby9jeWJlci9lc3BvcnRzL3YxYgZwcm90bzM", [file_buf_validate_validate, file_cyber_esports_v1_order, file_cyber_shared_common_v1_pagination, file_ext_v1_access, file_ext_v1_desc, file_google_api_annotations, file_google_protobuf_timestamp, file_google_protobuf_wrappers]);
 
 /**
  * An order row as the operator reads it: the wire Order plus the
@@ -61,6 +61,15 @@ export type AdminOrder = Message<"cyber.esports.v1.AdminOrder"> & {
    * @generated from field: google.protobuf.StringValue sku_name = 4;
    */
   skuName?: string | undefined;
+
+  /**
+   * The derived refund fact on a paid order; absent = never refunded.
+   * One full refund per order — the operator face mints it, the channel
+   * idempotency key (out_refund_no) is derived from the order no.
+   *
+   * @generated from field: cyber.esports.v1.OrderRefundView refund = 6;
+   */
+  refund?: OrderRefundView | undefined;
 };
 
 /**
@@ -69,6 +78,58 @@ export type AdminOrder = Message<"cyber.esports.v1.AdminOrder"> & {
  */
 export const AdminOrderSchema: GenMessage<AdminOrder> = /*@__PURE__*/
   messageDesc(file_cyber_esports_v1_order_admin, 0);
+
+/**
+ * What a paid order's one full refund looks like to the operator.
+ *
+ * @generated from message cyber.esports.v1.OrderRefundView
+ */
+export type OrderRefundView = Message<"cyber.esports.v1.OrderRefundView"> & {
+  /**
+   * The caller-minted channel idempotency key ('R'+order_no).
+   *
+   * @generated from field: google.protobuf.StringValue refund_no = 1;
+   */
+  refundNo?: string | undefined;
+
+  /**
+   * The channel's own refund id — the support/portal join key.
+   *
+   * @generated from field: google.protobuf.StringValue channel_refund_id = 2;
+   */
+  channelRefundId?: string | undefined;
+
+  /**
+   * @generated from field: cyber.esports.v1.RefundState state = 3;
+   */
+  state: RefundState;
+
+  /**
+   * @generated from field: google.protobuf.Int64Value amount_fen = 4;
+   */
+  amountFen?: bigint | undefined;
+
+  /**
+   * The operator's paper trail for the offline exception.
+   *
+   * @generated from field: google.protobuf.StringValue reason = 5;
+   */
+  reason?: string | undefined;
+
+  /**
+   * The channel-side success moment; null until the refund succeeds.
+   *
+   * @generated from field: google.protobuf.Timestamp refunded_at = 6;
+   */
+  refundedAt?: Timestamp | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.OrderRefundView.
+ * Use `create(OrderRefundViewSchema)` to create a new message.
+ */
+export const OrderRefundViewSchema: GenMessage<OrderRefundView> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_order_admin, 1);
 
 /**
  * What a paid order actually unlocked, folded at read time.
@@ -109,7 +170,7 @@ export type OrderUnlockView = Message<"cyber.esports.v1.OrderUnlockView"> & {
  * Use `create(OrderUnlockViewSchema)` to create a new message.
  */
 export const OrderUnlockViewSchema: GenMessage<OrderUnlockView> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_order_admin, 1);
+  messageDesc(file_cyber_esports_v1_order_admin, 2);
 
 /**
  * @generated from message cyber.esports.v1.ListPaymentOrdersRequest
@@ -149,7 +210,7 @@ export type ListPaymentOrdersRequest = Message<"cyber.esports.v1.ListPaymentOrde
  * Use `create(ListPaymentOrdersRequestSchema)` to create a new message.
  */
 export const ListPaymentOrdersRequestSchema: GenMessage<ListPaymentOrdersRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_order_admin, 2);
+  messageDesc(file_cyber_esports_v1_order_admin, 3);
 
 /**
  * @generated from message cyber.esports.v1.ListPaymentOrdersResponse
@@ -171,7 +232,7 @@ export type ListPaymentOrdersResponse = Message<"cyber.esports.v1.ListPaymentOrd
  * Use `create(ListPaymentOrdersResponseSchema)` to create a new message.
  */
 export const ListPaymentOrdersResponseSchema: GenMessage<ListPaymentOrdersResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_order_admin, 3);
+  messageDesc(file_cyber_esports_v1_order_admin, 4);
 
 /**
  * @generated from message cyber.esports.v1.GetPaymentOrderRequest
@@ -188,7 +249,7 @@ export type GetPaymentOrderRequest = Message<"cyber.esports.v1.GetPaymentOrderRe
  * Use `create(GetPaymentOrderRequestSchema)` to create a new message.
  */
 export const GetPaymentOrderRequestSchema: GenMessage<GetPaymentOrderRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_order_admin, 4);
+  messageDesc(file_cyber_esports_v1_order_admin, 5);
 
 /**
  * @generated from message cyber.esports.v1.GetPaymentOrderResponse
@@ -212,7 +273,7 @@ export type GetPaymentOrderResponse = Message<"cyber.esports.v1.GetPaymentOrderR
  * Use `create(GetPaymentOrderResponseSchema)` to create a new message.
  */
 export const GetPaymentOrderResponseSchema: GenMessage<GetPaymentOrderResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_order_admin, 5);
+  messageDesc(file_cyber_esports_v1_order_admin, 6);
 
 /**
  * @generated from message cyber.esports.v1.ClosePaymentOrderRequest
@@ -229,7 +290,7 @@ export type ClosePaymentOrderRequest = Message<"cyber.esports.v1.ClosePaymentOrd
  * Use `create(ClosePaymentOrderRequestSchema)` to create a new message.
  */
 export const ClosePaymentOrderRequestSchema: GenMessage<ClosePaymentOrderRequest> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_order_admin, 6);
+  messageDesc(file_cyber_esports_v1_order_admin, 7);
 
 /**
  * @generated from message cyber.esports.v1.ClosePaymentOrderResponse
@@ -246,7 +307,84 @@ export type ClosePaymentOrderResponse = Message<"cyber.esports.v1.ClosePaymentOr
  * Use `create(ClosePaymentOrderResponseSchema)` to create a new message.
  */
 export const ClosePaymentOrderResponseSchema: GenMessage<ClosePaymentOrderResponse> = /*@__PURE__*/
-  messageDesc(file_cyber_esports_v1_order_admin, 7);
+  messageDesc(file_cyber_esports_v1_order_admin, 8);
+
+/**
+ * @generated from message cyber.esports.v1.RefundPaymentOrderRequest
+ */
+export type RefundPaymentOrderRequest = Message<"cyber.esports.v1.RefundPaymentOrderRequest"> & {
+  /**
+   * @generated from field: string order_no = 1;
+   */
+  orderNo: string;
+
+  /**
+   * Why the exception was granted — required: an operator refund with no
+   * recorded reason is an audit hole, not a shortcut.
+   *
+   * @generated from field: optional string reason = 2;
+   */
+  reason?: string | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.RefundPaymentOrderRequest.
+ * Use `create(RefundPaymentOrderRequestSchema)` to create a new message.
+ */
+export const RefundPaymentOrderRequestSchema: GenMessage<RefundPaymentOrderRequest> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_order_admin, 9);
+
+/**
+ * @generated from message cyber.esports.v1.RefundPaymentOrderResponse
+ */
+export type RefundPaymentOrderResponse = Message<"cyber.esports.v1.RefundPaymentOrderResponse"> & {
+  /**
+   * @generated from field: cyber.esports.v1.AdminOrder order = 1;
+   */
+  order?: AdminOrder | undefined;
+};
+
+/**
+ * Describes the message cyber.esports.v1.RefundPaymentOrderResponse.
+ * Use `create(RefundPaymentOrderResponseSchema)` to create a new message.
+ */
+export const RefundPaymentOrderResponseSchema: GenMessage<RefundPaymentOrderResponse> = /*@__PURE__*/
+  messageDesc(file_cyber_esports_v1_order_admin, 10);
+
+/**
+ * The channel's refund lifecycle folded onto the neutral vocabulary.
+ * Succeeded is terminal; abnormal is terminal-for-now — the channel's
+ * manual-intervention bucket a human resolves, not one this face retries.
+ *
+ * @generated from enum cyber.esports.v1.RefundState
+ */
+export enum RefundState {
+  /**
+   * @generated from enum value: REFUND_STATE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: REFUND_STATE_PROCESSING = 1;
+   */
+  PROCESSING = 1,
+
+  /**
+   * @generated from enum value: REFUND_STATE_SUCCEEDED = 2;
+   */
+  SUCCEEDED = 2,
+
+  /**
+   * @generated from enum value: REFUND_STATE_ABNORMAL = 3;
+   */
+  ABNORMAL = 3,
+}
+
+/**
+ * Describes the enum cyber.esports.v1.RefundState.
+ */
+export const RefundStateSchema: GenEnum<RefundState> = /*@__PURE__*/
+  enumDesc(file_cyber_esports_v1_order_admin, 0);
 
 /**
  * The order aggregate's operator face: the whole payment flow, not the
@@ -254,7 +392,9 @@ export const ClosePaymentOrderResponseSchema: GenMessage<ClosePaymentOrderRespon
  * lists by; the detail folds the unlock outcome a paid order produced.
  * Close here is the operator's variant — the same pending-only
  * arbitration, minus the member plane's owner check, plus the operator
- * identity on the audit trail.
+ * identity on the audit trail. Refund is the offline-exception executor
+ * the member FAQ points at: the product sells no self-service refunds,
+ * so this face mints the one full refund an operator grants by hand.
  *
  * @generated from service cyber.esports.v1.OrderAdminService
  */
@@ -282,6 +422,14 @@ export const OrderAdminService: GenService<{
     methodKind: "unary";
     input: typeof ClosePaymentOrderRequestSchema;
     output: typeof ClosePaymentOrderResponseSchema;
+  },
+  /**
+   * @generated from rpc cyber.esports.v1.OrderAdminService.RefundPaymentOrder
+   */
+  refundPaymentOrder: {
+    methodKind: "unary";
+    input: typeof RefundPaymentOrderRequestSchema;
+    output: typeof RefundPaymentOrderResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_cyber_esports_v1_order_admin, 0);

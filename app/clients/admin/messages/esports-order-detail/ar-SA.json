@@ -13,5 +13,15 @@
   "esports_order_detail_unlock_closed": "أُغلق الطلب، لا فتح",
   "esports_order_detail_unlock_trial": "التقرير {id} · فتح دائم",
   "esports_order_detail_unlock_period": "نافذة {from} ~ {to} · {n} مفتوحًا داخلها (يُحتفظ به للأبد)",
-  "esports_order_detail_refund_note": "سياسة الاسترداد: لا استرداد عبر الإنترنت أو ذاتيًا. المحتوى الرقمي يُعد مسلّمًا بمجرد فتحه أو سريانه وغير قابل للاسترداد افتراضيًا؛ الاستثناءات تعالجها الدعم دون اتصال (مع السبب والإثبات)، ويسترد الاسترداد الفتح (مرة واحدة) أو المدة المتبقية (العضوية)، والكل مدقق."
+  "esports_order_detail_refund_note": "سياسة الاسترداد: لا استرداد عبر الإنترنت أو ذاتيًا. المحتوى الرقمي يُعد مسلّمًا بمجرد فتحه أو سريانه وغير قابل للاسترداد افتراضيًا؛ الاستثناءات تعالجها الدعم دون اتصال (مع السبب والإثبات)، ويسترد الاسترداد الفتح (مرة واحدة) أو المدة المتبقية (العضوية)، والكل مدقق.",
+  "esports_order_detail_refund": "الاسترداد",
+  "esports_order_detail_refund_reason": "سبب الاسترداد",
+  "esports_order_detail_refund_act": "استرداد كامل",
+  "esports_order_detail_refund_title": "استرداد كامل",
+  "esports_order_detail_refund_desc": "سيُعاد مبلغ {amount} كاملًا إلى وسيلة الدفع الأصلية — لا يمكن التراجع. لا يقوم هذا الإجراء بسحب الفتحات أو مدة العضوية المتبقية تلقائيًا؛ استرجعها من جهة العضو عند الحاجة. وكل ذلك مُدوَّن في التدقيق.",
+  "esports_order_detail_refund_label": "السبب (مطلوب، يُدوَّن في التدقيق)",
+  "esports_order_detail_refund_ph": "سجّل نتيجة التسوية دون الاتصال (مثال: تذكرة دعم #123)",
+  "esports_order_detail_refund_ok": "تأكيد الاسترداد",
+  "esports_order_detail_refund_cancel": "إلغاء",
+  "esports_order_detail_refund_done": "تم قبول الاسترداد: {no}"
 }

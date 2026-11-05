@@ -27,6 +27,61 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// The channel's refund lifecycle folded onto the neutral vocabulary.
+// Succeeded is terminal; abnormal is terminal-for-now — the channel's
+// manual-intervention bucket a human resolves, not one this face retries.
+type RefundState int32
+
+const (
+	RefundState_REFUND_STATE_UNSPECIFIED RefundState = 0
+	RefundState_REFUND_STATE_PROCESSING  RefundState = 1
+	RefundState_REFUND_STATE_SUCCEEDED   RefundState = 2
+	RefundState_REFUND_STATE_ABNORMAL    RefundState = 3
+)
+
+// Enum value maps for RefundState.
+var (
+	RefundState_name = map[int32]string{
+		0: "REFUND_STATE_UNSPECIFIED",
+		1: "REFUND_STATE_PROCESSING",
+		2: "REFUND_STATE_SUCCEEDED",
+		3: "REFUND_STATE_ABNORMAL",
+	}
+	RefundState_value = map[string]int32{
+		"REFUND_STATE_UNSPECIFIED": 0,
+		"REFUND_STATE_PROCESSING":  1,
+		"REFUND_STATE_SUCCEEDED":   2,
+		"REFUND_STATE_ABNORMAL":    3,
+	}
+)
+
+func (x RefundState) Enum() *RefundState {
+	p := new(RefundState)
+	*p = x
+	return p
+}
+
+func (x RefundState) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RefundState) Descriptor() protoreflect.EnumDescriptor {
+	return file_cyber_esports_v1_order_admin_proto_enumTypes[0].Descriptor()
+}
+
+func (RefundState) Type() protoreflect.EnumType {
+	return &file_cyber_esports_v1_order_admin_proto_enumTypes[0]
+}
+
+func (x RefundState) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RefundState.Descriptor instead.
+func (RefundState) EnumDescriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{0}
+}
+
 // An order row as the operator reads it: the wire Order plus the
 // hydrated facts the list columns need. Absent hydration fields are the
 // lazy shape (no profile row yet, roster gone) — never an error.
@@ -41,7 +96,11 @@ type AdminOrder struct {
 	PhoneMasked *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=phone_masked,json=phoneMasked,proto3" json:"phone_masked,omitempty"`
 	// The sku's display title at read time; off-shelf and deleted rows
 	// still hydrate (order history outlives catalog changes).
-	SkuName       *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=sku_name,json=skuName,proto3" json:"sku_name,omitempty"`
+	SkuName *wrapperspb.StringValue `protobuf:"bytes,4,opt,name=sku_name,json=skuName,proto3" json:"sku_name,omitempty"`
+	// The derived refund fact on a paid order; absent = never refunded.
+	// One full refund per order — the operator face mints it, the channel
+	// idempotency key (out_refund_no) is derived from the order no.
+	Refund        *OrderRefundView `protobuf:"bytes,6,opt,name=refund,proto3" json:"refund,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -111,6 +170,102 @@ func (x *AdminOrder) GetSkuName() *wrapperspb.StringValue {
 	return nil
 }
 
+func (x *AdminOrder) GetRefund() *OrderRefundView {
+	if x != nil {
+		return x.Refund
+	}
+	return nil
+}
+
+// What a paid order's one full refund looks like to the operator.
+type OrderRefundView struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The caller-minted channel idempotency key ('R'+order_no).
+	RefundNo *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=refund_no,json=refundNo,proto3" json:"refund_no,omitempty"`
+	// The channel's own refund id — the support/portal join key.
+	ChannelRefundId *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=channel_refund_id,json=channelRefundId,proto3" json:"channel_refund_id,omitempty"`
+	State           RefundState             `protobuf:"varint,3,opt,name=state,proto3,enum=cyber.esports.v1.RefundState" json:"state,omitempty"`
+	AmountFen       *wrapperspb.Int64Value  `protobuf:"bytes,4,opt,name=amount_fen,json=amountFen,proto3" json:"amount_fen,omitempty"`
+	// The operator's paper trail for the offline exception.
+	Reason *wrapperspb.StringValue `protobuf:"bytes,5,opt,name=reason,proto3" json:"reason,omitempty"`
+	// The channel-side success moment; null until the refund succeeds.
+	RefundedAt    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=refunded_at,json=refundedAt,proto3" json:"refunded_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OrderRefundView) Reset() {
+	*x = OrderRefundView{}
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrderRefundView) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrderRefundView) ProtoMessage() {}
+
+func (x *OrderRefundView) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OrderRefundView.ProtoReflect.Descriptor instead.
+func (*OrderRefundView) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *OrderRefundView) GetRefundNo() *wrapperspb.StringValue {
+	if x != nil {
+		return x.RefundNo
+	}
+	return nil
+}
+
+func (x *OrderRefundView) GetChannelRefundId() *wrapperspb.StringValue {
+	if x != nil {
+		return x.ChannelRefundId
+	}
+	return nil
+}
+
+func (x *OrderRefundView) GetState() RefundState {
+	if x != nil {
+		return x.State
+	}
+	return RefundState_REFUND_STATE_UNSPECIFIED
+}
+
+func (x *OrderRefundView) GetAmountFen() *wrapperspb.Int64Value {
+	if x != nil {
+		return x.AmountFen
+	}
+	return nil
+}
+
+func (x *OrderRefundView) GetReason() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Reason
+	}
+	return nil
+}
+
+func (x *OrderRefundView) GetRefundedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RefundedAt
+	}
+	return nil
+}
+
 // What a paid order actually unlocked, folded at read time.
 type OrderUnlockView struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -128,7 +283,7 @@ type OrderUnlockView struct {
 
 func (x *OrderUnlockView) Reset() {
 	*x = OrderUnlockView{}
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[1]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -140,7 +295,7 @@ func (x *OrderUnlockView) String() string {
 func (*OrderUnlockView) ProtoMessage() {}
 
 func (x *OrderUnlockView) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[1]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -153,7 +308,7 @@ func (x *OrderUnlockView) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OrderUnlockView.ProtoReflect.Descriptor instead.
 func (*OrderUnlockView) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{1}
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *OrderUnlockView) GetRecordId() *wrapperspb.StringValue {
@@ -201,7 +356,7 @@ type ListPaymentOrdersRequest struct {
 
 func (x *ListPaymentOrdersRequest) Reset() {
 	*x = ListPaymentOrdersRequest{}
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -213,7 +368,7 @@ func (x *ListPaymentOrdersRequest) String() string {
 func (*ListPaymentOrdersRequest) ProtoMessage() {}
 
 func (x *ListPaymentOrdersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[2]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -226,7 +381,7 @@ func (x *ListPaymentOrdersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPaymentOrdersRequest.ProtoReflect.Descriptor instead.
 func (*ListPaymentOrdersRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{2}
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListPaymentOrdersRequest) GetPage() *v1.PageRequest {
@@ -267,7 +422,7 @@ type ListPaymentOrdersResponse struct {
 
 func (x *ListPaymentOrdersResponse) Reset() {
 	*x = ListPaymentOrdersResponse{}
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[3]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -279,7 +434,7 @@ func (x *ListPaymentOrdersResponse) String() string {
 func (*ListPaymentOrdersResponse) ProtoMessage() {}
 
 func (x *ListPaymentOrdersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[3]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -292,7 +447,7 @@ func (x *ListPaymentOrdersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPaymentOrdersResponse.ProtoReflect.Descriptor instead.
 func (*ListPaymentOrdersResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{3}
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListPaymentOrdersResponse) GetPage() *v1.PageResponse {
@@ -318,7 +473,7 @@ type GetPaymentOrderRequest struct {
 
 func (x *GetPaymentOrderRequest) Reset() {
 	*x = GetPaymentOrderRequest{}
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -330,7 +485,7 @@ func (x *GetPaymentOrderRequest) String() string {
 func (*GetPaymentOrderRequest) ProtoMessage() {}
 
 func (x *GetPaymentOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[4]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -343,7 +498,7 @@ func (x *GetPaymentOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPaymentOrderRequest.ProtoReflect.Descriptor instead.
 func (*GetPaymentOrderRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{4}
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetPaymentOrderRequest) GetOrderNo() string {
@@ -364,7 +519,7 @@ type GetPaymentOrderResponse struct {
 
 func (x *GetPaymentOrderResponse) Reset() {
 	*x = GetPaymentOrderResponse{}
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -376,7 +531,7 @@ func (x *GetPaymentOrderResponse) String() string {
 func (*GetPaymentOrderResponse) ProtoMessage() {}
 
 func (x *GetPaymentOrderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[5]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -389,7 +544,7 @@ func (x *GetPaymentOrderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPaymentOrderResponse.ProtoReflect.Descriptor instead.
 func (*GetPaymentOrderResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{5}
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetPaymentOrderResponse) GetOrder() *AdminOrder {
@@ -415,7 +570,7 @@ type ClosePaymentOrderRequest struct {
 
 func (x *ClosePaymentOrderRequest) Reset() {
 	*x = ClosePaymentOrderRequest{}
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[6]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -427,7 +582,7 @@ func (x *ClosePaymentOrderRequest) String() string {
 func (*ClosePaymentOrderRequest) ProtoMessage() {}
 
 func (x *ClosePaymentOrderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[6]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -440,7 +595,7 @@ func (x *ClosePaymentOrderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClosePaymentOrderRequest.ProtoReflect.Descriptor instead.
 func (*ClosePaymentOrderRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{6}
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ClosePaymentOrderRequest) GetOrderNo() string {
@@ -459,7 +614,7 @@ type ClosePaymentOrderResponse struct {
 
 func (x *ClosePaymentOrderResponse) Reset() {
 	*x = ClosePaymentOrderResponse{}
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[7]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -471,7 +626,7 @@ func (x *ClosePaymentOrderResponse) String() string {
 func (*ClosePaymentOrderResponse) ProtoMessage() {}
 
 func (x *ClosePaymentOrderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[7]
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -484,10 +639,108 @@ func (x *ClosePaymentOrderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClosePaymentOrderResponse.ProtoReflect.Descriptor instead.
 func (*ClosePaymentOrderResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{7}
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ClosePaymentOrderResponse) GetOrder() *AdminOrder {
+	if x != nil {
+		return x.Order
+	}
+	return nil
+}
+
+type RefundPaymentOrderRequest struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	OrderNo string                 `protobuf:"bytes,1,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`
+	// Why the exception was granted — required: an operator refund with no
+	// recorded reason is an audit hole, not a shortcut.
+	Reason        *string `protobuf:"bytes,2,opt,name=reason,proto3,oneof" json:"reason,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RefundPaymentOrderRequest) Reset() {
+	*x = RefundPaymentOrderRequest{}
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RefundPaymentOrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RefundPaymentOrderRequest) ProtoMessage() {}
+
+func (x *RefundPaymentOrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RefundPaymentOrderRequest.ProtoReflect.Descriptor instead.
+func (*RefundPaymentOrderRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *RefundPaymentOrderRequest) GetOrderNo() string {
+	if x != nil {
+		return x.OrderNo
+	}
+	return ""
+}
+
+func (x *RefundPaymentOrderRequest) GetReason() string {
+	if x != nil && x.Reason != nil {
+		return *x.Reason
+	}
+	return ""
+}
+
+type RefundPaymentOrderResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Order         *AdminOrder            `protobuf:"bytes,1,opt,name=order,proto3" json:"order,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RefundPaymentOrderResponse) Reset() {
+	*x = RefundPaymentOrderResponse{}
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RefundPaymentOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RefundPaymentOrderResponse) ProtoMessage() {}
+
+func (x *RefundPaymentOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_order_admin_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RefundPaymentOrderResponse.ProtoReflect.Descriptor instead.
+func (*RefundPaymentOrderResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_order_admin_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *RefundPaymentOrderResponse) GetOrder() *AdminOrder {
 	if x != nil {
 		return x.Order
 	}
@@ -498,14 +751,24 @@ var File_cyber_esports_v1_order_admin_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_order_admin_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/esports/v1/order_admin.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1ccyber/esports/v1/order.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x88\x02\n" +
+	"\"cyber/esports/v1/order_admin.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1ccyber/esports/v1/order.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\xc3\x02\n" +
 	"\n" +
 	"AdminOrder\x12-\n" +
 	"\x05order\x18\x01 \x01(\v2\x17.cyber.esports.v1.OrderR\x05order\x12\x17\n" +
 	"\auser_id\x18\x05 \x01(\tR\x06userId\x128\n" +
 	"\bnickname\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\bnickname\x12?\n" +
 	"\fphone_masked\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\vphoneMasked\x127\n" +
-	"\bsku_name\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\askuName\"\x82\x02\n" +
+	"\bsku_name\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\askuName\x129\n" +
+	"\x06refund\x18\x06 \x01(\v2!.cyber.esports.v1.OrderRefundViewR\x06refund\"\xfa\x02\n" +
+	"\x0fOrderRefundView\x129\n" +
+	"\trefund_no\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\brefundNo\x12H\n" +
+	"\x11channel_refund_id\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\x0fchannelRefundId\x123\n" +
+	"\x05state\x18\x03 \x01(\x0e2\x1d.cyber.esports.v1.RefundStateR\x05state\x12:\n" +
+	"\n" +
+	"amount_fen\x18\x04 \x01(\v2\x1b.google.protobuf.Int64ValueR\tamountFen\x124\n" +
+	"\x06reason\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\x06reason\x12;\n" +
+	"\vrefunded_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"refundedAt\"\x82\x02\n" +
 	"\x0fOrderUnlockView\x129\n" +
 	"\trecord_id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\brecordId\x129\n" +
 	"\n" +
@@ -533,14 +796,28 @@ const file_cyber_esports_v1_order_admin_proto_rawDesc = "" +
 	"\x18ClosePaymentOrderRequest\x12'\n" +
 	"\border_no\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18 R\aorderNo\"O\n" +
 	"\x19ClosePaymentOrderResponse\x122\n" +
-	"\x05order\x18\x01 \x01(\v2\x1c.cyber.esports.v1.AdminOrderR\x05order2\xda\x04\n" +
+	"\x05order\x18\x01 \x01(\v2\x1c.cyber.esports.v1.AdminOrderR\x05order\"{\n" +
+	"\x19RefundPaymentOrderRequest\x12'\n" +
+	"\border_no\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18 R\aorderNo\x12*\n" +
+	"\x06reason\x18\x02 \x01(\tB\r\xbaH\n" +
+	"\xc8\x01\x01r\x05\x10\x01\x18\xff\x01H\x00R\x06reason\x88\x01\x01B\t\n" +
+	"\a_reason\"P\n" +
+	"\x1aRefundPaymentOrderResponse\x122\n" +
+	"\x05order\x18\x01 \x01(\v2\x1c.cyber.esports.v1.AdminOrderR\x05order*\x7f\n" +
+	"\vRefundState\x12\x1c\n" +
+	"\x18REFUND_STATE_UNSPECIFIED\x10\x00\x12\x1b\n" +
+	"\x17REFUND_STATE_PROCESSING\x10\x01\x12\x1a\n" +
+	"\x16REFUND_STATE_SUCCEEDED\x10\x02\x12\x19\n" +
+	"\x15REFUND_STATE_ABNORMAL\x10\x032\xa1\x06\n" +
 	"\x11OrderAdminService\x12\xb2\x01\n" +
 	"\x11ListPaymentOrders\x12*.cyber.esports.v1.ListPaymentOrdersRequest\x1a+.cyber.esports.v1.ListPaymentOrdersResponse\"D\x88\xf1\x04\x02\x8a\xd3\x0e\x16\n" +
 	"\x12全量订单列表\x10\x01\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/esports/payment-orders\x12\xb1\x01\n" +
 	"\x0fGetPaymentOrder\x12(.cyber.esports.v1.GetPaymentOrderRequest\x1a).cyber.esports.v1.GetPaymentOrderResponse\"I\x88\xf1\x04\x02\x8a\xd3\x0e\x10\n" +
 	"\f订单详情\x10\x01\x82\xd3\xe4\x93\x02+\x12)/api/v1/esports/payment-orders/{order_no}\x12\xc0\x01\n" +
 	"\x11ClosePaymentOrder\x12*.cyber.esports.v1.ClosePaymentOrderRequest\x1a+.cyber.esports.v1.ClosePaymentOrderResponse\"R\x88\xf1\x04\x02\x8a\xd3\x0e\x10\n" +
-	"\f关闭订单\x10\x02\x82\xd3\xe4\x93\x024:\x01*\"//api/v1/esports/payment-orders/{order_no}/close\x1a\x19\x8a\xe2\t\x15订单与解锁记录B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	"\f关闭订单\x10\x02\x82\xd3\xe4\x93\x024:\x01*\"//api/v1/esports/payment-orders/{order_no}/close\x12\xc4\x01\n" +
+	"\x12RefundPaymentOrder\x12+.cyber.esports.v1.RefundPaymentOrderRequest\x1a,.cyber.esports.v1.RefundPaymentOrderResponse\"S\x88\xf1\x04\x02\x8a\xd3\x0e\x10\n" +
+	"\f全额退款\x10\x02\x82\xd3\xe4\x93\x025:\x01*\"0/api/v1/esports/payment-orders/{order_no}/refund\x1a\x19\x8a\xe2\t\x15订单与解锁记录B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_order_admin_proto_rawDescOnce sync.Once
@@ -554,53 +831,69 @@ func file_cyber_esports_v1_order_admin_proto_rawDescGZIP() []byte {
 	return file_cyber_esports_v1_order_admin_proto_rawDescData
 }
 
-var file_cyber_esports_v1_order_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_cyber_esports_v1_order_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_cyber_esports_v1_order_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_cyber_esports_v1_order_admin_proto_goTypes = []any{
-	(*AdminOrder)(nil),                // 0: cyber.esports.v1.AdminOrder
-	(*OrderUnlockView)(nil),           // 1: cyber.esports.v1.OrderUnlockView
-	(*ListPaymentOrdersRequest)(nil),  // 2: cyber.esports.v1.ListPaymentOrdersRequest
-	(*ListPaymentOrdersResponse)(nil), // 3: cyber.esports.v1.ListPaymentOrdersResponse
-	(*GetPaymentOrderRequest)(nil),    // 4: cyber.esports.v1.GetPaymentOrderRequest
-	(*GetPaymentOrderResponse)(nil),   // 5: cyber.esports.v1.GetPaymentOrderResponse
-	(*ClosePaymentOrderRequest)(nil),  // 6: cyber.esports.v1.ClosePaymentOrderRequest
-	(*ClosePaymentOrderResponse)(nil), // 7: cyber.esports.v1.ClosePaymentOrderResponse
-	(*Order)(nil),                     // 8: cyber.esports.v1.Order
-	(*wrapperspb.StringValue)(nil),    // 9: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),     // 10: google.protobuf.Timestamp
-	(*wrapperspb.Int32Value)(nil),     // 11: google.protobuf.Int32Value
-	(*v1.PageRequest)(nil),            // 12: cyber.shared.common.v1.PageRequest
-	(OrderState)(0),                   // 13: cyber.esports.v1.OrderState
-	(OrderScope)(0),                   // 14: cyber.esports.v1.OrderScope
-	(*v1.PageResponse)(nil),           // 15: cyber.shared.common.v1.PageResponse
+	(RefundState)(0),                   // 0: cyber.esports.v1.RefundState
+	(*AdminOrder)(nil),                 // 1: cyber.esports.v1.AdminOrder
+	(*OrderRefundView)(nil),            // 2: cyber.esports.v1.OrderRefundView
+	(*OrderUnlockView)(nil),            // 3: cyber.esports.v1.OrderUnlockView
+	(*ListPaymentOrdersRequest)(nil),   // 4: cyber.esports.v1.ListPaymentOrdersRequest
+	(*ListPaymentOrdersResponse)(nil),  // 5: cyber.esports.v1.ListPaymentOrdersResponse
+	(*GetPaymentOrderRequest)(nil),     // 6: cyber.esports.v1.GetPaymentOrderRequest
+	(*GetPaymentOrderResponse)(nil),    // 7: cyber.esports.v1.GetPaymentOrderResponse
+	(*ClosePaymentOrderRequest)(nil),   // 8: cyber.esports.v1.ClosePaymentOrderRequest
+	(*ClosePaymentOrderResponse)(nil),  // 9: cyber.esports.v1.ClosePaymentOrderResponse
+	(*RefundPaymentOrderRequest)(nil),  // 10: cyber.esports.v1.RefundPaymentOrderRequest
+	(*RefundPaymentOrderResponse)(nil), // 11: cyber.esports.v1.RefundPaymentOrderResponse
+	(*Order)(nil),                      // 12: cyber.esports.v1.Order
+	(*wrapperspb.StringValue)(nil),     // 13: google.protobuf.StringValue
+	(*wrapperspb.Int64Value)(nil),      // 14: google.protobuf.Int64Value
+	(*timestamppb.Timestamp)(nil),      // 15: google.protobuf.Timestamp
+	(*wrapperspb.Int32Value)(nil),      // 16: google.protobuf.Int32Value
+	(*v1.PageRequest)(nil),             // 17: cyber.shared.common.v1.PageRequest
+	(OrderState)(0),                    // 18: cyber.esports.v1.OrderState
+	(OrderScope)(0),                    // 19: cyber.esports.v1.OrderScope
+	(*v1.PageResponse)(nil),            // 20: cyber.shared.common.v1.PageResponse
 }
 var file_cyber_esports_v1_order_admin_proto_depIdxs = []int32{
-	8,  // 0: cyber.esports.v1.AdminOrder.order:type_name -> cyber.esports.v1.Order
-	9,  // 1: cyber.esports.v1.AdminOrder.nickname:type_name -> google.protobuf.StringValue
-	9,  // 2: cyber.esports.v1.AdminOrder.phone_masked:type_name -> google.protobuf.StringValue
-	9,  // 3: cyber.esports.v1.AdminOrder.sku_name:type_name -> google.protobuf.StringValue
-	9,  // 4: cyber.esports.v1.OrderUnlockView.record_id:type_name -> google.protobuf.StringValue
-	10, // 5: cyber.esports.v1.OrderUnlockView.granted_at:type_name -> google.protobuf.Timestamp
-	10, // 6: cyber.esports.v1.OrderUnlockView.expires_at:type_name -> google.protobuf.Timestamp
-	11, // 7: cyber.esports.v1.OrderUnlockView.unlock_count:type_name -> google.protobuf.Int32Value
-	12, // 8: cyber.esports.v1.ListPaymentOrdersRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	13, // 9: cyber.esports.v1.ListPaymentOrdersRequest.state:type_name -> cyber.esports.v1.OrderState
-	14, // 10: cyber.esports.v1.ListPaymentOrdersRequest.scope:type_name -> cyber.esports.v1.OrderScope
-	15, // 11: cyber.esports.v1.ListPaymentOrdersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
-	0,  // 12: cyber.esports.v1.ListPaymentOrdersResponse.orders:type_name -> cyber.esports.v1.AdminOrder
-	0,  // 13: cyber.esports.v1.GetPaymentOrderResponse.order:type_name -> cyber.esports.v1.AdminOrder
-	1,  // 14: cyber.esports.v1.GetPaymentOrderResponse.unlock:type_name -> cyber.esports.v1.OrderUnlockView
-	0,  // 15: cyber.esports.v1.ClosePaymentOrderResponse.order:type_name -> cyber.esports.v1.AdminOrder
-	2,  // 16: cyber.esports.v1.OrderAdminService.ListPaymentOrders:input_type -> cyber.esports.v1.ListPaymentOrdersRequest
-	4,  // 17: cyber.esports.v1.OrderAdminService.GetPaymentOrder:input_type -> cyber.esports.v1.GetPaymentOrderRequest
-	6,  // 18: cyber.esports.v1.OrderAdminService.ClosePaymentOrder:input_type -> cyber.esports.v1.ClosePaymentOrderRequest
-	3,  // 19: cyber.esports.v1.OrderAdminService.ListPaymentOrders:output_type -> cyber.esports.v1.ListPaymentOrdersResponse
-	5,  // 20: cyber.esports.v1.OrderAdminService.GetPaymentOrder:output_type -> cyber.esports.v1.GetPaymentOrderResponse
-	7,  // 21: cyber.esports.v1.OrderAdminService.ClosePaymentOrder:output_type -> cyber.esports.v1.ClosePaymentOrderResponse
-	19, // [19:22] is the sub-list for method output_type
-	16, // [16:19] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	12, // 0: cyber.esports.v1.AdminOrder.order:type_name -> cyber.esports.v1.Order
+	13, // 1: cyber.esports.v1.AdminOrder.nickname:type_name -> google.protobuf.StringValue
+	13, // 2: cyber.esports.v1.AdminOrder.phone_masked:type_name -> google.protobuf.StringValue
+	13, // 3: cyber.esports.v1.AdminOrder.sku_name:type_name -> google.protobuf.StringValue
+	2,  // 4: cyber.esports.v1.AdminOrder.refund:type_name -> cyber.esports.v1.OrderRefundView
+	13, // 5: cyber.esports.v1.OrderRefundView.refund_no:type_name -> google.protobuf.StringValue
+	13, // 6: cyber.esports.v1.OrderRefundView.channel_refund_id:type_name -> google.protobuf.StringValue
+	0,  // 7: cyber.esports.v1.OrderRefundView.state:type_name -> cyber.esports.v1.RefundState
+	14, // 8: cyber.esports.v1.OrderRefundView.amount_fen:type_name -> google.protobuf.Int64Value
+	13, // 9: cyber.esports.v1.OrderRefundView.reason:type_name -> google.protobuf.StringValue
+	15, // 10: cyber.esports.v1.OrderRefundView.refunded_at:type_name -> google.protobuf.Timestamp
+	13, // 11: cyber.esports.v1.OrderUnlockView.record_id:type_name -> google.protobuf.StringValue
+	15, // 12: cyber.esports.v1.OrderUnlockView.granted_at:type_name -> google.protobuf.Timestamp
+	15, // 13: cyber.esports.v1.OrderUnlockView.expires_at:type_name -> google.protobuf.Timestamp
+	16, // 14: cyber.esports.v1.OrderUnlockView.unlock_count:type_name -> google.protobuf.Int32Value
+	17, // 15: cyber.esports.v1.ListPaymentOrdersRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	18, // 16: cyber.esports.v1.ListPaymentOrdersRequest.state:type_name -> cyber.esports.v1.OrderState
+	19, // 17: cyber.esports.v1.ListPaymentOrdersRequest.scope:type_name -> cyber.esports.v1.OrderScope
+	20, // 18: cyber.esports.v1.ListPaymentOrdersResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	1,  // 19: cyber.esports.v1.ListPaymentOrdersResponse.orders:type_name -> cyber.esports.v1.AdminOrder
+	1,  // 20: cyber.esports.v1.GetPaymentOrderResponse.order:type_name -> cyber.esports.v1.AdminOrder
+	3,  // 21: cyber.esports.v1.GetPaymentOrderResponse.unlock:type_name -> cyber.esports.v1.OrderUnlockView
+	1,  // 22: cyber.esports.v1.ClosePaymentOrderResponse.order:type_name -> cyber.esports.v1.AdminOrder
+	1,  // 23: cyber.esports.v1.RefundPaymentOrderResponse.order:type_name -> cyber.esports.v1.AdminOrder
+	4,  // 24: cyber.esports.v1.OrderAdminService.ListPaymentOrders:input_type -> cyber.esports.v1.ListPaymentOrdersRequest
+	6,  // 25: cyber.esports.v1.OrderAdminService.GetPaymentOrder:input_type -> cyber.esports.v1.GetPaymentOrderRequest
+	8,  // 26: cyber.esports.v1.OrderAdminService.ClosePaymentOrder:input_type -> cyber.esports.v1.ClosePaymentOrderRequest
+	10, // 27: cyber.esports.v1.OrderAdminService.RefundPaymentOrder:input_type -> cyber.esports.v1.RefundPaymentOrderRequest
+	5,  // 28: cyber.esports.v1.OrderAdminService.ListPaymentOrders:output_type -> cyber.esports.v1.ListPaymentOrdersResponse
+	7,  // 29: cyber.esports.v1.OrderAdminService.GetPaymentOrder:output_type -> cyber.esports.v1.GetPaymentOrderResponse
+	9,  // 30: cyber.esports.v1.OrderAdminService.ClosePaymentOrder:output_type -> cyber.esports.v1.ClosePaymentOrderResponse
+	11, // 31: cyber.esports.v1.OrderAdminService.RefundPaymentOrder:output_type -> cyber.esports.v1.RefundPaymentOrderResponse
+	28, // [28:32] is the sub-list for method output_type
+	24, // [24:28] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_order_admin_proto_init() }
@@ -609,19 +902,21 @@ func file_cyber_esports_v1_order_admin_proto_init() {
 		return
 	}
 	file_cyber_esports_v1_order_proto_init()
-	file_cyber_esports_v1_order_admin_proto_msgTypes[2].OneofWrappers = []any{}
+	file_cyber_esports_v1_order_admin_proto_msgTypes[3].OneofWrappers = []any{}
+	file_cyber_esports_v1_order_admin_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_order_admin_proto_rawDesc), len(file_cyber_esports_v1_order_admin_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   8,
+			NumEnums:      1,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_cyber_esports_v1_order_admin_proto_goTypes,
 		DependencyIndexes: file_cyber_esports_v1_order_admin_proto_depIdxs,
+		EnumInfos:         file_cyber_esports_v1_order_admin_proto_enumTypes,
 		MessageInfos:      file_cyber_esports_v1_order_admin_proto_msgTypes,
 	}.Build()
 	File_cyber_esports_v1_order_admin_proto = out.File

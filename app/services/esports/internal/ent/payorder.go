@@ -50,7 +50,19 @@ type PayOrder struct {
 	// payment deadline carried from creation (channel default two hours); expiry closes pending orders
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// channel-side payment time; the entitlement window starts here for membership
-	PaidAt       *time.Time `json:"paid_at,omitempty"`
+	PaidAt *time.Time `json:"paid_at,omitempty"`
+	// out_refund_no of the order's one full refund ('R'+order_no); null = never refunded — the refund is a derived fact on a paid order, not a state
+	RefundNo *string `json:"refund_no,omitempty"`
+	// channel refund id backfilled from the refund answer — the support/portal join key
+	RefundID *string `json:"refund_id,omitempty"`
+	// refunded amount in fen; the full-refund tool writes the order amount, partial refunds are not a product shape
+	RefundedFen *int64 `json:"refunded_fen,omitempty"`
+	// the operator's recorded reason for the offline exception — the audit trail the FAQ's manual handling assumes
+	RefundReason *string `json:"refund_reason,omitempty"`
+	// channel refund lifecycle; abnormal is terminal-for-now (the channel's manual-intervention bucket), processing converges through the refund query
+	RefundState *payorder.RefundState `json:"refund_state,omitempty"`
+	// channel-side refund success time; null until the refund succeeds
+	RefundedAt   *time.Time `json:"refunded_at,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -59,11 +71,11 @@ func (*PayOrder) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case payorder.FieldAmountFen:
+		case payorder.FieldAmountFen, payorder.FieldRefundedFen:
 			values[i] = new(sql.NullInt64)
-		case payorder.FieldID, payorder.FieldTenantID, payorder.FieldOrderNo, payorder.FieldUserID, payorder.FieldSkuCode, payorder.FieldScopeKind, payorder.FieldScopeRef, payorder.FieldProvider, payorder.FieldChannel, payorder.FieldState, payorder.FieldCredentialKind, payorder.FieldCredentialValue, payorder.FieldTransactionID:
+		case payorder.FieldID, payorder.FieldTenantID, payorder.FieldOrderNo, payorder.FieldUserID, payorder.FieldSkuCode, payorder.FieldScopeKind, payorder.FieldScopeRef, payorder.FieldProvider, payorder.FieldChannel, payorder.FieldState, payorder.FieldCredentialKind, payorder.FieldCredentialValue, payorder.FieldTransactionID, payorder.FieldRefundNo, payorder.FieldRefundID, payorder.FieldRefundReason, payorder.FieldRefundState:
 			values[i] = new(sql.NullString)
-		case payorder.FieldCreatedAt, payorder.FieldUpdatedAt, payorder.FieldExpiresAt, payorder.FieldPaidAt:
+		case payorder.FieldCreatedAt, payorder.FieldUpdatedAt, payorder.FieldExpiresAt, payorder.FieldPaidAt, payorder.FieldRefundedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -191,6 +203,48 @@ func (_m *PayOrder) assignValues(columns []string, values []any) error {
 				_m.PaidAt = new(time.Time)
 				*_m.PaidAt = value.Time
 			}
+		case payorder.FieldRefundNo:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field refund_no", values[i])
+			} else if value.Valid {
+				_m.RefundNo = new(string)
+				*_m.RefundNo = value.String
+			}
+		case payorder.FieldRefundID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field refund_id", values[i])
+			} else if value.Valid {
+				_m.RefundID = new(string)
+				*_m.RefundID = value.String
+			}
+		case payorder.FieldRefundedFen:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field refunded_fen", values[i])
+			} else if value.Valid {
+				_m.RefundedFen = new(int64)
+				*_m.RefundedFen = value.Int64
+			}
+		case payorder.FieldRefundReason:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field refund_reason", values[i])
+			} else if value.Valid {
+				_m.RefundReason = new(string)
+				*_m.RefundReason = value.String
+			}
+		case payorder.FieldRefundState:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field refund_state", values[i])
+			} else if value.Valid {
+				_m.RefundState = new(payorder.RefundState)
+				*_m.RefundState = payorder.RefundState(value.String)
+			}
+		case payorder.FieldRefundedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field refunded_at", values[i])
+			} else if value.Valid {
+				_m.RefundedAt = new(time.Time)
+				*_m.RefundedAt = value.Time
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -281,6 +335,36 @@ func (_m *PayOrder) String() string {
 	builder.WriteString(", ")
 	if v := _m.PaidAt; v != nil {
 		builder.WriteString("paid_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.RefundNo; v != nil {
+		builder.WriteString("refund_no=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.RefundID; v != nil {
+		builder.WriteString("refund_id=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.RefundedFen; v != nil {
+		builder.WriteString("refunded_fen=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.RefundReason; v != nil {
+		builder.WriteString("refund_reason=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.RefundState; v != nil {
+		builder.WriteString("refund_state=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.RefundedAt; v != nil {
+		builder.WriteString("refunded_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteByte(')')

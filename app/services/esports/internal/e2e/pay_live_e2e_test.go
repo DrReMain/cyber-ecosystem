@@ -452,6 +452,39 @@ func TestPayLiveE2E(t *testing.T) {
 		t.Fatalf("operator close of a paid order: err=%v", err)
 	}
 
+	// The refund leg: the offline-exception executor takes the paid order's
+	// one full refund (the mock channel answers terminal synchronously),
+	// refuses a second, and never touches a closed row.
+	refunded, err := adminUC.Refund(actx, mem1.Order.OrderNo, "e2e: full refund of the settled membership")
+	if err != nil {
+		t.Fatalf("refund: %v", err)
+	}
+	if refunded.RefundNo == nil || *refunded.RefundNo != order.RefundNoPrefix+mem1.Order.OrderNo ||
+		refunded.RefundedFen == nil || *refunded.RefundedFen != mem1.Order.AmountFen ||
+		refunded.RefundState == nil || *refunded.RefundState != order.RefundSucceeded || refunded.RefundedAt == nil {
+		t.Fatalf("refund row: %+v", refunded.Order)
+	}
+	if _, err := adminUC.Refund(actx, mem1.Order.OrderNo, "e2e: again"); !esportspb.IsEsportsOrderAlreadyRefunded(err) {
+		t.Fatalf("re-refund: err=%v", err)
+	}
+	if _, err := adminUC.Refund(actx, aged.Order.OrderNo, "e2e: closed"); !esportspb.IsEsportsOrderStateConflict(err) {
+		t.Fatalf("refund of a closed order: err=%v", err)
+	}
+	// The read-time converge: a row stuck on processing folds onto the
+	// channel's terminal truth at the operator's next read.
+	if _, err := db.ExecContext(context.Background(),
+		`UPDATE pay_order SET refund_state = 'processing', refunded_at = NULL WHERE order_no = $1`,
+		mem1.Order.OrderNo); err != nil {
+		t.Fatalf("restick refund: %v", err)
+	}
+	converged, _, err := adminUC.Get(actx, mem1.Order.OrderNo)
+	if err != nil {
+		t.Fatalf("converge get: %v", err)
+	}
+	if converged.RefundState == nil || *converged.RefundState != order.RefundSucceeded || converged.RefundedAt == nil {
+		t.Fatalf("refund converge: %+v", converged.Order)
+	}
+
 	skuUC := sku.NewSkuUC(logger, pf, sku.NewSkuRP(logger, pf), compliance.NewComplianceRP(logger, pf))
 	memberPlane := func() []string {
 		skus, err := skuUC.List(context.Background())

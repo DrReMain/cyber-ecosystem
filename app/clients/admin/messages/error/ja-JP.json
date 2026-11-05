@@ -146,5 +146,6 @@
   "error_ESPORTS_FEEDBACK_NOT_OWNED": "自分のフィードバックのみ閲覧できます",
   "error_ESPORTS_FEEDBACK_CLOSED": "このフィードバックは終了しました。新しい質問は再送信してください",
   "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "お知らせが見つかりません",
-  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "現在の状態ではこの操作はできません"
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "現在の状態ではこの操作はできません",
+  "error_ESPORTS_ORDER_ALREADY_REFUNDED": "この注文はすでに全額返金済みです"
 }

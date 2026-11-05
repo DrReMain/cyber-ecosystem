@@ -18,3 +18,8 @@ export const getPaymentOrder = OrderAdminService.method.getPaymentOrder;
  * @generated from rpc cyber.esports.v1.OrderAdminService.ClosePaymentOrder
  */
 export const closePaymentOrder = OrderAdminService.method.closePaymentOrder;
+
+/**
+ * @generated from rpc cyber.esports.v1.OrderAdminService.RefundPaymentOrder
+ */
+export const refundPaymentOrder = OrderAdminService.method.refundPaymentOrder;

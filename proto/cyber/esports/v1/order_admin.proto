@@ -18,7 +18,9 @@ option go_package = "cyber-ecosystem/gen/go/cyber/esports/v1";
 // lists by; the detail folds the unlock outcome a paid order produced.
 // Close here is the operator's variant — the same pending-only
 // arbitration, minus the member plane's owner check, plus the operator
-// identity on the audit trail.
+// identity on the audit trail. Refund is the offline-exception executor
+// the member FAQ points at: the product sells no self-service refunds,
+// so this face mints the one full refund an operator grants by hand.
 service OrderAdminService {
   option (cyber.ext.v1.service_comment) = "订单与解锁记录";
   rpc ListPaymentOrders(ListPaymentOrdersRequest) returns (ListPaymentOrdersResponse) {
@@ -48,6 +50,17 @@ service OrderAdminService {
       body: "*"
     };
   }
+  rpc RefundPaymentOrder(RefundPaymentOrderRequest) returns (RefundPaymentOrderResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "全额退款"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/esports/payment-orders/{order_no}/refund"
+      body: "*"
+    };
+  }
 }
 
 // An order row as the operator reads it: the wire Order plus the
@@ -64,6 +77,34 @@ message AdminOrder {
   // The sku's display title at read time; off-shelf and deleted rows
   // still hydrate (order history outlives catalog changes).
   google.protobuf.StringValue sku_name = 4;
+  // The derived refund fact on a paid order; absent = never refunded.
+  // One full refund per order — the operator face mints it, the channel
+  // idempotency key (out_refund_no) is derived from the order no.
+  OrderRefundView refund = 6;
+}
+
+// The channel's refund lifecycle folded onto the neutral vocabulary.
+// Succeeded is terminal; abnormal is terminal-for-now — the channel's
+// manual-intervention bucket a human resolves, not one this face retries.
+enum RefundState {
+  REFUND_STATE_UNSPECIFIED = 0;
+  REFUND_STATE_PROCESSING = 1;
+  REFUND_STATE_SUCCEEDED = 2;
+  REFUND_STATE_ABNORMAL = 3;
+}
+
+// What a paid order's one full refund looks like to the operator.
+message OrderRefundView {
+  // The caller-minted channel idempotency key ('R'+order_no).
+  google.protobuf.StringValue refund_no = 1;
+  // The channel's own refund id — the support/portal join key.
+  google.protobuf.StringValue channel_refund_id = 2;
+  RefundState state = 3;
+  google.protobuf.Int64Value amount_fen = 4;
+  // The operator's paper trail for the offline exception.
+  google.protobuf.StringValue reason = 5;
+  // The channel-side success moment; null until the refund succeeds.
+  google.protobuf.Timestamp refunded_at = 6;
 }
 
 // What a paid order actually unlocked, folded at read time.
@@ -125,5 +166,28 @@ message ClosePaymentOrderRequest {
 }
 
 message ClosePaymentOrderResponse {
+  AdminOrder order = 1;
+}
+
+message RefundPaymentOrderRequest {
+  string order_no = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 32
+    }
+  ];
+  // Why the exception was granted — required: an operator refund with no
+  // recorded reason is an audit hole, not a shortcut.
+  optional string reason = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 1
+      max_len: 255
+    }
+  ];
+}
+
+message RefundPaymentOrderResponse {
   AdminOrder order = 1;
 }

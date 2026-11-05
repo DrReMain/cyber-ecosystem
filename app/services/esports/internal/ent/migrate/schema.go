@@ -525,6 +525,12 @@ var (
 		{Name: "transaction_id", Type: field.TypeString, Nullable: true, Size: 64, Comment: "channel transaction id, backfilled at settlement — the bill-reconciliation join key"},
 		{Name: "expires_at", Type: field.TypeTime, Comment: "payment deadline carried from creation (channel default two hours); expiry closes pending orders"},
 		{Name: "paid_at", Type: field.TypeTime, Nullable: true, Comment: "channel-side payment time; the entitlement window starts here for membership"},
+		{Name: "refund_no", Type: field.TypeString, Nullable: true, Size: 40, Comment: "out_refund_no of the order's one full refund ('R'+order_no); null = never refunded — the refund is a derived fact on a paid order, not a state"},
+		{Name: "refund_id", Type: field.TypeString, Nullable: true, Size: 64, Comment: "channel refund id backfilled from the refund answer — the support/portal join key"},
+		{Name: "refunded_fen", Type: field.TypeInt64, Nullable: true, Comment: "refunded amount in fen; the full-refund tool writes the order amount, partial refunds are not a product shape"},
+		{Name: "refund_reason", Type: field.TypeString, Nullable: true, Size: 255, Comment: "the operator's recorded reason for the offline exception — the audit trail the FAQ's manual handling assumes"},
+		{Name: "refund_state", Type: field.TypeEnum, Nullable: true, Comment: "channel refund lifecycle; abnormal is terminal-for-now (the channel's manual-intervention bucket), processing converges through the refund query", Enums: []string{"processing", "succeeded", "abnormal"}},
+		{Name: "refunded_at", Type: field.TypeTime, Nullable: true, Comment: "channel-side refund success time; null until the refund succeeds"},
 	}
 	// PayOrderTable holds the schema information for the "pay_order" table.
 	PayOrderTable = &schema.Table{

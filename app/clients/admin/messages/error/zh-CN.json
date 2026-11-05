@@ -146,5 +146,6 @@
   "error_ESPORTS_FEEDBACK_NOT_OWNED": "只能查看自己的反馈",
   "error_ESPORTS_FEEDBACK_CLOSED": "该反馈已关闭，如有新问题请重新提交",
   "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "公告不存在",
-  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "公告当前状态不支持该操作"
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "公告当前状态不支持该操作",
+  "error_ESPORTS_ORDER_ALREADY_REFUNDED": "该订单已全额退款，请勿重复操作"
 }

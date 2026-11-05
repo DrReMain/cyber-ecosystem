@@ -12,4 +12,5 @@ func RegisterOrderAdminServiceConnectServer(srv *connect.Server, svc OrderAdminS
 	connect.HandleUnary(srv, "/cyber.esports.v1.OrderAdminService/ListPaymentOrders", svc.ListPaymentOrders)
 	connect.HandleUnary(srv, "/cyber.esports.v1.OrderAdminService/GetPaymentOrder", svc.GetPaymentOrder)
 	connect.HandleUnary(srv, "/cyber.esports.v1.OrderAdminService/ClosePaymentOrder", svc.ClosePaymentOrder)
+	connect.HandleUnary(srv, "/cyber.esports.v1.OrderAdminService/RefundPaymentOrder", svc.RefundPaymentOrder)
 }

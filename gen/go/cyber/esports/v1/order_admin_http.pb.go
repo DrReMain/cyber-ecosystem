@@ -20,11 +20,13 @@ const _ = http.SupportPackageIsVersion3
 const OperationOrderAdminServiceClosePaymentOrder = "/cyber.esports.v1.OrderAdminService/ClosePaymentOrder"
 const OperationOrderAdminServiceGetPaymentOrder = "/cyber.esports.v1.OrderAdminService/GetPaymentOrder"
 const OperationOrderAdminServiceListPaymentOrders = "/cyber.esports.v1.OrderAdminService/ListPaymentOrders"
+const OperationOrderAdminServiceRefundPaymentOrder = "/cyber.esports.v1.OrderAdminService/RefundPaymentOrder"
 
 type OrderAdminServiceHTTPServer interface {
 	ClosePaymentOrder(context.Context, *ClosePaymentOrderRequest) (*ClosePaymentOrderResponse, error)
 	GetPaymentOrder(context.Context, *GetPaymentOrderRequest) (*GetPaymentOrderResponse, error)
 	ListPaymentOrders(context.Context, *ListPaymentOrdersRequest) (*ListPaymentOrdersResponse, error)
+	RefundPaymentOrder(context.Context, *RefundPaymentOrderRequest) (*RefundPaymentOrderResponse, error)
 }
 
 func RegisterOrderAdminServiceHTTPServer(s *http.Server, srv OrderAdminServiceHTTPServer) {
@@ -32,6 +34,7 @@ func RegisterOrderAdminServiceHTTPServer(s *http.Server, srv OrderAdminServiceHT
 	r.Handle("GET", "/api/v1/esports/payment-orders", _OrderAdminService_ListPaymentOrders0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/payment-orders/{order_no}", _OrderAdminService_GetPaymentOrder0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/esports/payment-orders/{order_no}/close", _OrderAdminService_ClosePaymentOrder0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/esports/payment-orders/{order_no}/refund", _OrderAdminService_RefundPaymentOrder0_HTTP_Handler(srv))
 }
 
 func _OrderAdminService_ListPaymentOrders0_HTTP_Handler(srv OrderAdminServiceHTTPServer) func(ctx http.Context) error {
@@ -97,10 +100,33 @@ func _OrderAdminService_ClosePaymentOrder0_HTTP_Handler(srv OrderAdminServiceHTT
 	}
 }
 
+func _OrderAdminService_RefundPaymentOrder0_HTTP_Handler(srv OrderAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in RefundPaymentOrderRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationOrderAdminServiceRefundPaymentOrder)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.RefundPaymentOrder(ctx, req.(*RefundPaymentOrderRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*RefundPaymentOrderResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type OrderAdminServiceHTTPClient interface {
 	ClosePaymentOrder(ctx context.Context, req *ClosePaymentOrderRequest, opts ...http.CallOption) (rsp *ClosePaymentOrderResponse, err error)
 	GetPaymentOrder(ctx context.Context, req *GetPaymentOrderRequest, opts ...http.CallOption) (rsp *GetPaymentOrderResponse, err error)
 	ListPaymentOrders(ctx context.Context, req *ListPaymentOrdersRequest, opts ...http.CallOption) (rsp *ListPaymentOrdersResponse, err error)
+	RefundPaymentOrder(ctx context.Context, req *RefundPaymentOrderRequest, opts ...http.CallOption) (rsp *RefundPaymentOrderResponse, err error)
 }
 
 type OrderAdminServiceHTTPClientImpl struct {
@@ -154,6 +180,23 @@ func (c *OrderAdminServiceHTTPClientImpl) ListPaymentOrders(ctx context.Context,
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *OrderAdminServiceHTTPClientImpl) RefundPaymentOrder(ctx context.Context, in *RefundPaymentOrderRequest, opts ...http.CallOption) (*RefundPaymentOrderResponse, error) {
+	var out RefundPaymentOrderResponse
+	pattern := "/api/v1/esports/payment-orders/{order_no}/refund"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationOrderAdminServiceRefundPaymentOrder),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

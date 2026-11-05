@@ -13,5 +13,15 @@
   "esports_order_detail_unlock_closed": "注文はクローズ、アンロックなし",
   "esports_order_detail_unlock_trial": "レポート {id} · 永久解放",
   "esports_order_detail_unlock_period": "{from} ~ {to} の期間 · 期内 {n} 件解放（永久保持）",
-  "esports_order_detail_refund_note": "返金方針：オンライン・セルフサービス返金は不可。デジタルコンテンツはアンロック・発効をもって引き渡し完了とみなし、原則返金不可；例外はカスタマーサポートがオフラインで処理（理由と証憑付き）、返金時にアンロック（単回）または残り期間（会員）を回収、すべて監査対象。"
+  "esports_order_detail_refund_note": "返金方針：オンライン・セルフサービス返金は不可。デジタルコンテンツはアンロック・発効をもって引き渡し完了とみなし、原則返金不可；例外はカスタマーサポートがオフラインで処理（理由と証憑付き）、返金時にアンロック（単回）または残り期間（会員）を回収、すべて監査対象。",
+  "esports_order_detail_refund": "返金",
+  "esports_order_detail_refund_reason": "返金理由",
+  "esports_order_detail_refund_act": "全額返金",
+  "esports_order_detail_refund_title": "全額返金",
+  "esports_order_detail_refund_desc": "{amount} を全額お支払い元の経路で返金します。取り消し不可。アンロックと会員残り期間は本操作では自動回収されないため、必要に応じて会員側で別途回収してください。すべて監査に記録されます。",
+  "esports_order_detail_refund_label": "返金理由（必須・監査記録）",
+  "esports_order_detail_refund_ph": "オフライン協議の結論を記録（例：対応記録 #123）",
+  "esports_order_detail_refund_ok": "返金を確定",
+  "esports_order_detail_refund_cancel": "キャンセル",
+  "esports_order_detail_refund_done": "返金を受け付けました：{no}"
 }

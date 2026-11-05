@@ -173,6 +173,90 @@ func (_c *PayOrderCreate) SetNillablePaidAt(v *time.Time) *PayOrderCreate {
 	return _c
 }
 
+// SetRefundNo sets the "refund_no" field.
+func (_c *PayOrderCreate) SetRefundNo(v string) *PayOrderCreate {
+	_c.mutation.SetRefundNo(v)
+	return _c
+}
+
+// SetNillableRefundNo sets the "refund_no" field if the given value is not nil.
+func (_c *PayOrderCreate) SetNillableRefundNo(v *string) *PayOrderCreate {
+	if v != nil {
+		_c.SetRefundNo(*v)
+	}
+	return _c
+}
+
+// SetRefundID sets the "refund_id" field.
+func (_c *PayOrderCreate) SetRefundID(v string) *PayOrderCreate {
+	_c.mutation.SetRefundID(v)
+	return _c
+}
+
+// SetNillableRefundID sets the "refund_id" field if the given value is not nil.
+func (_c *PayOrderCreate) SetNillableRefundID(v *string) *PayOrderCreate {
+	if v != nil {
+		_c.SetRefundID(*v)
+	}
+	return _c
+}
+
+// SetRefundedFen sets the "refunded_fen" field.
+func (_c *PayOrderCreate) SetRefundedFen(v int64) *PayOrderCreate {
+	_c.mutation.SetRefundedFen(v)
+	return _c
+}
+
+// SetNillableRefundedFen sets the "refunded_fen" field if the given value is not nil.
+func (_c *PayOrderCreate) SetNillableRefundedFen(v *int64) *PayOrderCreate {
+	if v != nil {
+		_c.SetRefundedFen(*v)
+	}
+	return _c
+}
+
+// SetRefundReason sets the "refund_reason" field.
+func (_c *PayOrderCreate) SetRefundReason(v string) *PayOrderCreate {
+	_c.mutation.SetRefundReason(v)
+	return _c
+}
+
+// SetNillableRefundReason sets the "refund_reason" field if the given value is not nil.
+func (_c *PayOrderCreate) SetNillableRefundReason(v *string) *PayOrderCreate {
+	if v != nil {
+		_c.SetRefundReason(*v)
+	}
+	return _c
+}
+
+// SetRefundState sets the "refund_state" field.
+func (_c *PayOrderCreate) SetRefundState(v payorder.RefundState) *PayOrderCreate {
+	_c.mutation.SetRefundState(v)
+	return _c
+}
+
+// SetNillableRefundState sets the "refund_state" field if the given value is not nil.
+func (_c *PayOrderCreate) SetNillableRefundState(v *payorder.RefundState) *PayOrderCreate {
+	if v != nil {
+		_c.SetRefundState(*v)
+	}
+	return _c
+}
+
+// SetRefundedAt sets the "refunded_at" field.
+func (_c *PayOrderCreate) SetRefundedAt(v time.Time) *PayOrderCreate {
+	_c.mutation.SetRefundedAt(v)
+	return _c
+}
+
+// SetNillableRefundedAt sets the "refunded_at" field if the given value is not nil.
+func (_c *PayOrderCreate) SetNillableRefundedAt(v *time.Time) *PayOrderCreate {
+	if v != nil {
+		_c.SetRefundedAt(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *PayOrderCreate) SetID(v string) *PayOrderCreate {
 	_c.mutation.SetID(v)
@@ -361,6 +445,31 @@ func (_c *PayOrderCreate) check() error {
 	if _, ok := _c.mutation.ExpiresAt(); !ok {
 		return &ValidationError{Name: "expires_at", err: errors.New(`ent: missing required field "PayOrder.expires_at"`)}
 	}
+	if v, ok := _c.mutation.RefundNo(); ok {
+		if err := payorder.RefundNoValidator(v); err != nil {
+			return &ValidationError{Name: "refund_no", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_no": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.RefundID(); ok {
+		if err := payorder.RefundIDValidator(v); err != nil {
+			return &ValidationError{Name: "refund_id", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_id": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.RefundedFen(); ok {
+		if err := payorder.RefundedFenValidator(v); err != nil {
+			return &ValidationError{Name: "refunded_fen", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refunded_fen": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.RefundReason(); ok {
+		if err := payorder.RefundReasonValidator(v); err != nil {
+			return &ValidationError{Name: "refund_reason", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_reason": %w`, err)}
+		}
+	}
+	if v, ok := _c.mutation.RefundState(); ok {
+		if err := payorder.RefundStateValidator(v); err != nil {
+			return &ValidationError{Name: "refund_state", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_state": %w`, err)}
+		}
+	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := payorder.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "PayOrder.id": %w`, err)}
@@ -469,6 +578,30 @@ func (_c *PayOrderCreate) createSpec() (*PayOrder, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.PaidAt(); ok {
 		_spec.SetField(payorder.FieldPaidAt, field.TypeTime, value)
 		_node.PaidAt = &value
+	}
+	if value, ok := _c.mutation.RefundNo(); ok {
+		_spec.SetField(payorder.FieldRefundNo, field.TypeString, value)
+		_node.RefundNo = &value
+	}
+	if value, ok := _c.mutation.RefundID(); ok {
+		_spec.SetField(payorder.FieldRefundID, field.TypeString, value)
+		_node.RefundID = &value
+	}
+	if value, ok := _c.mutation.RefundedFen(); ok {
+		_spec.SetField(payorder.FieldRefundedFen, field.TypeInt64, value)
+		_node.RefundedFen = &value
+	}
+	if value, ok := _c.mutation.RefundReason(); ok {
+		_spec.SetField(payorder.FieldRefundReason, field.TypeString, value)
+		_node.RefundReason = &value
+	}
+	if value, ok := _c.mutation.RefundState(); ok {
+		_spec.SetField(payorder.FieldRefundState, field.TypeEnum, value)
+		_node.RefundState = &value
+	}
+	if value, ok := _c.mutation.RefundedAt(); ok {
+		_spec.SetField(payorder.FieldRefundedAt, field.TypeTime, value)
+		_node.RefundedAt = &value
 	}
 	return _node, _spec
 }
@@ -579,6 +712,120 @@ func (u *PayOrderUpsert) UpdatePaidAt() *PayOrderUpsert {
 // ClearPaidAt clears the value of the "paid_at" field.
 func (u *PayOrderUpsert) ClearPaidAt() *PayOrderUpsert {
 	u.SetNull(payorder.FieldPaidAt)
+	return u
+}
+
+// SetRefundNo sets the "refund_no" field.
+func (u *PayOrderUpsert) SetRefundNo(v string) *PayOrderUpsert {
+	u.Set(payorder.FieldRefundNo, v)
+	return u
+}
+
+// UpdateRefundNo sets the "refund_no" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdateRefundNo() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldRefundNo)
+	return u
+}
+
+// ClearRefundNo clears the value of the "refund_no" field.
+func (u *PayOrderUpsert) ClearRefundNo() *PayOrderUpsert {
+	u.SetNull(payorder.FieldRefundNo)
+	return u
+}
+
+// SetRefundID sets the "refund_id" field.
+func (u *PayOrderUpsert) SetRefundID(v string) *PayOrderUpsert {
+	u.Set(payorder.FieldRefundID, v)
+	return u
+}
+
+// UpdateRefundID sets the "refund_id" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdateRefundID() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldRefundID)
+	return u
+}
+
+// ClearRefundID clears the value of the "refund_id" field.
+func (u *PayOrderUpsert) ClearRefundID() *PayOrderUpsert {
+	u.SetNull(payorder.FieldRefundID)
+	return u
+}
+
+// SetRefundedFen sets the "refunded_fen" field.
+func (u *PayOrderUpsert) SetRefundedFen(v int64) *PayOrderUpsert {
+	u.Set(payorder.FieldRefundedFen, v)
+	return u
+}
+
+// UpdateRefundedFen sets the "refunded_fen" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdateRefundedFen() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldRefundedFen)
+	return u
+}
+
+// AddRefundedFen adds v to the "refunded_fen" field.
+func (u *PayOrderUpsert) AddRefundedFen(v int64) *PayOrderUpsert {
+	u.Add(payorder.FieldRefundedFen, v)
+	return u
+}
+
+// ClearRefundedFen clears the value of the "refunded_fen" field.
+func (u *PayOrderUpsert) ClearRefundedFen() *PayOrderUpsert {
+	u.SetNull(payorder.FieldRefundedFen)
+	return u
+}
+
+// SetRefundReason sets the "refund_reason" field.
+func (u *PayOrderUpsert) SetRefundReason(v string) *PayOrderUpsert {
+	u.Set(payorder.FieldRefundReason, v)
+	return u
+}
+
+// UpdateRefundReason sets the "refund_reason" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdateRefundReason() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldRefundReason)
+	return u
+}
+
+// ClearRefundReason clears the value of the "refund_reason" field.
+func (u *PayOrderUpsert) ClearRefundReason() *PayOrderUpsert {
+	u.SetNull(payorder.FieldRefundReason)
+	return u
+}
+
+// SetRefundState sets the "refund_state" field.
+func (u *PayOrderUpsert) SetRefundState(v payorder.RefundState) *PayOrderUpsert {
+	u.Set(payorder.FieldRefundState, v)
+	return u
+}
+
+// UpdateRefundState sets the "refund_state" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdateRefundState() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldRefundState)
+	return u
+}
+
+// ClearRefundState clears the value of the "refund_state" field.
+func (u *PayOrderUpsert) ClearRefundState() *PayOrderUpsert {
+	u.SetNull(payorder.FieldRefundState)
+	return u
+}
+
+// SetRefundedAt sets the "refunded_at" field.
+func (u *PayOrderUpsert) SetRefundedAt(v time.Time) *PayOrderUpsert {
+	u.Set(payorder.FieldRefundedAt, v)
+	return u
+}
+
+// UpdateRefundedAt sets the "refunded_at" field to the value that was provided on create.
+func (u *PayOrderUpsert) UpdateRefundedAt() *PayOrderUpsert {
+	u.SetExcluded(payorder.FieldRefundedAt)
+	return u
+}
+
+// ClearRefundedAt clears the value of the "refunded_at" field.
+func (u *PayOrderUpsert) ClearRefundedAt() *PayOrderUpsert {
+	u.SetNull(payorder.FieldRefundedAt)
 	return u
 }
 
@@ -736,6 +983,139 @@ func (u *PayOrderUpsertOne) UpdatePaidAt() *PayOrderUpsertOne {
 func (u *PayOrderUpsertOne) ClearPaidAt() *PayOrderUpsertOne {
 	return u.Update(func(s *PayOrderUpsert) {
 		s.ClearPaidAt()
+	})
+}
+
+// SetRefundNo sets the "refund_no" field.
+func (u *PayOrderUpsertOne) SetRefundNo(v string) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundNo(v)
+	})
+}
+
+// UpdateRefundNo sets the "refund_no" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdateRefundNo() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundNo()
+	})
+}
+
+// ClearRefundNo clears the value of the "refund_no" field.
+func (u *PayOrderUpsertOne) ClearRefundNo() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundNo()
+	})
+}
+
+// SetRefundID sets the "refund_id" field.
+func (u *PayOrderUpsertOne) SetRefundID(v string) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundID(v)
+	})
+}
+
+// UpdateRefundID sets the "refund_id" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdateRefundID() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundID()
+	})
+}
+
+// ClearRefundID clears the value of the "refund_id" field.
+func (u *PayOrderUpsertOne) ClearRefundID() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundID()
+	})
+}
+
+// SetRefundedFen sets the "refunded_fen" field.
+func (u *PayOrderUpsertOne) SetRefundedFen(v int64) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundedFen(v)
+	})
+}
+
+// AddRefundedFen adds v to the "refunded_fen" field.
+func (u *PayOrderUpsertOne) AddRefundedFen(v int64) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.AddRefundedFen(v)
+	})
+}
+
+// UpdateRefundedFen sets the "refunded_fen" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdateRefundedFen() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundedFen()
+	})
+}
+
+// ClearRefundedFen clears the value of the "refunded_fen" field.
+func (u *PayOrderUpsertOne) ClearRefundedFen() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundedFen()
+	})
+}
+
+// SetRefundReason sets the "refund_reason" field.
+func (u *PayOrderUpsertOne) SetRefundReason(v string) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundReason(v)
+	})
+}
+
+// UpdateRefundReason sets the "refund_reason" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdateRefundReason() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundReason()
+	})
+}
+
+// ClearRefundReason clears the value of the "refund_reason" field.
+func (u *PayOrderUpsertOne) ClearRefundReason() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundReason()
+	})
+}
+
+// SetRefundState sets the "refund_state" field.
+func (u *PayOrderUpsertOne) SetRefundState(v payorder.RefundState) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundState(v)
+	})
+}
+
+// UpdateRefundState sets the "refund_state" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdateRefundState() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundState()
+	})
+}
+
+// ClearRefundState clears the value of the "refund_state" field.
+func (u *PayOrderUpsertOne) ClearRefundState() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundState()
+	})
+}
+
+// SetRefundedAt sets the "refunded_at" field.
+func (u *PayOrderUpsertOne) SetRefundedAt(v time.Time) *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundedAt(v)
+	})
+}
+
+// UpdateRefundedAt sets the "refunded_at" field to the value that was provided on create.
+func (u *PayOrderUpsertOne) UpdateRefundedAt() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundedAt()
+	})
+}
+
+// ClearRefundedAt clears the value of the "refunded_at" field.
+func (u *PayOrderUpsertOne) ClearRefundedAt() *PayOrderUpsertOne {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundedAt()
 	})
 }
 
@@ -1060,6 +1440,139 @@ func (u *PayOrderUpsertBulk) UpdatePaidAt() *PayOrderUpsertBulk {
 func (u *PayOrderUpsertBulk) ClearPaidAt() *PayOrderUpsertBulk {
 	return u.Update(func(s *PayOrderUpsert) {
 		s.ClearPaidAt()
+	})
+}
+
+// SetRefundNo sets the "refund_no" field.
+func (u *PayOrderUpsertBulk) SetRefundNo(v string) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundNo(v)
+	})
+}
+
+// UpdateRefundNo sets the "refund_no" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdateRefundNo() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundNo()
+	})
+}
+
+// ClearRefundNo clears the value of the "refund_no" field.
+func (u *PayOrderUpsertBulk) ClearRefundNo() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundNo()
+	})
+}
+
+// SetRefundID sets the "refund_id" field.
+func (u *PayOrderUpsertBulk) SetRefundID(v string) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundID(v)
+	})
+}
+
+// UpdateRefundID sets the "refund_id" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdateRefundID() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundID()
+	})
+}
+
+// ClearRefundID clears the value of the "refund_id" field.
+func (u *PayOrderUpsertBulk) ClearRefundID() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundID()
+	})
+}
+
+// SetRefundedFen sets the "refunded_fen" field.
+func (u *PayOrderUpsertBulk) SetRefundedFen(v int64) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundedFen(v)
+	})
+}
+
+// AddRefundedFen adds v to the "refunded_fen" field.
+func (u *PayOrderUpsertBulk) AddRefundedFen(v int64) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.AddRefundedFen(v)
+	})
+}
+
+// UpdateRefundedFen sets the "refunded_fen" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdateRefundedFen() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundedFen()
+	})
+}
+
+// ClearRefundedFen clears the value of the "refunded_fen" field.
+func (u *PayOrderUpsertBulk) ClearRefundedFen() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundedFen()
+	})
+}
+
+// SetRefundReason sets the "refund_reason" field.
+func (u *PayOrderUpsertBulk) SetRefundReason(v string) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundReason(v)
+	})
+}
+
+// UpdateRefundReason sets the "refund_reason" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdateRefundReason() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundReason()
+	})
+}
+
+// ClearRefundReason clears the value of the "refund_reason" field.
+func (u *PayOrderUpsertBulk) ClearRefundReason() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundReason()
+	})
+}
+
+// SetRefundState sets the "refund_state" field.
+func (u *PayOrderUpsertBulk) SetRefundState(v payorder.RefundState) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundState(v)
+	})
+}
+
+// UpdateRefundState sets the "refund_state" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdateRefundState() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundState()
+	})
+}
+
+// ClearRefundState clears the value of the "refund_state" field.
+func (u *PayOrderUpsertBulk) ClearRefundState() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundState()
+	})
+}
+
+// SetRefundedAt sets the "refunded_at" field.
+func (u *PayOrderUpsertBulk) SetRefundedAt(v time.Time) *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.SetRefundedAt(v)
+	})
+}
+
+// UpdateRefundedAt sets the "refunded_at" field to the value that was provided on create.
+func (u *PayOrderUpsertBulk) UpdateRefundedAt() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.UpdateRefundedAt()
+	})
+}
+
+// ClearRefundedAt clears the value of the "refunded_at" field.
+func (u *PayOrderUpsertBulk) ClearRefundedAt() *PayOrderUpsertBulk {
+	return u.Update(func(s *PayOrderUpsert) {
+		s.ClearRefundedAt()
 	})
 }
 

@@ -146,5 +146,6 @@
   "error_ESPORTS_FEEDBACK_NOT_OWNED": "يمكنك عرض ملاحظاتك فقط",
   "error_ESPORTS_FEEDBACK_CLOSED": "تم إغلاق هذه الملاحظات؛ أرسل ملاحظات جديدة لأي أسئلة أخرى",
   "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "لم يتم العثور على الإعلان",
-  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "الحالة الحالية للإعلان لا تسمح بهذا الإجراء"
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "الحالة الحالية للإعلان لا تسمح بهذا الإجراء",
+  "error_ESPORTS_ORDER_ALREADY_REFUNDED": "تم استرداد قيمة هذا الطلب بالكامل بالفعل"
 }
