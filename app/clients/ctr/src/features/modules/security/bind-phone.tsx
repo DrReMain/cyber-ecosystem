@@ -5,6 +5,7 @@ import type { GetSecurityStatusResponse } from "@cyber-ecosystem/gen-connect-ts/
 import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
@@ -209,6 +210,7 @@ export function BindPhonePage() {
                 type="button"
               >
                 {conflictCtaLabel(conflict)}
+                <ChevronRight aria-hidden size={14} />
               </button>
             ) : null}
           </div>

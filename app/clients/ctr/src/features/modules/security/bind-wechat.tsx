@@ -2,7 +2,7 @@ import { useQuery } from "@connectrpc/connect-query";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { MessageCircle } from "lucide-react";
+import { ChevronRight, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
@@ -117,11 +117,16 @@ export function BindWechatPage() {
           onClick={() => void onBind()}
           type="button"
         >
-          {pending
-            ? m.security_pending()
-            : failed
-              ? m.security_bind_wechat_conflict_cta()
-              : m.security_bind_wechat_submit()}
+          {pending ? (
+            m.security_pending()
+          ) : failed ? (
+            <>
+              {m.security_bind_wechat_conflict_cta()}
+              <ChevronRight aria-hidden size={14} />
+            </>
+          ) : (
+            m.security_bind_wechat_submit()
+          )}
         </button>
         {failed ? (
           <div className="text-ink-tertiary text-center text-[11px] leading-[1.7]">

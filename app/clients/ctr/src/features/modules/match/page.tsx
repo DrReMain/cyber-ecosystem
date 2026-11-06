@@ -136,7 +136,13 @@ interface SessionGateProps {
 
 // The session read's non-faces: loading, the brief wait while a verdict's
 // redirect (tie or empty pool) is in flight, and the retryable error face.
-function SessionGate({ pending, error, undecided, emptyPool, onRetry }: Readonly<SessionGateProps>) {
+function SessionGate({
+  pending,
+  error,
+  undecided,
+  emptyPool,
+  onRetry,
+}: Readonly<SessionGateProps>) {
   if (pending || (error && (undecided || emptyPool))) {
     return (
       <AmbientLayout orbs={guideOrbs}>
@@ -182,6 +188,40 @@ function bestScoresOf(data: { abilities?: unknown[] } | undefined): Map<string, 
  * it), the tie verdict routes to the pick page, and the start button
  * enters the first step with retakes left.
  */
+// The verdict's landing word: tie and empty pool both route to the pick
+// page, each carrying its own why.
+function pickWhyOf(undecided: boolean, emptyPool: boolean): "tie" | "empty" | null {
+  if (undecided) return "tie";
+  if (emptyPool) return "empty";
+  return null;
+}
+
+// The session-derived readers: the done set, retakes left, the test-name
+// lookup, and the engine gate — derived once from the session read, then
+// read by every row.
+function matchReaders(
+  tests: { code?: string; name?: string }[],
+  session: { done?: string[]; retestLeft?: Record<string, number> } | null | undefined,
+) {
+  return {
+    doneCodes: session?.done ?? [],
+    leftOf: (code: string): number => session?.retestLeft?.[code] ?? 0,
+    nameOf: (code: string) => tests.find((t) => t.code === code)?.name ?? code,
+    engineReady: (code: string): boolean => getGameModule(code) !== null,
+  };
+}
+
+// The start button walks the linear path (prototype match-guide): the
+// first step not yet done — a done step re-enters only by its own row
+// tap, even with retakes left; the flow never re-parks on it.
+function isOpenStep(
+  step: { testCode?: string },
+  done: readonly string[],
+  engineReady: (code: string) => boolean,
+): boolean {
+  return step.testCode != null && !done.includes(step.testCode) && engineReady(step.testCode);
+}
+
 export function MatchPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/match/" }) as { genre?: Genre };
@@ -209,17 +249,9 @@ export function MatchPage() {
     },
   );
   const bestOf = bestScoresOf(reportQuery.data);
-  const leftOf = (code: string): number => session?.retestLeft?.[code] ?? 0;
-  const nameOf = (code: string) => tests.find((t) => t.code === code)?.name ?? code;
-  const engineReady = (code: string): boolean => getGameModule(code) !== null;
-  const doneCount = (session?.done ?? []).length;
-  // The start button walks the linear path (prototype match-guide): the
-  // first step not yet done — a done step re-enters only by its own row
-  // tap, even with retakes left; the flow never re-parks on it.
-  const next = steps.find(
-    (s) =>
-      s.testCode != null && !(session?.done ?? []).includes(s.testCode) && engineReady(s.testCode),
-  );
+  const { doneCodes, leftOf, nameOf, engineReady } = matchReaders(tests, session);
+  const doneCount = doneCodes.length;
+  const next = steps.find((s) => isOpenStep(s, doneCodes, engineReady));
   const errorReason = (sessionQuery.error as { reason?: string } | null)?.reason;
   const undecided = errorReason === reasonGenreUndecided;
   const emptyPool = errorReason === reasonGenreUnknown || errorReason === reasonNoDrawable;
@@ -229,10 +261,9 @@ export function MatchPage() {
   const switched = search.genre !== undefined;
 
   useEffect(() => {
-    if (undecided) {
-      void navigate({ to: "/match/pick", search: { why: "tie" } });
-    } else if (emptyPool) {
-      void navigate({ to: "/match/pick", search: { why: "empty" } });
+    const why = pickWhyOf(undecided, emptyPool);
+    if (why !== null) {
+      void navigate({ to: "/match/pick", search: { why } });
     }
   }, [undecided, emptyPool, navigate]);
 
@@ -269,7 +300,7 @@ export function MatchPage() {
             <div className="flex flex-col gap-[9px]">
               {steps.map((step, i) => {
                 const code = step.testCode ?? "";
-                const done = (session?.done ?? []).includes(code);
+                const done = doneCodes.includes(code);
                 return (
                   <StepRow
                     ability={step.ability ?? ""}
