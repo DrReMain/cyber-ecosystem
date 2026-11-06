@@ -26,7 +26,9 @@ interface WireAbility {
 export function SessionDonePage() {
   const { sessionId } = useParams({ from: "/report/session/$sessionId" });
   const navigate = useNavigate();
-  const reportQuery = useConnectQuery(getSessionReport, { sessionId });
+  // The retry face below owns a failed report read; the global throw
+  // default would hand it to the route boundary instead.
+  const reportQuery = useConnectQuery(getSessionReport, { sessionId }, { throwOnError: false });
 
   if (reportQuery.isPending) {
     return (

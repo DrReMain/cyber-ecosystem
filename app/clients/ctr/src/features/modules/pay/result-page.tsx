@@ -295,7 +295,9 @@ export function PayResultPage() {
   const orderQuery = useConnectQuery(
     getOrder,
     { orderNo: search.order },
-    { enabled: search.order !== "" },
+    // The verdict reads this query's error as its honest error face; the
+    // global throw default would boundary it instead.
+    { enabled: search.order !== "", throwOnError: false },
   );
   const skusQuery = useConnectQuery(listSkus, {});
   const session = useQuery({ ...sessionQuery, throwOnError: false });

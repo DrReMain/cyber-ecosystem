@@ -17,6 +17,14 @@ import { connectTransport } from "#/services/connect";
 // the pick page owns the manual choice then.
 export const reasonGenreUndecided = "ESPORTS_MATCH_GENRE_UNDECIDED";
 
+// The server's empty-pool verdicts: no match_config rows speak the genre,
+// or the rows exist yet nothing draws. The pick page's empty face owns the
+// way out then. The second word is the package's shared catch-all — within
+// the session read's chain it is only ever the no-drawable emission, so
+// callers match it exact-value, never by containment.
+export const reasonGenreUnknown = "ESPORTS_MATCH_GENRE_UNKNOWN";
+export const reasonNoDrawable = "ESPORTS_UNSPECIFIED";
+
 export function matchSessionKey(genre?: string) {
   const input = genre === undefined ? {} : { genre };
   return createQueryOptions(getMatchSession, input, { transport: connectTransport }).queryKey;

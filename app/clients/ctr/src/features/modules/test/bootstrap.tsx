@@ -51,9 +51,12 @@ function buildStepContext(session: MatchSession, code: string): StepContext | nu
 // every session refetch, so the result face reads the post-submit truth.
 export function TestBootstrap({ id, code, fallbackName, review }: Readonly<TestBootstrapProps>) {
   const navigate = useNavigate();
-  const testQuery = useConnectQuery(getTest, { id });
-  const configQuery = useConnectQuery(getTestConfig, { id });
-  const sessionQuery = useConnectQuery(getMatchSession, {});
+  // Each read owns its failure below — the retry face for the test/config
+  // pair, and a session load failure degrades the run to practice — so
+  // none may hand its error to the route boundary.
+  const testQuery = useConnectQuery(getTest, { id }, { throwOnError: false });
+  const configQuery = useConnectQuery(getTestConfig, { id }, { throwOnError: false });
+  const sessionQuery = useConnectQuery(getMatchSession, {}, { throwOnError: false });
   const gameModule = getGameModule(code);
   const session = sessionQuery.data?.session ?? null;
   const step = session !== null ? buildStepContext(session, code) : null;

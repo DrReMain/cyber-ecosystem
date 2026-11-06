@@ -162,18 +162,18 @@
 | 门实例 | 触发条件 | 可达判定 | 活证/处置 |
 |---|---|---|---|
 | /match 布局守卫(profileFlowGuard) | 匿名/未完成直访全子树 | 待造态(易) | 匿名→login?next;未完成→向导(§2.0 补遗) |
-| undecided 平票重定向 | getMatchSession reason=GENRE_UNDECIDED→effect 弹 pick?why=tie | 待造态 | 造平票偏好号(fps=moba 票数,SQL 调 games);竞态窗内 loading 面掩护 |
+| undecided 平票重定向 | getMatchSession reason=GENRE_UNDECIDED→effect 弹 pick?why=tie | **已活证**(11-06 开发会话,G-408 修后) | 平票号(13977660011,CS2+王者荣耀 1:1)向导毕落 /match→自动收敛 /match/pick?why=tie;服务端互证 400 reason=ESPORTS_MATCH_GENRE_UNDECIDED;`.reason` wire 读法首次活跑成功 |
 | pick·choose 种子创建 | 点 genre 卡→/match?genre=xx | 待造态(易) | resume 忽略 genre 参数(只种子创建),URL 参数=显式选择标记(switched 标) |
 | test-guide·ready 双落点 | 有 undone 引擎步→test/$code;无→回 /match | 待造态 | 无步兜底=防呆 |
 | guide·loading 面 | pending ∨ (error∧undecided 竞态窗) | 观测受限 | 瞬态;throttle 可视 |
-| guide·error 面(题/述/重试) | sessionQuery 错误且非 undecided | 待造态(**支不可达嫌疑升级**) | 停 esports 即造;GENRE_UNKNOWN(config 行缺)也落此面,重试恒败——**G-406 接线红条在案**;11-06 活证发现:该 isError 分支在全局 throwOnError=shouldThrow 默认下**永不可达**(error 先 throw 进 router defaultErrorComponent=ErrorFallback——18606513270 现场实见),SessionGate error 支随 G-408 一行修(throwOnError:false)复活 |
+| guide·error 面(题/述/重试) | sessionQuery 错误且非 undecided/emptyPool | 待造态(支已复活) | G-408 修毕(11-06):throwOnError:false 落,分支可达;GENRE_UNKNOWN/UNSPECIFIED 现导流 empty 面(G-406 接线毕)——此面仅余真 infra 类错误;专态造证(停 esports)归走查 |
 | guide·genre null 支 | 服务端未知 genre 词→genre 面整块不渲染 | 数据门 | 防未来词;正常不可达 |
 | GenreHeaderCard 2×2 | fps/moba × default/switched 标 | 部分活证 | X1-1 见过 fresh default 态;switched 标待造(URL 带 genre 即显) |
 | StepRow 四态 | done(绿边✓+best 回执行)/ready undone left>0(绿字)/left=0(灰字)/!ready(dim+engine_soon) | 部分活证 | **done 支已活证**(11-06:MOBA 场 4/4 后行点击=review 重执行;fresh undone X1-1 在案);**left=0 已活证**(11-06 晚:MOBA 全耗尽场「已用完」灰字×4);!ready 待造;**per-test retake 额度差实捕**:FPS target_recognition=剩 1 次 vs MOBA 场 3 次(match_config 面;11-06 晚二抽 FPS 全 4 项皆剩 1=genre 级配置差再证) |
 | 主钮双态+disabled | 有 next→go;全 done→go_result(→报告);next 空∧anchor 空→disabled | 部分活证 | go(第 1 项)已活证;**go_result 钮面已活证**(11-06 晚:MOBA 4/4 全耗尽场主钮「查看结果」——点击 1.1s 未导航,**单点存疑**:anchor 缺失下疑似 visible-but-dead 或慢导航,该场已关闭不可复核);**retake 耗尽面已活证**(11-06:重测 0/1+死灰钮「重新测试(机会已用完)」+「本款机会已用完,成绩已取最高——返回阵容继续下一款,或切换类型开新的一场」指引文=target_recognition 耗尽现场) |
 | go_blocked 注释行 | next 空∧anchor 空 | **已活证** | 11-06 晚:MOBA 全耗尽场「可玩项目的重测次数已用完（或引擎即将上线）—— 切换类型可开始新的一场」两因+出路口径全字面 |
-| **pick·empty 空池面** | 手输 ?why=empty=**唯一到达路径** | **已判(11-06):接线,立 G-406** | 零生产者:navigate why:"empty" 全仓不存在;服务端池空两 reason(biz.go:164/:225 GENRE_UNKNOWN=config 行缺 / :246 UNSPECIFIED=无可抽)均落 guide 通用 error 面=重试恒败;empty 面已建成(五文案含回首页逃生门)。判据:非「预留 vs 删」而是**错接**——服务端状态今日即可触发(删 config 行/抽干题库),可达路径错、正确路径不可达;「预留」前提(将来才可达)不成立,「删」不成立(恰是正确落点)。执行归开发会话 |
-| pick·tie 黄条/normal 灰条 | ?why=tie/无参 | **tie 已活证**(11-06 手输 URL,18606513270 平票号:黄条「FPS 与 MOBA 票数相同…请手动选一个」+双卡 4 能力清单+返回钮全渲染);normal 灰条待造(直访即见) | 活证时 /match→pick 自动导流死(G-408),tie 面靠手输 URL 达 |
+| **pick·empty 空池面** | 服务端池空两 reason 对值导流(生产者已接) | **已活证**(11-06 开发会话,G-406 修后) | 接线毕:session.ts 两 reason 常量+page error 分支对值 navigate why=empty;活证=直入 ?why=empty 面渲染毕(「没有可编排的测试…」+双逃生钮);机制腿由 G-408 平票号同分支族活证;服务器侧池空触发(删 config/抽干题)归走查真遇 |
+| pick·tie 黄条/normal 灰条 | ?why=tie/无参 | **tie 双路活证**(11-06:手输 URL+**自动导流**——G-408 修后平票号 /match→pick?why=tie 收敛,黄条逐字+双卡全渲染);normal 灰条待造(直访即见) | 导流死循环已修(G-408 绿) |
 | pick·推荐角标 | defaultGenre 偏好多数票;平票/无偏好→无角标 | 待造态 | 角标=原型外增强(注释在案);多数票号/平票号两态 |
 | pick·两 genre 卡常驻 | GENRE_ORDER 冻结副本预览 | 常驻非门 | presentation-only,hydrate 无他处(注释在案) |
 | switch·进度警告黄条 | doneCount>0 | 待造态 | SQL 造 done 数组 |
@@ -184,7 +184,7 @@
 | toast·pick choose(success) | 选 genre | **已活证**(11-06「已选择 MOBA 测评」文案实捕) | |
 | toast·switch 成功(success) | 切换落库 | **已活证**(11-06「已切换为 FPS(本次会话生效)」文案实捕) | |
 
-族小计:22 门=路由门 4/状态门 16/交互门 2;**11-06 晚三连收**:go_result 钮面+go_blocked 注释行+StepRow left=0 灰字(MOBA 全耗尽场);已活证 6、部分活证 4、待造态 11(易造 3)、观测受限 1、数据门 3、死码嫌疑 1(已判接线 G-406)。toast 位 2/31 已全活(累计 15/31)。**genre 级 retake 预算差再证**:二抽 FPS 全 4 项剩 1 vs MOBA 3。
+族小计:22 门=路由门 4/状态门 16/交互门 2;**11-06 晚三连收**:go_result 钮面+go_blocked 注释行+StepRow left=0 灰字(MOBA 全耗尽场);**开发会话片A(11-06)再收两门**:undecided 导流已活证+pick·empty 接线毕已活证——已活证 8、部分活证 4、待造态 10(易造 3)、观测受限 1、数据门 3、死码嫌疑 0。toast 位 2/31 已全活(累计 15/31)。**genre 级 retake 预算差再证**:二抽 FPS 全 4 项剩 1 vs MOBA 3。
 
 ### 2.5 test 族(routes 1 + test 模块 14 tsx;提取毕 2026-11-06)
 
@@ -197,7 +197,7 @@
 | ?review=true 读回相 | done 步行入口(match 族 done 行 tap) | 待造态 | SQL 造 done 数组后从 guide 点 done 行 |
 | page·loading/error/unknown 三面 | listTests pending/错/code 不在列 | 待造态 | error 面**无重试钮**(bootstrap 面有)——不对称,观察注记待 U2 对原型;unknown=手输错码即见(易) |
 | bootstrap·loading/error(双 refetch 重试)/no-engine 三面 | 三 query 态/引擎缺席 | 待造态(易) | no-engine=code 无注册引擎;error=停服 |
-| bootstrap·practice 降解 | session 缺/undecided/读败 | 待造态 | 法条①;活证=无场号直访引擎码 |
+| bootstrap·practice 降解 | session 缺/undecided/读败 | 待造态(路径已复活) | 法条①;G-408 修(11-06):bootstrap sessionQuery 豁免落,读败不再边界 throw,降解可达;活证=无场号直访引擎码 |
 | bootstrap·duration 兜底链 | config 0→test→30s | 数据门 | proto3 零值注释在案(implicit presence) |
 | attempt·phase 三相 | intro→running→ended(review 直落 ended) | **已活证** | 11-06 晚:target_recognition+flash_aiming 两场 live 全相走(intro 面/running HUD/ended end 面);review 直落 ended 早证 |
 | RunTimeBar(running 专属,6px 最小宽) | running | **已活证** | 11-06 晚:flash_aiming 暂停帧截图=顶栏蓝色细进度条(≈90% 宽@26.92/30)视觉证;class 选择器两 hunt 皆空=**样式入 style 不入 class 面**,视觉截图为准 |
@@ -409,5 +409,5 @@
 - **U1-ctr 分支级提取全量毕(2026-11-06)**:11 批=壳 15+守卫补遗 4+login 22+向导 25+home 13+match 22+test 32+report 29+member/pay 28+messages/feedback 20+security 29+末批 15=**254 门**(交互门 43/状态门 174/路由门 37)。
 - 判定分布:已活证 13(X1-1/e2e 红利)、部分活证 11、e2e 在案 3、待造态 189(易造约 80)、观测受限 28(真微信腿+瞬态各半)、数据门 14、法条在案 4。
 - **悬置三件已判(11-06,「先由你来判断」授权)**:①Skeleton=删(孤儿资产,Q1-③ 残骸无预留登记,现行 loading idiom=LoadingStrip 已竞争上岗);②pick·empty=接线(错接非预留,立 **G-406**);③profile 报告中心=接线(原型 289-291 三钮真跳转实锤,立 **G-407**)。①为代码删除、②③为红条工单,执行均归开发会话。红条 G-405 已立(emoji 字形)。
-- 下一步:起栈 U1-ctr 活证走查(chrome mcp 人在环;优先序=test verdict 六面→messages/feedback 全族→security merge 离线缝→易造 80 门铺开),后 U1-admin。**进度(11-06 全天):前四项毕+易造大丰收**——verdict 5/6 面/messages 八面/security 大批(merge 全族/双闸/bind-phone 真链/password/forgot/bind-wechat)/test 单场×4 全脸/向导族直访群/登出态批(Logout 链+双守卫匿名支+login 族 toast 群)/profile 总览连walk;**新伤五枚(G-408..412)**。ctr 侧小残=FormErrorLine 三支/AgreeBox indeterminate/home guest 面/logout sheet 面文(皆需再登出循环,边际低)+InvalidNotice 余三词+SubmitError;**下一大块=admin 起栈(X2-1 admin 腿+U1-admin 文件级)**——**起栈日毕(11-06 晚)**:X2-1 六腿全闭环/X2-2 全毕/X2-3 半毕(G-413 立)+U1-admin 首轮 25 面(22 live+1 观测受限+2 parked)+U3 三裁定入 calibration-log(tab 筛选族→Filter/Segmented、布局留白、drawer 重型 table);下一=X1-2 mock 购会员→X3 铸码导出→A-套余面→U2 harness 重激活;伤单累计 G-405..413(2 绿 11 红)。
+- 下一步:起栈 U1-ctr 活证走查(chrome mcp 人在环;优先序=test verdict 六面→messages/feedback 全族→security merge 离线缝→易造 80 门铺开),后 U1-admin。**进度(11-06 全天):前四项毕+易造大丰收**——verdict 5/6 面/messages 八面/security 大批(merge 全族/双闸/bind-phone 真链/password/forgot/bind-wechat)/test 单场×4 全脸/向导族直访群/登出态批(Logout 链+双守卫匿名支+login 族 toast 群)/profile 总览连walk;**新伤五枚(G-408..412)**。ctr 侧小残=FormErrorLine 三支/AgreeBox indeterminate/home guest 面/logout sheet 面文(皆需再登出循环,边际低)+InvalidNotice 余三词+SubmitError;**下一大块=admin 起栈(X2-1 admin 腿+U1-admin 文件级)**——**起栈日毕(11-06 晚)**:X2-1 六腿全闭环/X2-2 全毕/X2-3 半毕(G-413 立)+U1-admin 首轮 25 面(22 live+1 观测受限+2 parked)+U3 三裁定入 calibration-log(tab 筛选族→Filter/Segmented、布局留白、drawer 重型 table);下一=X1-2 mock 购会员→X3 铸码导出→A-套余面→U2 harness 重激活;伤单累计 G-405..413(2 绿 11 红)。**开发会话片A清偿(11-06 晚)**:G-408/406 翻绿(伤单 4 绿 9 红)——六文件 throwOnError 豁免族(含 8 页体检:4 真全修/4 假维持边界)+空池两 reason 对值接线;平票号(13977660011)导流收敛+服务端 400 互证+empty 面渲染活证;序=片B NaN 零值族(G-409/411)→片C 机械批(G-407/405/412)→片D G-413 admin 信箱 Tab。
 - 死码嫌疑处置:修条件 bug 或删(逐条用户过目);预留门登记编号引 gap-ledger/pm-review。

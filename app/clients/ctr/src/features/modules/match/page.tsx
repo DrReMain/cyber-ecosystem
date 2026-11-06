@@ -10,7 +10,7 @@ import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { getGameModule } from "#/features/modules/test/registry";
 import { m } from "#/paraglide/messages";
-import { reasonGenreUndecided } from "./session";
+import { reasonGenreUndecided, reasonGenreUnknown, reasonNoDrawable } from "./session";
 import { FlowHeader } from "./ui/flow-header";
 import { abilityWord, type Genre, genreLabel, genreMeta, narrowGenre } from "./vocabulary";
 
@@ -130,13 +130,14 @@ interface SessionGateProps {
   readonly pending: boolean;
   readonly error: boolean;
   readonly undecided: boolean;
+  readonly emptyPool: boolean;
   readonly onRetry: () => void;
 }
 
-// The session read's non-faces: loading, the brief wait while the tie
-// verdict's redirect is in flight, and the retryable error face.
-function SessionGate({ pending, error, undecided, onRetry }: Readonly<SessionGateProps>) {
-  if (pending || (error && undecided)) {
+// The session read's non-faces: loading, the brief wait while a verdict's
+// redirect (tie or empty pool) is in flight, and the retryable error face.
+function SessionGate({ pending, error, undecided, emptyPool, onRetry }: Readonly<SessionGateProps>) {
+  if (pending || (error && (undecided || emptyPool))) {
     return (
       <AmbientLayout orbs={guideOrbs}>
         <StateScreen variant="loading" />
@@ -188,6 +189,10 @@ export function MatchPage() {
   const sessionQuery = useConnectQuery(
     getMatchSession,
     search.genre ? { genre: search.genre } : {},
+    // The undecided and empty-pool redirects below decide on this very
+    // error — the global throw default would hand it to the route
+    // boundary before any page-level branch could act.
+    { throwOnError: false },
   );
 
   const tests = testsQuery.data?.tests ?? [];
@@ -215,8 +220,9 @@ export function MatchPage() {
     (s) =>
       s.testCode != null && !(session?.done ?? []).includes(s.testCode) && engineReady(s.testCode),
   );
-  const undecided =
-    (sessionQuery.error as { reason?: string } | null)?.reason === reasonGenreUndecided;
+  const errorReason = (sessionQuery.error as { reason?: string } | null)?.reason;
+  const undecided = errorReason === reasonGenreUndecided;
+  const emptyPool = errorReason === reasonGenreUnknown || errorReason === reasonNoDrawable;
   // The session's genre is an open word on the wire; faces narrow it to
   // the two-genre vocabulary this UI speaks.
   const genre = narrowGenre(session?.genre);
@@ -225,12 +231,15 @@ export function MatchPage() {
   useEffect(() => {
     if (undecided) {
       void navigate({ to: "/match/pick", search: { why: "tie" } });
+    } else if (emptyPool) {
+      void navigate({ to: "/match/pick", search: { why: "empty" } });
     }
-  }, [undecided, navigate]);
+  }, [undecided, emptyPool, navigate]);
 
   if (sessionQuery.isPending || sessionQuery.isError) {
     return (
       <SessionGate
+        emptyPool={emptyPool}
         error={sessionQuery.isError}
         onRetry={() => void sessionQuery.refetch()}
         pending={sessionQuery.isPending}
