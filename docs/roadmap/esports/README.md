@@ -15,10 +15,9 @@
 | progress.md | 进度:切片认领状态 + 里程碑验收记录(活档区=唯一可变) | 三人共写 |
 | progress-archive.md | 进度归档:历史节奏行索引(压实形;全文=git log proven-by 尾/收口报告) | 随里程碑收口写入 |
 | migration.md | 迁移专项:四档重算 + 逐表口径 + cutover 验收清单 | M4 前由开发维护 |
-| coverage.md | 语义锚索引:验收口径(D-O2)+语料版本律+活锚清单(2026-11-05 压缩:逐页表退役,处置=demand-ledger/映射=ctr-matrix/面检=q-line) | 三人共写,谁落地谁改行 |
 | metric.md | 评分规格单源:13 款指标/单位分/锚点常量/8 维权重/档位(E3 建立,旧仓评分语料废止) | 开发共同维护 |
-| verify/ | 验证工作台:原型保真与逻辑验收(盘点矩阵/gap 台账/PM 物料档/harness SOP);已冻结,重激活=开发阶段完成后照 HARNESS-SOP 抄落盘 | 验证会话(与开发会话分工) |
-| verify/demand-ledger.md | **需求总账**:85 页原型×现行处置+旧码功能处置+对账计数(进度对账唯一真值) | 验证会话建立维护,切片收口改行 |
+| verify/ | 验证工作台:demand-ledger(处置真值)/integration-matrix(用例设计)/coverage-map(三方覆盖映射)/q-line(校对锚)/导航锚(admin-nav/member/ctr-matrix)/HARNESS-SOP。历史取证档(gap-ledger/render-coverage×2/calibration-log/pm-review-items/admin-gap-matrix/coverage)2026-11-07 役三退役,**全文=git** | 走查会话维护;走查与开发同会话执行(2026-11-05 起),红→绿翻转须复跑证据(11-07 三律:join 红条/视觉轴标注/毕=动词全走) |
+| verify/demand-ledger.md | **需求总账**:85 页原型×现行处置+旧码功能处置+对账计数(进度对账唯一真值;§四 计数随收口脚本再生) | 走查/开发共同维护,切片收口改行 |
 | design-alignment.md | 执行法:客户端面切片设计对齐前置动作(D-AQ,消费 verify 矩阵为开发侧导航) | 开发共同维护 |
 
 ---
@@ -196,4 +195,5 @@
 - 2026-11-05 D-BF:H5 支付申请递延(ljr)——微信驳回 H5 权限(业务形态不支持),H5 递延至新版本部署上线、有真实界面逻辑后再提;同日 Native 扫码申请通过(仅余 H5);PAY2 走 JSAPI+Native 主链路,微信外降级「引导微信内打开完成支付」。
 - 2026-11-05 经营类目降级(ljr,非裁决事件):商户平台「售卖商品类目」只读且现值为综合/平台+实体兜底,与测评业务不匹配——降级处理,等有订单要结算时再走「商户信息变更」改类目。**PAY2 行政件门至此全清**(APIv3 已核对/H5 递延/Native 已开通/类目降级)。
 - 2026-11-04 W6 备料:verify/cutover-watch.md 落档——上线走查+值守清单草案(hzy 座位;T-1 五检/值守六节点/冒烟八环含激活码兜底腿与 match_session 净清法/座位分工);W6 修订后作 cutover 执行稿。同日 Q6 读腿收口(见 q-line.md:①续费窗缝契约级+②微注入 lzx 队列 PAY3 前同窗)。
-- 2026-11-05 roadmap 瘦身+校准役(用户令,防 coding agent 注意力漂移):**剪枝律执法**——10-31..11-05 已收池(M2 核心组/E9/R 线/Q 线/MIG1 五阶段/MSG-1 首刀/PAY3 四片)全量压实迁 archive,plan.md 巨格清除(PAY3 单格 9.2k 字/Q 队列 7.4k 字)只载未完片,progress.md 活档区重写;**窗口表 11-05 重排**(编码超前窗口约两周:MSG-1 余面拉前 W3 余、真通道刀先行件 W3-W5;锚点裁决不动);**三源校准**——demand-ledger 对账(pay 三页+member 行翻✅,计数 44=✅26+◐5+❌8+⏸1+📄4;§四 盘点刷新 21 service/83 RPC/23 表/43 路由/14 admin 面)、ctr-matrix 重构纯映射(映射列按现行路由重推导,待裁清单四项全闭)、coverage 压缩为语义锚索引、pm-review PM-6/7 闭(双轨=§0.5(6)/moba-6dim=P15)、gap-ledger 增六批偏离登记簿(七项产品口径级集中登记)+G-402 附 lzx 建议裁②服务端富集(D-BC 报备形);原型仓 manage/design-systems git 零演进实证=10-30 四路穷举基线仍有效。**校准结论:偏移在档不在码**——Q 线六片独立复核+PAY3 四片双轴审查在案,未登记漂移零;已登记偏离七项全数入 gap-ledger 六批。
+- 2026-11-05 roadmap 瘦身+校准役(用户令,防 coding agent 注意力漂移):**剪枝律执法**——10-31..11-05 已收池(M2 核心组/E9/R 线/Q 线/MIG1 五阶段/MSG-1 首刀/PAY3 四片)全量压实迁 archive,plan.md 巨格清除(PAY3 单格 9.2k 字/Q 队列 7.4k 字)只载未完片,progress.md 活档区重写;**窗口表 11-05 重排**(编码超前窗口约两周:MSG-1 余面拉前 W3 余、真通道刀先行件 W3-W5;锚点裁决不动);**三源校准**——demand-ledger 对账(pay 三页+member 行翻✅,计数 44=✅26+◐5+❌8+⏸1+📄4;§四 盘点刷新)、ctr-matrix 重构纯映射、coverage 压缩为语义锚索引、pm-review PM-6/7 闭、gap-ledger 增六批偏离登记簿+G-402 附 lzx 建议裁②;原型仓零演进实证=10-30 基线仍有效。校准结论:偏移在档不在码。
+- 2026-11-07 重构役三(用户令,文档可信度审计驱动——progress 曾 10-30 被裁「两向失真」,本役根治其结构性成因):**S1 分母机核**(191 端点/36 业务表/原型 192+41 全实测;tsv 机器锚与磁盘零差集;旧前端「64/23 视图」口径失传废弃)→**S2 demand-ledger 重核**(85 页行级账目逐行对质成立;§四「14 面/83 RPC」两处漂移修正为 17 面/85 RPC;计数改脚本再生纪律)→**S3 走查史清零**(七档退役:coverage/gap-ledger/render-coverage×2/calibration-log/admin-gap-matrix/pm-review-items,全文=git 391ccc87;未修红条转 plan 缺陷工单 B-1..B-9;R-01..R-13+PM-13..20 并 prd 待裁区;coverage.md 承重内容分流=验收口径+语料版本律→design-alignment、活锚清单→demand-ledger)→**S4 活档重写**(plan 重立+缺陷工单节;progress 执法剪枝律,5567 字巨行拆解,「修复件待提交」僵尸句清除;README 体制行修正=走查/开发合流如实记档+自证绿须复核)→**S5 八域覆盖核验**(并行 subagent+逐域复核,产出=verify/coverage-map.md:56 例对已建面/RPC 映射成立;缺口=MOBA 侧 8/13 引擎零执行、admin 三写 RPC 全链零执行、C2/C3/C4/C6 例族未走;锚 15/15 命中,3 处内容滞后修正;新发现偏离入 prd)→**S6 矩阵重写**(态列全清零重立,正式走查阶段重走)。

@@ -1,54 +1,53 @@
 # esports 进度档 — 认领状态与验收记录
 
-> 归属:esports 前沿进度档,三人共写。**剪枝律**(全文=README §5):片收口即剪枝为一行收口注(状态+日期+hash+关键判定);节奏行=索引形 ≤150 字;活档区(快照/认领表/遗留清单)=唯一可变区;历史压实迁 progress-archive.md;里程碑收口做活档漂移对账。
-> **2026-11-05 瘦身役**:10-31..11-05 已收池(M2 核心组/E9/R 线/Q 线/MIG1 五阶段/MSG-1 首刀/PAY3 四片)全量压实迁 archive;需求分母与页面处置=verify/demand-ledger.md。
+> 归属:esports 前沿进度档,三人共写。**剪枝律**(全文=README §5):片收口即剪枝为一行收口注(状态+日期+hash+关键判定);节奏行=索引形 ≤150 字;活档区(快照/认领表/遗留清单)=唯一可变区,收口时**重写而非追加**;历史压实迁 progress-archive.md;里程碑收口做活档漂移对账。
+> 2026-11-07 重构役三:本档按剪枝律整体重写(旧快照巨行拆解,叙事全文=git proven-by 尾);走查态清零=verify/integration-matrix 重立,覆盖映射=verify/coverage-map.md。
 
-## 现状快照(2026-11-05,W3 中)
+## 现状快照(2026-11-07,W3 末)
 
 | 人 | 一行定位(详单=archive) | 当前 → 下一片 |
 |---|---|---|
-| lzx | M2 核心组+E9 全收(10-31..11-01);MIG1 五阶段毕(冻结待 P26/P26.1);Q 队列①-⑩清(11-03..04);PAY3 四片全收双推(11-04..05,末笔 2c3ecb7c);MSG-1 ctr 腿+G-403/404 先行件收+admin 三页 V10 毕(11-05,提交 5d3bded5/7b267589);PAY2 真通道双腿毕(11-05..06:首探+NO_STATEMENT_EXIST 修 3fe2cc3f+0.01 闭环+退款腿活证);MIG1 备料毕(11-06:生产副本直载+谱系三源互证+census 三绿,预演前两决策 D-MIG-1/2 待裁);G-402 裁②落码(11-06:openid 服务端按绑定富集,esports 契约净重);MIG1 预演保险件毕(11-06,5de64998:回滚腿+造数彩排绿+密码面实数定谳);MSG-1 窄化接洽单立(11-06:pm-review-items PM-13..20);走查会话六笔双推(11-06 晚,bcd1c82f);G 伤单清偿片A/B/C毕(11-06 深夜:七翻绿+G-414 立,9 绿 5 红;片A=b749982d、片B=72f47689 均双推);片D毕+双推(11-06 深夜,09e6547f,含提交前双轴审查三修一顺修:user_id len-20 家族校验/i18n 空态组序/df685f48 admin copy.ts 缺线);片E毕+双推(11-07,a240f182,G-414 security 字形批+随片修 HEAD 两陈红;conventions 重定位 e2535ef3 双推);**X1-2 mock 购链毕(11-07 片F,提交 6c8ac47d 双推)**:trial/会员/续费三链+墙四支+收银台三钮+result 五面全活证;G-415 立即绿(result error 面死码支序,当场修两帧活证)+G-416 红(过期灰 banner 无生产者,两形待裁);**X3 铸码五行毕(11-07 片G,提交 8df43807 双推)**:admin 铸码/导出 CSV 六列/码表回读/停用 O-3/过期拒全活证,码>政策翻面 CODE_REDEEMED+核销 trail 落码行秒级互证,族幂等宽形精读(活授权在手=停用批未兑异码亦答站窗不烧),≥95% 补码黄条现成活证;**立 G-417 红**(esports/agent 零审计接线,§5a 三兄弟缺一+proto/UI 双承诺落空,跨服务 sink 形待裁);ctr 输码面结构性未建挂 P4;伤单 12 绿 5 红;**A 套 15 例毕(11-07 片H)**:SKU 改价(¥39.9 墙即时同步)/下架(¥— 禁用设计形)/新建(条件会员期字段+新建即上架)/users·members·orders 读面族/协议版本全环(建即当前+拒删=结构性缺席+净还原)/同意记录(CSV 掩码导出)/合规配置(分级处置)/出生开关(净还原+ctr 零消费方代码互证)/报告策略(写读+SQL 净还原)/game-config(诚实空题库)/导航零死链;**发现收拢**:ActionIconButton href 缺 locale 前缀四实例(候选并 U3)/设置人裸 user_id/「动作只在列表行」族两实例/覆盖后无恢复默认(与文案卡同族);全部写面夹具净还原;**C1 冷启动六例毕(11-07 片I)**:登录族/向导三步/home 首观/编排族/测评族/完成与中心全 live(mock SMS 双号=平票 13906640217「阿澈」+多数票 13906640218「沛然」);**发现并即修 G-418**(须知页缓存错误重放+undecided 缺支→ERR 边界面,镜像 MatchPage 法条当场修,redirect 腿 SQL 造态活证;**修复件待提交**);校准三项=向导毕直入编排页非 home(矩阵勘误)/偏好至少 1 款(简写勘误)/续测卡=进行中才在场+当日开局显「已过 1 天」off-by-one 疑点;退出 sheet/暂停面/诚实零收据(未评级+常模积累中)全字面;零输入撞毁快=时敏局仍须缝法(§1.4 教训重申);**C1-6 首记「分享 CTA parked 兑现」系红条洗绿,当场改判**(未 join G-410 即下正判;done 页=G-410 红在案页,scored 态活面整役未见);X3 陈重复行顺手清;**用户「隐患」质询→收紧判据三律入 §1**(join 红条/视觉轴标注/毕=动词全走)+全量复扫(产物=欠账总表落 §9;C1-6 红条洗绿改判在案);**补刀七枚当晚全闭**:①密码 tab(错密码=行内「账号或密码不正确」)②自定义游戏添加/删除(profile 编辑器=向导页复用+投票读出行+icon-only aria ×=§1.2 再演)③「推荐」角标+pick 正常态④退出腿=不烧机会实证⑤判定中=暂态⑦已过 1 天=原型含当日计数非 bug(措辞留表态)⑥′**真分链=整役首枚真分**:red_dot 按 e2e 配方单脚本真打=100 分·S·专业+DB authoritative 100/S+下游全通(done scored 态 1/4+最强项卡=G-410 ①②活体佐证/单报告锁面+付费墙真价/home 三计数器翻值+RecentCard 条件渲染勘误/match「本次最高 100」回读);**§1.4 教训修正=工具调用间延迟≠脚本内延迟**;余欠=A1-3 编辑腿+A2-2 到期夹具(两 admin 腿降半@R1 在行内);**同夜补刀收口(11-07 深夜)**:A1-3 编辑腿撤欠(原型 `data-a="edit"`=改价,编辑表单结构性不存在=动词误记,先查后走未洗绿)/A2-2 到期腿毕(SQL 夹具→≤7 天 Tab 出行+**续费 ratchet 实锤**=新行 exp 旧到期+31d+Tab 自动迁徙+夹具净还原复读核)/G-417 四行内注补齐;**用户质询「SKU 列表布局明显有问题」→G-419 立+当场修+几何活证**(三层=max-content 撞钉列文字重叠+划线价死列+elllipsis 失效;砍死列+封宽 ellipsis+有界 scroll 三修;**视觉轴首测+conventions §3.4 回灌=布局判定须几何测定**;共享件族注=25 表同嫌疑待裁);**三路对抗审毕(11-07 深夜,新起代理独立审+承重项亲手复核)**:立 G-420(支付:真微信 400 折叠杀到期竞速恢复支路=最重,dev 结构性照不见;notify 单宿 ctr/对账游标内存态等六项)+G-421(授权:同族双码并发静默烧一码+Terminate×授予复活窗;71 RPC 零 IDOR 独立证);**G-417 修形照亮=消费侧已在,修=esports 生产者三件**(约 3 文件+wire,候选①近乎定形);退款不撤权益=三路独立复认 parked 项;台账 14 绿 7 红 | MIG1 预演 11-15(先过 D-MIG-1/2)→CP3 核验 11-28→cutover |
-| hzy | R 线五片+PC/PM 批+消费片 ✅(11-01..02);Q1-Q6 全毕(11-03..04,MR FF 合入);W6 值守备料 ✅(11-04 cutover-watch 草案) | 待分配:W4-W5 上线走查执行稿修订+值守演练 |
-| ljr | P7 定稿(11-02);P21/P19/P22/PM-12/同意口径已裁(D-BC);P6 已代裁定档(D-BE 预演 11-15);H5 递延+Native 已开通(D-BF);经营类目降级(11-05,只读,结算时再改) | 行政件清空→P22 否决窗 11-14→P26/P26.1(理想 11-12/硬限 11-24)→appid+绑域 11-26→P23/P20 11-28;P4 11 月底 |
+| lzx | M2 核心组+E9/Q 线 Q1-Q6/PAY3 四片/MSG-1 全链/PAY2 Native+0.01 真钱+退款腿/MIG1 五阶段+备料+彩排全收(10-31..11-06);走查 R1 轮(X1-1/2、X2、X3、A 套、C1)毕+G 伤单 14 绿;11-07 起=roadmap 重构役三(demand-ledger 重核+八域覆盖核验) | MIG1 预演 11-15(先过 P26/P26.1+D-MIG-1/2)→PAY2 JSAPI 活证→CP3 核验 11-28→cutover |
+| hzy | R 线五片+PC/PM 批+消费片毕(11-01..02);Q1-Q6 全毕(11-03..04,MR FF 合入);W6 值守备料毕(11-04 cutover-watch 草案) | 待分配:W4-W5 上线走查执行稿修订+值守演练 |
+| ljr | P7 定稿(11-02);P21/P19/P22/同意口径已裁(D-BC);P6 已代裁定档(D-BE 预演 11-15);H5 递延+Native 已开通(D-BF);经营类目降级(11-05) | P22 否决窗 11-14→P26/P26.1(理想 11-12/硬限 11-24)→appid+绑域 11-26→P23/P20 11-28;P4 11 月底 |
 
 ## 活片认领表(定义=plan.md;已收片迁 archive)
 
 | 片 | 认领 | 状态 | 一行注 |
 |---|---|---|---|
-| MSG-1 余面 | lzx(D-BB 全片) | **admin 三页+V10 闭环毕(11-05)**:反馈管理(状态段+快捷回复+关闭)+反馈详情(KV/对话气泡/contact)+公告管理(两步发布/编辑草稿/下线);V10 全环 live 走查毕(ctr 提交→admin 双路回复→追问回待处理→关闭终态;全员信 11 封/会员型空投/banner 零投递 DB 侧证);走查捕五伤全修(Form.Item 双子断绑定/form store 残值/枚举名比对/两处分型 confirm 文案);窄化 R-09..R-13 已登记 | 余=W6 ljr 裁决落地(**接洽单已立 11-06**=pm-review-items PM-13..20,两主裁+六复核含裁翻成本分级,全维持=零改动;裁决若翻契约面小改随改);banner ctr 消费面见遗留清单 |
-| PAY2 通道联调 | lzx | W4(**行政件门已清空 11-05**);材料全齐活证(APP_ 前缀引号形 boot 绿+对账 sweep 获微信真应答);**Native 腿全生命周期活证(11-05 晚,dev 栈真 UI)**:create(真 code_url 落库+码图 sheet 渲染)→query(商户直签 GET,微信答 NOTPAY,应答签名平台公钥验过)→close(259ms 真往返,双侧 CLOSED);同单复用回放(零通道往返)与 notify 拒绝路径(ctr server route→服务 400 INVALID_SIGNATURE)亦证;**0.01 真钱支付腿毕(11-05 深夜)**:member_probe 1 分 SKU 真扫码支付→直签查单亲证 SUCCESS(22:58:29,transaction_id 4500…1881,应答验签过)→收敛环 23:07:44 翻 paid(paid_at=通道 success_time 分秒差零)→membership 权益 1 天窗(paid_at+1d)→UI 会员面「已开通」翻转;notify 不可达场景=收敛环兜底实证(10 分钟 stale 线后 26 秒拾起);探针 SKU 用后即下架;deploy 事实=localhost notify_url create 侧照收/v3 token=mchid 非 m | **退款腿毕(11-06 深夜,W5 件拉前)**:RefundPaymentOrder 出口+pay_order 派生事实六列(paid 不翻状态,RefundPaid/SettleRefund 双仲裁写)+admin 详情退款块/列表双标签/原因必填弹窗;0.01 标本真退款六段活证=微信答 PROCESSING(refund_id 503…8181,channel=ORIGINAL 原路)→刷新读穿收敛 succeeded(refunded_at=通道 success_time 分秒差零)→支付方零钱通到账亲证→直签退款单 SUCCESS+支付单 trade_state=REFUND 双验签过;e2e 退款/重退拒绝/错态拒绝/读穿收敛四臂绿;随片修 reconcile 单账单对全量→按 provider 分组对账(dev 库进多通道时代实弹暴露);余=JSAPI 腿真实 appid+绑定域(上线清单;G-402 裁②已落 11-06=openid 服务端按绑定富集,唯微信侧活证待)+微信外降级「引导微信内打开」(D-BF) |
-| 真通道刀(G-402/403/404) | lzx | G-403/404 先行件收(11-05):qrcode 码图 tile+sheet visual 槽;returnUrl 三层修形(客户端收据 URL/biz 缝 order/网关 redirect_url 镜像);G-402 裁②落码毕(11-06:契约删 payer_openid/system 增 GetWechatOpenId me-face/order 按 jsapi 富集+未绑拒 6158 七 locale,e2e 双臂绿,唯微信侧活证随真通道);**NO_STATEMENT_EXIST 误分类已修(11-05 晚,真通道首探发现:活通道「无账单」拼写落 ErrNotFound,boot sweep INFO 命中;shared-go/payment/wechat 双拼写修随本片落)** | 唯微信侧活证+信任拨盘(XFF 优先已随片3入码=部署面口径,台账收口)=真通道联调刀(W5);query 无面层触发器(convergeStaleAfter=10m 静默;11-05 深夜 0.01 闭环实证=收敛环 10 分钟 stale 线后 26 秒拾起,notify 不可达场景兜底成立)与 boot 放弃日 ERROR 噪声两裁点随刀;详单=gap-ledger 五批 |
-| MIG1 迁移工具 | lzx(专职 D-BB) | 五阶段毕;**备料毕 11-06**:生产副本直载(lab mysql8:13306,106MB)+谱系三源互证(master=生产 V15 世代/block34 未发布/转储=唯一真相,init.sql=CI 残缺基线不可信)+census 真数据首跑(guard 必停 school 4/463 含 7 真实用户 22 行+账号冲突 6 组 23 行=**预演前两决策 D-MIG-1/2**,详 migration.md 预演备料节);随片修 Nickname NullString+test_record 宽行排序(MySQL 1038);migrator 临时 nx target run/check 落地(go 直执禁);**回滚腿+造数件毕并彩排(11-06)**:rehearsal/ 四件(快照/restore 全表 counts 对账+四形态造数幂等),密码口径实数定谳(MD5 274 行关密码面/BCRYPT_OVER_MD5 11 行同关/纯 BCRYPT 0 行直迁;lockedOut 实数 6),预演执行稿入 migration.md | snapshot/recompute 冻结待 P26/P26.1;**预演 11-15**(D-BE,绿门含回滚腿,先过 D-MIG-1/2;裁回可提前,报备制);口径=migration.md;cutover 执行同专职 |
-| G 伤单清偿批(走查伤单 G-405..413) | lzx | **片A毕(11-06 晚,b749982d 双推)**:G-408=六文件 throwOnError 豁免族(match/test×2/session-done/pay-result;8 页体检定谳 4 真全修/4 假维持边界兜底)+G-406=空池两 reason 常量对值接线导流 pick?why=empty;活证=平票号(13977660011,CS2+王者荣耀)/match→pick?why=tie 自动收敛+服务端 400 reason 互证+empty 面渲染,`.reason` wire 读法首次活跑;**片B毕(11-06 晚,72f47689 双推)**:G-409+G-411 翻绿——NaN 零值族两缝单落点窄化(digest wireDigestOf+session-done,修一处愈四面);18606513270 真数据三面全愈+挂机完成场零 NaN;小裁=played-0 行入已测计数(诚实零);新知识=session report abilities 只含 tier 判档款;**片C毕(11-06,未提交)**:G-405/407/412 翻绿+G-414 立(9 绿 5 红)——405=lucide 全换(center 四卡+卡尾/About 头 chevron+career 关闭面 Target;**i18n 词条值第三层「›」发现**:profile_center_all 随批修,security 4 键立 G-414;career 关闭面=常开门预留态编译代偿);407=两钮 navigate 接线(照 home:197 形)+过时注释改写,新号双腿落页活证;412=**活跑反证勘误收案零码改**(2015-06+监护人+性别空→停在 age 步+错误行在场;onNext 首查 sex 分支无关,两支齐拦「*」兑现);新走查号 13977669999 留 dev 库(u13 监护人态夹具;向导毕双票顺证 tie 导流);**片D毕(11-06 深夜,09e6547f 双推)**:G-413 翻绿(X2-3 admin 腿闭环,伤单 10 绿 4 红)——proto 增量 ListUserMessages(ACCESS_ADMIN,复用 Message 消息=同源)+MessageAdminUC 复用 RP(RP 本吃任意 UserID)+MessagePB 导出单源(免跨模块复制词表)+admin messages-tab 五列表+路由 op+i18n 14 键×5 locale;活证=拒答腿匿名 401+正腿 admin 登录 3 封逐封互证(注脚「未读 1·共 3 封」)+服务端日志 4 发;提交前双轴审查(功能轴零缺项+规范轴 2 硬 2 判断全修)+len-20 校验腿活证(authed malformed→400/正腿 200 复证);admin:dev 用毕即停;「溯源」Tab parked=trace 递延非本片面;**片E毕(11-06,未提交)**:G-414 翻绿(伤单 11 绿 3 红,本车道 G 红条清零)——security 4 键×2 locale 剥形+三消费点 ChevronRight;活证=双号互搏冲突卡(bind-phone 占位预检拦短信+CTA 白 chevron 像素)+可达面零字形+第三层全树扫零;随片修 HEAD 两陈红(ctr copy.ts 缺线两枚+match 复杂度超限,stash 隔离归因=HEAD 既有);走查期 dev 栈三服务曾被外部事件整簇 SIGTERM(23:15),全重启续走;**片F毕(11-07,未提交)=X1-2 mock 购链**:18606513270 全链——trial 三腿(取消=closeOrder CLOSED 互证/失败=pending 不关单/成功=markPaid 桥+**快照即时冻结** tier=unjudged+entitlement trial/recordId 永久)+会员 open 31 天窗+续费窗口顺延(期段行模型两行并列,UI 读最远窗尾)+墙四支(showTrial 双卡两入口/态①/态② RenewalFace)+收银台三钮+result 五面+四钮矩阵+树守卫双门+member 权益页 active+FAQ 五对;**同单复用实证**(重试不开新单);**G-415 立即绿**(result error 面死码支序自噬=drawn 与早退支互锁,删 drawn 早退单条件,无参直访首帧 error 面+返回首页,两帧截图+trial-ok 回归);**G-416 红**(过期灰 banner 结构性不可达=服务端 MembershipWindow GT-now 恒滤+客户端 windowOf.expired/StateBanner expired/pay_member_expired 死面三件,接线 digest LastMembershipUntil 或删面两形待裁) | 余红=G-410(归 U2)/G-416(两形待裁)/微信侧两活证随真通道;金卡 0 分像素终态待 tier-rated 完成场走查补证;服务器侧空池触发归走查 |
-| M2-4 trace/messages Tab | 递延 | trace=暂缓后置(11-03 用户裁,P22 否决窗 11-14 后复评);messages=随 MSG-1 admin 面 | — |
+| MSG-1 余面 | lzx(D-BB 全片) | 活 | 已毕=契约+ctr 腿+admin 三页+V10 闭环(11-05);余=窄化裁决落地(PM-13..20=prd 待裁区,全维持=零改动,裁翻契约面小改随改) |
+| PAY2 通道联调 | lzx | 活 | 已毕=行政件全清+Native 腿全生命周期+0.01 真钱闭环+全额退款腿+NO_STATEMENT_EXIST 修(11-05..06);余=JSAPI 真实 appid+绑域/微信侧活证(G-402/403/404 尾)/微信外降级面/XFF 拨盘收口/两裁点(query 无触发器、boot 放弃日 ERROR) |
+| MIG1 冻结件+预演 | lzx(专职 D-BB) | 活 | 已毕=五阶段+生产副本直载+谱系三源互证+census 三绿+回滚腿彩排+密码面实数定谳(11-06);余=snapshot/recompute 冻结待 P26/P26.1;预演 11-15(D-BE 绿门含回滚腿,先过 D-MIG-1/2);cutover 执行同专职 |
+| U2 ctr 原型对齐 | 未认领 | 活 | U1 渲染可达毕(11-06);harness 重激活按 HARNESS-SOP;含 B-6(done 页三差)修法+趋势进阶 CTA 偏离处置(prd 待裁) |
+| U3 admin 对齐基座范式 | 未认领 | 活 | 三裁定落地(Filter 化/留白对齐/drawer 降级)+ActionIconButton href locale 前缀族四实例 |
+| M2-4 trace Tab | 递延 | 暂缓 | 11-03 用户裁,P22 否决窗 11-14 后复评(messages Tab 已随 G-413 闭合并销账) |
 
-## 开放遗留清单(完成即删行)
+## 开放遗留清单(完成即删行;切片级任务=plan.md,缺陷=plan 缺陷工单)
 
 | 项 | 归属 | 触发/时点 |
 |---|---|---|
 | 微信回调 next 丢失(redirect_uri 不能带 query,须 state 中转) | 真通道刀 | 设计时定 |
 | 上线前登录切真实公众号 appid(JSAPI 绑域;测试号绑不了商户) | PAY2 | 上线清单 |
-| H5 支付重审(D-BF 递延:新版部署上线、有真实付费界面后再提;过审前微信外=降级「引导微信内打开完成支付」prd P7.2) | PAY2 | 新版部署上线后即提 |
+| H5 支付重审(D-BF 递延:新版部署上线、有真实付费界面后再提;过审前微信外=降级引导) | PAY2 | 新版部署上线后即提 |
 | ICP 串上线前 beian.miit.gov.cn 复核一次(D-AO① 维持带「备」) | 上线清单 | cutover 前 |
-| G-208 余族 share-invite 腿(pay-confirm 腿已随 PAY3 片2 落,oracle=P7 稿) | MSG-2 | 落地时先验 oracle 形状 |
-| 报告页 ④⑤ CTA live 走查(裸记录过不了 getReport 判分面;导航形与 profile 卡同构已活证) | lzx | 随真通道刀/激活码走查复核 |
-| age-required 页本体逃生口(「先看免费报告」;墙侧未成年红卡逃生已随片2 落=minor-card) | lzx | 随 MSG-1 余面或走查批 |
+| G-208 余族 share-invite 腿(pay-confirm 腿已随 PAY3 片2 落;oracle=P7 稿) | MSG-2 | 落地时先验 oracle 形状 |
+| 报告页 ④⑤ CTA live 走查(裸记录过不了 getReport 判分面;导航形已活证) | lzx | 随真通道刀/激活码走查复核 |
+| age-required 页本体逃生口(「先看免费报告」;墙侧未成年红卡逃生已随片2 落) | lzx | 随 MSG-1 余面或走查批 |
 | G-203 多凭证掩码取序=已裁保持现状(最近绑定序) | — | 运营反馈再议 |
 | G-304 开通 Modal 接用户搜索选择器(列表→开通需经详情转手) | lzx | 下轮会员面增量裁 |
 | G-305 会员列表全表 fold 下推(万行/预演触发器) | lzx | MIG1 预演时评估 |
 | G-306 订单/会员手机号搜索(需 system 名册反查投影) | lzx | 运营反馈高频时 system 车道立契约 |
 | consent 渠道列缺契约字段(Q5 登记;可并 P23 归因记账一句裁) | lzx | P23 裁时 |
-| 合规配置提示文案无「恢复默认」手势(契约 min_len1 挡空串;A5-1 报告策略覆盖行同族=设回默认值仍留覆盖旗,行模型=表空才默认) | lzx | ljr 提出时契约小补;策略行可并 UI 小修 |
-| 出生采集开关消费面未接(ctr 向导仍恒问出生年月;付费年龄线/文案执法已随 PAY3 落) | lzx | 注册面向导片/消费端立契约时 |
-| banner 型公告 ctr 首页消费面未建(ListBanners 契约在、无消费方;admin 发布+DB 空投递已活证 11-05) | lzx | MSG-2/精修带评估 |
-| 同意记录同版重复登录追加行=已裁维持每次记(D-BC);admin 展示去重未排 | — | 运营反馈再议 |
-| dev 常模池 fixture 机制未立(幻影池 boot 种子=生产污染硬否;percentile 列消费端落地片再议) | lzx | 消费端落地片 |
-| mt-D5 unitScoreLabel 种子(介绍文半边已随 Q1-⑥ 落;单位标签仍空隐) | lzx | 随种子/国际化面 |
+| 合规配置提示文案无「恢复默认」手势(A5-1 报告策略覆盖行同族) | lzx | ljr 提出时契约小补 |
+| 出生采集开关消费面未接(ctr 向导仍恒问出生年月) | lzx | 注册面向导片/消费端立契约时 |
+| banner 型公告 ctr 首页消费面未建(ListBanners 契约在、无消费方) | lzx | MSG-2/精修带评估 |
+| 同意记录同版重复登录追加行=已裁维持每次记;admin 展示去重未排 | — | 运营反馈再议 |
+| dev 常模池 fixture 机制未立(幻影池 boot 种子=生产污染硬否) | lzx | 消费端落地片 |
+| mt-D5 unitScoreLabel 种子(单位标签仍空隐) | lzx | 随种子/国际化面 |
 | skill_trajectory 30s 走查体感偏紧 | lzx | 评估加时 |
 | 组内 spec doc 存量约 40 处行尾化 | lzx | 触碰 test 模块顺路或独立机械片 |
 | conventions guard 正则精度修正回流 dev 兄弟服务(esports 已 AST 化) | lzx | dev 车道下次触碰同步 |
-| dev 栈老库接 atlas 需基线(无 revisions 表先 `atlas migrate set` 打基线;专用 schema `atlas_schema_revisions`) | lzx | migrate:baseline 补 nx target 或本行即文档 |
+| dev 栈老库接 atlas 需基线(无 revisions 表先 `atlas migrate set`) | lzx | migrate:baseline 补 nx target 或本行即文档 |
 | dev 栈状态目录 .run/ 迁仓外(D-AX,`$TMPDIR/cyber-dev/<project>.json`) | 各机 coding agent | 下次开栈前 |
-| trial 单退款后解锁回收无操作面工具(会员侧回收=entitleadmin 终止组合即得;FAQ 口径言「退款单回收对应解锁」) | lzx | 运营需要时裁 |
-| ctr 输码面未建( redeem 无消费方;入口形态=独立页 vs 锁行内,属 P4 ToB 渠道模型;四拒绝词条已备 locale) | lzx | P4 裁时(11-30)定形随建 |
-| G-417 跨服务审计 sink 形待裁(esports/agent 未装 audit 中间件,全部 WRITE 面零审计行;候选=MQ 发射→system 订阅/per-service 表/RP 直写) | lzx+用户 | 裁定后落片;cutover 审计合规前 |
+| trial 单退款后解锁回收无操作面工具(会员侧回收=entitleadmin 终止组合即得) | lzx | 运营需要时裁 |
+| ctr 输码面未建(redeem 无消费方;入口形态属 P4;四拒绝词条已备 locale) | lzx | P4 裁时(11-30)定形随建 |
