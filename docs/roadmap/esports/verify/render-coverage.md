@@ -244,7 +244,7 @@
 | center·四卡状态徽 | digest.reportAccess/career.access/sessionsTotal 三键组合 | 部分活证 | X1-1 已见全锁态(unlocked 假/0 场 untested);解锁态待造 R-rich |
 | center·covered 双文案+进度条 | covered≥6 切 full 句 | 已活证 | X1-1 见 0/6;full 支待造(全六项) |
 | center·goDigest 空兜底 | latestAnchor 无→toast | 待造态(易) | 0 报告号点首卡 |
-| session-done·金卡+网格 vs 诚实空板 | 有计分能力/全无 | 部分活证 | 诚实空板已活证两形(11-06:挂机场「成绩未定」;**晚:四场全跑全未评级场「0 / 4 项能力已测·本场成绩未定」**);金卡(有计分)待真分场。**11-06 用户视觉裁定:本页低保真→立 G-410**(已测收据语义反转/CTA 族反转/blob 氛围缺失;hero+勾选空板态 DOM 实证在位) |
+| session-done·金卡+网格 vs 诚实空板 | 有计分能力/全无 | 部分活证 | 诚实空板已活证两形(11-06:挂机场「成绩未定」;**晚:四场全跑全未评级场「0 / 4 项能力已测·本场成绩未定」**);金卡(有计分)待真分场。**11-06 用户视觉裁定:本页低保真→立 G-410**(已测收据语义反转/CTA 族反转/blob 氛围缺失;hero+勾选空板态 DOM 实证在位)。**G-409 修毕(11-06 晚)**:缝窄化+零 NaN 活证;**触发收窄新知识**=abilities 只含 tier 判档款(curve 冻结族),curvePending 场恒空板——金卡 0 分像素终态待 tier-rated 完成场走查补证 |
 | session-done·beat 徽/报告入口钮 | percentile 有/anchor 有 | 待造态 | 随完成场 |
 | 单报·CompositeCard 双态 | composite 有(top X% 反转+beat 面板)/无(「—」) | 待造态 | 薄 cohort=无支;有 cohort=有支 |
 | 单报·AbilityRadar shape null 支 | 全 score-only 不成形+satellite 注两支 | 数据门 | 卫星=子能力场次 |
@@ -384,7 +384,7 @@
 
 | 门实例 | 触发条件 | 可达判定 | 活证/处置 |
 |---|---|---|---|
-| IdentityCard·meta 行/pill×2/四 stat 条 | meta 空整行不渲染;pill=soon 占位;prog 恒「—」(无源面,诚实 dash 注释) | 部分活证 | **meta 行 live**(11-06:「30-40岁 · 2 款游戏偏好」=band 派生+偏好数);四 stat 条 live:总测试 4/综合分 —(诚实 dash)/**最高分 NaN 分=G-411 抓伤现场**/进步次数 —(恒 dash 法条 live);pill soon 待造(易) |
+| IdentityCard·meta 行/pill×2/四 stat 条 | meta 空整行不渲染;pill=soon 占位;prog 恒「—」(无源面,诚实 dash 注释) | 部分活证 | **meta 行 live**(11-06:「30-40岁 · 2 款游戏偏好」=band 派生+偏好数);四 stat 条 live:总测试 4/综合分 —(诚实 dash)/**最高分 0 分(11-06 晚 G-411 修后全愈,修前 NaN 分抓伤现场)**/进步次数 —(恒 dash 法条 live);pill soon 待造(易) |
 | DataCard 三行×未设词+年单支 | 未设/年无月 | 部分活证 | X1-1 |
 | SecurityCard 三行 bound/unbound | manage/bind 双链+掩码+chip 三态 | 待造态(易) | R-rich/新号两态 |
 | ProfileMemberCard 双态 | active(止日+unlock 行,digest 缺行不渲染)/pitch(价+月标) | **已活证** | X1-1 翻转前后两态 |
