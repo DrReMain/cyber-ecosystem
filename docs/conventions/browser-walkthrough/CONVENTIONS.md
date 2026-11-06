@@ -1,6 +1,6 @@
 # Browser Walkthrough Conventions
 
-**Scope:** human-like walkthrough of the repo's `app/clients/*` via **chrome-devtools-mcp** (install guidance: the `tool-recommendations` skill). Tool-bound: these are chrome-devtools-mcp shapes — never extrapolate to another driver; a different driver earns its own page. Skeleton-side asset, business-neutral by law: cases keep their date and generic stack shape; business detail lives in the owning campaign's ledger. Prescriptive — MUST / SHOULD / MAY.
+**Scope:** e2e and simulated human-like walkthrough of the repo's **TanStack Start web clients** via **chrome-devtools-mcp** (install guidance: the `tool-recommendations` skill). Three concerns: stack-specific debugging (SSR loaders, server functions, error boundaries, hydration), observing transient UI, and driving time-critical runs. Tool-bound: these are chrome-devtools-mcp shapes — never extrapolate to another driver; a different driver earns its own page. Skeleton-side asset, business-neutral by law: business fixtures and campaign detail live in the owning campaign's ledger. Prescriptive — MUST / SHOULD / MAY.
 
 **Maintenance law:** a trap diagnosed mid-walkthrough gets written back here the moment it is understood, verdict-style (symptom / mechanism / prescription / case date). Same law as conventions-drift: the file is the memory, the session is not.
 
@@ -55,6 +55,13 @@ document.dispatchEvent(new Event("visibilitychange"));
 Reflect.deleteProperty(document, "hidden"); // restore
 ```
 
+### 1.4 Time-critical runs — drive the seam, not the pixels
+
+- **Law:** an AI-driven browser carries seconds of latency per step; sub-100ms reaction windows cannot be human-timed through it. Time-critical UIs are driven through deterministic seams, never real-time input.
+- **The seam shape this stack ships** (the game-host contract): an injected time source (`ctx.now()` — every reaction window reads one base), a single `durationMs` run-length truth, instance `pause()/resume()` controls, and one `collect(event)` funnel for all behavior. Recipes: wrap `performance.now` **before** the run starts (the whole run slows with its clock — same law as §1.3: synthesize the state the tool cannot deliver), or reach the live host module via dev `await import("/src/…")` (§7.2) and exercise the instance controls; read behavior from the event funnel, not from screenshots.
+- **Anti-trap:** a backend that validates fact plausibility rejects too-perfect synthesized timing as invalid attempts — the seam drives the real engine's clock; it never fabricates the record.
+- **Ruling — MUST raise:** a new time-critical surface without such a seam is a walkthrough gap against its owning feature, not something to fake through timing luck.
+
 ## §2 Observing transient feedback
 
 ### 2.1 One script: trigger → wait → observe (toast law)
@@ -69,6 +76,7 @@ const toasts = [...document.querySelectorAll("[data-sonner-toast]")].map(t => t.
 ```
 
 - Read the toast container selector whole. **Never** filter candidate feedback by an invented wordlist — the wordlist is the bug.
+- The law covers every surface that unmounts on a timer or on the next interaction (sheets, countdowns, pulse states, hover cards): capture the evidence inside the triggering script — a later screenshot arrives after unmount. Screenshots are evidence only for faces that hold.
 
 ### 2.2 The "silent" verdict discipline
 
@@ -113,43 +121,49 @@ window.fetch = async (...a) => {
 - **Symptom:** a `main`-scoped (or any assumed-container) query returns empty text/DOM on one page while the same query works on another — layout families render different container shapes.
 - **Prescription:** scope selectors to tighten output, never as a structural assumption; when a scoped capture comes back unexpectedly empty, re-run from `document.body` before concluding the element is absent. (Case 2026-11-06: twice in one day — a modal-layout page and a full-screen HUD timer.)
 
-## §4 Sessions and cookies
+## §4 Fault locus — SSR faces vs client faces (TanStack Start)
 
-### 4.1 evaluate-script fetch may not carry the session
+- **a) An error-boundary face is a server-chain symptom.** Route loaders run server-side; a deep URL rendering its network/502 face means the loader's server-fn chain failed — the DOM is the symptom, the server is the disease. Debug order: service liveness (`curl` each port — HTTP `000` = process gone, a 4xx/2xx = alive) → the dev task log (§3.3) → only then the page. (Case 2026-11-06: a mid-walk whole-stack death first read as a page bug.)
+- **b) Boundary retry ≠ loader re-run.** `CatchBoundary.reset` resets the client tree, not the loader — an error face's in-page retry button can honestly no-op for loader-fed data; recovery is a fresh navigation. Before recording "retry did nothing", ask which of the two it was.
+- **c) First-paint empty may be hydration, not emptiness.** Only loader-`await`ed queries enter the dehydrated payload; the rest resolve client-side after mount. Await the client query's settle before recording an honest-empty verdict.
+
+## §5 Sessions and cookies
+
+### 5.1 evaluate-script fetch may not carry the session
 
 - **Symptom:** logged in on the page, yet a hand-rolled `fetch` inside `evaluate_script` returns 401 — the cookie does not always ride along.
-- **Prescription:** prefer the page's own UI for anything session-bound; for direct API probes use `curl` with the cookie taken from the dev flow. HttpOnly cookies cannot be injected manually — the real login flow is the only road (see §6 for the mock-sms seam).
+- **Prescription:** prefer the page's own UI for anything session-bound; for direct API probes use `curl` with the cookie taken from the dev flow. HttpOnly cookies cannot be injected manually — the real login flow is the only road (see §7 for the mock-sms seam).
 - Multi-account sessions: open pages with `isolatedContext` so cookies and storage never trample each other.
 
-## §5 Screenshots
+## §6 Screenshots
 
-### 5.1 bringToFront against phantom frames; blob copy fidelity
+### 6.1 bringToFront against phantom frames; blob copy fidelity
 
 - **Prescription:** bring the page to the front before capturing (background tabs yield stale/phantom frames); when capturing generated assets, copy blob URLs promptly — they expire with the page. (Case 2026-10.)
 
-## §6 Server-truth cross-checks
+## §7 Server-truth cross-checks
 
-### 6.1 Browser observation × server truth
+### 7.1 Browser observation × server truth
 
 - **Law:** a simulated walk proves an interaction only when the browser says "done" AND the server truth agrees. Keep both sides in the record.
 - **Prescription:** read the backend directly for the counterpart fact — redis keys (e.g. the system auth service's mock-sms login code under `auth:web:sms-code:<phone>`), SQL fixtures to plant states, `sessionStorage` seams the client already exposes (e.g. parked third-party identity profiles, one-shot handoff payloads) for faces the normal flow cannot reach offline. (Case 2026-11-06: sms code read from redis seconds after the toast.)
 
-### 6.2 In-memory handoffs — same-mount continuity and the dev-import seam
+### 7.2 In-memory handoffs — same-mount continuity and the dev-import seam
 
 - **Symptom (shape A — per-mount state):** an sms flow (send → submit) driven with a navigation in between shows the page's GENERIC failure word instead of the specific reason — the remount destroyed the per-mount `state` minted by send, the submit's validator threw, and the catch rendered the fallback. A "no specific copy" verdict here is a walkthrough artifact, not a product fact. (Case 2026-11-06: a password-reset leg misread as missing its not-found copy.)
 - **Prescription (A) — MUST** keep send and submit inside the same mounted page: navigate once, then run send and submit as separate `evaluate_script` calls **without navigation** between them (the component stays mounted across tool calls; only navigating remounts it).
 - **Symptom (shape B — module-singleton handoff):** a one-shot handoff held in module scope (not sessionStorage, not URL — e.g. a payload that cannot be re-derived) is unreachable by URL gardening or storage injection.
 - **Prescription (B):** in dev, `await import("/src/path/to/module.ts")` from the page returns the **live module instance** — call its setter, then navigate SPA-side (the router global or an in-app link); a hard reload resets module state (which itself proves the honest-bounce path). (Case 2026-11-06: a module-singleton handoff's faces, cross-validated against its real producer.)
 
-## §7 Environment-state traps
+## §8 Environment-state traps
 
-### 7.1 Stack bring-up checks
+### 8.1 Stack bring-up checks
 
 - Ports first, then HTTP: TCP-listen polling for the dev stack, then a 200-chain over healthz/page roots. Readiness words live in each task's `.output` ("ready in", listening lines). Service logs: `tail` the task file, never guess from silence.
 
-## §8 Framework probe handles
+## §9 Framework probe handles
 
-### 8.1 `window.__TSR_ROUTER__` — replicate before accusing
+### 9.1 `window.__TSR_ROUTER__` — replicate before accusing
 
 - **Symptom:** a navigate call inside a component seems to misresolve (doubled path segments in router warnings).
 - **Prescription:** TanStack Router's dev global exposes the live router; replicate the exact call in the console (`router.navigate({ to, search })`) and watch URL/state/matches. A healthy manual replication clears the API and pins the fault on timing or render-cycle context. (Case 2026-11-06.)
