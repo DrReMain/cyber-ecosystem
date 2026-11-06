@@ -238,7 +238,7 @@
 |---|---|---|---|
 | 六路由守卫(各自挂 profileFlowGuard) | 匿名/未完成直访 | 待造态(易) | 同 §2.0 补遗 |
 | 单报·onBack 双支 | 有史→history.back;直入→/match | 待造态(易) | 两刀:链入访问/直输 URL |
-| 单报·pay 跳转两链 | MemberCard→/pay?from;UnlockCard→/pay?ref=recordId&from(trial 范围目标) | 待造态 | X1-2 mock 购会员链复用 |
+| 单报·pay 跳转两链 | MemberCard→/pay?from;UnlockCard→/pay?ref=recordId&from(trial 范围目标) | **已活证**(11-07) | UnlockCard 链执行=ref+from 双参原样;MemberCard 锁态 CTA 像素在案+profile 孪生链执行代偿(会员窗内全解锁→报告侧锁态结构不可达) |
 | 六页面·loading 面(各页 query pending) | query pending | 观测受限 | 瞬态;throttle |
 | 六页面·error 面重试钮(各页) | query 错误 | 待造态 | 停 esports 统一活证(六页同刀) |
 | center·四卡状态徽 | digest.reportAccess/career.access/sessionsTotal 三键组合 | 部分活证 | X1-1 已见全锁态(unlocked 假/0 场 untested);解锁态待造 R-rich |
@@ -276,33 +276,33 @@
 
 | 门实例 | 触发条件 | 可达判定 | 活证/处置 |
 |---|---|---|---|
-| /member+/pay 树守卫(member 自身挂/pay 父层挂) | 匿名直访 | 待造态(易) | §2.0 补遗 |
-| 墙·showTrial 分支 | ref 在场(报告语境)=双卡;无 ref=member-only(原型 profile 入口同形) | 待造态(易) | 两入口各一刀:报告解锁钮/profile 卡 |
+| /member+/pay 树守卫(member 自身挂/pay 父层挂) | 匿名直访 | **已活证**(11-07) | 隔离上下文匿名直访:/pay→/login?next=%2Fpay、/member→/login?next=%2Fmember,next 保往返 |
+| 墙·showTrial 分支 | ref 在场(报告语境)=双卡;无 ref=member-only(原型 profile 入口同形) | **已活证**(11-07) | 两入口双走:报告解锁钮→/pay?ref=<recordId>&from=/report/<id> 双卡;profile 卡→/pay?from=/profile trial 卡缺席;报告侧 MemberCard 锁态 CTA 像素在案(会员窗内全解锁语义→锁态结构不可达,profile 孪生链执行代偿) |
 | 墙·birthMissing 支 | 生日缺(pay_gate fold) | 待造态 | SQL 清生日;回填链→/age-required |
 | 墙·minor 支 | 未达龄线(ageLine 默认 18) | 待造态 | X1-5 未成年拦截例共刀;红卡+双出口零支付钮 |
-| 墙·memberActive 态② | 活窗口 | 待造态 | R-rich;绿续费钮+benefit 链+紫 banner 带止日 |
-| 墙·DualFace 态①/③ | 非会员/过期会员 | 待造态(易) | 过期支=SQL 造过期窗口(expired banner 灰);无 ref member-only |
-| StateBanner 双形 | expired 灰/active 紫带 tag | 待造态 | 随上两行 |
-| mock 收银台 sheet(三钮) | provider=mock 的 create 应答 | 待造态(易) | dev 默认 mock;成功=markPaid 桥→poll;失败=直落 result(fail);取消=closeOrder→result(cancel);X1-2 mock 购链主刀 |
+| 墙·memberActive 态② | 活窗口 | **已活证**(11-07) | RenewalFace 全景:紫 banner「会员将于 2027-01-08 到期」+绿「确认续费 ¥29.9」+PayWayCard 微信支付行+benefit 链;截图 x12-pay-wall-renewal-face |
+| 墙·DualFace 态①/③ | 非会员/过期会员 | 态①**已活证**;态③**反证立 G-416**(11-07) | 态①双卡+member-only 两形均证;SQL 造过期窗→落态①**无灰 banner**=expiredText 结构性不可达(服务端 MembershipWindow GT-now 恒滤过窗→MemberUntil nil),死面三件待裁 |
+| StateBanner 双形 | expired 灰/active 紫带 tag | 部分活证 | active 紫随态②;expired 灰=不可达(G-416) |
+| mock 收银台 sheet(三钮) | provider=mock 的 create 应答 | **已活证**(11-07) | 三钮三腿全走:取消=closeOrder→DB state=closed 互证;失败=直落 result 且 DB state=**pending 不关单**(「可重试/同一订单不会重复扣款」诚实);成功=markPaid 桥+首次 poll 即 PAID;截图 x12-mock-cashier-sheet |
 | QR sheet(visual 槽+双钮) | provider 真+credential=QR | 观测受限 | G-403 半绿:mock 恒走收银台不可达;UI 活证随真通道联调刀 |
 | QrTile 双态 | PNG 渲染/编码拒→回退值文本 | 观测受限 | 随 QR 腿;白垫静区(暗卡会吞模块) |
 | invoke 腿(JSAPI) | 微信内+credential=invoke | 观测受限 | 真微信;G-402 裁②后服务端富集 openid |
 | jump 腿(H5 跳走) | 微信外+credential=jump_url | 观测受限 | G-404 真回程刀;returnUrl 带点击时 face |
-| settle 轮询链 | 700ms poll;PAID→invalidate session→result;CLOSED→result | 待造态 | 随 mock 三钮;桥同步落定=首次 poll 即答 |
+| settle 轮询链 | 700ms poll;PAID→invalidate session→result;CLOSED→result | **已活证**(11-07) | 成功腿同步落定;invalidate session 缝=member 翻面无需重登(profile 卡即时 active+止日+「已解锁 0 份」诚实计) |
 | pending 钮(disabled) | create 进行中 | 观测受限 | 瞬态 |
-| result·loading/error 面 | 错读/无单号直入 | 待造态(易) | 直访 /pay/result 无参=error 面即刻(不永转) |
-| result·trial-ok 面 | PAID∧scope=trial | 待造态 | X1-2;绿 orb+收据四行(单号/额/渠道/时刻) |
-| result·member 面 open/renew 双文案 | PAID∧scope=member;face 参数分叉 | 待造态 | 紫 orb+Crown;D-AU 第三参数 |
-| result·fail 面 | 订单未决(poll 中逃逸/超时) | 待造态 | 黄警卡+同单重试链(ref+from 保往返) |
-| result·cancel 面 | CLOSED | 待造态 | R-03 文案;灰 orb+Ban |
-| result·memberSub 三支 | 天数+日期/NaN 裸句/裸句 | 待造态 | session 未落定时裸句(永不显陈旧日期) |
-| result·viewHref/retry 链 | from 赢;trial→record/member→center | 待造态 | 四钮矩阵(view/retry/home/member) |
-| channelLabel 三词+「—」 | h5/jsapi/native/未知 | 数据门 | |
+| result·loading/error 面 | 错读/无单号直入 | **已活证**(11-07,G-415 修后) | 修前=永转加载(死码支序,G-415);修后=首帧「无法读取支付结果/订单不存在或网络异常」+返回首页钮;两帧截图在案 |
+| result·trial-ok 面 | PAID∧scope=trial | **已活证**(11-07) | 绿 orb+「认知综合报告已解锁 · 永久有效」+收据四行(单号/¥19.9/微信扫码/时刻);viewHref→record 落解锁后报告(UnlockCard 消失+对比卡现);DB 三落定互证=order paid+entitlement trial/recordId 永久+**快照即时冻结**(tier=unjudged 诚实,cohort_basis 记档) |
+| result·member 面 open/renew 双文案 | PAID∧scope=member;face 参数分叉 | **已活证**(11-07) | open=「会员开通成功·有效期至 2026-12-08(31 天)」/renew=「续费成功·有效期至 2027-01-08(31 天)」窗口顺延(期段行模型:两 entitlement 行并列,UI 读最远窗尾);face 参数 URL 互证 |
+| result·fail 面 | 订单未决(poll 中逃逸/超时) | **已活证**(11-07) | 黄警卡+重试链;**重试不开新单**=同单复用实证(pending 单直付,「同一订单不会重复扣款」兑现) |
+| result·cancel 面 | CLOSED | **已活证**(11-07) | R-03 文案逐字「已取消支付,未产生扣款。随时可以重新购买。」;灰 orb+Ban;重新支付/返回首页双钮 |
+| result·memberSub 三支 | 天数+日期/NaN 裸句/裸句 | 部分活证(11-07) | 天数+日期支两见(open/renew);裸句支=session 未落定瞬态未捕,观测受限 |
+| result·viewHref/retry 链 | from 赢;trial→record/member→center | **已活证**(11-07) | 四钮矩阵:trial 查看→record/member 查看→/member(权益页满绿 R-04 active+FAQ)/fail+cancel 重试→wall ref+from 保往返/home |
+| channelLabel 三词+「—」 | h5/jsapi/native/未知 | 数据门 | native=「微信扫码」已见(11-07 收据行);h5/jsapi 随真通道 |
 | member·loading/error 面 | digest pending/null | 待造态 | error=回家钮单出口 |
-| member·窗口三态 | active 紫条/expired 灰条带止日/never 无条 | 待造态 | **R-04:terminated 折 never 形**;三态号=R-rich/过期号/新号 |
+| member·窗口三态 | active 紫条/expired 灰条带止日/never 无条 | 部分活证 | active 支已活证(11-07:「已开通 · 有效期至 2027-01-08」+权益四行);**R-04:terminated 折 never 形**;expired/never 号待造(R-rich/过期号/新号) |
 | member·BenefitCard 第四行 | periodDays 缺→诚实缺席 | 数据门 | 目录降级读 |
-| member·CTA 双文案+disabled | active=renew/open;目录缺=disabled | 待造态 | |
-| member·FAQ 五对常驻 | 常驻 | 待造态(易) | R-05 硬价在案 |
+| member·CTA 双文案+disabled | active=renew/open;目录缺=disabled | 部分活证 | active=renew「续费会员 ¥29.9」已见(11-07 /member 页脚);open 支待新号 |
+| member·FAQ 五对常驻 | 常驻 | **已活证**(11-07) | 五对全渲(¥19.9 对比/到期保留/不自动续费等);R-05 硬价逐字 |
 | toast·create 拒因 | mutation cache 承载 | 待造态 | 全局 mutation toast 面(非本页字面 toast 调用) |
 
 族小计:28 门=路由门 2/状态门 23/交互门 3;待造态 19(易造 5)、观测受限 6、数据门 2。toast 位 1/31(累计 17/31,mutation-cache 承载形)。R-03/04/05+G-403/404 五条在册项挂本族面。
@@ -409,5 +409,5 @@
 - **U1-ctr 分支级提取全量毕(2026-11-06)**:11 批=壳 15+守卫补遗 4+login 22+向导 25+home 13+match 22+test 32+report 29+member/pay 28+messages/feedback 20+security 29+末批 15=**254 门**(交互门 43/状态门 174/路由门 37)。
 - 判定分布:已活证 13(X1-1/e2e 红利)、部分活证 11、e2e 在案 3、待造态 189(易造约 80)、观测受限 28(真微信腿+瞬态各半)、数据门 14、法条在案 4。
 - **悬置三件已判(11-06,「先由你来判断」授权)**:①Skeleton=删(孤儿资产,Q1-③ 残骸无预留登记,现行 loading idiom=LoadingStrip 已竞争上岗);②pick·empty=接线(错接非预留,立 **G-406**);③profile 报告中心=接线(原型 289-291 三钮真跳转实锤,立 **G-407**)。①为代码删除、②③为红条工单,执行均归开发会话。红条 G-405 已立(emoji 字形)。
-- 下一步:起栈 U1-ctr 活证走查(chrome mcp 人在环;优先序=test verdict 六面→messages/feedback 全族→security merge 离线缝→易造 80 门铺开),后 U1-admin。**进度(11-06 全天):前四项毕+易造大丰收**——verdict 5/6 面/messages 八面/security 大批(merge 全族/双闸/bind-phone 真链/password/forgot/bind-wechat)/test 单场×4 全脸/向导族直访群/登出态批(Logout 链+双守卫匿名支+login 族 toast 群)/profile 总览连walk;**新伤五枚(G-408..412)**。ctr 侧小残=FormErrorLine 三支/AgreeBox indeterminate/home guest 面/logout sheet 面文(皆需再登出循环,边际低)+InvalidNotice 余三词+SubmitError;**下一大块=admin 起栈(X2-1 admin 腿+U1-admin 文件级)**——**起栈日毕(11-06 晚)**:X2-1 六腿全闭环/X2-2 全毕/X2-3 半毕(G-413 立)+U1-admin 首轮 25 面(22 live+1 观测受限+2 parked)+U3 三裁定入 calibration-log(tab 筛选族→Filter/Segmented、布局留白、drawer 重型 table);下一=X1-2 mock 购会员→X3 铸码导出→A-套余面→U2 harness 重激活;伤单累计 G-405..413(2 绿 11 红)。**开发会话片A清偿(11-06 晚)**:G-408/406 翻绿(伤单 4 绿 9 红)——六文件 throwOnError 豁免族(含 8 页体检:4 真全修/4 假维持边界)+空池两 reason 对值接线;平票号(13977660011)导流收敛+服务端 400 互证+empty 面渲染活证;序=片B NaN 零值族(G-409/411)→片C 机械批(G-407/405/412)→片D G-413 admin 信箱 Tab。**片B清偿(11-06 晚,72f47689 双推)**:G-409/411 翻绿(伤单 6 绿 7 红)——digest/session-done 两缝单落点窄化(修一处愈四面);18606513270 真数据三面全愈+挂机完成场零 NaN+session-done 三态 live;金卡 0 分像素终态条件活证(tier-rated 款进完成场,走查 X 线补)。**片C清偿(11-06)**:G-405/407/412 翻绿+G-414 立(伤单 9 绿 5 红)——lucide 全换(JSX 六处+About 头+i18n 词条第三层发现)+两钮接线双腿活证+G-412 活跑反证勘误收案(u13 支齐拦,零码改);career 关闭面=常开门预留态编译代偿;余序=片D G-413。**片D清偿(11-06)**:G-413 翻绿(伤单 10 绿 4 红)——admin 信箱 Tab 全链(proto ListUserMessages 增量+MessagePB 导出单源+messages-tab 五列表);拒答 401+正腿 3 封逐封互证双活证;X2-3 admin 腿闭环=矩阵翻全毕;提交 09e6547f 双推(含 df685f48 admin 侧 copy.ts 缺线随片修+user_id len-20 家族校验随双轴审查落)。**片E清偿(11-06)**:G-414 翻绿(伤单 11 绿 3 红)——security 4 键×2 locale 剥形+三消费点 ChevronRight(bind-phone 冲突钮/bind-wechat conflict fragment 支/password NoPhoneCard Link);活证=双号互搏真触发冲突卡(13977669999 绑 13977660011→占位预检拦短信零花费+merge CTA+白 chevron 像素,截图 g414-bind-phone-conflict-cta)+bind-wechat/password 可达面零字形走查(conditional 面=编译代偿 career 先例)+ctr 全树第三层扫零残留;/match→pick?why=tie 重定向腿随片复证;随片修 HEAD 两陈红=ctr copy.ts 穷尽 Record 缺线两枚(ESPORTS_PAY_WECHAT_UNBOUND@df685f48/ESPORTS_ORDER_ALREADY_REFUNDED@3eb73a5e,ctr locale 补译镜像 admin)+match/page.tsx 认知复杂度 16>15(matchReaders/pickWhyOf/isOpenStep 抽离,行为等价);余红=G-410(U2)/微信侧两活证随真通道——本车道 G 台账红条清零。
+- 下一步:起栈 U1-ctr 活证走查(chrome mcp 人在环;优先序=test verdict 六面→messages/feedback 全族→security merge 离线缝→易造 80 门铺开),后 U1-admin。**进度(11-06 全天):前四项毕+易造大丰收**——verdict 5/6 面/messages 八面/security 大批(merge 全族/双闸/bind-phone 真链/password/forgot/bind-wechat)/test 单场×4 全脸/向导族直访群/登出态批(Logout 链+双守卫匿名支+login 族 toast 群)/profile 总览连walk;**新伤五枚(G-408..412)**。ctr 侧小残=FormErrorLine 三支/AgreeBox indeterminate/home guest 面/logout sheet 面文(皆需再登出循环,边际低)+InvalidNotice 余三词+SubmitError;**下一大块=admin 起栈(X2-1 admin 腿+U1-admin 文件级)**——**起栈日毕(11-06 晚)**:X2-1 六腿全闭环/X2-2 全毕/X2-3 半毕(G-413 立)+U1-admin 首轮 25 面(22 live+1 观测受限+2 parked)+U3 三裁定入 calibration-log(tab 筛选族→Filter/Segmented、布局留白、drawer 重型 table);下一=X1-2 mock 购会员→X3 铸码导出→A-套余面→U2 harness 重激活;伤单累计 G-405..413(2 绿 11 红)。**开发会话片A清偿(11-06 晚)**:G-408/406 翻绿(伤单 4 绿 9 红)——六文件 throwOnError 豁免族(含 8 页体检:4 真全修/4 假维持边界)+空池两 reason 对值接线;平票号(13977660011)导流收敛+服务端 400 互证+empty 面渲染活证;序=片B NaN 零值族(G-409/411)→片C 机械批(G-407/405/412)→片D G-413 admin 信箱 Tab。**片B清偿(11-06 晚,72f47689 双推)**:G-409/411 翻绿(伤单 6 绿 7 红)——digest/session-done 两缝单落点窄化(修一处愈四面);18606513270 真数据三面全愈+挂机完成场零 NaN+session-done 三态 live;金卡 0 分像素终态条件活证(tier-rated 款进完成场,走查 X 线补)。**片C清偿(11-06)**:G-405/407/412 翻绿+G-414 立(伤单 9 绿 5 红)——lucide 全换(JSX 六处+About 头+i18n 词条第三层发现)+两钮接线双腿活证+G-412 活跑反证勘误收案(u13 支齐拦,零码改);career 关闭面=常开门预留态编译代偿;余序=片D G-413。**片D清偿(11-06)**:G-413 翻绿(伤单 10 绿 4 红)——admin 信箱 Tab 全链(proto ListUserMessages 增量+MessagePB 导出单源+messages-tab 五列表);拒答 401+正腿 3 封逐封互证双活证;X2-3 admin 腿闭环=矩阵翻全毕;提交 09e6547f 双推(含 df685f48 admin 侧 copy.ts 缺线随片修+user_id len-20 家族校验随双轴审查落)。**片E清偿(11-06)**:G-414 翻绿(伤单 11 绿 3 红)——security 4 键×2 locale 剥形+三消费点 ChevronRight(bind-phone 冲突钮/bind-wechat conflict fragment 支/password NoPhoneCard Link);活证=双号互搏真触发冲突卡(13977669999 绑 13977660011→占位预检拦短信零花费+merge CTA+白 chevron 像素,截图 g414-bind-phone-conflict-cta)+bind-wechat/password 可达面零字形走查(conditional 面=编译代偿 career 先例)+ctr 全树第三层扫零残留;/match→pick?why=tie 重定向腿随片复证;随片修 HEAD 两陈红=ctr copy.ts 穷尽 Record 缺线两枚(ESPORTS_PAY_WECHAT_UNBOUND@df685f48/ESPORTS_ORDER_ALREADY_REFUNDED@3eb73a5e,ctr locale 补译镜像 admin)+match/page.tsx 认知复杂度 16>15(matchReaders/pickWhyOf/isOpenStep 抽离,行为等价);余红=G-410(U2)/微信侧两活证随真通道——本车道 G 台账红条清零。**X1-2 mock 购链毕(11-07,片F)**:18606513270 全链走收——trial 三腿(取消 CLOSED/失败 pending 不关单/成功 markPaid 桥+快照即时冻结 tier=unjudged)+会员 open(31 天窗)+续费(窗口顺延期段行模型)+墙四支(showTrial 双卡/member-only/态①/态② RenewalFace)+收银台三钮+result 五面+四钮矩阵+树守卫双门+member 权益页 active 态+FAQ 五对;**同单复用实证**(重试不开新单)+「已解锁 0 份」诚实计(trial 解锁不在会员窗内不计);**新伤两枚:G-415 立即绿**(result error 面死码支序自噬→当场修+两帧活证+trial-ok 回归)/G-416 红**(过期灰 banner 无生产者=服务端 GT-now 恒滤+客户端死面三件,两形待裁);余=X3 铸码导出→A-套余面→U2 harness 重激活。
 - 死码嫌疑处置:修条件 bug 或删(逐条用户过目);预留门登记编号引 gap-ledger/pm-review。

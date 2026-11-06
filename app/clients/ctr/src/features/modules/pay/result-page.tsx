@@ -312,7 +312,6 @@ export function PayResultPage() {
     orderQuery.isPending && !noOrder,
     orderQuery.isError || noOrder,
   );
-  const drawn = verdict.kind === "loading" || verdict.kind === "error" ? null : verdict;
 
   // The member sub-line's inputs, narrowed at the seam: the catalog row
   // by the order's own sku code, the standing window off the session. A
@@ -332,7 +331,7 @@ export function PayResultPage() {
     void navigate({ to: "/" });
   }
 
-  if (verdict.kind === "loading" || drawn === null) {
+  if (verdict.kind === "loading") {
     return (
       <AmbientLayout>
         <StateScreen variant="loading" />
@@ -371,9 +370,9 @@ export function PayResultPage() {
       }
       onView={() => void navigate({ href: viewHrefOf(order as WireResultOrder, search.from) })}
       order={order as WireResultOrder}
-      sub={subOf(drawn, periodDays, memberUntil)}
-      title={titleOf(drawn)}
-      verdict={drawn}
+      sub={subOf(verdict, periodDays, memberUntil)}
+      title={titleOf(verdict)}
+      verdict={verdict}
     />
   );
 }
