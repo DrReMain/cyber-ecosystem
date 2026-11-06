@@ -24,6 +24,7 @@ const (
 	MessageAdminService_PublishAnnouncement_FullMethodName = "/cyber.esports.v1.MessageAdminService/PublishAnnouncement"
 	MessageAdminService_OfflineAnnouncement_FullMethodName = "/cyber.esports.v1.MessageAdminService/OfflineAnnouncement"
 	MessageAdminService_ListAnnouncements_FullMethodName   = "/cyber.esports.v1.MessageAdminService/ListAnnouncements"
+	MessageAdminService_ListUserMessages_FullMethodName    = "/cyber.esports.v1.MessageAdminService/ListUserMessages"
 )
 
 // MessageAdminServiceClient is the client API for MessageAdminService service.
@@ -47,6 +48,11 @@ type MessageAdminServiceClient interface {
 	PublishAnnouncement(ctx context.Context, in *PublishAnnouncementRequest, opts ...grpc.CallOption) (*PublishAnnouncementResponse, error)
 	OfflineAnnouncement(ctx context.Context, in *OfflineAnnouncementRequest, opts ...grpc.CallOption) (*OfflineAnnouncementResponse, error)
 	ListAnnouncements(ctx context.Context, in *ListAnnouncementsRequest, opts ...grpc.CallOption) (*ListAnnouncementsResponse, error)
+	// Read-only: the operator inspects a member's letterbox — the same rows
+	// the member face lists, never a different truth. Read state lives on
+	// the row and only the member's own mark-read flips it; this face
+	// observes, it never mutates.
+	ListUserMessages(ctx context.Context, in *ListUserMessagesRequest, opts ...grpc.CallOption) (*ListUserMessagesResponse, error)
 }
 
 type messageAdminServiceClient struct {
@@ -107,6 +113,16 @@ func (c *messageAdminServiceClient) ListAnnouncements(ctx context.Context, in *L
 	return out, nil
 }
 
+func (c *messageAdminServiceClient) ListUserMessages(ctx context.Context, in *ListUserMessagesRequest, opts ...grpc.CallOption) (*ListUserMessagesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListUserMessagesResponse)
+	err := c.cc.Invoke(ctx, MessageAdminService_ListUserMessages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MessageAdminServiceServer is the server API for MessageAdminService service.
 // All implementations must embed UnimplementedMessageAdminServiceServer
 // for forward compatibility.
@@ -128,6 +144,11 @@ type MessageAdminServiceServer interface {
 	PublishAnnouncement(context.Context, *PublishAnnouncementRequest) (*PublishAnnouncementResponse, error)
 	OfflineAnnouncement(context.Context, *OfflineAnnouncementRequest) (*OfflineAnnouncementResponse, error)
 	ListAnnouncements(context.Context, *ListAnnouncementsRequest) (*ListAnnouncementsResponse, error)
+	// Read-only: the operator inspects a member's letterbox — the same rows
+	// the member face lists, never a different truth. Read state lives on
+	// the row and only the member's own mark-read flips it; this face
+	// observes, it never mutates.
+	ListUserMessages(context.Context, *ListUserMessagesRequest) (*ListUserMessagesResponse, error)
 	mustEmbedUnimplementedMessageAdminServiceServer()
 }
 
@@ -152,6 +173,9 @@ func (UnimplementedMessageAdminServiceServer) OfflineAnnouncement(context.Contex
 }
 func (UnimplementedMessageAdminServiceServer) ListAnnouncements(context.Context, *ListAnnouncementsRequest) (*ListAnnouncementsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAnnouncements not implemented")
+}
+func (UnimplementedMessageAdminServiceServer) ListUserMessages(context.Context, *ListUserMessagesRequest) (*ListUserMessagesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListUserMessages not implemented")
 }
 func (UnimplementedMessageAdminServiceServer) mustEmbedUnimplementedMessageAdminServiceServer() {}
 func (UnimplementedMessageAdminServiceServer) testEmbeddedByValue()                             {}
@@ -264,6 +288,24 @@ func _MessageAdminService_ListAnnouncements_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MessageAdminService_ListUserMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserMessagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageAdminServiceServer).ListUserMessages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MessageAdminService_ListUserMessages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageAdminServiceServer).ListUserMessages(ctx, req.(*ListUserMessagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MessageAdminService_ServiceDesc is the grpc.ServiceDesc for MessageAdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -290,6 +332,10 @@ var MessageAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAnnouncements",
 			Handler:    _MessageAdminService_ListAnnouncements_Handler,
+		},
+		{
+			MethodName: "ListUserMessages",
+			Handler:    _MessageAdminService_ListUserMessages_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

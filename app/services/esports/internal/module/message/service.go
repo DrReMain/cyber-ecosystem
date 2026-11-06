@@ -50,7 +50,7 @@ func (s *MessageService) ListMessages(ctx context.Context, in *esportspb.ListMes
 	}
 	return &esportspb.ListMessagesResponse{
 		Page:        out.PageResponse,
-		Messages:    utils.SliceMap(out.Rows, messagePB),
+		Messages:    utils.SliceMap(out.Rows, MessagePB),
 		UnreadCount: utils.ConvNum[int32](out.Unread),
 	}, nil
 }
@@ -87,7 +87,9 @@ func (s *MessageService) ListBanners(ctx context.Context, in *esportspb.ListBann
 
 // Private -------------------------------------------------------------------------------------------------------------
 
-func messagePB(m *Message) *esportspb.Message {
+func MessagePB(m *Message) *esportspb.Message {
+	// messageadmin's transport consumes this; one mapper owning the type
+	// switch is what keeps both faces agreeing on what a letter carries.
 	return &esportspb.Message{
 		Id:        utils.StringW(m.ID),
 		Type:      messageTypePB(m.Type),

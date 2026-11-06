@@ -1365,6 +1365,18 @@ export type CyberEsportsV1ListTestsResponse = {
     tests?: Array<CyberEsportsV1Test>;
 };
 
+export type CyberEsportsV1ListUserMessagesResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    /**
+     * Newest first, the letterbox's own order.
+     */
+    messages?: Array<CyberEsportsV1Message>;
+    /**
+     * The same count the member's unread badge reads.
+     */
+    unreadCount?: number;
+};
+
 export type CyberEsportsV1MarkAllMessagesReadRequest = {
     [key: string]: unknown;
 };
@@ -5996,6 +6008,58 @@ export type FeedbackAdminServiceReplyFeedbackResponses = {
 };
 
 export type FeedbackAdminServiceReplyFeedbackResponse = FeedbackAdminServiceReplyFeedbackResponses[keyof FeedbackAdminServiceReplyFeedbackResponses];
+
+export type MessageAdminServiceListUserMessagesData = {
+    body?: never;
+    path: {
+        /**
+         * The member whose letterbox is read — the same rows the member face
+         * lists, never a different truth. A member nobody ever mailed answers
+         * an empty page, not an error.
+         */
+        userId: string;
+    };
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/esports/users/{userId}/messages';
+};
+
+export type MessageAdminServiceListUserMessagesResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListUserMessagesResponse;
+};
+
+export type MessageAdminServiceListUserMessagesResponse = MessageAdminServiceListUserMessagesResponses[keyof MessageAdminServiceListUserMessagesResponses];
 
 export type AuditServiceListAuditLogsData = {
     body?: never;

@@ -76,5 +76,19 @@
   "esports_user_detail_mem_unlocks_value": "{n} tests",
   "esports_user_detail_mem_to_member": "Membership",
   "esports_user_detail_mem_history": "Renewal timeline",
-  "esports_user_detail_mem_note": "The membership lifecycle is independent of this profile; bulk actions and termination live in the membership detail."
+  "esports_user_detail_mem_note": "The membership lifecycle is independent of this profile; bulk actions and termination live in the membership detail.",
+  "esports_user_detail_msg_title": "Letterbox",
+  "esports_user_detail_msg_note": "Unread {unread} · {total} total",
+  "esports_user_detail_msg_col_time": "Time",
+  "esports_user_detail_msg_col_type": "Type",
+  "esports_user_detail_msg_col_subject": "Subject",
+  "esports_user_detail_msg_col_content": "Content",
+  "esports_user_detail_msg_col_read": "Read state",
+  "esports_user_detail_msg_read": "Read",
+  "esports_user_detail_msg_unread": "Unread",
+  "esports_user_detail_msg_type_announcement": "Announcement",
+  "esports_user_detail_msg_type_report": "Report",
+  "esports_user_detail_msg_type_membership": "Membership",
+  "esports_user_detail_msg_type_feedback": "Feedback reply",
+  "esports_user_detail_msg_empty": "No letters in this letterbox yet"
 }

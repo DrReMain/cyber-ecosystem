@@ -28,3 +28,13 @@ export const offlineAnnouncement = MessageAdminService.method.offlineAnnouncemen
  * @generated from rpc cyber.esports.v1.MessageAdminService.ListAnnouncements
  */
 export const listAnnouncements = MessageAdminService.method.listAnnouncements;
+
+/**
+ * Read-only: the operator inspects a member's letterbox — the same rows
+ * the member face lists, never a different truth. Read state lives on
+ * the row and only the member's own mark-read flips it; this face
+ * observes, it never mutates.
+ *
+ * @generated from rpc cyber.esports.v1.MessageAdminService.ListUserMessages
+ */
+export const listUserMessages = MessageAdminService.method.listUserMessages;

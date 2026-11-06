@@ -2495,6 +2495,74 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.ReplyFeedbackResponse'
+    /api/v1/esports/users/{userId}/messages:
+        get:
+            tags:
+                - MessageAdminService
+            description: |-
+                Read-only: the operator inspects a member's letterbox — the same rows
+                 the member face lists, never a different truth. Read state lives on
+                 the row and only the member's own mark-read flips it; this face
+                 observes, it never mutates.
+            operationId: MessageAdminService_ListUserMessages
+            parameters:
+                - name: userId
+                  in: path
+                  description: |-
+                    The member whose letterbox is read — the same rows the member face
+                     lists, never a different truth. A member nobody ever mailed answers
+                     an empty page, not an error.
+                  required: true
+                  schema:
+                    type: string
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListUserMessagesResponse'
     /api/v1/system/audit-logs:
         get:
             tags:
@@ -6276,6 +6344,20 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Test'
+        cyber.esports.v1.ListUserMessagesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                messages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Message'
+                    description: Newest first, the letterbox's own order.
+                unreadCount:
+                    type: integer
+                    description: The same count the member's unread badge reads.
+                    format: int32
         cyber.esports.v1.MarkAllMessagesReadRequest:
             type: object
             properties: {}

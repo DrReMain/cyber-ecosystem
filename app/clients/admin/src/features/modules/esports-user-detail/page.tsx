@@ -29,6 +29,7 @@ import { UserAvatar } from "#/features/modules/system-users/ui/user-avatar";
 import { m } from "#/paraglide/messages";
 import { AssessmentsTab } from "./ui/assessments-tab";
 import { MembershipTab } from "./ui/membership-tab";
+import { MessagesTab } from "./ui/messages-tab";
 
 const LIST_SEARCH = parseUsersSearch({});
 
@@ -122,7 +123,11 @@ export function EsportsUserDetailPage() {
               label: m.esports_user_detail_tab_membership(),
               children: <MembershipTab userId={member.userId ?? ""} />,
             },
-            notOpen("messages", m.esports_user_detail_tab_messages()),
+            {
+              key: "messages",
+              label: m.esports_user_detail_tab_messages(),
+              children: <MessagesTab userId={member.userId ?? ""} />,
+            },
             {
               key: "account",
               label: m.esports_user_detail_tab_account(),

@@ -76,5 +76,19 @@
   "esports_user_detail_mem_unlocks_value": "{n} 件",
   "esports_user_detail_mem_to_member": "会員管理",
   "esports_user_detail_mem_history": "継続タイムライン",
-  "esports_user_detail_mem_note": "会員ライフサイクルはユーザープロフィールから独立。一括操作と終了は会員管理詳細へ。"
+  "esports_user_detail_mem_note": "会員ライフサイクルはユーザープロフィールから独立。一括操作と終了は会員管理詳細へ。",
+  "esports_user_detail_msg_title": "サイト内メッセージ",
+  "esports_user_detail_msg_note": "未読 {unread} · 全 {total} 件",
+  "esports_user_detail_msg_col_time": "時間",
+  "esports_user_detail_msg_col_type": "種別",
+  "esports_user_detail_msg_col_subject": "件名",
+  "esports_user_detail_msg_col_content": "内容",
+  "esports_user_detail_msg_col_read": "既読状態",
+  "esports_user_detail_msg_read": "既読",
+  "esports_user_detail_msg_unread": "未読",
+  "esports_user_detail_msg_type_announcement": "お知らせ",
+  "esports_user_detail_msg_type_report": "レポート",
+  "esports_user_detail_msg_type_membership": "会員",
+  "esports_user_detail_msg_type_feedback": "フィードバック返信",
+  "esports_user_detail_msg_empty": "メッセージはまだありません"
 }

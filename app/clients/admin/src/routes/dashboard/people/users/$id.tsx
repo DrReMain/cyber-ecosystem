@@ -1,5 +1,6 @@
 import { EntitleAdminService } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/activation_admin_pb";
 import { MemberService } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/member_pb";
+import { MessageAdminService } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/message_admin_pb";
 import { TestAdminService } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_admin_pb";
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "#/config";
@@ -12,6 +13,7 @@ const operations = [
   op(EntitleAdminService, "getMembership"),
   op(EntitleAdminService, "listActivationCodes"),
   op(EntitleAdminService, "listReportAccessPolicies"),
+  op(MessageAdminService, "listUserMessages"),
   op(TestAdminService, "listTests"),
   op(TestAdminService, "listTestAttempts"),
 ];
