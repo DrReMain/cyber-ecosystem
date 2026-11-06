@@ -4,8 +4,8 @@
     "allow": [
       "Bash(curl *)",
       "Bash(grpcurl *)",
-      "Bash(./nx *)",
-      "Bash(pnpm *)"
+      "Bash(docker *)",
+      "Bash(./nx *)"
     ],
     "deny": [
       "Bash(nohup)",
