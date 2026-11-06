@@ -232,7 +232,7 @@
 
 > 族文件:routes/report.{center,cognitive,career,trend,$recordId,session.$sessionId}(**六路由全挂自身 profileFlowGuard**)+ 模块 6 页面件(page=单报详情/center/cognitive/trend/career/session-done)+ ui/×14 + 5 ts 纯推导层(career/cognitive/digest/session/trend/vocabulary)。死码:零(ui 全消费;filing-footer 双份之一,文件级已核)。X1-1 红利:center 锁态四卡+covered 0/6 已活证。
 > 族法条:①**free seat**(E5-0 裁)——最优已测主能力三件套(档/析/谏)全员免费开,卫星不竞争座,无 cohort 座虚位;②价格永不硬编码(全从 SKU 读面);③诚实零贯穿(composite 无→「—」、雷达缺轴=缺非零、career 空板不发明赢家、trend 混史黄警=决策②)。
-> 观察项已结:G-001 早已裁定**仓法胜出 emoji 不还原**——center 四卡 📊🧠🎯📈+「›」字形+career 关闭面 🎯=违反已裁法的漏网,**已登记 G-405 红条**(换 lucide,随 UI 校准役或开发会话修)。
+> 观察项已结:G-001 早已裁定**仓法胜出 emoji 不还原**——center 四卡 📊🧠🎯📈+「›」字形+career 关闭面 🎯=违反已裁法的漏网,已登记 G-405,**片C 清偿(11-06)**:JSX 六处+profile About 头「›」+**i18n 词条值第三层**(profile_center_all 随批修:词条剥形+按钮接 chevron svg)全换 lucide;活证=四卡全 svg+尾 chevron+零 emoji 复扫;career 关闭面=常开门预留态(biz.go:926 rides open by default),编译+同 Target 组件代偿,关态走查补;security 4 词条键立 G-414。
 
 | 门实例 | 触发条件 | 可达判定 | 活证/处置 |
 |---|---|---|---|
@@ -380,7 +380,7 @@
 ### 2.10 末批:profile 总览+agreement+age-required(routes 5 + 14 tsx;提取毕 2026-11-06)
 
 > 族文件:routes/profile.index+agreement.{user,privacy}+age-required(壳已读)+ profile/(page 259、logout-sheet、ui/×7、overview/bands)+agreement/page+age-required/page。守卫:/profile 布局 sessionGuard;/age-required 自身挂;**协议双页公开=设计**(登录前链接需预读)。死码:零(logout.fn/overview/bands helpers 全消费)。
-> **新发现:占位 toast 过时嫌疑(11-06 判决定案=接线,立 G-407)**——profile 面报告中心卡「查看全部/查看报告」+ICP park 在 `toast.info(common_soon)`,注释自证「center 页是 later face」;但 /report/center 与 /report/trend **均已建成**(§2.6),home 入口行也已接线(X1-1 活证)。**原型实锤(profile-overview.html:289-291):三钮全真跳转——toCenter→report-center.html、toTrend→report-trend.html**,「Phase-2 故意留」不成立(押后无任何登记;训练趋势是另一张卡,原型自带 Phase-2 虚线占位,与此卡无关)。=漏拆占位,原型固化律下对原型明确偏离。ICP soon 合法不动。
+> **新发现:占位 toast 过时嫌疑(11-06 判决定案=接线,立 G-407)**——profile 面报告中心卡「查看全部/查看报告」+ICP park 在 `toast.info(common_soon)`,注释自证「center 页是 later face」;但 /report/center 与 /report/trend **均已建成**(§2.6),home 入口行也已接线(X1-1 活证)。**原型实锤(profile-overview.html:289-291):三钮全真跳转——toCenter→report-center.html、toTrend→report-trend.html**,「Phase-2 故意留」不成立(押后无任何登记;训练趋势是另一张卡,原型自带 Phase-2 虚线占位,与此卡无关)。=漏拆占位,原型固化律下对原型明确偏离。ICP soon 合法不动。**片C 清偿(11-06)**:两钮 navigate 接线(照 home:197 形)+两行过时注释改写;活证=新号 13977669999 双腿落页 center/trend(title 互证)。
 
 | 门实例 | 触发条件 | 可达判定 | 活证/处置 |
 |---|---|---|---|
@@ -392,7 +392,7 @@
 | HistoryCard 三态行×2 genre | 未玩→去测评/未完→继续/完→读回(anchor 分叉 report/session-done) | 部分活证 | X1-1 未玩态;**完态 live**(11-06:FPS/MOBA 双行「2026-11-06 · 已完成」+查看报告 CTA);未完态待半场数据 |
 | GenreStatsCard 共享轨道 | max 定标,零显零 | **已活证** | 11-06:FPS 2 次/MOBA 2 次双行满格(max=2 定标);零显零支待单 genre 数据 |
 | 训练趋势占位卡(虚线+soon 标) | 常驻 | **已活证** | 11-06:「训练趋势 敬请期待 自由练习与专项训练模块…」Phase-2 placeholder(原型自带) |
-| **报告中心行占位 toast×2** | 查看全部/查看报告 | **已判(11-06):接线,立 G-407** | 见批注(原型 289-291 实锤);执行归开发会话 |
+| **报告中心行占位 toast×2** | 查看全部/查看报告 | **已接线(11-06 片C 活证,G-407 绿)** | 新号 13977669999 双腿落页 /report/center+/report/trend;查看全部钮剥词条「›」接 chevron(随 G-405);ICP 第三处 soon 合法不动 |
 | 语言行(LocaleSelect 现装,D-AT) | 常驻 | 待造态(易) | |
 | about 行(双协议链+ICP soon) | 常驻 | 待造态(易) | |
 | LogoutSheet+onLogout 链 | open 受控;取消 autoFocus 领衔;确认=logout→clear→clearWechatProfile→broadcastSessionKick(**无 expired 通知=刻意**)→/login | **已活证** | 11-06 晚:确认→本页落 /login;**多标签踢出实证**(第二标签页 home→被踢 `/login?next=%2F`,kick 带原 href 播种);无 expired toast 刻意形同证;sheet 取消/autoFocus 支待复走 |
@@ -409,5 +409,5 @@
 - **U1-ctr 分支级提取全量毕(2026-11-06)**:11 批=壳 15+守卫补遗 4+login 22+向导 25+home 13+match 22+test 32+report 29+member/pay 28+messages/feedback 20+security 29+末批 15=**254 门**(交互门 43/状态门 174/路由门 37)。
 - 判定分布:已活证 13(X1-1/e2e 红利)、部分活证 11、e2e 在案 3、待造态 189(易造约 80)、观测受限 28(真微信腿+瞬态各半)、数据门 14、法条在案 4。
 - **悬置三件已判(11-06,「先由你来判断」授权)**:①Skeleton=删(孤儿资产,Q1-③ 残骸无预留登记,现行 loading idiom=LoadingStrip 已竞争上岗);②pick·empty=接线(错接非预留,立 **G-406**);③profile 报告中心=接线(原型 289-291 三钮真跳转实锤,立 **G-407**)。①为代码删除、②③为红条工单,执行均归开发会话。红条 G-405 已立(emoji 字形)。
-- 下一步:起栈 U1-ctr 活证走查(chrome mcp 人在环;优先序=test verdict 六面→messages/feedback 全族→security merge 离线缝→易造 80 门铺开),后 U1-admin。**进度(11-06 全天):前四项毕+易造大丰收**——verdict 5/6 面/messages 八面/security 大批(merge 全族/双闸/bind-phone 真链/password/forgot/bind-wechat)/test 单场×4 全脸/向导族直访群/登出态批(Logout 链+双守卫匿名支+login 族 toast 群)/profile 总览连walk;**新伤五枚(G-408..412)**。ctr 侧小残=FormErrorLine 三支/AgreeBox indeterminate/home guest 面/logout sheet 面文(皆需再登出循环,边际低)+InvalidNotice 余三词+SubmitError;**下一大块=admin 起栈(X2-1 admin 腿+U1-admin 文件级)**——**起栈日毕(11-06 晚)**:X2-1 六腿全闭环/X2-2 全毕/X2-3 半毕(G-413 立)+U1-admin 首轮 25 面(22 live+1 观测受限+2 parked)+U3 三裁定入 calibration-log(tab 筛选族→Filter/Segmented、布局留白、drawer 重型 table);下一=X1-2 mock 购会员→X3 铸码导出→A-套余面→U2 harness 重激活;伤单累计 G-405..413(2 绿 11 红)。**开发会话片A清偿(11-06 晚)**:G-408/406 翻绿(伤单 4 绿 9 红)——六文件 throwOnError 豁免族(含 8 页体检:4 真全修/4 假维持边界)+空池两 reason 对值接线;平票号(13977660011)导流收敛+服务端 400 互证+empty 面渲染活证;序=片B NaN 零值族(G-409/411)→片C 机械批(G-407/405/412)→片D G-413 admin 信箱 Tab。
+- 下一步:起栈 U1-ctr 活证走查(chrome mcp 人在环;优先序=test verdict 六面→messages/feedback 全族→security merge 离线缝→易造 80 门铺开),后 U1-admin。**进度(11-06 全天):前四项毕+易造大丰收**——verdict 5/6 面/messages 八面/security 大批(merge 全族/双闸/bind-phone 真链/password/forgot/bind-wechat)/test 单场×4 全脸/向导族直访群/登出态批(Logout 链+双守卫匿名支+login 族 toast 群)/profile 总览连walk;**新伤五枚(G-408..412)**。ctr 侧小残=FormErrorLine 三支/AgreeBox indeterminate/home guest 面/logout sheet 面文(皆需再登出循环,边际低)+InvalidNotice 余三词+SubmitError;**下一大块=admin 起栈(X2-1 admin 腿+U1-admin 文件级)**——**起栈日毕(11-06 晚)**:X2-1 六腿全闭环/X2-2 全毕/X2-3 半毕(G-413 立)+U1-admin 首轮 25 面(22 live+1 观测受限+2 parked)+U3 三裁定入 calibration-log(tab 筛选族→Filter/Segmented、布局留白、drawer 重型 table);下一=X1-2 mock 购会员→X3 铸码导出→A-套余面→U2 harness 重激活;伤单累计 G-405..413(2 绿 11 红)。**开发会话片A清偿(11-06 晚)**:G-408/406 翻绿(伤单 4 绿 9 红)——六文件 throwOnError 豁免族(含 8 页体检:4 真全修/4 假维持边界)+空池两 reason 对值接线;平票号(13977660011)导流收敛+服务端 400 互证+empty 面渲染活证;序=片B NaN 零值族(G-409/411)→片C 机械批(G-407/405/412)→片D G-413 admin 信箱 Tab。**片B清偿(11-06 晚,72f47689 双推)**:G-409/411 翻绿(伤单 6 绿 7 红)——digest/session-done 两缝单落点窄化(修一处愈四面);18606513270 真数据三面全愈+挂机完成场零 NaN+session-done 三态 live;金卡 0 分像素终态条件活证(tier-rated 款进完成场,走查 X 线补)。**片C清偿(11-06)**:G-405/407/412 翻绿+G-414 立(伤单 9 绿 5 红)——lucide 全换(JSX 六处+About 头+i18n 词条第三层发现)+两钮接线双腿活证+G-412 活跑反证勘误收案(u13 支齐拦,零码改);career 关闭面=常开门预留态编译代偿;余序=片D G-413。
 - 死码嫌疑处置:修条件 bug 或删(逐条用户过目);预留门登记编号引 gap-ledger/pm-review。

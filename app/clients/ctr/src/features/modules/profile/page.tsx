@@ -7,7 +7,7 @@ import {
 import { listSkus } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku-SkuService_connectquery";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { TrendingUp } from "lucide-react";
+import { ChevronRight, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { LocaleSelect } from "#/domains/i18n";
@@ -109,7 +109,7 @@ export function ProfilePage() {
         <div className="flex items-center justify-between">
           <h1 className="text-ink text-[19px] font-bold">{m.profile_title()}</h1>
           <button
-            className="tap-zone text-danger-text rounded-full border border-[rgba(239,68,68,0.6)] px-[11px] py-1 text-[11.5px] font-extrabold active:opacity-60 disabled:opacity-50"
+            className="tap-zone text-danger-text rounded-full border border-[rgba(239,68,68,0.6)] px-2.75 py-1 text-[11.5px] font-extrabold active:opacity-60 disabled:opacity-50"
             disabled={loggingOut}
             onClick={() => setSheetOpen(true)}
             type="button"
@@ -151,12 +151,12 @@ export function ProfilePage() {
         ) : null}
 
         {/* Training trend — the prototype's own Phase-2 placeholder, dashed. */}
-        <div className="rounded-card border border-dashed border-[rgba(107,114,128,0.6)] bg-[rgba(17,23,41,0.5)] px-4 py-[15px]">
-          <div className="mb-[6px] flex items-center justify-between">
+        <div className="rounded-card border border-dashed border-[rgba(107,114,128,0.6)] bg-[rgba(17,23,41,0.5)] px-4 py-3.75">
+          <div className="mb-1.5 flex items-center justify-between">
             <span className="text-[14.5px] font-extrabold text-[#9ca3af]">
               {m.profile_training_title()}
             </span>
-            <span className="rounded-full bg-[rgba(234,179,8,0.18)] px-2.5 py-[3px] text-[10px] font-semibold text-[#fde047]">
+            <span className="text-grade-s rounded-full bg-[rgba(234,179,8,0.18)] px-2.5 py-0.75 text-[10px] font-semibold">
               {m.profile_training_soon()}
             </span>
           </div>
@@ -165,32 +165,29 @@ export function ProfilePage() {
           </p>
         </div>
 
-        {/* The report-center row (prototype ⑧): the trend report it names
-            is a later slice's face, so the entry parks on the honest soon
-            toast rather than linking nowhere. */}
-        <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]">
-          <div className="mb-[11px] flex items-center justify-between">
+        {/* The report-center row (prototype ⑧): both entries route into
+            the built aggregate faces — the hub and the trend page. */}
+        <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-3.75">
+          <div className="mb-2.75 flex items-center justify-between">
             <span className="text-ink text-[14.5px] font-extrabold">
               {m.profile_center_title()}
             </span>
-            {/* The prototype's header link (查看全部 ›) — the center's own
-                page is a later face, so it parks on the same honest soon
-                toast the embedded row's button holds. */}
             <button
-              className="tap-zone text-ink-tertiary text-[10.5px] active:opacity-60"
-              onClick={() => toast.info(m.common_soon())}
+              className="text-ink-tertiary tap-zone inline-flex items-center gap-0.5 text-[10.5px] active:opacity-60"
+              onClick={() => void navigate({ to: "/report/center" })}
               type="button"
             >
               {m.profile_center_all()}
+              <ChevronRight aria-hidden size={12} />
             </button>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex min-w-0 items-center gap-2.5">
               <span
                 aria-hidden
-                className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px] bg-[rgba(234,179,8,0.18)]"
+                className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-[9px] bg-[rgba(234,179,8,0.18)]"
               >
-                <TrendingUp aria-hidden className="text-[#fde047]" size={14} />
+                <TrendingUp aria-hidden className="text-grade-s" size={14} />
               </span>
               <div className="min-w-0">
                 <div className="text-ink text-[12.5px] font-extrabold">
@@ -202,8 +199,8 @@ export function ProfilePage() {
               </div>
             </div>
             <button
-              className="text-ink-secondary tap-zone rounded-control shrink-0 border-[1.5px] border-[#4b5563] px-3 py-1.5 text-[11.5px] font-medium active:opacity-60"
-              onClick={() => toast.info(m.common_soon())}
+              className="text-ink-secondary tap-zone rounded-control border-ambient-slate shrink-0 border-[1.5px] px-3 py-1.5 text-[11.5px] font-medium active:opacity-60"
+              onClick={() => void navigate({ to: "/report/trend" })}
               type="button"
             >
               {m.profile_center_view()}
@@ -214,19 +211,19 @@ export function ProfilePage() {
         {/* The standing language row (D-AT): the profile's settings entry
             is the ready LocaleSelect mounted as-is — the prototype carries
             no settings block, the ruling defines this row. */}
-        <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]">
+        <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-3.75">
           <div className="flex items-center justify-between">
             <span className="text-ink text-[13px] font-bold">{m.profile_settings_language()}</span>
             <LocaleSelect />
           </div>
         </div>
 
-        <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]">
-          <div className="mb-[9px] flex items-center justify-between">
+        <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-3.75">
+          <div className="mb-2.25 flex items-center justify-between">
             <span className="text-ink text-[14.5px] font-extrabold">{m.profile_about()}</span>
-            <span className="text-ink-tertiary text-xs">›</span>
+            <ChevronRight aria-hidden className="text-ink-tertiary" size={14} />
           </div>
-          <div className="text-ink-muted flex gap-[14px] text-xs">
+          <div className="text-ink-muted flex gap-3.5 text-xs">
             <Link className="tap-zone text-link py-1 active:opacity-60" to="/agreement/user">
               {m.profile_about_user()}
             </Link>
@@ -243,7 +240,7 @@ export function ProfilePage() {
           </div>
         </div>
 
-        <div className="text-ink-tertiary mt-[14px] text-center text-[10.5px] leading-[1.7]">
+        <div className="text-ink-tertiary mt-3.5 text-center text-[10.5px] leading-[1.7]">
           {m.common_footer_company()} · {m.common_footer_icp()}
           <br />
           {m.common_footer_email()}
