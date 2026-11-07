@@ -6,12 +6,15 @@ import {
   setSkuShelf,
   updateSkuPrice,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku_admin-SkuAdminService_connectquery";
-import { useNavigate, useSearch } from "@tanstack/react-router";
-import { Button, Card, Tabs, Typography } from "antd";
-import { Plus } from "lucide-react";
+import { Filter } from "@cyber-ecosystem/shared-antd/filter";
+import { useFilter } from "@cyber-ecosystem/shared-antd/use-search";
+import { useSearch } from "@tanstack/react-router";
+import { Card, Typography } from "antd";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
+import { parseSkusSearch, skusSearchSchema } from "./search";
 import { RepriceModal } from "./ui/reprice-modal";
 import { type SkuDraft, SkuFormModal } from "./ui/sku-form-modal";
 import { SkusTable } from "./ui/skus-table";
@@ -20,13 +23,10 @@ const AREA = "/dashboard/pricing/skus/";
 
 export function EsportsSkusPage() {
   const search = useSearch({ from: AREA });
-  const navigate = useNavigate();
+  const store = useAreaSearchStore(AREA, search, parseSkusSearch);
+  const { values, onFilter, onReset } = useFilter(store, skusSearchSchema);
   const [formOpen, setFormOpen] = useState(false);
   const [repriceRow, setRepriceRow] = useState<AdminSku | null>(null);
-
-  const patchSearch = (patch: Record<string, unknown>) => {
-    void navigate({ to: "/dashboard/pricing/skus", search: { ...search, ...patch } });
-  };
 
   const listQuery = useQuery(listCatalogSkus, {});
   const refetch = () => listQuery.refetch();
@@ -56,58 +56,64 @@ export function EsportsSkusPage() {
     },
   });
 
+  // Shelf is a client-side fold over the unpaginated catalog — the whole
+  // list is already in memory, so the filter only narrows what renders.
   const all = listQuery.data?.skus ?? [];
   const rows = all.filter((s) =>
-    search.shelf === "on" ? s.onShelf : search.shelf === "off" ? !s.onShelf : true,
+    values.shelf === "on" ? s.onShelf : values.shelf === "off" ? !s.onShelf : true,
   );
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-start justify-between">
-        <div>
-          <Typography.Title className="!mb-0" level={4}>
-            {m.esports_skus_title()}
-          </Typography.Title>
-          <Typography.Text className="text-xs" type="secondary">
-            {m.esports_skus_desc()}
-          </Typography.Text>
-        </div>
-        <Button
-          icon={<Plus size={14} />}
-          onClick={() => setFormOpen(true)}
-          size="small"
-          type="primary"
-        >
-          {m.esports_skus_new()}
-        </Button>
+    <div className="flex flex-col gap-4 p-4">
+      <div>
+        <Typography.Title className="!mb-0" level={4}>
+          {m.esports_skus_title()}
+        </Typography.Title>
+        <Typography.Text className="text-xs" type="secondary">
+          {m.esports_skus_desc()}
+        </Typography.Text>
       </div>
 
-      <Tabs
-        activeKey={search.shelf ?? "all"}
-        items={[
-          { key: "all", label: m.esports_skus_filter_all() },
-          { key: "on", label: m.esports_skus_filter_on() },
-          { key: "off", label: m.esports_skus_filter_off() },
-        ]}
-        onChange={(key) =>
-          patchSearch({ shelf: key === "all" ? undefined : (key as "on" | "off") })
-        }
-      />
-
       <Card>
-        <SkusTable
-          loading={listQuery.isLoading}
-          onRefresh={refetch}
-          onReprice={setRepriceRow}
-          onToggleShelf={(row) =>
-            shelfMut.mutate({ skuCode: row.sku?.skuCode, onShelf: !row.onShelf })
-          }
-          rows={rows}
+        <Filter
+          columns={4}
+          initialValues={values}
+          labels={{
+            search: m.common_filter_search(),
+            reset: m.common_filter_reset(),
+            fold: m.common_filter_fold(),
+            expand: m.common_filter_expand(),
+          }}
+          onFilter={onFilter}
+          onReset={onReset}
+          options={[
+            {
+              label: m.esports_skus_filter_shelf(),
+              name: "shelf",
+              type: "select",
+              placeholder: m.esports_skus_filter_all(),
+              options: [
+                { label: m.esports_skus_filter_on(), value: "on" },
+                { label: m.esports_skus_filter_off(), value: "off" },
+              ],
+            },
+          ]}
         />
-        <Typography.Text className="mt-2 block text-xs" type="secondary">
-          {m.esports_skus_count({ n: rows.length, total: all.length })}
-        </Typography.Text>
       </Card>
+
+      <SkusTable
+        loading={listQuery.isLoading}
+        onCreate={() => setFormOpen(true)}
+        onRefresh={refetch}
+        onReprice={setRepriceRow}
+        onToggleShelf={(row) =>
+          shelfMut.mutate({ skuCode: row.sku?.skuCode, onShelf: !row.onShelf })
+        }
+        rows={rows}
+      />
+      <Typography.Text className="text-xs" type="secondary">
+        {m.esports_skus_count({ n: rows.length, total: all.length })}
+      </Typography.Text>
 
       <SkuFormModal
         onCancel={() => setFormOpen(false)}
@@ -127,7 +133,7 @@ export function EsportsSkusPage() {
         onCancel={() => setRepriceRow(null)}
         onSubmit={(priceFen) =>
           repriceRow?.sku?.skuCode &&
-          repriceMut.mutate({ skuCode: repriceRow.sku?.skuCode, priceFen })
+          repriceMut.mutate({ skuCode: repriceRow?.sku?.skuCode, priceFen })
         }
         pending={repriceMut.isPending}
         sku={repriceRow}

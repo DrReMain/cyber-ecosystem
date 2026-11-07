@@ -44,7 +44,6 @@
   "test_result_retry_disabled": "Retest (chances spent)",
   "test_result_next": "Continue · {ability}",
   "test_result_finish": "Finish",
-  "test_result_report": "View ability report",
   "test_result_first": "First attempt",
   "test_result_prev": "vs last {delta}",
   "test_result_best": "Personal best {score}",

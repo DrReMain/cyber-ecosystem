@@ -4,6 +4,7 @@
   "esports_skus_filter_all": "전체",
   "esports_skus_filter_on": "진열 중",
   "esports_skus_filter_off": "미진열",
+  "esports_skus_filter_shelf": "진열 상태",
   "esports_skus_col_sku": "SKU",
   "esports_skus_col_kind": "유형",
   "esports_skus_col_price": "가격",

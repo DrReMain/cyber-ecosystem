@@ -11,13 +11,14 @@
 - 需求分母(demand-ledger,2026-11-07 机核):ctr 44=✅29+◐5+❌5+⏸1+📄4;admin 41=已建 16+底座 6+非本期 4+余组 13+M3 2;新实现=21 service/85 RPC/23 ent 表/ctr 50 路由文件(1 root+9 布局壳+40 叶页)/admin esports 17 面。
 - 等待面:**P26/P26.1(ljr,理想 11-12/硬限 11-24)=MIG1 冻结件门**;P22 否决窗 11-14;D-MIG-1/2=预演前决策;微信侧活证随 PAY2 联调;U2/U3=UI 校准余段。
 - 覆盖核验(2026-11-07,八域三方对照=verify/coverage-map.md):56 例对已建面/RPC 的映射成立;缺口集中=**MOBA 侧零执行(8/13 引擎无任何用例跑过)**、admin 三个写 RPC 全链零执行、C2/C3/C4/C6 例族未走;新发现偏离/缺陷已分流入本档缺陷工单与 prd 待裁区。
+- hzy 车道:W6 备料+执行稿修订+**九环本地预演 ✅ 11-05**(T1 门禁四套绿+13 截图+带出 ⑪⑫——⑪=admin 授予列 grantedAt 窗头显示错入缺陷工单 B-11;⑫=兑码面未建已在案[遗留清单行,P4 裁时定形随建],梯④ 断腿角度=cutover-watch 环8;详=cutover-watch §六);余=随实况随修+11-24 复核终版+W5 值守演练配合(预演已提前)。
 
 ## 窗口(11-05 校准重排;锚点裁决不动:cutover 12-01~03/12-08、CP3 核验 11-28)
 
 | 窗 | 日期 | 服务/管理线(lzx) | 精修带(hzy,分配制) | 产品线(ljr) |
 |---|---|---|---|---|
-| W4 | 11.10-16 | MSG-1 窄化裁决窗(PM-13..20 接洽单=prd 待裁区);PAY2 联调启动;**MIG1 预演 11-15**(先过 D-MIG-1/2,绿门含回滚腿) | 上线走查执行稿修订(cutover-watch) | P22 否决窗 11-14;P26 理想 11-12 |
-| W5 | 11.17-23 | 真通道联调收口(JSAPI 真实 appid+绑域+微信侧活证+微信外降级面);MIG1 snapshot+recompute(P26/P26.1 裁后)含曲线入码 sizing ⑧ | 值守演练配合 | P23/P20 推进 |
+| W4 | 11.10-16 | MSG-1 窄化裁决窗(PM-13..20 接洽单=prd 待裁区);PAY2 联调启动;**MIG1 预演 11-15**(先过 D-MIG-1/2,绿门含回滚腿) | 执行稿修订+九环预演 ✅ 11-05 提前毕;余=随实况随修 | P22 否决窗 11-14;P26 理想 11-12 |
+| W5 | 11.17-23 | 真通道联调收口(JSAPI 真实 appid+绑域+微信侧活证+微信外降级面);MIG1 snapshot+recompute(P26/P26.1 裁后)含曲线入码 sizing ⑧ | 值守演练配合(九环预演已提前) | P23/P20 推进 |
 | W6 | 11.24-30 | **CP3 三腿内部核验 11-28**(M1 e2e/PAY2 0.01 真钱/PAY3 全链+MSG-1 可走);cutover 准备(真实 appid 切换+上线清单);U2/U3 若未毕随窗收 | 上线值守(执行稿=cutover-watch) | P23/P20 11-28;appid+绑域 11-26 |
 | cutover | 12.01-03/12.08 | 停机切换+L4 验证+上线;旧栈停机封存 2 周(D-P);迁移执行=lzx 专职(D-BB) | 值守 | 上线内容核对 |
 | 上线后首迭代 | 12 月起 | MSG-2(P23 已排)+M2 余组梯①(各项开工前过对应 P 票) | 精修池 | P4 11 月底(专版 buffer 窗) |
@@ -29,8 +30,7 @@
 | MSG-1 余面(lzx,D-BB 全片) | 窄化裁决落地(PM-13..20=prd 待裁区;全维持=零改动,裁翻契约面小改随改);banner ctr 消费面未建(随 MSG-2/精修带评估);定时发布=已裁非特性 | W6 ljr 裁决 | S |
 | PAY2 通道联调(lzx) | 已毕=行政件全清+Native 腿全生命周期+0.01 真钱闭环+全额退款腿+NO_STATEMENT_EXIST 修(11-05..06)。余=JSAPI 腿真实 appid+绑定域(上线清单);微信侧活证(G-402/403/404 尾);微信外降级「引导微信内打开」(D-BF);XFF 信任拨盘台账收口;query 无触发器(convergeStaleAfter=10m)与 boot 放弃日 ERROR 两裁点随刀 | W4 起 | M |
 | MIG1 冻结件+预演(lzx 专职,D-BB) | 已毕=五阶段+生产副本直载+谱系三源互证+census+回滚腿彩排+密码面实数定谳(11-06)。余=snapshot 承载表(P26)+recompute 口径标与重放窗口(P26.1,含曲线入码 sizing ⑧);**预演 11-15**(D-BE 绿门含回滚腿);预演前过 D-MIG-1(school 域处置)/D-MIG-2(账号冲突消解);cutover 迁移执行同专职 | P26/P26.1+D-MIG-1/2 | M |
-| U2 ctr 原型对齐(harness 重激活) | 渲染可达已毕(U1);余=按 HARNESS-SOP 重激活保真 harness 对原型核视觉;**B-6(done 页三差)修法在此**;趋势进阶 CTA 偏离处置随本片(见 prd 待裁) | 走查轮前 | M |
-| U3 admin 对齐基座范式 | 三裁定落地=列表页 tab 筛选族迁基座 Filter/Segmented 例外形;容器层级与留白对齐骨架基线;drawer 内简单列表降级朴素组件;ActionIconButton href locale 前缀族四实例同修 | — | S-M |
+| U2 ctr 原型对齐(harness 重激活) | **片A B-6 done 页 ✅ 11-07 三轮毕(三差→复检五差→渲染并排轮;详=archive+git proven-by)**;**片B 保真 harness 重激活 ✅ 11-07(HARNESS-SOP 照抄三件套+fixtures target;锚再生 4 枚,本机语料根经 `ESPORTS_PROTO_DIR` 注入;`ctr:e2e` login 常红复活=新鲜 4 组全在案/等价形:ICP 备=D-AO①、非微信预告=G-005、⚡=Zap SVG vs 字符、tab 行形=innerText 分行差,后二组视觉轴待铺开核;10-28 红 9→今 4=G 伤单实收 5)**;渲染可达已毕(U1);余=铺开(home/profile/report 逐页逐预设 fidelity spec,序=ctr-prototype-matrix ✅/◐ 19 页)+N-1(prd 待裁) | 走查轮前 | M |
 | M2-4 trace Tab | 暂缓后置(11-03 用户裁;P22 否决窗 11-14 后复评) | P22 | S |
 | Q 线尾(役毕残件) | ⑧曲线入码 sizing(随 P26.1);consent 渠道列契约微欠(一句裁,可并 P23);E4 三配置模块=P4;隐私真文「7 天保留」句 vs 反推续用任意龄=ljr/法务车道 | P26.1/P4/P23 | S |
 
@@ -40,11 +40,11 @@
 |---|---|---|---|---|
 | B-1 | 支付到期竞速「已付」恢复死路——**修形已落**(11-08 用户裁 a):classifyAPIError 增 ORDERPAID→ChannelError 分支(400 不再折叠为 ErrInvalidArgument,retirePending 认得「已付拒关」→ConvergeOnce 收敛)+单测钉。**余=真通道活证**:live 码表与关单实测归 PAY2 联调刀(NO_STATEMENT_EXIST 前科=文档码表之外的拼写可能仍在),dev/mock 结构性照不见 | 最重→余活证 | G-420 F1;修形=wechat/error.go+client_test.go(400_orderpaid 例) | PAY2 联调窗活证 |
 | B-4 | esports(及 agent)全部 WRITE 面零审计行:kratos §5a 三兄弟缺一+proto/UI「入审计」承诺落空;修形=esports 生产者三件(MQ+Sink+ladder 双块,镜像 system server.go:38-58) | 高(cutover 审计合规) | G-417;消费侧已在(system/audit 订阅 audit_log 实锤) | lzx+用户裁定后落片;**并行会话已在途,落片时核对** |
-| B-6 | session-done 页三差:已测收据行=评级口径非原型已玩口径;CTA 族反转(报告入口为主,原型明令不在本页);blob 氛围缺失 | 中 | G-410(用户裁定「视觉低质」) | U2 |
+| B-11 | admin 会员面授予列 grantedAt 窗头显示错:periodStart 无条件取前行 ExpiresAt(entitleadmin/biz.go:441-451)——terminated 行后新购显示旧行到期日(hzypw 实测:显示 12-05 16:10 vs 真窗头 11-05 14:15);数据侧正确(Q6-① 修后 settle 缝只读活窗),显示推导级一行修(前行 terminated→改用自身 created_at) | 低(显示级) | 11-05 九环预演环7 实测(cutover-watch §六) | lzx |
 
 走查覆盖缺口(非缺陷,未执行的用例腿)=verify/coverage-map.md 缺口清单,后续多轮走查轮次消费。
 
-**B 工单清偿批(2026-11-08,用户令「清空所有待修复问题」;叙事全文=git 提交 proven-by)**:八案修毕销行——B-2 兑换双码竞速烧码(entitlement 写路径 advisory xact lock:Redeem 锁内读-判-取+双码竞速 e2e 腿活证「烧一留一」)/B-3 Terminate×Grant 复活窗(membership 写者三处同锁:Grant/Terminate/SettlePaid,同锁同序为读码级断言,Terminate×Grant 竞速 e2e 腿未立——B-2 双码腿为邻证)/B-5 过期会员灰 banner(proto 增 last_member_until 姊妹字段保 member_until liveness 语义不泄给 report fold;墙实读「会员已于 2026-11-05 到期」+terminated 排除顺证;三死面=墙内同一渲染链三件(分支/StateBanner/文案键),一面活证即三件同活)/B-7-F4 换渠道死胡同(复用加 channel 匹配,不匹配走 retire+新建)/B-7-F6 结算缺授予对账盲区(ExistsSource 探针入对账循环,注释空头支票补上)/B-7-F5 游标内存态=复核销案不修(对账只读幂等,重启重扫无害,游标落库不成比例)/B-8 fail 页死指路(双语文案撤「我的→订单」)/B-9 proto 注文(per-(member,family) 改毕+regen+drift 绿)/B-10 手机号+密码登录(system exchangePassword 增 credential fallback——**kind-agnostic 形**(用户裁定:system 只做泛化,新 credential kind 零新分支);live 双侧证据=Login args=手机号 code=200 对照 R2 的 400 account not found——11-08 走查双侧记录)/P4 反馈下界=复核翻案销案(行内红行真实渲染,R2「零反馈面」系 toast 单观测误判)。
+**B 工单清偿批(2026-11-08,用户令「清空所有待修复问题」;叙事全文=git 提交 proven-by)**:八案修毕销行——B-2 兑换双码竞速烧码(entitlement 写路径 advisory xact lock:Redeem 锁内读-判-取+双码竞速 e2e 腿活证「烧一留一」)/B-3 Terminate×Grant 复活窗(membership 写者三处同锁:Grant/Terminate/SettlePaid,同锁同序为读码级断言,Terminate×Grant 竞速 e2e 腿未立——B-2 双码腿为邻证)/B-5 过期会员灰 banner(proto 增 last_member_until 姊妹字段保 member_until liveness 语义不泄给 report fold;墙实读「会员已于 2026-11-05 到期」+terminated 排除顺证;三死面=墙内同一渲染链三件(分支/StateBanner/文案键),一面活证即三件同活)/B-7-F4 换渠道死胡同(复用加 channel 匹配,不匹配走 retire+新建)/B-7-F6 结算缺授予对账盲区(ExistsSource 探针入对账循环,注释空头支票补上)/B-7-F5 游标内存态=复核销案不修(对账只读幂等,重启重扫无害,游标落库不成比例)/B-8 fail 页死指路(双语文案撤「我的→订单」)/B-9 proto 注文(per-(member,family) 改毕+regen+drift 绿)/B-10 手机号+密码登录(system exchangePassword 增 credential fallback——**kind-agnostic 形**(用户裁定:system 只做泛化,新 credential kind 零新分支);live 双侧证据=Login args=手机号 code=200 对照 R2 的 400 account not found——11-08 走查双侧记录)/P4 反馈下界=复核翻案销案(行内红行真实渲染,R2「零反馈面」系 toast 单观测误判)/B-6=同窗 hzy 车道修毕销行(U2 片A 三轮:三差→复检→渲染并排,详=archive+proven-by)。
 
 ## M2 余组(梯①=上线后首迭代;每项开工前先过对应 P 票)
 

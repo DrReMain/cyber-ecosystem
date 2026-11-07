@@ -1,10 +1,13 @@
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { getSessionReport } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { Check, House } from "lucide-react";
+import { Check } from "lucide-react";
 import { Button } from "react-aria-components";
+import { toast } from "sonner";
+import { loginOrbs } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
+import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { abilityWord } from "#/features/modules/match/vocabulary";
 import { TierChip } from "#/features/modules/test/ui/tier-chip";
 import { m } from "#/paraglide/messages";
@@ -18,11 +21,53 @@ interface WireAbility {
   percentile: number | undefined;
 }
 
+// WKT Timestamp on the wire is dual-shaped (Q4 law): an ISO string off
+// toJson, or the raw { seconds } object — both read, epoch out.
+interface WireAttempt {
+  ability: string;
+  at?: unknown;
+}
+
+const epochOf = (value: unknown): number | undefined => {
+  if (typeof value === "string") {
+    const t = Date.parse(value);
+    return Number.isNaN(t) ? undefined : t;
+  }
+  if (typeof value === "object" && value !== null && "seconds" in value) {
+    const s = Number((value as { seconds: unknown }).seconds);
+    return Number.isFinite(s) ? s * 1000 : undefined;
+  }
+  return undefined;
+};
+
+// First submit → last submit — the sitting's play span. The session's
+// own started_at is the mint stamp (a match session can sit for days
+// before its lineup completes), not the play clock.
+const elapsedSecondsOf = (attempts: WireAttempt[]): number | undefined => {
+  const first = attempts[0];
+  const last = attempts[attempts.length - 1];
+  if (first === undefined || last === undefined) return undefined;
+  const from = epochOf(first.at);
+  const to = epochOf(last.at);
+  if (from === undefined || to === undefined) return undefined;
+  return Math.max(0, Math.round((to - from) / 1000));
+};
+
+const timeTextOf = (seconds: number | undefined): string | undefined =>
+  seconds === undefined
+    ? undefined
+    : seconds < 60
+      ? m.report_session_time_sec({ sec: seconds })
+      : m.report_session_time_min_sec({
+          min: Math.floor(seconds / 60),
+          sec: seconds % 60,
+        });
+
 /** The session-done page (prototype test-done): the closing ceremony a
  * finished lineup earns — the check hero with its N/N receipt, the
- * strongest-ability gold card, the ability grid, then the report entry.
- * A session with no scored ability keeps the page honest: the empty
- * board states it, never invents a winner. */
+ * strongest-ability gold card, the ability grid, then the share/profile
+ * CTAs. A session with no scored ability keeps the page honest: the
+ * empty board states it, never invents a winner. */
 export function SessionDonePage() {
   const { sessionId } = useParams({ from: "/report/session/$sessionId" });
   const navigate = useNavigate();
@@ -62,11 +107,15 @@ export function SessionDonePage() {
   if (data === undefined) {
     return null;
   }
-  // The transport flattens the wrappers: the anchor and composite ride
-  // as plain scalars-or-undefined.
-  const anchor = (data as { anchorRecordId?: string }).anchorRecordId;
-  const tested = data.testedDimensions ?? 0;
   const total = data.totalDimensions ?? 0;
+
+  // The receipt counts what was PLAYED, not what a calibration curve has
+  // graded (the match guide's own count law — one session, one truth).
+  // attemptDetails is the full attempt list, pending rows included, in
+  // submit order: distinct abilities = played.
+  const attempts = (data.attemptDetails ?? []) as WireAttempt[];
+  const played = new Set(attempts.map((a) => a.ability)).size;
+  const timeText = timeTextOf(elapsedSecondsOf(attempts));
 
   // The grid rows ride the lineup's own order; the gold card's winner is
   // the best score among them. A row exists only for abilities this
@@ -76,19 +125,41 @@ export function SessionDonePage() {
     ...a,
     bestScore: a.bestScore ?? 0,
   }));
-  const top = abilities.reduce<WireAbility | undefined>(
-    (best, a) => (best === undefined || a.bestScore > best.bestScore ? a : best),
-    undefined,
-  );
+  // One strongest criterion page-wide (prototype: highest percentile
+  // ranks both the grid and the gold card); with no cohort answer
+  // anywhere, the best raw score holds the card.
+  const ranked = [...abilities].sort((a, b) => (b.percentile ?? -1) - (a.percentile ?? -1));
+  const leader = ranked[0];
+  const top =
+    leader !== undefined && leader.percentile !== undefined
+      ? leader
+      : abilities.reduce<WireAbility | undefined>(
+          (best, a) => (best === undefined || a.bestScore > best.bestScore ? a : best),
+          undefined,
+        );
 
   return (
-    <AmbientLayout>
+    // The prototype's test-done trio (test-done.html:3-5) is exactly the
+    // shared login trio — passed explicitly to art-direct the page.
+    <AmbientLayout orbs={loginOrbs}>
       <div className="flex w-full flex-col gap-3 pb-6">
+        {/* The page header (prototype: back fab + title + the N/N done
+            tag, design sheet 27c). */}
+        <FlowHeader
+          onBack={() => void navigate({ to: "/" })}
+          title={m.report_session_title()}
+          trailing={
+            <span className="rounded-full bg-[rgba(34,197,94,0.15)] px-2.5 py-0.75 text-[11px] font-semibold text-[#6EE7B7]">
+              {m.report_session_done_tag({ done: played, total })}
+            </span>
+          }
+        />
+
         {/* ① The check hero (prototype 27c): the ceremony's own frame. */}
         <div className="relative flex w-full flex-col items-center pt-4 pb-1 text-center">
           <div
             aria-hidden
-            className="bg-ambient-cyan pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.3),transparent_65%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.3),transparent_65%)]"
           />
           <div className="relative flex size-[88px] items-center justify-center rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.35),transparent_70%)]">
             <Check aria-hidden className="text-[#22D3EE]" size={40} strokeWidth={2.5} />
@@ -97,14 +168,16 @@ export function SessionDonePage() {
             {m.report_session_hero()}
           </div>
           <div className="text-ink-tertiary relative mt-1 text-[12px]">
-            {m.report_session_line({ done: tested, total })}
+            {m.report_session_line({ done: played, total })}
+            {timeText !== undefined ? ` · ${timeText}` : ""}
           </div>
         </div>
 
         {top !== undefined ? (
           <>
-            {/* ② The strongest-ability gold card. */}
-            <div className="border-line bg-surface-card shadow-card rounded-card relative w-full overflow-hidden border border-[rgba(234,179,8,0.45)] px-4 py-5 backdrop-blur-md">
+            {/* ② The strongest-ability gold card — the prototype's pad is
+                text-centered throughout, this card included. */}
+            <div className="border-line bg-surface-card shadow-card rounded-card relative w-full overflow-hidden border border-[rgba(234,179,8,0.45)] px-4 py-5 text-center backdrop-blur-md">
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(234,179,8,0.16),transparent_70%)]"
@@ -129,12 +202,19 @@ export function SessionDonePage() {
             </div>
 
             {/* ③ The ability grid (prototype 2×2; one column when the
-                lineup says fewer). */}
+                lineup says fewer): percentile-ranked, strongest first,
+                the leader crowned with the gold border; a pending row
+                carries no percentile line. */}
             <div className="grid w-full grid-cols-2 gap-2.5">
-              {abilities.map((a) => (
+              {ranked.map((a, i) => (
                 <div
                   className="border-line bg-surface-card shadow-card rounded-card border p-3.5 text-start backdrop-blur-md"
                   key={a.ability}
+                  style={
+                    i === 0 && a.percentile !== undefined
+                      ? { borderColor: "rgba(234,179,8,0.5)" }
+                      : undefined
+                  }
                 >
                   <div className="flex items-center gap-2">
                     <div
@@ -149,10 +229,15 @@ export function SessionDonePage() {
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="text-ink text-xl font-extrabold tabular-nums">
-                      {Math.round(a.bestScore * 10) / 10}
+                      {m.report_session_card_score({ score: Math.round(a.bestScore * 10) / 10 })}
                     </span>
                     <TierChip grade={a.bestGrade} />
                   </div>
+                  {a.percentile !== undefined ? (
+                    <div className="text-ink-tertiary mt-1 text-[10px]">
+                      {m.report_session_card_beat({ pct: Math.round(a.percentile) })}
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -167,26 +252,28 @@ export function SessionDonePage() {
           </div>
         )}
 
-        {/* ④ The closing CTAs: the report entry when the session scored,
-            home always. */}
+        {/* ④ The closing CTAs (prototype 27c): share leads, profile
+            second — the report entry deliberately stays off this page
+            (test-done.html:69; it lives in the report center/history).
+            The invite face is MSG-2's to build, so until then the share
+            button announces instead of linking — the G-202 gated
+            placeholder precedent. */}
         <div className="flex flex-col gap-3">
-          {anchor !== undefined ? (
-            <Button
-              className="bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
-              onPress={() =>
-                void navigate({ to: "/report/$recordId", params: { recordId: anchor } })
-              }
-            >
-              {m.test_result_report()}
-            </Button>
-          ) : null}
           <Button
-            className="border-line text-ink-secondary rounded-control flex w-full cursor-pointer items-center justify-center gap-2 border px-4 py-3 text-[14px] font-bold active:opacity-80"
-            onPress={() => void navigate({ to: "/" })}
+            className="bg-cta-success shadow-cta-success rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
+            onPress={() => toast.info(m.common_soon())}
           >
-            <House aria-hidden size={16} />
-            {m.report_session_cta_home()}
+            {m.report_session_cta_share()}
           </Button>
+          <Button
+            className="border-line text-ink-secondary rounded-control flex w-full cursor-pointer items-center justify-center border-[1.5px] px-4 py-3 text-[14px] font-bold active:opacity-80"
+            onPress={() => void navigate({ to: "/profile" })}
+          >
+            {m.report_session_cta_profile()}
+          </Button>
+          <div className="text-ink-tertiary text-center text-[10px]">
+            {m.report_session_share_note()}
+          </div>
         </div>
       </div>
     </AmbientLayout>

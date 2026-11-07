@@ -34,7 +34,7 @@ export function FeedbackDetailPage() {
   const asker = ticket?.nickname ?? ticket?.userId ?? "-";
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <Button
           icon={<ArrowLeft size={14} />}

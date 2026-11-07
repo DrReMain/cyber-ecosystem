@@ -2,9 +2,9 @@ import { useQuery } from "@connectrpc/connect-query";
 import type { QuestionBankRow } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_admin_pb";
 import { listQuestionBank } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_admin-TestAdminService_connectquery";
 import type { Test } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/test_pb";
-import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
+import { useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TableProps } from "antd";
-import { Drawer, Tag, Typography } from "antd";
+import { Drawer, Table, Tag, Typography } from "antd";
 import { useState } from "react";
 import { m } from "#/paraglide/messages";
 
@@ -76,11 +76,14 @@ export function BankDrawer({ test, onClose }: Readonly<BankDrawerProps>) {
       title={`${m.esports_tests_bank_title()} · ${test.name ?? test.code ?? ""}`}
       width={720}
     >
-      <DataTable<QuestionBankRow>
+      {/* A drawer is a light stage — the plain Table serves it; the heavy
+          DataTable (card, toolbar, column settings) stays on main list
+          pages (U3 component-weight ruling). */}
+      <Table<QuestionBankRow>
         columns={columns}
         dataSource={bankQuery.data?.questions ?? []}
-        emptyDescription={m.esports_tests_bank_empty()}
         loading={bankQuery.isFetching}
+        locale={{ emptyText: m.esports_tests_bank_empty() }}
         pagination={{
           current: pageNo,
           onChange: setPageNo,
@@ -89,6 +92,7 @@ export function BankDrawer({ test, onClose }: Readonly<BankDrawerProps>) {
           total: Number(bankQuery.data?.page?.total ?? 0),
         }}
         rowKey="scenarioCode"
+        size="small"
       />
     </Drawer>
   );

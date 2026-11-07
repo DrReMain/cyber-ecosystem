@@ -7,7 +7,7 @@ import {
   publishAnnouncement,
   updateAnnouncement,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/message_admin-MessageAdminService_connectquery";
-import { Button, Card, Modal, Tag, Typography } from "antd";
+import { Button, Modal, Tag, Typography } from "antd";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -83,7 +83,7 @@ export function AnnouncementsPage() {
   });
 
   return (
-    <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-4 p-4">
       <div className="flex items-start justify-between gap-2">
         <div>
           <Typography.Title className="!mb-0" level={4}>
@@ -98,17 +98,15 @@ export function AnnouncementsPage() {
         </Button>
       </div>
 
-      <Card>
-        <AnnouncementsTable
-          loading={listQuery.isLoading}
-          onEdit={openEdit}
-          onOffline={(row) => offlineMut.mutate({ announcementId: row.id ?? "" })}
-          onPublish={(row) => publishMut.mutate({ announcementId: row.id ?? "" })}
-          onRefresh={() => void listQuery.refetch()}
-          onView={setViewing}
-          rows={listQuery.data?.announcements ?? []}
-        />
-      </Card>
+      <AnnouncementsTable
+        loading={listQuery.isLoading}
+        onEdit={openEdit}
+        onOffline={(row) => offlineMut.mutate({ announcementId: row.id ?? "" })}
+        onPublish={(row) => publishMut.mutate({ announcementId: row.id ?? "" })}
+        onRefresh={() => void listQuery.refetch()}
+        onView={setViewing}
+        rows={listQuery.data?.announcements ?? []}
+      />
 
       <AnnouncementFormModal
         key={formSession.key}
