@@ -5,6 +5,7 @@
   "esports_feedback_tickets_filter_pending": "قيد المعالجة",
   "esports_feedback_tickets_filter_replied": "تم الرد",
   "esports_feedback_tickets_filter_closed": "مغلق",
+  "esports_feedback_tickets_filter_status": "الحالة",
   "esports_feedback_tickets_col_user": "المستخدم",
   "esports_feedback_tickets_col_category": "التصنيف",
   "esports_feedback_tickets_col_content": "المحتوى",

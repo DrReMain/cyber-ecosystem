@@ -5,6 +5,7 @@
   "esports_members_tab_active": "유효",
   "esports_members_tab_expiring": "만료 임박 ≤7일",
   "esports_members_tab_expired": "만료됨",
+  "esports_members_filter_status": "상태",
   "esports_members_source_filter": "출처",
   "esports_members_source_order": "결제",
   "esports_members_source_manual": "수동 개통",

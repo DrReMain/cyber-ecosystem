@@ -89,7 +89,7 @@ export function AgreementConsentsPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-4 p-4">
       <div>
         <Typography.Title className="!mb-0" level={4}>
           {m.esports_agreement_consents_title()}

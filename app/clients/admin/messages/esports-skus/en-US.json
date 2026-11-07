@@ -4,6 +4,7 @@
   "esports_skus_filter_all": "All",
   "esports_skus_filter_on": "On shelf",
   "esports_skus_filter_off": "Off shelf",
+  "esports_skus_filter_shelf": "Shelf status",
   "esports_skus_col_sku": "SKU",
   "esports_skus_col_kind": "Kind",
   "esports_skus_col_price": "Price",

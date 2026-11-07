@@ -5,9 +5,10 @@ import {
   listFeedbacks,
   replyFeedback,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/feedback_admin-FeedbackAdminService_connectquery";
-import { useServerPagination } from "@cyber-ecosystem/shared-antd/use-search";
-import { useNavigate, useSearch } from "@tanstack/react-router";
-import { Card, Tabs, Typography } from "antd";
+import { Filter } from "@cyber-ecosystem/shared-antd/filter";
+import { useFilter, useServerPagination } from "@cyber-ecosystem/shared-antd/use-search";
+import { useSearch } from "@tanstack/react-router";
+import { Card, Typography } from "antd";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAreaSearchStore } from "#/libs";
@@ -22,15 +23,11 @@ const AREA = "/dashboard/feedback/tickets/";
 export function FeedbackTicketsPage() {
   const search = useSearch({ from: AREA });
   const store = useAreaSearchStore(AREA, search, parseTicketsSearch);
-  const navigate = useNavigate();
+  const { values, onFilter, onReset } = useFilter(store, ticketsSearchSchema);
   const [replying, setReplying] = useState<FeedbackTicket | null>(null);
 
-  const patchSearch = (patch: Record<string, unknown>) => {
-    void navigate({ to: "/dashboard/feedback/tickets", search: { ...search, ...patch } });
-  };
-
   const listQuery = useQuery(listFeedbacks, {
-    status: TAB_TO_STATUS[search.status ?? "all"],
+    status: TAB_TO_STATUS[values.status ?? "all"],
     page: { pageNo: search.pageNo, pageSize: search.pageSize },
   });
 
@@ -63,7 +60,7 @@ export function FeedbackTicketsPage() {
   });
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4 p-4">
       <div>
         <Typography.Title className="!mb-0" level={4}>
           {m.esports_feedback_tickets_title()}
@@ -73,32 +70,42 @@ export function FeedbackTicketsPage() {
         </Typography.Text>
       </div>
 
-      <Tabs
-        activeKey={search.status ?? "all"}
-        items={[
-          { key: "all", label: m.esports_feedback_tickets_filter_all() },
-          { key: "pending", label: m.esports_feedback_tickets_filter_pending() },
-          { key: "replied", label: m.esports_feedback_tickets_filter_replied() },
-          { key: "closed", label: m.esports_feedback_tickets_filter_closed() },
-        ]}
-        onChange={(key) =>
-          patchSearch({
-            status: key === "all" ? undefined : (key as "pending" | "replied" | "closed"),
-            pageNo: undefined,
-          })
-        }
-      />
-
       <Card>
-        <TicketsTable
-          loading={listQuery.isLoading}
-          onClose={(row) => closeMut.mutate({ feedbackId: row.id ?? "" })}
-          onRefresh={() => void listQuery.refetch()}
-          onReply={setReplying}
-          pagination={pagination}
-          rows={listQuery.data?.tickets ?? []}
+        <Filter
+          columns={4}
+          initialValues={values}
+          labels={{
+            search: m.common_filter_search(),
+            reset: m.common_filter_reset(),
+            fold: m.common_filter_fold(),
+            expand: m.common_filter_expand(),
+          }}
+          onFilter={onFilter}
+          onReset={onReset}
+          options={[
+            {
+              label: m.esports_feedback_tickets_filter_status(),
+              name: "status",
+              type: "select",
+              placeholder: m.esports_feedback_tickets_filter_all(),
+              options: [
+                { label: m.esports_feedback_tickets_filter_pending(), value: "pending" },
+                { label: m.esports_feedback_tickets_filter_replied(), value: "replied" },
+                { label: m.esports_feedback_tickets_filter_closed(), value: "closed" },
+              ],
+            },
+          ]}
         />
       </Card>
+
+      <TicketsTable
+        loading={listQuery.isLoading}
+        onClose={(row) => closeMut.mutate({ feedbackId: row.id ?? "" })}
+        onRefresh={() => void listQuery.refetch()}
+        onReply={setReplying}
+        pagination={pagination}
+        rows={listQuery.data?.tickets ?? []}
+      />
 
       <ReplyModal
         onClose={() => setReplying(null)}

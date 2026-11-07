@@ -5,6 +5,7 @@
   "esports_members_tab_active": "有效",
   "esports_members_tab_expiring": "即将到期 ≤7天",
   "esports_members_tab_expired": "已过期",
+  "esports_members_filter_status": "状态",
   "esports_members_source_filter": "来源",
   "esports_members_source_order": "支付",
   "esports_members_source_manual": "手动开通",

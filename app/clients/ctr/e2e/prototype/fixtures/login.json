@@ -1,0 +1,24 @@
+{
+  "page": "login",
+  "preset": null,
+  "source": "file:///Users/huangzhiyin/xm/esports/manage/design-systems/ctr/prototype/login.html",
+  "title": "ctr · 登录",
+  "lines": [
+    "⚡",
+    "电竞天赋",
+    "科学测评你的电竞潜能",
+    "验证码登录",
+    "密码登录",
+    "发送验证码",
+    "我已阅读并同意 《用户协议》",
+    "全选",
+    "我已阅读并同意 《隐私政策》",
+    "未成年需监护人同意并陪同使用",
+    "登录 / 注册",
+    "微信授权登录",
+    "忘记密码？ · 用户协议 · 隐私政策 · 返回入口",
+    "星歌未来教育科技（杭州）有限公司 · 浙ICP2026028293号",
+    "客服邮箱 xgwledu@126.com"
+  ],
+  "placeholders": ["手机号", "6 位验证码"]
+}

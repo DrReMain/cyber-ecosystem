@@ -4,6 +4,7 @@
   "esports_skus_filter_all": "全部",
   "esports_skus_filter_on": "上架",
   "esports_skus_filter_off": "未上架",
+  "esports_skus_filter_shelf": "上架状态",
   "esports_skus_col_sku": "SKU",
   "esports_skus_col_kind": "类型",
   "esports_skus_col_price": "价格",

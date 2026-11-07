@@ -5,6 +5,7 @@
   "esports_members_tab_active": "有効",
   "esports_members_tab_expiring": "まもなく期限切れ ≤7日",
   "esports_members_tab_expired": "期限切れ",
+  "esports_members_filter_status": "状態",
   "esports_members_source_filter": "ソース",
   "esports_members_source_order": "支払い",
   "esports_members_source_manual": "手動開通",

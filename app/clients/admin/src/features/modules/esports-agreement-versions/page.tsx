@@ -57,7 +57,7 @@ export function AgreementVersionsPage() {
   });
 
   return (
-    <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-4 p-4">
       <div className="flex items-start justify-between gap-2">
         <div>
           <Typography.Title className="!mb-0" level={4}>

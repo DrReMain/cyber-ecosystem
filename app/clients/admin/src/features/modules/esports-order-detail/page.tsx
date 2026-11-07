@@ -29,7 +29,7 @@ export function EsportsOrderDetailPage() {
   const state = stateTags[String(o?.order?.state ?? "")];
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <Button
           icon={<ArrowLeft size={14} />}
