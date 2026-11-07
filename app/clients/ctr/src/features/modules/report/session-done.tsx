@@ -159,7 +159,7 @@ export function SessionDonePage() {
         <div className="relative flex w-full flex-col items-center pt-4 pb-1 text-center">
           <div
             aria-hidden
-            className="bg-ambient-cyan pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.3),transparent_65%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.3),transparent_65%)]"
           />
           <div className="relative flex size-[88px] items-center justify-center rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.35),transparent_70%)]">
             <Check aria-hidden className="text-[#22D3EE]" size={40} strokeWidth={2.5} />
@@ -175,8 +175,9 @@ export function SessionDonePage() {
 
         {top !== undefined ? (
           <>
-            {/* ② The strongest-ability gold card. */}
-            <div className="border-line bg-surface-card shadow-card rounded-card relative w-full overflow-hidden border border-[rgba(234,179,8,0.45)] px-4 py-5 backdrop-blur-md">
+            {/* ② The strongest-ability gold card — the prototype's pad is
+                text-centered throughout, this card included. */}
+            <div className="border-line bg-surface-card shadow-card rounded-card relative w-full overflow-hidden border border-[rgba(234,179,8,0.45)] px-4 py-5 text-center backdrop-blur-md">
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(234,179,8,0.16),transparent_70%)]"
