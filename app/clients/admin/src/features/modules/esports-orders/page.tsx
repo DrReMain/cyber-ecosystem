@@ -9,7 +9,7 @@ import { useFilter, useServerPagination } from "@cyber-ecosystem/shared-antd/use
 import { useSearch } from "@tanstack/react-router";
 import { Card, Typography } from "antd";
 import { toast } from "sonner";
-import { useAreaSearchStore } from "#/libs";
+import { filterLabels, useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
 import { ordersSearchSchema, parseOrdersSearch } from "./search";
 import { OrdersTable } from "./ui/orders-table";
@@ -71,12 +71,7 @@ export function EsportsOrdersPage() {
         <Filter
           columns={4}
           initialValues={values}
-          labels={{
-            search: m.common_filter_search(),
-            reset: m.common_filter_reset(),
-            fold: m.common_filter_fold(),
-            expand: m.common_filter_expand(),
-          }}
+          labels={filterLabels()}
           onFilter={onFilter}
           onReset={onReset}
           options={[

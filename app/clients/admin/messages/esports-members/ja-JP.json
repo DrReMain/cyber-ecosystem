@@ -1,10 +1,10 @@
 {
   "esports_members_title": "会員管理",
   "esports_members_detail_title": "会員詳細",
-  "esports_members_tab_all": "すべて",
   "esports_members_tab_active": "有効",
   "esports_members_tab_expiring": "まもなく期限切れ ≤7日",
   "esports_members_tab_expired": "期限切れ",
+  "esports_members_filter_all": "すべて",
   "esports_members_filter_status": "状態",
   "esports_members_source_filter": "ソース",
   "esports_members_source_order": "支払い",

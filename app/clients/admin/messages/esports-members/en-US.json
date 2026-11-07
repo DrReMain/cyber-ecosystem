@@ -1,10 +1,10 @@
 {
   "esports_members_title": "Memberships",
   "esports_members_detail_title": "Membership Detail",
-  "esports_members_tab_all": "All",
   "esports_members_tab_active": "Active",
   "esports_members_tab_expiring": "Expiring ≤7d",
   "esports_members_tab_expired": "Expired",
+  "esports_members_filter_all": "All",
   "esports_members_filter_status": "Status",
   "esports_members_source_filter": "Source",
   "esports_members_source_order": "Payment",

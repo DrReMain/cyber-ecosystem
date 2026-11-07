@@ -13,7 +13,7 @@ import { useFilter, useServerPagination } from "@cyber-ecosystem/shared-antd/use
 import { useSearch } from "@tanstack/react-router";
 import { Card, Typography } from "antd";
 import { useState } from "react";
-import { useAreaSearchStore } from "#/libs";
+import { filterLabels, useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
 import { membersSearchSchema, parseMembersSearch } from "./search";
 import { GrantModal, MEMBER_MONTH_SKU } from "./ui/grant-modal";
@@ -22,7 +22,9 @@ import { TerminateModal } from "./ui/terminate-modal";
 
 const AREA = "/dashboard/people/members/";
 
-const TAB_TO_STATUS: Record<string, MembershipStatus | undefined> = {
+// "all" stays a legal URL value (legacy tab shares) but never re-enters
+// the filter — a cleared select is the all case.
+const STATUS_TO_WIRE: Record<string, MembershipStatus | undefined> = {
   all: undefined,
   active: MembershipStatus.ACTIVE,
   expiring: MembershipStatus.EXPIRING_SOON,
@@ -41,7 +43,7 @@ export function EsportsMembersPage() {
   const { values, onFilter, onReset } = useFilter(store, membersSearchSchema);
 
   const listQuery = useQuery(listMemberships, {
-    status: TAB_TO_STATUS[values.tab ?? "all"],
+    status: STATUS_TO_WIRE[values.tab ?? "all"],
     source: values.source ? SOURCE_TO_WIRE[values.source] : undefined,
     page: { pageNo: search.pageNo, pageSize: search.pageSize },
   });
@@ -81,12 +83,7 @@ export function EsportsMembersPage() {
         <Filter
           columns={4}
           initialValues={values}
-          labels={{
-            search: m.common_filter_search(),
-            reset: m.common_filter_reset(),
-            fold: m.common_filter_fold(),
-            expand: m.common_filter_expand(),
-          }}
+          labels={filterLabels()}
           onFilter={onFilter}
           onReset={onReset}
           options={[
@@ -94,7 +91,7 @@ export function EsportsMembersPage() {
               label: m.esports_members_filter_status(),
               name: "tab",
               type: "select",
-              placeholder: m.esports_members_tab_all(),
+              placeholder: m.esports_members_filter_all(),
               options: [
                 { label: m.esports_members_tab_active(), value: "active" },
                 { label: m.esports_members_tab_expiring(), value: "expiring" },
@@ -105,7 +102,7 @@ export function EsportsMembersPage() {
               label: m.esports_members_source_filter(),
               name: "source",
               type: "select",
-              placeholder: m.esports_members_tab_all(),
+              placeholder: m.esports_members_filter_all(),
               options: [
                 { label: m.esports_members_source_order(), value: "order" },
                 { label: m.esports_members_source_manual(), value: "manual" },

@@ -12,7 +12,7 @@ import { useSearch } from "@tanstack/react-router";
 import { Card, Typography } from "antd";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAreaSearchStore } from "#/libs";
+import { filterLabels, useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
 import { parseSkusSearch, skusSearchSchema } from "./search";
 import { RepriceModal } from "./ui/reprice-modal";
@@ -78,12 +78,7 @@ export function EsportsSkusPage() {
         <Filter
           columns={4}
           initialValues={values}
-          labels={{
-            search: m.common_filter_search(),
-            reset: m.common_filter_reset(),
-            fold: m.common_filter_fold(),
-            expand: m.common_filter_expand(),
-          }}
+          labels={filterLabels()}
           onFilter={onFilter}
           onReset={onReset}
           options={[

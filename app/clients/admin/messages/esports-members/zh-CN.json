@@ -1,10 +1,10 @@
 {
   "esports_members_title": "会员管理",
   "esports_members_detail_title": "会员详情",
-  "esports_members_tab_all": "全部",
   "esports_members_tab_active": "有效",
   "esports_members_tab_expiring": "即将到期 ≤7天",
   "esports_members_tab_expired": "已过期",
+  "esports_members_filter_all": "全部",
   "esports_members_filter_status": "状态",
   "esports_members_source_filter": "来源",
   "esports_members_source_order": "支付",

@@ -1,10 +1,10 @@
 {
   "esports_members_title": "إدارة العضويات",
   "esports_members_detail_title": "تفاصيل العضوية",
-  "esports_members_tab_all": "الكل",
   "esports_members_tab_active": "نشط",
   "esports_members_tab_expiring": "تنتهي ≤7 أيام",
   "esports_members_tab_expired": "منتهية",
+  "esports_members_filter_all": "الكل",
   "esports_members_filter_status": "الحالة",
   "esports_members_source_filter": "المصدر",
   "esports_members_source_order": "دفع",
