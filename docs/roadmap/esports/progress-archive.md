@@ -140,3 +140,4 @@
 - ②CTA 族对齐原型 27c/test-done.html:69:分享主(G-202 占位先例 toast「即将开放」——share-invite 页=demand-ledger 裁归 MSG-2/P23 前置,不建死链)+个人中心次(live 跳 /profile 实证)+尾注;报告入口撤(原型明令在报告中心/历史)。
 - ③三球氛围:AmbientLayout orbs 显式传入(原型 test-done trio=共享 loginOrbs 同值,purple/blue/cyan 260/220/200px blur70 op.26,DOM 3 球实证)。
 - 门禁:ctr build+typecheck+check 三绿(途中复杂度拆手+两 noUncheckedIndexedAccess 守卫);词档 +5 键×2 locale,-2 死键(test_result_report/report_session_cta_home),paraglide 强再生;存证 u3-1107/r7/r8。
+- **用户复检轮(「跟原型设计不一样吧」令)整页对照补五处**:页头(FlowHeader 增 trailing 槽+「{done}/{total} 完成」绿徽)/hero 词回原型「本次测评完成」/网格卡三缺(百分位降序+最强项金边 style[biome 类序法 bypass]+「{score} 分」键+「超过 {pct}% 同龄」行,cohort 无答=诚实省略)/金卡与网格统一百分位冠军(无答回退最高分)/分享钮换 cta-success 绿渐变 token(=原型 btn-grn 同值)+ghost 1.5px;hzytm 1/2 评级场满分态活证(r9:页头+徽+金卡+19.5 分卡+绿渐变钮);词档 +3 键×2 locale。

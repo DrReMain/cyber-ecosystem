@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { loginOrbs } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
+import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { abilityWord } from "#/features/modules/match/vocabulary";
 import { TierChip } from "#/features/modules/test/ui/tier-chip";
 import { m } from "#/paraglide/messages";
@@ -124,16 +125,36 @@ export function SessionDonePage() {
     ...a,
     bestScore: a.bestScore ?? 0,
   }));
-  const top = abilities.reduce<WireAbility | undefined>(
-    (best, a) => (best === undefined || a.bestScore > best.bestScore ? a : best),
-    undefined,
-  );
+  // One strongest criterion page-wide (prototype: highest percentile
+  // ranks both the grid and the gold card); with no cohort answer
+  // anywhere, the best raw score holds the card.
+  const ranked = [...abilities].sort((a, b) => (b.percentile ?? -1) - (a.percentile ?? -1));
+  const leader = ranked[0];
+  const top =
+    leader !== undefined && leader.percentile !== undefined
+      ? leader
+      : abilities.reduce<WireAbility | undefined>(
+          (best, a) => (best === undefined || a.bestScore > best.bestScore ? a : best),
+          undefined,
+        );
 
   return (
     // The prototype's test-done trio (test-done.html:3-5) is exactly the
     // shared login trio — passed explicitly to art-direct the page.
     <AmbientLayout orbs={loginOrbs}>
       <div className="flex w-full flex-col gap-3 pb-6">
+        {/* The page header (prototype: back fab + title + the N/N done
+            tag, design sheet 27c). */}
+        <FlowHeader
+          onBack={() => void navigate({ to: "/" })}
+          title={m.report_session_title()}
+          trailing={
+            <span className="rounded-full bg-[rgba(34,197,94,0.15)] px-2.5 py-0.75 text-[11px] font-semibold text-[#6EE7B7]">
+              {m.report_session_done_tag({ done: played, total })}
+            </span>
+          }
+        />
+
         {/* ① The check hero (prototype 27c): the ceremony's own frame. */}
         <div className="relative flex w-full flex-col items-center pt-4 pb-1 text-center">
           <div
@@ -180,12 +201,19 @@ export function SessionDonePage() {
             </div>
 
             {/* ③ The ability grid (prototype 2×2; one column when the
-                lineup says fewer). */}
+                lineup says fewer): percentile-ranked, strongest first,
+                the leader crowned with the gold border; a pending row
+                carries no percentile line. */}
             <div className="grid w-full grid-cols-2 gap-2.5">
-              {abilities.map((a) => (
+              {ranked.map((a, i) => (
                 <div
                   className="border-line bg-surface-card shadow-card rounded-card border p-3.5 text-start backdrop-blur-md"
                   key={a.ability}
+                  style={
+                    i === 0 && a.percentile !== undefined
+                      ? { borderColor: "rgba(234,179,8,0.5)" }
+                      : undefined
+                  }
                 >
                   <div className="flex items-center gap-2">
                     <div
@@ -200,10 +228,15 @@ export function SessionDonePage() {
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="text-ink text-xl font-extrabold tabular-nums">
-                      {Math.round(a.bestScore * 10) / 10}
+                      {m.report_session_card_score({ score: Math.round(a.bestScore * 10) / 10 })}
                     </span>
                     <TierChip grade={a.bestGrade} />
                   </div>
+                  {a.percentile !== undefined ? (
+                    <div className="text-ink-tertiary mt-1 text-[10px]">
+                      {m.report_session_card_beat({ pct: Math.round(a.percentile) })}
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -226,13 +259,13 @@ export function SessionDonePage() {
             placeholder precedent. */}
         <div className="flex flex-col gap-3">
           <Button
-            className="bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
+            className="bg-cta-success shadow-cta-success rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
             onPress={() => toast.info(m.common_soon())}
           >
             {m.report_session_cta_share()}
           </Button>
           <Button
-            className="border-line text-ink-secondary rounded-control flex w-full cursor-pointer items-center justify-center border px-4 py-3 text-[14px] font-bold active:opacity-80"
+            className="border-line text-ink-secondary rounded-control flex w-full cursor-pointer items-center justify-center border-[1.5px] px-4 py-3 text-[14px] font-bold active:opacity-80"
             onPress={() => void navigate({ to: "/profile" })}
           >
             {m.report_session_cta_profile()}
