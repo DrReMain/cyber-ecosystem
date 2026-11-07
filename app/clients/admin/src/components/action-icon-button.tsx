@@ -42,6 +42,7 @@ export function ActionIconButton({
   // The native anchor carries the localized URL so copies and new-tab opens
   // keep the active locale — the router strips the prefix back off on its
   // input rewrite, so navigation itself still takes the raw route href.
+  // biome-ignore lint/complexity/useOptionalChain: the direct null guard is the alias that narrows href for localizeUrl below — the optional-chain rewrite drops TS's aliased narrowing and reddens typecheck
   const internal = href !== undefined && href.startsWith("/");
   // localizeUrl may hand back a URL object; the anchor wants the string form.
   const anchorHref = internal ? localizeUrl(href).toString() : href;
