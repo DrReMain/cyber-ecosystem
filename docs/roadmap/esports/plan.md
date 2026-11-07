@@ -32,7 +32,7 @@
 | MIG1 冻结件+预演(lzx 专职,D-BB) | 已毕=五阶段+生产副本直载+谱系三源互证+census+回滚腿彩排+密码面实数定谳(11-06)。余=snapshot 承载表(P26)+recompute 口径标与重放窗口(P26.1,含曲线入码 sizing ⑧);**预演 11-15**(D-BE 绿门含回滚腿);预演前过 D-MIG-1(school 域处置)/D-MIG-2(账号冲突消解);cutover 迁移执行同专职 | P26/P26.1+D-MIG-1/2 | M |
 | U2 ctr 原型对齐(harness 重激活) | **片A B-6 done 页 ✅ 11-07 三轮毕(三差→复检五差→渲染并排轮;详=archive+git proven-by)**;**片B 保真 harness 重激活 ✅ 11-07(HARNESS-SOP 照抄三件套+fixtures target;锚再生 4 枚,本机语料根经 `ESPORTS_PROTO_DIR` 注入;`ctr:e2e` login 常红复活=新鲜 4 组全在案/等价形:ICP 备=D-AO①、非微信预告=G-005、⚡=Zap SVG vs 字符、tab 行形=innerText 分行差,后二组视觉轴待铺开核;10-28 红 9→今 4=G 伤单实收 5)**;渲染可达已毕(U1);余=铺开(home/profile/report 逐页逐预设 fidelity spec,序=ctr-prototype-matrix ✅/◐ 19 页)+N-1(prd 待裁) | 走查轮前 | M |
 | M2-4 trace Tab | 暂缓后置(11-03 用户裁;P22 否决窗 11-14 后复评) | P22 | S |
-| Q 线尾(役毕残件) | ⑧曲线入码 sizing(随 P26.1);consent 渠道列契约微欠(一句裁,可并 P23);E4 三配置模块=P4;隐私真文「7 天保留」句 vs 反推续用任意龄=ljr/法务车道 | P26.1/P4/P23 | S |
+| Q 线尾(役毕残件) | ⑧曲线入码 sizing(随 P26.1);⑨ctr 部署接线(compose.app/traefik dynamic 零引用而 image target 已备;形态随 W6 上线清单定形,lzx);⑩skill_trajectory 复板重验归属待裁(开小票=服务端消费 random_seed 对位复板 vs 明示不验收现状——proto 已带 seed 而 scorer 零消费;test.proto 两注释顺下次 proto 片:E9 将来时过时+seed「reproduces server-side」改能力语义);职业库逐区淘汰率/训练强度=占位常数等 ljr 产品数据(careerAreas 注在案);旧 MSG 数据迁移无载体亦无票(migration.md:28 声明「随 MSG-1」而 migrator 七阶段无 MSG 腿,behavior 面=偏好/记录/溯源/邀请)=待裁随 MSG-2 建腿 or 裁不迁旧消息史(11-08 审查立);consent 渠道列契约微欠(一句裁,可并 P23);E4 三配置模块=P4;隐私真文「7 天保留」句 vs 反推续用任意龄=ljr/法务车道 | P26.1/P4/P23/W6 | S |
 
 ## 缺陷工单(未修;取证全文=git 391ccc87 gap-ledger 或 verify/coverage-map.md 缺口节)
 
@@ -40,7 +40,8 @@
 |---|---|---|---|---|
 | B-1 | 支付到期竞速「已付」恢复死路——**修形已落**(11-08 用户裁 a):classifyAPIError 增 ORDERPAID→ChannelError 分支(400 不再折叠为 ErrInvalidArgument,retirePending 认得「已付拒关」→ConvergeOnce 收敛)+单测钉。**余=真通道活证**:live 码表与关单实测归 PAY2 联调刀(NO_STATEMENT_EXIST 前科=文档码表之外的拼写可能仍在),dev/mock 结构性照不见 | 最重→余活证 | G-420 F1;修形=wechat/error.go+client_test.go(400_orderpaid 例) | PAY2 联调窗活证 |
 | B-4 | esports(及 agent)全部 WRITE 面零审计行:kratos §5a 三兄弟缺一+proto/UI「入审计」承诺落空;修形=esports 生产者三件(MQ+Sink+ladder 双块,镜像 system server.go:38-58) | 高(cutover 审计合规) | G-417;消费侧已在(system/audit 订阅 audit_log 实锤) | lzx+用户裁定后落片;**并行会话已在途,落片时核对** |
-| B-11 | admin 会员面授予列 grantedAt 窗头显示错:periodStart 无条件取前行 ExpiresAt(entitleadmin/biz.go:441-451)——terminated 行后新购显示旧行到期日(hzypw 实测:显示 12-05 16:10 vs 真窗头 11-05 14:15);数据侧正确(Q6-① 修后 settle 缝只读活窗),显示推导级一行修(前行 terminated→改用自身 created_at) | 低(显示级) | 11-05 九环预演环7 实测(cutover-watch §六) | lzx |
+| B-11 | admin 会员面授予列 grantedAt 窗头显示错:periodStart 无条件取前行 ExpiresAt(entitleadmin/biz.go:459-469 periodStart;11-08 审查锚修——原 441-451 已随 B 批锁代码漂移,缺陷本体仍在=前行 ExpiresAt 无条件取、无 terminated 分支)——terminated 行后新购显示旧行到期日(hzypw 实测:显示 12-05 16:10 vs 真窗头 11-05 14:15);数据侧正确(Q6-① 修后 settle 缝只读活窗),显示推导级一行修(前行 terminated→改用自身 created_at) | 低(显示级) | 11-05 九环预演环7 实测(cutover-watch §六) | lzx |
+| B-12 | ctr 报告面 curve-pending-only 记录退化无护栏:0 维雷达空卡(AbilityRadar 无条件渲染;axes=[] 时栅格线为空 polygon、无 NaN——11-08 审查修正原「NaN 栅格」不实描述)+UnlockCard count=0 文案(空报告上卖解锁);服务端 r.Abilities=lines 仅载 authoritative——MOBA 全量新记录(4 款全 curve-pending)必触发,FPS 未抽中 red_dot 同型;从未走查(MOBA 8/13 引擎零执行)。修形=页级空轴护栏(0 维不渲染雷达/付费卡改「待评级」行政态文案)或并入曲线片统一裁 | 低(显示+文案级,付费面上) | 2026-11-08 外部审查对账复核(biz.go:560+page.tsx 无条件渲染+vocabulary.ts:104 实证) | lzx |
 
 走查覆盖缺口(非缺陷,未执行的用例腿)=verify/coverage-map.md 缺口清单,后续多轮走查轮次消费。
 

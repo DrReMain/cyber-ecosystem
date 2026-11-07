@@ -11,9 +11,11 @@
 -- login_record 994000001-2) that sit below the snowflake segment and were
 -- asserted empty. Every marker is double-keyed (id band + username/invite
 -- prefix) so a revert can never touch a real row. The demo password is the
--- md5 of "migsyn-demo" with password_algorithm='MD5' so the rehearsal
--- walkthrough exercises the verify-then-rehash login path on a migrated
--- account. Apply inside the container:
+-- md5 of "migsyn-demo" with password_algorithm='MD5' — production shape
+-- (the census found zero BCRYPT rows); per the 11-06 census ruling the
+-- migrated account's password plane closes (forced reset), so the
+-- walkthrough leg for these rows is SMS-code login, never password login
+-- (no verify-then-rehash path exists). Apply inside the container:
 --   docker exec -i mysql8 sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' \
 --     < synthetic.sql
 

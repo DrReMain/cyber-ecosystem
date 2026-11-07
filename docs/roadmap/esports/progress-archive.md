@@ -60,7 +60,7 @@
 - 10-25 E8-b 权益验收锚+策略面:ENT_E2E 十人竞兑不超卖 e2e+report_policy 表+判定序重构(码兑>policy>默认)。
 - 10-25 E8-c 会员衍生解锁+R7 修订(E8 三片收满):trial 自动解锁=事件钩子(TrialGrantHook port)。
 - 10-25 整洁架构+DDD 全服务审查与收口(三路对抗+用户两裁):守面大面积满分;跨模块写两合法形法条回灌。
-- 10-26 走查修批日(hzy,用户现场走查九条全绿 93f67de3..179b1af2):mt 面色批/mt-F2 游走保真/mt-D3 统计面/ms 切换页等。
+- 10-26 走查修批日(hzy,用户现场走查九条全绿 93f67de3..13b0f780〔11-08 审查修:原尾 SHA 179b1af2 非任何 git 对象〕):mt 面色批/mt-F2 游走保真/mt-D3 统计面/ms 切换页等。
 - 10-27 验收收口+性别卡入账(hzy):用户亲验两件销账(tm 五修复复验+home-D5 续测卡);性别卡闭环 6beff1c1。
 - 10-27 MR!9 审查+吸收(lzx):三门代验绿后 12 笔 rebase 重放吸收(c78cd9e5,零 merge commit);wire-stamp 修复笔 e62ce8c6。
 - 10-27 全量审查+roadmap 纠正役(lzx,四片):R1 机械面修 8 处/R2 Go 面(13 跨模块边全 port 注入)/R3-R4 见 git。
@@ -110,7 +110,7 @@
 - M2-3 激活码全面 ✅ 11-01 45c276d4:批次模型+码表页+停用复启(6155)+导出 CSV+trail 落码行 TakeUse;e2e 捉单行 ratchet 丢去向洞;回退重审(授权法)修 12。
 - M2-4 首刀两 Tab ✅ 11-01 197fdbc6:assessments(场次分组派生+解锁三事实并陈)+membership Tab;契约增量 ListActivationCodes+user_id;双轴审查修 7。
 - E9 增量全收 ✅ 11-01 首刀 067a89ce+余刀 32f5cf0a:agreement 域 8 RPC+617x 四枚+两表+admin 两页;compliance_config 单例表+4 RPC+页;versions.ts 真源化+登录 consent 上行三腿;三轮双轴审查修 12+9。
-- R 线五片+PC/PM 批 ✅ 11-01/02(hzy):R1 5c2f272a/R2 86e834ba/R3 a44045a8/R4 全收(D-BD)/R5 复扫全绿;PC 桌面居中 82bb2ad9;PM 票批(双 N/4 ed4f4f21+品牌词 ab7ec52f)。
+- R 线五片+PC/PM 批 ✅ 11-01/02(hzy):R1 5c2f272a/R2 86e834ba/R3 a44045a8/R4 全收(D-BD)/R5 复扫全绿;PC 桌面居中 82bb2ad9;PM 票批(双 N/4 ed4f0f21〔11-08 修:原笔误 ed4f4f21〕+品牌词 ab7ec52f)。
 - 待校准成绩小片+消费片 ✅ 11-01/02:ecbe8ab6(SessionAttemptDetail 明细行组,pending 行全真)+ca729f5f(回读原始分面+逐次收据,hzy)。
 - 机械债两件 ✅ 11-02 84fe10ee(paraglide 13 键改名+orderadmin §3 重排);agreement lint 三处 d502d60b。
 - MIG1 五阶段 ✅ 11-02(三刀)+审计毕:首刀 f9d1d3dc(guard+identity,仓库根独立 module 不入 nx)+entitlement 3bdec4ad(两代解锁翻译)+behavior 54654a62(偏好折叠+事实流保真,grade=band 金向量);recompute 审计=注册重算四目标全消解(读时重算,迁移器零写入);reconcile=43 断言全绿+负探针三破坏七路齐咬;snapshot/recompute 机械片冻结待 P26/P26.1(ljr 硬限 11-24)。

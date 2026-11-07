@@ -89,7 +89,7 @@
 |---|---|
 | `unlocked_cognitive=1` | `scope_kind=report_type, scope_ref=cognitive, source=legacy_flag`,永久;**仅服务存量 ToC 与 ToB,新 ToC 用户不再发放**;报告已配置为 `open` 时,旗标仅作历史溯源 |
 | `unlocked_career=1` | `scope_kind=report_type, scope_ref=career, source=legacy_flag`,永久;报告已配置为 `open` 时,旗标仅作历史溯源 |
-| `unlocked_school=1` | 优先用「学校/租户默认」规则表达;仅在无租户上下文时落 `scope_kind=report_type, scope_ref=school` 的个人事件 |
+| `unlocked_school=1` | ~~优先用「学校/租户默认」规则表达;仅在无租户上下文时落个人事件~~〔11-08 审查注:已被 D-BA 组织层解散取代——迁移器实况=flagSchoolDropped 整族丢弃(entitlement.go:404-410),school 域 463 行处置随 D-MIG-1 裁〕 |
 | `activation_records`(已核销) | 按码的 `report_type` 落类型范围事件,`source=activation_code`,保留旧码 ID 供溯源 |
 | 未核销激活码 | 新兑换码批次,保留 `report_type` 语义 |
 | 旧 payment/membership | 旧库无实建表(A1 仅设计),无订单/会员迁移 |
@@ -396,7 +396,7 @@
 - 原型三页有、线上无的三个功能块,全部卡在契约层,客户端单方面补不了(补了也存不进):
   1. **性别卡**(男/女/待确定三段,必选挡下一步,注记「微信授权登录时会自动填入」)——`UpdateProfileRequest` 与 `Profile` 均无 sex 字段;
   2. **「只填年龄段」8 档次级卡**(只选档位也能继续,清空出生年月,付费时再补;未满13档同走监护人闸)——age_band 是服务端从出生年月推导的只读输出(proto 注释 "Clients render, never compute"),无 band-only 写入路径;
-  3. **微信昵称绿色胶囊**(「获取微信昵称」/已授权带出+超长含 emoji 自动截断提示)——需绑定态+snsapi_userinfo 授权;触发条件(微信环境+未绑定+手机号登录)在当前登录面不存在。**根因实证(2026-10-24)**:现微信登录 scope=snsapi_base(`app/services/system/internal/module/auth/provider_wechat.go:53`),该档位微信只回 openid,昵称/头像从未被捕获——即使前端做胶囊也无数据可带,「已授权带出」态同理;升 scope 属 system 基座授权配置。
+  3. **微信昵称绿色胶囊**(「获取微信昵称」/已授权带出+超长含 emoji 自动截断提示)——需绑定态+snsapi_userinfo 授权;触发条件(微信环境+未绑定+手机号登录)在当前登录面不存在。**根因实证(2026-10-24;⚠️11-08 审查注:本条根因已解除——10-30 G-201(99c5bb06)已升 `wechatScope="snsapi_userinfo"`(provider_wechat.go:27),昵称预填+头像落 profile.avatar_url 全链在案,胶囊面的数据前提已备,原文留档)**:时点快照 scope=snsapi_base,该档位微信只回 openid,昵称/头像从未被捕获——即使前端做胶囊也无数据可带,「已授权带出」态同理;升 scope 属 system 基座授权配置。
 - 游戏种子差异(数据层,非契约):线上目录 9 款 = CS:GO/Valorant/PUBG/Apex Legends/守望先锋/Fortnite(FPS)+英雄联盟/Dota 2/王者荣耀(MOBA);原型 = CS2/无畏契约/守望先锋/APEX/和平精英(FPS)+王者荣耀/英雄联盟/DOTA2/决战平安京(MOBA)——名称与类目构成都不同。
 - 句「命中偏好的能力池内权重 ×1.5」:原型有,engine.go 无该权重(2026-10-23 grep 已核),线上未采用——照写即承诺不存在的行为。
 - 昵称长度已按冻结契约 2-12 code points(proto 注释明示 carried from legacy),原型 24 加权为旧法,非缺口。
@@ -454,7 +454,7 @@ API 定→hzy 一次补 ①④⑤⑥ 四卡(档位空值按 P16 已裁灰章形�
 **推荐**:A1+B1(站内信留痕合规+主号直觉一致)。
 **旧仓实锤(2026-11-02 复核)**:未读语义旧系统就是 A1——`user_message.is_read` 行级服务端态+`GET /messages/unread-count`(按类型计数)+`POST /messages/{id}/read`+`POST /messages/read-all`(esport-server UserController);严格还原律下**未读半面=证据裁决 A1,待用户确认即闭**,票缩余面=G-203 掩码主号(B1 默认)。
 
-### P22 溯源数据面【**默认已定 A(2026-11-02 D-BC):IP 省级+UA 派生设备类型,不留原文**;ljr 否决窗至 11-14(旧行为=市级+UA 原文,从严系刻意收紧);M2-4 trace 按 A 开工】
+### P22 溯源数据面【**默认已定 A(2026-11-02 D-BC):IP 省级+UA 派生设备类型,不留原文**;ljr 否决窗至 11-14(旧行为=市级+UA 原文,从严系刻意收紧);M2-4 trace 已裁暂缓后置(11-03 用户裁,否决窗 11-14 后复评——plan.md 未完片表,11-08 审查同步)】
 **背景**:旧版登录记 IP/省市/UA/设备九件套(login_record+ip2region+DeviceParser+回填 Runner);user-detail trace Tab 与用户列表「注册溯源/最近登录」列消费它;新栈无此采集(隐私最小化);溯源 PRD(user:*:view 分区权限点)在档。
 **候选**:A 采最小集(IP 省级+UA 派生设备类型,不留原文);B 全量还原九件套(含城市级+回填);C 不采,trace Tab 只显时间线(登录方式/时间)。
 **推荐**:A——溯源价值在异常登录识别不在精确定位;隐私政策已承诺 IP 仅省级。
