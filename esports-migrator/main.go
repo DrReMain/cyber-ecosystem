@@ -31,11 +31,12 @@ import (
 )
 
 type environment struct {
-	src    *sql.DB
-	sys    *sql.DB
-	esp    *sql.DB
-	dryRun bool
-	sample int
+	src                *sql.DB
+	sys                *sql.DB
+	esp                *sql.DB
+	dryRun             bool
+	sample             int
+	allowSchoolResidue bool
 }
 
 // ensureTargets opens the write targets on first use: read-only phases
@@ -77,9 +78,10 @@ func main() {
 	phaseFlag := flag.String("phase", "all", "comma-separated phases to run (guard,identity,... or all)")
 	dryRun := flag.Bool("dry-run", false, "read the source and print the plan census without writing anything")
 	sample := flag.Int("sample", 200, "per-field sampling size for the reconcile phase")
+	allowSchool := flag.Bool("allow-school-residue", false, "D-MIG-1 ruling (a): proceed past the org-layer guard, logging the residue counts as run evidence — school data is ruled not-migrated and the sealed source dump retains every row")
 	flag.Parse()
 
-	env := &environment{dryRun: *dryRun, sample: *sample}
+	env := &environment{dryRun: *dryRun, sample: *sample, allowSchoolResidue: *allowSchool}
 
 	srcDSN, err := requiredEnv("APP_MIG_SOURCE_DSN")
 	if err != nil {

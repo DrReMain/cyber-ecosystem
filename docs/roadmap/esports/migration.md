@@ -44,27 +44,27 @@
 - **随片两修+执行面**:srcUser.Nickname→NullString;test_record 读取改 PK 序+Go 侧四键排序(MySQL 1038 宽行 filesort 爆 buffer——cutover 宿主 buffer 不可假设)。migrator build+race test+lint 绿。直执 go 已禁(11-06 用户指示)→临时 nx target `esports-migrator:run/check`(project.json+README 带 TODO 拆除清单;DSN=~/.xgwl-secrets/esports-mig/source.env 引号形)。
 - **回滚腿+造数件毕并彩排(11-06,清单 2/7 两项)**:`esports-migrator/rehearsal/` 四件=snapshot/restore 脚本对(dump 出仓至 lab mig-snapshots/,restore 后全表精确 counts 对 sidecar,不一致即.abort)+synthetic/revert 造数对。彩排链全绿:快照(37 表 sidecar)→造数(migsyn 4 用户+2 登录行;behavior census login_record 217→219 增量精确对上)→restore(exit 0,37 表 counts 全对,造数抹净回基线)→双应用幂等(仍 4 行)+revert 净。造数口径:鸿蒙 NEXT/IPv6/CGNAT/组合四形态为真缺面(生产存量 OpenHarmony 6.1 仅 2 行、IPv6=0);软删 25 行/无注册 IP 117 行**真实存量已足不造**;造数行 id 段 990000xxx/994000xxx(低于雪花段,预查零撞),demo 密码 MD5(migsyn-demo)按 11-06 定谳密码面关闭——走查=手机验证码登录+forcedReset 态亲证,非密码登录(verify-then-rehash 路径两侧皆不存在,11-08 审查修)。identity census 打印被 D-MIG-2 冲突组拦在 buildPlans(11-06 实测)→造数对账探针=SQL 直查,预演日同理。
 
-### 预演前决策(拦 11-14/15 绿门)
+### 预演前决策(拦 11-14/15 绿门)——**两项均已裁并实现(11-08)**
 
-1. **D-MIG-1 school 域处置**(guard 停机即此):证据如上。选项 (a) 裁「测试/残留不迁」+guard 显式旁路旗标(默认仍停、运行日志留证、cutover 夜同旗标)——ljr 需对「7 真实用户 22 行」复核签字;(b) 22 行保真迁(需新 schema 落点,预演前代价大);(c) 封存旧栈只读承接(受 D-P 两周封存窗约束,非永久)。推荐 (a)。
-2. **D-MIG-2 账号冲突消解**(identity 停机即此):6 组 23 行=131****8167×7、Aqiu openid×2、test×2、test2×2、todeleteuser×5(全软删)、newtestuser×5(全存活同手机号 13900000000);混合组活行全为雪flake 行。推荐机械规则(零产品判断/零丢行/可审计):组内存活行得原账号,多存活取 updated_at 最新;其余账号改 `<account>#<legacy_id>`(软删身份登录面已死,migration_map 全量留痕,census 打印改写计数)。替代=测试族整批排除(丢数据,须产品裁)。
+1. **D-MIG-1 school 域处置=裁 (a)「不迁+显式旁路」**(11-08,lzx 裁,用户令「按推荐处理」背书):guard 旁路旗标 `--allow-school-residue` 已落码(默认仍停机报错;旁路行入运行日志=留证;cutover 夜同旗标)。理由:组织层已随 D-BA 解散=新版本无承载面与读面,7 真实用户 22 行属已删功能的辅助报告,其核心资产(画像/成绩/解锁)迁移不受影响;数据不灭——11-05 生产转储+lab mig-snapshots 快照永久可回取,上线后若有人索取从封存转储手工承接。ljr 对「7 真实用户 22 行」的复核移入 cutover-watch 上线清单(支持性确认,非预演阻塞)。弃 (b)(需新 schema 落点+读面,预演前代价不成比例)/(c)(受 D-P 两周封存窗约束,非永久解)。〔11-08 真副本 dry-run 活证:guard 打印 4/463 后旁路行落录〕
+2. **D-MIG-2 账号冲突消解=裁机械规则(已实现)**:6 组 23 行=131****8167×7、Aqiu openid×2、test×2、test2×2、todeleteuser×5(全软删)、newtestuser×5(全存活同手机号 13900000000);混合组活行全为雪flake 行。规则=组内恰好一行保原账号(活行优先→同活取 updated_at 最新→再平取小 legacy id;全死组取最新),其余改 `<account>#<legacy_id>`——改名柄非登录键(member 登录走 phone/wechat 凭据),软删身份登录面已死,migration_map 全量留痕;胜者殿前定序(credential 插入 first-wins,胜者先落=凭据归账号胜者);census 打印改写计数。identity_test 七例钉规则。弃=测试族整批排除(丢数据)。〔11-08 真副本 dry-run 活证:285 行 census 全打(11-06 被 buildPlans 拦死的面首次放行)+**17 行改名(=23−6 胜者)**+locked-out 6 与基线一致〕
 
 ## 预演执行稿(2026-11-06 预制;回滚腿与造数件已彩排,见备料节)
 
-前置门:D-MIG-1/2 裁决形(拦 S3);snapshot/recompute 是否入演随 P26/P26.1(理想 11-12)。演练日程 P6 已代裁定 11-15;副本 11-06 已就绪,裁回皆可提前(报备制)。
+前置门:D-MIG-1/2 **已裁已实现(11-08,见上),S3 阻塞解除**;snapshot/recompute 是否入演随 P26/P26.1(理想 11-12)。演练日程 P6 已代裁定 11-15;副本 11-06 已就绪,裁回皆可提前(报备制)。
 
 | 步 | 动作 | 判据 |
 |---|---|---|
 | S0 | `rehearsal/snapshot-source.sh` 打预演态快照 | 37 表 counts sidecar 落(lab mig-snapshots/) |
 | S1 | `rehearsal/synthetic.sql` 造数(四形态 4 用户+2 登录行) | migsyn 4 行 SQL 证;login_record 217→219 |
 | S2 | 目标库重建:drop/recreate → atlas migrate → bootstrap seed | 种子重放绿(2 垃圾场景 DETAIL_MISMATCH 拒后平移=设计内预期;副能力终态 4 行勿回修 3) |
-| S3 | `--phase all` 五阶段(guard 按 D-MIG-1 裁决形:(a)=显式旁路旗标+运行日志留证) | 各阶段 census+写入计数入录 |
+| S3 | `--phase all --allow-school-residue` 五阶段(D-MIG-1(a) 旁路=已实现,旁路行入运行日志) | 各阶段 census+写入计数入录(identity census 11-08 已首次放行:dry-run 285 行+17 改名) |
 | S4 | `--phase reconcile --sample N` | 全绿零 fail |
 | S5 | 新栈走查:造数账号手机验证码登录(MD5 密码面按 11-06 定谳关闭=forcedReset 态亲证;verify-then-rehash 路径不存在,11-08 审查修)/鸿蒙 UA 访问/IPv6·CGNAT 审计形态 | 走查录;nginx 仿真=本机反代近似(真形状 W8 前定,条目挂账) |
 | S6 | **绿门**=对账全绿+走查过+migration_map 落盘(含软删行) | 任一不过 → S7 |
 | S7 | 回滚腿:目标侧=重走 S2-S3(可重建);源侧只读无需回滚,误写则 `restore-source.sh <快照>` | 11-06 彩排证:restore 后全表 counts 对 sidecar |
 
-对账预期锚(基线 11-06 census,造数增量随 S1):user 285(260 活/25 删)+4 活;phone 凭据 distinct+4;login_record 冷存 217+2;entitlement/behavior 面不变(造数不触解锁/偏好/成绩);school 停项 4/463 按 D-MIG-1 裁决形消解;账号冲突 6 组 23 行按 D-MIG-2 规则改写计数入 census 打印。
+对账预期锚(基线 11-06 census,造数增量随 S1):user 285(260 活/25 删)+4 活;phone 凭据 distinct+4;login_record 冷存 217+2;entitlement/behavior 面不变(造数不触解锁/偏好/成绩);school 停项 4/463 按 D-MIG-1(a) 旁路消解(不入迁);账号冲突 6 组 23 行按 D-MIG-2 规则改写 **17 行**(=23−6 胜者,11-08 dry-run 实测数)入 census 打印。
 
 ## cutover 验收清单(血泪教训条款)
 

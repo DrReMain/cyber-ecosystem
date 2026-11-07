@@ -25,7 +25,15 @@ func runGuard(ctx context.Context, env *environment) error {
 	}
 	fmt.Printf("school rows: %d, school_report rows: %d\n", school, schoolReport)
 	if school > 0 || schoolReport > 0 {
-		return fmt.Errorf("organization layer not empty (school=%d, school_report=%d) — the no-school-data premise is void, halting for a decision", school, schoolReport)
+		if !env.allowSchoolResidue {
+			return fmt.Errorf("organization layer not empty (school=%d, school_report=%d) — the no-school-data premise is void, halting for a decision (ruling D-MIG-1(a) proceeds with --allow-school-residue)", school, schoolReport)
+		}
+		// Ruling D-MIG-1(a): the residue is test data plus 22 rows of 7
+		// real users, all belonging to a product layer the new version
+		// dissolved — nothing migrates, and the sealed source dump keeps
+		// every row retrievable. The bypass is explicit and the counts
+		// stay in the run log as evidence.
+		fmt.Printf("D-MIG-1(a) bypass: %d school + %d school_report rows ruled not-migrated (org layer dissolved); the sealed source dump retains every row\n", school, schoolReport)
 	}
 	return nil
 }
@@ -49,6 +57,7 @@ type userPlan struct {
 	wechatRegionDropped bool
 	schoolBound         bool
 	lockedOut           bool // live identity with a closed password plane and no provider credential
+	accountRenamed      bool // D-MIG-2: lost its collision group, keeps the `<account>#<legacy_id>` handle
 }
 
 func (p *userPlan) srcID() string { return strconv.FormatInt(p.src.ID, 10) }
@@ -74,12 +83,13 @@ type census struct {
 	lockedOut           int
 	algorithmCounts     map[string]int
 	lockedOutExamples   []string
+	renamedAccounts     int
+	renamedExamples     []string
 }
 
 func buildPlans(users []*srcUser) ([]*userPlan, *census, error) {
 	c := &census{algorithmCounts: map[string]int{}}
 	plans := make([]*userPlan, 0, len(users))
-	accounts := map[string]string{} // account -> legacy id, for collision detection
 	now := time.Now()
 
 	for _, u := range users {
@@ -162,14 +172,77 @@ func buildPlans(users []*srcUser) ([]*userPlan, *census, error) {
 			}
 		}
 
-		if prev, dup := accounts[p.account]; dup {
-			return nil, nil, fmt.Errorf("account collision: legacy ids %s and %s both map to account %q — needs a manual decision before any write", prev, p.srcID(), p.account)
-		}
-		accounts[p.account] = p.srcID()
-
 		plans = append(plans, p)
 	}
-	return plans, c, nil
+	resolveAccountCollisions(plans, c)
+	return orderRenamedLast(plans), c, nil
+}
+
+// resolveAccountCollisions applies ruling D-MIG-2's mechanical rule to
+// every group of legacy rows deriving the same account handle: exactly one
+// row keeps the original account, every other row is renamed
+// `<account>#<legacy_id>`. Zero product judgement, zero dropped rows:
+// a renamed handle is never a login key (member logins ride the
+// phone/wechat credentials), soft-deleted identities have no login
+// surface at all, and migration_map keeps every legacy id's trail.
+func resolveAccountCollisions(plans []*userPlan, c *census) {
+	byAccount := make(map[string][]*userPlan, len(plans))
+	for _, p := range plans {
+		byAccount[p.account] = append(byAccount[p.account], p)
+	}
+	for _, group := range byAccount {
+		if len(group) < 2 {
+			continue
+		}
+		winner := group[0]
+		for _, p := range group[1:] {
+			if keepsOriginalAccount(p, winner) {
+				winner = p
+			}
+		}
+		for _, p := range group {
+			if p == winner {
+				continue
+			}
+			p.account = fmt.Sprintf("%s#%s", p.account, p.srcID())
+			p.accountRenamed = true
+			c.renamedAccounts++
+			if len(c.renamedExamples) < 5 {
+				c.renamedExamples = append(c.renamedExamples, p.srcID())
+			}
+		}
+	}
+}
+
+// keepsOriginalAccount is true when a outranks b as the holder of a
+// collision group's original account: a live identity beats a deleted one
+// (a dead row's handle is pure bookkeeping), then the most recently
+// updated row wins, then the smaller legacy id keeps the order total.
+func keepsOriginalAccount(a, b *userPlan) bool {
+	if a.live() != b.live() {
+		return a.live()
+	}
+	if !a.src.UpdatedAt.Equal(b.src.UpdatedAt) {
+		return a.src.UpdatedAt.After(b.src.UpdatedAt)
+	}
+	return a.src.ID < b.src.ID
+}
+
+// orderRenamedLast moves every renamed (losing) plan behind all others.
+// The credential inserts are first-wins on conflict, so a group winner's
+// phone/wechat credential must land before its renamed mates': the
+// original account's owner is also the credential's owner.
+func orderRenamedLast(plans []*userPlan) []*userPlan {
+	ordered := make([]*userPlan, 0, len(plans))
+	renamed := make([]*userPlan, 0)
+	for _, p := range plans {
+		if p.accountRenamed {
+			renamed = append(renamed, p)
+		} else {
+			ordered = append(ordered, p)
+		}
+	}
+	return append(ordered, renamed...)
 }
 
 func nullStr(s sql.NullString) string {
@@ -439,6 +512,10 @@ func printCensus(c *census, planned int) {
 	if c.lockedOut > 0 {
 		fmt.Printf("  ⚠ locked out (password closed, no phone/openid): %d — e.g. %s; these owners cannot sign in and need the reset/announce path\n",
 			c.lockedOut, strings.Join(c.lockedOutExamples, ", "))
+	}
+	if c.renamedAccounts > 0 {
+		fmt.Printf("  account collisions resolved (D-MIG-2): %d rows renamed to `<account>#<legacy_id>` — e.g. legacy ids %s\n",
+			c.renamedAccounts, strings.Join(c.renamedExamples, ", "))
 	}
 }
 

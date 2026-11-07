@@ -9,7 +9,7 @@
 
 - 已收池:M2 核心组+E9(10-31..11-01)/Q 线 Q1-Q6(11-03..04)/PAY3 四片(11-04..05)/MSG-1 契约+ctr 腿+admin 三页+V10 闭环(11-04..05)/PAY2 Native 真通道+0.01 真钱+全额退款腿(11-05..06)/MIG1 五阶段+备料+回滚彩排(11-06)/走查 R1 轮(X1-1、X1-2、X2、X3、A 套 15 例、C1 六例)/G 伤单清偿 A-F 批+三路对抗审(11-06..07)。叙事全文=progress-archive+git proven-by。
 - 需求分母(demand-ledger,2026-11-07 机核):ctr 44=✅29+◐5+❌5+⏸1+📄4;admin 41=已建 16+底座 6+非本期 4+余组 13+M3 2;新实现=21 service/85 RPC/23 ent 表/ctr 50 路由文件(1 root+9 布局壳+40 叶页)/admin esports 17 面。
-- 等待面:**P26/P26.1(ljr,理想 11-12/硬限 11-24)=MIG1 冻结件门**;P22 否决窗 11-14;D-MIG-1/2=预演前决策;微信侧活证随 PAY2 联调;U2/U3=UI 校准余段。
+- 等待面:**P26/P26.1(ljr,理想 11-12/硬限 11-24)=MIG1 冻结件门**;P22 否决窗 11-14;~~D-MIG-1/2=预演前决策~~→**已裁已实现 11-08**(lzx 裁+用户背书,school=不迁+旁路旗标/撞号=机械规则;详=migration.md 预演前决策节);微信侧活证随 PAY2 联调;U2/U3=UI 校准余段。
 - 覆盖核验(2026-11-07,八域三方对照=verify/coverage-map.md):56 例对已建面/RPC 的映射成立;缺口集中=**MOBA 侧零执行(8/13 引擎无任何用例跑过)**、admin 三个写 RPC 全链零执行、C2/C3/C4/C6 例族未走;新发现偏离/缺陷已分流入本档缺陷工单与 prd 待裁区。
 - hzy 车道:W6 备料+执行稿修订+**九环本地预演 ✅ 11-05**(T1 门禁四套绿+13 截图+带出 ⑪⑫——⑪=admin 授予列 grantedAt 窗头显示错入缺陷工单 B-11;⑫=兑码面未建已在案[遗留清单行,P4 裁时定形随建],梯④ 断腿角度=cutover-watch 环8;详=cutover-watch §六);余=随实况随修+11-24 复核终版+W5 值守演练配合(预演已提前)。
 
@@ -17,7 +17,7 @@
 
 | 窗 | 日期 | 服务/管理线(lzx) | 精修带(hzy,分配制) | 产品线(ljr) |
 |---|---|---|---|---|
-| W4 | 11.10-16 | MSG-1 窄化裁决窗(PM-13..20 接洽单=prd 待裁区);PAY2 联调启动;**MIG1 预演 11-15**(先过 D-MIG-1/2,绿门含回滚腿) | 执行稿修订+九环预演 ✅ 11-05 提前毕;余=随实况随修 | P22 否决窗 11-14;P26 理想 11-12 |
+| W4 | 11.10-16 | MSG-1 窄化裁决窗(PM-13..20 接洽单=prd 待裁区);PAY2 联调启动;**MIG1 预演 11-15**(D-MIG-1/2 已裁已实现 11-08,绿门含回滚腿) | 执行稿修订+九环预演 ✅ 11-05 提前毕;余=随实况随修 | P22 否决窗 11-14;P26 理想 11-12 |
 | W5 | 11.17-23 | 真通道联调收口(JSAPI 真实 appid+绑域+微信侧活证+微信外降级面);MIG1 snapshot+recompute(P26/P26.1 裁后)含曲线入码 sizing ⑧ | 值守演练配合(九环预演已提前) | P23/P20 推进 |
 | W6 | 11.24-30 | **CP3 三腿内部核验 11-28**(M1 e2e/PAY2 0.01 真钱/PAY3 全链+MSG-1 可走);cutover 准备(真实 appid 切换+上线清单);U2/U3 若未毕随窗收 | 上线值守(执行稿=cutover-watch) | P23/P20 11-28;appid+绑域 11-26 |
 | cutover | 12.01-03/12.08 | 停机切换+L4 验证+上线;旧栈停机封存 2 周(D-P);迁移执行=lzx 专职(D-BB) | 值守 | 上线内容核对 |
@@ -29,7 +29,7 @@
 |---|---|---|---|
 | MSG-1 余面(lzx,D-BB 全片) | 窄化裁决落地(PM-13..20=prd 待裁区;全维持=零改动,裁翻契约面小改随改);banner ctr 消费面未建(随 MSG-2/精修带评估);定时发布=已裁非特性 | W6 ljr 裁决 | S |
 | PAY2 通道联调(lzx) | 已毕=行政件全清+Native 腿全生命周期+0.01 真钱闭环+全额退款腿+NO_STATEMENT_EXIST 修(11-05..06)。余=JSAPI 腿真实 appid+绑定域(上线清单);微信侧活证(G-402/403/404 尾);微信外降级「引导微信内打开」(D-BF);XFF 信任拨盘台账收口;query 无触发器(convergeStaleAfter=10m)与 boot 放弃日 ERROR 两裁点随刀 | W4 起 | M |
-| MIG1 冻结件+预演(lzx 专职,D-BB) | 已毕=五阶段+生产副本直载+谱系三源互证+census+回滚腿彩排+密码面实数定谳(11-06)。余=snapshot 承载表(P26)+recompute 口径标与重放窗口(P26.1,含曲线入码 sizing ⑧);**预演 11-15**(D-BE 绿门含回滚腿);预演前过 D-MIG-1(school 域处置)/D-MIG-2(账号冲突消解);cutover 迁移执行同专职 | P26/P26.1+D-MIG-1/2 | M |
+| MIG1 冻结件+预演(lzx 专职,D-BB) | 已毕=五阶段+生产副本直载+谱系三源互证+census+回滚腿彩排+密码面实数定谳(11-06)+**D-MIG-1/2 裁决落码**(11-08:school 旁路旗标 `--allow-school-residue`+撞号机械规则 17 改名,identity census 真副本首次放行,详=migration.md)。余=snapshot 承载表(P26)+recompute 口径标与重放窗口(P26.1,含曲线入码 sizing ⑧);**预演 11-15**(D-BE 绿门含回滚腿);cutover 迁移执行同专职 | P26/P26.1 | M |
 | U2 ctr 原型对齐(harness 重激活) | **片A B-6 done 页 ✅ 11-07 三轮毕(三差→复检五差→渲染并排轮;详=archive+git proven-by)**;**片B 保真 harness 重激活 ✅ 11-07(HARNESS-SOP 照抄三件套+fixtures target;锚再生 4 枚,本机语料根经 `ESPORTS_PROTO_DIR` 注入;`ctr:e2e` login 常红复活=新鲜 4 组全在案/等价形:ICP 备=D-AO①、非微信预告=G-005、⚡=Zap SVG vs 字符、tab 行形=innerText 分行差,后二组视觉轴待铺开核;10-28 红 9→今 4=G 伤单实收 5)**;渲染可达已毕(U1);余=铺开(home/profile/report 逐页逐预设 fidelity spec,序=ctr-prototype-matrix ✅/◐ 19 页)+N-1(prd 待裁) | 走查轮前 | M |
 | M2-4 trace Tab | 暂缓后置(11-03 用户裁;P22 否决窗 11-14 后复评) | P22 | S |
 | Q 线尾(役毕残件) | ⑧曲线入码 sizing(随 P26.1);⑨ctr 部署接线(compose.app/traefik dynamic 零引用而 image target 已备;形态随 W6 上线清单定形,lzx);⑩skill_trajectory 复板重验归属待裁(开小票=服务端消费 random_seed 对位复板 vs 明示不验收现状——proto 已带 seed 而 scorer 零消费;test.proto 两注释顺下次 proto 片:E9 将来时过时+seed「reproduces server-side」改能力语义);职业库逐区淘汰率/训练强度=占位常数等 ljr 产品数据(careerAreas 注在案);旧 MSG 数据迁移无载体亦无票(migration.md:28 声明「随 MSG-1」而 migrator 七阶段无 MSG 腿,behavior 面=偏好/记录/溯源/邀请)=待裁随 MSG-2 建腿 or 裁不迁旧消息史(11-08 审查立);consent 渠道列契约微欠(一句裁,可并 P23);E4 三配置模块=P4;隐私真文「7 天保留」句 vs 反推续用任意龄=ljr/法务车道 | P26.1/P4/P23/W6 | S |
