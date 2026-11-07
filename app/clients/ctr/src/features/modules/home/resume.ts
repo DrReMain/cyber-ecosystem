@@ -1,4 +1,5 @@
 import { type Timestamp, timestampMs } from "@bufbuild/protobuf/wkt";
+import { localDateTimeOf } from "#/features/app/date";
 
 /* The wire stamp a resume card consumes: the generated type claims the WKT
  * message while the JSON transport flattens it to its RFC 3339 string, so
@@ -24,8 +25,5 @@ export function resumeDescVars(createdAt: WireStamp, done: number, total: number
     created = Date.now();
   }
   const days = Math.max(1, Math.floor((Date.now() - created) / 86_400_000) + 1);
-  const d = new Date(created);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const stamp = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  return { done, total, date: stamp, days };
+  return { done, total, date: localDateTimeOf(created), days };
 }

@@ -23,9 +23,13 @@ export function IdentityCard({
   stats,
 }: Readonly<{ profile: ProfilePB | undefined; stats: IdentityStats }>) {
   const games = profile?.games ?? [];
+  // The prototype's meta line is four segments: band, preference count,
+  // session count, city. The session count rides the digest the strip
+  // already reads; the city stays absent — no location source exists.
   const meta = [
     bandLabel(profile?.ageBand),
     games.length > 0 ? m.profile_meta_games({ n: games.length }) : null,
+    stats.total !== null ? m.profile_meta_sessions({ n: stats.total }) : null,
   ]
     .filter((part): part is string => part !== null && part !== undefined)
     .join(" · ");

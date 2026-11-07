@@ -1,6 +1,7 @@
 import { createQueryOptions } from "@connectrpc/connect-query";
 import { getAbilityDigest } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import type { QueryClient } from "@tanstack/react-query";
+import { localDateTimeOf } from "#/features/app/date";
 import { connectTransport } from "#/services/connect";
 import type { WireAccessVerdict } from "./cognitive";
 
@@ -141,4 +142,12 @@ export function wireDateOf(stamp: string | undefined): string {
   const d = new Date(ms);
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// The minute-precision sibling: faces that name the start moment itself
+// (the profile history line, the resume card's stamp) keep the hour — a
+// date-only slice there would blur two sessions a day apart into one.
+export function wireDateTimeOf(stamp: string | undefined): string {
+  const ms = typeof stamp === "string" ? Date.parse(stamp) : Number.NaN;
+  return Number.isNaN(ms) ? "" : localDateTimeOf(ms);
 }

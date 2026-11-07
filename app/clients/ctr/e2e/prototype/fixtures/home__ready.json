@@ -1,7 +1,7 @@
 {
   "page": "home",
   "preset": "ready",
-  "source": "file:///Users/huangzhiyin/xm/esports/manage/design-systems/ctr/prototype/home.html?preset=ready",
+  "source": "home.html?preset=ready",
   "title": "ctr · 首页",
   "lines": [
     "欢迎回来",

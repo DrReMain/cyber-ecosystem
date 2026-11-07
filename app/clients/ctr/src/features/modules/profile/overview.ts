@@ -2,7 +2,7 @@ import { abilityWord, GENRE_ORDER, genreLabel } from "#/features/modules/match/v
 import {
   type WireDigest,
   type WireDigestSession,
-  wireDateOf,
+  wireDateTimeOf,
 } from "#/features/modules/report/digest";
 import { m } from "#/paraglide/messages";
 
@@ -59,14 +59,18 @@ export function overviewRowsOf(digest: WireDigest): AbilityOverviewRow[] {
 }
 
 // The untested row's way in: the genre order that covers the ability —
-// a single covering genre names itself (the prototype's "test MOBA to
-// unlock" shape generalized), a both-genres ability stays generic (the
-// member simply has not tested yet).
+// a single covering genre names itself with the uncovered one beside it
+// (the prototype's "FPS 场景不覆盖 · 测 MOBA 可解锁" sentence), a
+// both-genres ability stays generic (the member simply has not tested
+// yet).
 function untestedHintOf(ability: string): string {
   const covers = (["fps", "moba"] as const).filter((g) => GENRE_ORDER[g].includes(ability));
   const only = covers.length === 1 ? covers[0] : undefined;
   return only !== undefined
-    ? m.profile_ability_hint_one({ genre: genreLabel(only) })
+    ? m.profile_ability_hint_one({
+        genre: genreLabel(only),
+        other: genreLabel(only === "fps" ? "moba" : "fps"),
+      })
     : m.profile_ability_hint_any();
 }
 
@@ -85,16 +89,17 @@ export function historySlotsOf(digest: WireDigest): HistorySlot[] {
 }
 
 // The row's progress words: never played states it; a finished session
-// carries its local date (an absent stamp keeps only the words); an
-// unfinished one its honest progress counts.
+// carries its local stamp to the minute (the prototype's history line
+// names the start moment, not just its date — the resume card's own
+// law); an unfinished one its honest progress counts.
 export function historyDescOf(slot: HistorySlot): string {
   const line = slot.line;
   if (line === undefined) {
     return m.profile_hist_none();
   }
   if (line.finished) {
-    const date = wireDateOf(line.createdAt);
-    return date !== "" ? `${date} · ${m.profile_hist_done()}` : m.profile_hist_done();
+    const stamp = wireDateTimeOf(line.createdAt);
+    return stamp !== "" ? `${stamp} · ${m.profile_hist_done()}` : m.profile_hist_done();
   }
   return m.profile_hist_prog({ done: line.doneCount, total: line.stepCount });
 }

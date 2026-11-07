@@ -12,7 +12,27 @@ const PROTO =
   process.env.ESPORTS_PROTO_DIR ??
   "/Users/shijiao/Desktop/lab/esports/manage/design-systems/ctr/prototype";
 const REVIEW_CHROME = ".vchip, .ckbtn, #__ck, .envsw";
-const PAGES = ["login", "home?preset=ready", "home?preset=resume", "home?preset=tested-fps"];
+// The wizard pages freeze at profile-missing — the only logged preset whose
+// partial profile is exactly the wizard's own subject (guard:'login' bounces
+// a blank storage to login.html, and READY-complete members are not this
+// face). The overview rides tested-fps (the richest member-data face).
+// password's three faces share one shell: the m= param picks the copy, and
+// an explicit #key suffix keeps three fixtures apart where the preset alone
+// would collide; the forget face's rebuild lives at /login/forgot (G2's
+// pre-login-context split).
+const PAGES = [
+  "login",
+  "home?preset=ready",
+  "home?preset=resume",
+  "home?preset=tested-fps",
+  "profile-nickname?preset=profile-missing",
+  "profile-age?preset=profile-missing",
+  "profile-setup?preset=profile-missing",
+  "profile-overview?preset=tested-fps",
+  "password?preset=ready&m=set#set",
+  "password?preset=ready&m=change#change",
+  "password?preset=ready&m=forget#forget",
+];
 
 test.skip(!process.env.GEN_FIXTURES, "fixture regeneration is opt-in (GEN_FIXTURES=1)");
 
@@ -20,7 +40,10 @@ test("regenerate prototype text fixtures", async ({ browser }) => {
   const outDir = fileURLToPath(new URL("./fixtures/", import.meta.url));
   mkdirSync(outDir, { recursive: true });
   for (const spec of PAGES) {
-    const [pageName, query = ""] = spec.split("?");
+    // "#key" names the fixture when the query alone cannot (password's
+    // three m= faces share one preset).
+    const [specNoKey = spec, key = ""] = spec.split("#");
+    const [pageName, query = ""] = specNoKey.split("?");
     const url = `file://${PROTO}/${pageName}.html${query ? `?${query}` : ""}`;
     const context = await browser.newContext(); // fresh storage per page
     const page = await context.newPage();
@@ -46,11 +69,21 @@ test("regenerate prototype text fixtures", async ({ browser }) => {
         .filter(Boolean),
     }));
     const preset = new URLSearchParams(query).get("preset");
-    const file = `${pageName}${preset ? `__${preset}` : ""}.json`;
+    const suffix = key !== "" ? key : (preset ?? "");
+    const file = `${pageName}${suffix ? `__${suffix}` : ""}.json`;
     writeFileSync(
       `${outDir}${file}`,
       `${JSON.stringify(
-        { page: pageName, preset, source: url, title, lines: normalizeLines(raw), placeholders },
+        // source stays the relative page+query, never the file:// path —
+        // the corpus is machine-independent (two dev machines generate it).
+        {
+          page: pageName,
+          preset,
+          source: `${pageName}.html${query ? `?${query}` : ""}`,
+          title,
+          lines: normalizeLines(raw),
+          placeholders,
+        },
         null,
         2,
       )}\n`,

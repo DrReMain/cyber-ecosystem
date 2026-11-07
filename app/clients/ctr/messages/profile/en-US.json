@@ -46,7 +46,7 @@
   "profile_ability_sub": "6 core abilities · {n} tested",
   "profile_ability_best": "{score} pts · best",
   "profile_ability_untested": "Untested",
-  "profile_ability_hint_one": "Take a {genre} assessment to unlock",
+  "profile_ability_hint_one": "Not covered in {other} · test {genre} to unlock",
   "profile_ability_hint_any": "Finish any assessment to unlock",
   "profile_center_title": "Report Center",
   "profile_center_all": "View all",
@@ -152,5 +152,6 @@
   "profile_member_unlocked": "{count} reports unlocked",
   "profile_member_kept": "kept forever",
   "profile_member_cta_renew": "Renew membership",
-  "profile_member_cta_open": "Get membership"
+  "profile_member_cta_open": "Get membership",
+  "profile_meta_sessions": "{n} tests taken"
 }

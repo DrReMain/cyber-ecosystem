@@ -22,12 +22,12 @@ export function AbilityOverviewCard({ rows }: Readonly<{ rows: readonly AbilityO
         row.best !== undefined ? (
           <div className="py-[7px]" key={row.ability}>
             <div className="mb-1.5 flex items-center gap-2">
+              {/* The prototype's identity block is a bare gradient chip —
+               * no text rides inside it (the row's name carries the word). */}
               <div
                 aria-hidden
-                className={`${row.gradient} shadow-inset-ring flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[9px] text-[10px] font-bold text-white`}
-              >
-                {row.abilityCn.slice(0, 2)}
-              </div>
+                className={`${row.gradient} shadow-inset-ring h-[26px] w-[26px] shrink-0 rounded-[9px]`}
+              />
               <span className="text-ink text-[12.5px] font-extrabold">{row.abilityCn}</span>
               <TierChip grade={row.grade} />
               <span className="text-ink-muted ml-auto text-[10.5px] tabular-nums">
@@ -46,10 +46,8 @@ export function AbilityOverviewCard({ rows }: Readonly<{ rows: readonly AbilityO
             <div className="mb-1 flex items-center gap-2">
               <div
                 aria-hidden
-                className={`${row.gradient} shadow-inset-ring flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[9px] text-[10px] font-bold text-white opacity-40`}
-              >
-                {row.abilityCn.slice(0, 2)}
-              </div>
+                className={`${row.gradient} shadow-inset-ring h-[26px] w-[26px] shrink-0 rounded-[9px] opacity-40`}
+              />
               <span className="text-[12.5px] font-extrabold text-[#6b7280]">{row.abilityCn}</span>
               <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-[9.5px] font-semibold text-[#6b7280]">
                 {m.profile_ability_untested()}

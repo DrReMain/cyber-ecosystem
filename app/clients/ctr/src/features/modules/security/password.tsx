@@ -4,8 +4,9 @@ import { System } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/error_re
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { pageTitle } from "#/config";
 import { systemReason } from "#/domains/error";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { mainlandMobile } from "#/features/modules/login/sms";
@@ -102,6 +103,15 @@ export function PasswordPage() {
   const [pending, setPending] = useState(false);
 
   const isSet = mode !== "change";
+
+  // The route head is static (set-mode word); the prototype retitles the
+  // document per face, so the change face claims its own title here — the
+  // next route's head takes the tag back on navigation.
+  useEffect(() => {
+    if (!isSet) {
+      document.title = pageTitle(m.security_pw_change_title());
+    }
+  }, [isSet]);
 
   async function onSubmit() {
     setError(null);
