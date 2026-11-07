@@ -250,6 +250,56 @@ func TestEntitleLiveE2E(t *testing.T) {
 		t.Fatalf("short code burned a use: %+v", row)
 	}
 
+	// The two-code race the family lock closes: the same member, grant
+	// lapsed again, redeems two different fresh codes of the family at
+	// once. The sequential shape (proven above) answers the second code
+	// idempotent and keeps its use in the member's hand; the lock makes
+	// the racing shape equal — exactly one use taken between the two
+	// codes, the grant ratcheted to the codes' expiry.
+	raceGen, err := codeUC.Generate(adminCtx, &entitle.GenerateIn{ReportType: shared.ReportSchool, Count: 2, ExpireDays: 30})
+	if err != nil || len(raceGen.Codes) != 2 {
+		t.Fatalf("race generate: %+v err=%v", raceGen, err)
+	}
+	if _, err := db.ExecContext(context.Background(),
+		`UPDATE entitlement SET expires_at = now() - interval '1 hour' WHERE user_id = $1 AND scope_kind = $2`,
+		userC, shared.ScopeReportType); err != nil {
+		t.Fatalf("lapse the grant again: %v", err)
+	}
+	var two sync.WaitGroup
+	twoErrs := make(chan error, 2)
+	for _, code := range raceGen.Codes {
+		two.Add(1)
+		go func(code string) {
+			defer two.Done()
+			if _, err := uc.Redeem(entSubject(userC), code); err != nil {
+				twoErrs <- err
+			} else {
+				twoErrs <- nil
+			}
+		}(code)
+	}
+	two.Wait()
+	close(twoErrs)
+	for err := range twoErrs {
+		if err != nil {
+			t.Fatalf("two-code race errored: %v", err)
+		}
+	}
+	used := 0
+	for _, code := range raceGen.Codes {
+		row, err := codeRP.ByCode(context.Background(), code)
+		if err != nil {
+			t.Fatalf("race code readback: %v", err)
+		}
+		used += row.UsedCount
+	}
+	if used != 1 {
+		t.Fatalf("two-code race burned %d uses, want 1 — the sequential shape's answer", used)
+	}
+	if g, gerr := entRP.ByScope(context.Background(), userC, shared.ScopeReportType, &familySchool); gerr != nil || g == nil || g.ExpiresAt == nil || !g.ExpiresAt.After(time.Now()) {
+		t.Fatalf("two-code race left the grant lapsed: g=%+v err=%v", g, gerr)
+	}
+
 	// The batch plane reads as one story: the list folds counts over the
 	// code rows, the code table carries each redeem's trail, a disable
 	// voids only the unredeemed remainder, and the export answers the
@@ -307,7 +357,11 @@ func TestEntitleLiveE2E(t *testing.T) {
 	// The true disable-vs-idempotent case: userC already holds short[0]'s
 	// grant and a disabled batch cannot void a landed use — the answer is
 	// the standing (longer) grant, not a fresh mint from short[0].
-	if out, err := uc.Redeem(entSubject(userC), short[0]); err != nil || out.ExpiresAt == nil || !out.ExpiresAt.Equal(codeRow4.ExpiresAt) {
+	standingC, err := entRP.ByScope(context.Background(), userC, shared.ScopeReportType, &familySchool)
+	if err != nil || standingC == nil || standingC.ExpiresAt == nil {
+		t.Fatalf("standing grant read: %+v err=%v", standingC, err)
+	}
+	if out, err := uc.Redeem(entSubject(userC), short[0]); err != nil || out.ExpiresAt == nil || !out.ExpiresAt.Equal(*standingC.ExpiresAt) {
 		t.Fatalf("idempotent under disabled must re-answer the standing grant: out=%+v err=%v", out, err)
 	}
 	if _, err := codeUC.SetBatchStatus(adminCtx, shortGen.BatchNo, false); err != nil {

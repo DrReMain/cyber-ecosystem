@@ -38,6 +38,9 @@ type Profile struct {
 type GetOut struct {
 	Profile     *Profile
 	MemberUntil *time.Time // liveness rides the read, not the row
+	// The expired-member faces' fact: most recent non-terminated window
+	// end, past or future.
+	LastMemberUntil *time.Time
 }
 
 type GamePreference struct {
@@ -111,6 +114,9 @@ type MergePreviewer interface {
 
 type MembershipRP interface {
 	MemberUntil(ctx context.Context, userID string) (*time.Time, error) // furthest live membership window end; nil = none standing — entitle's UC hosts the adapter (verdict-port direction: entitle already reads profile, the import arrow stays one-way)
+	// The same port's history twin: most recent non-terminated window end,
+	// past or future; nil = never a member.
+	LastMembershipUntil(ctx context.Context, userID string) (*time.Time, error)
 }
 
 // UC ------------------------------------------------------------------------------------------------------------------
@@ -151,7 +157,11 @@ func (uc *ProfileUC) Get(ctx context.Context) (*GetOut, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &GetOut{Profile: p, MemberUntil: until}, nil
+	lastUntil, err := uc.membershipRP.LastMembershipUntil(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &GetOut{Profile: p, MemberUntil: until, LastMemberUntil: lastUntil}, nil
 }
 
 func (uc *ProfileUC) Update(ctx context.Context, in *UpdateIn) (*Profile, error) {

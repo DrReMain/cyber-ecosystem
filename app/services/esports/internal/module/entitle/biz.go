@@ -188,6 +188,9 @@ type EntitlementRP interface {
 	Exists(ctx context.Context, userID, scopeKind string, scopeRef *string) (bool, error)             // the narrow query pay's port asks of the same face
 	HasActiveMembership(ctx context.Context, userID string) (bool, error)
 	MembershipWindow(ctx context.Context, userID string) (*EntitlementRow, error) // the live membership row with the furthest expiry; nil = none
+	// The history-telling twin above: the most recent non-terminated
+	// window's end, past or future; nil = never a member.
+	LastMembershipUntil(ctx context.Context, userID string) (*time.Time, error)
 	HasAnyScope(ctx context.Context, userID, scopeKind string) (bool, error)      // any row of the kind, ref-agnostic
 	// Membership rows for the lifecycle faces: every member's whole history
 	// when ids is nil, the named members' rows otherwise — the operator
@@ -198,6 +201,18 @@ type EntitlementRP interface {
 	// row. False = no live period to terminate (a settled fact, not a race
 	// to report: the caller answers not-found).
 	TerminateLiveMembership(ctx context.Context, userID string) (bool, error)
+	// Serializes the rival writers to one member's scope: the redeem's
+	// read-judge-take window and the membership writers' seam read share
+	// this transaction-scoped advisory lock, so no two transactions race
+	// the same grant target. Advisory because the first grant to a scope
+	// has no row to lock yet; xact-scoped because it releases with the
+	// caller's commit.
+	LockScope(ctx context.Context, userID, scopeKind string, scopeRef *string) error
+	// The reconciliation's missing-grant probe: whether any row names this
+	// source — a settled order owes exactly one. Narrower than ByScope on
+	// purpose: a member's standing rows from other sources must not mask
+	// this order's missing grant.
+	ExistsSource(ctx context.Context, userID, source string) (bool, error)
 	// Member-window trial grants for the named members — the count behind
 	// "unlocked inside this period, permanently".
 	ListMembershipUnlocks(ctx context.Context, userIDs []string) ([]*WindowUnlockRow, error)
@@ -396,6 +411,12 @@ func (uc *EntitleUC) MemberUntil(ctx context.Context, userID string) (*time.Time
 	return window.ExpiresAt, nil
 }
 
+func (uc *EntitleUC) LastMembershipUntil(ctx context.Context, userID string) (*time.Time, error) {
+	// The greet port's history twin — the same verdict-port shape, the
+	// nil contract already the RP's own answer.
+	return uc.entRP.LastMembershipUntil(ctx, userID)
+}
+
 func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error) {
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok || subject == nil {
@@ -420,8 +441,8 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 	// rule.
 	if grant, err := uc.entRP.ByScope(ctx, subject.UserID, shared.ScopeReportType, &family); err != nil {
 		return nil, err
-	} else if grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now())) {
-		return &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}, nil
+	} else if grantStanding(grant) {
+		return idempotentOut(family, grant), nil
 	}
 	if row.ExpiresAt.Before(time.Now()) {
 		return nil, esportspb.ErrorEsportsActivationCodeExpired("")
@@ -433,6 +454,23 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 	}
 	var out *RedeemOut
 	err = uc.Tm.InTx(ctx, func(txCtx context.Context) error {
+		// The fast read above cannot close the two-code race: two codes of
+		// one family redeeming concurrently past an expired grant both read
+		// "lapsed" outside and both take their use — silently burning one
+		// code's option that the sequential shape keeps in the member's
+		// hand. The advisory lock serializes the family's redeem writers;
+		// the re-read inside answers the race — the winner's committed
+		// grant is visible here, the loser returns idempotent without
+		// taking any use.
+		if err := uc.entRP.LockScope(txCtx, subject.UserID, shared.ScopeReportType, &family); err != nil {
+			return err
+		}
+		if grant, err := uc.entRP.ByScope(txCtx, subject.UserID, shared.ScopeReportType, &family); err != nil {
+			return err
+		} else if grantStanding(grant) {
+			out = idempotentOut(family, grant)
+			return nil
+		}
 		// One transaction takes the use and lands the grant: a use taken
 		// without its grant is unrecoverable — the retry path would find
 		// the code exhausted and no grant to be idempotent against.
@@ -449,7 +487,7 @@ func (uc *EntitleUC) Redeem(ctx context.Context, code string) (*RedeemOut, error
 				return err
 			}
 			if grant != nil {
-				out = &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}
+				out = idempotentOut(family, grant)
 				return nil
 			}
 			return esportspb.ErrorEsportsActivationCodeExhausted("")
@@ -513,6 +551,19 @@ func (uc *EntitleUC) SetReportAccessPolicy(ctx context.Context, family, policy s
 }
 
 // Private -------------------------------------------------------------------------------------------------------
+
+// grantStanding: the liveness read the redeem's idempotent answer rides —
+// a family row with no expiry, or one still in the future.
+func grantStanding(grant *EntitlementRow) bool {
+	return grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now()))
+}
+
+// idempotentOut: the answer a standing family grant gives — the grant's
+// own facts, never a fresh mint.
+func idempotentOut(family string, grant *EntitlementRow) *RedeemOut {
+	return &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}
+}
+
 func (uc *EntitleUC) onTrialCompleted(ctx context.Context, e shared.TrialCompleted) {
 	// The member plane's derived grant: a valid trial finished while a
 	// membership is active unlocks that record permanently. The ruling

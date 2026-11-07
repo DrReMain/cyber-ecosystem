@@ -179,6 +179,12 @@ message GetProfileResponse {
   // home greet already reads so membership adds no extra call. Clients
   // render presence, never re-derive expiry.
   google.protobuf.Timestamp member_until = 2;
+  // The most recent membership window's end among non-terminated rows —
+  // past or future. The expired-member faces read this ("membership ended
+  // on …"); null = never a member at all. Liveness stays member_until's
+  // own question — a terminated window is invisible here on purpose, a
+  // termination is not an expiry.
+  google.protobuf.Timestamp last_member_until = 3;
 }
 
 // updateProfile — presence-based partial update: a field left out stays

@@ -129,6 +129,15 @@ func (f *fakeUserRP) ListSeatsByUser(_ context.Context, _ string) ([]*user.Seat,
 	return f.seats, nil
 }
 
+func (f *fakeUserRP) FindCredentialByIdentifier(_ context.Context, identifier string) (*user.Credential, error) {
+	for k, c := range f.credentials {
+		if _, id, ok := strings.Cut(k, "|"); ok && id == identifier {
+			return c, nil
+		}
+	}
+	return nil, errorspb.ErrorInfraErrorDbNotFound("")
+}
+
 func (f *fakeUserRP) FindCredential(_ context.Context, kind, identifier string) (*user.Credential, error) {
 	if c, ok := f.credentials[kind+"|"+identifier]; ok {
 		return c, nil
@@ -523,6 +532,36 @@ func TestLoginUnknownAccountSameShapeAsWrongPassword(t *testing.T) {
 	_, _, _, errWrong := uc.Login(context.Background(), "a@x.co", "wrong", "")
 	if !systempb.IsSystemLoginFailed(errWrong) {
 		t.Fatalf("wrong password: want LOGIN_FAILED, got %v", errWrong)
+	}
+}
+
+// The credential fallback: an SMS-born member's login handle is their
+// phone — a bound credential, not an account handle. The handle misses,
+// the identifier resolves, the password answers. Kind-agnostic on
+// purpose: whatever kind the identifier bound through names the same
+// account, so a future email binding rides this path with zero new
+// branches.
+func TestLoginCredentialIdentifierFallback(t *testing.T) {
+	handle := "dbn18mlthm88rvujd2t0"
+	phone := "13800001111"
+	digest, err := utils.Hash("right")
+	if err != nil {
+		t.Fatalf("hash seed: %v", err)
+	}
+	row := &user.User{ID: "u-sms-born", Account: &handle, PasswordHash: &digest, Enabled: true}
+	rp := &fakeUserRP{row: row, credentials: map[string]*user.Credential{
+		"sms|" + phone: {Kind: "sms", Identifier: phone, UserID: "u-sms-born"},
+	}}
+	uc := newAuthUC(rp, &fakeAuthzRP{}, newTokenStore())
+
+	if _, _, _, err := uc.Login(context.Background(), phone, "right", ""); err != nil {
+		t.Fatalf("phone + password on sms-born member: %v", err)
+	}
+	if _, _, _, err := uc.Login(context.Background(), phone, "wrong", ""); !systempb.IsSystemLoginFailed(err) {
+		t.Fatalf("wrong password via credential: want LOGIN_FAILED, got %v", err)
+	}
+	if _, _, _, err := uc.Login(context.Background(), "13900002222", "right", ""); !systempb.IsSystemLoginFailed(err) {
+		t.Fatalf("identifier no credential knows: want LOGIN_FAILED, got %v", err)
 	}
 }
 

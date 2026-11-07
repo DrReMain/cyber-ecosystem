@@ -38,6 +38,13 @@ func classifyAPIError(a *APIError) error {
 		// NO_STATEMENT_EXIST the live channel returns for an unpublished
 		// trade bill.
 		return fmt.Errorf("%w: %s", payment.ErrNotFound, a.Code)
+	case a.Status == http.StatusBadRequest && a.Code == "ORDERPAID":
+		// A close refused because the trade already paid — the exact
+		// channel-state signal the retire path reads as "paid in the
+		// expiry race" (via ChannelError → ErrChannelRejected), so it must
+		// not fold into the caller-fixes-it bucket every other 400 lands
+		// in. Live-channel proof lands at the real-channel window.
+		return &payment.ChannelError{Code: a.Code, Message: a.Message}
 	case a.Status == http.StatusBadRequest, a.Status == http.StatusUnauthorized:
 		// 401 is the channel refusing our signature — a credential or
 		// signing fault on our side, the same caller-fixes-it bucket as a

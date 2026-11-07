@@ -676,9 +676,15 @@ type GetProfileResponse struct {
 	// the same liveness read the merge preview promises, riding the probe the
 	// home greet already reads so membership adds no extra call. Clients
 	// render presence, never re-derive expiry.
-	MemberUntil   *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=member_until,json=memberUntil,proto3" json:"member_until,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	MemberUntil *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=member_until,json=memberUntil,proto3" json:"member_until,omitempty"`
+	// The most recent membership window's end among non-terminated rows —
+	// past or future. The expired-member faces read this ("membership ended
+	// on …"); null = never a member at all. Liveness stays member_until's
+	// own question — a terminated window is invisible here on purpose, a
+	// termination is not an expiry.
+	LastMemberUntil *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=last_member_until,json=lastMemberUntil,proto3" json:"last_member_until,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *GetProfileResponse) Reset() {
@@ -721,6 +727,13 @@ func (x *GetProfileResponse) GetProfile() *Profile {
 func (x *GetProfileResponse) GetMemberUntil() *timestamppb.Timestamp {
 	if x != nil {
 		return x.MemberUntil
+	}
+	return nil
+}
+
+func (x *GetProfileResponse) GetLastMemberUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastMemberUntil
 	}
 	return nil
 }
@@ -974,10 +987,11 @@ const file_cyber_esports_v1_profile_proto_rawDesc = "" +
 	"\agame_id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x06gameId\x12=\n" +
 	"\vcustom_name\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\n" +
 	"customName\"\x13\n" +
-	"\x11GetProfileRequest\"\x88\x01\n" +
+	"\x11GetProfileRequest\"\xd0\x01\n" +
 	"\x12GetProfileResponse\x123\n" +
 	"\aprofile\x18\x01 \x01(\v2\x19.cyber.esports.v1.ProfileR\aprofile\x12=\n" +
-	"\fmember_until\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\vmemberUntil\"\x88\x05\n" +
+	"\fmember_until\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\vmemberUntil\x12F\n" +
+	"\x11last_member_until\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x0flastMemberUntil\"\x88\x05\n" +
 	"\x14UpdateProfileRequest\x12*\n" +
 	"\bnickname\x18\x01 \x01(\tB\t\xbaH\x06r\x04\x10\x02\x18\fH\x00R\bnickname\x88\x01\x01\x12.\n" +
 	"\n" +
@@ -1081,20 +1095,21 @@ var file_cyber_esports_v1_profile_proto_depIdxs = []int32{
 	13, // 18: cyber.esports.v1.ProfileGame.custom_name:type_name -> google.protobuf.StringValue
 	6,  // 19: cyber.esports.v1.GetProfileResponse.profile:type_name -> cyber.esports.v1.Profile
 	14, // 20: cyber.esports.v1.GetProfileResponse.member_until:type_name -> google.protobuf.Timestamp
-	11, // 21: cyber.esports.v1.UpdateProfileRequest.game_preference:type_name -> cyber.esports.v1.GamePreferenceInput
-	1,  // 22: cyber.esports.v1.UpdateProfileRequest.sex:type_name -> cyber.esports.v1.ProfileSex
-	6,  // 23: cyber.esports.v1.UpdateProfileResponse.profile:type_name -> cyber.esports.v1.Profile
-	8,  // 24: cyber.esports.v1.ProfileService.GetProfile:input_type -> cyber.esports.v1.GetProfileRequest
-	10, // 25: cyber.esports.v1.ProfileService.UpdateProfile:input_type -> cyber.esports.v1.UpdateProfileRequest
-	2,  // 26: cyber.esports.v1.ProfileService.PreviewMerge:input_type -> cyber.esports.v1.PreviewMergeRequest
-	9,  // 27: cyber.esports.v1.ProfileService.GetProfile:output_type -> cyber.esports.v1.GetProfileResponse
-	12, // 28: cyber.esports.v1.ProfileService.UpdateProfile:output_type -> cyber.esports.v1.UpdateProfileResponse
-	5,  // 29: cyber.esports.v1.ProfileService.PreviewMerge:output_type -> cyber.esports.v1.PreviewMergeResponse
-	27, // [27:30] is the sub-list for method output_type
-	24, // [24:27] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	14, // 21: cyber.esports.v1.GetProfileResponse.last_member_until:type_name -> google.protobuf.Timestamp
+	11, // 22: cyber.esports.v1.UpdateProfileRequest.game_preference:type_name -> cyber.esports.v1.GamePreferenceInput
+	1,  // 23: cyber.esports.v1.UpdateProfileRequest.sex:type_name -> cyber.esports.v1.ProfileSex
+	6,  // 24: cyber.esports.v1.UpdateProfileResponse.profile:type_name -> cyber.esports.v1.Profile
+	8,  // 25: cyber.esports.v1.ProfileService.GetProfile:input_type -> cyber.esports.v1.GetProfileRequest
+	10, // 26: cyber.esports.v1.ProfileService.UpdateProfile:input_type -> cyber.esports.v1.UpdateProfileRequest
+	2,  // 27: cyber.esports.v1.ProfileService.PreviewMerge:input_type -> cyber.esports.v1.PreviewMergeRequest
+	9,  // 28: cyber.esports.v1.ProfileService.GetProfile:output_type -> cyber.esports.v1.GetProfileResponse
+	12, // 29: cyber.esports.v1.ProfileService.UpdateProfile:output_type -> cyber.esports.v1.UpdateProfileResponse
+	5,  // 30: cyber.esports.v1.ProfileService.PreviewMerge:output_type -> cyber.esports.v1.PreviewMergeResponse
+	28, // [28:31] is the sub-list for method output_type
+	25, // [25:28] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_profile_proto_init() }

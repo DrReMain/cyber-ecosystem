@@ -51,7 +51,7 @@
   "pay_result_sub_fail": "未完成付款，未解锁任何内容，也未产生扣款",
   "pay_result_title_cancel": "已取消支付",
   "pay_result_sub_cancel": "未付款，未解锁任何内容",
-  "pay_result_tip_fail": "可重试：订单未支付时可重新发起，同一订单不会重复扣款。若已扣款但显示失败，请稍后在「我的 → 订单」查看，或联系客服。",
+  "pay_result_tip_fail": "可重试：订单未支付时可重新发起，同一订单不会重复扣款。若已扣款但显示失败，请保留支付凭证并联系客服核实。",
   "pay_result_tip_cancel": "已取消支付，未产生扣款。随时可以重新购买。",
   "pay_result_row_order": "订单号",
   "pay_result_row_amount": "金额",

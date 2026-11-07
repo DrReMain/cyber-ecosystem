@@ -23,6 +23,7 @@ export const sessionFn = createServerFn({ method: "GET" }).handler(async () => {
       // Transport-flattened: the Timestamp arrives as its ISO string —
       // the generated type claims a Message the runtime never delivers.
       memberUntil: (res.memberUntil ?? null) as string | null,
+      lastMemberUntil: (res.lastMemberUntil ?? null) as string | null,
     } as const;
   } catch (error) {
     const { kind, reason } = normalize(error);

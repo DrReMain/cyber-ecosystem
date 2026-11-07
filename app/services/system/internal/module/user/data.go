@@ -249,6 +249,28 @@ func (rp *userRP) FindCredential(ctx context.Context, kind, identifier string) (
 	return mapCredential(c), nil
 }
 
+func (rp *userRP) FindCredentialByIdentifier(ctx context.Context, identifier string) (*Credential, error) {
+	// The kind-agnostic twin: an identifier names its account whatever
+	// kind it bound through — the login path resolves, the proof paths
+	// (which know their kind) use the narrow one above. Identifier shapes
+	// across kinds do not collide (a phone is not an email is not an
+	// openid); a same-identifier pair across kinds is a data disease —
+	// logged loudly here, answered as a miss, so the login path keeps its
+	// timing-honest refusal instead of surfacing a 500.
+	c, err := rp.Platform.GetClient(ctx).Credential.Query().
+		Where(credential.Identifier(identifier)).
+		Only(ctx)
+	if err != nil {
+		var nse *ent.NotSingularError
+		if errors.As(err, &nse) {
+			rp.Log.Error("credential identifier collision across kinds", "identifier", identifier)
+			return nil, errorspb.ErrorInfraErrorDbNotFound("")
+		}
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return mapCredential(c), nil
+}
+
 func (rp *userRP) CreateCredential(ctx context.Context, c *Credential) error {
 	if _, err := rp.Platform.GetClient(ctx).Credential.Create().
 		SetKind(c.Kind).SetIdentifier(c.Identifier).SetUserID(c.UserID).

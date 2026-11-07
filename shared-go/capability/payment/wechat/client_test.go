@@ -463,6 +463,15 @@ func TestClientAPIErrorClassification(t *testing.T) {
 				t.Fatalf("ChannelError must unwrap to ErrChannelRejected, got %v", err)
 			}
 		}},
+		{"400_orderpaid", 400, `{"code":"ORDERPAID","message":"trade already paid"}`, func(t *testing.T, err error) {
+			var ce *payment.ChannelError
+			if !errors.As(err, &ce) || ce.Code != "ORDERPAID" {
+				t.Fatalf("want ChannelError ORDERPAID, got %v", err)
+			}
+			if !errors.Is(err, payment.ErrChannelRejected) {
+				t.Fatalf("ChannelError must unwrap to ErrChannelRejected (the retire path's paid-race signal), got %v", err)
+			}
+		}},
 		{"404_order_not_exists", 404, `{"code":"ORDER_NOT_EXISTS","message":"no order"}`, sentinel(payment.ErrNotFound)},
 		{"429_frequency_limited", 429, `{"code":"FREQUENCY_LIMITED","message":"slow down"}`, sentinel(payment.ErrUnavailable)},
 		{"500_system_error", 500, `{"code":"SYSTEM_ERROR","message":"channel busy"}`, sentinel(payment.ErrUnavailable)},

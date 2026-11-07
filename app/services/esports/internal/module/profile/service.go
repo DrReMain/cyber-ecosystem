@@ -54,7 +54,11 @@ func (s *ProfileService) GetProfile(ctx context.Context, in *esportspb.GetProfil
 	if err != nil {
 		return nil, err
 	}
-	return &esportspb.GetProfileResponse{Profile: mapProfilePB(out.Profile), MemberUntil: utils.ToTimestamp(out.MemberUntil)}, nil
+	return &esportspb.GetProfileResponse{
+		Profile:         mapProfilePB(out.Profile),
+		MemberUntil:     utils.ToTimestamp(out.MemberUntil),
+		LastMemberUntil: utils.ToTimestamp(out.LastMemberUntil),
+	}, nil
 }
 
 func (s *ProfileService) UpdateProfile(ctx context.Context, in *esportspb.UpdateProfileRequest) (*esportspb.UpdateProfileResponse, error) {

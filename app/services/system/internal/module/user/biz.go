@@ -89,6 +89,9 @@ type UserRP interface {
 	FindSeatedAnyPlane(ctx context.Context, id string) (*User, error)
 	FindByIDs(ctx context.Context, ids []string) (map[string]*User, error)
 	FindCredential(ctx context.Context, kind, identifier string) (*Credential, error)
+	// The kind-agnostic resolution the password login path takes: whatever
+	// kind the identifier bound through, it names its account.
+	FindCredentialByIdentifier(ctx context.Context, identifier string) (*Credential, error)
 	ListCredentialsByUser(ctx context.Context, userID string) ([]*Credential, error)
 	ListCredentialsByUsers(ctx context.Context, userIDs []string) ([]*Credential, error) // the roster hydration's batch twin — one IN query for a whole page
 	CreateCredential(ctx context.Context, c *Credential) error

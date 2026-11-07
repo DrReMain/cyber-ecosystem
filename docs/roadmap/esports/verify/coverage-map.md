@@ -41,7 +41,7 @@ C1 冷启动=R1 承接在案;C2 报告族/C3 支付面/C4 账号族/C5 消息反
 | P3-7 | 服务端拒绝腿族:UpdateProfile 拒绝面(biz.go:200-215)/GetMatchSession GENRE_UNKNOWN·no-drawable 拒答 | C1-2/C1-4 补步 |
 
 ### P4 轻缺与变体(顺路收割)
-昵称 emoji(**毕@R2**:「昵称暂不支持 emoji 表情」行内)/偏好重复 toast·满 3 态·平票字面/出生不完整拒/13-18 黄条/profile 总览九区无主走例/digest 空兜底 toast/center covered≥6 full 支/趋势进阶 CTA(见 §三)/admin 码表两筛·分页·空态·「复制未核销码」/admin 反馈详情 closed 送框移除/公告时间列(§三)/X2-2 home 红点句复走证(毕@R2)/断网暖卡/**+反馈 10 下界拒绝形缺失(R2 11-07:5 字提交零反馈面,客户端拦,SubmitFeedback 未发——N-5 族)**。
+昵称 emoji(**毕@R2**:「昵称暂不支持 emoji 表情」行内)/偏好重复 toast·满 3 态·平票字面/出生不完整拒/13-18 黄条/profile 总览九区无主走例/digest 空兜底 toast/center covered≥6 full 支/趋势进阶 CTA(见 §三)/admin 码表两筛·分页·空态·「复制未核销码」/admin 反馈详情 closed 送框移除/公告时间列(§三)/X2-2 home 红点句复走证(毕@R2)/断网暖卡。反馈 10 下界=R2 入账后 11-08 复核**翻案销案**(行内红行「描述至少 10 个字,便于我们定位问题」真实渲染+SubmitFeedback 未发——R2「零反馈面」系 toast 单观测漏持久红行的误判,§2.2 立法实证案例)。
 
 ## 三) 新登记偏离(本次核验发现,未入任何台账;全数转 prd 待裁区 R 系)
 | # | 偏离 | 依据 |

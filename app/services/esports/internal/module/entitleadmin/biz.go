@@ -163,12 +163,18 @@ func (uc *MembershipUC) Grant(ctx context.Context, userID, skuCode string) (*Mem
 		return nil, err
 	}
 	err = uc.Tm.InTx(ctx, func(txCtx context.Context) error {
+		// The membership writers' lock, shared with the settle path and
+		// the terminate action: the seam read below cannot straddle a
+		// concurrent terminate's commit — the race where a renewal lands
+		// from the old window's expiry and outlives the termination it
+		// raced. Rival grants serialize behind it too, so two operators'
+		// grants tile instead of overlapping.
+		if err := uc.entRP.LockScope(txCtx, userID, shared.ScopeMembership, nil); err != nil {
+			return err
+		}
 		// The renewal seam: a live window (terminated rows excluded) sets
 		// the start, so consecutive periods tile without gaps — a first
-		// grant starts now. Two operators racing both read the same seam
-		// and land overlapping rows; the operator plane accepts that
-		// replay shape (the audit trail shows both), unlike the settle
-		// path's pending-unique, because no money fact hangs on it.
+		// grant starts now.
 		start := time.Now()
 		if window, err := uc.entRP.MembershipWindow(txCtx, userID); err != nil {
 			return err
@@ -193,7 +199,19 @@ func (uc *MembershipUC) Terminate(ctx context.Context, userID string) (*Membersh
 	if !ok || subject == nil {
 		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("membership terminate requires an admin session"))
 	}
-	terminated, err := uc.entRP.TerminateLiveMembership(ctx, userID)
+	var terminated bool
+	err := uc.Tm.InTx(ctx, func(txCtx context.Context) error {
+		// The membership writers' lock, the grant paths' twin: a rival
+		// grant's seam read has committed or waits behind this terminate —
+		// never between the read and the insert, the window where a
+		// renewal would outlive the termination it raced.
+		if err := uc.entRP.LockScope(txCtx, userID, shared.ScopeMembership, nil); err != nil {
+			return err
+		}
+		var err error
+		terminated, err = uc.entRP.TerminateLiveMembership(txCtx, userID)
+		return err
+	})
 	if err != nil {
 		return nil, err
 	}

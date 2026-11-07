@@ -66,11 +66,12 @@ interface QrState {
   value: string;
 }
 
-// The session probe's authed shape, read structurally — the wall only
-// needs the birth pair and the standing window.
+// The session probe's authed shape, read structurally — the wall needs
+// the birth pair and the window history (liveness is lastMemberUntil's
+// own derived fact here: future end = active, past end = expired).
 interface SessionView {
   status: string;
-  memberUntil?: string | null;
+  lastMemberUntil?: string | null;
   profile?: { birthYear?: number; birthMonth?: number };
 }
 
@@ -128,7 +129,7 @@ function wallStateOf(sdata: SessionView | undefined, payGate: PayGateView | unde
   const authed = sdata?.status === "authed";
   const birthYear = authed ? sdata?.profile?.birthYear : undefined;
   const birthMonth = authed ? sdata?.profile?.birthMonth : undefined;
-  const window = windowOf(authed ? sdata?.memberUntil : null);
+  const window = windowOf(authed ? sdata?.lastMemberUntil : null);
   const birthMissing = authed && (birthYear === undefined || birthMonth === undefined);
   const ageLine = payGate?.payAgeLine ?? 18;
   const minor =

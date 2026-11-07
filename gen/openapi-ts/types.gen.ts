@@ -1043,6 +1043,14 @@ export type CyberEsportsV1GetProfileResponse = {
      * render presence, never re-derive expiry.
      */
     memberUntil?: string;
+    /**
+     * The most recent membership window's end among non-terminated rows —
+     * past or future. The expired-member faces read this ("membership ended
+     * on …"); null = never a member at all. Liveness stays member_until's
+     * own question — a terminated window is invisible here on purpose, a
+     * termination is not an expiry.
+     */
+    lastMemberUntil?: string;
 };
 
 export type CyberEsportsV1GetReportAccessResponse = {

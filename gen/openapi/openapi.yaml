@@ -5894,6 +5894,15 @@ components:
                          home greet already reads so membership adds no extra call. Clients
                          render presence, never re-derive expiry.
                     format: date-time
+                lastMemberUntil:
+                    type: string
+                    description: |-
+                        The most recent membership window's end among non-terminated rows —
+                         past or future. The expired-member faces read this ("membership ended
+                         on …"); null = never a member at all. Liveness stays member_until's
+                         own question — a terminated window is invisible here on purpose, a
+                         termination is not an expiry.
+                    format: date-time
         cyber.esports.v1.GetReportAccessResponse:
             type: object
             properties:
@@ -9681,8 +9690,9 @@ tags:
     - name: EntitlementService
       description: |-
         The member's entitlement faces. Redeem is idempotent per (member,
-         code): handing the same code to the same member again returns the same
-         entitlement, while a rival member's redeem takes the code's single use.
+         family): the family's grant already standing, a later code of the same
+         family answers that grant without taking the code's use, while a rival
+         member's redeem takes the code's single use.
          Access folds every openable fact — policy config, an active membership,
          a redeemed code — into one answer with one reason, so the client never
          re-derives entitlement rules.

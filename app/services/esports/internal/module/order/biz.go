@@ -325,10 +325,14 @@ func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error)
 	if active, err := uc.orderRP.ActiveByScope(ctx, subject.UserID, scopeKind, scopeRef); err != nil {
 		return nil, err
 	} else if active != nil {
-		if active.ExpiresAt.After(time.Now()) {
+		if active.ExpiresAt.After(time.Now()) && active.Channel == string(in.Channel) {
 			// Same-order reuse: the stored credential replays with zero
 			// channel round trips, so the channel never sees a second
-			// create for the same grant target.
+			// create for the same grant target. A channel switch is not
+			// a reuse — the old channel's credential is dead weight in
+			// the new channel's hands — so the old order retires and a
+			// fresh one takes the member's chosen channel instead of
+			// handing back a credential it cannot pay with.
 			return &CreateOut{Order: active, Credential: credentialOf(active)}, nil
 		}
 		if _, err := retirePending(ctx, uc.channelRP, uc.orderRP, active); err != nil {
@@ -509,13 +513,19 @@ func (uc *OrderUC) SettlePaid(ctx context.Context, in *SettleIn) (bool, error) {
 			return nil
 		}
 		if grant.ScopeKind == EntMembership {
+			// The membership writers' lock, the operator grant and
+			// terminate paths' twin: the seam read below cannot straddle a
+			// concurrent terminate's commit — a renewal paid moments
+			// before a termination must not outlive it.
+			if lerr := uc.entRP.LockScope(txCtx, order.UserID, EntMembership, nil); lerr != nil {
+				return lerr
+			}
 			// The renewal seam, the same in-transaction read the operator
 			// grant makes: a live window sets the start, so a renewal paid
 			// mid-window tiles after the standing remainder rather than
 			// overlapping and forfeiting it; a first purchase starts at the
-			// paid moment. Concurrent renewal settles may still read the
-			// same seam and overlap — the replay shape the operator plane
-			// accepts; the fold reads the furthest window either way.
+			// paid moment. The writers' lock serializes concurrent renewal
+			// settles too, so the tiles never overlap.
 			start := in.PaidAt
 			if window, werr := uc.entRP.MembershipWindow(txCtx, order.UserID); werr != nil {
 				return werr
@@ -964,6 +974,23 @@ func (uc *OrderUC) reconcileProviderDay(ctx context.Context, day, start, end tim
 			mismatch++
 		case int64(l.AmountFen) != o.AmountFen:
 			uc.Log.Error("bill amount mismatch", "order_no", o.OrderNo, "row_fen", o.AmountFen, "bill_fen", int64(l.AmountFen))
+			mismatch++
+		}
+		if o.ScopeKind != ScopeTrial && o.ScopeKind != ScopePeriod {
+			continue
+		}
+		// The settle path's own alarm, read where alarms are read: money
+		// moved and the row settled, so the grant the order owes must
+		// exist — a sku losing its period between order and settle skips
+		// the grant while the amount reconciliation above stays green
+		// (both sides agree the money moved), leaving this probe the only
+		// witness.
+		granted, gerr := uc.entRP.ExistsSource(ctx, o.UserID, o.OrderNo)
+		if gerr != nil {
+			return gerr
+		}
+		if !granted {
+			uc.Log.Error("settled order missing its grant", "order_no", o.OrderNo, "scope_kind", o.ScopeKind, "day", day.Format("2006-01-02"))
 			mismatch++
 		}
 	}

@@ -38,18 +38,13 @@
 
 | # | 缺陷 | 级 | 依据 | 归属 |
 |---|---|---|---|---|
-| B-1 | 支付到期竞速「已付」恢复死路:wechat classifyAPIError 将全部 HTTP 400 折为 ErrInvalidArgument,retirePending 只认 ChannelError→2h 边缘已付单卡 pending(钱已收/无权益);dev/mock 结构性照不见 | 最重 | G-420 F1(error.go:41-45/biz.go:1154,亲手复核) | PAY2 真通道刀共裁 |
-| B-2 | 兑换幂等读在事务外:同族两码并发兑换对已失效 grant 双双落穿=静默烧一码 | 高 | G-421①(entitle/biz.go:421-435,亲手复核) | cutover 前修或挂险由用户裁 |
-| B-3 | Terminate×竞速授予复活窗:Grant tx 内窗读与插入间 Terminate 可先提交→终止成功而新行自旧到期复活 | 高 | G-421②(entitle/biz.go:173,亲手复核) | 同上 |
+| B-1 | 支付到期竞速「已付」恢复死路——**修形已落**(11-08 用户裁 a):classifyAPIError 增 ORDERPAID→ChannelError 分支(400 不再折叠为 ErrInvalidArgument,retirePending 认得「已付拒关」→ConvergeOnce 收敛)+单测钉。**余=真通道活证**:live 码表与关单实测归 PAY2 联调刀(NO_STATEMENT_EXIST 前科=文档码表之外的拼写可能仍在),dev/mock 结构性照不见 | 最重→余活证 | G-420 F1;修形=wechat/error.go+client_test.go(400_orderpaid 例) | PAY2 联调窗活证 |
 | B-4 | esports(及 agent)全部 WRITE 面零审计行:kratos §5a 三兄弟缺一+proto/UI「入审计」承诺落空;修形=esports 生产者三件(MQ+Sink+ladder 双块,镜像 system server.go:38-58) | 高(cutover 审计合规) | G-417;消费侧已在(system/audit 订阅 audit_log 实锤) | lzx+用户裁定后落片;**并行会话已在途,落片时核对** |
-| B-5 | pay 墙过期会员灰 banner 无生产者:MembershipWindow GT-now 恒滤→expired 态三死面;两形待裁(墙补读 digest LastMembershipUntil / 删死面三件) | 中 | G-416(SQL 造态活跑) | 随下片裁 |
 | B-6 | session-done 页三差:已测收据行=评级口径非原型已玩口径;CTA 族反转(报告入口为主,原型明令不在本页);blob 氛围缺失 | 中 | G-410(用户裁定「视觉低质」) | U2 |
-| B-7 | G-420 F4-F6 待复核定级:同单复用忽略渠道切换/对账游标内存态重启归昨/sku 丢 PeriodDays 结算零授予仅 ERROR | 待核 | G-420(代理引证) | 下片复核 |
-| B-8 | pay result fail 卡「我的→订单」死指路(ListOrders 零客户端消费方,订单列表页原型未画) | 低 | coverage D5(pay/zh-CN.json:54;order/service.go:75) | 随 PAY2/C3-3 走查裁 |
-| B-9 | entitlement.proto 幂等注文滞后:注文 per-(member,code) vs 实现 per-(member,family) 族宽形 | 低 | coverage D6-5(entitlement.proto:13-15;X3-4 宽形活证) | 契约注释一行修 |
-| B-10 | **「手机号+密码」登录假承诺**:ctr set/change 密码页承诺「设置后即可用手机号+密码登录」(security_pw_set_pitch+总面「已设置——可用于账号密码登录」),但 system Login 只按 user.account 句柄查(exchangePassword→FindByAccount,无手机号→credential 解析分支);SMS-born 用户 account=ULID 句柄(dbn18mlthm88rvujd2t0 实证),手机号登录必 400 SYSTEM_LOGIN_FAILED「account not found」→**全体自然注册 member 的 set/change 密码=死出口**。底座 schema 注文明言「phone are bindable credentials, never the identity key」=esports 侧消费错位非底座 bug | **高** | R2 走查 11-07 三重证据:UI 承诺(security/password.tsx:148-149+zh-CN.json)+服务端行为(Login 400 日志)+数据模型(system user 表实查);B-8 邻案 | 修复方向待裁(三选):a) system Login 增手机号解析分支(底座动,重) b) ctr 文案撤回承诺(轻,产品语义损失) c) ljr 另裁 |
 
 走查覆盖缺口(非缺陷,未执行的用例腿)=verify/coverage-map.md 缺口清单,后续多轮走查轮次消费。
+
+**B 工单清偿批(2026-11-08,用户令「清空所有待修复问题」;叙事全文=git 提交 proven-by)**:八案修毕销行——B-2 兑换双码竞速烧码(entitlement 写路径 advisory xact lock:Redeem 锁内读-判-取+双码竞速 e2e 腿活证「烧一留一」)/B-3 Terminate×Grant 复活窗(membership 写者三处同锁:Grant/Terminate/SettlePaid,同锁同序为读码级断言,Terminate×Grant 竞速 e2e 腿未立——B-2 双码腿为邻证)/B-5 过期会员灰 banner(proto 增 last_member_until 姊妹字段保 member_until liveness 语义不泄给 report fold;墙实读「会员已于 2026-11-05 到期」+terminated 排除顺证;三死面=墙内同一渲染链三件(分支/StateBanner/文案键),一面活证即三件同活)/B-7-F4 换渠道死胡同(复用加 channel 匹配,不匹配走 retire+新建)/B-7-F6 结算缺授予对账盲区(ExistsSource 探针入对账循环,注释空头支票补上)/B-7-F5 游标内存态=复核销案不修(对账只读幂等,重启重扫无害,游标落库不成比例)/B-8 fail 页死指路(双语文案撤「我的→订单」)/B-9 proto 注文(per-(member,family) 改毕+regen+drift 绿)/B-10 手机号+密码登录(system exchangePassword 增 credential fallback——**kind-agnostic 形**(用户裁定:system 只做泛化,新 credential kind 零新分支);live 双侧证据=Login args=手机号 code=200 对照 R2 的 400 account not found——11-08 走查双侧记录)/P4 反馈下界=复核翻案销案(行内红行真实渲染,R2「零反馈面」系 toast 单观测误判)。
 
 ## M2 余组(梯①=上线后首迭代;每项开工前先过对应 P 票)
 

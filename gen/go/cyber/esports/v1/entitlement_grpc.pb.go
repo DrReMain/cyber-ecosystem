@@ -28,8 +28,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // The member's entitlement faces. Redeem is idempotent per (member,
-// code): handing the same code to the same member again returns the same
-// entitlement, while a rival member's redeem takes the code's single use.
+// family): the family's grant already standing, a later code of the same
+// family answers that grant without taking the code's use, while a rival
+// member's redeem takes the code's single use.
 // Access folds every openable fact — policy config, an active membership,
 // a redeemed code — into one answer with one reason, so the client never
 // re-derives entitlement rules.
@@ -71,8 +72,9 @@ func (c *entitlementServiceClient) GetReportAccess(ctx context.Context, in *GetR
 // for forward compatibility.
 //
 // The member's entitlement faces. Redeem is idempotent per (member,
-// code): handing the same code to the same member again returns the same
-// entitlement, while a rival member's redeem takes the code's single use.
+// family): the family's grant already standing, a later code of the same
+// family answers that grant without taking the code's use, while a rival
+// member's redeem takes the code's single use.
 // Access folds every openable fact — policy config, an active membership,
 // a redeemed code — into one answer with one reason, so the client never
 // re-derives entitlement rules.

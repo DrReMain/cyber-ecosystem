@@ -330,6 +330,30 @@ func (rp *entitlementRP) MembershipWindow(ctx context.Context, userID string) (*
 	return mapEntitlementRow(rows[0]), nil
 }
 
+func (rp *entitlementRP) LastMembershipUntil(ctx context.Context, userID string) (*time.Time, error) {
+	// MembershipWindow's history-telling twin: the same furthest-window
+	// ordering without the liveness filter, terminated rows excluded — a
+	// termination is not an expiry, and the expired-member faces must not
+	// announce a window an operator ended. Trial nulls never reach this
+	// read the same way (rows are born bounded).
+	rows, err := rp.Platform.GetClient(ctx).Entitlement.Query().
+		Where(
+			entitlement.UserIDEQ(userID),
+			entitlement.ScopeKindEQ(entitlement.ScopeKind(shared.ScopeMembership)),
+			entitlement.StatusEQ(entitlement.StatusActive),
+		).
+		Order(ent.Desc(entitlement.FieldExpiresAt)).
+		Limit(1).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	if len(rows) == 0 || rows[0].ExpiresAt == nil {
+		return nil, nil
+	}
+	return rows[0].ExpiresAt, nil
+}
+
 func (rp *entitlementRP) HasAnyScope(ctx context.Context, userID, scopeKind string) (bool, error) {
 	ok, err := rp.Platform.GetClient(ctx).Entitlement.Query().
 		Where(
@@ -387,6 +411,38 @@ func (rp *entitlementRP) TerminateLiveMembership(ctx context.Context, userID str
 		return false, rp.Platform.HandleEntError(err)
 	}
 	return rows > 0, nil
+}
+
+func (rp *entitlementRP) LockScope(ctx context.Context, userID, scopeKind string, scopeRef *string) error {
+	// A transaction-scoped advisory lock keyed on the scope's identity —
+	// hashtext narrows the key to a 32-bit int, and a hash collision only
+	// over-serializes two unrelated scopes, never under-serializes one.
+	// Executes on the context's client, so inside InTx it rides the
+	// transaction and releases with its commit.
+	// '|' separates the parts — every part (ULID ids, enum-kind words)
+	// comes from a vocabulary that never contains it, and unlike NUL it
+	// survives PG's text encoding.
+	key := userID + "|" + scopeKind
+	if scopeRef != nil {
+		key += "|" + *scopeRef
+	}
+	if _, err := rp.Platform.GetClient(ctx).ExecContext(ctx, "SELECT pg_advisory_xact_lock(hashtext($1))", key); err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	return nil
+}
+
+func (rp *entitlementRP) ExistsSource(ctx context.Context, userID, source string) (bool, error) {
+	ok, err := rp.Platform.GetClient(ctx).Entitlement.Query().
+		Where(
+			entitlement.UserIDEQ(userID),
+			entitlement.SourceEQ(source),
+		).
+		Exist(ctx)
+	if err != nil {
+		return false, rp.Platform.HandleEntError(err)
+	}
+	return ok, nil
 }
 
 func (rp *entitlementRP) ListMembershipUnlocks(ctx context.Context, userIDs []string) ([]*WindowUnlockRow, error) {

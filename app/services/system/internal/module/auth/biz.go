@@ -762,13 +762,51 @@ func (uc *AuthUC) mergeable(ctx context.Context, poor *user.User) error {
 	return nil
 }
 
+// resolveByCredential answers whether a login spelling that missed the
+// account handle still names an account: any bound credential identifier
+// resolves kind-agnostically. Nil, nil = no credential row knows the
+// spelling (or its user vanished — a settled miss); a non-nil error is
+// infrastructure and stays loud.
+func (uc *AuthUC) resolveByCredential(ctx context.Context, account string) (*user.User, error) {
+	cred, err := uc.userRP.FindCredentialByIdentifier(ctx, account)
+	if errorspb.IsInfraErrorDbNotFound(err) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	found, ferr := uc.userRP.FindByID(ctx, cred.UserID)
+	if errorspb.IsInfraErrorDbNotFound(ferr) {
+		return nil, nil
+	}
+	if ferr != nil {
+		return nil, ferr
+	}
+	return found, nil
+}
+
 func (uc *AuthUC) exchangePassword(ctx context.Context, account, password string) (*user.User, error) {
 	u, err := uc.userRP.FindByAccount(ctx, account)
-	if err != nil {
-		if errorspb.IsInfraErrorDbNotFound(err) {
+	if errorspb.IsInfraErrorDbNotFound(err) {
+		// Handle first, credential second: the account handle is not the
+		// only spelling that names an account — any bound credential
+		// identifier names its own, the same resolution the sms proof
+		// already makes ("the phone names its account"). Kind-agnostic on
+		// purpose: a credential kind yet to be invented needs no new
+		// branch here. An identifier no credential row knows keeps the
+		// timing-honest refusal below.
+		found, rerr := uc.resolveByCredential(ctx, account)
+		if rerr != nil {
+			return nil, rerr
+		}
+		if found != nil {
+			u, err = found, nil
+		}
+		if err != nil {
 			utils.Verify(password, dummyDigest)
 			return nil, systempb.ErrorSystemLoginFailed("").WithCause(fmt.Errorf("account not found: %s", account))
 		}
+	} else if err != nil {
 		return nil, err
 	}
 	if !utils.Verify(password, *u.PasswordHash) {

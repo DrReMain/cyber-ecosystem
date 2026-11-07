@@ -51,7 +51,7 @@
   "pay_result_sub_fail": "The payment never completed — nothing was unlocked, nothing was charged",
   "pay_result_title_cancel": "Payment Cancelled",
   "pay_result_sub_cancel": "Nothing was paid, nothing was unlocked",
-  "pay_result_tip_fail": "You can retry: while an order stays unpaid it can be started again — the same order is never charged twice. If you were charged but see failure here, check later under My Profile → Orders, or contact support.",
+  "pay_result_tip_fail": "You can retry: while an order stays unpaid it can be started again — the same order is never charged twice. If you were charged but see failure here, keep your payment receipt and contact support to verify.",
   "pay_result_tip_cancel": "Cancelled with no charge. You can purchase again at any time.",
   "pay_result_row_order": "Order No.",
   "pay_result_row_amount": "Amount",
