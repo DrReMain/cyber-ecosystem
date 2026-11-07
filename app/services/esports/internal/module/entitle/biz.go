@@ -552,15 +552,15 @@ func (uc *EntitleUC) SetReportAccessPolicy(ctx context.Context, family, policy s
 
 // Private -------------------------------------------------------------------------------------------------------
 
-// grantStanding: the liveness read the redeem's idempotent answer rides —
-// a family row with no expiry, or one still in the future.
 func grantStanding(grant *EntitlementRow) bool {
+	// The liveness read the redeem's idempotent answer rides: a family
+	// row with no expiry, or one still in the future.
 	return grant != nil && (grant.ExpiresAt == nil || grant.ExpiresAt.After(time.Now()))
 }
 
-// idempotentOut: the answer a standing family grant gives — the grant's
-// own facts, never a fresh mint.
 func idempotentOut(family string, grant *EntitlementRow) *RedeemOut {
+	// The answer a standing family grant gives: the grant's own facts,
+	// never a fresh mint.
 	return &RedeemOut{ReportType: family, ExpiresAt: grant.ExpiresAt, GrantedAt: grant.CreatedAt}
 }
 
