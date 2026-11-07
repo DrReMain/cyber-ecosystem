@@ -8,10 +8,10 @@ import {
   listMemberships,
   terminateMembership,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/activation_admin-EntitleAdminService_connectquery";
-import { useServerPagination } from "@cyber-ecosystem/shared-antd/use-search";
-import { useNavigate, useSearch } from "@tanstack/react-router";
-import { Button, Card, Select, Tabs, Typography } from "antd";
-import { Plus } from "lucide-react";
+import { Filter } from "@cyber-ecosystem/shared-antd/filter";
+import { useFilter, useServerPagination } from "@cyber-ecosystem/shared-antd/use-search";
+import { useSearch } from "@tanstack/react-router";
+import { Card, Typography } from "antd";
 import { useState } from "react";
 import { useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
@@ -38,11 +38,11 @@ const SOURCE_TO_WIRE: Record<string, MembershipSource | undefined> = {
 export function EsportsMembersPage() {
   const search = useSearch({ from: AREA });
   const store = useAreaSearchStore(AREA, search, parseMembersSearch);
-  const navigate = useNavigate();
+  const { values, onFilter, onReset } = useFilter(store, membersSearchSchema);
 
   const listQuery = useQuery(listMemberships, {
-    status: TAB_TO_STATUS[search.tab ?? "all"],
-    source: search.source ? SOURCE_TO_WIRE[search.source] : undefined,
+    status: TAB_TO_STATUS[values.tab ?? "all"],
+    source: values.source ? SOURCE_TO_WIRE[values.source] : undefined,
     page: { pageNo: search.pageNo, pageSize: search.pageSize },
   });
   const pagination = useServerPagination(store, membersSearchSchema, listQuery.data?.page, {
@@ -71,74 +71,53 @@ export function EsportsMembersPage() {
     },
   });
 
-  const patchSearch = (patch: Record<string, unknown>) => {
-    void navigate({
-      to: "/dashboard/people/members",
-      search: { ...search, ...patch },
-    });
-  };
-
+  // The tabs' live counters are gone with the tabs; this line keeps every
+  // count the backend still reports, below the table instead of on it.
   const counts = listQuery.data;
-  const tabOf = (key: string) => ({
-    key,
-    label:
-      key === "all"
-        ? m.esports_members_tab_all()
-        : key === "active"
-          ? m.esports_members_tab_active()
-          : key === "expiring"
-            ? m.esports_members_tab_expiring()
-            : m.esports_members_tab_expired(),
-  });
-  const badgeOf = (key: string): number | undefined =>
-    key === "all"
-      ? (counts?.totalCount ?? undefined)
-      : key === "active"
-        ? (counts?.activeCount ?? undefined)
-        : key === "expiring"
-          ? (counts?.expiringSoonCount ?? undefined)
-          : (counts?.expiredCount ?? undefined);
 
   return (
     <div className="flex flex-col gap-4 p-4">
       <Card>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <Tabs
-            activeKey={search.tab ?? "all"}
-            items={["all", "active", "expiring", "expired"].map((key) => {
-              const n = badgeOf(key);
-              const tab = tabOf(key);
-              return { ...tab, label: n != null ? `${tab.label} (${n})` : tab.label };
-            })}
-            onChange={(key) =>
-              patchSearch({ tab: key === "all" ? undefined : key, pageNo: undefined })
-            }
-          />
-          <div className="flex items-center gap-2">
-            <Select
-              allowClear
-              className="w-40"
-              onChange={(v) => patchSearch({ source: v ?? undefined, pageNo: undefined })}
-              options={[
+        <Filter
+          columns={4}
+          initialValues={values}
+          labels={{
+            search: m.common_filter_search(),
+            reset: m.common_filter_reset(),
+            fold: m.common_filter_fold(),
+            expand: m.common_filter_expand(),
+          }}
+          onFilter={onFilter}
+          onReset={onReset}
+          options={[
+            {
+              label: m.esports_members_filter_status(),
+              name: "tab",
+              type: "select",
+              placeholder: m.esports_members_tab_all(),
+              options: [
+                { label: m.esports_members_tab_active(), value: "active" },
+                { label: m.esports_members_tab_expiring(), value: "expiring" },
+                { label: m.esports_members_tab_expired(), value: "expired" },
+              ],
+            },
+            {
+              label: m.esports_members_source_filter(),
+              name: "source",
+              type: "select",
+              placeholder: m.esports_members_tab_all(),
+              options: [
                 { label: m.esports_members_source_order(), value: "order" },
                 { label: m.esports_members_source_manual(), value: "manual" },
                 { label: m.esports_members_source_legacy(), value: "legacy_code" },
-              ]}
-              placeholder={m.esports_members_source_filter()}
-              value={search.source ?? null}
-            />
-            <Button
-              icon={<Plus size={14} />}
-              onClick={() => setGrantRow({ open: true, row: null })}
-              type="primary"
-            >
-              {m.esports_members_act_grant()}
-            </Button>
-          </div>
-        </div>
+              ],
+            },
+          ]}
+        />
       </Card>
       <MembersTable
         loading={listQuery.isFetching}
+        onCreate={() => setGrantRow({ open: true, row: null })}
         onRefresh={refetch}
         onRenew={(row) => setGrantRow({ open: true, row })}
         onTerminate={(row) => setTerminateRow(row)}

@@ -5,6 +5,7 @@
   "esports_feedback_tickets_filter_pending": "待处理",
   "esports_feedback_tickets_filter_replied": "已回复",
   "esports_feedback_tickets_filter_closed": "已关闭",
+  "esports_feedback_tickets_filter_status": "状态",
   "esports_feedback_tickets_col_user": "用户",
   "esports_feedback_tickets_col_category": "分类",
   "esports_feedback_tickets_col_content": "反馈内容",

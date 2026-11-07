@@ -1,7 +1,7 @@
 import type { MembershipSummary } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/activation_admin_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TableProps } from "antd";
-import { Tag, Typography } from "antd";
+import { Button, Tag, Typography } from "antd";
 import { Ban, FileSearch, RefreshCw } from "lucide-react";
 import { ActionIconButton } from "#/components/action-icon-button";
 import { m } from "#/paraglide/messages";
@@ -35,6 +35,7 @@ export const isLive = (row: MembershipSummary): boolean =>
 interface MembersTableProps {
   rows: MembershipSummary[];
   loading?: boolean;
+  onCreate: () => void;
   onRefresh: () => void;
   onRenew: (row: MembershipSummary) => void;
   onTerminate: (row: MembershipSummary) => void;
@@ -44,6 +45,7 @@ interface MembersTableProps {
 export function MembersTable({
   rows,
   loading,
+  onCreate,
   onRefresh,
   onRenew,
   onTerminate,
@@ -164,6 +166,11 @@ export function MembersTable({
       pagination={pagination}
       rowKey="userId"
       toolbar={{
+        extra: (
+          <Button color="primary" onClick={onCreate} variant="filled">
+            {m.esports_members_act_grant()}
+          </Button>
+        ),
         labels: {
           density: m.common_toolbar_density(),
           densityLarge: m.common_toolbar_density_large(),

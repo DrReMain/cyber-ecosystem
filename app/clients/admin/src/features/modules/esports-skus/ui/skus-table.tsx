@@ -1,7 +1,7 @@
 import type { AdminSku } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/sku_admin_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TableProps } from "antd";
-import { Tag, Typography } from "antd";
+import { Button, Tag, Typography } from "antd";
 import { CircleCheckBig, CircleOff, PenLine } from "lucide-react";
 import { ActionIconButton } from "#/components/action-icon-button";
 import { m } from "#/paraglide/messages";
@@ -15,6 +15,7 @@ const kindTags: Record<string, { color: string; label: () => string }> = {
 interface SkusTableProps {
   rows: AdminSku[];
   loading?: boolean;
+  onCreate: () => void;
   onRefresh: () => void;
   onReprice: (row: AdminSku) => void;
   onToggleShelf: (row: AdminSku) => void;
@@ -23,6 +24,7 @@ interface SkusTableProps {
 export function SkusTable({
   rows,
   loading,
+  onCreate,
   onRefresh,
   onReprice,
   onToggleShelf,
@@ -132,6 +134,11 @@ export function SkusTable({
       // the table under the pinned action column.
       scroll={{ x: 880 }}
       toolbar={{
+        extra: (
+          <Button color="primary" onClick={onCreate} variant="filled">
+            {m.esports_skus_new()}
+          </Button>
+        ),
         labels: {
           density: m.common_toolbar_density(),
           densityLarge: m.common_toolbar_density_large(),

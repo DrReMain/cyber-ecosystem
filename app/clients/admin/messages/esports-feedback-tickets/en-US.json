@@ -5,6 +5,7 @@
   "esports_feedback_tickets_filter_pending": "Pending",
   "esports_feedback_tickets_filter_replied": "Replied",
   "esports_feedback_tickets_filter_closed": "Closed",
+  "esports_feedback_tickets_filter_status": "Status",
   "esports_feedback_tickets_col_user": "Member",
   "esports_feedback_tickets_col_category": "Category",
   "esports_feedback_tickets_col_content": "Feedback",

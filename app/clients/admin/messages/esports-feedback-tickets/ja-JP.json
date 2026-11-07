@@ -5,6 +5,7 @@
   "esports_feedback_tickets_filter_pending": "対応待ち",
   "esports_feedback_tickets_filter_replied": "回答済み",
   "esports_feedback_tickets_filter_closed": "終了",
+  "esports_feedback_tickets_filter_status": "状態",
   "esports_feedback_tickets_col_user": "ユーザー",
   "esports_feedback_tickets_col_category": "分類",
   "esports_feedback_tickets_col_content": "内容",

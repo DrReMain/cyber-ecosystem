@@ -31,7 +31,6 @@
 | PAY2 通道联调(lzx) | 已毕=行政件全清+Native 腿全生命周期+0.01 真钱闭环+全额退款腿+NO_STATEMENT_EXIST 修(11-05..06)。余=JSAPI 腿真实 appid+绑定域(上线清单);微信侧活证(G-402/403/404 尾);微信外降级「引导微信内打开」(D-BF);XFF 信任拨盘台账收口;query 无触发器(convergeStaleAfter=10m)与 boot 放弃日 ERROR 两裁点随刀 | W4 起 | M |
 | MIG1 冻结件+预演(lzx 专职,D-BB) | 已毕=五阶段+生产副本直载+谱系三源互证+census+回滚腿彩排+密码面实数定谳(11-06)。余=snapshot 承载表(P26)+recompute 口径标与重放窗口(P26.1,含曲线入码 sizing ⑧);**预演 11-15**(D-BE 绿门含回滚腿);预演前过 D-MIG-1(school 域处置)/D-MIG-2(账号冲突消解);cutover 迁移执行同专职 | P26/P26.1+D-MIG-1/2 | M |
 | U2 ctr 原型对齐(harness 重激活) | 渲染可达已毕(U1);余=按 HARNESS-SOP 重激活保真 harness 对原型核视觉;**B-6(done 页三差)修法在此**;趋势进阶 CTA 偏离处置随本片(见 prd 待裁) | 走查轮前 | M |
-| U3 admin 对齐基座范式 | 三裁定落地=列表页 tab 筛选族迁基座 Filter/Segmented 例外形;容器层级与留白对齐骨架基线;drawer 内简单列表降级朴素组件;ActionIconButton href locale 前缀族四实例同修 | — | S-M |
 | M2-4 trace Tab | 暂缓后置(11-03 用户裁;P22 否决窗 11-14 后复评) | P22 | S |
 | Q 线尾(役毕残件) | ⑧曲线入码 sizing(随 P26.1);consent 渠道列契约微欠(一句裁,可并 P23);E4 三配置模块=P4;隐私真文「7 天保留」句 vs 反推续用任意龄=ljr/法务车道 | P26.1/P4/P23 | S |
 

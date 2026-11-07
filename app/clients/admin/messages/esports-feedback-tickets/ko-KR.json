@@ -5,6 +5,7 @@
   "esports_feedback_tickets_filter_pending": "대기 중",
   "esports_feedback_tickets_filter_replied": "답변 완료",
   "esports_feedback_tickets_filter_closed": "종료",
+  "esports_feedback_tickets_filter_status": "상태",
   "esports_feedback_tickets_col_user": "사용자",
   "esports_feedback_tickets_col_category": "분류",
   "esports_feedback_tickets_col_content": "내용",

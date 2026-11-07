@@ -127,3 +127,9 @@
 - S4 活档重写毕:plan 重立(未完片+缺陷工单节);progress 执法剪枝律(5567 字巨行→索引行,「修复件待提交」僵尸句清除);README 体制行修正(走查/开发合流如实记档);design-alignment/verify README 指针重锚。
 - S5 八域覆盖核验毕(并行 subagent+主会话复核):85 页全归属零悬空;85 RPC=live 69/e2e-only 11/单测-only 1(SwitchMatchGenre)/全链零执行 3(SetRenewalReminder/UpdateAnnouncement/OfflineAnnouncement)/零消费 1(ListOrders);锚失真 9 处;新偏离 6 项(N-1 趋势 CTA 最重);产出=verify/coverage-map.md。
 - S6 矩阵重立毕:58 例(X13/C30/A15;新增 C1-7 引擎扫尾+C6-6 服务端拒绝腿族),态列全域清零(R2 起正式阶段重走);R-empty 空号角色入 §2;三律入 §1。
+
+## 2026-11-07 U3 · admin 对齐基座范式(hzy,用户「直接开始任务吧」直派)
+
+- 三裁定全落:①tab 筛选族灭——feedback-tickets/members/orders/skus 四列表页迁基座 Filter(状态/来源/订单号=Select;line Tabs 禁形绝迹;URL search 可分享性保留=Filter 写 status/tab/state/scope/shelf 入 URL 且过滤即归页);②drawer 降级——tests 题库 drawer 重表 DataTable→朴素 Table(零嵌卡/零工具栏钮,character_counter 10 行+分页实证);③容器逐页审计(17 面)——四页 gap-3→gap-4、feedback/order 两详情页补 p-4、announcements 双卡拆、tests/activation-codes/agreement-consents 卡内 Select 与 activation-batch Segmented=例外形判合规。
+- ActionIconButton href locale 前缀族组件缝一次修六实例:锚点侧 localizeUrl(router input rewrite 自剥前缀,左键导航不变;/ar-SA/ members 实证锚点带前缀=复制/新标签保语言)。
+- 门禁:admin build+typecheck+check 三绿;6 新词键×5 locale(usage-prefix 律);live 走查 5 面存证 $TMPDIR/cyber-dev/u3-1107/。
